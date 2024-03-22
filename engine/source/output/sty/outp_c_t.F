@@ -1,32 +1,32 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  OUTP_C_T                      source/output/sty/outp_c_t.F  
 Chd|-- called by -----------
 Chd|        GENOUTP                       source/output/sty/genoutp.F   
 Chd|-- calls ---------------
 Chd|        SPMD_RGATHER9_1COMM           source/mpi/interfaces/spmd_outp.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE OUTP_C_T(ITENS ,KEY   ,TEXT  ,ELBUF_TAB,
      .                    IPARG ,EPSDOT,DD_IAD,SIZLOC   ,SIZP0,SIZ_WR)
@@ -45,8 +45,6 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "param_c.inc"
 #include      "units_c.inc"
-#include      "scr01_c.inc"
-#include      "scr05_c.inc"
 #include      "task_c.inc"
 #include      "scr16_c.inc"
 C-----------------------------------------------
@@ -375,13 +373,13 @@ Chd|-- calls ---------------
 Chd|        C_TF_NE                       source/output/sty/c_tf_ne.F   
 Chd|        SPMD_RGATHER9_1COMM           source/mpi/interfaces/spmd_outp.F
 Chd|        DRAPE_MOD                     share/modules/drape_mod.F     
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        STACK_MOD                     share/modules/stack_mod.F     
 Chd|====================================================================
       SUBROUTINE OUTP_C_TF(ITENS ,KEY   ,TEXT  ,ELBUF_TAB,IPARG,
      .                     DD_IAD,SIZLOC,SIZP0 ,THKE     ,GEO  ,
-     .                     IGEO  ,STACK ,DRAPE_Q4, DRAPE_T3 ,IXC  ,
-     .                     IXTG  ,SIZ_WR)
+     .                     IGEO  ,STACK ,DRAPE_SH4N, DRAPE_SH3N ,IXC  ,
+     .                     IXTG  ,SIZ_WR,DRAPEG)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -399,9 +397,6 @@ C-----------------------------------------------
 #include      "units_c.inc"
 #include      "task_c.inc"
 #include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "scr01_c.inc"
-#include      "scr05_c.inc"
 #include      "scr16_c.inc"
 #include      "mvsiz_p.inc"
 C-----------------------------------------------
@@ -436,7 +431,8 @@ C
       TYPE(BUF_LAY_) ,POINTER :: BUFLY
       TYPE(G_BUFEL_) ,POINTER :: GBUF
       TYPE(L_BUFEL_) ,POINTER :: LBUF
-      TYPE(DRAPE_) :: DRAPE_Q4, DRAPE_T3
+      TYPE(DRAPE_) :: DRAPE_SH4N(NUMELC_DRAPE), DRAPE_SH3N(NUMELTG_DRAPE)
+      TYPE(DRAPEG_) :: DRAPEG
 C-----------------------------------------------
         IF (ISPMD == 0) THEN
           WRITE(IUGEO,'(2A)')'/SHELL     /TENSOR    /',KEY
@@ -553,8 +549,8 @@ C------------------------
      .                         ITY          ,ISTRAIN  ,JJ   ,WA    ,1     ,
      .                         NLAY         ,NPTR     ,NPTS ,ITHK  ,NFT   ,
      .                         THKE         ,NPG      ,IGTYP,GEO   ,IGEO  ,
-     .                         IXFEM        ,ISUBSTACK,STACK,DRAPE_Q4, DRAPE_T3,
-     .                         IXC          ,IXTG     ,MPT  )
+     .                         IXFEM        ,ISUBSTACK,STACK,DRAPE_SH4N, DRAPE_SH3N,
+     .                         IXC          ,IXTG     ,MPT  ,DRAPEG )
                 ELSE
                   IF (MLW == 1 .OR. MLW == 3 .OR. MLW == 23) THEN
                     DO I=LFT,LLT
@@ -952,7 +948,7 @@ Chd|-- called by -----------
 Chd|        GENOUTP                       source/output/sty/genoutp.F   
 Chd|        OUTP_ARSZ_CT                  source/mpi/interfaces/spmd_outp.F
 Chd|-- calls ---------------
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE COUNT_ARSZ_CT(IPARG,DD_IAD,WASZ,SIZ_WRITE,ELBUF_TAB)
 C-----------------------------------------------

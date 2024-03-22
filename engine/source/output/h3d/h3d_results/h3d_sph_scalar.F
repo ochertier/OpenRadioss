@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  H3D_SPH_SCALAR                source/output/h3d/h3d_results/h3d_sph_scalar.F
 Chd|-- called by -----------
@@ -27,7 +27,7 @@ Chd|        GENH3D                        source/output/h3d/h3d_results/genh3d.F
 Chd|-- calls ---------------
 Chd|        H3D_WRITE_SCALAR              source/output/h3d/h3d_results/h3d_write_scalar.F
 Chd|        INITBUF                       share/resol/initbuf.F         
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        INITBUF_MOD                   share/resol/initbuf.F         
 Chd|        SCHLIEREN_MOD                 share/modules/schlieren_mod.F 
 Chd|        STACK_MOD                     share/modules/stack_mod.F     
@@ -35,26 +35,25 @@ Chd|====================================================================
       SUBROUTINE H3D_SPH_SCALAR(
      .                  ELBUF_TAB ,SPH_SCALAR      ,IFUNC     ,IPARG       ,GEO        ,
      .                  KXSP      ,PM        ,IPART       ,
-     .                  EL2FA     ,NBF       ,IXUR      ,IADP        ,
+     .                  EL2FA     ,NBF       ,IADP        ,
      .                  NBF_L     ,EHOUR     ,ANIM      ,NBPART      ,IADG       ,
      .                  IPM       ,IGEO      ,THKE      ,ERR_THK_SH4 ,ERR_THK_SH3,
      .                  INVERT    ,X         ,V         ,W           ,
      .                  NV46      ,NERCVOIS  ,NESDVOIS  ,LERCVOIS    ,LESDVOIS,
      .                  STACK     ,ID_ELEM   ,IPARTSP   ,IUVAR_INPUT ,H3D_PART    ,
-     .                  IS_WRITTEN_SPH,INFO1,KEYWORD    ,SPBUF       )
+     .                  IS_WRITTEN_SPH,INFO1,KEYWORD    ,SPBUF       ,ID          )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE INITBUF_MOD
       USE ELBUFDEF_MOD    
       USE SCHLIEREN_MOD 
-      USE STACK_MOD               
+      USE STACK_MOD
+      USE NAMES_AND_TITLES_MOD, ONLY: NCHARLINE100
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "chara_c.inc"
-#include      "nchara_c.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -62,16 +61,9 @@ C-----------------------------------------------
 #include      "mvsiz_p.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr01_c.inc"
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
-#include      "scr14_c.inc"
 #include      "scr17_c.inc"
-#include      "scr25_c.inc"
 #include      "param_c.inc"
-#include      "rnur_c.inc"
 #include      "task_c.inc"
-#include      "spmd_c.inc"
 #include      "sphcom.inc"
 #include      "mmale51_c.inc"
 C-----------------------------------------------
@@ -80,13 +72,14 @@ C-----------------------------------------------
       my_real
      .   SPH_SCALAR(*),X(3,*),V(3,*),W(3,*),THKE(*),EHOUR(*),GEO(NPROPG,*),
      .   ANIM(*),PM(NPROPM,*),ERR_THK_SH4(*), ERR_THK_SH3(*)
-      INTEGER IPARG(NPARG,*),KXSP(NISP,*),EL2FA(*),IFUNC,NBF,IXUR(NIXUR,*),
+      INTEGER IPARG(NPARG,*),KXSP(NISP,*),EL2FA(*),IFUNC,NBF,
      .   IADP(*),NBF_L, NBPART,IADG(NSPMD,*),IPM(NPROPMI,*),
      .   IGEO(NPROPGI,*),INVERT(*), NV46,ID_ELEM(*),IPARTSP(*),
      .   H3D_PART(*),IS_WRITTEN_SPH(*),INFO1,IUVAR_INPUT,IPART(LIPART1,*)
       TYPE (ELBUF_STRUCT_), DIMENSION(NGROUP), TARGET :: ELBUF_TAB
       TYPE (STACK_PLY) :: STACK
-      CHARACTER*ncharline KEYWORD
+      CHARACTER(NCHARLINE100) :: KEYWORD
+      INTEGER, INTENT(IN) :: ID
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -111,20 +104,20 @@ C-----------------------------------------------
      .        OFFSET,IHBE,NPTM,NPG, MPT,IPT,IADD,IADR,IPMAT,IFAILT,
      .        IIGEO,IADI,ISUBSTACK,ITHK,NERCVOIS(*),NESDVOIS(*),
      .        LERCVOIS(*),LESDVOIS(*),NB_PLYOFF,IUVAR,IPRT,IADBUF,
-     .        NUPARAM,IMAT
+     .        NUPARAM,IMAT,IEOS
       INTEGER PID(MVSIZ),MAT(MVSIZ),MATLY(MVSIZ*100),FAILG(100,MVSIZ),
      .        PTE(4),PTP(4),PTMAT(4),PTVAR(4),NPT_ALL,IPLY,
      .        ID_ELEM_TMP(MVSIZ),NIX,ISOLNOD,NPTG,TSHELL,TSH_ORT,
      .        IOK_PART(MVSIZ),JJ(6),IRUPT,IOK,NPG_PLANE,NUMLAY,IJK,IIR,
-     .        IS_WRITTEN_VALUE(MVSIZ),IPOS,ITRIMAT
+     .        IS_WRITTEN_VALUE(MVSIZ),IPOS,ITRIMAT,NVAREOS
       REAL R4
       TYPE(G_BUFEL_)  ,POINTER :: GBUF     
       TYPE(L_BUFEL_)  ,POINTER :: LBUF  
       TYPE(BUF_MAT_)  ,POINTER :: MBUF      
       TYPE(BUF_LAY_)  ,POINTER :: BUFLY     
       TYPE(BUF_FAIL_) ,POINTER :: FBUF 
-      my_real,
-     .  DIMENSION(:), POINTER  :: UVARF,DAMF,DFMAX,TDELE
+      TYPE(BUF_EOS_)  ,POINTER :: EBUF
+      my_real, DIMENSION(:), POINTER  :: UVARF,DAMF,DFMAX,TDELE
       TYPE(L_BUFEL_) ,POINTER  :: LBUF1,LBUF2,LBUF3,LBUF4
 C-----------------------------------------------
       DO I=1,NUMSPH
@@ -133,7 +126,7 @@ C-----------------------------------------------
 c
       DO 900 NG=1,NGROUP
 
-        CALL INITBUF (IPARG    ,NG      ,                    
+        CALL INITBUF(IPARG    ,NG      ,                    
      2          MLW     ,NEL     ,NFT     ,IAD     ,ITY     ,  
      3          NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,  
      4          JTHE    ,JLAG    ,JMULT   ,JHBE    ,JIVF    ,  
@@ -151,7 +144,7 @@ c
           DO I=1,NEL
             VALUE(I) = ZERO
             IS_WRITTEN_VALUE(I) = 0
-          ENDDO	     
+          ENDDO       
 C-----------------------------------------------
           IF (ITY == 51) THEN
 c           SPH ELEMENTS
@@ -181,13 +174,13 @@ C-----------------------------------------------
 C Mass computation
 C-----------------------------------------------
             IF (KEYWORD == 'MASS') THEN
-     	      GBUF => ELBUF_TAB(NG)%GBUF
-     	      DO I=1,NEL
-     	        N = I + NFT
-   	        IPRT=IPARTSP(N)                
-     	        MT  =IPART(1,IPRT)             
-     	        MASS(I)=PM(89,MT)*GBUF%VOL(I)  
-     	      ENDDO
+                GBUF => ELBUF_TAB(NG)%GBUF
+                DO I=1,NEL
+                  N = I + NFT
+                  IPRT=IPARTSP(N)                
+                  MT  =IPART(1,IPRT)             
+                  MASS(I)=PM(89,MT)*GBUF%VOL(I)  
+                ENDDO
             ENDIF
 C-----------
             IF (MLW /= 0 .and. MLW /= 13 .and. IGTYP /= 0) THEN
@@ -202,10 +195,10 @@ C--------------------------------------------------
 C--------------------------------------------------
               ELSEIF(KEYWORD == 'DIAMETER')THEN
 C--------------------------------------------------
-             	DO I=1,NEL
-             	  VALUE(I) = SPBUF(1,NFT+I)  
+          DO I=1,NEL
+            VALUE(I) = SPBUF(1,NFT+I)  
                   IS_WRITTEN_VALUE(I) = 1  
-             	ENDDO
+          ENDDO
 C--------------------------------------------------
               ELSEIF(KEYWORD == 'EPSP')THEN
 C--------------------------------------------------
@@ -218,10 +211,10 @@ C--------------------------------------------------
 C--------------------------------------------------
               ELSEIF(KEYWORD == 'DENS')THEN
 C----------------------------------------------------
-             	DO I=1,NEL
-             	  VALUE(I) = GBUF%RHO(I)
+          DO I=1,NEL
+            VALUE(I) = GBUF%RHO(I)
                   IS_WRITTEN_VALUE(I) = 1 
-             	ENDDO
+          ENDDO
 C-------------------------------------------------- 
               ELSEIF (KEYWORD == 'EINTM' .OR. KEYWORD == 'ENER')THEN
 C-------------------------------------------------- 
@@ -332,7 +325,7 @@ C--------------------------------------------------
                   S2=S22 + P
                   S3=S33 + P
                   VONM2= THREE*(S4*S4 + S5*S5 + S6*S6 +
-     .            	 HALF*(S1*S1+S2*S2+S3*S3) )
+     .               HALF*(S1*S1+S2*S2+S3*S3) )
                   VONM= SQRT(VONM2)
                   VALUE(I) = VONM
                   IS_WRITTEN_VALUE(I) = 1 
@@ -352,7 +345,7 @@ C             VISCOSITE TURBULENTE
                 DO I=1,NEL
                   IF((MLW == 6 .OR. MLW == 17).AND.JTURB/=0)THEN
                     IPRT=IPARTSP(N)
-      		    MT  =IPART(1,IPRT)
+              MT  =IPART(1,IPRT)
                     VALUE(I)=PM(81,MT)*GBUF%RK(I)**2/
      .                     MAX(EM15,GBUF%RE(I))
                     IS_WRITTEN_VALUE(I) = 1  
@@ -441,8 +434,8 @@ C--------------------------------------------------
 C--------------------------------------------------
               ELSEIF(KEYWORD == 'USER')THEN
 C--------------------------------------------------
-                IUS = IFUNC - 20				      
-                NUVAR = IPM(8,MT)				    
+                IUS = IFUNC - 20              
+                NUVAR = IPM(8,MT)            
                 IF (NUVAR > 0) THEN
                   DO I=1,NEL
                    IF(IUS <= NUVAR)THEN
@@ -468,14 +461,34 @@ C--------------------------------------------------
 C--------------------------------------------------        
               ELSEIF(KEYWORD == 'DAMA') THEN
 C--------------------------------------------------
+                 DO I = 1,NEL
+                   VALUE(I) = ZERO
+                 ENDDO
                  NFAIL = ELBUF_TAB(NG)%BUFLY(1)%NFAIL  
-                 DO IR=1,NFAIL  											  
+                 DO IR=1,NFAIL                          
                    DFMAX=>
      .               ELBUF_TAB(NG)%BUFLY(1)%FAIL(1,1,1)%FLOC(IR)%DAMMX
-                   DO I=1,NEL					
-                       VALUE(I) = DFMAX(I)
-                       IS_WRITTEN_VALUE(I) = 1  	
+                   DO I=1,NEL
+                     VALUE(I) = MAX(DFMAX(I),VALUE(I))
+                     IS_WRITTEN_VALUE(I) = 1  
                    ENDDO
+                 ENDDO 
+C--------------------------------------------------        
+              ELSEIF(KEYWORD == 'FAILURE') THEN
+C--------------------------------------------------
+                 DO I = 1,NEL
+                   VALUE(I) = ZERO
+                 ENDDO
+                 NFAIL = ELBUF_TAB(NG)%BUFLY(1)%NFAIL  
+                 DO IR=1,NFAIL 
+                   IF (ELBUF_TAB(NG)%BUFLY(1)%FAIL(1,1,1)%FLOC(IR)%IDFAIL == ID) THEN
+                     DFMAX=>
+     .                ELBUF_TAB(NG)%BUFLY(1)%FAIL(1,1,1)%FLOC(IR)%DAMMX
+                     DO I=1,NEL
+                       VALUE(I) = DFMAX(I)
+                       IS_WRITTEN_VALUE(I) = 1  
+                     ENDDO
+                   ENDIF
                  ENDDO 
 C--------------------------------------------------
               ELSEIF(KEYWORD == 'DOMAIN')THEN
@@ -499,18 +512,18 @@ C--------------------------------------------------
                     VALUE(I) = GBUF%SEQ(I)
                     IS_WRITTEN_VALUE(I) = 1
                   ENDDO
-                ELSE			  ! VON MISES
+                ELSE        ! VON MISES
                   DO I=1,NEL
-                    P = -(GBUF%SIG(JJ(1) + I)		     
-     .              	+ GBUF%SIG(JJ(2) + I)		     
-     .              	+ GBUF%SIG(JJ(3) + I)) * THIRD
-                    S1=GBUF%SIG(JJ(1) + I) + P  		
-                    S2=GBUF%SIG(JJ(2) + I) + P  		
-                    S3=GBUF%SIG(JJ(3) + I) + P  		
-                    VONM2= THREE*(GBUF%SIG(JJ(4) + I)**2 +	
-     .              		  GBUF%SIG(JJ(5) + I)**2 +	
-     .              		  GBUF%SIG(JJ(6) + I)**2 +	
-     .              	    HALF*(S1*S1+S2*S2+S3*S3)) 	  
+                    P = -(GBUF%SIG(JJ(1) + I)         
+     .                + GBUF%SIG(JJ(2) + I)         
+     .                + GBUF%SIG(JJ(3) + I)) * THIRD
+                    S1=GBUF%SIG(JJ(1) + I) + P  
+                    S2=GBUF%SIG(JJ(2) + I) + P  
+                    S3=GBUF%SIG(JJ(3) + I) + P  
+                    VONM2= THREE*(GBUF%SIG(JJ(4) + I)**2 +
+     .                    GBUF%SIG(JJ(5) + I)**2 +
+     .                    GBUF%SIG(JJ(6) + I)**2 +
+     .                    HALF*(S1*S1+S2*S2+S3*S3))     
                     VONM= SQRT(VONM2) 
                     VALUE(I) = VONM
                     IS_WRITTEN_VALUE(I) = 1
@@ -569,10 +582,26 @@ C--------------------------------------------------
                   ENDIF
                   IS_WRITTEN_VALUE(I) = 1
                 ENDDO
+C-------------------------------------------------- 
+              ELSEIF(KEYWORD == 'TILLOTSON') THEN  
+C-------------------------------------------------- 
+                 N = I + NFT
+                 IPRT=IPARTSP(N)                                           
+                 MT  =IPART(1,IPRT) 
+                 IEOS = IPM(4,MT)                             
+                 IF(IEOS == 3)THEN                            
+                   EBUF => ELBUF_TAB(NG)%BUFLY(1)%EOS(1,1,1)   
+                   NVAREOS = ELBUF_TAB(NG)%BUFLY(1)%NVAR_EOS  
+                   DO  I=1,NEL                                
+                     VALUE(I) = EBUF%VAR(I)                   
+                     IS_WRITTEN_VALUE(I) = 1                  
+                   ENDDO                                      
+                 ENDIF                                                       
+C-------------------------------------------------- 
               ENDIF   ! IFUNC
 C-------------------------------------------------- 
               CALL H3D_WRITE_SCALAR(IOK_PART,IS_WRITTEN_SPH,SPH_SCALAR,NEL,OFFSET,NFT,
-     .   			  VALUE,IS_WRITTEN_VALUE)
+     .           VALUE,IS_WRITTEN_VALUE)
             ENDIF
           ENDIF
        ENDIF

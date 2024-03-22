@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  SIGEPS73C                     source/materials/mat/mat073/sigeps73c.F
 Chd|-- called by -----------
@@ -31,20 +31,23 @@ Chd|        INTERFACE_TABLE_MOD           share/modules/table_mod.F
 Chd|        TABLE_MOD                     share/modules/table_mod.F     
 Chd|====================================================================
       SUBROUTINE SIGEPS73C(
-     1     NEL    ,NUPARAM,NUVAR   ,TIME   ,TIMESTEP,
-     2     UPARAM  ,RHO0  ,AREA    ,EINT   ,THKLY   ,
-     4     EPSPXX ,EPSPYY ,EPSPXY  ,EPSPYZ  ,EPSPZX ,
-     5     DEPSXX ,DEPSYY ,DEPSXY  ,DEPSYZ  ,DEPSZX ,
-     6     EPSXX  ,EPSYY  ,EPSXY   ,EPSYZ   ,EPSZX  ,
-     7     SIGOXX ,SIGOYY ,SIGOXY  ,SIGOYZ  ,SIGOZX ,
-     8     SIGNXX ,SIGNYY ,SIGNXY  ,SIGNYZ  ,SIGNZX ,
-     9     SIGVXX ,SIGVYY ,SIGVXY  ,SIGVYZ  ,SIGVZX ,
-     A     SOUNDSP,VISCMAX,THK     ,PLA     ,UVAR   ,
-     B     OFF    ,NGL    ,ITABLE  ,ETSE   ,
-     C     GS     ,SIGY   ,DPLA1   ,EPSP    ,TABLE  ,
-     D     VOL    ,TEMPEL ,DIE     ,COEF    ,NPF    ,
-     E     NFUNC  ,IFUNC  ,TF     ,SHF      ,HARDM  ,
-     F     SEQ_OUTPUT,INLOC,DPLANL   )
+     1   NEL,       NUPARAM,   NUVAR,     TIME,
+     2   TIMESTEP,  UPARAM,    RHO0,      AREA,
+     3   EINT,      THKLY,     EPSPXX,    EPSPYY,
+     4   EPSPXY,    EPSPYZ,    EPSPZX,    DEPSXX,
+     5   DEPSYY,    DEPSXY,    DEPSYZ,    DEPSZX,
+     6   EPSXX,     EPSYY,     EPSXY,     EPSYZ,
+     7   EPSZX,     SIGOXX,    SIGOYY,    SIGOXY,
+     8   SIGOYZ,    SIGOZX,    SIGNXX,    SIGNYY,
+     9   SIGNXY,    SIGNYZ,    SIGNZX,    SIGVXX,
+     A   SIGVYY,    SIGVXY,    SIGVYZ,    SIGVZX,
+     B   SOUNDSP,   VISCMAX,   THK,       PLA,
+     C   UVAR,      OFF,       NGL,       ITABLE,
+     D   ETSE,      GS,        SIGY,      DPLA1,
+     E   EPSP,      TABLE,     VOL,       TEMPEL,
+     F   DIE,       COEF,      NPF,       NFUNC,
+     G   IFUNC,     TF,        SHF,       HARDM,
+     H   SEQ_OUTPUT,INLOC,     DPLANL,    JTHE)
 C-----------------------------------------------
       USE TABLE_MOD
       USE INTERFACE_TABLE_MOD
@@ -56,12 +59,10 @@ C-----------------------------------------------
 C   G L O B A L   P A R A M E T E R S
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
-#include      "param_c.inc"
-#include      "com01_c.inc"
-#include      "vect01_c.inc"
 C-----------------------------------------------
 C   I N P U T   A R G U M E N T S
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: JTHE
       INTEGER NEL, NUPARAM, NUVAR, NGL(NEL),ITABLE(*),
      .   INLOC
       my_real 
@@ -260,7 +261,7 @@ C
         XX(I,3)=TEMP(I)
       END DO
 C
-      CALL TABLE_VINTERP(TABLE(FUNC_TAB),NEL,IPOS,XX,YLD,DYDX)
+      CALL TABLE_VINTERP(TABLE(FUNC_TAB),NEL,NEL,IPOS,XX,YLD,DYDX)
 C
 
       DO I=1,NEL
@@ -281,7 +282,7 @@ C
          XX(I,2)=EPSP(I)*XFAC
          XX(I,3)=TEMP(I)
        END DO      
-       CALL TABLE_VINTERP(TABLE(FUNC_TAB),NEL,IPOS,XX,YK,DYDX)
+       CALL TABLE_VINTERP(TABLE(FUNC_TAB),NEL,NEL,IPOS,XX,YK,DYDX)
 
        DO I=1,NEL
 C        ECROUISSAGE CINEMATIQUE
@@ -408,7 +409,7 @@ C------------------------------------------
         DR  =A11(I)*DR0  !!!!
         P_1=ONE/(ONE + B_1(I)*DR)
         P_2=ONE/(ONE + B_2(I)*DR)
-        P_3=ONE/(ONE + B_3(I)*DR)	
+        P_3=ONE/(ONE + B_3(I)*DR)
         S1=S11(I)*P_1
         S2=S22(I)*P_2
         SIGNXX(I)=JQ(I)*(S1-S2*Q12(I))
@@ -536,7 +537,7 @@ c        print *,xx(i,2)
         XX(I,3)=TEMP(I)
       END DO      
 C
-      CALL TABLE_VINTERP(TABLE(FUNC_TAB),NEL,IPOS,XX,YLD,DYDX)
+      CALL TABLE_VINTERP(TABLE(FUNC_TAB),NEL,NEL,IPOS,XX,YLD,DYDX)
 C
       DO I=1,NEL
         YLD(I) = YFAC*YLD(I)
@@ -556,7 +557,7 @@ C
          XX(I,2)=EPSP(I)*XFAC
          XX(I,3)=TEMP(I)
        END DO      
-       CALL TABLE_VINTERP(TABLE(FUNC_TAB),NEL,IPOS,XX,YK,DYDX)
+       CALL TABLE_VINTERP(TABLE(FUNC_TAB),NEL,NEL,IPOS,XX,YK,DYDX)
 
        DO I=1,NEL
 C        ECROUISSAGE CINEMATIQUE
@@ -682,7 +683,7 @@ C------------------------------------------
         DR  =A1*DR0
         P_1=ONE/(ONE + B_1(I)*DR)
         P_2=ONE/(ONE + B_2(I)*DR)
-        P_3=ONE/(ONE + B_3(I)*DR)	
+        P_3=ONE/(ONE + B_3(I)*DR)
         S1=S11(I)*P_1
         S2=S22(I)*P_2
         SIGNXX(I)=JQ(I)*(S1-S2*Q12(I))

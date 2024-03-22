@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  EOSMAIN                       eos/eosmain.F                 
 Chd|-- called by -----------
@@ -54,7 +54,7 @@ Chd|====================================================================
      3                   DVOL  ,DF    ,VNEW   ,MAT   ,PSH   ,
      4                   PNEW  ,DPDM  ,DPDE   ,THETA ,ECOLD ,
      5                   BUFMAT,SIG   ,MU_OLD ,MLW   ,POLD  ,
-     6                   NPF   ,TF)
+     6                   NPF   ,TF    ,VAREOS ,NVAREOS)
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C-----------------------------------------------
@@ -63,7 +63,6 @@ C depending on EOSTYP(INTEGER) value.
       !------------------------------------!                
       !  IEOS     !    EOS                 !             
       !-----------!------------------------!  
-      !   0       !     LINEAR             !                 
       !   1       !     POLYNOMIAL         !             
       !   2       !     GRUNEISEN          !             
       !   3       !     TILLOTSON          !             
@@ -81,6 +80,7 @@ C depending on EOSTYP(INTEGER) value.
       !  15       !     JWL                ! internal use : INIMAP   
       !  16       !     IDEALGAS_VT        ! 2022.0
       !  17       !     TABULATED          ! 2022.2
+      !  18       !     LINEAR             ! 2019.0                
       !------------------------------------!  
 !
 !  input   EINT(:) :  rho.e   (law151    , unit J/m**3)
@@ -110,14 +110,10 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER MAT(NEL),IFLAG, EOSTYP, NEL, MLW
-      my_real
-     .   PM(NPROPM,NUMMAT),BUFMAT(NEL)   ,OFF(NEL)  , 
-     .   EINT(NEL) ,RHO(NEL)  ,RHO0(NEL) , 
-     .   MU(NEL)   ,MU2(NEL)  ,ESPE(NEL) ,DVOL(NEL), 
-     .   DF(NEL)   ,VNEW(NEL) ,PSH(NEL)  ,PNEW(NEL),
-     .   DPDM(NEL) ,DPDE(NEL) ,THETA(NEL),ECOLD(NEL),
-     .   SIG(NEL,6), MU_OLD(NEL),POLD(NEL)
+      INTEGER MAT(NEL),IFLAG, EOSTYP, NEL, MLW, NVAREOS
+      my_real PM(NPROPM,NUMMAT),BUFMAT(SBUFMAT),OFF(NEL),EINT(NEL),RHO(NEL),RHO0(NEL),MU(NEL),MU2(NEL),ESPE(NEL),DVOL(NEL), 
+     .        DF(NEL),VNEW(NEL),PSH(NEL),PNEW(NEL),DPDM(NEL),DPDE(NEL),THETA(NEL),ECOLD(NEL),MU_OLD(NEL),POLD(NEL),
+     .        SIG(NEL,6),VAREOS(NVAREOS*NEL)
       INTEGER,INTENT(IN)::NPF(SNPC)
       my_real,INTENT(IN)::TF(STF)
 C-----------------------------------------------
@@ -149,18 +145,10 @@ C-----------------------------------------------
            ENDDO
          ENDIF         
       ENDIF    
-      
-      ! inutile de conserver cela, si PNEW a une expression cumulative avec IEOSTYP=1 mais dans tous les autres cas il est ecrase.
-      ! a quoi bon mettre a 0.0 quelque chose qui va etre ecrase dans le bloc SELECT CASE ce dessous.
-      !IF (IFLAG==1)THEN
-      !  IF (MLW /= 6 .AND. MLW /= 17) THEN
-      !      IF(EOSTYP/=13)PNEW(1:NEL) = ZERO
-      !  ENDIF
-      !ENDIF
            
       SELECT CASE (EOSTYP)
 
-        CASE (0)
+        CASE (18)
          !--------------------------------------------------!
          !         LINEAR EOS                               !
          !--------------------------------------------------! 
@@ -194,7 +182,7 @@ C-----------------------------------------------
          CALL TILLOTSON(
      1                  IFLAG  ,NEL    ,PM     ,OFF    ,EINT  ,MU  ,MU2,      
      2                  ESPE   ,DVOL   ,DF     ,VNEW   ,MAT   ,          
-     3                  PNEW   ,DPDM   ,DPDE   ,THETA  ,ECOLD )  
+     3                  PNEW   ,DPDM   ,DPDE   ,THETA  ,ECOLD ,VAREOS,NVAREOS)  
 
        CASE (4) 
          !--------------------------------------------------!

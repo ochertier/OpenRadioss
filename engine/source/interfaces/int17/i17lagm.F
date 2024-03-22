@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  I17LAGM                       source/interfaces/int17/i17lagm.F
 Chd|-- called by -----------
@@ -45,15 +45,8 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "task_c.inc"
-#include      "warn_c.inc"
-#include      "scr05_c.inc"
-#include      "scr07_c.inc"
-#include      "scr18_c.inc"
-#include      "units_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
-#include      "param_c.inc"
-#include      "couple_c.inc"
       COMMON /I17GLOBI/IE_MIN,IES_MIN
       COMMON /I17GLOBR/VIT_MIN
 C-----------------------------------------------
@@ -159,8 +152,8 @@ c
 c      print *, "dans la boite",XMIN,XMAX,YMIN,YMAX,ZMIN,ZMAX
 c
           LLT = LLT+1
-	  IEL(LLT)=IE
-	  IESL(LLT)=IES
+            IEL(LLT)=IE
+            IESL(LLT)=IES
           DO K=1,4
 C III 1,2,3,4,5,6,7,8, 9,10,11,12,13,14,15,16
             III(LLT,K)   =IXS(K+1,IE)
@@ -212,7 +205,7 @@ c debug
       ENDDO
 C-----------------------------------------------------------------------
 C     calcul de  [L] pour dernier paquet   
-C-----------------------------------------------------------------------	
+C-----------------------------------------------------------------------
       IF(LLT/=0) CALL I17LLL(
      1       LLT ,LLL       ,JLL       ,SLL       ,XLL     ,V       ,
      2       XX  ,YY        ,ZZ        ,III       ,NC      ,IADLL   ,
@@ -249,11 +242,6 @@ C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com08_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -471,7 +459,7 @@ c      ICONT(J,1) = 1
       ENDDO
       IF(J/=0)THEN
         ICONT(J,1) = ICON
-cc	print *,ITASK,':',VIT(J),IE(J),IES(J),NC,J,ICON
+cc  print *,ITASK,':',VIT(J),IE(J),IES(J),NC,J,ICON
       ENDIF
 C-----------------------------------------------------------------------
 C     calcul du contact
@@ -483,8 +471,8 @@ C-----------------------------------------------------------------------
      5             ICONT(1,1),R_CM   ,T_CM   ,R_S    ,T_S    )
 c      IF(J/=0)THEN
 c        do i=1,nc*16
-c	print *,ITASK,':',i,':',LLL(i),JLL(i),XLL(i)
-c	enddo
+c  print *,ITASK,':',i,':',LLL(i),JLL(i),XLL(i)
+c  enddo
 c      ENDIF
 C
 #include "lockoff.inc"
@@ -509,11 +497,6 @@ C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com08_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -625,11 +608,6 @@ C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com08_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -808,9 +786,6 @@ C     REAL
       my_real
      .   R(MVSIZ),S(MVSIZ),T(MVSIZ),NI(MVSIZ,17) 
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,J,IK,NK,ITER,NITERMAX,JTER,NJTERMAX,CONV
@@ -944,9 +919,6 @@ C     REAL
      + R_3M(MVSIZ) ,R_4M(MVSIZ) ,T_3M(MVSIZ) ,T_4M(MVSIZ),
      + NX(MVSIZ) ,NY(MVSIZ) ,NZ(MVSIZ)   
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,ITER,NITERMAX
@@ -957,7 +929,6 @@ C-----------------------------------------------
      +        F1,F2,F3,F4,F5,F6,F7,F8,
      +        CC1,CC2,CC3,DD1,DD2,DD3,DD,D,
      +        A0,AB,BA,A4R,B4T,A5T,B5R,EPS
-C-----------------------------------------------
 C-----------------------------------------------
 C ro = r ri    to = t ti
 C
@@ -1320,7 +1291,7 @@ C
         NI(I,1) = U_M_T * U_M_R * (-R(I)-T(I)-ONE)
         NI(I,2) = U_P_T * U_M_R * (-R(I)+T(I)-ONE)
         NI(I,3) = U_P_T * U_P_R * ( R(I)+T(I)-ONE)
-        NI(I,4) = U_M_T * U_P_R * ( R(I)-T(I)-ONE)	
+        NI(I,4) = U_M_T * U_P_R * ( R(I)-T(I)-ONE)
 C------------------------------------
         A = (ONE-R(I)*R(I))
         NI(I,6) = A * U_P_T
@@ -1384,7 +1355,7 @@ C
           ENDIF
         ELSEIF(D<ZERO)THEN
             R1(I) = -ONE
-            R2(I) =  ONE	    
+            R2(I) =  ONE      
         ELSE
             D = SQRT( D )
             R1(I) = (-B(I) - D) / (TWO*A(I))
@@ -1519,7 +1490,6 @@ C  A6 = (+f1 + f2 + f3 + f4 - 2 f5         - 2 f7        )/4
 C  A7 = (-f1 + f2 + f3 - f4         - 2 f6         + 2 f8)/4   
 C  A8 = (-f1 - f2 + f3 + f4 + 2 f5         - 2 f7        )/4  
 C-----------------------------------------------
-C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
@@ -1584,7 +1554,6 @@ Chd|====================================================================
 C-----------------------------------------------
 C          calcul de Ni(r,t); dNi/dr; dNi/dt; normale
 C-----------------------------------------------
-C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
@@ -1601,9 +1570,6 @@ C     REAL
      .   XX(MVSIZ,*) ,YY(MVSIZ,*),ZZ(MVSIZ,*),
      .   NX(MVSIZ) ,NY(MVSIZ) ,NZ(MVSIZ),
      .   RR(MVSIZ) ,SS(MVSIZ) ,TT(MVSIZ)
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

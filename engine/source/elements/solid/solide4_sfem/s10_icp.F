@@ -1,37 +1,38 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  S10_ICP                       source/elements/solid/solide4_sfem/s10_icp.F
 Chd|-- called by -----------
 Chd|        S10FORC3                      source/elements/solid/solide10/s10forc3.F
 Chd|-- calls ---------------
-Chd|        JACOB_J33                     source/elements/solid/solide8e/s8edefo3.F
+Chd|        JACOB_J33                     source/elements/solid/solide8e/jacob_j33.F
 Chd|====================================================================
-      SUBROUTINE S10_ICP(OFFG,JACG,FACP,NU,
-     .                   DXX, DXY, DXZ,
-     .                   DYX, DYY, DYZ,
-     .                   DZX, DZY, DZZ,
-     .                   VOL0,VOLN,VOL0DP,VOLDP,NEL)
+      SUBROUTINE S10_ICP(
+     1   OFFG,    JACG,    FACP,    NU,
+     2   DXX,     DXY,     DXZ,     DYX,
+     3   DYY,     DYZ,     DZX,     DZY,
+     4   DZZ,     VOL0,    VOLN,    VOL0DP,
+     5   VOLDP,   NEL,     ISMSTR)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -40,13 +41,10 @@ C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
-#include      "param_c.inc"
-#include      "com04_c.inc"
-#include      "com08_c.inc"
-#include      "com01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: ISMSTR
       INTEGER NEL
 C     REAL
       my_real ,DIMENSION(NEL) ,INTENT(IN) :: OFFG,VOL0
@@ -61,7 +59,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr05_c.inc"
-#include      "vect01_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -72,10 +69,10 @@ C-----------------------------------------------
 C----------------------------
       IF(ISMSTR==1.OR.ISMSTR>=10)THEN
         IF (ISMSTR==10) THEN
-          CALL JACOB_J33(JAC,
-     .                DXX, DXY, DXZ,
-     .                DYX, DYY, DYZ,
-     .                DZX, DZY, DZZ)
+          CALL JACOB_J33(
+     1   JAC,     DXX,     DXY,     DXZ,
+     2   DYX,     DYY,     DYZ,     DZX,
+     3   DZY,     DZZ,     NEL)
           DO I=1,NEL
            IF(OFFG(I)==ZERO.OR.ABS(OFFG(I))>ONE) CYCLE
            FAC=TWO_THIRD*NU(I)

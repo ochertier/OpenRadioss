@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  ALEW4                         source/ale/grid/alew4.F       
 Chd|-- called by -----------
@@ -27,13 +27,14 @@ Chd|        ALEWDX                        source/ale/grid/alewdx.F
 Chd|-- calls ---------------
 Chd|        SPMD_EXALEW                   source/mpi/fluid/spmd_cfd.F   
 Chd|        SPMD_EXALEW_PON               source/mpi/fluid/spmd_cfd.F   
+Chd|        ALE_MOD                       ../common_source/modules/ale/ale_mod.F
 Chd|====================================================================
       SUBROUTINE ALEW4(
      1   X       ,D      ,V       ,W     ,WA    ,
      2   NALE    ,IPARG  ,NC      ,WB    ,
      3   IAD_ELEM,FR_ELEM,FR_NBCC ,SIZEN ,ADDCNE,
      4   PROCNE  ,FSKY   ,FSKYV   ,IADX  ,WMA   ,
-     5   NIX,     NIADX  ,ITAB	)
+     5   NIX,     NIADX  ,ITAB  )
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C-----------------------------------------------
@@ -43,6 +44,10 @@ C     X,D,V are allocated to SX,SD,DV=3*(NUMNOD_L+NUMVVOIS_L)
 C      in grid subroutine it may needed to access nodes which
 C      are connected to a remote elem. They are sored in X(1:3,NUMNOD+1:)
 C      Consequently X is defined here X(3,SX/3) instead of X(3,NUMNOD) as usually
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
+      USE ALE_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -56,11 +61,8 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com07_c.inc"
 #include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "scr05_c.inc"
-#include      "task_c.inc"
 #include      "parit_c.inc"
 #include      "tabsiz_c.inc"
 C-----------------------------------------------
@@ -99,42 +101,42 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------
-      IF(ALPHA < ZERO)THEN
- 	DO I=1,NUMNOD
- 	  IF(IABS(NALE(I)) == 1) THEN
- 	    WB(1,I)=ZERO
- 	    WB(2,I)=ZERO
- 	    WB(3,I)=ZERO
- 	  ENDIF
- 	ENDDO
+      IF(ALE%GRID%ALPHA < ZERO)THEN
+          DO I=1,NUMNOD
+            IF(IABS(NALE(I)) == 1) THEN
+              WB(1,I)=ZERO
+              WB(2,I)=ZERO
+              WB(3,I)=ZERO
+            ENDIF
+          ENDDO
 C
-         ALPHA=-ALPHA
+         ALE%GRID%ALPHA=-ALE%GRID%ALPHA
       ENDIF
 C
-      DT0X=DT2/(-VGX+SQRT(VGX**2+ONE))/ALPHA
-      IF(TT == ZERO)VGZ=DT0X
-      VGZ=MAX(DT0X,(VGZ+HALF*DT0X)/THREE_HALF)
-      IF(VGY0 == ZERO)THEN
-       VGY0=VGY
-       VGZ0=VGZ
+      DT0X=DT2/(-ALE%GRID%VGX+SQRT(ALE%GRID%VGX**2+ONE))/ALE%GRID%ALPHA
+      IF(TT == ZERO)ALE%GRID%VGZ=DT0X
+      ALE%GRID%VGZ=MAX(DT0X,(ALE%GRID%VGZ+HALF*DT0X)/THREE_HALF)
+      IF(ALE%GRID%VGY0 == ZERO)THEN
+       ALE%GRID%VGY0=ALE%GRID%VGY
+       ALE%GRID%VGZ0=ALE%GRID%VGZ
       ENDIF
-      VGY=VGY0*VGZ/VGZ0
-      GAM1=GAMMA-ONE
+      ALE%GRID%VGY=ALE%GRID%VGY0*ALE%GRID%VGZ/ALE%GRID%VGZ0
+      GAM1=ALE%GRID%GAMMA-ONE
 C
 C-----------------------------------------------
 C SPMD
 C-----------------------------------------------
       IF (IPARIT /= 0) THEN
 #include "vectorize.inc"
-     	DO I=1,NUMNOD
-     	  IF(IABS(NALE(I)) == 1) THEN
-     	    WA(1,I)=ZERO
-     	    WA(2,I)=ZERO
-     	    WA(3,I)=ZERO
-     	  ENDIF
-     	ENDDO
+          DO I=1,NUMNOD
+            IF(IABS(NALE(I)) == 1) THEN
+              WA(1,I)=ZERO
+              WA(2,I)=ZERO
+              WA(3,I)=ZERO
+            ENDIF
+          ENDDO
       ELSE
-Cel traitement parith/off avec utilisation WBTMP
+
 #include "vectorize.inc"
         DO I=1,NUMNOD
           IF(IABS(NALE(I)) == 1) THEN
@@ -149,7 +151,7 @@ Cel traitement parith/off avec utilisation WBTMP
         ENDDO
       ENDIF
 C
-C mise a 0 de FSKY pour Parith/ON
+C zeroing FSKY for Parith/ON
 C
       IF(IPARIT /= 0) THEN
          IF(IVECTOR == 0) THEN
@@ -194,7 +196,7 @@ C
        IF ((ITY == 1 .OR. ITY == 2) .AND. MQE == 1) THEN
         ISOLNOD=IPARG(28,NG)
          
-c nombre de ressort/noeud=3 
+c number of springs/node=3 
         IF(ITY == 2)THEN
           NTR=4
           DO ITR=1,NTR
@@ -266,32 +268,32 @@ C middle
          IF(ITY == 2)KK=(ITR+1)/2 
          DO  I=1,NEL
 C
- 	  J1(I)=NC(ICT(1,ITR)+1,NFT+I)
- 	  J2(I)=NC(ICT(2,ITR)+1,NFT+I)
+            J1(I)=NC(ICT(1,ITR)+1,NFT+I)
+            J2(I)=NC(ICT(2,ITR)+1,NFT+I)
 C
- 	  DDX(I)=(W(1,J2(I))-W(1,J1(I)))*DT2
- 	  DDY(I)=(W(2,J2(I))-W(2,J1(I)))*DT2
- 	  DDZ(I)=(W(3,J2(I))-W(3,J1(I)))*DT2
- 	  DX(I)=D(1,J2(I))-D(1,J1(I))
- 	  DY(I)=D(2,J2(I))-D(2,J1(I))
- 	  DZ(I)=D(3,J2(I))-D(3,J1(I))
- 	  XX(I)=X(1,J2(I))-X(1,J1(I))
- 	  XY(I)=X(2,J2(I))-X(2,J1(I))
- 	  XZ(I)=X(3,J2(I))-X(3,J1(I))
+            DDX(I)=(W(1,J2(I))-W(1,J1(I)))*DT2
+            DDY(I)=(W(2,J2(I))-W(2,J1(I)))*DT2
+            DDZ(I)=(W(3,J2(I))-W(3,J1(I)))*DT2
+            DX(I)=D(1,J2(I))-D(1,J1(I))
+            DY(I)=D(2,J2(I))-D(2,J1(I))
+            DZ(I)=D(3,J2(I))-D(3,J1(I))
+            XX(I)=X(1,J2(I))-X(1,J1(I))
+            XY(I)=X(2,J2(I))-X(2,J1(I))
+            XZ(I)=X(3,J2(I))-X(3,J1(I))
 C
- 	  DDLF=VX(I,KK)*DDX(I)+VY(I,KK)*DDY(I)+VZ(I,KK)*DDZ(I)
- 	  DLF0=ABS(VX(I,KK)*XX(I)+VY(I,KK)*XY(I)+VZ(I,KK)*XZ(I))
- 	  DLF=(DLF0-VGY)/VGY
- 	  DLF=MIN(DLF,ZERO)
- 	  DLF0=DLF0-0.2*VGY
- 	  DLF0=MIN(DLF0,ZERO)
- 	  DLF=GAMMA+GAM1*DLF*DLF*DLF
- 	  DLF=MIN(DLF,ONE)
- 	  DX(I)=DT2*DLF0*DLF/VGZ/VGZ
- 	  DDL(I)= VGX/VGZ
- 	  IF(DDLF > 0.)DLF=GAMMA
- 	  DL(I) = 1. /VGZ/VGZ *DLF
-c	   DL(I)=0.
+            DDLF=VX(I,KK)*DDX(I)+VY(I,KK)*DDY(I)+VZ(I,KK)*DDZ(I)
+            DLF0=ABS(VX(I,KK)*XX(I)+VY(I,KK)*XY(I)+VZ(I,KK)*XZ(I))
+            DLF=(DLF0-ALE%GRID%VGY)/ALE%GRID%VGY
+            DLF=MIN(DLF,ZERO)
+            DLF0=DLF0-0.2*ALE%GRID%VGY
+            DLF0=MIN(DLF0,ZERO)
+            DLF=ALE%GRID%GAMMA+GAM1*DLF*DLF*DLF
+            DLF=MIN(DLF,ONE)
+            DX(I)=DT2*DLF0*DLF/ALE%GRID%VGZ/ALE%GRID%VGZ
+            DDL(I)= ALE%GRID%VGX/ALE%GRID%VGZ
+            IF(DDLF > 0.)DLF=ALE%GRID%GAMMA
+            DL(I) = 1. /ALE%GRID%VGZ/ALE%GRID%VGZ *DLF
+c     DL(I)=0.
 C
          ENDDO
 C
@@ -301,22 +303,22 @@ C-----------------------------------------------
          IF(IPARIT == 0) THEN
           DO I=1,NEL
            IF(NALE(J1(I)) /= 0) THEN
- 	    WBTMP(1,J1(I))=WBTMP(1,J1(I))+DDX(I)*DL(I)
- 	    WBTMP(2,J1(I))=WBTMP(2,J1(I))+DDY(I)*DL(I)
- 	    WBTMP(3,J1(I))=WBTMP(3,J1(I))+DDZ(I)*DL(I)
- 	    WA(1,J1(I))=WA(1,J1(I))+DDX(I)*DDL(I)
- 	    WA(2,J1(I))=WA(2,J1(I))+DDY(I)*DDL(I)
- 	    WA(3,J1(I))=WA(3,J1(I))+DDZ(I)*DDL(I)
+              WBTMP(1,J1(I))=WBTMP(1,J1(I))+DDX(I)*DL(I)
+              WBTMP(2,J1(I))=WBTMP(2,J1(I))+DDY(I)*DL(I)
+              WBTMP(3,J1(I))=WBTMP(3,J1(I))+DDZ(I)*DL(I)
+              WA(1,J1(I))=WA(1,J1(I))+DDX(I)*DDL(I)
+              WA(2,J1(I))=WA(2,J1(I))+DDY(I)*DDL(I)
+              WA(3,J1(I))=WA(3,J1(I))+DDZ(I)*DDL(I)
            ENDIF
 C
- 	   IF(NALE(J2(I)) /= 0) THEN
- 	    WBTMP(1,J2(I))=WBTMP(1,J2(I))-DDX(I)*DL(I)
- 	    WBTMP(2,J2(I))=WBTMP(2,J2(I))-DDY(I)*DL(I)
- 	    WBTMP(3,J2(I))=WBTMP(3,J2(I))-DDZ(I)*DL(I)
- 	    WA(1,J2(I))=WA(1,J2(I))-DDX(I)*DDL(I)
- 	    WA(2,J2(I))=WA(2,J2(I))-DDY(I)*DDL(I)
- 	    WA(3,J2(I))=WA(3,J2(I))-DDZ(I)*DDL(I)
- 	   ENDIF
+             IF(NALE(J2(I)) /= 0) THEN
+              WBTMP(1,J2(I))=WBTMP(1,J2(I))-DDX(I)*DL(I)
+              WBTMP(2,J2(I))=WBTMP(2,J2(I))-DDY(I)*DL(I)
+              WBTMP(3,J2(I))=WBTMP(3,J2(I))-DDZ(I)*DL(I)
+              WA(1,J2(I))=WA(1,J2(I))-DDX(I)*DDL(I)
+              WA(2,J2(I))=WA(2,J2(I))-DDY(I)*DDL(I)
+              WA(3,J2(I))=WA(3,J2(I))-DDZ(I)*DDL(I)
+             ENDIF
           ENDDO
          ELSE
 C-----------------------------------------------
@@ -387,7 +389,7 @@ C
 C-----------------------------------------------
 C SPMD : CUMULATION OF WA WB
 C-----------------------------------------------
-	IF(IPARIT == 0)THEN
+          IF(IPARIT == 0)THEN
         IF(NSPMD > 1)THEN
           SIZE = 6
           LENR = IAD_ELEM(1,NSPMD+1)-IAD_ELEM(1,1)

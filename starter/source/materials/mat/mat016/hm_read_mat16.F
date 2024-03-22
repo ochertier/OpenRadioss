@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  HM_READ_MAT16                 source/materials/mat/mat016/hm_read_mat16.F
 Chd|-- called by -----------
@@ -31,7 +31,7 @@ Chd|        HM_GET_FLOATV_DIM             source/devtools/hm_reader/hm_get_float
 Chd|        HM_OPTION_IS_ENCRYPTED        source/devtools/hm_reader/hm_option_is_encrypted.F
 Chd|        INIT_MAT_KEYWORD              source/materials/mat/init_mat_keyword.F
 Chd|        ELBUFTAG_MOD                  share/modules1/elbuftag_mod.F 
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/matparam_def_mod.F
+Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
@@ -42,13 +42,13 @@ C-----------------------------------------------
 C FAC_M FACL FAC_T : enable to convert (custom) input unit to working unit system
 C FAC_MASS, FAC_LENGTH, FAC_TIME : enable to convert working unit system into International Unit system
 C-----------------------------------------------
-C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE ELBUFTAG_MOD
       USE MESSAGE_MOD
       USE SUBMODEL_MOD
       USE MATPARAM_DEF_MOD
+      USE UNITAB_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -56,21 +56,19 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr03_c.inc"
 #include      "scr17_c.inc"
 #include      "param_c.inc"
 #include      "units_c.inc"
-#include      "sysunit.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      CHARACTER*nchartitle ,INTENT(IN)             :: TITR
-      INTEGER, INTENT(IN)                          :: MAT_ID
-      INTEGER, DIMENSION(NPROPMI) ,INTENT(INOUT)   :: IPM
-      my_real, DIMENSION(NPROPM)  ,INTENT(INOUT)   :: PM
-      my_real, DIMENSION(LUNIT,NUNITS) ,INTENT(IN) :: UNITAB
-      TYPE(SUBMODEL_DATA), DIMENSION(*),INTENT(IN) :: LSUBMODEL
-      TYPE(MLAW_TAG_), INTENT(OUT)                 :: MTAG
+      CHARACTER*nchartitle ,INTENT(IN) :: TITR
+      INTEGER, INTENT(IN) :: MAT_ID
+      INTEGER, DIMENSION(NPROPMI) ,INTENT(INOUT) :: IPM
+      my_real, DIMENSION(NPROPM)  ,INTENT(INOUT) :: PM
+      TYPE(UNIT_TYPE_) ,INTENT(IN) :: UNITAB
+      TYPE(SUBMODEL_DATA), DIMENSION(NSUBMOD),INTENT(IN) :: LSUBMODEL
+      TYPE(MLAW_TAG_), INTENT(INOUT) :: MTAG
       TYPE(MATPARAM_STRUCT_) ,INTENT(INOUT) :: MATPARAM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -87,7 +85,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 !
       ILAW = 16
-      IS_ENCRYPTED   = .FALSE.
+      IS_ENCRYPTED = .FALSE.
       IS_AVAILABLE = .FALSE.
 !-----------------------
       CALL HM_OPTION_IS_ENCRYPTED(IS_ENCRYPTED)
@@ -182,9 +180,9 @@ C     GRAY
 C--------------------------------------
 !
       !translation from Working unit System to {big bang} unit system
-      FAC_M_bb = FAC_MASS*EP03
-      FAC_L_bb = FAC_LENGTH*EP02 
-      FAC_T_bb = FAC_TIME*EP06
+      FAC_M_bb = UNITAB%FAC_MASS*EP03
+      FAC_L_bb = UNITAB%FAC_LENGTH*EP02 
+      FAC_T_bb = UNITAB%FAC_TIME*EP06
 !
       IF (A == ZERO)    A = GAM0-HALF
       IF (GAM0M == ZERO) GAM0M = GAM0
@@ -283,6 +281,12 @@ c-----------------
       ELSE
         CALL INIT_MAT_KEYWORD(MATPARAM,"COMPRESSIBLE")
       END IF
+
+      ! EOS/Thermo keyword for pressure treatment in elements
+      CALL INIT_MAT_KEYWORD(MATPARAM,"HYDRO_EOS")
+
+      ! Properties compatibility
+      CALL INIT_MAT_KEYWORD(MATPARAM,"SOLID_ISOTROPIC")
 c-----------------
       WRITE(IOUT,1001)TRIM(TITR),MAT_ID,ILAW
       WRITE(IOUT,1000)
@@ -301,9 +305,7 @@ C        WRITE(IOUT,2000)E0J,TMJ,P1J
       ENDIF
 C--------------------
       IF (EPS0 == ZERO) THEN
-         CALL ANCMSG(MSGID=298,
-     .               MSGTYPE=MSGERROR,
-     .               ANMODE=ANINFO,
+         CALL ANCMSG(MSGID=298,MSGTYPE=MSGERROR,ANMODE=ANINFO,
      .               I1=16,
      .               I2=MAT_ID,
      .               C1=TITR)
@@ -331,7 +333,7 @@ C--------------------
      & 5X,'MATERIAL LAW. . . . . . . . . . . . . .=',I10/)
  1002 FORMAT(
      & 5X,'INITIAL DENSITY . . . . . . . . . . . .=',1PG20.13/,
-     & 5X,'EOS REFERENCE DENSITY . . . . . . . . .=',1PG20.13/)
+     & 5X,'REFERENCE DENSITY . . . . . . . . . . .=',1PG20.13/)
  1300 FORMAT(
      & 5X,40HYOUNG'S MODULUS . . . . . . . . . . . .=,1PG20.13/,
      & 5X,40HPOISSON'S RATIO . . . . . . . . . . . .=,1PG20.13/,

@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  HM_READ_UNIT                  source/general_controls/computation/hm_read_unit.F
 Chd|-- called by -----------
@@ -51,9 +51,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       TYPE (UNIT_TYPE_) ::UNITAB
@@ -61,12 +58,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com04_c.inc"
 #include      "scr17_c.inc"
-#include      "scr03_c.inc"
 #include      "units_c.inc"
 #include      "sysunit.inc"
-#include      "submod_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -89,11 +83,21 @@ C     UNITAB(2)         Mass unit
 C     UNITAB(3)         Length unit
 C     UNITAB(4)         Time unit
 C=======================================================================
+      UNITE = 0
+      DO I = 1, NUNIT0+NSUBMOD
+C                     12345678901234567890
+        FIELD11(I) = '                    '
+        FIELD22(I) = '                    '
+        FIELD33(I) = '                    '
+      ENDDO
+
       IS_AVAILABLE = .FALSE.
 C----------------------------------------------
       WRITE(IOUT,1000)
 C
+      UNITE = 0
       UNITAB%NUNITS = NUNIT0+NSUBMOD+1
+      UNITAB%NUNIT0 = NUNIT0
       ALLOCATE(UNITAB%UNIT_ID(NUNIT0+NSUBMOD+1))
       ALLOCATE(UNITAB%FAC_M  (NUNIT0+NSUBMOD+1))
       ALLOCATE(UNITAB%FAC_L  (NUNIT0+NSUBMOD+1))
@@ -154,6 +158,14 @@ C
       FAC_MASS   = FAC_M_WORK
       FAC_LENGTH = FAC_L_WORK
       FAC_TIME   = FAC_T_WORK
+
+      UNITAB%FAC_MASS   = FAC_M_WORK
+      UNITAB%FAC_LENGTH = FAC_L_WORK
+      UNITAB%FAC_TIME   = FAC_T_WORK
+
+      UNITAB%FAC_M_WORK = FAC_M_WORK
+      UNITAB%FAC_L_WORK = FAC_L_WORK
+      UNITAB%FAC_T_WORK = FAC_T_WORK
       NUNITS     = 1
       IWRITE     = 1
 C
@@ -618,6 +630,8 @@ C
       UNITAB%FAC_M(1)   = FAC_M_INPUT / FAC_MASS  
       UNITAB%FAC_L(1)   = FAC_L_INPUT / FAC_LENGTH  
       UNITAB%FAC_T(1)   = FAC_T_INPUT / FAC_TIME 
+
+      UNITAB%NUNITS = NUNITS
 C-----
       RETURN
 C-----

@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  POLYHEDR1                     source/airbag/polyhedr1.F     
 Chd|-- called by -----------
@@ -86,6 +86,7 @@ C--------------------------------
          NNP=IPOLY(2,I)
          NHOL=0
          ALLOCATE(PNODES(2,NNP), PSEG(2,NNP),PTRI(3,2*NNP),PHOLES(2,1))
+         PTRI(1:3,1:2*NNP) = 0
 C
 C Coordonnees des sommets dans le plan du polygone
          NX=RPOLY(2,I)
@@ -124,6 +125,7 @@ C
          PSEG(2,NNP)=1
          NSEG=NNP
 C
+         NELP = 0
          CALL C_TRICALL(PNODES, PSEG, PHOLES, PTRI, NNP,
      .                  NSEG,   NHOL, NELP  )
 CFA         IF(NELP > NNP) THEN
@@ -438,7 +440,7 @@ C
           Y2=RPOLY(4+3*(JJ-1)+2,II)
           Z2=RPOLY(4+3*(JJ-1)+3,II)
           TST21=NX*(X2-X1)+NY*(Y2-Y1)+NZ*(Z2-Z1)
-C			 
+C       
           IF(TST12*TST21 < ZERO) THEN
             N2=EDGVER(J,2)
             WRITE(IOUT,'(/2(A,I5),2A,2(/A,1P3G20.13,A))') 
@@ -506,7 +508,7 @@ C---------------------------------------
 C Arete connectee a 3 polygones internes
 C---------------------------------------
       DO J=1,NEDGE
-          IF(EDGPOL(J,1) /= 3) CYCLE		  
+          IF(EDGPOL(J,1) /= 3) CYCLE      
           I1=EDGPOL(J,2)
           I2=EDGPOL(J,3)
           IF(ITYP(I2) /= 3) CYCLE
@@ -576,7 +578,7 @@ C Premier polyedre
           IF (ITAG(K1,I1) == 0 .AND. ITAG(L1,I2) == 0) THEN
             ICMAX=ICMAX+1
             ITAG(K1,I1)=ICMAX
-            ITAG(L1,I2)=ICMAX						
+            ITAG(L1,I2)=ICMAX
           ELSEIF(ITAG(K1,I1) == 0 .AND. ITAG(L1,I2) /= 0) THEN
             ITAG(K1,I1)=ITAG(L1,I2)
           ELSEIF(ITAG(K1,I1) /= 0. AND. ITAG(L1,I2) == 0) THEN
@@ -590,7 +592,7 @@ C Premier polyedre
                  IF(ITYP(I) /= 3) CYCLE
                  IF(ITAG(2,I) == IMAX) ITAG(2,I)=IMIN
                ENDDO
-            ENDIF			
+            ENDIF
           ENDIF 
 C Deuxieme polyedre
           IF(ITAG(M1,I3) == 0 .AND. ITAG(L2,I2) == 0) THEN
@@ -600,7 +602,7 @@ C Deuxieme polyedre
           ELSEIF(ITAG(M1,I3) /= 0 .AND. ITAG(L2,I2) == 0) THEN
             ITAG(L2,I2)=ITAG(M1,I3)
           ELSEIF(ITAG(M1,I3) == 0 .AND. ITAG(L2,I2) /= 0) THEN
-            ITAG(M1,I3)=ITAG(L2,I2)			
+            ITAG(M1,I3)=ITAG(L2,I2)
           ELSEIF(ITAG(M1,I3) /= 0 .AND. ITAG(L2,I2) /= 0) THEN
             IF(ITAG(M1,I3) /= ITAG(L2,I2)) THEN
                IMIN=MIN(ITAG(M1,I3),ITAG(L2,I2))
@@ -620,7 +622,7 @@ C Troisieme polyedre
           ELSEIF(ITAG(M2,I3) /= 0 .AND. ITAG(K2,I1) == 0) THEN
             ITAG(K2,I1)=ITAG(M2,I3)
           ELSEIF(ITAG(M2,I3) == 0 .AND. ITAG(K2,I1) /= 0) THEN
-            ITAG(M2,I3)=ITAG(K2,I1)			
+            ITAG(M2,I3)=ITAG(K2,I1)
           ELSEIF(ITAG(M2,I3) /= 0 .AND. ITAG(K2,I1) /= 0) THEN
             IF(ITAG(M2,I3) /= ITAG(K2,I1)) THEN
                IMIN=MIN(ITAG(M2,I3),ITAG(K2,I1))
@@ -631,13 +633,13 @@ C Troisieme polyedre
                  IF(ITAG(2,I) == IMAX) ITAG(2,I)=IMIN
                ENDDO
             ENDIF
-          ENDIF		  
+          ENDIF      
       ENDDO ! J=1,NEDGE
 C-------------------------------------------------------
 C Arete connectee a 3 polygones (1 interne + 2 externes)
 C-------------------------------------------------------
       DO J=1,NEDGE
-          IF(EDGPOL(J,1) /= 3) CYCLE		  
+          IF(EDGPOL(J,1) /= 3) CYCLE      
           I1=EDGPOL(J,2)
           I2=EDGPOL(J,3)
           IF(ITYP(I2) == 3) CYCLE
@@ -718,7 +720,7 @@ C-------------------------------------------------------
                  IF(ITAG(2,I) == IMAX) ITAG(2,I)=IMIN
                ENDDO
             ENDIF 
-          ENDIF 		  
+          ENDIF       
       ENDDO ! J=1,NEDGE
 C------------------------------------------------
 C Arete connectee a 2 polygones
@@ -767,7 +769,7 @@ C
                  IF(ITAG(2,I) == IMAX) ITAG(2,I)=IMIN
               ENDDO
             ENDIF
-          ENDIF			
+          ENDIF
       ENDDO  ! J=1,NEDGE
 C
       DEALLOCATE (EDGPOL)

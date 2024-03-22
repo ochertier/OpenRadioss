@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  SPH_NODSEG                    source/elements/sph/sph_nodseg.F
 Chd|-- called by -----------
@@ -28,19 +28,11 @@ Chd|        SPONOF2                       source/elements/sph/sponof2.F
 Chd|-- calls ---------------
 Chd|====================================================================
       SUBROUTINE SPH_NODSEG(XI,YI,ZI,XX,TFLAG,NP,LONFSPH,IXP,DPS,WNORMAL,FLAG)
-C----6---------------------------------------------------------------7---------8
+C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "sphcom.inc"
-#include      "param_c.inc"
-C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER TFLAG,LONFSPH(*),IXP(*),NP,FLAG
@@ -81,7 +73,7 @@ C----------
              XC=X3
              YC=Y3
              ZC=Z3
-           ENDIF	   
+           ENDIF     
 C----------
 C          triangle 1,2,C
            K  =0
@@ -469,7 +461,7 @@ C             normale sortante au segment.
               Z12=HALF*(Z2+Z3-Z1-Z4)
               X23=HALF*(X3+X4-X1-X2)
               Y23=HALF*(Y3+Y4-Y1-Y2)
-              Z23=HALF*(Z3+Z4-Z1-Z2)	      
+              Z23=HALF*(Z3+Z4-Z1-Z2)        
               NX = Y12*Z23-Z12*Y23
               NY =-X12*Z23+Z12*X23
               NZ = X12*Y23-Y12*X23
@@ -484,7 +476,7 @@ C             cumule normale sortante au segment.
               Z12=HALF*(Z2+Z3-Z1-Z4)
               X23=HALF*(X3+X4-X1-X2)
               Y23=HALF*(Y3+Y4-Y1-Y2)
-              Z23=HALF*(Z3+Z4-Z1-Z2)	      
+              Z23=HALF*(Z3+Z4-Z1-Z2)        
               NX = Y12*Z23-Z12*Y23
               NY =-X12*Z23+Z12*X23
               NZ = X12*Y23-Y12*X23

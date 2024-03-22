@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  INIGRAV_LOAD                  source/initial_conditions/inigrav/inigrav_load.F
 Chd|-- called by -----------
@@ -31,19 +31,20 @@ Chd|        INIGRAV_EOS                   source/initial_conditions/inigrav/inig
 Chd|        INIGRAV_M37                   source/initial_conditions/inigrav/inigrav_m37.F
 Chd|        INIGRAV_M51                   source/initial_conditions/inigrav/inigrav_m51.F
 Chd|        INIGRAV_PART_LIST             source/initial_conditions/inigrav/inigrav_part_list.F
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
-Chd|        EBCS_MOD                      ../common_source/modules/ebcs_mod.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
+Chd|        EBCS_MOD                      ../common_source/modules/boundary_conditions/ebcs_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        INIGRAV                       share/modules1/inigrav_mod.F  
+Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|====================================================================
       SUBROUTINE INIGRAV_LOAD(ELBUF_TAB ,IPART  ,IGRPART ,IPARG  ,IPARTTG  ,
      1                        IPARTS    ,IPARTQ ,X       ,IXS    ,IXQ      ,
      2                        IXTG      ,PM     ,IPM     ,BUFMAT ,MULTI_FVM,
      3                        ALE_CONNECTIVITY ,NV46   ,IGRSURF ,ITAB   ,EBCS_TAB,
-     4                        NPF       ,TF)
+     4                        NPF       ,TF    ,MAT_PARAM)
 C-----------------------------------------------
 C   Description
 C-----------------------------------------------
@@ -75,6 +76,7 @@ C-----------------------------------------------
       USE GROUPDEF_MOD
       USE EBCS_MOD
       USE ALE_CONNECTIVITY_MOD
+      USE MATPARAM_DEF_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -88,7 +90,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "vect01_c.inc"
 #include      "param_c.inc"
-#include      "inigrav_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "scr17_c.inc"
@@ -111,6 +112,7 @@ C-----------------------------------------------
       TYPE(t_ale_connectivity), INTENT(INOUT) :: ALE_CONNECTIVITY
       INTEGER,INTENT(IN)::NPF(SNPC)
       my_real,INTENT(IN)::TF(STF)      
+      TYPE(MATPARAM_STRUCT_) ,DIMENSION(NUMMAT), INTENT(IN) :: MAT_PARAM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -323,8 +325,8 @@ C-----------------------------------------------
                  !intersection point such as INTERP = Z + ALPHA . NG   et   <B-INTERP,N> = 0, donc :
                  ALPHA                 = (BX-Z(1))*NX+(BY-Z(2))*NY+(BZ-Z(3))*NZ / (NGX*NX+NGY*NY+NGZ*NZ)  !non nul car verification a la lecture
                  INTERP(1)             = Z(1) + ALPHA*NGX
-	         INTERP(2)             = Z(2) + ALPHA*NGY
-	         INTERP(3)             = Z(3) + ALPHA*NGZ
+                   INTERP(2)             = Z(2) + ALPHA*NGY
+                   INTERP(3)             = Z(3) + ALPHA*NGZ
                  ! profondeur = <INTERP_P , N>
                  !DEPTH(I) = (INTERP(1)-Z(1))*(INTERP(1)-Z(1))+(INTERP(2)-Z(2))*(INTERP(2)-Z(2))+(INTERP(3)-Z(3))*(INTERP(3)-Z(3))
                  !DEPTH(I) = SQRT(DEPTH(I))
@@ -422,7 +424,7 @@ C-----------------------------------------------
            CASE (3, 4, 6, 10, 49)      !Material law defined with Equations Of States 
               RHO0 = PM(1,MATID)                  
               CALL INIGRAV_EOS(NEL,NEL2, NG, MATID, IPM, GRAV0, RHO0, DEPTH, PM, BUFMAT(IADBUF), 
-     .                         ELBUF_TAB, PSURF, LIST , PGRAV, 0 ,MLW, NPF, TF)
+     .                         ELBUF_TAB, PSURF, LIST , PGRAV, 0 ,MLW, NPF, TF ,NUMMAT,MAT_PARAM)
           !=======================================!
           !     MM-ALE 37                         !
           !=======================================! 
@@ -477,7 +479,7 @@ C-----------------------------------------------
                 MATID  = IPM(20 + IMAT, IX(1, 1))  
                 MATLAW = IPM(2, MATID)            
                 CALL INIGRAV_EOS(NEL,   NEL2 , NG   , MATID, IPM, GRAV0, RHO0, DEPTH, PM, BUFMAT(IADBUF), ELBUF_TAB, 
-     .                           PSURF, LIST , PGRAV, IMAT , MLW, NPF, TF)
+     .                           PSURF, LIST , PGRAV, IMAT , MLW, NPF, TF,MAT_PARAM)
               ENDDO
               ! GLOBAL STATE
               DO KK=1,NEL2

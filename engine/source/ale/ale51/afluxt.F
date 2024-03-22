@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  AFLUXT                        source/ale/ale51/afluxt.F     
 Chd|-- called by -----------
@@ -42,10 +42,11 @@ Chd|        SPMD_E4VOIS                   source/mpi/fluid/spmd_cfd.F
 Chd|        SPMD_E6VOIS                   source/mpi/fluid/spmd_cfd.F   
 Chd|        SPMD_I4VOIS                   source/mpi/fluid/spmd_cfd.F   
 Chd|        SPMD_I8VOIS                   source/mpi/fluid/spmd_cfd.F   
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
-Chd|        I22BUFBRIC_MOD                ../common_source/modules/cut-cell-search_mod.F
-Chd|        I22TRI_MOD                    ../common_source/modules/cut-cell-search_mod.F
+Chd|        ALEMUSCL_MOD                  ../common_source/modules/ale/alemuscl_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
+Chd|        I22BUFBRIC_MOD                ../common_source/modules/interfaces/cut-cell-search_mod.F
+Chd|        I22TRI_MOD                    ../common_source/modules/interfaces/cut-cell-search_mod.F
 Chd|        INITBUF_MOD                   share/resol/initbuf.F         
 Chd|        SEGVAR_MOD                    share/modules/segvar_mod.F    
 Chd|        TRIMAT_MOD                    share/modules/trimat.F        
@@ -66,6 +67,7 @@ C-----------------------------------------------
       USE I22BUFBRIC_MOD  
       USE SEGVAR_MOD   
       USE ALE_CONNECTIVITY_MOD
+      USE ALEMUSCL_MOD , only:ALEMUSCL_Param
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -73,18 +75,13 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr01_c.inc"
-#include      "scr05_c.inc"
 #include      "spmd_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com08_c.inc"
 #include      "vect01_c.inc"
 #include      "param_c.inc"
 #include      "task_c.inc"
-#include      "parit_c.inc"
 #include      "inter22.inc"
-#include      "alemuscl.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -129,7 +126,7 @@ C-----------------------------------------------
       DO NG=ITASK+1,NGROUP,NTHREAD
 C     ALE ON / OFF
         IF (IPARG(76, NG)  ==  1) CYCLE ! --> OFF
-        CALL INITBUF (IPARG    ,NG      ,                  
+        CALL INITBUF(IPARG    ,NG      ,                  
      2                MTN     ,LLT     ,NFT     ,IAD     ,ITY     ,   
      3                NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,   
      4                JTHE    ,JLAG    ,JMULT   ,JHBE    ,JIVF    ,   
@@ -223,11 +220,8 @@ C--------------------
 C--------------------
 
       IF(NSPMD > 1)THEN
-        ! Part not parallel smt
 !$OMP SINGLE
-        CALL SPMD_E1VOIS(ALPHA   ,NERCVOIS,NESDVOIS,LERCVOIS,
-     2                   LESDVOIS,LENCOM  )
-        ! End part not parallel smt
+        CALL SPMD_E1VOIS(ALPHA,NERCVOIS,NESDVOIS,LERCVOIS,LESDVOIS,LENCOM  )
 !$OMP END SINGLE
       ENDIF
 C
@@ -242,10 +236,10 @@ C-----------------------------------------------
             NFIRST = 1+ITASK*(NUMELQ)/NTHREAD
             NLAST = (ITASK+1)*(NUMELQ)/NTHREAD
          ENDIF
-        DO I = NFIRST, NLAST
-          N4_VOIS(I,1) = 0
-          FLUX_VOIS(I,1:NV46) = -EP20
-        ENDDO
+         N4_VOIS(NFIRST:NLAST,1) = 0
+         DO I=1,NV46
+            FLUX_VOIS(NFIRST:NLAST,I) = -EP20
+         ENDDO
 C----------------------
         CALL MY_BARRIER
 C----------------------
@@ -257,7 +251,7 @@ C-----------------------------------------------
       DO NG=ITASK+1,NGROUP,NTHREAD
 C     ALE ON / OFF
         IF (IPARG(76, NG)  ==  1) CYCLE ! --> OFF
-        CALL INITBUF (IPARG    ,NG      ,                  
+        CALL INITBUF(IPARG    ,NG      ,                  
      2     MTN     ,LLT     ,NFT     ,IAD     ,ITY     ,   
      3     NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,   
      4     JTHE    ,JLAG    ,JMULT   ,JHBE    ,JIVF    ,   
@@ -277,7 +271,7 @@ C     ALE ON / OFF
         LFT=1
         VOLG => ELBUF_TAB(NG)%GBUF%VOL
         IF(N2D == 0)THEN
-           IF (IALEMUSCL  >  0) THEN
+           IF (ALEMUSCL_Param%IALEMUSCL  >  0) THEN
               CALL ALEMUSCL_UPWIND(FLUX, ALE_CONNECT, ALPHA  ,    X, IXS, FLUX_VOIS, N4_VOIS, 
      .                             ITAB, NV46       , ITRIMAT,SEGVAR)
            ELSE
@@ -285,7 +279,7 @@ C     ALE ON / OFF
      .                             ITAB, NV46       , ITRIMAT, SEGVAR)
            ENDIF
         ELSE
-           IF (IALEMUSCL  >  0) THEN
+           IF (ALEMUSCL_Param%IALEMUSCL  >  0) THEN
               CALL ALEMUSCL_UPWIND2(FLUX, ALE_CONNECT, ALPHA  , X    , IXQ, FLUX_VOIS, N4_VOIS, 
      .                              ITAB, NV46       , ITRIMAT,SEGVAR)
            ELSE
@@ -305,20 +299,14 @@ C--------------------
 C--------------------
 
       IF(NSPMD > 1)THEN
-         ! Part not parallel smt
 !$OMP SINGLE
          IF (N2D  ==  0) THEN
-            CALL SPMD_E6VOIS(FLUX_VOIS,NERCVOIS,NESDVOIS,LERCVOIS,
-     2                       LESDVOIS       ,LENCOM  )
-            CALL SPMD_I8VOIS(N4_VOIS ,NERCVOIS,NESDVOIS,LERCVOIS,
-     2                       LESDVOIS     ,LENCOM  )
+            CALL SPMD_E6VOIS(FLUX_VOIS,NERCVOIS,NESDVOIS,LERCVOIS,LESDVOIS,LENCOM)
+            CALL SPMD_I8VOIS(N4_VOIS ,NERCVOIS,NESDVOIS,LERCVOIS,LESDVOIS,LENCOM)
          ELSE
-            CALL SPMD_E4VOIS(FLUX_VOIS,NERCVOIS,NESDVOIS,LERCVOIS,
-     2                       LESDVOIS       ,LENCOM  )
-            CALL SPMD_I4VOIS(N4_VOIS ,NERCVOIS,NESDVOIS,LERCVOIS,
-     2                       LESDVOIS     ,LENCOM  )
+            CALL SPMD_E4VOIS(FLUX_VOIS,NERCVOIS,NESDVOIS,LERCVOIS,LESDVOIS,LENCOM)
+            CALL SPMD_I4VOIS(N4_VOIS ,NERCVOIS,NESDVOIS,LERCVOIS,LESDVOIS,LENCOM)
          ENDIF
-         ! end part not parallel smt
 !$OMP END SINGLE
       ENDIF
 
@@ -328,7 +316,7 @@ C-----------------------------------------------
       DO NG=ITASK+1,NGROUP,NTHREAD
 C     ALE ON / OFF
         IF (IPARG(76, NG)  ==  1) CYCLE ! --> OFF
-        CALL INITBUF (IPARG    ,NG      ,                  
+        CALL INITBUF(IPARG    ,NG      ,                  
      2     MTN     ,LLT     ,NFT     ,IAD     ,ITY     ,   
      3     NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,   
      4     JTHE    ,JLAG    ,JMULT   ,JHBE    ,JIVF    ,   

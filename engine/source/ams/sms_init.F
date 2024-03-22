@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  SMS_INI_PART                  source/ams/sms_init.F         
 Chd|-- called by -----------
@@ -43,16 +43,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "kincod_c.inc"
-#include      "param_c.inc"
-#include      "scr17_c.inc"
-#include      "scr18_c.inc"
 #include      "sms_c.inc"
-#include      "spmd_c.inc"
-#include      "task_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -118,16 +110,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "kincod_c.inc"
 #include      "param_c.inc"
-#include      "scr17_c.inc"
-#include      "scr18_c.inc"
-#include      "sms_c.inc"
-#include      "spmd_c.inc"
-#include      "task_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -232,14 +217,9 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "kincod_c.inc"
 #include      "param_c.inc"
 #include      "scr17_c.inc"
-#include      "scr18_c.inc"
 #include      "sms_c.inc"
-#include      "spmd_c.inc"
-#include      "task_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -465,12 +445,12 @@ C-----------------------------------------------
              DO K=1,2
                I=IXR(1+K,J)
                DO KK=1,2
-         	 JJ = IXR(1+KK,J)
+           JJ = IXR(1+KK,J)
                  IF(JJ/=I.AND..NOT.(NATIV_SMS(I)==0.AND.NATIV_SMS(JJ)==0))THEN
                    TAGREL_SMS(NG)=1
-         	   NAD_SMS(I)=NAD_SMS(I)+1
-         	   KNZ_SMS   =KNZ_SMS+1
-         	 END IF
+             NAD_SMS(I)=NAD_SMS(I)+1
+             KNZ_SMS   =KNZ_SMS+1
+           END IF
                END DO
              END DO
            END DO
@@ -481,44 +461,44 @@ C-----------------------------------------------
                I=IXR(1+K,J)
 
                KK=2
-         	 JJ = IXR(1+KK,J)
+           JJ = IXR(1+KK,J)
                  IF(JJ/=I.AND..NOT.(NATIV_SMS(I)==0.AND.NATIV_SMS(JJ)==0))THEN
                    TAGREL_SMS(NG)=1
-         	   NAD_SMS(I)=NAD_SMS(I)+1
-         	   KNZ_SMS   =KNZ_SMS+1
-         	 END IF
+             NAD_SMS(I)=NAD_SMS(I)+1
+             KNZ_SMS   =KNZ_SMS+1
+           END IF
 
              K=2
 
                I=IXR(1+K,J)
 
                KK=1
-         	 JJ = IXR(1+KK,J)
+           JJ = IXR(1+KK,J)
                  IF(JJ/=I.AND..NOT.(NATIV_SMS(I)==0.AND.NATIV_SMS(JJ)==0))THEN
                    TAGREL_SMS(NG)=1
-         	   NAD_SMS(I)=NAD_SMS(I)+1
-         	   KNZ_SMS   =KNZ_SMS+1
-         	 END IF
+             NAD_SMS(I)=NAD_SMS(I)+1
+             KNZ_SMS   =KNZ_SMS+1
+           END IF
 
                KK=3
-         	 JJ = IXR(1+KK,J)
+           JJ = IXR(1+KK,J)
                  IF(JJ/=I.AND..NOT.(NATIV_SMS(I)==0.AND.NATIV_SMS(JJ)==0))THEN
                    TAGREL_SMS(NG)=1
-         	   NAD_SMS(I)=NAD_SMS(I)+1
-         	   KNZ_SMS   =KNZ_SMS+1
-         	 END IF
+             NAD_SMS(I)=NAD_SMS(I)+1
+             KNZ_SMS   =KNZ_SMS+1
+           END IF
 
              K=3
 
                I=IXR(1+K,J)
 
                KK=2
-         	 JJ = IXR(1+KK,J)
+           JJ = IXR(1+KK,J)
                  IF(JJ/=I.AND..NOT.(NATIV_SMS(I)==0.AND.NATIV_SMS(JJ)==0))THEN
                    TAGREL_SMS(NG)=1
-         	   NAD_SMS(I)=NAD_SMS(I)+1
-         	   KNZ_SMS   =KNZ_SMS+1
-         	 END IF
+             NAD_SMS(I)=NAD_SMS(I)+1
+             KNZ_SMS   =KNZ_SMS+1
+           END IF
 
            END DO
           END IF
@@ -557,16 +537,9 @@ Chd|====================================================================
      1 NUMNOD  ,NUMEL ,NIX ,MIX ,LIX ,
      2 IX      ,IPARTX,TAGPRT_SMS,NODNX_SMS)
 C-----------------------------------------------
-C   M o d u l e s
-C-----------------------------------------------
-C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -593,8 +566,8 @@ C
             IF(TAG(I)==0)THEN
               NODNX_SMS(I)=NODNX_SMS(I)+1
               TAG(I)=1
-            END IF		    
-          END IF		    
+            END IF        
+          END IF        
         ENDDO                                    
       ENDDO                                      
 
@@ -631,18 +604,13 @@ C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "comlock.inc"
 C-----------------------------------------------
-#include "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "kincod_c.inc"
 #include      "param_c.inc"
-#include      "parit_c.inc"
 #include      "sms_c.inc"
 #include      "task_c.inc"
-#include      "units_c.inc"
 #include      "scr17_c.inc"
 C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -1059,18 +1027,12 @@ C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "comlock.inc"
 C-----------------------------------------------
-#include "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "kincod_c.inc"
 #include      "param_c.inc"
-#include      "parit_c.inc"
 #include      "sms_c.inc"
-#include      "task_c.inc"
-#include      "units_c.inc"
 #include      "scr17_c.inc"
 C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -1400,19 +1362,12 @@ C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "comlock.inc"
 C-----------------------------------------------
-#include "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "intstamp_c.inc"
-#include      "kincod_c.inc"
 #include      "param_c.inc"
-#include      "parit_c.inc"
 #include      "sms_c.inc"
-#include      "task_c.inc"
-#include      "units_c.inc"
 #include      "scr17_c.inc"
 C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -1722,19 +1677,12 @@ C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "comlock.inc"
 C-----------------------------------------------
-#include "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "intstamp_c.inc"
-#include      "kincod_c.inc"
 #include      "param_c.inc"
-#include      "parit_c.inc"
 #include      "sms_c.inc"
-#include      "task_c.inc"
-#include      "units_c.inc"
 #include      "scr17_c.inc"
 C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -2121,7 +2069,7 @@ C-----------------------------------------------
       END DO
       LSMSPCG=LSMSPCG+NINDX1_SMS
       IF(NSPMD>1) 
-     .  CALL SPMD_ALLGLOB_ISUM9(LSMSPCG,1)	
+     .  CALL SPMD_ALLGLOB_ISUM9(LSMSPCG,1)
       NSMSPCG=MIN(NSMSPCG,3*LSMSPCG)
 C
 C------------
@@ -2175,11 +2123,9 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "param_c.inc"
 #include      "scr03_c.inc"
 #include      "sms_c.inc"
 #include      "task_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -2450,11 +2396,7 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "param_c.inc"
 #include      "scr03_c.inc"
-#include      "sms_c.inc"
-#include      "task_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -2556,10 +2498,6 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "scr03_c.inc"
-#include      "sms_c.inc"
-#include      "task_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -2579,115 +2517,115 @@ C /DT/AMS or /DT/INTER/AMS
 C
       TAG(1:NUMNOD)=0
       DO N=1,NINTER
-     	NTY=IPARI(7,N)
+          NTY=IPARI(7,N)
         ILEV  = IPARI(20,N)
         IF(NTY==2 .AND. ILEV/=25 .and. ILEV /= 26)THEN
-     	  NRTS  =IPARI(3,N)
-     	  NRTM  =IPARI(4,N)
-     	  NSN	=IPARI(5,N)
-     	  NMN	=IPARI(6,N)
-     	  ILEV  =IPARI(20,N)
+            NRTS  =IPARI(3,N)
+            NRTM  =IPARI(4,N)
+            NSN  =IPARI(5,N)
+            NMN  =IPARI(6,N)
+            ILEV  =IPARI(20,N)
 C
-     	  DO II=1,NSN	     
+            DO II=1,NSN       
             J=INTBUF_TAB(N)%NSV(II)
             IF ((ILEV==27.OR.ILEV==28).AND.INTBUF_TAB(N)%IRUPT(II)==1) CYCLE
-     	    TAG(J)=1
-     	  ENDDO
-     	ENDIF
+              TAG(J)=1
+            ENDDO
+          ENDIF
       ENDDO
 C
       IF(NSPMD > 1) THEN
-     	SIZE = 1
-     	LENR = IAD_ELEM(1,NSPMD+1)-IAD_ELEM(1,1)
-     	CALL SPMD_EXCH_ICONT(TAG,IAD_ELEM ,FR_ELEM,SIZE,LENR)
+          SIZE = 1
+          LENR = IAD_ELEM(1,NSPMD+1)-IAD_ELEM(1,1)
+          CALL SPMD_EXCH_ICONT(TAG,IAD_ELEM ,FR_ELEM,SIZE,LENR)
         CALL SPMD_EXCH_SMST2(IPARI,TAG,INTLIST,NBINTC,INTBUF_TAB)
       END IF
 C
       DO N=1,NINTER
-     	 NTY=IPARI(7,N)
-     	 NSN   =IPARI(5,N)
-     	 NRTS  =IPARI(3,N)
-     	 NRTM  =IPARI(4,N)
-     	 IF(NTY==7.OR.NTY==10.OR.NTY==20.OR.NTY==25)THEN
-     	   DO II=1,NSN
+           NTY=IPARI(7,N)
+           NSN   =IPARI(5,N)
+           NRTS  =IPARI(3,N)
+           NRTM  =IPARI(4,N)
+           IF(NTY==7.OR.NTY==10.OR.NTY==20.OR.NTY==25)THEN
+             DO II=1,NSN
              J=INTBUF_TAB(N)%NSV(II)
-     	     IF(TAG(J)/=0) THEN
+               IF(TAG(J)/=0) THEN
                INTBUF_TAB(N)%STFNS(II) = ZERO
-     	     END IF
-     	   END DO
-     	   DO II=1,NRTM
-     	     J=INTBUF_TAB(N)%IRECTM(4*(II-1)+1)
-     	     IF(TAG(J)/=0)THEN
+               END IF
+             END DO
+             DO II=1,NRTM
+               J=INTBUF_TAB(N)%IRECTM(4*(II-1)+1)
+               IF(TAG(J)/=0)THEN
                INTBUF_TAB(N)%STFM(II)=ZERO
-     	     END IF
-     	     J=INTBUF_TAB(N)%IRECTM(4*(II-1)+2)
-     	     IF(TAG(J)/=0)THEN
+               END IF
+               J=INTBUF_TAB(N)%IRECTM(4*(II-1)+2)
+               IF(TAG(J)/=0)THEN
                INTBUF_TAB(N)%STFM(II)=ZERO
-     	     END IF
-     	     J=INTBUF_TAB(N)%IRECTM(4*(II-1)+3)
-     	     IF(TAG(J)/=0)THEN
+               END IF
+               J=INTBUF_TAB(N)%IRECTM(4*(II-1)+3)
+               IF(TAG(J)/=0)THEN
                INTBUF_TAB(N)%STFM(II)=ZERO
-     	     END IF
-     	     J=INTBUF_TAB(N)%IRECTM(4*(II-1)+4)
-     	     IF(TAG(J)/=0)THEN
+               END IF
+               J=INTBUF_TAB(N)%IRECTM(4*(II-1)+4)
+               IF(TAG(J)/=0)THEN
                INTBUF_TAB(N)%STFM(II)=ZERO
-     	     END IF
-     	   END DO
-     	   IF(NTY==20)THEN
-     	     NLINS  =IPARI(51,N)
-     	     NLINM  =IPARI(52,N)
-     	     IF(NLINS+NLINM /= 0)THEN
-     	       DO II=1,NLINS
-     		 J=INTBUF_TAB(N)%IXLINS(2*(II-1)+1)
-     		 IF(TAG(J)/=0)THEN
+               END IF
+             END DO
+             IF(NTY==20)THEN
+               NLINS  =IPARI(51,N)
+               NLINM  =IPARI(52,N)
+               IF(NLINS+NLINM /= 0)THEN
+                 DO II=1,NLINS
+           J=INTBUF_TAB(N)%IXLINS(2*(II-1)+1)
+           IF(TAG(J)/=0)THEN
                    INTBUF_TAB(N)%STFS(II) = ZERO
-     		 END IF
-     		 J=INTBUF_TAB(N)%IXLINS(2*(II-1)+2)
-     		 IF(TAG(J)/=0)THEN
+           END IF
+           J=INTBUF_TAB(N)%IXLINS(2*(II-1)+2)
+           IF(TAG(J)/=0)THEN
                    INTBUF_TAB(N)%STFS(II) = ZERO
-     		 END IF
-     	       END DO
-     	       DO II=1,NLINM
-     		 J=INTBUF_TAB(N)%IXLINM(2*(II-1)+1)
-     		 IF(TAG(J)/=0)THEN
+           END IF
+                 END DO
+                 DO II=1,NLINM
+           J=INTBUF_TAB(N)%IXLINM(2*(II-1)+1)
+           IF(TAG(J)/=0)THEN
                    INTBUF_TAB(N)%STF(II) = ZERO
-     		 END IF
-     		 J=INTBUF_TAB(N)%IXLINM(2*(II-1)+2)
-     		 IF(TAG(J)/=0)THEN
+           END IF
+           J=INTBUF_TAB(N)%IXLINM(2*(II-1)+2)
+           IF(TAG(J)/=0)THEN
                    INTBUF_TAB(N)%STF(II) = ZERO
-     		 END IF
-     	       END DO
-     	     END IF
-     	   END IF
-     	 ELSEIF(NTY==11)THEN
-     	   DO II=1,NRTS
-     	     J=INTBUF_TAB(N)%IRECTS(2*(II-1)+1)
-     	     IF(TAG(J)/=0)THEN
+           END IF
+                 END DO
+               END IF
+             END IF
+           ELSEIF(NTY==11)THEN
+             DO II=1,NRTS
+               J=INTBUF_TAB(N)%IRECTS(2*(II-1)+1)
+               IF(TAG(J)/=0)THEN
                INTBUF_TAB(N)%STFS(II) = ZERO
-     	     END IF
-     	     J=INTBUF_TAB(N)%IRECTS(2*(II-1)+2)
-     	     IF(TAG(J)/=0)THEN
+               END IF
+               J=INTBUF_TAB(N)%IRECTS(2*(II-1)+2)
+               IF(TAG(J)/=0)THEN
                INTBUF_TAB(N)%STFS(II) = ZERO
-     	     END IF
-     	   END DO
-     	   DO II=1,NRTM
-     	     J=INTBUF_TAB(N)%IRECTM(2*(II-1)+1)
-     	     IF(TAG(J)/=0)THEN
+               END IF
+             END DO
+             DO II=1,NRTM
+               J=INTBUF_TAB(N)%IRECTM(2*(II-1)+1)
+               IF(TAG(J)/=0)THEN
                INTBUF_TAB(N)%STFM(II) = ZERO
-     	     END IF
-     	     J=INTBUF_TAB(N)%IRECTM(2*(II-1)+2)
-     	     IF(TAG(J)/=0)THEN
+               END IF
+               J=INTBUF_TAB(N)%IRECTM(2*(II-1)+2)
+               IF(TAG(J)/=0)THEN
                INTBUF_TAB(N)%STFM(II) = ZERO
-     	     END IF
-     	   END DO
-     	 ELSEIF(NTY==21)THEN
-     	   DO II=1,NSN
-     	     J=INTBUF_TAB(N)%NSV(II)
-     	     IF(TAG(J)/=0) THEN
+               END IF
+             END DO
+           ELSEIF(NTY==21)THEN
+             DO II=1,NSN
+               J=INTBUF_TAB(N)%NSV(II)
+               IF(TAG(J)/=0) THEN
                INTBUF_TAB(N)%STFNS(II) = ZERO
-     	     END IF
-     	   END DO
-     	 END IF
+               END IF
+             END DO
+           END IF
       END DO  
 C-----------------------------------------------
       RETURN
@@ -2713,20 +2651,12 @@ C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "comlock.inc"
 C-----------------------------------------------
-#include "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "intstamp_c.inc"
 #include      "kincod_c.inc"
-#include      "param_c.inc"
-#include      "parit_c.inc"
-#include      "sms_c.inc"
 #include      "task_c.inc"
-#include      "units_c.inc"
-C-----------------------------------------------------------------
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER 

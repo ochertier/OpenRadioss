@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  HM_READ_MAT120                source/materials/mat/mat120/hm_read_mat120.F
 Chd|-- called by -----------
@@ -31,7 +31,7 @@ Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.
 Chd|        HM_OPTION_IS_ENCRYPTED        source/devtools/hm_reader/hm_option_is_encrypted.F
 Chd|        INIT_MAT_KEYWORD              source/materials/mat/init_mat_keyword.F
 Chd|        ELBUFTAG_MOD                  share/modules1/elbuftag_mod.F 
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/matparam_def_mod.F
+Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
@@ -70,24 +70,21 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr03_c.inc"
 #include      "scr17_c.inc"
-#include      "com04_c.inc"
 #include      "param_c.inc"
 #include      "units_c.inc"
-#include      "sysunit.inc"
 C----------------------------------------------- 
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       TYPE (UNIT_TYPE_),INTENT(IN)    :: UNITAB 
       INTEGER ,INTENT(IN   )          :: MAXUPARAM,MAXTABL,MAT_ID
-      INTEGER ,INTENT(OUT)            :: NUMTABL,NUPARAM,NUVAR,NVARTMP
-      INTEGER ,DIMENSION(MAXTABL) ,INTENT(OUT)  :: ITABLE
+      INTEGER ,INTENT(INOUT)            :: NUMTABL,NUPARAM,NUVAR,NVARTMP
+      INTEGER ,DIMENSION(MAXTABL) ,INTENT(INOUT)  :: ITABLE
       my_real ,INTENT(INOUT)          :: PM(NPROPM),PARMAT(100),UPARAM(MAXUPARAM)
       CHARACTER*nchartitle,INTENT(IN) :: TITR
       TYPE(SUBMODEL_DATA),INTENT(IN)  :: LSUBMODEL(*)
-      TYPE(MLAW_TAG_), INTENT(OUT)    :: MTAG
-      TYPE(MATPARAM_STRUCT_) ,INTENT(OUT) :: MATPARAM
+      TYPE(MLAW_TAG_), INTENT(INOUT)  :: MTAG
+      TYPE(MATPARAM_STRUCT_) ,INTENT(INOUT) :: MATPARAM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -156,12 +153,12 @@ c-------------------
       ISRATE = 0
       FCUT   = ZERO
       IF (CC > ZERO) THEN
-        FCUT = 1000.0D0 * FAC_T_WORK
+        FCUT = 1000.0D0 * UNITAB%FAC_T_WORK
       END IF
       IF (EXP_N == ZERO) EXP_N = ONE  
       IF (IFORM == 0) IFORM = 1  
-      IF (ITRX  == 0) ITRX  = 1  
-      IF (IDAM  == 0) IDAM  = 1  
+      IF (ITRX  == 0) ITRX  = 2  
+      IF (IDAM  == 0) IDAM  = 2  
       IF (XSCALE == ZERO) THEN
         CALL HM_GET_FLOATV_DIM('MAT_Xscale' ,XSCALE_UNIT ,IS_AVAILABLE, LSUBMODEL, UNITAB)
         XSCALE = ONE * XSCALE_UNIT
@@ -231,31 +228,38 @@ c
       UPARAM(33) = C12            
 c
       UPARAM(34) = THICK ! For connect element  (type43)
-      ITABLE(1) = YTAB_ID     ! Yield function table = f(epsp,epsdot,temp)
+      ITABLE(1)  = YTAB_ID     ! Yield function table = f(epsp,epsdot,temp)
 c------------------
       PM(1)  = RHOR
       PM(89) = RHO0
       PM(27) = SSP
       PM(100)= BULK      
 c--------------------------------
-      PARMAT(1)  = C11
+      PARMAT(1)  = BULK
       PARMAT(2)  = E
       PARMAT(3)  = NU
       PARMAT(4)  = ISRATE
       PARMAT(5)  = FCUT
 C     Formulation for solid elements time step computation.
       PARMAT(16) = 2
-      PARMAT(17) = TWO*G/(C11+FOUR_OVER_3*G) ! == (1-2*nu)/(1-nu)
+      PARMAT(17) = TWO*G/(BULK+FOUR_OVER_3*G) ! == (1-2*nu)/(1-nu)
 c-----------------
 c     Element buffer variable allocation
 c-----------------
-      MTAG%G_PLA   = 1
-      MTAG%L_PLA   = 1
-      MTAG%L_EPSD  = 1
-      MTAG%G_EPSD  = 1
+      MTAG%G_PLA    = 1
+      MTAG%L_PLA    = 1
+      MTAG%L_EPSD   = 1
+      MTAG%G_EPSD   = 1
+      MTAG%L_DMG    = 1
+      MTAG%G_DMG    = 1
+      MTAG%L_DMGSCL = 1
+
       CALL INIT_MAT_KEYWORD(MATPARAM ,"COMPRESSIBLE")
       CALL INIT_MAT_KEYWORD(MATPARAM ,"INCREMENTAL" )
       CALL INIT_MAT_KEYWORD(MATPARAM ,"LARGE_STRAIN")
+      CALL INIT_MAT_KEYWORD(MATPARAM ,"HOOK")
+      ! Properties compatibility
+      CALL INIT_MAT_KEYWORD(MATPARAM,"SOLID_ALL")
 c-----------------
       WRITE(IOUT,1000) TRIM(TITR),MAT_ID,ILAW
       WRITE(IOUT,1100)
@@ -267,7 +271,7 @@ c-----------------
         IF (YTAB_ID > 0) THEN
           WRITE(IOUT,1300) YTAB_ID,XSCALE,YSCALE
         ELSE
-          WRITE(IOUT,1400) Q,B,H,CC,EPSPMIN,EPSPMAX
+          WRITE(IOUT,1400) Q,B,H,Y0,CC,EPSPMIN,EPSPMAX
         END IF
         WRITE(IOUT,1500) A1F,A2F,A1H,A2H,AS,D1C,D2C,D1F,D2F,
      .                   D_TRX,D_JC,EXP_N,ITRX,IDAM

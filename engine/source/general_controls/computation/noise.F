@@ -1,37 +1,37 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  NOISE                         source/general_controls/computation/noise.F
 Chd|-- called by -----------
 Chd|        SORTIE_MAIN                   source/output/sortie_main.F   
 Chd|-- calls ---------------
-Chd|        CUR_FIL_C                     source/output/tools/sortie_c.c
+Chd|        CUR_FIL_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|        INITNOISE                     source/general_controls/computation/initnoise.F
 Chd|        INITNOISE2                    source/general_controls/computation/initnoise.F
 Chd|        PNOISE                        source/general_controls/computation/pnoise.F
 Chd|        SPMD_GLOB_DSUM9               source/mpi/interfaces/spmd_th.F
 Chd|        WRTDES                        source/output/th/wrtdes.F     
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE NOISE(
      1   DT2R  ,IN,J     ,BUF  ,V     ,
@@ -48,7 +48,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "r4r8_p.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
@@ -174,7 +173,7 @@ C
       IF(IMACH==3.AND.ISPMD/=0) THEN
         DO I=1,6*NNOISE
           DO L=1,NCNOIS
-            BUF(L,I)=ZERO	 
+            BUF(L,I)=ZERO   
           ENDDO
         ENDDO
       ENDIF
@@ -191,13 +190,13 @@ C
             IF(NOISEV/=0)THEN
              BUF(1,KK)=BUF(1,KK)+CC *V(1,IN(I))
              BUF(2,KK)=BUF(2,KK)+CC *V(2,IN(I))
-	            BUF(3,KK)=BUF(3,KK)+CC *V(3,IN(I))
+                      BUF(3,KK)=BUF(3,KK)+CC *V(3,IN(I))
             ENDIF
             IF(NOISEA/=0)THEN
              IAD=3*NOISEV
              BUF(IAD+1,KK)=BUF(IAD+1,KK)+CC *A(1,IN(I))
              BUF(IAD+2,KK)=BUF(IAD+2,KK)+CC *A(2,IN(I))
-	            BUF(IAD+3,KK)=BUF(IAD+3,KK)+CC *A(3,IN(I))
+                      BUF(IAD+3,KK)=BUF(IAD+3,KK)+CC *A(3,IN(I))
             ENDIF
            ENDIF
           END IF

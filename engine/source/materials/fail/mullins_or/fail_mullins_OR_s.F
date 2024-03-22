@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  FAIL_MULLINS_OR_S             source/materials/fail/mullins_or/fail_mullins_OR_s.F
 Chd|-- called by -----------
@@ -29,10 +29,10 @@ Chd|-- calls ---------------
 Chd|        MULLINS_OR                    source/materials/fail/mullins_or/fail_mullins_OR_s.F
 Chd|====================================================================
       SUBROUTINE FAIL_MULLINS_OR_S(
-     1     NEL    ,NUPARAM  ,NUVAR   ,NPF    ,TF     ,
+     1     NEL    ,NUPARAM  ,NUVAR   ,
      2     TIME   ,TIMESTEP ,UPARAM  ,NGL    ,  
-     3     MAT    ,SIGNXX   ,SIGNYY  ,SIGNZZ ,SIGNXY  ,
-     4     SIGNYZ ,SIGNZX   ,UVAR    ,OFF    ,IP     ,
+     3     SIGNXX ,SIGNYY   ,SIGNZZ  ,SIGNXY  ,
+     4     SIGNYZ ,SIGNZX   ,UVAR    ,OFF    ,
      5     DFMAX  ,WW)
 C---------+---------+---+---+--------------------------------------------
 c---------+---------+---+---+--------------------------------------------
@@ -48,9 +48,6 @@ C NEL     |  1      | I | R | SIZE OF THE ELEMENT GROUP NEL
 C NUPARAM |  1      | I | R | SIZE OF THE USER PARAMETER ARRAY
 C NUVAR   |  1      | I | R | NUMBER OF FAILURE ELEMENT VARIABLES
 C---------+---------+---+---+--------------------------------------------
-C NPF     |  *      | I | R | FUNCTION ARRAY   
-C TF      |  *      | F | R | FUNCTION ARRAY 
-C---------+---------+---+---+--------------------------------------------
 C TIME    |  1      | F | R | CURRENT TIME
 C TIMESTEP|  1      | F | R | CURRENT TIME STEP
 C UPARAM  | NUPARAM | F | R | USER FAILURE PARAMETER ARRAY
@@ -63,18 +60,13 @@ C---------+---------+---+---+--------------------------------------------
 C UVAR    |NEL*NUVAR| F |R/W| USER ELEMENT VARIABLE ARRAY
 C OFF     | NEL     | F |R/W| DELETED ELEMENT FLAG (=1. ON, =0. OFF)
 C---------+---------+---+---+--------------------------------------------
-#include "units_c.inc"
-#include "param_c.inc"
-#include "scr17_c.inc"
-#include "scr19_c.inc"
-#include "com01_c.inc"
 C-----------------------------------------------
 C   I N P U T   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER,  INTENT(IN) ::  NEL,NUPARAM  ,NUVAR ,IP
+      INTEGER,  INTENT(IN) ::  NEL,NUPARAM  ,NUVAR
       my_real,  INTENT(IN) ::  TIME,TIMESTEP
       my_real, DIMENSION(NUPARAM),  INTENT(IN) :: UPARAM
-      my_real, DIMENSION(NEL), INTENT(IN) ::NGL,MAT, WW
+      my_real, DIMENSION(NEL), INTENT(IN) ::NGL, WW
 C-----------------------------------------------
 C   O U T P U T   A r g u m e n t s
 C-----------------------------------------------
@@ -86,18 +78,10 @@ C-----------------------------------------------
      .   SIGNYY,SIGNZZ,SIGNXY,SIGNYZ,SIGNZX,DFMAX, OFF
       my_real, DIMENSION(NEL,NUVAR), INTENT(INOUT) :: UVAR      
 C-----------------------------------------------
-C   VARIABLES FOR FUNCTION INTERPOLATION 
-C-----------------------------------------------
-      INTEGER NPF(*)
-      my_real TF(*)
-C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,J,JJ,K,IR,IADBUF,NINDX,IFAIL
-      INTEGER, DIMENSION(NEL) :: 
-     .   INDX
-C
-
+      INTEGER, DIMENSION(NEL) :: INDX
       my_real 
      .    COEFR, BETAF ,COEFM,SXX,SYY,SZZ,TRACE,ETA(NEL)
 C=======================================================================
@@ -158,9 +142,6 @@ C NEL     |  1      | I | R | SIZE OF THE ELEMENT GROUP NEL
 C NUPARAM |  1      | I | R | SIZE OF THE USER PARAMETER ARRAY
 C NUVAR   |  1      | I | R | NUMBER OF FAILURE ELEMENT VARIABLES
 C---------+---------+---+---+--------------------------------------------
-C NPF     |  *      | I | R | FUNCTION ARRAY   
-C TF      |  *      | F | R | FUNCTION ARRAY 
-C---------+---------+---+---+--------------------------------------------
 C TIME    |  1      | F | R | CURRENT TIME
 C TIMESTEP|  1      | F | R | CURRENT TIME STEP
 C UPARAM  | NUPARAM | F | R | USER FAILURE PARAMETER ARRAY
@@ -173,11 +154,6 @@ C---------+---------+---+---+--------------------------------------------
 C UVAR    |NEL*NUVAR| F |R/W| USER ELEMENT VARIABLE ARRAY
 C OFF     | NEL     | F |R/W| DELETED ELEMENT FLAG (=1. ON, =0. OFF)
 C---------+---------+---+---+--------------------------------------------
-#include "units_c.inc"
-#include "param_c.inc"
-#include "scr17_c.inc"
-#include "scr19_c.inc"
-#include "com01_c.inc"
 C-----------------------------------------------
 C   I N P U T   A r g u m e n t s
 C-----------------------------------------------
@@ -194,7 +170,6 @@ C-----------------------------------------------
       my_real, DIMENSION(NEL,NUVAR ), INTENT(INOUT) ::  UVAR
 C-----------------------------------------------
 C   VARIABLES FOR FUNCTION INTERPOLATION 
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  I18FOR3                       source/interfaces/int18/i18for3.F
 Chd|-- called by -----------
@@ -31,9 +31,10 @@ Chd|        I7ASS3                        source/interfaces/int07/i7ass3.F
 Chd|        MULTI_I18_FORCE_POFF          source/interfaces/int18/multi_i18_force_poff.F
 Chd|        MULTI_I18_FORCE_PON           source/interfaces/int18/multi_i18_force_pon.F
 Chd|        ALEANIM_MOD                   share/modules/aleanim_mod.F   
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ANIM_MOD                      ../common_source/modules/anim_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
       SUBROUTINE I18FOR3(JLT      ,A          ,V         ,IBCC      ,ICODT         ,
@@ -75,7 +76,8 @@ C-----------------------------------------------
       USE MULTI_FVM_MOD
       USE H3D_MOD
       USE ALEANIM_MOD !FANI_CELL   
-      USE ELBUFDEF_MOD       
+      USE ELBUFDEF_MOD   
+      USE ANIM_MOD    
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -92,22 +94,14 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "com06_c.inc"
 #include      "com08_c.inc"
-#include      "scr02_c.inc"
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
 #include      "scr07_c.inc"
-#include      "scr11_c.inc"
 #include      "scr14_c.inc"
 #include      "scr16_c.inc"
 #include      "scr18_c.inc"
 #include      "units_c.inc"
 #include      "parit_c.inc"
-#include      "warn_c.inc"
-#include      "couple_c.inc"
 #include      "param_c.inc"
-#include      "task_c.inc"
 #include      "kincod_c.inc"
-#include      "inter18.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -182,13 +176,11 @@ C-----------------------------------------------
      .   CS(MVSIZ),C1(MVSIZ),C2(MVSIZ),C3(MVSIZ),C4(MVSIZ),
      .   CX,CY,CFI,AUX,PHI1(MVSIZ), PHI2(MVSIZ), PHI3(MVSIZ),
      .   PHI4(MVSIZ),DX, DTI
-      INTEGER JSUB,KSUB,JJ,KK,IN,NSUB,IBID,IDX,ILEN,IPOS,ITASK,NELFT,NELLT
-      my_real
-     .   FSAVSUB1(15,NISUB),IMPX,IMPY,IMPZ,PP1,PP2,PP3,PP4,BID
+      INTEGER JSUB,KSUB,JJ,KK,IN,NSUB,IBID,ITASK,NELFT,NELLT
+      my_real FSAVSUB1(15,NISUB),IMPX,IMPY,IMPZ,PP1,PP2,PP3,PP4,BID
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------
-#include "sync_dir.inc"
 
       IBID   = 0
       BID    = ZERO      
@@ -778,16 +770,12 @@ C---------------------------------
            !   /H3D/ELEM/VECT/CONT WITH LAW151 (COLOCATED SCHEME)                       
            IF (MULTI_FVM%IS_USED) THEN 
              IF(H3D_DATA%N_VECT_CONT  > 0)THEN                                                 
-               IDX=NUMELS*(ANIM_SE(10)+ANIM_SE(4960)+ANIM_SE(4961)) !skip vorticity data  
-               ILEN=NUMELS+NUMELQ                                                         
-               DO I=1,JLT                                                                 
-                 IPOS=NSVG(I)
-                 IF(IPOS>0) THEN ! local cell
-                      IPOS=IPOS-NUMNOD                                                         
-                      IPOS = IDX+3*(IPOS-1)                                                    
-                      FANI_CELL(IPOS+1)=FANI_CELL(IPOS+1)-FXI(I)                               
-                      FANI_CELL(IPOS+2)=FANI_CELL(IPOS+2)-FYI(I)                               
-                      FANI_CELL(IPOS+3)=FANI_CELL(IPOS+3)-FZI(I)                               
+               DO I=1,JLT
+                 JG=NSVG(I)-NUMNOD
+                 IF(JG>0) THEN ! local cell
+                    FANI_CELL%F18(1,JG)=FANI_CELL%F18(1,JG)-FXI(I)
+                    FANI_CELL%F18(2,JG)=FANI_CELL%F18(2,JG)-FYI(I)
+                    FANI_CELL%F18(3,JG)=FANI_CELL%F18(3,JG)-FZI(I)
                   ENDIF
                ENDDO     
              ENDIF                                                                 
@@ -805,9 +793,10 @@ C---------------------------------
            ENDIF                                                                        
 #include "lockoff.inc"
       ENDIF
-      IF(ANIM_V(12)+OUTP_V(12)+H3D_DATA%N_VECT_PCONT > 0 .AND.
-     .    (TT>=TANIM.OR.TT>=TOUTP.OR.TT>=H3D_DATA%TH3D .OR.
-     .    (MANIM>=4.AND.MANIM<=15).OR.H3D_DATA%MH3D /= 0))THEN
+      IF((ANIM_V(12)+OUTP_V(12)+H3D_DATA%N_VECT_PCONT > 0 .AND.
+     .    ((TT>=TANIM .AND. TT<=TANIM_STOP).OR.TT>=TOUTP.OR.(TT>=H3D_DATA%TH3D.AND.TT<=H3D_DATA%TH3D_STOP) .OR.
+     .    (MANIM>=4.AND.MANIM<=15).OR.H3D_DATA%MH3D /= 0))
+     .   .OR.H3D_DATA%N_VECT_PCONT_MAX>0)THEN
 #include "lockon.inc"
            DO I=1,JLT
             FNCONT(1,IX1(I)) =FNCONT(1,IX1(I)) + FXI(I)*H1(I)

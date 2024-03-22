@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  I2COR3                        source/interfaces/inter3d1/i2cor3.F
 Chd|-- called by -----------
@@ -41,7 +41,7 @@ Chd|====================================================================
      5                  IX3    ,IX4    ,NSVG,X1      ,X2    ,
      6                  X3     ,X4     ,Y1  ,Y2      ,Y3    ,
      7                  Y4     ,Z1     ,Z2  ,Z3      ,Z4    ,
-     8                  XI     ,YI     ,ZI  ,STIF)
+     8                  XI     ,YI     ,ZI  ,STIF    ,IFLAG )
 C============================================================================
 C  cette routine est appelee par : I7BUC1(/inter3d1/i7buc1.F)
 C                                  I7TRI(/inter3d1/i7tri.F)
@@ -69,6 +69,7 @@ C-----------------------------------------------
      .        NOD2ELTG(*),NINT,IGNORE,
      .        IXS16(*), IXS20(*),IPARTTG(*),IGEO(NPROPGI,*),
      .        IWORKSH(*)
+      INTEGER, INTENT(IN) :: IFLAG
 C     REAL
       my_real
      .   GAP, X(3,*), STF(*), STFN(*), GAPV(*), GAP_S(*), GAP_M(*),
@@ -86,6 +87,7 @@ C-----------------------------------------------
 #include      "param_c.inc"
 #include      "scr08_c.inc"
 #include      "vect07_c.inc"
+#include      "units_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -93,18 +95,8 @@ C-----------------------------------------------
      .        IEL,MG,IP,NELS,NELC,NELTG
 C     REAL
       my_real
-     .     THKSECND,THKMAIN,DD,DX1,DY1,DZ1,DX3,DY3,DZ3,VOL,AREA
+     .     THKSECND,THKMAIN,DD,DX1,DY1,DZ1,DX3,DY3,DZ3,VOL,AREA,GAPMIN,GAPMAX
 C-----------------------------------------------
-C
-!      EQUIVALENCE (IX1,IV(1,1)) ,(IX2,IV(1,2)) ,(IX3,IV(1,3))
-!      EQUIVALENCE (IX4,IV(1,4)) ,(NSVG,IV(1,5))
-C
-!      EQUIVALENCE (X1,BV(1,1)) ,(Y1,BV(1,2)) ,(Z1,BV(1,3))
-!      EQUIVALENCE (X2,BV(1,4)) ,(Y2,BV(1,5)) ,(Z2,BV(1,6))
-!      EQUIVALENCE (X3,BV(1,7)) ,(Y3,BV(1,8)) ,(Z3,BV(1,9))
-!      EQUIVALENCE (X4,BV(1,10)),(Y4,BV(1,11)),(Z4,BV(1,12))
-!      EQUIVALENCE (XI,BV(1,13)),(YI,BV(1,14)),(ZI,BV(1,15))
-!      EQUIVALENCE (STIF,BV(1,30))
 C
       DO I=LFT,LLT
        IG = NSV(CAND_N(I))
@@ -114,14 +106,18 @@ C
        ZI(I) = X(3,IG)
       ENDDO
 C
+      GAPMIN = EP30
+      GAPMAX = ZERO
       IF(IGAP==0 .AND. IGNORE <= 1)THEN
         DO I=LFT,LLT
          GAPV(I) = GAP
         ENDDO 
+        IF(IFLAG==1) WRITE(IOUT,2001) GAP
       ELSEIF((IGNORE == 2 .OR. IGNORE == 3) .AND. DSEARCH /= ZERO)THEN
         DO I=LFT,LLT
           GAPV(I) = GAP
         ENDDO
+        IF(IFLAG==1) WRITE(IOUT,2001) GAP
       ELSEIF(IGNORE >= 2)THEN
         DO I=LFT,LLT
           THKSECND = ZERO
@@ -130,27 +126,27 @@ C
           DO IAD = KNOD2ELC(NSVG(I))+1,KNOD2ELC(NSVG(I)+1)
             IEL  = NOD2ELC(IAD)
             MG=IXC(6,IEL)
-	    IP = IPARTC(IEL)
+              IP = IPARTC(IEL)
             IF ( THK_PART(IP) /= ZERO) THEN  
               THKSECND = THK_PART(IP)
-	    ELSEIF ( THK(IEL) /= ZERO) THEN
-	      THKSECND = THK(IEL)
-	    ELSE
+              ELSEIF ( THK(IEL) /= ZERO) THEN
+                THKSECND = THK(IEL)
+              ELSE
               THKSECND = GEO(1,MG)
-	    ENDIF
+              ENDIF
           ENDDO 
 C--         Cooques 3n
           DO IAD = KNOD2ELTG(NSVG(I))+1,KNOD2ELTG(NSVG(I)+1)
             IEL  = NOD2ELTG(IAD) 
             MG=IXTG(5,IEL)
-	    IP = IPARTTG(IEL)
+              IP = IPARTTG(IEL)
             IF ( THK_PART(IP) /= ZERO) THEN  
               THKSECND = THK_PART(IP)
-	    ELSEIF ( THK(NUMELC+IEL) /= ZERO) THEN
-	      THKSECND = THK(NUMELC+IEL)
-	    ELSE
+              ELSEIF ( THK(NUMELC+IEL) /= ZERO) THEN
+                THKSECND = THK(NUMELC+IEL)
+              ELSE
               THKSECND = GEO(1,MG)
-	    ENDIF
+              ENDIF
           ENDDO
           NELS = 0
           NELC = 0
@@ -164,24 +160,24 @@ C--         Cooques 3n
      .            PM_STACK , IWORKSH )
           IF(NELTG/=0) THEN
             MG=IXTG(5,NELTG)
-	    IP = IPARTTG(NELTG) 
+              IP = IPARTTG(NELTG) 
             IF ( THK_PART(IP) /= ZERO) THEN  
               THKMAIN = THK_PART(IP)
-	    ELSEIF ( THK(NUMELC+NELTG) /= ZERO) THEN
+              ELSEIF ( THK(NUMELC+NELTG) /= ZERO) THEN
               THKMAIN = THK(NUMELC+NELTG)
-	    ELSE
+              ELSE
               THKMAIN = GEO(1,MG)
-	    ENDIF
+              ENDIF
           ELSEIF(NELC/=0) THEN
             MG=IXC(6,NELC)
-	    IP = IPARTC(NELC) 
+              IP = IPARTC(NELC) 
             IF ( THK_PART(IP) /= ZERO) THEN  
               THKMAIN = THK_PART(IP)
-	    ELSEIF ( THK(NELC) /= ZERO) THEN
+              ELSEIF ( THK(NELC) /= ZERO) THEN
               THKMAIN = THK(NELC)
-	    ELSE
+              ELSE
               THKMAIN = GEO(1,MG)
-	    ENDIF
+              ENDIF
           ELSEIF(NELS/=0 .AND. NELS <= NUMELS8 .AND. IGNORE == 2) THEN
             DO JJ=1,8
               JJJ=IXS(JJ+1,NELS)
@@ -209,12 +205,18 @@ C         LONGUEUR DIAG 2
           DZ3=(X(3,NODE2)-X(3,NODE4))
           DD=MIN(DD,SQRT(DX3**2+DY3**2+DZ3**2))
           GAPV(I) = MAX(ZEP05*DD,ZEP6*(THKSECND+THKMAIN))
+          GAPMIN = MIN(GAPMIN,GAPV(I))
+          GAPMAX = MAX(GAPMAX,GAPV(I))
         ENDDO
+        IF(IFLAG==1) WRITE(IOUT,2002) GAPMIN,GAPMAX
       ELSE
         DO I=LFT,LLT
          GAPV(I) = GAP_S(CAND_N(I))+GAP_M(CAND_E(I))
          GAPV(I) = MAX(GAP,GAPV(I))
+          GAPMIN = MIN(GAPMIN,GAPV(I))
+          GAPMAX = MAX(GAPMAX,GAPV(I))
         ENDDO
+        IF(IFLAG==1) WRITE(IOUT,2002) GAPMIN,GAPMAX
       ENDIF
 C
       IF(ISTF/=0)THEN
@@ -259,5 +261,8 @@ C
       ENDDO
 C
       RETURN
+C---+----1----+----2----+----3----+----4----+----5----+----6----+----7--
+ 2001 FORMAT(//,1X,'SEARCH DISTANCE . . . . . . . . . . . . . .',1PG20.13/)
+ 2002 FORMAT(//,1X,'SEARCH DISTANCE . . . . . . . . . . . . . .BETWEEN',1PG20.13,' AND ',1PG20.13/)
+C---+----1----+----2----+----3----+----4----+----5----+----6----+----7--
       END
-

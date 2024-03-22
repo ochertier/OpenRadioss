@@ -1,33 +1,41 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  UPWIND4                       source/elements/solid/solide4/upwind4.F
 Chd|-- called by -----------
 Chd|        A4MOMT3                       source/elements/solid/solide4/a4momt3.F
 Chd|        A4MOMTN3                      source/elements/solid/solide4/a4momtn3.F
 Chd|-- calls ---------------
+Chd|        ALE_MOD                       ../common_source/modules/ale/ale_mod.F
 Chd|====================================================================
-      SUBROUTINE UPWIND4(RHO,VIS,VDX,VDY,VDZ,R,S,T,GAM)
+      SUBROUTINE UPWIND4(
+     1   RHO,     VIS,     VDX,     VDY,
+     2   VDZ,     R,       S,       T,
+     3   GAM,     NEL)
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
+      USE ALE_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -39,13 +47,11 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com08_c.inc"
-#include      "vect01_c.inc"
-#include      "scrupw_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: NEL
       my_real
      .   R(MVSIZ,3),S(MVSIZ,3),T(MVSIZ,3),
      .   VDX(*),VDY(*),VDZ(*),RHO(*),VIS(*),GAM(*)
@@ -63,17 +69,17 @@ C-----------------------------------------------
       !-------------!
       !   /UPWM/TG  !
       !-------------!
-      IF(UPWM==2)THEN
-        FAC=CUPWM*HALF*DT1
-        DO I=LFT,LLT
+      IF(ALE%UPWIND%UPWM==2)THEN
+        FAC=ALE%UPWIND%CUPWM*HALF*DT1
+        DO I=1,NEL
           GAM(I)=FAC
         END DO
         
       !-------------!
       !  /UPWM/SUPG !
       !-------------!
-      ELSEIF(UPWM==3)THEN
-        DO  I=LFT,LLT
+      ELSEIF(ALE%UPWIND%UPWM==3)THEN
+        DO  I=1,NEL
           V(I)=VDX(I)**2+VDY(I)**2+VDZ(I)**2
           D1=ABS(R(I,1)*VDX(I)+R(I,2)*VDY(I)+R(I,3)*VDZ(I)) 
           D2=ABS(S(I,1)*VDX(I)+S(I,2)*VDY(I)+S(I,3)*VDZ(I)) 
@@ -81,12 +87,12 @@ C-----------------------------------------------
           GAM(I)=MAX(D1,D2,D3) !dominant direction
         ENDDO 
 
-        CH2=CUPWM*HALF
+        CH2=ALE%UPWIND%CUPWM*HALF
         CH1=CH2*THIRD
        
        !SU/PG weighting function for current node.
        !SUPG is a Finite Element Method !
-        DO  I=LFT,LLT
+        DO  I=1,NEL
           FAC=HALF*RHO(I)/MAX(EM20,VIS(I))
           PE=FAC*GAM(I)
           IF(PE<=EM3)THEN

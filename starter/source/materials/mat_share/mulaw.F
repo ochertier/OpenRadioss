@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  MULAW                         source/materials/mat_share/mulaw.F
 Chd|-- called by -----------
@@ -31,25 +31,28 @@ Chd|        SIGEPS38                      source/materials/mat/mat038/sigeps38.F
 Chd|        SIGEPS42                      source/materials/mat/mat042/sigeps42.F
 Chd|        SIGEPS70                      source/materials/mat/mat070/sigeps70.F
 Chd|        SIGEPS90                      source/materials/mat/mat090/sigeps90.F
+Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
 Chd|====================================================================
       SUBROUTINE MULAW(LFT   ,LLT   ,NFT    ,MTN   ,JCVT   ,
      2                 PM    ,OFF   ,SIG    ,EINT  ,RHO    ,
-     3                        VOL   ,STRAIN ,       GAMA   ,
+     3                 VOL   ,STRAIN,GAMA   ,
      4                 UVAR  ,BUFMAT,TF     ,NPF   ,
-     5                 MAT   ,NGL   ,NUVAR  ,
-     6                               GEO    ,PID   ,EPSD   ,
-     8                                              WXX    ,
-     9                 WYY   ,WZZ   ,JSPH   ,       SSP    ,
-     A                        VOLN  ,               VIS    ,
-     B                 D1    ,D2    ,D3     ,D4    ,D5     ,
-     C                 D6    ,
-     D                 DVOL  ,SOLD1 ,SOLD2  ,SOLD3 ,SOLD4  ,
-     E                 SOLD5 ,SOLD6 ,RX     ,RY    ,RZ     ,
-     F                 SX    ,SY    ,SZ     ,TX    ,TY     ,
-     G                 TZ    ,                      ISMSTR ,
-     H                 MFXX  ,MFXY  ,MFXZ   ,MFYX  ,MFYY   , 
-     I                 MFYZ  ,MFZX  ,MFZY   ,MFZZ  ,IPM    ,
-     J                 ISORTH,NEL   )
+     5                 IMAT  ,NGL   ,NUVAR  ,NVARTMP,VARTMP,
+     6                 GEO   ,PID   ,EPSD   ,
+     8                 WXX   ,WYY   ,WZZ    ,JSPH   ,SSP    ,
+     9                 VOLN  ,VIS   ,D1    ,
+     A                 D2    ,D3     ,D4    ,D5     ,D6    ,                      
+     B                 DVOL  ,SOLD1 ,SOLD2  ,SOLD3 ,SOLD4  ,
+     C                 SOLD5 ,SOLD6 ,RX     ,RY    ,RZ     ,
+     D                 SX    ,SY    ,SZ     ,TX    ,TY     ,
+     E                 TZ    ,ISMSTR,
+     F                 MFXX  ,MFXY  ,MFXZ   ,MFYX  ,MFYY   , 
+     G                 MFYZ  ,MFZX  ,MFZY   ,MFZZ  ,IPM    ,
+     H                 ISORTH,NEL   ,MATPARAM)
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
+      USE MATPARAM_DEF_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -61,20 +64,17 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com08_c.inc"
 #include      "param_c.inc"
 #include      "scr03_c.inc"
-#include      "units_c.inc"
+#include      "com04_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER LFT,LLT,NFT,MTN,NUVAR,JCVT,ISORTH,
-     .        JSPH,ISMSTR,NEL
-      INTEGER NPF(*), MAT(MVSIZ), NGL(MVSIZ),PID(MVSIZ),IPM(NPROPMI,*)
+      INTEGER LFT,LLT,NFT,MTN,NUVAR,JCVT,ISORTH,JSPH,ISMSTR,NEL,IMAT,NVARTMP
+      INTEGER NPF(*), NGL(MVSIZ),PID(MVSIZ),IPM(NPROPMI,NUMMAT)
 C 
       my_real 
-     .   PM(NPROPM,*), GAMA(*), 
+     .   PM(NPROPM,NUMMAT), GAMA(*), 
      .   OFF(*), SIG(NEL,6), STRAIN(NEL,6), EINT(*),
      .   RHO(*), VOL(*), UVAR(*), BUFMAT(*), TF(*),
      .   GEO(NPROPG,*),EPSD(MVSIZ),
@@ -89,12 +89,13 @@ C
      .   TX(MVSIZ)    ,TY(MVSIZ)    ,TZ(MVSIZ)   ,
      .   MFXX(*)  ,MFXY(*)  ,MFXZ(*)  ,MFYX(*) ,MFYY(*)   ,MFYZ(*)   ,
      .   MFZX(*)  ,MFZY(*)  ,MFZZ(*)
+      INTEGER ,DIMENSION(NEL,NVARTMP) ,INTENT(INOUT):: VARTMP
+      TYPE(MATPARAM_STRUCT_) ,DIMENSION(NUMMAT) ,INTENT(INOUT) :: MATPARAM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J,
-     .        NVPHAS, N0PHAS, NPH, IFLG,
-     .        NPAR, IADBUF, NFUNC, IFUNC(100) 
+      INTEGER I,J,NVPHAS, N0PHAS, NPH, IFLG,NPAR, 
+     .   IADBUF, NFUNC, IFUNC(100) 
       my_real
      . EP1(MVSIZ), EP2(MVSIZ), EP3(MVSIZ),E7(MVSIZ),
      . EP4(2*MVSIZ),EP5(2*MVSIZ),EP6(2*MVSIZ),
@@ -108,24 +109,22 @@ C-----------------------------------------------
      .SV1(MVSIZ),SV2(MVSIZ),SV3(MVSIZ),SV4(MVSIZ),SV5(MVSIZ),SV6(MVSIZ),
      .R11(MVSIZ),R12(MVSIZ),R13(MVSIZ),R21(MVSIZ),R22(MVSIZ),R23(MVSIZ),    
      .R31(MVSIZ),R32(MVSIZ),R33(MVSIZ)
-      my_real 
-     .   RHO0(MVSIZ),VOL_AVG(MVSIZ)
-      my_real
-     . RBID, E1, E2, E3, E4, E5, E6, P2, TIME, TIMESTEP
+      my_real RHO0(MVSIZ),VOL_AVG(MVSIZ)
+      my_real RBID, E1, E2, E3, E4, E5, E6, P2, TIME, TIMESTEP
 C=======================================================================
       TIME    =ZERO
       TIMESTEP=ONE/FLOAT(NITRS)
 C---------------------------
-      NPAR   = IPM(9,MAT(1))
-      IADBUF = IPM(7,MAT(1))
-      NFUNC  = IPM(10,MAT(1))
+      NPAR   = IPM(9,IMAT)
+      IADBUF = IPM(7,IMAT)
+      NFUNC  = IPM(10,IMAT)
       DO I=1,NFUNC
-        IFUNC(I) = IPM(10+I,MAT(1))
+        IFUNC(I) = IPM(10+I,IMAT)
       ENDDO
 C---------------------------
       VIS = ZERO
       DO I=LFT,LLT
-        RHO0(I)= PM( 1,MAT(I))
+        RHO0(I)= PM(1,IMAT)
       END DO
 C---------------------------
       EP1 = ZERO
@@ -149,7 +148,7 @@ C---------------------------
       S6  = ZERO
       E7  = ZERO
 C---------------------------
-C     ISOTROPE ET ORTHOTROPE CONVECTE (JCVT>0)
+C     ISOTROPE ET ORTHOTROPE CONVECTED (JCVT>0)
 C---------------------------
       DO I=LFT,LLT
        DE1(I) = D1(I)
@@ -185,18 +184,12 @@ C     unify w/ Engine-----
        IF (ISMSTR == 10.OR.ISMSTR == 12) THEN
           DO I=LFT,LLT
 C Is like 42 ...etc we compute [B]=[F][F]^t - I strain----- e.g. 62,92,88  
-            ES1(I)=MFXX(I)*(TWO+MFXX(I))+
-     .          MFXY(I)*MFXY(I)+MFXZ(I)*MFXZ(I) 
-            ES2(I)=MFYY(I)*(TWO+MFYY(I))+
-     .          MFYX(I)*MFYX(I)+MFYZ(I)*MFYZ(I)
-            ES3(I)=MFZZ(I)*(TWO+MFZZ(I))+
-     .          MFZX(I)*MFZX(I)+MFZY(I)*MFZY(I)
-            ES4(I)=TWO*(MFXY(I)+MFYX(I)+MFXX(I)*MFYX(I)+
-     .               MFXY(I)*MFYY(I)+MFXZ(I)*MFYZ(I))
-            ES6(I)=TWO*(MFXZ(I)+MFZX(I)+MFXX(I)*MFZX(I)+
-     .               MFXY(I)*MFZY(I)+MFXZ(I)*MFZZ(I))
-            ES5(I)=TWO*(MFZY(I)+MFYZ(I)+MFZX(I)*MFYX(I)+
-     .               MFZY(I)*MFYY(I)+MFZZ(I)*MFYZ(I))  
+            ES1(I)=MFXX(I)*(TWO+MFXX(I))+MFXY(I)*MFXY(I)+MFXZ(I)*MFXZ(I) 
+            ES2(I)=MFYY(I)*(TWO+MFYY(I))+MFYX(I)*MFYX(I)+MFYZ(I)*MFYZ(I)
+            ES3(I)=MFZZ(I)*(TWO+MFZZ(I))+MFZX(I)*MFZX(I)+MFZY(I)*MFZY(I)
+            ES4(I)=TWO*(MFXY(I)+MFYX(I)+MFXX(I)*MFYX(I)+MFXY(I)*MFYY(I)+MFXZ(I)*MFYZ(I))
+            ES6(I)=TWO*(MFXZ(I)+MFZX(I)+MFXX(I)*MFZX(I)+MFXY(I)*MFZY(I)+MFXZ(I)*MFZZ(I))
+            ES5(I)=TWO*(MFZY(I)+MFYZ(I)+MFZX(I)*MFYX(I)+MFZY(I)*MFYY(I)+MFZZ(I)*MFYZ(I))  
           ENDDO
        ELSEIF(ISMSTR == 11)THEN
           DO I=LFT,LLT
@@ -210,7 +203,7 @@ C Is like 42 ...etc we compute [B]=[F][F]^t - I strain----- e.g. 62,92,88
        END IF
 C          IF (JCVT <= 0 .AND. ISORTH /= 0) THEN
 C---------------------------
-C a verifier:       ORTHOTROPE GLOBAL
+C       ORTHOTROIC / GLOBAL
 C---------------------------
 C            CALL MREPLOC(GAMA,R11,R12,R13,R21,R22    ,
 C     2                   R23 ,R31,R32,R33,
@@ -266,22 +259,20 @@ C ====================================================================
      6                  ES1 ,ES2 ,ES3 ,ES4  ,ES5  ,ES6 ,
      7                  SO1 ,SO2 ,SO3 ,SO4  ,SO5  ,SO6 ,
      8                  S1  ,S2  ,S3  ,S4   ,S5   ,S6  ,
-     9                  SV1 ,SV2 ,SV3 ,SV4  ,SV5  ,SV6 ,
      A                  SSP ,VIS ,UVAR,OFF  ,WXX  ,WYY ,
      .                  WZZ ,ISMSTR,MFXX,MFXY,MFXZ,MFYX, 
      .                  MFYY ,MFYZ ,MFZX ,MFZY,MFZZ)
       ELSEIF(MTN==70)THEN
         CALL SIGEPS70(LLT ,NPAR,NUVAR,NFUNC,IFUNC,
      2                  NPF ,TF  ,TIME,TIMESTEP,BUFMAT,
-     3                  RHO0,RHO ,VOLN,EINT,
-     4                  EP1 ,EP2 ,EP3 ,EP4  ,EP5  ,EP6 ,
-     5                  DE1 ,DE2 ,DE3 ,DE4  ,DE5  ,DE6 ,
-     6                  ES1 ,ES2 ,ES3 ,ES4  ,ES5  ,ES6 ,
-     7                  SO1 ,SO2 ,SO3 ,SO4  ,SO5  ,SO6 ,
-     8                  S1  ,S2  ,S3  ,S4   ,S5   ,S6  ,
-     9                  SV1 ,SV2 ,SV3 ,SV4  ,SV5  ,SV6 ,
-     A                  SSP ,VIS ,UVAR,OFF  ,NGL  ,
-     B                  PM  ,IPM ,MAT ,EPSD )
+     3                  RHO0,RHO ,VOLN,EINT,NVARTMP ,VARTMP  ,
+     4                  DE1 ,DE2 ,DE3 ,DE4  ,DE5  ,DE6 ,
+     5                  ES1 ,ES2 ,ES3 ,ES4  ,ES5  ,ES6 ,
+     6                  SO1 ,SO2 ,SO3 ,SO4  ,SO5  ,SO6 ,
+     7                  S1  ,S2  ,S3  ,S4   ,S5   ,S6  ,
+     8                  SV1 ,SV2 ,SV3 ,SV4  ,SV5  ,SV6 ,
+     9                  SSP ,VIS ,UVAR,OFF  ,NGL  ,
+     A                  PM  ,IPM ,IMAT ,MATPARAM(IMAT))
       ELSEIF(MTN==90)THEN
         CALL SIGEPS90(LLT ,NPAR,NUVAR,NFUNC,IFUNC,
      2                  NPF ,TF  ,TIME,TIMESTEP,BUFMAT,

@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  LOAD_PRESSURE                 source/loads/general/load_pressure/load_pressure.F
 Chd|-- called by -----------
@@ -28,17 +28,19 @@ Chd|-- calls ---------------
 Chd|        FINTER                        source/tools/curve/finter.F   
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
+Chd|        TH_SURF_MOD                   ../common_source/modules/interfaces/th_surf_mod.F
 Chd|====================================================================
-      SUBROUTINE LOAD_PRESSURE (ILOADP    ,LOADP     ,LLOADP ,NPC     ,TF      ,
-     2                          A         ,V         ,X      ,SKEW    ,SENSOR_TAB,
-     3                          IADC     ,FSKY    ,FEXT    ,TAGNCONT,
-     4                          KLOADPINTER,LOADPINTER ,LOADP_HYD_INTER, H3D_DATA,
-     5                          NPRESLOAD ,LOADP_TAGDEL)
+      SUBROUTINE LOAD_PRESSURE (ILOADP    ,LOADP     ,LLOADP   ,NPC     ,TF        ,
+     2                          A         ,V         ,X       ,SKEW     ,SENSOR_TAB,
+     3                          IADC      ,FSKY      ,FEXT    ,TAGNCONT ,NSENSOR   ,
+     4                          LOADP_HYD_INTER  , H3D_DATA ,
+     5                          NPRESLOAD  ,LOADP_TAGDEL,TH_SURF,FSAVSURF,NSEG_LOADP)
 C-----------------------------------------------
 C   M o d u l e s
 C----------------------------------------------- 
       USE H3D_MOD
       USE SENSOR_MOD
+      USE TH_SURF_MOD , ONLY : TH_SURF_
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -48,17 +50,13 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com06_c.inc"
 #include      "com08_c.inc"
 #include      "impl1_c.inc"
-#include      "scr05_c.inc"
 #include      "scr14_c.inc"
 #include      "scr16_c.inc"
-#include      "task_c.inc"
 #include      "parit_c.inc"
-#include      "alefvm.inc"
 #include      "tabsiz_c.inc"
 C-----------------------------------------------
 C   E x t e r n a l  F u n c t i o n s
@@ -70,11 +68,10 @@ C-----------------------------------------------
 C-----------------------------------------------,
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER, INTENT(IN) :: NPRESLOAD
+      INTEGER, INTENT(IN) :: NPRESLOAD,NSENSOR
       INTEGER NPC(*),LLOADP(SLLOADP)
       INTEGER ILOADP(SIZLOADP,*),
      .        TAGNCONT(NLOADP_HYD_INTER,NUMNOD),
-     .        KLOADPINTER(NINTER+1),LOADPINTER(NINTER*NLOADP_HYD),
      .        LOADP_HYD_INTER(NLOADP_HYD)
       INTEGER  IADC(*) 
       my_real
@@ -82,41 +79,52 @@ C-----------------------------------------------
      .   X(3,*), SKEW(LSKEW,*),FSKY(8,LSKY), FEXT(3,*)
       TYPE(H3D_DATABASE) :: H3D_DATA
       INTEGER, INTENT(IN) :: LOADP_TAGDEL(NPRESLOAD)
-      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) ,INTENT(IN) :: SENSOR_TAB
+      TYPE (TH_SURF_) , INTENT(IN) :: TH_SURF
+      my_real, INTENT(INOUT) :: FSAVSURF(5,NSURF)
+      INTEGER, INTENT(INOUT) :: NSEG_LOADP(NSURF)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NL, N1, ISK, N2, N3, N4, N5, NG1, NG2, NG3, NG4, ISENS,K,LL,IERR,
+      INTEGER N1, ISK, N2, N3, N4, ISENS,
      .        IAD ,NP ,IFUNC ,NPRES ,NINTERP ,IDIR ,INORM ,NPL ,IANIM,IFLOAD,
      .        SEGCONT ,N ,IADN , IJK ,UP_BOUND,TAGN1,TAGN2,TAGN3,TAGN4,NUMPRESLOAD,
-     .        IDEL
+     .        IDEL, NSEGPL, NS, KSURF,NIDXLOAD
       my_real
-     .   NX, NY, NZ, AXI, AA, A0, VV, FX, FY, FZ, AX, DYDX, TS,
-     .   SIXTH,TFEXTT,X_OLD, F1, F2,FCX,FCY,NORM 
-      my_real FINTER, ZFx,ZFy,ZFz, ZZFx,ZZFy,ZZFz,PS, Zx,Zy,Zz,FINTER_SMOOTH
-      EXTERNAL FINTER,FINTER_SMOOTH
+     .   NX, NY, NZ,  AA, FX, FY, FZ, DYDX, TS,
+     .   TFEXTT,F1, FCX,FCY,NORM,AREA 
+      my_real FINTER
+      EXTERNAL FINTER
 C=======================================================================
+C---------------------------------------------------------------------
+C   D e s c r i p t i o n
+C----------------------------------------------------------------------
+C     This subroutine is applying pressure load to
+C      a defined surface on dynamic zones which is not in contact
+C---------------------------------------------------------------------
       TFEXTT = ZERO
 
       IANIM  = ANIM_V(5)+OUTP_V(5)+H3D_DATA%N_VECT_FINT+
      .         ANIM_V(6)+OUTP_V(6)+H3D_DATA%N_VECT_FEXT
 C
       NUMPRESLOAD = 0
+      NSEGPL = TH_SURF%NSEGLOADPF+TH_SURF%NSEGLOADPB
+      NIDXLOAD = NLOADP_F+NLOADP_B
       IF(IPARIT==0) THEN
 C code SPMD Parith/OFF or SMP 
-       DO  NP=1,NLOADP_HYD
+       DO  NP= 1,NLOADP_HYD
 
-           NPRES = ILOADP(1,NP)
-           IFUNC = ILOADP(3,NP)
-           IAD = ILOADP(4,NP)
-           NINTERP = ILOADP(5,NP)
-	   IDIR = ILOADP(6,NP)   
-           ISENS =  ILOADP(7,NP) 
-           ISK = ILOADP(8,NP)    
-           INORM = ILOADP(9,NP)
-           IFLOAD = ILOADP(10,NP)
-           FCY = LOADP(1,NP)
-           FCX = LOADP(2,NP)
+           NPRES = ILOADP(1,NIDXLOAD+NP)
+           IFUNC = ILOADP(3,NIDXLOAD+NP)
+           IAD = ILOADP(4,NIDXLOAD+NP)
+           NINTERP = ILOADP(5,NIDXLOAD+NP)
+           IDIR = ILOADP(6,NIDXLOAD+NP)   
+           ISENS =  ILOADP(7,NIDXLOAD+NP) 
+           ISK = ILOADP(8,NIDXLOAD+NP)    
+           INORM = ILOADP(9,NIDXLOAD+NP)
+           IFLOAD = ILOADP(10,NIDXLOAD+NP)
+           FCY = LOADP(1,NIDXLOAD+NP)
+           FCX = LOADP(2,NIDXLOAD+NP)
 C
            IF(ISENS==0)THEN
               TS=TT
@@ -136,6 +144,7 @@ C
               N3 = LLOADP(IAD+4*(N-1)+2)
               N4 = LLOADP(IAD+4*(N-1)+3)
               NUMPRESLOAD = NUMPRESLOAD + 1
+              NSEGPL = NSEGPL + 1
 
               IDEL = LOADP_TAGDEL(NUMPRESLOAD)
 
@@ -259,7 +268,7 @@ C
                        FEXT(1,N1) = FEXT(1,N1)+FX
                        FEXT(2,N1) = FEXT(2,N1)+FY
                        FEXT(3,N1) = FEXT(3,N1)+FZ
-                    ENDIF
+                    ENDIF 
                   ENDIF
 C
                   IF(TAGN2 == 0) THEN
@@ -270,7 +279,7 @@ C
                         FEXT(1,N2) = FEXT(1,N2)+FX
                         FEXT(2,N2) = FEXT(2,N2)+FY
                         FEXT(3,N2) = FEXT(3,N2)+FZ
-                     ENDIF
+                     ENDIF 
                   ENDIF
 C
                   IF(TAGN3 == 0) THEN                  
@@ -294,6 +303,16 @@ C
                        FEXT(3,N4) = FEXT(3,N4)+FZ
                      ENDIF
                  ENDIF
+C
+                 IF(TH_SURF%LOADP_FLAG >0 ) THEN
+                    AREA = HALF*SQRT(NX*NX+NY*NY+NZ*NZ)
+                    DO NS=TH_SURF%LOADP_KSEGS(NSEGPL) +1,TH_SURF%LOADP_KSEGS(NSEGPL+1)
+                       KSURF = TH_SURF%LOADP_SEGS(NS)
+                       NSEG_LOADP(KSURF) = NSEG_LOADP(KSURF) + 1
+                       FSAVSURF(4,KSURF)= FSAVSURF(4,KSURF) + AA
+                       FSAVSURF(5,KSURF)= FSAVSURF(5,KSURF) + AREA
+                    ENDDO
+                  ENDIF
 C
                   TFEXTT=TFEXTT+DT1*(FX*(V(1,N1)+V(1,N2)+V(1,N3)+V(1,N4))
      +                         +FY*(V(2,N1)+V(2,N2)+V(2,N3)+V(2,N4))
@@ -382,6 +401,7 @@ C
                        FEXT(2,N1) = FEXT(2,N1)+FY
                        FEXT(3,N1) = FEXT(3,N1)+FZ
                     ENDIF
+
                   ENDIF
 C
                   IF(TAGN2 == 0) THEN
@@ -405,7 +425,17 @@ C
                        FEXT(3,N3) = FEXT(3,N3)+FZ
                     ENDIF
                   ENDIF
-
+C
+                 IF(TH_SURF%LOADP_FLAG >0 ) THEN
+                    AREA = HALF*SQRT(NX*NX+NY*NY+NZ*NZ)
+                    DO NS=TH_SURF%LOADP_KSEGS(NSEGPL) +1,TH_SURF%LOADP_KSEGS(NSEGPL+1)
+                       KSURF = TH_SURF%LOADP_SEGS(NS)
+                       NSEG_LOADP(KSURF) = NSEG_LOADP(KSURF) + 1
+                       FSAVSURF(4,KSURF)= FSAVSURF(4,KSURF) + AA
+                       FSAVSURF(5,KSURF)= FSAVSURF(5,KSURF) + AREA
+                    ENDDO
+                  ENDIF
+C
                   TFEXTT=TFEXTT+DT1*(FX*(V(1,N1)+V(1,N2)+V(1,N3)) 
      +                              + FY*(V(2,N1)+V(2,N2)+V(2,N3))
      +                              + FZ*(V(3,N1)+V(3,N2)+V(3,N3)))
@@ -426,19 +456,19 @@ C-------------------------
 C code SPMD Parith/ON
 C-------------------------
 
-       DO  NP=1,NLOADP_HYD
+       DO  NP= 1,NLOADP_HYD
 
-           NPRES = ILOADP(1,NP)
-           IFUNC = ILOADP(3,NP)
-           IAD = ILOADP(4,NP)
-           NINTERP = ILOADP(5,NP)
-	   IDIR = ILOADP(6,NP)   
-           ISENS =  ILOADP(7,NP) 
-           ISK = ILOADP(8,NP)    
-           INORM = ILOADP(9,NP)
-           IFLOAD = ILOADP(10,NP)
-           FCY = LOADP(1,NP)
-           FCX = LOADP(2,NP)
+           NPRES = ILOADP(1,NIDXLOAD+NP)
+           IFUNC = ILOADP(3,NIDXLOAD+NP)
+           IAD = ILOADP(4,NIDXLOAD+NP)
+           NINTERP = ILOADP(5,NIDXLOAD+NP)
+           IDIR = ILOADP(6,NIDXLOAD+NP)   
+           ISENS =  ILOADP(7,NIDXLOAD+NP) 
+           ISK = ILOADP(8,NIDXLOAD+NP)    
+           INORM = ILOADP(9,NIDXLOAD+NP)
+           IFLOAD = ILOADP(10,NIDXLOAD+NP)
+           FCY = LOADP(1,NIDXLOAD+NP)
+           FCX = LOADP(2,NIDXLOAD+NP)
 C
            IF(ISENS==0)THEN
               TS=TT
@@ -479,6 +509,7 @@ C
               N4 = LLOADP(IAD+4*(N-1)+3)
 
               NUMPRESLOAD = NUMPRESLOAD + 1
+              NSEGPL = NSEGPL + 1
 
               IDEL = LOADP_TAGDEL(NUMPRESLOAD)
 
@@ -627,7 +658,7 @@ C
                        FEXT(1,N3) = FEXT(1,N3) + FX
                        FEXT(2,N3) = FEXT(2,N3) + FY
                        FEXT(3,N3) = FEXT(3,N3) + FZ
-                    ENDIF
+                    ENDIF 
                   ENDIF
 C
                   IF(TAGN4 == 0) THEN
@@ -642,6 +673,15 @@ C
                     ENDIF
                   ENDIF
 C
+                 IF(TH_SURF%LOADP_FLAG >0 ) THEN
+                    AREA = HALF*SQRT(NX*NX+NY*NY+NZ*NZ)
+                    DO NS=TH_SURF%LOADP_KSEGS(NSEGPL) +1,TH_SURF%LOADP_KSEGS(NSEGPL+1)
+                       KSURF = TH_SURF%LOADP_SEGS(NS)
+                       NSEG_LOADP(KSURF) = NSEG_LOADP(KSURF) + 1
+                       FSAVSURF(4,KSURF)= FSAVSURF(4,KSURF) + AA
+                       FSAVSURF(5,KSURF)= FSAVSURF(5,KSURF) + AREA
+                    ENDDO
+                  ENDIF
                   TFEXTT=TFEXTT+DT1*(FX*(V(1,N1)+V(1,N2)+V(1,N3)+V(1,N4))
      +                         +FY*(V(2,N1)+V(2,N2)+V(2,N3)+V(2,N4))
      +                         +FZ*(V(3,N1)+V(3,N2)+V(3,N3)+V(3,N4)))
@@ -755,6 +795,17 @@ C
                        FEXT(2,N3) = FEXT(2,N3) + FY
                        FEXT(3,N3) = FEXT(3,N3) + FZ
                     ENDIF
+                  ENDIF
+
+C
+                 IF(TH_SURF%LOADP_FLAG >0 ) THEN
+                    AREA = HALF*SQRT(NX*NX+NY*NY+NZ*NZ)
+                    DO NS=TH_SURF%LOADP_KSEGS(NSEGPL) +1,TH_SURF%LOADP_KSEGS(NSEGPL+1)
+                       KSURF = TH_SURF%LOADP_SEGS(NS)
+                       NSEG_LOADP(KSURF) = NSEG_LOADP(KSURF) + 1
+                       FSAVSURF(4,KSURF)= FSAVSURF(4,KSURF) + AA
+                       FSAVSURF(5,KSURF)= FSAVSURF(5,KSURF) + AREA
+                    ENDDO
                   ENDIF
 
                   TFEXTT=TFEXTT+DT1*(FX*(V(1,N1)+V(1,N2)+V(1,N3)) 

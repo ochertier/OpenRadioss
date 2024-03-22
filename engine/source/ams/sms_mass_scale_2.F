@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
       module MOD_SMS_WORK
       implicit none
 #include      "my_real.inc"
@@ -76,7 +76,7 @@ Chd|====================================================================
      6        WEIGHT   ,NPBY      ,LPBY      ,
      7        TAGSLV_RBY_SMS,LAD_SMS ,KAD_SMS ,JRB_SMS,IBFV      ,
      8        VEL      ,NPC      ,TF       ,V         ,X         ,
-     9        D        ,SENSOR_TAB,IFRAME    ,XFRAME    ,
+     9        D        ,SENSOR_TAB,NSENSOR ,IFRAME    ,XFRAME    ,
      A        JADI_SMS ,JDII_SMS ,LTI_SMS  ,FR_SMS    ,FR_RMS    ,
      B        ISKYI_SMS,MSKYI_SMS,RES_SMS  ,IGRV      ,AGRV      ,
      C        LGRAV    ,ILINK    ,RLINK    ,FR_RL     ,FRL6      ,
@@ -107,7 +107,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "comlock.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -115,14 +114,10 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "com06_c.inc"
 #include      "com08_c.inc"
-#include      "intstamp_c.inc"
-#include      "kincod_c.inc"
 #include      "param_c.inc"
 #include      "parit_c.inc"
 #include      "remesh_c.inc"
-#include      "scr02_c.inc"
 #include      "scr03_c.inc"
-#include      "scr17_c.inc"
 #include      "sms_c.inc"
 #include      "tabsiz_c.inc"
 #include      "task_c.inc"
@@ -133,7 +128,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER  ITASK, NODFT, NODLT, NODII_SMS(*), INDX2_SMS(*),
+      INTEGER  ITASK, NODFT,NSENSOR,NODLT, NODII_SMS(*), INDX2_SMS(*),
      .         NODXI_SMS(*), ICODT(*), ICODR(*),
      .         ISKEW(*), JAD_SMS(*), JDI_SMS(*), INDX1_SMS(*),
      .         IAD_ELEM(2,NSPMD+1) ,FR_ELEM(*), WEIGHT(*),
@@ -169,7 +164,7 @@ C-----------------------------------------------
       DOUBLE PRECISION FRL6(*), FNL6(*), FRWL6(*), RRBE3_PON(*)
       DOUBLE PRECISION RBY6(8,6,NRBYKIN)
       TYPE(INTSTAMP_DATA) INTSTAMP(*)
-      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) ,INTENT(IN) :: SENSOR_TAB
 C-----------------------------------------------
       TYPE (GROUP_)  , DIMENSION(NGRNOD) :: IGRNOD
 C-----------------------------------------------
@@ -199,11 +194,11 @@ C-----
 C-----------------------------------------------
       IF(ITASK==0)THEN
         ALLOCATE(CJWORK(18,NJOINT),
-     .  	 FREA(3,NUMNOD), IRWL_WORK(SLPRW),
+     .     FREA(3,NUMNOD), IRWL_WORK(SLPRW),
      .           STAT=IERROR)
         IF(IERROR/=0) THEN
           CALL ANCMSG(MSGID=19,ANMODE=ANINFO,
-     .  	      C1='(/DT/.../AMS)')
+     .          C1='(/DT/.../AMS)')
           CALL ARRET(2)
         ENDIF
       END IF
@@ -275,7 +270,7 @@ C----
 C
       CALL SMS_GRAVIT(IGRV  ,AGRV   ,NPC   ,TF   ,A     ,
      2                V     ,X      ,SKEW  ,MS   ,SENSOR_TAB,
-     3                WEIGHT,LGRAV ,ITASK,TAGSLV_RBY_SMS)
+     3                WEIGHT,LGRAV ,ITASK,TAGSLV_RBY_SMS,NSENSOR)
 C
       CALL MY_BARRIER
 C
@@ -613,7 +608,7 @@ C-----------------------------------
                DW =DW+DA*V(J,I)*DT12*WEIGHT(I)
              END DO
           END DO
-		ELSE
+          ELSE
          IF(ISTATG<0)THEN
           ISTATG=NGR2USR(-ISTATG,IGRNOD,NGRNOD)
          ENDIF
@@ -762,7 +757,7 @@ C
           IT=0
           CALL SMS_FIXVEL(IBFV   ,A       ,V        ,NPC    ,TF     ,
      2                    VEL    ,MS      ,X        ,SKEW   ,SENSOR_TAB,
-     3                    WEIGHT  ,D        ,IFRAME ,XFRAME ,
+     3                    WEIGHT  ,D        ,IFRAME ,XFRAME ,NSENSOR ,
      4                    IT     ,PREC_SMS,NODXI_SMS,CPTREAC,NODREAC,
      5                    FTHREAC,AM      ,VR       ,DR     ,IN     ,
      6                    RBY    )
@@ -799,7 +794,7 @@ C-----------------------------------
      5            ISKEW   ,SKEW     ,ITASK  ,NODXI_SMS,IAD_ELEM,
      6            FR_ELEM ,WEIGHT   ,IBFV   ,VEL      ,NPC     ,
      7            TF       ,V      ,X       ,D        ,SENSOR_TAB,
-     8            IFRAME ,XFRAME  ,JADI_SMS ,JDII_SMS,
+     8            IFRAME ,XFRAME  ,JADI_SMS ,JDII_SMS ,NSENSOR   ,
      9            LTI_SMS  ,FR_SMS ,FR_RMS  ,LIST_SMS ,LIST_RMS,
      A            MSKYI_FI_SMS,VFI ,ISKYI_SMS,MSKYI_SMS,
      B            RES_SMS  ,ILINK  ,RLINK   ,FR_RL    ,FRL6    ,
@@ -865,7 +860,7 @@ C
       CALL MY_BARRIER
 C
       IF(ITASK==0) DEALLOCATE(CJWORK, FREA, IRWL_WORK, 
-     .    	LIST_SMS,LIST_RMS,MSKYI_FI_SMS,VFI)
+     .      LIST_SMS,LIST_RMS,MSKYI_FI_SMS,VFI)
       IF(IPARIT/=0)THEN
         DEALLOCATE(IMV, MV, MV6)
         IF(ITASK==0)DEALLOCATE(MW6)

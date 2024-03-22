@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  CMAIN3                        source/materials/mat_share/cmain3.F
 Chd|-- called by -----------
@@ -37,16 +37,16 @@ Chd|        DELAMINATION                  source/properties/composite_options/st
 Chd|        LAYINI                        source/elements/shell/coque/layini.F
 Chd|        MULAWC                        source/materials/mat_share/mulawc.F
 Chd|        MULAWGLC                      source/materials/mat_share/mulawglc.F
-Chd|        PUT_ETFAC                     source/elements/solid/solide8z/mmats.F
+Chd|        PUT_ETFAC                     source/elements/solid/solide8z/put_etfac.F
 Chd|        STARTIME                      source/system/timer.F         
 Chd|        STOPTIME                      source/system/timer.F         
 Chd|        THERMEXPC                     source/materials/mat_share/thermexpc.F
 Chd|        USERMAT_SHELL                 source/materials/mat_share/usermat_shell.F
 Chd|        FINTER                        source/tools/curve/finter.F   
 Chd|        DRAPE_MOD                     share/modules/drape_mod.F     
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
 Chd|        FAILWAVE_MOD                  ../common_source/modules/failwave_mod.F
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/matparam_def_mod.F
+Chd|        MAT_ELEM_MOD                  ../common_source/modules/mat_elem/mat_elem_mod.F
+Chd|        MULAWC_MOD                    source/materials/mat_share/mulawc.F
 Chd|        NLOCAL_REG_MOD                ../common_source/modules/nlocal_reg_mod.F
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
 Chd|        STACK_MOD                     share/modules/stack_mod.F     
@@ -59,7 +59,7 @@ Chd|====================================================================
      4           SSP       ,RHO       ,VISCMX    ,DT1C      ,SIGY       ,
      5           AREA      ,EXX       ,EYY       ,EXY       ,EXZ        ,
      6           EYZ       ,KXX       ,KYY       ,KXY       ,NU         ,
-     7           OFF       ,THK0      ,MAT       ,PID       ,MATPARAM_TAB,
+     7           OFF       ,THK0      ,MAT       ,PID       ,MAT_ELEM   ,
      8           FOR       ,MOM       ,GSTR      ,FAILWAVE  ,FWAVE_EL   ,
      9           THK       ,EINT      ,IOFC      ,
      A           G         ,A11       ,A12       ,VOL0      ,INDXDEL    ,
@@ -73,19 +73,20 @@ Chd|====================================================================
      I           DEL_PLY   ,TH_IPLY   ,SIG_IPLY  ,E1X       ,E1Y        ,
      J           E1Z       ,E2X       ,E2Y       ,E2Z       ,E3X        ,
      K           E3Y       ,E3Z       ,NG        ,TABLE     ,IXFEM      ,
-     L           OFFI      ,SENSOR_TAB,A11_IPLY  ,ELCRKINI   ,
+     L           OFFI      ,SENSORS   ,A11_IPLY  ,ELCRKINI   ,
      M           DIR1_CRK  ,DIR2_CRK  ,ALDT      ,
      N           ISMSTR    ,IR        ,IS        ,NLAY      ,NPT        ,
      O           IXLAY     ,IXEL      ,ISUBSTACK ,STACK     ,
-     P           F_DEF     ,ITASK     ,DRAPE     ,VARNL     ,NLOC_DMG   )
+     P           F_DEF     ,ITASK     ,DRAPE     ,VARNL     ,NLOC_DMG   ,
+     R           INDX_DRAPE,THKE      ,SEDRAPE   ,NUMEL_DRAPE)
 C-----------------------------------------------
 C   M o d u l e s
 C----------------------------------------------- 
+      USE MULAWC_MOD
       USE TABLE_MOD
-      USE ELBUFDEF_MOD
+      USE MAT_ELEM_MOD
       USE STACK_MOD
       USE FAILWAVE_MOD
-      USE MATPARAM_DEF_MOD
       USE DRAPE_MOD 
       USE NLOCAL_REG_MOD
       USE SENSOR_MOD
@@ -101,24 +102,22 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
-#include      "scr03_c.inc"
-#include      "scr17_c.inc"
 #include      "scr18_c.inc"
 #include      "impl1_c.inc"
-#include      "sms_c.inc"
 #include      "timeri_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER JFT,JLT,NFT,IR,IS,NPT,NG,NPG,NLAY,NEL,MTN,IPLA,IOFC,ITHK,
      .   KFTS,JHBE,IFAILURE,JTHE,IEXPAN,ISHPLYXFEM,ISMSTR,
-     .   IXLAY,IXEL,IXFEM,ISUBSTACK,ITASK
+     .   IXLAY,IXEL,IXFEM,ISUBSTACK,ITASK  
+      INTEGER ,    INTENT(IN)     ::        SEDRAPE,NUMEL_DRAPE
       INTEGER MAT(MVSIZ), PID(MVSIZ), INDXDEL(MVSIZ), NGL(MVSIZ),NPF(*), 
      .   IGEO(NPROPGI,*),IPM(NPROPMI,*),IPARG(*),
      .   A11_IPLY(MVSIZ,*),ELCRKINI(*),FWAVE_EL(NEL)
+      INTEGER , DIMENSION(SEDRAPE) :: INDX_DRAPE
       my_real
      .   PM(NPROPM,*), GEO(NPROPG,*),TF(*),THK(*),EINT(JLT,*),FOR(NEL,5), 
      .   MOM(NEL,3),EPSP(*),GSTR(NEL,8),BUFMAT(*),G(*),A11(*),A12(*),VOL0(*),
@@ -136,25 +135,27 @@ C-----------------------------------------------
      .   E3X(MVSIZ), E3Y(MVSIZ), E3Z(MVSIZ),OFFI(MVSIZ,*),
      .   DIR1_CRK(*),DIR2_CRK(*),DMG_SCALE(MVSIZ),
      .   F_DEF(MVSIZ,*),ALDT(MVSIZ),VARNL(NEL,*)
+      my_real, DIMENSION(NEL), INTENT(IN) :: THKE
       TYPE (TTABLE) TABLE(*)
       TYPE (ELBUF_STRUCT_), TARGET :: ELBUF_STR
       TYPE (STACK_PLY) :: STACK
       TYPE (FAILWAVE_STR_) ,TARGET :: FAILWAVE 
-      TYPE (GRP_PARAM_STRUCT_) :: GROUP_PARAM
-      TYPE (DRAPE_) :: DRAPE
-      TYPE (MATPARAM_STRUCT_) , DIMENSION(NUMMAT) :: MATPARAM_TAB
+      TYPE (GROUP_PARAM_) :: GROUP_PARAM
+      TYPE (DRAPE_) :: DRAPE(NUMEL_DRAPE)
+      TYPE (MAT_ELEM_) ,INTENT(INOUT) :: MAT_ELEM
       TYPE (NLOCAL_STR_) :: NLOC_DMG 
-      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE (SENSORS_) ,INTENT(IN) :: SENSORS
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,IT,MX,IGTYP,IFUNC_ALPHA,IPMAT_IPLY,ILAY,LAYNPT_MAX,LAY_MAX
-      PARAMETER (LAYNPT_MAX = 10)
-      PARAMETER (LAY_MAX = 100)
-      INTEGER MATLY(MVSIZ*LAY_MAX),MAT_IPLY(MVSIZ,NPT)
+      INTEGER I,J,IT,MX,IGTYP,IFUNC_ALPHA,IPMAT_IPLY,ILAY,LAYNPT_MAX,NLAY_MAX
+      INTEGER MAT_IPLY(MVSIZ,NPT)
+      INTEGER, DIMENSION(:) , ALLOCATABLE :: MATLY   !!  MATLY(MVSIZ*LAY_MAX)
+      my_real, DIMENSION(:) , ALLOCATABLE :: THKLY   !!  THKLY(MVSIZ*LAY_MAX*LAYNPT_MAX)
+      my_real, DIMENSION(:,:), ALLOCATABLE :: POSLY,THK_LY
+        !!         POSLY(MVSIZ,LAY_MAX*LAYNPT_MAX) THK_LY(NEL,LAY_MAX*LAYNPT_MAX)
       my_real
-     .   THKLY(MVSIZ*LAY_MAX*LAYNPT_MAX),POSLY(MVSIZ,LAY_MAX*LAYNPT_MAX),
-     .   THK_LY(NEL,LAY_MAX*LAYNPT_MAX),TSTAR(MVSIZ),DTEMP(MVSIZ),
+     .   TSTAR(MVSIZ),DTEMP(MVSIZ),
      .   SXX(MVSIZ),SYY(MVSIZ), SXY(MVSIZ),SYZ(MVSIZ),SZX(MVSIZ),
      .   EPSXX(MVSIZ),EPSYY(MVSIZ),EPSXY(MVSIZ),EPSYZ(MVSIZ),EPSZX(MVSIZ),
      .   DEPSXX(MVSIZ),DEPSYY(MVSIZ),DEPSXY(MVSIZ),DEPSYZ(MVSIZ),
@@ -211,7 +212,17 @@ c-----Tstar computation for Jhonson cook failure : T* = (T-T0)/(TM-T0)----
         ENDDO
       ELSE
         TSTAR(JFT:JLT) = ZERO
-      ENDIF     
+      ENDIF  
+! Npt_max
+      LAYNPT_MAX = 1
+      IF(IGTYP == 51 .OR. IGTYP == 52) THEN
+        DO ILAY=1,NLAY
+           LAYNPT_MAX = MAX(LAYNPT_MAX , ELBUF_STR%BUFLY(ILAY)%NPTT)
+        ENDDO  
+      ENDIF
+      NLAY_MAX   = MAX(NLAY,NPT,IXLAY, ELBUF_STR%NLAY)
+      ALLOCATE(MATLY(MVSIZ*NLAY_MAX), THKLY(MVSIZ*NLAY_MAX*LAYNPT_MAX),
+     .         POSLY(MVSIZ,NLAY_MAX*LAYNPT_MAX),THK_LY(NEL,NLAY_MAX*LAYNPT_MAX))
 c
 c----------------------------
       IF (NPT == 0) THEN
@@ -239,10 +250,10 @@ c
         CALL LAYINI(ELBUF_STR,JFT      ,JLT      ,GEO      ,IGEO     ,
      .              MAT      ,PID      ,THKLY    ,MATLY    ,POSLY    , 
      .              IGTYP    ,IXFEM    ,IXLAY    ,NLAY     ,NPT      ,   
-     .              ISUBSTACK,STACK    ,DRAPE    ,NFT      ,THK      ,
-     .              NEL      ,THK_LY   )
+     .              ISUBSTACK,STACK    ,DRAPE    ,NFT      ,THKE      ,
+     .              NEL      ,THK_LY   ,INDX_DRAPE,SEDRAPE ,NUMEL_DRAPE)
 c
-        CALL USERMAT_SHELL (ELBUF_STR ,
+        CALL USERMAT_SHELL (ELBUF_STR  ,MAT_ELEM,
      1       JFT     ,JLT     ,NEL     ,PM      ,FOR     ,MOM     ,
      2       GSTR    ,THK     ,EINT    ,OFF     ,DIR_A   ,DIR_B   ,
      3       MAT     ,AREA    ,EXX     ,EYY     ,EXY     ,EXZ     ,
@@ -260,7 +271,7 @@ c
      F       IXEL    ,ITHK    ,F_DEF   ,ISHPLYXFEM,
      G       ITASK   ,STACK%PM ,ISUBSTACK,STACK ,TSTAR   ,ALPE    ,
      H       PLY_EXX ,PLY_EYY ,PLY_EXY ,PLY_EXZ ,PLY_EYZ ,PLY_F   ,
-     I       VARNL   ,NLOC_DMG)
+     I       VARNL   ,NLOC_DMG,NLAY_MAX,LAYNPT_MAX)
 cc----------------------------
       ELSE   ! User-type Radioss laws , NPT > 0
 c----------------------------
@@ -270,8 +281,8 @@ c----------------------------
         CALL LAYINI(ELBUF_STR,JFT      ,JLT      ,GEO      ,IGEO     ,
      .              MAT      ,PID      ,THKLY    ,MATLY    ,POSLY    , 
      .              IGTYP    ,IXFEM    ,IXLAY    ,NLAY     ,NPT      ,   
-     .              ISUBSTACK,STACK    ,DRAPE    ,NFT     ,THK       ,
-     .              NEL      ,THK_LY   )
+     .              ISUBSTACK,STACK    ,DRAPE    ,NFT     ,THKE       ,
+     .              NEL      ,THK_LY   ,INDX_DRAPE, SEDRAPE,NUMEL_DRAPE)
 c 
         CALL MULAWC(ELBUF_STR ,
      1       JFT     ,JLT     ,NEL     ,PM      ,FOR     ,MOM     ,
@@ -280,19 +291,19 @@ c
      4       EYZ     ,KXX     ,KYY     ,KXY     ,GEO     ,THK_LY  ,
      5       PID     ,TF      ,NPF     ,MTN     ,DT1C    ,DM      ,
      6       BUFMAT  ,SSP     ,RHO     ,VISCMX  ,IPLA    ,IOFC    ,
-     7       INDXDEL ,NGL     ,THKLY   ,MATLY   ,ZCFAC   ,MATPARAM_TAB,
+     7       INDXDEL ,NGL     ,THKLY   ,MATLY   ,ZCFAC   ,MAT_ELEM,
      8       SHF     ,GS      ,SIGY    ,THK0    ,EPSP    ,
      9       POSLY   ,IGEO    ,IPM     ,FAILWAVE,FWAVE_EL,
      A       IFAILURE,ALDT    ,TEMPEL  ,DIE     ,
      B       E1X     ,E1Y     ,E1Z     ,E2X     ,E2Y     ,E2Z     ,
      C       E3X     ,E3Y     ,E3Z     ,TABLE   ,IXFEM   ,ELCRKINI,
-     D       SENSOR_TAB,NG      ,
+     D       SENSORS ,NG      ,
      E       DIR1_CRK,DIR2_CRK,IPARG   ,JHBE    ,ISMSTR  ,JTHE    ,
      F       TENS    ,IR      ,IS      ,NLAY    ,NPT     ,IXLAY   ,
      G       IXEL    ,ITHK    ,F_DEF   ,ISHPLYXFEM,
      H       ITASK   ,STACK%PM ,ISUBSTACK,STACK ,TSTAR   ,ALPE    ,
      I       PLY_EXX ,PLY_EYY ,PLY_EXY ,PLY_EXZ ,PLY_EYZ ,PLY_F   ,
-     J       VARNL   ,ETIMP   ,NLOC_DMG)
+     J       VARNL   ,ETIMP   ,NLOC_DMG,NLAY_MAX,LAYNPT_MAX)
       ENDIF ! IF (NPT == 0) 
 C----------------------------------------------------------------------
       IF (IEXPAN > 0 .AND. JTHE > 0. AND.IDT_THERM==0) THEN
@@ -332,7 +343,7 @@ C-----------------------------------------------
           EPSZX(I)= GSTR(I,5)
         ENDDO
 c----------
-       CALL DELAMINATION(ELBUF_STR,
+       CALL DELAMINATION(ELBUF_STR,MAT_ELEM%MAT_PARAM,
      .                   JFT      ,JLT      ,IR      ,IS      ,NPT     ,
      .                   MAT_IPLY ,IPM      ,PM      ,BUFMAT  ,NPF     ,
      .                   TF       ,DT1C     ,NGL     ,OFF     ,TH_IPLY ,
@@ -340,7 +351,8 @@ c----------
      .                   MOM      ,PLY_F    ,THK0    ,SHF     ,EPSZX   ,
      .                   EPSYZ    ,AREA     ,PID     ,GEO     ,SSP     ,
      .                   POSLY    ,THKLY    ,KXX     ,KYY     ,KXY     ,
-     .                   EXZ      ,EYZ      ,EINT    ,GSTR    ,NEL     ) 
+     .                   EXZ      ,EYZ      ,EINT    ,GSTR    ,NEL     ,
+     .                   NUMMAT   ) 
      
       ENDIF ! PLYXFEM 
 C---------------------------------------------------------             
@@ -348,6 +360,7 @@ C---------------------------------------------------------
         IF (MTN /=78)  ETIMP(JFT:JLT) = ZCFAC(JFT:JLT,1)
         CALL PUT_ETFAC(NEL ,ETIMP ,MTN)
       END IF
+      DEALLOCATE(MATLY, THKLY, POSLY, THK_LY)
 c-----------
       RETURN
       END SUBROUTINE CMAIN3

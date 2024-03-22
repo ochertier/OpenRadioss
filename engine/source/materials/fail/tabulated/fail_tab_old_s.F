@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  FAIl_TAB_OLD_S                source/materials/fail/tabulated/fail_tab_old_s.F
 Chd|-- called by -----------
@@ -28,10 +28,10 @@ Chd|        FINTER                        source/tools/curve/finter.F
 Chd|====================================================================
       SUBROUTINE FAIl_TAB_OLD_S (
      1     NEL     ,NUVAR   ,NPF     ,TF      ,TIME    ,
-     2     UPARAM  ,NGL     ,IPM     ,MAT     ,ALDT    ,
+     2     UPARAM  ,NGL     ,ALDT    ,
      4     SIGNXX  ,SIGNYY  ,SIGNZZ  ,SIGNXY  ,SIGNYZ  ,SIGNZX   ,
      5     PLAS    ,DPLA    ,EPSP    ,TSTAR   ,UVAR    ,
-     6     OFF     ,IP      ,DFMAX   ,TDELE   ,
+     6     OFF     ,DFMAX   ,TDELE   ,
      7     NFUNC   ,IFUNC )
 C---------+---------+---+---+--------------------------------------------
 C   /FAIL/TAB - tabulated rupture criteria for solids (old, obsolete version)
@@ -45,14 +45,13 @@ C-----------------------------------------------
 #include "units_c.inc"
 #include "param_c.inc"
 #include "scr17_c.inc"
-#include "scr19_c.inc"
 #include "impl1_c.inc"
 #include "comlock.inc"
 C-----------------------------------------------
 C   I N P U T   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER NEL,NUVAR,IP
-      INTEGER NGL(NEL),IPM(NPROPMI,*),MAT(NEL)
+      INTEGER NEL,NUVAR
+      INTEGER NGL(NEL)
       INTEGER, INTENT(IN) :: NFUNC
       INTEGER, DIMENSION(NFUNC), INTENT(IN) ::  IFUNC
 c

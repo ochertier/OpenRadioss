@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  EBCS_MAIN                     source/boundary_conditions/ebcs/ebcs_main.F
 Chd|-- called by -----------
@@ -33,14 +33,14 @@ Chd|        EBCS5                         source/boundary_conditions/ebcs/ebcs5.
 Chd|        EBCS6                         source/boundary_conditions/ebcs/ebcs6.F
 Chd|        EBCS7                         source/boundary_conditions/ebcs/ebcs7.F
 Chd|        EBCS_VOL2SEG                  source/boundary_conditions/ebcs/ebcs_vol2seg.F
-Chd|        EBCS_MOD                      ../common_source/modules/ebcs_mod.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        EBCS_MOD                      ../common_source/modules/boundary_conditions/ebcs_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|====================================================================
       SUBROUTINE EBCS_MAIN(IGRSURF,SEGVAR,VOLMON,A,V,W,X,
      .                     FSAV,FV,WA,MS,STIFN,IPARG,ELBUF_TAB,EBCS_TAB,MULTI_FVM,IXQ,IXS,IXTG,
-     .                     ITAB,NALE)
+     .                     ITAB,NALE,FSKY)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -58,7 +58,7 @@ C-----------------------------------------------
 #include      "param_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr17_c.inc"
+#include      "parit_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -71,6 +71,7 @@ C-----------------------------------------------
       TYPE (SURF_)   , DIMENSION(NSURF)   :: IGRSURF
       TYPE(t_ebcs_tab), TARGET, INTENT(INOUT) :: EBCS_TAB
       TYPE(MULTI_FVM_STRUCT),INTENT(IN) :: MULTI_FVM
+      my_real, DIMENSION(8,LSKY), INTENT(INOUT) :: FSKY ! acceleration array for parith/on option
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -81,6 +82,7 @@ C   S o u r  c e   L i n e s
 C-----------------------------------------------
  
       DO I = 1, NEBCS
+         IF(.NOT.EBCS_TAB%need_to_compute(I)) CYCLE
          EBCS => EBCS_TAB%tab(i)%poly
          IF(EBCS%is_multifluid)return
          TYP = EBCS%type
@@ -97,14 +99,11 @@ C-----------------------------------------------
      .           EBCS%la, FV, MS, STIFN, IPARG, ELBUF_TAB, twf)
             end select
          ELSE IF (TYP <= 3)THEN
-C           select type (twf => EBCS_TAB%tab(i)%poly)
-C           type is (t_ebcs_tab) 
             CALL EBCS1(NSEG,EBCS%iseg,SEGVAR,
      .           A,V,X,
      .           EBCS%node_list,NOD,EBCS%elem_list,
      .           EBCS%vold,EBCS%pold,EBCS%la,
      .           FV,MS,STIFN,TYP,EBCS_TAB, I)
-C           end select
          ELSE IF (TYP == 4) THEN
             select type (twf => EBCS_TAB%tab(i)%poly)
             type is (t_ebcs_vel) 
@@ -148,7 +147,7 @@ C           end select
      .             twf%node_list,NOD,twf%elem_list,twf%ielem,twf%iface,
      .             twf%ro0,twf%en0,
      .             twf%la,MS,STIFN,twf,IPARG,ELBUF_TAB,MULTI_FVM,IXQ,IXS,IXTG,
-     .             ITAB, NALE)  
+     .             ITAB, NALE, EBCS_PARITHON(I)%ELEM_ADRESS,FSKY)  
             end select  
          ELSE IF (TYP == 100) THEN
             SELECT TYPE(EBCS)

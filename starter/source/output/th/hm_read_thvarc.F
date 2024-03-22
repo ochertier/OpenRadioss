@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  HM_THVARC                     source/output/th/hm_read_thvarc.F
 Chd|-- called by -----------
@@ -29,6 +29,7 @@ Chd|        HM_READ_THGRNE                source/output/th/hm_read_thgrne.F
 Chd|        HM_READ_THGRNS                source/output/th/hm_read_thgrns.F
 Chd|        HM_READ_THGRPA                source/output/th/hm_read_thgrpa.F
 Chd|        HM_READ_THGRPA_SUB            source/output/th/hm_read_thgrpa.F
+Chd|        HM_READ_THGRSENS              source/output/th/hm_read_thgrsens.F
 Chd|        HM_READ_THGRSURF              source/output/th/hm_read_thgrsurf.F
 Chd|        HM_THGRKI_VENT                source/output/th/hm_thgrki_vent.F
 Chd|-- calls ---------------
@@ -45,7 +46,7 @@ C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
       USE SUBMODEL_MOD
-      USE HM_OPTION_READ_MOD      
+      USE HM_OPTION_READ_MOD   
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -54,24 +55,25 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr17_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
 #include      "r2r_c.inc"
-#include      "scr03_c.inc"
-#include      "submod_c.inc"
 C-----------------------------------------------
       INTEGER NV,NVG,IVAR(*),IVARG(18,*),NV0
       CHARACTER*10,TARGET :: VARE(NV),VARG(NVG)
-      CHARACTER VAR*10
-        INTEGER JREC,NVAR,TRU,N,L,M,I,J,K,OK,TAG(0:250000)
       INTEGER ID
-      CHARACTER*nchartitle,
-     .   TITR
-      LOGICAL IS_AVAILABLE
+      CHARACTER*nchartitle TITR
       TYPE(SUBMODEL_DATA) LSUBMODEL(NSUBMOD)
+C-----------------------------------------------
+C   L o c a l   V a r i a b l e s
+C-----------------------------------------------
+      LOGICAL IS_AVAILABLE
+      INTEGER,DIMENSION(:),ALLOCATABLE :: TAG
+      CHARACTER VAR*10
+      INTEGER JREC,NVAR,TRU,N,L,M,I,J,K,OK
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------
+      ! Tag must start from 0
+      ALLOCATE(TAG(0:NV))
 C
       ! Number of variables indicated by the user
       CALL HM_GET_INTV('Number_Of_Variables',NVAR,IS_AVAILABLE,LSUBMODEL) 
@@ -117,7 +119,7 @@ c
                 TAG(I)=1                             
                 OK=1                                 
 C---------Multidomaines : pour les subsets, on stocke des infos en plus dans le th pour merge---------                      
-	          IF ((NSUBDOM>0).AND.(SUB_FLAG==1002)) THEN                                        
+                    IF ((NSUBDOM>0).AND.(SUB_FLAG==1002)) THEN                                        
                     IF (I>=9) THEN                                                                     
                       TAG(3) = 1                                                                         
                       TAG(4) = 1                                                                         
@@ -161,5 +163,6 @@ C---------  --------------------------------------------------------------------
       
       HM_THVARC=NVAR
        
+      DEALLOCATE(TAG)
       RETURN
       END

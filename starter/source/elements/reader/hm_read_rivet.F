@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  HM_READ_RIVET                 source/elements/reader/hm_read_rivet.F
 Chd|-- called by -----------
@@ -77,14 +77,11 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr03_c.inc"
 #include      "scr17_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com10_c.inc"
 #include      "param_c.inc"
 #include      "units_c.inc"
-#include      "submod_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -113,8 +110,7 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, I1, I2, PID,MT,IPID,J,N,STAT,P,IF1,IF2
-      INTEGER CPT,INDEX_PART,OFF_DEF(NSUBMOD),OFF_NOD(NSUBMOD),OFF_EL(NSUBMOD),
-     .        OFF_PART(NSUBMOD)
+      INTEGER CPT,INDEX_PART
       CHARACTER MESS*40, MESS2*40
       my_real
      .   BID 
@@ -125,15 +121,6 @@ C-----------------------------------------------
       INTEGER USR2SYS
       DATA MESS/'RIVET OR SPOTWELD DEFINITION            '/
 C=======================================================================
-C--------------------------------------------------
-C      HM OFFSETS IDs
-C--------------------------------------------------
-      DO I=1,NSUBMOD
-        OFF_DEF(I) = LSUBMODEL(I)%OFF_DEF
-        OFF_NOD(I) = LSUBMODEL(I)%OFF_NOD
-        OFF_EL(I) = LSUBMODEL(I)%OFF_EL
-        OFF_PART(I) = LSUBMODEL(I)%OFF_PART
-      ENDDO
 C--------------------------------------------------
 C      ALLOCS & INITS
 C--------------------------------------------------
@@ -155,17 +142,7 @@ C--------------------------------------------------
 C--------------------------------------------------
 C      FILL OTHER STRUCTURES + CHECKS
 C--------------------------------------------------
-      DO I=1,NRIVET  
-C--------------------------------------------------
-C      SUBMODEL OFFSET
-C--------------------------------------------------
-        IF(SUB_RIVET(I) /= 0)THEN
-          IF(IPART_RIVET(I) /= 0) IPART_RIVET(I) = IPART_RIVET(I) + OFF_PART(SUB_RIVET(I)) 
-          IF(IXRI(4,I) /= 0) IXRI(4,I) = IXRI(4,I) + OFF_EL(SUB_RIVET(I))
-          DO J=2,3
-            IF(IXRI(J,I) /= 0) IXRI(J,I) = IXRI(J,I) + OFF_NOD(SUB_RIVET(I))
-          ENDDO
-        ENDIF
+      DO I=1,NRIVET
 C--------------------------------------------------
 C      INTERNAL PART ID
 C--------------------------------------------------
@@ -227,7 +204,7 @@ C-------------------------------------
         ENDDO
         IF (IF1==0) THEN
           CALL IFRONTPLUS(IXRI(2,J),1)
-          CALL IFRONTPLUS(IXRI(3,J),1)	  
+          CALL IFRONTPLUS(IXRI(3,J),1)    
         ENDIF      
       ENDDO
       CALL RIVET0(V,VR,MS,IN,IXRI,RIVET,GEO,ITAB,IKINE)

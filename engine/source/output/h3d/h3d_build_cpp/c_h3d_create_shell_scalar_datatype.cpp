@@ -1,5 +1,5 @@
 //Copyright>    OpenRadioss
-//Copyright>    Copyright (C) 1986-2022 Altair Engineering Inc.
+//Copyright>    Copyright (C) 1986-2024 Altair Engineering Inc.
 //Copyright>
 //Copyright>    This program is free software: you can redistribute it and/or modify
 //Copyright>    it under the terms of the GNU Affero General Public License as published by
@@ -15,11 +15,11 @@
 //Copyright>    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //Copyright>
 //Copyright>
-//Copyright>    Commercial Alternative: Altair Radioss Software 
+//Copyright>    Commercial Alternative: Altair Radioss Software
 //Copyright>
-//Copyright>    As an alternative to this open-source version, Altair also offers Altair Radioss 
-//Copyright>    software under a commercial license.  Contact Altair to discuss further if the 
-//Copyright>    commercial version may interest you: https://www.altair.com/radioss/.    
+//Copyright>    As an alternative to this open-source version, Altair also offers Altair Radioss
+//Copyright>    software under a commercial license.  Contact Altair to discuss further if the
+//Copyright>    commercial version may interest you: https://www.altair.com/radioss/.
 //    
 #include <stdio.h>
 #include <string.h>
@@ -71,7 +71,8 @@ extern "C"
 
 void c_h3d_create_shell_scalar_datatype_(int *cpt_data, char *name1, int *size1, int *info1, int *info2, char *name2, int *size2,
                                          int *layer, int *ipt, int *ply,int *nuvar, int *gauss, int *idMds, int *idMdsVar,
-                                         int *idMatMds, char *comment, int *s_comment,char *mdsUvarName,int *sizeMdsUvarName)
+                                         int *idMatMds, char *comment, int *s_comment,char *mdsUvarName,int *sizeMdsUvarName,
+                                         int *id)
 {
     char *cname,*cname2,*ccomment,*cmdsuvar;
     int cname_len,cname_len1,ccomment_len,cmdsuvar_len;
@@ -96,7 +97,7 @@ void c_h3d_create_shell_scalar_datatype_(int *cpt_data, char *name1, int *size1,
     ccomment=(char*) malloc(sizeof(char)*ccomment_len);
     for(i=0;i<*s_comment;i++)  ccomment[i] = comment[i];
     ccomment[*s_comment]='\0';  
-
+    cptBlank = 0;
     cmdsuvar_len = *sizeMdsUvarName + 1;
     cmdsuvar=(char*) malloc(sizeof(char)*cmdsuvar_len);
     for(i=0;i<*sizeMdsUvarName;i++)  cmdsuvar[i] = mdsUvarName[i];
@@ -120,6 +121,8 @@ void c_h3d_create_shell_scalar_datatype_(int *cpt_data, char *name1, int *size1,
     MID_STRING[0] ='\0'; 
     char * RES_STRING = new char [100];
     RES_STRING[0] ='\0'; 
+    char * ID_STRING = new char [100];
+    ID_STRING[0] ='\0';  
 
     H3D_ID layer_pool_id = H3D_NULL_ID;
 
@@ -128,6 +131,16 @@ void c_h3d_create_shell_scalar_datatype_(int *cpt_data, char *name1, int *size1,
 #else
     RES_STRING = strcat(RES_STRING,cname);
 #endif
+
+    if(*id > 0)
+    {
+        sprintf(ID_STRING, " id %d",*id);
+#ifdef _WIN64
+        strcat_s(RES_STRING,100,ID_STRING);
+#else
+        RES_STRING = strcat(RES_STRING,ID_STRING);
+#endif
+    }
 
     if(*idMdsVar > 0 && *idMds > 0)
     {
@@ -345,19 +358,19 @@ void c_h3d_create_shell_scalar_datatype_(int *cpt_data, char *name1, int *size1,
 
 void _FCALL C_H3D_CREATE_SHELL_SCALAR_DATATYPE(int *cpt_data, char *name1, int *size1, int *info1, int *info2, char *name2, int *size2,
                                          int *layer, int *ipt, int *ply, int *nuvar, int *gauss, int *idMds, int *idMdsVar, int *idMatMds,
-                                         char *comment, int *s_comment,char *mdsUvarName,int *sizeMdsUvarName)
+                                         char *comment, int *s_comment,char *mdsUvarName,int *sizeMdsUvarName, int *id)
 {c_h3d_create_shell_scalar_datatype_ (cpt_data, name1, size1, info1, info2, name2, size2,layer,ipt,ply,nuvar,gauss,idMds,idMdsVar,idMatMds,comment,s_comment,
-                                      mdsUvarName,sizeMdsUvarName);}
+                                      mdsUvarName,sizeMdsUvarName,id);}
 
 void c_h3d_create_shell_scalar_datatype__ (int *cpt_data, char *name1, int *size1, int *info1, int *info2, char *name2, int *size2,
                                          int *layer, int *ipt, int *ply, int *nuvar, int *gauss, int *idMds, int *idMdsVar, int *idMatMds,
-                                         char *comment, int *s_comment,char *mdsUvarName,int *sizeMdsUvarName)
+                                         char *comment, int *s_comment,char *mdsUvarName,int *sizeMdsUvarName,int *id)
 {c_h3d_create_shell_scalar_datatype_ (cpt_data, name1, size1, info1, info2, name2, size2,layer,ipt,ply,nuvar,gauss,idMds,idMdsVar,idMatMds,comment,s_comment,
-                                      mdsUvarName,sizeMdsUvarName);}
+                                      mdsUvarName,sizeMdsUvarName,id);}
 
 void c_create_shell_scalar_datatype (int *cpt_data, char *name1, int *size1, int *info1, int *info2, char *name2, int *size2,
                                          int *layer, int *ipt, int *ply, int *nuvar, int *gauss, int *idMds, int *idMdsVar,int *idMatMds,
-                                         char *comment, int *s_comment,char *mdsUvarName,int *sizeMdsUvarName)
+                                         char *comment, int *s_comment,char *mdsUvarName,int *sizeMdsUvarName,int *id)
 {c_h3d_create_shell_scalar_datatype_ (cpt_data, name1, size1, info1, info2, name2, size2,layer,ipt,ply,nuvar,gauss,idMds,idMdsVar,idMatMds,comment,s_comment,
-                                      mdsUvarName,sizeMdsUvarName);}
+                                      mdsUvarName,sizeMdsUvarName,id);}
 }

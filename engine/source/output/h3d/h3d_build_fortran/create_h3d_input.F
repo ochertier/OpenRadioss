@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  CREATE_H3D_INPUT              source/output/h3d/h3d_build_fortran/create_h3d_input.F
 Chd|-- called by -----------
@@ -32,14 +32,24 @@ Chd|        H3D_MOD                       share/modules/h3d_mod.F
 Chd|====================================================================
       SUBROUTINE CREATE_H3D_INPUT(H3D_DATA,IKAD,IKEY,IREC,NBC,KEY0,KEY2,KEY3,KEY4,KEY5,KEY6,KEY7,KEY8)
 C-----------------------------------------------
+C   D e s c r i p t i o n
+C-----------------------------------------------
+C This subroutine is activating flags which are used by Engine
+C to make allocation or specific calculatations.
+C Example :
+C   H3D_DATA%N_VECT_CONT  = 1
+C   means /H3D/ELEM/VECT/CONT is defined and
+C   specific calculation & storage are requested
+C   to output this result
+C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE H3D_MOD
+      USE NAMES_AND_TITLES_MOD, ONLY: NCHARLINE100,NCHARKEY
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "nchara_c.inc"
 #include      "units_c.inc"
 #include      "scr14_c.inc"
 C-----------------------------------------------
@@ -49,10 +59,7 @@ C-----------------------------------------------
       INTEGER IKAD(0:*),IKEY,IREC
       INTEGER NBC
       CHARACTER KEY0(*)*5 
-      CHARACTER(LEN=ncharkey) :: KEY2, KEY3, KEY4, KEY5,KEY6,KEY7,KEY8
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
+      CHARACTER(LEN=NCHARKEY) :: KEY2, KEY3, KEY4, KEY5,KEY6,KEY7,KEY8
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
@@ -60,7 +67,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      CHARACTER(LEN=ncharline):: CARTE,CARTE1,KEY3_GLOB
+      CHARACTER(LEN=NCHARLINE100):: CARTE,CARTE1,KEY3_GLOB
       INTEGER I,J,L,N_H3D_PART,CPT,
      .      IS_CHAR_KEY3,IS_CHAR_KEY4,IS_CHAR_KEY5,IS_CHAR_KEY6,IS_CHAR_KEY7,IS_CHAR_KEY8,
      .      IS_EMPTY_KEY3,IS_EMPTY_KEY4,IS_EMPTY_KEY5,IS_EMPTY_KEY6,IS_EMPTY_KEY7,IS_EMPTY_KEY8
@@ -113,7 +120,7 @@ C--------------------------------------------------
       IS_CHAR_KEY8 = 1
       IS_EMPTY_KEY8 = 1
       KEY3_GLOB = ''
-      DO I=1,ncharkey
+      DO I=1,NCHARKEY
         IF ( KEY3(I:I) == '=' ) IS_CHAR_KEY3 = 0
         IF ( KEY3(I:I) /= ' ' ) IS_EMPTY_KEY3 = 0
         IF ( KEY4(I:I) == '=' ) IS_CHAR_KEY4 = 0
@@ -130,7 +137,7 @@ C--------------------------------------------------
 C-------------------------------------------------- 
       CPT = 0
       IF ( IS_CHAR_KEY3 == 1 .AND. IS_EMPTY_KEY3 == 0) THEN
-        DO I=1,ncharkey
+        DO I=1,NCHARKEY
           IF ( KEY3(I:I) /= ' ' ) THEN 
             CPT = CPT + 1
             KEY3_GLOB(CPT:CPT) = KEY3(I:I)
@@ -140,7 +147,7 @@ C--------------------------------------------------
       IF ( IS_CHAR_KEY4 == 1 .AND. IS_EMPTY_KEY4 == 0 ) THEN
         CPT = CPT + 1
         KEY3_GLOB(CPT:CPT) = '/'
-        DO I=1,ncharkey
+        DO I=1,NCHARKEY
           IF ( KEY4(I:I) /= ' ' ) THEN 
             CPT = CPT + 1
             KEY3_GLOB(CPT:CPT) = KEY4(I:I)
@@ -150,7 +157,7 @@ C--------------------------------------------------
       IF ( IS_CHAR_KEY5 == 1 .AND. IS_EMPTY_KEY5 == 0 ) THEN
         CPT = CPT + 1
         KEY3_GLOB(CPT:CPT) = '/'
-        DO I=1,ncharkey
+        DO I=1,NCHARKEY
           IF ( KEY5(I:I) /= ' ' ) THEN 
             CPT = CPT + 1
             KEY3_GLOB(CPT:CPT) = KEY5(I:I)
@@ -160,7 +167,7 @@ C--------------------------------------------------
       IF ( IS_CHAR_KEY6 == 1 .AND. IS_EMPTY_KEY6 == 0 ) THEN
         CPT = CPT + 1
         KEY3_GLOB(CPT:CPT) = '/'
-        DO I=1,ncharkey
+        DO I=1,NCHARKEY
           IF ( KEY6(I:I) /= ' ' ) THEN 
             CPT = CPT + 1
             KEY3_GLOB(CPT:CPT) = KEY6(I:I)
@@ -170,7 +177,7 @@ C--------------------------------------------------
       IF ( IS_CHAR_KEY7 == 1 .AND. IS_EMPTY_KEY7 == 0 ) THEN
         CPT = CPT + 1
         KEY3_GLOB(CPT:CPT) = '/'
-        DO I=1,ncharkey
+        DO I=1,NCHARKEY
           IF ( KEY7(I:I) /= ' ' ) THEN 
             CPT = CPT + 1
             KEY3_GLOB(CPT:CPT) = KEY7(I:I)
@@ -180,7 +187,7 @@ C--------------------------------------------------
       IF ( IS_CHAR_KEY8 == 1 .AND. IS_EMPTY_KEY8 == 0 ) THEN
         CPT = CPT + 1
         KEY3_GLOB(CPT:CPT) = '/'
-        DO I=1,ncharkey
+        DO I=1,NCHARKEY
           IF ( KEY8(I:I) /= ' ' ) THEN 
             CPT = CPT + 1
             KEY3_GLOB(CPT:CPT) = KEY8(I:I)
@@ -197,14 +204,24 @@ c scalar
         IF (KEY3_GLOB == 'SKID_LINE') H3D_DATA%N_SCAL_SKID  = 1
         IF (KEY3_GLOB == 'STIFR') H3D_DATA%N_SCAL_STIFR  = 1
         IF (KEY3_GLOB == 'STIF') H3D_DATA%N_SCAL_STIFN  = 1
+        IF (KEY3_GLOB == 'CSE_FRICG') H3D_DATA%N_SCAL_CSE_FRIC  = 1
+        IF (KEY3_GLOB == 'CSE_FRIC') H3D_DATA%N_SCAL_CSE_FRICINT  = 1
 c vector
-        IF (KEY3_GLOB == 'CONT'.OR.KEY3_GLOB == 'CONT/MAX') H3D_DATA%N_VECT_CONT  = 1
-        IF (KEY3_GLOB == 'CONT/MAX') H3D_DATA%N_VECT_CONT_MAX  = 1
+        IF (KEY3_GLOB == 'CONT'.OR.KEY3_GLOB == 'CONT/TMAX') H3D_DATA%N_VECT_CONT  = 1
+        IF (KEY3_GLOB == 'CONT/TMAX') H3D_DATA%N_VECT_CONT_MAX  = 1
         IF (KEY3_GLOB == 'FINT') H3D_DATA%N_VECT_FINT  = 1
         IF (KEY3_GLOB == 'FEXT') H3D_DATA%N_VECT_FEXT   = 1
-        IF (KEY3_GLOB == 'PCONT') H3D_DATA%N_VECT_PCONT   = 1
-        IF (KEY3_GLOB == 'CONT2') H3D_DATA%N_VECT_CONT2   = 1
-        IF (KEY3_GLOB == 'PCONT2') H3D_DATA%N_VECT_PCONT2   = 1
+        IF (KEY3_GLOB == 'PCONT'.OR.KEY3_GLOB == 'PCONT/TMAX') H3D_DATA%N_VECT_PCONT   = 1
+        IF (KEY3_GLOB == 'PCONT/TMAX') H3D_DATA%N_VECT_PCONT_MAX  = 1
+        IF (KEY3_GLOB == 'CONT2'.OR.KEY3_GLOB == 'CONT2/TMAX'.OR.
+     .                KEY3_GLOB == 'CONT2/TMIN') H3D_DATA%N_VECT_CONT2   = 1
+        IF (KEY3_GLOB == 'PCONT2'.OR.KEY3_GLOB == 'PCONT2/TMAX'.OR.
+     .                KEY3_GLOB == 'PCONT2/TMIN') H3D_DATA%N_VECT_PCONT2   = 1
+        IF (KEY3_GLOB == 'CONT2/TMAX') H3D_DATA%N_VECT_CONT2_MAX   = 1
+        IF (KEY3_GLOB == 'CONT2/TMIN') H3D_DATA%N_VECT_CONT2_MIN   = 1
+        IF (KEY3_GLOB == 'PCONT2/TMAX') H3D_DATA%N_VECT_PCONT2_MAX   = 1
+        IF (KEY3_GLOB == 'PCONT2/TMIN') H3D_DATA%N_VECT_PCONT2_MIN   = 1
+        IF (KEY3_GLOB == 'CONT2/MOMENT') H3D_DATA%N_VECT_CONT2M  = 1
         IF (KEY3_GLOB == 'DROT') H3D_DATA%N_VECT_DROT   = 1 
         IF (KEY3_GLOB == 'DXANC') H3D_DATA%N_VECT_DXANC  = 1
         IF (KEY3_GLOB == 'FREAC') H3D_DATA%N_VECT_FREAC  = 1
@@ -214,11 +231,22 @@ c vector
       ENDIF
       
       IF(KEY2 == "ELEM" .OR. KEY2 == 'SOLID' .OR. KEY2 == 'QUAD')THEN
-        IF (KEY3_GLOB == 'VECT/CONT') H3D_DATA%N_VECT_CONT  = 1      
+        IF (KEY3_GLOB == 'VECT/CONT') H3D_DATA%N_VECT_CONT  = 1
+        IF (KEY3_GLOB == 'VECT/ACC') H3D_DATA%N_VECT_ACC  = 1
+        IF (KEY3_GLOB == 'TENS/EPSDOT') IEPSDOT = 1
+        IF (KEY3_GLOB == 'VORTX') H3D_DATA%SOL_SCAL_VORTX  = 1
+        IF (KEY3_GLOB == 'VORTY') H3D_DATA%SOL_SCAL_VORTY  = 1
+        IF (KEY3_GLOB == 'VORTZ') H3D_DATA%SOL_SCAL_VORTZ  = 1
+        IF (KEY3_GLOB == 'VORT') THEN
+          H3D_DATA%SOL_SCAL_VORTX  = 1
+          H3D_DATA%SOL_SCAL_VORTY  = 1
+          H3D_DATA%SOL_SCAL_VORTZ  = 1
+        ENDIF
       ENDIF
 c
-      ! Just for EPSDOT
       IF(KEY2 == 'SHELL') THEN
+c scalar
+        IF (KEY3_GLOB == 'ERROR/THICK') H3D_DATA%SH_SCAL_ERR_THK = 1
 c tensor
         IF (KEY3_GLOB == 'TENS/EPSDOT') IEPSDOT = 1
       ENDIF

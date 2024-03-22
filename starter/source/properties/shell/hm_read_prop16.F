@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  HM_READ_PROP16                source/properties/shell/hm_read_prop16.F
 Chd|-- called by -----------
@@ -52,20 +52,13 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "units_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "warn_c.inc"
-#include      "scr03_c.inc"
 #include      "scr17_c.inc"
 #include      "scr21_c.inc"
-#include      "submod_c.inc"
 #include      "sphcom.inc"
 #include      "tablen_c.inc"
 C-----------------------------------------------
@@ -89,7 +82,7 @@ C-----------------------------------------------
       INTEGER NUML(100), NLY, NLYMAX, N, J, IERREL, M1, M2, M3,
      .   M4, K, N2, N3, ISTRAIN, MLAWLY1,ISHEAR,IHBE,ITHK,IREP,
      .   IDSK, ISK, IPANG, IPPHI, IPTHK, IPPOS, IPOS, IPMAT, PID1,
-     .   ISKN(LISKN,*),ISMSTR,ISROT,IHBEOUTP,ISORTH,IHBE_OLD
+     .   ISKN(LISKN,*),ISMSTR,ISROT,IHBEOUTP,ISORTH,IHBE_OLD,IPWEIGHT
 C     REAL
       my_real
      .    AN, VX, VY, VZ, THICKT, DT, TMIN, TMAX, ASHEAR,PTHK,CVIS,PUN
@@ -98,9 +91,6 @@ C     REAL
       CHARACTER*nchartitle,
      .   TITR,TITR1
       LOGICAL IS_AVAILABLE, IS_ENCRYPTED
-C-----------------------------------------------
-C   E x t e r n a l   F u n c t i o n s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D a t a
 C-----------------------------------------------
@@ -116,6 +106,7 @@ c
       IPTHK = 300
       IPPOS = 400
       IPPHI = 500
+      IPWEIGHT = 900
       IDSK = 0
       IPOS = 0
       IREP = 2
@@ -179,7 +170,8 @@ c
         CALL HM_GET_FLOAT_ARRAY_INDEX('Alpha_arr',GEO(IPPHI+K),K,IS_AVAILABLE,LSUBMODEL,UNITAB)
         CALL HM_GET_FLOAT_ARRAY_INDEX('Prop_Thick',GEO(IPTHK+K),K,IS_AVAILABLE,LSUBMODEL,UNITAB) 
         CALL HM_GET_FLOAT_ARRAY_INDEX('Prop_Zi',GEO(IPPOS+K),K,IS_AVAILABLE,LSUBMODEL,UNITAB) 
-        IF (GEO(IPPHI+K) == ZERO) GEO(IPPHI+K) = NINTY         
+        IF (GEO(IPPHI+K) == ZERO) GEO(IPPHI+K) = NINTY
+        GEO(IPWEIGHT+K)= ONE        
       ENDDO  
 C--------------------------------------------------
 C SUBMODEL TRANSFORMATION
@@ -187,7 +179,9 @@ C--------------------------------------------------
       IF (SUB_ID /= 0)
      .       CALL SUBROTVECT(VX,VY,VZ,RTRANS,SUB_ID,LSUBMODEL)   
 C----------------------
-      PTHK = MIN(PTHK, ONE-EM06)
+      IF (PTHK == ZERO) PTHK = ONE-EM06
+      PTHK = MIN(PTHK, ONE)
+      PTHK = MAX(PTHK,-ONE) 
       GEO(42) = PTHK
 
 C fixing flag and removed from input
@@ -420,7 +414,7 @@ C-------LAYER 1
         IF (IPM(1,J) == NUML(1)) THEN
           IGEO(IPMAT+1) = J
           MLAWLY1= NINT(PM(19,J))
-          IF(MLAWLY1 == 58.OR.MLAWLY1 == 98) GO TO 250
+          IF(MLAWLY1 == 58 .OR. MLAWLY1 == 158 .OR. MLAWLY1 == 98) GO TO 250
           IF(MLAWLY1>=29.AND.MLAWLY1<=31) GO TO 250
           IF(MLAWLY1==99) GO TO 250
           CALL FRETITL2(TITR,IGEO(NPROPGI-LTITR+1),LTITR)
@@ -584,7 +578,9 @@ C---
      & 5X,'SHELL HOURGLASS ROTATIONAL DAMPING. . .=',1PG20.13/,
      & 5X,'SHELL MEMBRANE DAMPING. . . . . . . . .=',1PG20.13/,
      & 5X,'SHEAR AREA REDUCTION FACTOR . . . . . .=',1PG20.13/,
-     & 5X,'% OF LAYER THICKNESS TO FAIL. . . . . .=',1PG20.13/,
+     & 5X,'ELEMENT DELETION PARAMETER. . . . . . .=',1PG20.13/,
+     & 5X,' > 0.0 : FRACTION OF FAILED THICKNESS   ',/,
+     & 5X,' < 0.0 : FRACTION OF FAILED LAYERS      ',/,
      & 5X,'SHEAR FORMULATION FLAG. . . . . . . . .=',I10/,
      & 5X,'THICKNESS VARIATION FLAG. . . . . . . .=',I10/,
      & 5X,'X COMPONENT OF DIR 1 OF ORTHOTROPY. . .=',1PG20.13/,
@@ -606,7 +602,9 @@ C---
      & 5X,'SHELL HOURGLASS ROTATIONAL DAMPING. . .=',1PG20.13/,
      & 5X,'SHELL MEMBRANE DAMPING. . . . . . . . .=',1PG20.13/,
      & 5X,'SHEAR AREA REDUCTION FACTOR . . . . . .=',1PG20.13/,
-     & 5X,'% OF LAYER THICKNESS TO FAIL. . . . . .=',1PG20.13/,
+     & 5X,'ELEMENT DELETION PARAMETER. . . . . . .=',1PG20.13/,
+     & 5X,' > 0.0 : FRACTION OF FAILED THICKNESS   ',/,
+     & 5X,' < 0.0 : FRACTION OF FAILED LAYERS      ',/,
      & 5X,'SHEAR FORMULATION FLAG. . . . . . . . .=',I10/,
      & 5X,'THICKNESS VARIATION FLAG. . . . . . . .=',I10/,
      & 5X,'SKEW OF THE FIRST ORTHOTROPY DIRECTION.=',I10/,
@@ -624,7 +622,9 @@ C---
      & 5X,'SHELL MEMBRANE DAMPING. . . . . . . . .=',1PG20.13/,
      & 5X,'SHELL NUMERICAL DAMPING . . . . . . . .=',1PG20.13/,
      & 5X,'SHEAR AREA REDUCTION FACTOR . . . . . .=',1PG20.13/,
-     & 5X,'% OF LAYER THICKNESS TO FAIL. . . . . .=',1PG20.13/,
+     & 5X,'ELEMENT DELETION PARAMETER. . . . . . .=',1PG20.13/,
+     & 5X,' > 0.0 : FRACTION OF FAILED THICKNESS   ',/,
+     & 5X,' < 0.0 : FRACTION OF FAILED LAYERS      ',/,
      & 5X,'SHEAR FORMULATION FLAG. . . . . . . . .=',I10/,
      & 5X,'THICKNESS VARIATION FLAG. . . . . . . .=',I10/,
      & 5X,'X COMPONENT OF DIR 1 OF ORTHOTROPY. . .=',1PG20.13/,
@@ -644,7 +644,9 @@ C---
      & 5X,'SHELL MEMBRANE DAMPING. . . . . . . . .=',1PG20.13/,
      & 5X,'SHELL NUMERICAL DAMPING . . . . . . . .=',1PG20.13/,
      & 5X,'SHEAR AREA REDUCTION FACTOR . . . . . .=',1PG20.13/,
-     & 5X,'% OF LAYER THICKNESS TO FAIL. . . . . .=',1PG20.13/,
+     & 5X,'ELEMENT DELETION PARAMETER. . . . . . .=',1PG20.13/,
+     & 5X,' > 0.0 : FRACTION OF FAILED THICKNESS   ',/,
+     & 5X,' < 0.0 : FRACTION OF FAILED LAYERS      ',/,
      & 5X,'SHEAR FORMULATION FLAG. . . . . . . . .=',I10/,
      & 5X,'THICKNESS VARIATION FLAG. . . . . . . .=',I10/,
      & 5X,'SKEW OF THE FIRST ORTHOTROPY DIRECTION.=',I10/,

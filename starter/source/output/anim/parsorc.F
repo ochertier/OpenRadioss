@@ -1,38 +1,38 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  PARSORC                       source/output/anim/parsorc.F  
 Chd|-- called by -----------
 Chd|        GENANI1                       source/output/anim/genani1.F  
 Chd|-- calls ---------------
 Chd|        FACNOR                        source/output/anim/facnor.F   
-Chd|        WRITE_I_C                     source/output/tools/write_routines.c
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE PARSORC(X    ,D    ,XNORM,IADD ,CDG  ,
      .                  BUFEL,IPARG,IXQ  ,IXC  ,IXTG ,
-     .                  INVERT,EL2FA,IXUR,
-     .                  MATER,IPARTQ,IPARTC,IPARTUR,IPARTTG,
+     .                  INVERT,EL2FA,
+     .                  MATER,IPARTQ,IPARTC,IPARTTG,
      .                  ELBUF_TAB)
 C-----------------------------------------------
 C   M o d u l e s
@@ -48,9 +48,6 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "scr05_c.inc"
-#include      "scr14_c.inc"
-#include      "rnur_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -58,9 +55,9 @@ C     REAL
       my_real
      .   X(*),D(*),XNORM(3,*),CDG(*),BUFEL(*)
       INTEGER IXC(NIXC,*),IXTG(NIXTG,*),IADD(*),IPARG(NPARG,*),
-     .        IXQ(NIXQ,*),IXUR(NIXUR,*),
+     .        IXQ(NIXQ,*),
      .        INVERT(*), EL2FA(*),MATER(*),
-     .        IPARTQ(*),IPARTC(*),IPARTTG(*),IPARTUR(*)
+     .        IPARTQ(*),IPARTC(*),IPARTTG(*)
       TYPE (ELBUF_STRUCT_), DIMENSION(NGROUP) :: ELBUF_TAB
 C-----------------------------------------------
 C     REAL
@@ -70,7 +67,7 @@ C     REAL
      .        IPRT, NEL, IAD, NPAR, NFT, IMID,IALEL,MTN,
      .        NN1,NN2,NN3,NN4,NN5,NN6,NN7,NN8,NN9,NN10,
      .        JJ, K, SH_IH, IHBE,BUF
-      INTEGER NP((NUMELQ + NUMELC + NUMELTG + NUMELUR)*4)
+      INTEGER NP((NUMELQ + NUMELC + NUMELTG )*4)
 C-----------------------------------------------
 C     NORMALE
 C-----------------------------------------------
@@ -90,14 +87,13 @@ C
       NN7 = NN6
       NN8 = NN7
       NN9 = NN8
-      NN10= NN9 + NUMELUR
 C-----------------------------------------------
       NPAR = 0
 C
 C-----------------------------------------------
 C     PART
 C-----------------------------------------------
-      IF(NUMELQ + NUMELC + NUMELTG + NUMELUR/=0)THEN
+      IF(NUMELQ + NUMELC + NUMELTG/=0)THEN
       JJ = 0
 
       DO 500 IPRT=1,NPART
@@ -189,24 +185,7 @@ C-----------------------------------------------
              EL2FA(NN5+N) = IE
              JJ = JJ + 4
  170     CONTINUE
-C-----------------------------------------------
-C       RNUR
-C-----------------------------------------------
-        ELSEIF(ITY==50)THEN
-         DO 199 I=LFT,LLT
-          N = I + NFT
-          IF(IPARTUR(N)/=IPRT)GOTO 199
-          OFF = BUFEL(IAD+I-1)
-          II(1) = IXUR(2,N)-1
-          II(2) = IXUR(3,N)-1
-          II(3) = IXUR(4,N)-1
-          II(4) = IXUR(5,N)-1
-          CALL WRITE_I_C(II,4)
-          IE = IE + 1
-          INVERT(IE) = 0
-          EL2FA(NN9+N) = IE
-          JJ = JJ + 4
- 199      CONTINUE
+
         ELSE
         ENDIF
  490   CONTINUE

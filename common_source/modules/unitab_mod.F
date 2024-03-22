@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  UNITAB_MOD                    modules/unitab_mod.F          
 Chd|-- called by -----------
@@ -380,11 +380,18 @@ c define type NLOCAL_STRUCT_ for nodal variable regularization
 c=======================================================================      
 c 
       TYPE UNIT_TYPE_
-        INTEGER     :: NUNITS                             ! Number of UNIT options in input deck 
+        INTEGER     :: NUNIT0 ! number of /UNIT
+        INTEGER     :: NUNITS !                           ! Number of UNIT options in input deck  (NUNIT0 + NBSUBMOD + 1)
         INTEGER, DIMENSION(:)   , ALLOCATABLE :: UNIT_ID  ! (NUNITS) Unit user ID
         my_real, DIMENSION(:)   , ALLOCATABLE :: FAC_M    ! (NUNITS) Mass Unit
         my_real, DIMENSION(:)   , ALLOCATABLE :: FAC_L    ! (NUNITS) Length Unit    
         my_real, DIMENSION(:)   , ALLOCATABLE :: FAC_T    ! (NUNITS) Temperature Unit
+        my_real :: FAC_M_WORK
+        my_real :: FAC_L_WORK
+        my_real :: FAC_T_WORK
+        my_real :: FAC_MASS
+        my_real :: FAC_LENGTH
+        my_real :: FAC_TIME
       END TYPE UNIT_TYPE_
 c---------------
 c     MODE = 0 => no variable regularization, no structure allocation

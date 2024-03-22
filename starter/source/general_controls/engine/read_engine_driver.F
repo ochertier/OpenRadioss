@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  READ_ENGINE_DRIVER            source/general_controls/engine/read_engine_driver.F
 Chd|-- called by -----------
@@ -31,7 +31,7 @@ Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
-       SUBROUTINE READ_ENGINE_DRIVER(IGRPART,IS_DYNA)
+       SUBROUTINE READ_ENGINE_DRIVER(IGRPART,IS_DYNA,NB_DYNA_INCLUDE)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -46,38 +46,33 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com_engcards_c.inc"
-#include      "scr03_c.inc"
-#include      "scr07_c.inc"
 #include      "scr15_c.inc"
-#include      "scr17_c.inc"
-#include      "scr18_c.inc"
-#include      "sms_c.inc"
-#include      "stati_c.inc"
-#include      "statr_c.inc"
-#include      "timeri_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       TYPE(GROUP_)  ,DIMENSION(NGRPART) :: IGRPART
       INTEGER,INTENT(IN)::IS_DYNA
+      INTEGER,INTENT(IN)::NB_DYNA_INCLUDE
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
        CHARACTER FILNAM*512
-       INTEGER I,IOUT_1RAD,LEN_FILNAM,CPT,NRUN
+       INTEGER I,IOUT_1RAD,LEN_FILNAM,CPT,NRUN,NPARITH_ENG
 C=======================================================================
 C WRITE /ANIM OPTIONS THAT ARE IN MEMORY(HM MODEL) IN 1.RAD FILE 
 C=======================================================================
 C-----------------------------------------------
 C OPEN 1.rad FILE
 C-----------------------------------------------
-       FILNAM  =ROOTNAM(1:ROOTLEN)//'_0001.rad'
-       LEN_FILNAM=ROOTLEN+9
+       IF(NB_DYNA_INCLUDE .NE. 0) THEN
+         FILNAM  = 'DYNA_INCLUDE_0001.rad'
+         LEN_FILNAM=21
+       ELSE
+         FILNAM  =ROOTNAM(1:ROOTLEN)//'_0001.rad'
+         LEN_FILNAM=ROOTLEN+9
+       ENDIF
        CALL CPP_MODEL_OPEN_FILE(FILNAM,LEN_FILNAM)
 C--------------------------------------------------
 C START BROWSING ANIM OPTIONS
@@ -149,6 +144,17 @@ C--------------------------------------------------
 C WRITE VERS OPTIONS IN 1.RAD FILE
 C--------------------------------------------------
       DO CPT=1,NVERS_ENG
+        CALL CPP_GLOBAL_ENTITY_SDI_WRITE(IS_DYNA)
+      ENDDO
+C--------------------------------------------------
+C START BROWSING PARITH OPTION
+C--------------------------------------------------
+      CALL HM_OPTION_COUNT('/PARITH',NPARITH_ENG)
+      CALL HM_OPTION_START('/PARITH')
+C--------------------------------------------------
+C WRITE PARITH OPTIONS IN 1.RAD FILE
+C--------------------------------------------------
+      DO CPT=1,NPARITH_ENG
         CALL CPP_GLOBAL_ENTITY_SDI_WRITE(IS_DYNA)
       ENDDO
 C-----------------------------------------------

@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  ST_QAPRINT_SET                source/output/qaprint/st_qaprint_set.F
 Chd|-- called by -----------
@@ -57,14 +57,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "param_c.inc"
 #include      "scr17_c.inc"
-#include      "tabsiz_c.inc"
-#include      "units_c.inc"
-#include      "submod_c.inc"
-#include      "scr03_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -377,24 +371,70 @@ C-----------------------------------------------
               WRITE(VARNAME,'(A,I0,A)') 'SET_',ID,'_'//'SURFACE_NB_SEG'
               CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),NB_SURF_SEG,0.0_8)
               DO N = 1,NB_SURF_SEG
-                WRITE(VARNAME,'(A,I0,A,I0,A)') 'SET_',ID,'_'//'SURFACE_SEG_',N,'_NODE_1'
-                CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),ITAB(IGRSURF(IGR)%NODES(N,1)),0.0_8)
-                WRITE(VARNAME,'(A,I0,A,I0,A)') 'SET_',ID,'_'//'SURFACE_SEG_',N,'_NODE_2'
-                CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),ITAB(IGRSURF(IGR)%NODES(N,2)),0.0_8)
-                WRITE(VARNAME,'(A,I0,A,I0,A)') 'SET_',ID,'_'//'SURFACE_SEG_',N,'_NODE_3'
-                CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),ITAB(IGRSURF(IGR)%NODES(N,3)),0.0_8)
-                WRITE(VARNAME,'(A,I0,A,I0,A)') 'SET_',ID,'_'//'SURFACE_SEG_',N,'_NODE_4'
-                CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),ITAB(IGRSURF(IGR)%NODES(N,4)),0.0_8)
-                WRITE(VARNAME,'(A,I0,A,I0,A)') 'SET_',ID,'_'//'SURFACE_SEG_',N,'_ELTYP'
-                CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),IGRSURF(IGR)%ELTYP(N),0.0_8)
-                WRITE(VARNAME,'(A,I0,A,I0,A)') 'SET_',ID,'_'//'SURFACE_SEG_',N,'_ELEM'
-                IF (IGRSURF(IGR)%ELTYP(N) == 3 ) THEN ! SH4N
-                  CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),IXC(NIXC,IGRSURF(IGR)%ELEM(N)),0.0_8)
-                ELSEIF (IGRSURF(IGR)%ELTYP(N) == 7 ) THEN ! SH3N
-                  CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),IXTG(NIXTG,IGRSURF(IGR)%ELEM(N)),0.0_8)
-                ELSEIF (IGRSURF(IGR)%ELTYP(N) == 1 ) THEN ! SOLID
-                  CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),IXS(NIXS,IGRSURF(IGR)%ELEM(N)),0.0_8)
-                ENDIF ! IF (IGRSURF(IGR)%ELTYP(N) == 3 )
+                IF(SET(IGS)%NB_ELLIPSE == 0 .AND. SET(IGS)%NB_PLANE== 0)THEN
+                  WRITE(VARNAME,'(A,I0,A,I0,A)') 'SET_',ID,'_'//'SURFACE_SEG_',N,'_NODE_1'
+                  CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),ITAB(IGRSURF(IGR)%NODES(N,1)),0.0_8)
+                  WRITE(VARNAME,'(A,I0,A,I0,A)') 'SET_',ID,'_'//'SURFACE_SEG_',N,'_NODE_2'
+                  CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),ITAB(IGRSURF(IGR)%NODES(N,2)),0.0_8)
+                  WRITE(VARNAME,'(A,I0,A,I0,A)') 'SET_',ID,'_'//'SURFACE_SEG_',N,'_NODE_3'
+                  CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),ITAB(IGRSURF(IGR)%NODES(N,3)),0.0_8)
+                  WRITE(VARNAME,'(A,I0,A,I0,A)') 'SET_',ID,'_'//'SURFACE_SEG_',N,'_NODE_4'
+                  CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),ITAB(IGRSURF(IGR)%NODES(N,4)),0.0_8)
+                  WRITE(VARNAME,'(A,I0,A,I0,A)') 'SET_',ID,'_'//'SURFACE_SEG_',N,'_ELTYP'
+                  CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),IGRSURF(IGR)%ELTYP(N),0.0_8)
+                  WRITE(VARNAME,'(A,I0,A,I0,A)') 'SET_',ID,'_'//'SURFACE_SEG_',N,'_ELEM'
+                  IF (IGRSURF(IGR)%ELTYP(N) == 3 ) THEN ! SH4N
+                    CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),IXC(NIXC,IGRSURF(IGR)%ELEM(N)),0.0_8)
+                  ELSEIF (IGRSURF(IGR)%ELTYP(N) == 7 ) THEN ! SH3N
+                    CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),IXTG(NIXTG,IGRSURF(IGR)%ELEM(N)),0.0_8)
+                  ELSEIF (IGRSURF(IGR)%ELTYP(N) == 1 ) THEN ! SOLID
+                    CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),IXS(NIXS,IGRSURF(IGR)%ELEM(N)),0.0_8)
+                  ENDIF ! IF (IGRSURF(IGR)%ELTYP(N) == 3 )
+
+                ELSE IF(SET(IGS)%NB_ELLIPSE == 1)THEN
+                  WRITE(VARNAME,'(A,I0,A)') 'SET_',ID,'_'//'Ellipse_Xc = '
+                  TEMP_DOUBLE = SET(IGS)%ELLIPSE_XC
+                  CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),0,TEMP_DOUBLE)
+                  WRITE(VARNAME,'(A,I0,A)') 'SET_',ID,'_'//'Ellipse_Yc = '
+                  TEMP_DOUBLE = SET(IGS)%ELLIPSE_YC
+                  CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),0,TEMP_DOUBLE)
+                  WRITE(VARNAME,'(A,I0,A)') 'SET_',ID,'_'//'Ellipse_Zc = '
+                  TEMP_DOUBLE = SET(IGS)%ELLIPSE_ZC
+                  CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),0,TEMP_DOUBLE)
+                  WRITE(VARNAME,'(A,I0,A)') 'SET_',ID,'_'//'Ellipse_a = '
+                  TEMP_DOUBLE = SET(IGS)%ELLIPSE_A
+                  CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),0,TEMP_DOUBLE)
+                  WRITE(VARNAME,'(A,I0,A)') 'SET_',ID,'_'//'Ellipse_b = '
+                  TEMP_DOUBLE = SET(IGS)%ELLIPSE_B
+                  CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),0,TEMP_DOUBLE)
+                  WRITE(VARNAME,'(A,I0,A)') 'SET_',ID,'_'//'Ellipse_c = '
+                  TEMP_DOUBLE = SET(IGS)%ELLIPSE_C
+                  CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),0,TEMP_DOUBLE)
+                  WRITE(VARNAME,'(A,I0,A)') 'SET_',ID,'_'//'Ellipse_N'
+                  CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),SET(IGS)%ELLIPSE_N,0.0_8)
+                  WRITE(VARNAME,'(A,I0,A)') 'SET_',ID,'_'//'Ellipse_Skew_ID'
+                  CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),SET(IGS)%ELLIPSE_ID_MADYMO,0.0_8)
+                ELSE IF(SET(IGS)%NB_PLANE == 1)THEN
+                  WRITE(VARNAME,'(A,I0,A)') 'SET_',ID,'_'//'Plane_XM = '
+                  TEMP_DOUBLE = SET(IGS)%PLANE_XM
+                  CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),0,TEMP_DOUBLE)
+                  WRITE(VARNAME,'(A,I0,A)') 'SET_',ID,'_'//'PLANE_YM = '
+                  TEMP_DOUBLE = SET(IGS)%PLANE_YM
+                  CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),0,TEMP_DOUBLE)
+                  WRITE(VARNAME,'(A,I0,A)') 'SET_',ID,'_'//'PLANE_ZM = '
+                  TEMP_DOUBLE = SET(IGS)%PLANE_ZM
+                  CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),0,TEMP_DOUBLE)
+                  WRITE(VARNAME,'(A,I0,A)') 'SET_',ID,'_'//'PLANE_XM1 = '
+                  TEMP_DOUBLE = SET(IGS)%PLANE_XM1
+                  CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),0,TEMP_DOUBLE)
+                  WRITE(VARNAME,'(A,I0,A)') 'SET_',ID,'_'//'PLANE_YM1 = '
+                  TEMP_DOUBLE = SET(IGS)%PLANE_YM1
+                  CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),0,TEMP_DOUBLE)
+                  WRITE(VARNAME,'(A,I0,A)') 'SET_',ID,'_'//'PLANE_ZM1 = '
+                  TEMP_DOUBLE = SET(IGS)%PLANE_ZM1
+                  CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),0,TEMP_DOUBLE)
+                ENDIF
+
               ENDDO
             ENDIF ! IF (NB_SURF_SEG > 0)
 !---

@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  SPMD_EXCH_PRESS               source/mpi/interfaces/spmd_exch_press.F
 Chd|-- called by -----------
@@ -29,13 +29,15 @@ Chd|        ANCMSG                        source/output/message/message.F
 Chd|        ARRET                         source/system/arret.F         
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
+Chd|        OUTPUTS_MOD                   ../common_source/modules/outputs_mod.F
 Chd|        TRI25EBOX                     share/modules/tri25ebox.F     
 Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
       SUBROUTINE SPMD_EXCH_PRESS(
      1    IPARI   ,INTLIST ,NBINTC  ,FNCONT ,
      2    FTCONT  ,ISLEN7 ,IRLEN7  ,IRLEN7T ,ISLEN7T,
-     3    IRLEN20 ,ISLEN20,IRLEN20T,ISLEN20T,INTBUF_TAB)
+     3    IRLEN20 ,ISLEN20,IRLEN20T,ISLEN20T,INTBUF_TAB,
+     4    N_CSE_FRIC_INTER, N_SCAL_CSE_EFRIC  )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -43,11 +45,11 @@ C-----------------------------------------------
       USE TRI25EBOX
       USE MESSAGE_MOD
       USE INTBUFDEF_MOD
+      USE OUTPUTS_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 #include      "assert.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -58,25 +60,19 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr18_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
 #include      "task_c.inc"
-#include      "parit_c.inc"
-#include      "timeri_c.inc"
-#include      "warn_c.inc"
-#include      "spmd_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NBINTC,ISLEN7, IRLEN7,IRLEN7T, ISLEN7T,
      .        IRLEN20, ISLEN20, IRLEN20T, ISLEN20T,
      .        IPARI(NPARI,*), INTLIST(*)
+      INTEGER  , INTENT(IN) :: N_SCAL_CSE_EFRIC,N_CSE_FRIC_INTER(NINTER)
       my_real
      .        FNCONT(3,*), FTCONT(3,*)
-
       TYPE(INTBUF_STRUCT_) INTBUF_TAB(*)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
@@ -84,7 +80,7 @@ C-----------------------------------------------
 #ifdef MPI
       INTEGER P, L, ADD, LL, NB, LEN, SIZ, KFI, LOC_PROC, MULTIMP, II,
      .        NIN, IDEB, N, MSGTYP, IERROR, NI, NOD, I,
-     .        NTY, IALLOCS, IALLOCR, MSGOFF,
+     .        NTY, IALLOCS, IALLOCR, MSGOFF,INTERFRIC,LF,
      .        STATUS(MPI_STATUS_SIZE),DEBUT(NINTER),
      .        ADDS(NSPMD+1), ADDR(NSPMD+1),
      .        REQ_SI(NSPMD),REQ_RI(NSPMD)
@@ -97,6 +93,8 @@ C-----------------------------------------------
         LOC_PROC = ISPMD + 1
 C
         LEN = 7
+        IF(NINEFRIC > 0) LEN = LEN +1
+        IF(N_SCAL_CSE_EFRIC > 0)  LEN = LEN +1
 C
 C Partie 1 envoi et preparation buffer reception
 C
@@ -130,7 +128,7 @@ C
           ADDR(P) = ADD
           SIZ = 0
           IF(P/=LOC_PROC)THEN
-Cel test en plus pour savoir si com globale necessaire entre les 2 procs
+C   test en plus pour savoir si com globale necessaire entre les 2 procs
             DO II = 1, NBINTC
               NIN = INTLIST(II)
               NB = NSNSI(NIN)%P(P)
@@ -162,12 +160,13 @@ C
           ADDS(P) = ADD
           SIZ = 0
           IF(P/=LOC_PROC)THEN
-Cel test en plus pour savoir si com globale necessaire entre les 2 procs
+C   test en plus pour savoir si com globale necessaire entre les 2 procs
             DO II = 1, NBINTC
               NIN = INTLIST(II)
               IDEB = DEBUT(NIN)
               NB = NSNFI(NIN)%P(P)
               NTY  = IPARI(7,NIN)
+              INTERFRIC = N_CSE_FRIC_INTER(NIN)
               IF(NTY==7.OR.NTY==10.OR.NTY==20.OR.NTY==22.OR.
      .           NTY==23.OR.NTY==24.OR.NTY==25) THEN
                IF(NB>0) THEN
@@ -175,7 +174,7 @@ Cel test en plus pour savoir si com globale necessaire entre les 2 procs
                 L = L + 1
                 DO N = 1, NB
                   IF(NSVFI(NIN)%P(IDEB+N)<0)THEN
-C noeud generant une force
+C node generating force
                     BBUFS(L+1) = -NSVFI(NIN)%P(IDEB+N)
                     BBUFS(L+2) = FNCONTI(NIN)%P(1,IDEB+N)
                     BBUFS(L+3) = FNCONTI(NIN)%P(2,IDEB+N)
@@ -183,12 +182,48 @@ C noeud generant une force
                     BBUFS(L+5) = FTCONTI(NIN)%P(1,IDEB+N)
                     BBUFS(L+6) = FTCONTI(NIN)%P(2,IDEB+N)
                     BBUFS(L+7) = FTCONTI(NIN)%P(3,IDEB+N)
+                    LF = 7
+                    IF(INTERFRIC>0) THEN
+                        BBUFS(L+LF+1) = EFRICFI(NIN)%P(IDEB+N)
+                        EFRICFI(NIN)%P(IDEB+N) = ZERO
+                        LF=LF+1
+                    ELSEIF(NINEFRIC>0) THEN
+                        BBUFS(L+LF+1) = ZERO
+                        LF=LF+1
+                    ENDIF
+                    IF(N_SCAL_CSE_EFRIC>0) THEN
+                        BBUFS(L+LF+1) = EFRICGFI(NIN)%P(IDEB+N)
+                        EFRICGFI(NIN)%P(IDEB+N) = ZERO
+                    ENDIF
                     FNCONTI(NIN)%P(1,IDEB+N) = ZERO
                     FNCONTI(NIN)%P(2,IDEB+N) = ZERO
                     FNCONTI(NIN)%P(3,IDEB+N) = ZERO
                     FTCONTI(NIN)%P(1,IDEB+N) = ZERO
                     FTCONTI(NIN)%P(2,IDEB+N) = ZERO
-                    FTCONTI(NIN)%P(3,IDEB+N) = ZERO
+                    FTCONTI(NIN)%P(3,IDEB+N) = ZERO  
+                    L = L + LEN
+                  ELSEIF(INTERFRIC > 0.OR.N_SCAL_CSE_EFRIC>0) THEN
+C node not generating force but energy is cumulated
+                    BBUFS(L+1) = NSVFI(NIN)%P(IDEB+N)
+                    BBUFS(L+2) = ZERO
+                    BBUFS(L+3) = ZERO
+                    BBUFS(L+4) = ZERO
+                    BBUFS(L+5) = ZERO
+                    BBUFS(L+6) = ZERO
+                    BBUFS(L+7) = ZERO
+                    LF = 7
+                    IF(INTERFRIC>0) THEN
+                        BBUFS(L+LF+1) = EFRICFI(NIN)%P(IDEB+N)
+                        EFRICFI(NIN)%P(IDEB+N) = ZERO
+                        LF=LF+1
+                    ELSEIF(NINEFRIC>0) THEN
+                        BBUFS(L+LF+1) = ZERO
+                        LF=LF+1
+                    ENDIF
+                    IF(N_SCAL_CSE_EFRIC>0) THEN
+                        BBUFS(L+LF+1) = EFRICGFI(NIN)%P(IDEB+N)
+                        EFRICGFI(NIN)%P(IDEB+N) = ZERO
+                    ENDIF
                     L = L + LEN
                   ENDIF
                 ENDDO
@@ -222,6 +257,7 @@ C
               NIN = INTLIST(II)
               IF(NSNSI(NIN)%P(P)>0)THEN
                 NTY   =IPARI(7,NIN)
+                INTERFRIC = N_CSE_FRIC_INTER(NIN)
                 IF(NTY==7.OR.NTY==10.OR.NTY==20.OR.NTY==22.OR.
      .             NTY==23.OR.NTY==24.OR.NTY==25)THEN
                   NB = NINT(BBUFR(L))
@@ -239,6 +275,14 @@ C
                       FTCONT(1,NOD) = FTCONT(1,NOD) + BBUFR(L+LEN*(I-1)+4)
                       FTCONT(2,NOD) = FTCONT(2,NOD) + BBUFR(L+LEN*(I-1)+5)
                       FTCONT(3,NOD) = FTCONT(3,NOD) + BBUFR(L+LEN*(I-1)+6)
+                      LF = 6
+                      IF(INTERFRIC>0) THEN
+                          EFRIC(INTERFRIC,NOD)= EFRIC(INTERFRIC,NOD)+ BBUFR(L+LEN*(I-1)+LF+1)
+                          LF = LF+1
+                      ENDIF
+                      IF(N_SCAL_CSE_EFRIC>0) THEN
+                         EFRICG(NOD)= EFRICG(NOD)+ BBUFR(L+LEN*(I-1)+LF+1)
+                      ENDIF
                     ENDIF
                   ENDDO
                   L = L + NB*LEN

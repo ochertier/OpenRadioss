@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  RDRESB                        source/output/restart/rdresb.F
 Chd|-- called by -----------
@@ -27,7 +27,7 @@ Chd|        RADIOSS2                      source/engine/radioss2.F
 Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
 Chd|        ARRET                         source/system/arret.F         
-Chd|        CUR_FIL_C                     source/output/tools/sortie_c.c
+Chd|        CUR_FIL_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|        DECOMPRESS_I_NNZ              ../common_source/comm/decompress_nnz.F
 Chd|        DECOMPRESS_R_NNZ              ../common_source/comm/decompress_nnz.F
 Chd|        EIGRREST                      source/output/restart/rdresb.F
@@ -41,55 +41,70 @@ Chd|        INTFRIC_RRESTR                share/modules/intbuf_fric_mod.F
 Chd|        INTSTAMP_RRESTI               share/modules/intstamp_mod.F  
 Chd|        INTSTAMP_RRESTR               share/modules/intstamp_mod.F  
 Chd|        LINE_INI                      source/groups/line_ini.F      
-Chd|        PBLAST_INIT_TABLES            ../common_source/modules/pblast_mod.F
-Chd|        PBLAST_LOAD                   ../common_source/modules/pblast_mod.F
+Chd|        PBLAST_INIT_TABLES            ../common_source/modules/loads/pblast_mod.F
+Chd|        PBLAST_LOAD                   ../common_source/modules/loads/pblast_mod.F
 Chd|        RDCOMR                        source/output/restart/rdcomm.F
 Chd|        READ_CLUSTER                  source/output/cluster/read_cluster.F
 Chd|        READ_DB                       source/output/tools/read_db.F 
 Chd|        READ_DPDB                     source/output/tools/read_db.F 
 Chd|        READ_ELGROUP_PARAM            source/output/restart/read_elgroup_param.F
 Chd|        READ_FAILWAVE                 source/output/restart/read_failwave.F
-Chd|        READ_I_C                      source/output/tools/sortie_c.c
+Chd|        READ_I_C                      ../common_source/tools/input_output/write_routtines.c
 Chd|        READ_JOINT                    source/output/restart/read_joint.F
 Chd|        READ_MATPARAM                 source/output/restart/read_matparam.F
 Chd|        READ_NLOC_STRUCT              source/output/restart/read_nloc_struct.F
-Chd|        READ_SENSOR_TAB               source/output/restart/read_sensor_tab.F
+Chd|        READ_PCYL                     source/output/restart/read_pcyl.F
+Chd|        READ_SENSORS                  source/output/restart/read_sensors.F
+Chd|        READ_TH_RESTART               source/output/th/read_th_restart.F
 Chd|        SPMD_INISPH                   source/mpi/sph/spmd_sptool.F  
 Chd|        SPMD_INITFI                   source/mpi/interfaces/spmd_i7tool.F
 Chd|        SUBSET_INI                    source/groups/subset_ini.F    
 Chd|        SURF_INI                      source/groups/surf_ini.F      
 Chd|        TABLE_RRESTI                  source/tools/curve/table_tools.F
 Chd|        TABLE_RRESTR                  source/tools/curve/table_tools.F
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
+Chd|        THSURF_READ_RESTART           ../common_source/modules/interfaces/th_surf_mod.F
+Chd|        USERWI_READ                   source/user_interface/userwindow_interface_routines.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
+Chd|        ALE_MOD                       ../common_source/modules/ale/ale_mod.F
 Chd|        CLUSTER_MOD                   share/modules/cluster_mod.F   
-Chd|        EBCS_MOD                      ../common_source/modules/ebcs_mod.F
+Chd|        DAMP_MOD                      share/modules/damp_mod.F      
+Chd|        EBCS_MOD                      ../common_source/modules/boundary_conditions/ebcs_mod.F
 Chd|        ECND_MOD                      share/modules/ecdn_mod.F      
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|        INTBUFFRIC_MOD                share/modules/restart_mod.F   
 Chd|        INTBUFMOD                     share/modules/restart_mod.F   
 Chd|        INTBUF_MOD                    share/modules/restart_mod.F   
+Chd|        INTERFACES_MOD                ../common_source/modules/interfaces/interfaces_mod.F
 Chd|        INTSTAMP_GLOB_MOD             share/modules/intstamp_glob_mod.F
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/matparam_def_mod.F
+Chd|        LOADS_MOD                     ../common_source/modules/loads/loads_mod.F
+Chd|        MAT_ELEM_MOD                  ../common_source/modules/mat_elem/mat_elem_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        MONVOL_STRUCT_MOD             share/modules/monvol_struct_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|        NLOCAL_REG_MOD                ../common_source/modules/nlocal_reg_mod.F
 Chd|        OUTMAX_MOD                    ../common_source/modules/outmax_mod.F
-Chd|        PBLAST_MOD                    ../common_source/modules/pblast_mod.F
+Chd|        OUTPUTS_MOD                   ../common_source/modules/outputs_mod.F
+Chd|        OUTPUT_MOD                    ../common_source/modules/output/output_mod.F
+Chd|        PBLAST_MOD                    ../common_source/modules/loads/pblast_mod.F
 Chd|        PINCHTYPE_MOD                 ../common_source/modules/pinchtype_mod.F
+Chd|        PLOAD_CYL_MOD                 ../common_source/modules/loads/pload_cyl_mod.F
 Chd|        RESTMOD                       share/modules/restart_mod.F   
 Chd|        SEATBELT_MOD                  ../common_source/modules/seatbelt_mod.F
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
 Chd|        SPH_MOD                       share/modules/sph_mod.F       
+Chd|        STATE_MOD                     ../common_source/modules/state_mod.F
 Chd|        TABLE_GLOB_MOD                share/modules/table_glob_mod.F
+Chd|        USER_WINDOWS_MOD              ../common_source/modules/user_windows_mod.F
 Chd|====================================================================
-      SUBROUTINE RDRESB(AF ,IAF  ,LVARREA, XDP   ,
-     .           IRUNN, MULTI_FVM,H3D_DATA,MATPARAM_TAB,GROUP_PARAM_TAB,
-     .           PINCH_DATA, ALE_CONNECTIVITY, T_MONVOL  ,
-     .           SENSOR_TAB, EBCS_TAB)
+      SUBROUTINE RDRESB( AF               ,IAF      ,LVARREA      ,XDP             ,IRUNN      ,
+     .                   MULTI_FVM        ,H3D_DATA ,PINCH_DATA , 
+     .                   ALE_CONNECTIVITY ,T_MONVOL ,SENSORS      ,EBCS_TAB        ,DYNAIN_DATA,
+     .                   USER_WINDOWS     ,OUTPUT   ,INTERFACES   ,LOADS           ,MAT_ELEM   ,
+     .                   PYTHON)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE PYTHON_FUNCT_MOD
       USE INTBUFMOD
       USE INTBUF_MOD
       USE RESTMOD
@@ -103,7 +118,7 @@ C-----------------------------------------------
       USE H3D_MOD
       USE INTBUFFRIC_MOD
       USE NLOCAL_REG_MOD
-      USE MATPARAM_DEF_MOD
+      USE MAT_ELEM_MOD
       USE PINCHTYPE_MOD
       USE ALE_CONNECTIVITY_MOD
       USE MONVOL_STRUCT_MOD
@@ -112,6 +127,16 @@ C-----------------------------------------------
       USE SEATBELT_MOD
       USE PBLAST_MOD
       USE OUTMAX_MOD
+      USE OUTPUTS_MOD
+      USE PLOAD_CYL_MOD
+      USE STATE_MOD
+      USE USER_WINDOWS_MOD
+      USE ALE_MOD
+      USE OUTPUT_MOD
+      USE INTERFACES_MOD
+      USE SENSOR_MOD
+      USE LOADS_MOD
+      USE DAMP_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -124,12 +149,7 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com02_c.inc"
 #include      "com04_c.inc"
-#include      "com05_c.inc"
-#include      "com06_c.inc"
-#include      "com07_c.inc"
-#include      "com08_c.inc"
 #include      "com_xfem1.inc"
 #include      "couple_c.inc"
 #include      "intstamp_c.inc"
@@ -140,7 +160,6 @@ C-----------------------------------------------
 #include      "scr03_c.inc"
 #include      "scr05_c.inc"
 #include      "scr07_c.inc"
-#include      "scr13_c.inc"
 #include      "scr14_c.inc"
 #include      "scr16_c.inc"
 #include      "scr19_c.inc"
@@ -153,30 +172,31 @@ C-----------------------------------------------
 #include      "spmd_c.inc"
 #include      "tabsiz_c.inc"
 #include      "task_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "ale_param.inc"
-#include      "inter18.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IAF(*),LVARREA,LEN_G,LEN_M, IRUNN
       my_real AF(*)
       DOUBLE PRECISION XDP(*)
-      TYPE(MULTI_FVM_STRUCT) :: MULTI_FVM
-      TYPE(H3D_DATABASE) :: H3D_DATA
-      TYPE(MATPARAM_STRUCT_)  , DIMENSION(NUMMAT) :: MATPARAM_TAB
-      TYPE(GRP_PARAM_STRUCT_) , DIMENSION(NGROUP) :: GROUP_PARAM_TAB
-      TYPE(PINCH) :: PINCH_DATA
-      TYPE(t_ale_connectivity), INTENT(INOUT) :: ALE_CONNECTIVITY
+      TYPE(MULTI_FVM_STRUCT)                               :: MULTI_FVM
+      TYPE(H3D_DATABASE)                                   :: H3D_DATA
+      TYPE(PINCH)                                          :: PINCH_DATA
+      TYPE(t_ale_connectivity), INTENT(INOUT)              :: ALE_CONNECTIVITY
       TYPE(MONVOL_STRUCT_),DIMENSION(NVOLU), INTENT(INOUT) :: T_MONVOL
-      TYPE(SENSOR_STR_)   ,DIMENSION(NSENSOR) :: SENSOR_TAB
-      TYPE(t_ebcs_tab), INTENT(INOUT) :: EBCS_TAB
+      TYPE(t_ebcs_tab), INTENT(INOUT)                      :: EBCS_TAB
+      TYPE(DYNAIN_DATABASE) ,INTENT(INOUT)                 :: DYNAIN_DATA
+      TYPE(USER_WINDOWS_)   ,INTENT(INOUT)                 :: USER_WINDOWS
+      TYPE(OUTPUT_)         ,INTENT(INOUT)                 :: OUTPUT !< output structure
+      TYPE(INTERFACES_)     ,INTENT(INOUT)                 :: INTERFACES
+      TYPE(SENSORS_)        ,INTENT(INOUT)                 :: SENSORS
+      TYPE(LOADS_)          ,INTENT(INOUT)                 :: LOADS
+      TYPE(MAT_ELEM_)       ,INTENT(INOUT)                 :: MAT_ELEM
+      TYPE(PYTHON_)         ,INTENT(INOUT)                 :: PYTHON  
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER  IDUMM(MVSIZ)
-      INTEGER  I,J,I86B,I86C,I86D, LMXVREA, LEN,MY_ILEN,MY_RLEN,ISTAT,II,JJ,NS_DIFF
+      INTEGER  I,J,LMXVREA, LEN,MY_ILEN,MY_RLEN,ISTAT,II,NS_DIFF
       PARAMETER (LMXVREA=1000+30*MAXLAW+30)
       my_real TABVREA(LMXVREA)
       INTEGER, DIMENSION(:), ALLOCATABLE::IBID
@@ -184,7 +204,10 @@ C-----------------------------------------------
       DOUBLE PRECISION, DIMENSION(:),ALLOCATABLE :: XDPDUM
       INTEGER, DIMENSION(NVOLU) :: NTRI
       INTEGER, DIMENSION(:), ALLOCATABLE :: INTEGER_DATA
-      INTEGER :: INT1, INT2, INT0, ITMP
+      INTEGER :: INT1, INT2, INT3, INT0, ITMP
+      INTEGER :: MY_SIZE
+      INTEGER :: PYTHON_LEN
+      INTEGER, DIMENSION(:), ALLOCATABLE :: BUFFER
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------
@@ -212,8 +235,6 @@ C
 
         CALL READ_I_C(ICODE,SICODE)
 
-        CALL READ_I_C(LSHSUB,SLSHSUB)
-
         CALL READ_I_C(ISKEW,SISKEW)
 
         CALL READ_I_C(ISKWN,SISKWN)
@@ -228,9 +249,16 @@ C
 
         CALL READ_I_C(NOM_OPT,SNOM_OPT)
 
-        CALL READ_I_C(NPC,SNPC)
+        CALL READ_I_C(PYTHON_LEN,1)
 
-        CALL READ_I_C(IXUR,SIXUR)
+        ! read python data in form of integer buffer
+        ALLOCATE(BUFFER(PYTHON_LEN))
+        BUFFER(1) = PYTHON_LEN
+        CALL READ_I_C(BUFFER(2:PYTHON_LEN), PYTHON_LEN-1)
+        CALL PYTHON_DESERIALIZE(PYTHON, BUFFER) ! fills python structure
+        DEALLOCATE(BUFFER)
+
+        CALL READ_I_C(NPC,SNPC)
 
         CALL READ_I_C(IXTG,SIXTG)
 
@@ -249,12 +277,12 @@ C
         CALL READ_I_C(IXR,SIXR)
 
         CALL READ_I_C(ITAB,SITAB)
-c       WRITE(6,*) "ITAB = ",ITAB(1:SITAB)
+C       WRITE(6,*) "ITAB = ",ITAB(1:SITAB)
         CALL READ_I_C(ITABM1,SITABM1)
 
         CALL READ_I_C(GJBUFI,SGJBUFI)
 
-        CALL READ_I_C(ALE_CONNECTIVITY%NALE,SNALE)
+        CALL READ_I_C(ALE_CONNECTIVITY%NALE,ALE%GLOBAL%SNALE)
 
         IF (IALE + IEULER + IALELAG + ITHERM /= 0) THEN
            CALL READ_I_C(ITMP, 1)
@@ -274,9 +302,9 @@ c       WRITE(6,*) "ITAB = ",ITAB(1:SITAB)
            CALL READ_I_C(ALE_CONNECTIVITY%ee_connect%iface2, ITMP)
         ENDIF
 
-        CALL READ_I_C(ID_GLOBAL_VOIS,SIELVS)
+        CALL READ_I_C(ID_GLOBAL_VOIS,ALE%GLOBAL%SIELVS)
 
-        CALL READ_I_C(FACE_VOIS,SIELVS)
+        CALL READ_I_C(FACE_VOIS,ALE%GLOBAL%SIELVS)
 
         IF(ALE_CONNECTIVITY%has_ne_connect) THEN
            CALL READ_I_C(NE_NERCVOIS, NSPMD + 1)
@@ -286,7 +314,7 @@ c       WRITE(6,*) "ITAB = ",ITAB(1:SITAB)
            ALLOCATE(NE_LESDVOIS(NE_NESDVOIS(NSPMD+1)))
            CALL READ_I_C(NE_LESDVOIS, NE_NESDVOIS(NSPMD+1))
         ENDIF
-        IF (IALE > 0 .AND. NWALE_RST >= 0) THEN
+        IF (IALE > 0 .AND. ALE%GRID%NWALE_RST >= 0) THEN
          IF(ALE_CONNECTIVITY%has_nn_connect)THEN
            ALLOCATE(ALE_CONNECTIVITY%NN_CONNECT%IAD_CONNECT(NUMNOD + 1))
            CALL READ_I_C(ALE_CONNECTIVITY%NN_CONNECT%IAD_CONNECT, NUMNOD + 1)
@@ -383,36 +411,61 @@ c       WRITE(6,*) "ITAB = ",ITAB(1:SITAB)
 
         CALL READ_I_C(ILAS,SILAS)
 
-        CALL READ_I_C(INT0, 1)
-        CALL READ_I_C(INT1, 1)
-        CALL READ_I_C(INT2, 1)
+        ! -----------------------------
+        ! EBCS option
+        CALL READ_I_C(INT0, 1) ! total number of EBCS
+        CALL READ_I_C(INT1, 1) ! number of multifluid ebcs
+        CALL READ_I_C(INT2, 1) ! number of /NRF ebcs
+        CALL READ_I_C(INT3, 1) ! number of other ebcs
 
         EBCS_TAB%nebcs = INT0
         EBCS_TAB%nebcs_fvm = INT1
-        EBCS_TAB%nebcs_loc = INT2
+        EBCS_TAB%nebcs_nrf = INT2
+        EBCS_TAB%nebcs_loc = INT3
+
         IF (INT0 > 0) THEN
            ALLOCATE(INTEGER_DATA(INT0))
            CALL EBCS_TAB%read_type_data(INT0, INTEGER_DATA)
-           CALL EBCS_TAB%create_from_types(INT1 + INT2, INTEGER_DATA(1:INT1 + INT2))
+           ALLOCATE(EBCS_TAB%my_typ(INT0))
+           ALLOCATE(EBCS_TAB%need_to_compute(INT0))
+           ! save the type of /EBCS ( /EBCS/NRF --> typ = 10)
+           EBCS_TAB%my_typ(1:INT0) = INTEGER_DATA(1:INT0)
+           ! -------------
+           ! check if the current proc needs to compute an /EBCS
+           ! multifluid /EBCS and /EBCS/NRF are parallelized, can be computed by several proc
+           ! the others are sequential, only the main proc (ispmd=0) computes the other /EBCS
+           DO II=1,INT0
+                EBCS_TAB%need_to_compute(II) = .FALSE.
+                IF(ISPMD/=0) THEN
+                    IF(EBCS_TAB%my_typ(II)==10)EBCS_TAB%need_to_compute(II) = .TRUE. ! /EBCS/NRF are //
+                ELSE
+                    EBCS_TAB%need_to_compute(II) = .TRUE.   ! other /EBCS sequential
+                ENDIF
+           ENDDO
+           ! -------------
+           ! create the data of /EBCS options
+           CALL EBCS_TAB%create_from_types(INT1 + INT2 + INT3, INTEGER_DATA(1:INT1 + INT2 + INT3))
         ENDIF
-        IF (INT1 + INT2 > 0) THEN
-           DO II = 1, INT1 + INT2
+        ! read the data of /EBCS options
+        IF (INT1 + INT2 + INT3 > 0) THEN
+           DO II = 1, INT1 + INT2 + INT3
               CALL EBCS_TAB%tab(II)%poly%read_common_data()
               CALL EBCS_TAB%tab(II)%poly%read_data()
            ENDDO
         ENDIF
+        ! array allocation : adress for parith/on option
+        ALLOCATE( EBCS_PARITHON(EBCS_TAB%nebcs) )
+        ! -----------------------------
 
         CALL READ_I_C(LACCELM,SLACCELM)
 
         CALL READ_I_C(LGAUGE,3*NBGAUGE)
 
-        CALL READ_I_C(LSENSOR,SLSENSOR)
-
         CALL READ_I_C(NNLINK,SNNLINK)
 
         CALL READ_I_C(LNLINK,SLNLINK)
 
-        CALL READ_I_C(IUSER,SIUSER)
+        CALL USERWI_READ(USER_WINDOWS,ISPMD,NSPMD,NUMNOD)
 
         CALL READ_I_C(IPARG,SIPARG)
 
@@ -510,45 +563,10 @@ c        CALL READ_I_C(INBUF,SINBUF)
 
         CALL READ_I_C(ICNDS10,3*NS10E)
 
-        CALL READ_I_C(ITHGRP,SITHGRP)
+        ! Read Time History
+        CALL READ_TH_RESTART(OUTPUT%TH)
 
-        CALL READ_I_C(ITHBUF,SITHBUF)
-
-        CALL READ_I_C(ITHGRPA,SITHGRPA)
-
-        CALL READ_I_C(ITHBUFA,SITHBUFA)
-
-        CALL READ_I_C(ITHGRPB,SITHGRPB)
-
-        CALL READ_I_C(ITHBUFB,SITHBUFB)
-
-        CALL READ_I_C(ITHGRPC,SITHGRPC)
-
-        CALL READ_I_C(ITHBUFC,SITHBUFC)
-
-        CALL READ_I_C(ITHGRPD,SITHGRPD)
-
-        CALL READ_I_C(ITHBUFD,SITHBUFD)
-
-        CALL READ_I_C(ITHGRPE,SITHGRPE)
-
-        CALL READ_I_C(ITHBUFE,SITHBUFE)
-
-        CALL READ_I_C(ITHGRPF,SITHGRPF)
-
-        CALL READ_I_C(ITHBUFF,SITHBUFF)
-
-        CALL READ_I_C(ITHGRPG,SITHGRPG)
-
-        CALL READ_I_C(ITHBUFG,SITHBUFG)
-
-        CALL READ_I_C(ITHGRPH,SITHGRPH)
-
-        CALL READ_I_C(ITHBUFH,SITHBUFH)
-
-        CALL READ_I_C(ITHGRPI,SITHGRPI)
-
-        CALL READ_I_C(ITHBUFI,SITHBUFI)
+        CALL THSURF_READ_RESTART(OUTPUT%TH%TH_SURF)
 
         CALL READ_I_C(FR_MV,SFR_MV)
 
@@ -679,11 +697,6 @@ C
         CALL READ_I_C(LNODPOR,SLNODPOR)
 
         CALL READ_I_C(LLAGF,SLLAGF)
-
-        IF(IUSERWI /=0)THEN
-           CALL READ_I_C(IADUSERW,NSPMD+1)
-           CALL READ_I_C(FR_USERWI,SFR_USERWI)
-        ENDIF
 C
         WEIGHT_MD = WEIGHT
 
@@ -772,6 +785,20 @@ C
           ENDDO
         ENDIF
 c        ENDIF
+
+        ! ---------------
+        ! ebcs option : adress of FSKY array
+        IF(EBCS_TAB%nebcs_nrf>0) THEN
+            DO I=1,EBCS_TAB%nebcs
+                IF(EBCS_TAB%my_typ(I)==10) THEN
+                    MY_SIZE = EBCS_TAB%tab(I)%poly%nb_elem
+                    ALLOCATE(EBCS_PARITHON(I)%ELEM_ADRESS(4,MY_SIZE))
+                    CALL READ_I_C(EBCS_PARITHON(I)%ELEM_ADRESS,4*MY_SIZE)
+                ENDIF
+            ENDDO
+        ENDIF
+        ! ---------------
+
         CALL DECOMPRESS_I_NNZ(IGEO,SIGEO)
 
         CALL DECOMPRESS_I_NNZ(IPM, SIPM)
@@ -792,7 +819,7 @@ C--------------------------------------
 C--------------------------------------
 C allocation + lecture struture interface partie entiere
 C--------------------------------------
-        CALL SPMD_INITFI(IPARI,1,H3D_DATA)
+        CALL SPMD_INITFI(IPARI,1,H3D_DATA,INTERFACES%PARAMETERS)
 C
 C--------------------------------------
 C     Lecture + Init Frontiere SPMD pour SPH (partie entiere)
@@ -829,6 +856,10 @@ C--------------------------------------
         CALL PBLAST_LOAD(PBLAST_TAB)
         CALL PBLAST_INIT_TABLES(PBLAST_DATA) !PBLAST_DATA defined in PBLAST_MOD
       ENDIF
+c
+      IF (LOADS%NLOAD_CYL > 0) THEN
+        CALL READ_PCYL(LOADS)
+      ENDIF
 C----------------------------------
       IF(ICRACK3D > 0)THEN
         CALL READ_I_C(IBORDNODE,SIBORDNODE)
@@ -859,7 +890,8 @@ C-----
       CALL READ_DB(TABVREA,LVARREA)
 C
 C-----
-      CALL RDCOMR(LMXVREA,LVARREA,TABVREA)
+      CALL RDCOMR(LMXVREA,TABVREA,DYNAIN_DATA,INTERFACES%PARAMETERS,
+     .            OUTPUT)
 C--------------------------------------
 C     READING REALS
 C--------------------------------------
@@ -891,9 +923,9 @@ C--------------------------------------
 
         CALL READ_DB(PM,SPM)
 
-        CALL READ_MATPARAM(MATPARAM_TAB,NUMMAT)
+        CALL READ_MATPARAM(MAT_ELEM)
 
-        CALL READ_ELGROUP_PARAM(GROUP_PARAM_TAB,NGROUP)
+        CALL READ_ELGROUP_PARAM(MAT_ELEM)
 
         CALL READ_DB(SKEW,SSKEW)
 
@@ -940,17 +972,7 @@ C--------------------------------------
 
         CALL READ_DB(DSAVE,SDSAVE)
 
-        CALL READ_DB(DRSAVE,SDRSAVE)
-
         CALL READ_DB(ASAVE,SASAVE)
-
-        CALL READ_DB(ARSAVE,SARSAVE)
-
-        CALL READ_DB(STSAVE,SSTSAVE)
-
-        CALL READ_DB(STRSAVE,SSTRSAVE)
-
-        CALL READ_DB(FSAVSAV,SFSAVSAV)
 
         CALL READ_DB(SPBUF,SSPBUF)
 
@@ -966,15 +988,11 @@ C--------------------------------------
 
         CALL READ_DB(FSAV,SFSAV)
 
-        CALL READ_DB(FBSAV6,12*6*SFSAV6)
-
-        CALL READ_I_C(TABSENSOR,STABSEN)
-
         CALL READ_I_C(TAB_UMP,7*TAILLE)
 
         CALL READ_I_C(POIN_UMP,NUMMAT)
 
-	       CALL READ_DB(TAB_MAT,STAB_MAT)
+        CALL READ_DB(TAB_MAT,STAB_MAT)
 
         CALL READ_DB(FZERO,SFZERO)
 
@@ -984,9 +1002,7 @@ C--------------------------------------
 
         CALL READ_DB(GAUGE,LLGAUGE*NBGAUGE)
 
-        CALL READ_DB(SENSOR,SSENSOR)
-
-        CALL READ_SENSOR_TAB(SENSOR_TAB,NSENSOR)
+        CALL READ_SENSORS(SENSORS)
 
         CALL READ_DB(FBVEL,SFBVEL)
 
@@ -1004,11 +1020,9 @@ C--------------------------------------
 
         CALL READ_DB(PARTS0,SPARTS0)
 
-        CALL READ_DB(USER,SUSER)
-
         CALL READ_DB(ELBUF,SELBUF)
 
-        CALL ELBUF_INI(NGROUP, IPARG)
+        CALL ELBUF_INI(MAT_ELEM,NGROUP, IPARG)  ! allocate, read and initialize element buffer
 
         CALL READ_CLUSTER(CLUSTER)
 
@@ -1035,7 +1049,7 @@ C--------------------------------------
         CALL READ_DB(PCONTACT ,SRCONTACT)
 
 C lecture struture interface partie reelle si irunn > 1
-        IF(IRUNN>1.OR.MCHECK/=0)CALL SPMD_INITFI(IPARI,2,H3D_DATA)
+        IF(IRUNN>1.OR.MCHECK/=0)CALL SPMD_INITFI(IPARI,2,H3D_DATA,INTERFACES%PARAMETERS)
 C--------------------------------------
 C     Lecture + Init Frontiere SPMD pour SPH (partie reelle)
 C--------------------------------------
@@ -1089,7 +1103,7 @@ C     Utilise pour les checks point restart.
           !CALL READ_I_C(LINALE,LLINAL)
           CALL READ_I_C(NEFLSW,NSFLSW)
           CALL READ_I_C(NNFLSW,8*NTFLSW)
-	         CALL READ_I_C(ICUT,44*NCUTS)
+          CALL READ_I_C(ICUT,44*NCUTS)
           CALL READ_DB(CRFLSW,9*NSFLSW)
           CALL READ_DB(XCUT,7*NCUTS)
         ENDIF
@@ -1162,6 +1176,33 @@ C   ----------------------------------------------------------------------
            CALL READ_DB(FCONT_MAX, 3*NUMNOD)
          ENDIF
       ENDIF
+      IF(IFCONTPMAX >0)THEN
+         CALL READ_DB(FNCONT_MAX, 3*SPCONT_MAX)
+         CALL READ_DB(FTCONT_MAX, 3*SPCONT_MAX)
+      ENDIF
+      IF(IFCONT2MAX >0)THEN
+         CALL READ_DB(FCONT2_MAX, 3*NUMNOD)
+      ENDIF
+      IF(IFCONTP2MAX >0)THEN
+         CALL READ_DB(FNCONT2_MAX, 3*NUMNOD)
+         CALL READ_DB(FTCONT2_MAX, 3*NUMNOD)
+      ENDIF
+      IF(IFCONT2MIN >0)THEN
+         CALL READ_DB(FCONT2_MIN, 3*NUMNOD)
+      ENDIF
+      IF(IFCONTP2MIN >0)THEN
+         CALL READ_DB(FNCONT2_MIN, 3*NUMNOD)
+         CALL READ_DB(FTCONT2_MIN, 3*NUMNOD)
+      ENDIF
+C--------Frictional energy output-------
+      IF(S_EFRICINT >0)THEN
+         IF(NINEFRIC > 0) CALL READ_DB(EFRIC, NINEFRIC*NUMNOD)
+         IF(NINEFRIC_STAMP > 0) CALL READ_DB(EFRIC_STAMP, NINEFRIC_STAMP*NUMNODG)
+      ENDIF
+      IF(S_EFRIC >0)THEN
+         CALL READ_DB(EFRICG, NUMNOD)
+         IF(NINTSTAMP/=0) CALL READ_DB(EFRICG_STAMP, NUMNODG)
+      ENDIF
 C--------------------------------------
 C  Interface friction buffer (Reals )
 C--------------------------------------
@@ -1212,13 +1253,6 @@ C ALE LINK
 C--------------------------------------
 !      print *,"rdresb.F: READ_I_C, SLINALE=", SLINALE
       IF (SLINALE>0)CALL READ_I_C(LINALE,SLINALE)
-C--------------------------------------
-
-C--------------------------------------
-      CALL READ_I_C(LSTOPSENS_OLD,NSTOPSENS_OLD)
-      CALL READ_I_C(LSTATSENS_OLD,NSTATSENS_OLD)
-      CALL READ_I_C(LOUTPSENS_OLD,NOUTPSENS_OLD)
-      CALL READ_I_C(LANISENS_OLD,IANISENS_OLD)
 C--------------------------------------
 C FXBODY (moved from radioss2.F)
 C--------------------------------------
@@ -1353,6 +1387,29 @@ C--------------------------------------
       CALL READ_DB(TM_NSIG3,LMAX_NSIG*NUMNOD)
       CALL READ_DB(TM_NSTRA1,LMAX_NSTRA*NUMNOD)
       CALL READ_DB(TM_NSTRA3,LMAX_NSTRA*NUMNOD)
+C--------------------------------------
+      IF (LOADS%NLOAD_CLOAD > 0) THEN
+        CALL READ_DB(DPL0CLD,6*LOADS%NLOAD_CLOAD)
+        CALL READ_DB(VEL0CLD,6*LOADS%NLOAD_CLOAD)
+      ENDIF
+C--------------------------------------
+C   /DAMP/VREL
+C--------------------------------------
+      NDAMP_VREL_RBY = 0
+      NDAMP_VREL_RBYG = 0
+      IF (NDAMP_VREL > 0) THEN
+        CALL READ_I_C(ID_DAMP_VREL,NDAMP_VREL)
+        CALL READ_I_C(FR_DAMP_VREL,NDAMP_VREL*(NSPMD+2)) 
+        DO I=1,NDAMP_VREL
+          J = ID_DAMP_VREL(I)    
+          IF (NINT(DAMPR(NRDAMP*(J-1)+25)) > 0) NDAMP_VREL_RBY = NDAMP_VREL_RBY + 1
+        ENDDO    
+      ENDIF
+      IF (NDAMP > 0) THEN
+        DO I=1,NDAMP  
+          IF (NINT(DAMPR(NRDAMP*(I-1)+25)) > 0) NDAMP_VREL_RBYG = NDAMP_VREL_RBYG + 1
+        ENDDO    
+      ENDIF     
 C
       RETURN
       END
@@ -1363,9 +1420,10 @@ Chd|        RDRESB                        source/output/restart/rdresb.F
 Chd|-- calls ---------------
 Chd|        MY_GETPID                     source/system/pid.c           
 Chd|        READ_DB                       source/output/tools/read_db.F 
-Chd|        READ_I_C                      source/output/tools/sortie_c.c
+Chd|        READ_I_C                      ../common_source/tools/input_output/write_routtines.c
 Chd|        REDSQI                        source/output/tools/redsqi.F  
 Chd|        REDSQR                        source/output/tools/redsqr.F  
+Chd|        TMPENVF                       source/system/tmpenv_c.c      
 Chd|        FXB_MOD                       share/modules/fxb_mod.F       
 Chd|        SCRATCHFILE_MOD               share/modules/scratchfiles_mod.F
 Chd|====================================================================
@@ -1389,18 +1447,16 @@ C-----------------------------------------------
 #include      "chara_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
-C   D u m m y   A r g u m e n t s
-C-----------------------------------------------
-C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER LEN_IPM,LEN_MOD, NRECM, NRECS, IRCM, IRCM0, IRCM1,
-     .        IRCS, IRCS0, IRCS1, LREC, I, J, RCLEN
+     .        IRCS, IRCS0, IRCS1, LREC, I, J, RCLEN,TLEN
       my_real
      .        VV(6)
       INTEGER MY_PID
       CHARACTER(LEN=10) :: CPID
       CHARACTER(LEN=6) :: CISPMD
+      CHARACTER(LEN=4096) :: TMPDIR
 C--------------------------------------
 C     READING INTEGERS
 C--------------------------------------
@@ -1452,16 +1508,20 @@ C--------------------------------------
 C Lecture des fichiers de modes et de contraintes
       INQUIRE(IOLENGTH=RCLEN) VV
 
+      TLEN=4096
+      CALL TMPENVF(TMPDIR,TLEN)
       CALL MY_GETPID(MY_PID)
       WRITE(CPID,'(I10.10)') MY_PID
       WRITE(CISPMD,'(I6.6)') ISPMD
-      IFXM_FN='25_'//ROOTN(1:LENROOTN)//'_'//CPID//'_'//CISPMD//'.tmp'
-      IFXS_FN='26_'//ROOTN(1:LENROOTN)//'_'//CPID//'_'//CISPMD//'.tmp'
+      IFXM_FN=TMPDIR(1:TLEN)//'/'//'25_'//ROOTN(1:LENROOTN)//'_'//CPID//'_'//CISPMD//'.tmp'
+      IFXS_FN=TMPDIR(1:TLEN)//'/'//'26_'//ROOTN(1:LENROOTN)//'_'//CPID//'_'//CISPMD//'.tmp'
       LEN_IFXM_FN=LEN_TRIM(IFXM_FN)
       LEN_IFXS_FN=LEN_TRIM(IFXS_FN)
 
       OPEN(UNIT=IFXM,FILE=TRIM(IFXM_FN),ACCESS='DIRECT',RECL=RCLEN)
       OPEN(UNIT=IFXS,FILE=TRIM(IFXS_FN),ACCESS='DIRECT',RECL=RCLEN)
+      
+
       USE_IFXM = 1
       USE_IFXS = 1
       NRECM=0
@@ -1497,9 +1557,10 @@ Chd|        RDRESB                        source/output/restart/rdresb.F
 Chd|-- calls ---------------
 Chd|        MY_GETPID                     source/system/pid.c           
 Chd|        READ_DB                       source/output/tools/read_db.F 
-Chd|        READ_I_C                      source/output/tools/sortie_c.c
+Chd|        READ_I_C                      ../common_source/tools/input_output/write_routtines.c
 Chd|        REDSQI                        source/output/tools/redsqi.F  
 Chd|        REDSQR                        source/output/tools/redsqr.F  
+Chd|        TMPENVF                       source/system/tmpenv_c.c      
 Chd|        EIG_MOD                       share/modules/eig_mod.F       
 Chd|        SCRATCHFILE_MOD               share/modules/scratchfiles_mod.F
 Chd|====================================================================
@@ -1523,16 +1584,14 @@ C-----------------------------------------------
 #include      "chara_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
-C   D u m m y   A r g u m e n t s
-C-----------------------------------------------
-C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NRECM, IRCM, NBN, NBM, IAD, LREC, I, J, RCLEN
+      INTEGER NRECM, IRCM, NBN, NBM, LREC, I, J, RCLEN,TLEN
       my_real
      .        VV(6)
       CHARACTER(LEN=10) :: CPID
       CHARACTER(LEN=6) :: CISPMD
+      CHARACTER(LEN=4096) :: TMPDIR
       INTEGER MY_PID
 C--------------------------------------
 C     READING INTEGERS
@@ -1558,7 +1617,9 @@ C Lecture du fichier de modes additionnels
       CALL MY_GETPID(MY_PID)
       WRITE(CPID,'(I10.10)') MY_PID
       WRITE(CISPMD,'(I6.6)') ISPMD
-      IEIGM_FN='27_'//ROOTN(1:LENROOTN)//'_'//CPID//'_'//CISPMD//'.tmp'
+      TLEN=4096
+      CALL TMPENVF(TMPDIR,TLEN)
+      IEIGM_FN=TMPDIR(1:TLEN)//'/'//'27_'//ROOTN(1:LENROOTN)//'_'//CPID//'_'//CISPMD//'.tmp'
       LEN_IEIGM_FN=LEN_TRIM(IEIGM_FN)
       OPEN(UNIT=IEIGM,FILE=TRIM(IEIGM_FN),ACCESS='DIRECT',RECL=RCLEN)
       USE_IEIGM = 1
@@ -1586,7 +1647,7 @@ Chd|  DSRREST                       source/output/restart/rdresb.F
 Chd|-- called by -----------
 Chd|-- calls ---------------
 Chd|        READ_DB                       source/output/tools/read_db.F 
-Chd|        READ_I_C                      source/output/tools/sortie_c.c
+Chd|        READ_I_C                      ../common_source/tools/input_output/write_routtines.c
 Chd|        REDSQI                        source/output/tools/redsqi.F  
 Chd|        REDSQR                        source/output/tools/redsqr.F  
 Chd|        DSGRAPH_MOD                   share/modules/dsgraph_mod.F   
@@ -1606,8 +1667,6 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "scr05_c.inc"
 *
-#include      "units_c.inc"
-#include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1744,7 +1803,7 @@ Chd|-- called by -----------
 Chd|        RADIOSS2                      source/engine/radioss2.F      
 Chd|-- calls ---------------
 Chd|        READ_DB                       source/output/tools/read_db.F 
-Chd|        READ_I_C                      source/output/tools/sortie_c.c
+Chd|        READ_I_C                      ../common_source/tools/input_output/write_routtines.c
 Chd|        REDSQI                        source/output/tools/redsqi.F  
 Chd|        REDSQR                        source/output/tools/redsqr.F  
 Chd|====================================================================
@@ -1756,8 +1815,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
-#include      "com04_c.inc"
 #include      "scr05_c.inc"
 #include      "flowcom.inc"
 C-----------------------------------------------
@@ -1824,7 +1881,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J,ND,IDYNA0
+      INTEGER ND,IDYNA0
       my_real
      . A(3*NUMNOD),AR(3*NUMNOD)
 C--------------------------------------
@@ -1867,11 +1924,11 @@ Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
 Chd|        ARRET                         source/system/arret.F         
 Chd|        READ_DB                       source/output/tools/read_db.F 
-Chd|        READ_I_C                      source/output/tools/sortie_c.c
+Chd|        READ_I_C                      ../common_source/tools/input_output/write_routtines.c
 Chd|        SPMD_COMM_SPLIT               source/mpi/generic/spmd_comm_split.F
 Chd|        SPMD_FVB_COMM_PATTERN         source/mpi/airbags/spmd_fvb_comm_pattern.F
 Chd|        FVBAG_MOD                     share/modules/fvbag_mod.F     
-Chd|        FVMBAG_MESHCONTROL_MOD        ../common_source/modules/fvmbag_meshcontrol_mod.F
+Chd|        FVMBAG_MESHCONTROL_MOD        ../common_source/modules/airbag/fvmbag_meshcontrol_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
       SUBROUTINE FVRREST(MONVOL)
@@ -1888,13 +1945,13 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
 #include      "scr05_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "task_c.inc"
 #include      "param_c.inc"
 #include      "tabsiz_c.inc"
+#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1906,12 +1963,18 @@ C-----------------------------------------------
      .        LENP_ANIM, NPOLH_ANIM, LENH_ANIM, NNS_ANIM, NN_L, NNA_L,
      .        NNSA_L, NSA, NELSA, NNI_L, IFV, ID_DT_OPTION, K1, ITYP, 
      .        ID_BAG, ID_BAG_INPUT, N
-      INTEGER COLOR,KEY
+      INTEGER COLOR,KEY, IH3D_FLAG
       LOGICAL lFOUND
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------
 
+C----------------------------------------------------------
+C   CONSTANT INIT. : VISUALIZATION OF FVBAG RESULTS
+C----------------------------------------------------------       
+       !---AIRBAGS_TOTAL_FVM_IN_H3D
+       AIRBAGS_TOTAL_FVM_IN_H3D = 0 !number of polyhedra to display for visualization subroutines (Sum FVDATA%NPOLH_ANIM)
+       
 C--------------------------------------
 C     READING SIZES
 C--------------------------------------
@@ -1937,7 +2000,9 @@ C--------------------------------------
      *          FVDATA_OLD(I)%CPDPOLH,FVDATA_OLD(I)%CPEPOLH,
      *          FVDATA_OLD(I)%CPFPOLH,FVDATA_OLD(I)%DTPOLH,
      *          FVDATA_OLD(I)%RMWPOLH,FVDATA_OLD(I)%VPOLH_INI,
-     *          FVDATA_OLD(I)%QPOLH )
+     *          FVDATA_OLD(I)%QPOLH,
+     *          FVDATA_OLD(I)%SSPPOLH,     
+     *          FVDATA_OLD(I)%CENTROID_POLH )
 
         FVDATA_OLD(I)%L_TYPE = 0
         FVDATA_OLD(I)%ID_DT_OPTION = -1
@@ -2068,7 +2133,6 @@ C
          FVDATA_OLD(I)%NPOLH_ANIM=NPOLH_ANIM
          FVDATA_OLD(I)%NNS_ANIM=NNS_ANIM
          FVDATA_OLD(I)%ID=TABI(11)
-
 C
          ALLOCATE(FVDATA_OLD(I)%IFVNOD(3,NNS),
      .            FVDATA_OLD(I)%RFVNOD(2,NNS),
@@ -2094,7 +2158,10 @@ C
      .            FVDATA_OLD(I)%CPFPOLH(NPOLH),
      .            FVDATA_OLD(I)%RMWPOLH(NPOLH),
      .            FVDATA_OLD(I)%VPOLH_INI(NPOLH),
-     .            FVDATA_OLD(I)%DTPOLH(NPOLH))
+     .            FVDATA_OLD(I)%DTPOLH(NPOLH),
+     .            FVDATA_OLD(I)%SSPPOLH(NPOLH),     
+     .            FVDATA_OLD(I)%CENTROID_POLH(3,NPOLH) )
+     
          IF (NPOLH_ANIM>0)
      .      ALLOCATE(FVDATA_OLD(I)%IFVPOLY_ANIM(LENP_ANIM),
      .               FVDATA_OLD(I)%IFVTADR_ANIM(NPOLY+1),
@@ -2102,7 +2169,8 @@ C
      .               FVDATA_OLD(I)%IFVPADR_ANIM(NPOLH_ANIM+1),
      .               FVDATA_OLD(I)%IFVTRI_ANIM(6,NNTR),
      .               FVDATA_OLD(I)%REDIR_ANIM(NNS_ANIM),
-     .               FVDATA_OLD(I)%NOD_ANIM(3,NNS_ANIM))
+     .               FVDATA_OLD(I)%NOD_ANIM(3,NNS_ANIM) )
+
 
 C--------------------------------------
 C     READING INTEGERS
@@ -2130,8 +2198,8 @@ C--------------------------------------
 C     READING REALS
 C--------------------------------------
          LEN = 1
-	 CALL READ_DB(FVDATA_OLD(I)%PDISP_OLD,LEN)
-	 CALL READ_DB(FVDATA_OLD(I)%PDISP,LEN)
+         CALL READ_DB(FVDATA_OLD(I)%PDISP_OLD,LEN)
+         CALL READ_DB(FVDATA_OLD(I)%PDISP,LEN)
          LEN=2*NNS
          CALL READ_DB(FVDATA_OLD(I)%RFVNOD,LEN)
          CALL READ_DB(FVDATA_OLD(I)%MPOLH,NPOLH)
@@ -2156,8 +2224,26 @@ C--------------------------------------
             LEN=3*NNS_ANIM
             CALL READ_DB(FVDATA_OLD(I)%NOD_ANIM,LEN)
          ENDIF
+         !FVDATA_OLD(I)%SSPPOLH       not read : H3D only. Generated if needed.
+         !FVDATA_OLD(I)%CENTROID_POLH not read : H3D only. Generated if needed.
 C
-      ENDDO
+         K1 = 1
+         IH3D_FLAG = 0
+         !Looping over all existing bags to check which one is matching : collect IHED_FLAG
+         DO N=1,NVOLU                                                          
+           IFV = MONVOL(K1-1 + 45)         
+           IF(IFV==I)THEN                  
+             IH3D_FLAG = MONVOL(K1-1 + 75)
+             IF(IH3D_FLAG==1)THEN
+               AIRBAGS_TOTAL_FVM_IN_H3D = AIRBAGS_TOTAL_FVM_IN_H3D + NPOLH_ANIM
+             ENDIF 
+             EXIT                          
+           ENDIF                                                                                                       
+           K1=K1+NIMV                                                           
+         ENDDO !next N  
+           
+C
+      ENDDO !next FVBAG
       
 
 C--------------------------------------
@@ -2309,10 +2395,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
 #include      "com04_c.inc"
 #include      "scr05_c.inc"
-#include      "flowcom.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -2356,10 +2440,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
 #include      "com04_c.inc"
 #include      "scr05_c.inc"
-#include      "flowcom.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -2392,7 +2474,7 @@ Chd|-- called by -----------
 Chd|        RADIOSS2                      source/engine/radioss2.F      
 Chd|-- calls ---------------
 Chd|        READ_DB                       source/output/tools/read_db.F 
-Chd|        READ_I_C                      source/output/tools/sortie_c.c
+Chd|        READ_I_C                      ../common_source/tools/input_output/write_routtines.c
 Chd|        REDSQI                        source/output/tools/redsqi.F  
 Chd|        REDSQR                        source/output/tools/redsqr.F  
 Chd|====================================================================
@@ -2404,7 +2486,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
 #include      "com04_c.inc"
 #include      "scr05_c.inc"
 #include      "param_c.inc"
@@ -2442,7 +2523,7 @@ Chd|-- called by -----------
 Chd|        RADIOSS2                      source/engine/radioss2.F      
 Chd|-- calls ---------------
 Chd|        READ_DB                       source/output/tools/read_db.F 
-Chd|        READ_I_C                      source/output/tools/sortie_c.c
+Chd|        READ_I_C                      ../common_source/tools/input_output/write_routtines.c
 Chd|        REDSQI                        source/output/tools/redsqi.F  
 Chd|        REDSQR                        source/output/tools/redsqr.F  
 Chd|====================================================================
@@ -2454,7 +2535,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
 #include      "com04_c.inc"
 #include      "scr05_c.inc"
 #include      "param_c.inc"
@@ -2492,7 +2572,7 @@ Chd|-- called by -----------
 Chd|        RADIOSS2                      source/engine/radioss2.F      
 Chd|-- calls ---------------
 Chd|        READ_DB                       source/output/tools/read_db.F 
-Chd|        READ_I_C                      source/output/tools/sortie_c.c
+Chd|        READ_I_C                      ../common_source/tools/input_output/write_routtines.c
 Chd|        REDSQI                        source/output/tools/redsqi.F  
 Chd|        REDSQR                        source/output/tools/redsqr.F  
 Chd|====================================================================
@@ -2504,7 +2584,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
 #include      "com04_c.inc"
 #include      "scr05_c.inc"
 #include      "param_c.inc"
@@ -2542,7 +2621,7 @@ Chd|-- called by -----------
 Chd|        RADIOSS2                      source/engine/radioss2.F      
 Chd|-- calls ---------------
 Chd|        READ_DB                       source/output/tools/read_db.F 
-Chd|        READ_I_C                      source/output/tools/sortie_c.c
+Chd|        READ_I_C                      ../common_source/tools/input_output/write_routtines.c
 Chd|        REDSQI                        source/output/tools/redsqi.F  
 Chd|        REDSQR                        source/output/tools/redsqr.F  
 Chd|====================================================================
@@ -2554,10 +2633,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
 #include      "com04_c.inc"
 #include      "scr05_c.inc"
-#include      "flowcom.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -2596,7 +2673,7 @@ Chd|-- called by -----------
 Chd|        RADIOSS2                      source/engine/radioss2.F      
 Chd|-- calls ---------------
 Chd|        READ_DB                       source/output/tools/read_db.F 
-Chd|        READ_I_C                      source/output/tools/sortie_c.c
+Chd|        READ_I_C                      ../common_source/tools/input_output/write_routtines.c
 Chd|====================================================================
       SUBROUTINE PLYXFEM_RREST(MS_LAYER,ZI_LAYER,INOD,IEL,ICODE,ISKEW,
      .                         MSZ2)
@@ -2607,10 +2684,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr05_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -2649,7 +2724,7 @@ Chd|  PLYXFEM_RRESTANIM             source/output/restart/rdresb.F
 Chd|-- called by -----------
 Chd|        RADIOSS2                      source/engine/radioss2.F      
 Chd|-- calls ---------------
-Chd|        READ_I_C                      source/output/tools/sortie_c.c
+Chd|        READ_I_C                      ../common_source/tools/input_output/write_routtines.c
 Chd|        PLYXFEM_MOD                   share/modules/plyxfem_mod.F   
 Chd|====================================================================
       SUBROUTINE PLYXFEM_RRESTANIM()
@@ -2662,54 +2737,55 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
 #include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "scr05_c.inc"
 #include      "param_c.inc"
-#include      "task_c.inc"
-C-----------------------------------------------
-C   D u m m y   A r g u m e n t s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER K,I,ELSZ,NDSZ
+      INTEGER K,ELSZ,NDSZ
 C-----------------------------------------------
-      CALL READ_I_C(NPLYPART,1)
-      ALLOCATE(INDX_PLY(NPLYPART))
-      CALL READ_I_C(INDX_PLY,NPLYPART)
-
-      ALLOCATE(PLYSHELL(NPLYMAX))
-      ALLOCATE(PLYNOD(NPLYMAX))
-
-      DO K=1,NPLYMAX
-        CALL READ_I_C(ELSZ,1)
-        PLYSHELL(K)%PLYNUMSHELL=ELSZ
-        ALLOCATE(PLYSHELL(K)%SHID(ELSZ))
-        ALLOCATE(PLYSHELL(K)%SHELLIPT(ELSZ))
-        ALLOCATE(PLYSHELL(K)%SHELLID(ELSZ))
-
-        CALL READ_I_C(PLYSHELL(K)%SHID,     ELSZ)
-        CALL READ_I_C(PLYSHELL(K)%SHELLIPT, ELSZ)
-        CALL READ_I_C(PLYSHELL(K)%SHELLID,  ELSZ)
-
-
-        CALL READ_I_C(NDSZ,1)
-        PLYNOD(K)%PLYNUMNODS=NDSZ
-        ALLOCATE(PLYNOD(K)%NODES(NDSZ))
-        ALLOCATE(PLYNOD(K)%PLYNODID(NDSZ))
-
-        CALL READ_I_C(PLYNOD(K)%NODES,    NDSZ)
-        CALL READ_I_C(PLYNOD(K)%PLYNODID, NDSZ)
-      ENDDO
-
-      ALLOCATE(PLYSIZG(NPLYMAX))
-      CALL READ_I_C(PLYSIZG,NPLYMAX)
-C
-      ALLOCATE (IDPID_PLY(NPLYPART))
-      CALL READ_I_C(IDPID_PLY,NPLYPART)
-
+      IF(IPLYXFEM == 0) THEN
+! Those array be used as dummy argument
+! they MUST be allocated in all cases
+        ALLOCATE(INDX_PLY(0))
+        ALLOCATE(PLYSHELL(0))
+        ALLOCATE(PLYNOD(0))
+      ELSE
+        CALL READ_I_C(NPLYPART,1)
+        ALLOCATE(INDX_PLY(NPLYPART))
+        CALL READ_I_C(INDX_PLY,NPLYPART)
+       
+        ALLOCATE(PLYSHELL(NPLYMAX))
+        ALLOCATE(PLYNOD(NPLYMAX))
+       
+        DO K=1,NPLYMAX
+          CALL READ_I_C(ELSZ,1)
+          PLYSHELL(K)%PLYNUMSHELL=ELSZ
+          ALLOCATE(PLYSHELL(K)%SHID(ELSZ))
+          ALLOCATE(PLYSHELL(K)%SHELLIPT(ELSZ))
+          ALLOCATE(PLYSHELL(K)%SHELLID(ELSZ))
+       
+          CALL READ_I_C(PLYSHELL(K)%SHID,     ELSZ)
+          CALL READ_I_C(PLYSHELL(K)%SHELLIPT, ELSZ)
+          CALL READ_I_C(PLYSHELL(K)%SHELLID,  ELSZ)
+       
+       
+          CALL READ_I_C(NDSZ,1)
+          PLYNOD(K)%PLYNUMNODS=NDSZ
+          ALLOCATE(PLYNOD(K)%NODES(NDSZ))
+          ALLOCATE(PLYNOD(K)%PLYNODID(NDSZ))
+       
+          CALL READ_I_C(PLYNOD(K)%NODES,    NDSZ)
+          CALL READ_I_C(PLYNOD(K)%PLYNODID, NDSZ)
+        ENDDO
+       
+        ALLOCATE(PLYSIZG(NPLYMAX))
+        CALL READ_I_C(PLYSIZG,NPLYMAX)
+C      
+        ALLOCATE (IDPID_PLY(NPLYPART))
+        CALL READ_I_C(IDPID_PLY,NPLYPART)
+      ENDIF
+      RETURN
       END
 C centrifugal force
 Chd|====================================================================
@@ -2801,7 +2877,7 @@ Chd|  CRKXFEM_RREST                 source/output/restart/rdresb.F
 Chd|-- called by -----------
 Chd|        RADIOSS2                      source/engine/radioss2.F      
 Chd|-- calls ---------------
-Chd|        READ_I_C                      source/output/tools/sortie_c.c
+Chd|        READ_I_C                      ../common_source/tools/input_output/write_routtines.c
 Chd|====================================================================
       SUBROUTINE CRKXFEM_RREST(INOD_CRKXFEM,IEL_CRKXFEM,NODLEVXF)
 C-----------------------------------------------
@@ -2811,12 +2887,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com_xfem1.inc"
-#include      "param_c.inc"
-#include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -2824,7 +2896,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I
 C=======================================================================
       CALL READ_I_C(INOD_CRKXFEM,NUMNOD)
       CALL READ_I_C(IEL_CRKXFEM,NUMELC+NUMELTG)
@@ -2838,7 +2909,7 @@ Chd|-- called by -----------
 Chd|        RADIOSS2                      source/engine/radioss2.F      
 Chd|-- calls ---------------
 Chd|        READ_DB                       source/output/tools/read_db.F 
-Chd|        READ_I_C                      source/output/tools/sortie_c.c
+Chd|        READ_I_C                      ../common_source/tools/input_output/write_routtines.c
 Chd|        RESTMOD                       share/modules/restart_mod.F   
 Chd|        XFEM2VARS_MOD                 share/modules/xfem2vars_mod.F 
 Chd|====================================================================
@@ -2853,153 +2924,159 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com_xfem1.inc"
-#include      "scr05_c.inc"
-#include      "param_c.inc"
-#include      "task_c.inc"
-C-----------------------------------------------
-C   D u m m y   A r g u m e n t s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,K,NN,LEN,ELSZ,NDSZ,NENR,ELSZC,ELSZTG,NCRKXFE_G,
+      INTEGER K,LEN,ELSZ,NENR,ELSZC,ELSZTG,NCRKXFE_G,
      .        CRKNUMNODS
 C=======================================================================
-      CALL READ_I_C(NCRKPART,1)
-      CALL READ_I_C(NCRKXFE_G,1)
-      ALLOCATE(INDX_CRK(NCRKPART))
-      CALL READ_I_C(INDX_CRK,NCRKPART)
-C
-      ALLOCATE(CRKSHELL(NLEVMAX))
-      ALLOCATE(CRKNOD(NLEVMAX))
-      ALLOCATE(CRKLVSET(NLEVMAX))
-      ALLOCATE(CRKAVX(NLEVMAX))
-      ALLOCATE(CRKSKY(NLEVMAX))
-C
-      DO K=1,NLEVMAX
-        CALL READ_I_C(ELSZC  ,1)
-        CALL READ_I_C(ELSZTG ,1)
-        CALL READ_I_C(ELSZ   ,1)
-c
-c------ CRKSHELL
-        CRKSHELL(K)%CRKNUMSHELL = ELSZ
-        CRKSHELL(K)%CRKNUMSH4   = ELSZC
-        CRKSHELL(K)%CRKNUMSH3   = ELSZTG
-C
-        ALLOCATE(CRKSHELL(K)%CRKSHELLID(ELSZ))
-        ALLOCATE(CRKSHELL(K)%ELTYPE(ELSZ))
-        CALL READ_I_C(CRKSHELL(K)%CRKSHELLID  ,ELSZ)
-        CALL READ_I_C(CRKSHELL(K)%ELTYPE      ,ELSZ)
-c------ CRKNOD
-        LEN = 4*ELSZ
-        ALLOCATE(CRKNOD(K)%XFECRKNODID(LEN))
-        ALLOCATE(CRKNOD(K)%XFENODES(LEN))
-        CALL READ_I_C(CRKNOD(K)%XFECRKNODID ,LEN)
-        CALL READ_I_C(CRKNOD(K)%XFENODES    ,LEN)
-c------ CRKSHELL
-        LEN = 4*ELSZ
-        ALLOCATE(CRKSHELL(K)%XNODEL(4  ,ELSZ))
-        CALL READ_I_C(CRKSHELL(K)%XNODEL,  LEN)
-c------ CRKLVSET
-        LEN = LCNECRKXFEM
-        ALLOCATE(CRKLVSET(K)%ENR0(2,LEN))
-        ALLOCATE(CRKLVSET(K)%AREA(ELSZ))
-        CALL READ_I_C(CRKLVSET(K)%ENR0(1,1:LEN) ,LEN)
-        CALL READ_I_C(CRKLVSET(K)%ENR0(2,1:LEN) ,LEN)
-        CALL READ_DB (CRKLVSET(K)%AREA          ,ELSZ)
-c------ CRKAVX
-        LEN = LCNECRKXFEM
-        ALLOCATE(CRKAVX(K)%A(3,LEN))
-        ALLOCATE(CRKAVX(K)%AR(3,LEN))
-        ALLOCATE(CRKAVX(K)%V(3,LEN))
-        ALLOCATE(CRKAVX(K)%VR(3,LEN))
-        ALLOCATE(CRKAVX(K)%X(3,LEN))
-        ALLOCATE(CRKAVX(K)%U(3,LEN))
-        LEN = LCNECRKXFEM*3
-        CALL READ_DB(CRKAVX(K)%A   ,LEN)
-        CALL READ_DB(CRKAVX(K)%AR  ,LEN)
-        CALL READ_DB(CRKAVX(K)%V   ,LEN)
-        CALL READ_DB(CRKAVX(K)%VR  ,LEN)
-        CALL READ_DB(CRKAVX(K)%X   ,LEN)
-        CALL READ_DB(CRKAVX(K)%U   ,LEN)
-        LEN = 4*ELSZ
-        ALLOCATE(CRKAVX(K)%XX(3,LEN))
-        CALL READ_DB(CRKAVX(K)%XX,  3*LEN)
-c------ CRKSKY
-        ALLOCATE(CRKSKY(K)%FSKY(8,LCNECRKXFEM))
-        CALL READ_DB(CRKSKY(K)%FSKY,  8*LCNECRKXFEM)
-c------ CRKNOD
-        LEN = 4*ELSZ
-        ALLOCATE(CRKNOD(K)%NOD2IAD(LEN))
-        CALL READ_I_C(CRKNOD(K)%NOD2IAD,  LEN)
-        CALL READ_I_C(CRKNUMNODS, 1)
-        CRKNOD(K)%CRKNUMNODS = CRKNUMNODS
-c
-      ENDDO ! K=1,NLEVMAX
-c
-c---  read XFEM_PHANTOM  ----------------------------
-c
-
-      NENR = INT(IENRNOD/NLEVMAX)
-      ALLOCATE(XFEM_PHANTOM(NXLAYMAX))
-      DO K=1,NXLAYMAX
-        ALLOCATE(XFEM_PHANTOM(K)%ELCUT(ELSZ))
-        ALLOCATE(XFEM_PHANTOM(K)%IFI(LCNECRKXFEM))
-        ALLOCATE(XFEM_PHANTOM(K)%TAGXP(5,NCRKXFE,IENRNOD))  ! IENRNOD -> NENR
-        ALLOCATE(XFEM_PHANTOM(K)%ITRI(2,ELSZ))
-c
-        CALL READ_I_C(XFEM_PHANTOM(K)%ELCUT    ,ELSZ)
-        CALL READ_I_C(XFEM_PHANTOM(K)%IFI      ,LCNECRKXFEM)
-        CALL READ_I_C(XFEM_PHANTOM(K)%TAGXP    ,NCRKXFE*IENRNOD*5)
-        CALL READ_I_C(XFEM_PHANTOM(K)%ITRI     ,ELSZ*2)
-      END DO
-c
-c---  read CRKEDGE  ----------------------------
-c
-      LEN = NUMEDGES
-      ALLOCATE(CRKEDGE(NXLAYMAX))
-      DO K=1,NXLAYMAX
-        ALLOCATE(CRKEDGE(K)%LAYCUT(ELSZ))
-        ALLOCATE(CRKEDGE(K)%IEDGEC(4,ELSZC))
-        ALLOCATE(CRKEDGE(K)%IEDGETG(3,ELSZTG))
-        ALLOCATE(CRKEDGE(K)%EDGEICRK(NUMEDGES))
-        ALLOCATE(CRKEDGE(K)%EDGEIFI(2,NUMEDGES))
-        ALLOCATE(CRKEDGE(K)%EDGEENR(2,NUMEDGES))
-        ALLOCATE(CRKEDGE(K)%EDGETIP(2,NUMEDGES))
-        ALLOCATE(CRKEDGE(K)%IBORDEDGE(NUMEDGES))
-        ALLOCATE(CRKEDGE(K)%ICUTEDGE(NUMEDGES))
-        ALLOCATE(CRKEDGE(K)%RATIO(NUMEDGES))
-c
-        CALL READ_I_C(CRKEDGE(K)%LAYCUT     ,ELSZ)
-        CALL READ_I_C(CRKEDGE(K)%IEDGEC     ,ELSZC*4)
-        CALL READ_I_C(CRKEDGE(K)%IEDGETG    ,ELSZTG*3)
-        CALL READ_I_C(CRKEDGE(K)%EDGEICRK   ,NUMEDGES)
-        CALL READ_I_C(CRKEDGE(K)%EDGEIFI    ,NUMEDGES*2)
-        CALL READ_I_C(CRKEDGE(K)%EDGEENR    ,NUMEDGES*2)
-        CALL READ_I_C(CRKEDGE(K)%EDGETIP    ,NUMEDGES*2)
-        CALL READ_I_C(CRKEDGE(K)%IBORDEDGE  ,NUMEDGES)
-        CALL READ_I_C(CRKEDGE(K)%ICUTEDGE   ,NUMEDGES)
-        CALL READ_DB (CRKEDGE(K)%RATIO      ,NUMEDGES)
-      END DO
-c-----------------------------
-      ALLOCATE(XEDGE4N(4,ELSZC))
-      ALLOCATE(XEDGE3N(3,ELSZTG))
-      CALL READ_I_C(XEDGE4N, 4*ELSZC)
-      CALL READ_I_C(XEDGE3N, 3*ELSZTG)
-c-----------------------------
-      LEN = 2*(NUMELC+NUMELTG)
-      CALL READ_I_C(ELCUTC,LEN)
-      LEN = NCRKXFE
-      CALL READ_I_C(NODENR,LEN)
-      LEN = NCRKXFE
-      CALL READ_I_C(KXFENOD2ELC,LEN)
-      LEN = NUMNOD*IENRNOD
-      CALL READ_I_C(ENRTAG,LEN)
-C---
+      IF(ICRACK3D == 0) THEN
+        ALLOCATE(INDX_CRK(0))
+        ALLOCATE(CRKSHELL(0))
+        ALLOCATE(CRKNOD(0))
+        ALLOCATE(CRKLVSET(0))
+        ALLOCATE(CRKAVX(0))
+        ALLOCATE(CRKSKY(0))
+        ALLOCATE(XFEM_PHANTOM(0))
+        ALLOCATE(CRKEDGE(0))
+        ALLOCATE(XEDGE4N(4,0))
+        ALLOCATE(XEDGE3N(3,0))
+      ELSE
+        CALL READ_I_C(NCRKPART,1)
+        CALL READ_I_C(NCRKXFE_G,1)
+        ALLOCATE(INDX_CRK(NCRKPART))
+        CALL READ_I_C(INDX_CRK,NCRKPART)
+C      
+        ALLOCATE(CRKSHELL(NLEVMAX))
+        ALLOCATE(CRKNOD(NLEVMAX))
+        ALLOCATE(CRKLVSET(NLEVMAX))
+        ALLOCATE(CRKAVX(NLEVMAX))
+        ALLOCATE(CRKSKY(NLEVMAX))
+C      
+        DO K=1,NLEVMAX
+          CALL READ_I_C(ELSZC  ,1)
+          CALL READ_I_C(ELSZTG ,1)
+          CALL READ_I_C(ELSZ   ,1)
+c      
+c-------- CRKSHELL
+          CRKSHELL(K)%CRKNUMSHELL = ELSZ
+          CRKSHELL(K)%CRKNUMSH4   = ELSZC
+          CRKSHELL(K)%CRKNUMSH3   = ELSZTG
+C      
+          ALLOCATE(CRKSHELL(K)%CRKSHELLID(ELSZ))
+          ALLOCATE(CRKSHELL(K)%ELTYPE(ELSZ))
+          CALL READ_I_C(CRKSHELL(K)%CRKSHELLID  ,ELSZ)
+          CALL READ_I_C(CRKSHELL(K)%ELTYPE      ,ELSZ)
+c-------- CRKNOD
+          LEN = 4*ELSZ
+          ALLOCATE(CRKNOD(K)%XFECRKNODID(LEN))
+          ALLOCATE(CRKNOD(K)%XFENODES(LEN))
+          CALL READ_I_C(CRKNOD(K)%XFECRKNODID ,LEN)
+          CALL READ_I_C(CRKNOD(K)%XFENODES    ,LEN)
+c-------- CRKSHELL
+          LEN = 4*ELSZ
+          ALLOCATE(CRKSHELL(K)%XNODEL(4  ,ELSZ))
+          CALL READ_I_C(CRKSHELL(K)%XNODEL,  LEN)
+c-------- CRKLVSET
+          LEN = LCNECRKXFEM
+          ALLOCATE(CRKLVSET(K)%ENR0(2,LEN))
+          ALLOCATE(CRKLVSET(K)%AREA(ELSZ))
+          CALL READ_I_C(CRKLVSET(K)%ENR0(1,1:LEN) ,LEN)
+          CALL READ_I_C(CRKLVSET(K)%ENR0(2,1:LEN) ,LEN)
+          CALL READ_DB (CRKLVSET(K)%AREA          ,ELSZ)
+c-------- CRKAVX
+          LEN = LCNECRKXFEM
+          ALLOCATE(CRKAVX(K)%A(3,LEN))
+          ALLOCATE(CRKAVX(K)%AR(3,LEN))
+          ALLOCATE(CRKAVX(K)%V(3,LEN))
+          ALLOCATE(CRKAVX(K)%VR(3,LEN))
+          ALLOCATE(CRKAVX(K)%X(3,LEN))
+          ALLOCATE(CRKAVX(K)%U(3,LEN))
+          LEN = LCNECRKXFEM*3
+          CALL READ_DB(CRKAVX(K)%A   ,LEN)
+          CALL READ_DB(CRKAVX(K)%AR  ,LEN)
+          CALL READ_DB(CRKAVX(K)%V   ,LEN)
+          CALL READ_DB(CRKAVX(K)%VR  ,LEN)
+          CALL READ_DB(CRKAVX(K)%X   ,LEN)
+          CALL READ_DB(CRKAVX(K)%U   ,LEN)
+          LEN = 4*ELSZ
+          ALLOCATE(CRKAVX(K)%XX(3,LEN))
+          CALL READ_DB(CRKAVX(K)%XX,  3*LEN)
+c-------- CRKSKY
+          ALLOCATE(CRKSKY(K)%FSKY(8,LCNECRKXFEM))
+          CALL READ_DB(CRKSKY(K)%FSKY,  8*LCNECRKXFEM)
+c-------- CRKNOD
+          LEN = 4*ELSZ
+          ALLOCATE(CRKNOD(K)%NOD2IAD(LEN))
+          CALL READ_I_C(CRKNOD(K)%NOD2IAD,  LEN)
+          CALL READ_I_C(CRKNUMNODS, 1)
+          CRKNOD(K)%CRKNUMNODS = CRKNUMNODS
+c      
+        ENDDO ! K=1,NLEVMAX
+c      
+c---    read XFEM_PHANTOM  ----------------------------
+c      
+       
+        NENR = INT(IENRNOD/NLEVMAX)
+        ALLOCATE(XFEM_PHANTOM(NXLAYMAX))
+        DO K=1,NXLAYMAX
+          ALLOCATE(XFEM_PHANTOM(K)%ELCUT(ELSZ))
+          ALLOCATE(XFEM_PHANTOM(K)%IFI(LCNECRKXFEM))
+          ALLOCATE(XFEM_PHANTOM(K)%TAGXP(5,NCRKXFE,IENRNOD))  ! IENRNOD -> NENR
+          ALLOCATE(XFEM_PHANTOM(K)%ITRI(2,ELSZ))
+c      
+          CALL READ_I_C(XFEM_PHANTOM(K)%ELCUT    ,ELSZ)
+          CALL READ_I_C(XFEM_PHANTOM(K)%IFI      ,LCNECRKXFEM)
+          CALL READ_I_C(XFEM_PHANTOM(K)%TAGXP    ,NCRKXFE*IENRNOD*5)
+          CALL READ_I_C(XFEM_PHANTOM(K)%ITRI     ,ELSZ*2)
+        END DO
+c      
+c---    read CRKEDGE  ----------------------------
+c      
+        LEN = NUMEDGES
+        ALLOCATE(CRKEDGE(NXLAYMAX))
+        DO K=1,NXLAYMAX
+          ALLOCATE(CRKEDGE(K)%LAYCUT(ELSZ))
+          ALLOCATE(CRKEDGE(K)%IEDGEC(4,ELSZC))
+          ALLOCATE(CRKEDGE(K)%IEDGETG(3,ELSZTG))
+          ALLOCATE(CRKEDGE(K)%EDGEICRK(NUMEDGES))
+          ALLOCATE(CRKEDGE(K)%EDGEIFI(2,NUMEDGES))
+          ALLOCATE(CRKEDGE(K)%EDGEENR(2,NUMEDGES))
+          ALLOCATE(CRKEDGE(K)%EDGETIP(2,NUMEDGES))
+          ALLOCATE(CRKEDGE(K)%IBORDEDGE(NUMEDGES))
+          ALLOCATE(CRKEDGE(K)%ICUTEDGE(NUMEDGES))
+          ALLOCATE(CRKEDGE(K)%RATIO(NUMEDGES))
+c      
+          CALL READ_I_C(CRKEDGE(K)%LAYCUT     ,ELSZ)
+          CALL READ_I_C(CRKEDGE(K)%IEDGEC     ,ELSZC*4)
+          CALL READ_I_C(CRKEDGE(K)%IEDGETG    ,ELSZTG*3)
+          CALL READ_I_C(CRKEDGE(K)%EDGEICRK   ,NUMEDGES)
+          CALL READ_I_C(CRKEDGE(K)%EDGEIFI    ,NUMEDGES*2)
+          CALL READ_I_C(CRKEDGE(K)%EDGEENR    ,NUMEDGES*2)
+          CALL READ_I_C(CRKEDGE(K)%EDGETIP    ,NUMEDGES*2)
+          CALL READ_I_C(CRKEDGE(K)%IBORDEDGE  ,NUMEDGES)
+          CALL READ_I_C(CRKEDGE(K)%ICUTEDGE   ,NUMEDGES)
+          CALL READ_DB (CRKEDGE(K)%RATIO      ,NUMEDGES)
+        END DO
+c-------------------------------
+        ALLOCATE(XEDGE4N(4,ELSZC))
+        ALLOCATE(XEDGE3N(3,ELSZTG))
+        CALL READ_I_C(XEDGE4N, 4*ELSZC)
+        CALL READ_I_C(XEDGE3N, 3*ELSZTG)
+c-------------------------------
+        LEN = 2*(NUMELC+NUMELTG)
+        CALL READ_I_C(ELCUTC,LEN)
+        LEN = NCRKXFE
+        CALL READ_I_C(NODENR,LEN)
+        LEN = NCRKXFE
+        CALL READ_I_C(KXFENOD2ELC,LEN)
+        LEN = NUMNOD*IENRNOD
+        CALL READ_I_C(ENRTAG,LEN)
+C--- 
+      ENDIF
       RETURN
       END
 
@@ -3022,15 +3099,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
-#include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "scr05_c.inc"
 #include      "param_c.inc"
-#include      "task_c.inc"
-C-----------------------------------------------
-C   D u m m y   A r g u m e n t s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -3066,19 +3135,11 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr05_c.inc"
-#include      "param_c.inc"
-#include      "task_c.inc"
-C-----------------------------------------------
-C   D u m m y   A r g u m e n t s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER K,NOSZ
+      INTEGER NOSZ
 C-----------------------------------------------
         ALLOCATE (VFLOW(3*NUMNOD), DFLOW(3*NUMNOD),WFLOW(3*NUMNOD))
         NOSZ = 3*NUMNOD
@@ -3148,8 +3209,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com04_c.inc"
-#include      "param_c.inc"
 #include      "tabsiz_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -3190,8 +3249,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com04_c.inc"
-#include      "param_c.inc"
 #include      "tabsiz_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -3232,8 +3289,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com04_c.inc"
-#include      "param_c.inc"
 #include      "tabsiz_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -3274,8 +3329,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
-#include      "param_c.inc"
-#include      "tabsiz_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -3283,7 +3336,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-        INTEGER I
 C--------------------------------------
 C     READING INTEGERS
 C--------------------------------------
@@ -3301,10 +3353,9 @@ Chd|-- called by -----------
 Chd|        RADIOSS2                      source/engine/radioss2.F      
 Chd|-- calls ---------------
 Chd|        READ_DB                       source/output/tools/read_db.F 
-Chd|        READ_I_C                      source/output/tools/sortie_c.c
+Chd|        READ_I_C                      ../common_source/tools/input_output/write_routtines.c
 Chd|====================================================================
       SUBROUTINE STACK_RREST(IGEO,GEO,PM)
-C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -3312,12 +3363,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
-#include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "scr05_c.inc"
 #include      "param_c.inc"
-#include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -3329,8 +3375,7 @@ C-----------------------------------------------
       INTEGER LSIZ
 
 C-----------------------------------------------
-
-        LSIZ =(3*NPT_STACK +2)*NS_STACK
+        LSIZ =(4*NPT_STACK +2)*NS_STACK
         CALL READ_I_C(IGEO,     LSIZ)
         LSIZ =(6*NPT_STACK + 1)*NS_STACK
         CALL READ_DB(GEO,     LSIZ)
@@ -3344,12 +3389,11 @@ Chd|-- called by -----------
 Chd|        RADIOSS2                      source/engine/radioss2.F      
 Chd|-- calls ---------------
 Chd|        READ_DB                       source/output/tools/read_db.F 
-Chd|        READ_I_C                      source/output/tools/sortie_c.c
+Chd|        READ_I_C                      ../common_source/tools/input_output/write_routtines.c
 Chd|        DRAPE_MOD                     share/modules/drape_mod.F     
 Chd|====================================================================
-      SUBROUTINE DRAPE_RREST(DRAPE_Q4,DRAPE_T3)
+      SUBROUTINE DRAPE_RREST(DRAPE_SH4N,DRAPE_SH3N,DRAPEG)
 C
-
         USE DRAPE_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -3359,67 +3403,129 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-       TYPE(DRAPE_) :: DRAPE_Q4,DRAPE_T3
+        TYPE(DRAPE_),   DIMENSION(*) ,TARGET       :: DRAPE_SH4N,DRAPE_SH3N
+        TYPE(DRAPEG_)                              :: DRAPEG
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-        INTEGER LEN,OFF,I,J,NPT,NDIM,IDX
-        my_real, ALLOCATABLE, DIMENSION(:,:) ::RTMP
-        INTEGER, ALLOCATABLE, DIMENSION(:) ::ITMP,INDX,NPT_ELT
+      INTEGER LEN,OFF,II,J,IS,NSLICE,NPT,NDIM_INDX_PLY,NDIM,NDIM_SLICE,
+     .        NPT_DRAPE
+      my_real, DIMENSION(:,:), ALLOCATABLE :: RTMP
+      INTEGER, DIMENSION(:,:), ALLOCATABLE :: ITMP
+      INTEGER, DIMENSION(:)  , ALLOCATABLE :: NPTDRP_ELT,ISLICE,INDX_PLY,
+     .                                        NPT_ELT
 C--------------------------------------
 C     READING INTEGERS
 C--------------------------------------
-C     Shell 4 noeuds
-      CALL READ_I_C(NDIM ,1)
-      ALLOCATE(INDX(NUMELC), NPT_ELT(NUMELC),ITMP(NDIM),RTMP(NDIM,2))
-      CALL READ_I_C(INDX, NUMELC )
-      CALL READ_I_C(NPT_ELT,NUMELC  )
-      CALL READ_I_C(ITMP,NDIM)
-      CALL READ_DB(RTMP,2*NDIM)
+C     4 node Shell 
+      SCDRAPE = 0
+      STDRAPE = 0
+      IF(NUMELC_DRAPE > 0) THEN
+        CALL READ_I_C(NDIM ,1)
+        CALL READ_I_C(NDIM_SLICE,1)
+        CALL READ_I_C(NDIM_INDX_PLY,1)
+        DRAPEG%NDIM_SH4N          = NDIM 
+        DRAPEG%NDIM_SLICE_SH4N    = NDIM_SLICE 
+        DRAPEG%NDIM_INDX_PLY_SH4N = NDIM_INDX_PLY
+        !
+        ALLOCATE(NPT_ELT(NUMELC_DRAPE),ITMP(NDIM,2),RTMP(NDIM,2),
+     .         NPTDRP_ELT(NUMELC_DRAPE),ISLICE(NDIM_SLICE),INDX_PLY(NDIM_INDX_PLY))
+        CALL READ_I_C(DRAPEG%INDX_SH4N,NUMELC)
+        CALL READ_I_C(NPTDRP_ELT,NUMELC_DRAPE)
+        CALL READ_I_C(NPT_ELT,NUMELC_DRAPE)
+        CALL READ_I_C(ISLICE,NDIM_SLICE )
+        CALL READ_I_C(INDX_PLY,NDIM_INDX_PLY)  
+        CALL READ_I_C(ITMP,2*NDIM)            
+        CALL READ_DB(RTMP,2*NDIM)
+        NDIM_INDX_PLY = 0
+        NDIM_SLICE = 0
+        NDIM = 0
+        DO II= 1,NUMELC_DRAPE
+           DRAPE_SH4N(II)%NPLY_DRAPE = NPTDRP_ELT(II)
+           DRAPE_SH4N(II)%NPLY       = NPT_ELT(II)
+           NPT = DRAPE_SH4N(II)%NPLY 
+           ALLOCATE(DRAPE_SH4N(II)%INDX_PLY(NPT))
+           DRAPE_SH4N(II)%INDX_PLY = 0
+           DO J = 1,NPT
+              DRAPE_SH4N(II)%INDX_PLY(J)=INDX_PLY(NDIM_INDX_PLY + J) 
+           ENDDO
+           NDIM_INDX_PLY = NDIM_INDX_PLY + NPT
+           NPT_DRAPE = DRAPE_SH4N(II)%NPLY_DRAPE
+           ALLOCATE(DRAPE_SH4N(II)%DRAPE_PLY(NPT_DRAPE))
+           DO J=1 ,NPT_DRAPE
+             NSLICE = ISLICE(NDIM_SLICE + J)
+             DRAPE_SH4N(II)%DRAPE_PLY(J)%NSLICE = NSLICE 
+             ALLOCATE(DRAPE_SH4N(II)%DRAPE_PLY(J)%IDRAPE(NSLICE,2),DRAPE_SH4N(II)%DRAPE_PLY(J)%RDRAPE(NSLICE,2))
+             DRAPE_SH4N(II)%DRAPE_PLY(J)%IDRAPE = 0
+             DRAPE_SH4N(II)%DRAPE_PLY(J)%RDRAPE = ZERO
+             DO  IS= 1,NSLICE  
+                 DRAPE_SH4N(II)%DRAPE_PLY(J)%IDRAPE(IS,1) = ITMP(NDIM + IS,1)
+                 DRAPE_SH4N(II)%DRAPE_PLY(J)%IDRAPE(IS,2) = ITMP(NDIM + IS,2) 
+                 DRAPE_SH4N(II)%DRAPE_PLY(J)%RDRAPE(IS,1) = RTMP(NDIM + IS,1) 
+                 DRAPE_SH4N(II)%DRAPE_PLY(J)%RDRAPE(IS,2) = RTMP(NDIM + IS,2)
+             ENDDO             
+             NDIM = NDIM + NSLICE 
+           ENDDO
+           NDIM_SLICE = NDIM_SLICE + NPT_DRAPE
+        ENDDO ! NUMELC_DRAPE
+        DEALLOCATE(NPT_ELT,ITMP,RTMP,NPTDRP_ELT,ISLICE,INDX_PLY)
+        SCDRAPE = NUMELC
+      ENDIF
 C
-      ALLOCATE(DRAPE_Q4%NPT(NUMELC),DRAPE_Q4%INDX(NUMELC),
-     .         DRAPE_Q4%IDRAPE(NDIM),DRAPE_Q4%RDRAPE(NDIM,2))
-      DRAPE_Q4%NDIM = NDIM
-      DO I=1,NUMELC
-        IDX = INDX(I)
-        NPT = NPT_ELT(I)
-        DRAPE_Q4%NPT(I) = NPT
-        DRAPE_Q4%INDX(I) = IDX
-        DO J=1,NPT
-          DRAPE_Q4%IDRAPE(IDX + J  ) = ITMP(IDX + J)
-          DRAPE_Q4%RDRAPE(IDX + J,1) = RTMP(IDX + J,1)
-          DRAPE_Q4%RDRAPE(IDX + J,2) = RTMP(IDX + J,2)
-        ENDDO
-      ENDDO
-      DEALLOCATE(INDX,NPT_ELT,ITMP,RTMP)
-C
-CCALL READ_I_C(NDIM ,1)
-      CALL READ_I_C(NDIM ,1)
-      ALLOCATE(INDX(NUMELTG), NPT_ELT(NUMELTG),ITMP(NDIM),RTMP(NDIM,2))
-      CALL READ_I_C(INDX, NUMELTG )
-      CALL READ_I_C(NPT_ELT,NUMELTG  )
-      CALL READ_I_C(ITMP,NDIM)
-      CALL READ_DB(RTMP,2*NDIM)
-C     Shell 3 noeuds
-      ALLOCATE(DRAPE_T3%NPT(NUMELTG),DRAPE_T3%INDX(NUMELTG),
-     .         DRAPE_T3%IDRAPE(NDIM),DRAPE_T3%RDRAPE(NDIM,2))
-      DRAPE_T3%NDIM= NDIM
-      DO I=1,NUMELTG
-        IDX = INDX(I)
-        NPT = NPT_ELT(I)
-        DRAPE_T3%NPT(I) = NPT
-        DRAPE_T3%INDX(I) = IDX
-        DO J=1,NPT
-          DRAPE_T3%IDRAPE(IDX + J  ) = ITMP(IDX + J)
-          DRAPE_T3%RDRAPE(IDX + J,1) = RTMP(IDX + J,1)
-          DRAPE_T3%RDRAPE(IDX + J,2) = RTMP(IDX + J,2)
-        ENDDO
-      ENDDO
-      DEALLOCATE(INDX,NPT_ELT,ITMP,RTMP)
+C     3 Node Shell 
+      IF(NUMELTG_DRAPE > 0) THEN
+        CALL READ_I_C(NDIM ,1)
+        CALL READ_I_C(NDIM_SLICE,1)
+        Call READ_I_C(NDIM_INDX_PLY,1)
+        DRAPEG%NDIM_SH3N          = NDIM 
+        DRAPEG%NDIM_SLICE_SH3N    = NDIM_SLICE 
+        DRAPEG%NDIM_INDX_PLY_SH3N = NDIM_INDX_PLY
+        ALLOCATE( NPT_ELT(NUMELTG_DRAPE),ITMP(NDIM,2),RTMP(NDIM,2),
+     .         NPTDRP_ELT(NUMELTG_DRAPE),ISLICE(NDIM_SLICE),INDX_PLY(NDIM_INDX_PLY))
+        CALL READ_I_C(DRAPEG%INDX_SH3N,NUMELTG)
+        CALL READ_I_C(NPTDRP_ELT,NUMELTG_DRAPE)
+        CALL READ_I_C(NPT_ELT,NUMELTG_DRAPE)
+        CALL READ_I_C(ISLICE,NDIM_SLICE)
+        CALL READ_I_C(INDX_PLY,NDIM_INDX_PLY)  
+        CALL READ_I_C(ITMP,2*NDIM)            
+        CALL READ_DB(RTMP,2*NDIM)
+        NDIM_INDX_PLY = 0
+        NDIM_SLICE = 0
+        NDIM = 0
+        DO II= 1,NUMELTG_DRAPE
+           DRAPE_SH3N(II)%NPLY_DRAPE = NPTDRP_ELT(II)
+           DRAPE_SH3N(II)%NPLY       = NPT_ELT(II)
+           NPT = DRAPE_SH3N(II)%NPLY 
+           ALLOCATE(DRAPE_SH3N(II)%INDX_PLY(NPT))
+           DRAPE_SH3N(II)%INDX_PLY = 0
+           DO J = 1,NPT
+              DRAPE_SH3N(II)%INDX_PLY(J)=INDX_PLY(NDIM_INDX_PLY + J) 
+           ENDDO
+           NDIM_INDX_PLY = NDIM_INDX_PLY + NPT
+           NPT_DRAPE = DRAPE_SH3N(II)%NPLY_DRAPE
+           ALLOCATE(DRAPE_SH3N(II)%DRAPE_PLY(NPT_DRAPE))
+           DO J = 1,NPT_DRAPE
+             NSLICE = ISLICE(NDIM_SLICE + J) 
+             DRAPE_SH3N(II)%DRAPE_PLY(J)%NSLICE = NSLICE 
+             ALLOCATE(DRAPE_SH3N(II)%DRAPE_PLY(J)%IDRAPE(NSLICE,2),DRAPE_SH3N(II)%DRAPE_PLY(J)%RDRAPE(NSLICE,2))
+             DRAPE_SH3N(II)%DRAPE_PLY(J)%IDRAPE = 0
+             DRAPE_SH3N(II)%DRAPE_PLY(J)%RDRAPE = ZERO
+             DO  IS= 1,NSLICE  
+                 DRAPE_SH3N(II)%DRAPE_PLY(J)%IDRAPE(IS,1) = ITMP(NDIM + IS,1)
+                 DRAPE_SH3N(II)%DRAPE_PLY(J)%IDRAPE(IS,2) = ITMP(NDIM + IS,2) 
+                 DRAPE_SH3N(II)%DRAPE_PLY(J)%RDRAPE(IS,1) = RTMP(NDIM + IS,1) 
+                 DRAPE_SH3N(II)%DRAPE_PLY(J)%RDRAPE(IS,2) = RTMP(NDIM + IS,2)             
+             ENDDO 
+             NDIM = NDIM + NSLICE 
+           ENDDO
+           NDIM_SLICE = NDIM_SLICE + NPT_DRAPE
+        ENDDO ! NUMELTG_DRAPE
+        DEALLOCATE( NPT_ELT,ITMP,RTMP,NPTDRP_ELT,ISLICE,INDX_PLY)
+        STDRAPE = NUMELTG
+      ENDIF  
 C
       RETURN
       END
@@ -3428,7 +3534,7 @@ Chd|  PLY_INFO_REST                 source/output/restart/rdresb.F
 Chd|-- called by -----------
 Chd|        RADIOSS2                      source/engine/radioss2.F      
 Chd|-- calls ---------------
-Chd|        READ_I_C                      source/output/tools/sortie_c.c
+Chd|        READ_I_C                      ../common_source/tools/input_output/write_routtines.c
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
       SUBROUTINE PLY_INFO_REST(PLY_INFO)
@@ -3444,7 +3550,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

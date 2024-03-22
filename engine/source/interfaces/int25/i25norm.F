@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 #define TO1D(i,j,k,s1,s2) i+(j-1)*s1+(k-1)*s1*s2
 Chd|====================================================================
 Chd|  I25TAGN                       source/interfaces/int25/i25norm.F
@@ -36,7 +36,8 @@ Chd|====================================================================
      4                    TAGNOD    ,IAD_ELEM,FR_ELEM ,ADMSR    ,KNOR2MSR ,
      5                    NOR2MSR   ,FLAGREMN,KREMNOR ,REMNOR   ,IEDGE    ,
      6                    NEDGE,LEDGE,NRTM_FREE,FREE_IRECT_ID,I_STOK_E2S  ,
-     7                    CANDM_E2S  ,CANDS_E2S  ,MVOISIN ,E2S_ACTNOR,NADMSR )
+     7                    CANDM_E2S  ,CANDS_E2S  ,MVOISIN ,E2S_ACTNOR,NADMSR ,
+     8                    NUMBER_EDGE_TYPE1,NUMBER_EDGE_TYPE1_0,EDGE_TYPE1,EDGE_TYPE1_0 )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -49,17 +50,14 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
-#include      "mvsiz_p.inc"
 #include      "i25edge_c.inc"
 
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "scr05_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com08_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -73,6 +71,10 @@ C-----------------------------------------------
       INTEGER, INTENT(IN) :: IEDGE,NEDGE
       INTEGER :: LEDGE(NLEDGE,NEDGE)
       INTEGER :: FREE_IRECT_ID(NRTM),NRTM_FREE
+      INTEGER, INTENT(in) :: NUMBER_EDGE_TYPE1 !< number of solid edge
+      INTEGER, INTENT(in) :: NUMBER_EDGE_TYPE1_0 !< number of solid + S edge
+      INTEGER, DIMENSION(NUMBER_EDGE_TYPE1), INTENT(in) :: EDGE_TYPE1 !< solid edge list
+      INTEGER, DIMENSION(NUMBER_EDGE_TYPE1_0), INTENT(in) :: EDGE_TYPE1_0 !< solid + S edge list
 C     REAL
       my_real
      .        STFNS(*)
@@ -307,12 +309,14 @@ C         Primary edges <=> only candidates retained for this cycle (optcd_e2s)
           END DO
 C
 C         All secondary edges includes
-          NEDGFT= 1+(JTASK-1)*NEDGE/NTHREAD
-          NEDGLT= JTASK*NEDGE/NTHREAD
-          DO I = NEDGFT,NEDGLT
+          NEDGFT = 1 + (JTASK-1)*NUMBER_EDGE_TYPE1_0 / NTHREAD
+          NEDGLT = JTASK*NUMBER_EDGE_TYPE1_0 / NTHREAD
+          IF(JTASK==NTHREAD) NEDGLT =NUMBER_EDGE_TYPE1_0
+#include "vectorize.inc"
+          DO J = NEDGFT,NEDGLT
+            I = EDGE_TYPE1_0(J)
 C
-            IF( LEDGE(LEDGE_TYPE,I) < 0 .OR.
-     .         (SH_EDGE==1 .AND. LEDGE(LEDGE_TYPE,I) /= 1 .AND. LEDGE(LEDGE_RIGHT_SEG,I) /= 0)) CYCLE
+            IF(SH_EDGE==1 .AND. LEDGE(LEDGE_TYPE,I) /= 1 .AND. LEDGE(LEDGE_RIGHT_SEG,I) /= 0) CYCLE
             ! Not a secondary edge
 C
             IRM =LEDGE(LEDGE_LEFT_SEG ,I)
@@ -358,10 +362,12 @@ c              IF( LEDGE(LEDGE_TYPE,ABS(CANDS_E2S(I)))/=1)CYCLE
           END DO
 
 C         All secondary edges includes
-          NEDGFT= 1+(JTASK-1)*NEDGE/NTHREAD
-          NEDGLT= JTASK*NEDGE/NTHREAD
-          DO I = NEDGFT,NEDGLT
-             IF(LEDGE(LEDGE_TYPE,I)/=1)CYCLE 
+          NEDGFT = 1 + (JTASK-1)*NUMBER_EDGE_TYPE1 / NTHREAD
+          NEDGLT = JTASK*NUMBER_EDGE_TYPE1 / NTHREAD
+          IF(JTASK==NTHREAD) NEDGLT =NUMBER_EDGE_TYPE1
+#include "vectorize.inc"
+          DO J = NEDGFT,NEDGLT
+            I = EDGE_TYPE1(J)
 C
             IRM =LEDGE(LEDGE_LEFT_SEG ,I)
             IEDG=LEDGE(LEDGE_LEFT_ID  ,I)
@@ -443,17 +449,12 @@ C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
-#include      "assert.inc"
-#include      "i25edge_c.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "scr05_c.inc"
-#include      "spmd_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -1120,16 +1121,8 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
-#include      "scr05_c.inc"
-#include      "com01_c.inc"
-#include      "com08_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s

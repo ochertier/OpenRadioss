@@ -1,28 +1,28 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
-Cel|         I10MAIN_TRI                       /intsort/i10main_tri.F
-Cel|         I11MAIN_TRI                       /intsort/i11main_tri.F
-Cel|         I24MAIN_TRI                       /intsort/i24main_tri.F
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
+C  |         I10MAIN_TRI                       /intsort/i10main_tri.F
+C  |         I11MAIN_TRI                       /intsort/i11main_tri.F
+C  |         I24MAIN_TRI                       /intsort/i24main_tri.F
 Chd|====================================================================
 Chd|  I7XSAVE                       source/interfaces/intsort/i7xsave.F
 Chd|-- called by -----------
@@ -47,14 +47,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com08_c.inc"
-#include      "scr05_c.inc"
 #include      "task_c.inc"
-#include      "param_c.inc"
 #include      "impl1_c.inc"
 #include      "ige3d_c.inc"
 C-----------------------------------------------
@@ -67,15 +61,12 @@ C-----------------------------------------------
      .        SX, SY, SZ, SX2, SY2, SZ2,
      .        X(3,*), XSAV(3,*), CURV_MAX(*)
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER NSNF,NMNF,NSNL,NMNL,I, J, II
       my_real
      .        XXX, YYY, ZZZ 
+      INTEGER :: INCONV_L
 C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
@@ -99,16 +90,19 @@ C
       SY2=ZERO
       SZ2=ZERO
       NMN_L = 0
-C        
+C      
+      INCONV_L = INCONV
       IF(NSN+NMN < NUMNOD+NUMFAKENODIGEO)THEN
-        DO I=NSNF,NSNL
-          J=NSV(I)
-          IF(J>0.AND.J<=(NUMNOD+NUMFAKENODIGEO).AND.INCONV==1)THEN
-            XSAV(1,I)=X(1,J)
-            XSAV(2,I)=X(2,J)
-            XSAV(3,I)=X(3,J)
-          END IF
-        END DO
+        IF(INCONV_L == 1) THEN
+          DO I=NSNF,NSNL
+            J=NSV(I)
+            IF(J>0.AND.J<=(NUMNOD+NUMFAKENODIGEO))THEN
+              XSAV(1,I)=X(1,J)
+              XSAV(2,I)=X(2,J)
+              XSAV(3,I)=X(3,J)
+            END IF
+          END DO
+        ENDIF
         DO I=NMNF,NMNL
           II = I+NSN
           J=MSR(I)
@@ -120,7 +114,7 @@ C msr < 0 <=> shooting nodes
             XMAX= MAX(XMAX,X(1,J))
             YMAX= MAX(YMAX,X(2,J))
             ZMAX= MAX(ZMAX,X(3,J))
-            IF (INCONV==1) THEN
+            IF (INCONV_L==1) THEN
               XSAV(1,II)=X(1,J)
               XSAV(2,II)=X(2,J)
               XSAV(3,II)=X(3,J)
@@ -136,14 +130,16 @@ C msr < 0 <=> shooting nodes
         END DO
       ELSE
 C
-        DO I=NSNF,NSNL
-          J=NSV(I)
-          IF(J>0.AND.J<=(NUMNOD+NUMFAKENODIGEO).AND.INCONV==1)THEN
-            XSAV(1,J)=X(1,J)
-            XSAV(2,J)=X(2,J)
-            XSAV(3,J)=X(3,J)
-          END IF
-        END DO
+        IF(INCONV_L == 1) THEN
+          DO I=NSNF,NSNL
+            J=NSV(I)
+            IF(J>0.AND.J<=(NUMNOD+NUMFAKENODIGEO))THEN
+              XSAV(1,J)=X(1,J)
+              XSAV(2,J)=X(2,J)
+              XSAV(3,J)=X(3,J)
+            END IF
+          END DO
+        ENDIF
         DO I=NMNF,NMNL
           J=MSR(I)
 C msr < 0 <=> shooting nodes
@@ -154,7 +150,7 @@ C msr < 0 <=> shooting nodes
             XMAX= MAX(XMAX,X(1,J))
             YMAX= MAX(YMAX,X(2,J))
             ZMAX= MAX(ZMAX,X(3,J))
-            IF (INCONV==1) THEN
+            IF (INCONV_L==1) THEN
               XSAV(1,J)=X(1,J)
               XSAV(2,J)=X(2,J)
               XSAV(3,J)=X(3,J)

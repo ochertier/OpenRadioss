@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 #define NSUB_MAX 21
 #define NIVEAU_MAX 10
 #define NLIGNES_MAX 20
@@ -39,14 +39,10 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-cow41p23+2
 #include      "comlock.inc"
 #include      "task_c.inc"
-#include      "units_c.inc"
 #include      "warn_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -170,11 +166,8 @@ C-----------------------------------------------
 #include      "implicit_f.inc"
 #include "comlock.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
 #include      "task_c.inc"
 #include      "scr01_c.inc"
 C-----------------------------------------------
@@ -246,8 +239,6 @@ C-----------------------------------------------
 #include      "task_c.inc"
 #include      "scr01_c.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "units_c.inc"
@@ -266,9 +257,15 @@ C-----------------------------------------------
       CHARACTER*80 BLANC
       CHARACTER*132 TEXT(NLIGNES_MAX,PARASIZ)
       INTEGER I,IP,IL,NLIGNES,IT
-      SAVE NLIGNES_PILE,TEXT,CHECK_PILE
+      LOGICAL :: FIRST_CALL = .TRUE.
+      SAVE NLIGNES_PILE,TEXT,CHECK_PILE, FIRST_CALL
       INTEGER NS_SIGNAL1,IW1,LAST_IN
 C-----------------------------------------------
+      IF(FIRST_CALL) THEN
+        FIRST_CALL = .FALSE.
+        NLIGNES_PILE = 0
+        CHECK_PILE = 0
+      ENDIF
 C-----------------------------------------------
       BLANC=' '
       NIVEAU_PILE = TRACE_PILE(0)

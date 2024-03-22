@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  CONC24                        source/materials/mat/mat024/conc24.F
 Chd|-- called by -----------
@@ -36,15 +36,19 @@ Chd|        PLAS24B                       source/materials/mat/mat024/plas24b.F
 Chd|        ROTLOC                        source/materials/mat/mat024/rotloc.F
 Chd|        UDAM24N                       source/materials/mat/mat024/udam24.F
 Chd|====================================================================
-      SUBROUTINE CONC24(PM      ,OFF    ,SIG    ,EINT   ,SIGA   ,
-     2                  EPXA    ,GAMA   ,DAM    ,ANG    ,EPS_F  ,
-     3                  VK0     ,STRAIN ,CRAK   ,DAMSUM ,ROB    ,
-     4                  SIGC    ,VK     ,PLA    ,NGL    ,D1     ,
-     5                  D2      ,D3     ,D4     ,D5     ,D6     ,
-     6                  RX      ,RY     ,RZ     ,SX     ,SY     ,
-     7                  SZ      ,SEQ    ,RHO    ,EPSVP  ,NEL    ,
-     8                  R11     ,R12    ,R13    ,R21    ,R22    ,
-     9                  R23     ,R31    ,R32    ,R33    )
+      SUBROUTINE CONC24(
+     1   PM,      OFF,     SIG,     EINT,
+     2   SIGA,    EPXA,    GAMA,    DAM,
+     3   ANG,     EPS_F,   VK0,     STRAIN,
+     4   CRAK,    DAMSUM,  ROB,     SIGC,
+     5   VK,      PLA,     NGL,     D1,
+     6   D2,      D3,      D4,      D5,
+     7   D6,      RX,      RY,      RZ,
+     8   SX,      SY,      SZ,      SEQ,
+     9   RHO,     EPSVP,   NEL,     R11,
+     A   R12,     R13,     R21,     R22,
+     B   R23,     R31,     R32,     R33,
+     C   JCVT,    JSPH)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -58,7 +62,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "param_c.inc"
-#include      "vect01_c.inc"
 #include      "units_c.inc"
 #include      "com08_c.inc"
 #include      "scr17_c.inc"
@@ -66,6 +69,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: JCVT
+      INTEGER, INTENT(IN) :: JSPH
       INTEGER NGL(NEL),NEL
       my_real GAMA(MVSIZ,6)
       my_real PM(NPROPM), OFF(NEL), SIG(NEL,6), EINT(NEL), SIGA(NEL,3),
@@ -89,7 +94,7 @@ C-----------------------------------------------
      .   SM, DSM, S1,S2,S3,S4,S5,S6,DE1,DE2, DE3, C44, C55, C66
       my_real, DIMENSION(NEL,3,3) :: CDAM
 C=======================================================================
-      DO I=LFT,LLT
+      DO I=1,NEL
         STRAIN(I,1) = STRAIN(I,1) + D1(I)*DT1
         STRAIN(I,2) = STRAIN(I,2) + D2(I)*DT1
         STRAIN(I,3) = STRAIN(I,3) + D3(I)*DT1
@@ -100,7 +105,7 @@ C=======================================================================
 C . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 C ARMATURES
 C . . . . . . . . . . .
-      DO I=LFT,LLT
+      DO I=1,NEL
         ARM1(I) = PM(53)
         ARM2(I) = PM(54)
         ARM3(I) = PM(55)
@@ -108,20 +113,22 @@ C . . . . . . . . . . .
       VMAX = PM(27)
       RT   = PM(34)
       EPSMAX = PM(47)
-      YMS  = PM(50)         
-      Y0S  = PM(51)         
-      ETS  = PM(52)         
+      YMS  = PM(50)  !young modulus       
+      Y0S  = PM(51)  !yield strength         
+      ETS  = PM(52)  !tangent modulus        
       ICAP = NINT(PM(57))   
 c
       ARMA = ZERO
-      DO I=LFT,LLT
+      DO I=1,NEL
         ARMA = ARMA + ARM1(I) + ARM2(I) + ARM3(I)
       ENDDO
 c     GAMA = repere  d'armature
-      CALL ROTLOC(NEL,GAMA,
-     .            RX,RY,RZ,SX,SY,SZ,
-     .            R11,R12,R13,R21,R22,
-     .            R23,R31,R32,R33)
+      CALL ROTLOC(
+     1   NEL,     GAMA,    RX,      RY,
+     2   RZ,      SX,      SY,      SZ,
+     3   R11,     R12,     R13,     R21,
+     4   R22,     R23,     R31,     R32,
+     5   R33,     JCVT,    JSPH)
 c
       CALL GLOA24(NEL,STRAIN,DT1,ARM1,ARM2,ARM3,
      .            D1,D2,D3,D4,D5,D6,
@@ -149,7 +156,7 @@ c------
 c------
 C     2 - EVALUATION DU CRITERE
 c------
-      CALL CRIT24(NEL,PM,SIGC,VK0,OFF,
+      CALL CRIT24(NEL,PM,SIGC,VK0,VK,OFF,
      .            ROB,NGL,SEQ,
      .            S01,S02,S03,S04,S05,S06,
      .            S1 ,S2 ,S3 ,S4 ,S5 ,S6 ,
@@ -161,7 +168,7 @@ c------
       I1 = 0
       I2 = 0
 c
-      DO I=LFT,LLT
+      DO I=1,NEL
         IF (OFF(I) /= ZERO) THEN        !calculated in CRIT24>FR() SCLE3=-/+1 -1:elastic
           !---------------------------!
           !---      ELASTIC        ---!
@@ -172,7 +179,7 @@ c
             SIGC(I,3)=S03(I)
             SIGC(I,4)=S04(I)
             SIGC(I,5)=S05(I)
-            SIGC(I,6)=S06(I)			 
+            SIGC(I,6)=S06(I)       
           !---------------------------!
           !---      DAMAGE         ---!
           !---------------------------!           
@@ -182,7 +189,7 @@ c
             SIGC(I,3)=S03(I)
             SIGC(I,4)=S04(I)
             SIGC(I,5)=S05(I)
-            SIGC(I,6)=S06(I)			 
+            SIGC(I,6)=S06(I)       
             IF (DAM(I,1) == ZERO .or. DAM(I,2) == ZERO .or. DAM(I,3) == ZERO) THEN 
               I1 = I1 + 1
               INDEX1(I1) = I
@@ -234,7 +241,7 @@ c---------------------------------------------------------------
         ENDIF                  
       ENDIF                  
 c-----
-      DO I=LFT,LLT
+      DO I=1,NEL
         SIG(I,1)=SIGC(I,1)
         SIG(I,2)=SIGC(I,2)
         SIG(I,3)=SIGC(I,3)
@@ -248,14 +255,14 @@ c-----
 C . . . . . . . . . . . . . .
 C     CALCUL DU OFF
 C . . . . . . . . . . . . .
-      DO I=LFT,LLT
+      DO I=1,NEL
         IF(OFF(I) < EM01) OFF(I)=ZERO
         IF(OFF(I) < ONE)   OFF(I)=OFF(I)*FOUR_OVER_5
       ENDDO
 C
       I1 = 0
       IF(N2D/=1) THEN
-        DO I=LFT,LLT
+        DO I=1,NEL
           IF (OFF(I)>=ONE) THEN
             ETEST= MAX(CRAK(I,1),CRAK(I,2),CRAK(I,3))
             IF(ETEST>=EPSMAX)THEN
@@ -266,7 +273,7 @@ C
           ENDIF
         ENDDO
       ELSE
-        DO I=LFT,LLT
+        DO I=1,NEL
           IF(OFF(I)>=ONE) THEN
             PLUS=STRAIN(I,1)+STRAIN(I,2)
             DIFF=STRAIN(I,1)-STRAIN(I,2)
@@ -294,7 +301,7 @@ c-----------------------
 c     RETOUR REPERE ARMATURE
 c-----------------------
       NBDAMA = 0
-      DO I=LFT,LLT
+      DO I=1,NEL
         IF (DAMSUM(I) > ZERO) THEN
           NBDAMA = NBDAMA + 1
           DAMAI(NBDAMA)=I
@@ -305,7 +312,7 @@ c
 c
 c     ADDITION DES FORCES ARMATURES ET RETOUR REPERE GLOBAL
       IF (ARMA > ZERO) THEN
-        DO I=LFT,LLT
+        DO I=1,NEL
           SIG(I,1) = SIG(I,1) * (ONE - ARM1(I)) + ARM1(I)*SIGA(I,1)
           SIG(I,2) = SIG(I,2) * (ONE - ARM2(I)) + ARM2(I)*SIGA(I,2)
           SIG(I,3) = SIG(I,3) * (ONE - ARM3(I)) + ARM3(I)*SIGA(I,3)
@@ -315,7 +322,7 @@ c-------------------------
       CALL AGLO24(NEL,SIG,R11,R12,R13,
      .            R21,R22,R23,R31,R32,R33)
 c-------------------------
-      DO I=LFT,LLT
+      DO I=1,NEL
         SIG(I,1)=SIG(I,1)*OFF(I)
         SIG(I,2)=SIG(I,2)*OFF(I)
         SIG(I,3)=SIG(I,3)*OFF(I)

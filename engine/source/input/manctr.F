@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  MANCTR                        source/input/manctr.F         
 Chd|-- called by -----------
@@ -28,15 +28,22 @@ Chd|-- calls ---------------
 Chd|        REDKEY2                       source/input/redkey2.F        
 Chd|        SPMD_IBCAST                   source/mpi/generic/spmd_ibcast.F
 Chd|        SPMD_RBCAST                   source/mpi/generic/spmd_rbcast.F
+Chd|        ALE_MOD                       ../common_source/modules/ale/ale_mod.F
+Chd|        ANIM_MOD                      ../common_source/modules/anim_mod.F
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|        INOUTFILE_MOD                 ../common_source/modules/inoutfile_mod.F
+Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
 Chd|====================================================================
-      SUBROUTINE MANCTR(SENSOR,H3D_DATA)
+      SUBROUTINE MANCTR(SENSORS ,H3D_DATA)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE NAMES_AND_TITLES_MOD, ONLY: NCHARLINE100
       USE H3D_MOD         
       USE INOUTFILE_MOD
+      USE SENSOR_MOD
+      USE ANIM_MOD
+      USE ALE_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -45,6 +52,7 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
+#include      "com04_c.inc"
 #include      "com06_c.inc"
 #include      "com08_c.inc"
 #include      "units_c.inc"
@@ -52,18 +60,13 @@ C-----------------------------------------------
 #include      "scr07_c.inc"
 #include      "scr14_c.inc"
 #include      "chara_c.inc"
-#include      "param_c.inc"
 #include      "task_c.inc"
-#include      "scr05_c.inc"
-#include      "check.inc"
 #include      "rad2r_c.inc"
-#include      "nchara_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      my_real
-     .     SENSOR(NSENSR,*)
       TYPE(H3D_DATABASE) :: H3D_DATA
+      TYPE (SENSORS_) ,INTENT(INOUT) :: SENSORS
 C-----------------------------------------------
 C   L o c a l   P a r a m e t e r s
 C-----------------------------------------------
@@ -72,18 +75,13 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER J,MANIM0, MREST0, MSTOP0, MFILR, MCYCLE, LK2, IKEY,
-     .   WMCHECK0, MSG_R2R, R2R_MSTOP_LOC,ICTLSTOP0, MH3D0
-C     REAL
-      my_real
-     .   TMPMAN(50)
-      my_real
-     .   TMAN,TMAN_LOC
-      CHARACTER FILNAM*100, CARTE*ncharline, KEY2*80, FMT*80, 
-     . KEY0(NKEY)*5,REC*1
+      INTEGER J,MANIM0, MREST0, MSTOP0, MFILR, MCYCLE, LK2, IKEY, WMCHECK0, 
+     .   MSG_R2R, R2R_MSTOP_LOC,ICTLSTOP0, MH3D0,SENS_ID
+      my_real TMPMAN(50), TMAN,TMAN_LOC
+      CHARACTER FILNAM*100, KEY2*80, FMT*80, KEY0(NKEY)*5,REC*1
+      CHARACTER(LEN=NCHARLINE100)::CARTE
       INTEGER :: LEN_TMP_NAME
       CHARACTER(len=2148) :: TMP_NAME
-
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
@@ -116,58 +114,59 @@ C-----------------------------
       MSG_R2R = 0
       IF ((IRAD2R==1).AND.(NCYCLE<2)) R2R_MFILR = 0   
 C
-      IF(IALESUB/=0 .AND. TT+DT2<=T1S+DT2S)RETURN
+      IF(ALE%SUB%IALESUB/=0 .AND. TT+DT2<=T1S+DT2S)RETURN
 C SOUS CYCLAGE ALE
 C-----------------------------
 C     SENSOR 
 C-----------------------------
-       IF(IANISENS>0)THEN
-        IF(TT>SENSOR(2,IANISENS))THEN
-C         ACTIVATION
-          IANISENS=-IANISENS
-          TANIMSENS=TT+DTANISENS
-          MANIM=4
-          MDESS=MDESS+MANIM
-        ENDIF
-       ELSEIF(IANISENS<0)THEN
-        IF(TT<SENSOR(2,-IANISENS))THEN
-C         DEACTIVATION
-          IANISENS=-IANISENS
-        ELSEIF(TT>TANIMSENS)THEN
-C         ACTIF
-          TANIMSENS=TANIMSENS+DTANISENS
-          MANIM=4
-          MDESS=MDESS+MANIM
-          RETURN
-        ENDIF
+       IF (SENSORS%ANIM_ID > 0)THEN
+         IF (TT > SENSORS%SENSOR_TAB(SENSORS%ANIM_ID)%TSTART) THEN
+C          ACTIVATION
+           SENSORS%ANIM_ID = -SENSORS%ANIM_ID
+           TANIMSENS = TT + SENSORS%ANIM_DT
+           MANIM=4
+           MDESS=MDESS+MANIM
+         ENDIF
+       ELSEIF (SENSORS%ANIM_ID < 0) THEN
+         IF (TT < SENSORS%SENSOR_TAB(-SENSORS%ANIM_ID)%TSTART) THEN
+C          DEACTIVATION
+           SENSORS%ANIM_ID = -SENSORS%ANIM_ID
+         ELSEIF (TT > TANIMSENS) THEN
+C          ACTIF
+           TANIMSENS = TANIMSENS + SENSORS%ANIM_DT
+           MANIM=4
+           MDESS=MDESS+MANIM
+           RETURN
+         ENDIF
        ENDIF
-       IF(NLSENS>0)THEN
-         DO I=1,NLSENS
-           IF(LANISENS(I)>0)THEN
-             IF(TT>SENSOR(2,LANISENS(I)))THEN
-C           ACTIVATION
-               LANISENS(I)=-LANISENS(I)
+c
+       IF (SENSORS%NANIM > 0) THEN
+         DO I=1,SENSORS%NANIM
+           SENS_ID = SENSORS%ANIM(I)
+           IF (SENSORS%ANIM(I) > 0) THEN
+             IF (TT > SENSORS%SENSOR_TAB(SENS_ID)%TSTART) THEN  ! ACTIVATION
+               SENSORS%ANIM(I) = -SENS_ID
                MANIM=4
                MDESS=MDESS+MANIM
              ENDIF
-           ELSEIF(LANISENS(I)<0)THEN
-             IF(TT<SENSOR(2,-LANISENS(I)))THEN
-C           DEACTIVATION
-               LANISENS(I)=-LANISENS(I)
+           ELSEIF (SENS_ID < 0) THEN
+             IF (TT < SENSORS%SENSOR_TAB(-SENS_ID)%TSTART) THEN ! DEACTIVATION
+               SENSORS%ANIM(I) = -SENS_ID
              ENDIF
            ENDIF
          ENDDO
        ENDIF
+c
        IF(H3D_DATA%N_SENS_H3D>0)THEN
          DO I=1,H3D_DATA%N_SENS_H3D
            IF(H3D_DATA%LSENS_H3D(I)>0)THEN
-             IF(TT>SENSOR(2,H3D_DATA%LSENS_H3D(I)))THEN
+             IF (TT > SENSORS%SENSOR_TAB(H3D_DATA%LSENS_H3D(I))%TSTART) THEN
 C           ACTIVATION
                H3D_DATA%LSENS_H3D(I)=-H3D_DATA%LSENS_H3D(I)
                H3D_DATA%MH3D=1
              ENDIF
-           ELSEIF(H3D_DATA%LSENS_H3D(I)<0)THEN
-             IF(TT<SENSOR(2,-H3D_DATA%LSENS_H3D(I)))THEN
+           ELSEIF (H3D_DATA%LSENS_H3D(I)<0) THEN
+             IF (TT < SENSORS%SENSOR_TAB(-H3D_DATA%LSENS_H3D(I))%TSTART) THEN
 C           DEACTIVATION
                H3D_DATA%LSENS_H3D(I)=-H3D_DATA%LSENS_H3D(I)
              ENDIF
@@ -221,11 +220,11 @@ C CYCLE
            GOTO 100
           ENDIF  
           READ(KEY2,FMT,ERR=990,END=990)MCYCLE
-C MCYCLE DESATIVE EN MULTIDOMAINES	  
-	  IF (IRAD2R==1) THEN
-	    MSG_R2R = 1
-	    MCYCLE = 0
-	  ENDIF 	  
+C MCYCLE DESATIVE EN MULTIDOMAINES    
+            IF (IRAD2R==1) THEN
+              MSG_R2R = 1
+              MCYCLE = 0
+            ENDIF     
           GOTO 100
 C PLOT
  30       MANIM0=MANIM0+1
@@ -314,7 +313,7 @@ C
          IF(MH3D0 == 1)
      .    WRITE(IUSC3,'(A,A)',ERR=990)' UPDATE H3D FILE', CARTE
          MFILR=1
-	 IF (IRAD2R==1) R2R_MFILR=1    
+           IF (IRAD2R==1) R2R_MFILR=1    
          GOTO 999
  990    CONTINUE
         CLOSE (IUSC3)
@@ -330,33 +329,32 @@ C---------------------------------
        IF (IRAD2R==1) THEN
          IF (ISPMD==0) THEN
 C *** traitement flag mstop ***       
-	   MSTOP = R2R_MSTOP
+             MSTOP = R2R_MSTOP
            R2R_MSTOP = MSTOP0
-	   MSTOP0 = MSTOP	 	 	 
-       	   IF (R2R_MFILR == 1) THEN      
+             MSTOP0 = MSTOP         
+             IF (R2R_MFILR == 1) THEN      
 C *** stockage des flags pour envoi     rad2rad ***
-             TMAN_R2R = TMAN	  	       
+             TMAN_R2R = TMAN             
              R2R_CTR(1) = MREST0
              R2R_CTR(2) = MANIM0
-             R2R_CTR(3) = WMCHECK0	   
-	   ELSEIF (R2R_MFILR == 2) THEN
+             R2R_CTR(3) = WMCHECK0     
+             ELSEIF (R2R_MFILR == 2) THEN
 C *** on applique les flags recus de rad2rad ***
              MFILR = 1
-	     R2R_MFILR = 0
+               R2R_MFILR = 0
              TMAN = TMAN_R2R
-	     MANIM0 = R2R_CTR(2)
-	     WMCHECK0= R2R_CTR(3)	     	   	 	 	 	 	 	 
-	   ENDIF
-	 ENDIF
-         IF(NSPMD > 1) CALL SPMD_IBCAST(MFILR,MFILR,1,1,0,2)	   	 	 	 	          
+               MANIM0 = R2R_CTR(2)
+               WMCHECK0= R2R_CTR(3)                              
+             ENDIF
+           ENDIF
+         IF(NSPMD > 1) CALL SPMD_IBCAST(MFILR,MFILR,1,1,0,2)                          
        ENDIF
 
 C---------------------------------
 C     ECHANGE MULTIPROCS
 C---------------------------------
-      IF((IANISENS/=0.OR.NLSENS/=0.OR.H3D_DATA%N_SENS_H3D>0).OR.
-     .  ((NCYCLE/NCINP)*NCINP==NCYCLE).OR.
-     .  ((IRAD2R==1).AND.(MFILR==1))) THEN    
+      IF((SENSORS%ANIM_ID /=0 .OR. SENSORS%NANIM /=0 .OR. H3D_DATA%N_SENS_H3D > 0) .OR.
+     .  ((NCYCLE/NCINP)*NCINP==NCYCLE) .OR. (IRAD2R==1 .AND. MFILR==1)) THEN    
           IF (ISPMD==0) THEN
              TMPMAN(1) = MDESS
              TMPMAN(2) = MREST0

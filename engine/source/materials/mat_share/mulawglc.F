@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  MULAWGLC                      source/materials/mat_share/mulawglc.F
 Chd|-- called by -----------
@@ -35,7 +35,7 @@ Chd|        SIGEPS56G                     source/materials/mat/mat056/sigeps56g.
 Chd|        SIGEPS60G                     source/materials/mat/mat060/sigeps60g.F
 Chd|        SIGEPS86G                     source/materials/mat/mat086/sigeps86g.F
 Chd|        UROTO                         source/airbag/uroto.F         
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        TABLE_MOD                     share/modules/table_mod.F     
 Chd|====================================================================
       SUBROUTINE MULAWGLC(ELBUF_STR,
@@ -65,12 +65,9 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "units_c.inc"
-#include      "scr06_c.inc"
 #include      "scr17_c.inc"
 #include      "param_c.inc"
-#include      "com04_c.inc"
 #include      "com08_c.inc"
-#include      "com20_c.inc"
 #include      "impl1_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -90,9 +87,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER IGTYP, I, NUVAR ,NINDX,IGEO(NPROPGI,*),NVARTMP,
+      INTEGER IGTYP, I, NUVAR ,VP,NINDX,IGEO(NPROPGI,*),NVARTMP,
      .        MX,IOFF_DUCT(MVSIZ),ISRATE
-C     REAL
       my_real 
      .   DEGMB(MVSIZ) ,DEGFX(MVSIZ) ,THKN(MVSIZ),
      .   DEPSXX(MVSIZ),DEPSYY(MVSIZ),DEPSXY(MVSIZ),DEPSYZ(MVSIZ),
@@ -109,18 +105,18 @@ C     REAL
      .   MOMOXX(MVSIZ),MOMOYY(MVSIZ),MOMOXY(MVSIZ),
      .   MOMNXX(MVSIZ),MOMNYY(MVSIZ),MOMNXY(MVSIZ),
      .   ETSE(MVSIZ)  ,EPSPL(MVSIZ),EPSP_LOC(MVSIZ)
-      my_real,
-     .  DIMENSION(:) ,POINTER :: UVAR
+      my_real,DIMENSION(:) ,POINTER :: UVAR
       my_real, DIMENSION(MVSIZ) :: DT_INV
 C-------------------------------------
       INTEGER, DIMENSION(:), POINTER :: VARTMP
       TYPE(L_BUFEL_) ,POINTER :: LBUF
-C-------------------------------------
-C---+----1----+----2----+----3----+----4----+----5----+----6----+----7--
+C-----------------------------------------------
+C   S o u r c e   L i n es
+C-----------------------------------------------
 C
       LBUF => ELBUF_STR%BUFLY(1)%LBUF(IR,IS,1)
 C
-C     pour les lois user pid(i)=pid(1)
+C     for user material laws : pid(i)=pid(1)
       IGTYP  = IGEO(11,PID(1))
       IF(MTN==43.OR.MTN==56.OR.MTN==60.OR.MTN==86) THEN
         NUVAR  = ELBUF_STR%BUFLY(1)%NVAR_MAT
@@ -146,6 +142,8 @@ C
       DO I=JFT,JLT
         DT_INV(I) = DT1C(I)/MAX(DT1C(I)**2,EM20)
       ENDDO
+!
+      ETSE(1:MVSIZ) = ZERO      
 C-----------------------------------------------------------
 C     EPS POINT EQUIVALENT (au sens energetique)
 C-----------------------------------------------------------
@@ -181,7 +179,7 @@ C     eps_eq = sqrt[ eps_m^2 + 1/12 k^2t^2 ]
         END DO
       ENDIF
 C-----------------------
-C     PLASTICITE GLOBALE
+C     GLOBAL PLASTICITY
 C-----------------------
       DO I=JFT,JLT
         SIGNXX(I) = ZERO
@@ -309,8 +307,8 @@ C
         EPSPZX(I) = DEPSZX(I)*DT_INV(I)
       ENDDO
 C-------------------------------------------
-C      CONTRAINTES ELASTIQUES + 
-C      CONTRAINTES PLASTIQUEMENT ADMISSIBLES
+C      ELASTIC STRESS + 
+C      PLASTICLY ADMISSIBLE STRESS
 C-------------------------------------------
       IF (MTN == 1) THEN
         CALL SIGEPS01G(JFT     ,JLT     ,G       ,THKN    ,OFF     ,
@@ -322,6 +320,7 @@ C-------------------------------------------
      6                 SIGNYY  ,SIGNXY  ,SIGNYZ  ,SIGNZX  ,MOMNXX  ,
      7                 MOMNYY  ,MOMNXY  )
       ELSEIF (MTN == 2) THEN
+        VP = IPM(255,MX)
         CALL SIGEPS02G(ELBUF_STR,
      1                 JFT     ,JLT     ,PM      ,FOR     ,MOM     ,
      2                 THKN    ,EINT    ,OFF     ,DT1C    ,ISRATE  ,
@@ -334,7 +333,7 @@ C-------------------------------------------
      9                 SIGOZX  ,MOMOXX  ,MOMOYY  ,MOMOXY  ,SIGNXX  ,
      A                 SIGNYY  ,SIGNXY  ,SIGNYZ  ,SIGNZX  ,MOMNXX  ,
      B                 MOMNYY  ,MOMNXY  ,ETSE    ,EXZ     ,EYZ     ,
-     C                 NEL    ,IOFF_DUCT)
+     C                 NEL    ,IOFF_DUCT,VP      , NUVAR  ,UVAR )
       ELSEIF (MTN == 22) THEN
         CALL SIGEPS22G(ELBUF_STR,
      1            JFT     ,JLT     ,PM      ,FOR     ,MOM      ,
@@ -516,9 +515,9 @@ C---------------------------
         DO I=JFT,JLT                                                   
           VISCMX(I) = MAX(VISCMX(I),DM)
           VISC = ONEP414*DM*RHO(I)*SSP(I)*SQRT(AREA(I))*DT_INV(I)        
-          FOR(I,1) = FOR(I,1) + VISC*(EXX(I)+HALF*EYY(I))		  
-          FOR(I,2) = FOR(I,2) + VISC*(EYY(I)+HALF*EXX(I))		  
-          FOR(I,3) = FOR(I,3) + VISC* EXY(I)*THIRD			     
+          FOR(I,1) = FOR(I,1) + VISC*(EXX(I)+HALF*EYY(I))      
+          FOR(I,2) = FOR(I,2) + VISC*(EYY(I)+HALF*EXX(I))      
+          FOR(I,3) = FOR(I,3) + VISC* EXY(I)*THIRD           
         ENDDO
       ENDIF
 C

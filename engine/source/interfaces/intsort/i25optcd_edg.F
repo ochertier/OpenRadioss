@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  I25OPTCD_EDG                  source/interfaces/intsort/i25optcd_edg.F
 Chd|-- called by -----------
@@ -67,14 +67,8 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "task_c.inc"
-#include      "scr05_c.inc"
-#include      "scr07_c.inc"
-#include      "scr18_c.inc"
-#include      "units_c.inc"
 #include      "com01_c.inc"
-#include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "couple_c.inc"
 #include      "parit_c.inc"
 #include      "i25edge_c.inc"
 #include      "assert.inc"
@@ -128,7 +122,7 @@ C
 C            CAND_S is local
              IF(SH_EDGE==1.AND.LEDGE(3,CAND_S(I))/=0) CYCLE ! Shell edge is not a free edge
 
-	     IF(SH_EDGE==3 .AND.
+               IF(SH_EDGE==3 .AND.
      .          LEDGE(3,CAND_M(I))/=0 .AND.
      .          LEDGE(3,CAND_S(I))/=0) CYCLE ! One of the 2 edges is not a free edge
 
@@ -142,7 +136,7 @@ C            CAND_S is local
              IF(SH_EDGE==1.AND.LEDGE_FIE(NIN)%P(E_RIGHT_SEG,CAND_S(I)-NEDGE)/=0) CYCLE ! Shell edge is not a free edge
 C            IF(SH_EDGE==1.AND.LEDGE(3,CAND_M(I))/=0) CYCLE ! Shell edge is not a free edge
 
-	     IF(SH_EDGE==3 .AND.
+               IF(SH_EDGE==3 .AND.
      .          LEDGE(3,CAND_M(I))/=0 .AND.
      .          LEDGE_FIE(NIN)%P(E_RIGHT_SEG,CAND_S(I)-NEDGE)/=0) CYCLE ! One of the 2 edges is not a free edge
        DEBUG_E2E(LEDGE(8,CAND_M(I))==D_EM.AND.LEDGE_FIE(NIN)%P(1,CAND_S(I)-NEDGE)==D_ES,STIFIE(NIN)%P(CAND_S(I)-NEDGE))
@@ -183,7 +177,7 @@ C            IF(SH_EDGE==1.AND.LEDGE(3,CAND_M(I))/=0) CYCLE ! Shell edge is not 
 
            IF(SH_EDGE==1.AND.LEDGE(3,CAND_S(I))/=0) CYCLE ! Shell edge is not a free edge
 
-	   IF(SH_EDGE==3 .AND.
+             IF(SH_EDGE==3 .AND.
      .        LEDGE(3,CAND_M(I))/=0 .AND.
      .        LEDGE(3,CAND_S(I))/=0) CYCLE ! One of the 2 edges is not a free edge
 
@@ -328,7 +322,7 @@ C
          NLS=0
 #include      "vectorize.inc"
          DO LS = NLF, NLT
-Cel conserver LISTI et LIST pour optimiser le code genere (IA64)
+C   conserver LISTI et LIST pour optimiser le code genere (IA64)
           IS = LISTI(LS)
           I=JS+IS
           II = CAND_S(I)-NEDGE

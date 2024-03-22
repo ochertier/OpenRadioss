@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  SGRTAILS                      source/elements/solid/solide/sgrtails.F
 Chd|-- called by -----------
@@ -28,29 +28,32 @@ Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
 Chd|        ARRET                         source/system/arret.F         
 Chd|        FRETITL2                      source/starter/freform.F      
+Chd|        INIT_MAT_KEYWORD              source/materials/mat/init_mat_keyword.F
 Chd|        MY_ORDERS                     ../common_source/tools/sort/my_orders.c
 Chd|        ZEROIN                        source/system/zeroin.F        
 Chd|        CLUSTER_MOD                   share/modules1/cluster_mod.F  
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        INIVOL_ARRAY_MOD              share/modules1/inivol_mod.F   
 Chd|        INIVOL_DEF_MOD                share/modules1/inivol_mod.F   
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/matparam_def_mod.F
+Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        R2R_MOD                       share/modules1/r2r_mod.F      
 Chd|        REORDER_MOD                   share/modules1/reorder_mod.F  
 Chd|====================================================================
       SUBROUTINE SGRTAILS(
      1       IXS    ,PM     ,IPARG  ,GEO     ,
-     2       EADD   ,ND     ,NELS   ,IPARTS  ,DD_IAD  ,
-     3       IDX    ,ISOLNOD,LB_MAX ,INUM    ,INDEX   ,
+     2       EADD   ,ND     ,IPARTS  ,DD_IAD  ,
+     3       IDX    ,ISOLNOD,INUM    ,INDEX   ,
      4       CEP    ,ITR1   ,IXS10  ,IGRSURF ,IGRBRIC ,
-     5       IXS20  ,IXS16  ,IGEO    ,
+     5       IXS20  ,IXS16  ,IGEO    , IDDLEVEL,
      6       IPM    ,NOD2ELS,ISOLOFF,ISOLNOD1,
      7       TAGPRT_SMS,INIVOL,SPH2SOL ,SOL2SPH,SOL2SPH_TYP,
-     8       IFLAG_BPRELOAD,CLUSTERS,MATPARAM_TAB,RNOISE)
+     8       IFLAG_BPRELOAD,CLUSTERS,MATPARAM_TAB,RNOISE,
+     9       PRINT_FLAG)
 C-----------------------------------------------
 C   A n a l y s e   M o d u l e
 C-----------------------------------------------
+      USE MY_ALLOC_MOD
       USE MESSAGE_MOD
       USE R2R_MOD
       USE REORDER_MOD
@@ -59,6 +62,7 @@ C-----------------------------------------------
       USE MATPARAM_DEF_MOD
       USE INIVOL_DEF_MOD
       USE INIVOL_ARRAY_MOD
+      USE QA_OUT_MOD
 C-----------------------------------------------
 C            A R G U M E N T S
 C-----------------------------------------------
@@ -81,39 +85,32 @@ C   I M P L I C I T   T Y P E S
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G L O B A L   P A R A M E T E R S
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C O M M O N   B L O C K S
 C-----------------------------------------------
 #include      "vect01_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com10_c.inc"
 #include      "units_c.inc"
 #include      "param_c.inc"
-#include      "warn_c.inc"
-#include      "scr03_c.inc"
-#include      "scr12_c.inc"
 #include      "scr21_c.inc"
 #include      "sms_c.inc"
 #include      "scr17_c.inc"
 #include      "r2r_c.inc"
 #include      "sphcom.inc"
 #include      "boltpr_c.inc"
-#include      "my_allocate.inc"
 C-----------------------------------------------
 C   D U M M Y   A R G U M E N T S
 C-----------------------------------------------
-      INTEGER ND, IDX, LB_MAX
+      INTEGER ND, IDX
       INTEGER IXS(11,*),IPARG(NPARG,*),EADD(*), ISOLNOD(*),
-     .        DD_IAD(NSPMD+1,*),IPARTS(*), NELS(*),
+     .        DD_IAD(NSPMD+1,*),IPARTS(*),
      .        INUM(16,*), INDEX(*),CEP(*),ITR1(*),IXS10(6,*),IXS20(12,*),
      .        IXS16(8,*),IGEO(NPROPGI,NUMGEO),IPM(NPROPMI,NUMMAT),
      .        NOD2ELS(*), ISOLOFF(*),ISOLNOD1(*),
      .        TAGPRT_SMS(*),SPH2SOL(*),
      .        SOL2SPH(2,*),SOL2SPH_TYP(*),IFLAG_BPRELOAD(*)
+      INTEGER, INTENT(IN) :: IDDLEVEL
+      INTEGER, INTENT(IN) :: PRINT_FLAG !< flag to print the element group data
       TYPE(MATPARAM_STRUCT_) , TARGET, DIMENSION(NUMMAT),INTENT(IN) :: MATPARAM_TAB
       MY_REAL  PM(NPROPM,NUMMAT), GEO(NPROPG,NUMGEO), RNOISE(NPERTURB,NUMELS)
 C-----------------------------------------------
@@ -128,7 +125,7 @@ C-----------------------------------------------
      .   NGR1, MLN, NG, ISSN, ISSN_, N, MID, PID, II,ILOC,IL,NEL, NE1,IREP,IINT,
      .   P, NEL_PREC, IGT, JHBE, I, IKSNOD0,NB,IEOS,NLAY,
      .   MODE, WORK(70000), NN, J, NPTR,NPTS,NPTT,NPG,
-     .   IPLAST,NUVARP, IALEL, MT, INEG, JIVF,ICPRE,ICSTR,
+     .   IPLAST,NUVARP, IALEL, INEG, JIVF,ICPRE,ICSTR,
      .   IFAIL,IMATVIS,NLY,NL,ILAW,IM,IPMAT,ITET4,ITET10,
      .   NGP(NSPMD+1),JJ,IFAILMODEL,NFAIL,ISVIS,IVISC,IMAT,
      .   INUM_R2R(1+R2R_SIU*NUMELS),IPARTSPH,IPARTR2R,MFT,IBOLTP,ICP0,ISM0,
@@ -143,11 +140,12 @@ C-----------------------------------------------
       my_real, DIMENSION(:,:), ALLOCATABLE :: XNUM_RNOISE
       TYPE(MATPARAM_STRUCT_) , POINTER :: MATPARAM
       LOGICAL lFOUND
+      INTEGER :: NB_NODES, LDIM, OFFSET
 C--------------------------------------------------------------
 C         BORNAGE DES GROUPES DE MVSIZ
 C--------------------------------------------------------------
-      MY_ALLOCATE(INDEXS2,NUMELS)
-
+      CALL MY_ALLOC(INDEXS2,NUMELS)
+      nullify(MATPARAM)
       INDEXS2(1:NUMELS)=PERMUTATION%SOLID(1:NUMELS)
       NGR1 = NGROUP + 1
 C
@@ -158,7 +156,7 @@ C
      .                           C1='XNUM_RNOISE')
       ENDIF
 C
-C phase 1 : domain decompostition
+C phase 1 : domain decomposition
 C
       IDX=IDX+ND*(NSPMD+1)
       CALL ZEROIN(1,ND*(NSPMD+1),DD_IAD(1,NSPGROUP+1))
@@ -209,8 +207,16 @@ C
           ENDDO
         END IF
       
-        MODE=0
-        CALL MY_ORDERS( MODE, WORK, CEP(NFT+1), INDEX, NEL , 1)
+        IF(DOQA .NE. 0 .OR. IDDLEVEL == 0) THEN
+          MODE=0
+          CALL MY_ORDERS( MODE, WORK, CEP(NFT+1), INDEX, NEL , 1)
+        ELSE
+          NB_NODES = 8 ! 8 nodes for solids
+          LDIM = 16 ! fist dimension of INUM
+          OFFSET = 2 ! nodes starts at INUM(3,I)
+          CALL CPP_REORDER_ELEMENTS(NEL, NSPMD, NB_NODES, OFFSET, LDIM , CEP(NFT+1), INUM, INDEX)
+        ENDIF
+
         DO I = 1, NEL
           PERMUTATION%SOLID(I+NFT)=INDEXS2(INDEX(I)+NFT)
           IPARTS(I+NFT)=INUM(1,INDEX(I))
@@ -455,6 +461,7 @@ C Bolt preloading
           IF (NPRELOAD > 0) THEN
            IBOLTP=IFLAG_BPRELOAD(II)
           ENDIF
+          IPARTR2R = 0
           IF (NSUBDOM>0) IPARTR2R = TAG_MAT(MID)
           ID = IGEO(1,PID)
           CALL FRETITL2(TITR,IGEO(NPROPGI-LTITR+1,PID),LTITR)
@@ -480,6 +487,8 @@ C de plus ISOLNOD remis a 0 real dans lectur
           IVISC = 0
           ITSH = 0
           IT10 = 0
+          ITET4 = 0
+          ITET10 = 0
 C-------------------------
 C         PARAMETRE GROUPE
           IF (PID/=0) THEN
@@ -497,20 +506,10 @@ C         PARAMETRE GROUPE
 c
             ISVIS  = IGEO(33,PID)                       
 C   is a material flag   IVISC  = IGEO(34,PID)
-            IPARTSPH=IGEO(38,PID)
-C  material flag for viscosity
-            IF (IGT == 22) THEN                   
-              NLAY = IGEO(30,PID)                 
-              DO IL=1,NLAY                        
-                IMAT = IGEO(100+IL,PID)
-                IF (IPM(222,IMAT) > 0) IVISC = 1
-              ENDDO
-            ELSEIF (IPM(222,IABS(MID)) > 0) THEN
-               IVISC = 1
-            ENDIF
+            IPARTSPH=IGEO(38,PID)          
 C            
-            IF (ISSN == 10.OR.ISSN == 11) THEN
-               IF ((IKSNOD0/=4 .AND. IKSNOD0/=8.AND. IKSNOD0/=10) .OR. JHBE == 15 ) THEN
+            IF ((ISSN == 10.OR.ISSN == 11).AND.(IGT == 14.OR.IGT == 6)) THEN
+               IF (IKSNOD0/=4 .AND. IKSNOD0/=8.AND. IKSNOD0/=10 ) THEN
                   CALL ANCMSG(MSGID=1159,
      .                    MSGTYPE=MSGERROR,
      .                    ANMODE=ANINFO_BLIND_2,
@@ -566,27 +565,18 @@ C
               IF (ITET10/=0.AND.IKSNOD0 == 8) THEN
                 ITET10=0
               END IF
-c              IF (ITET4 == 1 .AND. IKSNOD0 == 4 .AND. ISSN <= 3) THEN
-c                CALL ANCMSG(MSGID=1112,
-c     .                  MSGTYPE=MSGWARNING,
-c     .                  ANMODE=ANINFO_BLIND_2,
-c     .                  I1=ID,
-c     .                  C1=TITR,
-c     .                  PRMOD=MSG_CUMU)
-c                ISSN=4
-c              END IF
             END IF
           ENDIF
 C
           MLN = NINT(PM(19,ABS(MID))) 
-	     IF(MLN == 20)THEN
-	           IF(IPARG(5,NGROUP)/=2)THEN
-	                    CALL ANCMSG(MSGID=129,
+         IF(MLN == 20)THEN
+               IF(IPARG(5,NGROUP)/=2)THEN
+                        CALL ANCMSG(MSGID=129,
      .                           MSGTYPE=MSGERROR,
      .                           ANMODE=ANINFO)
-                     CALL ARRET(2) 	    
+                     CALL ARRET(2)      
                      ENDIF
-	     ENDIF
+         ENDIF
 C          
           IF(MID<0)THEN
             IF(MLN == 6.AND.JPOR/=2)MLN=17
@@ -595,6 +585,8 @@ C
             IXS(1,II)=MID
             INEG = 1
           ENDIF
+c          
+          MATPARAM => MATPARAM_TAB(MID)
           IF(IGT == 6 .AND. MLN == 70) THEN
                 CALL ANCMSG(MSGID=1221,
      .                   MSGTYPE=MSGERROR,
@@ -617,7 +609,7 @@ C
             IF(MLN /= 14 .AND. MLN /= 12 .AND. MLN /= 25  .AND.
      .         MLN /= 28 .AND. MLN /= 50 .AND. MLN /= 68  .AND. 
      .         MLN /= 53 .AND. MLN /= 93 .AND. MLN /= 107 .AND.
-     .         MLN /= 112) THEN
+     .         MLN /= 112.AND. MLN /= 122) THEN
             CALL ANCMSG(MSGID=1225,
      .                  MSGTYPE=MSGWARNING,
      .                  ANMODE=ANINFO_BLIND_2,
@@ -645,10 +637,10 @@ C
             NLAY = IGEO(30,PID)                 
             DO IL=1,NLAY                        
               IMAT  = IGEO(100+IL,PID)           
-              NFAIL = MAX(NFAIL,IPM(220, IMAT))
+              NFAIL = MAX(NFAIL,MATPARAM_TAB(IMAT)%NFAIL)
             ENDDO
           ELSE
-            NFAIL = IPM(220,MID)
+            NFAIL = MATPARAM_TAB(MID)%NFAIL
           ENDIF        
 c
           IF (NFAIL > 0)THEN
@@ -667,14 +659,6 @@ c
             IT10 =1
           ELSEIF(IKSNOD0 == 4)THEN
             NPT=1
-!          ELSEIF(IKSNOD0 == 20.OR.IKSNOD0 == 16)THEN
-!            IF(NPT == 1.OR.NPT == 8)THEN
-!              CALL ANCMSG(MSGID=615,
-!     .                    MSGTYPE=MSGERROR,
-!     .                    ANMODE=ANINFO,
-!     .                    I1=ID,
-!     .                    C1=TITR)
-!            END IF
           ENDIF
           IF ((JHBE/=1 .AND. JHBE/=2) .AND. MLN==68 ) THEN
             CALL ANCMSG(MSGID=672,
@@ -740,7 +724,6 @@ C--------------------
           IF (IGT == 20 .OR. IGT == 21 .OR. IGT == 22) ITSH = 1
 C---add ICPRE auto for thick-shell          
           IF (ITSH == 1 ) THEN
-            MATPARAM => MATPARAM_TAB(MID)
              ICP0=MATPARAM%COMPRESSIBILITY
              SELECT CASE (ICP0)
 C-------compressible       
@@ -761,10 +744,17 @@ C--------message out
      .                      C1=TITR,
      .                      I2=ICPRE,
      .                      PRMOD=MSG_CUMU)
+            IF (ISSN >= 10) THEN
+                  CALL ANCMSG(MSGID=3027,
+     .                    MSGTYPE=MSGERROR,
+     .                    ANMODE=ANINFO_BLIND_2,
+     .                    I1=ID,
+     .                    C1=TITR,
+     .                    I2=ISSN)
+            ENDIF
           END IF !IF (ITSH == 1 )
 C          
           IF (IGT == 14 .OR. IGT == 6) THEN
-           MATPARAM => MATPARAM_TAB(MID)
            IF (ICPRE<0) THEN
             IF (IKSNOD0 ==8.AND.JHBE>10) THEN
              ICP0=MATPARAM%COMPRESSIBILITY
@@ -839,7 +829,6 @@ C--------message out
 C---add ICPRE auto for T10, firsly limited by Large Strain          
           IF (IT10 ==1 .AND. (ISSN==4 .OR. ISSN==10)
      .                 .AND. IKSNOD0==10 ) THEN
-            MATPARAM => MATPARAM_TAB(MID)
              ICP0=MATPARAM%COMPRESSIBILITY
              SELECT CASE (ICP0)
 C-------compressible       
@@ -848,9 +837,11 @@ C-------compressible
 C-------uncompressible       
               CASE(2)                                             
                ICPRE = 1
+               IF (MLN == 1.OR.MLN == 92) ICPRE = 3
 C--------elasto-plastic       
               CASE(3)                                             
                ICPRE = 2
+               IF (ICPT10==3) ICPRE = 3 
              END SELECT 
 C--------message out       
              IF (ICPRE ==1 .OR. ICPRE ==2)  CALL ANCMSG(
@@ -864,6 +855,16 @@ C--------message out
           ELSEIF (IT10 ==1) THEN
             ICPRE = 0
           END IF !IF (IT10 == 1 )
+c          
+          IF (MLN == 1.AND.ISSN<10) CALL INIT_MAT_KEYWORD(MATPARAM,"HYDROSTATIC")
+          IF (ITSH == 1.AND. MATPARAM%IPRES/=1)   CALL ANCMSG(
+     .                      MSGID=3012,
+     .                      MSGTYPE=MSGINFO,
+     .                      ANMODE=ANINFO_BLIND_2,
+     .                      I1=ID,
+     .                      C1=TITR,
+     .                      I2=MLN,
+     .                      PRMOD=MSG_CUMU)
 C--------------------
 C TEST COMPATIBILITE
 C--------------------
@@ -871,7 +872,7 @@ C--------------------
           !---------------------------------!
           !   ALE / EULER compatibility     !
           !---------------------------------!  
-	  IF (JALE+JEUL /= 0) THEN
+      IF (JALE+JEUL /= 0) THEN
 
             IF (JHBE>=2.AND.JHBE/=24) THEN   !FORMULATION CHECK
              CALL ANCMSG(MSGID=608,
@@ -879,8 +880,8 @@ C--------------------
      .                   ANMODE=ANINFO_BLIND_1,
      .                   I1=ID,
      .                   C1=TITR,
-     .                   I2=JHBE) 	         !  allows only: isolid=1(JHBE=1)
-	    ELSEIF (JCVT==1) THEN                !COROTATIONAL NOT ALLOWED  
+     .                   I2=JHBE)            !  allows only: isolid=1(JHBE=1)
+        ELSEIF (JCVT==1) THEN                !COROTATIONAL NOT ALLOWED  
               IF(JHBE==0) THEN
               CALL ANCMSG(MSGID=246,
      .                    MSGTYPE=MSGERROR,
@@ -888,17 +889,17 @@ C--------------------
      .                    I1=ID,
      .                    C1=TITR,
      .                    I2=2)
-	      ELSE
+          ELSE
               CALL ANCMSG(MSGID=246,
      .                    MSGTYPE=MSGERROR,
      .                    ANMODE=ANINFO_BLIND_1,
      .                    I1=ID,
      .                    C1=TITR,
      .                    I2=JHBE)
-	      END IF
-	    END IF	  
+          END IF
+        END IF    
 
-	  END IF
+      END IF
           !---------------------------------!
 C
           IF (IGT == 14.AND.MLN == 28 .AND.
@@ -930,7 +931,7 @@ C
      .                  I1=ID,
      .                  C1=TITR,
      .                  I2=IGEO(1,PID))
-	    JCVT = 0 
+        JCVT = 0 
           ELSEIF(IKSNOD0 == 4.OR.IKSNOD0 == 10)THEN
             JCVT = 0 
           ENDIF
@@ -946,7 +947,7 @@ c     .                  ANMODE=ANINFO_BLIND_2,
 c     .                  I1=ID,
 c     .                  C1=TITR,
 c     .                  I2=JHBE)
-	      JCVT = 0     
+          JCVT = 0     
           JHBE = 1
            IF (NPT/=4) NPT=4
           ENDIF
@@ -958,7 +959,7 @@ C
      .                  ANMODE=ANINFO_BLIND_2,
      .                  I1=ID,
      .                  C1=TITR)
- 	      JCVT = 0       
+          JCVT = 0       
           ENDIF
 c          IF (JHBE == 14 .AND. (IKSNOD0 == 16 .OR. IKSNOD0 == 20)) THEN
           IF (JHBE /= 16 .AND. (IKSNOD0 == 16 .OR. IKSNOD0 == 20)) THEN
@@ -1054,7 +1055,7 @@ C------ default IHKT of HEPH
            IF (IMATVIS > 0 .OR.MLN==24) THEN
             SELECT CASE (MLN)
 C--------hyperelastic, visco-elastic           
-             CASE(38,42,62,69,70,82,88,90,92,94)             
+             CASE(38,42,62,69,70,82,88,90,92,94,190)             
               IINT =2
 C--------SUPERELASTIC           
              CASE(71)                                             
@@ -1072,7 +1073,7 @@ C -------------------
             ICPRE = 1
             SELECT CASE (MLN)
 C--------elastic ,visco-elastic           
-             CASE(1,13,16,33,34,35,38,40,41,70,77,90)                                             
+             CASE(1,13,16,33,34,35,38,40,41,70,77,90,190)                                             
               ICPRE = 0
               IF (PM(21,MID)>=0.49) ICPRE = 1
 C-----Keep IINT=2 for message and output (Isolid=18->17), remove free-shear in Engine               
@@ -1127,7 +1128,7 @@ C--------hyper-elastic
              CASE(42,62,69,82,88,92,94,95,100,101,111)                                             
               ISSN=10
 C--------visco_elastic  add 90       
-             CASE(38,90)                                             
+             CASE(38,90,190)                                             
               ISSN=10
 C--------special          
              CASE(28)                                             
@@ -1172,11 +1173,11 @@ C-----due to ICPRE automatic
          
           ENDIF   
           IF (IKSNOD0 == 16 .OR. IKSNOD0 == 20) THEN
- 	      JCVT = 0                      
+          JCVT = 0                      
           ENDIF
 
 
-C------For Incompatibility w/ Isolid=12, don't add new law	  
+C------For Incompatibility w/ Isolid=12, don't add new law    
           IF( IKSNOD0 == 8        .AND.IABS(JHBE) < 200 .AND. NPT == 8
      .       .AND.IABS(JHBE) /= 14.    AND.IABS(JHBE) /= 15 
      .       .AND.IABS(JHBE) /= 24    .AND.IABS(JHBE) /= 17
@@ -1213,7 +1214,7 @@ cc          CALL ANCERR(601,ANINFO_BLIND_2)
      .         MLN /= 99 .AND. MLN /= 1  .AND. MLN /= 88  .AND. 
      .         MLN /= 71 .AND. MLN /= 94 .AND. MLN /= 90  .AND. 
      .         MLN /= 95 .AND. MLN /=100 .AND. MLN /= 101 .AND.
-     .         MLN /= 111 ) THEN
+     .         MLN /= 111 .AND. MLN /=190) THEN
 C--------------warning out     
                 CALL ANCMSG(MSGID=1092,
      .                      MSGTYPE=MSGWARNING,
@@ -1230,7 +1231,7 @@ C--------------warning out
             END IF
           ELSE IF (ISSN == 11) THEN
             IF(MLN /= 1 .AND.MLN /= 38 .AND. MLN /= 70 .AND. MLN /= 77 
-     .         .AND. MLN /= 90  )THEN
+     .         .AND. MLN /= 90  .AND. MLN /= 190)THEN
 C--------------error out     
                 CALL ANCMSG(MSGID=1093,
      .                      MSGTYPE=MSGERROR,
@@ -1284,10 +1285,10 @@ C         composite-------------
             NPTS=MOD(ABS(NPT)/10,10)
             NPTT=MOD(ABS(NPT),10)
             NPG = NPTR*NPTS*NPTT
-	           NLY = NPTS
+               NLY = NPTS
           ELSE
             NPG = NPT
-	           NLY = NPT
+               NLY = NPT
           ENDIF  
 C   -----for mix hardening------------          
           IF (IGT==22) THEN
@@ -1296,21 +1297,21 @@ C   -----for mix hardening------------
              CASE(100)                                             
               NLY = NPTR
               IF (NLY ==0) THEN
-	              NLY =IINT 
+                  NLY =IINT 
                NPG = NLY*NPTS*NPTT
-	             ENDIF 
+                 ENDIF 
              CASE(10)                                          
               NLY = NPTS
               IF (NLY ==0) THEN
-	              NLY =IINT 
+                  NLY =IINT 
                NPG = NLY*NPTR*NPTT
-	             ENDIF 
+                 ENDIF 
              CASE(1)                                          
               NLY = NPTT
               IF (NLY ==0) THEN
-	              NLY =IINT 
+                  NLY =IINT 
                NPG = NLY*NPTR*NPTS
-	             ENDIF 
+                 ENDIF 
             END SELECT 
            ENDIF  
            DO NL=1,NLY
@@ -1356,18 +1357,19 @@ C           Preloaded elements are not compatible with Total Strain formulations
         ELSEIF(IKSNOD0 == 10.AND.ITET10==2)THEN
          IINT = 0
         ENDIF
-C------ compatibility w/ AMS		
-		IF (IKSNOD0 == 10.AND.ITET10==2.AND.ISMS>0) THEN
+C------ compatibility w/ AMS        
+        IF (IKSNOD0 == 10.AND.ITET10==2.AND.ISMS>0) THEN
               CALL ANCMSG(MSGID=2024,
      .                  MSGTYPE=MSGERROR,
      .                  ANMODE=ANINFO_BLIND_2,
      .                  I1=ID,
      .                  C1=TITR,
      .                  PRMOD=MSG_CUMU)
-		END IF
+        END IF
 C-------
         ! remove incompatibility for Itet4 = 3 
-        IF (ISSN < 10 .AND. ITET4 == 3 .AND.MATPARAM%STRAIN_FORMULATION==2) THEN 
+        IF (ISSN < 10 .AND. ITET4 == 3 .AND. ASSOCIATED(MATPARAM)) THEN
+          IF(MATPARAM%STRAIN_FORMULATION==2) THEN 
           CALL ANCMSG(MSGID=2037,
      .                MSGTYPE=MSGWARNING,
      .                ANMODE=ANINFO_BLIND_2,
@@ -1375,6 +1377,15 @@ C-------
      .                I2=ISSN,    
      .                PRMOD=MSG_CUMU)
           ISSN = 10
+          ENDIF
+        ENDIF
+        IVISC = IPM(222,MID)
+        IF(IVISC == 2 .AND. ISSN /=10 .AND. ISSN /=12) THEN
+            CALL ANCMSG(MSGID=3018,
+     .                      MSGTYPE=MSGWARNING,
+     .                      ANMODE=ANINFO_BLIND_2,
+     .                      I1=PID,
+     .                      C1=TITR)
         ENDIF
 C-------------------------------------------------
 C STOCKAGE IPARG
@@ -1420,7 +1431,7 @@ C reperage groupe/processeur
           ELSE
             IPARG(41,NGROUP)=ITET4
           ENDIF
-          IF(MLN/=24.AND.MLN/=25.AND.MLN<28)THEN
+          IF(MLN/=25.AND.MLN<28)THEN
           IPARG(44,NGROUP)= ISTRAIN
           ELSEIF(MLN>=28)THEN
            ISTRAIN=2
@@ -1433,7 +1444,7 @@ C thermal material expansion
      .    IPARG(49,NGROUP)= 1  
           IPARG(52,NGROUP)= JSMS
 C
-C   - initial volume franction -
+C   - initial volume fraction -
 C
           IPARG(53,NGROUP) = 0
           lFOUND=.FALSE.
@@ -1467,7 +1478,7 @@ C         Formulation level for the solid elements time step computation
           IPARG(73,NGROUP)=IPM(252,MID)
           IPARG(74,NGROUP)=ITET10
 c         non-local variable regularization flag for failure models
-          IPARG(78,NGROUP) = IPM(253,MID)   ! NLOC_FAIL
+          IPARG(78,NGROUP) = MATPARAM%NLOC   ! NLOC_FAIL
 C------------------------------------------------------
 C LONGUEUR BUFFER
 C------------------------------------------------------
@@ -1498,7 +1509,7 @@ C
           IXS(1,I) = ABS(IXS(1,I))
         ENDDO
       ENDIF
-      WRITE(IOUT,1010) 
+      IF(PRINT_FLAG>6) WRITE(IOUT,1010) 
 c-----------
       DO N=NGR1,NGROUP
         JHBE=IPARG(23,N)
@@ -1519,14 +1530,15 @@ c-----------
         ELSE
          NPTS=NPT
         ENDIF
-        WRITE(IOUT,1011)N,IPARG(1,N),IPARG(2,N),IPARG(3,N)+1,
+        IF(PRINT_FLAG>6) THEN
+            WRITE(IOUT,1011)N,IPARG(1,N),IPARG(2,N),IPARG(3,N)+1,
      +                IPARG(4,N),NPTS,IPARG(7,N),IPARG(11,N),    
      +                IPARG(12,N),IPARG(13,N),IPARG(23,N),
      +                IPARG(24,N),IPARG(18,N),IPARG(27,N),
      +                IPARG(29,N)+1,
      +                IPARG(33,N),IPARG(34,N),IPARG(43,N),IPARG(55,N)
+        ENDIF
       ENDDO
-c      WRITE(IOUT,1002) LBUFEL
       CALL ANCMSG(MSGID=758,
      .                  MSGTYPE=MSGWARNING,
      .                  ANMODE=ANINFO_BLIND_2,
@@ -1588,6 +1600,10 @@ C-----------
      .                  MSGTYPE=MSGWARNING,
      .                  ANMODE=ANINFO_BLIND_2,
      .                  PRMOD=MSG_PRINT)
+      CALL ANCMSG(MSGID=3012,
+     .                  MSGTYPE=MSGINFO,
+     .                  ANMODE=ANINFO_BLIND_2,
+     .                  PRMOD=MSG_PRINT)
 c-----
       DEALLOCATE(INDEXS2)
       IF (NPERTURB > 0) THEN
@@ -1606,7 +1622,6 @@ c------------------------------------------------------------
      +'       MID    MEDIUM      FLAG      FLAG              FLAG',
      +'      TYPE' )
  1011 FORMAT(19(I10))
- 1002 FORMAT(' BUFFER LENGTH : ',I10 )
 c-----------
       RETURN
       END

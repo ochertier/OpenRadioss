@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 
 Chd|====================================================================
 Chd|  WRITE_NLOC_STRUCT             source/restart/ddsplit/write_nloc_struct.F
@@ -27,7 +27,7 @@ Chd|-- called by -----------
 Chd|        DDSPLIT                       source/restart/ddsplit/ddsplit.F
 Chd|-- calls ---------------
 Chd|        WRITE_DB                      source/restart/ddsplit/wrrest.F
-Chd|        WRITE_I_C                     source/output/tools/write_routines.c
+Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|        NLOCAL_REG_MOD                ../common_source/modules/nlocal_reg_mod.F
 Chd|====================================================================
       SUBROUTINE WRITE_NLOC_STRUCT(NLOC_DMG ,NUMNOD_L ,NODGLOB  ,NODLOC   ,
@@ -44,10 +44,7 @@ C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "param_c.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
+#include      "r2r_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -63,7 +60,7 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,ILOC,NNOD,NNOD_L,NG,NL,NN, LNLOC_L,ND,NP,NM,N1,
      .        N2,NNO,CC,CC_L,NUMG,NUML,PROC_L,K,SHFT,TESTVAL,
-     .        L_NLOC,NDDMAX_L,OFF,LENBIS,LCNENL_L
+     .        L_NLOC,NDDMAX_L,OFF,LENBIS,LCNENL_L,MATSIZE
       INTEGER, DIMENSION(NUMNOD_L)   :: INDX_L, NDDL, IDXI_L
       INTEGER, DIMENSION(NUMNOD_L+1) :: POSI
       my_real, DIMENSION(NLOC_DMG%L_NLOC) :: MASS,UNL,MASS0
@@ -241,17 +238,25 @@ c
         HEAD(6) = NUMELTG_L
         HEAD(7) = NDDMAX_L
         HEAD(8) = LCNENL_L
+C
+        IF (NSUBDOM > 0) THEN
+C--       multidomains - origianl nummat is used
+          MATSIZE = NUMMAT0 
+        ELSE
+          MATSIZE = NUMMAT 
+        ENDIF
+C
         CALL WRITE_I_C(HEAD,8)
 c
-        CALL WRITE_DB(NLOC_DMG%DENS,NUMMAT)         ! DENS
+        CALL WRITE_DB(NLOC_DMG%DENS,MATSIZE)         ! DENS
 c
-        CALL WRITE_DB(NLOC_DMG%DAMP,NUMMAT)         ! DAMP
+        CALL WRITE_DB(NLOC_DMG%DAMP,MATSIZE)         ! DAMP
 c
-        CALL WRITE_DB(NLOC_DMG%LEN,NUMMAT)          ! LEN
+        CALL WRITE_DB(NLOC_DMG%LEN,MATSIZE)          ! LEN
 c
-        CALL WRITE_DB(NLOC_DMG%LE_MAX,NUMMAT)       ! LEN
+        CALL WRITE_DB(NLOC_DMG%LE_MAX,MATSIZE)       ! LEN
 c
-        CALL WRITE_DB(NLOC_DMG%SSPNL,NUMMAT)        ! SSPNL
+        CALL WRITE_DB(NLOC_DMG%SSPNL,MATSIZE)        ! SSPNL
 c   
         CALL WRITE_I_C(INDX_L,NNOD_L)               ! INDX_L(NNOD_L)
 c  

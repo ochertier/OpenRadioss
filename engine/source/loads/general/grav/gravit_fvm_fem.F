@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  GRAVIT_FVM_FEM                source/loads/general/grav/gravit_fvm_fem.F
 Chd|-- called by -----------
@@ -28,15 +28,18 @@ Chd|-- calls ---------------
 Chd|        MY_BARRIER                    source/system/machine.F       
 Chd|        FINTER                        source/tools/curve/finter.F   
 Chd|        FINTER_SMOOTH                 source/tools/curve/finter_smooth.F
+Chd|        ALE_MOD                       ../common_source/modules/ale/ale_mod.F
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
 Chd|====================================================================
       SUBROUTINE GRAVIT_FVM_FEM(IGRV  ,AGRV   ,NPC   ,TF   ,A     ,
      2                          V     ,X      ,SKEW  ,MS   ,SENSOR_TAB,
-     3                          WEIGHT,IB    ,ITASK,NALE)
+     3                          WEIGHT,IB     ,ITASK ,NALE ,NSENSOR , PYTHON)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------  
+      USE PYTHON_FUNCT_MOD
       USE SENSOR_MOD
+      USE ALE_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -49,34 +52,29 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "com06_c.inc"
 #include      "com08_c.inc"
-#include      "scr05_c.inc"
 #include      "task_c.inc"
 #include      "param_c.inc"
 #include      "tabsiz_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER, INTENT(IN) :: NALE(SNALE)
+      INTEGER ,INTENT(IN) :: NSENSOR
+      INTEGER, INTENT(IN) :: NALE(ALE%GLOBAL%SNALE)
       INTEGER NPC(*),NDDIM,NVDIM
       INTEGER IGRV(NIGRV,*),IB(*)
       INTEGER WEIGHT(*), ITASK
-      my_real
-     .   AGRV(LFACGRV,*), TF(*), A(3,*), V(3,*), MS(*),
-     .   X(3,*), SKEW(LSKEW,*)
-      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      my_real AGRV(LFACGRV,*), TF(*), A(3,*), V(3,*), MS(*), X(3,*), SKEW(LSKEW,*)
+      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) ,INTENT(IN) :: SENSOR_TAB
+      TYPE (PYTHON_), INTENT(INOUT) :: PYTHON
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NL, N1, ISK, N2, IFUNC, K1, K2, K3, ISENS,K,NN,
-     .    IAD,J, IADF, IADL, ISMOOTH
-
-      my_real
-     .   NX, NY, NZ, AXI, A0, AA, VV, FX, FY, FZ, AX, DYDX, TS,
-     .   GAMA, TFEXTT,FCX,FCY
-      my_real
-     .   FINTER,FINTER_SMOOTH
-      EXTERNAL FINTER,FINTER_SMOOTH
-C=======================================================================
+      INTEGER NL, N1, ISK, N2, IFUNC, K1, K2, K3, ISENS,K,NN, IAD,J, IADF, IADL, ISMOOTH
+      my_real NX, NY, NZ, AXI, A0, AA, VV, FX, FY, FZ, AX, DYDX, TS, GAMA, TFEXTT,FCX,FCY
+      my_real, EXTERNAL :: FINTER,FINTER_SMOOTH
+C-----------------------------------------------
+C   S o u r c e   L i n e s
+C-----------------------------------------------
       TFEXTT=ZERO
 C
       DO NL=1,NGRAV
@@ -104,14 +102,16 @@ C
         ENDIF
 C
         IF (IFUNC > 0) THEN
-!!          A0   = FCY*FINTER(IFUNC,(TS-DT1)*FCX,NPC,TF,DYDX)
-!!          GAMA = FCY*FINTER(IFUNC,TS*FCX,NPC,TF,DYDX)
           IF (ISMOOTH == 0) THEN
             A0   = FCY*FINTER(IFUNC,(TS-DT1)*FCX,NPC,TF,DYDX)
             GAMA = FCY*FINTER(IFUNC,TS*FCX,NPC,TF,DYDX)
-          ELSE
+          ELSE IF(ISMOOTH > 0) THEN
             A0   = FCY*FINTER_SMOOTH(IFUNC,(TS-DT1)*FCX,NPC,TF,DYDX)
             GAMA = FCY*FINTER_SMOOTH(IFUNC,TS*FCX,NPC,TF,DYDX)
+          ELSE 
+            ISMOOTH = -ISMOOTH ! the id the python function is saved in the position of ISMOOTH in the NPC array 
+            CALL PYTHON_CALL_FUNCT1D(PYTHON, ISMOOTH,(TS-DT1)*FCX, A0)
+            CALL PYTHON_CALL_FUNCT1D(PYTHON, ISMOOTH,TS*FCX, GAMA)
           ENDIF
         ELSE
           A0   = FCY

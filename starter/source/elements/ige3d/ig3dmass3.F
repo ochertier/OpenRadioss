@@ -1,30 +1,31 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  IG3DMASS3                     source/elements/ige3d/ig3dmass3.F
 Chd|-- called by -----------
 Chd|        IG3DINIT3                     source/elements/ige3d/ig3dinit3.F
 Chd|-- calls ---------------
+Chd|        ALE_MOD                       ../common_source/modules/ale/ale_mod.F
 Chd|====================================================================
       SUBROUTINE IG3DMASS3(
      1  RHO    ,MS    ,PARTSAV,X     ,Y      ,
@@ -34,6 +35,10 @@ Chd|====================================================================
      5  MCPS   ,MSSA  ,RHOF   ,FRAC  ,NCTRL  ,
      6  KXIG3D ,IXIG3D,R      ,DETJAC,PGAUSS ,
      7  I )
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
+      USE ALE_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -60,19 +65,14 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com07_c.inc"
 #include      "vect01_c.inc"
-#include      "scr05_c.inc"
 #include      "param_c.inc"
-#include      "ale_param.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER J,IP,I1,I2,I3,I4,I5,I6,I7,I8, ITNCTRL, INCTRL
-      my_real
-     .   XX,YY,ZZ,XY,YZ,ZX,INER,RCP
-      my_real
-     .   MASS(MVSIZ),MASSF(MVSIZ)
+      my_real XX,YY,ZZ,XY,YZ,ZX,INER,RCP
+      my_real MASS(MVSIZ),MASSF(MVSIZ)
 
 C=======================================================================
 C   S o u r c e  L i n e s
@@ -156,7 +156,7 @@ c           INS(ITNCTRL,I)=INER
 c         ENDDO
 c       ENDIF
 C
-      IF(JALE > 0 .AND. NWALE == 4)THEN
+      IF(JALE > 0 .AND. ALE%GRID%NWALE == 4)THEN
          DO ITNCTRL=1,NCTRL
           INCTRL = IXIG3D(KXIG3D(4,I+NFT)+ITNCTRL-1)         
           WMA(INCTRL)=WMA(INCTRL)+THREE_HALF

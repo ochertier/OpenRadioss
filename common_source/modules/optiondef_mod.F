@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  OPTIONDEF_MOD                 modules/optiondef_mod.F       
 Chd|-- called by -----------
@@ -84,7 +84,8 @@ Chd|-- calls ---------------
 Chd|====================================================================
       MODULE OPTIONDEF_MOD
 !----------------------------------------------------------------------- 
-#include "nchar_c.inc"
+      USE NAMES_AND_TITLES_MOD, ONLY: NCHARTITLE
+!----------------------------------------------------------------------- 
 #include "my_real.inc"
 !-----------------------------------------------------------------------
 !--------------
@@ -99,7 +100,7 @@ Chd|====================================================================
 !--------------
       TYPE INICRACK_
         INTEGER   :: ID ! - INICRACK IDENTIFIER
-        CHARACTER :: TITLE*nchartitle ! INICRACK title
+        CHARACTER(LEN=NCHARTITLE) :: TITLE ! INICRACK title
         INTEGER   :: NSEG  ! - INICRACK NUMBER OF SEGMENTS
 !
         TYPE (SEG_) ,DIMENSION(:) ,ALLOCATABLE :: SEG     ! SEGMENTS OF INICRACK
@@ -117,7 +118,7 @@ Chd|====================================================================
 !--------------
       TYPE ADMAS_
         INTEGER   :: ID ! - ADMAS IDENTIFIER
-        CHARACTER :: TITLE*nchartitle ! ADMAS title
+        CHARACTER(LEN=NCHARTITLE) :: TITLE ! ADMAS title
         INTEGER   :: TYPE ! ADMAS type
 !                    = 0 ! Mass is added to each node of node group
 !                    = 1 ! Mass/N is added to each node of node group.
@@ -143,7 +144,7 @@ Chd|====================================================================
 !--------------
       TYPE BOX_
         INTEGER   :: ID ! - BOX IDENTIFIER
-        CHARACTER :: TITLE*nchartitle ! BOX title
+        CHARACTER(LEN=NCHARTITLE) :: TITLE ! BOX title
         INTEGER   :: ISKBOX ! BOX SKEW_ID (RECTA + CYLIN)
         INTEGER   :: NOD1 ! FIRST NODE for box limit definition  - N1 -
         INTEGER   :: NOD2 ! SECOND NODE for box limit definition - N2 -

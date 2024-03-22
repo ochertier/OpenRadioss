@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  M14AMA                        source/materials/mat/mat014/m14ama.F
 Chd|-- called by -----------
@@ -27,9 +27,12 @@ Chd|        M12LAW                        source/materials/mat/mat012/m12law.F
 Chd|        M14LAW                        source/materials/mat/mat014/m14law.F
 Chd|-- calls ---------------
 Chd|====================================================================
-      SUBROUTINE M14AMA(PM, A,  RX, RY, RZ, SX, 
-     2                  SY, SZ, AX, AY, AZ, BX,
-     3                  BY, BZ, CX, CY, CZ)
+      SUBROUTINE M14AMA(
+     1   PM,      A,       RX,      RY,
+     2   RZ,      SX,      SY,      SZ,
+     3   AX,      AY,      AZ,      BX,
+     4   BY,      BZ,      CX,      CY,
+     5   CZ,      NEL,     JCVT,    JSPH)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -43,10 +46,12 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "param_c.inc"
-#include      "vect01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: NEL
+      INTEGER, INTENT(IN) :: JCVT
+      INTEGER, INTENT(IN) :: JSPH
 C     REAL
       my_real PM(NPROPM,*), A(MVSIZ,6)
       my_real
@@ -62,7 +67,7 @@ C     REAL
 C-----------------------------------------------
 C
       IF (JSPH==1) THEN
-        DO I=LFT,LLT
+        DO I=1,NEL
           AX(I)=A(I,1)
           AY(I)=A(I,2)
           AZ(I)=A(I,3)
@@ -76,7 +81,7 @@ C
 C
       ELSEIF(JCVT==0)THEN
        IF (N2D==0) THEN
-        DO I=LFT,LLT
+        DO I=1,NEL
           RR=ONE/SQRT(RX(I)**2+RY(I)**2+RZ(I)**2)
           RX(I)=RX(I)*RR
           RY(I)=RY(I)*RR
@@ -99,7 +104,7 @@ C
           SZ(I)=SZ(I)*RR
         ENDDO
        ELSE
-        DO I=LFT,LLT
+        DO I=1,NEL
           RR=ONE/SQRT(SY(I)**2+SZ(I)**2)
           SY(I)=SY(I)*RR
           SZ(I)=SZ(I)*RR
@@ -112,7 +117,7 @@ C
         ENDDO
        ENDIF
 C
-       DO 200 I=LFT,LLT
+       DO 200 I=1,NEL
        AX(I)= A(I,1)*RX(I)+A(I,2)*SX(I)+A(I,3)*TX(I)
        AY(I)= A(I,1)*RY(I)+A(I,2)*SY(I)+A(I,3)*TY(I)
        AZ(I)= A(I,1)*RZ(I)+A(I,2)*SZ(I)+A(I,3)*TZ(I)
@@ -133,7 +138,7 @@ C
 C-------------------------------
 C     CO-ROTATIONAL FORMULATION IN  ORTHOTROPIC CO-ROTATIONAL SYSTEM.
       ELSE
-        DO 500 I=LFT,LLT
+        DO 500 I=1,NEL
          AX(I)=ONE
          BX(I)=ZERO
          CX(I)=ZERO

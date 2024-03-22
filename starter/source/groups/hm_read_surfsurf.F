@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  HM_READ_SURFSURF              source/groups/hm_read_surfsurf.F
 Chd|-- called by -----------
@@ -40,6 +40,7 @@ Chd|====================================================================
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE MY_ALLOC_MOD
       USE MESSAGE_MOD
       USE GROUPDEF_MOD
       USE SUBMODEL_MOD
@@ -49,20 +50,12 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr17_c.inc"
-#include      "scr03_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
 #include      "param_c.inc"
-#include      "my_allocate.inc"
-#include      "submod_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -222,11 +215,11 @@ C-----
                IF (SKIPFLAG == 0) THEN             
                   INSEG=INSEG+NISX*NSEG    
                   IGRSURF(IGS)%NSEG=NSEG
-                  MY_ALLOCATE2D(IGRSURF(IGS)%NODES,NSEG,4)
+                  CALL MY_ALLOC(IGRSURF(IGS)%NODES,NSEG,4)
                   IGRSURF(IGS)%NODES(1:NSEG,1:4) = 0
-                  MY_ALLOCATE(IGRSURF(IGS)%ELTYP,NSEG)
+                  CALL MY_ALLOC(IGRSURF(IGS)%ELTYP,NSEG)
                   IGRSURF(IGS)%ELTYP(1:NSEG) = 0
-                  MY_ALLOCATE(IGRSURF(IGS)%ELEM,NSEG)
+                  CALL MY_ALLOC(IGRSURF(IGS)%ELEM,NSEG)
                   IGRSURF(IGS)%ELEM(1:NSEG) = 0
                ENDIF                                 
 C-----------
@@ -255,7 +248,7 @@ C-----------
                            IGRSURF(IGS)%NODES(NSEG_TOT,3) = IGRSURF(IGRS)%NODES(L,3)
                            IGRSURF(IGS)%NODES(NSEG_TOT,4) = IGRSURF(IGRS)%NODES(L,4)
                            IGRSURF(IGS)%ELTYP(NSEG_TOT)   = IGRSURF(IGRS)%ELTYP(L)
-                           IGRSURF(IGS)%ELEM(NSEG_TOT)	 = IGRSURF(IGRS)%ELEM(L)
+                           IGRSURF(IGS)%ELEM(NSEG_TOT)   = IGRSURF(IGRS)%ELEM(L)
                         ENDDO
                      ELSE   
                         IF(N2D==0)THEN
@@ -341,11 +334,11 @@ C-----------
                IF (SKIPFLAG == 0) THEN               
                   INSEG=INSEG+NISX*NSEG    
                   IGRSURF(IGS)%NSEG=NSEG
-                  MY_ALLOCATE2D(IGRSURF(IGS)%NODES,NSEG,4)
+                  CALL MY_ALLOC(IGRSURF(IGS)%NODES,NSEG,4)
                   IGRSURF(IGS)%NODES(1:NSEG,1:4) = 0
-                  MY_ALLOCATE(IGRSURF(IGS)%ELTYP,NSEG)
+                  CALL MY_ALLOC(IGRSURF(IGS)%ELTYP,NSEG)
                   IGRSURF(IGS)%ELTYP(1:NSEG) = 0
-                  MY_ALLOCATE(IGRSURF(IGS)%ELEM,NSEG)
+                  CALL MY_ALLOC(IGRSURF(IGS)%ELEM,NSEG)
                   IGRSURF(IGS)%ELEM(1:NSEG) = 0
                ENDIF  
 C-----------
@@ -532,7 +525,7 @@ C------ for re-allocation %NODES
               ENDDO             
               IF (NSEGV /= NSEG) THEN               
                 DEALLOCATE(IGRSURF(IGS)%NODES)
-                MY_ALLOCATE2D(IGRSURF(IGS)%NODES,NSEGV,4)
+                CALL MY_ALLOC(IGRSURF(IGS)%NODES,NSEGV,4)
                 IGRSURF(IGS)%NODES(1:NSEGV,1:4) = 0
               ENDIF  
               DO L=1,NSEG
@@ -546,7 +539,7 @@ C------ for re-allocation %NODES
                   IGRSURF(IGS)%NODES(NSEG_TOT,3) = BUFTMP((INDEX(L)-1) *NISX+3)
                   IGRSURF(IGS)%NODES(NSEG_TOT,4) = BUFTMP((INDEX(L)-1) *NISX+4)
                   IGRSURF(IGS)%ELTYP(NSEG_TOT)   = BUFTMP((INDEX(L)-1) *NISX+5)
-                  IGRSURF(IGS)%ELEM(NSEG_TOT)	 = BUFTMP((INDEX(L)-1) *NISX+6)
+                  IGRSURF(IGS)%ELEM(NSEG_TOT)   = BUFTMP((INDEX(L)-1) *NISX+6)
                 ENDIF 
               ENDDO             
               IGRSURF(IGS)%NSEG=NSEG_TOT

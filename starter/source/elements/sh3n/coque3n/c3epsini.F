@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  C3EPSINI                      source/elements/sh3n/coque3n/c3epsini.F
 Chd|-- called by -----------
@@ -32,7 +32,7 @@ Chd|        C3PXPYI                       source/elements/sh3n/coque3n/c3epsini.
 Chd|        CMLAWI                        source/elements/shell/coque/cepsini.F
 Chd|        CORTH3                        source/elements/shell/coque/corth3.F
 Chd|        SHTROTO3                      source/elements/sh3n/coque3n/c3epsini.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE C3EPSINI(ELBUF_STR,
      1           JFT    ,JLT    ,ISMSTR ,MTN   ,ITHK   ,
@@ -74,7 +74,7 @@ C-----------------------------------------------
 C------------------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, NT, I1, I2, I3
+      INTEGER I, NT, I1, I2, I3,IDRAPE,IGTYP
       INTEGER PID(MVSIZ)
       my_real FAC
       my_real ECOS(MVSIZ),ESIN(MVSIZ),
@@ -91,6 +91,8 @@ C-----------------------------------------------
      .   X2L(MVSIZ), X3L(MVSIZ), Y3L(MVSIZ)
       my_real, DIMENSION(:) , POINTER :: DIR1, DIR2
 C=======================================================================
+      IDRAPE = ELBUF_STR%IDRAPE
+      IGTYP  = ELBUF_STR%IGTYP
       DO I=JFT,JLT
         I1    = IXTG(2,I)
         I2    = IXTG(3,I)
@@ -192,7 +194,8 @@ c
      .               NLAY     ,IREP ,NEL  ,
      .               X1  ,X2  ,X3  ,X4  ,Y1  ,Y2  ,
      .               Y3  ,Y4  ,Z1  ,Z2  ,Z3  ,Z4  ,
-     .               E1X, E2X, E3X, E1Y, E2Y, E3Y ,E1Z, E2Z, E3Z )
+     .               E1X, E2X, E3X, E1Y, E2Y, E3Y ,E1Z, E2Z, E3Z ,
+     .               IDRAPE , IGTYP )
 c
           CALL C3PXPYI(JFT  ,JLT  ,ISMSTR,
      .                 PX1G ,PY1G ,PY2G ,

@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  DOMETIS2                      source/spmd/domain_decomposition/domdecs.F
 Chd|-- called by -----------
@@ -27,54 +27,50 @@ Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
 Chd|        INITWG                        source/spmd/domain_decomposition/initwg.F
 Chd|        MY_ORDERS                     ../common_source/tools/sort/my_orders.c
+Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        MID_PID_MOD                   share/modules1/mid_pid_mod.F  
 Chd|====================================================================
       SUBROUTINE DOMETIS2(
      1  IXS   , IXQ   , IXC     , IXT     , IXP   ,
-     2  IXR   , IXUR  , IXTG    , CEP     , GEO   ,
+     2  IXR   , IXTG    , CEP     , GEO   ,
      3  WD    , NELEM , IDDLEVEL, NELEMINT, IXINT ,
      4  PM    , X     , KXX     , IXX     , NSUB  ,
      5  NUMNOD, NUMELS, NUMELQ  , NUMELC  , NUMELT,
-     6  NUMELP, NUMELR, NUMELTG , NUMELUR , NUMELX,
+     6  NUMELP, NUMELR, NUMELTG , NUMELX,
      7  ADSKY , IGEO  , DSARCH  , ISOLNOD , IWCONT,
      8  IWCIN2, DSDOF , IPM     ,BUFMAT,
      9  NUMMAT,NUMGEO ,TAILLE   ,POIN_UMP ,TAB_UMP,
      1  POIN_UMP_OLD,TAB_UMP_OLD,CPUTIME_MP_OLD,
      2  TABMP_L,IPART,IPARTC,IPARTG,
      3  IPARTS ,NPART,POIN_PART_SHELL,POIN_PART_TRI,POIN_PART_SOL,
-     4  MID_PID_SHELL,MID_PID_TRI,MID_PID_SOL)
+     4  MID_PID_SHELL,MID_PID_TRI,MID_PID_SOL,MAT_PARAM)
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
       USE MESSAGE_MOD
       USE MID_PID_MOD
-C-----------------------------------------------
-C            A r g u m e n t s
-C-----------------------------------------------
+      USE MATPARAM_DEF_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "scr12_c.inc"
 #include      "param_c.inc"
-#include      "units_c.inc"
-#include      "scr15_c.inc"
-#include      "scr05_c.inc"
 #include      "scr17_c.inc"
 #include      "scr23_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IXS(NIXS,*), IXQ(NIXQ,*), IXC(NIXC,*), IXT(NIXT,*),
-     .        IXP(NIXP,*), IXR(NIXR,*), IXUR(NIXUR,*), IXTG(NIXTG,*),
+     .        IXP(NIXP,*), IXR(NIXR,*), IXTG(NIXTG,*),
      .        CEP(*), NELEM,IDDLEVEL, NELEMINT, IXINT(6,*), ISOLNOD(*),
      .        KXX(NIXX,*),IXX(*), NSUB, NUMNOD, NUMELS, NUMELQ,  
-     .        NUMELC, NUMELT, NUMELP, NUMELR, NUMELTG, NUMELUR, NUMELX,
+     .        NUMELC, NUMELT, NUMELP, NUMELR, NUMELTG,  NUMELX,
      .        ADSKY(0:*), IGEO(NPROPGI,NUMGEO), IWCONT(*), IWCIN2(*),
      .        DSDOF(*), DSARCH,times,IPM(*),TABMP_L,NPART
       INTEGER, DIMENSION(LIPART1,*), INTENT(IN) :: IPART
@@ -86,6 +82,7 @@ C-----------------------------------------------
       INTEGER, DIMENSION(2,NPART,7), INTENT(IN) :: POIN_PART_SOL
       TYPE(MID_PID_TYPE), DIMENSION(NUMMAT), INTENT(IN) :: MID_PID_SHELL,MID_PID_TRI
       TYPE(MID_PID_TYPE), DIMENSION(NUMMAT,7), INTENT(IN) :: MID_PID_SOL
+      TYPE(MATPARAM_STRUCT_) ,DIMENSION(NUMMAT), INTENT(IN) :: MAT_PARAM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -178,12 +175,6 @@ C
           ADSKY(N) = ADSKY(N) + 1
  170  CONTINUE
 
-      DO K=2,5
-        DO I=1,NUMELUR
-          N = IXUR(K,I) + 1
-          ADSKY(N) = ADSKY(N) + 1
-        ENDDO
-      ENDDO
 C
        DO I=1,NUMELX
         NELX=KXX(3,I) 
@@ -242,14 +233,15 @@ C poids Metis suivant
 C optimisation des poids par defaut
       CALL INITWG(WD,PM,GEO,IXS,IXQ,
      .            IXC,IXT,IXP,IXR,IXTG,
-     .            IXUR,KXX,IGEO,ISOLNOD,DSARCH,
+     .            KXX,IGEO,ISOLNOD,DSARCH,
      .            NUMELS, NUMELQ,NUMELC,NUMELT,NUMELP, 
-     .            NUMELR, NUMELTG,NUMELUR,NUMELX,IPM,
+     .            NUMELR, NUMELTG,NUMELX,IPM,
      .            BUFMAT,NUMMAT,NUMGEO,TAILLE,POIN_UMP,
      .            TAB_UMP,POIN_UMP_OLD,TAB_UMP_OLD,CPUTIME_MP_OLD,
      .            TABMP_L,IPART,IPARTC,IPARTG,
      .            IPARTS,NPART,POIN_PART_SHELL,POIN_PART_TRI,POIN_PART_SOL,
-     .            MID_PID_SHELL,MID_PID_TRI,MID_PID_SOL,IDDLEVEL)
+     .            MID_PID_SHELL,MID_PID_TRI,MID_PID_SOL,IDDLEVEL,
+     .            MAT_PARAM)
       DO I=1,NUMELS
         DO K=1,8
           N = IXS(K+1,I)
@@ -381,23 +373,6 @@ C poids int2
 C
       OFF = OFF + NUMELTG
 C
-      DO I = 1, NUMELUR
-        DO K=1,4
-          N = IXUR(K+1,I)
-          CNE(ADSKY(N)) = I+OFF
-          ADSKY(N) = ADSKY(N) + 1
-          IF(N/=0)THEN
-C poids ddl
-            IWD(NCOND*(I+OFF-1)+1) = IWD(NCOND*(I+OFF-1)+1)+DSDOF(N)
-C poids interface
-            IWD(NCOND*(I+OFF-1)+2) = IWD(NCOND*(I+OFF-1)+2)+IWCONT(N)
-C poids int2
-            IWD(NCOND*(I+OFF-1)+3) = IWD(NCOND*(I+OFF-1)+3)+IWCIN2(N)
-          END IF
-        ENDDO
-      ENDDO
-C
-      OFF = OFF + NUMELUR
       DO I=1, NUMELX
         NELX=KXX(3,I)
         DO K=1,NELX

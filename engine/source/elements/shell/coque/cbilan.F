@@ -1,32 +1,31 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  CBILAN                        source/elements/shell/coque/cbilan.F
 Chd|-- called by -----------
 Chd|        CBAFORC3                      source/elements/shell/coqueba/cbaforc3.F
 Chd|        CFORC3                        source/elements/shell/coque/cforc3.F
 Chd|        CFORC3_CRK                    source/elements/xfem/cforc3_crk.F
-Chd|        CSUBC3                        source/elements/shell/coque/csubc3.F
 Chd|        CZFORC3                       source/elements/shell/coquez/czforc3.F
 Chd|        CZFORC3_CRK                   source/elements/xfem/czforc3_crk.F
 Chd|-- calls ---------------
@@ -34,16 +33,20 @@ Chd|        GRELEM_SAV                    source/output/th/grelem_sav.F
 Chd|        SENSOR_ENERGY_BILAN           source/tools/sensor/sensor_energy_bilan.F
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
 Chd|====================================================================
-      SUBROUTINE CBILAN(JFT,JLT ,PM   ,V   ,IXC,
-     2                  THK,EINT,PARTSAV,AREA,MAT,
-     3                  IPARTC,X,VR   ,VOL0,VOL00,
-     4                  THK0,THK02,IFLA ,OFF ,
-     5                  NFT1,GRESAV,GRTH,IGRTH,
-     6                  VL1  ,VL2    ,VL3   ,VL4  ,VRL1,
-     7                  VRL2 ,VRL3   ,VRL4  ,X1G  ,X2G ,
-     8                  X3G  ,X4G    ,Y1G   ,Y2G  ,Y3G ,
-     9                  Y4G  ,Z1G    ,Z2G   ,Z3G  ,Z4G ,
-     A                  IXFEM,IEXPAN ,EINTTH,ITASK)
+      SUBROUTINE CBILAN(
+     1   JFT,      JLT,      PM,       V,
+     2   IXC,      THK,      EINT,     PARTSAV,
+     3   AREA,     MAT,      IPARTC,   X,
+     4   VR,       VOL0,     VOL00,    THK0,
+     5   THK02,    IFLA,     OFF,      NFT1,
+     6   GRESAV,   GRTH,     IGRTH,    VL1,
+     7   VL2,      VL3,      VL4,      VRL1,
+     8   VRL2,     VRL3,     VRL4,     X1G,
+     9   X2G,      X3G,      X4G,      Y1G,
+     A   Y2G,      Y3G,      Y4G,      Z1G,
+     B   Z2G,      Z3G,      Z4G,      IXFEM,
+     C   IEXPAN,   EINTTH,   ITASK,    GVOL,
+     D   ACTIFXFEM,IGRE)
       USE SENSOR_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -57,15 +60,14 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "parit_c.inc"
-#include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "vect01_c.inc"
+#include      "com_xfem1.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: IGRE
       INTEGER IXC(NIXC,*),MAT(MVSIZ), JFT, JLT,IFLA,IEXPAN,
      .   IPARTC(*),NFT1,GRTH(*),IGRTH(*),IXFEM,ITASK
+      INTEGER, INTENT(IN) :: ACTIFXFEM
 C     REAL
       my_real
      .   PM(NPROPM,*), V(3,*), THK(*), EINT(JLT,2),
@@ -78,6 +80,7 @@ C     REAL
      .   Z1G(MVSIZ), Z2G(MVSIZ), Z3G(MVSIZ), Z4G(MVSIZ),
      .   VL1(MVSIZ,3),VL2(MVSIZ,3),VL3(MVSIZ,3),VL4(MVSIZ,3),
      .   VRL1(MVSIZ,3),VRL2(MVSIZ,3),VRL3(MVSIZ,3),VRL4(MVSIZ,3)
+      my_real, INTENT(IN) :: GVOL(MVSIZ)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -157,7 +160,7 @@ C
 
 C
       DO I=JFT,JLT
-        XMAS(I)=RHO*AREA(I)*THK(I)
+        XMAS(I)=RHO*GVOL(I)
       ENDDO
 C
       DO I=JFT,JLT
@@ -232,25 +235,34 @@ C
      6                    REK   ,FLAG)
         ENDIF
 C
-	IC=1
-	JST(IC)=JFT
-	DO J=JFT+1,JLT
-	  IF (IPARTC(J)/=IPARTC(J-1)) THEN
-	    IC=IC+1
-	    JST(IC)=J
-	  ENDIF
-	ENDDO
-	JST(IC+1)=JLT+1
+          IC=1
+          JST(IC)=JFT
+          DO J=JFT+1,JLT
+            IF (IPARTC(J)/=IPARTC(J-1)) THEN
+              IC=IC+1
+              JST(IC)=J
+            ENDIF
+          ENDDO
+          JST(IC+1)=JLT+1
         IF (IC==1) THEN
          MX = IPARTC(JFT)
-#include      "simd.inc"
          DO I=JFT,JLT
-          IF(OFF(I)/=0.0)THEN
+          IF (ICRACK3D > 0 .AND. IXFEM > 0 .AND. ACTIFXFEM > 0) THEN
+            IF(OFF(I)/=ZERO)THEN
+              PARTSAV(1,MX)=PARTSAV(1,MX) + EI(I)
+              PARTSAV(2,MX)=PARTSAV(2,MX) + EK(I)
+              PARTSAV(3,MX)=PARTSAV(3,MX) + XM(I)
+              PARTSAV(4,MX)=PARTSAV(4,MX) + YM(I)
+              PARTSAV(5,MX)=PARTSAV(5,MX) + ZM(I)
+            ENDIF
+          ELSE 
             PARTSAV(1,MX)=PARTSAV(1,MX) + EI(I)
             PARTSAV(2,MX)=PARTSAV(2,MX) + EK(I)
             PARTSAV(3,MX)=PARTSAV(3,MX) + XM(I)
             PARTSAV(4,MX)=PARTSAV(4,MX) + YM(I)
             PARTSAV(5,MX)=PARTSAV(5,MX) + ZM(I)
+          ENDIF
+          IF(OFF(I)/=ZERO)THEN
             PARTSAV(6,MX)=PARTSAV(6,MX) + XMAS(I)
 C           PARTSAV(8,MX)=PARTSAV(8,MX) + EHOU(I)
           ENDIF
@@ -274,14 +286,23 @@ C
           DO II=1,IC
             MX=IPARTC(JST(II))
             IF (JST(II+1)-JST(II)>15) THEN
-#include "simd.inc"
               DO I=JST(II),JST(II+1)-1
-               IF(OFF(I)/=0.0)THEN
+               IF (ICRACK3D > 0 .AND. IXFEM > 0 .AND. ACTIFXFEM > 0) THEN
+                 IF(OFF(I)/=ZERO)THEN
+                   PARTSAV(1,MX)=PARTSAV(1,MX) + EI(I)
+                   PARTSAV(2,MX)=PARTSAV(2,MX) + EK(I)
+                   PARTSAV(3,MX)=PARTSAV(3,MX) + XM(I)
+                   PARTSAV(4,MX)=PARTSAV(4,MX) + YM(I)
+                   PARTSAV(5,MX)=PARTSAV(5,MX) + ZM(I)
+                 ENDIF
+               ELSE 
                  PARTSAV(1,MX)=PARTSAV(1,MX) + EI(I)
                  PARTSAV(2,MX)=PARTSAV(2,MX) + EK(I)
                  PARTSAV(3,MX)=PARTSAV(3,MX) + XM(I)
                  PARTSAV(4,MX)=PARTSAV(4,MX) + YM(I)
                  PARTSAV(5,MX)=PARTSAV(5,MX) + ZM(I)
+               ENDIF
+               IF(OFF(I)/=ZERO)THEN
                  PARTSAV(6,MX)=PARTSAV(6,MX) + XMAS(I)
 C                PARTSAV(8,MX)=PARTSAV(8,MX) + EHOU(I)
                ENDIF
@@ -302,12 +323,22 @@ C                PARTSAV(8,MX)=PARTSAV(8,MX) + EHOU(I)
               ENDDO
             ELSE
               DO I=JST(II),JST(II+1)-1
-               IF(OFF(I)/=0.0)THEN
-                 PARTSAV(1,MX)=PARTSAV(1,MX) + EI(I)
-                 PARTSAV(2,MX)=PARTSAV(2,MX) + EK(I)
-                 PARTSAV(3,MX)=PARTSAV(3,MX) + XM(I)
-                 PARTSAV(4,MX)=PARTSAV(4,MX) + YM(I)
-                 PARTSAV(5,MX)=PARTSAV(5,MX) + ZM(I)
+               IF (ICRACK3D > 0 .AND. IXFEM > 0 .AND. ACTIFXFEM > 0) THEN
+                  IF (OFF(I)/=ZERO) THEN
+                    PARTSAV(1,MX)=PARTSAV(1,MX) + EI(I)
+                    PARTSAV(2,MX)=PARTSAV(2,MX) + EK(I)
+                    PARTSAV(3,MX)=PARTSAV(3,MX) + XM(I)
+                    PARTSAV(4,MX)=PARTSAV(4,MX) + YM(I)
+                    PARTSAV(5,MX)=PARTSAV(5,MX) + ZM(I)
+                  ENDIF
+               ELSE 
+                  PARTSAV(1,MX)=PARTSAV(1,MX) + EI(I)
+                  PARTSAV(2,MX)=PARTSAV(2,MX) + EK(I)
+                  PARTSAV(3,MX)=PARTSAV(3,MX) + XM(I)
+                  PARTSAV(4,MX)=PARTSAV(4,MX) + YM(I)
+                  PARTSAV(5,MX)=PARTSAV(5,MX) + ZM(I)
+               ENDIF
+               IF(OFF(I)/=ZERO)THEN
                  PARTSAV(6,MX)=PARTSAV(6,MX) + XMAS(I)
 C                PARTSAV(8,MX)=PARTSAV(8,MX) + EHOU(I)
                ENDIF
@@ -338,26 +369,35 @@ C                PARTSAV(8,MX)=PARTSAV(8,MX) + EHOU(I)
      4                    RBIDON,RBIDON,RBIDON,RBIDON,RBIDON,
      5                    RBIDON,RBIDON,RBIDON,RBIDON,RBIDON,
      6                    RBIDON,FLAG)
-        ENDIF	   
-	IC=1
-	JST(IC)=JFT
-	DO J=JFT+1,JLT
-	  IF (IPARTC(J)/=IPARTC(J-1)) THEN
-	    IC=IC+1
-	    JST(IC)=J
-	  ENDIF
-	ENDDO
-	JST(IC+1)=JLT+1		   
+        ENDIF     
+          IC=1
+          JST(IC)=JFT
+          DO J=JFT+1,JLT
+            IF (IPARTC(J)/=IPARTC(J-1)) THEN
+              IC=IC+1
+              JST(IC)=J
+            ENDIF
+          ENDDO
+          JST(IC+1)=JLT+1       
         IF (IC==1) THEN
           MX = IPARTC(JFT)
-#include      "simd.inc"
           DO I=JFT,JLT
-            IF(OFF(I)/=0.0)THEN
+            IF (ICRACK3D > 0 .AND. IXFEM > 0 .AND. ACTIFXFEM > 0) THEN
+              IF (OFF(I)/=ZERO)THEN
+                PARTSAV(1,MX)=PARTSAV(1,MX) + EI(I)
+                PARTSAV(2,MX)=PARTSAV(2,MX) + EK(I)
+                PARTSAV(3,MX)=PARTSAV(3,MX) + XM(I)
+                PARTSAV(4,MX)=PARTSAV(4,MX) + YM(I)
+                PARTSAV(5,MX)=PARTSAV(5,MX) + ZM(I)
+              ENDIF
+            ELSE 
               PARTSAV(1,MX)=PARTSAV(1,MX) + EI(I)
               PARTSAV(2,MX)=PARTSAV(2,MX) + EK(I)
               PARTSAV(3,MX)=PARTSAV(3,MX) + XM(I)
               PARTSAV(4,MX)=PARTSAV(4,MX) + YM(I)
               PARTSAV(5,MX)=PARTSAV(5,MX) + ZM(I)
+            ENDIF
+            IF(OFF(I)/=ZERO)THEN
               PARTSAV(6,MX)=PARTSAV(6,MX) + XMAS(I)
 C             PARTSAV(8,MX)=PARTSAV(8,MX) + EHOU(I)
             ENDIF
@@ -366,26 +406,45 @@ C             PARTSAV(8,MX)=PARTSAV(8,MX) + EHOU(I)
            DO II=1,IC
              MX=IPARTC(JST(II))
              IF (JST(II+1)-JST(II)>15) THEN
-#include "simd.inc"
                DO I=JST(II),JST(II+1)-1
-                 IF(OFF(I)/=0.0)THEN
+                 IF (ICRACK3D > 0 .AND. IXFEM > 0 .AND. ACTIFXFEM > 0) THEN
+                   IF(OFF(I)/=ZERO)THEN
+                     PARTSAV(1,MX)=PARTSAV(1,MX) + EI(I)
+                     PARTSAV(2,MX)=PARTSAV(2,MX) + EK(I)
+                     PARTSAV(3,MX)=PARTSAV(3,MX) + XM(I)
+                     PARTSAV(4,MX)=PARTSAV(4,MX) + YM(I)
+                     PARTSAV(5,MX)=PARTSAV(5,MX) + ZM(I)
+                   ENDIF
+                 ELSE 
                    PARTSAV(1,MX)=PARTSAV(1,MX) + EI(I)
                    PARTSAV(2,MX)=PARTSAV(2,MX) + EK(I)
                    PARTSAV(3,MX)=PARTSAV(3,MX) + XM(I)
                    PARTSAV(4,MX)=PARTSAV(4,MX) + YM(I)
                    PARTSAV(5,MX)=PARTSAV(5,MX) + ZM(I)
+                 ENDIF
+                 IF(OFF(I)/=ZERO)THEN
                    PARTSAV(6,MX)=PARTSAV(6,MX) + XMAS(I)
 C                  PARTSAV(8,MX)=PARTSAV(8,MX) + EHOU(I)
                  ENDIF
                ENDDO
              ELSE
                DO I=JST(II),JST(II+1)-1
-                 IF(OFF(I)/=0.0)THEN
+                 IF (ICRACK3D > 0 .AND. IXFEM > 0 .AND. ACTIFXFEM > 0) THEN
+                   IF(OFF(I)/=ZERO)THEN
+                     PARTSAV(1,MX)=PARTSAV(1,MX) + EI(I)
+                     PARTSAV(2,MX)=PARTSAV(2,MX) + EK(I)
+                     PARTSAV(3,MX)=PARTSAV(3,MX) + XM(I)
+                     PARTSAV(4,MX)=PARTSAV(4,MX) + YM(I)
+                     PARTSAV(5,MX)=PARTSAV(5,MX) + ZM(I)
+                   ENDIF
+                 ELSE
                    PARTSAV(1,MX)=PARTSAV(1,MX) + EI(I)
                    PARTSAV(2,MX)=PARTSAV(2,MX) + EK(I)
                    PARTSAV(3,MX)=PARTSAV(3,MX) + XM(I)
                    PARTSAV(4,MX)=PARTSAV(4,MX) + YM(I)
                    PARTSAV(5,MX)=PARTSAV(5,MX) + ZM(I)
+                 ENDIF
+                 IF(OFF(I)/=ZERO)THEN
                    PARTSAV(6,MX)=PARTSAV(6,MX) + XMAS(I)
 C                  PARTSAV(8,MX)=PARTSAV(8,MX) + EHOU(I)
                  ENDIF
@@ -398,11 +457,19 @@ C
       IF(IEXPAN > 0) THEN
          DO I=JFT,JLT
             MX = IPARTC(I)
-            IF(OFF(I)/=0.0)THEN
+            IF(OFF(I)/=ZERO)THEN
                PARTSAV(27,MX)=PARTSAV(27,MX) + EINTTH(I)
             ENDIF
          ENDDO
       ENDIF
+C
+      DO I = JFT,JLT
+        MX = IPARTC(I)
+        IF (OFF(I)==ZERO) THEN 
+          PARTSAV(25,MX) = PARTSAV(25,MX) + ONE
+        ENDIF
+      ENDDO
+C
       CALL SENSOR_ENERGY_BILAN(JFT,JLT,EI,EK,OFF,IPARTC,ITASK)      
 C---
       RETURN

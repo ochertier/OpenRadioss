@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  I9WAL3                        source/interfaces/int09/i9wal3.F
 Chd|-- called by -----------
@@ -32,7 +32,7 @@ Chd|        SPMD_GLOB_DSUM9               source/mpi/interfaces/spmd_th.F
 Chd|        SPMD_GLOB_ISUM9               source/mpi/interfaces/spmd_th.F
 Chd|        SPMD_IBCAST                   source/mpi/generic/spmd_ibcast.F
 Chd|        SPMD_RBCAST                   source/mpi/generic/spmd_rbcast.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE I9WAL3(X    ,V         ,W         ,A     ,CRST     ,
      2          NSV      ,ILOC      ,IRTL      ,ICODE     ,ISKEW    ,
@@ -40,7 +40,7 @@ Chd|====================================================================
      4          IRECT    ,UPW       ,IXS       ,ELBUF_TAB,
      5          IPARG    ,PM        ,NALE      ,EE        ,IELES    ,
      6          IELEM    ,TSTIF     ,INTTH     ,IEULT     ,STENS    ,
-     7          NOR      ,ISIZES    ,ISIZEM    )
+     7          NOR      ,ISIZES    ,ISIZEM    ,NRTS, NRTM, NSN,NMN  )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -54,16 +54,14 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com08_c.inc"
-#include      "scr04_c.inc"
-#include      "scr08_s_c.inc"
 #include      "scr08_a_c.inc"
 #include      "param_c.inc"
-#include      "scr05_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER IRECT(4,*), NSV(*), ILOC(*), IRTL(*), ICODE(*), ISKEW(*),
+      INTEGER, INTENT(IN) :: NRTS, NRTM, NSN,NMN 
+      INTEGER IRECT(4,*), NSV(NSN), ILOC(*), IRTL(NSN), ICODE(*), ISKEW(*),
      .   MSR(*), IRECTS(4,*), LMSR(*), NSEG(*),IXS(NIXS,*),
      .   IPARG(NPARG,*), IELES(*), IELEM(*),NALE(*) ,
      .   INTTH, IEULT, ISIZES, ISIZEM
@@ -205,12 +203,12 @@ C
          CALL SPMD_GLOB_DSUM9(COMT,ILEN)
          CALL SPMD_GLOB_DSUM9(COMVOL,ILEN)
          CALL SPMD_GLOB_ISUM9(ICOMERR,ILEN)
- 	       CALL SPMD_GLOB_ISUM9(ICOMNGR,ILEN)
- 	       CALL SPMD_GLOB_ISUM9(ICOMNEL,ILEN)
-Cel partie noeud sur P0 uniquement
+                 CALL SPMD_GLOB_ISUM9(ICOMNGR,ILEN)
+                 CALL SPMD_GLOB_ISUM9(ICOMNEL,ILEN)
+C   partie noeud sur P0 uniquement
          IF(ISPMD/=0) GOTO 900
        END IF
-Cel interface traitee par p0
+C   interface traitee par p0
       ELSE
        IF(ISPMD/=0) RETURN
       ENDIF
@@ -248,39 +246,10 @@ C
         W(2,N) = W(2,N) + DVN * NOR(2,II)
         W(3,N) = W(3,N) + DVN * NOR(3,II)
 C
-C        W(1,N)=VMX
-C        W(2,N)=VMY
-C        W(3,N)=VMZ
 C---------------------------------
 C       PONT THERMIQUE
 C---------------------------------
         IF(INTTH/=ZERO)THEN
-c         IF(IMACH/=3) THEN
-c          CALL I9GRD3(
-c     1       IERR  ,AREAM   ,TSTIFM,TM             ,VOLM      ,
-c     2       NB3M  ,IELEM(L),X     ,IXS(1,IELEM(L)),IX        ,
-c     3       IPARG ,PM      ,ELBUF )
-c          IF(IERR==0) THEN
-c            EFRIC = HALF * EE(II) / (LL2-LL1+1)
-c            DO 80 LL=LL1,LL2
-c             LG  = LMSR(LL)
-c             IXX(1)=NSV(IRECTS(1,LG))
-c             IXX(2)=NSV(IRECTS(2,LG))
-c             IXX(3)=NSV(IRECTS(3,LG))
-c             IXX(4)=NSV(IRECTS(4,LG))
-c             CALL I9GRD3(
-c     1        IERR  ,AREAS    ,TSTIFS,TS              ,VOLS    ,
-c     2        NB3S  ,IELES(LG),X     ,IXS(1,IELES(LG)),IXX     ,
-c     3        IPARG ,PM       ,ELBUF )
-c             IF(IERR==0) THEN
-c               TSTIFT = TSTIFM + TSTIFS + TSTIF
-c               PHI = AREAS * DT1 * (TM-TS) / TSTIFT
-c               ELBUF(NB3S) = ELBUF(NB3S) + (EFRIC+PHI)/VOLS
-c               ELBUF(NB3M) = ELBUF(NB3M) + (EFRIC-PHI)/VOLM
-c             ENDIF
-c 80         CONTINUE
-c          ENDIF
-c         ELSEIF(ISPMD==0)THEN
            KK = TAGM(L)
            EFRIC = HALF * EE(II) / (LL2-LL1+1)
            IERR = ICOMERR(KK)

@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  DESACTI                       source/elements/desacti.F     
 Chd|-- called by -----------
@@ -28,17 +28,17 @@ Chd|-- calls ---------------
 Chd|        CONVECOFF                     source/constraints/thermic/convecoff.F
 Chd|        ELOFF                         source/elements/eloff.F       
 Chd|        RADIATOFF                     source/constraints/thermic/radiatoff.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
 Chd|====================================================================
-      SUBROUTINE DESACTI(IXS     ,IXQ      ,IXC     ,IXP     ,IXT      ,
-     .                   IXR     ,IXTG     ,IPARG   , 
-     .                   IACTIV  ,SENSOR_TAB,FSKY    ,X       ,ELBUF_TAB,
-     .                   IBCV    ,FCONV    ,IBCR    ,FRADIA  ,IGROUPS  ,
-     .                   FACTIV  ,TEMP     ,MCP     ,PM      ,MCP_OFF  ,
-     .                   IGRBRIC ,IGRQUAD  ,IGRSH4N ,IGRSH3N ,IGRTRUSS ,
-     .                   IGRBEAM ,IGRSPRING)
+      SUBROUTINE DESACTI(IXS      ,IXQ      ,IXC     ,IXP     ,IXT      ,
+     .                   IXR      ,IXTG     ,IPARG   ,IACTIV  , 
+     .                   NSENSOR  ,SENSOR_TAB,FSKY    ,X      ,ELBUF_TAB,
+     .                   IBCV     ,FCONV    ,IBCR    ,FRADIA  ,IGROUPS  ,
+     .                   FACTIV   ,TEMP     ,MCP     ,PM      ,MCP_OFF  ,
+     .                   IGRBRIC  ,IGRQUAD  ,IGRSH4N ,IGRSH3N ,IGRTRUSS ,
+     .                   IGRBEAM  ,IGRSPRING)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -56,12 +56,12 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
-#include      "scr17_c.inc"
 #include      "parit_c.inc"
 #include      "scr_thermal_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER ,INTENT(IN) :: NSENSOR
       INTEGER IACTIV(LACTIV,*),IPARG(NPARG,*),
      .        IXS(NIXS,*), IXQ(NIXQ,*), IXC(NIXC,*),  
      .        IXT(NIXT,*),IXP(NIXP,*), IXR(NIXR,*), IXTG(NIXTG,*)
@@ -172,7 +172,7 @@ C----------------------------------------------------------------------
      .                 IGRTRUSS,IGRBEAM ,IGRSPRING)
             IACTIV(1,N) = 0
             OFFCHANGE=1
-          ENDIF		  
+          ENDIF      
         ENDIF
       ENDDO ! N=1,NACTIV
 C

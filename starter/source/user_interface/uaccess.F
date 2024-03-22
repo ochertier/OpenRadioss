@@ -1,27 +1,26 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 
-#include      "my_real.inc"
 
 Chd|====================================================================
 Chd|  ST_UACCESS_DUM                source/user_interface/uaccess.F
@@ -72,10 +71,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
 #include      "scr19_c.inc"
-#include      "scr17_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -135,9 +131,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
 #include      "scr19_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -235,7 +229,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "units_c.inc"
 #include      "scr05_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -320,7 +313,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "units_c.inc"
 #include      "scr05_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -391,8 +383,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "units_c.inc"
-#include      "r4r8_p.inc"
 #include      "scr05_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -471,8 +461,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "units_c.inc"
-#include      "r4r8_p.inc"
 #include      "scr05_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -545,9 +533,6 @@ C------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "units_c.inc"
-#include      "r4r8_p.inc"
-#include      "scr05_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -596,8 +581,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "r4r8_p.inc"
-#include      "scr05_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -645,7 +628,6 @@ C-------------------------------------------------
 C
       RETURN
       END
-#include "my_real.inc"
 Chd|====================================================================
 Chd|  GET_U_FUNC_N                  source/user_interface/uaccess.F
 Chd|-- called by -----------
@@ -656,9 +638,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -692,7 +671,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "r4r8_p.inc"
 #include      "scr05_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -744,7 +722,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "r4r8_p.inc"
 #include      "scr05_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -808,7 +785,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "r4r8_p.inc"
 #include      "scr05_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -919,7 +895,8 @@ Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        SENSOR_MOD                    share/modules1/sensor_mod.F   
-Chd|        SENSOR_VARIABLE_MOD           share/modules1/sensor_mod.F   
+Chd|        USER_INTERFACE_MOD            share/modules1/user_interface_mod.F
+Chd|        USER_SENSOR_MOD               share/modules1/user_interface_mod.F
 Chd|====================================================================
       INTEGER FUNCTION SET_U_SENS_IPAR(IVAR,VAR)
 C-----------------------------------------------
@@ -927,18 +904,12 @@ C   M o d u l e s
 C-----------------------------------------------  
       USE MESSAGE_MOD
       USE SENSOR_MOD
-      USE SENSOR_VARIABLE_MOD
+      USE USER_INTERFACE_MOD
+      USE USER_SENSOR_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "r4r8_p.inc"
-#include      "param_c.inc"
-#include      "com04_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -963,11 +934,11 @@ C
         RETURN
       ENDIF
 C
-      ITYP = SENSOR_TAB(NSENS)%TYPE
+      ITYP = SENSORS%SENSOR_TAB(NSENS)%TYPE
 
 C
       IF (ITYP>=29 .AND. ITYP<=31)THEN
-        SENSOR_TAB(NSENS)%INTEGER_USERPARAM(IVAR)=VAR
+        SENSORS%SENSOR_TAB(NSENS)%INTEGER_USERPARAM(IVAR)=VAR
         SET_U_SENS_IPAR = 0
       ENDIF
 C
@@ -981,7 +952,8 @@ Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        SENSOR_MOD                    share/modules1/sensor_mod.F   
-Chd|        SENSOR_VARIABLE_MOD           share/modules1/sensor_mod.F   
+Chd|        USER_INTERFACE_MOD            share/modules1/user_interface_mod.F
+Chd|        USER_SENSOR_MOD               share/modules1/user_interface_mod.F
 Chd|====================================================================
       INTEGER FUNCTION SET_U_SENS_FPAR(IVAR,VAR)
 C-----------------------------------------------
@@ -989,19 +961,12 @@ C   M o d u l e s
 C-----------------------------------------------  
       USE MESSAGE_MOD
       USE SENSOR_MOD
-      USE SENSOR_VARIABLE_MOD
+      USE USER_INTERFACE_MOD
+      USE USER_SENSOR_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "r4r8_p.inc"
-#include      "param_c.inc"
-#include      "com04_c.inc"
-#include      "units_c.inc"
-#include      "scr05_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1029,10 +994,10 @@ C
 
       ENDIF
 C
-      ITYP = SENSOR_TAB(NSENS)%TYPE
+      ITYP = SENSORS%SENSOR_TAB(NSENS)%TYPE
 
       IF (ITYP>=29 .AND. ITYP<=31)THEN
-         SENSOR_TAB(NSENS)%FLOAT_USERPARAM(IVAR)=VAR
+         SENSORS%SENSOR_TAB(NSENS)%FLOAT_USERPARAM(IVAR)=VAR
          SET_U_SENS_FPAR = 0
       ENDIF
 C
@@ -1058,8 +1023,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
-#include      "units_c.inc"
 #include      "com04_c.inc"
 #include      "scr03_c.inc"
 C-----------------------------------------------
@@ -1117,7 +1080,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
-#include      "r4r8_p.inc"
 #include      "scr05_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------

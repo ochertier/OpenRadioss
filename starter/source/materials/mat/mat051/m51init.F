@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  M51INIT                       source/materials/mat/mat051/m51init.F
 Chd|-- called by -----------
@@ -28,9 +28,9 @@ Chd|-- calls ---------------
 Chd|        M5IN2                         source/initial_conditions/detonation/m5in2.F
 Chd|        M5IN3                         source/initial_conditions/detonation/m5in3.F
 Chd|        NRF51INI                      source/materials/mat/mat051/nrf51ini.F
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
 Chd|        DETONATORS_MOD                share/modules1/detonators_mod.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE M51INIT(
      .               IPM                ,DETONATORS ,PM      ,
@@ -54,17 +54,16 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "vect01_c.inc"
 #include      "mmale51_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IPM(NPROPMI,NUMMAT),NGL(NEL),MAT(NEL), IPARG(NPARG),IFORM,NIX,IX(NIX,*)
       my_real PM(NPROPM,NUMMAT),UVAR(NEL,NUVAR),UPARAM(*), X(3,NUMNOD), BUFMAT(*), RHO0
-      INTEGER,INTENT(IN)                   :: NEL
+      INTEGER,INTENT(IN) :: NEL
       my_real,INTENT(INOUT) :: SIG(NEL,6)
       TYPE(G_BUFEL_), INTENT(INOUT),TARGET :: GBUF  
-      TYPE(DETONATOR_STRUCT_) :: DETONATORS
+      TYPE(DETONATORS_STRUCT_) :: DETONATORS
       TYPE(t_ale_connectivity), INTENT(INOUT) :: ALE_CONNECTIVITY
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -170,7 +169,7 @@ C-----------------------------------------------
         UVAR(I,20+KK) = RHO0_(IMAT)  !rho0 initial state is element dependent and can be updated by /INIGRAV
         UVAR(I,21+KK) = E0_(IMAT)    !E0
         UVAR(I,22+KK) = ZERO !SSP0 to introduce if needed
-	UVAR(I,23+KK) = VF(IMAT)                      !alpha0                   
+          UVAR(I,23+KK) = VF(IMAT)                      !alpha0                   
        ENDDO                                                            
       ENDDO 
       !particular case of submaterial 4 (burning time to initialize)
@@ -205,7 +204,7 @@ C-----------------------------------------------
         ENDIF
         CALL NRF51INI (
      .                  IPM              , PM    , X     , NIX     ,  IX,
-     .                  ALE_CONNECTIVITY , BUFMAT, UPARAM, NV46    ,  RHO0,
+     .                  ALE_CONNECTIVITY , BUFMAT, UPARAM, RHO0    ,
      .                  UVAR             , NUVAR , NEL   , GBUF%RHO, NUMEL
      .                )
       ENDIF      

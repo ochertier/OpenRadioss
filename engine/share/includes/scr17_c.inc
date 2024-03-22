@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>    
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,19 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
-#include "nchara_c.inc"
 C.../SCR17/
       COMMON /SCR17/IDEL7,IDT1SH,IDEL7NG,IDEL7NOK,IDEL2NG,
-     .              NSOLOFF,NSH4OFF,NSH3OFF,IQEPHV5,NTRSOFF,
-     .              NPOUOFF,NSPROFF,LCNEL,ISMOOTH4,IMLAGSOL,
-     .              LIDFS,LIRNUR,ISHV51,IDTHEPH,IDTS6,
+     .              NSOLOFF,NSH4OFF,NSH3OFF,NTRSOFF,
+     .              NPOUOFF,NSPROFF,LCNEL,ISMOOTH4,
+     .              LIDFS,LIRNUR,IDTS6,
      .              LNOPT1,LTITR,LILSET1,LISLIN1,LISUB1,
      .              LISURF1,LIPART1,LIGRN1,IDT1SOL,INEG_V,
      .              IDT1TET10,IDTTSH
       INTEGER       IDEL7,IDT1SH,IDEL7NG,IDEL7NOK,IDEL2NG,
-     .              NSOLOFF,NSH4OFF,NSH3OFF,IQEPHV5,NTRSOFF,
-     .              NPOUOFF,NSPROFF,LCNEL,ISMOOTH4,IMLAGSOL,
-     .              LIDFS,LIRNUR,ISHV51,IDTHEPH,IDTS6,
+     .              NSOLOFF,NSH4OFF,NSH3OFF,NTRSOFF,
+     .              NPOUOFF,NSPROFF,LCNEL,ISMOOTH4,
+     .              LIDFS,LIRNUR,IDTS6,
      .              LNOPT1,LTITR,LILSET1,LISLIN1,LISUB1,
      .              LISURF1,LIPART1,LIGRN1,IDT1SOL,INEG_V,
      .              IDT1TET10,IDTTSH

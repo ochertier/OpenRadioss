@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  CHSTI3                        source/elements/shell/coque/chsti3.F
 Chd|-- called by -----------
@@ -52,14 +52,11 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com06_c.inc"
-#include      "com08_c.inc"
 #include      "param_c.inc"
 #include      "remesh_c.inc"
 #include      "scr02_c.inc"
-#include      "scr06_c.inc"
 #include      "scr14_c.inc"
 #include      "scr16_c.inc"
 #include      "scr17_c.inc"
@@ -119,7 +116,7 @@ C
          GAMA1(I)= OFF(I)*( ONE - PX1V-PY1V)
          GAMA3(I)= OFF(I)*( ONE + PX1V+PY1V)
          GAMA2(I)= OFF(I)*(-ONE - PX2V-PY2V)
-         GAMA4(I)= OFF(I)*(-ONE + PX2V+PY2V)	 
+         GAMA4(I)= OFF(I)*(-ONE + PX2V+PY2V)   
        ENDDO
       ELSE
        DO I=JFT,JLT
@@ -154,11 +151,11 @@ C-----------------------------------
          H3Q(I)=ZERO
          H3L(I)=ZERO
          H1(I)=ZERO
-         H2(I)=ZERO	 
+         H2(I)=ZERO   
        ENDIF
       ENDDO
 C-----------------------------------
-C     RIGIDITE-DT
+C     STIFFNESS - DT
 C-----------------------------------
        DO I=JFT,JLT
           SCALE(I) = ZERO
@@ -234,7 +231,7 @@ c     ..                + 0.5 * SHF(I) * AREA(I) * G(I)/A11(I))
        ENDIF! igtyp
       ENDIF ! 
 C-----------------------------------
-C     FORCES ANTISABLIER DE MEMBRANE
+C     ANTI-HOURGLASS MEMBRANE FORCES
 C-----------------------------------
       DO I=JFT,JLT
         HG1(I)=VX1(I)*GAMA1(I)+VX2(I)*GAMA2(I)
@@ -263,7 +260,7 @@ C-----------------------------------
       ENDDO
 C
 C----------------------------------
-C     FORCES ANTISABLIER DE FLEXION
+C     ANTI-HOURGLASS BENDING FORCES
 C----------------------------------
       DO I=JFT,JLT
         HG1(I)=VZ1(I)*GAMA1(I)+VZ2(I)*GAMA2(I)
@@ -282,7 +279,7 @@ C----------------------------------
       ENDDO
 C
 C------------------------
-C     MOMENTS ANTISABLIER
+C     ANTI-HOURGLASS MOMENTS
 C------------------------
       DO I=JFT,JLT
        HG1(I)=RX1(I)-RX2(I)+RX3(I)-RX4(I)
@@ -314,12 +311,9 @@ C
         EHOUR = EHOUR + EHOURT
 #include "atomend.inc"
 C
-      IF((ANIM_E(25)==1).OR.(ANIM_CE(25)==1).OR.
-     &             (OUTP_CS(25)==1)) THEN
-        DO I=JFT,JLT
-          EANI(NFT+NUMELS+I) = EANI(NFT+NUMELS+I)+EHOU(I)
-        ENDDO
-      ENDIF
+      DO I=JFT,JLT
+        EANI(NFT+NUMELS+I) = EANI(NFT+NUMELS+I)+EHOU(I)
+      ENDDO
 C
       RETURN
       END

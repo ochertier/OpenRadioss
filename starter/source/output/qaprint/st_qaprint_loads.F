@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  ST_QAPRINT_LOADS              source/output/qaprint/st_qaprint_loads.F
 Chd|-- called by -----------
@@ -42,9 +42,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
@@ -53,7 +50,6 @@ C-----------------------------------------------
 #include      "scr03_c.inc"
 #include      "scr17_c.inc"
 #include      "tabsiz_c.inc"
-#include      "units_c.inc"
 #include      "boltpr_c.inc"
 #include      "sphcom.inc"
 C-----------------------------------------------
@@ -135,12 +131,12 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,IS,IPRE, MY_ID, MY_LOAD,J,K0,NSMAX,NS,LPRELOADTAB,
      .        IDS(NSPHIO),IDX(NSPHIO),II,MY_SPHIO,LVAD(NSPHIO),
-     .        IADSPHIO_1,IADSPHIO_2
+     .        IADSPHIO_1,IADSPHIO_2,FIRST,LAST
       CHARACTER *nchartitle TITR
       CHARACTER (LEN=255) :: VARNAME
       DOUBLE PRECISION TEMP_DOUBLE
       LOGICAL :: OK_QA 
-      INTEGER :: COUNT
+      INTEGER :: COUNT,IOPT_FIRST,IOPT_LAST
 C-----------------------------------------------
 C     /LOAD/CENTRI
 C-----------------------------------------------
@@ -184,11 +180,28 @@ C
         END DO ! MY_LOAD=1,NLOADC
       END IF
 C-----------------------------------------------
-C     /LOAD/PFLUID
+C     /LOAD/PFLUID & /LOAD/PBLAST  & /LOAD/PRESSURE
 C-----------------------------------------------
-      OK_QA = MYQAKEY('/LOAD/PFLUID') .OR. MYQAKEY('/LOAD/PBLAST')
+      OK_QA = MYQAKEY('/LOAD/PFLUID') .OR. MYQAKEY('/LOAD/PBLAST') .OR. MYQAKEY('/LOAD/PRESSURE') 
+      
       IF (OK_QA) THEN
-        DO MY_LOAD=1,NLOADP_F + NLOADP_B
+
+        IF(MYQAKEY('/LOAD/PFLUID'))THEN
+          !output pfluid only
+          IOPT_FIRST = 1
+          IOPT_LAST = NLOADP_F
+        ELSEIF(MYQAKEY('/LOAD/PBLAST'))THEN
+          !output pblast only
+          IOPT_FIRST = 1+NLOADP_F
+          IOPT_LAST = NLOADP_F+NLOADP_B
+        ELSEIF(MYQAKEY('/LOAD/PRESSURE'))THEN
+          !output pressure only
+          IOPT_FIRST = 1+NLOADP_F+NLOADP_B
+          IOPT_LAST = NLOADP_F+NLOADP_B+NLOADP_HYD
+        ENDIF
+            
+        !common procedure for /LOAD/PFLUID, /LOAD/PBLAST, /LOAD/PRESSURE options.
+        DO MY_LOAD=IOPT_FIRST,IOPT_LAST
 C
 C         Title of the option was not stored in NOM_OPT ... TBD
           TITR(1:nchartitle)=''
@@ -206,14 +219,7 @@ C             VARNAME: variable name in ref.extract (without blanks)
               CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),ILOADP(I,MY_LOAD),0.0_8)
             END IF
           END DO
-C
-          DO I=ILOADP(4,MY_LOAD),ILOADP(4,MY_LOAD)+ILOADP(1,MY_LOAD)-1
-C
-C           VARNAME: variable name in ref.extract (without blanks)
-            WRITE(VARNAME,'(A,I0)') 'LLOADP_',I      ! LLOADP(11) => 'LLOADP_11'
-            CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),LLOADP(I),0.0_8)
-          END DO
-C
+
           DO I=1,LFACLOAD
             IF(LOADP(I,MY_LOAD)/=ZERO)THEN
 C
@@ -223,51 +229,42 @@ C             VARNAME: variable name in ref.extract (without blanks)
               CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),0,TEMP_DOUBLE)
             END IF
           END DO
-C
-        END DO ! MY_LOAD=1,NLOADP_F
-      END IF
-C-----------------------------------------------
-C     /LOAD/PRESSURE
-C-----------------------------------------------
-      IF (MYQAKEY('/LOAD/PRESSURE')) THEN
-        DO MY_LOAD=1,NLOADP_HYD
-C
-C         Title of the option was not stored in NOM_OPT ... TBD
-          TITR(1:nchartitle)=''
-          IF(LEN_TRIM(TITR)/=0)THEN
-            CALL QAPRINT(TITR(1:LEN_TRIM(TITR)),ILOADP(2,MY_LOAD),0.0_8)
+ 
+          FIRST=ILOADP(4,MY_LOAD)
+          LAST=ILOADP(4,MY_LOAD)+ILOADP(1,MY_LOAD)-1
+          
+          IF(LAST-FIRST+1 <= 10 )THEN            
+            !display all segments
+            DO I=FIRST,LAST
+C             VARNAME: variable name in ref.extract (without blanks)
+              WRITE(VARNAME,'(A,I0)') 'LLOADP_',I      ! LLOADP(11) => 'LLOADP_11'
+              CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),LLOADP(I),0.0_8)
+            END DO
           ELSE
-            CALL QAPRINT('A_LOAD_PRESSURE_FAKE_NAME',ILOADP(2,MY_LOAD),0.0_8)
-          END IF
-C
-          DO I=1,SIZLOADP
-            IF(ILOADP(I,MY_LOAD) /=0)THEN
-C
+            !display only 5 first ones and 5 last ones
+            !first 5 segments
+            FIRST=ILOADP(4,MY_LOAD)
+            LAST=FIRST+5
+            DO I=FIRST,LAST
 C             VARNAME: variable name in ref.extract (without blanks)
-              WRITE(VARNAME,'(A,I0)') 'ILOADP_',I      ! ILOADP(11) => 'ILOADP_11'
-              CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),ILOADP(I,MY_LOAD),0.0_8)
-            END IF
-          END DO
-C
-          DO I=ILOADP(4,MY_LOAD),ILOADP(4,MY_LOAD)+ILOADP(1,MY_LOAD)-1
-C
-C           VARNAME: variable name in ref.extract (without blanks)
-            WRITE(VARNAME,'(A,I0)') 'LLOADP_',I      ! LLOADP(11) => 'LLOADP_11'
-            CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),LLOADP(I),0.0_8)
-          END DO
-C
-          DO I=1,LFACLOAD
-            IF(LOADP(I,MY_LOAD)/=ZERO)THEN
-C
+              WRITE(VARNAME,'(A,I0)') 'LLOADP_',I      ! LLOADP(11) => 'LLOADP_11'
+              CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),LLOADP(I),0.0_8)
+            END DO  
+            !suspension points '...'
+            CALL QAPRINT('...',0,0.0_8)
+            !last 5 segments
+            LAST=ILOADP(4,MY_LOAD)+ILOADP(1,MY_LOAD)-1
+            FIRST=LAST-5
+            DO I=FIRST,LAST
 C             VARNAME: variable name in ref.extract (without blanks)
-              WRITE(VARNAME,'(A,I0)') 'LOADP_',I
-              TEMP_DOUBLE = LOADP(I,MY_LOAD)
-              CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),0,TEMP_DOUBLE)
-            END IF
-          END DO
+              WRITE(VARNAME,'(A,I0)') 'LLOADP_',I      ! LLOADP(11) => 'LLOADP_11'
+              CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),LLOADP(I),0.0_8)
+            END DO                     
+          ENDIF
 C
-        END DO ! MY_LOAD=1,NLOADP_HYD
+        END DO ! MY_LOAD=IOPT_FIRST, IOPT_LAST
       END IF
+
 C-----------------------------------------------
 C     /CLOAD
 C-----------------------------------------------

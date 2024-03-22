@@ -1,36 +1,41 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  I12S2M                        source/interfaces/interf/i12s2m.F
 Chd|-- called by -----------
 Chd|        INTTI12A                      source/interfaces/interf/intti12.F
 Chd|-- calls ---------------
+Chd|        ALE_MOD                       ../common_source/modules/ale/ale_mod.F
 Chd|        SEGVAR_MOD                    share/modules/segvar_mod.F    
 Chd|====================================================================
       SUBROUTINE I12S2M(NSN,IRTL,NRTM,JCODV,NODVARS,MCOUNT,
      +                  NMN,NODVARM,IRECTM,NCOUNT,MSR,
      +                  SEGVAR,ISEGM,NOINT)
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
       USE SEGVAR_MOD
+      USE ALE_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -45,8 +50,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "conv_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -57,8 +60,7 @@ C-----------------------------------------------
       NIR=2
       IF(N2D==0)NIR=4
 
-
-      DO KVAR=1,NVCONV
+      DO KVAR=1,ALE%GLOBAL%NVCONV
       
         SELECT CASE(KVAR)                
           CASE(1)                        
@@ -88,7 +90,7 @@ C-----------------------------------------------
         MCOUNT(L)=MCOUNT(L)+ONE
       ENDDO
 
-      DO KVAR=1,NVCONV
+      DO KVAR=1,ALE%GLOBAL%NVCONV
       
         SELECT CASE(KVAR)                
           CASE(1)                        
@@ -105,7 +107,7 @@ C-----------------------------------------------
               
         DO II=1,NSN
           L=IRTL(II)
-          ADS=NVCONV*(II-1)+KVAR
+          ADS=ALE%GLOBAL%NVCONV*(II-1)+KVAR
           ptr(ISEGM(L))=ptr(ISEGM(L))+NODVARS(ADS)
          ENDDO
          
@@ -127,23 +129,23 @@ C-----------------------------------------------
               NCOUNT(IRECTM(JJ,L))= NCOUNT(IRECTM(JJ,L))+1
             ENDDO
         ENDDO
-        DO KVAR=1,NVCONV
+        DO KVAR=1,ALE%GLOBAL%NVCONV
           DO I=1,NMN
-            ADM=NVCONV*(I-1)+KVAR
+            ADM=ALE%GLOBAL%NVCONV*(I-1)+KVAR
             NODVARM(ADM)=ZERO
           ENDDO
           DO II=1,NSN
             L=IRTL(II)
-            ADS=NVCONV*(II-1)+KVAR
+            ADS=ALE%GLOBAL%NVCONV*(II-1)+KVAR
             DO JJ=1,NIR
-              ADM=NVCONV*(IRECTM(JJ,L)-1)+KVAR
+              ADM=ALE%GLOBAL%NVCONV*(IRECTM(JJ,L)-1)+KVAR
               NODVARM(ADM)=NODVARM(ADM)+NODVARS(ADS)
             ENDDO
           ENDDO
         ENDDO
-        DO KVAR=1,NVCONV
+        DO KVAR=1,ALE%GLOBAL%NVCONV
           DO I=1,NMN
-            ADM=NVCONV*(I-1)+KVAR
+            ADM=ALE%GLOBAL%NVCONV*(I-1)+KVAR
             IF(NCOUNT(I)>ZERO)THEN
               NODVARM(ADM)=NODVARM(ADM)/NCOUNT(I)
             ENDIF
@@ -151,7 +153,7 @@ C-----------------------------------------------
         ENDDO
       ENDIF
 
-      DO KVAR=1,NVCONV
+      DO KVAR=1,ALE%GLOBAL%NVCONV
       
         SELECT CASE(KVAR)                
           CASE(1)                        
@@ -167,7 +169,7 @@ C-----------------------------------------------
         END SELECT 
               
         DO I=1,NRTM
-          SEGAD=NVCONV*(ISEGM(I)-1)+KVAR
+          SEGAD=ALE%GLOBAL%NVCONV*(ISEGM(I)-1)+KVAR
           IF(MCOUNT(I)>ZERO)THEN
             ptr(ISEGM(I))=ptr(ISEGM(I))/MCOUNT(I)
           ELSE
@@ -175,7 +177,7 @@ C-----------------------------------------------
             L=0
             DO JJ=1,NIR
               II=IRECTM(JJ,I)
-              ADM=NVCONV*(II-1)+KVAR
+              ADM=ALE%GLOBAL%NVCONV*(II-1)+KVAR
               IF(NCOUNT(II)>ZERO)THEN
                 ptr(ISEGM(I))=ptr(ISEGM(I))+NODVARM(ADM)
                 L=L+1

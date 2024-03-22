@@ -1,43 +1,48 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  SIGEPS84                      source/materials/mat/mat084/sigeps84.F
 Chd|-- called by -----------
 Chd|        MULAW                         source/materials/mat_share/mulaw.F
 Chd|-- calls ---------------
 Chd|====================================================================
-      SUBROUTINE SIGEPS84 (
-     1     NEL    ,NUPARAM,NUVAR   ,NFUNC   ,IFUNC   ,NPF    ,
-     2     TF     ,TIME   ,TIMESTEP,UPARAM  ,RHO0    ,RHO    ,
-     3     VOLUME ,EINT   ,TEMPEL, NGL ,
-     4     EPSPXX ,EPSPYY ,EPSPZZ  ,EPSPXY  ,EPSPYZ  ,EPSPZX ,
-     5     DEPSXX ,DEPSYY ,DEPSZZ  ,DEPSXY  ,DEPSYZ  ,DEPSZX ,
-     6     EPSXX  ,EPSYY  ,EPSZZ   ,EPSXY   ,EPSYZ   ,EPSZX  ,
-     7     SIGOXX ,SIGOYY ,SIGOZZ  ,SIGOXY  ,SIGOYZ  ,SIGOZX ,
-     8     SIGNXX ,SIGNYY ,SIGNZZ  ,SIGNXY  ,SIGNYZ  ,SIGNZX ,
-     9     SIGVXX ,SIGVYY ,SIGVZZ  ,SIGVXY  ,SIGVYZ  ,SIGVZX ,
-     A     SOUNDSP,VISCMAX,UVAR    ,OFF     ,YLD     ,PLA    ,
-     B     DEP    ,ETSE   ,IPM     ,MAT    )
+      SUBROUTINE SIGEPS84(
+     1   NEL,     NUPARAM, NUVAR,   NFUNC,
+     2   IFUNC,   NPF,     TF,      TIME,
+     3   TIMESTEP,UPARAM,  RHO0,    RHO,
+     4   VOLUME,  EINT,    TEMPEL,  NGL,
+     5   EPSPXX,  EPSPYY,  EPSPZZ,  EPSPXY,
+     6   EPSPYZ,  EPSPZX,  DEPSXX,  DEPSYY,
+     7   DEPSZZ,  DEPSXY,  DEPSYZ,  DEPSZX,
+     8   EPSXX,   EPSYY,   EPSZZ,   EPSXY,
+     9   EPSYZ,   EPSZX,   SIGOXX,  SIGOYY,
+     A   SIGOZZ,  SIGOXY,  SIGOYZ,  SIGOZX,
+     B   SIGNXX,  SIGNYY,  SIGNZZ,  SIGNXY,
+     C   SIGNYZ,  SIGNZX,  SIGVXX,  SIGVYY,
+     D   SIGVZZ,  SIGVXY,  SIGVYZ,  SIGVZX,
+     E   SOUNDSP, VISCMAX, UVAR,    OFF,
+     F   YLD,     PLA,     DEP,     ETSE,
+     G   IPM,     MAT,     JTHE)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -46,9 +51,7 @@ C-----------------------------------------------
 C   G L O B A L   P A R A M E T E R S
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "scr17_c.inc"
 #include      "param_c.inc"
-#include      "vect01_c.inc"
 C-----------------------------------------------
 C   C O M M O N
 C-----------------------------------------------
@@ -99,7 +102,7 @@ C---------+---------+---+---+--------------------------------------------
 C-----------------------------------------------
 C   I N P U T   A r g u m e n t s
 C-----------------------------------------------
-C
+      INTEGER, INTENT(IN) :: JTHE
       INTEGER NEL, NUPARAM, NUVAR,
      .        IPM(NPROPMI,*),MAT(NEL), NGL(NEL)
       my_real 
@@ -197,7 +200,7 @@ C
 C     Initialize material parameters
 C     --------------
       YOUNG = UPARAM(1)
-	 NU    = UPARAM(2)
+           NU    = UPARAM(2)
       SHEAR = YOUNG*HALF/(ONE+NU)
       G2    = TWO*SHEAR   
       LAMDA = YOUNG*NU/(ONE+NU)/(ONE-TWO*NU)  

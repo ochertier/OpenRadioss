@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  SPMD_MSIN_ADDMASS             source/elements/initia/spmd_msin_addmass.F
 Chd|-- called by -----------
@@ -31,12 +31,12 @@ Chd|====================================================================
       SUBROUTINE SPMD_MSIN_ADDMASS(
      1               IXS    ,IXS10  ,IXS20  ,IXS16  ,IXQ      ,
      2               IXC    ,IXT    ,IXP    ,IXR    ,IXTG     ,
-     3               IXUR   ,MSS    ,MSSX   ,MSQ    ,MSC      ,
-     4               MST    ,MSP    ,MSR    ,MSTG   ,MSUR     ,
-     5               PTG    ,EVUR   ,MS     ,INDEX  ,ITRI     ,
+     3               MSS    ,MSSX   ,MSQ    ,MSC    ,
+     4               MST    ,MSP    ,MSR    ,MSTG   ,
+     5               PTG    ,MS     ,INDEX  ,ITRI     ,
      6               GEO    ,SH4TREE,SH3TREE,PARTSAV,IPMAS    ,
      7               IPARTS ,IPARTQ ,IPARTC ,IPARTT   ,
-     8               IPARTP ,IPARTR ,IPARTUR,IPARTTG,TOTADDMAS,
+     8               IPARTP ,IPARTR ,IPARTTG,TOTADDMAS,
      9               IPART  ,THK    ,PM     ,PART_AREA,
      A               ADDEDMS,ITAB   ,PARTSAV1_PON,ELE_AREA)
 C-----------------------------------------------
@@ -48,19 +48,10 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "scr03_c.inc"
-#include      "rnur_c.inc"
-#include      "scr12_c.inc"
 #include      "scr17_c.inc"
 #include      "remesh_c.inc"
 C-----------------------------------------------
@@ -68,14 +59,14 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IXS(NIXS,*),IXS10(6,*),IXS20(12,*),IXS16(8,*),
      .   IXQ(NIXQ,*),IXC(NIXC,*),IXT(NIXT,*),IXP(NIXP,*),IXR(NIXR,*),
-     .   IXTG(6,*),IXUR(6,*),INDEX(*), ITRI(*),SH4TREE(KSH4TREE,*),
+     .   IXTG(6,*),INDEX(*), ITRI(*),SH4TREE(KSH4TREE,*),
      .   SH3TREE(KSH3TREE,*),IPARTS(*),IPARTQ(*),IPARTC(*),
-     .   IPARTT(*),IPARTP(*),IPARTR(*),IPARTUR(*),IPARTTG(*),
+     .   IPARTT(*),IPARTP(*),IPARTR(*),IPARTTG(*),
      .   IPART(LIPART1,*),ITAB(*)
 C     REAL
       my_real
      .   MSS(8,*),MSSX(12,*),MSQ(*),MSC(*),MST(*),MSP(*),MSR(3,*),
-     .   MSTG(*),MSUR(*),PTG(3,*),EVUR(3,*),MS(*),GEO(NPROPG,*),
+     .   MSTG(*),PTG(3,*),MS(*),GEO(NPROPG,*),
      .   PARTSAV(20,*),TOTADDMAS,PART_AREA(*),THK(*),
      .   ADDEDMS(*),PM(NPROPM,*),PARTSAV1_PON(NPART),ELE_AREA(*)
 C
@@ -504,44 +495,34 @@ Chd|====================================================================
       SUBROUTINE SPMD_PARTSAV_PON(
      1               IXS    ,IXS10  ,IXS20  ,IXS16        ,IXQ    ,
      2               IXC    ,IXT    ,IXP    ,IXR          ,IXTG   ,
-     3               IXUR   ,MSS    ,MSSX   ,MSQ          ,MSC    ,
-     4               MST    ,MSP    ,MSR    ,MSTG         ,MSUR   ,
+     3               MSS    ,MSSX   ,MSQ          ,MSC    ,
+     4               MST    ,MSP    ,MSR    ,MSTG         ,
      5               INDEX  ,ITRI   ,GEO    ,PARTSAV1_PON ,IPARTS ,
      6               IPARTQ ,IPARTC ,IPARTT ,IPARTP       ,IPARTR ,
-     7               IPARTUR,IPARTTG,IPART  )
+     7               IPARTTG,IPART  )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "scr03_c.inc"
-#include      "rnur_c.inc"
-#include      "scr12_c.inc"
 #include      "scr17_c.inc"
-#include      "remesh_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IXS(NIXS,*),IXS10(6,*),IXS20(12,*),IXS16(8,*),
      .   IXQ(NIXQ,*),IXC(NIXC,*),IXT(NIXT,*),IXP(NIXP,*),IXR(NIXR,*),
-     .   IXTG(6,*),IXUR(6,*),INDEX(*), ITRI(*),
+     .   IXTG(6,*),INDEX(*), ITRI(*),
      .   IPARTS(*),IPARTQ(*),IPARTC(*),
-     .   IPARTT(*),IPARTP(*),IPARTR(*),IPARTUR(*),IPARTTG(*),
+     .   IPARTT(*),IPARTP(*),IPARTR(*),IPARTTG(*),
      .   IPART(LIPART1,*)
 C     REAL
       my_real
      .   MSS(8,*),MSSX(12,*),MSQ(*),MSC(*),MST(*),MSP(*),MSR(3,*),
-     .   MSTG(*),MSUR(*),GEO(NPROPG,*),PARTSAV1_PON(NPART)
+     .   MSTG(*),GEO(NPROPG,*),PARTSAV1_PON(NPART)
 C
       INTEGER IDEB
 C-----------------------------------------------

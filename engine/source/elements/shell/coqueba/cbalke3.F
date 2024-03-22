@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  CBALKE3                       source/elements/shell/coqueba/cbalke3.F
 Chd|-- called by -----------
@@ -309,7 +309,7 @@ C ----add mem-bending coupling terms of orthotrope--coplanar first---
 #include "vectorize.inc"
         DO M=JFT,JLT 
          EP=IPLAT(M)
- 	 C2=VOL(EP)*THK0(EP)
+           C2=VOL(EP)*THK0(EP)
          DMF(1,1,M)=HMFOR(EP,1)*C2
          DMF(2,2,M)=HMFOR(EP,2)*C2
          DMF(1,2,M)=HMFOR(EP,3)*C2
@@ -654,53 +654,53 @@ C
          KM12       =T11(1,1,EP)*DF5(EP)+T11(2,2,EP)*DF6(EP)
          M11(1,2,EP)=M11(1,2,EP)-KM12
          M11(2,2,EP)=M11(2,2,EP)+T11(1,2,EP)*DF5_2(EP)
-	 
-         M12(1,1,EP)=M12(1,1,EP)+T12(1,2,EP)*DF6_2(EP)	 
+           
+         M12(1,1,EP)=M12(1,1,EP)+T12(1,2,EP)*DF6_2(EP)   
          KM12       =T12(1,1,EP)*DF5(EP)+T12(2,2,EP)*DF6(EP)
          M12(1,2,EP)=M12(1,2,EP)-KM12
          M12(2,1,EP)=M12(2,1,EP)-KM12
          M12(2,2,EP)=M12(2,2,EP)+T12(1,2,EP)*DF5_2(EP)
-	 
-         M13(1,1,EP)=M13(1,1,EP)+T13(1,2,EP)*DF6_2(EP)	 
+           
+         M13(1,1,EP)=M13(1,1,EP)+T13(1,2,EP)*DF6_2(EP)   
          KM12       =T13(1,1,EP)*DF5(EP)+T13(2,2,EP)*DF6(EP)
          M13(1,2,EP)=M13(1,2,EP)-KM12
          M13(2,1,EP)=M13(2,1,EP)-KM12
          M13(2,2,EP)=M13(2,2,EP)+T13(1,2,EP)*DF5_2(EP)
-	 
+           
          M14(1,1,EP)=M14(1,1,EP)+T14(1,2,EP)*DF6_2(EP)
          KM12       =T14(1,1,EP)*DF5(EP)+T14(2,2,EP)*DF6(EP)
          M14(1,2,EP)=M14(1,2,EP)-KM12
          M14(2,1,EP)=M14(2,1,EP)-KM12
          M14(2,2,EP)=M14(2,2,EP)+T14(1,2,EP)*DF5_2(EP)
-	 
-         M22(1,1,EP)=M22(1,1,EP)+T22(1,2,EP)*DF6_2(EP)	 
+           
+         M22(1,1,EP)=M22(1,1,EP)+T22(1,2,EP)*DF6_2(EP)   
          KM12       =T22(1,1,EP)*DF5(EP)+T22(2,2,EP)*DF6(EP)
          M22(1,2,EP)=M22(1,2,EP)-KM12
          M22(2,2,EP)=M22(2,2,EP)+T22(1,2,EP)*DF5_2(EP)
-	 
+           
          M23(1,1,EP)=M23(1,1,EP)+T23(1,2,EP)*DF6_2(EP)
          KM12       =T23(1,1,EP)*DF5(EP)+T23(2,2,EP)*DF6(EP)
          M23(1,2,EP)=M23(1,2,EP)-KM12
          M23(2,1,EP)=M23(2,1,EP)-KM12
          M23(2,2,EP)=M23(2,2,EP)+T23(1,2,EP)*DF5_2(EP)
-	 
+           
          M24(1,1,EP)=M24(1,1,EP)+T24(1,2,EP)*DF6_2(EP)
          KM12       =T24(1,1,EP)*DF5(EP)+T24(2,2,EP)*DF6(EP)
          M24(1,2,EP)=M24(1,2,EP)-KM12
          M24(2,1,EP)=M24(2,1,EP)-KM12
          M24(2,2,EP)=M24(2,2,EP)+T24(1,2,EP)*DF5_2(EP)
-	 
+           
          M33(1,1,EP)=M33(1,1,EP)+T33(1,2,EP)*DF6_2(EP)
          KM12       =T33(1,1,EP)*DF5(EP)+T33(2,2,EP)*DF6(EP)
          M33(1,2,EP)=M33(1,2,EP)-KM12
          M33(2,2,EP)=M33(2,2,EP)+T33(1,2,EP)*DF5_2(EP)
-	 
+           
          M34(1,1,EP)=M34(1,1,EP)+T34(1,2,EP)*DF6_2(EP)
          KM12       =T34(1,1,EP)*DF5(EP)+T34(2,2,EP)*DF6(EP)
          M34(1,2,EP)=M34(1,2,EP)-KM12
          M34(2,1,EP)=M34(2,1,EP)-KM12
          M34(2,2,EP)=M34(2,2,EP)+T34(1,2,EP)*DF5_2(EP)
-	 
+           
          M44(1,1,EP)=M44(1,1,EP)+T44(1,2,EP)*DF6_2(EP)
          KM12       =T44(1,1,EP)*DF5(EP)+T44(2,2,EP)*DF6(EP)
          M44(1,2,EP)=M44(1,2,EP)-KM12
@@ -1314,7 +1314,7 @@ C
          ENDDO
         ENDDO
         ENDDO
-C	
+C
         DO I=1,2
         DO J=I,2
          DO EP=NF,JLT
@@ -1771,7 +1771,6 @@ C   I M P L I C I T   T Y P E S
 C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "mvsiz_p.inc"
-#include      "com04_c.inc"
 C-----------------------------------------------
 C   D U M M Y   A R G U M E N T S
 C-----------------------------------------------
@@ -1968,7 +1967,7 @@ C ----add mem-bending coupling terms of orthotrope--coplanar first---
 #include "vectorize.inc"
         DO M=JFT,JLT 
          EP=IPLAT(M)
- 	 C2=VOL(EP)*THK0(EP)
+           C2=VOL(EP)*THK0(EP)
          DMF(1,1,M)=HMFOR(EP,1)*C2
          DMF(2,2,M)=HMFOR(EP,2)*C2
          DMF(1,2,M)=HMFOR(EP,3)*C2

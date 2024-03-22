@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  H3D_SKIN_SCALAR               source/output/h3d/h3d_results/h3d_skin_scalar.F
 Chd|-- called by -----------
@@ -30,12 +30,15 @@ Chd|        H3D_FLD_TSH                   source/output/h3d/h3d_results/h3d_fld_
 Chd|        H3D_PRE_SKIN_SCALAR           source/output/h3d/h3d_results/h3d_skin_scalar.F
 Chd|        H3D_SOL_SKIN_SCALAR           source/output/h3d/h3d_results/h3d_sol_skin_scalar.F
 Chd|        INITBUF                       share/resol/initbuf.F         
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        H3D_INC_MOD                   share/modules/h3d_inc_mod.F   
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|        INITBUF_MOD                   share/resol/initbuf.F         
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        LOADS_MOD                     ../common_source/modules/loads/loads_mod.F
+Chd|        MAT_ELEM_MOD                  ../common_source/modules/mat_elem/mat_elem_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|        SCHLIEREN_MOD                 share/modules/schlieren_mod.F 
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
+Chd|        TABLE_MOD                     share/modules/table_mod.F     
 Chd|====================================================================
       SUBROUTINE H3D_SKIN_SCALAR(
      .                  ELBUF_TAB       ,SKIN_SCALAR  ,IFUNC     ,IPARG       ,GEO         ,
@@ -45,23 +48,25 @@ Chd|====================================================================
      .                  IS_WRITTEN_SKIN ,INFO1        ,KEYWORD   , H3D_DATA  ,
      6                  IAD_ELEM        ,FR_ELEM     , WEIGHT    ,TAG_SKINS6,
      7                  NPF   ,TF    ,BUFMAT,IBCL    ,ILOADP     ,LLOADP    ,FAC    ,
-     8                  SENSOR_TAB,TAGNCONT    ,LOADP_HYD_INTER,XFRAME,FORC    ,
-     9                  NODAL_IPART ) 
+     8                  NSENSOR,SENSOR_TAB,TAGNCONT    ,LOADP_HYD_INTER,XFRAME,FORC    ,
+     9                  NODAL_IPART ,IMAPSKP ,LOADS  ,TABLE, IFRAME,MAT_PARAM) 
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE INITBUF_MOD
-      USE ELBUFDEF_MOD    
-      USE SCHLIEREN_MOD 
-      USE H3D_MOD        
+      USE MAT_ELEM_MOD
+      USE SCHLIEREN_MOD
+      USE H3D_MOD
       USE MULTI_FVM_MOD
       USE SENSOR_MOD
+      USE H3D_INC_MOD
+      USE TABLE_MOD
+      USE LOADS_MOD
+      USE NAMES_AND_TITLES_MOD, ONLY: NCHARLINE100
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "chara_c.inc"
-#include      "nchara_c.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -69,23 +74,15 @@ C-----------------------------------------------
 #include      "mvsiz_p.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr01_c.inc"
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
-#include      "scr14_c.inc"
-#include      "scr25_c.inc"
 #include      "param_c.inc"
-#include      "rnur_c.inc"
-#include      "task_c.inc"
-#include      "spmd_c.inc"
-#include      "mmale51_c.inc"
-#include      "alefvm.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER  ,INTENT(IN) :: NSENSOR
       my_real
      .   SKIN_SCALAR(*),X(3,*),V(3,*),W(3,*),GEO(NPROPG,*),PM(NPROPM,*),
      .   TF(*),BUFMAT(*)
+      INTEGER , DIMENSION(NUMSKINP0), INTENT(IN) ::  IMAPSKP
       INTEGER IPARG(NPARG,*),IXS(NIXS,*),IFUNC,IXS10(*),IXS16(*), IXS20(*),
      .   IPM(NPROPMI,*),IGEO(NPROPGI,*),IPARTS(*),
      .   H3D_PART(*),IS_WRITTEN_SKIN(*),INFO1,
@@ -94,11 +91,15 @@ C-----------------------------------------------
       INTEGER ILOADP(SIZLOADP,*),IBCL(NIBCLD,*),NODAL_IPART(*)
       INTEGER TAGNCONT(NLOADP_HYD_INTER,NUMNOD),LOADP_HYD_INTER(NLOADP_HYD)
       my_real
-     .   FAC(LFACCLD,*),XFRAME(NXFRAME,*),FORC(*)
+     .   FAC(LFACLOAD,NLOADP),XFRAME(NXFRAME,*),FORC(*)
       TYPE (ELBUF_STRUCT_), DIMENSION(NGROUP), TARGET :: ELBUF_TAB
-      CHARACTER*ncharline KEYWORD
-      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      CHARACTER(LEN=NCHARLINE100)::KEYWORD
+      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) ,INTENT(IN) :: SENSOR_TAB
       TYPE (H3D_DATABASE) :: H3D_DATA
+      TYPE (LOADS_)   , INTENT(IN) :: LOADS
+      INTEGER ,       DIMENSION(LISKN,NUMFRAM+1)  ,INTENT(IN) :: IFRAME
+      TYPE (TTABLE)  ,DIMENSION(NTABLE)   ,INTENT(IN) :: TABLE
+      TYPE (MATPARAM_STRUCT_) ,DIMENSION(NUMMAT) ,INTENT(IN) :: MAT_PARAM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -111,7 +112,7 @@ C-----------------------------------------------
      .        OFFSET,IHBE,NPTM,NPG, MPT,IPT,IADD,IADR,IPMAT,IFAILT,
      .        IIGEO,IADI,ISUBSTACK,ITHK,NB_PLYOFF,IUVAR,IDX,IPOS,ITRIMAT,
      .        IALEFVM_FLG, IMAT,IADBUF,NUPARAM,IOK_PART(MVSIZ),
-     .        MLWI,PID,MID,IP,MX,KCVT,IOR_TSH,ICSTR
+     .        MLWI,PID,MID,MX,KCVT,IOR_TSH,ICSTR
       INTEGER 
      .        IS_WRITTEN_VALUE(MVSIZ),NFRAC,IU(4),IV,NB_FACE,KFACE,NSKIN
       INTEGER NGL(MVSIZ) 
@@ -130,7 +131,7 @@ C-----------------------------------------------
       IF (NUMSKIN> NUMSKINP) THEN      
       DO NG=1,NGROUP
 C      
-        CALL INITBUF (   IPARG   ,NG      ,                    
+        CALL INITBUF(   IPARG   ,NG      ,                    
      2          MLW     ,NEL     ,NFT     ,IAD     ,ITY     ,  
      3          NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,  
      4          JTHE    ,JLAG    ,JMULT   ,JHBE    ,JIVF    ,  
@@ -170,7 +171,7 @@ c
             IS_WRITTEN_VALUE(I) = 0
             IOK_PART(I) = 0 
             IF( H3D_PART(IPARTS(NFT+I)) == 1) IOK_PART(I) = 1
-          ENDDO	     
+          ENDDO       
           MLWI = MLW
           IF (IGTYP == 22 .AND. NLAY>9) THEN
            F_EXP = ONE
@@ -202,15 +203,13 @@ C----------    F.I. uses also average strain to be consisting
               NFAIL = ELBUF_TAB(NG)%BUFLY(ILAY)%NFAIL                                                                   
              DO IFAIL=1,NFAIL                                                          
                IF (FBUF%FLOC(IFAIL)%ILAWF == 7) THEN ! check /FLD model                
-                  IP=(IFAIL -1)*15         
-                  CALL H3D_FLD_TSH(ELBUF_TAB(NG),
-     .                       IR,IS,IT,ILAY,IFAIL,IP,MX,
-     .                       IPM,NPF,TF,BUFMAT,
-     .                       NGL,STRAIN,NEL )
+                  CALL H3D_FLD_TSH(ELBUF_TAB(NG),MAT_PARAM(MX)%FAIL(IFAIL),
+     .                       IR,IS,IT,ILAY,IFAIL,
+     .                       NPF,TF,NGL,STRAIN,NEL )
                    DO I=1,NEL 
                     RINDX = FBUF%FLOC(IFAIL)%INDX(I)                  
                     VALUE(I) = MAX(VALUE(I),RINDX) 
-                    IS_WRITTEN_VALUE(I) = 1	                         
+                    IS_WRITTEN_VALUE(I) = 1                           
                   ENDDO                                                                 
                ENDIF
              END DO               
@@ -237,15 +236,85 @@ C-------- grp skin_up
               NFAIL = ELBUF_TAB(NG)%BUFLY(ILAY)%NFAIL                                                                   
              DO IFAIL=1,NFAIL                                                          
                IF (FBUF%FLOC(IFAIL)%ILAWF == 7) THEN ! check /FLD model                
-                  IP=(IFAIL -1)*15         
                   DO I=1,NEL                                                      
-                     CALL H3D_FLD_TSH(ELBUF_TAB(NG),
-     .                       IR,IS,IT,ILAY,IFAIL,IP,MX,
-     .                       IPM,NPF,TF,BUFMAT,
-     .                       NGL,STRAIN,NEL )
+                     CALL H3D_FLD_TSH(ELBUF_TAB(NG),MAT_PARAM(MX)%FAIL(IFAIL),
+     .                       IR,IS,IT,ILAY,IFAIL,
+     .                       NPF,TF,NGL,STRAIN,NEL )
                     RINDX = FBUF%FLOC(IFAIL)%INDX(I)                  
                     VALUE(I) = MAX(VALUE(I),RINDX) 
-                    IS_WRITTEN_VALUE(I) = 1	                         
+                    IS_WRITTEN_VALUE(I) = 1                           
+                  ENDDO                                                                 
+               ENDIF
+             END DO               
+             DO I=1,NEL
+               SKIN_SCALAR(NSKIN+I) = VALUE(I)
+               IF(IOK_PART(I) == 1 ) IS_WRITTEN_SKIN(NSKIN+I) = IS_WRITTEN_VALUE(I)
+             END DO
+             NSKIN = NSKIN + NEL
+C-----------------------------------------------
+          ELSEIF (KEYWORD == 'FLDZ/OUTER_AVERAGE') THEN
+            IS_WRITTEN_VALUE(1:NEL) = 1
+            MX = IXS(1,1 + NFT)
+            NGL(1:NEL) =IXS(NIXS,1 + NFT:NEL + NFT) 
+            IT = 1
+C-----------------------------------------------
+            ILAY=(1+NLAY)/2
+C-------- grp skin_inf first
+            IF (IGTYP == 22) THEN
+             PID = IXS(NIXS-1,1 + NFT)
+             MID = IGEO(100+ILAY,PID)
+             MLWI=NINT(PM(19,MID))
+            END IF
+            CALL H3D_FLD_STRAIN(ELBUF_TAB(NG),X  ,IXS   ,
+     .                       JHBE,MLWI,ILAY,KCVT,IOR_TSH,
+     .                       ICSTR,NPTR,NPTS,NEL,F_EXP,STRAIN )
+C------
+              IR = 1
+              IS = 1
+              FBUF => ELBUF_TAB(NG)%BUFLY(ILAY)%FAIL(IR,IS,IT)                            
+              NFAIL = ELBUF_TAB(NG)%BUFLY(ILAY)%NFAIL                                                                   
+             DO IFAIL=1,NFAIL                                                          
+               IF (FBUF%FLOC(IFAIL)%ILAWF == 7) THEN ! check /FLD model                
+                  CALL H3D_FLD_TSH(ELBUF_TAB(NG),MAT_PARAM(MX)%FAIL(IFAIL),
+     .                       IR,IS,IT,ILAY,IFAIL,
+     .                       NPF,TF,NGL,STRAIN,NEL )
+                   DO I=1,NEL 
+                    RINDX = FBUF%FLOC(IFAIL)%INDX(I)                  
+                    VALUE(I) = MAX(VALUE(I),RINDX) 
+                    IS_WRITTEN_VALUE(I) = 1                           
+                  ENDDO                                                                 
+               ENDIF
+             END DO               
+C------           
+             DO I=1,NEL
+               SKIN_SCALAR(NSKIN+I) = VALUE(I)
+               IF(IOK_PART(I) == 1 ) IS_WRITTEN_SKIN(NSKIN+I) = IS_WRITTEN_VALUE(I)
+             END DO
+             NSKIN = NSKIN + NEL
+C-------- grp skin_up
+              ILAY=(1+NLAY)/2
+              VALUE(1:NEL) = ZERO
+             IF (IGTYP == 22) THEN
+              PID = IXS(NIXS-1,1 + NFT)
+              MID = IGEO(100+ILAY,PID)
+              MLWI=NINT(PM(19,MID))
+             END IF
+             CALL H3D_FLD_STRAIN(ELBUF_TAB(NG),X  ,IXS   ,
+     .                         JHBE,MLWI,ILAY,KCVT,IOR_TSH,
+     .                         ICSTR,NPTR,NPTS,NEL,F_EXP,STRAIN )
+              IR = 1
+              IS = 1
+              FBUF => ELBUF_TAB(NG)%BUFLY(ILAY)%FAIL(IR,IS,IT)                            
+              NFAIL = ELBUF_TAB(NG)%BUFLY(ILAY)%NFAIL                                                                   
+             DO IFAIL=1,NFAIL                                                          
+               IF (FBUF%FLOC(IFAIL)%ILAWF == 7) THEN ! check /FLD model                
+                  DO I=1,NEL                                                      
+                     CALL H3D_FLD_TSH(ELBUF_TAB(NG),MAT_PARAM(MX)%FAIL(IFAIL),
+     .                       IR,IS,IT,ILAY,IFAIL,
+     .                       NPF,TF,NGL,STRAIN,NEL )
+                    RINDX = FBUF%FLOC(IFAIL)%INDX(I)                  
+                    VALUE(I) = MAX(VALUE(I),RINDX) 
+                    IS_WRITTEN_VALUE(I) = 1                           
                   ENDDO                                                                 
                ENDIF
              END DO               
@@ -277,14 +346,12 @@ C-------- grp skin_inf first
               NFAIL = ELBUF_TAB(NG)%BUFLY(ILAY)%NFAIL                                                                   
              DO IFAIL=1,NFAIL                                                          
                IF (FBUF%FLOC(IFAIL)%ILAWF == 7) THEN ! check /FLD model                
-                  IP=(IFAIL -1)*15         
-                  CALL H3D_FLD_TSH(ELBUF_TAB(NG),
-     .                       IR,IS,IT,ILAY,IFAIL,IP,MX,
-     .                       IPM,NPF,TF,BUFMAT,
-     .                       NGL,STRAIN,NEL )
+                  CALL H3D_FLD_TSH(ELBUF_TAB(NG),MAT_PARAM(MX)%FAIL(IFAIL),
+     .                       IR,IS,IT,ILAY,IFAIL,
+     .                       NPF,TF,NGL,STRAIN,NEL )
                   DO I=1,NEL                                                      
                     VALUE(I) = MAX(VALUE(I),FBUF%FLOC(IFAIL)%DAM(I)) 
-                    IS_WRITTEN_VALUE(I) = 1	                         
+                    IS_WRITTEN_VALUE(I) = 1                           
                   ENDDO                                                                 
                ENDIF
              END DO               
@@ -313,14 +380,84 @@ C-------- grp skin_up
               NFAIL = ELBUF_TAB(NG)%BUFLY(ILAY)%NFAIL                                                                   
              DO IFAIL=1,NFAIL                                                          
                IF (FBUF%FLOC(IFAIL)%ILAWF == 7) THEN ! check /FLD model                
-                  IP=(IFAIL -1)*15         
-                  CALL H3D_FLD_TSH(ELBUF_TAB(NG),
-     .                       IR,IS,IT,ILAY,IFAIL,IP,MX,
-     .                       IPM,NPF,TF,BUFMAT,
-     .                       NGL,STRAIN,NEL )
+                  CALL H3D_FLD_TSH(ELBUF_TAB(NG),MAT_PARAM(MX)%FAIL(IFAIL),
+     .                       IR,IS,IT,ILAY,IFAIL,
+     .                       NPF,TF,NGL,STRAIN,NEL )
                   DO I=1,NEL                                                      
                     VALUE(I) = MAX(VALUE(I),FBUF%FLOC(IFAIL)%DAM(I)) 
-                    IS_WRITTEN_VALUE(I) = 1	                         
+                    IS_WRITTEN_VALUE(I) = 1                           
+                  ENDDO                                                                 
+               ENDIF
+             END DO               
+             DO I=1,NEL
+               N = I + NFT
+               SKIN_SCALAR(NSKIN+I) = VALUE(I)
+               IF(IOK_PART(I) == 1 ) IS_WRITTEN_SKIN(NSKIN+I) = IS_WRITTEN_VALUE(I)
+             END DO
+             NSKIN = NSKIN + NEL
+C------------to get right NSKIN for next case          
+          ELSEIF (KEYWORD == 'FLDF/OUTER_AVERAGE') THEN
+            IS_WRITTEN_VALUE(1:NEL) = 1
+            MX = IXS(1,1 + NFT)
+            NGL(1:NEL) =IXS(NIXS,1 + NFT:NEL + NFT) 
+C-----------------------------------------------
+              ILAY=(1+NLAY)/2
+              IT = 1
+            IF (IGTYP == 22) THEN
+             PID = IXS(NIXS-1,1 + NFT)
+             MID = IGEO(100+ILAY,PID)
+             MLWI=NINT(PM(19,MID))
+            END IF
+            CALL H3D_FLD_STRAIN(ELBUF_TAB(NG),X  ,IXS   ,
+     .                        JHBE,MLWI,ILAY,KCVT,IOR_TSH,
+     .                        ICSTR,NPTR,NPTS,NEL,F_EXP,STRAIN )
+C-------- grp skin_inf first
+              IR = 1
+              IS = 1
+              FBUF => ELBUF_TAB(NG)%BUFLY(ILAY)%FAIL(IR,IS,IT)                            
+              NFAIL = ELBUF_TAB(NG)%BUFLY(ILAY)%NFAIL                                                                   
+             DO IFAIL=1,NFAIL                                                          
+               IF (FBUF%FLOC(IFAIL)%ILAWF == 7) THEN ! check /FLD model                
+                  CALL H3D_FLD_TSH(ELBUF_TAB(NG),MAT_PARAM(MX)%FAIL(IFAIL),
+     .                       IR,IS,IT,ILAY,IFAIL,
+     .                       NPF,TF,NGL,STRAIN,NEL )
+                  DO I=1,NEL                                                      
+                    VALUE(I) = MAX(VALUE(I),FBUF%FLOC(IFAIL)%DAM(I)) 
+                    IS_WRITTEN_VALUE(I) = 1                           
+                  ENDDO                                                                 
+               ENDIF
+             END DO               
+C------           
+             DO I=1,NEL
+               N = I + NFT
+               SKIN_SCALAR(NSKIN+I) = VALUE(I)
+               IF(IOK_PART(I) == 1 ) IS_WRITTEN_SKIN(NSKIN+I) = IS_WRITTEN_VALUE(I)
+             END DO
+             NSKIN = NSKIN + NEL
+C-------- grp skin_up
+              ILAY=(1+NLAY)/2
+              IT = 1
+             VALUE(1:NEL) = ZERO
+             IF (IGTYP == 22) THEN
+              PID = IXS(NIXS-1,1 + NFT)
+              MID = IGEO(100+ILAY,PID)
+              MLWI=NINT(PM(19,MID))
+             END IF
+             CALL H3D_FLD_STRAIN(ELBUF_TAB(NG),X  ,IXS   ,
+     .                        JHBE,MLWI,ILAY,KCVT,IOR_TSH,
+     .                        ICSTR,NPTR,NPTS,NEL,F_EXP,STRAIN )
+              IR = 1
+              IS = 1
+              FBUF => ELBUF_TAB(NG)%BUFLY(ILAY)%FAIL(IR,IS,IT)                            
+              NFAIL = ELBUF_TAB(NG)%BUFLY(ILAY)%NFAIL                                                                   
+             DO IFAIL=1,NFAIL                                                          
+               IF (FBUF%FLOC(IFAIL)%ILAWF == 7) THEN ! check /FLD model                
+                  CALL H3D_FLD_TSH(ELBUF_TAB(NG),MAT_PARAM(MX)%FAIL(IFAIL),
+     .                       IR,IS,IT,ILAY,IFAIL,
+     .                       NPF,TF,NGL,STRAIN,NEL )
+                  DO I=1,NEL                                                      
+                    VALUE(I) = MAX(VALUE(I),FBUF%FLOC(IFAIL)%DAM(I)) 
+                    IS_WRITTEN_VALUE(I) = 1                           
                   ENDDO                                                                 
                ENDIF
              END DO               
@@ -341,16 +478,17 @@ C------for solid elements
        IF (NUMSKIN> (NSKIN+NUMSKINP))       
      .  CALL H3D_SOL_SKIN_SCALAR(
      .                   ELBUF_TAB,SKIN_SCALAR, IPARG   ,IXS     ,X     ,PM  ,
-     4                   IPARTS  ,IPM     ,IGEO    ,IXS10 ,IXS16 , IXS20  ,
+     4                   IPARTS  ,IGEO    ,IXS10 ,IXS16 , IXS20  ,
      5                   IS_WRITTEN_SKIN  ,H3D_PART,INFO1   ,KEYWORD ,NSKIN ,
      6                   IAD_ELEM        ,FR_ELEM     , WEIGHT   ,TAG_SKINS6,
-     7                   NPF  ,TF   ,BUFMAT)
+     7                   NPF  ,TF   ,MAT_PARAM)
 C------for solid elements
        IF (NUMSKINP> 0)       
      .  CALL H3D_PRE_SKIN_SCALAR(SKIN_SCALAR,NODAL_IPART,
      .                   IS_WRITTEN_SKIN  ,H3D_PART,INFO1   ,KEYWORD ,
      .                   IBCL,ILOADP,LLOADP,FAC ,NPF,TF ,SENSOR_TAB,
-     .                   TAGNCONT,LOADP_HYD_INTER,FORC,XFRAME ,X ,V ,NSKIN )
+     .                   TAGNCONT,LOADP_HYD_INTER,FORC,XFRAME ,X ,V ,
+     .                   IMAPSKP,NSKIN ,NSENSOR,LOADS ,TABLE, IFRAME)
 C-----------------------------------------------
       RETURN
       END
@@ -359,17 +497,22 @@ Chd|  H3D_PRE_SKIN_SCALAR           source/output/h3d/h3d_results/h3d_skin_scala
 Chd|-- called by -----------
 Chd|        H3D_SKIN_SCALAR               source/output/h3d/h3d_results/h3d_skin_scalar.F
 Chd|-- calls ---------------
+Chd|        PRESS_SEG3                    source/loads/general/load_pcyl/press_seg3.F
 Chd|        FINTER                        source/tools/curve/finter.F   
 Chd|        FINTER_SMOOTH                 source/tools/curve/finter_smooth.F
+Chd|        H3D_INC_MOD                   share/modules/h3d_inc_mod.F   
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
-Chd|        PBLAST_MOD                    ../common_source/modules/pblast_mod.F
+Chd|        LOADS_MOD                     ../common_source/modules/loads/loads_mod.F
+Chd|        PBLAST_MOD                    ../common_source/modules/loads/pblast_mod.F
 Chd|        PINCHTYPE_MOD                 ../common_source/modules/pinchtype_mod.F
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
+Chd|        TABLE_MOD                     share/modules/table_mod.F     
 Chd|====================================================================
       SUBROUTINE H3D_PRE_SKIN_SCALAR(SKIN_SCALAR,NODAL_IPART,
      .                   IS_WRITTEN_SKIN  ,H3D_PART,INFO1   ,KEYWORD ,
      .                   IB ,ILOADP,LLOADP,FAC ,NPC,TF ,SENSOR_TAB,
-     .                   TAGNCONT,LOADP_HYD_INTER,FORC,XFRAME,X ,V ,NSKIN )
+     .                   TAGNCONT,LOADP_HYD_INTER,FORC,XFRAME,X ,V ,
+     .                   IMAPSKP, NSKIN ,NSENSOR ,LOADS ,TABLE,IFRAME)
 C-----------------------------------------------
 C   M o d u l e s 
 C-----------------------------------------------
@@ -377,6 +520,10 @@ C-----------------------------------------------
       USE PINCHTYPE_MOD 
       USE PBLAST_MOD
       USE SENSOR_MOD
+      USE H3D_INC_MOD        
+      USE LOADS_MOD        
+      USE TABLE_MOD
+      USE NAMES_AND_TITLES_MOD, ONLY: NCHARLINE100
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -385,14 +532,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com06_c.inc"
 #include      "com08_c.inc"
 #include      "tabsiz_c.inc"
-C-----------------------------------------------
-C   E x t e r n a l  F u n c t i o n s
-C-----------------------------------------------
 C-----------------------------------------------
 C   E x t e r n a l  F u n c t i o n s
 C-----------------------------------------------
@@ -403,10 +545,12 @@ C-----------------------------------------------
 C-----------------------------------------------,
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER  ,INTENT(IN) :: NSENSOR
       my_real
      .   SKIN_SCALAR(*),TF(*),X(3,*),V(3,*)
-      CHARACTER*ncharline KEYWORD
+      CHARACTER(LEN=NCHARLINE100) :: KEYWORD
       TYPE (H3D_DATABASE) :: H3D_DATA
+      INTEGER , DIMENSION(NUMSKINP0), INTENT(IN) ::  IMAPSKP
       INTEGER
      .   H3D_PART(*),IS_WRITTEN_SKIN(*),INFO1,NPC(*)
       INTEGER LLOADP(SLLOADP),NSKIN
@@ -414,43 +558,46 @@ C-----------------------------------------------
       INTEGER TAGNCONT(NLOADP_HYD_INTER,NUMNOD),
      .        LOADP_HYD_INTER(NLOADP_HYD),NODAL_IPART(*)
       my_real
-     .   FAC(LFACCLD,*),XFRAME(NXFRAME,*),FORC(LFACCLD,*)
-      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+     .   FAC(LFACLOAD,NLOADP),XFRAME(NXFRAME,*),FORC(LFACCLD,*)
+      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) ,INTENT(IN) :: SENSOR_TAB
+      TYPE (LOADS_)   , INTENT(IN) :: LOADS
+      INTEGER ,       DIMENSION(LISKN,NUMFRAM+1)  ,INTENT(IN) :: IFRAME
+      TYPE (TTABLE)  ,DIMENSION(NTABLE)   ,INTENT(IN) :: TABLE
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NL, N1, ISK, N2, N3, N4, N5, 
+      INTEGER NL, N1, ISK, N2, N3, N4, N5,
      .        IAD ,NP ,IFUNC ,NPRES,NSKIN0,NSKIN1,N1FRAM,DIR_HSP,I,N
       INTEGER K1, K2, K3, ISENS,K,LL,IERR,
      .        N_OLD, ISMOOTH,IDEL,NINTERP ,NPL,TAGN1,TAGN2,TAGN3,TAGN4,
      .        FUN_CX,FUN_VEL,DIR_VEL,IFRA2, IANIM,IJK,UP_BOUND,
      .        IZ_UPDATE,ABAC_ID,ISIZ_SEG,IERR1,
      .        Phi_I, ID, USER_ID, ITA_SHIFT,NDT,NDT0,
-     .        NITER,ITER,IMODEL,IL,IS,SEGCONT,FUN_HSP,IFRA1,IFLOAD
+     .        NITER,ITER,IMODEL,IL,IS,SEGCONT,FUN_HSP,IFRA1,IFLOAD,NP0,NPI
       my_real
      .   NX, NY, NZ, AXI, AA, A0, VV, FX, FY, FZ, AX, DYDX, TS,
      .   SIXTH,TFEXTT,X_OLD, F1, F2,XSENS,FCX,FCY,FCYPINCH,FP,
      .   FCX1,FCY1,FCX2,FCY2,VX,VY,VZ,VEL,VSEG,NORM
       my_real FINTER, ZFx,ZFy,ZFz, ZZFx,ZZFy,ZZFz,PS, Zx,Zy,Zz,FINTER_SMOOTH
-      my_real
-     .   LAMBDA,VSEGX, VSEGY, VSEGZ,
-     .   cos_theta, alpha_inci, alpha_refl, P_inci, P_refl_,P_inci_, P_refl,Z, 
-     .   I_inci,I_refl,I_inci_,I_refl_, dt_0, t_a,dt_0_,
-     .   WAVE_refl,WAVE_inci, W13, P0, T_,Phi_DB,bound1,bound2
+c
       my_real COORMEAN,YMEAN,ZMEAN,PVEL,NSIGN,DNORM,
      .        Xdet,Ydet,Zdet,Tdet,Wtnt,PMIN,Dx,Dy,Dz,NORMD, P,
      .        FAC_M_bb, FAC_L_bb, FAC_T_bb, FAC_P_bb, FAC_I_bb, T0INF_LOC, TA_SHIFT, TT_STAR
       
-      DOUBLE PRECISION A_,B_,Z0_
-      
-      my_real DECAY_inci,DECAY_refl,ZETA,ZETA2,ZETA3,TMP,TMP2,TMP3,TMP4,FUNCT,DIFF,RES,TOL,T_INF,T_FIN,T_ZERO
-      my_real H00,H10,H01,H11,pP0,pP1,pM0,pM1,kk,m2,PI_,Ic,alpha,diff_t0_inci,diff_t0_refl
-      
-      DATA PI_/3.141592653589793238462643D0/
+C      
+      INTEGER :: IFUN,IFRA,M1,M2,NDIM,NPOINT, IIOUT,SHIFT
+       my_real :: A11,A12,A21,A22,B1,B2,DET,LEN,DIRX,DIRY,DIRZ,
+     .     BETA,GAMMA,R,S,RMAX,XFACR,XFACT,YFAC,SEGP,PRESS
+      my_real, DIMENSION(3) :: P0,DIR,A,B,C,D,M
+     
       EXTERNAL FINTER,FINTER_SMOOTH
 C=======================================================================
 C---- fill SKIN_SCALAR(*) w/ IS_WRITTEN_SKIN(*)=1
         IF (KEYWORD /= 'PEXT') RETURN
+        IS_WRITTEN_SKIN(NSKIN+1:NUMSKIN) = 0
+          SKIN_SCALAR(NSKIN+1:NUMSKIN)=ZERO
+        NP0= 0
+        NSKIN0 = NSKIN
 C-----Force (pressure) first 
       N_OLD  = 0
       X_OLD  = ZERO
@@ -463,12 +610,12 @@ C-----Force (pressure) first
          IDEL    = IB(8,NL)
          FCY     = FORC(1,NL)
          FCX     = FORC(2,NL)
-		 IF (N1==0.OR.N2==0.OR.N3==0.OR.N4==-1) CYCLE
+           IF (N1==0.OR.N2==0.OR.N3==0.OR.N4==-1) CYCLE
 C--------default zero        
-		 NSKIN = NSKIN + 1
-		 SKIN_SCALAR(NSKIN)=ZERO
+           NP0 = NP0 + 1
+         NSKIN = NSKIN0+ IMAPSKP(NP0)
          IF (NODAL_IPART(N1)>0) THEN
-		   IF (H3D_PART(NODAL_IPART(N1))==1) IS_WRITTEN_SKIN(NSKIN)=1
+             IF (H3D_PART(NODAL_IPART(N1))==1) IS_WRITTEN_SKIN(NSKIN)=1
          END IF
          ISENS   = 0
          XSENS   = ONE
@@ -477,10 +624,10 @@ C--------default zero
          ENDDO
          IF(ISENS==0)THEN
             TS=TT
+         ELSE
             TS = TT-SENSOR_TAB(ISENS)%TSTART
-            IF(TS < ZERO) CYCLE
          ENDIF
-         IF(IDEL > 0 ) CYCLE  ! SEGMENT DELETED
+         IF(IDEL > 0 .OR. TS < ZERO) CYCLE  ! SEGMENT DELETED,SENSOR
          IF(N_OLD/=N5.OR.X_OLD/=TS) THEN
            ISMOOTH = 0
            IF (N5 > 0) ISMOOTH = NPC(2*NFUNCT+N5+1)
@@ -494,10 +641,11 @@ C--------default zero
            X_OLD = TS
          ENDIF
          AA = FCY*F1*XSENS
-		 SKIN_SCALAR(NSKIN)=AA
+         SKIN_SCALAR(NSKIN)=AA
        END DO 
-C----------load_pressure	
-       DO NP=1,NLOADP_HYD
+C----------load_pressure
+       SHIFT =   NLOADP_F+NLOADP_B
+       DO NP=1+SHIFT,NLOADP_HYD+SHIFT
          ISIZ_SEG = ILOADP(1,NP)/4 
          IFUNC = ILOADP(3,NP)
          IAD = ILOADP(4,NP)
@@ -513,9 +661,9 @@ C--------default zero
            N3 = LLOADP(IAD+4*(N-1)+2)
            N4 = LLOADP(IAD+4*(N-1)+3)
            IF (N1==0.OR.N2==0.OR.N3==0) CYCLE
-           SKIN_SCALAR(NSKIN+N)=ZERO
+           NSKIN = NSKIN0+ IMAPSKP(NP0+N)
            IF (NODAL_IPART(N1)>0) THEN
-              IF (H3D_PART(NODAL_IPART(N1))==1) IS_WRITTEN_SKIN(NSKIN+N)=1
+              IF (H3D_PART(NODAL_IPART(N1))==1) IS_WRITTEN_SKIN(NSKIN)=1
            END IF
          ENDDO
 C
@@ -523,15 +671,17 @@ C
             TS=TT
          ELSE
             TS = TT-SENSOR_TAB(ISENS)%TSTART
-            IF(TS<ZERO) CYCLE
          ENDIF    
          DO N=1, ISIZ_SEG
            N1 = LLOADP(IAD+4*(N-1))
            N2 = LLOADP(IAD+4*(N-1)+1)
            N3 = LLOADP(IAD+4*(N-1)+2)
            N4 = LLOADP(IAD+4*(N-1)+3)
-		   IF (N1==0.OR.N2==0.OR.N3==0) CYCLE
+             IF (N1==0.OR.N2==0.OR.N3==0) CYCLE
 
+             NP0 = NP0 + 1
+           IF(TS<ZERO) CYCLE
+           NSKIN = NSKIN0+ IMAPSKP(NP0)
            F1 = FINTER(IFUNC,TS*FCX,NPC,TF,DYDX)
            AA = FCY*F1  
 C----------------
@@ -570,24 +720,23 @@ C----------------
 c                IF (FP==ZERO) FP = ONE
              ENDIF
              IF (SEGCONT==1) AA = ZERO
-             NSKIN = NSKIN +1
-             SKIN_SCALAR(NSKIN)=AA*FP
+             SKIN_SCALAR(NSKIN)=SKIN_SCALAR(NSKIN)+AA*FP
          END DO !N=1, NPRES/4
        END DO !NP=1,NLOADP_HYD
-C---------pfluid	   
+C---------pfluid
        DO NL=1,NLOADP_F
 C--------default zero        
-         ISIZ_SEG = ILOADP(1,NP)/4 
-         IAD = ILOADP(4,NP)
+         ISIZ_SEG = ILOADP(1,NL)/4 
+         IAD = ILOADP(4,NL)
          DO N=1, ISIZ_SEG
            N1 = LLOADP(IAD+4*(N-1))
            N2 = LLOADP(IAD+4*(N-1)+1)
            N3 = LLOADP(IAD+4*(N-1)+2)
            N4 = LLOADP(IAD+4*(N-1)+3)
-		   IF (N1==0.OR.N2==0.OR.N3==0) CYCLE
-		   SKIN_SCALAR(NSKIN+N)=ZERO
+             IF (N1==0.OR.N2==0.OR.N3==0) CYCLE
+           NSKIN = NSKIN0+ IMAPSKP(NP0+N)
            IF (NODAL_IPART(N1)>0) THEN
-		     IF (H3D_PART(NODAL_IPART(N1))==1) IS_WRITTEN_SKIN(NSKIN+N)=1
+               IF (H3D_PART(NODAL_IPART(N1))==1) IS_WRITTEN_SKIN(NSKIN)=1
            END IF
          ENDDO
          FUN_HSP=ILOADP(7,NL)
@@ -614,14 +763,16 @@ C--------default zero
             TS=TT
          ELSE                        
             TS = TT-SENSOR_TAB(ISENS)%TSTART
-            IF(TS < ZERO) CYCLE     
          ENDIF
          DO I = 1,ISIZ_SEG
            N1=LLOADP(ILOADP(4,NL)+4*(I-1))
            N2=LLOADP(ILOADP(4,NL)+4*(I-1)+1)
            N3=LLOADP(ILOADP(4,NL)+4*(I-1)+2)
            N4=LLOADP(ILOADP(4,NL)+4*(I-1)+3)
-		   IF (N1==0.OR.N2==0.OR.N3==0) CYCLE
+             IF (N1==0.OR.N2==0.OR.N3==0) CYCLE
+             NP0 = NP0 + 1
+           IF(TS < ZERO) CYCLE     
+           NSKIN = NSKIN0+ IMAPSKP(NP0)
 C        
            AA = ZERO
            VEL = ZERO
@@ -694,7 +845,8 @@ C
             ELSEIF(N3 == N4)THEN
               N4 = 0
             ENDIF
-Csv         true triangles.
+            IF (N4==0) N4=N3
+C           true triangles.
             IF(FUN_HSP /=0)THEN
                K1=3*DIR_HSP-2
                K2=3*DIR_HSP-1
@@ -738,11 +890,10 @@ C
      .                 (NZ/NORM)*VEL*XFRAME(K3,IFRA2))**2  )* FCY1*
      .              FINTER(FUN_CX,TT*FCX1,NPC,TF,DYDX)/TWO
            ENDIF
-		  	NSKIN = NSKIN +1
-		    SKIN_SCALAR(NSKIN)=-AA+PVEL*NSIGN
+              SKIN_SCALAR(NSKIN)=SKIN_SCALAR(NSKIN)-AA+PVEL*NSIGN
          END DO 
        END DO 
-C---------pblast	   
+C---------pblast     
        DO NL=1+NLOADP_F,NLOADP_F+NLOADP_B
 C--------default zero        
          ISIZ_SEG  = ILOADP(1,NL)/4 
@@ -752,31 +903,118 @@ C--------default zero
            N2 = LLOADP(IAD+4*(N-1)+1)
            N3 = LLOADP(IAD+4*(N-1)+2)
            N4 = LLOADP(IAD+4*(N-1)+3)
-		   IF (N1==0.OR.N2==0.OR.N3==0) CYCLE
-		   SKIN_SCALAR(NSKIN+N)=ZERO
+             IF (N1==0.OR.N2==0.OR.N3==0) CYCLE
+           NSKIN = NSKIN0+ IMAPSKP(NP0+N)
            IF (NODAL_IPART(N1)>0) THEN
-		     IF (H3D_PART(NODAL_IPART(N1))==1) IS_WRITTEN_SKIN(NSKIN+N)=1
+               IF (H3D_PART(NODAL_IPART(N1))==1) IS_WRITTEN_SKIN(NSKIN)=1
            END IF
          ENDDO
          IL             = NL-NLOADP_F
          TDET           = FAC(01,NL)
          ID             = ILOADP(08,NL) !user_id
-         IF(TT<TDET)CYCLE
+         DO I = 1,ISIZ_SEG
+           NP0 = NP0 + 1
+           IF (TT<TDET) CYCLE     
+           NSKIN = NSKIN0+ IMAPSKP(NP0)
+           P = PBLAST_TAB(IL)%PRES(I)                                                           
+           SKIN_SCALAR(NSKIN)= SKIN_SCALAR(NSKIN)-P
+         ENDDO!next I
+       END DO 
+C---------/LOAD/PCYL
+       DO NL=1,LOADS%NLOAD_CYL
+C--------default zero        
+         ISIZ_SEG  = LOADS%LOAD_CYL(NL)%NSEG 
+         DO N=1, ISIZ_SEG
+           N1 = LOADS%LOAD_CYL(NL)%SEGNOD(N,1)
+           N2 = LOADS%LOAD_CYL(NL)%SEGNOD(N,2)
+           N3 = LOADS%LOAD_CYL(NL)%SEGNOD(N,3)
+           N4 = LOADS%LOAD_CYL(NL)%SEGNOD(N,4)
+           IF (N1==0.OR.N2==0.OR.N3==0) CYCLE
+           NSKIN = NSKIN0+ IMAPSKP(NP0+N)
+           IF (NODAL_IPART(N1)>0) THEN
+             IF (H3D_PART(NODAL_IPART(N1))==1) IS_WRITTEN_SKIN(NSKIN)=1
+           END IF
+         ENDDO
+         ISENS = LOADS%LOAD_CYL(NL)%ISENS
+         IIOUT = 0
+         IF (ISENS > 0) THEN
+           IF (SENSOR_TAB(ISENS)%STATUS == 0) THEN
+              NP0 = NP0 + ISIZ_SEG
+              CYCLE
+           END IF
+         END IF
+         IFRA = LOADS%LOAD_CYL(NL)%IFRAME + 1
+         XFACR= LOADS%LOAD_CYL(NL)%XSCALE_R
+         XFACT= LOADS%LOAD_CYL(NL)%XSCALE_T
+         YFAC = LOADS%LOAD_CYL(NL)%YSCALE
+         IFUN = LOADS%LOAD_CYL(NL)%ITABLE
+         NDIM = TABLE(IFUN)%NDIM
+         NPOINT = SIZE(TABLE(IFUN)%X(1)%VALUES)
+         RMAX = TABLE(IFUN)%X(1)%VALUES(NPOINT)
+         M1   = IFRAME(1,IFRA)
+         M2   = IFRAME(2,IFRA)
+         DIRX = X(1,M1) - X(1,M2)
+         DIRY = X(2,M1) - X(2,M2)
+         DIRZ = X(3,M1) - X(3,M2)
+         LEN  = SQRT(DIRX**2 + DIRY**2 + DIRZ**2)
+         ! SEGP beam axis
+         DIR(1) = DIRX / LEN
+         DIR(2) = DIRY / LEN
+         DIR(3) = DIRZ / LEN
+         P0(1)  = X(1,M2)
+         P0(2)  = X(2,M2)
+         P0(3)  = X(3,M2)
          !---------------------------------------------
          !   LOOP ON SEGMENTS (4N or 3N)
          !---------------------------------------------      
-         DO I = 1,ISIZ_SEG
-           N1=LLOADP(ILOADP(4,NL)+4*(I-1))
-           N2=LLOADP(ILOADP(4,NL)+4*(I-1)+1)
-           N3=LLOADP(ILOADP(4,NL)+4*(I-1)+2)
-           N4=LLOADP(ILOADP(4,NL)+4*(I-1)+3) 
-		   IF (N1==0.OR.N2==0.OR.N3==0) CYCLE           
-           !Dist                                                                                                          
-           
-           P = PBLAST_TAB(IL)%PRES(I)                                                           
-		   NSKIN = NSKIN +1
-		   SKIN_SCALAR(NSKIN)= -P
-         ENDDO!next I
+         DO N = 1,ISIZ_SEG
+           N1 = LOADS%LOAD_CYL(NL)%SEGNOD(N,1)
+           N2 = LOADS%LOAD_CYL(NL)%SEGNOD(N,2)
+           N3 = LOADS%LOAD_CYL(NL)%SEGNOD(N,3)
+           N4 = LOADS%LOAD_CYL(NL)%SEGNOD(N,4)
+           PRESS = ZERO
+           A(1) = X(1,N1)
+           A(2) = X(2,N1)
+           A(3) = X(3,N1)
+           B(1) = X(1,N2)
+           B(2) = X(2,N2)
+           B(3) = X(3,N2)
+           C(1) = X(1,N3)
+           C(2) = X(2,N3)
+           C(3) = X(3,N3)
+           NP0 = NP0 + 1
+           IF (N4 == 0) THEN    ! 3 node segment
+             CALL PRESS_SEG3(A       ,B      ,C      ,P0      ,DIR    , 
+     .                       IFUN    ,TABLE  ,XFACR  ,SEGP   )
+             PRESS = ABS(SEGP) * YFAC
+c          
+           ELSE                ! 4 node segment
+             D(1) = X(1,N4)
+             D(2) = X(2,N4)
+             D(3) = X(3,N4)
+             M(1) = (X(1,N1) + X(1,N2) + X(1,N3) + X(1,N4)) * FOURTH
+             M(2) = (X(2,N1) + X(2,N2) + X(2,N3) + X(2,N4)) * FOURTH
+             M(3) = (X(3,N1) + X(3,N2) + X(3,N3) + X(3,N4)) * FOURTH
+c            1st internal triangle 
+             CALL PRESS_SEG3(A       ,B      ,M      ,P0      ,DIR    , 
+     .                       IFUN    ,TABLE  ,XFACR  ,SEGP   )
+             PRESS = PRESS + SEGP * FOURTH
+c            2nd internal triangle 
+             CALL PRESS_SEG3(B       ,C      ,M      ,P0      ,DIR    , 
+     .                       IFUN    ,TABLE  ,XFACR  ,SEGP   )
+             PRESS = PRESS + SEGP * FOURTH
+c            3rd internal triangle 
+             CALL PRESS_SEG3(C       ,D      ,M      ,P0      ,DIR    , 
+     .                       IFUN    ,TABLE  ,XFACR  ,SEGP   )
+             PRESS = PRESS + SEGP * FOURTH
+c            4th internal triangle 
+             CALL PRESS_SEG3(D       ,A      ,M      ,P0      ,DIR    , 
+     .                       IFUN    ,TABLE  ,XFACR  ,SEGP   )
+             PRESS = ABS(PRESS) * YFAC
+           END IF  !  seg 4 node
+           NSKIN = NSKIN0+ IMAPSKP(NP0)
+           SKIN_SCALAR(NSKIN)= SKIN_SCALAR(NSKIN)+PRESS
+         ENDDO!next N
        END DO 
 C
       RETURN

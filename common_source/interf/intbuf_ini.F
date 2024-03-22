@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  INTBUF_INI                    interf/intbuf_ini.F           
 Chd|-- called by -----------
@@ -30,8 +30,7 @@ Chd|        ARRET                         engine/source/system/arret.F
 Chd|        INTBUF_INI_T8                 interf/intbuf_ini.F           
 Chd|        READ_DB                       starter/source/restart/ddsplit/wrrest.F
 Chd|        READ_DB                       engine/source/output/tools/read_db.F
-Chd|        READ_I_C                      starter/source/output/tools/write_routines.c
-Chd|        READ_I_C                      engine/source/output/tools/sortie_c.c
+Chd|        READ_I_C                      tools/input_output/write_routtines.c
 Chd|        INTBUFDEF_MOD                 modules/intbufdef_mod.F       
 Chd|        MESSAGE_MOD                   starter/share/message_module/message_mod.F
 Chd|        MESSAGE_MOD                   engine/share/message_module/message_mod.F
@@ -55,7 +54,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   M y  A l l o c a t e                         
 C-----------------------------------------------
-#include      "my_allocate.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -371,6 +369,10 @@ C=======================================================================
         N = N+1 
         INTBUF_TAB(NI)%S_PENIS        = INTBUF_SIZE(N)
         N = N+1
+        INTBUF_TAB(NI)%S_STIFMSDT_S   = INTBUF_SIZE(N)
+        N = N+1
+        INTBUF_TAB(NI)%S_STIFMSDT_M   = INTBUF_SIZE(N)
+        N = N+1
         INTBUF_TAB(NI)%S_GAP_M        = INTBUF_SIZE(N)
         N = N+1
         INTBUF_TAB(NI)%S_GAP_S        = INTBUF_SIZE(N)
@@ -400,6 +402,8 @@ C=======================================================================
         INTBUF_TAB(NI)%S_GAP_E_L     = INTBUF_SIZE(N)
         N = N+1
         INTBUF_TAB(NI)%S_STFE        = INTBUF_SIZE(N)
+        N = N+1
+        INTBUF_TAB(NI)%S_STIFMSDT_EDG = INTBUF_SIZE(N)
         N = N+1
         INTBUF_TAB(NI)%S_FTSAVX       = INTBUF_SIZE(N)
         N = N+1
@@ -697,9 +701,11 @@ C=======================================================================
         ENDIF
 
         SIZ = INTBUF_TAB(NI)%S_LISUBM
-        ALLOCATE(INTBUF_TAB(NI)%LISUBM(SIZ))
+        ALLOCATE(INTBUF_TAB(NI)%LISUBM(SIZ+1))
         IF(SIZ>0)THEN
           CALL READ_I_C(INTBUF_TAB(NI)%LISUBM,SIZ)
+          !sentinel value to avoid invalid read in i*for3.F
+          INTBUF_TAB(NI)%LISUBM(SIZ+1) = HUGE(SIZ)
         ENDIF
 
         SIZ = INTBUF_TAB(NI)%S_INFLG_SUBS
@@ -1132,7 +1138,7 @@ C----------to be cleaned later
         ENDIF
 
         SIZ = INTBUF_TAB(NI)%S_ISPT2
-        MY_ALLOCATE(INTBUF_TAB(NI)%ISPT2,SIZ)
+        ALLOCATE(INTBUF_TAB(NI)%ISPT2(SIZ))
         IF(SIZ>0)THEN
           CALL READ_I_C(INTBUF_TAB(NI)%ISPT2,SIZ)
         ENDIF
@@ -1437,6 +1443,18 @@ C=======================================================================
           CALL READ_DB(INTBUF_TAB(NI)%PENIS,SIZ)
         ENDIF
 
+        SIZ = INTBUF_TAB(NI)%S_STIFMSDT_S
+        ALLOCATE(INTBUF_TAB(NI)%STIFMSDT_S(SIZ))
+        IF(SIZ>0)THEN
+          CALL READ_DB(INTBUF_TAB(NI)%STIFMSDT_S,SIZ)
+        ENDIF
+
+        SIZ = INTBUF_TAB(NI)%S_STIFMSDT_M
+        ALLOCATE(INTBUF_TAB(NI)%STIFMSDT_M(SIZ))
+        IF(SIZ>0)THEN
+          CALL READ_DB(INTBUF_TAB(NI)%STIFMSDT_M,SIZ)
+        ENDIF
+
         SIZ = INTBUF_TAB(NI)%S_GAP_M
         ALLOCATE(INTBUF_TAB(NI)%GAP_M(SIZ))
         IF(SIZ>0)THEN
@@ -1527,6 +1545,12 @@ C=======================================================================
         ALLOCATE(INTBUF_TAB(NI)%STFE(SIZ))
         IF(SIZ>0)THEN
           CALL READ_DB(INTBUF_TAB(NI)%STFE,SIZ)
+        ENDIF
+
+        SIZ = INTBUF_TAB(NI)%S_STIFMSDT_EDG
+        ALLOCATE(INTBUF_TAB(NI)%STIFMSDT_EDG(SIZ))
+        IF(SIZ>0)THEN
+          CALL READ_DB(INTBUF_TAB(NI)%STIFMSDT_EDG,SIZ)
         ENDIF
 
         SIZ = INTBUF_TAB(NI)%S_RIGE
@@ -2094,9 +2118,8 @@ Chd|  INTBUF_INI_T8                 interf/intbuf_ini.F
 Chd|-- called by -----------
 Chd|        INTBUF_INI                    common_source/interf/intbuf_ini.F
 Chd|-- calls ---------------
-Chd|        READ_I_C                      starter/source/output/tools/write_routines.c
-Chd|        READ_I_C                      engine/source/output/tools/sortie_c.c
-Chd|        INT8_MOD                      modules/int8_mod.F            
+Chd|        READ_I_C                      tools/input_output/write_routtines.c
+Chd|        INT8_MOD                      modules/interfaces/int8_mod.F 
 Chd|====================================================================
       SUBROUTINE INTBUF_INI_T8(T8)  
 C Reads the T8 structures

@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  FRONT_MOD                     share/modules1/front_mod.F    
 Chd|-- called by -----------
@@ -69,6 +69,7 @@ Chd|        SET_INTERCEP                  source/spmd/node/ddtools.F
 Chd|        SPLIT_ADSKYN_25               source/restart/ddsplit/inter_tools.F
 Chd|        SPLIT_CAND_I11                source/restart/ddsplit/inter_tools.F
 Chd|        SPLIT_CAND_I24                source/restart/ddsplit/inter_tools.F
+Chd|        SPLIT_EBCS                    source/boundary_conditions/ebcs/split_ebcs.F
 Chd|        SPLIT_INTERFACES              source/restart/ddsplit/split_interfaces.F
 Chd|        SPLIT_REMNODE_I24             source/restart/ddsplit/inter_tools.F
 Chd|        SPLIT_REMNODE_I25             source/restart/ddsplit/inter_tools.F
@@ -85,7 +86,7 @@ Chd|====================================================================
 
       TYPE my_front
         INTEGER, DIMENSION(:,:), POINTER :: P
-	INTEGER, DIMENSION(:)  , ALLOCATABLE :: IENTRY
+          INTEGER, DIMENSION(:)  , ALLOCATABLE :: IENTRY
       END TYPE my_front     
       
 c IFRONT chained-list      
@@ -93,7 +94,7 @@ c IFRONT chained-list
 
       TYPE my_connectdom
         INTEGER, DIMENSION(:,:), POINTER :: PDOM
-	INTEGER, DIMENSION(:,:)  , ALLOCATABLE :: IENTRYDOM
+          INTEGER, DIMENSION(:,:)  , ALLOCATABLE :: IENTRYDOM
       END TYPE my_connectdom     
       
 c IFRONT64 chained-list      

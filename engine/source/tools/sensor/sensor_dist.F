@@ -1,30 +1,29 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  ConTSTART Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C=======================================================================
 Chd|====================================================================
 Chd|  SENSOR_DIST                   source/tools/sensor/sensor_dist.F
 Chd|-- called by -----------
-Chd|        SENSOR1                       source/tools/sensor/sensor1.F 
 Chd|        SENSOR_BASE                   source/tools/sensor/sensor_base.F
 Chd|-- calls ---------------
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
@@ -41,8 +40,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
-#include      "scr17_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
@@ -54,14 +51,15 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       my_real, DIMENSION(3,NUMNOD) :: X
       my_real, DIMENSION(12)       :: XSENS
-      TYPE (SENSOR_STR_) ,TARGET   :: SENSOR
+      TYPE (SENSOR_STR_) ,INTENT(INOUT) ,TARGET :: SENSOR
 C----------------------------------------------------------
 C Local Variables
 C----------------------------------------------------------
       INTEGER :: N1,N2,ICRIT,DFLAG,IFLAG,ACTI
-      my_real :: DX,DY,DZ,DD,DMIN,DMAX,TMIN,TDELAY,INFINITY
+      my_real :: DX,DY,DZ,DD,DMIN,DMAX,TSTART,TMIN,TDELAY,INFINITY
       PARAMETER (INFINITY = 1.0E20)
 C=======================================================================
+      TSTART  = SENSOR%TSTART
       TDELAY = SENSOR%TDELAY
       TMIN   = SENSOR%TMIN
 c      
@@ -99,24 +97,23 @@ c----------------------------------------------------------------
           IF (ICRIT == 0) THEN
             SENSOR%TCRIT = INFINITY
           ELSE IF (ICRIT == 1 .and. SENSOR%TCRIT == INFINITY) THEN
-            SENSOR%TCRIT = MIN(SENSOR%TCRIT, TT)
+            SENSOR%TCRIT = TT
           END IF
         END IF
-        IF (SENSOR%TSTART == INFINITY .and. SENSOR%TCRIT < INFINITY) THEN
-          SENSOR%TSTART = SENSOR%TCRIT + TMIN + TDELAY      
-        END IF
-        IF (SENSOR%TSTART <= TT) THEN   
+        TSTART = SENSOR%TCRIT + TMIN + TDELAY      
+        IF (TSTART <= TT) THEN   
           ! sensor activation
           ACTI = 1
           SENSOR%STATUS = 1
-          SENSOR%VALUE = INFINITY
+          SENSOR%TSTART = TSTART
+          SENSOR%VALUE  = INFINITY
         END IF 
       END IF 
 c
       IF (DFLAG == 1 .and. SENSOR%STATUS == 1) THEN
           IF (SENSOR%VALUE + TMIN > TT) THEN
             IF (ICRIT == 0 .and. SENSOR%VALUE == INFINITY) THEN
-              SENSOR%VALUE = MIN(SENSOR%VALUE, TT)
+              SENSOR%VALUE = TT
             ELSE IF (ICRIT > 0) THEN
               SENSOR%VALUE = INFINITY
             END IF

@@ -1,39 +1,39 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  GPS_SOLID                     source/output/outmaxsubr.F    
 Chd|-- called by -----------
 Chd|        UPD_TMAX                      source/output/upd_outmax.F    
 Chd|-- calls ---------------
-Chd|        SPMD_EXCH_N                   source/mpi/generic/spmd_exch_n.F
-Chd|        SPMD_EXCH_NODAREAI            source/mpi/anim/spmd_exch_nodareai.F
+Chd|        SPMD_EXCH_V                   source/mpi/generic/spmd_exch_v.F
 Chd|        TENSGPS3                      source/output/anim/generate/tensor6.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE GPS_SOLID(ELBUF_TAB,IPARG   ,GEO     ,PM   ,
-     .  	       IXS	,IXS10   ,IXS16   ,IXS20   ,IXQ     ,
-     .  	       IXC	,IXTG	 ,IXT	  ,IXP     ,IXR     ,
-     .  	       X	,IAD_ELEM,FR_ELEM ,WEIGHT  ,SIG_N   )
+     .           IXS  ,IXS10   ,IXS16   ,IXS20   ,IXQ     ,
+     .           IXC  ,IXTG   ,IXT    ,IXP     ,IXR     ,
+     .           X  ,IAD_ELEM,FR_ELEM ,WEIGHT  ,SIG_N   ,
+     .             ITAGPS)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -42,17 +42,12 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "chara_c.inc"
-#include      "nchara_c.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "mvsiz_p.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "task_c.inc"
-#include      "spmd_c.inc"
 #include      "tabsiz_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -69,8 +64,9 @@ C-----------------------------------------------
       INTEGER, DIMENSION(8,NUMELS16) ,INTENT(IN):: IXS16
       INTEGER, DIMENSION(12,NUMELS20) ,INTENT(IN):: IXS20
       INTEGER, DIMENSION(2,NSPMD+1)   ,INTENT(IN):: IAD_ELEM
-      INTEGER, DIMENSION(SFR_ELEM)     ,INTENT(IN):: FR_ELEM
-      INTEGER, DIMENSION(NUMNOD)     ,INTENT(IN):: WEIGHT
+      INTEGER, DIMENSION(SFR_ELEM)    ,INTENT(IN):: FR_ELEM
+      INTEGER, DIMENSION(NUMNOD)      ,INTENT(IN):: WEIGHT
+      INTEGER, DIMENSION(NUMNOD)     ,INTENT(INOUT):: ITAGPS
       my_real, DIMENSION(NPROPG,NUMGEO) ,INTENT(IN):: GEO
       my_real, DIMENSION(NPROPM,NUMMAT) ,INTENT(IN):: PM
       my_real, DIMENSION(3,NUMNOD) ,INTENT(IN):: X
@@ -79,34 +75,32 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,K,N,LENR
+      INTEGER I,J,K,N,LENR,NSIZ
       my_real
      .  FAC
-      INTEGER, DIMENSION(:), ALLOCATABLE :: ITAGPS    
       my_real
-     .       , DIMENSION(:,:), ALLOCATABLE :: AFLU, VFLU
+     .       , DIMENSION(:,:), ALLOCATABLE, TARGET :: VCOM
+      my_real
+     .       , DIMENSION(:,:), POINTER :: AFLU, VFLU
 C-----------------------------------------------
 C
-      ALLOCATE(AFLU(3,NUMNOD))
-      ALLOCATE(VFLU(3,NUMNOD))
-      ALLOCATE(ITAGPS(NUMNOD))
+      NSIZ = 7
+      ALLOCATE(VCOM(NSIZ,NUMNOD))
+      AFLU=>VCOM(1:3,1:NUMNOD)
+      VFLU=>VCOM(4:6,1:NUMNOD)
+      VCOM = ZERO
 
        SIG_N(1:NUMNOD,1:6) = ZERO
-         DO N=1,NUMNOD
-           ITAGPS(N) = 0
-           VFLU(1:3,N) = ZERO
-           AFLU(1:3,N) = ZERO
-         ENDDO
-         CALL TENSGPS3(ELBUF_TAB ,VFLU	  ,AFLU    ,IPARG   ,GEO     ,
-     .  	       IXS	,IXS10   ,IXS16   ,IXS20   ,IXQ     ,
-     .  	       IXC	,IXTG	 ,IXT	  ,IXP     ,IXR     ,
-     .  	       X	,ITAGPS  ,PM	  )
-
+       ITAGPS(1:NUMNOD) = 0
+         CALL TENSGPS3(ELBUF_TAB ,VFLU    ,AFLU    ,IPARG   ,GEO     ,
+     .           IXS  ,IXS10   ,IXS16   ,IXS20   ,IXQ     ,
+     .           IXC  ,IXTG   ,IXT    ,IXP     ,IXR     ,
+     .           X  ,ITAGPS  ,PM    )
          IF(NSPMD > 1)THEN
+           VCOM(7,1:NUMNOD) =ITAGPS(1:NUMNOD) 
            LENR = IAD_ELEM(1,NSPMD+1)-IAD_ELEM(1,1)
-           CALL SPMD_EXCH_NODAREAI(ITAGPS,IAD_ELEM,FR_ELEM,LENR,WEIGHT)
-           CALL SPMD_EXCH_N(VFLU,IAD_ELEM,FR_ELEM,LENR)
-           CALL SPMD_EXCH_N(AFLU,IAD_ELEM,FR_ELEM,LENR)
+           CALL SPMD_EXCH_V(VCOM,NSIZ,IAD_ELEM,FR_ELEM,LENR)
+           ITAGPS(1:NUMNOD)=NINT(VCOM(7,1:NUMNOD)) 
          ENDIF
          DO N=1,NUMNOD
            IF (ITAGPS(N) == 0) CYCLE
@@ -115,9 +109,7 @@ C
            SIG_N(N,4:6)=FAC*AFLU(1:3,N)
          ENDDO
 
-      DEALLOCATE(AFLU)
-      DEALLOCATE(VFLU)
-      DEALLOCATE(ITAGPS)
+      DEALLOCATE(VCOM)
 
       RETURN
       END
@@ -129,12 +121,13 @@ Chd|-- calls ---------------
 Chd|        SPMD_EXCH_N                   source/mpi/generic/spmd_exch_n.F
 Chd|        SPMD_EXCH_NODAREAI            source/mpi/anim/spmd_exch_nodareai.F
 Chd|        TENSGPSTRAIN                  source/output/anim/generate/tensgpstrain.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE GPSTRA_SOLID(ELBUF_TAB,IPARG   ,GEO     ,PM   ,
-     .  	       IXS	,IXS10   ,IXS16   ,IXS20   ,IXQ     ,
-     .  	       IXC	,IXTG	 ,IXT	  ,IXP     ,IXR     ,
-     .  	       X	,IAD_ELEM,FR_ELEM ,WEIGHT  ,STR_N   )
+     .           IXS  ,IXS10   ,IXS16   ,IXS20   ,IXQ     ,
+     .           IXC  ,IXTG   ,IXT    ,IXP     ,IXR     ,
+     .           X  ,IAD_ELEM,FR_ELEM ,WEIGHT  ,STR_N   ,
+     .             ITAGPS)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -143,17 +136,12 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "chara_c.inc"
-#include      "nchara_c.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "mvsiz_p.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "task_c.inc"
-#include      "spmd_c.inc"
 #include      "tabsiz_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -170,8 +158,9 @@ C-----------------------------------------------
       INTEGER, DIMENSION(8,NUMELS16) ,INTENT(IN):: IXS16
       INTEGER, DIMENSION(12,NUMELS20) ,INTENT(IN):: IXS20
       INTEGER, DIMENSION(2,NSPMD+1)   ,INTENT(IN):: IAD_ELEM
-      INTEGER, DIMENSION(SFR_ELEM)     ,INTENT(IN):: FR_ELEM
-      INTEGER, DIMENSION(NUMNOD)     ,INTENT(IN):: WEIGHT
+      INTEGER, DIMENSION(SFR_ELEM)    ,INTENT(IN):: FR_ELEM
+      INTEGER, DIMENSION(NUMNOD)      ,INTENT(IN):: WEIGHT
+      INTEGER, DIMENSION(NUMNOD)     ,INTENT(INOUT):: ITAGPS
       my_real, DIMENSION(NPROPG,NUMGEO) ,INTENT(IN):: GEO
       my_real, DIMENSION(NPROPM,NUMMAT) ,INTENT(IN):: PM
       my_real, DIMENSION(3,NUMNOD) ,INTENT(IN):: X
@@ -183,14 +172,12 @@ C-----------------------------------------------
       INTEGER I,J,K,N,LENR
       my_real
      .  FAC
-      INTEGER, DIMENSION(:), ALLOCATABLE :: ITAGPS    
       my_real
      .       , DIMENSION(:,:), ALLOCATABLE :: AFLU, VFLU
 C-----------------------------------------------
 C
       ALLOCATE(AFLU(3,NUMNOD))
       ALLOCATE(VFLU(3,NUMNOD))
-      ALLOCATE(ITAGPS(NUMNOD))
 
 
        STR_N(1:NUMNOD,1:6) = ZERO
@@ -199,10 +186,10 @@ C
            VFLU(1:3,N) = ZERO
            AFLU(1:3,N) = ZERO
          ENDDO
-         CALL TENSGPSTRAIN(ELBUF_TAB,VFLU	 ,AFLU    ,IPARG   ,GEO     ,
-     .  	       IXS	,IXS10   ,IXS16   ,IXS20   ,IXQ     ,
-     .  	       IXC	,IXTG	 ,IXT	  ,IXP     ,IXR     ,
-     .  	       X	,ITAGPS  ,PM	  )
+         CALL TENSGPSTRAIN(ELBUF_TAB,VFLU   ,AFLU    ,IPARG   ,GEO     ,
+     .           IXS  ,IXS10   ,IXS16   ,IXS20   ,IXQ     ,
+     .           IXC  ,IXTG   ,IXT    ,IXP     ,IXR     ,
+     .           X  ,ITAGPS  ,PM    )
          IF(NSPMD > 1)THEN
            LENR = IAD_ELEM(1,NSPMD+1)-IAD_ELEM(1,1)
            CALL SPMD_EXCH_NODAREAI(ITAGPS,IAD_ELEM,FR_ELEM,LENR,WEIGHT)
@@ -218,7 +205,6 @@ C
 
       DEALLOCATE(AFLU)
       DEALLOCATE(VFLU)
-      DEALLOCATE(ITAGPS)
 
       RETURN
       END
@@ -235,9 +221,6 @@ C-----------------------------------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -276,9 +259,6 @@ C-----------------------------------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -336,9 +316,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER  ,INTENT(IN) :: NEL
@@ -372,9 +349,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER  ,INTENT(IN) :: NEL
@@ -406,9 +380,6 @@ C-----------------------------------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -444,9 +415,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER  IVISC,NEL
@@ -462,14 +430,14 @@ C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------     
         DO I=1,NEL
-          S(1:6) = SIG(I,1:6)				  
-          IF(IVISC > 0 ) S(1:6) = S(1:6) + VISC(I,1:6)				  
+          S(1:6) = SIG(I,1:6)          
+          IF(IVISC > 0 ) S(1:6) = S(1:6) + VISC(I,1:6)          
           P = - (S(1)  + S(2) + S(3) ) * THIRD
           S1= S(1) + P
           S2= S(2) + P
           S3= S(3) + P
           VONM2= THREE*(S(4)*S(4)  +  S(5)*S(5) + S(6)*S(6) +
-     .    	   HALF*(S1*S1 + S2*S2  + S3*S3) )
+     .         HALF*(S1*S1 + S2*S2  + S3*S3) )
           VONM= SQRT(VONM2) ! can be optimized
           VALUE(I) = MAX(VALUE(I),VONM)
         ENDDO 
@@ -482,7 +450,7 @@ Chd|-- called by -----------
 Chd|        UPD_TMAX                      source/output/upd_outmax.F    
 Chd|-- calls ---------------
 Chd|        TM_VONM_SOLID                 source/output/outmaxsubr.F    
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE TM_SEQ_SOLID(ELBUF_TAB,NLAY,NPTR,NPTS,NPTT,IVISC,VALUE,NEL)
 C-----------------------------------------------
@@ -493,9 +461,6 @@ C-----------------------------------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -538,7 +503,7 @@ Chd|  TM_DMG_SOLID                  source/output/outmaxsubr.F
 Chd|-- called by -----------
 Chd|        UPD_TMAX                      source/output/upd_outmax.F    
 Chd|-- calls ---------------
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE TM_DMG_SOLID(ELBUF_TAB,NLAY,NPTR,NPTS,NPTT,VALUE,NEL)
 C-----------------------------------------------
@@ -549,9 +514,6 @@ C-----------------------------------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -569,13 +531,13 @@ C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------     
         DO IL=1,NLAY 
-         NFAIL = ELBUF_TAB%BUFLY(IL)%NFAIL								    
-         DO IS=1,NPTS					
-           DO IT=1,NPTT					
-             DO IIR=1,NPTR	
-               DO IR=1,NFAIL 											   
+         NFAIL = ELBUF_TAB%BUFLY(IL)%NFAIL                    
+         DO IS=1,NPTS
+           DO IT=1,NPTT
+             DO IIR=1,NPTR
+               DO IR=1,NFAIL                          
                  DFMAX=>ELBUF_TAB%BUFLY(IL)%FAIL(IIR,IS,IT)%FLOC(IR)%DAMMX
-                 DO I=1,NEL  			       
+                 DO I=1,NEL               
                    VALUE(I) = MAX(VALUE(I),DFMAX(I))
                  ENDDO
                ENDDO 
@@ -592,7 +554,7 @@ Chd|-- called by -----------
 Chd|        UPD_TMAX                      source/output/upd_outmax.F    
 Chd|-- calls ---------------
 Chd|        SIG3DPIN2                     source/output/outmaxsubr.F    
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE TM_SIG_SOLID(ELBUF_TAB,NLAY,NPTR,NPTS,NPTT,IVISC,
      .                        TEN1,TEN3,P2,NEL)
@@ -604,9 +566,6 @@ C-----------------------------------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -633,11 +592,11 @@ C-----------------------------------------------
              DO IS=1,NPTS
                LBUF =>  ELBUF_TAB%BUFLY(IL)%LBUF(IR,IS,IT)        
                DO I = 1,NEL
-                 S(I,1:6) = LBUF%SIG(JJ(1:6)+I)				  
+                 S(I,1:6) = LBUF%SIG(JJ(1:6)+I)          
                END DO 
                IF(IVISC > 0 ) THEN
                  DO I = 1,NEL
-                   S(I,1:6) = S(I,1:6) + LBUF%VISC(JJ(1:6)+I)				  
+                   S(I,1:6) = S(I,1:6) + LBUF%VISC(JJ(1:6)+I)          
                  END DO 
                END IF
                CALL SIG3DPIN2(S,SP2,NEL)
@@ -664,7 +623,7 @@ Chd|-- called by -----------
 Chd|        UPD_TMAX                      source/output/upd_outmax.F    
 Chd|-- calls ---------------
 Chd|        SIG3DPIN2                     source/output/outmaxsubr.F    
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE TM_STRA_SOLID(ELBUF_TAB,NLAY,NPTR,NPTS,NPTT,
      .                         TEN1,TEN3,P2,NEL) 
@@ -676,9 +635,6 @@ C-----------------------------------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -707,7 +663,7 @@ C-----------------------------------------------
 C !!!!! law 12,14                
                IF (ELBUF_TAB%BUFLY(IL)%L_STRA > 0) THEN
                  DO I = 1,NEL
-                   S(I,1:6) = LBUF%STRA(JJ(1:6)+I)				  
+                   S(I,1:6) = LBUF%STRA(JJ(1:6)+I)          
                  END DO 
                  CALL SIG3DPIN2(S,SP2,NEL)
                  DO I = 1,NEL
@@ -741,9 +697,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER  NEL
@@ -759,9 +712,9 @@ C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------     
         DO I=1,NEL
-          S1 = FOR(I,1)				  
-          S2 = FOR(I,2)				  
-          S12 = FOR(I,3)				  
+          S1 = FOR(I,1)          
+          S2 = FOR(I,2)          
+          S12 = FOR(I,3)          
           VONM2= S1*S1 + S2*S2 - S1*S2 + THREE*S12*S12 
           VONM= SQRT(VONM2)
           VALUE(I) = MAX(VALUE(I),VONM)
@@ -775,7 +728,7 @@ Chd|-- called by -----------
 Chd|        UPD_TMAX                      source/output/upd_outmax.F    
 Chd|-- calls ---------------
 Chd|        TM_VONM_SHELL                 source/output/outmaxsubr.F    
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE TM_SEQ_SHELL(ELBUF_TAB,NLAY,NPTR,NPTS,VALUE,NEL)
 C-----------------------------------------------
@@ -786,9 +739,6 @@ C-----------------------------------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -832,7 +782,7 @@ Chd|-- called by -----------
 Chd|        UPD_TMAX                      source/output/upd_outmax.F    
 Chd|-- calls ---------------
 Chd|        SIG2DPIN2                     source/output/outmaxsubr.F    
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE TM_SIG_SHELL(ELBUF_TAB,NLAY,NPTR,NPTS,TEN1,TEN3,P2,NEL)
 C-----------------------------------------------
@@ -843,9 +793,6 @@ C-----------------------------------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -874,7 +821,7 @@ C-----------------------------------------------
             DO IT=1,BUFLY%NPTT
               LBUF  => BUFLY%LBUF(IR,IS,IT)
                DO I = 1,NEL
-                 S(I,1:3) = LBUF%SIG(JJ(1:3)+I)				  
+                 S(I,1:3) = LBUF%SIG(JJ(1:3)+I)          
                END DO 
                CALL SIG2DPIN2(S,SP2,NEL)
                DO I = 1,NEL
@@ -900,7 +847,7 @@ Chd|-- called by -----------
 Chd|        UPD_TMAX                      source/output/upd_outmax.F    
 Chd|-- calls ---------------
 Chd|        SIG2DPIN2                     source/output/outmaxsubr.F    
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE TM_STRA_SHELL(ELBUF_TAB,NPTR,NPTS,TEN1,TEN3,P2,NEL)
 C-----------------------------------------------
@@ -911,9 +858,6 @@ C-----------------------------------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -938,7 +882,7 @@ C-----------------------------------------------
        NPG = NPTS*NPTR
       IF (NPG == 1) THEN
         DO I = 1,NEL
-          S(I,1:3) = GBUF%STRA(JJ(1:3)+I)				  
+          S(I,1:3) = GBUF%STRA(JJ(1:3)+I)          
         END DO 
         CALL SIG2DPIN2(S,SP2,NEL)
         DO I = 1,NEL
@@ -958,7 +902,7 @@ C-----------------------------------------------
             NG = NPTR*(IS-1) + IR
             PTS = (NG-1)*LENS+1
                DO I = 1,NEL
-                 S(I,1:3) = GBUF%STRPG(PTS+JJ(1:3)+I)				  
+                 S(I,1:3) = GBUF%STRPG(PTS+JJ(1:3)+I)          
                END DO 
                CALL SIG2DPIN2(S,SP2,NEL)
                DO I = 1,NEL
@@ -982,20 +926,17 @@ Chd|  TM_DMG_SHELLS                 source/output/outmaxsubr.F
 Chd|-- called by -----------
 Chd|        UPD_TMAX                      source/output/upd_outmax.F    
 Chd|-- calls ---------------
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE TM_DMG_SHELLS(ELBUF_TAB,NLAY,NPTR,NPTS,VALUE,NEL)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE ELBUFDEF_MOD 
-C-----------------------------------------------------------------------
+C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1006,21 +947,20 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER  I,J,IL,IR,IS,IT,NFAIL,IIR
-      my_real,
-     .  DIMENSION(:), POINTER  :: DFMAX
+      my_real, DIMENSION(:), POINTER  :: DFMAX
       TYPE(BUF_LAY_) ,POINTER :: BUFLY
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------     
        DO IL=1,NLAY 
          BUFLY => ELBUF_TAB%BUFLY(IL)
-         NFAIL = BUFLY%NFAIL								    
-         DO IS=1,NPTS					
-           DO IR=1,NPTR					
-             DO IT=1,BUFLY%NPTT	
-               DO IIR=1,NFAIL 											   
+         NFAIL = BUFLY%NFAIL                    
+         DO IS=1,NPTS
+           DO IR=1,NPTR
+             DO IT=1,BUFLY%NPTT
+               DO IIR=1,NFAIL                          
                  DFMAX=>BUFLY%FAIL(IR,IS,IT)%FLOC(IIR)%DAMMX
-                 DO I=1,NEL  			       
+                 DO I=1,NEL               
                    VALUE(I) = MAX(VALUE(I),DFMAX(I))
                  ENDDO
                ENDDO 
@@ -1036,7 +976,7 @@ Chd|  TM_DMGL25_SHELL               source/output/outmaxsubr.F
 Chd|-- called by -----------
 Chd|        UPD_TMAX                      source/output/upd_outmax.F    
 Chd|-- calls ---------------
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE TM_DMGL25_SHELL(ELBUF_TAB,NLAY,NPTR,NPTS,IGTYP,
      .                           PM,MATLY,VALUE,NEL)
@@ -1052,7 +992,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
@@ -1080,13 +1019,13 @@ C   S o u r c e   L i n e s
 C-----------------------------------------------     
        DO IL=1,NLAY 
          BUFLY => ELBUF_TAB%BUFLY(IL)
-         NFAIL = BUFLY%NFAIL								    
-         DO IS=1,NPTS					
-           DO IR=1,NPTR					
-             DO IT=1,BUFLY%NPTT	
-               DO IIR=1,NFAIL 											   
+         NFAIL = BUFLY%NFAIL                    
+         DO IS=1,NPTS
+           DO IR=1,NPTR
+             DO IT=1,BUFLY%NPTT
+               DO IIR=1,NFAIL                          
                  DFMAX=>BUFLY%FAIL(IR,IS,IT)%FLOC(IIR)%DAMMX
-                 DO I=1,NEL  			       
+                 DO I=1,NEL               
                    VALUE(I) = MAX(VALUE(I),DFMAX(I))
                  END DO
                END DO
@@ -1102,29 +1041,29 @@ C
          ENDDO
          DO IL=1,NLAY 
            BUFLY => ELBUF_TAB%BUFLY(IL)
-           DO IPT=1,BUFLY%NPTT	
-             IADR = (IPT - 1)*NEL			      
-             DO I=1,NEL  					  
+           DO IPT=1,BUFLY%NPTT
+             IADR = (IPT - 1)*NEL            
+             DO I=1,NEL              
                J = IADR + I 
                VLY(1:5) = ZERO
                VG(1:5) = ZERO
                DO IR=1,NPTR
                  DO IS=1,NPTS
                    LBUF => BUFLY%LBUF(IR,IS,IPT)        
-                   DMAX(I) = ONE/PM(64,MATLY(J))				
-                   WPMAX(I)= ONE/PM(41,MATLY(J))				
-                   EPST1(I)= PM(60,MATLY(J))  			     
-                   EPST2(I)= PM(61,MATLY(J))  			     
-                   EPSF1(I)= ONE/PM(98,MATLY(J))				
+                   DMAX(I) = ONE/PM(64,MATLY(J))
+                   WPMAX(I)= ONE/PM(41,MATLY(J))
+                   EPST1(I)= PM(60,MATLY(J))             
+                   EPST2(I)= PM(61,MATLY(J))             
+                   EPSF1(I)= ONE/PM(98,MATLY(J))
                    EPSF2(I)= ONE/PM(99,MATLY(J))
 C        
                    VG(1) = MAX(VG(1),LBUF%DAM(JJ(1)+I)*DMAX(I)) 
                    VG(2) = MAX(VG(2),LBUF%DAM(JJ(2)+I)*DMAX(I)) 
                    VG(3) = MAX(VG(3),ABS(LBUF%PLA(I))*WPMAX(I)) 
                    IF(LBUF%CRAK(JJ(1)+I) > ZERO) VG(4)=  MAX(VG(4),
-     .         	     (LBUF%CRAK(JJ(1)+I)+EPST1(I))*EPSF1(I)) 
+     .                (LBUF%CRAK(JJ(1)+I)+EPST1(I))*EPSF1(I)) 
                    IF(LBUF%CRAK(JJ(2)+I) > ZERO )VG(5) = MAX(VG(5), 
-     .         	     (LBUF%CRAK(JJ(2)+I)+EPST2(I))*EPSF2(I))
+     .                (LBUF%CRAK(JJ(2)+I)+EPST2(I))*EPSF2(I))
                  END DO
                END DO
                VLY(1) =VLY(1) + VG(1) 
@@ -1132,10 +1071,10 @@ C
                VLY(3) =VLY(3) + VG(3) 
                VLY(4) =VLY(4) + VG(4) 
                VLY(5) =VLY(5) + VG(5)
-C                 	 
+C                    
                VALUE(I) = MAX(VALUE(I),VLY(1),VLY(2),VLY(3),VLY(4),VLY(5))
              END DO  ! I=1,NEL
-           END DO !IPT=1,BUFLY%NPTT	
+           END DO !IPT=1,BUFLY%NPTT
          END DO !IL=1,NLAY 
        END IF !(IGTYP == 10 .OR. IGTYP == 11 .OR. 
 C      
@@ -1189,7 +1128,7 @@ Chd|-- called by -----------
 Chd|        UPD_TMAX                      source/output/upd_outmax.F    
 Chd|-- calls ---------------
 Chd|====================================================================
-      SUBROUTINE UPD_TMTENS(NSIG,PNSIG,TM_NSIG1,TM_NSIG3,TM_PNSIG,NFT,NLT)
+      SUBROUTINE UPD_TMTENS(NSIG,PNSIG,TM_NSIG1,TM_NSIG3,TM_PNSIG,NFT,NLT,IGPSTAG)
 C-----------------------------------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -1202,6 +1141,7 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER  NFT,NLT
+      INTEGER  ,DIMENSION(NUMNOD) ,INTENT(IN):: IGPSTAG
       my_real, DIMENSION(NUMNOD,6) ,INTENT(IN):: NSIG
       my_real, DIMENSION(NUMNOD,2) ,INTENT(IN):: PNSIG
       my_real, DIMENSION(NUMNOD,2) ,INTENT(INOUT):: TM_PNSIG
@@ -1216,6 +1156,7 @@ C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------     
       DO  I=NFT,NLT 
+        IF (IGPSTAG(I)==0) CYCLE      
         IF (PNSIG(I,1) > TM_PNSIG(I,1)) THEN
           TM_PNSIG(I,1) = PNSIG(I,1)
           TM_NSIG1(I,1:6) = NSIG(I,1:6)
@@ -1234,7 +1175,7 @@ Chd|-- called by -----------
 Chd|        UPD_TMAX                      source/output/upd_outmax.F    
 Chd|-- calls ---------------
 Chd|====================================================================
-      SUBROUTINE SIG3DPIN2H(SIG,PIN,NFT,NLT)
+      SUBROUTINE SIG3DPIN2H(SIG,PIN,NFT,NLT,IGPSTAG)
 C-----------------------------------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -1247,8 +1188,9 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER  ,INTENT(IN) :: NFT,NLT
+      INTEGER  ,DIMENSION(NUMNOD) ,INTENT(IN):: IGPSTAG
       my_real, DIMENSION(NUMNOD,6) ,INTENT(IN) :: SIG
-      my_real, DIMENSION(NUMNOD,2) ,INTENT(OUT):: PIN
+      my_real, DIMENSION(NUMNOD,2) ,INTENT(INOUT):: PIN
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -1258,7 +1200,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------     
-      DO  I=NFT,NLT 
+      DO  I=NFT,NLT
+        IF (IGPSTAG(I)==0) CYCLE      
         S1 = SIG(I,4)*SIG(I,4)+SIG(I,5)*SIG(I,5)+SIG(I,6)*SIG(I,6)
         IF (S1 > EM10) THEN
           T1 = THIRD*(SIG(I,1)+SIG(I,2)+SIG(I,3))

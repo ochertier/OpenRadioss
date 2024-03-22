@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  HM_READ_SH3N                  source/elements/reader/hm_read_sh3n.F
 Chd|-- called by -----------
@@ -78,22 +78,14 @@ C   A n a l y s e   M o d u l e
 C-----------------------------------------------
 #include      "analyse_name.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com10_c.inc"
 #include      "units_c.inc"
 #include      "scr03_c.inc"
 #include      "scr17_c.inc"
 #include      "param_c.inc"
-#include      "titr_c.inc"
 #include      "remesh_c.inc"
-#include      "sysunit.inc"
-#include      "submod_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -123,8 +115,7 @@ C-----------------------------------------------
       my_real
      .   BID,FAC_L
       INTEGER I, J, I1, I2, ID,IDS,IPID,MT,N,MID,PID,UID,JC,STAT,IPARTTG_TMP
-      INTEGER INDEX_PART,OFF_DEF(NSUBMOD),OFF_NOD(NSUBMOD),OFF_EL(NSUBMOD),
-     .        OFF_PART(NSUBMOD)
+      INTEGER INDEX_PART
       CHARACTER*40 MESS
       DATA MESS /'3D TRIANGULAR SHELL ELEMENT DEFINITION '/
       INTEGER ISH3N,KK,IFLAGUNIT
@@ -137,15 +128,6 @@ C-----------------------------------------------
       INTEGER USR2SYS
       INTEGER NINTRN
 C=======================================================================
-C--------------------------------------------------
-C      HM OFFSETS IDs
-C--------------------------------------------------
-      DO I=1,NSUBMOD
-        OFF_DEF(I) = LSUBMODEL(I)%OFF_DEF
-        OFF_NOD(I) = LSUBMODEL(I)%OFF_NOD
-        OFF_EL(I) = LSUBMODEL(I)%OFF_EL
-        OFF_PART(I) = LSUBMODEL(I)%OFF_PART
-      ENDDO
 C--------------------------------------------------
 C      ALLOCS & INITS
 c      use NUMELTG0 IN PLACE OF NUMELTG ( NBADMESH routine is modifying NUMELTG )
@@ -195,9 +177,6 @@ C--------------------------------------------------
       DO WHILE (KK <= 6)       
         DO N=1,NUMELTG0 
           IPARTTG_TMP = TMP_IPARTTG(N)
-          IF(SUB_SH3N(N) /= 0)THEN
-            IF(TMP_IPARTTG(N) /= 0) IPARTTG_TMP = TMP_IPARTTG(N) + OFF_PART(SUB_SH3N(N)) 
-          ENDIF
 
           IF( IPART(4,INDEX_PART) /= IPARTTG_TMP)THEN  
             DO J=1,NPART                            
@@ -223,12 +202,6 @@ C--------------------------------------------------
 C      SUBMODEL OFFSET
 C--------------------------------------------------
             IF(SUB_SH3N(N) /= 0)THEN
-              IF(IPARTTG(I) /= 0) IPARTTG(I) = IPARTTG(I) + OFF_PART(SUB_SH3N(N)) 
-              IF(IXTG(NIXTG,I) /= 0) IXTG(NIXTG,I) = IXTG(NIXTG,I) + OFF_EL(SUB_SH3N(N))
-              DO J=2,4
-                IF(IXTG(J,I) /= 0) IXTG(J,I) = IXTG(J,I) + OFF_NOD(SUB_SH3N(N))
-              ENDDO
-              IF(UID_SH3N(N) /= 0) UID_SH3N(N) = UID_SH3N(N) + OFF_DEF(SUB_SH3N(N))
               IF(UID_SH3N(N) == 0 .AND. LSUBMODEL(SUB_SH3N(N))%UID /= 0) 
      .             UID_SH3N(N) = LSUBMODEL(SUB_SH3N(N))%UID
             ENDIF
@@ -238,7 +211,7 @@ C--------------------------------------------------
             IF(UID_SH3N(N) /= UID )THEN
               UID = UID_SH3N(N)
               IFLAGUNIT = 0          
-              DO J=1,NUNITS                         
+              DO J=1,UNITAB%NUNITS                         
                 IF (UNITAB%UNIT_ID(J) == UID) THEN  
                   FAC_L = UNITAB%FAC_L(J)                 
                   IFLAGUNIT = 1                     

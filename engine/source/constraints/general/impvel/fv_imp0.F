@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C   ------- only FIXV dans system global sont traites---------
 Chd|====================================================================
 Chd|  FV_IMP0                       source/constraints/general/impvel/fv_imp0.F
@@ -41,14 +41,11 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "impl1_c.inc"
-#include      "com01_c.inc"
-#include "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -162,7 +159,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -206,11 +202,16 @@ Chd|-- calls ---------------
 Chd|        DINTERI                       source/constraints/general/impvel/fv_imp0.F
 Chd|        FVL_MODIF                     source/constraints/general/impvel/fv_imp0.F
 Chd|        VELROT                        source/constraints/general/rbe2/rbe2v.F
+Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
 Chd|====================================================================
-      SUBROUTINE FV_IMP(IBFV  ,NPC    ,TF   ,VEL   ,SENSOR,
-     1                  LSENSOR,UD    ,RD   ,IFIX  ,IDDL  ,
+      SUBROUTINE FV_IMP(IBFV  ,NPC    ,TF   ,VEL   ,SENSOR_TAB,
+     1                  UD    ,RD   ,IFIX  ,IDDL   ,NSENSOR   ,
      2                  SKEW   ,IFRAME,XFRAME,V    ,VR    ,
      3                  X      ,LJ    ,NDOF  ,A    ,AR    )
+C-----------------------------------------------  
+C   M o d u l e s
+C-----------------------------------------------  
+      USE SENSOR_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -223,20 +224,19 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "task_c.inc"
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER NPC(*),IBFV(NIFV,*),LSENSOR(NSENSI,*),
+      INTEGER ,INTENT(IN) :: NSENSOR
+      INTEGER NPC(*),IBFV(NIFV,*),
      .        IFIX(*),IDDL(*),IFRAME(LISKN,*),LJ(*),NDDL,
      .        NDOF(*)
 C     REAL
       my_real
-     .  TF(*), VEL(LFXVELR,*), UD(3,*), SENSOR(NSENSR,*),
+     .  TF(*), VEL(LFXVELR,*), UD(3,*),
      .  SKEW(LSKEW,*),RD(3,*),V(3,*),VR(3,*),
      .  X(3,*),XFRAME(NXFRAME,*),A(3,*),AR(3,*)
+      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) ,INTENT(IN) :: SENSOR_TAB
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -272,12 +272,12 @@ C
             IF(NDOF(I)==0) GOTO 10
             ISENS=0
             DO K=1,NSENSOR
-              IF(IBFV(4,N)==LSENSOR(1,K))ISENS=K
+              IF(IBFV(4,N)== SENSOR_TAB(K)%SENS_ID) ISENS=K
             ENDDO
             IF(ISENS==0)THEN
               TS=TT
             ELSE
-              TS = TT-SENSOR(2,ISENS)
+              TS = TT - SENSOR_TAB(ISENS)%TSTART
               IF(TS<ZERO)GOTO 10
             ENDIF
             IC = IC + 1
@@ -441,7 +441,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -505,7 +504,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -549,7 +547,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -603,7 +600,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -804,7 +800,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
-#include      "com08_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -944,7 +939,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
-#include      "com08_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -1017,10 +1011,10 @@ C
              EJ(NN) = EJ(NN)*S
             ENDDO
             IF (ND ==0 ) THEN
-C	     UD(J1,I)=UD(J1,I)*S*S
+C       UD(J1,I)=UD(J1,I)*S*S
              CALL BC_UPDD(I     ,EJ   ,J1     ,UD     )
             ELSE
-c	     RD(J1,I)=RD(J1,I)*S*S
+c       RD(J1,I)=RD(J1,I)*S*S
              CALL BC_UPDD(I     ,EJ   ,J1     ,RD     )
             ENDIF
        ELSEIF (ITAG(N)>0) THEN
@@ -1078,12 +1072,12 @@ C
              EJ1(NN) = EJ1(NN)*S2
             ENDDO
            IF (ND==0) THEN
-C	     UD(J1,I)=UD(J1,I)*S1*S1
-C	     UD(J2,I)=UD(J2,I)*S2*S2
+C       UD(J1,I)=UD(J1,I)*S1*S1
+C       UD(J2,I)=UD(J2,I)*S2*S2
             CALL BC_UPDD2(I   ,EJ    ,J1   ,EJ1    ,J2   ,UD    )
            ELSEIF (ND==3) THEN
-C	     RD(J1,I)=RD(J1,I)*S1*S1
-C	     RD(J2,I)=RD(J2,I)*S2*S2
+C       RD(J1,I)=RD(J1,I)*S1*S1
+C       RD(J2,I)=RD(J2,I)*S2*S2
             CALL BC_UPDD2(I   ,EJ    ,J1   ,EJ1    ,J2   ,RD    )
            ENDIF
        ENDIF
@@ -1107,7 +1101,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
@@ -1440,8 +1433,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -1501,9 +1492,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER N   ,J1
@@ -1536,9 +1524,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1579,7 +1564,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
-#include      "com08_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -1657,8 +1641,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com04_c.inc"
-#include      "com08_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -1724,9 +1706,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER N,J1,IDLM    ,IFSS  ,IFSM
@@ -1768,9 +1747,10 @@ Chd|        DYNA_WEX                      source/implicit/imp_dyna.F
 Chd|-- calls ---------------
 Chd|        DINTERA                       source/constraints/general/impvel/fv_imp0.F
 Chd|        IMP_DYNA                      share/modules/impbufdef_mod.F 
+Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
 Chd|====================================================================
-      SUBROUTINE WFV_IMP(IBFV  ,NPC    ,TF   ,VEL   ,SENSOR,
-     1                  LSENSOR,UD     ,RD   ,IFIX  ,IDDL  ,
+      SUBROUTINE WFV_IMP(IBFV  ,NPC    ,TF   ,VEL   ,SENSOR_TAB,
+     1                  UD     ,RD    ,IFIX  ,IDDL  ,NSENSOR   ,
      2                  SKEW   ,IFRAME ,XFRAME,A    ,AR    ,
      3                  X      ,NDOF  ,MS   ,IN    ,WEIGHT ,
      4                  RBY    ,DW    )
@@ -1778,6 +1758,7 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE IMP_DYNA
+      USE SENSOR_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -1786,25 +1767,22 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "task_c.inc"
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
 Ctmp+1
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER NPC(*),IBFV(NIFV,*),LSENSOR(NSENSI,*),
+      INTEGER ,INTENT(IN) :: NSENSOR
+      INTEGER NPC(*),IBFV(NIFV,*),
      .        IFIX(*),IDDL(*),IFRAME(LISKN,*),NDOF(*),WEIGHT(*)
 C     REAL
       my_real
-     .  TF(*), VEL(LFXVELR,*), UD(3,*), SENSOR(NSENSR,*),
+     .  TF(*), VEL(LFXVELR,*), UD(3,*),
      .  SKEW(LSKEW,*),RD(3,*),A(3,*),AR(3,*),IN(*),
      .  X(3,*),XFRAME(NXFRAME,*),DW,MS(*),RBY(NRBY,*)
+      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) ,INTENT(IN) :: SENSOR_TAB
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -1843,12 +1821,12 @@ C
             IF(NDOF(I)==0) GOTO 10
             ISENS=0
             DO K=1,NSENSOR
-              IF(IBFV(4,N)==LSENSOR(1,K))ISENS=K
+              IF(IBFV(4,N)==SENSOR_TAB(K)%SENS_ID) ISENS=K
             ENDDO
             IF(ISENS==0)THEN
               TS=TT
             ELSE
-              TS = TT-SENSOR(2,ISENS)
+              TS = TT-SENSOR_TAB(ISENS)%TSTART
               IF(TS<ZERO)GOTO 10
             ENDIF
             IC = IC + 1
@@ -1913,12 +1891,12 @@ C
 C---Correction for DY_V,DY_D
             DY_V(J,I) = DY_V(J,I)+(YC(II)-A(J,I))*DT2
             DY_D(J,I) =DT2*(DY_V(J,I)+(DY_G-DY_B-HALF)*YC(II)*DT2)
-	        A(J,I) = YC(II)
+                  A(J,I) = YC(II)
             IF (TT<=DT2) THEN
              DY_V(J,I) = UD(J,I)/DT2
              DY_D(J,I) = UD(J,I)
              YC(II) = HALF*DY_V(J,I)/DT2
-	        END IF
+                  END IF
             DW   = DW + UD(J,I)*(MS(I)*WEIGHT(I)*YC(II)-FINT)
           ELSEIF(J<=6)THEN
            J1 = J
@@ -1974,12 +1952,12 @@ c
 C---Correction for DY_VR,DY_DR, DY_AR
             DY_VR(J,I) = DY_VR(J,I)+(YC(II)-AR(J,I))*DT2
             DY_DR(J,I) =DT2*(DY_VR(J,I)+(DY_G-DY_B-HALF)*YC(II)*DT2)
-	    AR(J,I) = YC(II)
+              AR(J,I) = YC(II)
             IF (TT<=DT2) THEN
              DY_VR(J,I) = RD(J,I)/DT2
              DY_DR(J,I) = RD(J,I)
              YC(II) = HALF*DY_VR(J,I)/DT2
-	    END IF
+              END IF
             DW   = DW + RD(J,I)*(IN0*YC(II)-FINT)
           ENDIF
          ENDDO
@@ -2008,10 +1986,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -2156,9 +2130,10 @@ Chd|-- called by -----------
 Chd|        IMP_SOLV                      source/implicit/imp_solv.F    
 Chd|-- calls ---------------
 Chd|        IMP_DYNA                      share/modules/impbufdef_mod.F 
+Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
 Chd|====================================================================
-      SUBROUTINE FV_FINT0(IBFV  ,NPC    ,TF   ,VEL   ,SENSOR,
-     1                   LSENSOR,UD     ,RD   ,IFIX  ,IDDL  ,
+      SUBROUTINE FV_FINT0(IBFV  ,NPC    ,TF   ,VEL   ,SENSOR_TAB,
+     1                   UD     ,RD     ,IFIX ,IDDL  ,NSENSOR   ,
      2                   SKEW   ,IFRAME ,XFRAME,A    ,AR    ,
      3                   X      ,NDOF  ,MS   ,IN    ,WEIGHT ,
      4                   RBY    )
@@ -2166,6 +2141,7 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE IMP_DYNA
+      USE SENSOR_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -2174,24 +2150,21 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "task_c.inc"
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER NPC(*),IBFV(NIFV,*),LSENSOR(NSENSI,*),
+      INTEGER ,INTENT(IN) :: NSENSOR
+      INTEGER NPC(*),IBFV(NIFV,*),
      .        IFIX(*),IDDL(*),IFRAME(LISKN,*),NDOF(*),WEIGHT(*)
 C     REAL
       my_real
-     .  TF(*), VEL(LFXVELR,*), UD(3,*), SENSOR(NSENSR,*),
+     .  TF(*), VEL(LFXVELR,*), UD(3,*),
      .  SKEW(LSKEW,*),RD(3,*),A(3,*),AR(3,*),IN(*),
      .  X(3,*),XFRAME(NXFRAME,*),DW,MS(*),RBY(NRBY,*)
+      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) ,INTENT(IN) :: SENSOR_TAB
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -2225,12 +2198,12 @@ C
             IF(NDOF(I)==0) GOTO 10
             ISENS=0
             DO K=1,NSENSOR
-              IF(IBFV(4,N)==LSENSOR(1,K))ISENS=K
+              IF(IBFV(4,N)==SENSOR_TAB(K)%SENS_ID) ISENS=K
             ENDDO
             IF(ISENS==0)THEN
               TS=TT
             ELSE
-              TS = TT-SENSOR(2,ISENS)
+              TS = TT-SENSOR_TAB(ISENS)%TSTART
               IF(TS<ZERO)GOTO 10
             ENDIF
             IC = IC + 1
@@ -2259,7 +2232,7 @@ C
           IFM = IBFV(9,N)
           J=IBFV(2,N)
           IF (IFM<=1) J=J-10*ISK
-	  MS0=ABS(MS(I))*WEIGHT(I)
+            MS0=ABS(MS(I))*WEIGHT(I)
           IF(J<=3)THEN
             IF(ISK<=1.AND.IFM<=1)THEN
               A0   = A(J,I)+MS0*DY_A(J,I)
@@ -2335,9 +2308,7 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
-#include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "impl1_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -2415,7 +2386,7 @@ C--------------NBKUD compter----
           DO K=1,3
            IF (IFIX(ND+K)==9) NUD = NUD + 1
           END DO
-C    case 2 Ud	 ---search only ICT 1,2,4
+C    case 2 Ud   ---search only ICT 1,2,4
           IF (NUD > 1) THEN
 C---------look for another Ud in LJ()<0
            DO N1=N+1,NFXVEL
@@ -2438,7 +2409,7 @@ C---------
            CALL UPDFVBC_L(ND   ,IFIX  ,NDDL  ,IADK  ,JDIK ,
      1                    NBKUD )
           ELSEIF (NUD == 1) THEN
-C-----case 1 Ud	 ---search first ICT 3,5,6  +2BCS=3global UD-> no change for BCS--
+C-----case 1 Ud   ---search first ICT 3,5,6  +2BCS=3global UD-> no change for BCS--
            IF (ICTR==3 .OR.ICTR==5.OR.ICTR==6) THEN
             CALL GETBCL_J(ICTR ,ISK   ,SKEW  ,K    ,J)
 C--------check compatibility--
@@ -2452,7 +2423,7 @@ C---------
            ND=IDDL(I)+K
            CALL UPDFVBC_L(ND    ,IFIX  ,NDDL  ,IADK  ,JDIK ,
      1                    NBKUD )
-C-----case 1 Ud	 ---search first ICT 1,2,4  -> 2d ud, change for BCS--
+C-----case 1 Ud   ---search first ICT 1,2,4  -> 2d ud, change for BCS--
           ELSEIF (ICTR==1 .OR.ICTR==2.OR.ICTR==4) THEN
 C--------termine independent dof K w/ fixing j1
             CALL GFVBC2_IND(J,ICTR,SKEW(1,ISK),K ,L )
@@ -2500,7 +2471,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com08_c.inc"
 #include      "param_c.inc"
 #include      "units_c.inc"
 C-----------------------------------------------
@@ -2560,7 +2530,7 @@ C--------
            IF (IFIX(ND+K)==9) NUD = NUD + 1
            UDL(K)=ZERO
           END DO
-C      case 2 Ud	 ---search only ICT 1,2,4
+C      case 2 Ud   ---search only ICT 1,2,4
           IF (NUD > 1) THEN
 C---------look for another Ud in LJ()<0
            DO N1=N+1,NFXVEL
@@ -2609,11 +2579,11 @@ C---------update {B} manually for the last ud
      1                   LT_K  ,UDG(K),NKUD1 ,IKUD  ,BKUD )
           ELSEIF (NUD == 1) THEN
             IF (J>3) THEN
-	         CALL RECU_UL(ISK,IFM,SKEW,XFRAME,J,J1,UDL,RD(1,I),N)
+                   CALL RECU_UL(ISK,IFM,SKEW,XFRAME,J,J1,UDL,RD(1,I),N)
             ELSE
-	         CALL RECU_UL(ISK,IFM,SKEW,XFRAME,J,J1,UDL,UD(1,I),N)
+                   CALL RECU_UL(ISK,IFM,SKEW,XFRAME,J,J1,UDL,UD(1,I),N)
             END IF
-C-----case 1 Ud	 ---search first ICT 3,5,6  -> no change for BCS--
+C-----case 1 Ud   ---search first ICT 3,5,6  -> no change for BCS--
            IF (ICTR==3 .OR.ICTR==5.OR.ICTR==6) THEN
 C--------calculate Ud in global system (only SKEW is available w/ BCS
             CALL UDL2_UG(SKEW(1,ISK),UDL,UDG)
@@ -2646,7 +2616,7 @@ C---------update {B} of manually for the 2 other ud
            IF (K >3 ) K = K -3
            CALL UPDFVBC_B(ND    ,IFIX  ,NDDL  ,IADK  ,JDIK ,
      1                   LT_K   ,UDG(K),NKUD1 ,IKUD  ,BKUD )
-C-----case 1 Ud	 ---search first ICT 1,2,4  -> 2d ud, change for BCS--
+C-----case 1 Ud   ---search first ICT 1,2,4  -> 2d ud, change for BCS--
            ELSEIF (ICTR==1 .OR.ICTR==2.OR.ICTR==4) THEN
 C--------termine independent dof K w/ so that DET=DET_max
             CALL GFVBC2_IND(J,ICTR,SKEW(1,ISK),K ,ICTR1)
@@ -2675,7 +2645,7 @@ C---------update {B} of manually for the ud_j1
      1                    LT_K   ,UDG(J1_1),NKUD1 ,IKUD  ,BKUD )
 C---------attention IFIX is changed also in BC_IMP1([K] update)
 C---------due to this, update {B} of manually for the ud_j1
-C---------update ICODT1,ICODR1	for dof j1,j1_1-> [K] update (consisting w/ BC_IMP1
+C---------update ICODT1,ICODR1  for dof j1,j1_1-> [K] update (consisting w/ BC_IMP1
 C-------------negative value (taged) to avoid the change of IFIX by BC_IMP1
             IF (J>3) THEN
              ICODR1(I) = -ICTR1
@@ -2710,8 +2680,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com04_c.inc"
-#include      "com08_c.inc"
 #include      "param_c.inc"
 #include      "impl1_c.inc"
 C-----------------------------------------------
@@ -2772,15 +2740,8 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com04_c.inc"
-#include      "com08_c.inc"
-#include      "param_c.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-C     REAL
       my_real
      .  UDL(3),UDG(3), SKEW(3,3)
 C-----------------------------------------------
@@ -2807,9 +2768,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -3012,7 +2970,7 @@ c          CALL L_DIR(EJ,J)
           EJ1(3)=SKEW(6,ISK)
           CALL BC_C2D(EJ,EJ1, J, J1  ,EA, EB  )
           CALL DIR_RBE2(J    ,J1    ,K     )
-	     J = K
+               J = K
          ELSEIF (ICT == 5) THEN
           EJ(1)=SKEW(7,ISK)
           EJ(2)=SKEW(8,ISK)
@@ -3023,7 +2981,7 @@ c          CALL L_DIR(EJ,J)
           EJ1(3)=SKEW(3,ISK)
           CALL BC_C2D(EJ,EJ1, J, J1  ,EA, EB  )
           CALL DIR_RBE2(J    ,J1    ,K     )
-	      J = K
+                J = K
          ELSEIF (ICT == 6) THEN
 C
           EJ(1)=SKEW(4,ISK)
@@ -3035,12 +2993,12 @@ c          CALL L_DIR(EJ,J)
           EJ1(3)=SKEW(3,ISK)
           CALL BC_C2D(EJ,EJ1, J, J1  ,EA, EB  )
           CALL DIR_RBE2(J    ,J1    ,K     )
-	      J = K
+                J = K
          ELSEIF (ICT == 7) THEN
           J=0
          ENDIF
 C---------rotational id----------
-	  IF (IR > 3) J = J + 3
+            IF (IR > 3) J = J + 3
 C
       RETURN
       END
@@ -3060,9 +3018,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER J1  ,JBC ,IFIX(*),K
@@ -3075,37 +3030,37 @@ C---------JBC is the fix component of BCS
        IF (J01>3) J01 = J01 -3
        J02 = JBC
        IF (J02>3) J02 = J02 -3
-C	   
+C     
        IF (J02==K) THEN
         IF (J01==K) THEN
 C       change JBC,J1 to -->
          J02=K+1
-		 IF (J02>3) J02 = J02 -3
-		 IF (JBC>3) J02 = J02 +3
+           IF (J02>3) J02 = J02 -3
+           IF (JBC>3) J02 = J02 +3
          IFIX(J02)=8
          IFIX(JBC)=0
-         JBC = J02		 
-C		 
+         JBC = J02     
+C     
          J01=K+2
-		 IF (J01>3) J01 = J01 -3
-		 IF (J1>3) J01 = J01 +3
+           IF (J01>3) J01 = J01 -3
+           IF (J1>3) J01 = J01 +3
          IFIX(J01)=9
-         IFIX(J1)=0	
+         IFIX(J1)=0
          J1 = J01
         ELSE
 C       change JBC to -->
          CALL DIR_RBE2(J01    ,K    ,J02     )
-		 IF (JBC>3) J02 = J02 +3
+           IF (JBC>3) J02 = J02 +3
          IFIX(J02)=8
          IFIX(JBC)=0
-         JBC = J02		 
+         JBC = J02     
         END IF
        ELSEIF (J01==K) THEN
 C       change J1 to -->
          CALL DIR_RBE2(J02    ,K    ,J01     )
-		 IF (J1>3) J01 = J01 +3
+           IF (J1>3) J01 = J01 +3
          IFIX(J01)=9
-         IFIX(J1)=0	
+         IFIX(J1)=0
          J1 = J01
        END IF !(J02==K) THEN
       RETURN
@@ -3125,9 +3080,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER J1  ,K ,IFIX(*)
@@ -3142,7 +3094,7 @@ c        print *,'change FV condensation component', J1,'to',k
 C------should change only one times
         IFIX(K)=9
         IFIX(J1)=0
-		J1 = K
+          J1 = K
        END IF
 C
       RETURN
@@ -3163,9 +3115,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER J1  ,J2 ,JBC ,IFIX(*)
@@ -3180,13 +3129,13 @@ C---------change J1
 c        print *,'change FV condensation component', J1,'to',k
         IFIX(K)=9
         IFIX(J1)=0
-		J1 = K
+          J1 = K
        ELSEIF (JBC == J2) THEN
         CALL DIR_FVBC(JBC   ,J1    ,K     )
 c        print *,'change FV condensation component', J2,'to',k
         IFIX(K)=9
         IFIX(J2)=0
-		J2 =K
+          J2 =K
        END IF
 C
       RETURN
@@ -3204,12 +3153,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com04_c.inc"
-#include      "com08_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -3241,7 +3184,7 @@ C-----Ud_g=[A(2,2)]Ud_l, [A] =reduced (condense k) [SKEW]^-t
         EJ(J)=SKEW(J,I)
        END DO
        UDJ=UDL(I)
-C	  
+C    
        IF (K == 1) THEN
         DET = EI(2)*EJ(3)-EI(3)*EJ(2)
         UDG(2)=(EJ(3)*UDI-EI(3)*UDJ)/DET
@@ -3323,7 +3266,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com04_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -3373,9 +3315,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com08_c.inc"
 #include      "param_c.inc"
 #include      "units_c.inc"
 C-----------------------------------------------
@@ -3449,7 +3389,7 @@ C
           IF (IFIX(ND+K)==9) NUD = NUD + 1
           UDL(K)=ZERO
          END DO
-C-----case 2 Ud	 ---search only ICT 1,2,4
+C-----case 2 Ud   ---search only ICT 1,2,4
          IF (NUD > 1) THEN
 C---------look for another Ud in LJ()>0
            DO N1=N+1,NFXVEL
@@ -3491,11 +3431,11 @@ C----------update 2 ud J1,J1_1 ;
              UD(J1_1,I)=UDG(J1_1)
             END IF
          ELSEIF (NUD == 1) THEN
-C-----case 1 Ud	 ---search first ICT 3,5,6  -> no change for BCS--
+C-----case 1 Ud   ---search first ICT 3,5,6  -> no change for BCS--
             IF (J>3) THEN
-	         CALL RECU_UL(ISK,IFM,SKEW,XFRAME,J,J1,UDL,RD(1,I),N)
+                   CALL RECU_UL(ISK,IFM,SKEW,XFRAME,J,J1,UDL,RD(1,I),N)
             ELSE
-	         CALL RECU_UL(ISK,IFM,SKEW,XFRAME,J,J1,UDL,UD(1,I),N)
+                   CALL RECU_UL(ISK,IFM,SKEW,XFRAME,J,J1,UDL,UD(1,I),N)
             END IF
            IF (ICTR==3 .OR.ICTR==5.OR.ICTR==6) THEN
 C--------calculate Ud in global system (only SKEW is available w/ BCS
@@ -3509,15 +3449,15 @@ C----------update ud
             ELSE
              UD(J1,I)=UDG(J1)
             END IF
-C-----case 1 Ud	 ---search first ICT 1,2,4  -> 2d ud, change for BCS--
+C-----case 1 Ud   ---search first ICT 1,2,4  -> 2d ud, change for BCS--
            ELSEIF (ICTR==1 .OR.ICTR==2.OR.ICTR==4) THEN
 C--------termine independent dof K w/ fixing j1
             CALL GFVBC2_IND(J,ICTR,SKEW(1,ISK),K ,L )
             CALL GETBCL_J(ICTR  ,ISK   ,SKEW  ,J1_1    ,J   )
-	        ND = IDDL(I)+1
+                  ND = IDDL(I)+1
             CALL FVBC_COMPA0(J1  ,J1_1   ,IFIX(ND) ,K )
 C--------calculate Ud() free of K in global system update ud_i
-c	        IF (K >3 ) K = K -3
+c          IF (K >3 ) K = K -3
             CALL UDL2_UG2(J,ICTR,SKEW(1,ISK),UDL,UDG,K)
 C----------update ud
              IF (J>3) THEN
@@ -3529,7 +3469,7 @@ C----------update ud
              END IF
            END IF !(ICTR==3 .OR.ICTR==5.OR.ICTR==6)
           END IF !IF (NUD > 1) THEN
-	     ENDIF
+               ENDIF
       ENDDO
 C
       RETURN
@@ -3556,9 +3496,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -3604,9 +3541,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER FVJ,K,ICT,ICT1
@@ -3621,27 +3555,27 @@ C-----------------------------------------------
      .  EI(3),EJ(3)
 C-----determine independent direction (global) K, ICT1 is used to call BC_IMP1
       IF (ICT==4) THEN
-	   I=1
+             I=1
       ELSEIF(ICT==2) THEN
-	   I=2
+             I=2
       ELSEIF(ICT==1) THEN
-	   I=3
+             I=3
       END IF
       DO J=1,3
        EI(J)=SKEW(J,I)
       END DO
-	  J = FVJ
+            J = FVJ
       IF (J>3) J=J-3
       DO L=1,3
        EJ(L)=SKEW(L,J)
       END DO
       CALL DIR_RBE2(I,J,L)
       IF (L==1) THEN
-	   ICT1=3
+             ICT1=3
       ELSEIF(L==2) THEN
-	   ICT1=5
+             ICT1=5
       ELSEIF(L==3) THEN
-	   ICT1=6
+             ICT1=6
       END IF
       CALL GDIR2_IND(EI,EJ,K)
 C
@@ -3673,7 +3607,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com08_c.inc"
 #include      "param_c.inc"
 #include      "units_c.inc"
 C-----------------------------------------------
@@ -3723,7 +3656,7 @@ C----first translation
         II=IABS(IBFV(1,N))
         IF (J==0.OR.J > 3) CYCLE
         NLFV(N)= ITAG1(II)
-C------if ITAG1(II)>1, the second one will not be traited		
+C------if ITAG1(II)>1, the second one will not be traited
         ITAG1(II)=0
        ENDDO
 C----rotational---can use the same NLFV as FV is defined per dir------
@@ -3741,10 +3674,10 @@ c       END DO
         II=IABS(IBFV(1,N))
         IF (J < 3) CYCLE
         NLFV(N)= ITAG1(II)
-C------if ITAG1(II)>1, the second one will not be traited		
+C------if ITAG1(II)>1, the second one will not be traited
         ITAG1(II)=0
        ENDDO
-C	   
+C     
       DO N = 1,NUMNOD
        ICODT1(N) = ICODT(N)
       END DO
@@ -3753,7 +3686,7 @@ C
        ICODR1(N) = ICODR(N)
        END DO
       END IF !(IRODDL/=0) THEN
-C-----put ICODT,R 0 for coupling bcs	  
+C-----put ICODT,R 0 for coupling bcs    
 C  Tag coulping FV-BCS
       DO N = 1,NFXVEL
         ITAG(N)=0
@@ -3797,7 +3730,7 @@ C
 c          IF (IFIX(ND+K)==9) NUD = NUD + 1
           UDL(K)=ZERO
          END DO
-C-----case 2 Ud	 ---search only ICT 1,2,4
+C-----case 2 Ud   ---search only ICT 1,2,4
          IF (NUD > 1 .AND. IDONE ==1) THEN
 C---------look for another Ud in LJ()>0
            DO N1=N+1,NFXVEL
@@ -3839,11 +3772,11 @@ C----------update 2 ud J1,J1_1 ;
              UD(J1_1,I)=UDG(J1_1)
             END IF
          ELSEIF (NUD == 1) THEN
-C-----case 1 Ud	 ---search first ICT 3,5,6  -> no change for BCS--
+C-----case 1 Ud   ---search first ICT 3,5,6  -> no change for BCS--
             IF (J>3) THEN
-	         CALL RECU_UL(ISK,IFM,SKEW,XFRAME,J,J1,UDL,RD(1,I),N)
+                   CALL RECU_UL(ISK,IFM,SKEW,XFRAME,J,J1,UDL,RD(1,I),N)
             ELSE
-	         CALL RECU_UL(ISK,IFM,SKEW,XFRAME,J,J1,UDL,UD(1,I),N)
+                   CALL RECU_UL(ISK,IFM,SKEW,XFRAME,J,J1,UDL,UD(1,I),N)
             END IF
            IF (ICTR==3 .OR.ICTR==5.OR.ICTR==6) THEN
             IF (IDONE == 1) THEN
@@ -3868,7 +3801,7 @@ C----------update ud
             ELSE
              ICODT1(I) = 0
             END IF 
-C-----case 1 Ud	 ---search first ICT 1,2,4  -> 2d ud, change for BCS--
+C-----case 1 Ud   ---search first ICT 1,2,4  -> 2d ud, change for BCS--
            ELSEIF (ICTR==1 .OR.ICTR==2.OR.ICTR==4) THEN
 C--------termine independent dof K w/ fixing j1
              CALL GFVBC2_IND(J,ICTR,SKEW(1,ISK),K ,ICTR1 )
@@ -3876,7 +3809,7 @@ C--------termine independent dof K w/ fixing j1
              CALL FVBC_COMPA0(J1  ,J1_1   ,IFIX ,K )
 C--------calculate Ud() free of K in global system update ud_i
             IF (IDONE == 1) THEN
-             CALL UDL2_UG2(J,ICTR,SKEW(1,ISK),UDL,UDG,K)			 
+             CALL UDL2_UG2(J,ICTR,SKEW(1,ISK),UDL,UDG,K)       
 C----------update ud
              IF (J>3) THEN
               RD(J1-1,I)=UDG(J1-1)
@@ -3886,7 +3819,7 @@ C----------update ud
               UD(J1_1,I)=UDG(J1_1)
              END IF
             END IF 
-C-----------different than real BCS _local			
+C-----------different than real BCS _local
             IF (J>3) THEN 
              ICODR1(I) = -ICTR1
             ELSE
@@ -3931,31 +3864,31 @@ C-----------------------------------------------
      .  EJ(3),EJ1(3),DET,EA,EB
 C-----update LB of terme diag()*ud
       IF (IMCONV/=1) RETURN
-C	  
+C    
       IF (ICT==4) THEN
-	   I=1
+             I=1
       ELSEIF(ICT==2) THEN
-	   I=2
+             I=2
       ELSEIF(ICT==1) THEN
-	   I=3
+             I=3
       END IF
       DO J=1,3
        EJ1(J)=SKEW(J,I)
       END DO
-	  J = FVJ
+            J = FVJ
       IF (J>3) J=J-3
       DO L=1,3
        EJ(L)=SKEW(L,J)
       END DO
       CALL GDIR2_IND(EJ,EJ1,K)
-	  J  = J1
-	  IF (J >3) J= J-3
+            J  = J1
+            IF (J >3) J= J-3
       J2  = J1_1
-	  IF (J2 >3) J2= J2-3
+            IF (J2 >3) J2= J2-3
       DET = ONE/(EJ(J)*EJ1(J2)-EJ(J2)*EJ1(J))
-	  EA = -DET*(EJ1(J2)*EJ(K)-EJ(J2)*EJ1(K))
-	  EB = -DET*(EJ(J)*EJ1(K)-EJ1(J)*EJ(K))
-C	  
+            EA = -DET*(EJ1(J2)*EJ(K)-EJ(J2)*EJ1(K))
+            EB = -DET*(EJ(J)*EJ1(K)-EJ1(J)*EJ(K))
+C    
       LB(ND+K)=LB(ND+K)-EA*DIAG_K(ND+J)*UD(J)
       LB(ND+K)=LB(ND+K)-EB*DIAG_K(ND+J2)*UD(J2)
 C

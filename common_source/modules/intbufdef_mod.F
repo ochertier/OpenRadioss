@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  INTBUFDEF_MOD                 modules/intbufdef_mod.F       
 Chd|-- called by -----------
@@ -30,9 +30,6 @@ Chd|        UPGRADE_CAND_OPT              common_source/interf/upgrade_multimp.F
 Chd|        UPGRADE_LCAND_E2S             common_source/interf/upgrade_multimp.F
 Chd|        UPGRADE_LCAND_EDG             common_source/interf/upgrade_multimp.F
 Chd|        UPGRADE_MULTIMP               common_source/interf/upgrade_multimp.F
-Chd|        ADDINT2M                      starter/source/interfaces/inter3d1/i7remnode.F
-Chd|        ADDINT2S                      starter/source/interfaces/inter3d1/i7remnode.F
-Chd|        ANOTHERN2                     starter/source/interfaces/inter3d1/i7remnode.F
 Chd|        BUILD_CSRECT                  starter/source/model/mesh/build_cnel.F
 Chd|        CHKTYP2                       starter/source/interfaces/interf1/chktyp2.F
 Chd|        COPY_IVAL                     starter/source/restart/ddsplit/inter_tools.F
@@ -46,7 +43,10 @@ Chd|        FICTIVMASSIGEO                starter/source/groups/ssurftagigeo.F
 Chd|        FILLCNI2                      starter/source/spmd/domdec2.F 
 Chd|        FILL_INTERCEP                 starter/source/spmd/node/ddtools.F
 Chd|        FILTER_NODE_NODLOC            starter/source/restart/ddsplit/inter_tools.F
+Chd|        FLUSH_REMNODE_ARRAY           starter/source/interfaces/inter3d1/flush_remnode_array.F
 Chd|        FXBTAGN                       starter/source/constraints/fxbody/fxbtagn.F
+Chd|        HM_READ_INTER_TYPE21          starter/source/interfaces/int21/hm_read_inter_type21.F
+Chd|        HM_READ_INTER_TYPE25          starter/source/interfaces/int25/hm_read_inter_type25.F
 Chd|        I11EDGE                       starter/source/interfaces/inter3d1/i11edge.F
 Chd|        I20INI3                       starter/source/interfaces/inter3d1/i20ini3.F
 Chd|        I20STA                        starter/source/interfaces/inter3d1/inintr2.F
@@ -67,6 +67,7 @@ Chd|        INIEND2D                      starter/source/interfaces/inter3d1/ini
 Chd|        ININT2                        starter/source/interfaces/inter2d1/inint2.F
 Chd|        ININT3                        starter/source/interfaces/inter3d1/inint3.F
 Chd|        ININT3_THKVAR                 starter/source/interfaces/inter3d1/inint3_thkvar.F
+Chd|        ININTMASS                     starter/source/interfaces/inter3d1/inintmass.F
 Chd|        ININTR                        starter/source/interfaces/interf1/inintr.F
 Chd|        ININTR1                       starter/source/interfaces/interf1/inintr1.F
 Chd|        ININTR2                       starter/source/interfaces/inter3d1/inintr2.F
@@ -76,6 +77,7 @@ Chd|        ININTSUB                      starter/source/interfaces/interf1/inin
 Chd|        ININTSUB_11                   starter/source/output/subinterface/inintsub_11.F
 Chd|        ININTSUB_25                   starter/source/output/subinterface/inintsub_25.F
 Chd|        ININTSUB_7                    starter/source/output/subinterface/inintsub_7.F
+Chd|        INITIA                        starter/source/elements/initia/initia.F
 Chd|        INT2CY_CHK                    starter/source/constraints/general/bcs/lecbcscyc.F
 Chd|        INT2MODIF_ND                  starter/source/elements/solid/solide10/dim_s10edg.F
 Chd|        INT8_INI                      starter/source/interfaces/intbuf/intbuf_ini_starter.F
@@ -83,6 +85,8 @@ Chd|        INTBUF_INI_STARTER            starter/source/interfaces/intbuf/intbu
 Chd|        IPARI_L_INI                   starter/source/restart/ddsplit/ipari_l_ini.F
 Chd|        ITAGSL12                      starter/source/interfaces/inter3d1/inintr2.F
 Chd|        ITAGSL2                       starter/source/interfaces/inter3d1/itagsl2.F
+Chd|        IWCONTDD_TYPE24               starter/source/spmd/domain_decomposition/iwcontdd_type24.F
+Chd|        IWCONTDD_TYPE25               starter/source/spmd/domain_decomposition/iwcontdd_type25.F
 Chd|        LAGM_INI                      starter/source/tools/lagmul/lagm_ini.F
 Chd|        LECINS                        starter/source/interfaces/interf1/lecins.F
 Chd|        LECTUR                        starter/source/starter/lectur.F
@@ -107,11 +111,11 @@ Chd|        PREPARE_SPLIT_I9              starter/source/restart/ddsplit/inter_t
 Chd|        PRESCRINT                     starter/source/interfaces/interf1/prescrint.F
 Chd|        PRE_I2                        starter/source/interfaces/inter3d1/i7remnode.F
 Chd|        R2R_CLEAN_INTER               starter/source/coupling/rad2rad/r2r_clean_inter.F
-Chd|        REMN_I2                       starter/source/interfaces/inter3d1/i7remnode.F
 Chd|        REMN_I2OP                     starter/source/interfaces/inter3d1/i7remnode.F
 Chd|        REMN_I2OP_EDG25               starter/source/interfaces/int25/i25remlin.F
 Chd|        REMN_I2_EDG                   starter/source/interfaces/inter3d1/i7remnode.F
 Chd|        REMN_I2_EDGOP                 starter/source/interfaces/inter3d1/i7remnode.F
+Chd|        REMN_SELF24                   starter/source/interfaces/inter3d1/remn_self24.F
 Chd|        RESET_GAP                     starter/source/interfaces/interf1/reset_gap.F
 Chd|        RI2_INT24P_INI                starter/source/interfaces/inter3d1/i7remnode.F
 Chd|        SCRINT                        starter/source/interfaces/interf1/scrint.F
@@ -168,6 +172,7 @@ Chd|        UPGRADE_REMNODE2              starter/source/interfaces/interf1/upgr
 Chd|        UPGRADE_REMNODE_E2S           starter/source/interfaces/interf1/upgrade_remnode.F
 Chd|        UPGRADE_REMNODE_EDG           starter/source/interfaces/interf1/upgrade_remnode.F
 Chd|        UPGRADE_REMNODE_EDG2          starter/source/interfaces/interf1/upgrade_remnode.F
+Chd|        WRCOMIP                       starter/source/restart/ddsplit/wrcommp.F
 Chd|        W_FI                          starter/source/restart/ddsplit/w_fi.F
 Chd|        W_FRONT                       starter/source/restart/ddsplit/w_front.F
 Chd|        W_INTBUF_SIZE                 starter/source/restart/ddsplit/inter_tools.F
@@ -180,6 +185,7 @@ Chd|        ALEMAIN                       engine/source/ale/alemain.F
 Chd|        ALEWDX                        engine/source/ale/grid/alewdx.F
 Chd|        CHECK_EDGE_STATE              engine/source/interfaces/interf/check_edge_state.F
 Chd|        CHECK_NODAL_STATE             engine/source/interfaces/interf/check_nodal_state.F
+Chd|        CHECK_REMOTE_SURFACE_STATE    engine/source/interfaces/interf/check_remote_surface_state.F
 Chd|        CHECK_SURFACE_STATE           engine/source/interfaces/interf/check_surface_state.F
 Chd|        CHKSTFN3N                     engine/source/interfaces/interf/chkstfn3.F
 Chd|        CHKSTIFN                      engine/source/interfaces/inter2d/chkstifn.F
@@ -354,6 +360,7 @@ Chd|        IND_KINEFR                    engine/source/mpi/implicit/imp_fri.F
 Chd|        IND_KINE_I                    engine/source/implicit/ind_glob_k.F
 Chd|        IND_KINE_K                    engine/source/implicit/ind_glob_k.F
 Chd|        IND_KINFRK                    engine/source/mpi/implicit/imp_fri.F
+Chd|        INIT_I25_EDGE                 engine/source/interfaces/int25/init_i25_edge.F
 Chd|        INIT_INTERF_SORTING_STRATEGY  engine/source/interfaces/init_interf_sorting_strategy.F
 Chd|        INIT_NODAL_STATE              engine/source/interfaces/interf/init_nodal_state.F
 Chd|        INI_DD0                       engine/source/mpi/implicit/imp_fri.F
@@ -387,6 +394,7 @@ Chd|        INTER_VOXEL_CREATION          engine/source/interfaces/generic/inter
 Chd|        INTFOP1                       engine/source/interfaces/interf/intfop1.F
 Chd|        INTFOP2                       engine/source/interfaces/interf/intfop2.F
 Chd|        INTFOP8                       engine/source/interfaces/interf/intfop8.F
+Chd|        INTMASS_UPDATE                engine/source/interfaces/interf/intmass_update.F
 Chd|        INTTI0                        engine/source/interfaces/interf/intti0.F
 Chd|        INTTI1                        engine/source/interfaces/interf/intti1.F
 Chd|        INTTI12A                      engine/source/interfaces/interf/intti12.F
@@ -430,6 +438,7 @@ Chd|        NDDLI_NS                      engine/source/mpi/implicit/imp_fri.F
 Chd|        NL_SOLV                       engine/source/implicit/nl_solv.F
 Chd|        PRINTIME_INTERF               engine/source/system/timer_interf.F
 Chd|        PRINT_STIF                    engine/source/implicit/imp_solv.F
+Chd|        RDCOMI                        engine/source/output/restart/rdcomm.F
 Chd|        RECUKIN                       engine/source/implicit/recudis.F
 Chd|        RER02                         engine/source/implicit/upd_glob_k.F
 Chd|        RER_INT_V                     engine/source/implicit/upd_glob_k.F
@@ -450,12 +459,15 @@ Chd|        SPMD_CELL_SIZE_EXCHANGE       engine/source/mpi/interfaces/spmd_cell
 Chd|        SPMD_CHECK_TAG                engine/source/mpi/ams/spmd_check_tag.F
 Chd|        SPMD_EXCH_DA20                engine/source/mpi/interfaces/spmd_exch_da20.F
 Chd|        SPMD_EXCH_DELETED_SURF_EDGE   engine/source/mpi/interfaces/spmd_exch_deleted_surf_edge.F
+Chd|        SPMD_EXCH_EFRIC               engine/source/mpi/interfaces/spmd_exch_efric.F
 Chd|        SPMD_EXCH_I24                 engine/source/mpi/interfaces/spmd_exch_i24.F
 Chd|        SPMD_EXCH_I25                 engine/source/mpi/interfaces/spmd_exch_i25.F
 Chd|        SPMD_EXCH_IDEL_SEGLO          engine/source/mpi/interfaces/spmd_exch_idel_seglo.F
+Chd|        SPMD_EXCH_INTER_18            engine/source/mpi/interfaces/spmd_exch_inter_18.F
 Chd|        SPMD_EXCH_NOR                 engine/source/mpi/interfaces/spmd_exch_nor.F
 Chd|        SPMD_EXCH_PRESS               engine/source/mpi/interfaces/spmd_exch_press.F
 Chd|        SPMD_EXCH_SMST2               engine/source/mpi/ams/spmd_exch_smst2.F
+Chd|        SPMD_EXCH_SORTING_EFRIC       engine/source/mpi/interfaces/spmd_exch_sorting_efric.F
 Chd|        SPMD_GLOB_MIN5                engine/source/mpi/generic/spmd_glob_min5.F
 Chd|        SPMD_I18KINE_COM_A            engine/source/mpi/interfaces/spmd_i18kine_com_a.F
 Chd|        SPMD_I18KINE_COM_ACC          engine/source/mpi/interfaces/spmd_i18kine_com_acc.F
@@ -478,7 +490,6 @@ Chd|        SPMD_IFRONT_STAMP             engine/source/mpi/interfaces/send_cand
 Chd|        SPMD_INT18_LAW151_PON         engine/source/mpi/forces/spmd_int18_law151_pon.F
 Chd|        SPMD_SAVEFI                   engine/source/mpi/interfaces/spmd_i7tool.F
 Chd|        SPMD_SPLIT_COMM_INTER         engine/source/mpi/interfaces/spmd_split_comm_inter.F
-Chd|        SPMD_TAGNCONT_STAMP           engine/source/mpi/forces/spmd_exch_tagncont.F
 Chd|        SPMD_WAIT_NB                  engine/source/mpi/interfaces/spmd_wait_nb.F
 Chd|        UD_INT5                       engine/source/implicit/upd_glob_k.F
 Chd|        UPDK_MV                       engine/source/airbag/monv_imp0.F
@@ -489,12 +500,14 @@ Chd|        UPD_KML                       engine/source/mpi/implicit/imp_fri.F
 Chd|        UPD_KSL                       engine/source/mpi/implicit/imp_fri.F
 Chd|        UPD_RHS                       engine/source/implicit/upd_glob_k.F
 Chd|        UPD_RHS_FR                    engine/source/implicit/imp_solv.F
+Chd|        WRCOMI                        engine/source/output/restart/wrcomm.F
 Chd|        WRITE_INTBUF                  engine/source/output/restart/write_intbuf.F
 Chd|        WRRESTP                       engine/source/output/restart/wrrestp.F
 Chd|        IMP_INTBUF                    engine/share/modules/imp_mod_def.F
 Chd|        INTBUF_MOD                    engine/share/modules/restart_mod.F
+Chd|        UPDATE_WEIGHT_INTER_TYPE_24_25starter/source/spmd/domain_decomposition/update_weight_inter_type_24_25.F
 Chd|-- calls ---------------
-Chd|        INT8_MOD                      modules/int8_mod.F            
+Chd|        INT8_MOD                      modules/interfaces/int8_mod.F 
 Chd|        METRIC_MOD                    modules/metric_mod.F          
 Chd|====================================================================
       MODULE INTBUFDEF_MOD
@@ -623,9 +636,9 @@ C-------S_ISEADD,S_ISEDGE,S_CAND_T will be cleaned after, for the moment with si
         integer ::   S_ISEADD     !  ISEADD     :SECND EDGE ADDRESS                      :      24
         integer ::   S_ISEDGE     !  L24ADD     :ISEDGE:SECND EDGES NODES AND FLAGS      :      24
         integer ::   S_CAND_T     !  MULTIMP*NSN:CAND_T:Candidate type                   :      24
-c					  ! =0 node to surface candidate
-c					  ! =1 node or edge to surface candidate
-c					  ! =2 edge to surface candidate
+c            ! =0 node to surface candidate
+c            ! =1 node or edge to surface candidate
+c            ! =2 edge to surface candidate
         integer ::   S_ISEG_PXFEM !  ISEG_PXFEM:       :      24
         integer ::   S_ISEG_PLY   !  ISEG_PLY          :      24
 
@@ -809,9 +822,16 @@ C---------to be cleaned later
         integer ::   S_STFE         !  NEDGE 
         integer ::   S_GAPMSAV      ! NRTM
         integer ::   S_E2S_NOD_NORMAL ! 3*NADMSR
+
+        integer :: NUMBER_EDGE_TYPE1
+        integer :: NUMBER_EDGE_TYPE1_0
 C       Orthotropic friction 
         integer ::   S_DIR_FRICM !  2*NRTM         : orhotropic directions for friction 
-
+C   Stiffness based on mass and time step
+        integer ::   S_STIFMSDT_S       ! NSN : nodal mass on secondary node *STFACM
+        integer ::   S_STIFMSDT_M       ! NRTM : main mass *STFACM
+        integer ::   S_STIFMSDT_EDG     ! NEDGE : edge mass *STFACM
+C
 C=======================================================================
 c DEFINE ARRAYS (integers arrays)
 C=======================================================================
@@ -928,7 +948,9 @@ C--------to be cleaned later
         integer, DIMENSION(:) , POINTER ::  CANDM_E2S  
         integer, DIMENSION(:) , POINTER ::  CANDS_E2S
         integer, DIMENSION(:) , POINTER ::  IFPEN_E   
-        integer, DIMENSION(:) , POINTER ::  IFPEN_E2S       
+        integer, DIMENSION(:) , POINTER ::  IFPEN_E2S      
+        integer, DIMENSION(:), ALLOCATABLE :: EDGE_TYPE1
+        integer, DIMENSION(:), ALLOCATABLE :: EDGE_TYPE1_0
 C---- INTER FRICTION PARTS
         integer, DIMENSION(:) , POINTER ::  IPARTFRICS 
         integer, DIMENSION(:) , POINTER ::  IPARTFRICM
@@ -1092,6 +1114,10 @@ C-------to be cleaned later
         my_real, DIMENSION(:) , POINTER ::   STFE
         my_real, DIMENSION(:) , POINTER ::   GAPMSAV
         REAL(4), DIMENSION(:) , POINTER ::   E2S_NOD_NORMAL  !
+
+        my_real, DIMENSION(:) , POINTER ::   STIFMSDT_S
+        my_real, DIMENSION(:) , POINTER ::   STIFMSDT_M
+        my_real, DIMENSION(:) , POINTER ::   STIFMSDT_EDG
         INTEGER :: NRTM_FREE
 
 C MPI Communicators
@@ -1118,7 +1144,9 @@ C=======================================================================
 
 c INTBUF_SIZE array maximum length defined as parameter
 c (maximum number of different arrays composing INTBUF_TAB structure)
-        INTEGER, PARAMETER :: L_INTBUF_SIZE_MAX = 514
+      INTEGER, PARAMETER :: L_INTBUF_SIZE_MAX = 516
+      INTEGER INTER_ITHKNOD !Flag to fill THKNOD array  (enabled with Ithick parameter from interface type 25 or 21)
+
 
 c
 c---------------

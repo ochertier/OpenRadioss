@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  UTABLE_DUM                    source/user_interface/utable.F
 Chd|-- called by -----------
@@ -27,8 +27,11 @@ Chd|        RADIOSS2                      source/engine/radioss2.F
 Chd|-- calls ---------------
 Chd|====================================================================
       SUBROUTINE UTABLE_DUM(IERR)
-C---------+---------+---+---+--------------------------------------------
+C-----------------------------------------------
+C   I m p l i c i t   T y p e s
+C-----------------------------------------------
 #include      "implicit_f.inc"
+C-----------------------------------------------
        INTEGER IERR
        IERR=0
       END
@@ -40,12 +43,21 @@ Chd|        TABLE_GLOB_MOD                share/modules/table_glob_mod.F
 Chd|        TABLE_MOD                     share/modules/table_mod.F     
 Chd|====================================================================
       INTEGER FUNCTION GET_U_NUMTABLE(TID) 
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
       USE TABLE_GLOB_MOD
       USE TABLE_MOD
+C-----------------------------------------------
+C   I m p l i c i t   T y p e s
+C-----------------------------------------------      
+#include      "implicit_f.inc"
+C-----------------------------------------------
+#include      "com04_c.inc"     
+C----------------------------------------------- 
       TYPE(TTABLE) CUR_TABLE
       INTEGER I,TID
 C need NTABLE
-#include      "com04_c.inc"
 C
       GET_U_NUMTABLE = 0
       DO I=1,NTABLE
@@ -65,6 +77,9 @@ Chd|        INTERFACE_TABLE_MOD           share/modules/table_mod.F
 Chd|        TABLE_GLOB_MOD                share/modules/table_glob_mod.F
 Chd|====================================================================
       SUBROUTINE GET_U_TABLE(ITABLE,XX,YY) 
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
       USE TABLE_GLOB_MOD
       USE INTERFACE_TABLE_MOD
 C-----------------------------------------------
@@ -117,6 +132,40 @@ C
       RETURN
       END
 Chd|====================================================================
+Chd|  GET_TABLE_VALUE_DYDX          source/user_interface/utable.F
+Chd|-- called by -----------
+Chd|-- calls ---------------
+Chd|        TABLE_INTERP_DYDX             source/tools/curve/table_tools.F
+Chd|        INTERFACE_TABLE_MOD           share/modules/table_mod.F     
+Chd|        TABLE_GLOB_MOD                share/modules/table_glob_mod.F
+Chd|====================================================================
+      SUBROUTINE GET_TABLE_VALUE_DYDX(ITABLE,XX,XXDIM,YY,DYDX) 
+      USE TABLE_GLOB_MOD
+      USE INTERFACE_TABLE_MOD
+C-----------------------------------------------
+C   I m p l i c i t   T y p e s
+C-----------------------------------------------
+#include      "implicit_f.inc"
+C-----------------------------------------------
+C   C o m m o n   B l o c k s
+C-----------------------------------------------
+       INTEGER ITABLE,XXDIM
+       my_real XX(XXDIM)
+
+       my_real
+     .       YY,DYDX
+       my_real, DIMENSION(:),ALLOCATABLE :: XX2
+
+      ALLOCATE (XX2(XXDIM))
+      XX2(1:XXDIM)=XX(1:XXDIM)
+C
+      call my_flush(6)
+      CALL TABLE_INTERP_DYDX(TABLE(ITABLE),XX2,XXDIM,YY,DYDX)
+      
+      DEALLOCATE(XX2)
+      RETURN
+      END
+Chd|====================================================================
 Chd|  GET_U_VTABLE                  source/user_interface/utable.F
 Chd|-- called by -----------
 Chd|-- calls ---------------
@@ -132,9 +181,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER ITABLE,NEL0
@@ -147,7 +193,7 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
 C
-      CALL TABLE_VINTERP(TABLE(ITABLE),NEL0,IPOS,XX,YY,DYDX1)
+      CALL TABLE_VINTERP(TABLE(ITABLE),NEL0,NEL0,IPOS,XX,YY,DYDX1)
       RETURN
       END
 
@@ -167,16 +213,12 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER ITABLE,NEL0,XXDIM
       INTEGER IPOS(NEL0,XXDIM)
       my_real  XX(NEL0,XXDIM)
-      my_real
-     .       YY(*), DYDX1(*)
+      my_real  YY(*), DYDX1(*)
      
       my_real, DIMENSION(:,:), ALLOCATABLE :: XX2 
       INTEGER, DIMENSION(:,:), ALLOCATABLE :: IPOS2
@@ -191,7 +233,7 @@ C
       IPOS2(1:NEL0,1:XXDIM) = IPOS(1:NEL0,1:XXDIM)
       XX2(1:NEL0,1:XXDIM) = XX(1:NEL0,1:XXDIM)
 
-      CALL TABLE_VINTERP(TABLE(ITABLE),NEL0,IPOS2,XX2,YY,DYDX1)
+      CALL TABLE_VINTERP(TABLE(ITABLE),NEL0,NEL0,IPOS2,XX2,YY,DYDX1)
 
       DEALLOCATE(XX2)
       DEALLOCATE(IPOS2)

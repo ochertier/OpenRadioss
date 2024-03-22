@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  SIGEPS58C                     source/materials/mat/mat058/sigeps58c.F
 Chd|-- called by -----------
@@ -32,7 +32,7 @@ Chd|        TABLE_MOD                     share/modules/table_mod.F
 Chd|====================================================================
       SUBROUTINE SIGEPS58C(
      1     NEL0   ,NUPARAM,NUVAR   ,MFUNC   ,KFUNC  ,
-     2     NPF    ,NPT0    ,IPT    ,IFLAG   ,
+     2     NPF    ,NPT0    ,IPT    ,IFLAG   ,NSENSOR,
      2     TF     ,TIME   ,TIMESTEP,UPARAM  ,RHO0   ,
      3     AREA   ,EINT   ,THKLY   ,
      4     EPSPXX ,EPSPYY ,EPSPXY  ,EPSPYZ  ,EPSPZX ,
@@ -111,14 +111,13 @@ C---------+---------+---+---+--------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "parit_c.inc"
 #include      "com04_c.inc"
-#include      "scr05_c.inc"
 #include      "com01_c.inc"
 #include      "com08_c.inc"
 C-----------------------------------------------
 C   I N P U T   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER ,INTENT(IN) :: NSENSOR
       INTEGER NEL0, NUPARAM, NUVAR, NPT0, IPT,ISMSTR,IFLAG(*),
      .   NGL(NEL0),MAT(NEL0)
       my_real TIME,TIMESTEP(NEL0),UPARAM(*),
@@ -148,7 +147,7 @@ C-----------------------------------------------
       my_real UVAR(NEL0,NUVAR), OFF(NEL0),THK(NEL0),YLD(NEL0)
       TYPE(TTABLE) TABLE(*)
       my_real, DIMENSION(1) :: XX
-      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) ,INTENT(IN) :: SENSOR_TAB
 C-----------------------------------------------
 C   VARIABLES FOR FUNCTION INTERPOLATION 
 C-----------------------------------------------
@@ -506,10 +505,13 @@ C------------------------------------------------------------------
           RFAC = NC / EC2
           RFAT = NT / ET2
 C---      contraintes membrane       
-          SIGC = RFAC * FC * LC(I) / DC
-          SIGT = RFAT * FT * LT(I) / DT
-          SIGNXX(I) = SIGC
-          SIGNYY(I) = SIGT
+          SIGC = FC * LC(I) / DC
+          SIGT = FT * LT(I) / DT
+          SIGNXX(I) = SIGC * RFAC
+          SIGNYY(I) = SIGT * RFAT
+c
+          UVAR(I,1)  = SIGC
+          UVAR(I,2)  = SIGT
           UVAR(I,15) = DC
           UVAR(I,16) = DT
 C---      contraintes cisaillement      
@@ -568,8 +570,6 @@ C---
 #include "vectorize.inc"
         DO  J=1,NINDX
           I=INDEX(J)
-          UVAR(I,1) = SIGNXX(I) + SIGVXX(I)
-          UVAR(I,2) = SIGNYY(I) + SIGVYY(I)
           UVAR(I,3) = SIGNXY(I) + SIGVXY(I)
           TAN_PHI(I)= DEPSXY(I)
           UVAR(I,6) = DEPSXY(I)
@@ -1507,10 +1507,14 @@ c
         RFAC = ONE / EC2
         RFAT = ONE / ET2
 C---    contraintes membrane       
-        SIGC = RFAC * FC * LC(I) / DC
-        SIGT = RFAT * FT * LT(I) / DT
-        SIGNXX(I) = SIGC
-        SIGNYY(I) = SIGT
+c
+        SIGC = FC * LC(I) / DC
+        SIGT = FT * LT(I) / DT
+        SIGNXX(I) = SIGC * RFAC
+        SIGNYY(I) = SIGT * RFAT
+c
+        UVAR(I,1)  = SIGC
+        UVAR(I,2)  = SIGT
         UVAR(I,15) = DC
         UVAR(I,16) = DT
 C------------------------------------------------------------------
@@ -1650,8 +1654,6 @@ C---
 #include "vectorize.inc"
       DO  J=1,NINDX
         I=INDEX(J)
-        UVAR(I,1) = SIGNXX(I) + SIGVXX(I)
-        UVAR(I,2) = SIGNYY(I) + SIGVYY(I)
         UVAR(I,3) = SIGNXY(I) + SIGVXY(I)
         TAN_PHI(I) = DEPSXY(I)
         UVAR(I,6)  = DEPSXY(I)

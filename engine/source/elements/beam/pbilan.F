@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  PBILAN                        source/elements/beam/pbilan.F 
 Chd|-- called by -----------
@@ -29,14 +29,18 @@ Chd|        GRELEM_SAV                    source/output/th/grelem_sav.F
 Chd|        SENSOR_ENERGY_BILAN           source/tools/sensor/sensor_energy_bilan.F
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|====================================================================
-      SUBROUTINE PBILAN(PM     ,V     ,EINT   ,GEO ,PARTSAV,
-     2                  IPARTP ,TANI  ,FOR    ,MOM ,GRESAV ,
-     3                  GRTH   ,IGRTH ,OFF_DUM,NEL ,AL     ,
-     4                  NC1    ,NC2   ,NC3    ,E1X ,E1Y    ,
-     5                  E1Z    ,E2X   ,E2Y    ,E2Z ,MAT    ,
-     6                  PID    ,VX1G  ,VX2G   ,VY1G,VY2G   ,
-     7                  VZ1G   ,VZ2G  ,X1G    ,X2G ,Y1G    ,
-     .                  Y2G    ,Z1G   ,Z2G    ,ITASK,H3D_DATA)
+      SUBROUTINE PBILAN(
+     1   PM,      V,       EINT,    GEO,
+     2   PARTSAV, IPARTP,  TANI,    FOR,
+     3   MOM,     GRESAV,  GRTH,    IGRTH,
+     4   OFF_DUM, NEL,     AL,      NC1,
+     5   NC2,     NC3,     E1X,     E1Y,
+     6   E1Z,     E2X,     E2Y,     E2Z,
+     7   MAT,     PID,     VX1G,    VX2G,
+     8   VY1G,    VY2G,    VZ1G,    VZ2G,
+     9   X1G,     X2G,     Y1G,     Y2G,
+     A   Z1G,     Z2G,     ITASK,   H3D_DATA,
+     B   IGRE)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -53,12 +57,11 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "com01_c.inc"
-#include      "vect01_c.inc"
 #include      "scr14_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: IGRE
       INTEGER IPARTP(*),GRTH(*),IGRTH(*),NEL,NC1(MVSIZ),NC2(MVSIZ),
      .   NC3(MVSIZ),MAT(MVSIZ),PID(MVSIZ),ITASK
 C     REAL
@@ -91,12 +94,12 @@ C-----------------------------------------------
       RBIDON = ZERO
       OFF(1:MVSIZ) = ZERO
       FLAG = 0
-      DO I=LFT,LLT
+      DO I=1,NEL
         SECT(I)=GEO(1,PID(I))
         RHO(I) =PM(1,MAT(I))
       ENDDO
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         XX(I)=X1G(I)+X2G(I)
         YY(I)=Y1G(I)+Y2G(I)
         ZZ(I)=Z1G(I)+Z2G(I)
@@ -108,7 +111,7 @@ C
      .        +VZ1G(I)*VZ1G(I)+VZ2G(I)*VZ2G(I)
       ENDDO
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         XX(I)=XX(I)*HALF
         YY(I)=YY(I)*HALF
         ZZ(I)=ZZ(I)*HALF
@@ -118,11 +121,11 @@ C
         VA2(I)=VA2(I)*HALF
       ENDDO
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         XMAS(I)=RHO(I)*AL(I)*SECT(I)
       ENDDO
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         EI(I)= EINT(I,1) + EINT(I,2)
         EK(I)= XMAS(I)*VA2(I)*HALF
         XM(I)= XMAS(I)*VXA(I)
@@ -130,7 +133,7 @@ C
         ZM(I)= XMAS(I)*VZA(I) 
       ENDDO
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         XCG(I)= XMAS(I)*XX(I)
         YCG(I)= XMAS(I)*YY(I)
         ZCG(I)= XMAS(I)*ZZ(I)
@@ -152,10 +155,10 @@ C
       ENDDO
 C
       IF (IGRE /= 0) THEN
-        DO I=LFT,LLT
+        DO I=1,NEL
           OFF(I) = ONE
         ENDDO
-        CALL GRELEM_SAV(LFT   ,LLT   ,GRESAV,IGRTH ,GRTH  ,
+        CALL GRELEM_SAV(1   ,NEL   ,GRESAV,IGRTH ,GRTH  ,
      2                  OFF   ,EI    ,EK    ,XM    ,YM    ,
      3                  ZM    ,XMAS  ,XCG   ,YCG   ,ZCG   ,
      4                  XXM   ,YYM   ,ZZM   ,IXX   ,IYY   ,
@@ -163,7 +166,7 @@ C
      6                  REK   ,FLAG  )
       ENDIF
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         M = IPARTP(I)
         PARTSAV(1,M)=PARTSAV(1,M) + EI(I)
         PARTSAV(2,M)=PARTSAV(2,M) + EK(I)
@@ -188,7 +191,7 @@ C
       ENDDO
 C
       IF (ANIM_FT(1) /= 0 .OR. H3D_DATA%UND_FORC /= 0) THEN
-        DO I=LFT,LLT
+        DO I=1,NEL
           TANI(1,I)= FOR(I,1)
           TANI(2,I)= FOR(I,2)
           TANI(3,I)= FOR(I,3)
@@ -207,7 +210,7 @@ C          TANI(15,I)= E2Z(I)
         ENDDO
       ENDIF
       OFF(1:MVSIZ) = ONE
-      CALL SENSOR_ENERGY_BILAN(LFT,LLT,EI,EK,OFF,IPARTP,ITASK) 
+      CALL SENSOR_ENERGY_BILAN(1,NEL,EI,EK,OFF,IPARTP,ITASK) 
 C-----------------------------------------------
       RETURN
       END

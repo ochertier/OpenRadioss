@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  RUSER46                       source/elements/spring/ruser46.F
 Chd|-- called by -----------
@@ -116,7 +116,7 @@ C   D u m m y   A r g u m e n t s   a n d   F u n c t i o n
 C----------------------------------------------------------
       INTEGER IOUT,NEL,NUVAR,IPROP,
      .        GET_U_PNU,GET_U_PID,GET_U_MID,GET_U_MNU,
-     .        KFUNC,KMAT,KPROP,GET_SPRING_ELNUM
+     .        KFUNC,KMAT,KPROP
       my_real
      .   UVAR(NUVAR,*),DT ,
      .   FX(*), FY(*), FZ(*), E(*), VX(*),MASS(*) ,XINER(*),
@@ -125,8 +125,7 @@ C----------------------------------------------------------
      .   STIFM(*) ,STIFR(*) , VISCM(*) ,VISCR(*) ,FR_WAVE(*) ,
      .   GET_U_MAT, GET_U_GEO, GET_U_FUNC, GET_U_TIME
       EXTERNAL GET_U_MNU,GET_U_PNU,GET_U_MID,GET_U_PID,
-     .         GET_U_MAT,GET_U_GEO, GET_U_FUNC, GET_U_TIME,
-     .         GET_SPRING_ELNUM
+     .         GET_U_MAT,GET_U_GEO, GET_U_FUNC, GET_U_TIME
       PARAMETER (KFUNC=29)
 !      PARAMETER (KMAT=31)
 !      PARAMETER (KPROP=33)

@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  TRI7BOX                       share/modules/tri7box.F       
 Chd|-- called by -----------
@@ -58,6 +58,7 @@ Chd|        I17CUT                        source/interfaces/int17/i17tri.F
 Chd|        I17FOR3                       source/interfaces/int17/i17for3.F
 Chd|        I17LLL4_PENA                  source/interfaces/int17/i17for3.F
 Chd|        I17VIT_PENA                   source/interfaces/int17/i17for3.F
+Chd|        I18DST3                       source/interfaces/int18/i18dst3.F
 Chd|        I18FOR3                       source/interfaces/int18/i18for3.F
 Chd|        I18KINE_F                     source/interfaces/int18/i18main_kine.F
 Chd|        I18KINE_I                     source/interfaces/int18/i18main_kine.F
@@ -130,6 +131,7 @@ Chd|        I24SMS2                       source/interfaces/int24/i24for3.F
 Chd|        I24STO                        source/interfaces/intsort/i24sto.F
 Chd|        I24TRC                        source/interfaces/intsort/i7trc.F
 Chd|        I24TRIVOX                     source/interfaces/intsort/i24trivox.F
+Chd|        I24_SAVE_SUB                  source/interfaces/int24/i24_save_sub.F
 Chd|        I25ASS0                       source/interfaces/int25/i25ass3.F
 Chd|        I25ASS2                       source/interfaces/int25/i25ass3.F
 Chd|        I25ASS3                       source/interfaces/int25/i25ass3.F
@@ -218,9 +220,12 @@ Chd|        IMPL_SAV1                     source/interfaces/int24/i24main.F
 Chd|        IMP_FR7I                      source/mpi/implicit/imp_fri.F 
 Chd|        IMP_STIF24                    source/implicit/imp_solv.F    
 Chd|        INIT_TRIM                     source/interfaces/intsort/init_trim.F
+Chd|        INT18_ALLOC                   source/interfaces/int18/int18_alloc.F
 Chd|        INT18_LAW151_OMP_ACCUMULATION source/interfaces/int18/int18_law151_omp_accumulation.F
 Chd|        INTCRIT                       source/interfaces/intsort/intcrit.F
+Chd|        INTER7_COLLISION_DETECTION    source/interfaces/inter7_collision_detection.F
 Chd|        INTER_SORT_07                 source/interfaces/int07/inter_sort_07.F
+Chd|        INTMASS_UPDATE                source/interfaces/interf/intmass_update.F
 Chd|        INTTRI                        source/interfaces/intsort/inttri.F
 Chd|        I_CORPFIT3                    source/interfaces/int24/i24cor3.F
 Chd|        I_COR_EPFIT3                  source/interfaces/int24/i24cor3.F
@@ -238,10 +243,13 @@ Chd|        SPMD_CELL_SIZE_EXCHANGE       source/mpi/interfaces/spmd_cell_size_e
 Chd|        SPMD_CELL_SIZE_EXCHANGE_INIT  source/mpi/interfaces/spmd_cell_size_exchange_init.F
 Chd|        SPMD_CELL_SIZE_POST_RCV       source/mpi/interfaces/spmd_cell_size_post_rcv.F
 Chd|        SPMD_CHECK_TAG                source/mpi/ams/spmd_check_tag.F
+Chd|        SPMD_EXCH_EFRIC               source/mpi/interfaces/spmd_exch_efric.F
 Chd|        SPMD_EXCH_I24                 source/mpi/interfaces/spmd_exch_i24.F
 Chd|        SPMD_EXCH_I25                 source/mpi/interfaces/spmd_exch_i25.F
+Chd|        SPMD_EXCH_INTER_18            source/mpi/interfaces/spmd_exch_inter_18.F
 Chd|        SPMD_EXCH_PRESS               source/mpi/interfaces/spmd_exch_press.F
 Chd|        SPMD_EXCH_SMST2               source/mpi/ams/spmd_exch_smst2.F
+Chd|        SPMD_EXCH_SORTING_EFRIC       source/mpi/interfaces/spmd_exch_sorting_efric.F
 Chd|        SPMD_GET_PENIS                source/mpi/interfaces/send_cand.F
 Chd|        SPMD_GET_PENIS20              source/mpi/interfaces/send_cand.F
 Chd|        SPMD_GET_STIF                 source/mpi/interfaces/send_cand.F
@@ -288,7 +296,6 @@ Chd|        SPMD_SD_STFN25                source/mpi/interfaces/send_cand.F
 Chd|        SPMD_SPHVOX                   source/mpi/sph/spmd_sphvox.F  
 Chd|        SPMD_SPHVOX0                  source/mpi/elements/spmd_sph.F
 Chd|        SPMD_SPHVOX_OLD               source/mpi/sph/spmd_sphvox.F  
-Chd|        SPMD_TAGNCONT_STAMP           source/mpi/forces/spmd_exch_tagncont.F
 Chd|        SPMD_TRI10BOX                 source/mpi/interfaces/spmd_int.F
 Chd|        SPMD_TRI10GAT                 source/mpi/interfaces/spmd_int.F
 Chd|        SPMD_TRI11GAT                 source/mpi/interfaces/spmd_int.F
@@ -499,11 +506,13 @@ C indiquant pour chaque interface type7, 10, 24, 25, et pour chaque noeud remote
 C son adresse de depart dans LISUBSFI et INFLG_SUBSFI (tableau dimensionne a NSNR+1 (noeud remote + 1)
       TYPE(int_pointer), DIMENSION(:), ALLOCATABLE :: ADDSUBSFI
       TYPE(real_pointer2), DIMENSION(:), ALLOCATABLE :: FNCONTI, FTCONTI
+      TYPE(real_pointer), DIMENSION(:), ALLOCATABLE :: EFRICFI, EFRICGFI
       INTEGER , DIMENSION(:), ALLOCATABLE :: NLSKYFI, NLSKYFIE
 C Temporary array for VOXEL SORTING
       INTEGER , DIMENSION(:), ALLOCATABLE :: NEXT_NOD
       INTEGER , DIMENSION(:), ALLOCATABLE :: CHAIN_ELEM,CHAIN_NEXT
       INTEGER , DIMENSION(:), ALLOCATABLE :: CHAIN_LAST 
+      INTEGER , DIMENSION(:), ALLOCATABLE :: PREV_REMOTE_NUMBER 
       INTEGER LVOXEL
       PARAMETER(LVOXEL = 8000000)
       INTEGER INIVOXEL, VOXEL1(LVOXEL)
@@ -538,6 +547,9 @@ C Type 25 Interface
       TYPE(int_pointer) , DIMENSION(:), ALLOCATABLE :: KREMNOR_FI
       TYPE(int_pointer) , DIMENSION(:), ALLOCATABLE :: ISKEW_FI
       TYPE(int_pointer) , DIMENSION(:), ALLOCATABLE :: ICODT_FI
+      TYPE(real_pointer), DIMENSION(:), ALLOCATABLE :: STIF_MSDT_FI
+      TYPE(real_pointer), DIMENSION(:), ALLOCATABLE :: STIFE_MSDT_FI
+      TYPE(real_pointer), DIMENSION(:), ALLOCATABLE :: INTAREANFI
 
 C AMS TYPE2 + Contact
       TYPE(real_pointer), DIMENSION(:), ALLOCATABLE :: T2FAC_SMS_FI

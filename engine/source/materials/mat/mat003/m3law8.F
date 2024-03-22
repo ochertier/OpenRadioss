@@ -1,38 +1,40 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd LOI 3 PARTIE DEVIATORIQUE 8 PTS D'INTEGRATION
 Chd|====================================================================
 Chd|  M3LAW8                        source/materials/mat/mat003/m3law8.F
 Chd|-- called by -----------
 Chd|        MMAIN8                        source/materials/mat_share/mmain8.F
 Chd|-- calls ---------------
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
-      SUBROUTINE M3LAW8(PM    ,OFF   ,SIG   ,EPSEQ ,EINT  ,
-     .                  RHO   ,D1    ,D2    ,D3    ,D4    ,
-     .                  D5    ,D6    ,VNEW  ,VOLGP ,DVOL  ,
-     .                  MAT   ,NGL   ,IPLA  ,DPLA  ,EPD   ,
-     .                  TSTAR ,BUFLY ,NEL   )
+      SUBROUTINE M3LAW8(
+     1   PM,      OFF,     SIG,     EPSEQ,
+     2   EINT,    RHO,     D1,      D2,
+     3   D3,      D4,      D5,      D6,
+     4   VNEW,    VOLGP,   DVOL,    MAT,
+     5   NGL,     IPLA,    DPLA,    EPD,
+     6   TSTAR,   BUFLY,   NEL,     NPT)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -50,13 +52,13 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com08_c.inc"
-#include      "vect01_c.inc"
 #include      "param_c.inc"
 #include      "units_c.inc"
 #include      "scr17_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: NPT
       INTEGER MAT(MVSIZ),NGL(MVSIZ),IPLA,NEL
 C     REAL
       my_real
@@ -84,7 +86,7 @@ C     REAL
      .  DIMENSION(:), POINTER :: SIGP, EPLA
       TYPE(L_BUFEL_) ,POINTER :: LBUF
 C=======================================================================
-      MX  =MAT(LFT)
+      MX  =MAT(1)
       G   =PM(22,MX)
       CA  =PM(38,MX)
       CB  =PM(39,MX)
@@ -93,13 +95,13 @@ C=======================================================================
       SIGMX=PM(42,MX)    
 
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         POLD(I)=(SIG(I,1)+SIG(I,2)+SIG(I,3))*THIRD
       ENDDO
 C
       G1=DT1*G
       G2=TWO*G1
-      DO I=LFT,LLT
+      DO I=1,NEL
         EPSEQ(I)=ZERO
         TSTAR(I) = ZERO       
       ENDDO
@@ -114,8 +116,8 @@ C--------------------------------------------------
         LBUF => BUFLY%LBUF(1,1,IPT)
         SIGP => BUFLY%LBUF(1,1,IPT)%SIG(1:NEL*6)
         EPLA => BUFLY%LBUF(1,1,IPT)%PLA(1:NEL)
-        JPT=(IPT-1)*LLT
-        DO I=LFT,LLT
+        JPT=(IPT-1)*NEL
+        DO I=1,NEL
          II=I+JPT
          SIGP(JJ(1)+I) = SIGP(JJ(1)+I)-POLD(I) 
          SIGP(JJ(2)+I) = SIGP(JJ(2)+I)-POLD(I) 
@@ -133,7 +135,7 @@ C--------------------------------------------------
      .       HALF*ABS(D5(I,IPT)),HALF*ABS(D6(I,IPT)))        
         ENDDO
 C
-        DO I=LFT,LLT
+        DO I=1,NEL
           DAV=-THIRD*(D1(I,IPT)+D2(I,IPT)+D3(I,IPT))
           SIGP(JJ(1)+I)=SIGP(JJ(1)+I)+G2*(D1(I,IPT)+DAV)
           SIGP(JJ(2)+I)=SIGP(JJ(2)+I)+G2*(D2(I,IPT)+DAV)
@@ -145,13 +147,13 @@ C
 C---------------------
 C     LIMITE PLASTIQUE
 C---------------------
-        DO I=LFT,LLT
+        DO I=1,NEL
           YLD(I)= MIN(SIGMX,CA+CB*EPLA(I)**CN)
         ENDDO
 C-----------------------
 C       MODULE ECROUISSAGE
 C-----------------------
-        DO I=LFT,LLT
+        DO I=1,NEL
          II=I+JPT
          IF(CN==ONE) THEN
           QH(I)= CB
@@ -168,7 +170,7 @@ C-----------------------
          ENDIF
         ENDDO
 C
-        DO I=LFT,LLT
+        DO I=1,NEL
           J = (I-1)*6
           AJ2(I)=HALF*(SIGP(JJ(1)+I)**2+SIGP(JJ(2)+I)**2+SIGP(JJ(3)+I)**2)
      .                  +SIGP(JJ(4)+I)**2+SIGP(JJ(5)+I)**2+SIGP(JJ(6)+I)**2
@@ -176,7 +178,7 @@ C
         ENDDO
 C
       IF(IPLA==0)THEN
-       DO I=LFT,LLT
+       DO I=1,NEL
         II=I+JPT
         IF (YLD(I)==ZERO) CYCLE
           SCALE= MIN(ONE,YLD(I)/ MAX(SJ2(I),EM15))
@@ -190,7 +192,7 @@ C
           DPLA(II)= (ONE-SCALE)*SJ2(I)/(THREE*G+QH(I))       
         ENDDO
       ELSEIF(IPLA==2)THEN
-       DO 110 I=LFT,LLT
+       DO 110 I=1,NEL
         II=I+JPT
         IF(YLD(I)==ZERO)    GO TO 110
           SCALE= MIN(ONE,YLD(I)/ MAX(SJ2(I),EM15))
@@ -204,7 +206,7 @@ C
           DPLA(II)=(ONE-SCALE)*SJ2(I)/(THREE*G)         
   110  CONTINUE
       ELSEIF(IPLA==1)THEN
-       DO 120 I=LFT,LLT
+       DO 120 I=1,NEL
         II=I+JPT
         IF(YLD(I)==ZERO)    GO TO 120
         SCALE= MIN(ONE,YLD(I)/ MAX(SJ2(I),EM15))
@@ -225,7 +227,7 @@ C       actual yield stress.
 C--------------------------------------------------
 C     EPS PLASTIQUE MOYEN (OUTPUT ET RUPTURE)
 C--------------------------------------------------
-        DO I=LFT,LLT
+        DO I=1,NEL
           EPSEQ(I)=EPSEQ(I)+ONE_OVER_8*EPLA(I)
         ENDDO
 C
@@ -234,20 +236,20 @@ C FIN BOUCLE 1 PT DE GAUSS
 C----------------------------
 C     TEST DE RUPTURE DUCTILE
 C---------------------------
-      DO I=LFT,LLT
+      DO I=1,NEL
         IF(OFF(I)<EM01) OFF(I)=ZERO
         IF(OFF(I)<ONE) OFF(I)=OFF(I)*FOUR_OVER_5
       ENDDO
 C
       IWR=0
-      DO I=LFT,LLT
+      DO I=1,NEL
         IF(EPMX ==ZERO)    CYCLE
         IF(OFF(I)  <ONE)      CYCLE
         IF(EPSEQ(I)<EPMX) CYCLE
         IWR=1
       ENDDO
       IF(IWR==1) THEN
-        DO I=LFT,LLT
+        DO I=1,NEL
           IF(EPMX ==ZERO)    CYCLE
           IF(OFF(I)  <ONE)      CYCLE
           IF(EPSEQ(I)<EPMX) CYCLE
@@ -266,11 +268,11 @@ C--------------------------------------------------
         LBUF => BUFLY%LBUF(1,1,IPT)
         SIGP => BUFLY%LBUF(1,1,IPT)%SIG(1:NEL*6)
         EPLA => BUFLY%LBUF(1,1,IPT)%PLA(1:NEL)
-        JPT=(IPT-1)*LLT
+        JPT=(IPT-1)*NEL
 C--------------------------------------------------
 C       MISE A OFF AUX POINTS DE GAUSS
 C--------------------------------------------------
-        DO I=LFT,LLT
+        DO I=1,NEL
           SIGP(JJ(1)+I)=SIGP(JJ(1)+I)*OFF(I)
           SIGP(JJ(2)+I)=SIGP(JJ(2)+I)*OFF(I)
           SIGP(JJ(3)+I)=SIGP(JJ(3)+I)*OFF(I)
@@ -281,7 +283,7 @@ C--------------------------------------------------
 C--------------------------------------------------
 C     ENERGIE INTERNE DEVIATORIQUE
 C--------------------------------------------------
-        DO I=LFT,LLT
+        DO I=1,NEL
           DAV=VOLGP(I,IPT)*OFF(I)*DTA
           EINT(I)=EINT(I)+DAV*(D1(I,IPT)*(SOLD1(I,IPT)+SIGP(JJ(1)+I))+
      +                         D2(I,IPT)*(SOLD2(I,IPT)+SIGP(JJ(2)+I))+

@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  I25COR3E                      source/interfaces/inter3d1/i25cor3e.F
 Chd|-- called by -----------
@@ -54,11 +54,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr02_c.inc"
-#include      "scr05_c.inc"
-#include      "com06_c.inc"
-#include      "com08_c.inc"
-#include      "sms_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -132,16 +127,16 @@ C-----------------------------------------------
 
       DO I=1,JLT
         GAPE_M(I)=GAPE(CAND_M(I))
-	IF(CAND_S(I)<=NEDGE) THEN
+          IF(CAND_S(I)<=NEDGE) THEN
           GAPE_S(I)=GAPE(CAND_S(I))
         ELSE ! TBD
-	END IF
+          END IF
         GAPVE(I)=GAPE_M(I)+GAPE_S(I)
       END DO
       IF(IGAP==3) THEN
         DO I=1,JLT
            GAPE_M(I)=MIN(GAPE_M(I),GAP_E_L(CAND_M(I)))
-	   IF(CAND_S(I)<=NEDGE) THEN
+             IF(CAND_S(I)<=NEDGE) THEN
               GAPE_S(I)=MIN(GAPE_S(I),GAP_E_L(CAND_S(I)))
               GAPVE(I)=MIN(GAP_E_L(CAND_M(I))+GAP_E_L(CAND_S(I)),GAPVE(I))
            ENDIF
@@ -287,9 +282,9 @@ C
           FZ(I) = EDG_BISECTOR(3,JE,IE)
 C
 C         DX, DY, DZ Direction for shifting
-	  DX = VTX_BISECTOR(1,1,I1)+VTX_BISECTOR(1,2,I1)
-	  DY = VTX_BISECTOR(2,1,I1)+VTX_BISECTOR(2,2,I1)
-	  DZ = VTX_BISECTOR(3,1,I1)+VTX_BISECTOR(3,2,I1)
+            DX = VTX_BISECTOR(1,1,I1)+VTX_BISECTOR(1,2,I1)
+            DY = VTX_BISECTOR(2,1,I1)+VTX_BISECTOR(2,2,I1)
+            DZ = VTX_BISECTOR(3,1,I1)+VTX_BISECTOR(3,2,I1)
 C
           NNI = FX(I)*DX + FY(I)*DY + FZ(I)*DZ
           NI2 = DX*DX + DY*DY + DZ*DZ
@@ -309,22 +304,22 @@ c           scharp angle bound nodal normal to 45 from edge normal
             DZ = DZ + AAA*FZ(I)
           ENDIF
           DD=ONE/MAX(EM20,SQRT(DX*DX+DY*DY+DZ*DZ))
-	  DX = DX*DD
-	  DY = DY*DD
-	  DZ = DZ*DD
+            DX = DX*DD
+            DY = DY*DD
+            DZ = DZ*DD
           INVCOS  = ONE / MAX(EM20,FX(I)*DX  + FY(I)*DY  + FZ(I)*DZ)
           DX = DX*INVCOS
           DY = DY*INVCOS
           DZ = DZ*INVCOS
 C
-	  XXS1(I) = XXS1(I)-GAPE_S(I)*DX
-	  XYS1(I) = XYS1(I)-GAPE_S(I)*DY
-	  XZS1(I) = XZS1(I)-GAPE_S(I)*DZ
+            XXS1(I) = XXS1(I)-GAPE_S(I)*DX
+            XYS1(I) = XYS1(I)-GAPE_S(I)*DY
+            XZS1(I) = XZS1(I)-GAPE_S(I)*DZ
 C
 C         DX, DY, DZ Direction for shifting
-	  DX = VTX_BISECTOR(1,1,I2)+VTX_BISECTOR(1,2,I2)
-	  DY = VTX_BISECTOR(2,1,I2)+VTX_BISECTOR(2,2,I2)
-	  DZ = VTX_BISECTOR(3,1,I2)+VTX_BISECTOR(3,2,I2)
+            DX = VTX_BISECTOR(1,1,I2)+VTX_BISECTOR(1,2,I2)
+            DY = VTX_BISECTOR(2,1,I2)+VTX_BISECTOR(2,2,I2)
+            DZ = VTX_BISECTOR(3,1,I2)+VTX_BISECTOR(3,2,I2)
 C
           NNI = FX(I)*DX  + FY(I)*DY  + FZ(I)*DZ
           NI2 = DX*DX + DY*DY + DZ*DZ
@@ -344,17 +339,17 @@ c           scharp angle bound nodal normal to 45 from edge normal
             DZ = DZ + AAA*FZ(I)
           ENDIF
           DD=ONE/MAX(EM20,SQRT(DX*DX+DY*DY+DZ*DZ))
-	  DX = DX*DD
-	  DY = DY*DD
-	  DZ = DZ*DD
+            DX = DX*DD
+            DY = DY*DD
+            DZ = DZ*DD
           INVCOS  = ONE / MAX(EM20,FX(I)*DX  + FY(I)*DY  + FZ(I)*DZ)
           DX = DX*INVCOS
           DY = DY*INVCOS
           DZ = DZ*INVCOS
 C
-	  XXS2(I) = XXS2(I)-GAPE_S(I)*DX
-	  XYS2(I) = XYS2(I)-GAPE_S(I)*DY
-	  XZS2(I) = XZS2(I)-GAPE_S(I)*DZ
+            XXS2(I) = XXS2(I)-GAPE_S(I)*DX
+            XYS2(I) = XYS2(I)-GAPE_S(I)*DY
+            XZS2(I) = XZS2(I)-GAPE_S(I)*DZ
 C
         END DO
       END IF

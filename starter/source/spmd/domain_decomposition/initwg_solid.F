@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  INITWG_SOLID                  source/spmd/domain_decomposition/initwg_solid.F
 Chd|-- called by -----------
@@ -27,6 +27,7 @@ Chd|        INITWG                        source/spmd/domain_decomposition/initw
 Chd|-- calls ---------------
 Chd|        BIDON                         source/system/machine.F       
 Chd|        DDWEIGHTS_MOD                 share/modules1/ddweights_mod.F
+Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
 Chd|        MID_PID_MOD                   share/modules1/mid_pid_mod.F  
 Chd|====================================================================
       SUBROUTINE INITWG_SOLID(WD,PM,GEO,IXS,IGEO,ISOLNOD,
@@ -34,12 +35,13 @@ Chd|====================================================================
      .            NUMMAT,NUMGEO,
      .            POIN_PART_SOL,MID_PID_SOL,IPARTS,BUFMAT,
      .            MID_OLD,PID_OLD,MLN_OLD,RECHERCHE,ISOL_OLD,
-     .            TELT_PRO,TABMP_L,NPART)
+     .            TELT_PRO,TABMP_L,NPART,MAT_PARAM)
 C-----------------------------------------------
 C            M o d u l e s
 C-----------------------------------------------
       USE DDWEIGHTS_MOD
       USE MID_PID_MOD
+      USE MATPARAM_DEF_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -49,12 +51,8 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
 #include      "com01_c.inc"
-#include      "com_xfem1.inc"
 #include      "scr21_c.inc"
-#include      "scr05_c.inc"
 #include      "tablen_c.inc"
-#include      "scr23_c.inc"
-#include      "spmd_c.inc" 
 #include      "ddspmd_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -75,6 +73,7 @@ C     REAL OU REAL*8
       INTEGER, DIMENSION(2,NPART,*), INTENT(IN) :: POIN_PART_SOL
       INTEGER, DIMENSION(*), INTENT(IN) :: IPARTS
       TYPE(MID_PID_TYPE), DIMENSION(NUMMAT,*), INTENT(INOUT) :: MID_PID_SOL
+      TYPE(MATPARAM_STRUCT_) ,DIMENSION(NUMMAT), INTENT(IN) :: MAT_PARAM
 C-----------------------------------------------
       INTEGER OFF, NPN, MID, PID, JHBE, IGT, MLN,
      .    ISTRAIN, ITHK, IHBE, IPLA, ISSN, MTN, I, J, K,L,
@@ -82,7 +81,7 @@ C-----------------------------------------------
      .    I_MID,I_PID,I_MID_OLD,I_PID_OLD,PUID,MUID,
      .    ELM_TYP,ELM_TYP_OLD,ILAW,ILAW_OLD,TEST_MAT,
      .    I_PRO,ISOL2,MUID_OLD,PUID_OLD,
-     .    TEST,NFUNC1,NFUNC2,IRUP,IRUP2,
+     .    TEST,NFUNC1,NFUNC2,NFAIL,IRUP2,
      .    ISOL,INDI,IAD,INDI2,MULT
       INTEGER :: INDI3,ADD_OPTION,INDI_OPT_1,INDI_OPT_2
       INTEGER :: IRUP_TAB(SIZE_IRUP)
@@ -173,11 +172,11 @@ C -------------------------------
          NPN   = IGEO(4,PID)
          JSROT = IGEO(20,PID)
         ENDIF
-        IRUP = IPM(220,ABS(MID))
-        IRUP_TAB(1:IRUP) = 0
-        IF(IRUP/=0) THEN          ! up to 6 failure models per material
-         DO J=1,IRUP
-          IRUP_TAB(J) = IPM(111+15*(J-1),ABS(MID))
+        NFAIL = MAT_PARAM(ABS(MID))%NFAIL
+        IRUP_TAB(1:NFAIL) = 0
+        IF(NFAIL/=0) THEN          ! up to 6 failure models per material
+         DO J=1,NFAIL
+          IRUP_TAB(J) = MAT_PARAM(ABS(MID))%FAIL(J)%IRUPT
          ENDDO
         ENDIF
         TMAT = 0.
@@ -194,7 +193,7 @@ C -------------------------------
         !   -------------
         !   check if composite material is used
         COMPOSITE_OPTION = .FALSE.
-        IF(IGEO(30,PID)>0) THEN
+        IF (IGEO(30,PID)>0 .AND. IGEO(11,PID)==22) THEN
             COMPOSITE_OPTION = .TRUE.
         ENDIF
         !   -------------
@@ -315,7 +314,7 @@ C -------------------------------
            ELSEIF(FLAG_GURSON==3) THEN
              SPE_I_2 = 3
            ENDIF                
-           FLAG_NON_LOCAL = IPM(253,ABS(MID))
+           FLAG_NON_LOCAL = MAT_PARAM(ABS(MID))%NLOC
         ELSE
            INDI = 1
         ENDIF
@@ -356,8 +355,8 @@ C -------------------------------
            ENDIF
 !          --------------
 !          Failure
-           IF(IRUP/=0) THEN
-            DO J=1,IRUP
+           IF(NFAIL/=0) THEN
+            DO J=1,NFAIL
              TRUP = TRUP + RUPTURE_TET4(IRUP_TAB(J),IRUP2)
             ENDDO
            ENDIF
@@ -411,8 +410,8 @@ C -------------------------------
             ENDIF
 !           --------------
 !           Failure
-            IF(IRUP/=0) THEN
-             DO J=1,IRUP
+            IF(NFAIL/=0) THEN
+             DO J=1,NFAIL
               TRUP = TRUP + RUPTURE_TET10(IRUP_TAB(J),IRUP2)
              ENDDO
             ENDIF
@@ -465,8 +464,8 @@ C -------------------------------
               ENDIF
 !             --------------
 !             Failure
-              IF(IRUP/=0) THEN
-               DO J=1,IRUP
+              IF(NFAIL/=0) THEN
+               DO J=1,NFAIL
                 TRUP = TRUP + RUPTURE_SOL(IRUP_TAB(J),IRUP2)
                ENDDO
               ENDIF
@@ -484,8 +483,8 @@ C -------------------------------
               ENDIF
 !             --------------
 !             Failure
-              IF(IRUP/=0) THEN
-               DO J=1,IRUP
+              IF(NFAIL/=0) THEN
+               DO J=1,NFAIL
                 TRUP = TRUP + RUPTURE_SOL(IRUP_TAB(J),IRUP2)
                ENDDO
               ENDIF
@@ -503,8 +502,8 @@ C -------------------------------
               ENDIF
 !             --------------
 !             Failure
-              IF(IRUP/=0) THEN
-               DO J=1,IRUP
+              IF(NFAIL/=0) THEN
+               DO J=1,NFAIL
                 TRUP = TRUP + RUPTURE_SOL(IRUP_TAB(J),IRUP2)
                ENDDO
               ENDIF
@@ -523,8 +522,8 @@ C
               ENDIF
 !             --------------
 !             Failure
-              IF(IRUP/=0) THEN
-               DO J=1,IRUP
+              IF(NFAIL/=0) THEN
+               DO J=1,NFAIL
                 TRUP = TRUP + RUPTURE_SOL12(IRUP_TAB(J),IRUP2)
                ENDDO
               ENDIF
@@ -548,8 +547,8 @@ C
                ENDIF
 !              --------------
 !              Failure
-               IF(IRUP/=0) THEN
-                DO J=1,IRUP
+               IF(NFAIL/=0) THEN
+                DO J=1,NFAIL
                  TRUP = TRUP + RUPTURE_SOL(IRUP_TAB(J),IRUP2)
                 ENDDO
                ENDIF
@@ -619,8 +618,8 @@ C
                ENDIF
 !              --------------
 !              Failure
-               IF(IRUP/=0) THEN
-                DO J=1,IRUP
+               IF(NFAIL/=0) THEN
+                DO J=1,NFAIL
                  TRUP = TRUP + RUPTURE_SOL(IRUP_TAB(J),IRUP2)
                 ENDDO
                ENDIF
@@ -628,7 +627,32 @@ C
                ! 4 NPT = 202 = 4 * reference weight 
                ! if NPT > 4, element weight = reference weight + overcost
                TELT = OVERCOST_ELM*TMAT+NPTOT*TRUP + 
-     .                OVERCOST_ELM*NUMBER_LAYER*SOLTELT(10) + MULT_SPE*NLOCAL_OPTION(SPE_I_3)     
+     .                OVERCOST_ELM*NUMBER_LAYER*SOLTELT(10) + MULT_SPE*NLOCAL_OPTION(SPE_I_3)
+            ELSEIF(JHBE==15) THEN
+               ! -------------- 
+               ! Solid Thick shell
+               ! -------------- 
+               IF( DDWEIGHTS(1,1,IABS(MID))/=0)THEN
+                TMAT = DDWEIGHTS(1,1,IABS(MID)) * TPSREF
+               ELSE
+                IF(MULT/=0) TMATADD = MULT * (SOL1TNL(MLN,INDI)-SOL1TNL(MLN,INDI2))
+                IF(ADD_OPTION/=0) TMATADD = OPT_1 * SOL1TNL(MLN,INDI_OPT_1) + OPT_2 * SOL1TNL(MLN,INDI_OPT_2)
+                IF(SPECIAL_OPTION/=0) TMATADD = TMATADD + SOL_OPTION(SPE_I_1,SPE_I_2) 
+                TMAT = SOL1TNL(MLN,INDI) + TMATADD
+               ENDIF
+!              --------------
+!              Failure
+               IF(NFAIL/=0) THEN
+                DO J=1,NFAIL
+                 TRUP = TRUP + RUPTURE_SOL(IRUP_TAB(J),IRUP2)
+                ENDDO
+               ENDIF
+
+               NPTOT = ABS (NPN)
+              ! --------------
+               ! jhbe=15 : weight = element weight + element extracost + mat + rupture
+               TELT = NPTOT*(TMAT+TRUP) + SOLTELT(11) + NPTOT*SOLTELT(12) + MULT_SPE*NLOCAL_OPTION(SPE_I_3)
+              ! --------------  
             ELSEIF (JHBE==17) THEN   
 !           ISOLIDE=17 H8C Standard 8-nodes compatible 
 !           solid full integration formulation 2*2*2 integration points, no hourglass
@@ -642,8 +666,8 @@ C
                ENDIF
 !              --------------
 !              Failure
-               IF(IRUP/=0) THEN
-                DO J=1,IRUP
+               IF(NFAIL/=0) THEN
+                DO J=1,NFAIL
                  TRUP = TRUP + RUPTURE_SOL(IRUP_TAB(J),IRUP2)
                 ENDDO
                ENDIF
@@ -661,8 +685,8 @@ C
                ENDIF
 !              --------------
 !              Failure
-               IF(IRUP/=0) THEN
-                DO J=1,IRUP
+               IF(NFAIL/=0) THEN
+                DO J=1,NFAIL
                  TRUP = TRUP + RUPTURE_SOL(IRUP_TAB(J),IRUP2)
                 ENDDO
                ENDIF
@@ -671,8 +695,8 @@ C
             ELSE
 !             --------------
 !             Failure
-              IF(IRUP/=0) THEN
-               DO J=1,IRUP
+              IF(NFAIL/=0) THEN
+               DO J=1,NFAIL
                 TRUP = TRUP + RUPTURE_SOL(IRUP_TAB(J),IRUP2)
                ENDDO
               ENDIF

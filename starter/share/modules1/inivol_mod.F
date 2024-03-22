@@ -1,28 +1,29 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  INIVOL_DEF_MOD                share/modules1/inivol_mod.F   
 Chd|-- called by -----------
+Chd|        ALE_BOX_COLORATION            source/initial_conditions/inivol/ale_box_coloration.F
 Chd|        CONTRL                        source/starter/contrl.F       
 Chd|        HM_READ_INIVOL                source/initial_conditions/inivol/hm_read_inivol.F
 Chd|        HM_READ_MAT151                source/materials/mat/mat151/hm_read_mat151.F
@@ -31,6 +32,7 @@ Chd|        LECTUR                        source/starter/lectur.F
 Chd|        QGRTAILS                      source/elements/solid_2d/quad/qgrtails.F
 Chd|        SGRTAILS                      source/elements/solid/solide/sgrtails.F
 Chd|        ST_QAPRINT_INIVOL             source/output/qaprint/st_qaprint_inivol.F
+Chd|        SURFACE_MIN_MAX_COMPUTATION   source/initial_conditions/inivol/surface_min_max_computation.F
 Chd|        T3GRTAILS                     source/elements/solid_2d/tria/t3grtails.F
 Chd|        INIVOL_ARRAY_MOD              share/modules1/inivol_mod.F   
 Chd|-- calls ---------------
@@ -129,7 +131,6 @@ C------------------------------------------------
          USE SETDEF_MOD   
 #include "tabsiz_c.inc"           
 #include "com04_c.inc"  
-#include "submod_c.inc"  
          TYPE (INIVOL_)  , INTENT(INOUT), DIMENSION(:), ALLOCATABLE  :: INIVOL_STRUCT
               my_real, DIMENSION(:), ALLOCATABLE, INTENT(INOUT) :: KVOL
               INTEGER, DIMENSION(SIPART) :: IPART

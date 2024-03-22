@@ -1,37 +1,37 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  INITVARS_AUTO                 source/elements/elbuf_init/initvars_auto.F
 Chd|-- called by -----------
 Chd|        ELBUF_INI                     source/elements/elbuf_init/elbuf_ini.F
 Chd|-- calls ---------------
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        ELBUFTAG_MOD                  share/modules1/elbuftag_mod.F 
 Chd|====================================================================
       SUBROUTINE INITVARS_AUTO(
-     .                         ELBUF_STR,MLAW_TAG ,PROP_TAG ,FAIL_TAG ,VISC_TAG ,
+     .                         ELBUF_STR,MLAW_TAG ,PROP_TAG ,FAIL_TAG ,
      .                         GMAT     ,GLAW     ,IGTYP    ,JMULT    ,IFAIL    , 
-     .                         IEOS     ,MAXEOS   ,EOS_TAG  ,ISNOD)
+     .                         IEOS     ,EOS_TAG  ,ISNOD)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -44,7 +44,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
 #include      "tablen_c.inc"
 #include      "inter22.inc"
 #include      "com04_c.inc"
@@ -52,34 +51,39 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER IGTYP,GMAT,GLAW,JMULT,IFAIL,IEOS,MAXEOS,ISNOD
+      INTEGER IGTYP,GMAT,GLAW,JMULT,IFAIL,IEOS,ISNOD
       TYPE(ELBUF_STRUCT_),TARGET  :: ELBUF_STR
       TYPE(MLAW_TAG_)    ,TARGET ,DIMENSION(NUMMAT)     :: MLAW_TAG
       TYPE(EOS_TAG_)     ,TARGET ,DIMENSION(0:MAXEOS)   :: EOS_TAG
       TYPE(PROP_TAG_)    ,TARGET ,DIMENSION(0:MAXPROP)  :: PROP_TAG
       TYPE(FAIL_TAG_)    ,TARGET ,DIMENSION(0:MAXFAIL ) :: FAIL_TAG
-      TYPE(VISC_TAG_)    ,TARGET ,DIMENSION(0:MAXVISC ) :: VISC_TAG
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER ILAY,NLAY,NPG,NPTT
+      INTEGER ILAY,NLAY,NPG,NPTT,NPTR,NPTS,IL,IR,IS,IT
       TYPE(G_BUFEL_)     , POINTER :: GBUF
       TYPE(BUF_LAY_)     , POINTER :: BUFLY
       TYPE(MLAW_TAG_)    , POINTER :: MTAG
       TYPE(EOS_TAG_)     , POINTER :: ETAG
       TYPE(PROP_TAG_)    , POINTER :: PTAG
-      TYPE(FAIL_TAG_)    , POINTER :: FTAG
+      TYPE(FAIL_TAG_)    , POINTER :: FTAG 
 C-----------------------------------------------------------------------
 c     GMAT - globat material number
 c     GLAW - globat material law model
 C=======================================================================
 
+      
+      NULLIFY(ETAG)
+      
       GBUF => ELBUF_STR%GBUF
       PTAG => PROP_TAG(IGTYP)     
-      ETAG => EOS_TAG(IEOS)
+      IF(IEOS>0)ETAG => EOS_TAG(IEOS)
       NLAY =  ELBUF_STR%NLAY
       NPTT =  ELBUF_STR%NPTT
       NPG  =  ELBUF_STR%NPTR*ELBUF_STR%NPTS
+      
+      NPTR = ELBUF_STR%NPTR
+      NPTS = ELBUF_STR%NPTS
 c---------------------
 c     global material variables                                            
 c---------------------
@@ -102,7 +106,7 @@ c---------------------
           IF (GBUF%G_RHO    == 0) GBUF%G_RHO    = MTAG%G_RHO               
           IF (GBUF%G_DELTAX == 0) GBUF%G_DELTAX = MTAG%G_DELTAX            
           IF (GBUF%G_EPSD   == 0) GBUF%G_EPSD   = MTAG%G_EPSD              
-          IF (GBUF%G_EPSQ   == 0) GBUF%G_EPSQ   = MTAG%G_EPSQ              	  
+          IF (GBUF%G_EPSQ   == 0) GBUF%G_EPSQ   = MTAG%G_EPSQ
           IF (GBUF%G_PLA    == 0) GBUF%G_PLA    = MTAG%G_PLA               
           IF (GBUF%G_RK     == 0) GBUF%G_RK     = MTAG%G_RK                
           IF (GBUF%G_RE     == 0) GBUF%G_RE     = MTAG%G_RE                
@@ -118,10 +122,14 @@ c---------------------
           IF (GBUF%G_DMG    == 0) GBUF%G_DMG    = MTAG%G_DMG
           IF (GBUF%G_MAXFRAC== 0) GBUF%G_MAXFRAC= MTAG%G_MAXFRAC    
           IF (GBUF%G_MAXEPS == 0) GBUF%G_MAXEPS = MTAG%G_MAXEPS
-          IF (GBUF%G_TSAIWU == 0) GBUF%G_TSAIWU = MTAG%G_TSAIWU            
+          IF (GBUF%G_PLANL  == 0) GBUF%G_PLANL  = MTAG%G_PLANL
+          IF (GBUF%G_EPSDNL == 0) GBUF%G_EPSDNL = MTAG%G_EPSDNL
+          IF (GBUF%G_DMGSCL == 0) GBUF%G_DMGSCL = MTAG%G_DMGSCL                 
+          IF (GBUF%G_TSAIWU == 0) GBUF%G_TSAIWU = MTAG%G_TSAIWU      
           BUFLY%NVAR_MAT= MTAG%NUVAR
           BUFLY%NVARTMP = MTAG%NVARTMP
-        ENDDO                                      
+          IF(BUFLY%NVAR_EOS==0 .AND. IEOS>0 )BUFLY%NVAR_EOS=ETAG%NVAR
+        ENDDO   
       ELSE
         IF (NLAY > 1) THEN
           DO ILAY = 1,NLAY  
@@ -132,7 +140,7 @@ c---------------------
             IF (GBUF%G_RHO    == 0) GBUF%G_RHO    = MTAG%G_RHO                 
             IF (GBUF%G_DELTAX == 0) GBUF%G_DELTAX = MTAG%G_DELTAX              
             IF (GBUF%G_EPSD   == 0) GBUF%G_EPSD   = MTAG%G_EPSD                
-            IF (GBUF%G_EPSQ   == 0) GBUF%G_EPSQ   = MTAG%G_EPSQ              	
+            IF (GBUF%G_EPSQ   == 0) GBUF%G_EPSQ   = MTAG%G_EPSQ
             IF (GBUF%G_PLA    == 0) GBUF%G_PLA    = MTAG%G_PLA                 
             IF (GBUF%G_RK     == 0) GBUF%G_RK     = MTAG%G_RK                  
             IF (GBUF%G_RE     == 0) GBUF%G_RE     = MTAG%G_RE                  
@@ -149,8 +157,11 @@ c---------------------
             IF (GBUF%G_DAMDL  == 0) GBUF%G_DAMDL  = MTAG%G_DAMDL 
             IF (GBUF%G_IERR   == 0) GBUF%G_IERR   = MTAG%G_IERR
             IF (GBUF%G_MAXFRAC== 0) GBUF%G_MAXFRAC= MTAG%G_MAXFRAC    
-            IF (GBUF%G_MAXEPS == 0) GBUF%G_MAXEPS = MTAG%G_MAXEPS      
-            IF (GBUF%G_TSAIWU == 0) GBUF%G_TSAIWU = MTAG%G_TSAIWU      
+            IF (GBUF%G_MAXEPS == 0) GBUF%G_MAXEPS = MTAG%G_MAXEPS    
+            IF (GBUF%G_PLANL  == 0) GBUF%G_PLANL  = MTAG%G_PLANL
+            IF (GBUF%G_EPSDNL == 0) GBUF%G_EPSDNL = MTAG%G_EPSDNL  
+            IF (GBUF%G_DMGSCL == 0) GBUF%G_DMGSCL = MTAG%G_DMGSCL    
+            IF (GBUF%G_TSAIWU == 0) GBUF%G_TSAIWU = MTAG%G_TSAIWU   
           ENDDO 
         ELSE IF (GMAT > 0) THEN
           MTAG  => MLAW_TAG(GMAT)
@@ -160,7 +171,7 @@ c---------------------
           IF (GBUF%G_RHO    == 0) GBUF%G_RHO    = MTAG%G_RHO                 
           IF (GBUF%G_DELTAX == 0) GBUF%G_DELTAX = MTAG%G_DELTAX              
           IF (GBUF%G_EPSD   == 0) GBUF%G_EPSD   = MTAG%G_EPSD                
-          IF (GBUF%G_EPSQ   == 0) GBUF%G_EPSQ   = MTAG%G_EPSQ              	
+          IF (GBUF%G_EPSQ   == 0) GBUF%G_EPSQ   = MTAG%G_EPSQ
           IF (GBUF%G_PLA    == 0) GBUF%G_PLA    = MTAG%G_PLA                 
           IF (GBUF%G_RK     == 0) GBUF%G_RK     = MTAG%G_RK                  
           IF (GBUF%G_RE     == 0) GBUF%G_RE     = MTAG%G_RE                  
@@ -175,6 +186,7 @@ c---------------------
           IF (GBUF%G_MU     == 0) GBUF%G_MU     = MTAG%G_MU 
           IF (GBUF%G_PLANL  == 0) GBUF%G_PLANL  = MTAG%G_PLANL
           IF (GBUF%G_EPSDNL == 0) GBUF%G_EPSDNL = MTAG%G_EPSDNL
+          IF (GBUF%G_DMGSCL == 0) GBUF%G_DMGSCL = MTAG%G_DMGSCL
           IF (GBUF%G_TSAIWU == 0) GBUF%G_TSAIWU = MTAG%G_TSAIWU
           IF (GBUF%G_MAXFRAC== 0) GBUF%G_MAXFRAC= MTAG%G_MAXFRAC   
           IF (GBUF%G_MAXEPS == 0) GBUF%G_MAXEPS = MTAG%G_MAXEPS               
@@ -194,11 +206,30 @@ C
 c
 c     equation of state (eos)                                           
 c     
-      IF (MAXEOS > 0)THEN
+      IF (IEOS > 0)THEN
         IF (GBUF%G_MU    == 0) GBUF%G_MU    = ETAG%G_MU   
         IF (GBUF%G_TB    == 0) GBUF%G_TB    = ETAG%G_TB
         IF (GBUF%G_ABURN == 0) GBUF%G_ABURN = ETAG%G_ABURN  
         IF (GBUF%G_BFRAC == 0) GBUF%G_BFRAC = ETAG%G_BFRAC
+        
+        DO IL = 1, NLAY                                                    
+          IF (IGTYP == 51 .OR. IGTYP == 52) THEN                     
+            NPTT = ELBUF_STR%BUFLY(IL)%NPTT                      
+          ELSE                                                       
+            NPTT = ELBUF_STR%NPTT                                
+          ENDIF                                                      
+          DO IR = 1,NPTR                                                  
+            DO IS = 1,NPTS                                                
+              DO IT = 1,NPTT                                         
+                IF(ELBUF_STR%BUFLY(IL)%NVAR_EOS == 0)THEN
+                  ELBUF_STR%BUFLY(IL)%NVAR_EOS = ETAG%NVAR                                          
+                ENDIF                                              
+              ENDDO                                                           
+            ENDDO                                                            
+          ENDDO                                                           
+        ENDDO                                                        
+
+        
       ENDIF
 
 c
@@ -327,7 +358,7 @@ c
           MTAG  => MLAW_TAG(BUFLY%IMAT)
         ENDIF 
         ETAG  => EOS_TAG(BUFLY%IEOS)
-        IF(MAXEOS > 0)THEN
+        IF(IEOS > 0)THEN
           IF (BUFLY%L_MU    == 0) BUFLY%L_MU    = ETAG%L_MU   
           IF (BUFLY%L_TB    == 0) BUFLY%L_TB    = ETAG%L_TB
           IF (BUFLY%L_ABURN == 0) BUFLY%L_ABURN = ETAG%L_ABURN  
@@ -390,8 +421,7 @@ c       layer property variables
         IF (BUFLY%LY_GAMA == 0) BUFLY%LY_GAMA   = PTAG%LY_GAMA               
         IF (BUFLY%LY_DIRA == 0) BUFLY%LY_DIRA   = PTAG%LY_DIRA               
         IF (BUFLY%LY_DIRB == 0) BUFLY%LY_DIRB   = PTAG%LY_DIRB  
-        IF (BUFLY%LY_PLAPT== 0 .and. BUFLY%L_PLA > 0) 
-     .                    BUFLY%LY_PLAPT  = PTAG%LY_PLAPT
+        IF (BUFLY%LY_PLAPT== 0 .and. BUFLY%L_PLA > 0) BUFLY%LY_PLAPT  = PTAG%LY_PLAPT
         IF (BUFLY%LY_SIGPT == 0) BUFLY%LY_SIGPT = PTAG%LY_SIGPT
         IF (BUFLY%LY_HOURG == 0) BUFLY%LY_HOURG = PTAG%LY_HOURG
 c       local property variables
@@ -409,7 +439,6 @@ c       local property variables
         IF (BUFLY%L_QVIS   == 0) BUFLY%L_QVIS   = PTAG%L_QVIS
         IF (BUFLY%L_FORTH  == 0) BUFLY%L_FORTH  = PTAG%L_FORTH
         IF (BUFLY%L_EINTTH == 0) BUFLY%L_EINTTH = PTAG%L_EINTTH 
-        IF (BUFLY%L_DMG    == 0) BUFLY%L_DMG    = PTAG%LY_DMG  
       ENDDO 
 C-----------------------------------------------
       RETURN

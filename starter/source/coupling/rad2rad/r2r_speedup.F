@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Cbm|====================================================================
 Cbm|  CHK_DT_ENGINE                       src/rad2r/routines_r2r.F      
 Cbm|-- called by -----------
@@ -42,6 +42,7 @@ Chd|====================================================================
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE MY_ALLOC_MOD
       USE MESSAGE_MOD
       USE R2R_MOD
 C-----------------------------------------------
@@ -52,12 +53,8 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "units_c.inc"
-#include      "com04_c.inc"
-#include      "param_c.inc"
 #include      "scr15_c.inc"
 #include      "sphcom.inc"
-#include      "warn_c.inc"
-#include      "rnur_c.inc"
 #include      "r2r_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -168,6 +165,7 @@ Chd|====================================================================
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE MY_ALLOC_MOD
       USE R2R_MOD
       USE INOUTFILE_MOD
       USE MESSAGE_MOD
@@ -180,12 +178,8 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "com06_c.inc"
-#include      "param_c.inc"
 #include      "scr15_c.inc"
 #include      "sphcom.inc"
-#include      "rnur_c.inc"
-#include      "r2r_c.inc"
-#include      "my_allocate.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -213,9 +207,9 @@ C
       DT_MIN_ELEM(:) = EP30 
       FLAG_TRI(:) = 0
       DTFAC1(:) = DTFAC
-      NUMEL= NUMELC+NUMELS+NUMELT+NUMELQ+NUMELP+NUMELR+NUMELUR+NUMELTG
+      NUMEL= NUMELC+NUMELS+NUMELT+NUMELQ+NUMELP+NUMELR+NUMELTG
      .      +NUMELX+NUMSPH+NUMELIG3D
-      MY_ALLOCATE( PERM,NUMEL )
+      CALL MY_ALLOC( PERM,NUMEL+1)
   
 C-----------------------------------------------
 C     Computation of index in dtelem for each type of elements
@@ -227,7 +221,7 @@ C-----------------------------------------------
       NUME(5) = NUMELP
       NUME(6) = NUMELR
       NUME(7) = NUMELTG
-      NUME(8) = NUMELUR
+      NUME(8) = 0
       NUME(9) = NUMELX
       NUME(10) = NUMSPH
       NUME(11) = NUMELIG3D           

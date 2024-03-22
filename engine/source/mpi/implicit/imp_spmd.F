@@ -1,26 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
-#include "hardware.inc"
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 
 #ifndef MPI
 #define MPI_COMM_WORLD 0
@@ -28,7 +27,6 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 #define MPI_SUM 0 
 #define MPI_STATUS_SIZE 1
 #endif
-#if defined(MUMPS5)
 Chd|====================================================================
 Chd|  SPMD_MUMPS_FRONT              source/mpi/implicit/imp_spmd.F
 Chd|-- called by -----------
@@ -40,7 +38,12 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
+C-----------------------------------------------
+C   C o m m o n   B l o c k s
+C-----------------------------------------------
+#include      "task_c.inc"
+#include      "units_c.inc"
+#include      "com01_c.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -48,17 +51,11 @@ C-----------------------------------------------
 #include "mpif.h"
 #endif
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "units_c.inc"
-#include      "task_c.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER ITK(2,*), NKFRONT, NKFLOC, NKLOC, NDDLG, IPRINT
-      my_real
-     .        RTK(*)
+      my_real RTK(*)
+#if defined(MUMPS5)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -71,10 +68,8 @@ C-----------------------------------------------
      .        TSTAT4(MPI_STATUS_SIZE,3), IERR, NP, JJ, NKIP(NSPMD-1),
      .        SBUF(2), RBUF(2,NSPMD-1), NNZT, NDDLP(NSPMD-1),
      .        IADFIN, IAD, IAD0, ADDCM(NDDLG)
-      INTEGER, DIMENSION(:,:), ALLOCATABLE :: ITKF, IKFRONT, PKFRONT,
-     .                                        KFMAP
-      my_real
-     .       , DIMENSION(:), ALLOCATABLE :: RTKF, RKFRONT
+      INTEGER, DIMENSION(:,:), ALLOCATABLE :: ITKF, IKFRONT, PKFRONT,KFMAP
+      my_real, DIMENSION(:), ALLOCATABLE :: RTKF, RKFRONT
       INTEGER MSGOFF,MSGOFF2,MSGOFF3,MSGOFF4,MSGOFF5,MSGOFF6
       DATA MSGOFF/16000/,MSGOFF2/16062/
       DATA MSGOFF3/16000/,MSGOFF4/16062/
@@ -342,6 +337,7 @@ C
       ENDIF
 C
       RETURN
+#endif
       END
 Chd|====================================================================
 Chd|  SPMD_MUMPS_COUNT              source/mpi/implicit/imp_spmd.F
@@ -354,7 +350,11 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
+C-----------------------------------------------
+C   C o m m o n   B l o c k s
+C-----------------------------------------------
+#include      "com01_c.inc"
+#include      "task_c.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -362,19 +362,14 @@ C-----------------------------------------------
 #include "mpif.h"
 #endif
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "task_c.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NZLOC, NZP(NSPMD-1), NNZ
+#if defined(MUMPS5)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, IRQTAG, MSGOFF, REQ(NSPMD-1),
-     .        TSTAT(MPI_STATUS_SIZE,NSPMD-1), IERR
+      INTEGER I, IRQTAG, MSGOFF, REQ(NSPMD-1), TSTAT(MPI_STATUS_SIZE,NSPMD-1), IERR
       DATA MSGOFF/16001/
 C
       NNZ=0
@@ -398,6 +393,7 @@ C
       ENDIF
 C
       RETURN
+#endif
       END
 Chd|====================================================================
 Chd|  SPMD_MUMPS_GATH               source/mpi/implicit/imp_spmd.F
@@ -411,7 +407,11 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
+C-----------------------------------------------
+C   C o m m o n   B l o c k s
+C-----------------------------------------------
+#include      "com01_c.inc"
+#include      "task_c.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -419,16 +419,11 @@ C-----------------------------------------------
 #include "mpif.h"
 #endif
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "task_c.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER ITK(2,*), NZLOC, IRN(*), JCN(*), NZP(*)
-      my_real
-     .        RTK(*), A(*)
+      my_real RTK(*), A(*)
+#if defined(MUMPS5)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -485,6 +480,7 @@ C
       ENDIF
 C
       RETURN
+#endif
       END
 Chd|====================================================================
 Chd|  SPMD_MUMPS_INI                source/mpi/implicit/imp_spmd.F
@@ -500,7 +496,14 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
+C-----------------------------------------------
+C   C o m m o n   B l o c k s
+C-----------------------------------------------
+#if defined(MUMPS5)
+#include      "dmumps_struc.h"
+#endif
+#include      "com01_c.inc"
+#include      "task_c.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -508,17 +511,17 @@ C-----------------------------------------------
 #include "mpif.h"
 #endif
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "dmumps_struc.h"
-#include      "com01_c.inc"
-#include      "task_c.inc"
-
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER SYM
+#ifdef MUMPS5
       TYPE(DMUMPS_STRUC) MUMPS_PAR
+#else
+      ! Fake declaration as DMUMPS_STRUC is shipped with MUMPS
+      INTEGER MUMPS_PAR 
+#endif
+
+#if defined(MUMPS5)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -537,6 +540,7 @@ c     CALL STOPTIME(96,1)
 
 C
       RETURN
+#endif
       END
 Chd|====================================================================
 Chd|  SPMD_MUMPS_DEAL               source/mpi/implicit/imp_spmd.F
@@ -551,24 +555,23 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
-C-----------------------------------------------
-C   M e s s a g e   P a s s i n g
-C-----------------------------------------------
-#ifdef MPI
-#include "mpif.h"
-#endif
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
+#if defined(MUMPS5)
 #include      "dmumps_struc.h"
-#include      "com01_c.inc"
-#include      "task_c.inc"
-
+#endif
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+#ifdef MUMPS5
       TYPE(DMUMPS_STRUC) MUMPS_PAR
+#else
+      ! Fake declaration as DMUMPS_STRUC is shipped with MUMPS
+      INTEGER MUMPS_PAR 
+#endif
+
+#if defined(MUMPS5)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -588,6 +591,7 @@ C
 
 C
       RETURN
+#endif
       END
 Chd|====================================================================
 Chd|  SPMD_MUMPS_RHS                source/mpi/implicit/imp_spmd.F
@@ -601,7 +605,11 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
+C-----------------------------------------------
+C   C o m m o n   B l o c k s
+C-----------------------------------------------
+#include      "com01_c.inc"
+#include      "task_c.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -609,26 +617,19 @@ C-----------------------------------------------
 #include "mpif.h"
 #endif
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "task_c.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER CDDLP(*), NDDL, ISENS, NDDLG
-      my_real
-     .        V(*), RHS(*)
+      my_real V(*), RHS(*)
+#if defined(MUMPS5)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, IRQTAG, MSGOFF, II, REQ(NSPMD-1), 
      .        TSTAT(MPI_STATUS_SIZE,NSPMD-1), IERR,
      .        J, JJ
-      my_real
-     .        VG(NDDLG)
-      my_real
-     .       , DIMENSION(:,:), ALLOCATABLE :: VP
+      my_real VG(NDDLG)
+      my_real, DIMENSION(:,:), ALLOCATABLE :: VP
       DATA MSGOFF/16003/
 C
       IF (ISPMD==0) THEN
@@ -700,6 +701,7 @@ C
       ENDIF
 C
       RETURN
+#endif
       END
 Chd|====================================================================
 Chd|  SPMD_MUMPS_EXEC               source/mpi/implicit/imp_spmd.F
@@ -714,28 +716,28 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
-C-----------------------------------------------
-C   M e s s a g e   P a s s i n g
-C-----------------------------------------------
-#ifdef MPI
-#include "mpif.h"
-#endif
-#include "timeri_c.inc"
-#include "dmumps_struc.h"
-#include "impl1_c.inc"
-#include "task_c.inc"
-#include "com01_c.inc"
-#include "units_c.inc"
-
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
+#if defined(MUMPS5)
+#include      "dmumps_struc.h"
+#endif
+#include      "units_c.inc"
+#include      "com01_c.inc"
+#include      "task_c.inc"
+#include      "impl1_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER ITASK
+#ifdef MUMPS5
       TYPE(DMUMPS_STRUC) MUMPS_PAR
+#else
+      ! Fake declaration as DMUMPS_STRUC is shipped with MUMPS
+      INTEGER MUMPS_PAR 
+#endif
+
+#if defined(MUMPS5)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -876,6 +878,7 @@ c        CALL STOPTIME(99,1)
       ENDIF
 C
       RETURN
+#endif
       END
 Chd|====================================================================
 Chd|  SPMD_MUMPS_FLUSH              source/mpi/implicit/imp_spmd.F
@@ -888,27 +891,32 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
+C-----------------------------------------------
+C   C o m m o n   B l o c k s
+C-----------------------------------------------
+#if defined(MUMPS5)
+#include      "dmumps_struc.h"
+#endif
+#include      "com01_c.inc"
+#include      "task_c.inc"
+#include      "impl1_c.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
 #ifdef MPI
 #include "mpif.h"
 #endif
-#include      "dmumps_struc.h"
-#include      "com01_c.inc"
-#include      "impl1_c.inc"
-#include      "units_c.inc" 
-
-* debug
-#include      "task_c.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+#ifdef MUMPS5
       TYPE(DMUMPS_STRUC) MUMPS_PAR
+#else
+      ! Fake declaration as DMUMPS_STRUC is shipped with MUMPS
+      INTEGER MUMPS_PAR 
+#endif
+
+#if defined(MUMPS5)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -973,10 +981,9 @@ C If centralized matrix on zero
 
       ENDIF
       RETURN
-      END
 #endif
+      END
 
-#if defined(MPI) && defined(MUMPS5)
 
 
 Chd|====================================================================
@@ -1006,31 +1013,29 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
-C-----------------------------------------------------------------
-C   M e s s a g e   P a s s i n g
-C-----------------------------------------------
-#ifdef MPI
-#include "mpif.h"
-#endif
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
+C   M e s s a g e   P a s s i n g
+C-----------------------------------------------
+#ifdef MPI
+#include "mpif.h"
+#endif
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      my_real
-     .        S
+      my_real S
+#if defined(MPI) && defined(MUMPS5)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, N, MSGOFF, MSGOFF2, MSGTYP, IERROR, LOC_PROC,
      .        INDEX, SIZ,
      .        STATUS(MPI_STATUS_SIZE), REQ_R(NSPMD)
-      my_real
-     .        RBUF(NSPMD),SI
+      my_real RBUF(NSPMD),SI
       DATA MSGOFF/16004/
       DATA MSGOFF2/16005/
 C-----------------------------------------------
@@ -1071,6 +1076,7 @@ C
       END IF
 C
       RETURN
+#endif
       END
 Chd|====================================================================
 Chd|  SPMD_SUM_S2                   source/mpi/implicit/imp_spmd.F
@@ -1082,24 +1088,24 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
-C-----------------------------------------------------------------
-C   M e s s a g e   P a s s i n g
-C-----------------------------------------------
-#ifdef MPI
-#include "mpif.h"
-#endif
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
+C   M e s s a g e   P a s s i n g
+C-----------------------------------------------
+#ifdef MPI
+#include "mpif.h"
+#endif
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER LEN 
       my_real
      .        S(LEN)
+#if defined(MPI) && defined(MUMPS5)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -1113,10 +1119,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
-C---try
-C---try      SI=S
-C---try      CALL MPI_REDUCE(SI,S,1,REAL,MPI_SUM,0,MPI_COMM_WORLD,IERROR)
-C---try      CALL MPI_BCAST(S,1,REAL,0,MPI_COMM_WORLD,IERROR)
+
       LOC_PROC = ISPMD + 1
       SIZ=LEN
       IF(ISPMD==0) THEN
@@ -1152,6 +1155,7 @@ C
       END IF
 C
       RETURN
+#endif
       END
 Chd|====================================================================
 Chd|  SPMD_MAX_S                    source/mpi/implicit/imp_spmd.F
@@ -1166,23 +1170,22 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
-C-----------------------------------------------------------------
-C   M e s s a g e   P a s s i n g
-C-----------------------------------------------
-#ifdef MPI
-#include "mpif.h"
-#endif
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
+C   M e s s a g e   P a s s i n g
+C-----------------------------------------------
+#ifdef MPI
+#include "mpif.h"
+#endif
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      my_real
-     .        S
+      my_real S
+#if defined(MPI) && defined(MUMPS5)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -1226,6 +1229,7 @@ C
       END IF
 C
       RETURN
+#endif
       END
 Chd|====================================================================
 Chd|  SPMD_MIN_S                    source/mpi/implicit/imp_spmd.F
@@ -1243,31 +1247,29 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
-C-----------------------------------------------------------------
-C   M e s s a g e   P a s s i n g
-C-----------------------------------------------
-#ifdef MPI
-#include "mpif.h"
-#endif
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
+C   M e s s a g e   P a s s i n g
+C-----------------------------------------------
+#ifdef MPI
+#include "mpif.h"
+#endif
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      my_real
-     .        S
+      my_real S
+#if defined(MPI) && defined(MUMPS5)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, N, MSGOFF, MSGOFF2, MSGTYP, IERROR, LOC_PROC,
      .        INDEX, SIZ,
      .        STATUS(MPI_STATUS_SIZE), REQ_R(NSPMD)
-      my_real
-     .        RBUF(NSPMD),SI
+      my_real RBUF(NSPMD),SI
       DATA MSGOFF/16009/
       DATA MSGOFF2/16010/
 C-----------------------------------------------
@@ -1304,6 +1306,7 @@ C
       END IF
 C
       RETURN
+#endif
       END
 Chd|====================================================================
 Chd|  SPMD_MAX_I                    source/mpi/implicit/imp_spmd.F
@@ -1331,21 +1334,22 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------------------------
-C   M e s s a g e   P a s s i n g
-C-----------------------------------------------
-#ifdef MPI
-#include "mpif.h"
-#endif
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
+C   M e s s a g e   P a s s i n g
+C-----------------------------------------------
+#ifdef MPI
+#include "mpif.h"
+#endif
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER  N
+#if defined(MPI) && defined(MUMPS5)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -1390,6 +1394,7 @@ C
 C
 
       RETURN
+#endif
       END
 Chd|====================================================================
 Chd|  SPMD_MIN_I                    source/mpi/implicit/imp_spmd.F
@@ -1402,21 +1407,22 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------------------------
-C   M e s s a g e   P a s s i n g
-C-----------------------------------------------
-#ifdef MPI
-#include "mpif.h"
-#endif
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
+C   M e s s a g e   P a s s i n g
+C-----------------------------------------------
+#ifdef MPI
+#include "mpif.h"
+#endif
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER  N
+#if defined(MPI) && defined(MUMPS5)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -1460,6 +1466,7 @@ C
       END IF
 C
       RETURN
+#endif
       END
 Chd|====================================================================
 Chd|  SPMD_INF_G                    source/mpi/implicit/imp_spmd.F
@@ -1481,24 +1488,24 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
-C-----------------------------------------------------------------
+C-----------------------------------------------
+C   C o m m o n   B l o c k s
+C-----------------------------------------------
+#include      "com01_c.inc"
+#include      "task_c.inc"
+#include      "impl1_c.inc"
+C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
 #ifdef MPI
 #include "mpif.h"
 #endif
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "task_c.inc"
-#include      "impl1_c.inc" 
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NDDL,NDDL0,NZZK,NZZK0,NNMAX,
      .        NDDLP(*),NDDL0P(*),NZZKP(*),NZZK0P(*),NNMAXP(*)
+#if defined(MPI) && defined(MUMPS5)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -1582,6 +1589,7 @@ C
       IF (L_LIM==0) L_LIM = NDDL_G
 C
       RETURN
+#endif
       END
 Chd|====================================================================
 Chd|  SPMD_SUMF_V                   source/mpi/implicit/imp_spmd.F
@@ -1615,25 +1623,22 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
-C-----------------------------------------------------------------
+C-----------------------------------------------
+C   C o m m o n   B l o c k s
+C-----------------------------------------------
+#include      "com01_c.inc"
+#include      "task_c.inc"
+C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
 #ifdef MPI
 #include "mpif.h"
 #endif
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "task_c.inc"
-#include      "units_c.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      my_real
-     .        V(*)
+      my_real V(*)
+#if defined(MPI) && defined(MUMPS5)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -1706,7 +1711,7 @@ C--------------------------------------------------------------------
         ENDIF
       ENDDO
 C
-Cel wait terminaison isend
+C   wait terminaison isend
 C--------------------------------------------------------------------
       DO I = 1, NSPMD
         IF(ND_FR(I)>0)THEN
@@ -1715,6 +1720,7 @@ C--------------------------------------------------------------------
       ENDDO
 C
       RETURN
+#endif
       END
 
 Chd|====================================================================
@@ -1734,26 +1740,24 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
-C-----------------------------------------------------------------
+C-----------------------------------------------
+C   C o m m o n   B l o c k s
+C-----------------------------------------------
+#include      "com01_c.inc"
+#include      "task_c.inc"
+C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
 #ifdef MPI
 #include "mpif.h"
 #endif
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "task_c.inc"
-#include      "units_c.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER LCOM, INDEX(LCOM)
       my_real
      .        VGAT(LCOM), VSCA(LCOM)
+#if defined(MPI) && defined(MUMPS5)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -1810,6 +1814,7 @@ C
       END DO
 C
       RETURN
+#endif
       END
 
 Chd|====================================================================
@@ -1830,25 +1835,23 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
-C-----------------------------------------------------------------
+C-----------------------------------------------
+C   C o m m o n   B l o c k s
+C-----------------------------------------------
+#include      "com01_c.inc"
+#include      "task_c.inc"
+C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
 #ifdef MPI
 #include "mpif.h"
 #endif
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "task_c.inc"
-#include      "units_c.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       my_real
      .        DIAG_K(*),L_K(*)
+#if defined(MPI) && defined(MUMPS5)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -1944,7 +1947,7 @@ C--------------------------------------------------------------------
         IAD =IAD + ND_FR(I)+1
        ENDDO
 C
-Cel wait terminaison isend
+C   wait terminaison isend
 C--------------------------------------------------------------------
       DO I = 1, NSPMD
         IF(SIZ(I)>0)THEN
@@ -1953,6 +1956,7 @@ C--------------------------------------------------------------------
       ENDDO
 C
       RETURN
+#endif
       END
 Chd|====================================================================
 Chd|  SPMD_INIS                     source/mpi/implicit/imp_spmd.F
@@ -1965,22 +1969,22 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
-C-----------------------------------------------
-C   M e s s a g e   P a s s i n g
-C-----------------------------------------------
-#ifdef  MPI
-#include "mpif.h"
-#endif
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
+C   M e s s a g e   P a s s i n g
+C-----------------------------------------------
+#ifdef MPI
+#include "mpif.h"
+#endif
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IAD_R(*),IAD_S(*)
+#if defined(MPI) && defined(MUMPS5)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -2029,7 +2033,7 @@ C--------------------------------------------------------------------
         ENDIF
       ENDDO
 C
-Cel wait terminaison isend
+C   wait terminaison isend
 C--------------------------------------------------------------------
       DO I = 1, NSPMD
         IF(I/=LOC_PROC)THEN
@@ -2038,6 +2042,7 @@ C--------------------------------------------------------------------
       ENDDO
 C
       RETURN
+#endif
       END
 Chd|====================================================================
 Chd|  SPMD_INISL                    source/mpi/implicit/imp_spmd.F
@@ -2050,22 +2055,25 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
-C-----------------------------------------------
-C   M e s s a g e   P a s s i n g
-C-----------------------------------------------
-#ifdef  MPI
-#include "mpif.h"
-#endif
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
+#if defined(MUMPS5)
+#include      "dmumps_struc.h"
+#endif
 #include      "com01_c.inc"
 #include      "task_c.inc"
+C-----------------------------------------------
+C   M e s s a g e   P a s s i n g
+C-----------------------------------------------
+#ifdef MPI
+#include "mpif.h"
+#endif
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NBINTC,INBSL(NBINTC,*)
+#if defined(MPI) && defined(MUMPS5)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -2122,7 +2130,7 @@ C--------------------------------------------------------------------
         ENDIF
       ENDDO
 C
-Cel wait terminaison isend
+C   wait terminaison isend
 C--------------------------------------------------------------------
       DO I = 1, NSPMD
         IF(I/=LOC_PROC)THEN
@@ -2131,6 +2139,7 @@ C--------------------------------------------------------------------
       ENDDO
 C
       RETURN
+#endif
       END
 Chd|====================================================================
 Chd|  SPMD_IFC1                     source/mpi/implicit/imp_spmd.F
@@ -2149,24 +2158,27 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
-C-----------------------------------------------
-C   M e s s a g e   P a s s i n g
-C-----------------------------------------------
-#ifdef  MPI
-#include "mpif.h"
-#endif
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
+#if defined(MUMPS5)
+#include      "dmumps_struc.h"
+#endif
 #include      "com01_c.inc"
 #include      "task_c.inc"
+C-----------------------------------------------
+C   M e s s a g e   P a s s i n g
+C-----------------------------------------------
+#ifdef MPI
+#include "mpif.h"
+#endif
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER SSIZE  ,RSIZE
       my_real
      .        KSS(6,RSIZE)
+#if defined(MPI) && defined(MUMPS5)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -2252,7 +2264,7 @@ C--------------------------------------------------------------------
         ENDIF
       ENDDO
 C
-Cel wait terminaison isend
+C   wait terminaison isend
 C--------------------------------------------------------------------
       DO I = 1, NSPMD
         IF(IAD_SREM(I+1)-IAD_SREM(I)>0)THEN
@@ -2261,6 +2273,7 @@ C--------------------------------------------------------------------
       ENDDO
 C
       RETURN
+#endif
       END
 
 Chd|====================================================================
@@ -2280,24 +2293,24 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
-C-----------------------------------------------
-C   M e s s a g e   P a s s i n g
-C-----------------------------------------------
-#ifdef  MPI
-#include "mpif.h"
-#endif
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
+C   M e s s a g e   P a s s i n g
+C-----------------------------------------------
+#ifdef MPI
+#include "mpif.h"
+#endif
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER SSIZE  ,RSIZE
       my_real
      .        D_IMP(3,*)
+#if defined(MPI) && defined(MUMPS5)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -2374,7 +2387,7 @@ C--------------------------------------------------------------------
         ENDIF
       ENDDO
 C
-Cel wait terminaison isend
+C   wait terminaison isend
 C--------------------------------------------------------------------
       DO I = 1, NSPMD
         IF(IAD_SL(I+1)-IAD_SL(I)>0)THEN
@@ -2383,6 +2396,7 @@ C--------------------------------------------------------------------
       ENDDO
 C
       RETURN
+#endif
       END
 
 Chd|====================================================================
@@ -2402,24 +2416,27 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
-C-----------------------------------------------
-C   M e s s a g e   P a s s i n g
-C-----------------------------------------------
-#ifdef  MPI
-#include "mpif.h"
-#endif
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
+#if defined(MUMPS5)
+#include      "dmumps_struc.h"
+#endif
 #include      "com01_c.inc"
 #include      "task_c.inc"
+C-----------------------------------------------
+C   M e s s a g e   P a s s i n g
+C-----------------------------------------------
+#ifdef MPI
+#include "mpif.h"
+#endif
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER SSIZE  ,RSIZE
       my_real
      .        F_IMP(3,*)
+#if defined(MPI) && defined(MUMPS5)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -2496,7 +2513,7 @@ C--------------------------------------------------------------------
         ENDIF
       ENDDO
 C
-Cel wait terminaison isend
+C   wait terminaison isend
 C--------------------------------------------------------------------
       DO I = 1, NSPMD
         IF(IAD_SREM(I+1)-IAD_SREM(I)>0)THEN
@@ -2505,6 +2522,7 @@ C--------------------------------------------------------------------
       ENDDO
 C
       RETURN
+#endif
       END
 
 Chd|====================================================================
@@ -2520,22 +2538,22 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
-C-----------------------------------------------
-C   M e s s a g e   P a s s i n g
-C-----------------------------------------------
-#ifdef  MPI
-#include "mpif.h"
-#endif
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
+C   M e s s a g e   P a s s i n g
+C-----------------------------------------------
+#ifdef MPI
+#include "mpif.h"
+#endif
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NROW(*),FR_NROW(*),IAD_ELEM(2,*),TSIZE
+#if defined(MPI) && defined(MUMPS5)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -2594,7 +2612,7 @@ C--------------------------------------------------------------------
        ENDIF
       ENDDO
 C
-Cel wait terminaison isend
+C   wait terminaison isend
 C--------------------------------------------------------------------
       DO I = 1, NSPMD
         IF((IAD_ELEM(1,I+1)-IAD_ELEM(1,I))>0)THEN
@@ -2603,6 +2621,7 @@ C--------------------------------------------------------------------
       ENDDO
 C
       RETURN
+#endif
       END
 
 Chd|====================================================================
@@ -2620,18 +2639,17 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
-C-----------------------------------------------
-C   M e s s a g e   P a s s i n g
-C-----------------------------------------------
-#ifdef  MPI
-#include "mpif.h"
-#endif
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "task_c.inc"
+C-----------------------------------------------
+C   M e s s a g e   P a s s i n g
+C-----------------------------------------------
+#ifdef MPI
+#include "mpif.h"
+#endif
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -2639,6 +2657,7 @@ C-----------------------------------------------
       INTEGER IAD_R(*),IAD_S(*),FR_NROW(*),NROW(*),
      .        IAD_ELEM(2,*),FR_ELEM(*),ICOL(NNMAX,*),
      .        SSIZE ,RSIZE
+#if defined(MPI) && defined(MUMPS5)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -2711,7 +2730,7 @@ C--------------------------------------------------------------------
        ENDIF
       ENDDO
 C
-Cel wait terminaison isend
+C   wait terminaison isend
 C--------------------------------------------------------------------
       DO I = 1, NSPMD
         IF(IAD_S(I+1)-IAD_S(I)>0)THEN
@@ -2720,6 +2739,7 @@ C--------------------------------------------------------------------
       ENDDO
 C
       RETURN
+#endif
       END
 Chd|====================================================================
 Chd|  SPMD_I2D                      source/mpi/implicit/imp_spmd.F
@@ -2732,22 +2752,22 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
-C-----------------------------------------------
-C   M e s s a g e   P a s s i n g
-C-----------------------------------------------
-#ifdef  MPI
-#include "mpif.h"
-#endif
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
+C   M e s s a g e   P a s s i n g
+C-----------------------------------------------
+#ifdef MPI
+#include "mpif.h"
+#endif
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NDOF(*),FR_ELEM(*),IAD_ELEM(*),TSIZE
+#if defined(MPI) && defined(MUMPS5)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -2808,7 +2828,7 @@ C--------------------------------------------------------------------
        ENDIF
       ENDDO
 C
-Cel wait terminaison isend
+C   wait terminaison isend
 C--------------------------------------------------------------------
       DO I = 1, NSPMD
         IF((IAD_ELEM(I+1)-IAD_ELEM(I))>0)THEN
@@ -2817,6 +2837,7 @@ C--------------------------------------------------------------------
       ENDDO
 C
       RETURN
+#endif
       END
 
 Chd|====================================================================
@@ -2834,24 +2855,24 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
-C-----------------------------------------------
-C   M e s s a g e   P a s s i n g
-C-----------------------------------------------
-#ifdef  MPI
-#include "mpif.h"
-#endif
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
+C   M e s s a g e   P a s s i n g
+C-----------------------------------------------
+#ifdef MPI
+#include "mpif.h"
+#endif
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER FR_ELEM(*),IAD_ELEM(2,*),SIZE,LR
       my_real
      .     A(3,*),AR(3,*)
+#if defined(MPI) && defined(MUMPS5)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -2958,7 +2979,7 @@ C--------------------------------------------------------------------
         ENDIF
       ENDDO
 C
-Cel wait terminaison isend
+C   wait terminaison isend
 C--------------------------------------------------------------------
       DO I = 1, NSPMD
         IF(IAD_ELEM(1,I+1)-IAD_ELEM(1,I)>0)THEN
@@ -2967,6 +2988,7 @@ C--------------------------------------------------------------------
       ENDDO
 C
       RETURN
+#endif
       END
 Chd|====================================================================
 Chd|  SPMD_NDOF                     source/mpi/implicit/imp_spmd.F
@@ -2979,22 +3001,22 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
+C-----------------------------------------------
+C   C o m m o n   B l o c k s
+C-----------------------------------------------"
+#include      "com01_c.inc"
+#include      "task_c.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
-#ifdef  MPI
+#ifdef MPI
 #include "mpif.h"
 #endif
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NDOF(*),FR_ELEM(*),IAD_ELEM(2,*),TSIZE
+#if defined(MPI) && defined(MUMPS5)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -3055,7 +3077,7 @@ C--------------------------------------------------------------------
        ENDIF
       ENDDO
 C
-Cel wait terminaison isend
+C   wait terminaison isend
 C--------------------------------------------------------------------
       DO I = 1, NSPMD
         IF((IAD_ELEM(1,I+1)-IAD_ELEM(1,I))>0)THEN
@@ -3064,9 +3086,8 @@ C--------------------------------------------------------------------
       ENDDO
 C
       RETURN
+#endif
       END
-
-
 C-----------------------------------------------
 Chd|====================================================================
 Chd|  SPMD_CDDL                     source/mpi/implicit/imp_spmd.F
@@ -3081,26 +3102,25 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
-C-----------------------------------------------
-C   M e s s a g e   P a s s i n g
-C-----------------------------------------------
-#ifdef  MPI
-#include "mpif.h"
-#endif
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "units_c.inc"
 #include      "task_c.inc"
 #include      "spmd_c.inc"
+C-----------------------------------------------
+C   M e s s a g e   P a s s i n g
+C-----------------------------------------------
+#ifdef MPI
+#include "mpif.h"
+#endif
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NDDL, NODGLOB(*), IDDL(*), NDOF(*), CDDLP(*), 
      .        INLOC(*), IKC(*), NDDLG, NDDLP(*)
+#if defined(MPI) && defined(MUMPS5)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -3202,6 +3222,7 @@ C  +3
       ENDIF
 C
       RETURN
+#endif
       END
 Chd|====================================================================
 Chd|  SPMD_VCHGRID                  source/mpi/implicit/imp_spmd.F
@@ -3214,22 +3235,23 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
-C-----------------------------------------------
-C   M e s s a g e   P a s s i n g
-C-----------------------------------------------
-#include "mpif.h"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
+C   M e s s a g e   P a s s i n g
+C-----------------------------------------------
+#ifdef MPI
+#include "mpif.h"
+#endif
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IV(*), NV, NVG, NBLOC, NDDL, IS, ISUM
-      my_real
-     .        V(*), VG(*)
+      my_real V(*), VG(*)
+#if defined(MPI) && defined(MUMPS5)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -3359,6 +3381,7 @@ C
       ENDIF
 C
       RETURN
+#endif
       END
 Chd|====================================================================
 Chd|  SPMD_ISR                      source/mpi/implicit/imp_spmd.F
@@ -3373,23 +3396,23 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
-C-----------------------------------------------
-C   M e s s a g e   P a s s i n g
-C-----------------------------------------------
-#ifdef  MPI
-#include "mpif.h"
-#endif
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
+C   M e s s a g e   P a s s i n g
+C-----------------------------------------------
+#ifdef MPI
+#include "mpif.h"
+#endif
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER SSIZE  ,RSIZE
       INTEGER IAD_S(NSPMD+1),IAD_R(NSPMD+1),ITS(SSIZE),ITR(RSIZE)
+#if defined(MPI) && defined(MUMPS5)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -3462,7 +3485,7 @@ C--------------------------------------------------------------------
         ENDIF
       ENDDO
 C
-Cel wait terminaison isend
+C   wait terminaison isend
 C--------------------------------------------------------------------
       DO I = 1, NSPMD
         IF(IAD_S(I+1)-IAD_S(I)>0)THEN
@@ -3471,6 +3494,7 @@ C--------------------------------------------------------------------
       ENDDO
 C
       RETURN
+#endif
       END
 
 Chd|====================================================================
@@ -3485,24 +3509,24 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
-C-----------------------------------------------
-C   M e s s a g e   P a s s i n g
-C-----------------------------------------------
-#ifdef  MPI
-#include "mpif.h"
-#endif
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
+C   M e s s a g e   P a s s i n g
+C-----------------------------------------------
+#ifdef MPI
+#include "mpif.h"
+#endif
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER SSIZE  ,RSIZE,SIZE
       INTEGER ITS(SIZE,SSIZE),ITR(SIZE,RSIZE),
      .        IAD_S(NSPMD+1),IAD_R(NSPMD+1)
+#if defined(MPI) && defined(MUMPS5)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -3579,7 +3603,7 @@ C--------------------------------------------------------------------
         ENDIF
       ENDDO
 C
-Cel wait terminaison isend
+C   wait terminaison isend
 C--------------------------------------------------------------------
       DO I = 1, NSPMD
         IF(IAD_S(I+1)-IAD_S(I)>0)THEN
@@ -3588,6 +3612,7 @@ C--------------------------------------------------------------------
       ENDDO
 C
       RETURN
+#endif
       END
 
 Chd|====================================================================
@@ -3603,24 +3628,24 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
+C-----------------------------------------------
+C   C o m m o n   B l o c k s
+C-----------------------------------------------"
+#include      "com01_c.inc"
+#include      "task_c.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
-#ifdef  MPI
+#ifdef MPI
 #include "mpif.h"
 #endif
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER SSIZE  ,RSIZE,IAD_S(*),IAD_R(*),SIZE 
       my_real
      .     KS11(SIZE,*),KR11(SIZE,*)
+#if defined(MPI) && defined(MUMPS5)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -3694,7 +3719,7 @@ C--------------------------------------------------------------------
         ENDIF
       ENDDO
 C
-Cel wait terminaison isend
+C   wait terminaison isend
 C--------------------------------------------------------------------
       DO I = 1, NSPMD
         IF(IAD_S(I+1)-IAD_S(I)>0)THEN
@@ -3703,6 +3728,7 @@ C--------------------------------------------------------------------
       ENDDO
 C
       RETURN
+#endif
       END
 Chd|====================================================================
 Chd|  SPMD_IFRU                     source/mpi/implicit/imp_spmd.F
@@ -3720,23 +3746,23 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
-C-----------------------------------------------
-C   M e s s a g e   P a s s i n g
-C-----------------------------------------------
-#ifdef  MPI
-#include "mpif.h"
-#endif
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
+C   M e s s a g e   P a s s i n g
+C-----------------------------------------------
+#ifdef MPI
+#include "mpif.h"
+#endif
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       my_real
      .        LX(*)
+#if defined(MPI) && defined(MUMPS5)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -3808,7 +3834,7 @@ C--------------------------------------------------------------------
         ENDIF
       ENDDO
 C
-Cel wait terminaison isend
+C   wait terminaison isend
 C--------------------------------------------------------------------
       DO I = 1, NSPMD
         IF(IAD_SL(I+1)-IAD_SL(I)>0)THEN
@@ -3817,6 +3843,7 @@ C--------------------------------------------------------------------
       ENDDO
 C
       RETURN
+#endif
       END
 
 Chd|====================================================================
@@ -3836,23 +3863,23 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
-C-----------------------------------------------
-C   M e s s a g e   P a s s i n g
-C-----------------------------------------------
-#ifdef  MPI
-#include "mpif.h"
-#endif
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
+C   M e s s a g e   P a s s i n g
+C-----------------------------------------------
+#ifdef MPI
+#include "mpif.h"
+#endif
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       my_real
      .        F_IMP(*)
+#if defined(MPI) && defined(MUMPS5)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -3924,7 +3951,7 @@ C--------------------------------------------------------------------
         ENDIF
       ENDDO
 C
-Cel wait terminaison isend
+C   wait terminaison isend
 C--------------------------------------------------------------------
       DO I = 1, NSPMD
         IF(IAD_SREM(I+1)-IAD_SREM(I)>0)THEN
@@ -3933,6 +3960,7 @@ C--------------------------------------------------------------------
       ENDDO
 C
       RETURN
+#endif
       END
 Chd|====================================================================
 Chd|  SPMD_IFRU_GPU                 source/mpi/implicit/imp_spmd.F
@@ -3950,24 +3978,24 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
-C-----------------------------------------------
-C   M e s s a g e   P a s s i n g
-C-----------------------------------------------
-#ifdef  MPI
-#include "mpif.h"
-#endif
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
+C   M e s s a g e   P a s s i n g
+C-----------------------------------------------
+#ifdef MPI
+#include "mpif.h"
+#endif
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NINDEX(*)
       my_real
      .        LX(*)
+#if defined(MPI) && defined(MUMPS5)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -4040,7 +4068,7 @@ C--------------------------------------------------------------------
         ENDIF
       ENDDO
 C
-Cel wait terminaison isend
+C   wait terminaison isend
 C--------------------------------------------------------------------
       DO I = 1, NSPMD
         IF(IAD_SL(I+1)-IAD_SL(I)>0)THEN
@@ -4049,6 +4077,7 @@ C--------------------------------------------------------------------
       ENDDO
 C
       RETURN
+#endif
       END
 
 Chd|====================================================================
@@ -4067,24 +4096,24 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
-C-----------------------------------------------
-C   M e s s a g e   P a s s i n g
-C-----------------------------------------------
-#ifdef  MPI
-#include "mpif.h"
-#endif
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
+C   M e s s a g e   P a s s i n g
+C-----------------------------------------------
+#ifdef MPI
+#include "mpif.h"
+#endif
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NINDEX(*)
       my_real
      .        F_IMP(*)
+#if defined(MPI) && defined(MUMPS5)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -4157,7 +4186,7 @@ C--------------------------------------------------------------------
         ENDIF
       ENDDO
 C
-Cel wait terminaison isend
+C   wait terminaison isend
 C--------------------------------------------------------------------
       DO I = 1, NSPMD
         IF(IAD_SREM(I+1)-IAD_SREM(I)>0)THEN
@@ -4166,6 +4195,7 @@ C--------------------------------------------------------------------
       ENDDO
 C
       RETURN
+#endif
       END
 Chd|====================================================================
 Chd|  SPMD_IFRI                     source/mpi/implicit/imp_spmd.F
@@ -4185,20 +4215,21 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   M e s s a g e   P a s s i n g
-C-----------------------------------------------
-#ifdef  MPI
-#include "mpif.h"
-#endif
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
+C   M e s s a g e   P a s s i n g
+C-----------------------------------------------
+#ifdef MPI
+#include "mpif.h"
+#endif
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER  IG(*), IL(*)
+#if defined(MPI) && defined(MUMPS5)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -4269,7 +4300,7 @@ C--------------------------------------------------------------------
         ENDIF
       ENDDO
 C
-Cel wait terminaison isend
+C   wait terminaison isend
 C--------------------------------------------------------------------
       DO I = 1, NSPMD
         IF(IAD_SL(I+1)-IAD_SL(I)>0)THEN
@@ -4278,6 +4309,7 @@ C--------------------------------------------------------------------
       ENDDO
 C
       RETURN
+#endif
       END
 Chd|====================================================================
 Chd|  SPMD_SEND_VI                  source/mpi/implicit/imp_spmd.F
@@ -4291,23 +4323,23 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
-C-----------------------------------------------------------------
-C   M e s s a g e   P a s s i n g
-C-----------------------------------------------
-#ifdef MPI
-#include "mpif.h"
-#endif
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
+C   M e s s a g e   P a s s i n g
+C-----------------------------------------------
+#ifdef MPI
+#include "mpif.h"
+#endif
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NV       ,NSIZ    ,NVMAX     ,IOUT
-      INTEGER VI(NSIZ,*)       
+      INTEGER VI(NSIZ,*)
+#if defined(MPI) && defined(MUMPS5)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -4505,6 +4537,7 @@ C
  1015 FORMAT(A,' INCOMPABILITY NODE BETWEEN ',/
      .       ' RWALL CONTACT AND IMPOSED DISP.=',I8)
  1100 FORMAT(A,' IMPLICIT IS INCOMPABLE WITH :',A/)
+#endif
       END
 Chd|====================================================================
 Chd|  SPMD_SEND_VR                  source/mpi/implicit/imp_spmd.F
@@ -4519,24 +4552,24 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
-C-----------------------------------------------------------------
-C   M e s s a g e   P a s s i n g
-C-----------------------------------------------
-#ifdef MPI
-#include "mpif.h"
-#endif
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
+C   M e s s a g e   P a s s i n g
+C-----------------------------------------------
+#ifdef MPI
+#include "mpif.h"
+#endif
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NV       ,NSIZ    ,NVMAX     ,IOUT
       my_real
      .        VR(NSIZ,*)       
+#if defined(MPI) && defined(MUMPS5)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -4632,6 +4665,7 @@ C
       RETURN
  1001 FORMAT(' NODE NUM. =',I10,5X,'TRA_DIR = ',1A,5X,'VAL.= ',G14.7)
  1002 FORMAT(' NODE NUM. =',I10,5X,'ROT_DIR = ',1A,5X,'VAL.= ',G14.7)
+#endif
       END
 
 Chd|====================================================================
@@ -4645,18 +4679,17 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
-C-----------------------------------------------------------------
-C   M e s s a g e   P a s s i n g
-C-----------------------------------------------
-#ifdef MPI
-#include "mpif.h"
-#endif
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "task_c.inc"
+C-----------------------------------------------
+C   M e s s a g e   P a s s i n g
+C-----------------------------------------------
+#ifdef MPI
+#include "mpif.h"
+#endif
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -4670,6 +4703,7 @@ C-----------------------------------------------
       INTEGER
      .        RBUF(NSPMD),SI
       DATA MSGOFF/16043/,MSGOFF2/16044/
+#if defined(MPI) && defined(MUMPS5)
 C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
@@ -4706,6 +4740,7 @@ C
       END IF
 C
       RETURN
+#endif
       END
 
 Chd|====================================================================
@@ -4720,22 +4755,22 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
-C-----------------------------------------------
-C   M e s s a g e   P a s s i n g
-C-----------------------------------------------
-#ifdef  MPI
-#include "mpif.h"
-#endif
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
+C   M e s s a g e   P a s s i n g
+C-----------------------------------------------
+#ifdef MPI
+#include "mpif.h"
+#endif
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NMAX,IAD_ELEM(*),TSIZE
+#if defined(MPI) && defined(MUMPS5)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -4794,7 +4829,7 @@ C--------------------------------------------------------------------
        ENDIF
       ENDDO
 C
-Cel wait terminaison isend
+C   wait terminaison isend
 C--------------------------------------------------------------------
       DO I = 1, NSPMD
         IF((IAD_ELEM(I+1)-IAD_ELEM(I))>0)THEN
@@ -4803,6 +4838,7 @@ C--------------------------------------------------------------------
       ENDDO
 C
       RETURN
+#endif
       END
 Chd|====================================================================
 Chd|  SPMD_MAX_F                    source/mpi/implicit/imp_spmd.F
@@ -4815,24 +4851,23 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
-C-----------------------------------------------------------------
-C   M e s s a g e   P a s s i n g
-C-----------------------------------------------
-#ifdef MPI
-#include "mpif.h"
-#endif
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
+C   M e s s a g e   P a s s i n g
+C-----------------------------------------------
+#ifdef MPI
+#include "mpif.h"
+#endif
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER ITAB, K
-      my_real
-     .        F
+      my_real F
+#if defined(MPI) && defined(MUMPS5)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -4910,6 +4945,7 @@ C
       END IF
 C
       RETURN
+#endif
       END
 
 Chd|====================================================================
@@ -4928,25 +4964,23 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
-C-----------------------------------------------------------------
+C-----------------------------------------------
+C   C o m m o n   B l o c k s
+C-----------------------------------------------
+#include      "com01_c.inc"
+#include      "task_c.inc"
+C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
 #ifdef MPI
 #include "mpif.h"
 #endif
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "task_c.inc"
-#include      "units_c.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER
      .        IV(*)
+#if defined(MPI) && defined(MUMPS5)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -5017,7 +5051,7 @@ C--------------------------------------------------------------------
         ENDIF
       ENDDO
 C
-Cel wait terminaison isend
+C   wait terminaison isend
 C--------------------------------------------------------------------
       DO I = 1, NSPMD
         IF(ND_FR(I)>0)THEN
@@ -5026,6 +5060,7 @@ C--------------------------------------------------------------------
       ENDDO
 C
       RETURN
+#endif
       END
 Chd|====================================================================
 Chd|  SPMD_INT_ALLREDUCE_MAX        source/mpi/implicit/imp_spmd.F
@@ -5038,22 +5073,22 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
-C-----------------------------------------------
-C   M e s s a g e   P a s s i n g
-C-----------------------------------------------
-#ifdef  MPI
-#include "mpif.h"
-#endif
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
+C   M e s s a g e   P a s s i n g
+C-----------------------------------------------
+#ifdef MPI
+#include "mpif.h"
+#endif
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER SENDBUF(*),RECVBUF(*),COUNT
+#if defined(MPI) && defined(MUMPS5)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -5067,6 +5102,7 @@ C MPI_ALLREDUCE with MAX function applied to table of integers
      .                     MPI_COMM_WORLD,IERROR)
 C
       RETURN
+#endif
       END
 Chd|====================================================================
 Chd|  SPMD_E_REF                    source/mpi/implicit/imp_spmd.F
@@ -5084,26 +5120,22 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
-C-----------------------------------------------
-C   M e s s a g e   P a s s i n g
-C-----------------------------------------------
-#ifdef  MPI
-#include "mpif.h"
-#endif
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "task_c.inc"
+#include      "com01_c.inc"
+C-----------------------------------------------
+C   M e s s a g e   P a s s i n g
+C-----------------------------------------------
+#ifdef MPI
+#include "mpif.h"
+#endif
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      my_real
-     .        DMIN
-C-----------------------------------------------
-C   L o c a l  V a r i a b l e s
-C-----------------------------------------------
+      my_real DMIN
+#if defined(MPI) && defined(MUMPS5)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -5217,6 +5249,7 @@ C
         LSKEW_G = INT(RBUF(L,1)) 
 C
       RETURN
+#endif
       END
 Chd|====================================================================
 Chd|  SPMD_N_REF                    source/mpi/implicit/imp_spmd.F
@@ -5234,24 +5267,18 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
-C-----------------------------------------------
-C   M e s s a g e   P a s s i n g
-C-----------------------------------------------
-#ifdef  MPI
-#include "mpif.h"
-#endif
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
-C   D u m m y   A r g u m e n t s
+C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
-C-----------------------------------------------
-C   L o c a l  V a r i a b l e s
-C-----------------------------------------------
+#ifdef MPI
+#include "mpif.h"
+#endif
+#if defined(MPI) && defined(MUMPS5)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -5417,91 +5444,6 @@ C
         END DO 
 C
       RETURN
+#endif
       END
-
-
-#else
-C
-Chd|====================================================================
-Chd|  BIDON_IMP                     source/mpi/implicit/imp_spmd.F
-Chd|-- called by -----------
-Chd|-- calls ---------------
-Chd|====================================================================
-      SUBROUTINE BIDON_IMP
-C-----------------------------------------------
-#include "implicit_f.inc"
-#ifdef MUMPS5
-#include      "dmumps_struc.h"
-#endif
-C-----------------------------------------------
-      INTEGER
-     .        IDUM1, IDUM2, IDUM3, IDUM4, IDUM5,
-     .        IDUM6, IDUM7, IDUM8, IDUM9, IDUM0,
-     .        IDUM11,IDUM12,IDUM13,IDUM14,IDUM15,
-     .        IDUM16
-      my_real
-     .        RDUM1, RDUM2, RDUM3, RDUM4, RDUM5,
-     .        RDUM6, RDUM7, RDUM8, RDUM9, RDUM0,
-     .        RDUMA, RDUMB
-#ifdef MUMPS5
-      TYPE(DMUMPS_STRUC) MUMPS_PAR
-#endif
-C
-      ENTRY SPMD_SUM_S(RDUM1)
-      ENTRY SPMD_SUM_S2(RDUM1,IDUM1)
-      ENTRY SPMD_MAX_S(RDUM1)
-      ENTRY SPMD_MIN_S(RDUM1)
-      ENTRY SPMD_MAX_I(IDUM1)
-      ENTRY SPMD_INF_G(
-     .        IDUM1, IDUM2, IDUM3, IDUM4, IDUM5,
-     .        IDUM6, IDUM7, IDUM8, IDUM9, IDUM0)
-      ENTRY SPMD_SUMF_V(RDUM1)
-      ENTRY SPMD_SUMFC_V(RDUM1,RDUM2,IDUM1)
-      ENTRY SPMD_SUMF_K(RDUM1, RDUM2)
-      ENTRY SPMD_INIS(IDUM1,IDUM2)
-      ENTRY SPMD_INISL(IDUM1,IDUM2)
-      ENTRY SPMD_IFC1(IDUM1, IDUM2,RDUM1)
-      ENTRY SPMD_IFCD(RDUM1,IDUM1, IDUM2)
-      ENTRY SPMD_IFCF(RDUM1,IDUM1, IDUM2)
-      ENTRY SPMD_NROW(IDUM1, IDUM2, IDUM3, IDUM4)
-      ENTRY SPMD_ICOL(
-     .        IDUM1, IDUM2, IDUM3, IDUM4, IDUM5,
-     .        IDUM6, IDUM7, IDUM8, IDUM9, IDUM0)
-      ENTRY SPMD_I2D(IDUM1, IDUM2, IDUM3, IDUM4)
-      ENTRY SPMD_SUMF_A(RDUM1,RDUM2,IDUM1, IDUM2, IDUM3, IDUM4)
-      ENTRY SPMD_NDOF(IDUM1, IDUM2, IDUM3, IDUM4)
-      ENTRY SPMD_CDDL(IDUM1, IDUM2, IDUM3, IDUM4, IDUM5,
-     .                IDUM6, IDUM7, IDUM8, IDUM9)
-      ENTRY SPMD_VCHGRID(RDUM1, IDUM1, IDUM2, RDUM2, IDUM3,
-     .                   IDUM4, IDUM5, IDUM6,IDUM7)
-      ENTRY SPMD_ISR(IDUM1, IDUM2, IDUM3, IDUM4, IDUM5,IDUM6)
-      ENTRY SPMD_EXCI(IDUM1, IDUM2, IDUM3, IDUM4, IDUM5,IDUM6,IDUM7)
-      ENTRY SPMD_EXCK(RDUM1,RDUM2,IDUM1, IDUM2,IDUM3,IDUM4, IDUM5)
-      ENTRY SPMD_IFRU(RDUM1)
-      ENTRY SPMD_IFRF(RDUM1)
-      ENTRY SPMD_IFRU_GPU(RDUM1,IDUM1)
-      ENTRY SPMD_IFRF_GPU(RDUM1,IDUM1)
-      ENTRY SPMD_IFRI(IDUM1, IDUM2)
-      ENTRY SPMD_SEND_VI(IDUM1, IDUM2, IDUM3, IDUM4, IDUM5)
-      ENTRY SPMD_SEND_VR(IDUM1, IDUM2, RDUM3, IDUM4, IDUM5)
-      ENTRY SPMD_NDDLIG(IDUM1, IDUM2, IDUM3 )
-      ENTRY SPMD_MAX_II(IDUM1, IDUM2, IDUM3)
-      ENTRY SPMD_MIN_I(IDUM1)
-      ENTRY SPMD_MAX_IV(IDUM1)
-      ENTRY SPMD_MAX_F(RDUM1, IDUM1, IDUM2)
-      ENTRY SPMD_INT_ALLREDUCE_MAX(IDUM1, IDUM2, IDUM3)
-      ENTRY SPMD_E_REF(RDUM1)
-      ENTRY SPMD_N_REF
-
-C     ENTRY MPI_BCAST(IDUM1, IDUM2, IDUM3, IDUM4, IDUM5, IDUM6)
-C     ENTRY MPI_ALLREDUCE
-C     ENTRY MPI_IRECV
-C     ENTRY MPI_ISEND
-C     ENTRY MPI_WAITANY
-C     ENTRY MPI_WAITALL
-C     ENTRY MPI_WAIT
-C     ENTRY MPI_REDUCE
-
-      END
-#endif
 C

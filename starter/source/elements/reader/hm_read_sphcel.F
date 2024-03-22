@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  HM_READ_SPHCEL                source/elements/reader/hm_read_sphcel.F
 Chd|-- called by -----------
@@ -43,7 +43,7 @@ Chd|====================================================================
      2                  IPARTSP ,IPM     ,IGEO  ,KXSP    ,IXSP    ,
      3                  NOD2SP, RESERVEP ,IXS   ,IPARTS  ,ISOLNOD ,
      4                  SPH2SOL ,SOL2SPH ,IRST  ,X       ,SOL2SPH_TYP,
-     5                  LSUBMODEL)
+     5                  LSUBMODEL,SPBUF  ,UNITAB)
 C-----------------------------------------------
 C   ROUTINE DESCRIPTION :
 C   ===================
@@ -71,6 +71,7 @@ C     KXSP(5,*)              :NVOIS  :   NOMBRE DE CANDIDATS RETENUS PAR LE BUCK
 C     KXSP(6,*)              :NVOISS :   NOMBRE DE VOISINS DANS LA PARTIE SYMETRIQUE.
 C     KXSP(7,*)              :NVOISS :   NOMBRE DE CANDIDATS RETENUS DANS LA PARTIE SYMETRIQUE.
 C     KXSP(NISP,*)           :ID     :   ID DE LA CELLULE.
+C     UNITAB          UNIT ARRAY 
 C-----------------------------------------------
 C     IXSP(1:KVOISPH,*)      :IVOIS  :   NOS DES VOISINS. 
 C-----------------------------------------------
@@ -79,17 +80,11 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE HM_OPTION_READ_MOD
       USE SUBMODEL_MOD
+      USE UNITAB_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -98,9 +93,7 @@ C-----------------------------------------------
 #include      "units_c.inc"
 #include      "sphcom.inc"
 #include      "scr17_c.inc"
-#include      "warn_c.inc"
 #include      "param_c.inc"
-#include      "submod_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -108,13 +101,12 @@ C-----------------------------------------------
      .        NOD2SP(*),IPM(NPROPMI,*),IGEO(NPROPGI,*),
      .        ITAB(*),ITABM1(*),IPART(LIPART1,*),IPARTSP(*),
      .        RESERVEP(NBPARTINLET), IXS(NIXS,*), IPARTS(*), ISOLNOD(*),
-     .        SPH2SOL(*), SOL2SPH(2,*), IRST(3,NSPHSOL),SOL2SPH_TYP(*),
-     .        OFF_DEF(NSUBMOD),OFF_NOD(NSUBMOD),OFF_EL(NSUBMOD),
-     .        OFF_PART(NSUBMOD)
-C     REAL
+     .        SPH2SOL(*), SOL2SPH(2,*), IRST(3,NSPHSOL),SOL2SPH_TYP(*)
       my_real
      .        X(3,*)
       TYPE(SUBMODEL_DATA) LSUBMODEL(*)
+      my_real, INTENT(INOUT) :: SPBUF(NSPBUF,NUMSPH)
+      TYPE (UNIT_TYPE_),INTENT(IN) ::UNITAB 
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -125,7 +117,7 @@ C-----------------------------------------------
      .        INDEX_PART,UID,IFLAGUNIT
 C     REAL
       my_real
-     .       BID
+     .       BID,FAC_M
       CHARACTER MESS*40,KEY*ncharkey
       LOGICAL IS_AVAILABLE
 
@@ -141,22 +133,15 @@ C     REAL
       LOGICAL, DIMENSION(NPART) :: TAG_PART
       INTEGER, DIMENSION(NPART) :: PART_ID_SPH,PART_ID_SOL
       INTEGER, DIMENSION(:), ALLOCATABLE :: SUB_SPH
+      INTEGER, DIMENSION(:), ALLOCATABLE :: TYPE
+      REAL*8, DIMENSION(:), ALLOCATABLE :: HM_MASS
+      INTEGER, DIMENSION(:), ALLOCATABLE :: UID_SPH
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
       INTEGER USR2SYS
 C-----------------------------------------------
       DATA MESS /'SPH CONNECTIVITIES DEFINITION           '/
-C-----------------------------------------------
-C--------------------------------------------------
-C      HM OFFSETS IDs
-C--------------------------------------------------
-      DO I=1,NSUBMOD
-        OFF_DEF(I) = LSUBMODEL(I)%OFF_DEF
-        OFF_NOD(I) = LSUBMODEL(I)%OFF_NOD
-        OFF_EL(I) = LSUBMODEL(I)%OFF_EL
-        OFF_PART(I) = LSUBMODEL(I)%OFF_PART
-      ENDDO
 C--------------------------------------------------
 C      ALLOCS & INITS
 c      use NUMELQ IN PLACE OF NUMELC ( NBADMESH routine is modifying NUMELC )
@@ -165,14 +150,29 @@ C--------------------------------------------------
       IF (STAT /= 0) CALL ANCMSG(MSGID=268,ANMODE=ANINFO,
      .                             MSGTYPE=MSGERROR,
      .                             C1='SUB_SPH')
+      ALLOCATE (UID_SPH(NUMSPH),STAT=stat)
+      IF (STAT /= 0) CALL ANCMSG(MSGID=268,ANMODE=ANINFO,
+     .                             MSGTYPE=MSGERROR,
+     .                             C1='UID_SPH') 
+      ALLOCATE (TYPE(NUMSPH),STAT=stat)
+      IF (STAT /= 0) CALL ANCMSG(MSGID=268,ANMODE=ANINFO,
+     .                             MSGTYPE=MSGERROR,
+     .                             C1='TYPE') 
+      ALLOCATE (HM_MASS(NUMSPH),STAT=stat)
+      IF (STAT /= 0) CALL ANCMSG(MSGID=268,ANMODE=ANINFO,
+     .                             MSGTYPE=MSGERROR,
+     .                             C1='HM_MASS') 
       SUB_SPH(1:NUMSPH) = 0
+      UID_SPH(1:NUMSPH) = 0
+      HM_MASS(1:NUMSPH) = ZERO
+      TYPE(1:NUMSPH) = 0
       INDEX_PART = 1
       UID = -1 
 
 C--------------------------------------------------
 C      READING QUADS INPUTS IN HM STRUCTURE
 C-------------------------------------------------- 
-      CALL CPP_SPHCEL_READ(KXSP,NISP,IPARTSP,SUB_SPH)
+      CALL CPP_SPHCEL_READ(KXSP,NISP,IPARTSP,SUB_SPH,TYPE,HM_MASS,UID_SPH)
 C--------------------------------------------------
       CALL HM_OPTION_COUNT('/SPHCEL',NSPHCEL)
       NCELL=0
@@ -185,14 +185,35 @@ C--------------------------------------------------
 C      SUBMODEL OFFSET
 C--------------------------------------------------
         IF(SUB_SPH(I) /= 0)THEN
-          IF(IPARTSP(I) /= 0) IPARTSP(I) = IPARTSP(I) + OFF_PART(SUB_SPH(I)) 
-          IF(KXSP(NISP,I) /= 0) KXSP(NISP,I) = KXSP(NISP,I) + OFF_EL(SUB_SPH(I))
-
-          IF(KXSP(3,I) /= 0) KXSP(3,I) = KXSP(3,I) + OFF_NOD(SUB_SPH(I))
-
+          IF(UID_SPH(I) == 0 .AND. LSUBMODEL(SUB_SPH(I))%UID /= 0) 
+     .         UID_SPH(I) = LSUBMODEL(SUB_SPH(I))%UID
         ENDIF
 C--------------------------------------------------
-C      INTERNAL PART ID
+C      UNITS
+C--------------------------------------------------
+        FAC_M = ONE
+        IF(UID_SPH(I) /= UID )THEN
+          UID = UID_SPH(I)
+          IFLAGUNIT = 0          
+          DO J=1,UNITAB%NUNITS                         
+            IF (UNITAB%UNIT_ID(J) == UID) THEN  
+              FAC_M = UNITAB%FAC_M(J)                 
+              IFLAGUNIT = 1                     
+            ENDIF                               
+          ENDDO                                  
+          IF (UID/=0.AND.IFLAGUNIT==0) THEN
+            CALL ANCMSG(MSGID=643,ANMODE=ANINFO,MSGTYPE=MSGERROR,
+     .                  I1=UID,C1='/SPHCELL')
+          ENDIF 
+        ENDIF 
+        HM_MASS(I) = HM_MASS(I) * FAC_M
+C--------------------------------------------------
+C       STORAGE OF MASS PER PARTICULE
+C--------------------------------------------------
+        SPBUF(12,I) = HM_MASS(I)
+        SPBUF(13,I) = TYPE(I)
+C--------------------------------------------------
+C       INTERNAL PART ID
 C--------------------------------------------------
         IF( IPART(4,INDEX_PART) /= IPARTSP(I) )THEN  
           DO J=1,NPART                            
@@ -225,6 +246,9 @@ C--------------------------------------------------
       ENDDO
 C-------------------------------------
        IF(ALLOCATED(SUB_SPH)) DEALLOCATE(SUB_SPH)
+       IF(ALLOCATED(UID_SPH)) DEALLOCATE(UID_SPH)
+       IF(ALLOCATED(TYPE)) DEALLOCATE(TYPE)
+       IF(ALLOCATED(HM_MASS)) DEALLOCATE(HM_MASS)
 C-------------------------------------
        FIRST_SPHRES=NCELL+1
        IF(NSPHRES/=0)THEN

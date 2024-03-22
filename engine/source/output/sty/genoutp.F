@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  GENOUTP                       source/output/sty/genoutp.F   
 Chd|-- called by -----------
@@ -35,7 +35,7 @@ Chd|        COUNT_ARSZ_SPT                source/output/sty/outp_sp_t.F
 Chd|        COUNT_ARSZ_SPTT               source/output/sty/outp_sp_t.F 
 Chd|        COUNT_ARSZ_SS                 source/output/sty/outp_s_s.F  
 Chd|        COUNT_ARSZ_ST                 source/output/sty/outp_s_t.F  
-Chd|        FILELEN_SYS                   source/output/tools/sortie_c.c
+Chd|        FILELEN_SYS                   ../common_source/tools/input_output/write_routtines.c
 Chd|        OUTP_ARSZ_CS                  source/mpi/interfaces/spmd_outp.F
 Chd|        OUTP_ARSZ_CT                  source/mpi/interfaces/spmd_outp.F
 Chd|        OUTP_ARSZ_RS                  source/mpi/interfaces/spmd_outp.F
@@ -63,7 +63,7 @@ Chd|        OUTP_S_T                      source/output/sty/outp_s_t.F
 Chd|        OUTP_S_TT                     source/output/sty/outp_s_t.F  
 Chd|        SPMD_OUTPITAB                 source/mpi/interfaces/spmd_outp.F
 Chd|        DRAPE_MOD                     share/modules/drape_mod.F     
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        INOUTFILE_MOD                 ../common_source/modules/inoutfile_mod.F
 Chd|        STACK_MOD                     share/modules/stack_mod.F     
 Chd|====================================================================
@@ -75,7 +75,8 @@ Chd|====================================================================
      6                  VR    ,ELBUF_TAB ,DD_IAD,WEIGHT,
      7                  IPM   ,KXSP      ,SPBUF  ,NODGLOB,LENG ,
      8                  FOPT  ,NOM_OPT   ,NPBY   ,FNCONT   ,FTCONT,
-     9                  GEO   ,THKE      ,STACK  ,DRAPE_Q4, DRAPE_T3)
+     9                  GEO   ,THKE      ,STACK  ,DRAPE_SH4N, DRAPE_SH3N,
+     A                  DRAPEG )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -92,23 +93,19 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com05_c.inc"
 #include      "com06_c.inc"
 #include      "com08_c.inc"
 #include      "com09_c.inc"
 #include      "param_c.inc"
 #include      "units_c.inc"
 #include      "scr03_c.inc"
-#include      "scr05_c.inc"
 #include      "scr11_c.inc"
-#include      "scr13_c.inc"
 #include      "scr14_c.inc"
 #include      "scr16_c.inc"
 #include      "scr17_c.inc"
 #include      "chara_c.inc"
 #include      "task_c.inc"
 #include      "sphcom.inc"
-#include      "spmd_c.inc"
 #include      "filescount_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -126,7 +123,8 @@ C     REAL
      .   SPBUF(*), FOPT(*), FNCONT(3,*), FTCONT(3,*),GEO(*),THKE(*)
       TYPE (ELBUF_STRUCT_), DIMENSION(NGROUP) :: ELBUF_TAB
       TYPE (STACK_PLY) :: STACK
-      TYPE(DRAPE_) :: DRAPE_Q4, DRAPE_T3
+      TYPE(DRAPE_) :: DRAPE_SH4N(NUMELC_DRAPE), DRAPE_SH3N(NUMELTG_DRAPE)
+      TYPE(DRAPEG_) :: DRAPEG
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -237,9 +235,7 @@ C-----------------------------------------------
      .   20,FEXT,NUMNOD,ITAB,
      .   ITABG,LENG,NODGLOB,WEIGHT)
 
-      IF(OUTP_V(9) == 1 .AND. (IDROT==1 .OR. ISECUT>0 .OR. ISUB>0 .OR.
-     .                 MSHSUB>0 .OR. IISROT>0 .OR. IMPOSE_DR>0 ) .AND.
-     .                 IRODDL/=0) 
+      IF(OUTP_V(9) == 1 .AND. (IDROT==1 .OR. ISECUT>0 .OR. IISROT>0 .OR. IMPOSE_DR>0 ) .AND. IRODDL/=0)
      .                   CALL OUTP_N_V('VELO_ROT  ',
      .   ' Rotational Velocity                               ',
      .   20,VR,NUMNOD,ITAB,
@@ -711,17 +707,18 @@ C-----------------------------------------------
      .         ELBUF_TAB,IPARG,TANI,DD_IAD,SIZLOC_CT(1),SIZP0_CT(1),SIZWR_CT(1)  )
        ENDIF
       ENDDO
-
       IF(OUTP_CT(95) == 1) CALL OUTP_C_TF(95,'STRESS_FUL',
      .   ' Full stress tensor + plastic strain    ',
      .     ELBUF_TAB,IPARG ,DD_IAD,SIZLOC_CT(2),SIZP0_CT(2),THKE,GEO,
-     .     IGEO     ,STACK ,DRAPE_Q4, DRAPE_T3,IXC  ,IXTG,SIZWR_CT(2))
+     .     IGEO     ,STACK ,DRAPE_SH4N, DRAPE_SH3N,IXC  ,IXTG,SIZWR_CT(2),
+     .     DRAPEG )
 
 
       IF(OUTP_CT(96) == 1) CALL OUTP_C_TF(96,'STRAIN_FUL',
      .   ' Full strain tensor + plastic strain    ',
      .     ELBUF_TAB,IPARG ,DD_IAD,SIZLOC_CT(3),SIZP0_CT(3),THKE,GEO,
-     .     IGEO     ,STACK ,DRAPE_Q4, DRAPE_T3,IXC  ,IXTG,SIZWR_CT(3))
+     .     IGEO     ,STACK ,DRAPE_SH4N, DRAPE_SH3N,IXC  ,IXTG,SIZWR_CT(3),
+     .     DRAPEG )
 
 C-----------------------------------------------
 C   SPH TENSOR(3D)

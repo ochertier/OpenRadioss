@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  STAT_S_STRSF                  source/output/sta/stat_s_strsf.F
 Chd|-- called by -----------
@@ -31,7 +31,7 @@ Chd|        SPMD_STAT_PGATHER             source/mpi/output/spmd_stat.F
 Chd|        SROTA6                        source/output/anim/generate/srota6.F
 Chd|        STRS_TXT50                    source/output/sta/sta_txt.F   
 Chd|        TAB_STRS_TXT50                source/output/sta/sta_txt.F   
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        INITBUF_MOD                   share/resol/initbuf.F         
 Chd|====================================================================
       SUBROUTINE STAT_S_STRSF(ELBUF_TAB,IPARG ,IPM ,IGEO ,IXS ,
@@ -50,14 +50,10 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "param_c.inc"
 #include      "units_c.inc"
-#include      "scr01_c.inc"
-#include      "scr05_c.inc"
 #include      "scr14_c.inc"
 #include      "task_c.inc"
-#include      "scr03_c.inc"
 #include      "scr16_c.inc"
 #include      "vect01_c.inc"
 #include      "scr17_c.inc"
@@ -97,7 +93,7 @@ C======================================================================|
         ITY   =IPARG(5,NG)
 c
         IF (ITY == 1) THEN
-          CALL INITBUF (IPARG    ,NG      ,                    
+          CALL INITBUF(IPARG    ,NG      ,                    
      2          MLW     ,NEL     ,NFT     ,IAD     ,ITY     ,  
      3          NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,  
      4          JTHE    ,JLAG    ,JMULT   ,JHBE    ,JIVF    ,  
@@ -147,12 +143,12 @@ c---------------
               JJ = JJ + 12                                              
               IF (IGLOB == 1)THEN
                 IF (JCVT==2 ) THEN
-                  GAMA(1)=GBUF%GAMA(KK(1)+I)				  
-                  GAMA(2)=GBUF%GAMA(KK(2)+I)				  
-                  GAMA(3)=GBUF%GAMA(KK(3)+I)				  
-                  GAMA(4)=GBUF%GAMA(KK(4)+I)				  
-                  GAMA(5)=GBUF%GAMA(KK(5)+I)				  
-                  GAMA(6)=GBUF%GAMA(KK(6)+I)				  
+                  GAMA(1)=GBUF%GAMA(KK(1)+I)          
+                  GAMA(2)=GBUF%GAMA(KK(2)+I)          
+                  GAMA(3)=GBUF%GAMA(KK(3)+I)          
+                  GAMA(4)=GBUF%GAMA(KK(4)+I)          
+                  GAMA(5)=GBUF%GAMA(KK(5)+I)          
+                  GAMA(6)=GBUF%GAMA(KK(6)+I)          
                 ELSE
                   GAMA(1)=ONE
                   GAMA(2)=ZERO
@@ -174,21 +170,22 @@ c---
                     WATMP(4) = LBUF%SIG(KK(4)+I)
                     WATMP(5) = LBUF%SIG(KK(5)+I)
                     WATMP(6) = LBUF%SIG(KK(6)+I)
-                    IF (IGLOB == 1) CALL SROTA6(X,IXS(1,N),				    
-     .              		    JCVT,WATMP,GAMA,JHBE,IGTYP)   
+                    IF (IGLOB == 1) CALL SROTA6(
+     1   X,       IXS(1,N),JCVT,    WATMP,
+     2   GAMA,    JHBE,    IGTYP,   ISORTH)
                     WA(JJ + 1) = WATMP(1)
                     WA(JJ + 2) = WATMP(2)
                     WA(JJ + 3) = WATMP(3)
                     WA(JJ + 4) = WATMP(4)
                     WA(JJ + 5) = WATMP(5)
                     WA(JJ + 6) = WATMP(6)
-                    IF (ELBUF_TAB(NG)%BUFLY(IL)%L_PLA == 0) THEN			       
+                    IF (ELBUF_TAB(NG)%BUFLY(IL)%L_PLA == 0) THEN             
                       WA(JJ + 7) = ZERO
                     ELSE
-                      WA(JJ + 7) = LBUF%PLA(I)  		      
+                      WA(JJ + 7) = LBUF%PLA(I)            
                     ENDIF
-                    WA(JJ+8)= LBUF%EINT(I)			       
-                    WA(JJ+9)= LBUF%RHO(I)			       
+                    WA(JJ+8)= LBUF%EINT(I)             
+                    WA(JJ+9)= LBUF%RHO(I)             
                     JJ = JJ + 9
                   ENDDO
                 ENDDO
@@ -219,12 +216,12 @@ c---------------
               JJ = JJ + 12                                              
               IF (IGLOB == 1)THEN
                 IF (JCVT==2 ) THEN
-                  GAMA(1)=GBUF%GAMA(KK(1)+I)				  
-                  GAMA(2)=GBUF%GAMA(KK(2)+I)				  
-                  GAMA(3)=GBUF%GAMA(KK(3)+I)				  
-                  GAMA(4)=GBUF%GAMA(KK(4)+I)				  
-                  GAMA(5)=GBUF%GAMA(KK(5)+I)				  
-                  GAMA(6)=GBUF%GAMA(KK(6)+I)				  
+                  GAMA(1)=GBUF%GAMA(KK(1)+I)          
+                  GAMA(2)=GBUF%GAMA(KK(2)+I)          
+                  GAMA(3)=GBUF%GAMA(KK(3)+I)          
+                  GAMA(4)=GBUF%GAMA(KK(4)+I)          
+                  GAMA(5)=GBUF%GAMA(KK(5)+I)          
+                  GAMA(6)=GBUF%GAMA(KK(6)+I)          
                 ELSE
                   GAMA(1)=ONE
                   GAMA(2)=ZERO
@@ -240,27 +237,28 @@ c---
                 DO IS=1,NPTS      
                   DO IR=1,NPTR                                                 
                     LBUF => ELBUF_TAB(NG)%BUFLY(IL)%LBUF(IR,IS,IT)     
-                    WATMP(1) = LBUF%SIG(KK(1)+I)			
-                    WATMP(2) = LBUF%SIG(KK(2)+I)			
-                    WATMP(3) = LBUF%SIG(KK(3)+I)			
-                    WATMP(4) = LBUF%SIG(KK(4)+I)			
-                    WATMP(5) = LBUF%SIG(KK(5)+I)			
-                    WATMP(6) = LBUF%SIG(KK(6)+I)			
-                    IF (IGLOB == 1) CALL SROTA6(X,IXS(1,N),				    
-     .              		    JCVT,WATMP,GAMA,JHBE,IGTYP)   
+                    WATMP(1) = LBUF%SIG(KK(1)+I)
+                    WATMP(2) = LBUF%SIG(KK(2)+I)
+                    WATMP(3) = LBUF%SIG(KK(3)+I)
+                    WATMP(4) = LBUF%SIG(KK(4)+I)
+                    WATMP(5) = LBUF%SIG(KK(5)+I)
+                    WATMP(6) = LBUF%SIG(KK(6)+I)
+                    IF (IGLOB == 1) CALL SROTA6(
+     1   X,       IXS(1,N),JCVT,    WATMP,
+     2   GAMA,    JHBE,    IGTYP,   ISORTH)
                     WA(JJ + 1) = WATMP(1)
                     WA(JJ + 2) = WATMP(2)
                     WA(JJ + 3) = WATMP(3)
                     WA(JJ + 4) = WATMP(4)
                     WA(JJ + 5) = WATMP(5)
                     WA(JJ + 6) = WATMP(6)
-                    IF (ELBUF_TAB(NG)%BUFLY(IL)%L_PLA == 0) THEN			       
+                    IF (ELBUF_TAB(NG)%BUFLY(IL)%L_PLA == 0) THEN             
                       WA(JJ + 7) = ZERO
                     ELSE
-                      WA(JJ + 7) = LBUF%PLA(I)  		      
+                      WA(JJ + 7) = LBUF%PLA(I)            
                     ENDIF
-                    WA(JJ+8)= LBUF%EINT(I)			       
-                    WA(JJ+9)= LBUF%RHO(I)			       
+                    WA(JJ+8)= LBUF%EINT(I)             
+                    WA(JJ+9)= LBUF%RHO(I)             
                     JJ = JJ + 9
                   ENDDO
                 ENDDO
@@ -291,12 +289,12 @@ c---------------
               JJ = JJ + 12                                              
               IF (IGLOB == 1)THEN
                 IF (JCVT==2 ) THEN
-                  GAMA(1)=GBUF%GAMA(KK(1)+I)				  
-                  GAMA(2)=GBUF%GAMA(KK(2)+I)				  
-                  GAMA(3)=GBUF%GAMA(KK(3)+I)				  
-                  GAMA(4)=GBUF%GAMA(KK(4)+I)				  
-                  GAMA(5)=GBUF%GAMA(KK(5)+I)				  
-                  GAMA(6)=GBUF%GAMA(KK(6)+I)				  
+                  GAMA(1)=GBUF%GAMA(KK(1)+I)          
+                  GAMA(2)=GBUF%GAMA(KK(2)+I)          
+                  GAMA(3)=GBUF%GAMA(KK(3)+I)          
+                  GAMA(4)=GBUF%GAMA(KK(4)+I)          
+                  GAMA(5)=GBUF%GAMA(KK(5)+I)          
+                  GAMA(6)=GBUF%GAMA(KK(6)+I)          
                 ELSE
                   GAMA(1)=ONE
                   GAMA(2)=ZERO
@@ -312,14 +310,15 @@ c---
                   DO IT=1,NPTT    
                     DO IL=1,NLAY                                                 
                       LBUF => ELBUF_TAB(NG)%BUFLY(IL)%LBUF(IR,IS,IT)     
-                      WATMP(1) = LBUF%SIG(KK(1)+I)			  
-                      WATMP(2) = LBUF%SIG(KK(2)+I)			  
-                      WATMP(3) = LBUF%SIG(KK(3)+I)			  
-                      WATMP(4) = LBUF%SIG(KK(4)+I)			  
-                      WATMP(5) = LBUF%SIG(KK(5)+I)			  
-                      WATMP(6) = LBUF%SIG(KK(6)+I)			  
-                      IF (IGLOB == 1) CALL SROTA6(X,IXS(1,N),                                 
-     .                                JCVT,WATMP,GAMA,JHBE,IGTYP)   
+                      WATMP(1) = LBUF%SIG(KK(1)+I)        
+                      WATMP(2) = LBUF%SIG(KK(2)+I)        
+                      WATMP(3) = LBUF%SIG(KK(3)+I)        
+                      WATMP(4) = LBUF%SIG(KK(4)+I)        
+                      WATMP(5) = LBUF%SIG(KK(5)+I)        
+                      WATMP(6) = LBUF%SIG(KK(6)+I)        
+                      IF (IGLOB == 1) CALL SROTA6(
+     1   X,       IXS(1,N),JCVT,    WATMP,
+     2   GAMA,    JHBE,    IGTYP,   ISORTH)
                       WA(JJ + 1) = WATMP(1)
                       WA(JJ + 2) = WATMP(2)
                       WA(JJ + 3) = WATMP(3)
@@ -367,12 +366,12 @@ c---------------
               JJ = JJ + 12                                              
               IF (IGLOB == 1)THEN
                 IF (JCVT==2 ) THEN
-                GAMA(1)=GBUF%GAMA(KK(1)+I)				  
-                GAMA(2)=GBUF%GAMA(KK(2)+I)				  
-                GAMA(3)=GBUF%GAMA(KK(3)+I)				  
-                GAMA(4)=GBUF%GAMA(KK(4)+I)				  
-                GAMA(5)=GBUF%GAMA(KK(5)+I)				  
-                GAMA(6)=GBUF%GAMA(KK(6)+I)				  
+                GAMA(1)=GBUF%GAMA(KK(1)+I)          
+                GAMA(2)=GBUF%GAMA(KK(2)+I)          
+                GAMA(3)=GBUF%GAMA(KK(3)+I)          
+                GAMA(4)=GBUF%GAMA(KK(4)+I)          
+                GAMA(5)=GBUF%GAMA(KK(5)+I)          
+                GAMA(6)=GBUF%GAMA(KK(6)+I)          
                 ELSE
                   GAMA(1)=ONE
                   GAMA(2)=ZERO
@@ -388,14 +387,15 @@ c---
                   DO IS=1,NPTS
                     DO IR=1,NPTR
                       LBUF => ELBUF_TAB(NG)%BUFLY(IL)%LBUF(IR,IS,IT)    
-                      WATMP(1) = LBUF%SIG(KK(1)+I)			  
-                      WATMP(2) = LBUF%SIG(KK(2)+I)			  
-                      WATMP(3) = LBUF%SIG(KK(3)+I)			  
-                      WATMP(4) = LBUF%SIG(KK(4)+I)			  
-                      WATMP(5) = LBUF%SIG(KK(5)+I)			  
-                      WATMP(6) = LBUF%SIG(KK(6)+I)			    
-                      IF (IGLOB == 1) CALL SROTA6(X,IXS(1,N),                                 
-     .                                JCVT,WATMP,GAMA,JHBE,IGTYP)
+                      WATMP(1) = LBUF%SIG(KK(1)+I)        
+                      WATMP(2) = LBUF%SIG(KK(2)+I)        
+                      WATMP(3) = LBUF%SIG(KK(3)+I)        
+                      WATMP(4) = LBUF%SIG(KK(4)+I)        
+                      WATMP(5) = LBUF%SIG(KK(5)+I)        
+                      WATMP(6) = LBUF%SIG(KK(6)+I)          
+                      IF (IGLOB == 1) CALL SROTA6(
+     1   X,       IXS(1,N),JCVT,    WATMP,
+     2   GAMA,    JHBE,    IGTYP,   ISORTH)
                       WA(JJ + 1) = WATMP(1)
                       WA(JJ + 2) = WATMP(2)
                       WA(JJ + 3) = WATMP(3)
@@ -447,14 +447,15 @@ c---------------
 c---
               DO IR=1,NPTR                                                 
                 LBUF => ELBUF_TAB(NG)%BUFLY(1)%LBUF(IR,1,1)             
-                WATMP(1) = LBUF%SIG(KK(1)+I)				      
-                WATMP(2) = LBUF%SIG(KK(2)+I)				      
-                WATMP(3) = LBUF%SIG(KK(3)+I)				      
-                WATMP(4) = LBUF%SIG(KK(4)+I)				      
-                WATMP(5) = LBUF%SIG(KK(5)+I)				      
-                WATMP(6) = LBUF%SIG(KK(6)+I)				      
-                IF (IGLOB == 1) CALL SROTA6(X,IXS(1,N),                                       
-     .                          JCVT,WATMP,GAMA,JHBE,IGTYP)                
+                WATMP(1) = LBUF%SIG(KK(1)+I)              
+                WATMP(2) = LBUF%SIG(KK(2)+I)              
+                WATMP(3) = LBUF%SIG(KK(3)+I)              
+                WATMP(4) = LBUF%SIG(KK(4)+I)              
+                WATMP(5) = LBUF%SIG(KK(5)+I)              
+                WATMP(6) = LBUF%SIG(KK(6)+I)              
+                IF (IGLOB == 1) CALL SROTA6(
+     1   X,       IXS(1,N),JCVT,    WATMP,
+     2   GAMA,    JHBE,    IGTYP,   ISORTH)
                 WA(JJ + 1) = WATMP(1)                                      
                 WA(JJ + 2) = WATMP(2)                                      
                 WA(JJ + 3) = WATMP(3)                                      
@@ -497,12 +498,12 @@ c---------------
               JJ = JJ + 12                                              
               IF (IGLOB == 1)THEN
                 IF (JCVT==2 ) THEN
-                GAMA(1)=GBUF%GAMA(KK(1)+I)				  
-                GAMA(2)=GBUF%GAMA(KK(2)+I)				  
-                GAMA(3)=GBUF%GAMA(KK(3)+I)				  
-                GAMA(4)=GBUF%GAMA(KK(4)+I)				  
-                GAMA(5)=GBUF%GAMA(KK(5)+I)				  
-                GAMA(6)=GBUF%GAMA(KK(6)+I)				  
+                GAMA(1)=GBUF%GAMA(KK(1)+I)          
+                GAMA(2)=GBUF%GAMA(KK(2)+I)          
+                GAMA(3)=GBUF%GAMA(KK(3)+I)          
+                GAMA(4)=GBUF%GAMA(KK(4)+I)          
+                GAMA(5)=GBUF%GAMA(KK(5)+I)          
+                GAMA(6)=GBUF%GAMA(KK(6)+I)          
                 ELSE
                   GAMA(1)=ONE
                   GAMA(2)=ZERO
@@ -518,14 +519,15 @@ c---
                   DO IS=1,NPTS
                     DO IT=1,NPTT
                       LBUF => ELBUF_TAB(NG)%BUFLY(IL)%LBUF(IR,IS,IT)     
-                      WATMP(1) = LBUF%SIG(KK(1)+I)			  
-                      WATMP(2) = LBUF%SIG(KK(2)+I)			  
-                      WATMP(3) = LBUF%SIG(KK(3)+I)			  
-                      WATMP(4) = LBUF%SIG(KK(4)+I)			  
-                      WATMP(5) = LBUF%SIG(KK(5)+I)			  
-                      WATMP(6) = LBUF%SIG(KK(6)+I)			   
-                      IF (IGLOB == 1) CALL SROTA6(X,IXS(1,N),                                 
-     .                                JCVT,WATMP,GAMA,JHBE,IGTYP)
+                      WATMP(1) = LBUF%SIG(KK(1)+I)        
+                      WATMP(2) = LBUF%SIG(KK(2)+I)        
+                      WATMP(3) = LBUF%SIG(KK(3)+I)        
+                      WATMP(4) = LBUF%SIG(KK(4)+I)        
+                      WATMP(5) = LBUF%SIG(KK(5)+I)        
+                      WATMP(6) = LBUF%SIG(KK(6)+I)         
+                      IF (IGLOB == 1) CALL SROTA6(
+     1   X,       IXS(1,N),JCVT,    WATMP,
+     2   GAMA,    JHBE,    IGTYP,   ISORTH)
                       WA(JJ + 1) = WATMP(1)
                       WA(JJ + 2) = WATMP(2)
                       WA(JJ + 3) = WATMP(3)
@@ -571,12 +573,12 @@ c---------------
               JJ = JJ + 12                                              
               IF (IGLOB == 1)THEN
                 IF (JCVT==2 ) THEN
-                GAMA(1)=GBUF%GAMA(KK(1)+I)				  
-                GAMA(2)=GBUF%GAMA(KK(2)+I)				  
-                GAMA(3)=GBUF%GAMA(KK(3)+I)				  
-                GAMA(4)=GBUF%GAMA(KK(4)+I)				  
-                GAMA(5)=GBUF%GAMA(KK(5)+I)				  
-                GAMA(6)=GBUF%GAMA(KK(6)+I)				  
+                GAMA(1)=GBUF%GAMA(KK(1)+I)          
+                GAMA(2)=GBUF%GAMA(KK(2)+I)          
+                GAMA(3)=GBUF%GAMA(KK(3)+I)          
+                GAMA(4)=GBUF%GAMA(KK(4)+I)          
+                GAMA(5)=GBUF%GAMA(KK(5)+I)          
+                GAMA(6)=GBUF%GAMA(KK(6)+I)          
                 ELSE
                   GAMA(1)=ONE
                   GAMA(2)=ZERO
@@ -592,14 +594,15 @@ c---
                   DO IS=1,NPTS
                     DO IT=1,NPTT
                       LBUF => ELBUF_TAB(NG)%BUFLY(IL)%LBUF(IR,IS,IT)    
-                      WATMP(1) = LBUF%SIG(KK(1)+I)			  
-                      WATMP(2) = LBUF%SIG(KK(2)+I)			  
-                      WATMP(3) = LBUF%SIG(KK(3)+I)			  
-                      WATMP(4) = LBUF%SIG(KK(4)+I)			  
-                      WATMP(5) = LBUF%SIG(KK(5)+I)			  
-                      WATMP(6) = LBUF%SIG(KK(6)+I)			     
-                      IF (IGLOB == 1) CALL SROTA6(X,IXS(1,N),                                 
-     .                                JCVT,WATMP,GAMA,JHBE,IGTYP)
+                      WATMP(1) = LBUF%SIG(KK(1)+I)        
+                      WATMP(2) = LBUF%SIG(KK(2)+I)        
+                      WATMP(3) = LBUF%SIG(KK(3)+I)        
+                      WATMP(4) = LBUF%SIG(KK(4)+I)        
+                      WATMP(5) = LBUF%SIG(KK(5)+I)        
+                      WATMP(6) = LBUF%SIG(KK(6)+I)           
+                      IF (IGLOB == 1) CALL SROTA6(
+     1   X,       IXS(1,N),JCVT,    WATMP,
+     2   GAMA,    JHBE,    IGTYP,   ISORTH)
                       WA(JJ + 1) = WATMP(1)
                       WA(JJ + 2) = WATMP(2)
                       WA(JJ + 3) = WATMP(3)

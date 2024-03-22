@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  S8EVOLUME                     source/elements/solid/solide8e/s8evolume.F
 Chd|-- called by -----------
@@ -37,10 +37,6 @@ C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -62,7 +58,7 @@ C
      .   AJ1(MVSIZ),AJ2(MVSIZ),AJ3(MVSIZ),
      .   AJ4(MVSIZ),AJ5(MVSIZ),AJ6(MVSIZ),
      .   AJ7(MVSIZ),AJ8(MVSIZ),AJ9(MVSIZ)
-	  my_real
+            my_real
      .   JAC_59_68(MVSIZ), JAC_67_49(MVSIZ), JAC_48_57(MVSIZ)
       my_real
      .   X17(MVSIZ) , X28(MVSIZ) , X35(MVSIZ) , X46(MVSIZ),
@@ -79,7 +75,7 @@ C
      .   AJP1(MVSIZ,8),AJP2(MVSIZ,8),AJP3(MVSIZ,8),
      .   AJP4(MVSIZ,8),AJP5(MVSIZ,8),AJP6(MVSIZ,8),
      .   AJP7(MVSIZ,8),AJP8(MVSIZ,8),AJP9(MVSIZ,8)
-	  my_real
+            my_real
      .   PG2, PG, WI
       my_real
      .  W_GAUSS(9,9)
@@ -229,7 +225,7 @@ C
        HZ4PG2(I)=HZ(I,4)*PG2
       ENDDO
       IP=1
-C - - -	  
+C - - -    
       DO I=1,NELA
        AJP1(I,IP)=AJ1(I)-HX3PG(I)-HX2PG(I)+HX4PG2(I)
        AJP2(I,IP)=AJ2(I)-HY3PG(I)-HY2PG(I)+HY4PG2(I)
@@ -243,8 +239,8 @@ C
        AJP8(I,IP)=AJ8(I)-HY2PG(I)-HY1PG(I)+HY4PG2(I)
        AJP9(I,IP)=AJ9(I)-HZ2PG(I)-HZ1PG(I)+HZ4PG2(I)
       ENDDO
-      IP=2	  
-C + - -	  
+      IP=2    
+C + - -    
       DO I=1,NELA
        AJP1(I,IP)=AJ1(I)-HX3PG(I)-HX2PG(I)+HX4PG2(I)
        AJP2(I,IP)=AJ2(I)-HY3PG(I)-HY2PG(I)+HY4PG2(I)
@@ -258,8 +254,8 @@ C
        AJP8(I,IP)=AJ8(I)+HY2PG(I)-HY1PG(I)-HY4PG2(I)
        AJP9(I,IP)=AJ9(I)+HZ2PG(I)-HZ1PG(I)-HZ4PG2(I)
       ENDDO
-      IP=3	  
-C - + -	  
+      IP=3    
+C - + -    
       DO I=1,NELA
        AJP1(I,IP)=AJ1(I)+HX3PG(I)-HX2PG(I)-HX4PG2(I)
        AJP2(I,IP)=AJ2(I)+HY3PG(I)-HY2PG(I)-HY4PG2(I)
@@ -273,8 +269,8 @@ C
        AJP8(I,IP)=AJ8(I)-HY2PG(I)+HY1PG(I)-HY4PG2(I)
        AJP9(I,IP)=AJ9(I)-HZ2PG(I)+HZ1PG(I)-HZ4PG2(I)
       ENDDO
-      IP=4	  
-C + + -	  
+      IP=4    
+C + + -    
       DO I=1,NELA
        AJP1(I,IP)=AJ1(I)+HX3PG(I)-HX2PG(I)-HX4PG2(I)
        AJP2(I,IP)=AJ2(I)+HY3PG(I)-HY2PG(I)-HY4PG2(I)
@@ -288,8 +284,8 @@ C
        AJP8(I,IP)=AJ8(I)+HY2PG(I)+HY1PG(I)+HY4PG2(I)
        AJP9(I,IP)=AJ9(I)+HZ2PG(I)+HZ1PG(I)+HZ4PG2(I)
       ENDDO
-      IP=5	  
-C - - +	  
+      IP=5    
+C - - +    
       DO I=1,NELA
        AJP1(I,IP)=AJ1(I)-HX3PG(I)+HX2PG(I)-HX4PG2(I)
        AJP2(I,IP)=AJ2(I)-HY3PG(I)+HY2PG(I)-HY4PG2(I)
@@ -303,8 +299,8 @@ C
        AJP8(I,IP)=AJ8(I)-HY2PG(I)-HY1PG(I)+HY4PG2(I)
        AJP9(I,IP)=AJ9(I)-HZ2PG(I)-HZ1PG(I)+HZ4PG2(I)
       ENDDO
-      IP=6	  
-C + - +	  
+      IP=6    
+C + - +    
       DO I=1,NELA
        AJP1(I,IP)=AJ1(I)-HX3PG(I)+HX2PG(I)-HX4PG2(I)
        AJP2(I,IP)=AJ2(I)-HY3PG(I)+HY2PG(I)-HY4PG2(I)
@@ -318,8 +314,8 @@ C
        AJP8(I,IP)=AJ8(I)+HY2PG(I)-HY1PG(I)-HY4PG2(I)
        AJP9(I,IP)=AJ9(I)+HZ2PG(I)-HZ1PG(I)-HZ4PG2(I)
       ENDDO
-      IP=7	  
-C - + +	  
+      IP=7    
+C - + +    
       DO I=1,NELA
        AJP1(I,IP)=AJ1(I)+HX3PG(I)+HX2PG(I)+HX4PG2(I)
        AJP2(I,IP)=AJ2(I)+HY3PG(I)+HY2PG(I)+HY4PG2(I)
@@ -333,8 +329,8 @@ C
        AJP8(I,IP)=AJ8(I)-HY2PG(I)+HY1PG(I)-HY4PG2(I)
        AJP9(I,IP)=AJ9(I)-HZ2PG(I)+HZ1PG(I)-HZ4PG2(I)
       ENDDO
-      IP=8	  
-C + + +	  
+      IP=8    
+C + + +    
       DO I=1,NELA
        AJP1(I,IP)=AJ1(I)+HX3PG(I)+HX2PG(I)+HX4PG2(I)
        AJP2(I,IP)=AJ2(I)+HY3PG(I)+HY2PG(I)+HY4PG2(I)

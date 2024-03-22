@@ -1,33 +1,33 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  ALEFVM_STRESS_INT22           source/ale/alefvm/alefvm_stress_int22.F
 Chd|-- called by -----------
 Chd|        SFORC3                        source/elements/solid/solide/sforc3.F
 Chd|-- calls ---------------
-Chd|        ALEFVM_MOD                    ../common_source/modules/alefvm_mod.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
-Chd|        I22BUFBRIC_MOD                ../common_source/modules/cut-cell-search_mod.F
+Chd|        ALEFVM_MOD                    ../common_source/modules/ale/alefvm_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
+Chd|        I22BUFBRIC_MOD                ../common_source/modules/interfaces/cut-cell-search_mod.F
 Chd|====================================================================
       SUBROUTINE ALEFVM_STRESS_INT22 (
      1                          IXS,      NV46, SIG,  QVIS, 
@@ -48,7 +48,7 @@ C This subroutine is treating an uncut cell.
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
-      USE ALEFVM_MOD       !F_FACE
+      USE ALEFVM_MOD
       USE ELBUFDEF_MOD     !TYPE(ELBUF_STRUCT_)
       USE I22BUFBRIC_MOD   !BRICK_LIST
 C-----------------------------------------------
@@ -64,15 +64,9 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "vect01_c.inc"
 #include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "com06_c.inc"
-#include      "com08_c.inc"
 #include      "nsvis_c.inc"
-#include      "fluid_scr_c.inc"
-#include      "inter22.inc"
 #include      "param_c.inc"
-#include      "alefvm.inc"
-#include      "task_c.inc"
+
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C----------------------------------------------- 
@@ -111,8 +105,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   P r e - C o n d i t i o n s
 C-----------------------------------------------      
-      IF(IALEFVM==0)RETURN
-      IMAT        = IXS(1,LFT+NFT)
+      IF(ALEFVM_Param%IEnabled==0)RETURN
+      IMAT        = IXS(1,1+NFT)
       IALEFVM_FLG = IPM(251,IMAT)  
       IF(IALEFVM_FLG <= 1)RETURN       
 C-----------------------------------------------
@@ -130,19 +124,19 @@ C-----------------------------------------------
       !-------------------------------------------------------------!
       ! PRESSURE                                                    !
       !-------------------------------------------------------------! 
-      DO I=LFT,LLT                          
+      DO I=1,NEL                          
         S1(I) = SIG(I,1) + SVIS(I,1) - QVIS(I) 
         S2(I) = SIG(I,2) + SVIS(I,2) - QVIS(I) 
         S3(I) = SIG(I,3) + SVIS(I,3) - QVIS(I) 
         S4(I) = SIG(I,4) + SVIS(I,4)
         S5(I) = SIG(I,5) + SVIS(I,5) 
-        S6(I) = SIG(I,6) + SVIS(I,6)		   
+        S6(I) = SIG(I,6) + SVIS(I,6)       
       ENDDO 
-      DO I=LFT,LLT
+      DO I=1,NEL
         P(I)      = -THIRD*(S1(I)+S2(I)+S3(I))        
       ENDDO
       ! STORAGE
-      DO I=LFT,LLT                           
+      DO I=1,NEL                           
         IB = NINT(IAD22(I))                  
         IF(IB<=0) CYCLE 
         BRICK_LIST(NIN,IB)%RHOC   = RHO(I)*SSP(I)                   
@@ -159,7 +153,7 @@ C-----------------------------------------------
       !-------------------------------------------------------------!
       ! NORMAL VECTOR FOR ALE  (can be optimize for EULER           !
       !-------------------------------------------------------------!                                       
-      DO I=LFT,LLT                          
+      DO I=1,NEL                          
       II      = I + NFT                     
       IB      = NINT(IAD22(I))              
       IF(IB<=0)CYCLE                      
@@ -194,7 +188,7 @@ C-----------------------------------------------
       ! COMPOSING THE SUPERCELL                                     !
       !   NEEDED FOR ALE_FVM_SFINT3_INT22 INTEGRAL : Pface interp.  !
       !-------------------------------------------------------------!
-      DO I=LFT, LLT
+      DO I=1, NEL
         !WARNING : Normal vectors computed in EPXLE3() if IALEFVM>0
         II                                               = I + NFT
         IB                                               = NINT(IAD22(I))
@@ -307,19 +301,19 @@ C-----------------------------------------------
 
  
         !DEBUG-OUTPUT---------------!
-        if(IALEFVM_OUTP_STRESS /= 0)then
+        if(ALEFVM_Param%IOUTP_STRESS /= 0)then
           debug_outp = .FALSE.
-          if(IALEFVM_OUTP_STRESS>0)then
+          if(ALEFVM_Param%IOUTP_STRESS>0)then
             do i=lft,llt
               ii = nft + i
-              if(ixs(11,ii)==IALEFVM_OUTP_STRESS)THEN
+              if(ixs(11,ii)==ALEFVM_Param%IOUTP_STRESS)THEN
                 debug_outp = .TRUE.
                 idbf   = i
                 idbl   = i
                 EXIT
               endif
              enddo
-          elseif(IALEFVM_OUTP_STRESS==-1)then
+          elseif(ALEFVM_Param%IOUTP_STRESS==-1)then
             debug_outp=.TRUE.
                 idbf   = lft
                 idbl   = llt          

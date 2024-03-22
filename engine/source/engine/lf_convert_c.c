@@ -1,5 +1,5 @@
 //Copyright>    OpenRadioss
-//Copyright>    Copyright (C) 1986-2022 Altair Engineering Inc.
+//Copyright>    Copyright (C) 1986-2024 Altair Engineering Inc.
 //Copyright>
 //Copyright>    This program is free software: you can redistribute it and/or modify
 //Copyright>    it under the terms of the GNU Affero General Public License as published by
@@ -15,11 +15,11 @@
 //Copyright>    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //Copyright>
 //Copyright>
-//Copyright>    Commercial Alternative: Altair Radioss Software 
+//Copyright>    Commercial Alternative: Altair Radioss Software
 //Copyright>
-//Copyright>    As an alternative to this open-source version, Altair also offers Altair Radioss 
-//Copyright>    software under a commercial license.  Contact Altair to discuss further if the 
-//Copyright>    commercial version may interest you: https://www.altair.com/radioss/.    
+//Copyright>    As an alternative to this open-source version, Altair also offers Altair Radioss
+//Copyright>    software under a commercial license.  Contact Altair to discuss further if the
+//Copyright>    commercial version may interest you: https://www.altair.com/radioss/.
 #include "hardware.inc"
 #include <stdio.h>
 #include <string.h>
@@ -567,8 +567,8 @@ void lf_convert_c_flat(got_input, rootname, rootlen, filename, namelen, outname,
                   strcpy_s(outname_local,sz_lenpath,cwd);                                              
                   strcat_s(outname_local,sz_lenpath,"\\");                                                     
 #else
-                  strcat(outname_local, "/");  
                   strcpy(outname_local,cwd);                                              
+                  strcat(outname_local, "/");
 #endif
                   free(cwd);
                 }

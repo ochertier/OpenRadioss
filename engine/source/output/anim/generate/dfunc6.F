@@ -1,42 +1,43 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  DFUNCS                        source/output/anim/generate/dfunc6.F
 Chd|-- called by -----------
 Chd|        GENANI                        source/output/anim/generate/genani.F
 Chd|-- calls ---------------
 Chd|        INITBUF                       share/resol/initbuf.F         
-Chd|        SCHLIEREN                     source/output/anim/generate/schlieren.F
+Chd|        OUTPUT_SCHLIEREN              source/output/anim/generate/output_schlieren.F
 Chd|        SCHLIEREN_BUFFER_GATHERING    source/output/anim/generate/schlieren_buffer_gathering.F
 Chd|        SPMD_R4GET_PARTN              source/mpi/anim/spmd_r4get_partn.F
 Chd|        SROTORTH                      source/elements/solid/srotorth.F
-Chd|        WRITE_R_C                     source/output/tools/sortie_c.c
-Chd|        ALEFVM_MOD                    ../common_source/modules/alefvm_mod.F
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
-Chd|        I22TRI_MOD                    ../common_source/modules/cut-cell-search_mod.F
+Chd|        WRITE_R_C                     ../common_source/tools/input_output/write_routtines.c
+Chd|        ALEANIM_MOD                   share/modules/aleanim_mod.F   
+Chd|        ALEFVM_MOD                    ../common_source/modules/ale/alefvm_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
+Chd|        I22TRI_MOD                    ../common_source/modules/interfaces/cut-cell-search_mod.F
 Chd|        INITBUF_MOD                   share/resol/initbuf.F         
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MAT_ELEM_MOD                  ../common_source/modules/mat_elem/mat_elem_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|        SCHLIEREN_MOD                 share/modules/schlieren_mod.F 
 Chd|====================================================================
       SUBROUTINE DFUNCS(ELBUF_TAB  ,FUNC      ,IFUNC     ,IPARG    ,GEO     ,
@@ -45,17 +46,18 @@ Chd|====================================================================
      4                  IADG       ,SPBUF     ,IPART     ,IPARTSP  ,ISPH3D  ,
      5                  X          ,V         ,W         ,ALE_CONNECTIVITY,
      6                  NERCVOIS   ,NESDVOIS  ,LERCVOIS  ,LESDVOIS ,BUFMAT  ,
-     7                  FANI_CELL  ,MULTI_FVM)
+     7                  FANI_CELL  ,MULTI_FVM ,MAT_PARAM )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE INITBUF_MOD
-      USE ELBUFDEF_MOD
+      USE MAT_ELEM_MOD
       USE SCHLIEREN_MOD  
-      USE I22TRI_MOD  ,  ONLY : INT22_FCELL_ANIM  
+      USE I22TRI_MOD , only:INT22_FCELL_ANIM  
       USE ALEFVM_MOD  
       USE MULTI_FVM_MOD   
       USE ALE_CONNECTIVITY_MOD
+      USE ALEANIM_MOD , ONLY : FANI_CELL_
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -67,19 +69,13 @@ C-----------------------------------------------
 #include      "mvsiz_p.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com08_c.inc"
 #include      "sphcom.inc"
-#include      "scr01_c.inc"
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
 #include      "scr14_c.inc"
 #include      "scr17_c.inc"
 #include      "param_c.inc"
-#include      "rnur_c.inc"
 #include      "task_c.inc"
 #include      "spmd_c.inc"
 #include      "mmale51_c.inc"
-#include      "alefvm.inc"
 #include      "inter22.inc"
 #include      "tabsiz_c.inc"
 C-----------------------------------------------
@@ -88,7 +84,7 @@ C-----------------------------------------------
       my_real
      .   FUNC(*), MASS(*) ,PM(NPROPM,NUMMAT), GEO(NPROPG,NUMGEO),
      .   EHOUR(*),ANIM(*), SPBUF(*),X(3,NUMNOD),V(3,NUMNOD), W(3,NUMNOD),BUFMAT(*)
-      my_real, INTENT(IN) :: FANI_CELL(SFANI_CELL)
+      TYPE(FANI_CELL_), INTENT(IN) :: FANI_CELL
       INTEGER IPARG(NPARG,*),EL2FA(*),IXS(NIXS,NUMELS),IFUNC,NBF,ISPH3D,
      .        NBPART,IADG(NSPMD,*),IPM(NPROPMI,NUMMAT),
      .        IPART(LIPART1,*),IPARTSP(*),BUF,IGEO(NPROPGI,NUMGEO)
@@ -96,6 +92,7 @@ C-----------------------------------------------
       TYPE (ELBUF_STRUCT_), DIMENSION(NGROUP), TARGET :: ELBUF_TAB
       TYPE(MULTI_FVM_STRUCT), INTENT(IN) :: MULTI_FVM
       TYPE(t_ale_connectivity), INTENT(IN) :: ALE_CONNECTIVITY
+      TYPE (MATPARAM_STRUCT_) ,DIMENSION(NUMMAT) ,INTENT(IN) :: MAT_PARAM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -108,7 +105,8 @@ C-----------------------------------------------
      .        PID, NPG_PLANE,NFAIL,NUMLAY,IJK,IIR,IOFF,IALEFVM_FLG,
      .        NERCVOIS(*),NESDVOIS(*),LERCVOIS(*),LESDVOIS(*),
      .        IDEB, IPOS, ITRIMAT,IVISC,JJ(6),IFRAC,IMAT,IADBUF,
-     .        NUPARAM,IDX,ISUBMAT,IU(4),NFRAC,IS_ALE,IS_EULER
+     .        NUPARAM,IDX,ISUBMAT,IU(4),NFRAC,IS_ALE,IS_EULER,
+     .        IMAT_TILLOTSON,NTILLOTSON,FAC,NVAREOS,IEOS
       my_real
      .   EVAR(MVSIZ), USER(MVSIZ),
      .   OFF, P, VONM2, VONM, S1, S2, S3, VALUE,VALUES(MVSIZ),GAMA(6),
@@ -120,6 +118,8 @@ C-----------------------------------------------
       TYPE(G_BUFEL_)  ,POINTER :: GBUF     
       TYPE(L_BUFEL_)  ,POINTER :: LBUF    
       TYPE(BUF_MAT_)  ,POINTER :: MBUF  
+      TYPE(BUF_EOS_)  ,POINTER :: EBUF
+      
       my_real, 
      .   DIMENSION(:),POINTER  :: 
      .   UVARF, DAMF,DFMAX,TDELE
@@ -145,7 +145,7 @@ C-----------------------------------------------
 
 C-----------------------------------------------
       DO 900 NG=1,NGROUP
-        CALL INITBUF (IPARG    ,NG      ,                    
+        CALL INITBUF(IPARG    ,NG      ,                    
      2          MLW     ,NEL     ,NFT     ,IAD     ,ITY     ,  
      3          NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,  
      4          JTHE    ,JLAG    ,JMULT   ,JHBE    ,JIVF    ,  
@@ -183,7 +183,7 @@ C-----------------------------------------------
             TSH_ORT = 0  
             IF (IGTYP==20 .OR. IGTYP==21 .OR. IGTYP==22) TSHELL = 1 
             IF (IGTYP==21 .OR. IGTYP==22) TSH_ORT = 1               
-	           PID=IXS(10,1 + NFT)
+                     PID=IXS(10,1 + NFT)
 c
             DO I=LFT,LLT
               EVAR(I) = ZERO   
@@ -305,14 +305,13 @@ C               VISCOSITE TURBULENTE
                 ENDDO                                               
 c-----------
               ELSEIF(IFUNC == 10)THEN
-C               VORTICITE-X
+C               VORTICITY-X
                 DO I=LFT,LLT     
-                  EVAR(I) = FANI_CELL(I+NFT)                 
+                  EVAR(I) = FANI_CELL%VORT_X(I+NFT)                 
                 ENDDO
 C
 c-----------
-              ELSEIF((IFUNC == 11.OR.IFUNC == 12.OR.IFUNC == 13)
-     .                                      .AND.MLW == 24)THEN
+              ELSEIF((IFUNC == 11.OR.IFUNC == 12.OR.IFUNC == 13) .AND.MLW == 24)THEN
 C                dam 1 2 3
                  DO I=LFT,LLT
                    EVAR(I) = LBUF%DAM(JJ(IFUNC-10) + I)
@@ -341,20 +340,22 @@ c                 USER VARIABLES per Gauss point from 1 to 5
                   IF (ISOLNOD == 8 .AND. MLW == 59) THEN ! exception for connect rupture   
                    !output = global damage variables of /fail/connect                      
                     MT = IXS(1,NFT+1)                                                      
-                    IRUPT = IPM(111,MT)                                                    
-                    NFAIL = ELBUF_TAB(NG)%BUFLY(1)%NFAIL                                   
-                    IF (IRUPT == 20) THEN                                                  
-                      NPTG = 4                                                             
-                      DO IR=1,NFAIL                                                        
-                        DO IPT = 1,NPTG                                                    
-                         UVARF =>                                                          
-     .                   ELBUF_TAB(NG)%BUFLY(1)%FAIL(IPT,1,1)%FLOC(IR)%VAR                 
-                         DO I=LFT,LLT                                                      
-                           USER(I) = MAX(USER(I),UVARF(IUS*NEL + I))                       
-                         ENDDO                                                             
+                    NFAIL = ELBUF_TAB(NG)%BUFLY(1)%NFAIL
+                    IF (NFAIL > 0) THEN                                 
+                      IRUPT = MAT_PARAM(MT)%FAIL(1)%IRUPT ! one failure model only ?!!                                              
+                      IF (IRUPT == 20) THEN                                                
+                        NPTG = 4                                                           
+                        DO IR=1,NFAIL                                                      
+                          DO IPT = 1,NPTG                                                  
+                           UVARF =>                                                        
+     .                     ELBUF_TAB(NG)%BUFLY(1)%FAIL(IPT,1,1)%FLOC(IR)%VAR               
+                           DO I=LFT,LLT                                                    
+                             USER(I) = MAX(USER(I),UVARF(IUS*NEL + I))                     
+                           ENDDO                                                           
+                          ENDDO                                                            
                         ENDDO                                                              
-                      ENDDO                                                                
-                    ENDIF                                                                  
+                      ENDIF                                                                
+                    ENDIF                                                                
                   ELSE                                                                     
                     DO IL=1,NLAY                                                           
                       DO IS=1,NPTS                                                         
@@ -419,20 +420,22 @@ C               IUS = (n-1)'th user variable in UVAR
                 IF (ISOLNOD == 8 .AND. MLW == 59) THEN                      
 c                 output = global damage variables of /fail/connect         
                   MT = IXS(1,NFT+1)                                         
-                  IRUPT = IPM(111,MT)                                       
-                  NFAIL = ELBUF_TAB(NG)%BUFLY(1)%NFAIL                      
-                  IF (IRUPT == 20) THEN                                     
-                    NPTG = 4                                                
-                    DO IR=1,NFAIL                                           
-                      DO IPT = 1,NPTG                                       
-                       UVARF =>                                             
-     .                 ELBUF_TAB(NG)%BUFLY(1)%FAIL(IPT,1,1)%FLOC(IR)%VAR    
-                       DO I=LFT,LLT                                         
-                         USER(I) = MAX(USER(I),UVARF(IUS*NEL + I))          
-                       ENDDO                                                
+                  NFAIL = ELBUF_TAB(NG)%BUFLY(1)%NFAIL
+                  IF (NFAIL > 0) THEN                    
+                    IRUPT = MAT_PARAM(MT)%FAIL(1)%IRUPT                                
+                    IF (IRUPT == 20) THEN                                   
+                      NPTG = 4                                              
+                      DO IR=1,NFAIL                                         
+                        DO IPT = 1,NPTG                                     
+                         UVARF =>                                           
+     .                   ELBUF_TAB(NG)%BUFLY(1)%FAIL(IPT,1,1)%FLOC(IR)%VAR  
+                         DO I=LFT,LLT                                       
+                           USER(I) = MAX(USER(I),UVARF(IUS*NEL + I))        
+                         ENDDO                                              
+                        ENDDO                                               
                       ENDDO                                                 
-                    ENDDO                                                   
-                  ENDIF                                                     
+                    ENDIF                                                   
+                  ENDIF                                                   
                 ELSE                                                        
                   DO IL=1,NLAY                                              
                     DO IS=1,NPTS                                            
@@ -527,7 +530,7 @@ C
                 IF (ISOLNOD == 16.OR.ISOLNOD == 20.OR.
      .             (ISOLNOD == 8.AND.JHBE == 14).OR.
      .             ((ISOLNOD == 6.OR.ISOLNOD == 8).AND.JHBE == 15))THEN
-		  IF (IUS <= NPTG) THEN      
+            IF (IUS <= NPTG) THEN      
                     DO IL=1,NLAY                                          
                       IF (ELBUF_TAB(NG)%BUFLY(IL)%L_PLA > 0) THEN
                         DO IS=1,NPTS                                        
@@ -542,7 +545,7 @@ C
                         ENDDO                                               
                       ENDIF                                        
                     ENDDO                                                 
-		  ENDIF                                              
+            ENDIF                                              
                 ENDIF
 c-----------
               ELSEIF (IFUNC == 282 .AND. MLW == 25) THEN
@@ -685,60 +688,62 @@ c--------------
                 IF (ISOLNOD == 8 .AND. MLW == 83) THEN 
 c                 output = damage variables of /fail/snconnect  
                   MT = IXS(1,NFT+1)
-                  IRUPT = IPM(111,MT)
-                  NFAIL = ELBUF_TAB(NG)%BUFLY(1)%NFAIL! ng= ngroup
-                  IF (IRUPT == 26) THEN 
-                   IF(IFUNC <= 890 ) THEN
-                    IUS = IFUNC - 888
-C                   IUS = (n-1)'th user variable IN DAM 
-                    NPTG = 4
-                    DO IR=1,NFAIL
-                      DO IPT = 1,NPTG
-                       DAMF => 
-     .                ELBUF_TAB(NG)%BUFLY(1)%FAIL(IPT,1,1)%FLOC(IR)%DAM
+                  NFAIL = ELBUF_TAB(NG)%BUFLY(1)%NFAIL
+                  IF (NFAIL > 0) THEN
+                    IRUPT = MAT_PARAM(MT)%FAIL(1)%IRUPT
+                    IF (IRUPT == 26) THEN 
+                     IF(IFUNC <= 890 ) THEN
+                      IUS = IFUNC - 888
+C                     IUS = (n-1)'th user variable IN DAM 
+                      NPTG = 4
+                      DO IR=1,NFAIL
+                        DO IPT = 1,NPTG
+                         DAMF => 
+     .                  ELBUF_TAB(NG)%BUFLY(1)%FAIL(IPT,1,1)%FLOC(IR)%DAM
+                         DO I=LFT,LLT                                 
+                           EVAR(I) = MAX(EVAR(I) ,DAMF(IUS*NEL + I))      
+                         ENDDO                                           
+                        ENDDO
+                      ENDDO
+                     ELSEIF(IFUNC <= 1890 )THEN !vdam1_ijk
+                      IJK = IFUNC - 890
+                      IIR = IJK/100
+                      IS = (MOD(IJK,100)-MOD(IJK,10))/10
+                      IT = MOD(IJK,10)
+                      DO IR=1,NFAIL
+                      DAMF => 
+     .                 ELBUF_TAB(NG)%BUFLY(1)%FAIL(IIR,1,1)%FLOC(IR)%DAM
                        DO I=LFT,LLT                                 
-                         EVAR(I) = MAX(EVAR(I) ,DAMF(IUS*NEL + I))      
+                        EVAR(I) = DAMF(I)   
                        ENDDO                                           
                       ENDDO
-                    ENDDO
-                   ELSEIF(IFUNC <= 1890 )THEN !vdam1_ijk
-                    IJK = IFUNC - 890
-                    IIR = IJK/100
-                    IS = (MOD(IJK,100)-MOD(IJK,10))/10
-                    IT = MOD(IJK,10)
-                    DO IR=1,NFAIL
-                    DAMF => 
-     .               ELBUF_TAB(NG)%BUFLY(1)%FAIL(IIR,1,1)%FLOC(IR)%DAM
-                     DO I=LFT,LLT                                 
-                      EVAR(I) = DAMF(I)   
-                     ENDDO                                           
-                    ENDDO
-                   ELSEIF(IFUNC <= 2890 )THEN !vdam2_ijk
-                    IJK = IFUNC - 1890
-                    IIR = IJK/100
-                    IS = (MOD(IJK,100)-MOD(IJK,10))/10
-                    IT = MOD(IJK,10)
-                    DO IR=1,NFAIL
-                     DAMF => 
-     .               ELBUF_TAB(NG)%BUFLY(1)%FAIL(IIR,1,1)%FLOC(IR)%DAM
-                     DO I=LFT,LLT                                 
-                      EVAR(I) = DAMF(NEL+I)            
-                     ENDDO                                           
-                    ENDDO
-                   ELSE !vdam3_ijk
-                    IJK = IFUNC - 2890
-                    IIR = IJK/100
-                    IS = (MOD(IJK,100)-MOD(IJK,10))/10
-                    IT = MOD(IJK,10)
-                    DO IR=1,NFAIL
-                     DAMF => 
-     .               ELBUF_TAB(NG)%BUFLY(1)%FAIL(IIR,1,1)%FLOC(IR)%DAM
-                     DO I=LFT,LLT                                 
-                      EVAR(I) = DAMF(2*NEL+I)                
-                     ENDDO                                           
-                    ENDDO
-                   ENDIF !IFUNC <= 890                       
-                  ENDIF !IRUPT
+                     ELSEIF(IFUNC <= 2890 )THEN !vdam2_ijk
+                      IJK = IFUNC - 1890
+                      IIR = IJK/100
+                      IS = (MOD(IJK,100)-MOD(IJK,10))/10
+                      IT = MOD(IJK,10)
+                      DO IR=1,NFAIL
+                       DAMF => 
+     .                 ELBUF_TAB(NG)%BUFLY(1)%FAIL(IIR,1,1)%FLOC(IR)%DAM
+                       DO I=LFT,LLT                                 
+                        EVAR(I) = DAMF(NEL+I)            
+                       ENDDO                                           
+                      ENDDO
+                     ELSE !vdam3_ijk
+                      IJK = IFUNC - 2890
+                      IIR = IJK/100
+                      IS = (MOD(IJK,100)-MOD(IJK,10))/10
+                      IT = MOD(IJK,10)
+                      DO IR=1,NFAIL
+                       DAMF => 
+     .                 ELBUF_TAB(NG)%BUFLY(1)%FAIL(IIR,1,1)%FLOC(IR)%DAM
+                       DO I=LFT,LLT                                 
+                        EVAR(I) = DAMF(2*NEL+I)                
+                       ENDDO                                           
+                      ENDDO
+                     ENDIF !IFUNC <= 890                       
+                    ENDIF !IRUPT
+                  ENDIF
                 ENDIF ! ISOLNOD == 8 .AND. MLW == 83
 c-----------
               ELSEIF (IFUNC >= 3891.AND.IFUNC <= 4889 )THEN
@@ -746,20 +751,20 @@ c-----------
                   EVAR(I) = ZERO                                      
                 ENDDO 
                 IJK = IFUNC - 3890
-				IF (TSHELL>0) THEN
+          IF (TSHELL>0) THEN
                   IIR = IJK/100
                   IL = (MOD(IJK,100)-MOD(IJK,10))/10
                   IS = MOD(IJK,10)
-				  IT =1
-				ELSE
+            IT =1
+          ELSE
                   IIR = IJK/100
                   IS = (MOD(IJK,100)-MOD(IJK,10))/10
                   IT = MOD(IJK,10)
-				  IL =1
-				END IF
+            IL =1
+          END IF
                 IUS = NLAY*IIR*IS*IT
                 DAMMAX = ZERO
-		         IF (IIR <= NPTR.AND.IS <= NPTS.AND.IT <= NPTT) THEN                            
+                   IF (IIR <= NPTR.AND.IS <= NPTS.AND.IT <= NPTT) THEN                            
                      NFAIL = ELBUF_TAB(NG)%BUFLY(IL)%NFAIL                          
                      DO IR=1,NFAIL                                                                                            
                         DFMAX=>
@@ -775,7 +780,7 @@ c-----------
                 ENDDO 
                 IJK = IFUNC - 3890
                 IF ((ISOLNOD == 6 .OR. ISOLNOD == 8).AND.JHBE == 15) THEN
-				  IL = MOD(ABS(IJK)/10,201)
+            IL = MOD(ABS(IJK)/10,201)
                   IIR = 1
                   IS = 1
                   IT = 1
@@ -786,9 +791,9 @@ c-----------
                   IL=MOD(ABS(IJK)/10,201)
                   IS=MOD(ABS(IJK),10)
                   IT = 1
-				END IF
+          END IF
                 DAMMAX = ZERO
-		         IF (IIR <= NPTR.AND.IS <= NPTS.AND.IT <= NPTT) THEN                            
+                   IF (IIR <= NPTR.AND.IS <= NPTS.AND.IT <= NPTT) THEN                            
                      NFAIL = ELBUF_TAB(NG)%BUFLY(IL)%NFAIL                          
                      DO IR=1,NFAIL                                                                                            
                         DFMAX=>
@@ -859,10 +864,10 @@ c-----------
                  IF(IALEL == 0)THEN
                    EVAR(LFT:LLT) = ZERO
                  ELSE
-                   CALL SCHLIEREN(
-     1                            EVAR    ,IXS    , X          , V      ,W,
+                   CALL OUTPUT_SCHLIEREN(
+     1                            EVAR    ,IXS    ,X           ,
      2                            IPARG   ,WA_L   ,ELBUF_TAB   ,ALE_CONNECTIVITY   ,GBUF%VOL,
-     3                            PM      ,NG     ,NIXS        ,ITY)
+     3                            NG      ,NIXS   ,ITY)
                  ENDIF          
 c-----------  
               ELSEIF(IFUNC == 4893) THEN  
@@ -1231,7 +1236,7 @@ c-----------
 !                          IAD0     = (I-1)*3                                                                         
                           EVAR(I) = SQRT ( GBUF%MOM(JJ(1)+I)*GBUF%MOM(JJ(1)+I)+ 
      +                                     GBUF%MOM(JJ(2)+I)*GBUF%MOM(JJ(2)+I)+
-     +                                     GBUF%MOM(JJ(3)+I)*GBUF%MOM(JJ(3)+I) )					       
+     +                                     GBUF%MOM(JJ(3)+I)*GBUF%MOM(JJ(3)+I) )                 
                         ENDDO 
                       ENDIF    
                     ENDIF                                                                                    
@@ -1272,7 +1277,7 @@ c-----------
 !                          IAD0     = (I-1)*3                                                                         
                           EVAR(I) = SQRT ( GBUF%MOM(JJ(1)+I)*GBUF%MOM(JJ(1)+I)+ 
      +                                     GBUF%MOM(JJ(2)+I)*GBUF%MOM(JJ(2)+I)+
-     +                                     GBUF%MOM(JJ(3)+I)*GBUF%MOM(JJ(3)+I) )       / GBUF%RHO(I)						
+     +                                     GBUF%MOM(JJ(3)+I)*GBUF%MOM(JJ(3)+I) )       / GBUF%RHO(I)
                         ENDDO 
                       ENDIF    
                     ENDIF                                                                                    
@@ -1289,32 +1294,32 @@ c-----------
                       IF(IFUNC>=4952 .AND. IFUNC<=4954)THEN                                                                 
                         DO I=LFT,LLT 
                           II      = I+NFT                                                                          
-                          EVAR(I) =       FINT_CELL(IFUNC-4951,II)                                              
+                          EVAR(I) = ALEFVM_Buffer%FINT_CELL(IFUNC-4951,II)                                              
                         ENDDO 
                       ELSEIF(IFUNC==4955)THEN
                         DO I=LFT,LLT  
                           II      = I+NFT                                                                                                                                                                        
-                          EVAR(I) = SQRT (  FINT_CELL(1,II)* FINT_CELL(1,II)+ 
-     +                                      FINT_CELL(2,II)* FINT_CELL(2,II) )                                 
+                          EVAR(I) = SQRT (  ALEFVM_Buffer%FINT_CELL(1,II)* ALEFVM_Buffer%FINT_CELL(1,II)+ 
+     +                                      ALEFVM_Buffer%FINT_CELL(2,II)* ALEFVM_Buffer%FINT_CELL(2,II) )                                 
                         ENDDO 
                       ELSEIF(IFUNC==4956)THEN
                         DO I=LFT,LLT   
                           II      = I+NFT                                                                                                                                      
-                          EVAR(I) = SQRT ( FINT_CELL(2,II)* FINT_CELL(2,II)+ 
-     +                                     FINT_CELL(3,II)* FINT_CELL(3,II) )                                
+                          EVAR(I) = SQRT ( ALEFVM_Buffer%FINT_CELL(2,II)* ALEFVM_Buffer%FINT_CELL(2,II)+ 
+     +                                     ALEFVM_Buffer%FINT_CELL(3,II)* ALEFVM_Buffer%FINT_CELL(3,II) )                                
                         ENDDO 
                       ELSEIF(IFUNC==4957)THEN
                         DO I=LFT,LLT                                                                
                           II      = I+NFT                                         
-                          EVAR(I) = SQRT ( FINT_CELL(1,II)* FINT_CELL(1,II)+ 
-     +                                     FINT_CELL(3,II)* FINT_CELL(3,II) )                                
+                          EVAR(I) = SQRT ( ALEFVM_Buffer%FINT_CELL(1,II)* ALEFVM_Buffer%FINT_CELL(1,II)+ 
+     +                                     ALEFVM_Buffer%FINT_CELL(3,II)* ALEFVM_Buffer%FINT_CELL(3,II) )                                
                         ENDDO 
                       ELSEIF(IFUNC==4958)THEN
                         DO I=LFT,LLT  
                           II      = I+NFT                                         
-                          EVAR(I) = SQRT ( FINT_CELL(1,II)* FINT_CELL(1,II)+ 
-     +                                     FINT_CELL(2,II)* FINT_CELL(2,II)+ 
-     +                                     FINT_CELL(3,II)* FINT_CELL(3,II) )                             
+                          EVAR(I) = SQRT ( ALEFVM_Buffer%FINT_CELL(1,II)* ALEFVM_Buffer%FINT_CELL(1,II)+ 
+     +                                     ALEFVM_Buffer%FINT_CELL(2,II)* ALEFVM_Buffer%FINT_CELL(2,II)+ 
+     +                                     ALEFVM_Buffer%FINT_CELL(3,II)* ALEFVM_Buffer%FINT_CELL(3,II) )                             
                         ENDDO 
                       ENDIF    
                     ENDIF                                                                                    
@@ -1330,17 +1335,15 @@ c-----------
                 ENDIF  
 c-----------
               ELSEIF(IFUNC == 4960)THEN
-                !VORTICITE-Y
-                IDX = ANIM_SE(10)*NUMELS 
+                !VORTICITY-Y
                 DO I=LFT,LLT
-                  EVAR(I) = FANI_CELL(IDX+I+NFT)                 
+                  EVAR(I) = FANI_CELL%VORT_Y(I+NFT)                 
                 ENDDO     
 c-----------
               ELSEIF(IFUNC == 4961)THEN
-                !VORTICITE-Z
-                IDX = (ANIM_SE(10)+ANIM_SE(4960))*NUMELS 
+                !VORTICITY-Z
                 DO I=LFT,LLT
-                  EVAR(I) = FANI_CELL(IDX+I+NFT)                 
+                  EVAR(I) = FANI_CELL%VORT_Z(I+NFT)                 
                 ENDDO   
 c-----------
               ELSEIF(IFUNC == 4962)THEN
@@ -1409,7 +1412,7 @@ c-----------Mach Number
                       VEL(0) = SQRT(VEL(1)*VEL(1)+VEL(2)*VEL(2)+VEL(3)*VEL(3))                            
                       EVAR(I) = VEL(0)/MULTI_FVM%SOUND_SPEED(I + NFT)                                    
                    ENDDO                                                                                  
-                ELSEIF(I_ALE_SOLVER>1)THEN                                                                  
+                ELSEIF(ALEFVM_Param%ISOLVER>1)THEN                                                                  
                      L = ELBUF_TAB(NG)%BUFLY(1)%L_SSP                                                     
                      IF(ELBUF_TAB(NG)%BUFLY(1)%L_SSP /= 0)THEN                                          
                         LBUF => ELBUF_TAB(NG)%BUFLY(1)%LBUF(1,1,1)                                        
@@ -1421,8 +1424,7 @@ c-----------Mach Number
                            EVAR(I) = VEL(0)/LBUF%SSP(I)                                                  
                         ENDDO                                                                             
                      ENDIF                                                                                
-                ELSE  
-                  L = ELBUF_TAB(NG)%BUFLY(1)%L_SSP                                                     
+                ELSE
                   IF(ELBUF_TAB(NG)%BUFLY(1)%L_SSP /= 0)THEN                                          
                     LBUF => ELBUF_TAB(NG)%BUFLY(1)%LBUF(1,1,1)                     
                     IF(IS_ALE /= 0)THEN
@@ -1604,7 +1606,59 @@ C
                       ENDIF                                        
                     ENDDO                                                 
                   ENDIF                                              
-                ENDIF         
+                ENDIF  
+
+c------------------------------------ Tillotson Region id
+            ELSEIF( IFUNC == 5172 ) THEN
+              DO I=LFT,LLT
+                EVAR(I) = ZERO
+              ENDDO 
+              MT = IXS(1,NFT+1)
+              IF (MLW == 151) THEN 
+                NLAY = ELBUF_TAB(NG)%NLAY 
+                !count number of submaterial based on /EOS/TILLOTSON (IEOS=3)            
+                NTILLOTSON = 0 
+                DO IMAT=1,NLAY
+                  IEOS =  IPM(4, IPM(20 + IMAT,MT) )
+                  IF(IEOS == 3)THEN 
+                    NTILLOTSON = NTILLOTSON + 1 
+                    IMAT_TILLOTSON = IMAT 
+                  ENDIF 
+                ENDDO 
+                !several Tillotson EoS   Value= sum ( Region_i*10**(i-1),  i=1,imat)       
+                IF(NTILLOTSON > 1)THEN 
+                  FAC=ONE
+                  DO IMAT=1,NLAY
+                    IEOS =  IPM(4,    IPM(20 + IMAT,MT) )
+                    IF(IEOS == 3)THEN 
+                      EBUF => ELBUF_TAB(NG)%BUFLY(IMAT)%EOS(1,1,1) 
+                      NVAREOS = ELBUF_TAB(NG)%BUFLY(IMAT)%NVAR_EOS
+                      DO I=1,NEL
+                        EVAR(I) = EVAR(I) + EBUF%VAR(I) * FAC
+                      ENDDO 
+                    ENDIF 
+                    FAC=FAC*TEN 
+                  ENDDO 
+                !single Tillotson EoS   Value=  Region_i                                 
+                ELSEIF(NTILLOTSON == 1)THEN
+                      EBUF => ELBUF_TAB(NG)%BUFLY(IMAT_TILLOTSON)%EOS(1,1,1)
+                      NVAREOS = ELBUF_TAB(NG)%BUFLY(IMAT_TILLOTSON)%NVAR_EOS 
+                      DO I=1,NEL
+                        EVAR(I) = EBUF%VAR(I)
+                      ENDDO 
+                ENDIF 
+              ELSE 
+                !monomaterial law                                                        
+                IEOS = IPM(4,MT)
+                IF(IEOS == 3)THEN
+                  EBUF => ELBUF_TAB(NG)%BUFLY(1)%EOS(1,1,1)                              
+                  NVAREOS = ELBUF_TAB(NG)%BUFLY(1)%NVAR_EOS                              
+                  DO  I=1,NEL
+                    EVAR(I) = EBUF%VAR(I)
+                  ENDDO
+                ENDIF
+              ENDIF
+                       
 c------------------------------------ 
               !OTHER IFUNC VALUES
               ELSE 
@@ -1843,12 +1897,12 @@ C-----------
               ELSEIF(IFUNC == 3890) THEN
 
                   NFAIL = ELBUF_TAB(NG)%BUFLY(1)%NFAIL  
-                  DO IR=1,NFAIL 											   
+                  DO IR=1,NFAIL                          
                     DFMAX=>
      .                ELBUF_TAB(NG)%BUFLY(1)%FAIL(1,1,1)%FLOC(IR)%DAMMX
                     DO I=LFT,LLT   
-                  	N = I + NFT				 
-                  	FUNC(EL2FA(NN3+N)) = DFMAX(I)    
+          N = I + NFT         
+          FUNC(EL2FA(NN3+N)) = DFMAX(I)    
                     ENDDO
                   ENDDO   
 C-----------        

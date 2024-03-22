@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  SPGRTAILS                     source/elements/sph/spgrtails.F
 Chd|-- called by -----------
@@ -30,31 +30,26 @@ Chd|        FRETITL2                      source/starter/freform.F
 Chd|        MY_ORDERS                     ../common_source/tools/sort/my_orders.c
 Chd|        ZEROIN                        source/system/zeroin.F        
 Chd|        GET_U_GEO                     source/user_interface/uaccess.F
+Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        R2R_MOD                       share/modules1/r2r_mod.F      
 Chd|====================================================================
       SUBROUTINE SPGRTAILS(KXSP   , IPARG , PM  ,IPART ,
      2                     IPARTSP, EADD,   ND  , CEPSP, DD_IAD,
-     3                     IDX,     LB_MAX,   IXSP, IPM  , IGEO,
+     3                     IDX,   IXSP, IPM  , IGEO,
      4                     SPBUF,SPH2SOL,SOL2SPH,
-     5                     IRST   , NOD2SP )
+     5                     IRST   , NOD2SP ,PRINT_FLAG,MAT_PARAM )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE MOD_SPGRHEAD
       USE MESSAGE_MOD
       USE R2R_MOD
+      USE MATPARAM_DEF_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -63,21 +58,21 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "sphcom.inc"
 #include      "units_c.inc"
-#include      "warn_c.inc"
 #include      "param_c.inc"
 #include      "scr17_c.inc"
 #include      "r2r_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER IDX, LB_MAX, ND,
+      INTEGER IDX,ND,
      .        KXSP(NISP,*),IPARG(NPARG,*),DD_IAD(NSPMD+1,*),EADD(*),
      .        IPART(LIPART1,*),IPARTSP(*),CEPSP(*),IXSP(KVOISPH,NUMSPH),
      .        IPM(NPROPMI,*), IGEO(NPROPGI,*),
      .        SPH2SOL(*), SOL2SPH(2,*), IRST(3,*), NOD2SP(*)
-C     REAL
+      INTEGER, INTENT(IN) :: PRINT_FLAG !< flag to print the element group data
       my_real
      .        PM(NPROPM,*), SPBUF(NSPBUF,NUMSPH)
+      TYPE(MATPARAM_STRUCT_) ,DIMENSION(NUMMAT), INTENT(IN) :: MAT_PARAM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -85,7 +80,7 @@ C-----------------------------------------------
      .        N, IGTYP,JIVF,JHBE,IJK,NE1,
      .        ISSN,IKSNOD,IORDER,IPRT,ISLEEP,IEOS,NEL_PREC,IUN,IG,IFAIL, 
      .        WORK(70000),INUM(13,NUMSPH),INDEX(2*NUMSPH),
-     .        NGP(NSPMD+1),K,J,II, MX, NUMBER_FAILURE, IR, IP, STAT,
+     .        NGP(NSPMD+1),K,J,II, MX, NFAIL, IR, IP, STAT,
      .        IPARTR2R, NOD, JALE_FROM_MAT, JALE_FROM_PROP
 C     REAL
       my_real
@@ -94,7 +89,6 @@ C     REAL
       CHARACTER*nchartitle,
      .   TITR
       DATA IUN/1/
-      INTEGER, DIMENSION(:), ALLOCATABLE :: MINDEXSPH2
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
@@ -167,11 +161,11 @@ c retri spbuf
           KXSP(8,I+NFT)=INUM(9,INDEX(I))
 
 c tri SPBUF
- 	  DO K=1,NSPBUF
-           SPBUF(K,I+NFT)=RNUM(K,INDEX(I))
+          DO K=1,NSPBUF
+            SPBUF(K,I+NFT)=RNUM(K,INDEX(I))
           END DO
-
         END DO
+
         DO I = 1, NEL
           DO J = 1, KVOISPH
             IXSP(J,I+NFT) = IXSPS(J,INDEX(I))
@@ -287,6 +281,7 @@ C ngroup global
           NGROUP=NGROUP+1
           II = EADD(N)+NFT
           IPRT  =IPARTSP(II)
+          IPARTR2R = 0
           IF (NSUBDOM>0) IPARTR2R = TAG_PART(IPRT)          
           MT    =IPART(1,IPRT)
           MLN   =NINT(PM(19,ABS(MT)))
@@ -295,7 +290,7 @@ C ngroup global
           ISORTH= MAX(IGEO(17,IG),MIN(IUN,IGEO(2,IG)))
           ISRAT = IPM(3,MT)
           IEOS  = IPM(4,MT)
-          IORDER=GET_U_GEO(5,IG)
+          IORDER=INT(GET_U_GEO(5,IG))
           ISLEEP=KXSP(2,II)
           
           JALE_FROM_MAT = NINT(PM(72,MT))
@@ -331,19 +326,15 @@ C           IERR=IERR+1
 C     full geometric non linearities.
           NE1 = MIN( NVSIZ, NEL + NEL_PREC - NFT)
           IFAIL = 0
-          IF(IPM(111,MT) > 0)THEN
-           IFAIL = 1
-          ENDIF
+          IF (MAT_PARAM(MT)%NFAIL > 0) IFAIL = 1
 C-------------------------------------------------          
-          IF((MLN/=14).AND.(MLN/=24).AND.(MLN/=25).AND.
-     .       (MLN<28))THEN
-            NUMBER_FAILURE = IPM(220, MT)
+          IF(MLN/=14 .AND. MLN/=24 .AND. MLN/=25 .AND. MLN<28) THEN
+            NFAIL = MAT_PARAM(MT)%NFAIL
             DO IJK = 1, NE1
               II = EADD(N)+NFT-1+IJK
               MX = IPART(1,IPARTSP(II))
-              DO IR = 1,NUMBER_FAILURE 
-                IP=(IR -1)*15
-                IF(IPM(111 + IP,MX)==10) THEN
+              DO IR = 1,NFAIL 
+                IF (MAT_PARAM(MX)%FAIL(IR)%IRUPT == 10) THEN
                   ISTRAIN=1
                   GO TO 100
                 END IF
@@ -421,24 +412,24 @@ C
       NSPGROUP = NSPGROUP + ND
 C
       ! rebuild NOD2SP after KXSP renumerotation
-      NOD2SP(1:NUMNOD) = ZERO
+      NOD2SP(1:NUMNOD) = 0
       DO I = 1, NUMSPH
         NOD = KXSP(3,I)
         NOD2SP(NOD) = I
       END DO 
 C
-      WRITE(IOUT,1000)
-      WRITE(IOUT,1001)(N,IPARG(1,N),IPARG(2,N),IPARG(3,N)+1,
+      IF(PRINT_FLAG>6) THEN
+          WRITE(IOUT,1000)
+          WRITE(IOUT,1001)(N,IPARG(1,N),IPARG(2,N),IPARG(3,N)+1,
      +                   IPARG(4,N),IPARG(5,N),IPARG(55,N),
      +                 N=NGR1,NGROUP)
-c      WRITE(IOUT,1002) LBUFEL
+      ENDIF
 C
  1000 FORMAT(10X,' 3D - SPH CELL GROUPS '/
      +       10X,' -------------------- '/
      +' GROUP   CELL       CELL      FIRST    BUFFER   CELL     IEOS'/
      +'         MATERIAL   NUMBER    CELL     ADDRESS  TYPE     TYPE'/)
  1001 FORMAT(7(1X,I7,1X))
- 1002 FORMAT(' BUFFER LENGTH : ',I10 )
 C-----------
       DEALLOCATE(IXSPS)
 C-----------

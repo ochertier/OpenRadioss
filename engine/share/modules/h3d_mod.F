@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  H3D_MOD                       share/modules/h3d_mod.F       
 Chd|-- called by -----------
@@ -70,9 +70,11 @@ Chd|        FORANI3                       source/output/anim/generate/forani3.F
 Chd|        FORCE                         source/loads/general/force.F  
 Chd|        FORCEFINGEO                   source/loads/general/forcefingeo.F
 Chd|        FORCEPINCH                    source/loads/general/forcepinch.F
+Chd|        FORCE_IMP                     source/loads/general/force_imp.F
 Chd|        FORINT                        source/elements/forint.F      
 Chd|        FREFORM                       source/input/freform.F        
 Chd|        FVBAG0                        source/airbag/fvbag0.F        
+Chd|        FVBAG1                        source/airbag/fvbag1.F        
 Chd|        FVBAG2                        source/airbag/fvbag2.F        
 Chd|        GENANI                        source/output/anim/generate/genani.F
 Chd|        GENH3D                        source/output/h3d/h3d_results/genh3d.F
@@ -174,6 +176,7 @@ Chd|        I2FOR3P                       source/interfaces/interf/i2for3p.F
 Chd|        I2FOR3PN                      source/interfaces/interf/i2for3p.F
 Chd|        I2FOR3PO                      source/interfaces/interf/i2for3p.F
 Chd|        I2FORCES                      source/interfaces/interf/i2forces.F
+Chd|        I2FORCES_2D                   source/interfaces/interf/i2forces_2D.F
 Chd|        I2MOM27P_CIN                  source/interfaces/interf/i2mom27p_cin.F
 Chd|        I2MOM27_CIN                   source/interfaces/interf/i2mom27_cin.F
 Chd|        I2MOM3N                       source/interfaces/interf/i2for3.F
@@ -227,7 +230,7 @@ Chd|        LECTUR                        source/input/lectur.F
 Chd|        LOAD_PRESSURE                 source/loads/general/load_pressure/load_pressure.F
 Chd|        MANCTR                        source/input/manctr.F         
 Chd|        MONVOL0                       source/airbag/monvol0.F       
-Chd|        NEED_FOR_REACTIONS            source/output/reactions.F     
+Chd|        MULTI_ALLOCATE                source/multifluid/multi_allocate.F
 Chd|        PBILAN                        source/elements/beam/pbilan.F 
 Chd|        PBLAST                        source/loads/pblast/pblast.F  
 Chd|        PBLAST_1                      source/loads/pblast/pblast_1.F
@@ -235,6 +238,7 @@ Chd|        PBLAST_2                      source/loads/pblast/pblast_2.F
 Chd|        PBLAST_3                      source/loads/pblast/pblast_3.F
 Chd|        PFLUID                        source/loads/general/pfluid/pfluid.F
 Chd|        PFORC3                        source/elements/beam/pforc3.F 
+Chd|        PRESSURE_CYL                  source/loads/general/load_pcyl/pressure_cyl.F
 Chd|        R1TORS                        source/elements/spring/r1tors.F
 Chd|        R23FORC3                      source/elements/spring/r23forc3.F
 Chd|        R23LAW108                     source/elements/spring/r23law108.F
@@ -249,6 +253,7 @@ Chd|        RBE3T1                        source/constraints/general/rbe3/rbe3f.
 Chd|        RDCOMI                        source/output/restart/rdcomm.F
 Chd|        RDRESA                        source/output/restart/rdresa.F
 Chd|        RDRESB                        source/output/restart/rdresb.F
+Chd|        REACTION_FORCES_CHECK_FOR_REQUESTED_OUTPUTsource/output/reactions.F     
 Chd|        REALLOCATE_FI2                source/mpi/interfaces/spmd_i25slide.F
 Chd|        RESOL                         source/engine/resol.F         
 Chd|        RESOL_HEAD                    source/engine/resol_head.F    
@@ -261,6 +266,13 @@ Chd|        SORTIE_MAIN                   source/output/sortie_main.F
 Chd|        SPMD_EXCH2_A_PON              source/mpi/forces/spmd_exch2_a_pon.F
 Chd|        SPMD_EXCH_A                   source/mpi/forces/spmd_exch_a.F
 Chd|        SPMD_EXCH_A_AMS_POFF          source/mpi/forces/spmd_exch_a_ams_poff.F
+Chd|        SPMD_EXCH_A_INT2              source/mpi/forces/spmd_exch_a_int2.F
+Chd|        SPMD_EXCH_A_INT2H             source/mpi/forces/spmd_exch_a_int2h.F
+Chd|        SPMD_EXCH_A_INT2H_AMS         source/mpi/forces/spmd_exch_a_int2h_ams.F
+Chd|        SPMD_EXCH_A_INT2_AMS          source/mpi/forces/spmd_exch_a_int2_ams.F
+Chd|        SPMD_EXCH_A_INT2_PON          source/mpi/forces/spmd_exch_a_int2_pon.F
+Chd|        SPMD_EXCH_EFRIC               source/mpi/interfaces/spmd_exch_efric.F
+Chd|        SPMD_EXCH_SORTING_EFRIC       source/mpi/interfaces/spmd_exch_sorting_efric.F
 Chd|        SPMD_FIADD11_POFF             source/mpi/interfaces/spmd_i7tool.F
 Chd|        SPMD_FIADD11_PON              source/mpi/interfaces/spmd_i7tool.F
 Chd|        SPMD_FIADD17_POFF             source/mpi/interfaces/spmd_i7tool.F
@@ -283,8 +295,10 @@ Chd|        SPMD_TRI20GAT                 source/mpi/interfaces/spmd_i7crit.F
 Chd|        SPMD_TRI24GAT                 source/mpi/interfaces/spmd_int.F
 Chd|        SPMD_TRI25GAT                 source/mpi/interfaces/spmd_tri25gat.F
 Chd|        SPMD_TRI7GAT                  source/mpi/interfaces/spmd_int.F
+Chd|        STOP_SENSOR                   source/tools/sensor/stop_sensor.F
 Chd|        TBILAN                        source/elements/truss/tbilan.F
 Chd|        TFORC3                        source/elements/truss/tforc3.F
+Chd|        TMAX_IPART                    source/output/tmax_ipart.F    
 Chd|        VOLPRE                        source/airbag/volpres.F       
 Chd|        VOLPREP                       source/airbag/volpresp.F      
 Chd|        WRCOMI                        source/output/restart/wrcomm.F
@@ -303,16 +317,16 @@ C-----------------------------------------------
 C   H3D_KEYWORD : LIST OF AVAILABLE /H3D OPTIONS
 C-----------------------------------------------
       TYPE H3D_KEYWORD
-          CHARACTER KEY3*100
-          CHARACTER KEY4*100
-          CHARACTER KEY5*100
-          CHARACTER KEY6*100
-          CHARACTER KEY7*100
-          CHARACTER KEY8*100
+          CHARACTER(LEN=100) ::  KEY3 = ''
+          CHARACTER(LEN=100) ::  KEY4 = ''
+          CHARACTER(LEN=100) ::  KEY5 = ''
+          CHARACTER(LEN=100) ::  KEY6 = ''
+          CHARACTER(LEN=100) ::  KEY7 = ''
+          CHARACTER(LEN=100) ::  KEY8 = ''
           INTEGER ::  ID = 0 
-          CHARACTER*50  TEXT1
-          CHARACTER*50  TEXT2
-          CHARACTER*80  COMMENT
+          CHARACTER(LEN=50) ::   TEXT1 = ''
+          CHARACTER(LEN=50) ::   TEXT2 = ''
+          CHARACTER(LEN=80) ::   COMMENT = ''
 c
           INTEGER ::  IS_PLY = 0 
           INTEGER ::  IS_PLY_ALL = 0 
@@ -345,21 +359,21 @@ C-----------------------------------------------
 C   H3D_INPUT_LIST : LIST OF /H3D KEYWORDS READ IN 1.rad
 C-----------------------------------------------
       TYPE H3D_INPUT
-          CHARACTER KEY2*20
-          CHARACTER KEY3*20
-          CHARACTER KEY4*20
-          CHARACTER KEY5*20
-          CHARACTER KEY6*20
-          CHARACTER KEY7*20
-          CHARACTER KEY8*20
-          INTEGER NB_PART
+          CHARACTER(LEN=20) :: KEY2 = ''
+          CHARACTER(LEN=20) ::  KEY3 = ''
+          CHARACTER(LEN=20) ::  KEY4 = ''
+          CHARACTER(LEN=20) ::  KEY5 = ''
+          CHARACTER(LEN=20) ::  KEY6 = ''
+          CHARACTER(LEN=20) ::  KEY7 = ''
+          CHARACTER(LEN=20) ::  KEY8 = ''
+          INTEGER ::  NB_PART=0
           INTEGER, DIMENSION(:), ALLOCATABLE :: PART_LIST
       END TYPE H3D_INPUT
 C-----------------------------------------------
 C   H3D_PARTS : LIST OF OUTPUTTED PARTS
 C-----------------------------------------------
       TYPE H3D_PART_LIST
-          INTEGER NB_PART
+          INTEGER :: NB_PART=0
           INTEGER, DIMENSION(:), ALLOCATABLE :: PART_LIST
           INTEGER, DIMENSION(:), ALLOCATABLE :: NODES
           INTEGER, DIMENSION(:), ALLOCATABLE :: PART
@@ -368,47 +382,47 @@ C-----------------------------------------------
 C   H3D_OUTPUT_LIST : OUTPUT DATABASE
 C-----------------------------------------------
       TYPE H3D_OUTPUT
-          INTEGER ID
-          INTEGER OK
-          INTEGER N_OUTP
-          CHARACTER KEYWORD*100
-          INTEGER ETYPE
-          INTEGER OUTP_TYPE
-          INTEGER IS_INFO1
-          INTEGER INFO1
-          INTEGER IS_INFO2
-          INTEGER INFO2
-          INTEGER PLY
-          INTEGER LAYER
-          INTEGER LAYER_UPPER
-          INTEGER LAYER_LOWER
-          INTEGER LAYER_MEMB
-          INTEGER LAYER_BEND
-          INTEGER IPT
-          INTEGER IS_IPT_UPPER
-          INTEGER IS_IPT_LOWER
-          INTEGER IS_IPT_MEMB
-          INTEGER IS_IPT_BEND
-          INTEGER IUVAR
-          INTEGER IMDSVAR
-          INTEGER IDMDS
-          INTEGER IDMATMDS
-          CHARACTER*64  MDSVAR_NAME
-          INTEGER SMDSVAR_NAME
-          INTEGER GAUSS
-          INTEGER IR
-          INTEGER IS
-          INTEGER IT
-          INTEGER OBJECT_ID
-          INTEGER IS_CORNER_DATA
-          CHARACTER*80  STRING1
-          INTEGER  S_STRING1
-          CHARACTER*80  STRING2
-          INTEGER  S_STRING2
-          CHARACTER*120  COMMENT
-          INTEGER  S_COMMENT
-          INTEGER N_H3D_PART_LIST
-          INTEGER INTER
+          INTEGER ::  ID = 0
+          INTEGER ::  OK = 0
+          INTEGER ::  N_OUTP = 0
+          CHARACTER(LEN=100) :: KEYWORD = ''
+          INTEGER ::  ETYPE = 0
+          INTEGER ::  OUTP_TYPE = 0
+          INTEGER ::  IS_INFO1 = 0
+          INTEGER ::  INFO1 = 0
+          INTEGER ::  IS_INFO2 = 0
+          INTEGER ::  INFO2 = 0
+          INTEGER ::  PLY = 0
+          INTEGER ::  LAYER = 0
+          INTEGER ::  LAYER_UPPER = 0
+          INTEGER ::  LAYER_LOWER = 0
+          INTEGER ::  LAYER_MEMB = 0
+          INTEGER ::  LAYER_BEND = 0
+          INTEGER ::  IPT = 0
+          INTEGER ::  IS_IPT_UPPER = 0
+          INTEGER ::  IS_IPT_LOWER = 0
+          INTEGER ::  IS_IPT_MEMB = 0
+          INTEGER ::  IS_IPT_BEND = 0
+          INTEGER ::  IUVAR = 0
+          INTEGER ::  IMDSVAR = 0
+          INTEGER ::  IDMDS = 0
+          INTEGER ::  IDMATMDS = 0
+          CHARACTER(LEN=64) ::  MDSVAR_NAME = ''
+          INTEGER ::  SMDSVAR_NAME = 0
+          INTEGER ::  GAUSS = 0
+          INTEGER ::  IR = 0
+          INTEGER ::  IS = 0
+          INTEGER ::  IT = 0
+          INTEGER ::  OBJECT_ID = 0
+          INTEGER ::  IS_CORNER_DATA = 0
+          CHARACTER(LEN=80) ::  STRING1 = ''
+          INTEGER ::   S_STRING1 = 0
+          CHARACTER(LEN=80) ::  STRING2 = ''
+          INTEGER ::   S_STRING2 = 0
+          CHARACTER(LEN=120) ::  COMMENT = ''
+          INTEGER ::   S_COMMENT = 0
+          INTEGER ::  N_H3D_PART_LIST = 0
+          INTEGER ::  INTER = 0
           INTEGER, DIMENSION(:), ALLOCATABLE :: PART_LIST
           INTEGER, DIMENSION(:), ALLOCATABLE :: PART
       END TYPE H3D_OUTPUT
@@ -418,63 +432,77 @@ C-----------------------------------------------
       TYPE H3D_DATABASE
 
           
-        INTEGER N_TITLE
-        INTEGER N_SENS_H3D
-        INTEGER N_OUTP_H3D
-        INTEGER IH3D
-        INTEGER IH3D_RUN
-        INTEGER N_INPUT_H3D
-        INTEGER IPART_SELECT
-        INTEGER MH3D
+        INTEGER ::  N_TITLE = 0
+        INTEGER ::  N_SENS_H3D = 0
+        INTEGER ::  N_OUTP_H3D = 0
+        INTEGER ::  IH3D = 0
+        INTEGER ::  IH3D_RUN = 0
+        INTEGER ::  N_INPUT_H3D = 0
+        INTEGER ::  IPART_SELECT = 0
+        INTEGER ::  MH3D = 0
 
-        INTEGER N_SCAL_DT               !ANIM_N(1)
-        INTEGER N_SCAL_DMAS             !ANIM_N(2)
-        INTEGER N_SCAL_DINER            !ANIM_N(12)
-        INTEGER N_SCAL_DAMA2            !ANIM_N(15&16)
-        INTEGER N_SCAL_SKID               
-        INTEGER N_SCAL_STIFR            !ANIM_N(18)
-        INTEGER N_SCAL_STIFN            !ANIM_N(19)
+        INTEGER ::  N_SCAL_DT = 0               !ANIM_N(1)
+        INTEGER ::  N_SCAL_DMAS   = 0           !ANIM_N(2)
+        INTEGER ::  N_SCAL_DINER = 0            !ANIM_N(12)
+        INTEGER ::  N_SCAL_DAMA2 = 0            !ANIM_N(15&16)
+        INTEGER ::  N_SCAL_SKID = 0               
+        INTEGER ::  N_SCAL_STIFR = 0            !ANIM_N(18)
+        INTEGER ::  N_SCAL_STIFN = 0            !ANIM_N(19)
+        INTEGER ::  N_SCAL_CSE_FRIC = 0      
+        INTEGER ::  N_SCAL_CSE_FRICINT = 0          
 
-        INTEGER N_VECT_CONT             !ANIM_V(4)
-        INTEGER N_VECT_FINT             !ANIM_V(5)
-        INTEGER N_VECT_FEXT             !ANIM_V(6)
-        INTEGER N_VECT_PCONT            !ANIM_V(12)
-        INTEGER N_VECT_CONT2            !ANIM_V(13)
-        INTEGER N_VECT_DROT             !ANIM_V(14)
-        INTEGER N_VECT_DXANC            !ANIM_V(15)
-        INTEGER N_VECT_FREAC            !ANIM_V(17)
-        INTEGER N_VECT_MREAC            !ANIM_V(18)
-        INTEGER N_VECT_CLUST_FORCE      !ANIM_V(19)
-        INTEGER N_VECT_CLUST_MOM        !ANIM_V(20)
-        INTEGER N_VECT_CONT_MAX         !ANIM_V(26)
-        INTEGER N_VECT_PCONT2           !ANIM_V(27)
+        INTEGER ::  N_VECT_CONT = 0             !ANIM_V(4)
+        INTEGER ::  N_VECT_FINT = 0             !ANIM_V(5)
+        INTEGER ::  N_VECT_FEXT = 0             !ANIM_V(6)
+        INTEGER ::  N_VECT_PCONT = 0            !ANIM_V(12)
+        INTEGER ::  N_VECT_CONT2 = 0            !ANIM_V(13)
+        INTEGER ::  N_VECT_DROT = 0             !ANIM_V(14)
+        INTEGER ::  N_VECT_DXANC  = 0           !ANIM_V(15)
+        INTEGER ::  N_VECT_FREAC = 0            !ANIM_V(17)
+        INTEGER ::  N_VECT_MREAC = 0            !ANIM_V(18)
+        INTEGER ::  N_VECT_CLUST_FORCE = 0      !ANIM_V(19)
+        INTEGER ::  N_VECT_CLUST_MOM = 0        !ANIM_V(20)
+        INTEGER ::  N_VECT_CONT_MAX  = 0        !ANIM_V(26)
+        INTEGER ::  N_VECT_PCONT2 = 0           !ANIM_V(27)
+        INTEGER ::  N_VECT_PCONT_MAX = 0     
+        INTEGER ::  N_VECT_CONT2_MAX = 0             
+        INTEGER ::  N_VECT_PCONT2_MAX = 0     
+        INTEGER ::  N_VECT_CONT2_MIN  = 0            
+        INTEGER ::  N_VECT_PCONT2_MIN  = 0
+        INTEGER ::  N_VECT_CONT2M  = 0
+        INTEGER ::  N_VECT_ACC = 0  !FVM acceleration (law151, colocated scheme)
 
-        INTEGER SOL_SCAL_VORTX          !ANIM_SE(10)
-        INTEGER SOL_SCAL_VORTY          !ANIM_SE(4960)
-        INTEGER SOL_SCAL_VORTZ          !ANIM_SE(4961)
+        INTEGER ::  SH_SCAL_ERR_THK = 0         !ANIM_CE(2156)
 
-        INTEGER SH_IEPSDOT              !ANIM_C(...)
-        INTEGER UND_FORC                !ANIM_FT(1)
-        INTEGER STRAIN                  !ANIM STRAIN TENSOR
+        INTEGER ::  SOL_SCAL_VORTX = 0          !ANIM_SE(10)
+        INTEGER ::  SOL_SCAL_VORTY = 0          !ANIM_SE(4960)
+        INTEGER ::  SOL_SCAL_VORTZ = 0          !ANIM_SE(4961)
 
-        INTEGER IS_CORNER_DATA
-        INTEGER RBODY_SINGLE
-        INTEGER RBE2_SINGLE
-        INTEGER RBE3_SINGLE
+        INTEGER ::  SH_IEPSDOT  = 0             !ANIM_C(...)
+        INTEGER ::  UND_FORC = 0                !ANIM_FT(1)
+        INTEGER ::  STRAIN   = 0                !ANIM STRAIN TENSOR
 
-        INTEGER COMP_LEVEL
+        INTEGER ::  IS_CORNER_DATA = 0
+        INTEGER ::  RBODY_SINGLE = 0
+        INTEGER ::  RBE2_SINGLE = 0
+        INTEGER ::  RBE3_SINGLE = 0
 
-        my_real TH3D
-        my_real DTH3D
-        my_real TH3D0
-        my_real DTH3D0
-        my_real PERCENTAGE_ERROR
+        INTEGER ::  COMP_LEVEL = 0
+
+        my_real  :: TH3D  = 0.
+        my_real  :: DTH3D= 0.
+        my_real  :: TH3D_STOP= 0.
+        my_real  :: TH3D0= 0.
+        my_real  :: DTH3D0= 0.
+        my_real  :: TH3D_STOP0= 0.
+        my_real  :: PERCENTAGE_ERROR= 0.
 
         INTEGER, DIMENSION(:), ALLOCATABLE :: N_SKID_INTER   
         INTEGER, DIMENSION(:), ALLOCATABLE :: ITITLE 
         INTEGER, DIMENSION(:), ALLOCATABLE :: LSENS_H3D      
+        INTEGER, DIMENSION(:), ALLOCATABLE :: N_CSE_FRIC_INTER   
 
-        CHARACTER*80, DIMENSION(:), ALLOCATABLE ::TITLE        
+        CHARACTER(LEN=80), DIMENSION(:), ALLOCATABLE ::TITLE        
 
         TYPE (H3D_INPUT), DIMENSION(:), ALLOCATABLE :: INPUT_LIST
 
@@ -486,24 +514,24 @@ C-----------------------------------------------
       
 C-----------------------------------------------
       TYPE H3D_NUMBER_OF_KEY
-        INTEGER NODAL_SCALAR
-        INTEGER NODAL_VECTOR
-        INTEGER NODAL_TENSOR
-        INTEGER ONED_SCALAR
-        INTEGER ONED_VECTOR
-        INTEGER ONED_TENSOR
-        INTEGER ONED_TORSOR
-        INTEGER SHELL_SCALAR
-        INTEGER SHELL_VECTOR
-        INTEGER SHELL_TENSOR
-        INTEGER SOLID_SCALAR
-        INTEGER SOLID_VECTOR
-        INTEGER SOLID_TENSOR
-        INTEGER SPH_SCALAR
-        INTEGER SPH_TENSOR
-        INTEGER QUAD_SCALAR
-        INTEGER QUAD_VECTOR
-        INTEGER QUAD_TENSOR
+        INTEGER :: NODAL_SCALAR =0
+        INTEGER ::  NODAL_VECTOR =0
+        INTEGER ::  NODAL_TENSOR =0
+        INTEGER ::  ONED_SCALAR =0
+        INTEGER ::  ONED_VECTOR =0
+        INTEGER ::  ONED_TENSOR =0
+        INTEGER ::  ONED_TORSOR =0
+        INTEGER ::  SHELL_SCALAR =0
+        INTEGER ::  SHELL_VECTOR =0
+        INTEGER ::  SHELL_TENSOR =0
+        INTEGER ::  SOLID_SCALAR =0
+        INTEGER ::  SOLID_VECTOR =0
+        INTEGER ::  SOLID_TENSOR =0
+        INTEGER ::  SPH_SCALAR =0
+        INTEGER ::  SPH_TENSOR =0
+        INTEGER ::  QUAD_SCALAR =0
+        INTEGER ::  QUAD_VECTOR =0
+        INTEGER ::  QUAD_TENSOR =0
       END TYPE H3D_NUMBER_OF_KEY
 C-----------------------------------------------
       

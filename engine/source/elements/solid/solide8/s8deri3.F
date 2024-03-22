@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  S8DERI3                       source/elements/solid/solide8/s8deri3.F
 Chd|-- called by -----------
@@ -30,11 +30,16 @@ Chd|        ARRET                         source/system/arret.F
 Chd|        BASISF                        source/elements/solid/solide8/basisf.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
-      SUBROUTINE S8DERI3(X,Y,Z,
-     .             PX1,PX2,PX3,PX4,PX5,PX6,PX7,PX8,
-     .             PY1,PY2,PY3,PY4,PY5,PY6,PY7,PY8,
-     .             PZ1,PZ2,PZ3,PZ4,PZ5,PZ6,PZ7,PZ8,
-     .             VLINC,VOL,DELTAX,NGL,OFF)
+      SUBROUTINE S8DERI3(
+     1   X,       Y,       Z,       PX1,
+     2   PX2,     PX3,     PX4,     PX5,
+     3   PX6,     PX7,     PX8,     PY1,
+     4   PY2,     PY3,     PY4,     PY5,
+     5   PY6,     PY7,     PY8,     PZ1,
+     6   PZ2,     PZ3,     PZ4,     PZ5,
+     7   PZ6,     PZ7,     PZ8,     VLINC,
+     8   VOL,     DELTAX,  NGL,     OFF,
+     9   NEL)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -51,13 +56,10 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
-#include      "com06_c.inc"
-#include      "units_c.inc"
-#include      "vect01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: NEL
 C     REAL
       my_real
      .   X(MVSIZ,8), Y(MVSIZ,8), Z(MVSIZ,8),
@@ -105,7 +107,7 @@ C     REAL
      .   SPZ1,SPZ2,SPZ3,SPZ4,SPZ5,SPZ6,SPZ7,SPZ8,
      .   XX1,YY1,ZZ1,XX2,YY2,ZZ2,XX3,YY3,ZZ3,SMAX,VMIN,
      .   P1(8), P2(8), P3(8)
-      DO 5 I=LFT,LLT
+      DO 5 I=1,NEL
       X12(I)=X(I,1)-X(I,2)
       Y12(I)=Y(I,1)-Y(I,2)
       Z12(I)=Z(I,1)-Z(I,2)
@@ -152,7 +154,7 @@ C     VALEUR DES FONCTIONS DE FORMES AU POINT D 'INTEGRATION
 C
       CALL BASISF (H,P1,P2,P3,IPT)
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         AJ11(I)=P1(1)*X12(I)+P1(3)*X34(I)+P1(5)*X56(I)+P1(7)*X78(I)
         AJ12(I)=P1(1)*Y12(I)+P1(3)*Y34(I)+P1(5)*Y56(I)+P1(7)*Y78(I)
         AJ13(I)=P1(1)*Z12(I)+P1(3)*Z34(I)+P1(5)*Z56(I)+P1(7)*Z78(I)
@@ -164,14 +166,14 @@ C
         AJ33(I)=P3(1)*Z15(I)+P3(2)*Z26(I)+P3(3)*Z37(I)+P3(4)*Z48(I)
       ENDDO
 C
-      DO 20 I=LFT,LLT
+      DO 20 I=1,NEL
       AI11(I)= AJ22(I)*AJ33(I)-AJ23(I)*AJ32(I)
       AI21(I)=-AJ21(I)*AJ33(I)+AJ23(I)*AJ31(I)
       AI31(I)= AJ21(I)*AJ32(I)-AJ22(I)*AJ31(I)
       VLINC(I,IPT)=AJ11(I)*AI11(I)+AJ12(I)*AI21(I)+AJ13(I)*AI31(I)
    20 CONTINUE
 C
-      DO 130 I=LFT,LLT
+      DO 130 I=1,NEL
 C  053 +1
       IF(OFF(I)==ZERO)VLINC(I,IPT)=ONE
       VOL(I)=VOL(I)+VLINC(I,IPT)
@@ -181,7 +183,7 @@ C  053 +1
       CALL ARRET(2)
   130 CONTINUE
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         VLINV=ONE/VLINC(I,IPT)
         AI11(I)=VLINV*AI11(I)
         AI21(I)=VLINV*AI21(I)
@@ -258,7 +260,7 @@ C
 C
   100 CONTINUE
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
 c mediane * 4
         XX1 = X(I,1) + X(I,2) + X(I,3) + X(I,4)
      .      - X(I,5) - X(I,6) - X(I,7) - X(I,8)

@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  FVUPD0                        source/airbag/fvupd.F         
 Chd|-- called by -----------
@@ -29,7 +29,7 @@ Chd|        FVUPD1                        source/airbag/fvupd.F
 Chd|        SPMD_FVB_GATH_BEGIN           source/mpi/airbags/spmd_fvb.F 
 Chd|        FVBAG_MOD                     share/modules/fvbag_mod.F     
 Chd|====================================================================
-      SUBROUTINE FVUPD0(MONVOL, X, V, VOLMON)
+      SUBROUTINE FVUPD0(MONVOL, X, V, VOLMON, SMONVOL, SVOLMON)
 C-----------------------------------------------
 C   M o d u l e s 
 C-----------------------------------------------
@@ -43,18 +43,16 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com06_c.inc"
 #include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "task_c.inc"
-C     DTMIN1
-#include      "scr18_c.inc"
-#include      "mvsiz_p.inc"
+C DTMIN
+#include      "scr18_c.inc" 
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER MONVOL(*)
-      my_real X(3,*), V(3,*), VOLMON(*)
+      INTEGER,INTENT(IN) :: SMONVOL, SVOLMON
+      INTEGER MONVOL(SMONVOL)
+      my_real X(3,NUMNOD), V(3,NUMNOD), VOLMON(SVOLMON)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -66,7 +64,9 @@ C-----------------------------------------------
       INTEGER NFVMERGE(4), NSKIP, IEQUI, IVINI
       INTEGER NSKIP_TAB(NVOLU)
       my_real :: FVBAG_DTMIN
-C
+C-----------------------------------------------
+C   S o u r c e   L i n e s
+C-----------------------------------------------
       IADPOLH=1
       K1=1
       K2=1+NIMV*NVOLU
@@ -185,7 +185,7 @@ C
             KIA7=KIA6+NTGA
             KIA8=KIA7+8*NBA
 C
-            KRA5=KR1+7*(NNS+NNI)+4*(NTG+NTGI)+6*NNA
+            KRA5=MIN(SVOLMON, KR1+7*(NNS+NNI)+4*(NTG+NTGI)+6*NNA)
             KRA6=KRA5+3*NNA
 C
             NFVMERGE(1)=0
@@ -199,22 +199,22 @@ C
                FVBAG_DTMIN = DTMIN1(52)
             ENDIF
             CALL FVUPD1(
-     .NTG,                   MONVOL(KI1),         MONVOL(KI2), X, NPOLH, 
-     .FVDATA(IFV)%MPOLH,     FVDATA(IFV)%QPOLH,   FVDATA(IFV)%EPOLH, V ,
-     .FVDATA(IFV)%PPOLH,     FVDATA(IFV)%RPOLH,   FVDATA(IFV)%GPOLH,     
-     .FVDATA(IFV)%IFVNOD,    FVDATA(IFV)%RFVNOD,  FVDATA(IFV)%IFVTRI,    
-     .FVDATA(IFV)%IFVPOLY,   FVDATA(IFV)%IFVTADR, FVDATA(IFV)%IFVPOLH,   
-     .FVDATA(IFV)%IFVPADR,   NNFV, NTRFV,         VOLMON(KK1),   NPOLY,  
-     .ID,                    FVDATA(IFV)%CPAPOLH, FVDATA(IFV)%CPBPOLH,   
-     .FVDATA(IFV)%CPCPOLH,   FVDATA(IFV)%RMWPOLH, FVDATA(IFV)%VPOLH_INI, 
-     .IVMIN,                 FVDATA(IFV)%IDPOLH , MONVOL(KIA4),          
-     .MONVOL(KIA5),          MONVOL(KIA6),        FVDATA(IFV)%IBPOLH,    
-     .FVDATA(IFV)%REDIR_ANIM,FVDATA(IFV)%NOD_ANIM,FVDATA(IFV)%NNS_ANIM,
-     .FVDATA(IFV)%NPOLH_ANIM,FVDATA(IFV)%DTPOLH  ,ILVOUT,   NNT,   NNA,
-     .IFV,                   VOLMON(KRA5),        FVDATA(IFV)%TPOLH,
-     .FVDATA(IFV)%CPDPOLH,   FVDATA(IFV)%CPEPOLH, FVDATA(IFV)%CPFPOLH,
-     .ITYP,                  NFVMERGE,            VOLMON(KRA6),
-     .MONVOL(KIA8),          MONVOL(K1)         , FVBAG_DTMIN)   
+     .        NTG,                   MONVOL(KI1),         MONVOL(KI2)          , X          , NPOLH ,
+     .        FVDATA(IFV)%MPOLH,     FVDATA(IFV)%QPOLH,   FVDATA(IFV)%EPOLH    , V          ,
+     .        FVDATA(IFV)%PPOLH,     FVDATA(IFV)%RPOLH,   FVDATA(IFV)%GPOLH    ,    
+     .        FVDATA(IFV)%IFVNOD,    FVDATA(IFV)%RFVNOD,  FVDATA(IFV)%IFVTRI   ,   
+     .        FVDATA(IFV)%IFVPOLY,   FVDATA(IFV)%IFVTADR, FVDATA(IFV)%IFVPOLH  ,  
+     .        FVDATA(IFV)%IFVPADR,   NNFV,                NTRFV                , VOLMON(KK1), NPOLY , 
+     .        ID,                    FVDATA(IFV)%CPAPOLH, FVDATA(IFV)%CPBPOLH  ,  
+     .        FVDATA(IFV)%CPCPOLH,   FVDATA(IFV)%RMWPOLH, FVDATA(IFV)%VPOLH_INI,
+     .        IVMIN,                 FVDATA(IFV)%IDPOLH , MONVOL(KIA4)         ,         
+     .        MONVOL(KIA5),          MONVOL(KIA6),        FVDATA(IFV)%IBPOLH   ,   
+     .        FVDATA(IFV)%REDIR_ANIM,FVDATA(IFV)%NOD_ANIM,FVDATA(IFV)%NNS_ANIM ,
+     .        FVDATA(IFV)%NPOLH_ANIM,FVDATA(IFV)%DTPOLH  ,ILVOUT               , NNT        , NNA   ,
+     .        IFV,                   VOLMON(KRA5),        FVDATA(IFV)%TPOLH    ,
+     .        FVDATA(IFV)%CPDPOLH,   FVDATA(IFV)%CPEPOLH, FVDATA(IFV)%CPFPOLH  ,
+     .        ITYP,                  NFVMERGE,            VOLMON(KRA6)         ,
+     .        MONVOL(KIA8),          MONVOL(K1)         , FVBAG_DTMIN          , NUMNOD)  
 C
             MONVOL(K1-1+49)=NPOLH
             FVDATA(IFV)%NPOLH=NPOLH
@@ -239,7 +239,7 @@ Chd|-- calls ---------------
 Chd|        FVTEMP                        source/airbag/fvtemp.F        
 Chd|        SPMD_FVB_GATH_END             source/mpi/airbags/spmd_fvb.F 
 Chd|        FVBAG_MOD                     share/modules/fvbag_mod.F     
-Chd|        FVMBAG_MESHCONTROL_MOD        ../common_source/modules/fvmbag_meshcontrol_mod.F
+Chd|        FVMBAG_MESHCONTROL_MOD        ../common_source/modules/airbag/fvmbag_meshcontrol_mod.F
 Chd|====================================================================
       SUBROUTINE FVUPD1(NEL       , IBUF    , ELEM     , X    , NPOLH ,
      .                  MPOLH     , QPOLH   , EPOLH    , V    ,
@@ -256,7 +256,7 @@ Chd|====================================================================
      .                  IFV       , XXXA    , TPOLH, 
      .                  CPDPOLH   , CPEPOLH , CPFPOLH  ,
      .                  ITYP      , NFVMERGE, VVVA     , 
-     .                  NCONA     , IVOLU   ,FVBAG_DTMIN)
+     .                  NCONA     , IVOLU   ,FVBAG_DTMIN, NUMNOD)
 C-----------------------------------------------
 C   M o d u l e s 
 C-----------------------------------------------
@@ -269,7 +269,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr05_c.inc"
 #include      "scr18_c.inc"
 #include      "com01_c.inc"
 #include      "com08_c.inc"
@@ -279,19 +278,21 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER NEL, IBUF(*), ELEM(3,*), NPOLH, IFVNOD(3,*), IFVTRI(6,*),
-     .        IFVPOLY(*), IFVTADR(*), IFVPOLH(*), IFVPADR(*), NNS,
-     .        NNTR, NPOLY, ID, IVMIN, IDPOLH(*), IBUFA(*), ELEMA(3,*),
-     .        TAGELA(*), IBPOLH(*), REDIR_ANIM(*), NNS_ANIM, NPOLH_ANIM,
-     .        ILVOUT, NNT, NNA, IFV, ITYP, NFVMERGE(4), NCONA(16,*),
+      INTEGER, INTENT(IN) :: NUMNOD, NNTR, NNS,NNS_ANIM, NPOLH_ANIM,ILVOUT, NNT, NNA, IFV, ITYP,NPOLY, ID, IVMIN, NEL
+      INTEGER,INTENT(INOUT) ::NPOLH
+      INTEGER IBUF(*), ELEM(3,*), IFVNOD(3,*), IFVTRI(6,NNTR),
+     .        IFVPOLY(*), IFVTADR(*), IFVPOLH(*), IFVPADR(*), 
+     .        IDPOLH(*), IBUFA(*), ELEMA(3,*),
+     .        TAGELA(*), IBPOLH(*), REDIR_ANIM(*), 
+     .        NFVMERGE(4), NCONA(16,*),
      .        IVOLU(*)
       my_real
-     .        X(3,*), MPOLH(*), QPOLH(3,*), EPOLH(*), PPOLH(*), 
-     .        RPOLH(*), GPOLH(*), RFVNOD(2,*), RVOLU(*),
-     .        CPAPOLH(*), CPBPOLH(*), CPCPOLH(*), RMWPOLH(*),
-     .        VPOLH_INI(*), NOD_ANIM(3,*), DTPOLH(*), XXXA(3,*),
-     .        TPOLH(*), CPDPOLH(*), CPEPOLH(*), CPFPOLH(*),
-     .        V(3,*)  , VVVA(3,*), FVBAG_DTMIN
+     .        X(3,NUMNOD), MPOLH(NPOLH), QPOLH(3,NPOLH), EPOLH(NPOLH), PPOLH(NPOLH), 
+     .        RPOLH(NPOLH), GPOLH(NPOLH), RFVNOD(2,NNS), RVOLU(*),
+     .        CPAPOLH(NPOLH), CPBPOLH(NPOLH), CPCPOLH(NPOLH), RMWPOLH(NPOLH),
+     .        VPOLH_INI(NPOLH), NOD_ANIM(3,NNS_ANIM), DTPOLH(NPOLH), XXXA(3,*),
+     .        TPOLH(NPOLH), CPDPOLH(NPOLH), CPEPOLH(NPOLH), CPFPOLH(NPOLH),
+     .        V(3,NUMNOD)  , VVVA(3,*), FVBAG_DTMIN
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -447,7 +448,7 @@ C
       ELSE
          DTI = DT12
       ENDIF
-	  
+            
 
 !$OMP PARALLEL PRIVATE(I,II,J,JJ,K,KK,IP1,IP2,IEL,AREA,NX,NY,NZ,PVOLTMP)
 !$OMP+ PRIVATE(X1,Y1,Z1,N1,N2,N3,X12,Y12,Z12,X13,Y13,Z13)
@@ -570,7 +571,7 @@ C
          ENDDO 
 !$OMP END DO
       ENDIF 
-	  
+            
 C Normale et aire des triangles
 !$OMP DO SCHEDULE(DYNAMIC,MVSIZ)
       DO I=1,NNTR
@@ -673,10 +674,21 @@ C Volume moyen
             NPA=NPA+1
          ENDIF
       ENDDO
-      VM=VM/NPA
-      IF (IVMIN==1) THEN
-         VOLUMIN=VM*RVOLU(31)
-      ELSE
+      IF(NPA>0)THEN
+        VM=VM/NPA
+      ENDIF
+      
+      !RVOLU(31) : cgmerg
+      !RVOLU(33) : VM(from starter)
+      !IVOLU(60) : IVMIN/Igmerg
+      IF (IVMIN == 1) THEN
+         ! mean volume is current one
+         VOLUMIN=VM*RVOLU(31) 
+      ELSEIF (IVMIN == -1)THEN
+         ! specific case : Iswitch=2 : full merging request on Tswitch/Pswitch criteria
+         VOLUMIN = EP20
+      ELSE 
+         ! mean volume is initial one
          VOLUMIN=RVOLU(33)*RVOLU(31)
       ENDIF
 

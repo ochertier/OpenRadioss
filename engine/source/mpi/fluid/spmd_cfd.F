@@ -1,26 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
-#include "hardware.inc"
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 #include "macro.inc"
 Chd|====================================================================
 Chd|  SPMD_XVOIS                    source/mpi/fluid/spmd_cfd.F   
@@ -41,9 +40,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
 #ifdef MPI
@@ -53,7 +49,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -155,9 +150,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
 #ifdef MPI
@@ -167,9 +159,7 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "task_c.inc"
-#include      "spmd_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -285,9 +275,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
 #ifdef MPI
@@ -297,7 +284,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -407,9 +393,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
 #ifdef MPI
@@ -419,9 +402,7 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "task_c.inc"
-#include      "spmd_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -515,9 +496,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -636,9 +614,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
 #ifdef MPI
@@ -748,9 +723,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
 #ifdef MPI
@@ -843,8 +815,6 @@ C
 Chd|====================================================================
 Chd|  SPMD_ENVOIS                   source/mpi/fluid/spmd_cfd.F   
 Chd|-- called by -----------
-Chd|        ALE51_GRADIENT_RECONSTRUCTION source/ale/alemuscl/ale51_gradient_reconstruction.F
-Chd|        ALE51_GRADIENT_RECONSTRUCTION2source/ale/alemuscl/ale51_gradient_reconstruction2.F
 Chd|        ALEMAIN                       source/ale/alemain.F          
 Chd|        ALEW6                         source/ale/grid/alew6.F       
 Chd|        MULTI_TIMEEVOLUTION           source/multifluid/multi_timeevolution.F
@@ -860,9 +830,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
 #ifdef MPI
@@ -872,9 +839,7 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "task_c.inc"
-#include      "spmd_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -971,9 +936,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
 #ifdef MPI
@@ -983,7 +945,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -1072,9 +1033,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -1197,9 +1155,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
 #ifdef MPI
@@ -1308,9 +1263,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
 #ifdef MPI
@@ -1407,7 +1359,7 @@ Chd|        ALEMAIN                       source/ale/alemain.F
 Chd|-- calls ---------------
 Chd|        STARTIME                      source/system/timer.F         
 Chd|        STOPTIME                      source/system/timer.F         
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE SPMD_L11VOIS(
      1                        LBVOIS  ,IPARG   ,ELBUF_TAB,PM      ,IXS,
@@ -1421,9 +1373,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -1654,7 +1603,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -1665,7 +1613,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -1791,7 +1738,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -1802,7 +1748,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "task_c.inc"
 #include      "parit_c.inc"
 C-----------------------------------------------
@@ -1854,7 +1799,6 @@ C
           NOD = FR_ELEM(J)
           IF(IABS(NALE(NOD)) == 1) THEN
             IF(IVECTOR == 1) THEN
-#include "scalar.inc"
               DO CC = ADDCNE(NOD),ADDCNE(NOD+1)-1
                 IF(PROCNE(CC) == LOC_PROC) THEN
                   SBUF(L)   = FSKYV(CC,1)
@@ -1905,7 +1849,6 @@ C
           NOD = FR_ELEM(J)
           IF(IABS(NALE(NOD)) == 1) THEN
             IF(IVECTOR == 1) THEN
-#include "scalar.inc"
               DO CC = ADDCNE(NOD), ADDCNE(NOD+1)-1
                 IF(PROCNE(CC) == I) THEN
                   FSKYV(CC,1) = RBUF(L)
@@ -1966,7 +1909,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -1976,7 +1918,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -2021,9 +1962,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -2159,7 +2097,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -2170,7 +2107,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -2271,17 +2207,19 @@ Chd|        ALEMAIN                       source/ale/alemain.F
 Chd|-- calls ---------------
 Chd|        STARTIME                      source/system/timer.F         
 Chd|        STOPTIME                      source/system/timer.F         
+Chd|        ALE_MOD                       ../common_source/modules/ale/ale_mod.F
 Chd|        SEGVAR_MOD                    share/modules/segvar_mod.F    
 Chd|====================================================================
       SUBROUTINE SPMD_SEGCOM(SEGVAR,NPSEGCOM,LSEGCOM,SIZE,FLAG)
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
       USE SEGVAR_MOD
+      USE ALE_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -2292,9 +2230,7 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "task_c.inc"
-#include      "conv_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -2308,7 +2244,7 @@ C-----------------------------------------------
      .        STATUS(MPI_STATUS_SIZE), REQ_R(NSPMD), IRINDEX(NSPMD),
      .        LOC_PROC, N, KK, NN, NBIRECV, II, INDEX, LEN      
       DATA MSGOFF/3012/
-      my_real WA(SIZE*NVCONV)
+      my_real WA(SIZE*ALE%GLOBAL%NVCONV)
 C-----------------------------------------------
       CALL STARTIME(MACRO_TIMER_SPMDCFD,1)
 
@@ -2325,33 +2261,33 @@ C
               KK = LSEGCOM(N)
               
               NN=1
-              IF(NN <= NVCONV .AND. SEGVAR%has_rho)THEN
-               WA(NVCONV*(N-1)+NN) = SEGVAR%RHO(KK)
+              IF(NN <= ALE%GLOBAL%NVCONV .AND. SEGVAR%has_rho)THEN
+               WA(ALE%GLOBAL%NVCONV*(N-1)+NN) = SEGVAR%RHO(KK)
               ENDIF
               
               NN=2              
-              IF(NN <= NVCONV .AND. SEGVAR%has_eint)THEN
-                WA(NVCONV*(N-1)+NN) = SEGVAR%EINT(KK)
+              IF(NN <= ALE%GLOBAL%NVCONV .AND. SEGVAR%has_eint)THEN
+                WA(ALE%GLOBAL%NVCONV*(N-1)+NN) = SEGVAR%EINT(KK)
               ENDIF
               
               NN=3
-              IF(NN <= NVCONV .AND. SEGVAR%has_rk)THEN
-                WA(NVCONV*(N-1)+NN) = SEGVAR%RK(KK)
+              IF(NN <= ALE%GLOBAL%NVCONV .AND. SEGVAR%has_rk)THEN
+                WA(ALE%GLOBAL%NVCONV*(N-1)+NN) = SEGVAR%RK(KK)
               ENDIF
               
               NN=4
-              IF(NN <= NVCONV .AND. SEGVAR%has_re)THEN
-                WA(NVCONV*(N-1)+NN) = SEGVAR%RE(KK)
+              IF(NN <= ALE%GLOBAL%NVCONV .AND. SEGVAR%has_re)THEN
+                WA(ALE%GLOBAL%NVCONV*(N-1)+NN) = SEGVAR%RE(KK)
               ENDIF
               
               NN=5
-              IF(NN <= NVCONV .AND. SEGVAR%has_uvar)THEN
-                WA(NVCONV*(N-1)+NN) = SEGVAR%UVAR(KK)                                                        
+              IF(NN <= ALE%GLOBAL%NVCONV .AND. SEGVAR%has_uvar)THEN
+                WA(ALE%GLOBAL%NVCONV*(N-1)+NN) = SEGVAR%UVAR(KK)                                                        
               ENDIF
              
             ENDDO
             CALL MPI_SEND(
-     S        WA            ,LEN*NVCONV,REAL,IT_SPMD(1),MSGTYP,
+     S        WA            ,LEN*ALE%GLOBAL%NVCONV,REAL,IT_SPMD(1),MSGTYP,
      G        MPI_COMM_WORLD,IERROR    )
           ENDIF
 C
@@ -2364,7 +2300,7 @@ C
             IF(NPSEGCOM(I)>0) THEN
               NBIRECV = NBIRECV + 1
               IRINDEX(NBIRECV) = I
-              LEN = NVCONV*NPSEGCOM(I)
+              LEN = ALE%GLOBAL%NVCONV*NPSEGCOM(I)
               CALL MPI_IRECV(
      S          WA(IDEB+1),LEN,REAL,IT_SPMD(I),MSGTYP,
      G          MPI_COMM_WORLD,REQ_R(NBIRECV),ierror)
@@ -2377,33 +2313,33 @@ C
             CALL MPI_WAITANY(NBIRECV,REQ_R,INDEX,STATUS,ierror)
             I = IRINDEX(INDEX)
             IDEB2 = IAD_RECV(I)-1
-            IDEB = IDEB2 / NVCONV
+            IDEB = IDEB2 / ALE%GLOBAL%NVCONV
             DO N = 1, NPSEGCOM(I)
               KK = LSEGCOM(IDEB+N)
               
               NN=1
-              IF(NN <= NVCONV .AND. SEGVAR%has_rho)THEN
-               SEGVAR%RHO(KK) = WA(IDEB2+NVCONV*(N-1)+NN) 
+              IF(NN <= ALE%GLOBAL%NVCONV .AND. SEGVAR%has_rho)THEN
+               SEGVAR%RHO(KK) = WA(IDEB2+ALE%GLOBAL%NVCONV*(N-1)+NN) 
               ENDIF
               
               NN=2              
-              IF(NN <= NVCONV .AND. SEGVAR%has_eint)THEN
-                SEGVAR%EINT(KK) = WA(IDEB2+NVCONV*(N-1)+NN)
+              IF(NN <= ALE%GLOBAL%NVCONV .AND. SEGVAR%has_eint)THEN
+                SEGVAR%EINT(KK) = WA(IDEB2+ALE%GLOBAL%NVCONV*(N-1)+NN)
               ENDIF
               
               NN=3
-              IF(NN <= NVCONV .AND. SEGVAR%has_rk)THEN
-                SEGVAR%RK(KK) = WA(IDEB2+NVCONV*(N-1)+NN)
+              IF(NN <= ALE%GLOBAL%NVCONV .AND. SEGVAR%has_rk)THEN
+                SEGVAR%RK(KK) = WA(IDEB2+ALE%GLOBAL%NVCONV*(N-1)+NN)
               ENDIF
               
               NN=4
-              IF(NN <= NVCONV .AND. SEGVAR%has_re)THEN
-                SEGVAR%RE(KK) = WA(IDEB2+NVCONV*(N-1)+NN)
+              IF(NN <= ALE%GLOBAL%NVCONV .AND. SEGVAR%has_re)THEN
+                SEGVAR%RE(KK) = WA(IDEB2+ALE%GLOBAL%NVCONV*(N-1)+NN)
               ENDIF
               
               NN=5
-              IF(NN <= NVCONV .AND. SEGVAR%has_uvar)THEN
-                SEGVAR%UVAR(KK) = WA(IDEB2+NVCONV*(N-1)+NN)                                                       
+              IF(NN <= ALE%GLOBAL%NVCONV .AND. SEGVAR%has_uvar)THEN
+                SEGVAR%UVAR(KK) = WA(IDEB2+ALE%GLOBAL%NVCONV*(N-1)+NN)                                                       
               ENDIF
                             
             ENDDO
@@ -2419,34 +2355,34 @@ C
           LEN = NPSEGCOM(1)
           IF(LEN>0) THEN
             CALL MPI_RECV(
-     S        WA,LEN*NVCONV,REAL,IT_SPMD(1),MSGTYP,
+     S        WA,LEN*ALE%GLOBAL%NVCONV,REAL,IT_SPMD(1),MSGTYP,
      G        MPI_COMM_WORLD,status,ierror)
             DO N = 1, LEN
               KK = LSEGCOM(N)
                             
               NN=1
-              IF(NN <= NVCONV .AND. SEGVAR%has_rho)THEN
-               SEGVAR%RHO(KK) = WA(NVCONV*(N-1)+NN) 
+              IF(NN <= ALE%GLOBAL%NVCONV .AND. SEGVAR%has_rho)THEN
+               SEGVAR%RHO(KK) = WA(ALE%GLOBAL%NVCONV*(N-1)+NN) 
               ENDIF
               
               NN=2              
-              IF(NN <= NVCONV .AND. SEGVAR%has_eint)THEN
-                SEGVAR%EINT(KK) = WA(NVCONV*(N-1)+NN)
+              IF(NN <= ALE%GLOBAL%NVCONV .AND. SEGVAR%has_eint)THEN
+                SEGVAR%EINT(KK) = WA(ALE%GLOBAL%NVCONV*(N-1)+NN)
               ENDIF
               
               NN=3
-              IF(NN <= NVCONV .AND. SEGVAR%has_rk)THEN
-                SEGVAR%RK(KK) = WA(NVCONV*(N-1)+NN)
+              IF(NN <= ALE%GLOBAL%NVCONV .AND. SEGVAR%has_rk)THEN
+                SEGVAR%RK(KK) = WA(ALE%GLOBAL%NVCONV*(N-1)+NN)
               ENDIF
               
               NN=4
-              IF(NN <= NVCONV .AND. SEGVAR%has_re)THEN
-                SEGVAR%RE(KK) = WA(NVCONV*(N-1)+NN)
+              IF(NN <= ALE%GLOBAL%NVCONV .AND. SEGVAR%has_re)THEN
+                SEGVAR%RE(KK) = WA(ALE%GLOBAL%NVCONV*(N-1)+NN)
               ENDIF
               
               NN=5
-              IF(NN <= NVCONV .AND. SEGVAR%has_uvar)THEN
-                SEGVAR%UVAR(KK) = WA(NVCONV*(N-1)+NN)                                                       
+              IF(NN <= ALE%GLOBAL%NVCONV .AND. SEGVAR%has_uvar)THEN
+                SEGVAR%UVAR(KK) = WA(ALE%GLOBAL%NVCONV*(N-1)+NN)                                                       
               ENDIF              
                             
             ENDDO
@@ -2462,34 +2398,34 @@ C
                 KK = LSEGCOM(IDEB+N)
                 
                 NN=1
-                IF(NN <= NVCONV .AND. SEGVAR%has_rho)THEN
-                  WA(NVCONV*(N-1)+NN) = SEGVAR%RHO(KK)
+                IF(NN <= ALE%GLOBAL%NVCONV .AND. SEGVAR%has_rho)THEN
+                  WA(ALE%GLOBAL%NVCONV*(N-1)+NN) = SEGVAR%RHO(KK)
                 ENDIF
                 
                 NN=2              
-                IF(NN <= NVCONV .AND. SEGVAR%has_eint)THEN
-                   WA(NVCONV*(N-1)+NN) = SEGVAR%EINT(KK)
+                IF(NN <= ALE%GLOBAL%NVCONV .AND. SEGVAR%has_eint)THEN
+                   WA(ALE%GLOBAL%NVCONV*(N-1)+NN) = SEGVAR%EINT(KK)
                 ENDIF
                 
                 NN=3
-                IF(NN <= NVCONV .AND. SEGVAR%has_rk)THEN
-                   WA(NVCONV*(N-1)+NN) = SEGVAR%RK(KK)
+                IF(NN <= ALE%GLOBAL%NVCONV .AND. SEGVAR%has_rk)THEN
+                   WA(ALE%GLOBAL%NVCONV*(N-1)+NN) = SEGVAR%RK(KK)
                 ENDIF
                 
                 NN=4
-                IF(NN <= NVCONV .AND. SEGVAR%has_re)THEN
-                   WA(NVCONV*(N-1)+NN) = SEGVAR%RE(KK)
+                IF(NN <= ALE%GLOBAL%NVCONV .AND. SEGVAR%has_re)THEN
+                   WA(ALE%GLOBAL%NVCONV*(N-1)+NN) = SEGVAR%RE(KK)
                 ENDIF
                 
                 NN=5
-                IF(NN <= NVCONV .AND. SEGVAR%has_uvar)THEN
-                   WA(NVCONV*(N-1)+NN) = SEGVAR%UVAR(KK)                                                       
+                IF(NN <= ALE%GLOBAL%NVCONV .AND. SEGVAR%has_uvar)THEN
+                   WA(ALE%GLOBAL%NVCONV*(N-1)+NN) = SEGVAR%UVAR(KK)                                                       
                 ENDIF
               
                               
               ENDDO
               CALL MPI_SEND(
-     S        WA            ,LEN*NVCONV,REAL,IT_SPMD(I),MSGTYP,
+     S        WA            ,LEN*ALE%GLOBAL%NVCONV,REAL,IT_SPMD(I),MSGTYP,
      G        MPI_COMM_WORLD,IERROR    )
               IDEB = IDEB + LEN
             ENDIF
@@ -2511,7 +2447,7 @@ Chd|-- calls ---------------
 Chd|        SPMD_IBCAST                   source/mpi/generic/spmd_ibcast.F
 Chd|        STARTIME                      source/system/timer.F         
 Chd|        STOPTIME                      source/system/timer.F         
-Chd|        EBCS_MOD                      ../common_source/modules/ebcs_mod.F
+Chd|        EBCS_MOD                      ../common_source/modules/boundary_conditions/ebcs_mod.F
 Chd|====================================================================
       SUBROUTINE SPMD_INIT_EBCS(V,ISIZXV,IAD_ELEM,FR_ELEM,EBCS_TAB)
       USE EBCS_MOD
@@ -2519,7 +2455,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -2532,7 +2467,6 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "task_c.inc"
-#include      "scr05_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -2631,7 +2565,7 @@ Chd|        ALEMAIN                       source/ale/alemain.F
 Chd|-- calls ---------------
 Chd|        STARTIME                      source/system/timer.F         
 Chd|        STOPTIME                      source/system/timer.F         
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE SPMD_L51VOIS(
      1     LBVOIS  ,IPARG    ,ELBUF_TAB ,PM       ,IXS     ,

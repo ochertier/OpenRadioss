@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  RINIT3                        source/elements/spring/rinit3.F
 Chd|-- called by -----------
@@ -51,7 +51,8 @@ Chd|        RUINI                         source/elements/spring/rinit3.F
 Chd|        ST_USERLIB_RINIUSER           source/user_interface/dyn_userlib.c
 Chd|        USER_OUTPUT                   source/user_interface/user_output.F
 Chd|        STRR                          source/tools/univ/strr.F      
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        BPRELOAD_MOD                  share/modules1/bpreload_mod.F 
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        SEATBELT_MOD                  ../common_source/modules/seatbelt_mod.F
 Chd|====================================================================
@@ -63,13 +64,14 @@ Chd|====================================================================
      .                  INR      ,STIFINT  ,STR      ,IGEO   ,SIGRS ,
      .                  NSIGRS   ,IMERGE2  ,IADMERGE2,MSRT   ,IXR_KJ,
      .                  NOM_OPT  ,STRR     ,PTSPRI   ,IPM    ,PM   ,
-     .                  UPARAM   ,R_SKEW)
+     .                  UPARAM   ,R_SKEW   ,PRELOAD_A,IPRELD )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE ELBUFDEF_MOD
       USE MESSAGE_MOD
       USE SEATBELT_MOD
+      USE BPRELOAD_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -83,13 +85,10 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
 #include      "units_c.inc"
-#include      "warn_c.inc"
 #include      "vect01_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr03_c.inc"
 #include      "random_c.inc"
-#include      "scr05_c.inc"
 #include      "scr12_c.inc"
 #include      "scr17_c.inc"
 #include      "userlib.inc"
@@ -102,6 +101,7 @@ C-----------------------------------------------
      .        IADMERGE2(NUMNOD+1),IXR_KJ(5,*),PTSPRI(*),
      .        IPM(NPROPMI,*),R_SKEW(*)
       INTEGER NOM_OPT(LNOPT1,*)
+      INTEGER , INTENT (IN   )  :: IPRELD
 C     REAL
       my_real
      .   X(3,*), GEO(NPROPG,*), XMAS(*), PLD(*), XIN(*),
@@ -111,6 +111,7 @@ C     REAL
      .   PM(NPROPM,*)
 C
       TYPE(ELBUF_STRUCT_), TARGET :: ELBUF_STR
+      TYPE(PREL1D_) ,      TARGET :: PRELOAD_A
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -143,7 +144,7 @@ C     REAL
      .     NSPRG23 /0/,NSPRG27/0/
       INTEGER MINIDL, MAXIDL,IPID
       my_real 
-     .     NOISE,BIDON,MAS2
+     .     NOISE,BIDON,MAS2,UNDAMP
       INTEGER ID
       CHARACTER*nchartitle,
      .   TITR
@@ -357,7 +358,7 @@ c      CALL ANCNTS(IDS, CNT2)
      .                   ANMODE=ANINFO_BLIND_1,
      .                   I1=ID,
      .                   C1=TITR,
-     .                   I2=IXR(NIXR,I))
+     .                   I2=IXR(NIXR,J))
           ENDIF
         ELSE
           XL(I)=ONE
@@ -1532,16 +1533,46 @@ C
           STIFN(I2)=STIFN(I2)+STI
         END IF 
       ENDDO
-      IDS = 42
-c      CALL ANCHECK(IDS)
-C
-      IDS = 43
-c      CALL ANCHECK(IDS)
-C
-      IDS = 40
-c      CALL ANCHECK(IDS)
-      IDS = 37
-c      CALL ANCHECK(IDS)
+!
+      IF (IPRELD>0) THEN
+        SELECT CASE (IGTYP)
+          CASE(4,13,26,27)
+            DO I=LFT,LLT
+              J=I+NFT
+              I0=IXR(1,J)
+              XM=GEO(1,I0)*XL(I)
+              UNDAMP = XM/DTELEM(NDEPAR+I)
+              GBUF%BPRELD(I)     = PRELOAD_A%preload
+              GBUF%BPRELD(I+NEL) = UNDAMP*PRELOAD_A%damp
+            ENDDO
+          CASE(23)
+            IF (MTN==113) THEN  
+              DO I=LFT,LLT
+                XM=GBUF%MASS(I)
+                UNDAMP = XM/DTELEM(NDEPAR+I)
+                GBUF%BPRELD(I)     = PRELOAD_A%preload
+                GBUF%BPRELD(I+NEL) = UNDAMP*PRELOAD_A%damp
+              ENDDO
+            ELSE
+              CALL ANCMSG(MSGID=3053,
+     .                  MSGTYPE=MSGWARNING,
+     .                  ANMODE=ANINFO_BLIND_1,
+     .                  I1=ID,
+     .                  I2=IGTYP,
+     .                  C1=TITR)
+              GBUF%BPRELD(LFT:2*LLT)  = ZERO
+            END IF
+          CASE DEFAULT
+            CALL ANCMSG(MSGID=3053,
+     .                  MSGTYPE=MSGWARNING,
+     .                  ANMODE=ANINFO_BLIND_1,
+     .                  I1=ID,
+     .                  I2=IGTYP,
+     .                  C1=TITR)
+           GBUF%BPRELD(LFT:2*LLT)  = ZERO
+        END SELECT 
+!
+      END IF
 C-----
  1000 FORMAT('LIST OF POSSIBLE CNODES MERGED WITH NODE OF ID=',I10)
 C-----
@@ -1755,7 +1786,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "param_c.inc"
 #include      "scr05_c.inc"
 #include      "vect01_c.inc"
 C-----------------------------------------------
@@ -1887,10 +1917,7 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "vect01_c.inc"
-#include      "com04_c.inc"
-#include      "param_c.inc"
 #include      "com01_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1965,8 +1992,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "vect01_c.inc"
-#include       "com04_c.inc"
-#include       "param_c.inc"
 #include       "com01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -2002,8 +2027,8 @@ C---
           JJ = PTSPRI(II)
           IF (JJ == 0) GOTO 200
 C---
-!          FX(I)	   = SIGRS(2, JJ)
-!          DX(I)	   = SIGRS(3, JJ)
+!          FX(I)     = SIGRS(2, JJ)
+!          DX(I)     = SIGRS(3, JJ)
           FXEP(I)  = SIGRS(4, JJ)
           DXPL(I)  = SIGRS(5, JJ)
           DXPL2(I) = SIGRS(6, JJ)
@@ -2017,8 +2042,8 @@ C---
           FZEP(I)  = SIGRS(14,JJ)
           DZPL(I)  = SIGRS(15,JJ)
           DZPL2(I) = SIGRS(16,JJ)
-!          MX(I)	   = SIGRS(17,JJ)
-!          RX(I)	   = SIGRS(18,JJ)
+!          MX(I)     = SIGRS(17,JJ)
+!          RX(I)     = SIGRS(18,JJ)
           XMEP(I)  = SIGRS(19,JJ)
           RPX(I)   = SIGRS(20,JJ)
           RPX2(I)  = SIGRS(21,JJ)
@@ -2027,8 +2052,8 @@ C---
           YMEP(I)  = SIGRS(24,JJ) 
           RPY(I)   = SIGRS(25,JJ)
           RPY2(I)  = SIGRS(26,JJ)
-!          MZ(I)	   = SIGRS(27,JJ) 
-!          RZ(I)	   = SIGRS(28,JJ)
+!          MZ(I)     = SIGRS(27,JJ) 
+!          RZ(I)     = SIGRS(28,JJ)
           ZMEP(I)  = SIGRS(29,JJ)
           RPZ(I)   = SIGRS(30,JJ)
           RPZ2(I)  = SIGRS(31,JJ)
@@ -2085,8 +2110,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "vect01_c.inc"
-#include       "com04_c.inc"
-#include       "param_c.inc"
 #include       "com01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -2113,16 +2136,16 @@ C
           JJ = PTSPRI(II)
           IF (JJ == 0) GOTO 200
 C---
-          FX(I)	  = SIGRS(2, JJ)
+          FX(I)    = SIGRS(2, JJ)
           DX(I)   = SIGRS(3, JJ)
           FY(I)   = SIGRS(4, JJ)
           DY(I)   = SIGRS(5, JJ)
           FZ(I)   = SIGRS(6, JJ)
-          DZ(I)	  = SIGRS(7, JJ)
+          DZ(I)    = SIGRS(7, JJ)
           XMOM(I) = SIGRS(8, JJ)
-          RX(I)	  = SIGRS(9,JJ)
+          RX(I)    = SIGRS(9,JJ)
           YMOM(I) = SIGRS(10,JJ)
-          RY(I)	  = SIGRS(11,JJ)
+          RY(I)    = SIGRS(11,JJ)
           ZMOM(I) = SIGRS(12,JJ)
           RZ(I)   = SIGRS(13,JJ)  
           EINT(I) = SIGRS(14,JJ)

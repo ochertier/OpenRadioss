@@ -1,5 +1,5 @@
 //Copyright>    OpenRadioss
-//Copyright>    Copyright (C) 1986-2022 Altair Engineering Inc.
+//Copyright>    Copyright (C) 1986-2024 Altair Engineering Inc.
 //Copyright>
 //Copyright>    This program is free software: you can redistribute it and/or modify
 //Copyright>    it under the terms of the GNU Affero General Public License as published by
@@ -15,11 +15,11 @@
 //Copyright>    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //Copyright>
 //Copyright>
-//Copyright>    Commercial Alternative: Altair Radioss Software 
+//Copyright>    Commercial Alternative: Altair Radioss Software
 //Copyright>
-//Copyright>    As an alternative to this open-source version, Altair also offers Altair Radioss 
-//Copyright>    software under a commercial license.  Contact Altair to discuss further if the 
-//Copyright>    commercial version may interest you: https://www.altair.com/radioss/.    
+//Copyright>    As an alternative to this open-source version, Altair also offers Altair Radioss
+//Copyright>    software under a commercial license.  Contact Altair to discuss further if the
+//Copyright>    commercial version may interest you: https://www.altair.com/radioss/.
 //    
 #include <stdio.h>
 #include <string.h>
@@ -338,7 +338,7 @@ void h3dlib_load_(int * IERROR)
       if(dllpath_size > 0) {
           arch_size = GetEnvironmentVariable("ARCH",hwarch,200);
           if(arch_size >0) {
-              strcpy_s(load_libname, 20000, libh3dpath);
+              strcpy_s(load_libname,20000, libh3dpath);
               strcat_s(load_libname,20000,"\\hwsolvers\\common\\bin\\");
               strcat_s(load_libname,20000,hwarch);
               strcat_s(load_libname,20000,"\\");
@@ -617,7 +617,7 @@ void h3dlib_load_(int * IERROR)
     strcat(load_libname,getenv("RAD_H3D_PATH"));
     strcat(load_libname,"/");
     strcat(load_libname,h3dlib);
-    h3dhandle = dlopen(load_libname,RTLD_LAZY|RTLD_GLOBAL|RTLD_DEEPBIND);
+    h3dhandle = dlopen(load_libname,RTLD_LAZY|RTLD_GLOBAL);
     if(!h3dhandle) fprintf(stderr,"Warning: libh3dwriter.so not found in $RAD_H3D_PATH:\n %s \n",dlerror());
 
   }
@@ -629,7 +629,7 @@ void h3dlib_load_(int * IERROR)
     getcwd(load_libname,20000);
     strcat(load_libname,"/");
     strcat(load_libname,h3dlib);
-    h3dhandle = dlopen(load_libname,RTLD_LAZY|RTLD_GLOBAL|RTLD_DEEPBIND);
+    h3dhandle = dlopen(load_libname,RTLD_LAZY|RTLD_GLOBAL);
     if(!h3dhandle) {fprintf(stderr,"Warning: libh3dwriter.so not found in current directory:\n %s\n",dlerror());}
     else {fprintf(stderr,"success: libh3dwriter.so was found in current directory\n");}
 
@@ -644,7 +644,7 @@ void h3dlib_load_(int * IERROR)
     strcat(load_libname,getenv("ARCH"));
     strcat(load_libname,"/");
     strcat(load_libname,h3dlib);
-    h3dhandle = dlopen(load_libname,RTLD_LAZY|RTLD_GLOBAL|RTLD_DEEPBIND);
+    h3dhandle = dlopen(load_libname,RTLD_LAZY|RTLD_GLOBAL);
     if(!h3dhandle) {fprintf(stderr,"Warning: libh3dwriter.so not found in $ALTAIR_HOME:\n %s\n",dlerror());}
   }
 
@@ -652,7 +652,7 @@ void h3dlib_load_(int * IERROR)
   if(!h3dhandle) {
   /* Fourth trial : $LD_LIBRARY_PATH settings - simple dlopen*/
     strcpy(load_libname,h3dlib);
-    h3dhandle = dlopen(load_libname,RTLD_LAZY|RTLD_GLOBAL|RTLD_DEEPBIND);
+    h3dhandle = dlopen(load_libname,RTLD_LAZY|RTLD_GLOBAL);
     if(!h3dhandle) {fprintf(stderr,"Warning: libh3dwriter.so not found in $LD_LIBRARY_PATH:\n %s\n",dlerror());}
     else {fprintf(stderr,"success: libh3dwriter.so was found in $LD_LIBRARY_PATH\n");}
 

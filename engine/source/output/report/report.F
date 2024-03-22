@@ -1,37 +1,40 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  REPORT                        source/output/report/report.F 
 Chd|-- called by -----------
 Chd|        ARRET                         source/system/arret.F         
 Chd|-- calls ---------------
 Chd|        INOUTFILE_MOD                 ../common_source/modules/inoutfile_mod.F
+Chd|        USER_INTERFACE_MOD            share/modules/user_interface_mod.F
 Chd|====================================================================
       SUBROUTINE REPORT(IH3DREADER,N,IMVW)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE INOUTFILE_MOD
+      USE USER_INTERFACE_MOD
+      USE NAMES_AND_TITLES_MOD, ONLY: LPATH
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -46,17 +49,10 @@ C-----------------------------------------------
 #include      "com08_c.inc"
 #include      "com10_c.inc"
 #include      "commandline.inc"
-#include      "param_c.inc"
 #include      "scr02_c.inc"
-#include      "scr05_c.inc"
 #include      "scr11_c.inc"
-#include      "scr14_c.inc"
-#include      "scr17_c.inc"
-#include      "scr18_c.inc"
 #include      "spmd_c.inc"
-#include      "units_c.inc"
 #include      "chara_c.inc"
-#include      "nchara_c.inc"
 #include      "drape_c.inc"
 #include      "submodel.inc"
 C-----------------------------------------------
@@ -73,7 +69,7 @@ C-----------------------------------------------
 
       CHARACTER FILNAM*100,MVWNAM*100
       CHARACTER LINE*200
-      CHARACTER CWD*ncharline
+      CHARACTER(LEN=LPATH) :: CWD
       CHARACTER*100  FMW
       CHARACTER*8  DATE
       CHARACTER*10  TIME
@@ -101,7 +97,7 @@ C-----------------------------------------------
      7           '     ','     ','     ','     ','     ',
      8           '     ','     ','     ','     ','     ',
      9           '     ','     ','     ','     ','     ',
-     A           '     ','     ','     ','     ','RENAU',
+     A           '     ','     ','     ','     ','     ',
      B           'SPCEL','FVBAG','     ','     ','     ',
      C           '     ','     ','     ','     ','     ',
      D           '     ','     ','     ','     ','     ',
@@ -511,10 +507,10 @@ c
          WRITE(IOUTREP,'(A,I10,A)')'<td><font face="Arial" size="2">',NSLIN,'</td>'
          WRITE(IOUTREP,'(A)')'</tr>'
        ENDIF
-       IF(NSENSOR /= 0)THEN
+       IF(SENSORS%NSENSOR /= 0)THEN
          WRITE(IOUTREP,'(A)')'<tr>'
          WRITE(IOUTREP,'(A)')'<td><font face="Arial" size="2">Number of sensors: &nbsp;&nbsp;</td>'
-         WRITE(IOUTREP,'(A,I10,A)')'<td><font face="Arial" size="2">',NSENSOR,'</td>'
+         WRITE(IOUTREP,'(A,I10,A)')'<td><font face="Arial" size="2">',SENSORS%NSENSOR,'</td>'
          WRITE(IOUTREP,'(A)')'</tr>'
        ENDIF
        IF(NUMSKW /= 0)THEN

@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  ADD_ID                        source/interfaces/inter3d1/i24tools.F
 Chd|-- called by -----------
@@ -79,13 +79,13 @@ C----6---------------------------------------------------------------7---------8
 Chd|====================================================================
 Chd|  INTAB                         source/interfaces/inter3d1/i24tools.F
 Chd|-- called by -----------
-Chd|        ADD_NS                        source/interfaces/inter3d1/i7remnode.F
 Chd|        ADD_NSFIC                     source/interfaces/inter3d1/i7remnode.F
 Chd|        COMM_SEG_E                    source/interfaces/inter3d1/i24inisu_nei.F
 Chd|        I24PENMAX                     source/interfaces/inter3d1/i24pen3.F
 Chd|        I25NEIGH_SEG_E                source/interfaces/inter3d1/i25neigh.F
 Chd|        ITAGSL2                       source/interfaces/inter3d1/itagsl2.F
 Chd|        RIGMODIF_ND                   source/elements/solid/solide10/dim_s10edg.F
+Chd|        S10EDG_RLINK                  source/elements/solid/solide10/s10edg_rlink.F
 Chd|        SEG_OPP                       source/interfaces/inter3d1/i24tools.F
 Chd|        SAME_SEG                      source/interfaces/inter3d1/i24tools.F
 Chd|-- calls ---------------
@@ -269,20 +269,16 @@ Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
       SUBROUTINE MSG_ERR(I1,I2,ITAB,IRR,ID,TITR)
       USE MESSAGE_MOD
-C----6---------------------------------------------------------------7---------8
+C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
 #include      "scr03_c.inc"
 #include      "scr17_c.inc"
-C-----------------------------------------------------------------
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER I1,I2,ITAB(*),IRR
@@ -319,7 +315,7 @@ c     +                 Itab(I1),Itab(I2)
 c        CALL ARRET(2)
        END IF
 #endif
-C----6---------------------------------------------------------------7---------8
+C-----------------------------------------------
       RETURN
       END
 Chd|====================================================================
@@ -331,11 +327,11 @@ Chd|-- calls ---------------
 Chd|        INTAB                         source/interfaces/inter3d1/i24tools.F
 Chd|====================================================================
       LOGICAL FUNCTION SAME_SEG(IRECT1,IRECT2)
-C----6---------------------------------------------------------------7---------8
+C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------------------------
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IRECT1(*),IRECT2(*)
@@ -377,11 +373,11 @@ Chd|        NORMA4N                       source/interfaces/inter3d1/norma1.F
 Chd|        INTAB                         source/interfaces/inter3d1/i24tools.F
 Chd|====================================================================
       SUBROUTINE SEG_OPP(EI,EJ,IRECT,X ,IOP)
-C----6---------------------------------------------------------------7---------8
+C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------------------------
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER EI,EJ,IRECT(4,*),IOP
@@ -406,7 +402,7 @@ C---
          CALL NORMA4N(NXI,NYI,NZI,AREA,IRECT(1,EI),X )
          CALL NORMA4N(NXJ,NYJ,NZJ,AREA,IRECT(1,EJ),X )
          S=NXI*NXJ+NYI*NYJ+NZI*NZJ
-	     IF (S<ZERO.AND.ABS(S)>0.99) IOP=1
+               IF (S<ZERO.AND.ABS(S)>0.99) IOP=1
          IF (IOP == 0 ) THEN
           NN = 0
           DO I = 1,3
@@ -419,9 +415,9 @@ C---
            IF (INTAB(3,IRECT(1,EJ),J)) NN = NN +1
            IF (IRECT(3,EJ)/=IRECT(4,EJ).AND.J==IRECT(4,EJ)) NN = NN +1
           END IF
-	      IF (NN > 2) IOP = 1
+                IF (NN > 2) IOP = 1
          END IF !IF (IOP == 0 )
-C----6---------------------------------------------------------------7---------8
+C-----------------------------------------------
       RETURN
       END
 Chd|====================================================================
@@ -437,11 +433,10 @@ C----6---------------------------------------------------------------7---------8
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------------------------
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER N,IC(*),ISELF,IRECT(4,*),I1,I2,IE,IASYM,IRR
-C     REAL
       my_real
      .   X(3,*)
 C----ne reste qu'un seg
@@ -550,11 +545,11 @@ Chd|        NORMV3                        source/interfaces/inter3d1/i24tools.F
 Chd|        VOISIN1                       source/interfaces/inter3d1/voisin1.F
 Chd|====================================================================
       SUBROUTINE REMOVEIC1(N,IC,ISELF,IRECT,X ,I1,I2,IASYM,IRR)
-C----6---------------------------------------------------------------7---------8
+C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------------------------
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER N,IC(*),ISELF,IRECT(4,*),I1,I2,IE,IASYM,IRR
@@ -667,6 +662,6 @@ C
         DO I=2,N
          IC(I)=0
         END DO 
-C----6---------------------------------------------------------------7---------8
+C-----------------------------------------------
       RETURN
       END

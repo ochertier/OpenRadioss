@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  LECM51__CHECK_INITIAL_STATE   source/materials/mat/mat051/lecm51__check_initial_state.F
 Chd|-- called by -----------
@@ -30,12 +30,11 @@ Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
       SUBROUTINE LECM51__CHECK_INITIAL_STATE(   
      .   AV,  R0,     C0,   C1,   C2, C3, C4,   C5,
-     .   E0,  PM,   RHO0, RHOR, IEXP, JTHE,PEXT,IFLG,
-     .   A0,  A1,     A2,  PLA,
+     .   E0,  PM,   RHO0, RHOR, IEXP, PEXT,IFLG,
+     .   A1,     A2,  PLA,
      .   ID,  TITR,
      .   SSP1,SSP2, SSP3, SSP4,
      .   LC1 ,LC2 ,  LC3,  LC4,
-     .   TCARP,
      .   P0a          )
       USE MESSAGE_MOD
 C-----------------------------------------------
@@ -59,27 +58,26 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       my_real   
      . AV(4),R0(4), C0(4), C1(4),C2(4), C3(4),
-     . A0(4), A1(4),A2(4),
+     . A1(4),A2(4),
      . C4(4),C5(4), E0(4), PM(4), PEXT,  RHO0, RHOR,
      . SSP(4),LC(4),
      . SSP1,SSP2,SSP3,SSP4,
      . LC1,LC2,LC3,LC4,
-     . TCARP,
      . P0a(4)
-      INTEGER IEXP, JTHE, IFLG,PLA(4)
+      INTEGER IEXP, IFLG,PLA(4)
       INTEGER ID
       CHARACTER*nchartitle,TITR
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER i,j, TEST1,TEST2,TEST3,TEST4,TEST5,
-     .        TEST6,TEST7,TEST8,TEST9, IMAX,IPLA(4)
+     .        TEST6, IMAX,IPLA(4)
      
       my_real SUM, P0b, err
       
       character*8 chain
       character*47 chain3
-      character*63 chain1
+      character*64 chain1
 C===============================================|
       IPLA(1)=PLA(1)
       IPLA(2)=PLA(2)
@@ -100,9 +98,6 @@ C===============================================|
       TEST4=0    !Unbalanced Pressure  t=0              
       TEST5=0    !Global density = mean(rho_i)
       TEST6=0    !C1,C4,C5 >=0,  C1>0 phase 4
-      TEST8=0    !Perfect Gas cavitation pressure
-      TEST8=0    !
-      TEST9=0    !
 
       IF(IFLG==6)THEN
         SUM=0
@@ -124,14 +119,9 @@ C===============================================|
       DO I=1,IMAX
         IF ((AV(I)<ZERO).OR.(AV(I)>ONE)) THEN
          chain='SUBMAT-0'
-         write(chain(8:8),'(i1.1)')I
-         chain1='INITIAL VOLUMETRIC FRACTION MUST BE BETWEEN 0 AND 1 FOR '//chain
-         CALL ANCMSG(MSGID=99,
-     .               MSGTYPE=MSGERROR,
-     .               ANMODE=ANINFO,
-     .               I1=ID,
-     .               C1=TITR,
-     .               C2=chain1)
+         write(chain(8:8),'(i1)')I
+         chain1='INITIAL VOLUMETRIC FRACTION MUST BE BETWEEN 0 AND 1 FOR '//chain(1:8)
+         CALL ANCMSG(MSGID=99,MSGTYPE=MSGERROR,ANMODE=ANINFO,I1=ID,C1=TITR,C2=chain1)
          TEST1=1
          !exit
         END IF
@@ -149,21 +139,11 @@ C===============================================|
         END DO
         IF(SUM==ZERO)THEN
          AV(1)=1 
-         CALL ANCMSG(MSGID=98,
-     .               MSGTYPE=MSGWARNING,
-     .               ANMODE=ANINFO_BLIND_1,
-     .               I1=ID,
-     .               C1=TITR,
-     .   C2=
-     .   'INITIAL VOLUMETRIC FRACTIONS ARE NULL , SUBMAT-1 SET TO 100%')
+         CALL ANCMSG(MSGID=98,MSGTYPE=MSGWARNING,ANMODE=ANINFO_BLIND_1,I1=ID,C1=TITR,
+     .   C2='INITIAL VOLUMETRIC FRACTIONS ARE NULL , SUBMAT-1 SET TO 100%')
         ELSEIF (abs(1-SUM)>EM03) THEN
-         CALL ANCMSG(MSGID=99,
-     .               MSGTYPE=MSGERROR,
-     .               ANMODE=ANINFO_BLIND_1,
-     .               I1=ID,
-     .               C1=TITR,
-     .   C2=
-     .   'SUM OF INITIAL VOLUMETRIC FRACTION IS NOT EQUAL TO 1')
+         CALL ANCMSG(MSGID=99,MSGTYPE=MSGERROR,ANMODE=ANINFO_BLIND_1,I1=ID,C1=TITR,
+     .   C2='SUM OF INITIAL VOLUMETRIC FRACTION IS NOT EQUAL TO 1')
          TEST2=1
         END IF
       END IF
@@ -179,12 +159,7 @@ C===============================================|
          write(chain(8:8),'(i1.1)')I
          !print *,"chain(1:8) =", chain(1:8)
          chain3='NULL OR NEGATIVE INITIAL DENSITIES FOR '//chain
-         CALL ANCMSG(MSGID=99,
-     .               MSGTYPE=MSGERROR,
-     .               ANMODE=ANINFO,
-     .               I1=ID,
-     .               C1=TITR,
-     .               C2=chain3)
+         CALL ANCMSG(MSGID=99,MSGTYPE=MSGERROR,ANMODE=ANINFO,I1=ID,C1=TITR,C2=chain3)
          TEST3=1
          !exit
         END IF
@@ -209,21 +184,13 @@ C===============================================|
             IF (Err/max(abs(P0a(I)),abs(P0b))>EM06) THEN
                 IF (J==4) THEN
                   TEST4=1
-                  CALL ANCMSG(MSGID=98,
-     .                        MSGTYPE=MSGWARNING,
-     .                        ANMODE=ANINFO_BLIND_1,
-     .                        I1=ID,
-     .                        C1=TITR,
-     .                        C2='PRESSURES ARE UNBALANCED WITH JWL MATERIAL')
+                  CALL ANCMSG(MSGID=98,MSGTYPE=MSGWARNING,ANMODE=ANINFO_BLIND_1,
+     .                        I1=ID,C1=TITR,C2='PRESSURES ARE UNBALANCED WITH JWL MATERIAL')
                   exit
               ELSE
                   TEST4=1
-                  CALL ANCMSG(MSGID=98,
-     .                        MSGTYPE=MSGWARNING,
-     .                        ANMODE=ANINFO_BLIND_1,
-     .                        I1=ID,
-     .                        C1=TITR,
-     .                        C2='INITIAL PRESSURES ARE UNBALANCED')
+                  CALL ANCMSG(MSGID=98,MSGTYPE=MSGWARNING,ANMODE=ANINFO_BLIND_1,
+     .                        I1=ID,C1=TITR,C2='INITIAL PRESSURES ARE UNBALANCED')
                 EXIT
             END IF
             END IF
@@ -255,12 +222,7 @@ C===============================================|
          chain='SUBMAT-0'
          write(chain(8:8),'(i1.1)')I
          chain1='POLYNOMIAL COEFFICIENT C1 MUST BE POSITIVE OR NULL FOR '//chain
-         CALL ANCMSG(MSGID=99,
-     .               MSGTYPE=MSGERROR,
-     .               ANMODE=ANINFO,
-     .               I1=ID,
-     .               C1=TITR,
-     .               C2=chain1)
+         CALL ANCMSG(MSGID=99,MSGTYPE=MSGERROR,ANMODE=ANINFO,I1=ID,C1=TITR,C2=chain1)
          TEST6=1
          !exit
         END IF
@@ -269,12 +231,7 @@ C===============================================|
          chain='SUBMAT-0'
          write(chain(8:8),'(i1.1)')I
          chain1='POLYNOMIAL COEFFICIENT C2 IS NEGATIVE FOR '//chain
-         CALL ANCMSG(MSGID=98,
-     .               MSGTYPE=MSGWARNING,
-     .               ANMODE=ANINFO_BLIND_1,
-     .               I1=ID,
-     .               C1=TITR,
-     .               C2=chain1)
+         CALL ANCMSG(MSGID=98,MSGTYPE=MSGWARNING,ANMODE=ANINFO_BLIND_1,I1=ID,C1=TITR,C2=chain1)
          TEST6=1
          !exit
         END IF
@@ -283,12 +240,7 @@ C===============================================|
          chain='SUBMAT-0'
          write(chain(8:8),'(i1.1)')I
          chain1='POLYNOMIAL COEFFICIENT C3 IS NEGATIVE FOR '//chain
-         CALL ANCMSG(MSGID=98,
-     .               MSGTYPE=MSGWARNING,
-     .               ANMODE=ANINFO_BLIND_1,
-     .               I1=ID,
-     .               C1=TITR,
-     .               C2=chain1)
+         CALL ANCMSG(MSGID=98,MSGTYPE=MSGWARNING,ANMODE=ANINFO_BLIND_1,I1=ID,C1=TITR,C2=chain1)
          TEST6=1
          !exit
         END IF        
@@ -297,12 +249,7 @@ C===============================================|
          chain='SUBMAT-0'
          write(chain(8:8),'(i1.1)')I
          chain1='POLYNOMIAL COEFFICIENT C4 MUST BE POSITIVE OR NULL FOR '//chain
-         CALL ANCMSG(MSGID=99,
-     .               MSGTYPE=MSGERROR,
-     .               ANMODE=ANINFO_BLIND_1,
-     .               I1=ID,
-     .               C1=TITR,
-     .               C2=chain1)
+         CALL ANCMSG(MSGID=99,MSGTYPE=MSGERROR,ANMODE=ANINFO_BLIND_1,I1=ID,C1=TITR,C2=chain1)
          TEST6=1
          !exit
         END IF        
@@ -311,12 +258,7 @@ C===============================================|
          chain='SUBMAT-0'
          write(chain(8:8),'(i1.1)')I
          chain1='POLYNOMIAL COEFFICIENT C5 MUST BE POSITIVE OR NULL FOR '//chain
-         CALL ANCMSG(MSGID=99,
-     .               MSGTYPE=MSGERROR,
-     .               ANMODE=ANINFO_BLIND_1,
-     .               I1=ID,
-     .               C1=TITR,
-     .               C2=chain1)
+         CALL ANCMSG(MSGID=99,MSGTYPE=MSGERROR,ANMODE=ANINFO_BLIND_1,I1=ID,C1=TITR,C2=chain1)
          TEST6=1
          !exit
         END IF                        
@@ -339,12 +281,7 @@ C===============================================|
                write(chain(8:8),'(i1.1)')I           
                chain1=
      .         chain//' IS A PERFECT GAS:MINIMUM PRESSURE SHOULD BE -PEXT       '
-               CALL ANCMSG(MSGID=98,
-     .                     MSGTYPE=MSGWARNING,
-     .                     ANMODE=ANINFO_BLIND_1,
-     .                     I1=ID,
-     .                     C1=TITR,
-     .                     C2=chain1)
+               CALL ANCMSG(MSGID=98,MSGTYPE=MSGWARNING,ANMODE=ANINFO_BLIND_1,I1=ID,C1=TITR,C2=chain1)
              END IF
            ENDIF
          END IF
@@ -359,25 +296,11 @@ C===============================================|
           !
           IF(A1(I) < ZERO .AND. A2(I) == ZERO)THEN                               
             chain1 = chain//': INVERTED YIELD SURFACE. CHECK A1 SIGN.                '
-            CALL ANCMSG(MSGID=829,                                               
-     .                  MSGTYPE=MSGWARNING,                                    
-     .                  ANMODE=ANINFO,                                         
-     .                  I1=51,                                                 
-     .                  I2=ID,                                                 
-     .                  C1='WARNING',                                          
-     .                  C2=TITR,                                               
-     .                  C3=chain)                                              
+            CALL ANCMSG(MSGID=829,MSGTYPE=MSGWARNING,ANMODE=ANINFO,I1=51,I2=ID,C1='WARNING',C2=TITR,C3=chain)                                              
           ENDIF                                                                  
           IF(A2(I) < ZERO)THEN                                                   
             chain1 = chain//': UNTIPYCAL YIELD SURFACE. CHECK A2 SIGN.               '        
-            CALL ANCMSG(MSGID=829,                                               
-     .                  MSGTYPE=MSGWARNING,                                    
-     .                  ANMODE=ANINFO,                                         
-     .                  I1=51,                                                 
-     .                  I2=ID,                                                 
-     .                  C1='WARNING',                                          
-     .                  C2=TITR,                                               
-     .                  C3=chain)                                              
+            CALL ANCMSG(MSGID=829,MSGTYPE=MSGWARNING,ANMODE=ANINFO,I1=51,I2=ID,C1='WARNING',C2=TITR,C3=chain)                                              
           ENDIF                                                                  
           !
         END DO !next I

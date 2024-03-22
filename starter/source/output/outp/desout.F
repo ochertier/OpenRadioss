@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  DESOUT                        source/output/outp/desout.F   
 Chd|-- called by -----------
@@ -31,8 +31,12 @@ Chd|====================================================================
       SUBROUTINE DESOUT(X   ,IXS  ,IXQ  ,IXC  ,IXT  ,
      .                  IXP ,IXR  ,IXTG ,ITAB ,PM   ,
      .                  GEO ,MS   ,IXS10,IGEO ,IPM  ,
-     .                  KXSP,IPART,IPARTSP)
+     .                  KXSP,IPART,IPARTSP,NAMES_AND_TITLES)
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
       USE INOUTFILE_MOD
+      USE NAMES_AND_TITLES_MOD, only:NAMES_AND_TITLES_,NCHARTITLE !< NAMES_AND_TITLES host the input deck names and titles for outputs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -40,13 +44,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com05_c.inc"
 #include      "units_c.inc"
 #include      "param_c.inc"
-#include      "scr04_c.inc"
-#include      "scr05_c.inc"
 #include      "scr15_c.inc"
 #include      "scr16_c.inc"
 #include      "scr17_c.inc"
@@ -61,15 +61,19 @@ C-----------------------------------------------
 C     REAL
       my_real
      .   X(3,*),MS(*), PM(NPROPM,*), GEO(NPROPG,*)
+      TYPE(NAMES_AND_TITLES_),INTENT(IN):: NAMES_AND_TITLES
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER IWA(10), I, J, FILEN
-      CHARACTER CARD*nchartitle, FILNAM*100   
+      CHARACTER (LEN=NCHARTITLE) ::  CARD  !< Host the title to be print in OUTP 
+      CHARACTER (LEN=100) :: FILNAM
       INTEGER :: LEN_TMP_NAME
       CHARACTER(len=2148) :: TMP_NAME   
+      INTEGER TITLE_LEN
 C-----------------------------------------
-      WRITE(CARD,'(20A4)')TEXT
+      TITLE_LEN=LEN_TRIM(NAMES_AND_TITLES%TITLE)
+      CARD(1:TITLE_LEN)=NAMES_AND_TITLES%TITLE(1:TITLE_LEN)
 C
       FILNAM=ROOTNAM(1:ROOTLEN)//'Y000'
       FILEN = ROOTLEN + 4

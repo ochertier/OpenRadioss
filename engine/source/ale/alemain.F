@@ -1,30 +1,31 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  ALEMAIN                       source/ale/alemain.F          
 Chd|-- called by -----------
 Chd|        RESOL                         source/engine/resol.F         
 Chd|-- calls ---------------
+Chd|        AGAUGE                        source/ale/agauge.F           
 Chd|        ALEFVM_GRAV_INIT              source/ale/alefvm/alefvm_grav_init.F
 Chd|        ALESUB1                       source/ale/subcycling/alesub1.F
 Chd|        ALETHE                        source/ale/alethe.F           
@@ -57,18 +58,20 @@ Chd|        SPMD_SEGCOM                   source/mpi/fluid/spmd_cfd.F
 Chd|        SPMD_XVOIS                    source/mpi/fluid/spmd_cfd.F   
 Chd|        STARTIME                      source/system/timer.F         
 Chd|        STOPTIME                      source/system/timer.F         
-Chd|        ALEFVM_MOD                    ../common_source/modules/alefvm_mod.F
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
+Chd|        ALEFVM_MOD                    ../common_source/modules/ale/alefvm_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
+Chd|        ALE_MOD                       ../common_source/modules/ale/ale_mod.F
 Chd|        DIFFUSION_MOD                 share/modules/diffusion_mod.F 
-Chd|        EBCS_MOD                      ../common_source/modules/ebcs_mod.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        DT_MOD                        share/modules/dt_mod.F        
+Chd|        EBCS_MOD                      ../common_source/modules/boundary_conditions/ebcs_mod.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|        INITBUF_MOD                   share/resol/initbuf.F         
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/matparam_def_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MAT_ELEM_MOD                  ../common_source/modules/mat_elem/mat_elem_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|        NLOCAL_REG_MOD                ../common_source/modules/nlocal_reg_mod.F
+Chd|        OUTPUT_MOD                    ../common_source/modules/output/output_mod.F
 Chd|        SEGVAR_MOD                    share/modules/segvar_mod.F    
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
 Chd|        TABLE_MOD                     share/modules/table_mod.F     
@@ -92,16 +95,16 @@ Chd|====================================================================
      H         GRTH        , IGRTH       ,LGAUGE        ,GAUGE     ,MSSA      ,
      I         DMELS       , IGAUP       ,NGAUP         ,TABLE     ,MS0       ,
      J         XDP         , IGRNOD      ,VARNOD                   ,FSKYI     ,ISKY            ,
-     K         INTBUF_TAB  , IXT         ,IGRV          ,AGRAV     ,SENSOR_TAB,
+     K         INTBUF_TAB  , IXT         ,IGRV          ,AGRAV     ,SENSORS   ,
      L         LGRAV       , CONDNSKY    ,CONDN         ,MS_2D     ,MULTI_FVM ,IGRTRUSS        ,
      M         IGRBRIC     , NLOC_DMG    ,ID_GLOBAL_VOIS,FACE_VOIS ,EBCS_TAB  ,ALE_CONNECTIVITY, 
-     N         DIFFUSION   , MATPARAM_TAB,H3D_DATA)
+     N         DIFFUSION   , MAT_ELEM    ,H3D_DATA      ,DT   ,OUTPUT,NEED_COMM_INTER18)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE INITBUF_MOD
       USE TABLE_MOD
-      USE ELBUFDEF_MOD
+      USE MAT_ELEM_MOD
       USE INTBUFDEF_MOD
       USE ALEFVM_MOD
       USE MULTI_FVM_MOD
@@ -112,8 +115,10 @@ C-----------------------------------------------
       USE ALE_CONNECTIVITY_MOD
       USE DIFFUSION_MOD
       USE SEGVAR_MOD
-      USE MATPARAM_DEF_MOD
       USE H3D_MOD
+      USE ALE_MOD
+      USE DT_MOD
+      USE OUTPUT_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -127,23 +132,18 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com02_c.inc"
 #include      "com04_c.inc"
 #include      "com06_c.inc"
 #include      "com08_c.inc"
 #include      "param_c.inc"
 #include      "vect01_c.inc"
-#include      "scr05_c.inc"
 #include      "scr06_c.inc"
 #include      "scr17_c.inc"
-#include      "units_c.inc"
 #include      "parit_c.inc"
 #include      "task_c.inc"
 #include      "spmd_c.inc"
-#include      "vale_c.inc"
 #include      "inter18.inc"
 #include      "inter22.inc"
-#include      "alefvm.inc"
 #include      "mmale51_c.inc" 
 #include      "scr07_c.inc"
 #include      "stati_c.inc"
@@ -168,7 +168,7 @@ C-----------------------------------------------
      .   IGRV(*),LGRAV(*)
       ! for parith/on : ID_GLOBAL_VOIS --> user id ; FACE_VOIS --> face of the remote element
       INTEGER, DIMENSION(*), INTENT(in) :: ID_GLOBAL_VOIS,FACE_VOIS
-     
+      LOGICAL, INTENT(inout) :: NEED_COMM_INTER18 !< true if the mpi comm "exchange of remote XCELL data" is mandatory
       DOUBLE PRECISION XDP(3,*)
       
       my_real X(3,NUMNOD),V(3,NUMNOD),MS(*),PM(NPROPM,NUMMAT),SKEW(LSKEW,*),
@@ -197,11 +197,13 @@ C-----------------------------------------------
       TYPE (SURF_)   , DIMENSION(NSURF)   :: IGRSURF
       TYPE(t_ebcs_tab), INTENT(INOUT) :: EBCS_TAB
       TYPE(t_ale_connectivity), INTENT(IN) :: ALE_CONNECTIVITY
-      TYPE(T_DIFFUSION), INTENT(INOUT) :: DIFFUSION
-      TYPE(MATPARAM_STRUCT_)  , DIMENSION(NUMMAT) :: MATPARAM_TAB
+      TYPE(T_DIFFUSION),INTENT(INOUT) :: DIFFUSION
+      TYPE (MAT_ELEM_) ,INTENT(INOUT) :: MAT_ELEM
       TYPE (H3D_DATABASE) :: H3D_DATA
-      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE (SENSORS_) ,INTENT(IN)  :: SENSORS
       my_real, INTENT(INOUT) :: XCELL(3,SXCELL)
+      TYPE (DT_) ,INTENT(INOUT)  :: DT
+      TYPE(OUTPUT_), INTENT(INOUT) :: OUTPUT !< output structure
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -213,7 +215,8 @@ C-----------------------------------------------
       my_real FX(MVSIZ,10),FY(MVSIZ,10),FZ(MVSIZ,10),VOLN(MVSIZ) 
       my_real, TARGET  :: BID
       my_real, DIMENSION(:,:),ALLOCATABLE,TARGET  :: QMV
-      my_real, POINTER :: pQMV      
+      my_real, POINTER :: pQMV
+      my_real :: SUM_MASS
       ! SPMD array for adjacent data ALE/CFD
       my_real, DIMENSION(:,:),ALLOCATABLE ::BUFVOIS
 
@@ -232,26 +235,25 @@ C-----------------------------------------------
 
 C  IOUTPRT (assembly report)   
          IOUTPRT = 0
-         IF(MOD(NCYCLE,IABS(NCPRI)) == 0.OR.TT >= THIS.OR.TT >= TDES.
-     .   OR.TT >= TPAT.OR.MDESS /= 0.
-     .   OR.(IALESUB /= 0.AND.T1S+DT2S >= THIS).
-     .   OR.TT >= THIS1(1).OR.TT >= THIS1(2).
-     .   OR.TT >= THIS1(3).OR.TT >= THIS1(4).OR.TT >= THIS1(5).
-     .   OR.TT >= THIS1(6).OR.TT >= THIS1(7).OR.TT >= THIS1(8).
-     .   OR.TT >= THIS1(9).OR.NTH /= 0.OR.NANIM /= 0          .
+         IF(MOD(NCYCLE,IABS(NCPRI)) == 0.OR.TT >= OUTPUT%TH%THIS.OR.MDESS /= 0.
+     .   OR.(ALE%SUB%IALESUB /= 0.AND.T1S+DT2S >= OUTPUT%TH%THIS).
+     .   OR.TT >= OUTPUT%TH%THIS1(1).OR.TT >= OUTPUT%TH%THIS1(2).
+     .   OR.TT >= OUTPUT%TH%THIS1(3).OR.TT >= OUTPUT%TH%THIS1(4).OR.TT >= OUTPUT%TH%THIS1(5).
+     .   OR.TT >= OUTPUT%TH%THIS1(6).OR.TT >= OUTPUT%TH%THIS1(7).OR.TT >= OUTPUT%TH%THIS1(8).
+     .   OR.TT >= OUTPUT%TH%THIS1(9).OR.NTH /= 0.OR.NANIM /= 0          .
      .   OR.TT >= TABFIS(1).OR.TT >= TABFIS(2).
      .   OR.TT >= TABFIS(3).OR.TT >= TABFIS(4).OR.TT >= TABFIS(5).
      .   OR.TT >= TABFIS(6).OR.TT >= TABFIS(7).OR.TT >= TABFIS(8).
      .   OR.TT >= TABFIS(9).OR.TT >= TABFIS(10).
-     .   OR.(IALESUB /= 0.AND.T1S+DT2S >= THIS1(1)).
-     .   OR.(IALESUB /= 0.AND.T1S+DT2S >= THIS1(2)).
-     .   OR.(IALESUB /= 0.AND.T1S+DT2S >= THIS1(3)).
-     .   OR.(IALESUB /= 0.AND.T1S+DT2S >= THIS1(4)).
-     .   OR.(IALESUB /= 0.AND.T1S+DT2S >= THIS1(5)).
-     .   OR.(IALESUB /= 0.AND.T1S+DT2S >= THIS1(6)).
-     .   OR.(IALESUB /= 0.AND.T1S+DT2S >= THIS1(7)).
-     .   OR.(IALESUB /= 0.AND.T1S+DT2S >= THIS1(8)).
-     .   OR.(IALESUB /= 0.AND.T1S+DT2S >= THIS1(9)).OR.ISTAT==3) IOUTPRT=1
+     .   OR.(ALE%SUB%IALESUB /= 0.AND.T1S+DT2S >= OUTPUT%TH%THIS1(1)).
+     .   OR.(ALE%SUB%IALESUB /= 0.AND.T1S+DT2S >= OUTPUT%TH%THIS1(2)).
+     .   OR.(ALE%SUB%IALESUB /= 0.AND.T1S+DT2S >= OUTPUT%TH%THIS1(3)).
+     .   OR.(ALE%SUB%IALESUB /= 0.AND.T1S+DT2S >= OUTPUT%TH%THIS1(4)).
+     .   OR.(ALE%SUB%IALESUB /= 0.AND.T1S+DT2S >= OUTPUT%TH%THIS1(5)).
+     .   OR.(ALE%SUB%IALESUB /= 0.AND.T1S+DT2S >= OUTPUT%TH%THIS1(6)).
+     .   OR.(ALE%SUB%IALESUB /= 0.AND.T1S+DT2S >= OUTPUT%TH%THIS1(7)).
+     .   OR.(ALE%SUB%IALESUB /= 0.AND.T1S+DT2S >= OUTPUT%TH%THIS1(8)).
+     .   OR.(ALE%SUB%IALESUB /= 0.AND.T1S+DT2S >= OUTPUT%TH%THIS1(9)).OR.ISTAT==3) IOUTPRT=1
       
       ALLOCATE(QMV(2*NV46,LENQMV)) !MM-ALE 51 only                       !OPTIM : SHOULD BE ALLOCATED IN ARRALOC
       IF(M51_IFLG6 == 1)SBUFVOIS = M51_IFLG6_SIZE
@@ -266,13 +268,13 @@ C  IOUTPRT (assembly report)
         IADBH=1
       ENDIF
       !IFSUBM=1 : masse changed
-      IFSUBM=1
+      ALE%SUB%IFSUBM=1
 
       IF(IALE+IEULER /= 0)THEN
        DO N=NODFT,NODLT
         IF(ALE_CONNECTIVITY%NALE(N) /= 0) MS0(N) = MS(N)
        ENDDO
-       IF(IALEFVM > 0)THEN
+       IF(ALEFVM_Param%IEnabled > 0)THEN
          DO N=NODFT,NODLT
            IF(ALE_CONNECTIVITY%NALE(N) /= 0) V(1:3,N) = ZERO !reset velocities
          ENDDO       
@@ -283,10 +285,12 @@ C  IOUTPRT (assembly report)
       !     INTERFACE 18 - VARIABLE GAP
       !---------------------------------------------
        IF(INTER18_IS_VARIABLE_GAP_DEFINED)THEN
+          NEED_COMM_INTER18 = .TRUE.
           DO NG=ITASK+1,NGROUP,NTHREAD
              IF (TT > ZERO .AND. IPARG(76, NG) == 1) CYCLE ! --> OFF
              IF(IPARG(8,NG) == 1) CYCLE
-             CALL INITBUF (
+             ISOLNOD=IPARG(28,NG)
+             CALL INITBUF(
      1          IPARG   ,NG      ,
      2          MTN     ,NEL     ,NFT     ,IAD      ,ITY     ,
      3          NPT     ,JALE    ,ISMSTR  ,JEUL     ,JTUR    ,
@@ -298,41 +302,41 @@ C  IOUTPRT (assembly report)
                DO I=1,NEL                             
                  XCELL(1,I+NFT)=EXP(LOG(ELBUF_TAB(NG)%GBUF%VOL(I))/THREE)
                  XCELL(2,I+NFT)=ZERO
-                 XCELL(3,I+NFT)=ZERO                   
+                 XCELL(3,I+NFT)=ZERO      
                ENDDO      
              ENDIF                                    
           ENDDO
       CALL MY_BARRIER
         IF(NSPMD>1)THEN
            LENCOM = NERCVOIS(NSPMD + 1) + NESDVOIS(NSPMD + 1)
-           CALL SPMD_ENVOIS(1, XCELL, 
+           CALL SPMD_ENVOIS(3, XCELL, 
      .          NERCVOIS, NESDVOIS, LERCVOIS, LESDVOIS, LENCOM)    
         ENDIF
-      ENDIF
-      
+      ENDIF      
+
       !--------------------------------------------------------
       ! F L U I D E
       !       ALE SUB-CYCLING PREPARATION
-      !       IALESUB=1 LEGACY IMPLEMENTATION, NOT PARALLEL, DELETED IN V11
-      !       IALESUB=2 PARALLEL IMPLMEMENTATION IN 2002
+      !       ALE%SUB%IALESUB=1 LEGACY IMPLEMENTATION, NOT PARALLEL, DELETED IN V11
+      !       ALE%SUB%IALESUB=2 PARALLEL IMPLMEMENTATION IN 2002
       !--------------------------------------------------------
-      IF(IALESUB /= 0) CALL MY_BARRIER    
+      IF(ALE%SUB%IALESUB /= 0) CALL MY_BARRIER    
       !-----
-      IF(IALESUB == 2)THEN
+      IF(ALE%SUB%IALESUB == 2)THEN
         IF(ITASK == 0)THEN
           IF(TT == ZERO .OR. TT+DT1 > T1S+DT2S)THEN
-            IFSUB  = 0
-            IFSUBM = 1
-            DT1SAVE= DT1
+            ALE%SUB%IFSUB  = 0
+            ALE%SUB%IFSUBM = 1
+            ALE%SUB%DT1SAVE= DT1
             DT1    = TT-T1S
             T1S    = TT
           ELSE
-            IFSUB=1
-            IFSUBM=0
+            ALE%SUB%IFSUB=1
+            ALE%SUB%IFSUBM=0
           ENDIF
         ENDIF
         CALL MY_BARRIER
-        IF(IFSUB == 0)THEN
+        IF(ALE%SUB%IFSUB == 0)THEN
           NELTSA  = NELTST
           ITYPTSA = ITYPTST
           DT2SAVE = DT2T
@@ -342,13 +346,13 @@ C  IOUTPRT (assembly report)
      1               ALE_CONNECTIVITY%NALE,V,W,DSAVE,ICODT,ISKEW,SKEW,D,
      2               ITASK,NODFT,NODLT,FSKY,FSKY      )
       ENDIF
-      IF(IALESUB == 0  .AND. ITASK == 0)THEN
-        IFSUB = 0
+      IF(ALE%SUB%IALESUB == 0  .AND. ITASK == 0)THEN
+        ALE%SUB%IFSUB = 0
         T1S   = TT
       ENDIF
       !-----      
       
-      IF(ITHERM == 1 .AND. IALE+IEULER == 0) IFSUBM=0
+      IF(ITHERM == 1 .AND. IALE+IEULER == 0) ALE%SUB%IFSUBM=0
 C----------------------------------
 C       ALE - EULER - THERMAL
 C       WA  = flux for sforc3 and qforc3
@@ -356,8 +360,7 @@ C----------------------------------
 
       CALL MY_BARRIER
 C
-      IF (IPARIT == 0 .AND. NSPMD > 1 .AND. 
-     +    IFSUBM == 1 .AND. N2D == 0 .AND. INCOMP == 0) THEN
+      IF (IPARIT == 0 .AND. NSPMD > 1 .AND. ALE%SUB%IFSUBM == 1 .AND. N2D == 0 .AND. ALE%GLOBAL%INCOMP == 0) THEN
         DO N = NODFT, NODLT
           MS(N) = MS(N)*WEIGHT(N)
           MSNF(N) = MSNF(N)*WEIGHT(N)
@@ -369,7 +372,7 @@ C
 C---------------------------------------------------------
 C       ALE - EULER  + 2D : update masses 
 C---------------------------------------------------------
-      IF (N2D > 0 .AND. IFSUBM == 1) THEN
+      IF (N2D > 0 .AND. ALE%SUB%IFSUBM == 1) THEN
         DO N = NODFT, NODLT
           MS_2D(N) = ZERO
         ENDDO
@@ -378,23 +381,20 @@ C
 C
       ENDIF
 C
-      IF(IFSUB == 0)THEN
+      IF(ALE%SUB%IFSUB == 0)THEN
         IF(ITASK==0) CALL STARTIME(MACRO_TIMER_IFSUB0,1)
         IF(IALE+IEULER+ITHERM /= 0)THEN
-          IF(INCOMP == 0) THEN
+          IF(ALE%GLOBAL%INCOMP == 0) THEN
             IF(NSEGFLU > 0 .AND. N2D == 0) THEN
               CALL SEGGETV(IPARG,ELBUF_TAB,ALE_CONNECTIVITY,ITASK,SEGVAR)
 C             Comm SPMD SEGVAR Pi -> P0
               IF(NSPMD > 1) THEN
 
-C Part not parallel smt
 !$OMP SINGLE
-                CALL SPMD_SEGCOM(
-     .            SEGVAR,NPSEGCOM,LSEGCOM,NPSEGCOM(NSPMD+1),0)
+                CALL SPMD_SEGCOM(SEGVAR,NPSEGCOM,LSEGCOM,NPSEGCOM(NSPMD+1),0)
 !$OMP END SINGLE
               ENDIF
             ENDIF
-            
             !------------------------------------------------!
             ! INTERFACE CONVECTIONS                          !
             !------------------------------------------------!  
@@ -413,20 +413,16 @@ C              Envoi X pour interface type 12 ?
      .                          A,V,W,X,FSAV(1,I),FV,
      .                          WA,MS,STIFN,IPARG,
      .                          ELBUF_TAB,EBCS_TAB,MULTI_FVM,IXQ,IXS,IXTG,
-     .                          ITAB,ALE_CONNECTIVITY%NALE)
+     .                          ITAB,ALE_CONNECTIVITY%NALE,FSKY)
                ENDIF
                CALL MY_BARRIER
             ENDIF
             !------------------------------------------------!              
-
             IF(NSEGFLU > 0) THEN
 C Comm SPMD SEGVAR P0 -> Pi
                IF(NSPMD > 1) THEN
-C Part not parallel smt
 !$OMP SINGLE
-                 CALL SPMD_SEGCOM(
-     .             SEGVAR,NPSEGCOM,LSEGCOM,NPSEGCOM(NSPMD+1),1)
-
+                 CALL SPMD_SEGCOM(SEGVAR,NPSEGCOM,LSEGCOM,NPSEGCOM(NSPMD+1),1)
 C Comm SPMD P0 -> Pi time T=0 depending on EBCS type
                  IF(TT == ZERO)THEN
                     CALL SPMD_INIT_EBCS(V,ISIZXV,IAD_ELEM,FR_ELEM, EBCS_TAB)
@@ -455,8 +451,8 @@ c
          ENDIF
          !==================================================================================   
          
-
          IF (MULTI_FVM%IS_USED) THEN
+
           IF(ITASK==0) CALL STARTIME(MACRO_TIMER_MULTIFVM,1)
 C     -------------------------
 C     Multifluid law variable globalization
@@ -567,7 +563,7 @@ C     -------------------------
 C     Gravity terms
 C     -------------------------
                CALL ALEFVM_GRAV_INIT(
-     1              AGRAV, IGRV    , LGRAV, SENSOR_TAB,
+     1              AGRAV, IGRV    , LGRAV, SENSORS%NSENSOR,SENSORS%SENSOR_TAB,
      2              IXS  , ITASK   , NPC  , TF    , SKEW   ,
      3              ITAB 
      .              )
@@ -674,25 +670,29 @@ C     -------------------------
                CALL MY_BARRIER
             ENDIF
             IF(ITASK==0) CALL STOPTIME(MACRO_TIMER_MULTIFVM,1)
+
          ELSE
+
 !------------------------------------------------!
 ! CONVECTION, CONDUCTION, REZONING               !
 !------------------------------------------------! 
             CALL ALETHE(
-     1           IPARG    ,ELBUF_TAB ,WA      ,VAL2    ,PHI     ,
-     2           ALE_CONNECTIVITY    ,IXS       ,IXQ     ,V       ,W       ,
-     3           X        ,PM        ,MS      ,VEUL    ,FILL    ,
-     4           DFILL    ,ALPH      ,FV      ,BUFMAT  ,TF      ,
-     5           NPC      ,ITASK     ,NBRCVOIS,NBSDVOIS,LNRCVOIS,
-     6           LNSDVOIS ,NERCVOIS  ,NESDVOIS,LERCVOIS,LESDVOIS,
-     7           IADS     ,SEGVAR    ,MSNF    ,NODFT   ,NODLT   ,
-     8           WA(IADBH),IPM       ,QMV     ,ITAB    ,ITABM1  ,
-     9           LENQMV   ,NV46      ,LGAUGE  ,GAUGE   ,
-     A           IGAUP    ,NGAUP     ,VOLN,
-     B           IAD_ELEM, FR_ELEM)
+     1   IPARG,           ELBUF_TAB,       WA,              VAL2,
+     2   PHI,             ALE_CONNECTIVITY,IXS,             IXQ,
+     3   V,               W,               X,               PM,
+     4   MS,              VEUL,            FILL,            DFILL,
+     5   ALPH,            FV,              BUFMAT,          TF,
+     6   NPC,             ITASK,           NBRCVOIS,        NBSDVOIS,
+     7   LNRCVOIS,        LNSDVOIS,        NERCVOIS,        NESDVOIS,
+     8   LERCVOIS,        LESDVOIS,        IADS,            SEGVAR,
+     9   MSNF,            NODFT,           NODLT,           WA(IADBH),
+     A   IPM,             QMV,             ITAB,            ITABM1,
+     B   LENQMV,          NV46,
+     C   VOLN,            IAD_ELEM,
+     D   FR_ELEM,         NEL,             IXTG)
          ENDIF
       ELSE
-         IFSUBM=0
+         ALE%SUB%IFSUBM=0
           ENDIF
 C
           CALL MY_BARRIER
@@ -713,11 +713,11 @@ C
          !---------------------------------------------
          !     ALEFVM : FINITE VOLUME FOR MOMENTUM
          !---------------------------------------------          
-          IF(IALEFVM > 0) THEN
+          IF(ALEFVM_Param%IEnabled > 0) THEN
             !GRAVITY INIT
             ! VERTEX(4,1:NUMNOD) = ZERO  !-> not needed, nodes remain the same ones and VERTEX is initialized on allocation
             CALL ALEFVM_GRAV_INIT(
-     1                           AGRAV, IGRV    , LGRAV, SENSOR_TAB,
+     1                           AGRAV, IGRV    , LGRAV, SENSORS%NSENSOR,SENSORS%SENSOR_TAB,
      2                           IXS  , ITASK   , NPC  , TF    , SKEW   ,
      3                           ITAB 
      .                           )
@@ -729,14 +729,20 @@ C
          !---------------------------------------------
          ! TETRA4 : SMOOTH FINITE ELEMENT FORMULATIONS
          !---------------------------------------------
-c non parallel SMP section (SPMD communications in S4ALESFEM)
 !$OMP SINGLE
           IF(ISFEM >= 1) THEN
             CALL S4ALESFEM(IPARG,IXS,X,ELBUF_TAB,VARNOD,PM,
      .                     IAD_ELEM,FR_ELEM)
           ENDIF
-c end non parallel SMP section
 !$OMP END SINGLE
+
+         !---------------------------------------------
+         ! /ALE/GRID/MASSFLOW - INIT BUFFER
+         !---------------------------------------------
+          IF(ALE%GRID%NWALE == 7) THEN
+             ALE%GRID%MASSFLOW_DATA%EP(1:9)=ZERO
+             ALE%GRID%MASSFLOW_DATA%SUM_M = ZERO
+          ENDIF
 
          !---------------------------------------------
          ! ALL ELEMENTS EXPECT LAW/=11
@@ -747,7 +753,7 @@ C     ALE ON / OFF
              IF (TT  >  ZERO .AND. IPARG(76, NG)  ==  1) CYCLE ! --> OFF
              IF(IPARG(8,NG) /= 1) THEN
 C
-             CALL INITBUF (IPARG    ,NG      ,
+             CALL INITBUF(IPARG    ,NG      ,
      2          MTN     ,NEL     ,NFT     ,IAD     ,ITY     ,
      3          NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,
      4          JTHE    ,JLAG    ,JMULT   ,JHBE    ,JIVF    ,
@@ -772,21 +778,25 @@ C
                  NF1=NFT+1
 C
                  IF (ITY == 1 .AND. ISOLNOD == 4) THEN
-                  CALL S4FORC3(ELBUF_TAB,NG     ,
-     1            PM        ,GEO       ,IXS     ,X          ,
-     2            A         ,V         ,MS      ,W          ,WA       ,
-     3            VAL2      ,VEUL      ,FV      ,ALE_CONNECTIVITY      ,IPARG    ,
-     4            TF        ,NPC       ,BUFMAT  ,PARTSAV    ,NLOC_DMG ,
-     5            DT2T      ,NELTST    ,ITYPTST ,STIFN      ,FSKY     ,
-     6            IADS      ,OFFSET    ,EANI    ,IPARTS(NF1),
-     7            FX(1,1)   ,FY(1,1)   ,FZ(1,1) ,FX(1,2)    ,FY(1,2)  ,
-     8            FZ(1,2)   ,FX(1,3)   ,FY(1,3) ,FZ(1,3)    ,FX(1,4)  ,
-     9            FY(1,4)   ,FZ(1,4)   ,NEL     ,FSKYM      ,MSNF     ,
-     A            IPM       ,IGEO      ,BUFVOIS ,ISTRA      ,ITASK    ,
-     B            BID       ,BID       ,BID     ,IBID       ,GRESAV   ,
-     C            GRTH      ,IGRTH     ,MSSA    ,DMELS      ,TABLE    ,
-     D            XDP       ,VARNOD    ,VOLN    ,BID        ,BID      ,
-     E            D         ,SENSOR_TAB,IOUTPRT ,MATPARAM_TAB,IBID)
+                  CALL S4FORC3(
+     1   ELBUF_TAB,       NG,              PM,              GEO,
+     2   IXS,             X,               A,               V,
+     3   MS,              W,               WA,              VAL2,
+     4   VEUL,            FV,              ALE_CONNECTIVITY,IPARG,
+     5   TF,              NPC,             BUFMAT,          PARTSAV,
+     6   NLOC_DMG,        DT2T,            NELTST,          ITYPTST,
+     7   STIFN,           FSKY,            IADS,            OFFSET,
+     8   EANI,            IPARTS(NF1),     FX(1,1),         FY(1,1),
+     9   FZ(1,1),         FX(1,2),         FY(1,2),         FZ(1,2),
+     A   FX(1,3),         FY(1,3),         FZ(1,3),         FX(1,4),
+     B   FY(1,4),         FZ(1,4),         NEL,             FSKYM,
+     C   MSNF,            IPM,             IGEO,            BUFVOIS,
+     D   ISTRA,           ITASK,           BID,             BID,
+     E   BID,             IBID,            GRESAV,          GRTH,
+     F   IGRTH,           MSSA,            DMELS,           TABLE,
+     G   XDP,             VARNOD,          VOLN,            BID,
+     H   BID,             D,               SENSORS,         IOUTPRT,
+     I   MAT_ELEM,        IBID,            DT,              IDEL7NOK)
 C
                  ELSEIF (ITY == 1 .AND. ISOLNOD /= 4) THEN
                   NULLIFY(pQMV); 
@@ -795,31 +805,35 @@ C
                   ELSE
                     pQMV => BID
                   ENDIF
-                  CALL SFORC3(ELBUF_TAB,NG      ,
-     2            PM           ,GEO          ,IXS          ,X            ,NV46    , 
-     3            A            ,V            ,MS           ,W            ,WA      , 
-     4            VAL2         ,VEUL         ,FV           ,ALE_CONNECTIVITY     ,IPARG   , 
-     5            TF           ,NPC          ,BUFMAT       ,PARTSAV      ,ITAB    ,          
-     6            DT2T         ,NELTST       ,ITYPTST      ,STIFN        ,FSKY    , 
-     7            IADS         ,OFFSET       ,EANI         ,IPARTS(1+NFT),   
-     8            FX(1,1)      ,FY(1,1)      ,FZ(1,1)      ,FX(1,2)      ,FY(1,2) ,     
-     9            FZ(1,2)      ,FX(1,3)      ,FY(1,3)      ,FZ(1,3)      ,FX(1,4) ,     
-     A            FY(1,4)      ,FZ(1,4)      ,FX(1,5)      ,FY(1,5)      ,FZ(1,5) ,     
-     B            FX(1,6)      ,FY(1,6)      ,FZ(1,6)      ,FX(1,7)      ,FY(1,7) ,     
-     C            FZ(1,7)      ,FX(1,8)      ,FY(1,8)      ,FZ(1,8)      ,NEL     ,     
-     D            FSKYM        ,MSNF         ,ISKY         ,FSKYI        ,
-     E            NVC          ,IPM          ,IGEO         ,BID          ,BID     ,     
-     F            BID          ,BID          ,BID          ,BUFVOIS ,       
-     G            ITASK        ,pQMV         ,ISTRA        ,TEMP         ,BID     ,        
-     H            BID          ,IBID         ,GRESAV       ,GRTH         ,IGRTH   ,       
-     I            MSSA         ,DMELS        ,TABLE        ,BID          ,BID     ,       
-     J            BID          ,BID          ,BID          ,BID          ,BID     ,
-     K            BID          ,BID          ,IPARG(1,NG)  ,XDP     ,
-     M            BID          ,IBID         ,IBID         ,VOLN         ,CONDN   ,
-     N            CONDNSKY     ,AGRAV        ,IGRV         ,LGRAV        ,SENSOR_TAB,
-     O            SKEW          ,
-     P            ALE_CONNECTIVITY%NALE      ,D            ,IOUTPRT      ,NLOC_DMG,
-     Q            MATPARAM_TAB ,IBID)
+                  CALL SFORC3(
+     1   ELBUF_TAB,            NG,                   PM,                   GEO,
+     2   IXS,                  X,                    NV46,                 A,
+     3   V,                    MS,                   W,                    WA,
+     4   VAL2,                 VEUL,                 FV,                   ALE_CONNECTIVITY,
+     5   IPARG,                TF,                   NPC,                  BUFMAT,
+     6   PARTSAV,              ITAB,                 DT2T,                 NELTST,
+     7   ITYPTST,              STIFN,                FSKY,                 IADS,
+     8   OFFSET,               EANI,                 IPARTS(1+NFT),        FX(1,1),
+     9   FY(1,1),              FZ(1,1),              FX(1,2),              FY(1,2),
+     A   FZ(1,2),              FX(1,3),              FY(1,3),              FZ(1,3),
+     B   FX(1,4),              FY(1,4),              FZ(1,4),              FX(1,5),
+     C   FY(1,5),              FZ(1,5),              FX(1,6),              FY(1,6),
+     D   FZ(1,6),              FX(1,7),              FY(1,7),              FZ(1,7),
+     E   FX(1,8),              FY(1,8),              FZ(1,8),              NEL,
+     F   FSKYM,                MSNF,                 ISKY,                 FSKYI,
+     G   NVC,                  IPM,                  IGEO,                 BID,
+     H   BID,                  BID,                  BID,                  BID,
+     I   BUFVOIS,              ITASK,                pQMV,                 ISTRA,
+     J   TEMP,                 BID,                  BID,                  IBID,
+     K   GRESAV,               GRTH,                 IGRTH,                MSSA,
+     L   DMELS,                TABLE,                BID,                  BID,
+     M   BID,                  BID,                  BID,                  BID,
+     N   BID,                  BID,                  BID,                  IPARG(1,NG),
+     O   XDP,                  BID,                  IBID,                 IBID,
+     P   VOLN,                 CONDN,                CONDNSKY,             AGRAV,
+     Q   IGRV,                 LGRAV,                SENSORS,              SKEW,
+     R   ALE_CONNECTIVITY%NALE,D,                    IOUTPRT,              NLOC_DMG,
+     S   MAT_ELEM,             IBID,                 DT,                   IDEL7NOK)
 C
                  ELSEIF (ITY == 2 .AND. JMULT == 0) THEN
                   NULLIFY(pQMV); 
@@ -838,7 +852,7 @@ C
      6              EANI         ,IPARTQ(1+NFT),NEL         ,IADQ      ,FSKY     ,  
      9              IPM          ,BUFVOIS      ,pQMV        ,
      A              GRESAV       ,GRTH         ,IGRTH       ,TABLE     ,IGEO     ,
-     B              VOLN         ,ITASK        ,MS_2D       ,FSKYM     ,IOUTPRT  ,MATPARAM_TAB,
+     B              VOLN         ,ITASK        ,MS_2D       ,FSKYM     ,IOUTPRT  ,MAT_ELEM,
      C              H3D_DATA%STRAIN) 
 c
                  ELSEIF (ITY == 2 .AND. JMULT /= 0) THEN
@@ -847,20 +861,19 @@ c
      2              A           ,V     ,MS     ,W         ,WA          ,
      3              VAL2        ,VEUL  ,FV     ,ALE_CONNECTIVITY     ,IPARG       ,
      4              IPARG(1,NG) ,FILL  ,DFILL  ,IMS       ,NLOC_DMG    ,
-     5              IFILL       ,TF    ,NPC    ,BUFMAT    ,PARTSAV     ,
+     5              TF    ,NPC    ,BUFMAT    ,PARTSAV     ,
      6              DT2T        ,NELTST,ITYPTST,STIFN     ,OFFSET      ,
      7              EANI        ,IPARTQ(1+NFT),NEL,IADQ   ,FSKY        ,
      8              IPM ,BUFVOIS,
      9              GRESAV,GRTH ,IGRTH ,TABLE  ,IGEO,
-     O              VOLN  ,ITASK,MS_2D ,FSKYM  ,MATPARAM_TAB,
-     B              IBID)
+     O              VOLN  ,ITASK,MS_2D ,FSKYM  ,MAT_ELEM,
+     B              IBID,OUTPUT)
                  ENDIF
                 ENDIF
               ENDIF
             ENDIF
           ENDDO
 C
-
          !---------------------------------------------
          ! ELEMENTS : LAW==11
          !---------------------------------------------
@@ -872,31 +885,28 @@ C
              ! WA[1..IADC-1] : FLUX
              ! WA[IADC..IADD-1] : BUFVOIS (buffer elements voisins en SPMD)
              ! WA[IADD..LENWA] : BUFCOM (wa pour comm spmd)
-C Partie non parallele smt
 !$OMP SINGLE
               LENCOM=NBRCVOIS(NSPMD+1)+NBSDVOIS(NSPMD+1)
               IF(M51_IFLG6 == 0) THEN
               !======LAW11-NRF/SPMD=====================================!
-                 ! comm noeuds voisins
+                 ! comm adjacent domains
                  CALL SPMD_XVOIS(
      1              V       ,NBRCVOIS,NBSDVOIS,LNRCVOIS,LNSDVOIS,
      2              LENCOM  )
-                 ! a optimiser en fct des combinaisons d'options possibles
-                 IF(INCOMP == 1.OR.ITURB+ITHERM == 0)
-     .             CALL SPMD_XVOIS(
-     1               X       ,NBRCVOIS,NBSDVOIS,LNRCVOIS,LNSDVOIS,
-     2               LENCOM  )
-                   ! comm elements voisins
+                 ! to be optimized depending on combination of options
+                 IF(ALE%GLOBAL%INCOMP == 1.OR.ITURB+ITHERM == 0)
+     .             CALL SPMD_XVOIS(X       ,NBRCVOIS,NBSDVOIS,LNRCVOIS,LNSDVOIS,LENCOM  )
+                   ! comm adjacent elems
                  CALL SPMD_L11VOIS(
-     1             BUFVOIS ,IPARG   ,ELBUF_TAB,PM      ,IXS     ,
-     2             IXQ     ,NERCVOIS,NESDVOIS,LERCVOIS,LESDVOIS,
-     3             LENCOM  )
+     1                 BUFVOIS ,IPARG   ,ELBUF_TAB,PM      ,IXS     ,
+     2                 IXQ     ,NERCVOIS,NESDVOIS,LERCVOIS,LESDVOIS,
+     3                 LENCOM  )
               ELSE
               !======LAW51-NRF/SPMD=====================================!
                  CALL SPMD_L51VOIS(
-     1               BUFVOIS ,IPARG   ,ELBUF_TAB,PM      ,IXS     ,
-     2               IXQ     ,NERCVOIS,NESDVOIS,LERCVOIS,LESDVOIS,
-     3               LENCOM  ,IPM     ,BUFMAT)
+     1                 BUFVOIS ,IPARG   ,ELBUF_TAB,PM      ,IXS     ,
+     2                 IXQ     ,NERCVOIS,NESDVOIS,LERCVOIS,LESDVOIS,
+     3                 LENCOM  ,IPM     ,BUFMAT)
               ENDIF
 !$OMP END SINGLE
             ENDIF
@@ -905,7 +915,7 @@ C Partie non parallele smt
 C     ALE ON / OFF
                NGR_SENSOR = NG
                IF (TT  >  ZERO .AND. IPARG(76, NG)  ==  1) CYCLE ! --> OFF
-               CALL INITBUF (IPARG    ,NG      ,
+               CALL INITBUF(IPARG    ,NG      ,
      2           MTN     ,NEL     ,NFT     ,IAD     ,ITY     ,
      3           NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,
      4           JTHE    ,JLAG    ,JMULT   ,JHBE    ,JIVF    ,
@@ -929,21 +939,25 @@ C     ALE ON / OFF
                  NF1=NFT+1
 
                  IF(ITY == 1 .AND. ISOLNOD == 4)THEN
-                  CALL S4FORC3(ELBUF_TAB,NG     ,
-     1            PM        ,GEO       ,IXS     ,X          ,
-     2            A         ,V         ,MS      ,W          ,WA       ,
-     3            VAL2      ,VEUL      ,FV      ,ALE_CONNECTIVITY      ,IPARG    ,
-     4            TF        ,NPC       ,BUFMAT  ,PARTSAV    ,NLOC_DMG ,
-     5            DT2T      ,NELTST    ,ITYPTST ,STIFN      ,FSKY     ,
-     6            IADS      ,OFFSET    ,EANI    ,IPARTS(NF1),
-     7            FX(1,1)   ,FY(1,1)   ,FZ(1,1) ,FX(1,2)    ,FY(1,2)  ,
-     8            FZ(1,2)   ,FX(1,3)   ,FY(1,3) ,FZ(1,3)    ,FX(1,4)  ,
-     9            FY(1,4)   ,FZ(1,4)   ,NEL     ,FSKYM      ,MSNF     ,
-     A            IPM       ,IGEO      ,BUFVOIS ,ISTRA      ,ITASK    ,
-     B            BID       ,BID       ,BID     ,IBID       ,GRESAV   ,
-     C            GRTH      ,IGRTH     ,MSSA    ,DMELS      ,TABLE    ,
-     D            XDP       ,BID       ,VOLN    ,BID        ,BID      ,
-     E            D         ,SENSOR_TAB,IOUTPRT ,MATPARAM_TAB ,IBID)
+                  CALL S4FORC3(
+     1   ELBUF_TAB,       NG,              PM,              GEO,
+     2   IXS,             X,               A,               V,
+     3   MS,              W,               WA,              VAL2,
+     4   VEUL,            FV,              ALE_CONNECTIVITY,IPARG,
+     5   TF,              NPC,             BUFMAT,          PARTSAV,
+     6   NLOC_DMG,        DT2T,            NELTST,          ITYPTST,
+     7   STIFN,           FSKY,            IADS,            OFFSET,
+     8   EANI,            IPARTS(NF1),     FX(1,1),         FY(1,1),
+     9   FZ(1,1),         FX(1,2),         FY(1,2),         FZ(1,2),
+     A   FX(1,3),         FY(1,3),         FZ(1,3),         FX(1,4),
+     B   FY(1,4),         FZ(1,4),         NEL,             FSKYM,
+     C   MSNF,            IPM,             IGEO,            BUFVOIS,
+     D   ISTRA,           ITASK,           BID,             BID,
+     E   BID,             IBID,            GRESAV,          GRTH,
+     F   IGRTH,           MSSA,            DMELS,           TABLE,
+     G   XDP,             BID,             VOLN,            BID,
+     H   BID,             D,               SENSORS,         IOUTPRT,
+     I   MAT_ELEM,        IBID,            DT,              IDEL7NOK)
 
                  ELSEIF(ITY == 1 .AND. ISOLNOD /= 4)THEN
                   NULLIFY(pQMV); 
@@ -952,31 +966,35 @@ C     ALE ON / OFF
                   ELSE
                     pQMV => BID
                   ENDIF
-                  CALL SFORC3(ELBUF_TAB,NG      ,
-     2            PM           ,GEO         ,IXS       ,X            ,NV46    ,
-     3            A            ,V           ,MS        ,W            ,WA      ,   
-     4            VAL2         ,VEUL        ,FV        ,ALE_CONNECTIVITY        ,IPARG   ,   
-     5            TF           ,NPC         ,BUFMAT    ,PARTSAV      ,ITAB    ,           
-     6            DT2T         ,NELTST      ,ITYPTST   ,STIFN        ,FSKY    ,   
-     7            IADS         ,OFFSET      ,EANI      ,IPARTS(1+NFT),   
-     8            FX(1,1)      ,FY(1,1)     ,FZ(1,1)   ,FX(1,2)      ,FY(1,2) ,      
-     9            FZ(1,2)      ,FX(1,3)     ,FY(1,3)   ,FZ(1,3)      ,FX(1,4) ,      
-     A            FY(1,4)      ,FZ(1,4)     ,FX(1,5)   ,FY(1,5)      ,FZ(1,5) ,      
-     B            FX(1,6)      ,FY(1,6)     ,FZ(1,6)   ,FX(1,7)      ,FY(1,7) ,      
-     C            FZ(1,7)      ,FX(1,8)     ,FY(1,8)   ,FZ(1,8)      ,NEL     ,      
-     D            FSKYM        ,MSNF        ,ISKY      ,FSKYI        ,
-     E            NVC          ,IPM         ,IGEO      ,BID          ,BID     ,
-     F            BID          ,BID         ,BID       ,BUFVOIS ,
-     G            ITASK        ,pQMV        ,ISTRA     ,TEMP         ,BID     ,
-     H            BID          ,IBID        ,GRESAV    ,GRTH         ,IGRTH   ,      
-     I            MSSA         ,DMELS       ,TABLE     ,BID          ,BID     ,      
-     J            BID          ,BID         ,BID       ,BID          ,BID     ,      
-     K            BID          ,BID         ,IPARG(1,NG)  ,XDP     ,      
-     M            BID          ,IBID        ,IBID      ,VOLN         ,CONDN   ,
-     N            CONDNSKY     ,AGRAV       ,IGRV      ,LGRAV        ,SENSOR_TAB,
-     O            SKEW        ,
-     P            ALE_CONNECTIVITY%NALE         ,D           ,IOUTPRT   ,NLOC_DMG     ,
-     Q            MATPARAM_TAB ,IBID)
+                  CALL SFORC3(
+     1   ELBUF_TAB,            NG,                   PM,                   GEO,
+     2   IXS,                  X,                    NV46,                 A,
+     3   V,                    MS,                   W,                    WA,
+     4   VAL2,                 VEUL,                 FV,                   ALE_CONNECTIVITY,
+     5   IPARG,                TF,                   NPC,                  BUFMAT,
+     6   PARTSAV,              ITAB,                 DT2T,                 NELTST,
+     7   ITYPTST,              STIFN,                FSKY,                 IADS,
+     8   OFFSET,               EANI,                 IPARTS(1+NFT),        FX(1,1),
+     9   FY(1,1),              FZ(1,1),              FX(1,2),              FY(1,2),
+     A   FZ(1,2),              FX(1,3),              FY(1,3),              FZ(1,3),
+     B   FX(1,4),              FY(1,4),              FZ(1,4),              FX(1,5),
+     C   FY(1,5),              FZ(1,5),              FX(1,6),              FY(1,6),
+     D   FZ(1,6),              FX(1,7),              FY(1,7),              FZ(1,7),
+     E   FX(1,8),              FY(1,8),              FZ(1,8),              NEL,
+     F   FSKYM,                MSNF,                 ISKY,                 FSKYI,
+     G   NVC,                  IPM,                  IGEO,                 BID,
+     H   BID,                  BID,                  BID,                  BID,
+     I   BUFVOIS,              ITASK,                pQMV,                 ISTRA,
+     J   TEMP,                 BID,                  BID,                  IBID,
+     K   GRESAV,               GRTH,                 IGRTH,                MSSA,
+     L   DMELS,                TABLE,                BID,                  BID,
+     M   BID,                  BID,                  BID,                  BID,
+     N   BID,                  BID,                  BID,                  IPARG(1,NG),
+     O   XDP,                  BID,                  IBID,                 IBID,
+     P   VOLN,                 CONDN,                CONDNSKY,             AGRAV,
+     Q   IGRV,                 LGRAV,                SENSORS,              SKEW,
+     R   ALE_CONNECTIVITY%NALE,D,                    IOUTPRT,              NLOC_DMG,
+     S   MAt_ELEM,             IBID,                 DT,                   IDEL7NOK)
                
                  ELSEIF (ITY == 2 .AND. JMULT == 0) THEN
                   NULLIFY(pQMV); 
@@ -995,7 +1013,7 @@ C     ALE ON / OFF
      6              EANI         ,IPARTQ(1+NFT),NEL         ,IADQ     ,FSKY      ,
      9              IPM          ,BUFVOIS      ,pQMV        ,
      A              GRESAV       ,GRTH         ,IGRTH       ,TABLE    ,IGEO      ,
-     B              VOLN         ,ITASK        ,MS_2D       ,FSKYM    ,IOUTPRT   ,MATPARAM_TAB ,
+     B              VOLN         ,ITASK        ,MS_2D       ,FSKYM    ,IOUTPRT   ,MAT_ELEM ,
      C              H3D_DATA%STRAIN)
 c
                       ELSEIF(ITY == 2 .AND. JMULT /= 0)THEN
@@ -1004,13 +1022,13 @@ c
      2            A          ,V         ,MS      ,W         ,WA        ,  
      3            VAL2       ,VEUL      ,FV      ,ALE_CONNECTIVITY     ,IPARG     ,  
      4            IPARG(1,NG),FILL      ,DFILL   ,IMS       ,NLOC_DMG  ,             
-     5            IFILL      ,TF        ,NPC     ,BUFMAT    ,PARTSAV   ,       
+     5            TF        ,NPC     ,BUFMAT    ,PARTSAV   ,       
      5            DT2T       ,NELTST    ,ITYPTST ,STIFN     ,OFFSET    ,       
      6            EANI       ,IPARTQ(1+NFT),NEL  ,IADQ      ,FSKY      ,       
      7            IPM        ,BUFVOIS   ,
      8            GRESAV     ,GRTH      ,IGRTH   ,TABLE     ,IGEO      ,
-     9            VOLN       ,ITASK     ,MS_2D   ,FSKYM     ,MATPARAM_TAB,
-     B            IBID)
+     9            VOLN       ,ITASK     ,MS_2D   ,FSKYM     ,MAT_ELEM,
+     B            IBID,OUTPUT)
 
                  ENDIF
                 ENDIF
@@ -1019,7 +1037,7 @@ c
             ENDDO!next NG
             
           ENDIF!IF (ILAW11 /= 0) THEN
-           
+
         ENDIF!IF(IALE+IEULER+ITHERM /= 0)THEN
         IF(ITASK==0) CALL STOPTIME(MACRO_TIMER_IFSUB0,1)
       ENDIF!IF(IFSUB == 0)THEN
@@ -1031,20 +1049,34 @@ c          MSNF(N) = ZERO
 c        ENDDO
 c      ENDIF
 
+      !-----------------------------!
+      !     PRESSURE GAUGE          !
+      !-----------------------------!
+      IF (NBGAUGE > 0) THEN
+      IF (NSPMD  > 1) THEN
+        LENCOM =NERCVOIS(NSPMD+1)+NESDVOIS(NSPMD+1)
+      END IF
+      CALL AGAUGE(
+     1          IPARG   ,ELBUF_TAB  ,PHI    ,IXS     ,IXQ     ,
+     2          X       ,ALE_CONNECTIVITY,ITASK  ,NERCVOIS,NESDVOIS,
+     3          LERCVOIS,LESDVOIS   ,LENCOM ,LGAUGE  ,
+     4          GAUGE   ,V          ,IGAUP  ,NGAUP   ,IXTG)
+      ENDIF ! IF (NBGAUGE > 0)
+
       !--------------------------------------------------------
       !       ALE SUB-CYCLING SUITE
       !--------------------------------------------------------
-      IF(IALESUB == 2)THEN
+      IF(ALE%SUB%IALESUB == 2)THEN
         !ifsub=0 fluid calculation
         !ifsub=2 fluid calculation + assembly
         !ifsub=1 no fluid calculation
         IF(ITASK == 0) THEN
-          IF(IFSUB == 0) THEN
-            IFSUB=2
+          IF(ALE%SUB%IFSUB == 0) THEN
+            ALE%SUB%IFSUB=2
           ENDIF
         ENDIF
         CALL MY_BARRIER
-        IF(IFSUB == 1)THEN
+        IF(ALE%SUB%IFSUB == 1)THEN
           ! getting A from ASAVE
           ! AGLOB is pointing on A (no SMP shift))
           DO N=NODFT,NODLT

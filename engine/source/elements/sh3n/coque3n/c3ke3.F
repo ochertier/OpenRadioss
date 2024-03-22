@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  C3KE3                         source/elements/sh3n/coque3n/c3ke3.F
 Chd|-- called by -----------
@@ -37,7 +37,7 @@ Chd|        C3SUMG3                       source/elements/sh3n/coque3n/c3sumg3.F
 Chd|        CMATC3                        source/elements/shell/coqueba/cmatc3.F
 Chd|        CMATIP3                       source/elements/shell/coqueba/cmatc3.F
 Chd|        DRAPE_MOD                     share/modules/drape_mod.F     
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        STACK_MOD                     share/modules/stack_mod.F     
 Chd|====================================================================
       SUBROUTINE C3KE3(
@@ -48,7 +48,8 @@ Chd|====================================================================
      5            ETAG  , IDDL  ,NDOF  ,K_DIAG ,K_LT  , IADK  ,JDIK  ,     
      6            IHBE   ,THKE   ,ISMSTR ,X      ,
      7            IKGEO  ,IPM    ,IGEO   ,IEXPAN ,
-     8            IPARG  ,ISUBSTACK,STACK,DRAPE_T3 )
+     8            IPARG  ,ISUBSTACK,STACK,DRAPE_SH3N, INDX_DRAPE ,
+     9            SEDRAPE,NUMEL_DRAPE)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -66,7 +67,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
@@ -76,6 +76,8 @@ C
       INTEGER JFT     ,JLT    ,NFT    ,NPT   ,MTN     ,ITHK   ,
      .        NCYCLE,ISUBSTACK,
      .        ISTRAIN ,IPLA   ,OFFSET,IHBE    ,ISMSTR,IKGEO, IEXPAN
+      INTEGER ,    INTENT(IN)     ::        SEDRAPE,NUMEL_DRAPE
+      INTEGER, DIMENSION(SEDRAPE) :: INDX_DRAPE
       INTEGER IXTG(NIXTG,*) ,IGEO(NPROPGI,*),IPM(*),IPARG(*)
       INTEGER INDXOF(MVSIZ),
      .         ETAG(*),IDDL(*)  ,NDOF(*)  ,IADK(*) ,JDIK(*)
@@ -88,7 +90,7 @@ C     REAL OU REAL*8
      .   K_DIAG(*) ,K_LT(*)
       TYPE (ELBUF_STRUCT_), TARGET :: ELBUF_STR
       TYPE (STACK_PLY) :: STACK
-      TYPE (DRAPE_) :: DRAPE_T3
+      TYPE (DRAPE_) :: DRAPE_SH3N(NUMELTG_DRAPE)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -157,7 +159,6 @@ C
      6               M11,M12,M13,M22,M23,M33, 
      7               MF11,MF12,MF13,MF22,MF23,MF33, 
      8               FM12,FM13,FM23,OFF ,NEL) 
-
       IF (IREP>0) THEN
        CALL CMATC3(JFT    ,JLT       ,PM     ,MAT     ,GEO      ,
      1             PID    ,AREA      ,THK0   ,THK02   ,GBUF%THK ,
@@ -165,8 +166,8 @@ C
      3             HM     ,HF        ,HC     ,HZ      ,IGTYP    ,
      4             IORTH  ,HMOR      ,HFOR   ,DIR_A   ,IGEO     ,
      5             IDRIL  ,IHBE      ,HMFOR  ,GS      ,ISUBSTACK,
-     6             STACK  ,ELBUF_STR ,NLAY   ,DRAPE_T3 , NFT      ,
-     .              NEL    )
+     6             STACK  ,ELBUF_STR ,NLAY   ,DRAPE_SH3N , NFT      ,
+     .              NEL   ,INDX_DRAPE,SEDRAPE,NUMEL_DRAPE)
       ELSE
        CALL CMATC3(JFT    ,JLT       ,PM     ,MAT     ,GEO      ,
      1             PID    ,AREA      ,THK0   ,THK02   ,GBUF%THK ,
@@ -174,8 +175,8 @@ C
      3             HM     ,HF        ,HC     ,HZ      ,IGTYP    ,
      4             IORTH  ,HMOR      ,HFOR   ,DIRA    ,IGEO     ,
      5             IDRIL  ,IHBE      ,HMFOR  ,GS      ,ISUBSTACK,
-     6             STACK  ,ELBUF_STR ,NLAY   ,DRAPE_T3   ,NFT      ,
-     .             NEL    )
+     6             STACK  ,ELBUF_STR ,NLAY   ,DRAPE_SH3N   ,NFT      ,
+     .             NEL    ,INDX_DRAPE,SEDRAPE,NUMEL_DRAPE)
       ENDIF
 C-----------------------------------------------
 C     IF [KT]

@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  HM_READ_PROP33_OLD_JNT        source/properties/spring/hm_read_prop33_old_jnt.F
 Chd|-- called by -----------
@@ -45,8 +45,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   A n a l y s e   M o d u l e
 C-----------------------------------------------
-#include      "warn_c.inc"
-#include      "scr03_c.inc"
 #include      "scr17_c.inc"
 C----------+---------+---+---+--------------------------------------------
 C VAR      | SIZE    |TYP| RW| DEFINITION
@@ -133,24 +131,24 @@ C--------------------------------------------------
 C-----------------------
       IF (IDSK1<=0) THEN
          CALL ANCMSG(MSGID=386,
-     .  	     MSGTYPE=MSGERROR,
-     .  	     ANMODE=ANINFO_BLIND_1,
-     .  	     I1=ID,
-     .  	     C1=TITR)
+     .         MSGTYPE=MSGERROR,
+     .         ANMODE=ANINFO_BLIND_1,
+     .         I1=ID,
+     .         C1=TITR)
       ENDIF
       IF (KNN==0.) THEN
          CALL ANCMSG(MSGID=387,
-     .  	     MSGTYPE=MSGERROR,
-     .  	     ANMODE=ANINFO_BLIND_1,
-     .  	     I1=ID,
-     .  	     C1=TITR)
+     .         MSGTYPE=MSGERROR,
+     .         ANMODE=ANINFO_BLIND_1,
+     .         I1=ID,
+     .         C1=TITR)
       ENDIF
       IF (CR<ZERO.OR.CR>1.) THEN
          CALL ANCMSG(MSGID=388,
-     .  	     MSGTYPE=MSGERROR,
-     .  	     ANMODE=ANINFO_BLIND_1,
-     .  	     I1=ID,
-     .  	     C1=TITR)
+     .         MSGTYPE=MSGERROR,
+     .         ANMODE=ANINFO_BLIND_1,
+     .         I1=ID,
+     .         C1=TITR)
       ENDIF
       IF (CR==ZERO) CR =FIVEEM2
 C
@@ -201,8 +199,8 @@ C-----------------------
       IERROR = SET_U_GEO(24,ZERO)
       IERROR = SET_U_GEO(25,ZERO)
       IERROR = SET_U_GEO(26,ZERO)
-      IERROR = SET_U_GEO(27,FAC_CTX)		
-      IERROR = SET_U_GEO(28,FAC_CRX)		
+      IERROR = SET_U_GEO(27,FAC_CTX)
+      IERROR = SET_U_GEO(28,FAC_CRX)
       IERROR = SET_U_PNU(1,ZEROI,KFUNC)
       IERROR = SET_U_PNU(2,IFUN_YY,KFUNC)
       IERROR = SET_U_PNU(3,IFUN_ZZ,KFUNC)
@@ -224,7 +222,7 @@ C-----------------------
         WRITE(IOUT,1001)IDSK1,IDSK2,XK,CR,KNN,KYY,KZZ,IFUN_YY,IFUN_ZZ
        ELSE
         WRITE(IOUT,1000)IDSK1,IDSK2,XK,CR,KNN,KYY,KZZ,IFUN_YY,IFUN_ZZ,
-     .  		CYY,CZZ,IFUN_CYY,IFUN_CZZ
+     .      CYY,CZZ,IFUN_CYY,IFUN_CZZ
        ENDIF
       ENDIF
 C-----------------------

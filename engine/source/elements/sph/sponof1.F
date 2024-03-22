@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  SPONOF1                       source/elements/sph/sponof1.F 
 Chd|-- called by -----------
@@ -30,10 +30,11 @@ Chd|        ARRET                         source/system/arret.F
 Chd|        INITBUF                       share/resol/initbuf.F         
 Chd|        SPHREQS                       source/elements/sph/sphreq.F  
 Chd|        GET_U_GEO                     source/user_interface/upidmid.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        INITBUF_MOD                   share/resol/initbuf.F         
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
+Chd|        OUTPUTS_MOD                   ../common_source/modules/outputs_mod.F
 Chd|====================================================================
       SUBROUTINE SPONOF1(X ,V       ,D       ,MS      ,SPBUF   ,
      2             ITAB    ,KXSP    ,IXSP    ,NOD2SP  ,NPC     ,
@@ -48,14 +49,13 @@ C-----------------------------------------------
       USE ELBUFDEF_MOD            
       USE MESSAGE_MOD
       USE GROUPDEF_MOD
+      USE OUTPUTS_MOD
 C----6---------------------------------------------------------------7---------8
+C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "comlock.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -66,22 +66,17 @@ C-----------------------------------------------
 #include      "com08_c.inc"
 #include      "param_c.inc"
 #include      "sphcom.inc"
-#include      "scr01_c.inc"
 #include      "scr05_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
 #include      "tabsiz_c.inc"
-#include      "task_c.inc"
 #include      "scr17_c.inc"
 #include      "rad2r_c.inc"
-C-----------------------------------------------------------------
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER KXSP(NISP,*),IXSP(KVOISPH,*),NOD2SP(*),ITAB(*),NPC(*),
      .        IPARG(NPARG,*),ISPHIO(NISPHIO,*),IPART(LIPART1,*),
      .        LPRTSPH(2,0:NPART),LONFSPH(*),
      .        MWA(*), IBUFSSG_IO(SIBUFSSG_IO),IPARTSP(*),OFF_SPH_R2R(*)
-C     REAL
       my_real
      .   X(3,*) ,V(3,*) ,D(3,*) ,MS(*) ,SPBUF(NSPBUF,*) ,
      .   PLD(*) ,VSPHIO(*) ,PM(NPROPM,*) ,WA(*),
@@ -103,7 +98,6 @@ C-----------------------------------------------
      .        KNSX,KISX,KNSY,KISY,KNSZ,KISZ,
      .        KNPX,KIPX,KNPY,KIPY,KNPZ,KIPZ,KVNORM,KXPROJ,KF,
      .        IUN,IAD2,NSEGB
-C     REAL
       my_real
      .       PENTV,VT,VN,VV,
      .       PENTR,RHON,RHO0,PENTP,PN,PSHFT,PENTE,EN,EI,
@@ -471,7 +465,7 @@ c          IN4=IBUFSSG_IO(IAD2+NIBSPH*(J-1)+3)
           Z4=X(3,IN4)
           XP=FOURTH*(X1+X2+X3+X4)
           YP=FOURTH*(Y1+Y2+Y3+Y4)
-          ZP=FOURTH*(Z1+Z2+Z3+Z4)	  
+          ZP=FOURTH*(Z1+Z2+Z3+Z4)    
          ELSE
           X4=X3
           Y4=Y3
@@ -486,7 +480,7 @@ C--------
          Z12=HALF*(Z2+Z3-Z1-Z4)
          X23=HALF*(X3+X4-X1-X2)
          Y23=HALF*(Y3+Y4-Y1-Y2)
-         Z23=HALF*(Z3+Z4-Z1-Z2)	 
+         Z23=HALF*(Z3+Z4-Z1-Z2)   
          NX = Y12*Z23-Z12*Y23
          NY =-X12*Z23+Z12*X23
          NZ = X12*Y23-Y12*X23
@@ -496,9 +490,15 @@ C--------
          NZ=NN*NZ
 C--------
          INOD=KXSP(3,N)
-         D(1,INOD)=XP-X(1,INOD)
-         D(2,INOD)=YP-X(2,INOD)
-         D(3,INOD)=ZP-X(3,INOD)
+         IF (ITAB(INOD) >= 1000000000) THEN
+           D(1,INOD)=XP-XI_RES
+           D(2,INOD)=YP-YI_RES
+           D(3,INOD)=ZP-ZI_RES
+         ELSE
+           D(1,INOD)=XP-X(1,INOD)+D(1,INOD)
+           D(2,INOD)=YP-X(2,INOD)+D(2,INOD)
+           D(3,INOD)=ZP-X(3,INOD)+D(3,INOD)
+         ENDIF
          X(1,INOD)=XP
          X(2,INOD)=YP
          X(3,INOD)=ZP
@@ -519,7 +519,7 @@ C--------
           NG=-KXSP(2,N)
           IPARG(8,NG) =0
           IPARG(10,NG)=IPARG(10,NG)+1
-          CALL INITBUF (IPARG    ,NG      ,                   
+          CALL INITBUF(IPARG    ,NG      ,                   
      2       MTN     ,NEL     ,NFT     ,KAD     ,ITY     ,    
      3       NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,    
      4       JTHE    ,JLAG    ,JMULT   ,JHBE    ,JIVF    ,    

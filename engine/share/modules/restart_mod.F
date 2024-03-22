@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  RESTMOD                       share/modules/restart_mod.F   
 Chd|-- called by -----------
@@ -29,6 +29,7 @@ Chd|        UPGRADE_LCAND_EDG             ../common_source/interf/upgrade_multim
 Chd|        UPGRADE_MULTIMP               ../common_source/interf/upgrade_multimp.F
 Chd|        CRKXFEM_RRESTANIM             source/output/restart/rdresb.F
 Chd|        CRKXFEM_WRESTANIM             source/output/restart/wrrest.F
+Chd|        GET_USER_WINDOW_NODES         source/user_interface/userwindow_interface_routines.F
 Chd|        MAT_SOLID_GET_NOD_V           source/user_interface/uaccess.F
 Chd|        MAT_SOLID_GET_NOD_X           source/user_interface/uaccess.F
 Chd|        PREPARE_DEBUG                 share/modules/debug_mod.F     
@@ -55,25 +56,22 @@ Chd|====================================================================
 #include "my_real.inc"
 
         INTEGER , DIMENSION(:), ALLOCATABLE :: 
-     .      ICODE,   LSHSUB,  ISKEW,    ISKWN,   IFRAME,  NETH,  
+     .      ICODE,   ISKEW,    ISKWN,   IFRAME,  NETH,  
      .      IBCSLAG,
-     .      IPART,   NOM_OPT, NPC,      IXUR,    IXTG,    IXTG1,
+     .      IPART,   NOM_OPT, NPC,      IXTG,    IXTG1,
      .      IXS,     IXQ,     IXC,      IXT,     IXP,     IXR,
      .      ITAB,    ITABM1,  GJBUFI,   
      .      IFILL,   IMS,     ISUBS,
      .      KXX,     IXX,      KXSP,    IXSP,    NOD2SP,
      .      ISPSYM,  ISPCOND, ISPHIO,   LPRTSPH, LONFSPH, IBCL,
-     .      IBFV,    IECRAN,  ILAS,     LACCELM, LSENSOR,
-     .      NNLINK,  LNLINK,  IUSER,    IPARG,   DD_IAD,  IGRV, 
+     .      IBFV,    IECRAN,  ILAS,     LACCELM, 
+     .      NNLINK,  LNLINK,  IPARG,   DD_IAD,  IGRV, 
      .      IEXLNK,  IBVEL,    LBVEL,   IACTIV,  IBMPC, 
      .      KINET,   IPARI,   NPRW,    LPRW,    
      .      ICONX,   LGAUGE,
      .      MADPRT,  MADSH4,  MADSH3,   MADSOL,  MADNOD,  MADFAIL, 
      .      NPBY,    NPBYL,   LPBY,     LPBYL,   LRIVET,  NSTRF,
-     .      LJOINT,  NODPOR,  MONVOL,   LAGBUF,  ITHGRP,  ITHBUF,
-     .      ITHGRPA, ITHBUFA, ITHGRPB, ITHBUFB,  ITHGRPC, ITHBUFC, 
-     .      ITHGRPD, ITHBUFD, ITHGRPE, ITHBUFE,  ITHGRPF, ITHBUFF,
-     .      ITHGRPG, ITHBUFG, ITHGRPH, ITHBUFH,  ITHGRPI, ITHBUFI,
+     .      LJOINT,  NODPOR,  MONVOL,   LAGBUF,  
      .      IPART_STATE,IRBYM ,LNRBYM, WEIGHT_RM,ICODRBYM,
      .      IRBE3 ,LRBE3,INOD_PXFEM,IEL_PXFEM,
      .      IADC_PXFEM, ADSKY_PXFEM, MADIDX,MADCLNOD,NOM_SECT,
@@ -84,7 +82,7 @@ Chd|====================================================================
      .      IBC_PLY,IBORDNODE,IEDGESH,XNODANIMEL,NODEDGE,IEDGE,
      .      CRKNODIAD,DD_R2R_ELEM,KXIG3D,IXIG3D,
      .      MAIN_PROC ,TAG_SKINS6,IBCSCYC,LBCSCYC,
-     .      IPART_DYNAIN,INTERLOADP,KLOADPINTER,LOADPINTER
+     .      INTERLOADP,KLOADPINTER,LOADPINTER
             !rank (1 to NSPMD) of the processor that is the main of the node 
       INTEGER, DIMENSION(:), ALLOCATABLE :: ID_GLOBAL_VOIS,FACE_VOIS
 
@@ -93,22 +91,22 @@ Chd|====================================================================
         INTEGER , DIMENSION(:), ALLOCATABLE :: 
      .      IAD_ELEM,  IAD_RBY,  IAD_RBY2, IAD_I2M, 
      .      IADCJ,     IAD_RBM,  IAD_RBM2, IAD_SEC,    IAD_CUT,   FR_ELEM, 
-     .      FR_RBY,    FR_WALL,  FR_RBY2,  FR_I2M,     FR_MV,	  FR_LL, 
+     .      FR_RBY,    FR_WALL,  FR_RBY2,  FR_I2M,     FR_MV,    FR_LL, 
      .      FR_CJ,     FR_RBM,   FR_RBM2,  FR_SEC,     FR_CUT,    RG_CUT, 
      .      FR_MAD,    FR_I18,   WEIGHT,   NEWFRONT,   NODGLOB,   NBRCVOIS, 
      .      LNRCVOIS,  NBSDVOIS, LNSDVOIS, NERCVOIS,   LERCVOIS,  NESDVOIS, 
      .      LESDVOIS,  NPSEGCOM, LSEGCOM,  NPORGEO, 
-     .      LNODPOR,   ICODT,	 ICODR, 	       ADSKY,	  PROCNE,
-     .      ADDCNI2,   PROCNI2,  IADSDP,   IADRCP,     IADS,	  IADWAL, 
-     .      IADRBK,    IADI2,	 IADMV2,   IADMV3,     IADLL,	  IADRBM, 
-     .      IADI18,    ILINK,	 FR_RL,    LLINK,      IADRL,	  LINALE,
+     .      LNODPOR,   ICODT,    ICODR,    ADSKY,      PROCNE,
+     .      ADDCNI2,   PROCNI2,  IADSDP,   IADRCP,     IADS,      IADWAL, 
+     .      IADRBK,    IADI2,    IADMV2,   IADMV3,     IADLL,     IADRBM, 
+     .      IADI18,    ILINK,    FR_RL,    LLINK,      IADRL,     LINALE,
      .      NEFLSW,    NNFLSW,   ICUT,     LGRAV,      FASOLFR,   DD_R2R,
-     .      FR_LAGF,   LLAGF,	 IGEO,     IPM,        ICONTACT,  ISKWP,
+     .      FR_LAGF,   LLAGF,    IGEO,     IPM,        ICONTACT,  ISKWP,
      .      NSKWP,     ISENSP,   NSENSP,   IACCP,      NACCP,
      .                                                 IAD_RBE3M, FR_RBE3M,
      .      FR_RBE3MP ,FR_RBYM,  FR_RBYM2, IAD_RBYM   ,IAD_RBYM2, IADRBMK,
      .      ICODE_PLY ,ICODT_PLY,ISKEW_PLY,IAD_RBE2   ,FR_RBE2,
-     .      LCFIELD   ,FR_USERWI,IADUSERW ,LLOADP,
+     .      LCFIELD   ,LLOADP,
      .      IAD_EDGE  ,FR_EDGE,  FR_NBEDGE,IGAUP      ,NGAUP,     NODLEVXF,WEIGHT_MD,
      .      NODGLOBXFE,ELCUTC,   NODENR,   KXFENOD2ELC,ENRTAG,
      .      TABSENSOR ,ADDCSRECT,FR_NOR,   IAD_FRNOR  , PROCNOR,    
@@ -121,11 +119,11 @@ Chd|====================================================================
      .      DAMPR,   DAMP,    MS,      IN,      TF,      PM, 
      .      SKEW,    XFRAME,  GEO,     EANI,    BUFMAT,  BUFGEO,
      .      BUFSF,   RBMPC,   GJBUFR,  W,       VEUL,    FILL, 
-     .      DFILL,   ALPH,    WB,      DSAVE,   DRSAVE,  ASAVE, 
-     .      ARSAVE,  STSAVE,  STRSAVE, FSAVSAV, SPBUF,
+     .      DFILL,   ALPH,    WB,      DSAVE,   ASAVE, 
+     .      SPBUF,
      .      VSPHIO,  SPHVELN, MSNF,    FORC    ,
      .      VEL,     FSAV,    FZERO,   XLAS,   ACCELM, 
-     .      SENSOR,  FBVEL,   GRAV,    FR_WAVE, PARTS0,  USER, 
+     .      FBVEL,   GRAV,    FR_WAVE, PARTS0,
      .      ELBUF,   
      .      RWBUF,   RWSAV,   RBY,     RBYL,    
      .      RIVET,   SECBUF,  VOLMON,  LAMBDA,  WA,      FV, 
@@ -142,7 +140,7 @@ Chd|====================================================================
      .      CFIELD,  MSZ2,    DIAG_SMS,LOADP,   DMINT2,
      .      POR,     GAUGE,   WAGAP   ,RTHBUF,  KNOT,
      .      WIGE,    RDRAPE,  TAB_MAT, MS_2D ,KNOTLOCPC,KNOTLOCEL,
-     .      FCONT_MAX,IN0  ,  DGAPLOADINT
+     .      FCONT_MAX,IN0  ,  DGAPLOADINT,DPL0CLD,VEL0CLD
         
       my_real, 
      .    DIMENSION(:, :), ALLOCATABLE :: XCELL
@@ -246,7 +244,7 @@ Chd|        RADIOSS2                      source/engine/radioss2.F
 Chd|        RDRESB                        source/output/restart/rdresb.F
 Chd|        RESTALLOC                     source/output/restart/arralloc.F
 Chd|-- calls ---------------
-Chd|        INT8_MOD                      ../common_source/modules/int8_mod.F
+Chd|        INT8_MOD                      ../common_source/modules/interfaces/int8_mod.F
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
 Chd|====================================================================
       MODULE INTBUF_MOD

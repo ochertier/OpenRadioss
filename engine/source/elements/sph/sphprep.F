@@ -1,30 +1,29 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 
 
       module MOD_SPHPREP
       implicit none
-#include      "my_real.inc"
       INTEGER, DIMENSION(:), ALLOCATABLE :: WREDUCE
       END MODULE MOD_SPHPREP
 
@@ -61,7 +60,7 @@ Chd|        SPSYMP                        source/elements/sph/spsym.F
 Chd|        SPSYM_ALLOC                   source/elements/sph/spsym_alloc.F
 Chd|        STARTIME                      source/system/timer.F         
 Chd|        STOPTIME                      source/system/timer.F         
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        SPH_STRUCT_MOD                share/modules/sph_struct_mod.F
@@ -77,7 +76,8 @@ Chd|====================================================================
      8    SPHVELN ,ITASK   ,XDP, IBUFSSG_IO  ,LGAUGE  ,
      9    GAUGE   ,NGROUNC ,IGROUNC ,SOL2SPH ,SPH2SOL ,
      A    IXS     ,IADS    ,ADDCNE  ,FSKYD   ,DMSPH   ,
-     B    WASPACT ,ICONTACT,OFF_SPH_R2R,WSMCOMP,IRUNN_BIS)
+     B    WASPACT ,ICONTACT,OFF_SPH_R2R,WSMCOMP,IRUNN_BIS,
+     C    SPH_IORD1)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -86,24 +86,19 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE GROUPDEF_MOD
       USE SPH_STRUCT_MOD
-C--------------------------------------------------------------------7---------8
+C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "comlock.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr05_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
 #include      "sphcom.inc"
 #include      "param_c.inc"
-#include      "vect01_c.inc"
 #include      "task_c.inc"
 #include      "units_c.inc"
 #include      "tabsiz_c.inc"
@@ -124,6 +119,7 @@ C-----------------------------------------------
      .    NGROUNC,  IGROUNC(*), SOL2SPH(2,*), SPH2SOL(*), IXS(NIXS,*),
      .    IADS(8,*), ADDCNE(*), WASPACT(*), ICONTACT(*), OFF_SPH_R2R(*),
      .    IRUNN_BIS
+      INTEGER, INTENT(INOUT) :: SPH_IORD1     
 C     REAL
       my_real
      .   X(3,*), V(3,*), MS(*),PM(NPROPM,*),
@@ -295,7 +291,7 @@ C
         IF(ITASK==0)THEN
           IF(NSPMD>1)THEN
             CALL SPMD_MIN_MAX(DXMIN,DYMIN,DZMIN,DXMAX,DYMAX,DZMAX)
-          END IF	 
+          END IF   
 C
           DX=DXMAX-DXMIN
           DY=DYMAX-DYMIN
@@ -481,8 +477,8 @@ C
         MYSPATRUE=SPATRUE
 C       re-tri voisins (voisins vrais, voisins dans la zone de securite).
         CALL SPCLASV(X     ,SPBUF ,KXSP    ,IXSP   ,NOD2SP   ,
-     1  	     ISPSYM,XSPSYM%BUF,WSP2SORT ,ITASK  ,MYSPATRUE,
-     2  	     IREDUCE,WREDUCE,LGAUGE ,GAUGE ,ISORTSP)
+     1         ISPSYM,XSPSYM%BUF,WSP2SORT ,ITASK  ,MYSPATRUE,
+     2         IREDUCE,WREDUCE,LGAUGE ,GAUGE ,ISORTSP)
 C
 C      /---------------/
         CALL MY_BARRIER
@@ -586,7 +582,7 @@ C       re-tri voisins (voisins vrais, voisins dans la zone de securite).
         MYSPATRUE=ZERO
         CALL SPCLASV(X     ,SPBUF ,KXSP    ,IXSP   ,NOD2SP  ,
      1               ISPSYM,XSPSYM%BUF,WSP2SORT ,ITASK  ,MYSPATRUE,
-     2  	     IREDUCE,WREDUCE,LGAUGE ,GAUGE ,ISORTSP)
+     2         IREDUCE,WREDUCE,LGAUGE ,GAUGE ,ISORTSP)
 C      /---------------/
         CALL MY_BARRIER
 C      /---------------/
@@ -686,7 +682,7 @@ C-----------------------------------------------
      2    KXSP    ,IXSP    ,NOD2SP   ,ISPSYM ,XSPSYM%BUF  ,
      3    VSPSYM%BUF  ,IPARG   ,WASPH  ,ISPCOND ,
      4    XFRAME  ,WSMCOMP%BUF,GEO,IPART  ,IPARTSP ,
-     5    WASPACT ,ITASK  )
+     5    WASPACT ,ITASK   ,SPH_IORD1)
 C-----------------------------------------------
 C
       IF(ITASK==0) DEALLOCATE(WREDUCE)

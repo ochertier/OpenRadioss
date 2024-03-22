@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  FIXVEL                        source/constraints/general/impvel/fixvel.F
 Chd|-- called by -----------
@@ -31,13 +31,14 @@ Chd|        SENSOR_MOD                    share/modules/sensor_mod.F
 Chd|====================================================================
       SUBROUTINE FIXVEL(IBFV  ,A    ,V     ,NPC    ,TF   ,
      2                  VEL   ,MS   ,X     ,SKEW   ,AR   ,
-     3                  VR    ,IN   ,SENSOR_TAB,
+     3                  VR    ,IN   ,NSENSOR,SENSOR_TAB,
      4                  WEIGHT,DEPLA    ,RBY   ,IFRAME,
      5                  XFRAME,DR   ,NODNX_SMS,
-     6                  TT_DOUBLE,DEPLA_DOUBLE)
+     6                  TT_DOUBLE,DEPLA_DOUBLE, PYTHON)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------  
+      USE PYTHON_FUNCT_MOD
       USE SENSOR_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -54,16 +55,13 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "com06_c.inc"
 #include      "com08_c.inc"
-#include      "task_c.inc"
-#include      "scr05_c.inc"
 #include      "param_c.inc"
-#include      "scr03_c.inc"
 #include      "parit_c.inc"
 #include      "sms_c.inc"
-#include      "scr14_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER ,INTENT(IN) :: NSENSOR
       INTEGER NPC(*)
       INTEGER IBFV(NIFV,*),WEIGHT(*),IFRAME(LISKN,*),NODNX_SMS(*)
       my_real, DIMENSION(3,*), TARGET :: DEPLA
@@ -73,7 +71,8 @@ C-----------------------------------------------
      .   A(3,*), V(3,*), TF(*), VEL(LFXVELR,*), MS(*), X(3,*), 
      .   SKEW(LSKEW,*), AR(3,*), VR(3,*), IN(*),
      .   RBY(NRBY,*),XFRAME(NXFRAME,*), DR(3,*)
-      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) ,INTENT(IN) :: SENSOR_TAB
+      TYPE(PYTHON_), INTENT(INOUT) :: PYTHON
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -223,11 +222,15 @@ C------- First pass for impdisp with sensor - in the top of the list
                 INDEX_SMOOTH(NINDEX_SMOOTH) = II
                 TSC_SMOOTH(NINDEX_SMOOTH) = TSC(II)  
                 TSC0_SMOOTH(NINDEX_SMOOTH) = TSC0(II)  
-              ELSE
+              ELSE IF(ISMOOTH==0) THEN
                 NINDEX_WO_SMOOTH = NINDEX_WO_SMOOTH + 1
                 INDEX_WO_SMOOTH(NINDEX_WO_SMOOTH) = II          
                 TSC_WO_SMOOTH(NINDEX_WO_SMOOTH) = TSC(II)  
                 TSC0_WO_SMOOTH(NINDEX_WO_SMOOTH) = TSC0(II)  
+              ELSE IF(ISMOOTH<0) THEN
+                L = -ISMOOTH
+                CALL PYTHON_CALL_FUNCT1D(PYTHON,L,TSC(II),YC(II))
+                CALL PYTHON_CALL_FUNCT1D(PYTHON,L,TSC0(II),YC0(II))
               ENDIF 
             ENDIF       
         ENDDO
@@ -244,10 +247,13 @@ C------- Second pass
                 NINDEX_SMOOTH = NINDEX_SMOOTH + 1
                 INDEX_SMOOTH(NINDEX_SMOOTH) = II
                 TSC_SMOOTH(NINDEX_SMOOTH) = TSC(II) 
-              ELSE
+              ELSE IF(ISMOOTH==0) THEN
                 NINDEX_WO_SMOOTH = NINDEX_WO_SMOOTH + 1
                 INDEX_WO_SMOOTH(NINDEX_WO_SMOOTH) = II          
                 TSC_WO_SMOOTH(NINDEX_WO_SMOOTH) = TSC(II)  
+              ELSE IF(ISMOOTH<0) THEN
+                L = -ISMOOTH
+                CALL PYTHON_CALL_FUNCT1D(PYTHON,L,TSC(II),YC(II))
               ENDIF
             ENDIF        
         ENDDO
@@ -307,6 +313,8 @@ C------- Second pass
             IPOSC(JJ) = IPOSC_SMOOTH(II)
           ENDDO
         ENDIF
+
+
 
         IF (IVECTOR == 0) THEN
           DO II=1,IC

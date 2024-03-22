@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  FVBAG2                        source/airbag/fvbag2.F        
 Chd|-- called by -----------
@@ -27,9 +27,9 @@ Chd|        FVBAG0                        source/airbag/fvbag0.F
 Chd|-- calls ---------------
 Chd|        SPMD_IBCAST_SUBCOMM           source/mpi/generic/spmd_ibcast_subcomm.F
 Chd|        SPMD_RBCAST_SUBCOMM           source/mpi/generic/spmd_rbcast_subcomm.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        FVBAG_MOD                     share/modules/fvbag_mod.F     
-Chd|        FVMBAG_MESHCONTROL_MOD        ../common_source/modules/fvmbag_meshcontrol_mod.F
+Chd|        FVMBAG_MESHCONTROL_MOD        ../common_source/modules/airbag/fvmbag_meshcontrol_mod.F
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
@@ -62,19 +62,12 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com06_c.inc"
 #include      "com08_c.inc"
-#include      "scr02_c.inc"
-#include      "scr07_c.inc"
-#include      "scr18_c.inc"
 #include      "param_c.inc"
 #include      "units_c.inc"
-#include      "scr05_c.inc"
 #include      "task_c.inc"
-#include      "warn_c.inc"
 #include      "scr14_c.inc"
 #include      "scr16_c.inc"
-#include      "scr17_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -115,7 +108,7 @@ C
 
        DO I=1,NBGAUGE
           IF(LGAUGE(1,I) > 0 .OR. LGAUGE(1,I) < -NUMELS) CYCLE
-          IF(LGAUGE(1,I) == 0) THEN
+          IF(LGAUGE(1,I) == 0 . AND. LGAUGE(3,I) > 0) THEN
 C Node input
             N1=LGAUGE(3,I)
             DO J=1,FVSPMD(IFV)%NN_L+FVSPMD(IFV)%NNI_L
@@ -139,8 +132,10 @@ C Node input
             GAUGE(30,I)=ZERO
             GAUGE(31,I)=ZERO
             GAUGE(32,I)=ZERO
-          ELSE
-C Shell input
+          ELSEIF( LGAUGE(3,I) < 0 )THEN
+C Shell input -not available
+          ELSEIF(LGAUGE(1,I) == 0 . AND. LGAUGE(3,I) == 0)THEN
+C Point input (by coordinates) -not available
           ENDIF
   800  CONTINUE
        ENDDO
@@ -218,6 +213,21 @@ C     Automatic switch to uniform pressure when dispersion of pressure is low
          UP_SWITCH = UP_SWITCH .OR. AUTO_SWITCH
          FVDATA(IFV)%PDISP_OLD = FVDATA(IFV)%PDISP
       ENDIF
+      
+      IF (UP_SWITCH .AND. IVOLU(74)==2)THEN
+        !Iswitch=2 : full merging request on Tswitch/Pswitch criteria
+        IVOLU(74) = 0  ! Iswitch reset to 0
+        IVOLU(60) = -1 ! Igmerg/Ivmin => VOLUMIN=EP20 in fvupd.F => merge erverything     
+        RVOLU(70) = EP20 ! TSWITCH=infinity to prevent from any switch to Uniform Pressure
+        RVOLU(73) = ZERO ! PSWITCH RATIO=0 to prevent from any switch to Uniform Pressure
+        UP_SWITCH = .FALSE.
+        IF(ISPMD+1 == FVSPMD(IFV)%PMAIN) THEN
+               WRITE(IOUT,'(A,I10,A,E12.4/)') 
+     .              ' ** MONITORED VOLUME ID: ',IVOLU(1),
+     .              ' ALL POLYHEDRA ARE GOING TO BE MERGED ',TT
+        ENDIF
+      ENDIF
+            
       IF (UP_SWITCH) THEN
          IF (IVOLU(74) == 0 .OR. IVOLU(74) == 1) THEN
             DO I=1,NVENT

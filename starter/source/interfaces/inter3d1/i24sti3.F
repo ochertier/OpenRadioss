@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  I24STI3                       source/interfaces/inter3d1/i24sti3.F
 Chd|-- called by -----------
@@ -50,23 +50,18 @@ Chd|====================================================================
      G PEN_OLD,IPARTNS  ,IPARTS   ,IGEO    ,FILLSOL ,
      H PM_STACK, IWORKSH ,INTFRIC ,TAGPRT_FRIC,IPARTFRICS,
      G IPARTFRICM,INTBUF_FRIC_TAB ,INTNITSCHE,NRTS,IRECTS,
-     I IELNRTS ,ADRECTS ,FACNRTS  ,NMN       ,MSR )
+     I IELNRTS ,ADRECTS ,FACNRTS  ,NMN       ,MSR ,
+     J IPARTT ,IPARTP   ,IPARTR   )
 C-----------------------------------------------
 C   M o d u l e s
-C----------------------------------------------- 
+C-----------------------------------------------
+      USE MY_ALLOC_MOD 
       USE INTBUF_FRIC_MOD  
       USE GROUPDEF_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -75,11 +70,8 @@ C-----------------------------------------------
 #include      "param_c.inc"
 #include      "remesh_c.inc"
 #include      "scr03_c.inc"
-#include      "scr05_c.inc"
-#include      "scr08_c.inc"
 #include      "scr17_c.inc"
 #include      "units_c.inc"
-#include      "warn_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -104,6 +96,9 @@ C     REAL
      .   AREAS(*),THK(*),THK_PART(*),PEN_OLD(5,NSN), FILLSOL(*),
      .   PM_STACK(20,*)
       INTEGER ID,IPARTNS(*),IPARTS(*)
+      INTEGER, DIMENSION(NUMELT), INTENT(IN) :: IPARTT
+      INTEGER, DIMENSION(NUMELP), INTENT(IN) :: IPARTP
+      INTEGER, DIMENSION(NUMELR), INTENT(IN) :: IPARTR
       CHARACTER*nchartitle,
      .   TITR
       TYPE(INTBUF_FRIC_STRUCT_) INTBUF_FRIC_TAB(*)
@@ -123,7 +118,7 @@ C     REAL
       my_real
      .   DXM, GAPMX, GAPMN, AREA, VOL, DX,GAPS1,GAPS2, GAPM, DDX, 
      .   GAPTMP, GAPSCALE,SX1,SY1,SZ1,SX2,SY2,SZ2,SX3,SY3,SZ3,
-     .   SLSFAC,XL,GAPS_MN,ST
+     .   SLSFAC,XL,GAPS_MN
       INTEGER, DIMENSION(:),ALLOCATABLE ::TAGNOD
       DATA JPERM/2,3,4,1/
       DATA FACES/1,2,3,4,
@@ -231,15 +226,36 @@ C-----for case of coating shell--
 C-------
       DO I=1,NUMELT
         MG=IXT(4,I)
-        DX=HALF*SQRT(GEO(1,MG))
+        IP = IPARTT(I)
+        IF ( THK_PART(IP) > ZERO ) THEN
+          DX=HALF*THK_PART(IP)
+        ELSE
+          DX=HALF*SQRT(GEO(1,MG))
+        END IF
         WA(IXT(2,I))=MAX(WA(IXT(2,I)),DX)
         WA(IXT(3,I))=MAX(WA(IXT(3,I)),DX)
       ENDDO
       DO I=1,NUMELP
         MG=IXP(5,I)
-        DX=0.5*SQRT(GEO(1,MG))
+        IP = IPARTP(I)
+        IF ( THK_PART(IP) > ZERO ) THEN
+          DX=HALF*THK_PART(IP)
+        ELSE
+          DX=HALF*SQRT(GEO(1,MG))
+        END IF
         WA(IXP(2,I))=MAX(WA(IXP(2,I)),DX)
         WA(IXP(3,I))=MAX(WA(IXP(3,I)),DX)
+      ENDDO
+      DO I=1,NUMELR
+        IP = IPARTR(I)
+        IF ( THK_PART(IP) > ZERO ) THEN
+          MG=IXR(1,I)
+          IGTYP = IGEO(11,MG)
+          DX=HALF*THK_PART(IP)
+          WA(IXR(2,I))=MAX(WA(IXR(2,I)),DX)
+          WA(IXR(3,I))=MAX(WA(IXR(3,I)),DX)
+          IF (IGTYP==12) WA(IXR(4,I))=MAX(WA(IXR(4,I)),DX)
+       END IF
       ENDDO
       DO I=1,NSN
         GAP_S(I)=GAPSCALE * WA(NSV(I))
@@ -259,7 +275,7 @@ C
         ENDIF
        DO I=1,NSN
         NS = NSV(I)
-        IF( TAGB(NS) > 0 ) GAP_S(I) = ZERO
+        IF( TAGB(NS) > 0 ) GAP_S(I) = EM20
        ENDDO
       ENDIF
 C      
@@ -918,6 +934,7 @@ C-------shell elements
         END IF
        END DO
       END IF
+
       RETURN
  1300 FORMAT(2X,'GAP MIN = ',1PG20.13)
  1400 FORMAT(2X,'MIN,MAX OF SECONDARY GAP: ',2(1PG20.13))
@@ -928,6 +945,7 @@ Chd|  INSOL3ET                      source/interfaces/inter3d1/i24sti3.F
 Chd|-- called by -----------
 Chd|        I24STI3                       source/interfaces/inter3d1/i24sti3.F
 Chd|        I25STI3                       source/interfaces/inter3d1/i25sti3.F
+Chd|        REMN_SELF24                   source/interfaces/inter3d1/remn_self24.F
 Chd|-- calls ---------------
 Chd|====================================================================
       SUBROUTINE INSOL3ET(X   ,IRECT ,IXS     ,NINT   ,NEL,I ,
@@ -938,30 +956,17 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
-#include      "param_c.inc"
 #include      "com04_c.inc"
-#include      "scr07_c.2.inc"
-#include      "scr03_c.inc" 
-C-----------------------------------------------
-C   L o c a l   V a r i a b l e s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NINT, NEL, I, NOINT,NNOD
-C     REAL
       my_real
      .   AREA
       INTEGER IRECT(4,*), IXS(NIXS,*), KNOD2ELS(*), NOD2ELS(*), 
      .        IXS10(6,*), IXS16(8,*), IXS20(12,*)
-C     REAL
       my_real
      .   X(3,*)
 C-----------------------------------------------
@@ -1095,6 +1100,7 @@ Chd|====================================================================
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE MY_ALLOC_MOD
       USE MESSAGE_MOD
       USE INTBUF_FRIC_MOD  
       USE GROUPDEF_MOD
@@ -1103,24 +1109,14 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
 #include      "scr17_c.inc"
 #include      "scr08_c.inc"
 #include      "scr05_c.inc"
-#include      "scr03_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1154,7 +1150,8 @@ C-----------------------------------------------
       INTEGER I, J, INRT, NELS, MT, JJ, JJJ, NELC,
      .   MG, NUM, NPT, LL, L, NN, NELTG,N1,N2,N3,N4,IE,
      .   IP, NLEV, MYLEV, K, P, R, T,IAD,NREV,IGTYP,IPGMAT,IGMAT,
-     .   ISUBSTACK,IPL,IPG
+     .   ISUBSTACK,IPL,IPG,NINV
+      INTEGER, DIMENSION(:),ALLOCATABLE  :: TAGELEMS,INDEXE
 C     REAL
       my_real
      .   AREA, VOL, DX, GAPM, DDX, 
@@ -1163,6 +1160,13 @@ C     REAL
 C----------------------
       NREV=0
       IPGMAT = 700
+      IF(NUMELS > 0) THEN
+        CALL MY_ALLOC(TAGELEMS,NUMELS)
+        TAGELEMS = 0
+        CALL MY_ALLOC(INDEXE,NUMELS)
+        INDEXE = 0
+      ENDIF
+      NINV = 0
       DO I=1+NSHIFT,NRT+NSHIFT
        STF(I)=ZERO
        IF(INTTH > 0 ) IELES(I) = 0
@@ -1303,7 +1307,8 @@ C-------coating shell  stif=max(sol,shell)
           IF (MSEGTYP(I)>NRTT) THEN
              CALL INSOL3D(X,IRECT,IXS,NINT,NELS,I   ,
      .            AREA,NOINT,KNOD2ELS ,NOD2ELS ,0,
-     .            IXS10,IXS16,IXS20)
+     .            IXS10,IXS16,IXS20,TAGELEMS,INDEXE,
+     .            NINV)
            IF(NELS/=0) THEN
             MT=IXS(1,NELS)
             IF(MT>0)THEN
@@ -1412,7 +1417,8 @@ C-------coating shell  stif=max(sol,shell)
           IF (MSEGTYP(I)>NRTT) THEN
              CALL INSOL3D(X,IRECT,IXS,NINT,NELS,I   ,
      .            AREA,NOINT,KNOD2ELS ,NOD2ELS ,0,
-     .            IXS10,IXS16,IXS20)
+     .            IXS10,IXS16,IXS20,TAGELEMS,INDEXE ,
+     .            NINV)
            IF(NELS/=0) THEN
             MT=IXS(1,NELS)
             IF(MT>0)THEN
@@ -1448,7 +1454,8 @@ C     ELEMENTS SOLIDES
 C----------------------
        CALL INSOL3D(X,IRECT,IXS,NINT,NELS,I   ,
      .            AREA,NOINT,KNOD2ELS ,NOD2ELS ,0,
-     .            IXS10,IXS16,IXS20)
+     .            IXS10,IXS16,IXS20,TAGELEMS,INDEXE,
+     .            NINV)
       IF(NELS/=0) THEN
        MT=IXS(1,NELS)
        IF(INTTH > 0 ) IELES(I) = NELS
@@ -1698,6 +1705,36 @@ C      en SPMD il faut un element associe a l'arrete sinon erreur
         ENDIF
        ENDIF
       END DO
+C
+      IF(NUMELS > 0) DEALLOCATE(TAGELEMS,INDEXE)
+C
+      CALL ANCMSG(MSGID=3022,
+     .             MSGTYPE=MSGWARNING,
+     .             ANMODE=ANINFO_BLIND_1,
+     .             I1=ID,
+     .             C1=TITR,
+     .             PRMOD=MSG_PRINT)
+      CALL ANCMSG(MSGID=3024,
+     .             MSGTYPE=MSGWARNING,
+     .             ANMODE=ANINFO_BLIND_1,
+     .             I1=ID,
+     .             C1=TITR,
+     .             PRMOD=MSG_PRINT)
+      IF(NINV > 0 .AND.NINT>0)
+     .    CALL ANCMSG(MSGID=3023,
+     .             MSGTYPE=MSGWARNING,
+     .             ANMODE=ANINFO_BLIND_1,
+     .             I1=ID,
+     .             C1=TITR,
+     .             I2=NINV)
+C
+      IF(NINV > 0 .AND.NINT< 0)
+     .    CALL ANCMSG(MSGID=3025,
+     .             MSGTYPE=MSGWARNING,
+     .             ANMODE=ANINFO_BLIND_1,
+     .             I1=ID,
+     .             C1=TITR,
+     .             I2=NINV)
 C         
 C      IF (IPRI>=5.AND.NREV>0) WRITE (IOUT,1400) NREV,NOINT
 C----due to Cycle       ------- 
@@ -1718,18 +1755,9 @@ Chd|        MY_ORDERS                     ../common_source/tools/sort/my_orders.
 Chd|====================================================================
       SUBROUTINE I24BORD(NSEG,SURF_NODES ,TAGB)
 C-----------------------------------------------
-C   M o d u l e s
-C-----------------------------------------------
-C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1834,9 +1862,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
@@ -1844,7 +1869,6 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NRT,IRECT(4,*),NSN,NSV(*)
-C     REAL
       my_real
      .   X(3,*),PEN_OLD(5,NSN)
 C-----------------------------------------------
@@ -1862,49 +1886,52 @@ C=======================================================================
         ITAG(I) =0
        ENDDO
        DO I=1,NRT
-        DO J=1,4
-         NN(J)=IRECT(J,I)
-         ITAG(NN(J)) =ITAG(NN(J))+1
-        END DO
-C------Node 1        
-        DO J=1,3
-         R(J) = X(J,NN(2))-X(J,NN(1))
-         S(J) = X(J,NN(4))-X(J,NN(1))
-        END DO
-        CALL NORMVEC(R,S,T)
-        DO J=1,3
-         NORM(J,NN(1)) = NORM(J,NN(1))+T(J)
-        END DO
-C------Node 2        
-        DO J=1,3
-         R(J) = X(J,NN(3))-X(J,NN(2))
-         S(J) = X(J,NN(1))-X(J,NN(2))
-        END DO
-        CALL NORMVEC(R,S,T)
-        DO J=1,3
-         NORM(J,NN(2)) = NORM(J,NN(2))+T(J)
-        END DO
-C------Node 3        
-        DO J=1,3
-         R(J) = X(J,NN(4))-X(J,NN(3))
-         S(J) = X(J,NN(2))-X(J,NN(3))
-        END DO
-        CALL NORMVEC(R,S,T)
-        DO J=1,3
-         NORM(J,NN(3)) = NORM(J,NN(3))+T(J)
-        END DO
-C------Node 4
-        IF (NN(4)/=NN(3)) THEN        
-         DO J=1,3
-          R(J) = X(J,NN(1))-X(J,NN(4))
-          S(J) = X(J,NN(3))-X(J,NN(4))
-         END DO
-         CALL NORMVEC(R,S,T)
-         DO J=1,3
-          NORM(J,NN(4)) = NORM(J,NN(4))+T(J)
-         END DO
-        END IF
-       ENDDO
+          DO J=1,4
+            NN(J)=IRECT(J,I)
+            ITAG(NN(J)) =ITAG(NN(J))+1
+          END DO
+C------Node 1            
+          DO J=1,3
+            R(J) = X(J,NN(2))-X(J,NN(1))
+            S(J) = X(J,NN(4))-X(J,NN(1))
+          END DO
+          CALL NORMVEC(R,S,T)
+          DO J=1,3
+            NORM(J,NN(1)) = NORM(J,NN(1))+T(J)
+          END DO
+C------Node 2          
+          DO J=1,3
+            R(J) = X(J,NN(3))-X(J,NN(2))
+            S(J) = X(J,NN(1))-X(J,NN(2))
+          END DO
+          CALL NORMVEC(R,S,T)
+          DO J=1,3
+           NORM(J,NN(2)) = NORM(J,NN(2))+T(J)
+          END DO
+C------Node 3,4
+          IF (NN(4)/=NN(3)) THEN              
+            DO J=1,3
+              R(J) = X(J,NN(4))-X(J,NN(3))
+              S(J) = X(J,NN(2))-X(J,NN(3))
+            END DO
+            CALL NORMVEC(R,S,T)
+            DO J=1,3
+              NORM(J,NN(3)) = NORM(J,NN(3))+T(J)
+            END DO
+            DO J=1,3
+             R(J) = X(J,NN(1))-X(J,NN(4))
+             S(J) = X(J,NN(3))-X(J,NN(4))
+            END DO
+            CALL NORMVEC(R,S,T)
+            DO J=1,3
+             NORM(J,NN(4)) = NORM(J,NN(4))+T(J)
+            END DO
+          ELSE ! norm_n3=norm_n2
+            DO J=1,3
+             NORM(J,NN(3)) = NORM(J,NN(3))+T(J)
+            END DO
+          END IF
+      ENDDO
 C----re-normalizing---       
        DO I=1,NUMNOD
         IF (ITAG(I) >1) THEN
@@ -1934,17 +1961,10 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-C     REAL
       my_real
      .   R(3) , S(3) , T(3)
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -1974,7 +1994,8 @@ Chd|====================================================================
      3 NOINT ,NSN   ,NSV   ,IXTG  ,IXT   ,
      6 IXP   ,IPART ,IPARTC,IPARTTG,THK  ,
      D THK_PART,IXR ,ITAB  ,IXS10 ,IXS16 ,
-     E IXS20 ,NMN   ,MSR   ,LL_S  ,LL_M  )
+     E IXS20 ,NMN   ,MSR   ,LL_S  ,LL_M  ,
+     J IPARTT,IPARTP,IPARTR,IGEO  )
 C-----------------------------------------------
       USE MESSAGE_MOD
 C
@@ -1983,23 +2004,13 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
 #include      "scr17_c.inc"
 #include      "scr08_c.inc"
-#include      "scr05_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -2008,6 +2019,10 @@ C-----------------------------------------------
      .   NSV(*), IXTG(NIXTG,*), IXT(NIXT,*), IXP(NIXP,*),
      .   IXR(NIXR,*) ,IPART(LIPART1,*), IPARTC(*), IPARTTG(*),
      .   ITAB(*), IXS10(6,*), IXS16(8,*), IXS20(12,*)
+      INTEGER, DIMENSION(NUMELT), INTENT(IN) :: IPARTT
+      INTEGER, DIMENSION(NUMELP), INTENT(IN) :: IPARTP
+      INTEGER, DIMENSION(NUMELR), INTENT(IN) :: IPARTR
+      INTEGER, DIMENSION(NPROPGI,NUMGEO) ,INTENT(IN):: IGEO
 C     REAL
       my_real
      .   X(3,*), PM(NPROPM,*), GEO(NPROPG,*), WA(*),
@@ -2017,7 +2032,7 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, J, N, MT, JJ, JJJ, NELC,
      .   MG, NUM, NPT, LL, L, NN, NELTG,N1,N2,N3,N4,IE,
-     .   IP, NLEV, MYLEV, K, P, R, T,IAD
+     .   IP, NLEV, MYLEV, K, P, R, T,IAD,IGTYP
 C     REAL
       my_real
      .   AREA, VOL, DX, GAPM, DDX
@@ -2064,16 +2079,37 @@ C----SHELLS ------------
 C----truss------------
       DO I=1,NUMELT
         MG=IXT(4,I)
-        DX=SQRT(GEO(1,MG))
+        IP = IPARTT(I)
+        IF ( THK_PART(IP) > ZERO ) THEN
+          DX=THK_PART(IP)
+        ELSE
+          DX=SQRT(GEO(1,MG))
+        END IF
         WA(IXT(2,I))=MIN(WA(IXT(2,I)),DX)
         WA(IXT(3,I))=MIN(WA(IXT(3,I)),DX)
       ENDDO
 C----beam------------
       DO I=1,NUMELP
         MG=IXP(5,I)
-        DX=SQRT(GEO(1,MG))
+        IP = IPARTP(I)
+        IF ( THK_PART(IP) > ZERO ) THEN
+          DX=THK_PART(IP)
+        ELSE
+          DX=SQRT(GEO(1,MG))
+        END IF
         WA(IXP(2,I))=MIN(WA(IXP(2,I)),DX)
         WA(IXP(3,I))=MIN(WA(IXP(3,I)),DX)
+      ENDDO
+      DO I=1,NUMELR
+        IP = IPARTR(I)
+        IF ( THK_PART(IP) > ZERO ) THEN
+          MG=IXR(1,I)
+          IGTYP = IGEO(11,MG)
+          DX=THK_PART(IP)
+          WA(IXR(2,I))=MAX(WA(IXR(2,I)),DX)
+          WA(IXR(3,I))=MAX(WA(IXR(3,I)),DX)
+          IF (IGTYP==12) WA(IXR(4,I))=MAX(WA(IXR(4,I)),DX)
+       END IF
       ENDDO
 C----solides------------     
       DO I=1,NUMELS
@@ -2133,20 +2169,9 @@ Chd|====================================================================
      .                     I        ,AREA  ,NOINT ,IR   ,SURF_ELTYP,
      .                     SURF_ELEM)
 C-----------------------------------------------
-C   M o d u l e s
-C-----------------------------------------------
-C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "units_c.inc"
-#include      "param_c.inc"
-#include      "com04_c.inc"
-#include      "scr07_c.2.inc"
-#include      "scr03_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -2166,6 +2191,7 @@ C-----------------------------------------------
 C     REAL
       my_real
      .   N1, N2, N3, DDS
+      my_real :: XX1(4), XX2(4),XX3(4),XS1,YS1,ZS1,XC,YC,ZC
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
@@ -2191,7 +2217,7 @@ C-----------------------------------------------
        YS1=YS1+.25*X(2,NN)
   100  ZS1=ZS1+.25*X(3,NN)
 C
-       CALL NORMA1(N1,N2,N3,AREA)
+       CALL NORMA1(N1,N2,N3,AREA,XX1,XX2,XX3)
        XC=0.
        YC=0.
        ZC=0.
@@ -2232,25 +2258,14 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
-#include      "param_c.inc"
 #include      "com04_c.inc"
-C-----------------------------------------------
-C   L o c a l   V a r i a b l e s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER S_TYPE  ,S_EL,NS,INS,NOINT,IPART_E,IPART_NS,IPEN0
-C     REAL
       INTEGER IXS(NIXS,*), IXS10(6,*), IXS16(8,*), IXS20(12,*)
-C     REAL
       my_real
      .   X(3,*),GAP
 C-----------------------------------------------

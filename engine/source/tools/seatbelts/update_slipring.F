@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  UPDATE_SLIPRING               source/tools/seatbelts/update_slipring.F
 Chd|-- called by -----------
@@ -29,7 +29,7 @@ Chd|        ANCMSG                        source/output/message/message.F
 Chd|        ARRET                         source/system/arret.F         
 Chd|        SHELL_LOC_COR                 source/tools/seatbelts/shell_loc_cor.F
 Chd|        SHELL_REACTIVATION            source/tools/seatbelts/shell_reactivation.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        SEATBELT_MOD                  ../common_source/modules/seatbelt_mod.F
 Chd|====================================================================
@@ -46,17 +46,12 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "my_allocate.inc"
-C-----------------------------------------------------------------
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER ,INTENT(IN) :: IXC(NIXC,NUMELC),IPARG(NPARG,NGROUP),NPBY(NNPBY,NRBODY)
@@ -104,10 +99,10 @@ C         Check of rbody status
             ENDIF
           ENDIF   
         ENDDO
-        MY_ALLOCATE(TAG_NOD,NUMNOD)
-        MY_ALLOCATE(CORES_SLIP,S_SLIPRING)
-        MY_ALLOCATE(CORES_FRAM,S_SLIPRING)
-        MY_ALLOCATE(CORES_RET,NRETRACTOR)
+        ALLOCATE(TAG_NOD(NUMNOD))
+        ALLOCATE(CORES_SLIP(S_SLIPRING))
+        ALLOCATE(CORES_FRAM(S_SLIPRING))
+        ALLOCATE(CORES_RET(NRETRACTOR))
       ENDIF
 C
 C----------------------------------------------------------
@@ -154,11 +149,11 @@ C
         DO NG=1,NGROUP
 C
           ITYP = IPARG(5,NG)
-	  MTN = IPARG(1,NG)
-	  NEL = IPARG(2,NG)
-	  NFT = IPARG(3,NG) 
-	  JFT = 1
-	  JLT = MIN(NVSIZ,NEL)  
+            MTN = IPARG(1,NG)
+            NEL = IPARG(2,NG)
+            NFT = IPARG(3,NG) 
+            JFT = 1
+            JLT = MIN(NVSIZ,NEL)  
           GBUF => ELBUF_TAB(NG)%GBUF
 C
           DO I=1,6
@@ -171,7 +166,7 @@ C
 C--------> Boucle sur les elements ressort seatbelt-------
             DO I=JFT,JLT
 C
-	      J = I + NFT	  
+                J = I + NFT    
               N1 = IXR(2,J)
               N2 = IXR(3,J)
               SLIP = 0
@@ -278,7 +273,7 @@ C                   Element deactivated - X0 updated in r23l114def3 for consiste
                   ENDIF
                 ENDIF
               ENDIF 
-C	 
+C   
             ENDDO
 C
           ENDIF
@@ -342,15 +337,15 @@ C
         DO NG=1,NGROUP
 C
           ITYP = IPARG(5,NG)
-	  MTN = IPARG(1,NG)
-	  NEL = IPARG(2,NG)
-	  NFT = IPARG(3,NG)
+            MTN = IPARG(1,NG)
+            NEL = IPARG(2,NG)
+            NFT = IPARG(3,NG)
           ISEATBELT = IPARG(91,NG)
           IREP = IPARG(35,NG)
           ISMSTR = IPARG(9,NG)
 C 
-	  JFT = 1
-	  JLT = MIN(NVSIZ,NEL)  
+            JFT = 1
+            JLT = MIN(NVSIZ,NEL)  
           GBUF => ELBUF_TAB(NG)%GBUF
           DO I=1,6
             II(I) = (I-1)*NEL + 1
@@ -368,10 +363,10 @@ C
 C
             DO I=JFT,JLT
 C
-	      J = I + NFT
+                J = I + NFT
 C
               FLAG_REACTIV = 0
-C	
+C
               NFOUND = 0
               FOUND_SLIP(1:2) = 0
               FOUND_FRAM(1:2) = 0 

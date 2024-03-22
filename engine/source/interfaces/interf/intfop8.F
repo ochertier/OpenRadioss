@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  INTFOP8                       source/interfaces/interf/intfop8.F
 Chd|-- called by -----------
@@ -28,7 +28,7 @@ Chd|-- calls ---------------
 Chd|        INTVO8                        source/interfaces/inter3d/intvo8.F
 Chd|        SPMD_I8_REDUCE                source/mpi/interfaces/spmd_i8tool.F
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
-Chd|        INT8_MOD                      ../common_source/modules/int8_mod.F
+Chd|        INT8_MOD                      ../common_source/modules/interfaces/int8_mod.F
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
 Chd|====================================================================
@@ -37,7 +37,7 @@ Chd|====================================================================
      2       ICODT ,FSAV    ,WA      ,V      ,MS   ,
      3       DT2T  ,NELTST  ,ITYPTST ,ITAB   ,STIFN,
      4       NPC   ,TF      ,FSKYI   ,ISKY   ,VR   ,
-     5       FCONT ,IN      ,BUFSF   ,FNCONT ,
+     5       FCONT ,IN      ,BUFSF   ,FNCONT ,NSENSOR,
      6       FTCONT,ICONTACT,RCONTACT,NUM_IMP,NS_IMP,
      7       NE_IMP ,NT_IMP  ,SENSOR_TAB,INTBUF_TAB    ,
      8       H3D_DATA,PSKIDS,TAGNCONT,KLOADPINTER,LOADPINTER,
@@ -60,16 +60,13 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
-#include      "scr04_c.inc"
-#include      "scr06_c.inc"
-#include      "task_c.inc"
 #include      "param_c.inc"
 #include      "parit_c.inc"
 #include      "impl1_c.inc"
-#include      "scr17_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER ,INTENT(IN) :: NSENSOR
       INTEGER NELTST,ITYPTST 
       INTEGER NUM_IMP(*),NS_IMP(*),NE_IMP(*),NT_IMP
       INTEGER IPARI(NPARI,*), ICODT(*),ITAB(*), 
@@ -95,9 +92,7 @@ C-----------------------------------------------
       my_real TS,STARTT,STOPT
       INTEGER NSLV,SIZ,NBT8
       my_real, DIMENSION(:,:), ALLOCATABLE :: FTSAV_BUF
-
-C-----------------------------------------------
-#include "sync_dir.inc"
+      INTEGER :: NTY
 C-----------------------------------------------
       !CALL STARTIME(96,1)
       NBT8 = 0

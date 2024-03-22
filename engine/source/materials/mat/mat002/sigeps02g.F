@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 !hd|====================================================================
 !hd|  SIGEPS02G                     src/mate02/sigeps02g.F           
 !hd|-- called by -----------
@@ -32,7 +32,7 @@ Chd|  SIGEPS02G                     source/materials/mat/mat002/sigeps02g.F
 Chd|-- called by -----------
 Chd|        MULAWGLC                      source/materials/mat_share/mulawglc.F
 Chd|-- calls ---------------
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE SIGEPS02G(ELBUF_STR,
      1                     JFT      ,JLT     ,PM      ,FOR     ,MOM      ,
@@ -46,7 +46,7 @@ Chd|====================================================================
      9                     SIGOZX   ,MOMOXX  ,MOMOYY  ,MOMOXY  ,SIGNXX   ,
      A                     SIGNYY   ,SIGNXY  ,SIGNYZ  ,SIGNZX  ,MOMNXX   ,
      B                     MOMNYY   ,MOMNXY  ,ETSE    ,EXZ     ,EYZ      ,
-     C                     NEL     ,IOFF_DUCT)
+     C                     NEL     ,IOFF_DUCT,VP      , NUVAR  ,UVAR)
 !-----------------------------------------------
 !   M o d u l e s
 !-----------------------------------------------
@@ -66,7 +66,6 @@ Chd|====================================================================
 !-----------------------------------------------
 #include      "units_c.inc"
 #include      "param_c.inc"
-#include      "scr06_c.inc"
 #include      "scr05_c.inc"
 #include      "scr17_c.inc"
 #include      "com08_c.inc"
@@ -77,6 +76,9 @@ Chd|====================================================================
       INTEGER JFT,JLT,IOFC,KFTS,NLAY,IR,IS,NEL
       INTEGER NGL(MVSIZ),INDX(MVSIZ), 
      .        IOFF_DUCT(*),MX
+      INTEGER, INTENT(IN) :: NUVAR ,VP
+      my_real ,DIMENSION(NEL,NUVAR)   ,INTENT(INOUT) :: UVAR
+
       my_real
      .   PM(NPROPM,*),FOR(NEL,5),MOM(NEL,3),EINT(JLT,2),
      .   OFF(*),DT1C(*),NU(*),G(*),A1(*),A2(*),
@@ -113,14 +115,15 @@ Chd|====================================================================
      .   AM(MVSIZ),BM(MVSIZ),ANM(MVSIZ),BNM(MVSIZ),QTIER(MVSIZ),
      .   NUM1(MVSIZ),NUM2(MVSIZ),AN(MVSIZ),BN(MVSIZ),
      .   GAMA(MVSIZ),GAMA2(MVSIZ),LFN(MVSIZ),QFN(MVSIZ),QFNM(MVSIZ),
-     .   DEGMB_LOC(MVSIZ),DEGSH_LOC(MVSIZ),DEGFX_LOC(MVSIZ),YLD(MVSIZ)
+     .   DEGMB_LOC(MVSIZ),DEGSH_LOC(MVSIZ),DEGFX_LOC(MVSIZ),YLD(MVSIZ),
+     .   LOGEP(MVSIZ),PLAP(MVSIZ)
       my_real
      .   DPLA_I,DR,A,B,F,DF,YLD_I,CP1,CQ1,CP2,CQ2,SM3,FN,FM,FNM,
      .   DA,DB,A_I,B_I,PN,QN,SN1,SN2,S,P_M,QM,PNM1,PNM2,
      .   DFNP,DFNQ,DFMP,DFMQ,DFNMP,DFNMQ,XP,XQ,XPG,XQG,
-     .   QNM1,QNM2,FNP,FNQ,FMP,FMQ,FNMP,FNMQ,S3,AA,BB,
+     .   QNM1,QNM2,FNP,FNQ,FMP,FMQ,FNMP,FNMQ,S3,AA,BB,PLAP1,
      .   THK12,THK2,FAC,SH1,EZZ,DPLA(MVSIZ),AAA,BBB,CCC,
-     .   FACT,FF1,FF2,FF3,MM1,MM2,MM3,AUX,EPIF,
+     .   FACT,FF1,FF2,FF3,MM1,MM2,MM3,AUX,EPIF,ASRATE,
      .   MS,FS,D1,D2,MT,TM,TSTAR,VISC,CA_1,CB_1,YMAX_1
       TYPE(L_BUFEL_) ,POINTER :: LBUF
 !-----------------------------------------------
@@ -128,7 +131,7 @@ Chd|====================================================================
 !-----------------------------------------------
       LBUF => ELBUF_STR%BUFLY(1)%LBUF(IR,IS,1)
 !
-      EPIF = ZERO
+      EPIF   = ZERO
       EPIF   = MAX(EPIF,PM(43,MX))
       YM     = PM(20,MX)
       C1     = PM(28,MX)
@@ -147,16 +150,27 @@ Chd|====================================================================
       CP     = PM(53,MX)
 !
       DO I=JFT,JLT
+        ASRATE = MIN(ONE,PM(9,MX)*DT1C(I))
         CA(I)  = CA_1
         CB(I)  = CB_1
         YMAX(I)= YMAX_1
-        AUX = PM(44,MX)*DT1C(I)
-        EPDR(I)= MAX(EM20,AUX)
         NPIF   = NINT(PM(50,MX))
         T(I)   = PM(54,MX)
         ETSE(I) = ONE
         EPSPDT(I) = ONE
       ENDDO
+      IF(VP == 1)THEN
+        DO I=JFT,JLT
+          AUX    = PM(44,MX)
+          EPDR(I)= MAX(EM20,AUX)
+        ENDDO
+      ELSE               
+        DO I=JFT,JLT
+          AUX    = PM(44,MX)*DT1C(I)
+          EPDR(I)= MAX(EM20,AUX)
+        ENDDO
+      ENDIF
+
 !---------------------------
 !     CONTRAINTES ELASTIQUES
 !---------------------------
@@ -189,24 +203,33 @@ Chd|====================================================================
 !       e = 1/t integ[1/2 E (eps_m + k z)^2 dz ]
 !       e = 1/2 E eps_eq^2
 !       eps_eq = sqrt[ eps_m^2 + 1/12 k^2t^2 ]
-#include      "simd.inc"
-        IF (ISRATE >= 1) THEN
+        IF(VP==1)THEN
           DO I=JFT,JLT
-            EPSPDT(I) = EPSP(I)*DT1C(I)
-          ENDDO
+            PLAP(I)  = UVAR(I,I)
+            PLAP(I)  = MAX(PLAP(I),EPDR(I))
+            LOGEP(I) = LOG(PLAP(I)/EPDR(I))
+          ENDDO           
         ELSE
-          DO I=JFT,JLT
-            EPSPDT(I) = ABS(DEGMB_LOC(I)+DEGFX_LOC(I)*THK0(I))*UNSYEQ(I)
-          ENDDO
-        ENDIF ! IF (ISRATE >= 1)
+          IF (ISRATE >= 1) THEN
+            DO I=JFT,JLT
+              EPSPDT(I) = EPSP(I)*DT1C(I)
+              EPSPDT(I) = MAX(EPSPDT(I),EM20)
+              LOGEP(I)  = LOG(EPSPDT(I)/EPDR(I))
+            ENDDO
+          ELSE
+            DO I=JFT,JLT
+              EPSPDT(I) = ABS(DEGMB_LOC(I)+DEGFX_LOC(I)*THK0(I))*UNSYEQ(I)
+              EPSPDT(I) = MAX(EPSPDT(I),EM20)
+              LOGEP(I)  = LOG(EPSPDT(I)/EPDR(I))
+            ENDDO
+          ENDIF ! IF (ISRATE >= 1)
+        ENDIF
         DO I=JFT,JLT
-          EPSPDT(I) = MAX(EPSPDT(I),EM20)
-          EPSPDT(I) = LOG(EPSPDT(I)/EPDR(I))
+          EPSPDT(I) = LOGEP(I)    
           T(I) = T(I)+CP*(EINT(I,1)+EINT(I,2))/VOL0(I)
         ENDDO
 !
         IF (NPIF == ZERO .AND. (IMACH /= 3 .OR. IPARIT == 0)) THEN
-#include "simd.inc"
           DO I=JFT,JLT
             MT = MAX(EM20,Z3)
             TM = Z4
@@ -228,7 +251,6 @@ Chd|====================================================================
             IF (ICC == 1) YMAX(I) = YMAX(I)*EPSPDT(I)
           ENDDO
         ELSEIF (NPIF == JLT .AND. (IMACH /= 3 .OR. IPARIT == 0)) THEN
-#include "simd.inc"
           DO I=JFT,JLT
             EPSPDT(I) = CC*EXP((-Z3+Z4 * EPSPDT(I))*T(I))
             IF (ICC == 1) YMAX(I) = YMAX(I) + EPSPDT(I)
@@ -328,6 +350,13 @@ Chd|====================================================================
           EZZ = - (DEPSXX(I) + DEPSYY(I)) * (NU(I)*AAA/(ONE-NU(I)) + BBB)/CCC
           THK(I) = THK(I) * (ONE + EZZ*OFF(I))
         ENDDO
+        IF (VP== 1) THEN
+          DO I=1,NEL       
+            PLAP1   = DPLA(I)/MAX(EM20,DT1C(I))
+            PLAP(I) = ASRATE * PLAP1 + (ONE - ASRATE) * PLAP(I)
+          ENDDO
+        ENDIF
+
       ELSE
 !-------------------------
 !     ITERATIVE
@@ -335,7 +364,6 @@ Chd|====================================================================
 !-------------------------
 !     CRITERE DE VON MISES
 !-------------------------
-#include "simd.inc"
         DO I=JFT,JLT
           YLD(I) = CA(I)+CB(I)*EXP(CN * LOG(LBUF%PLA(I)+ EM30))
         ENDDO
@@ -385,7 +413,6 @@ Chd|====================================================================
 !---------------------------
 !    DEP EN CONTRAINTE PLANE
 !---------------------------
-#include      "simd.inc"
         DO J=1,NINDX
           I = INDEX(J)
           NU1(I) = HALF*(ONE + NU(I))
@@ -408,7 +435,6 @@ Chd|====================================================================
 !     TIENT COMPTE DU COUPLAGE
 !-------------------------------
         DO N=1,NMAX
-#include      "simd.inc"
           DO J=1,NINDX
             I = INDEX(J)
             DPLA_I = DPLA_J(I)
@@ -459,7 +485,6 @@ Chd|====================================================================
 !------------------------------------------
 !     CONTRAINTES PLASTIQUEMENT ADMISSIBLES
 !------------------------------------------
-#include      "simd.inc"
         DO J=1,NINDX
           I = INDEX(J)
           LBUF%PLA(I) = LBUF%PLA(I) + DPLA_J(I)
@@ -501,11 +526,18 @@ Chd|====================================================================
           EZZ = - NU3(I)*DR*SN1/YM
           THK(I) = THK(I) * (ONE + EZZ*OFF(I))
         ENDDO
+c     update and filter plastic strain rate for VP=1
+        IF (VP== 1) THEN
+          DO I=1,NEL       
+            PLAP1   = DPLA_J(I)/MAX(EM20,DT1C(I))
+            PLAP(I) = ASRATE * PLAP1 + (ONE - ASRATE) * PLAP(I)
+          ENDDO
+        ENDIF
+
       ENDIF ! IF (IPLA == 0)
 !--------------------------------
 !     TEST DE RUPTURE DUCTILE
 !--------------------------------
-#include "simd.inc"
       DO I=JFT,JLT
         IF (OFF(I) < EM01) OFF(I) = ZERO
         IF (OFF(I) < ONE)   OFF(I) = OFF(I)*FOUR_OVER_5

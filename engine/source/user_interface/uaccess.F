@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  UACCESS_DUM                   source/user_interface/uaccess.F
 Chd|-- called by -----------
@@ -27,7 +27,9 @@ Chd|        RADIOSS2                      source/engine/radioss2.F
 Chd|-- calls ---------------
 Chd|====================================================================
       SUBROUTINE UACCESS_DUM(IERR)
-C---------+---------+---+---+--------------------------------------------
+C-----------------------------------------------
+C   I m p l i c i t   T y p e s
+C-----------------------------------------------
 #include      "implicit_f.inc"
        INTEGER IERR
        IERR=0
@@ -38,6 +40,12 @@ Chd|-- called by -----------
 Chd|-- calls ---------------
 Chd|====================================================================
       INTEGER FUNCTION GET_U_CYCLE()
+C-----------------------------------------------
+C   I m p l i c i t   T y p e s
+C-----------------------------------------------
+#include "implicit_f.inc"
+C-----------------------------------------------
+C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include "com01_c.inc"
 C-----------------------------------------------
@@ -55,6 +63,10 @@ Chd|====================================================================
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+#include "implicit_f.inc"
+C-----------------------------------------------
+C   C o m m o n   B l o c k s
+C-----------------------------------------------
 #include "com08_c.inc"
 C-----------------------------------------------
        GET_U_TIME = TT
@@ -70,13 +82,11 @@ Chd|====================================================================
       INTEGER FUNCTION GET_U_ACCEL(NACC, AX,AY,AZ)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
+C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "my_real.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include "com04_c.inc"
 #include "scr05_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -119,12 +129,25 @@ Chd|-- calls ---------------
 Chd|        GET_VAR_USER_I                source/user_interface/eng_callback_c.c
 Chd|====================================================================
       INTEGER FUNCTION GET_U_NUMACC(IDACC)
+C-----------------------------------------------
+C   I m p l i c i t   T y p e s
+C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "param_c.inc"
+C-----------------------------------------------
+C   C o m m o n   B l o c k s
+C-----------------------------------------------
 #include      "com04_c.inc"
-      INTEGER IDACC
+C-----------------------------------------------
+C   D u m m y   A r g u m e n t s
+C-----------------------------------------------
+      INTEGER, INTENT(IN) :: IDACC
+C-----------------------------------------------
+C   L o c a l   V a r i a b l e s
+C-----------------------------------------------      
       INTEGER DEPLA,J,ID
-C=======================================================================
+C-----------------------------------------------
+C   S o u r c e   L i n e s
+C-----------------------------------------------  
       GET_U_NUMACC = 0
       IF(IDACC<=0)THEN
         RETURN
@@ -156,25 +179,26 @@ C-----------------------------------------------
       USE MESSAGE_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
+C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr05_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "warn_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER IU
+      INTEGER,INTENT(IN) :: IU
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER J, JINF, JSUP, ITAB1, ITAB2
       CHARACTER MESS*40
       DATA MESS/'USER SENSOR                             '/
+C-----------------------------------------------
+C   S o u r c e   L i n e s
 C-----------------------------------------------
       JINF=1
       JSUP=NUMNOD
@@ -186,7 +210,7 @@ C-----------------------------------------------
      .                I1=IU,C1=MESS)
         IERR=IERR+1
        END IF
-Cel en SPMD la valeur 0 n indique pas une erreur mais l absence du noeud sur le proc
+C   en SPMD la valeur 0 n indique pas une erreur mais l absence du noeud sur le proc
        GET_U_NUMNOD=0
        RETURN
       ENDIF
@@ -219,39 +243,35 @@ Chd|        SPMD_GLOB_DSUM                source/mpi/interfaces/spmd_th.F
 Chd|        SPMD_RBCAST                   source/mpi/generic/spmd_rbcast.F
 Chd|====================================================================
       INTEGER FUNCTION GET_U_NOD_X(NOD, X,Y,Z)
-Cel En SPMD, tous les procs doivent appeler cette fonction
-Cel sinon blocage
+C   En SPMD, tous les procs doivent appeler cette fonction
+C   sinon blocage
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "my_real.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include "com01_c.inc"
-#include "com04_c.inc"
 #include "scr05_c.inc"
 #include "userlib.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER NOD
-      my_real
-     .        X,Y,Z
+      INTEGER,INTENT(IN) :: NOD
+      my_real,INTENT(INOUT) :: X,Y,Z
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER L,D1,D2,D3, P
-      my_real
-     .        BUFS(6)
+      my_real BUFS(6)
 C-----------------------------------------------
-C
+C   S o u r c e   L i n e s
+C-----------------------------------------------
       IF (NOD>0) THEN
        IF(NSPMD>1) THEN
-Cel get_proc_user_f retourne 1 si weight(nod) = 1, , 0 sinon
-Cel weight : pointeur 18 (cf resol.F)
+C   get_proc_user_f retourne 1 si weight(nod) = 1, , 0 sinon
+C   weight : pointeur 18 (cf resol.F)
          CALL GET_VAR_USER_I(18,NOD,P)
        ELSE
          P = 1
@@ -314,39 +334,35 @@ Chd|        SPMD_GLOB_DSUM                source/mpi/interfaces/spmd_th.F
 Chd|        SPMD_RBCAST                   source/mpi/generic/spmd_rbcast.F
 Chd|====================================================================
       INTEGER FUNCTION GET_U_NOD_D(NOD, DX,DY,DZ)
-Cel En SPMD, tous les procs doivent appeler cette fonction
-Cel sinon blocage
+C   En SPMD, tous les procs doivent appeler cette fonction
+C   sinon blocage
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "my_real.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include "com01_c.inc"
-#include "com04_c.inc"
 #include "scr05_c.inc"
 #include "userlib.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER NOD
-      my_real
-     .        DX,DY,DZ
+      INTEGER,INTENT(IN) :: NOD
+      my_real,INTENT(INOUT) :: DX,DY,DZ
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER L,D1,D2,D3, P
-      my_real
-     .        BUFS(6)
+      my_real BUFS(6)
 C-----------------------------------------------
-C
+C   S o u r c e   L i n e s
+C-----------------------------------------------
       IF (NOD>0) THEN
        IF(NSPMD>1) THEN
-Cel get_proc_user_f retourne 1 si weight(nod) = 1, , 0 sinon
-Cel weight : pointeur 18 (cf resol.F)
+C   get_proc_user_f retourne 1 si weight(nod) = 1, , 0 sinon
+C   weight : pointeur 18 (cf resol.F)
          CALL GET_VAR_USER_I(18,NOD,P)
        ELSE
          P = 1
@@ -409,19 +425,16 @@ Chd|        SPMD_GLOB_DSUM                source/mpi/interfaces/spmd_th.F
 Chd|        SPMD_RBCAST                   source/mpi/generic/spmd_rbcast.F
 Chd|====================================================================
       INTEGER FUNCTION GET_U_NOD_V(NOD, VX,VY,VZ)
-Cel En SPMD, tous les procs doivent appeler cette fonction
-Cel sinon blocage
+C   En SPMD, tous les procs doivent appeler cette fonction
+C   sinon blocage
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "my_real.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include "com01_c.inc"
-#include "com04_c.inc"
 #include "scr05_c.inc"
 #include "userlib.inc"
 C-----------------------------------------------
@@ -437,11 +450,12 @@ C-----------------------------------------------
       my_real
      .        BUFS(6)
 C-----------------------------------------------
-C
+C   S o u r c e   L i n e s
+C-----------------------------------------------
       IF (NOD>0) THEN
        IF(NSPMD>1) THEN
-Cel get_proc_user_f retourne 1 si weight(nod) = 1, , 0 sinon
-Cel weight : pointeur 18 (cf resol.F)
+C   get_proc_user_f retourne 1 si weight(nod) = 1, , 0 sinon
+C   weight : pointeur 18 (cf resol.F)
          CALL GET_VAR_USER_I(18,NOD,P)
        ELSE
          P = 1
@@ -504,19 +518,16 @@ Chd|        SPMD_GLOB_DSUM                source/mpi/interfaces/spmd_th.F
 Chd|        SPMD_RBCAST                   source/mpi/generic/spmd_rbcast.F
 Chd|====================================================================
       INTEGER FUNCTION GET_U_NOD_A(NOD, AX,AY,AZ)
-Cel En SPMD, tous les procs doivent appeler cette fonction
-Cel sinon blocage
+C   En SPMD, tous les procs doivent appeler cette fonction
+C   sinon blocage
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "my_real.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include "com01_c.inc"
-#include "com04_c.inc"
 #include "scr05_c.inc"
 #include "userlib.inc"
 C-----------------------------------------------
@@ -528,14 +539,14 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER L,D1,D2,D3, P
-      my_real
-     .        BUFS(6)
+      my_real BUFS(6)
 C-----------------------------------------------
-C
+C   S o u r c e   L i n e s
+C-----------------------------------------------
       IF (NOD>0) THEN
        IF(NSPMD>1) THEN
-Cel get_proc_user_f retourne 1 si weight(nod) = 1, , 0 sinon
-Cel weight : pointeur 18 (cf resol.F)
+C   get_proc_user_f retourne 1 si weight(nod) = 1, , 0 sinon
+C   weight : pointeur 18 (cf resol.F)
          CALL GET_VAR_USER_I(18,NOD,P)
        ELSE
          P = 1
@@ -600,15 +611,25 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
+C-----------------------------------------------
+C   C o m m o n   B l o c k s
+C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "scr05_c.inc"
 #include      "r4r8_p.inc"
 #include      "param_c.inc"
-      my_real
-     .       VECT(LSKEW)
-      INTEGER IDSKW,N1,N2,N3
+C-----------------------------------------------
+C   D u m m y   A r g u m e n t s
+C-----------------------------------------------
+      my_real,INTENT(IN) :: VECT(LSKEW)
+      INTEGER,INTENT(IN) :: IDSKW,N1,N2,N3
+C-----------------------------------------------
+C   L o c a l   V a r i a b l e s
+C-----------------------------------------------      
       INTEGER I,ID,DEPLA
-C=======================================================================
+C-----------------------------------------------
+C   S o u r c e   L i n e s
+C-----------------------------------------------   
 C
       GET_U_SKEW = 0
 C
@@ -671,9 +692,12 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IEL,ILAYER,IVAR,NUVAR
+C-----------------------------------------------      
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER N
+C-----------------------------------------------      
+C   S o u r c e   L i n e s
 C-----------------------------------------------
       N = (ILAYER-1)*NUVAR+IVAR
       IF (N > 5000) THEN
@@ -704,7 +728,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
 #include      "vec_spring_num.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -715,6 +738,8 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,ID
+C-----------------------------------------------      
+C   S o u r c e   L i n e s
 C-----------------------------------------------
        DO I=JFT,JLT
          SPR_NUM(I) = IXR(NIXR,I)
@@ -747,6 +772,8 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IEL,NUM
+C-----------------------------------------------      
+C   S o u r c e   L i n e s
 C-----------------------------------------------
       NUM = NINT(SPR_NUM(IEL))
       GET_SPRING_ELNUM = NUM
@@ -766,24 +793,20 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "vect01_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       my_real USER_X(LLT,8,3)
 C-----------------------------------------------
-C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER ND1,ND2,ND3,ND4,ND5,ND6,ND7,ND8,ELEM,I
-      
+C-----------------------------------------------      
+C   S o u r c e   L i n e s
+C-----------------------------------------------
       DO I=1,LLT
          ELEM=NFT+I
          ND1=IXS(NIXS*(ELEM-1)+2)
@@ -894,24 +917,20 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "vect01_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       my_real USER_V(LLT,8,3)
 C-----------------------------------------------
-C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER ND1,ND2,ND3,ND4,ND5,ND6,ND7,ND8,ELEM,I
-      
+C-----------------------------------------------      
+C   S o u r c e   L i n e s
+C-----------------------------------------------
       DO I=1,LLT
          ELEM=NFT+I
          ND1=IXS(NIXS*(ELEM-1)+2)
@@ -1004,7 +1023,6 @@ C
          ENDIF 
 
       ENDDO
-C     
 
       END
 C-----------------------------------------------

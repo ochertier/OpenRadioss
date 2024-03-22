@@ -1,30 +1,29 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  MULTI_SUBMATLAW               source/multifluid/multi_submatlaw.F
 Chd|-- called by -----------
 Chd|        COMPUTE_PRESSURE              source/multifluid/multi_muscl_fluxes_computation.F
-Chd|        ENERGY_JUMP                   source/multifluid/multi_fluxes_computation.F
 Chd|        MULTI_INLET_EBCS              source/multifluid/multi_inlet_ebcs.F
 Chd|        MULTI_NRF_EBCS                source/multifluid/multi_nrf_ebcs.F
 Chd|        MULTI_PRESSURE_EQUILIBRIUM    source/multifluid/multi_pressure_equilibrium.F
@@ -33,12 +32,14 @@ Chd|-- calls ---------------
 Chd|        ARRET                         source/system/arret.F         
 Chd|        EOSMAIN                       ../common_source/eos/eosmain.F
 Chd|====================================================================
-      SUBROUTINE MULTI_SUBMATLAW(IFLAG   , MATLAW  , LOCAL_MATID, NEL, EINT   , PRES  , RHO, SSP  , VOL, GRUN, 
-     .                           PM      , IPM     , NPROPM     , NPROPMI     , BUFMAT, OFF, THETA,
-     .                           BURNFRAC, BURNTIME, DELTAX     , CURRENT_TIME, SIGOLD, NPF, TF)
-C-----------------------------------------------
-C     D e s c r i p t i o n
-C-----------------------------------------------      
+      SUBROUTINE MULTI_SUBMATLAW(
+     1   IFLAG,       MATLAW,      LOCAL_MATID, NEL,
+     2   EINT,        PRES,        RHO,         SSP,
+     3   VOL,         GRUN,        PM,          IPM,
+     4   NPROPM,      NPROPMI,     BUFMAT,      OFF,
+     5   THETA,       BURNFRAC,    BURNTIME,    DELTAX,
+     6   CURRENT_TIME,SIGOLD,      NPF,         TF,
+     7   VAREOS,      NVAREOS)
 C-----------------------------------------------
 C     I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -46,9 +47,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C     C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "vect01_c.inc"
 #include      "tabsiz_c.inc"
-CC-----------------------------------------------
+C-----------------------------------------------
 C     D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER, INTENT(IN) :: IFLAG
@@ -61,8 +61,8 @@ C-----------------------------------------------
       my_real, INTENT(OUT) :: PRES(NEL), SSP(NEL)
       my_real, INTENT(IN) :: BURNTIME(*), DELTAX(*), CURRENT_TIME
       my_real, INTENT(INOUT) :: BURNFRAC(*), BUFMAT(*)
-      INTEGER, INTENT(IN) :: NPF(SNPC)
-      my_real, INTENT(IN) :: TF(STF)
+      INTEGER, INTENT(IN) :: NPF(SNPC),NVAREOS
+      my_real, INTENT(IN) :: TF(STF),VAREOS(NVAREOS*NEL)
 C-----------------------------------------------
 C     L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -76,6 +76,7 @@ C-----------------------------------------------
       my_real :: R1V, R2V, WDR1V, WDR2V, DR1V, ER1V, ER2V
       my_real :: TB, BFRAC1, BFRAC2, PMIN
       INTEGER :: IBFRAC
+      INTEGER :: LFT, LLT 
 C-----------------------------------------------  
 C     B e g i n n i n g   o f   s u b r o u t i n e
 C-----------------------------------------------
@@ -160,12 +161,12 @@ C     Burnt fraction
             EOSTYPE      = IPM(4, LOCAL_MATID)
             MUOLD(1:NEL) = MU(1:NEL)
 C     -> FLAG = 2 : compute pressure as a function of rho and e, as well as dpdm and dpde
-            CALL EOSMAIN(2     , NEL   , EOSTYPE, PM    , OFF  , EINT, 
-     .                   RHO   , RHO0  , MU     , MU2   , ESPE , 
-     .                   DVOL  , DF    , VOL    , MAT   , PSH  , 
-     .                   PRES  , SSP   , DPDE   , THETA , ECOLD, 
-     .                   BUFMAT, SIGOLD, MUOLD  , MATLAW, PRES ,
-     .                   NPF   , TF)
+            CALL EOSMAIN(2     , NEL   , EOSTYPE   , PM    , OFF  , EINT, 
+     .                   RHO   , RHO0  , MU        , MU2   , ESPE , 
+     .                   DVOL  , DF    , VOL       , MAT   , PSH  , 
+     .                   PRES  , SSP   , DPDE      , THETA , ECOLD, 
+     .                   BUFMAT, SIGOLD, MUOLD     , MATLAW, PRES ,
+     .                   NPF   , TF    , VAREOS    , NVAREOS)
 C     SQUARE sound speed : c^2 = 1/rho0 * dp/dmu
             DO II = 1, NEL
                IF (VOL(II) > ZERO) THEN

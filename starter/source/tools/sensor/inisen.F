@@ -1,37 +1,39 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  INISEN                        source/tools/sensor/inisen.F  
 Chd|-- called by -----------
 Chd|        LECTUR                        source/starter/lectur.F       
 Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
+Chd|        INIPARSEN                     source/tools/sensor/iniparsen.F
+Chd|        SORT_LOGICAL_SENSORS          source/tools/sensor/sort_logical_sensors.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        SENSOR_MOD                    share/modules1/sensor_mod.F   
 Chd|====================================================================
-      SUBROUTINE INISEN(SENSOR_TAB, LSENSOR,IPARI ,NOM_OPT,PTR_NOPT_RWALL,
-     .                  PTR_NOPT_SECT,NBR_SENS,IPARSENS,PTR_NOPT_INTER,
-     .                  IXR    ,R_SKEW   )
+      SUBROUTINE INISEN(SENSORS , IPARI ,NOM_OPT ,PTR_NOPT_RWALL,
+     .                  PTR_NOPT_SECT ,PTR_NOPT_INTER  ,IXR    ,R_SKEW   ,NUMELR,
+     .                  NSECT   ,NINTER ,NINTSUB ,NRWALL   ,NRBODY  )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------  
@@ -44,31 +46,31 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr03_c.inc"
 #include      "scr17_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER LSENSOR(NSENSI,NSENSOR),IPARI(NPARI,NINTER)
+      INTEGER ,INTENT(IN) :: NUMELR,NSECT,NINTER,NINTSUB,NRWALL,NRBODY
+      INTEGER IPARI(NPARI,NINTER)
       INTEGER NOM_OPT(LNOPT1,*),PTR_NOPT_RWALL,PTR_NOPT_SECT,
      .        PTR_NOPT_INTER
       INTEGER ,DIMENSION(NUMELR)      :: R_SKEW
       INTEGER ,DIMENSION(NIXR,NUMELR) :: IXR
-      INTEGER NBR_SENS,IPARSENS,JSUB
-      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE (SENSORS_) ,INTENT(INOUT) ,TARGET  :: SENSORS
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,K,IN,IS1,IS2,SENS_TYPE,SENS_ID,SPRING_ID
+      INTEGER I,J,K,IN,NSENSOR,IPARSENS,STABSEN,SFSAV,STAT,
+     .        IS1,IS2,SENS_TYPE,SENS_ID,SPRING_ID
       CHARACTER TITR*nchartitle
+      TYPE (SENSOR_STR_) ,DIMENSION(:) ,POINTER :: SENSOR_TAB
 c=======================================================================
 C     INIT DES PARAMETRES DE SENSOR
 C---------------------------------------------
+      NSENSOR    =  SENSORS%NSENSOR
+      SENSOR_TAB => SENSORS%SENSOR_TAB(1:NSENSOR)
+c
       DO K=1,NSENSOR
         IS1  = 0
         IS2  = 0
@@ -93,8 +95,6 @@ C-------------------------------------
           ENDIF
           SENSOR_TAB(K)%IPARAM(1) = IS1
           SENSOR_TAB(K)%IPARAM(2) = IS2
-          LSENSOR(4,K)=IS1
-          LSENSOR(5,K)=IS2
 c
         ELSEIF (SENS_TYPE == 4 .OR. SENS_TYPE == 5) THEN
 C-------------------------------------
@@ -118,8 +118,6 @@ C-------------------------------------
           ENDIF
           SENSOR_TAB(K)%IPARAM(1) = IS1
           SENSOR_TAB(K)%IPARAM(2) = IS2
-          LSENSOR(4,K)=IS1
-          LSENSOR(5,K)=IS2
 c
         ELSEIF (SENS_TYPE == 6) THEN
 C-------------------------------------
@@ -149,7 +147,6 @@ C-------------------------------------
      .                  I2=SENSOR_TAB(K)%IPARAM(1),C2='INTERFACE')
           ENDIF
           SENSOR_TAB(K)%IPARAM(1) = IN
-          LSENSOR(4,K)=IN
 c
         ELSEIF (SENS_TYPE == 7) THEN
 C-------------------------------------
@@ -165,7 +162,6 @@ C-------------------------------------
      .                  I2=SENSOR_TAB(K)%IPARAM(1),C2='RIGID WALL')
           ENDIF
           SENSOR_TAB(K)%IPARAM(1) = IN
-          LSENSOR(4,K)=IN
 c
         ELSEIF (SENS_TYPE == 8)THEN
 C-------------------------------------
@@ -181,7 +177,6 @@ C-------------------------------------
      .                  I2=SENSOR_TAB(K)%IPARAM(1),C2='SENSOR')
           ENDIF
           SENSOR_TAB(K)%IPARAM(1) = IS1
-          LSENSOR(4,K)=IS1
 c
         ELSEIF (SENS_TYPE == 11)THEN
 C-------------------------------------
@@ -197,7 +192,6 @@ C-------------------------------------
      .                   I2=SENSOR_TAB(K)%IPARAM(1),C2='RIGID BODY')
           ENDIF
           SENSOR_TAB(K)%IPARAM(1) = IN
-          LSENSOR(4,K)=IN
 c
         ELSEIF (SENS_TYPE == 12)THEN
 C-------------------------------------
@@ -213,7 +207,6 @@ C-------------------------------------
      .                   I2=SENSOR_TAB(K)%IPARAM(1),C2='SECTION')
           ENDIF
           SENSOR_TAB(K)%IPARAM(1) = IN
-          LSENSOR(4,K)=IN
 c---
         ELSEIF (SENS_TYPE == 13) THEN
 C-------------------------------------
@@ -225,7 +218,6 @@ c         ID section
             IF (NOM_OPT(1,PTR_NOPT_SECT +I) == SENSOR_TAB(K)%IPARAM(3)) IN=I
           ENDDO
           SENSOR_TAB(K)%IPARAM(3) = IN
-          LSENSOR(6,K)=IN
 c
 c         ID INTERFACE
           IN = 0
@@ -241,13 +233,11 @@ c         ID INTERFACE
                  IF (IPARI(15,J) == NOM_OPT(2,PTR_NOPT_INTER+I))THEN
                    IN = I + NINTER
                    SENSOR_TAB(K)%IPARAM(5) = J
-                   LSENSOR(8,K)=IN
                  ENDIF
               ENDDO
             ENDIF
           ENDDO
           SENSOR_TAB(K)%IPARAM(4) = IN
-          LSENSOR(7,K)=IN
 c
 c         ID RWALL
           IN = 0
@@ -255,7 +245,6 @@ c         ID RWALL
             IF (NOM_OPT(1,PTR_NOPT_RWALL+I) == SENSOR_TAB(K)%IPARAM(6)) IN=I
           ENDDO
           SENSOR_TAB(K)%IPARAM(6) = IN
-          LSENSOR(9,K)=IN
 c
 c         ID RBODY
           IN = 0
@@ -263,7 +252,6 @@ c         ID RBODY
             IF (NOM_OPT(1,I) == SENSOR_TAB(K)%IPARAM(7)) IN=I
           ENDDO
           SENSOR_TAB(K)%IPARAM(7) = IN
-          LSENSOR(10,K)=IN
 c
           IF (SENSOR_TAB(K)%IPARAM(3) == 0 .and. SENSOR_TAB(K)%IPARAM(4) == 0 .and. 
      .        SENSOR_TAB(K)%IPARAM(5) == 0 .and. SENSOR_TAB(K)%IPARAM(6) == 0 .and. 
@@ -289,19 +277,47 @@ C-------------------------------------
 c---
         ENDIF ! SENSOR TYPE
       ENDDO
-C-------------------------------------
-C   Traitement special sensors type force + parit/on
-C-------------------------------------
-      IPARSENS=0        ! Flag pour sensor type force
-      NBR_SENS=0
-      DO I=1,NSENSOR
-        SENS_TYPE = SENSOR_TAB(I)%TYPE
-        IF (SENS_TYPE== 6  .OR. SENS_TYPE== 7 .OR. SENS_TYPE== 11 .OR.
-     .      SENS_TYPE== 12 .OR. SENS_TYPE== 13) THEN 
-          NBR_SENS = NBR_SENS+1
-          IPARSENS = 1
-        ENDIF
-      ENDDO
+c
+c----------------------------------------------------------------------
+c     Logical sensors : AND, OR, NOT, SENS - create a dependancy order
+c----------------------------------------------------------------------
+
+      CALL SORT_LOGICAL_SENSORS(SENSOR_TAB,NSENSOR)
+
+c----------------------------------------------------------------------
+c     Allocate sensor arrays for PARITH_ON/SMPD exchange
+c----------------------------------------------------------------------
+      IPARSENS = 0        ! Flag pour sensor type force
+      SFSAV    = 0
+      STABSEN  = 0
+c
+      IF (NSENSOR > 0) THEN
+        DO I=1,NSENSOR
+          SENS_TYPE = SENSOR_TAB(I)%TYPE
+          IF (SENS_TYPE== 6  .OR. SENS_TYPE== 7 .OR. SENS_TYPE== 11 .OR.
+     .        SENS_TYPE== 12 .OR. SENS_TYPE== 13) THEN 
+            SFSAV = SFSAV + 1
+            IPARSENS = 1
+          ENDIF
+        ENDDO
+        IF (IPARSENS == 1) STABSEN = NSECT+NINTER+NINTSUB+NRWALL+NRBODY+1
+      END IF
+c
+      ALLOCATE(SENSORS%TABSENSOR(STABSEN) , STAT=stat)
+      ALLOCATE(SENSORS%FSAV(12,6,SFSAV)   , STAT=stat)
+      SENSORS%STABSEN   = STABSEN
+      SENSORS%SFSAV     = SFSAV
+      SENSORS%TABSENSOR = 0
+      SENSORS%FSAV      = ZERO
+
+      SENSORS%NSTOP = 0
+      SENSORS%NSTAT = 0
+      SENSORS%NOUTP = 0
+      SENSORS%NANIM = 0
+c
+      IF (IPARSENS == 1) THEN
+        CALL INIPARSEN(SENSORS,NSECT,NINTER,NINTSUB,NRWALL,NRBODY)
+      END IF
 c-----------
       RETURN
       END

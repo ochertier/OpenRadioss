@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  MERGE_NODE                    source/elements/nodes/merge_node.F
 Chd|-- called by -----------
@@ -36,7 +36,7 @@ Chd|====================================================================
      .                      IADMERGE2,NMERGE_TOT,MERGE_NODE_TAB,MERGE_NODE_TOL,
      .                      NMERGE_NODE_CAND,NMERGE_NODE_DEST,IXS,IXS10,IXS20,
      .                      IXS16,IXQ,IXC,IXT,IXP,
-     .                      IXR,IXTG,IXUR,EANI,IGRNOD)   
+     .                      IXR,IXTG,EANI,IGRNOD)   
       USE MESSAGE_MOD
       USE NOD2EL_MOD
       USE GROUPDEF_MOD
@@ -49,10 +49,6 @@ C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "units_c.inc"
 #include      "com04_c.inc"
-#include      "scr06_c.inc"
-#include      "scr03_c.inc"
-#include      "titr_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -61,7 +57,7 @@ C-----------------------------------------------
      .        NMERGE_NODE_CAND,NMERGE_NODE_DEST,NMERGE_TOT
       INTEGER IXS(NIXS,*),IXS10(6,*),IXS16(8,*),IXS20(12,*),IXQ(NIXQ,*),
      .        IXC(NIXC,*),IXT(NIXT,*),IXP(NIXP,*),IXR(NIXR,*),IXTG(NIXTG,*),
-     .        IXUR(6,*),EANI(*)
+     .        EANI(*)
       TARGET  ITAB
       my_real
      .        X(3,NUMNOD),MERGE_NODE_TOL(*)
@@ -227,79 +223,79 @@ C
           N_DEST = USRTOS(IMERGE0(I),ITABM1)
 C
 C---      Check of elements
-	  FLAG = 0 	
-C------------------------>   cas des coques  <-----------------------C		    
+            FLAG = 0 
+C------------------------>   cas des coques  <-----------------------C        
           DO J = KNOD2ELC(N)+1,KNOD2ELC(N+1)
-            DO K=2,5	           
-              IF (IXC(K,NOD2ELC(J)) == N_DEST) FLAG = 1   	   
+            DO K=2,5             
+              IF (IXC(K,NOD2ELC(J)) == N_DEST) FLAG = 1        
             ENDDO
           ENDDO
-C------------------------>   cas des coques triagnles <--------------C		    
+C------------------------>   cas des coques triagnles <--------------C        
           DO J = KNOD2ELTG(N)+1,KNOD2ELTG(N+1)
             DO K=2,4            
-              IF (IXTG(K,NOD2ELTG(J)) == N_DEST) FLAG = 1   	   
+              IF (IXTG(K,NOD2ELTG(J)) == N_DEST) FLAG = 1        
             ENDDO
           ENDDO
-C------------------------>   cas des solides <-----------------------C	
+C------------------------>   cas des solides <-----------------------C
           DO J = KNOD2ELS(N)+1,KNOD2ELS(N+1)     
             CUR_ID = NOD2ELS(J)
             DO K=2,9
-	      IF(IXS(K,NOD2ELS(J)) == N_DEST) FLAG = 1
+                IF(IXS(K,NOD2ELS(J)) == N_DEST) FLAG = 1
             ENDDO
-	    IF (EANI(CUR_ID)==10) THEN
+              IF (EANI(CUR_ID)==10) THEN
               DO K=1,6
-	        IF(IXS10(K,CUR_ID-NUMELS8) == N_DEST) FLAG = 1
+                  IF(IXS10(K,CUR_ID-NUMELS8) == N_DEST) FLAG = 1
               ENDDO
-            ELSEIF (EANI(CUR_ID)==20) THEN		 	       
+            ELSEIF (EANI(CUR_ID)==20) THEN              
               DO K=1,12
-	        IF(IXS20(K,CUR_ID-NUMELS8-NUMELS10) == N_DEST) FLAG = 1
+                  IF(IXS20(K,CUR_ID-NUMELS8-NUMELS10) == N_DEST) FLAG = 1
               ENDDO
-	    ELSEIF (EANI(CUR_ID)==16) THEN      
+              ELSEIF (EANI(CUR_ID)==16) THEN      
               DO K=1,8
-	        IF(IXS16(K,CUR_ID-NUMELS8-NUMELS10-NUMELS20) == N) FLAG = 1
-              ENDDO			 		 	       
-	    ENDIF	       	           	    
-	  END DO
+                  IF(IXS16(K,CUR_ID-NUMELS8-NUMELS10-NUMELS20) == N) FLAG = 1
+              ENDDO                     
+              ENDIF                            
+            END DO
 C------------------------>   cas des elements 1D <-------------------C
           DO J = KNOD2EL1D(N)+1,KNOD2EL1D(N+1)
             CUR_ID = NOD2EL1D(J)
-	    IF (CUR_ID <= NUMELT) THEN
+              IF (CUR_ID <= NUMELT) THEN
               DO K=2,3
-                IF (IXT(K,NOD2EL1D(J)) == N_DEST) FLAG = 1   	   
+                IF (IXT(K,NOD2EL1D(J)) == N_DEST) FLAG = 1        
               ENDDO
             ELSEIF (CUR_ID <= NUMELT + NUMELP) THEN
               DO K=2,4
-                IF (IXP(K,CUR_ID-NUMELT) == N_DEST) FLAG = 1   	   
+                IF (IXP(K,CUR_ID-NUMELT) == N_DEST) FLAG = 1        
               ENDDO
             ELSE
               DO K=2,4
-                IF (IXR(K,CUR_ID-NUMELT-NUMELP) == N_DEST) FLAG = 1   	   
+                IF (IXR(K,CUR_ID-NUMELT-NUMELP) == N_DEST) FLAG = 1        
               ENDDO
             ENDIF
           ENDDO
 C------------------------>   cas des elements 1D inverse (pour 3e noeud )<---C
           DO J = KNOD2EL1D(N_DEST)+1,KNOD2EL1D(N_DEST+1)
             CUR_ID = NOD2EL1D(J)
-	    IF (CUR_ID <= NUMELT) THEN
+              IF (CUR_ID <= NUMELT) THEN
               DO K=2,3
-                IF (IXT(K,NOD2EL1D(J)) == N) FLAG = 1   	   
+                IF (IXT(K,NOD2EL1D(J)) == N) FLAG = 1        
               ENDDO
             ELSEIF (CUR_ID <= NUMELT + NUMELP) THEN
               DO K=2,4
-                IF (IXP(K,CUR_ID-NUMELT) == N) FLAG = 1   	   
+                IF (IXP(K,CUR_ID-NUMELT) == N) FLAG = 1        
               ENDDO
             ELSE
               DO K=2,4
-                IF (IXR(K,CUR_ID-NUMELT-NUMELP) == N) FLAG = 1   	   
+                IF (IXR(K,CUR_ID-NUMELT-NUMELP) == N) FLAG = 1        
               ENDDO
             ENDIF
           ENDDO
-C------------------------>   cas des quad  <-----------------------C		    
+C------------------------>   cas des quad  <-----------------------C        
           DO J = KNOD2ELQ(N)+1,KNOD2ELQ(N+1)
-            DO K=2,5	           
-              IF (IXQ(K,NOD2ELQ(J)) == N_DEST) FLAG = 1   	   
+            DO K=2,5             
+              IF (IXQ(K,NOD2ELQ(J)) == N_DEST) FLAG = 1        
             ENDDO
-          ENDDO	
+          ENDDO
 C
           IF (FLAG == 1) THEN
 C--         connection removed

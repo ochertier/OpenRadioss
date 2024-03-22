@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  DTNODAMS                      source/time_step/dtnodams.F   
 Chd|-- called by -----------
@@ -52,23 +52,19 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "rad2r_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "task_c.inc"
 #include      "scr02_c.inc"
-#include      "scr05_c.inc"
 #include      "scr07_c.inc"
 #include      "scr14_c.inc"
 #include      "scr16_c.inc"
 #include      "scr18_c.inc"
 #include      "units_c.inc"
 #include      "com08_c.inc"
-#include      "couple_c.inc"
 #include      "param_c.inc"
 #include      "parit_c.inc"
 #include      "sms_c.inc"
-#include      "scr17_c.inc"
 C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -134,7 +130,9 @@ C----------------------------------------------------------
 C----------------------------------------------------------
 C     ANIM TIME STEP 
 C----------------------------------------------------------
+!$OMP SINGLE
       IMSCH = 0
+!$OMP END SINGLE
       IF(ANIM_N(1)+OUTP_N(1)+H3D_DATA%N_SCAL_DT >0)THEN
 #include      "vectorize.inc"
         DO NN=NODFT,NODLT
@@ -462,19 +460,19 @@ C--------------------------------
           WRITE(ISTDO,*)
      .     ' **ERROR : NEGATIVE STIFFNESS NODE',-ISTOP
              IF ( ISTAMPING == 1) THEN
-	       WRITE(ISTDO,'(A)')'The run encountered a problem in an in
+                 WRITE(ISTDO,'(A)')'The run encountered a problem in an in
      .terface Type 7.'
                WRITE(ISTDO,'(A)')'You may need to check if there is enou 
      .gh clearance between the tools,'
                WRITE(ISTDO,'(A)')'and that they do not penetrate each ot
      .her during their travel'
-	       WRITE(IOUT, '(A)')'The run encountered a problem in an in
+                 WRITE(IOUT, '(A)')'The run encountered a problem in an in
      .terface Type 7.'
                WRITE(IOUT, '(A)')'You may need to check if there is enou
      .gh clearance between the tools,'
                WRITE(IOUT, '(A)')'and that they do not penetrate each ot
      .her during their travel'
-	     ENDIF
+               ENDIF
 #include "lockoff.inc"
         ENDIF
        ELSE
@@ -494,19 +492,19 @@ C--------------------------------
           WRITE(ISTDO,*)
      .     ' **ERROR : NEGATIVE STIFFNESS NODE',-ISTOP
              IF ( ISTAMPING == 1) THEN
-	       WRITE(ISTDO,'(A)')'The run encountered a problem in an in
+                 WRITE(ISTDO,'(A)')'The run encountered a problem in an in
      .terface Type 7.'
                WRITE(ISTDO,'(A)')'You may need to check if there is enou 
      .gh clearance between the tools,'
                WRITE(ISTDO,'(A)')'and that they do not penetrate each ot
      .her during their travel'
-	       WRITE(IOUT, '(A)')'The run encountered a problem in an in
+                 WRITE(IOUT, '(A)')'The run encountered a problem in an in
      .terface Type 7.'
                WRITE(IOUT, '(A)')'You may need to check if there is enou
      .gh clearance between the tools,'
                WRITE(IOUT, '(A)')'and that they do not penetrate each ot
      .her during their travel'
-	     ENDIF
+               ENDIF
 #include "lockoff.inc"
         ENDIF
        ENDIF

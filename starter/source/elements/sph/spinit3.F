@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  SPINIT3                       source/elements/sph/spinit3.F 
 Chd|-- called by -----------
@@ -30,9 +30,9 @@ Chd|        MATINI                        source/materials/mat_share/matini.F
 Chd|        SPORTH3                       source/elements/sph/sporth3.F 
 Chd|        SPPART3                       source/elements/sph/sppart3.F 
 Chd|        GET_U_GEO                     source/user_interface/uaccess.F
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
 Chd|        DETONATORS_MOD                share/modules1/detonators_mod.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE SPINIT3(IGRTYP  ,SPBUF    ,KXSP   ,X     ,GEO    ,
      .                   XMAS    ,NPC      ,PLD    ,XIN   ,SKEW   ,
@@ -64,15 +64,10 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "rnur_c.inc"
-#include      "scr01_c.inc"
-#include      "scr03_c.inc"
 #include      "scr17_c.inc"
 #include      "scry_c.inc"
 #include      "sphcom.inc"
-#include      "units_c.inc"
 #include      "vect01_c.inc"
-#include      "warn_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -88,7 +83,7 @@ C-----------------------------------------------
       TYPE (ELBUF_STRUCT_), TARGET :: ELBUF_STR
       INTEGER,INTENT(IN) :: ILOADP(SIZLOADP,*)
       my_real,INTENT(IN) :: FACLOAD(LFACLOAD,*)
-      TYPE(DETONATOR_STRUCT_)::DETONATORS
+      TYPE(DETONATORS_STRUCT_)::DETONATORS
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -131,7 +126,15 @@ c
           IG  =IPART(2,IPRT)
           MP    =GET_U_GEO(1,IG)
           RHO(I)=PM(1,IMAT)
-          VOL(I)=MP/RHO(I)
+          IF (NINT(SPBUF(13,N))==1) THEN
+C--         type = 1 - particle with mass input            
+            VOL(I)=SPBUF(12,N)/RHO(I)
+          ELSEIF (NINT(SPBUF(13,N))==2) THEN  
+C--         type = 2 - particle with volume input            
+            VOL(I)=SPBUF(12,N)
+          ELSE  
+            VOL(I)=MP/RHO(I)
+          ENDIF
           IF(NSPCOND/=0) VOL(I)=VOL(I)/ISPTAG(N)
           MASS(I)   =RHO(I)*VOL(I)
           SPBUF(2,N) =RHO(I)
@@ -193,7 +196,7 @@ C--------------------------------------------------
         Z1(I)=X(3,INOD)
        ENDDO
 C--------------------------------------------------
-       IF(ISORTH/=0)THEN
+       IF(ISORTH/=0)THEN 
          CALL SPORTH3(IPART ,IPARTSP(NFT+1) ,IGEO ,GBUF%GAMA,SKEW,
      .                NEL   )
        END IF
@@ -245,16 +248,17 @@ C--------------------------------------------------
 C--------------------------------------------------
 C     CALCUL DES DT ELEMENTAIRES
 C--------------------------------------------------
-       NDEPAR=NUMELC+NUMELS+NUMELT+NUMELQ+NUMELP+NUMELR+NUMELUR+NUMELTG
+       NDEPAR=NUMELC+NUMELS+NUMELT+NUMELQ+NUMELP+NUMELR+NUMELTG
      .       +NUMELX+NFT
      
       AIRE(:) = ZERO
+      IGTYP = IPARG(38)
       CALL DTMAIN(GEO       ,PM        ,IPM         ,NGEO    ,MXT     ,FV    ,
      .     GBUF%EINT ,GBUF%TEMP ,GBUF%DELTAX ,GBUF%RK ,GBUF%RE ,BUFMAT, DELTAX, AIRE, 
-     .     GBUF%VOL, DTX, IGEO)
+     .     GBUF%VOL, DTX, IGEO,IGTYP)
 
-       DO I=LFT,LLT
-         DTELEM(NDEPAR+I)=DTX(I)
+       DO I=LFT,LLT 
+         DTELEM(NDEPAR+I)=DTX(I) 
          STI = TWO * MASS(I) / MAX(EM20,DTX(I)*DTX(I))
          STIFN(KXSP(3,I+NFT))=STIFN(KXSP(3,I+NFT))+STI
        ENDDO

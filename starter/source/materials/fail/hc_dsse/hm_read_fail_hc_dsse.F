@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  HM_READ_FAIL_HC_DSSE          source/materials/fail/hc_dsse/hm_read_fail_hc_dsse.F
 Chd|-- called by -----------
@@ -29,36 +29,27 @@ Chd|        HM_GET_FLOATV                 source/devtools/hm_reader/hm_get_float
 Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
 Chd|        HM_OPTION_IS_ENCRYPTED        source/devtools/hm_reader/hm_option_is_encrypted.F
 Chd|        LINEAR_INTERP                 source/materials/fail/hc_dsse/hm_read_fail_hc_dsse.F
+Chd|        FAIL_PARAM_MOD                ../common_source/modules/mat_elem/fail_param_mod.F
 Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
-      SUBROUTINE HM_READ_FAIL_HC_DSSE(
-     .           UPARAM   ,MAXUPARAM,NUPARAM  ,NUVAR  ,IFUNC    ,
-     .           MAXFUNC  ,NFUNC    ,ID     ,FAIL_ID  ,
-     .           LSUBMODEL,UNITAB   )
+      SUBROUTINE HM_READ_FAIL_HC_DSSE(FAIL    ,
+     .           MAT_ID   ,FAIL_ID  ,IRUPT    ,LSUBMODEL,UNITAB   )
 C-----------------------------------------------
-C   ROUTINE DESCRIPTION :
-C   ===================
-C   READ FAILURE TENSSTRAIN (REPLACE LECR10)
+c    ROUTINE DESCRIPTION :
+c    Read HC-DSSE failure model parameters
 C-----------------------------------------------
-C   DUMMY ARGUMENTS DESCRIPTION:
-C   ===================
-C
-C     NAME            DESCRIPTION                         
-C
-C     UNITAB          UNITS ARRAY
-C     FAIL_ID         FAILURE ID(INTEGER)
-C     TITR            MATERIAL TITLE
-C     LSUBMODEL       SUBMODEL STRUCTURE    
+c!   UVAR 1 = damage value flag for IP at DSSE instability 
+c!   UVAR 2 = damage value for DSSE 
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE FAIL_PARAM_MOD
       USE UNITAB_MOD
       USE MESSAGE_MOD 
       USE SUBMODEL_MOD
       USE HM_OPTION_READ_MOD 
-C---s----1---------2---------3---------4---------5---------6---------7->
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -66,40 +57,27 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr17_c.inc"
-#include      "scr03_c.inc"
 #include      "units_c.inc"
-#include      "submod_c.inc"
-#include      "sysunit.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-C INPUT ARGUMENTS
-      TYPE (UNIT_TYPE_),INTENT(IN) ::UNITAB 
-      INTEGER,INTENT(IN)             ::ID,FAIL_ID
-      TYPE(SUBMODEL_DATA),INTENT(IN) ::LSUBMODEL(*)
-C MODIFIED ARGUMENT
-      INTEGER,INTENT(INOUT)          ::IFUNC(MAXFUNC),NFUNC,MAXFUNC,MAXUPARAM
-      my_real,INTENT(INOUT)          ::UPARAM(MAXUPARAM)
-      INTEGER,INTENT(OUT)            ::NUPARAM,NUVAR
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
+      INTEGER             ,INTENT(IN) :: FAIL_ID       ! failure model ID
+      INTEGER             ,INTENT(IN) :: MAT_ID        ! material law ID
+      INTEGER             ,INTENT(IN) :: IRUPT         ! failure model number
+      TYPE (UNIT_TYPE_)   ,INTENT(IN) :: UNITAB        ! table of input units
+      TYPE (SUBMODEL_DATA),INTENT(IN) :: LSUBMODEL(*)  ! submodel table 
+      TYPE (FAIL_PARAM_)  ,INTENT(INOUT) :: FAIL       ! failure model data structure
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-C     REAL
-C-----------------------------------------------
-      INTEGER     ::     ISHELL,IFLAG,I
-      my_real     ::     P_THICKFAIL,AFRAC,BFRAC,CFRAC,NFRAC,INST,
-     .                   AFRAC2,BFRAC2,CFRAC2,INST2,
-     .                   B16,B17,B18,B19,B21,
-     .                   F05,G12,I12,SMALL,
-     .                   TAB(1201),LX(1201),Y
-C-----------------------------------------------
-       LOGICAL    ::     IS_AVAILABLE,IS_ENCRYPTED
+      INTEGER  :: I,IFAIL_SH,IFLAG,NUVAR,NUPARAM
+      my_real  :: PTHKF,AFRAC,BFRAC,CFRAC,NFRAC,INST,INST2,
+     .            AFRAC2,BFRAC2,CFRAC2,Y,
+     .            B16,B17,B18,B19,B21,F05,G12,I12,SMALL,
+     .            TAB(1201),LX(1201)
+       LOGICAL :: IS_AVAILABLE,IS_ENCRYPTED
 C=======================================================================
-      IS_ENCRYPTED   = .FALSE.
+      IS_ENCRYPTED = .FALSE.
       IS_AVAILABLE = .FALSE.
 C--------------------------------------------------
 C EXTRACT DATA (IS OPTION CRYPTED)
@@ -108,8 +86,6 @@ C--------------------------------------------------
 C--------------------------------------------------
 C EXTRACT DATAS  
 C--------------------------------------------------
-
-
        LX( 1 )= 1.000000000000d0
        LX( 2 )= 1.000043653485d0
        LX( 3 )= 1.000087406030d0
@@ -2513,32 +2489,52 @@ C--------------------------------------------------
        TAB( 1199 )= 0.802000000000d0
        TAB( 1200 )= 0.801000000000d0
        TAB( 1201 )= 0.800000000000d0
-
 C=======================================================================
 c     HC_DSSE Rupture Criterion
 C=======================================================================
       INST  = ZERO
 CARD1     
-      CALL HM_GET_INTV           ('Ifail_sh'     ,ISHELL       ,IS_AVAILABLE,LSUBMODEL)
-      CALL HM_GET_FLOATV         ('P_thickfail'  ,P_THICKFAIL  ,IS_AVAILABLE,LSUBMODEL,UNITAB)
-      CALL HM_GET_INTV           ('I_Flag'       ,IFLAG        ,IS_AVAILABLE,LSUBMODEL)
+      CALL HM_GET_INTV   ('Ifail_sh'  ,IFAIL_SH ,IS_AVAILABLE,LSUBMODEL)
+      CALL HM_GET_FLOATV ('PTHKF'     ,PTHKF    ,IS_AVAILABLE,LSUBMODEL,UNITAB)
+      CALL HM_GET_INTV   ('I_Flag'    ,IFLAG    ,IS_AVAILABLE,LSUBMODEL)
 CARD2 
-      CALL HM_GET_FLOATV         ('a_HC_DSSE'  ,AFRAC  ,IS_AVAILABLE,LSUBMODEL,UNITAB)
-      CALL HM_GET_FLOATV         ('b_HC_DSSE'  ,BFRAC  ,IS_AVAILABLE,LSUBMODEL,UNITAB)
-      CALL HM_GET_FLOATV         ('c_HC_DSSE'  ,CFRAC  ,IS_AVAILABLE,LSUBMODEL,UNITAB)
-      CALL HM_GET_FLOATV         ('d_HC_DSSE'  ,INST   ,IS_AVAILABLE,LSUBMODEL,UNITAB)
-      CALL HM_GET_FLOATV         ('n_f'        ,NFRAC  ,IS_AVAILABLE,LSUBMODEL,UNITAB)
+      CALL HM_GET_FLOATV ('a_HC_DSSE' ,AFRAC    ,IS_AVAILABLE,LSUBMODEL,UNITAB)
+      CALL HM_GET_FLOATV ('b_HC_DSSE' ,BFRAC    ,IS_AVAILABLE,LSUBMODEL,UNITAB)
+      CALL HM_GET_FLOATV ('c_HC_DSSE' ,CFRAC    ,IS_AVAILABLE,LSUBMODEL,UNITAB)
+      CALL HM_GET_FLOATV ('d_HC_DSSE' ,INST     ,IS_AVAILABLE,LSUBMODEL,UNITAB)
+      CALL HM_GET_FLOATV ('n_f'       ,NFRAC    ,IS_AVAILABLE,LSUBMODEL,UNITAB)
 C=======================================================================
       IF (NFRAC  == ZERO) NFRAC  = ONE
-      IF (ISHELL == 0)    ISHELL = 1
+      IF (IFAIL_SH == 0) IFAIL_SH = 1
+      IFAIL_SH = MIN(IFAIL_SH,3)
+      IF (PTHKF == ZERO) PTHKF = ONE - EM06
+      PTHKF = MIN(PTHKF, ONE)
+      PTHKF = MAX(PTHKF,-ONE)
+       IF (PTHKF /= ZERO .and. IFAIL_SH > 1) THEN
+         PTHKF = PTHKF
+       ELSEIF (IFAIL_SH == 1) THEN
+         PTHKF = EM06
+       ELSEIF (IFAIL_SH == 2) THEN
+         PTHKF = ONE - EM06
+       ENDIF
+c---------------------------
+c
+      FAIL%KEYWORD = 'HC_DSSE' 
+      FAIL%IRUPT   = IRUPT 
+      FAIL%FAIL_ID = FAIL_ID 
+      FAIL%NUPARAM = 7
+      FAIL%NIPARAM = 0
+      FAIL%NUVAR   = 2
+      FAIL%NFUNC   = 0
+      FAIL%NTABLE  = 0
+      FAIL%NMOD    = 0
+      FAIL%PTHK    = PTHKF
+c            
+      ALLOCATE (FAIL%UPARAM(FAIL%NUPARAM))
+      ALLOCATE (FAIL%IPARAM(FAIL%NIPARAM))
+      ALLOCATE (FAIL%IFUNC (FAIL%NFUNC))
+      ALLOCATE (FAIL%TABLE (FAIL%NTABLE))
 
-      NUPARAM = 7
-      NUVAR   = 2
-      NFUNC   = 0
-c! 
-c!   UVAR 1 = damage value flag for IP at DSSE instability 
-c!   UVAR 2 = damage value for DSSE 
-c!       
 C=======================================================================
 C
 C pre definition for user-input data when only 
@@ -2546,14 +2542,14 @@ C tension test data are provided
 C
 C=============================================  
       IF (IFLAG == 0) THEN    ! NO parameter fitting
-        UPARAM(1) = AFRAC
-        UPARAM(2) = BFRAC
-        UPARAM(3) = CFRAC
-        UPARAM(4) = NFRAC
-        UPARAM(5) = INST
-        UPARAM(6) = P_THICKFAIL - 1e-6
-        UPARAM(7) = ISHELL
-      ELSE                      ! parameter fitting
+        FAIL%UPARAM(1) = AFRAC
+        FAIL%UPARAM(2) = BFRAC
+        FAIL%UPARAM(3) = CFRAC
+        FAIL%UPARAM(4) = NFRAC
+        FAIL%UPARAM(5) = INST
+        FAIL%UPARAM(6) = 0    !    PTHKF - no more used
+        FAIL%UPARAM(7) = IFAIL_SH
+      ELSE                    ! parameter fitting
         BFRAC2 = BFRAC
         B16    = (AFRAC / BFRAC)**0.1
         B17    = (CFRAC / BFRAC)**0.1          
@@ -2574,64 +2570,61 @@ C=============================================
      .             ((1.0+2.0**(INST2-SMALL-1.0))**(1.0/(INST2-SMALL)) - F05)**2)/(TWO*SMALL)
           INST2  = INST2 - G12/I12
         ENDDO
-        UPARAM(1) = AFRAC2
-        UPARAM(2) = BFRAC2
-        UPARAM(3) = CFRAC2
-        UPARAM(4) = NFRAC
-        UPARAM(5) = INST2
-        UPARAM(6) = P_THICKFAIL - 1e-6
-        UPARAM(7) = ISHELL
+        FAIL%UPARAM(1) = AFRAC2
+        FAIL%UPARAM(2) = BFRAC2
+        FAIL%UPARAM(3) = CFRAC2
+        FAIL%UPARAM(4) = NFRAC
+        FAIL%UPARAM(5) = INST2
+        FAIL%UPARAM(6) = 0    !     PTHKF - no more used
+        FAIL%UPARAM(7) = IFAIL_SH
       ENDIF
 
 C--------------------------------------------------
-      IF(IS_ENCRYPTED)THEN
-        WRITE(IOUT, 1000)
+      IF (IS_ENCRYPTED) THEN
+        WRITE(IOUT,'(5X,A,//)')'CONFIDENTIAL DATA'
       ELSE       
+        WRITE(IOUT,1000)
         IF (IFLAG == 0) THEN 
-          WRITE(IOUT, 1001)AFRAC,BFRAC,CFRAC,INST,NFRAC      
-          WRITE(IOUT, 1300)
-          WRITE(IOUT, 1200)
-          WRITE(IOUT, 1100)P_THICKFAIL
+          WRITE(IOUT,1001) AFRAC,BFRAC,CFRAC,INST,NFRAC
         ELSE
-          WRITE(IOUT, 1050)AFRAC,BFRAC,CFRAC,AFRAC2,BFRAC2,CFRAC2,INST2,NFRAC,INST       
-          WRITE(IOUT, 1200)
-          WRITE(IOUT, 1100)P_THICKFAIL
-        ENDIF       
+          WRITE(IOUT,1050) AFRAC,BFRAC,CFRAC,AFRAC2,BFRAC2,CFRAC2,INST2,NFRAC,INST
+        ENDIF  
+        WRITE(IOUT,1100) IFAIL_SH,PTHKF   
       ENDIF          
 C--------------------------------------------------
       RETURN
  1000 FORMAT(
-     & 5X,40H    CRYPTED DATA IN FAILURE MODEL             /,
-     & 5X,40H    -----------------------------             /)
+     & 5X,'-----------------------------------------------',/,
+     & 5X,'            HC-DSSE FAILURE MODEL              ',/,
+     & 5X,'-----------------------------------------------',/)
  1001 FORMAT(
-     & 5X,40H    HC-DSSE FAILURE CRITERIA                  /,
-     & 5X,40H    ------------------------                  /,
-     & 5X,' CLASSIC INPUT METHOD:',/
-     & 5X,' COEFFICIENT A ....... =',E12.4,/
-     & 5X,' COEFFICIENT B ....... =',E12.4,/
-     & 5X,' COEFFICIENT C ....... =',E12.4,/
-     & 5X,' COEFFICIENT D ....... =',E12.4,/
-     & 5X,' COEFFICIENT Nf....... =',E12.4,//)
+     & 5X,'CLASSIC INPUT METHOD:',/
+     & 5X,'COEFFICIENT A. . . . . . . . . . . . . . . . .=',1PG20.13,/
+     & 5X,'COEFFICIENT B. . . . . . . . . . . . . . . . .=',1PG20.13,/
+     & 5X,'COEFFICIENT C. . . . . . . . . . . . . . . . .=',1PG20.13,/
+     & 5X,'COEFFICIENT D. . . . . . . . . . . . . . . . .=',1PG20.13,/
+     & 5X,'COEFFICIENT Nf . . . . . . . . . . . . . . . .=',1PG20.13,/)
  1050 FORMAT(
-     & 5X,40H    HC-DSSE FAILURE CRITERIA                  /,
-     & 5X,40H    ------------------------                  /,
-     & 5X,' PHYSICAL INPUT METHOD:',/
-     & 5X,' SHEAR FAILURE STRAIN................... =',E12.4,/
-     & 5X,' UNIAXIAL TENSION FAILURE STRAIN ....... =',E12.4,/
-     & 5X,' PLAINSTRAIN TENSION FAILURE STRAIN..... =',E12.4,/
-     & 5X,' COEFFICIENT A ........... =',E12.4,/
-     & 5X,' COEFFICIENT B ........... =',E12.4,/
-     & 5X,' COEFFICIENT C ........... =',E12.4,/
-     & 5X,' COEFFICIENT D ........... =',E12.4,/
-     & 5X,' COEFFICIENT Nf........... =',E12.4,/
-     & 5X,' DSSE INSTABILITY STRAIN.. =',E12.4,//)
+     & 5X,'PHYSICAL INPUT METHOD:',/
+     & 5X,'SHEAR FAILURE STRAIN . . . . . . . . . . . . .=',1PG20.13,/
+     & 5X,'UNIAXIAL TENSION FAILURE STRAIN. . . . . . . .=',1PG20.13,/
+     & 5X,'PLAINSTRAIN TENSION FAILURE STRAIN . . . . . .=',1PG20.13,/
+     & 5X,'COEFFICIENT A. . . . . . . . . . . . . . . . .=',1PG20.13,/
+     & 5X,'COEFFICIENT B. . . . . . . . . . . . . . . . .=',1PG20.13,/
+     & 5X,'COEFFICIENT C. . . . . . . . . . . . . . . . .=',1PG20.13,/
+     & 5X,'COEFFICIENT D. . . . . . . . . . . . . . . . .=',1PG20.13,/
+     & 5X,'COEFFICIENT Nf . . . . . . . . . . . . . . . .=',1PG20.13,/
+     & 5X,'DSSE INSTABILITY STRAIN. . . . . . . . . . . .=',1PG20.13,/)
  1100 FORMAT(
-     & 5X,' Percentage of failed IPs for shell deletion   ',F5.1,'%',/
-     & 5X,' --------------------------------------------------------- ',/)
- 1200 FORMAT(
-     & 5X,' SHELL ELEMENT DELETION ')
- 1300 FORMAT(
-     & 5X,' CLASSIC INPUT METHOD ')
+     & 5X,'SHELL ELEMENT DELETION PARAMETERS:                  ',/, 
+     & 5X,'FAILURE FLAG IFAIL_SH. . . . . . . . . . . . .=',I3,/
+     & 5X,'  = 1: ONE INTG. PT. FAILURE PRIOR TO SHELL DELETION',/,
+     & 5X,'  = 2: ALL INTG. PT. FAILURE PRIOR TO SHELL DELETION',/, 
+     & 5X,'       (OR PTHICKFAIL IF DEFINED)                   ',/,
+     & 5X,'  = 3: NO ELEMENT DELETION                          ',/,
+     & 5X,'PARAMETER PTHICKFAIL . . . . . . . . . . . . .=',1PG20.13,/,
+     & 5X,'  > 0.0 : FRACTION OF FAILED THICKNESS              ',/,
+     & 5X,'  < 0.0 : FRACTION OF FAILED INTG. POINTS OR LAYERS ',/)
 
       END
       

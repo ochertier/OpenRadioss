@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  FAIL_TAB_OLD_XFEM             source/materials/fail/tabulated/fail_tab_old_xfem.F
 Chd|-- called by -----------
@@ -32,7 +32,7 @@ Chd|====================================================================
       SUBROUTINE FAIL_TAB_OLD_XFEM(
      1           NEL      ,NPARAM   ,NUVAR    ,NPF      ,TF       ,
      2           TIME     ,TIMESTEP ,UPARAM   ,NGL      ,IPT      ,
-     3           NPTOT    ,IP       ,NFUNC    ,IFUNC    ,DMG_FLAG ,
+     3           NPTOT    ,NFUNC    ,IFUNC    ,DMG_FLAG ,
      4           SIGNXX   ,SIGNYY   ,SIGNXY   ,SIGNYZ   ,SIGNZX   ,
      5           DPLA     ,EPSP     ,TSTAR    ,TENS     ,UVAR     ,
      6           NOFF     ,ALDT     ,OFF      ,OFFL     ,ELCRKINI ,
@@ -59,7 +59,7 @@ C NOFF                        NUMBER OF FAILED INTEGRATION POINTS (TOTAL)
 C-----------------------------------------------
 C   I N P U T   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER NEL,NPARAM,NUVAR,IP,IPT,NFUNC,IXFEM,IXEL,ILAY,NPTOT
+      INTEGER NEL,NPARAM,NUVAR,IPT,NFUNC,IXFEM,IXEL,ILAY,NPTOT
       INTEGER NGL(NEL),NOFF(NEL),IFUNC(NFUNC),
      .   ELCRKINI(NXLAYMAX,NEL)
       my_real TIME,TIMESTEP(NEL),UPARAM(*),DPLA(NEL),EPSP(NEL),
@@ -102,7 +102,7 @@ C-----------------------------------------------
       INDX = 0
       SIGM_PS = ONE/SQRT(THREE)
 
-      IF (TIME == ZERO) THEN
+      IF (UVAR(1,2) == ZERO) THEN
         UVAR(1:NEL,2) = ALDT(1:NEL) 
       ENDIF
 C-----------------------------------------------
@@ -113,13 +113,10 @@ C-----------------------------------------------
       SC_TEMP   = UPARAM(7)
       SC_EL     = UPARAM(8)
       EL_REF    = UPARAM(9)
-      LAYXFEM   = UPARAM(10)
       DADV      = UPARAM(11)
       NRATE     = NFUNC - 2
       YFAC(1:NRATE) = UPARAM(11+1      :11+NRATE)
       RATE(1:NRATE) = UPARAM(11+1+NRATE:11+NRATE*2)
-c-----------------------------
-      IF (LAYXFEM == 0) RETURN
 c-----------------------------
       LAYXFEM = IXFEM
       IF (LAYXFEM == 1 .and. ISHELL == 1) ISHELL=2

@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  VELVEC                        source/output/anim/generate/velvec.F
 Chd|-- called by -----------
@@ -27,7 +27,7 @@ Chd|        GENANI                        source/output/anim/generate/genani.F
 Chd|-- calls ---------------
 Chd|        SPMD_ANIM_PLY_VELVEC          source/mpi/anim/spmd_anim_ply_velvec.F
 Chd|        SPMD_VGATH                    source/mpi/anim/spmd_vgath.F  
-Chd|        WRITE_R_C                     source/output/tools/sortie_c.c
+Chd|        WRITE_R_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|        PLYXFEM_MOD                   share/modules/plyxfem_mod.F   
 Chd|====================================================================
       SUBROUTINE VELVEC(V,V_TEMP,IVOIS,AL,NODCUT,NNWL,NNSRG,
@@ -47,7 +47,6 @@ C-----------------------------------------------
 #include      "task_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr05_c.inc"
 #include      "scr14_c.inc"
 #include      "spmd_c.inc"
 C-----------------------------------------------
@@ -232,10 +231,10 @@ Chd|        GENANI                        source/output/anim/generate/genani.F
 Chd|-- calls ---------------
 Chd|        SPMD_GLOB_DSUM9               source/mpi/interfaces/spmd_th.F
 Chd|        SPMD_VELVEC2                  source/mpi/anim/spmd_velvec2.F
-Chd|        WRITE_R_C                     source/output/tools/sortie_c.c
+Chd|        WRITE_R_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|====================================================================
       SUBROUTINE VELVEC2(IVOIS,V_TEMP,AL   ,NODCUT,FOPT,
-     .                   NPBY,NNWL ,NNSRG,IXUR,NODGLOB,WEIGHT,FR_SEC,
+     .                   NPBY,NNWL ,NNSRG,NODGLOB,WEIGHT,FR_SEC,
      .                   NFVNOD,NFNOD_PXFEM,NFNOD_PXFEMG,NFNOD_CRKXFEMG)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -248,9 +247,7 @@ C-----------------------------------------------
 #include      "task_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr05_c.inc"
 #include      "scr14_c.inc"
-#include      "rnur_c.inc"
 #include      "spmd_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -260,7 +257,7 @@ C     REAL
      .  AL(*),FOPT(6,*),V_TEMP(3,*)
 
       REAL R4
-      INTEGER IVOIS(2,*),NPBY(NNPBY,*),IXUR(NIXUR,*),NODCUT,NNWL
+      INTEGER IVOIS(2,*),NPBY(NNPBY,*),NODCUT,NNWL
       INTEGER NNSRG,NFNOD_PXFEM,NFNOD_PXFEMG
       INTEGER I,N,WEIGHT(*),FR_SEC(NSPMD+1,*)
 
@@ -289,12 +286,6 @@ C
          V(3,I) = FOPT(3,NSECT+N)
         ENDDO
 C
-        DO N=1,NUMELUR
-         I = IXUR(3,N)
-         V(1,I) = V(1,I) + FOPT(1,NSECT+NRBODY+NRWALL+N)
-         V(2,I) = V(2,I) + FOPT(2,NSECT+NRBODY+NRWALL+N)
-         V(3,I) = V(3,I) + FOPT(3,NSECT+NRBODY+NRWALL+N)
-        ENDDO
       ELSE
          DO N=1,NRBODY
            I = NPBY(1,N)
@@ -307,14 +298,6 @@ C
            ENDIF
          ENDDO
 
-         DO N=1,NUMELUR
-           I = IXUR(3,N)
-           IF (WEIGHT(I)==1) THEN
-             V(1,I) = V(1,I) + FOPT(1,NSECT+NRBODY+NRWALL+N)
-             V(2,I) = V(2,I) + FOPT(2,NSECT+NRBODY+NRWALL+N)
-             V(3,I) = V(3,I) + FOPT(3,NSECT+NRBODY+NRWALL+N)
-           ENDIF
-         ENDDO
       ENDIF
 C
       IF (NSPMD == 1) THEN
@@ -488,7 +471,7 @@ Chd|-- called by -----------
 Chd|        GENANI                        source/output/anim/generate/genani.F
 Chd|-- calls ---------------
 Chd|        SPMD_GLOB_FSUM9               source/mpi/interfaces/spmd_th.F
-Chd|        WRITE_R_C                     source/output/tools/sortie_c.c
+Chd|        WRITE_R_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|====================================================================
       SUBROUTINE VELVECC(V,V_TEMP,IVOIS,AL,NODCUT,NNWL,NNSRG,
      .                  NODGLOB,WEIGHT,NFVNOD,NFNOD_PXFEM,
@@ -503,7 +486,6 @@ C-----------------------------------------------
 #include      "task_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr05_c.inc"
 #include      "scr14_c.inc"
 #include      "spmd_c.inc"
 C-----------------------------------------------
@@ -638,7 +620,7 @@ Chd|-- called by -----------
 Chd|        GENANI                        source/output/anim/generate/genani.F
 Chd|-- calls ---------------
 Chd|        SPMD_GLOB_DSUM9               source/mpi/interfaces/spmd_th.F
-Chd|        WRITE_R_C                     source/output/tools/sortie_c.c
+Chd|        WRITE_R_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|====================================================================
       SUBROUTINE VELVECC21(V,V_TEMP,IVOIS,AL,NODCUT,NNWL,
      .                  NNSRG,NODGLOB,WEIGHT,NFVNOD,NFNOD_PXFEM,
@@ -653,8 +635,6 @@ C-----------------------------------------------
 #include      "task_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "intstamp_c.inc"
-#include      "scr05_c.inc"
 #include      "scr14_c.inc"
 #include      "spmd_c.inc"
 C-----------------------------------------------
@@ -796,7 +776,7 @@ Chd|  VELVECC_MAX                   source/output/anim/generate/velvec.F
 Chd|-- called by -----------
 Chd|        GENANI                        source/output/anim/generate/genani.F
 Chd|-- calls ---------------
-Chd|        WRITE_R_C                     source/output/tools/sortie_c.c
+Chd|        WRITE_R_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|====================================================================
       SUBROUTINE VELVECC_MAX(VMAX,NODCUT,NNWL,NNSRG,NFVNOD,
      .                       NFNOD_PXFEMG,NFNOD_CRKXFEMG)
@@ -810,7 +790,6 @@ C-----------------------------------------------
 #include      "task_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr05_c.inc"
 #include      "scr14_c.inc"
 #include      "spmd_c.inc"
 C-----------------------------------------------
@@ -921,7 +900,7 @@ Chd|-- called by -----------
 Chd|        GENANI                        source/output/anim/generate/genani.F
 Chd|-- calls ---------------
 Chd|        SPMD_VGATH                    source/mpi/anim/spmd_vgath.F  
-Chd|        WRITE_R_C                     source/output/tools/sortie_c.c
+Chd|        WRITE_R_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|====================================================================
       SUBROUTINE VELVEC3(V,V_TEMP,VALE,IVOIS,AL,NODCUT,NNWL,NNSRG,
      .                  NODGLOB,WEIGHT,NFVNOD,NFNOD_PXFEM,NFNOD_PXFEMG,
@@ -936,7 +915,6 @@ C-----------------------------------------------
 #include      "task_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr05_c.inc"
 #include      "spmd_c.inc"
 #include      "scr14_c.inc"
 C-----------------------------------------------
@@ -1051,10 +1029,10 @@ Chd|  VELVECC22                     source/output/anim/generate/velvec.F
 Chd|-- called by -----------
 Chd|        GENANI                        source/output/anim/generate/genani.F
 Chd|-- calls ---------------
-Chd|        WRITE_R_C                     source/output/tools/sortie_c.c
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
-Chd|        I22BUFBRIC_MOD                ../common_source/modules/cut-cell-search_mod.F
-Chd|        I22TRI_MOD                    ../common_source/modules/cut-cell-search_mod.F
+Chd|        WRITE_R_C                     ../common_source/tools/input_output/write_routtines.c
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
+Chd|        I22BUFBRIC_MOD                ../common_source/modules/interfaces/cut-cell-search_mod.F
+Chd|        I22TRI_MOD                    ../common_source/modules/interfaces/cut-cell-search_mod.F
 Chd|        INITBUF_MOD                   share/resol/initbuf.F         
 Chd|====================================================================
       SUBROUTINE VELVECC22(ELBUF_TAB,IPARG,IFLG,IXS,IXQ,ITAB)
@@ -1083,12 +1061,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "task_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr05_c.inc"
-#include      "scr14_c.inc"
-#include      "spmd_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s

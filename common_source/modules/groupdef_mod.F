@@ -1,29 +1,30 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  GROUPDEF_MOD                  modules/groupdef_mod.F        
 Chd|-- called by -----------
 Chd|        ALETG                         starter/source/airbag/fvmbag1.F
+Chd|        ALE_BOX_COLORATION            starter/source/initial_conditions/inivol/ale_box_coloration.F
 Chd|        BIGBOX                        starter/source/model/box/bigbox.F
 Chd|        BIGBOX2                       starter/source/model/box/bigbox.F
 Chd|        BIGSBOX                       starter/source/model/box/bigbox.F
@@ -40,6 +41,7 @@ Chd|        CREATE_MAP_TABLES             starter/source/model/sets/map_tables.F
 Chd|        CREATE_SUBS_CLAUSE            starter/source/model/sets/create_subs_clause.F
 Chd|        CREATE_SUBS_LIST              starter/source/model/sets/create_subs_clause.F
 Chd|        CREATE_SUBS_LIST_G            starter/source/model/sets/create_subs_clause.F
+Chd|        C_DAMPVREL                    starter/source/restart/ddsplit/c_dampvrel.F
 Chd|        C_GROUP_STR                   starter/source/restart/ddsplit/c_group_str.F
 Chd|        C_GR_ENTITY_E                 starter/source/model/group/c_gr_entity.F
 Chd|        C_GR_ENTITY_N                 starter/source/model/group/c_gr_entity.F
@@ -62,6 +64,7 @@ Chd|        FILL_GR                       starter/source/model/sets/fill_gr.F
 Chd|        FILL_IGR                      starter/source/model/sets/fill_igr.F
 Chd|        FILL_LINE                     starter/source/model/sets/fill_gr.F
 Chd|        FILL_SURF                     starter/source/model/sets/fill_gr.F
+Chd|        FILL_SURF_ELLIPSE             starter/source/model/sets/fill_gr_surf_ellipse.F
 Chd|        FVBAG_TAGELE                  starter/source/airbag/fvmbag1.F
 Chd|        FVBAG_VERTEX                  starter/source/spmd/domain_decomposition/grid2mat.F
 Chd|        FVBRIC0                       starter/source/airbag/fvbric0.F
@@ -206,6 +209,7 @@ Chd|        HM_READ_MONVOL_TYPE8          starter/source/airbag/hm_read_monvol_t
 Chd|        HM_READ_MONVOL_TYPE9          starter/source/airbag/hm_read_monvol_type9.F
 Chd|        HM_READ_NBCS                  starter/source/constraints/general/bcs/hm_read_nbcs.F
 Chd|        HM_READ_PBLAST                starter/source/loads/pblast/hm_read_pblast.F
+Chd|        HM_READ_PCYL                  starter/source/loads/general/load_pcyl/hm_read_pcyl.F
 Chd|        HM_READ_PERTURB               starter/source/general_controls/computation/hm_read_perturb.F
 Chd|        HM_READ_PERTURB_FAIL          starter/source/general_controls/computation/hm_read_perturb_fail.F
 Chd|        HM_READ_PERTURB_PART_SHELL    starter/source/general_controls/computation/hm_read_perturb_part_shell.F
@@ -235,6 +239,7 @@ Chd|        HM_READ_SURF                  starter/source/groups/hm_read_surf.F
 Chd|        HM_READ_SURFSURF              starter/source/groups/hm_read_surfsurf.F
 Chd|        HM_READ_THGROU                starter/source/output/th/hm_read_thgrou.F
 Chd|        HM_READ_THGRPA_SUB            starter/source/output/th/hm_read_thgrpa.F
+Chd|        HM_READ_THGRSENS              starter/source/output/th/hm_read_thgrsens.F
 Chd|        HM_READ_THGRSURF              starter/source/output/th/hm_read_thgrsurf.F
 Chd|        HM_READ_THPART                starter/source/output/thpart/hm_read_thpart.F
 Chd|        HM_READ_XELEM                 starter/source/elements/reader/hm_read_xelem.F
@@ -281,6 +286,8 @@ Chd|        INI_FVMINIVEL                 starter/source/elements/initia/ini_fvm
 Chd|        INI_INIMAP1D                  starter/source/initial_conditions/inimap/ini_inimap1d.F
 Chd|        INI_INIMAP2D                  starter/stub/ini_inimap2d.F   
 Chd|        INSPCND                       starter/source/elements/sph/inspcnd.F
+Chd|        INT18_LAW151_ALLOC            starter/source/interfaces/int18/int18_law151_alloc.F
+Chd|        INT18_LAW151_INIT             starter/source/interfaces/int18/int18_law151_init.F
 Chd|        IPARI_L_INI                   starter/source/restart/ddsplit/ipari_l_ini.F
 Chd|        ISLIN_INI                     starter/source/model/group/islin_ini.F
 Chd|        ISURF_INI                     starter/source/model/group/isurf_ini.F
@@ -318,6 +325,7 @@ Chd|        PRELECSEC4BOLT                starter/source/tools/sect/prelecsec4bo
 Chd|        PREPARE_SPLIT_I17             starter/source/restart/ddsplit/inter_tools.F
 Chd|        PREREAD_RBODY_LAGMUL          starter/source/constraints/general/rbody/preread_rbody_lagmul.F
 Chd|        PRESEARCHIGEO3D               starter/source/elements/ige3d/searchigeo3d.F
+Chd|        PRE_STACKGROUP                starter/source/stack/pres_stackgroup.F
 Chd|        PRINTBCS                      starter/source/constraints/general/bcs/printbcs.F
 Chd|        PRINTGROUP                    starter/source/output/outfile/printgroup.F
 Chd|        QA_PRINT_GROUPS               starter/source/output/qaprint/st_qaprint_groups.F
@@ -370,11 +378,13 @@ Chd|        SET_IBUFSSG_IO                starter/source/starter/lectur.F
 Chd|        SGRHEAD                       starter/source/elements/solid/solide/sgrhead.F
 Chd|        SGRTAILS                      starter/source/elements/solid/solide/sgrtails.F
 Chd|        SORT_SURF                     starter/source/groups/sort_surf.F
+Chd|        SPLIT_EBCS                    starter/source/boundary_conditions/ebcs/split_ebcs.F
 Chd|        SPLIT_INTERFACES              starter/source/restart/ddsplit/split_interfaces.F
 Chd|        SSURFIGEO                     starter/source/groups/ssurftagigeo.F
 Chd|        SSURFTAG                      starter/source/groups/ssurftag.F
 Chd|        SSURFTAGIGEO                  starter/source/groups/ssurftagigeo.F
 Chd|        STACKGROUP                    starter/source/stack/stackgroup.F
+Chd|        STACKGROUP_DRAPE              starter/source/stack/stackgroup_drape.F
 Chd|        ST_QAPRINT_DFS_DETONATORS     starter/source/output/qaprint/st_qaprint_dfs_detonators.F
 Chd|        ST_QAPRINT_DFS_LASERS         starter/source/output/qaprint/st_qaprint_dfs_lasers.F
 Chd|        ST_QAPRINT_DRIVER             starter/source/output/qaprint/st_qaprint_driver.F
@@ -389,6 +399,7 @@ Chd|        ST_QAPRINT_THGROU             starter/source/output/qaprint/st_qapri
 Chd|        ST_QAPRINT_TIME_HISTORIES     starter/source/output/qaprint/st_qaprint_time_histories.F
 Chd|        ST_QAPRINT_TRANSFORMATIONS    starter/source/output/qaprint/st_qaprint_transformations.F
 Chd|        SUBSET_INI                    starter/source/model/group/subset_ini.F
+Chd|        SURFACE_MIN_MAX_COMPUTATION   starter/source/initial_conditions/inivol/surface_min_max_computation.F
 Chd|        SURFTAG                       starter/source/groups/surftag.F
 Chd|        SURFTAGADM                    starter/source/groups/surftag.F
 Chd|        SURFTAGE                      starter/source/groups/surftage.F
@@ -401,7 +412,9 @@ Chd|        TAG_ELEM_VOID_R2R_LIN         starter/source/coupling/rad2rad/tagele
 Chd|        TGRHEAD                       starter/source/elements/truss/tgrhead.F
 Chd|        TGRTAILS                      starter/source/elements/truss/tgrtails.F
 Chd|        THPRIN_SUB                    starter/source/output/th/thprin.F
+Chd|        TH_SURF_LOAD_PRESSURE         starter/source/output/th/th_surf_load_pressure.F
 Chd|        TSURFTAG                      starter/source/groups/tsurftag.F
+Chd|        W_DAMPVREL                    starter/source/restart/ddsplit/w_dampvrel.F
 Chd|        W_FRONT                       starter/source/restart/ddsplit/w_front.F
 Chd|        W_GROUP_STR                   starter/source/restart/ddsplit/w_group_str.F
 Chd|        W_GR_ENTITY_E                 starter/source/restart/ddsplit/w_gr_entity.F
@@ -438,9 +451,13 @@ Chd|        ALLOC_GROUP_STR               engine/source/groups/alloc_group_str.F
 Chd|        ALLOC_LINE_STR                engine/source/groups/alloc_line_str.F
 Chd|        ALLOC_SUBSET_STR              engine/source/groups/alloc_subset_str.F
 Chd|        ALLOC_SURF_STR                engine/source/groups/alloc_surf_str.F
+Chd|        ANIM_NODAL_CONTOUR_FVMBAGS    engine/source/output/anim/generate/anim_nodal_contour_fvmbags.F
+Chd|        ANIM_NODAL_VECTOR_FVMBAGS     engine/source/output/anim/generate/anim_nodal_vector_fvmbags.F
 Chd|        DAMPING                       engine/source/assembly/damping.F
 Chd|        DAMPING44                     engine/source/assembly/damping.F
 Chd|        DAMPING51                     engine/source/assembly/damping.F
+Chd|        DAMPING_VREF                  engine/source/assembly/damping_vref.F
+Chd|        DAMPVREF_SUM6                 engine/source/assembly/dampvref_sum6.F
 Chd|        DESACTI                       engine/source/elements/desacti.F
 Chd|        DIM_GLOB_K                    engine/source/implicit/ind_glob_k.F
 Chd|        DSRGCNT                       engine/source/output/anim/generate/dsrgcnt.F
@@ -462,7 +479,10 @@ Chd|        FORINTC                       engine/source/elements/forintc.F
 Chd|        GENANI                        engine/source/output/anim/generate/genani.F
 Chd|        GENH3D                        engine/source/output/h3d/h3d_results/genh3d.F
 Chd|        GROUP_INI                     engine/source/groups/group_ini.F
+Chd|        H3D_CREATE_FVMBAG_CENTROIDS   engine/source/output/h3d/h3d_build_fortran/h3d_create_fvmbag_centroids.F
+Chd|        H3D_NODAL_SCALAR              engine/source/output/h3d/h3d_results/h3d_nodal_scalar.F
 Chd|        H3D_NODAL_VECTOR              engine/source/output/h3d/h3d_results/h3d_nodal_vector.F
+Chd|        H3D_UPDATE_FVMBAG_CENTROIDS   engine/source/output/h3d/h3d_build_fortran/h3d_update_fvmbag_centroids.F
 Chd|        H3D_VELVECZ22                 engine/source/output/h3d/h3d_results/h3d_velvecz22.F
 Chd|        HIST1                         engine/source/output/th/hist1.F
 Chd|        HIST2                         engine/source/output/th/hist2.F
@@ -504,7 +524,7 @@ Chd|        IMP_UPDV2                     engine/source/implicit/imp_pcg.F
 Chd|        INIT_TH                       engine/source/output/th/init_th.F
 Chd|        INIT_TH0                      engine/source/output/th/init_th0.F
 Chd|        INIT_TH_GROUP                 engine/source/output/th/init_th_group.F
-Chd|        INT18_LAW151_ALLOC            engine/source/interfaces/int18/int18_law151_alloc.F
+Chd|        INT18_ALLOC                   engine/source/interfaces/int18/int18_alloc.F
 Chd|        INT18_LAW151_INIT             engine/source/interfaces/int18/int18_law151_init.F
 Chd|        INT18_LAW151_NSV_SHIFT        engine/source/interfaces/int18/int18_law151_nsv_shift.F
 Chd|        INT18_LAW151_UPDATE           engine/source/interfaces/int18/int18_law151_update.F
@@ -536,6 +556,12 @@ Chd|        MONV_PREM                     engine/source/airbag/monv_imp0.F
 Chd|        MPP_INIT                      engine/source/mpi/interfaces/spmd_i7tool.F
 Chd|        MV_MATV                       engine/source/airbag/monv_imp0.F
 Chd|        NL_SOLV                       engine/source/implicit/nl_solv.F
+Chd|        NODALD                        engine/source/output/anim/generate/nodald.F
+Chd|        NODALDT                       engine/source/output/anim/generate/nodaldt.F
+Chd|        NODALP                        engine/source/output/anim/generate/nodalp.F
+Chd|        NODALSSP                      engine/source/output/anim/generate/nodalssp.F
+Chd|        NODALT                        engine/source/output/anim/generate/nodalt.F
+Chd|        NODALVOL                      engine/source/output/anim/generate/nodalvol.F
 Chd|        PBLAST                        engine/source/loads/pblast/pblast.F
 Chd|        PBLAST_1                      engine/source/loads/pblast/pblast_1.F
 Chd|        PBLAST_2                      engine/source/loads/pblast/pblast_2.F
@@ -552,8 +578,6 @@ Chd|        RESOL_HEAD                    engine/source/engine/resol_head.F
 Chd|        RESOL_INIT                    engine/source/engine/resol_init.F
 Chd|        S10CNIDAMP                    engine/source/elements/solid/solide10/s10cndf.F
 Chd|        S10CNISTAT                    engine/source/elements/solid/solide10/s10cndf.F
-Chd|        SENSOR0                       engine/source/tools/sensor/sensor0.F
-Chd|        SENSOR1                       engine/source/tools/sensor/sensor1.F
 Chd|        SENSOR_BASE                   engine/source/tools/sensor/sensor_base.F
 Chd|        SENSOR_DIST_SURF              engine/source/tools/sensor/sensor_dist_surf.F
 Chd|        SENSOR_DIST_SURF0             engine/source/tools/sensor/sensor_dist_surf0.F
@@ -562,6 +586,7 @@ Chd|        SENSOR_ENERGY_PART            engine/source/tools/sensor/sensor_ener
 Chd|        SENSOR_HIC                    engine/source/tools/sensor/sensor_hic.F
 Chd|        SENSOR_INIT                   engine/source/tools/sensor/sensor_init.F
 Chd|        SENSOR_NIC                    engine/source/tools/sensor/sensor_nic.F
+Chd|        SENSOR_SPMD                   engine/source/tools/sensor/sensor_spmd.F
 Chd|        SENSOR_TEMP                   engine/source/tools/sensor/sensor_temp.F
 Chd|        SENSOR_TEMP0                  engine/source/tools/sensor/sensor_temp0.F
 Chd|        SINIT22_FVM                   engine/source/interfaces/int22/sinit22_fvm.F
@@ -596,8 +621,7 @@ Chd|-- calls ---------------
 Chd|====================================================================
       MODULE GROUPDEF_MOD
 C----------------------------------------------------------------------- 
-#include "nchar_c.inc"     
-!#include "nchara_c.inc"   !!!  engine
+      USE NAMES_AND_TITLES_MOD, ONLY: NCHARTITLE
 c=======================================================================      
 !---------
 !   NEW DATA STRUCTURE
@@ -622,7 +646,7 @@ C=======================================================================
 !---TIME HISTORY ( /TH et /ATH )
         INTEGER, DIMENSION(:)   ,ALLOCATABLE :: NVARTH ! - ! nb of subset TH/ATH variable
 !---
-        CHARACTER :: TITLE*nchartitle ! SUBSET title
+        CHARACTER(LEN=NCHARTITLE) :: TITLE ! SUBSET title
       END TYPE SUBSET_
 C-----------------------------------------------------------------------
 
@@ -635,7 +659,7 @@ C=======================================================================
 C-----------------------------------------------------------------------
       TYPE GROUP_
         INTEGER   :: ID ! - GROUP identifier
-        CHARACTER :: TITLE*nchartitle ! GROUP title
+        CHARACTER(LEN=NCHARTITLE) :: TITLE ! GROUP title
         INTEGER   :: SET_GROUP ! need to not printout empty set groups
         INTEGER   :: NENTITY ! - Entities' number of one the GROUP (NODES, ELEMENTS, PARTS)
         INTEGER, DIMENSION(:),ALLOCATABLE :: ENTITY   ! -Entity identifier (node, element or part)
@@ -680,7 +704,7 @@ C=======================================================================
 C-----------------------------------------------------------------------
       TYPE SURF_
         INTEGER   :: ID ! - SURFACE (or LINE) identifier
-        CHARACTER :: TITLE*nchartitle ! SURF title
+        CHARACTER(LEN=NCHARTITLE) :: TITLE ! SURF title
         INTEGER   :: NSEG ! - Number of surfaces (lines) within  /SURF
         INTEGER   :: NSEG_IGE    ! Number of iso-surfaces
         INTEGER   :: IAD_IGE    ! Pointer to fictive node in IGA tabulars
@@ -728,6 +752,7 @@ C-----------------------------------------------------------------------
         INTEGER   , DIMENSION(:,:), ALLOCATABLE :: NODES  ! dim =(NSEG,4) -SURF
 !                                                         ! dim =(NSEG,2) -LINE
         INTEGER   , DIMENSION(:),   ALLOCATABLE :: PROC   ! dim = (NSEG)
+        INTEGER   , DIMENSION(:),   ALLOCATABLE :: LOCAL_SEG   ! dim = (NSEG)
 !                               field to store the processor ID  (/LINE only)
 !
 !   1. Set processor only when no element is set in lines

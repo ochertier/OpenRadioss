@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  I24DST3                       source/interfaces/int24/i24dst3.F
 Chd|-- called by -----------
@@ -51,7 +51,7 @@ Chd|====================================================================
      G                  STIF_OLD,ITRIV ,ITAB   ,CAND_T ,IEDGE  ,
      H                  NFT     ,PENMIN,EPS0   ,NM1    ,NM2    ,
      I                  NM3     ,INTPLY ,DGAP_NM,ICONT_I,MARGE ,
-     J                  NSNE    ,ISPT2  ,IZERO ) 
+     J                  NSNE    ,ISPT2  ,IZERO ,IKNON  ,PENREF ) 
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -64,11 +64,6 @@ C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
-#include      "com01_c.inc"
-#include      "sms_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "task_c.inc"
 #include      "impl1_c.inc"
 #include      "comlock.inc"
 C-----------------------------------------------
@@ -99,13 +94,13 @@ C-----------------------------------------------
      .     PENE_OLD(5,NSN),STIF_OLD(2,NSN),PENMIN,EPS0,
      .     NM1(MVSIZ), NM2(MVSIZ), NM3(MVSIZ),DGAP_NM(4,*),MARGE
       INTEGER IRECT(4,*),ITAB(*),ICONT_I(*)
+      INTEGER, DIMENSION(MVSIZ), INTENT(IN)  :: IKNON
+      my_real, DIMENSION(MVSIZ), INTENT(OUT) :: PENREF
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr05_c.inc"
 #include      "com08_c.inc"
-#include      "parit_c.inc"
-#include      "com04_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -204,7 +199,8 @@ C-----------------------------------------------
      .     X23D,Y23D,Z23D,X34D,Y34D,Z34D,X41D,Y41D,Z41D,
      .     X12D,Y12D,Z12D,GAP2D,XI5D,YI5D,ZI5D,S2D, LA0,LB0,LC0,
      .     HLA, ADT,OVERW,EPS,PENE_SH,OVERW0,VOL,EPS2,DGAP,RX,RY,RZ,
-     .     PENE_TM(MVSIZ),LA_TM(MVSIZ),LB_TM(MVSIZ),N_TM(3,MVSIZ)
+     .     PENE_TM(MVSIZ),LA_TM(MVSIZ),LB_TM(MVSIZ),N_TM(3,MVSIZ),
+     .     AREA(MVSIZ)
       INTEGER ICONTACT(MVSIZ),IT0(3,20),IT(3,20,MVSIZ),IC(10,20),
      .     ISTEP(MVSIZ),IRTLM_OLD(MVSIZ),SUBTRIA_N(MVSIZ),
      .     NSS,MGLOB,ibug,JG,IZLIM,ip,IKEEP,LARGEP,IPEN0(MVSIZ),IER,
@@ -684,8 +680,8 @@ c     .        +GAP_NM(11,CAND_E(I))+GAP_NM(12,CAND_E(I)) /= ZERO)THEN
        ELSEIF(GAP_NM(11,L)>ZERO.OR.GAP_NM(12,L)>ZERO) THEN
          ISHEL(I)=1
        END IF
-C------taking into account Igap0=1      
-       IF(GAPS(I)>=ZERO.AND.GAP_M(L)>ZERO) ISHEL(I)=2
+C-now ISHEL(I)=2 means shell-to-shell since we set GAPS=EM20 instead of 0 when Igap0=1      
+       IF(GAPS(I)>ZERO.AND.GAP_M(L)>ZERO) ISHEL(I)=2
        IF(ISHEL(I)>0) THEN
          NX1 = NXX(I,1)
          NY1 = NYY(I,1)
@@ -978,6 +974,7 @@ C
         ENDIF
         
         S2 = MAX(EM30,SQRT(NQX*NQX + NQY*NQY + NQZ*NQZ))
+        AREA(I) = S2
         AAA = ONE/S2
         NQX = NQX*AAA
         NQY = NQY*AAA
@@ -1144,6 +1141,7 @@ c         check if outside side AB
           ELSEIF(LC(I)<AAA)THEN
               ISTEP(I)=3
               SUBTRIA_N(I)=IT0(3,ITQ)
+              SUBTRIA  (I)=IT0(3,ITQ)
               XXL(1:17)=XX(I,1:17)
               YYL(1:17)=YY(I,1:17)
               ZZL(1:17)=ZZ(I,1:17)
@@ -1587,7 +1585,15 @@ c        intersection time can be different for each sub-triangle
      C                    SZ235(I) ,SZ345(I),SZ415(I),XI(I)   ,YI(I)   ,
      D                    ZI(I)    ,ZEROM   ,UNP    ,ZEROMT,UNPT   )
         IF(INTERSECT == 0.AND.ISHEL(I)>1.AND.ISPT2(I)>0)THEN
-         CALL INTERSECSH(
+         XI5 = XX0(I,5) - XI(I)
+         YI5 = YY0(I,5) - YI(I)
+         ZI5 = ZZ0(I,5) - ZI(I)
+         AAA  = ABS(SX1250(I)*XI5 + SY1250(I)*YI5 + SZ1250(I)*ZI5) 
+         AAA  = MAX(AAA,(SX2350(I)*XI5 + SY2350(I)*YI5 + SZ2350(I)*ZI5))
+         AAA  = MAX(AAA,(SX3450(I)*XI5 + SY3450(I)*YI5 + SZ3450(I)*ZI5)) 
+         AAA  = MAX(AAA,(SX4150(I)*XI5 + SY4150(I)*YI5 + SZ4150(I)*ZI5))
+         IF (AAA<FIVE*EM04)         
+     *   CALL INTERSECSH(
      1                    ISTEP(I)  ,SUBTRIA(I),IXX(I,3) ,IXX(I,4),
      1                    INTERSECT,XX(I,1),
      3                    YY(I,1)  ,ZZ(I,1),XX(I,2),YY(I,2),ZZ(I,2) ,
@@ -2389,6 +2395,7 @@ c      write(iout,*)'i24dst3 8'
         NQZ = NZ(I)
         
         AAA = MAX(EM30,SQRT(NQX*NQX + NQY*NQY + NQZ*NQZ))
+        AREA(I) = AAA
         S2 = ONE/AAA
         NQX = NQX*S2
         NQY = NQY*S2
@@ -3339,7 +3346,7 @@ C-----Correction due to difference between starter/engine
 #include "lockoff.inc"
          ENDIF
         ENDDO
-C-------zero force for all first contact		
+C-------zero force for all first contact
        ELSE
         DO I=1,JLT
          IF(PENE(I) == ZERO)CYCLE
@@ -3378,6 +3385,42 @@ C---------PENE -> updated bt PENE_Offset
         PENE(I) = PENE_SH
        ENDDO
       END IF !IF (INACTI==5)
+C-----peneref for nonlinear stif (quadratic...)
+      PENREF(1:JLT) = ZERO 
+      IF (INACTI==-1) THEN
+        DO I=1,JLT
+          IF(PENE(I) == ZERO.OR.IKNON(I)==0) CYCLE
+          PENREF(I) = SQRT(EPS2*AREA(I))
+          JG = NSVG(I)
+          N  = CAND_N(I)
+          IF(JG > 0)THEN
+            PENE_SH = EM01*PENE_OLD(5,N)
+          ELSE
+            JG = -JG
+            PENE_SH = EM01*PENE_OLDFI(NIN)%P(5,JG)
+          ENDIF
+          PENREF(I) = MAX(PENREF(I),PENE_SH)
+        ENDDO
+      ELSE
+        DO I=1,JLT
+          IF(PENE(I) == ZERO.OR.IKNON(I)==0) CYCLE
+          N=CAND_N(I)
+          L=CAND_E(I)
+          PENREF(I) = ONE_FIFTH*SQRT(AREA(I))
+          GAP2 = ONE_FIFTH*(GAPS(I)+GAP_M(L)) 
+          IF (GAP2 > EM04) PENREF(I)=MIN(PENREF(I),GAP2)
+          JG = NSVG(I)
+          IF(JG > 0)THEN
+            PENE_SH = PENE_OLD(5,N)
+          ELSE
+            JG = -JG
+            PENE_SH = PENE_OLDFI(NIN)%P(5,JG)
+          ENDIF
+          PENREF(I) = MAX(PENREF(I),PENE_SH)
+          IF(IKNON(I)==1) PENREF(I) = TEN*PENREF(I)
+          IF(IKNON(I)>2) PENREF(I) = ONE_FIFTH*PENREF(I)
+        ENDDO
+      END IF
 C
       RETURN
       END
@@ -3408,13 +3451,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
-#include      "mvsiz_p.inc"
-#include      "com01_c.inc"
-#include      "sms_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "task_c.inc"
-#include      "impl1_c.inc"
 #include      "comlock.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -3425,12 +3461,6 @@ C-----------------------------------------------
      .     SX125,SY125,SZ125,SX235,SY235,
      .     SZ235,SX345,SY345,SZ345,SX415,
      .     SY415,SZ415,N1,N2,N3,LA,LB,LC,GAP2,EPS0
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "scr05_c.inc"
-#include      "com08_c.inc"
-#include      "parit_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -3726,13 +3756,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
-#include      "mvsiz_p.inc"
-#include      "com01_c.inc"
-#include      "sms_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "task_c.inc"
-#include      "impl1_c.inc"
 #include      "comlock.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -3743,12 +3766,6 @@ C-----------------------------------------------
      .     SX125,SY125,SZ125,SX235,SY235,
      .     SZ235,SX345,SY345,SZ345,SX415,
      .     SY415,SZ415,N1,N2,N3,LA,LB,LC,GAP2,EPS
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "scr05_c.inc"
-#include      "com08_c.inc"
-#include      "parit_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -4031,9 +4048,6 @@ C     REAL
       my_real
      .   X1,X2,X3,X4,
      .   Y1,Y2,Y3,Y4,Z1,Z2,Z3,Z4,XI,YI,ZI
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -4997,6 +5011,7 @@ Chd|-- called by -----------
 Chd|        I24DST3                       source/interfaces/int24/i24dst3.F
 Chd|-- calls ---------------
 Chd|        N2EDGE3                       source/interfaces/int24/i24dst3.F
+Chd|        N2EDGE3L                      source/interfaces/int24/n2edge3l.F
 Chd|====================================================================
       SUBROUTINE INTERSECSH(
      1                    ISTEP    ,SUBTRIA0,IXX3  ,IXX4  ,
@@ -5043,7 +5058,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com08_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -5110,32 +5124,32 @@ C--------edge selection: smallest pen between IJ,IK
          SELECT CASE (IEG)
            CASE (1) ! 12,41
             IF (MVOISIN(1)==0) THEN
-             CALL N2EDGE3(XX1    ,YY1      ,ZZ1    ,
-     2                    XX2    ,YY2      ,ZZ2    ,
-     3                    SX125  ,SY125    ,SZ125  ,
-     4                    XI     ,YI       ,ZI     ,PIJ )
-             IF (PIJ<ZERO) THEN 
                CALL N2EDGE3(XO1    ,YO1      ,ZO1    ,
      2                      XO2    ,YO2      ,ZO2    ,
      3                      SOX125 ,SOY125   ,SOZ125  ,
      4                      XOI    ,YOI      ,ZOI    ,PIJ0 )
-               IF (PIJ0>ZERO) THEN 
+             IF (PIJ0>ZERO) THEN 
+               CALL N2EDGE3L(XX1    ,YY1      ,ZZ1    ,
+     2                      XX2    ,YY2      ,ZZ2    ,
+     3                      SX125  ,SY125    ,SZ125  ,
+     4                      XI     ,YI       ,ZI     ,PIJ )
+               IF (PIJ<ZERO) THEN 
                 INTERSECT = 1
                 SUBTRIA= 20 + 1
                END IF
              END IF
             END IF !(MVOISIN(1)==0) THEN
             IF (MVOISIN(4)==0) THEN
-             CALL N2EDGE3(XX4    ,YY4      ,ZZ4    ,
-     2                    XX1    ,YY1      ,ZZ1    ,
-     3                    SX415  ,SY415    ,SZ415  ,
-     4                    XI     ,YI       ,ZI     ,PIK )
-             IF (PIK<ZERO.AND.PIK>PIJ) THEN
                CALL N2EDGE3(XO4    ,YO4      ,ZO4    ,
      2                      XO1    ,YO1      ,ZO1    ,
      3                      SOX415 ,SOY415   ,SOZ415  ,
      4                      XOI    ,YOI      ,ZOI    ,PIJ0 )
-               IF (PIJ0>ZERO) THEN 
+             IF (PIJ0>ZERO) THEN
+               CALL N2EDGE3L(XX4    ,YY4      ,ZZ4    ,
+     2                       XX1    ,YY1      ,ZZ1    ,
+     3                       SX415  ,SY415    ,SZ415  ,
+     4                       XI     ,YI       ,ZI     ,PIK )
+               IF (PIK<ZERO.AND.PIK>PIJ) THEN 
                 INTERSECT = 1
                 SUBTRIA= 20 + 4
                END IF
@@ -5143,32 +5157,32 @@ C--------edge selection: smallest pen between IJ,IK
             END IF 
            CASE (2) ! 23,12
             IF (MVOISIN(2)==0) THEN
-             CALL N2EDGE3(XX2    ,YY2      ,ZZ2    ,
-     2                    XX3    ,YY3      ,ZZ3    ,
-     3                    SX235  ,SY235    ,SZ235  ,
-     4                    XI     ,YI       ,ZI     ,PIJ )
-             IF (PIJ<ZERO) THEN 
                CALL N2EDGE3(XO2    ,YO2      ,ZO2    ,
      2                      XO3    ,YO3      ,ZO3    ,
      3                      SOX235 ,SOY235   ,SOZ235  ,
      4                      XOI    ,YOI      ,ZOI    ,PIJ0 )
-               IF (PIJ0>ZERO) THEN 
+             IF (PIJ0>ZERO) THEN 
+               CALL N2EDGE3L(XX2    ,YY2      ,ZZ2    ,
+     2                       XX3    ,YY3      ,ZZ3    ,
+     3                       SX235  ,SY235    ,SZ235  ,
+     4                       XI     ,YI       ,ZI     ,PIJ )
+               IF (PIJ<ZERO) THEN 
                 INTERSECT = 1
                 SUBTRIA= 20 + 2
                END IF
              END IF
             END IF 
             IF (MVOISIN(1)==0) THEN
-             CALL N2EDGE3(XX1    ,YY1      ,ZZ1    ,
-     2                    XX2    ,YY2      ,ZZ2    ,
-     3                    SX125  ,SY125    ,SZ125  ,
-     4                    XI     ,YI       ,ZI     ,PIK )
-             IF (PIK<ZERO.AND.PIK>PIJ) THEN
                CALL N2EDGE3(XO1    ,YO1      ,ZO1    ,
      2                      XO2    ,YO2      ,ZO2    ,
      3                      SOX125  ,SOY125    ,SOZ125  ,
      4                      XOI    ,YOI      ,ZOI    ,PIJ0 )
-               IF (PIJ0>ZERO) THEN 
+             IF (PIJ0>ZERO) THEN
+               CALL N2EDGE3L(XX1    ,YY1      ,ZZ1    ,
+     2                       XX2    ,YY2      ,ZZ2    ,
+     3                       SX125  ,SY125    ,SZ125  ,
+     4                       XI     ,YI       ,ZI     ,PIK )
+               IF (PIK<ZERO.AND.PIK>PIJ) THEN 
                 INTERSECT = 1
                 SUBTRIA= 20 + 1
                END IF
@@ -5177,16 +5191,16 @@ C--------edge selection: smallest pen between IJ,IK
            CASE (3) ! 34,23
              IF(IXX3 /= IXX4)THEN
                IF(MVOISIN(3)==0)THEN
-                CALL N2EDGE3(XX3    ,YY3      ,ZZ3    ,
-     2                       XX4    ,YY4      ,ZZ4    ,
-     3                       SX345  ,SY345    ,SZ345  ,
-     4                       XI     ,YI       ,ZI     ,PIJ )
-                IF (PIJ<ZERO) THEN 
                   CALL N2EDGE3(XO3    ,YO3      ,ZO3    ,
      2                         XO4    ,YO4      ,ZO4    ,
      3                         SOX345  ,SOY345    ,SOZ345  ,
      4                         XOI    ,YOI      ,ZOI    ,PIJ0)
-                  IF (PIJ0>ZERO) THEN 
+                IF (PIJ0>ZERO) THEN 
+                  CALL N2EDGE3L(XX3    ,YY3      ,ZZ3    ,
+     2                         XX4    ,YY4      ,ZZ4    ,
+     3                         SX345  ,SY345    ,SZ345  ,
+     4                         XI     ,YI       ,ZI     ,PIJ )
+                  IF (PIJ<ZERO) THEN 
                    INTERSECT = 1
                    SUBTRIA= 20 + 3
                   END IF
@@ -5194,16 +5208,16 @@ C--------edge selection: smallest pen between IJ,IK
                END IF
              ELSE   ! 3N : 41,23
               IF (MVOISIN(4)==0) THEN
-                CALL N2EDGE3(XX4    ,YY4      ,ZZ4    ,
-     2                       XX1    ,YY1      ,ZZ1    ,
-     3                       SX415  ,SY415    ,SZ415  ,
-     4                       XI     ,YI       ,ZI     ,PIJ )
-                IF (PIJ<ZERO) THEN
                   CALL N2EDGE3(XO4    ,YO4      ,ZO4    ,
      2                      XO1    ,YO1      ,ZO1    ,
      3                      SOX415  ,SOY415    ,SOZ415  ,
      4                      XOI    ,YOI      ,ZOI    ,PIJ0 )
-                  IF (PIJ0>ZERO) THEN 
+                IF (PIJ0>ZERO) THEN
+                 CALL N2EDGE3L(XX4    ,YY4      ,ZZ4    ,
+     2                       XX1    ,YY1      ,ZZ1    ,
+     3                       SX415  ,SY415    ,SZ415  ,
+     4                       XI     ,YI       ,ZI     ,PIJ )
+                 IF (PIJ<ZERO) THEN 
                    INTERSECT = 1
                    SUBTRIA= 20 + 4
                   END IF
@@ -5212,49 +5226,49 @@ C--------edge selection: smallest pen between IJ,IK
              END IF 
 C--------------  23 for both 3N/4N           
               IF(MVOISIN(2)==0)THEN !23
-                CALL N2EDGE3(XX2    ,YY2      ,ZZ2    ,
-     2                       XX3    ,YY3      ,ZZ3    ,
-     3                       SX235  ,SY235    ,SZ235  ,
-     4                       XI     ,YI       ,ZI     ,PIK )
-                IF (PIK<ZERO.AND.PIK>PIJ) THEN
-                  CALL N2EDGE3(XO2    ,YO2      ,ZO2    ,
+                CALL N2EDGE3(XO2    ,YO2      ,ZO2    ,
      2                      XO3    ,YO3      ,ZO3    ,
      3                      SOX235  ,SOY235    ,SOZ235  ,
      4                      XOI    ,YOI      ,ZOI    ,PIJ0 )
-                   IF (PIJ0>ZERO) THEN 
-                    INTERSECT = 1
-                    SUBTRIA= 20 + 2
-                   END IF
-                 END IF
+                IF (PIJ0>ZERO) THEN
+                  CALL N2EDGE3L(XX2    ,YY2      ,ZZ2    ,
+     2                       XX3    ,YY3      ,ZZ3    ,
+     3                       SX235  ,SY235    ,SZ235  ,
+     4                       XI     ,YI       ,ZI     ,PIK )
+                  IF (PIK<ZERO.AND.PIK>PIJ) THEN 
+                   INTERSECT = 1
+                   SUBTRIA= 20 + 2
+                  END IF
+                END IF
               END IF
            CASE (4) ! 41,34
             IF(MVOISIN(4)==0)THEN 
-             CALL N2EDGE3(XX4    ,YY4      ,ZZ4    ,
-     2                    XX1    ,YY1      ,ZZ1    ,
-     3                    SX415  ,SY415    ,SZ415  ,
-     4                    XI     ,YI       ,ZI     ,PIJ )
-             IF (PIJ<ZERO) THEN
                CALL N2EDGE3(XO4    ,YO4      ,ZO4    ,
      2                      XO1    ,YO1      ,ZO1    ,
      3                      SOX415  ,SOY415    ,SOZ415  ,
      4                      XOI    ,YOI      ,ZOI    ,PIJ0 )
-               IF (PIJ0>ZERO) THEN 
+             IF (PIJ0>ZERO) THEN
+               CALL N2EDGE3L(XX4    ,YY4      ,ZZ4    ,
+     2                       XX1    ,YY1      ,ZZ1    ,
+     3                       SX415  ,SY415    ,SZ415  ,
+     4                       XI     ,YI       ,ZI     ,PIJ )
+               IF (PIJ<ZERO) THEN 
                 INTERSECT = 1
                 SUBTRIA= 20 + 4
                END IF
              END IF
             END IF 
             IF(IXX3 /= IXX4.AND.MVOISIN(3)==0)THEN
-             CALL N2EDGE3(XX3    ,YY3      ,ZZ3    ,
-     2                    XX4    ,YY4      ,ZZ4    ,
-     3                    SX345  ,SY345    ,SZ345  ,
-     4                    XI     ,YI       ,ZI     ,PIK )
-                IF (PIK<ZERO.AND.PIK>PIJ) THEN 
                   CALL N2EDGE3(XO3    ,YO3      ,ZO3    ,
      2                         XO4    ,YO4      ,ZO4    ,
      3                         SOX345  ,SOY345    ,SOZ345  ,
      4                         XOI    ,YOI      ,ZOI    ,PIJ0)
-                  IF (PIJ0>ZERO) THEN 
+                IF (PIJ0>ZERO) THEN 
+                  CALL N2EDGE3L(XX3    ,YY3      ,ZZ3    ,
+     2                          XX4    ,YY4      ,ZZ4    ,
+     3                          SX345  ,SY345    ,SZ345  ,
+     4                          XI     ,YI       ,ZI     ,PIK )
+                  IF (PIK<ZERO.AND.PIK>PIJ) THEN 
                    INTERSECT = 1
                    SUBTRIA= 20 + 3
                   END IF
@@ -5296,9 +5310,6 @@ C     REAL
      2                           XXJ    ,YYJ      ,ZZJ    ,
      3                           NX     ,NY       ,NZ     ,
      4                           XI     ,YI       ,ZI     ,BBB
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

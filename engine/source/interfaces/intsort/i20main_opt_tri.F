@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  I20MAIN_OPT_TRI               source/interfaces/intsort/i20main_opt_tri.F
 Chd|-- called by -----------
@@ -44,23 +44,11 @@ C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "comlock.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "units_c.inc"
-#include      "scr03_c.inc"
-#include      "scr04_c.inc"
-#include      "scr05_c.inc"
-#include      "warn_c.inc"
-#include      "task_c.inc"
-#include      "parit_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -100,8 +88,8 @@ C-----------------------------------------------------------
       CALL I20OPTCD(
      1INTBUF_TAB%NSV,INTBUF_TAB%CAND_E,INTBUF_TAB%CAND_N,INTBUF_TAB%XA,I_STOK   ,
      2INTBUF_TAB%IRECTM,GAP      ,INTBUF_TAB%GAP_S,INTBUF_TAB%GAP_M,IPARI(21,NIN),
-     3INTBUF_TAB%STFA,ITASK	 ,INTBUF_TAB%STFM,IFQ	 ,INTBUF_TAB%IFPEN,
-     4INTBUF_TAB%CAND_FX,INTBUF_TAB%CAND_FY,INTBUF_TAB%CAND_FZ,NIN	 ,IPARI(5,NIN) ,
+     3INTBUF_TAB%STFA,ITASK   ,INTBUF_TAB%STFM,IFQ   ,INTBUF_TAB%IFPEN,
+     4INTBUF_TAB%CAND_FX,INTBUF_TAB%CAND_FY,INTBUF_TAB%CAND_FZ,NIN   ,IPARI(5,NIN) ,
      5INTBUF_TAB%VARIABLES(16),IPARI(39,NIN),COUNT_REMSLV )
 
 C-----------------------------------------------------------
@@ -110,9 +98,9 @@ C-----------------------------------------------------------
       I_STOK = INTBUF_TAB%I_STOK_E(1)
       CALL I20OPTCDE(
      1  INTBUF_TAB%LCAND_N ,INTBUF_TAB%LCAND_S ,INTBUF_TAB%XA ,I_STOK        ,
-     2  INTBUF_TAB%IXLINS ,INTBUF_TAB%IXLINM ,GAP	    ,NIN	   ,
-     3  V	      ,INTBUF_TAB%GAP_SE ,INTBUF_TAB%GAP_ME ,IPARI(21,NIN) ,
-     4  INTBUF_TAB%STFS ,ITASK	     ,IPARI(53,NIN) ,INTBUF_TAB%STF ,
+     2  INTBUF_TAB%IXLINS ,INTBUF_TAB%IXLINM ,GAP      ,NIN     ,
+     3  V        ,INTBUF_TAB%GAP_SE ,INTBUF_TAB%GAP_ME ,IPARI(21,NIN) ,
+     4  INTBUF_TAB%STFS ,ITASK       ,IPARI(53,NIN) ,INTBUF_TAB%STF ,
      5  COUNT_REMSLVE )
 C-----------------------------------------------------------
 C

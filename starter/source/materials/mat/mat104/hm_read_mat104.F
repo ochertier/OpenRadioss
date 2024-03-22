@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  HM_READ_MAT104                source/materials/mat/mat104/hm_read_mat104.F
 Chd|-- called by -----------
@@ -31,7 +31,7 @@ Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.
 Chd|        HM_OPTION_IS_ENCRYPTED        source/devtools/hm_reader/hm_option_is_encrypted.F
 Chd|        INIT_MAT_KEYWORD              source/materials/mat/init_mat_keyword.F
 Chd|        ELBUFTAG_MOD                  share/modules1/elbuftag_mod.F 
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/matparam_def_mod.F
+Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
@@ -54,22 +54,20 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "units_c.inc"
-#include      "submod_c.inc"
-#include      "sysunit.inc"
 #include      "param_c.inc"
 #include      "scr17_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      my_real, DIMENSION(MAXUPARAM) ,INTENT(OUT)   :: UPARAM
+      my_real, DIMENSION(MAXUPARAM) ,INTENT(INOUT)   :: UPARAM
       INTEGER, INTENT(IN)                          :: MAT_ID,MAXUPARAM,MAXFUNC
       INTEGER, INTENT(INOUT)                       :: NUPARAM,NUVAR,IFUNC(MAXFUNC),NFUNC
       TYPE (UNIT_TYPE_),INTENT(IN)                 :: UNITAB    
       CHARACTER*nchartitle ,INTENT(IN)             :: TITR
       my_real, DIMENSION(100),INTENT(INOUT)        :: PARMAT      
       TYPE(SUBMODEL_DATA), DIMENSION(*),INTENT(IN) :: LSUBMODEL
-      TYPE(MLAW_TAG_), INTENT(OUT)                 :: MTAG
-      TYPE(MATPARAM_STRUCT_) ,INTENT(OUT)          :: MATPARAM
+      TYPE(MLAW_TAG_), INTENT(INOUT)               :: MTAG
+      TYPE(MATPARAM_STRUCT_) ,INTENT(INOUT)        :: MATPARAM
       my_real, DIMENSION(NPROPM) ,INTENT(INOUT)    :: PM 
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -103,6 +101,7 @@ card3 - Hardening mdefied Voce
 card4 - JC strain rate
       CALL HM_GET_FLOATV('MAT104_Cjc'  ,JCC          ,IS_AVAILABLE, LSUBMODEL, UNITAB)
       CALL HM_GET_FLOATV('MAT104_Eps0' ,EPSP0        ,IS_AVAILABLE, LSUBMODEL, UNITAB)
+      CALL HM_GET_FLOATV('MAT104_Fcut' ,FCUT         ,IS_AVAILABLE, LSUBMODEL, UNITAB)
 card5 - thermal softening
       CALL HM_GET_FLOATV('MAT104_Tss'  ,MTEMP        ,IS_AVAILABLE, LSUBMODEL, UNITAB)
       CALL HM_GET_FLOATV('MAT104_Tref' ,TREF         ,IS_AVAILABLE, LSUBMODEL, UNITAB)
@@ -116,7 +115,9 @@ c---------------------------------------------------
       ! Default values
       IF (YLD0 == ZERO) YLD0 = INFINITY
       ! Cutting frequency
-      FCUT   = 10000.0D0*FAC_T_WORK
+      IF (FCUT == ZERO) THEN 
+        FCUT = 10000.0D0*UNITAB%FAC_T_WORK
+      ENDIF
       ASRATE = TWO*PI*FCUT
       ! If the inviscid plastic strain-rate is zero, no Johnson-Cook model
       IF(EPSP0 == ZERO) THEN 
@@ -240,6 +241,10 @@ c---------------------------
       CALL INIT_MAT_KEYWORD(MATPARAM ,"ELASTO_PLASTIC")
       CALL INIT_MAT_KEYWORD(MATPARAM ,"INCREMENTAL"   )
       CALL INIT_MAT_KEYWORD(MATPARAM ,"LARGE_STRAIN"  )
+      CALL INIT_MAT_KEYWORD(MATPARAM ,"HOOK")
+      ! Properties compatibility
+      CALL INIT_MAT_KEYWORD(MATPARAM,"SOLID_ISOTROPIC")
+      CALL INIT_MAT_KEYWORD(MATPARAM,"SHELL_ISOTROPIC")
 c---------------------------    
       PARMAT(1) = C1
       PARMAT(2) = YOUNG
@@ -261,7 +266,7 @@ c-----------------------------------------------------------------------
       ELSE
         WRITE(IOUT,1050) RHO0
         WRITE(IOUT,1100) YOUNG,NU   ,CDR ,QVOCE,BVOCE,
-     .                   YLD0, HP   ,JCC ,EPSP0,
+     .                   YLD0, HP   ,JCC ,EPSP0,FCUT,
      .                   MTEMP,TREF ,TINI,ETA  ,CP, DPIS,DPAD,
      .                   FLAGNICE
       ENDIF
@@ -288,6 +293,7 @@ c-----------------------------------------------------------------------
      & 5X,'LINEAR HARDENING PARAMETER. . . . . . . . . .=',1PG20.13/ 
      & 5X,'J-C STRAIN RATE COEFFICIENT C . . . . . . . .=',1PG20.13/
      & 5X,'J-C REFERENCE STRAIN RATE . . . . . . . . . .=',1PG20.13/
+     & 5X,'PLASTIC STRAIN RATE CUTOFF FREQUENCY. . . . .=',1PG20.13/
 !
      & 5X,'THERMAL SOFTENING SLOPE . . . . . . . . . . .=',1PG20.13/
      & 5X,'REFERENCE TEMPERATURE . . . . . . . . . . . .=',1PG20.13/

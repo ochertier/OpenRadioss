@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  CREATE_H3D_SOLID_SCALAR       source/output/h3d/h3d_build_fortran/create_h3d_solid_scalar.F
 Chd|-- called by -----------
@@ -31,35 +31,34 @@ Chd|====================================================================
       SUBROUTINE CREATE_H3D_SOLID_SCALAR(H3D_DATA,ID_SOLID_SCALAR,ID_INPUT,TEXT1,STEXT1,
      .                                   COMMENT, SCOMMENT, IPART,KEY3_GLOB,
      .                                   LAYER,IR,IS,IT,IUVAR,
-     .                                   IDMDS,IVARMDS,ID_MAT_MDS,MDS_LABEL,SMDS_LABEL)
+     .                                   IDMDS,IVARMDS,ID_MAT_MDS,MDS_LABEL,SMDS_LABEL,
+     .                                   ID   )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE H3D_MOD
+      USE NAMES_AND_TITLES_MOD, ONLY: NCHARLINE100
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "nchara_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       TYPE (H3D_DATABASE) :: H3D_DATA
       INTEGER ID_SOLID_SCALAR,ID_INPUT,STEXT1,SCOMMENT,
      .        LAYER,IUVAR,IR,IS,IT,IDMDS,IVARMDS,SMDS_LABEL,
-     .        ID_MAT_MDS
+     .        ID_MAT_MDS,ID
       INTEGER IPART(LIPART1,*)
       CHARACTER(LEN=STEXT1) ::  TEXT1
-      CHARACTER(LEN=ncharline) ::  KEY3_GLOB
+      CHARACTER(LEN=NCHARLINE100) ::  KEY3_GLOB
       CHARACTER(LEN=SCOMMENT) :: COMMENT
       CHARACTER(LEN=64) :: MDS_LABEL
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
-#include      "param_c.inc"
 #include      "scr17_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
@@ -67,7 +66,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      CHARACTER(LEN=ncharline) :: CARTE,CARTE1
+      CHARACTER(LEN=NCHARLINE100) :: CARTE,CARTE1
       INTEGER I,J,L,N_H3D_PART
 C=========================================================================
       H3D_DATA%N_OUTP_H3D = H3D_DATA%N_OUTP_H3D + 1
@@ -80,6 +79,7 @@ C=========================================================================
       H3D_DATA%OUTPUT_LIST(H3D_DATA%N_OUTP_H3D)%IR = IR
       H3D_DATA%OUTPUT_LIST(H3D_DATA%N_OUTP_H3D)%IS = IS
       H3D_DATA%OUTPUT_LIST(H3D_DATA%N_OUTP_H3D)%IT = IT
+      H3D_DATA%OUTPUT_LIST(H3D_DATA%N_OUTP_H3D)%OBJECT_ID = ID
       H3D_DATA%OUTPUT_LIST(H3D_DATA%N_OUTP_H3D)%IUVAR = IUVAR
       H3D_DATA%OUTPUT_LIST(H3D_DATA%N_OUTP_H3D)%IDMDS = IDMDS
       H3D_DATA%OUTPUT_LIST(H3D_DATA%N_OUTP_H3D)%IDMATMDS = ID_MAT_MDS

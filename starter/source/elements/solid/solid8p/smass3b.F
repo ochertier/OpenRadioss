@@ -1,37 +1,43 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  SMASS3B                       source/elements/solid/solid8p/smass3b.F
 Chd|-- called by -----------
 Chd|        SINIT3                        source/elements/solid/solide/sinit3.F
 Chd|-- calls ---------------
+Chd|        ALE_MOD                       ../common_source/modules/ale/ale_mod.F
 Chd|====================================================================
       SUBROUTINE SMASS3B(
-     1   RHO    ,MS ,VOLGP,LVLOC,MSS,
-     2   PARTSAV,X  ,V    ,IPART,MSNF,
-     3   MSSF   ,WMA,RHOCP,MCP   ,MCPS ,
-     4   MSSA, VOLU, 
-     5   NC1, NC2, NC3, NC4, NC5, NC6, NC7, NC8)
+     1                   RHO    ,MS  ,VOLGP,LVLOC,MSS,
+     2                   PARTSAV,X   ,V    ,IPART,MSNF,
+     3                   MSSF   ,WMA ,RHOCP,MCP  ,MCPS,
+     4                   MSSA   ,VOLU, 
+     5                   NC1    ,NC2 ,NC3  ,NC4  ,NC5 ,
+     6                   NC6    ,NC7 ,NC8)
+C-----------------------------------------------
+C   I m p l i c i t   T y p e s
+C-----------------------------------------------
+      USE ALE_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -44,10 +50,8 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com07_c.inc"
 #include      "vect01_c.inc"
 #include      "scr05_c.inc"
-#include      "ale_param.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -482,7 +486,7 @@ C
        ENDIF
       ENDIF
 C
-      IF(JALE>0 .AND. NWALE==4)THEN
+      IF(JALE>0 .AND. ALE%GRID%NWALE==4)THEN
         DO I=LFT,LLT
           I1 = NC1(I)
           I2 = NC2(I)

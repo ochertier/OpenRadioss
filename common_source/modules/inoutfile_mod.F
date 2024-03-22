@@ -1,29 +1,30 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  INOUTFILE_MOD                 modules/inoutfile_mod.F       
 Chd|-- called by -----------
 Chd|        CHECK_DYNAIN                  starter/source/starter/check_dynain.F
+Chd|        CHECK_QEPH_STRA               starter/source/starter/check_qeph_stra.F
 Chd|        CONTRL                        starter/source/starter/contrl.F
 Chd|        DDSPLIT                       starter/source/restart/ddsplit/ddsplit.F
 Chd|        DD_ANI                        starter/source/output/anim/dd_ani.F
@@ -80,9 +81,9 @@ Chd|        PRINTIME                      engine/source/system/timer.F
 Chd|        RADIOSS0                      engine/source/engine/radioss0.F
 Chd|        RADIOSS2                      engine/source/engine/radioss2.F
 Chd|        REPORT                        engine/source/output/report/report.F
-Chd|        SECT_INI                      engine/source/tools/sect/sectio.F
-Chd|        SECT_READ                     engine/source/tools/sect/sectio.F
-Chd|        SECT_READP                    engine/source/tools/sect/sectio.F
+Chd|        SECTION_INIT                  engine/source/tools/sect/section_init.F
+Chd|        SECTION_READ                  engine/source/tools/sect/section_read.F
+Chd|        SECTION_READP                 engine/source/tools/sect/section_readp.F
 Chd|        SORTIE_MAIN                   engine/source/output/sortie_main.F
 Chd|        SORTIE_MVW                    engine/source/output/report/sortie_mvw.F
 Chd|        SPMD_COLLECT                  engine/source/mpi/output/spmd_collect.F

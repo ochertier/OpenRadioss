@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  HM_READ_MAT13                 source/materials/mat/mat013/hm_read_mat13.F
 Chd|-- called by -----------
@@ -30,7 +30,7 @@ Chd|        HM_GET_FLOATV                 source/devtools/hm_reader/hm_get_float
 Chd|        HM_OPTION_IS_ENCRYPTED        source/devtools/hm_reader/hm_option_is_encrypted.F
 Chd|        INIT_MAT_KEYWORD              source/materials/mat/init_mat_keyword.F
 Chd|        ELBUFTAG_MOD                  share/modules1/elbuftag_mod.F 
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/matparam_def_mod.F
+Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
@@ -52,10 +52,8 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr17_c.inc"
-#include      "scr03_c.inc"
 #include      "units_c.inc"
 #include      "param_c.inc"
-#include      "sysunit.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -66,7 +64,7 @@ C-----------------------------------------------
       TYPE(MLAW_TAG_), INTENT(INOUT)               :: MTAG
       INTEGER, DIMENSION(NPROPMI) ,INTENT(INOUT)   :: IPM
       my_real, DIMENSION(NPROPM)  ,INTENT(INOUT)   :: PM
-      TYPE(MATPARAM_STRUCT_) ,INTENT(INOUT) :: MATPARAM
+      TYPE(MATPARAM_STRUCT_) ,INTENT(INOUT)        :: MATPARAM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -84,8 +82,8 @@ C-----------------------------------------------
 C     Check input encryption
       CALL HM_OPTION_IS_ENCRYPTED(IS_ENCRYPTED)
 C     Initial and reference density
-      CALL HM_GET_FLOATV('MAT_RHO'    ,RHO0        ,IS_AVAILABLE, LSUBMODEL, UNITAB)
-      CALL HM_GET_FLOATV('Refer_Rho'  ,RHOR        ,IS_AVAILABLE, LSUBMODEL, UNITAB)
+      CALL HM_GET_FLOATV('MAT_RHO'   ,RHO0, IS_AVAILABLE, LSUBMODEL, UNITAB)
+      CALL HM_GET_FLOATV('Refer_Rho' ,RHOR, IS_AVAILABLE, LSUBMODEL, UNITAB)
       IF (RHOR == ZERO) THEN
          RHOR = RHO0
       ENDIF
@@ -123,15 +121,24 @@ c-----------------
       ELSE
         CALL INIT_MAT_KEYWORD(MATPARAM,"COMPRESSIBLE")
       END IF
+
+      ! Properties compatibility
+      CALL INIT_MAT_KEYWORD(MATPARAM,"SOLID_ALL")
+      CALL INIT_MAT_KEYWORD(MATPARAM,"SHELL_ALL")
+      CALL INIT_MAT_KEYWORD(MATPARAM,"BEAM_ALL")
+      CALL INIT_MAT_KEYWORD(MATPARAM,"TRUSS")
+      CALL INIT_MAT_KEYWORD(MATPARAM,"SPRING_ALL")
+      CALL INIT_MAT_KEYWORD(MATPARAM,"SPH")
+
 c-----------------
 C--------------------------------
 C
-      WRITE(IOUT, 800) TRIM(TITR),MAT_ID,13
+      WRITE(IOUT,800)TRIM(TITR),MAT_ID,13
       WRITE(IOUT,1000)
       IF(IS_ENCRYPTED)THEN
          WRITE(IOUT,'(5X,A,//)')'CONFIDENTIAL DATA'
       ELSE
-         WRITE(IOUT, 850) RHO0
+         WRITE(IOUT, 850)RHO0,RHOR
          WRITE(IOUT,1300)YOUNG,ANU,G
       ENDIF
 C-----------
@@ -141,7 +148,8 @@ C-----------
      & 5X,'MATERIAL NUMBER. . . . . . . . . . . . =',I10/,
      & 5X,'MATERIAL LAW . . . . . . . . . . . . . =',I10/)
   850 FORMAT(
-     & 5X,'INITIAL DENSITY    . . . . . . . . . . =',1PG20.13/)
+     & 5X,'INITIAL DENSITY . . . . . . . . . . . .=',1PG20.13/,
+     & 5X,'REFERENCE DENSITY . . . . . . . . . . .=',1PG20.13/)
  1000 FORMAT(
      & 5X,'  RIGID LAW                           ',/,
      & 5X,'  ---------                           ')

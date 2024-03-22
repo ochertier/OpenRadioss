@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  HM_READ_MAT18                 source/materials/mat/mat018/hm_read_mat18.F
 Chd|-- called by -----------
@@ -28,15 +28,16 @@ Chd|-- calls ---------------
 Chd|        HM_GET_FLOATV                 source/devtools/hm_reader/hm_get_floatv.F
 Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
 Chd|        HM_OPTION_IS_ENCRYPTED        source/devtools/hm_reader/hm_option_is_encrypted.F
+Chd|        INIT_MAT_KEYWORD              source/materials/mat/init_mat_keyword.F
 Chd|        ELBUFTAG_MOD                  share/modules1/elbuftag_mod.F 
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/matparam_def_mod.F
+Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
       SUBROUTINE HM_READ_MAT18(
      .           NUPARAM  ,NUVAR    ,NFUNC    ,MAT_ID   ,TITR      ,
      .           UNITAB   ,LSUBMODEL,MTAG     ,PM       ,IPM       ,
-     .           JTHE     ) 
+     .           JTHE     ,MATPARAM ) 
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -44,6 +45,7 @@ C-----------------------------------------------
       USE MESSAGE_MOD 
       USE SUBMODEL_MOD
       USE MATPARAM_DEF_MOD          
+      USE UNITAB_MOD
 C-----------------------------------------------
 C   ROUTINE DESCRIPTION :
 C   ===================
@@ -57,21 +59,19 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr17_c.inc"
 #include      "units_c.inc"
-#include      "submod_c.inc"
-#include      "sysunit.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       CHARACTER*nchartitle ,INTENT(IN) :: TITR
-      TYPE(SUBMODEL_DATA), DIMENSION(*),INTENT(IN) :: LSUBMODEL
-      my_real, DIMENSION(*), INTENT(IN) :: UNITAB
-      INTEGER, INTENT(IN)    :: MAT_ID
-c
-      INTEGER, INTENT(OUT)   :: IPM(NPROPMI)
-      my_real, INTENT(OUT)   :: PM(NPROPM)     
-      INTEGER, INTENT(OUT)   :: NUPARAM,NUVAR,NFUNC,JTHE
-      TYPE(MLAW_TAG_) ,INTENT(OUT)         :: MTAG
+      TYPE(SUBMODEL_DATA), DIMENSION(NSUBMOD),INTENT(IN) :: LSUBMODEL
+      TYPE(UNIT_TYPE_), INTENT(in) :: UNITAB
+      INTEGER, INTENT(IN) :: MAT_ID
+      INTEGER, INTENT(INOUT) :: IPM(NPROPMI)
+      my_real, INTENT(INOUT) :: PM(NPROPM)     
+      INTEGER, INTENT(INOUT) :: NUPARAM,NUVAR,NFUNC,JTHE
+      TYPE(MLAW_TAG_) ,INTENT(INOUT) :: MTAG
+      TYPE(MATPARAM_STRUCT_) ,INTENT(INOUT) :: MATPARAM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -79,7 +79,7 @@ C-----------------------------------------------
       INTEGER :: ILAW,ITF,ISPH,IAS
       my_real :: RHOR,RHO0,T0,SPH,AS,BS,E0,TIMESCAL,TSCAL,ESCAL,KSCAL
 C=======================================================================
-      IS_ENCRYPTED   = .FALSE.
+      IS_ENCRYPTED = .FALSE.
       IS_AVAILABLE = .FALSE.
       ILAW = 18
       JTHE = 1
@@ -163,6 +163,16 @@ c
       MTAG%G_DELTAX = 1
       MTAG%L_TEMP   = 1
       MTAG%L_DELTAX = 1
+
+      ! MATPARM keywords
+
+      ! EOS/Thermo keyword for pressure treatment in elements
+      CALL INIT_MAT_KEYWORD(MATPARAM,"HYDRO_EOS")
+
+      CALL INIT_MAT_KEYWORD(MATPARAM,"INCOMPRESSIBLE")
+
+      ! Properties compatibility
+      CALL INIT_MAT_KEYWORD(MATPARAM,"SOLID_ORTHOTROPIC")
 c--------------------------------------------------
 c     Starter output
 c--------------------------------------------------

@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  HM_READ_NONLOCAL              source/materials/nonlocal/hm_read_nonlocal.F
 Chd|-- called by -----------
@@ -35,11 +35,13 @@ Chd|        HM_OPTION_READ_KEY            source/devtools/hm_reader/hm_option_re
 Chd|        HM_OPTION_START               source/devtools/hm_reader/hm_option_start.F
 Chd|        ELBUFTAG_MOD                  share/modules1/elbuftag_mod.F 
 Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
+Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        NLOCAL_REG_MOD                ../common_source/modules/nlocal_reg_mod.F
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
-      SUBROUTINE HM_READ_NONLOCAL(NLOC_DMG ,MLAW_TAG ,IPM      ,UNITAB   ,LSUBMODEL)
+      SUBROUTINE HM_READ_NONLOCAL(MAT_PARAM ,NLOC_DMG ,MLAW_TAG ,IPM    ,
+     .                            UNITAB    ,LSUBMODEL)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -49,6 +51,7 @@ C-----------------------------------------------
       USE HM_OPTION_READ_MOD
       USE NLOCAL_REG_MOD
       USE ELBUFTAG_MOD            
+      USE MATPARAM_DEF_MOD
 C============================================================================
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -56,21 +59,19 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr06_c.inc"
 #include      "scr17_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
 #include      "units_c.inc"
-#include      "sysunit.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       TYPE(NLOCAL_STR_)                                 :: NLOC_DMG
       TYPE(MLAW_TAG_), DIMENSION(NUMMAT), INTENT(INOUT) :: MLAW_TAG
-      INTEGER ,DIMENSION(NPROPMI,NUMMAT), INTENT(OUT)   :: IPM
+      INTEGER ,DIMENSION(NPROPMI,NUMMAT), INTENT(INOUT) :: IPM
       TYPE (UNIT_TYPE_) ,INTENT(IN)                     :: UNITAB 
-      TYPE(SUBMODEL_DATA) ,DIMENSION(*) , INTENT(IN)    :: LSUBMODEL
+      TYPE (SUBMODEL_DATA)    ,DIMENSION(*)      ,INTENT(IN)    :: LSUBMODEL
+      TYPE (MATPARAM_STRUCT_) ,DIMENSION(NUMMAT) ,INTENT(INOUT) :: MAT_PARAM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -134,7 +135,7 @@ c--------------------------------------------------
 c       Check UNIT_ID
 c--------------------------------------------------
         FLAGUNIT = 0
-        DO IUNIT=1,NUNITS
+        DO IUNIT=1,UNITAB%NUNITS
           IF (UNITAB%UNIT_ID(IUNIT) == UID) THEN
             FLAGUNIT = 1
             EXIT
@@ -168,7 +169,7 @@ c--------------------------------------------------
           CALL GET_LEMAX(NLOC_DMG%LE_MAX(IMAT),NLOC_DMG%LEN(IMAT))
         ENDIF
         ! Flag for non-local material
-        IPM(253,IMAT) = 1   
+        MAT_PARAM(IMAT)%NLOC = 1   
         ! Number of the material law
         ILAW = IPM(2,IMAT)       
         ! Flag of saving non-local plastic strain and strain rate in buffer

@@ -12,17 +12,18 @@ env:
   FROM_EMAIL: ${{ secrets.FROM_EMAIL }}
   TO_EMAIL: ${{ secrets.TO_EMAIL }}
   MAIL_RELAY: ${{ secrets.MAIL_RELAY }}
-  QA_TIMEOUT_PER_TEST: 150
+  QA_TIMEOUT_PER_TEST_LINUX: 150
+  QA_TIMEOUT_PER_TEST_WIN: 500
 
 jobs:
 
   build_tools_linux:
     if: ${{ github.repository_owner == 'OpenRadioss' }}
-    # DEV ONLY # runs-on: ["linux64","dev_pmci"]
+    # DEV ONLY # runs-on: ["linux64","dev_pmci"] 
     runs-on: ["linux64","prmerge_ci"]
     continue-on-error: true
     container: 
-      image: fr-qafactorydev.europe.altair.com/build-linux64_gf:ompi411
+      image: fr-qafactorydev.europe.altair.com/build-linux64_gf:ompi411-devts11
       credentials: 
         username: ${{secrets.DOCKER_REGISTRY_USER}}
         password: ${{secrets.DOCKER_REGISTRY_PASSWD}}
@@ -228,7 +229,7 @@ jobs:
     # DEV ONLY # runs-on: ["${{ matrix.build }}","dev_pmci"]
     runs-on: ["${{ matrix.build }}","prmerge_ci"]
     container: 
-      image: fr-qafactorydev.europe.altair.com/build-linux64_gf:ompi411
+      image: fr-qafactorydev.europe.altair.com/build-linux64_gf:ompi411-devts11
       credentials: 
         username: ${{secrets.DOCKER_REGISTRY_USER}}
         password: ${{secrets.DOCKER_REGISTRY_PASSWD}}
@@ -316,7 +317,7 @@ jobs:
             mpi_opts="-mpi=${{ matrix.mpi }}"
           fi
 
-          cmd="./build_script.sh -arch=${{ matrix.os }}_gf -prec=${{ matrix.precision }} -nt=${{ env.BUILD_NB_THREAD }} -static-link $mpi_opts"
+          cmd="./build_script.sh -release -arch=${{ matrix.os }}_gf -prec=${{ matrix.precision }} -nt=${{ env.BUILD_NB_THREAD }} -static-link $mpi_opts"
           echo "========================================="
           echo "--  BUILD ${{ matrix.build }} --"   
           echo "--  $cmd --"   
@@ -487,7 +488,7 @@ jobs:
           export LD_LIBRARY_PATH=${{ env.hm_reader_extlib }}/${{ matrix.os }}:$LD_LIBRARY_PATH
 
 
-          cmd="./or_qa_script ../../exec/engine_${{ matrix.os }}_gf_${{ env.mpi }}${precision_ext} 1.0 --env:RAD_CFG_PATH=${{ env.hm_reader_cfgfiles }} --system_run --env:OMP_STACKSIZE=400m --exec_script_args='mpiexec -np ${{ env.QA_NB_PROC }}' --env:OMP_NUM_THREADS=${{ env.QA_NB_THREAD }} --output_failures_stdout --xtra_args='--timeoutscript=${{ env.QA_TIMEOUT_PER_TEST }}'"
+          cmd="./or_qa_script ../../exec/engine_${{ matrix.os }}_gf_${{ env.mpi }}${precision_ext} 1.0 --env:RAD_CFG_PATH=${{ env.hm_reader_cfgfiles }} --system_run --env:OMP_STACKSIZE=400m --exec_script_args='mpiexec -np ${{ env.QA_NB_PROC }}' --env:OMP_NUM_THREADS=${{ env.QA_NB_THREAD }} --output_failures_stdout --xtra_args='--timeoutscript=${{ env.QA_TIMEOUT_PER_TEST_LINUX }}'"
           echo "========================================="
           echo "--  QA ${{ matrix.os }}_${{ matrix.precision }} --"   
           echo "--  $cmd --"   
@@ -511,7 +512,7 @@ jobs:
         run: |
 
           MAILMSG="Some error(s) has(ve) been raised during workflow execution:\n\n"
-          echo -e "\n#### STATUS_STEP_QA ${{ matrix.build }} ###"
+          echo -e "\n#### STATUS_STEP_QA ###"
           if [ "$STATUS_QA" = 0 ]
           then
             echo -e "Status\t[ \033[31;2;1mFAILED\033[0m ]" 
@@ -672,7 +673,7 @@ jobs:
           echo '---------------------------------';
           mpi_opts='';
           if [ ! -z ${{ matrix.mpi }} ]; then mpi_opts='-mpi=${{ matrix.mpi }}'; fi;
-          cmd=\"./build_script.sh -arch=${{ matrix.os }} -prec=${{ matrix.precision }} -nt=${{ env.BUILD_NB_THREAD }} $mpi_opts\";
+          cmd=\"./build_script.sh -release -arch=${{ matrix.os }} -prec=${{ matrix.precision }} -nt=${{ env.BUILD_NB_THREAD }} $mpi_opts\";
           echo \"=========================================\";
           echo \"--  BUILD ${{ matrix.build }} --\";
           echo \"--  $cmd --\";
@@ -816,7 +817,7 @@ jobs:
           rm -f QA.summary;
           export PATH=${{ env.hm_reader_extlib }}/${{ matrix.os }}:$PATH;
           export PATH=${{ env.oneapi_exlib }}/${{ matrix.os }}:$PATH;
-          cmd=\"./or_qa_script ../../exec/engine_${{ matrix.os }}_${{ env.mpi }}${precision_ext} 1.0 --env:RAD_CFG_PATH=${{ env.hm_reader_cfgfiles }} --system_run --env:KMP_STACKSIZE=400m --exec_script_args='mpiexec -np ${{ env.QA_NB_PROC }}' --env:OMP_NUM_THREADS=${{ env.QA_NB_THREAD }} --output_failures_stdout --xtra_args='--timeoutscript=${{ env.QA_TIMEOUT_PER_TEST }}' \";
+          cmd=\"./or_qa_script ../../exec/engine_${{ matrix.os }}_${{ env.mpi }}${precision_ext} 1.0 --env:RAD_CFG_PATH=${{ env.hm_reader_cfgfiles }} --system_run --env:KMP_STACKSIZE=400m --exec_script_args='mpiexec -np ${{ env.QA_NB_PROC }}' --env:OMP_NUM_THREADS=${{ env.QA_NB_THREAD }} --output_failures_stdout --xtra_args='--timeoutscript=${{ env.QA_TIMEOUT_PER_TEST_WIN }}' \";
           echo \"=========================================\";
           echo \"--  QA ${{ matrix.os }}_${{ matrix.precision }} --\"; 
           echo \"--  $cmd --\";   
@@ -838,7 +839,7 @@ jobs:
         run: >
           call C:\cygwin64\bin\bash --login -c "
           MAILMSG=\"Some error(s) has(ve) been raised during workflow execution:\n\n\";
-          echo -e \"\n#### STATUS_STEP_QA ${{ matrix.build }} ###\";
+          echo -e \"\n#### STATUS_STEP_QA ###\";
           if [ ${{ env.STATUS_QA }} = 0 ];
           then
           echo -e \"Status\t[ \033[31;2;1mFAILED\033[0m ]\";
@@ -890,17 +891,12 @@ jobs:
     secrets: 
       DOCKER_REGISTRY_USER: ${{secrets.DOCKER_REGISTRY_USER}}
       DOCKER_REGISTRY_PASSWD: ${{secrets.DOCKER_REGISTRY_PASSWD}}
-      SERVBOT_USER: ${{ secrets.SERVBOT_USER }}
       SERVBOT_PAT: ${{ secrets.SERVBOT_PAT }}
-      P4PORT: ${{secrets.P4PORT}}
-      P4USER: ${{secrets.P4USER}}
-      P4PASSWD: ${{secrets.P4PASSWD}}
-      RUN_FIRST_TIME: ${{secrets.RUN_FIRST_TIME}}
-      TEAM_RESTRICTIVE_CLOSED_BRANCH: ${{ secrets.TEAM_RESTRICTIVE_CLOSED_BRANCH }}      
       FROM_EMAIL: ${{ secrets.FROM_EMAIL }}
       TO_EMAIL: ${{ secrets.TO_EMAIL }} 
-      DATE_MIN_CHECK_COMMITS: "${{ secrets.DATE_MIN_CHECK_COMMITS }}"
-
+      GITLAB_PAT: "${{ secrets.GITLAB_PAT }}"
+      GITLAB_REPO_URL: "${{ secrets.GITLAB_REPO_URL }}"
+      
   delivery:
     needs: [qa_linux,qa_windows_no_container,build_tools_linux,build_tools_windows_no_container]
     # DEV ONLY # runs-on: dev_delivery

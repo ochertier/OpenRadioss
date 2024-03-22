@@ -1,32 +1,32 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  M15CPLRC                      source/materials/mat/mat015/m15cplrc.F
 Chd|-- called by -----------
 Chd|        SIGEPS15C                     source/materials/mat/mat015/sigeps15c.F
 Chd|-- calls ---------------
 Chd|====================================================================
-      SUBROUTINE M15CPLRC(JFT    ,JLT    ,PM     ,WPLA   ,DIR   ,
+      SUBROUTINE M15CPLRC(JFT    ,JLT    ,PM     ,WPLA   ,
      2                    IMATLY ,DAMT   ,SHF    ,NGL    ,SIGE  ,
      3                    DEPSXX ,DEPSYY ,DEPSXY ,DEPSYZ ,DEPSZX,
      4                    SIGOXX ,SIGOYY ,SIGOXY ,SIGOYZ ,SIGOZX,
@@ -46,20 +46,14 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "units_c.inc"
-#include      "scr03_c.inc"
-#include      "com01_c.inc"
-#include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
-
 C-----------------------------------------------
       INTEGER NGL(MVSIZ),NEL
-      INTEGER JFT,JLT, ISRATE(*)
+      INTEGER JFT,JLT, ISRATE
 C     REAL
       my_real
-     .   PM(NPROPM,*),WPLA(*),DIR(NEL,2),
-     .   DAMT(NEL,2),SHF(*),EPSP(*),
+     .   PM(NPROPM,*),WPLA(*),DAMT(NEL,2),SHF(*),EPSP(*),
      .   SIGE(MVSIZ,5),
      .   DEPSXX(MVSIZ),DEPSYY(MVSIZ),DEPSXY(MVSIZ),DEPSYZ(MVSIZ),
      .   DEPSZX(MVSIZ),
@@ -179,7 +173,7 @@ C-------------------------------------------------------------------
 C     STRAIN RATE
 C-------------------------------------------------------------------
       DO I=JFT,JLT
-        IF (ISRATE(I) == 0) EPSP(I) = MAX(
+        IF (ISRATE == 0) EPSP(I) = MAX(
      .                     ABS(DEPSXX(I)),ABS(DEPSYY(I)),ABS(DEPSXY(I)),
      .                     ABS(DEPSYZ(I)),ABS(DEPSZX(I))) / MAX(DT1,EM30)
         IF (EPSP(I) > EPDR(I)) THEN
@@ -208,7 +202,7 @@ C-------------------------------------------------------------------
         WVEC(I)=F1(I) *T1(I)       + F2(I) *T2(I) +
      .          F11(I)*T1(I)*T1(I) + F22(I)*T2(I)*T2(I) +
      .          F33(I)*T3(I)*T3(I) + TWO*F12(I)*T1(I)*T2(I)
-        TSAIWU(I) = MIN(WVEC(I)/FYLD(I),ONE)
+        TSAIWU(I) = MAX(MIN(WVEC(I)/FYLD(I),ONE),TSAIWU(I))
       ENDDO
 C
       DO I=JFT,JLT

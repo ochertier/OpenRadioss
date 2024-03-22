@@ -1,35 +1,39 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  I8MSR3                        source/interfaces/inter3d/i8msr3.F
 Chd|-- called by -----------
 Chd|        INTVO8                        source/interfaces/inter3d/intvo8.F
 Chd|-- calls ---------------
 Chd|        I8_NEAREST_SEG                source/interfaces/inter3d/i8_nearest_seg.F
-Chd|        INT8_MOD                      ../common_source/modules/int8_mod.F
+Chd|        INT8_MOD                      ../common_source/modules/interfaces/int8_mod.F
 Chd|====================================================================
-      SUBROUTINE I8MSR3(X,IRECT,LMSR,MSR,NSV,ILOC,IRTL,NSEG,XFACE, 
-     .           NBSECNDS,ITAB,HAS_MOVED,TAB_RMAX,TAB_RMAX_UID)
+      SUBROUTINE I8MSR3(
+     1   X,           IRECT,       LMSR,        MSR,
+     2   NSV,         ILOC,        IRTL,        NSEG,
+     3   XFACE,       NBSECNDS,    ITAB,        HAS_MOVED,
+     4   TAB_RMAX,    TAB_RMAX_UID,LFT,         LLT,
+     5   NFT)
 C-----------------------------------------------
 C   I n f o r m a t i o n s            
 C-----------------------------------------------
@@ -50,18 +54,17 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(INOUT) :: LFT
+      INTEGER, INTENT(INOUT) :: LLT
+      INTEGER, INTENT(INOUT) :: NFT
       INTEGER, INTENT(IN)  :: IRECT(4,*), LMSR(*), MSR(*), NSV(*), ILOC(*), NSEG(*)
       INTEGER, INTENT(INOUT) :: IRTL(*)
       my_real, DIMENSION(MVSIZ), INTENT(IN) ::  XFACE
       my_real, INTENT(IN)  ::  X(3,*)
-	  
+            
       INTEGER TAB_RMAX_UID(4,*),HAS_MOVED(*)
       INTEGER NBSECNDS,ITAB(*)
       my_real TAB_RMAX(*)
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "vect07_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -177,7 +180,7 @@ C
          ENDDO  !LL=LL1,LL2
 C
          IRTL(IL)=LSEG_NEW
-		 HAS_MOVED(IL)=1
+           HAS_MOVED(IL)=1
  200     CONTINUE
 
          TAB_RMAX(IL) = BMAX 
@@ -185,30 +188,9 @@ C
          TAB_RMAX_UID(2,IL) = ITAB(MSR(IRECT(2,LSEG_NEW)))
          TAB_RMAX_UID(3,IL) = ITAB(MSR(IRECT(3,LSEG_NEW)))
          TAB_RMAX_UID(4,IL) = ITAB(MSR(IRECT(4,LSEG_NEW)))
-		 
+           
         ENDIF !XFACE
       ENDDO !I=LFT,LLT
 
       RETURN
       END
-
-      FUNCTION IS_SUP_FACE_ID(A,B)
-C-----------------------------------------------
-C   I n f o r m a t i o n s            
-C-----------------------------------------------
-C Comparison of the User ID of two faces.
-C This UID is defined by four User ID of the nodes
-C-----------------------------------------------
-C   D u m m y   A r g u m e n t s
-C-----------------------------------------------
-        INTEGER :: A(4),B(4)
-        INTEGER :: IS_SUP_FACE_ID
-        IS_SUP_FACE_ID = 0       
-        IF( A(1) > B(1) .OR.
-     .  A(1) == B(1) .AND. ( A(2) > B(2) .OR.
-     .  A(2) == B(2) .AND. ( A(3) > B(3) .OR.
-     .  A(3) == B(3) .AND. A(4) > B(4)))) THEN
-          IS_SUP_FACE_ID = 1
-        ENDIF
-        RETURN
-      END FUNCTION

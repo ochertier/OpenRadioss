@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  HM_OPTION_COUNT               source/devtools/hm_reader/hm_option_count.F
 Chd|-- called by -----------
@@ -30,6 +30,7 @@ Chd|        HM_CONVERT_INTER_TYPE19       source/devtools/hm_reader/hm_convert_i
 Chd|        HM_COUNT_2D_ELEMENT_SEATBELT  source/devtools/hm_reader/hm_count_2d_element_seatbelt.F
 Chd|        HM_DEBUG_PRINT_OPTION         source/devtools/hm_reader/hm_debug_print_option.F
 Chd|        HM_GET_MAX_ID                 source/devtools/hm_reader/hm_get_max_id.F
+Chd|        HM_MESSAGES                   source/devtools/hm_reader/hm_messages.F
 Chd|        HM_PREREAD_BEM                source/loads/bem/hm_read_bem.F
 Chd|        HM_PREREAD_IMPACC             source/constraints/general/impvel/hm_preread_impacc.F
 Chd|        HM_PREREAD_IMPDISP            source/constraints/general/impvel/hm_preread_impdisp.F
@@ -59,6 +60,7 @@ Chd|        HM_READ_LAGMUL                source/tools/lagmul/hm_read_lagmul.F
 Chd|        HM_READ_LEAK                  source/airbag/hm_read_leak.F  
 Chd|        HM_READ_MOVE_FUNCT            source/tools/curve/hm_read_move_funct.F
 Chd|        HM_READ_NONLOCAL              source/materials/nonlocal/hm_read_nonlocal.F
+Chd|        HM_READ_PCYL                  source/loads/general/load_pcyl/hm_read_pcyl.F
 Chd|        HM_READ_PERTURB               source/general_controls/computation/hm_read_perturb.F
 Chd|        HM_READ_PERTURB_FAIL          source/general_controls/computation/hm_read_perturb_fail.F
 Chd|        HM_READ_PRETHGROU             source/output/th/hm_read_prethgrou.F
@@ -87,6 +89,7 @@ Chd|        NBFUNCT                       source/tools/curve/nbfunc.F
 Chd|        NBSPH                         source/elements/sph/nbsph.F   
 Chd|        R2R_PRELEC                    source/coupling/rad2rad/r2r_prelec.F
 Chd|        READ_ALE_MAT                  source/materials/ale/read_ale_mat.F
+Chd|        READ_DETONATORS               source/initial_conditions/detonation/read_detonators.F
 Chd|        READ_ENGINE_DRIVER            source/general_controls/engine/read_engine_driver.F
 Chd|        READ_EULER_MAT                source/materials/ale/read_euler_mat.F
 Chd|        READ_RWALL                    source/constraints/general/rwall/read_rwall.F
@@ -135,10 +138,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "nchar_c.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
 C INPUT ARGUMENTS
@@ -146,15 +145,6 @@ C INPUT ARGUMENTS
 C OUTPUT ARGUMENTS
       INTEGER,INTENT(OUT)::HM_OPTION_NUMBER
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
-C   L o c a l   V a r i a b l e s
-C-----------------------------------------------
-C-----------------------------------------------
-C   E x t e r n a l   F u n c t i o n s
-C-----------------------------------------------
-C=======================================================================
       CALL CPP_OPTION_COUNT(ENTITY_TYPE(1:LEN_TRIM(ENTITY_TYPE)),LEN_TRIM(ENTITY_TYPE),HM_OPTION_NUMBER) 
       RETURN
 C

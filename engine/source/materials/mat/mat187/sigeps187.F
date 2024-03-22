@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  SIGEPS187                     source/materials/mat/mat187/sigeps187.F
 Chd|-- called by -----------
@@ -52,9 +52,7 @@ C-----------------------------------------------
 C   G L O B A L   P A R A M E T E R S
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "scr17_c.inc"
 #include      "param_c.inc"
-#include      "vect01_c.inc"
 C-----------------------------------------------
 C   C O M M O N
 C-----------------------------------------------
@@ -379,7 +377,7 @@ C      ----------------------------------------------------
        DO II=1,NINDX                                              
         I = INDX(II)                                             
         !IF (SIG(I)>YLD(I).AND.OFF(I) == ONE)THEN
-	   DPLA(I)= UVAR(I,3)+ EM09
+             DPLA(I)= UVAR(I,3)+ EM09
 
         !DPLA(I)= (SIG(I)-YLD(I))/(THREE*G+DYDX(I))
         DEPLXX(I)=ZERO
@@ -555,7 +553,7 @@ c     .        -G * (DU * DF6) **2
          ENDIF
   
         ENDDO  ! iter  
-	   UVAR(I,3)=DPLA(I)       
+             UVAR(I,3)=DPLA(I)       
        ENDDO ! NINDX
 C-------------------
 C-------------------
@@ -681,9 +679,9 @@ C     ----------------------------------------------------
         !--------------------
         !PLASTIC FLOW
         !--------------------
-	       !DPLA(I)= UVAR(I,3)
+                 !DPLA(I)= UVAR(I,3)
          !DPLA(I)= (SIG(I)-YLD(I))/(THREE*G+DYDX(I))
-	    DPLA(I)= UVAR(I,3)+ EM09
+              DPLA(I)= UVAR(I,3)+ EM09
          DEPLXX(I)=ZERO
          DEPLYY(I)=ZERO
          DEPLZZ(I)=ZERO
@@ -810,7 +808,7 @@ C     ----------------------------------------------------
           ENDIF
 
          ENDDO !iter   
-	        UVAR(I,3)=DPLA(I)       
+                  UVAR(I,3)=DPLA(I)       
        ENDDO ! NINDX
 C=======================================================================
       ELSE !IFLAGSR PLASTIC STRAIN RATE ******************************
@@ -847,7 +845,7 @@ C=======================================================================
 
 
        
-	       !DPLA(I)= UVAR(I,3)
+                 !DPLA(I)= UVAR(I,3)
         !DPLA(I)= (SIG(I)-YLD(I))/(THREE*G+DYDX(I))
          DEPLXX(I)=ZERO
          DEPLYY(I)=ZERO

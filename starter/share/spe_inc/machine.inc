@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>    
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -24,25 +24,10 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 C
 C----------------------------------------------------------------------
 C
-#if CPP_mach == CPP_p4win32
-      CPUNAM ='win32'
-      ARCHTITLE='Windows 32 bits, Intel compiler'
-      IBUILTIN=23
-C
-#elif CPP_mach == CPP_p4win64
+#if CPP_mach == CPP_p4win64
       CPUNAM ='win64'
       ARCHTITLE='Windows 64 bits, Intel compiler'
       IBUILTIN=22
-C
-#elif CPP_mach == CPP_linux
-      CPUNAM ='linux32 pgi'
-      ARCHTITLE='Linux 32 bits, PGI compiler'
-      IBUILTIN=9
-C
-#elif CPP_mach == CPP_p4linux932
-      CPUNAM ='linux32'
-      ARCHTITLE='Linux 32 bits, Intel compiler'
-      IBUILTIN=25
 C
 #elif CPP_mach == CPP_linux964
       CPUNAM ='pgi_linux64'
@@ -60,34 +45,8 @@ C
 #elif 1
       ARCHTITLE='Linux 64 bits, Intel compiler'
 #endif
-
       IBUILTIN=18
 C
-#elif CPP_mach == CPP_il
-      CPUNAM = 'linuxia64'
-      ARCHTITLE='Linux Itanium 64 bits, Intel compiler'
-      IBUILTIN=10
-C
-#elif CPP_mach == CPP_pwr4
-      CPUNAM ='aix64'
-      ARCHTITLE='AIX 64 bits, IBM compiler'
-      IBUILTIN = 5
-C
-#elif CPP_mach == CPP_sun25
-#if CPP_rel == 1000
-      CPUNAM ='solarisx64'
-      ARCHTITLE='Solaris 64 bits, SUN compiler'
-      IBUILTIN = 24
-#elif 1
-      DATA CPUNAM /'UNKNOWN PLATFORM'/
-      ARCHTITLE='UNKNOWN PLATFORM'
-      IBUILTIN = 1
-#endif
-C
-#elif CPP_mach == CPP_macosx64
-      CPUNAM ='macosx64'
-      ARCHTITLE='Mac OS/X 64 bits, Intel compiler'
-      IBUILTIN=26
 #elif 1
 C (elif 1) remplace (else) qui ne marche pas sur sgi6 avec des (elif)
       DATA CPUNAM /'UNKNOWN PLATFORM'/
@@ -105,28 +64,19 @@ C      BMUL0 = 0.25
       IEXPM=1
 C     IEXPM=1  allocation dynamique de memoire
 C     IEXPM=0  dimension fixe
-#if CPP_mach == CPP_c90 || CPP_mach == CPP_ymp || CPP_mach == CPP_ymp_spmd || CPP_mach == CPP_t90 || CPP_mach == CPP_t90_i3e
-      ICRAY=1
-      IRESP=0
-#else
+
       ICRAY=0
-Cow41j2 +++
       IF (IR4R8 .EQ. 1) THEN
         IRESP = 1
       ELSE
         IRESP = 0
       ENDIF
-#endif
+
 C     ICRAY=0  non cray
 C     ICRAY=1  cray (hpalloc)
       IMACH=3
 C     IMACH=0,1 ou 2  non spmd
 C     IMACH=3  seule reste spmd
-      IGFORM=-1
-C     IGFORM=0  fichiers de dessin binaire
-C     IGFORM=1  fichiers de dessin formate compatible IEEE
-C     IGFORM=2  fichiers de dessin formate
-C     IGFORM=3  fichiers de dessin binaire compatible IEEE
       IRFORM=12
 C IRFORM= 5*irfe + irfl
 C irfl=0  lecture fichiers de restart binaire 32/64 bits

@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  FAIL_ORTHBIQUAD_C             source/materials/fail/orthbiquad/fail_orthbiquad_c.F
 Chd|-- called by -----------
@@ -32,13 +32,12 @@ Chd|====================================================================
      1           NEL      ,NUVAR    ,
      2           TIME     ,UPARAM   ,NGL      ,IPT      ,NPTOT    ,
      3           SIGNXX   ,SIGNYY   ,SIGNXY   ,SIGNYZ   ,SIGNZX   ,
-     4           DPLA     ,EPSP     ,UVAR     ,PTHKF    ,UEL1     ,
+     4           DPLA     ,EPSP     ,UVAR     ,UEL1     ,
      5           OFF      ,OFFL     ,DFMAX    ,TDEL     ,NFUNC    ,
      6           IFUNC    ,NPF      ,TF       ,ALDT     ,FOFF     ,
      7           IPG      )
 C-----------------------------------------------
 C    ORTHOTROPIC BIQUADRATIC FAILURE MODEL
-C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -47,9 +46,6 @@ C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include "units_c.inc"
-#include "param_c.inc"
-#include "scr17_c.inc"
-#include "scr19_c.inc"
 #include "comlock.inc"
 #include "mvsiz_p.inc"
 C---------+---------+---+---+--------------------------------------------
@@ -88,7 +84,7 @@ C-----------------------------------------------
       INTEGER NEL,NUVAR,IPT,NPTOT,NFUNC,IPG
       INTEGER NGL(NEL),IFUNC(NFUNC)
       my_real TIME,UPARAM(*),DPLA(NEL),EPSP(NEL),
-     .   UEL1(NEL),ALDT(NEL),PTHKF
+     .   UEL1(NEL),ALDT(NEL)
 C-----------------------------------------------
 C   I N P U T   O U T P U T   A r g u m e n t s 
 C-----------------------------------------------
@@ -120,6 +116,7 @@ C-----------------------------------------------
       my_real X_1(3),X_2(3),c3,DYDX,COS2(10,10),EPSD0,CJC,RATE_SCALE,FRATE
       my_real EPS_FAIL,EPS_FAIL2,DAMAGE,INST,FSCALE_LEN,MOHR_RADIUS
       my_real P1X,P1Y,S1X,S1Y,S2Y,A1,A2,B1,B2,C1,C2,FAC,LAMBDA,COS2THETA(NEL)
+      my_real SIG1(NEL),SIG2(NEL),MOHR_CENTER
       my_real, DIMENSION(:), ALLOCATABLE :: Q_X11,Q_X12,Q_X13,Q_X21,Q_X22,Q_X23,Q_INST
 C
       DATA  COS2/
@@ -143,7 +140,6 @@ c
       ! - INITIALISATION OF COMPUTATION ON TIME STEP
       !=======================================================================
       ! Recovering model parameters
-      PTHKF      = UPARAM(1)
       SEL        = INT(UPARAM(2))
       REF_EL_LEN = UPARAM(3)
       EPSD0      = UPARAM(4)
@@ -213,10 +209,16 @@ c
 c
           ! Computation of loading angle
           MOHR_RADIUS = SQRT(((SIGNXX(I)-SIGNYY(I))/TWO)**2 + SIGNXY(I)**2)
+          MOHR_CENTER = (SIGNXX(I)+SIGNYY(I))/TWO
           IF (MOHR_RADIUS > EM20) THEN
             COS2THETA(I) = ((SIGNXX(I)-SIGNYY(I))/TWO)/MOHR_RADIUS
           ELSE
             COS2THETA(I) = ONE
+          ENDIF
+          SIG1(I) = MOHR_CENTER + MOHR_RADIUS
+          SIG2(I) = MOHR_CENTER - MOHR_RADIUS
+          IF (SIG1(I)<ZERO.OR.((SIG2(I)<ZERO).AND.(SIG2(I)<-SIG1(I)))) THEN 
+            COS2THETA(I) = -COS2THETA(I)
           ENDIF
 c
           ! Computation of the BIQUAD parameters

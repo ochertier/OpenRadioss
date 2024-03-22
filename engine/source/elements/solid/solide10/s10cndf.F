@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  S10CNDF1                      source/elements/solid/solide10/s10cndf.F
 Chd|-- called by -----------
@@ -34,13 +34,6 @@ Chd|====================================================================
      1                   ADDCNCND,PROCNCND,A    ,IADCND,FSKYCND,
      2                   ITAGND  , NODFTSK,NODLTSK,EFTSK ,ELTSK ,
      3                   ITSK  ,ITAB   ,STIFN ,STIFND)
-C Called from              
-C I7FCOM_POFF resol:4581
-C FORINT      resol:4808
-C I7FCOM_POFF resol:5186 Get STIFN from remote nodes (STIFI -> STIFN) 
-C ASSPAR      resol:5244
-C S10CNDF1    resol:5630
-C
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -50,35 +43,26 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr05_c.inc"
-#include      "param_c.inc"
 #include      "task_c.inc"
 #include      "parit_c.inc"
 #include      "spmd_c.inc"
 #include      "comlock.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER ICNDS10(3,*),WEIGHT(*),IAD_CNDM(*),FR_CNDM(*),FR_NBCCCND(2,*),
      .        ADDCNCND(*),PROCNCND(*),IADCND(2,*),ITAGND(*),ITAB(*)
       INTEGER NODFTSK,NODLTSK,EFTSK,ELTSK,ITSK
-C     REAL
       my_real
      .   A(3,*),FSKYCND(4,*),STIFN(*),STIFND(*)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, J, N, K,ISIZE,LCOMM,LENS,LENR,NCT,NC,N1,N2,ND,IAD1,IAD2,IK
-C     REAL
       my_real
      .   FX,FY,FZ ,FAC,STIF
 C======================================================================|
@@ -96,7 +80,7 @@ C----pass1 : only N1,N2 are secnd nodes of Int2
          END DO
 !$OMP END SINGLE
        ENDIF
-       IF (IPARIT/=0.AND.ITSK==0) FSKYCND(1:4,1:LCNCND)=ZERO	
+       IF (IPARIT/=0.AND.ITSK==0) FSKYCND(1:4,1:LCNCND)=ZERO
 C------- change STIFND(I) :int  to ele
 C       IF (.FALSE.) THEN
 C#include "vectorize.inc"
@@ -140,10 +124,10 @@ C------------------------
 C------------------------      
        CALL MY_BARRIER()
 C------------------------      
-	 DO K = 1,NTHREAD-1
-	  IK = K*NUMNOD
+           DO K = 1,NTHREAD-1
+            IK = K*NUMNOD
           DO I=NODFTSK,NODLTSK
-	   IF (ITAGND(I)>0) THEN
+             IF (ITAGND(I)>0) THEN
             A(1,I) = A(1,I) + A(1,I+IK) 
             A(2,I) = A(2,I) + A(2,I+IK) 
             A(3,I) = A(3,I) + A(3,I+IK) 
@@ -152,17 +136,17 @@ C------------------------
             A(2,I+IK) = ZERO 
             A(3,I+IK) = ZERO 
             STIFN(I+IK) = ZERO
-	   END IF 
-	  END DO
+             END IF 
+            END DO
          END DO
 C------------------------      
        CALL MY_BARRIER()
 C------------------------      
          IF (NSPMD>1.AND.ITSK==0) THEN
-	  LCOMM =IAD_CNDM(NSPMD+1)-IAD_CNDM(1)
+            LCOMM =IAD_CNDM(NSPMD+1)-IAD_CNDM(1)
           CALL SPMD_EXCH_A_SCND(
      .        A    ,STIFN  ,FR_CNDM,IAD_CNDM,LCOMM,ISIZE)
-	 END IF
+           END IF
        ELSE ! P/ON
 #include "vectorize.inc"
          DO I=EFTSK,ELTSK
@@ -195,13 +179,13 @@ C------------------------
        CALL MY_BARRIER()
 C------------------------      
          IF (NSPMD>1.AND.ITSK==0) THEN
-	  LCOMM =IAD_CNDM(NSPMD+1)-IAD_CNDM(1)
+            LCOMM =IAD_CNDM(NSPMD+1)-IAD_CNDM(1)
           LENS = FR_NBCCCND(1,NSPMD+1)
           LENR = FR_NBCCCND(2,NSPMD+1)
           CALL SPMD_EXCH_A_SCND_PON(
      1         FR_CNDM,IAD_CNDM,ADDCNCND,PROCNCND,FR_NBCCCND,
      2         ISIZE,LENR   ,LENS   ,FSKYCND)
-	 END IF
+           END IF
 C------------------------      
        CALL MY_BARRIER()
 C------------------------      
@@ -209,7 +193,7 @@ C
 C Routine assemblage parith/ON
 C----------to be optimized after
          DO N = NODFTSK,NODLTSK
-	  IF (ITAGND(N)==0) CYCLE
+            IF (ITAGND(N)==0) CYCLE
           NCT = ADDCNCND(N)-1
           NC = ADDCNCND(N+1)-ADDCNCND(N)
           DO K = NCT+1, NCT+NC
@@ -247,16 +231,10 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr05_c.inc"
-#include      "param_c.inc"
 #include      "task_c.inc"
 #include      "parit_c.inc"
 #include      "spmd_c.inc"
@@ -292,7 +270,7 @@ C----pass2 : all excepting N1,N2 are secnd nodes of Int2
          END DO
 !$OMP END SINGLE
        ENDIF
-       IF (IPARIT/=0.AND.ITSK==0) FSKYCND(1:4,1:LCNCND)=ZERO	
+       IF (IPARIT/=0.AND.ITSK==0) FSKYCND(1:4,1:LCNCND)=ZERO
 C------------------------      
        CALL MY_BARRIER()
 C------------------------      
@@ -303,33 +281,33 @@ C------------------------
            ND  = IABS(ICNDS10(1,I))
            N1  = ICNDS10(2,I)
            N2  = ICNDS10(3,I)
-	   FAC = HALF*WEIGHT(ND)
+             FAC = HALF*WEIGHT(ND)
            FX = FAC*A(1,ND)
            FY = FAC*A(2,ND)
            FZ = FAC*A(3,ND)
            STIF = MAX(ZERO,FAC*(STIFN(ND)-STIFND(I)))
-	  IF (ITAGND(N1)==0) THEN
-	   N1 = N1 + IK
+            IF (ITAGND(N1)==0) THEN
+             N1 = N1 + IK
            A(1,N1) = A(1,N1) + FX 
            A(2,N1) = A(2,N1) + FY 
            A(3,N1) = A(3,N1) + FZ 
            STIFN(N1) = STIFN(N1) + STIF 
-	  END IF 
-	  IF (ITAGND(N2)==0) THEN
-	   N2 = N2 + IK
+            END IF 
+            IF (ITAGND(N2)==0) THEN
+             N2 = N2 + IK
            A(1,N2) = A(1,N2) + FX 
            A(2,N2) = A(2,N2) + FY 
            A(3,N2) = A(3,N2) + FZ 
            STIFN(N2) = STIFN(N2) + STIF 
-	  END IF 
+            END IF 
          END DO
 C------------------------      
        CALL MY_BARRIER()
 C------------------------      
-	 DO K = 1,NTHREAD-1
-	  IK = K*NUMNOD
+           DO K = 1,NTHREAD-1
+            IK = K*NUMNOD
           DO I=NODFTSK,NODLTSK
-	   IF (ITAGND(I)==0) THEN
+             IF (ITAGND(I)==0) THEN
             A(1,I) = A(1,I) + A(1,I+IK) 
             A(2,I) = A(2,I) + A(2,I+IK) 
             A(3,I) = A(3,I) + A(3,I+IK) 
@@ -338,17 +316,17 @@ C------------------------
             A(2,I+IK) = ZERO 
             A(3,I+IK) = ZERO 
             STIFN(I+IK) = ZERO
-	   END IF 
-	  END DO
+             END IF 
+            END DO
          END DO
 C------------------------      
        CALL MY_BARRIER()
 C------------------------
          IF (NSPMD>1.AND.ITSK==0) THEN
-	  LCOMM =IAD_CNDM(NSPMD+1)-IAD_CNDM(1)
+            LCOMM =IAD_CNDM(NSPMD+1)-IAD_CNDM(1)
           CALL SPMD_EXCH_A_SCND(
      .        A    ,STIFN  ,FR_CNDM,IAD_CNDM,LCOMM,ISIZE)
-	 END IF
+           END IF
         STIFND(EFTSK:ELTSK) = ZERO
        ELSE
 #include "vectorize.inc"
@@ -380,20 +358,20 @@ C------------------------
        CALL MY_BARRIER()
 C------------------------      
          IF (NSPMD>1.AND.ITSK==0) THEN
-	  LCOMM =IAD_CNDM(NSPMD+1)-IAD_CNDM(1)
+            LCOMM =IAD_CNDM(NSPMD+1)-IAD_CNDM(1)
           LENS = FR_NBCCCND(1,NSPMD+1)
           LENR = FR_NBCCCND(2,NSPMD+1)
           CALL SPMD_EXCH_A_SCND_PON(
      1         FR_CNDM,IAD_CNDM,ADDCNCND,PROCNCND,FR_NBCCCND,
      2         ISIZE,LENR   ,LENS   ,FSKYCND)
-	 END IF
+           END IF
 C------------------------      
        CALL MY_BARRIER()
 C------------------------      
 C Routine assemblage parith/ON
 C----------to be optimized after
          DO N = NODFTSK,NODLTSK
-	  IF (ITAGND(N)/=0) CYCLE
+            IF (ITAGND(N)/=0) CYCLE
           NCT = ADDCNCND(N)-1
           NC = ADDCNCND(N+1)-ADDCNCND(N)
           DO K = NCT+1, NCT+NC
@@ -418,9 +396,6 @@ Chd|====================================================================
      1                      ADDCNCND,PROCNCND,VND  ,V   ,ITAB    ,
      2                      IAD_CNDM1,FR_CNDM1,FR_NBCCCND1)
 C-----------------------------------------------
-C   M o d u l e s
-C-----------------------------------------------
-C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
@@ -429,10 +404,8 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "param_c.inc"
 #include      "parit_c.inc"
 #include      "task_c.inc"
-#include      "spmd_c.inc"
 C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -484,16 +457,16 @@ C
           FR_NBCCCND(2,NSPMD+1) = FR_NBCCCND(2,NSPMD+1)+FR_NBCCCND(2,I)
         ENDDO
        END IF !(IPARIT/=0.AND.IPARIT/=3) THEN
-C------for pass1	
+C------for pass1
         IAD_CNDM1(1) = 1
         DO I = 1, NSPMD
          K = 0
          DO J=IAD_CNDM(I),IAD_CNDM(I+1)-1
           NOD = FR_CNDM(J)
           IF (ITAGND(NOD)>0) THEN
-	   K = K + 1
-	   FR_CNDM1(K+IAD_CNDM1(I)-1) = NOD
-	  END IF
+             K = K + 1
+             FR_CNDM1(K+IAD_CNDM1(I)-1) = NOD
+            END IF
          ENDDO
          IAD_CNDM1(I+1) = IAD_CNDM1(I) + K
         ENDDO
@@ -549,7 +522,6 @@ C-----------------------------------------------
 #include      "param_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -585,9 +557,9 @@ C -------add RBE3  after
             NS = INTBUF_TAB(N)%NSV(I)
             IF (ITAGS(NS)==0) ITAGS(NS)=NUS
             L = INTBUF_TAB(N)%IRTLM(I)
-	    DO J = 1, 4
-	     II = 4*(L-1)+J
-	     IM = INTBUF_TAB(N)%IRECTM(II)
+              DO J = 1, 4
+               II = 4*(L-1)+J
+               IM = INTBUF_TAB(N)%IRECTM(II)
              IF (ITAGND(IM)>0) THEN
               ITAGND(IM) = ITAGND(IM) + NS10E
              ELSEIF(ITAGND(IM)<0) THEN
@@ -601,9 +573,9 @@ C -------add RBE3  after
            NS = INTBUF_TAB(N)%NSV(I)
            IF (ITAGS(NS)==0) ITAGS(NS)=NUS
            L = INTBUF_TAB(N)%IRTLM(I)
-	   DO J = 1, 4
-	    II = 4*(L-1)+J
-	    IM = INTBUF_TAB(N)%IRECTM(II)
+             DO J = 1, 4
+              II = 4*(L-1)+J
+              IM = INTBUF_TAB(N)%IRECTM(II)
             IF (ITAGND(IM)>0) THEN
              ITAGND(IM) = ITAGND(IM) + NS10E
             ELSEIF(ITAGND(IM)<0) THEN
@@ -657,16 +629,11 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com06_c.inc"
-#include      "com08_c.inc"
 #include      "comlock.inc"
 #include      "parit_c.inc"
 #include      "spmd_c.inc"
@@ -689,7 +656,7 @@ CC     REAL
       my_real
      .   TMP(NUMNOD)
 C======================================================================|
-       IF (IPARIT/=0) FSKYCND(1:3,1:LCNCND)=ZERO	
+       IF (IPARIT/=0) FSKYCND(1:3,1:LCNCND)=ZERO
        ISIZE = 4
 C                                                           
        IF (IPARIT == 0 ) THEN
@@ -798,26 +765,15 @@ Chd|====================================================================
      2                     NODFTSK,NODLTSK,EFTSK ,ELTSK ,ITSK   ,
      3                     STIFN ,STIFND)
 C-----------------------------------------------
-C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr05_c.inc"
-#include      "param_c.inc"
 #include      "task_c.inc"
-#include      "parit_c.inc"
-#include      "spmd_c.inc"
 #include      "comlock.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -870,10 +826,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -915,10 +869,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -958,15 +910,9 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com06_c.inc"
 #include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -983,12 +929,12 @@ C     REAL
          DO I=1,NS10E
            N1  = ICNDS10(2,I)
            N2  = ICNDS10(3,I)
-	  if (itab(n1)==1294333.and.itab(n2)==1338494) then
+            if (itab(n1)==1294333.and.itab(n2)==1338494) then
            ND  = IABS(ICNDS10(1,I))
            write(iout,*)'ND,N1,N2, A,V=',itab(nd),itab(n1),itab(n2)
            write(iout,*)a(1,ND),a(2,ND),a(3,ND)
            write(iout,*)v(1,ND),v(2,ND),v(3,ND)
-	  end if
+            end if
          END DO
 C----6---------------------------------------------------------------7---------8
       RETURN
@@ -1013,9 +959,7 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1047,9 +991,9 @@ C -------only cinematic--> mass condensation
           DO I=1,NSN
            IF (INTBUF_TAB(N)%IRUPT(I) /= 1) THEN
             L = INTBUF_TAB(N)%IRTLM(I)
-	    DO J = 1, 4
-	     II = 4*(L-1)+J
-	     IM = INTBUF_TAB(N)%IRECTM(II)
+              DO J = 1, 4
+               II = 4*(L-1)+J
+               IM = INTBUF_TAB(N)%IRECTM(II)
              IF (WEIGHT(IM)==0) CYCLE
              IF (ITAGND(IM)>0 .AND.ITAGND(IM)<= NS10E) THEN
               NKEND = NKEND + 1
@@ -1061,9 +1005,9 @@ C -------only cinematic--> mass condensation
          ELSEIF (ILEV <= 5 .or. ILEV == 30) THEN
           DO I=1,NSN
            L = INTBUF_TAB(N)%IRTLM(I)
-	   DO J = 1, 4
-	    II = 4*(L-1)+J
-	    IM = INTBUF_TAB(N)%IRECTM(II)
+             DO J = 1, 4
+              II = 4*(L-1)+J
+              IM = INTBUF_TAB(N)%IRECTM(II)
              IF (WEIGHT(IM)==0) CYCLE
              IF (ITAGND(IM)>0 .AND.ITAGND(IM)<= NS10E) THEN
               NKEND = NKEND + 1
@@ -1098,9 +1042,7 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1135,9 +1077,9 @@ C-----MASI2ND0 can be done here because DTNODA is called after INTTI1
           DO I=1,NSN
            IF (INTBUF_TAB(N)%IRUPT(I) /= 1) THEN
             L = INTBUF_TAB(N)%IRTLM(I)
-	    DO J = 1, 4
-	     II = 4*(L-1)+J
-	     IM = INTBUF_TAB(N)%IRECTM(II)
+              DO J = 1, 4
+               II = 4*(L-1)+J
+               IM = INTBUF_TAB(N)%IRECTM(II)
              IF (WEIGHT(IM)==0) CYCLE
              IF (ITAGND(IM)>0 .AND.ITAGND(IM)<= NS10E) THEN
               NK = NK + 1
@@ -1151,9 +1093,9 @@ C-----MASI2ND0 can be done here because DTNODA is called after INTTI1
          ELSEIF (ILEV <= 5 .or. ILEV == 30) THEN
           DO I=1,NSN
            L = INTBUF_TAB(N)%IRTLM(I)
-	   DO J = 1, 4
-	    II = 4*(L-1)+J
-	    IM = INTBUF_TAB(N)%IRECTM(II)
+             DO J = 1, 4
+              II = 4*(L-1)+J
+              IM = INTBUF_TAB(N)%IRECTM(II)
              IF (WEIGHT(IM)==0) CYCLE
              IF (ITAGND(IM)>0 .AND.ITAGND(IM)<= NS10E) THEN
               NK = NK + 1
@@ -1310,15 +1252,10 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com06_c.inc"
 #include      "com08_c.inc"
 #include      "comlock.inc"
 #include      "parit_c.inc"
@@ -1385,7 +1322,7 @@ C-------------------------------------------------
           DO N=1,IGRNOD(IGR)%NENTITY
            I=IGRNOD(IGR)%ENTITY(N)
            IF (ITAGS(I)==0) CYCLE
-		   J = ITAGS(I)
+             J = ITAGS(I)
            NMD  = IABS(ICNDS10(1,J))
            N1  = ICNDS10(2,J)
            N2  = ICNDS10(3,J)
@@ -1422,7 +1359,7 @@ C-------------------------------------------------
           DO N=1,IGRNOD(IGR)%NENTITY
             I=IGRNOD(IGR)%ENTITY(N)
            IF (ITAGS(I)==0) CYCLE
-		   J = ITAGS(I)
+             J = ITAGS(I)
            NMD  = IABS(ICNDS10(1,J))
            N1  = ICNDS10(2,J)
            N2  = ICNDS10(3,J)
@@ -1450,11 +1387,11 @@ C-------------------------------------------------
      .                +SKEW(8,ISK)*VY
      .                +SKEW(9,ISK)*VZ)
             DA_G(1)= SKEW(1,ISK)*VSKW(1)
-     .       	    +SKEW(4,ISK)*VSKW(2)
-     .       	    +SKEW(7,ISK)*VSKW(3)
+     .             +SKEW(4,ISK)*VSKW(2)
+     .             +SKEW(7,ISK)*VSKW(3)
             DA_G(2)= SKEW(2,ISK)*VSKW(1)
-     .       	    +SKEW(5,ISK)*VSKW(2)
-     .       	    +SKEW(8,ISK)*VSKW(3)
+     .             +SKEW(5,ISK)*VSKW(2)
+     .             +SKEW(8,ISK)*VSKW(3)
             DA_G(3)= SKEW(3,ISK)*VSKW(1)
      .              +SKEW(6,ISK)*VSKW(2)
      .              +SKEW(9,ISK)*VSKW(3)
@@ -1482,8 +1419,8 @@ C
      .        A    ,TMP  ,FR_CNDM,IAD_CNDM,LCOMM,ISIZE)
        END IF
       ELSE
-C-------P/ON	  
-       FSKYCND(1:3,1:LCNCND)=ZERO	
+C-------P/ON    
+       FSKYCND(1:3,1:LCNCND)=ZERO
       DO ND=1,NDAMP
         IGR   = NINT(DAMPR(2,ND))
         ISK   = NINT(DAMPR(15,ND))
@@ -1503,7 +1440,7 @@ C-------------------------------------------------
           DO N=1,IGRNOD(IGR)%NENTITY
            I=IGRNOD(IGR)%ENTITY(N)
            IF (ITAGS(I)==0) CYCLE
-		   J = ITAGS(I)
+             J = ITAGS(I)
            NMD  = IABS(ICNDS10(1,J))
            N1  = ICNDS10(2,J)
            N2  = ICNDS10(3,J)
@@ -1546,7 +1483,7 @@ C-------------------------------------------------
           DO N=1,IGRNOD(IGR)%NENTITY
             I=IGRNOD(IGR)%ENTITY(N)
            IF (ITAGS(I)==0) CYCLE
-		   J = ITAGS(I)
+             J = ITAGS(I)
            NMD  = IABS(ICNDS10(1,J))
            N1  = ICNDS10(2,J)
            N2  = ICNDS10(3,J)
@@ -1574,11 +1511,11 @@ C-------------------------------------------------
      .                +SKEW(8,ISK)*VY
      .                +SKEW(9,ISK)*VZ)
             DA_G(1)= SKEW(1,ISK)*VSKW(1)
-     .       	    +SKEW(4,ISK)*VSKW(2)
-     .       	    +SKEW(7,ISK)*VSKW(3)
+     .             +SKEW(4,ISK)*VSKW(2)
+     .             +SKEW(7,ISK)*VSKW(3)
             DA_G(2)= SKEW(2,ISK)*VSKW(1)
-     .       	    +SKEW(5,ISK)*VSKW(2)
-     .       	    +SKEW(8,ISK)*VSKW(3)
+     .             +SKEW(5,ISK)*VSKW(2)
+     .             +SKEW(8,ISK)*VSKW(3)
             DA_G(3)= SKEW(3,ISK)*VSKW(1)
      .              +SKEW(6,ISK)*VSKW(2)
      .              +SKEW(9,ISK)*VSKW(3)
@@ -1653,15 +1590,10 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com06_c.inc"
 #include      "com08_c.inc"
 #include      "comlock.inc"
 #include      "parit_c.inc"
@@ -1692,9 +1624,9 @@ C-----------------------------------------------
       EXTERNAL NGR2USR
 C======================================================================|
        IF (ISTAT/=1.AND.ISTAT/=3) RETURN
-C-------0.5*alpha	   
+C-------0.5*alpha     
        DAMPC=BETATE/(ONE + BETATE * DT12)
-c       DT05 = HALF*DT1	 
+c       DT05 = HALF*DT1   
        IF (IPARIT/=0) FSKYCND(1:3,1:LCNCND)=ZERO
        IF (ISTATG/=0) THEN      
         IF(ISTATG<0) ISTATG=NGR2USR(-ISTATG,IGRNOD,NGRNOD)
@@ -1855,39 +1787,26 @@ Chd|====================================================================
      2                     NODFTSK,NODLTSK,EFTSK ,ELTSK ,ITSK   ,
      3                     STIFN ,STIFND)
 C-----------------------------------------------
-C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr05_c.inc"
-#include      "param_c.inc"
 #include      "task_c.inc"
-#include      "parit_c.inc"
-#include      "spmd_c.inc"
 #include      "comlock.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER ICNDS10(3,*),WEIGHT(*),IAD_CNDS(*),FR_CNDS(*),ITAB(*)
       INTEGER NODFTSK,NODLTSK,EFTSK,ELTSK,ITSK
-C     REAL
-      my_real
-     .   STIFN(*),STIFND(*)
+      my_real STIFN(*),STIFND(*)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, J, N, K,LCOMM,IK,ND
-C     REAL
       my_real
      .   STIFEL(NS10E)
 C======================================================================|

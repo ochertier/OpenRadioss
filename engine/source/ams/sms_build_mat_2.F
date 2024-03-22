@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  SMS_BUILD_MAT_2               source/ams/sms_build_mat_2.F  
 Chd|-- called by -----------
@@ -30,7 +30,7 @@ Chd|        ARRET                         source/system/arret.F
 Chd|        MY_BARRIER                    source/system/machine.F       
 Chd|        SMS_BUILD_DIAG                source/ams/sms_build_diag.F   
 Chd|        SPMD_LIST_SMS                 source/mpi/ams/spmd_sms.F     
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
 Chd|        INTSTAMP_MOD                  share/modules/intstamp_mod.F  
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
@@ -72,25 +72,18 @@ C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "comlock.inc"
 C-----------------------------------------------
-#include "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com08_c.inc"
-#include      "intstamp_c.inc"
 #include      "kincod_c.inc"
 #include      "param_c.inc"
 #include      "parit_c.inc"
 #include      "sms_c.inc"
-#include      "scr01_c.inc"
-#include      "scr02_c.inc"
 #include      "scr17_c.inc"
 #include      "task_c.inc"
-#include      "units_c.inc"
 #include      "warn_c.inc"
-C-----------------------------------------------------------------
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER ITASK, NODFT, NODLT,
@@ -163,7 +156,9 @@ C-----
       DATA IPENTA6/1,2,3,5,6,7/
 C-----------------------------------------------
 C reset enforcement of contact sorting
+!$OMP SINGLE
       KFORSMS=0
+!$OMP END SINGLE
 C
       IF(IPARIT/=0)THEN
         IF(DEBUG(9)==0)THEN
@@ -389,9 +384,9 @@ C void elements may be into contact
             IF (OFFG(J) > ZERO) THEN
              MELE4 = HALF*DMELS(IE)
 C
-C             Q : Quelles VP pour M-1K ?  M=[ Mvettex+9dm, -dm      ,.....	  ]
-C         				    [	-dm	 , Medge+9dm, -dm, ....]
-C         				     .........
+C             Q : Quelles VP pour M-1K ?  M=[ Mvettex+9dm, -dm      ,.....    ]
+C                     [  -dm   , Medge+9dm, -dm, ....]
+C                      .........
 C             Mvertex = Mass/32, Medge=7*Mass/48
 C
 C             A: Supposed lambda(M) > Mvertex+10dm
@@ -409,8 +404,8 @@ C
              DO KK=1,4
                JJ = IXS(1+ILOC4(KK),IE)
                IF(JJ/=I.AND..NOT.(NATIV_SMS(I)==0.AND.NATIV_SMS(JJ)==0))THEN
-          	  LTK_SMS (IJ)=-MELE12
-          	  IJ=IJ+1
+            LTK_SMS (IJ)=-MELE12
+            IJ=IJ+1
                END IF
              END DO
 
@@ -419,8 +414,8 @@ C
                IF(JJ==0) CYCLE
 
                IF(.NOT.(NATIV_SMS(I)==0.AND.NATIV_SMS(JJ)==0))THEN
-          	  LTK_SMS (IJ)=-MELE12
-          	  IJ=IJ+1
+            LTK_SMS (IJ)=-MELE12
+            IJ=IJ+1
                END IF
              END DO
            END DO
@@ -435,8 +430,8 @@ C
              DO KK=1,4
                JJ = IXS(1+ILOC4(KK),IE)
                IF(.NOT.(NATIV_SMS(I)==0.AND.NATIV_SMS(JJ)==0))THEN
-          	  LTK_SMS (IJ)=-MELE12
-          	  IJ=IJ+1
+            LTK_SMS (IJ)=-MELE12
+            IJ=IJ+1
                END IF
              END DO
 
@@ -445,8 +440,8 @@ C
                IF(JJ==0) CYCLE
 
                IF(JJ/=I.AND..NOT.(NATIV_SMS(I)==0.AND.NATIV_SMS(JJ)==0))THEN
-          	  LTK_SMS (IJ)=-MELE12
-          	  IJ=IJ+1
+            LTK_SMS (IJ)=-MELE12
+            IJ=IJ+1
                END IF
              END DO
 
@@ -464,8 +459,8 @@ C          nd milieu inexistant, transfert aux sommets (symetrie dans JSM_SMS...
              DO KK=1,4
                JJ = IXS(1+ILOC4(KK),IE)
                IF(JJ/=I.AND..NOT.(NATIV_SMS(I)==0.AND.NATIV_SMS(JJ)==0))THEN
-          	  LTK_SMS (IJ)=LTK_SMS (IJ)-HALF*MELE12
-          	  IJ=IJ+1
+            LTK_SMS (IJ)=LTK_SMS (IJ)-HALF*MELE12
+            IJ=IJ+1
                END IF
              END DO
 
@@ -474,8 +469,8 @@ C          nd milieu inexistant, transfert aux sommets (symetrie dans JSM_SMS...
                IF(JJ==0) CYCLE
 
                IF(JJ/=I.AND..NOT.(NATIV_SMS(I)==0.AND.NATIV_SMS(JJ)==0))THEN
-          	  LTK_SMS (IJ)=LTK_SMS (IJ)-HALF*MELE12
-          	  IJ=IJ+1
+            LTK_SMS (IJ)=LTK_SMS (IJ)-HALF*MELE12
+            IJ=IJ+1
                END IF
              END DO
 
@@ -485,8 +480,8 @@ C          nd milieu inexistant, transfert aux sommets (symetrie dans JSM_SMS...
              DO KK=1,4
                JJ = IXS(1+ILOC4(KK),IE)
                IF(JJ/=I.AND..NOT.(NATIV_SMS(I)==0.AND.NATIV_SMS(JJ)==0))THEN
-          	  LTK_SMS (IJ)=LTK_SMS (IJ)-HALF*MELE12
-          	  IJ=IJ+1
+            LTK_SMS (IJ)=LTK_SMS (IJ)-HALF*MELE12
+            IJ=IJ+1
                END IF
              END DO
 
@@ -495,8 +490,8 @@ C          nd milieu inexistant, transfert aux sommets (symetrie dans JSM_SMS...
                IF(JJ==0) CYCLE
 
                IF(JJ/=I.AND..NOT.(NATIV_SMS(I)==0.AND.NATIV_SMS(JJ)==0))THEN
-          	  LTK_SMS (IJ)=LTK_SMS (IJ)-HALF*MELE12
-          	  IJ=IJ+1
+            LTK_SMS (IJ)=LTK_SMS (IJ)-HALF*MELE12
+            IJ=IJ+1
                END IF
              END DO
            END DO
@@ -512,9 +507,9 @@ C          nd milieu inexistant, transfert aux sommets (symetrie dans JSM_SMS...
             IF (OFFG(J) > ZERO) THEN
              MELE4 = HALF*DMELS(IE)
 C
-C             Q : Quelles VP pour M-1K ?  M=[ Mvettex+9dm, -dm      ,.....	  ]
-C         				    [	-dm	 , Medge+9dm, -dm, ....]
-C         				     .........
+C             Q : Quelles VP pour M-1K ?  M=[ Mvettex+9dm, -dm      ,.....    ]
+C                     [  -dm   , Medge+9dm, -dm, ....]
+C                      .........
 C             Mvertex = Mass/32, Medge=7*Mass/48
 C
 C             A: Supposed lambda(M) > Mvertex+10dm
@@ -532,8 +527,8 @@ C
              DO KK=1,4
                JJ = IXS(1+ILOC4(KK),IE)
                IF(JJ/=I.AND..NOT.(NATIV_SMS(I)==0.AND.NATIV_SMS(JJ)==0))THEN
-          	  LTK_SMS (IJ)=-MELE12
-          	  IJ=IJ+1
+            LTK_SMS (IJ)=-MELE12
+            IJ=IJ+1
                END IF
              END DO
 
@@ -542,8 +537,8 @@ C
                IF(JJ==0) CYCLE
 
                IF(.NOT.(NATIV_SMS(I)==0.AND.NATIV_SMS(JJ)==0))THEN
-          	  LTK_SMS (IJ)=-MELE12
-          	  IJ=IJ+1
+            LTK_SMS (IJ)=-MELE12
+            IJ=IJ+1
                END IF
              END DO
            END DO
@@ -558,8 +553,8 @@ C
              DO KK=1,4
                JJ = IXS(1+ILOC4(KK),IE)
                IF(.NOT.(NATIV_SMS(I)==0.AND.NATIV_SMS(JJ)==0))THEN
-          	  LTK_SMS (IJ)=-MELE12
-          	  IJ=IJ+1
+            LTK_SMS (IJ)=-MELE12
+            IJ=IJ+1
                END IF
              END DO
 
@@ -568,8 +563,8 @@ C
                IF(JJ==0) CYCLE
 
                IF(JJ/=I.AND..NOT.(NATIV_SMS(I)==0.AND.NATIV_SMS(JJ)==0))THEN
-          	  LTK_SMS (IJ)=-MELE12
-          	  IJ=IJ+1
+            LTK_SMS (IJ)=-MELE12
+            IJ=IJ+1
                END IF
              END DO
 
@@ -587,8 +582,8 @@ C          nd milieu inexistant, transfert aux sommets (symetrie dans JSM_SMS...
              DO KK=1,4
                JJ = IXS(1+ILOC4(KK),IE)
                IF(JJ/=I.AND..NOT.(NATIV_SMS(I)==0.AND.NATIV_SMS(JJ)==0))THEN
-          	  LTK_SMS (IJ)=LTK_SMS (IJ)-HALF*MELE12
-          	  IJ=IJ+1
+            LTK_SMS (IJ)=LTK_SMS (IJ)-HALF*MELE12
+            IJ=IJ+1
                END IF
              END DO
 
@@ -597,8 +592,8 @@ C          nd milieu inexistant, transfert aux sommets (symetrie dans JSM_SMS...
                IF(JJ==0) CYCLE
 
                IF(JJ/=I.AND..NOT.(NATIV_SMS(I)==0.AND.NATIV_SMS(JJ)==0))THEN
-          	  LTK_SMS (IJ)=LTK_SMS (IJ)-HALF*MELE12
-          	  IJ=IJ+1
+            LTK_SMS (IJ)=LTK_SMS (IJ)-HALF*MELE12
+            IJ=IJ+1
                END IF
              END DO
 
@@ -608,8 +603,8 @@ C          nd milieu inexistant, transfert aux sommets (symetrie dans JSM_SMS...
              DO KK=1,4
                JJ = IXS(1+ILOC4(KK),IE)
                IF(JJ/=I.AND..NOT.(NATIV_SMS(I)==0.AND.NATIV_SMS(JJ)==0))THEN
-          	  LTK_SMS (IJ)=LTK_SMS (IJ)-HALF*MELE12
-          	  IJ=IJ+1
+            LTK_SMS (IJ)=LTK_SMS (IJ)-HALF*MELE12
+            IJ=IJ+1
                END IF
              END DO
 
@@ -618,8 +613,8 @@ C          nd milieu inexistant, transfert aux sommets (symetrie dans JSM_SMS...
                IF(JJ==0) CYCLE
 
                IF(JJ/=I.AND..NOT.(NATIV_SMS(I)==0.AND.NATIV_SMS(JJ)==0))THEN
-          	  LTK_SMS (IJ)=LTK_SMS (IJ)-HALF*MELE12
-          	  IJ=IJ+1
+            LTK_SMS (IJ)=LTK_SMS (IJ)-HALF*MELE12
+            IJ=IJ+1
                END IF
              END DO
            END DO

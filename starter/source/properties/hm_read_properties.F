@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  HM_READ_PROPERTIES            source/properties/hm_read_properties.F
 Chd|-- called by -----------
@@ -63,10 +63,11 @@ Chd|        HM_READ_PROP51                source/properties/shell/hm_read_prop51
 Chd|        HM_READ_PROP_GENERIC          source/properties/hm_read_prop_generic.F
 Chd|        INI_PROP_VARS                 source/elements/elbuf_init/ini_prop_vars.F
 Chd|        VDOUBLE                       source/system/sysfus.F        
+Chd|        ALE_MOD                       ../common_source/modules/ale/ale_mod.F
 Chd|        ELBUFTAG_MOD                  share/modules1/elbuftag_mod.F 
 Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|        STACK_MOD                     share/modules1/stack_mod.F    
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
@@ -90,30 +91,19 @@ C-----------------------------------------------
       USE STACK_MOD
       USE MULTI_FVM_MOD
       USE HM_OPTION_READ_MOD
+      USE ALE_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "units_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com_xfem1.inc"
 #include      "param_c.inc"
-#include      "warn_c.inc"
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
 #include      "scr17_c.inc"
-#include      "scr21_c.inc"
 #include      "tablen_c.inc"
-#include      "fluid_scr_c.inc"
-#include      "submod_c.inc"
-#include      "sysunit.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -122,10 +112,8 @@ C-----------------------------------------------
      .        IGEO(NPROPGI,*),IPM(NPROPMI,*),NPC(*),
      .        IPART(LIPART1,*),IDRAPEID(*),NUMGEO_STACK(NUMGEO+NUMSTACK),
      .        NPROP_STACK,IADBUF
-      TYPE(SUBMODEL_DATA) LSUBMODEL(*)
-      my_real
-     .   GEO(NPROPG,*), X(*), PM(NPROPM,*),
-     .   PLD(*),RTRANS(NTRANSF,*),KNOT(*)
+      TYPE(SUBMODEL_DATA) LSUBMODEL(NSUBMOD)
+      my_real GEO(NPROPG,NUMGEO), X(*), PM(NPROPM,NUMMAT),PLD(*),RTRANS(NTRANSF,*),KNOT(*)
 
       DOUBLE PRECISION BUFGEO(*)
 
@@ -149,9 +137,8 @@ C-----------------------------------------------
      
       INTEGER JPID1,JPID2,NISUB,IPISUB,IFRAM,E_TYPE,OFF_DEF(NSUBMOD),CPT,
      .        CPT1,SUB_INDEX
-      my_real
-     .    FN, FT, DX, ANGL,PUN,HTEST,HCLOS,CVIS,RBID,VX,VY,VZ,
-     .    FAC_L,FAC_T,FAC_M, TMIN,TMAX,DT,THICKT,IERREL,DN_P,ZSHIFT,PTHK
+      my_real FN, FT, DX, ANGL,PUN,HTEST,HCLOS,CVIS,RBID,VX,VY,VZ,
+     .        FAC_L,FAC_T,FAC_M, TMIN,TMAX,DT,THICKT,IERREL,DN_P,ZSHIFT,PTHK
       CHARACTER IDTITL*ncharline, MESS*40,KEY*ncharline, KEY2*ncharkey,
      .          STRING*ncharfield,TITR1*nchartitle,
      .          CHROT*7,SOLVERKEYWORD*ncharline
@@ -278,7 +265,7 @@ C--------------------------------------------------
       DO CPT=1,HM_NUMGEO
         I = I + 1
         IGFLU = 0
-        IF(ICAA == 1)IGFLU=1
+        IF(ALE%GLOBAL%ICAA == 1)IGFLU=1
         ISORTH = 0
         IHGFLU = 0
 c
@@ -303,7 +290,7 @@ C--------------------------------------------------
 C CHECK IF UID IS EXISTING
 C--------------------------------------------------
         IFLAGUNIT = 0
-        DO IUNIT=1,NUNITS
+        DO IUNIT=1,UNITAB%NUNITS
           IF (UNITAB%UNIT_ID(IUNIT) == UID) THEN
             IFLAGUNIT = 1
             EXIT
@@ -370,8 +357,8 @@ C            HM READING PROPERTY TYPE6 (SOL_ORTH)
 c------------------------------
              IGTYP=6
              CALL HM_READ_PROP06(GEO(1,I),IGEO(1,I),PROP_TAG ,MULTI_FVM,IGTYP  ,
-     .                          PROP_ID       ,IDTITL   ,UNITAB   ,LSUBMODEL,RTRANS ,
-     .                          SUB_ID   ,ISKN     ,IPART    )
+     .                          PROP_ID  ,IDTITL   ,UNITAB   ,LSUBMODEL,RTRANS ,
+     .                          SUB_ID   ,ISKN     ,IPART    ,SUB_INDEX)
 
           CASE ('TYPE5','TYPE05','RIVET')
 c------------------------------
@@ -468,7 +455,7 @@ C            HM READING PROPERTY TYPE14 (SOLID,FLUID)
 C--------------------------------------------------
           CASE ('TYPE14','SOLID')
             IGTYP=14
-            IF (ICAA == 0 .AND. IGFLU == 0) THEN
+            IF (ALE%GLOBAL%ICAA == 0 .AND. IGFLU == 0) THEN
              CALL HM_READ_PROP14(GEO(1,I),IGEO(1,I),PROP_TAG ,MULTI_FVM,IGTYP,PROP_ID,IDTITL,UNITAB,LSUBMODEL,
      .                          IPART )
             ELSE
@@ -610,8 +597,8 @@ c----   Shells
           PROP_TAG(IGTYP)%L_THK = 0
           PROP_TAG(IGTYP)%L_EINT= 2
           PROP_TAG(IGTYP)%L_EINS= 0
-          PROP_TAG(IGTYP)%G_VOL = 0
-          PROP_TAG(IGTYP)%L_VOL = 0
+          PROP_TAG(IGTYP)%G_VOL = 1
+          PROP_TAG(IGTYP)%L_VOL = 1
           PROP_TAG(IGTYP)%LY_DMG = 2
           IF (IGTYP == 9  .OR. IGTYP == 10 .OR. IGTYP == 11 .OR. 
      .        IGTYP == 17 .OR. IGTYP == 51 .OR. IGTYP == 52 ) THEN
@@ -716,7 +703,6 @@ C
               DO J=1,N1
                 JPID = STACK_INFO(NUMS)%PID(J)
                 STACK_INFO(NUMS)%THK(J)   = GEO(1,JPID)
-                STACK_INFO(NUMS)%ANG(J)   = STACK_INFO(NUMS)%ANG(J) + GEO(2,JPID)
                 STACK_INFO(NUMS)%DIR(J)   = GEO(212,JPID) ! angle (DIR1,DIR2) - for compatibility of law58 with PID51)
                 STACK_INFO(NUMS)%MID(J)   = IGEO(101,JPID)
               ENDDO
@@ -785,6 +771,6 @@ C-------------------------------
       RETURN
 C-------------------------------
  1000 FORMAT(//
-     & 5X,'    PROPERTY SETS (HM_READER)'/,
+     & 5X,'    PROPERTY SETS'/,
      & 5X,'    -------------'//)
       END

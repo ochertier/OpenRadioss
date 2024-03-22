@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  SINIT22_FVM                   source/interfaces/int22/sinit22_fvm.F
 Chd|-- called by -----------
@@ -31,12 +31,12 @@ Chd|        INITBUF                       share/resol/initbuf.F
 Chd|        MY_BARRIER                    source/system/machine.F       
 Chd|        SIGEPS37_SINGLE_CELL          source/interfaces/int22/sigeps37_single_cell.F
 Chd|        weighting_Cell_Nodes          source/interfaces/int22/weighting_cell_nodes.F
-Chd|        ALEFVM_MOD                    ../common_source/modules/alefvm_mod.F
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ALEFVM_MOD                    ../common_source/modules/ale/alefvm_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        I22BUFBRIC_MOD                ../common_source/modules/cut-cell-search_mod.F
-Chd|        I22TRI_MOD                    ../common_source/modules/cut-cell-search_mod.F
+Chd|        I22BUFBRIC_MOD                ../common_source/modules/interfaces/cut-cell-search_mod.F
+Chd|        I22TRI_MOD                    ../common_source/modules/interfaces/cut-cell-search_mod.F
 Chd|        INITBUF_MOD                   share/resol/initbuf.F         
 Chd|====================================================================
       SUBROUTINE SINIT22_FVM (
@@ -140,17 +140,11 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "com08_c.inc"
 #include      "task_c.inc"
-#include      "vect01_c.inc"  
-!#include      "vect01_c.inc" NFT
-#include      "i22edges.inc"  
-!#include      "i22edges.inc"  nodFACE
+#include      "vect01_c.inc"    
 #include      "inter22.inc"
-#include      "tabsiz_c.inc"
 #include      "mvsiz_p.inc"
 #include      "comlock.inc"
 #include      "subvolumes.inc"
-!#include      "mmale51_c.inc"
-#include      "scr17_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -390,7 +384,7 @@ c      ALLOCATE (Ntarget(NBF:NBL))
       !TAG22==0 means elem I is not in cut cell buffer.
       DO NG=ITASK+1,NGROUP,NTHREAD                              
          IF(IPARG(8,NG) /= 1) THEN                              
-          CALL INITBUF (
+          CALL INITBUF(
      1       IPARG    ,NG      ,                     
      2       MTN     ,NEL     ,NFT     ,IAD     ,ITY     ,      
      3       NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,      
@@ -416,7 +410,7 @@ c      ALLOCATE (Ntarget(NBF:NBL))
       !------------------------------------------------------------!
       DO NG=ITASK+1,NGROUP,NTHREAD                              
          IF(IPARG(8,NG) /= 1) THEN                              
-          CALL INITBUF (
+          CALL INITBUF(
      1       IPARG    ,NG      ,                     
      2       MTN     ,NEL     ,NFT     ,IAD     ,ITY     ,      
      3       NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,      
@@ -856,7 +850,7 @@ c      ALLOCATE (Ntarget(NBF:NBL))
           !loop on nodes (1,2,3,4,5,6,7,8) composing face J                                      
           lFOUND = .FALSE.            
           DO K=1,4                    
-            INOD  = nodFACE(J,K)      
+            INOD  = INT22_BUF%nodFACE(J,K)      
             ICELL = BRICK_LIST(NIN,IB)%NODE(INOD)%WhichCell                                   
             IF(ICELL == 9) lFOUND = .TRUE.                                                       
           ENDDO                       
@@ -1006,9 +1000,9 @@ c      ALLOCATE (Ntarget(NBF:NBL))
                 NNODES = 0
                 DO K1=1,BRICK_LIST(NIN,IB)%POLY(ICELL)%NumNOD  !loop on polyhedron nodes   !TODO : might be optimized by looping on nodFACE and cycle with pNNODCELL
                   DO K2=1,4               !loop on face nodes
-                    IF(pListNodID(ICELL)%p(K1) == nodFACE(J,K2))THEN !polyhedron node on the current face
+                    IF(pListNodID(ICELL)%p(K1) == INT22_BUF%nodFACE(J,K2))THEN !polyhedron node on the current face
                       NNODES         = NNODES +1
-                      INODES(NNODES) = IXS(1+nodFACE(J,K2), ID)
+                      INODES(NNODES) = IXS(1+INT22_BUF%nodFACE(J,K2), ID)
                     ENDIF
                   ENDDO
                 ENDDO
@@ -1016,7 +1010,7 @@ c      ALLOCATE (Ntarget(NBF:NBL))
                 ICELLTAG(1:9) = 0
                 JV            = pAdjBRICK(J,5)
                 DO K0=1,4 !loop on adjacent 'local' nodes (II,J)<->(IV,JV)
-                  K1 = nodFACE(JV,K0)
+                  K1 = INT22_BUF%nodFACE(JV,K0)
                   DO IN=1,NNODES
                     IF(IXS(1+K1,IV)==INODES(IN) )THEN
                       ICELLv = pWhichCellNodv(K1)%WhichCell
@@ -1149,7 +1143,7 @@ C  non sinon cell trapped error et aussi on ne peut pas trouver de pression vois
         IV                                             = BRICK_LIST(NIN,IB)%Adjacent_Brick(J,1)
         IF(IV==0)CYCLE
           DO K=1,4 
-            INOD  = nodFACE(J,K)
+            INOD  = INT22_BUF%nodFACE(J,K)
             ICELL = BRICK_LIST(NIN,IB)%NODE(INOD)%WhichCell
             ICODE = IBSET(ICODE,ICELL)
           ENDDO
@@ -1179,12 +1173,12 @@ C              print *, "sinit22_fvm marked closure hypothesis."
           NBCUTprev                                    = 0
           DO INOD=4,1,-1
             !base point
-            pointTMP(1:3)                              = X(1:3,IXS(1+NodFace(J,INOD),IE))
+            pointTMP(1:3)                              = X(1:3,IXS(1+INT22_BUF%NodFace(J,INOD),IE))
             pPOINT(1)                                  = pPOINT(1) + pointTMP(1)
             pPOINT(2)                                  = pPOINT(2) + pointTMP(2)
             pPOINT(3)                                  = pPOINT(3) + pointTMP(3)
             !polygon point                    
-            iEDG                                       = iLeftEdge(J,INOD)
+            iEDG                                       = INT22_BUF%iLeftEdge(J,INOD)
             ISGN(1:2)                                  = (/1,2/)
             IF(iEDG < 0) ISGN(1:2)                     = (/2,1/)
             iEDG                                       = IABS(iEDG)
@@ -1706,7 +1700,7 @@ c        Ntarget(IB)                = NTAG ! number of secnd cell whose nodes we
         BRICK_LIST(NIN,IB)%NTarget = NTAG
         ! Ntarget always lower or equal to 9 (max number of secnd cell if one main per secnd)
         ! enumeration of the target
-        !ACHTUNG : what happen if 2 secnd cells have the same main cell. Doubloon are not possible by tagging main target
+        !Warning : what happen if 2 secnd cells have the same main cell. Duplicates are not possible by tagging main target
       ENDDO!next IB
 
       !------------------------------------------------------------!
@@ -2028,10 +2022,10 @@ c                 print *, "adding j "   , BRICK_LIST(NIN,IB)%bakMAT%UVAR(K) ,VA
         ENDDO 
         
         GBUF%EINT(IDLOC)             = EINT                                            
-        GBUF%RHO(IDLOC)              = RHO    ;         FCELL(4, BRICK_LIST(NIN,IB)%ID ) = RHO                                                    
-        GBUF%MOM(LLT_*(1-1) + IDLOC) = MOM(1) ;         FCELL(1, BRICK_LIST(NIN,IB)%ID ) = MOM(1)                                                 
-        GBUF%MOM(LLT_*(2-1) + IDLOC) = MOM(2) ;         FCELL(2, BRICK_LIST(NIN,IB)%ID ) = MOM(2)                                                 
-        GBUF%MOM(LLT_*(3-1) + IDLOC) = MOM(3) ;         FCELL(3, BRICK_LIST(NIN,IB)%ID ) = MOM(3)           
+        GBUF%RHO(IDLOC)              = RHO    ;         ALEFVM_Buffer%FCELL(4, BRICK_LIST(NIN,IB)%ID ) = RHO                                                    
+        GBUF%MOM(LLT_*(1-1) + IDLOC) = MOM(1) ;         ALEFVM_Buffer%FCELL(1, BRICK_LIST(NIN,IB)%ID ) = MOM(1)                                                 
+        GBUF%MOM(LLT_*(2-1) + IDLOC) = MOM(2) ;         ALEFVM_Buffer%FCELL(2, BRICK_LIST(NIN,IB)%ID ) = MOM(2)                                                 
+        GBUF%MOM(LLT_*(3-1) + IDLOC) = MOM(3) ;         ALEFVM_Buffer%FCELL(3, BRICK_LIST(NIN,IB)%ID ) = MOM(3)           
         !FCELL(5,.)  voir bloc conditionnel ci-dessous
                                                    
         DO J=1,NV46
@@ -2655,12 +2649,12 @@ ccc        print *, "    IDEMERGE= : ", IDEMERGE
         GBUF%SIG(LLT_*(5-1)+IDLOC)              =  SIG(5)
         GBUF%SIG(LLT_*(6-1)+IDLOC)              =  SIG(6) 
         LBUF%SSP(IDLOC)                         =  SSP      
-        FCELL(4, BRICK_LIST(NIN,IB)%ID )        = RHO
-        FCELL(1, BRICK_LIST(NIN,IB)%ID )        = MOM(1)
-        FCELL(2, BRICK_LIST(NIN,IB)%ID )        = MOM(2)
-        FCELL(3, BRICK_LIST(NIN,IB)%ID )        = MOM(3)         
-        FCELL(6, BRICK_LIST(NIN,IB)%ID )        = -THIRD*(SIG(1)+SIG(2)+SIG(3)) 
-        FCELL(5, BRICK_LIST(NIN,IB)%ID )        = SSP
+        ALEFVM_Buffer%FCELL(4, BRICK_LIST(NIN,IB)%ID )        = RHO
+        ALEFVM_Buffer%FCELL(1, BRICK_LIST(NIN,IB)%ID )        = MOM(1)
+        ALEFVM_Buffer%FCELL(2, BRICK_LIST(NIN,IB)%ID )        = MOM(2)
+        ALEFVM_Buffer%FCELL(3, BRICK_LIST(NIN,IB)%ID )        = MOM(3)         
+        ALEFVM_Buffer%FCELL(6, BRICK_LIST(NIN,IB)%ID )        = -THIRD*(SIG(1)+SIG(2)+SIG(3)) 
+        ALEFVM_Buffer%FCELL(5, BRICK_LIST(NIN,IB)%ID )        = SSP
         
         !---MUKLTIMAT-------------------------------------!
         IF(MTN_==37)THEN
@@ -3177,10 +3171,10 @@ c        print *, "check switch in brickID=", ixs(11,brick_list(nin,ib)%id)
               GBUF%MOM(LLTm*(1-1) + IDLOCB(IBm)) = (GBUF%MOM(LLTm*(1-1) + IDLOCB(IBm))  * VOLD + MOM(1))  / (VOLD+VOLcell)
               GBUF%MOM(LLTm*(2-1) + IDLOCB(IBm)) = (GBUF%MOM(LLTm*(2-1) + IDLOCB(IBm))  * VOLD + MOM(2))  / (VOLD+VOLcell)
               GBUF%MOM(LLTm*(3-1) + IDLOCB(IBm)) = (GBUF%MOM(LLTm*(3-1) + IDLOCB(IBm))  * VOLD + MOM(3))  / (VOLD+VOLcell)
-              FCELL(4, brick_list(nin,ibm)%id )= GBUF%RHO(IDLOCB(IBm))                                                       
-              FCELL(1, brick_list(nin,ibm)%id )= GBUF%MOM(LLTm*(1-1) + IDLOCB(IBm))
-              FCELL(2, brick_list(nin,ibm)%id )= GBUF%MOM(LLTm*(2-1) + IDLOCB(IBm))
-              FCELL(3, brick_list(nin,ibm)%id )= GBUF%MOM(LLTm*(3-1) + IDLOCB(IBm))
+              ALEFVM_Buffer%FCELL(4, brick_list(nin,ibm)%id )= GBUF%RHO(IDLOCB(IBm))                                                       
+              ALEFVM_Buffer%FCELL(1, brick_list(nin,ibm)%id )= GBUF%MOM(LLTm*(1-1) + IDLOCB(IBm))
+              ALEFVM_Buffer%FCELL(2, brick_list(nin,ibm)%id )= GBUF%MOM(LLTm*(2-1) + IDLOCB(IBm))
+              ALEFVM_Buffer%FCELL(3, brick_list(nin,ibm)%id )= GBUF%MOM(LLTm*(3-1) + IDLOCB(IBm))
               
               !FCELL(5, brick_list(nin,ibm)%id) = ! see mtn 37 conditional block below
               !FCELL(6, brick_list(nin,ibm)%id) = ! idem

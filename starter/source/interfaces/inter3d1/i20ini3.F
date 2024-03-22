@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  I20INI3                       source/interfaces/inter3d1/i20ini3.F
 Chd|-- called by -----------
@@ -41,16 +41,16 @@ Chd|        I20WCONTDD                    source/spmd/domain_decomposition/grid2
 Chd|        I7BUC1                        source/interfaces/inter3d1/i7buc1.F
 Chd|        I7COR3                        source/interfaces/inter3d1/i7cor3.F
 Chd|        I7ERR3                        source/interfaces/inter3d1/i7err3.F
-Chd|        I7NINTDD                      source/spmd/domain_decomposition/grid2mat.F
 Chd|        I7PEN3                        source/interfaces/inter3d1/i7pen3.F
+Chd|        UPDATE_WEIGHT_INTER_TYPE7     source/spmd/domain_decomposition/update_weight_inter_type7.F
 Chd|        UPGRADE_IXINT                 source/interfaces/interf1/upgrade_ixint.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
-Chd|        IXINTMOD                      share/modules1/restart_mod.F  
+Chd|        INTER_CAND_MOD                share/modules1/inter_cand_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
       SUBROUTINE I20INI3(X       ,IXS    ,IXC     ,
-     2                  PM      ,GEO     ,IPARI   ,NUMINT ,ITAB    ,
+     2                  PM      ,GEO     ,IPARI   ,INTERFACE_ID ,ITAB    ,
      3                  MS      ,MWA     ,RWA     ,IXTG   ,IWRN    ,
      4                  IKINE   ,IXT     ,IXP     ,IXR    ,NELEMINT,
      5                  IDDLEVEL,IFIEND  ,NSNET   ,
@@ -59,23 +59,20 @@ Chd|====================================================================
      8                  NOD2ELC ,NOD2ELTG,IGRSURF ,IKINE1 ,IPART   ,
      9                  IPARTC  ,IPARTTG ,THK     ,THK_PART,INPENE ,
      A                  IWPENTOT,IXS10 ,I_MEM    ,
-     B                  SIXINT  ,IXS16   ,IXS20   ,ID    ,TITR     ,
+     B                  INTER_CAND,IXS16,IXS20   ,ID    ,TITR     ,
      C                  KXX     ,IXX     ,IGEO  ,NOD2EL1D,KNOD2EL1D, 
-     D                  LELX    ,INTBUF_TAB ,PM_STACK, IWORKSH )
+     D                  LELX    ,INTBUF_TAB ,PM_STACK, IWORKSH,NSPMD)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
-      USE IXINTMOD
       USE INTBUFDEF_MOD
       USE GROUPDEF_MOD
+      USE INTER_CAND_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
 C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
@@ -83,21 +80,18 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "remesh_c.inc"
 #include      "scr03_c.inc"
 #include      "scr05_c.inc"
 #include      "scr12_c.inc"
 #include      "units_c.inc"
 #include      "vect07_c.inc"
-#include      "warn_c.inc"
 #include      "scr17_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER NUMINT, IWRN, NSNT, NMNT,SIXINT,
+      INTEGER INTERFACE_ID, IWRN, NSNT, NMNT,SIXINT,
      .   NSNET  ,NMNET, INPENE,IWPENTOT
       INTEGER IXS(NIXS,*), IXC(NIXC,*),
      .   IPARI(*), IXT(NIXT,*) ,IXP(NIXP,*) ,IXR(NIXR,*),
@@ -110,6 +104,7 @@ C-----------------------------------------------
      .   IXS16(*), IXS20(*),KXX(*),IXX(*), IGEO(NPROPGI,*),
      .   NOD2EL1D(*), KNOD2EL1D(*),IWORKSH(3,*)
       INTEGER IKINE1(*)
+      INTEGER, INTENT(in) :: NSPMD !< nuummber of mpi tasks
 C     REAL
       my_real
      .   X(*), PM(*), GEO(*), MS(*),RWA(6,*),
@@ -120,9 +115,7 @@ C     REAL
       CHARACTER*nchartitle,
      .   TITR
       TYPE (SURF_)   , DIMENSION(NSURF)   :: IGRSURF
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
+      TYPE(INTER_CAND_), INTENT(inout) :: INTER_CAND !< struture of pair of candidate
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -140,6 +133,7 @@ C     REAL
       my_real
      .   MAXBOX,MINBOX,GAP0,BID,TZINF,GAPINF,GAP_TRI,GAPSHMAX,GAPMAX0,
      .   GAPINFS,GAPINFM,GAPE,GAPINPUT,FPENMAX,DRAD
+      my_real :: GAP,GAPMIN,GAPMAX,DGAPLOAD
       my_real
      .   NX(MVSIZ),NY(MVSIZ),NZ(MVSIZ),GAPV(MVSIZ),XANEW(3,NUMNOD)
       my_real
@@ -222,7 +216,7 @@ C
       CALL I20STI3(
      1 PM             ,GEO            ,X              ,MS             ,
      2 IXS            ,IXC            ,IXTG           ,IXT            ,
-     3 IXP            ,RWA            ,NUMINT         ,NTY           ,
+     3 IXP            ,RWA            ,INTERFACE_ID         ,NTY           ,
      4 NOINT          ,NRTM           ,NSN            ,INTBUF_TAB%IRECTM  ,
      5 INTBUF_TAB%NSV ,INACTI         ,INTBUF_TAB%VARIABLES(2),IGAP       ,
      6 INTBUF_TAB%GAP_S  ,INTBUF_TAB%GAP_M ,INTBUF_TAB%VARIABLES(13),INTBUF_TAB%VARIABLES(6),
@@ -266,16 +260,23 @@ C
       INTBUF_TAB%VARIABLES(9) = MAXBOX
       INTBUF_TAB%VARIABLES(12) = MINBOX
       IF (IMACH==3) THEN
-        IF (IDDLEVEL==0)THEN
-          IF ( (NELEMINT+I_STOK)*6 >  SIXINT)THEN
-            CALL UPGRADE_IXINT(SIXINT,NELEMINT,I_STOK)
-          ENDIF
-          CALL I7NINTDD(
-     1     NELEMINT         ,IXINT(6*NELEMINT+1)    ,INTBUF_TAB%IRECTM,
-     2     INTBUF_TAB%NSV   ,INTBUF_TAB%CAND_E      ,INTBUF_TAB%CAND_N,I_STOK,IFIEND,
-     3     X                ,INTBUF_TAB%VARIABLES(2),DRAD, IGAP,INTBUF_TAB%GAP_S,INTBUF_TAB%GAP_M,
-     4     INTBUF_TAB%GAP_SL,INTBUF_TAB%GAP_ML      ,INTBUF_TAB%VARIABLES(13),INTBUF_TAB%VARIABLES(16),BID)
-        ENDIF
+       ! -----------------
+       ! update the weight of candidate's pair for the domain decomposition
+       IF (IDDLEVEL==0.AND.NSPMD>1)THEN
+         IF ( ((NELEMINT+I_STOK)) > INTER_CAND%S_IXINT_2) CALL UPGRADE_IXINT(INTER_CAND,NELEMINT,I_STOK)
+
+        GAP = INTBUF_TAB%VARIABLES(2)
+        GAPMIN = INTBUF_TAB%VARIABLES(13)
+        GAPMAX = INTBUF_TAB%VARIABLES(16)
+        DGAPLOAD = INTBUF_TAB%VARIABLES(46)
+        CALL UPDATE_WEIGHT_INTER_TYPE7(NELEMINT,INTERFACE_ID,NSN,NRTM,IFIEND,
+     .                                 INTBUF_TAB%IRECTM,INTBUF_TAB%NSV,I_STOK,INTBUF_TAB%CAND_E,INTBUF_TAB%CAND_N,
+     .                                 IGAP,GAP,GAPMAX,GAPMIN,DGAPLOAD,
+     .                                 DRAD,INTBUF_TAB%GAP_S,INTBUF_TAB%GAP_SL,INTBUF_TAB%GAP_M,INTBUF_TAB%GAP_ML,
+     .                                 NUMNOD,X,INTER_CAND)
+       ENDIF
+       ! -----------------
+
         IF((IDDLEVEL==0).AND.
      .     (DECTYP>=3.AND.DECTYP<=6))THEN
 C Appe routine poids noeuds interfaces
@@ -318,7 +319,7 @@ C
         GAPINFM = EP30
         CALL I20STI3E(
      1X         ,INTBUF_TAB%IXLINM ,INTBUF_TAB%STF,IXS      ,PM           ,
-     2GEO       ,NLINM         ,IXC         ,NUMINT    ,INTBUF_TAB%STFAC(1),
+     2GEO       ,NLINM         ,IXC         ,INTERFACE_ID    ,INTBUF_TAB%STFAC(1),
      3NTY       ,GAPE          ,NOINT       ,INTBUF_TAB%GAP_ME,        
      4MS        ,IXTG          ,IXT         ,IXP       ,IXR          ,
      5IGAP      ,INTBUF_TAB%VARIABLES(13),GAP0      ,GAPINFS   ,NSNE         ,
@@ -329,7 +330,7 @@ C
 C      
         CALL I20STI3E(
      1X         ,INTBUF_TAB%IXLINS,INTBUF_TAB%STFS,IXS      ,PM           ,
-     2GEO       ,NLINS        ,IXC         ,-NUMINT   ,INTBUF_TAB%STFAC(1),
+     2GEO       ,NLINS        ,IXC         ,-INTERFACE_ID   ,INTBUF_TAB%STFAC(1),
      3NTY       ,GAPE         ,NOINT       ,INTBUF_TAB%GAP_SE,       
      4MS        ,IXTG         ,IXT         ,IXP       ,IXR          ,
      5IGAP      ,INTBUF_TAB%VARIABLES(13),GAP0     ,GAPINFM   ,NSNE         ,

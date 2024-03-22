@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  HM_READ_THGRNE                source/output/th/hm_read_thgrne.F
 Chd|-- called by -----------
@@ -69,10 +69,8 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "units_c.inc"
-#include      "warn_c.inc"
 #include      "param_c.inc"
 #include      "r2r_c.inc"
-#include      "submod_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -127,7 +125,7 @@ C-----------------------------------------------
       ITHGRP(7)=IAD                                              
       IAD=IAD+NVAR                                               
       IFI=IFI+NVAR
-      RFI=0	                                              	                                              
+      RFI=0                                                                                                
 
       CONT=1
       NNE=0                                                      
@@ -151,7 +149,7 @@ C         Multidomains-> skipping entities which are not on current domain
         ELSE                                                                              
           NNE = NNE+1                                                                     
         ENDIF                                                                             
-      ENDDO	      
+      ENDDO        
 C------------------------
       ITHGRP(4)=NNE                                        
       ITHGRP(5)=IAD                                        
@@ -169,10 +167,10 @@ C------------------------
         SIZ=LEN_TRIM(TITR)
         TITR(SIZ+1:SIZ+1)=' '     
         IF (ITYP == 0) THEN                               
-C         Multidomains-> skipping nodes which are not on current domain 	    	 		  		  
-	  IF(NSUBDOM /= 0) THEN
+C         Multidomains-> skipping nodes which are not on current domain                      
+            IF(NSUBDOM /= 0) THEN
               IF (R2R_SYS(N,ITABM1,MESS) == 0) CYCLE
-	  ENDIF  
+            ENDIF  
           ITHBUF(IAD)=USR2SYS(N,ITABM1,MESS,ID)                          
           ITHBUF(IAD+NNE)=ISK                                         
           DO JC = 1,NMERGED                                           
@@ -180,10 +178,10 @@ C         Multidomains-> skipping nodes which are not on current domain
      .          ITHBUF(IAD)  = IMERGE(NUMCNOD+JC)                     
           ENDDO                                                         
         ELSE                                                                           
-C         Multidomains-> skipping elems which are not on current domain 		    	 		  		  
-	  IF(NSUBDOM /= 0) THEN                                   
-	      IF (R2R_NIN(N,IX,NIX,NUMEL) == 0) CYCLE             
-	  ENDIF  
+C         Multidomains-> skipping elems which are not on current domain                        
+            IF(NSUBDOM /= 0) THEN                                   
+                IF (R2R_NIN(N,IX,NIX,NUMEL) == 0) CYCLE             
+            ENDIF  
           ID_LOCAL = SET_USRTOS(N,MAP,MAPSIZE)
           IF(ID_LOCAL == 0) THEN
             CALL ANCMSG(MSGID=69, MSGTYPE=MSGERROR,ANMODE=ANINFO,I1=ITHGRP(1),C1=TITR1,I2=N)
@@ -217,9 +215,7 @@ C
      .        ITHBUF(I) == 625)) IREAC = 1                       
          IF((ITHBUF(I) == 626 .OR. ITHBUF(I) == 627 .OR.        
      .       ITHBUF(I) == 628) .AND.                            
-     .      ((ISUB == 0.AND.ISECUT == 0.AND.IISROT == 0.AND.   
-     .       MSHSUB == 0.AND.IMPOSE_DR == 0 .AND. IDROT == 0) .OR.   
-     .       IRODDL == 0)) THEN                           
+     .      ((ISECUT == 0 .AND. IISROT == 0 .AND. IMPOSE_DR == 0 .AND. IDROT == 0) .OR. IRODDL == 0)) THEN
                IF (ITHBUF(I) == 626)DIRMSG='DRX'           
                IF (ITHBUF(I) == 627)DIRMSG='DRY'               
                IF (ITHBUF(I) == 628)DIRMSG='DRZ'            

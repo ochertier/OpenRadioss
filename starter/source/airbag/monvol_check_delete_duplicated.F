@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/. 
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  MONVOL_CHECK_DELETE_DUPLICATEDsource/airbag/monvol_check_delete_duplicated.F
 Chd|-- called by -----------
@@ -33,6 +33,7 @@ Chd|====================================================================
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE MY_ALLOC_MOD
       USE MONVOL_STRUCT_MOD
       USE MESSAGE_MOD
 C-----------------------------------------------
@@ -43,7 +44,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
-#include      "my_allocate.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -66,20 +66,20 @@ C-----------------------------------------------
       INTEGER, DIMENSION(:, :), ALLOCATABLE :: ELEM
       INTEGER, DIMENSION(:), ALLOCATABLE :: ISAVE
 
-      MY_ALLOCATE(ISAVE, (NTG + NTGI))
+      CALL MY_ALLOC(ISAVE, (NTG + NTGI))
 !     Resize and copy ELTG
       DO II = 1, NTG + NTGI
          ISAVE(II) = T_MONVOLN%ELTG(II)
       ENDDO
       DEALLOCATE(T_MONVOLN%ELTG)
-      MY_ALLOCATE(T_MONVOLN%ELTG, (NTG + NTGI))
+      CALL MY_ALLOC(T_MONVOLN%ELTG, (NTG + NTGI))
       DO II = 1, NTG + NTGI
          T_MONVOLN%ELTG(II) = ISAVE(II)
       ENDDO
 !     Build edges of the elements
-      MY_ALLOCATE(EDGE_ARRAY_N1, (3 * (NTG + NTGI)))
-      MY_ALLOCATE(EDGE_ARRAY_N2, (3 * (NTG + NTGI)))
-      MY_ALLOCATE(EDGE_ARRAY_ELEM, (3 * (NTG + NTGI)))
+      CALL MY_ALLOC(EDGE_ARRAY_N1, (3 * (NTG + NTGI)))
+      CALL MY_ALLOC(EDGE_ARRAY_N2, (3 * (NTG + NTGI)))
+      CALL MY_ALLOC(EDGE_ARRAY_ELEM, (3 * (NTG + NTGI)))
       IDX = 0
       DO II = 1, NTG + NTGI
          EDGE_ARRAY_N1(IDX + 1) = MIN(T_MONVOLN%ELEM(1, II), T_MONVOLN%ELEM(2, II))
@@ -97,10 +97,10 @@ C-----------------------------------------------
       EDGE_PTR = 0
       CALL EDGE_SORT(EDGE_PTR, EDGE_ARRAY_N1, EDGE_ARRAY_N2, EDGE_ARRAY_ELEM, NEDGE)
       
-      MY_ALLOCATE(NB_CONNECT, (NEDGE))
+      CALL MY_ALLOC(NB_CONNECT, (NEDGE))
       CALL EDGE_GET_NB_CONNECT(EDGE_PTR, NB_CONNECT)
-      MY_ALLOCATE(EDGE_ELEM, (SUM(NB_CONNECT)))
-      MY_ALLOCATE(IAD_EDGE_ELEM, (NEDGE + 1))
+      CALL MY_ALLOC(EDGE_ELEM, (SUM(NB_CONNECT)))
+      CALL MY_ALLOC(IAD_EDGE_ELEM, (NEDGE + 1))
       CALL EDGE_GET_CONNECT(EDGE_PTR, EDGE_ELEM)
 
       IAD_EDGE_ELEM(1) = 1
@@ -145,14 +145,14 @@ C-----------------------------------------------
       
 !     Get pairs of duplicated elements
       CALL INTVECTOR_GET_SIZE(PAIR_VEC_PTR, NPAIR)
-      MY_ALLOCATE(PAIR_LIST, (NPAIR))
+      CALL MY_ALLOC(PAIR_LIST, (NPAIR))
       CALL INTVECTOR_COPY_TO(PAIR_VEC_PTR, PAIR_LIST)
       NPAIR = NPAIR / 2
 
 !     Reduce
-      MY_ALLOCATE(FLAG_ELEM, (NTG + NTGI))
+      CALL MY_ALLOC(FLAG_ELEM, (NTG + NTGI))
       FLAG_ELEM(1:NTG + NTGI) = 0
-      MY_ALLOCATE(INV_LIST, (NTG + NTGI))
+      CALL MY_ALLOC(INV_LIST, (NTG + NTGI))
       INV_LIST(1:NTG + NTGI) = 0
 
       NB_DUPLICATED_ELTS = 0
@@ -177,7 +177,7 @@ C-----------------------------------------------
       ENDIF
 
       CALL INTVECTOR_GET_SIZE(LIST_PTR, NB_DUPLICATED_ELTS)
-      MY_ALLOCATE(LIST, (NB_DUPLICATED_ELTS))
+      CALL MY_ALLOC(LIST, (NB_DUPLICATED_ELTS))
       CALL INTVECTOR_COPY_TO(LIST_PTR, LIST)
       
       DO II = 1, NPAIR
@@ -187,10 +187,10 @@ C-----------------------------------------------
 
       GRAPH_PTR = 0
       CALL GRAPH_BUILD_PATH(NB_DUPLICATED_ELTS, NPAIR, PAIR_LIST, NB_CONNEX_COMP, GRAPH_PTR)
-      MY_ALLOCATE(SIZES, (NB_CONNEX_COMP))
+      CALL MY_ALLOC(SIZES, (NB_CONNEX_COMP))
       CALL GRAPH_GET_SIZES(GRAPH_PTR, SIZES)
       PATH_SIZE = SUM(SIZES)
-      MY_ALLOCATE(PATHS, (PATH_SIZE))
+      CALL MY_ALLOC(PATHS, (PATH_SIZE))
       CALL GRAPH_GET_PATH(GRAPH_PTR, PATHS)
 
       DO II = 1, PATH_SIZE
@@ -205,8 +205,17 @@ C-----------------------------------------------
          IAD2 = IAD1 + SIZES(ICOMP) - 1
          CALL QUICKSORT_I(PATHS(IAD1:IAD2), IAD1, IAD2)
          ELEM_ID1 = PATHS(IAD1)
-         NODE_LIST1(1:3) = ITAB(T_MONVOLN%ELEM(1:3, ELEM_ID1))
-         CALL ANCMSG(MSGID = 2069, ANMODE = ANINFO, MSGTYPE = MSGWARNING,
+         NODE_LIST1(1:3) = 0
+   
+         !NODE_LIST1(1:3) = ITAB(T_MONVOLN%ELEM(1:3, ELEM_ID1))
+         IF(T_MONVOLN%ELEM(1, ELEM_ID1) > 0 .AND. T_MONVOLN%ELEM(1,ELEM_ID1) <= NUMNOD)  
+     .         NODE_LIST1(1) = ITAB(T_MONVOLN%ELEM(1, ELEM_ID1))
+         IF(T_MONVOLN%ELEM(2, ELEM_ID1) > 0 .AND. T_MONVOLN%ELEM(2,ELEM_ID1) <= NUMNOD)
+     .         NODE_LIST1(2) = ITAB(T_MONVOLN%ELEM(2, ELEM_ID1))
+         IF(T_MONVOLN%ELEM(3, ELEM_ID1) > 0 .AND. T_MONVOLN%ELEM(3,ELEM_ID1) <= NUMNOD)
+     .        NODE_LIST1(3) = ITAB(T_MONVOLN%ELEM(3, ELEM_ID1))
+
+         CALL ANCMSG(MSGID = 2072, ANMODE = ANINFO, MSGTYPE = MSGWARNING,
      .        I1 = T_MONVOLN%ID, C1 = T_MONVOLN%TITLE, 
      .        I2 = NODE_LIST1(1), I3 = NODE_LIST1(2), I4 = NODE_LIST1(3), I5 = SIZES(ICOMP)-1)
          DO II = IAD1 + 1, IAD2
@@ -218,7 +227,7 @@ C-----------------------------------------------
       NTG_NEW = SUM(FLAG_ELEM(1:NTG))
       NTGI_NEW = SUM(FLAG_ELEM(NTG + 1:NTG + NTGI))
       
-      MY_ALLOCATE2D(ELEM, 3, NTG_NEW + NTGI_NEW)
+      CALL MY_ALLOC(ELEM, 3, NTG_NEW + NTGI_NEW)
       IAD1 = 1
       DO II = 1, NTG + NTGI
          IF (FLAG_ELEM(II) == 1) THEN
@@ -232,7 +241,7 @@ C-----------------------------------------------
          ISAVE(II) = T_MONVOLN%FVBAG_ELEMID(II)
       ENDDO
       DEALLOCATE(T_MONVOLN%FVBAG_ELEMID)
-      MY_ALLOCATE(T_MONVOLN%FVBAG_ELEMID, NTG_NEW + NTGI_NEW)
+      CALL MY_ALLOC(T_MONVOLN%FVBAG_ELEMID, NTG_NEW + NTGI_NEW)
       IAD1 = 1
       DO II = 1, NTG + NTGI
          IF (FLAG_ELEM(II) == 1) THEN
@@ -245,7 +254,7 @@ C-----------------------------------------------
          ISAVE(II) = T_MONVOLN%ELTG(II)
       ENDDO
       DEALLOCATE(T_MONVOLN%ELTG)
-      MY_ALLOCATE(T_MONVOLN%ELTG, (NTG_NEW + NTGI_NEW))
+      CALL MY_ALLOC(T_MONVOLN%ELTG, (NTG_NEW + NTGI_NEW))
       IAD1 = 1
       DO II = 1, NTG + NTGI
          IF (FLAG_ELEM(II) == 1) THEN
@@ -258,7 +267,7 @@ C-----------------------------------------------
       T_MONVOLN%NTGI = NTGI_NEW
       NTG = NTG_NEW
       NTGI = NTGI_NEW
-      MY_ALLOCATE2D(T_MONVOLN%ELEM, 3, NTG + NTGI)
+      CALL MY_ALLOC(T_MONVOLN%ELEM, 3, NTG + NTGI)
       DO II = 1, NTG + NTGI
          T_MONVOLN%ELEM(1:3, II) = ELEM(1:3, II)
       ENDDO

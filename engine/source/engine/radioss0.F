@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  RADIOSS0                      source/engine/radioss0.F      
 Chd|-- called by -----------
@@ -28,7 +28,6 @@ Chd|        EXECARGCHECK                  source/engine/execargcheck.F
 Chd|        INIT_DYN_LIB_STRUC            share/modules/dynlib_mod.F    
 Chd|        RADIOSS2                      source/engine/radioss2.F      
 Chd|        RADIOSS_SET_ENV_VARIABLE      ../common_source/comm/radioss_set_env_variable.c
-Chd|        USERWINDOW_ACCESS_DUM         source/user_interface/userwindow_interface_routines.F
 Chd|        DYNLIB_MOD                    share/modules/dynlib_mod.F    
 Chd|        INOUTFILE_MOD                 ../common_source/modules/inoutfile_mod.F
 Chd|====================================================================
@@ -43,13 +42,8 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "r4r8_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "couple_c.inc"
 #include      "chara_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -85,11 +79,6 @@ C
 !     in order to write all scratch files in the user folder
       IF(INOUT_BOOL) CALL RADIOSS_SET_ENV_VARIABLE(OUTFILE_NAME , OUTFILE_NAME_LEN)
 !     ---------------------------- 
-C
-C---------------------------------------------------------------------------------------
-C Dummy call for Linux to avoid object files with user interface routines to be removed
-      DUM_IERR=0
-      CALL USERWINDOW_ACCESS_DUM(DUM_IERR)
 C-----------------------------------------------
 C     allocation minimale (en cas d'absence de couplage MADYMO).
       ALLOCATE(IDATA(MIDATA))

@@ -1,31 +1,32 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  SUM_6_FLOAT                   source/system/parit.F         
 Chd|-- called by -----------
 Chd|        AIRBAGB                       source/airbag/airbag2.F       
 Chd|        AIRBAGB1                      source/airbag/airbagb1.F      
 Chd|        ASS18                         source/interfaces/int18/ass18.F
+Chd|        DAMPVREF_SUM6                 source/assembly/dampvref_sum6.F
 Chd|        PORO                          source/ale/porous/poro.F      
 Chd|        RBYACT                        source/constraints/general/rbody/rbyact.F
 Chd|        RBYPID                        source/constraints/general/rbody/rbypid.F
@@ -65,18 +66,9 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "param_c.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER JFT, JLT, N
-C     REAL
       my_real
      .   F(*)
       DOUBLE PRECISION F6(N,6)
@@ -218,7 +210,7 @@ Chd|        S10VOLNODT3                   source/elements/solid/solide4_sfem/s10
 Chd|        S4ALESFEM                     source/elements/solid/solide4_sfem/s4alesfem.F
 Chd|        S4LAGSFEM                     source/elements/solid/solide4_sfem/s4lagsfem.F
 Chd|        S4VOLNOD3                     source/elements/solid/solide4_sfem/s4volnod3.F
-Chd|        S4VOLNOD_SM                   source/elements/solid/solide4_sfem/s4volnod3.F
+Chd|        S4VOLNOD_SM                   source/elements/solid/solide4_sfem/s4volnod_sm.F
 Chd|        SMS_BUILD_DIAG                source/ams/sms_build_diag.F   
 Chd|        SMS_MAV_LT                    source/ams/sms_pcg.F          
 Chd|        SMS_MAV_LT1                   source/ams/sms_pcg.F          
@@ -234,14 +226,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -377,14 +361,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "param_c.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
        DOUBLE PRECISION F,F7(7)
@@ -499,71 +475,7 @@ C-----------------------------------------------
        RETURN
        END
 
-       
-       
-c      SUBROUTINE DOUBLE_FLOT_IEEE(JFT  ,JLT  ,I8 ,R8, I8F)
-c      SUBROUTINE DOUBLE_FLOT_IEEE(JFT  ,JLT  ,I8 ,R8, I8F)
-C-----------------------------------------------
-C   I m p l i c i t   T y p e s
-C-----------------------------------------------
-c#include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-c#include      "mvsiz_p.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-c#include      "param_c.inc"
-C-----------------------------------------------
-C   D u m m y   A r g u m e n t s
-C-----------------------------------------------
-c      INTEGER JFT, JLT
-c      integer*8 I8(*),I8F(3,*)
-cC     REAL
-c      my_real
-c     .   R8(MVSIZ)
-C-----------------------------------------------
-C   L o c a l   V a r i a b l e s
-C-----------------------------------------------
-c___________________________________________________          
-c      integer i,iexpo,i4mask11
-c      integer*8 i8_mant
-c      integer*8 i8_deuxp52,i8mask43,i8mask52,i8mask63,i8mask1 
-c      data i8_deuxp52 /  '10000000000000'x/
-c      data i8mask1    /               '1'x/
-c      data i8mask43   /     '7ffffffffff'x/
-c      data i8mask52   /   'fffffffffffff'x/
-c      data i8mask63   /'7fffffffffffffff'x/
-c      data i4mask11   /             '7ff'x/
-c___________________________________________________          
-C-----------------------------------------------
-C
-c      DO I=JFT,JLT
-c___________________________________________________          
-c          i8_mant    = ior(iand(i8mask52,I8(I)),i8_deuxp52)
-cc          iexpo      = exponent(R8(I))-53
-cc          iexpo  = iand(ishft(I4(2,i),-20),i4mask11) - 1022 - 53  
-c          iexpo  = iand(ishft(I4(2,i),-20),i4mask11) - 1075  
-c          if(R8(I)<0.)then
-c           I8F(1,I) = -iand(i8mask63,ishft(i8_mant,iexpo))
-c           I8F(2,I) = -iand(i8mask43,ishft(i8_mant,iexpo+43))
-c           I8F(3,I) = -iand(i8mask43,ishft(i8_mant,iexpo+86))
-c     .                -iand(i8mask1 ,ishft(i8_mant,iexpo+87))
-c          elseif(R8(I)>0.)then
-c           I8F(1,I) =  iand(i8mask63,ishft(i8_mant,iexpo))
-c           I8F(2,I) =  iand(i8mask43,ishft(i8_mant,iexpo+43))
-c           I8F(3,I) =  iand(i8mask43,ishft(i8_mant,iexpo+86))
-c     .                +iand(i8mask1 ,ishft(i8_mant,iexpo+87))
-c          else
-c           I8F(1,I) =  0
-c           I8F(2,I) =  0
-c           I8F(3,I) =  0
-c          endif
-c      ENDDO
-c___________________________________________________          
-c      RETURN
-c      END
+
 Chd|====================================================================
 Chd|  DOUBLE_FLOT_IEEE              source/system/parit.F         
 Chd|-- called by -----------
@@ -582,15 +494,10 @@ C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "param_c.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER JFT, JLT
       integer*8 I8(*),I8F(3,*)
-C     REAL
       my_real
      .   R8(MVSIZ)
 C-----------------------------------------------
@@ -639,13 +546,8 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
 #include      "comlock.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -742,43 +644,43 @@ C-----------------------------------------------
       DO I= 1,A
         IF(ISENSINT(I) /=0)THEN
          DO J= 1,B
-   	    DO K=JFT,JLT
+              DO K=JFT,JLT
 
-   	     RESTE  = F(I,J,K)
+               RESTE  = F(I,J,K)
 
-   	     TEMP1  = RESTE + R8DEUXP89
-   	     TEMP11 = TEMP1 - R8DEUXP89
-   	     RESTE  = RESTE - TEMP11
+               TEMP1  = RESTE + R8DEUXP89
+               TEMP11 = TEMP1 - R8DEUXP89
+               RESTE  = RESTE - TEMP11
 
-   	     TEMP2  = RESTE + R8DEUXP62
-   	     TEMP12 = TEMP2 - R8DEUXP62
-   	     RESTE  = RESTE - TEMP12
+               TEMP2  = RESTE + R8DEUXP62
+               TEMP12 = TEMP2 - R8DEUXP62
+               RESTE  = RESTE - TEMP12
 
-   	     TEMP3  = RESTE + R8DEUXP35
-   	     TEMP13 = TEMP3 - R8DEUXP35
-   	     RESTE  = RESTE - TEMP13
+               TEMP3  = RESTE + R8DEUXP35
+               TEMP13 = TEMP3 - R8DEUXP35
+               RESTE  = RESTE - TEMP13
 
-   	     TEMP4  = RESTE + R8TWOP8
-   	     TEMP14 = TEMP4 - R8TWOP8
-   	     RESTE  = RESTE - TEMP14
+               TEMP4  = RESTE + R8TWOP8
+               TEMP14 = TEMP4 - R8TWOP8
+               RESTE  = RESTE - TEMP14
 
-   	     TEMP5  = RESTE + R8DEUXPM19
-   	     TEMP15 = TEMP5 - R8DEUXPM19
-   	     RESTE  = RESTE - TEMP15
+               TEMP5  = RESTE + R8DEUXPM19
+               TEMP15 = TEMP5 - R8DEUXPM19
+               RESTE  = RESTE - TEMP15
 
-   	     TEMP6  = RESTE + R8DEUXPM46
-   	     TEMP16 = TEMP6 - R8DEUXPM46
+               TEMP6  = RESTE + R8DEUXPM46
+               TEMP16 = TEMP6 - R8DEUXPM46
 
 #include "lockon.inc"
-   	     F6(J,1,ISENSINT(I))  = F6(J,1,ISENSINT(I)) + TEMP11
-   	     F6(J,2,ISENSINT(I))  = F6(J,2,ISENSINT(I)) + TEMP12
-   	     F6(J,3,ISENSINT(I))  = F6(J,3,ISENSINT(I)) + TEMP13
-   	     F6(J,4,ISENSINT(I))  = F6(J,4,ISENSINT(I)) + TEMP14
-   	     F6(J,5,ISENSINT(I))  = F6(J,5,ISENSINT(I)) + TEMP15
-   	     F6(J,6,ISENSINT(I))  = F6(J,6,ISENSINT(I)) + TEMP16 
+               F6(J,1,ISENSINT(I))  = F6(J,1,ISENSINT(I)) + TEMP11
+               F6(J,2,ISENSINT(I))  = F6(J,2,ISENSINT(I)) + TEMP12
+               F6(J,3,ISENSINT(I))  = F6(J,3,ISENSINT(I)) + TEMP13
+               F6(J,4,ISENSINT(I))  = F6(J,4,ISENSINT(I)) + TEMP14
+               F6(J,5,ISENSINT(I))  = F6(J,5,ISENSINT(I)) + TEMP15
+               F6(J,6,ISENSINT(I))  = F6(J,6,ISENSINT(I)) + TEMP16 
 #include "lockoff.inc"
 
-   	    ENDDO
+              ENDDO
          ENDDO
         ENDIF
       ENDDO
@@ -788,14 +690,14 @@ C-----------------------------------------------
 Chd|====================================================================
 Chd|  SUM_6_FLOAT_SECT              source/system/parit.F         
 Chd|-- called by -----------
-Chd|        SECTIO3N                      source/tools/sect/sectio.F    
-Chd|        SECTIOC                       source/tools/sect/sectio.F    
-Chd|        SECTIOP                       source/tools/sect/sectio.F    
-Chd|        SECTIOR                       source/tools/sect/sectio.F    
-Chd|        SECTIOS                       source/tools/sect/sectio.F    
-Chd|        SECTIOS4                      source/tools/sect/sectio.F    
-Chd|        SECTIOS6                      source/tools/sect/sectio.F    
-Chd|        SECTIOT                       source/tools/sect/sectio.F    
+Chd|        SECTION_3N                    source/tools/sect/section_3n.F
+Chd|        SECTION_C                     source/tools/sect/section_c.F 
+Chd|        SECTION_P                     source/tools/sect/section_p.F 
+Chd|        SECTION_R                     source/tools/sect/section_r.F 
+Chd|        SECTION_S                     source/tools/sect/section_s.F 
+Chd|        SECTION_S4                    source/tools/sect/section_s4.F
+Chd|        SECTION_S6                    source/tools/sect/section_s6.F
+Chd|        SECTION_T                     source/tools/sect/section_t.F 
 Chd|-- calls ---------------
 Chd|====================================================================
       SUBROUTINE SUM_6_FLOAT_SECT(F, A, B, JFT  ,JLT  , F6, D, E)
@@ -804,21 +706,14 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
 #include      "comlock.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER JFT, JLT, A, B, D, E
-C     REAL
-      my_real
-     .   F(A,B)
+      my_real F(A,B)
       DOUBLE PRECISION F6(D,E)
 C-----------------------------------------------
 c
@@ -904,43 +799,43 @@ C-----------------------------------------------
       DATA R8DEUXPM19/'3EC0000000000000'x/
       DATA R8DEUXPM46/'3D10000000000000'x/
       DO I= 1,A
-   	DO J=JFT,JLT
+          DO J=JFT,JLT
 
-   	 RESTE  = F(I,J)
+           RESTE  = F(I,J)
 
-   	 TEMP1  = RESTE + R8DEUXP89
-   	 TEMP11 = TEMP1 - R8DEUXP89
-   	 RESTE  = RESTE - TEMP11
+           TEMP1  = RESTE + R8DEUXP89
+           TEMP11 = TEMP1 - R8DEUXP89
+           RESTE  = RESTE - TEMP11
 
-   	 TEMP2  = RESTE + R8DEUXP62
-   	 TEMP12 = TEMP2 - R8DEUXP62
-   	 RESTE  = RESTE - TEMP12
+           TEMP2  = RESTE + R8DEUXP62
+           TEMP12 = TEMP2 - R8DEUXP62
+           RESTE  = RESTE - TEMP12
 
-   	 TEMP3  = RESTE + R8DEUXP35
-   	 TEMP13 = TEMP3 - R8DEUXP35
-   	 RESTE  = RESTE - TEMP13
+           TEMP3  = RESTE + R8DEUXP35
+           TEMP13 = TEMP3 - R8DEUXP35
+           RESTE  = RESTE - TEMP13
 
-   	 TEMP4  = RESTE + R8TWOP8
-   	 TEMP14 = TEMP4 - R8TWOP8
-   	 RESTE  = RESTE - TEMP14
+           TEMP4  = RESTE + R8TWOP8
+           TEMP14 = TEMP4 - R8TWOP8
+           RESTE  = RESTE - TEMP14
 
-   	 TEMP5  = RESTE + R8DEUXPM19
-   	 TEMP15 = TEMP5 - R8DEUXPM19
-   	 RESTE  = RESTE - TEMP15
+           TEMP5  = RESTE + R8DEUXPM19
+           TEMP15 = TEMP5 - R8DEUXPM19
+           RESTE  = RESTE - TEMP15
 
-   	 TEMP6  = RESTE + R8DEUXPM46
-   	 TEMP16 = TEMP6 - R8DEUXPM46
+           TEMP6  = RESTE + R8DEUXPM46
+           TEMP16 = TEMP6 - R8DEUXPM46
 
-#include "lockon.inc"   	 
-   	 F6(I,1)  = F6(I,1) + TEMP11
-   	 F6(I,2)  = F6(I,2) + TEMP12
-   	 F6(I,3)  = F6(I,3) + TEMP13
-   	 F6(I,4)  = F6(I,4) + TEMP14
-   	 F6(I,5)  = F6(I,5) + TEMP15
-   	 F6(I,6)  = F6(I,6) + TEMP16
+#include "lockon.inc"      
+           F6(I,1)  = F6(I,1) + TEMP11
+           F6(I,2)  = F6(I,2) + TEMP12
+           F6(I,3)  = F6(I,3) + TEMP13
+           F6(I,4)  = F6(I,4) + TEMP14
+           F6(I,5)  = F6(I,5) + TEMP15
+           F6(I,6)  = F6(I,6) + TEMP16
 #include "lockoff.inc"
 
-   	ENDDO
+          ENDDO
       ENDDO
 
       RETURN

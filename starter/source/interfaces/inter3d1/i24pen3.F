@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
 Chd|====================================================================
 Chd|  I24PEN3                       source/interfaces/inter3d1/i24pen3.F
@@ -50,20 +50,11 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
-C   D u m m y   A r g u m e n t s
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "units_c.inc"
-#include      "warn_c.inc"
 #include      "vect07_c.inc"
-#include      "scr03_c.inc"
 #include      "scr17_c.inc"
-#include      "param_c.inc"
 #include      "scr05_c.inc"
 #include      "com04_c.inc"
 C-----------------------------------------------
@@ -179,7 +170,6 @@ C------------used only for eliminating wrong contact w/ smaller distance
      +                    NS  ,IXS,   IXS10,     IXS16, IXS20   ,
      +                    IELIM)
             ICONN = 0
-C            IF (INACTI/=0 .AND. NS<=NUMNOD) THEN
             IF (NS>NUMNOD) THEN
               CALL I24FIC_GETN(NS1     ,IRTSE   ,IS2SE   ,IE    ,NN1     ,
      4                       NN2     )
@@ -202,6 +192,7 @@ C------Elimine the impact take into account to SECONDARY nodal normal
              IF (NORM >= ZERO) THEN
               PEN = -ABS(PEN)-TOL
 c             print *,'impact pair eliminated due to N_SECONDARY'
+              IDEL = 0
              END IF
            END IF
           END IF !(MSEGTYP(L)/=0 ) THEN
@@ -270,17 +261,6 @@ C----------warning w/o treatment
           ELSEIF(PEN > ZERO) THEN
 C------Warning anyway-------------
            IF (TAG(NS)==0) IWPENE=IWPENE+1
-C-----------add output of fictive nodes after           
-c           IF(IPRI>=1.AND.NS<=NUMNOD) THEN
-c            CALL ANCMSG(MSGID=346,
-c     .                  MSGTYPE=MSGWARNING,
-c     .                  ANMODE=ANINFO_BLIND_2,
-c     .                  I1=ID,I2=ITAB(NS),
-c     .                  C1=TITR,
-c     .                  R1=PEN)
-c            WRITE(IOUT,FMT=FMT_6I_2F)
-c     .      ITAB(NS),L,(ITAB(IRECT(JJ,L)),JJ=1,4),SSC,TTC
-c           END IF
 C------------PMIN has been changed from PENE to dist excepting (INACTI ==0,1)        
            IF(INACTI ==0 .OR. INACTI ==1) THEN
 C------------use IRTLM(2,NI)-> ICONT_I<0 for initial penetration
@@ -311,11 +291,11 @@ C------------multi-cont-> single by overwriting with min_pene
              PEN0=PMIN(I0)
              DIST0 = ABS(PMIN(I0))
              IF (DIST < DIST0) THEN
-C             IF (PEN < PEN0) THEN
               IRTLM(1,NI)=L
               IRTLM(2,NI)=1
               PMIN(NI)=DIST
               PEN_OLD(5,NI)=PEN
+              TAG(NS) = NI
 #ifdef HYPERMESH_LIB
               PEN_OLD(1:3,NI) = NN(1:3)
 #endif
@@ -325,6 +305,7 @@ C             IF (PEN < PEN0) THEN
              IRTLM(2,NI)=1
              PMIN(NI)=DIST
              PEN_OLD(5,NI)=PEN
+             TAG(NS) = NI
 #ifdef HYPERMESH_LIB
              PEN_OLD(1:3,NI) = NN(1:3)
 #endif
@@ -370,11 +351,11 @@ C------------multi-cont-> single by overwriting with min_pene
              PEN0=PEN_OLD(5,I0)
              DIST0 = ABS(PMIN(I0))
              IF (DIST < DIST0) THEN
-C             IF (PEN < PEN0) THEN
               IRTLM(1,NI)=L
               IRTLM(2,NI)=1
               PEN_OLD(5,NI)=PEN
               PMIN(NI)=DIST
+              TAG(NS) = NI
 #ifdef HYPERMESH_LIB
               PEN_OLD(1:3,NI) = NN(1:3)
 #endif
@@ -384,13 +365,13 @@ C             IF (PEN < PEN0) THEN
              IRTLM(2,NI)=1
              PEN_OLD(5,NI)=PEN
              PMIN(NI)=DIST
+             TAG(NS) = NI
 #ifdef HYPERMESH_LIB
              PEN_OLD(1:3,NI) = NN(1:3)
 #endif
             END IF
-           END IF !IF(INACTI ==-1) THEN
-           TAG(NS)=CAND_N(I)
-          END IF !(ABS(PEN)<=TOL) THEN
+           END IF !IF(INACTI ==0 .OR. INACTI ==1) THEN
+          END IF !(PEN > ZERO) THEN
         END IF !(IER==-1)THEN
       END DO !I=LFT,LLT              
 C      
@@ -420,16 +401,11 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IER
-C     REAL
       my_real
      .   XX(4),YY(4),ZZ(4),NN(3), SSC, TTC, ALP,XI,YI,ZI,XC,YC,ZC
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-C     REAL
       my_real
      .   H(4), X0, Y0, Z0, XL1, XL2, XL3, XL4, YY1, YY2, YY3, YY4,
      .   ZZ1, ZZ2, ZZ3, ZZ4, XI1, XI2, XI3, XI4, YI1, YI2, YI3, YI4,
@@ -643,7 +619,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "param_c.inc"
 #include      "com04_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -703,16 +678,9 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
 #include      "com04_c.inc"
-C-----------------------------------------------
-C   L o c a l   V a r i a b l e s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -789,24 +757,15 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
-C   D u m m y   A r g u m e n t s
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
       INTEGER CAND_E(*),CAND_N(*),NSN,IRTLM(2,*),II_STOK,
      *                    MSEGTYP(*)
-C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER E, I,ISH
      .        
-C     REAL
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------

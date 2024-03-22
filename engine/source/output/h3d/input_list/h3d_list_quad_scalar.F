@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  H3D_LIST_QUAD_SCALAR          source/output/h3d/input_list/h3d_list_quad_scalar.F
 Chd|-- called by -----------
@@ -27,7 +27,7 @@ Chd|        LECH3D                        source/output/h3d/h3d_build_fortran/le
 Chd|-- calls ---------------
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|        STACK_MOD                     share/modules/stack_mod.F     
 Chd|====================================================================
       SUBROUTINE H3D_LIST_QUAD_SCALAR(H3D_KEYWORD_QUAD_SCALAR,GEO,IGEO,MULTI_FVM,NKEY)
@@ -46,25 +46,22 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       TYPE (H3D_KEYWORD) H3D_KEYWORD_QUAD_SCALAR(*)
-      my_real
-     .      GEO(NPROPG,*)
-      INTEGER IGEO(NPROPGI,*)
+      my_real GEO(NPROPG,NUMGEO)
+      INTEGER IGEO(NPROPGI,NUMGEO)
       TYPE(MULTI_FVM_STRUCT), INTENT(IN) :: MULTI_FVM
       INTEGER, INTENT(INOUT) :: NKEY
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "chara_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-C-----------------------------------------------
-C   E x t e r n a l   F u n c t i o n s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,II,J,NIPMAX,IPLYMAX,CPTPLY,IPTMAX
-C=========================================================================
+C-----------------------------------------------
+C   S o u r c e   L i n e s
+C-----------------------------------------------
       I = 0
 c-----------------------------------------------
       I = I + 1
@@ -150,7 +147,7 @@ c-----------------------------------------------
 c-----------------------------------------------
       I = I + 1
       H3D_KEYWORD_QUAD_SCALAR(I)%KEY3  = 'HOURGLASS'
-      H3D_KEYWORD_QUAD_SCALAR(I)%TEXT1  = 'Hourglass Energy'
+      H3D_KEYWORD_QUAD_SCALAR(I)%TEXT1  = 'Hourglass Energy per unit mass'
 c-----------------------------------------------
       IF (MULTI_FVM%IS_USED) THEN
 c
@@ -162,26 +159,22 @@ c-----------------------------------------------
             I = I + 1
             WRITE(H3D_KEYWORD_QUAD_SCALAR(I)%KEY3, '(A9,I0)') 'M151VFRAC', II
             WRITE(H3D_KEYWORD_QUAD_SCALAR(I)%TEXT1, '(A17,I0)') 'Volume fraction ', II
-            H3D_KEYWORD_QUAD_SCALAR(I)%COMMENT  = 
-     .        'Volume fractions (for ALE multi-material Law151)'
+            H3D_KEYWORD_QUAD_SCALAR(I)%COMMENT  = 'Volume fractions (for ALE multi-material Law151)'
 c-----------------------------------------------
             I = I + 1
             WRITE(H3D_KEYWORD_QUAD_SCALAR(I)%KEY3, '(A8,I0)') 'M151DENS', II
             WRITE(H3D_KEYWORD_QUAD_SCALAR(I)%TEXT1, '(A8,I0)') 'Density ', II
-            H3D_KEYWORD_QUAD_SCALAR(I)%COMMENT  = 
-     .        'Density (for ALE multi-material Law151)'
+            H3D_KEYWORD_QUAD_SCALAR(I)%COMMENT  = 'Density (for ALE multi-material Law151)'
 c-----------------------------------------------
             I = I + 1
             WRITE(H3D_KEYWORD_QUAD_SCALAR(I)%KEY3, '(A8,I0)') 'M151ENER', II
             WRITE(H3D_KEYWORD_QUAD_SCALAR(I)%TEXT1, '(A7,I0)') 'Energy ', II
-            H3D_KEYWORD_QUAD_SCALAR(I)%COMMENT  = 
-     .        'Energy (for ALE multi-material Law151)'
+            H3D_KEYWORD_QUAD_SCALAR(I)%COMMENT  = 'Energy (for ALE multi-material Law151)'
 c-----------------------------------------------
             I = I + 1
             WRITE(H3D_KEYWORD_QUAD_SCALAR(I)%KEY3, '(A8,I0)') 'M151PRES', II
             WRITE(H3D_KEYWORD_QUAD_SCALAR(I)%TEXT1, '(A10,I0)') 'Pressure ', II
-            H3D_KEYWORD_QUAD_SCALAR(I)%COMMENT  = 
-     .        'Pressure (for ALE multi-material Law151)'
+            H3D_KEYWORD_QUAD_SCALAR(I)%COMMENT  = 'Pressure (for ALE multi-material Law151)'
 c-----------------------------------------------
          ENDDO
       ELSE
@@ -189,26 +182,22 @@ c-----------------------------------------------
          I = I + 1
          H3D_KEYWORD_QUAD_SCALAR(I)%KEY3  = 'VFRAC1'
          H3D_KEYWORD_QUAD_SCALAR(I)%TEXT1  = 'Volumetric Fraction 1'
-         H3D_KEYWORD_QUAD_SCALAR(I)%COMMENT  = 
-     .        'Volumetric fractions (for ALE multi-material laws: LAW20, LAW37 and LAW51)'
+         H3D_KEYWORD_QUAD_SCALAR(I)%COMMENT  = 'Volumetric fractions (for ALE multi-material laws: LAW20, LAW37 and LAW51)'
 c-----------------------------------------------
          I = I + 1
          H3D_KEYWORD_QUAD_SCALAR(I)%KEY3  = 'VFRAC2'
          H3D_KEYWORD_QUAD_SCALAR(I)%TEXT1  = 'Volumetric Fraction 2'
-         H3D_KEYWORD_QUAD_SCALAR(I)%COMMENT  = 
-     .        'Volumetric fractions (for ALE multi-material laws: LAW20, LAW37 and LAW51)'
+         H3D_KEYWORD_QUAD_SCALAR(I)%COMMENT  = 'Volumetric fractions (for ALE multi-material laws: LAW20, LAW37 and LAW51)'
 c-----------------------------------------------
          I = I + 1
          H3D_KEYWORD_QUAD_SCALAR(I)%KEY3  = 'VFRAC3'
          H3D_KEYWORD_QUAD_SCALAR(I)%TEXT1  = 'Volumetric Fraction 3'
-         H3D_KEYWORD_QUAD_SCALAR(I)%COMMENT  = 
-     .        'Volumetric fractions (for ALE multi-material laws: LAW20, LAW37 and LAW51)'
+         H3D_KEYWORD_QUAD_SCALAR(I)%COMMENT  = 'Volumetric fractions (for ALE multi-material laws: LAW20, LAW37 and LAW51)'
 c-----------------------------------------------
          I = I + 1
          H3D_KEYWORD_QUAD_SCALAR(I)%KEY3  = 'VFRAC4'
          H3D_KEYWORD_QUAD_SCALAR(I)%TEXT1  = 'Volumetric Fraction 4'
-         H3D_KEYWORD_QUAD_SCALAR(I)%COMMENT  = 
-     .        'Volumetric fractions (for ALE multi-material laws: LAW20, LAW37 and LAW51)'
+         H3D_KEYWORD_QUAD_SCALAR(I)%COMMENT  = 'Volumetric fractions (for ALE multi-material laws: LAW20, LAW37 and LAW51)'
 c-----------------------------------------------
       ENDIF  ! MULTI_FVM%IS_USED
 c-----------------------------------------------
@@ -233,6 +222,10 @@ c-----------------------------------------------
       H3D_KEYWORD_QUAD_SCALAR(I)%IS_PLY = 1
       H3D_KEYWORD_QUAD_SCALAR(I)%IS_PLY_ALL = 1
       H3D_KEYWORD_QUAD_SCALAR(I)%TEXT1  = 'Plastic Strain '
+c-----------------------------------------------
+      I = I + 1
+      H3D_KEYWORD_QUAD_SCALAR(I)%KEY3   = 'TSAIWU'
+      H3D_KEYWORD_QUAD_SCALAR(I)%TEXT1  = 'Tsai-Wu Criterion'
 c-----------------------------------------------
       I = I + 1
       H3D_KEYWORD_QUAD_SCALAR(I)%KEY3  = 'FAIL'
@@ -275,6 +268,18 @@ c-----------------------------------------------
       H3D_KEYWORD_QUAD_SCALAR(I)%IS_IPT = 1
       H3D_KEYWORD_QUAD_SCALAR(I)%IS_IPT_ALL = 1
       H3D_KEYWORD_QUAD_SCALAR(I)%TEXT1  = 'DAMAGE'
+c-----------------------------------------------
+      I = I + 1
+      H3D_KEYWORD_QUAD_SCALAR(I)%KEY3  = 'FAILURE'
+      H3D_KEYWORD_QUAD_SCALAR(I)%IS_PLY = 1
+      H3D_KEYWORD_QUAD_SCALAR(I)%IS_PLY_ALL = 1
+      H3D_KEYWORD_QUAD_SCALAR(I)%IS_LAYER = 1
+      H3D_KEYWORD_QUAD_SCALAR(I)%IS_LAYER_ALL = 1
+      H3D_KEYWORD_QUAD_SCALAR(I)%IS_IPT = 1
+      H3D_KEYWORD_QUAD_SCALAR(I)%IS_IPT_ALL = 1
+      H3D_KEYWORD_QUAD_SCALAR(I)%IS_ID = 1
+      H3D_KEYWORD_QUAD_SCALAR(I)%TEXT1  = 'Failure'
+      H3D_KEYWORD_QUAD_SCALAR(I)%COMMENT = 'Damage of current failue criterion'
 c-----------------------------------------------
       I = I + 1
       H3D_KEYWORD_QUAD_SCALAR(I)%KEY3  = 'DAMA/MEMB'
@@ -449,6 +454,16 @@ c-----------------------------------------------
       I = I + 1
       H3D_KEYWORD_QUAD_SCALAR(I)%KEY3  = 'LOCAL.ID'
       H3D_KEYWORD_QUAD_SCALAR(I)%TEXT1  = 'Local identifier within the group'
+c-----------------------------------------------
+      I = I + 1
+      H3D_KEYWORD_QUAD_SCALAR(I)%KEY3  = 'TILLOTSON'
+      H3D_KEYWORD_QUAD_SCALAR(I)%TEXT1  = 'Region identifier in p,v diagram'
+      H3D_KEYWORD_QUAD_SCALAR(I)%COMMENT  = '1:compressed, 2:expanded cold, 3:transition, 4:hot expansion'
+c-----------------------------------------------
+      I = I + 1
+      H3D_KEYWORD_QUAD_SCALAR(I)%KEY3  = 'DIV(U)'
+      H3D_KEYWORD_QUAD_SCALAR(I)%TEXT1  = 'div(u)'
+      H3D_KEYWORD_QUAD_SCALAR(I)%COMMENT  = 'Volumetric dilatation rate'
 c-----------------------------------------------
       NKEY=I
 c-----------------------------------------------

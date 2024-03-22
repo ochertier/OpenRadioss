@@ -1,47 +1,48 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  HIST13                        source/output/th/hist13.F     
 Chd|-- called by -----------
 Chd|        RADIOSS2                      source/engine/radioss2.F      
 Chd|-- calls ---------------
-Chd|        CUR_FIL_C                     source/output/tools/sortie_c.c
-Chd|        EOR_C                         source/output/tools/sortie_c.c
-Chd|        OPEN_C                        source/output/tools/sortie_c.c
-Chd|        WRITE_C_C                     source/output/tools/sortie_c.c
-Chd|        WRITE_I_C                     source/output/tools/sortie_c.c
+Chd|        CUR_FIL_C                     ../common_source/tools/input_output/write_routtines.c
+Chd|        EOR_C                         ../common_source/tools/input_output/write_routtines.c
+Chd|        OPEN_C                        ../common_source/tools/input_output/write_routtines.c
+Chd|        WRITE_C_C                     ../common_source/tools/input_output/write_routtines.c
+Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|        WRTDES                        source/output/th/wrtdes.F     
 Chd|        STRI                          source/tools/univ/stri.F      
 Chd|        INOUTFILE_MOD                 ../common_source/modules/inoutfile_mod.F
 Chd|====================================================================
       SUBROUTINE HIST13(IPARG ,IXS  ,IXQ  ,IXC    ,IXT    ,
      2                  IXP   ,IXR  ,IWA  ,ITAB   ,PM     ,
-     3                  NPBY  ,IXTG ,IRFE ,IXUR   ,LACCELM,
-     4                  IPARI ,IPART,ITHGRP ,ITHBUF,CHRUN_OLD)
+     3                  NPBY  ,IXTG ,IRFE ,LACCELM,
+     4                  IPARI ,IPART,ITHGRP ,ITHBUF,CHRUN_OLD,NAMES_AND_TITLES)
 C=======================================================================
 C   OLD TH V3 RADIOSS INPUT V3 or V4
 C=======================================================================
       USE INOUTFILE_MOD
+      USE NAMES_AND_TITLES_MOD,only:NAMES_AND_TITLES_,LTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -49,47 +50,43 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com05_c.inc"
-#include      "com08_c.inc"
 #include      "com10_c.inc"
 #include      "units_c.inc"
 #include      "param_c.inc"
-#include      "scr03_c.inc"
 #include      "scr05_c.inc"
 #include      "scr12_c.inc"
 #include      "scr13_c.inc"
 #include      "scr17_c.inc"
 #include      "scrfs_c.inc"
 #include      "chara_c.inc"
-#include      "rnur_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IRFE
       INTEGER IPARG(NPARG,*), IXS(NIXS,*), IXQ(NIXQ,*),
      .   IXC(NIXC,*), IXT(NIXT,*), IXP(NIXP,*), IXR(NIXR,*),
-     .   IXUR(NIXUR,*), IXTG(NIXTG,*), IWA(*), ITAB(*),
+     .   IXTG(NIXTG,*), IWA(*), ITAB(*),
      .   IPARI(NPARI,*),LACCELM(3,*),IPART(LIPART1,*), NPBY(NNPBY,*),
      .   ITHGRP(NITHGR,*), ITHBUF(*)
-C     REAL
-      my_real
-     .   PM(NPROPM,*)
+
+      my_real PM(NPROPM,NUMMAT)
       CHARACTER CHRUN_OLD*2
+      TYPE(NAMES_AND_TITLES_),INTENT(IN) :: NAMES_AND_TITLES   !< NAMES_AND_TITLES host the input deck names and titles for outputs+
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER ITITLE(80), IFILNAM(2148), ICODE, I, NJOINV, NRBAGV,
      .   NG, II, N, IH, ITY, NEL, NFT, K, MTN, NACCELV,NINTERS,
      .   IRUNR,NN,IAD,J,ITYP
-C     REAL
-      my_real
-     .   TITLE(20)
-      CHARACTER EOR*8, CH8*8, CARD*80, FILNAM*100, BLA*7
 
+      CHARACTER EOR*8, CH8*8, FILNAM*100, BLA*7
+      CHARACTER(LEN=LTITLE) :: CARD
+      my_real,DIMENSION(20) :: TITLE
       INTEGER :: LEN_TMP_NAME
       CHARACTER(len=2148) :: TMP_NAME
+      INTEGER, DIMENSION(20) :: TEXT
+      INTEGER  NGLV, NMTV, NINV, NRWV, NRBV, NNODV, NSCV, NELQV, NELSV, NELCV, NELTV, NELPV, NELRV, NELTGV, NELURV
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
@@ -98,8 +95,9 @@ C-----------------------------------------------
       EXTERNAL STRI
       DATA BLA/'       '/
       DATA EOR/'ZZZZZEOR'/
-C
-C
+C-----------------------------------------------
+C   S o u r c e   L i n e s
+C-----------------------------------------------
       NINTERS = 0
       DO N=1,NTHGRP
           ITYP=ITHGRP(2,N)
@@ -109,8 +107,7 @@ C
 C
       FILNAM=ROOTNAM(1:ROOTLEN)//'T'//CHRUN_OLD
 C
-      WRITE(CARD,'(20A4)')TEXT
-      READ(CARD,'(20A4)')TITLE
+      CARD(1:LTITLE)=NAMES_AND_TITLES%TITLE(1:LTITLE)
 C      ICODE=3017
 C      ICODE=3023
       ICODE=3030
@@ -150,6 +147,7 @@ C
       ENDIF
 C
       IF(ITFORM==0)THEN
+        READ(CARD,'(20A4)')TITLE
         WRITE(IUHIS)ICODE,TITLE
       ELSEIF(ITFORM==1)THEN
         CH8=STRI(ICODE)
@@ -235,7 +233,6 @@ C
       IWA(29)=NRBAGV
       IWA(30)=NSELTG
       IWA(31)=NELTGV
-C      IWA(32)=NSELUR
       IWA(32)=NSELU
       IWA(33)=NELURV
       IWA(34)=NACCELM
@@ -519,26 +516,6 @@ C
               I=ITHBUF(J)
               II=II+1
               IWA(II)=ITHBUF(J+2*NN)
-              II=II+1
-              IWA(II)=0
-            ENDDO
-          ENDIF
-        ENDDO
-        CALL WRTDES(IWA,IWA,II,ITFORM,0)
-      ENDIF
-C
-C      IF (NSELUR>0) THEN
-      IF (NSELU>0) THEN
-        II=0
-        DO N=1,NTHGRP
-          ITYP=ITHGRP(2,N)
-          NN  =ITHGRP(4,N)
-          IAD =ITHGRP(5,N)
-          IF(ITYP==50)THEN
-            DO J=IAD,IAD+NN-1
-              I=ITHBUF(J)
-              II=II+1
-              IWA(II)=IXUR(NIXUR,I)
               II=II+1
               IWA(II)=0
             ENDDO

@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
 Chd|====================================================================
 Chd|  SPMD_SD_XV                    source/mpi/nodes/spmd_sd_xv.F 
@@ -29,6 +29,8 @@ Chd|        RESOL                         source/engine/resol.F
 Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
 Chd|        ARRET                         source/system/arret.F         
+Chd|        ALE_MOD                       ../common_source/modules/ale/ale_mod.F
+Chd|        ANIM_MOD                      ../common_source/modules/anim_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
       SUBROUTINE SPMD_SD_XV(
@@ -38,12 +40,13 @@ Chd|====================================================================
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
-      USE MESSAGE_MOD     
+      USE MESSAGE_MOD  
+      USE ANIM_MOD   
+      USE ALE_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -57,13 +60,11 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "com06_c.inc"
 #include      "com08_c.inc"
-#include      "scr02_c.inc"
 #include      "scr06_c.inc"
 #include      "scr07_c.inc"
 #include      "scr18_c.inc"
 #include      "task_c.inc"
 #include      "scr05_c.inc"
-#include      "units_c.inc"
 #include      "rad2r_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -103,9 +104,8 @@ C-----------------------------------------------
         IF(IMSCH>0) DT_CST = 1
       ENDIF
       IF ((IRAD2R==1).AND.(NCYCLE<2)) DT_CST = 1
-      IF ((IALESUB/=0).OR.(IALE/=0).OR.(ISUB>0).OR.
-     .    TT>=TANIM.OR.
-     .    TT>=TOUTP.OR.TT>=TDES.OR.TT>=TPAT.OR.
+      IF ((ALE%SUB%IALESUB/=0).OR.(IALE/=0).OR.
+     .    (TT>=TANIM .AND. TT<=TANIM_STOP).OR.TT>=TOUTP.OR.
      .    (MANIM>=1.AND.MANIM<=15)) THEN
         NEW_D = 1
         IF(IALE/=0.AND.NINTER>0) NEW_D = 2
@@ -118,7 +118,7 @@ C-----------------------------------------------
       
       IF(IRESP==1)THEN
         ALLOCATE(SRBUFDP(ISIZXV*LEN_DP),STAT=IERROR1)
-	IF(IERROR1/=0) THEN
+          IF(IERROR1/=0) THEN
           CALL ANCMSG(MSGID=20,ANMODE=ANINFO)
           CALL ARRET(2)
         ENDIF
@@ -128,7 +128,7 @@ C-----------------------------------------------
       
       IF(ISPMD==0) THEN
         L = 1
-	L2 = 1
+        L2 = 1
 C
         DO I=1,NSPMD
           IF (NEW_D==0) THEN
@@ -191,7 +191,7 @@ C
               L = L + E_LEN
             END DO
            ENDIF
-Cel D est a envoyer pour sorties
+C   D est a envoyer pour sorties
           ELSEIF(NEW_D==1) THEN
            IF(IRODDL/=0.AND.DT_CST/=0) THEN
 #include      "vectorize.inc"
@@ -264,7 +264,7 @@ Cel D est a envoyer pour sorties
               L = L + E_LEN
             END DO
            ENDIF
-Cel NEW_D==2 => Envoyer D et W
+C   NEW_D==2 => Envoyer D et W
           ELSE
            IF(IRODDL/=0.AND.DT_CST/=0) THEN
 #include      "vectorize.inc"
@@ -350,16 +350,16 @@ Cel NEW_D==2 => Envoyer D et W
             END DO
            ENDIF
           ENDIF
-	  IF(IRESP==1)THEN
+            IF(IRESP==1)THEN
 #include      "vectorize.inc"
             DO J=IAD_ELEM(2,I),IAD_ELEM(1,I+1)-1
-              NOD = FR_ELEM(J)	     
-	      SRBUFDP(L2)  = XDP(1,NOD)
-	      SRBUFDP(L2+1)= XDP(2,NOD)
-	      SRBUFDP(L2+2)= XDP(3,NOD)	       
-	      L2= L2 + LEN_DP 
-	    ENDDO
-	  ENDIF	  
+              NOD = FR_ELEM(J)       
+                SRBUFDP(L2)  = XDP(1,NOD)
+                SRBUFDP(L2+1)= XDP(2,NOD)
+                SRBUFDP(L2+2)= XDP(3,NOD)         
+                L2= L2 + LEN_DP 
+              ENDDO
+            ENDIF    
         ENDDO
 C
 C   Envoi messages
@@ -375,25 +375,25 @@ C----------------------------------------------------------------------------
      S       SRBUF(L),SIZ,REAL,IT_SPMD(I),MSGTYP,
      G       MPI_COMM_WORLD,REQ_S(I),IERROR)
            L = L + SIZ
-	   
-	   IF(IRESP==1)THEN
-	     MSGTYP = MSGOFF2
+             
+             IF(IRESP==1)THEN
+               MSGTYP = MSGOFF2
              SIZDP = LEN_DP*(IAD_ELEM(1,I+1)-IAD_ELEM(2,I))
              CALL MPI_ISEND(
      S         SRBUFDP(L2),SIZDP,MPI_DOUBLE_PRECISION,IT_SPMD(I),MSGTYP,
      G         MPI_COMM_WORLD,REQ_S_DP(I),IERROR)
              L2 = L2 + SIZDP
-	   ENDIF
+             ENDIF
          ENDIF
 C----------------------------------------------------------------------------
        ENDDO
-Cel wait terminaison isend
+C   wait terminaison isend
        DO I = 1, NSPMD
          IF(IAD_ELEM(1,I+1)-IAD_ELEM(2,I)>0)THEN
            CALL MPI_WAIT(REQ_S(I),STATUS,IERROR)
-	   IF(IRESP==1)THEN
-    	     CALL MPI_WAIT(REQ_S_DP(I),STATUS,IERROR)
-	   ENDIF
+             IF(IRESP==1)THEN
+               CALL MPI_WAIT(REQ_S_DP(I),STATUS,IERROR)
+             ENDIF
          END IF
        END DO
 
@@ -403,9 +403,9 @@ C decompactage
 C
       IF(ISPMD/=0) THEN
         L = 1
-	L2= 1
+          L2= 1
         SIZ = E_LEN*(IAD_ELEM(1,2)-IAD_ELEM(2,1))
-	IF(IRESP==1)SIZDP = LEN_DP*(IAD_ELEM(1,2)-IAD_ELEM(2,1))
+          IF(IRESP==1)SIZDP = LEN_DP*(IAD_ELEM(1,2)-IAD_ELEM(2,1))
         IF(SIZ/=0)THEN
           MSGTYP = MSGOFF
           CALL MPI_RECV(
@@ -418,7 +418,7 @@ C
      S        SRBUFDP(L2),SIZDP,MPI_DOUBLE_PRECISION,IT_SPMD(1),MSGTYP,
      G        MPI_COMM_WORLD,STATUS,IERROR)
           ENDIF
-     	  
+            
           IF(NEW_D==0) THEN
             IF(IRODDL/=0.AND.DT_CST/=0) THEN
 #include      "vectorize.inc"
@@ -479,7 +479,7 @@ C
                 L = L + E_LEN
               END DO
             ENDIF
-Cel D a recevoir
+C   D a recevoir
           ELSEIF(NEW_D==1) THEN
             IF(IRODDL/=0.AND.DT_CST/=0) THEN
 #include      "vectorize.inc"
@@ -639,16 +639,16 @@ CD et W a recevoir
               END DO
             ENDIF
           ENDIF
-	  IF(IRESP==1)THEN
+            IF(IRESP==1)THEN
 #include      "vectorize.inc"
             DO J=IAD_ELEM(2,1),IAD_ELEM(1,2)-1
-	      NOD = FR_ELEM(J)  
-	      XDP(1,NOD)=  SRBUFDP(L2)
-	      XDP(2,NOD)=  SRBUFDP(L2+1)
-	      XDP(3,NOD)=  SRBUFDP(L2+2)
-	      L2= L2 + LEN_DP      	    
-	    ENDDO
-	  ENDIF	    
+                NOD = FR_ELEM(J)  
+                XDP(1,NOD)=  SRBUFDP(L2)
+                XDP(2,NOD)=  SRBUFDP(L2+1)
+                XDP(3,NOD)=  SRBUFDP(L2+2)
+                L2= L2 + LEN_DP            
+              ENDDO
+            ENDIF      
         END IF
       ENDIF
       DEALLOCATE(SRBUF)

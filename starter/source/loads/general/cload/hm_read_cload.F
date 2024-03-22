@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  HM_READ_CLOAD                 source/loads/general/cload/hm_read_cload.F
 Chd|-- called by -----------
@@ -36,12 +36,14 @@ Chd|        NODGRNR5                      source/starter/freform.F
 Chd|        NODGR_R2R                     source/coupling/rad2rad/routines_r2r.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
+Chd|        LOADS_MOD                     ../common_source/modules/loads/loads_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        R2R_MOD                       share/modules1/r2r_mod.F      
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
-      SUBROUTINE HM_READ_CLOAD(IBCL   ,FORC    ,NUM    ,ITAB   ,ITABM1 ,
-     .                         IGRNOD ,NWORK   ,UNITAB ,ISKN   ,LSUBMODEL)
+      SUBROUTINE HM_READ_CLOAD(IBCL   ,FORC    ,NUM    ,ITAB   ,ITABM1   ,
+     .                         IGRNOD ,NWORK   ,UNITAB ,ISKN   ,LSUBMODEL,
+     .                         LOADS  )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -51,6 +53,7 @@ C-----------------------------------------------
       USE GROUPDEF_MOD
       USE SUBMODEL_MOD
       USE HM_OPTION_READ_MOD
+      USE LOADS_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -59,14 +62,10 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "scr03_c.inc"
 #include      "scr17_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "sysunit.inc"
-#include      "submod_c.inc"
 #include      "r2r_c.inc"
 #include      "sphcom.inc"
 C-----------------------------------------------
@@ -80,6 +79,7 @@ C     REAL
       my_real
      .   FORC(LFACCLD,*)
       TYPE(SUBMODEL_DATA),INTENT(IN)::LSUBMODEL(*)
+      TYPE (LOADS_),INTENT(INOUT) :: LOADS
 C-----------------------------------------------
       TYPE (GROUP_)  ,DIMENSION(NGRNOD)  :: IGRNOD
 C-----------------------------------------------
@@ -88,7 +88,7 @@ C-----------------------------------------------
       my_real
      .        FCX,FCY,FAC_FCX,FAC_FCY
       INTEGER I,J,K,K1,K2,NOD, NCUR, NOSKEW, ISENS,NLD0,NN,IGU,IGS,
-     .        UID,IAD,NS,IWA,ID,NUM0,IFLAGUNIT,COMPT,SUB_INDEX,IDIR
+     .        UID,IAD,NS,IWA,ID,NUM0,IFLAGUNIT,COMPT,SUB_INDEX,IDIR,IFUNCTYPE
       INTEGER NNB
       CHARACTER MESS*40, XYZ*ncharfield,
      .          X*1, Y*1, Z*1, XX*2, YY*2, ZZ*2
@@ -110,6 +110,7 @@ C     4: -1 <=> CLOAD                      4th node number of the segment
 C     5: UNUSED                            Function internal number
 C     6: ISENS Sensor User ID              ISENS Sensor User ID
 C     7: User ID                           User ID
+C     9: Itypfun                           Function type
 C-----------------------------------------------
 C     FORC(LFACCLD,NUMCLD+NUMPRES)
 C     FORC(LFACCLD,NUMCLD)                 PRES = FORC(LFACCLD,NUMCLD+1:NUMCLD+NUMPRES)
@@ -131,6 +132,7 @@ C
       NLD0=NUM
       NUM=0
       I=0
+      IFUNCTYPE=0
 C--------------------------------------------------
 C START BROWSING MODEL CLOAD
 C--------------------------------------------------
@@ -164,6 +166,7 @@ C--------------------------------------------------
         IF(NOSKEW == 0 .AND. SUB_INDEX /= 0 ) NOSKEW = LSUBMODEL(SUB_INDEX)%SKEW
         CALL HM_GET_INTV('rad_sensor_id',ISENS,IS_AVAILABLE,LSUBMODEL)
         CALL HM_GET_INTV('entityid',IGU,IS_AVAILABLE,LSUBMODEL)
+        CALL HM_GET_INTV('Itypfun',IFUNCTYPE,IS_AVAILABLE,LSUBMODEL)
 C--------------------------------------------------
 C EXTRACT DATAS (REAL VALUES)
 C--------------------------------------------------
@@ -173,7 +176,7 @@ C--------------------------------------------------
         CALL HM_GET_FLOATV_DIM('magnitude',FAC_FCY,IS_AVAILABLE,LSUBMODEL,UNITAB)
 C--------------------------------------------------
         IFLAGUNIT = 0
-        DO J=1,NUNITS
+        DO J=1,UNITAB%NUNITS
           IF (UNITAB%UNIT_ID(J) == UID) THEN
             IFLAGUNIT = 1
             EXIT
@@ -242,10 +245,11 @@ C-----------Multidomaines : on enleve les noeuds communs qui sont deja trait   s
         ENDIF
 C-----------
         IF (NN==0) THEN
-         CALL ANCMSG(MSGID=54,
+         CALL ANCMSG(MSGID=3026,
      .               ANMODE=ANINFO,
      .               MSGTYPE=MSGERROR,
-     .               C1=KLINE)
+     .               I1=ID,
+     .               C1=TITR)
         ENDIF
         NUM=NUM+NN
         DO J=NN,1,-1
@@ -253,6 +257,10 @@ C       !!  IBCL ET NWORK ONT LA MEME ADRESSE
 C          IBCL(1,I+J)=NWORK(J+6*NUM0)
             NWORK(1+NIBCLD*(J+I-1))=NWORK(J+NIBCLD*NUM0)
         ENDDO
+
+        IF(IFUNCTYPE == 0) IFUNCTYPE = 1 ! Abscissa function is time (by default)
+                        !  IFUNCTYPE = 2 ! Abscissa function is nodal displacement
+                        !  IFUNCTYPE = 3 ! Abscissa function is nodal velocity
 
         DO J=1,NN
           I=I+1
@@ -262,6 +270,7 @@ C          IBCL(1,I+J)=NWORK(J+6*NUM0)
           IBCL(6,I)      = ISENS
           IBCL(7,I)      = 0
           IBCL(8,I)      = 0
+          IBCL(9,I)      = IFUNCTYPE
           FORC(1,I) = FCY
           FORC(2,I) = ONE/FCX
           IF (IDIR <= 3) THEN
@@ -277,8 +286,9 @@ C          IBCL(1,I+J)=NWORK(J+6*NUM0)
           ENDIF
         ENDDO
       ENDDO
-
-C
+C----
+      LOADS%NLOAD_CLOAD = NUM
+C----
  2000 FORMAT(//
      .'     CONCENTRATED LOADS  '/
      .'     ------------------  '/

@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  FREFORM                       source/starter/freform.F      
 Chd|-- called by -----------
@@ -30,7 +30,7 @@ Chd|        CHECK_MOD                     ../common_source/modules/check_mod.F
 Chd|        DETONATORS_MOD                share/modules1/detonators_mod.F
 Chd|        INOUTFILE_MOD                 ../common_source/modules/inoutfile_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
       SUBROUTINE FREFORM(MULTI_FVM,LSUBMODEL,ISUB_HIERARCHY,TRALL_MAXVAL,DETONATORS)
@@ -45,31 +45,16 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C-----------------------------------------------
-C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "scr17_c.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "com01_c.inc"
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
-#include      "scr06_c.inc"
-#include      "scr12_c.inc"
-#include      "lon_c.inc"
-#include      "sysunit.inc"
-#include      "submod_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       TYPE(MULTI_FVM_STRUCT), INTENT(IN) :: MULTI_FVM
       TYPE(SUBMODEL_DATA) LSUBMODEL(*)
       INTEGER ISUB_HIERARCHY,TRALL_MAXVAL(7)
-      TYPE(DETONATOR_STRUCT_)::DETONATORS
+      TYPE(DETONATORS_STRUCT_)::DETONATORS
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -671,17 +656,12 @@ C--------------------------
       LKEY0(K)=4
       KANIM=K
       K=K+1
-C remarque, cette option et lu dans le starter0.F
-C a ne pas utiliser, elle sert pour lire le rootnam
       KEY0(K)='BEGIN'
       LKEY0(K)=5
-cpas besoin !     KBEEGIN= K
       K=K+1
 C-------------------------------------------------------------------
-C optrion bidon pour preprocesseur
       KEY0(K)='PREPRO'
       LKEY0(K)=6
-cpas besoin !     KPREPRO= K
       K=K+1
       KEY0(K)='CNODE'
       LKEY0(K)=5
@@ -959,7 +939,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr17_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
       INTEGER IOP,ID
       CHARACTER MOT1*ncharfield
@@ -990,7 +969,6 @@ C
 Chd|====================================================================
 Chd|  FREDEC4                       source/starter/freform.F      
 Chd|-- called by -----------
-Chd|        PREREAD_INIVEL                source/initial_conditions/general/inivel/inivel.F
 Chd|-- calls ---------------
 Chd|        FREERR                        source/starter/freform.F      
 Chd|====================================================================
@@ -1003,7 +981,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr17_c.inc"
-#include      "units_c.inc"
 C
       CHARACTER COPT*ncharfield
 C
@@ -1034,7 +1011,6 @@ C
 Chd|====================================================================
 Chd|  FREDEC5                       source/starter/freform.F      
 Chd|-- called by -----------
-Chd|        YCTRL                         source/initial_conditions/inista/yctrl.F
 Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
 Chd|        FREERR                        source/starter/freform.F      
@@ -1051,7 +1027,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr17_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
       INTEGER ID
       CHARACTER COPT*ncharkey
@@ -1086,7 +1061,7 @@ C
       J1=I
       DO WHILE(KLINE(I:I)/='/')
         I=I+1
-	      IF(I>ncharline)EXIT
+                IF(I>ncharline)EXIT
       ENDDO
       J2=I-1
 
@@ -1108,7 +1083,6 @@ C
 Chd|====================================================================
 Chd|  FREDEC6                       source/starter/freform.F      
 Chd|-- called by -----------
-Chd|        YCTRL                         source/initial_conditions/inista/yctrl.F
 Chd|-- calls ---------------
 Chd|        FREERR                        source/starter/freform.F      
 Chd|        MY_EXIT                       source/output/analyse/analyse.c
@@ -1122,7 +1096,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr17_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
       CHARACTER*ncharkey COPT,COPT2
 C-----------------------------------------------
@@ -1202,9 +1175,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
-#include      "scr17_c.inc"
-#include      "warn_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
       INTEGER IGU,IGS,IBUF(*),ITABM1(*)
       CHARACTER MESS*40
@@ -1266,9 +1236,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
-#include      "scr17_c.inc"
-#include      "warn_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C  THIS FUNCTION REMOVES main NODE FROM SECND NODAL SET
 C  IN THE KINEMATIC CONSTRAINT DEFINITION 
@@ -1342,10 +1309,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
-#include      "scr17_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
       INTEGER IGU
       CHARACTER MESS*40
@@ -1389,7 +1352,6 @@ Chd|        BOXBOXS                       source/model/box/boxbox.F
 Chd|        BUILD_ADMESH                  source/model/remesh/build_admesh.F
 Chd|        CONTRL                        source/starter/contrl.F       
 Chd|        ELSTAGBOX                     source/model/box/bigbox.F     
-Chd|        ELSTAGBOX2                    source/model/box/rdbox.F      
 Chd|        ELSTAGBOXBOX                  source/model/box/boxbox.F     
 Chd|        FACEBOX                       source/model/box/bigbox.F     
 Chd|        FREDEC0                       source/starter/freform.F      
@@ -1422,7 +1384,6 @@ Chd|        HM_READ_MONVOL_TYPE9          source/airbag/hm_read_monvol_type9.F
 Chd|        HM_READ_PLOAD                 source/loads/general/pload/hm_read_pload.F
 Chd|        HM_READ_THGRNS                source/output/th/hm_read_thgrns.F
 Chd|        HM_SETFXRBYON                 source/constraints/fxbody/hm_setfxrbyon.F
-Chd|        INIVEL                        source/initial_conditions/general/inivel/inivel.F
 Chd|        LECG47                        source/properties/ige3d/lecgeo47.F
 Chd|        LECIG3D                       source/elements/ige3d/lecig3d.F
 Chd|        LECTRANS                      source/model/transformation/lectrans.F
@@ -1458,7 +1419,7 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER IT1
 C=======================================================================
-	IT1 = IT
+          IT1 = IT
       IF(IT1==3)THEN
         IT1=0
         READ(IIN,REC=IREC,ERR=999,FMT='(A)')LINE
@@ -1522,6 +1483,7 @@ Chd|        HM_READ_SPCND                 source/constraints/sph/hm_read_spcnd.F
 Chd|        HM_READ_THGRNE                source/output/th/hm_read_thgrne.F
 Chd|        HM_READ_THGRNS                source/output/th/hm_read_thgrns.F
 Chd|        HM_READ_THGROU                source/output/th/hm_read_thgrou.F
+Chd|        HM_READ_THGRSENS              source/output/th/hm_read_thgrsens.F
 Chd|        HM_READ_THGRSURF              source/output/th/hm_read_thgrsurf.F
 Chd|        HM_READ_THPART                source/output/thpart/hm_read_thpart.F
 Chd|        HM_THGRKI_VENT                source/output/th/hm_thgrki_vent.F
@@ -1537,6 +1499,7 @@ Chd|        READ_IMPVEL                   source/constraints/general/impvel/read
 Chd|        READ_IMPVEL_FGEO              source/constraints/general/impvel/read_impvel_fgeo.F
 Chd|        READ_IMPVEL_LAGMUL            source/constraints/general/impvel/read_impvel_lagmul.F
 Chd|        READ_MONVOL                   source/airbag/read_monvol.F   
+Chd|        WRITE_SENSORS                 source/tools/sensor/write_sensors.F
 Chd|        W_GR_ENTITY_E                 source/restart/ddsplit/w_gr_entity.F
 Chd|        W_GR_ENTITY_N                 source/restart/ddsplit/w_gr_entity.F
 Chd|        W_GR_ENTITY_P                 source/restart/ddsplit/w_gr_entity.F
@@ -1550,7 +1513,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "scr17_c.inc"
 C-----------------------------------------------
 C   D u m m y  A r g u m e  n t s
 C-----------------------------------------------
@@ -1607,8 +1569,6 @@ Chd|        ECRSUB2                       source/model/assembling/hm_read_subset
 Chd|        FSDCOD                        source/system/fsdcod.F        
 Chd|        GENANI1                       source/output/anim/genani1.F  
 Chd|        HIREORBE3                     source/constraints/general/rbe3/hm_read_rbe3.F
-Chd|        HM_READ_EOS                   source/materials/eos/hm_read_eos.F
-Chd|        HM_READ_FAIL                  source/materials/fail/hm_read_fail.F
 Chd|        HM_READ_FXB1                  source/constraints/fxbody/hm_read_fxb.F
 Chd|        HM_READ_INISTATE_D00          source/elements/initia/hm_read_inistate_d00.F
 Chd|        HM_READ_INTSUB                source/output/subinterface/hm_read_intsub.F
@@ -1634,6 +1594,7 @@ Chd|        HM_READ_THGRKI                source/output/th/hm_read_thgrki.F
 Chd|        HM_READ_THGRKI_RBODY          source/output/th/hm_read_thgrki_rbody.F
 Chd|        HM_READ_THGRNE                source/output/th/hm_read_thgrne.F
 Chd|        HM_READ_THGRNS                source/output/th/hm_read_thgrns.F
+Chd|        HM_READ_THGRSENS              source/output/th/hm_read_thgrsens.F
 Chd|        HM_READ_THGRSURF              source/output/th/hm_read_thgrsurf.F
 Chd|        HM_READ_XREF                  source/loads/reference_state/xref/hm_read_xref.F
 Chd|        HM_THGRKI_VENT                source/output/th/hm_thgrki_vent.F
@@ -1682,9 +1643,9 @@ Chd|        QGRTAILS                      source/elements/solid_2d/quad/qgrtails
 Chd|        QINIT2                        source/elements/solid_2d/quad/qinit2.F
 Chd|        QMORTH2                       source/elements/solid_2d/quad/qmorth2.F
 Chd|        RCHECKMASS                    source/elements/spring/rcheckmass.F
-Chd|        REMN_I2                       source/interfaces/inter3d1/i7remnode.F
 Chd|        REMN_I2OP                     source/interfaces/inter3d1/i7remnode.F
 Chd|        REMN_I2OP_EDG25               source/interfaces/int25/i25remlin.F
+Chd|        REMN_SELF24                   source/interfaces/inter3d1/remn_self24.F
 Chd|        RI2_INT24P_INI                source/interfaces/inter3d1/i7remnode.F
 Chd|        RIGID_MAT                     source/materials/mat/mat019/rigid_mat.F
 Chd|        RINI33_RB                     source/elements/joint/rjoint/rini33_rb.F
@@ -1733,7 +1694,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "scr17_c.inc"
 C-----------------------------------------------
 C   D u m m y  A r g u m e  n t s
 C-----------------------------------------------
@@ -1761,9 +1721,6 @@ C-----------------------------------------------
 Chd|====================================================================
 Chd|  NEXTSLA                       source/starter/freform.F      
 Chd|-- called by -----------
-Chd|        INIVEL                        source/initial_conditions/general/inivel/inivel.F
-Chd|        PREREAD_INIVEL                source/initial_conditions/general/inivel/inivel.F
-Chd|        R2R_PRELEC                    source/coupling/rad2rad/r2r_prelec.F
 Chd|        SZ_R2R                        source/coupling/rad2rad/routines_r2r.F
 Chd|-- calls ---------------
 Chd|        FREERR                        source/starter/freform.F      
@@ -1799,7 +1756,6 @@ C-----------------------------------------------
 Chd|====================================================================
 Chd|  FREDEC_2KEY_ID_OR_KEY_ID      source/starter/freform.F      
 Chd|-- called by -----------
-Chd|        YCTRL                         source/initial_conditions/inista/yctrl.F
 Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
 Chd|        FREERR                        source/starter/freform.F      
@@ -1816,7 +1772,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr17_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
       INTEGER UID,SUB_ID
       CHARACTER TITR*nchartitle,KEY2*ncharkey,KEY3*ncharkey
@@ -2012,7 +1967,6 @@ C---
 Chd|====================================================================
 Chd|  FREDEC_2KEY_4ID_T             source/starter/freform.F      
 Chd|-- called by -----------
-Chd|        INIVEL                        source/initial_conditions/general/inivel/inivel.F
 Chd|        NBADIGEMESH                   source/elements/ige3d/nbadigemesh.F
 Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
@@ -2192,7 +2146,6 @@ C---
 Chd|====================================================================
 Chd|  FREDEC_2KEY_4ID               source/starter/freform.F      
 Chd|-- called by -----------
-Chd|        R2R_PRELEC                    source/coupling/rad2rad/r2r_prelec.F
 Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
 Chd|        FREERR                        source/starter/freform.F      
@@ -2209,7 +2162,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr17_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
       INTEGER ID,UID,VERS,SUB_ID
       CHARACTER TITR*nchartitle,KEY2*ncharkey

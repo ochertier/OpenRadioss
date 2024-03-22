@@ -1,48 +1,48 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  DFUNC0                        source/output/anim/generate/dfunc0.F
 Chd|-- called by -----------
 Chd|        GENANI                        source/output/anim/generate/genani.F
 Chd|-- calls ---------------
-Chd|        SCHLIEREN                     source/output/anim/generate/schlieren.F
+Chd|        OUTPUT_SCHLIEREN              source/output/anim/generate/output_schlieren.F
 Chd|        SCHLIEREN_BUFFER_GATHERING    source/output/anim/generate/schlieren_buffer_gathering.F
 Chd|        SPMD_R4GET_PARTN              source/mpi/anim/spmd_r4get_partn.F
-Chd|        WRITE_R_C                     source/output/tools/sortie_c.c
-Chd|        ALEFVM_MOD                    ../common_source/modules/alefvm_mod.F
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        WRITE_R_C                     ../common_source/tools/input_output/write_routtines.c
+Chd|        ALEFVM_MOD                    ../common_source/modules/ale/alefvm_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        INITBUF_MOD                   share/resol/initbuf.F         
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|        SCHLIEREN_MOD                 share/modules/schlieren_mod.F 
 Chd|====================================================================
-      SUBROUTINE DFUNC0(ELBUF_TAB   ,    FUNC      ,IFUNC     ,IPARG   ,
-     2                  MASS        ,    PM        ,EL2FA     ,NBF     ,
-     3                  NBPART      ,    IADG      ,SPBUF     ,IPART   ,
-     4                  IPARTSP     ,ALE_CONNECTIVITY,IXQ     ,
-     5                  X           ,    V         ,W         ,
-     6                  NERCVOIS    ,    NESDVOIS  ,LERCVOIS  ,LESDVOIS ,BUFMAT  ,
-     7                  MULTI_FVM)
+      SUBROUTINE DFUNC0(ELBUF_TAB, FUNC             ,IFUNC     ,IPARG   ,
+     2                  MASS     , PM               ,EL2FA     ,NBF     ,
+     3                  NBPART   , IADG             ,SPBUF     ,IPART   ,
+     4                  IPARTSP  , ALE_CONNECTIVITY ,IXQ       ,IPM     ,
+     5                  X        , V                ,W         ,
+     6                  NERCVOIS , NESDVOIS         ,LERCVOIS  ,LESDVOIS, 
+     7                  BUFMAT   , MULTI_FVM)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -64,34 +64,30 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "sphcom.inc"
-#include      "scr01_c.inc"
 #include      "scr17_c.inc"
 #include      "param_c.inc"
 #include      "task_c.inc"
 #include      "spmd_c.inc"
-#include      "alefvm.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       my_real FUNC(*), MASS(*) ,PM(NPROPM,NUMMAT),SPBUF(NSPBUF,*),BUFMAT(*),X(3,NUMNOD),V(3,NUMNOD), W(*)
       INTEGER IPARG(NPARG,NGROUP),EL2FA(*),IFUNC,NBF,
      .        NBPART,IADG(NSPMD,*),IPART(LIPART1,*),IPARTSP(*),
-     .        NERCVOIS(*),NESDVOIS(*),LERCVOIS(*),LESDVOIS(*),IXQ(NIXQ,NUMELQ)
+     .        NERCVOIS(*),NESDVOIS(*),LERCVOIS(*),LESDVOIS(*),IXQ(NIXQ,NUMELQ),IPM(NPROPMI,NUMMAT)
       TYPE (ELBUF_STRUCT_), DIMENSION(NGROUP), TARGET :: ELBUF_TAB
       TYPE(MULTI_FVM_STRUCT), INTENT(IN) :: MULTI_FVM
       TYPE(t_ale_connectivity), INTENT(IN) :: ALE_CONNECTIVITY
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      my_real
-     .   EVAR(MVSIZ),
-     .   P, VONM2, VONM, S1, S2, S3, VALUE
-      INTEGER I,II(6),N,NN,NN1,NG,NEL,JTURB,MT,MLW,IALEL,IPRT,IUS,BUF,
-     .        NUVAR,IR,NFAIL,IALEFVM_FLG
+      my_real EVAR(MVSIZ), P, VONM2, VONM, S1, S2, S3, VALUE
+      INTEGER I,II(6),N,NN,NN1,NG,NEL,JTURB,MT,MLW,IALEL,IPRT,IUS,BUF,NUVAR,IR,NFAIL,IALEFVM_FLG,IEOS,NVAREOS
       REAL R4,WA(NBF)
-      TYPE(G_BUFEL_) ,POINTER :: GBUF     
-      TYPE(L_BUFEL_) ,POINTER :: LBUF     
-      TYPE(BUF_MAT_) ,POINTER :: MBUF 
+      TYPE(G_BUFEL_) ,POINTER :: GBUF
+      TYPE(L_BUFEL_) ,POINTER :: LBUF
+      TYPE(BUF_MAT_) ,POINTER :: MBUF
+      TYPE(BUF_EOS_)  ,POINTER :: EBUF
       my_real, DIMENSION(:),POINTER  ::  DFMAX
 C-----------------------------------------------
 C   S o u r c e   L i n e s
@@ -177,9 +173,9 @@ c-----------
      .               + GBUF%SIG(II(3) + I) ) * THIRD
                 VALUE = P
                 IF (IFUNC == 7) THEN
-                  S1=GBUF%SIG(II(1) + I) + P		      
-                  S2=GBUF%SIG(II(2) + I) + P		      
-                  S3=GBUF%SIG(II(3) + I) + P		      
+                  S1=GBUF%SIG(II(1) + I) + P          
+                  S2=GBUF%SIG(II(2) + I) + P          
+                  S3=GBUF%SIG(II(3) + I) + P          
                   VONM2= THREE*(GBUF%SIG(II(4) + I)**2 +      
      .                          GBUF%SIG(II(5) + I)**2 +      
      .                          GBUF%SIG(II(6) + I)**2 +      
@@ -276,12 +272,12 @@ c-----------
            ELSEIF(IFUNC == 3890) THEN
 
            NFAIL = ELBUF_TAB(NG)%BUFLY(1)%NFAIL  
-           DO IR=1,NFAIL											    
+           DO IR=1,NFAIL                          
              DFMAX=>
      .         ELBUF_TAB(NG)%BUFLY(1)%FAIL(1,1,1)%FLOC(IR)%DAMMX
              DO I=LFT,LLT   
-           	 N = I + NFT				  
-           	 FUNC(EL2FA(NN1+N)) = DFMAX(I)    
+           N = I + NFT          
+           FUNC(EL2FA(NN1+N)) = DFMAX(I)    
              ENDDO
            ENDDO  
 c-----------
@@ -290,10 +286,10 @@ c-----------
              IF(IALEL == 0)THEN
                EVAR(LFT:LLT) = ZERO
              ELSE
-               CALL SCHLIEREN(
-     1                        EVAR    ,IXQ    ,X           ,V       ,W       ,
+               CALL OUTPUT_SCHLIEREN(
+     1                        EVAR    ,IXQ    ,X           ,
      2                        IPARG   ,WA_L   ,ELBUF_TAB   ,ALE_CONNECTIVITY   ,GBUF%VOL,
-     3                        PM      ,NG     ,NIXQ        ,ITY)
+     3                        NG      ,NIXQ   ,ITY)
              ENDIF  
              FUNC(EL2FA(NN1+NFT+1:NN1+NFT+LLT)) = EVAR(1:LLT)      
 c-----------      
@@ -316,12 +312,12 @@ C  equivalent stress -  (NON VON MISES / VON MISES)
                DO I=LFT,LLT
                  N = I + NFT
                  IF (EL2FA(NN1+N) /= 0) THEN
-                   P = -(GBUF%SIG(II(1) + I)		    
-     .                 + GBUF%SIG(II(2) + I)		    
+                   P = -(GBUF%SIG(II(1) + I)        
+     .                 + GBUF%SIG(II(2) + I)        
      .                 + GBUF%SIG(II(3) + I)) * THIRD
-                   S1=GBUF%SIG(II(1) + I) + P		       
-                   S2=GBUF%SIG(II(2) + I) + P		       
-                   S3=GBUF%SIG(II(3) + I) + P		       
+                   S1=GBUF%SIG(II(1) + I) + P           
+                   S2=GBUF%SIG(II(2) + I) + P           
+                   S3=GBUF%SIG(II(3) + I) + P           
                    VONM2= THREE*(GBUF%SIG(II(4) + I)**2 +      
      .                           GBUF%SIG(II(5) + I)**2 +      
      .                           GBUF%SIG(II(6) + I)**2 +      
@@ -392,7 +388,7 @@ c-----------
                   IF(EL2FA(NN1+N)/=0)THEN
                      FUNC(EL2FA(NN1+N)) = SQRT( GBUF%MOM(II(1) + I)+GBUF%MOM(II(1) + I) 
      +                                         +GBUF%MOM(II(2) + I)+GBUF%MOM(II(2) + I)
-     +                                         +GBUF%MOM(II(3) + I)+GBUF%MOM(II(3) + I) )		     
+     +                                         +GBUF%MOM(II(3) + I)+GBUF%MOM(II(3) + I) )         
                   ENDIF
                  ENDDO                                            
                ENDIF
@@ -413,7 +409,7 @@ c-----------
 !                  IAD0  = (I-1)*3
                   IF(EL2FA(NN1+N)/=0)THEN
                      FUNC(EL2FA(NN1+N)) = SQRT( GBUF%MOM(II(1) + I)+GBUF%MOM(II(1) + I) 
-     +                                         +GBUF%MOM(II(2) + I)+GBUF%MOM(II(2) + I) )  / GBUF%RHO(I)		  
+     +                                         +GBUF%MOM(II(2) + I)+GBUF%MOM(II(2) + I) )  / GBUF%RHO(I)      
                   ENDIF
                  ENDDO 
                ELSEIF(IFUNC==4949)THEN
@@ -422,7 +418,7 @@ c-----------
 !                  IAD0  = (I-1)*3
                   IF(EL2FA(NN1+N)/=0)THEN
                      FUNC(EL2FA(NN1+N)) = SQRT( GBUF%MOM(II(2) + I)+GBUF%MOM(II(2) + I) 
-     +                                         +GBUF%MOM(II(3) + I)+GBUF%MOM(II(3) + I) )  / GBUF%RHO(I)		  
+     +                                         +GBUF%MOM(II(3) + I)+GBUF%MOM(II(3) + I) )  / GBUF%RHO(I)      
                   ENDIF
                  ENDDO                 
                ELSEIF(IFUNC==4950)THEN
@@ -431,7 +427,7 @@ c-----------
 !                  IAD0  = (I-1)*3
                   IF(EL2FA(NN1+N)/=0)THEN
                      FUNC(EL2FA(NN1+N)) = SQRT( GBUF%MOM(II(1) + I)+GBUF%MOM(II(1) + I) 
-     +                                         +GBUF%MOM(II(3) + I)+GBUF%MOM(II(3) + I) )  / GBUF%RHO(I)		  
+     +                                         +GBUF%MOM(II(3) + I)+GBUF%MOM(II(3) + I) )  / GBUF%RHO(I)      
                   ENDIF
                  ENDDO 
                ELSEIF(IFUNC==4951)THEN
@@ -441,7 +437,7 @@ c-----------
                   IF(EL2FA(NN1+N)/=0)THEN
                      FUNC(EL2FA(NN1+N)) = SQRT( GBUF%MOM(II(1) + I)+GBUF%MOM(II(1) + I) 
      +                                         +GBUF%MOM(II(2) + I)+GBUF%MOM(II(2) + I)
-     +                                         +GBUF%MOM(II(3) + I)+GBUF%MOM(II(3) + I) )  / GBUF%RHO(I)		  
+     +                                         +GBUF%MOM(II(3) + I)+GBUF%MOM(II(3) + I) )  / GBUF%RHO(I)      
                   ENDIF
                  ENDDO                                            
                ENDIF
@@ -449,46 +445,46 @@ c-----------
 c-----------
               !/ANIM/ELEM/FINT || FINTX || FINTY || FINXY || FINYZ || FINXZ
               ELSEIF (IFUNC>=4952 .AND. IFUNC<=4958)THEN                                                                                
-                IALEFVM_FLG = IALEFVM_IFORM                                                                    
+                IALEFVM_FLG = ALEFVM_Param%IFORM                                                                    
                 IF(IALEFVM_FLG >= 2)THEN                                                                   
                   IF(IFUNC>=4952 .AND. IFUNC<=4954)THEN                                                                                             
                     DO I=LFT,LLT                                                                                                                        
                       N      = I+NFT  
                       IF(EL2FA(NN1+ N)/=0)THEN                                                                                                                 
-                      FUNC(EL2FA(NN1+ N)) =         FINT_CELL(IFUNC-4951, N) 
+                      FUNC(EL2FA(NN1+ N)) = ALEFVM_Buffer%FINT_CELL(IFUNC-4951, N) 
                       ENDIF                                                                                        
                     ENDDO                                                                                                                               
                   ELSEIF(IFUNC==4955)THEN                                                                                                             
                     DO I=LFT,LLT                                                                                                                        
                        N      = I+NFT 
                       IF(EL2FA(NN1+ N)/=0)THEN                                                                                                                                                                           
-                      FUNC(EL2FA(NN1+ N)) = SQRT (  FINT_CELL(1, N)* FINT_CELL(1, N)+                                                                               
-     +                                              FINT_CELL(2, N)* FINT_CELL(2, N) ) 
+                      FUNC(EL2FA(NN1+ N)) = SQRT (  ALEFVM_Buffer%FINT_CELL(1, N)* ALEFVM_Buffer%FINT_CELL(1, N)+                                                                               
+     +                                              ALEFVM_Buffer%FINT_CELL(2, N)* ALEFVM_Buffer%FINT_CELL(2, N) ) 
                       ENDIF                                                                             
                     ENDDO                                                                                                                               
                   ELSEIF(IFUNC==4956)THEN                                                                                                             
                     DO I=LFT,LLT                                                                                                                        
                        N      = I+NFT  
                       IF(EL2FA(NN1+ N)/=0)THEN                                                                                                                                        
-                      FUNC(EL2FA(NN1+ N)) = SQRT ( FINT_CELL(2, N)* FINT_CELL(2, N)+                                                                                
-     +                                             FINT_CELL(3, N)* FINT_CELL(3, N) )
+                      FUNC(EL2FA(NN1+ N)) = SQRT ( ALEFVM_Buffer%FINT_CELL(2, N)* ALEFVM_Buffer%FINT_CELL(2, N)+                                                                                
+     +                                             ALEFVM_Buffer%FINT_CELL(3, N)* ALEFVM_Buffer%FINT_CELL(3, N) )
                       ENDIF 
                     ENDDO                                                                                                                               
                   ELSEIF(IFUNC==4957)THEN                                                                                                             
                     DO I=LFT,LLT                                                                                                                        
                        N      = I+NFT   
                       IF(EL2FA(NN1+ N)/=0)THEN                                                                                                                
-                      FUNC(EL2FA(NN1+ N)) = SQRT ( FINT_CELL(1, N)* FINT_CELL(1,N)+                                                                                
-     +                                             FINT_CELL(3, N)* FINT_CELL(3,N) )
+                      FUNC(EL2FA(NN1+ N)) = SQRT ( ALEFVM_Buffer%FINT_CELL(1, N)* ALEFVM_Buffer%FINT_CELL(1,N)+                                                                                
+     +                                             ALEFVM_Buffer%FINT_CELL(3, N)* ALEFVM_Buffer%FINT_CELL(3,N) )
                       ENDIF                                                                               
                     ENDDO                                                                                                                               
                   ELSEIF(IFUNC==4958)THEN                                                                                                             
                     DO I=LFT,LLT                                                                                                                        
                        N      = I+NFT   
                       IF(EL2FA(NN1+ N)/=0)THEN                                                                                                                
-                      FUNC(EL2FA(NN1+ N)) = SQRT ( FINT_CELL(1, N)* FINT_CELL(1, N)+                                                                                
-     +                                             FINT_CELL(2, N)* FINT_CELL(2, N)+                                                                                
-     +                                             FINT_CELL(3, N)* FINT_CELL(3, N) )
+                      FUNC(EL2FA(NN1+ N)) = SQRT ( ALEFVM_Buffer%FINT_CELL(1, N)* ALEFVM_Buffer%FINT_CELL(1, N)+                                                                                
+     +                                             ALEFVM_Buffer%FINT_CELL(2, N)* ALEFVM_Buffer%FINT_CELL(2, N)+                                                                                
+     +                                             ALEFVM_Buffer%FINT_CELL(3, N)* ALEFVM_Buffer%FINT_CELL(3, N) )
                       ENDIF                                                                               
                     ENDDO                                                                                                                               
                   ENDIF                                                                                                                                 
@@ -519,6 +515,23 @@ c-----------OFF
                  ENDIF
                ENDDO  
              ENDIF
+c-----------TILLOTSON             
+           ELSEIF(IFUNC == 5172)THEN   !/ANIM/ELEM/TILLOTSON
+              DO I=LFT,NEL
+                EVAR(I) = ZERO
+              ENDDO 
+              N=1+NFT
+              IPRT=IPARTSP(N)
+              MT=IPART(1,IPRT)                                                        
+              IEOS=IPM(4,MT)
+              IF(IEOS == 3)THEN
+                EBUF => ELBUF_TAB(NG)%BUFLY(1)%EOS(1,1,1)                              
+                NVAREOS = ELBUF_TAB(NG)%BUFLY(1)%NVAR_EOS                              
+                DO  I=1,NEL
+                  EVAR(I) = EBUF%VAR(I)
+                ENDDO
+              ENDIF 
+              FUNC(EL2FA(NN1+NFT+1:NN1+NFT+NEL)) = EVAR(1:NEL)                       
 c-----------
            ELSE
             DO I=LFT,LLT

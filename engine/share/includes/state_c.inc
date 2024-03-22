@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>    
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -23,11 +23,11 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 C.../STATE/
       COMMON /STATE/    IS_STAT_SHELL, IS_STAT_BRICK, IS_STAT_SPRING, IS_STAT_BEAM, IS_STAT_TRUSS,
      .                  IS_STAT_INIMAP1D, IS_STAT_INIMAP2D, IS_STAT_DT, IS_STAT_STRF, IS_STAT_NODE,
-     .                  IS_STAT_LSENS, IS_STAT_NO_DE, IS_STAT
+     .                  IS_STAT_NO_DE, IS_STAT
 
       LOGICAL        :: IS_STAT_SHELL, IS_STAT_BRICK, IS_STAT_SPRING, IS_STAT_BEAM, IS_STAT_TRUSS,
      .                  IS_STAT_INIMAP1D, IS_STAT_INIMAP2D, IS_STAT_DT, IS_STAT_STRF, IS_STAT_NODE,
-     .                  IS_STAT_LSENS, IS_STAT_NO_DE, IS_STAT
+     .                  IS_STAT_NO_DE, IS_STAT
 
 C.../DYNAIN/
       COMMON /DYNAIN/   IS_DYNAIN_SHELL, IS_DYNAIN, IS_DYNAIN_DT

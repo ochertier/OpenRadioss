@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  HM_READ_EBCS_INLET            source/boundary_conditions/ebcs/hm_read_ebcs_inlet.F
 Chd|-- called by -----------
@@ -27,13 +27,15 @@ Chd|        READ_EBCS                     source/boundary_conditions/ebcs/read_e
 Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
 Chd|        HM_GET_FLOATV                 source/devtools/hm_reader/hm_get_floatv.F
+Chd|        HM_GET_FLOAT_ARRAY_INDEX      source/devtools/hm_reader/hm_get_float_array_index.F
 Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
+Chd|        HM_GET_INT_ARRAY_INDEX        source/devtools/hm_reader/hm_get_int_array_index.F
 Chd|        HM_OPTION_IS_ENCRYPTED        source/devtools/hm_reader/hm_option_is_encrypted.F
 Chd|        NGR2USR                       source/system/nintrr.F        
-Chd|        EBCS_MOD                      ../common_source/modules/ebcs_mod.F
+Chd|        EBCS_MOD                      ../common_source/modules/boundary_conditions/ebcs_mod.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
       SUBROUTINE HM_READ_EBCS_INLET(LOCAL_ID, IGRSURF,
@@ -51,18 +53,12 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr17_c.inc"
 #include      "units_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "warn_c.inc"
-#include      "scr05_c.inc"
-#include      "sysunit.inc"
-#include      "submod_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -80,12 +76,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,ISU,SENS,MONVOL,SURF,NGR2USR,
-     .        IPRES,IRHO,NOD,IAD,J,K1,K2,NSEG,IENER,IVX,IVY,IVZ,IALPHA
-      INTEGER LISTE(NUMNOD), IMAT,IVEL_TYP,U_IALPHA,U_IRHO,U_IPRES,IFLAGUNIT,FLAG_FMT,
-     .        CHECK_CUMUL_VF(2)
-      my_real
-     .   C,PRES,RHO,LCAR,R1,R2,ENER,VX,VY,VZ, ALPHA
+      INTEGER I,ISU,SENS,MONVOL,SURF,NGR2USR,IPRES,IRHO,NOD,IAD,J,K1,K2,NSEG,IENER,IVX,IVY,IVZ,IALPHA
+      INTEGER LISTE(NUMNOD), IMAT,IVEL_TYP,U_IALPHA,U_IRHO,U_IPRES,IFLAGUNIT,FLAG_FMT,CHECK_CUMUL_VF(2)
+      my_real C,PRES,RHO,LCAR,R1,R2,ENER,VX,VY,VZ, ALPHA
       CHARACTER MESS*40,KEY*ncharkey,chain*9, chain1*64
       EXTERNAL NGR2USR
       LOGICAL FOUND
@@ -124,21 +117,15 @@ C-----------------------------------------------
       VZ=ZERO
       
       IFLAGUNIT=0
-      DO J=1,NUNITS                                              
+      DO J=1,UNITAB%NUNITS                                              
         IF (UNITAB%UNIT_ID(J) == UID) THEN                                               
           IFLAGUNIT = 1                                          
           EXIT                                                   
         ENDIF                                                    
       ENDDO                                                      
       IF (UID/=0.AND.IFLAGUNIT==0) THEN                      
-        CALL ANCMSG(MSGID=659,ANMODE=ANINFO,MSGTYPE=MSGERROR,    
-     .              I2=UID,
-     .              I1=ID,
-     .              C1='EBCS',           
-     .              C2='EBCS',                           
-     .              C3=TITR)                                      
-      ENDIF      
-
+        CALL ANCMSG(MSGID=659,ANMODE=ANINFO,MSGTYPE=MSGERROR,I2=UID,I1=ID,C1='EBCS',C2='EBCS',C3=TITR)
+      ENDIF
     
       CALL HM_OPTION_IS_ENCRYPTED(IS_ENCRYPTED)
       CALL HM_GET_INTV('entityid',  SURF  ,IS_AVAILABLE,LSUBMODEL)
@@ -173,9 +160,7 @@ C-----------------------------------------------
                EBCS%fvm_inlet_data%FORMULATION = 2
                WRITE(IOUT,1022)
             ELSE
-               CALL ANCMSG(MSGID=1602,
-     .              MSGTYPE=MSGERROR,
-     .              ANMODE=ANINFO,
+               CALL ANCMSG(MSGID=1602,MSGTYPE=MSGERROR,ANMODE=ANINFO,
      .              I1 = ID,
      .              C1 = TRIM(TITR),
      .              C2 = "AN INPUT FORMULATION HAS TO BE PROVIDED : VE, OR VP")
@@ -203,9 +188,7 @@ C-----------------------------------------------
             ELSEIF(IVX==0)THEN
                 IF(VY/=ZERO.OR.VZ/=ZERO)THEN
                 !check that user is defining VX ocrrectly
-                  CALL ANCMSG(MSGID=1602,
-     .                 MSGTYPE=MSGERROR,
-     .                 ANMODE=ANINFO,
+                  CALL ANCMSG(MSGID=1602,MSGTYPE=MSGERROR,ANMODE=ANINFO,
      .                 I1 = ID,
      .                 C1 = TRIM(TITR),
      .                 C2 = "NORMAL VELOCITY MUST BE INPUT WITH COMPONENT-1 WHEN VEL_FLAG SET TO 0")                
@@ -215,9 +198,7 @@ C-----------------------------------------------
                 WRITE(IOUT,1135)IVX
             ENDIF
             IF(IVX<-1 .OR. (IVX>0.AND. .NOT.FOUND))THEN
-                 CALL ANCMSG(MSGID  = 1602,
-     .                       MSGTYPE= MSGERROR,
-     .                       ANMODE = ANINFO,
+                 CALL ANCMSG(MSGID  = 1602,MSGTYPE= MSGERROR,ANMODE = ANINFO,
      .                       I1     = ID,
      .                       C1     = TRIM(TITR),
      .                       C2     = "INVALID FUNCTION ID FOR VELOCITY-X")
@@ -240,9 +221,7 @@ C-----------------------------------------------
                 WRITE(IOUT,1127)IVX
               ENDIF
               IF(IVX<-1 .OR. (IVX>0.AND. .NOT.FOUND))THEN
-                 CALL ANCMSG(MSGID  = 1602,
-     .                       MSGTYPE= MSGERROR,
-     .                       ANMODE = ANINFO,
+                 CALL ANCMSG(MSGID  = 1602, MSGTYPE= MSGERROR,ANMODE = ANINFO,
      .                       I1     = ID,
      .                       C1     = TRIM(TITR),
      .                       C2     = "INVALID FUNCTION ID FOR VELOCITY-X")
@@ -264,9 +243,7 @@ C-----------------------------------------------
                 WRITE(IOUT,1128)IVY
               ENDIF
               IF(IVY<-1 .OR. (IVY>0.AND. .NOT.FOUND))THEN
-                 CALL ANCMSG(MSGID  = 1602,
-     .                       MSGTYPE= MSGERROR,
-     .                       ANMODE = ANINFO,
+                 CALL ANCMSG(MSGID  = 1602,MSGTYPE= MSGERROR,ANMODE = ANINFO,
      .                       I1     = ID,
      .                       C1     = TRIM(TITR),
      .                       C2     = "INVALID FUNCTION ID FOR VELOCITY-Y")
@@ -288,9 +265,7 @@ C-----------------------------------------------
                 WRITE(IOUT,1129)IVZ
               ENDIF
               IF(IVZ<-1 .OR. (IVZ>0.AND. .NOT.FOUND))THEN
-                 CALL ANCMSG(MSGID  = 1602,
-     .                       MSGTYPE= MSGERROR,
-     .                       ANMODE = ANINFO,
+                 CALL ANCMSG(MSGID  = 1602,MSGTYPE= MSGERROR,ANMODE = ANINFO,
      .                       I1     = ID,
      .                       C1     = TRIM(TITR),
      .                       C2     = "INVALID FUNCTION ID FOR VELOCITY-Z")
@@ -305,12 +280,12 @@ C-----------------------------------------------
             EBCS%fvm_inlet_data%VAL_VEL(3)  =  VZ
             CHECK_CUMUL_VF(1:2)=ZERO
             DO IMAT = 1, MULTI_FVM%NBMAT
-               CALL HM_GET_FLOATV('Fscalevf_n',  ALPHA  ,IS_AVAILABLE,LSUBMODEL,UNITAB)                
-               CALL HM_GET_FLOATV('Fscalerho_n',  RHO  ,IS_AVAILABLE,LSUBMODEL,UNITAB)                
-               CALL HM_GET_FLOATV('Fscalep_e_n',  PRES  ,IS_AVAILABLE,LSUBMODEL,UNITAB)                
-               CALL HM_GET_INTV('fct_IDvf_n',  IALPHA  ,IS_AVAILABLE,LSUBMODEL)
-               CALL HM_GET_INTV('fct_IDrho_n',  IRHO  ,IS_AVAILABLE,LSUBMODEL)
-               CALL HM_GET_INTV('fct_IDp_e_n',  IPRES  ,IS_AVAILABLE,LSUBMODEL)
+               CALL HM_GET_FLOAT_ARRAY_INDEX('Fscalevf_n', ALPHA ,IMAT,IS_AVAILABLE,LSUBMODEL,UNITAB)
+               CALL HM_GET_FLOAT_ARRAY_INDEX('Fscalerho_n',RHO   ,IMAT,IS_AVAILABLE,LSUBMODEL,UNITAB)
+               CALL HM_GET_FLOAT_ARRAY_INDEX('Fscalep_e_n',PRES  ,IMAT,IS_AVAILABLE,LSUBMODEL,UNITAB)
+               CALL HM_GET_INT_ARRAY_INDEX('fct_IDvf_n',   IALPHA,IMAT,IS_AVAILABLE,LSUBMODEL)
+               CALL HM_GET_INT_ARRAY_INDEX('fct_IDrho_n',  IRHO  ,IMAT,IS_AVAILABLE,LSUBMODEL)
+               CALL HM_GET_INT_ARRAY_INDEX('fct_IDp_e_n',  IPRES ,IMAT,IS_AVAILABLE,LSUBMODEL)
                CHECK_CUMUL_VF(1)=CHECK_CUMUL_VF(1)+ABS(IALPHA)
                CHECK_CUMUL_VF(2)=CHECK_CUMUL_VF(2)+ABS(ALPHA)
                !user ids backup
@@ -331,9 +306,7 @@ C-----------------------------------------------
                     chain='SUBMAT-00'
                     write(chain(8:9),'(i2)')IMAT
                     chain1='INVALID FUNCTION ID FOR IALPHA & '//chain
-                    CALL ANCMSG(MSGID  = 1602,
-     .                          MSGTYPE= MSGERROR,
-     .                          ANMODE = ANINFO,
+                    CALL ANCMSG(MSGID  = 1602,MSGTYPE= MSGERROR,ANMODE = ANINFO,
      .                          I1     = ID,
      .                          C1     = TRIM(TITR),
      .                          C2     = chain1)
@@ -353,9 +326,7 @@ C-----------------------------------------------
                     chain='SUBMAT-00'
                     write(chain(8:9),'(i2)')IMAT
                     chain1='INVALID FUNCTION ID FOR IRHO & '//chain
-                    CALL ANCMSG(MSGID  = 1602,
-     .                          MSGTYPE= MSGERROR,
-     .                          ANMODE = ANINFO,
+                    CALL ANCMSG(MSGID  = 1602,MSGTYPE= MSGERROR,ANMODE = ANINFO,
      .                          I1     = ID,
      .                          C1     = TRIM(TITR),
      .                          C2     = chain1)
@@ -375,9 +346,7 @@ C-----------------------------------------------
                     chain='SUBMAT-00'
                     write(chain(8:9),'(i2)')IMAT
                     chain1='INVALID FUNCTION ID FOR IPRES & '//chain
-                    CALL ANCMSG(MSGID  = 1602,
-     .                          MSGTYPE= MSGERROR,
-     .                          ANMODE = ANINFO,
+                    CALL ANCMSG(MSGID  = 1602,MSGTYPE= MSGERROR,ANMODE = ANINFO,
      .                          I1     = ID,
      .                          C1     = TRIM(TITR),
      .                          C2     = chain1)
@@ -385,17 +354,13 @@ C-----------------------------------------------
                ENDIF
 
               IF(ALPHA<ZERO)THEN
-                CALL ANCMSG(MSGID  = 1602,                                              
-     .                      MSGTYPE= MSGERROR,                                          
-     .                      ANMODE = ANINFO,                                            
+                CALL ANCMSG(MSGID  = 1602,MSGTYPE= MSGERROR,ANMODE = ANINFO,
      .                      I1     = ID,                                                
      .                      C1     = TRIM(TITR),                                        
      .                      C2     = "VOLUME FRACTION CANNOT BE NEGATIVE") 
               ENDIF
               IF(RHO<ZERO)THEN        
-                CALL ANCMSG(MSGID  = 1602,                                              
-     .                      MSGTYPE= MSGERROR,                                          
-     .                      ANMODE = ANINFO,                                            
+                CALL ANCMSG(MSGID  = 1602,MSGTYPE= MSGERROR,ANMODE = ANINFO,
      .                      I1     = ID,                                                
      .                      C1     = TRIM(TITR),                                        
      .                      C2     = "MASS DENSITY CANNOT BE NEGATIVE")                             
@@ -413,9 +378,7 @@ C-----------------------------------------------
             ENDDO
             WRITE(IOUT, FMT='(/)' )
             IF(CHECK_CUMUL_VF(1)==ZERO .AND. CHECK_CUMUL_VF(2)==ZERO)THEN
-              CALL ANCMSG(MSGID  = 1602,                                                
-     .                    MSGTYPE= MSGERROR,                                            
-     .                    ANMODE = ANINFO,                                              
+              CALL ANCMSG(MSGID  = 1602,MSGTYPE= MSGERROR,ANMODE = ANINFO,
      .                    I1     = ID,                                                  
      .                    C1     = TRIM(TITR),                                          
      .                    C2     = "INPUT VOLUME FRACTIONS ARE EMPTY")                

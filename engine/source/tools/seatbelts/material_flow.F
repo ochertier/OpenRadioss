@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  MATERIAL_FLOW                 source/tools/seatbelts/material_flow.F
 Chd|-- called by -----------
@@ -29,7 +29,7 @@ Chd|        SOLVE_DELTA_L0                source/tools/seatbelts/material_flow.F
 Chd|        SOLVE_DELTA_L02               source/tools/seatbelts/material_flow.F
 Chd|        GET_U_FUNC                    source/user_interface/ufunc.F 
 Chd|        GET_U_FUNC_INV                source/user_interface/ufunc.F 
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        SEATBELT_MOD                  ../common_source/modules/seatbelt_mod.F
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
 Chd|====================================================================
@@ -43,7 +43,7 @@ Chd|====================================================================
      7                         VY3,VZ3,XC,RETRACTOR_ID,FLAG_RETRACTOR_UPDATE,
      8                         SENSOR_TAB,AL0DP,FR_ID,DDF,FX,FX2,
      9                         ALDP2,AL0DP2,EX2DP,EY2DP,EZ2DP,
-     A                         XL02,XK2,COMPT,INDEX2)
+     A                         XL02,XK2,COMPT,INDEX2,NSENSOR)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -61,15 +61,12 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
-#include      "param_c.inc"
-#include      "vect01_c.inc"
-#include      "task_c.inc"
 C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER ,INTENT(IN) :: NSENSOR
       INTEGER UPDATE_FLAG(*),SLIPRING_ID(*),NC1(*),NC2(*),NC3(*),SLIPRING_STRAND(*),
      .        ADHER(*),FLAG_SLIPRING_UPDATE,ADD_NODE1(*),ADD_NODE2(*),RETRACTOR_ID(*),
      .        FLAG_RETRACTOR_UPDATE,FR_ID(*)
@@ -604,7 +601,7 @@ C--             Loading --
                 YY = GET_U_FUNC(RETRACTOR(RETRACTOR_ID(I))%IFUNC(1),XX,DXDY)*RETRACTOR(RETRACTOR_ID(I))%FAC(1)
                 DXDY = DXDY * (RETRACTOR(RETRACTOR_ID(I))%FAC(2) / RETRACTOR(RETRACTOR_ID(I))%FAC(1))
                 YY = YY + PRETENS
-                CALL SOLVE_DELTA_L02(DELTA_LO,DXDY,YY,XK(I),ALDP(I),AL0DP(I),LMIN(I))
+                CALL SOLVE_DELTA_L02(DELTA_LO,DXDY,YY,XK(I),ALDP(I),AL0DP(I),LMIN(I),FB)
                 EPSN = (ALDP(I)-AL0DP(I)-DELTA_LO)/MAX(LMIN(I),AL0DP(I)+DELTA_LO)
                 FB = FX(I) + XK(I)*(EPSN-EPS1)
                 RETRACTOR(RETRACTOR_ID(I))%LOCK_YIELD_FORCE = FB
@@ -621,7 +618,7 @@ C--             Unloading --
                 YY = GET_U_FUNC(RETRACTOR(RETRACTOR_ID(I))%IFUNC(2),XX,DXDY)*RETRACTOR(RETRACTOR_ID(I))%FAC(1)
                 DXDY = DXDY * (RETRACTOR(RETRACTOR_ID(I))%FAC(2) / RETRACTOR(RETRACTOR_ID(I))%FAC(1))
                 YY = YY + PRETENS
-                CALL SOLVE_DELTA_L02(DELTA_LO,DXDY,YY,XK(I),ALDP(I),AL0DP(I),LMIN(I))
+                CALL SOLVE_DELTA_L02(DELTA_LO,DXDY,YY,XK(I),ALDP(I),AL0DP(I),LMIN(I),FB)
                 EPSN = (ALDP(I)-AL0DP(I)-DELTA_LO)/MAX(LMIN(I),AL0DP(I)+DELTA_LO)
                 FB = FX(I) + XK(I)*(EPSN-EPS1)
               ENDIF
@@ -788,10 +785,6 @@ C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "comlock.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER FLAG
@@ -853,35 +846,29 @@ Chd|-- called by -----------
 Chd|        MATERIAL_FLOW                 source/tools/seatbelts/material_flow.F
 Chd|-- calls ---------------
 Chd|====================================================================
-      SUBROUTINE SOLVE_DELTA_L02(DELTA_LO,ALPHA,BETA,XK,L,L0,LMIN)
+      SUBROUTINE SOLVE_DELTA_L02(DELTA_LO,ALPHA,BETA,XK,L,L0,LMIN,FB)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "comlock.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      my_real
-     .        ALPHA,BETA,XK,LMIN
+      my_real ALPHA,BETA,XK,LMIN,FB
       DOUBLE PRECISION DELTA_LO,L,L0
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      my_real
-     .        DD,SOL1,SOL2,AA,BB,CC
+      my_real  DD,SOL1,SOL2,AA,BB,CC
 C-----------------------------------------------
 C
 C      Computation of Dl0 for locked retractor
 C
 C--    equation 1 -> l0 > lmin
        AA = ALPHA
-       BB = ALPHA*L0+BETA+XK
-       CC = BETA*L0 - XK*(L-L0)
+       BB = ALPHA*L0+BETA+XK*L/L0-FB
+       CC = BETA*L0-FB*L0
        IF (ABS(AA) > EM20) THEN
          DD = BB*BB-4*AA*CC
          SOL1 = (-BB+SQRT(DD))/(2*AA)

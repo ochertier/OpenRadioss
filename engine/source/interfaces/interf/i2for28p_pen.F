@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  I2FOR28P_PEN                  source/interfaces/interf/i2for28p_pen.F
 Chd|-- called by -----------
@@ -71,12 +71,9 @@ C     REAL
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
-#include      "param_c.inc"
 #include      "com01_c.inc"
 #include      "com06_c.inc"
 #include      "com08_c.inc"
-#include      "scr02_c.inc"
 #include      "scr11_c.inc"
 #include      "scr14_c.inc"
 #include      "sms_c.inc"
@@ -163,50 +160,50 @@ C------------------------------------------------
           X1  = X(1,IX1(K))                                       
           Y1  = X(2,IX1(K))                                          
           Z1  = X(3,IX1(K))                                          
-          X2  = X(1,IX2(K))					     
-          Y2  = X(2,IX2(K))					     
-          Z2  = X(3,IX2(K))					     
-          X3  = X(1,IX3(K))					     
-          Y3  = X(2,IX3(K))					     
-          Z3  = X(3,IX3(K))					     
-          X4  = X(1,IX4(K))					     
-          Y4  = X(2,IX4(K))					     
-          Z4  = X(3,IX4(K))					     
+          X2  = X(1,IX2(K))               
+          Y2  = X(2,IX2(K))               
+          Z2  = X(3,IX2(K))               
+          X3  = X(1,IX3(K))               
+          Y3  = X(2,IX3(K))               
+          Z3  = X(3,IX3(K))               
+          X4  = X(1,IX4(K))               
+          Y4  = X(2,IX4(K))               
+          Z4  = X(3,IX4(K))               
           XS  = X(1,I)                                          
           YS  = X(2,I)                                         
           ZS  = X(3,I)                                           
           VSX = V(1,I)                                                   
           VSY = V(2,I)                                                   
           VSZ = V(3,I)                                                
-          VX1 = V(1,IX1(K))						      
-          VY1 = V(2,IX1(K))						      
-          VZ1 = V(3,IX1(K))						      
-          VX2 = V(1,IX2(K))						      
-          VY2 = V(2,IX2(K))						      
-          VZ2 = V(3,IX2(K))						      
-          VX3 = V(1,IX3(K))						      
-          VY3 = V(2,IX3(K))						      
-          VZ3 = V(3,IX3(K))						      
-          VX4 = V(1,IX4(K))						      
-          VY4 = V(2,IX4(K))						      
+          VX1 = V(1,IX1(K))                  
+          VY1 = V(2,IX1(K))                  
+          VZ1 = V(3,IX1(K))                  
+          VX2 = V(1,IX2(K))                  
+          VY2 = V(2,IX2(K))                  
+          VZ2 = V(3,IX2(K))                  
+          VX3 = V(1,IX3(K))                  
+          VY3 = V(2,IX3(K))                  
+          VZ3 = V(3,IX3(K))                  
+          VX4 = V(1,IX4(K))                  
+          VY4 = V(2,IX4(K))                  
           VZ4 = V(3,IX4(K))
           IF (IRODDL == 1 .AND. IN(I) > ZERO) THEN
             VRSX = VR(1,I)
             VRSY = VR(2,I)
             VRSZ = VR(3,I)   
-            VRX1 = VR(1,IX1(K))						      
-            VRY1 = VR(2,IX1(K))						      
-            VRZ1 = VR(3,IX1(K))						      
-            VRX2 = VR(1,IX2(K))						      
-            VRY2 = VR(2,IX2(K))						      
-            VRZ2 = VR(3,IX2(K))						      
-            VRX3 = VR(1,IX3(K))						      
-            VRY3 = VR(2,IX3(K))						      
-            VRZ3 = VR(3,IX3(K))						      
-            VRX4 = VR(1,IX4(K))						      
-            VRY4 = VR(2,IX4(K))						      
+            VRX1 = VR(1,IX1(K))                  
+            VRY1 = VR(2,IX1(K))                  
+            VRZ1 = VR(3,IX1(K))                  
+            VRX2 = VR(1,IX2(K))                  
+            VRY2 = VR(2,IX2(K))                  
+            VRZ2 = VR(3,IX2(K))                  
+            VRX3 = VR(1,IX3(K))                  
+            VRY3 = VR(2,IX3(K))                  
+            VRZ3 = VR(3,IX3(K))                  
+            VRX4 = VR(1,IX4(K))                  
+            VRY4 = VR(2,IX4(K))                  
             VRZ4 = VR(3,IX4(K))
-          ENDIF								
+          ENDIF
 C---------------------
           CALL I2REP(X1     ,X2     ,X3     ,X4     ,
      .               Y1     ,Y2     ,Y3     ,Y4     ,
@@ -305,9 +302,9 @@ c
         RZ(4) = E3X*X4 + E3Y*Y4 + E3Z*Z4         
 C
         IF (NIR==3) THEN
- 	  RX(4)=ZERO
- 	  RY(4)=ZERO
- 	  RZ(4)=ZERO
+            RX(4)=ZERO
+            RY(4)=ZERO
+            RZ(4)=ZERO
         END IF
 C
         VS(1) = VSX*E1X + VSY*E1Y + VSZ*E1Z

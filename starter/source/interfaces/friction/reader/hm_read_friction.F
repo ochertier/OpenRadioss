@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  HM_READ_FRICTION              source/interfaces/friction/reader/hm_read_friction.F
 Chd|-- called by -----------
@@ -59,9 +59,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr17_c.inc"
@@ -84,17 +81,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
-#include      "scr06_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com09_c.inc"
 #include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "scr12_c.inc"
-#include      "sysunit.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -231,6 +219,8 @@ C          1st defaults
             WRITE(IOUT,3506) 
           ELSEIF(MFROT==3)THEN
             WRITE(IOUT,3507)  
+          ELSEIF(MFROT==4)THEN
+            WRITE(IOUT,3508)  
           ENDIF
           WRITE(IOUT,1502)MOD(IFQ,10), XFILTR
           WRITE(IOUT,1501)
@@ -244,6 +234,8 @@ C          1st defaults
             WRITE(IOUT,1505)  FRIC,C1,C2,C3,C4,C5,C6
           ELSEIF(MFROT==3)THEN
             WRITE(IOUT,1506)  C1,C2,C3,C4,C5,C6
+          ELSEIF(MFROT==4)THEN
+            WRITE(IOUT,1514)  FRIC,C1,C2
           ENDIF
        ENDIF
 C
@@ -498,6 +490,8 @@ C
                     WRITE(IOUT,1505)FRIC,C1,C2,C3,C4,C5,C6
                   ELSEIF(MFROT==3)THEN
                     WRITE(IOUT,1506)C1,C2,C3,C4,C5,C6
+                  ELSEIF(MFROT==4)THEN
+                     WRITE(IOUT,1514)  FRIC,C1,C2
                   ENDIF
                 ELSE
                   WRITE(IOUT,1511)
@@ -511,6 +505,8 @@ C
                     WRITE(IOUT,1505)FRIC,C1,C2,C3,C4,C5,C6
                   ELSEIF(MFROT==3)THEN
                     WRITE(IOUT,1506)C1,C2,C3,C4,C5,C6
+                  ELSEIF(MFROT==4)THEN
+                     WRITE(IOUT,1514)  FRIC,C1,C2
                   ENDIF
                   WRITE(IOUT,1513)
                   IF(MFROT==0)THEN
@@ -522,6 +518,8 @@ C
                     WRITE(IOUT,1505)FRIC2,C11,C22,C33,C44,C55,C66
                   ELSEIF(MFROT==3)THEN
                     WRITE(IOUT,1506)C11,C22,C33,C44,C55,C66
+                  ELSEIF(MFROT==4)THEN
+                    WRITE(IOUT,1514)  FRIC2,C11,C22
                   ENDIF
                 ENDIF
 C
@@ -714,6 +712,8 @@ C--Output--
                       WRITE(IOUT,1505)FRIC,C1,C2,C3,C4,C5,C6
                    ELSEIF(MFROT==3)THEN
                       WRITE(IOUT,1506)C1,C2,C3,C4,C5,C6
+                   ELSEIF(MFROT==4)THEN
+                     WRITE(IOUT,1514)  FRIC,C1,C2
                    ENDIF
                 ELSE
                    WRITE(IOUT,1511)
@@ -727,6 +727,8 @@ C--Output--
                       WRITE(IOUT,1505)FRIC,C1,C2,C3,C4,C5,C6
                    ELSEIF(MFROT==3)THEN
                       WRITE(IOUT,1506)C1,C2,C3,C4,C5,C6
+                   ELSEIF(MFROT==4)THEN
+                     WRITE(IOUT,1514)  FRIC,C1,C2
                    ENDIF
                    WRITE(IOUT,1513)
                    IF(MFROT==0)THEN
@@ -738,6 +740,8 @@ C--Output--
                       WRITE(IOUT,1505)FRIC2,C11,C22,C33,C44,C55,C66
                    ELSEIF(MFROT==3)THEN
                       WRITE(IOUT,1506)C11,C22,C33,C44,C55,C66
+                   ELSEIF(MFROT==4)THEN
+                      WRITE(IOUT,1514) FRIC2,C11,C22
                    ENDIF
                 ENDIF
              ENDIF
@@ -925,6 +929,8 @@ C--Output--
                      WRITE(IOUT,1505)FRIC,C1,C2,C3,C4,C5,C6
                   ELSEIF(MFROT==3)THEN
                      WRITE(IOUT,1506)C1,C2,C3,C4,C5,C6
+                  ELSEIF(MFROT==4)THEN
+                     WRITE(IOUT,1514)  FRIC,C1,C2
                   ENDIF
                ELSE
                   WRITE(IOUT,1511)
@@ -938,6 +944,8 @@ C--Output--
                      WRITE(IOUT,1505)FRIC,C1,C2,C3,C4,C5,C6
                   ELSEIF(MFROT==3)THEN
                      WRITE(IOUT,1506)C1,C2,C3,C4,C5,C6
+                  ELSEIF(MFROT==4)THEN
+                     WRITE(IOUT,1514)  FRIC,C1,C2
                   ENDIF
                   WRITE(IOUT,1513)
                   IF(MFROT==0)THEN
@@ -949,6 +957,8 @@ C--Output--
                      WRITE(IOUT,1505)FRIC2,C11,C22,C33,C44,C55,C66
                   ELSEIF(MFROT==3)THEN
                      WRITE(IOUT,1506)C11,C22,C33,C44,C55,C66
+                  ELSEIF(MFROT==4)THEN
+                    WRITE(IOUT,1514)  FRIC2,C11,C22
                   ENDIF
                ENDIF
             ENDIF
@@ -1223,6 +1233,8 @@ C--Output--
                      WRITE(IOUT,1505)FRIC,C1,C2,C3,C4,C5,C6
                   ELSEIF(MFROT==3)THEN
                      WRITE(IOUT,1506)C1,C2,C3,C4,C5,C6
+                  ELSEIF(MFROT==4)THEN
+                    WRITE(IOUT,1514)  FRIC,C1,C2
                   ENDIF
                ELSE
                   WRITE(IOUT,1511)
@@ -1236,6 +1248,8 @@ C--Output--
                      WRITE(IOUT,1505)FRIC,C1,C2,C3,C4,C5,C6
                   ELSEIF(MFROT==3)THEN
                      WRITE(IOUT,1506)C1,C2,C3,C4,C5,C6
+                  ELSEIF(MFROT==4)THEN
+                    WRITE(IOUT,1514)  FRIC,C1,C2
                   ENDIF
                   WRITE(IOUT,1513)
                   IF(MFROT==0)THEN
@@ -1247,6 +1261,8 @@ C--Output--
                      WRITE(IOUT,1505)FRIC2,C11,C22,C33,C44,C55,C66
                   ELSEIF(MFROT==3)THEN
                      WRITE(IOUT,1506)C11,C22,C33,C44,C55,C66
+                  ELSEIF(MFROT==4)THEN
+                    WRITE(IOUT,1514)  FRIC2,C11,C22
                   ENDIF
                ENDIF
             ENDIF
@@ -1310,6 +1326,13 @@ C
      .    '          C4 . . . . . . . . . . . . . . . . . . . ',1PG20.13/,
      .    '          C5 . . . . . . . . . . . . . . . . . . . ',1PG20.13/,
      .    '          C6 . . . . . . . . . . . . . . . . . . . ',1PG20.13/)
+ 3508 FORMAT(/
+     .    '        EXPONENTIAL DECAY FRICTION LAW   '/
+     .    '          MU = c1+(MUo-c1)*exp(-c2*v)')
+ 1514 FORMAT(/
+     .    '          STATIC COEFFICIENT MUo . . . . . . . . . ',1PG20.13/,
+     .    '          DYNAMIC COEFFICIENT C1 . . . . . . . . . ',1PG20.13/,
+     .    '          EXPONENTIAL DECAY COEFFICIENT C2 . . . . ',1PG20.13/)
 c 2503 FORMAT(/
 c     .    '      FRICTION COEFFICIENT . . . . . . . . .  . . ',1PG20.13/
 c     .    '      FRICTION CRITICAL DAMPING FACTOR. . . . . . ',1PG20.13)

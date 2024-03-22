@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  FINDELE                       source/boundary_conditions/ebcs/findele.F
 Chd|-- called by -----------
@@ -29,7 +29,7 @@ Chd|        NORMA1                        source/interfaces/inter3d1/norma1.F
 Chd|        IFACE                         source/ale/ale3d/iface.F      
 Chd|        IFACE2                        source/ale/ale3d/iface.F      
 Chd|        IFACE2T                       source/ale/ale3d/iface.F      
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
       SUBROUTINE FINDELE(ALE_CONNECTIVITY, NNODE, NIX, NVOIS, IDSU,ID,NSEG,IX,
@@ -51,8 +51,6 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "scr03_c.inc"
-#include      "scr07_c.2.inc"
-#include      "warn_c.inc"
 #include      "scr17_c.inc"
 #include      "tabsiz_c.inc"
 C-----------------------------------------------
@@ -67,8 +65,9 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER II,JJ,J,K,L,M,PP,NN,KK,NEL,IRECT(4),IAD,N,ALE,NF,IP(NNODE),TURBU,NEIGH,CON(8),IS
-      INTEGER IFACE, IFACE2, IFACE2T, JALE_FROM_MAT, JALE_FROM_PROP
+      INTEGER IFACE, IFACE2, IFACE2T, JALE_FROM_MAT, JALE_FROM_PROP,MINUS
       my_real :: N1, N2, N3, DDS,AREA
+      my_real :: XX1(4), XX2(4),XX3(4),XS1,YS1,ZS1,XC,YC,ZC
       EXTERNAL  IFACE, IFACE2, IFACE2T
       DATA CON/1,2,3,4,5,6,7,8/
 C-----------------------------------------------
@@ -146,7 +145,7 @@ C-----------------------------------------------
         ENDDO
 
         IF (N2D == 0) THEN               
-           CALL NORMA1(N1,N2,N3,AREA)      
+           CALL NORMA1(N1,N2,N3,AREA,XX1,XX2,XX3)      
         ELSE                               
            N1 = ZERO                       
            N2 = XX3(2) - XX3(1)            
@@ -163,7 +162,7 @@ C-----------------------------------------------
           KK=IX(K+1,NEL)
           XC=XC+X(1,KK)
           YC=YC+X(2,KK)
-          ZC=ZC+X(3,KK)
+          ZC=ZC+X(3,KK) 
         ENDDO
         XC=XC/NNODE
         YC=YC/NNODE
@@ -190,6 +189,8 @@ C-----------------------------------------------
           SEGINDX = SEGINDX+1
           ISEG(J) = IS*SEGINDX
           IAD = ALE_CONNECTIVITY%ee_connect%iad_connect(NEL)
+          MINUS = -1
+!          IF(TYPE==10) MINUS = 1
           ALE_CONNECTIVITY%ee_connect%connected(iad + NF - 1) = -SEGINDX   !NEGATIVE VALUE => STORAGE OF SEGMENT ID
           IF(IPRI>=1)WRITE(IOUT,FMT=FMW_10I)J,IX(NIX,NEL),NF,ISEG(J)
         ELSE

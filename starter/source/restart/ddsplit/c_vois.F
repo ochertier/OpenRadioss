@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
 Chd|====================================================================
 Chd|  C_VOIS                        source/restart/ddsplit/c_vois.F
@@ -27,9 +27,9 @@ Chd|-- called by -----------
 Chd|        DDSPLIT                       source/restart/ddsplit/ddsplit.F
 Chd|-- calls ---------------
 Chd|        NLOCAL                        source/spmd/node/ddtools.F    
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
 Chd|        FRONT_MOD                     share/modules1/front_mod.F    
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|        SPLIT_CFD_MOD                 share/modules1/split_cfd_mod.F
 Chd|====================================================================
       SUBROUTINE C_VOIS(NSVOIS  ,NQVOIS ,NTGVOIS, NRCVVOIS,NSNDVOIS,ILAW11 ,
@@ -48,7 +48,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -125,7 +124,7 @@ C
          NEL = IPARG(2,NG)
          NFT = IPARG(3,NG)
          ITY = IPARG(5,NG)
-Cel voir autres types solides
+C   voir autres types solides
          ISOLNOD = IPARG(28,NG)
          IF(ITY==1) THEN
            DO I = 1, NEL
@@ -133,7 +132,7 @@ Cel voir autres types solides
              IE_LOC = CEL(IE)
              IAD1 = ALE_CONNECTIVITY%ee_connect%iad_connect(IE)
              LGTH = ALE_CONNECTIVITY%ee_connect%iad_connect(IE+1)-ALE_CONNECTIVITY%ee_connect%iad_connect(IE)
-Cel IVOIS
+C   IVOIS
              DO J = 1, LGTH
                IV = ALE_CONNECTIVITY%ee_connect%connected(IAD1 + J - 1)
                IF (IV>0) THEN
@@ -159,7 +158,7 @@ C IV < 0 : SEGMENT INT12
              ENDDO
            ENDDO
          ELSEIF(ITY==2) THEN
-Cel 2D
+C   2D
             DO I = 1, NEL
                IE = I+NFT
                IE_LOC = CEL(IE)
@@ -215,12 +214,12 @@ C
          NFT = IPARG(3,NG)
          ITY = IPARG(5,NG)
          P = IPARG(32,NG)+1
-Cel voir autres types solides
+C   voir autres types solides
          ISOLNOD = IPARG(28,NG)
          IF(ITY==1) THEN
            DO I = 1, NEL
              IE = I+NFT
-Cel IVOIS
+C   IVOIS
              IAD1 = ALE_CONNECTIVITY%ee_connect%iad_connect(IE)
              LGTH = ALE_CONNECTIVITY%ee_connect%iad_connect(IE+1)-ALE_CONNECTIVITY%ee_connect%iad_connect(IE)
              DO J = 1, LGTH

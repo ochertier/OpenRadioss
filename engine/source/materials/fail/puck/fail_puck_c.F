@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 
 Chd|====================================================================
 Chd|  FAIL_PUCK_C                   source/materials/fail/puck/fail_puck_c.F
@@ -32,8 +32,8 @@ Chd|====================================================================
      1     NEL       ,NUPARAM   ,NUVAR     ,UPARAM    ,UVAR      , 
      2     TIME      ,NGL       ,IPG       ,ILAY      ,IPT       ,                          
      3     SIGNXX    ,SIGNYY    ,SIGNXY    ,SIGNYZ    ,SIGNZX    ,  
-     4     OFF       ,FOFF      ,PTHKF     ,DMG_FLAG  ,DMG_SCALE ,
-     5     DFMAX     ,TDEL      )                               
+     4     OFF       ,FOFF      ,DMG_FLAG  ,DMG_SCALE ,
+     5     DFMAX     ,TDEL      ,TIMESTEP  )                               
 C-----------------------------------------------
 C    modified Puck model ------
 C-----------------------------------------------
@@ -62,7 +62,6 @@ C ...     |         |   |   |
 C---------+---------+---+---+--------------------------------------------
 C OFF     | NEL     | F | R | DELETED ELEMENT FLAG (=1. ON, =0. OFF)
 C FOFF    | NEL     | I |R/W| DELETED INTEGRATION POINT FLAG (=1 ON, =0 OFF)
-C PTHKF   |  1      | F | W | PERCENTAGE OF LAYER THICKNESS TO FAIL
 C DFMAX   | NEL     | F |R/W| MAX DAMAGE FACTOR 
 C TDEL    | NEL     | F | W | FAILURE TIME
 C DMG_FLAG|  1      | I | W | STRESS REDUCTION FLAG DUE TO DAMAGE
@@ -77,7 +76,7 @@ C   I N P U T   A r g u m e n t s
 C-----------------------------------------------
       INTEGER ,INTENT(IN) :: NEL,NUPARAM,NUVAR,IPG,ILAY,IPT
       INTEGER ,DIMENSION(NEL) ,INTENT(IN) :: NGL
-      my_real ,INTENT(IN) :: TIME
+      my_real ,INTENT(IN) :: TIME,TIMESTEP
       my_real ,DIMENSION(NEL) ,INTENT(IN)    :: OFF,
      .   SIGNXX,SIGNYY,SIGNXY,SIGNYZ,SIGNZX
       my_real,DIMENSION(NUPARAM) ,INTENT(IN) :: UPARAM
@@ -86,17 +85,17 @@ C   I N P U T   O U T P U T   A r g u m e n t s
 C-----------------------------------------------
       INTEGER ,INTENT(OUT) ::DMG_FLAG
       INTEGER ,DIMENSION(NEL) ,INTENT(INOUT) :: FOFF
-      my_real ,INTENT(OUT) :: PTHKF
       my_real ,DIMENSION(NEL) ,INTENT(INOUT) :: DFMAX
       my_real ,DIMENSION(NEL) ,INTENT(OUT)   :: TDEL,DMG_SCALE
       my_real ,DIMENSION(NEL,NUVAR) ,INTENT(INOUT) :: UVAR
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER :: I,J,NINDX,IFAIL_SH
+      INTEGER :: I,J,NINDX,FSMOOTH
       INTEGER ,DIMENSION(NEL) :: INDX
       my_real :: SIGT1,SIGT2, SIGC1,SIGC2,FSIG12,F1,FA,FB,FC,
-     .           PN12,PP12,PN22,FAC,TMAX,DAMMX
+     .           PN12,PP12,PN22,FAC,TMAX,DAMMX,FCUT,ASRATE,
+     .           SXX(NEL),SYY(NEL),SXY(NEL)
 C=======================================================================
       SIGT1  = UPARAM(1)
       SIGT2  = UPARAM(2)
@@ -107,16 +106,33 @@ C=======================================================================
       PN12   = UPARAM(7) 
       PN22   = UPARAM(8)
       TMAX   = UPARAM(9)
-      IFAIL_SH = INT(UPARAM(10)) 
-c
-      IF (IFAIL_SH == 1) THEN
-        PTHKF = EM06
-      ELSEIF (IFAIL_SH == 2) THEN
-        PTHKF = ONE
+      FCUT   = UPARAM(12)
+      IF (FCUT > ZERO) THEN
+        FSMOOTH = 1 
+        ASRATE = TWO*PI*FCUT*TIMESTEP
+        ASRATE = ASRATE/(ONE+ASRATE)
+      ELSE
+        FSMOOTH = 0
       ENDIF
 c
       DMG_FLAG = 1               
       NINDX    = 0 
+      IF (FSMOOTH > 0) THEN 
+        DO I = 1,NEL
+          SXX(I) = ASRATE*SIGNXX(I) + (ONE - ASRATE)*UVAR(I,2)
+          SYY(I) = ASRATE*SIGNYY(I) + (ONE - ASRATE)*UVAR(I,3)
+          SXY(I) = ASRATE*SIGNXY(I) + (ONE - ASRATE)*UVAR(I,4)
+          UVAR(I,2) = SXX(I)
+          UVAR(I,3) = SYY(I)
+          UVAR(I,4) = SXY(I)
+        ENDDO
+      ELSE
+        DO I = 1,NEL
+          SXX(I) = SIGNXX(I)
+          SYY(I) = SIGNYY(I)
+          SXY(I) = SIGNXY(I)
+        ENDDO
+      ENDIF
 c-------------------------------
       DO I=1,NEL
         IF (OFF(I) == ONE .and. FOFF(I) == 1) THEN
@@ -129,26 +145,26 @@ C
 c
 c           fiber criteria
 c
-            IF (SIGNXX(I) >= ZERO) THEN
-              F1 = SIGNXX(I)/SIGT1
+            IF (SXX(I) >= ZERO) THEN
+              F1 = SXX(I)/SIGT1
             ELSE
-              F1 = -SIGNXX(I)/SIGC1
+              F1 = -SXX(I)/SIGC1
             ENDIF
 c
 c           matrix criteria                                      
 c                                                                
-            IF (SIGNYY(I) >= ZERO) THEN
+            IF (SYY(I) >= ZERO) THEN
               FAC = ONE - PP12*SIGT2/FSIG12
-              FAC = FAC*SIGNYY(I)/SIGT2
-              FA  = SQRT((SIGNXY(I)/FSIG12)**2 + FAC*FAC) 
-     .            + PP12*SIGNYY(I)/FSIG12
+              FAC = FAC*SYY(I)/SIGT2
+              FA  = SQRT((SXY(I)/FSIG12)**2 + FAC*FAC) 
+     .            + PP12*SYY(I)/FSIG12
              ELSE
               FAC = HALF/(ONE + PN22)/FSIG12
-              FC  = (SIGNXY(I)*FAC)**2 + (SIGNYY(I)/SIGC2)**2
-              FC  =-FC*SIGC2/SIGNYY(I)
+              FC  = (SXY(I)*FAC)**2 + (SYY(I)/SIGC2)**2
+              FC  =-FC*SIGC2/SYY(I)
             ENDIF
-            FB = SQRT(SIGNXY(I)**2 + (PN12*SIGNYY(I))**2 ) 
-     .                             + PN12*SIGNYY(I)
+            FB = SQRT(SXY(I)**2 + (PN12*SYY(I))**2 ) 
+     .                             + PN12*SYY(I)
             FB = FB/FSIG12
 C
             DAMMX    = MIN(ONE,MAX(F1,FA,FB,FC))

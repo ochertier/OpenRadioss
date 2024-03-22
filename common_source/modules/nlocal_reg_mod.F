@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  NLOCAL_REG_MOD                modules/nlocal_reg_mod.F      
 Chd|-- called by -----------
@@ -31,6 +31,7 @@ Chd|        CDKFINT_REG_INI               starter/source/elements/sh3n/coquedk/c
 Chd|        CDKINIT3                      starter/source/elements/sh3n/coquedk/cdkinit3.F
 Chd|        CFINT_REG_INI                 starter/source/elements/shell/coque/cfint_reg_ini.F
 Chd|        CINIT3                        starter/source/elements/shell/coque/cinit3.F
+Chd|        C_FRONT                       starter/source/restart/ddsplit/c_front.F
 Chd|        DDSPLIT                       starter/source/restart/ddsplit/ddsplit.F
 Chd|        HM_READ_FAIL                  starter/source/materials/fail/hm_read_fail.F
 Chd|        HM_READ_FAIL_GURSON           starter/source/materials/fail/gurson/hm_read_fail_gurson.F
@@ -40,9 +41,11 @@ Chd|        LAW104_UPD                    starter/source/materials/mat/mat104/la
 Chd|        LECTUR                        starter/source/starter/lectur.F
 Chd|        NLOCAL_INIT_STA               starter/source/materials/fail/nlocal_init_sta.F
 Chd|        NLOC_DMG_INIT                 starter/source/materials/fail/nloc_dmg_init.F
+Chd|        R2R_GROUP                     starter/source/coupling/rad2rad/r2r_group.F
 Chd|        READ_MATERIAL_MODELS          starter/source/materials/read_material_models.F
 Chd|        UPDMAT                        starter/source/materials/updmat.F
 Chd|        WRITE_NLOC_STRUCT             starter/source/restart/ddsplit/write_nloc_struct.F
+Chd|        W_FRONT                       starter/source/restart/ddsplit/w_front.F
 Chd|        ALEMAIN                       engine/source/ale/alemain.F   
 Chd|        BFORC2                        engine/source/ale/bimat/bforc2.F
 Chd|        C3FINT_REG                    engine/source/elements/sh3n/coque3n/c3fint_reg.F
@@ -76,6 +79,9 @@ Chd|        NLOCAL_INCR                   engine/source/assembly/nlocal_incr.F
 Chd|        NLOCAL_VEL                    engine/source/assembly/nlocal_vel.F
 Chd|        Q4FORC2                       engine/source/elements/solid_2d/quad4/q4forc2.F
 Chd|        QFORC2                        engine/source/elements/solid_2d/quad/qforc2.F
+Chd|        R2R_EXCHANGE                  engine/source/coupling/rad2rad/r2r_exchange.F
+Chd|        R2R_GETDATA                   engine/source/coupling/rad2rad/r2r_getdata.F
+Chd|        R2R_INIT                      engine/source/coupling/rad2rad/r2r_init.F
 Chd|        RDRESB                        engine/source/output/restart/rdresb.F
 Chd|        READ_NLOC_STRUCT              engine/source/output/restart/read_nloc_struct.F
 Chd|        RESOL                         engine/source/engine/resol.F  
@@ -85,16 +91,20 @@ Chd|        S16FORC3                      engine/source/elements/thickshell/soli
 Chd|        S20FORC3                      engine/source/elements/solid/solide20/s20forc3.F
 Chd|        S4FINT_REG                    engine/source/elements/solid/solide4/s4fint_reg.F
 Chd|        S4FORC3                       engine/source/elements/solid/solide4/s4forc3.F
+Chd|        S6CFINT_REG                   engine/source/elements/thickshell/solide6c/s6cfint_reg.F
 Chd|        S6CFORC3                      engine/source/elements/thickshell/solide6c/s6cforc3.F
+Chd|        S8CFINT_REG                   engine/source/elements/thickshell/solide8c/s8cfint_reg.F
 Chd|        S8CFORC3                      engine/source/elements/thickshell/solide8c/s8cforc3.F
 Chd|        S8EFORC3                      engine/source/elements/solid/solide8e/s8eforc3.F
 Chd|        S8SFORC3                      engine/source/elements/solid/solide8s/s8sforc3.F
 Chd|        S8ZFINT_REG                   engine/source/elements/solid/solide8z/s8zfint_reg.F
 Chd|        S8ZFORC3                      engine/source/elements/solid/solide8z/s8zforc3.F
+Chd|        SCFINT_REG                    engine/source/elements/thickshell/solidec/scfint_reg.F
 Chd|        SCFORC3                       engine/source/elements/thickshell/solidec/scforc3.F
 Chd|        SFINT_REG                     engine/source/elements/solid/solide/sfint_reg.F
 Chd|        SFORC3                        engine/source/elements/solid/solide/sforc3.F
 Chd|        SPMD_COLLECT_NLOCAL           engine/source/mpi/output/spmd_collect_nlocal.F
+Chd|        SPMD_EXCH_R2R_NL              engine/source/mpi/r2r/spmd_exch_r2r_nl.F
 Chd|        SPMD_EXCH_SUB_POFF            engine/source/mpi/spmd_exch_sub.F
 Chd|        SPMD_EXCH_SUB_PON             engine/source/mpi/spmd_exch_sub.F
 Chd|        SPMD_SUB_BOUNDARIES           engine/source/mpi/spmd_exch_sub.F

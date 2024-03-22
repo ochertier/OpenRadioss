@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  PINIT3                        source/elements/beam/pinit3.F 
 Chd|-- called by -----------
@@ -33,7 +33,8 @@ Chd|        PCOORI                        source/elements/beam/pcoori.F
 Chd|        PEVECI                        source/elements/beam/peveci.F 
 Chd|        PIBUF3                        source/elements/beam/pibuf3.F 
 Chd|        PMASS                         source/elements/beam/pmass.F  
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        BPRELOAD_MOD                  share/modules1/bpreload_mod.F 
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
       SUBROUTINE PINIT3(ELBUF_STR,
@@ -42,19 +43,17 @@ Chd|====================================================================
      3                  STIFN    ,STIFR   ,PARTSAV ,V       ,IPART ,
      4                  MSP      ,INP     ,IGEO    ,STIFINT ,STRP  ,
      5                  NSIGBEAM ,SIGBEAM ,PTBEAM  ,IUSER   ,MCP   ,
-     6                  MCPP     ,TEMP )
+     6                  MCPP     ,TEMP    ,PRELOAD_A,IPRELD )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE ELBUFDEF_MOD
       USE MESSAGE_MOD
+      USE BPRELOAD_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
 C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
@@ -65,14 +64,12 @@ C-----------------------------------------------
 #include      "param_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr03_c.inc"
-#include      "scry_c.inc"
-#include      "warn_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER :: NEL,NSIGBEAM,IUSER,NFT
       INTEGER :: IC(NIXP,*),IPART(*),IGEO(NPROPGI,*),PTBEAM(*)
+      INTEGER , INTENT (IN   )  :: IPRELD
       my_real
      .   PM(*),X(*),GEO(NPROPG,*),XMAS(*),TINER(*),
      .   DTELEM(*),STIFN(*),STIFR(*),PARTSAV(20,*),V(*),MSP(*),INP(*),
@@ -80,6 +77,7 @@ C-----------------------------------------------
      .   TEMP(*)
 C
       TYPE(ELBUF_STRUCT_), TARGET :: ELBUF_STR
+      TYPE(PREL1D_) ,      TARGET :: PRELOAD_A
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -95,7 +93,7 @@ C-----------------------------------------------
      .   E3X(MVSIZ),E3Y(MVSIZ),E3Z(MVSIZ),DELTAX(MVSIZ),DTX(MVSIZ) 
       INTEGER IDMIN,IDMAX
       DATA IDMIN /-1/,IDMAX /-1/
-      my_real :: LGTHMIN,LGTHMAX
+      my_real :: LGTHMIN,LGTHMAX,CC1,UNDAMP
       DATA LGTHMIN /-1/,LGTHMAX /-1/
 C
       TYPE(G_BUFEL_),POINTER :: GBUF
@@ -106,7 +104,7 @@ C
      .            MXT,MXG ,NC1,NC2,NC3,DELTAX,
      .            X1,X2,X3, Y1,Y2,Y3, Z1,Z2,Z3)
 c
-      CALL PEVECI(GBUF%SKEW, X1,X3, Y1,Y3, Z1,Z3)
+      CALL PEVECI(GBUF%SKEW, X1,X3, Y1,Y3, Z1,Z3,X2,Y2,Z2,NC2,NC3)
       CALL PMASS(GEO,PM,XMAS,TINER,
      .           STIFN,STIFR,PARTSAV,V,IPART(NFT+1),
      .           MSP(NFT+1),INP(NFT+1),IGEO , STIFINT, STP(NFT+1),
@@ -148,12 +146,21 @@ C------------------------------------------
         ENDIF
       ENDDO
 C-----------
-      CALL DT1LAWP(PM,GEO,MXT,MXG,DELTAX,DTX)
+      CALL DT1LAWP(PM,GEO,MXT,MXG,DELTAX,DTX,IGTYP)
       NDEPAR=NUMELS+NUMELC+NUMELT+NFT
 C-----------
       DO I=1,NEL
         DTELEM(NDEPAR+I)=DTX(I)
       ENDDO
+!---  /PRELOAD/AXIAL     
+      IF (IPRELD>0) THEN
+          CC1 =TWO*SQRT(TWO)
+          DO I=1,NEL
+            UNDAMP = CC1*MSP(NFT+I)*GBUF%LENGTH(I)/DTX(I)
+            GBUF%BPRELD(I)     = PRELOAD_A%preload
+            GBUF%BPRELD(I+NEL) = UNDAMP*PRELOAD_A%damp
+          ENDDO
+      END IF
 C-----------
       RETURN
       END

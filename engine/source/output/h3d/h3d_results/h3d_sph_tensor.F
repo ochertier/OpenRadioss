@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  H3D_SPH_TENSOR                source/output/h3d/h3d_results/h3d_sph_tensor.F
 Chd|-- called by -----------
@@ -27,7 +27,7 @@ Chd|        GENH3D                        source/output/h3d/h3d_results/genh3d.F
 Chd|-- calls ---------------
 Chd|        H3D_WRITE_TENSOR              source/output/h3d/h3d_results/h3d_write_tensor.F
 Chd|        INITBUF                       share/resol/initbuf.F         
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        INITBUF_MOD                   share/resol/initbuf.F         
 Chd|        SCHLIEREN_MOD                 share/modules/schlieren_mod.F 
 Chd|        STACK_MOD                     share/modules/stack_mod.F     
@@ -44,13 +44,12 @@ C-----------------------------------------------
       USE INITBUF_MOD
       USE ELBUFDEF_MOD    
       USE SCHLIEREN_MOD 
-      USE STACK_MOD               
+      USE STACK_MOD        
+      USE NAMES_AND_TITLES_MOD, ONLY: NCHARLINE100       
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "chara_c.inc"
-#include      "nchara_c.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -60,13 +59,6 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "sphcom.inc"
 #include      "param_c.inc"
-#include      "scr01_c.inc"
-#include      "scr05_c.inc"
-#include      "scr14_c.inc"
-#include      "rnur_c.inc"
-#include      "task_c.inc"
-#include      "scr03_c.inc"
-#include      "spmd_c.inc"
 #include      "scr17_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -80,7 +72,7 @@ C     REAL
      .   ISPH3D,IGEO(NPROPGI,*),IS_WRITTEN_SPH(*),ID_ELEM(*),
      .   H3D_PART(*)
       TYPE (ELBUF_STRUCT_), DIMENSION(NGROUP), TARGET :: ELBUF_TAB
-      CHARACTER*ncharline KEYWORD
+      CHARACTER(LEN=NCHARLINE100):: KEYWORD
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C----------------------------------------------- 
@@ -130,7 +122,7 @@ C-----------------------------------------------
         ISTRAIN = IPARG(44,NG)
         ISOLNOD = IPARG(28,NG)
         IVISC = IPARG(61,NG)
-        CALL INITBUF (IPARG    ,NG      ,                      
+        CALL INITBUF(IPARG    ,NG      ,                      
      2        MLW     ,NEL     ,NFT     ,IAD     ,ITY     ,    
      3        NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,    
      4        JTHE    ,JLAG    ,JMULT   ,JHBE    ,JIVF    ,    
@@ -240,54 +232,54 @@ C-----------------------------------------------
 C           CRACKS
             IF (MLW == 24. AND. NINT(PM(56,MT1)) == 1) THEN
               IF(ISORTH==0)THEN
-             	 DO I=1,NEL
-             	   EVAR(1,I) =  LBUF%DGLO(JJ(1) + I)
-             	   EVAR(2,I) =  LBUF%DGLO(JJ(2) + I)
-             	   EVAR(3,I) =  LBUF%DGLO(JJ(3) + I)
-             	   EVAR(4,I) =  LBUF%DGLO(JJ(4) + I)
-             	   EVAR(5,I) =  LBUF%DGLO(JJ(5) + I)
-             	   EVAR(6,I) =  LBUF%DGLO(JJ(6) + I)
+           DO I=1,NEL
+             EVAR(1,I) =  LBUF%DGLO(JJ(1) + I)
+             EVAR(2,I) =  LBUF%DGLO(JJ(2) + I)
+             EVAR(3,I) =  LBUF%DGLO(JJ(3) + I)
+             EVAR(4,I) =  LBUF%DGLO(JJ(4) + I)
+             EVAR(5,I) =  LBUF%DGLO(JJ(5) + I)
+             EVAR(6,I) =  LBUF%DGLO(JJ(6) + I)
                    IS_WRITTEN_TENSOR(I) = 1
-             	 ENDDO
+           ENDDO
               ELSE
-             	DO I=1,NEL	
-             	  L11 = LBUF%DGLO(JJ(1) + I)		 
-             	  L21 = LBUF%DGLO(JJ(2) + I)		 
-             	  L31 = LBUF%DGLO(JJ(3) + I)		 
-             	  L12 = LBUF%DGLO(JJ(4) + I)	  
-             	  L22 = LBUF%DGLO(JJ(5) + I)	  
-             	  L32 = LBUF%DGLO(JJ(6) + I)
-             	  L13 = L21*L32-L31*L22
-             	  L23 = L31*L12-L11*L32
-             	  L33 = L11*L22-L21*L12
-             	  G11 = GBUF%GAMA(JJ(1) + I)
-             	  G21 = GBUF%GAMA(JJ(2) + I)
-             	  G31 = GBUF%GAMA(JJ(3) + I)
-             	  G12 = GBUF%GAMA(JJ(4) + I)
-             	  G22 = GBUF%GAMA(JJ(5) + I)
-             	  G32 = GBUF%GAMA(JJ(6) + I)
-             	  G13 = G21*G32-G31*G22
-             	  G23 = G31*G12-G11*G32
-             	  G33 = G11*G22-G21*G12
-             	  S11 =L11*G11+L12*G12+L13*G13 
-             	  S12 =L11*G21+L12*G22+L13*G23 
-             	  S13 =L11*G31+L12*G32+L13*G33
-             	  S21 =L12*G11+L22*G12+L23*G13
-             	  S22 =L12*G21+L22*G22+L23*G23
-             	  S23 =L12*G31+L22*G32+L23*G33 
-             	  S31 =L13*G11+L23*G12+L33*G13
-             	  S32 =L13*G21+L23*G22+L33*G23
-             	  S33 =L13*G31+L23*G32+L33*G33
-             	  EVAR(1,I) = G11*S11+G12*S21+G13*S31
-             	  EVAR(2,I) = G21*S12+G22*S22+G23*S32
-             	  EVAR(3,I) = G31*S13+G32*S23+G33*S33
-             	  EVAR(4,I) = G11*S12+G12*S22+G13*S32
-             	  EVAR(5,I) = G21*S13+G22*S23+G23*S33
-             	  EVAR(6,I) = G11*S13+G12*S23+G13*S33
+          DO I=1,NEL
+            L11 = LBUF%DGLO(JJ(1) + I)     
+            L21 = LBUF%DGLO(JJ(2) + I)     
+            L31 = LBUF%DGLO(JJ(3) + I)     
+            L12 = LBUF%DGLO(JJ(4) + I)    
+            L22 = LBUF%DGLO(JJ(5) + I)    
+            L32 = LBUF%DGLO(JJ(6) + I)
+            L13 = L21*L32-L31*L22
+            L23 = L31*L12-L11*L32
+            L33 = L11*L22-L21*L12
+            G11 = GBUF%GAMA(JJ(1) + I)
+            G21 = GBUF%GAMA(JJ(2) + I)
+            G31 = GBUF%GAMA(JJ(3) + I)
+            G12 = GBUF%GAMA(JJ(4) + I)
+            G22 = GBUF%GAMA(JJ(5) + I)
+            G32 = GBUF%GAMA(JJ(6) + I)
+            G13 = G21*G32-G31*G22
+            G23 = G31*G12-G11*G32
+            G33 = G11*G22-G21*G12
+            S11 =L11*G11+L12*G12+L13*G13 
+            S12 =L11*G21+L12*G22+L13*G23 
+            S13 =L11*G31+L12*G32+L13*G33
+            S21 =L12*G11+L22*G12+L23*G13
+            S22 =L12*G21+L22*G22+L23*G23
+            S23 =L12*G31+L22*G32+L23*G33 
+            S31 =L13*G11+L23*G12+L33*G13
+            S32 =L13*G21+L23*G22+L33*G23
+            S33 =L13*G31+L23*G32+L33*G33
+            EVAR(1,I) = G11*S11+G12*S21+G13*S31
+            EVAR(2,I) = G21*S12+G22*S22+G23*S32
+            EVAR(3,I) = G31*S13+G32*S23+G33*S33
+            EVAR(4,I) = G11*S12+G12*S22+G13*S32
+            EVAR(5,I) = G21*S13+G22*S23+G23*S33
+            EVAR(6,I) = G11*S13+G12*S23+G13*S33
                   IS_WRITTEN_TENSOR(I) = 1
-             	ENDDO							 
-              END IF								 
-            END IF	
+          ENDDO               
+              END IF                 
+            END IF
           ENDIF
 
           CALL H3D_WRITE_TENSOR(IOK_PART,IS_WRITTEN_SPH,SPH_TENSOR,NEL,0,NFT,

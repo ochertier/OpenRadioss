@@ -1,54 +1,61 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
+Chd|====================================================================
+Chd|  FORCE_MOD                     source/loads/general/force.F  
+Chd|-- called by -----------
+Chd|        FORCE_IMP                     source/loads/general/force_imp.F
+Chd|        RESOL                         source/engine/resol.F         
+Chd|-- calls ---------------
+Chd|====================================================================
+      MODULE FORCE_MOD
+      CONTAINS
 Chd|====================================================================
 Chd|  FORCE                         source/loads/general/force.F  
 Chd|-- called by -----------
-Chd|        DYNA_INA                      source/implicit/imp_dyna.F    
-Chd|        DYNA_WEX                      source/implicit/imp_dyna.F    
-Chd|        IMP_CHKM                      source/implicit/imp_solv.F    
-Chd|        IMP_SOLV                      source/implicit/imp_solv.F    
 Chd|        RESOL                         source/engine/resol.F         
 Chd|-- calls ---------------
 Chd|        FINTER                        source/tools/curve/finter.F   
 Chd|        FINTER_SMOOTH                 source/tools/curve/finter_smooth.F
-Chd|        GET_U_SENS_VALUE              source/user_interface/usensor.F
-Chd|        SET_U_SENS_VALUE              source/user_interface/usensor.F
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|        PINCHTYPE_MOD                 ../common_source/modules/pinchtype_mod.F
+Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
+Chd|        TH_SURF_MOD                   ../common_source/modules/interfaces/th_surf_mod.F
 Chd|====================================================================
-      SUBROUTINE FORCE (IB     ,FAC     ,NPC    ,TF      ,A     ,
-     2                  V      ,X       ,SKEW   ,AR      ,VR    ,
-     3                  SENSOR ,LSENSOR ,WEIGHT ,TFEXC   ,IADC  ,
-     4                  FSKY   ,FSKYV   ,FEXT   ,H3D_DATA,
-     5                  CPTREAC,FTHREAC,NODREAC)
+      SUBROUTINE FORCE (IB      ,FAC       ,NPC     ,TF      ,A      ,
+     2                  V       ,X         ,SKEW    ,AR      ,VR     ,
+     3                  NSENSOR ,SENSOR_TAB,TFEXC   ,IADC   ,
+     4                  FSKY    ,FSKYV     ,FEXT    ,H3D_DATA,
+     5                  CPTREAC ,FTHREAC   ,NODREAC ,TH_SURF ,FSAVSURF,
+     6                  NSEG_LOADP,DPL0CLD ,VEL0CLD ,D       ,DR      ,
+     7                  NCONLD  ,NUMNOD    ,NSURF   ,NFUNCT  , PYTHON )
 C-----------------------------------------------
 C   M o d u l e s
 C----------------------------------------------- 
+      USE PYTHON_FUNCT_MOD
       USE H3D_MOD
       USE PINCHTYPE_MOD 
-C-----------------------------------------------
-C   M o d u l e s 
-C-----------------------------------------------
+      USE SENSOR_MOD
+      USE TH_SURF_MOD , ONLY : TH_SURF_
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -59,17 +66,13 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "com06_c.inc"
 #include      "com08_c.inc"
 #include      "impl1_c.inc"
 #include      "scr05_c.inc"
 #include      "scr14_c.inc"
 #include      "scr16_c.inc"
-#include      "task_c.inc"
 #include      "parit_c.inc"
-#include      "alefvm.inc"
-#include      "tabsiz_c.inc"
 C-----------------------------------------------
 C   E x t e r n a l  F u n c t i o n s
 C-----------------------------------------------
@@ -80,25 +83,37 @@ C-----------------------------------------------
 C-----------------------------------------------,
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER ,INTENT(IN) :: NSENSOR,NCONLD,NUMNOD,NSURF,NFUNCT
       INTEGER NPC(*),CPTREAC,NODREAC(*)
-      INTEGER IB(NIBCLD,*),LSENSOR(NSENSI,*)
-      INTEGER WEIGHT(*), IADC(4,*)
+      INTEGER IB(NIBCLD,*)
+      INTEGER IADC(4,*)
       my_real
      .   FAC(LFACCLD,*), TF(*), A(3,*), V(3,*), AR(3,*), VR(3,*),
-     .   X(3,*), SKEW(LSKEW,*), SENSOR(NSENSR,*),TFEXC,
+     .   X(3,*), SKEW(LSKEW,*), TFEXC,
      .   FSKY(8,LSKY), FSKYV(LSKY,8),FEXT(3,*),FTHREAC(6,*)
       TYPE(H3D_DATABASE) :: H3D_DATA
+      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE (TH_SURF_) , INTENT(IN) :: TH_SURF
+      my_real, INTENT(INOUT) :: FSAVSURF(5,NSURF)
+      INTEGER, INTENT(INOUT) :: NSEG_LOADP(NSURF)
+      TYPE(PYTHON_), OPTIONAL :: PYTHON
+      my_real, INTENT(IN) :: 
+     .   DPL0CLD(6,NCONLD),VEL0CLD(6,NCONLD)
+      my_real, INTENT(IN) :: 
+     .   D(3,NUMNOD), DR(3,NUMNOD)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NL, N1, ISK, N2, N3, N4, N5, K1, K2, K3, ISENS,K,LL,IERR,
-     .        ICODE,IAD,N_OLD, Bric(2), Face(2), NumBric, IBRIC, IANIM,I,
-     .        ISMOOTH,IDEL
+      INTEGER NL, N1, ISK, N2, N3, N4, N5, K1, K2, K3, ISENS,K,
+     .        IAD,N_OLD,IANIM,IFUN,IDIR,
+     .        ISMOOTH,IDEL,KSURF,NS,NSEGPL
       INTEGER :: UP_BOUND
+      INTEGER :: FID ! id of the python function
       my_real
      .   NX, NY, NZ, AXI, AA, A0, VV, FX, FY, FZ, AX, DYDX, TS,
-     .   SIXTH,TFEXTT,X_OLD, F1, F2,XSENS,FCX,FCY,FCYPINCH
-      my_real FINTER, ZFx,ZFy,ZFz, ZZFx,ZZFy,ZZFz,PS, Zx,Zy,Zz,FINTER_SMOOTH
+     .   SIXTH,TFEXTT,X_OLD, F1, F2,XSENS,FCX,FCY,AREA,
+     .   DISP,DISP_OLD,VEL,VEL_OLD
+      my_real FINTER, FINTER_SMOOTH
       EXTERNAL FINTER,FINTER_SMOOTH
 C=======================================================================
       SIXTH  = ONE_OVER_6
@@ -106,6 +121,11 @@ C=======================================================================
       TFEXTT = ZERO
       N_OLD  = 0
       X_OLD  = ZERO
+      DISP_OLD = ZERO
+      VEL_OLD  = ZERO
+      VEL = ZERO
+      DISP = ZERO
+      NSEGPL = 0
       IANIM  = ANIM_V(5)+OUTP_V(5)+H3D_DATA%N_VECT_FINT+
      .         ANIM_V(6)+OUTP_V(6)+H3D_DATA%N_VECT_FEXT
 C
@@ -121,22 +141,32 @@ C code SPMD Parith/OFF ou SMP NE PAS OUBLIER LE CODE P/ON !
        N4      = IB(4,NL)
        N5      = IB(5,NL)
        IDEL    = IB(8,NL)
+       IFUN    = IB(9,NL)
        FCY     = FAC(1,NL)
        FCX     = FAC(2,NL)
-C
+C---------------------------------------
+       IF (IFUN > 1) THEN
+         ISK = IB(2,NL)/10
+         IDIR  = IB(2,NL)-10*ISK
+         IF (IDIR<=3) THEN
+           DISP = D(IDIR,N1)
+           VEL  = V(IDIR,N1)
+         ELSEIF (IDIR<=6) THEN
+           DISP = DR(IDIR-3,N1)
+           VEL  = VR(IDIR-3,N1)
+         ENDIF
+       ENDIF
+C----------------------------------------
 C
        ISENS   = 0
        XSENS   = ONE
        DO K=1,NSENSOR
-         IF(IB(6,NL)==LSENSOR(1,K))ISENS=K
+         IF(IB(6,NL) == SENSOR_TAB(K)%SENS_ID) ISENS=K
        ENDDO
        IF(ISENS==0)THEN
           TS=TT
-       ELSEIF (LSENSOR(4,ISENS)==753096514 .AND. TT /= ZERO) THEN
-         IERR = SET_U_SENS_VALUE(ISENS,1,ZERO)
-         IERR = GET_U_SENS_VALUE(ISENS,2,XSENS)
        ELSE
-          TS = TT-SENSOR(2,ISENS)
+          TS = TT-SENSOR_TAB(ISENS)%TSTART
           IF(TS < ZERO) GOTO 10
        ENDIF
 C
@@ -144,21 +174,78 @@ C
 C----------------
 C       FORCE CONCENTREE
 C----------------
-        IF(N_OLD/=N3.OR.X_OLD/=TS) THEN
-          ISMOOTH = 0
-          IF (N3 > 0) ISMOOTH = NPC(2*NFUNCT+N3+1)
-!!          F1    = FINTER(N3,(TS-DT1)*FCX,NPC,TF,DYDX)
-!!          F2    = FINTER(N3,TS*FCX,NPC,TF,DYDX)
-          IF (ISMOOTH == 0) THEN
-            F1 = FINTER(N3,(TS-DT1)*FCX,NPC,TF,DYDX)
-            F2 = FINTER(N3,TS*FCX,NPC,TF,DYDX)
-          ELSE
-            F1 = FINTER_SMOOTH(N3,(TS-DT1)*FCX,NPC,TF,DYDX)
-            F2 = FINTER_SMOOTH(N3,TS*FCX,NPC,TF,DYDX)
-          ENDIF ! IF (ISMOOTH == 0)
-          N_OLD = N3
-          X_OLD = TS
+        !!--------------------
+        IF(IFUN == 1)THEN
+          !! time dependent abscisa
+          IF(N_OLD/=N3.OR.X_OLD/=TS) THEN
+            ISMOOTH = 0
+            IF (N3 > 0) ISMOOTH = NPC(2*NFUNCT+N3+1)
+            IF (ISMOOTH == 0) THEN
+              F1 = FINTER(N3,(TS-DT1)*FCX,NPC,TF,DYDX) !! current cycle
+              F2 = FINTER(N3,TS*FCX,NPC,TF,DYDX)       !! previous cycle
+            ELSE IF (ISMOOTH > 0) THEN
+              F1 = FINTER_SMOOTH(N3,(TS-DT1)*FCX,NPC,TF,DYDX)
+              F2 = FINTER_SMOOTH(N3,TS*FCX,NPC,TF,DYDX)
+            ELSE
+              IF(PRESENT(PYTHON)) THEN
+                FID = -ISMOOTH ! the id the python function is saved in the position of ISMOOTH in the NPC array 
+                CALL PYTHON_CALL_FUNCT1D(PYTHON, FID,(TS-DT1)*FCX,F1)
+                CALL PYTHON_CALL_FUNCT1D(PYTHON, FID,TS*FCX,F2)
+              ENDIF
+            ENDIF ! IF (ISMOOTH == 0)
+            N_OLD = N3
+            X_OLD = TS
+          ENDIF
+        ELSE IF(IFUN == 2)THEN
+          !! displacement dependent abscisa
+          !!DISP_OLD  !! previous cycle displacement
+          !!DISP      !! current cycle displacement
+          DISP_OLD = DPL0CLD(IDIR,NL)
+          IF(N_OLD/=N3.OR.X_OLD/=DISP) THEN
+            ISMOOTH = 0
+            IF (N3 > 0) ISMOOTH = NPC(2*NFUNCT+N3+1)
+            IF (ISMOOTH == 0) THEN
+              F1 = FINTER(N3,DISP_OLD*FCX,NPC,TF,DYDX)
+              F2 = FINTER(N3,DISP*FCX,NPC,TF,DYDX)
+            ELSE IF (ISMOOTH > 0) THEN
+              F1 = FINTER_SMOOTH(N3,DISP_OLD*FCX,NPC,TF,DYDX)
+              F2 = FINTER_SMOOTH(N3,DISP*FCX,NPC,TF,DYDX)
+            ELSE
+              IF(PRESENT(PYTHON)) THEN
+                FID = -ISMOOTH ! the id the python function is saved in the position of ISMOOTH in the NPC array 
+                CALL PYTHON_CALL_FUNCT1D(PYTHON, FID,DISP_OLD*FCX,F1)
+                CALL PYTHON_CALL_FUNCT1D(PYTHON, FID,DISP*FCX,F2)
+              ENDIF
+            ENDIF ! IF (ISMOOTH == 0)
+            N_OLD = N3
+            X_OLD = DISP
+          ENDIF
+        ELSE IF(IFUN == 3)THEN
+          !! velocity dependent abscisa
+          !!VEL_OLD   !! previous cycle velocity
+          !!VEL       !! current cycle velocity
+          VEL_OLD  = VEL0CLD(IDIR,NL)
+          IF(N_OLD/=N3.OR.X_OLD/=VEL) THEN
+            ISMOOTH = 0
+            IF (N3 > 0) ISMOOTH = NPC(2*NFUNCT+N3+1)
+            IF (ISMOOTH == 0) THEN
+              F1 = FINTER(N3,VEL_OLD*FCX,NPC,TF,DYDX)
+              F2 = FINTER(N3,VEL*FCX,NPC,TF,DYDX)
+            ELSE IF (ISMOOTH > 0) THEN
+              F1 = FINTER_SMOOTH(N3,VEL_OLD*FCX,NPC,TF,DYDX)
+              F2 = FINTER_SMOOTH(N3,VEL*FCX,NPC,TF,DYDX)
+            ELSE
+              IF(PRESENT(PYTHON)) THEN
+                FID = -ISMOOTH ! the id the python function is saved in the position of ISMOOTH in the NPC array 
+                CALL PYTHON_CALL_FUNCT1D(PYTHON, FID,VEL_OLD*FCX,F1)
+                CALL PYTHON_CALL_FUNCT1D(PYTHON, FID,VEL*FCX,F2)
+              ENDIF
+            ENDIF ! IF (ISMOOTH == 0)
+            N_OLD = N3
+            X_OLD = VEL
+          ENDIF
         ENDIF
+        !!--------------------
         A0  = FCY*F1
         AA  = FCY*F2
         ISK = IB(2,NL)/10
@@ -245,19 +332,65 @@ C       PRESSION
 C----------------
 
         IF(IDEL > 0 ) CYCLE  ! SEGMENT DELETED
-
-        IF(N_OLD/=N5.OR.X_OLD/=TS) THEN
-          ISMOOTH = 0
-          IF (N5 > 0) ISMOOTH = NPC(2*NFUNCT+N5+1)
-!!          F1 = FINTER(N5,TS*FCX,NPC,TF,DYDX)
-          IF (ISMOOTH == 0) THEN
-            F1 = FINTER(N5,TS*FCX,NPC,TF,DYDX)
-          ELSE
-            F1 = FINTER_SMOOTH(N5,TS*FCX,NPC,TF,DYDX)
-          ENDIF ! IF (ISMOOTH == 0)
-          N_OLD = N5
-          X_OLD = TS
+C
+        IF(IFUN == 1)THEN
+          !! time dependent abscisa
+          IF(N_OLD/=N5.OR.X_OLD/=TS) THEN
+            ISMOOTH = 0
+            IF (N5 > 0) ISMOOTH = NPC(2*NFUNCT+N5+1)
+            IF (ISMOOTH == 0) THEN
+              F1 = FINTER(N5,TS*FCX,NPC,TF,DYDX)
+            ELSE IF(ISMOOTH > 0) THEN
+              F1 = FINTER_SMOOTH(N5,TS*FCX,NPC,TF,DYDX)
+            ELSE
+              IF(PRESENT(PYTHON)) THEN
+                FID = -ISMOOTH ! the id the python function is saved in the position of ISMOOTH in the NPC array 
+                CALL PYTHON_CALL_FUNCT1D(PYTHON, FID,TS*FCX,F1)
+              ENDIF
+            ENDIF ! IF (ISMOOTH == 0)
+            N_OLD = N5
+            X_OLD = TS
+          ENDIF
+        ELSEIF(IFUN == 2)THEN
+          !! displacement dependent abscisa
+          !!DISP      !! current cycle displacement
+          IF(N_OLD/=N5.OR.X_OLD/=DISP) THEN
+            ISMOOTH = 0
+            IF (N5 > 0) ISMOOTH = NPC(2*NFUNCT+N5+1)
+            IF (ISMOOTH == 0) THEN
+              F1 = FINTER(N5,DISP*FCX,NPC,TF,DYDX)
+            ELSE IF(ISMOOTH > 0) THEN
+              F1 = FINTER_SMOOTH(N5,DISP*FCX,NPC,TF,DYDX)
+            ELSE
+              IF(PRESENT(PYTHON)) THEN
+                FID = -ISMOOTH ! the id the python function is saved in the position of ISMOOTH in the NPC array 
+                CALL PYTHON_CALL_FUNCT1D(PYTHON, FID,DISP*FCX,F1)
+              ENDIF
+            ENDIF ! IF (ISMOOTH == 0)
+            N_OLD = N5
+            X_OLD = DISP
+          ENDIF
+        ELSEIF(IFUN == 3)THEN
+          !! velocity dependent abscisa
+          !!VEL       !! current cycle velocity
+          IF(N_OLD/=N5.OR.X_OLD/=VEL) THEN
+            ISMOOTH = 0
+            IF (N5 > 0) ISMOOTH = NPC(2*NFUNCT+N5+1)
+            IF (ISMOOTH == 0) THEN
+              F1 = FINTER(N5,VEL*FCX,NPC,TF,DYDX)
+            ELSE IF(ISMOOTH > 0) THEN
+              F1 = FINTER_SMOOTH(N5,VEL*FCX,NPC,TF,DYDX)
+            ELSE
+              IF(PRESENT(PYTHON)) THEN
+                FID = -ISMOOTH ! the id the python function is saved in the position of ISMOOTH in the NPC array 
+                CALL PYTHON_CALL_FUNCT1D(PYTHON, FID,VEL*FCX,F1)
+              ENDIF
+            ENDIF ! IF (ISMOOTH == 0)
+            N_OLD = N5
+            X_OLD = VEL
+          ENDIF
         ENDIF
+C
         AA = FCY*F1*XSENS
 C
         IF(N2D==0)THEN
@@ -287,6 +420,16 @@ C
             ENDIF
           ENDIF
 !
+          IF(TH_SURF%PLOAD_FLAG >0 ) THEN
+             NSEGPL = NSEGPL + 1
+             AREA = HALF*SQRT(NX*NX+NY*NY+NZ*NZ)
+             DO NS=TH_SURF%PLOAD_KSEGS(NSEGPL) +1,TH_SURF%PLOAD_KSEGS(NSEGPL+1)
+                KSURF = TH_SURF%PLOAD_SEGS(NS)
+                NSEG_LOADP(KSURF) = NSEG_LOADP(KSURF) + 1
+                FSAVSURF(4,KSURF)= FSAVSURF(4,KSURF) + AA
+                FSAVSURF(5,KSURF)= FSAVSURF(5,KSURF) + AREA
+             ENDDO
+          ENDIF
 C
            A(1,N2)=A(1,N2)+FX
            A(2,N2)=A(2,N2)+FY
@@ -340,7 +483,6 @@ C
               FTHREAC(3,NODREAC(N4)) = FTHREAC(3,NODREAC(N4)) + FZ*DT1
             ENDIF
           ENDIF
-         
 !
 C
            TFEXTT=TFEXTT+DT1*(FX*(V(1,N1)+V(1,N2)+V(1,N3)+V(1,N4))
@@ -373,6 +515,16 @@ C
             ENDIF
           ENDIF
 !
+          IF(TH_SURF%PLOAD_FLAG >0 ) THEN
+             NSEGPL = NSEGPL + 1
+             AREA = HALF*SQRT(NX*NX+NY*NY+NZ*NZ)
+             DO NS=TH_SURF%PLOAD_KSEGS(NSEGPL) +1,TH_SURF%PLOAD_KSEGS(NSEGPL+1)
+                KSURF = TH_SURF%PLOAD_SEGS(NS)
+                NSEG_LOADP(KSURF) = NSEG_LOADP(KSURF) + 1
+                FSAVSURF(4,KSURF)= FSAVSURF(4,KSURF) + AA
+                FSAVSURF(5,KSURF)= FSAVSURF(5,KSURF) + AREA
+             ENDDO
+          ENDIF
 C
           A(1,N2) = A(1,N2)+FX
           A(2,N2) = A(2,N2)+FY
@@ -445,6 +597,16 @@ c
             ENDIF
           ENDIF
 !
+          IF(TH_SURF%PLOAD_FLAG >0 ) THEN
+             NSEGPL = NSEGPL + 1
+             AREA = HALF*SQRT(NX*NX+NY*NY+NZ*NZ)
+             DO NS=TH_SURF%PLOAD_KSEGS(NSEGPL) +1,TH_SURF%PLOAD_KSEGS(NSEGPL+1)
+                KSURF = TH_SURF%PLOAD_SEGS(NS)
+                NSEG_LOADP(KSURF) = NSEG_LOADP(KSURF) + 1
+                FSAVSURF(4,KSURF)= FSAVSURF(4,KSURF) + AA
+                FSAVSURF(5,KSURF)= FSAVSURF(5,KSURF) + AREA
+             ENDDO
+          ENDIF
 C
          IF(N2D==1)THEN
           AX     = HALF*(X(2,N1)+X(2,N2))
@@ -474,6 +636,7 @@ C-------------------------
          N4  = IB(4,NL)
          N5  = IB(5,NL)
          IDEL = IB(8,NL)
+         IFUN = IB(9,NL)
          FCY = FAC(1,NL)
          FCX = FAC(2,NL)
          UP_BOUND = 4
@@ -496,15 +659,27 @@ C-------------------------
          ENDIF
          FSKY(1:8,IADC(1:UP_BOUND,NL))=ZERO
          ! -------------
-
+C---------------------------------------
+         IF (IFUN > 1) THEN
+           ISK = IB(2,NL)/10
+           IDIR  = IB(2,NL)-10*ISK
+           IF (IDIR<=3) THEN
+             DISP = D(IDIR,N1)
+             VEL  = V(IDIR,N1)
+           ELSEIF (IDIR<=6) THEN
+             DISP = DR(IDIR-3,N1)
+             VEL  = VR(IDIR-3,N1)
+           ENDIF
+         ENDIF
+C----------------------------------------
          ISENS=0
          DO K=1,NSENSOR
-           IF(IB(6,NL)==LSENSOR(1,K))ISENS=K
+           IF(IB(6,NL) == SENSOR_TAB(K)%SENS_ID) ISENS=K
          ENDDO
          IF(ISENS==0)THEN
            TS=TT
          ELSE
-           TS = TT-SENSOR(2,ISENS)
+           TS = TT - SENSOR_TAB(ISENS)%TSTART
            IF(TS<ZERO)GOTO 100
          ENDIF
 C
@@ -512,21 +687,78 @@ C
 C-------------------------
 C        FORCE CONCENTREE
 C-------------------------
-           IF(N_OLD/=N3.OR.X_OLD/=TS) THEN
-             ISMOOTH = 0
-             IF (N3 > 0) ISMOOTH = NPC(2*NFUNCT+N3+1)
-!!             F1    = FINTER(N3,(TS-DT1)*FCX,NPC,TF,DYDX)
-!!             F2    = FINTER(N3,TS*FCX,NPC,TF,DYDX)
-             IF (ISMOOTH == 0) THEN
-               F1 = FINTER(N3,(TS-DT1)*FCX,NPC,TF,DYDX)
-               F2 = FINTER(N3,TS*FCX,NPC,TF,DYDX)
-             ELSE
-               F1 = FINTER_SMOOTH(N3,(TS-DT1)*FCX,NPC,TF,DYDX)
-               F2 = FINTER_SMOOTH(N3,TS*FCX,NPC,TF,DYDX)
-             ENDIF ! IF (ISMOOTH == 0)
-             N_OLD = N3
-             X_OLD = TS
+!!--------------------
+           IF(IFUN == 1)THEN
+             !! time dependent abscisa
+             IF(N_OLD/=N3.OR.X_OLD/=TS) THEN
+               ISMOOTH = 0
+               IF (N3 > 0) ISMOOTH = NPC(2*NFUNCT+N3+1)
+               IF (ISMOOTH == 0) THEN
+                 F1 = FINTER(N3,(TS-DT1)*FCX,NPC,TF,DYDX) !! current cycle
+                 F2 = FINTER(N3,TS*FCX,NPC,TF,DYDX)       !! previous cycle
+               ELSE IF (ISMOOTH > 0) THEN
+                 F1 = FINTER_SMOOTH(N3,(TS-DT1)*FCX,NPC,TF,DYDX)
+                 F2 = FINTER_SMOOTH(N3,TS*FCX,NPC,TF,DYDX)
+               ELSE
+                 IF(PRESENT(PYTHON)) THEN
+                   FID = -ISMOOTH ! the id the python function is saved in the position of ISMOOTH in the NPC array 
+                   CALL PYTHON_CALL_FUNCT1D(PYTHON, FID,(TS-DT1)*FCX,F1)
+                   CALL PYTHON_CALL_FUNCT1D(PYTHON, FID,TS*FCX,F2)
+                 ENDIF
+               ENDIF ! IF (ISMOOTH == 0)
+               N_OLD = N3
+               X_OLD = TS
+             ENDIF
+           ELSE IF(IFUN == 2)THEN
+            !! displacement dependent abscisa
+            !!DISP_OLD  !! previous cycle displacement
+            !!DISP      !! current cycle displacement
+             DISP_OLD = DPL0CLD(IDIR,NL)
+             IF(N_OLD/=N3.OR.X_OLD/=DISP) THEN
+               ISMOOTH = 0
+               IF (N3 > 0) ISMOOTH = NPC(2*NFUNCT+N3+1)
+               IF (ISMOOTH == 0) THEN
+                 F1 = FINTER(N3,DISP_OLD*FCX,NPC,TF,DYDX)
+                 F2 = FINTER(N3,DISP*FCX,NPC,TF,DYDX)
+               ELSE IF (ISMOOTH > 0) THEN
+                 F1 = FINTER_SMOOTH(N3,DISP_OLD*FCX,NPC,TF,DYDX)
+                 F2 = FINTER_SMOOTH(N3,DISP*FCX,NPC,TF,DYDX)
+               ELSE
+                 IF(PRESENT(PYTHON)) THEN
+                   FID = -ISMOOTH ! the id the python function is saved in the position of ISMOOTH in the NPC array 
+                   CALL PYTHON_CALL_FUNCT1D(PYTHON, FID,DISP_OLD*FCX,F1)
+                   CALL PYTHON_CALL_FUNCT1D(PYTHON, FID,DISP*FCX,F2)
+                 ENDIF
+               ENDIF ! IF (ISMOOTH == 0)
+               N_OLD = N3
+               X_OLD = DISP
+             ENDIF
+           ELSE IF(IFUN == 3)THEN
+             !! velocity dependent abscisa
+             !!VEL_OLD   !! previous cycle velocity
+             !!VEL       !! current cycle velocity
+             VEL_OLD  = VEL0CLD(IDIR,NL)
+             IF(N_OLD/=N3.OR.X_OLD/=VEL) THEN
+               ISMOOTH = 0
+              IF (N3 > 0) ISMOOTH = NPC(2*NFUNCT+N3+1)
+              IF (ISMOOTH == 0) THEN
+                F1 = FINTER(N3,VEL_OLD*FCX,NPC,TF,DYDX)
+                F2 = FINTER(N3,VEL*FCX,NPC,TF,DYDX)
+              ELSE IF (ISMOOTH > 0) THEN
+               F1 = FINTER_SMOOTH(N3,VEL_OLD*FCX,NPC,TF,DYDX)
+               F2 = FINTER_SMOOTH(N3,VEL*FCX,NPC,TF,DYDX)
+              ELSE
+                IF(PRESENT(PYTHON)) THEN
+                  FID = -ISMOOTH ! the id the python function is saved in the position of ISMOOTH in the NPC array 
+                  CALL PYTHON_CALL_FUNCT1D(PYTHON, FID,VEL_OLD*FCX,F1)
+                  CALL PYTHON_CALL_FUNCT1D(PYTHON, FID,VEL*FCX,F2)
+                ENDIF
+              ENDIF ! IF (ISMOOTH == 0)
+              N_OLD = N3
+              X_OLD = VEL
+             ENDIF
            ENDIF
+!!--------------------
            A0  = FCY*F1
            AA  = FCY*F2
            ISK = IB(2,NL)/10
@@ -615,19 +847,65 @@ C         PRESSION
 C--------------------
 
            IF(IDEL > 0 ) CYCLE  ! SEGMENT DELETED
-
-           IF(N_OLD/=N5.OR.X_OLD/=TS) THEN
-             ISMOOTH = 0
-             IF (N5 > 0) ISMOOTH = NPC(2*NFUNCT+N5+1)
-!!             F1 = FINTER(N5,TS*FCX,NPC,TF,DYDX)
-             IF (ISMOOTH == 0) THEN
-               F1 = FINTER(N5,TS*FCX,NPC,TF,DYDX)
-             ELSE
-               F1 = FINTER_SMOOTH(N5,TS*FCX,NPC,TF,DYDX)
-             ENDIF ! IF (ISMOOTH == 0)
-             N_OLD = N5
-             X_OLD = TS
+C
+           IF(IFUN == 1)THEN
+             !! time dependent abscisa
+             IF(N_OLD/=N5.OR.X_OLD/=TS) THEN
+               ISMOOTH = 0
+               IF (N5 > 0) ISMOOTH = NPC(2*NFUNCT+N5+1)
+               IF (ISMOOTH == 0) THEN
+                 F1 = FINTER(N5,TS*FCX,NPC,TF,DYDX)
+               ELSEIF(ISMOOTH > 0) THEN
+                 F1 = FINTER_SMOOTH(N5,TS*FCX,NPC,TF,DYDX)
+               ELSEIF(ISMOOTH < 0) THEN
+                 IF(PRESENT(PYTHON)) THEN
+                   FID = -ISMOOTH ! the id the python function is saved in the position of ISMOOTH in the NPC array 
+                   CALL PYTHON_CALL_FUNCT1D(PYTHON, FID,TS*FCX,F1)
+                 ENDIF
+               ENDIF ! IF (ISMOOTH == 0)
+               N_OLD = N5
+               X_OLD = TS
+             ENDIF
+           ELSEIF(IFUN == 2)THEN
+             !! displacement dependent abscisa
+             !!DISP      !! current cycle displacement
+             IF(N_OLD/=N5.OR.X_OLD/=DISP) THEN
+               ISMOOTH = 0
+               IF (N5 > 0) ISMOOTH = NPC(2*NFUNCT+N5+1)
+               IF (ISMOOTH == 0) THEN
+                 F1 = FINTER(N5,DISP*FCX,NPC,TF,DYDX)
+               ELSEIF(ISMOOTH > 0) THEN
+                 F1 = FINTER_SMOOTH(N5,DISP*FCX,NPC,TF,DYDX)
+               ELSEIF(ISMOOTH < 0) THEN
+                 IF(PRESENT(PYTHON)) THEN
+                   FID = -ISMOOTH ! the id the python function is saved in the position of ISMOOTH in the NPC array 
+                   CALL PYTHON_CALL_FUNCT1D(PYTHON, FID,DISP*FCX,F1)
+                 ENDIF
+               ENDIF ! IF (ISMOOTH == 0)
+               N_OLD = N5
+               X_OLD = DISP
+             ENDIF
+           ELSEIF(IFUN == 3)THEN
+             !! velocity dependent abscisa
+             !!VEL       !! current cycle velocity
+             IF(N_OLD/=N5.OR.X_OLD/=VEL) THEN
+               ISMOOTH = 0
+               IF (N5 > 0) ISMOOTH = NPC(2*NFUNCT+N5+1)
+               IF (ISMOOTH == 0) THEN
+                 F1 = FINTER(N5,VEL*FCX,NPC,TF,DYDX)
+               ELSEIF(ISMOOTH > 0) THEN
+                 F1 = FINTER_SMOOTH(N5,VEL*FCX,NPC,TF,DYDX)
+               ELSEIF(ISMOOTH < 0) THEN
+                 IF(PRESENT(PYTHON)) THEN
+                   FID = -ISMOOTH ! the id the python function is saved in the position of ISMOOTH in the NPC array 
+                   CALL PYTHON_CALL_FUNCT1D(PYTHON, FID,VEL*FCX,F1)
+                 ENDIF
+               ENDIF ! IF (ISMOOTH == 0)
+               N_OLD = N5
+               X_OLD = VEL
+             ENDIF
            ENDIF
+C
            AA = FCY*F1
            IF(N2D==0)THEN
              !  3D
@@ -658,6 +936,16 @@ C
                  ENDIF
                ENDIF
 !
+               IF(TH_SURF%PLOAD_FLAG >0 ) THEN
+                  NSEGPL = NSEGPL + 1
+                  AREA = HALF*SQRT(NX*NX+NY*NY+NZ*NZ)
+                  DO NS=TH_SURF%PLOAD_KSEGS(NSEGPL) +1,TH_SURF%PLOAD_KSEGS(NSEGPL+1)
+                     KSURF = TH_SURF%PLOAD_SEGS(NS)
+                     NSEG_LOADP(KSURF) = NSEG_LOADP(KSURF) + 1
+                     FSAVSURF(4,KSURF)= FSAVSURF(4,KSURF) + AA
+                     FSAVSURF(5,KSURF)= FSAVSURF(5,KSURF) + AREA
+                  ENDDO
+               ENDIF
 C
                IAD = IADC(2,NL)
                FSKY(1,IAD) = FX
@@ -747,6 +1035,16 @@ C
                  ENDIF
                ENDIF
 !
+               IF(TH_SURF%PLOAD_FLAG >0 ) THEN
+                 NSEGPL = NSEGPL + 1
+                 AREA = HALF*SQRT(NX*NX+NY*NY+NZ*NZ)
+                 DO NS=TH_SURF%PLOAD_KSEGS(NSEGPL) +1,TH_SURF%PLOAD_KSEGS(NSEGPL+1)
+                    KSURF = TH_SURF%PLOAD_SEGS(NS)
+                    NSEG_LOADP(KSURF) = NSEG_LOADP(KSURF) + 1
+                    FSAVSURF(4,KSURF)= FSAVSURF(4,KSURF) + AA
+                    FSAVSURF(5,KSURF)= FSAVSURF(5,KSURF) + AREA
+                 ENDDO
+               ENDIF
 C
                IAD = IADC(2,NL)
                FSKY(1,IAD) = FX
@@ -823,6 +1121,16 @@ c
                ENDIF
              ENDIF
 !
+             IF(TH_SURF%PLOAD_FLAG >0 ) THEN
+               NSEGPL = NSEGPL + 1
+               AREA = HALF*SQRT(NX*NX+NY*NY+NZ*NZ)
+               DO NS=TH_SURF%PLOAD_KSEGS(NSEGPL) +1,TH_SURF%PLOAD_KSEGS(NSEGPL+1)
+                  KSURF = TH_SURF%PLOAD_SEGS(NS)
+                  NSEG_LOADP(KSURF) = NSEG_LOADP(KSURF) + 1
+                  FSAVSURF(4,KSURF)= FSAVSURF(4,KSURF) + AA
+                  FSAVSURF(5,KSURF)= FSAVSURF(5,KSURF) + AREA
+               ENDDO
+             ENDIF
 C
              IF(N2D==1)THEN
                AX=HALF*(X(2,N1)+X(2,N2))
@@ -844,38 +1152,109 @@ C---------------------
          N4  = IB(4,NL)
          N5  = IB(5,NL)
          IDEL = IB(8,NL)
+         IFUN = IB(9,NL)
          FCY = FAC(1,NL)
          FCX = FAC(2,NL)
          ISENS=0
          DO K=1,NSENSOR
-           IF(IB(6,NL)==LSENSOR(1,K))ISENS=K
+           IF(IB(6,NL)==SENSOR_TAB(K)%SENS_ID) ISENS=K
          ENDDO
          IF(ISENS==0)THEN
            TS=TT
          ELSE
-           TS = TT-SENSOR(2,ISENS)
+           TS = TT - SENSOR_TAB(ISENS)%TSTART
            IF(TS<ZERO)GOTO 1000
          ENDIF
+C---------------------------------------
+         IF (IFUN > 1) THEN
+           ISK = IB(2,NL)/10
+           IDIR  = IB(2,NL)-10*ISK
+           IF (IDIR<=3) THEN
+             DISP = D(IDIR,N1)
+             VEL  = V(IDIR,N1)
+           ELSEIF (IDIR<=6) THEN
+             DISP = DR(IDIR-3,N1)
+             VEL  = VR(IDIR-3,N1)
+           ENDIF
+         ENDIF
+C----------------------------------------
 C
          IF(N4==-1)THEN
 C---------------------
 C          FORCE CONCENTREE
 C---------------------
-           IF(N_OLD/=N3.OR.X_OLD/=TS) THEN
-             ISMOOTH = 0
-             IF (N3 > 0) ISMOOTH = NPC(2*NFUNCT+N3+1)
-!!             F1    = FINTER(N3,(TS-DT1)*FCX,NPC,TF,DYDX)
-!!             F2    = FINTER(N3,TS*FCX,NPC,TF,DYDX)
-             IF (ISMOOTH == 0) THEN
-               F1 = FINTER(N3,(TS-DT1)*FCX,NPC,TF,DYDX)
-               F2 = FINTER(N3,TS*FCX,NPC,TF,DYDX)
-             ELSE
-               F1 = FINTER_SMOOTH(N3,(TS-DT1)*FCX,NPC,TF,DYDX)
-               F2 = FINTER_SMOOTH(N3,TS*FCX,NPC,TF,DYDX)
-             ENDIF ! IF (ISMOOTH == 0)
-             N_OLD = N3
-             X_OLD = TS
+!!--------------------
+           IF(IFUN == 1)THEN
+           !! time dependent abscisa
+             IF(N_OLD/=N3.OR.X_OLD/=TS) THEN
+               ISMOOTH = 0
+               IF (N3 > 0) ISMOOTH = NPC(2*NFUNCT+N3+1)
+               IF (ISMOOTH == 0) THEN
+                 F1 = FINTER(N3,(TS-DT1)*FCX,NPC,TF,DYDX) !! current cycle
+                 F2 = FINTER(N3,TS*FCX,NPC,TF,DYDX)       !! previous cycle
+               ELSE IF (ISMOOTH > 0) THEN
+                 F1 = FINTER_SMOOTH(N3,(TS-DT1)*FCX,NPC,TF,DYDX)
+                 F2 = FINTER_SMOOTH(N3,TS*FCX,NPC,TF,DYDX)
+               ELSE 
+                 IF(PRESENT(PYTHON)) THEN
+                   FID = -ISMOOTH ! the id the python function is saved in the position of ISMOOTH in the NPC array 
+                   CALL PYTHON_CALL_FUNCT1D(PYTHON, FID,(TS-DT1)*FCX,F1)
+                   CALL PYTHON_CALL_FUNCT1D(PYTHON, FID,TS*FCX,F2)
+                 ENDIF
+               ENDIF ! IF (ISMOOTH == 0)
+               N_OLD = N3
+               X_OLD = TS
+             ENDIF
+           ELSE IF(IFUN == 2)THEN
+           !! displacement dependent abscisa
+           !!DISP_OLD  !! previous cycle displacement
+           !!DISP      !! current cycle displacement
+             DISP_OLD = DPL0CLD(IDIR,NL)
+             IF(N_OLD/=N3.OR.X_OLD/=DISP) THEN
+               ISMOOTH = 0
+               IF (N3 > 0) ISMOOTH = NPC(2*NFUNCT+N3+1)
+               IF (ISMOOTH == 0) THEN
+                 F1 = FINTER(N3,DISP_OLD*FCX,NPC,TF,DYDX)
+                 F2 = FINTER(N3,DISP*FCX,NPC,TF,DYDX)
+               ELSE IF (ISMOOTH > 0) THEN
+                 F1 = FINTER_SMOOTH(N3,DISP_OLD*FCX,NPC,TF,DYDX)
+                 F2 = FINTER_SMOOTH(N3,DISP*FCX,NPC,TF,DYDX)
+               ELSE 
+                 IF(PRESENT(PYTHON)) THEN
+                   FID = -ISMOOTH ! the id the python function is saved in the position of ISMOOTH in the NPC array 
+                   CALL PYTHON_CALL_FUNCT1D(PYTHON, FID,DISP_OLD*FCX,F1)
+                   CALL PYTHON_CALL_FUNCT1D(PYTHON, FID,DISP*FCX,F2)
+                 ENDIF
+               ENDIF ! IF (ISMOOTH == 0)
+               N_OLD = N3
+               X_OLD = DISP
+             ENDIF
+           ELSE IF(IFUN == 3)THEN
+           !! velocity dependent abscisa
+           !!VEL_OLD   !! previous cycle velocity
+           !!VEL       !! current cycle velocity
+             VEL_OLD  = VEL0CLD(IDIR,NL)
+             IF(N_OLD/=N3.OR.X_OLD/=VEL) THEN
+               ISMOOTH = 0
+               IF (N3 > 0) ISMOOTH = NPC(2*NFUNCT+N3+1)
+               IF (ISMOOTH == 0) THEN
+                 F1 = FINTER(N3,VEL_OLD*FCX,NPC,TF,DYDX)
+                 F2 = FINTER(N3,VEL*FCX,NPC,TF,DYDX)
+               ELSE IF (ISMOOTH > 0) THEN
+                 F1 = FINTER_SMOOTH(N3,VEL_OLD*FCX,NPC,TF,DYDX)
+                 F2 = FINTER_SMOOTH(N3,VEL*FCX,NPC,TF,DYDX)
+               ELSE 
+                 IF(PRESENT(PYTHON)) THEN
+                   FID = -ISMOOTH ! the id the python function is saved in the position of ISMOOTH in the NPC array 
+                   CALL PYTHON_CALL_FUNCT1D(PYTHON, FID,VEL_OLD*FCX,F1)
+                   CALL PYTHON_CALL_FUNCT1D(PYTHON, FID,VEL*FCX,F2)
+                 ENDIF
+               ENDIF ! IF (ISMOOTH == 0)
+               N_OLD = N3
+               X_OLD = VEL
+             ENDIF
            ENDIF
+!!--------------------
            A0  = FCY*F1
            AA  = FCY*F2
            ISK = IB(2,NL)/10
@@ -964,19 +1343,65 @@ C          PRESSION
 C---------------------
 
            IF(IDEL > 0 ) CYCLE  ! SEGMENT DELETED
-
-           IF(N_OLD/=N5.OR.X_OLD/=TS) THEN
-             ISMOOTH = 0
-             IF (N5 > 0) ISMOOTH = NPC(2*NFUNCT+N5+1)
-!!             F1 = FINTER(N5,TS*FCX,NPC,TF,DYDX)
-             IF (ISMOOTH == 0) THEN
-               F1 = FINTER(N5,TS*FCX,NPC,TF,DYDX)
-             ELSE
-               F1 = FINTER_SMOOTH(N5,TS*FCX,NPC,TF,DYDX)
-             ENDIF ! IF (ISMOOTH == 0)
-             N_OLD = N5
-             X_OLD = TS
+C
+           IF(IFUN == 1)THEN
+             !! time dependent abscisa
+             IF(N_OLD/=N5.OR.X_OLD/=TS) THEN
+               ISMOOTH = 0
+               IF (N5 > 0) ISMOOTH = NPC(2*NFUNCT+N5+1)
+               IF (ISMOOTH == 0) THEN
+                 F1 = FINTER(N5,TS*FCX,NPC,TF,DYDX)
+               ELSE IF (ISMOOTH > 0) THEN
+                 F1 = FINTER_SMOOTH(N5,TS*FCX,NPC,TF,DYDX)
+               ELSE 
+                 IF(PRESENT(PYTHON)) THEN
+                   FID = -ISMOOTH ! the id the python function is saved in the position of ISMOOTH in the NPC array 
+                   CALL PYTHON_CALL_FUNCT1D(PYTHON, FID,TS*FCX,F1)
+                 ENDIF
+               ENDIF ! IF (ISMOOTH == 0)
+               N_OLD = N5
+               X_OLD = TS
+             ENDIF
+           ELSEIF(IFUN == 2)THEN
+             !! displacement dependent abscisa
+             !!DISP      !! current cycle displacement
+             IF(N_OLD/=N5.OR.X_OLD/=DISP) THEN
+               ISMOOTH = 0
+               IF (N5 > 0) ISMOOTH = NPC(2*NFUNCT+N5+1)
+               IF (ISMOOTH == 0) THEN
+                 F1 = FINTER(N5,DISP*FCX,NPC,TF,DYDX)
+               ELSE IF (ISMOOTH > 0) THEN
+                 F1 = FINTER_SMOOTH(N5,DISP*FCX,NPC,TF,DYDX)
+               ELSE 
+                 IF(PRESENT(PYTHON)) THEN
+                   FID = -ISMOOTH ! the id the python function is saved in the position of ISMOOTH in the NPC array 
+                   CALL PYTHON_CALL_FUNCT1D(PYTHON, FID,DISP*FCX,F1)
+                 ENDIF
+               ENDIF ! IF (ISMOOTH == 0)
+               N_OLD = N5
+               X_OLD = DISP
+             ENDIF
+           ELSEIF(IFUN == 3)THEN
+             !! velocity dependent abscisa
+             !!VEL       !! current cycle velocity
+             IF(N_OLD/=N5.OR.X_OLD/=VEL) THEN
+               ISMOOTH = 0
+               IF (N5 > 0) ISMOOTH = NPC(2*NFUNCT+N5+1)
+               IF (ISMOOTH == 0) THEN
+                 F1 = FINTER(N5,VEL*FCX,NPC,TF,DYDX)
+               ELSE IF (ISMOOTH > 0) THEN
+                 F1 = FINTER_SMOOTH(N5,VEL*FCX,NPC,TF,DYDX)
+               ELSE 
+                 IF(PRESENT(PYTHON)) THEN
+                   FID = -ISMOOTH ! the id the python function is saved in the position of ISMOOTH in the NPC array 
+                   CALL PYTHON_CALL_FUNCT1D(PYTHON, FID,VEL*FCX,F1)
+                 ENDIF
+               ENDIF ! IF (ISMOOTH == 0)
+               N_OLD = N5
+               X_OLD = VEL
+             ENDIF
            ENDIF
+C
            AA = FCY*F1
            IF(N2D==0)THEN
 C            ANALYSE 3D
@@ -1006,6 +1431,16 @@ C
                  ENDIF
                ENDIF
 !
+               IF(TH_SURF%PLOAD_FLAG >0 ) THEN
+                 NSEGPL = NSEGPL + 1
+                 AREA = HALF*SQRT(NX*NX+NY*NY+NZ*NZ)
+                 DO NS=TH_SURF%PLOAD_KSEGS(NSEGPL) +1,TH_SURF%PLOAD_KSEGS(NSEGPL+1)
+                   KSURF = TH_SURF%PLOAD_SEGS(NS)
+                   NSEG_LOADP(KSURF) = NSEG_LOADP(KSURF) + 1
+                   FSAVSURF(4,KSURF)= FSAVSURF(4,KSURF) + AA
+                   FSAVSURF(5,KSURF)= FSAVSURF(5,KSURF) + AREA
+                 ENDDO
+               ENDIF
 C
                IAD = IADC(2,NL)
                FSKYV(IAD,1) = FX
@@ -1095,6 +1530,16 @@ C
                  ENDIF
                ENDIF
 !
+               IF(TH_SURF%PLOAD_FLAG >0 ) THEN
+                 NSEGPL = NSEGPL + 1
+                 AREA = HALF*SQRT(NX*NX+NY*NY+NZ*NZ)
+                 DO NS=TH_SURF%PLOAD_KSEGS(NSEGPL) +1,TH_SURF%PLOAD_KSEGS(NSEGPL+1)
+                   KSURF = TH_SURF%PLOAD_SEGS(NS)
+                   NSEG_LOADP(KSURF) = NSEG_LOADP(KSURF) + 1
+                   FSAVSURF(4,KSURF)= FSAVSURF(4,KSURF) + AA
+                   FSAVSURF(5,KSURF)= FSAVSURF(5,KSURF) + AREA
+                 ENDDO
+               ENDIF
 C
                IAD = IADC(2,NL)
                FSKYV(IAD,1) = FX
@@ -1171,7 +1616,6 @@ c
                ENDIF
              ENDIF
 !
-C
              IF(N2D==1)THEN
                AX=HALF*(X(2,N1)+X(2,N2))
              ELSE
@@ -1188,3 +1632,5 @@ C
       ENDIF
       RETURN
       END
+      END MODULE
+

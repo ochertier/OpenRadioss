@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  MULTI_MUSCL_FLUXES_COMPUTATIONsource/multifluid/multi_muscl_fluxes_computation.F
 Chd|-- called by -----------
@@ -27,35 +27,34 @@ Chd|        MULTI_TIMEEVOLUTION           source/multifluid/multi_timeevolution.
 Chd|-- calls ---------------
 Chd|        ARRET                         source/system/arret.F         
 Chd|        COMPUTE_PRESSURE              source/multifluid/multi_muscl_fluxes_computation.F
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        MY_FLUSH                      source/system/machine.F       
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        INITBUF_MOD                   share/resol/initbuf.F         
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|====================================================================
       SUBROUTINE MULTI_MUSCL_FLUXES_COMPUTATION(NG, ELBUF_TAB, IPARG, ITASK, 
      .     IXS, IXQ, IXTG,
      .     PM, IPM, MULTI_FVM, ALE_CONNECTIVITY, WGRID, XGRID, ITAB, NBMAT, CURRENT_TIME, BUFMAT,
-     .     ID_GLOBAL_VOIS,FACE_VOIS,NPF,TF)
+     .     ID_GLOBAL_VOIS,FACE_VOIS,NPF,TF,ISPMD)
+C-----------------------------------------------
 !$COMMENT
 !       MULTI_MUSCL_FLUXES_COMPUTATION description :
 !           computation of fluxes with 2nd order algorithm
 !       MULTI_MUSCL_FLUXES_COMPUTATION organization :
-!           The parith/on is ensured by the same 
+!           The parith/on is ensured by the same
 !           order computation :
 !           * check the user ID
 !           * if user ID( element1) < user ID( element2)
 !             --> element1 drives the computation
 !           * if user ID( element1) > user ID( element2)
 !             --> element2 drives the computation
-!           
+!
 !$ENDCOMMENT
-C-----------------------------------------------
-C     D e s c r i p t i o n
-C-----------------------------------------------
 C-----------------------------------------------
 C     M o d u l e s
 C-----------------------------------------------
-      USE INITBUF_MOD      
+      USE INITBUF_MOD
       USE ELBUFDEF_MOD
       USE MULTI_FVM_MOD
       USE ALE_CONNECTIVITY_MOD
@@ -66,22 +65,20 @@ C-----------------------------------------------
 C-----------------------------------------------
 C     C o m m o n   B l o c k s
 C-----------------------------------------------
+! NUMELS :
 #include      "com01_c.inc"
-! NUMELS      
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "task_c.inc"
+#include      "comlock.inc"
+! DTFAC1:
 #include      "mvsiz_p.inc"
-!     DTFAC1
-#include      "scr18_c.inc" 
-!     SNPC, STF
-!#include      "tabsiz_c.inc" 
+#include      "units_c.inc"
       COMMON /TABLESIZF/ STF,SNPC
       INTEGER STF,SNPC
 C-----------------------------------------------
 C     D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER, INTENT(IN) :: NG
+      INTEGER, INTENT(IN) :: NG, ISPMD
       TYPE(ELBUF_STRUCT_), TARGET, DIMENSION(NGROUP) :: ELBUF_TAB
       INTEGER, INTENT(IN) :: IPARG(NPARG, *)
       INTEGER, INTENT(IN) :: ITASK ! SMP TASK
@@ -102,30 +99,32 @@ C     L o c a l   V a r i a b l e s
 C-----------------------------------------------
       TYPE(G_BUFEL_), POINTER :: GBUF, GBUFJJ
       TYPE(L_BUFEL_), POINTER :: LBUF
+      TYPE(BUF_EOS_), POINTER :: EBUF
 
-      INTEGER :: II, JJ, KFACE, I, J, KFACE2, NGJJ, NFTJJ, NELJJ, IFACE
+      INTEGER :: II, JJ, KFACE, I, J, KFACE2, NGJJ, NFTJJ, NELJJ, IFACE, KK, ID_OUT, IARRAY(2)
       INTEGER :: ITY, NFT, NEL
       INTEGER :: IMAT
       my_real :: X1(3), X2(3), X3(3), X4(3)
       my_real :: LAMBDAII, LAMBDAF, NORMUII, NORMUJJ
-      my_real :: FII(5), SUB_FII(3), FJJ(5), NORMAL_VELII, NORMAL_VELJJ, VII(5), SUB_VII(3), VJJ(5), 
+      my_real :: FII(5), SUB_FII(3), FJJ(5), NORMAL_VELII, NORMAL_VELJJ, VII(5), SUB_VII(3), VJJ(5),
      .     VELII2, VELJJ2, SURF
-      my_real :: SL, SR, SSTAR, PSTAR, FIISTAR(5), SUB_FIISTAR(3), FJJSTAR(5), VIISTAR(5), VJJSTAR(5), PP(5), 
+      my_real :: SL, SR, SSTAR, PSTAR, FIISTAR(5), SUB_FIISTAR(3), FJJSTAR(5), VIISTAR(5), VJJSTAR(5), PP(5),
      .     SUB_VIISTAR(3)
       my_real :: SSPII, SSPJJ, RHOII, RHOJJ, PII, PJJ, NX, NY, NZ, NORMALW
       INTEGER :: NODE1, NODE2, NODE3, NODE4
       my_real :: VXII, VYII, VZII
       my_real :: VXJJ, VYJJ, VZJJ, VX, VY, VZ, NORMVEL, SSP, RHO, P
       INTEGER :: NB_FACE, ELEMID, NUMEL_SPMD
-      my_real :: MACHII, MACHJJ, PSTAR2, THETA, ALPHAII, SUB_RHOII, SUB_RHOEINTII, 
+      my_real :: MACHII, MACHJJ, PSTAR2, THETA, ALPHAII, SUB_RHOII, SUB_RHOEINTII,
      .     ALPHASTAR, SUB_RHOSTAR, SUB_ESTAR, SUB_PII, WFAC(3)
       TYPE(LBUF_PTR) :: LBUFS(NBMAT)
-      INTEGER :: LOCAL_MATID(NBMAT), MATLAW(NBMAT),IDX(6)
+      TYPE(EBUF_PTR) :: EBUFS(NBMAT)
+      INTEGER :: LOCAL_MATID(NBMAT), MATLAW(NBMAT),IDX(6), NVAREOS(NBMAT)
       my_real :: XF(3), XK(3), XL(3)
       my_real :: EINTII, EINTJJ, GRUN, TEMP
-      my_real :: PHASE_RHOII(NBMAT), PHASE_PRESII(NBMAT), PHASE_EINTII(NBMAT), 
+      my_real :: PHASE_RHOII(NBMAT), PHASE_PRESII(NBMAT), PHASE_EINTII(NBMAT),
      .     PHASE_SSPII(NBMAT), PHASE_ALPHAII(NBMAT)
-      my_real :: PHASE_RHOJJ(NBMAT), PHASE_PRESJJ(NBMAT), PHASE_EINTJJ(NBMAT), 
+      my_real :: PHASE_RHOJJ(NBMAT), PHASE_PRESJJ(NBMAT), PHASE_EINTJJ(NBMAT),
      .     PHASE_SSPJJ(NBMAT), PHASE_ALPHAJJ(NBMAT), CUMUL_ALPHA, PSHIFT
 
       INTEGER :: KFACE3,I_OLD,J_OLD,KFACE_OLD,KFACE2_OLD
@@ -151,10 +150,15 @@ C-----------------------------------------------
 !DIR$ NOVECTOR
          DO IMAT = 1, NBMAT
             LBUFS(IMAT)%LBUF => ELBUF_TAB(NG)%BUFLY(IMAT)%LBUF(1, 1, 1)
+            EBUFS(IMAT)%EBUF => ELBUF_TAB(NG)%BUFLY(IMAT)%EOS(1, 1, 1)
+            NVAREOS(IMAT) = ELBUF_TAB(NG)%BUFLY(IMAT)%NVAR_EOS
          ENDDO
       ELSE
          DO IMAT = 1, NBMAT
-            NULLIFY( LBUFS(IMAT)%LBUF )
+            !GBUF will be used
+            NULLIFY( LBUFS(IMAT)%LBUF, EBUFS(IMAT)%EBUF )
+            EBUF => ELBUF_TAB(NG)%BUFLY(1)%EOS(1,1,1)
+            NVAREOS(1) = ELBUF_TAB(NG)%BUFLY(1)%NVAR_EOS
          ENDDO
       ENDIF
 C     Normal and surface computation
@@ -202,7 +206,7 @@ C     Flux computation
       DO II = 1, NEL
          I = II + NFT
          IAD = ALE_CONNECTIVITY%ee_connect%iad_connect(I)
-         NB_FACE = ALE_CONNECTIVITY%ee_connect%iad_connect(I+1) - 
+         NB_FACE = ALE_CONNECTIVITY%ee_connect%iad_connect(I+1) -
      .        ALE_CONNECTIVITY%ee_connect%iad_connect(I)
          I_OLD = I
 C     Face KFACE
@@ -216,7 +220,7 @@ C     Face normal
             SURF = MULTI_FVM%FACE_DATA%SURF(KFACE3, I_OLD)
             WFAC(1:3) = MULTI_FVM%FACE_DATA%WFAC(1:3, KFACE3, I_OLD)
 
-            ID_GLOBAL_VOIS_1 = GLOBAL_ID_CURRENT_ELM(II)            
+            ID_GLOBAL_VOIS_1 = GLOBAL_ID_CURRENT_ELM(II)
             ID_GLOBAL_VOIS_2 = ID_GLOBAL_VOIS( NB_FACE * (I_OLD - 1) + KFACE3 )
             KFACE_OLD = KFACE3
             IF( J_OLD>0 ) THEN
@@ -226,7 +230,7 @@ C     Face normal
                     KFACE2_OLD = FACE_VOIS( NB_FACE * (I_OLD - 1) + KFACE3 )
                 ENDIF
             ENDIF
-            
+
 !   -----------------------------------------------
             IF (J_OLD  >  0 .AND. I_OLD  <  J_OLD) THEN
                ! ----------------------
@@ -260,7 +264,7 @@ C     ============
                XK(1:3) = MULTI_FVM%ELEM_DATA%CENTROID(1:3, I)
                XL(1:3) = MULTI_FVM%ELEM_DATA%CENTROID(1:3, J)
                XF(1:3) = MULTI_FVM%FACE_DATA%CENTROID(1:3, KFACE, I)    ! <-- need to commnicate this value
-    
+
 C     Reconstructed velocity current element
                VXII = MULTI_FVM%VEL(1, I)
                VYII = MULTI_FVM%VEL(2, I)
@@ -281,28 +285,28 @@ C     Reconstructed velocity current element
 C     Squared velocity
                VELII2 = VXII * VXII + VYII * VYII + VZII * VZII
 C     Normal velocity current element
-               NORMAL_VELII = VXII * NX + VYII * NY + VZII * NZ               
+               NORMAL_VELII = VXII * NX + VYII * NY + VZII * NZ
 C     Reconstructed internal energy current element
                IF (MULTI_FVM%NBMAT  ==  1) THEN
 C     Reconstructed density current element
                   RHOII = MULTI_FVM%RHO(I)
-                  EINTII = MULTI_FVM%EINT(I) 
+                  EINTII = MULTI_FVM%EINT(I)
 
                   IF (MULTI_FVM%MUSCL  ==  1) THEN
                      RHOII = RHOII + MULTI_FVM%GRAD_RHO(1, I) * (XF(1) - XK(1))
      .                    + MULTI_FVM%GRAD_RHO(2, I) * (XF(2) - XK(2))
-     .                    + MULTI_FVM%GRAD_RHO(3, I) * (XF(3) - XK(3))       
+     .                    + MULTI_FVM%GRAD_RHO(3, I) * (XF(3) - XK(3))
                      EINTII = EINTII + MULTI_FVM%GRAD_PRES(1, I) * (XF(1) - XK(1))
      .                    + MULTI_FVM%GRAD_PRES(2, I) * (XF(2) - XK(2))
      .                    + MULTI_FVM%GRAD_PRES(3, I) * (XF(3) - XK(3))
                   ENDIF
                   MATLAW(1) = IPM(2, LOCAL_MATID(1))
-                  CALL COMPUTE_PRESSURE(MATLAW(1), LOCAL_MATID(1), PM, IPM, NPROPM, NPROPMI, 
+                  CALL COMPUTE_PRESSURE(MATLAW(1), LOCAL_MATID(1), PM, IPM, NPROPM, NPROPMI,
      .                 EINTII, RHOII, PII, SSPII,
      .                 MULTI_FVM%BFRAC(1, I), GBUF%TB(II), GBUF%DELTAX(II), CURRENT_TIME,
-     .                 BUFMAT, GBUF%OFF(II), GBUF%SIG(II+IDX(1):II+IDX(6)), NPF, TF)
+     .                 BUFMAT, GBUF%OFF(II), GBUF%SIG(II+IDX(1):II+IDX(6)), NPF, TF, EBUF%VAR, NVAREOS(1))
                   SSPII = SQRT(SSPII)
-                 
+
                ELSE
                   RHOII = ZERO
                   PII = ZERO
@@ -318,13 +322,13 @@ C     Reconstructed density current element
                      PHASE_ALPHAII(IMAT) = MAX (PHASE_ALPHAII(IMAT), ZERO)
                      CUMUL_ALPHA = CUMUL_ALPHA + PHASE_ALPHAII(IMAT)
                   ENDDO
-                  
+
                   DO IMAT = 1, NBMAT
                      PHASE_ALPHAII(IMAT) = PHASE_ALPHAII(IMAT) / CUMUL_ALPHA
                      PHASE_RHOII(IMAT) = MULTI_FVM%PHASE_RHO(IMAT, I)
                      PHASE_EINTII(IMAT) = MULTI_FVM%PHASE_EINT(IMAT, I)
                      IF (MULTI_FVM%MUSCL  ==  1) THEN
-                        PHASE_RHOII(IMAT) = PHASE_RHOII(IMAT) 
+                        PHASE_RHOII(IMAT) = PHASE_RHOII(IMAT)
      .                       + MULTI_FVM%PHASE_GRAD_RHO(1, IMAT, I) * (XF(1) - XK(1))
      .                       + MULTI_FVM%PHASE_GRAD_RHO(2, IMAT, I) * (XF(2) - XK(2))
      .                       + MULTI_FVM%PHASE_GRAD_RHO(3, IMAT, I) * (XF(3) - XK(3))
@@ -337,15 +341,16 @@ C     Global reconstructed density
                      RHOII = RHOII + PHASE_ALPHAII(IMAT) * PHASE_RHOII(IMAT)
                      MATLAW(IMAT) = IPM(2, LOCAL_MATID(IMAT))
                      IF (PHASE_ALPHAII(IMAT)  >  ZERO) THEN
-                        
-                        CALL COMPUTE_PRESSURE(MATLAW(IMAT), LOCAL_MATID(IMAT), PM, IPM, NPROPM, NPROPMI, 
+                        NVAREOS = ELBUF_TAB(NG)%BUFLY(IMAT)%NVAR_EOS
+                        CALL COMPUTE_PRESSURE(MATLAW(IMAT), LOCAL_MATID(IMAT), PM, IPM, NPROPM, NPROPMI,
      .                       PHASE_EINTII(IMAT), PHASE_RHOII(IMAT), PHASE_PRESII(IMAT), PHASE_SSPII(IMAT),
      .                       MULTI_FVM%BFRAC(IMAT, I), GBUF%TB(II), GBUF%DELTAX(II), CURRENT_TIME,
-     .                       BUFMAT, LBUFS(IMAT)%LBUF%OFF(II),LBUFS(IMAT)%LBUF%SIG(II+IDX(1):II+IDX(6)), NPF,TF)
+     .                       BUFMAT, LBUFS(IMAT)%LBUF%OFF(II),LBUFS(IMAT)%LBUF%SIG(II+IDX(1):II+IDX(6)), NPF,TF,
+     .                       EBUFS(IMAT)%EBUF%VAR,NVAREOS(IMAT))
 C     Global reconstructed pressure
                         PII = PII + PHASE_ALPHAII(IMAT) * PHASE_PRESII(IMAT)
                         EINTII = EINTII + PHASE_ALPHAII(IMAT) * PHASE_EINTII(IMAT)
-                        SSPII = SSPII + PHASE_ALPHAII(IMAT) * PHASE_RHOII(IMAT) * 
+                        SSPII = SSPII + PHASE_ALPHAII(IMAT) * PHASE_RHOII(IMAT) *
      .                       MAX(EM20, PHASE_SSPII(IMAT))
                      ENDIF
                   ENDDO
@@ -357,9 +362,9 @@ C     Global reconstructed pressure
                ENDIF
 
 C     Reconstructed velocity adjacent element
-               VXJJ = MULTI_FVM%VEL(1, J)  
+               VXJJ = MULTI_FVM%VEL(1, J)
                VYJJ = MULTI_FVM%VEL(2, J)
-               VZJJ = MULTI_FVM%VEL(3, J) 
+               VZJJ = MULTI_FVM%VEL(3, J)
                IF (MULTI_FVM%MUSCL  ==  1) THEN
                   VXJJ = VXJJ
      .                 + MULTI_FVM%GRAD_U(1, J) * (XF(1) - XL(1))
@@ -376,13 +381,13 @@ C     Reconstructed velocity adjacent element
                ENDIF
 C     Normal velocity adjacent element
                NORMAL_VELJJ = VXJJ * NX + VYJJ * NY + VZJJ * NZ
-               VELJJ2 = VXJJ * VXJJ + VYJJ * VYJJ + VZJJ * VZJJ                
-                    
+               VELJJ2 = VXJJ * VXJJ + VYJJ * VYJJ + VZJJ * VZJJ
+
 C     Reconstructed internal energy adjacent element
                IF (MULTI_FVM%NBMAT  ==  1) THEN
 C     Reconstructed density adjacent element
                   RHOJJ = MULTI_FVM%RHO(J)
-                  EINTJJ = MULTI_FVM%EINT(J) 
+                  EINTJJ = MULTI_FVM%EINT(J)
                   IF (MULTI_FVM%MUSCL  ==  1) THEN
                      RHOJJ = RHOJJ
      .                    + MULTI_FVM%GRAD_RHO(1, J) * (XF(1) - XL(1))
@@ -394,10 +399,11 @@ C     Reconstructed density adjacent element
      .                    + MULTI_FVM%GRAD_PRES(3, J) * (XF(3) - XL(3))
                   ENDIF
                   MATLAW(1) = IPM(2, LOCAL_MATID(1))
-                  CALL COMPUTE_PRESSURE(MATLAW(1), LOCAL_MATID(1), PM, IPM, NPROPM, NPROPMI, 
+                  NVAREOS = ELBUF_TAB(NG)%BUFLY(1)%NVAR_EOS
+                  CALL COMPUTE_PRESSURE(MATLAW(1), LOCAL_MATID(1), PM, IPM, NPROPM, NPROPMI,
      .                 EINTJJ, RHOJJ, PJJ, SSPJJ,
      .                 MULTI_FVM%BFRAC(1, J), GBUF%TB(II), GBUF%DELTAX(II), CURRENT_TIME,
-     .                 BUFMAT, GBUF%OFF(II),GBUF%SIG(II+IDX(1):II+IDX(6)), NPF,TF)
+     .                 BUFMAT, GBUF%OFF(II),GBUF%SIG(II+IDX(1):II+IDX(6)), NPF,TF,EBUF%VAR,NVAREOS(1))
                   SSPJJ = SQRT(SSPJJ)
                ELSE
                   RHOJJ = ZERO
@@ -413,7 +419,7 @@ C     Reconstructed density adjacent element
                      PHASE_ALPHAJJ(IMAT) = MAX (PHASE_ALPHAJJ(IMAT), ZERO)
                      CUMUL_ALPHA = CUMUL_ALPHA + PHASE_ALPHAJJ(IMAT)
                   ENDDO
-                  
+
                   DO IMAT = 1, NBMAT
                      PHASE_ALPHAJJ(IMAT) = PHASE_ALPHAJJ(IMAT) / CUMUL_ALPHA
                      PHASE_RHOJJ(IMAT) = MULTI_FVM%PHASE_RHO(IMAT, J)
@@ -432,15 +438,16 @@ C     Global reconstructed density
                      RHOJJ = RHOJJ + PHASE_ALPHAJJ(IMAT) * PHASE_RHOJJ(IMAT)
                      MATLAW(IMAT) = IPM(2, LOCAL_MATID(IMAT))
                      IF (PHASE_ALPHAJJ(IMAT)  >  ZERO) THEN
-                        
-                        CALL COMPUTE_PRESSURE(MATLAW(IMAT), LOCAL_MATID(IMAT), PM, IPM, NPROPM, NPROPMI, 
+
+                        CALL COMPUTE_PRESSURE(MATLAW(IMAT), LOCAL_MATID(IMAT), PM, IPM, NPROPM, NPROPMI,
      .                       PHASE_EINTJJ(IMAT), PHASE_RHOJJ(IMAT), PHASE_PRESJJ(IMAT), PHASE_SSPJJ(IMAT),
      .                       MULTI_FVM%BFRAC(IMAT, J), GBUF%TB(II), GBUF%DELTAX(II), CURRENT_TIME,
-     .                       BUFMAT, LBUFS(IMAT)%LBUF%OFF(II),LBUFS(IMAT)%LBUF%SIG(II+IDX(1):II+IDX(6)),NPF,TF)
+     .                       BUFMAT, LBUFS(IMAT)%LBUF%OFF(II),LBUFS(IMAT)%LBUF%SIG(II+IDX(1):II+IDX(6)),NPF,TF,
+     .                       EBUFS(IMAT)%EBUF%VAR,NVAREOS(IMAT))
 C     Global reconstructed pressure
                         PJJ = PJJ + PHASE_ALPHAJJ(IMAT) * PHASE_PRESJJ(IMAT)
                         EINTJJ = EINTJJ + PHASE_ALPHAJJ(IMAT) * PHASE_EINTJJ(IMAT)
-                        SSPJJ = SSPJJ + PHASE_ALPHAJJ(IMAT) * PHASE_RHOJJ(IMAT) * 
+                        SSPJJ = SSPJJ + PHASE_ALPHAJJ(IMAT) * PHASE_RHOJJ(IMAT) *
      .                       MAX(EM20, PHASE_SSPJJ(IMAT))
                      ENDIF
                   ENDDO
@@ -449,19 +456,19 @@ C     Global reconstructed pressure
                   ELSE
                      SSPJJ = MULTI_FVM%SOUND_SPEED(J)
                   ENDIF
-               ENDIF           
+               ENDIF
 C     Local Mach numbers
                MACHII = ABS(NORMAL_VELII) / SSPII
-               MACHJJ = ABS(NORMAL_VELJJ) / SSPJJ               
+               MACHJJ = ABS(NORMAL_VELJJ) / SSPJJ
 
 C     HLL wave speed estimates
                SL = MIN(NORMAL_VELII - SSPII, NORMAL_VELJJ - SSPJJ)
                SR = MAX(NORMAL_VELII + SSPII, NORMAL_VELJJ + SSPJJ)
 
 C     Intermediate wave speed
-               SSTAR = PJJ - PII + RHOII * NORMAL_VELII * (SL - NORMAL_VELII) - 
+               SSTAR = PJJ - PII + RHOII * NORMAL_VELII * (SL - NORMAL_VELII) -
      .              RHOJJ * NORMAL_VELJJ * (SR - NORMAL_VELJJ)
-               SSTAR = SSTAR / (RHOII * (SL - NORMAL_VELII) - 
+               SSTAR = SSTAR / (RHOII * (SL - NORMAL_VELII) -
      .              RHOJJ * (SR - NORMAL_VELJJ))
 C     Specific for Low Mach number corrections
 C     Intermediate pressure
@@ -476,7 +483,7 @@ C     Intermediate pressure
                   PP(1) = ZERO
                   PP(2) = PSTAR * NX
                   PP(3) = PSTAR * NY
-                  PP(4) = PSTAR * NZ   
+                  PP(4) = PSTAR * NZ
                   PP(5) = SSTAR * (PSTAR + PSHIFT)
                ELSE
                   PP(1) = ZERO
@@ -514,15 +521,15 @@ C     Submaterial fluxes
                         SUB_VIISTAR(2) = ALPHAII * SUB_RHOII ! ALPHA_RHO
                         SUB_VIISTAR(3) = ALPHAII * SUB_RHOEINTII
                         SUB_FIISTAR(1:3) = SUB_VIISTAR(1:3) * NORMAL_VELII
-                        MULTI_FVM%SUBVOL_FLUXES(IMAT, KFACE_OLD, I_OLD) = DIRECTION * 
+                        MULTI_FVM%SUBVOL_FLUXES(IMAT, KFACE_OLD, I_OLD) = DIRECTION *
      .                       (SUB_FIISTAR(1) - NORMALW * SUB_VIISTAR(1)) * SURF
-                        MULTI_FVM%SUBMASS_FLUXES(IMAT, KFACE_OLD, I_OLD) = DIRECTION * 
+                        MULTI_FVM%SUBMASS_FLUXES(IMAT, KFACE_OLD, I_OLD) = DIRECTION *
      .                       (SUB_FIISTAR(2) - NORMALW * SUB_VIISTAR(2)) * SURF
-                        MULTI_FVM%SUBENER_FLUXES(IMAT, KFACE_OLD, I_OLD) = DIRECTION * 
+                        MULTI_FVM%SUBENER_FLUXES(IMAT, KFACE_OLD, I_OLD) = DIRECTION *
      .                       (SUB_FIISTAR(3) - NORMALW * SUB_VIISTAR(3)) * SURF
                      ENDDO
                   ENDIF
-C     
+C
                ELSEIF (SL  <=  NORMALW .AND. NORMALW  <=  SSTAR) THEN
                   VII(1) = RHOII
                   VII(2) = RHOII * VXII
@@ -540,8 +547,8 @@ C     ===
 C     Global fluxes
                   VIISTAR(1:5) = FII(1:5) - (SL) * VII(1:5) - PP(1:5)
                   VIISTAR(1:5) = VIISTAR(1:5) / (SSTAR - SL)
-                  FIISTAR(1:5) = VIISTAR(1:5) * SSTAR + PP(1:5) 
-                  MULTI_FVM%FLUXES(1:5, KFACE_OLD, I_OLD) = DIRECTION * 
+                  FIISTAR(1:5) = VIISTAR(1:5) * SSTAR + PP(1:5)
+                  MULTI_FVM%FLUXES(1:5, KFACE_OLD, I_OLD) = DIRECTION *
      .                 (FIISTAR(1:5) - NORMALW * VIISTAR(1:5)) * SURF
                   MULTI_FVM%FLUXES(6, KFACE_OLD, I_OLD) = DIRECTION * SSTAR * SURF
 C     ===
@@ -555,8 +562,8 @@ C     Submaterial fluxes
                            SUB_RHOII = PHASE_RHOII(IMAT)
                            SUB_RHOEINTII = PHASE_EINTII(IMAT)
                            SUB_PII = PHASE_PRESII(IMAT)
-                           SUB_ESTAR = PHASE_EINTII(IMAT) / PHASE_RHOII(IMAT) - 
-     .                          PHASE_PRESII(IMAT) * (ONE / SUB_RHOSTAR - ONE / PHASE_RHOII(IMAT)) 
+                           SUB_ESTAR = PHASE_EINTII(IMAT) / PHASE_RHOII(IMAT) -
+     .                          PHASE_PRESII(IMAT) * (ONE / SUB_RHOSTAR - ONE / PHASE_RHOII(IMAT))
 
                            IF (SUB_ESTAR  <  ZERO) THEN
                               SUB_ESTAR = ZERO
@@ -569,15 +576,15 @@ C     Submaterial fluxes
                         SUB_VIISTAR(3) = ALPHASTAR * SUB_RHOSTAR * SUB_ESTAR
 
                         SUB_FIISTAR(1:3) = SUB_VIISTAR(1:3) * SSTAR
-                        MULTI_FVM%SUBVOL_FLUXES(IMAT, KFACE_OLD, I_OLD) = DIRECTION * 
+                        MULTI_FVM%SUBVOL_FLUXES(IMAT, KFACE_OLD, I_OLD) = DIRECTION *
      .                       (SUB_FIISTAR(1) - NORMALW * SUB_VIISTAR(1)) * SURF
-                        MULTI_FVM%SUBMASS_FLUXES(IMAT, KFACE_OLD, I_OLD) = DIRECTION * 
+                        MULTI_FVM%SUBMASS_FLUXES(IMAT, KFACE_OLD, I_OLD) = DIRECTION *
      .                       (SUB_FIISTAR(2) - NORMALW * SUB_VIISTAR(2)) * SURF
-                        MULTI_FVM%SUBENER_FLUXES(IMAT, KFACE_OLD, I_OLD) = DIRECTION * 
+                        MULTI_FVM%SUBENER_FLUXES(IMAT, KFACE_OLD, I_OLD) = DIRECTION *
      .                       (SUB_FIISTAR(3) - NORMALW * SUB_VIISTAR(3)) * SURF
                      ENDDO
                   ENDIF
-                
+
                ELSE IF (SSTAR  <  NORMALW .AND. NORMALW  <=  SR) THEN
                   VII(1) = RHOJJ
                   VII(2) = RHOJJ * VXJJ
@@ -595,8 +602,8 @@ C     ===
 C     Global fluxes
                   VIISTAR(1:5) = FII(1:5) - (SR) * VII(1:5) - PP(1:5)
                   VIISTAR(1:5) = VIISTAR(1:5) / (SSTAR - SR)
-                  FIISTAR(1:5) = VIISTAR(1:5) * SSTAR + PP(1:5) 
-                  MULTI_FVM%FLUXES(1:5, KFACE_OLD, I_OLD) = DIRECTION * 
+                  FIISTAR(1:5) = VIISTAR(1:5) * SSTAR + PP(1:5)
+                  MULTI_FVM%FLUXES(1:5, KFACE_OLD, I_OLD) = DIRECTION *
      .                 (FIISTAR(1:5) - NORMALW * VIISTAR(1:5)) * SURF
                   MULTI_FVM%FLUXES(6, KFACE_OLD, I_OLD) = DIRECTION * SSTAR * SURF
 C     ===
@@ -610,8 +617,8 @@ C     Submaterial fluxes
                            SUB_RHOII = PHASE_RHOJJ(IMAT)
                            SUB_RHOEINTII = PHASE_EINTJJ(IMAT)
                            SUB_PII = PHASE_PRESJJ(IMAT)
-                           SUB_ESTAR = PHASE_EINTJJ(IMAT) / PHASE_RHOJJ(IMAT) - 
-     .                          PHASE_PRESJJ(IMAT) * (ONE / SUB_RHOSTAR - ONE / PHASE_RHOJJ(IMAT)) 
+                           SUB_ESTAR = PHASE_EINTJJ(IMAT) / PHASE_RHOJJ(IMAT) -
+     .                          PHASE_PRESJJ(IMAT) * (ONE / SUB_RHOSTAR - ONE / PHASE_RHOJJ(IMAT))
                            IF (SUB_ESTAR  <  ZERO) THEN
                               SUB_ESTAR = ZERO
                            ENDIF
@@ -623,11 +630,11 @@ C     Submaterial fluxes
                         SUB_VIISTAR(2) = PHASE_ALPHAJJ(IMAT) * SUB_RHOSTAR
                         SUB_VIISTAR(3) = PHASE_ALPHAJJ(IMAT) * SUB_RHOSTAR * SUB_ESTAR
                         SUB_FIISTAR(1:3) = SUB_VIISTAR(1:3) * SSTAR
-                        MULTI_FVM%SUBVOL_FLUXES(IMAT, KFACE_OLD, I_OLD) = DIRECTION * 
+                        MULTI_FVM%SUBVOL_FLUXES(IMAT, KFACE_OLD, I_OLD) = DIRECTION *
      .                       (SUB_FIISTAR(1) - NORMALW * SUB_VIISTAR(1)) * SURF
-                        MULTI_FVM%SUBMASS_FLUXES(IMAT, KFACE_OLD, I_OLD) = DIRECTION * 
+                        MULTI_FVM%SUBMASS_FLUXES(IMAT, KFACE_OLD, I_OLD) = DIRECTION *
      .                       (SUB_FIISTAR(2) - NORMALW * SUB_VIISTAR(2)) * SURF
-                        MULTI_FVM%SUBENER_FLUXES(IMAT, KFACE_OLD, I_OLD) = DIRECTION * 
+                        MULTI_FVM%SUBENER_FLUXES(IMAT, KFACE_OLD, I_OLD) = DIRECTION *
      .                       (SUB_FIISTAR(3) - NORMALW * SUB_VIISTAR(3)) * SURF
                      ENDDO
                   ENDIF
@@ -659,20 +666,41 @@ C     Submaterial fluxes
                         SUB_VIISTAR(2) = ALPHAII * SUB_RHOII ! ALPHA_RHO
                         SUB_VIISTAR(3) = ALPHAII * SUB_RHOEINTII
                         SUB_FIISTAR(1:3) = SUB_VIISTAR(1:3) * NORMAL_VELJJ
-                        MULTI_FVM%SUBVOL_FLUXES(IMAT, KFACE_OLD, I_OLD) = DIRECTION * 
+                        MULTI_FVM%SUBVOL_FLUXES(IMAT, KFACE_OLD, I_OLD) = DIRECTION *
      .                       (SUB_FIISTAR(1) - NORMALW * SUB_VIISTAR(1)) * SURF
-                        MULTI_FVM%SUBMASS_FLUXES(IMAT, KFACE_OLD, I_OLD) = DIRECTION * 
+                        MULTI_FVM%SUBMASS_FLUXES(IMAT, KFACE_OLD, I_OLD) = DIRECTION *
      .                       (SUB_FIISTAR(2) - NORMALW * SUB_VIISTAR(2)) * SURF
-                        MULTI_FVM%SUBENER_FLUXES(IMAT, KFACE_OLD, I_OLD) = DIRECTION * 
+                        MULTI_FVM%SUBENER_FLUXES(IMAT, KFACE_OLD, I_OLD) = DIRECTION *
      .                       (SUB_FIISTAR(3) - NORMALW * SUB_VIISTAR(3)) * SURF
                      ENDDO
-                  ENDIF     
+                  ENDIF
                ELSE
-                  PRINT*, "SSPII", SSPII, "SSPJJ", SSPJJ, "NORMALVEL_II", NORMAL_VELII, 
-     .                 "NORMALVEL_JJ", NORMAL_VELJJ
-                  PRINT*, "SOUNDSPEEDII", MULTI_FVM%SOUND_SPEED(I), "SOUNDSPEEDJJ", MULTI_FVM%SOUND_SPEED(J)
+
+                IF(ISPMD == 0)THEN
+#include "lockon.inc"
+                  IARRAY(1:2)=(/IOUT,ISTDO/)
+                  DO KK=1,2
+                    ID_OUT=IARRAY(KK)
+                    WRITE(ID_OUT,*)"  **error : MUSCL FLUXES CALCULATION"
+                    WRITE(ID_OUT,*)"    potential instability with elem id = ", GLOBAL_ID_CURRENT_ELM(II)
+                    WRITE(ID_OUT,*)"                               face id = ", KFACE3
+                    WRITE(ID_OUT,*)"                           sound speed = ", SSPII
+                    WRITE(ID_OUT,*)"                  adjacent sound speed = ", SSPJJ
+                    WRITE(ID_OUT,*)"                       normal velocity = ", NORMAL_VELII
+                    WRITE(ID_OUT,*)"              adjacent normal velocity = ", NORMAL_VELJJ
+                    WRITE(ID_OUT,*)""
+                    WRITE(ID_OUT,*)"    recommendations :"
+                    WRITE(ID_OUT,*)"    -1- check EoS parameters and unit system"
+                    WRITE(ID_OUT,*)"    -2- check boundary conditions (type, parameters, and proximity from important gradients);"
+                    WRITE(ID_OUT,*)
+     .                     "    -3- update BETA parameters in /ALE/MUSCL option (find compromise between precision and stability)"
+                  ENDDO
+                  CALL MY_FLUSH(IOUT)
+                  CALL MY_FLUSH(ISTDO)
                   CALL ARRET(2)
-C
+#include "lockoff.inc"
+                ENDIF!ISPMD==0
+
                ENDIF
 
                IF (J_OLD  <=  NUMEL_SPMD) THEN
@@ -743,7 +771,7 @@ Chd|====================================================================
       SUBROUTINE COMPUTE_PRESSURE(MATLAW, LOCAL_MATID, PM, IPM, NPROPM, NPROPMI, 
      .     EINT, RHO, PRES, SSP, 
      .     BURNFRAC, BURNTIME, DELTAX, CURRENT_TIME,
-     .     BUFMAT, OFF, SIG, NPF, TF)
+     .     BUFMAT, OFF, SIG, NPF, TF, VAREOS,NVAREOS)
 C-----------------------------------------------
 C     I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -757,8 +785,8 @@ C-----------------------------------------------
       my_real, INTENT(INOUT) :: BURNFRAC, BURNTIME, DELTAX, BUFMAT(*)
       my_real, INTENT(OUT) :: OFF
       my_real, INTENT(INOUT) :: EINT, RHO
-      INTEGER,INTENT(IN)::NPF(SNPC)
-      my_real,INTENT(IN)::TF(STF)
+      INTEGER,INTENT(IN)::NPF(SNPC),NVAREOS
+      my_real,INTENT(IN)::TF(STF),VAREOS(NVAREOS*1)
 
       INTEGER :: ITER, MAX_ITER
       my_real :: TOL, ERROR
@@ -776,7 +804,12 @@ C     Initialization
       TEMP = ZERO
       ITER = 0
       CONT = .TRUE.
-      CALL MULTI_SUBMATLAW(0, MATLAW, LOCAL_MATID, 1, EINT, PRES, RHO, SSP, VOL, GRUN, 
-     .     PM, IPM, NPROPM, NPROPMI, BUFMAT, OFF, TEMP, 
-     .     BURNFRAC, BURNTIME, DELTAX, CURRENT_TIME,SIG(1:6),NPF,TF)
+      CALL MULTI_SUBMATLAW(
+     1   0,           MATLAW,      LOCAL_MATID, 1,
+     2   EINT,        PRES,        RHO,         SSP,
+     3   VOL,         GRUN,        PM,          IPM,
+     4   NPROPM,      NPROPMI,     BUFMAT,      OFF,
+     5   TEMP,        BURNFRAC,    BURNTIME,    DELTAX,
+     6   CURRENT_TIME,SIG(1:6),    NPF,         TF,
+     7   VAREOS,      NVAREOS)
       END SUBROUTINE COMPUTE_PRESSURE

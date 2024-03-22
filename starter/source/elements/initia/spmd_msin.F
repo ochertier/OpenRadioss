@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  SPMD_MSIN                     source/elements/initia/spmd_msin.F
 Chd|-- called by -----------
@@ -30,11 +30,11 @@ Chd|        STRR                          source/tools/univ/strr.F
 Chd|====================================================================
       SUBROUTINE SPMD_MSIN(
      1               IXS  ,IXQ  ,IXC  ,IXT  ,IXP  ,
-     2               IXR  ,IXTG ,IXUR ,MSS  ,MSQ  ,
+     2               IXR  ,IXTG ,MSS  ,MSQ  ,
      3               MSC  ,MST  ,MSP  ,MSR  ,MSTG ,
-     4               MSUR ,INC  ,INP  ,INR  ,INTG ,
-     5               INUR ,INDEX,ITRI ,MS   ,IN   ,
-     6               PTG  ,EVUR ,GEO  ,IXS10,IXS20,
+     4               INC  ,INP  ,INR  ,INTG ,
+     5               INDEX,ITRI ,MS   ,IN   ,
+     6               PTG  ,GEO  ,IXS10,IXS20,
      7               IXS16,MSSX ,MSNF ,MSSF ,VNS  ,
      8               VNSX ,STC  ,STT  ,STP  ,STR  ,
      9               STTG ,STUR ,BNS  ,BNSX ,VOLNOD ,
@@ -51,18 +51,11 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "scr03_c.inc"
-#include      "rnur_c.inc"
 #include      "scr12_c.inc"
 #include      "remesh_c.inc"
 C-----------------------------------------------
@@ -70,16 +63,16 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IXS(NIXS,*), IXQ(NIXQ,*), IXC(NIXC,*),
      .   IXT(NIXT,*),IXP(NIXP,*), IXR(NIXR,*), IXTG(6,*),
-     .   IXUR(6,*), INDEX(*), ITRI(*),
+     .   INDEX(*), ITRI(*),
      .   IXS10(6,*),IXS20(12,*),IXS16(8,*),
      .   SH4TREE(KSH4TREE,*), SH3TREE(KSH3TREE,*),KXIG3D(NIXIG3D,*),
      .   IXIG3D(*),NSHNOD(*)
 C     REAL
       my_real
      .   MSS(8,*), MSQ(*),MSC(*),MST(*),MSP(*),MSR(3,*),
-     .   MSTG(*),MSUR(*),MSSX(12,*),INC(*),
-     .   INP(*),INR(3,*),INTG(*),INUR(*),
-     .   MS(*), IN(*),PTG(3,*), EVUR(3,*), GEO(NPROPG,*),
+     .   MSTG(*),MSSX(12,*),INC(*),
+     .   INP(*),INR(3,*),INTG(*),
+     .   MS(*), IN(*),PTG(3,*),  GEO(NPROPG,*),
      .   MSNF(*), MSSF(8,*),
      .   VNS(8,*) ,VNSX(12,*) ,STC(*) ,STT(*) ,STP(*) ,STR(*) ,
      .   STTG(*) ,STUR(*) ,BNS(8,*) ,BNSX(12,*) ,
@@ -645,22 +638,6 @@ C
         ENDDO
        ENDDO
       ENDIF
-C
-      DO I = 1, NUMELUR
-        ITRI(I) = IXUR(6,I)
-      ENDDO
-      CALL MY_ORDERS(0,WORK,ITRI,INDEX,NUMELUR,1)
-      DO J=1,NUMELUR
-        I = INDEX(J)
-        N = IXUR(2,I)
-        MS(N) = MS(N) + MSUR(I)
-        IN(N) = IN(N) + INUR(I)
-        DO K=1,3
-          N = IXUR(K+2,I)
-          MS(N) = MS(N) + ABS(MSUR(I)*EVUR(K,I))
-          IF (IRODDL/=0)IN(N) = IN(N) + ABS(INUR(I)*EVUR(K,I))
-        ENDDO
-      ENDDO
 C
       DO I = 1, NUMELIG3D
         ITRI(I) = KXIG3D(5,I)

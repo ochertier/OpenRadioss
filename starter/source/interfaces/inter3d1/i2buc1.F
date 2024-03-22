@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  I2BUC1                        source/interfaces/inter3d1/i2buc1.F
 Chd|-- called by -----------
@@ -70,17 +70,12 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
-#include      "warn_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
 #include      "scr08_c.inc"
@@ -125,19 +120,19 @@ C-----------------------------------------------
       INTEGER I, J, L, N1, N2, N3, N4, I_AMAX,I_MEM
       INTEGER I_ADD, ADESTK, NB_NC, NB_EC, ADNSTK,IEL,N
       INTEGER IP1, IP2, IP21, IP22, IP31,J_STOK,I_BID,NB_N_B,IS,IAD,
-     .   MG,IP,NELS,NELC,NELTG,JJ,JJJ
+     .   MG,IP,NELS,NELC,NELTG,JJ,JJJ,IFLAG
 C     REAL
       my_real
      .   DX1,DY1,DZ1,DX3,DY3,DZ3,DX4,DY4,DZ4,DX6,DY6,DZ6,
      .   DD1,DD2,DD3,DD4,DD,XMIN,YMIN,ZMIN,MAXBOX,MINBOX,XMAX,YMAX,ZMAX,
      .   BID,TZINFMIN,THKSECND,THKMAIN,AREA,VOL,GAPV(MVSIZ),DSEARCH
 C
-!      EQUIVALENCE (PROV_N,IV(1,6)) ,(PROV_E,IV(1,7))
 C=======================================================================
 C     1-CALCUL TAILLE DES ZONES INFLUENCES
 c
       DD = ZERO
       DSEARCH = TZINF05
+      IFLAG = 1
       IF (IGNORE >= 2) THEN
          THKSECND = ZERO
          THKMAIN = ZERO
@@ -451,7 +446,7 @@ C---------------------------------
      5               IX3    ,IX4    ,NSVG,X1      ,X2    ,
      6               X3     ,X4     ,Y1  ,Y2      ,Y3    ,
      7               Y4     ,Z1     ,Z2  ,Z3      ,Z4    ,
-     8               XI     ,YI     ,ZI  ,STIF)
+     8               XI     ,YI     ,ZI  ,STIF    ,IFLAG )
 C
          IF (ILEV == 27) THEN
 C--        Improved projections on triangles for spotflag27

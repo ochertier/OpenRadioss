@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  INTTI12A                      source/interfaces/interf/intti12.F
 Chd|-- called by -----------
@@ -36,16 +36,20 @@ Chd|        I12ROT3                       source/interfaces/inter3d/i12rot3.F
 Chd|        I12S2M                        source/interfaces/interf/i12s2m.F
 Chd|        I3CST3                        source/interfaces/inter3d/i3cst3.F
 Chd|        VARCONDEC                     source/interfaces/interf/varcondec.F
+Chd|        ALE_MOD                       ../common_source/modules/ale/ale_mod.F
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
 Chd|        SEGVAR_MOD                    share/modules/segvar_mod.F    
 Chd|====================================================================
-      SUBROUTINE INTTI12A(IPARI,X     ,WA    ,ITAB,
-     .        SEGVAR,TEST,SKEW,ISKWN ,INTBUF_TAB  )
-C INTERFACE FLUIDE/FLUIDE DERIVEE DES INTERFACE 2 ET 5 (SLIDING)
-      USE SEGVAR_MOD
+      SUBROUTINE INTTI12A(IPARI, X, WA, ITAB, SEGVAR, TEST, SKEW, ISKWN ,INTBUF_TAB )
+C-----------------------------------------------
+C   D e s c r i p t i o n
+C-----------------------------------------------
+C  FLUID/FLUID INTERFACE DERIVATED FROM TYPE 2 & 5 (SLIDING)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE SEGVAR_MOD
+      USE ALE_MOD
       USE INTBUFDEF_MOD      
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -62,17 +66,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "vect07_c.inc"
-#include      "scr04_c.inc"
-#include      "scr05_c.inc"
 #include      "scr06_c.inc"
-#include      "task_c.inc"
 #include      "units_c.inc"
-#include      "secur_c.inc"
-#include      "conv_c.inc"
 #include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -80,7 +76,7 @@ C-----------------------------------------------
  
       INTEGER ITIED,NOINT,NGROUS,NGROUM,NG,
      .  L1 ,L2 ,L3 ,L4,L5,L6
-      INTEGER JCODV(LCONV),CODTOT,I,ITEST,ILEV,IREF,ICEN
+      INTEGER JCODV(ALE%GLOBAL%LCONV),CODTOT,I,ITEST,ILEV,IREF,ICEN
       INTEGER, DIMENSION(MVSIZ) :: IX1,IX2,IX3,IX4
       my_real
      .  GAP
@@ -101,6 +97,8 @@ C-----------------------------------------------
       my_real, DIMENSION(MVSIZ) :: ZN1,ZN2,ZN3,ZN4
       my_real, DIMENSION(MVSIZ) :: XP,YP,ZP
       my_real, DIMENSION(MVSIZ) :: H1,H2,H3,H4
+      INTEGER :: NRTS, NRTM, NSN, NMN, NST, MST
+      INTEGER :: LFT, LLT, NFT
 C-----------------------------------------------
       ITEST =0
 
@@ -134,14 +132,18 @@ C-----------------------------------------------
           !----------------------------------------------!
           !   FIND NEAREST NODE                          !
           !----------------------------------------------!
-          CALL I12LOC3(WA(L1),WA(L2),INTBUF_TAB%IRECTM,INTBUF_TAB%LMSR,
-     1               INTBUF_TAB%MSR,INTBUF_TAB%NSV,INTBUF_TAB%ILOCS,INTBUF_TAB%NSEGM)
+          CALL I12LOC3(
+     1   WA(L1),           WA(L2),           INTBUF_TAB%IRECTM,INTBUF_TAB%LMSR,
+     2   INTBUF_TAB%MSR,   INTBUF_TAB%NSV,   INTBUF_TAB%ILOCS, INTBUF_TAB%NSEGM,
+     3   LFT,              LLT,              NFT)
 
           !----------------------------------------------!
           !   FIND MAIN SEGMENT
           !----------------------------------------------!
-          CALL I12MSR3(WA(L1),WA(L2),INTBUF_TAB%IRECTM,INTBUF_TAB%LMSR,
-     1          INTBUF_TAB%MSR,INTBUF_TAB%NSV,INTBUF_TAB%ILOCS,INTBUF_TAB%IRTLM,INTBUF_TAB%NSEGM)
+          CALL I12MSR3(
+     1   WA(L1),           WA(L2),           INTBUF_TAB%IRECTM,INTBUF_TAB%LMSR,
+     2   INTBUF_TAB%MSR,   INTBUF_TAB%NSV,   INTBUF_TAB%ILOCS, INTBUF_TAB%IRTLM,
+     3   INTBUF_TAB%NSEGM, LFT,              LLT,              NFT)
         ENDDO
 
         IF(ILEV>0)
@@ -152,33 +154,42 @@ C-----------------------------------------------
           NFT=(NG-1)*NVSIZ
           LFT=1
           LLT=MIN0(NVSIZ,NSN-NFT)
-          CALL I12COR3(WA(L1),WA(L2),INTBUF_TAB%IRECTM,INTBUF_TAB%MSR,INTBUF_TAB%IRTLM,
-     1                 ILEV,X ,INTBUF_TAB%STFNS ,IX1 ,IX2  ,
-     2                 IX3 ,IX4 ,X1   ,X2  ,X3   ,
-     3                 X4  ,XI  ,Y1   ,Y2  ,Y3   ,
-     4                 Y4  ,YI  ,Z1   ,Z2  ,Z3   ,
-     5                 Z4  ,ZI  ,XFACE)
+          CALL I12COR3(
+     1   WA(L1),           WA(L2),           INTBUF_TAB%IRECTM,INTBUF_TAB%MSR,
+     2   INTBUF_TAB%IRTLM, ILEV,             X,                INTBUF_TAB%STFNS,
+     3   IX1,              IX2,              IX3,              IX4,
+     4   X1,               X2,               X3,               X4,
+     5   XI,               Y1,               Y2,               Y3,
+     6   Y4,               YI,               Z1,               Z2,
+     7   Z3,               Z4,               ZI,               XFACE,
+     8   LFT,              LLT,              NFT)
           !-----------------------------------------------------------!
           !   CALCUL COORDONNEES ISOPARAMETRIQUES S & T NOEUD SECONDARY   !
           !-----------------------------------------------------------!
-          CALL I3CST3(  X1    ,X2      ,X3    ,X4    ,XI ,
-     1                  Y1    ,Y2      ,Y3    ,Y4    ,YI ,
-     2                  Z1    ,Z2      ,Z3    ,Z4    ,ZI ,
-     3                  XFACE ,N1      ,N2    ,N3    ,SSC,
-     4                  TTC   ,X0      ,Y0    ,Z0    ,XX1,
-     5                  XX2   ,XX3     ,XX4   ,YY1   ,YY2,
-     6                  YY3   ,YY4     ,ZZ1   ,ZZ2   ,ZZ3,
-     7                  ZZ4   ,XI1     ,XI2   ,XI3   ,XI4,
-     8                  YI1   ,YI2     ,YI3   ,YI4   ,ZI1,
-     9                  ZI2   ,ZI3     ,ZI4   ,XN1   ,XN2,
-     1                  XN3   ,XN4     ,YN1   ,YN2   ,YN3,
-     2                  YN4   ,ZN1     ,ZN2   ,ZN3   ,ZN4,
-     3                  AREA)
+          CALL I3CST3(
+     1   X1,      X2,      X3,      X4,
+     2   XI,      Y1,      Y2,      Y3,
+     3   Y4,      YI,      Z1,      Z2,
+     4   Z3,      Z4,      ZI,      XFACE,
+     5   N1,      N2,      N3,      SSC,
+     6   TTC,     X0,      Y0,      Z0,
+     7   XX1,     XX2,     XX3,     XX4,
+     8   YY1,     YY2,     YY3,     YY4,
+     9   ZZ1,     ZZ2,     ZZ3,     ZZ4,
+     A   XI1,     XI2,     XI3,     XI4,
+     B   YI1,     YI2,     YI3,     YI4,
+     C   ZI1,     ZI2,     ZI3,     ZI4,
+     D   XN1,     XN2,     XN3,     XN4,
+     E   YN1,     YN2,     YN3,     YN4,
+     F   ZN1,     ZN2,     ZN3,     ZN4,
+     G   AREA,    LFT,     LLT)
           !-----------------------------------------------------------!
           ! VERIFIE QUE LE NOEUD EST SUR LA FACETTE ET STOCKE S & T   !
           !-----------------------------------------------------------!
-        CALL I12DIS3(INTBUF_TAB%CSTS,INTBUF_TAB%NSV,ITAB,GAP,NOINT,
-     .               ITEST,INTBUF_TAB%FCOUNT,SSC ,TTC)
+        CALL I12DIS3(
+     1   INTBUF_TAB%CSTS,  INTBUF_TAB%NSV,   ITAB,             GAP,
+     2   NOINT,            ITEST,            INTBUF_TAB%FCOUNT,SSC,
+     3   TTC,              LFT,              LLT,              NFT)
         ENDDO
         IF(ITEST>0)THEN
           WRITE(IOUT,'(A,I8,A,I8,A)')
@@ -188,12 +199,12 @@ C-----------------------------------------------
         ENDIF
       ENDIF !(ITIED==0 .OR. ITIED==3)
 
-      IF(CODTOT/=0 .AND. INCOMP==0 .AND. ITIED/=3)THEN
+      IF(CODTOT/=0 .AND. ALE%GLOBAL%INCOMP==0 .AND. ITIED/=3)THEN
         L1=1
-        L2=L1+NSN*NVCONV
-        L3=L2+NSN*NVCONV
+        L2=L1+NSN*ALE%GLOBAL%NVCONV
+        L3=L2+NSN*ALE%GLOBAL%NVCONV
         L4=L3+NRTM        
-        L5=L4+NMN*NVCONV
+        L5=L4+NMN*ALE%GLOBAL%NVCONV
         L6=L5+NMN
         !-----------------------------------------------------------------!
         !   ECHANGE DES INFORMATIONS ENTRE LES TWO FACES DE l'INTERFACE  !
@@ -247,14 +258,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "param_c.inc"
-#include      "vect07_c.inc"
-#include      "scr04_c.inc"
-#include      "scr05_c.inc"
-#include      "task_c.inc"
-#include      "units_c.inc"
-#include      "secur_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -262,6 +266,8 @@ C-----------------------------------------------
       INTEGER ILEV,IREF
       my_real
      .  GAP
+      INTEGER :: NRTS, NRTM, NSN, NMN, NST, MST
+
 C-----------------------------------------------
 
       NRTS  =IPARI(3)
@@ -329,16 +335,13 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "param_c.inc"
-#include      "vect07_c.inc"
-#include      "scr04_c.inc"
-#include      "scr05_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER 
      .  ITIED,ILEV,IREF
+      INTEGER :: NRTS, NRTM, NSN, NMN, NST, MST
+
 C-----------------------------------------------
       NRTS  =IPARI(3)
       NRTM  =IPARI(4)

@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  SPMD_ANIM_PLY_INIT            source/spmd/spmd_anim_ply_init.F
 Chd|-- called by -----------
@@ -29,7 +29,7 @@ Chd|        PLYXFEM_MOD                   share/modules1/plyxfem_mod.F
 Chd|        STACK_MOD                     share/modules1/stack_mod.F    
 Chd|====================================================================
       SUBROUTINE SPMD_ANIM_PLY_INIT (IGEO, GEO  ,IPARG  ,IXC  ,IXTG ,
-     .                          IPARTC,IPARTQ,IPARTTG,IPARTUR ,STACK)
+     .                          IPARTC,IPARTQ,IPARTTG,STACK)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -45,23 +45,18 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "scr05_c.inc"
-#include      "scr14_c.inc"
-#include      "rnur_c.inc"
-#include      "spmd_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
 C     REAL
       my_real
      .  GEO(NPROPG,*)
-      INTEGER IXC(NIXC,*),IPARTQ(*),IPARTTG(*),IPARTUR(*),IXTG(NIXTG,*),
+      INTEGER IXC(NIXC,*),IPARTQ(*),IPARTTG(*),IXTG(NIXTG,*),
      .        IPARG(NPARG,*), IPARTC(*),IGEO(NPROPGI,*)
 C     
       TYPE (STACK_PLY) :: STACK
 C-----------------------------------------------
 C   L O C A L   V A R I A B L E S
-C-----------------------------------------------
 C-----------------------------------------------
       INTEGER IE,NG, ITY, LFT, LLT, NPT, N, I, J,
      .        IPRT, NEL, IAD, NPAR, NFT, IMID,IALEL,MTN,
@@ -92,11 +87,6 @@ C-----------------------------------------------
             DO I = 1, NEL
               N = I + NFT
               MATER(IPARTTG(N)) = 1
-            ENDDO
-          ELSEIF(ITY==50)THEN
-            DO I = 1, NEL
-              N = I + NFT
-              MATER(IPARTUR(N)) = 1
             ENDDO
           ENDIF
       ENDDO
@@ -294,16 +284,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "param_c.inc"
-#include      "scr05_c.inc"
-#include      "scr14_c.inc"
-#include      "rnur_c.inc"
-#include      "spmd_c.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IPLY,NODID
@@ -373,16 +353,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "param_c.inc"
-#include      "scr05_c.inc"
-#include      "scr14_c.inc"
-#include      "rnur_c.inc"
-#include      "spmd_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

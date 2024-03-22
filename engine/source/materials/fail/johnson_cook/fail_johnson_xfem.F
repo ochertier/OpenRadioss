@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  FAIL_JOHNSON_XFEM             source/materials/fail/johnson_cook/fail_johnson_xfem.F
 Chd|-- called by -----------
@@ -99,7 +99,7 @@ C-----------------------------------------------
       INTEGER I,J,K,L,JJ,ISHELL,NINDX,NINDXP,IADR,LAYXFEM
       INTEGER INDX(NEL),INDXP(NEL),RFLAG(NEL),RFLAGP(NEL)
       my_real D1,D2,D3,D4,D5,EPSP0,P,EPSF,SVM,THK_TMP,
-     .    DADV,CC,BB,CR,ORM,SS1,SS2
+     .    DADV,CC,BB,CR,ORM,SS1,SS2,EPSF_MIN
       CHARACTER (LEN=3) :: XCHAR
 C=======================================================================
       IADR = (IPT-1)*NEL
@@ -112,10 +112,8 @@ c
       D5      = UPARAM(5)
       EPSP0   = UPARAM(6)
       DADV    = UPARAM(10)
+      EPSF_MIN = UPARAM(12)
       ISHELL  = INT(UPARAM(7))
-      LAYXFEM = INT(UPARAM(11))
-c-----------------------------
-      IF (LAYXFEM == 0) RETURN
 c-----------------------------
       LAYXFEM = IXFEM
       IF (LAYXFEM == 1 .and. ISHELL == 1) ISHELL=2
@@ -162,7 +160,8 @@ C---------------
                 EPSF = D3*P/MAX(EM20,SVM)                                       
                 EPSF = (D1 + D2*EXP(EPSF))*(ONE                                       
      .                     + D4*LOG(MAX(ONE,EPSP(I)/EPSP0)))                   
-     .                     * (ONE + D5*TSTAR(I))                                
+     .                     * (ONE + D5*TSTAR(I))     
+                EPSF = MAX(EPSF,EPSF_MIN)  
                 IF (EPSF > ZERO) DFMAX(I) = DFMAX(I) + DPLA(I)/EPSF              
 c                                                                               
                 IF (IXEL == 0) THEN                                             
@@ -271,7 +270,8 @@ c
                 EPSF = D3*P/MAX(EM20,SVM)                            
                 EPSF = (D1 + D2*EXP(EPSF))*(ONE                       
      .                     + D4*LOG(MAX(ONE,EPSP(I)/EPSP0)))       
-     .                     * (ONE + D5*TSTAR(I))                    
+     .                     * (ONE + D5*TSTAR(I))     
+                EPSF = MAX(EPSF,EPSF_MIN)
                 IF (EPSF > ZERO) DFMAX(I) = DFMAX(I) + DPLA(I)/EPSF  
 c
                 IF (IXEL == 0) THEN                                  
@@ -332,7 +332,8 @@ c
                   EPSF = D3*P/MAX(EM20,SVM)                                       
                   EPSF = (D1 + D2*EXP(EPSF))*(ONE                                       
      .                       + D4*LOG(MAX(ONE,EPSP(I)/EPSP0)))                   
-     .                       * (ONE + D5*TSTAR(I))                                
+     .                       * (ONE + D5*TSTAR(I))    
+                  EPSF = MAX(EPSF,EPSF_MIN)          
                   IF (EPSF > ZERO) DFMAX(I) = DFMAX(I) + DPLA(I)/EPSF
 c                                                                                 
                   IF (IXEL == 0) THEN                                             

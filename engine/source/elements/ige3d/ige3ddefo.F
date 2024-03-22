@@ -1,34 +1,38 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  IGE3DDEFO                     source/elements/ige3d/ige3ddefo.F
 Chd|-- called by -----------
 Chd|        IG3DUFORC3                    source/elements/ige3d/ig3duforc3.F
 Chd|-- calls ---------------
 Chd|====================================================================
-      SUBROUTINE IGE3DDEFO(VX,VY,VZ,MATB,NCTRL,
-     .                     WXX,WYY,WZZ,DXX,DYY,DZZ,DXY,DYX,
-     .                     DYZ,DZY,DXZ,DZX,D4,D5,D6,BA,A)
+      SUBROUTINE IGE3DDEFO(
+     1   VX,      VY,      VZ,      MATB,
+     2   NCTRL,   WXX,     WYY,     WZZ,
+     3   DXX,     DYY,     DZZ,     DXY,
+     4   DYX,     DYZ,     DZY,     DXZ,
+     5   DZX,     D4,      D5,      D6,
+     6   BA,      A,       NEL)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -40,16 +44,12 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "vect01_c.inc"
-#include      "com01_c.inc"
 #include      "com08_c.inc"
-#include      "impl1_c.inc"
-#include      "scr18_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: NEL
       INTEGER NCTRL
-C     REAL
       my_real
      .   DXX(*), DXY(*), DXZ(*),
      .   DYX(*), DYY(*), DYZ(*),
@@ -60,18 +60,13 @@ C     REAL
      .   VX(NCTRL,MVSIZ),VY(NCTRL,MVSIZ),VZ(NCTRL,MVSIZ),
      .   BA(6,MVSIZ), A(3*NCTRL,MVSIZ),MATB(3*NCTRL,MVSIZ)
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER  I, J, INCTRL
-C     REAL
-      my_real
-     .   DT1D2, DT1D, AAA
+      my_real DT1D2, DT1D, AAA
 C=======================================================================
 
-      DO I=LFT,LLT
+      DO I=1,NEL
         DXX(I)=ZERO
         DYY(I)=ZERO
         DZZ(I)=ZERO
@@ -94,7 +89,7 @@ C         [dNj/dy  dNl/dy  ..  ] |  T
 C         [dNj/dz  dNl/dz  ..  ] |  R
 C         [  ..      ..    ..  ] /  L
 
-      DO I=LFT,LLT
+      DO I=1,NEL
         DO J=1,NCTRL 
           INCTRL = (J-1)*3
           DXX(I)=DXX(I)+MATB(INCTRL+1,I)*VX(J,I) 
@@ -111,7 +106,7 @@ C         [  ..      ..    ..  ] /  L
 
           DT1D2=HALF*DT1 
 
-      DO I=LFT,LLT
+      DO I=1,NEL
           DXX(I)  = DXX(I)
      .             -DT1D2*(DXX(I)*DXX(I)+DYX(I)*DYX(I)+DZX(I)*DZX(I))
           DYY(I)  = DYY(I)

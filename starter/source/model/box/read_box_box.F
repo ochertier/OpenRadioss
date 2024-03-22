@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  READ_BOX_BOX                  source/model/box/read_box_box.F
 Chd|-- called by -----------
@@ -39,6 +39,7 @@ Chd|====================================================================
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE MY_ALLOC_MOD
       USE SUBMODEL_MOD
       USE MESSAGE_MOD
       USE OPTIONDEF_MOD
@@ -50,14 +51,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
 #include      "scr17_c.inc"
 #include      "com04_c.inc"
-#include      "submod_c.inc"
-#include      "units_c.inc"
-#include      "sysunit.inc"
-#include      "warn_c.inc"
-#include      "my_allocate.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -115,7 +110,7 @@ c
 c
         IAD = IAD + 1
         IBOX(IAD)%NBOXBOX = NLIST
-        MY_ALLOCATE(IBOX(IAD)%IBOXBOX  ,NLIST)
+        CALL MY_ALLOC(IBOX(IAD)%IBOXBOX  ,NLIST)
 c
         II = 0
         IF (NBOX_POS > 0) THEN
@@ -156,6 +151,9 @@ c
         IBOX(IAD)%X2      = ZERO
         IBOX(IAD)%Y2      = ZERO
         IBOX(IAD)%Z2      = ZERO
+        IBOX(IAD)%SURFIAD = 0
+        IBOX(IAD)%NENTITY = 0
+        IBOX(IAD)%BOXIAD  = 0
 c
       ENDDO
 c-----------

@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  I7KEG3                        source/interfaces/int07/i7keg3.F
 Chd|-- called by -----------
@@ -59,7 +59,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr05_c.inc"
 Ctmp+1
-#include      "units_c.inc" 
 #include      "com01_c.inc"
 #include      "impl1_c.inc"
 C-----------------------------------------------
@@ -106,8 +105,7 @@ C-----------------------------------------------
      .   A0X,A0Y,A0Z,RX,RY,RZ,
      .   ANX,ANY,ANZ,AAN,AAX,AAY,AAZ ,RR,RS,AAA ,TM,TS
 C-----------------------------------------------
-Celdev021
-#include "sync_dir.inc"
+C  dev021
       IF (IRESP==1) THEN
            PREC = FIVEEM4
       ELSE
@@ -525,19 +523,19 @@ C
         JLTF = 0
         DO I=1,JLT
          IF(NSVG(I)<0) THEN
-	  NN=-NSVG(I)
+            NN=-NSVG(I)
           JLTF = JLTF + 1
-	  NE=SHF_INT(NIN) + JLTF +LREM
-	  NS=IND_INT(NIN)%P(NN)
-	  STIFS(NE)=STIF(I)
-	  H_E(1,NE)=H1(I)
-	  H_E(2,NE)=H2(I)
-	  H_E(3,NE)=H3(I)
-	  H_E(4,NE)=H4(I)
-	  N_E(1,NE)=N1(I)
-	  N_E(2,NE)=N2(I)
-	  N_E(3,NE)=N3(I)
-	 ENDIF
+            NE=SHF_INT(NIN) + JLTF +LREM
+            NS=IND_INT(NIN)%P(NN)
+            STIFS(NE)=STIF(I)
+            H_E(1,NE)=H1(I)
+            H_E(2,NE)=H2(I)
+            H_E(3,NE)=H3(I)
+            H_E(4,NE)=H4(I)
+            N_E(1,NE)=N1(I)
+            N_E(2,NE)=N2(I)
+            N_E(3,NE)=N3(I)
+           ENDIF
         ENDDO
        ENDIF 
 C
@@ -568,9 +566,6 @@ C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -744,12 +739,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "com08_c.inc"
 #include      "scr05_c.inc"
-#include      "units_c.inc"
-#include      "param_c.inc"
 #include      "impl1_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -796,7 +787,6 @@ C-----------------------------------------------
      .   ANX,ANY,ANZ,AAN,AAX,AAY,AAZ ,RR,RS,AAA ,GAP2 ,PENE2,PREC 
       INTEGER NA1,NA2
 C-----------------------------------------------
-#include "sync_dir.inc"
       IF (IRESP==1) THEN
            PREC = FIVEEM4
       ELSE
@@ -1189,7 +1179,7 @@ C---        Loi Renard
             ENDIF
           ENDDO
         ENDIF
-C	
+C
 C---------------------------------
 C       INCREMENTAL (STIFFNESS) FORMULATION
 C---------------------------------
@@ -1286,13 +1276,13 @@ C--------secnd part-------
            A(1,IG)=A(1,IG)-FXI(I)
            A(2,IG)=A(2,IG)-FYI(I)
            A(3,IG)=A(3,IG)-FZI(I)
-	  ELSE
-	   NN=-IG
-	   NS=IND_INT(NIN)%P(NN)
+            ELSE
+             NN=-IG
+             NS=IND_INT(NIN)%P(NN)
 C---------
-	   FFI(1,NS)=FFI(1,NS)-FXI(I)
-	   FFI(2,NS)=FFI(2,NS)-FYI(I)
-	   FFI(3,NS)=FFI(3,NS)-FZI(I)
+             FFI(1,NS)=FFI(1,NS)-FXI(I)
+             FFI(2,NS)=FFI(2,NS)-FYI(I)
+             FFI(3,NS)=FFI(3,NS)-FZI(I)
           ENDIF
         ENDDO
        END IF

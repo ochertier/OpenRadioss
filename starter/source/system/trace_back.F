@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 #define NIVEAU_MAX 50
 Chd|====================================================================
 Chd|  TRACE_IN1                     source/system/trace_back.F    
@@ -77,7 +77,6 @@ C-----------------------------------------------
         CALL MY_EXIT(3)
       END IF
 C-----------------------------------------------
-C-----------------------------------------------
       CALL TRACE_PRINT(LINE1,NIVEAU_PILE,0)
 C-----------------------------------------------
       RETURN
@@ -101,9 +100,7 @@ C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
 #include      "warn_c.inc"
-#include      "scr17_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -228,27 +225,6 @@ C-----------------------------------------------
      .'CLOSING STARTER',
      .'    ',
      .'    '/
-c      1234567890123456789012345678901234567890
-c      1234567890123456789012345678901234567890
-c      1234567890123456789012345678901234567890
-c      1234567890123456789012345678901234567890
-c      1234567890123456789012345678901234567890
-c      1234567890123456789012345678901234567890
-c      1234567890123456789012345678901234567890
-c      12345678901234567890 12345678901234567890
-c      1234567890123456789012345678901234567890
-c      1234567890123456789012345678901234567890
-c      1234567890123456789012345678901234567890
-c      1234567890123456789012345678901234567890
-c      1234567890123456789012345678901234567890
-c      1234567890123456789012345678901234567890
-c      1234567890123456789012345678901234567890
-c      1234567890123456789012345678901234567890
-c      1234567890123456789012345678901234567890
-c      1234567890123456789012345678901234567890
-c      1234567890123456789012345678901234567890
-c      1234567890123456789012345678901234567890
-c      1234567890123456789012345678901234567890
       DATA LL /
      .     15,12, 6, 5,
      .  10, 9,12,12,10,
@@ -379,10 +355,6 @@ C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "warn_c.inc"
 #include      "units_c.inc"
-#include      "scr17_c.inc"
-C-----------------------------------------------
-C   D u m m y   A r g u m e n t s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -422,22 +394,15 @@ Chd|        TRACE_OUT1                    source/system/trace_back.F
 Chd|        TRACE_PRINT                   source/system/trace_back.F    
 Chd|-- calls ---------------
 Chd|====================================================================
-      INTEGER FUNCTION TRACE_PILE(INOUT)
+      INTEGER FUNCTION TRACE_PILE(VAL)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "units_c.inc"
-#include      "scr01_c.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER INOUT
+      INTEGER VAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -445,7 +410,7 @@ C-----------------------------------------------
       DATA NIVEAU_PILE/0/
       SAVE NIVEAU_PILE
 C-----------------------------------------------
-      NIVEAU_PILE = NIVEAU_PILE + INOUT
+      NIVEAU_PILE = NIVEAU_PILE + VAL
       TRACE_PILE = NIVEAU_PILE
 C-----------------------------------------------
       RETURN
@@ -461,7 +426,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "scr17_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -498,15 +462,12 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "scr01_c.inc"
-#include      "scr17_c.inc"
 C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "units_c.inc"
-#include      "warn_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -518,17 +479,16 @@ C-----------------------------------------------
       INTEGER TRACE_PILE
       EXTERNAL TRACE_PILE
       INTEGER NIVEAU_PILE
-      INTEGER CHECK_PILE(0:NIVEAU_MAX)
+      INTEGER CHECK_PILE(0:NIVEAU_MAX) 
       CHARACTER*ncharline BLANC
       CHARACTER*ncharline TEXT(0:NIVEAU_MAX)
       INTEGER I,IP,IL,NLIGNES,IT
+      DATA CHECK_PILE/0,NIVEAU_MAX*0/
       SAVE TEXT,CHECK_PILE
-C-----------------------------------------------
 C-----------------------------------------------
       DO I=1,ncharline
         BLANC(I:I)=' '
       END DO
-c            123456789012345678901234567890
       NIVEAU_PILE = TRACE_PILE(0)
 C
       IF(IW==0) THEN

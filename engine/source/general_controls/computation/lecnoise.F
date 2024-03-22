@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  LECNOISE                      source/general_controls/computation/lecnoise.F
 Chd|-- called by -----------
@@ -27,25 +27,26 @@ Chd|        LECTUR                        source/input/lectur.F
 Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
 Chd|        ARRET                         source/system/arret.F         
-Chd|        CUR_FIL_C                     source/output/tools/sortie_c.c
-Chd|        EOR_C                         source/output/tools/sortie_c.c
+Chd|        CUR_FIL_C                     ../common_source/tools/input_output/write_routtines.c
+Chd|        EOR_C                         ../common_source/tools/input_output/write_routtines.c
 Chd|        MY_CTIME                      source/system/timer_c.c       
-Chd|        OPEN_C                        source/output/tools/sortie_c.c
+Chd|        OPEN_C                        ../common_source/tools/input_output/write_routtines.c
 Chd|        SPMD_GLOB_ISUM9               source/mpi/interfaces/spmd_th.F
-Chd|        WRITE_C_C                     source/output/tools/sortie_c.c
-Chd|        WRITE_I_C                     source/output/tools/sortie_c.c
+Chd|        WRITE_C_C                     ../common_source/tools/input_output/write_routtines.c
+Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|        WRTDES                        source/output/th/wrtdes.F     
 Chd|        STRI                          source/tools/univ/stri.F      
 Chd|        SYSFUS2                       source/system/sysfus.F        
 Chd|        INOUTFILE_MOD                 ../common_source/modules/inoutfile_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
-      SUBROUTINE LECNOISE(INOISE,ITABM1)
+      SUBROUTINE LECNOISE(INOISE,ITABM1,NAMES_AND_TITLES)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
       USE INOUTFILE_MOD
+      USE NAMES_AND_TITLES_MOD,only:NAMES_AND_TITLES_,LTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -55,7 +56,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com05_c.inc"
 #include      "units_c.inc"
 #include      "scrnoi_c.inc"
 #include      "chara_c.inc"
@@ -68,6 +68,7 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER INOISE(*), ITABM1(*)
+      TYPE(NAMES_AND_TITLES_),INTENT(INOUT) :: NAMES_AND_TITLES !< NAMES_AND_TITLES host the input deck names and titles for outputs
 C     REAL
 C      my_real
 C-----------------------------------------------
@@ -79,7 +80,8 @@ C-----------------------------------------------
 C     REAL
       my_real
      . TITLE(20),TIT40(10)
-       CHARACTER FILNAM*100, CH8*8 , EOR*8, CARD*80, CH40*40, CH80*80
+       CHARACTER FILNAM*100, CH8*8 , EOR*8, CH40*40, CH80*80
+       CHARACTER(LEN=LTITLE) :: CARD
        INTEGER :: LEN_TMP_NAME
        CHARACTER(len=2148) :: TMP_NAME 
 C-----------------------------------------------
@@ -216,10 +218,10 @@ C
 C
 C TITRE
 C
-      WRITE(CARD,'(20A4)')TEXT
-      READ(CARD,'(20A4)')TITLE
+      CARD(1:LTITLE)=NAMES_AND_TITLES%TITLE(1:LTITLE)
+
       IF(ITFORM==0)THEN
-        WRITE(IUNIT)ICODE,TITLE
+        ! ITFORM is no more used
       ELSEIF(ITFORM==1)THEN
         CH8=STRI(ICODE)
        WRITE(IUNIT,'(A)')FILNAM(1:NOILEN+11)
@@ -284,11 +286,11 @@ C-------PART DESCRIPTION------------
        ITIT40(I)=ICHAR(CH40(I:I))
       ENDDO
       IF(ITFORM==0)THEN
-	WRITE(IUNIT)1,TIT40,0,1,1,0
+          WRITE(IUNIT)1,TIT40,0,1,1,0
       ELSEIF(ITFORM==1)THEN
       ELSEIF(ITFORM==2)THEN
-	WRITE(IUNIT,'(A,I5,A,I5,A,I5,A)')EOR,1,'I',40,'C',4,'I'
-	WRITE(IUNIT,'(I5,A,4I5)')1,CH40,0,1,1,0
+          WRITE(IUNIT,'(A,I5,A,I5,A,I5,A)')EOR,1,'I',40,'C',4,'I'
+          WRITE(IUNIT,'(I5,A,4I5)')1,CH40,0,1,1,0
       ELSEIF(ITFORM==3)THEN
        CALL EOR_C(60)
        CALL WRITE_I_C(1,1)
@@ -385,11 +387,11 @@ C-------NODE GROUPS------------
       ENDDO
 C
       IF(ITFORM==0)THEN
-    	WRITE(IUNIT)1,0,0,NNOISE,NCNOIS,TIT40
+          WRITE(IUNIT)1,0,0,NNOISE,NCNOIS,TIT40
       ELSEIF(ITFORM==1)THEN
       ELSEIF(ITFORM==2)THEN
-    	WRITE(IUNIT,'(A,I5,A,I5,A)')EOR,5,'I',40,'C'
-    	WRITE(IUNIT,'(5I5,A)')1,0,0,NNOISE,NCNOIS,CH40
+          WRITE(IUNIT,'(A,I5,A,I5,A)')EOR,5,'I',40,'C'
+          WRITE(IUNIT,'(5I5,A)')1,0,0,NNOISE,NCNOIS,CH40
       ELSEIF(ITFORM==3)THEN
        CALL EOR_C(60)
        CALL WRITE_I_C(1,1)

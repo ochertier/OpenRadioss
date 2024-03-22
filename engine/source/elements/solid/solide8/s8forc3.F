@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  S8FORC3                       source/elements/solid/solide8/s8forc3.F
 Chd|-- called by -----------
@@ -34,32 +34,31 @@ Chd|        S8DERI3                       source/elements/solid/solide8/s8deri3.
 Chd|        S8FINT3                       source/elements/solid/solide8/s8fint3.F
 Chd|        S8LAGR3                       source/elements/solid/solide8/s8lagr3.F
 Chd|        S8ROTA3                       source/elements/solid/solide8/s8rota3.F
-Chd|        SCUMU3P                       source/elements/solid/solide/scumu3.F
-Chd|        SMALLB3                       source/elements/solid/solide/small3.F
+Chd|        SCUMU3P                       source/elements/solid/solide/scumu3p.F
+Chd|        SMALLB3                       source/elements/solid/solide/smallb3.F
 Chd|        SR8BILAN                      source/elements/solid/solide8/sr8bilan.F
 Chd|        SR8COOR3                      source/elements/solid/solide8/sr8coor3.F
 Chd|        SRROTA3                       source/elements/solid/solide/srrota3.F
 Chd|        STARTIME                      source/system/timer.F         
 Chd|        STOPTIME                      source/system/timer.F         
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
+Chd|        MAT_ELEM_MOD                  ../common_source/modules/mat_elem/mat_elem_mod.F
 Chd|        TABLE_MOD                     share/modules/table_mod.F     
 Chd|====================================================================
       SUBROUTINE S8FORC3(
      1                   ELBUF_STR,PM       ,GEO    ,IXS      ,X      ,
      2                   A        ,V        ,MS     , 
      3                   VEUL     ,FV       ,ALE_CONNECT  ,IPARG    ,
-     4                   TF       ,NPF      ,BUFMAT ,PARTSAV  ,
-     5                   STIFN ,FSKY ,IADS  ,OFFSET ,IPARTS ,
-     6                   NEL      ,DT2T     ,NELTST ,ITYPTST,IPM      ,
-     7                   ITASK    ,GRESAV   ,GRTH   ,IGRTH  ,MSSA     ,
-     8                   DMELS    ,TABLE    ,
-     9                   IOUTPRT  ,NG       )
+     4                   TF       ,NPF      ,BUFMAT ,PARTSAV ,
+     5                   STIFN ,FSKY ,IADS  ,OFFSET ,IPARTS  ,
+     6                   NEL      ,DT2T     ,NELTST ,ITYPTST ,IPM      ,
+     7                   ITASK    ,GRESAV   ,GRTH   ,IGRTH   ,MSSA     ,
+     8                   DMELS    ,TABLE    ,IOUTPRT,MAT_ELEM,NG       )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE TABLE_MOD
-      USE ELBUFDEF_MOD         
+      USE MAT_ELEM_MOD         
       USE ALE_CONNECTIVITY_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -73,17 +72,9 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com06_c.inc"
-#include      "com08_c.inc"
-#include      "scr07_c.inc"
 #include      "vect01_c.inc"
-#include      "scr01_c.inc"
-#include      "scr03_c.inc"
-#include      "scr06_c.inc"
 #include      "parit_c.inc"
-#include      "vecfx_c.inc"
 #include      "timeri_c.inc"
-#include      "warn_c.inc"
 #include      "param_c.inc" 
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -97,6 +88,7 @@ C     REAL
      .   VEUL(*), FV(*),TF(*), BUFMAT(*),
      .   PARTSAV(*),STIFN(*),FSKY(*), DT2T,GRESAV(*), MSSA(*), DMELS(*)
       TYPE (ELBUF_STRUCT_), TARGET :: ELBUF_STR
+      TYPE (MAT_ELEM_) ,TARGET ,INTENT(INOUT) :: MAT_ELEM
       TYPE(TTABLE) TABLE(*)
       TYPE(t_ale_connectivity), INTENT(IN) :: ALE_CONNECT
 C-----------------------------------------------
@@ -130,6 +122,12 @@ C Variables utilisees en arguments dans les routines solides
      .   R21(MVSIZ),R22(MVSIZ),R23(MVSIZ),
      .   R31(MVSIZ),R32(MVSIZ),R33(MVSIZ)
       my_real :: SSP(MVSIZ)
+      my_real :: F11(MVSIZ),F12(MVSIZ),F13(MVSIZ),F14(MVSIZ),
+     .   F15(MVSIZ), F16(MVSIZ), F17(MVSIZ), F18(MVSIZ), F21(MVSIZ),
+     .   F22(MVSIZ), F23(MVSIZ), F24(MVSIZ), F25(MVSIZ), F26(MVSIZ),
+     .   F27(MVSIZ), F28(MVSIZ), F31(MVSIZ), F32(MVSIZ), F33(MVSIZ),
+     .   F34(MVSIZ), F35(MVSIZ), F36(MVSIZ), F37(MVSIZ), F38(MVSIZ)
+
 C
 
       my_real, 
@@ -146,9 +144,11 @@ C-----------------------------------------------
 C GATHERING VECTEURS LOCAUX
 C-----------------------------------------------
       IF (JCVT==0) THEN
-       CALL S8COOR3(GBUF%OFF,OFF,X,V,IXS(LCO),
-     .             XLOC,YLOC,ZLOC,VXLOC,VYLOC,VZLOC,
-     .             MXT,NC,NGL,PID)
+       CALL S8COOR3(
+     1   GBUF%OFF,OFF,     X,       V,
+     2   IXS(LCO),XLOC,    YLOC,    ZLOC,
+     3   VXLOC,   VYLOC,   VZLOC,   MXT,
+     4   NC,      NGL,     PID,     NEL)
       ELSE
        CALL SR8COOR3(GBUF%OFF,OFF,X,V,IXS(LCO),
      .             XLOC,YLOC,ZLOC,VXLOC,VYLOC,VZLOC,
@@ -162,39 +162,53 @@ C-----------------------------------------------
 C FONCTIONS DE FORME, DEFORMATION, ET OBJECTIVITE 
 C PXJ(K,I) FONCTION J DU PT INTEGRATION K ELEMENT I
 C-----------------------------------------------
-      CALL S8DERI3(XLOC,YLOC,ZLOC,
-     .             PX1,PX2,PX3,PX4,PX5,PX6,PX7,PX8,
-     .             PY1,PY2,PY3,PY4,PY5,PY6,PY7,PY8,
-     .             PZ1,PZ2,PZ3,PZ4,PZ5,PZ6,PZ7,PZ8,
-     .             VOLGP,VOLN,DELTAX,NGL,OFF)
-      CALL S8LAGR3(PM,GBUF%VOL,GBUF%RHO,GBUF%EINT,
-     .            MXT,VOLN,RHO0,DVOL,VD2)
+      CALL S8DERI3(
+     1   XLOC,    YLOC,    ZLOC,    PX1,
+     2   PX2,     PX3,     PX4,     PX5,
+     3   PX6,     PX7,     PX8,     PY1,
+     4   PY2,     PY3,     PY4,     PY5,
+     5   PY6,     PY7,     PY8,     PZ1,
+     6   PZ2,     PZ3,     PZ4,     PZ5,
+     7   PZ6,     PZ7,     PZ8,     VOLGP,
+     8   VOLN,    DELTAX,  NGL,     OFF,
+     9   NEL)
+      CALL S8LAGR3(
+     1   PM,       GBUF%VOL, GBUF%RHO, GBUF%EINT,
+     2   MXT,      VOLN,     RHO0,     DVOL,
+     3   VD2,      NEL)
 C
         DO IPT = 1,NPT
           LBUF => ELBUF_STR%BUFLY(1)%LBUF(1,1,IPT)
-        CALL S8DEFO3(VXLOC,VYLOC,VZLOC,
-     .               PX1,PX2,PX3,PX4,PX5,PX6,PX7,PX8,
-     .               PY1,PY2,PY3,PY4,PY5,PY6,PY7,PY8,
-     .               PZ1,PZ2,PZ3,PZ4,PZ5,PZ6,PZ7,PZ8,
-     .               IPT,D1,D2,D3,D4,D5,D6,
-     .               WXX(1,IPT),WYY(1,IPT),WZZ(1,IPT))
-        CALL S8ROTA3(LBUF%SIG,WXX(1,IPT),WYY(1,IPT),WZZ(1,IPT),NEL)
+        CALL S8DEFO3(
+     1   VXLOC,     VYLOC,     VZLOC,     PX1,
+     2   PX2,       PX3,       PX4,       PX5,
+     3   PX6,       PX7,       PX8,       PY1,
+     4   PY2,       PY3,       PY4,       PY5,
+     5   PY6,       PY7,       PY8,       PZ1,
+     6   PZ2,       PZ3,       PZ4,       PZ5,
+     7   PZ6,       PZ7,       PZ8,       IPT,
+     8   D1,        D2,        D3,        D4,
+     9   D5,        D6,        WXX(1,IPT),WYY(1,IPT),
+     A   WZZ(1,IPT),NEL,       JCVT)
+        CALL S8ROTA3(
+     1   LBUF%SIG,  WXX(1,IPT),WYY(1,IPT),WZZ(1,IPT),
+     2   NEL,       JCVT)
       ENDDO
 C------------------------------------------------------
 C     CALCUL DES CONTRAINTES SUIVANT LOIS CONSTITUTIVES
 C------------------------------------------------------
       IF ((ITASK==0).AND.(IMON_MAT==1)) CALL STARTIME(35,1)
-      CALL MMAIN8(PM   ,GEO   ,ELBUF_STR,
+      CALL MMAIN8(PM   ,GEO   ,ELBUF_STR,MAT_ELEM ,
      2            IXS  ,IPARG ,V        ,TF    ,    
-     3              NPF  ,BUFMAT,STI    ,X     ,D1    ,
-     4              D2   ,D3    ,D4     ,D5    ,D6    ,
-     5              VOLGP,DELTAX,VOLN   ,DVOL  ,VD2   ,
+     3            NPF  ,BUFMAT,STI    ,X     ,D1    ,
+     4            D2   ,D3    ,D4     ,D5    ,D6    ,
+     5            VOLGP,DELTAX,VOLN   ,DVOL  ,VD2   ,
      6            RHO0 ,MXT   ,NC       ,NGL   ,FV    ,           
-     7              NEL  ,WXX   ,WYY    ,WZZ   ,PID   ,
-     8              DT2T ,NELTST,ITYPTST,R11   ,R21   ,  
-     9              R31  ,R12   ,R22    ,R32   ,R13   , 
-     A              R23  ,R33   ,OFF    ,IPM   ,GAMA  ,
-     B              MSSA ,DMELS ,TABLE  ,SSP   ,ITASK )
+     7            NEL  ,WXX   ,WYY    ,WZZ   ,PID   ,
+     8            DT2T ,NELTST,ITYPTST,R11   ,R21   ,  
+     9            R31  ,R12   ,R22    ,R32   ,R13   , 
+     A            R23  ,R33   ,OFF    ,IPM   ,GAMA  ,
+     B            MSSA ,DMELS ,TABLE  ,SSP   ,ITASK )
       IF ((ITASK==0).AND.(IMON_MAT==1)) CALL STOPTIME(35,1)
 C--------------------------
 C     BILANS PAR MATERIAU
@@ -222,41 +236,71 @@ c           IF (MTN==11) NB3S = NB14
 C----------------------------
 C       OFF
 C----------------------------
-        CALL SMALLB3(GBUF%OFF,OFF)
+        CALL SMALLB3(
+     1   GBUF%OFF,OFF,     NEL,     ISMSTR)
 C----------------------------
 C     INTERNAL FORCES
 C----------------------------
         CALL S8FINT3(ELBUF_STR%BUFLY(1) ,VOLGP,GBUF%QVIS,
      .               PX1,PX2,PX3,PX4,PX5,PX6,PX7,PX8,
      .               PY1,PY2,PY3,PY4,PY5,PY6,PY7,PY8,
-     .               PZ1,PZ2,PZ3,PZ4,PZ5,PZ6,PZ7,PZ8,NEL)
+     .               PZ1,PZ2,PZ3,PZ4,PZ5,PZ6,PZ7,PZ8,NEL,
+     .               F11, F12, F13, F14,
+     .               F15, F16, F17, F18, F21,
+     .               F22, F23, F24, F25, F26,
+     .               F27, F28, F31, F32, F33,
+     .               F34, F35, F36, F37, F38)
+
 C----------------------------
 C     CONVECTE --> GLOBAL.
 C----------------------------
       IF (JCVT==1) THEN
        CALL SRROTA3(
-     .   R11, R21, R31, R12, R22, R32, R13, R23, R33,
-     .   F11, F12, F13, F14, F15, F16, F17, F18,
-     .   F21, F22, F23, F24, F25, F26, F27, F28,
-     .   F31, F32, F33, F34, F35, F36, F37, F38)
+     1   R11,     R21,     R31,     R12,
+     2   R22,     R32,     R13,     R23,
+     3   R33,     F11,     F12,     F13,
+     4   F14,     F15,     F16,     F17,
+     5   F18,     F21,     F22,     F23,
+     6   F24,     F25,     F26,     F27,
+     7   F28,     F31,     F32,     F33,
+     8   F34,     F35,     F36,     F37,
+     9   F38,     NEL)
       ENDIF
 C-------------------------
 C     ASSEMBLE
 C-------------------------
       IF(IPARIT==0)THEN
-          CALL S8CUMU3(GBUF%OFF,A,NC,STIFN,STI,
-     .   F11,F21,F31,F12,F22,F32,F13,F23,F33,F14,F24,F34,
-     .   F15,F25,F35,F16,F26,F36,F17,F27,F37,F18,F28,F38)
+          CALL S8CUMU3(
+     1   GBUF%OFF,A,       NC,      STIFN,
+     2   STI,     F11,     F21,     F31,
+     3   F12,     F22,     F32,     F13,
+     4   F23,     F33,     F14,     F24,
+     5   F34,     F15,     F25,     F35,
+     6   F16,     F26,     F36,     F17,
+     7   F27,     F37,     F18,     F28,
+     8   F38,     NEL)
       ELSE
           FBI = ZERO
-          CALL SCUMU3P(GBUF%OFF,STI,FSKY,FSKY,IADS,
-     2   F11,F21,F31,F12,F22,F32,F13,F23,F33,F14,F24,F34,
-     3   F15,F25,F35,F16,F26,F36,F17,F27,F37,F18,F28,F38,
-     4   IBI,IBI,IBI,IBI,IBI,IBI,IBI,IBI,
-     5   FBI,FBI,FBI,
-     6   FBI,FBI,FBI,FBI,FBI,FBI,FBI,FBI,FBI,FBI,FBI,FBI,
-     7   FBI,FBI,FBI,FBI,FBI,FBI,FBI,FBI,FBI,FBI,FBI,FBI,
-     8   FBI, FBI,FBI,FBI)
+          CALL SCUMU3P(
+     1   GBUF%OFF,STI,     FSKY,    FSKY,
+     2   IADS,    F11,     F21,     F31,
+     3   F12,     F22,     F32,     F13,
+     4   F23,     F33,     F14,     F24,
+     5   F34,     F15,     F25,     F35,
+     6   F16,     F26,     F36,     F17,
+     7   F27,     F37,     F18,     F28,
+     8   F38,     IBI,     IBI,     IBI,
+     9   IBI,     IBI,     IBI,     IBI,
+     A   IBI,     FBI,     FBI,     FBI,
+     B   FBI,     FBI,     FBI,     FBI,
+     C   FBI,     FBI,     FBI,     FBI,
+     D   FBI,     FBI,     FBI,     FBI,
+     E   FBI,     FBI,     FBI,     FBI,
+     F   FBI,     FBI,     FBI,     FBI,
+     G   FBI,     FBI,     FBI,     FBI,
+     H   FBI,     FBI,     FBI,     FBI,
+     I   NEL,     NFT,     JTHE,    ISROT,
+     J   IPARTSPH)
       ENDIF
 C
 C-----------

@@ -1,32 +1,32 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  I9GRD2                        source/interfaces/int09/i9grd2.F
 Chd|-- called by -----------
 Chd|        I9WAL2                        source/interfaces/int09/i9wal2.F
 Chd|-- calls ---------------
 Chd|        INITBUF                       share/resol/initbuf.F         
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        INITBUF_MOD                   share/resol/initbuf.F         
 Chd|====================================================================
       SUBROUTINE I9GRD2(IERR  ,AREA  ,TSTIF    ,T      ,VOL     ,
@@ -44,11 +44,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "vect01_c.inc"
-#include      "scr01_c.inc"
 #include      "com01_c.inc"
-#include      "com06_c.inc"
-#include      "com08_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -64,13 +60,17 @@ C-----------------------------------------------
       INTEGER I, N1, N2, N3, N4, IE, NG,MAT, IFA
       my_real
      .  Y1, Y2, Z1, Z2,NY, NZ, DY, DZ,NORM,COND
+      INTEGER :: LLT ,NFT ,MTN ,IAD ,ITY ,NPT ,JALE ,ISMSTR ,JEUL ,JTUR ,JTHE ,JLAG ,JMULT ,JHBE
+      INTEGER :: JIVF, NVAUX, JPOR, JCVT, JCLOSE, JPLASOL, IREP, IINT, IGTYP
+      INTEGER :: ISORTH, ISORTHG, ISRAT, ISROT, ICSEN, IFAILURE, JSMS
+
 C-----------------------------------------------
       IERR = 0
 C---------------------------------
 C         RECHERCHE DE L'ELEMENT DANS LE BUFFER
 C---------------------------------
           DO 200 NG=1,NGROUP
-            CALL INITBUF (IPARG    ,NG      ,                  
+            CALL INITBUF(IPARG    ,NG      ,                  
      2            MTN     ,LLT     ,NFT     ,IAD     ,ITY     ,
      3            NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,
      4            JTHE    ,JLAG    ,JMULT   ,JHBE    ,JIVF    ,

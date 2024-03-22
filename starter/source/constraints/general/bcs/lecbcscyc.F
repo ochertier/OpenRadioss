@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  HM_PREREAD_BCSCYC             source/constraints/general/bcs/lecbcscyc.F
 Chd|-- called by -----------
@@ -52,13 +52,7 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr17_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "units_c.inc"
-#include      "scr03_c.inc"
-#include      "submod_c.inc"
-#include      "titr_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -148,13 +142,9 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "units_c.inc"
 #include      "com04_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -274,13 +264,9 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -316,7 +302,7 @@ C------sorting by dis
         J = INDEX(I)
         N1(I) = IXCYCL(1,J)
         CY_X1(1:3,I)=CY_TMP(1:3,J)
-      ENDDO 
+      ENDDO
       LMIN = EP20     
       DO I=2,NBCY_N
         RI = ABS(CY_X1(1,I)-CY_X1(1,I-1))
@@ -354,7 +340,6 @@ C------sorting by dis
          J = I
         END IF
       ENDDO
-c      print *,'ERMAX , n1,n2 =',ERMAX ,ITAB(N1(J)),ITAB(N2(J))
       IF (ERMAX>TOL ) THEN 
           CALL ANCMSG(MSGID=1763,ANMODE=ANINFO,MSGTYPE=MSGERROR,
      .                I1=ID,I2=ITAB(N1(J)),I3=ITAB(N2(J)))
@@ -378,13 +363,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "units_c.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NBCY_N,IX(*),IER
@@ -396,10 +374,11 @@ C-----------------------------------------------
       INTEGER I, J 
 C
       my_real
-     .     XX,YY,ZZ,XL,YL,ZL,R2,TH_MEAN,TH_MAX
+     .     XX,YY,ZZ,XL,YL,ZL,R2,TH_MEAN,TH_MAX,ZL_MIN
 C========================================================================|
 C----- compute cylindrical co-ordinates(r,cos(theta),z) and dis=r*r+z*z
       TH_MEAN =ZERO
+      ZL_MIN = EP20
       DO I=1,NBCY_N
         XX = X(1,IX(I))-XYZ0(1)
         YY = X(2,IX(I))-XYZ0(2)
@@ -411,8 +390,13 @@ C----- compute cylindrical co-ordinates(r,cos(theta),z) and dis=r*r+z*z
         CY_X(1,I) = SQRT(R2)
         CY_X(2,I) = XL/CY_X(1,I)
         CY_X(3,I) = ZL
-        DIS(I) = ZL*ZL+R2
+        DIS(I) = R2
         TH_MEAN = TH_MEAN + CY_X(2,I)
+        ZL_MIN = MIN(ZL_MIN,ZL)
+      ENDDO
+      DO I=1,NBCY_N
+        CY_X(3,I) = CY_X(3,I)-ZL_MIN
+        DIS(I) = DIS(I) + CY_X(3,I)*CY_X(3,I)
       ENDDO
       TH_MEAN =TH_MEAN/NBCY_N
       IER = 0
@@ -449,12 +433,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
 #include      "param_c.inc"
-#include      "scr17_c.inc"
 #include      "com04_c.inc"
-#include      "warn_c.inc"
-#include      "scr03_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

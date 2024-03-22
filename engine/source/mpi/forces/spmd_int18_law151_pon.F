@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 
 Chd|====================================================================
 Chd|  SPMD_INT18_LAW151_PON         source/mpi/forces/spmd_int18_law151_pon.F
@@ -30,7 +30,7 @@ Chd|        ANCMSG                        source/output/message/message.F
 Chd|        ARRET                         source/system/arret.F         
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
         SUBROUTINE SPMD_INT18_LAW151_PON(     
@@ -65,7 +65,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -75,19 +74,10 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "i25edge_c.inc"
-#include      "scr05_c.inc"
-#include      "scr17_c.inc"
-#include      "scr18_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
 #include      "task_c.inc"
-#include      "parit_c.inc"
-#include      "timeri_c.inc"
-#include      "warn_c.inc"
-#include      "spmd_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -163,7 +153,7 @@ C
                 ADDR(P) = ADD
                 SIZ = 0
                 IF(P/=LOC_PROC)THEN
-Cel test en plus pour savoir si com globale necessaire entre les 2 procs
+C   test en plus pour savoir si com globale necessaire entre les 2 procs
                     DO II=1,MULTI_FVM%NUMBER_INT18
                         NIN = MULTI_FVM%INT18_LIST(II)
                         NB = NSNSI(NIN)%P(P)
@@ -206,12 +196,17 @@ C
                                 IF(NSVFI(NIN)%P(IDEB+N)<0)THEN
                                     L = L + 1
                                     BBUFS(L) = -NSVFI(NIN)%P(IDEB+N)
+                                    NSVFI(NIN)%P(IDEB+N) = -NSVFI(NIN)%P(IDEB+N)
                                     DO IJ=1,6
                                        BBUFS(L+IJ)  = MULTI_FVM%R_AFI(NIN)%R_FORCE_INT(1,IJ,IDEB+N)
                                        BBUFS(L+6+IJ)  = MULTI_FVM%R_AFI(NIN)%R_FORCE_INT(2,IJ,IDEB+N)
                                        BBUFS(L+12+IJ) = MULTI_FVM%R_AFI(NIN)%R_FORCE_INT(3,IJ,IDEB+N)
                                     ENDDO
-                                    MULTI_FVM%R_AFI(NIN)%R_FORCE_INT(1:3,1:6,IDEB+N) = 0.d+00   
+                                    DO IJ = 1,6
+                                      MULTI_FVM%R_AFI(NIN)%R_FORCE_INT(1,IJ,IDEB+N) = 0
+                                      MULTI_FVM%R_AFI(NIN)%R_FORCE_INT(2,IJ,IDEB+N) = 0
+                                      MULTI_FVM%R_AFI(NIN)%R_FORCE_INT(3,IJ,IDEB+N) = 0
+                                    ENDDO
                                     L = L + 18
                                 ENDIF
                             ENDDO

@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  HM_READ_PROP34                source/properties/sph/hm_read_prop34.F
 Chd|-- called by -----------
@@ -51,7 +51,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr05_c.inc"
 #include      "scr17_c.inc"
 #include      "com01_c.inc"
 #include      "param_c.inc"
@@ -108,7 +107,6 @@ C=======================================================================
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "warn_c.inc"
 #include      "com04_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -164,7 +162,7 @@ C
 
       IF(QA==ZERO)QA=TWO
       IF(QB==ZERO)QB=ONE
-      IF (ZSTAB>0) NSPBUF=13
+      IF (ZSTAB>0) NSPBUF=14
 C
       IF(ISK /= 0)THEN
         DO K=1,NUMSKW
@@ -183,12 +181,12 @@ C
         K = 1
       ENDIF
 C------
-      IF(NSPMD > 1 .AND. IORDER==1)THEN
-        CALL ANCMSG(MSGID=755,
-     .              MSGTYPE=MSGERROR,
-     .              ANMODE=ANINFO,
-     .              C1='SPH CORRECTION ORDER 1')
-      END IF
+C      IF(NSPMD > 1 .AND. IORDER==1)THEN
+C        CALL ANCMSG(MSGID=755,
+C     .              MSGTYPE=MSGERROR,
+C     .              ANMODE=ANINFO,
+C     .              C1='SPH CORRECTION ORDER 1')
+C      END IF
 C
       IF (IFLG_H_1D==0) THEN
         RFLG_H_1D = THIRD

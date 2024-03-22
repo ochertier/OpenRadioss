@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  PMASS                         source/elements/beam/pmass.F  
 Chd|-- called by -----------
@@ -71,10 +71,12 @@ C-----------------------------------------------
       my_real
      .   XX,YY,ZZ,XY,YZ,ZX,
      .   STI, E, G, AA, BB, DX,DY,DZ, ARI,INI,RYI,RZI,
-     .   STIR, PHI, SHF, DSH, DMP, SL2I, FAC
+     .   STIR, PHI, SHF, DSH, DMP, SL2I, FAC,LL
       my_real
-     .   RHO(MVSIZ), EMS(MVSIZ),
+     .   RHO(MVSIZ), EMS(MVSIZ),COEFI(MVSIZ),
      .   TIN(MVSIZ), TIXX(MVSIZ), TIYY(MVSIZ), TIZZ(MVSIZ),RHOCP(MVSIZ)
+      my_real
+     .   FACDT(MVSIZ), PHII(MVSIZ),KPHI(MVSIZ),CST,PHMAX,PHMIN,FSH(MVSIZ)
 C=======================================================================
       IPY = 200  
       IPZ = 300  
@@ -110,12 +112,40 @@ C=======================================================================
         ENDIF
       ENDDO
 C----------------------------------------------
+C     for dt
+C----------------------------------------------
+      DO I=LFT,LLT
+        E = PM (20,MXT(I))
+        G = PM (22,MXT(I))
+        CST = SIX_OVER_5*E/G
+        BB  = MAX(TIYY(I),TIZZ(I),EM30)
+        SL2I= AREA(I)*AL(I)**2 /BB
+        FACDT(I) = ONE_OVER_12*SL2I
+        PHMAX = CST/FACDT(I)        
+        PHMIN = MIN(TIYY(I),TIZZ(I))*PHMAX/BB
+        KPHI(I) = (FOUR+PHMIN)/(ONE+PHMIN)
+        PHII(I) = KPHI(I)/(ONE+FACDT(I))
+        PHII(I) = MAX(ONE,PHII(I)) 
+        FSH(I) = AL(I)/(FACDT(I)+CST)
+        FSH(I) = MAX(ONE,FSH(I))
+        COEFI(I) =ONE_OVER_12 
+      ENDDO
+      IF (IGTYP == 18) THEN
+         DO I=LFT,LLT
+           FSH(I) = ONE
+           KPHI(I) = MAX(ONE,TWELVE*FACDT(I))  
+           IF (KPHI(I) > TWELVE ) COEFI(I) =ONE 
+         ENDDO
+      END IF
+C----------------------------------------------
 C     MASSE ELEMENT /2
 C----------------------------------------------
       DO I=LFT,LLT
+       LL = ONEP2*AL(I)
        EMS(I)=RHO(I)*AL(I)*AREA(I)* HALF
-       TIN(I)=EMS(I)*AL(I)**2*ONE_OVER_12 + RHO(I)*(AL(I)*HALF)
+       TIN(I)=ONEP2*EMS(I)*LL**2*COEFI(I) + RHO(I)*(AL(I)*HALF)
      .       * MAX(TIYY(I),TIZZ(I))
+       IF (FACDT(I)<ONE) TIN(I)=PHII(I)*TIN(I)
        TIN(I)= MAX(TIN(I),RHO(I)*AL(I)/TWO*TIXX(I))
       ENDDO
        IF( JTHE > 0 ) THEN
@@ -187,21 +217,8 @@ C
        AA  =(SQRT(ONE +DMP*DMP)-DMP)
        AA  = AL(I) * AA * AA
        BB  = MAX(TIYY(I),TIZZ(I))
-       STIR = MAX(G*TIXX(I),FOUR*E*BB) / AA
-       STI  = AREA(I) * E / AA
-C
-C      calcul du pourcentage d'amortissement en cisaillement
-       SL2I= AREA(I)*AL(I)**2 / MAX(BB,EM30)
-       SHF    = ONE-GEO(37,MXG(I))
-       PHI    = TWELVE*E/(FIVE/SIX*G)/MAX(EM30,SL2I)
-C
-C      DSH > DMP : ne change pas ce qui marche, meme si trop severe
-       DSH = DMP
-     .         *MAX(ONE,
-     .  	SQRT(TWELVE/MAX(EM30,SL2I))*SQRT(ONE+PHI*SHF))
-       AA     = SQRT(ONE+DSH*DSH)-DSH
-       AA     = AL(I) * AA * AA
-       STI = MAX(STI,TWELVE*BB*E/AL(I)/AL(I) / AA)
+       STIR = MAX(G*TIXX(I),KPHI(I)*E*BB) / AA
+       STI  = FSH(I)*AREA(I) * E / AA
 C
        STIFN(NC1(I))=STIFN(NC1(I))+STI
        STIFN(NC2(I))=STIFN(NC2(I))+STI

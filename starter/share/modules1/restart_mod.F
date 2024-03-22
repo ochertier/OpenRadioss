@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  RESTMOD                       share/modules1/restart_mod.F  
 Chd|-- called by -----------
@@ -28,7 +28,6 @@ Chd|        UPGRADE_LCAND_E2S             ../common_source/interf/upgrade_multim
 Chd|        UPGRADE_LCAND_EDG             ../common_source/interf/upgrade_multimp.F
 Chd|        UPGRADE_MULTIMP               ../common_source/interf/upgrade_multimp.F
 Chd|        CONTRL                        source/starter/contrl.F       
-Chd|        HM_READ_WINDOW_USER           source/tools/userwi/hm_read_window_user.F
 Chd|        LECLAS                        source/loads/laser/leclas.F   
 Chd|        LECTUR                        source/starter/lectur.F       
 Chd|        NEW_LINK                      source/coupling/rad2rad/new_link.F
@@ -46,6 +45,8 @@ Chd|        R2R_SPLIT                     source/coupling/rad2rad/r2r_split.F
 Chd|        R2R_VOID                      source/coupling/rad2rad/r2r_void.F
 Chd|        R2R_VOID_1D                   source/coupling/rad2rad/r2r_void.F
 Chd|        READ_EBCS                     source/boundary_conditions/ebcs/read_ebcs.F
+Chd|        SET_USER_WINDOW_NODES         source/user_interface/user_windows_tools.F
+Chd|        SPLIT_EBCS                    source/boundary_conditions/ebcs/split_ebcs.F
 Chd|        ST_QAPRINT_EBCS               source/output/qaprint/st_qaprint_ebcs.F
 Chd|        TAGNOD_R2R_S                  source/coupling/rad2rad/tagnod_r2r.F
 Chd|        TAG_ELEM_VOID_R2R             source/coupling/rad2rad/tagelem_r2r.F
@@ -60,7 +61,7 @@ Chd|====================================================================
 
         USE UNITAB_MOD
         INTEGER , DIMENSION(:), ALLOCATABLE :: 
-     .      ICODE,   LSHSUB,  ISKEW,    ISKWN,            NETH,  
+     .      ICODE,      ISKEW,    ISKWN,            NETH,  
      .      IBCSLAG,
      .      IPART,      NOM_OPT, NPC,      IXUR,    IXTG,    IXTG1,
      .      IXS,        IXQ,     IXC,      IXT,     IXP,     IXR,
@@ -68,16 +69,13 @@ Chd|====================================================================
      .      IFILL,      IMS,
      .      KXX,        IXX,     KXSP,     NOD2SP,  IEXMAD, 
      .      ISPSYM,     ISPCOND, ISPHIO,   LPRTSPH, LONFSPH, IBCL,
-     .      IBFV,       ILAS,    LACCELM,  LSENSOR,
-     .      NNLINK,     LNLINK,  IUSER,    IPARG,   DD_IAD,  IGRV, 
+     .      IBFV,       ILAS,    LACCELM,  
+     .      NNLINK,     LNLINK,  IPARG,   DD_IAD,  IGRV, 
      .      IEXLNK,     IBVEL,   LBVEL,    IACTIV,  IBMPC, 
      .      KINET,      IPARI,   NPRW,     LPRW,    
      .      ICONX,      LGAUGE,
      .      NPBY,       LPBY,    LRIVET,   NSTRF,
-     .      LJOINT,     NODPOR,  MONVOL,   LAGBUF,  ITHGRP,  ITHBUF,
-     .      ITHGRPA,    ITHBUFA, ITHGRPB,  ITHBUFB,  ITHGRPC, ITHBUFC, 
-     .      ITHGRPD,    ITHBUFD, ITHGRPE,  ITHBUFE,  ITHGRPF, ITHBUFF,
-     .      ITHGRPG,    ITHBUFG, ITHGRPH,  ITHBUFH,  ITHGRPI, ITHBUFI,
+     .      LJOINT,     NODPOR,  MONVOL,   LAGBUF, 
      .      IPART_STATE,IRBE3,   LRBE3  ,  ICODEP , ISKEWP ,
      .      NOM_SECT,   IRBE2   ,LRBE2,
      .      ITHVAR,     ICFIELD, ILOADP  , IXIG3D  , KXIG3D , INTERLOADP,
@@ -125,11 +123,11 @@ C 2D to avoid integer limitation
      .      DAMPR,            MS,      IN,      TF,      PM, 
      .      SKEW,             GEO,     EANI,    BUFMAT,  
      .      BUFSF,   RBMPC,   GJBUFR,  W,       VEUL,    FILL, 
-     .      DFILL,   ALPH,    WB,      DSAVE,   DRSAVE,  ASAVE, 
-     .      ARSAVE,  STSAVE,  STRSAVE, FSAVSAV, SPBUF ,
+     .      DFILL,   ALPH,    WB,      DSAVE,   ASAVE, 
+     .      SPBUF ,
      .      VSPHIO,  SPHVELN, MSNF,    FORC, 
      .      VEL,     FSAV,    FZERO,   XLAS,    ACCELM, 
-     .      SENSOR,  FBVEL,   GRAV,    FR_WAVE, PARTS0,  USER, 
+     .      FBVEL,   GRAV,    FR_WAVE, PARTS0, 
      .      ELBUF,   FANI_CELL,
      .      RWBUF,   RWSAV,   RBY,      
      .      RIVET,   SECBUF,  VOLMON,  LAMBDA,  WA,      FV, 
@@ -145,7 +143,7 @@ C 2D to avoid integer limitation
      .      MSP,     DMELP,   MSRT,    DMELRT,  RES_SMS,
      .      KVOL,    CFIELD, DIAG_SMS, LOADP,   GAUGE,
      .      DFLOW,   VFLOW,   WFLOW   ,KNOT,    WIGE,
-     .      RDRAPE,  KNOTLOCPC,KNOTLOCEL
+     .      RDRAPE,  KNOTLOCPC,KNOTLOCEL,DPL0CLD,VEL0CLD
       my_real , 
      .    DIMENSION(:), ALLOCATABLE :: FCONV, FBFTEMP, FRADIA, FBFFLUX
      
@@ -239,16 +237,3 @@ c     .         DIMENSION(:),ALLOCATABLE :: BUFIN
 c        TARGET :: BUFIN
 
       END MODULE INTBUFMOD
-
-Chd|====================================================================
-Chd|  IXINTMOD                      share/modules1/restart_mod.F  
-Chd|-- called by -----------
-Chd|        I20INI3                       source/interfaces/inter3d1/i20ini3.F
-Chd|        ININT3                        source/interfaces/inter3d1/inint3.F
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|        UPGRADE_IXINT                 source/interfaces/interf1/upgrade_ixint.F
-Chd|-- calls ---------------
-Chd|====================================================================
-      MODULE IXINTMOD
-          INTEGER , DIMENSION(:), ALLOCATABLE, TARGET :: IXINT
-       END MODULE IXINTMOD

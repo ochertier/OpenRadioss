@@ -1,26 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
-#include "hardware.inc"
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 #if defined(MPI)
 Chd|====================================================================
 Chd|  SPMD_GET_MULT                 source/mpi/lag_multipliers/spmd_lag.F
@@ -36,14 +35,11 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 #include      "mpif.h"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr05_c.inc"
 #include      "task_c.inc"
-#include      "spmd_c.inc"
 #include      "com01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -80,7 +76,7 @@ C-----------------------------------------------
          DO N = 1, N_MULT
            IADLL(N+1) = IADLL(N)+NINT(LAGCOMC(1,N))
            BLL(N)   = LAGCOMC(2,N)
-Cel ICTAG et JCFTAG : id (pas de cond. autre que fixe pour le moment !)
+C   ICTAG et JCFTAG : id (pas de cond. autre que fixe pour le moment !)
            ICFTAG(N) = N
            JCFTAG(N) = N
          END DO
@@ -89,7 +85,7 @@ Cel ICTAG et JCFTAG : id (pas de cond. autre que fixe pour le moment !)
            JLL(N) = NINT(LAGCOMK(2,N))
            SLL(N) = NINT(LAGCOMK(3,N))
            XLL(N) = LAGCOMK(4,N)
-Cel mise a jour du flag directement ici et non dans LTAG_FXV
+C   mise a jour du flag directement ici et non dans LTAG_FXV
            COMNTAG(LLL(N)) = COMNTAG(LLL(N))+1
          END DO     
 C
@@ -106,7 +102,7 @@ C
                IADLL(N_MULT+N+1) = IADLL(N_MULT+N)
      +                            +NINT(LAGCOMC(1,N_MULT+N))
                BLL(N_MULT+N)     = LAGCOMC(2,N_MULT+N)
-Cel ICTAG et JCFTAG : id (pas de cond. autre que fixe pour le moment !)
+C   ICTAG et JCFTAG : id (pas de cond. autre que fixe pour le moment !)
                ICFTAG(N_MULT+N) = N_MULT+N
                JCFTAG(N_MULT+N) = N_MULT+N
              END DO
@@ -122,7 +118,7 @@ C
                JLL(N_IK+N) = NINT(LAGCOMK(2,N_IK+N))
                SLL(N_IK+N) = NINT(LAGCOMK(3,N_IK+N))
                XLL(N_IK+N) = LAGCOMK(4,N_IK+N)
-Cel mise a jour du flag directement ici et non dans LTAG_FXV
+C   mise a jour du flag directement ici et non dans LTAG_FXV
                COMNTAG(LLL(N_IK+N)) = COMNTAG(LLL(N_IK+N))+1
              END DO
              N_IK = N_IK + IKL
@@ -156,14 +152,11 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 #include      "mpif.h"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr05_c.inc"
 #include      "task_c.inc"
-#include      "spmd_c.inc"
 #include      "com01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -325,14 +318,11 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 #include      "mpif.h"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr05_c.inc"
 #include      "task_c.inc"
-#include      "spmd_c.inc"
 #include      "com01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -445,14 +435,11 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 #include      "mpif.h"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr05_c.inc"
 #include      "task_c.inc"
-#include      "spmd_c.inc"
 #include      "com01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -536,19 +523,11 @@ C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
 #include "mpif.h"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "vect01_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com08_c.inc"
-#include      "param_c.inc"
 #include      "task_c.inc"
-#include      "parit_c.inc"
-#include      "scr01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -690,7 +669,7 @@ C on recupere le bon noeud en fct de sa position relative dans fr_elem, liste tr
          ENDIF
        ENDIF
       ENDDO
-Cel wait terminaison isend
+C   wait terminaison isend
       DO I = 1, NSPMD
         IF(IAD_ELEM(1,I+1)-IAD_ELEM(1,I)/=0)
      .    CALL MPI_WAIT(REQ_S(I),STATUS,IERROR)
@@ -734,14 +713,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "scr05_c.inc"
-#include      "task_c.inc"
-#include      "spmd_c.inc"
-#include      "com01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -758,7 +729,7 @@ C-----------------------------------------------
       DO N = 1, N_MULT
         IADLL(N+1) = IADLL(N)+NINT(LAGCOMC(1,N))
         BLL(N)   = LAGCOMC(2,N)
-Cel ICTAG et JCFTAG : id (pas de cond. autre que fixe pour le moment !)
+C   ICTAG et JCFTAG : id (pas de cond. autre que fixe pour le moment !)
         ICFTAG(N) = N
         JCFTAG(N) = N
       END DO
@@ -767,7 +738,7 @@ Cel ICTAG et JCFTAG : id (pas de cond. autre que fixe pour le moment !)
         JLL(N) = NINT(LAGCOMK(2,N))
         SLL(N) = NINT(LAGCOMK(3,N))
         XLL(N) = LAGCOMK(4,N)
-Cel mise a jour du flag directement ici et non dans LTAG_FXV
+C   mise a jour du flag directement ici et non dans LTAG_FXV
         COMNTAG(LLL(N)) = COMNTAG(LLL(N))+1
       END DO     
 C
@@ -789,13 +760,9 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr05_c.inc"
-#include      "task_c.inc"
-#include      "spmd_c.inc"
 #include      "com01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -859,13 +826,9 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr05_c.inc"
-#include      "task_c.inc"
-#include      "spmd_c.inc"
 #include      "com01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -914,23 +877,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----C-----------------------------------------------------------------
-C   M e s s a g e   P a s s i n g
-C-----------------------------------------------
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "vect01_c.inc"
-#include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "com08_c.inc"
-#include      "param_c.inc"
-#include      "task_c.inc"
-#include      "parit_c.inc"
-#include      "scr01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

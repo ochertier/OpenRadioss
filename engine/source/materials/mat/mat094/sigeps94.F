@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  SIGEPS94                      source/materials/mat/mat094/sigeps94.F
 Chd|-- called by -----------
@@ -48,14 +48,11 @@ C-----------------------------------------------
 C   G L O B A L   P A R A M E T E R S
 C-----------------------------------------------
 #include "mvsiz_p.inc"
-#include      "scr17_c.inc"
 C-----------------------------------------------
 C   C O M M O N 
 C-----------------------------------------------
 #include "scr05_c.inc"
 #include "impl1_c.inc"
-#include "units_c.inc"
-#include "com01_c.inc"
 C----------------------------------------------------------------
 C  I N P U T   A R G U M E N T S
 C----------------------------------------------------------------
@@ -251,23 +248,23 @@ c----compute GT_MAX
           DO II = 1,3
             CLP = FOUR*II*C0(II)
             DO I=1,NEL
-			 IF (ABS(TRAC3(I))<EM10) CYCLE
+           IF (ABS(TRAC3(I))<EM10) CYCLE
              LAM_2(1:3) = EVM(I,1:3)*EVM(I,1:3)
              LAM_4(1:3) = LAM_2(1:3)*LAM_2(1:3)
              AA = ONE_OVER_9*II*TRAC3(I)**II
-			 BB = ZERO
-			 CC = ZERO
-			 IF (II>1) BB =THIRD*(3-II)*TRAC3(I)**(II-1)
-			 IF (II>2) CC =(II-1)*TRAC3(I)**(II-2)
+           BB = ZERO
+           CC = ZERO
+           IF (II>1) BB =THIRD*(3-II)*TRAC3(I)**(II-1)
+           IF (II>2) CC =(II-1)*TRAC3(I)**(II-2)
              CII(I,1:3) = CII(I,1:3) +CLP*(AA+BB*LAM_2(1:3) +CC*LAM_4(1:3))
             ENDDO
           ENDDO
           DO I=1,NEL
            AMAX= MAX(CII(I,1),CII(I,2),CII(I,3))
-C---------reduce old result change		   
+C---------reduce old result change       
            ETI = MAX(ONE,AMAX*0.81) 
            GTMAX(I) = G*ETI
-C---- see if many QA return for HEPH 		   
+C---- see if many QA return for HEPH        
            RKMAX(I) = RBULK+TWELVE*D(2)*(RV(I) - ONE)**2 + 30*D(3)*(RV(I) - ONE)**4
            RKMAX(I) = MAX(RBULK,RKMAX(I))
            ET(I)= MAX(ONE,AMAX)

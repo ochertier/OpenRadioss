@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  S6CBILAN                      source/elements/thickshell/solide6c/s6cbilan.F
 Chd|-- called by -----------
@@ -32,7 +32,7 @@ Chd|====================================================================
      .   VXA, VYA, VZA, VA2, VNEW,IPARTS ,
      .   GRESAV,GRTH,IGRTH,OFF,IEXPAN,EINTTH,
      .   FILL, XX, YY, ZZ,
-     .   XX2,YY2,ZZ2,XY,YZ,ZX,ITASK,IPARG)
+     .   XX2,YY2,ZZ2,XY,YZ,ZX,ITASK,IPARG,OFFG)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -45,7 +45,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "com01_c.inc"
 #include      "vect01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -60,6 +59,7 @@ C     REAL
      .  XY(MVSIZ), YZ(MVSIZ), ZX(MVSIZ)
       INTEGER IEXPAN,ITASK,
      .  IPARTS(*),GRTH(*),IGRTH(*),IPARG(*)
+      my_real, INTENT(IN) :: OFFG(MVSIZ)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -74,7 +74,6 @@ C     REAL
      .   IXX(MVSIZ), IYY(MVSIZ), IZZ(MVSIZ),
      .   IXY(MVSIZ), IYZ(MVSIZ), IZX(MVSIZ),
      .   REI(MVSIZ), REK(MVSIZ), OFF_L(MVSIZ)
-C-----------------------------------------------
 C-----------------------------------------------
       FLAG = IPARG(80) ! Flag pour sorties additionnelles
 C-----------------------------------------------
@@ -97,14 +96,13 @@ C
       ENDDO
 C
       DO I=LFT,LLT
-        IF(OFF(I) < ONE) CYCLE
         M=IPARTS(I)
         PARTSAV(1,M)=PARTSAV(1,M) + EI(I)
         PARTSAV(2,M)=PARTSAV(2,M) + EK(I)
         PARTSAV(3,M)=PARTSAV(3,M) + XM(I)
         PARTSAV(4,M)=PARTSAV(4,M) + YM(I)
         PARTSAV(5,M)=PARTSAV(5,M) + ZM(I)
-        PARTSAV(6,M)=PARTSAV(6,M) + XMAS(I)
+        IF (OFFG(I) >= ONE) PARTSAV(6,M)=PARTSAV(6,M) + XMAS(I)
       END DO
 C
 C-----------------------------------------------
@@ -193,6 +191,14 @@ C
             OFF_L(I) = ONE
           ENDIF
       ENDDO
+C
+      DO I = LFT,LLT
+        M=IPARTS(I)
+        IF (OFFG(I) < ONE) THEN 
+          PARTSAV(25,M) = PARTSAV(25,M) + ONE
+        ENDIF
+      ENDDO
+C
       CALL SENSOR_ENERGY_BILAN(LFT,LLT,EI,EK,OFF_L,IPARTS,ITASK) 
 C
       RETURN

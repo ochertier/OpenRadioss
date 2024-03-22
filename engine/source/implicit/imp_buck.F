@@ -1,26 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
-#if defined(MUMPS5) && defined(DNC)
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  IMP_BUCK                      source/implicit/imp_buck.F    
 Chd|-- called by -----------
@@ -49,28 +48,31 @@ Chd|        SPMD_RBCAST                   source/mpi/generic/spmd_rbcast.F
 Chd|        UPD_FR_K                      source/mpi/implicit/imp_fri.F 
 Chd|        UPD_GLOB_K                    source/implicit/upd_glob_k.F  
 Chd|        ZEROR                         source/system/zero.F          
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
+Chd|        ANIM_MOD                      ../common_source/modules/anim_mod.F
 Chd|        CLUSTER_MOD                   share/modules/cluster_mod.F   
 Chd|        CRACKXFEM_MOD                 share/modules/crackxfem_mod.F 
 Chd|        DRAPE_MOD                     share/modules/drape_mod.F     
 Chd|        DSGRAPH_MOD                   share/modules/dsgraph_mod.F   
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        GENANI_MOD                    source/output/anim/generate/genani.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|        IMPBUFDEF_MOD                 share/modules/impbufdef_mod.F 
 Chd|        IMP_WORKG                     share/modules/impbufdef_mod.F 
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
+Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
+Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
 Chd|        STACK_MOD                     share/modules/stack_mod.F     
 Chd|====================================================================
       SUBROUTINE IMP_BUCK(
      2                    PM          , GEO         , IPM      , IGEO     , ELBUF     ,
      3                    IXS         , IXQ         , IXC      , IXT      , IXP       ,
-     4                    IXR         , IXTG        , IXTG1    , IXUR     , IPARG     ,
+     4                    IXR         , IXTG        , IXTG1    , IPARG     ,
      5                    TF          , NPC         , FR_WAVE  , W16      , BUFMAT    ,
-     6                    THKE        , BUFGEO      , LSENSOR  , SENSOR   , RBY       ,
+     6                    THKE        , BUFGEO      , NSENSOR  ,SENSOR_TAB, RBY       ,
      7                    SKEW        , WA          ,ICODT     , ICODR    , ISKEW     ,
      9                    IBFV        , VEL         , LPBY     , NPBY     , ITAB      ,
      A                    WEIGHT      , MS          , IN       ,IPARI    , INTBUF_TAB ,  
@@ -95,9 +97,10 @@ Chd|====================================================================
      V                    ALE_CONNECT ,W            , NV46     , NERCVOIS , NESDVOIS  ,
      W                    LERCVOIS    ,LESDVOIS     ,CRKEDGE   , STACK    ,DIMFB      ,
      X                    FBSAV6      ,STABSEN      ,TABSENSOR ,INDX_CRK  ,XEDGE4N    ,
-     Y                    XEDGE3N     ,SPH2SOL      ,STIFN     ,STIFR     ,DRAPE_Q4   ,
-     Z                    DRAPE_T3    ,H3D_DATA     ,SUBSET    ,IGRNOD    ,FCONT_MAX  ,
-     a                    FNCONTP2    ,FTCONTP2     ,NDDL0     ,NNZK0     ,IMPBUF_TAB )
+     Y                    XEDGE3N     ,SPH2SOL      ,STIFN     ,STIFR     ,DRAPE_SH4N   ,
+     Z                    DRAPE_SH3N    ,H3D_DATA     ,SUBSET    ,IGRNOD    ,FCONT_MAX  ,
+     a                    FNCONTP2    ,FTCONTP2     ,NDDL0     ,NNZK0     ,IMPBUF_TAB ,
+     b                    DRAPEG      ,MATPARAM_TAB )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -116,6 +119,9 @@ C-----------------------------------------------
       USE DRAPE_MOD
       USE ALE_CONNECTIVITY_MOD
       USE IMPBUFDEF_MOD
+      USE SENSOR_MOD
+      USE ANIM_MOD
+      USE MATPARAM_DEF_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -129,7 +135,6 @@ C-----------------------------------------------
 #include      "com08_c.inc"
 #include      "com09_c.inc"
 #include      "com_xfem1.inc"
-#include      "rnur_c.inc"
 #include      "sphcom.inc"
 #include      "scr05_c.inc"
 #include      "scr14_c.inc"
@@ -142,14 +147,17 @@ C-----------------------------------------------
 #include      "spmd_c.inc"
 #include      "impl1_c.inc"
 #include      "buckcom.inc"
+#if defined(MUMPS5)
 #include      "dmumps_struc.h"
+#endif
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER ,INTENT(IN) :: NSENSOR
       INTEGER NDDL0, NNZK0,  IPM(NPROPMI,*),IGEO(NPROPGI,*),
      .        IXS(*), IXQ(NIXQ,*), IXC(NIXC,*), IXT(NIXT,*),
      .        IXP(NIXP,*),IXR(NIXR,*),IXTG(NIXTG,*),INDX_CRK(*),   
-     .        IXTG1(4,*), IXUR(*), IPARG(NPARG,*), LSENSOR(NSENSI,*),
+     .        IXTG1(4,*), IPARG(NPARG,*),
      .        NPC(*), ICODT(*), ICODR(*), ISKEW(*), IBFV(NIFV,*),
      .        LPBY(*), NPBY(NNPBY,*), ITAB(*),
      .        WEIGHT(*),IPARI(NPARI,*),ITASK, ICUT(*), NSTRF(*), NPRW(*),
@@ -169,7 +177,7 @@ C-----------------------------------------------
       my_real
      .        PM(NPROPM,*), GEO(NPROPG,*),
      .        ELBUF(*), TF(*), W16(*), BUFMAT(*),
-     .        THKE(*), BUFGEO(*), SENSOR(NSENSR,*), RBY(*),
+     .        THKE(*), BUFGEO(*),RBY(*),
      .        SKEW(LSKEW,*),  WA(*), VEL(LFXVELR,*), MS(*),
      .        IN(*),FR_WAVE(*), CONT(3,*),
      .        XCUT(*), FINT(*), FEXT(3,*), FOPT(6,*), ANIN(*), RWBUF(*),
@@ -183,7 +191,6 @@ C-----------------------------------------------
      .        FSAV(NTHVKI,*) ,FSAVD(NTHVKI,*), RWSAV(*),AR(3,*),W(*),
      .        STIFN(*),STIFR(*),FCONT_MAX(*)
       TYPE(PRGRAPH) :: GRAPHE(*)
-      TYPE(DMUMPS_STRUC) MUMPS_PAR
       DOUBLE PRECISION
      .        FRWL6(*)
       DOUBLE PRECISION
@@ -198,12 +205,17 @@ C-----------------------------------------------
       TYPE (SUBSET_) , DIMENSION(NSUBS)  :: SUBSET
       TYPE (GROUP_)  , DIMENSION(NGRNOD) :: IGRNOD
       TYPE (SURF_)   , DIMENSION(NSURF)  :: IGRSURF
-      TYPE(DRAPE_)    :: DRAPE_Q4, DRAPE_T3
+      TYPE(DRAPE_)    :: DRAPE_SH4N(NUMELC_DRAPE), DRAPE_SH3N(NUMELTG_DRAPE)
       TYPE(t_ale_connectivity), INTENT(IN) :: ALE_CONNECT
       TYPE (IMPBUF_STRUCT_) ,TARGET :: IMPBUF_TAB
+      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE(DRAPEG_)    :: DRAPEG
+      TYPE (MATPARAM_STRUCT_) ,DIMENSION(NUMMAT) ,INTENT(IN) :: MATPARAM_TAB
+#if defined(MUMPS5) && defined(DNC)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
+      TYPE(DMUMPS_STRUC) MUMPS_PAR
       INTEGER I, NM, NMMAX, MAXITR, N, MAXNCV, NEV, NCV, MAXN,
      .        MAXNEV, LDV, ISHFTS, MODE, INFO, PRSP,
      .        NEL3D, NEL2D, NEL1D, NEL, N1, N2, N3, N4, N5, N6, N7, N8,
@@ -347,15 +359,14 @@ citask0citask0      END IF !(ITASK == 0) THEN
 citask0       IF (ITASK == 0) THEN
 
         IF(NFXVEL/=0) THEN
-          CALL FV_IMP(IBFV  ,NPC    ,TF     ,VEL   ,SENSOR,
-     1               LSENSOR,D_IMP  ,DR_IMP ,IKC   ,IDDL  ,
+          CALL FV_IMP(IBFV  ,NPC    ,TF     ,VEL   ,SENSOR_TAB,
+     1                D_IMP  ,DR_IMP ,IKC   ,IDDL  ,NSENSOR   ,
      2                SKEW  ,IFRAME ,XFRAME ,V     ,VR    ,
      3                X     ,DIRUL  ,NDOF   ,A     ,AR    )
         ENDIF
 C-------------
         NT_RW=0
-        NRWDONE = 0
-           IMCONV = 1
+        IMCONV = 1
         IF (NRWALL>0) THEN
          CALL RGWAL0_IMP(
      1     X           ,D_IMP    ,V      ,RWBUF   ,LPRW    ,
@@ -379,13 +390,13 @@ C    /---------------/
        CALL IMP_GLOB_KHP(
      1   PM        ,GEO       ,IPM       ,IGEO      ,ELBUF     ,
      2   IXS       ,IXQ       ,IXC       ,IXT       ,IXP       ,
-     3   IXR       ,IXTG      ,IXTG1     ,IXUR      ,IXS(L1)   ,
+     3   IXR       ,IXTG      ,IXTG1     ,IXS(L1)   ,
      4   IXS(L2)   ,IXS(L3)   ,IPARG     ,TF        ,NPC       ,
      5   FR_WAVE   ,W16       ,BUFMAT    ,THKE      ,BUFGEO    ,
-     6   LSENSOR   ,SENSOR    ,RBY       ,SKEW      ,X         ,
+     6   RBY       ,SKEW      ,X         ,
      7   WA        ,IDDL      ,NDOF      ,DIAG_K    ,LT_K      ,
      8   IADK      ,JDIK      ,IKG       ,IBID      ,ITASK     ,
-     9   ELBUF_TAB ,STACK     ,DRAPE_Q4, DRAPE_T3    )
+     9   ELBUF_TAB ,STACK     ,DRAPE_SH4N, DRAPE_SH3N   ,DRAPEG )
 C    /---------------/
 c      CALL MY_BARRIER
 C    /---------------/
@@ -394,7 +405,7 @@ citask0       IF (ITASK == 0) THEN
 
        CALL UPD_GLOB_K(
      1   ICODT     ,ICODR     ,ISKEW     ,IBFV      ,NPC       ,
-     2   TF        ,VEL       ,SENSOR    ,LSENSOR   ,XFRAME    ,
+     2   TF        ,VEL       ,XFRAME    ,
      3   RBY       ,X         ,SKEW      ,LPBY      ,NPBY      ,
      4   ITAB      ,WEIGHT    ,MS        ,IN        ,NRBYAC    ,
      5   IRBYAC    ,NSC       ,IKINW(LI1),NMC       ,IKINW(LI2),
@@ -426,7 +437,7 @@ citask0      IF (ITASK == 0) THEN
      4   IKINW(LI6),IKINW(LI7),IPARG     ,ELBUF     ,ELBUF_TAB ,
      5   IXS       ,IXQ       ,IXC       ,IXT       ,IXP       ,
      6   IXR       ,IXTG      ,IXTG1     ,IXS(L1)   ,IXS(L2)   ,
-     7   IXS(L3)   ,IXUR      ,IDDL      ,NDOF      ,IADK      ,
+     7   IXS(L3)   ,IDDL      ,NDOF      ,IADK      ,
      8   JDIK      ,NDDL      ,NNZK      ,NNMAX     ,LSIZE(8)  ,
      9   INLOC     ,NKMAX     ,IKINW(LI9),IKINW(LI10),IKINW(LI11),
      A   NMC2      ,IKINW(LI12),NTMP     ,LSIZE(12) ,LSIZE(13) ,
@@ -443,13 +454,13 @@ C    /---------------/
       CALL IMP_GLOB_KHP(
      1   PM        ,GEO       ,IPM       ,IGEO      ,ELBUF     ,
      2   IXS       ,IXQ       ,IXC       ,IXT       ,IXP       ,
-     3   IXR       ,IXTG      ,IXTG1     ,IXUR      ,IXS(L1)   ,
+     3   IXR       ,IXTG      ,IXTG1     ,IXS(L1)   ,
      4   IXS(L2)   ,IXS(L3)   ,IPARG     ,TF        ,NPC       ,
      5   FR_WAVE   ,W16       ,BUFMAT    ,THKE      ,BUFGEO    ,
-     6   LSENSOR   ,SENSOR    ,RBY       ,SKEW      ,X         ,
+     6   RBY       ,SKEW      ,X         ,
      7   WA        ,IDDL      ,NDOF      ,DIAG_KG   ,LT_KG     ,
      8   IADK      ,JDIK      ,IKG       ,IBID      ,ITASK     ,
-     9   ELBUF_TAB ,STACK     ,DRAPE_Q4, DRAPE_T3      )
+     9   ELBUF_TAB ,STACK     ,DRAPE_SH4N, DRAPE_SH3N   ,DRAPEG   )
 C    /---------------/
 c      CALL MY_BARRIER
 C    /---------------/
@@ -459,13 +470,13 @@ citask0      IF (ITASK == 0) THEN
 C--------include load-stiffness matrix-in Kg---------
       IF (IKPRES>0) THEN
          CALL IMP_KPRES(IBCL  ,FORC   ,NPC   ,TF    ,X     ,
-     2                  SKEW  ,SENSOR,LSENSOR,WEIGHT,IBID  ,
+     2                  SKEW  ,NSENSOR,SENSOR_TAB,WEIGHT,IBID  ,
      3                  IDDL  ,NDOF   ,IADK  ,JDIK  ,DIAG_KG,
      4                  LT_KG )
       END IF
       CALL UPD_GLOB_K(
      1   ICODT     ,ICODR     ,ISKEW     ,IBFV      ,NPC       ,
-     2   TF        ,VEL       ,SENSOR    ,LSENSOR   ,XFRAME    ,
+     2   TF        ,VEL       ,XFRAME    ,
      3   RBY       ,X         ,SKEW      ,LPBY      ,NPBY      ,
      4   ITAB      ,WEIGHT    ,MS        ,IN        ,NRBYAC    ,
      5   IRBYAC    ,NSC       ,IKINW(LI1),NMC       ,IKINW(LI2),
@@ -703,11 +714,11 @@ C
       ENDIF
 C
       NEL3D = NUMELS + NUMSPH + 3*NUMELS16
-      NEL2D = NUMELC + NUMELTG + NUMELQ + NUMELUR
+      NEL2D = NUMELC + NUMELTG + NUMELQ 
       NEL1D = NUMELT + NUMELP  + 2*NUMELR + NANIM1D
       NEL = MAX(NEL1D,NEL2D,NEL3D)
       NELG = MAX (  NUMELSG+3*NUMELS16G+NUMSPHG,
-     .              NUMELCG+NUMELTGG+NUMELQG+NUMELURG,
+     .              NUMELCG+NUMELTGG+NUMELQG,
      .              NUMELTG + NUMELPG  + 2*NUMELRG)
 C
       SN1 = MAX(3*NUMNOD,6*NEL3D,3*NEL2D,9*NEL1D,NUMSPH)
@@ -774,7 +785,7 @@ C
       K5=K4+NUMELT
       K6=K5+NUMELP
       K7=K6+NUMELR
-      K8=K7+NUMELUR
+      K8=K7
       K9=K8+NUMELTG
       K10=K9+NUMELX
       K11=K10+NUMSPH
@@ -795,8 +806,8 @@ C
      .                D,    DR,   INLOC)
 C
          CALL RECUKIN(RBY,    LPBY,   NPBY,    SKEW,  ISKEW,
-     .                ITAB,   WEIGHT, MS,      IN,    SENSOR,
-     .                IBFV,   VEL,    LSENSOR, ICODT  , ICODR,
+     .                ITAB,   WEIGHT, MS,      IN,
+     .                IBFV,   VEL,    ICODT  , ICODR,
      .                NRBYAC, IRBYAC, NINT2,   IINT2, IPARI,
      .                INTBUF_TAB    , NDOF,    D,     DR,
      .                X    ,  XFRAME , DIRUL,  IXR    ,IXC  ,
@@ -846,7 +857,7 @@ C
      5             SN5        ,CONT      ,SN6        ,ICUT        ,SKEW      ,
      6             XCUT       ,FINT      ,ITAB       ,SN7         ,FEXT      ,
      7             FOPT       ,ANIN      ,LPBY       ,NPBY        ,NSTRF     ,
-     8             RWBUF      ,NPRW      ,IXUR       ,TANI        ,ELBUF_TAB ,
+     8             RWBUF      ,NPRW      ,TANI       ,ELBUF_TAB   ,MATPARAM_TAB,
      A             DD_IAD     ,WEIGHT    ,EANI       ,IPART       ,CLUSTER   ,
      B             IPART(K1)  ,IPART(K2) ,IPART(K3)  ,IPART(K4)   ,IPART(K5) ,
      C             IPART(K6)  ,IPART(K7) ,IPART(K8)  ,
@@ -894,7 +905,7 @@ C
      6             VR    ,ELBUF_TAB ,DD_IAD,WEIGHT,
      7             IPM       ,KXSP   ,SPBUF ,NODGLOB,LENG ,
      8             FOPT  ,NOM_OPT   ,NPBY   ,FNCONT   ,FTCONT    ,
-     9             GEO   ,THKE      ,STACK  ,DRAPE_Q4, DRAPE_T3 )
+     9             GEO   ,THKE      ,STACK  ,DRAPE_SH4N, DRAPE_SH3N ,DRAPEG )
          ENDIF
       ENDDO
 c
@@ -910,8 +921,8 @@ citask0      END IF !(ITASK == 0) THEN
 
 C
       RETURN
-      END
 #endif 
+      END
 
 Chd|====================================================================
 Chd|  STOBUCK                       source/implicit/imp_buck.F    
@@ -925,9 +936,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

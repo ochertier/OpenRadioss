@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C new routine (starter input format >= 4.4)
 Chd|====================================================================
 Chd|  VOLPVGA                       source/airbag/volpvg.F        
@@ -32,7 +32,6 @@ Chd|====================================================================
 C-----------------------------------------------
 C      MONITORED VOLUMES TYPE PERFECT GAS, INPUT STARTER >= 4.4 (PRESSURE).
 C-----------------------------------------------
-C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
@@ -40,8 +39,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "units_c.inc"
-#include      "scr05_c.inc"
 #include      "com06_c.inc"
 #include      "com08_c.inc"
 #include      "task_c.inc"
@@ -49,8 +46,7 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IVOLU(*),NVENT,IBAGHOL(NIBHOL,*),PMAIN
-      my_real
-     .   RVOLU(*),VOL,FSAV(*),RBAGHOL(NRBHOL,*)
+      my_real RVOLU(*),VOL,FSAV(*),RBAGHOL(NRBHOL,*)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -181,9 +177,9 @@ C
         FSAV(6)=ZERO
         FSAV(7)=ZERO
         FSAV(8)=ZERO
-        FSAV(9)=ZERO	
+        FSAV(9)=ZERO
         FSAV(10)=ZERO
-        FSAV(11)=ZERO	
+        FSAV(11)=ZERO
         FSAV(12)=GAMA
       ENDIF
 C
@@ -202,7 +198,7 @@ Chd|-- calls ---------------
 Chd|        SPMD_EXCH_FR6                 source/mpi/kinematic_conditions/spmd_exch_fr6.F
 Chd|        SUM_6_FLOAT                   source/system/parit.F         
 Chd|        GET_U_FUNC                    source/user_interface/ufunc.F 
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|====================================================================
       SUBROUTINE VOLPVGB(IVOLU ,RVOLU   ,VOL     ,FSAV    ,NVENT   ,
@@ -227,18 +223,14 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
-#include      "scr05_c.inc"
 #include      "task_c.inc"
 #include      "vect01_c.inc"
-#include      "scr01_c.inc"
-#include      "scr17_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IVOLU(*),NVENT,IBAGHOL(NIBHOL,*), FR_MV(*),
      .        NN,IPARG(NPARG,*)
       INTEGER, INTENT(IN) :: IGROUPC(*), IGROUPTG(*)
-C     REAL
       my_real
      .   RVOLU(*),FSAV(*),RBAGHOL(NRBHOL,*),N(3,*)
       TYPE(ELBUF_STRUCT_), DIMENSION(NGROUP), TARGET :: ELBUF_TAB

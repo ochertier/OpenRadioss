@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  HM_READ_INTER_TYPE25          source/interfaces/int25/hm_read_inter_type25.F
 Chd|-- called by -----------
@@ -35,16 +35,19 @@ Chd|        INTER_DCOD_FUNCTION           source/interfaces/reader/inter_dcod_fu
 Chd|        INTER_DCOD_SENSOR             source/interfaces/reader/inter_dcod_sensor.F
 Chd|        NGR2USR                       source/system/nintrr.F        
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
+Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
 Chd|        INTBUF_FRIC_MOD               share/modules1/intbuf_fric_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
+Chd|        PARAMETERS_MOD                ../common_source/modules/interfaces/parameters_mod.F
 Chd|        SENSOR_MOD                    share/modules1/sensor_mod.F   
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
       SUBROUTINE HM_READ_INTER_TYPE25(
      1        IPARI      ,STFAC      ,FRIGAP     ,NOINT     ,NI         ,
      2        IGRNOD     ,IGRSURF    ,XFILTR     ,FRIC_P    ,DEF_INTER  ,
-     3        SENSOR_TAB ,NOM_OPT    ,UNITAB    ,LSUBMODEL  ,TITR       ,
-     4        NOM_OPTFRIC,INTBUF_FRIC_TAB,NPC   ,NPC1       ,TF         )
+     3        SENSORS    ,NOM_OPT    ,UNITAB    ,LSUBMODEL  ,TITR       ,
+     4        NOM_OPTFRIC,INTBUF_FRIC_TAB,NPC   ,NPC1       ,TF         ,
+     5        PARAMETERS)
 C============================================================================
 C     
 C-----------------------------------------------
@@ -56,6 +59,8 @@ C-----------------------------------------------
       USE SUBMODEL_MOD
       USE UNITAB_MOD
       USE SENSOR_MOD
+      USE INTBUFDEF_MOD
+      USE PARAMETERS_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -77,30 +82,20 @@ C-----------------------------------------------
       CHARACTER TITR*nchartitle
       TYPE(INTBUF_FRIC_STRUCT_) INTBUF_FRIC_TAB(*)
       TYPE(SUBMODEL_DATA) LSUBMODEL(*)
-      TYPE (UNIT_TYPE_),INTENT(IN) ::UNITAB 
-      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE (UNIT_TYPE_),INTENT(IN) :: UNITAB 
+      TYPE (SENSORS_)  ,INTENT(IN) :: SENSORS
 C-----------------------------------------------
       TYPE (GROUP_)  ,TARGET, DIMENSION(NGRNOD)  :: IGRNOD
       TYPE (SURF_)   ,TARGET , DIMENSION(NSURF)   :: IGRSURF
+      TYPE (PARAMETERS_) ,INTENT(INOUT):: PARAMETERS
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
 #include      "scr06_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com09_c.inc"
-#include      "intstamp_c.inc"
 #include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "fluid_scr_c.inc"
 #include      "scr12_c.inc"
-#include      "remesh_c.inc"
-#include      "sysunit.inc"
-#include      "thknod_c.inc"
-#include      "inter22.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -109,13 +104,14 @@ C-----------------------------------------------
      .    IGAP,MULTIMP,MFROT,IFQ,IBAG,MODFR,ISYM,IEDGE,NOD1,
      .    IDEL25,KK,IGAP0,FLAGREMNOD,IDSENS,IDELKEEP,INTKG,
      .    IREM25I2,IPRINT,INTFRIC,MULTIMPE,IASSIGN,ISHARP,   
-     .    ITHK,NOTUSED,INTTH,IFORM,IKTHE,FCOND,IFRICTH,NPREF
+     .    ITHK,NOTUSED,INTTH,IFORM,IKTHE,FCOND,IFRICTH,NPREF,
+     .    IPSTIF
       my_real
      .    FRIC,GAP,STARTT,BUMULT,STOPT,C1,C2,C3,C4,C5,C6,ALPHA,
      .    GAPSCALE,STMIN,STMAX,EDG_ANGL,VISC,VISCF,PERCENT_SIZE,
      .    GAPMAX_S,GAPMAX_M,PENMAX,PENMIN,SIGMAXADH,VISCADHFACT,
      .    VISCFLUID,PMAX,KTHE,TINT,XTHE,FRAD,DRAD,FHEATS,
-     .    FHEATM,DCOND,XTHE_UNIT,TPFIT
+     .    FHEATM,DCOND,XTHE_UNIT,TPFIT,STFACM,DTSTIF
       CHARACTER KEY1*ncharkey,BCFLAG*ncharfield
 !
       INTEGER, DIMENSION(:), POINTER :: INGR2USR
@@ -158,6 +154,7 @@ C Initializations
       IFORM = 0
       FCOND = 0
       IFRICTH = 0
+      IPSTIF = 0
 
 C-------for the moment
 C     IGSTI = 0
@@ -200,7 +197,8 @@ C
       FHEATS= ZERO
       FHEATM= ZERO
       DCOND = ZERO
-
+      STFACM= ZERO
+      DTSTIF= ZERO
 C
       IASSIGN = 1
 C
@@ -225,6 +223,7 @@ C
       CALL HM_GET_INTV('TYPE24_Idel',IDEL25,IS_AVAILABLE,LSUBMODEL)
       CALL HM_GET_INTV('Irem_i2',IREM25I2,IS_AVAILABLE,LSUBMODEL)
       CALL HM_GET_INTV('TYPE24_Iedge',IEDGE,IS_AVAILABLE,LSUBMODEL)
+      CALL HM_GET_INTV('IPSTIF',IPSTIF,IS_AVAILABLE,LSUBMODEL)
 C
       CALL HM_GET_INTV('GRNOD_ID',NOD1,IS_AVAILABLE,LSUBMODEL)
 C
@@ -261,6 +260,7 @@ C
       CALL HM_GET_FLOATV('STMIN',STMIN,IS_AVAILABLE,LSUBMODEL,UNITAB)
       CALL HM_GET_FLOATV('STMAX',STMAX,IS_AVAILABLE,LSUBMODEL,UNITAB)
       CALL HM_GET_FLOATV('TYPE24_Edge_Angle',EDG_ANGL,IS_AVAILABLE,LSUBMODEL,UNITAB)
+      CALL HM_GET_FLOATV('STFAC_MDT',STFACM,IS_AVAILABLE,LSUBMODEL,UNITAB)
 C
       CALL HM_GET_FLOATV('STFAC',STFAC,IS_AVAILABLE,LSUBMODEL,UNITAB)
       CALL HM_GET_FLOATV('FRIC',FRIC,IS_AVAILABLE,LSUBMODEL,UNITAB)
@@ -272,6 +272,7 @@ C
       CALL HM_GET_FLOATV('Tpressfit',TPFIT,IS_AVAILABLE,LSUBMODEL,UNITAB) 
 C
       CALL HM_GET_FLOATV('Xfreq',ALPHA,IS_AVAILABLE,LSUBMODEL,UNITAB)
+      CALL HM_GET_FLOATV('DTSTIF',DTSTIF,IS_AVAILABLE,LSUBMODEL,UNITAB)
 C
       IF (MFROT>0) THEN
          CALL HM_GET_FLOATV('C1',C1,IS_AVAILABLE,LSUBMODEL,UNITAB)
@@ -496,8 +497,8 @@ C-------- default EDG_ANGL=135
         IF(IGAP == 3 .AND. PERCENT_SIZE == ZERO) PERCENT_SIZE = FOUR*EM01
         FRIGAP(28) = PERCENT_SIZE
 
-	IF(GAPSCALE==ZERO)GAPSCALE=ONE
-	FRIGAP(13) = GAPSCALE ! historically stored, get modified in I25STI3 (GAPMIN)
+          IF(GAPSCALE==ZERO)GAPSCALE=ONE
+          FRIGAP(13) = GAPSCALE ! historically stored, get modified in I25STI3 (GAPMIN)
         FRIGAP(45) = GAPSCALE
         
 
@@ -505,7 +506,7 @@ C-------- default EDG_ANGL=135
         IF(GAPMAX_M==ZERO)GAPMAX_M=EP30
 C       IF(PENMAX==ZERO)PENMAX=EP30
         IF(PENMIN==ZERO)PENMIN=EM8
-	FRIGAP(35) = GAPMAX_S
+          FRIGAP(35) = GAPMAX_S
         FRIGAP(36) = GAPMAX_M
         FRIGAP(37) = PENMAX
         FRIGAP(38) = PENMIN
@@ -576,7 +577,7 @@ C-------used for TPFIT
         ENDIF
         FRIGAP(14)=VISC
 C-------MAIN side gap changes with thickness change
-        IF(ITHK==1) ITHKNOD=1
+        IF(ITHK==1) INTER_ITHKNOD=1 !defined in interface module (common_source directory)
 C
 C-------* Storage IPARI FRIGAP *----------------------------
 C
@@ -621,6 +622,21 @@ C bmult augmente pour les tres gros modeles et interface 7 ou 20
             END IF
         END IF
         FRIGAP(4)=BUMULT
+
+C---------
+        IF(IPSTIF >0 .OR.IGSTI==7) IPARI(97)   = 1
+        IF(IGSTI==7.AND.IPSTIF ==0) IPSTIF = 1
+        IPARI(98) = IPSTIF
+        IF(STFACM == ZERO.AND.IPARI(97) > 0) STFACM = EM01
+        IF(IPARI(97) > 0) THEN
+           FRIGAP(48) = DTSTIF 
+           PARAMETERS%ISTIF_DT = 1
+           FRIGAP(47) = STFACM
+        ELSE
+           DTSTIF = ZERO 
+           STFACM = ZERO
+        ENDIF
+
 
 
 C
@@ -798,7 +814,7 @@ C     RENUMBERING OF FUNCTIONS AND SENSOR - USER TO INTERNAL ID
 C------------------------------------------------------------
 C
         CALL INTER_DCOD_FUNCTION(NTYP,NI,IPARI,NPC1,NOM_OPT,NPC,TF)
-        CALL INTER_DCOD_SENSOR (NTYP,NI,IPARI,NOM_OPT,SENSOR_TAB)
+        CALL INTER_DCOD_SENSOR (NTYP,NI,IPARI,NOM_OPT,SENSORS)
         CALL INTER_DCOD_FRICTION(NTYP,NI,IPARI,NOM_OPT,NOM_OPTFRIC,
      .                INTBUF_FRIC_TAB)
 
@@ -881,6 +897,8 @@ C........* PRINT INTERFACES INPUT *.....................
           ENDIF         
         ENDIF
 C
+        IF(IPARI(97) > 0) WRITE(IOUT,3500) STFACM,DTSTIF,IPSTIF
+C
         IF(INTFRIC > 0 ) THEN
           WRITE(IOUT,5030) INTFRIC
         ELSE
@@ -900,6 +918,8 @@ C
           ELSEIF(MFROT==3)THEN
             WRITE(IOUT,1523)FRIC_P(1),FRIC_P(2),FRIC_P(3),
      .      FRIC_P(4),FRIC_P(5),FRIC_P(6)
+          ELSEIF(MFROT==4)THEN
+            WRITE(IOUT,1526)  FRIC,FRIC_P(1),FRIC_P(2)
           ENDIF
         ENDIF
 C Interface Adhesion 
@@ -988,6 +1008,12 @@ C------------
  1520 FORMAT(
      .    '    FRICTION FILTERING FLAG. . . . . . . . . ',I10/,
      .    '    FILTERING FACTOR . . . . . . . . . . . . ',1PG20.13)
+ 1526 FORMAT(/
+     .    '        EXPONENTIAL DECAY FRICTION LAW   '/
+     .    '          MU = c1+(MUo-c1)*exp(-c2*v)'/
+     .    '          STATIC COEFFICIENT MUo . . . . . . . . . ',1PG20.13/,
+     .    '          DYNAMIC COEFFICIENT C1 . . . . . . . . . ',1PG20.13/,
+     .    '          EXPONENTIAL DECAY COEFFICIENT C2 . . . . ',1PG20.13/)
 C----------     
  3526 FORMAT(//
      .       '    TYPE==25  MUTI-TYPE IMPACTING             ' //,
@@ -1049,6 +1075,11 @@ C
      .       '    QUADRATIC DAMPING FLAG. . . . . . . . . . .            ',I5/,
      .       '    FLAGREMNODE : NOT CONSIDER NEIGHBORING      '/,
      .       '    NODES IN CASE OF ELEMENT SIZE < GAP VALUE .            ',I5/)
+ 3500 FORMAT(/
+     .    '    STIFFNESS BASED OF TIME STEP AND MASSES  :'/,
+     .    '    SCALE FACTOR . . . . . . . . . . . . . . . . . ',1PG20.13/,
+     .    '    TIME STEP  . . . . . . . . . . . . . . . . . . ',1PG20.13/,
+     .    '    FLAG FOR PENALTY STIFFNESS . . . . . . . . . . ',1PG20.13/)      
 C
  5030 FORMAT(/
      .       '    INTERFACE FRICTION MODEL.  . . . . . . . . ',I10)

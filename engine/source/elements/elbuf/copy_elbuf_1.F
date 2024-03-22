@@ -1,31 +1,31 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  COPY_ELBUF_1                  source/elements/elbuf/copy_elbuf_1.F
 Chd|-- called by -----------
 Chd|        COPY_ELBUF                    source/elements/elbuf/copy_elbuf.F
 Chd|-- calls ---------------
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE COPY_ELBUF_1(ELBUF_SRC,ELBUF_TGT,IPARG,NGROUP,NG)
 C-----------------------------------------------
@@ -39,7 +39,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "tabsiz_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -68,7 +67,7 @@ C-----------------------------------------------
      .   G_FORPGPINCH,G_MOMPGPINCH,G_EPGPINCHXZ,G_EPGPINCHYZ,G_EPGPINCHZZ,
      .   G_SKEW_ID,G_MAXFRAC,G_MAXEPS,G_SLIPRING_ID,G_SLIPRING_STRAND,G_RETRACTOR_ID,
      .   G_RINGSLIP,G_ADD_NODE,G_UPDATE,G_INTVAR,G_BETAORTH,G_AMU,G_SLIPRING_FRAM_ID,
-     .   G_FRAM_FACTOR,G_TSAIWU
+     .   G_FRAM_FACTOR,G_TSAIWU,G_DMGSCL
       INTEGER  ! layer variables
      .   LY_DMG,LY_GAMA,LY_DIRA,LY_DIRB,LY_CRKDIR,LY_PLAPT,LY_SIGPT,LY_HOURG,
      .   LY_UELR,LY_UELR1,LY_OFFPG,LY_OFF,LEN_PLAPT,LEN_SIGPT
@@ -80,14 +79,16 @@ C-----------------------------------------------
      .   L_DAM,L_DSUM,L_DGLO,L_EPE,L_EPC,L_XST,L_SSP,L_Z,L_FRAC,L_VISC,
      .   L_THK,L_FOR,L_MOM,L_SMSTR,L_BFRAC,L_DMG,LF_DAM,LF_DAMMX,LF_TDEL,
      .   LF_INDX,LF_OFF,L_FORTH,L_EINTTH,L_SEQ,L_SIGPLY,L_FAC_YLD,L_ABURN,
-     .   L_MU,L_PLANL,L_EPSDNL,L_DMGSCL,L_TSAIWU
+     .   L_MU,L_PLANL,L_EPSDNL,L_DMGSCL,L_TSAIWU,LF_DAMINI,IFAIL,IDFAIL
       TYPE(BUF_LAY_)  , POINTER :: BUFLY
       TYPE(L_BUFEL_)  , POINTER :: LBUF
       TYPE(G_BUFEL_)  , POINTER :: GBUFS,GBUFT
       TYPE(L_BUFEL_)  , POINTER :: LBUFS,LBUFT
       TYPE(FAIL_LOC_) , POINTER :: FLOCS,FLOCT
       TYPE(BUF_VISC_) , POINTER :: VISCS,VISCT
+      TYPE(BUF_EOS_)  , POINTER :: EOSS,EOST
       TYPE(BUF_NLOC_) , POINTER :: BUFNLS,BUFNLT
+      TYPE(BUF_NLOCTS_),POINTER :: BUFNLSTS,BUFNLTTS
 c-------------------------------------------------
 c      copy the element buffer : ELBUF_SRC -> ELBUF_TGT
 c      target must be allocated
@@ -128,24 +129,19 @@ c-------------------------------------------------
           ELBUF_TGT(NG)%NPTT   = NPTT 
 c
           DO IL = 1,NLAY                                         
-            ELBUF_TGT(NG)%BUFLY(IL)%ILAW  =ELBUF_SRC(NG)%BUFLY(IL)%ILAW                          
-            ELBUF_TGT(NG)%BUFLY(IL)%IMAT  =ELBUF_SRC(NG)%BUFLY(IL)%IMAT                          
-            ELBUF_TGT(NG)%BUFLY(IL)%IEOS  =ELBUF_SRC(NG)%BUFLY(IL)%IEOS                           
-            ELBUF_TGT(NG)%BUFLY(IL)%IVISC =ELBUF_SRC(NG)%BUFLY(IL)%IVISC                          
-            ELBUF_TGT(NG)%BUFLY(IL)%IPORO =ELBUF_SRC(NG)%BUFLY(IL)%IPORO                         
-            ELBUF_TGT(NG)%BUFLY(IL)%NFAIL =ELBUF_SRC(NG)%BUFLY(IL)%NFAIL                         
-            ELBUF_TGT(NG)%BUFLY(IL)%NVAR_MAT =
-     .                                  ELBUF_SRC(NG)%BUFLY(IL)%NVAR_MAT                           
-            ELBUF_TGT(NG)%BUFLY(IL)%NVARTMP =
-     .                                  ELBUF_SRC(NG)%BUFLY(IL)%NVARTMP                           
-            ELBUF_TGT(NG)%BUFLY(IL)%NVAR_VISC=
-     .                                 ELBUF_SRC(NG)%BUFLY(IL)%NVAR_VISC                        
-            ELBUF_TGT(NG)%BUFLY(IL)%NVAR_LOC=
-     .                                  ELBUF_SRC(NG)%BUFLY(IL)%NVAR_LOC                        
-            ELBUF_TGT(NG)%BUFLY(IL)%NVAR_LAY=
-     .                                  ELBUF_SRC(NG)%BUFLY(IL)%NVAR_LAY                       
-            ELBUF_TGT(NG)%BUFLY(IL)%NPTT=
-     .                                  ELBUF_SRC(NG)%BUFLY(IL)%NPTT
+            ELBUF_TGT(NG)%BUFLY(IL)%ILAW = ELBUF_SRC(NG)%BUFLY(IL)%ILAW                          
+            ELBUF_TGT(NG)%BUFLY(IL)%IMAT = ELBUF_SRC(NG)%BUFLY(IL)%IMAT                          
+            ELBUF_TGT(NG)%BUFLY(IL)%IEOS = ELBUF_SRC(NG)%BUFLY(IL)%IEOS                           
+            ELBUF_TGT(NG)%BUFLY(IL)%IVISC = ELBUF_SRC(NG)%BUFLY(IL)%IVISC                          
+            ELBUF_TGT(NG)%BUFLY(IL)%IPORO = ELBUF_SRC(NG)%BUFLY(IL)%IPORO                         
+            ELBUF_TGT(NG)%BUFLY(IL)%NFAIL = ELBUF_SRC(NG)%BUFLY(IL)%NFAIL                         
+            ELBUF_TGT(NG)%BUFLY(IL)%NVAR_MAT = ELBUF_SRC(NG)%BUFLY(IL)%NVAR_MAT                           
+            ELBUF_TGT(NG)%BUFLY(IL)%NVARTMP = ELBUF_SRC(NG)%BUFLY(IL)%NVARTMP                           
+            ELBUF_TGT(NG)%BUFLY(IL)%NVAR_EOS = ELBUF_SRC(NG)%BUFLY(IL)%NVAR_EOS                           
+            ELBUF_TGT(NG)%BUFLY(IL)%NVAR_VISC = ELBUF_SRC(NG)%BUFLY(IL)%NVAR_VISC                        
+            ELBUF_TGT(NG)%BUFLY(IL)%NVAR_LOC = ELBUF_SRC(NG)%BUFLY(IL)%NVAR_LOC                        
+            ELBUF_TGT(NG)%BUFLY(IL)%NVAR_LAY = ELBUF_SRC(NG)%BUFLY(IL)%NVAR_LAY                       
+            ELBUF_TGT(NG)%BUFLY(IL)%NPTT = ELBUF_SRC(NG)%BUFLY(IL)%NPTT
           ENDDO                                                            
 c
           DO IL = 1, NLAY                                                         
@@ -436,8 +432,12 @@ c-------------------------------
                   DO K = 1,NFAIL                                            
                    FLOCS=>ELBUF_SRC(NG)%BUFLY(IL)%FAIL(IR,IS,IT)%FLOC(K)      
                    FLOCT=>ELBUF_TGT(NG)%BUFLY(IL)%FAIL(IR,IS,IT)%FLOC(K)
-                   NUVAR = FLOCS%NVAR        
-                   FLOCT%NVAR = NUVAR        
+                   IFAIL  = FLOCS%ILAWF  
+                   FLOCT%ILAWF  = IFAIL
+                   IDFAIL = FLOCS%IDFAIL 
+                   FLOCT%IDFAIL = IDFAIL
+                   NUVAR  = FLOCS%NVAR 
+                   FLOCT%NVAR   = NUVAR        
                    FLOCT%VAR(1:NEL*NUVAR) = FLOCS%VAR(1:NEL*NUVAR) 
 c
                    LF_DAM = FLOCS%LF_DAM 
@@ -447,6 +447,10 @@ c
                    LF_DAMMX = FLOCS%LF_DAMMX 
                    FLOCT%LF_DAMMX = LF_DAMMX   
                    FLOCT%DAMMX(1:NEL*LF_DAMMX) = FLOCS%DAMMX(1:NEL*LF_DAMMX) 
+c
+                   LF_DAMINI = FLOCS%LF_DAMINI 
+                   FLOCT%LF_DAMINI = LF_DAMINI
+                   FLOCT%DAMINI(1:NEL*LF_DAMINI) = FLOCS%DAMINI(1:NEL*LF_DAMINI) 
 c
                    LF_TDEL = FLOCS%LF_TDEL 
                    FLOCT%LF_TDEL = LF_TDEL  
@@ -520,7 +524,57 @@ c-------------------------------
                 ENDDO
               ENDDO
             ENDIF
+c-------------------------------
+c         Non-local regularization in the thickshell thickness                   
+c-------------------------------
+          ELSEIF (ITY==1) THEN
+            ! Number of integration points in the shell thickness
+            NPTT = ELBUF_SRC(NG)%NLAY
+            IF ((INLOC>0).AND.(NPTT>1)) THEN
+              ! Number of non-local nodes in the thickness
+              NONL = NPTT+1
+              ! Loop over integration points in the plane of the shell
+              DO IR = 1,NPTR
+                DO IS = 1,NPTS
+                  ! Pointing the non-local buffer of the source
+                  BUFNLSTS => ELBUF_SRC(NG)%NLOCTS(IR,IS)
+                  ! Pointing the non-local buffer of the target
+                  BUFNLTTS => ELBUF_TGT(NG)%NLOCTS(IR,IS)
+                  ! Copying the buffer
+                  DO I = 1,NEL
+                    ! Nodal masses
+                    BUFNLTTS%MASSTH(I,1:NONL) = BUFNLSTS%MASSTH(I,1:NONL) 
+                    ! Non-local in-thickness cumulated variables
+                    BUFNLTTS%UNLTH(I,1:NONL)  = BUFNLSTS%UNLTH(I,1:NONL) 
+                    ! Non-local in-thickness velocities
+                    BUFNLTTS%VNLTH(I,1:NONL)  = BUFNLSTS%VNLTH(I,1:NONL) 
+                    ! Non-local in-thickness forces
+                    BUFNLTTS%FNLTH(I,1:NONL)  = BUFNLSTS%FNLTH(I,1:NONL) 
+                  ENDDO
+                ENDDO
+              ENDDO
+            ENDIF
           ENDIF
+c-------------------------------
+c         EoS                            
+c-------------------------------
+          DO IL = 1, NLAY  
+            NUVAR = ELBUF_SRC(NG)%BUFLY(IL)%NVAR_EOS                                                
+            IF (IGTYP == 51 .OR. IGTYP == 52) THEN
+              NPTT = ELBUF_SRC(NG)%BUFLY(IL)%NPTT
+            ELSE
+              NPTT = ELBUF_SRC(NG)%NPTT
+            ENDIF
+            DO IR = 1,NPTR                                                
+              DO IS = 1,NPTS                                              
+                DO IT = 1,NPTT                                  
+                  EOSS => ELBUF_SRC(NG)%BUFLY(IL)%EOS(IR,IS,IT)
+                  EOST => ELBUF_TGT(NG)%BUFLY(IL)%EOS(IR,IS,IT)
+                  EOST%VAR(1:NEL*NUVAR) = EOSS%VAR(1:NEL*NUVAR)
+                ENDDO                                                         
+              ENDDO                                                          
+            ENDDO                                                         
+          ENDDO             
 c-------------------------------------------------
 c         Global buffer variables
 c-------------------------------------------------
@@ -581,6 +635,7 @@ C
           G_MU    = GBUFS%G_MU    
           G_PLANL = GBUFS%G_PLANL
           G_EPSDNL = GBUFS%G_EPSDNL
+          G_DMGSCL = GBUFS%G_DMGSCL
           G_TSAIWU = GBUFS%G_TSAIWU
           G_BPRELD= GBUFS%G_BPRELD
           G_COR_NF = GBUFS%G_COR_NF
@@ -679,7 +734,7 @@ c
             ELBUF_TGT(NG)%GBUF%DELTAX => LBUFT%DELTAX
             ELBUF_TGT(NG)%GBUF%VOL    => LBUFT%VOL
             ELBUF_TGT(NG)%GBUF%EPSD   => LBUFT%EPSD
-            ELBUF_TGT(NG)%GBUF%EPSQ   => LBUFT%EPSQ	    
+            ELBUF_TGT(NG)%GBUF%EPSQ   => LBUFT%EPSQ      
             ELBUF_TGT(NG)%GBUF%PLA    => LBUFT%PLA
             ELBUF_TGT(NG)%GBUF%TEMP   => LBUFT%TEMP
             ELBUF_TGT(NG)%GBUF%TB     => LBUFT%TB
@@ -776,7 +831,7 @@ C              ELBUF_TGT(NG)%GBUF%EPGPINCHXZ => LBUFT%EPGPINCHXZ ! [PM] add late
 C              ELBUF_TGT(NG)%GBUF%EPGPINCHYZ => LBUFT%EPGPINCHYZ ! [PM] add later
 C              ELBUF_TGT(NG)%GBUF%EPGPINCHZZ => LBUFT%EPGPINCHZZ ! [PM] add later
 C
-              ELBUF_TGT(NG)%GBUF%STRPG => LBUFT%STRA
+              IF (G_STRPG<=G_STRA) ELBUF_TGT(NG)%GBUF%STRPG => LBUFT%STRA
             ELSE
               ELBUF_TGT(NG)%GBUF%FORPG => ELBUF_TGT(NG)%GBUF%FOR
               ELBUF_TGT(NG)%GBUF%MOMPG => ELBUF_TGT(NG)%GBUF%MOM
@@ -787,9 +842,10 @@ C              ELBUF_TGT(NG)%GBUF%EPGPINCHXZ => ELBUF_TGT(NG)%GBUF%EPGPINCHXZ ! 
 C              ELBUF_TGT(NG)%GBUF%EPGPINCHYZ => ELBUF_TGT(NG)%GBUF%EPGPINCHYZ ! [PM] add later
 C              ELBUF_TGT(NG)%GBUF%EPGPINCHZZ => ELBUF_TGT(NG)%GBUF%EPGPINCHZZ ! [PM] add later
 C
-              ELBUF_TGT(NG)%GBUF%STRPG => ELBUF_TGT(NG)%GBUF%STRA
+              IF (G_STRPG<=G_STRA) ELBUF_TGT(NG)%GBUF%STRPG => ELBUF_TGT(NG)%GBUF%STRA
             ENDIF
             ELBUF_TGT(NG)%GBUF%STRWPG=> ELBUF_TGT(NG)%GBUF%STRW
+            IF (G_STRPG>G_STRA) GBUFT%STRPG(1:NEL*G_STRPG) =  GBUFS%STRPG(1:NEL*G_STRPG)
           ELSEIF (NPG > 1) THEN
             GBUFT%FORPG(1:NEL*G_FORPG) =  GBUFS%FORPG(1:NEL*G_FORPG)
             GBUFT%MOMPG(1:NEL*G_MOMPG) =  GBUFS%MOMPG(1:NEL*G_MOMPG)

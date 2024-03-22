@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  CUPDT3F                       source/elements/shell/coque/cupdt3.F
 Chd|-- called by -----------
@@ -50,7 +50,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "scr18_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -79,24 +78,10 @@ C-----------------------------------------------
      .  I8M21(3,MVSIZ), I8M22(3,MVSIZ), I8M23(3,MVSIZ), I8M24(3,MVSIZ),
      .  I8M31(3,MVSIZ), I8M32(3,MVSIZ), I8M33(3,MVSIZ), I8M34(3,MVSIZ)
 C-----------------------------------------------
-      INTEGER NVC1, NVC2, NVC3, NVC4, I, J,N,IOFF,MX,MT
+      INTEGER NVC1, NVC2, NVC3, NVC4, I, J,N,MX,MT
       my_real OFF_L
 C=======================================================================
 C cumul de l'energie des elements deletes AU moment du delete
-      IOFF=0
-      DO I=JFT,JLT
-        IF(OFF(I) == 0.0.AND.OFFG(I) > 0.)IOFF=1
-      ENDDO
-      IF(IOFF == 1)THEN
-       MT = MAT(JFT)
-       DO I=JFT,JLT
-        IF(OFF(I) == 0.0.AND.OFFG(I) > 0.)THEN
-           MX = IPARTC(I)
-           PARTSAV(24,MX)=PARTSAV(24,MX) + EINT(I,1) + EINT(I,2)
-           PARTSAV(25,MX)=PARTSAV(25,MX) + PM(1,MT)*AREA(I)*THK(I)
-        ENDIF
-       ENDDO
-      ENDIF
       OFF_L = ZERO
       DO I=JFT,JLT
         IF(OFF(I)<1.)OFFG(I) = OFF(I)
@@ -542,7 +527,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "com01_c.inc"
 #include      "scr18_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -564,26 +548,12 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NVC1, NVC2, NVC3, NVC4, I, J,IOFF,MX, MT
+      INTEGER NVC1, NVC2, NVC3, NVC4, I, J,MX, MT
       my_real
      .   OFF_L,CF(MVSIZ)
 C=======================================================================
 C
 C cumul de l'energie des elements deletes AU moment du delete
-      IOFF=0
-      DO I=JFT,JLT
-        IF (OFF(I) == ZERO .AND. OFFG(I) > ZERO) IOFF=1
-      ENDDO
-      MT = MAT(JFT)
-      IF (IOFF == 1)THEN
-       DO I=JFT,JLT
-        IF (OFF(I) == ZERO .AND. OFFG(I) > ZERO) THEN
-           MX = IPARTC(I)
-           PARTSAV(24,MX)=PARTSAV(24,MX) + EINT(I,1) + EINT(I,2)
-           PARTSAV(25,MX)=PARTSAV(25,MX) + PM(1,MT)*AREA(I)*THK(I)
-        ENDIF
-       ENDDO
-      ENDIF
       OFF_L = ZERO
       DO I=JFT,JLT
         IF (OFF(I) < ONE) OFFG(I) = OFF(I)
@@ -1008,10 +978,8 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "task_c.inc"
 #include      "parit_c.inc"
 #include      "scr18_c.inc"
-#include      "com01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1033,24 +1001,10 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, II, K, J,IOFF,MX,MT
+      INTEGER I, II, K, J,MX,MT
       my_real OFF_L
 C=======================================================================
 C cumul de l'energie des elements deletes AU moment du delete
-      IOFF=0
-      DO I=JFT,JLT
-        IF (OFF(I) == ZERO .AND. OFFG(I) > ZERO) IOFF=1
-      ENDDO
-      IF (IOFF == 1) THEN
-       MT = MAT(JFT)
-       DO I=JFT,JLT
-        IF (OFF(I) == ZERO .AND. OFFG(I) > ZERO) THEN
-           MX = IPARTC(I)
-           PARTSAV(24,MX)=PARTSAV(24,MX) + EINT(I,1) + EINT(I,2)
-           PARTSAV(25,MX)=PARTSAV(25,MX) + PM(1,MT)*AREA(I)*THK(I)
-        ENDIF
-       ENDDO
-      ENDIF
       OFF_L = ZERO
       DO I=JFT,JLT
         IF (OFF(I) < ONE) OFFG(I) = OFF(I)
@@ -1167,8 +1121,7 @@ C$DIR PREFETCH FSKY(8,IADC(4,I+4))
 C
 c  End of Prefetch
 C
-Cel  prefetch FSKY
-c#include "cupdt3_pf.inc"
+C    prefetch FSKY
           K = IADC(1,I)
           FSKY(1,K)=-F11(I)
           FSKY(2,K)=-F21(I)
@@ -1212,7 +1165,6 @@ C
 C
         IF(JTHE > 0 ) THEN
           DO I=JFT,JLT
-c#include "cupdt3_pf.inc"
             FTHESKY(IADC(1,I)) = THEM(I,1)
             FTHESKY(IADC(2,I)) = THEM(I,2)
             FTHESKY(IADC(3,I)) = THEM(I,3)

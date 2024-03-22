@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  I6DAMP                        source/interfaces/inter3d/i6damp.F
 Chd|-- called by -----------
@@ -27,16 +27,18 @@ Chd|        I6MAIN                        source/interfaces/inter3d/i6main.F
 Chd|-- calls ---------------
 Chd|        NINTERP                       source/interfaces/int14/ninterp.F
 Chd|====================================================================
-      SUBROUTINE I6DAMP(V      ,NPC    ,TF     ,IRECT  ,
-     1                  MSR    ,NSV    ,IRTL   ,IRTLO  ,
-     2                  CST    ,ES     ,EM     ,VISC   ,
-     3                  NDAMP1 ,NDAMP2 ,LOLD   ,MASS   ,
-     4                  VNI    ,ASCALF ,ASCALV ,FSCALV ,
-     5                  H1     ,H2     ,H3     ,H4     ,
-     6                  FNI    ,FXI    ,FYI    ,FZI    ,
-     7                  FX1    ,FX2    ,FX3    ,FX4    ,
-     8                  FY1    ,FY2    ,FY3    ,FY4    ,
-     9                  FZ1    ,FZ2    ,FZ3    ,FZ4)
+      SUBROUTINE I6DAMP(
+     1   V,       NPC,     TF,      IRECT,
+     2   MSR,     NSV,     IRTL,    IRTLO,
+     3   CST,     ES,      EM,      VISC,
+     4   NDAMP1,  NDAMP2,  LOLD,    MASS,
+     5   VNI,     ASCALF,  ASCALV,  FSCALV,
+     6   H1,      H2,      H3,      H4,
+     7   FNI,     FXI,     FYI,     FZI,
+     8   FX1,     FX2,     FX3,     FX4,
+     9   FY1,     FY2,     FY3,     FY4,
+     A   FZ1,     FZ2,     FZ3,     FZ4,
+     B   LFT,     LLT,     NFT)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -48,6 +50,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(INOUT) :: LFT
+      INTEGER, INTENT(INOUT) :: LLT
+      INTEGER, INTENT(INOUT) :: NFT
       INTEGER NDAMP1 ,NDAMP2
       INTEGER IRECT(4,*),MSR(*),NSV(*),IRTL(*),IRTLO(*),NPC(*),LOLD(*)
 C     REAL
@@ -63,8 +68,6 @@ C     REAL
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com08_c.inc"
-#include      "vect07_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -75,16 +78,6 @@ C     REAL
       my_real
      .   VIS(LLT),VISCV(LLT),FACT(LLT),XX(LLT)
 C-----------------------------------------------
-!      EQUIVALENCE (N1,BV(1,19)) ,(N2,BV(1,20)) ,(N3,BV(1,21))
-!      EQUIVALENCE (H1,BV(1,25)) ,(H2,BV(1,26)) ,(H3,BV(1,27))
-!      EQUIVALENCE (H4,BV(1,28)) ,(XFACE,BV(1,29))
-!      EQUIVALENCE (FNI,BV(1,40))
-!      EQUIVALENCE (FXI,BV(1,41)),(FYI,BV(1,42)),(FZI,BV(1,43))
-!      EQUIVALENCE (FX1,BV(1,44)),(FY1,BV(1,45)),(FZ1,BV(1,46))
-!      EQUIVALENCE (FX2,BV(1,47)),(FY2,BV(1,48)),(FZ2,BV(1,49))
-!      EQUIVALENCE (FX3,BV(1,50)),(FY3,BV(1,51)),(FZ3,BV(1,52))
-!      EQUIVALENCE (FX4,BV(1,53)),(FY4,BV(1,54)),(FZ4,BV(1,55))
-C=======================================================================
 C     Coefficient d'amortissement
 C--------------------------------
       IF (NDAMP1 > 0) THEN    ! velocity function

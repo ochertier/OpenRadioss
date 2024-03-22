@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  HM_READ_MAT36                 source/materials/mat/mat036/hm_read_mat36.F
 Chd|-- called by -----------
@@ -33,16 +33,17 @@ Chd|        HM_GET_FLOAT_ARRAY_INDEX_DIM  source/devtools/hm_reader/hm_get_float
 Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
 Chd|        HM_GET_INT_ARRAY_INDEX        source/devtools/hm_reader/hm_get_int_array_index.F
 Chd|        HM_OPTION_IS_ENCRYPTED        source/devtools/hm_reader/hm_option_is_encrypted.F
+Chd|        INIT_MAT_KEYWORD              source/materials/mat/init_mat_keyword.F
 Chd|        ELBUFTAG_MOD                  share/modules1/elbuftag_mod.F 
 Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/matparam_def_mod.F
+Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
-      SUBROUTINE HM_READ_MAT36(UPARAM   ,MAXUPARAM,NUPARAM   ,NUVAR  ,NVARTMP  ,
-     .                         IFUNC    ,MAXFUNC  ,MFUNC     , PARMAT,UNITAB   ,
-     .                         ID       ,MTAG     ,TITR     , LSUBMODEL,PM     ,
-     .                         ISRATE   )                     
+      SUBROUTINE HM_READ_MAT36(UPARAM   ,MAXUPARAM,NUPARAM   ,NUVAR    ,NVARTMP  ,
+     .                         IFUNC    ,MAXFUNC  ,MFUNC     ,PARMAT   ,UNITAB   ,
+     .                         ID       ,MTAG     ,TITR      ,LSUBMODEL,PM       ,
+     .                         ISRATE   ,MATPARAM )                     
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C-----------------------------------------------
@@ -76,33 +77,28 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr17_c.inc"
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
 #include      "units_c.inc"
-#include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "submod_c.inc"
-#include      "sysunit.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       TYPE (UNIT_TYPE_),INTENT(IN) ::UNITAB 
       my_real, DIMENSION(NPROPM) ,INTENT(INOUT)   :: PM     
-      my_real, DIMENSION(100)    ,INTENT(OUT)     :: PARMAT
-      my_real, DIMENSION(MAXUPARAM) ,INTENT(OUT)  :: UPARAM
-      INTEGER, DIMENSION(MAXFUNC)   ,INTENT(OUT)  :: IFUNC
+      my_real, DIMENSION(100)    ,INTENT(INOUT)     :: PARMAT
+      my_real, DIMENSION(MAXUPARAM) ,INTENT(INOUT)  :: UPARAM
+      INTEGER, DIMENSION(MAXFUNC)   ,INTENT(INOUT)  :: IFUNC
       INTEGER, INTENT(INOUT)          :: MFUNC,NUPARAM,NUVAR,NVARTMP,ISRATE
       TYPE(MLAW_TAG_),INTENT(INOUT)   :: MTAG
       INTEGER,INTENT(IN)              :: ID,MAXFUNC,MAXUPARAM
       CHARACTER*nchartitle,INTENT(IN) :: TITR
       TYPE(SUBMODEL_DATA),INTENT(IN)  :: LSUBMODEL(*)
+      TYPE(MATPARAM_STRUCT_) ,INTENT(INOUT) :: MATPARAM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER :: NBMAT, MAT_ID  ! Number of declared materials
       INTEGER :: I,J,VP,YLDCHECK
-      INTEGER :: RHOFLAG,ICOMP,NRATE1,NRATE,IPFUN,IFUNCE,ISRAT,
+      INTEGER :: RHOFLAG,ICOMP,NRATE1,NRATE,IPFUN,IFUNCE,ISRAT,ISMOOTH,
      .           NBLINE,NBREAD,IFAIL,OPTE,ILAW,NFUNC
       my_real :: RHO0, RHOR,E,NU,G,C1,SOUNDSP, EPSMAX,EPSR1,EPSR2,EPSF,FISOKIN,FCUT,
      .           PSCAL_UNIT,PSCALE,EINF,CE ,
@@ -131,7 +127,7 @@ Card1
 C-----------------------------------------------
 Card2
       CALL HM_GET_INTV  ('NFUNC'        ,NRATE   ,IS_AVAILABLE,LSUBMODEL)
-      CALL HM_GET_INTV  ('Fsmooth'      ,ISRAT   ,IS_AVAILABLE,LSUBMODEL)
+      CALL HM_GET_INTV  ('Fsmooth'      ,ISMOOTH ,IS_AVAILABLE,LSUBMODEL)
       CALL HM_GET_FLOATV('MAT_HARD'     ,FISOKIN ,IS_AVAILABLE, LSUBMODEL, UNITAB)
       CALL HM_GET_FLOATV('Fcut'         ,FCUT    ,IS_AVAILABLE, LSUBMODEL, UNITAB)
       CALL HM_GET_FLOATV('MAT_Epsilon_F',EPSF    ,IS_AVAILABLE, LSUBMODEL, UNITAB)
@@ -143,6 +139,16 @@ Card3
       CALL HM_GET_FLOATV('MAT_EFIB'     ,EINF    ,IS_AVAILABLE, LSUBMODEL, UNITAB)
       CALL HM_GET_FLOATV('MAT_C'        ,CE      ,IS_AVAILABLE, LSUBMODEL, UNITAB)
 C-----------------------------------------------
+      ! Poisson's ratio check
+      IF (NU < ZERO .OR. NU >= HALF) THEN
+        CALL ANCMSG(MSGID=49,
+     .              MSGTYPE=MSGERROR,
+     .              ANMODE=ANINFO_BLIND_2,
+     .              R1=NU,
+     .              I1=ID,
+     .              C1=TITR)
+      ENDIF
+c
       IF(NRATE > 100)THEN
         CALL ANCMSG(MSGID=215, MSGTYPE=MSGERROR, ANMODE=ANINFO,
      .               I1=36,
@@ -182,7 +188,7 @@ c
         ENDDO
 c
         DO I=1,NRATE-1                        
-	         IF (RATE(I) >= RATE(I+1)) THEN        
+          IF (RATE(I) >= RATE(I+1)) THEN        
             CALL ANCMSG(MSGID=478, MSGTYPE=MSGERROR, ANMODE=ANINFO_BLIND_1,
      .                  I1=ID,
      .                  C1=TITR)
@@ -201,7 +207,8 @@ c
 c-------------------------
       IF (NRATE == 1) THEN
         NFUNC  = 1
-        ISRAT  = 0
+        ISMOOTH= 0
+        ISRAT  = 0     ! strain rate is always calculated for output
         FCUT   = ZERO
         VP     = 0   !!!  no plastic strain rate dependency with single static curve
       ELSE    ! NRATE > 1
@@ -219,7 +226,7 @@ c-------------------------
         ENDIF
 c
         IF (FCUT == ZERO .or. VP == 1) THEN
-          FCUT = 10000.0D0*FAC_T_WORK
+          FCUT = 10000.0D0*UNITAB%FAC_T_WORK
         END IF 
       ENDIF
       ISRATE = MAX(ISRATE,ISRAT) 
@@ -234,7 +241,7 @@ c-----------------------------------------------
      .              C2=TITR)
       END IF
 C      
-      IF (EPSR1 == ZERO .AND. EPSR1 == ZERO .AND. EPSF == ZERO) THEN
+      IF (EPSR1 == ZERO .AND. EPSR2 == ZERO .AND. EPSF == ZERO) THEN
         IF (EPSMAX == ZERO) THEN
           IFAIL = 0
         ELSE
@@ -247,6 +254,10 @@ c     IFAIL = 0 => no failure at all inside material
 c     IFAIL = 1 => only failure vs max plastic strain
 c     IFAIL = 2 => failure + damage vs principal tensile strain
 c
+      IF (IFAIL > 0) THEN 
+        MTAG%G_DMG = 1
+        MTAG%L_DMG = 1        
+      ENDIF
       IF (EPSMAX== ZERO) EPSMAX= INFINITY
       IF (EPSR1 == ZERO) EPSR1 = INFINITY
       IF (EPSR2 == ZERO) EPSR2 = TWO*INFINITY
@@ -318,8 +329,9 @@ c -----------------------
       UPARAM(2*NFUNC + 26) = VP
       UPARAM(2*NFUNC + 27) = IFAIL
       UPARAM(2*NFUNC + 28) = YLDCHECK
+      UPARAM(2*NFUNC + 29) = ISMOOTH
 c
-      NUPARAM = 2*NFUNC + 28
+      NUPARAM = 2*NFUNC + 29
 c--------------------------------
       IF (RHOR == ZERO) RHOR=RHO0
       PM(1) = RHOR
@@ -352,7 +364,12 @@ C-----------------------
       IF (FISOKIN /= ZERO) THEN
         MTAG%L_SIGB = 6
       ENDIF
-
+C-----------------------  
+      ! Properties compatibility
+      CALL INIT_MAT_KEYWORD(MATPARAM,"SHELL_ISOTROPIC")
+      CALL INIT_MAT_KEYWORD(MATPARAM,"SOLID_ISOTROPIC")
+      CALL INIT_MAT_KEYWORD(MATPARAM,"SPH")   
+      CALL INIT_MAT_KEYWORD(MATPARAM,"BEAM_INTEGRATED")    
 C-----------------------      
       WRITE(IOUT,1001) TRIM(TITR),ID,36  
       WRITE(IOUT,1000)   
@@ -360,7 +377,7 @@ C-----------------------
         WRITE(IOUT,'(5X,A,//)')'CONFIDENTIAL DATA'
       ELSE     
         WRITE(IOUT,1002) RHO0
-        WRITE(IOUT,1100) E,NU,EPSMAX,EPSR1,EPSR2,EPSF,FISOKIN,ISRATE,FCUT,VP
+        WRITE(IOUT,1100) E,NU,EPSMAX,EPSR1,EPSR2,EPSF,FISOKIN,ISMOOTH,FCUT,VP
         WRITE(IOUT,1200)(IFUNC(J),YFAC(J),RATE(J),J=1,NFUNC)
         WRITE(IOUT,1300) IPFUN,PSCALE, IFUNCE,EINF,CE
         WRITE(IOUT,*)' '
@@ -369,37 +386,41 @@ C-----------
       RETURN
 C-----------
  1000 FORMAT(
-     & 5X,40H  TABULATED ELASTIC PLASTIC LAW 36      ,/,
-     & 5X,40H  --------------------------------      ,//)
+     & 5X,'    TABULATED ELASTIC PLASTIC LAW 36    ',/,
+     & 5X,'    --------------------------------    ' ,//)
  1001 FORMAT(/
      & 5X,A,/,
-     & 5X,'MATERIAL NUMBER. . . . . . . . . . . . =',I10/,
-     & 5X,'MATERIAL LAW . . . . . . . . . . . . . =',I10/)
+     & 5X,'MATERIAL NUMBER . . . . . . . . . . . . . .=',I10/,
+     & 5X,'MATERIAL LAW. . . . . . . . . . . . . . . .=',I10/)
  1002 FORMAT(
-     & 5X,'INITIAL DENSITY. . . . . . . . . . . . =',1PG20.13/)  
+     & 5X,'INITIAL DENSITY . . . . . . . . . . . . . .=',1PG20.13/)  
  1100 FORMAT(
-     & 5X,'YOUNG''S MODULUS. . . . . . . . . . . .=',1PG20.13/
-     & 5X,'POISSON''S RATIO. . . . . . . . . . . .=',1PG20.13/
-     & 5X,'MAXIMUM PLASTIC STRAIN . . . . . . . . =',1PG20.13/
-     & 5X,'TENSION FAILURE STRAIN 1 . . . . . . . =',1PG20.13/
-     & 5X,'TENSION FAILURE STRAIN 2 . . . . . . . =',1PG20.13/
-     & 5X,'MAXIMUM TENSION FAILURE STRAIN  .. . . =',1PG20.13/     
-     & 5X,'ISO-KINEMATIC HARDENING FACTOR. . . .  =',1PG20.13/
-     & 5X,'SMOOTH STRAIN RATE OPTION. . . . . . . =',I10/
-     & 5X,'STRAIN RATE CUTTING FREQUENCY . . . . .=',1PG20.13/
-     & 5X,'PLASTIC STRAIN RATE DEPENDENCY FLAG . .=',I10/
-     & 5X,40H  - FLAG_PL = 0 -> TOTAL SR DEPENDENCY         ,/,
-     & 5X,40H  - FLAG_PL = 1 -> PLASTIC SR DEPENDENCY       ,//)
+     & 5X,'YOUNG MODULUS . . . . . . . . . . . . . . .=',1PG20.13/
+     & 5X,'POISSON RATIO . . . . . . . . . . . . . . .=',1PG20.13/
+     & 5X,'MAXIMUM PLASTIC STRAIN  . . . . . . . . . .=',1PG20.13/
+     & 5X,'TENSION FAILURE STRAIN 1  . . . . . . . . .=',1PG20.13/
+     & 5X,'TENSION FAILURE STRAIN 2  . . . . . . . . .=',1PG20.13/
+     & 5X,'MAXIMUM TENSION FAILURE STRAIN  . . . . . .=',1PG20.13/     
+     & 5X,'ISO-KINEMATIC HARDENING FACTOR. . . . . . .=',1PG20.13/
+     & 5X,'SMOOTH STRAIN RATE OPTION . . . . . . . . .=',I10/
+     & 5X,'     0 -> NO SMOOTHING                      ',/,
+     & 5X,'     1 -> SMOOTH + LINEAR INTERPOLATION     ',/,
+     & 5X,'     2 -> SMOOTH + LOG_N  INTERPOLATION     ',/
+     & 5X,'STRAIN RATE CUTTING FREQUENCY . . . . . . .=',1PG20.13/
+     & 5X,'PLASTIC STRAIN RATE DEPENDENCY FLAG . . . .=',I10/
+     & 5X,'   FLAG_PL = 0 -> TOTAL SR DEPENDENCY       ',/,
+     & 5X,'   FLAG_PL = 1 -> PLASTIC SR DEPENDENCY     ',/,
+     & 5X,'STRAIN RATE INTERPOLATION FLAG. . . . . . .=',I10/)
  1200 FORMAT(
-     & 5X,'YIELD STRESS FUNCTION NUMBER. . . . . .=',I10/
-     & 5X,'YIELD SCALE FACTOR. . . . . . . . . . .=',1PG20.13/
-     & 5X,'STRAIN RATE . . . . . . . . . . . . . .=',1PG20.13)
+     & 5X,'YIELD STRESS FUNCTION NUMBER. . . . . . . .=',I10/
+     & 5X,'YIELD SCALE FACTOR. . . . . . . . . . . . .=',1PG20.13/
+     & 5X,'STRAIN RATE . . . . . . . . . . . . . . . .=',1PG20.13)
  1300 FORMAT(
-     & 5X,'PRESSURE DEPENDENT YIELD FUNCTION . . . .=',I10/
-     & 5X,'PRESSURE SCALE FACTOR. . . . . . . . .  .=',1PG20.13/
-     & 5X,'YOUNG MODULUS SCALE FACTOR FUNCTION . . .=',I10/
-     & 5X,'YOUNG MODULUS EINF . . . . . . . . . . . =',1PG20.13/
-     & 5X,'PARAMETER CE . . . . . . . . . . . . . . =',1PG20.13)
+     & 5X,'PRESSURE DEPENDENT YIELD FUNCTION . . . . .=',I10/
+     & 5X,'PRESSURE SCALE FACTOR . . . . . . . . . . .=',1PG20.13/
+     & 5X,'YOUNG MODULUS SCALE FACTOR FUNCTION . . . .=',I10/
+     & 5X,'YOUNG MODULUS EINF. . . . . . . . . . . . .=',1PG20.13/
+     & 5X,'PARAMETER CE. . . . . . . . . . . . . . . .=',1PG20.13)
 c-----------
       RETURN
       END

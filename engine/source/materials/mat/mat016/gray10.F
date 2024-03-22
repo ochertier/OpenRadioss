@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  GRAY10                        source/materials/mat/mat016/gray10.F
 Chd|-- called by -----------
@@ -51,7 +51,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "vect01_c.inc"
 #include      "com08_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -61,11 +60,10 @@ C-----------------------------------------------
      .   VAVG(MVSIZ), E1(MVSIZ), E2(MVSIZ), E3(MVSIZ), E4(MVSIZ),
      .   E5(MVSIZ),   E6(MVSIZ), DTA
 C-----------------------------------------------
-C-----------------------------------------------
-      
+     
       DTA =FOURTH*DT1
 
-      DO I=LFT,LLT
+      DO I=1,NEL
         E1(I)=D1(I)*(SOLD1(I)+SNEW(I,1)+POLD(I))
         E2(I)=D2(I)*(SOLD2(I)+SNEW(I,2)+POLD(I))
         E3(I)=D3(I)*(SOLD3(I)+SNEW(I,3)+POLD(I))
@@ -74,13 +72,13 @@ C-----------------------------------------------
         E6(I)=D6(I)*(SOLD6(I)+SNEW(I,6))
       ENDDO
 
-      DO I=LFT,LLT
+      DO I=1,NEL
         VAVG(I)=(TWO*VOLN(I)-DVOL(I))*OFF(I)
         DVOL(I)=DVOL(I)*OFF(I)
         EINC(I)=VAVG(I)*(E1(I)+E2(I)+E3(I)+E4(I)+E5(I)+E6(I))*DTA
       ENDDO
 
-      DO I=LFT,LLT
+      DO I=1,NEL
         EINC(I)=EINC(I)-DVOL(I)*(POLD(I)+QOLD(I))*HALF
         EINT(I)=EINT(I)+EINC(I)
       ENDDO

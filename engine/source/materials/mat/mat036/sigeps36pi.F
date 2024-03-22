@@ -1,29 +1,29 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  SIGEPS36PI                    source/materials/mat/mat036/sigeps36pi.F
 Chd|-- called by -----------
-Chd|        MULAWP                        source/elements/beam/mulawp.F 
+Chd|        MULAW_IB                      source/elements/beam/mulaw_ib.F
 Chd|-- calls ---------------
 Chd|        VINTER                        source/tools/curve/vinter.F   
 Chd|        FINTER                        source/tools/curve/finter.F   
@@ -31,7 +31,7 @@ Chd|====================================================================
       SUBROUTINE SIGEPS36PI(
      1               NEL     ,KFUNC   ,IPT     ,NPF     ,TF      ,        
      2               NGL     ,TIME    ,TIMESTEP,UPARAM  ,IPM     ,       
-     3               MAT     ,E       ,G       ,OFF     ,DEPSXX  ,      
+     3               IMAT    ,E       ,G       ,OFF     ,DEPSXX  ,      
      4               DEPSXY  ,DEPSXZ  ,SIGOXX  ,SIGOXY  ,SIGOXZ  ,      
      5               SIGNXX  ,SIGNXY  ,SIGNXZ  ,ETSE    ,PLA     ,
      6               EPSP    ,NVARTMP ,VARTMP)      
@@ -74,14 +74,13 @@ C---------+---------+---+---+--------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "com01_c.inc"
-#include      "scr05_c.inc"
 #include      "units_c.inc"
 C-----------------------------------------------
 C   I N P U T   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER ,INTENT(IN) :: IMAT
       INTEGER NEL,NUPARAM,IPT,NVARTMP
-      INTEGER MAT(NEL),NGL(NEL),NPF(*),IPM(NPROPMI,*),KFUNC(*)
+      INTEGER NGL(NEL),NPF(*),IPM(NPROPMI,*),KFUNC(*)
       my_real
      . TIME,TIMESTEP,UPARAM(*),PLA(NEL),EPSP(NEL),
      .   DEPSXX(NEL),DEPSXY(NEL),DEPSXZ(NEL),
@@ -103,13 +102,11 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
+      INTEGER I,J,J1,J2,N,NINDX,IADBUF,NFUNC,IPLAS,IFAIL,MFUNCE,ISMOOTH
       INTEGER NRATE(NEL),IAD1(NEL),IPOS1(NEL),ILEN1(NEL),
      .        IAD2(NEL),IPOS2(NEL),ILEN2(NEL),JJ(NEL),
-     .        IFUNC(NEL,100),OPTE(NEL),MFUNCE
-      INTEGER I,J,J1,J2,N,NINDX,IADBUF,NFUNC,IPLAS,IFAIL
-      my_real 
-     .        G3(NEL),
-     .        DYDX1(NEL),DYDX2(NEL),RATE(NEL,2),
+     .        IFUNC(NEL,100),OPTE(NEL)
+      my_real :: G3(NEL),DYDX1(NEL),DYDX2(NEL),RATE(NEL,2),
      .        Y1(NEL),Y2(NEL),DR(NEL),YFAC(NEL,2),
      .        PP(NEL),QQ(NEL),FAIL(NEL),SVM(NEL),H(NEL),
      .        EPSMAX(NEL),EPSR1(NEL),EPSR2(NEL),
@@ -117,21 +114,20 @@ C-----------------------------------------------
      .        HK(NEL),NU(NEL),NU1(NEL),EPSF(NEL),YLD(NEL),
      .        AA(NEL),BB(NEL),CC(NEL),EINF(NEL),CE(NEL),
      .        ESCALE(NEL),DYDXE(NEL)
-      my_real
-     .        R,UMR,FAC,GS,SVM1,SHFACT
+      my_real :: R,UMR,FAC,GS,SVM1,SHFACT,EPSP1,EPSP2,RFAC
 C=======================================================================
       IPLAS  = 1                        
       SHFACT = FIVE_OVER_6
       DO I=1,NEL                            
-        NFUNC  = IPM(10,MAT(I))   
+        NFUNC  = IPM(10,IMAT)   
         DO J=1,NFUNC                         
-          IFUNC(I,J)=IPM(10+J,MAT(I))   
+          IFUNC(I,J)=IPM(10+J,IMAT)   
         ENDDO                                
         FAIL(I) = ONE                            
       ENDDO                                  
 C
+      IADBUF = IPM(7,IMAT)-1                
       DO I=1,NEL                                
-        IADBUF = IPM(7,MAT(I))-1                
         E(I)   = UPARAM(IADBUF+2)                
         G(I)   = UPARAM(IADBUF+5)                
         G3(I)  = THREE*G(I)                      
@@ -142,7 +138,8 @@ c---------------------
         OPTE(I) = UPARAM(IADBUF+2*NRATE(I) + 23) 
         EINF(I) = UPARAM(IADBUF+2*NRATE(I) + 24) 
         CE(I)   = UPARAM(IADBUF+2*NRATE(I) + 25) 
-        IFAIL   = NINT(UPARAM(2*NRATE(I) + 27))    ! flag for failure
+        IFAIL   = NINT(UPARAM(IADBUF+2*NRATE(I) + 27))    ! flag for failure
+        ISMOOTH = NINT(UPARAM(IADBUF+2*NRATE(I) + 29))    ! strain rate interpolation flag
 c--------------------
         IF (OPTE(I) == 1)THEN                                                     
            IF(PLA(I) > ZERO)THEN             
@@ -186,18 +183,18 @@ C     Yield Stress
 C-------------------
       JJ(1:NEL) = 1 
       DO I=1,NEL                                     
-        IADBUF = IPM(7,MAT(I))-1
+        IADBUF = IPM(7,IMAT)-1
         DO J=2,NRATE(I)-1                             
           IF (EPSP(I) > UPARAM(IADBUF+6+J)) JJ(I) = J 
         ENDDO                                         
       ENDDO                                           
       DO I=1,NEL                                               
-        IADBUF = IPM(7,MAT(I))-1
-        RATE(I,1)=UPARAM(IADBUF+6+JJ(I))                        
-        YFAC(I,1)=UPARAM(IADBUF+6+NRATE(I)+JJ(I))   
-        IF ( NRATE(I) > 1)THEN         
-          RATE(I,2)=UPARAM(IADBUF+6+JJ(I)+1)                      
-          YFAC(I,2)=UPARAM(IADBUF+6+NRATE(I)+JJ(I)+1)  
+        IADBUF = IPM(7,IMAT)-1
+        RATE(I,1) = UPARAM(IADBUF+6+JJ(I))                        
+        YFAC(I,1) = UPARAM(IADBUF+6+NRATE(I)+JJ(I))   
+        IF (NRATE(I) > 1) THEN         
+          RATE(I,2) = UPARAM(IADBUF+6+JJ(I)+1)                      
+          YFAC(I,2) = UPARAM(IADBUF+6+NRATE(I)+JJ(I)+1)  
         ENDIF           
       ENDDO                                                     
 C
@@ -210,7 +207,7 @@ C
         IPOS1(I) = VARTMP(I,J1)                                         
         IAD1(I)  = NPF(IFUNC(I,J1)) / 2 + 1                    
         ILEN1(I) = NPF(IFUNC(I,J1)+1) / 2 - IAD1(I) - IPOS1(I) 
-        IF ( NRATE(I) > 1)THEN         
+        IF (NRATE(I) > 1) THEN         
           IPOS2(I) = VARTMP(I,J2)                                           
           IAD2(I)  = NPF(IFUNC(I,J2)) / 2 + 1                    
           ILEN2(I) = NPF(IFUNC(I,J2)+1) / 2 - IAD2(I) - IPOS2(I) 
@@ -231,9 +228,17 @@ C
           J1 = JJ(I)                                              
           J2 = J1+1                                               
           Y1(I) = Y1(I)*YFAC(I,1)                                 
-          Y2(I) = Y2(I)*YFAC(I,2)                                 
-          FAC   = (EPSP(I) - RATE(I,1))/(RATE(I,2) - RATE(I,1))   
-          YLD(I)  = FAIL(I)*(Y1(I)    + FAC*(Y2(I)-Y1(I)))        
+          Y2(I) = Y2(I)*YFAC(I,2)
+          IF (ISMOOTH == 2) THEN       ! log_n  based interpolation of strain rate
+            EPSP1 = MAX(RATE(I,1), EM20)
+            EPSP2 = RATE(I,2)
+            FAC   = LOG(MAX(EPSP(I),EM20)/EPSP1) / LOG(EPSP2/EPSP1)   
+          ELSE                         ! linear interpolation of strain rate
+            EPSP1 = RATE(I,1)
+            EPSP2 = RATE(I,2)
+            FAC   = (EPSP(I) - EPSP1) / (EPSP2 - EPSP1)   
+          END IF
+          YLD(I)  = FAIL(I)*(Y1(I) + FAC*(Y2(I)-Y1(I)))        
           YLD(I)  = MAX(YLD(I),EM20)                              
           DYDX1(I)= DYDX1(I)*YFAC(I,1)                            
           DYDX2(I)= DYDX2(I)*YFAC(I,2)                            

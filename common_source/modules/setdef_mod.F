@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  SETDEF_MOD                    modules/setdef_mod.F          
 Chd|-- called by -----------
@@ -30,6 +30,7 @@ Chd|        COPY_LIST_IN_CAUSE            starter/source/model/sets/create_eleme
 Chd|        CREATE_BOX_CLAUSE             starter/source/model/sets/create_box_clause.F
 Chd|        CREATE_ELEMENT_FROM_PART      starter/source/model/sets/create_element_from_part.F
 Chd|        CREATE_ELEM_ALL_CLAUSE        starter/source/model/sets/create_elem_all_clause.F
+Chd|        CREATE_ELLIPSE_CLAUSE         starter/source/model/sets/create_ellipse_clause.F
 Chd|        CREATE_ELT_BOX                starter/source/model/sets/create_elt_box.F
 Chd|        CREATE_ELT_CLAUSE             starter/source/model/sets/create_element_clause.F
 Chd|        CREATE_ELT_LIST               starter/source/model/sets/create_element_clause.F
@@ -77,6 +78,7 @@ Chd|        FILL_GR                       starter/source/model/sets/fill_gr.F
 Chd|        FILL_IGR                      starter/source/model/sets/fill_igr.F
 Chd|        FILL_LINE                     starter/source/model/sets/fill_gr.F
 Chd|        FILL_SURF                     starter/source/model/sets/fill_gr.F
+Chd|        FILL_SURF_ELLIPSE             starter/source/model/sets/fill_gr_surf_ellipse.F
 Chd|        HM_READ_INIVOL                starter/source/initial_conditions/inivol/hm_read_inivol.F
 Chd|        HM_SET                        starter/source/model/sets/hm_set.F
 Chd|        INSERT_CLAUSE_IN_SET          starter/source/model/sets/insert_clause_in_set.F
@@ -96,8 +98,9 @@ Chd|        CREATE_LINE_FROM_SURFACE_EXT_ALLstarter/source/model/sets/create_lin
 Chd|-- calls ---------------
 Chd|====================================================================
       MODULE SETDEF_MOD
+        USE NAMES_AND_TITLES_MOD, ONLY: NCHARTITLE
 C----------------------------------------------------------------------- 
-#include "nchar_c.inc"    
+#include "my_real.inc"   
 c=======================================================================      
 !---------
 !   SET DATA STRUCTURE
@@ -112,7 +115,7 @@ C=======================================================================
 C-----------------------------------------------------------------------
       TYPE SET_
         INTEGER   :: SET_ID               ! SET identifier
-        CHARACTER :: TITLE*nchartitle ! SET title
+        CHARACTER(LEN=NCHARTITLE) :: TITLE ! SET title
         INTEGER   :: SET_TYPE         ! SET type      (1-GENERAL, 2-COLLECT)
         INTEGER   :: SET_ACTIV         
         INTEGER   :: KEYTYPE          ! SET KEY type (all keys)
@@ -156,6 +159,26 @@ C-----------------------------------------------------------------------
         INTEGER   :: NB_LINE_SEG      ! SET nb of line/edge's segments
 !
         INTEGER   :: NB_RBODY         ! SET nb of Rbody
+
+        INTEGER   :: NB_ELLIPSE       ! CLAUSE nb of Ellipses within a SET (max = 1, one per /SET)
+        INTEGER   :: ELLIPSE_IAD_BUFR
+        INTEGER   :: ELLIPSE_ID_MADYMO
+        INTEGER   :: ELLIPSE_N
+        MY_REAL   :: ELLIPSE_XC
+        MY_REAL   :: ELLIPSE_YC
+        MY_REAL   :: ELLIPSE_ZC
+        MY_REAL   :: ELLIPSE_A
+        MY_REAL   :: ELLIPSE_B
+        MY_REAL   :: ELLIPSE_C
+
+        INTEGER   :: NB_PLANE       ! CLAUSE nb of Planes within a SET (max = 1, one per /SET)
+        INTEGER   :: PLANE_IAD_BUFR
+        MY_REAL   :: PLANE_XM
+        MY_REAL   :: PLANE_YM
+        MY_REAL   :: PLANE_ZM
+        MY_REAL   :: PLANE_XM1
+        MY_REAL   :: PLANE_YM1
+        MY_REAL   :: PLANE_ZM1
 !
         INTEGER, DIMENSION(:), ALLOCATABLE  ::   NODE
         INTEGER, DIMENSION(:), ALLOCATABLE  ::   PART
@@ -177,6 +200,8 @@ C-----------------------------------------------------------------------
         INTEGER, DIMENSION(:,:), ALLOCATABLE  :: LINE_NODES ! dim = (NB_LINE_SEG,2)
         INTEGER, DIMENSION(:)  , ALLOCATABLE  :: LINE_ELTYP ! dim = (NB_LINE_SEG)
         INTEGER, DIMENSION(:)  , ALLOCATABLE  :: LINE_ELEM  ! dim = (NB_LINE_SEG)
+
+        MY_REAL, DIMENSION(:)  , ALLOCATABLE  :: ELLIPSE_SKEW
 !==============================================================
 !       SET HIERARCHY
         INTEGER   :: FATHER

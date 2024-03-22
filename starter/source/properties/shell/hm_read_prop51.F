@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  HM_READ_PROP51                source/properties/shell/hm_read_prop51.F
 Chd|-- called by -----------
@@ -61,13 +61,10 @@ C-----------------------------------------------
 #include      "units_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "warn_c.inc"
-#include      "scr03_c.inc"
 #include      "scr16_c.inc"
 #include      "scr17_c.inc"
 #include      "scr21_c.inc"
 #include      "tablen_c.inc"
-#include      "submod_c.inc"
 #include      "sphcom.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -166,7 +163,9 @@ c
             CALL HM_GET_FLOAT_ARRAY_2INDEXES('Prop_Zi',POS,IS,I,IS_AVAILABLE,LSUBMODEL,UNITAB)
             CALL HM_GET_FLOAT_ARRAY_2INDEXES('P_thick_fail_lam',PTHKLY,IS,I,IS_AVAILABLE,LSUBMODEL,UNITAB)
             CALL HM_GET_FLOAT_ARRAY_2INDEXES('F_weight_i',WEIGHT,IS,I,IS_AVAILABLE,LSUBMODEL,UNITAB)
-            IF (PTHKLY == ZERO) PTHKLY = EM03
+            IF (PTHKLY == ZERO) PTHKLY = ONE-EM06
+            PTHKLY = MIN(PTHKLY, ONE)
+            PTHKLY = MAX(PTHKLY,-ONE)
             IF (WEIGHT == ZERO) WEIGHT = ONE
             STACK_INFO%PID(NPLY) = PLY_ID
             STACK_INFO%ANG(NPLY) = ANG
@@ -193,7 +192,9 @@ c
           CALL HM_GET_FLOAT_ARRAY_INDEX('P_thick_fail_lam' ,PTHKLY,I,IS_AVAILABLE,LSUBMODEL,UNITAB)   
           CALL HM_GET_FLOAT_ARRAY_INDEX('F_weight_i' ,WEIGHT,I,IS_AVAILABLE,LSUBMODEL,UNITAB)   
 c
-          IF (PTHKLY == ZERO) PTHKLY = EM03
+          IF (PTHKLY == ZERO) PTHKLY = ONE-EM06
+          PTHKLY = MIN(PTHKLY, ONE)
+          PTHKLY = MAX(PTHKLY,-ONE)
           IF (WEIGHT == ZERO) WEIGHT = ONE
           STACK_INFO%PID(I) = PLY_ID
           STACK_INFO%ANG(I) = ANG
@@ -206,7 +207,9 @@ c
 c--------------------------------------------
 c     Default values
 c--------------------------------------------
-      PTHK = MIN(PTHK, ONE-EM06)
+      IF (PTHK == ZERO) PTHK = ONE-EM06
+      PTHK = MIN(PTHK, ONE)
+      PTHK = MAX(PTHK,-ONE)
       IF (ISHELL == 0) ISHELL = IHBE_D
 c      IHBEOUTP = ISHELL
       IF (ISH3N  == 0) ISH3N = ISH3N_D
@@ -309,7 +312,7 @@ c     Check skew ID
      .              I2=IDSK)
         ENDIF
       ENDIF
-      IF (IRP==22.AND.ISK==0) THEN
+      IF ((IRP==22.OR.IRP==25).AND.ISK==0) THEN
         CALL ANCMSG(MSGID=1923,
      .              MSGTYPE=MSGERROR,
      .              ANMODE=ANINFO,
@@ -480,7 +483,9 @@ c-----------------------------------------------------------------------
      & 5X,'SHELL MEMBRANE DAMPING. . . . . . . . .=',1PG20.13/,
      & 5X,'SHELL NUMERICAL DAMPING . . . . . . . .=',1PG20.13/,
      & 5X,'SHEAR AREA REDUCTION FACTOR . . . . . .=',1PG20.13/,
-     & 5X,'% OF ELEMENT THICKNESS TO FAIL. . . . .=',1PG20.13/,
+     & 5X,'ELEMENT DELETION PARAMETER. . . . . . .=',1PG20.13/,
+     & 5X,' > 0.0 : FRACTION OF FAILED THICKNESS   ',/,
+     & 5X,' < 0.0 : FRACTION OF FAILED LAYERS/PLYS ',/,
      & 5X,'COMPOSITE FAILURE EXPONENT. . . . . . .=',1PG20.13/,
      & 5X,'SHEAR FORMULATION FLAG. . . . . . . . .=',I10/,
      & 5X,'THICKNESS VARIATION FLAG. . . . . . . .=',I10/,
@@ -501,7 +506,9 @@ c-----------------------------------------------------------------------
      & 5X,'SHELL HOURGLASS ROTATIONAL DAMPING. . .=',1PG20.13/,
      & 5X,'SHELL MEMBRANE DAMPING. . . . . . . . .=',1PG20.13/,
      & 5X,'SHEAR AREA REDUCTION FACTOR . . . . . .=',1PG20.13/,
-     & 5X,'% OF ELEMENT THICKNESS TO FAIL. . . . .=',1PG20.13/,
+     & 5X,'ELEMENT DELETION PARAMETER. . . . . . .=',1PG20.13/,
+     & 5X,' > 0.0 : FRACTION OF FAILED THICKNESS   ',/,
+     & 5X,' < 0.0 : FRACTION OF FAILED LAYERS/PLYS ',/,
      & 5X,'COMPOSITE FAILURE EXPONENT. . . . . . .=',1PG20.13/,
      & 5X,'SHEAR FORMULATION FLAG. . . . . . . . .=',I10/,
      & 5X,'THICKNESS VARIATION FLAG. . . . . . . .=',I10/,
@@ -521,7 +528,9 @@ c-----------------------------------------------------------------------
      & 5X,'SHELL MEMBRANE DAMPING. . . . . . . . .=',1PG20.13/,
      & 5X,'SHELL NUMERICAL DAMPING . . . . . . . .=',1PG20.13/,
      & 5X,'SHEAR AREA REDUCTION FACTOR . . . . . .=',1PG20.13/,
-     & 5X,'% OF ELEMENT THICKNESS TO FAIL. . . . .=',1PG20.13/,
+     & 5X,'ELEMENT DELETION PARAMETER. . . . . . .=',1PG20.13/,
+     & 5X,' > 0.0 : FRACTION OF FAILED THICKNESS   ',/,
+     & 5X,' < 0.0 : FRACTION OF FAILED LAYERS/PLYS ',/,
      & 5X,'COMPOSITE FAILURE EXPONENT. . . . . . .=',1PG20.13/,
      & 5X,'SHEAR FORMULATION FLAG. . . . . . . . .=',I10/,
      & 5X,'THICKNESS VARIATION FLAG. . . . . . . .=',I10/,
@@ -539,7 +548,9 @@ c-----------------------------------------------------------------------
      & 5X,'SHELL HOURGLASS FLEXURAL DAMPING. . . .=',1PG20.13/,
      & 5X,'SHELL HOURGLASS ROTATIONAL DAMPING. . .=',1PG20.13/,
      & 5X,'SHELL MEMBRANE DAMPING. . . . . . . . .=',1PG20.13/,
-     & 5X,'% OF ELEMENT THICKNESS TO FAIL. . . . .=',1PG20.13/,
+     & 5X,'ELEMENT DELETION PARAMETER. . . . . . .=',1PG20.13/,
+     & 5X,' > 0.0 : FRACTION OF FAILED THICKNESS   ',/,
+     & 5X,' < 0.0 : FRACTION OF FAILED LAYERS/PLYS ',/,
      & 5X,'COMPOSITE FAILURE EXPONENT. . . . . . .=',1PG20.13/,
      & 5X,'SHEAR AREA REDUCTION FACTOR . . . . . .=',1PG20.13/,
      & 5X,'SHEAR FORMULATION FLAG. . . . . . . . .=',I10/,
@@ -553,7 +564,9 @@ c-----------------------------------------------------------------------
      & 5X,'    PLY ',I3/,
      & 5X,'      PLY PID NUMBER  . . . . . . . . .=',I10/
      & 5X,'      ANGLE (DIR 1,PROJ(DIR 1 / SHELL).=',1PG20.13/,
-     & 5X,'      % OF PLY THICKNESS TO FAIL. . . .=',1PG20.13/,
+     & 5X,'      PLY FAILURE PARAMETER . . . . . .=',1PG20.13/,
+     & 5X,'        > 0.0 : FRACTION OF FAILED THICKNESS   ',/,
+     & 5X,'        < 0.0 : FRACTION OF FAILED INTG. POINTS',/,
      & 5X,'      WEIGHT FACTOR FOR PLY FAILURE . .=',1PG20.13/)
  3000 FORMAT(
      & 5X,' COMPOSITE SUBSTACK SHELL NUMBER . . . =',I10/ ) 

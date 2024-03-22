@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
 Chd|====================================================================
 Chd|  SPMD_I7FCOM_PON               source/mpi/forces/spmd_i7fcom_pon.F
@@ -54,19 +54,19 @@ Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|        HEAT_MOD                      share/modules/heat_mod.F      
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
+Chd|        INTERFACES_MOD                ../common_source/modules/interfaces/interfaces_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|        TRI25EBOX                     share/modules/tri25ebox.F     
 Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
       SUBROUTINE SPMD_I7FCOM_PON(
-     1                       IPARI   ,INTLIST,
-     2                       NBINTC  ,NISKYFI,ICODT   ,SECFCUM ,NSTRF  ,
-     3                       ICONTACT,FCONT  ,IGRBRIC ,IXS     ,
-     4                       IXS16   ,NISKYFIE,NBINT20,
-     5                       IFLAG, INTBUF_TAB,  SFSKYI ,
-     6                       SISKY,H3D_DATA ,MULTI_FVM  ,                    
-     7                       TAGNCONT  ,KLOADPINTER,LOADPINTER,LOADP_HYD_INTER)
+     1                       IPARI   ,INTLIST,NBINTC  ,NISKYFI,ICODT   ,
+     2                       SECFCUM ,NSTRF  ,ICONTACT,FCONT  ,IGRBRIC ,
+     3                       IXS     ,IXS16  ,NISKYFIE,NBINT20,IFLAG   ,                        
+     4                       INTBUF_TAB,SFSKYI,SISKY  ,H3D_DATA,MULTI_FVM  ,                                         
+     5                       TAGNCONT  ,KLOADPINTER,LOADPINTER,LOADP_HYD_INTER,FSAV,
+     6                       INTERFACES)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -79,11 +79,11 @@ C-----------------------------------------------
       USE H3D_MOD
       USE GROUPDEF_MOD
       USE MULTI_FVM_MOD
+      USE INTERFACES_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 #include      "macro.inc"
 #include      "assert.inc"
 C-----------------------------------------------
@@ -96,18 +96,12 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr05_c.inc"
-#include      "scr17_c.inc"
 #include      "scr18_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
 #include      "task_c.inc"
 #include      "parit_c.inc"
-#include      "timeri_c.inc"
-#include      "warn_c.inc"
-#include      "spmd_c.inc"
-#include      "units_c.inc"
-#include      "i25edge_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -120,10 +114,12 @@ C-----------------------------------------------
      .        SFSKYI , SISKY
       my_real
      .        SECFCUM(7,NUMNOD,NSECT), FCONT(3,*)
+      my_real, INTENT(INOUT) :: FSAV(NTHVKI,*) 
 
       TYPE(INTBUF_STRUCT_) INTBUF_TAB(*)
       TYPE(H3D_DATABASE) :: H3D_DATA
       TYPE(MULTI_FVM_STRUCT) :: MULTI_FVM
+      TYPE (INTERFACES_)    ,INTENT(IN)     :: INTERFACES
 C-----------------------------------------------
       TYPE (GROUP_)  , DIMENSION(NGRBRIC) :: IGRBRIC
 C-----------------------------------------------
@@ -135,7 +131,7 @@ C-----------------------------------------------
      .        IBC, ISECIN, IBAG, NOINT, NTY, LEN11, N1, N2,LENI,INACTI,
      .        IALLOCS, IALLOCR, LEN17, JJ, NAD, IGN, IGE, NMES, NME,
      .        IADM, IES,INTTH,LEN7T,LEN20, LEN20E, INC,LEN11T,
-     .        MSGOFF, MSGOFF2,J,K,
+     .        MSGOFF, MSGOFF2,J,K,INTCAREA,
      .        JD(50), KD(50),  STATUS(MPI_STATUS_SIZE),
      .        DEBUT(NINTER), DEBUTI(NINTER),
      .        DEBUTE(NINTER), DEBUTIE(NINTER),
@@ -352,8 +348,13 @@ C routine calcul place supplementaire int20
      +          NSNFI(NIN)%P(1),NSVFI(NIN)%P(1),ISIZENV,LEN20)
           END IF
 C precomptage du nombre de contacts par processeur+calcul nsnfi total
-          CALL INTCONTP(
-     +      NI,ISKYFI(NIN)%P(1),NSNFI(NIN)%P(1),ISIZENV,NSNFITOT,LENI)
+          IF(NI > 0) THEN
+            CALL INTCONTP(NI,ISKYFI(NIN)%P,NSNFI(NIN)%P,ISIZENV,NSNFITOT,LENI)
+          ELSE
+            DO J = 1, NSPMD
+              NSNFITOT(J) = NSNFITOT(J) + NSNFI(NIN)%P(J)
+            END DO
+          ENDIF
 C ajout partie edge
           IF(NTY==20)THEN
             NI = NISKYFIE(NIN)
@@ -1191,6 +1192,7 @@ C
                 IBAG  =IPARI(32,NIN)
                 IADM  =IPARI(44,NIN)
                 INTTH = IPARI(47,NIN)
+                INTCAREA=IPARI(99,NIN)
 C type int20 (non edge)
                 IF(NTY == 20) THEN
                   NB = NSNSI(NIN)%P(P)
@@ -1236,7 +1238,7 @@ C type int20 (non edge)
      3                ICODT   ,SECFCUM,NSTRF   ,ICONTACT     ,FCONT  ,
      4                INACTI  ,IADM   ,INTTH   , FTHESKYI    ,CONDNSKYI,
      5                H3D_DATA,NIN    ,TAGNCONT,KLOADPINTER  ,LOADPINTER,
-     6                LOADP_HYD_INTER)
+     6                LOADP_HYD_INTER ,INTCAREA,FSAV(1,NIN)  ,INTERFACES%PARAMETERS)
                      L = L + NB*LEN
                     ELSE
                      CALL SPMD_FIADD_PON(
@@ -1245,7 +1247,7 @@ C type int20 (non edge)
      3                ICODT   ,SECFCUM,NSTRF   ,ICONTACT     ,FCONT  ,
      4                INACTI  ,IADM   ,INTTH   , FTHESKYI    ,CONDNSKYI,
      5                H3D_DATA,NIN    ,TAGNCONT, KLOADPINTER ,LOADPINTER,
-     6                LOADP_HYD_INTER)
+     6                LOADP_HYD_INTER ,INTCAREA,FSAV(1,NIN)  ,INTERFACES%PARAMETERS)
                       L = L + NB*LEN7T
                     ENDIF
                     ENDIF ! NSNSI

@@ -1,45 +1,47 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
 Chd|====================================================================
 Chd|  W_PON                         source/restart/ddsplit/w_pon.F
 Chd|-- called by -----------
 Chd|        DDSPLIT                       source/restart/ddsplit/ddsplit.F
 Chd|-- calls ---------------
-Chd|        WRITE_I_C                     source/output/tools/write_routines.c
+Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|        NLOCAL                        source/spmd/node/ddtools.F    
+Chd|        EBCS_MOD                      ../common_source/modules/boundary_conditions/ebcs_mod.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
+Chd|        LOADS_MOD                     ../common_source/modules/loads/loads_mod.F
 Chd|====================================================================
       SUBROUTINE W_PON(
      1      ADDCNE   ,CNE      ,LCNE      ,NUMNOD_L  ,NODGLOB   ,
      2      LCNE_L   ,CEP      ,CEL       ,IXS       ,IXS10     ,
      3      IXS20    ,IXS16    ,IXQ       ,IXC       ,IXT       ,
-     4      IXP      ,IXR      ,IXTG      ,IXUR      ,MONVOL    ,
+     4      IXP      ,IXR      ,IXTG      ,MONVOL    ,
      5      IB       ,GEO      ,IGEO      ,PROC      ,
      6      NUMELS_L ,NUMELS8_L,NUMELS10_L,NUMELS16_L,NUMELS20_L,
      7      NUMELQ_L ,NUMELC_L ,NUMELT_L  ,NUMELP_L  ,NUMELR_L  ,
-     8      NUMELTG_L,NUMELUR_L,NSKYRW_L  ,NPRW      ,LPRW      ,
+     8      NUMELTG_L,NSKYRW_L  ,NPRW      ,LPRW      ,
      9      NSKYRBK_L,NPBY      ,LPBY     ,DD_RBY2   ,
      A      I2NSNT   ,I2NSN_L  ,IPARI     ,NIR       ,
      B      LCNI2_L  ,NISKYI2_L,CEPI2     ,CELI2     ,CNI2      ,
@@ -57,17 +59,19 @@ Chd|====================================================================
      N      CRKNODIAD, INTBUF_TAB,NUMELIG3D_L,KXIG3D,IXIG3D,
      O      IBFFLUX  ,NFXFLUX_L ,CEPCND  ,CELCND   ,ADDCNCND    ,
      P      CNCND     ,NS10E_L  ,ICNDS10 ,LCNCND_L ,ITAGND ,IGRSURF,
-     Q      IGRSURF_PROC )
+     Q      IGRSURF_PROC ,LOCAL_NEBCS, EBCS_TAB_LOC_2,
+     R      NUMBER_LOAD_CYL,LOADS,LOADS_PER_PROC)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE INTBUFDEF_MOD
       USE GROUPDEF_MOD
+      USE EBCS_MOD
+      USE LOADS_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "mvsiz_p.inc"
 #include      "tabsiz_c.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
@@ -75,10 +79,7 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "rnur_c.inc"
 #include      "com_xfem1.inc"
-#include      "scr17_c.inc"
-#include      "ige3d_c.inc"
 #include      "thermal_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -87,12 +88,12 @@ C-----------------------------------------------
      .         LCNI2_L, NISKYI2_L, NBDDI2M, NSKYLL_L, NBI18_L,NSKYI18_L,
      .         NUMELS_L ,NUMELS8_L ,NUMELS10_L,NUMELS16_L,NUMELS20_L,
      .         NUMELC_L ,NUMELT_L  ,NUMELP_L  ,NUMELR_L  ,NUMELTG_L,
-     .         NUMELQ_L ,NUMELUR_L, NSKYRW_L, NSKYRBK_L, NCONLD_L,
+     .         NUMELQ_L , NSKYRW_L, NSKYRBK_L, NCONLD_L,
      .         NUMELTG6_L, NNMV_L, NNMVC_L, NSKYRBM_L,
      .         ADDCNE(0:NUMNOD+1), CNE(*), NODGLOB(*), CEP(*), CEL(*),
      .         IXS(NIXS,*),IXS10(6,*),IXS20(12,*),IXS16(8,*),
      .         IXQ(NIXQ,*),IXC(NIXC,*),IXT(NIXT,*),IXP(NIXP,*),
-     .         IXR(NIXR,*),IXUR(NIXUR,*),IXTG(NIXTG,*),IXTG6(4,*),
+     .         IXR(NIXR,*),IXTG(NIXTG,*),IXTG6(4,*),
      .         IB(NIBCLD,*),MONVOL(*), NPRW(*),
      .         LPRW(*), NPBY(NNPBY,*), LPBY(*),
      .         DD_RBY2(3,NRBYKIN), IPARI(NPARI,*),
@@ -127,6 +128,12 @@ C-----------------------------------------------
 !                 %ELEM  --> element id
 !                 %NSEG --> total element number
 !       -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-**-*-*-*-*-*-*-*-*-*-*-*-*
+      INTEGER, INTENT(IN) :: LOCAL_NEBCS ! number of parallelized ebcs 
+      TYPE(T_EBCS_TAB), INTENT(INOUT) :: EBCS_TAB_LOC_2 ! ebcs structure
+      ! load option
+      INTEGER, INTENT(IN) :: NUMBER_LOAD_CYL ! sum of load segment number
+      TYPE(LOADS_),INTENT(IN) :: LOADS ! initial structure of load cyl
+      TYPE(LOADS_), INTENT(INOUT) :: LOADS_PER_PROC ! structure of load cyl for for the current proc P
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
@@ -161,14 +168,24 @@ C-----------------------------------------------
       INTEGER IUN,EMPL,COORD,SHFT,TESTVAL,KD(50),KFI
       INTEGER, DIMENSION(:), ALLOCATABLE :: SOLTAG,SOL10TAG,
      .      SOL20TAG,SOL16TAG,QUADTAG,SHTAG,TTAG,PTAG,RTAG,TGTAG,TG6TAG,
-     .      URTAG,IBTAG,IBCVTAG,IBCRTAG,IBFXTAG,ILTAG,TAGIG3D
+     .      IBTAG,IBCVTAG,IBCRTAG,IBFXTAG,ILTAG,TAGIG3D
       INTEGER, DIMENSION(:), ALLOCATABLE :: ITAGC, ITAGTG,ADDCNE_L,ADDCNI2_L,
      .                                      ADDCNCND_L
       INTEGER, DIMENSION(:,:), ALLOCATABLE :: IADS,IADS10,
      .        IADS16,IADS20,IADQ,IADC,IADT,
-     .        IADP,IADR,IADTG,IADUR, IADIB,
+     .        IADP,IADR,IADTG,IADIB,
      .        IADTG1,IADIG3D
+      TYPE(ebcs_parith_on), DIMENSION(:), ALLOCATABLE :: EBCS_PARITHON_L ! adress for the fsky array for parith/on
+      LOGICAL, DIMENSION(:), ALLOCATABLE :: EBCS_TAG ! boolean : true if the element belongs to an ebcs
+      INTEGER :: LOCAL_NODE_ID,ELEM_ID,NUMG_SAVE
+
+      ! loads option
+      INTEGER :: GLOBAL_SEGMENT_ID ! global segment id
+      INTEGER :: LOCAL_PROC_ID ! processor id where the segment is defined
+      INTEGER :: LOCAL_SEGMENT_ID ! local segment id (local to the proc LOCAL_PROC_ID)
+      INTEGER :: GLOBAL_LOAD_ID,LOCAL_LOAD_ID ! load id (global and local to proc LOCAL_PROC_ID)
 C-----------------------------------------------
+
       IUN = 1
       ALLOCATE(SOLTAG(NUMELS))
       SOLTAG(1:NUMELS)=0
@@ -203,9 +220,6 @@ C-----------------------------------------------
       ALLOCATE(TG6TAG(NUMELTG6))
       TG6TAG(1:NUMELTG6)=0
 
-      ALLOCATE(URTAG(NUMELUR))
-      URTAG(1:NUMELUR)=0
-
       ALLOCATE(IBTAG(NCONLD))
       IBTAG(1:NCONLD)=0
 
@@ -237,7 +251,7 @@ C-----------------------------------------------
       ALLOCATE( IADR(3,NUMELR_L),IADTG(3,NUMELTG_L) )
       IADR(1:3,1:NUMELR_L) = 0
       IADTG(1:3,1:NUMELTG_L) = 0
-      ALLOCATE( IADUR(4,NUMELUR_L), IADIB(4,NCONLD_L) )
+      ALLOCATE(IADIB(4,NCONLD_L) )
       ALLOCATE( IADTG1(3,NUMELTG6_L),IADIG3D(100,NUMELIG3D_L) )
 ! ------------------------------
 
@@ -387,6 +401,38 @@ C
           ENDDO
         ENDDO
       ENDIF
+
+      ! --------------------------
+      ! tag the element belonging to an ebcs
+      ALLOCATE( EBCS_TAG(NUMELS+NUMELQ+NUMELTG) )
+      EBCS_TAG(1:NUMELS+NUMELQ+NUMELTG) = .FALSE.
+      ALLOCATE(EBCS_PARITHON_L(LOCAL_NEBCS))
+      IF(LOCAL_NEBCS>0) THEN
+        ! ---------------------
+        ! loop over the /EBCS
+        DO I=1,LOCAL_NEBCS
+            ! allocation of adress array
+            ALLOCATE( EBCS_PARITHON_L(I)%ELEM_ADRESS(4,EBCS_TAB_LOC_2%tab(I)%poly%nb_elem) )
+            EBCS_PARITHON_L(I)%ELEM_ADRESS(1:4,1:EBCS_TAB_LOC_2%tab(I)%poly%nb_elem) = 0
+            ! check if a surface is associated to the ebcs
+            IF(EBCS_TAB_LOC_2%tab(I)%poly%surf_id>0) THEN
+                ! ---------------------
+                ! loop over the element of the surface to tag the element
+                DO J=1,EBCS_TAB_LOC_2%tab(I)%poly%nb_elem
+                    ELEM_ID = EBCS_TAB_LOC_2%tab(I)%poly%global_ielem(J)
+                    IF(N2D/=0) THEN
+                        IF(ELEM_ID>NUMELS+NUMELQ) THEN
+                            ELEM_ID = ELEM_ID - (NUMELC+NUMELT+NUMELP+NUMELR)
+                        ENDIF
+                    ENDIF
+                    EBCS_TAG(ELEM_ID) = .TRUE.
+                ENDDO
+                ! ---------------------
+            ENDIF
+        ENDDO
+        ! ---------------------
+      ENDIF
+      ! --------------------------
 C-----------------------------------------------
 C ADDCNE_L et IADS
 C-----------------------------------------------
@@ -410,6 +456,7 @@ C
         ADDCNE_L(I+1) = ADDCNE_L(I) + N2-N1
         DO CC = N1, N2-1
           NUMG = CNE(CC)
+          NUMG_SAVE = CNE(CC)
  
           NUML = CEL(NUMG)
           PROC_L = CEP(NUMG)+1 
@@ -468,6 +515,45 @@ C
                  ENDIF
                ENDDO
              ENDIF
+
+             ! --------------------
+             ! element belongs to an ebcs
+             IF(EBCS_TAG(NUMG_SAVE)) THEN
+                DO II=1,LOCAL_NEBCS
+                ! check if a surface is associated to the ebcs
+                    IF(EBCS_TAB_LOC_2%tab(II)%poly%surf_id>0) THEN
+                        ! -------------
+                        ! loop over the element of the surface
+                        DO J=1,EBCS_TAB_LOC_2%tab(II)%poly%nb_elem
+                            ELEM_ID = EBCS_TAB_LOC_2%tab(II)%poly%global_ielem(J) ! global element id
+                            ! -------------
+                            ! find the location of the node :
+                            ! 4 nodes for a solid
+                            ! 1     2
+                            ! o-----o
+                            ! |     |
+                            ! o-----o
+                            ! 4     3
+                            IF(ELEM_ID==NUMG_SAVE) THEN
+                                DO K=1,4
+                                    LOCAL_NODE_ID = EBCS_TAB_LOC_2%tab(II)%poly%elem_list(K,J)
+                                    LOCAL_NODE_ID = EBCS_TAB_LOC_2%tab(II)%poly%node_list(LOCAL_NODE_ID)
+                                    IF(N==NODGLOB(LOCAL_NODE_ID)) THEN
+                                        IF(EBCS_PARITHON_L(II)%ELEM_ADRESS(K,J)==0) THEN
+                                            EBCS_PARITHON_L(II)%ELEM_ADRESS(K,J) = CC_L
+                                            GOTO 100
+                                        ENDIF                                        
+                                    ENDIF
+                                ENDDO
+                            ENDIF
+                            ! -------------
+                        ENDDO
+                        ! -------------
+                    ENDIF
+                ENDDO
+             ENDIF
+
+             ! --------------------
 C
            ELSEIF(NUMG<=NUMELS+NUMELQ) THEN
              DO K=1,4
@@ -479,6 +565,44 @@ C
                  GOTO 100
                ENDIF
              ENDDO
+             ! --------------------
+             ! element belongs to an ebcs
+             IF(EBCS_TAG(NUMG_SAVE)) THEN
+                DO II=1,LOCAL_NEBCS
+                ! check if a surface is associated to the ebcs
+                    IF(EBCS_TAB_LOC_2%tab(II)%poly%surf_id>0) THEN
+                        ! -------------
+                        ! loop over the element of the surface
+                        DO J=1,EBCS_TAB_LOC_2%tab(II)%poly%nb_elem
+                            ELEM_ID = EBCS_TAB_LOC_2%tab(II)%poly%global_ielem(J) ! global element id
+                            ! -------------
+                            ! find the location of the node for a quad :
+                            ! only 2 nodes for the surface (2D case) 
+                            ! 1     2
+                            ! o-----o
+                            ! |     |
+                            ! o-----o
+                            ! 4     3
+                            IF(ELEM_ID==NUMG_SAVE) THEN
+                                DO K=1,2
+                                    LOCAL_NODE_ID = EBCS_TAB_LOC_2%tab(II)%poly%elem_list(K,J)
+                                    LOCAL_NODE_ID = EBCS_TAB_LOC_2%tab(II)%poly%node_list(LOCAL_NODE_ID)
+                                    IF(N==NODGLOB(LOCAL_NODE_ID)) THEN
+                                        IF(EBCS_PARITHON_L(II)%ELEM_ADRESS(K,J)==0) THEN
+                                            EBCS_PARITHON_L(II)%ELEM_ADRESS(K,J) = CC_L
+                                            GOTO 100
+                                        ENDIF
+                                    ENDIF
+                                ENDDO
+                            ENDIF
+                            ! -------------
+                        ENDDO
+                        ! -------------
+                    ENDIF
+                ENDDO
+             ENDIF
+             ! --------------------
+
            ELSEIF(NUMG<=NUMELS+NUMELQ+NUMELC) THEN
              NUMG = NUMG - (NUMELS+NUMELQ)
              DO K=1,4
@@ -636,24 +760,51 @@ C mv coque triangle
                  ENDDO
                ENDIF
              ENDIF
+
+             ! --------------------
+             ! element belongs to an ebcs
+             IF(EBCS_TAG(NUMG_SAVE-(NUMELC+NUMELT+NUMELP+NUMELR))) THEN
+                DO II=1,LOCAL_NEBCS
+                ! check if a surface is associated to the ebcs
+                    IF(EBCS_TAB_LOC_2%tab(II)%poly%surf_id>0) THEN
+                        ! -------------
+                        ! loop over the element of the surface
+                        DO J=1,EBCS_TAB_LOC_2%tab(II)%poly%nb_elem
+                            ELEM_ID = EBCS_TAB_LOC_2%tab(II)%poly%global_ielem(J) ! global element id
+                            ! -------------
+                            ! find the location of the node for a triangle : 
+                            ! only 2 nodes for the surface (2D case) 
+                            !    1
+                            !    o
+                            !   / \
+                            !  /   \
+                            ! o-----o
+                            ! 3     2
+                            IF(ELEM_ID==NUMG_SAVE) THEN
+                                DO K=1,2
+                                    LOCAL_NODE_ID = EBCS_TAB_LOC_2%tab(II)%poly%elem_list(K,J)
+                                    IF(LOCAL_NODE_ID>0) THEN
+                                        IF(N==NODGLOB(LOCAL_NODE_ID)) THEN
+                                            IF(EBCS_PARITHON_L(II)%ELEM_ADRESS(K,J)==0) THEN
+                                                EBCS_PARITHON_L(II)%ELEM_ADRESS(K,J) = CC_L
+                                                GOTO 100
+                                            ENDIF
+                                        ENDIF
+                                    ENDIF
+                                ENDDO
+                            ENDIF
+                            ! -------------
+                        ENDDO
+                        ! -------------
+                    ENDIF
+                ENDDO
+             ENDIF
+             ! --------------------
 C
            ELSEIF(NUMG<=NUMELS+NUMELQ+NUMELC+NUMELT+NUMELP+
-     .            NUMELR+NUMELTG+NUMELUR) THEN
+     .            NUMELR+NUMELTG+NUMELX+NCONLD)THEN
              NUMG = NUMG - (NUMELS+NUMELQ+NUMELC+NUMELT+NUMELP+NUMELR+
-     +                      NUMELTG)
-             DO K=1,4
-               SHFT = ISHFT(IUN,K-1)
-               TESTVAL =IAND(URTAG(NUMG),SHFT)
-               IF (IXUR(K+1,NUMG)==N.AND.TESTVAL==0) THEN
-                 IADUR(K,NUML) = CC_L
-                 URTAG(NUMG)=URTAG(NUMG)+SHFT
-                 GOTO 100
-               ENDIF
-             ENDDO
-           ELSEIF(NUMG<=NUMELS+NUMELQ+NUMELC+NUMELT+NUMELP+
-     .            NUMELR+NUMELTG+NUMELUR+NUMELX+NCONLD)THEN
-             NUMG = NUMG - (NUMELS+NUMELQ+NUMELC+NUMELT+NUMELP+NUMELR+
-     +                      NUMELTG+NUMELUR+NUMELX)
+     +                      NUMELTG+NUMELX)
              IF(ITAGIB(NUMG)==0.AND.N2D==0)THEN
                KN = 4
              ELSEIF(ITAGIB(NUMG)==0.AND.N2D/=0)THEN
@@ -673,9 +824,9 @@ C
              ENDDO
 C
            ELSEIF(NUMG<=NUMELS+NUMELQ+NUMELC+NUMELT+NUMELP+
-     .            NUMELR+NUMELTG+NUMELUR+NUMELX+ NCONLD + NUMCONV)THEN
+     .            NUMELR+NUMELTG+NUMELX+ NCONLD + NUMCONV)THEN
              NUMG = NUMG - (NUMELS+NUMELQ+NUMELC+NUMELT+NUMELP+NUMELR+
-     +                      NUMELTG+NUMELUR+NUMELX+NCONLD)
+     +                      NUMELTG+NUMELX+NCONLD)
              IF(N2D==0)THEN
                KN = 4
              ELSEIF(N2D/=0)THEN
@@ -695,10 +846,10 @@ C
              ENDDO
 C
            ELSEIF(NUMG<=NUMELS+NUMELQ+NUMELC+NUMELT+NUMELP+
-     .            NUMELR+NUMELTG+NUMELUR+NUMELX+ NCONLD + NUMCONV +
+     .            NUMELR+NUMELTG+NUMELX+ NCONLD + NUMCONV +
      .            NUMRADIA)THEN
              NUMG = NUMG - (NUMELS+NUMELQ+NUMELC+NUMELT+NUMELP+NUMELR+
-     +                      NUMELTG+NUMELUR+NUMELX+NCONLD+NUMCONV)
+     +                      NUMELTG+NUMELX+NCONLD+NUMCONV)
              IF(N2D==0)THEN
                KN = 4
              ELSEIF(N2D/=0)THEN
@@ -718,10 +869,10 @@ C
              ENDDO
 C             
            ELSEIF(NUMG<=NUMELS+NUMELQ+NUMELC+NUMELT+NUMELP+
-     .            NUMELR+NUMELTG+NUMELUR+NUMELX+ NCONLD + NUMCONV +
+     .            NUMELR+NUMELTG+NUMELX+ NCONLD + NUMCONV +
      .            NUMRADIA+NFXFLUX)THEN
              NUMG = NUMG - (NUMELS+NUMELQ+NUMELC+NUMELT+NUMELP+NUMELR+
-     +                      NUMELTG+NUMELUR+NUMELX+NCONLD+NUMCONV+NUMRADIA)
+     +                      NUMELTG+NUMELX+NCONLD+NUMCONV+NUMRADIA)
              IF(N2D==0)THEN
                KN = 4
              ELSEIF(N2D/=0)THEN
@@ -741,10 +892,10 @@ C
              ENDDO
 C
            ELSEIF(NUMG<=NUMELS+NUMELQ+NUMELC+NUMELT+NUMELP+
-     .            NUMELR+NUMELTG+NUMELUR+NUMELX+ NCONLD + NUMCONV +
+     .            NUMELR+NUMELTG+NUMELX+ NCONLD + NUMCONV +
      .            NUMRADIA+NFXFLUX+SLLOADP/4)THEN
              NUMG = NUMG - (NUMELS+NUMELQ+NUMELC+NUMELT+NUMELP+NUMELR+
-     .                      NUMELTG+NUMELUR+NUMELX+NCONLD+NUMCONV+
+     .                      NUMELTG+NUMELX+NCONLD+NUMCONV+
      .                      NUMRADIA+NFXFLUX)
              IF(ITAGLOADP(NUMG)==0.AND.N2D==0)THEN
                KN = 4
@@ -765,10 +916,10 @@ C
              ENDDO
 C             
            ELSEIF(NUMG<=NUMELS+NUMELQ+NUMELC+NUMELT+NUMELP+
-     .            NUMELR+NUMELTG+NUMELUR+NUMELX+ NCONLD + NUMCONV +
+     .            NUMELR+NUMELTG+NUMELX+ NCONLD + NUMCONV +
      .            NUMRADIA+NFXFLUX+SLLOADP/4+NUMELIG3D)THEN
              NUMG = NUMG - (NUMELS+NUMELQ+NUMELC+NUMELT+NUMELP+NUMELR+
-     .                      NUMELTG+NUMELUR+NUMELX+NCONLD+NUMCONV+
+     .                      NUMELTG+NUMELX+NCONLD+NUMCONV+
      .                      NUMRADIA+NFXFLUX+SLLOADP/4)
              DO K = 1,20
                SHFT = ISHFT(IUN,K-1)
@@ -780,7 +931,30 @@ C
                ENDIF
              ENDDO
 C             
-C             
+C     
+           ELSEIF(NUMG<=NUMELS+NUMELQ+NUMELC+NUMELT+NUMELP+
+     .            NUMELR+NUMELTG+NUMELX+ NCONLD + NUMCONV +
+     .            NUMRADIA+NFXFLUX+SLLOADP/4+NUMELIG3D+NUMBER_LOAD_CYL)THEN
+            ! --------------------
+            ! /LOAD/PCYL option
+            ! get the global load segment id
+            GLOBAL_SEGMENT_ID = NUMG - (NUMELS+NUMELQ+NUMELC+NUMELT+NUMELP+
+     .            NUMELR+NUMELTG+NUMELX+ NCONLD + NUMCONV +
+     .            NUMRADIA+NFXFLUX+SLLOADP/4+NUMELIG3D)
+            LOCAL_PROC_ID = LOADS%GLOBAL_SEGMENT_ID(GLOBAL_SEGMENT_ID,1) ! get the proc id where the segment is defined
+            LOCAL_SEGMENT_ID = LOADS%GLOBAL_SEGMENT_ID(GLOBAL_SEGMENT_ID,2) ! get the local segment id (local to the proc P)
+            GLOBAL_LOAD_ID = LOADS%GLOBAL_SEGMENT_ID(GLOBAL_SEGMENT_ID,3) ! get the global load id
+            LOCAL_LOAD_ID = LOADS_PER_PROC%INDEX_LOAD(GLOBAL_LOAD_ID,2) ! get the local load id
+            ! --------
+            ! loop over the 4 nodes of the surfaces to save the adress
+            DO J=1,4
+                IF(N==LOADS_PER_PROC%LOAD_CYL(LOCAL_LOAD_ID)%SEGNOD(LOCAL_SEGMENT_ID,J)) THEN
+                    LOADS_PER_PROC%LOAD_CYL(LOCAL_LOAD_ID)%SEGMENT_ADRESS(J,LOCAL_SEGMENT_ID) = CC_L
+                    GO TO 100
+                ENDIF
+            ENDDO
+            ! --------
+            ! --------------------
            ELSE
              print *,'**error assadd2 unknown elem type'
            ENDIF
@@ -1221,7 +1395,7 @@ C
             NRTS  = IPARI(3,N)
             NRTM  = IPARI(4,N)
             DO K=1,NRTM
-Cel TAGE flag servant pour inacti
+C   TAGE flag servant pour inacti
               N1 = INTBUF_TAB(N)%IRECTM(4*(K-1)+1)
               N2 = INTBUF_TAB(N)%IRECTM(4*(K-1)+2)
               N3 = INTBUF_TAB(N)%IRECTM(4*(K-1)+3)
@@ -1245,7 +1419,6 @@ Cel TAGE flag servant pour inacti
             END DO
           END IF
         END DO
-        if(nn/=nskyi18_l)print*,'error in type18 decomp'
       END IF
 C-----------------------------------------------
 C Ecriture tableaux P/ON propre au SPMD
@@ -1293,8 +1466,6 @@ C adresses elements
       LEN_IA = LEN_IA + 3*NUMELTG_L
       CALL WRITE_I_C(IADTG1,3*NUMELTG6_L)
       LEN_IA = LEN_IA + 3*NUMELTG6_L
-      CALL WRITE_I_C(IADUR,4*NUMELUR_L)
-      LEN_IA = LEN_IA + 4*NUMELUR_L
       CALL WRITE_I_C(IADMV,4*NNMV_L)
       LEN_IA = LEN_IA + 4*NNMV_L
       CALL WRITE_I_C(IADIB,4*NCONLD_L)
@@ -1366,6 +1537,16 @@ C
         CALL WRITE_I_C(CRKNODIAD_L,LCNECRKXFEM_L)
         LEN_IA = LEN_IA + LCNECRKXFEM_L
       ENDIF
+
+      ! -----------------------
+      ! EBCS option : adress for parith/on 
+      IF(LOCAL_NEBCS>0) THEN
+        DO I=1,LOCAL_NEBCS
+            CALL WRITE_I_C(EBCS_PARITHON_L(I)%ELEM_ADRESS,4*EBCS_TAB_LOC_2%tab(I)%poly%nb_elem)
+            LEN_IA = LEN_IA + 4*EBCS_TAB_LOC_2%tab(I)%poly%nb_elem
+        ENDDO
+      ENDIF
+      ! -----------------------
 c
       DEALLOCATE (SOLTAG)
       DEALLOCATE (SOL10TAG)
@@ -1378,7 +1559,6 @@ c
       DEALLOCATE (RTAG)
       DEALLOCATE (TGTAG)
       DEALLOCATE (TG6TAG)
-      DEALLOCATE (URTAG)
       DEALLOCATE (IBTAG)
       DEALLOCATE (IBCVTAG)
       DEALLOCATE (IBCRTAG)
@@ -1395,9 +1575,17 @@ c
       DEALLOCATE( IADQ,IADC )
       DEALLOCATE( IADT,IADP ) 
       DEALLOCATE( IADR,IADTG )
-      DEALLOCATE( IADUR,IADIB )
+      DEALLOCATE( IADIB )
       DEALLOCATE( IADTG1,IADIG3D )
 ! -----------------------------
-
+      ! EBCS option : deallocation
+      DEALLOCATE( EBCS_TAG )
+      IF(LOCAL_NEBCS>0) THEN
+        DO I=1,LOCAL_NEBCS
+            DEALLOCATE( EBCS_PARITHON_L(I)%ELEM_ADRESS )
+        ENDDO
+      ENDIF
+      DEALLOCATE(EBCS_PARITHON_L)
+! -----------------------------
       RETURN
       END

@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  RINI33                        source/elements/joint/rjoint/rini33.F
 Chd|-- called by -----------
@@ -70,8 +70,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "vect01_c.inc"
-#include      "warn_c.inc"
 #include      "param_c.inc"
 C----------------------------------------------------------
 C   D u m m y   A r g u m e n t s   a n d   F u n c t i o n
@@ -229,13 +227,13 @@ C--------------------------------------
           UVAR(27,I)= EX(6)
           UVAR(28,I)= EX(7)
           UVAR(29,I)= EX(8)
-          UVAR(30,I)= EX(9)	  
+          UVAR(30,I)= EX(9)    
 C
           KR = KNN*MAX(ONE,LEN2)
           UVAR(19,I)= KXX
           UVAR(20,I)= KYY
           UVAR(21,I)= KZZ
-	  
+            
           IF(JTYP>=2.AND.JTYP<=4) THEN
             UVAR(31,I)= KRX
             UVAR(32,I)= KR
@@ -259,7 +257,7 @@ C
           UVAR(36,I)= ZERO
           UVAR(37,I)= ZERO
           UVAR(38,I)= ZERO
-          UVAR(39,I)= ZERO	  
+          UVAR(39,I)= ZERO    
 C
           STIFN(I) = KTT
           STIFR(I) = KRR+KTT*LEN2
@@ -382,7 +380,7 @@ C
           A(6) = HALF * (Q1(6) + Q2(8))
           A(7) = HALF * (Q1(7) + Q2(3))
           A(8) = HALF * (Q1(8) + Q2(6))
-          A(9) = HALF * (Q1(9) + Q2(9))	  
+          A(9) = HALF * (Q1(9) + Q2(9))    
 C
           CALL PROD_AB(U,A,X1)
           CALL PROD_ABT(V,A,X2)
@@ -451,7 +449,7 @@ C
       SKEW(5) =  E22   
       SKEW(8) =  E23  
       SKEW(3) =  E31  
-      SKEW(6	) =  E32  
+      SKEW(6  ) =  E32  
       SKEW(9) =  E33  
       RETURN
       END

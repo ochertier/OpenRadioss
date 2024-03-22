@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  I10DST3                       source/interfaces/int10/i10dst3.F
 Chd|-- called by -----------
@@ -239,9 +239,9 @@ C
        ENDDO
 C
        DO I=1,JLT
-	X23 = X3(I) - X2(I)
-	Y23 = Y3(I) - Y2(I)
-	Z23 = Z3(I) - Z2(I)
+          X23 = X3(I) - X2(I)
+          Y23 = Y3(I) - Y2(I)
+          Z23 = Z3(I) - Z2(I)
         LA = ONE - LB2(I) - LC2(I)
         AAA = ONE / MAX(EM20,X23*X23+Y23*Y23+Z23*Z23)
         HLA= LA*ABS(LA) * AAA
@@ -262,9 +262,9 @@ C
        ENDDO
 C
        DO I=1,JLT
-	X34 = X4(I) - X3(I)
-	Y34 = Y4(I) - Y3(I)
-	Z34 = Z4(I) - Z3(I)
+          X34 = X4(I) - X3(I)
+          Y34 = Y4(I) - Y3(I)
+          Z34 = Z4(I) - Z3(I)
         LA = ONE - LB3(I) - LC3(I)
         AAA = ONE / MAX(EM20,X34*X34+Y34*Y34+Z34*Z34)
         HLA= LA*ABS(LA) * AAA
@@ -285,9 +285,9 @@ C
        ENDDO
 C
        DO I=1,JLT
-	X41 = X1(I) - X4(I)
-	Y41 = Y1(I) - Y4(I)
-	Z41 = Z1(I) - Z4(I)
+          X41 = X1(I) - X4(I)
+          Y41 = Y1(I) - Y4(I)
+          Z41 = Z1(I) - Z4(I)
         LA = ONE - LB4(I) - LC4(I)
         AAA = ONE / MAX(EM20,X41*X41+Y41*Y41+Z41*Z41)
         HLA= LA*ABS(LA) * AAA
@@ -364,7 +364,7 @@ C
           IX2(JLT_NEW)  = IX2(I)
           IX3(JLT_NEW)  = IX3(I)
           IX4(JLT_NEW)  = IX4(I)
-Cel rajout specifique type 10
+C   rajout specifique type 10
           X1(JLT_NEW)  = X1(I)
           X2(JLT_NEW)  = X2(I)
           X3(JLT_NEW)  = X3(I)
@@ -377,7 +377,7 @@ Cel rajout specifique type 10
           Z2(JLT_NEW)  = Z2(I)
           Z3(JLT_NEW)  = Z3(I)
           Z4(JLT_NEW)  = Z4(I)
-Cel
+C  
           NSVG(JLT_NEW) = NSVG(I)
           NX1(JLT_NEW)  = NX1(I)
           NX2(JLT_NEW)  = NX2(I)
@@ -492,7 +492,7 @@ C ---------
           IX2(JLT_NEW)  = IX2(I)
           IX3(JLT_NEW)  = IX3(I)
           IX4(JLT_NEW)  = IX4(I)
-Cel rajout specifique type 10
+C   rajout specifique type 10
           X1(JLT_NEW)  = X1(I)
           X2(JLT_NEW)  = X2(I)
           X3(JLT_NEW)  = X3(I)
@@ -505,7 +505,7 @@ Cel rajout specifique type 10
           Z2(JLT_NEW)  = Z2(I)
           Z3(JLT_NEW)  = Z3(I)
           Z4(JLT_NEW)  = Z4(I)
-Cel
+C  
           NSVG(JLT_NEW) = NSVG(I)
           NX1(JLT_NEW)  = NX1(I)
           NX2(JLT_NEW)  = NX2(I)

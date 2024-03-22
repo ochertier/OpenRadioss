@@ -1,47 +1,45 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  INIGRAV_EOS                   source/initial_conditions/inigrav/inigrav_eos.F
 Chd|-- called by -----------
 Chd|        INIGRAV_LOAD                  source/initial_conditions/inigrav/inigrav_load.F
 Chd|-- calls ---------------
 Chd|        EOSMAIN                       ../common_source/eos/eosmain.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
+Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
 Chd|====================================================================
       SUBROUTINE INIGRAV_EOS(NELG, NEL, NG, MATID, IPM, GRAV0, RHO0, DEPTH, PM, BUFMAT,
-     .                       ELBUF_TAB,PSURF,LIST,PRES,IMAT,MLW,NPF,TF)
+     .                       ELBUF_TAB,PSURF,LIST,PRES,IMAT,MLW,NPF,TF,NUMMAT,MAT_PARAM)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE ELBUFDEF_MOD
+      USE MATPARAM_DEF_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -51,6 +49,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN)    :: NUMMAT
       INTEGER, INTENT(IN)    :: NEL, NG, MATID, IPM(NPROPMI, *), LIST(NEL),NELG, IMAT, MLW
       my_real, INTENT(IN)    :: GRAV0, DEPTH(*), PM(NPROPM, *), BUFMAT(*),PSURF
       my_real, INTENT(INOUT) :: PRES(NEL)
@@ -58,11 +57,12 @@ C-----------------------------------------------
       my_real, INTENT(IN) :: RHO0     
       INTEGER,INTENT(IN)::NPF(SNPC)
       my_real,INTENT(IN)::TF(STF)       
+      TYPE(MATPARAM_STRUCT_) ,DIMENSION(NUMMAT), INTENT(IN) :: MAT_PARAM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER :: I,K
-      INTEGER :: EOSTYPE, ITER, MAX_ITER, MAT(NEL), REMAINING_ELTS, NBMAT
+      INTEGER :: EOSTYPE, ITER, MAX_ITER, MAT(NEL), REMAINING_ELTS, NBMAT, NVAREOS
       my_real :: TOL, INCR
       my_real :: FUNC(NEL), DFUNC(NEL), ERROR(NEL), RHOZERO(NEL), RHO(NEL), 
      .           MU(NEL), MU2(NEL), ESPE(NEL), DVOL(NEL), DF(NEL), VOL(NEL), PSH(NEL), 
@@ -72,6 +72,7 @@ C-----------------------------------------------
       LOGICAL :: CONT, CONVERGED(NEL)
       TYPE(G_BUFEL_), POINTER :: GBUF
       TYPE(L_BUFEL_), POINTER :: LBUF
+      TYPE(BUF_EOS_), POINTER :: EBUF
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------
@@ -83,11 +84,17 @@ C IMAT : relevant for multifluid eos. imat=0 => monomaterial law
       
       GBUF => ELBUF_TAB(NG)%GBUF
       NULLIFY(LBUF)
+      NULLIFY(EBUF)
+      NVAREOS = ELBUF_TAB(NG)%BUFLY(1)%NVAR_EOS
+      EBUF =>  ELBUF_TAB(NG)%BUFLY(1)%EOS(1, 1, 1)
       IF(IMAT>0)THEN
         LBUF => ELBUF_TAB(NG)%BUFLY(IMAT)%LBUF(1, 1, 1)
+        EBUF =>  ELBUF_TAB(NG)%BUFLY(IMAT)%EOS(1, 1, 1)
+        NVAREOS = ELBUF_TAB(NG)%BUFLY(IMAT)%NVAR_EOS
       ENDIF
       
-      EOSTYPE          = IPM(4, MATID)
+      EOSTYPE          = MAT_PARAM(MATID)%IEOS   
+      EOSTYPE          = IPM(4, MATID)    ! still used temporarily in this section
       ITER             = 0
       MAX_ITER         = 30
       CONT             =.TRUE.
@@ -145,12 +152,12 @@ C IMAT : relevant for multifluid eos. imat=0 => monomaterial law
             DF(K) = RHOZERO(I) / RHO(K)
             EINT(K) = EINT(K) / DF(K) !with IFLAG==2 we need ESPE=Df*EINT
          ENDDO
-         CALL EOSMAIN(2     , NEL    , EOSTYPE, PM   , OFF  , EINT, 
-     .                RHO   , RHOZERO, MU     , MU2  , ESPE , 
-     .                DVOL  , DF     , VOL    , MAT  , PSH  , 
-     .                PRES  , DPDM   , DPDE   , THETA, ECOLD, 
-     .                BUFMAT, SIG    , MU     , MLW  , POLD ,
-     .                NPF   , TF)
+         CALL EOSMAIN(2     , NEL    , EOSTYPE  , PM     , OFF  , EINT, 
+     .                RHO   , RHOZERO, MU       , MU2    , ESPE , 
+     .                DVOL  , DF     , VOL      , MAT    , PSH  , 
+     .                PRES  , DPDM   , DPDE     , THETA  , ECOLD, 
+     .                BUFMAT, SIG    , MU       , MLW    , POLD ,
+     .                NPF   , TF     , EBUF%VAR , NVAREOS)
           DO K=1,NEL
             EINT(K)=EINT(K)*DF(K) ! set back to Eint/V
           ENDDO

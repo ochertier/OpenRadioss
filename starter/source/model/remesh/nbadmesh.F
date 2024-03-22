@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  NBADMESH                      source/model/remesh/nbadmesh.F
 Chd|-- called by -----------
@@ -50,21 +50,11 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
-#include      "param_c.inc"
 #include      "remesh_c.inc"
 #include      "scr17_c.inc"
-#include      "units_c.inc"
-#include      "submod_c.inc"
-#include      "warn_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -80,8 +70,7 @@ C-----------------------------------------------
       INTEGER IPART(4,NPART),
      .        N,IP,ID,I,J,NLEV,NMUL,STAT,INDEX_PART,NPART_ADM
       INTEGER USR2SYS,NUMNUSR1,IDS,NI,NJ,NK,NL,K,L,P,Q,QQ,
-     .        NN,OFF_DEF(NSUBMOD),OFF_NOD(NSUBMOD),OFF_EL(NSUBMOD),
-     .        UID,IP0,ID_IP
+     .        NN,UID,IP0,ID_IP
 C     REAL
       CHARACTER MESS*40,TITR*nchartitle,KEY*ncharkey
       INTEGER , DIMENSION(:), ALLOCATABLE :: IPARTC, SHELL_ID
@@ -93,9 +82,6 @@ C     REAL
       INTEGER, DIMENSION(:), ALLOCATABLE :: SUBID_NODES
 
       LOGICAL IS_AVAILABLE
-C-----------------------------------------------
-C   E x t e r n a l   F u n c t i o n s
-C-----------------------------------------------
 C-----------------------------------------------
       DATA MESS /'OPTIONS FOR ADAPTIVE MESHING DEFINITION '/
 C-----------------------------------------------
@@ -212,15 +198,6 @@ C
           ENDDO
 
       ENDDO
-
-C--------------------------------------------------
-C      HM OFFSETS IDs
-C--------------------------------------------------
-      DO I=1,NSUBMOD
-        OFF_DEF(I) = LSUBMODEL(I)%OFF_DEF
-        OFF_NOD(I) = LSUBMODEL(I)%OFF_NOD
-        OFF_EL(I) = LSUBMODEL(I)%OFF_EL
-      ENDDO
 C--------------------------------------
 C     nb shells and 3-node shells + nb nodes estimation (NUMNUSR < ...)
 C---------------  
@@ -253,16 +230,6 @@ C--------------------------------------------------
       IP0 = 0 
       DO I=1,NUMELC
 C--------------------------------------------------
-C      SUBMODEL OFFSET
-C-------------------------------------------------
-        IF(SUBID_SHELL(I) /= 0)THEN
-          IF(IPARTC(I) /= 0) IPARTC(I) = IPARTC(I) + OFF_DEF(SUBID_SHELL(I))
-          IF(IXC(NIXC,I) /= 0) IXC(NIXC,I) = IXC(NIXC,I) + OFF_EL(SUBID_SHELL(I))
-          DO J=2,5
-            IF(IXC(J,I) /= 0) IXC(J,I) = IXC(J,I) + OFF_NOD(SUBID_SHELL(I))
-          ENDDO
-        ENDIF
-C--------------------------------------------------
 C      INTERNAL PART ID
 C--------------------------------------------------
         IF( IPARTC(I) /= IP0)THEN
@@ -280,7 +247,7 @@ C--------------------------------------------------
      .                ANMODE=ANINFO,
      .                I1=ID)
         ELSE
-	  IXC(1,I)=IP
+            IXC(1,I)=IP
           IPART(2,IP)=IPART(2,IP)+1 
         END IF
       ENDDO
@@ -317,16 +284,6 @@ C--------------------------------------------------
       IP0 = 0  
       DO I=1,NUMELTG
 C--------------------------------------------------
-C      SUBMODEL OFFSET
-C--------------------------------------------------
-        IF(SUBID_SH3N(I) /= 0)THEN
-          IF(IPARTTG(I) /= 0) IPARTTG(I) = IPARTTG(I) + OFF_DEF(SUBID_SH3N(I))
-          IF(IXTG(NIXTG,I) /= 0) IXTG(NIXTG,I) = IXTG(NIXTG,I) + OFF_EL(SUBID_SH3N(I))
-          DO J=2,4
-            IF(IXTG(J,I) /= 0) IXTG(J,I) = IXTG(J,I) + OFF_NOD(SUBID_SH3N(I))
-          ENDDO
-        ENDIF
-C--------------------------------------------------
 C      INTERNAL PART ID
 C--------------------------------------------------
         IF( IPARTTG(I) /= IP0)THEN
@@ -343,7 +300,7 @@ C--------------------------------------------------
      .                ANMODE=ANINFO,
      .                I1=ID)
         ELSE
-	  IXTG(1,I)=IP
+            IXTG(1,I)=IP
           IPART(3,IP)=IPART(3,IP)+1 
         END IF
       ENDDO
@@ -371,18 +328,12 @@ C--------------------------------------------------
 C      CHECKS NODES & CNODES IDs
 C--------------------------------------------------  
       DO I=1,NUMNUSR
-C--------------------------------------------------
-C      SUBMODEL OFFSET
-C--------------------------------------------------
-        IF(SUBID_NODES(I) /= 0)THEN
-          IF(ITAB(I) /= 0) ITAB(I) = ITAB(I) + OFF_NOD(SUBID_NODES(I))
-        ENDIF
-	IF (ITAB(I) > ID_LIMIT_ADMESH
+          IF (ITAB(I) > ID_LIMIT_ADMESH
      .        .AND. (ITAB(I) <  IDFT_NODE_AUTO.OR.
      .               ITAB(I) >= IDLT_NODE_AUTO)) THEN
               CALL ANCMSG(MSGID=1069,ANMODE=ANINFO,MSGTYPE=MSGERROR,
      .                    I1=ITAB(I),C1=LINE,C2='/NODE') 
-	ENDIF 			 
+          ENDIF        
       ENDDO
       IF(ALLOCATED(SUBID_NODES)) DEALLOCATE(SUBID_NODES)
 C------
@@ -392,28 +343,28 @@ C     NUMNUSR=NUMNUSR1+NUMCNOD !
       CALL CONSTIT(ITAB,ITABM1,NUMNUSR)
 C------
 C     4-node shells
-C------			  
+C------        
       DO I=1,NUMELC
-	  IF (IXC(NIXC,I)>ID_LIMIT_ADMESH) THEN	     
+            IF (IXC(NIXC,I)>ID_LIMIT_ADMESH) THEN       
             CALL ANCMSG(MSGID=1069,ANMODE=ANINFO,MSGTYPE=MSGERROR,
      .            I1=IXC(NIXC,I),C1=LINE,C2='/SHELL') 
-	  ENDIF
-	  DO J=2,5						   
-	    IXC(J,I)=USR2SYS(IXC(J,I),ITABM1,MESS,ID)  
-	  ENDDO
+            ENDIF
+            DO J=2,5               
+              IXC(J,I)=USR2SYS(IXC(J,I),ITABM1,MESS,ID)  
+            ENDDO
       ENDDO
       IF(ALLOCATED(IPARTC)) DEALLOCATE(IPARTC)
       IF(ALLOCATED(SH_ANGLE)) DEALLOCATE(SH_ANGLE) 
       IF(ALLOCATED(SH_THK)) DEALLOCATE (SH_THK)
-C------			  
+C------        
       DO I=1,NUMELTG
-	  IF (IXTG(NIXTG,I)>ID_LIMIT_ADMESH) THEN	     
+            IF (IXTG(NIXTG,I)>ID_LIMIT_ADMESH) THEN       
             CALL ANCMSG(MSGID=1069,ANMODE=ANINFO,MSGTYPE=MSGERROR,
      .            I1=IXTG(NIXTG,I),C1=LINE,C2='/SH3N')
-	  ENDIF
-	  DO J=2,4						   
-	    IXTG(J,I)=USR2SYS(IXTG(J,I),ITABM1,MESS,ID) 
-	  ENDDO
+            ENDIF
+            DO J=2,4               
+              IXTG(J,I)=USR2SYS(IXTG(J,I),ITABM1,MESS,ID) 
+            ENDDO
       ENDDO
       IF(ALLOCATED(IPARTTG)) DEALLOCATE(IPARTTG)
       IF(ALLOCATED(SH3_ANGLE)) DEALLOCATE (SH3_ANGLE)  
@@ -423,41 +374,41 @@ C     inverse connectivity at level 0
 C------
       KNOD2SH=0
       DO N=1,NUMELC0
-	DO I=1,4
-	  NI=IXC(I+1,N)
-	  KNOD2SH(NI)=KNOD2SH(NI)+1
-	END DO
+          DO I=1,4
+            NI=IXC(I+1,N)
+            KNOD2SH(NI)=KNOD2SH(NI)+1
+          END DO
       END DO
 
       DO N=1,NUMELTG0
-	DO I=1,3
-	  NI=IXTG(I+1,N)
-	  KNOD2SH(NI)=KNOD2SH(NI)+1
-	END DO
+          DO I=1,3
+            NI=IXTG(I+1,N)
+            KNOD2SH(NI)=KNOD2SH(NI)+1
+          END DO
       END DO
 
       DO N=2,NUMNUSR
-	KNOD2SH(N)=KNOD2SH(N)+KNOD2SH(N-1)
+          KNOD2SH(N)=KNOD2SH(N)+KNOD2SH(N-1)
       END DO
 
       DO N=1,NUMELC0
-	DO I=1,4
-	  NI=IXC(I+1,N)-1
-	  KNOD2SH(NI)=KNOD2SH(NI)+1
-	  NOD2SH(KNOD2SH(NI))=N
-	END DO
+          DO I=1,4
+            NI=IXC(I+1,N)-1
+            KNOD2SH(NI)=KNOD2SH(NI)+1
+            NOD2SH(KNOD2SH(NI))=N
+          END DO
       END DO
 
       DO N=1,NUMELTG0
-	DO I=1,3
-	  NI=IXTG(I+1,N)-1
-	  KNOD2SH(NI)=KNOD2SH(NI)+1
-	  NOD2SH(KNOD2SH(NI))=NUMELC0+N
-	END DO
+          DO I=1,3
+            NI=IXTG(I+1,N)-1
+            KNOD2SH(NI)=KNOD2SH(NI)+1
+            NOD2SH(KNOD2SH(NI))=NUMELC0+N
+          END DO
       END DO
 
       DO N=NUMNUSR,1,-1
-	KNOD2SH(N)=KNOD2SH(N-1)
+          KNOD2SH(N)=KNOD2SH(N-1)
       END DO
       KNOD2SH(0)=0
 C------
@@ -465,9 +416,9 @@ C
 C------
       NUMELC=0
       DO N=1,NUMELC0
-	IP  =IXC(1,N)
-	NLEV=IPART(4,IP)
-	IF(NLEV/=0) THEN
+          IP  =IXC(1,N)
+          NLEV=IPART(4,IP)
+          IF(NLEV/=0) THEN
          NUMNOD=NUMNOD+(2**NLEV-1)*(2**NLEV-1)
          DO I=1,4
            IF(TAG(I,N)<NLEV)THEN
@@ -479,87 +430,87 @@ C------
              DO K=KNOD2SH(NI-1)+1,KNOD2SH(NI)
                P=NOD2SH(K)
                IF(P/=N)THEN
-         	DO L=KNOD2SH(NJ-1)+1,KNOD2SH(NJ)
-         	  Q=NOD2SH(L)
-         	  IF(Q==P)THEN
-         	     IF(Q<=NUMELC0)THEN
-         	       DO J=1,4
+          DO L=KNOD2SH(NJ-1)+1,KNOD2SH(NJ)
+            Q=NOD2SH(L)
+            IF(Q==P)THEN
+               IF(Q<=NUMELC0)THEN
+                 DO J=1,4
                          NK=IXC(J+1,Q)
                          NL=IXC(MOD(J,4)+2,Q)
                          IF((NK==NI.AND.NL==NJ).OR.
      .                      (NL==NI.AND.NK==NJ))THEN
-         		   TAG(J,Q)=NLEV
-         		 END IF
-         	       END DO
-         	     ELSE
-         	       QQ=Q-NUMELC0
-         	       DO J=1,3
+             TAG(J,Q)=NLEV
+           END IF
+                 END DO
+               ELSE
+                 QQ=Q-NUMELC0
+                 DO J=1,3
                         NK=IXTG(J+1,QQ)
                         NL=IXTG(MOD(J,3)+2,QQ)
-         		IF((NK==NI.AND.NL==NJ).OR.
-     .  		   (NL==NI.AND.NK==NJ))THEN
-         		   TAG(J,Q)=NLEV
-         		 END IF
-         	       END DO
-         	     END IF
-         	  END IF
-         	END DO
+          IF((NK==NI.AND.NL==NJ).OR.
+     .         (NL==NI.AND.NK==NJ))THEN
+             TAG(J,Q)=NLEV
+           END IF
+                 END DO
+               END IF
+            END IF
+          END DO
                END IF
              END DO
            END IF
          END DO
-	END IF
-	NUMELC =NUMELC +(4**(NLEV+1)-1)/3
+          END IF
+          NUMELC =NUMELC +(4**(NLEV+1)-1)/3
       END DO
 
 C
       NUMELTG=0
       DO N=1,NUMELTG0
-	IP  =IXTG(1,N)
-	NLEV=IPART(4,IP)
-	IF(NLEV/=0) THEN
+          IP  =IXTG(1,N)
+          NLEV=IPART(4,IP)
+          IF(NLEV/=0) THEN
          NUMNOD =NUMNOD+(2**(NLEV-1)+1)*(2**NLEV+1)-3*(2**NLEV)
-	 DO I=1,3
-	   IF(TAG(I,N+NUMELC0)<NLEV)THEN
-	     NUMNOD=NUMNOD+(2**NLEV-1)-(2**(TAG(I,N+NUMELC0))-1)
-	     TAG(I,N+NUMELC0)=NLEV
+           DO I=1,3
+             IF(TAG(I,N+NUMELC0)<NLEV)THEN
+               NUMNOD=NUMNOD+(2**NLEV-1)-(2**(TAG(I,N+NUMELC0))-1)
+               TAG(I,N+NUMELC0)=NLEV
 
-	     NI=IXTG(I+1,N)
-	     NJ=IXTG(MOD(I,3)+2,N)
-	     DO K=KNOD2SH(NI-1)+1,KNOD2SH(NI)
-	       P=NOD2SH(K)
-	       IF(P/=N+NUMELC0)THEN
-	 	 DO L=KNOD2SH(NJ-1)+1,KNOD2SH(NJ)
-	 	   Q=NOD2SH(L)
-	 	   IF(Q==P)THEN
-	 	     IF(Q<=NUMELC0)THEN
-	 	       DO J=1,4
+               NI=IXTG(I+1,N)
+               NJ=IXTG(MOD(I,3)+2,N)
+               DO K=KNOD2SH(NI-1)+1,KNOD2SH(NI)
+                 P=NOD2SH(K)
+                 IF(P/=N+NUMELC0)THEN
+           DO L=KNOD2SH(NJ-1)+1,KNOD2SH(NJ)
+             Q=NOD2SH(L)
+             IF(Q==P)THEN
+               IF(Q<=NUMELC0)THEN
+                 DO J=1,4
                          NK=IXC(J+1,Q)
                          NL=IXC(MOD(J,4)+2,Q)
                          IF((NK==NI.AND.NL==NJ).OR.
      .                      (NL==NI.AND.NK==NJ))THEN
-	 		   TAG(J,Q)=NLEV
-	 		 END IF
-	 	       END DO
-	 	     ELSE
-	 	       QQ=Q-NUMELC0
-	 	       DO J=1,3
+             TAG(J,Q)=NLEV
+           END IF
+                 END DO
+               ELSE
+                 QQ=Q-NUMELC0
+                 DO J=1,3
                         NK=IXTG(J+1,QQ)
                         NL=IXTG(MOD(J,3)+2,QQ)
-         		IF((NK==NI.AND.NL==NJ).OR.
-     .  		   (NL==NI.AND.NK==NJ))THEN
-	 		   TAG(J,Q)=NLEV
-	 		 END IF
-	 	       END DO
-	 	     END IF
-	 	   END IF
-	 	 END DO
-	       END IF
-	     END DO
-	   END IF
-	 END DO
-	END IF
-	NUMELTG =NUMELTG +(4**(NLEV+1)-1)/3
+          IF((NK==NI.AND.NL==NJ).OR.
+     .         (NL==NI.AND.NK==NJ))THEN
+             TAG(J,Q)=NLEV
+           END IF
+                 END DO
+               END IF
+             END IF
+           END DO
+                 END IF
+               END DO
+             END IF
+           END DO
+          END IF
+          NUMELTG =NUMELTG +(4**(NLEV+1)-1)/3
       END DO
 C-------------------------------------
       DEALLOCATE(ITAB,ITABM1,IXC,IXTG,KNOD2SH,NOD2SH,TAG)

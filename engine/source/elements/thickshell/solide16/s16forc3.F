@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  S16FORC3                      source/elements/thickshell/solide16/s16forc3.F
 Chd|-- called by -----------
@@ -28,25 +28,27 @@ Chd|-- calls ---------------
 Chd|        MMAIN                         source/materials/mat_share/mmain.F
 Chd|        S16BILAN                      source/elements/thickshell/solide16/s16bilan.F
 Chd|        S16DERI3                      source/elements/thickshell/solide16/s16deri3.F
-Chd|        S16RST                        source/elements/thickshell/solide16/s16deri3.F
+Chd|        S16RST                        source/elements/thickshell/solide16/s16rst.F
 Chd|        S16SIGP3                      source/elements/thickshell/solide16/s16sigp3.F
 Chd|        S16SIGS3                      source/elements/thickshell/solide16/s16sigs3.F
 Chd|        S20COOR3                      source/elements/solid/solide20/s20coor3.F
 Chd|        S20CUMU3                      source/elements/solid/solide20/s20cumu3.F
-Chd|        S20CUMU3P                     source/elements/solid/solide20/s20cumu3.F
+Chd|        S20CUMU3P                     source/elements/solid/solide20/s20cumu3p.F
 Chd|        S20DEFO3                      source/elements/solid/solide20/s20defo3.F
 Chd|        S20FINT3                      source/elements/solid/solide20/s20fint3.F
 Chd|        S20TEMPCG                     source/elements/solid/solide20/s20tempcg.F
 Chd|        S20THERM                      source/elements/solid/solide20/s20therm.F
-Chd|        SMALLA3                       source/elements/solid/solide/small3.F
-Chd|        SMALLB3                       source/elements/solid/solide/small3.F
+Chd|        SDLENSH2                      source/elements/thickshell/solidec/sdlensh2.F
+Chd|        SMALLA3                       source/elements/solid/solide/smalla3.F
+Chd|        SMALLB3                       source/elements/solid/solide/smallb3.F
 Chd|        SRHO3                         source/elements/solid/solide/srho3.F
 Chd|        SROTA3                        source/elements/solid/solide/srota3.F
 Chd|        SSTRA3                        source/elements/solid/solide/sstra3.F
 Chd|        SXFILLOPT                     source/elements/solid/solide10/sxfillopt.F
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/matparam_def_mod.F
+Chd|        TSHGEODEL3                    source/elements/thickshell/solidec/tshgeodel3.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
+Chd|        DT_MOD                        share/modules/dt_mod.F        
+Chd|        MAT_ELEM_MOD                  ../common_source/modules/mat_elem/mat_elem_mod.F
 Chd|        MMAIN_MOD                     source/materials/mat_share/mmain.F
 Chd|        NLOCAL_REG_MOD                ../common_source/modules/nlocal_reg_mod.F
 Chd|        TABLE_MOD                     share/modules/table_mod.F     
@@ -69,16 +71,16 @@ Chd|====================================================================
      F                    IPM      ,ISTRAIN ,TEMP   ,FTHE    ,FTHESKY ,
      G                    IEXPAN   ,GRESAV  ,GRTH   ,IGRTH   ,TABLE   ,
      H                    IGEO     ,VOLN    ,CONDN  ,CONDNSKY,ITASK  ,
-     I                    IOUTPRT  ,MATPARAM_TAB,H3D_STRAIN)
+     I                    IOUTPRT  ,MAT_ELEM,H3D_STRAIN  ,DT    )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE MMAIN_MOD
       USE TABLE_MOD
-      USE ELBUFDEF_MOD            
+      USE MAT_ELEM_MOD            
       USE NLOCAL_REG_MOD
       USE ALE_CONNECTIVITY_MOD
-      USE MATPARAM_DEF_MOD
+      USE DT_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -92,13 +94,8 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com06_c.inc"
 #include      "com08_c.inc"
-#include      "scr03_c.inc"
-#include      "scr07_c.inc"
 #include      "vect01_c.inc"
-#include      "scr01_c.inc"
-#include      "scr06_c.inc"
 #include      "parit_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
@@ -117,7 +114,7 @@ C-----------------------------------------------
       my_real
      .   DT2T
       my_real
-     .   PM(NPROPM,*), GEO(*), X(*), A(*), V(*), MS(*), W(*), 
+     .   PM(NPROPM,*), GEO(NPROPG,*), X(*), A(*), V(*), MS(*), W(*), 
      .   FLUX(6,*),FLU1(*), VEUL(*), FV(*), TF(*), 
      .   BUFMAT(*),PARTSAV(*),STIFN(*), FSKY(*),EANI(*)
       my_real
@@ -138,15 +135,14 @@ C-----------------------------------------------
       TYPE (ELBUF_STRUCT_), TARGET, DIMENSION(NGROUP) :: ELBUF_TAB
       TYPE (NLOCAL_STR_)  , TARGET :: NLOC_DMG 
       TYPE(t_ale_connectivity), INTENT(IN) :: ALE_CONNECT
-      TYPE(MATPARAM_STRUCT_)  , DIMENSION(NUMMAT) :: MATPARAM_TAB
+      TYPE (MAT_ELEM_) ,INTENT(INOUT) :: MAT_ELEM
+      TYPE(DT_), INTENT(INOUT) :: DT
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,J,N,LCO, NF1, IFLAG, IL, IR, IS, IT, NF2,L_PLA,
-     .        IP,NLAY,NPTT,NPTS,NPTR,ICO,IBID,IBIDON(1),MX,II(6)
+     .        IP,NLAY,NPTT,NPTS,NPTR,ICO,IBID,IBIDON(1),MX,II(6),PID
 
-      ! Variables utilisees en equivalence par les materiaux
-      ! transmises en argument a mmain.
       INTEGER MXT(MVSIZ),NGL(MVSIZ),NGEO(MVSIZ),IPERM1(NPE),IPERM2(NPE)
       my_real
      . VD2(MVSIZ) , DVOL(MVSIZ),DELTAX(MVSIZ),
@@ -169,10 +165,10 @@ C-----------------------------------------------
       my_real
      . SIGY(MVSIZ),ET(MVSIZ),GAMA(MVSIZ,6),
      . R1_FREE(MVSIZ),R3_FREE(MVSIZ),R4_FREE(MVSIZ),
-     . TEMPEL(MVSIZ),DIE(MVSIZ),THEM(MVSIZ,NPE)
+     . TEMPEL(MVSIZ),DIE(MVSIZ),THEM(MVSIZ,NPE),AREA(MVSIZ),LLSH(MVSIZ)
      
       ! Variables utilisees dans les routines solides uniquement (en arguments).
-      INTEGER NC(MVSIZ,NPE)
+      INTEGER NC(MVSIZ,NPE),NN_DEL,IPRES
       my_real
      .  OFF(MVSIZ) , RHOO(MVSIZ),NI(NPE,NIPMAX),
      .  SIGSM(MVSIZ),VOLSM(MVSIZ),
@@ -374,6 +370,7 @@ C=======================================================================
       NLAY     = ELBUF_TAB(NG)%NLAY
       IS       = 1
       ISORTH   = 0
+      TEMPEL(1:MVSIZ) = ZERO
       NF1      = NFT+1
       NF2      = NF1-(NUMELS8+NUMELS10+NUMELS20)
       IF (NPTR*NPTS*NPTT*NLAY > NIPMAX) STOP 933
@@ -385,20 +382,33 @@ C=======================================================================
       ENDDO
 !
       CALL S20COOR3(
-     1   X,IXS(1,NF1),IXS16(1,NF2),V,W, IPERM1,IPERM2,NPE,
-     2   XX, YY, ZZ, VX, VY, VZ,VDXX, VDYY, VDZZ, 
-     3   VDX,VDY,VDZ,VD2,VIS,GBUF%OFF,OFF,GBUF%SMSTR,
-     4   NC,NGL,MXT,NGEO,   FX,FY,FZ,STIG,
-     5   GBUF%SIG,GBUF%EINT,GBUF%RHO,GBUF%QVIS,GBUF%PLA,
-     6   GBUF%EPSD,GBUF%G_PLA,GBUF%G_EPSD,NEL,CONDEG)
+     1   X,           IXS(1,NF1),  IXS16(1,NF2),V,
+     2   W,           IPERM1,      IPERM2,      NPE,
+     3   XX,          YY,          ZZ,          VX,
+     4   VY,          VZ,          VDXX,        VDYY,
+     5   VDZZ,        VDX,         VDY,         VDZ,
+     6   VD2,         VIS,         GBUF%OFF,    OFF,
+     7   GBUF%SMSTR,  NC,          NGL,         MXT,
+     8   NGEO,        FX,          FY,          FZ,
+     9   STIG,        GBUF%SIG,    GBUF%EINT,   GBUF%RHO,
+     A   GBUF%QVIS,   GBUF%PLA,    GBUF%EPSD,   GBUF%G_PLA,
+     B   GBUF%G_EPSD, NEL,         CONDEG,      JALE,
+     C   ISMSTR,      JEUL,        JLAG)
 
+      NN_DEL = 0
+      PID = NGEO(1)
+      IF (GEO(190,PID)+GEO(191,PID)+GEO(192,PID)+GEO(192,PID)>ZERO)
+     .        NN_DEL=8
+      IF (NN_DEL ==0 .AND. DT%IDEL_BRICK>0) NN_DEL=16
+      IPRES = MAT_ELEM%MAT_PARAM(MXT(1))%IPRES
+C
       DO N=1,NPE
-        DO I=LFT,LLT
+        DO I=1,NEL
           UL(I,N) = ZERO
         ENDDO
       ENDDO
-      IF (JTHE < 0) THEM(LFT:LLT,1:NPE) = ZERO
-      DO I=LFT,LLT
+      IF (JTHE < 0) THEM(1:NEL,1:NPE) = ZERO
+      DO I=1,NEL
         VOLG(I)  = ZERO
       ENDDO
 C-----------------------------
@@ -406,7 +416,7 @@ C     POINTS D' INTEGRATION - SIGS
 C-----------------------------
       DO IT=1,NPTT
         DO IR=1,NPTR
-          DO I=LFT,LLT
+          DO I=1,NEL
             SIGSM(I) = ZERO
             VOLSM(I) = ZERO
           ENDDO
@@ -422,12 +432,15 @@ C-----------
      2         DNIDR         ,DNIDS         ,DNIDT         )
 
              CALL S16DERI3(
-     1       NGL,OFF,A_GAUSS(IR,NPTR),A_GAUSS(IL,NLAY),A_GAUSS(IT,NPTT),WI,
-     2       DNIDR    ,DNIDS    ,DNIDT   ,RX(1,IP)  ,RY(1,IP)  ,RZ(1,IP)  ,
-     3       SX(1,IP) ,SY(1,IP) ,SZ(1,IP),TX(1,IP)  ,TY(1,IP)  ,TZ(1,IP)  ,
-     4       XX       ,YY       ,ZZ      ,PX(1,1,IP),PY(1,1,IP),PZ(1,1,IP),
-     5       VOLNP(1,IP),DELTAX ,STIN    ,NI(1,IP)  ,VOLG      ,UL        ,
-     6       IR       ,IL       ,IT      ,VOLDP(1,IP))
+     1   NGL,             OFF,             A_GAUSS(IR,NPTR),A_GAUSS(IL,NLAY),
+     2   A_GAUSS(IT,NPTT),WI,              DNIDR,           DNIDS,
+     3   DNIDT,           RX(1,IP),        RY(1,IP),        RZ(1,IP),
+     4   SX(1,IP),        SY(1,IP),        SZ(1,IP),        TX(1,IP),
+     5   TY(1,IP),        TZ(1,IP),        XX,              YY,
+     6   ZZ,              PX(1,1,IP),      PY(1,1,IP),      PZ(1,1,IP),
+     7   VOLNP(1,IP),     DELTAX,          STIN,            NI(1,IP),
+     8   VOLG,            UL,              IR,              IL,
+     9   IT,              VOLDP(1,IP),     NEL)
             ELSEIF (IINT == 2) THEN
               !---LOBATTO
               WI = W_GAUSS(IR,NPTR)*W_LOBATTO(IL,NLAY)*W_GAUSS(IT,NPTT)
@@ -435,18 +448,21 @@ C-----------
      1       A_GAUSS(IR,NPTR),A_LOBATTO(IL,NLAY),A_GAUSS(IT,NPTT),NI(1,IP),
      2         DNIDR         ,DNIDS             ,DNIDT         )
 
-             CALL S16DERI3(NGL,OFF,
-     1       A_GAUSS(IR,NPTR),A_LOBATTO(IL,NLAY),A_GAUSS(IT,NPTT),WI      ,
-     2       DNIDR    ,DNIDS    ,DNIDT   ,RX(1,IP)  ,RY(1,IP)  ,RZ(1,IP)  ,
-     3       SX(1,IP) ,SY(1,IP) ,SZ(1,IP),TX(1,IP)  ,TY(1,IP)  ,TZ(1,IP)  ,
-     4       XX       ,YY       ,ZZ      ,PX(1,1,IP),PY(1,1,IP),PZ(1,1,IP),
-     5       VOLNP(1,IP),DELTAX ,STIN    ,NI(1,IP)  ,VOLG      ,UL        ,
-     6       IR       ,IL       ,IT      ,VOLDP(1,IP))
+             CALL S16DERI3(
+     1   NGL,               OFF,               A_GAUSS(IR,NPTR),  A_LOBATTO(IL,NLAY),
+     2   A_GAUSS(IT,NPTT),  WI,                DNIDR,             DNIDS,
+     3   DNIDT,             RX(1,IP),          RY(1,IP),          RZ(1,IP),
+     4   SX(1,IP),          SY(1,IP),          SZ(1,IP),          TX(1,IP),
+     5   TY(1,IP),          TZ(1,IP),          XX,                YY,
+     6   ZZ,                PX(1,1,IP),        PY(1,1,IP),        PZ(1,1,IP),
+     7   VOLNP(1,IP),       DELTAX,            STIN,              NI(1,IP),
+     8   VOLG,              UL,                IR,                IL,
+     9   IT,                VOLDP(1,IP),       NEL)
             ENDIF
             !--------------------------
             ! SOUS INTEGRATION DE SIGS
             !-------------------------
-            DO I=LFT,LLT
+            DO I=1,NEL
               AA         = ONE / SQRT(SX(I,IP)*SX(I,IP) + SY(I,IP)*SY(I,IP) +SZ(I,IP)*SZ(I,IP))
               SX(I,IP)   = SX(I,IP) * AA
               SY(I,IP)   = SY(I,IP) * AA
@@ -471,19 +487,19 @@ C-----------
              VOLSM(I)    = VOLSM(I) + LBUF%VOL(I)
             ENDDO!next I
           ENDDO!next ILAY 
-          DO I=LFT,LLT
+          DO I=1,NEL
             SIGSM(I) = SIGSM(I) / VOLSM(I)
           ENDDO
           DO IL=1,NLAY
             IP = IR + ( (IL-1) + (IT-1)*NLAY ) * NPTR
-            DO I = LFT,LLT
+            DO I = 1,NEL
               SIGS(I,IP) = SIGS(I,IP)-SIGSM(I)
             ENDDO
           ENDDO!IL=1,NLAY
        ENDDO!IR=1,NPTR
       ENDDO!IT=1,NPTT
 C-------------------------
-      DO I=LFT,LLT
+      DO I=1,NEL
         AA = MAX(UL(I,1),UL(I,2),UL(I,3),UL(I,4),
      .           UL(I,5),UL(I,6),UL(I,7),UL(I,8))
         BB = MAX(UL(I,9) ,UL(I,10),UL(I,11),UL(I,12),UL(I,13),UL(I,14),
@@ -492,8 +508,8 @@ C-------------------------
         BB = BB*THIRTY2*THIRD
         DELTAX(I) = SQRT(TWO*VOLG(I)/MAX(AA,BB))
       ENDDO
-      IF (ICP == 1 .OR. ICP == 2) THEN
-        CALL S16SIGP3(LFT,LLT,NEL,NPTR,NLAY,
+      IF (ICP == 1 .OR. ICP == 2 .AND. IPRES==1 ) THEN
+        CALL S16SIGP3(1,NEL,NEL,NPTR,NLAY,
      .                NPTT,ICP,MTN,NPE,NIPMAX, 
      .                PX, PY, PZ, VX, VY, VZ, 
      .                W_GAUSS,GBUF%PLA,PM,MXT,GBUF%SIG,DT1,
@@ -510,66 +526,95 @@ C
          IP = IR + ( (IL-1) + (IT-1)*NLAY )*NPTR
 c
          CALL S20DEFO3(
-     .    NPE,  PX(1,1,IP), PY(1,1,IP), PZ(1,1,IP), VX, VY, VZ,
-     .    DXX, DXY, DXZ, DYX, DYY, DYZ, DZX, DZY, DZZ, D4, D5, D6,
-     .    WXX, WYY, WZZ,LBUF%RHO,RHOO,VOLNP(1,IP),VOLN)
+     1   NPE,        PX(1,1,IP), PY(1,1,IP), PZ(1,1,IP),
+     2   VX,         VY,         VZ,         DXX,
+     3   DXY,        DXZ,        DYX,        DYY,
+     4   DYZ,        DZX,        DZY,        DZZ,
+     5   D4,         D5,         D6,         WXX,
+     6   WYY,        WZZ,        LBUF%RHO,   RHOO,
+     7   VOLNP(1,IP),VOLN,       NEL)
 C           
-         IF(DT1/=ZERO)CALL S16SIGS3(
-     1    DXX      ,DYY      ,DZZ      ,D4       ,D5       ,D6       ,
-     2    RX(1,IP) ,RY(1,IP) ,RZ(1,IP) ,SX(1,IP) ,SY(1,IP) ,SZ(1,IP) ,
-     3    TX(1,IP) ,TY(1,IP) ,TZ(1,IP) ,GBUF%EINT,LBUF%VOL,SIGS(1,IP) ,
-     4    MXT      ,PM       ,DT1      ,LBUF%VOL0DP)
+         IF(DT1/=ZERO .AND. IPRES==1 )CALL S16SIGS3(
+     1   DXX,        DYY,        DZZ,        D4,
+     2   D5,         D6,         RX(1,IP),   RY(1,IP),
+     3   RZ(1,IP),   SX(1,IP),   SY(1,IP),   SZ(1,IP),
+     4   TX(1,IP),   TY(1,IP),   TZ(1,IP),   GBUF%EINT,
+     5   LBUF%VOL,   SIGS(1,IP), MXT,        PM,
+     6   DT1,        LBUF%VOL0DP,NEL)
 C
          DIVDE(1:NEL) = DT1*(DXX(1:NEL)+ DYY(1:NEL)+ DZZ(1:NEL))   
-         CALL SRHO3( PM         , LBUF%VOL  ,LBUF%RHO ,LBUF%EINT, DIVDE,
-     2               FLUX(1,NF1), FLU1(NF1) ,VOLN     ,DVOL     , NGL, MXT, OFF,
-     3               0          , GBUF%TAG22,VOLDP(1,IP),LBUF%VOL0DP,AMU  ,GBUF%OFF )
+         CALL SRHO3(
+     1   PM,         LBUF%VOL,   LBUF%RHO,   LBUF%EINT,
+     2   DIVDE,      FLUX(1,NF1),FLU1(NF1),  VOLN,
+     3   DVOL,       NGL,        MXT,        OFF,
+     4   0,          GBUF%TAG22, VOLDP(1,IP),LBUF%VOL0DP,
+     5   AMU,        GBUF%OFF,   NEL,        MTN,
+     6   JALE,       ISMSTR,     JEUL,       JLAG)
      
-         CALL SROTA3(LBUF%SIG,S1   ,S2   ,S3   ,S4 ,
-     .               S5      ,S6   ,WXX  ,WYY  ,WZZ,
-     .               NEL     )
+         CALL SROTA3(
+     1   LBUF%SIG,S1,      S2,      S3,
+     2   S4,      S5,      S6,      WXX,
+     3   WYY,     WZZ,     NEL,     MTN,
+     4   ISMSTR)
       !-----------------------------
       !     SMALL STRAIN
       !-----------------------------
-         CALL SMALLA3(GBUF%SMSTR,GBUF%OFF,OFF,WXX,WYY,WZZ,NEL)
+         CALL SMALLA3(
+     1   GBUF%SMSTR,GBUF%OFF,  OFF,       WXX,
+     2   WYY,       WZZ,       NEL,       ISMSTR,
+     3   JLAG)
 C
 C    for heat transfert
 C
           IF(JTHE < 0 ) THEN
-             CALL S20TEMPCG(LFT,LLT,NPE, NC,NI(1,IP), TEMP,TEMPEL)
+             CALL S20TEMPCG(1,NEL,NPE, NC,NI(1,IP), TEMP,TEMPEL)
           ENDIF
       !------------------------------------------------------
       !     CALCUL DES CONTRAINTES SUIVANT LOIS CONSTITUTIVES
       !------------------------------------------------------
-         CALL MMAIN(ELBUF_TAB,NG       ,
-     1    PM       ,GEO      ,FV       ,ALE_CONNECT      ,IXS        ,
-     2    IPARG    ,V        ,TF       ,NPF        ,BUFMAT     ,
-     3    STI      ,X        ,DT2T     ,NELTST     ,ITYPTST    ,OFFSET   ,
-     4    NEL      ,W        ,OFF      ,NGEO       ,
-     6    MXT      ,NGL      ,VOLN     ,VD2        ,DVOL       ,DELTAX   ,
-     7    VIS      ,QVIS     ,CXX      ,S1         ,S2         ,S3	 ,
-     8    S4       ,S5       ,S6       ,DXX        ,DYY        ,DZZ	 ,
-     9    D4       ,D5       ,D6       ,WXX        ,WYY        ,WZZ	 ,
-     A    RX(1,IP) ,RY(1,IP) ,RZ(1,IP) ,SX(1,IP)   ,SY(1,IP)   ,SZ(1,IP) ,
-     B    VDX      ,VDY      ,VDZ      ,MUVOID     ,SSP_EQ     ,AIRE	 ,
-     C    SIGY     ,ET       ,R1_FREE  ,LBUF%PLA   ,R3_FREE    ,AMU      ,
-     D    DXX      ,DXY      ,DXZ      ,DYX        ,DYY        ,DYZ	 ,
-     E    DZX      ,DZY      ,DZZ      ,IPM        ,GAMA       ,BID	 ,
-     F    BID      ,BID      ,BID      ,BID        ,BID        ,BID	 ,
-     G    ISTRAIN , TEMPEL   ,DIE      ,IEXPAN     ,IL         ,MBID	 ,
-     H    MBID     ,IR       ,IS       ,IT         ,TABLE      ,BID	 ,
-     I    BID      ,BID      ,BID      ,IPARG(1,NG),IGEO     ,CONDE    ,
-     J    ITASK    ,NLOC_DMG ,VARNL    ,MATPARAM_TAB,H3D_STRAIN)
+         CALL MMAIN(
+     1   ELBUF_TAB,   NG,          PM,          GEO,
+     2   FV,          ALE_CONNECT, IXS,         IPARG,
+     3   V,           TF,          NPF,         BUFMAT,
+     4   STI,         X,           DT2T,        NELTST,
+     5   ITYPTST,     OFFSET,      NEL,         W,
+     6   OFF,         NGEO,        MXT,         NGL,
+     7   VOLN,        VD2,         DVOL,        DELTAX,
+     8   VIS,         QVIS,        CXX,         S1,
+     9   S2,          S3,          S4,          S5,
+     A   S6,          DXX,         DYY,         DZZ,
+     B   D4,          D5,          D6,          WXX,
+     C   WYY,         WZZ,         RX(1,IP),    RY(1,IP),
+     D   RZ(1,IP),    SX(1,IP),    SY(1,IP),    SZ(1,IP),
+     E   VDX,         VDY,         VDZ,         MUVOID,
+     F   SSP_EQ,      AIRE,        SIGY,        ET,
+     G   R1_FREE,     LBUF%PLA,    R3_FREE,     AMU,
+     H   DXX,         DXY,         DXZ,         DYX,
+     I   DYY,         DYZ,         DZX,         DZY,
+     J   DZZ,         IPM,         GAMA,        BID,
+     K   BID,         BID,         BID,         BID,
+     L   BID,         BID,         ISTRAIN,     TEMPEL,
+     M   DIE,         IEXPAN,      IL,          MBID,
+     N   MBID,        IR,          IS,          IT,
+     O   TABLE,       BID,         BID,         BID,
+     P   BID,         IPARG(1,NG), IGEO,        CONDE,
+     Q   ITASK,       NLOC_DMG,    VARNL,       MAT_ELEM,
+     R   H3D_STRAIN,  JPLASOL,     JSPH,        OPT_MTN=MTN,
+     S   OPT_JCVT=JCVT,OPT_ISORTH=ISORTH,       OPT_ISORTHG=ISORTHG)
+
 c
       IF (ISTRAIN == 1)THEN 
-        CALL SSTRA3(DXX,DYY,DZZ,D4,D5,
-     .              D6, LBUF%STRA, WXX, WYY, WZZ,
-     .              OFF,NEL      )
+        CALL SSTRA3(
+     1   DXX,      DYY,      DZZ,      D4,
+     2   D5,       D6,       LBUF%STRA,WXX,
+     3   WYY,      WZZ,      OFF,      NEL,
+     4   JCVT)
       ENDIF
       !-----------------------------
       !       SMALL STRAIN 
       !-----------------------------
-         CALL SMALLB3(GBUF%OFF,OFF)
+         CALL SMALLB3(
+     1   GBUF%OFF,OFF,     NEL,     ISMSTR)
       !-------------------------
       !       ASSEMBLE
       !-------------------------
@@ -584,23 +629,42 @@ c
 C
          L_PLA  = ELBUF_TAB(NG)%BUFLY(IL)%L_PLA
          CALL S20FINT3(
-     1    NPE,LBUF%SIG,PX(1,1,IP), PY(1,1,IP), PZ(1,1,IP),SSP_EQ,
-     2    FX,FY,FZ,VOLN,QVIS,STIG,STIN,
-     3    LBUF%EINT,LBUF%RHO,LBUF%QVIS,LBUF%PLA,LBUF%EPSD,GBUF%EPSD,
-     4    GBUF%SIG,GBUF%EINT,GBUF%RHO,GBUF%QVIS,GBUF%PLA,WI,VOLG,
-     5    LBUF%VOL,GBUF%VOL,L_PLA,NEL,CONDE,DELTAX,CONDEG)
+     1   NPE,       LBUF%SIG,  PX(1,1,IP),PY(1,1,IP),
+     2   PZ(1,1,IP),SSP_EQ,    FX,        FY,
+     3   FZ,        VOLN,      QVIS,      STIG,
+     4   STIN,      LBUF%EINT, LBUF%RHO,  LBUF%QVIS,
+     5   LBUF%PLA,  LBUF%EPSD, GBUF%EPSD, GBUF%SIG,
+     6   GBUF%EINT, GBUF%RHO,  GBUF%QVIS, GBUF%PLA,
+     7   WI,        VOLG,      LBUF%VOL,  GBUF%VOL,
+     8   L_PLA,     NEL,       CONDE,     DELTAX,
+     9   CONDEG,    ISRAT)
       !-------------------------
       !    finite element heat transfert  
       !--------------------------
 
          IF (JTHE < 0) THEN
-           CALL S20THERM(NPE,PM     ,MXT  , NC ,VOLN, 
-     .               PX(1,1,IP), PY(1,1,IP), PZ(1,1,IP),NI(1,IP),
-     .               DT1 ,TEMP  ,TEMPEL ,DIE  , THEM,GBUF%OFF,LBUF%OFF) 
+           CALL S20THERM(
+     1   NPE,       PM,        MXT,       NC,
+     2   VOLN,      PX(1,1,IP),PY(1,1,IP),PZ(1,1,IP),
+     3   NI(1,IP),  DT1,       TEMP,      TEMPEL,
+     4   DIE,       THEM,      GBUF%OFF,  LBUF%OFF,
+     5   NEL)
           ENDIF
         ENDDO   ! IL=1,NLAY
        ENDDO    ! IR=1,NPTR
       ENDDO     ! IT=1,NPTT
+C      
+      IF ( NN_DEL> 0) THEN
+        CALL SDLENSH2(VOLG,LLSH,AREA ,
+     .          XX(1,1), XX(1,2), XX(1,3), XX(1,4),
+     .          XX(1,5), XX(1,6), XX(1,7), XX(1,8),
+     .          YY(1,1), YY(1,2), YY(1,3), YY(1,4),
+     .          YY(1,5), YY(1,6), YY(1,7), YY(1,8),
+     .          ZZ(1,1), ZZ(1,2), ZZ(1,3), ZZ(1,4),
+     .          ZZ(1,5), ZZ(1,6), ZZ(1,7), ZZ(1,8), NEL)
+        CALL TSHGEODEL3(NGL,GBUF%OFF,VOLG,AREA,GBUF%VOL,
+     .                  LLSH,GEO(1,PID),NN_DEL,DT ,NEL )
+      ENDIF
       !--------------------------
       !     BILANS PAR MATERIAU
       !--------------------------
@@ -609,19 +673,29 @@ C
            CALL S16BILAN(PARTSAV,GBUF%EINT,GBUF%RHO,VOLG  ,GBUF%VOL,
      .             VX     ,VY       ,VZ      ,IPARTS     ,GRESAV    ,
      .             GRTH   ,IGRTH    ,IEXPAN  ,GBUF%EINTTH, GBUF%FILL,
-     .             XX     ,YY       ,ZZ      ,ITASK      ,IPARG(1,NG))
+     .             XX     ,YY       ,ZZ      ,ITASK      ,IPARG(1,NG),
+     .             GBUF%OFF)
       ENDIF
 C
 c-----------------------------
-      IF(NFILSOL/=0) CALL SXFILLOPT(NPE,GBUF%FILL,STIG,FX,FY,FZ)
+      IF(NFILSOL/=0) CALL SXFILLOPT(
+     1   NPE,      GBUF%FILL,STIG,     FX,
+     2   FY,       FZ,       NEL)
 c-----------------------------
       IF (IPARIT == 0)THEN
-        CALL S20CUMU3(GBUF%OFF,A,NC,STIFN,STIG,FX,FY,
-     .                FZ, IPERM1,IPERM2,NPE,THEM,FTHE,CONDN,CONDEG)
+        CALL S20CUMU3(
+     1   GBUF%OFF,A,       NC,      STIFN,
+     2   STIG,    FX,      FY,      FZ,
+     3   IPERM1,  IPERM2,  NPE,     THEM,
+     4   FTHE,    CONDN,   CONDEG,  NEL,
+     5   JTHE)
       ELSE
-        CALL S20CUMU3P(GBUF%OFF,STIG,FSKY,FSKY,IADS(1,NF1),FX,FY,
-     .           FZ,IADS16(1,NF2),NC,IPERM1,IPERM2,NPE,THEM,FTHESKY,
-     .           CONDNSKY,CONDEG)
+        CALL S20CUMU3P(
+     1   GBUF%OFF,     STIG,         FSKY,         FSKY,
+     2   IADS(1,NF1),  FX,           FY,           FZ,
+     3   IADS16(1,NF2),NC,           IPERM1,       IPERM2,
+     4   NPE,          THEM,         FTHESKY,      CONDNSKY,
+     5   CONDEG,       NEL,          NFT,          JTHE)
       ENDIF
 C-----------
       RETURN

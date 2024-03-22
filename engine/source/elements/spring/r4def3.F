@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  R4DEF3                        source/elements/spring/r4def3.F
 Chd|-- called by -----------
@@ -29,29 +29,35 @@ Chd|        REDEF3                        source/elements/spring/redef3.F
 Chd|        REPLA3                        source/elements/spring/repla3.F
 Chd|====================================================================
       SUBROUTINE R4DEF3(
-     1        SKEW    ,GEO    ,FX     ,FY     ,FZ    ,
-     2        E       ,DX     ,DY     ,DZ     ,NPF   , 
-     3        TF      ,OFF    ,DPX    ,DPY    ,DPZ   ,
-     4        DPX2    ,DPY2   ,DPZ2   ,FXEP   ,FYEP  ,
-     5        FZEP    ,X0     ,Y0     ,Z0     ,XMOM  ,
-     6        YMOM    ,ZMOM   ,RX     ,RY     ,RZ    ,
-     7        RPX     ,RPY    ,RPZ    ,XMEP   ,YMEP  ,
-     8        ZMEP    ,RPX2   ,RPY2   ,RPZ2   ,ANIM  ,
-     9        POSX    ,POSY   ,POSZ   ,POSXX  ,POSYY ,
-     A        POSZZ   ,FR_WAVE,E6     ,NEL    ,EXX2  ,
-     B        EYX2    ,EZX2   ,EXY2   ,EYY2   ,EZY2  ,
-     C        EXZ2    ,EYZ2   ,EZZ2   ,AL2DP  ,IGEO  ,
-     D        CRIT_NEW,X0_ERR ,ALDP   ,YIELDX ,YIELDY,
-     E        YIELDZ  ,YIELDX2,YIELDY2,YIELDZ2,NGL   ,
-     F        MGN     ,EXX    ,EYX    ,EZX    ,EXY   ,
-     E        EYY     ,EZY    ,EXZ    ,EYZ    ,EZZ   ,
-     G        XCR     ,RX1    ,RY1    ,RZ1    ,RX2   ,
-     H        RY2     ,RZ2    ,XIN    ,AK     ,XM    ,
-     I        XKM     ,XCM    ,XKR    ,VX1    ,VX2   ,
-     J        VY1     ,VY2    ,VZ1    ,VZ2    ,NUVAR ,
-     K        UVAR    ,DX0    ,DY0    ,DZ0    ,RX0   ,
-     L        RY0     ,RZ0    ,FX0    ,FY0    ,FZ0   ,
-     M        XMOM0   ,YMOM0  ,ZMOM0  )
+     1   SKEW,    GEO,     FX,      FY,
+     2   FZ,      E,       DX,      DY,
+     3   DZ,      NPF,     TF,      OFF,
+     4   DPX,     DPY,     DPZ,     DPX2,
+     5   DPY2,    DPZ2,    FXEP,    FYEP,
+     6   FZEP,    X0,      Y0,      Z0,
+     7   XMOM,    YMOM,    ZMOM,    RX,
+     8   RY,      RZ,      RPX,     RPY,
+     9   RPZ,     XMEP,    YMEP,    ZMEP,
+     A   RPX2,    RPY2,    RPZ2,    ANIM,
+     B   POSX,    POSY,    POSZ,    POSXX,
+     C   POSYY,   POSZZ,   FR_WAVE, E6,
+     D   NEL,     EXX2,    EYX2,    EZX2,
+     E   EXY2,    EYY2,    EZY2,    EXZ2,
+     F   EYZ2,    EZZ2,    AL2DP,   IGEO,
+     G   CRIT_NEW,X0_ERR,  ALDP,    YIELDX,
+     H   YIELDY,  YIELDZ,  YIELDX2, YIELDY2,
+     I   YIELDZ2, NGL,     MGN,     EXX,
+     J   EYX,     EZX,     EXY,     EYY,
+     K   EZY,     EXZ,     EYZ,     EZZ,
+     L   XCR,     RX1,     RY1,     RZ1,
+     M   RX2,     RY2,     RZ2,     XIN,
+     N   AK,      XM,      XKM,     XCM,
+     O   XKR,     VX1,     VX2,     VY1,
+     P   VY2,     VZ1,     VZ2,     NUVAR,
+     Q   UVAR,    DX0,     DY0,     DZ0,
+     R   RX0,     RY0,     RZ0,     FX0,
+     S   FY0,     FZ0,     XMOM0,   YMOM0,
+     T   ZMOM0,   NFT)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -67,16 +73,15 @@ C-----------------------------------------------
 #include      "param_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
-#include      "scr03_c.inc"
 #include      "scr14_c.inc"
 #include      "scr17_c.inc"
-#include      "vect01_c.inc"
 #include      "units_c.inc"
 #include      "com01_c.inc"
 #include      "impl1_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: NFT
       INTEGER NPF(*),IGEO(NPROPGI,*),NEL,NGL(*),MGN(*),NUVAR
 C     REAL
       my_real
@@ -130,7 +135,7 @@ C-----------------------------------------------
 C
       NOT_USED = ZERO
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
        EPLA(I)=ZERO
        XM(I)=GEO(1,MGN(I))
        XK(I)=GEO(3,MGN(I))
@@ -160,7 +165,7 @@ C
       ENDDO
 C
       IF (INISPRI /= 0 .and. TT == ZERO) THEN
-        DO I=LFT,LLT
+        DO I=1,NEL
           XL0(I)= X0(I)
 ! if not initialized length
           IF (XL0(I) == ZERO) XL0(I) = ALDP(I)
@@ -168,45 +173,45 @@ C
       ENDIF
 C
       IF (TT == ZERO) THEN
-        DO I=LFT,LLT
-          X0(I)= ALDP(I)                   ! cast double vers My_real
+        DO I=1,NEL
+          X0(I)= ALDP(I)                   ! cast double to My_real
         ENDDO
       ENDIF
 C
       IF (SCODVER >= 101) THEN
         IF (TT == ZERO) THEN
-          DO I=LFT,LLT
-            X0_ERR(I)= ALDP(I)-X0(I)         ! difference entre double et My_real
+          DO I=1,NEL
+            X0_ERR(I)= ALDP(I)-X0(I)         ! difference between double and my_real
           ENDDO
         ENDIF
       ENDIF
 C
       IF ( INISPRI /= 0 .and. TT == ZERO) THEN
-        DO I=LFT,LLT
+        DO I=1,NEL
           X0(I)= XL0(I)
         ENDDO
       ENDIF
 C
-      DO I=LFT,LLT
-        X0DP(I)= X0(I)                     ! cast double vers My_real
+      DO I=1,NEL
+        X0DP(I)= X0(I)                     ! cast double to My_real
       ENDDO
 C
       IF (SCODVER >= 101) THEN
-        DO I=LFT,LLT
-          X0DP(I)= X0(I) + X0_ERR(I)         ! difference entre double et My_real
+        DO I=1,NEL
+          X0DP(I)= X0(I) + X0_ERR(I)         ! difference between double and my_real
         ENDDO
       ENDIF
 C---------------------
 C     TRANSLATIONS
 C---------------------
-      DO I=LFT,LLT
+      DO I=1,NEL
         DXOLD(I)=DX(I)
         DYOLD(I)=DY(I)
         DZOLD(I)=DZ(I)
       ENDDO
 !
       IF (INISPRI /= 0 .and. TT == ZERO) THEN
-        DO I=LFT,LLT
+        DO I=1,NEL
           DXOLD(I)=DX0(I)
           DYOLD(I)=DY0(I)
           DZOLD(I)=DZ0(I)
@@ -215,7 +220,7 @@ C---------------------
 C
       DT05=HALF*DT1
       IF (ISMDISP > 0) THEN
-       DO I=LFT,LLT
+       DO I=1,NEL
         VX21  = VX2(I)-VX1(I)
         VY21  = VY2(I)-VY1(I)
         VZ21  = VZ2(I)-VZ1(I)
@@ -239,7 +244,7 @@ C
         CRIT(I) = ZERO
        ENDDO
       ELSE
-       DO I=LFT,LLT
+       DO I=1,NEL
          VX21  = VX2(I)-VX1(I)
          VY21  = VY2(I)-VY1(I)
          VZ21  = VZ2(I)-VZ1(I)
@@ -269,7 +274,7 @@ C
        ENDDO
       ENDIF !(ISMDISP > 0) THEN
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         ILENG=NINT(GEO(93,MGN(I)))
         IF (ILENG /= 0) THEN
           XL0(I)=X0DP(I)
@@ -279,7 +284,7 @@ C
       ENDDO
 C-------------------------------
       NINDX = 0
-      DO I=LFT,LLT
+      DO I=1,NEL
         IFUNC(I) = IGEO(101,MGN(I))
         IFV(I)   = IGEO(102,MGN(I))
         IFUNC2(I)= IGEO(103,MGN(I))
@@ -295,16 +300,20 @@ C-------------------------------
         DMN(I)   = GEO(65,MGN(I))
         DMX(I)   = GEO(66,MGN(I))
       ENDDO
-      CALL REDEF3(FX      ,XK      ,DX      ,FXEP       ,DXOLD   ,
-     .            DPX     ,TF      ,NPF     ,XC         ,OFF     ,
-     .            E6(1,1) ,DPX2    ,ANIM    ,ANIM_FE(11),POSX    ,
-     .            FR_WAVE ,XL0     ,DMN     ,DMX        ,DV      ,
-     .            FF      ,LSCALE  ,EE      ,GF3        ,IFUNC3  ,
-     .            YIELDX  ,ALDP    ,AK      ,B          ,D       ,
-     .            IECROU  ,IFUNC   ,IFV     ,IFUNC2     ,EPLA    ,
-     .            UVAR(1,1),NOT_USED,NOT_USED,NOT_USED)
+      CALL REDEF3(
+     1   FX,         XK,         DX,         FXEP,
+     2   DXOLD,      DPX,        TF,         NPF,
+     3   XC,         OFF,        E6(1,1),    DPX2,
+     4   ANIM,       ANIM_FE(11),POSX,       FR_WAVE,
+     5   XL0,        DMN,        DMX,        DV,
+     6   FF,         LSCALE,     EE,         GF3,
+     7   IFUNC3,     YIELDX,     ALDP,       AK,
+     8   B,          D,          IECROU,     IFUNC,
+     9   IFV,        IFUNC2,     EPLA,       UVAR(1,1),
+     A   NOT_USED,   NOT_USED,   NOT_USED,   NEL,
+     B   NFT)
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         CC = GEO(103,MGN(I))
         CN = GEO(109,MGN(I))
         XA = GEO(115,MGN(I))
@@ -337,21 +346,16 @@ C
             ENDIF
           ENDIF
           IF (IFAIL(I) == 0) THEN
-!         Rupture uniaxiale
-            IF ((XA*DLIM) > ONE) THEN
-              OFF(I) = ZERO
-              NINDX = NINDX + 1
-              INDX(NINDX) = I
-              IDEL7NOK = 1
-            ENDIF
+!         Uniaxial failure
+            CRIT(I) = MAX(CRIT(I),XA*DLIM)
           ELSE
-!         Rupture multiaxiale
+!         Multiaxial failure
             CRIT(I)= CRIT(I) + XA *(DLIM/XL0(I))**XB
           ENDIF
         ENDIF
       ENDDO
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         IFUNC(I) = IGEO(104,MGN(I))
         IFV(I)   = IGEO(105,MGN(I))
         IFUNC2(I)= IGEO(106,MGN(I))
@@ -369,16 +373,20 @@ C
       ENDDO
 C
       KK = 1 + NUMELR * ANIM_FE(11)
-      CALL REDEF3(FY      ,YK     ,DY      ,FYEP       ,DYOLD   ,
-     .            DPY     ,TF     ,NPF     ,YC         ,OFF     ,
-     .            E6(1,2) ,DPY2   ,ANIM(KK),ANIM_FE(12),POSY    ,
-     .            FR_WAVE ,XL0    ,DMN     ,DMX        ,DV      ,
-     .            FF      ,LSCALE ,EE      ,GF3        ,IFUNC3  ,
-     .            YIELDY  ,ALDP   ,AK      ,B          ,D       ,
-     .            IECROU  ,IFUNC  ,IFV     ,IFUNC2     ,EPLA    ,
-     .            UVAR(2,1),NOT_USED,NOT_USED,NOT_USED)
+      CALL REDEF3(
+     1   FY,         YK,         DY,         FYEP,
+     2   DYOLD,      DPY,        TF,         NPF,
+     3   YC,         OFF,        E6(1,2),    DPY2,
+     4   ANIM(KK),   ANIM_FE(12),POSY,       FR_WAVE,
+     5   XL0,        DMN,        DMX,        DV,
+     6   FF,         LSCALE,     EE,         GF3,
+     7   IFUNC3,     YIELDY,     ALDP,       AK,
+     8   B,          D,          IECROU,     IFUNC,
+     9   IFV,        IFUNC2,     EPLA,       UVAR(2,1),
+     A   NOT_USED,   NOT_USED,   NOT_USED,   NEL,
+     B   NFT)
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         CC  = GEO(104,MGN(I))
         CN  = GEO(110,MGN(I))
         XA  = GEO(116,MGN(I))
@@ -411,21 +419,16 @@ C
             ENDIF
           ENDIF
           IF (IFAIL(I) == 0) THEN
-!         Rupture uniaxiale
-            IF ((XA*DLIM) > ONE) THEN
-              OFF(I) = ZERO
-              NINDX = NINDX + 1
-              INDX(NINDX) = I
-              IDEL7NOK = 1
-            ENDIF
+!         Uniaxial failure
+            CRIT(I) = MAX(CRIT(I),XA*DLIM)
           ELSE
-!         Rupture multiaxiale
+!         Multiaxial failure
             CRIT(I)= CRIT(I) + XA *(DLIM/XL0(I))**XB
           ENDIF
         ENDIF
       ENDDO
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         IFUNC(I) = IGEO(107,MGN(I))
         IFV(I)   = IGEO(108,MGN(I))
         IFUNC2(I)= IGEO(109,MGN(I))
@@ -443,16 +446,20 @@ C
       ENDDO
 C
       KK = 1 + NUMELR * (ANIM_FE(11)+ANIM_FE(12))
-      CALL REDEF3(FZ      ,ZK     ,DZ      ,FZEP       ,DZOLD   ,
-     .            DPZ     ,TF     ,NPF     ,ZC         ,OFF     ,
-     .            E6(1,3) ,DPZ2   ,ANIM(KK),ANIM_FE(13),POSZ    ,
-     .            FR_WAVE ,XL0    ,DMN     ,DMX        ,DV      ,
-     .            FF      ,LSCALE ,EE      ,GF3        ,IFUNC3  ,
-     .            YIELDZ  ,ALDP   ,AK      ,B          ,D       ,
-     .            IECROU  ,IFUNC  ,IFV     ,IFUNC2     ,EPLA    ,
-     .            UVAR(3,1),NOT_USED,NOT_USED,NOT_USED)
+      CALL REDEF3(
+     1   FZ,         ZK,         DZ,         FZEP,
+     2   DZOLD,      DPZ,        TF,         NPF,
+     3   ZC,         OFF,        E6(1,3),    DPZ2,
+     4   ANIM(KK),   ANIM_FE(13),POSZ,       FR_WAVE,
+     5   XL0,        DMN,        DMX,        DV,
+     6   FF,         LSCALE,     EE,         GF3,
+     7   IFUNC3,     YIELDZ,     ALDP,       AK,
+     8   B,          D,          IECROU,     IFUNC,
+     9   IFV,        IFUNC2,     EPLA,       UVAR(3,1),
+     A   NOT_USED,   NOT_USED,   NOT_USED,   NEL,
+     B   NFT)
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         CC  = GEO(105,MGN(I))
         CN  = GEO(111,MGN(I))
         XA  = GEO(117,MGN(I))
@@ -485,15 +492,10 @@ C
             ENDIF
           ENDIF
           IF (IFAIL(I) == 0) THEN
-!         Rupture uniaxiale
-            IF ((XA*DLIM) > ONE) THEN
-              OFF(I) = ZERO
-              NINDX = NINDX + 1
-              INDX(NINDX) = I
-              IDEL7NOK = 1
-            ENDIF
+!         Uniaxial failure
+            CRIT(I) = MAX(CRIT(I),XA*DLIM)
           ELSE
-!         Rupture multiaxiale
+!         Multiaxial failure
             CRIT(I)= CRIT(I) + XA *(DLIM/XL0(I))**XB
           ENDIF
         ENDIF
@@ -501,7 +503,7 @@ C
 C---------------------
 C     ROTATIONS
 C---------------------
-      DO I=LFT,LLT
+      DO I=1,NEL
         XIN(I)=GEO(9,MGN(I))
         XK(I)=GEO(19,MGN(I))
         XC(I)=GEO(20,MGN(I))
@@ -521,21 +523,21 @@ C---------------------
         XCR(I)= MAX(XC(I),YC(I),ZC(I)) + XHR(I) +XCR(I)+XH(I)
       ENDDO
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         DXOLD(I)=RX(I)
         DYOLD(I)=RY(I)
         DZOLD(I)=RZ(I)
       ENDDO
 !
       IF ( INISPRI /= 0 .AND. TT == ZERO) THEN
-        DO I=LFT,LLT
+        DO I=1,NEL
           DXOLD(I)=RX0(I)
           DYOLD(I)=RY0(I)
           DZOLD(I)=RZ0(I)
         ENDDO
       ENDIF
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         X21  = (RX2(I)-RX1(I))*DT1
         Y21  = (RY2(I)-RY1(I))*DT1
         Z21  = (RZ2(I)-RZ1(I))*DT1
@@ -544,7 +546,7 @@ C
         RZ(I) = DZOLD(I) + X21*EXZ2(I)+Y21*EYZ2(I)+Z21*EZZ2(I)
       ENDDO
 C-------------------------------
-      DO I=LFT,LLT
+      DO I=1,NEL
         IFUNC(I) = IGEO(110,MGN(I))
         IFV(I)   = IGEO(111,MGN(I))
         IFUNC2(I)= IGEO(112,MGN(I))
@@ -560,16 +562,20 @@ C-------------------------------
         DMN(I)  =GEO(71,MGN(I))
         DMX(I)  =GEO(72,MGN(I))
       ENDDO
-      CALL REDEF3(XMOM    ,XK      ,RX      ,XMEP       ,DXOLD   ,
-     .            RPX     ,TF      ,NPF     ,XC         ,OFF     ,
-     .            E6(1,4) ,RPX2    ,ANIM    ,0          ,POSXX   ,
-     .            FR_WAVE ,XL0     ,DMN     ,DMX        ,DV      ,
-     .            FF      ,LSCALE  ,EE      ,GF3        ,IFUNC3  ,
-     .            YIELDX2 ,ALDP    ,AK      ,B          ,D       ,
-     .            IECROU  ,IFUNC   ,IFV     ,IFUNC2     ,EPLA    ,
-     .            UVAR(4,1),NOT_USED,NOT_USED,NOT_USED)
+      CALL REDEF3(
+     1   XMOM,     XK,       RX,       XMEP,
+     2   DXOLD,    RPX,      TF,       NPF,
+     3   XC,       OFF,      E6(1,4),  RPX2,
+     4   ANIM,     0,        POSXX,    FR_WAVE,
+     5   XL0,      DMN,      DMX,      DV,
+     6   FF,       LSCALE,   EE,       GF3,
+     7   IFUNC3,   YIELDX2,  ALDP,     AK,
+     8   B,        D,        IECROU,   IFUNC,
+     9   IFV,      IFUNC2,   EPLA,     UVAR(4,1),
+     A   NOT_USED, NOT_USED, NOT_USED, NEL,
+     B   NFT)
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         CC  = GEO(106,MGN(I))
         CN  = GEO(112,MGN(I))
         XA  = GEO(118,MGN(I))
@@ -602,21 +608,16 @@ C
             ENDIF
           ENDIF
           IF (IFAIL(I) == 0) THEN
-!         Rupture uniaxiale
-            IF ((XA*DLIM) > ONE) THEN
-              OFF(I)= ZERO
-              NINDX = NINDX + 1
-              INDX(NINDX) = I
-              IDEL7NOK = 1
-            ENDIF
+!         Uniaxial failure
+            CRIT(I) = MAX(CRIT(I),XA*DLIM)
           ELSE
-!         Rupture multiaxiale
+!         Multiaxial failure
             CRIT(I)= CRIT(I) + XA *(DLIM/XL0(I))**XB
           ENDIF
         ENDIF
       ENDDO
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         IFUNC(I) = IGEO(113,MGN(I))
         IFV(I)   = IGEO(114,MGN(I))
         IFUNC2(I)= IGEO(115,MGN(I))
@@ -632,16 +633,20 @@ C
         DMN(I)  =GEO(73,MGN(I))
         DMX(I)  =GEO(74,MGN(I))
       ENDDO
-      CALL REDEF3(YMOM    ,YK      ,RY      ,YMEP       ,DYOLD   ,
-     .            RPY     ,TF      ,NPF     ,YC         ,OFF     ,
-     .            E6(1,5) ,RPY2    ,ANIM    ,0          ,POSYY   ,
-     .            FR_WAVE ,XL0     ,DMN     ,DMX        ,DV      ,
-     .            FF      ,LSCALE  ,EE      ,GF3        ,IFUNC3  ,
-     .            YIELDY2 ,ALDP    ,AK      ,B          ,D       ,
-     .            IECROU  ,IFUNC   ,IFV     ,IFUNC2     ,EPLA    ,
-     .            UVAR(5,1),NOT_USED,NOT_USED,NOT_USED)
+      CALL REDEF3(
+     1   YMOM,     YK,       RY,       YMEP,
+     2   DYOLD,    RPY,      TF,       NPF,
+     3   YC,       OFF,      E6(1,5),  RPY2,
+     4   ANIM,     0,        POSYY,    FR_WAVE,
+     5   XL0,      DMN,      DMX,      DV,
+     6   FF,       LSCALE,   EE,       GF3,
+     7   IFUNC3,   YIELDY2,  ALDP,     AK,
+     8   B,        D,        IECROU,   IFUNC,
+     9   IFV,      IFUNC2,   EPLA,     UVAR(5,1),
+     A   NOT_USED, NOT_USED, NOT_USED, NEL,
+     B   NFT)
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         CC  = GEO(107,MGN(I))
         CN  = GEO(113,MGN(I))
         XA  = GEO(119,MGN(I))
@@ -674,21 +679,16 @@ C
             ENDIF
           ENDIF
           IF (IFAIL(I) == 0) THEN
-!         Rupture uniaxiale
-            IF ((XA*DLIM) > 1) THEN
-              OFF(I) = ZERO
-              NINDX = NINDX + 1
-              INDX(NINDX) = I
-              IDEL7NOK = 1
-            ENDIF
+!         Uniaxial failure
+            CRIT(I) = MAX(CRIT(I),XA*DLIM)
           ELSE
-!         Rupture multiaxiale
+!         Multiaxial failure
             CRIT(I)= CRIT(I) + XA *(DLIM/XL0(I))**XB
           ENDIF
         ENDIF
       ENDDO
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         IFUNC(I) = IGEO(116,MGN(I))
         IFV(I)   = IGEO(117,MGN(I))
         IFUNC2(I)= IGEO(118,MGN(I))
@@ -704,16 +704,20 @@ C
         DMN(I)  =GEO(75,MGN(I))
         DMX(I)  =GEO(76,MGN(I))
       ENDDO
-      CALL REDEF3(ZMOM    ,ZK      ,RZ      ,ZMEP       ,DZOLD    ,
-     .            RPZ     ,TF      ,NPF     ,ZC         ,OFF      ,
-     .            E6(1,6) ,RPZ2    ,ANIM    ,0          ,POSZZ    ,
-     .            FR_WAVE ,XL0     ,DMN     ,DMX        ,DV       ,
-     .            FF      ,LSCALE  ,EE      ,GF3        ,IFUNC3   ,
-     .            YIELDZ2 ,ALDP    ,AK      ,B          ,D        ,
-     .            IECROU  ,IFUNC   ,IFV     ,IFUNC2     ,EPLA     ,
-     .            UVAR(6,1),NOT_USED,NOT_USED,NOT_USED)
+      CALL REDEF3(
+     1   ZMOM,     ZK,       RZ,       ZMEP,
+     2   DZOLD,    RPZ,      TF,       NPF,
+     3   ZC,       OFF,      E6(1,6),  RPZ2,
+     4   ANIM,     0,        POSZZ,    FR_WAVE,
+     5   XL0,      DMN,      DMX,      DV,
+     6   FF,       LSCALE,   EE,       GF3,
+     7   IFUNC3,   YIELDZ2,  ALDP,     AK,
+     8   B,        D,        IECROU,   IFUNC,
+     9   IFV,      IFUNC2,   EPLA,     UVAR(6,1),
+     A   NOT_USED, NOT_USED, NOT_USED, NEL,
+     B   NFT)
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         CC  = GEO(108,MGN(I))
         CN  = GEO(114,MGN(I))
         XA  = GEO(120,MGN(I))
@@ -746,36 +750,42 @@ C
             ENDIF
           ENDIF
           IF (IFAIL(I) == 0) THEN
-!         Rupture uniaxiale
-            IF ((XA*DLIM) > 1) THEN
-              OFF(I) = ZERO
-              NINDX = NINDX + 1
-              INDX(NINDX) = I
-              IDEL7NOK = 1
-            ENDIF
+!         Uniaxial failure
+            CRIT(I) = MAX(CRIT(I),XA*DLIM)
           ELSE
-!         Rupture multiaxiale
+!         Multiaxial failure
             CRIT(I)= CRIT(I) + XA *(DLIM/XL0(I))**XB
           ENDIF
         ENDIF
       ENDDO
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         E(I) = E6(I,1)+E6(I,2)+E6(I,3)+E6(I,4)+E6(I,5)+E6(I,6)
       ENDDO
 C-------------------------------
-C     RUPTURE COUPLEE
+C     COUPLED FAILURE
 C-------------------------------
-      DO I=LFT,LLT
+      DO I=1,NEL
         ISRATE = INT (GEO(127,MGN(I)))
 C---- smoothing factor alpha = 2PI*fc*dt/(2PI*fc*dt+1) ---
         ASRATE = (2*PI*GEO(128,MGN(I))*DT1)/(ONE+2*PI*GEO(128,MGN(I))*DT1)
         IF (ISRATE /= 0) THEN
-          CRIT(I) = ASRATE*CRIT(I) + (ONE - ASRATE)*CRIT_NEW(I)
-          CRIT_NEW(I) = CRIT(I)
+          IF (CRIT_NEW(I) < ONE) THEN 
+            CRIT(I) = MIN(CRIT(I),ONE+EM3)
+            CRIT(I) = ASRATE*CRIT(I) + (ONE - ASRATE)*CRIT_NEW(I)
+            CRIT_NEW(I) = MIN(CRIT(I),ONE)
+          ELSE
+            CRIT_NEW(I) = ONE
+          ENDIF
+        ELSE
+          IF (CRIT_NEW(I) < ONE) THEN 
+            CRIT_NEW(I) = MIN(CRIT(I),ONE)
+          ELSE
+            CRIT_NEW(I) = ONE
+          ENDIF
         ENDIF
-        IF (OFF(I) == ONE .AND. IFAIL(I) == 1) THEN
-           IF (CRIT(I) > ONE) THEN
+        IF (OFF(I) == ONE) THEN
+           IF (CRIT(I) >= ONE) THEN
             OFF(I)=ZERO
             NINDX = NINDX + 1
             INDX(NINDX) = I
@@ -792,28 +802,40 @@ C
 #include "lockoff.inc"
       ENDDO
 C-------------------------------
-C     PLASTICITE COUPLEE
+C     COUPLED PLASTICITY
 C-------------------------------
-      CALL REPLA3(XK   ,RPX ,TF  ,NPF  ,IECROU,
-     .            IFUNC,IFV ,EPLA)
-      CALL REPLA3(YK   ,RPY ,TF  ,NPF  ,IECROU,
-     .            IFUNC,IFV ,EPLA)
-      CALL REPLA3(ZK   ,RPZ ,TF  ,NPF  ,IECROU,
-     .            IFUNC,IFV ,EPLA)
+      CALL REPLA3(
+     1   XK,      RPX,     TF,      NPF,
+     2   IECROU,  IFUNC,   IFV,     EPLA,
+     3   NEL)
+      CALL REPLA3(
+     1   YK,      RPY,     TF,      NPF,
+     2   IECROU,  IFUNC,   IFV,     EPLA,
+     3   NEL)
+      CALL REPLA3(
+     1   ZK,      RPZ,     TF,      NPF,
+     2   IECROU,  IFUNC,   IFV,     EPLA,
+     3   NEL)
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
       XK(I)=GEO(3,MGN(I))
       YK(I)=GEO(10,MGN(I))
       ZK(I)=GEO(15,MGN(I))
       ENDDO
 C
-      CALL REPLA3(XK   ,DPX ,TF  ,NPF  ,IECROU,
-     .            IFUNC,IFV ,EPLA)
-      CALL REPLA3(YK   ,DPY ,TF  ,NPF  ,IECROU,
-     .            IFUNC,IFV ,EPLA)
-      CALL REPLA3(ZK   ,DPZ ,TF  ,NPF  ,IECROU,
-     .            IFUNC,IFV ,EPLA)
-      DO I=LFT,LLT
+      CALL REPLA3(
+     1   XK,      DPX,     TF,      NPF,
+     2   IECROU,  IFUNC,   IFV,     EPLA,
+     3   NEL)
+      CALL REPLA3(
+     1   YK,      DPY,     TF,      NPF,
+     2   IECROU,  IFUNC,   IFV,     EPLA,
+     3   NEL)
+      CALL REPLA3(
+     1   ZK,      DPZ,     TF,      NPF,
+     2   IECROU,  IFUNC,   IFV,     EPLA,
+     3   NEL)
+      DO I=1,NEL
         XM(I)=XM(I)*XL0(I)
         XKM(I)=XKM(I)/XL0(I)
         XCM(I)=XCM(I)/XL0(I)

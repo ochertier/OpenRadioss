@@ -1,33 +1,33 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  M11VS2                        source/materials/mat/mat011/m11vs2.F
 Chd|-- called by -----------
 Chd|        M11LAW                        source/materials/mat/mat011/m11law.F
 Chd|-- calls ---------------
-Chd|        ALEFVM_MOD                    ../common_source/modules/alefvm_mod.F
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ALEFVM_MOD                    ../common_source/modules/ale/alefvm_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE M11VS2(PM    ,IPARG,IXQ  ,ALE_CONNECT  ,ELBUF_TAB  ,V    ,
      2                  X     ,DVP  ,VN   ,W      ,VEL        ,VD2  ,
@@ -56,10 +56,8 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
-#include      "scr05_c.inc"
 #include      "vect01_c.inc"
 #include      "param_c.inc"
-#include      "alefvm.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -84,8 +82,8 @@ C-----------------------------------------------
 C-----------------------------------------------
       DATA ICF/1,2,2,3,3,4,4,1/
 C-----------------------------------------------
-      MT = MAT(LFT)
-      DO I=LFT,LLT
+      MT = MAT(1)
+      DO I=1,NEL
         II=I+NFT
 !
         IAD2 = ALE_CONNECT%ee_connect%iad_connect(II)
@@ -148,7 +146,7 @@ C-----------------------------------------------
             ENDIF
             IF (JTHE>0) TV(I)  = GBUF%TEMP(IS+1)
             !MOMENTUM
-            IF(IALEFVM == 1)THEN          
+            IF(ALEFVM_Param%IEnabled == 1)THEN          
               IS       = IVOI-MFT
               MassV    = RHOV(I)*GBUF%VOL(IS)                      
               VxV(I)   = GBUF%MOM(JJ(1) + IS)/MassV
@@ -156,7 +154,7 @@ C-----------------------------------------------
               VzV(I)   = GBUF%MOM(JJ(3) + IS)/MassV 
               XmomV(I) = GBUF%MOM(JJ(1) + IS)
               YmomV(I) = GBUF%MOM(JJ(2) + IS)
-              ZmomV(I) = GBUF%MOM(JJ(3) + IS)		   
+              ZmomV(I) = GBUF%MOM(JJ(3) + IS)       
             ENDIF
           ELSE
             !                                                        

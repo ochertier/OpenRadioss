@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  CBAKE3                        source/elements/shell/coqueba/cbake3.F
 Chd|-- called by -----------
@@ -41,7 +41,7 @@ Chd|        CBASUMG3                      source/elements/shell/coqueba/cbasumg3
 Chd|        CMATC3                        source/elements/shell/coqueba/cmatc3.F
 Chd|        CMATIP3                       source/elements/shell/coqueba/cmatc3.F
 Chd|        DRAPE_MOD                     share/modules/drape_mod.F     
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        STACK_MOD                     share/modules/stack_mod.F     
 Chd|====================================================================
        SUBROUTINE CBAKE3 (
@@ -52,7 +52,7 @@ Chd|====================================================================
      5            ETAG  , IDDL   ,NDOF  ,K_DIAG ,K_LT  , IADK  ,JDIK  ,
      6            IHBE   ,THKE   ,ISMSTR ,X      ,IKGEO  ,
      7            IPM    ,IGEO   ,IEXPAN ,IPARG  ,ISUBSTACK ,STACK ,
-     8            DRAPE )
+     8            DRAPE_SH4N  ,INDX_DRAPE,SEDRAPE,NUMEL_DRAPE)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -70,8 +70,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C O M M O N   B L O C K S
 C-----------------------------------------------
-#include      "scr01_c.inc"
-#include      "parit_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
@@ -79,9 +77,11 @@ C   D U M M Y   A R G U M E N T S
 C-----------------------------------------------
       INTEGER JFT     ,JLT    ,NFT    ,NPT   ,MTN     ,ITHK   ,
      .   NCYCLE,ISTRAIN ,IPLA   ,OFFSET,IHBE    ,ISMSTR,IKGEO,IEXPAN
+      INTEGER ,    INTENT(IN)     ::        SEDRAPE,NUMEL_DRAPE
       INTEGER IXC(NIXC,*) ,IGEO(NPROPGI,*),IPM(*),IPARG(*)
       INTEGER INDXOF(MVSIZ),ISUBSTACK,
      .         ETAG(*),IDDL(*)  ,NDOF(*)  ,IADK(*) ,JDIK(*)
+      INTEGER, DIMENSION(SEDRAPE) :: INDX_DRAPE
 C     REAL OU REAL*8
       my_real
      .   PM(NPROPM,*),GEO(NPROPG,*),BUFMAT(*),   X(3,*),THKE(*)
@@ -91,7 +91,7 @@ C     REAL OU REAL*8
      .   KE24(36,MVSIZ),KE34(36,MVSIZ),OFF(MVSIZ),K_DIAG(*) ,K_LT(*)
       TYPE (ELBUF_STRUCT_), TARGET :: ELBUF_STR
       TYPE (STACK_PLY) :: STACK
-      TYPE (DRAPE_) :: DRAPE
+      TYPE (DRAPE_) :: DRAPE_SH4N(NUMELC_DRAPE)
 C-----------------------------------------------
 C   L O C A L   V A R I A B L E S
 C-----------------------------------------------
@@ -195,8 +195,8 @@ C
      3            HM     ,HF      ,HC     ,HZ      ,IGTYP   ,
      4            IORTH  ,HMOR    ,HFOR   ,DIR_A   ,IGEO    ,
      5            IDRIL  ,IHBE    ,HMFOR  ,GS      ,ISUBSTACK,
-     6            STACK  ,ELBUF_STR,NLAY  ,DRAPE   ,NFT      ,
-     7            NEL    )
+     6            STACK  ,ELBUF_STR,NLAY  ,DRAPE_SH4N   ,NFT      ,
+     7            NEL    ,INDX_DRAPE,SEDRAPE,NUMEL_DRAPE)
       ELSE
       CALL CMATC3(JFT    ,JLT     ,PM     ,MAT     ,GEO     ,
      1            PID    ,AREA    ,THK0   ,THK2    ,GBUF%THK,
@@ -204,8 +204,8 @@ C
      3            HM     ,HF      ,HC     ,HZ      ,IGTYP   ,
      4            IORTH  ,HMOR    ,HFOR   ,DIRA    ,IGEO    ,
      5            IDRIL  ,IHBE    ,HMFOR  ,GS      ,ISUBSTACK,
-     6            STACK  ,ELBUF_STR,NLAY  ,DRAPE  , NFT      ,
-     7            NEL    )
+     6            STACK  ,ELBUF_STR,NLAY  ,DRAPE_SH4N  , NFT      ,
+     7            NEL    ,INDX_DRAPE,SEDRAPE,NUMEL_DRAPE)
       ENDIF
       IF (IDRIL>0) THEN
         CALL CBADERIRZ(JFT  ,JLT  ,AREA ,X13 ,X24   ,
@@ -327,7 +327,6 @@ C-----------------------------------------------
 c-----------------------------------------------
 c   g l o b a l   p a r a m e t e r s
 c-----------------------------------------------
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   D U M M Y   A R G U M E N T S
 C-----------------------------------------------

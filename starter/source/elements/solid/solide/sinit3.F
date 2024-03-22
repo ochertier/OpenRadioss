@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  SINIT3                        source/elements/solid/solide/sinit3.F
 Chd|-- called by -----------
@@ -36,6 +36,7 @@ Chd|        FRETITL2                      source/starter/freform.F
 Chd|        INIMOM_FVM                    source/elements/solid/solide/inimom_fvm.F
 Chd|        M115_PERTURB                  source/materials/mat/mat115/m115_perturb.F
 Chd|        MATINI                        source/materials/mat_share/matini.F
+Chd|        S8EREFCOOR3                   source/elements/solid/solide8z/s8erefcoor3.F
 Chd|        SBOLTINI                      source/loads/bolt/sboltini.F  
 Chd|        SBULK3                        source/elements/solid/solide/sbulk3.F
 Chd|        SCOOR3                        source/elements/solid/solide/scoor3.F
@@ -43,7 +44,7 @@ Chd|        SDERI3                        source/elements/solid/solide/sderi3.F
 Chd|        SDERI3B                       source/elements/solid/solid8p/sderi3b.F
 Chd|        SDLEN3                        source/elements/solid/solide/sdlen3.F
 Chd|        SIGIN3B                       source/elements/solid/solid8p/sigin3b.F
-Chd|        SJAC_I                        source/elements/solid/solide/sderi3.F
+Chd|        SJACIDP                       source/elements/solid/solide/sjacidp.F
 Chd|        SMASS3                        source/elements/solid/solide/smass3.F
 Chd|        SMASS3B                       source/elements/solid/solid8p/smass3b.F
 Chd|        SMORTH3                       source/elements/solid/solide/smorth3.F
@@ -53,10 +54,12 @@ Chd|        SVEOK3                        source/elements/solid/solide/sveok3.F
 Chd|        SZDERI3                       source/elements/solid/solidez/szderi3.F
 Chd|        USERIN3                       source/elements/solid/solide/userin3.F
 Chd|        USTRSIN3                      source/elements/solid/solide/userin3.F
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
+Chd|        ALEFVM_MOD                    ../common_source/modules/ale/alefvm_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
 Chd|        BPRELOAD_MOD                  share/modules1/bpreload_mod.F 
 Chd|        DETONATORS_MOD                share/modules1/detonators_mod.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
+Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
       SUBROUTINE SINIT3(ELBUF_STR,MAS      ,IXS    ,PM      ,X       ,
@@ -71,7 +74,7 @@ Chd|====================================================================
      .                  XREFS    ,NPF      ,TF     ,MSSA    ,STRSGLOB,
      .                  STRAGLOB ,FAIL_INI ,SPBUF  ,KXSP    ,IPARTSP ,
      .                  NOD2SP   ,SOL2SPH  ,IRST   ,ILOADP  ,FACLOAD ,
-     .                  RNOISE   ,PERTURB  )
+     .                  RNOISE   ,PERTURB  ,MAT_PARAM)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -80,6 +83,8 @@ C-----------------------------------------------
       USE BPRELOAD_MOD
       USE DETONATORS_MOD
       USE ALE_CONNECTIVITY_MOD
+      USE ALEFVM_MOD , only:ALEFVM_Param
+      USE MATPARAM_DEF_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -94,17 +99,12 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "scr01_c.inc"
 #include      "scr03_c.inc"
 #include      "scr12_c.inc"
 #include      "scr17_c.inc"
 #include      "scry_c.inc"
 #include      "sphcom.inc"
-#include      "units_c.inc"
 #include      "vect01_c.inc"
-#include      "warn_c.inc"
-#include      "alefvm.inc"
-#include      "boltpr_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -127,8 +127,9 @@ C-----------------------------------------------
       TYPE(ELBUF_STRUCT_), TARGET :: ELBUF_STR
       INTEGER,INTENT(IN) :: ILOADP(SIZLOADP,*)
       my_real,INTENT(IN) :: FACLOAD(LFACLOAD,*)
-      TYPE(DETONATOR_STRUCT_)::DETONATORS
+      TYPE(DETONATORS_STRUCT_)::DETONATORS
       TYPE(t_ale_connectivity), INTENT(INOUT) :: ALE_CONNECTIVITY
+      TYPE (MATPARAM_STRUCT_) ,DIMENSION(NUMMAT) ,INTENT(INOUT) :: MAT_PARAM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -226,11 +227,17 @@ C Total Lagrange simulation
      .           XD1  ,XD2  ,XD3  ,XD4  ,XD5  ,XD6  ,XD7  ,XD8   ,
      .           YD1  ,YD2  ,YD3  ,YD4  ,YD5  ,YD6  ,YD7  ,YD8   ,
      .           ZD1  ,ZD2  ,ZD3  ,ZD4  ,ZD5  ,ZD6  ,ZD7  ,ZD8   )
+       IF (NSIGI > 0 ) THEN
+          CALL S8EREFCOOR3(GBUF%SMSTR,8,NEL,
+     .           XD1  ,XD2  ,XD3  ,XD4  ,XD5  ,XD6  ,XD7  ,XD8   ,
+     .           YD1  ,YD2  ,YD3  ,YD4  ,YD5  ,YD6  ,YD7  ,YD8   ,
+     .           ZD1  ,ZD2  ,ZD3  ,ZD4  ,ZD5  ,ZD6  ,ZD7  ,ZD8   )
+       END IF
 C JAC_I : [J]^-1 is calculated in global system
-        CALL SJAC_I(
-     .              X1   ,X2   ,X3   ,X4   ,X5   ,X6   ,X7   ,X8   ,
-     .              Y1   ,Y2   ,Y3   ,Y4   ,Y5   ,Y6   ,Y7   ,Y8   ,
-     .              Z1   ,Z2   ,Z3   ,Z4   ,Z5   ,Z6   ,Z7   ,Z8   ,
+        CALL SJACIDP(
+     .              XD1  ,XD2  ,XD3  ,XD4  ,XD5  ,XD6  ,XD7  ,XD8   ,
+     .              YD1  ,YD2  ,YD3  ,YD4  ,YD5  ,YD6  ,YD7  ,YD8   ,
+     .              ZD1  ,ZD2  ,ZD3  ,ZD4  ,ZD5  ,ZD6  ,ZD7  ,ZD8   ,
      .              GBUF%JAC_I ,NEL)
       END IF
 C Orthotropy wrt reference geometry
@@ -396,7 +403,7 @@ C Case /INIBRIS/STRS_FGLO missed
      .         (ISTRAIN == 1 .AND. 
      .         (MTN==1  .OR. MTN==2  .OR. MTN==3    .OR. MTN==4  .OR. 
      .          MTN==6  .OR. MTN==10 .OR. MTN==21   .OR. MTN==22 .OR.
-     .          MTN==23))) THEN
+     .          MTN==23 .OR. MTN==24))) THEN
               IDEF = 1
           ENDIF
 c
@@ -407,7 +414,8 @@ c
      .           IXS      ,NIXS    ,NSIGI    ,NUVAR    ,NEL     ,
      .           NSIGS    ,IUSER   ,IDEF     ,STRAGLOB ,JHBE    ,
      .           IGTYP    ,X       ,GBUF%GAMA,PTSOL    ,LBUF%SIGB,
-     .           L_SIGB   ,MAT(1)  ,IPM      ,BUFMAT   )
+     .           L_SIGB   ,MAT(1)  ,IPM      ,BUFMAT   ,LBUF%PLA,
+     .           L_PLA    )
           CALL SMASS3(
      .         GBUF%RHO   ,MAS        ,PARTSAV    ,X          ,V        ,
      .         IPARTS(NF1),MSS(1,NF1) ,VOLU       ,
@@ -428,7 +436,7 @@ c Failure model initialization
 C----------------------------------------
         CALL FAILINI(ELBUF_STR,NPTR,NPTS,NPTT,NLAY,
      .               IPM,SIGSP,NSIGI,FAIL_INI ,
-     .               SIGI,NSIGS,IXS,NIXS,PTSOL,RNOISE,PERTURB,BUFMAT)
+     .               SIGI,NSIGS,IXS,NIXS,PTSOL,RNOISE,PERTURB,MAT_PARAM)
 C--------------------------------------------------------------------
 C Compute nodal volumes and moduli for contact stiffness
 C Note : IX1, IX2 ... IX8 are in NC(MVSIZ,8)
@@ -443,7 +451,7 @@ C--------------------------------------------------------------------
 C----------------------------------------
 C Cell momentum for FVM
 C----------------------------------------      
-      IF(IALEFVM /= 0) THEN      
+      IF(ALEFVM_Param%IEnabled /= 0) THEN      
         CALL INIMOM_FVM(V   ,  GBUF%RHO,  GBUF%VOL,  GBUF%MOM,  IXS,
      .                  IPM ,  MAT     ,  IPARG_GR,  NPF     ,  TF ,
      .                  PM  ,  LBUF%SSP,  GBUF%SIG,  NEL
@@ -456,7 +464,7 @@ C------------------------------------------
       DTX(:) = ZERO
       CALL DTMAIN(GEO      , PM       , IPM        , PID    , MAT    , FV    ,
      .     GBUF%EINT, GBUF%TEMP, GBUF%DELTAX, GBUF%RK, GBUF%RE, BUFMAT, DELTAX, AIRE, 
-     .     VOLU, DTX, IGEO )
+     .     VOLU, DTX, IGEO ,IGTYP)
 C
       DO I=1,NEL
         IF(IXS(10,I+NFT) /= 0) THEN

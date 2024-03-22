@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  I21FOR3                       source/interfaces/int21/i21for3.F
 Chd|-- called by -----------
@@ -51,10 +51,12 @@ Chd|====================================================================
      k                  TEMPM   ,NPC    ,TF     ,IX1    ,IX2    ,
      L                  IX3     ,IX4    ,DT2T   ,NELTST ,ITYPTST,
      M                  KINET   ,NISUB  ,ISENSINT,FSAVPARIT,NFT ,
-     N                  IFTLIM  ,PSKIDFLAG,PRATIO,PMAXSKID )
+     N                  IFTLIM  ,PSKIDFLAG,PRATIO,PMAXSKID,INTEREFRIC,
+     O                  EFRIC_L )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -68,17 +70,13 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "com06_c.inc"
 #include      "com08_c.inc"
-#include      "param_c.inc"
 #include      "scr05_c.inc"
 #include      "scr11_c.inc"
 #include      "sms_c.inc"
 #include      "scr18_c.inc"
 #include      "units_c.inc"
-#include      "couple_c.inc"
-#include      "scr07_c.inc"
 #include      "kincod_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -90,7 +88,7 @@ C-----------------------------------------------
       INTEGER NSVG(MVSIZ),CAND_N_N(MVSIZ), WEIGHT(*),
      .        IX1(MVSIZ), IX2(MVSIZ), IX3(MVSIZ), IX4(MVSIZ), NISUB, 
      .        ISENSINT(*),NFT,PSKIDFLAG
-
+      INTEGER  , INTENT(IN) :: INTEREFRIC
       my_real
      .   STIGLO, PENI(*), FROT_P(*), FSAV(*), TF(*),
      .   ALPHA0, GAP, FRIC, VISC,DT2T,PMAXSKID ,
@@ -116,6 +114,7 @@ C-----------------------------------------------
      .   KT(MVSIZ), C(MVSIZ), FHEAT,EFRICT(MVSIZ),QFRIC,
      .   TEMPI(MVSIZ),TEMPM(MVSIZ),XFRIC,DYDX,
      .   FSAVPARIT(NISUB+1,11,*),PRATIO(MVSIZ)
+      my_real  , INTENT(INOUT) :: EFRIC_L(MVSIZ)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -145,7 +144,6 @@ C-----------------------------------------------
       EXTERNAL FINTER
 C
 C-----------------------------------------------
-#include "sync_dir.inc"
       IF (IRESP==1) THEN
            PREC = FIVEEM4
       ELSE
@@ -161,6 +159,8 @@ C-----------------------------------------------
             PRATIO(I) =  ZERO
          ENDDO
       ENDIF
+      EFRIC_L(1:JLT) =  ZERO
+      EFRICT(1:JLT) =  ZERO
 C---------------------
 C      PENE INITIALE
 C---------------------
@@ -423,7 +423,7 @@ C should be the current nodal surface instead of the initial one.
           XMU(I) = MAX(XMU(I),EM30)
         ENDDO
       ELSEIF(MFROT==2)THEN
-C---    Loi Darmstad
+C---    Darmstad LAW
         DO I=1,JLT
 C attention : normale <> normale a l'elt
           AA = NX(I)*VX(I) + NY(I)*VY(I) + NZ(I)*VZ(I)
@@ -442,7 +442,7 @@ C should be the current nodal surface instead of the initial one.
           XMU(I) = MAX(XMU(I),EM30)
         ENDDO
       ELSEIF (MFROT==3) THEN
-C---    Loi Renard
+C---    Renard LAW
         DO I=1,JLT
 C attention : normale <> normale a l'elt
           AA = NX(I)*VX(I) + NY(I)*VY(I) + NZ(I)*VZ(I)
@@ -464,6 +464,18 @@ C attention : normale <> normale a l'elt
             XMU(I) = FROT_P(2) - DMU / (ONE + DMU*VV2)
           ENDIF
           XMU(I) = MAX(XMU(I),EM30)
+        ENDDO
+      ELSEIF(MFROT==4)THEN
+C---        Exponential decay model
+        DO I=1,JLT
+          AA = NX(I)*VX(I) + NY(I)*VY(I) + NZ(I)*VZ(I)
+          V2 = (VX(I) - NX(I)*AA)**2 
+     .       + (VY(I) - NY(I)*AA)**2 
+     .       + (VZ(I) - NZ(I)*AA)**2
+           VV = SQRT(MAX(EM30,V2))
+           XMU(I) = FRIC
+     .            + (FROT_P(1)-FRIC)*EXP(-FROT_P(2)*VV)
+           XMU(I) = MAX(XMU(I),EM30)
         ENDDO
       ENDIF
 C------------------
@@ -539,20 +551,17 @@ C-------    total force
 C---------------------------------
 C       CONTACT ENERGY CALCULATION
 C---------------------------------
-        EFRICT(I) = ZERO
+        EFRIC_L(I) = DT1*(VX(I)*FXT(I)+VY(I)*FYT(I)+VZ(I)*FZT(I)) 
+     .              * WEIGHT(IG)
+        ECONVT = ECONVT   + EFRIC_L(I)
+
         IF( INTTH > 0 .AND.BETA/=ZERO) THEN
           EFRICT(I) = (FX-FXT(I))*FXT(I) + (FY-FYT(I))*FYT(I) + 
      .                (FZ-FZT(I))*FZT(I) ! FRICTIONAL ENERGY
           EFRICT(I) = EFRICT(I)/STIF0(I)
           QFRICT   =  QFRICT + EFRICT(I)
         ENDIF
-
-        ECONVT = ECONVT 
-     .         + DT1*(VX(I)*FXT(I)+VY(I)*FYT(I)+VZ(I)*FZT(I)) 
-     .              * WEIGHT(IG)
-        
-      ENDDO
-       
+      ENDDO    
 C---------------------------------
       DO I=1,JLT
        IG=NSVG(I)

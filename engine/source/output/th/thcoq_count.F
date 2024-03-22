@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  THCOQ_COUNT                   source/output/th/thcoq_count.F
 Chd|-- called by -----------
@@ -27,7 +27,7 @@ Chd|        INIT_TH                       source/output/th/init_th.F
 Chd|-- calls ---------------
 Chd|====================================================================
       SUBROUTINE THCOQ_COUNT(NTHGRP2 , ITHGRP , WA_SIZE, INDEX_WA_COQ,
-     .                 IPARG    ,ITHBUF  )
+     .                 IPARG    ,ITHBUF ,SITHBUF )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------       
@@ -38,10 +38,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "mvsiz_p.inc"
 #include      "com01_c.inc"
-#include      "scr01_c.inc"
-#include      "scr03_c.inc"
 #include      "scr05_c.inc"
 #include      "task_c.inc"
 #include      "param_c.inc"
@@ -49,6 +46,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER,INTENT(IN) :: SITHBUF
       INTEGER IPARG(NPARG,*),ITHBUF(SITHBUF)
       INTEGER, INTENT(inout) :: WA_SIZE,NTHGRP2
       INTEGER, DIMENSION(2*NTHGRP2+1), INTENT(inout) :: INDEX_WA_COQ
@@ -98,7 +96,7 @@ c
      .                           MTE == 35.OR.MTE == 36.OR.MTE == 43.OR.
      .                           MTE == 44.OR.MTE == 45.OR.MTE == 48.OR.MTE>=50) THEN
                                 CONTINUE
-	                        ELSEIF (MTE == 25) THEN
+                                  ELSEIF (MTE == 25) THEN
 
                             ENDIF     ! MTE = 25
 c---------

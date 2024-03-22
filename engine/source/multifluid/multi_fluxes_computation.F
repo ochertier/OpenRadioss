@@ -1,35 +1,35 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  MULTI_FLUXES_COMPUTATION      source/multifluid/multi_fluxes_computation.F
 Chd|-- called by -----------
 Chd|        MULTI_TIMEEVOLUTION           source/multifluid/multi_timeevolution.F
 Chd|-- calls ---------------
 Chd|        ARRET                         source/system/arret.F         
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        INITBUF_MOD                   share/resol/initbuf.F         
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|====================================================================
       SUBROUTINE MULTI_FLUXES_COMPUTATION(NG, ELBUF_TAB, IPARG, ITASK, IXS, IXQ, IXTG,
      .     PM, IPM, MULTI_FVM, ALE_CONNECTIVITY, WGRID, XGRID, ITAB, NBMAT, CURRENT_TIME, BUFMAT,
@@ -48,9 +48,6 @@ Chd|====================================================================
 !           
 !$ENDCOMMENT
 C-----------------------------------------------
-C     D e s c r i p t i o n
-C-----------------------------------------------
-C-----------------------------------------------
 C     M o d u l e s
 C-----------------------------------------------
       USE INITBUF_MOD      
@@ -68,10 +65,8 @@ C-----------------------------------------------
 ! NUMELS      
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "task_c.inc"
 #include      "mvsiz_p.inc"
 !     DTFAC1
-#include      "scr18_c.inc" 
       COMMON /TABLESIZF/ STF,SNPC
       INTEGER STF,SNPC
 C-----------------------------------------------
@@ -565,78 +560,3 @@ C     Boundary fluxes
 C----------------------
       END SUBROUTINE MULTI_FLUXES_COMPUTATION
 
-Chd|====================================================================
-Chd|  ENERGY_JUMP                   source/multifluid/multi_fluxes_computation.F
-Chd|-- called by -----------
-Chd|-- calls ---------------
-Chd|        MULTI_SUBMATLAW               source/multifluid/multi_submatlaw.F
-Chd|====================================================================
-      SUBROUTINE ENERGY_JUMP(MATLAW, LOCAL_MATID, PM, IPM, NPROPM, NPROPMI, 
-     .     EINT, RHOSTAR, PRES, ALPHA, 
-     .     BURNFRAC, BURNTIME, DELTAX, CURRENT_TIME,
-     .     ESTAR, BUFMAT,SIG,NPF,TF)
-C-----------------------------------------------
-C     I m p l i c i t   T y p e s
-C-----------------------------------------------
-#include      "implicit_f.inc"
-#include      "tabsiz_c.inc"
-      INTEGER, INTENT(IN) :: MATLAW, LOCAL_MATID, NPROPM, NPROPMI
-      my_real, INTENT(IN) :: PM(NPROPM, *)
-      INTEGER, INTENT(IN) :: IPM(NPROPMI, *)
-      my_real, INTENT(IN) :: EINT, PRES, ALPHA,SIG(6)
-      my_real, INTENT(INOUT) :: BURNFRAC, BURNTIME, DELTAX, CURRENT_TIME, BUFMAT(*), RHOSTAR
-      my_real, INTENT(OUT) :: ESTAR
-      INTEGER, INTENT(IN) :: NPF(SNPC)
-      my_real, INTENT(IN) :: TF(STF)
-
-      INTEGER :: ITER, MAX_ITER
-      my_real :: TOL, ERROR
-      my_real :: FUNC, DFUNC, PSTAR, GRUN, SSP, VOL, INCR, TEMP
-      LOGICAL :: CONT
-      my_real :: OFF
-      
-      MAX_ITER = 50
-      TOL = EM06
-      ERROR = ONE
-      OFF = ONE
-C     Dummy
-      VOL = ONE
-
-C     Initialization
-      ESTAR = EINT
-      TEMP = ZERO
-      ITER = 0
-      CONT = .TRUE.
-      DO WHILE(CONT .AND. ITER < MAX_ITER) 
-         ITER = ITER + 1
-         CALL MULTI_SUBMATLAW(0, MATLAW, LOCAL_MATID, 1, RHOSTAR * ESTAR, PSTAR, RHOSTAR, SSP, VOL, GRUN, 
-     .        PM, IPM, NPROPM, NPROPMI, BUFMAT, OFF, TEMP, 
-     .        BURNFRAC, BURNTIME, DELTAX, CURRENT_TIME,SIG(1:6),NPF,TF)
-
-         IF (GRUN == ZERO) THEN
-            ERROR = ZERO
-            CONT = .FALSE.
-            ESTAR = EINT
-         ELSE
-
-            FUNC = ESTAR - EINT + ALPHA / RHOSTAR * HALF * (PSTAR + PRES)
-            DFUNC = ONE + ALPHA * HALF * GRUN
-            INCR = - FUNC / DFUNC
-c$$$  IF (INCR < ZERO) THEN
-c$$$  INCR = MAX(INCR, - HALF * ESTAR)
-c$$$  ENDIF
-            ESTAR = ESTAR + INCR
-            ERROR = ABS(INCR)
-            IF (ERROR < TOL * ABS(ESTAR)) THEN
-               CONT = .FALSE.
-            ENDIF
-         ENDIF
-      ENDDO
-      
-      IF (ERROR > TOL * ABS(ESTAR)) THEN
-!         PRINT*, "ESTAR NOT FOUND"
-         ESTAR = EINT
-         PSTAR = PRES
-      ENDIF
-
-      END SUBROUTINE ENERGY_JUMP

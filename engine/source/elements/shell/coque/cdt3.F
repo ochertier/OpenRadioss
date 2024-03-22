@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  CDT3                          source/elements/shell/coque/cdt3.F
 Chd|-- called by -----------
@@ -46,18 +46,14 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
 #include      "com01_c.inc"
-#include      "com06_c.inc"
 #include      "com08_c.inc"
 #include      "scr02_c.inc"
-#include      "scr06_c.inc"
 #include      "scr07_c.inc"
 #include      "scr17_c.inc"
 #include      "scr18_c.inc"
 #include      "sms_c.inc"
 #include      "units_c.inc"
-#include      "couple_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -118,69 +114,42 @@ C
       ENDIF
       
 C------------------------------
-      IF(NODADT==0)THEN
-        IF(ISUB==1)THEN
-C         DTC(1) = 1.E6
-          DTC(1) = DT2C(1)
-          DO I=JFT,JLT
-           IF(IXC(4,I)==IXC(5,I))THEN
-C             DTC(1)=MIN(DTC(1),0.5*DT(I),DT2C(1))
-             DTC(1)=MIN(DTC(1),HALF*DT(I))
-           ELSE
-C             DTC(1)=MIN(DTC(1),DT(I),DT2C(1))
-             DTC(1)=MIN(DTC(1),DT(I))
-           ENDIF
-          ENDDO
-        ELSEIF(ISUB==2)THEN
-          DO I=JFT,JLT
-           IF(NDT(I)/=0)THEN
-             IF(IXC(4,I)==IXC(5,I))THEN
-               DTC(I)=MIN(0.5*DT(I),DT2C(I))
-             ELSE
-               DTC(I)=MIN(DT(I),DT2C(1))
-             ENDIF
-           ELSE
-             DT(I)=EP06
-           ENDIF
-          ENDDO
-        ENDIF
-        IF(IDTMIN(3)==0)RETURN
+      IF(NODADT == 0)THEN
+        IF(IDTMIN(3) == 0)RETURN
       ENDIF
 C------------------------------
-        IF(G_DT/=ZERO)THEN
+        IF(G_DT /= ZERO)THEN
            DO I=JFT,JLT
              DTEL(I) = DT(I)
            ENDDO
         ENDIF
 C------------------------------
-      IF(IDTMIN(3)==1)THEN
+      IF(IDTMIN(3) == 1)THEN
         NINDX=IOFC
-        DO 95 I=JFT,JLT
-        IF(DT(I)>DTMIN1(3).OR.
-     .     OFF(I)<ONE.OR.OFFG(I)==TWO.OR.OFFG(I)<ZERO) GO TO 95
+        DO I=JFT,JLT
+        IF(DT(I) > DTMIN1(3) .OR. OFF(I) < ONE .OR. OFFG(I) == TWO .OR. OFFG(I) < ZERO) CYCLE
          NINDX=NINDX+1
          INDXOF(NINDX)=I
-  95    CONTINUE
+        ENDDO
 C
-        DO 100 J=IOFC+1,NINDX
+        DO J=IOFC+1,NINDX
          I = INDXOF(J)
          TSTOP = TT
 #include "lockon.inc"
          WRITE(IOUT,1000)  NGL(I)
          WRITE(ISTDO,1000) NGL(I)
 #include "lockoff.inc"
-  100   CONTINUE
+        ENDDO
         NINDX=IOFC
       ELSEIF(IDTMIN(3)==2)THEN
         NINDX=IOFC
-        DO 120 I=JFT,JLT
-        IF(DT(I)>DTMIN1(3).OR.OFF(I)<ONE
-     .     .OR.OFFG(I)<ZERO) GO TO 120
+        DO I=JFT,JLT
+        IF(DT(I)>DTMIN1(3).OR.OFF(I)<ONE .OR.OFFG(I)<ZERO) CYCLE
          NINDX=NINDX+1
          INDXOF(NINDX)=I
-  120   CONTINUE
+        ENDDO
 C
-        DO 125 J=IOFC+1,NINDX
+        DO J=IOFC+1,NINDX
          I = INDXOF(J)
          OFF(I)=0.
          IDEL7NOK = 1         
@@ -188,43 +157,41 @@ C
          WRITE(IOUT,1200)  NGL(I)
          WRITE(ISTDO,1300) NGL(I),TT
 #include "lockoff.inc"
-  125   CONTINUE
+        ENDDO
         IOFC = NINDX
       ELSEIF(IDTMIN(3)==3.AND.ISMSTR==2)THEN
         NINDX=IOFC
-        DO 130 I=JFT,JLT
-        IF(DT(I)>DTMIN1(3).OR.
-     .     OFF(I)<ONE.OR.OFFG(I)==TWO.OR.OFFG(I)<ZERO)GO TO 130
+        DO I=JFT,JLT
+        IF(DT(I)>DTMIN1(3).OR.OFF(I)<ONE.OR.OFFG(I)==TWO.OR.OFFG(I)<ZERO)CYCLE
          NINDX=NINDX+1
          INDXOF(NINDX)=I
-  130   CONTINUE
+       ENDDO
 C
-        DO 140 J=IOFC+1,NINDX
+        DO J=IOFC+1,NINDX
          I = INDXOF(J)
          OFFG(I)=2.
 #include "lockon.inc"
          WRITE(IOUT,1400)  NGL(I)
          WRITE(ISTDO,1400) NGL(I)
 #include "lockoff.inc"
-  140   CONTINUE
+        ENDDO
         NINDX=IOFC
       ELSEIF(IDTMIN(3)==5)THEN
         NINDX=IOFC
-        DO 155 I=JFT,JLT
-        IF(DT(I)>DTMIN1(3).OR.
-     .     OFF(I)<ONE.OR.OFFG(I)==TWO.OR.OFFG(I)<ZERO)GO TO 155
+        DO I=JFT,JLT
+        IF(DT(I)>DTMIN1(3).OR.OFF(I)<ONE.OR.OFFG(I)==TWO.OR.OFFG(I)<ZERO)CYCLE
          NINDX=NINDX+1
          INDXOF(NINDX)=I
- 155    CONTINUE
+       ENDDO
 C
-        DO 160 J=IOFC+1,NINDX
+        DO J=IOFC+1,NINDX
          I = INDXOF(J)
          MSTOP = 2
 #include "lockon.inc"
          WRITE(IOUT,1000)  NGL(I)
          WRITE(ISTDO,1000) NGL(I)
 #include "lockoff.inc"
-  160   CONTINUE
+        ENDDO
         NINDX=IOFC
       ENDIF
 C

@@ -1,5 +1,5 @@
 //Copyright>    OpenRadioss
-//Copyright>    Copyright (C) 1986-2022 Altair Engineering Inc.
+//Copyright>    Copyright (C) 1986-2024 Altair Engineering Inc.
 //Copyright>
 //Copyright>    This program is free software: you can redistribute it and/or modify
 //Copyright>    it under the terms of the GNU Affero General Public License as published by
@@ -15,11 +15,11 @@
 //Copyright>    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //Copyright>
 //Copyright>
-//Copyright>    Commercial Alternative: Altair Radioss Software 
+//Copyright>    Commercial Alternative: Altair Radioss Software
 //Copyright>
-//Copyright>    As an alternative to this open-source version, Altair also offers Altair Radioss 
-//Copyright>    software under a commercial license.  Contact Altair to discuss further if the 
-//Copyright>    commercial version may interest you: https://www.altair.com/radioss/.    
+//Copyright>    As an alternative to this open-source version, Altair also offers Altair Radioss
+//Copyright>    software under a commercial license.  Contact Altair to discuss further if the
+//Copyright>    commercial version may interest you: https://www.altair.com/radioss/.
 //
 #include <stdio.h>
 #include <string.h>
@@ -96,6 +96,7 @@ void c_h3d_create_quad_tensor_datatype_(int *cpt_data, char *name1, int *size1, 
     ccomment[*s_comment]='\0';  
 
     if( strncmp(cname,"Strain",6)  == 0 ) tensor_type = H3D_DS_STRAIN; 
+    if( strncmp(cname,"Strn rate",9)  == 0 ) tensor_type = H3D_DS_STRAIN;
 
     char * LAYERPOOL = new char [100];
     LAYERPOOL[0] ='\0'; 

@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  S8SKE3                        source/elements/solid/solide8s/s8ske3.F
 Chd|-- called by -----------
@@ -32,14 +32,17 @@ Chd|        S8SCOORK_IMP                  source/elements/solid/solide8s/srcoork
 Chd|        S8SDERI3                      source/elements/solid/solide8s/s8sderi3.F
 Chd|        S8SKSIG                       source/elements/solid/solide8s/s8sksig.F
 Chd|        S8SLKE3                       source/elements/solid/solide8s/s8slke3.F
-Chd|        TRANSK                        source/elements/solid/solide8s/s8ske3.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        TRANSK                        source/elements/solid/solide8s/transk.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
-      SUBROUTINE S8SKE3 (PM     ,GEO    ,IXS    ,X      ,ELBUF_STR,
-     1                   NEL    ,ICP    ,ICSIG  ,ETAG   ,
-     2                   IDDL   ,NDOF   ,K_DIAG ,K_LT   ,IADK     ,
-     3                   JDIK   ,MPT    ,IPM    ,IGEO   ,IKGEO  ,
-     4                   BUFMAT )
+      SUBROUTINE S8SKE3(
+     1   PM,       GEO,      IXS,      X,
+     2   ELBUF_STR,NEL,      ICP,      ICSIG,
+     3   ETAG,     IDDL,     NDOF,     K_DIAG,
+     4   K_LT,     IADK,     JDIK,     MPT,
+     5   IPM,      IGEO,     IKGEO,    BUFMAT,
+     6   NFT,      MTN,      JHBE,     JCVT,
+     7   IGTYP,    ISORTH)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -55,16 +58,17 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "vect01_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr01_c.inc"
-#include      "scr03_c.inc"
-#include      "scr06_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: NFT
+      INTEGER, INTENT(IN) :: MTN
+      INTEGER, INTENT(IN) :: JHBE
+      INTEGER, INTENT(IN) :: JCVT
+      INTEGER, INTENT(IN) :: IGTYP
+      INTEGER, INTENT(IN) :: ISORTH
       INTEGER  NEL ,ICP, ICSIG,IKGEO,MPT
       INTEGER NDOF(*)  ,IADK(*) ,JDIK(*),
      .   IXS(NIXS,*),IPM(NPROPMI,*),IGEO(NPROPGI,*),ETAG(*),IDDL(*)  
@@ -237,10 +241,10 @@ C-----------
      .   K66,K67,K68,K77,K78,K88,JHBE,GBUF%GAMA,GAMA,
      .   NEL,TRM,KL)       !,TRM
 C
-      PID=NGEO(LFT)
+      PID=NGEO(1)
 C      IGTYP=NINT(GEO(12,PID))
 C      CALL GET_GAMA(MTN,NEL,NBGAMA,JCVT,PM,IXS(1,NF1),IGTYP)
-      DO I=LFT,LLT
+      DO I=1,NEL
         NU =PM(21,MXT(I))
         C1 =THREE*PM(32,MXT(I))/(ONE+NU)
         LAMDA=C1*NU
@@ -279,32 +283,44 @@ C
 !     .    Z1,Z2,Z3,Z4,Z5,Z6,Z7,Z8,
 !     .    DN_X,DN_Y,DN_Z,VOLM)
 ! used for ANS formulation
-         CALL S8SDERI3(OFFG,OFF,VOLN,NGL,
-     .    A_GAUSS(IT,NPTT),A_GAUSS(IR,NPTR),A_GAUSS(IS,NPTS),WI,
-     .    X1,X2,X3,X4,X5,X6,X7,X8,
-     .    Y1,Y2,Y3,Y4,Y5,Y6,Y7,Y8,
-     .    Z1,Z2,Z3,Z4,Z5,Z6,Z7,Z8,
-     .    A11,A12,A13,A21,A22,A23,A31,A32,A33,
-     .    DN_R,DN_S,DN_T,INVJ,
-     .    DN_X,DN_Y,DN_Z,VOLM)
-         CALL S8SLKE3(KL, HH, VOLN, !DN_X,DN_Y,DN_Z,
-     .    A_GAUSS(IT,NPTT),A_GAUSS(IR,NPTR),A_GAUSS(IS,NPTS),
-     .    DN_R,DN_S,DN_T,INVJ,
-     .    X1,X2,X3,X4,X5,X6,X7,X8,
-     .    Y1,Y2,Y3,Y4,Y5,Y6,Y7,Y8,
-     .    Z1,Z2,Z3,Z4,Z5,Z6,Z7,Z8,
-     .    A11,A12,A13,A21,A22,A23,A31,A32,A33
-     .    )
+         CALL S8SDERI3(
+     1   OFFG,            OFF,             VOLN,            NGL,
+     2   A_GAUSS(IT,NPTT),A_GAUSS(IR,NPTR),A_GAUSS(IS,NPTS),WI,
+     3   X1,              X2,              X3,              X4,
+     4   X5,              X6,              X7,              X8,
+     5   Y1,              Y2,              Y3,              Y4,
+     6   Y5,              Y6,              Y7,              Y8,
+     7   Z1,              Z2,              Z3,              Z4,
+     8   Z5,              Z6,              Z7,              Z8,
+     9   A11,             A12,             A13,             A21,
+     A   A22,             A23,             A31,             A32,
+     B   A33,             DN_R,            DN_S,            DN_T,
+     C   INVJ,            DN_X,            DN_Y,            DN_Z,
+     D   VOLM,            NEL)
+         CALL S8SLKE3(
+     1   KL,              HH,              VOLN,            !DN_X,
+     2   DN_Y,            DN_Z,            A_GAUSS(IT,NPTT),A_GAUSS(IR,NPTR),
+     3   A_GAUSS(IS,NPTS),DN_R,            DN_S,            DN_T,
+     4   INVJ,            X1,              X2,              X3,
+     5   X4,              X5,              X6,              X7,
+     6   X8,              Y1,              Y2,              Y3,
+     7   Y4,              Y5,              Y6,              Y7,
+     8   Y8,              Z1,              Z2,              Z3,
+     9   Z4,              Z5,              Z6,              Z7,
+     A   Z8,              A11,             A12,             A13,
+     B   A21,             A22,             A23,             A31,
+     C   A32,             A33,             NEL)
         ENDDO 
        ENDDO 
       ENDDO
       
-      CALL TRANSK(KL,TRM,NEL)
+      CALL TRANSK(
+     1   KL,      TRM,     NEL)
 C-------------      
       CALL S8SKSIG(X,IXS(1,NF1),NEL,
      .             GBUF%COR_NF,KS,V1,V2,V3,V4,V5,V6,V7,V8,
      .             NC1,NC2,NC3,NC4,NC5,NC6,NC7,NC8)
-      DO K=LFT,LLT
+      DO K=1,NEL
        DO J=1,24
         DO I=1,24
          KL(I,J,K)=KL(I,J,K)+KS(I,J,K)
@@ -315,9 +331,9 @@ C----------------------------
 C     CONVECTE --> GLOBAL.
 C----------------------------     
       IF (NEIG>0) CALL S8EOFF(
-     1   LFT, LLT, IXS(1,NF1), ETAG, OFFG)
+     1   1, NEL, IXS(1,NF1), ETAG, OFFG)
      
-      DO K=LFT,LLT
+      DO K=1,NEL
        DO J=1,3
         JJ=3*(J-1)
         DO I=1,3
@@ -375,47 +391,3 @@ C----------------------------
 C
       RETURN
       END
-      
-Chd|====================================================================
-Chd|  TRANSK                        source/elements/solid/solide8s/s8ske3.F
-Chd|-- called by -----------
-Chd|        S8SKE3                        source/elements/solid/solide8s/s8ske3.F
-Chd|-- calls ---------------
-Chd|====================================================================
-      SUBROUTINE TRANSK(KL,TRM,NEL)
-C-----------------------------------------------
-C   I m p l i c i t   T y p e s
-C-----------------------------------------------
-#include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-#include      "vect01_c.inc"
-      DOUBLE PRECISION
-     .   KL(24,24,NEL),KTEMP(24,24),TRM(NEL,24,24)
-      INTEGER I,L,M,N,NEL
-
-      DO I=LFT,LLT
-        !CALL DGEMM('N','N',24,24,24,ONE,KL(1,1,I),24,TRM(I,1,1),24,ZERO,
-        KTEMP(1:24,1:24) = ZERO
-        DO L=1,24
-         DO M=1,24
-          DO N=1,24
-           KTEMP(L,M) = KTEMP(L,M)+KL(L,N,I)*TRM(I,N,M)
-          ENDDO
-         ENDDO
-        ENDDO
-        
-        KL(1:24,1:24,I) = ZERO
-        DO L=1,24
-         DO M=1,24
-          DO N=1,24
-           KL(L,M,I) = KL(L,M,I)+TRM(I,N,L)*KTEMP(N,M)
-          ENDDO
-         ENDDO
-        ENDDO
-       ENDDO 
-c       
-       RETURN
-       END

@@ -1,38 +1,40 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  ENG_QAPRINT_DTINPUT           source/output/qaprint/eng_qaprint_dtinput.F
 Chd|-- called by -----------
 Chd|        ENG_QAPRINT_DRIVER            source/output/qaprint/eng_qaprint_driver.F
 Chd|-- calls ---------------
+Chd|        DT_MOD                        share/modules/dt_mod.F        
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
-      SUBROUTINE ENG_QAPRINT_DTINPUT()
+      SUBROUTINE ENG_QAPRINT_DTINPUT(DT)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE QA_OUT_MOD
       USE MESSAGE_MOD
+      USE DT_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -43,22 +45,19 @@ C-----------------------------------------------
 #include      "scr02_c.inc"
 #include      "scr18_c.inc"
 #include      "scr17_c.inc"
-#include      "inter22.inc"
 #include      "scr_thermal_c.inc"
 #include      "sms_c.inc"
 #include      "cong2_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(DT_)  , INTENT(INOUT)                      :: DT
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I
       CHARACTER (LEN=255) :: VARNAME
       DOUBLE PRECISION TEMP_DOUBLE
-C-----------------------------------------------
-C   E x t e r n a l   F u n c t i o n s
-C-----------------------------------------------
 C=======================================================================
 C-----------------------------------------------
 C     QA PRINT FOR DT INPUTS
@@ -86,11 +85,11 @@ C         VARNAME: variable name in ref.extract (without blanks)
         ENDDO
 
         WRITE(VARNAME,'(A)') 'MIN_ASPECT'
-        TEMP_DOUBLE = MIN_ASPECT
+        TEMP_DOUBLE = DT%BRICK_CST_COL_MIN
         CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),0,TEMP_DOUBLE)
 
         WRITE(VARNAME,'(A)') 'MIN_DEFV'
-        TEMP_DOUBLE = MIN_DEFV
+        TEMP_DOUBLE = DT%BRICK_CST_DEFV_MIN
         CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),0,TEMP_DOUBLE)
 
 C-----------------------------------------------
@@ -156,9 +155,6 @@ C-----------------------------------------------
 
         WRITE(VARNAME,'(A)') 'IDT1SH'
         CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),IDT1SH,0.0_8)
-
-        WRITE(VARNAME,'(A)') 'IDTHEPH'
-        CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),IDTHEPH,0.0_8)
 
         WRITE(VARNAME,'(A)') 'IDT1SOL'
         CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),IDT1SOL,0.0_8)

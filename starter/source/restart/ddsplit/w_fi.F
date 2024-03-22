@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  W_FI                          source/restart/ddsplit/w_fi.F 
 Chd|-- called by -----------
@@ -27,18 +27,18 @@ Chd|        DDSPLIT                       source/restart/ddsplit/ddsplit.F
 Chd|-- calls ---------------
 Chd|        MY_ORDERS                     ../common_source/tools/sort/my_orders.c
 Chd|        PLIST_IFRONT                  source/spmd/node/ddtools.F    
-Chd|        WRITE_I_C                     source/output/tools/write_routines.c
+Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|        ID                            source/boundary_conditions/ebcs/hm_read_ebcs_inlet.F
 Chd|        NLOCAL                        source/spmd/node/ddtools.F    
 Chd|        FRONT_MOD                     share/modules1/front_mod.F    
 Chd|        I25_FIE_MOD                   share/modules1/i25_fie_mod.F  
 Chd|        I7I10SPLITMOD                 share/modules1/i710split_mod.F
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|====================================================================
       SUBROUTINE W_FI(IPARI,PROC,LEN_IA,
      1                INTERCEP ,INTBUF_TAB,ITAB,MULTI_FVM,TAG,
-     2                NINDX_TAG,INDX_TAG  ,NODLOCAL,NUMNOD_L)
+     2                NINDX_TAG,INDX_TAG  ,NODLOCAL,NUMNOD_L,LEN_CEP,CEP)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -51,7 +51,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "mvsiz_p.inc"
 #include      "assert.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
@@ -59,7 +58,6 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "ige3d_c.inc"
 C-----------------------------------------------
       TYPE INTERMASURFEP
         INTEGER, DIMENSION(:), POINTER :: P
@@ -91,6 +89,8 @@ C-----------------------------------------------
       TYPE(INTERSURFP) :: INTERCEP(3,NINTER)
       TYPE(INTBUF_STRUCT_) INTBUF_TAB(*)
       TYPE(MULTI_FVM_STRUCT), INTENT(IN) :: MULTI_FVM
+      INTEGER, INTENT(in) :: LEN_CEP !< size of cep
+      INTEGER, DIMENSION(LEN_CEP), INTENT(in) :: CEP !< element -> proc connectivity array
 C-----------------------------------------------
 C   F u n c t i o n
 C-----------------------------------------------
@@ -121,26 +121,32 @@ C-----------------------------------------------
       INTEGER SPLIST
       INTEGER, DIMENSION(:),ALLOCATABLE :: TABZERO
       INTEGER, DIMENSION(:), ALLOCATABLE :: LEDGE_FIE
+      INTEGER :: INTER_LAW151
+      LOGICAL :: INTER18_LAW151
 C-----------------------------------------------
 C
 
       DO NI =1, NINTER
         NINDX_TAG = 0
         ITYP = IPARI(7,NI)
+        INACTI = IPARI(22,NI)
+        INTER_LAW151 = IPARI(14,NI)
+        INTER18_LAW151 = .FALSE.
+
+        IF(ITYP==7.AND.INACTI==7.AND.INTER_LAW151==151) INTER18_LAW151 = .TRUE.
 C
         IF(ITYP==7.OR.ITYP==10.OR.ITYP==11.OR.
      .    (ITYP==17.AND.IPARI(33,NI)==0).OR.ITYP==20.OR.
      .    ITYP==22.OR.ITYP==23.OR.ITYP==24.OR.ITYP==25)THEN
-Cel ecriture nsnsi : 0
+C   ecriture nsnsi : 0
           DO P = 1, NSPMD
             NSNFI(P) = 0
           END DO
           CALL WRITE_I_C(NSNFI,NSPMD) ! NSNSI at engine
           LEN_IA = LEN_IA + NSPMD
-          INACTI = IPARI(22,NI)
           IF(((INACTI/=5.AND.INACTI/=6.AND.INACTI/=7).OR.
      .        ITYP==10).AND.ITYP/=23.AND.INACTI/=-1) THEN
-Cel ecriture nsnfi : 0 si inacti # 5, 6 et 7
+C   ecriture nsnfi : 0 si inacti # 5, 6 et 7
             CALL WRITE_I_C(NSNFI,NSPMD) ! nsnfi at engine
             LEN_IA = LEN_IA + NSPMD
           ELSE
@@ -199,17 +205,24 @@ C
                   NSNLOCAL(K) = 0
                   IF(TAG(N)==0) THEN 
                      SPLIST=0 
-                     IF(N<=NUMNOD) THEN
-                        CALL PLIST_IFRONT(PLIST,N,SPLIST) 
-                        PLOC = 0
-                        IF(NODLOCAL(N)/=0.AND.NODLOCAL(N)<=NUMNOD_L) PLOC = 1
+                     PLOC = 0
+                     IF(INTER18_LAW151) THEN
+                        IF(CEP(N)==PROC) PLOC = 1
+                        SPLIST = 1
+                        PLIST(1) = CEP(N) + 1
                      ELSE
+                         IF(N<=NUMNOD) THEN
+                            CALL PLIST_IFRONT(PLIST,N,SPLIST) 
+                            PLOC = 0
+                            IF(NODLOCAL(N)/=0.AND.NODLOCAL(N)<=NUMNOD_L) PLOC = 1
+                         ELSE
 C     T24 E2E Fictive nodes are only on 1 domain (But they are not nodes
-                        PLOC = 0
-                        SE1 = INTBUF_TAB(NI)%IS2SE(2*(N-NUMNOD-1)+1)
-                        PLIST(1)=INTERCEP(2,NI)%P(SE1)
-                        SPLIST=1
-                        IF(PLIST(1)==PROC+1)PLOC=1
+                            PLOC = 0
+                            SE1 = INTBUF_TAB(NI)%IS2SE(2*(N-NUMNOD-1)+1)
+                            PLIST(1)=INTERCEP(2,NI)%P(SE1)
+                            SPLIST=1
+                            IF(PLIST(1)==PROC+1)PLOC=1
+                         ENDIF
                      ENDIF
                      DO I=1,SPLIST
                         P=PLIST(I)
@@ -345,15 +358,15 @@ C
 
             CALL WRITE_I_C(ITAFI,NODFI) !ITAFI
             LEN_IA = LEN_IA + NODFI
-Cel ecriture bidon kinfi
+C   ecriture bidon kinfi
             CALL WRITE_I_C(NSVFI,NODFI)
             LEN_IA = LEN_IA + NODFI
-Cel Void writing for MATSFI
+C   Void writing for MATSFI
             IF (INTTH>0) THEN
                CALL WRITE_I_C(NSVFI,NODFI)
                LEN_IA = LEN_IA + NODFI
             ENDIF
-Cel Void writing for IPARTFRICSFI
+C   Void writing for IPARTFRICSFI
             IF (INTFRIC>0) THEN
                CALL WRITE_I_C(NSVFI,NODFI)
                LEN_IA = LEN_IA + NODFI
@@ -520,16 +533,16 @@ C
 C
             CALL WRITE_I_C(NSNFI,NSPMD)
             CALL WRITE_I_C(NSVFI,NODFI)
-Cel ecriture bidon itafi n1
+C   ecriture bidon itafi n1
             CALL WRITE_I_C(NSVFI,NODFI)
-Cel ecriture bidon itafi n2
+C   ecriture bidon itafi n2
             CALL WRITE_I_C(NSVFI,NODFI)
-Cel Void writing for MATSFI
+C   Void writing for MATSFI
             IF (INTTH>0) THEN
                CALL WRITE_I_C(NSVFI,NODFI)
                LEN_IA = LEN_IA + NODFI
             ENDIF
-Cel Void writing for IPARTSFI
+C   Void writing for IPARTSFI
             IF (INTFRIC>0) THEN
                CALL WRITE_I_C(NSVFI,NODFI)
                LEN_IA = LEN_IA + NODFI
@@ -643,16 +656,16 @@ C
             LEN_IA = LEN_IA + NSPMD
             CALL WRITE_I_C(NSVFI,NODFI)
             LEN_IA = LEN_IA + NODFI
-Cel ecriture bidon itafi
+C   ecriture bidon itafi
             CALL WRITE_I_C(NSVFI,NODFI)
             LEN_IA = LEN_IA + NODFI
-Cel ecriture bidon kinfi
+C   ecriture bidon kinfi
             CALL WRITE_I_C(NSVFI,NODFI)
             LEN_IA = LEN_IA + NODFI
-Cel ecriture bidon nbinflfi
+C   ecriture bidon nbinflfi
             CALL WRITE_I_C(NSVFI,NODFI)
             LEN_IA = LEN_IA + NODFI
-Cel Void writing for MATSFI
+C   Void writing for MATSFI
             IF (INTTH>0) THEN
                CALL WRITE_I_C(NSVFI,NODFI)
                LEN_IA = LEN_IA + NODFI
@@ -667,14 +680,14 @@ C fin interface de contact inacti
           END IF
 C Type20 ajout pour edge
           IF (ITYP==20)THEN
-Cel ecriture nsnsie : 0
+C   ecriture nsnsie : 0
              DO P = 1, NSPMD
                NSNFI(P) = 0
              END DO
              CALL WRITE_I_C(NSNFI,NSPMD)
              INACTI = IPARI(22,NI)
              IF(INACTI/=5.AND.INACTI/=6.AND.INACTI/=7) THEN
-Cel ecriture nsnfie : 0 si inacti # 5, 6 et 7
+C   ecriture nsnfie : 0 si inacti # 5, 6 et 7
                CALL WRITE_I_C(NSNFI,NSPMD)
              ELSE
                NRTS   = IPARI(3,NI)
@@ -787,9 +800,9 @@ C
 C
                CALL WRITE_I_C(NSNFI,NSPMD)
                CALL WRITE_I_C(NSVFI,NODFI)
-Cel ecriture bidon itafi n1
+C   ecriture bidon itafi n1
                CALL WRITE_I_C(NSVFI,NODFI)
-Cel ecriture bidon itafi n2
+C   ecriture bidon itafi n2
                CALL WRITE_I_C(NSVFI,NODFI)
 C
                DEALLOCATE(NRTSLOCAL)
@@ -830,9 +843,9 @@ C LEDGE_FIE
                 LEDGE_FIE(E_IBUF_SIZE*(K-1) + 7) = INTBUF_TAB(NI)%LEDGE(6+ (J-1)*NLEDGE) 
                 LEDGE_FIE(E_IBUF_SIZE*(K-1) + 8) = INTBUF_TAB(NI)%LEDGE(7+ (J-1)*NLEDGE) 
                 ! global id node 1
-                LEDGE_FIE(E_IBUF_SIZE*(K-1) + 9) = ITAB(LEDGE_FIE(E_IBUF_SIZE*(K-1) + 7))
+                LEDGE_FIE(E_IBUF_SIZE*(K-1) + 9) = ITAB(LEDGE_FIE(E_IBUF_SIZE*(K-1) + 6))
                 !global id node 2
-                LEDGE_FIE(E_IBUF_SIZE*(K-1) +10) = ITAB(LEDGE_FIE(E_IBUF_SIZE*(K-1) + 8))
+                LEDGE_FIE(E_IBUF_SIZE*(K-1) +10) = ITAB(LEDGE_FIE(E_IBUF_SIZE*(K-1) + 7))
                 ! IM
                 LEDGE_FIE(E_IBUF_SIZE*(K-1) +11) = INTBUF_TAB(NI)%LEDGE(10 + (J-1)*NLEDGE) 
                 ! LocalID
@@ -846,7 +859,7 @@ C LEDGE_FIE
               ENDDO
               NSNE =  E_IBUF_SIZE*NEDGE_KEPT
               CALL WRITE_I_C(LEDGE_FIE,NSNE) ! LEDGE_FIE
-Cel Void writing for IPARTFRIC_FIE
+C   Void writing for IPARTFRIC_FIE
               IF (INTFRIC>0) THEN
                   CALL WRITE_I_C(I25_FIE(NI,PROC+1)%ID(1:NEDGE_KEPT),NEDGE_KEPT)
                ENDIF
@@ -871,13 +884,13 @@ C
         IF(ITYP==21 ) THEN
           INTTH = IPARI(47,NI)
           IF(INTTH==2.OR.IPARI(95,NI) > 0) THEN
-Cel ecriture NMNSI : 0
+C   ecriture NMNSI : 0
           DO P = 1, NSPMD
             NMNFI(P) = 0
           END DO
           CALL WRITE_I_C(NMNFI,NSPMD)
           LEN_IA = LEN_IA + NSPMD
-Cel ecriture nmnfi : 0
+C   ecriture nmnfi : 0
           CALL WRITE_I_C(NMNFI,NSPMD)
           LEN_IA = LEN_IA + NSPMD
 C

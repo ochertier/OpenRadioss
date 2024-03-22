@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  R2LEN3                        source/elements/spring/r2len3.F
 Chd|-- called by -----------
@@ -29,11 +29,13 @@ Chd|        R23LAW114                     source/elements/spring/r23law114.F
 Chd|        RFORC3                        source/elements/spring/rforc3.F
 Chd|-- calls ---------------
 Chd|====================================================================
-      SUBROUTINE R2LEN3(JFT    ,JLT   ,OFF  ,DT2T ,NELTST ,
-     2                  ITYPTST,STI   ,STIR ,MS   ,IN     ,
-     3                  MSRT   ,DMELRT,G_DT ,DTEL ,NGL    ,
-     4                  XCR    ,XIN   ,XM   ,XKM  ,XCM    ,
-     5                  XKR    ,NC1   ,NC2  )
+      SUBROUTINE R2LEN3(
+     1   JFT,     JLT,     OFF,     DT2T,
+     2   NELTST,  ITYPTST, STI,     STIR,
+     3   MS,      IN,      MSRT,    DMELRT,
+     4   G_DT,    DTEL,    NGL,     XCR,
+     5   XIN,     XM,      XKM,     XCM,
+     6   XKR,     NC1,     NC2,     JSMS)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -47,18 +49,16 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com08_c.inc"
-#include      "couple_c.inc"
 #include      "scr02_c.inc"
 #include      "scr07_c.inc"
 #include      "scr17_c.inc"
 #include      "scr18_c.inc"
 #include      "sms_c.inc"
 #include      "units_c.inc"
-#include      "vect01_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: JSMS
       INTEGER JFT,JLT,NELTST ,ITYPTST,NGL(*),NC1(*),NC2(*)
       my_real DT2T,
      .   OFF(*), STI(3,*), STIR(3,*), MS(*), IN(*),
@@ -230,7 +230,7 @@ C
          STI(2,I) = ZERO
          STIR(1,I) = ZERO
          STIR(2,I) = ZERO
-         IF(OFF(I)>ZERO) THEN	 
+         IF(OFF(I)>ZERO) THEN   
            STI(1,I) = XM(I) / DT(I)**2
            STI(2,I) = STI(1,I)
          ENDIF

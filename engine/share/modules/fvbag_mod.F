@@ -1,31 +1,33 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  FVBAG_MOD                     share/modules/fvbag_mod.F     
 Chd|-- called by -----------
 Chd|        ALEVEC                        source/output/anim/generate/genani.F
 Chd|        ALEVFLU                       source/output/anim/generate/genani.F
 Chd|        ANIMBALE                      source/output/anim/generate/genani.F
+Chd|        ANIM_NODAL_CONTOUR_FVMBAGS    source/output/anim/generate/anim_nodal_contour_fvmbags.F
+Chd|        ANIM_NODAL_VECTOR_FVMBAGS     source/output/anim/generate/anim_nodal_vector_fvmbags.F
 Chd|        FREFORM                       source/input/freform.F        
 Chd|        FVBAG0                        source/airbag/fvbag0.F        
 Chd|        FVBAG1                        source/airbag/fvbag1.F        
@@ -48,8 +50,18 @@ Chd|        FV_SWITCH_CRIT                source/airbag/fvdim.F
 Chd|        FV_UP_SWITCH                  source/airbag/fv_up_switch.F  
 Chd|        GENANI                        source/output/anim/generate/genani.F
 Chd|        GENH3D                        source/output/h3d/h3d_results/genh3d.F
+Chd|        H3D_CREATE_FVMBAG_CENTROIDS   source/output/h3d/h3d_build_fortran/h3d_create_fvmbag_centroids.F
+Chd|        H3D_NODAL_SCALAR              source/output/h3d/h3d_results/h3d_nodal_scalar.F
+Chd|        H3D_NODAL_VECTOR              source/output/h3d/h3d_results/h3d_nodal_vector.F
+Chd|        H3D_UPDATE_FVMBAG_CENTROIDS   source/output/h3d/h3d_build_fortran/h3d_update_fvmbag_centroids.F
 Chd|        LECFVBAG                      source/input/lecfvbag.F       
 Chd|        LECTUR                        source/input/lectur.F         
+Chd|        NODALD                        source/output/anim/generate/nodald.F
+Chd|        NODALDT                       source/output/anim/generate/nodaldt.F
+Chd|        NODALP                        source/output/anim/generate/nodalp.F
+Chd|        NODALSSP                      source/output/anim/generate/nodalssp.F
+Chd|        NODALT                        source/output/anim/generate/nodalt.F
+Chd|        NODALVOL                      source/output/anim/generate/nodalvol.F
 Chd|        RESOL                         source/engine/resol.F         
 Chd|        SORTIE_MAIN                   source/output/sortie_main.F   
 Chd|        SPMD_EXCH_FVSTATS             source/mpi/airbags/spmd_exch_fvstats.F
@@ -136,8 +148,11 @@ C-----------------------------------------------
      .                                    RPOLH,   GPOLH,   TPOLH,
      .                                    CPAPOLH, CPBPOLH, CPCPOLH, 
      .                                    CPDPOLH, CPEPOLH, CPFPOLH,
-     .                                    RMWPOLH, VPOLH_INI
-        my_real, DIMENSION(:,:), POINTER :: QPOLH
+     .                                    RMWPOLH, VPOLH_INI,
+     .                                    SSPPOLH !SSPPOLH : output purpose only (sound speed in polyhedra)          
+        my_real, DIMENSION(:,:), POINTER :: QPOLH     
+        my_real, DIMENSION(:,:), POINTER :: CENTROID_POLH !output purpose only (centroids positions)
+        
         !---------------------------
         ! Variables stabilite
         !---------------------------
@@ -174,6 +189,8 @@ C-----------------------------------------------
 C   G l o b a l   V a r i a b l e s   D e f i n i t i o n
 C-----------------------------------------------
       INTEGER NFVBAG
+      INTEGER AIRBAGS_TOTAL_FVM_IN_H3D ! number of polyhedra/centroids at first cycle (upper bound for following cycle due to merging) Visualization purpose only.
+      
       TYPE(FVBAG_DATA), DIMENSION(:), ALLOCATABLE :: FVDATA, FVDATA_OLD
       TYPE(FVBAG_SPMD), DIMENSION(:), ALLOCATABLE :: FVSPMD
 C-----------------------------------------------      

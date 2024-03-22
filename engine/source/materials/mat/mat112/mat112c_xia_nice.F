@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  MAT112C_XIA_NICE              source/materials/mat/mat112/mat112c_xia_nice.F
 Chd|-- called by -----------
@@ -50,9 +50,6 @@ Chd|====================================================================
       !=======================================================================
       !      Common
       !=======================================================================
-#include      "param_c.inc" 
-#include      "com01_c.inc"
-#include      "scr17_c.inc"
 #include      "com04_c.inc"
       !=======================================================================
       !      Dummy arguments
@@ -219,7 +216,7 @@ c
         !   -> Tensile yield stress in direction 1 (MD)
         IPOS(1:NEL,1) = VARTMP(1:NEL,1)
         IPOS(1:NEL,2) = 1
-        CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(1)),ISMOOTH,NEL,IPOS,XVEC,SIGY1,DSIGY1_DP,HARDR)
+        CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(1)),ISMOOTH,NEL,NEL,IPOS,XVEC,SIGY1,DSIGY1_DP,HARDR)
         SIGY1(1:NEL)    = SIGY1(1:NEL) * YSCALE1
         DSIGY1_DP(1:NEL)= DSIGY1_DP(1:NEL) * YSCALE1
         VARTMP(1:NEL,1) = IPOS(1:NEL,1)
@@ -227,7 +224,7 @@ c
         XVEC(1:NEL,2)   = EPSD(1:NEL,2) * XSCALE2
         IPOS(1:NEL,1)   = VARTMP(1:NEL,2)
         IPOS(1:NEL,2)   = 1
-        CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(2)),ISMOOTH,NEL,IPOS,XVEC,SIGY2,DSIGY2_DP,HARDR)
+        CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(2)),ISMOOTH,NEL,NEL,IPOS,XVEC,SIGY2,DSIGY2_DP,HARDR)
         SIGY2(1:NEL)    = SIGY2(1:NEL) * YSCALE2
         DSIGY2_DP(1:NEL)= DSIGY2_DP(1:NEL) * YSCALE2
         VARTMP(1:NEL,2) = IPOS(1:NEL,1)  
@@ -235,7 +232,7 @@ c
         XVEC(1:NEL,2) = EPSD(1:NEL,2) * XSCALE3
         IPOS(1:NEL,1) = VARTMP(1:NEL,3)
         IPOS(1:NEL,2) = 1
-        CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(3)),ISMOOTH,NEL,IPOS,XVEC,SIGY3,DSIGY3_DP,HARDR)
+        CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(3)),ISMOOTH,NEL,NEL,IPOS,XVEC,SIGY3,DSIGY3_DP,HARDR)
         SIGY3(1:NEL)    = SIGY3(1:NEL) * YSCALE3
         DSIGY3_DP(1:NEL)= DSIGY3_DP(1:NEL) * YSCALE3
         VARTMP(1:NEL,3) = IPOS(1:NEL,1)
@@ -243,7 +240,7 @@ c
         XVEC(1:NEL,2) = EPSD(1:NEL,2) * XSCALE4
         IPOS(1:NEL,1) = VARTMP(1:NEL,4)
         IPOS(1:NEL,2) = 1
-        CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(4)),ISMOOTH,NEL,IPOS,XVEC,SIGY4,DSIGY4_DP,HARDR)
+        CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(4)),ISMOOTH,NEL,NEL,IPOS,XVEC,SIGY4,DSIGY4_DP,HARDR)
         SIGY4(1:NEL)    = SIGY4(1:NEL) * YSCALE4
         DSIGY4_DP(1:NEL)= DSIGY4_DP(1:NEL) * YSCALE4
         VARTMP(1:NEL,4) = IPOS(1:NEL,1) 
@@ -251,7 +248,7 @@ c
         XVEC(1:NEL,2) = EPSD(1:NEL,2) * XSCALE5
         IPOS(1:NEL,1) = VARTMP(1:NEL,5)
         IPOS(1:NEL,2) = 1
-        CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(5)),ISMOOTH,NEL,IPOS,XVEC,SIGY5,DSIGY5_DP,HARDR)
+        CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(5)),ISMOOTH,NEL,NEL,IPOS,XVEC,SIGY5,DSIGY5_DP,HARDR)
         SIGY5(1:NEL)    = SIGY5(1:NEL) * YSCALE5
         DSIGY5_DP(1:NEL)= DSIGY5_DP(1:NEL) * YSCALE5
         VARTMP(1:NEL,5) = IPOS(1:NEL,1)
@@ -261,7 +258,7 @@ c
         !   -> Transverse shear yield stress
         IPOS(1:NEL,1) = VARTMP(1:NEL,7)
         IPOS(1:NEL,2) = 1
-        CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(7)),ISMOOTH,NEL,IPOS,XVEC,SIGYS,DSIGYS_DP,HARDR)
+        CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(7)),ISMOOTH,NEL,NEL,IPOS,XVEC,SIGYS,DSIGYS_DP,HARDR)
         SIGYS(1:NEL)    = SIGYS(1:NEL) * YSCALES
         DSIGYS_DP(1:NEL)= DSIGYS_DP(1:NEL) * YSCALES
         VARTMP(1:NEL,7) = IPOS(1:NEL,1)
@@ -350,20 +347,20 @@ c
 #include "vectorize.inc" 
       DO II=1,NINDX   
 c      
-        ! Number of the element with plastic behaviour  	                                           
+        ! Number of the element with plastic behaviour                                               
         I = INDEX(II)
 c        
         ! Note     : in this part, the purpose is to compute for each iteration
         ! a plastic multiplier allowing to update internal variables to satisfy
         ! the consistency condition. 
         ! Its expression is : DLAMBDA = - (PHI0 + DPHI) / DPHI_DLAMBDA
-	! -> PHI0 : old value of yield function (known)
+          ! -> PHI0 : old value of yield function (known)
         ! -> DPHI : yield function prediction (to compute)
         ! -> DPHI_DLAMBDA : derivative of PHI with respect to DLAMBDA by taking
         !                   into account of internal variables kinetic : 
         !                   plasticity, temperature and damage (to compute) 
 c        
-	! 1 - Computation of DPHI_DSIG the normal to the yield criterion
+          ! 1 - Computation of DPHI_DSIG the normal to the yield criterion
         !-------------------------------------------------------------          
 c    
         ! Computation of derivatives to the yield criterion
@@ -519,20 +516,20 @@ c
 #include "vectorize.inc" 
       DO II=1,NINDX2   
 c      
-        ! Number of the element with plastic behaviour  	                                           
+        ! Number of the element with plastic behaviour                                               
         I = INDEX2(II)
 c        
         ! Note     : in this part, the purpose is to compute for each iteration
         ! a plastic multiplier allowing to update internal variables to satisfy
         ! the consistency condition. 
         ! Its expression is : DLAMBDA = - (PHI + DPHI) / DPHI_DLAMBDA
-	! -> PHI  : current value of yield function (known)
+          ! -> PHI  : current value of yield function (known)
         ! -> DPHI : yield function prediction (to compute)
         ! -> DPHI_DLAMBDA : derivative of PHI with respect to DLAMBDA by taking
         !                   into account of internal variables kinetic : 
         !                   plasticity, temperature and damage (to compute) 
 c        
-	! 1 - Computation of DPHI_DSIG the normal to the yield criterion
+          ! 1 - Computation of DPHI_DSIG the normal to the yield criterion
         !-------------------------------------------------------------          
 c    
         ! Computation of derivatives to the yield criterion
@@ -615,7 +612,7 @@ c
           !   -> Tensile yield stress in direction 1 (MD)
           IPOS(1:NEL,1)   = VARTMP(1:NEL,1)
           IPOS(1:NEL,2)   = 1
-          CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(1)),ISMOOTH,NEL,IPOS,XVEC,SIGY1,DSIGY1_DP,HARDR)
+          CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(1)),ISMOOTH,NEL,NEL,IPOS,XVEC,SIGY1,DSIGY1_DP,HARDR)
           SIGY1(1:NEL)    = SIGY1(1:NEL) * YSCALE1
           DSIGY1_DP(1:NEL)= DSIGY1_DP(1:NEL) * YSCALE1
           VARTMP(1:NEL,1) = IPOS(1:NEL,1)
@@ -623,7 +620,7 @@ c
           XVEC(1:NEL,2)   = EPSD(1:NEL,2) * XSCALE2
           IPOS(1:NEL,1)   = VARTMP(1:NEL,2)
           IPOS(1:NEL,2)   = 1
-          CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(2)),ISMOOTH,NEL,IPOS,XVEC,SIGY2,DSIGY2_DP,HARDR)
+          CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(2)),ISMOOTH,NEL,NEL,IPOS,XVEC,SIGY2,DSIGY2_DP,HARDR)
           SIGY2(1:NEL)    = SIGY2(1:NEL) * YSCALE2
           DSIGY2_DP(1:NEL)= DSIGY2_DP(1:NEL) * YSCALE2
           VARTMP(1:NEL,2) = IPOS(1:NEL,1)  
@@ -631,7 +628,7 @@ c
           XVEC(1:NEL,2) = EPSD(1:NEL,2) * XSCALE3
           IPOS(1:NEL,1) = VARTMP(1:NEL,3)
           IPOS(1:NEL,2) = 1
-          CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(3)),ISMOOTH,NEL,IPOS,XVEC,SIGY3,DSIGY3_DP,HARDR)
+          CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(3)),ISMOOTH,NEL,NEL,IPOS,XVEC,SIGY3,DSIGY3_DP,HARDR)
           SIGY3(1:NEL)    = SIGY3(1:NEL) * YSCALE3
           DSIGY3_DP(1:NEL)= DSIGY3_DP(1:NEL) * YSCALE3
           VARTMP(1:NEL,3) = IPOS(1:NEL,1)
@@ -639,7 +636,7 @@ c
           XVEC(1:NEL,2) = EPSD(1:NEL,2) * XSCALE4
           IPOS(1:NEL,1) = VARTMP(1:NEL,4)
           IPOS(1:NEL,2) = 1
-          CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(4)),ISMOOTH,NEL,IPOS,XVEC,SIGY4,DSIGY4_DP,HARDR)
+          CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(4)),ISMOOTH,NEL,NEL,IPOS,XVEC,SIGY4,DSIGY4_DP,HARDR)
           SIGY4(1:NEL)    = SIGY4(1:NEL) * YSCALE4
           DSIGY4_DP(1:NEL)= DSIGY4_DP(1:NEL) * YSCALE4
           VARTMP(1:NEL,4) = IPOS(1:NEL,1) 
@@ -647,12 +644,14 @@ c
           XVEC(1:NEL,2) = EPSD(1:NEL,2) * XSCALE5
           IPOS(1:NEL,1) = VARTMP(1:NEL,5)
           IPOS(1:NEL,2) = 1
-          CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(5)),ISMOOTH,NEL,IPOS,XVEC,SIGY5,DSIGY5_DP,HARDR)
+          CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(5)),ISMOOTH,NEL,NEL,IPOS,XVEC,SIGY5,DSIGY5_DP,HARDR)
           SIGY5(1:NEL)    = SIGY5(1:NEL) * YSCALE5
           DSIGY5_DP(1:NEL)= DSIGY5_DP(1:NEL) * YSCALE5
           VARTMP(1:NEL,5) = IPOS(1:NEL,1)          
           ! Yield function value update
-          DO I = 1,NEL
+#include "vectorize.inc" 
+          DO II=1,NINDX 
+            I = INDEX(II)
             GAM1(I) = (N1(1)*SIGNXX(I)+N1(2)*SIGNYY(I))/SIGY1(I)
             GAM2(I) = (N2(1)*SIGNXX(I)+N2(2)*SIGNYY(I))/SIGY2(I)
             GAM3(I) = N3*SIGNXY(I)/SIGY3(I)
@@ -671,12 +670,14 @@ c
           ! Transverse shear yield stress
           IPOS(1:NEL,1) = VARTMP(1:NEL,7)
           IPOS(1:NEL,2) = 1
-          CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(7)),ISMOOTH,NEL,IPOS,XVEC,SIGYS,DSIGYS_DP,HARDR)
+          CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(7)),ISMOOTH,NEL,NEL,IPOS,XVEC,SIGYS,DSIGYS_DP,HARDR)
           SIGYS(1:NEL)    = SIGYS(1:NEL) * YSCALES
           DSIGYS_DP(1:NEL)= DSIGYS_DP(1:NEL) * YSCALES
           VARTMP(1:NEL,7) = IPOS(1:NEL,1)
           ! Yield function value update
-          DO I = 1,NEL
+#include "vectorize.inc" 
+          DO II=1,NINDX2 
+            I = INDEX2(II)
             PSI(I) = (SQRT(SIGNYZ(I)**2 + SIGNZX(I)**2)/SIGYS(I)) - ONE
           ENDDO
         ENDIF
@@ -685,8 +686,8 @@ c
       ! Storing new values
       DO I=1,NEL  
         ! USR Outputs
-        UVAR(I,1) = PHI(I) ! In-plane yield function value
-        UVAR(I,2) = PSI(I) ! Transverse shear yield function value
+        UVAR(I,1) = ZERO ! Reset in-plane yield function value
+        UVAR(I,2) = ZERO ! Reset transverse shear yield function value
         ! Plastic strain
         PLA(I,1)  = SQRT(PLA(I,2)**2 + PLA(I,4)**2)
         DPLA(I)   = (PLA(I,2)/(MAX(SQRT(PLA(I,2)**2 + PLA(I,4)**2),EM20)))*DPLA2(I) +
@@ -711,6 +712,20 @@ c
         ! Storing the yield stress
         SIGY(I) = SQRT(SIGY1(I)**2 + SIGY2(I)**2      + SIGY4(I)**2 + 
      .                 SIGY5(I)**2 + TWO*SIGY3(I)**2 + TWO*SIGYS(I)**2)
+      ENDDO
+c
+      ! Save in-plane yield function remaining value
+#include "vectorize.inc" 
+      DO II=1,NINDX                                              
+        I = INDEX(II)
+        UVAR(I,1) = PHI(I) 
+      ENDDO
+c
+      ! Save transverse shear yield function remaining value
+#include "vectorize.inc" 
+      DO II=1,NINDX2                                            
+        I = INDEX2(II)
+        UVAR(I,2) = PSI(I) 
       ENDDO
 c
       END

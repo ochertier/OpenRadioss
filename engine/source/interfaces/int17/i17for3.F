@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  I17FOR3                       source/interfaces/int17/i17for3.F
 Chd|-- called by -----------
@@ -31,6 +31,7 @@ Chd|        I17LLL_ASS                    source/interfaces/int17/i17for3.F
 Chd|        I17LLL_PENA                   source/interfaces/int17/i17for3.F
 Chd|        MY_BARRIER                    source/system/machine.F       
 Chd|        SPMD_I17FROTS_PON             source/mpi/interfaces/spmd_i17frots_pon.F
+Chd|        ANIM_MOD                      ../common_source/modules/anim_mod.F
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|        ICONTACT_MOD                  share/modules/icontact_mod.F  
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
@@ -51,6 +52,7 @@ C-----------------------------------------------
       USE ICONTACT_MOD
       USE MESSAGE_MOD
       USE H3D_MOD
+      USE ANIM_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -64,16 +66,8 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "task_c.inc"
-#include      "warn_c.inc"
-#include      "scr05_c.inc"
-#include      "scr07_c.inc"
-#include      "scr18_c.inc"
-#include      "units_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com08_c.inc"
-#include      "param_c.inc"
-#include      "couple_c.inc"
 #include      "parit_c.inc"
       COMMON /I17GLOBI/IE_MIN,IES_MIN
       COMMON /I17GLOBR/VIT_MIN
@@ -278,6 +272,7 @@ Chd|        I17LLL4_PENA                  source/interfaces/int17/i17for3.F
 Chd|        I17MINI_PENA                  source/interfaces/int17/i17for3.F
 Chd|        I17RST                        source/interfaces/int17/i17lagm.F
 Chd|        I17VIT_PENA                   source/interfaces/int17/i17for3.F
+Chd|        ANIM_MOD                      ../common_source/modules/anim_mod.F
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|====================================================================
       SUBROUTINE I17LLL_PENA(
@@ -292,6 +287,7 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE H3D_MOD
+      USE ANIM_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -301,11 +297,6 @@ C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com08_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -340,7 +331,6 @@ C-----------------------------------------------
      .   AREA_EL(MVSIZ)        
 C-----------------------------------------------
 C      calcul de r,s,t
-C-----------------------------------------------
 C-----------------------------------------------
 C      noeud centrale face 1 2 3 4
 C-----------------------------------------------
@@ -533,9 +523,6 @@ C     REAL
      + NX(MVSIZ) ,NY(MVSIZ) ,NZ(MVSIZ) ,AREA(MVSIZ) ,AREA_TOT(MVSIZ),
      + AREA_EL(MVSIZ)  
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,ITER,NITERMAX,IR,IT
@@ -551,7 +538,6 @@ C-----------------------------------------------
      +        P,RM,TM,SM,PP,RR,TT,AA,RT(9),AS(9)
       DATA RT/-1.,-0.75,-0.5,-0.25,0.0,0.25,0.5,0.75,1./
       DATA AS/0.0625,0.125,0.125,0.125,0.125,0.125,0.125,0.125,0.0625/
-C-----------------------------------------------
 C-----------------------------------------------
 C ro = r ri    to = t ti
 C
@@ -888,10 +874,10 @@ c-----------------------------------------------------------------------
           T_CS(I) = TT / PP
           CALL  I17ABC_PENA(I,RI_S,R_CS(I),T_CS(I),
      +                   BB1 ,BB2 ,BB3 ,CC1 ,CC2 ,CC3 )
-          R_CM(I) = BB1 + (BB2 + BB3*RT(IR))*RT(IR)
+          R_CM(I) = BB1 + (BB2 + BB3*R_CS(I))*R_CS(I)
           CALL  I17ABC_PENA(I,TI_S,R_CS(I),T_CS(I),
      +                   BB1 ,BB2 ,BB3 ,CC1 ,CC2 ,CC3 )
-          T_CM(I) = CC1 + (CC2 + CC3*RT(IT))*RT(IT)
+          T_CM(I) = CC1 + (CC2 + CC3*T_CS(I))*T_CS(I)
           CALL  I17ABC_PENA(I,SI_S,R_CS(I),T_CS(I),
      +                   BB1 ,BB2 ,BB3 ,CC1 ,CC2 ,CC3 )
           S_CM(I) = CC1 + (CC2 + CC3*T_CS(I))*T_CS(I)
@@ -977,7 +963,6 @@ C  A5 = (+f1 + f2 + f3 + f4         - 2 f6         - 2 f8)/4
 C  A6 = (+f1 + f2 + f3 + f4 - 2 f5         - 2 f7        )/4   
 C  A7 = (-f1 + f2 + f3 - f4         - 2 f6         + 2 f8)/4   
 C  A8 = (-f1 - f2 + f3 + f4 + 2 f5         - 2 f7        )/4  
-C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -1431,11 +1416,6 @@ C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com08_c.inc"
-#include      "units_c.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER LLT,NINT   
@@ -1509,6 +1489,7 @@ Chd|        I17LLL_PENA                   source/interfaces/int17/i17for3.F
 Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
 Chd|        ARRET                         source/system/arret.F         
+Chd|        ANIM_MOD                      ../common_source/modules/anim_mod.F
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|        ICONTACT_MOD                  share/modules/icontact_mod.F  
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
@@ -1530,6 +1511,7 @@ C-----------------------------------------------
       USE ICONTACT_MOD
       USE MESSAGE_MOD
       USE H3D_MOD
+      USE ANIM_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -1548,7 +1530,6 @@ C-----------------------------------------------
 #include      "scr16_c.inc"
 #include      "com06_c.inc"
 #include      "com08_c.inc"
-#include      "units_c.inc"
 #include      "parit_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -1955,7 +1936,7 @@ C-----------------------------------------------
            ENDIF
 C
            IF(ANIM_V(4)+OUTP_V(4)+H3D_DATA%N_VECT_CONT >0.AND.
-     .          (TT>=TANIM.OR.TT>=TOUTP.OR.TT>=H3D_DATA%TH3D.OR.
+     .          ((TT>=TANIM .AND. TT<=TANIM_STOP).OR.TT>=TOUTP.OR.(TT>=H3D_DATA%TH3D.AND.TT<=H3D_DATA%TH3D_STOP).OR.
      .              (MANIM>=4.AND.MANIM<=15).OR. H3D_DATA%MH3D /= 0))THEN
 #include "lockon.inc"
             DO IK=1,8
@@ -2029,7 +2010,7 @@ C
            ENDIF
 C
            IF(ANIM_V(4)+OUTP_V(4)+H3D_DATA%N_VECT_CONT >0.AND.
-     .          (TT>=TANIM.OR.TT>=TOUTP.OR.TT>=H3D_DATA%TH3D.OR.
+     .          ((TT>=TANIM .AND. TT<=TANIM_STOP).OR.TT>=TOUTP.OR.(TT>=H3D_DATA%TH3D.AND.TT<=H3D_DATA%TH3D_STOP).OR.
      .              (MANIM>=4.AND.MANIM<=15).OR. H3D_DATA%MH3D /= 0))THEN
 #include "lockon.inc"
             DO IK=1,8
@@ -2074,13 +2055,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

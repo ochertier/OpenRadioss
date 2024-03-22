@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  HM_READ_MAT112                source/materials/mat/mat112/hm_read_mat112.F
 Chd|-- called by -----------
@@ -32,7 +32,7 @@ Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.
 Chd|        HM_OPTION_IS_ENCRYPTED        source/devtools/hm_reader/hm_option_is_encrypted.F
 Chd|        INIT_MAT_KEYWORD              source/materials/mat/init_mat_keyword.F
 Chd|        ELBUFTAG_MOD                  share/modules1/elbuftag_mod.F 
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/matparam_def_mod.F
+Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
@@ -58,8 +58,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr17_c.inc"
 #include      "units_c.inc"
-#include      "submod_c.inc"
-#include      "sysunit.inc"
 #include      "param_c.inc"
 C
 C-----------------------------------------------
@@ -70,12 +68,12 @@ C-----------------------------------------------
       my_real, DIMENSION(NPROPM) ,INTENT(INOUT)    :: PM     
       CHARACTER*nchartitle ,INTENT(IN)             :: TITR
       INTEGER, INTENT(INOUT)                       :: ISRATE,ITABLE(MAXTABL)
-      INTEGER, INTENT(OUT)                         :: NUPARAM,NUVAR,NTABL,NVARTMP
-      my_real, DIMENSION(MAXUPARAM) ,INTENT(OUT)   :: UPARAM
+      INTEGER, INTENT(INOUT)                         :: NUPARAM,NUVAR,NTABL,NVARTMP
+      my_real, DIMENSION(MAXUPARAM) ,INTENT(INOUT)   :: UPARAM
       my_real, DIMENSION(100),INTENT(INOUT)        :: PARMAT
       TYPE(SUBMODEL_DATA), DIMENSION(*),INTENT(IN) :: LSUBMODEL
-      TYPE(MLAW_TAG_), INTENT(OUT)                 :: MTAG
-      TYPE(MATPARAM_STRUCT_) ,INTENT(OUT)          :: MATPARAM
+      TYPE(MLAW_TAG_), INTENT(INOUT)               :: MTAG
+      TYPE(MATPARAM_STRUCT_) ,INTENT(INOUT)        :: MATPARAM
 C     
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -356,7 +354,8 @@ c
       ISRATE    = 0
       PARMAT(4) = ZERO
       PARMAT(5) = ZERO
-      IF (ITAB > 0) ASRATE = 10000.0D0*FAC_T_WORK
+      ASRATE = ZERO
+      IF (ITAB > 0) ASRATE = 10000.0D0*UNITAB%FAC_T_WORK
 c
       ! Elasticity parameter
       !  Plane stress elastic constant
@@ -512,6 +511,12 @@ c
       CALL INIT_MAT_KEYWORD(MATPARAM ,"ELASTO_PLASTIC")
       CALL INIT_MAT_KEYWORD(MATPARAM ,"INCREMENTAL"   )
       CALL INIT_MAT_KEYWORD(MATPARAM ,"LARGE_STRAIN"  )
+      CALL INIT_MAT_KEYWORD(MATPARAM ,"HOOK")
+      CALL INIT_MAT_KEYWORD(MATPARAM ,"ORTHOTROPIC")
+c
+      ! Properties compatibility
+      CALL INIT_MAT_KEYWORD(MATPARAM,"SOLID_ORTHOTROPIC")
+      CALL INIT_MAT_KEYWORD(MATPARAM,"SHELL_ORTHOTROPIC")
 c
 c--------------------------
 c     Parameters printout
@@ -521,7 +526,7 @@ c--------------------------
       IF (IS_ENCRYPTED) THEN
         WRITE(IOUT,'(5X,A,//)')'CONFIDENTIAL DATA'
       ELSE
-        WRITE(IOUT,1200) RHO0,RHOR
+        WRITE(IOUT,1200) RHO0
         WRITE(IOUT,1300) YOUNG1,YOUNG2,YOUNG3,NU12,NU21,G12,G23,G31
         WRITE(IOUT,1350) Ires
         WRITE(IOUT,1400) K,E3C,CC,NU1P,NU2P,NU4P,NU5P
@@ -545,8 +550,7 @@ c-----------------------------------------------------------------------
      &(5X,'MATERIAL MODEL : PAPERBOARD (XIA,2002)',/,
      & 5X,'--------------------------------------',/)
  1200 FORMAT(
-     & 5X,'INITIAL DENSITY . . . . . . . . . . . .=',1PG20.13/
-     & 5X,'REFERENCE DENSITY . . . . . . . . . . .=',1PG20.13/) 
+     & 5X,'INITIAL DENSITY . . . . . . . . . . . .=',1PG20.13/) 
  1300 FORMAT(
      & 5X,'YOUNG MODULUS IN DIRECTION 1. . . . . .=',1PG20.13/
      & 5X,'YOUNG MODULUS IN DIRECTION 2. . . . . .=',1PG20.13/
@@ -564,10 +568,10 @@ c-----------------------------------------------------------------------
      & 5X,'YIELD CRITERION EXPONENT K  . . . . . .=',1PG20.13/
      & 5X,'ELASTIC COMPRESSION PARAMETER . . . . .=',1PG20.13/
      & 5X,'ELASTIC COMPRESSION EXPONENT  . . . . .=',1PG20.13/
-     & 5X,'TENSILE PLASTIC POISSON RATION IN DIR 1=',1PG20.13/
-     & 5X,'COMPRES PLASTIC POISSON RATION IN DIR 1=',1PG20.13/
-     & 5X,'TENSILE PLASTIC POISSON RATION IN DIR 2=',1PG20.13/
-     & 5X,'COMPRES PLASTIC POISSON RATION IN DIR 2=',1PG20.13/)
+     & 5X,'TENSILE PLASTIC POISSON RATIO IN DIR 1.=',1PG20.13/
+     & 5X,'COMPRES PLASTIC POISSON RATIO IN DIR 1.=',1PG20.13/
+     & 5X,'TENSILE PLASTIC POISSON RATIO IN DIR 2.=',1PG20.13/
+     & 5X,'COMPRES PLASTIC POISSON RATIO IN DIR 2.=',1PG20.13/)
  1500 FORMAT(
      & 5X,'-----------------------------------------------',/,
      & 5X,'YIELD STRESS IN TENSION IN DIRECTION 1 (MD)    ',/,

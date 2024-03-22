@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  I23COR3                       source/interfaces/int23/i23cor3.F
 Chd|-- called by -----------
@@ -29,16 +29,16 @@ Chd|        TRI7BOX                       share/modules/tri7box.F
 Chd|====================================================================
       SUBROUTINE I23COR3(JLT   ,NIN    ,X       ,IRECT ,NSN   ,
      2                NSV      ,CAND_E ,CAND_N  ,STF   ,STFN  ,
-     3                MSR      ,MS       ,V      ,XI	,YI    ,
-     4  	      ZI    ,IX1      ,IX2    ,IX3	,IX4   ,
-     5  	      NSVG  ,IGSTI    ,STIF   ,KMIN	,KMAX  ,
-     6  	      IGAP  ,GAP      ,GAP_S  ,GAPV	,GAPMAX,
-     7  	      GAPMIN,GAP_M    ,VXI    ,VYI      ,VZI   ,
-     8  	      MSI   ,NODNX_SMS,NSMS   ,KINET   ,X1     ,
-     9  	      Y1    ,Z1    ,X2       ,Y2     ,Z2	,
-     A  	      X3    ,Y3    ,Z3       ,X4     ,Y4	,
-     B  	      Z4    ,NX1   ,NX2      ,NX3    ,NX4	,
-     C                NY1   ,NY2   ,NY3      ,NY4    ,NZ1	,
+     3                MSR      ,MS       ,V      ,XI  ,YI    ,
+     4          ZI    ,IX1      ,IX2    ,IX3  ,IX4   ,
+     5          NSVG  ,IGSTI    ,STIF   ,KMIN  ,KMAX  ,
+     6          IGAP  ,GAP      ,GAP_S  ,GAPV  ,GAPMAX,
+     7          GAPMIN,GAP_M    ,VXI    ,VYI      ,VZI   ,
+     8          MSI   ,NODNX_SMS,NSMS   ,KINET   ,X1     ,
+     9          Y1    ,Z1    ,X2       ,Y2     ,Z2  ,
+     A          X3    ,Y3    ,Z3       ,X4     ,Y4  ,
+     B          Z4    ,NX1   ,NX2      ,NX3    ,NX4  ,
+     C                NY1   ,NY2   ,NY3      ,NY4    ,NZ1  ,
      D                NZ2   ,NZ3   ,NZ4      ,KINI   ,INDEX     )
 C-----------------------------------------------
 C   M o d u l e s
@@ -55,8 +55,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com08_c.inc"
 #include      "sms_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s

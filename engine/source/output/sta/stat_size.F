@@ -1,32 +1,32 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  STAT_SIZE_C                   source/output/sta/stat_size.F 
 Chd|-- called by -----------
 Chd|        GENSTAT                       source/output/sta/genstat.F   
 Chd|-- calls ---------------
 Chd|        SPMD_GLOB_ISUM9               source/mpi/interfaces/spmd_th.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE STAT_SIZE_C(IPARG ,IXC  ,IXTG ,IGEO ,IPM      ,
      .                       P0ARS ,WASZ ,IXS  ,GEO  ,ELBUF_TAB,
@@ -43,7 +43,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "scr05_c.inc"
 #include      "scr16_c.inc"
 #include      "param_c.inc"
 #include      "task_c.inc"
@@ -196,7 +195,7 @@ C------------------------------
             NPTS  = ELBUF_TAB(NG)%NPTS    
 c            NPTT  = ELBUF_TAB(NG)%NPTT    
             NPG   = NPTR*NPTS
-            IF (ITY==3.AND.IHBE==23) NPG=4
+            IF (IHBE==23) NPG=4
 C
 C pre counting of all NPTT (especially for PID_51)
 C
@@ -246,8 +245,9 @@ C------------------------------
               MPT = MAX(1,NPT_ALL)
            IF (NPT==0) MPT=2
 C
-           IHBE	 =IPARG(23,NG)
+           IHBE   =IPARG(23,NG)
            NPG   =IPARG(48,NG)
+           IF (IHBE==23) NPG=4
 C
            WASZ2 = WASZ2 + (7*NPG*MPT+6)*NEL
          ENDIF
@@ -277,7 +277,7 @@ C------------------------------
            MLW =IPARG(1,NG)
            IF (MLW == 1.OR.MLW == 3.OR.MLW == 23) MPT=0
 C
-           IHBE	 =IPARG(23,NG)
+           IHBE   =IPARG(23,NG)
            NPG   =IPARG(48,NG)
 CC         IF(ITY==3.AND.IHBE==23) NPG=4
 C
@@ -333,6 +333,8 @@ C
               NUVAR = NUVAR + 18 ! backstress will be printed in /AUX
             ELSEIF (MLW == 87) THEN
               NUVAR = ELBUF_TAB(NG)%BUFLY(1)%NVAR_MAT + 12 ! backstress will be printed in /AUX
+            ELSEIF (MLW == 112) THEN
+              NUVAR = 3
             ELSE IF (MLW == 36) THEN
               NUVAR = 6  ! backstress will be printed in /AUX
             END IF
@@ -401,9 +403,9 @@ C------------------------------
 C       8: fail
 C------------------------------
         DO NG=1,NGROUP
-          ITY	=IPARG(5,NG)
-          NEL	=IPARG(2,NG)
-          NFT	=IPARG(3,NG)
+          ITY  =IPARG(5,NG)
+          NEL  =IPARG(2,NG)
+          NFT  =IPARG(3,NG)
 
           IF (ITY == 3.OR.ITY == 7) THEN
             LFT=1
@@ -462,9 +464,9 @@ C       8: /inibri/stres/full
 C------------------------------
       IF (STAT_S(4)==1 .OR. STAT_S(8)==1) THEN
         DO NG=1,NGROUP
-          ITY	   =IPARG(5,NG)
+          ITY     =IPARG(5,NG)
           IF(ITY==1) THEN
-            NEL	   =IPARG(2,NG)
+            NEL     =IPARG(2,NG)
             NLAY = ELBUF_TAB(NG)%NLAY
             NPTR = ELBUF_TAB(NG)%NPTR
             NPTS = ELBUF_TAB(NG)%NPTS
@@ -488,9 +490,9 @@ C       9: /inibri/strai/full
 C------------------------------
       IF (STAT_S(5)==1 .OR. STAT_S(9)==1) THEN
         DO NG=1,NGROUP
-          ITY	 =IPARG(5,NG)
+          ITY   =IPARG(5,NG)
           IF(ITY==1) THEN
-            NEL	 =IPARG(2,NG)
+            NEL   =IPARG(2,NG)
             NLAY = ELBUF_TAB(NG)%NLAY
             NPTR = ELBUF_TAB(NG)%NPTR
             NPTS = ELBUF_TAB(NG)%NPTS
@@ -515,19 +517,24 @@ C      10: /inibri/aux/full
 C------------------------------
       IF (STAT_S(6)==1) THEN
         DO NG=1,NGROUP
+          MLW =IPARG(1,NG)  
           ITY =IPARG(5,NG)
           IF(ITY==1) THEN
-            NEL	 =IPARG(2,NG)
-            NFT	 =IPARG(3,NG)
+            NEL   =IPARG(2,NG)
+            NFT   =IPARG(3,NG)
             NLAY = ELBUF_TAB(NG)%NLAY
             NPTR = ELBUF_TAB(NG)%NPTR
             NPTS = ELBUF_TAB(NG)%NPTS
             NPTT = ELBUF_TAB(NG)%NPTT
             NPT  = NLAY*NPTR*NPTS*NPTT
 c
-            DO I=1,NEL
-              NUVAR  = MAX(NUVAR,IPM(8,IXS(1,I+NFT)))
-            ENDDO
+            IF (MLW == 112) THEN 
+              NUVAR = 3
+            ELSE
+              DO I=1,NEL
+                NUVAR  = MAX(NUVAR,IPM(8,IXS(1,I+NFT)))
+              ENDDO
+            ENDIF
             WASZ2 = WASZ2 + NEL * (11 + NPT * NUVAR)
           ENDIF
         ENDDO
@@ -548,7 +555,7 @@ C------------------------------
         DO NG=1,NGROUP
           ITY =IPARG(5,NG)
           IF(ITY==1) THEN
-            NEL	 =IPARG(2,NG)
+            NEL   =IPARG(2,NG)
             NLAY = ELBUF_TAB(NG)%NLAY
             NPTR = ELBUF_TAB(NG)%NPTR
             NPTS = ELBUF_TAB(NG)%NPTS
@@ -588,8 +595,8 @@ C------------------------------
         DO NG=1,NGROUP
           ITY =IPARG(5,NG)
           IF(ITY==1) THEN
-            NEL	 =IPARG(2,NG)
-            NFT	 =IPARG(3,NG)
+            NEL   =IPARG(2,NG)
+            NFT   =IPARG(3,NG)
             NLAY = ELBUF_TAB(NG)%NLAY
             NPTR = ELBUF_TAB(NG)%NPTR
             NPTS = ELBUF_TAB(NG)%NPTS
@@ -759,12 +766,12 @@ C      17: /inibri/eref
 C------------------------------
       IF (STAT_S(13)==1) THEN
         DO NG=1,NGROUP
-          ITY	 =IPARG(5,NG)
+          ITY   =IPARG(5,NG)
           ISOLNOD=IPARG(28,NG)
           ISMSTR =IPARG(9,NG)
           ISROT  =IPARG(41,NG)
           IF(ITY==1) THEN
-            NEL	 =IPARG(2,NG)
+            NEL   =IPARG(2,NG)
 c
             WASZ2 = WASZ2 + NEL * 7
             IF (ISMSTR==1.OR.ISMSTR>=10) THEN

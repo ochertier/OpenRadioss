@@ -1,28 +1,27 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
       module MOD_I25MAIN_TRI
       implicit none
-#include      "my_real.inc"
       INTEGER, DIMENSION(:), ALLOCATABLE :: CAND_A, CAND_B
       END MODULE MOD_I25MAIN_TRI
 Chd|====================================================================
@@ -56,6 +55,7 @@ Chd|        IMP_INTBUF                    share/modules/imp_mod_def.F
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
 Chd|        INTBUFMOD                     share/modules/restart_mod.F   
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
+Chd|        PARAMETERS_MOD                ../common_source/modules/interfaces/parameters_mod.F
 Chd|        TRI25EBOX                     share/modules/tri25ebox.F     
 Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
@@ -66,7 +66,7 @@ Chd|====================================================================
      4                  ITAB    ,KINET   ,TEMP    ,RENUM   ,
      5                  NSNFIOLD,NUM_IMP ,IND_IMP ,NODNX_SMS,
      6                  H3D_DATA,ESHIFT  ,NEDGE_T ,SSHIFT   ,NRTM_T ,
-     7                  ICODT   ,ISKEW   )
+     7                  ICODT   ,ISKEW   ,PARAMETERS)
 C============================================================================
 C   M o d u l e s
 C-----------------------------------------------
@@ -78,33 +78,21 @@ C-----------------------------------------------
       USE INTBUFDEF_MOD
       USE H3D_MOD
       USE MOD_I25MAIN_TRI
+      USE PARAMETERS_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "comlock.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "assert.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "units_c.inc"
-#include      "scr03_c.inc"
-#include      "scr04_c.inc"
-#include      "scr05_c.inc"
-#include      "warn_c.inc"
 #include      "task_c.inc"
-#include      "parit_c.inc"
 #include      "timeri_c.inc"
-#include      "impl1_c.inc"
-C common pour variable globale en memoire partagee
       COMMON /I25MAINC/BMINMA,CURV_MAX_MAX,RESULT,NSNR,NSNROLD,I_MEMG,I_MEMG_E,I_MEMG_S,NMN_G
       INTEGER RESULT,NSNR,NSNROLD,I_MEMG,I_MEMG_E,I_MEMG_S,NMN_G
       my_real 
@@ -124,13 +112,14 @@ C     REAL
      .    X(3,*), V(*), MS(*),TEMP(*)
       TYPE(INTBUF_STRUCT_) INTBUF_TAB
       TYPE(H3D_DATABASE) :: H3D_DATA
+      TYPE (PARAMETERS_) ,INTENT(IN):: PARAMETERS
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER LOC_PROC,IEDGE,NEDGE,IGSTI,ITIED,
      .        I,J, IP0, IP1, IP2, IP21, K11_T, I_SK_OLD, I_SK_OLD_E, I_STOK1, 
      .        ADD1, NOINT, INACTI, MULTIMP, IGAP, IFQ,
-     .        N, NSNF, NSNL, NSNRF, NSNRL,NMN_L, IVIS2, IGAP0
+     .        N, NSNF, NSNL, NSNRF, NSNRL,NMN_L, IVIS2, IGAP0, IFSUB_CAREA
       INTEGER 
      .        NCONT, NCONTE, MULNSN, MULNSNE, MULNSNS, INACTII, INACIMP, INTTH,
      .        I_MEM,I_MEME(2),CAND_N_OLD,CAND_E_OLD(2),ILEV,FLAGREMN, LREMNORMAX,
@@ -144,12 +133,13 @@ C     REAL
      .   XMAXL, YMAXL, ZMAXL, XMINL, YMINL, ZMINL, GAPMIN, GAPMAX,DRAD,
      .   C_MAXL,PMAX_GAP,VMAXDT,MARGE,TZINF,SX,SY,SZ,SX2,SY2,SZ2,DGAPLOAD,
      .   CURV_MAX(NRTM_T),BMINMA_OLD(6),BGAPEMX,BSAV(6)
-C-----------------------------------------------
-#include "sync_dir.inc"
+      INTEGER :: NMN,NRTM,NSN,NTY
 C-----------------------------------------------
       I_MEM = 0
+!$OMP SINGLE
       I_MEMG = 0
       NMN_G = 0
+!$OMP END SINGLE NOWAIT
       NMN_L = 0
 C
       LOC_PROC=ISPMD+1
@@ -172,25 +162,15 @@ C
       FLAGREMN =IPARI(63,NIN)
       LREMNORMAX =IPARI(82,NIN)
       NEDGE   = IPARI(68,NIN)
+!$OMP SINGLE
       NEDGE_REMOTE_OLD   = IPARI(69,NIN)
+      NSNROLD = IPARI(24,NIN)
+!$OMP END SINGLE NOWAIT
       NCONTE  = IPARI(88,NIN)
       ITHK    = IPARI(91,NIN)
+      IFSUB_CAREA =0
+      IF(IPARI(36,NIN)> 0.AND.PARAMETERS%INTCAREA > 0) IFSUB_CAREA = 1
 C
-      NSNROLD = IPARI(24,NIN)
-C
-c     STARTT=INTBUF_TAB%VARIABLES(3)
-c     STOPT =INTBUF_TAB%VARIABLES(11)
-c     IF(STARTT>TT) RETURN
-c     IF(TT>STOPT)  RETURN
-C
-C     Look if interface is activated 
-C     ISENS = IPARI(64,NIN)  
-C     IF(ISENS/=0)  THEN         ! Interface activated by sensor
-C        TS = SENSOR(2,ISENS)
-C     ELSE
-C        TS = TT
-C     ENDIF
-C     IF(TT<TS) RETURN
 C
       ISENS = IPARI(64,NIN)  
       IF(ISENS == 0) THEN
@@ -209,7 +189,6 @@ C
 C
       DGAPLOAD  =INTBUF_TAB%VARIABLES(46)
 C
-C     Specific TYPE7 :
       ITIED = 0 
 C
 C -------------------------------------------------------------
@@ -222,17 +201,17 @@ C
 C -------------------------------------------------------------
 C
       MARGE  = INTBUF_TAB%VARIABLES(25)
-      BMINMA(1)=-EP30
-      BMINMA(2)=-EP30
-      BMINMA(3)=-EP30
-      BMINMA(4)=EP30
-      BMINMA(5)=EP30
-      BMINMA(6)=EP30
-      CURV_MAX_MAX = ZERO
 C
 C -------------------------------------------------------------
 C
       IF(ITASK==0) THEN
+        BMINMA(1)=-EP30
+        BMINMA(2)=-EP30
+        BMINMA(3)=-EP30
+        BMINMA(4)=EP30
+        BMINMA(5)=EP30
+        BMINMA(6)=EP30
+        CURV_MAX_MAX = ZERO
         I_SK_OLD = INTBUF_TAB%I_STOK(1)
         INTBUF_TAB%I_STOK(1) = 0
         IF(IEDGE /= 0) ALLOCATE(NSNFIEOLD(NSPMD))
@@ -254,7 +233,7 @@ C
           I_SK_OLD_E = INTBUF_TAB%I_STOK_E(1)
           CALL I25TRC_EDG(
      1      NEDGE_TOTAL            ,I_SK_OLD_E ,INTBUF_TAB%CANDS_E2E,INTBUF_TAB%CANDM_E2E,
-     2      INTBUF_TAB%CAND_P,CAND_A     ,NIN ,NEDGE,LEDGE_FIE(NIN)%P,IFQ                ,
+     2      INTBUF_TAB%CAND_P      ,CAND_A     ,NIN                 ,NEDGE,IFQ           ,
      3      INTBUF_TAB%FTSAVX_E,INTBUF_TAB%FTSAVY_E, INTBUF_TAB%FTSAVZ_E,INTBUF_TAB%IFPEN_E)
 
           INTBUF_TAB%I_STOK_E(1)=I_SK_OLD_E
@@ -267,8 +246,8 @@ C
      1      NEDGE_TOTAL            ,I_SK_OLD_E ,INTBUF_TAB%CANDS_E2S,
      .                                    INTBUF_TAB%CANDM_E2S,
      2      INTBUF_TAB%CAND_PS,CAND_B     ,NIN               ,NEDGE,
-     3      INTBUF_TAB%LEDGE, LEDGE_FIE(NIN)%P,IFQ           ,
-     4      INTBUF_TAB%FTSAVX_E2S,INTBUF_TAB%FTSAVY_E2S, INTBUF_TAB%FTSAVZ_E2S,INTBUF_TAB%IFPEN_E2S )
+     3      INTBUF_TAB%LEDGE,IFQ          ,INTBUF_TAB%FTSAVX_E2S,
+     4      INTBUF_TAB%FTSAVY_E2S, INTBUF_TAB%FTSAVZ_E2S,INTBUF_TAB%IFPEN_E2S )
 
           INTBUF_TAB%I_STOK_E(2)=I_SK_OLD_E
 
@@ -306,9 +285,9 @@ C
       BMINMA(6) = MIN(BMINMA(6),ZMINL)
       CURV_MAX_MAX = MAX(CURV_MAX_MAX,C_MAXL)
       NMN_G = NMN_G + NMN_L
+      RESULT = 0
 #include "lockoff.inc"
 
-      RESULT = 0
 C BARRIER II_STOK, II_STOK_E et RESULT
       CALL MY_BARRIER
 
@@ -386,30 +365,22 @@ C
           NEDGE_LOCAL = INTBUF_TAB%NB_INTERNAL_EDGES + INTBUF_TAB%NB_BOUNDARY_EDGES_LOCAL
           IEDGE   = IPARI(58,NIN)
           CALL SPMD_TRI25VOX(
-     1      INTBUF_TAB%NSV,NSN     ,X            ,V            ,MS     ,
-     2      BMINMA       ,WEIGHT  ,INTBUF_TAB%STFNS,NIN        ,ISENDTO,
-     3      IRCVFROM     ,IAD_ELEM,FR_ELEM      ,NSNR   ,IPARI(21,NIN),
-     4      INTBUF_TAB%GAP_S,ITAB    ,KINET        ,IFQ          ,INACTI ,
-     5      NSNFIOLD,IPARI(47,NIN),INTBUF_TAB%IELES,INTBUF_TAB%AREAS,TEMP,
-     6      NUM_IMP     ,NODNX_SMS,INTBUF_TAB%GAP_SL,NTY   ,INTBUF_TAB%IRTLM,
+     1      INTBUF_TAB%NSV   ,NSN         ,X               ,V            ,MS           ,
+     2      BMINMA          ,WEIGHT       ,INTBUF_TAB%STFNS,NIN          ,ISENDTO      ,
+     3      IRCVFROM        ,IAD_ELEM     ,FR_ELEM         ,NSNR         ,IPARI(21,NIN),
+     4      INTBUF_TAB%GAP_S,ITAB         ,KINET           ,IFQ          ,INACTI       ,
+     5      NSNFIOLD        ,IPARI(47,NIN),INTBUF_TAB%IELES,INTBUF_TAB%AREAS,TEMP      ,
+     6      NUM_IMP         ,NODNX_SMS    ,INTBUF_TAB%GAP_SL,NTY         ,INTBUF_TAB%IRTLM,
      7      INTBUF_TAB%TIME_S,INTBUF_TAB%SECND_FR,INTBUF_TAB%PENE_OLD,INTBUF_TAB%STIF_OLD ,
-     8      INTBUF_TAB%NBINFLG,ILEV ,INTBUF_TAB%ICONT_I,IPARI(72,NIN),INTBUF_TAB%IPARTFRICS,
-     9      ITIED ,IVIS2, INTBUF_TAB%IF_ADH,
-     A      INTBUF_TAB%LEDGE,NEDGE,NLEDGE,INTBUF_TAB%STFM,
-     .      NEDGE_LOCAL,
-     B      INTBUF_TAB%GAPE,
-     C      INTBUF_TAB%GAP_E_L,
-     D      INTBUF_TAB%STFE,
-     E      INTBUF_TAB%EDGE_BISECTOR,
-     F      INTBUF_TAB%VTX_BISECTOR,
-     G      INTBUF_TAB%ADMSR,
-     H      INTBUF_TAB%IRECTM,
-     I      INTBUF_TAB%EBINFLG,
-     J      INTBUF_TAB%MVOISIN,
-     K      IEDGE, 
-     L      ICODT,
-     M      ISKEW,INTBUF_TAB%IPARTFRIC_E,
-     N      INTBUF_TAB%E2S_NOD_NORMAL)
+     8      INTBUF_TAB%NBINFLG,ILEV       ,INTBUF_TAB%ICONT_I,IPARI(72,NIN),INTBUF_TAB%IPARTFRICS,
+     9      ITIED           ,IVIS2        , INTBUF_TAB%IF_ADH,INTBUF_TAB%LEDGE,NEDGE   ,
+     A      NLEDGE          ,INTBUF_TAB%STFM,NEDGE_LOCAL,INTBUF_TAB%GAPE,INTBUF_TAB%GAP_E_L,      
+     B      INTBUF_TAB%STFE ,INTBUF_TAB%EDGE_BISECTOR,INTBUF_TAB%VTX_BISECTOR,INTBUF_TAB%ADMSR,
+     .                                                                       INTBUF_TAB%IRECTM,
+     D      INTBUF_TAB%EBINFLG,INTBUF_TAB%MVOISIN,IEDGE      ,ICODT       , ISKEW            ,
+     E      INTBUF_TAB%IPARTFRIC_E,INTBUF_TAB%E2S_NOD_NORMAL,IPARI(97,NIN),INTBUF_TAB%STIFMSDT_S,
+     .                                                                     INTBUF_TAB%STIFMSDT_EDG,
+     F      IFSUB_CAREA     ,PARAMETERS%INTAREAN)
 
 C local renumbering of old candidates to collision
           CALL SPMD_RNUM25(
@@ -585,21 +556,15 @@ C
      2      IPARI(21,NIN),NSNR,MULTIMP      ,NTY,IPARI(47,NIN),
      3      ILEV         ,NSNFIOLD,IPARI   ,NSNROLD, RENUM, H3D_DATA ,
      4      IPARI(72,NIN),FLAGREMN,LREMNORMAX,NRTM ,INTBUF_TAB%KREMNODE,
-     5      INTBUF_TAB%REMNODE,IVIS2)
+     5      INTBUF_TAB%REMNODE,IVIS2,IPARI(97,NIN),IFSUB_CAREA )
         IPARI(24,NIN) = NSNR
 
         NEDGE_REMOTE_OLD = NEDGE_REMOTE
 
         IF(IEDGE /= 0) THEN
-        CALL SPMD_TRI25EGAT(RESULT,
-     .        NIN, 
-     .        NEDGE,
-     .        INTBUF_TAB%CANDS_E2E,
-     .        INTBUF_TAB%I_STOK_E(1),
-     .        INTBUF_TAB%CANDS_E2S,
-     .        INTBUF_TAB%I_STOK_E(2),
-     .        IGAP,
-     .        IPARI(72,NIN))
+        CALL SPMD_TRI25EGAT(
+     1        RESULT       ,NIN       , NEDGE,INTBUF_TAB%CANDS_E2E,INTBUF_TAB%I_STOK_E(1),
+     2        INTBUF_TAB%CANDS_E2S,INTBUF_TAB%I_STOK_E(2),IGAP,IPARI(72,NIN),IPARI(97,NIN))      
         ENDIF
 
         IPARI(69 ,NIN) = NEDGE_REMOTE_OLD

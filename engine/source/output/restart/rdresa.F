@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  RDRESA                        source/output/restart/rdresa.F
 Chd|-- called by -----------
@@ -27,17 +27,23 @@ Chd|        RADIOSS2                      source/engine/radioss2.F
 Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
 Chd|        ARRET                         source/system/arret.F         
-Chd|        CUR_FIL_C                     source/output/tools/sortie_c.c
+Chd|        CUR_FIL_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|        RDCOMI                        source/output/restart/rdcomm.F
-Chd|        READ_I_C                      source/output/tools/sortie_c.c
+Chd|        READ_I_C                      ../common_source/tools/input_output/write_routtines.c
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
+Chd|        INTERFACES_MOD                ../common_source/modules/interfaces/interfaces_mod.F
+Chd|        LOADS_MOD                     ../common_source/modules/loads/loads_mod.F
+Chd|        MAT_ELEM_MOD                  ../common_source/modules/mat_elem/mat_elem_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|        PINCHTYPE_MOD                 ../common_source/modules/pinchtype_mod.F
+Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
+Chd|        STATE_MOD                     ../common_source/modules/state_mod.F
 Chd|====================================================================
       SUBROUTINE RDRESA(ITSTV1 , LHEADER, LVARINT, LVARREA, PRADIOS,
      .                  PRESFIL,MULTI_FVM,H3D_DATA,
-     .                  PINCH_DATA)
+     .                  PINCH_DATA,DYNAIN_DATA,INTERFACES,SENSORS,LOADS,
+     .                  MAT_ELEM, NAMES_AND_TITLES  )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -46,34 +52,26 @@ C-----------------------------------------------
       USE H3D_MOD
       USE PINCHTYPE_MOD
       USE H3D_MOD
+      USE STATE_MOD
+      USE INTERFACES_MOD
+      USE SENSOR_MOD
+      USE LOADS_MOD
+      USE MAT_ELEM_MOD
+      USE NAMES_AND_TITLES_MOD, only:NAMES_AND_TITLES_,LTITLE   !< NAMES_AND_TITLES host the input deck names and titles for outputs
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "r4r8_p.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com05_c.inc"
 #include      "scr03_c.inc"
-#include      "scr05_c.inc"
-#include      "scr13_c.inc"
 #include      "scr14_c.inc"
-#include      "scr20_c.inc"
-#include      "fluid_scr_c.inc"
 #include      "warn_c.inc"
 #include      "units_c.inc"
-#include      "couple_c.inc"
-#include      "check.inc"
-#include      "task_c.inc"
-#include      "tabsiz_c.inc"
-#include      "scrupw_c.inc"
 C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -82,6 +80,12 @@ C-----------------------------------------------
       TYPE(MULTI_FVM_STRUCT) :: MULTI_FVM
       TYPE(H3D_DATABASE) :: H3D_DATA
       TYPE(PINCH) :: PINCH_DATA
+      TYPE (DYNAIN_DATABASE),INTENT(INOUT)   :: DYNAIN_DATA
+      TYPE (INTERFACES_)    ,INTENT(INOUT)   :: INTERFACES
+      TYPE (SENSORS_)       ,INTENT(INOUT)   :: SENSORS
+      TYPE (LOADS_)         ,INTENT(INOUT)   :: LOADS
+      TYPE (MAT_ELEM_)      ,INTENT(INOUT)   :: MAT_ELEM
+      TYPE (NAMES_AND_TITLES_),INTENT(INOUT) :: NAMES_AND_TITLES
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -92,24 +96,25 @@ C-----------------------------------------------
       INTEGER   TABHEAD(LMXHEAD),TABVINT(LMXVINT)
       my_real
      .        PROBINT
+      INTEGER,DIMENSION(LTITLE) :: ITITLE
 C-----------------------------------------------
       DO I=1,LMXVINT
         TABVINT(I)=0
       ENDDO
 C-----------------------------------------------
-C     LECTURE TEXTE
+C     Read Restart File
 C-----------------------------------------------
       CALL CUR_FIL_C(0)
-      CALL READ_I_C(TEXT,LCOM05)
 C-----------------------------------------------
-C     LECTURE DE L'ENTETE
+      CALL READ_I_C(ITITLE,LTITLE)   !< input deck title
+      DO I=1,LTITLE
+        NAMES_AND_TITLES%TITLE(I:I) = CHAR(ITITLE(I))
+      ENDDO
+C-----------------------------------------------
+C     Read Header
 C-----------------------------------------------
         CALL READ_I_C(LHEADER,1)
-C       warning to radioss developers:
-C       IF(LHEADER>LMXHEAD)THEN
-C         WRITE(*,*) ' ** RADIOSS INTERNAL ERROR'
-C         CALL ARRET(7)
-C       ENDIF
+
         CALL READ_I_C(TABHEAD,LHEADER)
 C       RADIOSS FILE R/W
       PRADIOS=TABHEAD(1)
@@ -120,7 +125,7 @@ C       RESTART FILE
 C       ITESTV
       ITESTV =TABHEAD(3)
       ITESTV = IABS(ITESTV)
-C itestv +/- suivant ir4r8 courant
+C itestv +/- depending on R4R8 (single/double precision)
       IF (IR4R8==2) ITESTV = -ITESTV
       IF(ITESTV/=ITSTV1.AND.DEBUG(2)<2)RETURN
 C-----
@@ -154,17 +159,12 @@ C ------------------------------------------
         CALL ARRET(2)
       ENDIF
 
-C-----------------------------------------------
-C     LECTURE DES VARIABLES ENTIERES.
-C-----------------------------------------------
-C      warning to radioss developers:
-C      IF(LVARINT>LMXVINT)THEN
-C        WRITE(*,*) ' ** RADIOSS INTERNAL ERROR'
-C        CALL ARRET(7)
-C      ENDIF
-C-----
+C----------------------------
+C     Read integer variables
+C----------------------------
       CALL READ_I_C(TABVINT,LVARINT)
-      CALL RDCOMI(LMXVINT,LVARINT,TABVINT,MULTI_FVM,H3D_DATA)
+      CALL RDCOMI(TABVINT,MULTI_FVM,H3D_DATA,DYNAIN_DATA,
+     .            INTERFACES%PARAMETERS,SENSORS,LOADS  ,MAT_ELEM)
 
 C
       IF(ANIM_PLY > 0 .AND.IPLYXFEM == 0) THEN
@@ -185,6 +185,8 @@ Chd|  INIRESA                       source/output/restart/rdresa.F
 Chd|-- called by -----------
 Chd|        RADIOSS2                      source/engine/radioss2.F      
 Chd|-- calls ---------------
+Chd|        ALEANIM_MOD                   share/modules/aleanim_mod.F   
+Chd|        ALE_MOD                       ../common_source/modules/ale/ale_mod.F
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        PINCHTYPE_MOD                 ../common_source/modules/pinchtype_mod.F
@@ -196,6 +198,8 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE H3D_MOD
       USE PINCHTYPE_MOD
+      USE ALE_MOD
+      USE ALEANIM_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -207,13 +211,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "r4r8_p.inc"
 #include      "com01_c.inc"
-#include      "com02_c.inc"
 #include      "com04_c.inc"
-#include      "com05_c.inc"
-#include      "com09_c.inc"
-#include      "com10_c.inc"
 #include      "com_xfem1.inc"
 #include      "param_c.inc"
 #include      "units_c.inc"
@@ -221,31 +220,21 @@ C-----------------------------------------------
 #include      "scr05_c.inc"
 #include      "scr06_c.inc"
 #include      "scr07_c.inc"
-#include      "lon_c.inc"
-#include      "scr13_c.inc"
 #include      "scr14_c.inc"
 #include      "scr16_c.inc"
-#include      "cong1_c.inc"
 #include      "parit_c.inc"
 #include      "task_c.inc"
-#include      "rnur_c.inc"
 #include      "scrnoi_c.inc"
 #include      "scrfs_c.inc"
 #include      "scrcut_c.inc"
 #include      "scr_fac_c.inc"    
-#include      "warn_c.inc"
-#include      "couple_c.inc"
 #include      "sphcom.inc"
-#include      "conv_c.inc"
-#include      "check.inc"
-#include      "scr20_c.inc"
-#include      "scr18_c.inc"
 #include      "spmd_c.inc"
 #include      "tabsiz_c.inc"
 #include      "scr17_c.inc"
 #include      "sms_c.inc"
 #include      "thermal_c.inc" 
-C-----------------------------------------------------------------
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       TYPE(H3D_DATABASE) :: H3D_DATA
@@ -253,23 +242,20 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER   I,NVAR,M16STAK,NPE,NIPMAX,NPSAV_OLD
-      my_real
-     .          PROBINT
+      INTEGER I,NVAR,M16STAK,NPE,NIPMAX,NPSAV_OLD
+      my_real PROBINT
 C-----------------------------------------------
 C
       PINCH_DATA%SAPINCH = 0
-C ipari0 defini dans le starter
+C ipari0 from starter
       IF(IPARIT==-1)IPARIT=IPARI0
 C
       IF(ICRACK3D > 0)THEN
         IF(IPARIT /= 1) IPARIT = IPARI0
       ENDIF
 C
-      NUMELUR=SIXUR/NIXUR
       IF(IMACH==3.AND.IPARI0==0.AND.IPARIT==1) THEN
         IF(ISPMD==0)THEN
-C Parith/on necessite Parith/ON anterieur en SPMD (structures de donnees additionnelles)
           WRITE(ISTDO,*)' **WARNING PARALLEL ARITHMETIC DISABLED'
           WRITE(IOUT,*)' **WARNING PREVIOUS RUN WITHOUT PARITH/ON'
           WRITE(IOUT,*)' **PARALLEL ARITHMETIC IS NO MORE ACTIVABLE'
@@ -277,26 +263,25 @@ C Parith/on necessite Parith/ON anterieur en SPMD (structures de donnees additio
         IPARIT=0
       ENDIF
 
-C calcul de NISKY0 dans ts les cas
       NISKY0 = 8*NUMELS   + 4*NUMELQ    + 4*NUMELC   + 2*NUMELT  +
-     .         2*NUMELP   + 3*NUMELR    + 3*NUMELTG  + 4*NUMELUR +
+     .         2*NUMELP   + 3*NUMELR    + 3*NUMELTG  + 
      .         6*NUMELS10 + 12*NUMELS20 + 8*NUMELS16 + 3*NUMELTG6
       LCNEL = NISKY0
       IF(IMACH==3) THEN
-C rajout des surfaces de MV comme des elts pour parith/on SPMD
+C adding surfaces for MV as elems for parith/on SPMD
           NISKY0 = NISKY0 + 4*NSKYMV0
-C rajout des pressure loads calculee comme des elts pour parith/on SPMD
+C pressure loads 
           NISKY0 = NISKY0 + 4*NCONLD
-C rajout des flux thermiques
+C thermal fluxes
           NISKY0 = NISKY0 + 4*NUMCONV + 4*NUMRADIA + 4*NFXFLUX
           NISKY0 = NISKY0 + SLLOADP
       END IF
 C
-C Parith/ON en SPMD
+C Parith/ON + SPMD
       IF(NUMSPH/=0.AND.IMACH/=3) IPARIT=0
 C
       IF(IMACH==3.AND.IPARIT>=1) IPARIT=1
-      IF( LWAMP*LWANMP/=0)THEN
+      IF( LWAMP /= 0  .AND. LWANMP/=0)THEN
         LWAMP    = MAX(LWAMP,2*MVSIZ*100)
         LENWA    = MAX( NTHREAD * LWAMP,LWANMP)
       ENDIF
@@ -307,8 +292,9 @@ C
 C-------------------------------------------
 C     IPARITH
 C-------------------------------------------
-C AR=AM(M73) PLACE RECUPERABLE SI IRODDL=0 A CONDITION DE VERIFIER 
-C LES ROUTINES DE FORCES CONCENTEES ET DE VITESSES IMPOSEES
+C AR=AM(M73) MIGHT BE USABLE IF IRODDL=0  
+C
+C CONTENTRATED LOADS AND FORCES
 C
       NPSAV_OLD = NPSAV
       IF(NPSAV==0)NPSAV_OLD = 23
@@ -318,21 +304,16 @@ C
         SA  = 3*NUMNOD+9*NUMNOD*NTHREAD
         SAR = 3*NUMNOD+9*NUMNOD*NTHREAD
         SSTIFN = NUMNOD+3*NUMNOD*NTHREAD
-C   j ai un doute sur SVISCN - et du flag KDTINT
         SVISCN = NUMNOD+3*NUMNOD*NTHREAD
         SSTIFR = NUMNOD*IRODDL+3*NUMNOD*NTHREAD*IRODDL
-C non supported option w/IPARIT=3
         SDMSPH = 0
         SPARTSAV = NPSAV*(NPART+NTHPART)*NTHREAD
         SFSKY = 0
         SFSKYM = 0
         SFSKYD = 0
         SISKY    = 0
-
         PROBINT=0.5
-        LSKYI_SMS = MAX(NINT(5*MAX(4*NUMNOD,IMAXIMP)*PROBINT)
-     +           +4*(NUMSPH+NSKYI18)+LCNI2,ISUMNX)
-
+        LSKYI_SMS = MAX(NINT(5*MAX(4*NUMNOD,IMAXIMP)*PROBINT)+4*(NUMSPH+NSKYI18)+LCNI2,ISUMNX)
         SADSKY   = 0
         SPROCNE  = 0
         SADDCNI2 = 0
@@ -356,7 +337,6 @@ C non supported option w/IPARIT=3
         SA  = 3*NUMNOD
         SAR = 3*NUMNOD
         SSTIFN = NUMNOD
-C   j ai un doute sur SVISCN - et du flag KDTINT
         SVISCN = NUMNOD
         SSTIFR = NUMNOD
         IF(SOL2SPH_FLAG/=0) THEN
@@ -384,7 +364,7 @@ C FSKY DMASS
         ELSE
            SFSKYD = 0
         ENDIF
-Cel PROBINT egalement initialisee dans STARTER (lectur)
+C   PROBINT egalement initialisee dans STARTER (lectur)
         PROBINT=0.5
 
         LSKYI = MAX(NINT(5*MAX(4*NUMNOD,IMAXIMP)*PROBINT)
@@ -454,7 +434,7 @@ C   j ai un doute sur SVISCN - et du flag KDTINT
         SFSKY = 0
         SFSKYM = 0
         SFSKYD = 0
-        SISKY	 = 0
+        SISKY   = 0
 
         PROBINT=0.5
         LSKYI_SMS = MAX(NINT(5*MAX(4*NUMNOD,IMAXIMP)*PROBINT)
@@ -466,7 +446,7 @@ C   j ai un doute sur SVISCN - et du flag KDTINT
         SPROCNI2 = 0
         SIADSDP  = 0
         SIADRCP  = 0
-        SIADS	 = 0
+        SIADS   = 0
         SIADWAL  = 0
         SIADRBK  = 0
         SIADI2   = 0
@@ -478,7 +458,6 @@ C   j ai un doute sur SVISCN - et du flag KDTINT
         SPROCNE_PXFE = 0
         SPROCNE_CRKXFE = 0
       ENDIF
-      SUWA = NUSERW
 C      
        IF (NS10E >0 .AND. IPARI0 /= 0) THEN
         SADDCNCND = NUMNOD + 1
@@ -489,23 +468,18 @@ C
         SPROCNCND = 0
         SIADCND   = 0
        END IF
-
-C Si quasi compressible variables non necessaires
-      IF(INCOMP==0)THEN
-
-        SVAL2=
-     +  MAX(IALE,ITHERM,IEULER,IALELAG)*(NUMELS+NUMELQ+NUMELTG+NSVOIS+NQVOIS+NTGVOIS)
-     *  *MAX(1,NMULT)
-
-C tableau temporaire phi et valeur segsurf
-         SPHI = MAX(IALE,ITHERM,IEULER,IALELAG)*( NUMELS + NUMELQ + NUMELTG +
-     *                                            NSVOIS + NQVOIS + NTGVOIS + NSEGFLU )
+C
+      IF(ALE%GLOBAL%INCOMP==0)THEN
+        SVAL2=MAX(IALE,ITHERM,IEULER,IALELAG)*(NUMELS+NUMELQ+NUMELTG+NSVOIS+NQVOIS+NTGVOIS)*MAX(1,NMULT)
+        ! working array phi & segsurf
+        SPHI = MAX(IALE,ITHERM,IEULER,IALELAG)*( NUMELS + NUMELQ + NUMELTG + NSVOIS + NQVOIS + NTGVOIS + NSEGFLU )
       ELSE
         SVAL2 = 0
         SPHI = 0
       ENDIF
       SR = 0
       SESTIF = 0
+      
 C-------------------------------------------
 C     LINK
 C-------------------------------------------
@@ -522,46 +496,52 @@ C-------------------------------------------
       ELSE
          SIADRL = 0
       ENDIF
-      !SLINALE= SLINALE + LLINAL
-C-------------------------------------------
-C     IMPLICIT
-C-------------------------------------------
+
 C---------------------------------------------------------
-C     FLUX ET ROTATION
+C     /FLSEC (FLOW SECTION, obsolete option)
 C---------------------------------------------------------
       SCRFLSW = 9*NSFLSW
       SFLSW   = 6*NSFLSW
       SNEFLSW = 1*NSFLSW
       SNNFLSW = 8*NTFLSW
 C---------------------------------------------------------
-C     ANIMATION (VECTEURS CONTACT,FORCES INTERNES,FORCES EXTERNES)
+C     ANIMATION (vectors for CONTACT,INTERNAL FORCES, EXTERNAL FORCES)
 C     CUTS NOISE 
 C---------------------------------------------------------
       SFANI = 3*NUMNOD*(
      .                MIN(1,ANIM_V(4)+OUTP_V(4)+H3D_DATA%N_VECT_CONT)
      .              + MIN(1,ANIM_V(5)+OUTP_V(5)+H3D_DATA%N_VECT_FINT)
      .              + MIN(1,ANIM_V(6)+OUTP_V(6)+H3D_DATA%N_VECT_FEXT) )
-     .          + 6*(NSECT+NRBODY+NRWALL+NUMELUR)
+     .          + 6*(NSECT+NRBODY+NRWALL)
      .          + 6*NUMNOD*MIN(1,ANIM_V(12)+OUTP_V(12)+H3D_DATA%N_VECT_PCONT)  
      .          + 3*NUMNOD*MIN(1,ANIM_V(13)+H3D_DATA%N_VECT_CONT2)
      .          + 6*NUMNOD*MIN(1,ANIM_V(27)+H3D_DATA%N_VECT_PCONT2)  
-      SFANI_CELL = (NUMELS)*(ANIM_SE(10)+ANIM_SE(4960)+ANIM_SE(4961)) !ALE : 3D-Vorticity        
-      SFANI_CELL = SFANI_CELL+(NUMELS+NUMELQ)*3*(H3D_DATA%N_VECT_CONT) !ALE : FSI reaction force  /H3D/ELEM/VECT/CONT
 
       SXCUT = 7*NCUTS
       SANIN = NUMNOD*( 
      .                MIN(1,ANIM_N(1)+OUTP_N(1)+H3D_DATA%N_SCAL_DT)
      .              + MIN(1,ANIM_N(2)+OUTP_N(2)+H3D_DATA%N_SCAL_DMAS)
      .              + MIN(1,ANIM_N(12)+OUTP_N(3)+H3D_DATA%N_SCAL_DINER))
-     .          + NUMELR*(ANIM_FE(11)+ANIM_FE(12)+ANIM_FE(13))
-     .              + 2 * NUMNOD * MIN(1,ANIM_N(15)*ANIM_N(16)+H3D_DATA%N_SCAL_DAMA2)
-      STANI = 6*(NUMELC+NUMELTG)*IEPSDOT 
-     .          + 15*(NUMELT+NUMELP+NUMELR)*(MAX(ANIM_FT(1),H3D_DATA%UND_FORC))
+     .              + NUMELR*(ANIM_FE(11)+ANIM_FE(12)+ANIM_FE(13)) + 2*NUMNOD*MIN(1,ANIM_N(15)*ANIM_N(16)+H3D_DATA%N_SCAL_DAMA2)
+      STANI = 6*(NUMELC+NUMELTG)*IEPSDOT + 15*(NUMELT+NUMELP+NUMELR)*(MAX(ANIM_FT(1),H3D_DATA%UND_FORC))
 C
       SSECFCUM = 7*NUMNOD*NSECT*ISECUT
 C     Work Array private to sph : WAPSH(LWASPH)
       SWASPH = LWASPH
 C
+      !/H3D/ELEM/VORT,X,Y,Z
+      FANI_CELL%IS_VORT_X_REQUESTED = .FALSE.
+      FANI_CELL%IS_VORT_Y_REQUESTED = .FALSE.
+      FANI_CELL%IS_VORT_Z_REQUESTED = .FALSE.
+      IF(ANIM_SE(10) == 1   .OR. H3D_DATA%SOL_SCAL_VORTX == 1)FANI_CELL%IS_VORT_X_REQUESTED=.TRUE.
+      IF(ANIM_SE(4960) == 1 .OR. H3D_DATA%SOL_SCAL_VORTY == 1)FANI_CELL%IS_VORT_Y_REQUESTED=.TRUE.
+      IF(ANIM_SE(4961) == 1 .OR. H3D_DATA%SOL_SCAL_VORTZ == 1)FANI_CELL%IS_VORT_Z_REQUESTED=.TRUE.
+
+      ! /H3D/ELEM/VECT/CONT
+      ! INTER18 REACTION FORCES ON CELL CENTROIDS
+      FANI_CELL%IS_F18_FVM_REQUESTED = .FALSE.
+      IF(H3D_DATA%N_VECT_CONT == 1)FANI_CELL%IS_F18_FVM_REQUESTED = .TRUE.
+
       M16STAK = 0
       IF(NUMELS16/=0)THEN
         NPE = 16

@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  H3D_SKIN_IXSKIN               source/output/h3d/h3d_results/h3d_skin_ixskin.F
 Chd|-- called by -----------
@@ -28,46 +28,42 @@ Chd|-- calls ---------------
 Chd|        H3D_PRE_SKIN_IXSKIN           source/output/h3d/h3d_results/h3d_skin_ixskin.F
 Chd|        H3D_SOL_SKIN_IXSKIN           source/output/h3d/h3d_results/h3d_sol_skin_ixskin.F
 Chd|        INITBUF                       share/resol/initbuf.F         
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
+Chd|        H3D_INC_MOD                   share/modules/h3d_inc_mod.F   
 Chd|        INITBUF_MOD                   share/resol/initbuf.F         
+Chd|        LOADS_MOD                     ../common_source/modules/loads/loads_mod.F
 Chd|====================================================================
       SUBROUTINE H3D_SKIN_IXSKIN(ELBUF_TAB,IPARG,IPARTS,IXS,IXS10,
      .                           ITAB ,IXSKIN  ,TAG_SKINS6,IBCL  ,
-     .                           ILOADP,LLOADP ,NODAL_IPART)
+     .                           ILOADP,LLOADP ,NODAL_IPART,IMAPSKP,
+     .                           LOADS )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE INITBUF_MOD
       USE ELBUFDEF_MOD    
+      USE H3D_INC_MOD
+      USE LOADS_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "chara_c.inc"
-#include      "nchara_c.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "mvsiz_p.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "scr01_c.inc"
-#include      "scr05_c.inc"
-#include      "scr14_c.inc"
-#include      "rnur_c.inc"
-#include      "task_c.inc"
-#include      "scr03_c.inc"
-#include      "spmd_c.inc"
-#include      "scr17_c.inc"
+
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-C     REAL
+      INTEGER, DIMENSION(NUMSKINP0), INTENT(IN)  :: IMAPSKP
       INTEGER IPARG(NPARG,*),IXS(NIXS,*),IPARTS(*),ITAB(*),IXSKIN(NIXQ,*),
      .        IXS10(6,*) ,TAG_SKINS6(*),IBCL(*),ILOADP(*),LLOADP(*),
      .        NODAL_IPART(*)  
       TYPE (ELBUF_STRUCT_), DIMENSION(NGROUP), TARGET :: ELBUF_TAB
+      TYPE (LOADS_)   , INTENT(IN)          :: LOADS
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C----------------------------------------------- 
@@ -86,7 +82,7 @@ C-----------------------------------------------
        DO NG=1,NGROUP
         ISOLNOD = IPARG(28,NG)
         ICS     = IPARG(17,NG)                                        
-        CALL INITBUF (IPARG    ,NG      ,                      
+        CALL INITBUF(IPARG    ,NG      ,                      
      2        MLW     ,NEL     ,NFT     ,IAD     ,ITY     ,    
      3        NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,    
      4        JTHE    ,JLAG    ,JMULT   ,JHBE    ,JIVF    ,    
@@ -249,7 +245,7 @@ C------to show pressure
        NFT = NSKIN
       IF (NUMSKINP>0) THEN      
        CALL H3D_PRE_SKIN_IXSKIN(NODAL_IPART,IBCL ,ILOADP,LLOADP,
-     .                          IXSKIN  ,NSKIN )
+     .                          IXSKIN  ,NSKIN ,IMAPSKP,LOADS )
        DO I=NFT+1,NSKIN
          IXSKIN(2:5,I) = ITAB(IXSKIN(2:5,I))
        END DO 
@@ -266,12 +262,14 @@ Chd|        H3D_SKIN_PRE_DIM              source/output/h3d/h3d_results/h3d_skin
 Chd|        H3D_SKIN_SOL_DIM              source/output/h3d/h3d_results/h3d_skin_ixskin.F
 Chd|        H3D_SKIN_TSH_DIM              source/output/h3d/h3d_results/h3d_skin_ixskin.F
 Chd|        SPMD_ALLGLOB_ISUM9            source/mpi/generic/spmd_allglob_isum9.F
+Chd|        LOADS_MOD                     ../common_source/modules/loads/loads_mod.F
 Chd|====================================================================
       SUBROUTINE H3D_SKIN_DIM(IPARG ,NUMSKIN, NUMSKING,TAG_SKINS6,IBCL,
-     .   	                  ILOADP,LLOADP ,NUMSKINP,IFLAG )
+     .                       ILOADP,LLOADP ,LOADS,NUMSKINP0,NUMSKINP,IFLAG )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE LOADS_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -279,21 +277,18 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "mvsiz_p.inc"
-#include      "param_c.inc"
-#include      "scr05_c.inc"
-#include      "task_c.inc"
 #include      "com01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-C     REAL
+      INTEGER ,INTENT(OUT) :: NUMSKINP0
       INTEGER NUMSKIN, NUMSKING ,IPARG(*),TAG_SKINS6(*),
-     .        IBCL(*),ILOADP(*),LLOADP(*),NUMSKINP,IFLAG	  
+     .        IBCL(*),ILOADP(*),LLOADP(*),NUMSKINP,IFLAG    
+      TYPE (LOADS_) , INTENT(IN)   :: LOADS
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C----------------------------------------------- 
-      INTEGER I, LEN ,N0  
+      INTEGER I, LEN ,N0  ,NUMSKIN0
 
 C-----------------------------------------------
        NUMSKIN = 0
@@ -302,11 +297,13 @@ C--- thick-shell first, solid after
         CALL  H3D_SKIN_TSH_DIM(IPARG    ,TAG_SKINS6, NUMSKIN)     
         CALL  H3D_SKIN_SOL_DIM(IPARG    ,TAG_SKINS6, NUMSKIN)
        END IF        
-C--- followed by pressure: pblast, pfluid,force
+C--- followed by pressure: pblast, pfluid,force...
        N0 = NUMSKIN
+       NUMSKIN0 = NUMSKIN
 C------!!!!create NODAL_IPART(numnod) before       
-       IF (IFLAG>1) CALL H3D_SKIN_PRE_DIM (IBCL   ,ILOADP    ,LLOADP , NUMSKIN)
-	   NUMSKINP =NUMSKIN- N0
+       IF (IFLAG>1) CALL H3D_SKIN_PRE_DIM (IBCL,ILOADP,LLOADP,LOADS, NUMSKIN0,NUMSKIN)
+             NUMSKINP =NUMSKIN- N0
+             NUMSKINP0=NUMSKIN0- N0
 C
        LEN = 1       
        IF (NSPMD>1) THEN
@@ -338,10 +335,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "mvsiz_p.inc"
 #include      "param_c.inc"
-#include      "scr05_c.inc"
-#include      "task_c.inc"
 #include      "com01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -361,7 +355,7 @@ C-----------------------------------------------
      .        NN,ICS,ISOLNOD
 C-----------------------------------------------
        DO NG=1,NGROUP
-        CALL INITBUF (IPARG    ,NG      ,                      
+        CALL INITBUF(IPARG    ,NG      ,                      
      2        MLW     ,NEL     ,NFT     ,IAD     ,ITY     ,    
      3        NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,    
      4        JTHE    ,JLAG    ,JMULT   ,JHBE    ,JIVF    ,    
@@ -398,10 +392,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "mvsiz_p.inc"
 #include      "param_c.inc"
-#include      "scr05_c.inc"
-#include      "task_c.inc"
 #include      "com01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -436,7 +427,7 @@ c              N4=N2           1 2 3 3
 c              N3=N2           1 4 4 2
 C-----------------------------------------------
        DO NG=1,NGROUP
-        CALL INITBUF (IPARG    ,NG      ,                      
+        CALL INITBUF(IPARG    ,NG      ,                      
      2        MLW     ,NEL     ,NFT     ,IAD     ,ITY     ,    
      3        NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,    
      4        JTHE    ,JLAG    ,JMULT   ,JHBE    ,JIVF    ,    
@@ -488,13 +479,15 @@ Chd|  H3D_SKIN_PRE_DIM              source/output/h3d/h3d_results/h3d_skin_ixski
 Chd|-- called by -----------
 Chd|        H3D_SKIN_DIM                  source/output/h3d/h3d_results/h3d_skin_ixskin.F
 Chd|-- calls ---------------
+Chd|        LOADS_MOD                     ../common_source/modules/loads/loads_mod.F
 Chd|        PINCHTYPE_MOD                 ../common_source/modules/pinchtype_mod.F
 Chd|====================================================================
-      SUBROUTINE H3D_SKIN_PRE_DIM (IB     ,ILOADP    ,LLOADP , NSKIN)
+      SUBROUTINE H3D_SKIN_PRE_DIM(IB ,ILOADP  ,LLOADP ,LOADS, NSKIN0,NSKIN)
 C-----------------------------------------------
 C   M o d u l e s 
 C-----------------------------------------------
       USE PINCHTYPE_MOD 
+      USE LOADS_MOD 
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -503,7 +496,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "tabsiz_c.inc"
 C-----------------------------------------------
@@ -512,35 +504,40 @@ C-----------------------------------------------
 C-----------------------------------------------,
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER LLOADP(SLLOADP),NSKIN
+      INTEGER LLOADP(SLLOADP),NSKIN,NSKIN0
       INTEGER ILOADP(SIZLOADP,*),IB(NIBCLD,*)
+      TYPE (LOADS_)  , INTENT(IN)  :: LOADS
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NL, N1, ISK, N2, N3, N4, N5, 
-     .        IAD ,NP ,IFUNC ,NPRES ,N
+      INTEGER NL, N1, ISK, N2, N3, N4, N5, J,
+     .        IAD ,NP ,IFUNC ,NPRES ,N,NSKIN_I,NSKINP0,IERR,IXST,SHIFT
+      INTEGER, DIMENSION(:), ALLOCATABLE  :: ITAGN
+      INTEGER, DIMENSION(:,:), ALLOCATABLE  :: IRECT
 C=======================================================================
 C-----Force (pressure) first 
+       NSKIN_I = NSKIN
        DO NL=1,NCONLD-NPLOADPINCH
          N1      = IB(1,NL)
          N2      = IB(2,NL)
          N3      = IB(3,NL)
          N4      = IB(4,NL)
 C        
-		 IF (N1>0.AND.N2>0.AND.N3>0.AND.N4/=-1) NSKIN = NSKIN + 1
+           IF (N1>0.AND.N2>0.AND.N3>0.AND.N4/=-1) NSKIN = NSKIN + 1
        END DO 
 C----------load_pressure
-       DO  NL=1,NLOADP_HYD
+       SHIFT =   NLOADP_F+NLOADP_B
+       DO NL=1+SHIFT,NLOADP_HYD+SHIFT
            IAD = ILOADP(4,NL)
            DO N=1, ILOADP(1,NL)/4
               N1 = LLOADP(IAD+4*(N-1))
               N2 = LLOADP(IAD+4*(N-1)+1)
               N3 = LLOADP(IAD+4*(N-1)+2)
               N4 = LLOADP(IAD+4*(N-1)+3)
-		     IF (N1>0.AND.N2>0.AND.N3>0) NSKIN = NSKIN + 1
+               IF (N1>0.AND.N2>0.AND.N3>0) NSKIN = NSKIN + 1
            ENDDO
-       END DO !NP=1,NLOADP_HYD
-C---------pfluid+pblast	   
+       END DO 
+C---------pfluid+pblast     
        DO NL=1,NLOADP_F+NLOADP_B
          IAD = ILOADP(4,NL)
            DO N=1, ILOADP(1,NL)/4
@@ -548,9 +545,178 @@ C---------pfluid+pblast
               N2 = LLOADP(IAD+4*(N-1)+1)
               N3 = LLOADP(IAD+4*(N-1)+2)
               N4 = LLOADP(IAD+4*(N-1)+3)
-		     IF (N1>0.AND.N2>0.AND.N3>0) NSKIN = NSKIN + 1
+               IF (N1>0.AND.N2>0.AND.N3>0) NSKIN = NSKIN + 1
            ENDDO
        END DO 
+C       
+       DO NL = 1,LOADS%NLOAD_CYL
+         DO N = 1,LOADS%LOAD_CYL(NL)%NSEG
+           N1   = LOADS%LOAD_CYL(NL)%SEGNOD(N,1)
+           N2   = LOADS%LOAD_CYL(NL)%SEGNOD(N,2)
+           N3   = LOADS%LOAD_CYL(NL)%SEGNOD(N,3)
+           N4   = LOADS%LOAD_CYL(NL)%SEGNOD(N,4)
+             IF (N1>0.AND.N2>0.AND.N3>0) NSKIN = NSKIN + 1
+         ENDDO
+       END DO
+C       
+       NSKIN0 = NSKIN
+       NSKINP0 = NSKIN0 - NSKIN_I
+       IF (NSKINP0 > (NCONLD-NPLOADPINCH)) THEN
+         ALLOCATE(IRECT(4,NSKINP0),ITAGN(NUMNOD),STAT=IERR)
+C
+         NP = 0 
+         ITAGN = 0         
+         DO NL=1,NCONLD-NPLOADPINCH
+           N1      = IB(1,NL)
+           N2      = IB(2,NL)
+           N3      = IB(3,NL)
+           N4      = IB(4,NL)
+C          
+             IF (N1==0.OR.N2==0.OR.N3==0.OR.N4==-1) CYCLE
+           IF (N4==0) N4 = N3
+           NP = NP +1
+           ITAGN(N1) = 1
+           ITAGN(N2) = 1
+           ITAGN(N3) = 1
+           ITAGN(N4) = 1
+           IRECT(1:4,NP) = IB(1:4,NL)
+         END DO 
+C----add only not existing           
+           SHIFT =   NLOADP_F+NLOADP_B
+           DO NL=1+SHIFT,NLOADP_HYD+SHIFT
+              IAD = ILOADP(4,NL)
+              DO N=1, ILOADP(1,NL)/4
+                N1 = LLOADP(IAD+4*(N-1))
+                N2 = LLOADP(IAD+4*(N-1)+1)
+                N3 = LLOADP(IAD+4*(N-1)+2)
+                N4 = LLOADP(IAD+4*(N-1)+3)
+                  IF (N1==0.OR.N2==0.OR.N3==0) CYCLE
+                IF (N4==0) N4 = N3
+                IF(ITAGN(N1)+ITAGN(N2)+ITAGN(N3)+ITAGN(N4)<4) THEN
+                   NP = NP +1
+                   ITAGN(N1) = 1
+                   ITAGN(N2) = 1
+                   ITAGN(N3) = 1
+                   ITAGN(N4) = 1
+                   IRECT(1,NP) = N1
+                   IRECT(2,NP) = N2
+                   IRECT(3,NP) = N3
+                   IRECT(4,NP) = N4
+                ELSE
+                  IXST = 0
+                  J = 0
+                  DO WHILE (IXST==0 .AND. J < NP)
+                    J = J + 1
+                    IF (N1 /= IRECT(1,J)) CYCLE
+                    IF (N2 /= IRECT(2,J)) CYCLE
+                    IF (N3 /= IRECT(3,J)) CYCLE
+                    IF (N4 /= IRECT(4,J)) CYCLE
+                    IXST = 1
+                  END DO
+                  IF (IXST == 0 )THEN
+                    NP = NP +1
+                    ITAGN(N1) = 1
+                    ITAGN(N2) = 1
+                    ITAGN(N3) = 1
+                    ITAGN(N4) = 1
+                    IRECT(1,NP) = N1
+                    IRECT(2,NP) = N2
+                    IRECT(3,NP) = N3
+                    IRECT(4,NP) = N4
+                  END IF
+                END IF 
+              ENDDO
+           END DO 
+           DO  NL=1,NLOADP_F + NLOADP_B
+              IAD = ILOADP(4,NL)
+              DO N=1, ILOADP(1,NL)/4
+                N1 = LLOADP(IAD+4*(N-1))
+                N2 = LLOADP(IAD+4*(N-1)+1)
+                N3 = LLOADP(IAD+4*(N-1)+2)
+                N4 = LLOADP(IAD+4*(N-1)+3)
+                  IF (N1==0.OR.N2==0.OR.N3==0) CYCLE
+                IF (N4==0) N4 = N3
+                IF(ITAGN(N1)+ITAGN(N2)+ITAGN(N3)+ITAGN(N4)<4) THEN
+                   NP = NP +1
+                   ITAGN(N1) = 1
+                   ITAGN(N2) = 1
+                   ITAGN(N3) = 1
+                   ITAGN(N4) = 1
+                   IRECT(1,NP) = N1
+                   IRECT(2,NP) = N2
+                   IRECT(3,NP) = N3
+                   IRECT(4,NP) = N4
+                ELSE
+                  IXST = 0
+                  J = 0
+                  DO WHILE (IXST==0 .AND. J < NP)
+                    J = J + 1
+                    IF (N1 /= IRECT(1,J)) CYCLE
+                    IF (N2 /= IRECT(2,J)) CYCLE
+                    IF (N3 /= IRECT(3,J)) CYCLE
+                    IF (N4 /= IRECT(4,J)) CYCLE
+                    IXST = 1
+                  END DO
+                  IF (IXST == 0 )THEN
+                    NP = NP +1
+                    ITAGN(N1) = 1
+                    ITAGN(N2) = 1
+                    ITAGN(N3) = 1
+                    ITAGN(N4) = 1
+                    IRECT(1,NP) = N1
+                    IRECT(2,NP) = N2
+                    IRECT(3,NP) = N3
+                    IRECT(4,NP) = N4
+                  END IF
+                END IF 
+              ENDDO
+           END DO 
+           DO NL = 1,LOADS%NLOAD_CYL
+             DO N = 1,LOADS%LOAD_CYL(NL)%NSEG
+               N1   = LOADS%LOAD_CYL(NL)%SEGNOD(N,1)
+               N2   = LOADS%LOAD_CYL(NL)%SEGNOD(N,2)
+               N3   = LOADS%LOAD_CYL(NL)%SEGNOD(N,3)
+               N4   = LOADS%LOAD_CYL(NL)%SEGNOD(N,4)
+                IF (N4==0) N4 = N3
+                IF(ITAGN(N1)+ITAGN(N2)+ITAGN(N3)+ITAGN(N4)<4) THEN
+                   NP = NP +1
+                   ITAGN(N1) = 1
+                   ITAGN(N2) = 1
+                   ITAGN(N3) = 1
+                   ITAGN(N4) = 1
+                   IRECT(1,NP) = N1
+                   IRECT(2,NP) = N2
+                   IRECT(3,NP) = N3
+                   IRECT(4,NP) = N4
+                ELSE
+                  IXST = 0
+                  J = 0
+                  DO WHILE (IXST==0 .AND. J < NP)
+                    J = J + 1
+                    IF (N1 /= IRECT(1,J)) CYCLE
+                    IF (N2 /= IRECT(2,J)) CYCLE
+                    IF (N3 /= IRECT(3,J)) CYCLE
+                    IF (N4 /= IRECT(4,J)) CYCLE
+                    IXST = 1
+                  END DO
+                  IF (IXST == 0 )THEN
+                    NP = NP +1
+                    ITAGN(N1) = 1
+                    ITAGN(N2) = 1
+                    ITAGN(N3) = 1
+                    ITAGN(N4) = 1
+                    IRECT(1,NP) = N1
+                    IRECT(2,NP) = N2
+                    IRECT(3,NP) = N3
+                    IRECT(4,NP) = N4
+                  END IF
+                END IF 
+             ENDDO
+           END DO
+          NSKIN = NSKIN_I + NP
+          DEALLOCATE(IRECT,ITAGN)
+       END IF
+C-----some segs are used > 1 times       
 C
       RETURN
       END
@@ -559,14 +725,18 @@ Chd|  H3D_PRE_SKIN_IXSKIN           source/output/h3d/h3d_results/h3d_skin_ixski
 Chd|-- called by -----------
 Chd|        H3D_SKIN_IXSKIN               source/output/h3d/h3d_results/h3d_skin_ixskin.F
 Chd|-- calls ---------------
+Chd|        H3D_INC_MOD                   share/modules/h3d_inc_mod.F   
+Chd|        LOADS_MOD                     ../common_source/modules/loads/loads_mod.F
 Chd|        PINCHTYPE_MOD                 ../common_source/modules/pinchtype_mod.F
 Chd|====================================================================
       SUBROUTINE H3D_PRE_SKIN_IXSKIN(NODAL_IPART,IB ,ILOADP,LLOADP,
-     .                               IXSKIN  ,NSKIN )
+     .                               IXSKIN  ,NSKIN ,IMAPSKP,LOADS )
 C-----------------------------------------------
 C   M o d u l e s 
 C-----------------------------------------------
       USE PINCHTYPE_MOD 
+      USE H3D_INC_MOD
+      USE LOADS_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -575,7 +745,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "tabsiz_c.inc"
 C-----------------------------------------------
@@ -584,62 +753,69 @@ C-----------------------------------------------
 C-----------------------------------------------,
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER , DIMENSION(NUMSKINP0), INTENT(IN) ::  IMAPSKP
       INTEGER LLOADP(SLLOADP),NSKIN,IXSKIN(NIXQ,*)
       INTEGER ILOADP(SIZLOADP,*),IB(NIBCLD,*),NODAL_IPART(*)
+      TYPE (LOADS_)   , INTENT(IN) :: LOADS
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER NL, N1, ISK, N2, N3, N4, N5, 
-     .        IAD ,NP ,IFUNC ,NPRES,NSKIN0,NSKIN1,N,I,PID0
+     .        IAD ,NP ,IFUNC ,NPRES,NSKIN0,NSKIN1,N,I,PID0,SHIFT
 C=======================================================================
 C-----IXSKIN(1,*):ipart;IXSKIN(2:5,*):N1-4,IXSKIN(6,*):pid;IXSKIN(7,*):usr_id
        PID0 =0
        NSKIN0 = NSKIN
+       NP = 0
 C-----Force (pressure) first 
        DO NL=1,NCONLD-NPLOADPINCH
          N1      = IB(1,NL)
          N2      = IB(2,NL)
          N3      = IB(3,NL)
          N4      = IB(4,NL)
-		 IF (N1==0.OR.N2==0.OR.N3==0.OR.N4==-1) CYCLE
+           IF (N1==0.OR.N2==0.OR.N3==0.OR.N4==-1) CYCLE
 C        
-		 NSKIN = NSKIN + 1
-		 IXSKIN(2,NSKIN)=N1
-		 IXSKIN(3,NSKIN)=N2
-		 IXSKIN(4,NSKIN)=N3
-		 IF (N4==0) THEN
-		  IXSKIN(5,NSKIN)=N3
-		 ELSEIF(N4>0) THEN
-		  IXSKIN(5,NSKIN)=N4
-		 END IF
-		 IXSKIN(1,NSKIN)=NODAL_IPART(N1)
-		 IXSKIN(6,NSKIN)=NSKIN0+NL
+           NP = NP + 1
+           NSKIN = NSKIN0+ IMAPSKP(NP)
+           IXSKIN(2,NSKIN)=N1
+           IXSKIN(3,NSKIN)=N2
+           IXSKIN(4,NSKIN)=N3
+           IF (N4==0) THEN
+            IXSKIN(5,NSKIN)=N3
+           ELSEIF(N4>0) THEN
+            IXSKIN(5,NSKIN)=N4
+           END IF
+           IXSKIN(1,NSKIN)=NODAL_IPART(N1)
+           IXSKIN(6,NSKIN)=NSKIN0+NL
        END DO 
        NSKIN1 = NSKIN
-C----------load_pressure	   
-       DO NL=1,NLOADP_HYD
+C----------load_pressure     
+       SHIFT =   NLOADP_F+NLOADP_B
+       DO NL=1+SHIFT,NLOADP_HYD+SHIFT
          IAD = ILOADP(4,NL)
          DO N=1, ILOADP(1,NL)/4
            N1 = LLOADP(IAD+4*(N-1))
            N2 = LLOADP(IAD+4*(N-1)+1)
            N3 = LLOADP(IAD+4*(N-1)+2)
            N4 = LLOADP(IAD+4*(N-1)+3)
-		   IF (N1==0.OR.N2==0.OR.N3==0) CYCLE
+             IF (N1==0.OR.N2==0.OR.N3==0) CYCLE
 C          
-		   NSKIN = NSKIN + 1
-		   IXSKIN(2,NSKIN)=N1
-		   IXSKIN(3,NSKIN)=N2
-		   IXSKIN(4,NSKIN)=N3
-		   IF (N4==0) THEN
-		    IXSKIN(5,NSKIN)=N3
-		   ELSEIF(N4>0) THEN
-		    IXSKIN(5,NSKIN)=N4
-		   END IF
-		   IXSKIN(1,NSKIN)=NODAL_IPART(N1)
-		   IXSKIN(6,NSKIN)=NSKIN1+NL
+             NP = NP + 1
+             IF (IMAPSKP(NP) < NP) CYCLE
+             NSKIN = NSKIN0+ IMAPSKP(NP)
+             IXSKIN(2,NSKIN)=N1
+             IXSKIN(3,NSKIN)=N2
+             IXSKIN(4,NSKIN)=N3
+             IF (N4==0) THEN
+              IXSKIN(5,NSKIN)=N3
+             ELSEIF(N4>0) THEN
+              IXSKIN(5,NSKIN)=N4
+             END IF
+             IXSKIN(1,NSKIN)=NODAL_IPART(N1)
+             IXSKIN(6,NSKIN)=NSKIN1+NL
          ENDDO
        END DO !NP=1,NLOADP_HYD
-C---------pfluid	   
+C---------pfluid     
        NSKIN1 = NSKIN
        DO NL=1,NLOADP_F
          IAD = ILOADP(4,NL)
@@ -648,22 +824,24 @@ C---------pfluid
            N2=LLOADP(IAD+4*(I-1)+1)
            N3=LLOADP(IAD+4*(I-1)+2)
            N4=LLOADP(IAD+4*(I-1)+3)
-		   IF (N1==0.OR.N2==0.OR.N3==0) CYCLE
+             IF (N1==0.OR.N2==0.OR.N3==0) CYCLE
 C          
-		   NSKIN = NSKIN + 1
-		   IXSKIN(2,NSKIN)=N1
-		   IXSKIN(3,NSKIN)=N2
-		   IXSKIN(4,NSKIN)=N3
-		   IF (N4==0) THEN
-		    IXSKIN(5,NSKIN)=N3
-		   ELSEIF(N4>0) THEN
-		    IXSKIN(5,NSKIN)=N4
-		   END IF
-		   IXSKIN(1,NSKIN)=NODAL_IPART(N1)
-		   IXSKIN(6,NSKIN)=NSKIN1+NL
+             NP = NP + 1
+             IF (IMAPSKP(NP) < NP) CYCLE
+           NSKIN = NSKIN0+ IMAPSKP(NP)
+             IXSKIN(2,NSKIN)=N1
+             IXSKIN(3,NSKIN)=N2
+             IXSKIN(4,NSKIN)=N3
+             IF (N4==0) THEN
+              IXSKIN(5,NSKIN)=N3
+             ELSEIF(N4>0) THEN
+              IXSKIN(5,NSKIN)=N4
+             END IF
+             IXSKIN(1,NSKIN)=NODAL_IPART(N1)
+             IXSKIN(6,NSKIN)=NSKIN1+NL
          END DO 
        END DO 
-C---------pblast	   
+C---------pblast     
        NSKIN1 = NSKIN
        DO NL=1+NLOADP_F,NLOADP_F+NLOADP_B
          IAD = ILOADP(4,NL)
@@ -672,19 +850,45 @@ C---------pblast
            N2=LLOADP(IAD+4*(I-1)+1)
            N3=LLOADP(IAD+4*(I-1)+2)
            N4=LLOADP(IAD+4*(I-1)+3)
-		   IF (N1==0.OR.N2==0.OR.N3==0) CYCLE
+             IF (N1==0.OR.N2==0.OR.N3==0) CYCLE
 C          
-		   NSKIN = NSKIN + 1
-		   IXSKIN(2,NSKIN)=N1
-		   IXSKIN(3,NSKIN)=N2
-		   IXSKIN(4,NSKIN)=N3
-		   IF (N4==0) THEN
-		    IXSKIN(5,NSKIN)=N3
-		   ELSEIF(N4>0) THEN
-		    IXSKIN(5,NSKIN)=N4
-		   END IF
-		   IXSKIN(1,NSKIN)=NODAL_IPART(N1)
-		   IXSKIN(6,NSKIN)=NSKIN1+NL
+             NP = NP + 1
+             IF (IMAPSKP(NP) < NP) CYCLE
+           NSKIN = NSKIN0+ IMAPSKP(NP)
+             IXSKIN(2,NSKIN)=N1
+             IXSKIN(3,NSKIN)=N2
+             IXSKIN(4,NSKIN)=N3
+             IF (N4==0) THEN
+              IXSKIN(5,NSKIN)=N3
+             ELSEIF(N4>0) THEN
+              IXSKIN(5,NSKIN)=N4
+             END IF
+             IXSKIN(1,NSKIN)=NODAL_IPART(N1)
+             IXSKIN(6,NSKIN)=NSKIN1+NL
+         END DO 
+       END DO 
+C---------/LOAD/PCYL     
+       NSKIN1 = NSKIN
+       DO NL=1,LOADS%NLOAD_CYL
+         DO I = 1,LOADS%LOAD_CYL(NL)%NSEG
+           N1 = LOADS%LOAD_CYL(NL)%SEGNOD(I,1)
+           N2 = LOADS%LOAD_CYL(NL)%SEGNOD(I,2)
+           N3 = LOADS%LOAD_CYL(NL)%SEGNOD(I,3)
+           N4 = LOADS%LOAD_CYL(NL)%SEGNOD(I,4)
+C          
+           NP = NP + 1
+           IF (IMAPSKP(NP) < NP) CYCLE
+           NSKIN = NSKIN0+ IMAPSKP(NP)
+           IXSKIN(2,NSKIN)=N1
+           IXSKIN(3,NSKIN)=N2
+           IXSKIN(4,NSKIN)=N3
+           IF (N4==0) THEN
+             IXSKIN(5,NSKIN)=N3
+           ELSEIF(N4>0) THEN
+             IXSKIN(5,NSKIN)=N4
+           END IF
+           IXSKIN(1,NSKIN)=NODAL_IPART(N1)
+           IXSKIN(6,NSKIN)=NSKIN1+NL
          END DO 
        END DO 
 C
@@ -696,7 +900,7 @@ Chd|-- called by -----------
 Chd|        GENH3D                        source/output/h3d/h3d_results/genh3d.F
 Chd|-- calls ---------------
 Chd|        INITBUF                       share/resol/initbuf.F         
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        INITBUF_MOD                   share/resol/initbuf.F         
 Chd|====================================================================
       SUBROUTINE GET_NODAL_IPART(ELBUF_TAB,IPARG,IPARTC,IPARTTG,IPARTS,
@@ -714,7 +918,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "mvsiz_p.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
@@ -741,7 +944,7 @@ C-----------------------------------------------
 C-----------------------------------------------
        DO NG=1,NGROUP
         ISOLNOD = IPARG(28,NG)
-        CALL INITBUF (IPARG    ,NG      ,                      
+        CALL INITBUF(IPARG    ,NG      ,                      
      2        MLW     ,NEL     ,NFT     ,IAD     ,ITY     ,    
      3        NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,    
      4        JTHE    ,JLAG    ,JMULT   ,JHBE    ,JIVF    ,    

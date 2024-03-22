@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  LECLAS                        source/loads/laser/leclas.F   
 Chd|-- called by -----------
@@ -49,11 +49,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr05_c.inc"
 #include      "scr17_c.inc"
 #include      "units_c.inc"
 #include      "com04_c.inc"
-#include      "sysunit.inc"
 #include      "tabsiz_c.inc"
 #include      "titr_c.inc"
 C-----------------------------------------------
@@ -74,13 +72,13 @@ C-----------------------------------------------
 C   P r e - C o n d i t i o n
 C-----------------------------------------------
       CALL PRELECLAS(SILAS,SXLAS,LSUBMODEL)  
-      IF(NLASER == 0)RETURN
-      WRITE(ISTDO,'(A)')TITRE(49)      
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------
       IF(.NOT.ALLOCATED(ILAS))ALLOCATE (ILAS(SILAS)    ,STAT=stat)  
       IF(.NOT.ALLOCATED(XLAS))ALLOCATE (XLAS(SXLAS)    ,STAT=stat)       
+      IF(NLASER == 0)RETURN
+      WRITE(ISTDO,'(A)')TITRE(49)      
       IF (SILAS > 0) ILAS = 0              
       IF (SXLAS > 0) XLAS = ZERO            
 C-----------------------------------------------
@@ -109,8 +107,8 @@ C-----------------------------------------------
 
           !---------------------------------!
           !             UNITS               !
-          !---------------------------------!	
-          DO J=1,NUNITS
+          !---------------------------------!
+          DO J=1,UNITAB%NUNITS
             IF (UNITAB%UNIT_ID(J) == UID) THEN    
               FAC_M = UNITAB%FAC_M(J)
               FAC_L = UNITAB%FAC_L(J)
@@ -122,7 +120,7 @@ C-----------------------------------------------
 
           !---------------------------------!
           !             READING             !
-          !---------------------------------!	
+          !---------------------------------!
           I=I+1
 
           CALL HM_GET_FLOATV('SLAS'  ,FI       ,IS_AVAILABLE, LSUBMODEL, UNITAB)        

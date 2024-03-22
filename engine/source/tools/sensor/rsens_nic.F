@@ -1,3 +1,25 @@
+Copyright>        OpenRadioss
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
+Copyright>        This program is free software: you can redistribute it and/or modify
+Copyright>        it under the terms of the GNU Affero General Public License as published by
+Copyright>        the Free Software Foundation, either version 3 of the License, or
+Copyright>        (at your option) any later version.
+Copyright>
+Copyright>        This program is distributed in the hope that it will be useful,
+Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
+Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+Copyright>        GNU Affero General Public License for more details.
+Copyright>
+Copyright>        You should have received a copy of the GNU Affero General Public License
+Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  RSENS_NIC                     source/tools/sensor/rsens_nic.F
 Chd|-- called by -----------
@@ -5,8 +27,8 @@ Chd|        RFORC3                        source/elements/spring/rforc3.F
 Chd|-- calls ---------------
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
 Chd|====================================================================
-      SUBROUTINE RSENS_NIC(NEL   ,IXR   ,FOR   ,MOM    ,SKEW     ,
-     .                     SENSOR_TAB)
+      SUBROUTINE RSENS_NIC(NEL    ,IXR   ,FOR   ,MOM    ,SKEW     ,
+     .                     NSENSOR,SENSOR_TAB)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -23,7 +45,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER ,INTENT(IN) :: NEL
+      INTEGER ,INTENT(IN) :: NEL,NSENSOR
       INTEGER ,DIMENSION(NIXR,NUMELR) ,INTENT(IN) :: IXR
       my_real ,DIMENSION(NEL) ,INTENT(IN)  :: FOR,MOM
       TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) ,INTENT(INOUT) :: SENSOR_TAB

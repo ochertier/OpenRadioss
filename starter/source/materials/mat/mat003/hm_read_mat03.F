@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  HM_READ_MAT03                 source/materials/mat/mat003/hm_read_mat03.F
 Chd|-- called by -----------
@@ -29,19 +29,23 @@ Chd|        ANCMSG                        source/output/message/message.F
 Chd|        HM_GET_FLOATV                 source/devtools/hm_reader/hm_get_floatv.F
 Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
 Chd|        HM_OPTION_IS_ENCRYPTED        source/devtools/hm_reader/hm_option_is_encrypted.F
+Chd|        INIT_MAT_KEYWORD              source/materials/mat/init_mat_keyword.F
 Chd|        ELBUFTAG_MOD                  share/modules1/elbuftag_mod.F 
+Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
       SUBROUTINE HM_READ_MAT03(
-     .           LSUBMODEL ,MTAG     ,UNITAB   ,IPM    ,PM,
-     .           MAT_ID    ,TITR     ,EOS_TAG  ,MAXEOS ,ISRATE      )
+     .           LSUBMODEL ,MTAG     ,UNITAB   ,IPM    ,PM      ,
+     .           MAT_ID    ,TITR     ,ISRATE ,MATPARAM)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
-      USE ELBUFTAG_MOD            
+      USE ELBUFTAG_MOD   !MAXEOS
       USE MESSAGE_MOD
       USE SUBMODEL_MOD
+      USE MATPARAM_DEF_MOD          
+      USE UNITAB_MOD
 C-----------------------------------------------
 C   ROUTINE DESCRIPTION :
 C   ===================
@@ -63,23 +67,19 @@ C-----------------------------------------------
 #include      "scr17_c.inc"
 #include      "scr03_c.inc"
 #include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "sysunit.inc"
-#include      "submod_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER, INTENT(INOUT)                       :: MAT_ID
-      INTEGER, INTENT(IN)                          :: MAXEOS
       INTEGER, INTENT(INOUT)                       :: ISRATE
       INTEGER, DIMENSION(NPROPMI) ,INTENT(INOUT)   :: IPM
       CHARACTER*nchartitle ,INTENT(IN)             :: TITR
       my_real, DIMENSION(NPROPM)  ,INTENT(INOUT)   :: PM
-      my_real, DIMENSION(LUNIT,NUNITS) ,INTENT(IN) :: UNITAB
+      TYPE(UNIT_TYPE_) ,INTENT(IN) :: UNITAB
       TYPE(SUBMODEL_DATA), DIMENSION(NSUBMOD),INTENT(IN) :: LSUBMODEL
       TYPE(MLAW_TAG_), INTENT(INOUT)               :: MTAG
-      TYPE(EOS_TAG_) , TARGET, DIMENSION(0:MAXEOS) ,INTENT(OUT) :: EOS_TAG  
+      TYPE(MATPARAM_STRUCT_),INTENT(INOUT)         :: MATPARAM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -132,7 +132,7 @@ C-----------------------------------------------
         !CHECK IF OLD CARD FORMAT 100 IS USED (OBSOLETE)                                                               
         ! MAKES IT  COMPATIBLE + WARNING                                                                               
         !----------------------------------------------------                                                          
-      IF(EOS_EMBEDDED)THEN                                                                          
+      IF(EOS_EMBEDDED)THEN            ! POLYNOMIAL EOS                                                               
         IF(INVERS_INIT>=140) THEN                                                                 
           CALL ANCMSG(MSGID=1072,                                                                   
      .                MSGTYPE=MSGERROR,                                                             
@@ -158,8 +158,13 @@ C-----------------------------------------------
         PM(35)= C4                                                                                  
         PM(36)= C5                                                                                  
         PM(88)= PSH                                                                                 
-        IEOS = 1 ! POLYNOMIAL EOS                                                                   
+        IEOS = 1 ! POLYNOMIAL EOS
+       ELSE
+         IEOS = 18     ! linear EOS is used by default
        ENDIF                                                                                        
+!
+      MATPARAM%IEOS = IEOS
+      IPM(4)        = IEOS  ! keep this temporarily for output and fluid sections
      
       IF (PMIN==ZERO) PMIN=-EP20
       IF (RHOR==ZERO) RHOR=RHO0
@@ -193,13 +198,23 @@ C-----------------------------------------------
       MTAG%G_TEMP  = 1
       MTAG%L_TEMP  = 1
 
-      WRITE(IOUT,1000)          
+      ! Material compatibility with /EOS
+      CALL INIT_MAT_KEYWORD(MATPARAM,"EOS")
 
+      ! EOS/Thermo keyword
+      CALL INIT_MAT_KEYWORD(MATPARAM,"HYDRO_EOS")
+
+      ! Properties compatibility
+      CALL INIT_MAT_KEYWORD(MATPARAM,"SOLID_ISOTROPIC")
+      CALL INIT_MAT_KEYWORD(MATPARAM,"SPH")
+      
+      WRITE(IOUT,2001) TITR,MAT_ID,3
+      WRITE(IOUT,1000)    
+              
       IF(IS_ENCRYPTED)THEN
         WRITE(IOUT,'(5X,A,//)')'CONFIDENTIAL DATA'
       ELSE
-        WRITE(IOUT,2001) TITR,MAT_ID,3
-        WRITE(IOUT,2002) RHO0,RHOR 
+        WRITE(IOUT,2002)RHO0,RHOR 
         WRITE(IOUT,1300)YOUNG,ANU,G,BULK
         WRITE(IOUT,1400)CA,CB,CN,EPSM,SIGM
         WRITE(IOUT,1500)PMIN
@@ -211,9 +226,7 @@ C-----------------------------------------------
         WRITE(IOUT,2000)                                 !      
         IF(IS_ENCRYPTED)THEN                        !
           WRITE(IOUT,'(5X,A,//)')'CONFIDENTIAL DATA'     !
-        ELSE      
-          WRITE(IOUT,2001) TITR,MAT_ID,6                       
-          WRITE(IOUT,2002) RHO0,RHOR                                                  !
+        ELSE                                                       !
           WRITE(IOUT,2500)C0,C1,C2,C3,C4,C5,E0,PM(1),PSH !
         ENDIF                                            !
       ENDIF                                              !

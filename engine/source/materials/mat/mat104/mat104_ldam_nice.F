@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  MAT104_LDAM_NICE              source/materials/mat/mat104/mat104_ldam_nice.F
 Chd|-- called by -----------
@@ -42,9 +42,7 @@ Chd|====================================================================
       !=======================================================================
       !      Common
       !=======================================================================
-#include      "param_c.inc" 
 #include      "com01_c.inc"
-#include      "scr17_c.inc"
       !=======================================================================
       !      Dummy arguments
       !=======================================================================
@@ -168,7 +166,7 @@ c
       ! Recovering internal variables
       DO I=1,NEL
         ! If the element is failing
-        IF (OFF(I) < 0.001) OFF(I) = ZERO
+        IF (OFF(I) < EM03) OFF(I) = ZERO
         IF (OFF(I) < ONE)  OFF(I) = OFF(I)*FOUR_OVER_5
         ! User inputs
         PHI0(I)  = UVAR(I,1)  ! Previous yield function value
@@ -370,13 +368,13 @@ c
         ! a plastic multiplier allowing to update internal variables to satisfy
         ! the consistency condition. 
         ! Its expression is : DLAMBDA = - (PHI + DPHI) / DPHI_DLAMBDA
-	! -> PHI  : current value of yield function (known)
+          ! -> PHI  : current value of yield function (known)
         ! -> DPHI : yield function prediction (to compute)
         ! -> DPHI_DLAMBDA : derivative of PHI with respect to DLAMBDA by taking
         !                   into account of internal variables kinetic : 
         !                   plasticity, temperature and damage (to compute)
 c        
-	! 1 - Computation of DPHI_DSIG the normal to the yield surface
+          ! 1 - Computation of DPHI_DSIG the normal to the yield surface
         !-------------------------------------------------------------
 c        
         ! Computation of the normal to the yield criterion NORM
@@ -440,7 +438,7 @@ c
 c     
         ! 2 - Computation of DPHI_DLAMBDA
         !--------------------------------------------------------   
-        !   a) Derivative with respect stress increments tensor DSIG			
+        !   a) Derivative with respect stress increments tensor DSIG
         !   --------------------------------------------------------
         TRDFDS  = NORMXX + NORMYY + NORMZZ  
         DFDSIG2 = NORMXX*(ONE-D(I))*(NORMXX*G2 + LAM*TRDFDS)
@@ -450,7 +448,7 @@ c
      .          + NORMYZ*(ONE-D(I))*NORMYZ*G
      .          + NORMZX*(ONE-D(I))*NORMZX*G 
 c     
-        !   b) Derivatives with respect to plastic strain P 			
+        !   b) Derivatives with respect to plastic strain P 
         !   ------------------------------------------------
 c        
         !     i) Derivative of the yield stress with respect to plastic strain dYLD / dPLA
@@ -576,7 +574,7 @@ c
         DLAM  = (DPHI + PHI(I)) / DENOM
         DLAM  = MAX(DLAM, ZERO)
 c        
-	! Plastic strains tensor update
+          ! Plastic strains tensor update
         DPXX  = DLAM * NORMXX
         DPYY  = DLAM * NORMYY
         DPZZ  = DLAM * NORMZZ
@@ -705,7 +703,11 @@ c
           SIGDR(I)   = ZERO
         ENDIF
         ! USR Outputs
-        UVAR(I,1)  = PHI(I)           ! Yield function value
+        IF (DPLA(I) > ZERO) THEN 
+          UVAR(I,1) = PHI(I)          ! Yield function value
+        ELSE
+          UVAR(I,1) = ZERO
+        ENDIF
         UVAR(I,2)  = FG(I)            ! Growth damage
         UVAR(I,3)  = FN(I)            ! Nucleation damage
         UVAR(I,4)  = FSH(I)           ! Shear damage

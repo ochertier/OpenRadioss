@@ -1,31 +1,32 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  I2MOM27_CIN                   source/interfaces/interf/i2mom27_cin.F
 Chd|-- called by -----------
 Chd|        I2FOR27                       source/interfaces/interf/i2for27.F
 Chd|-- calls ---------------
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
+Chd|        OUTMAX_MOD                    ../common_source/modules/outmax_mod.F
 Chd|====================================================================
       SUBROUTINE I2MOM27_CIN(NSN ,NMN     ,AR      ,IRECT    ,CRST    ,
      2               MSR     ,NSV     ,IRTL    ,IN       ,MS      ,
@@ -36,6 +37,7 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE H3D_MOD
+      USE OUTMAX_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -54,8 +56,6 @@ C     REAL
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com08_c.inc"
 #include      "scr05_c.inc"
 #include      "scr14_c.inc"
 #include      "scr16_c.inc"
@@ -170,6 +170,19 @@ C
             ADI(J)=ADI(J)+AI*H(JJ)
           END DO
         END IF
+C
+        IF (H3D_DATA%N_VECT_CONT2M > 0) THEN
+          MCONT2(1,I) =  -AR(1,I)*W
+          MCONT2(2,I) =  -AR(2,I)*W
+          MCONT2(3,I) =  -AR(3,I)*W
+          DO JJ=1,NIR
+            J=IRECT(JJ,L)
+            MCONT2(1,J) = MCONT2(1,J) + MXI*H(JJ)*W
+            MCONT2(2,J) = MCONT2(2,J) + MYI*H(JJ)*W
+            MCONT2(3,J) = MCONT2(3,J) + MZI*H(JJ)*W
+          ENDDO
+        ENDIF
+C         
         DO JJ=1,NIR
          J=IRECT(JJ,L)
          IF (MSEGTYP2(L)==1) THEN
@@ -292,6 +305,19 @@ C
             ADI(J)=ADI(J)+AI*H(JJ)
           END DO
         END IF
+C
+        IF (H3D_DATA%N_VECT_CONT2M > 0) THEN
+          MCONT2(1,I) =  -AR(1,I)*W
+          MCONT2(2,I) =  -AR(2,I)*W
+          MCONT2(3,I) =  -AR(3,I)*W
+          DO JJ=1,NIR
+            J=IRECT(JJ,L)
+            MCONT2(1,J) = MCONT2(1,J) + MXI*H(JJ)*W
+            MCONT2(2,J) = MCONT2(2,J) + MYI*H(JJ)*W
+            MCONT2(3,J) = MCONT2(3,J) + MZI*H(JJ)*W
+          ENDDO
+        ENDIF
+C        
         DO JJ=1,4
          J=IRECT(JJ,L)
          IF (MSEGTYP2(L)==1) THEN

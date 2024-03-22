@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
 Chd|====================================================================
 Chd|  I25PEN3                       source/interfaces/inter3d1/i25pen3.F
@@ -38,7 +38,8 @@ Chd|====================================================================
      7                  MSEGLO ,GAPS   ,IRECT  ,IRTLM  ,
      9                  TIME_S ,PENE_OLD,ITAB   ,MSEGTYP,ISHARP,
      A                  NNX     ,NNY    ,NNZ   ,GAP_NM  ,MVOISN,
-     B                  GAPMXL  ,IVIS2  ,IBOUND,VTX_BISECTOR)
+     B                  GAPMXL  ,IVIS2  ,IBOUND,VTX_BISECTOR,ILEV,
+     C                  INACTI)
 C
       USE MESSAGE_MOD
 C
@@ -51,31 +52,17 @@ C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
-C   D u m m y   A r g u m e n t s
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "vect07_c.inc"
-#include      "scr03_c.inc"
-#include      "scr17_c.inc"
-#include      "param_c.inc"
 #include      "scr05_c.inc"
-#include      "com04_c.inc"
 C-----------------------------------------------
       INTEGER JLT, NSVG(*), NSN, MSEGLO(*), MSEGTYP(*), NRTM, IVIS2, ISHARP
-C     REAL
+      INTEGER , INTENT(IN) :: INACTI, ILEV
       my_real
      .   GAPS(*), GAP_NM(4,*), GAPMXL(*)
       INTEGER IRECT(4,*), ITAB(*),CAND_E(*),CAND_N(*),IRTLM(4,*)
       INTEGER IX1(MVSIZ),IX2(MVSIZ),IX3(MVSIZ),IX4(MVSIZ),
      .        MVOISN(MVSIZ,4), IBOUND(4,MVSIZ)
-C     REAL
       my_real
      .   PENMAX,PENMIN,PENE_OLD(5,NSN),TIME_S(NSN)
       my_real
@@ -91,7 +78,6 @@ C-----------------------------------------------
      .        NINDX, INDX(MVSIZ), I4N(MVSIZ), 
      .        FAR(MVSIZ,4), SUBTRIA(MVSIZ), I1, I2, ITRIA(2,4), JJ
       INTEGER IB1, IB2, IB3, IBX, IX, IY, IZ, NBORD, KBORD(MVSIZ)
-C     REAL
       my_real
      .   UNP,ZEROM,EPS,UNPT,ZEROMT,AAA,BB(MVSIZ,4)
       my_real
@@ -101,7 +87,7 @@ C     REAL
      .     LBH(MVSIZ,4), LCH(MVSIZ,4), LAH(MVSIZ,4), 
      .     DX, DY, DZ, DD(MVSIZ,4), 
      .     XP, YP, ZP,
-     .     GAP_MM(MVSIZ), GAPV(MVSIZ,4), GAP2
+     .     GAP_MM(MVSIZ), GAPV(MVSIZ,4), GAP2,NORM
       my_real
      .     PENE, 
      .     SX1,SX2,SX3,SX4,
@@ -372,7 +358,11 @@ C
             PENT(I,IT)=ZERO
           END IF
         ELSEIF(ETYP(I) > NRTM)THEN ! Coating shell (same orientation than solid)
-          PENT(I,IT)=MAX(GAPV(I,IT)+BB(I,IT),ZERO)
+          IF(BB(I,IT) > ZERO)THEN
+            PENT(I,IT)=GAPV(I,IT)+BB(I,IT)
+          ELSE
+            PENT(I,IT)=MAX(ZERO,GAPV(I,IT)-SQRT(DD(I,IT)))          
+          END IF
         ELSE
           IF(BB(I,IT) > ZERO)THEN
 C
@@ -457,7 +447,11 @@ C
               PENT(I,IT)=ZERO
             END IF
           ELSEIF(ETYP(I) > NRTM)THEN ! Coating shell (same orientation than solid)
-            PENT(I,IT)=MAX(GAPV(I,IT)+BB(I,IT),ZERO)
+            IF(BB(I,IT) > ZERO)THEN
+               PENT(I,IT)=GAPV(I,IT)+BB(I,IT)
+            ELSE
+               PENT(I,IT)=MAX(ZERO,GAPV(I,IT)-SQRT(DD(I,IT)))          
+            END IF
           ELSE
             IF(BB(I,IT) > ZERO)THEN
 C
@@ -760,7 +754,13 @@ C
         I1=ITRIA(1,IT)
         I2=ITRIA(2,IT)
 C
-        IF(PENT(I,IT)==ZERO) CYCLE
+        NN1(I) = ZERO
+        NN2(I) = ZERO
+        NN3(I) = ZERO
+
+        IF(PENT(I,IT)==ZERO) THEN
+         CYCLE
+        ENDIF
 C
         IF(IX3(I) /= IX4(I))THEN
 C
@@ -846,8 +846,8 @@ C
 
             ELSE
 
-c              print *,' ** possible internal error wrt p1,p2 in i25pen3',ib1,ib2,
-c     .        itab(nsvg(i)),itab(ix1(i)),itab(ix2(i)),itab(ix3(i)),itab(ix4(i)),p1,p2
+C              print *,' ** possible internal error wrt p1,p2 in i25pen3',ib1,ib2,
+C     .        itab(nsvg(i)),itab(ix1(i)),itab(ix2(i)),itab(ix3(i)),itab(ix4(i)),p1,p2
 
             END IF
 
@@ -1181,6 +1181,15 @@ C--------------------------------------------------------
           MGLOB = MSEGLO(L)
 
           PENE=PENT(I,IT) ! PENE /= ZERO .OR. DIST(I) < PENMIN**2
+
+C------- exclude wrong normal dir PEN_OLD(1-3): normal of nn  
+         IF (MSEGTYP(L)==0.OR.MSEGTYP(L)>NRTM) THEN          
+            IF(INACTI/=0.AND.ILEV/=3)THEN
+              NORM = NN1(I)*PENE_OLD(1,N)+NN2(I)*PENE_OLD(2,N)
+     +                  +NN3(I)*PENE_OLD(3,N)
+              IF(NORM > ZERO) PENE = ZERO
+            END IF 
+          ENDIF 
 C       if(itab(nsvg(i))==299344.or.itab(ix1(i))==299344.or.itab(ix2(i))==299344
 C    .   .or.itab(ix3(i))==299344.or.itab(ix4(i))==299344)
 C    .      print *,itab(nsvg(i)),itab(ix1(i)),itab(ix2(i)),itab(ix3(i)),itab(ix4(i)),
@@ -1226,7 +1235,17 @@ C         Looking for penetration vs closest segment (cf initial penetrations vs
             IF(PENT(I,IT)==ZERO) CYCLE
           END IF
 
+
           PENE=MAX(ZERO,PENT(I,IT)-HALF*GAPV(I,IT)) ! PENE /= ZERO .OR. DIST(I) < PENMIN**2
+
+C------- exclude wrong normal dir PEN_OLD(1-3): normal of nn  
+         IF (MSEGTYP(L)==0.OR.MSEGTYP(L)>NRTM) THEN          
+            IF(INACTI/=0.AND.ILEV/=3)THEN
+              NORM = NN1(I)*PENE_OLD(1,N)+NN2(I)*PENE_OLD(2,N)
+     +                  +NN3(I)*PENE_OLD(3,N)
+              IF(NORM > ZERO) PENE = ZERO
+            END IF 
+          ENDIF 
 C 
 C         Looking for penetration vs closest segment (cf initial penetrations vs solids)
           IF(DIST(I) < TIME_S(N) .OR.

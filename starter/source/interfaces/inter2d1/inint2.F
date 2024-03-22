@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C=======================================================================
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7--
 C
@@ -58,15 +58,11 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "units_c.inc"
 #include      "scr03_c.inc"
 #include      "scr17_c.inc"
-#include      "warn_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -90,7 +86,7 @@ C-----------------------------------------------
      .   K13, K14, KFI, J10, J11, J12, JFI, K16, K21, K23, J20, L17,
      .   L20, L22, J21, J22, L16, L21, L23, K15, K17, K18, K19, K20,
      .   K22, J13, J14, J15, J16, J17, J18, J19, IWPENE, K24, K25,K48,
-     .   IBIDON
+     .   IBIDON,I
 C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
@@ -127,11 +123,11 @@ C
       L22=L20+1+NSN
 C
        CALL ININT0(X,INTBUF_TAB%IRECTM,INTBUF_TAB%NSEGM,INTBUF_TAB%NRT,INTBUF_TAB%MSR,
-     1  	     INTBUF_TAB%NSV,INTBUF_TAB%ILOCS,NSN,NMN,NRTM)
+     1         INTBUF_TAB%NSV,INTBUF_TAB%ILOCS,NSN,NMN,NRTM)
        CALL I1CHK2(X,INTBUF_TAB%IRECTS,IXQ,NRTS, NINT,
-     1  	   NSN,INTBUF_TAB%NSV,NOINT,ID,TITR)
+     1       NSN,INTBUF_TAB%NSV,NOINT,ID,TITR)
        CALL I1CHK2(X,INTBUF_TAB%IRECTM,IXQ,NRTM,-NINT,
-     1  	   NMN,INTBUF_TAB%MSR,NOINT,ID,TITR)
+     1       NMN,INTBUF_TAB%MSR,NOINT,ID,TITR)
        CALL INVOI2(X,INTBUF_TAB%IRECTM,INTBUF_TAB%NRT,INTBUF_TAB%MSR,INTBUF_TAB%NSV,
      1 INTBUF_TAB%ILOCS,INTBUF_TAB%IRTLM,INTBUF_TAB%NSEGM,NSN,NRTM)
        WRITE(IOUT,2200)
@@ -149,20 +145,25 @@ C
       L23=L22+NST
       K48 = KFI
        CALL ININT0(X,INTBUF_TAB%IRECTM,INSCR(L21),INSCR(L23),INTBUF_TAB%MSR,
-     1  	     INTBUF_TAB%NSV,INSCR(L16),NSN,NMN,NRTM)
+     1         INTBUF_TAB%NSV,INSCR(L16),NSN,NMN,NRTM)
        CALL I1CHK2(X,INTBUF_TAB%IRECTS,IXQ,NRTS, NINT,
-     1  	   NSN,INTBUF_TAB%NSV,NOINT,ID,TITR)
+     1       NSN,INTBUF_TAB%NSV,NOINT,ID,TITR)
        CALL I1CHK2(X,INTBUF_TAB%IRECTM,IXQ,NRTM,-NINT,
-     1  	   NMN,INTBUF_TAB%MSR,NOINT,ID,TITR)
+     1       NMN,INTBUF_TAB%MSR,NOINT,ID,TITR)
 
        CALL INVOI2(X,INTBUF_TAB%IRECTM,INSCR(L23),INTBUF_TAB%MSR,INTBUF_TAB%NSV,
      1 INSCR(L16),INTBUF_TAB%IRTLM,INSCR(L21),NSN,NRTM)
        WRITE(IOUT,2200)
        CALL I1TID2(X,INTBUF_TAB%IRECTM,INTBUF_TAB%CSTS,INTBUF_TAB%MSR,INTBUF_TAB%NSV,
      1     INSCR(L16),INTBUF_TAB%IRTLM,NSN,ITAB ,ID,TITR)
+C Projection on edges is used only for the distribution of masses and inertia to avoid negative masses / inertia on MAIN nodes
+       DO I=1,NSN
+         INTBUF_TAB%CSTS_BIS(2*(I-1)+1)=MIN(ONE,MAX(-1*ONE,INTBUF_TAB%CSTS(2*(I-1)+1)))
+         INTBUF_TAB%CSTS_BIS(2*(I-1)+2)=INTBUF_TAB%CSTS(2*(I-1)+2)
+       ENDDO
 C selection main nodes utiles et recompactage buffer interface
        CALL I2MAIN(INTBUF_TAB%NSV,INTBUF_TAB%MSR,INTBUF_TAB%IRECTM,IPARI,
-     .  	     MWA,MWA(NUMNOD+1),INTBUF_TAB)
+     .         MWA,MWA(NUMNOD+1),INTBUF_TAB)
        GOTO 100
 C
  30   K15=KFI
@@ -190,19 +191,19 @@ C
       INTBUF_TAB%STFNM(1:NMN) = 0      
 
        CALL ININT0(X,INTBUF_TAB%IRECTS,INTBUF_TAB%NSEGS,INTBUF_TAB%LNSV,INTBUF_TAB%NSV,
-     1  	     INTBUF_TAB%MSR,INTBUF_TAB%ILOCM,NMN,NSN,NRTS)
+     1         INTBUF_TAB%MSR,INTBUF_TAB%ILOCM,NMN,NSN,NRTS)
        CALL ININT0(X,INTBUF_TAB%IRECTM,INTBUF_TAB%NSEGM,INTBUF_TAB%LMSR,INTBUF_TAB%MSR,
-     1  	     INTBUF_TAB%NSV,INTBUF_TAB%ILOCS,NSN,NMN,NRTM)
+     1         INTBUF_TAB%NSV,INTBUF_TAB%ILOCS,NSN,NMN,NRTM)
        CALL I3STI2(
-     1 X	 ,INTBUF_TAB%IRECTS,INTBUF_TAB%STFS,IXQ	  ,PM	     ,
-     2 NRTS	 ,INTBUF_TAB%STFNS,INTBUF_TAB%NSEGS,INTBUF_TAB%LNSV,NINT      ,
-     3 NSN	 ,INTBUF_TAB%NSV,INTBUF_TAB%STFAC   ,NOINT         ,IPM       ,
+     1 X   ,INTBUF_TAB%IRECTS,INTBUF_TAB%STFS,IXQ    ,PM       ,
+     2 NRTS   ,INTBUF_TAB%STFNS,INTBUF_TAB%NSEGS,INTBUF_TAB%LNSV,NINT      ,
+     3 NSN   ,INTBUF_TAB%NSV,INTBUF_TAB%STFAC   ,NOINT         ,IPM       ,
      4 ID        ,TITR          ,INTBUF_TAB%AREAS   ,KNOD2ELQ      ,NOD2ELQ   ,
      5 NTY       ,IBIDON        ,IBIDON             ,SEGQUADFR    )
        CALL I3STI2(
-     1 X	 ,INTBUF_TAB%IRECTM,INTBUF_TAB%STFM,IXQ	  ,PM	     ,
-     2 NRTM	 ,INTBUF_TAB%STFNM,INTBUF_TAB%NSEGM,INTBUF_TAB%LMSR,-NINT      ,
-     3 NMN	 ,INTBUF_TAB%MSR,INTBUF_TAB%STFAC   ,NOINT         ,IPM        ,
+     1 X   ,INTBUF_TAB%IRECTM,INTBUF_TAB%STFM,IXQ    ,PM       ,
+     2 NRTM   ,INTBUF_TAB%STFNM,INTBUF_TAB%NSEGM,INTBUF_TAB%LMSR,-NINT      ,
+     3 NMN   ,INTBUF_TAB%MSR,INTBUF_TAB%STFAC   ,NOINT         ,IPM        ,
      4 ID        ,TITR          ,INTBUF_TAB%AREAM   ,KNOD2ELQ      ,NOD2ELQ    ,
      5 NTY       ,IBIDON        ,IBIDON             ,SEGQUADFR    )
 
@@ -212,14 +213,14 @@ C
      1 INTBUF_TAB%ILOCM,INTBUF_TAB%IRTLS,INTBUF_TAB%NSEGS,NMN,NRTS)
        WRITE(IOUT,2200)
        CALL I3PEN2
-     1   (X	    ,INTBUF_TAB%IRECTM  ,INTBUF_TAB%MSR,INTBUF_TAB%NSV,INTBUF_TAB%ILOCS,
-     2    INTBUF_TAB%IRTLM,NSN	 ,INTBUF_TAB%CSTS,INTBUF_TAB%IRTLOM,INTBUF_TAB%FRICOS,
-     3    INTBUF_TAB%VARIABLES(1),INTBUF_TAB%VARIABLES(2),IWPENE,ITAB	   ,NINT,ID,TITR)
+     1   (X      ,INTBUF_TAB%IRECTM  ,INTBUF_TAB%MSR,INTBUF_TAB%NSV,INTBUF_TAB%ILOCS,
+     2    INTBUF_TAB%IRTLM,NSN   ,INTBUF_TAB%CSTS,INTBUF_TAB%IRTLOM,INTBUF_TAB%FRICOS,
+     3    INTBUF_TAB%VARIABLES(1),INTBUF_TAB%VARIABLES(2),IWPENE,ITAB     ,NINT,ID,TITR)
        WRITE(IOUT,2300)
        CALL I3PEN2
-     1   (X	    ,INTBUF_TAB%IRECTS  ,INTBUF_TAB%NSV,INTBUF_TAB%MSR,INTBUF_TAB%ILOCM,
-     2    INTBUF_TAB%IRTLS,NMN	 ,INTBUF_TAB%CSTM,INTBUF_TAB%IRTLOS,INTBUF_TAB%FRICOM,
-     3    INTBUF_TAB%VARIABLES(1),INTBUF_TAB%VARIABLES(2),IWPENE,ITAB	  ,NINT,ID,TITR)
+     1   (X      ,INTBUF_TAB%IRECTS  ,INTBUF_TAB%NSV,INTBUF_TAB%MSR,INTBUF_TAB%ILOCM,
+     2    INTBUF_TAB%IRTLS,NMN   ,INTBUF_TAB%CSTM,INTBUF_TAB%IRTLOS,INTBUF_TAB%FRICOM,
+     3    INTBUF_TAB%VARIABLES(1),INTBUF_TAB%VARIABLES(2),IWPENE,ITAB    ,NINT,ID,TITR)
        GO TO 100
    40 CONTINUE
        GO TO 100
@@ -248,20 +249,20 @@ C
       INTBUF_TAB%STFNM(1:NMN) = 0
 
        CALL ININT0(X,INTBUF_TAB%IRECTM,INTBUF_TAB%NSEGM,INTBUF_TAB%LMSR,INTBUF_TAB%MSR,
-     1  	     INTBUF_TAB%NSV,INTBUF_TAB%ILOCS,NSN,NMN,NRTM)
+     1         INTBUF_TAB%NSV,INTBUF_TAB%ILOCS,NSN,NMN,NRTM)
        CALL I3STI2(
-     1 X	 ,INTBUF_TAB%IRECTM,INTBUF_TAB%STFM,IXQ	  ,PM	     ,
-     2 NRTM	 ,INTBUF_TAB%STFNM,INTBUF_TAB%NSEGM,INTBUF_TAB%LMSR,-NINT      ,
-     3 NMN	 ,INTBUF_TAB%MSR,INTBUF_TAB%STFAC  ,NOINT          ,IPM        ,
+     1 X   ,INTBUF_TAB%IRECTM,INTBUF_TAB%STFM,IXQ    ,PM       ,
+     2 NRTM   ,INTBUF_TAB%STFNM,INTBUF_TAB%NSEGM,INTBUF_TAB%LMSR,-NINT      ,
+     3 NMN   ,INTBUF_TAB%MSR,INTBUF_TAB%STFAC  ,NOINT          ,IPM        ,
      4 ID        ,TITR          ,INTBUF_TAB%AREAS  ,KNOD2ELQ       ,NOD2ELQ    ,
      5 NTY       ,NSN           ,INTBUF_TAB%NSV     ,SEGQUADFR     )
        CALL INVOI2(X,INTBUF_TAB%IRECTM,INTBUF_TAB%LMSR,INTBUF_TAB%MSR,INTBUF_TAB%NSV,
      1 INTBUF_TAB%ILOCS,INTBUF_TAB%IRTLM,INTBUF_TAB%NSEGM,NSN,NRTM)
        WRITE(IOUT,2200)
        CALL I3PEN2
-     1   (X	    ,INTBUF_TAB%IRECTM  ,INTBUF_TAB%MSR,INTBUF_TAB%NSV,INTBUF_TAB%ILOCS,
-     2    INTBUF_TAB%IRTLM,NSN	 ,INTBUF_TAB%CSTS,INTBUF_TAB%IRTLOM,INTBUF_TAB%FRICOS,
-     3    INTBUF_TAB%VARIABLES(1),INTBUF_TAB%VARIABLES(2),IWPENE,ITAB	   ,NINT,ID,TITR)
+     1   (X      ,INTBUF_TAB%IRECTM  ,INTBUF_TAB%MSR,INTBUF_TAB%NSV,INTBUF_TAB%ILOCS,
+     2    INTBUF_TAB%IRTLM,NSN   ,INTBUF_TAB%CSTS,INTBUF_TAB%IRTLOM,INTBUF_TAB%FRICOS,
+     3    INTBUF_TAB%VARIABLES(1),INTBUF_TAB%VARIABLES(2),IWPENE,ITAB     ,NINT,ID,TITR)
        GO TO 100
  90   K15=KFI
       K16=K15+NMN

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>    
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -15,21 +15,20 @@ Copyright>        You should have received a copy of the GNU Affero General Publ
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
 Copyright>    
 Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
+Copyright>        Commercial Alternative: Altair Radioss Software nod
 Copyright>    
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
 C.../SCR06/
-C...recopie par defaut en spmd
-      COMMON /SCR06/ INERI, IPLAST, IOFC0, ISHF, NCINP, IALESUB, NSOROT,
-     .               INCOMP, ISHSUB, NODSUBDT,IENTHA,IREPORT,IH3DREADER,IHTML,
-     .               IMVW,IMVW_REF,NINTSKIDOLD,IFCONTMAX,ANIMCONT
-      COMMON /SCR06R/ HVISC, HELAS, HVLIN, DTFSUB, DTMSUB,DT12S,
+      COMMON /SCR06/ INERI, IPLAST, IOFC0, ISHF, NCINP, 
+     .               IREPORT,IH3DREADER,IHTML,
+     .               IMVW,IMVW_REF,NINTSKIDOLD,ANIMCONT
+      COMMON /SCR06R/ HVISC, HELAS, HVLIN, DT12S,
      .        DMTMXS,DMNMXS,DEMXS,DMTMXK,DMNMXK,DEMXK
-      INTEGER INERI, IPLAST, IOFC0, ISHF, NCINP, IALESUB, NSOROT, 
-     .        INCOMP, ISHSUB, NODSUBDT,IENTHA,IREPORT,IH3DREADER,IHTML,
-     .        IMVW,IMVW_REF,NINTSKIDOLD,IFCONTMAX,ANIMCONT
+      INTEGER INERI, IPLAST, IOFC0, ISHF, NCINP, 
+     .        IREPORT,IH3DREADER,IHTML,
+     .        IMVW,IMVW_REF,NINTSKIDOLD,ANIMCONT
       my_real 
-     .        HVISC, HELAS, HVLIN, DTFSUB, DTMSUB,DT12S,
+     .        HVISC, HELAS, HVLIN, DT12S,
      .        DMTMXS,DMNMXS,DEMXS,DMTMXK,DMNMXK,DEMXK

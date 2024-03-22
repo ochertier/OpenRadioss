@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  INTER_DCOD_SENSOR             source/interfaces/reader/inter_dcod_sensor.F
 Chd|-- called by -----------
@@ -36,7 +36,7 @@ Chd|        INTSTAMP_MOD                  share/modules1/intstamp_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        SENSOR_MOD                    share/modules1/sensor_mod.F   
 Chd|====================================================================
-      SUBROUTINE INTER_DCOD_SENSOR(NTYP,NI,IPARI,NOM_OPT,SENSOR_TAB)
+      SUBROUTINE INTER_DCOD_SENSOR(NTYP,NI,IPARI,NOM_OPT,SENSORS)
 
 C-----------------------------------------------
 C     DECODE USER NUMBERS  
@@ -53,24 +53,13 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "lagmult.inc"
 #include      "com04_c.inc"
-#include      "param_c.inc"
-#include      "scr03_c.inc"
-#include      "com01_c.inc"
-#include      "com10_c.inc"
-#include      "warn_c.inc"
-#include      "units_c.inc"
-#include      "sphcom.inc"
-#include      "scr10_c.inc"
 #include      "scr17_c.inc"
-#include      "intstamp_c.inc"
-#include      "thermal_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NTYP,NI,IPARI(*),NOM_OPT(LNOPT1,*)
-      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE (SENSORS_) ,INTENT(IN) :: SENSORS
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -94,8 +83,8 @@ C
          IERR1 = 0
          IF(IPARI(64)/=0) THEN
               IERR1 = 1
-            DO J=1,NSENSOR
-               IF (SENSOR_TAB(J)%SENS_ID == IPARI(64) ) THEN  
+            DO J=1,SENSORS%NSENSOR
+               IF (SENSORS%SENSOR_TAB(J)%SENS_ID == IPARI(64) ) THEN  
                   IPARI(64) = J
                   IERR1 = 0
                ENDIF

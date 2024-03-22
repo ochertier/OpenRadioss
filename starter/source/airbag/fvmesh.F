@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  FVMESH1                       source/airbag/fvmesh.F        
 Chd|-- called by -----------
@@ -61,8 +61,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
-#include      "com04_c.inc"
 #include      "scr17_c.inc"
 #include      "units_c.inc"
 #include      "sysunit.inc"
@@ -1623,7 +1621,7 @@ C Face interne brique/brique
                           N2=FAC6(2,J)
                           N3=FAC6(3,J)
                           N4=FAC6(4,J)
-						ENDIF
+          ENDIF
                      ELSEIF (NTYPE==4) THEN
                         IF(J <= 4) THEN
                           IQUAD=0
@@ -1636,14 +1634,14 @@ C Face interne brique/brique
                           N2=FAC5(2,J)
                           N3=FAC5(3,J)
                           N4=FAC5(4,J)
-						ENDIF
+          ENDIF
                      ELSEIF (NTYPE==1) THEN
                         IQUAD=1
                         N1=FAC(1,J)
                         N2=FAC(2,J)
                         N3=FAC(3,J)
                         N4=FAC(4,J)
-                     ENDIF						  
+                     ENDIF              
 C
                      IF(IQUAD==0) THEN
 C Face=triangle
@@ -1693,7 +1691,7 @@ C
                         NNP=NNP+1
                         POLH_F(2+NNP,NPOLH+I)=NPOLY
                      ELSEIF(IQUAD==1) THEN
-C Face=quadrangle					 
+C Face=quadrangle           
                         NN1=IXS(1+N1,II)
                         NN2=IXS(1+N2,II)
                         NN3=IXS(1+N3,II)
@@ -2848,8 +2846,8 @@ C
          NNP=IPOLY_F(2,I)
          NHOL=0
          IF (IPOLY_F(1,I) == 2) NHOL=IPOLY_F(6+NNP+1,I)
-         ALLOCATE(PNODES(2,NNP), PSEG(2,NNP), PHOLES(2,NHOL),
-     .            PTRI(3,NNP), REDIR(NNP))   
+         ALLOCATE(PNODES(2,NNP), PSEG(2,NNP), PHOLES(2,NHOL),PTRI(3,NNP), REDIR(NNP)) 
+         PTRI(1:3,1:NNP) = 0       
 C
          DO J=1,NNP
             IF (IPOLY_F(6+J,I) > 0) THEN
@@ -2974,8 +2972,8 @@ C
             DEALLOCATE(ADR)
          ENDIF
 C
-         CALL C_TRICALL(PNODES, PSEG, PHOLES, PTRI, NNP,
-     .                  NSEG,   NHOL, NELP  )
+         NELP = 0
+         CALL C_TRICALL(PNODES, PSEG, PHOLES, PTRI, NNP, NSEG, NHOL, NELP)
 C
          FVDATA(IFV)%IFVTADR(NPOLY)=NNTR+1
 C avoid bug with PGI => comp O1
@@ -3420,9 +3418,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       my_real
@@ -3469,9 +3464,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -3516,9 +3509,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 C
 #include      "scr05_c.inc"
-C-----------------------------------------------
-C   D u m m y   A r g u m e n t s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

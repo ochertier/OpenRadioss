@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  ININTR2                       source/interfaces/inter3d1/inintr2.F
 Chd|-- called by -----------
@@ -40,6 +40,7 @@ Chd|        ITAGSL12                      source/interfaces/inter3d1/inintr2.F
 Chd|        ITAGSL2                       source/interfaces/inter3d1/itagsl2.F
 Chd|        REMN_I2OP                     source/interfaces/inter3d1/i7remnode.F
 Chd|        REMN_I2_EDGOP                 source/interfaces/inter3d1/i7remnode.F
+Chd|        REMN_SELF24                   source/interfaces/inter3d1/remn_self24.F
 Chd|        RI2_INT24P_INI                source/interfaces/inter3d1/i7remnode.F
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
 Chd|        INTBUFSCRATCH_MOD             source/interfaces/interf1/intbufscratch_mod.F
@@ -51,7 +52,9 @@ Chd|====================================================================
      .                   MWA     ,IKINE  ,I2NSNT  ,IN    ,
      .                   STIFN   ,STIFINT,NOM_OPT,INOD_PXFEM,MS_PLY,
      .                   INTBUF_TAB,STIFINTR,ITAGND,ICNDS10,MS_B,IN_B,
-     .                   NSTRF   ,ITAGCYC,IRBE2  ,IRBE3  ,LRBE3 )
+     .                   NSTRF   ,ITAGCYC,IRBE2  ,IRBE3  ,LRBE3 ,
+     .                   KNOD2ELS ,NOD2ELS,IXS10  ,IXS16 ,IXS20,
+     .                   S_NOD2ELS)
 C-----------------------------------------------
 C   M o d u l e s
 C----------------------------------------------- 
@@ -68,16 +71,20 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr05_c.inc"
 #include      "scr17_c.inc"
-#include      "warn_c.inc"
 #include      "tabsiz_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER , DIMENSION(NRBE2L,NRBE2), INTENT(IN) :: IRBE2
-      INTEGER , DIMENSION(NRBE3L,NRBE3), INTENT(IN) :: IRBE3
-      INTEGER , DIMENSION(SLRBE3), INTENT(IN) :: LRBE3
+      INTEGER, DIMENSION(6,NUMELS10)   ,INTENT(IN) :: IXS10
+      INTEGER, DIMENSION(8,NUMELS16)   ,INTENT(IN) :: IXS16
+      INTEGER, DIMENSION(12,NUMELS20)  ,INTENT(IN) :: IXS20
+      INTEGER, DIMENSION(NUMNOD+1)     ,INTENT(IN) :: KNOD2ELS
+      INTEGER,                          INTENT(IN) :: S_NOD2ELS
+      INTEGER, DIMENSION(S_NOD2ELS)    ,INTENT(IN) :: NOD2ELS
+      INTEGER, DIMENSION(NRBE2L,NRBE2), INTENT(IN) :: IRBE2
+      INTEGER, DIMENSION(NRBE3L,NRBE3), INTENT(IN) :: IRBE3
+      INTEGER, DIMENSION(SLRBE3), INTENT(IN) :: LRBE3
       INTEGER IPARI(NPARI,*), IXS(*), IXQ(*),
      .    IXC(*), INTC(*), ITAB(*), NPBY(*), LPBY(*), MWA(*),
      .    IKINE(*), I2NSNT,INOD_PXFEM(*),ITAGND(*),ICNDS10(3,*),
@@ -99,6 +106,8 @@ C-----------------------------------------------
       INTEGER ID,I,K,J1,J2
       CHARACTER*nchartitle,
      .   TITR
+      INTEGER :: FLAG_OUTPUT !< flag for output
+      INTEGER :: SKIP_TYPE25_EDGE_2_EDGE !< flag to activate only the computation of interface type 25 with edge to edge
 C=======================================================================
 C
 C     SWITCH OF INTERF2 SPOTFLAG26 TO SPOTFLAG25 IF POSSIBLE 
@@ -227,9 +236,15 @@ C
         ENDIF
       END DO
 C
-       IF (N2D==0 .AND. NINT2 >0 ) THEN      
-         CALL REMN_I2OP(IPARI   ,INTBUF_TAB   ,ITAB, NOM_OPT,NREMN )
-         CALL REMN_I2_EDGOP(IPARI   ,INTBUF_TAB   ,ITAB, NREMN )
+       IF (N2D==0 ) THEN 
+         NREMN(1:NINTER) = 0    
+         FLAG_OUTPUT = 1   
+         SKIP_TYPE25_EDGE_2_EDGE = 0
+         IF (NINT2 >0) CALL REMN_I2OP(IPARI   ,INTBUF_TAB   ,ITAB, NOM_OPT,NREMN,FLAG_OUTPUT,SKIP_TYPE25_EDGE_2_EDGE)
+         CALL REMN_SELF24(X   ,IXS   ,IXS10 ,IXS16,IXS20   ,
+     .                KNOD2ELS,NOD2ELS,IPARI ,INTBUF_TAB ,
+     .                ITAB , NOM_OPT,NREMN, S_NOD2ELS,FLAG_OUTPUT)
+         CALL REMN_I2_EDGOP(IPARI   ,INTBUF_TAB   ,ITAB, NREMN)
          CALL RI2_INT24P_INI(IPARI  ,INTBUF_TAB   ,ITAB, NOM_OPT,NREMN )
        END IF !(NINT2 >0) THEN   
 C-----------
@@ -259,9 +274,7 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "units_c.inc"
-#include      "param_c.inc"
 #include      "com04_c.inc"
-#include      "warn_c.inc"
 #include      "kincod_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -361,13 +374,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "units_c.inc"
-#include      "param_c.inc"
-#include      "com04_c.inc"
-#include      "warn_c.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IPARI(*)
@@ -444,18 +450,9 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
-#include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "scr03_c.inc"
-#include      "warn_c.inc"
-#include      "scr17_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

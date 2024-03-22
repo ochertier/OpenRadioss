@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  SPMD_I25_SLIDE_EXCH           source/mpi/interfaces/spmd_i25slide.F
 Chd|-- called by -----------
@@ -42,8 +42,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
-#include      "my_allocate.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -55,13 +53,7 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr02_c.inc"
-#include      "scr18_c.inc"
 #include      "task_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "timeri_c.inc"
-#include      "sms_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -183,7 +175,7 @@ C            CALL MPI_WAIT(COMM_SIZ%RECV_RQ(P,NIN),STATUS,IERROR)
                LENGTH = NB(P,NIN)*RSIZ
                MSGTYP = MSGOFF2 
                COMM_REAL%SIZ(P,NIN) = NB(P,NIN) 
-               MY_ALLOCATE(RBUF(P,NIN)%P,LENGTH)
+               ALLOCATE(RBUF(P,NIN)%P(LENGTH))
                RBUF(P,NIN)%P(1:LENGTH) = 0
                
                CALL MPI_RECV(
@@ -194,7 +186,7 @@ C            CALL MPI_WAIT(COMM_SIZ%RECV_RQ(P,NIN),STATUS,IERROR)
                MSGTYP = MSGOFF3 
                COMM_INT%SIZ(P,NIN) = NB(P,NIN) 
              
-               MY_ALLOCATE(IBUF(P,NIN)%P,LENGTH)
+               ALLOCATE(IBUF(P,NIN)%P(LENGTH))
                IBUF(P,NIN)%P(1:LENGTH) = 0
              
                CALL MPI_RECV(
@@ -252,7 +244,8 @@ Chd|====================================================================
       SUBROUTINE SPMD_I25_SLIDE_GAT(NSN  ,NIN, NI25,
      2                             IGAP  ,NSNR   ,INTTH   ,ILEV,INTBUF_TAB,
      3                             FR_NOR, IAD_FRNOR, NB_SLID   ,ITAB, H3D_DATA,
-     4                             INTFRIC,FLAGREMN , LREMNORMAX,NRTM,IVIS2 )
+     4                             INTFRIC,FLAGREMN , LREMNORMAX,NRTM,IVIS2 ,
+     5                             ISTIF_MSDT,IFSUB_CAREA)
 c
 c -  Nodes in IREM are not necessarily from their PMAIN processor.
 c -  IREM is reordered according to ITAB for each PMAIN 
@@ -353,28 +346,14 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
-C-----------------------------------------------
-C   M e s s a g e   P a s s i n g
-C-----------------------------------------------
-#ifdef MPI
-#include "mpif.h"
-#endif
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "task_c.inc"
-#include      "units_c.inc"
-#include      "scr14_c.inc"
-#include      "scr16_c.inc"
-#include      "scr18_c.inc"
-#include      "param_c.inc"
-#include      "parit_c.inc"
 #include      "spmd_c.inc"
 #include      "sms_c.inc"
-#include      "my_allocate.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -384,6 +363,7 @@ C-----------------------------------------------
      .        NB_SLID(NSPMD), ! NB of new sliding secnd nodes
      .        ITAB(*)
       INTEGER, INTENT(INOUT) :: NSNR
+      INTEGER, INTENT(IN) :: ISTIF_MSDT,IFSUB_CAREA
       INTEGER IAD_FRNOR(NINTER25,NSPMD+1),FR_NOR(*)
       TYPE(H3D_DATABASE) :: H3D_DATA
 C-----------------------------------------------
@@ -429,7 +409,7 @@ C
          NB_SLID_TOT = NB_SLID_TOT + NB_SLID(P) 
          NSNR_TOT = NSNR_TOT + NSNFI(NIN)%P(P) 
       ENDDO
-      MY_ALLOCATE(PROC_ORIG,NB_SLID_TOT)
+      ALLOCATE(PROC_ORIG(NB_SLID_TOT))
       IDEB = 0
       DO P = 1,NSPMD
          PROC_ORIG(IDEB+1:IDEB+NB_SLID(P)) =  P
@@ -437,9 +417,9 @@ C
       ENDDO
 
 
-      MY_ALLOCATE(INDEX,NSNR_TOT)
+      ALLOCATE(INDEX(NSNR_TOT))
       INDEX(1:NSNR_TOT) = 0
-      CALL REALLOCATE_FI1(NODFI,TMP,NIN,INTTH,IGAP,ILEV,INTFRIC,FLAGREMN,IVIS2)
+      CALL REALLOCATE_FI1(NODFI,TMP,NIN,INTTH,IGAP,ILEV,INTFRIC,FLAGREMN,IVIS2,ISTIF_MSDT,IFSUB_CAREA)
       NSNFI(NIN)%P(1:NSPMD) = TMP%NSNFI%P(1:NSPMD)
 C
 C Compactage des candidats
@@ -460,8 +440,8 @@ C
         ! overestimation
         nullify(INDX_FOR_P(P)%P)
         nullify(UID_FOR_P(P)%P)
-        MY_ALLOCATE(INDX_FOR_P(P)%P,MAX(NB_SLID_TOT,1))
-        MY_ALLOCATE(UID_FOR_P(P)%P,MAX(1,NB_SLID_TOT))
+        ALLOCATE(INDX_FOR_P(P)%P(MAX(NB_SLID_TOT,1)))
+        ALLOCATE(UID_FOR_P(P)%P(MAX(1,NB_SLID_TOT)))
         INDX_FOR_P(P)%P(1:NB_SLID_TOT) = 0
         UID_FOR_P(P)%P(1:NB_SLID_TOT) = 0
         SINDEX(P) = 0
@@ -482,9 +462,9 @@ C
          SIZE_PERM_MAX = MAX(SIZE_PERM_MAX,SINDEX(P))
       ENDDO
 
-      MY_ALLOCATE(PERMUTATIONS,2*SIZE_PERM_MAX)
+      ALLOCATE(PERMUTATIONS(2*SIZE_PERM_MAX))
       IF(FLAGREMN == 2 ) THEN
-         MY_ALLOCATE(REMNOR_FI_TMP,NODFI*LREMNORMAX)
+         ALLOCATE(REMNOR_FI_TMP(NODFI*LREMNORMAX))
          KI = 0
       ENDIF
       DO P = 1, NSPMD
@@ -508,11 +488,11 @@ C
             ENDDO
           ENDIF
 
-          MY_ALLOCATE(IAUX,NSNR_OLD+NSNR_NEW)
-          MY_ALLOCATE(IAUX_LOCAL,NSNR_OLD+NSNR_NEW)
-          MY_ALLOCATE(IAUX_REV,NSNR_OLD+NSNR_NEW)
-          MY_ALLOCATE(IAUX_K,NSNR_OLD+NSNR_NEW)
-          MY_ALLOCATE(IAUX_L,NSNR_OLD+NSNR_NEW)
+          ALLOCATE(IAUX(NSNR_OLD+NSNR_NEW))
+          ALLOCATE(IAUX_LOCAL(NSNR_OLD+NSNR_NEW))
+          ALLOCATE(IAUX_REV(NSNR_OLD+NSNR_NEW))
+          ALLOCATE(IAUX_K(NSNR_OLD+NSNR_NEW))
+          ALLOCATE(IAUX_L(NSNR_OLD+NSNR_NEW))
 
           POLD=1
           PNEW=1
@@ -745,28 +725,28 @@ C thermic
           ENDIF
           
 C Adhesion
-          IF(IVIS2==-1.AND.INTTH==0)THEN
+          IF(IVIS2==-1)THEN
              NBLOCAL = 0
              DO J = 1, NN
                I = IAUX(J)
                K = IDEB_NEW+J -NBLOCAL
                IF (I > 0) THEN
                  L = IDEB_OLD+I
-                 AREASFI(NIN)%P(K) = TMP%AREASFI%P(L) 
+                 IF(INTTH==0) AREASFI(NIN)%P(K) = TMP%AREASFI%P(L) 
                  IF_ADHFI(NIN)%P(K) =  TMP%IF_ADHFI%P(L)
                ELSEIF( I < 0 ) THEN
                  L = INDX_FOR_P(P)%P(-I)
-                 AREASFI(NIN)%P(K) =  XREM(RSHIFT,L)
+                 IF(INTTH==0) AREASFI(NIN)%P(K) =  XREM(RSHIFT,L)
                  IF_ADHFI(NIN)%P(K) =  IREM(ISHIFT,L)                
                ELSEIF(I == 0) THEN                 
                  K = IAUX_K(J) 
                  L = IAUX_L(J) 
-                 INTBUF_TAB%AREAS(K)   = XREM(RSHIFT,L)
+                 IF(INTTH==0) INTBUF_TAB%AREAS(K)   = XREM(RSHIFT,L)
                  INTBUF_TAB%IF_ADH(K)  = IREM(ISHIFT,L)
                  NBLOCAL = NBLOCAL+1
                END IF
              END DO
-             RSHIFT = RSHIFT + 1
+             IF(INTTH==0) RSHIFT = RSHIFT + 1
              ISHIFT = ISHIFT + 1
           ENDIF
               
@@ -787,6 +767,43 @@ C Friction
                END IF
              END DO
              ISHIFT = ISHIFT + 1
+          ENDIF
+C Stiffness based on masses and time step
+          IF(ISTIF_MSDT > 0) THEN
+             NBLOCAL = 0
+             DO J = 1, NN
+               I = IAUX(J)
+               K = IDEB_NEW+J -NBLOCAL
+               IF (I > 0) THEN
+                 L = IDEB_OLD+I
+                 STIF_MSDT_FI(NIN)%P(K) = TMP%STIF_MSDT_FI%P(L) 
+               ELSEIF( I < 0 ) THEN
+                 L = INDX_FOR_P(P)%P(-I)
+                  STIF_MSDT_FI(NIN)%P(K) =  XREM(RSHIFT,  L) 
+               ELSEIF(I == 0) THEN
+                 NBLOCAL = NBLOCAL+1
+               END IF
+             END DO
+             RSHIFT = RSHIFT + 1
+          ENDIF
+C
+C CAREA ouptut in TH (case of NISUB)
+          IF(IFSUB_CAREA > 0) THEN
+             NBLOCAL = 0
+             DO J = 1, NN
+               I = IAUX(J)
+               K = IDEB_NEW+J -NBLOCAL
+               IF (I > 0) THEN
+                 L = IDEB_OLD+I
+                 INTAREANFI(NIN)%P(K) = TMP%INTAREANFI%P(L) 
+               ELSEIF( I < 0 ) THEN
+                 L = INDX_FOR_P(P)%P(-I)
+                  INTAREANFI(NIN)%P(K) =  XREM(RSHIFT,  L) 
+               ELSEIF(I == 0) THEN
+                 NBLOCAL = NBLOCAL+1
+               END IF
+             END DO
+             RSHIFT = RSHIFT + 1
           ENDIF
 C
           IF(IDTMINS==2)THEN
@@ -1016,7 +1033,7 @@ C
 
 
         ENDIF !IF(NSNR_OLD/=0) 
-      ENDDO  ! end do NSPMD        	
+      ENDDO  ! end do NSPMD        
 
 c ===============================================================
 c                           TESTS
@@ -1050,7 +1067,7 @@ C
          KREMNOR_FI(NIN)%P(1)=0  
 
          SIZREMNORFI = KREMNOR_FI(NIN)%P(NODFI+1)
-         MY_ALLOCATE(REMNOR_FI(NIN)%P,SIZREMNORFI)
+         ALLOCATE(REMNOR_FI(NIN)%P(SIZREMNORFI))
          IF(SIZREMNORFI > 0) THEN
             DO N=1,SIZREMNORFI
                REMNOR_FI(NIN)%P(N) =REMNOR_FI_TMP(N)
@@ -1077,11 +1094,11 @@ C
 C
 C   ALLOCATIONS FOR THE ASSEMBLY  
 C
-      CALL REALLOCATE_FI2(NIN, INTTH, NODFI, LSKYFI, H3D_DATA, IVIS2) 
+      CALL REALLOCATE_FI2(NIN, INTTH, NODFI, LSKYFI, H3D_DATA) 
 C
 C      ! DEALLOCATE old structures
 C
-      CALL DEALLOCATE_FI1_TMP(NODFI,TMP,NIN,INTTH,IGAP,ILEV,INTFRIC,FLAGREMN,IVIS2)
+      CALL DEALLOCATE_FI1_TMP(NODFI,TMP,NIN,INTTH,IGAP,ILEV,INTFRIC,FLAGREMN,IVIS2,ISTIF_MSDT,IFSUB_CAREA)
 C
       DO I = 1, INTBUF_TAB%I_STOK(1)
         N = INTBUF_TAB%CAND_N(I)
@@ -1121,7 +1138,7 @@ Chd|        TRI25TMP                      share/modules/tri25tmp_mod.F
 Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
       SUBROUTINE REALLOCATE_FI1(NEW_SIZE,TMP,NIN,INTTH,IGAP,ILEV,INTFRIC,
-     .                          FLAGREMN,IVIS2)
+     .                          FLAGREMN,IVIS2,ISTIF_MSDT,IFSUB_CAREA)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -1132,31 +1149,18 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 #include      "assert.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "task_c.inc"
-#include      "units_c.inc"
-#include      "scr14_c.inc"
-#include      "scr16_c.inc"
-#include      "scr18_c.inc"
-#include      "param_c.inc"
-#include      "parit_c.inc"
-#include      "spmd_c.inc"
 #include      "sms_c.inc"
-C-----------------------------------------------
-C   M y  A l l o c a t e                             
-C-----------------------------------------------
-#include      "my_allocate.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER, INTENT(IN) ::  NEW_SIZE,NIN,INTTH,IGAP,ILEV,INTFRIC,FLAGREMN,
      .                        IVIS2
+      INTEGER, INTENT(IN) :: ISTIF_MSDT, IFSUB_CAREA
       TYPE(I25_TMP_STRUCT) TMP
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
@@ -1182,13 +1186,19 @@ C-----------------------------------------------
        TMP%MATSFI%P=>MATSFI(NIN)%P
        TMP%AREASFI%P=>AREASFI(NIN)%P
       ENDIF 
-      IF(INTTH==0.AND.IVIS2==-1) THEN
-        TMP%AREASFI%P=>AREASFI(NIN)%P
+      IF(IVIS2==-1) THEN
+        IF(INTTH==0) TMP%AREASFI%P=>AREASFI(NIN)%P
         TMP%IF_ADHFI%P=>IF_ADHFI(NIN)%P
       ENDIF
       IF(INTFRIC > 0 ) THEN
        TMP%IPARTFRICSFI%P=>IPARTFRICSFI(NIN)%P
       ENDIF 
+      IF(ISTIF_MSDT > 0 ) THEN
+       TMP%STIF_MSDT_FI%P=>STIF_MSDT_FI(NIN)%P
+      ENDIF
+      IF(IFSUB_CAREA > 0 ) THEN
+       TMP%INTAREANFI%P=>INTAREANFI(NIN)%P
+      ENDIF  
       IF(IDTMINS == 2) THEN
        TMP%NODNXFI%P=>NODNXFI(NIN)%P
        TMP%NODAMSFI%P=>NODAMSFI(NIN)%P
@@ -1230,60 +1240,66 @@ C
 
 C     WRITE(6,*) "NEW SIZE:",NEW_SIZE
 
-      MY_ALLOCATE(NSNFI(NIN)%P,NSPMD)
-      MY_ALLOCATE(NSVFI(NIN)%P,NEW_SIZE)
-      MY_ALLOCATE(MSFI(NIN)%P,NEW_SIZE)
-      MY_ALLOCATE(STIFI(NIN)%P,NEW_SIZE)
-      MY_ALLOCATE(ITAFI(NIN)%P,NEW_SIZE)
-      MY_ALLOCATE(PMAINFI(NIN)%P,NEW_SIZE)
-      MY_ALLOCATE(KINFI(NIN)%P,NEW_SIZE)
-      MY_ALLOCATE2D(VFI(NIN)%P,3,NEW_SIZE)
-      MY_ALLOCATE2D(XFI(NIN)%P,3,NEW_SIZE)
+      ALLOCATE(NSNFI(NIN)%P(NSPMD))
+      ALLOCATE(NSVFI(NIN)%P(NEW_SIZE))
+      ALLOCATE(MSFI(NIN)%P(NEW_SIZE))
+      ALLOCATE(STIFI(NIN)%P(NEW_SIZE))
+      ALLOCATE(ITAFI(NIN)%P(NEW_SIZE))
+      ALLOCATE(PMAINFI(NIN)%P(NEW_SIZE))
+      ALLOCATE(KINFI(NIN)%P(NEW_SIZE))
+      ALLOCATE(VFI(NIN)%P(3,NEW_SIZE))
+      ALLOCATE(XFI(NIN)%P(3,NEW_SIZE))
       IF(.TRUE.) THEN
-       MY_ALLOCATE(ICODT_FI(NIN)%P,NEW_SIZE)
-       MY_ALLOCATE(ISKEW_FI(NIN)%P,NEW_SIZE)
+       ALLOCATE(ICODT_FI(NIN)%P(NEW_SIZE))
+       ALLOCATE(ISKEW_FI(NIN)%P(NEW_SIZE))
       ENDIF
       IF(INTTH > 0 ) THEN
-       MY_ALLOCATE(TEMPFI(NIN)%P,NEW_SIZE)
-       MY_ALLOCATE(MATSFI(NIN)%P,NEW_SIZE)
-       MY_ALLOCATE(AREASFI(NIN)%P,NEW_SIZE)
+       ALLOCATE(TEMPFI(NIN)%P(NEW_SIZE))
+       ALLOCATE(MATSFI(NIN)%P(NEW_SIZE))
+       ALLOCATE(AREASFI(NIN)%P(NEW_SIZE))
       ENDIF 
-      IF(INTTH==0.AND.IVIS2==-1) THEN
-        MY_ALLOCATE(AREASFI(NIN)%P,NEW_SIZE)
-        MY_ALLOCATE(IF_ADHFI(NIN)%P,NEW_SIZE)
+      IF(IVIS2==-1) THEN
+        IF(INTTH==0) ALLOCATE(AREASFI(NIN)%P(NEW_SIZE))
+        ALLOCATE(IF_ADHFI(NIN)%P(NEW_SIZE))
       ENDIF
       IF(INTFRIC > 0 ) THEN
-       MY_ALLOCATE(IPARTFRICSFI(NIN)%P,NEW_SIZE)
+       ALLOCATE(IPARTFRICSFI(NIN)%P(NEW_SIZE))
+      ENDIF 
+      IF(ISTIF_MSDT > 0 ) THEN
+       ALLOCATE(STIF_MSDT_FI(NIN)%P(NEW_SIZE))
+      ENDIF 
+      IF(IFSUB_CAREA > 0 ) THEN
+       ALLOCATE(INTAREANFI(NIN)%P(NEW_SIZE))
       ENDIF 
       IF(IDTMINS == 2) THEN
-       MY_ALLOCATE(NODNXFI(NIN)%P,NEW_SIZE)
-       MY_ALLOCATE(NODAMSFI(NIN)%P,NEW_SIZE)
-       MY_ALLOCATE(PROCAMSFI(NIN)%P,NEW_SIZE)
+       ALLOCATE(NODNXFI(NIN)%P(NEW_SIZE))
+       ALLOCATE(NODAMSFI(NIN)%P(NEW_SIZE))
+       ALLOCATE(PROCAMSFI(NIN)%P(NEW_SIZE))
       ELSEIF(IDTMINS_INT /= 0) THEN
-       MY_ALLOCATE(NODAMSFI(NIN)%P,NEW_SIZE)
-       MY_ALLOCATE(PROCAMSFI(NIN)%P,NEW_SIZE)
+       ALLOCATE(NODAMSFI(NIN)%P(NEW_SIZE))
+       ALLOCATE(PROCAMSFI(NIN)%P(NEW_SIZE))
       ENDIF 
       IF(IGAP/=0) THEN
-        MY_ALLOCATE(GAPFI(NIN)%P,NEW_SIZE)
+        ALLOCATE(GAPFI(NIN)%P(NEW_SIZE))
         IF(IGAP==3) THEN
-          MY_ALLOCATE(GAP_LFI(NIN)%P,NEW_SIZE)
+          ALLOCATE(GAP_LFI(NIN)%P(NEW_SIZE))
         ENDIF
       ENDIF
       IF(ILEV == 2 ) THEN 
-        MY_ALLOCATE(NBINFLFI(NIN)%P,NEW_SIZE)
+        ALLOCATE(NBINFLFI(NIN)%P(NEW_SIZE))
       ENDIF
-      MY_ALLOCATE2D(IRTLM_FI(NIN)%P,4,NEW_SIZE)
-      MY_ALLOCATE(TIME_SFI(NIN)%P,2*NEW_SIZE)
-      MY_ALLOCATE2D(SECND_FRFI(NIN)%P,6,NEW_SIZE)
+      ALLOCATE(IRTLM_FI(NIN)%P(4,NEW_SIZE))
+      ALLOCATE(TIME_SFI(NIN)%P(2*NEW_SIZE))
+      ALLOCATE(SECND_FRFI(NIN)%P(6,NEW_SIZE))
       SECND_FRFI(NIN)%P (1:6,1:NEW_SIZE)=ZERO
-      MY_ALLOCATE2D(PENE_OLDFI(NIN)%P,5,NEW_SIZE)
+      ALLOCATE(PENE_OLDFI(NIN)%P(5,NEW_SIZE))
       PENE_OLDFI(NIN)%P(1:5,1:NEW_SIZE)=ZERO
-      MY_ALLOCATE2D(STIF_OLDFI(NIN)%P,2,NEW_SIZE)
+      ALLOCATE(STIF_OLDFI(NIN)%P(2,NEW_SIZE))
       STIF_OLDFI(NIN)%P(1:2,1:NEW_SIZE)=ZERO
-      MY_ALLOCATE(ICONT_I_FI(NIN)%P,NEW_SIZE)
-      MY_ALLOCATE2D(ISLIDE_FI(NIN)%P,4,NEW_SIZE)
+      ALLOCATE(ICONT_I_FI(NIN)%P(NEW_SIZE))
+      ALLOCATE(ISLIDE_FI(NIN)%P(4,NEW_SIZE))
       IF(FLAGREMN == 2) THEN       
-       MY_ALLOCATE(KREMNOR_FI(NIN)%P,NEW_SIZE+1)
+       ALLOCATE(KREMNOR_FI(NIN)%P(NEW_SIZE+1))
        KREMNOR_FI(NIN)%P(1:NEW_SIZE+1) = 0
       ENDIF
 C
@@ -1300,7 +1316,8 @@ Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        TRI25TMP                      share/modules/tri25tmp_mod.F  
 Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
-      SUBROUTINE DEALLOCATE_FI1_TMP(NEW_SIZE,TMP,NIN,INTTH,IGAP,ILEV,INTFRIC,FLAGREMN,IVIS2)
+      SUBROUTINE DEALLOCATE_FI1_TMP(NEW_SIZE,TMP,NIN,INTTH,IGAP,ILEV,INTFRIC,
+     .                          FLAGREMN,IVIS2,ISTIF_MSDT,IFSUB_CAREA)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -1311,29 +1328,15 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "task_c.inc"
-#include      "units_c.inc"
-#include      "scr14_c.inc"
-#include      "scr16_c.inc"
-#include      "scr18_c.inc"
-#include      "param_c.inc"
-#include      "parit_c.inc"
-#include      "spmd_c.inc"
 #include      "sms_c.inc"
-C-----------------------------------------------
-C   M y  A l l o c a t e                             
-C-----------------------------------------------
-#include      "my_allocate.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER, INTENT(IN) ::  NEW_SIZE,NIN,INTTH,IGAP,ILEV,INTFRIC,FLAGREMN,IVIS2
+      INTEGER, INTENT(IN) :: ISTIF_MSDT, IFSUB_CAREA
       TYPE(I25_TMP_STRUCT) TMP
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
@@ -1358,12 +1361,18 @@ C-----------------------------------------------
        DEALLOCATE(TMP%MATSFI%P)
        DEALLOCATE(TMP%AREASFI%P)
       ENDIF 
-      IF(INTTH==0.AND.IVIS2==-1) THEN
-        DEALLOCATE(TMP%AREASFI%P)
+      IF(IVIS2==-1) THEN
+        IF(INTTH==0) DEALLOCATE(TMP%AREASFI%P)
         DEALLOCATE(TMP%IF_ADHFI%P)
       ENDIF
       IF(INTFRIC > 0 ) THEN
        DEALLOCATE(TMP%IPARTFRICSFI%P)
+      ENDIF 
+      IF(ISTIF_MSDT > 0 ) THEN
+       DEALLOCATE(TMP%STIF_MSDT_FI%P)
+      ENDIF 
+      IF(IFSUB_CAREA > 0 ) THEN
+       DEALLOCATE(TMP%INTAREANFI%P)
       ENDIF 
       IF(IDTMINS == 2) THEN
        DEALLOCATE(TMP%NODNXFI%P)
@@ -1413,7 +1422,7 @@ Chd|        H3D_MOD                       share/modules/h3d_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
-      SUBROUTINE REALLOCATE_FI2(NIN, INTTH, NODFI, LSKYFI,H3D_DATA,IVIS2) 
+      SUBROUTINE REALLOCATE_FI2(NIN, INTTH, NODFI, LSKYFI,H3D_DATA) 
 C
 C                               
 C
@@ -1427,31 +1436,18 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
-C-----------------------------------------------
-C   M e s s a g e   P a s s i n g
-C-----------------------------------------------
-#ifdef MPI
-#include "mpif.h"
-#endif
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "task_c.inc"
-#include      "units_c.inc"
 #include      "scr14_c.inc"
 #include      "scr16_c.inc"
 #include      "scr18_c.inc"
-#include      "param_c.inc"
 #include      "parit_c.inc"
-#include      "spmd_c.inc"
-#include      "sms_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER, INTENT(IN) ::  NIN, INTTH, NODFI, LSKYFI, IVIS2
+      INTEGER, INTENT(IN) ::  NIN, INTTH, NODFI, LSKYFI
       TYPE(H3D_DATABASE) :: H3D_DATA
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
@@ -1591,7 +1587,7 @@ C
         CALL ARRET(2)
       ENDIF
 C
-C allocations conditionnelles output pression
+C allocations conditionnelles output pression/ friction energy
 C
       IF(ANIM_V(12)+OUTP_V(12)+H3D_DATA%N_VECT_PCONT >0)THEN
         IF(ASSOCIATED(FNCONTI(NIN)%P)) DEALLOCATE(FNCONTI(NIN)%P)
@@ -1613,6 +1609,33 @@ C
         END IF          
       END IF
 C
+      IF(H3D_DATA%N_SCAL_CSE_FRICINT >0)THEN
+       IF(H3D_DATA%N_CSE_FRIC_INTER (NIN) >0)THEN
+        IF(ASSOCIATED(EFRICFI(NIN)%P)) DEALLOCATE(EFRICFI(NIN)%P)
+        ALLOCATE(EFRICFI(NIN)%P(NODFI),STAT=IERROR1)
+        IF(IERROR1/=0) THEN
+          CALL ANCMSG(MSGID=20,ANMODE=ANINFO)
+          CALL ARRET(2)
+        ELSE
+          DO J = 1, NODFI
+            EFRICFI(NIN)%P(J)=ZERO
+          END DO                  
+        END IF            
+       END IF
+      ENDIF
+C
+      IF(H3D_DATA%N_SCAL_CSE_FRIC >0)THEN
+        IF(ASSOCIATED(EFRICGFI(NIN)%P)) DEALLOCATE(EFRICGFI(NIN)%P)
+        ALLOCATE(EFRICGFI(NIN)%P(NODFI),STAT=IERROR1)
+        IF(IERROR1/=0) THEN
+          CALL ANCMSG(MSGID=20,ANMODE=ANINFO)
+          CALL ARRET(2)
+        ELSE
+          DO J = 1, NODFI
+            EFRICGFI(NIN)%P(J)=ZERO
+          END DO                  
+        END IF            
+      END IF
 
       RETURN
       END SUBROUTINE
@@ -1637,38 +1660,19 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "task_c.inc"
-#include      "units_c.inc"
-#include      "scr14_c.inc"
-#include      "scr16_c.inc"
-#include      "scr18_c.inc"
-#include      "param_c.inc"
-#include      "parit_c.inc"
-#include      "spmd_c.inc"
-#include      "sms_c.inc"
-C-----------------------------------------------
-C   M y  A l l o c a t e                             
-C-----------------------------------------------
-#include      "my_allocate.inc"
-C-----------------------------------------------
-C   D u m m y   A r g u m e n t s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
 
        IF(ISPMD == 1) THEN
-      !   IF(NSNR > 0) THEN
            IF(ABS(NSVFI(1)%P(2)) ==  5864) THEN 
              WRITE(6,*) __FILE__,__LINE__
            ENDIF
-      !   ENDIF
        ENDIF 
+       
        RETURN  
        END SUBROUTINE

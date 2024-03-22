@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  INIRBY                        source/constraints/general/rbody/inirby.F
 Chd|-- called by -----------
@@ -63,10 +63,8 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "units_c.inc"
-#include      "scr03_c.inc"
 #include      "scr17_c.inc"
 #include      "com04_c.inc"
-#include      "warn_c.inc"
 #include      "r2r_c.inc"
 #include      "com01_c.inc"
 C-----------------------------------------------
@@ -116,10 +114,10 @@ C-------------------------------------------------------------------------------
 C-----------Multidomaines : on ne compte l'ajout de masse et d'inertie uniquement d'1 cote-------------
       IF ((NSUBDOM>0).AND.(IPID==0)) THEN
         IF (TAGNO(M+N_PART)==3) THEN
-	   FLAG = 1
-	   DO J=1,9
-	     RBY(J,NRB) = ZERO
-	   END DO
+             FLAG = 1
+             DO J=1,9
+               RBY(J,NRB) = ZERO
+             END DO
 C-----------Multidomaines : on evite de compter 2 fois la masse et l'inertie des noeuds communs--------
            DO I=1,NSL
              N=LSN(I)
@@ -128,7 +126,7 @@ C-----------Multidomaines : on evite de compter 2 fois la masse et l'inertie des
              IF (TAGNO(N+N_PART)==0) MS_LOC(I)= 0
              IF (TAGNO(N+N_PART)==0) IN_LOC(I)= 0
            ENDDO
-	ENDIF
+          ENDIF
       ENDIF
 C------------------------------------------------------------------------------------------------------
        IF (NS10E>0) THEN
@@ -226,7 +224,7 @@ C-----CDG DES NOEUDS SECONDS
          ENDDO
          MASRB   = MASRB+MS_LOC(I)
         ENDDO
-	IF (FLAG==1) MASRB = MAX(MASRB,EM20)	
+          IF (FLAG==1) MASRB = MAX(MASRB,EM20)
 C
         IF(MASRB<=EM30) THEN
            CALL ANCMSG(MSGID=679,
@@ -341,11 +339,11 @@ C        ANALYSE 3D
           RBY(8,NRB)=RBY(8,NRB)-YZ*XMG
           RBY(9,NRB)=RBY(9,NRB)+(XX+YY)*XMG
 
-	  IF (NSL==1) THEN
+            IF (NSL==1) THEN
             RBY(1,NRB)=RBY(1,NRB)+EM20
             RBY(5,NRB)=RBY(5,NRB)+EM20
             RBY(9,NRB)=RBY(9,NRB)+EM20
-	  ENDIF
+            ENDIF
 C
           DO I=1,NSL
            N=LSN(I)
@@ -385,11 +383,11 @@ C
           RBY(8,NRB)=ZERO
           RBY(9,NRB)=RBY(9,NRB)+YY*XMG
 
-	  IF (NSL==1) THEN
+            IF (NSL==1) THEN
             RBY(1,NRB)=RBY(1,NRB)+EM20
             RBY(5,NRB)=RBY(5,NRB)+EM20
             RBY(9,NRB)=RBY(9,NRB)+EM20
-	  ENDIF
+            ENDIF
 C
           DO I=1,NSL
            N=LSN(I)
@@ -419,11 +417,11 @@ c
           RBY(8,NRB)=RBY(8,NRB)-YZ*XMG
           RBY(9,NRB)=RBY(9,NRB)+YY*XMG
 
-	  IF (NSL==1) THEN
+            IF (NSL==1) THEN
             RBY(1,NRB)=RBY(1,NRB)+EM20
             RBY(5,NRB)=RBY(5,NRB)+EM20
             RBY(9,NRB)=RBY(9,NRB)+EM20
-	  ENDIF
+            ENDIF
 C
           DO I=1,NSL
            N=LSN(I)
@@ -633,7 +631,7 @@ C-----------Multidomaines : on evite de compter 2 fois la masse et l'inertie des
                  IF (TAGNO(N+N_PART)==0) MS_LOC(I)= 0
                  IF (TAGNO(N+N_PART)==0) IN_LOC(I)= 0
               ENDDO
-	    ENDIF
+              ENDIF
           ENDIF
 C
           IF (NS10E>0) THEN
@@ -660,8 +658,8 @@ C-----------Multidomaines : on stoke la matrice assembl   e--------------
         IF(NSUBDOM>0)THEN
           IF(TAGNO(M+N_PART)==3)THEN
             DO J=1,9
-	      RBY_R2R(J)=RBY(J,NRB)
-	    END DO
+                RBY_R2R(J)=RBY(J,NRB)
+              END DO
           END IF
         ENDIF
 
@@ -1135,14 +1133,9 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "units_c.inc"
-#include      "scr03_c.inc"
-#include      "warn_c.inc"
 #include      "param_c.inc"
 #include      "com04_c.inc"
 #include      "com01_c.inc"
@@ -1357,11 +1350,11 @@ C        ANALYSE 2D : Axisymetrie
             RBY(2,NRB)=ZERO
             RBY(3,NRB)=ZERO
             RBY(4,NRB)=ZERO
-            RBY(5,NRB)=RBY(5,NRB)+IN(N)+(ZZ+XX)*MS(N)
+            RBY(5,NRB)=RBY(5,NRB)+IN(N)+ZZ*MS(N) 
             RBY(6,NRB)=ZERO
             RBY(7,NRB)=ZERO
             RBY(8,NRB)=ZERO
-            RBY(9,NRB)=RBY(9,NRB)+IN(N)+(XX+YY)*MS(N)
+            RBY(9,NRB)=RBY(9,NRB)+IN(N)+YY*MS(N)
            ELSEIF(NI>0)THEN
 C MAIN DE SOUS RBY
             YY=(X(2,N)-X(2,M))*(X(2,N)-X(2,M))
@@ -1371,11 +1364,11 @@ C MAIN DE SOUS RBY
             RBY(2,NRB)=ZERO
             RBY(3,NRB)=ZERO
             RBY(4,NRB)=ZERO
-            RBY(5,NRB)=RBY(5,NRB)+(ZZ+XX)*MS(N)+RBY(21,NI)
+            RBY(5,NRB)=RBY(5,NRB)+ZZ*MS(N)+RBY(21,NI)
             RBY(6,NRB)=ZERO
             RBY(7,NRB)=ZERO
             RBY(8,NRB)=ZERO
-            RBY(9,NRB)=RBY(9,NRB)+(XX+YY)*MS(N)+RBY(25,NI)
+            RBY(9,NRB)=RBY(9,NRB)+YY*MS(N)+RBY(25,NI)
            ENDIF
          ENDDO
 C

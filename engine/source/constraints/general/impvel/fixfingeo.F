@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  FIXFINGEO                     source/constraints/general/impvel/fixfingeo.F
 Chd|-- called by -----------
@@ -31,7 +31,7 @@ Chd|        SENSOR_MOD                    share/modules/sensor_mod.F
 Chd|====================================================================
       SUBROUTINE FIXFINGEO(IBFV   ,A     ,V      ,NPC    ,TF       ,
      2                     VEL    ,MS    ,X      ,D      ,SENSOR_TAB,
-     3                     WEIGHT,CPTREAC,NODREAC,NODNX_SMS,
+     3                     WEIGHT ,CPTREAC,NODREAC,NODNX_SMS,NSENSOR,
      4                     FTHREAC,ITABM1,ITAB   ) 
 C-----------------------------------------------
 C   M o d u l e s
@@ -50,12 +50,12 @@ C-----------------------------------------------
 #include      "com08_c.inc"
 #include      "param_c.inc"
 #include      "sms_c.inc"
-#include      "scr14_c.inc"
 #include      "units_c.inc"
 C
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER ,INTENT(IN) :: NSENSOR
       INTEGER NPC(*),CPTREAC,NODREAC(*)
       INTEGER IBFV(NIFV,*),WEIGHT(*),
      .        NODNX_SMS(*),ITABM1(*),ITAB(*)
@@ -78,7 +78,7 @@ C     REAL
      .   AOLD0(3),
      .   VX1, VY1, VZ1, VX2, VY2, VZ2
       my_real, DIMENSION(:), ALLOCATABLE :: MASS, VX, VY, VZ      
-      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) ,INTENT(IN) :: SENSOR_TAB
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
@@ -105,7 +105,7 @@ C-------------------------------------------------
         IF(TT>STOPT)  THEN
            N1 = IABS(IBFV(1,N))
            N2 = IBFV(14,N)
-C			  
+C        
            VX1= V(1,N1)+A(1,N1)*DT12
            VY1= V(2,N1)+A(2,N1)*DT12
            VZ1= V(3,N1)+A(3,N1)*DT12
@@ -125,13 +125,13 @@ C
          VY(N)=VY(N)/MASS(N)
          VZ(N)=VZ(N)/MASS(N)
       ENDDO
-C	  
+C    
       DO N=1,NFXVEL
         IF (IBFV(13,N) /= 2) CYCLE
         STOPT  = VEL(3,N)
         IF(TT>STOPT)  THEN
            N1 = IABS(IBFV(1,N))
-           N2 = IBFV(14,N)		   
+           N2 = IBFV(14,N)       
            A(1,N1)=(VX(N2)-V(1,N1))/DT12
            A(2,N1)=(VY(N2)-V(2,N1))/DT12
            A(3,N1)=(VZ(N2)-V(3,N1))/DT12

@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  IMP_INT_K                     source/implicit/imp_int_k.F   
 Chd|-- called by -----------
@@ -35,10 +35,11 @@ Chd|        UPD_INT_K                     source/implicit/upd_glob_k.F
 Chd|        IMP_INTBUF                    share/modules/imp_mod_def.F   
 Chd|        IMP_INTTD                     share/modules/imp_mod_def.F   
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
+Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
 Chd|====================================================================
       SUBROUTINE IMP_INT_K( A     ,V         ,
      1                      ICODT ,ICODR ,ISKEW  ,IBFV  ,NPC    ,
-     2                      TF    ,VEL   ,SENSOR ,LSENSOR,XFRAME ,
+     2                      TF    ,VEL   ,NSENSOR,SENSOR_TAB,XFRAME ,
      3                      RBY   ,X     ,SKEW   ,LPBY   ,NPBY  ,
      4                      ITAB  ,WEIGHT,MS     ,IN     ,NRBYAC,
      5                      IRBYAC,NSS   ,ISS    ,IPARI  ,INTBUF_TAB,
@@ -57,17 +58,14 @@ C-----------------------------------------------
       USE IMP_INTTD
       USE INTBUFDEF_MOD
       USE IMP_INTBUF
+      USE SENSOR_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
 #include      "impl1_c.inc"
@@ -75,7 +73,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER NPC(*),IBFV(NIFV,*),LSENSOR(NSENSI,*),DIRUL(*),
+      INTEGER ,INTENT(IN) :: NSENSOR
+      INTEGER NPC(*),IBFV(NIFV,*),DIRUL(*),
      .        ICODT(*),ICODR(*),ISKEW(*),ITOK(*),NDDL,NT_RW
       INTEGER WEIGHT(*),LPBY(*),NPBY(NNPBY,*),ITAB(*),
      .        IPARI(NPARI,*), NRBYAC,IRBYAC(*),
@@ -88,10 +87,11 @@ C-----------------------------------------------
       my_real
      .  A(3,*),V(3,*),RBY(NRBY,*),X(3,*) ,SKEW(*),IN(*),MS(*)
       my_real
-     .  TF(*), VEL(LFXVELR,*),SENSOR(NSENSR,*),DIAG_K(*),LT_K(*),
+     .  TF(*), VEL(LFXVELR,*),DIAG_K(*),LT_K(*),
      .  DIAG_I(*),LT_I(*),LB(*),UD(3,*),GAPMIN,XFRAME(NXFRAME,*),
      .  FRBE3(*)
       TYPE(INTBUF_STRUCT_) INTBUF_TAB(*)
+      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) ,INTENT(IN) :: SENSOR_TAB
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -113,7 +113,7 @@ C-----------int5 first-------------
 C
           ISENS = IPARI(64,N)
           IF(ISENS/=0)  THEN  ! SENSOR
-             TS = SENSOR(2,ISENS)
+             TS = SENSOR_TAB(ISENS)%TSTART
           ELSE
              TS = TT
           ENDIF
@@ -130,12 +130,12 @@ C
 C       
        DO N=1,NINTER
         NTY   =IPARI(7,N)
-	    LREM(N) = 0
+              LREM(N) = 0
         IF(NTY==7) THEN
 C
           ISENS = IPARI(64,N)
           IF(ISENS/=0)  THEN  ! SENSOR
-             TS = SENSOR(2,ISENS)
+             TS = SENSOR_TAB(ISENS)%TSTART
           ELSE
              TS = TT
           ENDIF
@@ -159,7 +159,7 @@ C
 C
           ISENS = IPARI(64,N)
           IF(ISENS/=0)  THEN  ! SENSOR
-             TS = SENSOR(2,ISENS)
+             TS = SENSOR_TAB(ISENS)%TSTART
           ELSE
              TS = TT
           ENDIF
@@ -176,7 +176,7 @@ C
 C
           ISENS = IPARI(64,N)
           IF(ISENS/=0)  THEN  ! SENSOR
-             TS = SENSOR(2,ISENS)
+             TS = SENSOR_TAB(ISENS)%TSTART
           ELSE
              TS = TT
           ENDIF
@@ -205,7 +205,7 @@ c     2        NUM_IMP1(N),NS_IMP1(IAD),NE_IMP1(IAD)   ,IND_IMP1(IAD),
 C
           ISENS = IPARI(64,N)
           IF(ISENS/=0)  THEN  ! SENSOR
-             TS = SENSOR(2,ISENS)
+             TS = SENSOR_TAB(ISENS)%TSTART
           ELSE
              TS = TT
           ENDIF
@@ -229,7 +229,7 @@ C
 C
           ISENS = IPARI(64,N)
           IF(ISENS/=0)  THEN  ! SENSOR
-             TS = SENSOR(2,ISENS)
+             TS = SENSOR_TAB(ISENS)%TSTART
           ELSE
              TS = TT
           ENDIF
@@ -246,7 +246,7 @@ C
 C
           ISENS = IPARI(64,N)
           IF(ISENS/=0)  THEN  ! SENSOR
-             TS = SENSOR(2,ISENS)
+             TS = SENSOR_TAB(ISENS)%TSTART
           ELSE
              TS = TT
           ENDIF
@@ -273,7 +273,7 @@ C----- normal branche------------
 C
           ISENS = IPARI(64,N)
           IF(ISENS/=0)  THEN  ! SENSOR
-             TS = SENSOR(2,ISENS)
+             TS = SENSOR_TAB(ISENS)%TSTART
           ELSE
              TS = TT
           ENDIF
@@ -289,12 +289,12 @@ C
        END DO
       DO N=1,NINTER
         NTY   =IPARI(7,N)
-	LREM(N) = 0
+                 LREM(N) = 0
         IF(NTY==7) THEN
 C
           ISENS = IPARI(64,N)
           IF(ISENS/=0)  THEN  ! SENSOR
-             TS = SENSOR(2,ISENS)
+             TS = SENSOR_TAB(ISENS)%TSTART
           ELSE
              TS = TT
           ENDIF
@@ -318,7 +318,7 @@ C
 C
           ISENS = IPARI(64,N)
           IF(ISENS/=0)  THEN  ! SENSOR
-             TS = SENSOR(2,ISENS)
+             TS = SENSOR_TAB(ISENS)%TSTART
           ELSE
              TS = TT
           ENDIF
@@ -335,7 +335,7 @@ C
 C
           ISENS = IPARI(64,N)
           IF(ISENS/=0)  THEN  ! SENSOR
-             TS = SENSOR(2,ISENS)
+             TS = SENSOR_TAB(ISENS)%TSTART
           ELSE
              TS = TT
           ENDIF
@@ -353,7 +353,7 @@ C
 C
         IF(GAPMIN<ZERO)RETURN  
             CALL UPD_INT_K(ICODT ,ICODR ,ISKEW ,IBFV    ,NPC    ,
-     1                      TF   ,VEL   ,SENSOR ,LSENSOR,XFRAME ,
+     1                      TF   ,VEL   ,XFRAME ,
      2                      RBY   ,X     ,SKEW   ,LPBY   ,NPBY  ,
      3                      ITAB  ,WEIGHT,MS     ,IN     ,NRBYAC,
      4                      IRBYAC,NSS   ,ISS    ,IPARI  ,INTBUF_TAB,
@@ -378,24 +378,23 @@ Chd|        I7MAIN_CRIT_TRI               source/interfaces/intsort/i7main_crit_
 Chd|        IMP_ICOMCRIT                  source/implicit/imp_int_k.F   
 Chd|        SPMD_MIN_S                    source/mpi/implicit/imp_spmd.F
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
+Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
 Chd|====================================================================
       SUBROUTINE IMP_INTDT(
      1       IPARI    ,INTBUF_TAB,X        ,
      2       V        ,VR      ,ISENDTO ,IRECVFROM,
      4       NEWFRONT ,ITASK   ,DTK     ,ITAB     ,
      5       INTLIST  ,NBINTC  ,DT_MIN  ,MS       ,
-     6       SENSOR   ,MAXDGAP)
+     6       NSENSOR  ,SENSOR_TAB,MAXDGAP)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE INTBUFDEF_MOD
+      USE SENSOR_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -403,20 +402,21 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "scr05_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER ,INTENT(IN) :: NSENSOR
       INTEGER IPARI(NPARI,*), ITAB(*),
      .        NEWFRONT(*),NBINTC,INTLIST(*),
      .        ISENDTO(NINTER+1,*),IRECVFROM(NINTER+1,*),
      .        ITASK
       my_real 
      .   X(3,*), V(3,*),VR(3,*),DTK(*),DT_MIN,MS(*),
-     .   SENSOR(NSENSR,*),MAXDGAP(NINTER)
+     .   MAXDGAP(NINTER)
 
       TYPE(INTBUF_STRUCT_) INTBUF_TAB(*)
+      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -451,7 +451,7 @@ C        N = INTLIST(KK)
         XSLV_L(16,N)= EP30
         XSLV_L(17,N)= EP30
         XSLV_L(18,N)= EP30
-	
+
         XMSR_L(1,N)= -EP30
         XMSR_L(2,N)= -EP30
         XMSR_L(3,N)= -EP30
@@ -485,7 +485,7 @@ C
 C        N = INTLIST(KK)
       DO N=1,NINTER
         DTK(N) = EP30
-C----------ICONT-----	
+C----------ICONT-----
         IPARI(29,N) = 0
 C
         NTY   =IPARI(7,N)
@@ -496,7 +496,7 @@ C
           ISENS = 0
           IF(NTY == 7) ISENS = IPARI(64,N)  
           IF(ISENS/=0)  THEN
-             TS = SENSOR(2,ISENS)
+             TS = SENSOR_TAB(ISENS)%TSTART
           ELSE
              TS = TT
           ENDIF
@@ -512,7 +512,7 @@ C
 C
           ISENS = IPARI(64,N)  
           IF(ISENS/=0)  THEN
-             TS = SENSOR(2,ISENS)
+             TS = SENSOR_TAB(ISENS)%TSTART
           ELSE
              TS = TT
           ENDIF
@@ -528,8 +528,8 @@ C
          CALL IMP_ICOMCRIT(
      1    INTBUF_TAB   ,IPARI   ,NEWFRONT ,ISENDTO  ,
      2    IRECVFROM,DTK(N)  ,ITAB    ,XSLV_L   ,XMSR_L   ,
-     3    VSLV_L  ,VMSR_L   ,SIZE_T  ,N        ,SENSOR   ,
-     4    INTLIST  ,NBINTC  ,MAXDGAP)
+     3    VSLV_L  ,VMSR_L   ,SIZE_T  ,N        ,SENSOR_TAB,
+     4    INTLIST  ,NBINTC  ,MAXDGAP ,NSENSOR  )
 C     
           IF (NSPMD>1)CALL SPMD_MIN_S(DTK(N))
          DT_MIN = MIN(DT_MIN,DTK(N))
@@ -547,21 +547,22 @@ Chd|        SPMD_GET_STIF11               source/mpi/interfaces/send_cand.F
 Chd|        SPMD_SYNC_MMX                 source/mpi/interfaces/spmd_sync_mmx.F
 Chd|        INTAB                         source/implicit/ind_glob_k.F  
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
+Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
 Chd|====================================================================
       SUBROUTINE IMP_ICOMCRIT(
      1  INTBUF_TAB,IPARI  ,NEWFRONT,ISENDTO,
      2  IRCVFROM,DT2T   ,ITAB   ,XSLV_L  ,XMSR_L ,
-     3  VSLV_L ,VMSR_L  ,SIZE_T ,N       ,SENSOR ,
-     4  INTLIST ,NBINTC ,MAXDGAP) 
+     3  VSLV_L ,VMSR_L  ,SIZE_T ,N       ,SENSOR_TAB,
+     4  INTLIST ,NBINTC ,MAXDGAP,NSENSOR ) 
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE INTBUFDEF_MOD
+      USE SENSOR_MOD
 C----6---------------------------------------------------------------7---------8
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -569,25 +570,20 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
-#include      "scr05_c.inc"
-#include      "task_c.inc"
-#include      "scr03_c.inc"
-#include      "scr04_c.inc"
-#include      "warn_c.inc"
-#include      "units_c.inc"
-#include      "timeri_c.inc"
 C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER ,INTENT(IN) :: NSENSOR
       INTEGER IPARI(NPARI,*), NEWFRONT(*), ITAB(*),
      .        ISENDTO(NINTER+1,*) ,IRCVFROM(NINTER+1,*),N,
      .        NBINTC,INTLIST(*)
 C     REAL
       my_real
      .   DT2T,XSLV_L(6,*), XMSR_L(6,*), VSLV_L(6,*), 
-     .VMSR_L(6,*), SIZE_T(*),SENSOR(NSENSR,*),MAXDGAP(NINTER)
+     .VMSR_L(6,*), SIZE_T(*),MAXDGAP(NINTER)
 
       TYPE(INTBUF_STRUCT_) INTBUF_TAB(*)
+      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -597,6 +593,7 @@ C-----------------------------------------------
      .        XX,XY,XZ,DIST0,VX,VY,VZ,GAPINF,VV,DTI,
      .        MINBOX,
      .        STARTT, STOPT, TZINF(1), TS,PMAX(NINTER)
+      INTEGER :: NTY
 C-----------------------------------------------
 C   External function
 C-----------------------------------------------
@@ -619,7 +616,7 @@ C
           IF(NTY == 7.OR.NTY == 11.OR.NTY == 24.OR.NTY == 21.OR.
      .       NTY == 5.OR.NTY == 19 ) ISENS = IPARI(64,I)      
           IF(ISENS/=0) THEN             
-            TS = SENSOR(2,ISENS)
+            TS = SENSOR_TAB(ISENS)%TSTART
             IF (TT>=TS) INTERACT = 1
           ELSE
             STARTT = INTBUF_TAB(I)%VARIABLES(3)
@@ -682,7 +679,7 @@ C
             GAPINF = INTBUF_TAB(I)%VARIABLES(6)
             IF (GAPINF==ZERO) GAPINF = INTBUF_TAB(I)%VARIABLES(2)
 C-------supposee s est encore loin de M ------
-	    GAPINF =GAPINF+MAX(ZERO,DIST0)
+              GAPINF =GAPINF+MAX(ZERO,DIST0)
             DTI = ONEP8*GAPINF/VV
 Ctmp            DTI = ZEP9*GAPINF/VV
             IF(DTI<DT2T) DT2T    = DTI            
@@ -707,7 +704,9 @@ Chd|        IMP_TRIPI                     source/implicit/imp_int_k.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        INTERFACES_MOD                ../common_source/modules/interfaces/interfaces_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
+Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
 Chd|====================================================================
       SUBROUTINE IMP_INTTD0(
      1       IPARI ,INTBUF_TAB     ,X       ,D       ,
@@ -721,7 +720,8 @@ Chd|====================================================================
      9       DT2PREV,WA,NUM_IMP1,IRLEN20,ISLEN20,
      A       IRLEN20T,ISLEN20T,IRLEN20E,ISLEN20E,
      B       IKINE,DIAG_SMS,COUNT_REMSLV,COUNT_REMSLVE,
-     C       SENSOR,XDP,H3D_DATA,MULTI_FVM,FORNEQS,MAXDGAP)
+     C       NSENSOR,SENSOR_TAB,XDP,H3D_DATA,MULTI_FVM,FORNEQS,
+     D       MAXDGAP,INTERFACES)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -729,13 +729,12 @@ C-----------------------------------------------
       USE H3D_MOD
       USE MULTI_FVM_MOD
       USE GROUPDEF_MOD
+      USE SENSOR_MOD
+      USE INTERFACES_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -743,13 +742,12 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "scr05_c.inc"
 #include      "task_c.inc"
 #include      "impl1_c.inc"
-#include      "scr17_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER ,INTENT(IN) :: NSENSOR
       INTEGER IPARI(NPARI,*), ITAB(*),
      .        NEWFRONT(*),NBINTC,INTLIST(*),
      .        ISENDTO(NINTER+1,*),IRECVFROM(NINTER+1,*),
@@ -767,13 +765,15 @@ C-----------------------------------------------
       my_real 
      .   X(3,*), D(3,*),MS(*),WA(*),
      .   DT2PREV, TEMP(*),D_IMP(3,*),DR_IMP(3,*),IN(*),DIAG_SMS(*),
-     .   SENSOR(NSENSR,*),FORNEQS(3,*),MAXDGAP(NINTER)
+     .   FORNEQS(3,*),MAXDGAP(NINTER)
 
       TYPE(INTBUF_STRUCT_) INTBUF_TAB(*)
       TYPE(H3D_DATABASE) :: H3D_DATA
       TYPE(MULTI_FVM_STRUCT), INTENT(INOUT) :: MULTI_FVM
 !
       TYPE (GROUP_)  , DIMENSION(NGRBRIC) :: IGRBRIC
+      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE (INTERFACES_)    ,INTENT(IN)     :: INTERFACES
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -814,7 +814,7 @@ C----deactive cette fonction.
      2       V        ,VR      ,ISENDTO ,IRECVFROM,
      4       NEWFRONT ,ITASK   ,DTK     ,ITAB     ,
      5       INTLIST  ,NBINTC  ,DT_MIN  ,MS       ,
-     6       SENSOR   ,MAXDGAP)
+     6       NSENSOR  ,SENSOR_TAB,MAXDGAP)
        IF (DT_MIN >= DT2) GOTO 1000
        DO N = 1,NINTER
         NUM_IMP(N) = 0
@@ -840,7 +840,7 @@ C
         ISENS = 0
         IF(NTY == 7.OR.NTY == 11) ISENS = IPARI(64,N)      
         IF(ISENS/=0) THEN             !CMAAAAA
-           TS = SENSOR(2,ISENS)
+           TS = SENSOR_TAB(ISENS)%TSTART
            IF (TT>=TS) INTERACT = 1
         ELSE
            STARTT = INTBUF_TAB(N)%VARIABLES(3)
@@ -876,7 +876,8 @@ C
      9       IXS    ,TEMP  ,DT2PREV,WA     ,N    ,NTY,
      A       IRLEN20,ISLEN20,IRLEN20T,ISLEN20T,IRLEN20E,
      B       ISLEN20E,IKINE,DIAG_SMS,COUNT_REMSLV,COUNT_REMSLVE,
-     C       SENSOR  ,XDP  ,H3D_DATA, MULTI_FVM  ,FORNEQS)
+     C       SENSOR_TAB,XDP  ,H3D_DATA, MULTI_FVM  ,FORNEQS,
+     D       INTERFACES,NSENSOR)
  999   CONTINUE
       ENDDO
 C
@@ -903,9 +904,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
@@ -926,7 +924,7 @@ C     REAL
 C------------------------------------
         DO J=1,NSN
           I=NSV(J)
-	 IF (I>0) THEN
+           IF (I>0) THEN
           DX = D(1,I)*FACD
           DY = D(2,I)*FACD
           DZ = D(3,I)*FACD
@@ -940,7 +938,7 @@ C------------------------------------
         END DO
         DO J=1,NMN
           I=MSR(J)
-	 IF (I>0) THEN
+           IF (I>0) THEN
           DX = D(1,I)*FACD
           DY = D(2,I)*FACD
           DZ = D(3,I)*FACD
@@ -956,7 +954,7 @@ C
         IF (IRODDL/=0) THEN
          DO J=1,NSN
           I=NSV(J)
-	  IF (I>0) THEN
+            IF (I>0) THEN
            VR(1,I)=DR(1,I)*FACV
            VR(2,I)=DR(2,I)*FACV
            VR(3,I)=DR(3,I)*FACV
@@ -964,7 +962,7 @@ C
          END DO
          DO J=1,NMN
           I=MSR(J)
-	  IF (I>0) THEN
+            IF (I>0) THEN
            VR(1,I)=DR(1,I)*FACV
            VR(2,I)=DR(2,I)*FACV
            VR(3,I)=DR(3,I)*FACV
@@ -989,9 +987,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
@@ -1011,7 +1006,7 @@ C     REAL
      .        DX,DY,DZ
 C------------------------------------
         DO J=1,NSN
-	 IF (STFN(J)/=ZERO) THEN
+           IF (STFN(J)/=ZERO) THEN
           I=NSV(J)
           DX = D(1,I)*FACD
           DY = D(2,I)*FACD
@@ -1026,7 +1021,7 @@ C------------------------------------
         END DO
         DO J=1,NMN
           I=MSR(J)
-	 IF (I>0) THEN
+           IF (I>0) THEN
           DX = D(1,I)*FACD
           DY = D(2,I)*FACD
           DZ = D(3,I)*FACD
@@ -1041,7 +1036,7 @@ C------------------------------------
 C
         IF (IRODDL/=0) THEN
          DO J=1,NSN
-	  IF (STFN(J)/=ZERO) THEN
+            IF (STFN(J)/=ZERO) THEN
            I=NSV(J)
            VR(1,I)=DR(1,I)*FACV
            VR(2,I)=DR(2,I)*FACV
@@ -1050,7 +1045,7 @@ C
          END DO
          DO J=1,NMN
           I=MSR(J)
-	  IF (I>0) THEN
+            IF (I>0) THEN
            VR(1,I)=DR(1,I)*FACV
            VR(2,I)=DR(2,I)*FACV
            VR(3,I)=DR(3,I)*FACV
@@ -1082,7 +1077,9 @@ Chd|        SPMD_SD_XV                    source/mpi/nodes/spmd_sd_xv.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        INTERFACES_MOD                ../common_source/modules/interfaces/interfaces_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
+Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
 Chd|====================================================================
       SUBROUTINE IMP_TRIPI(
      1       IPARI ,INTBUF_TAB   ,X       ,D       ,
@@ -1096,7 +1093,8 @@ Chd|====================================================================
      9       IXS    ,TEMP  ,DT2PREV,WAG    ,N   ,NTY ,
      A       IRLEN20,ISLEN20,IRLEN20T,ISLEN20T,IRLEN20E,
      B       ISLEN20E,IKINE,DIAG_SMS,COUNT_REMSLV,COUNT_REMSLVE,  
-     C       SENSOR  ,XDP,H3D_DATA,MULTI_FVM,FORNEQS)
+     C       SENSOR_TAB,XDP,H3D_DATA,MULTI_FVM,FORNEQS,
+     D       INTERFACES,NSENSOR )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -1104,13 +1102,12 @@ C-----------------------------------------------
       USE H3D_MOD
       USE MULTI_FVM_MOD
       USE GROUPDEF_MOD
+      USE SENSOR_MOD
+      USE INTERFACES_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -1119,11 +1116,10 @@ C-----------------------------------------------
 #include      "com08_c.inc"
 #include      "param_c.inc"
 #include      "scr05_c.inc"
-#include      "task_c.inc"
-#include      "scr17_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER ,INTENT(IN) :: NSENSOR
       INTEGER IPARI(NPARI,*), ITAB(*),
      .        NEWFRONT(*),NBINTC,INTLIST(*),IKINE(*),
      .        ISENDTO(NINTER+1,*),IRECVFROM(NINTER+1,*),
@@ -1140,14 +1136,15 @@ C-----------------------------------------------
       
       my_real 
      .   X(3,*), D(3,*),V(*),MS(*),WAG(*),
-     .   VR(3,*),DT2PREV, TEMP(*),IN(*), DIAG_SMS(*), SENSOR(NSENSR,*),
-     .   FORNEQS(3,*)
+     .   VR(3,*),DT2PREV, TEMP(*),IN(*), DIAG_SMS(*),FORNEQS(3,*)
 
       TYPE(INTBUF_STRUCT_) INTBUF_TAB(*)
       TYPE(H3D_DATABASE) :: H3D_DATA
       TYPE(MULTI_FVM_STRUCT), INTENT(INOUT) :: MULTI_FVM
 !
       TYPE (GROUP_)  , DIMENSION(NGRBRIC) :: IGRBRIC
+      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE (INTERFACES_)    ,INTENT(IN)     :: INTERFACES
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -1178,20 +1175,20 @@ C-------------dans inttri------
      1       IPARI   ,X    ,V       ,MS          ,
      2       IMSCH   ,I2MSCH ,DT2PREV ,INTLIST ,NBINTC  ,
      3       ISLEN7  ,IRLEN7 ,ISLEN11 ,IRLEN11 ,ISLEN17 ,
-     4       IRLEN17 ,IXS    ,IXS(L3) ,
+     4       IRLEN17 ,IXS    ,IXS(L3) ,NSENSOR ,
      5       IGRBRIC ,TEMP   ,1       ,IRLEN7T ,ISLEN7T ,
      6       IRLEN20 ,ISLEN20,IRLEN20T,ISLEN20T,IRLEN20E,
-     7       ISLEN20E,IKINE  ,DIAG_SMS,SENSOR  ,INTBUF_TAB,INT24E2EUSE,
-     8       FORNEQS ,MULTI_FVM)
+     7       ISLEN20E,IKINE  ,DIAG_SMS,SENSOR_TAB,INTBUF_TAB,INT24E2EUSE,
+     8       FORNEQS ,MULTI_FVM,INTERFACES)
            CALL SPMD_I7XVCOM2(
      1       IPARI   ,X       ,V       ,MS      ,
      2       IMSCH   ,I2MSCH ,DT2PREV ,INTLIST ,NBINTC  ,
      3       ISLEN7  ,IRLEN7 ,ISLEN11 ,IRLEN11 ,ISLEN17 ,
-     4       IRLEN17 ,IXS    ,IXS(L3) ,
+     4       IRLEN17 ,IXS    ,IXS(L3) ,NSENSOR ,
      5       IGRBRIC ,TEMP   ,2       ,IRLEN7T ,ISLEN7T ,
      6       IRLEN20 ,ISLEN20,IRLEN20T,ISLEN20T,IRLEN20E,
-     7       ISLEN20E,IKINE  ,DIAG_SMS,SENSOR  ,INTBUF_TAB,INT24E2EUSE,
-     8       FORNEQS ,MULTI_FVM)
+     7       ISLEN20E,IKINE  ,DIAG_SMS,SENSOR_TAB,INTBUF_TAB,INT24E2EUSE,
+     8       FORNEQS ,MULTI_FVM,INTERFACES)
         ENDIF
           NRTM_T = IPARI(4,N)
           ESHIFT = 0
@@ -1199,7 +1196,7 @@ C-------------dans inttri------
 C
           ISENS = IPARI(64,N)
           IF(ISENS/=0)  THEN  ! SENSOR
-             TS = SENSOR(2,ISENS)
+             TS = SENSOR_TAB(ISENS)%TSTART
           ELSE
              TS = TT
           ENDIF
@@ -1226,12 +1223,12 @@ C
 C
          ISENS = IPARI(64,N)
          IF(ISENS/=0)  THEN  ! SENSOR
-            TS = SENSOR(2,ISENS)
+            TS = SENSOR_TAB(ISENS)%TSTART
          ELSE
             TS = TT
          ENDIF
 C
-         IF(TT>=TS) THEN  ! If interface is activated	
+         IF(TT>=TS) THEN  ! If interface is activated
           CALL I11MAIN_TRI(
      1 IPARI      ,X       ,V        ,
      2 MS         ,N            ,ITASK        ,WEIGHT  ,ISENDTO  ,
@@ -1255,16 +1252,16 @@ C
 C--------- a modifier par interface---
          CALL SPMD_IFRONT(
      1    IPARI  ,NEWFRONT,ISENDTO ,IRECVFROM,
-     2    NBINTC ,INTLIST ,IBIDLEN ,IBIDLEN  ,
+     2    NSENSOR,NBINTC ,INTLIST ,IBIDLEN ,IBIDLEN  ,
      3    IBIDLEN,IBIDLEN,IBIDLEN ,IBIDLEN ,IBIDLEN  ,
      4    IBIDLEN,IBIDLEN,IBIDLEN ,IBIDLEN ,IBIDLEN  ,
-     5    IBIDLEN,IBIDLEN,SENSOR  ,INTBUF_TAB, 1)
+     5    IBIDLEN,IBIDLEN,SENSOR_TAB,INTBUF_TAB, 1)
          CALL SPMD_IFRONT(
      1    IPARI  ,NEWFRONT,ISENDTO ,IRECVFROM,
-     2    NBINTC ,INTLIST ,IBIDLEN ,IBIDLEN  ,
+     2    NSENSOR,NBINTC ,INTLIST ,IBIDLEN ,IBIDLEN  ,
      3    IBIDLEN,IBIDLEN,IBIDLEN ,IBIDLEN ,IBIDLEN  ,
      4    IBIDLEN,IBIDLEN,IBIDLEN ,IBIDLEN ,IBIDLEN  ,
-     5    IBIDLEN,IBIDLEN,SENSOR  ,INTBUF_TAB, 2)
+     5    IBIDLEN,IBIDLEN,SENSOR_TAB,INTBUF_TAB, 2)
 
 
         ENDIF
@@ -1273,7 +1270,7 @@ C
 C
           ISENS = IPARI(64,N)
           IF(ISENS/=0)  THEN  ! SENSOR
-             TS = SENSOR(2,ISENS)
+             TS = SENSOR_TAB(ISENS)%TSTART
           ELSE
              TS = TT
           ENDIF
@@ -1291,7 +1288,7 @@ C
 C
           ISENS = IPARI(64,N)
           IF(ISENS/=0)  THEN  ! SENSOR
-             TS = SENSOR(2,ISENS)
+             TS = SENSOR_TAB(ISENS)%TSTART
           ELSE
              TS = TT
           ENDIF
@@ -1319,7 +1316,7 @@ C
 C
           ISENS = IPARI(64,N)
           IF(ISENS/=0)  THEN  ! SENSOR
-             TS = SENSOR(2,ISENS)
+             TS = SENSOR_TAB(ISENS)%TSTART
           ELSE
              TS = TT
           ENDIF
@@ -1342,7 +1339,7 @@ C
 C
           ISENS = IPARI(64,N)
           IF(ISENS/=0)  THEN  ! SENSOR
-             TS = SENSOR(2,ISENS)
+             TS = SENSOR_TAB(ISENS)%TSTART
           ELSE
              TS = TT
           ENDIF
@@ -1376,16 +1373,9 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   M e s s a g e   P a s s i n g
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "task_c.inc"
-#include      "scr05_c.inc" 
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1439,17 +1429,11 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   M e s s a g e   P a s s i n g
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "impl1_c.inc"
-#include      "task_c.inc"
-#include      "scr05_c.inc" 
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1470,7 +1454,7 @@ C------dans NS_IMP input:d'abord NT_IMP1, + NT_IMP-NT_IMP1, output: NT_IMP
        IF(NSPMD>1) THEN
         IAD1 = 0
         DO N = 1,NINTER
-	 DO I = 1,NUMIMP1(N)
+           DO I = 1,NUMIMP1(N)
           NS_IMP(IAD1+I)=NS_IMP1(IAD1+I)
          END DO
          IAD1 =IAD1 + NUMIMP1(N) 
@@ -1486,18 +1470,18 @@ C----
 C
        IAD1 = 0
        DO N = 1,NINTER
-	DO I = 1,NUMIMP1(N)
-	 NS_IMP1(IAD1+I) = NS_IMP(IAD1+I)
-	 NE_IMP1(IAD1+I) = NE_IMP(IAD1+I)
-	 IND_IMP1(IAD1+I) = IND_IMP(IAD1+I)
+          DO I = 1,NUMIMP1(N)
+           NS_IMP1(IAD1+I) = NS_IMP(IAD1+I)
+           NE_IMP1(IAD1+I) = NE_IMP(IAD1+I)
+           IND_IMP1(IAD1+I) = IND_IMP(IAD1+I)
         END DO
         IAD1 =IAD1 + NUMIMP1(N) 
        END DO
        DO N = 1,NINTER
-	DO I = 1,NUMIMP(N)
-	 NS_IMP1(IAD1+I) = NS_IMP(IAD1+I)
-	 NE_IMP1(IAD1+I) = NE_IMP(IAD1+I)
-	 IND_IMP1(IAD1+I) = IND_IMP(IAD1+I)
+          DO I = 1,NUMIMP(N)
+           NS_IMP1(IAD1+I) = NS_IMP(IAD1+I)
+           NE_IMP1(IAD1+I) = NE_IMP(IAD1+I)
+           IND_IMP1(IAD1+I) = IND_IMP(IAD1+I)
         END DO
         IAD1 =IAD1 + NUMIMP(N) 
        END DO
@@ -1505,10 +1489,10 @@ C--------change ind for NS_IMP,INE_IMP,IND_IMP---
        IAD = 0
        IAD1 = 0
        DO N = 1,NINTER
-	DO I = 1,NUMIMP1(N)
-	 NS_IMP(IAD+I) = NS_IMP1(IAD1+I)
-	 NE_IMP(IAD+I) = NE_IMP1(IAD1+I)
-	 IND_IMP(IAD+I) = IND_IMP1(IAD1+I)
+          DO I = 1,NUMIMP1(N)
+           NS_IMP(IAD+I) = NS_IMP1(IAD1+I)
+           NE_IMP(IAD+I) = NE_IMP1(IAD1+I)
+           IND_IMP(IAD+I) = IND_IMP1(IAD1+I)
         END DO
         IAD =IAD + NUMIMP1(N) + NUMIMP(N)
         IAD1 = IAD1 + NUMIMP1(N)
@@ -1516,10 +1500,10 @@ C--------change ind for NS_IMP,INE_IMP,IND_IMP---
        IAD = 0
        DO N = 1,NINTER
         IADT =IAD + NUMIMP1(N) 
-	DO I = 1,NUMIMP(N)
-	 NS_IMP(IADT+I) = NS_IMP1(IAD1+I)
-	 NE_IMP(IADT+I) = NE_IMP1(IAD1+I)
-	 IND_IMP(IADT+I) = IND_IMP1(IAD1+I)
+          DO I = 1,NUMIMP(N)
+           NS_IMP(IADT+I) = NS_IMP1(IAD1+I)
+           NE_IMP(IADT+I) = NE_IMP1(IAD1+I)
+           IND_IMP(IADT+I) = IND_IMP1(IAD1+I)
         END DO
         IAD1 =IAD1 + NUMIMP(N) 
         IAD =IAD + NUMIMP1(N) + NUMIMP(N)
@@ -1552,13 +1536,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   M e s s a g e   P a s s i n g
-C-----------------------------------------------
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com04_c.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER CAND_N(*) ,NIN,NSN,NUM_IMP,INDEX(*)
@@ -1587,24 +1564,23 @@ Chd|        IMP_SOLV                      source/implicit/imp_solv.F
 Chd|-- calls ---------------
 Chd|        IMP_INTDT                     source/implicit/imp_int_k.F   
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
+Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
 Chd|====================================================================
       SUBROUTINE IMP_DTKIN(
      1       IPARI ,INTBUF_TAB      ,X       ,V       ,
      2       VR    ,ITAB   ,D_IMP   ,DR_IMP  ,NBINTC  ,
      3       INTLIST,ITASK ,NEWFRONT,ISENDTO ,IRECVFROM,
      4       IDDL  ,NDOF   ,IKC     ,SCAL    ,MS      ,
-     5       SENSOR, MAXDGAP)
+     5       NSENSOR,SENSOR_TAB, MAXDGAP)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE INTBUFDEF_MOD
+      USE SENSOR_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -1617,6 +1593,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER ,INTENT(IN) :: NSENSOR
       INTEGER IPARI(NPARI,*), ITAB(*),
      .        NEWFRONT(*),NBINTC,INTLIST(*),
      .        ISENDTO(NINTER+1,*),IRECVFROM(NINTER+1,*),
@@ -1624,10 +1601,11 @@ C-----------------------------------------------
       INTEGER IDDL(*)  ,NDOF(*),IKC(*)
       my_real 
      .   X(3,*), V(3,*),VR(3,*),
-     .   D_IMP(3,*),DR_IMP(3,*),SCAL,MS(*),SENSOR(NSENSR,*),
+     .   D_IMP(3,*),DR_IMP(3,*),SCAL,MS(*),
      .   MAXDGAP(NINTER)
 
       TYPE(INTBUF_STRUCT_) INTBUF_TAB(*)
+      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -1658,7 +1636,7 @@ C-------------before inttri------
      2       V        ,VR      ,ISENDTO ,IRECVFROM,
      4       NEWFRONT ,ITASK   ,DTK     ,ITAB     ,
      5       INTLIST  ,NBINTC  ,DT_MIN  ,MS       ,
-     6       SENSOR   ,MAXDGAP)
+     6       NSENSOR  ,SENSOR_TAB,MAXDGAP)
 C  
        SCAL = DT_MIN*DTI
        IF (SCAL<ONE) THEN
@@ -1711,15 +1689,10 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "impl1_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1750,7 +1723,7 @@ C--------allocation------
 C
        ALLOCATE(IN_KN(NUMN_KN),ID_KN(3,NUMN_KN),STAT=IERR1)
       IF (NUMN_KN > 0) THEN
-       ID_KN = -7	  
+       ID_KN = -7    
        N = 0
 C------------valeur nega pour les nsl nodes-----      
        DO I=1,NUMNOD
@@ -1820,13 +1793,13 @@ C ------ini RBE3---
          IROT=MAX(IROT,IRBE3(6,N))
         ENDDO 
         ALLOCATE(ID_KNM3(6,IAD,NRBE3_KN),STAT=IERR3)
-	 ID_KNM3=0
-	 RKN_MAX=IAD
+           ID_KNM3=0
+           RKN_MAX=IAD
         ALLOCATE(FCDI_KN(18*NMT),STAT=IERR5)
-	 FCDI_KN=ZERO
+           FCDI_KN=ZERO
         IF (IROT>0) THEN
-	 ALLOCATE(MCDI_KN(18*NMT),STAT=IERR5)
-	 MCDI_KN=ZERO
+           ALLOCATE(MCDI_KN(18*NMT),STAT=IERR5)
+           MCDI_KN=ZERO
         ENDIF 
         CALL RBE3_MINT(IRBE3   ,LRBE3    ,FRBE3   ,X     ,SKEW ,
      .                 NRBE3_KN,IRBE3_KN ,FCDI_KN,MCDI_KN)
@@ -1874,21 +1847,16 @@ C-----------------------------------------------
       USE IMP_RWL
       USE IMP_ASPC
       USE INTBUFDEF_MOD
-C----6---------------------------------------------------------------7---------8
+C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-C-----------------------------------------------------------------
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NPBY(NNPBY,*),LPBY(*),NRBYAC,IRBYAC(*),
@@ -2019,21 +1987,16 @@ C-----------------------------------------------
       USE IMP_RWL
       USE IMP_ASPC
       USE INTBUFDEF_MOD
-C----6---------------------------------------------------------------7---------8
+C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-C-----------------------------------------------------------------
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IBFV(NIFV,*),LJ(*),ISKEW(*) ,ICODT(*)
@@ -2136,7 +2099,7 @@ C-
        NSPC = 0
        DO N=1,NSPCL
         IF (INLOC(N)>0.AND.IC_SPC(N)<=3)THEN
-	 NSPC = NSPC + 1  
+           NSPC = NSPC + 1  
          ISPC_MV(NSPC) = N 
         ENDIF 
        ENDDO
@@ -2215,12 +2178,8 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   M e s s a g e   P a s s i n g
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -2244,17 +2203,17 @@ C   S o u r c e  L i n e s
 C-----------------------------------------------
 C
        IF (NML>0) THEN
-C--------initialization for ndof=0---	
+C--------initialization for ndof=0---
         DO I = 1, NML
          N = IML(I)
          NDD = 0
          DO J = 1 , MIN(3,NDOF(N))
-	  ID = IDDL(N) + J
+            ID = IDDL(N) + J
           IF (IKC(ID)<1) THEN
            NDD = NDD + 1
-           IDDML(J,I) = IDDLM(N) + NDD	  
+           IDDML(J,I) = IDDLM(N) + NDD    
           ELSE
-           IDDML(J,I) = -IKC(ID)	  
+           IDDML(J,I) = -IKC(ID)    
           ENDIF
          ENDDO
         ENDDO
@@ -2265,12 +2224,12 @@ C
          N = IFRSR(1,I)
          NDD = 0
          DO J = 1 , NDOF(N)
-	  ID = IDDL(N) + J
+            ID = IDDL(N) + J
           IF (IKC(ID)<1) THEN
            NDD = NDD + 1
-           IDDMR(J,I) = IDDLM(N) + NDD	  
+           IDDMR(J,I) = IDDLM(N) + NDD    
           ELSE
-           IDDMR(J,I) = -IKC(ID)	  
+           IDDMR(J,I) = -IKC(ID)    
           ENDIF
          ENDDO
         ENDDO
@@ -2302,12 +2261,12 @@ C-------si noeud main est dependant aussi-----
           NJ=INTBUF_TAB(N)%IRECTM(NL+M)
           NDD = 0
           DO J = 1 , NDOF(NJ)
-	   ID = IDDL(NJ) + J
+             ID = IDDL(NJ) + J
            IF (IKC(ID)<1) THEN
             NDD = NDD + 1
-            IDDMI2(J,M,I) = IDDLM(NJ) + NDD	  
+            IDDMI2(J,M,I) = IDDLM(NJ) + NDD    
            ELSE
-            IDDMI2(J,M,I) = -IKC(ID)	  
+            IDDMI2(J,M,I) = -IKC(ID)    
            ENDIF
           ENDDO
          ENDDO 
@@ -2325,12 +2284,12 @@ C-------
           NJ=LRBE3(IAD+M)
           NDD = 0
           DO J = 1 , NDOF(NJ)
-	     ID = IDDL(NJ) + J
+               ID = IDDL(NJ) + J
            IF (IKC(ID)<1) THEN
             NDD = NDD + 1
-            IDDMI3(J,M,I) = IDDLM(NJ) + NDD	  
+            IDDMI3(J,M,I) = IDDLM(NJ) + NDD    
            ELSE
-            IDDMI3(J,M,I) = -IKC(ID)	  
+            IDDMI3(J,M,I) = -IKC(ID)    
            ENDIF
           ENDDO
          ENDDO 
@@ -2343,12 +2302,12 @@ C------RBE2
          M = IRBE2(3,N)
          NDD = 0
          DO J = 1 , NDOF(M)
-	  ID = IDDL(M) + J
+            ID = IDDL(M) + J
           IF (IKC(ID)<1) THEN
            NDD = NDD + 1
-           IDDMI4(J,I) = IDDLM(M) + NDD	  
+           IDDMI4(J,I) = IDDLM(M) + NDD    
           ELSE
-           IDDMI4(J,I) = -IKC(ID)	  
+           IDDMI4(J,I) = -IKC(ID)    
           ENDIF
          ENDDO
         ENDDO
@@ -2370,12 +2329,8 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   M e s s a g e   P a s s i n g
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "param_c.inc"
 #include      "tabsiz_c.inc"
 C-----------------------------------------------
@@ -2441,10 +2396,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "impl1_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -2540,7 +2493,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
@@ -2634,10 +2586,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "impl1_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -2689,14 +2639,9 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "task_c.inc" 
-#include      "scr05_c.inc" 
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

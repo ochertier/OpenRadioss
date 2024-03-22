@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  HM_READ_PRELOAD               source/loads/general/preload/hm_read_preload.F
 Chd|-- called by -----------
@@ -37,7 +37,7 @@ Chd|        SENSOR_MOD                    share/modules1/sensor_mod.F
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
       SUBROUTINE HM_READ_PRELOAD(IXS     ,IXS10,IPRELOAD ,PRELOAD  ,IFLAG_BPRELOAD,
-     .                           NSTRF   ,SENSOR_TAB ,UNITAB ,X       ,
+     .                           NSTRF   ,SENSORS    ,UNITAB ,X       ,
      .                           ISOLNOD ,ITAB       ,LSUBMODEL)
 C-----------------------------------------------
 C   M o d u l e s
@@ -54,14 +54,10 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
 #include      "units_c.inc"
-#include      "scr03_c.inc"
 #include      "scr17_c.inc"
 #include      "com04_c.inc"
-#include      "sysunit.inc"
 #include      "boltpr_c.inc"
-#include      "submod_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -69,7 +65,7 @@ C-----------------------------------------------
       INTEGER IXS(NIXS,*), IXS10(6,*), IPRELOAD(3,*), IFLAG_BPRELOAD(*)  
       INTEGER NSTRF(*),ITAB(*),ISOLNOD(*)
       my_real PRELOAD(6,*),X(3,*)
-      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR), TARGET :: SENSOR_TAB
+      TYPE (SENSORS_) ,INTENT(IN) :: SENSORS
       TYPE(SUBMODEL_DATA) LSUBMODEL(*)
 
 C-----------------------------------------------
@@ -87,7 +83,7 @@ C-----------------------------------------------
       my_real
      .   TDEB,TFIN, LOADVAL,
      .   X1,Y1,Z1,X2,Y2,Z2,X3,Y3,Z3,N3,AREA(NPRELOAD)
-      CHARACTER MESS*40,TITR*nchartitle
+      CHARACTER MESS*40,TITR*nchartitle,KEY*ncharline
 C-----------------------------------------------
       LOGICAL IS_AVAILABLE
 C-----------------------------------------------
@@ -110,12 +106,15 @@ C-----------------------------------------------
         CALL HM_OPTION_READ_KEY(LSUBMODEL, 
      .                          OPTION_ID      = ID, 
      .                          UNIT_ID        = UID,
-     .                          OPTION_TITR    = TITR)           
+     .                          OPTION_TITR    = TITR,           
+     .                          KEYWORD2       = KEY)
 C
+         IUGRP(I) = 0
+         IF (KEY(1:LEN_TRIM(KEY))=='AXIAL') CYCLE
         ! Checking unit ID
         IFLAGUNIT = 0 
 C
-        DO J=1,NUNITS                           
+        DO J=1,UNITAB%NUNITS                           
           IF (UNITAB%UNIT_ID(J) == UID) THEN
             IFLAGUNIT = 1
             EXIT
@@ -155,8 +154,8 @@ C
 c        
         SENSNUM = 0
         IF (ISENS > 0) THEN
-          DO JS=1,NSENSOR
-            IF (ISENS == SENSOR_TAB(JS)%SENS_ID) THEN
+          DO JS=1,SENSORS%NSENSOR
+            IF (ISENS == SENSORS%SENSOR_TAB(JS)%SENS_ID) THEN
               SENSNUM = JS ! not used - not stored
               EXIT
             ENDIF
@@ -170,7 +169,7 @@ c
            END IF
         ENDIF !(ISENS > 0) 
 c
-	   NN = 0
+             NN = 0
         IF (ISEC > 0) THEN !ISEC=sect_ID input is mandatory
           K0=31
           DO IS=1,NSECT 
@@ -260,6 +259,7 @@ c
 c-----------------------------output------------------------------------------
    90  WRITE (IOUT,2000)
        DO I=I1,I2
+         IF (IUGRP(I)==0) CYCLE
          WRITE (IOUT,'(I10,1X,I10,1X,1PE10.3,1X,I10,6(1X,1PE10.3))') I,
      .        IUGRP(I), AREA(I), IDSENSOR(I), NX(I), NY(I), NZ(I), LVAL(I), TS(I), TE(I)
        ENDDO

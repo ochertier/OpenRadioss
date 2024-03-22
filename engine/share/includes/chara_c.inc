@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>    
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,12 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
-#include "nchara_c.inc"
 C.../CHARA/
       COMMON /CHARA/ ROOTNAM, CHRUN, CHRUN0,INPUT ,ROOTN,PATH,RVERS,IMVW_REFPATH
       COMMON /CHARI/ ROOTLEN,MULTIREST
       INTEGER ROOTLEN,MULTIREST
       CHARACTER ROOTNAM*80, CHRUN*4, CHRUN0*2,INPUT*256 ,ROOTN*80,
-     *          PATH*2048,RVERS*32, IMVW_REFPATH*ncharline
+     *          PATH*2048,RVERS*32, IMVW_REFPATH*500
 
       COMMON /LENTIT/ LENINPUT,LENROOTN,GOT_INPUT,RUNN,LENPATH,GOT_PATH
       INTEGER LENINPUT,LENROOTN,GOT_INPUT,RUNN,LENPATH,GOT_PATH

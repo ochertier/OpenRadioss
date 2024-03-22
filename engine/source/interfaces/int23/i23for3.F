@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  I23FOR3                       source/interfaces/int23/i23for3.F
 Chd|-- called by -----------
@@ -33,6 +33,7 @@ Chd|        I7ASS3                        source/interfaces/int07/i7ass3.F
 Chd|        I7ASS35                       source/interfaces/int07/i7ass3.F
 Chd|        I7SMS2                        source/interfaces/int07/i7sms2.F
 Chd|        IBCOFF                        source/interfaces/interf/ibcoff.F
+Chd|        ANIM_MOD                      ../common_source/modules/anim_mod.F
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
@@ -61,6 +62,7 @@ C   M o d u l e s
 C-----------------------------------------------
       USE TRI7BOX
       USE H3D_MOD
+      USE ANIM_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -78,7 +80,6 @@ C-----------------------------------------------
 #include      "com06_c.inc"
 #include      "com08_c.inc"
 #include      "impl1_c.inc"
-#include      "param_c.inc"
 #include      "parit_c.inc"
 #include      "scr05_c.inc"
 #include      "scr07_c.inc"
@@ -153,7 +154,6 @@ C-----------------------------------------------
 C-----------------------------------------------
       RBID = ZERO
       IBID = 0
-#include "sync_dir.inc"
       IF (IRESP==1) THEN
            PREC = FIVEEM4
       ELSE
@@ -288,9 +288,10 @@ C
         ENDDO
       ENDIF
 C---------------------------------
-      IF(ANIM_V(12)+OUTP_V(12)+H3D_DATA%N_VECT_PCONT>0.AND.
-     .          (TT>=TANIM.OR.TT>=TOUTP.OR.TT>=H3D_DATA%TH3D.OR.
-     .              (MANIM>=4.AND.MANIM<=15).OR.H3D_DATA%MH3D/=0))THEN
+      IF((ANIM_V(12)+OUTP_V(12)+H3D_DATA%N_VECT_PCONT>0.AND.
+     .          ((TT>=TANIM .AND. TT<=TANIM_STOP).OR.TT>=TOUTP.OR.(TT>=H3D_DATA%TH3D.AND.TT<=H3D_DATA%TH3D_STOP).OR.
+     .              (MANIM>=4.AND.MANIM<=15).OR.H3D_DATA%MH3D/=0))
+     .   .OR.H3D_DATA%N_VECT_PCONT_MAX>0)THEN
          IF (INCONV==1) THEN
 #include "lockon.inc"
            DO I=1,JLT
@@ -381,7 +382,7 @@ C attention : normale <> normale a l'elt
           XMU(I) = MAX(XMU(I),EM30)
         ENDDO
       ELSEIF (MFROT==3) THEN
-C---    Loi Renard
+C---    Renard 
         DO I=1,JLT
 C attention : normale <> normale a l'elt
           AA = NX(I)*VX(I) + NY(I)*VY(I) + NZ(I)*VZ(I)
@@ -404,6 +405,18 @@ C attention : normale <> normale a l'elt
           ENDIF
           XMU(I) = MAX(XMU(I),EM30)
         ENDDO
+      ELSEIF(MFROT==4)THEN
+C---    Exponential decay model
+        DO I=1,JLT
+          AA = NX(I)*VX(I) + NY(I)*VY(I) + NZ(I)*VZ(I)
+          V2 = (VX(I) - NX(I)*AA)**2 
+     .       + (VY(I) - NY(I)*AA)**2 
+     .       + (VZ(I) - NZ(I)*AA)**2
+           VV = SQRT(MAX(EM30,V2))
+           XMU(I) = FRIC
+     .        + (FROT_P(1)-FRIC)*EXP(-FROT_P(2)*VV)
+           XMU(I) = MAX(XMU(I),EM30)
+         ENDDO
       ENDIF
 C------------------
 C    TANGENT FORCE CALCULATION
@@ -454,9 +467,10 @@ C-------    total force
       ENDDO
 C---------------------------------
 C
-      IF(ANIM_V(12)+OUTP_V(12)+H3D_DATA%N_VECT_PCONT>0.AND.
-     .          (TT>=TANIM.OR.TT>=TOUTP.OR.TT>=H3D_DATA%TH3D.OR.
-     .              (MANIM>=4.AND.MANIM<=15).OR.H3D_DATA%MH3D/=0))THEN
+      IF((ANIM_V(12)+OUTP_V(12)+H3D_DATA%N_VECT_PCONT>0.AND.
+     .          ((TT>=TANIM .AND. TT<=TANIM_STOP).OR.TT>=TOUTP.OR.(TT>=H3D_DATA%TH3D.AND.TT<=H3D_DATA%TH3D_STOP).OR.
+     .              (MANIM>=4.AND.MANIM<=15).OR.H3D_DATA%MH3D/=0))
+     .   .OR.H3D_DATA%N_VECT_PCONT_MAX>0)THEN
          IF (INCONV==1) THEN
 #include "lockon.inc"
            DO I=1,JLT
@@ -869,7 +883,7 @@ C
 C
 C-----------------------------------------------------
       IF(ANIM_V(4)+OUTP_V(4)+H3D_DATA%N_VECT_CONT >0.AND.
-     .          (TT>=TANIM.OR.TT>=TOUTP.OR.TT>=H3D_DATA%TH3D.OR.
+     .          ((TT>=TANIM .AND. TT<=TANIM_STOP).OR.TT>=TOUTP.OR.(TT>=H3D_DATA%TH3D.AND.TT<=H3D_DATA%TH3D_STOP).OR.
      .              (MANIM>=4.AND.MANIM<=15).OR. H3D_DATA%MH3D /= 0))THEN
          IF (INCONV==1) THEN
 #include "lockon.inc"

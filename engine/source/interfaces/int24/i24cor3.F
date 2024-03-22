@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  I24COR3                       source/interfaces/int24/i24cor3.F
 Chd|-- called by -----------
@@ -27,6 +27,7 @@ Chd|        I24MAINF                      source/interfaces/int24/i24main.F
 Chd|-- calls ---------------
 Chd|        I24FIC_GETN                   source/interfaces/int24/i24for3e.F
 Chd|        DEBUG_MOD                     share/modules/debug_mod.F     
+Chd|        PARAMETERS_MOD                ../common_source/modules/interfaces/parameters_mod.F
 Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
       SUBROUTINE I24COR3(
@@ -47,12 +48,14 @@ Chd|====================================================================
      I               IXX3     ,IXX4      , XX1     ,XX2   ,XX3       ,
      3               XX4      ,YY1       ,YY2      ,YY3   ,YY4       ,
      4               ZZ1      ,ZZ2       ,ZZ3      ,ZZ4   ,NINLOADP  ,
-     5               DIST    ) 
+     5               DIST     ,ISTIF_MSDT,DTSTIF   ,STIFMSDT_S,STIFMSDT_M,
+     6               NRTM     ,PARAMETERS) 
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE TRI7BOX
       USE DEBUG_MOD
+      USE PARAMETERS_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -64,15 +67,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr02_c.inc"
-#include      "scr05_c.inc"
-#include      "com06_c.inc"
-#include      "com08_c.inc"
 #include      "sms_c.inc"
-#include      "units_c.inc"
 #include      "com04_c.inc"
-#include      "task_c.inc"
-#include      "com01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -86,6 +82,8 @@ C-----------------------------------------------
      .        IPARTFRICMI(MVSIZ),IREP_FRICM(*),IREP_FRICMI(MVSIZ),
      .        IXX3(MVSIZ),IXX4(MVSIZ)
            INTEGER  , INTENT(IN) :: NINLOADP
+      INTEGER , INTENT(IN) :: ISTIF_MSDT
+      INTEGER , INTENT(IN) :: NRTM
 C     REAL
       my_real
      .   X(3,*), STF(*), STFN(*),
@@ -100,15 +98,19 @@ C     REAL
      .   DIR_FRICM(2,*) ,DIR_FRICMI(MVSIZ,2) ,
      .   XX1(MVSIZ), XX2(MVSIZ), XX3(MVSIZ), XX4(MVSIZ),
      .   YY1(MVSIZ), YY2(MVSIZ), YY3(MVSIZ), YY4(MVSIZ),
-     .   ZZ1(MVSIZ), ZZ2(MVSIZ), ZZ3(MVSIZ), ZZ4(MVSIZ)
+     .   ZZ1(MVSIZ), ZZ2(MVSIZ), ZZ3(MVSIZ), ZZ4(MVSIZ),
+     .   STIF_MSDT(MVSIZ)
       my_real  , INTENT(INOUT) :: DIST(MVSIZ)
+      my_real , INTENT(IN) :: DTSTIF
+      my_real , INTENT(IN) ::  STIFMSDT_S(NSN) ,STIFMSDT_M(NRTM)
+      TYPE (PARAMETERS_) ,INTENT(IN):: PARAMETERS
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I ,J  ,IL, L, NN, IG,JFT, IX,  NI,IGF,IPT,IE,NS1,NS2,
      .        ICONT1,ICONT2,NSI,IPT2,NS
       my_real
-     .        SX1, SY1, SZ1, SX2, SY2, SZ2, NORM
+     .        SX1, SY1, SZ1, SX2, SY2, SZ2, NORM, DTS
 C-----------------------------------------------
 C initiailisation
       DO I=1,JLT
@@ -485,7 +487,7 @@ C
            ENDIF
 
       END DO
-C	  
+C    
       IF(IGSTI<=1)THEN
          DO I=1,JLT
           L  = CAND_E(I)
@@ -508,7 +510,7 @@ C
             STIF(I)=ABS(STIFI(NIN)%P(NN))
           END IF
           STIF(I)=HALF*(STF(L)+STIF(I))
-          STIF(I)=MAX(KMIN,MIN(STIF(I),KMAX))
+c          STIF(I)=MAX(KMIN,MIN(STIF(I),KMAX))
          ENDDO
       ELSEIF(IGSTI==3)THEN
          DO I=1,JLT
@@ -521,7 +523,7 @@ C
             STIF(I)=ABS(STIFI(NIN)%P(NN))
           END IF
           STIF(I)=MAX(STF(L),STIF(I))
-          STIF(I)=MAX(KMIN,MIN(STIF(I),KMAX))
+c          STIF(I)=MAX(KMIN,MIN(STIF(I),KMAX))
          ENDDO
       ELSEIF(IGSTI==4.OR.IGSTI==6)THEN
          DO I=1,JLT
@@ -534,7 +536,7 @@ C
             STIF(I)=ABS(STIFI(NIN)%P(NN))
           END IF
           STIF(I)=MIN(STF(L),STIF(I))
-          STIF(I)=MAX(KMIN,MIN(STIF(I),KMAX))
+c          STIF(I)=MAX(KMIN,MIN(STIF(I),KMAX))
          ENDDO
       ELSEIF(IGSTI==5)THEN
          DO I=1,JLT
@@ -548,7 +550,11 @@ C
           END IF
           STIF(I)=STF(L)*STIF(I)/
      .            MAX(EM30,(STF(L)+STIF(I)))
-          STIF(I)=MAX(KMIN,MIN(STIF(I),KMAX))
+c          STIF(I)=MAX(KMIN,MIN(STIF(I),KMAX))
+         ENDDO
+      ELSEIF(IGSTI==7)THEN
+         DO I=1,JLT
+            STIF(I)=ZERO
          ENDDO
       ENDIF
 c      DO I=1,JLT
@@ -561,6 +567,40 @@ c           STIF(I) = ZEP3*STIF(I)
 c          END IF
 c        END IF
 c      END DO !I=1,JLT
+
+
+C------------------------------------------
+C   Stiffness based on mass and time step
+C------------------------------------------
+
+      IF(ISTIF_MSDT > 0) THEN
+         IF(DTSTIF > ZERO) THEN
+            DTS = DTSTIF
+         ELSE
+            DTS = PARAMETERS%DT_STIFINT
+         ENDIF
+         DO I=1,JLT
+            L  = CAND_E(I)
+            NI = CAND_N(I)
+            IF(NI<=NSN)THEN
+              STIF_MSDT(I) = STIFMSDT_S(NI)
+            ELSE
+              NN = NI - NSN
+              STIF_MSDT(I) = ABS(STIF_MSDT_FI(NIN)%P(NN))
+            ENDIF
+            STIF_MSDT(I) = STIFMSDT_M(L)*STIF_MSDT(I)/(STIFMSDT_M(L)+STIF_MSDT(I))
+            STIF_MSDT(I) = STIF_MSDT(I)/(DTS*DTS)
+            STIF(I)=MAX(STIF(I),STIF_MSDT(I))
+         ENDDO
+      ENDIF
+C
+      DO I=1,JLT
+         STIF(I)=MAX(KMIN,MIN(STIF(I),KMAX))
+      ENDDO
+C----------
+
+
+
 C----------
       IF(IDTMINS==2)THEN
        DO I=1,JLT
@@ -691,14 +731,9 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
-#include      "units_c.inc"
-#include      "com01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -782,14 +817,9 @@ C-----------------------------------------------
       USE TRI7BOX
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
-#include      "units_c.inc"
-#include      "com01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -823,7 +853,7 @@ C-----------one internal point for SPMD reason ----
                NN = NSI
                ICONT1 = IRTLM(1,NN)
               IF (ICONT1 /=0) THEN
-	       ISPT2(I) = 0
+                 ISPT2(I) = 0
               ELSE
                ISPT2(I) = NSI
               END IF
@@ -869,15 +899,6 @@ C-----------------------------------------------
       USE DEBUG_MOD
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com04_c.inc"
-#include      "units_c.inc"
-#include      "com01_c.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IRTSE(5,*) ,IS2SE(2,*),JLT ,NSV(*),CAND_N(*) ,NSN   ,
@@ -907,7 +928,7 @@ C---not set ISPT2=0 : when only one internal point is on contact
 C-----------one internal point for SPMD reason ----   
                ICONT1 = IRTLM(1,NSI)
               IF (ICONT1 /=0) THEN
-	       ISPT2(NI) = 0
+                 ISPT2(NI) = 0
               ELSE
                ISPT2(NI) = 1
               END IF
@@ -932,7 +953,7 @@ Chd|====================================================================
       SUBROUTINE I_CORPFIT3(
      1               JLT      ,STF     ,STFN    ,STIF     ,NSN    ,
      2               CAND_E   ,CAND_N  ,NIN     ,IGSTI   ,KMIN     ,
-     3               KMAX     ,INACTI  ,NCFIT   ,TNCY) 
+     3               KMAX     ,INACTI  ,NCFIT   ,TNCY    ,IKNON   ) 
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -946,21 +967,13 @@ C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com06_c.inc"
-#include      "com08_c.inc"
-#include      "units_c.inc"
-#include      "com04_c.inc"
-#include      "task_c.inc"
-#include      "com01_c.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER CAND_E(*), CAND_N(*),JLT,NSN, NIN, IGSTI,NCFIT,INACTI
 C     REAL
       my_real
      .   STF(*), STFN(*),STIF(*),KMIN,KMAX,TNCY
+      INTEGER, DIMENSION(MVSIZ), INTENT(INOUT) :: IKNON
 C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -980,8 +993,22 @@ C--- fixing min(stif) with Inacti=-1
             NN = NI - NSN
             STIF_S =ABS(STIFI(NIN)%P(NN))
           END IF
-c		  STIF_R(I) = MIN(STIF_S,STF(L))/MAX(EM20,STIF(I))
-		  STIF(I) = MIN(STIF_S,STF(L))
+c      STIF_R(I) = MIN(STIF_S,STF(L))/MAX(EM20,STIF(I))
+          STIF(I) = MIN(STIF_S,STF(L))
+          IF(IGSTI==2) STIF(I) = HALF*(STIF_S+STF(L))
+         ENDDO
+      ELSEIF (IGSTI==-1)THEN
+         DO I=1,JLT
+           L  = CAND_E(I)
+           NI = CAND_N(I)
+           IF(NI<=NSN)THEN
+             STIF_S =ABS(STFN(NI))
+           ELSE
+             NN = NI - NSN
+             STIF_S =ABS(STIFI(NIN)%P(NN))
+           END IF
+           STIF_R(I) = MIN(STIF_S,STF(L))/MAX(STIF_S,STF(L))
+           STIF(I) = MIN(STIF_S,STF(L))
          ENDDO
       END IF
       IF(NCFIT>0)THEN
@@ -990,6 +1017,19 @@ c		  STIF_R(I) = MIN(STIF_S,STF(L))/MAX(EM20,STIF(I))
          FB = MAX(ZERO,THREE*TNCY-TWO)
          F_PFIT = EM04*(FA+FAB)+FB
          STIF(1:JLT)=F_PFIT*STIF(1:JLT)
+         IF (FB >ZERO.AND.IGSTI/=2) IKNON(1:JLT) = 1 ! -> nonlinear stiff
+      ELSEIF (INACTI==-1.AND.IGSTI/=2)THEN
+         IKNON(1:JLT) = 1 
+      ELSEIF (IGSTI ==-1)THEN
+         DO I=1,JLT
+           IF (STIF_R(I) > 0.9 ) THEN
+             IKNON(I) = 1 
+           ELSEIF (STIF_R(I) < EM03) THEN
+             IKNON(I) = 3
+           ELSE             
+             IKNON(I) = 2
+           END IF
+         ENDDO
       END IF
 C
       RETURN
@@ -1016,12 +1056,6 @@ C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "units_c.inc"
-#include      "com04_c.inc"
-#include      "com01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1051,8 +1085,8 @@ C--- fixing min(stif) with Inacti=-1
             NN = NI - NEDGE
             STIF_S =STIFIE(NIN)%P(NN)
           END IF
-c		  STIF_R(I) = MIN(STIF_S,STFE(EM))/MAX(EM20,STIF(I))
-		  STIF(I) = MIN(STIF_S,STFE(EM))
+c      STIF_R(I) = MIN(STIF_S,STFE(EM))/MAX(EM20,STIF(I))
+            STIF(I) = MIN(STIF_S,STFE(EM))
          ENDDO
       END IF
       IF(NCFIT>0)THEN

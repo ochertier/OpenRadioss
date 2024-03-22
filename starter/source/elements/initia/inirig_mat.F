@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  INIRIG_MAT                    source/elements/initia/inirig_mat.F
 Chd|-- called by -----------
@@ -47,8 +47,8 @@ Chd|        SCOOR3                        source/elements/solid/solide/scoor3.F
 Chd|        SDERI3                        source/elements/solid/solide/sderi3.F
 Chd|        SDLEN3                        source/elements/solid/solide/sdlen3.F
 Chd|        SMASS3                        source/elements/solid/solide/smass3.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/matparam_def_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
+Chd|        GROUP_PARAM_MOD               ../common_source/modules/mat_elem/group_param_mod.F
 Chd|        STACK_MOD                     share/modules1/stack_mod.F    
 Chd|====================================================================
       SUBROUTINE INIRIG_MAT(IXC ,IXS    ,IXTG   ,IXS10  ,X      ,
@@ -64,13 +64,13 @@ Chd|====================================================================
      B                   NINDX  ,XREFC  ,XREFTG ,XREFS   ,MSSA  ,
      C                   SH3TRIM,ISUBSTACK,BUFMAT,IPM    ,STACK ,
      D                   RNOISE ,STRC  ,STRTG   ,PERTURB ,NEL   ,
-     E                   GROUP_PARAM)
+     E                   GROUP_PARAM   ,IGTYP)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE ELBUFDEF_MOD
       USE STACK_MOD
-      USE MATPARAM_DEF_MOD            
+      USE GROUP_PARAM_MOD            
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -93,6 +93,7 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NVC, IHBE, ISOLNOD, NDDIM, ILEV,NRIG_MAT,NUMEL,
      .        NINDX,ISUBSTACK,NEL
+      INTEGER ,INTENT(IN) :: IGTYP
       INTEGER IXC(NIXC,*),IXS(NIXS,*),IXTG(NIXTG,*),IXS10(6,*),
      .        IPARTS(*),IPARTC(*),IPARTT(*),IGEO(NPROPGI,*),
      .        NSHNOD(*), SH4TREE(KSH4TREE,*), SH3TREE(*),
@@ -107,11 +108,11 @@ C-----------------------------------------------
      .   MSSX(12,*),STIFN(*), STIFR(*),
      .   XREFC(4,3,*),XREFTG(3,3,*),XREFS(8,3,*), MSSA(*),BUFMAT(*),
      .   RNOISE(*),STRC(*),STRTG(*)
-      TYPE(GRP_PARAM_STRUCT_)  :: GROUP_PARAM
+      TYPE(GROUP_PARAM_)  :: GROUP_PARAM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, IGTYP, NDEPAR, NDSA,NC(20),N,JJ,KK,J,K,IP,NF1,NF2,
+      INTEGER I,  NDEPAR, NDSA,NC(20),N,JJ,KK,J,K,IP,NF1,NF2,
      .   ILAW,IMAT,IPROP,IE,IBID(MVSIZ),NREFSTA
       INTEGER NC10(MVSIZ,10)
       INTEGER, DIMENSION(MVSIZ) :: IX1,IX2,IX3,IX4,IX5,IX6,IX7,IX8,MXT,PID,NGL
@@ -211,7 +212,8 @@ C
         ENDIF                   
 C
         CALL DTMAIN(GEO  ,PM   ,VOID  ,PID   ,MXT   ,VOID  ,
-     .              VOID ,VOID ,VOID  ,VOID  ,VOID  ,BUFMAT, DDELTAX, AREA, VOLU, DTX, IGEO)
+     .              VOID ,VOID ,VOID  ,VOID  ,VOID  ,BUFMAT, 
+     .              DDELTAX, AREA, VOLU, DTX, IGEO,IGTYP)
 C
         DO I=1,NEL
          DTELEM(NFT+I)=DTX(I)
@@ -236,10 +238,10 @@ C Solid 10 nodes tetrahedron-
      .                XX, YY, ZZ, PX,PY,PZ, NX,
      .                RX, RY, RZ, SX, SY, SZ, TX, TY, TZ,VOLU,VOID,
      .                BIDBUF,VOLG)
- 	CALL S10LEN3(VOLP,NGL,DELTAX,DELTAX2,
-     .  	     PX,PY,PZ,VOLU,VOID,VOLG, 
-     .  	     RX, RY, RZ, SX, SY, SZ, TX, TY, TZ,
-     .  	     NEL,MXT,PM,V_PITER,IBID)
+          CALL S10LEN3(VOLP,NGL,DELTAX,DELTAX2,
+     .         PX,PY,PZ,VOLU,VOID,VOLG, 
+     .         RX, RY, RZ, SX, SY, SZ, TX, TY, TZ,
+     .         NEL,MXT,PM,V_PITER,IBID)
 C
         DO I=1,NEL
           MASSCP(I) = ZERO 
@@ -360,7 +362,7 @@ C
 C  
 C Element time step
         CALL DTMAIN(GEO  ,PM   ,VOID  ,PID   ,MXT   ,VOID  ,  
-     .              VOID ,VOID ,VOID  ,VOID  ,VOID  ,BUFMAT, DDELTAX, AREA, VOLU, DTX , IGEO)  
+     .              VOID ,VOID ,VOID  ,VOID  ,VOID  ,BUFMAT, DDELTAX, AREA, VOLU, DTX , IGEO,IGTYP)  
 C
         DO  I=1,NEL
           N = I + NFT
@@ -401,7 +403,7 @@ C
      .              TEMP    ,BID , BID,BID,BID,
      .              BID,BID,ISUBSTACK,IBID,BIDBUF,
      .              STACK,BIDG, RNOISE ,BID ,
-     .              PERTURB,IX1     ,IX2      ,IX3     ,IX4      )
+     .              PERTURB,IX1     ,IX2      ,IX3     ,IX4    ,IBID, IBID )
         CALL CDERII(PX1 ,PX2 ,PY1   ,PY2,
      .              X1  ,X2  ,X3  ,X4  ,Y1  ,Y2  , 
      .              Y3  ,Y4  ,Z1  ,Z2  ,Z3  ,Z4  ,
@@ -495,7 +497,7 @@ C
      .               MCPS(1,NFT+1) , TEMP,SH3TRIM,ISUBSTACK,IBID,
      .               BIDBUF, STACK,BIDG ,RNOISE,
      .               BID,PERTURB,IX1   ,IX2      ,IX3    ,
-     .               X2L      ,X3L    ,Y3L   )
+     .               X2L      ,X3L    ,Y3L , IBID, IBID   )
         CALL C3DERII(LFT,LLT,PM,GEO,PX1,PY1,PY2,S
      .               TIFN   ,STIFR   ,IXTG(1,NFT+1),
      .               THKT,SH3TREE,ALDT,BUFMAT , IPM   ,IGEO ,

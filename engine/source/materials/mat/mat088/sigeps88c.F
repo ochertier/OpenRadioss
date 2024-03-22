@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  SIGEPS88C                     source/materials/mat/mat088/sigeps88c.F
 Chd|-- called by -----------
@@ -45,9 +45,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C O M M O N
 C-----------------------------------------------
-#include "param_c.inc"
-#include "scr17_c.inc"
-#include "com01_c.inc"
 #include "tabsiz_c.inc"
 C----------------------------------------------------------------
 C  I N P U T   A R G U M E N T S
@@ -113,6 +110,7 @@ C initialization
       IF(TIME == ZERO)THEN
          UVAR(1:NEL,1:NUVAR) = ZERO 
          UVAR(1:NEL,1) = ONE 
+         UVAR(1:NEL,18)= ONE 
       ENDIF      
       G_INI = THREE_HALF*RBULK*(ONE - TWO*NU)/(ONE + NU)
 C
@@ -241,9 +239,11 @@ C
            UVAR(I,17)= MAX(UVAR(I,17), ECURENT(I)) 
            DEINT(I) = ECURENT(I) - UVAR(I,16)
            UVAR(I,16) = ECURENT(I)
-           IF(DEINT(I) >= ZERO) THEN
+           IF(DEINT(I) >= ZERO .OR. DEPS_EQ(I) >= ZERO) THEN
               NE_L = NE_L + 1 
               INDX_L(NE_L) = I
+              UVAR(I,19) = 1
+              IF(UVAR(I,18) == ONE )UVAR(I,17) = UVAR(I,16) 
            ELSE
               NE_UNL = NE_UNL + 1 
               INDX_UNL(NE_UNL) = I
@@ -256,6 +256,8 @@ C
 C  global      
                     T1(I) = DAM*T1(I)
                     T2(I) = DAM*T2(I)
+                    UVAR(I,19) = -1
+                    UVAR(I,18) = DAM
               ENDIF
       ENDDO
 C-------------------------------------------------------------                                  

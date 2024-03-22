@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  DAMPDTNODA                    source/general_controls/damping/dampdtnoda.F
 Chd|-- called by -----------
@@ -42,7 +42,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "units_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -67,28 +66,28 @@ C----------------------------------------------------------
         DTMAX = EP04
         DT0 = DTMAX
         DO I=1,NDAMP
-          IF (DAMPR(19,I)/=0) CYCLE	   	        	      	      	              
+          IF (DAMPR(19,I)/=0) CYCLE                                               
           IGR   = NINT(DAMPR(2,I))
           DTN = DTMAX
           DO J=1,IGRNOD(IGR)%NENTITY
             ND=IGRNOD(IGR)%ENTITY(J)
             DT2N(ND) = DTMAX
             IF(STIFN(ND)>EM20 .AND. MS(ND)>ZERO)THEN
-              DT2N(ND) = SQRT(TWO*MS(ND)/STIFN(ND))		
-              DT2N(ND) = MIN(DTMAX,DT2N(ND))		
-              DTN = MIN(DT2N(ND),DTN)		
-            END IF      	       	      	      
-          END DO	    
+              DT2N(ND) = SQRT(TWO*MS(ND)/STIFN(ND))
+              DT2N(ND) = MIN(DTMAX,DT2N(ND))
+              DTN = MIN(DT2N(ND),DTN)
+            END IF                               
+          END DO      
           IF (IRODDL/=0) THEN
             DO J=1,IGRNOD(IGR)%NENTITY
               ND=IGRNOD(IGR)%ENTITY(J)
               IF(STIFR(ND)>EM20 .AND. IN(ND)>ZERO)THEN
-                DTN2 = SQRT(TWO*IN(ND)/STIFR(ND))		
-                DT2N(ND) = MIN(DT2N(ND),DTN2)		
-                DTN = MIN(DT2N(ND),DTN)		
-              END IF      	       	      	      
-            END DO	    
-          END IF      	       	      	      
+                DTN2 = SQRT(TWO*IN(ND)/STIFR(ND))
+                DT2N(ND) = MIN(DT2N(ND),DTN2)
+                DTN = MIN(DT2N(ND),DTN)
+              END IF                               
+            END DO      
+          END IF                               
           DT0=MIN(DT0,DTN)
           DAMPAI = MAX(DAMPR(3,I),DAMPR(5,I),DAMPR(7,I))
           DAMPAI = MAX(DAMPAI,DAMPR(9,I),DAMPR(11,I),DAMPR(13,I))
@@ -107,14 +106,14 @@ C--
             END IF
             COEFF =ONE/FAC**2
             IF(STIFN(ND)>EM20 .AND. MS(ND)>ZERO)THEN
-              STIFN(ND) =STIFN(ND)*COEFF		
-            END IF      	       	      	      
+              STIFN(ND) =STIFN(ND)*COEFF
+            END IF                               
             IF (IRODDL/=0) THEN
               IF(STIFR(ND)>EM20 .AND. IN(ND)>ZERO)THEN
-                STIFR(ND) =STIFR(ND)*COEFF		
-              END IF      	       	      	      
-            END IF      	       	      	      
-          END DO	    
+                STIFR(ND) =STIFR(ND)*COEFF
+              END IF                               
+            END IF                               
+          END DO      
         END DO !I=1,NDAMP
 C        
       RETURN 

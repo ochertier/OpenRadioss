@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  FAIL_CONNECT                  source/materials/fail/connect/fail_connect.F
 Chd|-- called by -----------
@@ -73,7 +73,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include "com01_c.inc"
-#include "scr17_c.inc"
 #include "units_c.inc"
 #include "comlock.inc"
 C-----------------------------------------------
@@ -123,13 +122,17 @@ C-----------------------------------------------
 C     USER VARIABLES INITIALIZATION
 C-----------------------------------------------
       IF (ISIGI == ZERO) THEN
-        IF (TIME == ZERO) THEN
+        IF ((UVAR(1,6) == ZERO).AND.(OFFL(1) == ONE)) THEN 
           DO I=1,NEL
-            UVAR(I,6)= ONE         
+            UVAR(I,6)= ONE  
+          ENDDO
+        ENDIF
+        IF (UVAR(1,13) == ZERO) THEN
+          DO I=1,NEL         
             UVAR(I,13)= AREA(I)  
-          ENDDO   
-        ENDIF     
-      ENDIF  
+          ENDDO  
+        ENDIF 
+      ENDIF 
 C-----------------------------------------------
       DO I=1,NEL
         DAM1(I) = UVAR(I,7)                   

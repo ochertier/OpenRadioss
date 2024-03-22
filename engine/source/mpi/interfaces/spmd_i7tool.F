@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  SPMD_OLDNUMCD                 source/mpi/interfaces/spmd_i7tool.F
 Chd|-- called by -----------
@@ -29,6 +29,7 @@ Chd|        I23TRIVOX                     source/interfaces/intsort/i23trivox.F
 Chd|        I24TRIVOX                     source/interfaces/intsort/i24trivox.F
 Chd|        I7TRI                         source/interfaces/intsort/i7tri.F
 Chd|        I7TRIVOX                      source/interfaces/intsort/i7trivox.F
+Chd|        INTER7_COLLISION_DETECTION    source/interfaces/inter7_collision_detection.F
 Chd|-- calls ---------------
 Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
@@ -41,12 +42,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "scr18_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -91,7 +86,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -169,7 +163,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -247,8 +240,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
-#include      "task_c.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -332,7 +323,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -398,8 +388,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
-#include      "task_c.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -475,8 +463,10 @@ Chd|-- called by -----------
 Chd|        SPMD_I7FCOM_POFF              source/mpi/forces/spmd_i7fcom_poff.F
 Chd|-- calls ---------------
 Chd|        IBCOFF                        source/interfaces/interf/ibcoff.F
+Chd|        ANIM_MOD                      ../common_source/modules/anim_mod.F
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
+Chd|        PARAMETERS_MOD                ../common_source/modules/interfaces/parameters_mod.F
 Chd|====================================================================
       SUBROUTINE SPMD_FIADD_POFF(
      1       NB    ,LEN     ,BUFR   ,NSV    ,A       ,
@@ -484,21 +474,22 @@ Chd|====================================================================
      3       IBAG  ,ICODT   ,SECFCUM,NSTRF  ,ICONTACT,
      4       FCONT ,INACTI  ,IADM   ,INTTH  ,FTHE    ,
      5       CONDN ,H3D_DATA, MULTI_FVM,NIN ,TAGNCONT,
-     6       KLOADPINTER,LOADPINTER,LOADP_HYD_INTER)
+     6       KLOADPINTER,LOADPINTER,LOADP_HYD_INTER  ,
+     .                     INTCAREA,FSAV  ,PARAMETERS)       
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE H3D_MOD
       USE MULTI_FVM_MOD
+      USE ANIM_MOD
+      USE PARAMETERS_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "parit_c.inc"
 #include      "scr07_c.inc"
 #include      "scr14_c.inc"
 #include      "scr16_c.inc"
@@ -507,9 +498,7 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "com06_c.inc"
 #include      "com08_c.inc"
-#include      "task_c.inc"
 #include      "impl1_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -518,17 +507,19 @@ C-----------------------------------------------
      .        TAGNCONT(NLOADP_HYD_INTER,*),KLOADPINTER(*),LOADPINTER(*),
      .        LOADP_HYD_INTER(*),
      .        IADM,INTTH
-      INTEGER, INTENT(in) :: NIN
+      INTEGER, INTENT(in) :: NIN, INTCAREA
       my_real
      .        BUFR(LEN,*), A(3,*), STIFN(*), VISCN(*),
      .        SECFCUM(7,NUMNOD,NSECT),
      .        FCONT(3,*),FTHE(*),CONDN(*)
+      my_real, INTENT(INOUT) :: FSAV(*)
       TYPE(H3D_DATABASE) :: H3D_DATA
       TYPE(MULTI_FVM_STRUCT), INTENT(INOUT) :: MULTI_FVM
+      TYPE (PARAMETERS_) ,INTENT(IN):: PARAMETERS
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
-      my_real :: MASS
+      my_real :: MASS, FSAV29
       INTEGER :: IBRIC
       INTEGER I, J, II, N, NOD, K0, K1S, IBCS, IBCM, NBINTER,PP,PPL,NP  
 C-----------------------------------------------
@@ -581,11 +572,11 @@ C
             ENDIF
          ENDIF      
 C     
-C     suite traitement i7for3 et i10for3 sur noeud secnd
+C     following i7for3 & i10for3 process on secondary nodes
 C     
          IF (INCONV == 1) THEN
             IF((ANIM_V(4)+OUTP_V(4)+H3D_DATA%N_VECT_CONT >0.AND.
-     .           (TT>=TANIM.OR.TT>=TOUTP.OR.TT>=H3D_DATA%TH3D.OR.
+     .           ((TT>=TANIM .AND. TT<=TANIM_STOP).OR.TT>=TOUTP.OR.(TT>=H3D_DATA%TH3D.AND.TT<=H3D_DATA%TH3D_STOP).OR.
      .           (MANIM>=4.AND.MANIM<=15).OR. H3D_DATA%MH3D /= 0))
      .          .OR.ANIM_V(26)+H3D_DATA%N_VECT_CONT_MAX>0)THEN
 C     Anim FCONT
@@ -609,6 +600,16 @@ C------------For /LOAD/PRESSURE tag nodes in contact-------------
                  TAGNCONT(PPL,NOD) = 1
               ENDDO
             ENDDO
+         ENDIF
+C------------For outputting total contact area------------
+         IF(INTCAREA > 0) THEN
+           FSAV29 = ZERO
+           DO I = 1, NB
+              N = NINT(BUFR(1,I))
+              NOD = NSV(N)
+              FSAV29 = FSAV29 + PARAMETERS%INTAREAN(NOD)
+            ENDDO
+            FSAV(29) = FSAV(29) + FSAV29
          ENDIF
 C     
          IF(ISECIN>0)THEN
@@ -674,6 +675,7 @@ Chd|  SPMD_FIADD11_POFF             source/mpi/interfaces/spmd_i7tool.F
 Chd|-- called by -----------
 Chd|        SPMD_I7FCOM_POFF              source/mpi/forces/spmd_i7fcom_poff.F
 Chd|-- calls ---------------
+Chd|        ANIM_MOD                      ../common_source/modules/anim_mod.F
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|====================================================================
       SUBROUTINE SPMD_FIADD11_POFF(
@@ -686,11 +688,11 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE H3D_MOD
+      USE ANIM_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -702,7 +704,6 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "com06_c.inc"
 #include      "com08_c.inc"
-#include      "task_c.inc"
 #include      "impl1_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -839,7 +840,7 @@ C suite traitement i11for3 sur noeud secnd
 C
       IF(INCONV == 1) THEN
        IF((ANIM_V(4)+OUTP_V(4)+H3D_DATA%N_VECT_CONT >0.AND.
-     .   (TT>=TANIM.OR.TT>=TOUTP.OR.TT>=H3D_DATA%TH3D.OR.
+     .   ((TT>=TANIM .AND. TT<=TANIM_STOP).OR.TT>=TOUTP.OR.(TT>=H3D_DATA%TH3D.AND.TT<=H3D_DATA%TH3D_STOP).OR.
      .   (MANIM>=4.AND.MANIM<=15).OR. H3D_DATA%MH3D /= 0))
      .   .OR.ANIM_V(26)+H3D_DATA%N_VECT_CONT_MAX>0)THEN
 C Anim FCONT
@@ -978,6 +979,7 @@ Chd|  SPMD_FIADD17_POFF             source/mpi/interfaces/spmd_i7tool.F
 Chd|-- called by -----------
 Chd|        SPMD_I7FCOM_POFF              source/mpi/forces/spmd_i7fcom_poff.F
 Chd|-- calls ---------------
+Chd|        ANIM_MOD                      ../common_source/modules/anim_mod.F
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|====================================================================
       SUBROUTINE SPMD_FIADD17_POFF(
@@ -988,24 +990,19 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE H3D_MOD
+      USE ANIM_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr07_c.inc"
 #include      "scr14_c.inc"
 #include      "scr16_c.inc"
-#include      "scr18_c.inc"
-#include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "com06_c.inc"
 #include      "com08_c.inc"
-#include      "task_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1117,7 +1114,7 @@ C
 C suite traitement i11for3 sur noeud secnd
 C
       IF((ANIM_V(4)+OUTP_V(4)+H3D_DATA%N_VECT_CONT >0.AND.
-     .   (TT>=TANIM.OR.TT>=TOUTP.OR.TT>=H3D_DATA%TH3D.OR.
+     .   ((TT>=TANIM .AND. TT<=TANIM_STOP).OR.TT>=TOUTP.OR.(TT>=H3D_DATA%TH3D.AND.TT<=H3D_DATA%TH3D_STOP).OR.
      .   (MANIM>=4.AND.MANIM<=15).OR. H3D_DATA%MH3D /= 0))
      .   .OR.ANIM_V(26)+H3D_DATA%N_VECT_CONT_MAX>0)THEN
 C Anim FCONT
@@ -1202,6 +1199,7 @@ Chd|        SPMD_I7FCOM_POFF              source/mpi/forces/spmd_i7fcom_poff.F
 Chd|-- calls ---------------
 Chd|        GETDPDAANC                    source/mpi/interfaces/spmd_i7tool.F
 Chd|        IBCOFF                        source/interfaces/interf/ibcoff.F
+Chd|        ANIM_MOD                      ../common_source/modules/anim_mod.F
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|====================================================================
       SUBROUTINE SPMD_FIADD20_POFF(
@@ -1214,15 +1212,14 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE H3D_MOD
+      USE ANIM_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "parit_c.inc"
 #include      "scr05_c.inc"
 #include      "scr07_c.inc"
 #include      "scr14_c.inc"
@@ -1232,7 +1229,6 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "com06_c.inc"
 #include      "com08_c.inc"
-#include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1263,7 +1259,7 @@ C
           A(2,NOD)   = A(2,NOD) + BUFR(3,I)
           A(3,NOD)   = A(3,NOD) + BUFR(4,I)
           STIFN(NOD) = STIFN(NOD) + BUFR(5,I)          
-C Traitement interface type20
+C type20 interface treatment
           ISIGN = 1
           IF(ALPHAK(2,N) < ZERO .or. BUFR(6,I) < ZERO)ISIGN = -1
           ALPHAK(2,N) = ISIGN*MIN(ABS(ALPHAK(2,N)),ABS(BUFR(6,I)))             
@@ -1299,7 +1295,7 @@ C Traitement interface type20
           ISIGN = 1
           IF(ALPHAK(2,N) < ZERO .or. BUFR(7,I) < ZERO)ISIGN = -1
           ALPHAK(2,N) = ISIGN*MIN(ABS(ALPHAK(2,N)),ABS(BUFR(7,I)))             
-C Traitement interface type20
+C type20 interface treatment
           CALL GETDPDAANC(DAANC6L,BUFR(8,I),IRESP,INC)
           DAANC6(1,1,N) = DAANC6(1,1,N)+DAANC6L(1,1)
           DAANC6(1,2,N) = DAANC6(1,2,N)+DAANC6L(1,2)
@@ -1332,7 +1328,7 @@ C
           A(3,NOD)   = A(3,NOD) + BUFR(4,I)
           STIFN(NOD) = STIFN(NOD) + BUFR(5,I)
           FTHE(NOD) = FTHE(NOD) + BUFR(6,I)       
-C Traitement interface type20
+C type20 interface treatment
           ISIGN = 1
           IF(ALPHAK(2,N) < ZERO .or. BUFR(7,I) < ZERO)ISIGN = -1
           ALPHAK(2,N) = ISIGN*MIN(ABS(ALPHAK(2,N)),ABS(BUFR(7,I)))             
@@ -1366,7 +1362,7 @@ C Traitement interface type20
           STIFN(NOD) = STIFN(NOD) + BUFR(5,I)          
           VISCN(NOD) = VISCN(NOD) + BUFR(6,I)
           FTHE(NOD) = FTHE(NOD) + BUFR(7,I)            
-C Traitement interface type20
+C type20 interface treatment
           ISIGN = 1
           IF(ALPHAK(2,N) < ZERO .or. BUFR(8,I) < ZERO)ISIGN = -1
           ALPHAK(2,N) = ISIGN*MIN(ABS(ALPHAK(2,N)),ABS(BUFR(8,I)))             
@@ -1393,10 +1389,10 @@ C Traitement interface type20
         ENDIF
       ENDIF
 C
-C suite traitement i7for3 et i10for3 sur noeud secnd
+C following i7for3 & i10for3 process on secondary nodes
 C
       IF((ANIM_V(4)+OUTP_V(4)+H3D_DATA%N_VECT_CONT >0.AND.
-     .   (TT>=TANIM.OR.TT>=TOUTP.OR.TT>=H3D_DATA%TH3D.OR.
+     .   ((TT>=TANIM .AND. TT<=TANIM_STOP).OR.TT>=TOUTP.OR.(TT>=H3D_DATA%TH3D.AND.TT<=H3D_DATA%TH3D_STOP).OR.
      .   (MANIM>=4.AND.MANIM<=15).OR. H3D_DATA%MH3D /= 0))
      .    .OR.ANIM_V(26)+H3D_DATA%N_VECT_CONT_MAX>0)THEN
 C Anim FCONT
@@ -1472,6 +1468,7 @@ Chd|-- called by -----------
 Chd|        SPMD_I7FCOM_POFF              source/mpi/forces/spmd_i7fcom_poff.F
 Chd|-- calls ---------------
 Chd|        GETDPDAANC                    source/mpi/interfaces/spmd_i7tool.F
+Chd|        ANIM_MOD                      ../common_source/modules/anim_mod.F
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|====================================================================
       SUBROUTINE SPMD_FIADD20E_POFF(
@@ -1483,15 +1480,14 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE H3D_MOD
+      USE ANIM_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "parit_c.inc"
 #include      "scr05_c.inc"
 #include      "scr07_c.inc"
 #include      "scr14_c.inc"
@@ -1501,7 +1497,6 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "com06_c.inc"
 #include      "com08_c.inc"
-#include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1655,7 +1650,7 @@ C
 C suite traitement i7for3 et i10for3 sur noeud secnd
 C
       IF((ANIM_V(4)+OUTP_V(4)+H3D_DATA%N_VECT_CONT >0.AND.
-     .   (TT>=TANIM.OR.TT>=TOUTP.OR.TT>=H3D_DATA%TH3D.OR.
+     .   ((TT>=TANIM .AND. TT<=TANIM_STOP).OR.TT>=TOUTP.OR.(TT>=H3D_DATA%TH3D.AND.TT<=H3D_DATA%TH3D_STOP).OR.
      .   (MANIM>=4.AND.MANIM<=15).OR. H3D_DATA%MH3D /= 0))
      .    .OR.ANIM_V(26)+H3D_DATA%N_VECT_CONT_MAX>0)THEN
 C Anim FCONT
@@ -1787,21 +1782,10 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "parit_c.inc"
 #include      "scr05_c.inc"
-#include      "scr07_c.inc"
-#include      "scr14_c.inc"
-#include      "scr16_c.inc"
-#include      "scr18_c.inc"
-#include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "com06_c.inc"
-#include      "com08_c.inc"
-#include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1860,21 +1844,10 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "parit_c.inc"
 #include      "scr05_c.inc"
-#include      "scr07_c.inc"
-#include      "scr14_c.inc"
-#include      "scr16_c.inc"
-#include      "scr18_c.inc"
-#include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "com06_c.inc"
-#include      "com08_c.inc"
-#include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1952,8 +1925,10 @@ Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
 Chd|        ARRET                         source/system/arret.F         
 Chd|        IBCOFF                        source/interfaces/interf/ibcoff.F
+Chd|        ANIM_MOD                      ../common_source/modules/anim_mod.F
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
+Chd|        PARAMETERS_MOD                ../common_source/modules/interfaces/parameters_mod.F
 Chd|====================================================================
       SUBROUTINE SPMD_FIADD_PON(
      1       NB     ,LEN    ,BUFR   ,NSV     ,FSKYI,
@@ -1961,17 +1936,18 @@ Chd|====================================================================
      3       ICODT  ,SECFCUM,NSTRF  ,ICONTACT,FCONT,
      4       INACTI ,IADM   ,INTTH  ,FTHESKYI,CONDNSKYI,
      5       H3D_DATA,NIN   ,TAGNCONT,KLOADPINTER,LOADPINTER  ,
-     6       LOADP_HYD_INTER )
+     6       LOADP_HYD_INTER,INTCAREA,FSAV   ,PARAMETERS)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
       USE H3D_MOD
+      USE ANIM_MOD
+      USE PARAMETERS_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -1984,8 +1960,6 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "com06_c.inc"
 #include      "com08_c.inc"
-#include      "task_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1994,16 +1968,20 @@ C-----------------------------------------------
      .        TAGNCONT(NLOADP_HYD_INTER,*),KLOADPINTER(*),LOADPINTER(*),
      .        LOADP_HYD_INTER(*),
      .        IADM,INTTH
+      INTEGER ,INTENT(IN):: INTCAREA
       my_real
      .        BUFR(LEN,*),
      .        FSKYI(LSKYI,NFSKYI), SECFCUM(7,NUMNOD,NSECT),
      .        FCONT(3,*),FTHESKYI(LSKYI),CONDNSKYI(LSKYI)
+      my_real, INTENT(INOUT) :: FSAV(*) 
       TYPE(H3D_DATABASE) :: H3D_DATA
+      TYPE (PARAMETERS_) ,INTENT(IN):: PARAMETERS
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, J, II, N, NOD, K0, K1S, IBCS, IBCM, NBINTER,
      .        NISKY_SAV,TEMP_SIZ,IERROR,PP,PPL,NP
+      my_real FSAV29
 C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
@@ -2057,7 +2035,7 @@ C
 C suite traitement i7for3 et i10for3 sur noeud secnd
 C
       IF((ANIM_V(4)+OUTP_V(4)+H3D_DATA%N_VECT_CONT >0.AND.
-     .   (TT>=TANIM.OR.TT>=TOUTP.OR.TT>=H3D_DATA%TH3D.OR.
+     .   ((TT>=TANIM .AND. TT<=TANIM_STOP).OR.TT>=TOUTP.OR.(TT>=H3D_DATA%TH3D.AND.TT<=H3D_DATA%TH3D_STOP).OR.
      .   (MANIM>=4.AND.MANIM<=15).OR. H3D_DATA%MH3D /= 0))
      .   .OR.ANIM_V(26)+H3D_DATA%N_VECT_CONT_MAX>0)THEN
 C Anim FCONT
@@ -2082,6 +2060,17 @@ C------------For /LOAD/PRESSURE tag nodes in contact-------------
             ENDDO
          ENDDO
        ENDIF
+C------------For outputting total contact area------------
+         IF(INTCAREA > 0) THEN
+           FSAV29 = ZERO
+           DO I = 1, NB
+              N = NINT(BUFR(1,I))
+              NOD = NSV(N)
+              FSAV29 = FSAV29 + PARAMETERS%INTAREAN(NOD)
+            ENDDO
+            FSAV(29) = FSAV(29) + FSAV29
+         ENDIF
+C 
 C
       IF(ISECIN>0)THEN
 C Sections
@@ -2147,6 +2136,7 @@ Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
 Chd|        ARRET                         source/system/arret.F         
 Chd|        IBCOFF                        source/interfaces/interf/ibcoff.F
+Chd|        ANIM_MOD                      ../common_source/modules/anim_mod.F
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
@@ -2161,11 +2151,11 @@ C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
       USE H3D_MOD
+      USE ANIM_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -2178,8 +2168,6 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "com06_c.inc"
 #include      "com08_c.inc"
-#include      "task_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -2263,7 +2251,7 @@ C
 C suite traitement i7for3 et i10for3 sur noeud secnd
 C
       IF((ANIM_V(4)+OUTP_V(4)+H3D_DATA%N_VECT_CONT >0.AND.
-     .   (TT>=TANIM.OR.TT>=TOUTP.OR.TT>=H3D_DATA%TH3D.OR.
+     .   ((TT>=TANIM .AND. TT<=TANIM_STOP).OR.TT>=TOUTP.OR.(TT>=H3D_DATA%TH3D.AND.TT<=H3D_DATA%TH3D_STOP).OR.
      .   (MANIM>=4.AND.MANIM<=15).OR. H3D_DATA%MH3D /= 0))
      .   .OR.ANIM_V(26)+H3D_DATA%N_VECT_CONT_MAX>0)THEN
 C Anim FCONT
@@ -2340,6 +2328,7 @@ Chd|        SPMD_I7FCOM_PON               source/mpi/forces/spmd_i7fcom_pon.F
 Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
 Chd|        ARRET                         source/system/arret.F         
+Chd|        ANIM_MOD                      ../common_source/modules/anim_mod.F
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
@@ -2355,11 +2344,11 @@ C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
       USE H3D_MOD
+      USE ANIM_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -2372,8 +2361,6 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "com06_c.inc"
 #include      "com08_c.inc"
-#include      "task_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -2538,7 +2525,7 @@ C
 C suite traitement i11for3 sur noeud secnd
 C
       IF((ANIM_V(4)+OUTP_V(4)+H3D_DATA%N_VECT_CONT >0.AND.
-     .   (TT>=TANIM.OR.TT>=TOUTP.OR.TT>=H3D_DATA%TH3D.OR.
+     .   ((TT>=TANIM .AND. TT<=TANIM_STOP).OR.TT>=TOUTP.OR.(TT>=H3D_DATA%TH3D.AND.TT<=H3D_DATA%TH3D_STOP).OR.
      .   (MANIM>=4.AND.MANIM<=15).OR. H3D_DATA%MH3D /= 0))
      .   .OR.ANIM_V(26)+H3D_DATA%N_VECT_CONT_MAX>0)THEN
 C Anim FCONT
@@ -2679,6 +2666,7 @@ Chd|        SPMD_I7FCOM_PON               source/mpi/forces/spmd_i7fcom_pon.F
 Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
 Chd|        ARRET                         source/system/arret.F         
+Chd|        ANIM_MOD                      ../common_source/modules/anim_mod.F
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
@@ -2692,11 +2680,11 @@ C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
       USE H3D_MOD
+      USE ANIM_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -2709,8 +2697,6 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "com06_c.inc"
 #include      "com08_c.inc"
-#include      "task_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -2777,7 +2763,7 @@ C
 C suite traitement i11for3 sur noeud secnd
 C
       IF((ANIM_V(4)+OUTP_V(4)+H3D_DATA%N_VECT_CONT >0.AND.
-     .   (TT>=TANIM.OR.TT>=TOUTP.OR.TT>=H3D_DATA%TH3D.OR.
+     .   ((TT>=TANIM .AND. TT<=TANIM_STOP).OR.TT>=TOUTP.OR.(TT>=H3D_DATA%TH3D.AND.TT<=H3D_DATA%TH3D_STOP).OR.
      .   (MANIM>=4.AND.MANIM<=15).OR. H3D_DATA%MH3D /= 0))
      .   .OR.ANIM_V(26)+H3D_DATA%N_VECT_CONT_MAX>0)THEN
 C Anim FCONT
@@ -2901,21 +2887,21 @@ Chd|  SPMD_FIADD17_PON              source/mpi/interfaces/spmd_i7tool.F
 Chd|-- called by -----------
 Chd|        SPMD_I7FCOM_PON               source/mpi/forces/spmd_i7fcom_pon.F
 Chd|-- calls ---------------
+Chd|        ANIM_MOD                      ../common_source/modules/anim_mod.F
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|====================================================================
       SUBROUTINE SPMD_FIADD17_PON(
      1       NB     ,LEN    ,BUFR  ,NELEMS ,FSKYI ,
      2       ISKY   ,FCONT  ,IXS   ,IXS16  ,H3D_DATA  )
-c     2       ISKY   ,FCONT  ,IXS   ,IXS16  ,FROTS )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE H3D_MOD
+      USE ANIM_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -2923,20 +2909,15 @@ C-----------------------------------------------
 #include      "scr07_c.inc"
 #include      "scr14_c.inc"
 #include      "scr16_c.inc"
-#include      "scr18_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com06_c.inc"
 #include      "com08_c.inc"
-#include      "task_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NB, LEN, 
      .        NELEMS(*), ISKY(*), IXS(NIXS,*), IXS16(8,*)
-      my_real
-     .        BUFR(LEN,*),
+      my_real BUFR(LEN,*),
      .        FSKYI(LSKYI,NFSKYI),
      .        FCONT(3,*)
       TYPE(H3D_DATABASE) :: H3D_DATA
@@ -2949,11 +2930,7 @@ C   S o u r c e  L i n e s
 C-----------------------------------------------
       DO I = 1, NB
         NN = NINT(BUFR(1,I))
-        IES = NELEMS(NN)
-c        FROTS(1,NN) = FROTS(1,NN) + BUFR(2,I)                       
-c        FROTS(2,NN) = FROTS(2,NN) + BUFR(3,I)                       
-c        FROTS(3,NN) = FROTS(3,NN) + BUFR(4,I)                       
-c        FROTS(4,NN) = FROTS(4,NN) + BUFR(5,I)                       
+        IES = NELEMS(NN)                    
         DO II =1,8
           IIIS = NINT(BUFR(6+(II-1)*5,I))
           IF(IIIS<=8)THEN
@@ -2970,10 +2947,10 @@ c        FROTS(4,NN) = FROTS(4,NN) + BUFR(5,I)
         END DO
       END DO
 C
-C suite traitement i11for3 sur noeud secnd
+C followin i11for3 process on secondary nodes
 C
       IF((ANIM_V(4)+OUTP_V(4)+H3D_DATA%N_VECT_CONT >0.AND.
-     .   (TT>=TANIM.OR.TT>=TOUTP.OR.TT>=H3D_DATA%TH3D.OR.
+     .   ((TT>=TANIM .AND. TT<=TANIM_STOP).OR.TT>=TOUTP.OR.(TT>=H3D_DATA%TH3D.AND.TT<=H3D_DATA%TH3D_STOP).OR.
      .   (MANIM>=4.AND.MANIM<=15).OR. H3D_DATA%MH3D /= 0))
      .   .OR.ANIM_V(26)+H3D_DATA%N_VECT_CONT_MAX>0)THEN
 C Anim FCONT
@@ -3024,8 +3001,8 @@ Chd|====================================================================
      4   NME17   ,ISLEN17 ,IRLEN17 ,IRLEN7T ,ISLEN7T ,
      5   LINDIDEL,LBUFIDEL,IRLEN20 ,ISLEN20 ,IRLEN20T,
      6   ISLEN20T,NBINT20 ,IRLEN20E,ISLEN20E,FR_RBY  ,
-     7   FR_RBY6 ,NPBY    ,IRBKIN_L,
-     8   NRBYKIN_L,KINDRBY,SENSOR_TAB,LBUFIDEL24,INTBUF_TAB,
+     7   FR_RBY6 ,NPBY    ,IRBKIN_L,NRBYKIN_L,KINDRBY,
+     8   NSENSOR ,SENSOR_TAB,LBUFIDEL24,INTBUF_TAB,
      9   SORT_COMM)
 C-----------------------------------------------
 C   M o d u l e s
@@ -3042,14 +3019,12 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
-#include      "scr05_c.inc"
 #include      "scr17_c.inc"
 #include      "scr18_c.inc"
 #include      "task_c.inc"
@@ -3063,6 +3038,7 @@ C commun local a spmd_init et spmd_ring_mmx
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER ,INTENT(IN) :: NSENSOR
       INTEGER ISENDTO(NINTER+1,NSPMD+1),
      .        IRCVFROM(NINTER+1,NSPMD+1), IPARI(NPARI,*),
      .        INTLIST(NINTER), IAD_ELEM(2,*),
@@ -3092,11 +3068,6 @@ C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
 C
-C ne sert plus que dans spmd_anim (a virer)
-        NEW_BOUND = 1
-        NEW_BOUND_E = 1
-        NEW_BOUND_A = 1
-        NEW_BOUND_V = 1
 C iexicodt : flag pour envoi icodt en cours de run
         IEXICODT = 0
 C
@@ -3524,16 +3495,17 @@ Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
 Chd|        ARRET                         source/system/arret.F         
 Chd|        READ_DB                       source/output/tools/read_db.F 
-Chd|        READ_I_C                      source/output/tools/sortie_c.c
-Chd|        READ_R_C                      source/output/tools/sortie_c.c
+Chd|        READ_I_C                      ../common_source/tools/input_output/write_routtines.c
+Chd|        READ_R_C                      ../common_source/tools/input_output/write_routtines.c
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|        INTERFACE_MODIFICATION_MOD    share/modules/interface_modification_mod.F
 Chd|        INTSTAMP_GLOB_MOD             share/modules/intstamp_glob_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
+Chd|        PARAMETERS_MOD                ../common_source/modules/interfaces/parameters_mod.F
 Chd|        TRI25EBOX                     share/modules/tri25ebox.F     
 Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
-      SUBROUTINE SPMD_INITFI(IPARI,IFLAG,H3D_DATA)
+      SUBROUTINE SPMD_INITFI(IPARI,IFLAG,H3D_DATA,PARAMETERS)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -3543,35 +3515,31 @@ C-----------------------------------------------
       USE INTSTAMP_GLOB_MOD
       USE H3D_MOD
       USE INTERFACE_MODIFICATION_MOD
+      USE PARAMETERS_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "i25edge_c.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr05_c.inc"
 #include      "scr14_c.inc"
 #include      "scr16_c.inc"
 #include      "scr18_c.inc"
 #include      "task_c.inc"
 #include      "param_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
 #include      "parit_c.inc"
 #include      "spmd_c.inc"
-#include      "impl1_c.inc"
 #include      "sms_c.inc"
-#include      "my_allocate.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IPARI(NPARI,*), IFLAG
       TYPE(H3D_DATABASE) :: H3D_DATA
+      TYPE (PARAMETERS_) ,INTENT(IN):: PARAMETERS
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -3639,6 +3607,10 @@ C
         IERROR = IERROR + IERROR1
         ALLOCATE(ADDSUBSFI(NINTER),STAT=IERROR1)
         IERROR = IERROR + IERROR1
+        IF(PARAMETERS%INTCAREA > 0 ) THEN
+           ALLOCATE(INTAREANFI(NINTER),STAT=IERROR1)
+           IERROR = IERROR + IERROR1
+        ENDIF
 
         ALLOCATE(NISUBSFIE(NINTER),STAT=IERROR1)
         IERROR = IERROR + IERROR1
@@ -3800,7 +3772,10 @@ C INT 25
         IERROR = IERROR + IERROR1
         ALLOCATE (ISKEW_FI(NINTER),STAT=IERROR1)
         IERROR = IERROR + IERROR1
-
+        IF(PARAMETERS%ISTIF_DT > 0) THEN
+           ALLOCATE(STIF_MSDT_FI(NINTER))
+           ALLOCATE(STIFE_MSDT_FI(NINTER))
+        ENDIF
 C
         IF(INTHEAT > 0 ) THEN
          ALLOCATE (FTHESKYFI(NINTER),STAT=IERROR1)
@@ -3857,11 +3832,17 @@ C
 C
         IF(INTHEAT > 0.OR.INTERADHESION > 0 ) THEN
          ALLOCATE(AREASFI(NINTER),STAT=IERROR1)        
+          DO I = 1, NINTER
+            NULLIFY(AREASFI(I)%p)
+          ENDDO
          IERROR = IERROR + IERROR1 
         ENDIF
 C
         IF(INTERADHESION > 0) THEN
          ALLOCATE(IF_ADHFI(NINTER),STAT=IERROR1)        
+          DO I = 1, NINTER
+            NULLIFY(IF_ADHFI(I)%p)
+          ENDDO
          IERROR = IERROR + IERROR1 
         ENDIF
 
@@ -3873,12 +3854,18 @@ C
          IERROR = IERROR + IERROR1 
         ENDIF
 
-C       MY_ALLOCATE(MAIN_FIE,NINTER)
-        MY_ALLOCATE(GAPE_L_FIE,NINTER)
-        MY_ALLOCATE(EDG_BISECTOR_FIE,NINTER)
-        MY_ALLOCATE(VTX_BISECTOR_FIE,NINTER)
-        MY_ALLOCATE(X_SEG_FIE,NINTER)
-        MY_ALLOCATE(LEDGE_FIE,NINTER)
+C
+        ALLOCATE(EFRICFI(NINTER),STAT=IERROR1)
+        IERROR = IERROR + IERROR1
+        ALLOCATE(EFRICGFI(NINTER),STAT=IERROR1)
+        IERROR = IERROR + IERROR1
+
+C       ALLOCATE(MAIN_FIE(NINTER))
+        ALLOCATE(GAPE_L_FIE(NINTER))
+        ALLOCATE(EDG_BISECTOR_FIE(NINTER))
+        ALLOCATE(VTX_BISECTOR_FIE(NINTER))
+        ALLOCATE(X_SEG_FIE(NINTER))
+        ALLOCATE(LEDGE_FIE(NINTER))
 
 
 C
@@ -3910,6 +3897,7 @@ C
           NULLIFY(LISUBSFI(I)%p)
           NULLIFY(INFLG_SUBSFI(I)%p)
           NULLIFY(ADDSUBSFI(I)%p)
+          IF(PARAMETERS%INTCAREA > 0) NULLIFY(INTAREANFI(I)%p)
 
           NULLIFY(NISUBSFIE(I)%p)
           NULLIFY(LISUBSFIE(I)%p)
@@ -3997,6 +3985,10 @@ C INT25
           NULLIFY(CANDF_SI(I)%P)
           NULLIFY(ISKEW_FI(I)%P)
           NULLIFY(ICODT_FI(I)%P)
+          IF(PARAMETERS%ISTIF_DT > 0) THEN
+             NULLIFY(STIF_MSDT_FI(I)%P)
+             NULLIFY(STIFE_MSDT_FI(I)%P)
+          ENDIF
 C INT25 E2E
 C         NULLIFY(MAIN_FIE(I)%P)
           NULLIFY(GAPE_L_FIE(I)%P)
@@ -4004,7 +3996,9 @@ C         NULLIFY(MAIN_FIE(I)%P)
           NULLIFY(VTX_BISECTOR_FIE(I)%P)
           NULLIFY(LEDGE_FIE(I)%P)
           NULLIFY(X_SEG_FIE(I)%P)
-
+C
+           NULLIFY(EFRICFI(I)%P)  
+           NULLIFY(EFRICGFI(I)%P)                
         END DO
 C
         IF(INTHEAT /= 0) THEN
@@ -4385,8 +4379,6 @@ C
                 IF(INTTH > 0 )  THEN      
                  ALLOCATE(TEMPFI(I)%P(LENR),STAT=IERROR1)
                  IERROR = IERROR + IERROR1
-c                  ALLOCATE(MATSFI(I)%P(LENR),STAT=IERROR1)
-c                 IERROR = IERROR + IERROR
                 ENDIF
 C
                 IF(INTTH>0.OR.(ITYP == 25.AND.IVIS2==-1)) THEN
@@ -4397,8 +4389,6 @@ C
                   ALLOCATE(IF_ADHFI(I)%P(LENR),STAT=IERROR1)
                   IERROR = IERROR + IERROR1
                 ENDIF
-C
-                
 C  
                END IF
                IF(ITYP == 24)THEN
@@ -4420,6 +4410,17 @@ C
                  ALLOCATE(STIF_OLDFI(I)%P(2,LENR),STAT=IERROR1)
                  STIF_OLDFI(I)%P(1:2,1:LENR)=ZERO
                  IERROR = IERROR + IERROR1
+
+                 IF(IPARI(97,I) > 0) THEN
+                    ALLOCATE(STIF_MSDT_FI(I)%P(LENR))
+                    STIF_MSDT_FI(I)%P(1:LENR)=ZERO
+                 ENDIF
+
+                 IF(PARAMETERS%INTCAREA > 0.AND.IPARI(36,I)>0) THEN
+                   ALLOCATE(INTAREANFI(I)%P(LENR),STAT=IERROR1)
+                   IERROR = IERROR + IERROR1
+                   INTAREANFI(I)%P(1:LENR) =ZERO
+                ENDIF
                ENDIF
               ELSEIF(ITYP==11)THEN
 C type11
@@ -4738,7 +4739,6 @@ C
                   ALLOCATE(ISKYFIE(I)%P(LSKYFI),STAT=IERROR1)
                   IERROR = IERROR + IERROR1
                   IF(KDTINT==0) THEN
-C                   ALLOCATE(FSKYFIE(I)%P(8,LSKYFI),STAT=IERROR1)
                     ALLOCATE(FSKYFIE(I)%P(8,LSKYFI),STAT=IERROR1)
                   ELSE
                     ALLOCATE(FSKYFIE(I)%P(8,LSKYFI),STAT=IERROR1)
@@ -4746,21 +4746,20 @@ C                   ALLOCATE(FSKYFIE(I)%P(8,LSKYFI),STAT=IERROR1)
                   IERROR = IERROR + IERROR1
                 ENDIF
                 IF(LENR_EDGE>0) THEN
-                  MY_ALLOCATE(NSVFIE(I)%P,LENR_EDGE) !ok
-                  MY_ALLOCATE(ITAFIE(I)%P,LENR_EDGE*2)
-C                 MY_ALLOCATE(MAIN_FIE(I)%P,LENR_EDGE)
-                  MY_ALLOCATE2D(LEDGE_FIE(I)%P,E_LEDGE_SIZE,LENR_EDGE) !ok
-                  MY_ALLOCATE2D(XFIE(I)%P,3,LENR_EDGE*2) !ok
-                  MY_ALLOCATE2D(VFIE(I)%P,3,LENR_EDGE*2) !ok
-                  MY_ALLOCATE(MSFIE(I)%P,LENR_EDGE*2) !ok
-                  MY_ALLOCATE(GAPFIE(I)%P,LENR_EDGE) !ok
+                  ALLOCATE(NSVFIE(I)%P(LENR_EDGE)) 
+                  ALLOCATE(ITAFIE(I)%P(LENR_EDGE*2))
+                  ALLOCATE(LEDGE_FIE(I)%P(E_LEDGE_SIZE,LENR_EDGE)) 
+                  ALLOCATE(XFIE(I)%P(3,LENR_EDGE*2)) 
+                  ALLOCATE(VFIE(I)%P(3,LENR_EDGE*2)) 
+                  ALLOCATE(MSFIE(I)%P(LENR_EDGE*2)) 
+                  ALLOCATE(GAPFIE(I)%P(LENR_EDGE)) 
                   IF( IGAP == 3) THEN
-                    MY_ALLOCATE(GAPE_L_FIE(I)%P,LENR_EDGE) !ok
+                    ALLOCATE(GAPE_L_FIE(I)%P(LENR_EDGE)) 
                   ENDIF
-                  MY_ALLOCATE(STIFIE(I)%P,LENR_EDGE) !ok
-                  ALLOCATE(EDG_BISECTOR_FIE(I)%P(3,3,LENR_EDGE)) !ok
-                  ALLOCATE(VTX_BISECTOR_FIE(I)%P(3,4,LENR_EDGE)) !ok
-                  ALLOCATE(X_SEG_FIE(I)%P(3,4,LENR_EDGE)) !ok
+                  ALLOCATE(STIFIE(I)%P(LENR_EDGE)) 
+                  ALLOCATE(EDG_BISECTOR_FIE(I)%P(3,3,LENR_EDGE)) 
+                  ALLOCATE(VTX_BISECTOR_FIE(I)%P(3,4,LENR_EDGE)) 
+                  ALLOCATE(X_SEG_FIE(I)%P(3,4,LENR_EDGE)) 
                   EDG_BISECTOR_FIE(I)%P(1:3,1:3,1:LENR_EDGE) = 0
                   VTX_BISECTOR_FIE(I)%P(1:3,1:4,1:LENR_EDGE) = 0
                   X_SEG_FIE(I)%P(1:3,1:4,1:LENR_EDGE) = 0
@@ -4772,6 +4771,10 @@ C                 MY_ALLOCATE(MAIN_FIE(I)%P,LENR_EDGE)
                   IF(INTFRIC > 0) THEN
                      ALLOCATE(IPARTFRIC_FIE(I)%P(LENR),STAT=IERROR1)
                      CALL READ_I_C(IPARTFRIC_FIE(I)%P,LENR_EDGE)
+                  ENDIF
+                  IF(IPARI(97,I) > 0) THEN
+                    ALLOCATE(STIFE_MSDT_FI(I)%P(LENR_EDGE))
+                    STIFE_MSDT_FI(I)%P(1:LENR_EDGE)=ZERO
                   ENDIF
 
                 ENDIF
@@ -5088,6 +5091,12 @@ C rajout partie edge
               CALL READ_DB(SECND_FRFI(I)%P(1,1),6*LENR)
               CALL READ_DB(PENE_OLDFI(I)%P(1,1),5*LENR)
               CALL READ_DB(STIF_OLDFI(I)%P(1,1),2*LENR)
+              IF(IPARI(97,I) > 0) THEN
+                 CALL READ_DB(STIF_MSDT_FI(I)%P(1),LENR) ! stif based on mass and dt
+              ENDIF
+              IF(PARAMETERS%INTCAREA > 0.AND.IPARI(36,I)>0) THEN
+                 CALL READ_DB(INTAREANFI(I)%P(1),LENR) ! Area of seconday node
+              ENDIF
           ENDIF  ! fin partie type 24 & 25
 C
           IF (ITYP==24) THEN
@@ -5135,18 +5144,22 @@ C
                 CALL READ_R_C(VTX_BISECTOR_FIE(I)%P(1,1,1),3*4*LENR)
                 CALL READ_DB(X_SEG_FIE(I)%P(1,1,1),3*4*LENR)
                 IF(IDTMINS_OLD == 2) THEN
-                 MY_ALLOCATE(NODNXFIE(I)%P,LENR*2)
+                 ALLOCATE(NODNXFIE(I)%P(LENR*2))
                  CALL READ_I_C(NODNXFIE(I)%P(1),LENR*2)
-                 MY_ALLOCATE(NODAMSFIE(I)%P,LENR*2)
+                 ALLOCATE(NODAMSFIE(I)%P(LENR*2))
                  CALL READ_I_C(NODAMSFIE(I)%P(1),LENR*2)
-                 MY_ALLOCATE(PROCAMSFIE(I)%P,LENR*2)
+                 ALLOCATE(PROCAMSFIE(I)%P(LENR*2))
                  CALL READ_I_C(PROCAMSFIE(I)%P(1),LENR*2)
                 ELSEIF(IDTMINS_INT_OLD /= 0) THEN
-                 MY_ALLOCATE(NODAMSFIE(I)%P,LENR*2)
+                 ALLOCATE(NODAMSFIE(I)%P(LENR*2))
                  CALL READ_I_C(NODAMSFIE(I)%P(1),LENR*2)
-                 MY_ALLOCATE(PROCAMSFIE(I)%P,LENR*2)
+                 ALLOCATE(PROCAMSFIE(I)%P(LENR*2))
                  CALL READ_I_C(PROCAMSFIE(I)%P(1),LENR*2)
-              ENDIF
+                ENDIF
+
+                IF(IPARI(97,I) > 0) THEN
+                   CALL READ_DB(STIFE_MSDT_FI(I)%P(1),LENR)
+                ENDIF
               ENDIF
             ENDIF
           ENDIF
@@ -5177,6 +5190,33 @@ C
             ENDIF
           ENDIF
 C
+          IF(H3D_DATA%N_SCAL_CSE_FRICINT >0)THEN
+            IF(H3D_DATA%N_CSE_FRIC_INTER (I) >0)THEN
+              IERROR = 0
+              ALLOCATE(EFRICFI(I)%P(LENR),STAT=IERROR)
+              IF(IERROR/=0) THEN
+                CALL ANCMSG(MSGID=20,ANMODE=ANINFO)
+                CALL ARRET(2)
+c              ELSEIF(S_EFRICINT >0) THEN ! to be corrected if inters
+c                CALL READ_DB(EFRICFI(I)%P(1),LENR)  
+              ELSE
+                  EFRICFI(I)%P(1:LENR)=ZERO            
+              END IF                   
+            END IF
+          ENDIF
+C
+          IF(H3D_DATA%N_SCAL_CSE_FRIC >0)THEN
+              IERROR = 0
+              ALLOCATE(EFRICGFI(I)%P(LENR),STAT=IERROR)
+              IF(IERROR/=0) THEN
+                CALL ANCMSG(MSGID=20,ANMODE=ANINFO)
+                CALL ARRET(2)
+c              ELSEIF(S_EFRIC >0) THEN
+c                CALL READ_DB(EFRICGFI(I)%P(1),LENR)  
+              ELSE
+                  EFRICGFI(I)%P(1:LENR) =ZERO                   
+              END IF                   
+          END IF
         END DO
        END IF
       END IF
@@ -5190,16 +5230,17 @@ Chd|-- called by -----------
 Chd|        WRRESTP                       source/output/restart/wrrestp.F
 Chd|-- calls ---------------
 Chd|        WRITE_DB                      source/output/tools/write_db.F
-Chd|        WRITE_I_C                     source/output/tools/sortie_c.c
-Chd|        WRITE_R_C                     source/output/tools/sortie_c.c
+Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
+Chd|        WRITE_R_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
 Chd|        INTERFACE_MODIFICATION_MOD    share/modules/interface_modification_mod.F
 Chd|        INTSTAMP_GLOB_MOD             share/modules/intstamp_glob_mod.F
+Chd|        PARAMETERS_MOD                ../common_source/modules/interfaces/parameters_mod.F
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
 Chd|        TRI25EBOX                     share/modules/tri25ebox.F     
 Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
-      SUBROUTINE SPMD_SAVEFI(IPARI, IFLAG,INTBUF_TAB,SENSOR_TAB)
+      SUBROUTINE SPMD_SAVEFI(IPARI, IFLAG,INTBUF_TAB,NSENSOR,SENSOR_TAB,PARAMETERS)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -5209,31 +5250,27 @@ C-----------------------------------------------
       USE INTSTAMP_GLOB_MOD
       USE INTERFACE_MODIFICATION_MOD
       USE SENSOR_MOD
+      USE PARAMETERS_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
-#include      "scr05_c.inc"
-#include      "scr18_c.inc"
-#include      "task_c.inc"
 #include      "param_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "parit_c.inc"
 #include      "sms_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER ,INTENT(IN) :: NSENSOR
       INTEGER IPARI(NPARI,*), IFLAG
       TYPE(INTBUF_STRUCT_) INTBUF_TAB(*)
       TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE (PARAMETERS_) ,INTENT(IN):: PARAMETERS
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -5241,6 +5278,7 @@ C-----------------------------------------------
      .        INACTI, LSKYFI, LENI,INTTH,IEDGE4, IVIS2, INTNITSCHE
       INTEGER INTERACT,ISENS
       my_real TS,STARTT,STOPT
+      INTEGER, DIMENSION(NSPMD) :: SAVE_NSNFI,SAVE_NSNSI
 C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
@@ -5263,6 +5301,9 @@ C ecriture strutures interfaces sur fichier restart (partie entiere)
 C Issue : Restarts + INACTI + TSTART when Start timee was not reached before Restart
                INTERACT = 1
 
+               SAVE_NSNFI(1:NSPMD) = NSNFI(I)%P(1:NSPMD)
+               SAVE_NSNSI(1:NSPMD) = NSNSI(I)%P(1:NSPMD)
+
                INACTI=IPARI(22,I)
                IF (INACTI==5.OR.INACTI==6.OR.INACTI==7.OR.ITYP==23.OR.INACTI==-1)THEN
 C
@@ -5281,6 +5322,9 @@ C
                IF((INTERACT == 0 .OR. NSNFI_FLAG(I)==1).AND.ITYP/=25) THEN
                     NSNFI(I)%P(1:NSPMD) = NSNFI_SAV(I)%P(1:NSPMD)
                     NSNSI(I)%P(1:NSPMD) = NSNSI_SAV(I)%P(1:NSPMD)
+
+                    NSNFI_SAV(I)%P(1:NSPMD) = SAVE_NSNFI(1:NSPMD)
+                    NSNSI_SAV(I)%P(1:NSPMD) = SAVE_NSNSI(1:NSPMD)
                ENDIF
 
               IF(ITYP==24)THEN
@@ -5299,6 +5343,7 @@ C
 C
               CALL WRITE_I_C(NSNSI(I)%P(1),NSPMD)
               CALL WRITE_I_C(NSNFI(I)%P(1),NSPMD)
+
               IF (LENS>0)
      .         CALL WRITE_I_C(NSVSI(I)%P(1),LENS)
 C
@@ -5543,24 +5588,31 @@ C In case deactivated Interface - Flush NSNFI back to Zero
 C Issue : Restarts + INACTI + TSTART when Start timee was not reached before Restart
                INTERACT = 1
 
+               ISENS = 0
+               IF(ITYP == 7.OR.ITYP == 11.OR.ITYP == 24)  ISENS = IPARI(64,I)  ! All but ITYP == 25
+ 
+               IF (ISENS > 0) THEN               ! Sensors may be deactivated w/o INACTI            
+                  TS = SENSOR_TAB(ISENS)%TSTART
+                  IF (TS>TT) INTERACT = 0
+               ENDIF
+
                INACTI=IPARI(22,I)
                IF (INACTI==5.OR.INACTI==6.OR.INACTI==7.OR.ITYP==23.OR.INACTI==-1)THEN
 C
                ISENS = 0
-               IF(ITYP == 7.OR.ITYP == 11.OR.ITYP == 24) ! All but ITYP == 25
-     .            ISENS = IPARI(64,I)      
-                  IF (ISENS > 0) THEN            
-                    TS = SENSOR_TAB(ISENS)%TSTART
-                    IF (TS>TT) INTERACT = 0
-                  ELSE
+               IF(ITYP == 7.OR.ITYP == 11.OR.ITYP == 24)  ISENS = IPARI(64,I) ! All but ITYP == 25
+                  IF(ISENS == 0)THEN
                     STARTT = INTBUF_TAB(I)%VARIABLES(3)
                     STOPT  = INTBUF_TAB(I)%VARIABLES(11)
                    IF (STARTT>TT) INTERACT = 0
                   ENDIF
                ENDIF
-               IF(INTERACT == 0) NSNFI(I)%P(1:NSPMD) = 0
-              
 
+               IF((INTERACT == 0 .OR. NSNFI_FLAG(I)==1).AND.ITYP/=25) THEN
+                    NSNFI(I)%P(1:NSPMD) = NSNFI_SAV(I)%P(1:NSPMD)
+                    NSNSI(I)%P(1:NSPMD) = NSNSI_SAV(I)%P(1:NSPMD)
+               ENDIF
+              
 C
               IF(LENR>0) THEN
 C
@@ -5661,6 +5713,8 @@ C
                 CALL WRITE_DB(SECND_FRFI(I)%P(1,1),6*LENR)
                 CALL WRITE_DB(PENE_OLDFI(I)%P(1,1),5*LENR)
                 CALL WRITE_DB(STIF_OLDFI(I)%P(1,1),2*LENR)
+                IF(IPARI(97,I) > 0) CALL WRITE_DB(STIF_MSDT_FI(I)%P(1),LENR) ! stif based on mass and dt
+                IF(PARAMETERS%INTCAREA > 0.AND.IPARI(36,I)>0) CALL WRITE_DB(INTAREANFI(I)%P(1),LENR) ! output carea th (only case NISUB)
               ENDIF  ! fin partie type 24 & 25
 C             
               IF (ITYP==24) THEN
@@ -5699,6 +5753,10 @@ C
                     CALL WRITE_I_C(NODAMSFIE(I)%P(1),LENR*2)
                     CALL WRITE_I_C(PROCAMSFIE(I)%P(1),LENR*2)
                   END IF
+
+                  IF(IPARI(97,I) > 0) THEN
+                   CALL WRITE_DB(STIFE_MSDT_FI(I)%P(1),LENR)
+                  ENDIF
 
                 ENDIF
               ENDIF
@@ -5739,10 +5797,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "task_c.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -5756,7 +5810,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
-Cel test sur n=0
+C   test sur n=0
       IF (N==0) RETURN
       L=N/2+1
       IR=N
@@ -5816,9 +5870,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER N, NFSKYI, ISKY(*)
@@ -5833,7 +5884,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
-Cel test sur n=0
+C   test sur n=0
       IF (N==0) RETURN
       L=N/2+1
       IR=N
@@ -5983,9 +6034,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER N, NFSKYI, ISKY(*)
@@ -6000,7 +6048,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
-Cel test sur n=0
+C   test sur n=0
       IF (N==0) RETURN
       L=N/2+1
       IR=N
@@ -6162,9 +6210,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER N, NFSKYI, ISKY(*)
@@ -6179,7 +6224,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
-Cel test sur n=0
+C   test sur n=0
       IF (N==0) RETURN
       L=N/2+1
       IR=N
@@ -6419,9 +6464,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER N, NFSKYI, ISKY(*)
@@ -6437,7 +6479,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
-Cel test sur n=0
+C   test sur n=0
       IF (N==0) RETURN
       L=N/2+1
       IR=N
@@ -6631,9 +6673,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER N, NFSKYI, ISKY(*)
@@ -6650,7 +6689,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
-Cel test sur n=0
+C   test sur n=0
       IF (N==0) RETURN
       L=N/2+1
       IR=N
@@ -6856,9 +6895,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER N, NFSKYI, ISKY(*)
@@ -6875,7 +6911,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
-Cel test sur n=0
+C   test sur n=0
       IF (N==0) RETURN
       L=N/2+1
       IR=N
@@ -7093,9 +7129,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER N, NFSKYI, ISKY(*)
@@ -7182,9 +7215,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IRESP,INC
@@ -7225,9 +7255,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IRESP,INC
@@ -7263,9 +7290,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -7310,9 +7334,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER LEN
@@ -7350,9 +7371,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -7392,9 +7410,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

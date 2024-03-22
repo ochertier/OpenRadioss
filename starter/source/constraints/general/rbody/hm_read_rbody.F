@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  HM_READ_RBODY                 source/constraints/general/rbody/hm_read_rbody.F
 Chd|-- called by -----------
@@ -50,7 +50,7 @@ Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F
 Chd|====================================================================
       SUBROUTINE HM_READ_RBODY(RBY       ,NPBY    ,LPBY    ,ITAB     ,ITABM1   ,
      2                         IGRNOD    ,IGRSURF ,IBFV    ,IGRV     ,IBGR     ,
-     3                         SENSOR_TAB,IMERGE  ,UNITAB  ,ISKN     ,NOM_OPT  ,
+     3                         SENSORS   ,IMERGE  ,UNITAB  ,ISKN     ,NOM_OPT  ,
      4                         NUMSL     ,KNOD2ELS,KNOD2ELC,KNOD2ELTG,KNOD2EL1D,
      5                         KNOD2ELQ  ,ITAGND  ,ICDNS10 ,LSUBMODEL,ICFIELD  ,
      6                         LCFIELD   )
@@ -59,6 +59,7 @@ C     LECTURE STRUCTURE RIGIDES
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE MY_ALLOC_MOD
       USE UNITAB_MOD
       USE R2R_MOD
       USE MESSAGE_MOD
@@ -77,17 +78,11 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "my_allocate.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "units_c.inc"
 #include      "scr17_c.inc"
 #include      "scr03_c.inc"
-#include      "scr05_c.inc"
-#include      "warn_c.inc"
 #include      "param_c.inc"
-#include      "submod_c.inc"
-#include      "sysunit.inc"
 #include      "r2r_c.inc"
 #include      "sphcom.inc"
 #include      "sms_c.inc"
@@ -108,8 +103,8 @@ C     REAL
 C-----------------------------------------------
       TYPE (GROUP_)  , DIMENSION(NGRNOD)  :: IGRNOD
       TYPE (SURF_)   ,TARGET, DIMENSION(NSURF)   :: IGRSURF        
-      TYPE(SUBMODEL_DATA),INTENT(IN)::LSUBMODEL(*)
-      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE (SUBMODEL_DATA),INTENT(IN)::LSUBMODEL(*)
+      TYPE (SENSORS_) ,INTENT(IN) :: SENSORS
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -168,7 +163,7 @@ C=======================================================================
       DATA MESS/'RIGID BODY DEFINITION                   '/
 C=======================================================================
       IF (NUMSL > 0) THEN
-        MY_ALLOCATE2D(TABSL,2,NUMSL)
+        CALL MY_ALLOC(TABSL,2,NUMSL)
         TABSL=0
       END IF
 
@@ -179,7 +174,7 @@ C--------------------------------------------------
       IS_AVAILABLE = .FALSE.
       CALL HM_OPTION_START('/RBODY')
 C
-      MY_ALLOCATE(ITAG,NUMNOD) 
+      CALL MY_ALLOC(ITAG,NUMNOD) 
       ITAG(1:NUMNOD) = 0
 C
       K=0
@@ -208,7 +203,7 @@ C
         NRB = NRB + 1
 C-------
         IFLAGUNIT = 0
-        DO J=1,NUNITS
+        DO J=1,UNITAB%NUNITS
           IF (UNITAB%UNIT_ID(J) == UID) THEN
             IFLAGUNIT = 1
             EXIT
@@ -304,7 +299,7 @@ C
 !
         DO JC=1,NMERGED
           IF (NPBY(1,NRB) == IMERGE(JC)) NPBY(1,NRB)=IMERGE(NUMCNOD+JC)
-	ENDDO
+          ENDDO
         CALL ANODSET(NPBY(1,NRB), CHECK_RB_M)
 C
         NPBY(11,NRB)=K
@@ -336,8 +331,8 @@ c
         ENDDO
 C
         IF(ISENS > 0)THEN
-          DO I=1,NSENSOR
-            IF (ISENS == SENSOR_TAB(I)%SENS_ID) NPBY(4,NRB)=I
+          DO I=1,SENSORS%NSENSOR
+            IF (ISENS == SENSORS%SENSOR_TAB(I)%SENS_ID) NPBY(4,NRB)=I
           ENDDO
           IF(NPBY(4,NRB) == 0)THEN
              TITR1 = IGRSURF(IGS)%TITLE
@@ -489,7 +484,7 @@ C
       ENDDO
 C
       DO K=1,NLOADC
-	NN   = ICFIELD(1,K) 
+          NN   = ICFIELD(1,K) 
         IAD  = ICFIELD(4,K)
         DO I=1,NN
          N=LCFIELD(IAD+I-1)
@@ -572,6 +567,7 @@ C    PRE LECTURE STRUCTURE RIGIDES POUR OPTIMIZATION
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE MY_ALLOC_MOD
       USE MESSAGE_MOD
       USE R2R_MOD
       USE GROUPDEF_MOD
@@ -584,15 +580,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "my_allocate.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "units_c.inc"
-#include      "scr17_c.inc"
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
-#include      "warn_c.inc"
-#include      "param_c.inc"
 #include      "r2r_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -629,7 +618,7 @@ C
       END DO
 C
 C init a 0 de itag
-      MY_ALLOCATE(ITAG,NUMNOD) 
+      CALL MY_ALLOC(ITAG,NUMNOD) 
       DO I=1,NUMNOD
         ITAG(I)=0
       ENDDO
@@ -752,7 +741,7 @@ Chd|  SETELOFF                      source/constraints/general/rbody/hm_read_rbo
 Chd|-- called by -----------
 Chd|        LECTUR                        source/starter/lectur.F       
 Chd|-- calls ---------------
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
@@ -763,6 +752,7 @@ Chd|====================================================================
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE MY_ALLOC_MOD
       USE MESSAGE_MOD
       USE ELBUFDEF_MOD
       USE GROUPDEF_MOD
@@ -775,14 +765,10 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "my_allocate.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "units_c.inc"
-#include      "scr17_c.inc"
 #include      "scr03_c.inc"
-#include      "scr05_c.inc"
-#include      "warn_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -815,7 +801,7 @@ C======================================================================|
 C
       IRBYON = 1
 C
-      MY_ALLOCATE(ITAG,NUMNOD) 
+      CALL MY_ALLOC(ITAG,NUMNOD) 
 C init initiale sur numnod
       DO I=1,NUMNOD
         ITAG(I)=0

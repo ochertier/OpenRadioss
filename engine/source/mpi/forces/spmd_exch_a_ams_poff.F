@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  SPMD_EXCH_A_AMS_POFF          source/mpi/forces/spmd_exch_a_ams_poff.F
 Chd|-- called by -----------
@@ -32,14 +32,14 @@ Chd|====================================================================
      2   IAD_ELEM ,FR_ELEM,MSNF ,IFSUBM,SIZE,
      3   LENR     ,FTHE   ,MCP  ,FR_LOC,NB_FR,
      4   MS_2D    , MCP_OFF,FORNEQS,NFACNIT  ,
-     5   LENC     ,FCONT   ,H3D_DATA)
+     5   LENC     ,FCONT   ,H3D_DATA,FNCONT  ,
+     6   FTCONT)
 C--------------------------------------
       USE H3D_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -49,11 +49,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr06_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "task_c.inc"
-#include      "units_c.inc"
 #include      "scr14_c.inc"
 #include      "intstamp_c.inc"
 C-----------------------------------------------
@@ -63,8 +61,9 @@ C-----------------------------------------------
      .        NFACNIT,LENC
       my_real
      .        A(3,*),AR(3,*),STIFN(*),STIFR(*),MS(*),MSNF(*),
-     .        FTHE(*),MCP(*),MCP_OFF(*),MS_2D(*),FORNEQS(3,*),
-     .        FCONT(3,*)
+     .        FTHE(*),MCP(*),MCP_OFF(*),MS_2D(*),FORNEQS(3,*)
+      my_real  , INTENT(INOUT) :: FCONT(3,NUMNOD),FNCONT(3,NUMNOD),
+     .        FTCONT(3,NUMNOD)
       TYPE(H3D_DATABASE) :: H3D_DATA
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
@@ -167,6 +166,17 @@ C --- /CONT/MAX output
             SHIFT = SHIFT+3
           ENDIF
 
+C --- /PCONT/MAX output
+          IF(ANIM_V(26)+H3D_DATA%N_VECT_PCONT_MAX /=0.AND.NINTSTAMP==0) THEN
+            SBUF(SHIFT+1) = FNCONT(1,NOD)
+            SBUF(SHIFT+2) = FNCONT(2,NOD)
+            SBUF(SHIFT+3) = FNCONT(3,NOD)
+            SBUF(SHIFT+4) = FTCONT(1,NOD)
+            SBUF(SHIFT+5) = FTCONT(2,NOD)
+            SBUF(SHIFT+6) = FTCONT(3,NOD)
+            SHIFT = SHIFT+6
+          ENDIF
+
           L = L + SIZE + NFACNIT +LENC
         ENDDO
 
@@ -178,7 +188,7 @@ C
       DO I=1,NSPMD
 C--------------------------------------------------------------------
 C envoi a N+I mod P
-Cel test si msg necessaire a envoyer a completer par test interface
+C   test si msg necessaire a envoyer a completer par test interface
        IF(IAD_ELEM(1,I+1)-IAD_ELEM(1,I)>0)THEN
           MSGTYP = MSGOFF
           SIZ = IAD_SEND(I+1)-IAD_SEND(I)
@@ -275,6 +285,21 @@ C SAUVEGARGE VALEURS ACCEL
             SHIFT = SHIFT+3
           ENDIF
 
+         IF(H3D_DATA%N_VECT_PCONT_MAX /=0.AND.NINTSTAMP==0) THEN
+            SAV_A(SHIFT+1,J) = FNCONT(1,NOD)
+            SAV_A(SHIFT+2,J) = FNCONT(2,NOD)
+            SAV_A(SHIFT+3,J) = FNCONT(3,NOD)
+            SAV_A(SHIFT+4,J) = FTCONT(1,NOD)
+            SAV_A(SHIFT+5,J) = FTCONT(2,NOD)
+            SAV_A(SHIFT+6,J) = FTCONT(3,NOD)
+
+            FNCONT(1,NOD) = ZERO
+            FNCONT(2,NOD) = ZERO
+            FNCONT(3,NOD) = ZERO
+
+            SHIFT = SHIFT+6
+          ENDIF
+
         ENDDO
 
 
@@ -284,7 +309,7 @@ C decompactage
 C
       DO I = 1, NSPMD
        IF(I/=LOC_PROC)THEN
-Cel test si msg necessaire a envoyer a completer par test interface
+C   test si msg necessaire a envoyer a completer par test interface
          NB_NOD = IAD_ELEM(1,I+1)-IAD_ELEM(1,I)
          IF(NB_NOD>0)THEN
            CALL MPI_WAIT(REQ_R(I),STATUS,IERROR)
@@ -345,6 +370,16 @@ Cel test si msg necessaire a envoyer a completer par test interface
                  FCONT(2,NOD)= FCONT(2,NOD)+ RBUF(SHIFT+2)
                  FCONT(3,NOD)= FCONT(3,NOD)+ RBUF(SHIFT+3)
                  SHIFT = SHIFT+3
+               ENDIF
+
+               IF(H3D_DATA%N_VECT_PCONT_MAX /=0.AND.NINTSTAMP==0) THEN
+                 FNCONT(1,NOD)= FNCONT(1,NOD)+ RBUF(SHIFT+1)
+                 FNCONT(2,NOD)= FNCONT(2,NOD)+ RBUF(SHIFT+2)
+                 FNCONT(3,NOD)= FNCONT(3,NOD)+ RBUF(SHIFT+3)
+                 FTCONT(1,NOD)= FTCONT(1,NOD)+ RBUF(SHIFT+4)
+                 FTCONT(2,NOD)= FTCONT(2,NOD)+ RBUF(SHIFT+5)
+                 FTCONT(3,NOD)= FTCONT(3,NOD)+ RBUF(SHIFT+6)
+                 SHIFT = SHIFT+6
                ENDIF
 
                L = L + SIZE +NFACNIT +LENC
@@ -409,11 +444,21 @@ C --- /CONT/MAX output
              SHIFT = SHIFT+3
            ENDIF
 
+           IF(H3D_DATA%N_VECT_PCONT_MAX /=0.AND.NINTSTAMP==0) THEN
+              FNCONT(1,NOD)= FNCONT(1,NOD)+ SAV_A(SHIFT+1,J)
+              FNCONT(2,NOD)= FNCONT(2,NOD)+ SAV_A(SHIFT+2,J)
+              FNCONT(3,NOD)= FNCONT(3,NOD)+ SAV_A(SHIFT+3,J)
+              FTCONT(1,NOD)= FTCONT(1,NOD)+ SAV_A(SHIFT+4,J)
+              FTCONT(2,NOD)= FTCONT(2,NOD)+ SAV_A(SHIFT+5,J)
+              FTCONT(3,NOD)= FTCONT(3,NOD)+ SAV_A(SHIFT+6,J)
+              SHIFT = SHIFT+6
+            ENDIF
+
          END DO
        ENDIF
       END DO
 C
-Cel wait terminaison isend
+C   wait terminaison isend
 C
       DO I = 1, NSPMD
         IF(IAD_ELEM(1,I+1)-IAD_ELEM(1,I)>0)THEN

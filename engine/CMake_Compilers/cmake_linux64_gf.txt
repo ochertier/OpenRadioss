@@ -1,3 +1,8 @@
+######################################## 
+#       ENGINE - Gfortran COMPILER
+#########################################
+
+
 # Compiler predefinition
 # Simplify usage for target compilation
 #########################################
@@ -11,6 +16,7 @@
 set ( cppmach "-DCPP_mach=CPP_p4linux964" ) 
 set ( cpprel  "-DCPP_rel=80" )
 
+set( unused_dummy_arg "") 
 
 # MPI
 # ---
@@ -19,7 +25,7 @@ if ( DEFINED MPI )
   if ( mpiver STREQUAL "smp")
      set (mpi_suf "" )
   elseif ( mpiver STREQUAL "ompi")
-
+      set( unused_dummy_arg "-Werror=unused-dummy-argument") 
       set (mpi_inc "-I/opt/openmpi/include/")
       set (mpi_lib "-L/opt/openmpi/lib -lmpi -lmpi_mpifh" )
 
@@ -60,15 +66,27 @@ set ( RELNAME ${arch}${mpi_suf}  )
 #H3D
 set (h3d_inc "-I${source_directory}/../extlib/h3d/includes")
 
+#ZLIB
+set (zlib_inc "-I${source_directory}/../extlib/zlib/linux64/include")
+set (zlib_lib "${source_directory}/../extlib/zlib/linux64/lib/libz.a")
 
 #MUMPS linear solver, used for Implicit, FSI. 
-#  - Create and enter the directory OpenRadioss/extlib/mumps
-#  - Download, extract and build Lapack, Scalalapack and mumps. 
-#    - wget https://github.com/Reference-LAPACK/lapack/archive/refs/tags/v3.10.1.tar.gz
-#    - [Optional] wget http://glaros.dtc.umn.edu/gkhome/fetch/sw/metis/metis-5.1.0.tar.gz
-#    - wget https://github.com/Reference-ScaLAPACK/scalapack/archive/refs/tags/v2.2.0.tar.gz ; (set the compiler variable to /opt/openmpi/mpif90)
-#    - wget http://mumps.enseeiht.fr/MUMPS_5.5.1.tar.gz (or wget http://ftp.mcs.anl.gov/pub/petsc/externalpackages/MUMPS_5.5.1.tar.gz)  
-# uncomment the following lines
+#  1) get MUMPS
+#     a) using a script
+#  The script ./extlib/get_and_build_mumps.sh download and bluid MUMPS. It was tested for GCC11 on ubuntu 22.04
+# ./build_script.sh -arch=linux64_gf -nt=4 -mpi=ompi -mumps_root=${absolute_path}/extlib/MUMPS_5.5.1 -scalapack_root=${absolute_path}/extlib/scalapack-2.2.0/build/lib -lapack_root=${absolute_path}/extlib/lapack-3.10.1/
+#     b) If the script fails or you want to enable more ordering methods, you may try to build it yourself:               
+#        - Create and enter the directory OpenRadioss/extlib/mumps
+#        - Download, extract and build Lapack, Scalalapack and mumps. 
+#          - wget https://github.com/Reference-LAPACK/lapack/archive/refs/tags/v3.10.1.tar.gz
+#          - [Optional] wget http://glaros.dtc.umn.edu/gkhome/fetch/sw/metis/metis-5.1.0.tar.gz
+#          - wget https://github.com/Reference-ScaLAPACK/scalapack/archive/refs/tags/v2.2.0.tar.gz ; (set the compiler variable to /opt/openmpi/mpif90)
+#          - wget http://mumps.enseeiht.fr/MUMPS_5.5.1.tar.gz (or wget http://ftp.mcs.anl.gov/pub/petsc/externalpackages/MUMPS_5.5.1.tar.gz)  
+#         When compiling mumps, lapack, scalapack with a recent version of gfortran, you may need add the option "-fallow-argument-mismatch" if you are using a recent GCC version
+#  2) build OpenRadioss
+#     a) clean: if you already built OpenRadioss without mumps, you need to run:  ./build_script.sh -arch=linux64_gf -nt=4 -mpi=ompi -clean 
+#     b) To build penRadioss with MUMPS and implicit feature, you need to run the following command, replacing ${absolute_path} by the absolute path to the engine directory.
+#        ./build_script.sh -arch=linux64_gf -nt=4 -mpi=ompi -mumps_root=${absolute_path}/extlib/MUMPS_5.5.1 -scalapack_root=${absolute_path}/extlib/scalapack-2.2.0/build/lib -lapack_root=${absolute_path}/extlib/lapack-3.10.1/
 if( DEFINED mumps_root)
     set(MUMPSLIB "${mumps_root}/lib")
     set(mumps_inc "-I${mumps_root}/include")
@@ -117,41 +135,70 @@ set ( wo_linalg "-DWITHOUT_LINALG" )
 endif()
 
 if ( CMAKE_C_COMPILER_VERSION VERSION_GREATER 10) 
-set( portability " -fallow-argument-mismatch -fallow-invalid-boz -std=legacy")
+set( portability "-fallow-argument-mismatch -fallow-invalid-boz -std=legacy")
 endif()
 
-set ( opt_flag "  ${wo_linalg} -DCOMP_GFORTRAN=1 -ffp-contract=off -frounding-math -fopenmp " )
+set ( opt_flag " ${wo_linalg} -DCOMP_GFORTRAN=1 -ffp-contract=off -frounding-math -fopenmp " )
 
 if ( sanitize STREQUAL "1" )
-set( FSANITIZE "-fsanitize=address -DSANITIZE") 
+set( FSANITIZE "-fsanitize=address -fsanitize=undefined  -fsanitize=bounds-strict -DSANITIZE") 
 endif()
 
 set(opt_flag "${opt_flag} ${mumps_flag} ${mumps_inc}")
+#set( strict "-fallow-argument-mismatch -Waliasing -Wunused-dummy-argument -Werror=unused-dummy-argument -Wdo-subscript -Warray-bounds -Wtabs -Werror=tabs -pedantic-errors -Wsurprising -Wuse-without-only -Werror=use-without-only") 
+set( strict " -Werror=aliasing -Werror=unused-dummy-argument -Werror=do-subscript -Werror=array-bounds -Werror=tabs -Werror=surprising ")
+set( strict_wo_mpi " -Werror=aliasing ${unused_dummy_arg} -Werror=do-subscript -Werror=array-bounds -Werror=tabs -Werror=surprising ") 
 
 
 if ( debug STREQUAL "1" )
 # Fortran
 
-set_source_files_properties(${source_files}  PROPERTIES COMPILE_FLAGS "${FSANITIZE} -O0 -g -fdec-math -fbacktrace -Wunused-dummy-argument -Wdo-subscript ${opt_flag} ${precision_flag} ${cppmach} ${cpprel} -DCPP_comp=f90 -ffixed-line-length-none  ${portability} ${mpi_flag} ${ADF}  " )
+set( legacy_flags "${FSANITIZE} -Wall -O0 -g -fdec-math -fbacktrace ${opt_flag} ${precision_flag} ${cppmach} ${cpprel} -DCPP_comp=f90 -ffixed-line-length-none  ${portability} ${mpi_flag} ${ADF}  ")
+
+set( unused_dummy_arg_strict_flags "${FSANITIZE} -Wall -Warray-temporaries -O0 -g -fdec-math -fbacktrace ${opt_flag} ${strict_wo_mpi} ${precision_flag} ${cppmach} ${cpprel} -DCPP_comp=f90 -ffixed-line-length-none  ${mpi_flag} ${ADF}  ")
+
+set_source_files_properties(${source_files}  PROPERTIES COMPILE_FLAGS "${FSANITIZE} -Wall -Warray-temporaries -O0 -g -fdec-math -fbacktrace ${opt_flag} ${strict} ${precision_flag} ${cppmach} ${cpprel} -DCPP_comp=f90 -ffixed-line-length-none  ${mpi_flag} ${ADF}  " )
 
 # C source files
-set_source_files_properties(${c_source_files} PROPERTIES COMPILE_FLAGS "${FSANITIZE} ${h3d_inc} ${precision_flag}  ${cppmach} ${cpprel} -O0 -g  -fopenmp " )
+set_source_files_properties(${c_source_files} PROPERTIES COMPILE_FLAGS "${FSANITIZE} ${h3d_inc} ${zlib_inc} ${precision_flag}  ${cppmach} ${cpprel} -O0 -g  -fopenmp " )
 
 # CXX source files
-set_source_files_properties(${cpp_source_files} PROPERTIES COMPILE_FLAGS "${FSANITIZE} ${h3d_inc} ${precision_flag} ${cppmach} ${cpprel}  -O0 -g -fopenmp -std=c++11  " )
+set_source_files_properties(${cpp_source_files} PROPERTIES COMPILE_FLAGS "${FSANITIZE} ${h3d_inc} ${zlib_inc} ${precision_flag} ${cppmach} ${cpprel}  -O0 -g -fopenmp -std=c++11  " )
+
+
+elseif ( debug STREQUAL "asan" )
+
+
+set( legacy_flags "-fsanitize=address -fsanitize=undefined  -fsanitize=bounds-strict -DSANITIZE -Wall -O0 -g -fdec-math -fbacktrace ${opt_flag} ${precision_flag} ${cppmach} ${cpprel} -DCPP_comp=f90 -ffixed-line-length-none  ${portability} ${mpi_flag} ${ADF}  ")
+
+set( unused_dummy_arg_strict_flags "-fsanitize=address -fsanitize=undefined  -fsanitize=bounds-strict -DSANITIZE -Wall -Warray-temporaries -O0 -g -fdec-math -fbacktrace ${opt_flag} ${strict_wo_mpi} ${precision_flag} ${cppmach} ${cpprel} -DCPP_comp=f90 -ffixed-line-length-none  ${mpi_flag} ${ADF}  ")
+
+set_source_files_properties(${source_files}  PROPERTIES COMPILE_FLAGS "-fsanitize=address -fsanitize=undefined  -fsanitize=bounds-strict -DSANITIZE -Wall -Warray-temporaries -O0 -g -fdec-math -fbacktrace ${opt_flag} ${strict} ${precision_flag} ${cppmach} ${cpprel} -DCPP_comp=f90 -ffixed-line-length-none  ${mpi_flag} ${ADF}  " )
+
+
+# C source files
+set_source_files_properties(${c_source_files} PROPERTIES COMPILE_FLAGS "-fsanitize=address -fsanitize=undefined  -fsanitize=bounds-strict -DSANITIZE ${h3d_inc} ${precision_flag}  ${cppmach} ${cpprel} -O0 -g  -fopenmp  ${zlib_inc}" )
+
+# CXX source files
+set_source_files_properties(${cpp_source_files} PROPERTIES COMPILE_FLAGS "-fsanitize=address -fsanitize=undefined  -fsanitize=bounds-strict -DSANITIZE} ${h3d_inc} ${precision_flag} ${cppmach} ${cpprel}  -O0 -g -fopenmp  ${zlib_inc} -std=c++11" )
+
+set( FSANITIZE "-fsanitize=address -fsanitize=undefined  -fsanitize=bounds-strict -DSANITIZE") 
 
 else ()
 
 # Fortran
 
+set( legacy_flags " -nostdinc -w -O3 -fdec-math ${opt_flag} ${precision_flag} ${cppmach} ${cpprel} -DCPP_comp=f90 -ffixed-line-length-none  ${portability} ${mpi_flag} ${ADF} " )
 
-set_source_files_properties( ${source_files}  PROPERTIES COMPILE_FLAGS " -O3 -fdec-math ${opt_flag} ${precision_flag} ${cppmach} ${cpprel} -DCPP_comp=f90 -ffixed-line-length-none  ${portability} ${mpi_flag} ${ADF} " )
+set( unused_dummy_arg_strict_flags " -nostdinc -O3 -fdec-math  ${opt_flag} ${strict_wo_mpi} ${precision_flag} ${cppmach} ${cpprel} -DCPP_comp=f90 -ffixed-line-length-none ${mpi_flag} ${ADF} ")
+
+set_source_files_properties( ${source_files}  PROPERTIES COMPILE_FLAGS " -nostdinc -O3 -fdec-math  ${opt_flag} ${strict} ${precision_flag} ${cppmach} ${cpprel} -DCPP_comp=f90 -ffixed-line-length-none ${mpi_flag} ${ADF} " )
 
 # C source files
-set_source_files_properties(${c_source_files} PROPERTIES COMPILE_FLAGS " -O2 ${h3d_inc} ${opt_flag} ${precision_flag} ${cppmach} ${cpprel} " )
+set_source_files_properties(${c_source_files} PROPERTIES COMPILE_FLAGS " -w -O2 ${h3d_inc} ${zlib_inc} ${opt_flag} ${precision_flag} ${cppmach} ${cpprel} " )
 
 # CXX source files
-set_source_files_properties(${cpp_source_files} PROPERTIES COMPILE_FLAGS " -O2 ${h3d_inc} ${opt_flag} ${precision_flag} ${cppmach} ${cpprel} -std=c++11  " )
+set_source_files_properties(${cpp_source_files} PROPERTIES COMPILE_FLAGS "-w -O2 ${h3d_inc} ${zlib_inc} ${opt_flag} ${precision_flag} ${cppmach} ${cpprel} -std=c++11  " )
 
 endif()
 
@@ -160,21 +207,33 @@ endif()
 set (CMAKE_EXE_LINKER_FLAGS "-rdynamic -fopenmp  -ldl -lrt -lstdc++ ${FSANITIZE}  " )
 
 #Libraries
+
 if ( static_link STREQUAL "1" )
-  set (LINK "rt  ${mumps_libs} -ldl -static-libgfortran -static-libstdc++ -static-libgcc ${mpi_lib} -Wunused-function")
+  set (LINK "rt  ${mumps_libs} ${zlib_lib} -ldl -static-libgfortran -static-libstdc++ -static-libgcc ${mpi_lib} -Wunused-function")
 else()
-  set (LINK "rt  ${mumps_libs} ${mpi_lib} -ldl -Wunused-function"  )
+  set (LINK "rt  ${mumps_libs} ${zlib_lib} ${mpi_lib} -ldl -Wunused-function")
 endif()
+string(STRIP ${LINK} LINK)
 
 
 # -------------------------------------------------------------------------------------------------------------------------------------------
 # Specific set of compilation flag
-if ( NOT debug STREQUAL "1" )
 
-set (F_O0_compiler_flags " -O0 ${opt_flag} ${portability} ${precision_flag} ${cppmach} ${cpprel} -DCPP_comp=f90 -ffixed-line-length-none  ${mpi_flag} ${ADF} ")
-set (F_O1_compiler_flags " -O1 ${opt_flag} ${portability} ${precision_flag} ${cppmach} ${cpprel} -DCPP_comp=f90 -ffixed-line-length-none  ${mpi_flag} ${ADF} ")
-set (F_O2_compiler_flags " -O2 ${opt_flag} ${portability} ${precision_flag} ${cppmach} ${cpprel} -DCPP_comp=f90 -ffixed-line-length-none  ${mpi_flag} ${ADF} ")
-set (C_O1_compiler_flags " -O1 ${opt_flag} ${portability} ${precision_flag} ${cppmach} ${cpprel}  ${mpi_flag} ${ADF} ")
+include (CMake_Compilers/legacy_fortran.cmake)
+
+if( no_python STREQUAL "1" )
+get_source_file_property( existing_flags ${source_directory}/../common_source/modules/cpp_python_funct.cpp COMPILE_FLAGS)
+set_source_files_properties( ${source_directory}/../common_source/modules/cpp_python_funct.cpp PROPERTIES COMPILE_FLAGS  "${exsisting_flags} -DPYTHON_DISABLED" )
+endif()
+
+
+if ( debug STREQUAL "0" )
+
+set (F_O0_compiler_flags " -nostdinc -O0 ${opt_flag} -w ${portability} ${precision_flag} ${cppmach} ${cpprel} -DCPP_comp=f90 -ffixed-line-length-none  ${mpi_flag} ${ADF} ")
+set (F_O1_compiler_flags " -nostdinc -O1 ${opt_flag} -w ${portability} ${precision_flag} ${cppmach} ${cpprel} -DCPP_comp=f90 -ffixed-line-length-none  ${mpi_flag} ${ADF} ")
+set (F_O2_compiler_flags " -nostdinc -O2 ${opt_flag} -w ${portability} ${precision_flag} ${cppmach} ${cpprel} -DCPP_comp=f90 -ffixed-line-length-none  ${mpi_flag} ${ADF} ")
+set (C_O1_compiler_flags " -O1 ${opt_flag} -w ${precision_flag} ${cppmach} ${cpprel}  ${mpi_flag} ${ADF} ")
+
 
 # resol_init.F
 set_source_files_properties( ${source_directory}/source/engine/resol_init.F PROPERTIES COMPILE_FLAGS ${F_O1_compiler_flags} )
@@ -230,7 +289,7 @@ set_source_files_properties( ${source_directory}/source/elements/sph/spbuc3.F PR
 # spclasv.F
 set_source_files_properties( ${source_directory}/source/elements/sph/spclasv.F PROPERTIES COMPILE_FLAGS ${F_O2_compiler_flags} )
 
-# spclasv.F
+# rad2rad
 set_source_files_properties( ${source_directory}/source/coupling/rad2rad/rad2rad_c.c PROPERTIES COMPILE_FLAGS ${C_O1_compiler_flags} )
 
 

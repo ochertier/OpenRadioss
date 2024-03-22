@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  HM_READ_PROP18                source/properties/beam/hm_read_prop18.F
 Chd|-- called by -----------
@@ -54,12 +54,8 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "units_c.inc"
-#include      "param_c.inc"
-#include      "warn_c.inc"
 #include      "scr17_c.inc"
-#include      "com01_c.inc"
 #include      "tablen_c.inc"
-#include      "scr03_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -81,6 +77,8 @@ C-----------------------------------------------
 C     REAL
       my_real
      .    DM,DR,PY,PZ,AI,YI,ZI,WI,AREA,Y0,Z0,L1,L2,L3,L4,L5,L6,PUN
+      my_real
+     .    AREA_I,TIXX_I,TIYY_I,TIZZ_I, ARI,INI,RYI,RZI
       LOGICAL IS_AVAILABLE, IS_ENCRYPTED
       DATA PUN/0.1/
 C=======================================================================
@@ -234,13 +232,29 @@ C---  rotation dof
         GEO(9) = 1.1-IR1Z      
         GEO(10)= 1.1-IR2Y      
         GEO(11)= 1.1-IR2Z      
-C---
+C---compute for print
+          AREA_I= ZERO
+          TIYY_I= ZERO
+          TIZZ_I= ZERO
+          DO IP=1,NIP
+            ARI = GEO(IPA+IP)
+            INI = ARI*ARI*ONE_OVER_12
+            RYI = GEO(IPY+IP)
+            RZI = GEO(IPZ+IP)
+            AREA_I = AREA_I + ARI
+            TIYY_I = TIYY_I + INI + ARI * RYI*RYI
+            TIZZ_I = TIZZ_I + INI + ARI * RZI*RZI
+          ENDDO
+          TIXX_I = TIYY_I + TIZZ_I
         IF(.NOT. IS_ENCRYPTED)THEN
-          WRITE(IOUT,1000)IG,ISS,IR1X,IR1Y,IR1Z,IR2X,IR2Y,IR2Z,DM,DR,ISECT,L1,L2,NIP
+          WRITE(IOUT,1000)IG,ISS,IR1X,IR1Y,IR1Z,IR2X,IR2Y,IR2Z,DM,DR,ISECT,L1
+          IF(ISECT==1.OR.ISECT==3)WRITE(IOUT,1002)L2
+          WRITE(IOUT,1003)NIP
           DO IP=1,NIP
             WRITE(IOUT,1010) IP,Y0+GEO(IPY+IP),Z0+GEO(IPZ+IP),
      .                   GEO(IPA+IP)
           ENDDO
+          WRITE(IOUT,1100)AREA_I,TIYY_I,TIZZ_I,TIXX_I
           WRITE(IOUT,*)
         ELSE
           WRITE(IOUT,1020) IG
@@ -289,10 +303,12 @@ C---
      & 5X,'BEAM STRUCTURAL MEMBRANE DAMPING. . . .=',1PG20.13/,
      & 5X,'BEAM STRUCTURAL FLEXURAL DAMPING. . . .=',1PG20.13/,
      & 5X,'SECTION TYPE. . . . . . . . . . . . . .=',I10/,
-     & 5X,'FIRST SIZE OF SECTION L1. . . . . . . .=',1PG20.13/,
-     & 5X,'SECOND SIZE OF SECTION L2 . . . . . . .=',1PG20.13/,   
+     & 5X,'FIRST SIZE OF SECTION L1. . . . . . . .=',1PG20.13)
+ 1002 FORMAT(   
+     & 5X,'SECOND SIZE OF SECTION L2 . . . . . . .=',1PG20.13) 
+ 1003 FORMAT(    
      & 5X,'NUMBER OF INTEGRATION POINTS. . . . . .=',I10//,
-     & 5X,'INTEGRATION POINTS:'/)
+     & 5X,'INTEGRATION POINTS:')
  1010 FORMAT(     
      & 5X,'POINT NO: . . . . . . . . . . . . . =',I10/,
      & 8X,'LOCAL Y POSITION. . . . . . . . . . =',1PG20.13/,
@@ -302,6 +318,11 @@ C---
      & 5X,'INTEGRATED BEAM PROPERTY SET (TYPE 18)'/,
      & 5X,'PROPERTY SET NUMBER . . . . . . . . . .=',I10,
      & 5X,'CONFIDENTIAL DATA'//)
+ 1100 FORMAT(
+     & 5X,'BEAM AREA . . . . . . . . . . . . . . .=',1PG20.13/,
+     & 5X,'MOMENT OF INERTIA IYY . . . . . . . . .=',1PG20.13/,
+     & 5X,'MOMENT OF INERTIA IZZ . . . . . . . . .=',1PG20.13/,
+     & 5X,'MOMENT OF INERTIA IXX . . . . . . . . .=',1PG20.13/)
 
       END SUBROUTINE
 

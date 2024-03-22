@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  INTTI1                        source/interfaces/interf/intti1.F
 Chd|-- called by -----------
@@ -70,14 +70,9 @@ C-----------------------------------------------
 #include      "param_c.inc"
 #include      "task_c.inc"
 #include      "parit_c.inc"
-#include      "scr03_c.inc"
 #include      "scr18_c.inc"
 #include      "spmd_c.inc"
 #include      "sms_c.inc"
-#include      "com06_c.inc"
-#include      "com08_c.inc"
-#include      "scr07_c.inc"
-#include      "scr14_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -103,17 +98,17 @@ C-----------------------------------------------
       INTEGER N, NTY, JI, JB, NMN, NINT, LWA, I2OK,K,ITIED,
      .        LCOMI2M, I0, NIR, SIZE, LENS, LENR, I, J, ILEV,
      .        TAGNOD(NUMNOD), K10, K11, K12, NSN, KSN,I25PENA,
-     .        I2SIZETH,INTTH2, SIZE_MINER_POFF,II
+     .        I2SIZETH,INTTH2, SIZE_INER_POFF,II
 C     REAL
       my_real
      .   FSKYI2(I2SIZE,LCNI2),FTHESKYI2(LCNI2),CONDNSKYI2(LCNI2)
       my_real,
      . DIMENSION(:,:),ALLOCATABLE ::SAV_FOR_PENA
       my_real,
-     . DIMENSION(:),ALLOCATABLE ::MS_PENA,SAV_MINER_POFF
+     . DIMENSION(:),ALLOCATABLE ::MS_PENA,SAV_INER_POFF
 C=======================================================================
       I25PENA=0
-      SIZE_MINER_POFF = 0
+      SIZE_INER_POFF = 0
 C
       IF (IPARIT == 0)THEN
         DO N=1,NINTER                                    
@@ -127,7 +122,7 @@ C
             ELSEIF (ILEV == 27 .or. ILEV == 28) THEN
               I25PENA=2
             ENDIF
-            IF (IRODDL > 0) SIZE_MINER_POFF = NUMNOD
+            IF (IRODDL > 0) SIZE_INER_POFF = NUMNOD
           ENDIF
         ENDDO
 C
@@ -146,9 +141,9 @@ C
           ALLOCATE(MS_PENA(0))
         ENDIF
 C
-C-- For parithoff inertia of main node must be saved
-        ALLOCATE(SAV_MINER_POFF(SIZE_MINER_POFF))
-        IF (SIZE_MINER_POFF>0) SAV_MINER_POFF(1:NUMNOD) = IN(1:NUMNOD)
+C-- For parithoff inertia of main and secondary node must be saved
+        ALLOCATE(SAV_INER_POFF(SIZE_INER_POFF))
+        IF (SIZE_INER_POFF>0) SAV_INER_POFF(1:NUMNOD) = IN(1:NUMNOD)
 C
       ENDIF
 C
@@ -168,7 +163,7 @@ C      Calcul flag de rupture pour interface type 2 user
          ENDIF                                           
        ENDDO                                            
 C
-Cel correction pb poff si main dans plusieurs interfaces type2
+C   correction pb poff si main dans plusieurs interfaces type2
       IF (IMACH == 3 .AND. IPARIT == 0) THEN                     
         IF (NHIN2 == 0) THEN                                  
           DO N=1,NINTER                                       
@@ -181,8 +176,8 @@ Cel correction pb poff si main dans plusieurs interfaces type2
               ILAGM = IPARI(33,N)                             
               IF (NTY == 2 .AND. ILAGM == 0)THEN  
                 CALL INT2POFF(                                
-     .   	         IPARI(1,N) ,X        ,V      ,  
-     .   	         A          ,VR       ,AR     ,MS    ,IN    ,          
+     .              IPARI(1,N) ,X        ,V      ,  
+     .              A          ,VR       ,AR     ,MS    ,IN    ,          
      .               WEIGHT     ,STIFN    ,STIFR  ,MCP   ,CONDN , 
      .               FTHE       ,INTBUF_TAB(N)    )               
               ENDIF                                           
@@ -200,9 +195,9 @@ Cel correction pb poff si main dans plusieurs interfaces type2
               ILAGM = IPARI(33,N)                             
               IF (NTY == 2 .AND. ILAGM == 0) THEN 
                 CALL INT2POFFH(                               
-     .   	      IPARI(1,N),X    ,V    ,  
-     .   	      A	  ,VR	,AR   ,MS   ,IN    ,          
-     .   	      WEIGHT    ,STIFN     ,STIFR   ,TAGNOD,INTBUF_TAB(N))        
+     .           IPARI(1,N),X    ,V    ,  
+     .           A    ,VR  ,AR   ,MS   ,IN    ,          
+     .           WEIGHT    ,STIFN     ,STIFR   ,TAGNOD,INTBUF_TAB(N))        
               ENDIF                                           
             ENDIF                                             
           ENDDO                                               
@@ -264,7 +259,7 @@ C---
      5       FSAV(1,N) ,FNCONT   ,NODNX_SMS,DMINT2(KSN)  ,SAV_FOR_PENA,
      6       MS_PENA   ,DT2T     ,NELTST   ,ITYPTST ,INTBUF_TAB(N),TEMP,
      7       FTHE      ,FTHESKYI2,CONDN    ,CONDNSKYI2,ITAB,
-     8       SAV_MINER_POFF     ,H3D_DATA,T2FAC_SMS,FNCONTP ,
+     8       SAV_INER_POFF     ,H3D_DATA,T2FAC_SMS,FNCONTP ,
      A       FTCONTP)
             ELSE
         !       WARNING : if NSN==0 and ILEV==2 or 4, ones needs to save the mass 
@@ -302,8 +297,7 @@ C---
         IF(IDT_THERM == 1) I2SIZETH = I2SIZETH + 1
       ELSE
           I2SIZETH = I2SIZE  
-      ENDIF
-                                                           
+      ENDIF                                                           
 C------------------------------------------------------------
       IF (IMACH == 3 .AND. I2OK == 1) THEN
 C version spmd avec plus d'1 proc : sommer A et AR sur les noeuds main
@@ -314,12 +308,14 @@ C version spmd avec plus d'1 proc : sommer A et AR sur les noeuds main
               CALL SPMD_EXCH_A_INT2_AMS(
      .            A    ,AR   ,MS      ,IN     ,STIFN,
      .            STIFR,FR_I2M,IAD_I2M,LCOMI2M,I2SIZETH,
-     .            NB_FRI2M,FR_LOCI2M,INTTH2,FTHE,CONDN)
+     .            NB_FRI2M,FR_LOCI2M,INTTH2,FTHE,CONDN,
+     .            FNCONT,FNCONTP,FTCONTP,H3D_DATA)
             ELSE
               CALL SPMD_EXCH_A_INT2(
      .            A    ,AR   ,MS      ,IN     ,STIFN,
      .            STIFR,FR_I2M,IAD_I2M,LCOMI2M,I2SIZETH,
-     .            INTTH2,FTHE,CONDN)
+     .            INTTH2,FTHE ,CONDN  ,FNCONT ,FNCONTP ,
+     .            FTCONTP,H3D_DATA )
              ENDIF
           ELSE
             LCOMI2M = IAD_I2M(NSPMD+1)
@@ -328,12 +324,13 @@ C version spmd avec plus d'1 proc : sommer A et AR sur les noeuds main
      .         A    ,AR   ,MS      ,IN     ,STIFN,
      .         STIFR,FR_I2M,IAD_I2M,LCOMI2M,I2SIZETH,
      .         NB_FRI2M,FR_LOCI2M,TAGNOD,INTTH2,FTHE,
-     .         CONDN)
+     .         CONDN,FNCONT,FNCONTP,FTCONTP,H3D_DATA )
             ELSE
               CALL SPMD_EXCH_A_INT2H(
      .         A    ,AR   ,MS      ,IN     ,STIFN,
      .         STIFR,FR_I2M,IAD_I2M,LCOMI2M,I2SIZETH,
-     .         TAGNOD,INTTH2,FTHE,CONDN)
+     .         TAGNOD,INTTH2,FTHE  ,CONDN  ,FNCONT  ,
+     .         FNCONTP,FTCONTP,H3D_DATA )
             ENDIF
           END IF
         ELSEIF (IPARIT > 0) THEN
@@ -341,10 +338,12 @@ C         version spmd p/on
           IF (NSPMD > 1) THEN
             LENS = FR_NBCCI2(1,NSPMD+1)
             LENR = FR_NBCCI2(2,NSPMD+1)
+            LCOMI2M = IAD_I2M(NSPMD+1)
             CALL SPMD_EXCH_A_INT2_PON(
-     1         FR_I2M,IAD_I2M,ADDCNI2,PROCNI2,FR_NBCCI2,
-     2         I2SIZETH,LENR   ,LENS   ,FSKYI2,INTTH2,
-     3         FTHESKYI2,CONDNSKYI2 ,I2SIZE)
+     1         FR_I2M  ,IAD_I2M,ADDCNI2,PROCNI2,FR_NBCCI2,
+     2         I2SIZETH,LENR   ,LENS   ,FSKYI2 ,INTTH2   ,
+     3         FTHESKYI2,CONDNSKYI2 ,I2SIZE,LCOMI2M,FNCONT,
+     4         FNCONTP,FTCONTP,H3D_DATA )
           END IF
 C
 C Routine assemblage parith/ON

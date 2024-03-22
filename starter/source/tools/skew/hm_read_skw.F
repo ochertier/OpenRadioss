@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  HM_READ_SKW                   source/tools/skew/hm_read_skw.F
 Chd|-- called by -----------
@@ -62,17 +62,13 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr17_c.inc"
-#include      "scr03_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com10_c.inc"
 #include      "sphcom.inc"
 #include      "units_c.inc"
 #include      "titr_c.inc"
-#include      "warn_c.inc"
 #include      "param_c.inc"
-#include      "submod_c.inc"
-#include      "sysunit.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -148,7 +144,7 @@ C--------------------------------------------------
       IMOV  = 0
 C
       IFLAGUNIT = 0
-      DO J=1,NUNITS
+      DO J=1,UNITAB%NUNITS
         IF (UNITAB%UNIT_ID(J) == UID) THEN                 
           IFLAGUNIT = 1
           EXIT
@@ -550,7 +546,7 @@ C          not a user's defined skew.
         ENDDO
       ENDIF
 C-------------------------------------------------------------
-Csv begin   building SKEWS for SUBMODEL (Rotation Transformation)
+C   begin   building SKEWS for SUBMODEL (Rotation Transformation)
 C-------------------------------------------------------------
       IF(NSUBMOD/=0)THEN
         WRITE (IOUT,'(A)')TITRE(118)
@@ -599,7 +595,7 @@ C-------------------------------------------------------------
           IF(LSUBMODEL(IDSUB)%NBTRANS /=0)
      .      CALL SUBROTPOINT(SKEW(10,J),SKEW(11,J),SKEW(12,J),
      .        RTRANS,LSUBMODEL(IDSUB)%NOSUBMOD,LSUBMODEL)
-Csv          not a user's defined skew.
+C            not a user's defined skew.
              ISKN(4,J)=1000000001 + (J-NUMSKW-NUMSPH_TMP-2)
           WRITE(IOUT,'(1X,I10,1X,3F16.7,3F16.7)')ISKN(4,J),
      .                (SKEW(K,J),K=1,3),(SKEW(K,J),K=10,12)

@@ -1,31 +1,32 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  HM_MESSAGES                   source/devtools/hm_reader/hm_messages.F
 Chd|-- called by -----------
 Chd|        STARTER0                      source/starter/starter0.F     
 Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
+Chd|        HM_OPTION_COUNT               source/devtools/hm_reader/hm_option_count.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
       SUBROUTINE HM_MESSAGES(IS_DYNA)
@@ -51,9 +52,6 @@ C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "nchar_c.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "units_c.inc"
@@ -68,7 +66,7 @@ C-----------------------------------------------
       INTEGER  I,J,NBMESSAGES,MSG_ID,MSG_TYPE,LINE_NB
       CHARACTER*ncharline FILE_NAME 
       CHARACTER*1000 MSG_DESCR,MSG_BLOCK,MSG_LINE
-      INTEGER  IS_READER_KO,FILE_END
+      INTEGER  IS_READER_KO,FILE_END,NB_INCLUDE_DYNA
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
@@ -82,7 +80,6 @@ C=======================================================================
       IS_READER_KO = 0
 C--------------------------------------------------
 C BROWSE MESSAGES
-C--------------------------------------------------
 C--------------------------------------------------
 C RADIOSS INPUT FORMAT READING MESSAGES ( SYNTAX PB)
 C--------------------------------------------------
@@ -162,10 +159,22 @@ C OUTPUT MESSAGE IN RADIOSS 0.out FILE
         ENDIF
       ENDDO
 C--------------------------------------------------
+C CHECK FOR SEVERAL /INCLUDE_DYNA
+C--------------------------------------------------
+      NB_INCLUDE_DYNA = 0
+      CALL HM_OPTION_COUNT('/INCLUDE_LS-DYNA', NB_INCLUDE_DYNA)
+      IF (NB_INCLUDE_DYNA > 1) THEN
+        CALL ANCMSG(MSGID=3006,
+     .    MSGTYPE=MSGERROR,
+     .    ANMODE=ANINFO)
+        IS_READER_KO = IS_READER_KO + 1
+      ENDIF
+C--------------------------------------------------
 C LS-DYNA INPUT FORMAT READING MESSAGES ( SYNTAX PB)
 C--------------------------------------------------
 C GET NUMBER OF MESSAGES
       IF(IS_DYNA == 1) THEN
+        NBMESSAGES = 0
         CALL CPP_GET_MESSAGE_NUMBER_DYNA(NBMESSAGES)
         DO I=1,NBMESSAGES
           MSG_ID = 0

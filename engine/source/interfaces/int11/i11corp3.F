@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  I11CORP3                      source/interfaces/int11/i11corp3.F
 Chd|-- called by -----------
@@ -53,9 +53,6 @@ C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IRECTS(2,*),IRECTM(2,*), CAND_E(*), CAND_N(*),
@@ -72,9 +69,6 @@ C     REAL
      .   VYM2(MVSIZ),VZM2(MVSIZ),DXS1(MVSIZ),DYS1(MVSIZ),DZS1(MVSIZ),
      .   DXS2(MVSIZ),DYS2(MVSIZ),DZS2(MVSIZ),DXM1(MVSIZ),DYM1(MVSIZ),
      .   DZM1(MVSIZ),DXM2(MVSIZ),DYM2(MVSIZ),DZM2(MVSIZ)
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -115,23 +109,23 @@ C
            MM1(JLT_NEW) = MS(M1(JLT_NEW))
            MM2(JLT_NEW) = MS(M2(JLT_NEW))
 C
-	   NS=IND_INT(NIN)%P(NN)
- 	   NE=SHF_INT(NIN)+JLT_NEW+LREM
+             NS=IND_INT(NIN)%P(NN)
+             NE=SHF_INT(NIN)+JLT_NEW+LREM
            HS1(JLT_NEW)  = H_E(1,NE)
            HS2(JLT_NEW)  = H_E(2,NE)
            HM1(JLT_NEW)  = H_E(3,NE)
            HM2(JLT_NEW)  = H_E(4,NE)
-	   STIF(JLT_NEW)=STIFS(NE)
-	   NX(JLT_NEW)=N_E(1,NE)
-	   NY(JLT_NEW)=N_E(2,NE)
-	   NZ(JLT_NEW)=N_E(3,NE)
+             STIF(JLT_NEW)=STIFS(NE)
+             NX(JLT_NEW)=N_E(1,NE)
+             NY(JLT_NEW)=N_E(2,NE)
+             NZ(JLT_NEW)=N_E(3,NE)
 C----------displacement
-	   DXS1(JLT_NEW)=DFI(1,NS)
-	   DYS1(JLT_NEW)=DFI(2,NS)
-	   DZS1(JLT_NEW)=DFI(3,NS)
-	   DXS2(JLT_NEW)=DFI(1,NS+1)
-	   DYS2(JLT_NEW)=DFI(2,NS+1)
-	   DZS2(JLT_NEW)=DFI(3,NS+1)
+             DXS1(JLT_NEW)=DFI(1,NS)
+             DYS1(JLT_NEW)=DFI(2,NS)
+             DZS1(JLT_NEW)=DFI(3,NS)
+             DXS2(JLT_NEW)=DFI(1,NS+1)
+             DYS2(JLT_NEW)=DFI(2,NS+1)
+             DZS2(JLT_NEW)=DFI(3,NS+1)
            N1(JLT_NEW)=NS
            N2(JLT_NEW)=NS+1
 C
@@ -166,9 +160,6 @@ C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER CAND_N(*),JLT,NIN,NRTS,IUPD
@@ -180,9 +171,6 @@ C     REAL
      .   XXS1(MVSIZ), XXS2(MVSIZ), XYS1(MVSIZ), XYS2(MVSIZ),
      .   XZS1(MVSIZ), XZS2(MVSIZ),D(3,*)
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I ,J  ,NI, L, NN, NS ,NE,NN1,NN2
@@ -192,23 +180,23 @@ C
          NI = CAND_N(I)
          IF(NI>NRTS)THEN
            NN = NI - NRTS
-	   NS=IND_INT(NIN)%P(NN)
+             NS=IND_INT(NIN)%P(NN)
 C----------displacement
-	   DXS1(I)=DFI(1,NS)
-	   DYS1(I)=DFI(2,NS)
-	   DZS1(I)=DFI(3,NS)
-	   DXS2(I)=DFI(1,NS+1)
-	   DYS2(I)=DFI(2,NS+1)
-	   DZS2(I)=DFI(3,NS+1)
-	 ELSE
-	  NN1 = N1(I)
-	  NN2 = N2(I)
-	  DXS1(I) = D(1,NN1)
-	  DYS1(I) = D(2,NN1)
-	  DZS1(I) = D(3,NN1)
-	  DXS2(I) = D(1,NN2)
-	  DYS2(I) = D(2,NN2)
-	  DZS2(I) = D(3,NN2)
+             DXS1(I)=DFI(1,NS)
+             DYS1(I)=DFI(2,NS)
+             DZS1(I)=DFI(3,NS)
+             DXS2(I)=DFI(1,NS+1)
+             DYS2(I)=DFI(2,NS+1)
+             DZS2(I)=DFI(3,NS+1)
+           ELSE
+            NN1 = N1(I)
+            NN2 = N2(I)
+            DXS1(I) = D(1,NN1)
+            DYS1(I) = D(2,NN1)
+            DZS1(I) = D(3,NN1)
+            DXS2(I) = D(1,NN2)
+            DYS2(I) = D(2,NN2)
+            DZS2(I) = D(3,NN2)
          END IF
 C----------update
          IF(IUPD>0.AND.NI>NRTS)THEN

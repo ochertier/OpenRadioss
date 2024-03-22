@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  R3DEF3                        source/elements/spring/r3def3.F
 Chd|-- called by -----------
@@ -31,15 +31,18 @@ Chd|        INTERFACE_TABLE_MOD           share/modules/table_mod.F
 Chd|        TABLE_MOD                     share/modules/table_mod.F     
 Chd|====================================================================
       SUBROUTINE R3DEF3(
-     1                  GEO    ,F     ,AL0    ,E     ,DL     ,
-     2                  NPF    ,TF    ,OFF    ,DPL   ,FEP    ,
-     3                  DPX2   ,DFS   ,V      ,IXR   ,DF     ,
-     4                  ANIM   ,IPOS  ,FR_WAVE,IGEO  ,AL0_ERR,
-     5                  X1DP   ,X2DP  ,X3DP   ,YIELD ,TABLE  ,
-     6                  INIFRIC,NGL   ,MGN    ,EX    ,EY     ,
-     7                  EZ     ,XK    ,XM     ,XC    ,AK     ,
-     8                  EX2    ,EY2   ,EZ2    ,NC1   ,NC2    ,
-     9                  NC3    ,NUVAR ,UVAR   ,DL0   )
+     1   GEO,     F,       AL0,     E,
+     2   DL,      NPF,     TF,      OFF,
+     3   DPL,     FEP,     DPX2,    DFS,
+     4   V,       IXR,     DF,      ANIM,
+     5   IPOS,    FR_WAVE, IGEO,    AL0_ERR,
+     6   X1DP,    X2DP,    X3DP,    YIELD,
+     7   TABLE,   INIFRIC, NGL,     MGN,
+     8   EX,      EY,      EZ,      XK,
+     9   XM,      XC,      AK,      EX2,
+     A   EY2,     EZ2,     NC1,     NC2,
+     B   NC3,     NUVAR,   UVAR,    DL0,
+     C   NEL,     NFT)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -62,14 +65,14 @@ C-----------------------------------------------
 #include      "param_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
-#include      "scr03_c.inc"
 #include      "scr14_c.inc"
-#include      "vect01_c.inc"
 #include      "com01_c.inc"
 #include      "impl1_c.inc" 
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: NFT
+      INTEGER, INTENT(IN) :: NEL
       INTEGER NPF(*),IXR(NIXR,*),IGEO(NPROPGI,*),NGL(*),MGN(*),
      .        NC1(*),NC2(*),NC3(*),NUVAR
 C     REAL
@@ -109,7 +112,7 @@ C-----------------------------------------------
 C
       NOT_USED = ZERO
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         EPLA(I) = ZERO
         IPID = MGN(I)
         XM(I)  =GEO(1,IPID)
@@ -138,7 +141,7 @@ C
         YSCALF(I)= GEO(140,IPID)
       ENDDO
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         EXDP(I)=X2DP(1,I)-X1DP(1,I)
         EYDP(I)=X2DP(2,I)-X1DP(2,I)
         EZDP(I)=X2DP(3,I)-X1DP(3,I)
@@ -149,12 +152,12 @@ C
       ENDDO
 C
       IF (INISPRI /= 0 .and. TT == ZERO) THEN
-        DO I=LFT,LLT
+        DO I=1,NEL
           DLOLD(I)=DL0(I)
         ENDDO
       ENDIF
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         AL1DP(I)=SQRT(EXDP(I)*EXDP(I)+EYDP(I)*EYDP(I)+EZDP(I)*EZDP(I))
         AL2DP(I)=SQRT(EX2DP(I)*EX2DP(I)+EY2DP(I)*EY2DP(I)+
      .                                  EZ2DP(I)*EZ2DP(I))
@@ -169,7 +172,7 @@ C
         EZ2DP(I)= EZ2DP(I)/AL2DP(I)
       ENDDO
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         EX(I) = EXDP(I) 
         EY(I) = EYDP(I) 
         EZ(I) = EZDP(I) 
@@ -179,7 +182,7 @@ C
       ENDDO
 !
       IF (INISPRI /= 0 .and. TT == ZERO) THEN
-        DO I=LFT,LLT
+        DO I=1,NEL
           XL0(I)= AL0(I)
 ! if not initialized length
           IF (XL0(I) == ZERO) XL0(I) = ALDP(I)
@@ -187,37 +190,37 @@ C
       ENDIF
 !
       IF (TT == ZERO) THEN
-        DO I=LFT,LLT
+        DO I=1,NEL
           AL0(I)= ALDP(I)               ! cast double vers My_real
         ENDDO
       ENDIF
 C
       IF (SCODVER >= 101) THEN
         IF (TT == ZERO) THEN
-          DO I=LFT,LLT
+          DO I=1,NEL
             AL0_ERR(I)=ALDP(I)-AL0(I)     ! difference entre double et My_real
           ENDDO
         ENDIF
       ENDIF
 !
       IF ( INISPRI /= 0 .and. TT == ZERO) THEN
-        DO I=LFT,LLT
+        DO I=1,NEL
           AL0(I)= XL0(I)
         ENDDO
       ENDIF
 !
-      DO I=LFT,LLT
+      DO I=1,NEL
         AL0DP(I)= AL0(I)                ! cast My_real en double
       ENDDO
 !
       IF (SCODVER >= 101) THEN
-        DO I=LFT,LLT
+        DO I=1,NEL
           AL0DP(I)= AL0DP(I)+AL0_ERR(I)   ! AL_DP doit   tre recalcul   ainsi afin de garantir la coh  rence absolue entre AL0_DP et AL_DP
         ENDDO
       ENDIF
 C
       IF (ISMDISP > 0) THEN
-        DO I=LFT,LLT
+        DO I=1,NEL
           VX21= V(1,NC2(I)) - V(1,NC1(I)) 
           VY21= V(2,NC2(I)) - V(2,NC1(I)) 
           VZ21= V(3,NC2(I)) - V(3,NC1(I)) 
@@ -229,12 +232,12 @@ C
           DL(I)= DLOLD(I)+(VL21+VL32)*DT1
         ENDDO
       ELSE
-        DO I=LFT,LLT
+        DO I=1,NEL
           DL(I)= (ALDP(I)-AL0DP(I))
         ENDDO
       ENDIF !(ISMDISP>0) THEN
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         ILENG=NINT(GEO(93,MGN(I)))
         IF (ILENG /= 0) THEN
           XL0(I)=AL0DP(I)
@@ -243,16 +246,20 @@ C
         ENDIF
       ENDDO
 C
-      CALL REDEF3(F       ,XK     ,DL    ,FEP        ,DLOLD ,
-     .            DPL     ,TF     ,NPF   ,XC         ,OFF   ,
-     .            E       ,DPX2   ,ANIM  ,ANIM_FE(11),IPOS  ,
-     .            FR_WAVE ,XL0    ,DMN   ,DMX        ,DV    ,
-     .            FF      ,LSCALE ,EE    ,GF3        ,IFUNC3,
-     .            YIELD   ,ALDP   ,AK    ,B          ,D     ,
-     .            IECROU  ,IFUNC  ,IFV   ,IFUNC2     ,EPLA  ,
-     .            UVAR(1,1),NOT_USED,NOT_USED,NOT_USED)
+      CALL REDEF3(
+     1   F,          XK,         DL,         FEP,
+     2   DLOLD,      DPL,        TF,         NPF,
+     3   XC,         OFF,        E,          DPX2,
+     4   ANIM,       ANIM_FE(11),IPOS,       FR_WAVE,
+     5   XL0,        DMN,        DMX,        DV,
+     6   FF,         LSCALE,     EE,         GF3,
+     7   IFUNC3,     YIELD,      ALDP,       AK,
+     8   B,          D,          IECROU,     IFUNC,
+     9   IFV,        IFUNC2,     EPLA,       UVAR(1,1),
+     A   NOT_USED,   NOT_USED,   NOT_USED,   NEL,
+     B   NFT)
       NINDX = 0
-      DO I=LFT,LLT
+      DO I=1,NEL
         IF (OFF(I) == ONE .AND. DMX(I) /= ZERO .AND. DMN(I) /= ZERO) THEN
           IF (DL(I) > DMX(I) .OR. DL(I) < DMN(I)) THEN
             OFF(I)=ZERO
@@ -271,14 +278,14 @@ C
 #include "lockoff.inc"
       ENDDO
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         XM(I)=XM(I)*XL0(I)
         XK(I)=XK(I)/XL0(I)
 C--- for time step compute adding +max slope of h
         XC(I)=(XC(I)+GEO(141,MGN(I)))/XL0(I)
       ENDDO
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         IF (IFRIC(I) == 0) THEN ! old approach
           IF (ITABF(I) > ZERO) THEN
             DDX =  EXDP(I) * (V(1,NC2(I)) - V(1,NC1(I)))
@@ -363,7 +370,7 @@ C---
             DF(I)= ZERO
           ENDIF ! IF (ITABF(I) > ZERO)
         ENDIF ! IF (IFRIC(I) == 0)
-      ENDDO ! DO I=LFT,LLT
+      ENDDO ! DO I=1,NEL
 C---
  1000 FORMAT(1X,'-- RUPTURE OF SPRING ELEMENT NUMBER ',I10)
  1100 FORMAT(1X,'-- RUPTURE OF SPRING ELEMENT :',I10,' AT TIME :',G11.4)

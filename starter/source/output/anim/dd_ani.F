@@ -1,38 +1,39 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  DD_ANI                        source/output/anim/dd_ani.F   
 Chd|-- called by -----------
 Chd|        DOMDEC1                       source/spmd/domain_decomposition/domdec1.F
 Chd|-- calls ---------------
-Chd|        CLOSE_C                       source/output/tools/write_routines.c
-Chd|        CUR_FIL_C                     source/output/tools/write_routines.c
+Chd|        CLOSE_C                       ../common_source/tools/input_output/write_routtines.c
+Chd|        CUR_FIL_C                     ../common_source/tools/input_output/write_routtines.c
+Chd|        OPEN_C                        ../common_source/tools/input_output/write_routtines.c
 Chd|        PARSOR                        source/output/anim/parsor.F   
 Chd|        SCANOR                        source/output/anim/scanor.F   
 Chd|        SLAGCNT                       source/output/anim/slagcnt.F  
-Chd|        WRITE_C_C                     source/output/tools/write_routines.c
-Chd|        WRITE_I_C                     source/output/tools/write_routines.c
-Chd|        WRITE_R_C                     source/output/tools/write_routines.c
+Chd|        WRITE_C_C                     ../common_source/tools/input_output/write_routtines.c
+Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
+Chd|        WRITE_R_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|        XYZNOD                        source/output/anim/xyznod.F   
 Chd|        XYZNOR                        source/output/anim/xyznor.F   
 Chd|        INOUTFILE_MOD                 ../common_source/modules/inoutfile_mod.F
@@ -56,19 +57,14 @@ C-----------------------------------------------
 #include      "scr15_c.inc"
 #include      "param_c.inc"
 #include      "units_c.inc"
-#include      "r4r8_p.inc"
 #include      "sphcom.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-C     REAL
       my_real
      .   X(*)
       INTEGER IXS(*),IXQ(*),IXC(*),KXSP(NISP,*),IXSP(KVOISPH,*),
      .        IXTG(*),IXT(*),IXP(*),IXR(*),IPARG(NPARG,*)
-C-----------------------------------------------
-C   F u n c t i o n
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -80,7 +76,6 @@ C-----------------------------------------------
       INTEGER I, NBF, NBPART, MAGIC, J, FILEN,NNSLAG,
      .        IANIM, NBCSPH, N1, N2,
      .        CTEXT(81),IB,PROC
-C     REAL
       my_real
      .        CDG(3), S3000, SCALE,BUFEL(1)
       REAL R4
@@ -93,13 +88,13 @@ C
       NBCSPH = 0
       DO I = 1, NUMSPH
 C maillage hexagonal compact => 12 voisins les + proches
-	DO J = 1,MIN(12,KXSP(4,I))
-	  N1 = KXSP(3,I)
-	  N2 = IXSP(J,I)
-	  IF(N1<N2) THEN
-	    NBCSPH = NBCSPH + 1
-	  END IF
-	END DO
+          DO J = 1,MIN(12,KXSP(4,I))
+            N1 = KXSP(3,I)
+            N2 = IXSP(J,I)
+            IF(N1<N2) THEN
+              NBCSPH = NBCSPH + 1
+            END IF
+          END DO
       END DO
 C---------- -------------------------------------
 C   INIT SPECIAL STARTER

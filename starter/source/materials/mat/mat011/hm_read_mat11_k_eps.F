@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  HM_READ_MAT11_K_EPS           source/materials/mat/mat011/hm_read_mat11_k_eps.F
 Chd|-- called by -----------
@@ -30,13 +30,17 @@ Chd|        HM_GET_FLOATV                 source/devtools/hm_reader/hm_get_float
 Chd|        HM_GET_FLOATV_DIM             source/devtools/hm_reader/hm_get_floatv_dim.F
 Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
 Chd|        HM_OPTION_IS_ENCRYPTED        source/devtools/hm_reader/hm_option_is_encrypted.F
+Chd|        INIT_MAT_KEYWORD              source/materials/mat/init_mat_keyword.F
 Chd|        USR2SYS                       source/system/sysfus.F        
+Chd|        ALEFVM_MOD                    ../common_source/modules/ale/alefvm_mod.F
+Chd|        ALE_MOD                       ../common_source/modules/ale/ale_mod.F
 Chd|        ELBUFTAG_MOD                  share/modules1/elbuftag_mod.F 
+Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
       SUBROUTINE HM_READ_MAT11_K_EPS(LSUBMODEL, MTAG, UNITAB, IPM, PM, 
-     .     MAT_ID, TITR)
+     .     MAT_ID, TITR, MATPARAM)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -44,6 +48,9 @@ C-----------------------------------------------
       USE ELBUFTAG_MOD            
       USE MESSAGE_MOD
       USE SUBMODEL_MOD
+      USE ALEFVM_MOD
+      USE ALE_MOD
+      USE MATPARAM_DEF_MOD 
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -52,12 +59,8 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "units_c.inc"
-#include      "scr03_c.inc"
 #include      "scr17_c.inc"
 #include      "param_c.inc"
-#include      "warn_c.inc"
-#include      "sysunit.inc"
-#include      "alesolver.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -68,6 +71,7 @@ C-----------------------------------------------
       TYPE(MLAW_TAG_), INTENT(INOUT)               :: MTAG
       INTEGER, DIMENSION(NPROPMI) ,INTENT(INOUT)   :: IPM
       my_real, DIMENSION(NPROPM)  ,INTENT(INOUT)   :: PM
+      TYPE(MATPARAM_STRUCT_),INTENT(INOUT)         :: MATPARAM
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C-----------------------------------------------
@@ -112,7 +116,7 @@ C     Initial and reference density
       ENDIF
       PM(1) = RHOR
       PM(89) = RHO0 
-      IS_BOUNDARY_MATERIAL = .TRUE.
+      ALE%GLOBAL%IS_BOUNDARY_MATERIAL = .TRUE.
 C    
       CARL     = ZERO
       T0       = ZERO
@@ -251,13 +255,13 @@ C     Already exited at input reading
 C----------------------
 C     PRINTOUT
 C----------------------
-      WRITE(IOUT, 800) TRIM(TITR),MAT_ID,11
+      WRITE(IOUT,800)TRIM(TITR),MAT_ID,11
       IF(IS_ENCRYPTED)THEN
          WRITE(IOUT,900)
          WRITE(IOUT,'(5X,A,//)')'CONFIDENTIAL DATA'
       ELSE
          WRITE(IOUT,1000)ITYP,PSH,TSCAL
-         WRITE(IOUT, 850) RHO0, RHOR
+         WRITE(IOUT,850) RHO0,RHOR
          SELECT CASE(ITYP)
          CASE(0)
             WRITE(IOUT,1100)GAM,P0,E0,VCRT,RCRT,PCRT,INOD
@@ -328,6 +332,14 @@ C----------------------
       MTAG%L_RE    = 1   ! NB12   
       MTAG%L_VK    = 1   ! NB13   
       MTAG%L_EINS  = 1   ! NB14   
+
+      ! EOS/Thermo keyword for pressure treatment in elements
+      CALL INIT_MAT_KEYWORD(MATPARAM,"HYDRO_EOS")
+
+      CALL INIT_MAT_KEYWORD(MATPARAM,"INCOMPRESSIBLE")
+
+      ! Properties compatibility
+      CALL INIT_MAT_KEYWORD(MATPARAM,"SOLID_ISOTROPIC")
 C--------------------------------
       RETURN
       
@@ -339,8 +351,8 @@ C----------------------
      & 5X,'MATERIAL NUMBER. . . . . . . . . . . . . . .=',I10/,
      & 5X,'MATERIAL LAW . . . . . . . . . . . . . . . .=',I10/)
   850 FORMAT(
-     & 5X,'INITIAL DENSITY    . . . . . . . . . . . . .=',1PG20.13/,
-     & 5X,'EOS REFERENCE DENSITY. . . . . . . . . . . .=',1PG20.13/)
+     & 5X,'INITIAL DENSITY . . . . . . . . . . . .=',1PG20.13/,
+     & 5X,'REFERENCE DENSITY . . . . . . . . . . .=',1PG20.13/)
   900 FORMAT(
      & 5X,40H  LAW FOR FLUID BOUNDARY ELEMENTS       ,/,
      & 5X,40H  -------------------------------       ,/)

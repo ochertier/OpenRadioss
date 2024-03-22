@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  RGRHEAD                       source/elements/spring/rgrhead.F
 Chd|-- called by -----------
@@ -35,7 +35,7 @@ Chd|====================================================================
      2       ITR1    ,EADD   ,INDEX  ,ITRI     ,
      3       IPARTR  ,ND     ,IGRSURF,IGRSPRING,
      4       CEP     ,XEP    ,IRESOFF,TAGPRT_SMS, CLUSTERS,
-     5       IPM     ,R_SKEW)
+     5       IPM     ,R_SKEW ,ITAGPRLD_SPRING)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -64,17 +64,10 @@ C-----------------------------------------------
 C   C O M M O N   B L O C K S
 C-----------------------------------------------
 #include      "vect01_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com10_c.inc"
-#include      "units_c.inc"
 #include      "param_c.inc"
-#include      "warn_c.inc"
-#include      "scr03_c.inc"
 #include      "scr05_c.inc"
-#include      "scr21_c.inc"
 #include      "sms_c.inc"
-#include      "scr17_c.inc"
 C-----------------------------------------------
 C   D U M M Y   A R G U M E N T S
 C-----------------------------------------------
@@ -85,6 +78,7 @@ C-----------------------------------------------
 C     REAL OU REAL*8
       my_real
      .    GEO(NPROPG,*)
+      INTEGER ,INTENT(INOUT), DIMENSION(NUMELR) ::ITAGPRLD_SPRING
 C-----------------------------------------------
       TYPE (GROUP_)  , DIMENSION(NGRSPRI)  :: IGRSPRING
       TYPE (SURF_)   , DIMENSION(NSURF)    :: IGRSURF
@@ -95,7 +89,7 @@ C-----------------------------------------------
       INTEGER 
      .        I, K, NG, ISSN, NPN, NN, N, MID, PID ,
      .        II, J, II3,JJ3,II2,JJ2,JJ,L,II4,JJ4,IGTYP,
-     .        IFLAG_GTYP,
+     .        IFLAG_GTYP,IPRLD,
      .        MSKMTN,MSKISN,MSKPID, MODE, WORK(70000)
       EXTERNAL MY_SHIFTL,MY_SHIFTR,MY_AND
       INTEGER MY_SHIFTL,MY_SHIFTR,MY_AND
@@ -148,7 +142,9 @@ C
           IFLAG_GTYP = 1
           MID = IXR(5,II)  
           MTN = IPM(2,MID)      
-        ENDIF  
+        ENDIF
+        IPRLD = ITAGPRLD_SPRING(II)
+        IF (IPRLD>0) IFLAG_GTYP = 1+IPRLD
           
 !!        MID = 0
 !!        IF(IGTYP == 23) MID = IXR(5,II)
@@ -245,6 +241,11 @@ C
         ENDDO
       ENDDO
 
+C REORDERING FOR ITAGPRLD_SPRING
+      DO I=1,NUMELR
+        IF (ITAGPRLD_SPRING(I) ==0) CYCLE
+        ITAGPRLD_SPRING(I) = ITR1(ITAGPRLD_SPRING(I))
+      ENDDO
 C--------------------------------------------------------------
 C         DETERMINATION DES SUPER_GROUPES
 C--------------------------------------------------------------

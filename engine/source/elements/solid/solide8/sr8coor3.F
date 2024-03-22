@@ -1,32 +1,32 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  SR8COOR3                      source/elements/solid/solide8/sr8coor3.F
 Chd|-- called by -----------
 Chd|        S8FORC3                       source/elements/solid/solide8/s8forc3.F
 Chd|-- calls ---------------
 Chd|        SORTHO3                       source/elements/solid/solide/sortho3.F
-Chd|        SREPISOT3                     source/elements/solid/solide/srepiso3.F
+Chd|        SREPISOT3                     source/elements/solid/solide/srepisot3.F
 Chd|====================================================================
       SUBROUTINE SR8COOR3(OFFG,OFF,X,V,IXS,
      .                   XLOC,YLOC,ZLOC,VXLOC,VYLOC,VZLOC,
@@ -46,7 +46,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "vect01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -90,7 +89,7 @@ C
      .   XL, YL, ZL, VXL, VYL, VZL, OFF_L
 C=======================================================================
       OFF_L  = ZERO
-      DO 10 I=LFT,LLT
+      DO 10 I=1,NEL
       NGL(I)=IXS(11,I)
       MXT(I)=IXS(1,I)
       PID(I)=IXS(10,I)
@@ -106,7 +105,7 @@ C
 C----------------------------
 C     NODAL COORDINATES     |
 C----------------------------
-      DO I=LFT,LLT
+      DO I=1,NEL
         X1(I)=X(1,NC(1,I))
         Y1(I)=X(2,NC(1,I))
         Z1(I)=X(3,NC(1,I))
@@ -133,7 +132,7 @@ C----------------------------
         Z8(I)=X(3,NC(8,I))
       ENDDO
 C-----------
-      DO I=LFT,LLT
+      DO I=1,NEL
         VX1(I)=V(1,NC(1,I))
         VY1(I)=V(2,NC(1,I))
         VZ1(I)=V(3,NC(1,I))
@@ -165,7 +164,7 @@ C
 C     Prepare les sorties par PART.
 C-----------
       IF(IOUTPRT/=0)THEN
-       DO I=LFT,LLT
+       DO I=1,NEL
         VGAX(I)=VX1(I)+VX2(I)+VX3(I)+VX4(I)+VX5(I)+VX6(I)+VX7(I)+VX8(I)
         VGAY(I)=VY1(I)+VY2(I)+VY3(I)+VY4(I)+VY5(I)+VY6(I)+VY7(I)+VY8(I)
         VGAZ(I)=VZ1(I)+VZ2(I)+VZ3(I)+VZ4(I)+VZ5(I)+VZ6(I)+VZ7(I)+VZ8(I)
@@ -177,7 +176,7 @@ C-----------
      5         +VZ5(I)*VZ5(I)+VZ6(I)*VZ6(I)+VZ7(I)*VZ7(I)+VZ8(I)*VZ8(I)
        ENDDO
        IF(IPARG(80)==1) THEN
-         DO I=LFT,LLT
+         DO I=1,NEL
           XGAX(I)=X1(I)+X2(I)+X3(I)+X4(I)+X5(I)+X6(I)+X7(I)+X8(I)
           XGAY(I)=Y1(I)+Y2(I)+Y3(I)+Y4(I)+Y5(I)+Y6(I)+Y7(I)+Y8(I)
           XGAZ(I)=Z1(I)+Z2(I)+Z3(I)+Z4(I)+Z5(I)+Z6(I)+Z7(I)+Z8(I)
@@ -201,18 +200,26 @@ C-----------
 C     REPERE CONVECTE (ITERATIONS).
 C-----------
       CALL SREPISOT3(
-     .       X1, X2, X3, X4, X5, X6, X7, X8,
-     .       Y1, Y2, Y3, Y4, Y5, Y6, Y7, Y8,
-     .       Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8,
-     .       RX, RY, RZ, SX, SY, SZ, TX, TY, TZ )
+     1   X1,      X2,      X3,      X4,
+     2   X5,      X6,      X7,      X8,
+     3   Y1,      Y2,      Y3,      Y4,
+     4   Y5,      Y6,      Y7,      Y8,
+     5   Z1,      Z2,      Z3,      Z4,
+     6   Z5,      Z6,      Z7,      Z8,
+     7   RX,      RY,      RZ,      SX,
+     8   SY,      SZ,      TX,      TY,
+     9   TZ,      NEL)
       CALL SORTHO3(
-     .       RX , RY , RZ , SX , SY , SZ , TX , TY , TZ ,
-     .       R11, R12, R13, R21, R22, R23, R31, R32, R33)
+     1   RX,      RY,      RZ,      SX,
+     2   SY,      SZ,      TX,      TY,
+     3   TZ,      R11,     R12,     R13,
+     4   R21,     R22,     R23,     R31,
+     5   R32,     R33,     NEL)
 C-----------
 C     PASSAGE AU REPERE CONVECTE.
 C-----------
 C     X=RX' <=> X'=t(R)X chgt de base.
-       DO I=LFT,LLT
+       DO I=1,NEL
         XL=R11(I)*X1(I)+R21(I)*Y1(I)+R31(I)*Z1(I)
         YL=R12(I)*X1(I)+R22(I)*Y1(I)+R32(I)*Z1(I)
         ZL=R13(I)*X1(I)+R23(I)*Y1(I)+R33(I)*Z1(I)
@@ -265,7 +272,7 @@ C     X=RX' <=> X'=t(R)X chgt de base.
 C-----------
 C     PASSAGE AU REPERE CONVECTE.
 C-----------
-       DO I=LFT,LLT
+       DO I=1,NEL
         VXL=R11(I)*VX1(I)+R21(I)*VY1(I)+R31(I)*VZ1(I)
         VYL=R12(I)*VX1(I)+R22(I)*VY1(I)+R32(I)*VZ1(I)
         VZL=R13(I)*VX1(I)+R23(I)*VY1(I)+R33(I)*VZ1(I)
@@ -348,7 +355,7 @@ C
        ENDDO
 C-----------
       IF(OFF_L<0.)THEN
-        DO I=LFT,LLT
+        DO I=1,NEL
           IF(OFFG(I)<0.)THEN
             VXLOC(I,1)=0.
             VYLOC(I,1)=0.

@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  HM_SET                        source/model/sets/hm_set.F    
 Chd|-- called by -----------
@@ -30,6 +30,7 @@ Chd|        CLAUSE_INIT                   source/model/sets/clause_init.F
 Chd|        CREATE_BOX_CLAUSE             source/model/sets/create_box_clause.F
 Chd|        CREATE_ELEMENT_FROM_PART      source/model/sets/create_element_from_part.F
 Chd|        CREATE_ELEM_ALL_CLAUSE        source/model/sets/create_elem_all_clause.F
+Chd|        CREATE_ELLIPSE_CLAUSE         source/model/sets/create_ellipse_clause.F
 Chd|        CREATE_ELT_CLAUSE             source/model/sets/create_element_clause.F
 Chd|        CREATE_LINE_FROM_ELEMENT      source/model/sets/create_line_from_element.F
 Chd|        CREATE_LINE_FROM_SURFACE      source/model/sets/create_line_from_surface.F
@@ -80,7 +81,8 @@ Chd|====================================================================
      .                  IXT      ,IXP       ,IXR       ,IXX      ,KXX       ,
      .                  KXSP     ,IXS20     ,IXS16     ,GEO      ,ITABM1    ,
      .                  IBOX     ,SKEW      ,IPARTQ    ,IPARTT   ,IPARTP    ,
-     .                  IPARTR   ,SUBSET    ,RBY_MSN   )
+     .                  IPARTR   ,SUBSET    ,RBY_MSN   ,ISKN     ,RTRANS    ,
+     .                  UNITAB   ,BUFSF     ,IAD       ,SISKWN   ,SSKEW     )
 C-----------------------------------------------
 C   ROUTINE DESCRIPTION :
 C   ===================
@@ -97,10 +99,6 @@ C     IPARTM1       PART Map table UID -> Internal ID
 C     IGRxxx        Radioss Structures Groups of Nodes, Parts, Elements, Surfaces and lines
 C===========================================================================================
 C-----------------------------------------------
-C   D e f i n i t i o n s 
-C-----------------------------------------------
-#include      "set_def.inc"
-C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE HM_OPTION_READ_MOD
@@ -112,6 +110,8 @@ C-----------------------------------------------
       USE OPTIONDEF_MOD
       USE MESSAGE_MOD
       USE SET_SCRATCH_MOD
+      USE UNITAB_MOD
+      USE CREATE_PLANE_CLAUSE_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -120,11 +120,9 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "radioss_maptable.inc"
-#include      "nchar_c.inc"
 #include      "com04_c.inc"
 #include      "scr17_c.inc"
 #include      "param_c.inc"
-#include      "remesh_c.inc"
 #include      "sphcom.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -134,6 +132,7 @@ C-----------------------------------------------
       TYPE(INVERTGROUP_STRUCT_),INTENT(IN) :: INV_GROUP
       TYPE(MAPPING_STRUCT_) :: MAP_TABLES
       TYPE (BOX_)  , DIMENSION(NBBOX)  :: IBOX
+      TYPE (UNIT_TYPE_),INTENT(IN) :: UNITAB 
 
       TYPE (GROUP_)  , INTENT(INOUT):: IGRNOD(*)
       TYPE (SURF_)   , INTENT(INOUT):: IGRSURF(*)
@@ -148,6 +147,8 @@ C-----------------------------------------------
       TYPE (GROUP_)  , INTENT(INOUT):: IGRSPRING(*)
       TYPE (SUBSET_) , INTENT(INOUT) :: SUBSET(*)
 
+      INTEGER, INTENT(INOUT) :: IAD
+      MY_REAL, INTENT(INOUT) :: BUFSF(LISURF1*(NSURF+NSETS))
       INTEGER, DIMENSION(2*NUMNOD), INTENT(IN) :: ITABM1
       INTEGER, DIMENSION(2*NRBODY), INTENT(IN) :: RBY_MSN
 
@@ -158,12 +159,15 @@ C-----------------------------------------------
      .  SH4TREE(*),SH3TREE(*),KNOD2ELQ(*),NOD2ELQ(*),IXQ(NIXQ,*),
      .  IXT(NIXT,*),IXP(NIXP,*),IXR(NIXR,*),IXX(*),KXX(*),KXSP(NISP,*),
      .  IPARTQ(*),IPARTT(*),IPARTP(*),IPARTR(*)
+      INTEGER, INTENT(IN) :: SISKWN,SSKEW
       my_real
      .  X(3,*),GEO(NPROPG,*),SKEW(LSKEW,*)
+      INTEGER, INTENT(IN) :: ISKN(LISKN,SISKWN/LISKN)
+      MY_REAL, INTENT(IN) :: RTRANS(NTRANSF,NRTRANS)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER IGS,I,J,ELTYP_SEG,ELTYP_ALL
+      INTEGER IGS,I,J,ELTYP_SEG,ELTYP_ALL,SUB_ID
       INTEGER SET_ID,ISET_TYPE,CLAUSES_MAX,ITMP,ICODE,SETL_SIZE
       INTEGER OPT_D,OPT_O,OPT_G,OPT_B,OPT_A,OPT_E,OPT_I,OPT_C
       INTEGER , DIMENSION(:), ALLOCATABLE :: SET_LIST,SETL
@@ -217,7 +221,8 @@ C-----------------------------------------------
      .                           OPTION_ID   = SET_ID,
      .                           OPTION_TITR = SET_TITLE,
      .                           KEYWORD2    = KEY,
-     .                           OPT_POS     = IGS )
+     .                           OPT_POS     = IGS,
+     .                           SUBMODEL_ID = SUB_ID)
         CALL HM_GET_STRING('set_Type' , SET_TYPE ,ncharfield, IS_AVAILABLE)
         CALL HM_GET_INTV  ('iset_Type', ISET_TYPE,IS_AVAILABLE,LSUBMODEL)
 
@@ -797,6 +802,25 @@ C-----------------------------------------------
                   CALL CREATE_NODE_FROM_RBODY(RBY_MSN,CLAUSE)
 
 
+              CASE ( 'ELLIPS' )
+                  
+                   ! Hyper-ellipsoid surface definition
+                   !-----------------------
+                   SET(IGS)%NB_ELLIPSE = 1
+                   CALL CREATE_ELLIPSE_CLAUSE(CLAUSE%SET_ID,CLAUSE%TITLE ,SUB_ID   ,SKEW   ,RTRANS,
+     .                                        CLAUSE       ,NRTRANS      ,LSUBMODEL,UNITAB ,ISKN  ,
+     .                                        IAD          ,NTRANSF      ,NUMSKW   ,LISKN  ,LSKEW ,
+     .                                        SSKEW        ,SISKWN       ,NSPCOND  ,NUMSPH )
+  
+              CASE ( 'PLANE' )
+                  
+                   ! PLANE surface definition
+                   !-----------------------
+                   SET(IGS)%NB_PLANE = 1
+                   CALL CREATE_PLANE_CLAUSE(CLAUSE%SET_ID ,CLAUSE%TITLE ,SUB_ID  ,CLAUSE ,LSUBMODEL,
+     .                                      UNITAB        ,IAD          ,NRTRANS ,NTRANSF,RTRANS   )
+
+
               CASE DEFAULT
 
                   CALL ANCMSG(MSGID=1906,ANMODE=ANSTOP,
@@ -865,7 +889,8 @@ C -----------------------------------------------------
       !  -----------------------------------------------------
       CALL FILL_IGR(SET,
      .              IGRSURF ,IGRNOD  ,IGRSLIN  ,IGRPART ,IGRBRIC, IGRQUAD ,   
-     .              IGRSH4N ,IGRSH3N ,IGRTRUSS ,IGRBEAM ,IGRSPRING)
+     .              IGRSH4N ,IGRSH3N ,IGRTRUSS ,IGRBEAM ,IGRSPRING,BUFSF  ,
+     .              LISURF1 )
 
 
       END 

@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  I11MAINF                      source/interfaces/int11/i11mainf.F
 Chd|-- called by -----------
@@ -28,6 +28,7 @@ Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
 Chd|        ARRET                         source/system/arret.F         
 Chd|        FRICTIONPARTS_MODEL_ISOT      source/interfaces/int07/frictionparts_model.F
+Chd|        I11ASS3                       source/interfaces/int11/i11ass3.F
 Chd|        I11CDCOR3                     source/interfaces/int11/i11cdcor3.F
 Chd|        I11COR3                       source/interfaces/int11/i11cor3.F
 Chd|        I11DST3                       source/interfaces/int11/i11dst3.F
@@ -72,19 +73,14 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "units_c.inc"
-#include      "scr04_c.inc"
-#include      "scr07_c.inc"
 #include      "warn_c.inc"
 #include      "task_c.inc"
 #include      "parit_c.inc"
 #include      "impl1_c.inc"
 #include      "timeri_c.inc"
-#include      "sms_c.inc"
 #include      "macro.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -169,16 +165,18 @@ C     REAL
       INTEGER,TARGET, DIMENSION(1):: TABPARTS_FRIC_BID
       INTEGER,TARGET, DIMENSION(1):: ADPARTS_FRIC_BID
       my_real,TARGET, DIMENSION(1):: TABCOEF_FRIC_BID
+      INTEGER :: NRTS, NTY
 C-----------------------------------------------
-C	Calcul des adresses des buffers d'interfaces. 
-C	Les adresses des buffers J10-JFI et K10-KFI 
-C	sont remplaces systematiquement par des tableaux
-C	JD(i) et KD(i), en gardant les memes numeros d'indexes.
-C	Les anciens adresses directs Jn, Kn sont modifies
-C	dans la routine sans commentaires additionnels habituels
+C  Calcul des adresses des buffers d'interfaces. 
+C  Les adresses des buffers J10-JFI et K10-KFI 
+C  sont remplaces systematiquement par des tableaux
+C  JD(i) et KD(i), en gardant les memes numeros d'indexes.
+C  Les anciens adresses directs Jn, Kn sont modifies
+C  dans la routine sans commentaires additionnels habituels
 C----------------------------------------------------
 C
       NRTS  =IPARI(3)
+      NTY   =IPARI(7)
       IBC   =IPARI(11)
       IVIS2 =IPARI(14)
       NOINT =IPARI(15)
@@ -222,6 +220,9 @@ C--- Corresponding Friction model
       INTFRIC=IPARI(72)
       MFROT = 0
       IORTHFRIC = 0
+      NPARTFRIC = 0 
+      XFILTR_FRIC = 0 
+      NSETPRTS = 0
       IF(INTFRIC /= 0) THEN 
          TABCOUPLEPARTS_FRIC  => INTBUF_FRIC_TAB(INTFRIC)%TABCOUPLEPARTS_FRIC
          TABCOEF_FRIC  => INTBUF_FRIC_TAB(INTFRIC)%TABCOEF_FRIC
@@ -230,10 +231,7 @@ C--- Corresponding Friction model
          XFILTR_FRIC   = INTBUF_FRIC_TAB(INTFRIC)%XFILTR_FRIC
          NSETPRTS =   INTBUF_FRIC_TAB(INTFRIC)%NSETPRTS
          NPARTFRIC =   INTBUF_FRIC_TAB(INTFRIC)%S_TABPARTS_FRIC
-
          IORTHFRIC = INTBUF_FRIC_TAB(INTFRIC)%IORTHFRIC
-
-c         IFORM    =   INTBUF_FRIC_TAB(INTFRIC)%FRICFORM ! This Flags are already put in Ipari
       ELSE
          TABCOUPLEPARTS_FRIC  => TABCOUPLEPARTS_FRIC_BID
          TABPARTS_FRIC  => TABPARTS_FRIC_BID
@@ -394,7 +392,7 @@ C
      7          PHIM2     ,CONDINTM1,CONDINTM2  ,IFORMTH  ) 
         ENDIF
 C
-	CALL I11ASS3 (
+          CALL I11ASS3 (
      1  JLT          ,A            ,NIN         ,NOINT       ,CS_LOC   ,
      2  STIFN        ,STIF         ,FSKYI       ,ISKY        ,FCONT    ,
      3  HS1          ,HS2          ,HM1         ,HM2         ,N1       ,
@@ -421,7 +419,7 @@ C
       ENDDO
       IF (SFSAVPARIT /= 0)THEN
           CALL SUM_6_FLOAT_SENS(FSAVPARIT, NISUB+1, 11, I_STOK,1,I_STOK,
-     .  			FBSAV6, 12, 6, DIMFB, ISENSINT )
+     .        FBSAV6, 12, 6, DIMFB, ISENSINT )
       ENDIF
       IF(ALLOCATED(FSAVPARIT)) DEALLOCATE (FSAVPARIT)
 

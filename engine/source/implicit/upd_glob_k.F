@@ -1,26 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
-C   ----  nouvelle routine---------
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  UPD_GLOB_K                    source/implicit/upd_glob_k.F  
 Chd|-- called by -----------
@@ -51,7 +50,7 @@ Chd|        IMP_FVBCL                     share/modules/impbufdef_mod.F
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE UPD_GLOB_K(ICODT ,ICODR ,ISKEW ,IBFV    ,NPC    ,
-     1                      TF    ,VEL   ,SENSOR ,LSENSOR,XFRAME ,
+     1                      TF    ,VEL   ,XFRAME ,
      2                      RBY   ,X     ,SKEW   ,LPBY   ,NPBY   ,
      3                      ITAB  ,WEIGHT,MS     ,IN     ,NRBYAC ,
      4                      IRBYAC,NSC   ,ISIJ   ,NMC    ,IMIJ   ,
@@ -75,16 +74,14 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com09_c.inc"
 #include      "param_c.inc"
 #include      "remesh_c.inc"
 #include      "impl1_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER NPC(*),IBFV(NIFV,*),LSENSOR(NSENSI,*),
+      INTEGER NPC(*),IBFV(NIFV,*),
      .        ICODT(*),ICODR(*),ISKEW(*),NSC(*),ISIJ(*),
      .        NMC,IMIJ(*),NSS(*),ISS(*),NINT2 ,IINT2(*),NT_RW,
      .        NSC2(*),ISIJ2(*),NSS2(*),ISS2(*),NKUD(*) ,IKUD(*),
@@ -97,7 +94,7 @@ C-----------------------------------------------
       my_real
      .   RBY(NRBY,*) ,X(3,*) ,SKEW(*),IN(*),MS(*)
       my_real
-     .  TF(*),VEL(LFXVELR,*),UD(3,*),SENSOR(NSENSR,*),DIAG_K(*),LT_K(*),
+     .  TF(*),VEL(LFXVELR,*),UD(3,*),DIAG_K(*),LT_K(*),
      .  B(*) ,BKUD(*),RD(3,*),XFRAME(NXFRAME,*),FRBE3(*)
 
       TYPE(INTBUF_STRUCT_) INTBUF_TAB(*)
@@ -138,7 +135,7 @@ c
        CALL RBY_IMP0(X     ,RBY   ,LPBY  ,NPBY  ,SKEW  ,
      1               NRBYAC,IRBYAC,NSC   ,ISIJ  ,NMC   ,
      2               IMIJ  ,NSS   ,ISS   ,ISKEW ,ITAB  ,
-     3               WEIGHT,MS    ,IN    ,SENSOR,
+     3               WEIGHT,MS    ,IN    ,
      4               NDDL  ,IADK  ,JDIK  ,DIAG_K,
      5               LT_K  ,NDOF  ,IDDL  ,IKC   ,B     )
       ENDIF
@@ -210,7 +207,6 @@ C -----update---condense-IKC>=1------------------------------------
 C
       RETURN
       END
-C   ----  nouvelle routine---------
 Chd|====================================================================
 Chd|  CONDENS_K                     source/implicit/upd_glob_k.F  
 Chd|-- called by -----------
@@ -264,7 +260,6 @@ C
 C
       RETURN
       END
-C   ----  nouvelle routine---------
 Chd|====================================================================
 Chd|  CONDENS_K0                    source/implicit/upd_glob_k.F  
 Chd|-- called by -----------
@@ -279,10 +274,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "impl1_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -342,9 +333,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NDDL,NNZ,IADK(*),JDIK(*),IKC(*)
@@ -391,7 +379,6 @@ C
 C
       RETURN
       END
-C   ----  nouvelle routine---NDDL n'est pas modifie------
 Chd|====================================================================
 Chd|  CONDENS_B                     source/implicit/upd_glob_k.F  
 Chd|-- called by -----------
@@ -416,9 +403,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -447,7 +431,6 @@ C
 C
       RETURN
       END
-C   ----  nouvelle routine---------
 Chd|====================================================================
 Chd|  UPD_INT_K                     source/implicit/upd_glob_k.F  
 Chd|-- called by -----------
@@ -469,7 +452,7 @@ Chd|        RBY_IMPI                      source/constraints/general/rbody/rby_i
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE UPD_INT_K(ICODT  ,ICODR ,ISKEW ,IBFV    ,NPC    ,
-     1                      TF    ,VEL   ,SENSOR ,LSENSOR,XFRAME ,
+     1                      TF    ,VEL   ,XFRAME ,
      2                      RBY   ,X     ,SKEW   ,LPBY   ,NPBY  ,
      3                      ITAB  ,WEIGHT,MS     ,IN     ,NRBYAC,
      4                      IRBYAC,NSS   ,ISS    ,IPARI  ,INTBUF_TAB,
@@ -489,19 +472,15 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
 #include      "impl1_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER NPC(*),IBFV(NIFV,*),LSENSOR(NSENSI,*),LUJ(*),
+      INTEGER NPC(*),IBFV(NIFV,*),LUJ(*),
      .        ICODT(*),ICODR(*),ISKEW(*),ITOK(*),NDDL,NT_RW
       INTEGER WEIGHT(*),LPBY(*),NPBY(NNPBY,*),ITAB(*),
      .        IPARI(NPARI,*), NRBYAC,IRBYAC(*),
@@ -513,7 +492,7 @@ C-----------------------------------------------
       my_real
      .   RBY(NRBY,*) ,X(3,*) ,SKEW(*),IN(*),MS(*)
       my_real
-     .  TF(*), VEL(LFXVELR,*),SENSOR(NSENSR,*),DIAG_K(*),LT_K(*),
+     .  TF(*), VEL(LFXVELR,*),DIAG_K(*),LT_K(*),
      .  DIAG_I(*),LT_I(*),LB(*),UD(3,*),XFRAME(NXFRAME,*),FRBE3(*)
 
       TYPE(INTBUF_STRUCT_) INTBUF_TAB(*)
@@ -575,7 +554,7 @@ C-----RIGID BODIES-------
       IF(NRBYAC>0)THEN
        CALL RBY_IMPI(X     ,RBY   ,LPBY  ,NPBY  ,SKEW  ,
      1               NRBYAC,IRBYAC,NSS   ,ISS   ,ISKEW ,
-     2               ITAB  ,WEIGHT,MS    ,IN    ,SENSOR,
+     2               ITAB  ,WEIGHT,MS    ,IN    ,
      3               NDDLI ,IADI ,JDII   ,DIAG_I,
      4               LT_I  ,NDOFI ,IDDLI ,IIC   ,LB0   )
       ENDIF
@@ -695,7 +674,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com09_c.inc"
 #include      "param_c.inc"
 #include      "scr05_c.inc"
 C-----------------------------------------------
@@ -891,7 +869,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com09_c.inc"
 #include      "param_c.inc"
 #include      "scr05_c.inc"
 C-----------------------------------------------
@@ -951,8 +928,8 @@ Chd|        SPMD_SUMF_V                   source/mpi/implicit/imp_spmd.F
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE RER02(RBY   ,LPBY  ,NPBY  ,SKEW  ,ISKEW ,
-     1                   ITAB  ,WEIGHT,MS    ,IN    ,SENSOR,
-     2                   IBFV  ,VEL   ,LSENSOR,ICODT,ICODR ,
+     1                   ITAB  ,WEIGHT,MS    ,IN    ,
+     2                   IBFV  ,VEL   ,ICODT,ICODR ,
      3                   NRBYAC,IRBYAC,NINT2 ,IINT2 ,IPARI ,
      4                   INTBUF_TAB    ,NDOF  ,D     ,DR    ,
      5                   X     ,XFRAME,LJ    ,IXR   ,IXC   ,
@@ -975,7 +952,6 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "remesh_c.inc"
 #include      "units_c.inc"
 #include      "impl1_c.inc"
 #include      "task_c.inc"
@@ -983,7 +959,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER IBFV(NIFV,*),LSENSOR(NSENSI,*),LJ(*)
+      INTEGER IBFV(NIFV,*),LJ(*)
       INTEGER WEIGHT(*),LPBY(*),NPBY(NNPBY,*),ITAB(*),
      .        IPARI(NPARI,*), ISKEW(*),
      .        NRBYAC,IRBYAC(*),NINT2 ,IINT2(*),IXR(*)
@@ -993,7 +969,7 @@ C-----------------------------------------------
       INTEGER NDDL,IADK(*),JDIK(*),IDDL(*),IKC(*) ,INLOC(*),
      .        NUM_IMP(*),NS_IMP(*),NE_IMP(*),INDEX2(*),W_DDL(*)
       my_real
-     .   RBY(NRBY,*) ,SKEW(*),IN(*),MS(*),SENSOR(NSENSR,*),
+     .   RBY(NRBY,*) ,SKEW(*),IN(*),MS(*),
      .   VEL(LFXVELR,*), XFRAME(NXFRAME,*),FRBE3(*),X_C(*)
       my_real
      .  X(3,*),D(3,*),DR(3,*),DIAG_K(*),LT_K(*),A(3,*),AR(3,*),R02
@@ -1032,8 +1008,8 @@ C-------D=0 for free dof------------
 C
        IF(IMP_LR > 0)THEN
          CALL RECUKIN(RBY   ,LPBY  ,NPBY  ,SKEW  ,ISKEW ,
-     1                ITAB  ,WEIGHT,MS    ,IN    ,SENSOR,
-     2                IBFV  ,VEL   ,LSENSOR,ICODT,ICODR ,
+     1                ITAB  ,WEIGHT,MS    ,IN    ,
+     2                IBFV  ,VEL   ,ICODT,ICODR ,
      3                NRBYAC,IRBYAC,NINT2 ,IINT2 ,IPARI ,
      4                INTBUF_TAB,NDOF  ,A     ,AR    ,
      5                X_C   ,XFRAME,LJ    ,IXR   ,IXC   ,
@@ -1041,8 +1017,8 @@ C
      7                FRBE3 ,IRBE2 ,LRBE2 )
        ELSE
          CALL RECUKIN(RBY   ,LPBY  ,NPBY  ,SKEW  ,ISKEW ,
-     1                ITAB  ,WEIGHT,MS    ,IN    ,SENSOR,
-     2                IBFV  ,VEL   ,LSENSOR,ICODT,ICODR ,
+     1                ITAB  ,WEIGHT,MS    ,IN    ,
+     2                IBFV  ,VEL   ,ICODT,ICODR ,
      3                NRBYAC,IRBYAC,NINT2 ,IINT2 ,IPARI ,
      4                INTBUF_TAB ,NDOF  ,A     ,AR    ,
      5                X     ,XFRAME,LJ    ,IXR   ,IXC   ,
@@ -1099,21 +1075,16 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE INTBUFDEF_MOD
-C----6---------------------------------------------------------------7---------8
+C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-C-----------------------------------------------------------------
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IPARI(NPARI,*),NUM_IMP(*),
@@ -1183,17 +1154,11 @@ Chd|====================================================================
       SUBROUTINE UD_INT7(
      1    JLT       ,NS_IMP    ,NE_IMP      ,IRECT    ,NSV       ,
      2    NSN       ,X         ,UD          )
-C----6---------------------------------------------------------------7---------8
+C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER JLT,NS_IMP(*),NE_IMP(*),IRECT(4,*),NSV(*),NSN
@@ -1254,17 +1219,11 @@ Chd|====================================================================
       SUBROUTINE UD_INT11(
      1    JLT       ,NS_IMP    ,NE_IMP      ,IRECTS   ,IRECTM    ,
      2    NSN       ,X         ,UD        )
-C----6---------------------------------------------------------------7---------8
+C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER JLT,NS_IMP(*),NE_IMP(*),IRECTS(2,*),IRECTM(2,*),NSN
@@ -1319,9 +1278,6 @@ C-----------------------------------------------
 C     REAL
       my_real
      .   X(3,*)    ,H(4)
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -1509,9 +1465,6 @@ C     REAL
       my_real
      .   X(3,*)    ,HS(2),HM(2)
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
 C     REAL
@@ -1602,14 +1555,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "scr03_c.inc"
-#include      "scr04_c.inc"
-#include      "scr07_c.inc"
-#include      "scr05_c.inc"
 #include      "vect01_c.inc"
 C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -1650,41 +1596,50 @@ C     REAL
       my_real, DIMENSION(MVSIZ) :: H1,H2,H3,H4
 C-----------------------------------------------
       INTY   = IPARI(7)
-C-------NSN defined in scr04_c.inc--
        GAP  =INTBUF_TAB%VARIABLES(2)
         DO NFT = 0 , NUM_IMP - 1 , NVSIZ
           LFT=1
           LLT = MIN( NVSIZ, NUM_IMP - NFT )
-          CALL I5CORK3(X ,INTBUF_TAB%IRECTM,INTBUF_TAB%MSR,
-     .                INTBUF_TAB%NSV,
-     .                INTBUF_TAB%IRTLM,CAND_N(NFT+1),CAND_E(NFT+1),
-     .                NSVG  ,JX1   ,JX2     ,JX3   ,JX4   ,
-     2                X1    ,X2    ,X3      ,
-     3                X4    ,Y1    ,Y2    ,Y3    ,Y4      ,
-     4                Z1    ,Z2    ,Z3    ,Z4    ,XFACE   ,
-     5                XI    ,YI    ,ZI    ,IX1   ,IX2     ,
-     6                IX3   ,IX4)
-          CALL I3CST3(  X1    ,X2      ,X3    ,X4    ,XI ,
-     1                  Y1    ,Y2      ,Y3    ,Y4    ,YI ,
-     2                  Z1    ,Z2      ,Z3    ,Z4    ,ZI ,
-     3                  XFACE ,N1      ,N2    ,N3    ,SSC,
-     4                  TTC   ,X0      ,Y0    ,Z0    ,XX1,
-     5                  XX2   ,XX3     ,XX4   ,YY1   ,YY2,
-     6                  YY3   ,YY4     ,ZZ1   ,ZZ2   ,ZZ3,
-     7                  ZZ4   ,XI1     ,XI2   ,XI3   ,XI4,
-     8                  YI1   ,YI2     ,YI3   ,YI4   ,ZI1,
-     9                  ZI2   ,ZI3     ,ZI4   ,XN1   ,XN2,
-     1                  XN3   ,XN4     ,YN1   ,YN2   ,YN3,
-     2                  YN4   ,ZN1     ,ZN2   ,ZN3   ,ZN4,
-     3                  AREA)
-          CALL I3GAP3(GAP,AREA,THK,ALP)
-          CALL I3DIS3(IGIMP,INTY,DIST,X1    ,X2 ,
-     1              X3   ,X4  ,XI  ,Y1    ,Y2 ,
-     2              Y3   ,Y4  ,YI  ,Z1    ,Z2 ,
-     3              Z3   ,Z4  ,ZI  ,XFACE ,N1 ,
-     4              N2   ,N3  ,SSC ,TTC   ,ALP,
-     5              ANS  ,XP  ,YP  ,ZP    ,H1 ,
-     6              H2   ,H3  ,H4)
+          CALL I5CORK3(
+     1   X,                INTBUF_TAB%IRECTM,INTBUF_TAB%MSR,   INTBUF_TAB%NSV,
+     2   INTBUF_TAB%IRTLM, CAND_N(NFT+1),    CAND_E(NFT+1),    NSVG,
+     3   JX1,              JX2,              JX3,              JX4,
+     4   X1,               X2,               X3,               X4,
+     5   Y1,               Y2,               Y3,               Y4,
+     6   Z1,               Z2,               Z3,               Z4,
+     7   XFACE,            XI,               YI,               ZI,
+     8   IX1,              IX2,              IX3,              IX4,
+     9   LFT,              LLT,              NFT)
+          CALL I3CST3(
+     1   X1,      X2,      X3,      X4,
+     2   XI,      Y1,      Y2,      Y3,
+     3   Y4,      YI,      Z1,      Z2,
+     4   Z3,      Z4,      ZI,      XFACE,
+     5   N1,      N2,      N3,      SSC,
+     6   TTC,     X0,      Y0,      Z0,
+     7   XX1,     XX2,     XX3,     XX4,
+     8   YY1,     YY2,     YY3,     YY4,
+     9   ZZ1,     ZZ2,     ZZ3,     ZZ4,
+     A   XI1,     XI2,     XI3,     XI4,
+     B   YI1,     YI2,     YI3,     YI4,
+     C   ZI1,     ZI2,     ZI3,     ZI4,
+     D   XN1,     XN2,     XN3,     XN4,
+     E   YN1,     YN2,     YN3,     YN4,
+     F   ZN1,     ZN2,     ZN3,     ZN4,
+     G   AREA,    LFT,     LLT)
+          CALL I3GAP3(
+     1   GAP,     AREA,    THK,     ALP,
+     2   LFT,     LLT)
+          CALL I3DIS3(
+     1   IGIMP,   INTY,    DIST,    X1,
+     2   X2,      X3,      X4,      XI,
+     3   Y1,      Y2,      Y3,      Y4,
+     4   YI,      Z1,      Z2,      Z3,
+     5   Z4,      ZI,      XFACE,   N1,
+     6   N2,      N3,      SSC,     TTC,
+     7   ALP,     ANS,     XP,      YP,
+     8   ZP,      H1,      H2,      H3,
+     9   H4,      LFT,     LLT)
           CALL UD_INTG5(LFT    ,LLT    ,NSVG   ,JX1    ,JX2    ,
      .                  JX3    ,JX4    ,UD     ,H1     ,H2     ,
      2                  H3     ,H4     ,XFACE)
@@ -1725,9 +1680,6 @@ C-----------------------------------------------
       INTEGER I, IL, IG, L, NN,M(4),J,NS
       my_real
      .   H(4),US(3)
-C-----------------------------------------------
-!      EQUIVALENCE (H1,BV(1,25)) ,(H2,BV(1,26)) ,(H3,BV(1,27))
-!      EQUIVALENCE (H4,BV(1,28)) ,(XFACE,BV(1,29))
 C-----------------------------------------------
        DO I = LFT    ,LLT
 C--------secnd node-----
@@ -1771,21 +1723,16 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE INTBUFDEF_MOD
-C----6---------------------------------------------------------------7---------8
+C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-C-----------------------------------------------------------------
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NPBY(NNPBY,*),NRBYAC,IRBYAC(*),LPBY(*),DOFSPC(*)

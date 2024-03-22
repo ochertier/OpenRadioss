@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  I25PEN3_E2S                   source/interfaces/inter3d1/i25pen3_e2s.F
 Chd|-- called by -----------
@@ -48,8 +48,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "scr05_c.inc"
-C#include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -61,9 +59,6 @@ C-----------------------------------------------
       my_real
      .     X(3,*), GAP_M(*), GAP_M_L(*), GAPE(*), GAP_E_L(*), PENE(MVSIZ)
       REAL*4 EDG_BISECTOR(3,4,*), VTX_BISECTOR(3,2,*)
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -186,7 +181,7 @@ C
         XX4=E1X(I)*X4(I)+E1Y(I)*Y4(I)+E1Z(I)*Z4(I)
         XMINM=MIN(XX1,XX2,XX3,XX4)
         XMAXM=MAX(XX1,XX2,XX3,XX4)
-	DX=EM02*(XMAXM-XMINM)
+          DX=EM02*(XMAXM-XMINM)
         XMINM=XMINM-DX-GAPV(I)
         XMAXM=XMAXM+DX+GAPV(I)
         XXA=E1X(I)*XXS1(I)+E1Y(I)*YYS1(I)+E1Z(I)*ZZS1(I)
@@ -209,7 +204,7 @@ C
         YY4=E2X(I)*X4(I)+E2Y(I)*Y4(I)+E2Z(I)*Z4(I)
         YMINM=MIN(YY1,YY2,YY3,YY4)
         YMAXM=MAX(YY1,YY2,YY3,YY4)
-	DY=EM02*(YMAXM-YMINM)
+          DY=EM02*(YMAXM-YMINM)
         YMINM=YMINM-DY-GAPV(I)
         YMAXM=YMAXM+DY+GAPV(I)
         YYA=E2X(I)*XXS1(I)+E2Y(I)*YYS1(I)+E2Z(I)*ZZS1(I)
@@ -232,7 +227,7 @@ C
         ZZ4=E3X(I)*X4(I)+E3Y(I)*Y4(I)+E3Z(I)*Z4(I)
         ZMINM=MIN(ZZ1,ZZ2,ZZ3,ZZ4)
         ZMAXM=MAX(ZZ1,ZZ2,ZZ3,ZZ4)
-	DZ=EM02*(ZMAXM-ZMINM)
+          DZ=EM02*(ZMAXM-ZMINM)
         ZMINM=ZMINM-DZ-GAPV(I)
         ZMAXM=ZMAXM+DZ+GAPV(I)
         ZZA=E3X(I)*XXS1(I)+E3Y(I)*YYS1(I)+E3Z(I)*ZZS1(I)

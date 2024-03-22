@@ -1,5 +1,5 @@
 //Copyright>    OpenRadioss
-//Copyright>    Copyright (C) 1986-2022 Altair Engineering Inc.
+//Copyright>    Copyright (C) 1986-2024 Altair Engineering Inc.
 //Copyright>
 //Copyright>    This program is free software: you can redistribute it and/or modify
 //Copyright>    it under the terms of the GNU Affero General Public License as published by
@@ -15,11 +15,11 @@
 //Copyright>    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //Copyright>
 //Copyright>
-//Copyright>    Commercial Alternative: Altair Radioss Software 
+//Copyright>    Commercial Alternative: Altair Radioss Software
 //Copyright>
-//Copyright>    As an alternative to this open-source version, Altair also offers Altair Radioss 
-//Copyright>    software under a commercial license.  Contact Altair to discuss further if the 
-//Copyright>    commercial version may interest you: https://www.altair.com/radioss/.    
+//Copyright>    As an alternative to this open-source version, Altair also offers Altair Radioss
+//Copyright>    software under a commercial license.  Contact Altair to discuss further if the
+//Copyright>    commercial version may interest you: https://www.altair.com/radioss/.
 #include "hardware.inc"
 #include <stdio.h>
 #include <string.h> 
@@ -698,7 +698,13 @@ void dyn_userlib_init_(char * libname, int *size, int * userlib_avail, int * use
 
      userlibhandle = NULL;
      if (has_path==1){
+#ifdef SANITIZE
+        userlibhandle = dlopen(libn,RTLD_LAZY|RTLD_GLOBAL);
+#else
         userlibhandle = dlopen(libn,RTLD_LAZY|RTLD_GLOBAL|RTLD_DEEPBIND);
+#endif
+
+
      }else{
 
        /* first trial find Environment variable RAD_USERLIB_LIBPATH */
@@ -707,7 +713,12 @@ void dyn_userlib_init_(char * libname, int *size, int * userlib_avail, int * use
          strcpy(load_libname,rad_userlib_libpath);
          strcat(load_libname,"/");
          strcat(load_libname,libn);
+#ifdef SANITIZE
+         userlibhandle = dlopen(load_libname,RTLD_LAZY|RTLD_GLOBAL);
+ #else
          userlibhandle = dlopen(load_libname,RTLD_LAZY|RTLD_GLOBAL|RTLD_DEEPBIND);
+#endif
+
        }
 
        if(userlibhandle==NULL){
@@ -715,12 +726,21 @@ void dyn_userlib_init_(char * libname, int *size, int * userlib_avail, int * use
          getcwd(load_libname,15000);
          strcat(load_libname,"/");
          strcat(load_libname,libn);
+#ifdef SANITIZE
+         userlibhandle = dlopen(load_libname,RTLD_LAZY|RTLD_GLOBAL);
+#else
          userlibhandle = dlopen(load_libname,RTLD_LAZY|RTLD_GLOBAL|RTLD_DEEPBIND);
+#endif
        }
 
        if(userlibhandle==NULL){
          /* Third Trial : Default - LD_LRARY_PATH */
+#ifdef SANITIZE
+         userlibhandle = dlopen(libn,RTLD_LAZY|RTLD_GLOBAL);
+#else
          userlibhandle = dlopen(libn,RTLD_LAZY|RTLD_GLOBAL|RTLD_DEEPBIND);
+#endif
+
        }
 
      }

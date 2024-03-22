@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C  New law -- material shape memory
 Chd|====================================================================
 Chd|  SIGEPS71C                     source/materials/mat/mat071/sigeps71c.F
@@ -28,19 +28,22 @@ Chd|        MULAWC                        source/materials/mat_share/mulawc.F
 Chd|-- calls ---------------
 Chd|====================================================================
       SUBROUTINE SIGEPS71C(
-     1     NEL    ,NUPARAM,NUVAR   ,MFUNC   ,KFUNC  ,
-     2     NPF    ,NPT0    ,IPT     ,IFLAG   ,
-     2     TF     ,TIME   ,TIMESTEP,UPARAM  ,RHO0   ,
-     3     AREA   ,EINT   ,THKLY   ,
-     4     EPSPXX ,EPSPYY ,EPSPXY  ,EPSPYZ  ,EPSPZX ,
-     5     DEPSXX ,DEPSYY ,DEPSXY  ,DEPSYZ  ,DEPSZX ,
-     6     EPSXX  ,EPSYY  ,EPSXY   ,EPSYZ   ,EPSZX  ,
-     7     SIGOXX ,SIGOYY ,SIGOXY  ,SIGOYZ  ,SIGOZX ,
-     8     SIGNXX ,SIGNYY ,SIGNXY  ,SIGNYZ  ,SIGNZX ,
-     9     SIGVXX ,SIGVYY ,SIGVXY  ,SIGVYZ  ,SIGVZX ,
-     A     SOUNDSP,VISCMAX,THK     ,PLA     ,UVAR   ,
-     B     OFF    ,NGL    ,IPM     ,MAT     ,ETSE   ,
-     C     GS     ,YLD    ,VOL     ,TEMPEL  )
+     1   NEL,     NUPARAM, NUVAR,   MFUNC,
+     2   KFUNC,   NPF,     NPT0,    IPT,
+     3   IFLAG,   TF,      TIME,    TIMESTEP,
+     4   UPARAM,  RHO0,    AREA,    EINT,
+     5   THKLY,   EPSPXX,  EPSPYY,  EPSPXY,
+     6   EPSPYZ,  EPSPZX,  DEPSXX,  DEPSYY,
+     7   DEPSXY,  DEPSYZ,  DEPSZX,  EPSXX,
+     8   EPSYY,   EPSXY,   EPSYZ,   EPSZX,
+     9   SIGOXX,  SIGOYY,  SIGOXY,  SIGOYZ,
+     A   SIGOZX,  SIGNXX,  SIGNYY,  SIGNXY,
+     B   SIGNYZ,  SIGNZX,  SIGVXX,  SIGVYY,
+     C   SIGVXY,  SIGVYZ,  SIGVZX,  SOUNDSP,
+     D   VISCMAX, THK,     PLA,     UVAR,
+     E   OFF,     NGL,     IPM,     MAT,
+     F   ETSE,    GS,      YLD,     VOL,
+     G   TEMPEL,  ISMSTR,  JTHE)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -101,15 +104,11 @@ C---------+---------+---+---+--------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "parit_c.inc"
-#include      "com04_c.inc"
-#include      "scr05_c.inc"
-#include      "com01_c.inc"
-#include      "vect01_c.inc"
 C-----------------------------------------------
 C   I N P U T   A r g u m e n t s
 C-----------------------------------------------
 C
+      INTEGER, INTENT(IN) :: ISMSTR, JTHE
       INTEGER NEL, NUPARAM, NUVAR, NPT0, IPT,IFLAG(*),
      .   NGL(NEL),MAT(NEL),ISRATE(NEL),NSG,IPM(NPROPMI,*)
       my_real TIME,TIMESTEP,UPARAM(*),
@@ -214,7 +213,7 @@ C     principal stretch (def gradient eigenvalues)
       TRAV(1:NEL)  = EPSXX(1:NEL)+EPSYY(1:NEL)                                     
       ROOTV(1:NEL) = SQRT((EPSXX(1:NEL)-EPSYY(1:NEL))*(EPSXX(1:NEL)-EPSYY(1:NEL))  
      .           + EPSXY(1:NEL)*EPSXY(1:NEL))
-	     EVV(1:NEL,1) = HALF*(TRAV(1:NEL)+ROOTV(1:NEL))
+               EVV(1:NEL,1) = HALF*(TRAV(1:NEL)+ROOTV(1:NEL))
       EVV(1:NEL,2) = HALF*(TRAV(1:NEL)-ROOTV(1:NEL))  
       EVV(1:NEL,3) = ZERO                               
 C     rot matrix (eigenvectors)
@@ -307,7 +306,7 @@ c----------------------------------------------
 #include "vectorize.inc"
          DO II =1,NINDX_LOOP
            I = INDX_LOOP(II) 
-	      FM = UVAR(I,1)   ! fraction of Martensite    
+                FM = UVAR(I,1)   ! fraction of Martensite    
            GT(I) = G + FM * (GM - G) !G_n
            KT(I) = K + FM * (KM - K) !K_n
           !pressure
@@ -323,17 +322,17 @@ c----------------------------------------------
            SYY(I)= TWO*GT(I)*(EE2(I) -EPSL*FM*NYY(I))
            SZZ(I)= TWO*GT(I)*(EE3(I) -EPSL*FM*NZZ(I))
 
-	      SV(I) =  SQRT( SXX(I)*SXX(I) + SYY(I)*SYY(I) + SZZ(I)*SZZ(I)  )
-	      !-------------------
-	      ! transformation  
-	      !-------------------
+                SV(I) =  SQRT( SXX(I)*SXX(I) + SYY(I)*SYY(I) + SZZ(I)*SZZ(I)  )
+                !-------------------
+                ! transformation  
+                !-------------------
            DFMSA = ZERO
            DFMAS = ZERO
 
            ! loading function
            FS(I) = SV(I) + THREE*ALPHA*P11(I) - CAS*TEMP(I) ! loading function A--> M
            !----------------------
-           !   Check Austenite -----> martensite  (dependance tempurature a voir ...)
+           !   Check Austenite -----> martensite  
            FASS = FS(I) -RSAS 
            FASF = FS(I) -RFAS 
            FS0  = UVAR(I,2)
@@ -441,7 +440,7 @@ c
 #include "vectorize.inc"
          DO II =1,NINDX_LOOP
            I = INDX_LOOP(II) 
-	      FM = UVAR(I,1)   ! fraction of Martensite    
+                FM = UVAR(I,1)   ! fraction of Martensite    
            !pressure
            P11(I) = K * (TRDE(I) - THREE*ALPHA*EPSL*FM)
            ! n= e/ norm(e)
@@ -454,7 +453,7 @@ c
            SXX(I)= G2*(EE1(I) -EPSL*FM*NXX(I))
            SYY(I)= G2*(EE2(I) -EPSL*FM*NYY(I))
            SZZ(I)= G2*(EE3(I) -EPSL*FM*NZZ(I))
-	      SV(I) =  SQRT( SXX(I)*SXX(I) + SYY(I)*SYY(I) + SZZ(I)*SZZ(I)  )
+                SV(I) =  SQRT( SXX(I)*SXX(I) + SYY(I)*SYY(I) + SZZ(I)*SZZ(I)  )
 
            !-------------------
            ! transformation  
@@ -486,9 +485,9 @@ c
            IF(DFM(I) < ZERO .AND. FM == ZERO) DFM(I) = ZERO
 
            !UPDATE
-	      SXX(I) =  SXX(I) -G2* EPSL*DFM(I)*NXX(I) 
-	      SYY(I) =  SYY(I) -G2* EPSL*DFM(I)*NYY(I)
-	      SZZ(I) =  SZZ(I) -G2* EPSL*DFM(I)*NZZ(I)
+                SXX(I) =  SXX(I) -G2* EPSL*DFM(I)*NXX(I) 
+                SYY(I) =  SYY(I) -G2* EPSL*DFM(I)*NYY(I)
+                SZZ(I) =  SZZ(I) -G2* EPSL*DFM(I)*NZZ(I)
            P11(I) =  P11(I) - K*EPSL*THREE*ALPHA*DFM(I)
            SIGXX(I)= SXX(I) + P11(I)
            SIGYY(I)= SYY(I) + P11(I)

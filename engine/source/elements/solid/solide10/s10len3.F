@@ -1,36 +1,39 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  S10LEN3                       source/elements/solid/solide10/s10len3.F
 Chd|-- called by -----------
 Chd|        S10FORC3                      source/elements/solid/solide10/s10forc3.F
 Chd|-- calls ---------------
 Chd|====================================================================
-      SUBROUTINE S10LEN3(VOL,NGL,DELTAX,DELTAX2,
-     .   PX,  PY,  PZ,VOLG,VOLGO,
-     .   RX,  RY,  RZ,  SX,  SY,  SZ , TX, TY, TZ,
-     .   NC,NEL,MXT,PM,
-     .   TAGELEM_SMS,V_PITER)
+      SUBROUTINE S10LEN3(
+     1   VOL,        NGL,        DELTAX,     DELTAX2,
+     2   PX,         PY,         PZ,         VOLG,
+     3   VOLGO,      RX,         RY,         RZ,
+     4   SX,         SY,         SZ,         TX,
+     5   TY,         TZ,         NC,         NEL,
+     6   MXT,        PM,         TAGELEM_SMS,V_PITER,
+     7   NPT,        IINT,       ISROT,      IFORMDT)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -43,18 +46,17 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "vect01_c.inc"
-#include      "units_c.inc"
-#include      "impl1_c.inc"
 #include      "com01_c.inc"
-#include      "com06_c.inc"
 #include      "param_c.inc"
 #include      "scr17_c.inc"
-#include      "scr07_c.inc"
 #include      "sms_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: NPT
+      INTEGER, INTENT(IN) :: IINT
+      INTEGER, INTENT(IN) :: ISROT
+      INTEGER, INTENT(IN) :: IFORMDT
       INTEGER NGL(*), NC(MVSIZ,10), NEL, MXT(MVSIZ), TAGELEM_SMS(*)
 C     REAL
       my_real
@@ -95,12 +97,12 @@ C-----------------------------------------------
       IF(IDT1TET10/=0 .AND. ISROT==0)THEN
 
         IF(IDTMINS==0)THEN
-          DO I=LFT,LLT
+          DO I=1,NEL
             FACEIGV(I)=TRHEE_OVER_14    ! computing eigenvalues of Me-1 Ke
           END DO
         ELSE
 C-------- AMS (possible mix of elements inside the group)
-          DO I=LFT,LLT
+          DO I=1,NEL
             IF(TAGELEM_SMS(I)==0)THEN
               FACEIGV(I)=TRHEE_OVER_14    ! computing eigenvalues of Me-1 Ke, TRHEE_OVER_14 = (1/32) / (7/48) rapport des masses
             ELSE
@@ -118,7 +120,7 @@ C         /DT1TET10 Conservative Time Step
 C--------------------------------------------------------------------------------------
           IF(IFORMDT==0)THEN
 
-            DO I=LFT,LLT
+            DO I=1,NEL
              PXX(I)=ZERO
              PYY(I)=ZERO
              PZZ(I)=ZERO
@@ -128,7 +130,7 @@ C            PYZ(I)=ZERO
             END DO
             DO IP=1,NPT
               DO N=1,4
-                DO I=LFT,LLT
+                DO I=1,NEL
                   PXX(I) =PXX(I) + VOL(I,IP)*PX(I,N,IP)*PX(I,N,IP)
                   PYY(I) =PYY(I) + VOL(I,IP)*PY(I,N,IP)*PY(I,N,IP)
                   PZZ(I) =PZZ(I) + VOL(I,IP)*PZ(I,N,IP)*PZ(I,N,IP)
@@ -138,7 +140,7 @@ C                 PYZ(I) =PYZ(I) + VOL(I,IP)*PY(I,N,IP)*PZ(I,N,IP)
                 ENDDO
               ENDDO
               DO N=5,10
-                DO I=LFT,LLT
+                DO I=1,NEL
                   PXX(I) =PXX(I) + FACEIGV(I)*VOL(I,IP)*PX(I,N,IP)*PX(I,N,IP)
                   PYY(I) =PYY(I) + FACEIGV(I)*VOL(I,IP)*PY(I,N,IP)*PY(I,N,IP)
                   PZZ(I) =PZZ(I) + FACEIGV(I)*VOL(I,IP)*PZ(I,N,IP)*PZ(I,N,IP)
@@ -148,20 +150,20 @@ C                 PYZ(I) =PYZ(I) + FACEIGV(I)*VOL(I,IP)*PY(I,N,IP)*PZ(I,N,IP)
                 ENDDO
               ENDDO
             ENDDO
-            DO I=LFT,LLT
+            DO I=1,NEL
               D(I) = PXX(I)+PYY(I)+PZZ(I)
             ENDDO
 
           ELSEIF(IFORMDT==1)THEN
 
-            D(LFT:LLT)=ZERO
+            D(1:NEL)=ZERO
 
             GFAC=PM(105,MXT(1))
             LD  =TWO*SQRT(MAX(ONE-GFAC,ZERO))+ONE
 
             DO IP=1,NPT
 
-              DO I=LFT,LLT
+              DO I=1,NEL
                 PXX(I)=PX(I,1,IP)*PX(I,1,IP)+PX(I,2,IP)*PX(I,2,IP)+PX(I,3,IP)*PX(I,3,IP)+PX(I,4,IP)*PX(I,4,IP)+
      .                 FACEIGV(I)*(PX(I,5,IP)*PX(I,5,IP)+PX(I,6,IP)*PX(I,6,IP)+PX(I,7,IP)*PX(I,7,IP)+
      .                            PX(I,8,IP)*PX(I,8,IP)+PX(I,9,IP)*PX(I,9,IP)+PX(I,10,IP)*PX(I,10,IP))
@@ -182,7 +184,7 @@ C                 PYZ(I) =PYZ(I) + FACEIGV(I)*VOL(I,IP)*PY(I,N,IP)*PZ(I,N,IP)
      .                            PY(I,8,IP)*PZ(I,8,IP)+PY(I,9,IP)*PZ(I,9,IP)+PY(I,10,IP)*PZ(I,10,IP)) 
               ENDDO
 
-              DO I=LFT,LLT
+              DO I=1,NEL
                 AA = -(PXX(I)+PYY(I)+PZZ(I))
                 BB =  (PXX(I)*PYY(I)+PXX(I)*PZZ(I)+PYY(I)*PZZ(I)-PXY(I)**2-PXZ(I)**2-PYZ(I)**2) 
                 P  = BB-THIRD*AA*AA
@@ -192,13 +194,13 @@ C                 PYZ(I) =PYZ(I) + FACEIGV(I)*VOL(I,IP)*PY(I,N,IP)*PZ(I,N,IP)
 
           ELSEIF(IFORMDT==2)THEN
 
-            D(LFT:LLT)=ZERO
+            D(1:NEL)=ZERO
 
             GFAC=PM(105,MXT(1))
 
             DO IP=1,NPT
 
-              DO I=LFT,LLT
+              DO I=1,NEL
                 PXX(I)=PX(I,1,IP)*PX(I,1,IP)+PX(I,2,IP)*PX(I,2,IP)+PX(I,3,IP)*PX(I,3,IP)+PX(I,4,IP)*PX(I,4,IP)+
      .                 FACEIGV(I)*(PX(I,5,IP)*PX(I,5,IP)+PX(I,6,IP)*PX(I,6,IP)+PX(I,7,IP)*PX(I,7,IP)+
      .                            PX(I,8,IP)*PX(I,8,IP)+PX(I,9,IP)*PX(I,9,IP)+PX(I,10,IP)*PX(I,10,IP))
@@ -219,7 +221,7 @@ C                 PYZ(I) =PYZ(I) + FACEIGV(I)*VOL(I,IP)*PY(I,N,IP)*PZ(I,N,IP)
      .                            PY(I,8,IP)*PZ(I,8,IP)+PY(I,9,IP)*PZ(I,9,IP)+PY(I,10,IP)*PZ(I,10,IP)) 
               ENDDO
 
-              DO I=LFT,LLT
+              DO I=1,NEL
                AA = -(PXX(I)+PYY(I)+PZZ(I))
                BB =  GFAC*(PXX(I)*PYY(I)+PXX(I)*PZZ(I)+PYY(I)*PZZ(I)-PXY(I)**2-PXZ(I)**2-PYZ(I)**2) 
                P  = BB-THIRD*AA*AA
@@ -273,7 +275,7 @@ C           Initialize at 1st time DT1TET10 has been encountered... Note : U nor
             END DO
 
             DO N=1,10
-              DO I=LFT,LLT
+              DO I=1,NEL
                 UX(I,N)=WX(N)
                 UY(I,N)=WY(N)
                 UZ(I,N)=WZ(N)
@@ -282,9 +284,9 @@ C           Initialize at 1st time DT1TET10 has been encountered... Note : U nor
           ELSE
 C
 C           Get vector from previous cycle / run
-            UX(LFT:LLT,1:10)=V_PITER(LFT:LLT,1,1:10)
-            UY(LFT:LLT,1:10)=V_PITER(LFT:LLT,2,1:10)
-            UZ(LFT:LLT,1:10)=V_PITER(LFT:LLT,3,1:10)
+            UX(1:NEL,1:10)=V_PITER(1:NEL,1,1:10)
+            UY(1:NEL,1:10)=V_PITER(1:NEL,2,1:10)
+            UZ(1:NEL,1:10)=V_PITER(1:NEL,3,1:10)
           END IF
 
           IF(IFORMDT==2)THEN
@@ -301,16 +303,16 @@ C           are computed using Gmax and c is also computed in the material using
           DO ITER=1,NITER
 
 
-            VX(LFT:LLT,1:10)=ZERO
-            VY(LFT:LLT,1:10)=ZERO
-            VZ(LFT:LLT,1:10)=ZERO
+            VX(1:NEL,1:10)=ZERO
+            VY(1:NEL,1:10)=ZERO
+            VZ(1:NEL,1:10)=ZERO
 
             DO IP=1,NPT
 C
 C             Bip.U
-              BU(LFT:LLT,1:6)=ZERO
+              BU(1:NEL,1:6)=ZERO
               DO N=1,10
-                DO I=LFT,LLT
+                DO I=1,NEL
                   BU(I,1)=BU(I,1)+PX(I,N,IP)*UX(I,N)
                   BU(I,2)=BU(I,2)+PY(I,N,IP)*UY(I,N)
                   BU(I,3)=BU(I,3)+PZ(I,N,IP)*UZ(I,N)
@@ -321,19 +323,19 @@ C             Bip.U
               END DO
 C
               DO J=1,3
-                DO I=LFT,LLT
+                DO I=1,NEL
                   BU(I,J)=BFAC*BU(I,J)
                 END DO
               END DO
               DO J=4,6
-                DO I=LFT,LLT
+                DO I=1,NEL
                   BU(I,J)=GFAC*BU(I,J)
                 END DO
               END DO
 C
 C             Vol_ip * Transpose(Bip).Bip.U
               DO N=1,10
-                DO I=LFT,LLT
+                DO I=1,NEL
                   VX(I,N)=VX(I,N)+VOL(I,IP)*(PX(I,N,IP)*BU(I,1)+PY(I,N,IP)*BU(I,4)+PZ(I,N,IP)*BU(I,6))
                   VY(I,N)=VY(I,N)+VOL(I,IP)*(PY(I,N,IP)*BU(I,2)+PX(I,N,IP)*BU(I,4)+PZ(I,N,IP)*BU(I,5))
                   VZ(I,N)=VZ(I,N)+VOL(I,IP)*(PZ(I,N,IP)*BU(I,3)+PY(I,N,IP)*BU(I,5)+PX(I,N,IP)*BU(I,6))
@@ -342,55 +344,55 @@ C             Vol_ip * Transpose(Bip).Bip.U
 
             END DO
 
-            NV(LFT:LLT) = ZERO
+            NV(1:NEL) = ZERO
             DO N=1,4
-              DO I=LFT,LLT
+              DO I=1,NEL
                 NV(I) = NV(I) + VX(I,N)*VX(I,N)+VY(I,N)*VY(I,N)+VZ(I,N)*VZ(I,N)
               END DO
             END DO
             DO N=5,10
-              DO I=LFT,LLT
+              DO I=1,NEL
                 VX(I,N)=FACEIGV(I)*VX(I,N)
                 VY(I,N)=FACEIGV(I)*VY(I,N)
                 VZ(I,N)=FACEIGV(I)*VZ(I,N)
                 NV(I) = NV(I) + VX(I,N)*VX(I,N)+VY(I,N)*VY(I,N)+VZ(I,N)*VZ(I,N)
               END DO
             END DO
-            DO I=LFT,LLT
+            DO I=1,NEL
               NV(I)  =SQRT(NV(I))
               NINV(I)=ONE/MAX(EM20,NV(I))
             END DO
             DO N=1,10
-              DO I=LFT,LLT
+              DO I=1,NEL
                 VX(I,N)=NINV(I) * VX(I,N)
                 VY(I,N)=NINV(I) * VY(I,N)
                 VZ(I,N)=NINV(I) * VZ(I,N)
               END DO
             END DO
-            UX(LFT:LLT,1:10)=VX(LFT:LLT,1:10)
-            UY(LFT:LLT,1:10)=VY(LFT:LLT,1:10)
-            UZ(LFT:LLT,1:10)=VZ(LFT:LLT,1:10)
+            UX(1:NEL,1:10)=VX(1:NEL,1:10)
+            UY(1:NEL,1:10)=VY(1:NEL,1:10)
+            UZ(1:NEL,1:10)=VZ(1:NEL,1:10)
 
           END DO ! DO ITER=1,NITER
 C
-          DO I=LFT,LLT
+          DO I=1,NEL
             D(I)=NV(I)
           END DO
-          V_PITER(LFT:LLT,1,1:10)=UX(LFT:LLT,1:10)
-          V_PITER(LFT:LLT,2,1:10)=UY(LFT:LLT,1:10)
-          V_PITER(LFT:LLT,3,1:10)=UZ(LFT:LLT,1:10)
+          V_PITER(1:NEL,1,1:10)=UX(1:NEL,1:10)
+          V_PITER(1:NEL,2,1:10)=UY(1:NEL,1:10)
+          V_PITER(1:NEL,3,1:10)=UZ(1:NEL,1:10)
 C
 C         2 * Max diagonal as an (under) estimation of Lambda 
 C         Because Iterative Power may be too much under-estimated before convergence.
           DO N=1,10
-            DO I=LFT,LLT
+            DO I=1,NEL
               UL(I,N) = ZERO
             ENDDO
           ENDDO
 C
           DO IP=1,NPT
             DO N=1,10
-              DO I=LFT,LLT
+              DO I=1,NEL
                 UL(I,N) =UL(I,N) + VOL(I,IP) *
      +          ( PX(I,N,IP)*PX(I,N,IP) + PY(I,N,IP)*PY(I,N,IP)
      +         + PZ(I,N,IP)*PZ(I,N,IP) )
@@ -398,7 +400,7 @@ C
             ENDDO
           ENDDO
 C
-          DO I=LFT,LLT
+          DO I=1,NEL
             AA   = MAX(UL(I,1),UL(I,2),UL(I,3),UL(I,4))
             BB   = FACEIGV(I)*MAX(UL(I,5),UL(I,6),UL(I,7),UL(I,8),UL(I,9),UL(I,10))
             D(I) = MAX(D(I),TWO*MAX(AA,BB))
@@ -406,7 +408,7 @@ C
 C
         END IF ! IF(NITER==0)THEN
 
-        DO I=LFT,LLT
+        DO I=1,NEL
 C
 C         DELTAX2 is not used w/IDT1TET10
           DELTAX2(I) = ONE 
@@ -426,7 +428,7 @@ C         /DT1TET10 Conservative Time Step
 C--------------------------------------------------------------------------------------
           IF(IFORMDT==0)THEN
 
-            DO I=LFT,LLT
+            DO I=1,NEL
              PXX(I)=ZERO
              PYY(I)=ZERO
              PZZ(I)=ZERO
@@ -441,7 +443,7 @@ C            Spectral Radius(M-1K)
 C-----------------------------------------------------------------------------
 C
 C             Q = M-1 Transpose(B)
-              DO I=LFT,LLT
+              DO I=1,NEL
                 QX(I,1)=PX(I,1,IP)+HALF*(PX(I,5,IP)+PX(I,7,IP)+PX(I,8,IP))   
                 QX(I,2)=PX(I,2,IP)+HALF*(PX(I,5,IP)+PX(I,6,IP)+PX(I,9,IP))
                 QX(I,3)=PX(I,3,IP)+HALF*(PX(I,6,IP)+PX(I,7,IP)+PX(I,10,IP))
@@ -480,7 +482,7 @@ C                        +FOURTH(PX(I,6,IP)+PX(I,7,IP)+PX(I,8,IP)+PX(I,9,IP)
               END DO
 C
 C             B M-1 Transpose(B)
-              DO I=LFT,LLT
+              DO I=1,NEL
                 PXX(I)=PXX(I)+
      .                 PX(I,1,IP)*QX(I,1)+PX(I,2,IP)*QX(I,2)+PX(I,3,IP)*QX(I,3)+PX(I,4,IP)*QX(I,4)+
      .                 PX(I,5,IP)*QX(I,5)+PX(I,6,IP)*QX(I,6)+PX(I,7,IP)*QX(I,7)+
@@ -506,13 +508,13 @@ C     .                           PY(I,8,IP)*QZ(I,8)+PY(I,9,IP)*QZ(I,9)+PY(I,10,
 
             ENDDO
 
-            DO I=LFT,LLT
+            DO I=1,NEL
               D(I) = PXX(I)+PYY(I)+PZZ(I)
             ENDDO
 
           ELSEIF(IFORMDT==1)THEN
 
-            D(LFT:LLT)=ZERO
+            D(1:NEL)=ZERO
 
             GFAC=PM(105,MXT(1))
             LD  =TWO*SQRT(MAX(ONE-GFAC,ZERO))+ONE
@@ -523,7 +525,7 @@ C            Spectral Radius(M-1K)
 C-----------------------------------------------------------------------------
 C
 C             Q = M-1 Transpose(B)
-              DO I=LFT,LLT
+              DO I=1,NEL
                 QX(I,1)=PX(I,1,IP)+HALF*(PX(I,5,IP)+PX(I,7,IP)+PX(I,8,IP))   
                 QX(I,2)=PX(I,2,IP)+HALF*(PX(I,5,IP)+PX(I,6,IP)+PX(I,9,IP))
                 QX(I,3)=PX(I,3,IP)+HALF*(PX(I,6,IP)+PX(I,7,IP)+PX(I,10,IP))
@@ -562,7 +564,7 @@ C                        +FOURTH(PX(I,6,IP)+PX(I,7,IP)+PX(I,8,IP)+PX(I,9,IP)
               END DO
 C
 C             B M-1 Transpose(B)
-              DO I=LFT,LLT
+              DO I=1,NEL
                 PXX(I)=PX(I,1,IP)*QX(I,1)+PX(I,2,IP)*QX(I,2)+PX(I,3,IP)*QX(I,3)+PX(I,4,IP)*QX(I,4)+
      .                 PX(I,5,IP)*QX(I,5)+PX(I,6,IP)*QX(I,6)+PX(I,7,IP)*QX(I,7)+
      .                            PX(I,8,IP)*QX(I,8)+PX(I,9,IP)*QX(I,9)+PX(I,10,IP)*QX(I,10)
@@ -583,7 +585,7 @@ C             B M-1 Transpose(B)
      .                            PY(I,8,IP)*QZ(I,8)+PY(I,9,IP)*QZ(I,9)+PY(I,10,IP)*QZ(I,10)
               ENDDO
 
-              DO I=LFT,LLT
+              DO I=1,NEL
                 AA = -(PXX(I)+PYY(I)+PZZ(I))
                 BB =  (PXX(I)*PYY(I)+PXX(I)*PZZ(I)+PYY(I)*PZZ(I)-PXY(I)**2-PXZ(I)**2-PYZ(I)**2) 
                 P  = BB-THIRD*AA*AA
@@ -593,7 +595,7 @@ C             B M-1 Transpose(B)
 
           ELSEIF(IFORMDT==2)THEN
 
-            D(LFT:LLT)=ZERO
+            D(1:NEL)=ZERO
 
             GFAC=PM(105,MXT(1))
 
@@ -603,7 +605,7 @@ C            Spectral Radius(M-1K)
 C-----------------------------------------------------------------------------
 C
 C             Q = M-1 Transpose(B)
-              DO I=LFT,LLT
+              DO I=1,NEL
                 QX(I,1)=PX(I,1,IP)+HALF*(PX(I,5,IP)+PX(I,7,IP)+PX(I,8,IP))   
                 QX(I,2)=PX(I,2,IP)+HALF*(PX(I,5,IP)+PX(I,6,IP)+PX(I,9,IP))
                 QX(I,3)=PX(I,3,IP)+HALF*(PX(I,6,IP)+PX(I,7,IP)+PX(I,10,IP))
@@ -642,7 +644,7 @@ C                        +FOURTH(PX(I,6,IP)+PX(I,7,IP)+PX(I,8,IP)+PX(I,9,IP)
               END DO
 C
 C             B M-1 Transpose(B)
-              DO I=LFT,LLT
+              DO I=1,NEL
                 PXX(I)=PX(I,1,IP)*QX(I,1)+PX(I,2,IP)*QX(I,2)+PX(I,3,IP)*QX(I,3)+PX(I,4,IP)*QX(I,4)+
      .                 PX(I,5,IP)*QX(I,5)+PX(I,6,IP)*QX(I,6)+PX(I,7,IP)*QX(I,7)+
      .                            PX(I,8,IP)*QX(I,8)+PX(I,9,IP)*QX(I,9)+PX(I,10,IP)*QX(I,10)
@@ -663,7 +665,7 @@ C             B M-1 Transpose(B)
      .                            PY(I,8,IP)*QZ(I,8)+PY(I,9,IP)*QZ(I,9)+PY(I,10,IP)*QZ(I,10)
               ENDDO
 C-------------------------------------------------------------------------------
-              DO I=LFT,LLT
+              DO I=1,NEL
                AA = -(PXX(I)+PYY(I)+PZZ(I))
                BB =  GFAC*(PXX(I)*PYY(I)+PXX(I)*PZZ(I)+PYY(I)*PZZ(I)-PXY(I)**2-PXZ(I)**2-PYZ(I)**2) 
                P  = BB-THIRD*AA*AA
@@ -719,7 +721,7 @@ C           Initialize at 1st time DT1TET10 has been encountered... Note : U nor
             END DO
 
             DO N=1,10
-              DO I=LFT,LLT
+              DO I=1,NEL
                 UX(I,N)=WX(N)
                 UY(I,N)=WY(N)
                 UZ(I,N)=WZ(N)
@@ -728,9 +730,9 @@ C           Initialize at 1st time DT1TET10 has been encountered... Note : U nor
           ELSE
 C
 C           Get vector from previous cycle / run
-            UX(LFT:LLT,1:10)=V_PITER(LFT:LLT,1,1:10)
-            UY(LFT:LLT,1:10)=V_PITER(LFT:LLT,2,1:10)
-            UZ(LFT:LLT,1:10)=V_PITER(LFT:LLT,3,1:10)
+            UX(1:NEL,1:10)=V_PITER(1:NEL,1,1:10)
+            UY(1:NEL,1:10)=V_PITER(1:NEL,2,1:10)
+            UZ(1:NEL,1:10)=V_PITER(1:NEL,3,1:10)
           END IF
 
           IF(IFORMDT==2)THEN
@@ -746,16 +748,16 @@ C           are computed using Gmax and c is also computed in the material using
 
           DO ITER=1,NITER
 
-            VX(LFT:LLT,1:10)=ZERO
-            VY(LFT:LLT,1:10)=ZERO
-            VZ(LFT:LLT,1:10)=ZERO
+            VX(1:NEL,1:10)=ZERO
+            VY(1:NEL,1:10)=ZERO
+            VZ(1:NEL,1:10)=ZERO
 
             DO IP=1,NPT
 C
 C             Bip.U
-              BU(LFT:LLT,1:6)=ZERO
+              BU(1:NEL,1:6)=ZERO
               DO N=1,10
-                DO I=LFT,LLT
+                DO I=1,NEL
                   BU(I,1)=BU(I,1)+PX(I,N,IP)*UX(I,N)
                   BU(I,2)=BU(I,2)+PY(I,N,IP)*UY(I,N)
                   BU(I,3)=BU(I,3)+PZ(I,N,IP)*UZ(I,N)
@@ -766,19 +768,19 @@ C             Bip.U
               END DO
 C
               DO J=1,3
-                DO I=LFT,LLT
+                DO I=1,NEL
                   BU(I,J)=BFAC*BU(I,J)
                 END DO
               END DO
               DO J=4,6
-                DO I=LFT,LLT
+                DO I=1,NEL
                   BU(I,J)=GFAC*BU(I,J)
                 END DO
               END DO
 C
 C             Vol_ip * Transpose(Bip).Bip.U
               DO N=1,10
-                DO I=LFT,LLT
+                DO I=1,NEL
                   VX(I,N)=VX(I,N)+VOL(I,IP)*(PX(I,N,IP)*BU(I,1)+PY(I,N,IP)*BU(I,4)+PZ(I,N,IP)*BU(I,6))
                   VY(I,N)=VY(I,N)+VOL(I,IP)*(PY(I,N,IP)*BU(I,2)+PX(I,N,IP)*BU(I,4)+PZ(I,N,IP)*BU(I,5))
                   VZ(I,N)=VZ(I,N)+VOL(I,IP)*(PZ(I,N,IP)*BU(I,3)+PY(I,N,IP)*BU(I,5)+PX(I,N,IP)*BU(I,6))
@@ -788,7 +790,7 @@ C             Vol_ip * Transpose(Bip).Bip.U
             END DO
 
 C           M-1 K . U
-            DO I=LFT,LLT
+            DO I=1,NEL
               VX(I,1)=VX(I,1)+HALF*(VX(I,5)+VX(I,7)+VX(I,8))   
               VX(I,2)=VX(I,2)+HALF*(VX(I,5)+VX(I,6)+VX(I,9))
               VX(I,3)=VX(I,3)+HALF*(VX(I,6)+VX(I,7)+VX(I,10))
@@ -826,40 +828,40 @@ C                      +FOURTH(VX(I,6)+VX(I,7)+VX(I,8)+VX(I,9)
 
             END DO
 
-            NV(LFT:LLT) = ZERO
+            NV(1:NEL) = ZERO
             DO N=1,10
-              DO I=LFT,LLT
+              DO I=1,NEL
                 NV(I) = NV(I) + VX(I,N)*VX(I,N)+VY(I,N)*VY(I,N)+VZ(I,N)*VZ(I,N)
               END DO
             END DO
-            DO I=LFT,LLT
+            DO I=1,NEL
               NV(I)  =SQRT(NV(I))
               NINV(I)=ONE/MAX(EM20,NV(I))
             END DO
             DO N=1,10
-              DO I=LFT,LLT
+              DO I=1,NEL
                 VX(I,N)=NINV(I) * VX(I,N)
                 VY(I,N)=NINV(I) * VY(I,N)
                 VZ(I,N)=NINV(I) * VZ(I,N)
               END DO
             END DO
-            UX(LFT:LLT,1:10)=VX(LFT:LLT,1:10)
-            UY(LFT:LLT,1:10)=VY(LFT:LLT,1:10)
-            UZ(LFT:LLT,1:10)=VZ(LFT:LLT,1:10)
+            UX(1:NEL,1:10)=VX(1:NEL,1:10)
+            UY(1:NEL,1:10)=VY(1:NEL,1:10)
+            UZ(1:NEL,1:10)=VZ(1:NEL,1:10)
 
           END DO ! DO ITER=1,NITER
 C
-          DO I=LFT,LLT
+          DO I=1,NEL
             D(I)=NV(I)
           END DO
-          V_PITER(LFT:LLT,1,1:10)=UX(LFT:LLT,1:10)
-          V_PITER(LFT:LLT,2,1:10)=UY(LFT:LLT,1:10)
-          V_PITER(LFT:LLT,3,1:10)=UZ(LFT:LLT,1:10)
+          V_PITER(1:NEL,1,1:10)=UX(1:NEL,1:10)
+          V_PITER(1:NEL,2,1:10)=UY(1:NEL,1:10)
+          V_PITER(1:NEL,3,1:10)=UZ(1:NEL,1:10)
 C
 C         2 * Max diagonal as an (under) estimation of Lambda 
 C         Because Iterative Power may be too much under-estimated before convergence.
           DO N=1,10
-            DO I=LFT,LLT
+            DO I=1,NEL
               UL(I,N) = ZERO
             ENDDO
           ENDDO
@@ -867,7 +869,7 @@ C
           DO IP=1,NPT
 C
 C           Q = M-1 Transpose(B)
-            DO I=LFT,LLT
+            DO I=1,NEL
               QX(I,1)=PX(I,1,IP)+HALF*(PX(I,5,IP)+PX(I,7,IP)+PX(I,8,IP))   
               QX(I,2)=PX(I,2,IP)+HALF*(PX(I,5,IP)+PX(I,6,IP)+PX(I,9,IP))
               QX(I,3)=PX(I,3,IP)+HALF*(PX(I,6,IP)+PX(I,7,IP)+PX(I,10,IP))
@@ -907,14 +909,14 @@ C                      +FOURTH(PX(I,6,IP)+PX(I,7,IP)+PX(I,8,IP)+PX(I,9,IP)
 C
 C           Diagonal of M-1 Transpose(B).B
             DO N=1,10
-              DO I=LFT,LLT
+              DO I=1,NEL
                 UL(I,N) =UL(I,N) + VOL(I,IP) *
      +          ( QX(I,N)*PX(I,N,IP) + QY(I,N)*PY(I,N,IP) + QZ(I,N)*PZ(I,N,IP) )
               ENDDO
             ENDDO
           ENDDO
 C
-          DO I=LFT,LLT
+          DO I=1,NEL
             AA   = MAX(UL(I,1),UL(I,2),UL(I,3),UL(I,4))
             BB   = MAX(UL(I,5),UL(I,6),UL(I,7),UL(I,8),UL(I,9),UL(I,10))
             D(I) = MAX(D(I),TWO*MAX(AA,BB))
@@ -922,7 +924,7 @@ C
 C
         END IF ! IF(NITER==0)THEN
 
-        DO I=LFT,LLT
+        DO I=1,NEL
 C
 C         DELTAX2 is not used w/IDT1TET10
           DELTAX2(I) = ONE 
@@ -938,7 +940,7 @@ C
         IF(ISROT == 0)THEN
 C
           DO N=1,10
-            DO I=LFT,LLT
+            DO I=1,NEL
               UL(I,N) = ZERO
             ENDDO
           ENDDO
@@ -946,7 +948,7 @@ C
           DO IP=1,NPT
 C
             DO N=1,10
-              DO I=LFT,LLT
+              DO I=1,NEL
                 UL(I,N) =UL(I,N) + VOL(I,IP) *
      +          ( PX(I,N,IP)*PX(I,N,IP) + PY(I,N,IP)*PY(I,N,IP)
      +         + PZ(I,N,IP)*PZ(I,N,IP) )
@@ -954,7 +956,7 @@ C
             ENDDO
           ENDDO
 C
-          DO I=LFT,LLT
+          DO I=1,NEL
             AA = MAX(UL(I,1),UL(I,2),UL(I,3),UL(I,4))
             BB = MAX(UL(I,5),UL(I,6),UL(I,7),UL(I,8),UL(I,9),UL(I,10))
             DELTAX2(I) = AA/MAX(AA,BB)
@@ -966,7 +968,7 @@ C
         ELSE
 
           IF(ISROT==2.AND.(IINT==0.OR.IDT1SOL>0))THEN
-            DO I=LFT,LLT
+            DO I=1,NEL
              B1(I) =  TY(I)*SZ(I) - SY(I)*TZ(I)
              B2(I) =  RY(I)*TZ(I) - TY(I)*RZ(I)
              B3(I) =  SY(I)*RZ(I) - RY(I)*SZ(I)
@@ -997,7 +999,7 @@ C
              P4Z4(I)= D4(I)*DD
 c             DELTAX2(I) = ONE
             END DO
-            DO I=LFT,LLT
+            DO I=1,NEL
              AA  = MAX(RX(I)*RX(I)+RY(I)*RY(I)+RZ(I)*RZ(I),
      .                 SX(I)*SX(I)+SY(I)*SY(I)+SZ(I)*SZ(I),
      .                 TX(I)*TX(I)+TY(I)*TY(I)+TZ(I)*TZ(I),
@@ -1013,7 +1015,7 @@ c             DELTAX2(I) = ONE
              DELTAX2(I) = AA
             ENDDO
             IF(IFORMDT==0)THEN
-             DO I=LFT,LLT
+             DO I=1,NEL
                DD = P4X1(I)*P4X1(I)+P4Y1(I)*P4Y1(I)+P4Z1(I)*P4Z1(I)
      .          + P4X2(I)*P4X2(I)+P4Y2(I)*P4Y2(I)+P4Z2(I)*P4Z2(I)
      .          + P4X3(I)*P4X3(I)+P4Y3(I)*P4Y3(I)+P4Z3(I)*P4Z3(I)
@@ -1025,7 +1027,7 @@ c             DELTAX2(I) = ONE
 
              GFAC=PM(105,MXT(1))
              LD  =TWO*SQRT(MAX(ONE-GFAC,ZERO))+ONE
-             DO I=LFT,LLT
+             DO I=1,NEL
               PXX(I)=P4X1(I)*P4X1(I)+P4X2(I)*P4X2(I)+P4X3(I)*P4X3(I)+P4X4(I)*P4X4(I)
               PYY(I)=P4Y1(I)*P4Y1(I)+P4Y2(I)*P4Y2(I)+P4Y3(I)*P4Y3(I)+P4Y4(I)*P4Y4(I)
               PZZ(I)=P4Z1(I)*P4Z1(I)+P4Z2(I)*P4Z2(I)+P4Z3(I)*P4Z3(I)+P4Z4(I)*P4Z4(I)
@@ -1046,7 +1048,7 @@ C
             ELSEIF(IFORMDT==2)THEN
 
              GFAC=PM(105,MXT(1))
-             DO I=LFT,LLT
+             DO I=1,NEL
               PXX(I)=P4X1(I)*P4X1(I)+P4X2(I)*P4X2(I)+P4X3(I)*P4X3(I)+P4X4(I)*P4X4(I)
               PYY(I)=P4Y1(I)*P4Y1(I)+P4Y2(I)*P4Y2(I)+P4Y3(I)*P4Y3(I)+P4Y4(I)*P4Y4(I)
               PZZ(I)=P4Z1(I)*P4Z1(I)+P4Z2(I)*P4Z2(I)+P4Z3(I)*P4Z3(I)+P4Z4(I)*P4Z4(I)
@@ -1064,7 +1066,7 @@ C
             END IF!(IFORMDT==0)THEN
           ELSE
 C        
-            DO I=LFT,LLT
+            DO I=1,NEL
       
               A1X = RY(I)*SZ(I)-RZ(I)*SY(I)
               A1Y = RZ(I)*SX(I)-RX(I)*SZ(I)

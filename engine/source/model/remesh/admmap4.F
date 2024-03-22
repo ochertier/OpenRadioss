@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  ADMMAP4                       source/model/remesh/admmap4.F 
 Chd|-- called by -----------
@@ -27,7 +27,7 @@ Chd|        ADMDIV                        source/model/remesh/admdiv.F
 Chd|        ADMINI                        source/model/remesh/admini.F  
 Chd|        ADMREGUL                      source/model/remesh/admregul.F
 Chd|-- calls ---------------
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        REMESH_MOD                    share/modules/remesh_mod.F    
 Chd|====================================================================
       SUBROUTINE ADMMAP4(N      ,IXC    ,X      ,IPARG  ,ELBUF_TAB,
@@ -42,21 +42,11 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "vect01_c.inc"
-#include      "scr01_c.inc"
 #include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "remesh_c.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -165,9 +155,9 @@ c----------------------------------------------
         M  = SH4TREE(2,N)+IB-1
         NG1= SH4TREE(4,M)
 
-        NEL1	 = IPARG(2,NG1)
-        NFT1	 = IPARG(3,NG1)
-        I1	 = M-NFT1
+        NEL1   = IPARG(2,NG1)
+        NFT1   = IPARG(3,NG1)
+        I1   = M-NFT1
         GBUFT => ELBUF_TAB(NG1)%GBUF
 !
         DO K=1,12  ! length max of GBUF%G_HOURG = 12
@@ -207,10 +197,10 @@ c
             DO IT=1,NPTT                                          
               ELBUF_TAB(NG1)%BUFLY(IL)%LBUF(IR,IS,IT)%PLA(I1) =    
      .        ELBUF_TAB(NG) %BUFLY(IL)%LBUF(IR,IS,IT)%PLA(I)      
-            END DO  	                                             
-            END DO  	                                             
-            END DO  	                                             
-            END DO  	                                             
+            END DO                                                 
+            END DO                                                 
+            END DO                                                 
+            END DO                                                 
           ENDIF                                                   
 c
 c         Stress
@@ -226,10 +216,10 @@ c
                LBUFT%SIG(KK1(3)+I1) = LBUFS%SIG(KK(3)+I) 
                LBUFT%SIG(KK1(4)+I1) = LBUFS%SIG(KK(4)+I) 
                LBUFT%SIG(KK1(5)+I1) = LBUFS%SIG(KK(5)+I) 
-             END DO  	                                            
-            END DO  	                                            
-           END DO  	                                            
-          END DO  	                                            
+             END DO                                                
+            END DO                                                
+           END DO                                                
+          END DO                                                
 c
 c         Uvar                                               
 c
@@ -242,10 +232,10 @@ c
                ELBUF_TAB(NG1)%BUFLY(IL)%MAT(IR,IS,IT)%VAR(NEL1*(K-1)+I1)=
      .         ELBUF_TAB(NG)%BUFLY(IL)%MAT(IR,IS,IT)%VAR(NEL*(K-1)+I)   
              END DO                                                      
-            END DO  	                                                     
-            END DO  	                                                     
-            END DO  	                                                     
-            END DO  	                                                     
+            END DO                                                         
+            END DO                                                         
+            END DO                                                         
+            END DO                                                         
           END IF                                                          
 c
           LENF = NEL*5
@@ -302,19 +292,19 @@ c
 
             IF (NPT==0) THEN
               GBUFT%FOR(KK1(1)+I1) = GBUFT%FOR(KK1(1)+I1)  
-     .	  		      + ST(1)*QPG(2,IB)+SK(1)*QPG(1,IB)
+     .              + ST(1)*QPG(2,IB)+SK(1)*QPG(1,IB)
               GBUFT%FOR(KK1(2)+I1) = GBUFT%FOR(KK1(2)+I1)  
-     .	  		      + ST(2)*QPG(2,IB)+SK(2)*QPG(1,IB)
+     .              + ST(2)*QPG(2,IB)+SK(2)*QPG(1,IB)
 c             GBUFT%FOR(KK1(3)+I1) = GBUFT%FOR(KK1(3)+I1)  
               GBUFT%FOR(KK1(4)+I1) = GBUFT%FOR(KK1(4)+I1)  
-     .	  		      + SHT(2)*QPG(2,IB)+SHK(2)*QPG(1,IB)
+     .              + SHT(2)*QPG(2,IB)+SHK(2)*QPG(1,IB)
               GBUFT%FOR(KK1(5)+I1) = GBUFT%FOR(KK1(5)+I1)  
-     .	  		      + SHT(1)*QPG(2,IB)+SHK(1)*QPG(1,IB)
+     .              + SHT(1)*QPG(2,IB)+SHK(1)*QPG(1,IB)
 !
               GBUFT%MOM(KK1(1)+I1) = GBUFT%MOM(KK1(1)+I1)
-     .	  		      + MT(1)*QPG(2,IB)+MK(1)*QPG(1,IB)
+     .              + MT(1)*QPG(2,IB)+MK(1)*QPG(1,IB)
               GBUFT%MOM(KK1(2)+I1) = GBUFT%MOM(KK1(2)+I1)
-     .	  		      + MT(2)*QPG(2,IB)+MK(2)*QPG(1,IB)
+     .              + MT(2)*QPG(2,IB)+MK(2)*QPG(1,IB)
 c             GBUFT%MOM(KK1(3)+I1) = GBUFT%MOM(KK1(3)+I1)
             ELSE
               CONTINUE
@@ -358,8 +348,8 @@ c
               LBUFT%SIG(KK1(3)+I1) = LBUFS%SIG(KK(3)+I)
               LBUFT%SIG(KK1(4)+I1) = LBUFS%SIG(KK(4)+I)
               LBUFT%SIG(KK1(5)+I1) = LBUFS%SIG(KK(5)+I)
-            END DO  	                                               
-          END DO  	                                                 
+            END DO                                                   
+          END DO                                                     
 c
           IF (JHBE == 22 .OR. JHBE == 23) THEN
             DO IL=1,NLAY                                          
@@ -372,14 +362,14 @@ c
      .                          + (SK(1)+ZZ*MK(1))*QPG(1,IB)  
                 LBUFT%SIG(KK1(2)+I1) = LBUFT%SIG(KK1(2)+I1)
      .                          + (ST(2)+ZZ*MT(2))*QPG(2,IB)  
-     .      	                   + (SK(2)+ZZ*MK(2))*QPG(1,IB)   
+     .                           + (SK(2)+ZZ*MK(2))*QPG(1,IB)   
 C               LBUFT%SIG(KK1(3)+I1) = LBUFT%SIG(KK1(3)+I1)
                 LBUFT%SIG(KK1(4)+I1) = LBUFT%SIG(KK1(4)+I1)
      .                          + SHT(2)*QPG(2,IB) + SHK(2)*QPG(1,IB)
                 LBUFT%SIG(KK1(5)+I1) = LBUFT%SIG(KK1(5)+I1)
      .                          + SHT(1)*QPG(2,IB) + SHK(1)*QPG(1,IB)   
-              END DO	       
-            END DO	       
+              END DO         
+            END DO         
           END IF
 c
 c         pla                                                    
@@ -389,8 +379,8 @@ c
              DO IT=1,NPTT                                          
               ELBUF_TAB(NG1)%BUFLY(IL)%LBUF(1,1,IT)%PLA(I1) =    
      .        ELBUF_TAB(NG )%BUFLY(IL)%LBUF(1,1,IT)%PLA(I)      
-             END DO  	                                             
-            END DO  	                                             
+             END DO                                                 
+            END DO                                                 
           ENDIF                                                   
 c
 C         uvar                                               
@@ -402,8 +392,8 @@ c
                ELBUF_TAB(NG1)%BUFLY(IL)%MAT(1,1,IT)%VAR(NEL1*(K-1)+I1)=
      .         ELBUF_TAB(NG )%BUFLY(IL)%MAT(1,1,IT)%VAR(NEL*(K-1)+I)   
              END DO                                                      
-             END DO  	                                                     
-            END DO  	                                                     
+             END DO                                                         
+            END DO                                                         
           END IF                                                          
 c
 C----    end Q4 & QEPH
@@ -440,8 +430,8 @@ c
               DO K=1,5                                                
                ELBUF_TAB(NG)%BUFLY(IL)%LBUF(IR,IS,IT)%SIG(KK(K)+I)=ZERO  
               ENDDO                                                   
-            END DO  	                                                 
-          END DO  	                                                   
+            END DO                                                     
+          END DO                                                       
         END DO                                                        
       END DO                                                          
 c

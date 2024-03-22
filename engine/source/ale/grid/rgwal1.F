@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  RGWAL1                        source/ale/grid/rgwal1.F      
 Chd|-- called by -----------
@@ -27,13 +27,13 @@ Chd|        ALEWDX                        source/ale/grid/alewdx.F
 Chd|-- calls ---------------
 Chd|        INTERP                        source/tools/curve/interp.F   
 Chd|        RGWATH                        source/interfaces/int09/rgwath.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
-      SUBROUTINE RGWAL1(X       ,A	,V	  ,W	  ,RWBUF   ,
-     2                  LPRW    ,NPRW	, 
-     3                  ICODT   ,ISKEW  ,SKEW	  ,MS	  ,FSAV    ,
-     4                  IXS     ,IXQ	,ELBUF_TAB,IPARG  ,
-     5                  PM      ,NALE	,TF	  ,NPF	  ,WEIGHT  ,
+      SUBROUTINE RGWAL1(X       ,A  ,V    ,W    ,RWBUF   ,
+     2                  LPRW    ,NPRW  , 
+     3                  ICODT   ,ISKEW  ,SKEW    ,MS    ,FSAV    ,
+     4                  IXS     ,IXQ  ,ELBUF_TAB,IPARG  ,
+     5                  PM      ,NALE  ,TF    ,NPF    ,WEIGHT  ,
      6                  IAD_ELEM,FR_ELEM,FR_WALL )
 C-----------------------------------------------
 C   M o d u l e s
@@ -48,14 +48,8 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "task_c.inc"
 #include      "param_c.inc"
-#include      "secur_c.inc"
-#include      "units_c.inc"
-#include      "scr05_c.inc"
-#include      "parit_c.inc"
 #include      "com08_c.inc"
-#include      "tabsiz_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -96,11 +90,11 @@ C-----------------------
               CALL INTERP(TF(NPF(IFUNC)),TIME,NPOINT,TEMP,BID)
               TEMP = TEMP * RWBUF(10,N)
               CALL RGWATH(
-     1          X       ,V	     ,W       ,RWBUF(1,N),LPRW(K)    ,
-     2          NSN     ,NPRW(N3)    ,MS      ,FSAV(1,N) ,IXS	     ,
-     3          IXQ     ,ELBUF_TAB   ,IPARG   ,PM	 ,
-     4          NTAG    ,LPRW(K+NSN) ,NE      ,TEMP	 ,RWBUF(11,N),
-     5          E       ,A	     ,NPRW(N2),WEIGHT	 ,IAD_ELEM   ,
+     1          X       ,V       ,W       ,RWBUF(1,N),LPRW(K)    ,
+     2          NSN     ,NPRW(N3)    ,MS      ,FSAV(1,N) ,IXS       ,
+     3          IXQ     ,ELBUF_TAB   ,IPARG   ,PM   ,
+     4          NTAG    ,LPRW(K+NSN) ,NE      ,TEMP   ,RWBUF(11,N),
+     5          E       ,A       ,NPRW(N2),WEIGHT   ,IAD_ELEM   ,
      6          FR_ELEM ,FR_WALL(1,N))
               K=K+NINT(RWBUF(8,N))
             ENDIF

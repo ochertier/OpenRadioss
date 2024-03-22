@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C   |============================================================
 C   |  CBALYVIT                          /coqueba/cbalyvit.F
 C   |------------------------------------------------------------
@@ -27,7 +27,14 @@ C   |-- appele -----------
 C   |-- appelee par -----------
 C   |         CBAFORC3                         /coqueba/cbaforc3.F
 C   |============================================================
-	SUBROUTINE CBAVIT_PLY(JFT,JLT,IXC,OFFG,OFF,NPLAT,IPLAT,NPT,
+Chd|====================================================================
+Chd|  CBAVIT_PLY                    source/properties/composite_options/stack/cbavit_ply.F
+Chd|-- called by -----------
+Chd|        CBAFORC3                      source/elements/shell/coqueba/cbaforc3.F
+Chd|-- calls ---------------
+Chd|        PLYXFEM_MOD                   share/modules/plyxfem_mod.F   
+Chd|====================================================================
+          SUBROUTINE CBAVIT_PLY(JFT,JLT,IXC,OFFG,OFF,NPLAT,IPLAT,NPT,
      1                        VCORE,DI,ZL,VQ , VXYZ,X13_T  ,X24_T ,
      2                        Y13_T,Y24_T,AREA,INOD,DEL_PLY,
      .                        VNI,ISTACK,VR)  
@@ -36,7 +43,7 @@ C   M o d u l e s
 C-----------------------------------------------
        USE PLYXFEM_MOD
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8
-C	transformation au repere local est absolue
+C  transformation au repere local est absolue
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8
 C-----------------------------------------------
 C   I M P L I C I T   T Y P E S
@@ -46,7 +53,6 @@ c-----------------------------------------------
 c   g l o b a l   p a r a m e t e r s
 c-----------------------------------------------
 #include      "mvsiz_p.inc"
-#include      "param_c.inc"
 #include      "scr17_c.inc"
 #include      "com08_c.inc"
 #include      "impl1_c.inc"
@@ -83,28 +89,28 @@ C-----------------------------------------------
 C-----------------------------------------------
 !!        NPLAT0 = JLT
         NPLAT0 = NPLAT
-	A1 = ONE - PG
+          A1 = ONE - PG
         A2 = ONE + PG
 C (-PG, -PG)        
         VNI(1,1)= FOURTH*A2*A2
-	VNI(2,1)= FOURTH*A1*A2
-	VNI(3,1)= FOURTH*A1*A1
-	VNI(4,1)= VNI(2,1)
+          VNI(2,1)= FOURTH*A1*A2
+          VNI(3,1)= FOURTH*A1*A1
+          VNI(4,1)= VNI(2,1)
 C (xi = PG,eta=-PG)
         VNI(1,2)= VNI(2,1)
-	VNI(2,2)= VNI(1,1)
-	VNI(3,2)= VNI(2,1)
-	VNI(4,2)= VNI(3,1)
+          VNI(2,2)= VNI(1,1)
+          VNI(3,2)= VNI(2,1)
+          VNI(4,2)= VNI(3,1)
 C  xi = PG, eta = PG 
         VNI(1,3)= VNI(3,1)
-	VNI(2,3)= VNI(2,1)
-	VNI(3,3)= VNI(1,1)
-	VNI(4,3)= VNI(2,1)
+          VNI(2,3)= VNI(2,1)
+          VNI(3,3)= VNI(1,1)
+          VNI(4,3)= VNI(2,1)
 Cxi= -PG, eta= pG
         VNI(1,4)= VNI(2,1)
-	VNI(2,4)= VNI(3,1)
-	VNI(3,4)= VNI(2,1)
-	VNI(4,4)= VNI(1,1)
+          VNI(2,4)= VNI(3,1)
+          VNI(3,4)= VNI(2,1)
+          VNI(4,4)= VNI(1,1)
 C        
       DO EP=JFT,JLT
         AREA_I(EP)=ONE/MAX(EM20,AREA(EP))
@@ -155,7 +161,7 @@ C
      
          ENDDO 
 C ---
-       IF (ISHV51>51.AND.IMPL_S==0) THEN
+       IF (IMPL_S==0) THEN
           DT05 = HALF*DT1
           DT025 =FOURTH*DT1
           DO I=JFT,JLT
@@ -357,5 +363,5 @@ C 4th
          ENDDO 
         ENDDO
 C ---
-	RETURN
-	END
+          RETURN
+          END

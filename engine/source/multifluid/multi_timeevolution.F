@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  MULTI_TIMEEVOLUTION           source/multifluid/multi_timeevolution.F
 Chd|-- called by -----------
@@ -40,13 +40,13 @@ Chd|        MULTI_UPDATE_PARTIAL          source/multifluid/multi_update_partial
 Chd|        MY_BARRIER                    source/system/machine.F       
 Chd|        SPMD_E1VOIS                   source/mpi/fluid/spmd_cfd.F   
 Chd|        SPMD_ENVOIS                   source/mpi/fluid/spmd_cfd.F   
-Chd|        ALEFVM_MOD                    ../common_source/modules/alefvm_mod.F
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
-Chd|        EBCS_MOD                      ../common_source/modules/ebcs_mod.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ALEFVM_MOD                    ../common_source/modules/ale/alefvm_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
+Chd|        EBCS_MOD                      ../common_source/modules/boundary_conditions/ebcs_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        INITBUF_MOD                   share/resol/initbuf.F         
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|====================================================================
       SUBROUTINE MULTI_TIMEEVOLUTION(TIMESTEP, ELBUF_TAB, IPARG, ITASK, IXS, IXQ, IXTG,
      .     PM, IPM, MULTI_FVM, ALE_CONNECTIVITY, VEL, ACCELE, WGRID, XGRID, DNOD, NALE,
@@ -55,9 +55,6 @@ Chd|====================================================================
      .     ITAB, ITABM1, CURRENT_TIME,
      .     STIFN, FSKY, IADS, FSKYM, 
      .     CONDN, CONDNSKY, BUFMAT, FUNC_VALUE, PRED,ID_GLOBAL_VOIS,FACE_VOIS,EBCS_TAB,NPF,TF)
-C-----------------------------------------------
-C     D e s c r i p t i o n
-C-----------------------------------------------
 C-----------------------------------------------
 C     M o d u l e s
 C-----------------------------------------------
@@ -77,19 +74,11 @@ C-----------------------------------------------
 C     C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-!     NEBCS
 #include      "com04_c.inc"
 #include      "param_c.inc"
 #include      "task_c.inc"
 #include      "mvsiz_p.inc"
-!     IPARIT
-#include      "parit_c.inc"
-!     DTFAC1
-#include      "scr18_c.inc" 
-!     SMPD
-#include "spmd_c.inc"
-!     SNPC,STF
-#include "tabsiz_c.inc"
+#include      "tabsiz_c.inc"
 C-----------------------------------------------
 C     D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -290,12 +279,12 @@ C     SUBMAT gradients
                CALL MULTI_MUSCL_FLUXES_COMPUTATION(NG, ELBUF_TAB, IPARG, ITASK, IXS, IXQ, IXTG,
      .              PM, IPM, MULTI_FVM, ALE_CONNECTIVITY, WGRID, XGRID, ITAB, 
      .              MULTI_FVM%NBMAT, CURRENT_TIME, BUFMAT,
-     .              ID_GLOBAL_VOIS,FACE_VOIS,NPF,TF)
+     .              ID_GLOBAL_VOIS,FACE_VOIS,NPF,TF,ISPMD)
             ELSE
                CALL MULTI_FLUXES_COMPUTATION(NG, ELBUF_TAB, IPARG, ITASK, IXS, IXQ, IXTG,
      .              PM, IPM, MULTI_FVM, ALE_CONNECTIVITY, WGRID, XGRID, ITAB, 
      .              MULTI_FVM%NBMAT, CURRENT_TIME, BUFMAT,
-     .              ID_GLOBAL_VOIS,NPF,TF) 
+     .              ID_GLOBAL_VOIS,NPF,TF)
             ENDIF
          ENDIF
       ENDDO                     ! DO NG = ITASK + 1, NGROUP, NTHREAD
@@ -340,14 +329,14 @@ C     -------------------------
 C     Multifluid law: update global values
 C     -------------------------
             CALL MULTI_EVOLVE_GLOBAL(TIMESTEP, NG, ELBUF_TAB, 
-     .           IPARG, ITASK, IXS, IXQ, IXTG, MULTI_FVM, VERTEX)  
+     .           IPARG, ITASK, IXS, IXQ, IXTG, MULTI_FVM, ALEFVM_Buffer%VERTEX)  
             IF (NBMAT > 1) THEN
 C     -------------------------  
 C     Multifluid law: evolve partial values
 C     -------------------------
                CALL MULTI_EVOLVE_PARTIAL(TIMESTEP, NG, ELBUF_TAB, 
      .              IPARG, ITASK, IXS, IXQ, IXTG,  MULTI_FVM, 
-     .              PM, IPM, VERTEX, CURRENT_TIME)                  
+     .              PM, IPM, ALEFVM_Buffer%VERTEX, CURRENT_TIME)                  
             ENDIF
          ENDIF                  !IF (MATLAW == 151) THEN
       ENDDO                     !NG = ITASK + 1, NGROUP, NTHREAD    
@@ -361,14 +350,15 @@ C     -------------------------
             GBUF => ELBUF_TAB(NG)%GBUF
 C     -------------------------  
 C     Volume computation
-C     -------------------------  
+C     -------------------------
+            VOLNEW(1:MVSIZ) = ZERO
             CALL MULTI_COMPUTEVOLUME(NEL, NG, IPARG, MULTI_FVM%SYM, 
      .           ELBUF_TAB, IXS, IXQ, IXTG, VOLNEW, XGRID)
 C     -------------------------  
 C     Multifluid law: update global values
 C     -------------------------
             CALL MULTI_UPDATE_GLOBAL(NG, ELBUF_TAB, IPARG, ITASK, MULTI_FVM, 
-     .           PARTSAV, IPARTS, GRESAV, IGRTH, GRTH, VOLNEW(1:NEL), PRED) 
+     .           PARTSAV, IPARTS, GRESAV, IGRTH, GRTH, VOLNEW(1:NEL), PRED, TIMESTEP)
 
             IF (MULTI_FVM%SYM == 0) THEN
                IX => IXS(1:NIXS, 1 + NFT:NEL + NFT)

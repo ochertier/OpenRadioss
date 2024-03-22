@@ -1,30 +1,32 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
 Chd|-- called by -----------
 Chd|        CONTRBE2                      source/constraints/general/rbe2/hm_read_rbe2.F
+Chd|        CONTRBE3                      source/constraints/general/rbe3/contrbe3.F
 Chd|        CONTRL                        source/starter/contrl.F       
+Chd|        CREATE_ELLIPSE_CLAUSE         source/model/sets/create_ellipse_clause.F
 Chd|        GROUPS_GET_ELEM_LIST          source/groups/groups_get_elem_list.F
 Chd|        GROUPS_GET_NENTITY            source/groups/groups_get_nentity.F
 Chd|        HM_ADMLIST                    source/groups/hm_admlist.F    
@@ -118,11 +120,14 @@ Chd|        HM_READ_FAIL_GENE1            source/materials/fail/gene1/hm_read_fa
 Chd|        HM_READ_FAIL_GURSON           source/materials/fail/gurson/hm_read_fail_gurson.F
 Chd|        HM_READ_FAIL_HASHIN           source/materials/fail/hashin/hm_read_fail_hashin.F
 Chd|        HM_READ_FAIL_HC_DSSE          source/materials/fail/hc_dsse/hm_read_fail_hc_dsse.F
+Chd|        HM_READ_FAIL_HOFFMAN          source/materials/fail/hoffman/hm_read_fail_hoffman.F
 Chd|        HM_READ_FAIL_INIEVO           source/materials/fail/inievo/hm_read_fail_inievo.F
 Chd|        HM_READ_FAIL_JOHNSON          source/materials/fail/johnson_cook/hm_read_fail_johnson.F
 Chd|        HM_READ_FAIL_LADEVEZE         source/materials/fail/ladeveze/hm_read_fail_ladeveze.F
+Chd|        HM_READ_FAIL_MAXSTRAIN        source/materials/fail/max_strain/hm_read_fail_maxstrain.F
 Chd|        HM_READ_FAIL_NXT              source/materials/fail/nxt/hm_read_fail_nxt.F
 Chd|        HM_READ_FAIL_ORTHBIQUAD       source/materials/fail/orthbiquad/hm_read_fail_orthbiquad.F
+Chd|        HM_READ_FAIL_ORTHENERG        source/materials/fail/orthenerg/hm_read_fail_orthenerg.F
 Chd|        HM_READ_FAIL_ORTHSTRAIN       source/materials/fail/orthstrain/hm_read_fail_orthstrain.F
 Chd|        HM_READ_FAIL_PUCK             source/materials/fail/puck/hm_read_fail_puck.F
 Chd|        HM_READ_FAIL_RTCL             source/materials/fail/rtcl/hm_read_fail_rtcl.F
@@ -135,6 +140,8 @@ Chd|        HM_READ_FAIL_TAB2             source/materials/fail/tabulated/hm_rea
 Chd|        HM_READ_FAIL_TAB_OLD          source/materials/fail/tabulated/hm_read_fail_tab_old.F
 Chd|        HM_READ_FAIL_TBUTCHER         source/materials/fail/tuler_butcher/hm_read_fail_tbutcher.F
 Chd|        HM_READ_FAIL_TENSSTRAIN       source/materials/fail/tensstrain/hm_read_fail_tensstrain.F
+Chd|        HM_READ_FAIL_TSAIHILL         source/materials/fail/tsaihill/hm_read_fail_tsaihill.F
+Chd|        HM_READ_FAIL_TSAIWU           source/materials/fail/tsaiwu/hm_read_fail_tsaiwu.F
 Chd|        HM_READ_FAIL_USER             source/materials/fail/failuser/hm_read_fail_user.F
 Chd|        HM_READ_FAIL_VISUAL           source/materials/fail/visual/hm_read_fail_visual.F
 Chd|        HM_READ_FAIL_WIERZBICKI       source/materials/fail/wierzbicki/hm_read_fail_wierzbicki.F
@@ -227,11 +234,15 @@ Chd|        HM_READ_MAT11_K_EPS           source/materials/mat/mat011/hm_read_ma
 Chd|        HM_READ_MAT12                 source/materials/mat/mat012/hm_read_mat12.F
 Chd|        HM_READ_MAT120                source/materials/mat/mat120/hm_read_mat120.F
 Chd|        HM_READ_MAT121                source/materials/mat/mat121/hm_read_mat121.F
+Chd|        HM_READ_MAT122                source/materials/mat/mat122/hm_read_mat122.F
+Chd|        HM_READ_MAT124                source/materials/mat/mat124/hm_read_mat124.F
 Chd|        HM_READ_MAT14                 source/materials/mat/mat014/hm_read_mat14.F
 Chd|        HM_READ_MAT15                 source/materials/mat/mat015/hm_read_mat15.F
 Chd|        HM_READ_MAT151                source/materials/mat/mat151/hm_read_mat151.F
+Chd|        HM_READ_MAT158                source/materials/mat/mat158/hm_read_mat158.F
 Chd|        HM_READ_MAT18                 source/materials/mat/mat018/hm_read_mat18.F
 Chd|        HM_READ_MAT19                 source/materials/mat/mat019/hm_read_mat19.F
+Chd|        HM_READ_MAT190                source/materials/mat/mat190/hm_read_mat190.F
 Chd|        HM_READ_MAT20                 source/materials/mat/mat020/hm_read_mat20.F
 Chd|        HM_READ_MAT21                 source/materials/mat/mat021/hm_read_mat21.F
 Chd|        HM_READ_MAT22                 source/materials/mat/mat022/hm_read_mat22.F
@@ -246,7 +257,7 @@ Chd|        HM_READ_MAT33                 source/materials/mat/mat033/hm_read_ma
 Chd|        HM_READ_MAT35                 source/materials/mat/mat035/hm_read_mat35.F
 Chd|        HM_READ_MAT36                 source/materials/mat/mat036/hm_read_mat36.F
 Chd|        HM_READ_MAT38                 source/materials/mat/mat038/hm_read_mat38.F
-Chd|        HM_READ_MAT41                 source/materials/mat/mat041/hm_read_mat41.F.F
+Chd|        HM_READ_MAT41                 source/materials/mat/mat041/hm_read_mat41.F
 Chd|        HM_READ_MAT42                 source/materials/mat/mat042/hm_read_mat42.F
 Chd|        HM_READ_MAT43                 source/materials/mat/mat043/hm_read_mat43.F
 Chd|        HM_READ_MAT44                 source/materials/mat/mat044/hm_read_mat44.F
@@ -274,15 +285,17 @@ Chd|        HM_READ_MAT75                 source/materials/mat/mat075/hm_read_ma
 Chd|        HM_READ_MAT76                 source/materials/mat/mat076/hm_read_mat76.F
 Chd|        HM_READ_MAT77                 source/materials/mat/mat077/hm_read_mat77.F
 Chd|        HM_READ_MAT78                 source/materials/mat/mat078/hm_read_mat78.F
+Chd|        HM_READ_MAT79                 source/materials/mat/mat079/hm_read_mat79.F
 Chd|        HM_READ_MAT80                 source/materials/mat/mat080/hm_read_mat80.F
 Chd|        HM_READ_MAT81                 source/materials/mat/mat081/hm_read_mat81.F
 Chd|        HM_READ_MAT82                 source/materials/mat/mat082/hm_read_mat82.F
-Chd|        HM_READ_MAT83                 source/materials/mat/mat083/hm_read_law83.F
+Chd|        HM_READ_MAT83                 source/materials/mat/mat083/hm_read_mat83.F
 Chd|        HM_READ_MAT87                 source/materials/mat/mat087/hm_read_mat87.F
 Chd|        HM_READ_MAT88                 source/materials/mat/mat088/hm_read_mat88.F
 Chd|        HM_READ_MAT90                 source/materials/mat/mat090/hm_read_mat90.F
 Chd|        HM_READ_MAT92                 source/materials/mat/mat092/hm_read_mat92.F
 Chd|        HM_READ_MAT93                 source/materials/mat/mat093/hm_read_mat93.F
+Chd|        HM_READ_MAT95                 source/materials/mat/mat095/hm_read_mat95.F
 Chd|        HM_READ_MAT97                 source/materials/mat/mat097/hm_read_mat97.F
 Chd|        HM_READ_MAT_99                source/materials/mat/matuser/hm_read_mat_user_99.F
 Chd|        HM_READ_MERGE                 source/constraints/general/merge/hm_read_merge.F
@@ -304,6 +317,7 @@ Chd|        HM_READ_NBCS                  source/constraints/general/bcs/hm_read
 Chd|        HM_READ_NODE                  source/elements/reader/hm_read_node.F
 Chd|        HM_READ_PART                  source/model/assembling/hm_read_part.F
 Chd|        HM_READ_PBLAST                source/loads/pblast/hm_read_pblast.F
+Chd|        HM_READ_PCYL                  source/loads/general/load_pcyl/hm_read_pcyl.F
 Chd|        HM_READ_PERTURB_FAIL          source/general_controls/computation/hm_read_perturb_fail.F
 Chd|        HM_READ_PERTURB_PART_SHELL    source/general_controls/computation/hm_read_perturb_part_shell.F
 Chd|        HM_READ_PERTURB_PART_SOLID    source/general_controls/computation/hm_read_perturb_part_solid.F
@@ -394,9 +408,11 @@ Chd|        HM_READ_THGRNE                source/output/th/hm_read_thgrne.F
 Chd|        HM_READ_THGRNS                source/output/th/hm_read_thgrns.F
 Chd|        HM_READ_THGRPA                source/output/th/hm_read_thgrpa.F
 Chd|        HM_READ_THGRPA_SUB            source/output/th/hm_read_thgrpa.F
+Chd|        HM_READ_THGRSENS              source/output/th/hm_read_thgrsens.F
 Chd|        HM_READ_THGRSURF              source/output/th/hm_read_thgrsurf.F
 Chd|        HM_READ_THPART                source/output/thpart/hm_read_thpart.F
 Chd|        HM_READ_UNIT                  source/general_controls/computation/hm_read_unit.F
+Chd|        HM_READ_VISC_LPRONY           source/materials/visc/hm_read_visc_lprony.F
 Chd|        HM_READ_VISC_PRONY            source/materials/visc/hm_read_visc_prony.F
 Chd|        HM_READ_WINDOW_USER           source/tools/userwi/hm_read_window_user.F
 Chd|        HM_READ_XREF                  source/loads/reference_state/xref/hm_read_xref.F
@@ -507,11 +523,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "nchar_c.inc"
-#include      "submod_c.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
 C INPUT ARGUMENTS
@@ -521,46 +532,17 @@ C OUTPUT ARGUMENTS
       INTEGER,INTENT(OUT)::IVAL
       LOGICAL,INTENT(OUT)::IS_AVAILABLE
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,VALUE_TYPE,SUB_ID
       LOGICAL(KIND=C_BOOL) C_IS_AVAILABLE
 C-----------------------------------------------
-C   E x t e r n a l   F u n c t i o n s
-C-----------------------------------------------
-C=======================================================================
-C--------------------------------------------------
       VALUE_TYPE = 0
       SUB_ID = 0
       IVAL = 0
 C--------------------------------------------------
       CALL CPP_GET_INTV(NAME(1:LEN_TRIM(NAME)),LEN_TRIM(NAME),IVAL,SUB_ID,C_IS_AVAILABLE,VALUE_TYPE)
       IS_AVAILABLE = C_IS_AVAILABLE
-C--------------------------------------------------
-C      ID OFFSETS FOR //SUBMODEL 
-C--------------------------------------------------
-      IF(SUB_ID /= 0 .AND. IVAL /= 0)THEN
-        IF(VALUE_TYPE == 1)THEN
-          IVAL = IVAL + LSUBMODEL(SUB_ID)%OFF_EL
-        ELSEIF(VALUE_TYPE == 2)THEN
-          IVAL = IVAL + LSUBMODEL(SUB_ID)%OFF_NOD
-        ELSEIF(VALUE_TYPE == 3)THEN
-          IVAL = IVAL + LSUBMODEL(SUB_ID)%OFF_PART
-        ELSEIF(VALUE_TYPE == 4)THEN
-          IVAL = IVAL + LSUBMODEL(SUB_ID)%OFF_MAT
-        ELSEIF(VALUE_TYPE == 5)THEN
-          IVAL = IVAL + LSUBMODEL(SUB_ID)%OFF_PROP
-        ELSEIF(VALUE_TYPE == 6)THEN
-c          IVAL = IVAL + LSUBMODEL(SUB_ID)%OFF_SUBMOD
-          IVAL = IVAL + LSUBMODEL(SUB_ID)%OFF_DEF
-        ELSEIF(VALUE_TYPE == 7)THEN
-          IVAL = IVAL + LSUBMODEL(SUB_ID)%OFF_DEF
-        ENDIF
-      ENDIF
-c      print *,'int value=',NAME(1:LEN_TRIM(NAME)),IVAL,IS_AVAILABLE
 C--------------------------------------------------
       RETURN
 C

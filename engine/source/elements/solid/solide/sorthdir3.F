@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  SORTHDIR3                     source/elements/solid/solide/sorthdir3.F
 Chd|-- called by -----------
@@ -34,9 +34,12 @@ Chd|        SRCOORK                       source/elements/solid/solide8z/srcoork
 Chd|-- calls ---------------
 Chd|====================================================================
       SUBROUTINE SORTHDIR3(
-     .       RX    ,RY   ,RZ   ,SX   ,SY   ,SZ   ,TX   ,TY   ,TZ   ,
-     .       E1X   ,E2X  ,E3X  ,E1Y  ,E2Y  ,E3Y  ,E1Z  ,E2Z  ,E3Z  , 
-     .       GAMA0,GAMA )
+     1   RX,      RY,      RZ,      SX,
+     2   SY,      SZ,      TX,      TY,
+     3   TZ,      E1X,     E2X,     E3X,
+     4   E1Y,     E2Y,     E3Y,     E1Z,
+     5   E2Z,     E3Z,     GAMA0,   GAMA,
+     6   NEL,     IREP)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -48,17 +51,18 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      my_real, DIMENSION(LLT), INTENT(IN)    ::
+      INTEGER, INTENT(IN) :: NEL
+      INTEGER, INTENT(IN) :: IREP
+      my_real, DIMENSION(NEL), INTENT(IN)    ::
      .   RX, RY, RZ, SX, SY, SZ, TX, TY, TZ,
      .   E1X, E1Y, E1Z, E2X, E2Y, E2Z, E3X, E3Y, E3Z
       my_real, 
-     .  DIMENSION(LLT,6), INTENT(IN)  :: GAMA0
+     .  DIMENSION(NEL,6), INTENT(IN)  :: GAMA0
       my_real, 
      .  DIMENSION(MVSIZ,6), INTENT(OUT) :: GAMA
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "vect01_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -68,18 +72,18 @@ C     REAL
      .  UX,UY,UZ,VX,VY,VZ,WX,WY,WZ,D1,D2,D3,GX,GY,GZ,SUMA,S2,S3
 C=======================================================================
       IF (IREP == 0) THEN 
-        DO I=LFT,LLT                                            
-          GAMA(I,1) = GAMA0(I,1)				  
-          GAMA(I,2) = GAMA0(I,2)				  
+        DO I=1,NEL                                            
+          GAMA(I,1) = GAMA0(I,1)          
+          GAMA(I,2) = GAMA0(I,2)          
           GAMA(I,3) = GAMA0(I,3) 
-          GAMA(I,4) = GAMA0(I,4)				  
-          GAMA(I,5) = GAMA0(I,5)				  
+          GAMA(I,4) = GAMA0(I,4)          
+          GAMA(I,5) = GAMA0(I,5)          
           GAMA(I,6) = GAMA0(I,6)
         ENDDO                                   
       ELSEIF (IREP > 0) THEN 
 ctmp      ELSEIF (IREP == 1) THEN 
 C         dir 1 = const
-        DO I=LFT,LLT                                            
+        DO I=1,NEL                                            
 C         Dir 1
           
           D1 = GAMA0(I,1)*RX(I) + GAMA0(I,2)*SX(I) + GAMA0(I,3)*TX(I)     
@@ -117,7 +121,7 @@ C ON VEUT LA 3EME DIRECTION DE GAMA (ELEM -> ORTHO)
         ENDDO                                     
 c      ELSEIF (IREP == 2) THEN 
 C       Plan (dir1,dir2) = const
-c        DO I=LFT,LLT                                            
+c        DO I=1,NEL                                            
 C         Dir 1  - normale au plan
 c          D1 = GAMA0(I,1)*RX(I) + GAMA0(I,2)*SX(I) + GAMA0(I,3)*TX(I)     
 c          D2 = GAMA0(I,1)*RY(I) + GAMA0(I,2)*SY(I) + GAMA0(I,3)*TY(I)     

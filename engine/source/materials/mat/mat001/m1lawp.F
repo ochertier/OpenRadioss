@@ -1,33 +1,33 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  M1LAWP                        source/materials/mat/mat001/m1lawp.F
 Chd|-- called by -----------
-Chd|        PFORC3                        source/elements/beam/pforc3.F 
+Chd|        MAIN_BEAM3                    source/elements/beam/main_beam3.F
 Chd|-- calls ---------------
 Chd|====================================================================
       SUBROUTINE M1LAWP(
-     1              PM      ,FOR     ,MOM     ,EINT    ,GEO,
+     1              PM      ,FOR     ,MOM     ,GEO     ,
      2              OFF     ,EXX     ,EXY     ,EXZ     ,KXX,
      3              KYY     ,KZZ     ,AL      ,F1      ,F2 ,
      4              F3      ,M1      ,M2      ,M3      ,NEL,
@@ -37,55 +37,48 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "scr06_c.inc"
-#include      "com04_c.inc"
 #include      "com08_c.inc"
-#include      "vect01_c.inc"
 #include      "impl1_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER NEL,MAT(MVSIZ),PID(MVSIZ)
+      INTEGER NEL,MAT(NEL),PID(NEL)
 C     REAL
       my_real
-     .   PM(NPROPM,*), FOR(NEL,3), MOM(NEL,3), EINT(NEL,2), GEO(NPROPG,*),
-     .   OFF(*),A1(MVSIZ),
-     .   AL(MVSIZ),EXX(MVSIZ),
-     .   EXY(MVSIZ),EXZ(MVSIZ),KXX(MVSIZ),KYY(MVSIZ),KZZ(MVSIZ),
-     .   F1(MVSIZ), F2(MVSIZ), F3(MVSIZ), 
-     .   M1(MVSIZ), M2(MVSIZ), M3(MVSIZ)
+     .   PM(NPROPM,*), FOR(NEL,3), MOM(NEL,3), GEO(NPROPG,*),
+     .   OFF(*),A1(NEL),
+     .   AL(NEL),EXX(NEL),
+     .   EXY(NEL),EXZ(NEL),KXX(NEL),KYY(NEL),KZZ(NEL),
+     .   F1(NEL), F2(NEL), F3(NEL), 
+     .   M1(NEL), M2(NEL), M3(NEL)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, J
 C     REAL
       my_real
-     .   YM(MVSIZ),SHF(MVSIZ),B1(MVSIZ),B2(MVSIZ),B3(MVSIZ),
-     .   DEGMB(MVSIZ), DEGFX(MVSIZ), 
-     .   SH(MVSIZ), YMA2(MVSIZ), SH10(MVSIZ),
-     .   SH20(MVSIZ), SH0(MVSIZ), SH1(MVSIZ), SH2(MVSIZ),
-     .   DMPM(MVSIZ),DMPF(MVSIZ),RHO(MVSIZ),G(MVSIZ)
+     .   YM(NEL),SHF(NEL),B1(NEL),B2(NEL),B3(NEL),
+     .   DEGMB(NEL), DEGFX(NEL), 
+     .   SH(NEL), YMA2(NEL), SH10(NEL),
+     .   SH20(NEL), SH0(NEL), SH1(NEL), SH2(NEL),
+     .   DMPM(NEL),DMPF(NEL),RHO(NEL),G(NEL)
 C-----------------------------------------------
       IF (IMPL_S == 0 .OR. IDYNA > 0) THEN
-        DO I=LFT,LLT                    
+        DO I=1,NEL                    
           DMPM(I)=GEO(16,PID(I))*AL(I)  
           DMPF(I)=GEO(17,PID(I))*AL(I)  
         ENDDO 
       ELSE
-        DO I=LFT,LLT                    
+        DO I=1,NEL                    
           DMPM(I)=ZERO  
           DMPF(I)=ZERO  
         ENDDO 
       ENDIF                                 
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         RHO(I) =PM( 1,MAT(I))
         G(I)   =PM(22,MAT(I))
         YM(I)  =PM(20,MAT(I))
@@ -96,34 +89,10 @@ C
         SHF(I) =GEO(37,PID(I))
       ENDDO
 C-----------------------------
-C     AMORTISSEMENT
-C-----------------------------
-      DO I=LFT,LLT
-        F1(I)= EXX(I)*DMPM(I)*A1(I)*SQRT(TWO*YM(I)*RHO(I))
-        F2(I)= EXY(I)*DMPF(I)*12*B2(I)*SQRT(TWO*YM(I)*RHO(I))/AL(I)**2
-        F3(I)= EXZ(I)*DMPF(I)*12*B1(I)*SQRT(TWO*YM(I)*RHO(I))/AL(I)**2
-        M1(I)= KXX(I)*DMPF(I)*B3(I)*SQRT(TWO*G(I)*RHO(I))
-        M2(I)= KYY(I)*DMPF(I)*B1(I)*SQRT(TWO*YM(I)*RHO(I))
-        M3(I)= KZZ(I)*DMPF(I)*B2(I)*SQRT(TWO*YM(I)*RHO(I))
-      ENDDO
-C
-      DO I=LFT,LLT
-        EXX(I)=EXX(I)*DT1
-        EXY(I)=EXY(I)*DT1
-        EXZ(I)=EXZ(I)*DT1
-        KXX(I)=KXX(I)*DT1
-        KYY(I)=KYY(I)*DT1
-        KZZ(I)=KZZ(I)*DT1
-      ENDDO
-C
-      DO I=LFT,LLT
-        DEGMB(I) =(FOR(I,1)*EXX(I)+FOR(I,2)*EXY(I)+FOR(I,3)*EXZ(I))
-        DEGFX(I) =(MOM(I,1)*KXX(I)+MOM(I,2)*KYY(I)+MOM(I,3)*KZZ(I))
-      ENDDO
 C
 C     CISSAILLEMENT TRANSVERSAL CALCULE AVEC K1=12EI/L**2 K2=5/6GA
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         SH(I)=FIVE_OVER_6*G(I)*A1(I)
         YMA2(I)=TWELVE*YM(I)/AL(I)**2
         SH10(I)=YMA2(I)*B1(I)
@@ -147,25 +116,13 @@ C
         MOM(I,3)=MOM(I,3)*OFF(I)
       ENDDO
 C
-      DO I=LFT,LLT
-        DEGMB(I) = DEGMB(I)
-     +            +FOR(I,1)*EXX(I)+FOR(I,2)*EXY(I)+FOR(I,3)*EXZ(I)
-        DEGFX(I) = DEGFX(I)
-     +            +MOM(I,1)*KXX(I)+MOM(I,2)*KYY(I)+MOM(I,3)*KZZ(I)
-      ENDDO
-C
-      DO I=LFT,LLT
-        EINT(I,1) = EINT(I,1) + DEGMB(I)*AL(I)*HALF*OFF(I)
-        EINT(I,2) = EINT(I,2) + DEGFX(I)*AL(I)*HALF*OFF(I)
-      ENDDO
-C
-      DO I=LFT,LLT
-        F1(I) = F1(I) + FOR(I,1)
-        F2(I) = F2(I) + FOR(I,2) 
-        F3(I) = F3(I) + FOR(I,3)  
-        M1(I) = M1(I) + MOM(I,1) 
-        M2(I) = M2(I) + MOM(I,2) 
-        M3(I) = M3(I) + MOM(I,3) 
+      DO I=1,NEL
+        F1(I) =  FOR(I,1)
+        F2(I) =  FOR(I,2) 
+        F3(I) =  FOR(I,3)  
+        M1(I) =  MOM(I,1) 
+        M2(I) =  MOM(I,2) 
+        M3(I) =  MOM(I,3) 
       ENDDO               
 C-----------------------------------------------
       RETURN

@@ -1,42 +1,41 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 #ifndef DNC
 Chd|====================================================================
 Chd|  EIGCOND                       stub/eigcond.F                
 Chd|-- called by -----------
 Chd|-- calls ---------------
 Chd|        ARRET                         source/system/arret.F         
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
 Chd|        CLUSTER_MOD                   share/modules/cluster_mod.F   
 Chd|        CRACKXFEM_MOD                 share/modules/crackxfem_mod.F 
 Chd|        DRAPE_MOD                     share/modules/drape_mod.F     
 Chd|        DSGRAPH_MOD                   share/modules/dsgraph_mod.F   
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
-Chd|        GENANI_MOD                    source/output/anim/generate/genani.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|        STACK_MOD                     share/modules/stack_mod.F     
 Chd|====================================================================
       SUBROUTINE EIGCOND(GRAPHE      , EIGIPM    , EIGRPM  , IKC0      , NDDL0       ,
@@ -47,7 +46,7 @@ Chd|====================================================================
      6                   PM          , GEO       , CONT    , ICUT      , SKEW        ,
      7                   XCUT        , FINT      , ITAB    , FEXT      , FOPT        ,
      8                   ANIN        , LPBY      , NPBY    , NSTRF     , RWBUF       ,
-     9                   NPRW        , IXUR      , TANI    , ELBUF_TAB , DD_IAD      ,
+     9                   NPRW        , TANI      , ELBUF_TAB ,DD_IAD  ,
      A                   FR_IAD      , DD_FRONT  , WEIGHT  , EANI      , IPART       ,
      B                   RBY         , NOM_OPT   , IGRSURF ,
      C                   BUFSF       , IDATA     , RDATA   , BUFMAT    , BUFGEO      ,
@@ -70,7 +69,6 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE DSGRAPH_MOD
-      USE GENANI_MOD
       USE ELBUFDEF_MOD         
       USE CLUSTER_MOD
       USE INTBUFDEF_MOD
@@ -100,7 +98,6 @@ C-----------------------------------------------
 #include      "scr23_c.inc"
 #include      "param_c.inc"
 #include      "sphcom.inc"
-#include      "rnur_c.inc"
 #include      "units_c.inc"
 #include      "spmd_c.inc"
 #include      "task_c.inc"
@@ -110,7 +107,7 @@ C-----------------------------------------------
       INTEGER EIGIPM(*), IKC0(*), NDDL0, IADK(*), JDIK(*), NDOF(*),
      .        NDDL, EIGIBUF(*), IXS(*), IXQ(*), IXC(*), IXT(*), IXP(*),
      .        IXR(*), IXTG(*), ICUT(*), ITAB(*), LPBY(*), NPBY(NNPBY,*),
-     .        NSTRF(*), NPRW(*), IXUR(*),INDX_CRK(*),XEDGE4N(4,*),XEDGE3N(3,*),
+     .        NSTRF(*), NPRW(*), INDX_CRK(*),XEDGE4N(4,*),XEDGE3N(3,*),
      .        DD_IAD(NSPMD+1,*), FR_IAD(*), DD_FRONT(4,*), WEIGHT(*),
      .        IPART(*), NOM_OPT(LNOPT1,*),
      .        IDATA(*), KXX(NIXX,*), IXX(*),

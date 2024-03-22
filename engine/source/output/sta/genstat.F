@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  GENSTAT                       source/output/sta/genstat.F   
 Chd|-- called by -----------
@@ -27,9 +27,9 @@ Chd|        SORTIE_MAIN                   source/output/sortie_main.F
 Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
 Chd|        ARRET                         source/system/arret.F         
-Chd|        CLOSE_C                       source/output/tools/sortie_c.c
-Chd|        CUR_FIL_C                     source/output/tools/sortie_c.c
-Chd|        OPEN_C                        source/output/tools/sortie_c.c
+Chd|        CLOSE_C                       ../common_source/tools/input_output/write_routtines.c
+Chd|        CUR_FIL_C                     ../common_source/tools/input_output/write_routtines.c
+Chd|        OPEN_C                        ../common_source/tools/input_output/write_routtines.c
 Chd|        SPMD_OUTPITAB                 source/mpi/interfaces/spmd_outp.F
 Chd|        STAT_BEAM_MP                  source/output/sta/stat_beam_mp.F
 Chd|        STAT_BEAM_SPMD                source/output/sta/stat_beam_spmd.F
@@ -74,10 +74,10 @@ Chd|        STAT_TRUSS_SPMD               source/output/sta/stat_truss_spmd.F
 Chd|        STAT_T_FULL                   source/output/sta/stat_t_full.F
 Chd|        STRS_TXT50                    source/output/sta/sta_txt.F   
 Chd|        DRAPE_MOD                     share/modules/drape_mod.F     
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
 Chd|        INOUTFILE_MOD                 ../common_source/modules/inoutfile_mod.F
+Chd|        MAT_ELEM_MOD                  ../common_source/modules/mat_elem/mat_elem_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|        STACK_MOD                     share/modules/stack_mod.F     
 Chd|        STATE_INIMAP_MOD              share/modules/state_inimap_mod.F
 Chd|====================================================================
@@ -93,11 +93,11 @@ Chd|====================================================================
      A                  IXS16    ,IXS20   ,ICODE    ,LENGR   ,LENGP   ,
      B                  LENGT    ,ISKEW   ,V        ,VR      ,LENGQ   ,
      C                  MULTI_FVM,BUFMAT  ,NPBY     ,LPBY    ,STACK   ,
-     D                  DRAPE_Q4 ,DRAPE_T3,DR       )
+     D                  DRAPE_SH4N ,DRAPE_SH3N,DR,DRAPEG,MAT_PARAM)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
-      USE ELBUFDEF_MOD
+      USE MAT_ELEM_MOD
       USE MESSAGE_MOD    
       USE INOUTFILE_MOD 
       USE MULTI_FVM_MOD
@@ -113,24 +113,17 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com05_c.inc"
-#include      "com06_c.inc"
-#include      "com08_c.inc"
 #include      "com09_c.inc"
 #include      "param_c.inc"
 #include      "units_c.inc"
 #include      "scr03_c.inc"
 #include      "scr05_c.inc"
-#include      "scr11_c.inc"
-#include      "scr13_c.inc"
 #include      "scr14_c.inc"
 #include      "scr16_c.inc"
 #include      "scr17_c.inc"
 #include      "chara_c.inc"
 #include      "task_c.inc"
 #include      "sphcom.inc"
-#include      "spmd_c.inc"
-#include      "vect01_c.inc"
 #include      "state_c.inc"
 #include      "sysunit.inc"
 #include      "tabsiz_c.inc"
@@ -155,7 +148,9 @@ C-----------------------------------------------
       TYPE (ELBUF_STRUCT_), DIMENSION(NGROUP), TARGET :: ELBUF_TAB
       TYPE(MULTI_FVM_STRUCT), INTENT(IN) :: MULTI_FVM
       TYPE (STACK_PLY) :: STACK
-      TYPE (DRAPE_)  :: DRAPE_Q4, DRAPE_T3
+      TYPE (DRAPE_)  :: DRAPE_SH4N(NUMELC_DRAPE), DRAPE_SH3N(NUMELTG_DRAPE)
+      TYPE(DRAPEG_) :: DRAPEG
+      TYPE (MATPARAM_STRUCT_) ,DIMENSION(NUMMAT) ,INTENT(INOUT) :: MAT_PARAM
       my_real BUFMAT(*)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -290,7 +285,7 @@ c
      .                         ITAB,ITABG,LENG,IPART,IGEO,                  
      .                         IXC,IXTG,IPARTC,IPARTTG,IPART_STATE,         
      .                         NODTAG,STAT_INDXC,STAT_INDXTG,LENGC,LENGTG,  
-     .                         IPARG ,ELBUF_TAB,THKE,SIZP0,STAT_C(9))       
+     .                         IPARG ,ELBUF_TAB,THKE,STAT_C(9))       
         !  - solids -
         CALL STAT_BRICK_SPMD(
      .                         ITAB,IPART,IGEO,IXS,IPARTS,
@@ -307,17 +302,17 @@ c
         CALL STAT_SPRING_SPMD(
      .                          ITAB   ,IPART     ,IXR   ,IPARTR,IPART_STATE,
      .                          NODTAG ,STAT_INDXR,LENGR ,IPARG ,ELBUF_TAB  ,
-     .                          SIZP0  ,STAT_R(2) )
+     .                          STAT_R(2) )
         !  - beams -
         CALL STAT_BEAM_SPMD(
      .                        ITAB   ,IPART     ,IXP   ,IPARTP,IPART_STATE,
      .                        NODTAG ,STAT_INDXP,LENGP ,IPARG ,ELBUF_TAB  ,
-     .                        SIZP0  ,STAT_P(2) )
+     .                        STAT_P(2) )
         !  - trusses -
         CALL STAT_TRUSS_SPMD(
      .                         ITAB   ,IPART     ,IXT   ,IPARTT,IPART_STATE,
      .                         NODTAG ,STAT_INDXT,LENGT ,IPARG ,ELBUF_TAB  ,
-     .                         SIZP0  ,STAT_T(2) )
+     .                         STAT_T(2) )
       END IF
 
       !  - inimap1d -  (generic subroutine : SMP or SPMD)
@@ -456,7 +451,7 @@ C     option non documentee (not a public option) ::
      .   ELBUF_TAB,X,IPARG ,IPM ,IGEO,IXC  ,
      .   IXTG ,WA,WAP0 ,IPARTC,IPARTTG,
      .   IPART_STATE,STAT_INDXC,STAT_INDXTG,
-     .   THKE ,SIZP0,GEO ,STACK,DRAPE_Q4,DRAPE_T3)
+     .   THKE ,SIZP0,GEO ,STACK,DRAPE_SH4N,DRAPE_SH3N,DRAPEG)
 
       IF(STAT_C(5)==1) CALL STAT_C_STRAF(
      .   ELBUF_TAB,IPARG ,IPM ,IGEO,IXC  ,
@@ -468,7 +463,7 @@ C     option non documentee (not a public option) ::
      .   ELBUF_TAB,X,IPARG ,IPM ,IGEO,IXC  ,
      .   IXTG ,WA,WAP0 ,IPARTC,IPARTTG,
      .   IPART_STATE,STAT_INDXC,STAT_INDXTG,
-     .   THKE ,SIZP0,GEO ,STACK,DRAPE_Q4,DRAPE_T3)
+     .   THKE ,SIZP0,GEO ,STACK,DRAPE_SH4N,DRAPE_SH3N,DRAPEG)
 
       IF(STAT_C(6)==1) CALL STAT_C_AUXF(
      .   ELBUF_TAB,IPARG ,IPM ,IGEO,IXC  ,
@@ -484,7 +479,8 @@ C
       IF(STAT_C(8)==1) CALL STAT_C_FAIL(
      .   ELBUF_TAB,IPARG ,IPM ,IGEO,IXC  ,
      .   IXTG ,WA,WAP0 ,IPARTC,IPARTTG,
-     .   IPART_STATE,STAT_INDXC,STAT_INDXTG,SIZP0)
+     .   IPART_STATE,STAT_INDXC,STAT_INDXTG,SIZP0,
+     .   NUMMAT,MAT_PARAM)
 C-----------------------------------------------
 C   SHELL TENSOR(2D)
 C-----------------------------------------------
@@ -539,7 +535,7 @@ C-----------------------------------------------
       IF(STAT_S(11)==1) CALL STAT_S_FAIL(
      1                        ELBUF_TAB ,IPARG ,IPM ,IGEO ,IXS ,
      2                        WA,WAP0 ,IPARTS, IPART_STATE,
-     3                        STAT_INDXS,IPART,SIZP0)
+     3                        STAT_INDXS,IPART,SIZP0,NUMMAT,MAT_PARAM)
       IF(STAT_S(13)==1) CALL STAT_S_EREF(
      1                        ELBUF_TAB ,IPARG ,IPM ,IGEO ,
      2                        IXS ,IXS10,IXS16,IXS20,X   ,

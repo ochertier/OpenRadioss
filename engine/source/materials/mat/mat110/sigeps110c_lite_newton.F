@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  SIGEPS110C_LITE_NEWTON        source/materials/mat/mat110/sigeps110c_lite_newton.F
 Chd|-- called by -----------
@@ -53,10 +53,7 @@ Chd|====================================================================
       !=======================================================================
       !      Common
       !=======================================================================
-#include      "param_c.inc" 
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr17_c.inc"
       !=======================================================================
       !      Dummy arguments
       !=======================================================================
@@ -252,7 +249,7 @@ c
           XVEC(1:NEL,2)  = EPSP(1:NEL) * XSCALE
           IPOS0(1:NEL,1) = 1
           IPOS0(1:NEL,2) = 1
-          CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(1)),ISMOOTH,NEL,IPOS0,XVEC  ,YL0  ,HARDP,HARDR)               
+          CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(1)),ISMOOTH,NEL,NEL,IPOS0,XVEC  ,YL0  ,HARDP,HARDR)               
           YL0(1:NEL) = YL0(1:NEL)   * YSCALE
           ! Tabulation with Temperature
           IF (NUMTABL == 2) THEN
@@ -260,10 +257,10 @@ c
             XVEC(1:NEL,2)  = TINI
             IPOS0(1:NEL,1) = 1
             IPOS0(1:NEL,2) = 1
-            CALL TABLE_VINTERP(TABLE(ITABLE(2)),NEL,IPOS0,XVEC,YLD_TREF,DYDX)      
+            CALL TABLE_VINTERP(TABLE(ITABLE(2)),NEL,NEL,IPOS0,XVEC,YLD_TREF,DYDX)      
             ! Current temperature factor
             XVEC(1:NEL,2) = TEMP(1:NEL)
-            CALL TABLE_VINTERP(TABLE(ITABLE(2)),NEL,IPOS0,XVEC,YLD_TEMP,DYDX)
+            CALL TABLE_VINTERP(TABLE(ITABLE(2)),NEL,NEL,IPOS0,XVEC,YLD_TEMP,DYDX)
             TFAC(1:NEL)  = YLD_TEMP(1:NEL) / YLD_TREF(1:NEL)      
             YL0(1:NEL)   = YL0(1:NEL) * TFAC(1:NEL)
           ENDIF    
@@ -281,7 +278,7 @@ c
         XVEC(1:NEL,2) = EPSP(1:NEL) * XSCALE
         IPOS(1:NEL,1) = VARTMP(1:NEL,1)
         IPOS(1:NEL,2) = 1
-        CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(1)),ISMOOTH,NEL,IPOS,XVEC,YLD,HARDP,HARDR)
+        CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(1)),ISMOOTH,NEL,NEL,IPOS,XVEC,YLD,HARDP,HARDR)
         YLD(1:NEL)   = YLD(1:NEL)   * YSCALE
         HARDP(1:NEL) = HARDP(1:NEL) * YSCALE
         VARTMP(1:NEL,1) = IPOS(1:NEL,1)
@@ -291,12 +288,12 @@ c
           XVEC(1:NEL,2) = TINI
           IPOS(1:NEL,1) = VARTMP(1:NEL,2)
           IPOS(1:NEL,2) = VARTMP(1:NEL,3)
-          CALL TABLE_VINTERP(TABLE(ITABLE(2)),NEL,IPOS,XVEC,YLD_TREF,DYDX)  
+          CALL TABLE_VINTERP(TABLE(ITABLE(2)),NEL,NEL,IPOS,XVEC,YLD_TREF,DYDX)  
           VARTMP(1:NEL,2) = IPOS(1:NEL,1)     
           VARTMP(1:NEL,3) = IPOS(1:NEL,2)   
           ! Current temperature factor
           XVEC(1:NEL,2) = TEMP(1:NEL)
-          CALL TABLE_VINTERP(TABLE(ITABLE(2)),NEL,IPOS,XVEC,YLD_TEMP,DYDX)
+          CALL TABLE_VINTERP(TABLE(ITABLE(2)),NEL,NEL,IPOS,XVEC,YLD_TEMP,DYDX)
           TFAC(1:NEL)  = YLD_TEMP(1:NEL) / YLD_TREF(1:NEL)
           YLD(1:NEL)   = YLD(1:NEL)   * TFAC(1:NEL)      
           HARDP(1:NEL) = HARDP(1:NEL) * TFAC(1:NEL) 
@@ -771,7 +768,7 @@ c
           XVEC(1:NEL,2) = EPSP(1:NEL) * XSCALE
           IPOS(1:NEL,1) = VARTMP(1:NEL,1)
           IPOS(1:NEL,2) = 1
-          CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(1)),ISMOOTH,NEL,IPOS,XVEC  ,YLD  ,HARDP,HARDR)               
+          CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(1)),ISMOOTH,NEL,NEL,IPOS,XVEC  ,YLD  ,HARDP,HARDR)               
           YLD(1:NEL)      = YLD(1:NEL) * YSCALE
           HARDP(1:NEL)    = HARDP(1:NEL) * YSCALE
           VARTMP(1:NEL,1) = IPOS(1:NEL,1)
@@ -781,12 +778,12 @@ c
             XVEC(1:NEL,2) = TINI
             IPOS(1:NEL,1) = VARTMP(1:NEL,2)
             IPOS(1:NEL,2) = VARTMP(1:NEL,3)
-            CALL TABLE_VINTERP(TABLE(ITABLE(2)),NEL,IPOS,XVEC,YLD_TREF,DYDX)  
+            CALL TABLE_VINTERP(TABLE(ITABLE(2)),NEL,NEL,IPOS,XVEC,YLD_TREF,DYDX)  
             VARTMP(1:NEL,2) = IPOS(1:NEL,1)     
             VARTMP(1:NEL,3) = IPOS(1:NEL,2)     
             ! Current temperature factor
             XVEC(1:NEL,2) = TEMP(1:NEL)
-            CALL TABLE_VINTERP(TABLE(ITABLE(2)),NEL,IPOS,XVEC,YLD_TEMP,DYDX)
+            CALL TABLE_VINTERP(TABLE(ITABLE(2)),NEL,NEL,IPOS,XVEC,YLD_TEMP,DYDX)
             TFAC(1:NEL)  = YLD_TEMP(1:NEL) / YLD_TREF(1:NEL)      
             YLD(1:NEL)   = YLD(1:NEL)   * TFAC(1:NEL)      
             HARDP(1:NEL) = HARDP(1:NEL) * TFAC(1:NEL) 

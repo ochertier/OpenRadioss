@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  HM_READ_RBE3                  source/constraints/general/rbe3/hm_read_rbe3.F
 Chd|-- called by -----------
@@ -61,20 +61,13 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-#include      "analyse_name.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr05_c.inc"
 #include      "scr17_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "units_c.inc"
-#include      "warn_c.inc"
 #include      "param_c.inc"
-#include      "submod_c.inc"
 #include      "tabsiz_c.inc"
 #include      "r2r_c.inc"
 #include      "sphcom.inc"
@@ -181,7 +174,8 @@ C
         IC2=J6(4)*4 +J6(5)*2 +J6(6)
         IC =IC1*512+IC2*64
         IF (IC==0) IC =7*512+7*64
-        IF (NS10E > 0.AND.ITAGND(NS)/=0) THEN
+        IF (NS10E > 0) THEN
+          IF(ITAGND(NS)/=0) THEN
 C------- error out      
           CALL ANCMSG(MSGID=1208,
      .                MSGTYPE=MSGERROR,
@@ -190,6 +184,7 @@ C------- error out
      .                C1='RBE3 ',
      .                I2=NUSER,
      .                C2='RBE3 ')
+          ENDIF
         END IF
         IRBE3(3,I) = NS
         IRBE3(4,I) = IC
@@ -263,7 +258,8 @@ C------- error out
      .                   I2=ITAB(NI))
             ENDIF
            ENDIF
-           IF (NS10E > 0.AND.ITAGND(NI)/=0) THEN
+           IF (NS10E > 0) THEN
+             IF(ITAGND(NI)/=0) THEN
 C------- error out      
              CALL ANCMSG(MSGID=1211,
      .               MSGTYPE=MSGERROR,
@@ -272,6 +268,7 @@ C------- error out
      .               C1='RBE3',
      .               I2=NUSER,
      .               C2='RBE3')
+             ENDIF
            END IF
            FRBE3(JJ,IAD+K) = WI(JJ,NI)
           ENDDO
@@ -320,11 +317,7 @@ c        WRITE(IOUT,1103)
           ENDDO
         ENDIF
       ENDDO
-      IF (NSPMD>1) THEN
-          LXINTD = 6*LXINTD
-      ELSE
-         LXINTD = 0
-      ENDIF
+      IF (NSPMD==1) LXINTD = 0
 C
       RETURN
 C
@@ -371,17 +364,11 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr05_c.inc"
 #include      "scr17_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
 #include      "param_c.inc"
 #include      "tabsiz_c.inc"
 C-----------------------------------------------
@@ -399,14 +386,14 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, N, K, NSL,NM, NI, NMT,M,IROT,IMO,
+      INTEGER I, N, K, NSL,NM, NI, NMT,M,IROT,IMO,ICR,
      .        J, P,IAD,NS,NN,J6(6),JJ,II,IADS,IERR1,NP,IC,ICT
       INTEGER ID
       CHARACTER*nchartitle,
      .   TITR
 C
       my_real
-     .   W,WMIN
+     .   W,WMIN,IN_T
 C-----------------------------------------------
 C     FRBE3(1-3,I) : tw(i)
 C     FRBE3(4-6,I) : rw(i)
@@ -426,6 +413,23 @@ C----- re-ordering by hierrrchy (only 1 level)
         
         ID=NOM_OPT(1,I)
         CALL FRETITL2(TITR,NOM_OPT(LNOPT1-LTITR+1,I),LTITR)
+C------ check if solid node for all independent        
+        IF (IROT>0) THEN
+          IN_T = ZERO
+          DO J=1,NM
+            M= LRBE3(IAD+J)
+            IN_T = IN_T + IN(M)
+          ENDDO
+          IF (IN_T<EM20) THEN
+             CALL ANCMSG(MSGID=3009,
+     .                   MSGTYPE=MSGWARNING,
+     .                   ANMODE=ANINFO_BLIND_1,
+     .                   I1=ID,
+     .                   C1=TITR)
+            IROT = 0
+            IRBE3(6,I) = 0
+          END IF
+         END IF !(IROT>0) THEN
         CALL RBE3CHK(LRBE3(IAD+1),LRBE3(NMT+IAD+1) ,NS     ,X      ,
      .               FRBE3(6*IAD+1),SKEW    ,NM   ,IROT  ,IMO, WMIN,
      .               IERR1 )
@@ -454,12 +458,6 @@ C----- re-ordering by hierrrchy (only 1 level)
      .                   R1=WMIN)
            END IF
         END IF
-C------ remove JR of NS if no dof of rotation		
-		IF (IRODDL==0 .OR.IN(NS)==ZERO) THEN
-		 IC = IRBE3(4,I)
-		 ICT = IC/512
-		 IRBE3(4,I) = ICT*512
-		END IF
         DO J=1,NM
           M= LRBE3(IAD+J)
           FRBE3(IADS+J) =MS(M)
@@ -483,68 +481,6 @@ C
       RETURN
       END
 Chd|====================================================================
-Chd|  INTXRBE3                      source/constraints/general/rbe3/hm_read_rbe3.F
-Chd|-- called by -----------
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|-- calls ---------------
-Chd|====================================================================
-      SUBROUTINE INTXRBE3(IRBE3  ,LRBE3  ,NELEMINT,IXINT,IFIEND)
-C-----------------------------------------------
-C   I m p l i c i t   T y p e s
-C-----------------------------------------------
-#include      "implicit_f.inc"
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "param_c.inc"
-C-----------------------------------------------
-C   D u m m y   A r g u m e n t s
-C-----------------------------------------------
-      INTEGER IRBE3(NRBE3L,*), LRBE3(*),NELEMINT, IXINT(6,*), IFIEND
-C-----------------------------------------------
-C   L o c a l   V a r i a b l e s
-C-----------------------------------------------
-      INTEGER I, N, J,K, NS,NM, NI, NMT,M,NFT,JLT,IAD,II
-C
-C========================================================================|
-      NMT = 0
-      DO I=1,NRBE3
-       IAD = IRBE3(1,I)
-       NS = IRBE3(3,I)
-       NM = IRBE3(5,I)
-       DO NFT =0,NM-1 ,4
-         JLT = MIN(4, NM - NFT )
-         NELEMINT = NELEMINT + 1
-         NMT = NMT + 1
-         DO J = 1 ,JLT
-          II = J+ NFT
-          M= LRBE3(IAD+II)
-          IXINT(J,NELEMINT)=M
-         ENDDO
-         IF (JLT==1) THEN
-          IXINT(2,NELEMINT)=IXINT(1,NELEMINT)
-          IXINT(3,NELEMINT)=IXINT(1,NELEMINT)
-          IXINT(4,NELEMINT)=IXINT(1,NELEMINT)
-         ELSEIF (JLT==2) THEN
-          IXINT(3,NELEMINT)=IXINT(1,NELEMINT)
-          IXINT(4,NELEMINT)=IXINT(2,NELEMINT)
-         ELSEIF (JLT==3) THEN
-          IXINT(4,NELEMINT)=IXINT(3,NELEMINT)
-         ENDIF
-         IXINT(5,NELEMINT)=NS
-         IXINT(6,NELEMINT)=100
-       ENDDO
-      ENDDO
-      IFIEND = IFIEND + NMT*6
-C
-      RETURN
-      END
-Chd|====================================================================
 Chd|  RBE3CHK                       source/constraints/general/rbe3/hm_read_rbe3.F
 Chd|-- called by -----------
 Chd|        INIRBE3                       source/constraints/general/rbe3/hm_read_rbe3.F
@@ -562,9 +498,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -1476,12 +1409,8 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com04_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -1564,12 +1493,8 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
 #include      "scr17_c.inc"

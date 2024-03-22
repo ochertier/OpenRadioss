@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  HM_READ_PROP22                source/properties/thickshell/hm_read_prop22.F
 Chd|-- called by -----------
@@ -34,7 +34,7 @@ Chd|        HM_OPTION_IS_ENCRYPTED        source/devtools/hm_reader/hm_option_is
 Chd|        SUBROTVECT                    source/model/submodel/subrot.F
 Chd|        ELBUFTAG_MOD                  share/modules1/elbuftag_mod.F 
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
       SUBROUTINE HM_READ_PROP22(GEO,IGEO ,IGTYP,IG,TITR,UNITAB,LSUBMODEL,
@@ -73,15 +73,11 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr17_c.inc"
-#include      "scr03_c.inc"
 #include      "units_c.inc"
 #include      "scr21_c.inc"
-#include      "submod_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
 #include      "tablen_c.inc"
-#include      "fluid_scr_c.inc"
 #include      "sphcom.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -99,9 +95,6 @@ C MODIFIED ARGUMENT
      .  INTENT(INOUT)::GEO(*)
       TYPE(PROP_TAG_) , DIMENSION(0:MAXPROP) :: PROP_TAG
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
 C     REAL
@@ -113,7 +106,8 @@ C     REAL
       INTEGER NUML(200), NLY, NLYMAX, N, J, M1, M2, M3,ICOMPA,
      .   K,  N1,IDSK, IPANG, IPTHK, IPPOS, IPMAT,IERRS,IP,ISK
       my_real
-     .   AN,  DT, THK, TMIN, TMAX,ANG,VX,VY,VZ
+     .   AN,  DT, THK, TMIN, TMAX,ANG,VX,VY,VZ,
+     .   VDEFMIN,VDEFMAX,ASPMAX,ASPTET
       LOGICAL IS_AVAILABLE, IS_ENCRYPTED
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
@@ -163,6 +157,10 @@ C--------------------------------------------------
       CALL HM_GET_FLOATV('Vz',VZ,IS_AVAILABLE,LSUBMODEL,UNITAB)
       CALL HM_GET_FLOATV('AREA_SHEAR',ASHEAR,IS_AVAILABLE,LSUBMODEL,UNITAB)
       CALL HM_GET_FLOATV('deltaT_min',DTMIN,IS_AVAILABLE,LSUBMODEL,UNITAB)
+      CALL HM_GET_FLOATV('vdef_min',VDEFMIN,IS_AVAILABLE,LSUBMODEL,UNITAB)
+      CALL HM_GET_FLOATV('vdef_max',VDEFMAX,IS_AVAILABLE,LSUBMODEL,UNITAB)
+      CALL HM_GET_FLOATV('ASP_max',ASPMAX,IS_AVAILABLE,LSUBMODEL,UNITAB)
+      CALL HM_GET_FLOATV('COL_min',ASPTET,IS_AVAILABLE,LSUBMODEL,UNITAB)
 C-------for lecture check 
 c         WRITE(IOUT,2100)IG,IHBE,ISMSTR,IPLAST,IINT,ICPRE,ICSTR,CVIS,QA,QB,
 c     .                   DTMIN,ISTRAIN,NPTR,NPTS,NPTT
@@ -263,10 +261,10 @@ c        NPT = NPTT
            ENDIF
         END SELECT
         IF (NLY ==0) THEN
-	 NLY =IINT
-	ELSE
-	 IINT = 1
-	ENDIF
+           NLY =IINT
+          ELSE
+           IINT = 1
+          ENDIF
       END SELECT      
       IF (NLY<=0) THEN
          CALL ANCMSG(MSGID=27,
@@ -282,7 +280,7 @@ c        NPT = NPTT
      .               I2=NLYMAX,
      .               I1=IG,
      .               C1=TITR)
-	     NLY =NLYMAX
+               NLY =NLYMAX
       ENDIF
 C                                 
 C  viscosity
@@ -370,6 +368,10 @@ C
       GEO(38) = ASHEAR
 C
       GEO(172) = DTMIN
+      GEO(190)= VDEFMIN
+      GEO(191)= VDEFMAX
+      GEO(192)= ASPMAX
+      GEO(193)= ASPTET
 C---------------------
        THK =ZERO
       DO K=1,NLY
@@ -460,6 +462,11 @@ C----------------------
      .                CVIS,QA,QB,DTMIN,NLY,IPOS,ASHEAR,IREP,ISKN(4,ISK)
          ENDIF
        ENDIF
+       IF((VDEFMIN+VDEFMAX+ASPMAX+ASPTET)>ZERO) THEN
+         IF (VDEFMAX==ZERO) VDEFMAX=EP10
+         IF (ASPMAX==ZERO) ASPMAX=EP10
+         WRITE(IOUT,3001) VDEFMIN,VDEFMAX,ASPMAX,ASPTET 
+       END IF          
       ENDIF
 C
       DO K=1,NLY
@@ -584,6 +591,11 @@ C---
      & 5X,'      THICKNESS (PER TOTAL THICKNESS). .=',1PG20.13/,
      & 5X,'      POSITION  ([-0.5,+0.5]). . . . . .=',1PG20.13/,
      & 5X,'      MATERIAL NUMBER . . . . . . . . . =',I10/)
+ 3001 FORMAT(
+     & 5X,'SOLID MINIMUM VOLUMETRIC STRAIN........=',1PG20.13/,
+     & 5X,'SOLID MAXIMUM VOLUMETRIC STRAIN........=',1PG20.13/,
+     & 5X,'SOLID MAXIMUM ASPECT RATIO.............=',1PG20.13/,
+     & 5X,'SOLID MINIMUM COLLAPSE RATIO...........=',1PG20.13/)
 C
 
       END SUBROUTINE HM_READ_PROP22

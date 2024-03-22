@@ -1,42 +1,46 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  M2LAW8                        source/materials/mat/mat002/m2law8.F
 Chd|-- called by -----------
 Chd|        MMAIN8                        source/materials/mat_share/mmain8.F
 Chd|-- calls ---------------
 Chd|        MQVISC8                       source/materials/mat_share/mqvisc8.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
-      SUBROUTINE M2LAW8 (PM     ,OFF    ,SIG    ,EINT   ,RHO     ,
-     .                   QOLD   ,VOL    ,STIFN  ,NEL    ,D1      ,
-     .                   D2     ,D3     ,D4     ,D5     ,D6      ,
-     .                   VNEW   ,VOLGP  ,DELTAX ,RHO0   ,DVOL    ,
-     .                   VD2    ,VIS    ,MAT    ,NC     ,NGL     ,
-     .                   GEO    ,PID    ,EPSEQ  ,DT2T   ,NELTST  ,
-     .                   ITYPTST,IPLA   ,OFFG   ,DPLA   ,EPSP    , 
-     .                   TSTAR  ,ETSE   ,MSSA   ,DMELS  ,BUFLY   ,
-     .                   SSP)
+      SUBROUTINE M2LAW8(
+     1   PM,      OFF,     SIG,     EINT,
+     2   RHO,     QOLD,    VOL,     STIFN,
+     3   NEL,     D1,      D2,      D3,
+     4   D4,      D5,      D6,      VNEW,
+     5   VOLGP,   DELTAX,  RHO0,    DVOL,
+     6   VD2,     VIS,     MAT,     NC,
+     7   NGL,     GEO,     PID,     EPSEQ,
+     8   DT2T,    NELTST,  ITYPTST, IPLA,
+     9   OFFG,    DPLA,    EPSP,    TSTAR,
+     A   ETSE,    MSSA,    DMELS,   BUFLY,
+     B   SSP,     ITY,     NPT,     JTUR,
+     C   JTHE,    JSMS)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -54,11 +58,15 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "vect01_c.inc"
 #include      "impl1_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: ITY
+      INTEGER, INTENT(IN) :: NPT
+      INTEGER, INTENT(IN) :: JTUR
+      INTEGER, INTENT(IN) :: JTHE
+      INTEGER, INTENT(IN) :: JSMS
       INTEGER MAT(MVSIZ),NC(8,MVSIZ),NGL(MVSIZ),PID(MVSIZ)
       INTEGER NEL,NELTST,ITYPTST,IPLA
 C     REAL
@@ -99,7 +107,7 @@ C=======================================================================
       NPIF = 0
 C
       DTA =HALF*DT1
-      MX=MAT(LFT)
+      MX=MAT(1)
       ICC  =NINT(PM(49,MX))
       C1   =PM(32,MX)
       CN   =PM(40,MX)
@@ -118,7 +126,7 @@ C
       CP_1   =PM(53,MX)
       T_1   =PM(54,MX)
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
        G(I)    =PM(22,MX)*OFF(I)
        CA(I)   =CA_1
        SIGMX(I)=SIGMX_1
@@ -127,7 +135,7 @@ C
        ETSE(I) = ONE
       ENDDO
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
        DF(I)=RHO0(I)/RHO(I)
       ENDDO
 C
@@ -137,7 +145,7 @@ C
 C-----------------------
 C     PRESSION ANCIENNE
 C-----------------------
-      DO I=LFT,LLT
+      DO I=1,NEL
         P(I)  =-THIRD*(SIG(I,1)+SIG(I,2)+SIG(I,3))
         G1(I)=DT1*G(I)
         G2(I)=TWO*G1(I)
@@ -154,23 +162,27 @@ C-----------------------
 C------------------------------
 C     DP/DRHO ET VITESSE DU SON
 C------------------------------
-      DO I=LFT,LLT
+      DO I=1,NEL
         DPDM(I)=ONEP333*G(I)+C1
         SSP(I)=SQRT(ABS(DPDM(I))/RHO0(I))
       ENDDO
 C--------------------------------------------------
 C     VISCOSITE VOLUMETRIQUE ET PAS DE TEMPS
 C--------------------------------------------------
-      CALL MQVISC8(PM,OFF,RHO,VIS,VIS,VIS,STIFN,EINT,
-     .             D1,D2,D3,VNEW,DVOL,
-     .             VD2,DELTAX,VIS,QOLD,SSP,
-     .             MAT,NC,NGL,GEO,PID,
-     .             DT2T ,NELTST,ITYPTST,OFFG,MSSA,
-     .             DMELS,NEL)
+      CALL MQVISC8(
+     1   PM,      OFF,     RHO,     VIS,
+     2   VIS,     VIS,     STIFN,   EINT,
+     3   D1,      D2,      D3,      VNEW,
+     4   DVOL,    VD2,     DELTAX,  VIS,
+     5   QOLD,    SSP,     MAT,     NC,
+     6   NGL,     GEO,     PID,     DT2T,
+     7   NELTST,  ITYPTST, OFFG,    MSSA,
+     8   DMELS,   NEL,     ITY,     JTUR,
+     9   JTHE,    JSMS)
 C--------------------------------------------------
 C     NOUVELLE PRESSION
 C--------------------------------------------------
-      DO I=LFT,LLT
+      DO I=1,NEL
         PNEW(I)=C1*AMU(I)
       ENDDO
 C--------------------------------------------------
@@ -180,9 +192,9 @@ C--------------------------------------------------
         LBUF => BUFLY%LBUF(1,1,IPT)
         SIGP => BUFLY%LBUF(1,1,IPT)%SIG(1:NEL*6)
         EPLA => BUFLY%LBUF(1,1,IPT)%PLA(1:NEL)
-        JPT=(IPT-1)*LLT
+        JPT=(IPT-1)*NEL
 C
-        DO I=LFT,LLT
+        DO I=1,NEL
           DAV=ONE-DVOL(I)/VNEW(I)
           SOLD1(I)=SIGP(JJ(1)+I)*DAV
           SOLD2(I)=SIGP(JJ(2)+I)*DAV
@@ -194,17 +206,17 @@ C
 C--------------------------------------------------
 C     CONTRAINTES DEVIATORIQUES AUX POINTS DE GAUSS
 C--------------------------------------------------
-        DO I=LFT,LLT
+        DO I=1,NEL
           DAV=-THIRD*(D1(I,IPT)+D2(I,IPT)+D3(I,IPT))
           SIGP(JJ(1)+I)=SIGP(JJ(1)+I)+P(I)+G2(I)*(D1(I,IPT)+DAV)
           SIGP(JJ(2)+I)=SIGP(JJ(2)+I)+P(I)+G2(I)*(D2(I,IPT)+DAV)
           SIGP(JJ(3)+I)=SIGP(JJ(3)+I)+P(I)+G2(I)*(D3(I,IPT)+DAV)
-          SIGP(JJ(4)+I)=SIGP(JJ(4)+I)	  +G1(I)* D4(I,IPT)
-          SIGP(JJ(5)+I)=SIGP(JJ(5)+I)	  +G1(I)* D5(I,IPT)
-          SIGP(JJ(6)+I)=SIGP(JJ(6)+I)	  +G1(I)* D6(I,IPT)
+          SIGP(JJ(4)+I)=SIGP(JJ(4)+I)    +G1(I)* D4(I,IPT)
+          SIGP(JJ(5)+I)=SIGP(JJ(5)+I)    +G1(I)* D5(I,IPT)
+          SIGP(JJ(6)+I)=SIGP(JJ(6)+I)    +G1(I)* D6(I,IPT)
         ENDDO
 C
-        DO I=LFT,LLT
+        DO I=1,NEL
           AJ2(I)=HALF*(SIGP(JJ(1)+I)**2+SIGP(JJ(2)+I)**2+SIGP(JJ(3)+I)**2)
      .                  +SIGP(JJ(4)+I)**2+SIGP(JJ(5)+I)**2+SIGP(JJ(6)+I)**2
           AJ2(I)=SQRT(THREE*AJ2(I))
@@ -213,7 +225,7 @@ C-------------
 C     STRAIN RATE (JOHNSON-COOK, ZERILLI-ARMSTRONG)
 C-------------
       IF(EPIF/=ZERO)THEN
-        DO I=LFT,LLT
+        DO I=1,NEL
           II=I+JPT
           EPD(I)=OFF(I)* 
      .      MAX( ABS(D1(I,IPT)), ABS(D2(I,IPT)), ABS(D3(I,IPT)),
@@ -227,14 +239,14 @@ C-------------
           MT=MAX(EM15,Z3_1)
           TM=Z4_1
           IF(TM==ZERO)TM=EP30
-            DO I=LFT,LLT
+            DO I=1,NEL
             TSTAR(I)=MIN(ONE,MAX(ZERO,(T(I)-TWOHUNDRED98)/(TM-TWOHUNDRED98)))
              EPD(I)= MAX(ZERO,EPD(I))
              EPD(I)= (ONE + CC * EPD(I))*(ONE - TSTAR(I)**MT)
              IF(ICC==1)SIGMX(I)= SIGMX(I)*EPD(I)
           ENDDO
-        ELSEIF(NPIF==LLT)THEN
-          DO I=LFT,LLT
+        ELSEIF(NPIF==NEL)THEN
+          DO I=1,NEL
              EPD(I)= CC*EXP((-Z3_1+Z4_1 * EPD(I))*T(I))
              IF(ICC==1)SIGMX(I)= SIGMX(I) + EPD(I)
              CA(I) = CA(I) + EPD(I)
@@ -243,7 +255,7 @@ C-------------
         ELSE
           MT=Z3_1
           TM=Z4_1
-          DO I=LFT,LLT
+          DO I=1,NEL
            IF(IRTY==0)THEN
             TSTAR(I)=MIN(ONE,MAX(ZERO,(T(I)-TWOHUNDRED98)/(TM-TWOHUNDRED98)))
             EPD(I)= MAX(ZERO,EPD(I))
@@ -258,14 +270,14 @@ C-------------
           ENDDO
         ENDIF
       ELSE
-        DO I=LFT,LLT
+        DO I=1,NEL
           EPD(I)=ONE
         ENDDO
       ENDIF
 C-------------
 C     CRITERE
 C-------------
-      DO I=LFT,LLT
+      DO I=1,NEL
        IF(CN==ONE) THEN
          AK(I)= CA(I)+CB_1*EPLA(I)
          QH(I)= CB_1*EPD(I)
@@ -287,7 +299,7 @@ C-------------
       ENDDO
 C
       IF(IPLA==0)THEN
-       DO I=LFT,LLT
+       DO I=1,NEL
          II=I+JPT
          SCALE= MIN(ONE,AK(I)/ MAX(AJ2(I),EM15))
          SIGP(JJ(1)+I)=SCALE*SIGP(JJ(1)+I)
@@ -301,7 +313,7 @@ C
          DPLA(II) =(ONE-SCALE)*AJ2(I)/ MAX(THREE*G(I)+QH(I),EM15)     
        ENDDO
       ELSEIF(IPLA==2)THEN
-       DO I=LFT,LLT
+       DO I=1,NEL
          II=I+JPT
          SCALE= MIN(ONE,AK(I)/ MAX(AJ2(I),EM15))
          SIGP(JJ(1)+I)=SCALE*SIGP(JJ(1)+I)
@@ -315,7 +327,7 @@ C
          DPLA(II) = (ONE -SCALE)*AJ2(I)/ MAX(THREE*G(I),EM15)     
        ENDDO
       ELSEIF(IPLA==1)THEN
-        DO I=LFT,LLT
+        DO I=1,NEL
          II=I+JPT
          SCALE= MIN(ONE,AK(I)/ MAX(AJ2(I),EM15))
 C        plastic strain increment.
@@ -335,7 +347,7 @@ C        actual yield stress.
 C--------------------------------------------------
 C     CONTRAINTE AUX POINTS DE GAUSS
 C--------------------------------------------------
-        DO I=LFT,LLT
+        DO I=1,NEL
           SIGP(JJ(1)+I)=(SIGP(JJ(1)+I)-PNEW(I))*OFF(I)
           SIGP(JJ(2)+I)=(SIGP(JJ(2)+I)-PNEW(I))*OFF(I)
           SIGP(JJ(3)+I)=(SIGP(JJ(3)+I)-PNEW(I))*OFF(I)
@@ -346,7 +358,7 @@ C--------------------------------------------------
 C--------------------------------------------------
 C       ENERGIE INTERNE
 C--------------------------------------------------
-        DO I=LFT,LLT
+        DO I=1,NEL
           DAV=VOLGP(I,IPT)*OFF(I)*DTA
           EINT(I)=EINT(I)+DAV*(D1(I,IPT)*(SOLD1(I)+SIGP(JJ(1)+I))+
      +                         D2(I,IPT)*(SOLD2(I)+SIGP(JJ(2)+I))+
@@ -358,24 +370,24 @@ C--------------------------------------------------
 C--------------------------------------------------
 C     CONTRAINTE MOYENNE (OUTPUT)
 C--------------------------------------------------
-        DO I=LFT,LLT
+        DO I=1,NEL
           SIG(I,1)=SIG(I,1)+ONE_OVER_8*SIGP(JJ(1)+I)
           SIG(I,2)=SIG(I,2)+ONE_OVER_8*SIGP(JJ(2)+I)
           SIG(I,3)=SIG(I,3)+ONE_OVER_8*SIGP(JJ(3)+I)
           SIG(I,4)=SIG(I,4)+ONE_OVER_8*SIGP(JJ(4)+I)
           SIG(I,5)=SIG(I,5)+ONE_OVER_8*SIGP(JJ(5)+I)
           SIG(I,6)=SIG(I,6)+ONE_OVER_8*SIGP(JJ(6)+I)
-          EPSEQ(I)=EPSEQ(I)+ONE_OVER_8*EPLA(I)	
+          EPSEQ(I)=EPSEQ(I)+ONE_OVER_8*EPLA(I)
         ENDDO
 C
       ENDDO  ! NPT
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         EINT(I)=EINT(I)/MAX(EM15,VOL(I))
       ENDDO
 C      
       IF (IMPL_S>0) THEN
-       DO I=LFT,LLT
+       DO I=1,NEL
          II=I+JPT
          IF(DPLA(II)>0) ETSE(I)= QH(I)/G2(I)
        ENDDO

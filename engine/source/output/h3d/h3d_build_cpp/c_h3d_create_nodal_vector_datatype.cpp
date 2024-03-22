@@ -1,5 +1,5 @@
 //Copyright>    OpenRadioss
-//Copyright>    Copyright (C) 1986-2022 Altair Engineering Inc.
+//Copyright>    Copyright (C) 1986-2024 Altair Engineering Inc.
 //Copyright>
 //Copyright>    This program is free software: you can redistribute it and/or modify
 //Copyright>    it under the terms of the GNU Affero General Public License as published by
@@ -15,11 +15,11 @@
 //Copyright>    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //Copyright>
 //Copyright>
-//Copyright>    Commercial Alternative: Altair Radioss Software 
+//Copyright>    Commercial Alternative: Altair Radioss Software
 //Copyright>
-//Copyright>    As an alternative to this open-source version, Altair also offers Altair Radioss 
-//Copyright>    software under a commercial license.  Contact Altair to discuss further if the 
-//Copyright>    commercial version may interest you: https://www.altair.com/radioss/.    
+//Copyright>    As an alternative to this open-source version, Altair also offers Altair Radioss
+//Copyright>    software under a commercial license.  Contact Altair to discuss further if the
+//Copyright>    commercial version may interest you: https://www.altair.com/radioss/.
 //
 #include <stdio.h>
 #include <string.h>
@@ -93,19 +93,6 @@ void c_h3d_create_nodal_vector_datatype_(int *cpt_data, char *name, int *size, i
     for(i=0;i<*s_comment;i++)  ccomment[i] = comment[i];
     ccomment[*s_comment]='\0';  
 
-    char * LAYERPOOL = new char [*size1+11];
-    H3D_ID layer_pool_id = H3D_NULL_ID;
-    if(*info2 != 0)
-    {
-        sprintf(LAYERPOOL, "%s %d %d" ,cname1,*info1,*info2);
-        rc = Hyper3DAddString(h3d_file, LAYERPOOL, &layer_pool_id);
-    }
-    else
-    {
-        sprintf(LAYERPOOL, "%s %d" ,cname1,*info1);
-        rc = Hyper3DAddString(h3d_file, LAYERPOOL, &layer_pool_id);
-    }
-
 
     char edata_type[50];
 
@@ -131,14 +118,7 @@ void c_h3d_create_nodal_vector_datatype_(int *cpt_data, char *name, int *size, i
              if( !rc ) throw rc;
         }
  
-        if(*info1 != 0 && *cpt_data != 0)
-        {
-            rc = Hyper3DDatatypePools(h3d_file, *cpt_data , node_poolname_id, 1, 
-                                    &layer_pool_id, has_corners, tensor_type, poisson);
-            if( !rc ) throw rc;
-
-        }
-        else if (*cpt_data != 0)
+        if (*cpt_data != 0)
         {
             rc = Hyper3DDatatypePools(h3d_file, *cpt_data , node_poolname_id, 0, 
                                     layername_ids, has_corners, tensor_type, poisson);
@@ -154,7 +134,6 @@ void c_h3d_create_nodal_vector_datatype_(int *cpt_data, char *name, int *size, i
     catch(...) {
         Hyper3DExportClearError(h3d_file);
     }
-    delete [] LAYERPOOL;
     free(cname);
     free(cname1);
     free(ccomment);

@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  I15CMP                        source/interfaces/int15/i15cmp.F
 Chd|-- called by -----------
@@ -64,13 +64,8 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com08_c.inc"
-#include      "com10_c.inc"
-#include      "task_c.inc"
-#include      "units_c.inc"
 #include      "param_c.inc"
 #include      "parit_c.inc"
-#include      "scr17_c.inc"
 C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -131,8 +126,8 @@ C-----------------------------------------------
 C     ELIMINATION (HEURISTIQUE).
 C-----------------------------------------------
       CALL I15CAN(NRTS,INTBUF_TAB%IRECTS,X,INTBUF_TAB%KSURF(1),IGRSURF,
-     2  	  BUFSF,NSC,WA(KSC),NTC,WA(KTC),
-     3  	  INTBUF_TAB%IMPACT)
+     2      BUFSF,NSC,WA(KSC),NTC,WA(KTC),
+     3      INTBUF_TAB%IMPACT)
 C-----------------------------------------------
       STFAC  =INTBUF_TAB%STFAC(1)
       FRIC   =INTBUF_TAB%VARIABLES(1)
@@ -156,31 +151,31 @@ C-----------------------------------------------
         WA(KWTF+3*(INOD-1))  =ZERO
         WA(KWTF+3*(INOD-1)+1)=ZERO
         WA(KWTF+3*(INOD-1)+2)=ZERO
-        WA(KWNS+INOD-1)=ZERO	
+        WA(KWNS+INOD-1)=ZERO
       ENDDO
 C-----------------------------------------------
 C      QUADRANGLES.
 C-----------------------------------------------
        NDEB =0
  10    CONTINUE
-       CALL I15TOT1(NOINT ,NDEB, NSC,X  	,INTBUF_TAB%KSURF(1) ,
+       CALL I15TOT1(NOINT ,NDEB, NSC,X    ,INTBUF_TAB%KSURF(1) ,
      2         IGRSURF  ,BUFSF   ,WA(KSC) ,INTBUF_TAB%IRECTS ,INTBUF_TAB%NOLD,
-     3         XP1   ,XP2   ,XP3   ,XP4   ,GX	  ,
+     3         XP1   ,XP2   ,XP3   ,XP4   ,GX    ,
      4         XTK   ,YTK   ,ZTK   ,NTX   ,NTY    ,
-     5         NTZ   ,ANS   ,DEPTH ,XI    ,YI	  ,
+     5         NTZ   ,ANS   ,DEPTH ,XI    ,YI    ,
      6         ZI    ,NXI   ,NYI   ,NZI   ,ANSMX  , 
      7         INTBUF_TAB%HOLD ,INTBUF_TAB%IMPACT ,ITAB )
-       CALL I15FOR1(NDEB, NSC, STFAC,X     ,V	   ,
+       CALL I15FOR1(NDEB, NSC, STFAC,X     ,V     ,
      2       INTBUF_TAB%KSURF ,IGRSURF ,BUFSF ,WA(KSC) ,INTBUF_TAB%IRECTS,
      3       INTBUF_TAB%IMPACT,INTBUF_TAB%IOLD ,INTBUF_TAB%HOLD ,INTBUF_TAB%NOLD ,
-     4  	 INTBUF_TAB%DOLD ,XP1   ,XP2    ,XP3	,XP4   ,GX     ,
-     5  	 XTK   ,YTK   ,ZTK   ,NTX   ,NTY    ,
-     6  	 NTZ   ,ANS   ,DEPTH ,XI    ,YI    ,
-     7  	 ZI	,NXI   ,NYI   ,NZI   ,MS   ,
-     8  	 DE    ,NPC   ,PLD    ,WA(KWNF) ,WA(KWTF) ,
-     9  	 WA(KWNS) ,FNORMX,FNORMY,FNORMZ,FTANGX,
-     A  	 FTANGY,FTANGZ  ,DT2T  ,NOINT ,NELTST ,
-     B  	 ITYPTST ,FRIC )
+     4     INTBUF_TAB%DOLD ,XP1   ,XP2    ,XP3  ,XP4   ,GX     ,
+     5     XTK   ,YTK   ,ZTK   ,NTX   ,NTY    ,
+     6     NTZ   ,ANS   ,DEPTH ,XI    ,YI    ,
+     7     ZI  ,NXI   ,NYI   ,NZI   ,MS   ,
+     8     DE    ,NPC   ,PLD    ,WA(KWNF) ,WA(KWTF) ,
+     9     WA(KWNS) ,FNORMX,FNORMY,FNORMZ,FTANGX,
+     A     FTANGY,FTANGZ  ,DT2T  ,NOINT ,NELTST ,
+     B     ITYPTST ,FRIC )
        NDEB=NDEB+MVSIZ
        IF (NDEB<NSC) GOTO 10
 C-----------------------------------------------
@@ -211,8 +206,8 @@ C------
 C      MARQUE LES NOEUDS / F<>0.
 C------
        CALL I15MARQ(INTBUF_TAB%IRECTS,NSC,WA(KSC),NTC,WA(KTC),
-     2  	  INTBUF_TAB%IMPACT,NSN,INTBUF_TAB%NSV,WA(KMARQND),NNC,
-     3  	  WA(KNC))
+     2      INTBUF_TAB%IMPACT,NSN,INTBUF_TAB%NSV,WA(KMARQND),NNC,
+     3      WA(KNC))
 C-----------------------------------------------
 C      RETURN TO GLOBAL VECTORS.
 C-----------------------------------------------

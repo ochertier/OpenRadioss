@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  HM_READ_SPRING                source/elements/reader/hm_read_spring.F
 Chd|-- called by -----------
@@ -73,13 +73,9 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr17_c.inc"
-#include      "scr03_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com10_c.inc"
 #include      "units_c.inc"
 #include      "param_c.inc"
-#include      "submod_c.inc"
 #include      "sphcom.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -103,8 +99,7 @@ C-----------------------------------------------
       INTEGER I, I1, I2,PID,N,ID,IDS,J,IPID,JC,STAT,IMID,IGTYP,MID
       INTEGER FLAG_FMT,FLAG_FMT_TMP,IFIX_TMP
       INTEGER FLAG_KJ(NUMELR),IKJ_TMP(3,NUMELR),NUMEL_KJ,CPT,
-     .        INDEX_PART,OFF_DEF(NSUBMOD),OFF_NOD(NSUBMOD),OFF_EL(NSUBMOD),
-     .        OFF_PART(NSUBMOD)
+     .        INDEX_PART
       CHARACTER MESS*40, MESS2*40, CHAR_MAT*11, CHAR_SKEW*11
       my_real
      .   BID 
@@ -117,15 +112,6 @@ C-----------------------------------------------
       DATA MESS /'3D SPRING ELEMENTS DEFINITION           '/
       DATA MESS2/'3D SPRING ELEMENTS SELECTION FOR TH PLOT'/
 C=======================================================================
-C--------------------------------------------------
-C      HM OFFSETS IDs
-C--------------------------------------------------
-      DO I=1,NSUBMOD
-        OFF_DEF(I) = LSUBMODEL(I)%OFF_DEF
-        OFF_NOD(I) = LSUBMODEL(I)%OFF_NOD
-        OFF_EL(I) = LSUBMODEL(I)%OFF_EL
-        OFF_PART(I) = LSUBMODEL(I)%OFF_PART
-      ENDDO
 C--------------------------------------------------
 C      ALLOCS & INITS
 C--------------------------------------------------
@@ -148,24 +134,10 @@ C--------------------------------------------------
 C      FILL OTHER STRUCTURES + CHECKS
 C--------------------------------------------------
         I=0
-	NUMEL_KJ = 0
-C	
+          NUMEL_KJ = 0
+C
         DO N=1,NUMELR
           I = I + 1
-C--------------------------------------------------
-C      SUBMODEL OFFSET
-C--------------------------------------------------
-          IF(SUB_SPRING(I) /= 0)THEN
-            IF(IPARTR(I) /= 0) IPARTR(I) = IPARTR(I) + OFF_PART(SUB_SPRING(I)) 
-            IF(IXR(NIXR,I) /= 0) IXR(NIXR,I) = IXR(NIXR,I) + OFF_EL(SUB_SPRING(I))
-            DO J=2,4
-              IF(IXR(J,I) /= 0) IXR(J,I) = IXR(J,I) + OFF_NOD(SUB_SPRING(I))
-            ENDDO
-            DO J=1,3
-              IF(IXR_KJ(J,I) /= 0) IXR_KJ(J,I) = IXR_KJ(J,I) + OFF_NOD(SUB_SPRING(I))
-            ENDDO
-            IF(SKEWID(I) > 0) SKEWID(I)=SKEWID(I)+OFF_DEF(SUB_SPRING(I))
-          ENDIF
 C--------------------------------------------------
 C      INTERNAL PART ID
 C--------------------------------------------------
@@ -196,7 +168,7 @@ c
           DO J=1,3
             IF (IXR_KJ(J,I)/=0) FLAG_KJ(I) = FLAG_KJ(I) + 1
           END DO   
-c	    
+c      
           IF (IXR(NIXR,I)>ID_LIMIT) THEN
             CALL ANCMSG(MSGID=509,ANMODE=ANINFO,MSGTYPE=MSGERROR,
      .                  I1=IXR(NIXR,I),C1=LINE,C2='/SPRING')
@@ -210,14 +182,14 @@ c
              IXR(4,I)=USR2SYS(IXR(4,I),ITABM1,MESS,IXR(NIXR,I))
              CALL ANODSET(IXR(4,I), CHECK_USED)
           ENDIF
-C         Noeuds additionels pour joints	  
-	  IF (FLAG_KJ(I)>0) THEN
+C         Noeuds additionels pour joints    
+            IF (FLAG_KJ(I)>0) THEN
             DO J=1,3
              IF(IXR_KJ(J,I)/=0) THEN
                 IXR_KJ(J,I)=USR2SYS(IXR_KJ(J,I),ITABM1,MESS,IXR(NIXR,I))
                 CALL ANODSET(IXR_KJ(J,I), CHECK_USED)
              ENDIF
-            END DO  	  		
+            END DO      
           ENDIF
 C         Skews per element - PROP type23 and mat law 108 or PROP type8 - only
           IF (SKEWID(I) > 0) THEN  
@@ -270,7 +242,7 @@ C
           CHAR_SKEW=''
         ENDIF
 C
-	IF (IGEO(11,IXR(1,I))==45) NUMEL_KJ = NUMEL_KJ + 1
+          IF (IGEO(11,IXR(1,I))==45) NUMEL_KJ = NUMEL_KJ + 1
         IF(IXR(4,I)==0) THEN
           WRITE (IOUT,'(5(I10,1X),44X,A,A)') I,IXR(NIXR,I),PID,
      .                  ITAB(IXR(2,I)),ITAB(IXR(3,I)),CHAR_MAT,CHAR_SKEW
@@ -278,7 +250,7 @@ C
           IF (FLAG_KJ(I) == 1) THEN
             WRITE (IOUT,'(7(I10,1X),A,A)') I,IXR(NIXR,I),PID,
      .                   ITAB(IXR(2,I)),ITAB(IXR(3,I)),ITAB(IXR(4,I)),
-     .                  (ITAB(IXR_KJ(J,I)),J=1,FLAG_KJ(I)),CHAR_MAT,CHAR_SKEW  	
+     .                  (ITAB(IXR_KJ(J,I)),J=1,FLAG_KJ(I)),CHAR_MAT,CHAR_SKEW  
           ELSEIF  (FLAG_KJ(I) == 2) THEN
             WRITE (IOUT,'(8(I10,1X),A,A)') I,IXR(NIXR,I),PID,
      .                   ITAB(IXR(2,I)),ITAB(IXR(3,I)),ITAB(IXR(4,I)),
@@ -288,7 +260,7 @@ C
      .                   ITAB(IXR(2,I)),ITAB(IXR(3,I)),ITAB(IXR(4,I)),
      .                  (ITAB(IXR_KJ(J,I)),J=1,FLAG_KJ(I)),CHAR_MAT,CHAR_SKEW 
           ENDIF
-	ELSE
+          ELSE
           WRITE (IOUT,'(6(I10,1X),33X,A,A)') I,IXR(NIXR,I),PID,
      .           ITAB(IXR(2,I)),ITAB(IXR(3,I)),ITAB(IXR(4,I)),CHAR_MAT,CHAR_SKEW
         ENDIF
@@ -307,22 +279,22 @@ C--------------------------------------------------
 
       IF (NUMEL_KJ>0) THEN
         DO I=1,NUMELR
-	  DO J=1,3
-	    IKJ_TMP(J,I)=IXR_KJ(J,I)
-	  END DO
-	END DO
-	CPT = 0
-	IXR_KJ(1,NUMELR+1)=NUMEL_KJ
+            DO J=1,3
+              IKJ_TMP(J,I)=IXR_KJ(J,I)
+            END DO
+          END DO
+          CPT = 0
+          IXR_KJ(1,NUMELR+1)=NUMEL_KJ
         DO I=1,NUMELR
-	  IF (IGEO(11,IXR(1,I))==45) THEN
-	    CPT = CPT+1
-	    DO J=1,3
-	      IXR_KJ(J,CPT)=IKJ_TMP(J,I)
-	    END DO
-	    IXR_KJ(4,CPT)=IXR(NIXR,I)
-	    IXR_KJ(5,CPT)=I
-	  ENDIF  
-	END DO	       
+            IF (IGEO(11,IXR(1,I))==45) THEN
+              CPT = CPT+1
+              DO J=1,3
+                IXR_KJ(J,CPT)=IKJ_TMP(J,I)
+              END DO
+              IXR_KJ(4,CPT)=IXR(NIXR,I)
+              IXR_KJ(5,CPT)=I
+            ENDIF  
+          END DO         
       ENDIF
 C
 C----

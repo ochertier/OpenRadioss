@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  SUBROTVECT                    source/model/submodel/subrot.F
 Chd|-- called by -----------
@@ -27,6 +27,7 @@ Chd|        HM_PROP_READ21                source/properties/thickshell/hm_read_p
 Chd|        HM_READ_FRICTION_ORIENTATIONS source/interfaces/friction/reader/hm_read_friction_orientations.F
 Chd|        HM_READ_FRM                   source/tools/skew/hm_read_frm.F
 Chd|        HM_READ_INISTATE_D00          source/elements/initia/hm_read_inistate_d00.F
+Chd|        HM_READ_INIVEL                source/initial_conditions/general/inivel/hm_read_inivel.F
 Chd|        HM_READ_PROP06                source/properties/solid/hm_read_prop06.F
 Chd|        HM_READ_PROP09                source/properties/shell/hm_read_prop09.F
 Chd|        HM_READ_PROP10                source/properties/shell/hm_read_prop10.F
@@ -60,8 +61,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr17_c.inc"
-#include      "submod_c.inc"
 #include      "com04_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -117,6 +116,7 @@ C---
 Chd|====================================================================
 Chd|  SUBROTPOINT                   source/model/submodel/subrot.F
 Chd|-- called by -----------
+Chd|        CREATE_ELLIPSE_CLAUSE         source/model/sets/create_ellipse_clause.F
 Chd|        HM_READ_FRM                   source/tools/skew/hm_read_frm.F
 Chd|        HM_READ_PBLAST                source/loads/pblast/hm_read_pblast.F
 Chd|        HM_READ_RWALL_CYL             source/constraints/general/rwall/hm_read_rwall_cyl.F
@@ -150,8 +150,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr17_c.inc"
-#include      "submod_c.inc"
 #include      "com04_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -191,10 +189,10 @@ C======================================================================
               Z = Z + TZ
             ELSEIF(ITY ==2 )THEN
               DO L=1,3
-        	X0(L) = RTRANS(LSUBMODEL(CUR_SUBMOD)%IDTRANS(I),L+11)
+          X0(L) = RTRANS(LSUBMODEL(CUR_SUBMOD)%IDTRANS(I),L+11)
               ENDDO
               DO L=1,9
-        	ROT(L) = RTRANS(LSUBMODEL(CUR_SUBMOD)%IDTRANS(I),L+2)
+          ROT(L) = RTRANS(LSUBMODEL(CUR_SUBMOD)%IDTRANS(I),L+2)
               ENDDO
               P(1) = X
               P(2) = Y
@@ -208,14 +206,14 @@ C======================================================================
               TY = RTRANS(LSUBMODEL(CUR_SUBMOD)%IDTRANS(I),16)
               TZ = RTRANS(LSUBMODEL(CUR_SUBMOD)%IDTRANS(I),17)
               DO L=1,9
-        	ROT(L) = RTRANS(LSUBMODEL(CUR_SUBMOD)%IDTRANS(I),L+2)
+          ROT(L) = RTRANS(LSUBMODEL(CUR_SUBMOD)%IDTRANS(I),L+2)
               ENDDO
               XP = ROT(1)*X + ROT(4)*Y + ROT(7)*Z + TX
               YP = ROT(2)*X + ROT(5)*Y + ROT(8)*Z + TY
               ZP = ROT(3)*X + ROT(6)*Y + ROT(9)*Z + TZ
               X = XP
               Y = YP
-              Z = ZP		
+              Z = ZP
             ELSEIF(ITY ==4 )THEN
               DO K=1,3
                 XCOLD(K)=RTRANS(LSUBMODEL(CUR_SUBMOD)%IDTRANS(I),K+11)
@@ -261,8 +259,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr17_c.inc"
-#include      "submod_c.inc"
 #include      "com04_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s

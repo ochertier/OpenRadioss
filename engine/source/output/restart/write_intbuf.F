@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
      
 
 Chd|====================================================================
@@ -30,7 +30,7 @@ Chd|-- calls ---------------
 Chd|        ARRET                         source/system/arret.F         
 Chd|        WRITE_DB                      source/output/tools/write_db.F
 Chd|        WRITE_INTBUF_T8               source/output/restart/write_intbuf.F
-Chd|        WRITE_I_C                     source/output/tools/sortie_c.c
+Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE WRITE_INTBUF(INTBUF_TAB)  
@@ -45,7 +45,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
 #include      "com04_c.inc"
 #include      "units_c.inc"
 C-----------------------------------------------
@@ -357,6 +356,10 @@ C=======================================================================
         N = N+1
         INTBUF_SIZE(N) = INTBUF_TAB(NI)%S_PENIS
         N = N+1
+        INTBUF_SIZE(N) = INTBUF_TAB(NI)%S_STIFMSDT_S  
+        N = N+1
+        INTBUF_SIZE(N) = INTBUF_TAB(NI)%S_STIFMSDT_M
+        N = N+1
         INTBUF_SIZE(N) = INTBUF_TAB(NI)%S_GAP_M
         N = N+1
         INTBUF_SIZE(N) = INTBUF_TAB(NI)%S_GAP_S
@@ -386,6 +389,8 @@ C=======================================================================
         INTBUF_SIZE(N) = INTBUF_TAB(NI)%S_GAP_E_L
         N = N+1
         INTBUF_SIZE(N) = INTBUF_TAB(NI)%S_STFE
+        N = N+1
+        INTBUF_SIZE(N) = INTBUF_TAB(NI)%S_STIFMSDT_EDG 
         N = N+1
         INTBUF_SIZE(N) = INTBUF_TAB(NI)%S_FTSAVX
         N = N+1
@@ -1028,6 +1033,12 @@ C=======================================================================
         SIZ = INTBUF_TAB(NI)%S_PENIS
         CALL WRITE_DB(INTBUF_TAB(NI)%PENIS,SIZ)
 
+        SIZ = INTBUF_TAB(NI)%S_STIFMSDT_S
+        CALL WRITE_DB(INTBUF_TAB(NI)%STIFMSDT_S,SIZ)
+
+        SIZ = INTBUF_TAB(NI)%S_STIFMSDT_M
+        CALL WRITE_DB(INTBUF_TAB(NI)%STIFMSDT_M,SIZ)
+
         SIZ = INTBUF_TAB(NI)%S_GAP_M
         CALL WRITE_DB(INTBUF_TAB(NI)%GAP_M,SIZ)
 
@@ -1076,6 +1087,8 @@ C=======================================================================
         SIZ = INTBUF_TAB(NI)%S_STFE
         CALL WRITE_DB(INTBUF_TAB(NI)%STFE,SIZ)
 
+        SIZ = INTBUF_TAB(NI)%S_STIFMSDT_EDG
+        CALL WRITE_DB(INTBUF_TAB(NI)%STIFMSDT_EDG,SIZ)
 !type10
         SIZ = INTBUF_TAB(NI)%S_CAND_F
         CALL WRITE_DB(INTBUF_TAB(NI)%CAND_F,SIZ)
@@ -1370,8 +1383,8 @@ Chd|  WRITE_INTBUF_T8               source/output/restart/write_intbuf.F
 Chd|-- called by -----------
 Chd|        WRITE_INTBUF                  source/output/restart/write_intbuf.F
 Chd|-- calls ---------------
-Chd|        WRITE_I_C                     source/output/tools/sortie_c.c
-Chd|        INT8_MOD                      ../common_source/modules/int8_mod.F
+Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
+Chd|        INT8_MOD                      ../common_source/modules/interfaces/int8_mod.F
 Chd|====================================================================
       SUBROUTINE WRITE_INTBUF_T8(T8)  
 C-----------------------------------------------
@@ -1385,9 +1398,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
 #include      "com01_c.inc"
-#include      "com04_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

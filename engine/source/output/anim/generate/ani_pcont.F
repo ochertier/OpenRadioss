@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  ANI_PCONT                     source/output/anim/generate/ani_pcont.F
 Chd|-- called by -----------
@@ -27,15 +27,17 @@ Chd|        SORTIE_MAIN                   source/output/sortie_main.F
 Chd|-- calls ---------------
 Chd|        SPMD_EXCH_NODAREA             source/mpi/anim/spmd_exch_nodarea.F
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
+Chd|        OUTPUTS_MOD                   ../common_source/modules/outputs_mod.F
 Chd|====================================================================
       SUBROUTINE ANI_PCONT(IXS ,IXC    ,IXTG    ,FASOLFR  ,X       ,
      .                 CONTN   ,CONTT  ,IAD_ELEM,FR_ELEM,WEIGHT    ,
      .                 IXQ     ,SEGQUADFR,IXS10 ,FNCONTP2,FTCONTP2 ,
-     .                 H3D_DATA)
+     .                 H3D_DATA,CSEFRIC,CSEFRICG)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE H3D_MOD
+      USE OUTPUTS_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -46,8 +48,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "param_c.inc"
-#include      "units_c.inc"
 #include      "scr14_c.inc"
 #include      "scr16_c.inc"
 C-----------------------------------------------
@@ -60,18 +60,20 @@ C     REAL
      .   IXS10(6,*)
       my_real
      .   X(3,*), CONTN(3,*), CONTT(3,*),FNCONTP2(3,*),FTCONTP2(3,*)
+      my_real  , INTENT(INOUT) :: CSEFRIC(NINEFRIC,S_EFRICINT),CSEFRICG(S_EFRIC)
       TYPE (H3D_DATABASE) :: H3D_DATA
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER N1,N2,N3,N4,NN1,NN2,NN3,J,
      .        I,N,IFAC,ILINE,
-     .        IERROR, LENR
+     .        IERROR, LENR, NI
        my_real
      .     AREA, 
      .     X1,Y1,Z1,X2,Y2,Z2,X3,Y3,Z3,X4,Y4,Z4,
      .     X31,Y31,Z31,X42,Y42,Z42,X32,Y32,Z32,E3X,E3Y,E3Z,
-     .     FS2, FS3, FT2, FT3, E, F, G, RAYON,AY1,AY2,AY3,AY4
+     .     FS2, FS3, FT2, FT3, E, F, G, RAYON,AY1,AY2,AY3,AY4,
+     .     AREAINV
       INTEGER FACES(4,6),LINES(2,4),FACES10(3,24)
        my_real, DIMENSION(:), ALLOCATABLE ::  NODAREA
 C     REAL
@@ -402,13 +404,13 @@ C
              CONTT(2,N)=ZERO
              CONTT(3,N)=ZERO
            ELSE
-             NODAREA(N)=ONE/MAX(EM30,NODAREA(N))
-             CONTN(1,N)=NODAREA(N)*CONTN(1,N)
-             CONTN(2,N)=NODAREA(N)*CONTN(2,N)
-             CONTN(3,N)=NODAREA(N)*CONTN(3,N)
-             CONTT(1,N)=NODAREA(N)*CONTT(1,N)
-             CONTT(2,N)=NODAREA(N)*CONTT(2,N)
-             CONTT(3,N)=NODAREA(N)*CONTT(3,N)
+             AREAINV = ONE/MAX(EM30,NODAREA(N))
+             CONTN(1,N)=AREAINV*CONTN(1,N)
+             CONTN(2,N)=AREAINV*CONTN(2,N)
+             CONTN(3,N)=AREAINV*CONTN(3,N)
+             CONTT(1,N)=AREAINV*CONTT(1,N)
+             CONTT(2,N)=AREAINV*CONTT(2,N)
+             CONTT(3,N)=AREAINV*CONTT(3,N)
            ENDIF
          END DO
        ENDIF
@@ -423,16 +425,40 @@ C
              FTCONTP2(2,N)=ZERO
              FTCONTP2(3,N)=ZERO
            ELSE
-             NODAREA(N)=ONE/MAX(EM30,NODAREA(N))
-             FNCONTP2(1,N)=NODAREA(N)*FNCONTP2(1,N)
-             FNCONTP2(2,N)=NODAREA(N)*FNCONTP2(2,N)
-             FNCONTP2(3,N)=NODAREA(N)*FNCONTP2(3,N)
-             FTCONTP2(1,N)=NODAREA(N)*FTCONTP2(1,N)
-             FTCONTP2(2,N)=NODAREA(N)*FTCONTP2(2,N)
-             FTCONTP2(3,N)=NODAREA(N)*FTCONTP2(3,N)
+             AREAINV = ONE/MAX(EM30,NODAREA(N))
+             FNCONTP2(1,N)=AREAINV*FNCONTP2(1,N)
+             FNCONTP2(2,N)=AREAINV*FNCONTP2(2,N)
+             FNCONTP2(3,N)=AREAINV*FNCONTP2(3,N)
+             FTCONTP2(1,N)=AREAINV*FTCONTP2(1,N)
+             FTCONTP2(2,N)=AREAINV*FTCONTP2(2,N)
+             FTCONTP2(3,N)=AREAINV*FTCONTP2(3,N)
            ENDIF
          END DO
        ENDIF
+C
+       IF(NINEFRIC > 0) THEN
+        DO NI=1,NINEFRIC
+         DO N=1,NUMNOD
+           IF (NODAREA(N) == ZERO) THEN
+             CSEFRIC(NI,N)=ZERO
+           ELSE
+             AREAINV = ONE/MAX(EM30,NODAREA(N))
+             CSEFRIC(NI,N)=AREAINV*EFRIC(NI,N)
+           ENDIF
+         END DO
+        ENDDO
+       ENDIF
+C
+      IF(H3D_DATA%N_SCAL_CSE_FRIC >0)THEN
+         DO N=1,NUMNOD
+           IF (NODAREA(N) == ZERO) THEN
+             CSEFRICG(N)=ZERO
+           ELSE
+             AREAINV = ONE/MAX(EM30,NODAREA(N))
+             CSEFRICG(N)=AREAINV*EFRICG(N)
+           ENDIF
+         END DO
+      ENDIF
 C
       DEALLOCATE(NODAREA)
 C
@@ -446,15 +472,17 @@ Chd|-- calls ---------------
 Chd|        SPMD_EXCH_NODAREA             source/mpi/anim/spmd_exch_nodarea.F
 Chd|        SPMD_GLOB_DSUM9               source/mpi/interfaces/spmd_th.F
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
+Chd|        OUTPUTS_MOD                   ../common_source/modules/outputs_mod.F
 Chd|====================================================================
       SUBROUTINE ANI_PCONT21(IXS ,IXC    ,IXTG    ,FASOLFR  ,X       ,
      .                 CONTN   ,CONTT  ,IAD_ELEM,FR_ELEM,WEIGHT      ,
      .                 NODGLOB ,FNCONTG ,FTCONTG,FNCONTP2,FTCONTP2   ,
-     .                 H3D_DATA )
+     .                 H3D_DATA,CSEFRIC_STAMP,CSEFRICG_STAMP )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE H3D_MOD
+      USE OUTPUTS_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -465,10 +493,8 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "param_c.inc"
 #include      "spmd_c.inc"
 #include      "task_c.inc"
-#include      "units_c.inc"
 #include      "scr14_c.inc"
 #include      "scr16_c.inc"
 C-----------------------------------------------
@@ -481,13 +507,15 @@ C     REAL
       my_real
      .   X(3,*), CONTN(3,*), CONTT(3,*), FNCONTG(3,*), FTCONTG(3,*),
      .   FNCONTP2(3,*),FTCONTP2(3,*)
+      my_real  , INTENT(INOUT) :: CSEFRIC_STAMP(NINEFRIC_STAMP,S_EFRICINTG),
+     .   CSEFRICG_STAMP(S_EFRICG)
       TYPE (H3D_DATABASE) :: H3D_DATA
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER N1,N2,N3,N4,
      .        I,K,N,IFAC,
-     .        IERROR, LENR
+     .        IERROR, LENR, NI
        my_real
      .     AREA, 
      .     X1,Y1,Z1,X2,Y2,Z2,X3,Y3,Z3,X4,Y4,Z4,
@@ -696,6 +724,45 @@ C
       END IF
 C-----
 
+      IF(NSPMD > 1)THEN
+        IF(ANIM_V(12)+OUTP_V(12)+H3D_DATA%N_VECT_PCONT+NINEFRIC_STAMP
+     .   +H3D_DATA%N_SCAL_CSE_FRIC /=0) THEN
+
+          ALLOCATE(NODAREAG(NUMNODG))
+           DO I=1,NUMNODG
+             NODAREAG(I)=ZERO
+           ENDDO
+           DO K=1,NUMNOD
+             I=NODGLOB(K)
+             NODAREAG(I)=NODAREA(K)*WEIGHT(K)
+           ENDDO
+
+           CALL SPMD_GLOB_DSUM9(NODAREAG,NUMNODG)
+
+           IF(ANIM_V(12)+OUTP_V(12)+H3D_DATA%N_VECT_PCONT/=0) THEN
+              CALL SPMD_GLOB_DSUM9(FNCONTG,3*NUMNODG)
+              CALL SPMD_GLOB_DSUM9(FTCONTG,3*NUMNODG)
+           ENDIF
+           IF(NINEFRIC_STAMP > 0) THEN
+             DO NI=1,NINEFRIC_STAMP
+               DO I=1,NUMNODG
+                 CSEFRIC_STAMP(NI,I)=EFRIC_STAMP(NI,I)
+               ENDDO
+               CALL SPMD_GLOB_DSUM9(CSEFRIC_STAMP(NI,1),NUMNODG)
+             ENDDO
+           ENDIF
+
+           IF(H3D_DATA%N_SCAL_CSE_FRIC > 0) THEN
+              DO I=1,NUMNODG
+                 CSEFRICG_STAMP(I)=EFRICG_STAMP(I)
+              ENDDO
+              CALL SPMD_GLOB_DSUM9(CSEFRICG_STAMP,NUMNODG)
+           ENDIF
+           
+        ENDIF
+
+      ENDIF
+
       IF(ANIM_V(12)+OUTP_V(12)+H3D_DATA%N_VECT_PCONT /=0) THEN
 C     INTER == 21
         IF (NSPMD == 1) THEN
@@ -719,19 +786,6 @@ C     INTER == 21
             ENDIF
           END DO
         ELSE
-          ALLOCATE(NODAREAG(NUMNODG))
-           DO I=1,NUMNODG
-             NODAREAG(I)=ZERO
-           ENDDO
-           DO K=1,NUMNOD
-             I=NODGLOB(K)
-             NODAREAG(I)=NODAREA(K)*WEIGHT(K)
-           ENDDO
-
-           CALL SPMD_GLOB_DSUM9(NODAREAG,NUMNODG)
-           CALL SPMD_GLOB_DSUM9(FNCONTG,3*NUMNODG)
-           CALL SPMD_GLOB_DSUM9(FTCONTG,3*NUMNODG)
-
            IF(ISPMD==0)THEN
              DO N=1,NUMNODG
                IF (NODAREAG(N) == ZERO) THEN
@@ -761,7 +815,7 @@ C     INTER == 21
                FTCONTG(3,N)=ZERO
              END DO
            END IF
-           DEALLOCATE(NODAREAG)
+
          END IF
        ENDIF
 C
@@ -775,17 +829,86 @@ C
              FTCONTP2(2,N)=ZERO
              FTCONTP2(3,N)=ZERO
            ELSE
-             NODAREA(N)=ONE/MAX(EM30,NODAREA(N))
-             FNCONTP2(1,N)=NODAREA(N)*FNCONTP2(1,N)
-             FNCONTP2(2,N)=NODAREA(N)*FNCONTP2(2,N)
-             FNCONTP2(3,N)=NODAREA(N)*FNCONTP2(3,N)
-             FTCONTP2(1,N)=NODAREA(N)*FTCONTP2(1,N)
-             FTCONTP2(2,N)=NODAREA(N)*FTCONTP2(2,N)
-             FTCONTP2(3,N)=NODAREA(N)*FTCONTP2(3,N)
+             TMP=ONE/MAX(EM30,NODAREA(N))
+             FNCONTP2(1,N)=TMP*FNCONTP2(1,N)
+             FNCONTP2(2,N)=TMP*FNCONTP2(2,N)
+             FNCONTP2(3,N)=TMP*FNCONTP2(3,N)
+             FTCONTP2(1,N)=TMP*FTCONTP2(1,N)
+             FTCONTP2(2,N)=TMP*FTCONTP2(2,N)
+             FTCONTP2(3,N)=TMP*FTCONTP2(3,N)
            ENDIF
          END DO
        ENDIF
 C
+       IF(NINEFRIC_STAMP > 0) THEN
+        IF (NSPMD == 1) THEN
+            DO NI=1,NINEFRIC_STAMP
+             DO N=1,NUMNOD
+                I=NODGLOB(N)
+                IF (NODAREA(N) == ZERO) THEN
+                   CSEFRIC_STAMP(NI,I)=ZERO
+                ELSE
+                  TMP=ONE/MAX(EM30,NODAREA(N))
+                  CSEFRIC_STAMP(NI,I)=TMP*EFRIC_STAMP(NI,I)
+                ENDIF
+             END DO
+            ENDDO
+        ELSE
+          IF(ISPMD==0)THEN 
+            DO NI=1,NINEFRIC_STAMP
+             DO N=1,NUMNODG
+                IF (NODAREAG(N) == ZERO) THEN
+                   CSEFRIC_STAMP(NI,N)=ZERO
+                ELSE
+                  TMP=ONE/MAX(EM30,NODAREAG(N))
+                  CSEFRIC_STAMP(NI,N)=TMP*CSEFRIC_STAMP(NI,N)
+                ENDIF
+             END DO
+            ENDDO
+          ELSE
+            DO NI=1,NINEFRIC_STAMP
+              DO N=1,NUMNODG
+                CSEFRIC_STAMP(NI,N)=ZERO
+              END DO
+            ENDDO
+          ENDIF
+        ENDIF
+       ENDIF
+C
+       IF(H3D_DATA%N_SCAL_CSE_FRIC > 0) THEN
+        IF (NSPMD == 1) THEN
+            DO N=1,NUMNOD
+              I=NODGLOB(N)
+              IF (NODAREA(N) == ZERO) THEN
+                 CSEFRICG_STAMP(I)=ZERO
+              ELSE
+                 TMP=ONE/MAX(EM30,NODAREA(N))
+                 CSEFRICG_STAMP(I)=TMP*EFRICG_STAMP(I)
+              ENDIF
+            ENDDO
+        ELSE
+          IF(ISPMD==0)THEN 
+            DO N=1,NUMNODG
+              IF (NODAREAG(N) == ZERO) THEN
+                 CSEFRICG_STAMP(N)=ZERO
+              ELSE
+                 TMP=ONE/MAX(EM30,NODAREAG(N))
+                 CSEFRICG_STAMP(N)=TMP*CSEFRICG_STAMP(N)
+              ENDIF
+            ENDDO
+          ELSE
+            DO N=1,NUMNODG
+              CSEFRICG_STAMP(N)=ZERO
+            END DO
+          ENDIF
+        ENDIF
+       ENDIF
+C
+      IF(NSPMD > 1)THEN
+        IF(ANIM_V(12)+OUTP_V(12)+H3D_DATA%N_VECT_PCONT+NINEFRIC_STAMP
+     .   +H3D_DATA%N_SCAL_CSE_FRIC /=0) DEALLOCATE(NODAREAG)
+      ENDIF
+          
       DEALLOCATE(NODAREA)
 C
       RETURN

@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  I2FOR27P_PEN                  source/interfaces/interf/i2for27p_pen.F
 Chd|-- called by -----------
@@ -30,6 +30,7 @@ Chd|        I2PEN_ROT27                   ../common_source/interf/i2pen_rot.F
 Chd|        I2REP                         ../common_source/interf/i2rep.F
 Chd|        I2SMS27                       source/interfaces/interf/i2sms27.F
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
+Chd|        OUTMAX_MOD                    ../common_source/modules/outmax_mod.F
 Chd|====================================================================
       SUBROUTINE I2FOR27P_PEN(
      .            X        ,V       ,VR      ,A       ,AR      ,
@@ -39,13 +40,14 @@ Chd|====================================================================
      .            I0       ,I2SIZE  ,IADI2   ,FSKYI2  ,STFN    ,            
      .            STFR     ,VISC    ,PENFLAG ,IROTB    ,NOINT   ,            
      .            NODNX_SMS,DMINT2  ,DT2T    ,NELTST  ,ITYPTST ,            
-     .            IRECT    ,INDXP    ,IADX    ,
+     .            IRECT    ,INDXP   ,IADX    ,
      .            H3D_DATA,MSEGTYP2,
-     .            FNCONTP  ,FTCONTP  )   
+     .            FNCONTP  ,FTCONTP)   
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
-      USE H3D_MOD         
+      USE H3D_MOD
+      USE OUTMAX_MOD  
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -73,12 +75,9 @@ C     REAL
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
-#include      "param_c.inc"
 #include      "com01_c.inc"
 #include      "com06_c.inc"
 #include      "com08_c.inc"
-#include      "scr02_c.inc"
 #include      "scr11_c.inc"
 #include      "scr14_c.inc"
 #include      "sms_c.inc"
@@ -139,13 +138,13 @@ C
           IX3(K) = IRECT(3,L)                                       
           IX4(K) = IRECT(4,L)
 C
-          IF ((MSEGTYP2(L)==1).AND.(IN(I)>EM20)) THEN
+          IROT = ZERO 
+          IF(IRODDL > 0) THEN
+            IF ((MSEGTYP2(L)==1).AND.(IN(I)>EM20)) THEN
 C-- shell main segment --
-            IROT = ONE
-          ELSE
-C-- solid main segment --
-            IROT = ZERO
-          ENDIF  
+              IROT = ONE
+            ENDIF  
+          ENDIF
 
           IF (IX3(K) == IX4(K)) THEN
 C--        Shape functions of triangles
@@ -174,50 +173,50 @@ C------------------------------------------------
           X1  = X(1,IX1(K))                                       
           Y1  = X(2,IX1(K))                                          
           Z1  = X(3,IX1(K))                                          
-          X2  = X(1,IX2(K))					     
-          Y2  = X(2,IX2(K))					     
-          Z2  = X(3,IX2(K))					     
-          X3  = X(1,IX3(K))					     
-          Y3  = X(2,IX3(K))					     
-          Z3  = X(3,IX3(K))					     
-          X4  = X(1,IX4(K))					     
-          Y4  = X(2,IX4(K))					     
-          Z4  = X(3,IX4(K))					     
+          X2  = X(1,IX2(K))               
+          Y2  = X(2,IX2(K))               
+          Z2  = X(3,IX2(K))               
+          X3  = X(1,IX3(K))               
+          Y3  = X(2,IX3(K))               
+          Z3  = X(3,IX3(K))               
+          X4  = X(1,IX4(K))               
+          Y4  = X(2,IX4(K))               
+          Z4  = X(3,IX4(K))               
           XS  = X(1,I)                                          
           YS  = X(2,I)                                         
           ZS  = X(3,I)                                           
           VSX = V(1,I)                                                   
           VSY = V(2,I)                                                   
           VSZ = V(3,I)                                                
-          VX1 = V(1,IX1(K))						      
-          VY1 = V(2,IX1(K))						      
-          VZ1 = V(3,IX1(K))						      
-          VX2 = V(1,IX2(K))						      
-          VY2 = V(2,IX2(K))						      
-          VZ2 = V(3,IX2(K))						      
-          VX3 = V(1,IX3(K))						      
-          VY3 = V(2,IX3(K))						      
-          VZ3 = V(3,IX3(K))						      
-          VX4 = V(1,IX4(K))						      
-          VY4 = V(2,IX4(K))						      
+          VX1 = V(1,IX1(K))                  
+          VY1 = V(2,IX1(K))                  
+          VZ1 = V(3,IX1(K))                  
+          VX2 = V(1,IX2(K))                  
+          VY2 = V(2,IX2(K))                  
+          VZ2 = V(3,IX2(K))                  
+          VX3 = V(1,IX3(K))                  
+          VY3 = V(2,IX3(K))                  
+          VZ3 = V(3,IX3(K))                  
+          VX4 = V(1,IX4(K))                  
+          VY4 = V(2,IX4(K))                  
           VZ4 = V(3,IX4(K))
           IF (IROT > ZERO) THEN
             VRSX = VR(1,I)
             VRSY = VR(2,I)
             VRSZ = VR(3,I)   
-            VRX1 = VR(1,IX1(K))						      
-            VRY1 = VR(2,IX1(K))						      
-            VRZ1 = VR(3,IX1(K))						      
-            VRX2 = VR(1,IX2(K))						      
-            VRY2 = VR(2,IX2(K))						      
-            VRZ2 = VR(3,IX2(K))						      
-            VRX3 = VR(1,IX3(K))						      
-            VRY3 = VR(2,IX3(K))						      
-            VRZ3 = VR(3,IX3(K))						      
-            VRX4 = VR(1,IX4(K))						      
-            VRY4 = VR(2,IX4(K))						      
+            VRX1 = VR(1,IX1(K))                  
+            VRY1 = VR(2,IX1(K))                  
+            VRZ1 = VR(3,IX1(K))                  
+            VRX2 = VR(1,IX2(K))                  
+            VRY2 = VR(2,IX2(K))                  
+            VRZ2 = VR(3,IX2(K))                  
+            VRX3 = VR(1,IX3(K))                  
+            VRY3 = VR(2,IX3(K))                  
+            VRZ3 = VR(3,IX3(K))                  
+            VRX4 = VR(1,IX4(K))                  
+            VRY4 = VR(2,IX4(K))                  
             VRZ4 = VR(3,IX4(K))
-          ENDIF								
+          ENDIF
 C---------------------
           CALL I2REP(X1     ,X2     ,X3     ,X4     ,
      .               Y1     ,Y2     ,Y3     ,Y4     ,
@@ -320,9 +319,9 @@ c
         RZ(4) = E3X*X4 + E3Y*Y4 + E3Z*Z4         
 C
         IF (NIR==3) THEN
- 	  RX(4)=ZERO
- 	  RY(4)=ZERO
- 	  RZ(4)=ZERO
+            RX(4)=ZERO
+            RY(4)=ZERO
+            RZ(4)=ZERO
         END IF
 C
         VS(1) = VSX*E1X + VSY*E1Y + VSZ*E1Z
@@ -686,9 +685,7 @@ C
             FNCONT(3,IX4(K)) = FNCONT(3,IX4(K)) + FZ(4)*W
           ENDIF
 
-
           IF(ANIM_V(27)+H3D_DATA%N_VECT_PCONT2>0) THEN ! Normal/Tangential forces output
-
             FNCONTP(1,I) = FNCONTP(1,I)  - FN(1) * W
             FNCONTP(2,I) = FNCONTP(2,I)  - FN(2) * W
             FNCONTP(3,I) = FNCONTP(3,I)  - FN(3) * W
@@ -728,7 +725,25 @@ C
             FTCONTP(1,IX4(K)) = FTCONTP(1,IX4(K)) + FT(1)*H(4,K)*W
             FTCONTP(2,IX4(K)) = FTCONTP(2,IX4(K)) + FT(2)*H(4,K)*W
             FTCONTP(3,IX4(K)) = FTCONTP(3,IX4(K)) + FT(3)*H(4,K)*W
-         ENDIF
+          ENDIF
+C
+          IF ((H3D_DATA%N_VECT_CONT2M > 0).AND.(IROT > 0)) THEN ! Moment output in h3d
+            MCONT2(1,I) =  (-MGX + MRX)*W
+            MCONT2(2,I) =  (-MGY + MRY)*W
+            MCONT2(3,I) =  (-MGZ + MRZ)*W
+            MCONT2(1,IX1(K)) = MCONT2(1,IX1(K)) + MX(1)*H(1,K)*W
+            MCONT2(2,IX1(K)) = MCONT2(2,IX1(K)) + MY(1)*H(1,K)*W
+            MCONT2(3,IX1(K)) = MCONT2(3,IX1(K)) + MZ(1)*H(1,K)*W
+            MCONT2(1,IX2(K)) = MCONT2(1,IX2(K)) + MX(2)*H(2,K)*W
+            MCONT2(2,IX2(K)) = MCONT2(2,IX2(K)) + MY(2)*H(2,K)*W
+            MCONT2(3,IX2(K)) = MCONT2(3,IX2(K)) + MZ(2)*H(2,K)*W
+            MCONT2(1,IX3(K)) = MCONT2(1,IX3(K)) + MX(3)*H(3,K)*W
+            MCONT2(2,IX3(K)) = MCONT2(2,IX3(K)) + MY(3)*H(3,K)*W
+            MCONT2(3,IX3(K)) = MCONT2(3,IX3(K)) + MZ(3)*H(3,K)*W
+            MCONT2(1,IX4(K)) = MCONT2(1,IX4(K)) + MX(4)*H(4,K)*W
+            MCONT2(2,IX4(K)) = MCONT2(2,IX4(K)) + MY(4)*H(4,K)*W
+            MCONT2(3,IX4(K)) = MCONT2(3,IX4(K)) + MZ(4)*H(4,K)*W
+          ENDIF          
 C----------
         ELSE  ! desactivated secnd node
           NSVG(K)= -I

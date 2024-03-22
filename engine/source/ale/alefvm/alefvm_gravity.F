@@ -1,31 +1,31 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  ALEFVM_GRAVITY                source/ale/alefvm/alefvm_gravity.F
 Chd|-- called by -----------
 Chd|        SFORC3                        source/elements/solid/solide/sforc3.F
 Chd|-- calls ---------------
-Chd|        ALEFVM_MOD                    ../common_source/modules/alefvm_mod.F
+Chd|        ALEFVM_MOD                    ../common_source/modules/ale/alefvm_mod.F
 Chd|====================================================================
       SUBROUTINE ALEFVM_GRAVITY(
      1                          AGRV, IGRV, LGRAV,
@@ -58,15 +58,7 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "vect01_c.inc"
 #include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "com06_c.inc"
-#include      "com08_c.inc"
-#include      "nsvis_c.inc"
-#include      "fluid_scr_c.inc"
-#include      "inter22.inc"
 #include      "param_c.inc"
-#include      "alefvm.inc"
-#include      "task_c.inc"
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C----------------------------------------------- 
@@ -106,11 +98,11 @@ C-----------------------------------------------
         !loop on vertexes
         DO J=1,8
           INOD       = IXS(1+J,I+NFT)
-          IF(VERTEX(4,INOD)==ZERO) CYCLE
+          IF(ALEFVM_Buffer%VERTEX(4,INOD)==ZERO) CYCLE
           NVERTEX    = NVERTEX + 1
-          ACCEL(1,I) = ACCEL(1,I) + VERTEX(1,INOD)
-          ACCEL(2,I) = ACCEL(2,I) + VERTEX(2,INOD)
-          ACCEL(3,I) = ACCEL(3,I) + VERTEX(3,INOD)                    
+          ACCEL(1,I) = ACCEL(1,I) + ALEFVM_Buffer%VERTEX(1,INOD)
+          ACCEL(2,I) = ACCEL(2,I) + ALEFVM_Buffer%VERTEX(2,INOD)
+          ACCEL(3,I) = ACCEL(3,I) + ALEFVM_Buffer%VERTEX(3,INOD)                    
         ENDDO
         IF(NVERTEX>0)THEN
           ACCEL(1,I) = ACCEL(1,I) / NVERTEX
@@ -125,25 +117,25 @@ C-----------------------------------------------
 
       DO I=LFT,LLT
         II          = I + NFT
-        FCELL(1,II) = FCELL(1,II) + M_CELL(I) * ACCEL(1,I)
-        FCELL(2,II) = FCELL(2,II) + M_CELL(I) * ACCEL(2,I)
-        FCELL(3,II) = FCELL(3,II) + M_CELL(I) * ACCEL(3,I)                
+        ALEFVM_Buffer%FCELL(1,II) = ALEFVM_Buffer%FCELL(1,II) + M_CELL(I) * ACCEL(1,I)
+        ALEFVM_Buffer%FCELL(2,II) = ALEFVM_Buffer%FCELL(2,II) + M_CELL(I) * ACCEL(2,I)
+        ALEFVM_Buffer%FCELL(3,II) = ALEFVM_Buffer%FCELL(3,II) + M_CELL(I) * ACCEL(3,I)                
       ENDDO!next I
 
         !DEBUG-OUTPUT---------------!
-        if(IALEFVM_OUTP_GRAV /= 0)then
+        if(ALEFVM_Param%IOUTP_GRAV /= 0)then
           debug_outp = .FALSE.
-          if(IALEFVM_OUTP_GRAV>0)then
+          if(ALEFVM_Param%IOUTP_GRAV>0)then
             do i=lft,llt
               ii = nft + i
-              if(ixs(11,ii)==IALEFVM_OUTP_GRAV)THEN
+              if(ixs(11,ii)==ALEFVM_Param%IOUTP_GRAV)THEN
                 debug_outp = .TRUE.
                 idbf   = i
                 idbl   = i
                 EXIT
               endif
              enddo
-          elseif(IALEFVM_OUTP_GRAV==-1)then
+          elseif(ALEFVM_Param%IOUTP_GRAV==-1)then
             debug_outp=.TRUE.
                 idbf   = lft
                 idbl   = llt          
@@ -171,9 +163,9 @@ C-----------------------------------------------
      .                                  "#--------- nod_3 ---------","#--------- nod_4 ---------",
      .                                  "#--------- nod_5 ---------","#--------- nod_6 ---------",
      .                                  "#--------- nod_7 ---------","#--------- nod_8 --------#"     
-            write (*,FMT='(A,8E26.14)') "           acc-X =", VERTEX(1,IXS(2:9,I))          
-            write (*,FMT='(A,8E26.14)') "           acc-Y =", VERTEX(2,IXS(2:9,I))
-            write (*,FMT='(A,8E26.14)') "           acc-Z =", VERTEX(3,IXS(2:9,I))                       
+            write (*,FMT='(A,8E26.14)') "           acc-X =", ALEFVM_Buffer%VERTEX(1,IXS(2:9,I))          
+            write (*,FMT='(A,8E26.14)') "           acc-Y =", ALEFVM_Buffer%VERTEX(2,IXS(2:9,I))
+            write (*,FMT='(A,8E26.14)') "           acc-Z =", ALEFVM_Buffer%VERTEX(3,IXS(2:9,I))                       
             print *, "      "          
           enddo
 !#!include "lockoff.inc"       

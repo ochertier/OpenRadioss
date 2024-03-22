@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  QGRTAILS                      source/elements/solid_2d/quad/qgrtails.F
 Chd|-- called by -----------
@@ -32,15 +32,16 @@ Chd|        ZEROIN                        source/system/zeroin.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        INIVOL_ARRAY_MOD              share/modules1/inivol_mod.F   
 Chd|        INIVOL_DEF_MOD                share/modules1/inivol_mod.F   
+Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        R2R_MOD                       share/modules1/r2r_mod.F      
 Chd|====================================================================
       SUBROUTINE QGRTAILS(
      1       IXQ    ,PM      ,IPARG  ,GEO    ,
-     2       EADD   ,ND      ,DD_IAD ,IDX    ,LB_MAX ,
-     3       INUM   ,INDEX   ,CEP    ,IPARTQ ,NELQ   ,
-     4       ITR1   ,IGRSURF ,IGRQUAD,
-     5       IGEO   ,IPM     ,IQUAOFF,INIVOL)
+     2       EADD   ,ND      ,DD_IAD ,IDX    ,
+     3       INUM   ,INDEX   ,CEP    ,IPARTQ ,
+     4       ITR1   ,IGRSURF ,IGRQUAD,MAT_PARAM,
+     5       IGEO   ,IPM     ,IQUAOFF,INIVOL,PRINT_FLAG)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -49,6 +50,7 @@ C-----------------------------------------------
       USE GROUPDEF_MOD
       USE INIVOL_DEF_MOD
       USE INIVOL_ARRAY_MOD
+      USE MATPARAM_DEF_MOD
 C-----------------------------------------------M
 C            A R G U M E N T S
 C-----------------------------------------------
@@ -62,47 +64,37 @@ C     INUM(8,NUMELQ)     TABLEAU DE TRAVAIL                         E/S
 C     INDEX(NUMELQ)      TABLEAU DE TRAVAIL                         E/S
 C     CEP(NUMELQ)        TABLEAU DE TRAVAIL                         E/S
 C     IPARTQ(NUMELQ)     TABLEAU DE TRAVAIL                         E/S
-C     NELQ(NUMELQ)       TABLEAU DE TRAVAIL                         E/S
 C     ITR1(NSELQ)        TABLEAU DE TRAVAIL                         E/S
 C-----------------------------------------------
 C   I M P L I C I T   T Y P E S
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
-C   G L O B A L   P A R A M E T E R S
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C O M M O N   B L O C K S
 C-----------------------------------------------
 #include      "vect01_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com10_c.inc"
 #include      "units_c.inc"
 #include      "param_c.inc"
-#include      "warn_c.inc"
-#include      "scr03_c.inc"
-#include      "scr12_c.inc"
 #include      "scr21_c.inc"
 #include      "scr17_c.inc"
 #include      "r2r_c.inc"
 C-----------------------------------------------
 C   D U M M Y   A R G U M E N T S
 C-----------------------------------------------
-      INTEGER ND, IDX, LB_MAX
+      INTEGER ND, IDX
       INTEGER IGEO(NPROPGI,NUMGEO),IPM(NPROPMI,NUMMAT), IXQ(NIXQ,NUMELQ),IPARG(NPARG,*),
      .        EADD(*),DD_IAD(NSPMD+1,*),INUM(9,*),INDEX(*),
-     .        CEP(*),IPARTQ(*),NELQ(*),ITR1(*),
+     .        CEP(*),IPARTQ(*),ITR1(*),
      .        IQUAOFF(*)
+      INTEGER, INTENT(IN) :: PRINT_FLAG !< flag to print the element group data
       TYPE (INIVOL_) , DIMENSION(NINIVOL) :: INIVOL
       MY_REAL PM(NPROPM,NUMMAT), GEO(NPROPG,NUMGEO)
 C-----------------------------------------------
       TYPE (GROUP_)  , DIMENSION(NGRQUAD)  :: IGRQUAD
       TYPE (SURF_)   , DIMENSION(NSURF)    :: IGRSURF
+      TYPE(MATPARAM_STRUCT_) ,DIMENSION(NUMMAT),INTENT(IN) :: MAT_PARAM
 C-----------------------------------------------
 C   L O C A L   V A R I A B L E S
 C-----------------------------------------------
@@ -111,8 +103,8 @@ C-----------------------------------------------
      .   P, NEL_PREC, LB_L, IGT, JHBE, I,
      .   ML1, ML2, MT1, MT2,NB,INEG,IEOS,
      .   MODE, WORK(70000),NN,J,
-     .   IPLAST, IALEL, MT,IFAIL,NFAIL,FAILMODEL,
-     .   NGP(NSPMD+1),ICPRE,NMTV_MAX,IPARTR2R,ISMST,TAG_INVOL,
+     .   IPLAST,IFAIL,NFAIL,
+     .   NGP(NSPMD+1),ICPRE,IPARTR2R,ISMST,TAG_INVOL,
      .   JALE_FROM_MAT,JALE_FROM_PROP
       INTEGER ID,MFT,ILOC,JJ
       CHARACTER*nchartitle, TITR
@@ -240,6 +232,7 @@ C ngroup global
           II = EADD(N)+NFT
           MID = IXQ(1,II)
           PID = IXQ(6,II)
+          IPARTR2R = 0
           IF (NSUBDOM>0) IPARTR2R = TAG_MAT(MID)
           NPT =1
           JHBE=0
@@ -248,6 +241,8 @@ C ngroup global
           ISORTH=0
           IPLAST=IPLA_DS-1
           ICPRE=0
+          ISMST = 0
+          IGT = 0
           IF(PID/=0)THEN
             IF(IGEO(10,PID)==17 .OR.
      .         (N2D==1.AND.IGEO(10,PID)==22)) THEN
@@ -355,15 +350,8 @@ C
           END IF
           ISRAT=IPM(3,MID)
           IFAIL = 0
-          NFAIL = IPM(220,MID)
-          IF (NFAIL > 0)THEN
-            IFAIL = 1
-            DO J=1,NFAIL
-              FAILMODEL = IPM(111 + 15*(J - 1) ,MID)
-              IF (FAILMODEL == 10 .OR. FAILMODEL == 4 .OR.
-     .            FAILMODEL == 5  .OR. FAILMODEL == 6) ISTRAIN = 1
-            ENDDO
-          ENDIF 
+          NFAIL = MAT_PARAM(MID)%NFAIL
+          ISTRAIN = 1
           IEOS=IPM(4,MID)
 
 C
@@ -460,14 +448,15 @@ C Traitement CFD sur MID negatif sur tous les solides si ineg=1
         ENDDO
       ENDIF
 C
-      WRITE(IOUT,1000)
-      WRITE(IOUT,1001)(N,IPARG(1,N),IPARG(2,N),IPARG(3,N)+1,
+      IF(PRINT_FLAG>6) THEN
+          WRITE(IOUT,1000)
+          WRITE(IOUT,1001)(N,IPARG(1,N),IPARG(2,N),IPARG(3,N)+1,
      +                IPARG(4,N),IPARG(6,N),IPARG(7,N),IPARG(11,N),    
      +                IPARG(12,N),IPARG(13,N),IPARG(23,N),
      +                IPARG(24,N),IPARG(18,N),IPARG(27,N),
      +                IPARG(29,N)+1,IPARG(43,N),IPARG(55,N),
      +                N=NGR1,NGROUP)
-c      WRITE(IOUT,1002) LBUFEL
+      ENDIF
        CALL ANCMSG(MSGID=1222,
      .                  MSGTYPE=MSGWARNING,
      .                  ANMODE=ANINFO_BLIND_2,
@@ -486,7 +475,6 @@ C
      +'      FLAG      FLAG      FLAG      FLAG     GLASS      FLAG',
      +'       MID    MEDIUM      FLAG      FLAG      TYPE   '/)
  1001 FORMAT(17(I10))
- 1002 FORMAT(' BUFFER LENGTH : ',I10 )
 C
       RETURN
       END

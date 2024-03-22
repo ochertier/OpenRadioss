@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C modified Puck model ------
 Chd|====================================================================
 Chd|  FAIL_PUCK_S                   source/materials/fail/puck/fail_puck_s.F
@@ -28,11 +28,11 @@ Chd|        MMAIN                         source/materials/mat_share/mmain.F
 Chd|-- calls ---------------
 Chd|====================================================================
       SUBROUTINE FAIL_PUCK_S(
-     1     NEL     ,NUVAR   ,IP      ,ILAY    ,NPT0    ,
-     2     NPF     ,TF      ,TIME    ,TIMESTEP,UPARAM  ,
-     3     MAT     ,NGL     ,OFF     ,NOFF    ,SIGNXX  ,
+     1     NEL     ,NUVAR   ,ILAY    ,NPT0    ,
+     2     TIME    ,TIMESTEP,UPARAM  ,
+     3     NGL     ,OFF     ,NOFF    ,SIGNXX  ,
      4     SIGNYY  ,SIGNZZ  ,SIGNXY  ,SIGNYZ  ,SIGNZX  ,
-     5     UVAR    ,IPM     ,NUPARAM ,DFMAX   ,TDELE   )
+     5     UVAR    ,NUPARAM ,DFMAX   ,TDELE   )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -42,9 +42,6 @@ C VAR     | SIZE    |TYP| RW| DEFINITION
 C---------+---------+---+---+--------------------------------------------
 C NEL     |  1      | I | R | SIZE OF THE ELEMENT GROUP NEL 
 C NUVAR   |  1      | I | R | NUMBER OF USER ELEMENT VARIABLES
-C---------+---------+---+---+--------------------------------------------
-C NPF     |  *      | I | R | FUNCTION ARRAY   
-C TF      |  *      | F | R | FUNCTION ARRAY 
 C---------+---------+---+---+--------------------------------------------
 C TIME    |  1      | F | R | CURRENT TIME
 C TIMESTEP|  1      | F | R | CURRENT TIME STEP
@@ -76,15 +73,14 @@ C OFF    | NEL     | F |R/W| DELETED ELEMENT FLAG (=1. ON, =0. OFF)
 C---------+---------+---+---+--------------------------------------------
 #include "mvsiz_p.inc"
 #include "com01_c.inc"
-#include "scr17_c.inc"
 #include "units_c.inc"
 #include  "comlock.inc"
 #include  "param_c.inc"
 C-----------------------------------------------
 C   I N P U T   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER NEL,NUPARAM, NUVAR,ILAY,IP,NPT0
-      INTEGER NGL(NEL),IPM(NPROPMI,*),MAT(NEL)
+      INTEGER NEL,NUPARAM, NUVAR,ILAY,NPT0
+      INTEGER NGL(NEL)
       my_real 
      .   TIME,TIMESTEP(NEL),UPARAM(NUPARAM),
      .   SIGNXX(NEL),SIGNYY(NEL),SIGNZZ(NEL),
@@ -95,42 +91,47 @@ C-----------------------------------------------
       INTEGER NOFF(NEL)
       my_real UVAR(NEL,NUVAR), OFF(NEL), DFMAX(NEL),TDELE(NEL)
 C-----------------------------------------------
-C   VARIABLES FOR FUNCTION INTERPOLATION 
-C-----------------------------------------------
-      INTEGER NPF(*)
-      my_real TF(*)
-C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER 
      .        I,J,IDEL,IDEL_L,IFLAG,INDX(MVSIZ),IADBUF,NINDX,
      .        NINDEX,INDEX(MVSIZ),IFAIL,JJ,IMATLY,
-     .        IUNIDIR,IFABRIC,INDX0(MVSIZ),NINDX0
+     .        IUNIDIR,IFABRIC,INDX0(MVSIZ),NINDX0,FSMOOTH
       my_real 
      .   SIGT1,SIGT2, SIGC1,SIGC2,
      .   FSIG12,F1,FA,FB,FC,PN12,PP12,PN22,
-     .   FAC,TMAX,FA_2,FB_2,FC_2
+     .   FAC,TMAX,FA_2,FB_2,FC_2,FCUT,ASRATE,
+     .   SXX(NEL),SYY(NEL),SZZ(NEL),
+     .   SXY(NEL),SYZ(NEL),SZX(NEL)
 C--------------------------------------------------------------
-      SIGT1   = UPARAM(1 )
-      SIGT2   = UPARAM(2)
-      SIGC1   = UPARAM(3)
-      SIGC2   = UPARAM(4)
-      FSIG12  = UPARAM(5)
-      PP12    = UPARAM(6)
-      PN12    = UPARAM(7)         
-      PN22    = UPARAM(8)
-      TMAX    = UPARAM(9) 
-      IFLAG   = INT(UPARAM(11))   
+      SIGT1  = UPARAM(1 )
+      SIGT2  = UPARAM(2)
+      SIGC1  = UPARAM(3)
+      SIGC2  = UPARAM(4)
+      FSIG12 = UPARAM(5)
+      PP12   = UPARAM(6)
+      PN12   = UPARAM(7)         
+      PN22   = UPARAM(8)
+      TMAX   = UPARAM(9) 
+      IFLAG  = INT(UPARAM(11)) 
+      FCUT   = UPARAM(12)  
+      IF (FCUT > ZERO) THEN
+        FSMOOTH = 1 
+        ASRATE  = TWO*PI*FCUT*TIMESTEP(1)
+        ASRATE  = ASRATE/(ONE+ASRATE)
+      ELSE
+        FSMOOTH = 0
+      ENDIF
       INDX(1:MVSIZ)  = 0
       INDEX(1:MVSIZ) = 0
 C-----------------------------------------------
 C     USER VARIABLES INITIALIZATION
 C-----------------------------------------------
       IF(ISIGI == 0)THEN
-        IF(TIME == ZERO)THEN
-         DO I=1,NEL
-          UVAR(I,8)  = ONE
-         ENDDO   
+        IF ((UVAR(1,8) == ZERO).AND.(OFF(1) == ONE)) THEN
+          DO I=1,NEL
+            UVAR(I,8)  = ONE
+          ENDDO   
         ENDIF    
       ENDIF 
 C-----------------------------------------------
@@ -138,7 +139,28 @@ C-----------------------------------------------
       IFABRIC = 0
       DO I=1,NEL
         IF(OFF(I)<EM01) OFF(I)=ZERO
-        IF(OFF(I)<ONE) OFF(I)=OFF(I)*FOUR_OVER_5
+        IF(OFF(I)<ONE)  OFF(I)=OFF(I)*FOUR_OVER_5
+        IF (FSMOOTH > 0) THEN 
+          SXX(I) = ASRATE*SIGNXX(I) + (ONE - ASRATE)*UVAR(I,9)
+          SYY(I) = ASRATE*SIGNYY(I) + (ONE - ASRATE)*UVAR(I,10)
+          SZZ(I) = ASRATE*SIGNZZ(I) + (ONE - ASRATE)*UVAR(I,11)
+          SXY(I) = ASRATE*SIGNXY(I) + (ONE - ASRATE)*UVAR(I,12)
+          SYZ(I) = ASRATE*SIGNYZ(I) + (ONE - ASRATE)*UVAR(I,13)
+          SZX(I) = ASRATE*SIGNZX(I) + (ONE - ASRATE)*UVAR(I,14)
+          UVAR(I,9)  = SXX(I)
+          UVAR(I,10) = SYY(I)
+          UVAR(I,11) = SZZ(I)
+          UVAR(I,12) = SXY(I)
+          UVAR(I,13) = SYZ(I)
+          UVAR(I,14) = SZX(I)
+        ELSE 
+          SXX(I) = SIGNXX(I)
+          SYY(I) = SIGNYY(I)
+          SZZ(I) = SIGNZZ(I)
+          SXY(I) = SIGNXY(I)
+          SYZ(I) = SIGNYZ(I)
+          SZX(I) = SIGNZX(I)
+        ENDIF
       END DO
 C-------------------------------
 C      
@@ -182,23 +204,23 @@ C-------------------------------
 C
 C             fiber criteria
 C
-              IF (SIGNXX(I) >= ZERO) THEN
-                F1 = SIGNXX(I)/SIGT1
+              IF (SXX(I) >= ZERO) THEN
+                F1 = SXX(I)/SIGT1
               ELSE
-                F1 = -SIGNXX(I)/SIGC1
+                F1 = -SXX(I)/SIGC1
               ENDIF
 C
 C             matrice criteria direction 2
 C              
-              IF (SIGNYY(I) >= ZERO) THEN
+              IF (SYY(I) >= ZERO) THEN
                 FAC = ONE - PP12*SIGT2/FSIG12
-                FAC = FAC*SIGNYY(I)/SIGT2
-                FA = SQRT((SIGNXY(I)/FSIG12)**2 + FAC*FAC) 
-     .                   + PP12*SIGNYY(I)/FSIG12
+                FAC = FAC*SYY(I)/SIGT2
+                FA = SQRT((SXY(I)/FSIG12)**2 + FAC*FAC) 
+     .                   + PP12*SYY(I)/FSIG12
                ELSE
                 FAC = HALF/(ONE + PN22)/FSIG12
-                FC = (SIGNXY(I)*FAC)**2 + (SIGNYY(I)/SIGC2)**2
-                FC =-FC*SIGC2/SIGNYY(I)
+                FC = (SXY(I)*FAC)**2 + (SYY(I)/SIGC2)**2
+                FC =-FC*SIGC2/SYY(I)
 C plane angle
 c                FAC = SQRT(ONE + TWO*PN12(I)*SIGC2(I)/FSIG12(I)) - ONE
 c                FAC = HALF*FAC*FSIG12(I)/PN12(I)
@@ -209,21 +231,21 @@ c                CC = SQRT(FAC*CC)
 c                ANGLE(I) = ACOS(CC)                               
               ENDIF
               
-              FB = SQRT(SIGNXY(I)**2 + (PN12*SIGNYY(I))**2 ) 
-     .                               + PN12*SIGNYY(I)
+              FB = SQRT(SXY(I)**2 + (PN12*SYY(I))**2 ) 
+     .                               + PN12*SYY(I)
               FB = FB/FSIG12
 C
 C             matrice criteria direction 3
 C              
-              IF (SIGNZZ(I) >= ZERO) THEN
+              IF (SZZ(I) >= ZERO) THEN
                 FAC = ONE - PP12*SIGT2/FSIG12
-                FAC = FAC*SIGNZZ(I)/SIGT2
-                FA_2 = SQRT((SIGNZX(I)/FSIG12)**2 + FAC*FAC) 
-     .                   + PP12*SIGNZZ(I)/FSIG12
+                FAC = FAC*SZZ(I)/SIGT2
+                FA_2 = SQRT((SZX(I)/FSIG12)**2 + FAC*FAC) 
+     .                   + PP12*SZZ(I)/FSIG12
               ELSE
                 FAC = HALF/(ONE + PN22)/FSIG12
-                FC_2 = (SIGNZX(I)*FAC)**2 + (SIGNZZ(I)/SIGC2)**2
-                FC_2 =-FC_2*SIGC2/SIGNZZ(I)
+                FC_2 = (SZX(I)*FAC)**2 + (SZZ(I)/SIGC2)**2
+                FC_2 =-FC_2*SIGC2/SZZ(I)
 C plane angle
 c                FAC = SQRT(ONE + TWO*PN12(I)*SIGC2(I)/FSIG12(I)) - ONE
 c                FAC = HALF*FAC*FSIG12(I)/PN12(I)
@@ -234,8 +256,8 @@ c                CC = SQRT(FAC*CC)
 c                ANGLE(I) = ACOS(CC)                               
               ENDIF
               
-              FB_2 = SQRT(SIGNZX(I)**2 + (PN12*SIGNZZ(I))**2 ) 
-     .                               + PN12*SIGNZZ(I)
+              FB_2 = SQRT(SZX(I)**2 + (PN12*SZZ(I))**2 ) 
+     .                               + PN12*SZZ(I)
               FB_2 = FB_2/FSIG12   
 C
                DFMAX(I)  = MIN(ONE,MAX(DFMAX(I),F1,FA,FB,FC,FA_2,FB_2,FC_2))
@@ -287,23 +309,23 @@ C-------------------------------
 C
 C   fiber criteria
 C
-              IF(SIGNXX(I) > 0 ) THEN
-                F1 = SIGNXX(I)/SIGT1
+              IF(SXX(I) > 0 ) THEN
+                F1 = SXX(I)/SIGT1
               ELSE
-                F1 = -SIGNXX(I)/SIGC1
+                F1 = -SXX(I)/SIGC1
               ENDIF
 C
 C  matrice criteria --direction 2
 C              
-              IF(SIGNYY(I) >= ZERO) THEN
+              IF(SYY(I) >= ZERO) THEN
                 FAC = ONE - PP12*SIGT2/FSIG12
-                FAC = FAC*SIGNYY(I)/SIGT2
-                FA = SQRT((SIGNXY(I)/FSIG12)**2 + FAC*FAC) 
-     .                   + PP12*SIGNYY(I)/FSIG12
+                FAC = FAC*SYY(I)/SIGT2
+                FA = SQRT((SXY(I)/FSIG12)**2 + FAC*FAC) 
+     .                   + PP12*SYY(I)/FSIG12
                ELSE
                 FAC = HALF/(ONE + PN22)/FSIG12
-                FC = (SIGNXY(I)*FAC)**2 + (SIGNYY(I)/SIGC2)**2
-                FC =-FC*SIGC2/SIGNYY(I)
+                FC = (SXY(I)*FAC)**2 + (SYY(I)/SIGC2)**2
+                FC =-FC*SIGC2/SYY(I)
 C plane angle
 c                FAC = SQRT(ONE + TWO*PN12(I)*SIGC2(I)/FSIG12(I)) - ONE
 c                FAC = HALF*FAC*FSIG12(I)/PN12(I)
@@ -313,22 +335,22 @@ c                FAC = HALF/ONE + PN22(I))
 c                CC = SQRT(FAC*CC)
 c                ANGLE(I) = ACOS(CC)                               
               ENDIF
-              FB = SQRT(SIGNXY(I)**2 + (PN12*SIGNYY(I))**2 ) 
-     .                               + PN12*SIGNYY(I)
+              FB = SQRT(SXY(I)**2 + (PN12*SYY(I))**2 ) 
+     .                               + PN12*SYY(I)
               FB = FB/FSIG12
 
 C
 C  matrice criteria direction 3
 C              
-              IF(SIGNZZ(I) >= ZERO) THEN
+              IF(SZZ(I) >= ZERO) THEN
                 FAC = ONE - PP12*SIGT2/FSIG12
-                FAC = FAC*SIGNZZ(I)/SIGT2
-                FA_2 = SQRT((SIGNZX(I)/FSIG12)**2 + FAC*FAC) 
-     .                   + PP12*SIGNZZ(I)/FSIG12
+                FAC = FAC*SZZ(I)/SIGT2
+                FA_2 = SQRT((SZX(I)/FSIG12)**2 + FAC*FAC) 
+     .                   + PP12*SZZ(I)/FSIG12
                ELSE
                 FAC = HALF/(ONE + PN22)/FSIG12
-                FC_2 = (SIGNZX(I)*FAC)**2 + (SIGNZZ(I)/SIGC2)**2
-                FC_2 =-FC_2*SIGC2/SIGNZZ(I)
+                FC_2 = (SZX(I)*FAC)**2 + (SZZ(I)/SIGC2)**2
+                FC_2 =-FC_2*SIGC2/SZZ(I)
 C plane angle
 c                FAC = SQRT(ONE + TWO*PN12(I)*SIGC2(I)/FSIG12(I)) - ONE
 c                FAC = HALF*FAC*FSIG12(I)/PN12(I)
@@ -339,8 +361,8 @@ c                CC = SQRT(FAC*CC)
 c                ANGLE(I) = ACOS(CC)                               
               ENDIF
               
-              FB_2 = SQRT(SIGNZX(I)**2 + (PN12*SIGNZZ(I))**2 ) 
-     .                               + PN12*SIGNZZ(I)
+              FB_2 = SQRT(SZX(I)**2 + (PN12*SZZ(I))**2 ) 
+     .                               + PN12*SZZ(I)
               FB_2 = FB_2/FSIG12    
 C
                DFMAX(I)  = MIN(ONE,MAX(DFMAX(I),F1,FA,FB,FC,FA_2,FB_2,FC_2))

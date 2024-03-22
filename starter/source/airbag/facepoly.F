@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  FACEPOLY                      source/airbag/facepoly.F      
 Chd|-- called by -----------
@@ -418,7 +418,7 @@ C SI SS1=SS2=0 les segments sont colineaires (cas non traite)
             SEG(NSEG,1,2)=XP2
             SEG(NSEG,2,2)=YP2
             SEG(NSEG,3,2)=ZP2
-            ELSEG(NSEG,2)=J			
+            ELSEG(NSEG,2)=J
          ENDDO
       ENDDO
 C
@@ -1005,7 +1005,7 @@ C Traitement des 2 segments internes
                 IF(JTAG(2,J) == IMAX) JTAG(2,J)=IMIN
              ENDDO
            ENDIF
-C Traitement des 2 segments externes		   
+C Traitement des 2 segments externes       
            ID1=ISEG(1,I3)
            ID2=ISEG(2,I3)
            IF(ID1==I) L=ID2
@@ -1092,7 +1092,7 @@ C
                ENDDO
              ENDIF
            ENDDO
-        ENDDO		   
+        ENDDO       
 C------------------------------------------------------
 C Noeud connecte a 3 segments : 1 interne et 2 externes
 C------------------------------------------------------
@@ -1425,7 +1425,7 @@ C
         ENDDO
 C----------------
 C Order polygones 
-C----------------	
+C----------------
         IAD=0
         DO I=1,NPOLY
            IF(LENPOLY(I) < 3) THEN
@@ -1475,7 +1475,7 @@ C
                     POLY(2,IAD+J+1)=2
                     ISTOP=1
                     ITAGSEG(K)=1
-                 ENDIF			   
+                 ENDIF         
               ENDDO
            ENDDO
            IF(ISEG(IP0SEG,ISSEG) /= I0) THEN
@@ -1487,7 +1487,7 @@ C
         ENDDO
 C
       ENDIF  ! ALGO
-C	  
+C    
       NNS=0
       IAD=0
       DO I=1,NPOLY

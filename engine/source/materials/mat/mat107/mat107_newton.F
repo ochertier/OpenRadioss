@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  MAT107_NEWTON                 source/materials/mat/mat107/mat107_newton.F
 Chd|-- called by -----------
@@ -50,9 +50,6 @@ Chd|====================================================================
       !=======================================================================
       !      Common
       !=======================================================================
-#include      "param_c.inc" 
-#include      "com01_c.inc"
-#include      "scr17_c.inc"
 #include      "com04_c.inc"
       !=======================================================================
       !      Dummy arguments
@@ -60,7 +57,8 @@ Chd|====================================================================
       INTEGER NEL,NUPARAM,NUVAR,JTHE,NUMTABL,ITABLE(NUMTABL),NVARTMP
       INTEGER ,DIMENSION(NEL), INTENT(IN)    :: NGL
       my_real 
-     .   TIME,TIMESTEP,VARTMP(NEL,NVARTMP)
+     .   TIME,TIMESTEP
+      INTEGER, INTENT(INOUT) :: VARTMP(NEL,NVARTMP)
       my_real,DIMENSION(NUPARAM), INTENT(IN) :: 
      .   UPARAM
       my_real,DIMENSION(NEL), INTENT(IN)     :: 
@@ -192,7 +190,7 @@ c
         XVEC(1:NEL,2) = EPSD(1:NEL,2) * XSCALE1
         IPOS(1:NEL,1) = VARTMP(1:NEL,1)
         IPOS(1:NEL,2) = 1
-        CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(1)),ISMOOTH,NEL,IPOS,XVEC,R1,DR1_DP,HARDR)
+        CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(1)),ISMOOTH,NEL,NEL,IPOS,XVEC,R1,DR1_DP,HARDR)
         R1(1:NEL)     = R1(1:NEL) * YSCALE1
         DR1_DP(1:NEL) = DR1_DP(1:NEL) * YSCALE1
         VARTMP(1:NEL,1) = IPOS(1:NEL,1)
@@ -201,7 +199,7 @@ c
         XVEC(1:NEL,2) = EPSD(1:NEL,3) * XSCALE2
         IPOS(1:NEL,1) = VARTMP(1:NEL,2)
         IPOS(1:NEL,2) = 1
-        CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(2)),ISMOOTH,NEL,IPOS,XVEC,R2,DR2_DP,HARDR)
+        CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(2)),ISMOOTH,NEL,NEL,IPOS,XVEC,R2,DR2_DP,HARDR)
         R2(1:NEL)     = R2(1:NEL) * YSCALE2
         DR2_DP(1:NEL) = DR2_DP(1:NEL) * YSCALE2
         VARTMP(1:NEL,2) = IPOS(1:NEL,1)  
@@ -210,7 +208,7 @@ c
         XVEC(1:NEL,2) = EPSD(1:NEL,4) * XSCALE1C
         IPOS(1:NEL,1) = VARTMP(1:NEL,3)
         IPOS(1:NEL,2) = 1
-        CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(3)),ISMOOTH,NEL,IPOS,XVEC,R1C,DR1C_DP,HARDR)
+        CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(3)),ISMOOTH,NEL,NEL,IPOS,XVEC,R1C,DR1C_DP,HARDR)
         R1C(1:NEL)    = R1C(1:NEL) * YSCALE1C
         DR1C_DP(1:NEL)= DR1C_DP(1:NEL) * YSCALE1C
         VARTMP(1:NEL,3) = IPOS(1:NEL,1)
@@ -219,7 +217,7 @@ c
         XVEC(1:NEL,2) = EPSD(1:NEL,5) * XSCALE2C
         IPOS(1:NEL,1) = VARTMP(1:NEL,4)
         IPOS(1:NEL,2) = 1
-        CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(4)),ISMOOTH,NEL,IPOS,XVEC,R2C,DR2C_DP,HARDR)
+        CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(4)),ISMOOTH,NEL,NEL,IPOS,XVEC,R2C,DR2C_DP,HARDR)
         R2C(1:NEL)    = R2C(1:NEL) * YSCALE2C
         DR2C_DP(1:NEL)= DR2C_DP(1:NEL) * YSCALE2C
         VARTMP(1:NEL,4) = IPOS(1:NEL,1) 
@@ -228,7 +226,7 @@ c
         XVEC(1:NEL,2) = EPSD(1:NEL,6) * XSCALET
         IPOS(1:NEL,1) = VARTMP(1:NEL,5)
         IPOS(1:NEL,2) = 1
-        CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(5)),ISMOOTH,NEL,IPOS,XVEC,RT,DRT_DP,HARDR)
+        CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(5)),ISMOOTH,NEL,NEL,IPOS,XVEC,RT,DRT_DP,HARDR)
         RT(1:NEL)     = RT(1:NEL) * YSCALET
         DRT_DP(1:NEL) = DRT_DP(1:NEL) * YSCALET
         VARTMP(1:NEL,5) = IPOS(1:NEL,1)
@@ -329,12 +327,12 @@ c
           ! a plastic multiplier allowing to update internal variables to satisfy
           ! the consistency condition using the cutting plane method
           ! Its expression at each iteration is : DLAMBDA = - PHI/DPHI_DLAMBDA
-	  ! -> PHI          : current value of yield function (known)
+            ! -> PHI          : current value of yield function (known)
           ! -> DPHI_DLAMBDA : derivative of PHI with respect to DLAMBDA by taking
           !                   into account of internal variables kinetic : 
           !                   hardening parameters
 c        
-	  ! 1 - Computation of DPHI_DSIG the normal to the yield criterion
+            ! 1 - Computation of DPHI_DSIG the normal to the yield criterion
           !-------------------------------------------------------------          
 c    
           NORMXX  = TWO*(ALPHA1(I)/(R1(I)**2))*(SIGNXX(I)-XI1*SIGNYY(I))
@@ -345,7 +343,7 @@ c
      .            + TWO*(ALPHA4(I)/(R2C(I)**2))*SIGNYY(I)
           NORMXY  = (ALPHA5(I)/(RT(I)**2))*ABS(SIGNXY(I))*SIGN(ONE,SIGNXY(I))
 c
-	  ! 2 - Computation of DFP_DSIG the normal to the non-associated plastic potential
+            ! 2 - Computation of DFP_DSIG the normal to the non-associated plastic potential
           !-------------------------------------------------------------------------------
           !  a) Computation of derivatives
           NORMPXX  = BETA1(I)*(TWO*SIGNXX(I)    + K2*SIGNYY(I)) + BETA2(I)*(TWO*SIGNXX(I)    + K4*SIGNYY(I))
@@ -403,7 +401,7 @@ c
           !   a) Computation of the plastic multiplier
           DLAM = -PHI(I) / DPHI_DLAM
 c        
-	  !   b) Plastic strains tensor update
+            !   b) Plastic strains tensor update
           DPXX = DLAM * NORMPXX
           DPYY = DLAM * NORMPYY
           DPXY = TWO * DLAM * NORMPXY 
@@ -477,7 +475,7 @@ c
             XVEC(1:NEL,2) = EPSD(1:NEL,2) * XSCALE1
             IPOS(1:NEL,1) = VARTMP(1:NEL,1)
             IPOS(1:NEL,2) = 1
-            CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(1)),ISMOOTH,NEL,IPOS,XVEC,R1,DR1_DP,HARDR)
+            CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(1)),ISMOOTH,NEL,NEL,IPOS,XVEC,R1,DR1_DP,HARDR)
             R1(1:NEL)     = R1(1:NEL) * YSCALE1
             DR1_DP(1:NEL) = DR1_DP(1:NEL) * YSCALE1
             VARTMP(1:NEL,1) = IPOS(1:NEL,1)
@@ -486,7 +484,7 @@ c
             XVEC(1:NEL,2) = EPSD(1:NEL,3) * XSCALE2
             IPOS(1:NEL,1) = VARTMP(1:NEL,2)
             IPOS(1:NEL,2) = 1
-            CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(2)),ISMOOTH,NEL,IPOS,XVEC,R2,DR2_DP,HARDR)
+            CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(2)),ISMOOTH,NEL,NEL,IPOS,XVEC,R2,DR2_DP,HARDR)
             R2(1:NEL)     = R2(1:NEL) * YSCALE2
             DR2_DP(1:NEL) = DR2_DP(1:NEL) * YSCALE2
             VARTMP(1:NEL,2) = IPOS(1:NEL,1)  
@@ -495,7 +493,7 @@ c
             XVEC(1:NEL,2) = EPSD(1:NEL,4) * XSCALE1C
             IPOS(1:NEL,1) = VARTMP(1:NEL,3)
             IPOS(1:NEL,2) = 1
-            CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(3)),ISMOOTH,NEL,IPOS,XVEC,R1C,DR1C_DP,HARDR)
+            CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(3)),ISMOOTH,NEL,NEL,IPOS,XVEC,R1C,DR1C_DP,HARDR)
             R1C(1:NEL)    = R1C(1:NEL) * YSCALE1C
             DR1C_DP(1:NEL)= DR1C_DP(1:NEL) * YSCALE1C
             VARTMP(1:NEL,3) = IPOS(1:NEL,1)
@@ -504,7 +502,7 @@ c
             XVEC(1:NEL,2) = EPSD(1:NEL,5) * XSCALE2C
             IPOS(1:NEL,1) = VARTMP(1:NEL,4)
             IPOS(1:NEL,2) = 1
-            CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(4)),ISMOOTH,NEL,IPOS,XVEC,R2C,DR2C_DP,HARDR)
+            CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(4)),ISMOOTH,NEL,NEL,IPOS,XVEC,R2C,DR2C_DP,HARDR)
             R2C(1:NEL)    = R2C(1:NEL) * YSCALE2C
             DR2C_DP(1:NEL)= DR2C_DP(1:NEL) * YSCALE2C
             VARTMP(1:NEL,4) = IPOS(1:NEL,1) 
@@ -513,7 +511,7 @@ c
             XVEC(1:NEL,2) = EPSD(1:NEL,6) * XSCALET
             IPOS(1:NEL,1) = VARTMP(1:NEL,5)
             IPOS(1:NEL,2) = 1
-            CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(5)),ISMOOTH,NEL,IPOS,XVEC,RT,DRT_DP,HARDR)
+            CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(5)),ISMOOTH,NEL,NEL,IPOS,XVEC,RT,DRT_DP,HARDR)
             RT(1:NEL)     = RT(1:NEL) * YSCALET
             DRT_DP(1:NEL) = DRT_DP(1:NEL) * YSCALET
             VARTMP(1:NEL,5) = IPOS(1:NEL,1)  

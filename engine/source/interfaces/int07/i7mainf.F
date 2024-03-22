@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
       module MOD_NODNORM
       implicit none
 #include      "my_real.inc"
@@ -33,7 +33,6 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       END MODULE MOD_NODNORM
       module MOD_RCURV
       implicit none
-#include      "my_real.inc"
       my_real 
      .       , DIMENSION(:), ALLOCATABLE :: RCURV,ANGLM
       END MODULE MOD_RCURV
@@ -71,14 +70,15 @@ Chd|        SPMD_I7CURVSZ                 source/mpi/interfaces/spmd_i7curvsz.F
 Chd|        STARTIME                      source/system/timer.F         
 Chd|        STOPTIME                      source/system/timer.F         
 Chd|        SUM_6_FLOAT_SENS              source/system/parit.F         
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
 Chd|        INTBUF_FRIC_MOD               share/modules/intbuf_fric_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
+Chd|        OUTPUTS_MOD                   ../common_source/modules/outputs_mod.F
 Chd|====================================================================
       SUBROUTINE I7MAINF(
      1                   IPARI          ,X           ,A              ,ALE_CONNECTIVITY ,XCELL      ,
@@ -99,7 +99,8 @@ Chd|====================================================================
      H                   FBSAV6         ,ISENSINT    ,DIMFB          ,IXIG3D           ,KXIG3D     ,
      I                   WIGE           ,KNOT        ,IGEO           ,MULTI_FVM        ,H3D_DATA   ,
      J                   INTBUF_FRIC_TAB,KNOTLOCPC   ,KNOTLOCEL      ,ITASK            ,TAGNCONT   ,
-     K                   KLOADPINTER    ,LOADPINTER  ,LOADP_HYD_INTER,DGAPLOADINT      ,S_LOADPINTER)
+     K                   KLOADPINTER    ,LOADPINTER  ,LOADP_HYD_INTER,DGAPLOADINT      ,S_LOADPINTER,
+     L                   INTEREFRIC     ,S_XCELL_REMOTE,XCELL_REMOTE)
 C======================================================================
 C-----------------------------------------------
 C   M o d u l e s
@@ -114,6 +115,7 @@ C-----------------------------------------------
       USE INTBUF_FRIC_MOD
       USE GROUPDEF_MOD
       USE ALE_CONNECTIVITY_MOD
+      USE OUTPUTS_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -129,17 +131,11 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "units_c.inc"
-#include      "scr03_c.inc"
-#include      "scr04_c.inc"
-#include      "scr05_c.inc"
-#include      "scr07_c.inc"
 #include      "warn_c.inc"
 #include      "task_c.inc"
 #include      "parit_c.inc"
 #include      "timeri_c.inc"
 #include      "impl1_c.inc"
-#include      "sms_c.inc"
 #include      "macro.inc"
 #include      "comlock.inc"
 #include      "tabsiz_c.inc"
@@ -163,6 +159,7 @@ C-----------------------------------------------
       INTEGER  , INTENT(IN) :: S_LOADPINTER
       INTEGER  , INTENT(IN) :: KLOADPINTER(NINTER+1),LOADPINTER(S_LOADPINTER),
      .         LOADP_HYD_INTER(NLOADP_HYD)
+      INTEGER  , INTENT(IN) :: INTEREFRIC
       my_real  , INTENT(IN) :: DGAPLOADINT(S_LOADPINTER)
       my_real  EMINX(*), XCELL(3,SXCELL)
       my_real DT2T,
@@ -179,6 +176,9 @@ C-----------------------------------------------
 
       DOUBLE PRECISION FBSAV6(12,6,DIMFB)
 
+      INTEGER, INTENT(in) :: S_XCELL_REMOTE
+      my_real, DIMENSION(S_XCELL_REMOTE), INTENT(in) :: XCELL_REMOTE
+
       TYPE(INTBUF_STRUCT_) INTBUF_TAB
       TYPE(MULTI_FVM_STRUCT), INTENT(INOUT) :: MULTI_FVM
       TYPE(H3D_DATABASE) :: H3D_DATA
@@ -188,7 +188,7 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, J, I_STOK, JLT_NEW, JLT , NFT, IVIS2,
-     .        IBC, NOINT, NSEG, ISECIN, IBAG, IADM,
+     .        IBC,  NSEG, ISECIN, IBAG, IADM,
      .        IGAP, INACTI, IFQ, MFROT, IGSTI, NISUB, ITIED,
      .        JLT_TIED, NB_LOC, I_STOK_LOC,DEBUT,
      .        ILAGM, LENR, LENT, MAXCC,INTTH,IFORM, H, IERROR,
@@ -265,13 +265,15 @@ C-----------------------------------------------
       INTEGER,TARGET, DIMENSION(1):: ADPARTS_FRIC_BID
       INTEGER,TARGET, DIMENSION(1):: IFRICORTH_BID
       my_real,TARGET, DIMENSION(1):: TABCOEF_FRIC_BID
-      
+      INTEGER :: NSN, NTY, NOINT
+      INTEGER :: NRTM
       LOGICAL TYPE18
       INTEGER :: IDIR
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------
       TYPE18=.FALSE.
+      NRTM  =IPARI(4,NIN)
       NSN   =IPARI(5,NIN)
       NTY   =IPARI(7,NIN)
       IBC   =IPARI(11,NIN)
@@ -333,6 +335,10 @@ C adaptive meshing
 C--- Corresponding Friction model  
       INTFRIC=IPARI(72,NIN)
       IORTHFRIC = 0
+      NSETPRTS = 0
+      NPARTFRIC = 0 
+      XFILTR_FRIC = ZERO
+      
       IF(INTFRIC /= 0) THEN 
          TABCOUPLEPARTS_FRIC  => INTBUF_FRIC_TAB(INTFRIC)%TABCOUPLEPARTS_FRIC
          TABCOEF_FRIC  => INTBUF_FRIC_TAB(INTFRIC)%TABCOEF_FRIC
@@ -383,14 +389,14 @@ C Traitement d'assemblage parith/on spmd a optimiser si besoin
              LENR = IAD_ELEM(1,NSPMD+1)-IAD_ELEM(1,1)
              IF(NSPMD>1)THEN
 C Calcul espace memoire parith/on avec communication
- 	       CALL SPMD_I7CURVSZ(
-     1	         IPARI(4,NIN),INTBUF_TAB%IRECTM,NUMNOD,IAD_ELEM,FR_ELEM,
-     2	         ISDSIZ      ,IRCSIZ	       ,ITAG  ,LENR    ,LENT   ,
-     3	         MAXCC       )
+               CALL SPMD_I7CURVSZ(
+     1           IPARI(4,NIN),INTBUF_TAB%IRECTM,NUMNOD,IAD_ELEM,FR_ELEM,
+     2           ISDSIZ      ,IRCSIZ           ,ITAG  ,LENR    ,LENT   ,
+     3           MAXCC       )
              ELSE
 C Calcul espace memoire parith/on sans communication
- 	       CALL I7CURVSZ(
-     1	         IPARI(4,NIN),INTBUF_TAB%IRECTM,NUMNOD,ITAG,LENT,MAXCC)
+               CALL I7CURVSZ(
+     1           IPARI(4,NIN),INTBUF_TAB%IRECTM,NUMNOD,ITAG,LENT,MAXCC)
              END IF
              CALL I7NORMP(
      1         IPARI(4,NIN),INTBUF_TAB%IRECTM,NUMNOD ,X    ,NOD_NORMAL,
@@ -423,14 +429,14 @@ C Traitement d'assemblage parith/on spmd a optimiser si besoin
              LENR = IAD_ELEM(1,NSPMD+1)-IAD_ELEM(1,1)
              IF(NSPMD>1)THEN
 C Calcul espace memoire parith/on avec communication
- 	       CALL SPMD_I7CURVSZ(
-     1	         IPARI(4,NIN),INTBUF_TAB%IRECTM,NUMNOD,IAD_ELEM,FR_ELEM,
-     2	         ISDSIZ      ,IRCSIZ	       ,ITAG  ,LENR    ,LENT   ,
-     3	         MAXCC       )
+               CALL SPMD_I7CURVSZ(
+     1           IPARI(4,NIN),INTBUF_TAB%IRECTM,NUMNOD,IAD_ELEM,FR_ELEM,
+     2           ISDSIZ      ,IRCSIZ           ,ITAG  ,LENR    ,LENT   ,
+     3           MAXCC       )
              ELSE
 C Calcul espace memoire parith/on sans communication
- 	       CALL I7CURVSZ(
-     1	         IPARI(4,NIN),INTBUF_TAB%IRECTM,NUMNOD,ITAG,LENT,MAXCC)
+               CALL I7CURVSZ(
+     1           IPARI(4,NIN),INTBUF_TAB%IRECTM,NUMNOD,ITAG,LENT,MAXCC)
              END IF
              CALL I7NORMNP(
      1         IPARI(4,NIN),INTBUF_TAB%IRECTM,NUMNOD ,X    ,NOD_NORMAL,
@@ -441,9 +447,9 @@ C Calcul espace memoire parith/on sans communication
          CALL MY_BARRIER()
          NMNFT=1+(JTASK-1)*IPARI(6,NIN)/NTHREAD
          NMNLT=JTASK*IPARI(6,NIN)/NTHREAD
- 	 CALL I7NORME(
-     .	   NMNFT,NMNLT,NOD_NORMAL,INTBUF_TAB%MSR)
- 	 CALL MY_BARRIER()
+         CALL I7NORME(
+     .     NMNFT,NMNLT,NOD_NORMAL,INTBUF_TAB%MSR)
+         CALL MY_BARRIER()
          NRTMFT=1+(JTASK-1)*IPARI(4,NIN)/NTHREAD
          NRTMLT=JTASK*IPARI(4,NIN)/NTHREAD
          CALL I7RCURV(NRTMFT, NRTMLT ,X ,NOD_NORMAL ,INTBUF_TAB%IRECTM ,
@@ -653,11 +659,14 @@ C
      B        JLT_NEW       ,GAPV     ,INACTI  , INTBUF_TAB%CAND_P ,ALE_CONNECTIVITY%NE_CONNECT,
      C        INDEX2(NFT+1) ,VXI      ,VYI     , ITAB              ,XCELL                      ,               
      D        VZI           ,MSI      ,KINI    , SURF              ,IBAG                       ,
-     E        IGAP          ,MULTI_FVM)
+     E        IGAP          ,MULTI_FVM,S_XCELL_REMOTE,XCELL_REMOTE)
 
             IF( MULTI_FVM%IS_INT18_LAW151 ) THEN
-                MSI_APPEND(1:MVSIZ) = ZERO
-                MSI_APPEND(MVSIZ+1:2*MVSIZ) = MSI(1:MVSIZ)
+              MSI_APPEND(1:MVSIZ) = ZERO
+              MSI_APPEND(MVSIZ+1:2*MVSIZ) = MSI(1:MVSIZ)
+            ELSE
+              MSI_APPEND(1:MVSIZ) = MSI(1:MVSIZ)
+              MSI_APPEND(MVSIZ+1:2*MVSIZ) = ZERO
             ENDIF
 
             JLT = JLT_NEW
@@ -673,18 +682,18 @@ C
      4  STIGLO       ,STIFN     ,STIF         ,FSKYI       ,ISKY     ,
      5  NX1          ,NX2       ,NX3          ,NX4         ,NY1      ,
      6  NY2          ,NY3       ,NY4          ,NZ1         ,NZ2      ,
-     7  NZ3	     ,NZ4	,LB1	      ,LB2	   ,LB3      ,
-     8  LB4	     ,LC1	,LC2	      ,LC3	   ,LC4      ,
-     9  P1	     ,P2	,P3	      ,P4	   ,FCONT    ,
-     B  IX1	     ,IX2	,IX3	      ,IX4	   ,NSVG     ,
+     7  NZ3          ,NZ4       ,LB1          ,LB2         ,LB3      ,
+     8  LB4          ,LC1       ,LC2          ,LC3         ,LC4      ,
+     9  P1           ,P2        ,P3           ,P4          ,FCONT    ,
+     B  IX1          ,IX2       ,IX3          ,IX4         ,NSVG     ,
      C          IVIS2                 ,NELTST           , ITYPTST          , DT2T             , IXS               ,
-     D  GAPV	     ,INACTI	,INTBUF_TAB%CAND_P,INDEX2(NFT+1),NISKYFI ,
-     E  KINET	     ,NEWFRONT  ,ISECIN       ,NSTRF	   ,SECFCUM  ,
-     F  X	     ,INTBUF_TAB%IRECTM,CE_LOC    ,MFROT ,IFQ ,
+     D  GAPV         ,INACTI    ,INTBUF_TAB%CAND_P,INDEX2(NFT+1),NISKYFI ,
+     E  KINET        ,NEWFRONT  ,ISECIN       ,NSTRF       ,SECFCUM  ,
+     F  X            ,INTBUF_TAB%IRECTM,CE_LOC    ,MFROT ,IFQ ,
      G          INTBUF_TAB%FRIC_P     ,INTBUF_TAB%FTSAVX, INTBUF_TAB%FTSAVY, INTBUF_TAB%FTSAVZ, INTBUF_TAB%XFILTR ,  
      H          INTBUF_TAB%IFPEN      ,IBAG             , ICONTACT         , IGROUPS          , IPARG             ,
      J          VISCN                 ,VXI              , VYI              , VZI              , MSI_APPEND        ,
-     K  KINI	     ,NIN	,NISUB   ,INTBUF_TAB%LISUB,INTBUF_TAB%ADDSUBS,
+     K  KINI         ,NIN       ,NISUB   ,INTBUF_TAB%LISUB,INTBUF_TAB%ADDSUBS,
      L  INTBUF_TAB%ADDSUBM,INTBUF_TAB%LISUBS,INTBUF_TAB%LISUBM,FSAVSUB,INTBUF_TAB%CAND_N,
      M          IPARI(33,NIN)         ,IPARI(39,NIN)    , PRES             , FNCONT           , MS0               ,
      N          JTASK                 ,ISENSINT         , FSAVPARIT        , NFT              , MULTI_FVM         ,
@@ -757,28 +766,28 @@ C
               CALL I7FOR3(
      1  JLT          ,A         ,V            ,IBC         ,ICODT    ,
      2  FSAV         ,GAP       ,FRIC         ,MS          ,VISC     ,
-     3  VISCF	     ,NOINT	,INTBUF_TAB%STFNS,ITAB	   ,CN_LOC   ,
-     4  STIGLO       ,STIFN	,STIF	      ,FSKYI	   ,ISKY     ,
-     5  NX1	     ,NX2	,NX3	      ,NX4	   ,NY1      ,
-     6  NY2	     ,NY3	,NY4	      ,NZ1	   ,NZ2      ,
-     7  NZ3	     ,NZ4	,LB1	      ,LB2	   ,LB3      ,
-     8  LB4	     ,LC1	,LC2	      ,LC3	   ,LC4      ,
-     9  P1	     ,P2	,P3	      ,P4	   ,FCONT    ,
-     A  IX1	     ,IX2	,IX3	      ,IX4	   ,NSVG     ,
-     B  IVIS2	     ,NELTST	,ITYPTST      ,DT2T	   ,GAPV     ,
-     C  INACTI,INTBUF_TAB%CAND_P,INDEX2(NFT+1),KINET	   ,NEWFRONT  ,
-     D  ISECIN       ,NSTRF	,X	 ,INTBUF_TAB%IRECTM,CE_LOC    ,
+     3  VISCF        ,NOINT     ,INTBUF_TAB%STFNS,ITAB     ,CN_LOC   ,
+     4  STIGLO       ,STIFN     ,STIF         ,FSKYI       ,ISKY     ,
+     5  NX1          ,NX2       ,NX3          ,NX4         ,NY1      ,
+     6  NY2          ,NY3       ,NY4          ,NZ1         ,NZ2      ,
+     7  NZ3          ,NZ4       ,LB1          ,LB2         ,LB3      ,
+     8  LB4          ,LC1       ,LC2          ,LC3         ,LC4      ,
+     9  P1           ,P2        ,P3           ,P4          ,FCONT    ,
+     A  IX1          ,IX2       ,IX3          ,IX4         ,NSVG     ,
+     B  IVIS2        ,NELTST    ,ITYPTST      ,DT2T        ,GAPV     ,
+     C  INACTI,INTBUF_TAB%CAND_P,INDEX2(NFT+1),KINET       ,NEWFRONT  ,
+     D  ISECIN       ,NSTRF     ,X       ,INTBUF_TAB%IRECTM,CE_LOC    ,
      E  MFROT        ,IFQ       ,INTBUF_TAB%FTSAVX  ,INTBUF_TAB%FTSAVY,
      F  INTBUF_TAB%FTSAVZ,XFILTR_FRIC,INTBUF_TAB%IFPEN     ,IBAG     ,
-     H  ICONTACT     ,VISCN	,VXI	      ,VYI	   ,VZI	     ,	  
-     I  MSI         ,KINI	,NIN	      ,NISUB   ,INTBUF_TAB%LISUB,
+     H  ICONTACT     ,VISCN     ,VXI          ,VYI         ,VZI      ,    
+     I  MSI         ,KINI       ,NIN          ,NISUB   ,INTBUF_TAB%LISUB,
      J  INTBUF_TAB%ADDSUBS,INTBUF_TAB%ADDSUBM,INTBUF_TAB%LISUBS     ,
      .                                     INTBUF_TAB%LISUBM,FSAVSUB,
      K  INTBUF_TAB%CAND_N,IPARI(33,NIN),IPARI(39,NIN),NOD_NORMAL ,FNCONT,     
-     L  FTCONT       ,X1	 ,X2          ,X3         ,X4         ,
-     M  Y1	     , Y2	 ,Y3          ,Y4         ,Z1         ,
-     N  Z2	     ,Z3	 ,Z4          ,XI         ,YI         ,
-     O  ZI	     ,IADM       ,RCURVI      ,RCONTACT   ,ACONTACT   ,
+     L  FTCONT       ,X1         ,X2          ,X3         ,X4         ,
+     M  Y1           , Y2        ,Y3          ,Y4         ,Z1         ,
+     N  Z2           ,Z3         ,Z4          ,XI         ,YI         ,
+     O  ZI           ,IADM       ,RCURVI      ,RCONTACT   ,ACONTACT   ,
      P  PCONTACT     ,ANGLMI     ,PADM        ,INTTH      ,TEMP       , 
      Q  TEMPI        ,IFORM      ,NPC         ,TF         ,CMAJ       ,
      R  DTMINI       ,DRAD       ,FHEATS      ,FHEATM     ,EFRICT     ,
@@ -796,7 +805,8 @@ C
      8  INDEXORTH    ,INDEXISOT  ,DIR1        ,DIR2        ,TAGNCONT   ,
      9  KLOADPINTER  ,LOADPINTER ,LOADP_HYD_INTER,INTBUF_TAB%TYPSUB    ,  
      .                                            INTBUF_TAB%INFLG_SUBS,
-     A  INTBUF_TAB%INFLG_SUBM,NINLOADP,DGAPLOADINT,S_LOADPINTER,DGAPLOADP)
+     A  INTBUF_TAB%INFLG_SUBM,NINLOADP,DGAPLOADINT,S_LOADPINTER,DGAPLOADP,
+     B  INTEREFRIC   )
 
 
               IF( INTTH > 0 ) THEN 

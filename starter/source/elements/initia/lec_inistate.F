@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  LEC_INISTATE                  source/elements/initia/lec_inistate.F
 Chd|-- called by -----------
@@ -30,6 +30,8 @@ Chd|        LEC_INISTATE_TRI              source/elements/initia/lec_inistate_tr
 Chd|        LEC_INISTATE_YFILE            source/initial_conditions/inista/lec_inistate_yfile.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        MAPPING_OPTION_MOD            share/modules1/dichotomy_mod.F
+Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
+Chd|        STACK_MOD                     share/modules1/stack_mod.F    
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
       SUBROUTINE LEC_INISTATE(      IXS          ,IXQ          ,IXC          ,IXT     ,
@@ -43,7 +45,8 @@ Chd|====================================================================
      8                  SIGI       ,SIGSH        ,SIGSP        ,SIGSPH       ,SIGRS    ,
      9                  SIGBEAM    ,SIGTRUSS     ,STRSGLOB     ,STRAGLOB     ,ORTHOGLOB,
      A                  ISIGSH     ,IYLDINI      ,KSIGSH3      ,FAIL_INI     ,IUSOLYLD ,
-     B                  IUSER      ,IGRBRIC      ,MAP_TABLES   ,IPARG        )
+     B                  IUSER      ,IGRBRIC      ,MAP_TABLES   ,IPARG        ,STACK    ,
+     C                  IWORKSH    ,MAT_PARAM    )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------                     
@@ -51,16 +54,12 @@ C-----------------------------------------------
       USE GROUPDEF_MOD
       USE SUBMODEL_MOD
       USE MAPPING_OPTION_MOD
+      USE STACK_MOD
+      USE MATPARAM_DEF_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -69,8 +68,6 @@ C-----------------------------------------------
 #include      "param_c.inc"
 #include      "scry_c.inc"
 #include      "scr16_c.inc"
-#include      "scr17_c.inc"
-#include      "sysunit.inc"
 #include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -95,6 +92,9 @@ C
       TYPE (GROUP_)  , DIMENSION(NGRBRIC) :: IGRBRIC
 C
       TYPE(MAPPING_STRUCT_) :: MAP_TABLES
+      TYPE (STACK_PLY) :: STACK
+      INTEGER,  INTENT(IN) :: IWORKSH(3,NUMELC + NUMELTG)
+      TYPE (MATPARAM_STRUCT_) ,DIMENSION(NUMMAT) ,INTENT(INOUT) :: MAT_PARAM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -130,12 +130,12 @@ C
       ALLOCATE (ID_SIGTRUSS(NUMTRUS)          ,STAT=stat)
       ALLOCATE (WORK(70000)                   ,STAT=stat)
 C
-      ID_SIGSH(1:NUMSHEL+NUMSH3N) = 0
-      ID_SOLID_SIGI(1:NUMSOL) = 0
-      ID_QUAD_SIGI(1:NUMQUAD) = 0
-      ID_SIGSPRI(1:NUMSPRI)  = 0
-      ID_SIGBEAM(1:NUMBEAM)  = 0
-      ID_SIGTRUSS(1:NUMTRUS) = 0
+      IF(NUMSHEL+NUMSH3N > 0) ID_SIGSH(1:NUMSHEL+NUMSH3N) = 0
+      IF(NUMSOL          > 0 )ID_SOLID_SIGI(1:NUMSOL) = 0
+      IF(NUMQUAD         > 0 )ID_QUAD_SIGI(1:NUMQUAD) = 0
+      IF(NUMSPRI         > 0 )ID_SIGSPRI(1:NUMSPRI)  = 0
+      IF(NUMBEAM         > 0 )ID_SIGBEAM(1:NUMBEAM)  = 0
+      IF(NUMTRUS         > 0 )ID_SIGTRUSS(1:NUMTRUS) = 0
       WORK(1:70000) = 0
 C
       IF (ABS(ISIGI) == 3.OR.ABS(ISIGI) == 4.OR.ABS(ISIGI) == 5) THEN
@@ -184,7 +184,6 @@ C     CONTRAINTES INITIALES FICHIER D00
 C-----------------------------------------
       IF (ISIGI == -3.OR.ISIGI == -4.OR.ISIGI == -5) THEN
          ISIGI = -ISIGI
-
 !         CALL LEC_INISTATE_D00 (
 !     1                  IXS        ,IXQ          ,IXC          ,IXT          ,IXP       ,
 !     2                  IXR        ,GEO          ,PM           ,IXTG         ,INDEX     ,
@@ -196,8 +195,7 @@ C-----------------------------------------
 !     8                  SIGBEAM    ,SIGTRUSS     ,STRSGLOB     ,STRAGLOB     ,ORTHOGLOB ,
 !     9                  ISIGSH     ,IYLDINI      ,FAIL_INI     ,IUSOLYLD     ,IUSER     , 
 !     A                  ID_SIGSH   ,ID_SOLID_SIGI,ID_QUAD_SIGI ,ID_SIGSPRI   ,ID_SIGBEAM,
-!     B                  ID_SIGTRUSS,WORK         ,IGRBRIC )
-
+!     B                  ID_SIGTRUSS,WORK         ,IGRBRIC )         
          CALL HM_READ_INISTATE_D00 (
      1                  IXS        ,IXQ          ,IXC          ,IXT          ,IXP       ,
      2                  IXR        ,GEO          ,PM           ,IXTG         ,INDEX     ,
@@ -211,11 +209,10 @@ C-----------------------------------------
      A                  ID_SIGSH   ,ID_SOLID_SIGI,ID_QUAD_SIGI ,ID_SIGSPRI   ,ID_SIGBEAM,
      B                  ID_SIGTRUSS,WORK         ,IGRBRIC      ,NIBRICK      ,NIQUAD    ,
      C                  NISHELL    ,NISH3N       ,NISPRING     ,NIBEAM       ,NITRUSS   ,
-     D                  MAP_TABLES ,VARMAX       ,IPARG        )
-
+     D                  MAP_TABLES ,VARMAX       ,IPARG        ,PTSHEL       ,PTSH3N    ,
+     E                  STACK      ,IWORKSH      ,IOUT         ,MAT_PARAM    )
       ENDIF
 C------------------------------------------------------------------------------------------
-
          CALL LEC_INISTATE_TRI(
      1                  IXS        ,IXQ          ,IXC          ,IXT          ,IXP       ,
      2                  IXR        ,KXSP         ,IXTG         ,INDEX        ,ITRI      ,
@@ -227,13 +224,13 @@ C-------------------------------------------------------------------------------
      8                  ID_SIGSH   ,ID_SOLID_SIGI,ID_QUAD_SIGI ,ID_SIGSPRI ,ID_SIGBEAM  ,
      9                  ID_SIGTRUSS,WORK )
 
-C
-      DEALLOCATE (ID_SOLID_SIGI)
-      DEALLOCATE (ID_QUAD_SIGI)
-      DEALLOCATE (ID_SIGSH)
-      DEALLOCATE (ID_SIGSPRI)
-      DEALLOCATE (ID_SIGBEAM)
-      DEALLOCATE (ID_SIGTRUSS)
+C 
+      IF(NUMSOL           > 0) DEALLOCATE (ID_SOLID_SIGI)
+      IF(NUMQUAD          > 0 )DEALLOCATE (ID_QUAD_SIGI)
+      IF(NUMSHEL+NUMSH3N  > 0 )DEALLOCATE (ID_SIGSH)
+      IF(NUMSPRI         > 0 )DEALLOCATE (ID_SIGSPRI)
+      IF(NUMBEAM         > 0 )DEALLOCATE (ID_SIGBEAM)
+      IF(NUMTRUS         > 0 )DEALLOCATE (ID_SIGTRUSS)
       DEALLOCATE (WORK)
 C
       RETURN

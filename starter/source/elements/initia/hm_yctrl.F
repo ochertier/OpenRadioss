@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  HM_YCTRL                      source/elements/initia/hm_yctrl.F
 Chd|-- called by -----------
@@ -31,12 +31,14 @@ Chd|        HM_GET_INT_ARRAY_INDEX        source/devtools/hm_reader/hm_get_int_a
 Chd|        HM_OPTION_COUNT               source/devtools/hm_reader/hm_option_count.F
 Chd|        HM_OPTION_READ_KEY            source/devtools/hm_reader/hm_option_read_key.F
 Chd|        HM_OPTION_START               source/devtools/hm_reader/hm_option_start.F
+Chd|        MY_ORDERS                     ../common_source/tools/sort/my_orders.c
+Chd|        UEL2SYS                       source/initial_conditions/inista/yctrl.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
-      SUBROUTINE HM_YCTRL(UNITAB,LSUBMODEL,IGRBRIC)
+      SUBROUTINE HM_YCTRL(UNITAB,LSUBMODEL,IGRBRIC,IXC, IXTG,PTSHEL,PTSH3N)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------                     
@@ -53,11 +55,9 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scry_c.inc"
-#include      "scr16_c.inc"
 #include      "scr17_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -65,6 +65,8 @@ C-----------------------------------------------
       TYPE (GROUP_)  , DIMENSION(NGRBRIC) :: IGRBRIC
 !
       TYPE(SUBMODEL_DATA) LSUBMODEL(*)
+      INTEGER   IXTG(NIXTG,NUMELTG) ,IXC(NIXC,NUMELC)
+      INTEGER,   INTENT(INOUT) :: PTSHEL(NUMELC),PTSH3N(NUMELTG)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -82,9 +84,15 @@ C-----------------------------------------------
       LOGICAL IS_AVAILABLE,GLOB
       CHARACTER KEY*ncharkey
       INTEGER  ID_ELEM,NB_INIBRI,NB_INISHE,NB_INISH3,NB_ELEMENTS,
-     .      NB_INITRUSS,NB_INIBEAM,NB_INISPRI,NB_INIQUA
+     .      NB_INITRUSS,NB_INIBEAM,NB_INISPRI,NB_INIQUA,IE,KTRIELC,
+     .      KTRIELTG,NELT
       my_real
      .   THK
+      INTEGER, DIMENSION(:), ALLOCATABLE :: KSYSUSRTG ,KSYSUSR,WORK,ITRI,
+     .                                      INDEX
+C-----------------------------------------------
+      EXTERNAL UEL2SYS
+      INTEGER  UEL2SYS
 C=======================================================================
 !      NFILSOL=0
 !      NUMSOL =0
@@ -94,9 +102,9 @@ C=======================================================================
 !      NUMBEAM=0
 !      NUMSPRI=0
 !      NUMSH3N=0
-      NVSHELL0   = 32
+      NVSHELL0   = 33
       NUSHELL0   = 4 
-      NORTSHEL0  = 3 
+      NORTSHEL0  = 5 
       NVAR_SHELL = 0
       NUBEAM0 = 4
 !      NUBEAM  = 0
@@ -122,6 +130,18 @@ C=======================================================================
 !       NVSOLID5 = 0
 !cc       NPSOLID = 0
 !cc       NVSOLID = 0
+      ALLOCATE (KSYSUSR(2*NUMELC))
+      ALLOCATE (KSYSUSRTG(2*NUMELTG))
+      ALLOCATE (WORK(70000))
+      NELT = MAX(NUMELC, NUMELTG)
+      ALLOCATE(ITRI(NELT),INDEX(2*NELT))
+      KTRIELC = 0
+      KTRIELTG = 0
+      KSYSUSR = 0
+      KSYSUSRTG = 0
+      WORK = 0
+      ITRI = 0
+      INDEX= 0 
 !-----------------------------------------
 
 C-----------------------------------------
@@ -315,9 +335,25 @@ C------------------------------------
 !
         CALL HM_OPTION_COUNT('/INISHE', NB_INISHE)
         IF ( NB_INISHE > 0 ) THEN
+        
+          IF (KTRIELC == 0) THEN
+C             tri des elts du D00 par ID croissant (on ne trie qu'une fois)
+              DO IE = 1, NUMELC
+          ITRI(IE) = IXC(NIXC,IE)
+              END DO
+              CALL MY_ORDERS(0,WORK,ITRI,INDEX,NUMELC,1)
+              DO J = 1, NUMELC
+          IE=INDEX(J)
+          KSYSUSR(J)   =IXC(NIXC,IE)
+          KSYSUSR(NUMELC+J)=IE
+              END DO
+              KTRIELC=1
+           ENDIF        
+!!        
           ! Start reading /INISHE card 
           CALL HM_OPTION_START('/INISHE')
 !
+          NUMSHEL = 0
           DO I=1,NB_INISHE
 !
             CALL HM_OPTION_READ_KEY(LSUBMODEL,
@@ -327,22 +363,29 @@ C------------------------------------
             IF (KEY2 /= ' ') GLOB = .TRUE.
 !
             SELECT CASE (KEY(1:LEN_TRIM(KEY)))
+             
 !-------------------
               CASE ( 'EPSP_F' )
 !-------------------
                 CALL HM_GET_INTV('inishe_epsp_f_count',NB_ELEMENTS,IS_AVAILABLE,LSUBMODEL)
 !
-                NUMSHEL = NUMSHEL + NB_ELEMENTS
                 DO J=1,NB_ELEMENTS
                   ! Reading  ---  ID_ELEM, NIP, NPG, THK  ---
                   CALL HM_GET_INT_ARRAY_INDEX('nb_integr',NIP,J,IS_AVAILABLE,LSUBMODEL)
                   CALL HM_GET_INT_ARRAY_INDEX('npg',NPG,J,IS_AVAILABLE,LSUBMODEL)
-!
-                  IF (NIP == 0) THEN
+                  CALL HM_GET_INT_ARRAY_INDEX('shell_ID',ID_ELEM,J,IS_AVAILABLE,LSUBMODEL)              
+!    
+                 IE=UEL2SYS(ID_ELEM,KSYSUSR,NUMELC)
+                 IF(IE == 0 ) CYCLE 
+                 IF(IE > 0 .AND. PTSHEL(IE)== 0 ) THEN
+                  NUMSHEL = NUMSHEL + 1
+                  PTSHEL(IE) = NUMSHEL 
+                 ENDIF 
+                 IF (NIP == 0) THEN
                     NVAR_SHELL = MAX(NVAR_SHELL, MAX(1,NPG)*9)
-                  ELSE
+                 ELSE
                     NVAR_SHELL = MAX(NVAR_SHELL, MAX(1,NIP)*MAX(1,NPG)*6)
-                  ENDIF
+                 ENDIF 
 !
                 ENDDO ! DO J=1,NB_ELEMENTS
 !-------------------
@@ -350,18 +393,25 @@ C------------------------------------
 !-------------------
                 IF ( GLOB ) THEN
                   CALL HM_GET_INTV('inishe_strs_f_glob_count',NB_ELEMENTS,IS_AVAILABLE,LSUBMODEL)
-!
-                  NUMSHEL = NUMSHEL + NB_ELEMENTS
+                  
+! 
                   DO J=1,NB_ELEMENTS
                     ! Reading  ---  ID_ELEM, NIP, NPG, THK  ---
+                    CALL HM_GET_INT_ARRAY_INDEX('shell_ID',ID_ELEM,J,IS_AVAILABLE,LSUBMODEL)
                     CALL HM_GET_INT_ARRAY_INDEX('nb_integr',NIP,J,IS_AVAILABLE,LSUBMODEL)
                     CALL HM_GET_INT_ARRAY_INDEX('npg',NPG,J,IS_AVAILABLE,LSUBMODEL)
-!
+                    !
+                    IE=UEL2SYS(ID_ELEM,KSYSUSR,NUMELC)
+                    IF(IE == 0 ) CYCLE 
+                    IF(IE > 0 .AND. PTSHEL(IE)== 0 ) THEN
+                        NUMSHEL = NUMSHEL + 1
+                        PTSHEL(IE) = NUMSHEL 
+                    ENDIF    
                     IF (NIP == 0) THEN
-                      NVAR_SHELL = MAX(NVAR_SHELL, MAX(1,NPG)*13)
+                         NVAR_SHELL = MAX(NVAR_SHELL, MAX(1,NPG)*13)
                     ELSE
-                      NVAR_SHELL = MAX(NVAR_SHELL, MAX(1,NIP)*MAX(1,NPG)*8)
-                    ENDIF
+                         NVAR_SHELL = MAX(NVAR_SHELL, MAX(1,NIP)*MAX(1,NPG)*8)
+                    ENDIF  
 !
                   ENDDO ! DO J=1,NB_ELEMENTS
 !
@@ -369,17 +419,24 @@ C------------------------------------
 !
                   CALL HM_GET_INTV('inishe_strs_f_count',NB_ELEMENTS,IS_AVAILABLE,LSUBMODEL)
 !
-                  NUMSHEL = NUMSHEL + NB_ELEMENTS
                   DO J=1,NB_ELEMENTS
                     ! Reading  CARD_1 ---  ID_ELEM, NIP, NPG, THK  ---
                     CALL HM_GET_INT_ARRAY_INDEX('nb_integr',NIP,J,IS_AVAILABLE,LSUBMODEL)
                     CALL HM_GET_INT_ARRAY_INDEX('npg',NPG,J,IS_AVAILABLE,LSUBMODEL)
+                    CALL HM_GET_INT_ARRAY_INDEX('shell_ID',ID_ELEM,J,IS_AVAILABLE,LSUBMODEL)
+                    IE=UEL2SYS(ID_ELEM,KSYSUSR,NUMELC)                    
 !
+
+                    IF(IE == 0 ) CYCLE 
+                    IF(IE > 0 .AND. PTSHEL(IE)== 0 ) THEN
+                       NUMSHEL = NUMSHEL + 1
+                       PTSHEL(IE) = NUMSHEL 
+                    ENDIF   
                     IF (NIP == 0) THEN
-                      NVAR_SHELL = MAX(NVAR_SHELL, MAX(1,NPG)*9)
+                         NVAR_SHELL = MAX(NVAR_SHELL, MAX(1,NPG)*9)
                     ELSE
-                      NVAR_SHELL = MAX(NVAR_SHELL, MAX(1,NIP)*MAX(1,NPG)*6)
-                    ENDIF
+                         NVAR_SHELL = MAX(NVAR_SHELL, MAX(1,NIP)*MAX(1,NPG)*6)
+                    ENDIF   
 !
                   ENDDO ! DO J=1,NB_ELEMENTS
 !
@@ -390,12 +447,18 @@ C------------------------------------
                 IF ( GLOB ) THEN
                   CALL HM_GET_INTV('inishe_stra_f_glob_count',NB_ELEMENTS,IS_AVAILABLE,LSUBMODEL)
 !
-                  NUMSHEL = NUMSHEL + NB_ELEMENTS
                   DO J=1,NB_ELEMENTS
                     CALL HM_GET_INT_ARRAY_INDEX('nb_integr',NIP,J,IS_AVAILABLE,LSUBMODEL)
                     CALL HM_GET_INT_ARRAY_INDEX('npg',NPG,J,IS_AVAILABLE,LSUBMODEL)
+                    CALL HM_GET_INT_ARRAY_INDEX('shell_ID',ID_ELEM,J,IS_AVAILABLE,LSUBMODEL)
+                    IE=UEL2SYS(ID_ELEM,KSYSUSR,NUMELC)
 !
-                    IF (NIP==0) NIP=2
+                    IF (NIP==0) NIP=2                    
+                    IF(IE == 0 ) CYCLE 
+                    IF(IE > 0 .AND. PTSHEL(IE)== 0 ) THEN
+                        NUMSHEL = NUMSHEL + 1
+                        PTSHEL(IE) = NUMSHEL 
+                    ENDIF ! IE > 0   
 C---------store only up to 2 pts of NIP eij(6)+T, pointer= INISHVAR1             
                     NVSH_STRA = MAX(NVSH_STRA,2*MAX(1,NPG)*7)
 !!                    NVSH_STRA = MAX(NVSH_STRA,NIP*MAX(1,NPG)*7)
@@ -405,11 +468,17 @@ C---------store only up to 2 pts of NIP eij(6)+T, pointer= INISHVAR1
 
                   CALL HM_GET_INTV('inishe_stra_f_count',NB_ELEMENTS,IS_AVAILABLE,LSUBMODEL)
 !
-                  NUMSHEL = NUMSHEL + NB_ELEMENTS
                   DO J=1,NB_ELEMENTS
                     CALL HM_GET_INT_ARRAY_INDEX('npg',NPG,J,IS_AVAILABLE,LSUBMODEL)
+                    CALL HM_GET_INT_ARRAY_INDEX('shell_ID',ID_ELEM,J,IS_AVAILABLE,LSUBMODEL)
+                    IE=UEL2SYS(ID_ELEM,KSYSUSR,NUMELC)
 !
+                    IF(IE == 0 ) CYCLE 
                     NVAR_SHELL = MAX(NVAR_SHELL, MAX(1,NPG)*8)
+                    IF(IE > 0 .AND. PTSHEL(IE)== 0 ) THEN
+                      NUMSHEL = NUMSHEL + 1
+                      PTSHEL(IE) = NUMSHEL 
+                    ENDIF ! IE > 0
                   ENDDO ! DO J=1,NB_ELEMENTS
                 ENDIF ! IF ( GLOB )
 !-------------------
@@ -417,24 +486,54 @@ C---------store only up to 2 pts of NIP eij(6)+T, pointer= INISHVAR1
 !-------------------
                 CALL HM_GET_INTV('no_elems',NB_ELEMENTS,IS_AVAILABLE,LSUBMODEL)
 !
-                NUMSHEL = NUMSHEL + NB_ELEMENTS
+                 DO J=1,NB_ELEMENTS
+                  CALL HM_GET_INT_ARRAY_INDEX('shell_ID',ID_ELEM,J,IS_AVAILABLE,LSUBMODEL)
+                  IE=UEL2SYS(ID_ELEM,KSYSUSR,NUMELC)
+                  IF(IE == 0 ) CYCLE 
+                  IF(IE > 0 .AND. PTSHEL(IE)== 0 ) THEN
+                     NUMSHEL = NUMSHEL + 1
+                     PTSHEL(IE) = NUMSHEL 
+                  ENDIF
+                 ENDDO   
 !
 !-------------------
               CASE ( 'EPSP' )
 !-------------------
                 CALL HM_GET_INTV('no_blocks',NB_ELEMENTS,IS_AVAILABLE,LSUBMODEL)
 !
-                NUMSHEL = NUMSHEL + NB_ELEMENTS
+                DO J=1,NB_ELEMENTS
+                  CALL HM_GET_INT_ARRAY_INDEX('shell_ID',ID_ELEM,J,IS_AVAILABLE,LSUBMODEL)
+                  IE=UEL2SYS(ID_ELEM,KSYSUSR,NUMELC)
+                  IF(IE == 0 ) CYCLE 
+                  IF(IE > 0 .AND. PTSHEL(IE)== 0 ) THEN
+                     NUMSHEL = NUMSHEL + 1
+                     PTSHEL(IE) = NUMSHEL 
+                  ENDIF
+                 ENDDO   
 !-------------------
               CASE ( 'ORTHO' )
 !-------------------
                 CALL HM_GET_INTV('inishe_ortho_count',NB_ELEMENTS,IS_AVAILABLE,LSUBMODEL)
 !
-                NUMSHEL = NUMSHEL + NB_ELEMENTS
+                DO J=1,NB_ELEMENTS
+                   CALL HM_GET_INT_ARRAY_INDEX('shell_ID',ID_ELEM,J,IS_AVAILABLE,LSUBMODEL)
+                   IE=UEL2SYS(ID_ELEM,KSYSUSR,NUMELC)
+                   IF(IE == 0 ) CYCLE 
+                   IF(IE > 0 .AND. PTSHEL(IE)== 0 ) THEN
+                     NUMSHEL = NUMSHEL + 1
+                     PTSHEL(IE) = NUMSHEL
+                   ENDIF   
+                ENDDO   
 !
                 DO J=1,NB_ELEMENTS
                   CALL HM_GET_INT_ARRAY_INDEX('nb_integr',NIP,J,IS_AVAILABLE,LSUBMODEL)
-!
+                  CALL HM_GET_INT_ARRAY_INDEX('shell_ID',ID_ELEM,J,IS_AVAILABLE,LSUBMODEL)
+                  IE=UEL2SYS(ID_ELEM,KSYSUSR,NUMELC)
+                  IF(IE == 0 ) CYCLE 
+                  IF(IE > 0 .AND. PTSHEL(IE)== 0 ) THEN
+                    NUMSHEL = NUMSHEL + 1
+                    PTSHEL(IE) = NUMSHEL 
+                  ENDIF
                   IF (NIP==0) THEN
                     NVAR_SHELL = MAX(NVAR_SHELL, 9)
                   ELSE
@@ -447,15 +546,20 @@ C---------store only up to 2 pts of NIP eij(6)+T, pointer= INISHVAR1
 !-------------------
               CASE ( 'ORTH_LOC' )
 !-------------------
+
                 CALL HM_GET_INTV('inishe_orth_loc_count',NB_ELEMENTS,IS_AVAILABLE,LSUBMODEL)
-!
-                NUMSHEL = NUMSHEL + NB_ELEMENTS
-!
                 DO J=1,NB_ELEMENTS
                   CALL HM_GET_INT_ARRAY_INDEX('nb_lay',NIP,J,IS_AVAILABLE,LSUBMODEL)
                   CALL HM_GET_INT_ARRAY_INDEX('npg',NPG,J,IS_AVAILABLE,LSUBMODEL)
                   CALL HM_GET_INT_ARRAY_INDEX('ndir',NDIR,J,IS_AVAILABLE,LSUBMODEL)
-!
+                  CALL HM_GET_INT_ARRAY_INDEX('shell_ID',ID_ELEM,J,IS_AVAILABLE,LSUBMODEL)
+                  !
+                  IE=UEL2SYS(ID_ELEM,KSYSUSR,NUMELC)
+                  IF(IE == 0 ) CYCLE 
+                  IF(IE > 0 .AND. PTSHEL(IE)== 0 ) THEN
+                    NUMSHEL = NUMSHEL + 1
+                    PTSHEL(IE) = NUMSHEL 
+                  ENDIF
                   IF (NIP==0) THEN
                     NVAR_SHELL = MAX(NVAR_SHELL, MAX(1,NPG)*9)
                   ELSE
@@ -470,11 +574,17 @@ C---------store only up to 2 pts of NIP eij(6)+T, pointer= INISHVAR1
 !-------------------
                 CALL HM_GET_INTV('inishe_scale_yld_count',NB_ELEMENTS,IS_AVAILABLE,LSUBMODEL)
                 IUFACYLD = 1
-                NUMSHEL = NUMSHEL + NB_ELEMENTS
                 DO J=1,NB_ELEMENTS
                   CALL HM_GET_INT_ARRAY_INDEX('nb_integr',NIP,J,IS_AVAILABLE,LSUBMODEL)
                   CALL HM_GET_INT_ARRAY_INDEX('npg',NPG,J,IS_AVAILABLE,LSUBMODEL)
-!
+                  CALL HM_GET_INT_ARRAY_INDEX('shell_ID',ID_ELEM,J,IS_AVAILABLE,LSUBMODEL)
+                  !!
+                  IE=UEL2SYS(ID_ELEM,KSYSUSR,NUMELC)
+                  IF(IE == 0 ) CYCLE 
+                  IF(IE > 0 .AND. PTSHEL(IE)== 0 ) THEN
+                    NUMSHEL = NUMSHEL + 1
+                    PTSHEL(IE) = NUMSHEL
+                  ENDIF 
                   IF (NIP==0) THEN
                     NVAR_SHELL = MAX(NVAR_SHELL, MAX(1,NPG)*9)
                   ELSE
@@ -487,12 +597,18 @@ C---------store only up to 2 pts of NIP eij(6)+T, pointer= INISHVAR1
 !-------------------
                 CALL HM_GET_INTV('inishe_aux_count',NB_ELEMENTS,IS_AVAILABLE,LSUBMODEL)
                 IUSHELL = 1
-                NUMSHEL = NUMSHEL + NB_ELEMENTS
                 DO J=1,NB_ELEMENTS
                   CALL HM_GET_INT_ARRAY_INDEX('nb_integr',NIP,J,IS_AVAILABLE,LSUBMODEL)
                   CALL HM_GET_INT_ARRAY_INDEX('npg',NPG,J,IS_AVAILABLE,LSUBMODEL)
                   CALL HM_GET_INT_ARRAY_INDEX('nvars',NUVAR,J,IS_AVAILABLE,LSUBMODEL)
-!
+                  CALL HM_GET_INT_ARRAY_INDEX('shell_ID',ID_ELEM,J,IS_AVAILABLE,LSUBMODEL)
+                  !!
+                  IE=UEL2SYS(ID_ELEM,KSYSUSR,NUMELC)
+                  IF(IE == 0 ) CYCLE 
+                  IF(IE > 0 .AND. PTSHEL(IE)== 0 ) THEN
+                    NUMSHEL = NUMSHEL + 1
+                    PTSHEL(IE) = NUMSHEL 
+                  ENDIF ! IE > 0
                   IF (NIP==0) THEN
                     NVAR_SHELL = MAX(NVAR_SHELL, MAX(1,NPG)*9)
                   ELSE
@@ -504,13 +620,20 @@ C---------store only up to 2 pts of NIP eij(6)+T, pointer= INISHVAR1
               CASE ( 'FAIL' )
 !-------------------
                 CALL HM_GET_INTV('inishe_fail_count',NB_ELEMENTS,IS_AVAILABLE,LSUBMODEL)
-                NUMSHEL = NUMSHEL + NB_ELEMENTS
                 DO J=1,NB_ELEMENTS
                   CALL HM_GET_INT_ARRAY_INDEX('Nlay',NLAY,J,IS_AVAILABLE,LSUBMODEL)
                   CALL HM_GET_INT_ARRAY_INDEX('npg',NPG,J,IS_AVAILABLE,LSUBMODEL)
                   CALL HM_GET_INT_ARRAY_INDEX('nptt',NPTT,J,IS_AVAILABLE,LSUBMODEL)
                   CALL HM_GET_INT_ARRAY_INDEX('lay_ID',ILAY,J,IS_AVAILABLE,LSUBMODEL)
                   CALL HM_GET_INT_ARRAY_INDEX('Nvar',NVAR_RUPT,J,IS_AVAILABLE,LSUBMODEL)
+                  CALL HM_GET_INT_ARRAY_INDEX('shell_ID',ID_ELEM,J,IS_AVAILABLE,LSUBMODEL)
+                  !!
+                  IE=UEL2SYS(ID_ELEM,KSYSUSR,NUMELC)
+                  IF(IE == 0 ) CYCLE 
+                  IF(IE > 0 .AND. PTSHEL(IE)== 0 ) THEN
+                    NUMSHEL = NUMSHEL + 1
+                    PTSHEL(IE) = NUMSHEL 
+                  ENDIF ! IE > 0
                   NPG = MAX(1,NPG)
                   NPTT = MAX(1,NPTT)
                   NLAY = MAX(1,NLAY)
@@ -521,7 +644,7 @@ C---------store only up to 2 pts of NIP eij(6)+T, pointer= INISHVAR1
 !
               CASE DEFAULT
 !
-            END SELECT ! SELECT CASE(KEY)
+            END SELECT ! SELECT CASE(KEY) 
 
           ENDDO ! DO I=1,NB_INISHE
         ENDIF ! IF ( NB_INISHE > 0 )
@@ -530,13 +653,26 @@ C---------store only up to 2 pts of NIP eij(6)+T, pointer= INISHVAR1
 C------------------------------------
 C /INISH3 card
 C------------------------------------
-
-
         CALL HM_OPTION_COUNT('/INISH3', NB_INISH3)
         IF ( NB_INISH3 > 0 ) THEN
+         !!
+          IF (KTRIELTG==0) THEN
+C         tri des elts du D00 par ID croissant (on ne trie qu'une fois)
+          DO IE = 1, NUMELTG
+            ITRI(IE) = IXTG(NIXTG,IE)
+          END DO
+          CALL MY_ORDERS(0,WORK,ITRI,INDEX,NUMELTG,1)
+          DO J = 1, NUMELTG
+            IE=INDEX(J)
+            KSYSUSRTG(J)       =IXTG(NIXTG,IE)
+            KSYSUSRTG(NUMELTG+J)=IE
+          END DO
+          KTRIELTG=1
+        END IF
           ! Start reading /INISH3 card 
-          CALL HM_OPTION_START('/INISH3')
+          CALL HM_OPTION_START('/INISH3')          
 !
+          NUMSH3N = 0
           DO I=1,NB_INISH3
 !
             CALL HM_OPTION_READ_KEY(LSUBMODEL,
@@ -551,11 +687,18 @@ C------------------------------------
 !-------------------
                 CALL HM_GET_INTV('inish3_epsp_f_count',NB_ELEMENTS,IS_AVAILABLE,LSUBMODEL)
 !
-                NUMSH3N = NUMSH3N + NB_ELEMENTS
+               
                 DO J=1,NB_ELEMENTS
                   ! Reading  ---  ID_ELEM, NIP, NPG, THK  ---
                   CALL HM_GET_INT_ARRAY_INDEX('nb_integr',NIP,J,IS_AVAILABLE,LSUBMODEL)
                   CALL HM_GET_INT_ARRAY_INDEX('npg',NPG,J,IS_AVAILABLE,LSUBMODEL)
+                  CALL HM_GET_INT_ARRAY_INDEX('shell_ID',ID_ELEM,J,IS_AVAILABLE,LSUBMODEL)
+                  IE = UEL2SYS(ID_ELEM,KSYSUSRTG,NUMELTG)
+                  IF(IE == 0 ) CYCLE 
+                  IF(IE > 0 .AND. PTSH3N(IE) == 0) THEN
+                    NUMSH3N = NUMSH3N + 1
+                    PTSH3N(IE) = NUMSH3N
+                  ENDIF
 !
                   IF (NIP == 0) THEN
                     NVAR_SHELL = MAX(NVAR_SHELL, MAX(1,NPG)*9)
@@ -571,11 +714,17 @@ C------------------------------------
 !
                   CALL HM_GET_INTV('inish3_strs_f_glob_count',NB_ELEMENTS,IS_AVAILABLE,LSUBMODEL)
 !
-                  NUMSH3N = NUMSH3N + NB_ELEMENTS
                   DO J=1,NB_ELEMENTS
                     ! Reading  ---  ID_ELEM, NIP, NPG, THK  ---
                     CALL HM_GET_INT_ARRAY_INDEX('nb_integr',NIP,J,IS_AVAILABLE,LSUBMODEL)
                     CALL HM_GET_INT_ARRAY_INDEX('npg',NPG,J,IS_AVAILABLE,LSUBMODEL)
+                    CALL HM_GET_INT_ARRAY_INDEX('shell_ID',ID_ELEM,J,IS_AVAILABLE,LSUBMODEL)
+                    IE = UEL2SYS(ID_ELEM,KSYSUSRTG,NUMELTG)
+                    IF(IE == 0 ) CYCLE 
+                    IF(IE > 0 .AND. PTSH3N(IE) == 0) THEN
+                       NUMSH3N = NUMSH3N + 1
+                       PTSH3N(IE) = NUMSH3N
+                    ENDIF
 !
                     IF (NIP == 0) THEN
                       NVAR_SHELL = MAX(NVAR_SHELL, MAX(1,NPG)*13)
@@ -590,11 +739,17 @@ C------------------------------------
 !
                   CALL HM_GET_INTV('inish3_strs_f_count',NB_ELEMENTS,IS_AVAILABLE,LSUBMODEL)
 !
-                  NUMSH3N = NUMSH3N + NB_ELEMENTS
                   DO J=1,NB_ELEMENTS
                     ! Reading  CARD_1 ---  ID_ELEM, NIP, NPG, THK  ---
                     CALL HM_GET_INT_ARRAY_INDEX('nb_integr',NIP,J,IS_AVAILABLE,LSUBMODEL)
                     CALL HM_GET_INT_ARRAY_INDEX('npg',NPG,J,IS_AVAILABLE,LSUBMODEL)
+                    CALL HM_GET_INT_ARRAY_INDEX('shell_ID',ID_ELEM,J,IS_AVAILABLE,LSUBMODEL)
+                    IE = UEL2SYS(ID_ELEM,KSYSUSRTG,NUMELTG)
+                    IF(IE == 0 ) CYCLE 
+                    IF(IE > 0 .AND. PTSH3N(IE) == 0) THEN
+                      NUMSH3N = NUMSH3N + 1
+                      PTSH3N(IE) = NUMSH3N
+                    ENDIF
 !
                     IF (NIP == 0) THEN
                       NVAR_SHELL = MAX(NVAR_SHELL, MAX(1,NPG)*9)
@@ -611,10 +766,16 @@ C------------------------------------
                 IF ( GLOB ) THEN
                   CALL HM_GET_INTV('inish3_stra_f_glob_count',NB_ELEMENTS,IS_AVAILABLE,LSUBMODEL)
 !
-                  NUMSH3N = NUMSH3N + NB_ELEMENTS
                   DO J=1,NB_ELEMENTS
                     CALL HM_GET_INT_ARRAY_INDEX('nb_integr',NIP,J,IS_AVAILABLE,LSUBMODEL)
                     CALL HM_GET_INT_ARRAY_INDEX('npg',NPG,J,IS_AVAILABLE,LSUBMODEL)
+                    CALL HM_GET_INT_ARRAY_INDEX('shell_ID',ID_ELEM,J,IS_AVAILABLE,LSUBMODEL)
+                    IE = UEL2SYS(ID_ELEM,KSYSUSRTG,NUMELTG)
+                    IF(IE == 0 ) CYCLE 
+                    IF(IE > 0 .AND. PTSH3N(IE) == 0) THEN
+                      NUMSH3N = NUMSH3N + 1
+                      PTSH3N(IE) = NUMSH3N
+                    ENDIF
 !
                     IF (NIP==0) NIP=2
 C---------store only up to 2 pts of NIP eij(6)+T, pointer= INISHVAR1             
@@ -626,9 +787,15 @@ C---------store only up to 2 pts of NIP eij(6)+T, pointer= INISHVAR1
 
                   CALL HM_GET_INTV('inish3_stra_f_count',NB_ELEMENTS,IS_AVAILABLE,LSUBMODEL)
 !
-                  NUMSH3N = NUMSH3N + NB_ELEMENTS
                   DO J=1,NB_ELEMENTS
                     CALL HM_GET_INT_ARRAY_INDEX('npg',NPG,J,IS_AVAILABLE,LSUBMODEL)
+                    CALL HM_GET_INT_ARRAY_INDEX('shell_ID',ID_ELEM,J,IS_AVAILABLE,LSUBMODEL)
+                    IE = UEL2SYS(ID_ELEM,KSYSUSRTG,NUMELTG)
+                   IF(IE == 0 ) CYCLE 
+                    IF(IE > 0 .AND. PTSH3N(IE) == 0) THEN
+                      NUMSH3N = NUMSH3N + 1
+                      PTSH3N(IE) = NUMSH3N
+                    ENDIF
 !
                     NVAR_SHELL = MAX(NVAR_SHELL, MAX(1,NPG)*8)
                   ENDDO ! DO J=1,NB_ELEMENTS
@@ -637,24 +804,44 @@ C---------store only up to 2 pts of NIP eij(6)+T, pointer= INISHVAR1
               CASE ( 'THICK' )
 !-------------------
                 CALL HM_GET_INTV('no_elems',NB_ELEMENTS,IS_AVAILABLE,LSUBMODEL)
-!
-                NUMSH3N = NUMSH3N + NB_ELEMENTS
-!
+! 
+                 DO J=1,NB_ELEMENTS
+                   CALL HM_GET_INT_ARRAY_INDEX('shell_ID',ID_ELEM,J,IS_AVAILABLE,LSUBMODEL)
+                   IE = UEL2SYS(ID_ELEM,KSYSUSRTG,NUMELTG)
+                   IF(IE == 0 ) CYCLE 
+                   IF(IE > 0 .AND. PTSH3N(IE) == 0) THEN
+                     NUMSH3N = NUMSH3N + 1
+                     PTSH3N(IE) = NUMSH3N
+                   ENDIF
+                 ENDDO ! DO J=1,NB_ELEMENTS
 !-------------------
               CASE ( 'EPSP' )
 !-------------------
                 CALL HM_GET_INTV('no_blocks',NB_ELEMENTS,IS_AVAILABLE,LSUBMODEL)
 !
-                NUMSH3N = NUMSH3N + NB_ELEMENTS
+                  DO J=1,NB_ELEMENTS
+                   CALL HM_GET_INT_ARRAY_INDEX('shell_ID',ID_ELEM,J,IS_AVAILABLE,LSUBMODEL)
+                   IE = UEL2SYS(ID_ELEM,KSYSUSRTG,NUMELTG)
+                   IF(IE == 0 ) CYCLE 
+                   IF(IE > 0 .AND. PTSH3N(IE) == 0) THEN
+                     NUMSH3N = NUMSH3N + 1
+                     PTSH3N(IE) = NUMSH3N
+                   ENDIF
+                 ENDDO ! DO J=1,NB_ELEMENTS
 !-------------------
               CASE ( 'ORTHO' )
 !-------------------
                 CALL HM_GET_INTV('inish3_ortho_count',NB_ELEMENTS,IS_AVAILABLE,LSUBMODEL)
 !
-                NUMSH3N = NUMSH3N + NB_ELEMENTS
-!
                 DO J=1,NB_ELEMENTS
                   CALL HM_GET_INT_ARRAY_INDEX('nb_integr',NIP,J,IS_AVAILABLE,LSUBMODEL)
+                  CALL HM_GET_INT_ARRAY_INDEX('shell_ID',ID_ELEM,J,IS_AVAILABLE,LSUBMODEL)
+                   IE = UEL2SYS(ID_ELEM,KSYSUSRTG,NUMELTG)
+                   IF(IE == 0 ) CYCLE 
+                   IF(IE > 0 .AND. PTSH3N(IE) == 0) THEN
+                     NUMSH3N = NUMSH3N + 1
+                      PTSH3N(IE) = NUMSH3N
+                   ENDIF
 !
                   IF (NIP==0) THEN
                     NVAR_SHELL = MAX(NVAR_SHELL, 9)
@@ -670,12 +857,18 @@ C---------store only up to 2 pts of NIP eij(6)+T, pointer= INISHVAR1
 !-------------------
                 CALL HM_GET_INTV('inish3_orth_loc_count',NB_ELEMENTS,IS_AVAILABLE,LSUBMODEL)
 !
-                NUMSH3N = NUMSH3N + NB_ELEMENTS
 !
                 DO J=1,NB_ELEMENTS
                   CALL HM_GET_INT_ARRAY_INDEX('nb_lay',NIP,J,IS_AVAILABLE,LSUBMODEL)
                   CALL HM_GET_INT_ARRAY_INDEX('npg',NPG,J,IS_AVAILABLE,LSUBMODEL)
                   CALL HM_GET_INT_ARRAY_INDEX('ndir',NDIR,J,IS_AVAILABLE,LSUBMODEL)
+                  CALL HM_GET_INT_ARRAY_INDEX('shell_ID',ID_ELEM,J,IS_AVAILABLE,LSUBMODEL)
+                   IE = UEL2SYS(ID_ELEM,KSYSUSRTG,NUMELTG)
+                   IF(IE == 0 ) CYCLE 
+                   IF(IE > 0 .AND. PTSH3N(IE) == 0) THEN
+                     NUMSH3N = NUMSH3N + 1
+                     PTSH3N(IE) = NUMSH3N
+                   ENDIF
 !
                   IF (NIP==0) THEN
                     NVAR_SHELL = MAX(NVAR_SHELL, MAX(1,NPG)*9)
@@ -691,10 +884,16 @@ C---------store only up to 2 pts of NIP eij(6)+T, pointer= INISHVAR1
 !-------------------
                 CALL HM_GET_INTV('inish3_scale_yld_count',NB_ELEMENTS,IS_AVAILABLE,LSUBMODEL)
                 IUFACYLD = 1
-                NUMSH3N = NUMSH3N + NB_ELEMENTS
                 DO J=1,NB_ELEMENTS
                   CALL HM_GET_INT_ARRAY_INDEX('nb_integr',NIP,J,IS_AVAILABLE,LSUBMODEL)
                   CALL HM_GET_INT_ARRAY_INDEX('npg',NPG,J,IS_AVAILABLE,LSUBMODEL)
+                  CALL HM_GET_INT_ARRAY_INDEX('shell_ID',ID_ELEM,J,IS_AVAILABLE,LSUBMODEL)
+                   IE = UEL2SYS(ID_ELEM,KSYSUSRTG,NUMELTG)
+                   IF(IE == 0 ) CYCLE 
+                   IF(IE > 0 .AND. PTSH3N(IE) == 0) THEN
+                     NUMSH3N = NUMSH3N + 1
+                     PTSH3N(IE) = NUMSH3N
+                   ENDIF
 !
                   IF (NIP==0) THEN
                     NVAR_SHELL = MAX(NVAR_SHELL, MAX(1,NPG)*9)
@@ -708,11 +907,17 @@ C---------store only up to 2 pts of NIP eij(6)+T, pointer= INISHVAR1
 !-------------------
                 CALL HM_GET_INTV('inish3_aux_count',NB_ELEMENTS,IS_AVAILABLE,LSUBMODEL)
                 IUSHELL = 1
-                NUMSH3N = NUMSH3N + NB_ELEMENTS
                 DO J=1,NB_ELEMENTS
                   CALL HM_GET_INT_ARRAY_INDEX('nb_integr',NIP,J,IS_AVAILABLE,LSUBMODEL)
                   CALL HM_GET_INT_ARRAY_INDEX('npg',NPG,J,IS_AVAILABLE,LSUBMODEL)
                   CALL HM_GET_INT_ARRAY_INDEX('nvars',NUVAR,J,IS_AVAILABLE,LSUBMODEL)
+                  CALL HM_GET_INT_ARRAY_INDEX('shell_ID',ID_ELEM,J,IS_AVAILABLE,LSUBMODEL)
+                   IE = UEL2SYS(ID_ELEM,KSYSUSRTG,NUMELTG)
+                   IF(IE == 0 ) CYCLE 
+                   IF(IE > 0 .AND. PTSH3N(IE) == 0) THEN
+                     NUMSH3N = NUMSH3N + 1
+                     PTSH3N(IE) = NUMSH3N
+                   ENDIF
 !
                   IF (NIP==0) THEN
                     NVAR_SHELL = MAX(NVAR_SHELL, MAX(1,NPG)*9)
@@ -725,13 +930,19 @@ C---------store only up to 2 pts of NIP eij(6)+T, pointer= INISHVAR1
               CASE ( 'FAIL' )
 !-------------------
                 CALL HM_GET_INTV('inish3_fail_count',NB_ELEMENTS,IS_AVAILABLE,LSUBMODEL)
-                NUMSH3N = NUMSH3N + NB_ELEMENTS
                 DO J=1,NB_ELEMENTS
                   CALL HM_GET_INT_ARRAY_INDEX('Nlay',NLAY,J,IS_AVAILABLE,LSUBMODEL)
                   CALL HM_GET_INT_ARRAY_INDEX('npg',NPG,J,IS_AVAILABLE,LSUBMODEL)
                   CALL HM_GET_INT_ARRAY_INDEX('nptt',NPTT,J,IS_AVAILABLE,LSUBMODEL)
                   CALL HM_GET_INT_ARRAY_INDEX('lay_ID',ILAY,J,IS_AVAILABLE,LSUBMODEL)
                   CALL HM_GET_INT_ARRAY_INDEX('Nvar',NVAR_RUPT,J,IS_AVAILABLE,LSUBMODEL)
+                  CALL HM_GET_INT_ARRAY_INDEX('shell_ID',ID_ELEM,J,IS_AVAILABLE,LSUBMODEL)
+                   IE = UEL2SYS(ID_ELEM,KSYSUSRTG,NUMELTG)
+                   IF(IE == 0 ) CYCLE 
+                   IF(IE > 0 .AND. PTSH3N(IE) == 0) THEN
+                     NUMSH3N = NUMSH3N + 1
+                     PTSH3N(IE) = NUMSH3N
+                   ENDIF
                   NPG = MAX(1,NPG)
                   NPTT = MAX(1,NPTT)
                   NLAY = MAX(1,NLAY)
@@ -943,11 +1154,6 @@ C------------------------------------
           ENDDO ! DO I=1,NB_INIQUA
 !
         ENDIF ! IF ( NB_INIQUA > 0 )
-
-
-
-
-
 !---
       ENDIF ! IF (ISIGI==-3.OR.ISIGI==-4.OR.ISIGI==-5)
 !
@@ -956,5 +1162,6 @@ C------------------------------------
        CALL ANCMSG(MSGID=557,
      .             MSGTYPE=MSGERROR,
      .             ANMODE=ANINFO_BLIND_1)
+       
       RETURN
       END

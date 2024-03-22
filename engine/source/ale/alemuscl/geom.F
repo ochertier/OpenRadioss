@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  GEOM                          source/ale/alemuscl/geom.F    
 Chd|-- called by -----------
@@ -27,7 +27,7 @@ Chd|        ALE51_GRADIENT_RECONSTRUCTION source/ale/alemuscl/ale51_gradient_rec
 Chd|        CENTROID3T                    source/multifluid/centroid.F  
 Chd|-- calls ---------------
 Chd|====================================================================
-      SUBROUTINE GEOM(A, B, C, CENTER, VOL)
+      SUBROUTINE GEOM(A, B, C, CENTER_X,CENTER_Y,CENTER_Z, VOL)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -36,12 +36,11 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C----------------------------------------------- 
       my_real, INTENT(IN) :: A(3), B(3), C(3)
-      my_real, INTENT(INOUT) :: CENTER(3), VOL
+      my_real, INTENT(INOUT) :: CENTER_X,CENTER_Y,CENTER_Z, VOL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       my_real :: NORM(3), AB, BC, CA
-      INTEGER :: JJ
 C-----------------------------------------------
 C   S o u r c e   L i n e s 
 C-----------------------------------------------
@@ -56,9 +55,9 @@ C-----------------------------------------------
       BC = DOT_PRODUCT(HALF * (B + C), HALF * (B + C))
       CA = DOT_PRODUCT(HALF * (C + A), HALF * (C + A))
 
-      DO JJ = 1, 3
-         CENTER(JJ) = CENTER(JJ) + NORM(JJ) * (AB + BC + CA)
-      ENDDO
+      CENTER_X = CENTER_X + NORM(1) * (AB + BC + CA)
+      CENTER_Y = CENTER_Y + NORM(2) * (AB + BC + CA)
+      CENTER_Z = CENTER_Z + NORM(3) * (AB + BC + CA)
 
 C-----------------------------------------------      
       END SUBROUTINE GEOM

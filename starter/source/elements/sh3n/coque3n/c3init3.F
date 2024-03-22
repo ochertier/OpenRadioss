@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  C3INIT3                       source/elements/sh3n/coque3n/c3init3.F
 Chd|-- called by -----------
@@ -49,12 +49,13 @@ Chd|        CSIGINI                       source/elements/shell/coque/csigini.F
 Chd|        CUSERINI                      source/elements/shell/coque/cuserini.F
 Chd|        FAIL_WINDSHIELD_INIT          source/materials/fail/windshield_alter/fail_windshield_init.F
 Chd|        FRETITL2                      source/starter/freform.F      
+Chd|        LAW158_INIT                   source/materials/mat/mat158/law158_init.F
 Chd|        LAYINI1                       source/elements/shell/coqueba/layini1.F
 Chd|        THICKINI                      source/elements/shell/coqueba/thickini.F
 Chd|        DRAPE_MOD                     share/modules1/drape_mod.F    
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/matparam_def_mod.F
+Chd|        GROUP_PARAM_MOD               ../common_source/modules/mat_elem/group_param_mod.F
+Chd|        MAT_ELEM_MOD                  ../common_source/modules/mat_elem/mat_elem_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        NLOCAL_REG_MOD                ../common_source/modules/nlocal_reg_mod.F
 Chd|        STACK_MOD                     share/modules1/stack_mod.F    
@@ -72,16 +73,18 @@ Chd|====================================================================
      C                   NPF    , TF    ,SH3TRIM ,XFEM_STR,ISUBSTACK,
      D                   STACK   ,RNOISE ,DRAPE ,SH3ANG  ,
      E                   GEO_STACK,IGEO_STACK,STRTG,PERTURB ,ISH3N,
-     F                   IYLDINI ,ELE_AREA,NLOC_DMG,NG,GROUP_PARAM)
+     F                   IYLDINI ,ELE_AREA,NLOC_DMG,NG,GROUP_PARAM,
+     G                   IDRAPE , DRAPEG,MAT_PARAM)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
-      USE ELBUFDEF_MOD            
+      USE MY_ALLOC_MOD
+      USE MAT_ELEM_MOD            
       USE MESSAGE_MOD          
       USE STACK_MOD
       USE GROUPDEF_MOD
       USE NLOCAL_REG_MOD
-      USE MATPARAM_DEF_MOD    
+      USE GROUP_PARAM_MOD    
       USE DRAPE_MOD            
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -98,17 +101,15 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "com_xfem1.inc"
 #include      "param_c.inc"
-#include      "scr01_c.inc"
 #include      "scr03_c.inc"
 #include      "scr17_c.inc"
-#include      "units_c.inc"
 #include      "vect01_c.inc"
 #include      "scry_c.inc"
 C-----------------------------------------------
 C      V a r i a b l e s
 C-----------------------------------------------
       INTEGER NDDIM,OFFSET,NEL,ITHK,ISIGSH,NSIGSH,IUSER,
-     .  CPT_ELTENS,ISUBSTACK,IYLDINI,ISH3N,NG
+     .  CPT_ELTENS,ISUBSTACK,IYLDINI,ISH3N,NG,IDRAPE
       INTEGER IXTG(NIXTG,*),IPART(*),IGEO(NPROPGI,*),IPM(NPROPMI,*),
      .  IPARG(*),NSHNOD(*), PTSH3N(*),NPF(*),
      .  SH3TREE(*),ITAGE(*),ITAGN(*),IXFEM,IAD0,SH3TRIM(*),
@@ -127,23 +128,23 @@ C     REAL
       !   when XFEM is ON, XFEM_STR's dimension = NGROUP,NXEL
       TYPE (STACK_PLY) :: STACK
       TYPE (NLOCAL_STR_) :: NLOC_DMG
-      TYPE (GRP_PARAM_STRUCT_)  :: GROUP_PARAM
-      TYPE (DRAPE_) :: DRAPE(*)
+      TYPE (GROUP_PARAM_)  :: GROUP_PARAM
+      TYPE (DRAPE_) :: DRAPE(NUMELC_DRAPE + NUMELTG_DRAPE)
+      TYPE (DRAPEG_) :: DRAPEG
+      TYPE (MATPARAM_STRUCT_) ,DIMENSION(NUMMAT) ,INTENT(INOUT) :: MAT_PARAM
 C-----------------------------------------------
       TYPE (GROUP_)  , DIMENSION(NGRSHEL) :: IGRSH4N
       TYPE (GROUP_)  , DIMENSION(NGRSH3N) :: IGRSH3N
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,NDEPAR,IGTYP,NVC,NUVAR,NLAY,IR,IS,IL,IFAIL,
+      INTEGER I,J,NDEPAR,IGTYP,NVC,NUVAR,NLAY,IR,IS,IL,IFAIL,NUPARAM,
      .        NPTR,NPTS,NPTT,IXEL,II,IT,ILAW,IMAT,IPROP,IREP,ITG,IGMAT,
      .        IFRAM_OLD,NPT_ALL,MPT,LAYNPT_MAX,LAY_MAX
       INTEGER IORTHLOC(MVSIZ),MAT(MVSIZ),PID(MVSIZ),NGL(MVSIZ),JJ(6),
      .   IX1(MVSIZ),IX2(MVSIZ),IX3(MVSIZ)
       my_real
-     .   VX(MVSIZ),VY(MVSIZ),VZ(MVSIZ),PHI1(NPT,MVSIZ),PHI2(NPT,MVSIZ),
-     .   COOR1(NPT,MVSIZ),COOR2(NPT,MVSIZ),COOR3(NPT,MVSIZ),
-     .   COOR4(NPT,MVSIZ),ALDT(MVSIZ),AREA(MVSIZ)
+     .   VX(MVSIZ),VY(MVSIZ),VZ(MVSIZ),ALDT(MVSIZ),AREA(MVSIZ)
       my_real,
      .   DIMENSION(MVSIZ) :: PX1G,PY1G,PY2G,X2S,X3S,Y3S,DT
       my_real X1(MVSIZ), X2(MVSIZ), X3(MVSIZ) ,X4(MVSIZ),
@@ -158,19 +159,25 @@ C-----------------------------------------------
       CHARACTER*nchartitle,
      .   TITR
       my_real, 
-     .    ALLOCATABLE, DIMENSION(:) :: DIR_A,DIR_B
+     .    ALLOCATABLE, DIMENSION(:) :: DIR_A,DIR_B,PHI1,PHI2,
+     .                                 COOR1,COOR2,COOR3,COOR4
+      INTEGER, ALLOCATABLE, DIMENSION(:) :: INDX     
       PARAMETER (LAYNPT_MAX = 10)
       PARAMETER (LAY_MAX = 100)
-      INTEGER MATLY(MVSIZ*LAY_MAX)
-      my_real
-     .   POSLY(MVSIZ,LAY_MAX*LAYNPT_MAX)
+      INTEGER, DIMENSION(:),ALLOCATABLE::MATLY
+      my_real, DIMENSION(:,:),ALLOCATABLE :: POSLY
 C-----------------------------------------------
       my_real,
      .  DIMENSION(:) ,POINTER :: UVAR,DIR1,DIR2
       TYPE(G_BUFEL_) ,POINTER :: GBUF     
       TYPE(L_BUFEL_) ,POINTER :: LBUF     
       TYPE(BUF_LAY_) ,POINTER :: BUFLY 
+      TYPE(L_BUFEL_DIR_), POINTER :: LBUF_DIR
 C=======================================================================
+      ! Allocate buffers
+      CALL MY_ALLOC(MATLY,MVSIZ*LAY_MAX)
+      CALL MY_ALLOC(POSLY,MVSIZ,LAY_MAX*LAYNPT_MAX)
+
       GBUF  => ELBUF_STR%GBUF
       BUFLY => ELBUF_STR%BUFLY(1)
 c
@@ -193,12 +200,6 @@ C
       VX   = ZERO
       VY   = ZERO
       VZ   = ZERO
-      PHI1 = ZERO
-      PHI2 = ZERO
-      COOR1 = ZERO
-      COOR2 = ZERO
-      COOR3 = ZERO
-      COOR4 = ZERO
       IORTHLOC = 0
       ITG = 1+NUMELC
 C---
@@ -207,17 +208,51 @@ C---
       NLAY = ELBUF_STR%NLAY
       NXEL = ELBUF_STR%NXEL
       NPTT = ELBUF_STR%NPTT
-      ALLOCATE(DIR_A(NLAY*NEL*2))
-      ALLOCATE(DIR_B(NLAY*NEL*2))
-      DIR_A = ZERO
-      DIR_B = ZERO
 C      
       NPT_ALL = 0
       DO IL=1,NLAY
-        NPT_ALL = NPT_ALL + ELBUF_STR%BUFLY(IL)%NPTT
-      ENDDO
+          NPT_ALL = NPT_ALL + ELBUF_STR%BUFLY(IL)%NPTT
+      ENDDO  
       MPT  = MAX(1,NPT_ALL)
+      IF(NPT_ALL == 0) NPT_ALL = NLAY
       IF (IPARG(6) == 0.OR.NPT==0) MPT=0
+      IF((IGTYP == 51 .OR. IGTYP == 52) .AND. IDRAPE > 0) THEN
+         ALLOCATE(DIR_A(NPT_ALL*NEL*2))
+         ALLOCATE(DIR_B(NPT_ALL*NEL*2))
+         DIR_A = ZERO
+         DIR_B = ZERO 
+         ALLOCATE(PHI1(MVSIZ*NPT_ALL))
+         ALLOCATE(PHI2(NVSIZ*NPT_ALL))
+         PHI1  = ZERO
+         PHI2  = ZERO
+         ALLOCATE(COOR1(NPT_ALL*MVSIZ))
+         ALLOCATE(COOR2(NPT_ALL*MVSIZ))
+         ALLOCATE(COOR3(NPT_ALL*MVSIZ))
+         ALLOCATE(COOR4(NPT_ALL*MVSIZ))
+         COOR1 = ZERO
+         COOR2 = ZERO
+         COOR3 = ZERO
+         COOR4 = ZERO
+      ELSE
+         ALLOCATE(DIR_A(NLAY*NEL*2))
+         ALLOCATE(DIR_B(NLAY*NEL*2))
+         DIR_A = ZERO
+         DIR_B = ZERO  
+         ALLOCATE(PHI1(NLAY*MVSIZ))
+         ALLOCATE(PHI2(NLAY*MVSIZ))
+         PHI1  = ZERO
+         PHI2  = ZERO
+         ALLOCATE(COOR1(NLAY*MVSIZ))
+         ALLOCATE(COOR2(NLAY*MVSIZ))
+         ALLOCATE(COOR3(NLAY*MVSIZ))
+         ALLOCATE(COOR4(NLAY*MVSIZ))
+         COOR1 = ZERO
+         COOR2 = ZERO
+         COOR3 = ZERO
+         COOR4 = ZERO
+         NPT_ALL = NLAY
+      ENDIF 
+      !
 C
       DO J=1,6
         JJ(J) = NEL*(J-1)
@@ -253,11 +288,18 @@ C------------
         DO I=LFT,LLT
           J = IPART(I+NFT)
 C         PART_AREA(J) = PART_AREA(J) + AREA(I)
-          ELE_AREA(I+NFT) = AREA(I)
+          ELE_AREA(NUMELC+I+NFT) = AREA(I)
           IF (GBUF%G_AREA > 0) GBUF%AREA(I) = AREA(I)
         ENDDO
       ENDIF
 C------------
+      IF(IDRAPE > 0 ) THEN
+        ALLOCATE(INDX(NUMELTG))
+        INDX = 0
+        INDX(1:NUMELTG) = DRAPEG%INDX(NUMELC + 1 : NUMELC + NUMELTG)
+      ELSE
+        ALLOCATE(INDX(0))
+      ENDIF  
       CALL C3INMAS(X,XREFTG(1,1,NFT+1),IXTG,GEO,PM,XMAS,IN,THK,
      .             PARTSAV,V,IPART(NFT+1),MSTG(NFT+1),INTG(NFT+1),
      .             PTG(1,NFT+1),IGEO    ,IMAT  ,IPROP   ,AREA    ,
@@ -265,7 +307,7 @@ C------------
      .             MCPTG(NFT+1),TEMP  ,SH3TRIM,ISUBSTACK,NLAY , 
      .             ELBUF_STR   ,STACK ,GBUF%THK_I,RNOISE,DRAPE,
      .             PERTURB,IX1   ,IX2      ,IX3    ,
-     .             X2L      ,X3L    ,Y3L   )
+     .             X2L      ,X3L    ,Y3L   ,IDRAPE,INDX)
 C-----------------------------------------------
       CALL C3DERII(LFT,LLT,PM,GEO,PX1G,PY1G,PY2G,
      .             STIFN   ,STIFR   ,IXTG(1,NFT+1),
@@ -302,9 +344,10 @@ c
      .   VX        ,VY        ,VZ        ,COOR1     ,COOR2     ,
      .   COOR3     ,COOR4     ,IORTHLOC  ,ISUBSTACK ,STACK     ,
      .   IREP      ,ELBUF_STR ,DRAPE    ,SH3ANG(NFT+1),X       ,
-     .   GEO_STACK ,IGEO_STACK,E3X       ,E3Y       ,E3Z       ,
+     .   GEO_STACK ,E3X       ,E3Y       ,E3Z       ,
      .   GBUF%BETAORTH,X1     ,X2        ,Y1        ,Y2        ,
-     .   Z1         ,Z2       ,NEL       ,GBUF%G_ADD_NODE,GBUF%ADD_NODE)
+     .   Z1         ,Z2       ,NEL       ,GBUF%G_ADD_NODE,GBUF%ADD_NODE,
+     .   NPT_ALL    ,IDRAPE   ,INDX)
 c---     
       IF(IGTYP == 51 .OR. IGTYP == 52 .OR. IGMAT > 0) THEN   
 c
@@ -316,7 +359,8 @@ c
      .                NEL      ,IMAT      ,IPROP      ,     
      .                X1  ,X2  ,X3  ,X4  ,Y1  ,Y2  ,
      .                Y3  ,Y4  ,Z1  ,Z2  ,Z3  ,Z4  ,
-     .                E1X ,E2X ,E3X ,E1Y ,E2Y ,E3Y ,E1Z ,E2Z ,E3Z )
+     .                E1X ,E2X ,E3X ,E1Y ,E2Y ,E3Y ,E1Z ,E2Z ,E3Z ,
+     .                NPT_ALL    ,IDRAPE)
 C            
       ELSEIF (MTN == 27) THEN
         CALL CM27IN3(ELBUF_STR,
@@ -344,10 +388,12 @@ c
      .                NEL      ,IMAT      ,IPROP      ,     
      .                X1  ,X2  ,X3  ,X4  ,Y1  ,Y2  ,
      .                Y3  ,Y4  ,Z1  ,Z2  ,Z3  ,Z4  ,
-     .                E1X ,E2X ,E3X ,E1Y ,E2Y ,E3Y ,E1Z ,E2Z ,E3Z )
+     .                E1X ,E2X ,E3X ,E1Y ,E2Y ,E3Y ,E1Z ,E2Z ,E3Z ,
+     .                NPT_ALL    ,IDRAPE)
       ENDIF
 c
-      IF (MTN == 58 .AND. IGTYP /= 16 .AND. IGTYP /= 51 .AND. IGTYP /= 52) THEN  
+      IF ((MTN == 58 .or. MTN == 158) .AND. 
+     .    IGTYP /= 16 .AND. IGTYP /= 51 .AND. IGTYP /= 52) THEN  
           CALL ANCMSG(MSGID=658,
      .                MSGTYPE=MSGERROR,
      .                ANMODE=ANINFO_BLIND_1,
@@ -355,26 +401,82 @@ c
      .                C1=TITR,
      .                I2=MTN,
      .                I3=IGTYP)
-      ELSEIF (MTN == 58 .OR. IGTYP == 51 .OR. IGTYP == 52) THEN
-        DO IL = 1,NLAY
-          NPTT =  ELBUF_STR%BUFLY(IL)%NPTT
-          IMAT =  ELBUF_STR%BUFLY(IL)%IMAT
-          ILAW =  ELBUF_STR%BUFLY(IL)%ILAW
-          IF (ILAW == 58) THEN
-            DIR1 => ELBUF_STR%BUFLY(IL)%DIRA
-            DIR2 => ELBUF_STR%BUFLY(IL)%DIRB
-            DO IT=1,NPTT
-              LBUF => ELBUF_STR%BUFLY(IL)%LBUF(IR,IS,IT)
-              UVAR => ELBUF_STR%BUFLY(IL)%MAT(IR,IS,IT)%VAR  
-              NUVAR = ELBUF_STR%BUFLY(IL)%NVAR_MAT
-              CALL CM58IN3(IREP     ,IMAT     ,IPM     ,DIR1    ,DIR2    ,
-     .                     BUFMAT   ,UVAR     ,ALDT    ,NEL     ,NUVAR   ,LBUF%ANG ,
-     .                     X1  ,X2  ,X3  ,X4  ,Y1  ,Y2  ,
-     .                     Y3  ,Y4  ,Z1  ,Z2  ,Z3  ,Z4  ,
-     .                     E1X, E2X, E3X, E1Y, E2Y, E3Y ,E1Z, E2Z, E3Z )
-            ENDDO
-          ENDIF
-        ENDDO ! DO IL = 1,NLAY
+      ELSEIF (MTN == 58 .or. MTN == 158 .OR. IGTYP == 51 .OR. IGTYP == 52) THEN
+        IF(IDRAPE == 0 ) THEN
+           DO IL = 1,NLAY
+             NPTT =  ELBUF_STR%BUFLY(IL)%NPTT
+             IMAT =  ELBUF_STR%BUFLY(IL)%IMAT
+             ILAW =  ELBUF_STR%BUFLY(IL)%ILAW
+             NUPARAM = IPM(9,IMAT) 
+             IF (ILAW == 58) THEN
+               DIR1 => ELBUF_STR%BUFLY(IL)%DIRA
+               DIR2 => ELBUF_STR%BUFLY(IL)%DIRB
+               DO IT=1,NPTT
+                 LBUF => ELBUF_STR%BUFLY(IL)%LBUF(IR,IS,IT)
+                 UVAR => ELBUF_STR%BUFLY(IL)%MAT(IR,IS,IT)%VAR  
+                 NUVAR = ELBUF_STR%BUFLY(IL)%NVAR_MAT
+                  CALL CM58IN3(
+     .                IREP     ,IMAT     ,IPM     ,DIR1    ,DIR2    ,
+     .                BUFMAT   ,UVAR     ,ALDT    ,NEL     ,NUVAR   ,LBUF%ANG ,
+     .                X1  ,X2  ,X3  ,X4  ,Y1  ,Y2  ,
+     .                Y3  ,Y4  ,Z1  ,Z2  ,Z3  ,Z4  ,
+     .                E1X, E2X, E3X, E1Y, E2Y, E3Y ,E1Z, E2Z, E3Z )
+               ENDDO
+             ELSE IF (ILAW == 158) THEN
+               DIR1 => ELBUF_STR%BUFLY(IL)%DIRA
+               DIR2 => ELBUF_STR%BUFLY(IL)%DIRB
+               DO IT=1,NPTT
+                 LBUF => ELBUF_STR%BUFLY(IL)%LBUF(IR,IS,IT)
+                 UVAR => ELBUF_STR%BUFLY(IL)%MAT(IR,IS,IT)%VAR  
+                 NUVAR = ELBUF_STR%BUFLY(IL)%NVAR_MAT
+                 CALL LAW158_INIT(
+     .                NUPARAM  ,IMAT     ,IPM     ,DIR1    ,DIR2    ,
+     .                BUFMAT   ,UVAR     ,ALDT    ,NEL     ,NUVAR   ,LBUF%ANG ,
+     .                X1  ,X2  ,X3  ,X4  ,Y1  ,Y2  ,
+     .                Y3  ,Y4  ,Z1  ,Z2  ,Z3  ,Z4  ,
+     .                E1X, E2X, E3X, E1Y, E2Y, E3Y ,E1Z, E2Z, E3Z )
+               ENDDO
+             ENDIF
+           ENDDO ! DO IL = 1,NLAY
+        ELSE
+           DO IL = 1,NLAY
+             NPTT =  ELBUF_STR%BUFLY(IL)%NPTT
+             IMAT =  ELBUF_STR%BUFLY(IL)%IMAT
+             ILAW =  ELBUF_STR%BUFLY(IL)%ILAW
+             NUPARAM = IPM(9,IMAT) 
+             IF (ILAW == 58) THEN
+               DO IT=1,NPTT
+                 LBUF => ELBUF_STR%BUFLY(IL)%LBUF(IR,IS,IT)
+                 UVAR => ELBUF_STR%BUFLY(IL)%MAT(IR,IS,IT)%VAR  
+                 NUVAR = ELBUF_STR%BUFLY(IL)%NVAR_MAT
+                 LBUF_DIR =>ELBUF_STR%BUFLY(IL)%LBUF_DIR(IT)    
+                 DIR1 => LBUF_DIR%DIRA
+                 DIR2 => LBUF_DIR%DIRB
+                 CALL CM58IN3(
+     .                IREP     ,IMAT     ,IPM     ,DIR1    ,DIR2    ,
+     .                BUFMAT   ,UVAR     ,ALDT    ,NEL     ,NUVAR   ,LBUF%ANG ,
+     .                X1  ,X2  ,X3  ,X4  ,Y1  ,Y2  ,
+     .                Y3  ,Y4  ,Z1  ,Z2  ,Z3  ,Z4  ,
+     .                E1X, E2X, E3X, E1Y, E2Y, E3Y ,E1Z, E2Z, E3Z )
+               ENDDO
+             ELSE IF (ILAW == 158) THEN
+               DO IT=1,NPTT
+                 LBUF => ELBUF_STR%BUFLY(IL)%LBUF(IR,IS,IT)
+                 UVAR => ELBUF_STR%BUFLY(IL)%MAT(IR,IS,IT)%VAR  
+                 NUVAR = ELBUF_STR%BUFLY(IL)%NVAR_MAT
+                 LBUF_DIR =>ELBUF_STR%BUFLY(IL)%LBUF_DIR(IT)    
+                 DIR1 => LBUF_DIR%DIRA
+                 DIR2 => LBUF_DIR%DIRB
+                 CALL LAW158_INIT(
+     .                NUPARAM  ,IMAT     ,IPM     ,DIR1    ,DIR2    ,
+     .                BUFMAT   ,UVAR     ,ALDT    ,NEL     ,NUVAR   ,LBUF%ANG ,
+     .                X1  ,X2  ,X3  ,X4  ,Y1  ,Y2  ,
+     .                Y3  ,Y4  ,Z1  ,Z2  ,Z3  ,Z4  ,
+     .                E1X, E2X, E3X, E1Y, E2Y, E3Y ,E1Z, E2Z, E3Z )
+               ENDDO
+             ENDIF
+           ENDDO ! DO IL = 1,NLAY
+        ENDIF   
       ENDIF ! IF (MTN == 58) THEN
 C-----------------------------------------------------------------------
 C     CALCUL DES CONTRAINTES INITIALES
@@ -385,13 +487,15 @@ C to be checked for IGTYP = 51
            CALL LAYINI1(
      .        ELBUF_STR  ,LFT        ,LLT        ,GEO        ,IGEO      ,
      .        MAT        ,PID        ,MATLY      ,POSLY      ,IGTYP     ,
-     .        NLAY       ,MPT        ,ISUBSTACK  ,STACK      ,DRAPE      ,
-     .        NFT        ,GBUF%THK   ,NEL        )
+     .        NLAY       ,MPT        ,ISUBSTACK  ,STACK      ,DRAPE     ,
+     .        NFT        ,GBUF%THK   ,NEL        ,IDRAPE    , STDRAPE   ,
+     .        INDX)
            CALL CORTH3(ELBUF_STR,DIR_A   ,DIR_B   ,LFT    ,LLT    ,
      .             NLAY     ,IREP    ,NEL     ,
      .             X1  ,X2  ,X3  ,X4  ,Y1  ,Y2  ,
      .             Y3  ,Y4  ,Z1  ,Z2  ,Z3  ,Z4  ,
-     .             E1X ,E2X ,E3X ,E1Y ,E2Y ,E3Y ,E1Z ,E2Z ,E3Z )
+     .             E1X ,E2X ,E3X ,E1Y ,E2Y ,E3Y ,E1Z ,E2Z ,E3Z , 
+     .             IDRAPE   , IGTYP)
         END IF
         CALL CSIGINI(ELBUF_STR,
      1       LFT     ,LLT      ,NFT      ,MPT       ,ISTRAIN   ,            
@@ -412,16 +516,15 @@ c Failure model initialisation
 C----------------------------------------
 c     tag edge elements in local UVAR for /FAIL/ALTER (XFEM)
       IF (IFAIL > 0) THEN
-        CALL FAIL_WINDSHIELD_INIT(
-     .       ELBUF_STR,NEL      ,NFT      ,ITY      ,NGL      ,
-     .       IPM      ,BUFMAT   ,IGRSH4N  ,IGRSH3N  )
+        CALL FAIL_WINDSHIELD_INIT(ELBUF_STR,MAT_PARAM,
+     .        NEL      ,NFT      ,ITY      ,IGRSH4N  ,IGRSH3N  )
       ENDIF
 c
 C to be checked for IGTYP = 51
 c      IF(NPERTURB /= 0 .OR. NVSHELL1 /= 0) THEN
-        CALL CFAILINI(ELBUF_STR,IXTG    ,NIXTG  ,NPTT    ,NLAY     ,
-     .                IPM      ,SIGSH   ,NSIGSH ,NUMELTG ,PTSH3N   ,
-     .                RNOISE   ,PERTURB ,BUFMAT ,ALDT    ,THK      )
+        CALL CFAILINI(ELBUF_STR,MAT_PARAM,
+     .                NPTT     ,NLAY     ,SIGSH   ,NSIGSH ,PTSH3N   ,
+     .                RNOISE   ,PERTURB  ,ALDT    ,THK      )
 c      ENDIF
 C-----------------------------------------------------------------------
 C     CALCUL DES DEFORMATIONS INITIALES (MEMBRANE)
@@ -511,9 +614,26 @@ C---
      .               PID      ,NPT ,NPTT ,NLAY,IR ,
      .               IS       ,IXFEM,MTN ,NG)
       ENDIF
+C------------
+      ! Compute the initial volume
+      DO I=LFT,LLT
+        IF (GBUF%G_VOL > 0) GBUF%VOL(I) = AREA(I)*GBUF%THK(I)
+      ENDDO
+      IF (IXFEM > 0) THEN
+        DO IXEL=1,NXEL
+          DO I=LFT,LLT
+            IF (XFEM_STR(NG,IXEL)%GBUF%G_VOL > 0) 
+     .      XFEM_STR(NG,IXEL)%GBUF%VOL(I) = AREA(I)*GBUF%THK(I)
+          END DO
+        ENDDO
+      ENDIF
 C---
       IF (ALLOCATED(DIR_B))    DEALLOCATE(DIR_B)
       IF (ALLOCATED(DIR_A))    DEALLOCATE(DIR_A)
+      IF (ALLOCATED(INDX))     DEALLOCATE(INDX)
+
+      DEALLOCATE(MATLY)
+      DEALLOCATE(POSLY)
 C------------
       RETURN
       END
@@ -543,7 +663,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
 #include      "scr03_c.inc"
-#include      "warn_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -598,10 +717,6 @@ C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

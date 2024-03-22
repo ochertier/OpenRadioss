@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  ANISKEWF                      source/output/anim/generate/aniskewf.F
 Chd|-- called by -----------
@@ -28,7 +28,7 @@ Chd|-- calls ---------------
 Chd|        RAD_SPMD_RECV                 source/mpi/generic/rad_spmd_recv.F
 Chd|        RAD_SPMD_SEND                 source/mpi/generic/rad_spmd_send.F
 Chd|        SPMD_IGATH                    source/mpi/anim/spmd_igath.F  
-Chd|        WRITE_I_C                     source/output/tools/sortie_c.c
+Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|====================================================================
       SUBROUTINE ANISKEWF(GEO,SKEW,IPARG,IXR,DD_IAD,LRBUF)
 C-----------------------------------------------
@@ -40,11 +40,8 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr05_c.inc"
 #include      "param_c.inc"
-#include      "units_c.inc"
 #include      "task_c.inc"
-#include      "spmd_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -60,15 +57,16 @@ C-----------------------------------------------
      .   NB10,NB11,NB12,NB13,NB14,NEL,LFT,LLT,NG,
      .   ITY,IAD,MLW,NFT,N,II,ISKK,MSGTAG,LEN,IGTYP
       INTEGER SRBUF(LRBUF)
+      INTEGER, PARAMETER :: INTSIZE = 4
 C
 C-----------------------------------------------
 C      SKEW
 C-----------------------------------------------
       ISK=NUMSKW-1
-Cel spmd
+C   spmd
 c      IF (IMACH==3) THEN
         II = 0
-Cel pb sur ISK : incremente par pour ts les elem !
+C   pb sur ISK : incremente par pour ts les elem !
         MSGTAG = 1000
         IF (NSPMD > 1 .AND. ISPMD/=0) THEN
 
@@ -209,12 +207,7 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "scr05_c.inc"
 #include      "param_c.inc"
-#include      "units_c.inc"
-#include      "task_c.inc"
-#include      "spmd_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

@@ -1,5 +1,5 @@
 //Copyright>    OpenRadioss
-//Copyright>    Copyright (C) 1986-2022 Altair Engineering Inc.
+//Copyright>    Copyright (C) 1986-2024 Altair Engineering Inc.
 //Copyright>
 //Copyright>    This program is free software: you can redistribute it and/or modify
 //Copyright>    it under the terms of the GNU Affero General Public License as published by
@@ -15,11 +15,11 @@
 //Copyright>    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //Copyright>
 //Copyright>
-//Copyright>    Commercial Alternative: Altair Radioss Software 
+//Copyright>    Commercial Alternative: Altair Radioss Software
 //Copyright>
-//Copyright>    As an alternative to this open-source version, Altair also offers Altair Radioss 
-//Copyright>    software under a commercial license.  Contact Altair to discuss further if the 
-//Copyright>    commercial version may interest you: https://www.altair.com/radioss/.    
+//Copyright>    As an alternative to this open-source version, Altair also offers Altair Radioss
+//Copyright>    software under a commercial license.  Contact Altair to discuss further if the
+//Copyright>    commercial version may interest you: https://www.altair.com/radioss/.
 #include "hardware.inc"
 #include <stdio.h>
 #include <string.h>
@@ -65,8 +65,6 @@ extern void GET_U_TABLE(int * itable,my_real *XX, my_real *YY);
 extern void GET_U_VTABLE(int * itable, int * nel0, int * ipos,my_real *XX, my_real*YY, my_real *DYDX1);
 extern void SET_U_SHLPLAS(int *USRNEL,my_real *SIGY,my_real *ETSE);
 extern void SET_U_SOLPLAS(int *USRNEL, my_real*SIGY, my_real*PLA);
-extern void USENS_SHIFT_AB(my_real * sensor);
-extern void USENS_SHIFT_BA(my_real * sensor);
 extern int GET_U_NUMSENS (int * idsens) ;
 extern int GET_U_SENS_ID (int * idsens);
 extern int SET_U_SENS_VALUE(int *nsens, int * ivar, my_real * var );
@@ -124,7 +122,7 @@ extern void RAD_UMAT_INPUT_REWIND();
 extern void RAD_UMAT_CLOSE_INPUT();
 extern void WRITE_IOUT(char* line,int* len);
 extern int SET_U_SENS_SPMD_NODE_LIST(int *var, int * ivar);
-
+extern void SET_USER_WINDOW_NODES(int *USERNODS, int *NUMBER_USERNODS);
 
 void init_callback(void ** callback_array){
 
@@ -204,7 +202,9 @@ for (i=0; i<200; i++) callback_array[ i]=NULL;
   callback_array[68] = RAD_UMAT_INPUT_REWIND;
   callback_array[69] = RAD_UMAT_CLOSE_INPUT;
   callback_array[70] = SET_U_SENS_SPMD_NODE_LIST;
-
+// callback_array[65] = get_table_value_dydx    Engine Routine 
+  callback_array[72] = SET_USER_WINDOW_NODES;
+//  callback_array[73] = GET_USER_WINDOW_NODES;   Engine Routine 
 
 }
 

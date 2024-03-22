@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  CRIT24                        source/materials/mat/mat024/crit24.F
 Chd|-- called by -----------
@@ -27,7 +27,7 @@ Chd|        CONC24                        source/materials/mat/mat024/conc24.F
 Chd|-- calls ---------------
 Chd|        FRV                           source/materials/mat/mat024/fr.F
 Chd|====================================================================
-      SUBROUTINE CRIT24(NEL,PM,SIG,VK0,OFF,
+      SUBROUTINE CRIT24(NEL,PM,SIG,VK0,VK,OFF,
      .                  ROB,NGL,SEQ,
      .                  S01,S02,S03,S04,S05,S06,
      .                  S1 ,S2 ,S3 ,S4 ,S5 ,S6 ,
@@ -50,7 +50,7 @@ C-----------------------------------------------
       my_real, DIMENSION(NPROPM) :: PM
       my_real, DIMENSION(NEL), INTENT(IN)  :: S01,S02,S03,S04,S05,S06,
      .   SCAL1,SCAL2,SCAL3,VK0,ROB,OFF,SEQ
-      my_real, DIMENSION(NEL), INTENT(OUT) :: S1,S2,S3,S4,S5,S6,
+      my_real, DIMENSION(NEL), INTENT(OUT) :: VK,S1,S2,S3,S4,S5,S6,
      .   SCLE1,SCLE2,SCLE3,SM,DSM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -124,7 +124,7 @@ c----------------------------------------------
       IF (NINDEX > 0) THEN
         IBUG = NINT(PM(59))
         CALL FRV(S1,S2,S3,S4,S5,S6,
-     .           SM,VK0,ROB,FC,RT,RC,
+     .           SM,VK0,VK,ROB,FC,RT,RC,
      .           RCT1,RCT2,AA,AC,BC,BT,
      .           ROK,TOL,FA,NINDEX,INDEX,IBUG,
      .           NEL,SEQ,ICRIT_OUTP)
@@ -166,7 +166,7 @@ c---------------
         ENDDO
 c----------------------------------------------
         CALL FRV(SN1,SN2,SN3,SN4,SN5,SN6,
-     .           SN7,VK0,ROB,FC,RT,RC,
+     .           SN7,VK0,VK,ROB,FC,RT,RC,
      .           RCT1,RCT2,AA,AC,BC,BT,
      .           ROK,TOL,FN,NINDEX2,INDEX,IBUG,
      .           NEL,SEQ,ICRIT_OUTP)

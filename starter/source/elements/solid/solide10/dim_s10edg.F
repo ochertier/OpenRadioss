@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  DIM_S10EDG                    source/elements/solid/solide10/dim_s10edg.F
 Chd|-- called by -----------
@@ -66,15 +66,15 @@ C-----------------------------------------------
         NF2  = NFT-NUMELS8
 C
         DO I=1,NEL
-	 II = I+NF2
+           II = I+NF2
          DO J = 1 , 6
- 	  N = IXS10(J,II)
- 	 IF (N >0) THEN
-	  IF (ITAGND(N)==0) THEN
-	   NEDG = NEDG + 1
-	   ITAGND(N)=NEDG
-	  END IF
-	 END IF
+            N = IXS10(J,II)
+           IF (N >0) THEN
+            IF (ITAGND(N)==0) THEN
+             NEDG = NEDG + 1
+             ITAGND(N)=NEDG
+            END IF
+           END IF
          ENDDO
         ENDDO
        END IF
@@ -139,17 +139,17 @@ C
           NC(3) =IXS(7,II)
           NC(4) =IXS(6,II)
          DO J = 1 , 6
- 	  N = IXS10(J,JJ)
- 	  IF (N >0) THEN
-	   IF (ITAGND(N)==0) THEN
-	    NEDG = NEDG + 1
+            N = IXS10(J,JJ)
+            IF (N >0) THEN
+             IF (ITAGND(N)==0) THEN
+              NEDG = NEDG + 1
             ITAGND(N) = NEDG
             N1=IPERM1(J)
             N2=IPERM2(J)
             ICNDS10(1,NEDG) = N
             ICNDS10(2,NEDG) = NC(N1)
             ICNDS10(3,NEDG) = NC(N2)
-	   END IF
+             END IF
           END IF
          END DO
         END DO 
@@ -178,9 +178,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER ICNDS10(3,*), ITAGND(*)
@@ -202,8 +199,8 @@ C
        IF (ITAGND(N)>0) THEN
         J = ITAGND(N)
         IE = IE + 1
-	ICNDS10(1:3,IE)=ICND_CP(1:3,J)
-	ITAGND(N) = IE
+          ICNDS10(1:3,IE)=ICND_CP(1:3,J)
+          ITAGND(N) = IE
        END IF
       END DO
       IF (IE /= NS10E) print *,'Error of re-ordering in REORD_ICND',IE,NS10E
@@ -229,17 +226,9 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NN, INN(*), ITAGND(*)
-C     REAL
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com04_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -251,7 +240,7 @@ C------remove tagged nodes in INN(*)----------------------------
        N = INN(I)
        IF (ITAGND(N) ==0 ) THEN
         ND = ND + 1
-	INN(ND) =INN(I)
+          INN(ND) =INN(I)
        END IF
       ENDDO 
 C      
@@ -271,17 +260,9 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NN, INN(*), ITAGND(*)
-C     REAL
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com04_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -293,7 +274,7 @@ C------remove tagged nodes in INN(*) and will be degenerated-----------
        N = INN(I)
        IF (ITAGND(N) ==0 ) THEN
         ND = ND + 1
-	INN(ND) =INN(I)
+          INN(ND) =INN(I)
        ELSEIF (ITAGND(N) >0 ) THEN
         ITAGND(N) = -ITAGND(N)
        END IF
@@ -319,9 +300,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -363,7 +341,7 @@ C--- -1: nd alone is in Rbody
         IS2 = INTAB(NN,INN,N2)
         IF (IS1.AND.IS2) THEN
 C----removed from INN and degenerating in 2nd passe----------
-         ITAGND(N) = ITAGND(N) + NS10E	
+         ITAGND(N) = ITAGND(N) + NS10E
          NNEW = NNEW + 1
          INN(NNEW) =INN(I)
          IER1 =1
@@ -375,7 +353,7 @@ C----removed from INN and degenerating in 2nd passe----------
      .                I1=ITAB(ND),
      .                PRMOD=MSG_CUMU)
         ELSEIF (.NOT.(IS1).AND..NOT.(IS2)) THEN
-C----error out	ND is along in RB
+C----error out  ND is along in RB
           CALL ANCMSG(MSGID=1216,
      .                MSGTYPE=MSGERROR,
      .                ANMODE=ANINFO_BLIND_1,
@@ -434,9 +412,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
@@ -460,15 +435,15 @@ C------removing Nd from LPBY(*)--degenerating--
         DO KK = 1, NSL
           NN = LPBY(K+KK)
           IF(ITAGND(NN)>NS10E)THEN
-	   ITAGND(NN) = -(ITAGND(NN)-NS10E)
+             ITAGND(NN) = -(ITAGND(NN)-NS10E)
           ELSE
            NSL_N = NSL_N + 1
-	   LPBY(K_N+NSL_N) =NN
+             LPBY(K_N+NSL_N) =NN
           END IF
         ENDDO
         K = K + NSL
         K_N = K_N + NSL_N
-	NPBY(2,N) = NSL_N
+          NPBY(2,N) = NSL_N
       ENDDO
 C
       RETURN
@@ -488,9 +463,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -573,7 +545,7 @@ C------!!!!add detail for message
 C----degenerating in 2nd passe------ and removed from RBE2 in 2nd passe
          NNEW = NNEW + 1
          INN(NNEW) =INN(I)
-         ITAGND(N) = ITAGND(N) + NS10E	
+         ITAGND(N) = ITAGND(N) + NS10E
          IER1 = 1
          IF (IPRI>=5)
      .    CALL ANCMSG(MSGID=1213,
@@ -583,7 +555,7 @@ C----degenerating in 2nd passe------ and removed from RBE2 in 2nd passe
      .                C1='RBE2 ',
      .                PRMOD=MSG_CUMU)
         ELSEIF (.NOT.(IS1).AND..NOT.(IS2)) THEN
-C----error out	ND is along in RBE2
+C----error out  ND is along in RBE2
           CALL ANCMSG(MSGID=1216,
      .                MSGTYPE=MSGERROR,
      .                ANMODE=ANINFO_BLIND_1,
@@ -601,7 +573,7 @@ C----remove Nd from RBE2 directly
      .                C1='RBE2 ',
      .                I1=ITAB(ND),
      .                PRMOD=MSG_CUMU)
-	END IF
+          END IF
        ELSE
         NNEW = NNEW + 1
         INN(NNEW) =INN(I)
@@ -644,9 +616,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -700,9 +669,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER ICODE(*), ITAGND(*),ICNDS10(3,*),ITAB(*)
@@ -716,59 +682,49 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,J,NG, NEL, NFT,NF1, NF2, N,ND,N1,N2,ID,IPR
-      INTEGER IS1,IS2
+      INTEGER IS1,IS2,ISMIN
 C     REAL
 C------treatment for /BCS ----------------------------
       IPR = 0
       DO N=1,NUMNOD
        IF (ICODE(N)>0 .AND. ITAGND(N) /=0 ) THEN
-        ID = IABS(ITAGND(N))
-	ND = ICNDS10(1,ID)
-	N1 = ICNDS10(2,ID)
-	N2 = ICNDS10(3,ID)
-	IS1 = ICODE(N1)
-	IS2 = ICODE(N2)
-c	IF (IS1==IS2.AND.ICODE(N)==IS1) THEN
-C----remove Nd from ICNDS10
-c         ITAGND(N) = ITAGND(N) + NS10E	
-c-----no need warning like gravity-----	 
-c          CALL ANCMSG(MSGID=1205,
-c     .                MSGTYPE=MSGINFO,
-c     .                ANMODE=ANINFO_BLIND_1,
-c     .                C1='Boundary conditions ',
-c     .                I1=IU,
-c     .                I2=ITAB(ND),
-c     .                I3=ITAB(ND))
-	IF (IS1/=ICODE(N).AND.IS2/=ICODE(N)) THEN
-C----error out	ND is along in /BCS
-          CALL ANCMSG(MSGID=1208,
+         ID = IABS(ITAGND(N))
+         ND = ICNDS10(1,ID)
+         N1 = ICNDS10(2,ID)
+         N2 = ICNDS10(3,ID)
+         IS1 = ICODE(N1)
+         IS2 = ICODE(N2)
+         ISMIN = MIN(IS1,IS2)
+         IF (IS1/=ICODE(N).AND.IS2/=ICODE(N).AND.ISMIN<ICODE(N)) THEN
+C----error out  ND has more /BCS than edge node
+            CALL ANCMSG(MSGID=1208,
      .                MSGTYPE=MSGERROR,
      .                ANMODE=ANINFO_BLIND_1,
      .                I1=ITAB(ND),
      .                C1='Boundary conditions ',
      .                C2='Boundary conditions')
-	ELSE
-C----remove Nd from /BCS +degenerating	
-         ICODE(N) = 0
-         IPR = 1
-         IF (ITAGND(N)>0)ITAGND(N) = -ITAGND(N) 
-         IF (IPRI>=5)
-     .    CALL ANCMSG(MSGID=1207,
+         ELSE
+C----remove Nd from /BCS +degenerating
+           ICODE(N) = 0
+           IPR = 1
+           IF (ITAGND(N)>0)ITAGND(N) = -ITAGND(N) 
+           IF (IPRI>=5)
+     .     CALL ANCMSG(MSGID=1207,
      .                MSGTYPE=MSGINFO,
      .                ANMODE=ANINFO_BLIND_1,
      .                I1=ITAB(ND),
      .                PRMOD=MSG_CUMU)
-	END IF
+         END IF
        END IF
       ENDDO 
-       IF (IPR >0.AND.IPRI>=5) THEN
+      IF (IPR >0.AND.IPRI>=5) THEN
           CALL ANCMSG(MSGID=1207,
      .                MSGTYPE=MSGINFO,
      .                ANMODE=ANINFO_BLIND_1,
      .                C1='Boundary conditions ',
      .                C2='Boundary conditions',
      .                PRMOD=MSG_PRINT)
-       END IF 
+      END IF 
 C
       RETURN
       END
@@ -788,9 +744,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -820,24 +773,24 @@ C------treatment for tagged nodes in INN(*)----------------------------
        K = IBFV(12,I)
        IF (ITAGND(N) /=0 ) THEN
         ID = IABS(ITAGND(N))
-	ND = ICNDS10(1,ID)
-	N1 = ICNDS10(2,ID)
-	N2 = ICNDS10(3,ID)
-C--------quadratic, but---	
-	IS1 = SAMEFVID(K,IBFV,N1)
-	IS2 = SAMEFVID(K,IBFV,N2)
-c	IF (IS1.AND.IS2) THEN
+          ND = ICNDS10(1,ID)
+          N1 = ICNDS10(2,ID)
+          N2 = ICNDS10(3,ID)
+C--------quadratic, but---
+          IS1 = SAMEFVID(K,IBFV,N1)
+          IS2 = SAMEFVID(K,IBFV,N2)
+c  IF (IS1.AND.IS2) THEN
 C----remove Nd from ICNDS10
-c         ITAGND(N) = ITAGND(N) + NS10E	
-	IF (.NOT.(IS1).AND..NOT.(IS2)) THEN
-C----error out	ND is along in FV
+c         ITAGND(N) = ITAGND(N) + NS10E
+          IF (.NOT.(IS1).AND..NOT.(IS2)) THEN
+C----error out  ND is along in FV
           CALL ANCMSG(MSGID=1208,
      .                MSGTYPE=MSGERROR,
      .                ANMODE=ANINFO_BLIND_1,
      .                I1=ITAB(ND),
      .                C1='Imposed VEL/DISP/ACC ',
      .                C2='Imposed VEL/DISP/ACC')
-	ELSE
+          ELSE
 C----remove Nd from FV and warning out-- will be done in ddsplit
          IPR = 1
          IF (IBFV(3,I)>0) IBFV(3,I) = -IBFV(3,I)
@@ -848,7 +801,7 @@ C----remove Nd from FV and warning out-- will be done in ddsplit
      .                ANMODE=ANINFO_BLIND_1,
      .                I1=ITAB(ND),
      .                PRMOD=MSG_CUMU)
-	END IF
+          END IF
        END IF
       ENDDO 
 C      
@@ -892,7 +845,7 @@ C----6---------------------------------------------------------------7---------8
        DO I =1,NFXVEL
         NI = IABS(IBFV(1,I))
         IF (NI==N) THEN
-	 K = IBFV(12,I)
+           K = IBFV(12,I)
          IF (K==ID) SAMEFVID=.TRUE.
          RETURN
         ENDIF
@@ -922,11 +875,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
 #include      "param_c.inc"
 #include      "scr17_c.inc"
 #include      "com04_c.inc"
-#include      "warn_c.inc"
 #include      "scr03_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -959,14 +910,14 @@ c         DO I=1,NS10E
 c          ND = ICNDS10(1,I)
 c          N1 = ICNDS10(2,I)
 c          N2 = ICNDS10(3,I)
-c	  IF (ITAGND(ND)>NS10E) CYCLE
-c	  ISD = INTAB(NSN,INTBUF_TAB(N)%NSV,ND)
+c    IF (ITAGND(ND)>NS10E) CYCLE
+c    ISD = INTAB(NSN,INTBUF_TAB(N)%NSV,ND)
 c          IF (.NOT.(ISD)) THEN
-c	   IS1 = INTAB(NSN,INTBUF_TAB(N)%NSV,N1)
-c	   IF (IS1) THEN
-c	    IS2 = INTAB(NSN,INTBUF_TAB(N)%NSV,N2)
-c	    IF (IS2.AND.ITAGND(ND)>0) THEN
-c	     ITAGND(ND)=-ITAGND(ND)
+c     IS1 = INTAB(NSN,INTBUF_TAB(N)%NSV,N1)
+c     IF (IS1) THEN
+c      IS2 = INTAB(NSN,INTBUF_TAB(N)%NSV,N2)
+c      IF (IS2.AND.ITAGND(ND)>0) THEN
+c       ITAGND(ND)=-ITAGND(ND)
 c             IPR = IPR +1
 c             CALL ANCMSG(MSGID=1212,
 c     .                MSGTYPE=MSGWARNING,
@@ -975,8 +926,8 @@ c     .                I1=ITAB(ND),
 c     .                I2=ITAB(N1),
 c     .                I3=ITAB(N2),
 c     .                PRMOD=MSG_CUMU)
-c	    END IF
-c           END IF	    
+c      END IF
+c           END IF      
 c          END IF 
 c         END DO 
 c         IF (IPR >0) THEN
@@ -1031,7 +982,7 @@ C
             ISL = INTBUF_TAB(N)%NSV(I)
             IF (ITAGMD(ISL)>0 ) ITAGMD(IML)=-ITAGMD(ISL)
           ENDDO
-	 END IF
+           END IF
         END IF
       END DO
 C
@@ -1069,28 +1020,28 @@ C
         IF (NTY == 2 ) THEN
           NSN   = IPARI(5,N)
           NOINT = IPARI(15,N)
-	  IMODI = 0
+            IMODI = 0
           IPR = 0
          IF (ILEV == 25 .or. ILEV == 26) THEN
          ELSEIF (ILEV == 27 .or. ILEV == 28) THEN
           DO I=1,NSN
             ISL = INTBUF_TAB(N)%NSV(I)
             IF (ITAGND(ISL)/=0 .AND.INTBUF_TAB(N)%IRUPT(I) /= 1)THEN
-	     INTBUF_TAB(N)%NSV(I) = -ISL
-	     IF (ITAGND(ISL)>0 ) ITAGND(ISL) = -ITAGND(ISL)
-	     IMODI = IMODI + 1
-	    END IF
+               INTBUF_TAB(N)%NSV(I) = -ISL
+               IF (ITAGND(ISL)>0 ) ITAGND(ISL) = -ITAGND(ISL)
+               IMODI = IMODI + 1
+              END IF
           ENDDO
          ELSE
           DO I=1,NSN
             ISL = INTBUF_TAB(N)%NSV(I)
             IF (ITAGND(ISL)/=0 )THEN
-	     INTBUF_TAB(N)%NSV(I) = -ISL
-	     IF (ITAGND(ISL)>0 ) ITAGND(ISL) = -ITAGND(ISL)
-	     IMODI = IMODI + 1
-	    END IF
+               INTBUF_TAB(N)%NSV(I) = -ISL
+               IF (ITAGND(ISL)>0 ) ITAGND(ISL) = -ITAGND(ISL)
+               IMODI = IMODI + 1
+              END IF
           ENDDO
-	 END IF
+           END IF
 C-----------------------------------------------
 C     Compact INT,REAL BUFFER
 C-----------------------------------------------
@@ -1105,8 +1056,8 @@ C-----------------------------------------------
                INTBUF_TAB(N)%NSV(II) = INTBUF_TAB(N)%NSV(I)
                INTBUF_TAB(N)%IRTLM(II) = INTBUF_TAB(N)%IRTLM(I)
                IF ((ILEV >= 10.AND.ILEV <= 22).OR.ILEV == 27.OR.ILEV == 28) THEN
-	        INTBUF_TAB(N)%IRUPT(II) = INTBUF_TAB(N)%IRUPT(I)
-	       END IF
+                  INTBUF_TAB(N)%IRUPT(II) = INTBUF_TAB(N)%IRUPT(I)
+                 END IF
               INTBUF_TAB(N)%CSTS(1+2*(II-1))   = INTBUF_TAB(N)%CSTS(1+2*(I-1))
               INTBUF_TAB(N)%CSTS(1+2*(II-1)+1) = INTBUF_TAB(N)%CSTS(1+2*(I-1)+1)
               INTBUF_TAB(N)%DPARA(1+7*(II-1))   = INTBUF_TAB(N)%DPARA(1+7*(I-1))
@@ -1119,14 +1070,14 @@ C-----------------------------------------------
               IF (IDEL7N /= 0)THEN
                INTBUF_TAB(N)%SMAS(II)  = INTBUF_TAB(N)%SMAS(I)
                INTBUF_TAB(N)%SINER(II) = INTBUF_TAB(N)%SINER(I)
-	      END IF
+                END IF
               IF ((ILEV>=10 .AND. ILEV<=22 ).OR. INTTH > 0) THEN
                INTBUF_TAB(N)%AREAS2(II) = INTBUF_TAB(N)%AREAS2(I)
                 DO K = 0,NUVAR-1
                  INTBUF_TAB(N)%UVAR(1+NUVAR*(II-1)+K) = 
      .                     INTBUF_TAB(N)%UVAR(1+NUVAR*(I-1)+K)
                 ENDDO                                  
-	      END IF
+                END IF
               IF (( ILEV>=10 .AND. ILEV<=12).OR.( ILEV>=20 .AND. ILEV<=22)) THEN
                INTBUF_TAB(N)%SMAS(II)  = INTBUF_TAB(N)%SMAS(I)
                INTBUF_TAB(N)%SINER(II) = INTBUF_TAB(N)%SINER(I)
@@ -1152,14 +1103,14 @@ C-----------------------------------------------
                 INTBUF_TAB(N)%FSM(1+3*(II-1)+K) = INTBUF_TAB(N)%FSM(1+3*(I-1)+K)
                 INTBUF_TAB(N)%FINI(1+3*(II-1)+K) = INTBUF_TAB(N)%FINI(1+3*(I-1)+K)
                ENDDO             
- 	      END IF
+                END IF
               IF (INTBUF_TAB(N)%S_CSTS_BIS>0) THEN
                DO K = 0,1
                 INTBUF_TAB(N)%CSTS_BIS(1+2*(II-1)+K) = INTBUF_TAB(N)%CSTS_BIS(1+2*(I-1)+K)
                ENDDO             
               END IF
-	     ELSE
-C-----warning out	 
+               ELSE
+C-----warning out   
              ISL = -INTBUF_TAB(N)%NSV(I)
              IPR = 1
            IF (IPRI>=5) 
@@ -1171,7 +1122,7 @@ C-----warning out
              ENDIF                                
            ENDDO                                  
            IPARI(5,N) = II
-	 END IF !(IMODI > 0 )
+           END IF !(IMODI > 0 )
          IF (IPR >0.AND.IPRI>=5) THEN
           CALL ANCMSG(MSGID=1209,
      .                MSGTYPE=MSGINFO,
@@ -1194,18 +1145,10 @@ Chd|-- calls ---------------
 Chd|        NLOCAL                        source/spmd/node/ddtools.F    
 Chd|====================================================================
       SUBROUTINE PRE_CNDPON(ICNDS10,ADSKYCND,CEPCND,CELCND  ,ITAGND)
-C
-C-----------------------------------------------
-C   M o d u l e s
-C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -1241,7 +1184,7 @@ C
         NIR = 2
         DO I=1,NS10E
           K = IABS(ICNDS10(1,I))
-	  IF (ITAGND(K)>NS10E) CYCLE
+            IF (ITAGND(K)>NS10E) CYCLE
           DO J=1,NIR
             KK = ICNDS10(1+J,I)
             ADSKYCND(KK) = ADSKYCND(KK) + 1
@@ -1257,18 +1200,18 @@ C------remove zero value nodes at the beginning---
         NI = 0
         DO I=2,NUMNOD
           IF (ADSKYCND(I)>0) THEN
-	   NI = I
-	   GOTO 100
-	  END IF
+             NI = I
+             GOTO 100
+            END IF
         ENDDO
  100     CONTINUE
        END IF
 C-----------first activate node should begin from 1       
         IF (NI==1) THEN
-	 ADSKYCND(1) = ADSKYCND(1)+1
-	ELSE
-	 ADSKYCND(1) = 1
-	END IF
+           ADSKYCND(1) = ADSKYCND(1)+1
+          ELSE
+           ADSKYCND(1) = 1
+          END IF
         DO I=2,NUMNOD+1
           ADSKYCND(I)=ADSKYCND(I)+ADSKYCND(I-1)
         ENDDO
@@ -1282,13 +1225,13 @@ C-----------------------------------------------
            ICOMP(1:NSPMD)=0
             DO I=1,NS10E
               K = IABS(ICNDS10(1,I))
-	      IF (ITAGND(K)>NS10E) CYCLE
+                IF (ITAGND(K)>NS10E) CYCLE
               DO P = 1, NSPMD
                 IF(NLOCAL(K,P)==1)THEN
                   CEPCND(I) = P-1
-		  ICOMP(P) = ICOMP(P) + 1
+            ICOMP(P) = ICOMP(P) + 1
                   CELCND(I)= ICOMP(P)
-	          GOTO 200
+                    GOTO 200
                 ENDIF
               ENDDO
  200        CONTINUE
@@ -1300,7 +1243,7 @@ c        DO P = 1, NSPMD
 c          NL_L = 0
 c          DO I=1,NS10E
 c            K = IABS(ICNDS10(1,I))
-c	    IF (ITAGND(K)>NS10E) CYCLE
+c      IF (ITAGND(K)>NS10E) CYCLE
 c            IF(CELCND(I)==0) THEN
 c              IF(NLOCAL(K,P)==1)THEN
 c                NL_L = NL_L + 1
@@ -1320,41 +1263,22 @@ Chd|-- calls ---------------
 Chd|====================================================================
       SUBROUTINE FILLCNCND(CNCND  ,ADDCNCND, ICNDS10,ITAGND)
 C-----------------------------------------------
-C   M o d u l e s
-C-----------------------------------------------
-C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "param_c.inc"
-#include      "rnur_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER ADDCNCND(0:*), CNCND(*),ICNDS10(3,*),ITAGND(*)
-
-C-----------------------------------------------
-C   F u n c t i o n
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
-C---------------------------------------
+C-----------------------------------------------
       INTEGER I, J, L, K, N, OFF, NTY, NRTS, NRTM, NSN, NMN,
      .        KK, NIR,ADSKY(NUMNOD+1)
-C-----------------------------------------------
-C   S o u r c e  L i n e s
-C-----------------------------------------------
 C-----------------------------------------------
 C   CALCUL DE CNE ADDCNE
 C-----------------------------------------------
@@ -1366,7 +1290,7 @@ C ADDCNCND(I+1)-ADDCNCND(I): nb of node I (main)
         NIR = 2
         DO I=1,NS10E
           K = ICNDS10(1,I)
-	  IF (ITAGND(K)>NS10E) CYCLE
+            IF (ITAGND(K)>NS10E) CYCLE
           DO J=1,NIR
             KK = ICNDS10(1+J,I)
             CNCND(ADSKY(KK)) = I
@@ -1388,9 +1312,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -1427,9 +1348,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -1478,18 +1396,13 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IBCSCYC(4,*), LBCSCYC(2,*), ITAGND(*),ITAB(*)
-C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

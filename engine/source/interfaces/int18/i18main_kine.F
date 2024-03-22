@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  I18MAIN_KINE_1                source/interfaces/int18/i18main_kine.F
 Chd|-- called by -----------
@@ -34,17 +34,19 @@ Chd|        SPMD_I18KINE_COM_MS           source/mpi/interfaces/spmd_i18kine_com
 Chd|        SPMD_I18KINE_MACC_COM_POFF    source/mpi/interfaces/spmd_i18kine_macc_com_poff.F
 Chd|        SPMD_I18KINE_MSF_COM_POFF     source/mpi/interfaces/spmd_i18kine_msf_com_poff.F
 Chd|        SPMD_I18KINE_PENE_COM_POFF    source/mpi/interfaces/spmd_i18kine_pene_com_poff.F
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
+Chd|        ANIM_MOD                      ../common_source/modules/anim_mod.F
+Chd|        ARRAY_MOD                     ../common_source/modules/array_mod.F
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
       SUBROUTINE I18MAIN_KINE_1(IPARI,INTBUF_TAB,X      ,V       ,
      2                   A      ,ISKEW   ,SKEW     ,LCOD          ,WA      ,
      3                   MS     ,ITAB    ,JTASK    ,KINET         ,STIFN   ,
      4                   MTF    ,CAND_SAV,INT18ADD ,IAD_ELEM      ,FR_ELEM ,
-     5                   TAGPENE,H3D_DATA,MULTI_FVM,ALE_NE_CONNECT,XCELL)
+     5                   TAGPENE,H3D_DATA,MULTI_FVM,ALE_NE_CONNECT,XCELL,XCELL_REMOTE)
 C-----------------------------------------------
 C   D e s c r i p t i o n 
 C-----------------------------------------------
@@ -59,7 +61,9 @@ C-----------------------------------------------
       USE INTBUFDEF_MOD
       USE H3D_MOD
       USE MULTI_FVM_MOD    
-      USE ALE_CONNECTIVITY_MOD          
+      USE ALE_CONNECTIVITY_MOD
+      USE ANIM_MOD
+      USE ARRAY_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -71,11 +75,8 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "secur_c.inc"
 #include      "task_c.inc"
-#include      "units_c.inc"
 #include      "warn_c.inc"
-#include      "scr05_c.inc"
 #include      "tabsiz_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -88,7 +89,8 @@ C-----------------------------------------------
       TYPE(INTBUF_STRUCT_) INTBUF_TAB(*)
       TYPE(H3D_DATABASE) :: H3D_DATA
       TYPE(MULTI_FVM_STRUCT), INTENT(IN) :: MULTI_FVM  
-      TYPE(t_connectivity), INTENT(IN) :: ALE_NE_CONNECT          
+      TYPE(t_connectivity), INTENT(IN) :: ALE_NE_CONNECT  
+      TYPE(array_type), DIMENSION(NINTER), INTENT(in) :: XCELL_REMOTE !< remote data structure for interface 18         
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -216,7 +218,8 @@ C LINDMAX = NCONT*MULTIMP
      2                       STIFN       ,V             ,A                     ,MS               , NMN             ,
      3                       ITAB        ,LINDMAX       ,CAND_SAV(INT18ADD(N)) ,MTF              , ALE_NE_CONNECT  ,
      4                       NRTMDIM     ,JTASK         ,NB_JLT(JTASK)         ,NB_JLT_NEW(JTASK),N B_STOK_N(JTASK),
-     5                       KINET       ,MULTI_FVM     ,XCELL)
+     5                       KINET       ,MULTI_FVM     ,XCELL,XCELL_REMOTE(N)%SIZE_MY_REAL_ARRAY_1D,
+     .                            XCELL_REMOTE(N)%MY_REAL_ARRAY_1D)
        ENDIF
       ENDDO
 C=======================================================================
@@ -337,13 +340,8 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "secur_c.inc"
 #include      "task_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "scr05_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -508,16 +506,16 @@ Chd|        I18KINE_I                     source/interfaces/int18/i18main_kine.F
 Chd|        I7CDCOR3                      source/interfaces/int07/i7cdcor3.F
 Chd|        I7COR3                        source/interfaces/int07/i7cor3.F
 Chd|        MY_BARRIER                    source/system/machine.F       
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|====================================================================
       SUBROUTINE I18MAIN_KINE_I(NIN,IPARI,INTBUF_TAB      ,X        ,
      2      STIFN    ,V         ,A          ,MS           ,NMN      ,
      3      ITAB     ,LINDMAX   ,CAND_SAV   ,MTF          ,ALE_NE_CONNECT,
      4      NRTMDIM  ,JTASK     ,NB_JLT     ,NB_JLT_NEW   ,NB_STOK_N,
-     5      KINET    ,MULTI_FVM ,XCELL)
+     5      KINET    ,MULTI_FVM ,XCELL,S_XCELL_REMOTE,XCELL_REMOTE)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -548,11 +546,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "units_c.inc"
 #include      "task_c.inc"
 #include      "warn_c.inc"
 #include      "tabsiz_c.inc"
@@ -562,6 +558,8 @@ C-----------------------------------------------
       INTEGER NIN,JTASK ,LINDMAX,NMN     ,
      .        NB_JLT,NB_JLT_NEW,NB_STOK_N,NRTMDIM
       INTEGER IPARI(NPARI), KINET(*),ITAB(*),STIFN(*)
+      INTEGER, INTENT(in) :: S_XCELL_REMOTE
+      my_real, DIMENSION(S_XCELL_REMOTE), INTENT(in) :: XCELL_REMOTE
       my_real
      .   X(3,*), V(3,*), A(3,*), MS(*),
      .   MTF(14,*),CAND_SAV(8,*),XCELL(3,SXCELL)
@@ -712,7 +710,7 @@ C cand_n et cand_e replaced with cand_n_n et cand_e_n
      B        JLT_NEW      ,GAPV     ,INACTI   ,INTBUF_TAB%CAND_P,ALE_NE_CONNECT,
      C        INDEX2(NFT+1),VXI      ,VYI      ,ITAB             ,XCELL  ,
      D        VZI          ,MSI      ,KINI     ,SURF             ,IBAG    ,
-     E        IGAP         ,MULTI_FVM)
+     E        IGAP         ,MULTI_FVM,S_XCELL_REMOTE,XCELL_REMOTE)
           JLT = JLT_NEW
           IF(JLT_NEW /= 0) THEN
             IPARI(29) = 1
@@ -781,13 +779,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "units_c.inc"
 #include      "task_c.inc"
-#include      "warn_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -909,12 +903,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "com08_c.inc"
-#include      "scr05_c.inc"
 #include      "task_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
@@ -923,10 +911,6 @@ C-----------------------------------------------
       INTEGER NMN,ITASK,MSR(*), ISKEW(*), LCOD(*) , ITAB(*)
       my_real
      .   A(3,*), V(3,*), MS(*),MTF(14,*), SKEW(LSKEW,*)
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -1031,13 +1015,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "units_c.inc"
 #include      "task_c.inc"
-#include      "warn_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1187,13 +1167,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "units_c.inc"
 #include      "task_c.inc"
-#include      "warn_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1332,24 +1308,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "com06_c.inc"
 #include      "com08_c.inc"
-#include      "scr02_c.inc"
-#include      "scr03_c.inc"
 #include      "scr05_c.inc"
-#include      "scr07_c.inc"
-#include      "scr11_c.inc"
-#include      "scr14_c.inc"
-#include      "scr16_c.inc"
-#include      "scr18_c.inc"
-#include      "units_c.inc"
-#include      "parit_c.inc"
-#include      "warn_c.inc"
-#include      "couple_c.inc"
-#include      "param_c.inc"
-#include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1413,7 +1373,6 @@ C-----------------------------------------------
      .   IMPX,IMPY,IMPZ,PP1,PP2,PP3,PP4,BID
 C
 C-----------------------------------------------
-#include "sync_dir.inc"
       IF (IRESP == 1) THEN
            PREC = FIVEEM4
       ELSE
@@ -1593,27 +1552,6 @@ C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "com06_c.inc"
-#include      "com08_c.inc"
-#include      "scr02_c.inc"
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
-#include      "scr07_c.inc"
-#include      "scr11_c.inc"
-#include      "scr14_c.inc"
-#include      "scr16_c.inc"
-#include      "scr18_c.inc"
-#include      "units_c.inc"
-#include      "parit_c.inc"
-#include      "warn_c.inc"
-#include      "couple_c.inc"
-#include      "param_c.inc"
-#include      "task_c.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER JLT,IBCM,IBCS,INACTI,NIN,
@@ -1682,9 +1620,6 @@ C-----------------------------------------------
       my_real
      .   IMPX,IMPY,IMPZ,PP1,PP2,PP3,PP4,BID,
      .   MTXX,MTXY,MTXZ,MTYY,MTYZ,MTZZ
-C
-C-----------------------------------------------
-#include "sync_dir.inc"
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------
@@ -1911,25 +1846,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "com06_c.inc"
 #include      "com08_c.inc"
-#include      "scr02_c.inc"
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
-#include      "scr07_c.inc"
-#include      "scr11_c.inc"
-#include      "scr14_c.inc"
-#include      "scr16_c.inc"
-#include      "scr18_c.inc"
-#include      "units_c.inc"
-#include      "parit_c.inc"
-#include      "warn_c.inc"
-#include      "couple_c.inc"
-#include      "param_c.inc"
 ctmp+1
-#include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1995,7 +1913,6 @@ C-----------------------------------------------
      .   V1,V2,V3,V4,VSX,VSY,VSZ
 C
 C-----------------------------------------------
-#include "sync_dir.inc"
       ECONTT = ZERO
       ECONVT = ZERO
 C--------------------------------------------------------
@@ -2099,6 +2016,7 @@ Chd|  I18KINE_S                     source/interfaces/int18/i18main_kine.F
 Chd|-- called by -----------
 Chd|        I18MAIN_KINE_S                source/interfaces/int18/i18main_kine.F
 Chd|-- calls ---------------
+Chd|        ANIM_MOD                      ../common_source/modules/anim_mod.F
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
@@ -2118,6 +2036,7 @@ C   M o d u l e s
 C-----------------------------------------------
       USE TRI7BOX
       USE H3D_MOD
+      USE ANIM_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -2131,24 +2050,11 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "com06_c.inc"
 #include      "com08_c.inc"
-#include      "scr02_c.inc"
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
 #include      "scr07_c.inc"
-#include      "scr11_c.inc"
 #include      "scr14_c.inc"
 #include      "scr16_c.inc"
-#include      "scr18_c.inc"
-#include      "units_c.inc"
-#include      "parit_c.inc"
-#include      "warn_c.inc"
-#include      "couple_c.inc"
-#include      "param_c.inc"
-ctmp+1
-#include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -2156,21 +2062,14 @@ C-----------------------------------------------
      .        ITAB(*), NOINT, IRECT(4,*),CAND_N(*),CAND_E(*),
      .        INTTH,IFORM,NSN
       INTEGER NSV(*) ,SLVNDTAG(*)
-      my_real
-     .   X(3,*),
-     .   A(3,*), MS(*), V(3,*), FSAV(*),FCONT(3,*),
-     .   GAP, STFN(*),STIFN(*), MTF(14,*),CAND_SAV(8,*)
-      my_real
-     .     NX1(MVSIZ), NX2(MVSIZ), NX3(MVSIZ), NX4(MVSIZ),
-     .     NY1(MVSIZ), NY2(MVSIZ), NY3(MVSIZ), NY4(MVSIZ),
-     .     NZ1(MVSIZ), NZ2(MVSIZ), NZ3(MVSIZ), NZ4(MVSIZ),
-     .     LB1(MVSIZ), LB2(MVSIZ), LB3(MVSIZ), LB4(MVSIZ),
-     .     LC1(MVSIZ), LC2(MVSIZ), LC3(MVSIZ), LC4(MVSIZ),
-     .     P1(MVSIZ), P2(MVSIZ), P3(MVSIZ), P4(MVSIZ), STIF(MVSIZ),
-     .     GAPV(MVSIZ),
-     .     STIFSAV(MVSIZ),
-     .     VXI(MVSIZ),VYI(MVSIZ),VZI(MVSIZ),MSI(MVSIZ),
-     .     RSTIF
+      my_real X(3,*), A(3,*), MS(*), V(3,*), FSAV(*),FCONT(3,*), GAP, STFN(*),STIFN(*), MTF(14,*),CAND_SAV(8,*)
+      my_real NX1(MVSIZ), NX2(MVSIZ), NX3(MVSIZ), NX4(MVSIZ),
+     .        NY1(MVSIZ), NY2(MVSIZ), NY3(MVSIZ), NY4(MVSIZ),
+     .        NZ1(MVSIZ), NZ2(MVSIZ), NZ3(MVSIZ), NZ4(MVSIZ),
+     .        LB1(MVSIZ), LB2(MVSIZ), LB3(MVSIZ), LB4(MVSIZ),
+     .        LC1(MVSIZ), LC2(MVSIZ), LC3(MVSIZ), LC4(MVSIZ),
+     .        P1(MVSIZ), P2(MVSIZ), P3(MVSIZ), P4(MVSIZ), STIF(MVSIZ),
+     .        GAPV(MVSIZ),STIFSAV(MVSIZ),VXI(MVSIZ),VYI(MVSIZ),VZI(MVSIZ),MSI(MVSIZ),RSTIF
       TYPE(H3D_DATABASE) :: H3D_DATA
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -2178,46 +2077,41 @@ C-----------------------------------------------
       INTEGER I, J1, IG, J, JG , K0,NBINTER,K1S,K,IL,IE, NN, NI,
      .        NA1,NA2,L
       INTEGER IX1(MVSIZ),IX2(MVSIZ),IX3(MVSIZ),IX4(MVSIZ),NSVG(MVSIZ)
-      my_real
-     .   FXI(MVSIZ), FYI(MVSIZ), FZI(MVSIZ), FNI(MVSIZ),
-     .   FXT(MVSIZ),FYT(MVSIZ),FZT(MVSIZ),
-     .   FX1(MVSIZ), FX2(MVSIZ), FX3(MVSIZ), FX4(MVSIZ),
-     .   FY1(MVSIZ), FY2(MVSIZ), FY3(MVSIZ), FY4(MVSIZ),
-     .   FZ1(MVSIZ), FZ2(MVSIZ), FZ3(MVSIZ), FZ4(MVSIZ),
-     .   N1(MVSIZ), N2(MVSIZ), N3(MVSIZ), PENE(MVSIZ),
-     .   VIS2(MVSIZ), DTMI(MVSIZ), XMU(MVSIZ),STIF0(MVSIZ),
-     .   H1(MVSIZ), H2(MVSIZ), H3(MVSIZ), H4(MVSIZ),
-     .   VX(MVSIZ), VY(MVSIZ), VZ(MVSIZ), VN(MVSIZ),DIST(MVSIZ),
-     .   VNX, VNY, VNZ, AA, CRIT,S2,RDIST,
-     .   FM2, DT12INV, VISCA, FAC, FAC2,FF,ALPHI,ALPHA,BETA,
-     .   FX, FY, FZ, F2, MAS2, M2SK, DTMI0,DTI,FT,FN,FMAX,FTN,
-     .   FACM1, ECONTT, ECONVT, H0, LA1, LA2, LA3, LA4,
-     .   D1,D2,D3,D4,A1,A2,A3,A4,
-     .   FSAV1, FSAV2, FSAV3, FSAV4, FSAV5, FSAV6, FSAV7, FSAV8,
-     .   FSAV9, FSAV10, FSAV11, FSAV12, FSAV13, FSAV14, FSAV15, FFO,
-     .   E10, H0D, S2D, SUM,
-     .   LA1D,LA2D,LA3D,LA4D,T1,T1D,T2,T2D,FFD,VISD,FACD,D1D,
-     .   P1S(MVSIZ),P2S(MVSIZ),P3S(MVSIZ),P4S(MVSIZ),
-     .   D2D,D3D,D4D,VNXD,VNYD,VNZD,V2D,FM2D,F2D,AAD,FXD,FYD,FZD,
-     .   A1D,A2D,A3D,A4D,VV,AX1,AX2,AY1,AY2,AZ1,AZ2,AX,AY,AZ,
-     .   AREA,P,VV1,VV2,V21,DMU, DTI2,H00 ,A0X,A0Y,A0Z,RX,RY,RZ,
-     .   ANX,ANY,ANZ,AAN,AAX,AAY,AAZ ,RR,RS,AAA ,TM,TS
-      my_real
-     .   PREC
-      my_real
-     .   ST1(MVSIZ),ST2(MVSIZ),ST3(MVSIZ),ST4(MVSIZ),STV(MVSIZ),
-     .   KT(MVSIZ),C(MVSIZ),CF(MVSIZ),
-     .   KS(MVSIZ),K1(MVSIZ),K2(MVSIZ),K3(MVSIZ),K4(MVSIZ),
-     .   CS(MVSIZ),C1(MVSIZ),C2(MVSIZ),C3(MVSIZ),C4(MVSIZ),
-     .   CX,CY,CFI,AUX,PHI1(MVSIZ), PHI2(MVSIZ), PHI3(MVSIZ),
-     .   PHI4(MVSIZ)
+      my_real FXI(MVSIZ), FYI(MVSIZ), FZI(MVSIZ), FNI(MVSIZ),
+     .        FXT(MVSIZ),FYT(MVSIZ),FZT(MVSIZ),
+     .        FX1(MVSIZ), FX2(MVSIZ), FX3(MVSIZ), FX4(MVSIZ),
+     .        FY1(MVSIZ), FY2(MVSIZ), FY3(MVSIZ), FY4(MVSIZ),
+     .        FZ1(MVSIZ), FZ2(MVSIZ), FZ3(MVSIZ), FZ4(MVSIZ),
+     .        N1(MVSIZ), N2(MVSIZ), N3(MVSIZ), PENE(MVSIZ),
+     .        VIS2(MVSIZ), DTMI(MVSIZ), XMU(MVSIZ),STIF0(MVSIZ),
+     .        H1(MVSIZ), H2(MVSIZ), H3(MVSIZ), H4(MVSIZ),
+     .        VX(MVSIZ), VY(MVSIZ), VZ(MVSIZ), VN(MVSIZ),DIST(MVSIZ),
+     .        VNX, VNY, VNZ, AA, CRIT,S2,RDIST,
+     .        FM2, DT12INV, VISCA, FAC, FAC2,FF,ALPHI,ALPHA,BETA,
+     .        FX, FY, FZ, F2, MAS2, M2SK, DTMI0,DTI,FT,FN,FMAX,FTN,
+     .        FACM1, ECONTT, ECONVT, H0, LA1, LA2, LA3, LA4,
+     .        D1,D2,D3,D4,A1,A2,A3,A4,
+     .        FSAV1, FSAV2, FSAV3, FSAV4, FSAV5, FSAV6, FSAV7, FSAV8,
+     .        FSAV9, FSAV10, FSAV11, FSAV12, FSAV13, FSAV14, FSAV15, FFO,
+     .        E10, H0D, S2D, SUM,
+     .        LA1D,LA2D,LA3D,LA4D,T1,T1D,T2,T2D,FFD,VISD,FACD,D1D,
+     .        P1S(MVSIZ),P2S(MVSIZ),P3S(MVSIZ),P4S(MVSIZ),
+     .        D2D,D3D,D4D,VNXD,VNYD,VNZD,V2D,FM2D,F2D,AAD,FXD,FYD,FZD,
+     .        A1D,A2D,A3D,A4D,VV,AX1,AX2,AY1,AY2,AZ1,AZ2,AX,AY,AZ,
+     .        AREA,P,VV1,VV2,V21,DMU, DTI2,H00 ,A0X,A0Y,A0Z,RX,RY,RZ,
+     .        ANX,ANY,ANZ,AAN,AAX,AAY,AAZ ,RR,RS,AAA ,TM,TS
+      my_real PREC
+      my_real ST1(MVSIZ),ST2(MVSIZ),ST3(MVSIZ),ST4(MVSIZ),STV(MVSIZ),
+     .        KT(MVSIZ),C(MVSIZ),CF(MVSIZ),
+     .        KS(MVSIZ),K1(MVSIZ),K2(MVSIZ),K3(MVSIZ),K4(MVSIZ),
+     .        CS(MVSIZ),C1(MVSIZ),C2(MVSIZ),C3(MVSIZ),C4(MVSIZ),
+     .        CX,CY,CFI,AUX,PHI1(MVSIZ), PHI2(MVSIZ), PHI3(MVSIZ),
+     .        PHI4(MVSIZ)
       INTEGER JSUB,KSUB,JJ,KK,IN,NSUB,IBID
-      my_real
-     .   IMPX,IMPY,IMPZ,PP1,PP2,PP3,PP4,BID,BBB,
-     .   V1,V2,V3,V4,VSX,VSY,VSZ,DVSX,DVSY,DVSZ,VSXP,VSYP,VSZP
+      my_real IMPX,IMPY,IMPZ,PP1,PP2,PP3,PP4,BID,BBB,
+     .        V1,V2,V3,V4,VSX,VSY,VSZ,DVSX,DVSY,DVSZ,VSXP,VSYP,VSZP
 C
 C-----------------------------------------------
-#include "sync_dir.inc"
       IF(DT12 > ZERO)THEN
         DT12INV = ONE/DT12
       ELSE
@@ -2380,23 +2274,23 @@ C---------------------------------
 #include "lockoff.inc"
 C
       IF(ANIM_V(4)+OUTP_V(4)+H3D_DATA%N_VECT_CONT > 0.AND.
-     .          (TT >= TANIM.OR.TT >= TOUTP.OR.TT >= H3D_DATA%TH3D.OR.
+     .          ((TT>=TANIM .AND. TT<=TANIM_STOP).OR.TT >= TOUTP.OR.TT >= H3D_DATA%TH3D.OR.
      .              (MANIM >= 4.AND.MANIM <= 15).OR. H3D_DATA%MH3D  /=  0))THEN
 #include "lockon.inc"
          DO I=1,JLT
           IF(PENE(I) > ZERO)THEN
-	    FCONT(1,IX1(I)) =FCONT(1,IX1(I)) + FX1(I)
-	    FCONT(2,IX1(I)) =FCONT(2,IX1(I)) + FY1(I)
-	    FCONT(3,IX1(I)) =FCONT(3,IX1(I)) + FZ1(I)
-	    FCONT(1,IX2(I)) =FCONT(1,IX2(I)) + FX2(I)
-	    FCONT(2,IX2(I)) =FCONT(2,IX2(I)) + FY2(I)
-	    FCONT(3,IX2(I)) =FCONT(3,IX2(I)) + FZ2(I)
-	    FCONT(1,IX3(I)) =FCONT(1,IX3(I)) + FX3(I)
-	    FCONT(2,IX3(I)) =FCONT(2,IX3(I)) + FY3(I)
-	    FCONT(3,IX3(I)) =FCONT(3,IX3(I)) + FZ3(I)
-	    FCONT(1,IX4(I)) =FCONT(1,IX4(I)) + FX4(I)
-	    FCONT(2,IX4(I)) =FCONT(2,IX4(I)) + FY4(I)
-	    FCONT(3,IX4(I)) =FCONT(3,IX4(I)) + FZ4(I)
+              FCONT(1,IX1(I)) =FCONT(1,IX1(I)) + FX1(I)
+              FCONT(2,IX1(I)) =FCONT(2,IX1(I)) + FY1(I)
+              FCONT(3,IX1(I)) =FCONT(3,IX1(I)) + FZ1(I)
+              FCONT(1,IX2(I)) =FCONT(1,IX2(I)) + FX2(I)
+              FCONT(2,IX2(I)) =FCONT(2,IX2(I)) + FY2(I)
+              FCONT(3,IX2(I)) =FCONT(3,IX2(I)) + FZ2(I)
+              FCONT(1,IX3(I)) =FCONT(1,IX3(I)) + FX3(I)
+              FCONT(2,IX3(I)) =FCONT(2,IX3(I)) + FY3(I)
+              FCONT(3,IX3(I)) =FCONT(3,IX3(I)) + FZ3(I)
+              FCONT(1,IX4(I)) =FCONT(1,IX4(I)) + FX4(I)
+              FCONT(2,IX4(I)) =FCONT(2,IX4(I)) + FY4(I)
+              FCONT(3,IX4(I)) =FCONT(3,IX4(I)) + FZ4(I)
             JG = NSVG(I)
             IF(JG > 0) THEN
               FCONT(1,JG)=FCONT(1,JG)- FXI(I)

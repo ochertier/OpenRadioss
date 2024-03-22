@@ -1,32 +1,32 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  PREINICRK4N                   source/elements/xfem/preinicrk4N.F
 Chd|-- called by -----------
 Chd|        LSLOCAL                       source/elements/xfem/lslocal.F
 Chd|-- calls ---------------
 Chd|        LSINTX                        source/elements/xfem/preinicrk4N.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        XFEM2DEF_MOD                  ../common_source/modules/xfem2def_mod.F
 Chd|====================================================================
       SUBROUTINE PREINICRK4N(ELBUF_STR,XFEM_STR,
@@ -53,7 +53,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c K s
 C-----------------------------------------------
 #include      "com_xfem1.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -146,8 +145,8 @@ c
           ELCRK = IELCRKC(I+NFT)
           IF (ELCUT(I+NFT) > 0) THEN
             ICRK = CRKSHELL(ILEV(1))%PHANTOMG(ELCRK)  ! global xfem element N
-            CRKLVSET(ILEV(1))%ELCUT(ELCRK) =  ICRK ! virer
-            CRKLVSET(ILEV(2))%ELCUT(ELCRK) = -ICRK ! virer
+            CRKLVSET(ILEV(1))%ELCUT(ELCRK) =  ICRK
+            CRKLVSET(ILEV(2))%ELCUT(ELCRK) = -ICRK
 c
             XFEM_PHANTOM(ILAY)%ELCUT(ELCRK) = ICRK
             CRKEDGE(ILAY)%LAYCUT(ELCRK) = 2
@@ -214,7 +213,7 @@ C
 C
                 CRKEDGE(ILAY)%EDGETIP(1,IEDGE) = MAX(IED,
      .                                     CRKEDGE(ILAY)%EDGETIP(1,IEDGE))
-                CRKEDGE(ILAY)%EDGETIP(2,IEDGE) = 
+                CRKEDGE(ILAY)%EDGETIP(2,IEDGE) =
      .                        CRKEDGE(ILAY)%EDGETIP(2,IEDGE) + 1
 C
 c               add check if BETA (0:1)
@@ -267,7 +266,7 @@ C------------------------------------------------------
         DO IXEL=1,NXEL
           GBUF => XFEM_STR(IXEL)%GBUF
           DO I=LFT,LLT
-           IF(ELCUT(I+NFT) > 0)THEN
+            IF(ELCUT(I+NFT) > 0)THEN
               OFF_PHANTOM = GBUF%OFF(I)
               GBUF%OFF(I) = - OFF_PHANTOM
             ENDIF

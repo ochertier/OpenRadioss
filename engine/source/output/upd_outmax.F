@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  UPD_TMAX                      source/output/upd_outmax.F    
 Chd|-- called by -----------
@@ -43,14 +43,14 @@ Chd|        TM_VONM_SHELL                 source/output/outmaxsubr.F
 Chd|        TM_VONM_SOLID                 source/output/outmaxsubr.F    
 Chd|        UPD_TMNORM2                   source/output/outmaxsubr.F    
 Chd|        UPD_TMTENS                    source/output/outmaxsubr.F    
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        OUTMAX_MOD                    ../common_source/modules/outmax_mod.F
 Chd|        STACK_MOD                     share/modules/stack_mod.F     
 Chd|====================================================================
       SUBROUTINE UPD_TMAX(ELBUF_TAB,IPARG   ,GEO     ,PM   ,
-     .  	       IXS	,IXS10   ,IXS16   ,IXS20   ,IXQ     ,
-     .  	       IXC	,IXTG	 ,IXT	  ,IXP     ,IXR     ,
-     .  	       X	,D       ,V       ,IAD_ELEM,FR_ELEM ,
+     .           IXS  ,IXS10   ,IXS16   ,IXS20   ,IXQ     ,
+     .           IXC  ,IXTG   ,IXT    ,IXP     ,IXR     ,
+     .           X  ,D       ,V       ,IAD_ELEM,FR_ELEM ,
      .             WEIGHT ,IPM   ,IGEO    ,STACK   ,ITASK   )
 C-----------------------------------------------
 C   M o d u l e s
@@ -70,7 +70,6 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "param_c.inc"
 #include      "task_c.inc"
-#include      "spmd_c.inc"
 #include      "tabsiz_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -118,6 +117,7 @@ C-----------------------------------------------
         NGFTSK   = 1+ITASK*NGROUP/ NTHREAD
         NGLTSK   = (ITASK+1)*NGROUP/NTHREAD
        DO NG=NGFTSK,NGLTSK
+         IF (IPARG(8,NG)==1) CYCLE                                 
          ITY=IPARG(5,NG)
          IF (ITY /= 1 .AND. ITY /= 3 .AND. ITY /= 7) CYCLE
          MTN=IPARG(1,NG)
@@ -193,11 +193,11 @@ C-----------------------------------------------
             NPT =  ELBUF_TAB(NG)%BUFLY(1)%NPTT
             ISUBSTACK = IPARG(71,NG)
             IF(ITY == 3)THEN
-              IMAT = IXC(1,NFT+1)				
-              IPID = IXC(6,NFT+1)				
+              IMAT = IXC(1,NFT+1)
+              IPID = IXC(6,NFT+1)
             ELSE
               IMAT = IXTG(1,NFT+1)
-              IPID = IXTG(5,NFT+1)				
+              IPID = IXTG(5,NFT+1)
             ENDIF
             IF (GBUF%G_TM_YIELD>0 ) THEN  !VONM main value
               VALUE(1:NEL) = ZERO            
@@ -209,7 +209,7 @@ C-----------------------------------------------
                IF (MTN == 151) CYCLE
                RHO = PM(1,IMAT)
                DO I=1,NEL
-             	  MASS(I) = RHO*GBUF%VOL(I)
+            MASS(I) = RHO*GBUF%VOL(I)
                   VALUE(I) = (GBUF%EINT(I)+ GBUF%EINT(I+NEL))/MAX(EM20,MASS(I))
                ENDDO
               GBUF%TM_EINT(1:NEL)= MAX(GBUF%TM_EINT(1:NEL),VALUE(1:NEL))
@@ -231,7 +231,7 @@ C-----------------------------------------------
                       END DO
                     END DO 
                   CASE(11)
-                    IPMAT = 100				    
+                    IPMAT = 100            
                     DO N=1,NPT
                       IADR = (N-1)*NEL
                       DO I=1,NEL
@@ -239,13 +239,13 @@ C-----------------------------------------------
                       END DO
                     END DO 
                   CASE(17,51,52)
-                    IPMAT = 2 + NLAY			   
+                    IPMAT = 2 + NLAY         
                     DO N=1,NLAY
-                      IADR = (N-1)*NEL			   
+                      IADR = (N-1)*NEL         
                       DO I=1,NEL
                         MATLY(IADR+I) = STACK%IGEO(IPMAT+N,ISUBSTACK)
-                      END DO				  
-                    END DO	
+                      END DO          
+                    END DO
                 END SELECT
                 CALL TM_DMGL25_SHELL(ELBUF_TAB(NG),NLAY,NPTR,NPTS,IGTYP,
      .                               PM,MATLY,VALUE,NEL)
@@ -270,28 +270,28 @@ C-----------------------------------------------
         NODLTSK   = (ITASK+1)*NUMNOD/NTHREAD
        IF (LMAX_DIS>0) CALL UPD_TMNORM2(D,TM_DIS,TM_PDIS,NODFTSK,NODLTSK)
        IF (LMAX_VEL>0) CALL UPD_TMNORM2(V,TM_VEL,TM_PVEL,NODFTSK,NODLTSK)
-       IF (LMAX_NSIG>0) THEN
+       IF (LMAX_NSIG>0 .AND.(NCYCLE <= 1 .OR. MOD(NCYCLE,NCY_GPS)==0)) THEN
 !$OMP SINGLE
          CALL GPS_SOLID(ELBUF_TAB,IPARG   ,GEO     ,PM   ,
-     .          IXS	,IXS10   ,IXS16   ,IXS20   ,IXQ     ,
-     .          IXC	,IXTG	 ,IXT	  ,IXP     ,IXR     ,
-     .          X	,IAD_ELEM,FR_ELEM ,WEIGHT  ,GPSTMP   )
+     .          IXS  ,IXS10   ,IXS16   ,IXS20   ,IXQ     ,
+     .          IXC  ,IXTG   ,IXT    ,IXP     ,IXR     ,
+     .          X  ,IAD_ELEM,FR_ELEM ,WEIGHT  ,GPSTMP  ,IGPSTAG )
 !$OMP END SINGLE
-         CALL SIG3DPIN2H(GPSTMP,P2TMP,NODFTSK,NODLTSK)
-         CALL UPD_TMTENS(GPSTMP,P2TMP,TM_NSIG1,TM_NSIG3,TM_PNSIG,NODFTSK,NODLTSK)
+         CALL SIG3DPIN2H(GPSTMP,P2TMP,NODFTSK,NODLTSK,IGPSTAG)
+         CALL UPD_TMTENS(GPSTMP,P2TMP,TM_NSIG1,TM_NSIG3,TM_PNSIG,NODFTSK,NODLTSK,IGPSTAG)
        END IF
 C-----------------         
          CALL MY_BARRIER()
 C-----------------         
-       IF (LMAX_NSTRA>0) THEN
+       IF (LMAX_NSTRA>0 .AND.(NCYCLE <= 1 .OR. MOD(NCYCLE,NCY_GPSTR)==0)) THEN
 !$OMP SINGLE
            CALL GPSTRA_SOLID(ELBUF_TAB,IPARG   ,GEO     ,PM   ,
-     .          IXS	,IXS10   ,IXS16   ,IXS20   ,IXQ     ,
-     .          IXC	,IXTG	 ,IXT	  ,IXP     ,IXR     ,
-     .          X	,IAD_ELEM,FR_ELEM ,WEIGHT  ,GPSTMP  )
+     .          IXS  ,IXS10   ,IXS16   ,IXS20   ,IXQ     ,
+     .          IXC  ,IXTG   ,IXT    ,IXP     ,IXR     ,
+     .          X  ,IAD_ELEM,FR_ELEM ,WEIGHT  ,GPSTMP  ,IGPSTRATAG)
 !$OMP END SINGLE
-         CALL SIG3DPIN2H(GPSTMP,P2TMP,NODFTSK,NODLTSK)
-         CALL UPD_TMTENS(GPSTMP,P2TMP,TM_NSTRA1,TM_NSTRA3,TM_PNSTRA,NODFTSK,NODLTSK)
+         CALL SIG3DPIN2H(GPSTMP,P2TMP,NODFTSK,NODLTSK,IGPSTRATAG)
+         CALL UPD_TMTENS(GPSTMP,P2TMP,TM_NSTRA1,TM_NSTRA3,TM_PNSTRA,NODFTSK,NODLTSK,IGPSTRATAG)
        END IF
       END IF !(NMAX_N > 0 )THEN   
 C-----------------         

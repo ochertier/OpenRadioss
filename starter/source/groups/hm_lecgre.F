@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  HM_LECGRE                     source/groups/hm_lecgre.F     
 Chd|-- called by -----------
@@ -56,6 +56,7 @@ Chd|====================================================================
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE MY_ALLOC_MOD
       USE UNITAB_MOD
       USE SUBMODEL_MOD
       USE MESSAGE_MOD
@@ -72,13 +73,7 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "param_c.inc"
 #include      "remesh_c.inc"
-#include      "scr03_c.inc"
 #include      "scr17_c.inc"
-#include      "submod_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "sysunit.inc"
-#include      "my_allocate.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -124,7 +119,6 @@ C-----------------------------------------------
       INTERFACE
        SUBROUTINE GROUPS_GET_ELEM_LIST(arg1,arg2,arg3)
         USE SUBMODEL_MOD
-#include      "submod_c.inc"
         INTEGER,DIMENSION(:),ALLOCATABLE       :: arg1
         INTEGER,INTENT(INOUT)                  :: arg2
         TYPE(SUBMODEL_DATA)                    :: arg3(NSUBMOD)
@@ -300,7 +294,7 @@ C-------------------------------------
                 IF(FLAG == 0)THEN
                   CALL GROUPS_GET_NENTITY(NEL,LSUBMODEL)
                   IGRELEM(IGS)%NENTITY=NEL
-                  MY_ALLOCATE(IGRELEM(IGS)%ENTITY,NEL)
+                  CALL MY_ALLOC(IGRELEM(IGS)%ENTITY,NEL)
                   IGRELEM(IGS)%ENTITY = 0
                 ELSEIF (FLAG == 1) THEN
                   
@@ -350,7 +344,7 @@ C-------------------------------------
      .                         KK       ,NEL     ,ELKEY  ,IGRELEM(IGS)%ID,TITR,LSUBMODEL)
                   KK=1
                   IGRELEM(IGS)%NENTITY=NEL
-                  MY_ALLOCATE(IGRELEM(IGS)%ENTITY,NEL)
+                  CALL MY_ALLOC(IGRELEM(IGS)%ENTITY,NEL)
                   IGRELEM(IGS)%ENTITY = 0
                 ELSEIF (FLAG == 1) THEN
                   NEL = IGRELEM(IGS)%NENTITY
@@ -417,7 +411,7 @@ C-------------------------
                     IF (BUFTMP(J) == 1) NEL=NEL+1
                   ENDDO!next J
                   IGRELEM(IGS)%NENTITY=NEL
-                  MY_ALLOCATE(IGRELEM(IGS)%ENTITY,NEL)
+                  CALL MY_ALLOC(IGRELEM(IGS)%ENTITY,NEL)
                   IGRELEM(IGS)%ENTITY = 0
                 ELSEIF (FLAG == 1) THEN
                   DO J=1,NUMEL
@@ -440,7 +434,7 @@ C-------------------------
                     END IF
                   ENDDO!next J
                   IGRELEM(IGS)%NENTITY=NEL
-                  MY_ALLOCATE(IGRELEM(IGS)%ENTITY,NEL)
+                  CALL MY_ALLOC(IGRELEM(IGS)%ENTITY,NEL)
                   IGRELEM(IGS)%ENTITY = 0
                 ELSEIF (FLAG == 1) THEN
                   DO J=1,NUMEL
@@ -502,7 +496,7 @@ C
               IADBOX = 1
               IFLAGUNIT = 0
               ID = IGRELEM(IGS)%ID
-              DO J=1,NUNITS
+              DO J=1,UNITAB%NUNITS
                 IF (UNITAB%UNIT_ID(J) == UID) THEN
                   FAC_L = UNITAB%FAC_L(J)
                   IFLAGUNIT = 1
@@ -527,7 +521,7 @@ C---
              IADBOXMAX = MAX(IADBOX,IADBOXMAX)
               IF(FLAG == 0)THEN
                 IGRELEM(IGS)%NENTITY=NEL
-                MY_ALLOCATE(IGRELEM(IGS)%ENTITY,NEL)
+                CALL MY_ALLOC(IGRELEM(IGS)%ENTITY,NEL)
                 IGRELEM(IGS)%ENTITY = 0
               ELSE IF(FLAG == 1)THEN
                 IGRELEM(IGS)%NENTITY=NEL
@@ -566,7 +560,7 @@ C---
                     IF (BUFTMP(IPARTE(J)) == 1) NEL=NEL+1
                   ENDDO
                   IGRELEM(IGS)%NENTITY=NEL
-                  MY_ALLOCATE(IGRELEM(IGS)%ENTITY,NEL)
+                  CALL MY_ALLOC(IGRELEM(IGS)%ENTITY,NEL)
                   IGRELEM(IGS)%ENTITY = 0
                 ELSEIF (FLAG == 1) THEN
                   DO J=1,NUMEL
@@ -588,7 +582,7 @@ C---
                     END IF
                   ENDDO
                   IGRELEM(IGS)%NENTITY=NEL
-                  MY_ALLOCATE(IGRELEM(IGS)%ENTITY,NEL)
+                  CALL MY_ALLOC(IGRELEM(IGS)%ENTITY,NEL)
                   IGRELEM(IGS)%ENTITY = 0
                 ELSEIF (FLAG == 1) THEN
                   DO J=1,NUMEL
@@ -634,7 +628,7 @@ C-------------------------
      .             NN      ,IGS     )
               IF (FLAG == 0) THEN
                 IGRELEM(IGS)%NENTITY=NEL
-                MY_ALLOCATE(IGRELEM(IGS)%ENTITY,NEL)
+                CALL MY_ALLOC(IGRELEM(IGS)%ENTITY,NEL)
                 IGRELEM(IGS)%ENTITY = 0
               ENDIF
             ENDIF
@@ -680,7 +674,7 @@ C-------------------------
                     IF (BUFTMP(J) == 1) NEL=NEL+1
                   ENDDO
                   IGRELEM(IGS)%NENTITY=NEL
-                  MY_ALLOCATE(IGRELEM(IGS)%ENTITY,NEL)
+                  CALL MY_ALLOC(IGRELEM(IGS)%ENTITY,NEL)
                   IGRELEM(IGS)%ENTITY = 0
                 ELSEIF (FLAG == 1) THEN
                   DO J=1,NUMEL
@@ -703,7 +697,7 @@ C-------------------------
                     END IF
                   ENDDO
                   IGRELEM(IGS)%NENTITY=NEL
-                  MY_ALLOCATE(IGRELEM(IGS)%ENTITY,NEL)
+                  CALL MY_ALLOC(IGRELEM(IGS)%ENTITY,NEL)
                   IGRELEM(IGS)%ENTITY = 0
                 ELSEIF (FLAG == 1) THEN
                   DO J=1,NUMEL

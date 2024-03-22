@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  ALLOCBUF_AUTO                 source/elements/elbuf/allocbuf_auto.F
 Chd|-- called by -----------
@@ -27,13 +27,15 @@ Chd|        ELBUF_INI                     source/elements/elbuf/elbuf_ini.F
 Chd|-- calls ---------------
 Chd|        READ_DB                       source/output/tools/read_db.F 
 Chd|        READ_DPDB                     source/output/tools/read_db.F 
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
+Chd|        H3D_INC_MOD                   share/modules/h3d_inc_mod.F   
 Chd|====================================================================
       SUBROUTINE ALLOCBUF_AUTO(ELBUF_STR,BUFLEN,NPT,ITY,ISNOD,NEWLEN,INLOC)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
-      USE ELBUFDEF_MOD            
+      USE ELBUFDEF_MOD    
+      USE H3D_INC_MOD          
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -42,7 +44,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com_xfem1.inc"
-#include      "inter22.inc"
 #include      "scr17_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -54,7 +55,8 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,K,IL,IR,IS,IT,IAD,ERR,NUVAR,NVARTMP,IGTYP,IXFEM,NLAY,
      .  NINTLAY,NPTR,NPTS,NPTT,NEL,NPG,IPT,LEN1,LEN2,ILAW,IMAT,IEOS,NONL,
-     .  IVISC,IPORO,NFAIL,NVAR_MAT,NVAR_VISC,NVAR_LOC,NVAR_LAY,NPTTOT,IADP
+     .  IVISC,IPORO,NFAIL,NVAR_MAT,NVAR_EOS,NVAR_VISC,NVAR_LOC,NVAR_LAY,NPTTOT,IADP,
+     .  IDRAPE
       INTEGER ! global variables
      .   G_GAMA,G_SIG,G_OFF,G_NOFF,G_EINT,G_EINS,G_TEMP,
      .   G_RHO,G_PLA,G_VOL,G_EPSD,G_QVIS,G_DELTAX,G_TB,G_RK,G_RE,
@@ -71,7 +73,7 @@ C-----------------------------------------------
      .   G_FORPGPINCH,G_MOMPGPINCH,G_EPGPINCHXZ,G_EPGPINCHYZ,G_EPGPINCHZZ,
      .   G_SKEW_ID,G_MAXFRAC,G_MAXEPS,G_GAMA_R,G_SLIPRING_ID,G_SLIPRING_STRAND,G_RETRACTOR_ID,
      .   G_RINGSLIP,G_ADD_NODE,G_UPDATE,G_INTVAR,G_BETAORTH,G_AMU,G_SLIPRING_FRAM_ID,G_FRAM_FACTOR,
-     .   G_TM_YIELD,G_TM_SEQ,G_TM_EINT,G_TM_DMG,G_TM_SIG,G_TM_STRA,G_TSAIWU
+     .   G_TM_YIELD,G_TM_SEQ,G_TM_EINT,G_TM_DMG,G_TM_SIG,G_TM_STRA,G_TSAIWU,G_DMGSCL
       INTEGER  ! layer variables
      .   LY_DMG,LY_GAMA,LY_DIRA,LY_DIRB,LY_CRKDIR,LY_PLAPT,LY_SIGPT,LY_SMSTR,
      .   LY_HOURG,LY_UELR,LY_UELR1,LY_OFFPG,LY_OFF,LEN_PLAPT,LEN_SIGPT
@@ -87,7 +89,7 @@ C-----------------------------------------------
      .   L_SEQ,L_SIGPLY,L_JAC_I,L_FAC_YLD,L_ABURN,L_MU,L_PLANL,L_EPSDNL,
      .   L_DMGSCL,L_PIJ,L_VOL0DP,L_TSAIWU
        INTEGER  ! failure variables
-     .   LF_DAM,LF_DAMMX,LF_TDEL,LF_INDX,LF_OFF
+     .   LF_DAM,LF_DAMMX,LF_DAMINI,LF_TDEL,LF_INDX,LF_OFF
       my_real, 
      .  ALLOCATABLE, DIMENSION(:)  :: RBUF
 
@@ -104,6 +106,8 @@ C-----------------------------------------------
       TYPE(BUF_INTLOC_)  , POINTER :: ILBUF
       TYPE(FAIL_LOC_)    , POINTER :: FLOC
       TYPE(BUF_NLOC_)    , POINTER :: BUFNL
+      TYPE(BUF_NLOCTS_)  , POINTER :: BUFNLTS
+      TYPE(L_BUFEL_DIR_) , POINTER :: LBUF_DIR
 c-------------------------------------------------
 c       allocation of sub-structures of the element buffer
 C=======================================================================
@@ -134,7 +138,9 @@ c-----
       IXFEM = NINT(RBUF(IAD+1))                        
         IAD = IAD+1                                      
       NXEL  = NINT(RBUF(IAD+1))                        
-        IAD = IAD+1                                      
+        IAD = IAD+1                     
+      IDRAPE  = NINT(RBUF(IAD+1))                        
+        IAD = IAD+1                     
 c-------------------------------------------------
       ELBUF_STR%IGTYP  = IGTYP
       ELBUF_STR%NEL    = NEL  
@@ -145,6 +151,7 @@ c-------------------------------------------------
       ELBUF_STR%NPTT   = NPTT 
       ELBUF_STR%IXFEM  = IXFEM 
       ELBUF_STR%NXEL   = NXEL 
+      ELBUF_STR%IDRAPE   = IDRAPE
       NPT  = NLAY*NPTR*NPTS*NPTT
 c-------------------------------------------------
       IF (ITY == 1 .OR. ITY == 2 .OR. ITY == 51 .OR. ITY == 101) THEN
@@ -182,7 +189,7 @@ c-------------------------------------------------
 c     LAYER VARIABLES
 c-------------------------------------------------
       DO IL = 1,ELBUF_STR%NLAY                                         
-c       Layer parameters : NPAR_LAY = 12 
+c       Layer parameters : NPAR_LAY = 13 
 c
         BUFLY => ELBUF_STR%BUFLY(IL)
 c
@@ -201,6 +208,8 @@ c
         NVAR_MAT = NINT(RBUF(IAD+1))               
           IAD = IAD+1                                                  
         NVARTMP = NINT(RBUF(IAD+1))               
+          IAD = IAD+1                                                  
+        NVAR_EOS = NINT(RBUF(IAD+1))               
           IAD = IAD+1                                                  
         NVAR_VISC= NINT(RBUF(IAD+1))                        
           IAD = IAD+1                                                  
@@ -374,6 +383,7 @@ c
         BUFLY%NFAIL     = NFAIL            
         BUFLY%NVAR_MAT  = NVAR_MAT         
         BUFLY%NVARTMP   = NVARTMP         
+        BUFLY%NVAR_EOS  = NVAR_EOS
         BUFLY%NVAR_VISC = NVAR_VISC        
         BUFLY%NVAR_LOC  = NVAR_LOC         
         BUFLY%NVAR_LAY  = NVAR_LAY         
@@ -396,7 +406,7 @@ c
         BUFLY%L_GAMA    = L_GAMA   
         BUFLY%L_STRA    = L_STRA   
         BUFLY%L_FRAC    = L_FRAC   
-        BUFLY%L_BFRAC   = L_BFRAC   	
+        BUFLY%L_BFRAC   = L_BFRAC   
         BUFLY%L_EINT    = L_EINT   
         BUFLY%L_EINS    = L_EINS   
         BUFLY%L_RHO     = L_RHO         
@@ -467,6 +477,8 @@ c-------------------------------------------------
         ALLOCATE(ELBUF_STR%BUFLY(IL)%EOS (NPTR,NPTS,NPTT),STAT=ERR)   
         ALLOCATE(ELBUF_STR%BUFLY(IL)%VISC(NPTR,NPTS,NPTT),STAT=ERR)   
         ALLOCATE(ELBUF_STR%BUFLY(IL)%PORO(NPTR,NPTS,NPTT),STAT=ERR)   
+        IF(IDRAPE > 0 .AND. (IGTYP == 51 .OR. IGTYP ==52))
+     .   ALLOCATE(ELBUF_STR%BUFLY(IL)%LBUF_DIR(NPTT),STAT=ERR)
 c-------------------------------------------------
 c-------------------------------------------------
 c       allocation & read of layer variables
@@ -477,12 +489,14 @@ c-------------------------------------------------
         ALLOCATE(BUFLY%GAMA (NEL*LY_GAMA)   ,STAT=ERR)                             
           BUFLY%GAMA(1:NEL*LY_GAMA) = RBUF(IAD+1:IAD+NEL*LY_GAMA)            
             IAD = IAD+NEL*LY_GAMA                                                
-        ALLOCATE(BUFLY%DIRA (NEL*LY_DIRA)   ,STAT=ERR)                             
+        IF(IDRAPE == 0 .OR. (IDRAPE > 0 .AND. IGTYP == 17)) THEN
+          ALLOCATE(BUFLY%DIRA (NEL*LY_DIRA)   ,STAT=ERR)                             
           BUFLY%DIRA(1:NEL*LY_DIRA) = RBUF(IAD+1:IAD+NEL*LY_DIRA)                 
             IAD = IAD+NEL*LY_DIRA                                                
-        ALLOCATE(BUFLY%DIRB (NEL*LY_DIRB)   ,STAT=ERR)                             
+          ALLOCATE(BUFLY%DIRB (NEL*LY_DIRB)   ,STAT=ERR)                             
           BUFLY%DIRB(1:NEL*LY_DIRB) = RBUF(IAD+1:IAD+NEL*LY_DIRB)                 
-            IAD = IAD+NEL*LY_DIRB                                                
+            IAD = IAD+NEL*LY_DIRB    
+        ENDIF                                                
         ALLOCATE(BUFLY%CRKDIR(NEL*LY_CRKDIR)   ,STAT=ERR)                             
           BUFLY%CRKDIR(1:NEL*LY_CRKDIR) = RBUF(IAD+1:IAD+NEL*LY_CRKDIR)                 
             IAD = IAD+NEL*LY_CRKDIR                                               
@@ -729,7 +743,18 @@ C---------- size of DP ---
          ENDDO !next IT
         ENDDO !next IS
        ENDDO !next IR
-      ENDDO !next IL                                                                     
+       IF(IDRAPE > 0 .AND. (IGTYP == 51 .OR. IGTYP == 52)) THEN
+         DO IT = 1, NPTT                
+          LBUF_DIR => ELBUF_STR%BUFLY(IL)%LBUF_DIR(IT)
+          ALLOCATE(LBUF_DIR%DIRA(NEL*LY_DIRA))                        
+          LBUF_DIR%DIRA(1:NEL*LY_DIRA) = RBUF(IAD+1:IAD+NEL*LY_DIRA)         
+          IAD = IAD + NEL*LY_DIRA                               
+          ALLOCATE(LBUF_DIR%DIRB(NEL*LY_DIRB)) 
+          LBUF_DIR%DIRB(1:NEL*LY_DIRB) = RBUF(IAD+1:IAD+NEL*LY_DIRB)         
+          IAD = IAD + NEL*LY_DIRB  
+        ENDDO !next IT
+      ENDIF 
+      ENDDO !next IL 
 C
       IF (ITY == 3 .OR. ITY == 7) THEN
 cc        NPTTOT  = 0
@@ -789,7 +814,7 @@ c-----    Material buffer - per integration point
 c
       DO IL = 1, NLAY                                                     
         NUVAR   = ELBUF_STR%BUFLY(IL)%NVAR_MAT                              
-        NVARTMP = ELBUF_STR%BUFLY(IL)%NVARTMP                              
+        NVARTMP = ELBUF_STR%BUFLY(IL)%NVARTMP
         IF (IGTYP == 51 .OR. IGTYP == 52) THEN
           NPTT = ELBUF_STR%BUFLY(IL)%NPTT
         ELSE
@@ -828,7 +853,11 @@ c-------------------------------
                 FLOC=>ELBUF_STR%BUFLY(IL)%FAIL(IR,IS,IT)%FLOC(K)  
          
                 FLOC%ILAWF = RBUF(IAD+1)                                   
-                IAD = IAD+1                                                
+                IAD = IAD+1    
+
+                FLOC%IDFAIL = RBUF(IAD+1)
+                IAD = IAD+1
+
                 NUVAR = RBUF(IAD+1)                                        
                 IAD = IAD+1                                                
                 FLOC%NVAR = NUVAR
@@ -839,7 +868,11 @@ c-------------------------------
 
                 LF_DAMMX = RBUF(IAD+1)                                        
                 IAD = IAD+1                                                
-                FLOC%LF_DAMMX = LF_DAMMX       
+                FLOC%LF_DAMMX = LF_DAMMX     
+
+                LF_DAMINI = RBUF(IAD+1)                                        
+                IAD = IAD+1                                                
+                FLOC%LF_DAMINI = LF_DAMINI
 
                 LF_TDEL = RBUF(IAD+1)                                        
                 IAD = IAD+1                                                
@@ -864,6 +897,10 @@ c-------------------------------
                 ALLOCATE(FLOC%DAMMX(NEL*LF_DAMMX), STAT=ERR)                    
                 FLOC%DAMMX(1:NEL*LF_DAMMX) = RBUF(IAD+1:IAD+NEL*LF_DAMMX)                        
                 IAD = IAD + NEL*LF_DAMMX     
+
+                ALLOCATE(FLOC%DAMINI(NEL*LF_DAMINI), STAT=ERR)                    
+                FLOC%DAMINI(1:NEL*LF_DAMINI) = RBUF(IAD+1:IAD+NEL*LF_DAMINI)                        
+                IAD = IAD + NEL*LF_DAMINI 
 
                 ALLOCATE(FLOC%TDEL(NEL*LF_TDEL), STAT=ERR)                    
                 FLOC%TDEL(1:NEL*LF_TDEL) = RBUF(IAD+1:IAD+NEL*LF_TDEL)                        
@@ -949,7 +986,70 @@ c-------------------------------
             ENDDO
           ENDDO
         ENDIF
+c-------------------------------
+c         Non-local regularization in the thickshell thickness                
+c-------------------------------
+      ELSEIF (ITY==1) THEN
+        ! Number of integration points in the shell thickness
+        NPTT = ELBUF_STR%NLAY
+        IF ((INLOC>0).AND.(NPTT>1)) THEN
+          ! Allocation of the non-local buffer
+          ALLOCATE(ELBUF_STR%NLOCTS(NPTR,NPTS), STAT=ERR)
+          ! Number of non-local nodes in the thickness
+          NONL = NPTT+1
+          ! Loop over the elements
+          DO IR = 1, NPTR
+            DO IS = 1, NPTS
+              ! Pointing the non-local buffer
+              BUFNLTS => ELBUF_STR%NLOCTS(IR,IS)
+              ! Non-local in-thickness masses
+              ALLOCATE(BUFNLTS%MASSTH(NEL,NONL), STAT=ERR) 
+              ! Non-local in-thickness cumulated variables
+              ALLOCATE(BUFNLTS%UNLTH(NEL,NONL) , STAT=ERR) 
+              ! Non-local in-thickness velocities
+              ALLOCATE(BUFNLTS%VNLTH(NEL,NONL) , STAT=ERR) 
+              ! Non-local in-thickness forces
+              ALLOCATE(BUFNLTS%FNLTH(NEL,NONL) , STAT=ERR) 
+              ! Copying the buffer
+              DO I = 1,NEL
+                ! Nodal masses
+                BUFNLTS%MASSTH(I,1:NONL) = RBUF(IAD+1:IAD+NONL)
+                IAD = IAD + NONL
+                ! Non-local in-thickness cumulated variables
+                BUFNLTS%UNLTH(I,1:NONL)  = RBUF(IAD+1:IAD+NONL)
+                IAD = IAD + NONL
+                ! Non-local in-thickness velocities
+                BUFNLTS%VNLTH(I,1:NONL)  = RBUF(IAD+1:IAD+NONL)
+                IAD = IAD + NONL
+                ! Non-local in-thickness forces
+                BUFNLTS%FNLTH(I,1:NONL)  = RBUF(IAD+1:IAD+NONL)
+                IAD = IAD + NONL
+              ENDDO
+            ENDDO
+          ENDDO
+        ENDIF
       ENDIF
+c-------------------------------
+c         EoS buffer
+c-------------------------------
+      DO IL = 1, NLAY 
+        NVAR_EOS = ELBUF_STR%BUFLY(IL)%NVAR_EOS                                                                                         
+        IF (IGTYP == 51 .OR. IGTYP == 52) THEN
+          NPTT = ELBUF_STR%BUFLY(IL)%NPTT
+        ELSE
+          NPTT = ELBUF_STR%NPTT
+        ENDIF
+        DO IR = 1,NPTR                                                    
+          DO IS = 1,NPTS                                                  
+            DO IT = 1,NPTT                                                           
+              ALLOCATE( ELBUF_STR%BUFLY(IL)%EOS(IR,IS,IT)%VAR(NEL*NVAR_EOS), STAT=ERR)                        
+              ELBUF_STR%BUFLY(IL)%EOS(IR,IS,IT)%VAR(1:NEL*NVAR_EOS) = RBUF(IAD+1:IAD+NEL*NVAR_EOS)                          
+              IAD = IAD+NEL*NVAR_EOS                                                                                                                   
+            ENDDO                                                             
+          ENDDO                                                              
+        ENDDO                                                             
+      ENDDO     
+            
 c-------------------------------------------------
 c     INTER LAYER VARIABLES
 c-------------------------------------------------
@@ -1025,7 +1125,9 @@ c-------------------------------
               DO K = 1,NFAIL                                               
                 FLOC=>ELBUF_STR%INTLAY(IL)%FAIL(IR,IS)%FLOC(K)           
                 FLOC%ILAWF = RBUF(IAD+1)                                   
-                IAD = IAD+1                                                
+                IAD = IAD+1       
+                FLOC%IDFAIL = RBUF(IAD+1)
+                IAD = IAD+1                                         
                 NUVAR = RBUF(IAD+1)                                        
                 IAD = IAD+1                                                
                 FLOC%NVAR = NUVAR                                          
@@ -1169,6 +1271,8 @@ C
         IAD = IAD + 1  
       G_EPSDNL= NINT(RBUF(IAD+1))         
         IAD = IAD + 1    
+      G_DMGSCL= NINT(RBUF(IAD+1))         
+        IAD = IAD + 1   
       G_TSAIWU= NINT(RBUF(IAD+1))         
         IAD = IAD + 1   
       G_TEMPG =  NINT(RBUF(IAD+1))         
@@ -1369,6 +1473,7 @@ C
       GBUF%G_MU     = G_MU   
       GBUF%G_PLANL  = G_PLANL
       GBUF%G_EPSDNL = G_EPSDNL 
+      GBUF%G_DMGSCL = G_DMGSCL
       GBUF%G_TSAIWU = G_TSAIWU      
       GBUF%G_TEMPG  = G_TEMPG     
       GBUF%G_COR_NF = G_COR_NF
@@ -1541,7 +1646,13 @@ C        ELBUF_STR%GBUF%EPGPINCHXZ => GBUF%EPGPINCHXZ ! [PM] add later
 C        ELBUF_STR%GBUF%EPGPINCHYZ => GBUF%EPGPINCHYZ ! [PM] add later
 C        ELBUF_STR%GBUF%EPGPINCHZZ => GBUF%EPGPINCHZZ ! [PM] add later
 C
-        ELBUF_STR%GBUF%STRPG => GBUF%STRA
+        IF (G_STRPG<=G_STRA) THEN
+          ELBUF_STR%GBUF%STRPG => GBUF%STRA
+        ELSE
+          ALLOCATE (ELBUF_STR%GBUF%STRPG(NEL*G_STRPG) ,STAT=ERR)                     
+          GBUF%STRPG(1:NEL*G_STRPG) = RBUF(IAD+1:IAD+NEL*G_STRPG)                  
+          IAD = IAD+NEL*G_STRPG 
+        END IF
       ELSEIF (NPG > 1) THEN
         ALLOCATE (ELBUF_STR%GBUF%FORPG(NEL*G_FORPG) ,STAT=ERR)                     
           GBUF%FORPG(1:NEL*G_FORPG) = RBUF(IAD+1:IAD+NEL*G_FORPG)                  
@@ -1790,6 +1901,53 @@ C
       ALLOCATE (ELBUF_STR%GBUF%SKEW_ID(NEL*G_SKEW_ID)         ,STAT=ERR)
         GBUF%SKEW_ID(1:NEL*G_SKEW_ID) = NINT(RBUF(IAD+1:IAD+NEL*G_SKEW_ID))
           IAD = IAD+NEL*G_SKEW_ID
+c            
+c---
+c         failure model for beams type 3
+c---
+      IF (IGTYP == 3 .and. G_NOFF > 0) THEN
+        ALLOCATE(ELBUF_STR%GBUF%FAIL(1) ,STAT=ERR)
+          GBUF%FAIL(1)%ILAWF     = NINT(RBUF(IAD+1))
+            IAD = IAD + 1
+          GBUF%FAIL(1)%IDFAIL    = NINT(RBUF(IAD+1))
+            IAD = IAD + 1
+          GBUF%FAIL(1)%NVAR      = NINT(RBUF(IAD+1))
+            IAD = IAD + 1
+          GBUF%FAIL(1)%LF_DAM    = NINT(RBUF(IAD+1))
+            IAD = IAD + 1
+          GBUF%FAIL(1)%LF_DAMMX  = NINT(RBUF(IAD+1))
+            IAD = IAD + 1
+          GBUF%FAIL(1)%LF_DAMINI = NINT(RBUF(IAD+1))
+            IAD = IAD + 1
+          GBUF%FAIL(1)%LF_TDEL   = NINT(RBUF(IAD+1))
+            IAD = IAD + 1
+          GBUF%FAIL(1)%LF_INDX   = NINT(RBUF(IAD+1))
+            IAD = IAD + 1
+          GBUF%FAIL(1)%LF_OFF    = NINT(RBUF(IAD+1))
+            IAD = IAD + 1
+
+          ALLOCATE(ELBUF_STR%GBUF%FAIL(1)%VAR(GBUF%FAIL(1)%NVAR*NEL) ,STAT=ERR)
+            GBUF%FAIL(1)%VAR(:) = RBUF(IAD+1:IAD+NEL*GBUF%FAIL(1)%NVAR)
+              IAD = IAD + NEL*GBUF%FAIL(1)%NVAR
+          ALLOCATE(ELBUF_STR%GBUF%FAIL(1)%DAM(GBUF%FAIL(1)%LF_DAM) ,STAT=ERR)
+            GBUF%FAIL(1)%DAM(:) = RBUF(IAD+1:IAD+NEL*GBUF%FAIL(1)%LF_DAM)
+              IAD = IAD + NEL*GBUF%FAIL(1)%LF_DAM
+          ALLOCATE(ELBUF_STR%GBUF%FAIL(1)%DAMMX(GBUF%FAIL(1)%LF_DAMMX) ,STAT=ERR)
+            GBUF%FAIL(1)%DAMMX(:) = RBUF(IAD+1:IAD+NEL*GBUF%FAIL(1)%LF_DAMMX)
+              IAD = IAD + NEL*GBUF%FAIL(1)%LF_DAMMX
+          ALLOCATE(ELBUF_STR%GBUF%FAIL(1)%DAMINI(GBUF%FAIL(1)%LF_DAMINI) ,STAT=ERR)
+            GBUF%FAIL(1)%DAMINI(:) = RBUF(IAD+1:IAD+NEL*GBUF%FAIL(1)%LF_DAMINI)
+              IAD = IAD + NEL*GBUF%FAIL(1)%LF_DAMINI
+          ALLOCATE(ELBUF_STR%GBUF%FAIL(1)%TDEL(GBUF%FAIL(1)%LF_TDEL) ,STAT=ERR)
+            GBUF%FAIL(1)%TDEL(:) = RBUF(IAD+1:IAD+NEL*GBUF%FAIL(1)%LF_TDEL)
+              IAD = IAD + NEL*GBUF%FAIL(1)%LF_TDEL
+          ALLOCATE(ELBUF_STR%GBUF%FAIL(1)%INDX(GBUF%FAIL(1)%LF_INDX) ,STAT=ERR)
+            GBUF%FAIL(1)%INDX(:) = RBUF(IAD+1:IAD+NEL*GBUF%FAIL(1)%LF_INDX)
+              IAD = IAD + NEL*GBUF%FAIL(1)%LF_INDX
+          ALLOCATE(ELBUF_STR%GBUF%FAIL(1)%OFF(GBUF%FAIL(1)%LF_OFF) ,STAT=ERR)
+            GBUF%FAIL(1)%OFF(:) = RBUF(IAD+1:IAD+NEL*GBUF%FAIL(1)%LF_OFF)
+              IAD = IAD + NEL*GBUF%FAIL(1)%LF_OFF
+      ENDIF
 c---
 c seatbelt elements
 c---

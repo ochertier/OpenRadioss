@@ -1,31 +1,31 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  EBCVIT4                       source/boundary_conditions/ebcs/ebcvit4.F
 Chd|-- called by -----------
 Chd|        EBCCLAP                       source/boundary_conditions/ebcs/ebcclap.F
 Chd|-- calls ---------------
-Chd|        EBCS_MOD                      ../common_source/modules/ebcs_mod.F
+Chd|        EBCS_MOD                      ../common_source/modules/boundary_conditions/ebcs_mod.F
 Chd|====================================================================
       SUBROUTINE EBCVIT4(V, A, LISTE, NOD, FV, RESO, LA, EBCS)
       USE EBCS_MOD
@@ -76,12 +76,12 @@ C
       ALPDT=ALP*DT1
 C
       IF(TT==ZERO)THEN
-     	  DO I=1,NOD
-	    N=LISTE(I)
-	    RESO(1,I)=A(1,N)
-	    RESO(2,I)=A(2,N)
-	    RESO(3,I)=A(3,N)
-     	  ENDDO
+            DO I=1,NOD
+              N=LISTE(I)
+              RESO(1,I)=A(1,N)
+              RESO(2,I)=A(2,N)
+              RESO(3,I)=A(3,N)
+            ENDDO
       ENDIF
 C
 c      write(6,*)'ebcvit4',VX,VY,VZ

@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  READ_SENSOR_NIC               source/tools/sensor/read_sensor_nic.F
 Chd|-- called by -----------
@@ -58,10 +58,7 @@ C-----------------------------------------------
 #include      "tabsiz_c.inc"
 #include      "com04_c.inc"
 #include      "sphcom.inc"
-#include      "warn_c.inc"
 #include      "units_c.inc"
-#include      "sysunit.inc"
-#include      "submod_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -134,14 +131,14 @@ c
           ENDIF
         ENDDO
       END IF
-      FAC_FORC = FAC_M_WORK * FAC_L_WORK / FAC_T_WORK**2
-      FAC_MOM  = FAC_FORC * FAC_L_WORK
+      FAC_FORC = UNITAB%FAC_M_WORK * UNITAB%FAC_L_WORK / UNITAB%FAC_T_WORK**2
+      FAC_MOM  = FAC_FORC * UNITAB%FAC_L_WORK
       IF (FTENS == 0) FTENS = 6806.0 / FAC_FORC 
       IF (FCOMP == 0) FCOMP = 6160.0 / FAC_FORC 
       IF (MFLEX == 0) MFLEX = 310.0  / FAC_MOM
       IF (MEXT  == 0) MEXT  = 135.0  / FAC_MOM
       IF (ALPHA == 0) ALPHA = 2.0775
-      IF (CFC == ZERO) CFC  = 600.0 * FAC_T_WORK
+      IF (CFC == ZERO) CFC  = 600.0 * UNITAB%FAC_T_WORK
 c--------------------------------------------------
 c     sensor data structure
 c--------------------------------------------------

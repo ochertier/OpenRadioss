@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  I24BUC1                       source/interfaces/inter3d1/i24buc1.F
 Chd|-- called by -----------
@@ -58,7 +58,8 @@ Chd|====================================================================
      8   NZ4,P1 ,P2 ,P3 ,P4 ,
      9   LB1,LB2,LB3,LB4,LC1,
      1   LC2,LC3,LC4,N11,N21,
-     2   N31,DGAPLOAD)
+     2   N31,DGAPLOAD,S_KREMNODE,S_REMNODE,
+     3   KREMNODE,REMNODE,FLAG_REMOVED_NODE)
 #ifndef HYPERMESH_LIB
       USE MESSAGE_MOD
 #endif
@@ -67,9 +68,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
@@ -77,10 +75,8 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "units_c.inc"
-#include      "warn_c.inc"
 #include      "com04_c.inc"
 #include      "vect07_c.inc"
-#include      "scr03_c.inc"
 #include      "scr05_c.inc"
 #include      "scr06_c.inc"
 #include      "scr17_c.inc"
@@ -101,6 +97,11 @@ C     REAL
      .   DIST,BUMULT,GAP,TZINF,MAXBOX,MINBOX,GAPMIN,GAPMAX,
      .   GAP_S_L(*),GAP_M_L(*),MARGE,GAP_N(12,*),PENMAX,XFIC(3,*)
       INTEGER ID
+      LOGICAL, INTENT(in) :: FLAG_REMOVED_NODE !< flag to remove some S node from the list of candidates
+      INTEGER, INTENT(in) :: S_KREMNODE !< size of KREMNODE
+      INTEGER, INTENT(in) :: S_REMNODE !< size of REMNODE   
+      INTEGER, DIMENSION(S_KREMNODE), INTENT(in) :: KREMNODE 
+      INTEGER, DIMENSION(S_REMNODE), INTENT(in) :: REMNODE
       CHARACTER*nchartitle,
      .   TITR
       INTEGER, DIMENSION(MVSIZ), INTENT(IN) ::PROV_N,PROV_E
@@ -138,9 +139,10 @@ C     REAL
      .         DIMENSION(:),ALLOCATABLE :: IWORK
       my_real,
      .         DIMENSION(:,:),ALLOCATABLE :: XTEN
-C
-!      EQUIVALENCE (PROV_N,IV(1,6)) ,(PROV_E,IV(1,7)) 
-      
+      INTEGER, DIMENSION(:), ALLOCATABLE :: TAG_REMOVED_NODE
+C    
+      ALLOCATE( TAG_REMOVED_NODE(NUMNOD) )
+      TAG_REMOVED_NODE(1:NUMNOD) = 0
       GAPMAX=EP30
       GAPMIN=ZERO
 C----edge fictive nodes----- 
@@ -445,7 +447,9 @@ C       SEPARER B ET N EN TWO
      K   NZ4    ,P1     ,P2     ,P3     ,P4     ,
      L   LB1    ,LB2    ,LB3    ,LB4    ,LC1    ,
      M   LC2    ,LC3    ,LC4    ,PENE   ,PROV_N ,
-     N   PROV_E ,N11    ,N21    ,N31    ,DGAPLOAD)
+     N   PROV_E ,N11    ,N21    ,N31    ,DGAPLOAD,
+     O   S_KREMNODE,S_REMNODE,KREMNODE,REMNODE,
+     P   TAG_REMOVED_NODE,FLAG_REMOVED_NODE)
 
        ELSE
         CALL I24TRI(
@@ -471,7 +475,9 @@ C       SEPARER B ET N EN TWO
      K   NZ4    ,P1     ,P2     ,P3     ,P4     ,
      L   LB1    ,LB2    ,LB3    ,LB4    ,LC1    ,
      M   LC2    ,LC3    ,LC4    ,PENE   ,PROV_N ,
-     N   PROV_E ,N11    ,N21    ,N31    ,DGAPLOAD)
+     N   PROV_E ,N11    ,N21    ,N31    ,DGAPLOAD,
+     O   S_KREMNODE,S_REMNODE,KREMNODE,REMNODE,
+     P   TAG_REMOVED_NODE,FLAG_REMOVED_NODE)
        END IF !(NSNE >0) THEN
 C------------------
       IF (I_MEM == 2)THEN
@@ -575,6 +581,7 @@ C
 
 C
       IF (NSNE >0) DEALLOCATE(XTEN,IWORK)
+      DEALLOCATE( TAG_REMOVED_NODE )
       RETURN
       END
 Chd|====================================================================
@@ -612,7 +619,6 @@ C-----------------------------------------------
 C     REAL
 C-----------------------------------------------
 C
-!      EQUIVALENCE (PENE,BV(1,22))
       INTEGER BITGET
       EXTERNAL BITGET
 C=======================================================================

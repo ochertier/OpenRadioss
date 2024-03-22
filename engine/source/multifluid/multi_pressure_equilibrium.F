@@ -1,40 +1,37 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  MULTI_PRESSURE_EQUILIBRIUM    source/multifluid/multi_pressure_equilibrium.F
 Chd|-- called by -----------
 Chd|        ALEMAIN                       source/ale/alemain.F          
 Chd|-- calls ---------------
 Chd|        MULTI_SUBMATLAW               source/multifluid/multi_submatlaw.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        INITBUF_MOD                   share/resol/initbuf.F         
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|====================================================================
       SUBROUTINE MULTI_PRESSURE_EQUILIBRIUM(TIMESTEP, ELBUF_TAB, IPARG, ITASK, IXS, IXQ, IXTG, 
      .     PM, IPM, MULTI_FVM, CURRENT_TIME, BUFMAT, NPF, TF)
-C-----------------------------------------------
-C     D e s c r i p t i o n
-C-----------------------------------------------
 C-----------------------------------------------
 C     M o d u l e s
 C-----------------------------------------------
@@ -73,6 +70,7 @@ C     L o c a l   V a r i a b l e s
 C-----------------------------------------------
       TYPE(G_BUFEL_), POINTER :: GBUF
       TYPE(L_BUFEL_), POINTER :: LBUF
+      TYPE(BUF_EOS_), POINTER :: EBUF
       INTEGER, DIMENSION(:, :), POINTER :: IX
       INTEGER :: NG, II, I
       INTEGER :: NEL
@@ -101,7 +99,7 @@ C-----------------------------------------------
      .     FPWT(MVSIZ, MULTI_FVM%NBMAT), FEWT(MVSIZ, MULTI_FVM%NBMAT), 
      .     FE0WT(MVSIZ, MULTI_FVM%NBMAT), TAU0WT(MVSIZ, MULTI_FVM%NBMAT)
       my_real :: DPDTAU, DPDE, P0(MVSIZ), COEF1, LIM_TAU(MVSIZ, MULTI_FVM%NBMAT), LIM
-      INTEGER :: NIX
+      INTEGER :: NIX,NVAREOS
       LOGICAL :: IDBG
       my_real :: DUMMY, PSHIFT
       my_real :: SIGOLD(MVSIZ*6)
@@ -152,11 +150,16 @@ C     Global buffer of the current group
                VOL  => GBUF%VOL
                EINT => MULTI_FVM%EINT(1 + NFT : NEL + NFT)
                RHO => MULTI_FVM%RHO(1 + NFT : NEL + NFT)
-               
-               CALL MULTI_SUBMATLAW(1, MATLAW, LOCAL_MATID, NEL, EINT, 
-     .              PRES, RHO, SSP, VOL, 
-     .              GRUN(1:NEL, 1), PM, IPM, NPROPM, NPROPMI, BUFMAT, GBUF%OFF, GBUF%TEMP, 
-     .              LBUF%BFRAC, GBUF%TB, GBUF%DELTAX, CURRENT_TIME, SIGOLD,NPF,TF)
+               EBUF => ELBUF_TAB(NG)%BUFLY(1)%EOS(1, 1, 1)
+               NVAREOS = ELBUF_TAB(NG)%BUFLY(1)%NVAR_EOS
+               CALL MULTI_SUBMATLAW(
+     1   1,            MATLAW,       LOCAL_MATID,  NEL,
+     2   EINT,         PRES,         RHO,          SSP,
+     3   VOL,          GRUN(1:NEL,1),PM,           IPM,
+     4   NPROPM,       NPROPMI,      BUFMAT,       GBUF%OFF,
+     5   GBUF%TEMP,    LBUF%BFRAC,   GBUF%TB,      GBUF%DELTAX,
+     6   CURRENT_TIME, SIGOLD,       NPF,          TF,
+     7   EBUF%VAR,     NVAREOS)
                DO II = 1, NEL
                   IF (MULTI_FVM%SOUND_SPEED(II + NFT) > ZERO) THEN
                      MULTI_FVM%SOUND_SPEED(II + NFT) = SQRT(MULTI_FVM%SOUND_SPEED(II + NFT))
@@ -263,10 +266,17 @@ C     Loop over the fluid layers
                   RHO  => RHOWT(1:NEL, IMAT)
                   EINT => EINTWT(1:NEL, IMAT)
                   LBUF => ELBUF_TAB(NG)%BUFLY(IMAT)%LBUF(1, 1, 1)
+                  EBUF => ELBUF_TAB(NG)%BUFLY(IMAT)%EOS(1, 1, 1)
+                  NVAREOS = ELBUF_TAB(NG)%BUFLY(IMAT)%NVAR_EOS                  
 C     Compute EOS
-                  CALL MULTI_SUBMATLAW(1, MATLAW, LOCAL_MATID, NEL, EINT, PRES, RHO, SSP, VOL, 
-     .                 GRUN(1:NEL, IMAT), PM, IPM, NPROPM, NPROPMI, BUFMAT, LBUF%OFF, LBUF%TEMP,
-     .                 LBUF%BFRAC, GBUF%TB, GBUF%DELTAX, CURRENT_TIME, SIGOLD,NPF,TF)
+                  CALL MULTI_SUBMATLAW(
+     1   1,               MATLAW,          LOCAL_MATID,     NEL,
+     2   EINT,            PRES,            RHO,             SSP,
+     3   VOL,             GRUN(1:NEL,IMAT),PM,              IPM,
+     4   NPROPM,          NPROPMI,         BUFMAT,          LBUF%OFF,
+     5   LBUF%TEMP,       LBUF%BFRAC,      GBUF%TB,         GBUF%DELTAX,
+     6   CURRENT_TIME,    SIGOLD,          NPF,             TF,
+     7   EBUF%VAR,        NVAREOS)
 C     Relaxed pressure initialization
                   DO II = 1, NEL
                      P0(II) = P0(II) + ALPHAWT(II, IMAT) * PRES(II)
@@ -425,10 +435,17 @@ C     Equation of state call
                      RHO  => RHOWT(1:NEL, IMAT)
                      EINT => EINTWT(1:NEL, IMAT)
                      LBUF => ELBUF_TAB(NG)%BUFLY(IMAT)%LBUF(1, 1, 1)
+                     EBUF => ELBUF_TAB(NG)%BUFLY(IMAT)%EOS(1, 1, 1)
+                     NVAREOS = ELBUF_TAB(NG)%BUFLY(IMAT)%NVAR_EOS
 C     Compute EOS
-                     CALL MULTI_SUBMATLAW(0, MATLAW, LOCAL_MATID, NEL, EINT, PRES, RHO, SSP, VOL, 
-     .                    GRUN(1:NEL, IMAT), PM, IPM, NPROPM, NPROPMI, BUFMAT, LBUF%OFF,LBUF%TEMP,
-     .                    LBUF%BFRAC, GBUF%TB, GBUF%DELTAX, CURRENT_TIME, SIGOLD, NPF, TF)
+                     CALL MULTI_SUBMATLAW(
+     1   0,               MATLAW,          LOCAL_MATID,     NEL,
+     2   EINT,            PRES,            RHO,             SSP,
+     3   VOL,             GRUN(1:NEL,IMAT),PM,              IPM,
+     4   NPROPM,          NPROPMI,         BUFMAT,          LBUF%OFF,
+     5   LBUF%TEMP,       LBUF%BFRAC,      GBUF%TB,         GBUF%DELTAX,
+     6   CURRENT_TIME,    SIGOLD,          NPF,             TF,
+     7   EBUF%VAR,        NVAREOS)
                   ENDDO         ! IMAT = 1, NBMAT 
                   
                ENDDO            !ITER = 1, MAX_ITER
@@ -466,6 +483,9 @@ C     Loop over the fluid layers
                   VOL  => VOLWT(1:NEL, IMAT)
                   RHO  => RHOWT(1:NEL, IMAT)
                   EINT => EINTWT(1:NEL, IMAT)
+                  
+                  EBUF => ELBUF_TAB(NG)%BUFLY(IMAT)%EOS(1, 1, 1)
+                  NVAREOS = ELBUF_TAB(NG)%BUFLY(IMAT)%NVAR_EOS                  
 
                   LBUF => ELBUF_TAB(NG)%BUFLY(IMAT)%LBUF(1, 1, 1)
                   MULTI_FVM%PHASE_EINT(IMAT, 1 + NFT : NEL + NFT) = EINTWT(1:NEL, IMAT)
@@ -475,9 +495,15 @@ C     Loop over the fluid layers
                      MULTI_FVM%PHASE_ALPHA(IMAT, I) = VOLWT(II, IMAT) / GBUF%VOL(II)
                   ENDDO
 C     Compute EOS
-                  CALL MULTI_SUBMATLAW(0, MATLAW, LOCAL_MATID, NEL, EINT, PRES, RHO, SSP, VOL, 
-     .                 GRUN(1:NEL, IMAT), PM, IPM, NPROPM, NPROPMI, BUFMAT, LBUF%OFF,LBUF%TEMP,
-     .                 LBUF%BFRAC, GBUF%TB, GBUF%DELTAX, CURRENT_TIME, SIGOLD, NPF, TF)
+                  CALL MULTI_SUBMATLAW(
+     1   0,               MATLAW,          LOCAL_MATID,     NEL,
+     2   EINT,            PRES,            RHO,             SSP,
+     3   VOL,             GRUN(1:NEL,IMAT),PM,              IPM,
+     4   NPROPM,          NPROPMI,         BUFMAT,          LBUF%OFF,
+     5   LBUF%TEMP,       LBUF%BFRAC,      GBUF%TB,         GBUF%DELTAX,
+     6   CURRENT_TIME,    SIGOLD,          NPF,             TF,
+     7   EBUF%VAR,        NVAREOS)
+     
                ENDDO            ! IMAT = 1, NBMAT                             
                
 C     Equilibrium densities have been found,
@@ -592,9 +618,16 @@ C     Call equation of state for the submaterial
                      SSP  => SSPWT(1:NEL, IMAT)
                      VOL  => VOLWT(1:NEL, IMAT)
                      LBUF => ELBUF_TAB(NG)%BUFLY(IMAT)%LBUF(1, 1, 1)
-                     CALL MULTI_SUBMATLAW(0, MATLAW, LOCAL_MATID, NEL, EINT, PRES, RHO, SSP, VOL, 
-     .                    GRUN(1:NEL, IMAT), PM, IPM, NPROPM, NPROPMI, BUFMAT, LBUF%OFF,LBUF%TEMP,
-     .                    LBUF%BFRAC, GBUF%TB, GBUF%DELTAX, CURRENT_TIME, SIGOLD, NPF, TF)
+                     EBUF => ELBUF_TAB(NG)%BUFLY(IMAT)%EOS(1, 1, 1)
+                     NVAREOS = ELBUF_TAB(NG)%BUFLY(IMAT)%NVAR_EOS                     
+                     CALL MULTI_SUBMATLAW(
+     1   0,               MATLAW,          LOCAL_MATID,     NEL,
+     2   EINT,            PRES,            RHO,             SSP,
+     3   VOL,             GRUN(1:NEL,IMAT),PM,              IPM,
+     4   NPROPM,          NPROPMI,         BUFMAT,          LBUF%OFF,
+     5   LBUF%TEMP,       LBUF%BFRAC,      GBUF%TB,         GBUF%DELTAX,
+     6   CURRENT_TIME,    SIGOLD,          NPF,             TF,
+     7   EBUF%VAR,        NVAREOS)
                   ENDDO  ! IMAT = 1, NBMAT
                   DO II = 1, NEL
                      IF (CV_INDICATOR(II) /= 1) THEN

@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  HM_READ_SUBMODEL              source/model/assembling/hm_read_submodel.F
 Chd|-- called by -----------
@@ -56,15 +56,9 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "nchar_c.inc"
-#include      "submod_c.inc"
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
 #include      "scr17_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -143,54 +137,14 @@ C
         LSUBMODEL(I)%IFATHER = IFATHER(I)
         LSUBMODEL(I)%NOSUBMOD = NOSUBMOD(I) 
         LSUBMODEL(I)%LEVEL = LEVEL(I)  
-        LSUBMODEL(I)%UID = UID_SUB(I) 
-
-        LSUBMODEL(I)%OFF_DEF0 =  OFFSETS(1,I)    
-        LSUBMODEL(I)%OFF_NOD0 =  OFFSETS(2,I)     
-        LSUBMODEL(I)%OFF_EL0 =  OFFSETS(3,I)  
-        LSUBMODEL(I)%OFF_PART0 =  OFFSETS(4,I)  
-        LSUBMODEL(I)%OFF_MAT0 =  OFFSETS(5,I)  
-        LSUBMODEL(I)%OFF_PROP0 =  OFFSETS(6,I)  
-        LSUBMODEL(I)%OFF_SUBMOD0 =  OFFSETS(7,I)  
+        LSUBMODEL(I)%UID = UID_SUB(I)
       ENDDO
 c
       ISUBSKEW = 1000000000
       DO I=1,NSUBMOD
         ISUBSKEW = ISUBSKEW + 1
-        IF (LSUBMODEL(I)%OFF_NOD0 == 0)    LSUBMODEL(I)%OFF_NOD0    = LSUBMODEL(I)%OFF_DEF0
-        IF (LSUBMODEL(I)%OFF_EL0 == 0)     LSUBMODEL(I)%OFF_EL0     = LSUBMODEL(I)%OFF_DEF0
-        IF (LSUBMODEL(I)%OFF_PART0 == 0)   LSUBMODEL(I)%OFF_PART0   = LSUBMODEL(I)%OFF_DEF0
-        IF (LSUBMODEL(I)%OFF_MAT0 == 0)    LSUBMODEL(I)%OFF_MAT0    = LSUBMODEL(I)%OFF_DEF0
-        IF (LSUBMODEL(I)%OFF_PROP0 == 0)   LSUBMODEL(I)%OFF_PROP0   = LSUBMODEL(I)%OFF_DEF0
-        IF (LSUBMODEL(I)%OFF_SUBMOD0 == 0) LSUBMODEL(I)%OFF_SUBMOD0 = LSUBMODEL(I)%OFF_DEF0
         IF (LSUBMODEL(I)%SKEW == 0) LSUBMODEL(I)%SKEW = ISUBSKEW
       ENDDO
-      IF (NSUBMOD /= 0) THEN
-        DO I=1,NSUBMOD
-          CUR_SUBMOD = I
-          LSUBMODEL(I)%OFF_DEF = LSUBMODEL(I)%OFF_DEF0
-          LSUBMODEL(I)%OFF_NOD = LSUBMODEL(I)%OFF_NOD0
-          LSUBMODEL(I)%OFF_EL = LSUBMODEL(I)%OFF_EL0
-          LSUBMODEL(I)%OFF_PART = LSUBMODEL(I)%OFF_PART0 
-          LSUBMODEL(I)%OFF_MAT = LSUBMODEL(I)%OFF_MAT0
-          LSUBMODEL(I)%OFF_PROP = LSUBMODEL(I)%OFF_PROP0
-          LSUBMODEL(I)%OFF_SUBMOD = LSUBMODEL(I)%OFF_SUBMOD0
-          DO WHILE (LSUBMODEL(CUR_SUBMOD)%IFATHER /= 0)
-            CUR_SUBMOD = LSUBMODEL(CUR_SUBMOD)%IFATHER
-            LSUBMODEL(I)%OFF_DEF = LSUBMODEL(I)%OFF_DEF + LSUBMODEL(CUR_SUBMOD)%OFF_DEF0 
-            LSUBMODEL(I)%OFF_NOD = LSUBMODEL(I)%OFF_NOD + LSUBMODEL(CUR_SUBMOD)%OFF_NOD0 
-            LSUBMODEL(I)%OFF_EL = LSUBMODEL(I)%OFF_EL + LSUBMODEL(CUR_SUBMOD)%OFF_EL0 
-            LSUBMODEL(I)%OFF_PART = LSUBMODEL(I)%OFF_PART + LSUBMODEL(CUR_SUBMOD)%OFF_PART0 
-            LSUBMODEL(I)%OFF_MAT = LSUBMODEL(I)%OFF_MAT + LSUBMODEL(CUR_SUBMOD)%OFF_MAT0 
-            LSUBMODEL(I)%OFF_PROP = LSUBMODEL(I)%OFF_PROP + LSUBMODEL(CUR_SUBMOD)%OFF_PROP0
-            LSUBMODEL(I)%OFF_SUBMOD = LSUBMODEL(I)%OFF_SUBMOD + LSUBMODEL(CUR_SUBMOD)%OFF_SUBMOD0
-            IF(LSUBMODEL(I)%NOSUBMOD /= 0)
-     .        LSUBMODEL(I)%NOSUBMOD = LSUBMODEL(I)%NOSUBMOD + LSUBMODEL(CUR_SUBMOD)%OFF_SUBMOD0 
-            IF(LSUBMODEL(I)%UID /= 0)
-     .        LSUBMODEL(I)%UID = LSUBMODEL(I)%UID  + LSUBMODEL(CUR_SUBMOD)%OFF_DEF0 
-          ENDDO
-        ENDDO
-      ENDIF
       IF (NSUBMOD /= 0) THEN
         DO I=1,NSUBMOD
           CUR_SUBMOD = I

@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  ALEW                          source/ale/grid/alew.F        
 Chd|-- called by -----------
@@ -27,7 +27,8 @@ Chd|        ALEWDX                        source/ale/grid/alewdx.F
 Chd|-- calls ---------------
 Chd|        MY_BARRIER                    source/system/machine.F       
 Chd|        SPMD_WVOIS                    source/mpi/fluid/spmd_cfd.F   
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
+Chd|        ALE_MOD                       ../common_source/modules/ale/ale_mod.F
 Chd|====================================================================
       SUBROUTINE ALEW(
      1     X              ,D       ,V        ,W       ,WA      ,
@@ -37,6 +38,7 @@ C-----------------------------------------------
 C     M o d u l e s 
 C-----------------------------------------------
       USE ALE_CONNECTIVITY_MOD
+      USE ALE_MOD
 C-----------------------------------------------
 C     D e s c r i p t i o n
 C-----------------------------------------------
@@ -53,12 +55,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C     C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr05_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com07_c.inc"
 #include      "com08_c.inc"
-#include      "param_c.inc"
 #include      "tabsiz_c.inc"
 C-----------------------------------------------
 C     D u m m y   A r g u m e n t s
@@ -88,17 +87,9 @@ C
 C     SPMD EXCHANGE : X, D, WA (X is already OK if INCOMP=0)
 C     
       IF(NSPMD > 1)THEN
-C     
-C     Part not parallel smt
-C     
 !$OMP SINGLE
-
          LENCOM=NBRCVOIS(NSPMD+1)+NBSDVOIS(NSPMD+1)
-         CALL SPMD_WVOIS(
-     1        X	  ,D	   ,WA    ,NBRCVOIS,NBSDVOIS,
-     2        LNRCVOIS,LNSDVOIS,LENCOM)
-
-C     End part not parallel smt
+         CALL SPMD_WVOIS(X,D,WA,NBRCVOIS,NBSDVOIS,LNRCVOIS,LNSDVOIS,LENCOM)
 !$OMP END SINGLE
 
       END IF
@@ -110,14 +101,13 @@ C
          W(3,N)=V(3,N)*XLAGR
       ENDDO
 C     
-      IF(ALPHA == ZERO) THEN
+      IF(ALE%GRID%ALPHA == ZERO) THEN
          DO I = NODFT,NODLT
             IF(NALE(I)  /=  0) THEN
                NCI=0
                WIX=ZERO
                WIY=ZERO
                WIZ=ZERO
-C     
                IAD1 = ALE_NN_CONNECT%IAD_CONNECT(I)
                IAD2 = ALE_NN_CONNECT%IAD_CONNECT(I + 1) - 1
                DO K = IAD1, IAD2
@@ -153,9 +143,7 @@ C
                   J = ALE_NN_CONNECT%CONNECTED(K)
                   IF (J > 0) THEN
                      NCI = NCI + 1
-                     LIJ2= (X(1,J)-X(1,I))*(X(1,J)-X(1,I))
-     .                    + (X(2,J)-X(2,I))*(X(2,J)-X(2,I))
-     .                    + (X(3,J)-X(3,I))*(X(3,J)-X(3,I))
+                     LIJ2= (X(1,J)-X(1,I))*(X(1,J)-X(1,I))+ (X(2,J)-X(2,I))*(X(2,J)-X(2,I))+ (X(3,J)-X(3,I))*(X(3,J)-X(3,I))
                      LIJSQR = SQRT(LIJ2)
                      LIJ=MAX(EM20,LIJSQR)
                      IF(LIJ < EP20) THEN
@@ -170,7 +158,7 @@ C
                   ENDIF
                ENDDO
 C     
-               FAC=ALPHA*SLI/(NCI*NCI*DT2)
+               FAC=ALE%GRID%ALPHA*SLI/(NCI*NCI*DT2)
                W(1,I) = WIX/NCI + FAC*FIX
                W(2,I) = WIY/NCI + FAC*FIY
                W(3,I) = WIZ/NCI + FAC*FIZ
@@ -179,18 +167,12 @@ C
          ENDDO
       ENDIF
 C     
-      IF(GAMMA < EIGHTY19)THEN
+      IF(ALE%GRID%GAMMA < EIGHTY19)THEN
          DO I = NODFT,NODLT
             IF(NALE(I)  /=  0) THEN
-               IF(V(1,I) /= ZERO)
-     .              W(1,I)=VGX*V(1,I)*
-     .              MAX((ONE-GAMMA), MIN((ONE+GAMMA),W(1,I)/V(1,I)))
-               IF(V(2,I) /= ZERO)
-     .              W(2,I)=VGY*V(2,I)*
-     .              MAX((ONE-GAMMA), MIN((ONE+GAMMA),W(2,I)/V(2,I)))
-               IF(V(3,I) /= ZERO)
-     .              W(3,I)=VGZ*V(3,I)*
-     .              MAX((ONE-GAMMA), MIN((ONE+GAMMA),W(3,I)/V(3,I)))
+               IF(V(1,I) /= ZERO) W(1,I)=ALE%GRID%VGX*V(1,I)*MAX((ONE-ALE%GRID%GAMMA), MIN((ONE+ALE%GRID%GAMMA),W(1,I)/V(1,I)))
+               IF(V(2,I) /= ZERO) W(2,I)=ALE%GRID%VGY*V(2,I)*MAX((ONE-ALE%GRID%GAMMA), MIN((ONE+ALE%GRID%GAMMA),W(2,I)/V(2,I)))
+               IF(V(3,I) /= ZERO) W(3,I)=ALE%GRID%VGZ*V(3,I)*MAX((ONE-ALE%GRID%GAMMA), MIN((ONE+ALE%GRID%GAMMA),W(3,I)/V(3,I)))
             ENDIF
          ENDDO
       ENDIF

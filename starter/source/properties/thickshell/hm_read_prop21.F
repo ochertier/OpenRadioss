@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  HM_PROP_READ21                source/properties/thickshell/hm_read_prop21.F
 Chd|-- called by -----------
@@ -48,16 +48,11 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "units_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "warn_c.inc"
-#include      "scr03_c.inc"
 #include      "scr17_c.inc"
 #include      "scr21_c.inc"
 #include      "tablen_c.inc"
@@ -74,9 +69,9 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER IHBE,ISMSTR,IPLAST,ICPRE,ICSTR,NPT,NPTR,NPTS,NPTT,
-     .    IINT,JCVT,IP,ISK,IREP,IDSK,ISTRAIN
+     .    IINT,JCVT,IP,ISK,IREP,IDSK,ISTRAIN,NLY
       my_real
-     .    CVIS,QA,QB,VX,VY,VZ,ANGLE,DTMIN,PUN
+     .    CVIS,QA,QB,VX,VY,VZ,ANGLE,DTMIN,PUN,VDEFMIN,VDEFMAX,ASPMAX,ASPTET
       INTEGER J
       LOGICAL IS_AVAILABLE, IS_ENCRYPTED
       CHARACTER IDTITL*nchartitle
@@ -132,6 +127,10 @@ C--------------------------------------------------
       CALL HM_GET_FLOATV('qa',QA,IS_AVAILABLE,LSUBMODEL,UNITAB)
       CALL HM_GET_FLOATV('qb',QB,IS_AVAILABLE,LSUBMODEL,UNITAB)
       CALL HM_GET_FLOATV('deltaT_min',DTMIN,IS_AVAILABLE,LSUBMODEL,UNITAB)
+      CALL HM_GET_FLOATV('vdef_min',VDEFMIN,IS_AVAILABLE,LSUBMODEL,UNITAB)
+      CALL HM_GET_FLOATV('vdef_max',VDEFMAX,IS_AVAILABLE,LSUBMODEL,UNITAB)
+      CALL HM_GET_FLOATV('ASP_max',ASPMAX,IS_AVAILABLE,LSUBMODEL,UNITAB)
+      CALL HM_GET_FLOATV('COL_min',ASPTET,IS_AVAILABLE,LSUBMODEL,UNITAB)
 C----------------------
 Capply submodel transform to V (VX,VY,VZ) 
 C
@@ -163,6 +162,8 @@ C  smstr
 C
 C  icpre/icstr
 C
+C      ICPRE = 0  
+      IF (IHBE == 14 .AND. ICSTR == 0) ICSTR = 10
       IF (IHBE == 14 .AND.
      .    (ICSTR /= 1.AND.ICSTR /= 10.AND.ICSTR /= 100)) THEN
          CALL ANCMSG(MSGID=677,
@@ -196,11 +197,20 @@ C
      .                I2=NPT,
      .                I3=IHBE)
         ENDIF
+        NLY = NPT
       CASE(14)
         IF (NPT == 0) NPT = 222
         NPTR= NPT/100
         NPTS= MOD(NPT/10,10)
         NPTT= MOD(NPT,10)
+        SELECT CASE(ICSTR)
+          CASE(1)
+            NLY = NPTT
+          CASE(10)
+            NLY = NPTS
+          CASE(100)
+            NLY = NPTR
+        END SELECT 
         IF (IHBE == 14 .AND.
      .     (NPTR < 1 .OR. NPTS < 1 .OR. NPTT < 1 .OR.
      .      NPTR > 9 .OR. NPTS > 9 .OR. NPTT > 9)) THEN
@@ -274,6 +284,7 @@ C
       IGEO(14) = ICSTR
       IGEO(15) = IINT
       IGEO(16) = JCVT-1
+      IGEO(30) = NLY
 C
       GEO(1)   = ANGLE
       GEO(7)   = VX
@@ -283,6 +294,11 @@ C
       GEO(14)  = QA
       GEO(15)  = QB
       GEO(172) = DTMIN
+      GEO(172) = DTMIN
+      GEO(190)= VDEFMIN
+      GEO(191)= VDEFMAX
+      GEO(192)= ASPMAX
+      GEO(193)= ASPTET
 C----
       IF(.NOT.IS_ENCRYPTED)THEN
         IF(IGEO(31) == 1)THEN
@@ -300,6 +316,11 @@ C----
       ELSE
         WRITE(IOUT,1099) IG
       ENDIF
+      IF((VDEFMIN+VDEFMAX+ASPMAX+ASPTET)>ZERO) THEN
+        IF (VDEFMAX==ZERO) VDEFMAX=EP10
+        IF (ASPMAX==ZERO) ASPMAX=EP10
+        WRITE(IOUT,3000) VDEFMIN,VDEFMAX,ASPMAX,ASPTET 
+      END IF          
 C
       IF(GEO( 3)/=ZERO.AND.IGEO( 5)== 0) IGEO( 5)=NINT(GEO( 3))
       IF(GEO(39)/=ZERO.AND.IGEO( 9)== 0) IGEO( 9)=NINT(GEO(39))
@@ -374,5 +395,10 @@ C---
      & 5X,'     VISCOSITY (QB) WILL BE USED . . . =',1PG20.13/,
      & 5X,'EXCEPT IN CASE LAW 70 WHERE QB = 0.     ',/,
      & 5X,'BRICK MINIMUM TIME STEP................=',1PG20.13/)
+ 3000 FORMAT(
+     & 5X,'SOLID MINIMUM VOLUMETRIC STRAIN........=',1PG20.13/,
+     & 5X,'SOLID MAXIMUM VOLUMETRIC STRAIN........=',1PG20.13/,
+     & 5X,'SOLID MAXIMUM ASPECT RATIO.............=',1PG20.13/,
+     & 5X,'SOLID MINIMUM COLLAPSE RATIO...........=',1PG20.13/)
 C---
       END SUBROUTINE HM_PROP_READ21

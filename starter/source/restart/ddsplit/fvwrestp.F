@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
 Chd|====================================================================
 Chd|  FVWRESTP                      source/restart/ddsplit/fvwrestp.F
@@ -27,11 +27,11 @@ Chd|-- called by -----------
 Chd|        DDSPLIT                       source/restart/ddsplit/ddsplit.F
 Chd|-- calls ---------------
 Chd|        WRITE_DB                      source/restart/ddsplit/wrrest.F
-Chd|        WRITE_I_C                     source/output/tools/write_routines.c
+Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|        FVBAG_MOD                     share/modules1/fvbag_mod.F    
-Chd|        FVMBAG_MESHCONTROL_MOD        ../common_source/modules/fvmbag_meshcontrol_mod.F
+Chd|        FVMBAG_MESHCONTROL_MOD        ../common_source/modules/airbag/fvmbag_meshcontrol_mod.F
 Chd|====================================================================
-	  SUBROUTINE FVWRESTP(PROC)
+            SUBROUTINE FVWRESTP(PROC)
 C-----------------------------------------------
 C   M o d u l e s 
 C-----------------------------------------------
@@ -41,12 +41,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "units_c.inc"
-#include      "com01_c.inc"
-#include      "scr05_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -63,13 +57,13 @@ C--------------------------------------
         CALL WRITE_I_C(NFVBAG,LEN)
 C
       DO I=1,NFVBAG
-	 CALL WRITE_I_C(FVDATA(I)%L_TYPE,1)
-	 CALL WRITE_I_C(FVDATA(I)%ID_DT_OPTION,1)
-	 CALL WRITE_DB(FVDATA(I)%LAMBDA,1)
-	 CALL WRITE_DB(FVDATA(I)%DTOLD,1)
+           CALL WRITE_I_C(FVDATA(I)%L_TYPE,1)
+           CALL WRITE_I_C(FVDATA(I)%ID_DT_OPTION,1)
+           CALL WRITE_DB(FVDATA(I)%LAMBDA,1)
+           CALL WRITE_DB(FVDATA(I)%DTOLD,1)
          
-	 CALL WRITE_DB(FVDATA(I)%CFL_COEF,1)
-	 CALL WRITE_DB(FVDATA(I)%DTMIN,1)
+           CALL WRITE_DB(FVDATA(I)%CFL_COEF,1)
+           CALL WRITE_DB(FVDATA(I)%DTMIN,1)
          TABI(1)=FVSPMD(I)%NN_L
          TABI(2)=FVSPMD(I)%NNA_L
          TABI(3)=FVSPMD(I)%NNSA_L
@@ -79,8 +73,8 @@ C
          TABI(7)=FVSPMD(I)%PMAIN
          TABI(8)=FVSPMD(I)%NNI_L
          LEN=8
-	 CALL WRITE_I_C(TABI,LEN)
-	 
+           CALL WRITE_I_C(TABI,LEN)
+           
          LEN=2*(FVSPMD(I)%NN_L+FVSPMD(I)%NNI_L)
          IF (LEN>0) THEN
               CALL WRITE_I_C(FVSPMD(I)%IBUF_L,LEN)
@@ -96,8 +90,8 @@ C
               CALL WRITE_I_C(FVSPMD(I)%IBUFSA_L,LEN)
               DEALLOCATE(FVSPMD(I)%IBUFSA_L)
          ENDIF
-	 LEN = 1
-	 CALL WRITE_I_C(KMESH(FVID(I)), LEN)
+           LEN = 1
+           CALL WRITE_I_C(KMESH(FVID(I)), LEN)
          IF (PROC/=FVSPMD(I)%PMAIN) CYCLE
 C
          LEN=8*FVSPMD(I)%NSA
@@ -140,7 +134,7 @@ C
          TABI(10)=NNS_ANIM
          TABI(11)=FVDATA(I)%ID
          LEN=11
-	 CALL WRITE_I_C(TABI,LEN)
+           CALL WRITE_I_C(TABI,LEN)
        
 C--------------------------------------
 C     ECRITURE DES ENTIERS
@@ -168,9 +162,9 @@ C
 C--------------------------------------
 C     ECRITURE DES REELS
 C--------------------------------------
-	 LEN = 1
-	 CALL WRITE_DB(FVDATA(I)%PDISP_OLD,LEN)
-	 CALL WRITE_DB(FVDATA(I)%PDISP,LEN)
+           LEN = 1
+           CALL WRITE_DB(FVDATA(I)%PDISP_OLD,LEN)
+           CALL WRITE_DB(FVDATA(I)%PDISP,LEN)
          LEN=2*NNS
            CALL WRITE_DB(FVDATA(I)%RFVNOD,LEN)
            CALL WRITE_DB(FVDATA(I)%MPOLH,NPOLH)

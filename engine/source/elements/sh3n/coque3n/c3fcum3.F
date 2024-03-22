@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  C3FCUM3                       source/elements/sh3n/coque3n/c3fcum3.F
 Chd|-- called by -----------
@@ -56,7 +56,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "com08_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -111,24 +110,24 @@ C-----------------------------------------------
       ENDIF
       IF(IABS(ISIGI)/=5.OR.TT==0) THEN
         DO I=JFT,JLT
-    	  G11 = F11(I)
-    	  G21 = F21(I)
-    	  G31 = F31(I)
-    	  F11(I) = E1X(I)*G11 + E2X(I)*G21 + E3X(I)*G31
-    	  F21(I) = E1Y(I)*G11 + E2Y(I)*G21 + E3Y(I)*G31
-    	  F31(I) = E1Z(I)*G11 + E2Z(I)*G21 + E3Z(I)*G31
-    	  G12 = F12(I)
-    	  G22 = F22(I)
-    	  G32 = F32(I)
-    	  F12(I) = E1X(I)*G12 + E2X(I)*G22 + E3X(I)*G32
-    	  F22(I) = E1Y(I)*G12 + E2Y(I)*G22 + E3Y(I)*G32
-    	  F32(I) = E1Z(I)*G12 + E2Z(I)*G22 + E3Z(I)*G32
-    	  G13 = F13(I)
-    	  G23 = F23(I)
-    	  G33 = F33(I)
-    	  F13(I) = E1X(I)*G13 + E2X(I)*G23 + E3X(I)*G33
-    	  F23(I) = E1Y(I)*G13 + E2Y(I)*G23 + E3Y(I)*G33
-    	  F33(I) = E1Z(I)*G13 + E2Z(I)*G23 + E3Z(I)*G33
+            G11 = F11(I)
+            G21 = F21(I)
+            G31 = F31(I)
+            F11(I) = E1X(I)*G11 + E2X(I)*G21 + E3X(I)*G31
+            F21(I) = E1Y(I)*G11 + E2Y(I)*G21 + E3Y(I)*G31
+            F31(I) = E1Z(I)*G11 + E2Z(I)*G21 + E3Z(I)*G31
+            G12 = F12(I)
+            G22 = F22(I)
+            G32 = F32(I)
+            F12(I) = E1X(I)*G12 + E2X(I)*G22 + E3X(I)*G32
+            F22(I) = E1Y(I)*G12 + E2Y(I)*G22 + E3Y(I)*G32
+            F32(I) = E1Z(I)*G12 + E2Z(I)*G22 + E3Z(I)*G32
+            G13 = F13(I)
+            G23 = F23(I)
+            G33 = F33(I)
+            F13(I) = E1X(I)*G13 + E2X(I)*G23 + E3X(I)*G33
+            F23(I) = E1Y(I)*G13 + E2Y(I)*G23 + E3Y(I)*G33
+            F33(I) = E1Z(I)*G13 + E2Z(I)*G23 + E3Z(I)*G33
         ENDDO
       ENDIF
 C

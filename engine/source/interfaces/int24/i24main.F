@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  I24MAINF                      source/interfaces/int24/i24main.F
 Chd|-- called by -----------
@@ -47,7 +47,9 @@ Chd|        H3D_MOD                       share/modules/h3d_mod.F
 Chd|        IMP_INTBUF                    share/modules/imp_mod_def.F   
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
 Chd|        INTBUF_FRIC_MOD               share/modules/intbuf_fric_mod.F
+Chd|        INTERFACES_MOD                ../common_source/modules/interfaces/interfaces_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
+Chd|        OUTPUTS_MOD                   ../common_source/modules/outputs_mod.F
 Chd|====================================================================
       SUBROUTINE I24MAINF(
      1                   IPARI  ,INTBUF_TAB         ,X        ,A      ,
@@ -68,7 +70,8 @@ Chd|====================================================================
      H                   DIMFB    ,H3D_DATA ,INTBUF_FRIC_TAB, T2MAIN_SMS,
      I                   FORNEQS  ,T2FAC_SMS,NPC    ,TF       ,TAGNCONT,
      J                   KLOADPINTER,LOADPINTER,LOADP_HYD_INTER,DGAPLOADINT,
-     .                                                         S_LOADPINTER)
+     .                                                         S_LOADPINTER,
+     K                   INTEREFRIC,INTERFACES,NISUBMAX)
 C========================================================================
 C-----------------------------------------------
 C   M o d u l e s
@@ -80,6 +83,8 @@ C-----------------------------------------------
       USE H3D_MOD
       USE INTBUF_FRIC_MOD
       USE MESSAGE_MOD
+      USE OUTPUTS_MOD
+      USE INTERFACES_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -96,11 +101,6 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "units_c.inc"
-#include      "scr03_c.inc"
-#include      "scr04_c.inc"
-#include      "scr05_c.inc"
-#include      "scr07_c.inc"
 #include      "warn_c.inc"
 #include      "task_c.inc"
 #include      "parit_c.inc"
@@ -110,6 +110,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER NISUBMAX                        ! Max number of SUB INTerfaces
       INTEGER NELTST,ITYPTST,NIN,NEWFRONT,
      .        NSTRF(*),
      .        NRTMDIM, IAD17, IPARSENS
@@ -124,7 +125,8 @@ C-----------------------------------------------
       INTEGER NUM_IMP,NS_IMP(*),NE_IMP(*),IND_IMP(*)
       INTEGER IXS(*)  ,IXS16(*) ,IXS20(*)
       INTEGER IAD_ELEM(2,*),FR_ELEM(*), 
-     .        ISKYI_SMS(*), NODNX_SMS(*), ISENSINT(*),DIMFB,T2MAIN_SMS(6,*)
+     .        ISKYI_SMS(*), NODNX_SMS(*), ISENSINT(NISUBMAX+1),DIMFB,T2MAIN_SMS(6,*)
+      INTEGER  , INTENT(IN) :: INTEREFRIC
       my_real  , INTENT(IN) :: DGAPLOADINT(S_LOADPINTER)
       my_real 
      .        EMINX(*)
@@ -141,6 +143,7 @@ C     REAL
       TYPE(INTBUF_STRUCT_) INTBUF_TAB
       TYPE(H3D_DATABASE) :: H3D_DATA
       TYPE(INTBUF_FRIC_STRUCT_), TARGET, DIMENSION(NINTERFRIC) ::  INTBUF_FRIC_TAB
+      TYPE (INTERFACES_) ,INTENT(IN):: INTERFACES
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -151,11 +154,11 @@ C-----------------------------------------------
      .        NB_LOC, I_STOK_LOC,DEBUT, I_STOK_GLO,
      .        ILAGM, LENR, LENT, MAXCC,INTTH,IFORM,INTPLY,INTFRIC,
      .        NSETPRTS ,NPARTFRIC, IERROR, INTNITSCHE, IORTHFRIC,
-     .        NFORTH ,NFISOT ,JJ
+     .        NFORTH ,NFISOT ,JJ ,ISTIF_MSDT, INTCAREA
       INTEGER IX1(MVSIZ), IX2(MVSIZ), IX3(MVSIZ), IX4(MVSIZ),
      .        NSVG(MVSIZ), CN_LOC(MVSIZ),CE_LOC(MVSIZ),
      .        CAND_N_N(MVSIZ),CAND_E_N(MVSIZ),CAND_T_N(MVSIZ),
-     .        KINI(MVSIZ),
+     .        KINI(MVSIZ),IKNON(MVSIZ),
      .        SUBTRIA_OLD(MVSIZ),
 c     .        INDEX2(LINDMAX),SUBTRIA_OLD(MVSIZ),
      .        ISDSIZ(NSPMD+1),IRCSIZ(NSPMD+1),
@@ -166,7 +169,7 @@ c     .        INDEX2(LINDMAX),SUBTRIA_OLD(MVSIZ),
       INTEGER, ALLOCATABLE, DIMENSION(:) :: INDEX2
 C     REAL
       my_real
-     .   STARTT, FRIC, GAP, STOPT,PMAX_GAP,
+     .   STARTT, FRIC, GAP, STOPT,PMAX_GAP,PENREF(MVSIZ),
      .   VISC,VISCF,STIGLO,GAPMIN,
      .   KMIN, KMAX, GAPMAX,RSTIF,FHEAT,TINT,RHOH,EPS,IFRIC
 C-----------------------------------------------
@@ -203,7 +206,7 @@ C     REAL
      .     RCURVI(MVSIZ), ANGLMI(MVSIZ), ANGLT, PADM,PENMIN,MARGE
       INTEGER NRTMFT, NRTMLT, NMNFT, NMNLT, NRADM,NCY_PFIT
       my_real
-     .     T_PFIT,FA,FB,F_PFIT,TNCY,FINC
+     .     T_PFIT,FA,FB,F_PFIT,TNCY,FINC,DTSTIF
       INTEGER ICURV,ILEV,NREBOU,NPT ,NRTSE,IEDG4,SFSAVPARIT,NINLOADP
       my_real
      .    XFILTR_FRIC,FRIC_COEFS(MVSIZ,10),VISCFFRIC(MVSIZ),FRICC(MVSIZ),
@@ -223,6 +226,7 @@ C     REAL
       INTEGER,TARGET, DIMENSION(1):: ADPARTS_FRIC_BID
       INTEGER,TARGET, DIMENSION(1):: IFRICORTH_BID
       my_real,TARGET, DIMENSION(1):: TABCOEF_FRIC_BID
+      INTEGER :: NRTM, NSN, NTY, NSNE
 C
 C
       NRTM   =IPARI(4,NIN)
@@ -286,11 +290,19 @@ C
       PMAX_GAP = ZERO
       ILEV  = IPARI(20,NIN)
       NRTSE = IPARI(52,NIN)
-
+C
+      ISTIF_MSDT =IPARI(97,NIN)
+      DTSTIF = INTBUF_TAB%VARIABLES(48)
+C
+      INTCAREA = IPARI(99,NIN)
+C
       IFRIC = 0
 C--- Corresponding Friction model  
       INTFRIC=IPARI(72,NIN)
       IORTHFRIC = 0
+      NSETPRTS = 0
+      NPARTFRIC = 0
+      XFILTR_FRIC = ZERO
       IF(INTFRIC /= 0) THEN 
          TABCOUPLEPARTS_FRIC  => INTBUF_FRIC_TAB(INTFRIC)%TABCOUPLEPARTS_FRIC
          TABCOEF_FRIC  => INTBUF_FRIC_TAB(INTFRIC)%TABCOEF_FRIC
@@ -331,10 +343,10 @@ C-----T_FIT .OR. NCY_PFIT
        ELSE
         NCY_PFIT = IPARI(40,NIN)
         IF (NCY_PFIT >0 .AND. NCYCLE> NCY_PFIT) IPARI(40,NIN) = 0
-		IF (IPARI(40,NIN)>0) THEN
+          IF (IPARI(40,NIN)>0) THEN
           FINC= ONE/IPARI(40,NIN)
           TNCY = (NCYCLE+1)*FINC
-		END IF
+          END IF
        END IF
       ALLOCATE(INDEX2(LINDMAX))
 
@@ -428,9 +440,10 @@ C
       DO NFT = 0 , I_STOK - 1 , NVSIZ
           JLT = MIN( NVSIZ, I_STOK - NFT )
 C preparation candidats retenus
-	  CALL I24CDCOR3(
+          IKNON(1:JLT) = 0
+            CALL I24CDCOR3(
      1     JLT,INDEX2(NFT+1),INTBUF_TAB%CAND_E,INTBUF_TAB%CAND_N,INTBUF_TAB%CAND_T,
-     2     CAND_E_N,CAND_N_N,CAND_T_N	  ,IEDGE	)
+     2     CAND_E_N,CAND_N_N,CAND_T_N    ,IEDGE  )
 C cand_n et cand_e remplace par cand_n_n et cand_e_n
 C-------ISPT2 change    dimension NSN, initialis   au Starter
           CALL I24COR3(
@@ -451,15 +464,16 @@ C-------ISPT2 change    dimension NSN, initialis   au Starter
      I  IXX3     ,IXX4        , XX1       ,XX2         ,XX3          ,
      3  XX4      ,YY1         ,YY2        ,YY3         ,YY4          ,
      4  ZZ1      ,ZZ2         ,ZZ3        ,ZZ4         ,NINLOADP     ,
-     5  DIST     ) 
+     5  DIST     ,ISTIF_MSDT  ,DTSTIF     ,INTBUF_TAB%STIFMSDT_S,INTBUF_TAB%STIFMSDT_M,
+     6  NRTM     ,INTERFACES%PARAMETERS) 
           CALL I_CORPFIT3(
      1               JLT      ,INTBUF_TAB%STFM  ,INTBUF_TAB%STFNS,STIF      ,NSN    ,
      2               CAND_E_N ,CAND_N_N,NIN     ,IGSTI   ,KMIN     ,
-     3               KMAX     ,INACTI  ,IPARI(40,NIN),TNCY ) 
+     3               KMAX     ,INACTI  ,IPARI(40,NIN),TNCY ,IKNON ) 
 
           JLT_NEW = 0
           IF(IMPL_S > 0 ) THEN
-	   CALL IMPL_SAV0(
+             CALL IMPL_SAV0(
      1        JLT    ,CAND_N_N ,SUBTRIA_OLD ,INTBUF_TAB%IRTLM,NSN  ,NIN  ) 
           END IF!(IMPL_S > 0 ) THEN
 C
@@ -484,7 +498,7 @@ C
      G INTBUF_TAB%STIF_OLD,ITRIV      ,ITAB       ,CAND_T_N    ,IEDGE  ,      
      H NFT         ,PENMIN      ,EPS        ,NM1         ,NM2          ,
      I NM3         ,INTPLY      ,INTBUF_TAB%DGAP_NM ,INTBUF_TAB%ICONT_I,
-     J MARGE       ,IEDG4       ,ISPT2_LOC  ,IPARI(40,NIN))
+     J MARGE       ,IEDG4       ,ISPT2_LOC  ,IPARI(40,NIN),IKNON,PENREF )
 
           IF(IEDGE/=0)CALL I24DST3E(
      1 JLT         ,A           ,X           ,CAND_N_N    ,CAND_E_N    ,
@@ -592,7 +606,9 @@ C-------------------------------------------------------------------------------
      Y  TAGNCONT    ,KLOADPINTER ,LOADPINTER  ,LOADP_HYD_INTER,
      Z  INTBUF_TAB%TYPSUB,INTBUF_TAB%INFLG_SUBS,INTBUF_TAB%INFLG_SUBM,
      .                                      NINLOADP,DGAPLOADINT,
-     1  S_LOADPINTER, DIST       ,IXX         ) 
+     1  S_LOADPINTER, DIST       ,IXX         ,INTEREFRIC ,INTCAREA ,
+     2  INTERFACES%PARAMETERS ,PENREF ,KMAX , INTBUF_TAB%S_ADDSUBM ,
+     3  INTBUF_TAB%S_LISUBM,INTBUF_TAB%S_TYPSUB,NISUBMAX,I_STOK)
 C
           IF(IMPL_S > 0 ) 
      +     CALL IMPL_SAV1(
@@ -651,15 +667,8 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "task_c.inc"
 #include      "com08_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -716,13 +725,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER JLT,NSN,NIN
@@ -753,23 +755,12 @@ Chd|====================================================================
       SUBROUTINE I24CDCOR3(JLT,INDEX,CAND_E,CAND_N,CAND_T,
      .                    CAND_E_N,CAND_N_N,CAND_T_N,IEDGE)      
 C============================================================================
-C============================================================================
-C-----------------------------------------------
-C   I m p l i c i t   T y p e s
-C-----------------------------------------------
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER JLT, IEDGE,
      .        INDEX(*), CAND_E(*), CAND_N(*), CAND_T(*),
      .        CAND_E_N(*), CAND_N_N(*), CAND_T_N(*)
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -812,15 +803,8 @@ C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "comlock.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "task_c.inc"
 #include      "com08_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s

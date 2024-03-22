@@ -1,26 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
-#include "my_real.inc"
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  UFUNC_DUM                     source/user_interface/ufunc.F 
 Chd|-- called by -----------
@@ -44,15 +43,12 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
-#include      "scr05_c.inc"
       INTEGER IFUNC,I,NPFI,NPFIP
       CALL GET_VAR_USER_I(5,IFUNC,NPFI)
       CALL GET_VAR_USER_I(5,IFUNC+1,NPFIP)
       GET_U_FUNC_N=(NPFIP-NPFI)/2
       RETURN
       END
-#include "my_real.inc"
 Chd|====================================================================
 Chd|  GET_U_FUNC_X                  source/user_interface/ufunc.F 
 Chd|-- called by -----------
@@ -74,9 +70,7 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 #include      "scr05_c.inc"
-#include      "units_c.inc"
 #include      "comlock.inc"
       INTEGER IFUNC,I,NPFI,NPFIP,N,NMAX
       my_real
@@ -100,7 +94,6 @@ C-----------------------------------------------
       GET_U_FUNC_X=XX
       RETURN
       END
-#include "my_real.inc"
 Chd|====================================================================
 Chd|  GET_U_FUNC_Y                  source/user_interface/ufunc.F 
 Chd|-- called by -----------
@@ -122,9 +115,7 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 #include      "scr05_c.inc"
-#include      "units_c.inc"
 #include      "comlock.inc"
       INTEGER IFUNC,I,NPFI,NPFIP,N,NMAX
       my_real
@@ -148,12 +139,12 @@ C-----------------------------------------------
       GET_U_FUNC_Y=YY
       RETURN
       END
-#include "my_real.inc"
 Chd|====================================================================
 Chd|  GET_U_FUNC                    source/user_interface/ufunc.F 
 Chd|-- called by -----------
 Chd|        AIRBAGB                       source/airbag/airbag2.F       
 Chd|        AIRBAGB1                      source/airbag/airbagb1.F      
+Chd|        DAMPING51                     source/assembly/damping.F     
 Chd|        FVBAG1                        source/airbag/fvbag1.F        
 Chd|        FVVENT0                       source/airbag/fvvent0.F       
 Chd|        FV_UP_SWITCH                  source/airbag/fv_up_switch.F  
@@ -179,7 +170,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 #include      "scr05_c.inc"
 C
       INTEGER IFUNC,I,NPFI,NPFIP,DEPLA
@@ -234,7 +224,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
@@ -265,7 +254,6 @@ Chd|        GET_VAR_USER_I                source/user_interface/eng_callback_c.c
 Chd|====================================================================
       INTEGER FUNCTION GET_U_NUMFUN(IDFUN)
 #include      "implicit_f.inc"
-#include      "param_c.inc"
 #include      "com04_c.inc"
       INTEGER IDFUN
       INTEGER J,ID
@@ -293,7 +281,6 @@ Chd|        GET_VAR_USER_I                source/user_interface/eng_callback_c.c
 Chd|====================================================================
       INTEGER FUNCTION GET_U_FID(IFUN)
 #include      "implicit_f.inc"
-#include      "param_c.inc"
 #include      "com04_c.inc"
       INTEGER IFUN,DEPLA
 C=======================================================================
@@ -320,7 +307,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 #include      "scr05_c.inc"
 C
       INTEGER IFUNC,I,NPFI,NPFIP,DEPLA

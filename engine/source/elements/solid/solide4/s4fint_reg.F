@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  S4FINT_REG                    source/elements/solid/solide4/s4fint_reg.F
 Chd|-- called by -----------
@@ -27,13 +27,14 @@ Chd|        S4FORC3                       source/elements/solid/solide4/s4forc3.
 Chd|-- calls ---------------
 Chd|        NLOCAL_REG_MOD                ../common_source/modules/nlocal_reg_mod.F
 Chd|====================================================================
-      SUBROUTINE S4FINT_REG(NLOC_DMG,VAR_REG  ,
-     .                      NEL     ,OFF      ,VOL      ,NC1     ,
-     .                      NC2     ,NC3      ,NC4      ,PX1     ,
-     .                      PX2     ,PX3      ,PX4      ,PY1     ,
-     .                      PY2     ,PY3      ,PY4      ,PZ1     ,
-     .                      PZ2     ,PZ3      ,PZ4      ,IMAT    ,
-     .                      ITASK   ,DT2T     ,VOL0     )
+      SUBROUTINE S4FINT_REG(
+     1   NLOC_DMG,VAR_REG, NEL,     OFF,
+     2   VOL,     NC1,     NC2,     NC3,
+     3   NC4,     PX1,     PX2,     PX3,
+     4   PX4,     PY1,     PY2,     PY3,
+     5   PY4,     PZ1,     PZ2,     PZ3,
+     6   PZ4,     IMAT,    ITASK,   DT2T,
+     7   VOL0,    NFT)
 C-----------------------------------------------
 C   M o d u l e s
 C----------------------------------------------- 
@@ -45,14 +46,13 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
-#include      "param_c.inc"
 #include      "parit_c.inc"
-#include      "vect01_c.inc"
 #include      "scr02_c.inc"
 #include      "scr18_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: NFT
       INTEGER ::  NEL, IMAT, ITASK
       INTEGER, DIMENSION(NEL) :: NC1,NC2,NC3,NC4
       my_real, INTENT(INOUT)                     ::

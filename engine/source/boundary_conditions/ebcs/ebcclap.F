@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  EBCCLAP                       source/boundary_conditions/ebcs/ebcclap.F
 Chd|-- called by -----------
@@ -29,7 +29,7 @@ Chd|        EBCCLAP1                      source/boundary_conditions/ebcs/ebccla
 Chd|        EBCVIT4                       source/boundary_conditions/ebcs/ebcvit4.F
 Chd|        EBCVIT5                       source/boundary_conditions/ebcs/ebcvit5.F
 Chd|        EBCVIT7                       source/boundary_conditions/ebcs/ebcvit7.F
-Chd|        EBCS_MOD                      ../common_source/modules/ebcs_mod.F
+Chd|        EBCS_MOD                      ../common_source/modules/boundary_conditions/ebcs_mod.F
 Chd|====================================================================
       SUBROUTINE EBCCLAP(V, A, FV, EBCS_TAB)
       USE EBCS_MOD
@@ -40,8 +40,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
-c#include      "com01_c.inc"
 #include      "com04_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -57,6 +55,7 @@ C-----------------------------------------------
       CLASS(t_ebcs), POINTER :: EBCS
 
       DO I=1,NEBCS
+         IF(.NOT.EBCS_TAB%need_to_compute(I)) CYCLE
          TYP = EBCS_TAB%tab(i)%poly%type
          NOD = EBCS_TAB%tab(i)%poly%nb_node
          

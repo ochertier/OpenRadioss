@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  DRAPE_MOD                     share/modules/drape_mod.F     
 Chd|-- called by -----------
@@ -39,6 +39,7 @@ Chd|        CNCOEFORT                     source/elements/sh3n/coquedk/cncoef3.F
 Chd|        CZFORC3                       source/elements/shell/coquez/czforc3.F
 Chd|        CZFORC3_CRK                   source/elements/xfem/czforc3_crk.F
 Chd|        CZKE3                         source/elements/shell/coquez/czke3.F
+Chd|        CZKEL3                        source/elements/shell/coquez/czkel3.F
 Chd|        C_TF_NE                       source/output/sty/c_tf_ne.F   
 Chd|        DRAPE_RREST                   source/output/restart/rdresb.F
 Chd|        DRAPE_WREST                   source/output/restart/wrrest.F
@@ -53,6 +54,7 @@ Chd|        GENDYNAIN                     source/output/dynain/gendynain.F
 Chd|        GENOUTP                       source/output/sty/genoutp.F   
 Chd|        GENSTAT                       source/output/sta/genstat.F   
 Chd|        IMP_BUCK                      source/implicit/imp_buck.F    
+Chd|        IMP_CHKM                      source/implicit/imp_solv.F    
 Chd|        IMP_GLOB_K                    source/implicit/imp_glob_k.F  
 Chd|        IMP_GLOB_K0                   source/implicit/imp_glob_k.F  
 Chd|        IMP_GLOB_KHP                  source/implicit/imp_glob_k.F  
@@ -61,12 +63,14 @@ Chd|        IMP_SOLV                      source/implicit/imp_solv.F
 Chd|        LAYINI                        source/elements/shell/coque/layini.F
 Chd|        OUTP_C_TF                     source/output/sty/outp_c_t.F  
 Chd|        RADIOSS2                      source/engine/radioss2.F      
+Chd|        RDCOMI                        source/output/restart/rdcomm.F
 Chd|        RESOL                         source/engine/resol.F         
 Chd|        RESOL_HEAD                    source/engine/resol_head.F    
 Chd|        RESTALLOC                     source/output/restart/arralloc.F
 Chd|        SORTIE_MAIN                   source/output/sortie_main.F   
 Chd|        STAT_C_STRAFG                 source/output/sta/stat_c_strafg.F
 Chd|        STAT_C_STRSFG                 source/output/sta/stat_c_strsfg.F
+Chd|        WRCOMI                        source/output/restart/wrcomm.F
 Chd|-- calls ---------------
 Chd|====================================================================
         MODULE DRAPE_MOD
@@ -76,13 +80,32 @@ C   m y _ r e a l
 C-----------------------------------------------
 #include      "my_real.inc"
 c=======================================================================      
-c
+c      
+      TYPE DRAPE_PLY_
+        INTEGER                           ::  NSLICE   ! number of slice
+        INTEGER                           ::  IPID     ! ID PID
+c-------  layer variables     
+        my_real, DIMENSION(:,:) , ALLOCATABLE ::   RDRAPE
+        INTEGER, DIMENSION(:,:) , ALLOCATABLE ::   IDRAPE 
+c-------       
+      END TYPE DRAPE_PLY_      
+      !!
       TYPE DRAPE_
-        integer                                 :: NDIM
-        integer, DIMENSION(:),    ALLOCATABLE   :: INDX
-        integer, DIMENSION(:) ,   ALLOCATABLE   :: NPT
-        integer, DIMENSION(:) ,   ALLOCATABLE   :: IDRAPE
-        my_real, DIMENSION(:,:) , ALLOCATABLE   :: RDRAPE  
-      END TYPE DRAPE_   
+        INTEGER                                        ::  NPLY_DRAPE
+        INTEGER                                        ::  NPLY
+        INTEGER,            DIMENSION(:)   , ALLOCATABLE   ::  INDX_PLY
+        TYPE (DRAPE_PLY_) , DIMENSION(:)   , ALLOCATABLE   ::  DRAPE_PLY
+      END TYPE DRAPE_  
+      !!
+      TYPE DRAPEG_
+        INTEGER        ::  NDIM_SH4N
+        INTEGER        ::  NDIM_SH3N
+        INTEGER        ::  NDIM_SLICE_SH4N
+        INTEGER        ::  NDIM_SLICE_SH3N
+        INTEGER        ::  NDIM_INDX_PLY_SH4N
+        INTEGER        ::  NDIM_INDX_PLY_SH3N
+        INTEGER, DIMENSION(:) , ALLOCATABLE  ::  INDX_SH3N,INDX_SH4N
+      END TYPE DRAPEG_  
+      INTEGER :: NUMELC_DRAPE    ,NUMELTG_DRAPE , SCDRAPE, STDRAPE 
 C=======================================================================
       END MODULE DRAPE_MOD

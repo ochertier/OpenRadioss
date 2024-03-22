@@ -1,36 +1,40 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  S10FINT3                      source/elements/solid/solide10/s10fint3.F
 Chd|-- called by -----------
 Chd|        S10FORC3                      source/elements/solid/solide10/s10forc3.F
 Chd|-- calls ---------------
 Chd|====================================================================
-      SUBROUTINE S10FINT3(SIG, PX, PY, PZ,
-     .                    FX,FY,FZ,VOL,QVIS,STI,STIG,
-     .                    EINT,RHO,Q,EPLAS,EPSD,EPSDG,
-     .                    SIGG,EINTG,RHOG,QG,EPLASG,
-     .                    WIP ,G_PLA,NEL,CONDE,CONDEG)
+      SUBROUTINE S10FINT3(
+     1   SIG,     PX,      PY,      PZ,
+     2   FX,      FY,      FZ,      VOL,
+     3   QVIS,    STI,     STIG,    EINT,
+     4   RHO,     Q,       EPLAS,   EPSD,
+     5   EPSDG,   SIGG,    EINTG,   RHOG,
+     6   QG,      EPLASG,  WIP,     G_PLA,
+     7   NEL,     CONDE,   CONDEG,  G_EPSD,
+     8   ISRAT)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -42,7 +46,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER G_PLA,NEL
+      INTEGER, INTENT(IN) :: ISRAT
+      INTEGER, INTENT(IN) :: G_PLA,NEL,G_EPSD
 C     REAL
       my_real
      .  PX(MVSIZ,10),PY(MVSIZ,10),PZ(MVSIZ,10),
@@ -53,11 +58,7 @@ C     REAL
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "vect01_c.inc"
-#include      "com01_c.inc"
 #include      "nsvis_c.inc"
-#include      "scr01_c.inc"
-#include      "scr03_c.inc"
 #include      "scr18_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -69,7 +70,7 @@ C     REAL
      .   S4(MVSIZ), S5(MVSIZ), S6(MVSIZ),
      .   FINT, QVIS_LOC, VOL_LOC
 C-----------------------------------------------
-      DO I=LFT,LLT
+      DO I=1,NEL
        QVIS_LOC = QVIS(I)
        VOL_LOC = VOL(I)
        SIGG(I,1) = SIGG(I,1) + WIP * SIG(I,1)
@@ -91,24 +92,24 @@ C-----------------------------------------------
       ENDDO
 C
       IF(NODADT_THERM == 1) THEN
-        DO I=LFT,LLT
+        DO I=1,NEL
           CONDEG(I)= CONDEG(I)+ CONDE(I)
         ENDDO
       ENDIF
 c
-      IF (ISRAT > 0) THEN                                                    
-        DO I=LFT,LLT
+      IF ((ISRAT > 0).OR.(G_EPSD > 0)) THEN                                                    
+        DO I=1,NEL
          EPSDG(I) = EPSDG(I) + WIP * EPSD(I)
         ENDDO
       ENDIF
       IF (G_PLA > 0) THEN                                                    
-        DO I=LFT,LLT                                                          
+        DO I=1,NEL                                                          
           EPLASG(I)  = EPLASG(I)  + WIP * EPLAS(I)                              
         ENDDO                                                                 
       ENDIF                                                                  
 C
       DO N=1,10
-        DO I=LFT,LLT
+        DO I=1,NEL
           FX(I,N)=FX(I,N)-(S1(I)*PX(I,N)+S4(I)*PY(I,N)+S6(I)*PZ(I,N))
           FY(I,N)=FY(I,N)-(S2(I)*PY(I,N)+S5(I)*PZ(I,N)+S4(I)*PX(I,N))
           FZ(I,N)=FZ(I,N)-(S3(I)*PZ(I,N)+S6(I)*PX(I,N)+S5(I)*PY(I,N))

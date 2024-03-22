@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  R23L114DEF3                   source/elements/spring/r23l114def3.F
 Chd|-- called by -----------
@@ -33,35 +33,43 @@ Chd|        SEATBELT_MOD                  ../common_source/modules/seatbelt_mod.
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
 Chd|====================================================================
       SUBROUTINE R23L114DEF3(
-     1        SKEW    ,IPM    ,IGEO   ,MID     ,PID    ,
-     2        GEO    ,UPARAM   ,FX     , FY    , FZ    ,
-     3        E       ,DX     , DY     , DZ    , NPF   ,
-     4        TF      ,OFF    ,DPX     ,DPY    ,DPZ   ,
-     5        DPX2    ,DPY2   , DPZ2   ,FXEP   ,FYEP  ,
-     6        FZEP    ,X0     ,Y0     , Z0     ,XMOM  ,
-     7        YMOM    ,ZMOM   , RX     ,RY     ,RZ    ,
-     8        RPX     ,RPY    ,RPZ    ,XMEP   ,YMEP   ,
-     9        ZMEP    ,RPX2   , RPY2   ,RPZ2   ,ANIM  , 
-     A        POSX    ,POSY   ,POSZ   ,POSXX  ,POSYY  ,
-     B        POSZZ   ,FR_WAVE,E6     ,NEL    , EXX2  ,
-     C        EYX2    ,EZX2   ,EXY2   ,EYY2   ,EZY2   , 
-     D        EXZ2    ,EYZ2   , EZZ2   , AL2DP  , NGL , 
-     E        CRIT_NEW,X0_ERR ,ALDP  ,YIELDX , YIELDY,
-     F        YIELDZ  ,YIELDX2,YIELDY2,YIELDZ2,EXX    ,
-     G        EYX    ,EZX   , EXY     ,EYY    ,  EZY  ,
-     H        EXZ    , EYZ   ,EZZ     ,XCR    , RX1   ,
-     I        RY1    ,RZ1   ,RX2      ,RY2    ,RZ2    ,
-     K        XIN     ,AK    ,XM      ,XKM    , XCM   , 
-     L        XKR     , VX1   ,VX2     ,VY1   ,VY2    ,
-     M        VZ1     ,VZ2   ,NUVAR   ,UVAR   ,MASS   ,
-     N        DX0    ,DY0    ,DZ0     ,RX0    ,RY0    ,
-     O        RZ0    ,SLIPRING_STRAND,DFS,RING_SLIP,X02,
-     P        LMIN,SLIPRING_ID,UPDATE_FLAG,RETRACTOR_ID,ADD_NODE1,
-     Q        ADD_NODE2,NC1,NC2,NC3,X1DP,
-     R        X2DP,X3DP,VX3,VY3,VZ3,
-     S        FLAG_SLIPRING_UPDATE,FLAG_RETRACTOR_UPDATE,SENSOR_TAB,UINER,FR_ID,
-     T        FRAM_FACTOR,EPS_OLD,FX_B2,DPX_B2,YIELDX_B2,
-     U        XX_OLD_B2,FXEP_B2,POSX_B2,EPS_OLD_B2)
+     1   SKEW,                 IPM,                  IGEO,                 MID,
+     2   PID,                  GEO,                  UPARAM,               FX,
+     3   FY,                   FZ,                   E,                    DX,
+     4   DY,                   DZ,                   NPF,                  TF,
+     5   OFF,                  DPX,                  DPY,                  DPZ,
+     6   DPX2,                 DPY2,                 DPZ2,                 FXEP,
+     7   FYEP,                 FZEP,                 X0,                   Y0,
+     8   Z0,                   XMOM,                 YMOM,                 ZMOM,
+     9   RX,                   RY,                   RZ,                   RPX,
+     A   RPY,                  RPZ,                  XMEP,                 YMEP,
+     B   ZMEP,                 RPX2,                 RPY2,                 RPZ2,
+     C   ANIM,                 POSX,                 POSY,                 POSZ,
+     D   POSXX,                POSYY,                POSZZ,                FR_WAVE,
+     E   E6,                   NEL,                  EXX2,                 EYX2,
+     F   EZX2,                 EXY2,                 EYY2,                 EZY2,
+     G   EXZ2,                 EYZ2,                 EZZ2,                 AL2DP,
+     H   NGL,                  CRIT_NEW,             X0_ERR,               ALDP,
+     I   YIELDX,               YIELDY,               YIELDZ,               YIELDX2,
+     J   YIELDY2,              YIELDZ2,              EXX,                  EYX,
+     K   EZX,                  EXY,                  EYY,                  EZY,
+     L   EXZ,                  EYZ,                  EZZ,                  XCR,
+     M   RX1,                  RY1,                  RZ1,                  RX2,
+     N   RY2,                  RZ2,                  XIN,                  AK,
+     O   XM,                   XKM,                  XCM,                  XKR,
+     P   VX1,                  VX2,                  VY1,                  VY2,
+     Q   VZ1,                  VZ2,                  NUVAR,                UVAR,
+     R   MASS,                 DX0,                  DY0,                  DZ0,
+     S   RX0,                  RY0,                  RZ0,                  SLIPRING_STRAND,
+     T   DFS,                  RING_SLIP,            X02,                  LMIN,
+     U   SLIPRING_ID,          UPDATE_FLAG,          RETRACTOR_ID,         ADD_NODE1,
+     V   ADD_NODE2,            NC1,                  NC2,                  NC3,
+     W   X1DP,                 X2DP,                 X3DP,                 VX3,
+     X   VY3,                  VZ3,                  FLAG_SLIPRING_UPDATE, FLAG_RETRACTOR_UPDATE,
+     Y   SENSOR_TAB,           UINER,                FR_ID,                FRAM_FACTOR,
+     Z   EPS_OLD,              FX_B2,                DPX_B2,               YIELDX_B2,
+     1   XX_OLD_B2,            FXEP_B2,              POSX_B2,              EPS_OLD_B2,
+     2   NFT      ,            NSENSOR               )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -82,16 +90,15 @@ C-----------------------------------------------
 #include      "param_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
-#include      "scr03_c.inc"
 #include      "scr14_c.inc"
 #include      "scr17_c.inc"
-#include      "vect01_c.inc"
 #include      "units_c.inc"
 #include      "com01_c.inc"
 #include      "impl1_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: NFT,NSENSOR
       INTEGER NPF(*),IGEO(NPROPGI,*),NEL,NGL(*),PID(*),MID(*),NUVAR,
      .     IPM(NPROPMI,*),NC1(*),NC2(*),NC3(*),ADD_NODE1(*),ADD_NODE2(*),
      .     SLIPRING_ID(*),UPDATE_FLAG(*),RETRACTOR_ID(*),SLIPRING_STRAND(*),
@@ -154,7 +161,7 @@ C     REAL
      .     RYAV, RZAV,DEN, C, CP, EXYP,
      .     X21PHI, Y21PHI, Z21PHI, VX21PHI, VY21PHI, VZ21PHI,
      .     RYAV1, RZAV1, RYAV1P, RZAV1P,ASRATE,NORM,GAP,LMIN_B2(MVSIZ),
-     .     EB(MVSIZ),DXOLDB(MVSIZ),XKP_B2(MVSIZ),DX_B2(MVSIZ)
+     .     EB(MVSIZ),DXOLDB(MVSIZ),XKP_B2(MVSIZ),DX_B2(MVSIZ),A1
       DOUBLE PRECISION X0DP(MVSIZ),X0DP_B2(MVSIZ),EX2DP(MVSIZ),EY2DP(MVSIZ),EZ2DP(MVSIZ),
      .                 ALDP_B2(MVSIZ)
       my_real ,DIMENSION(:), POINTER :: COORD_OLD
@@ -185,7 +192,7 @@ C
       I13 = I12 + 6
       I14 = I13 + 6
       NUPAR = NUPAR +  84    
-      DO I=LFT,LLT
+      DO I=1,NEL
 C
        INDEX1(I) = I
        IADBUF= IPM(7,MID(I)) - 1
@@ -229,7 +236,7 @@ C
       ENDDO      
 C
       IF (INISPRI /= 0 .and. TT == ZERO) THEN
-        DO I=LFT,LLT
+        DO I=1,NEL
           XL0(I)= X0(I)
 ! if not initialized length
           IF (XL0(I) == ZERO) XL0(I) = ALDP(I)
@@ -237,45 +244,45 @@ C
       ENDIF
 C
       IF (TT == ZERO) THEN
-        DO I=LFT,LLT
+        DO I=1,NEL
           X0(I)= ALDP(I)                   ! cast double vers My_real
         ENDDO
       ENDIF
 C
       IF (SCODVER >= 101) THEN
         IF (TT == ZERO) THEN
-          DO I=LFT,LLT
+          DO I=1,NEL
             X0_ERR(I)= ALDP(I)-X0(I)         ! difference entre double et My_real
           ENDDO
         ENDIF
       ENDIF
 C
       IF ( INISPRI /= 0 .and. TT == ZERO) THEN
-        DO I=LFT,LLT
+        DO I=1,NEL
           X0(I)= XL0(I)
         ENDDO
       ENDIF
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         X0DP(I)= X0(I)                     ! cast double vers My_real
       ENDDO
 C
       IF (SCODVER >= 101) THEN
-        DO I=LFT,LLT
+        DO I=1,NEL
           X0DP(I)= X0(I) + X0_ERR(I)         ! difference entre double et My_real
         ENDDO
       ENDIF
 C---------------------
 C     TRANSLATIONS
 C---------------------
-      DO I=LFT,LLT
+      DO I=1,NEL
         DXOLD(I)=DX(I)
         DYOLD(I)=DY(I)
         DZOLD(I)=DZ(I)
       ENDDO
 !
       IF (INISPRI /= 0 .and. TT == ZERO) THEN
-        DO I=LFT,LLT
+        DO I=1,NEL
           DXOLD(I)=DX0(I)
           DYOLD(I)=DY0(I)
           DZOLD(I)=DZ0(I)
@@ -284,7 +291,7 @@ C---------------------
 C
       DT05=HALF*DT1
       IF (ISMDISP > 0) THEN
-       DO I=LFT,LLT
+       DO I=1,NEL
         VX21  = VX2(I)-VX1(I)
         VY21  = VY2(I)-VY1(I)
         VZ21  = VZ2(I)-VZ1(I)
@@ -308,7 +315,7 @@ C
         CRIT(I) = ZERO
        ENDDO
       ELSE
-       DO I=LFT,LLT
+       DO I=1,NEL
          VX21  = VX2(I)-VX1(I)
          VY21  = VY2(I)-VY1(I)
          VZ21  = VZ2(I)-VZ1(I)
@@ -338,7 +345,7 @@ C
        ENDDO
       ENDIF !(ISMDISP > 0) THEN
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         IADBUF = IPM(7,MID(I)) - 1
         ILENG = NINT(UPARAM(IADBUF + 2))
         IF (ILENG /= 0) THEN
@@ -355,7 +362,7 @@ C-------------------------------
       IF4 = 18
       COMPT = 0
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         IADBUF   = IPM(7,MID(I)) - 1
         IFUNC(I) = IPM(10 + IF1 + 1,MID(I))
         IFV(I)   = IPM(10 + IF2 + 1,MID(I))
@@ -445,7 +452,7 @@ C
 C
         COMPT = 0
         COMPT2 = 0
-        DO I=LFT,LLT
+        DO I=1,NEL
           ADHER(I) = 0
           IF (SLIPRING_STRAND(I) > 0) THEN
             COMPT = COMPT + 1
@@ -484,13 +491,16 @@ C
       IF (NUVAR >=1) COORD_OLD => UVAR(1,1:NEL)
 C
       FLAG = 1
-      CALL REDEF_SEATBELT(FX      ,XK     ,DX     ,FXEP   ,DXOLD ,
-     .                    DPX     ,TF     ,NPF    ,XC     ,OFF   ,
-     .                    E6(1,1) ,ANIM   ,ANIM_FE(11),POSX(1)  ,XL0,
-     .                    DMN     ,DMX    ,LSCALE ,YIELDX ,AK    ,  
-     .                    IECROU  ,IFUNC  ,IFUNC2 ,COORD_OLD,FX_MAX,
-     .                    XK_COMP ,LLT    ,INDEX1 ,FLAG     ,XKP   ,
-     .                    EPS_OLD,FRAM_FACTOR)
+      CALL REDEF_SEATBELT(
+     1   FX,         XK,         DX,         FXEP,
+     2   DXOLD,      DPX,        TF,         NPF,
+     3   XC,         OFF,        E6(1,1),    ANIM,
+     4   ANIM_FE(11),POSX(1),    XL0,        DMN,
+     5   DMX,        LSCALE,     YIELDX,     AK,
+     6   IECROU,     IFUNC,      IFUNC2,     COORD_OLD,
+     7   FX_MAX,     XK_COMP,    NEL,        INDEX1,
+     8   FLAG,       XKP,        EPS_OLD,    FRAM_FACTOR,
+     9   NEL,        NFT)
 C
 
 C
@@ -545,13 +555,22 @@ C--     Computation of stress of 2nd strand for sliprings
         FLAG = 2
         EB(1:MVSIZ) = ZERO
         DXOLDB(1:MVSIZ) = ZERO
-        CALL REDEF_SEATBELT(FX_B2   ,XK     ,DX_B2  ,FXEP_B2,DXOLDB ,
-     .                      DPX_B2  ,TF     ,NPF    ,XC     ,OFF   ,
-     .                      EB      ,ANIM   ,ANIM_FE(11),POSX_B2,XL02,
-     .                      DMN     ,DMX    ,LSCALE ,YIELDX_B2,AK    ,  
-     .                      IECROU  ,IFUNC  ,IFUNC2 ,XX_OLD_B2,FX_MAX ,
-     .                      XK_COMP ,COMPT2 ,INDEX_SLIP ,FLAG ,XKP_B2 ,  
-     .                      EPS_OLD_B2,FRAM_FACTOR)
+        CALL REDEF_SEATBELT(
+     1   FX_B2,      XK,         DX_B2,      FXEP_B2,
+     2   DXOLDB,     DPX_B2,     TF,         NPF,
+     3   XC,         OFF,        EB,         ANIM,
+     4   ANIM_FE(11),POSX_B2,    XL02,       DMN,
+     5   DMX,        LSCALE,     YIELDX_B2,  AK,
+     6   IECROU,     IFUNC,      IFUNC2,     XX_OLD_B2,
+     7   FX_MAX,     XK_COMP,    COMPT2,     INDEX_SLIP,
+     8   FLAG,       XKP_B2,     EPS_OLD_B2, FRAM_FACTOR,
+     9   NEL,        NFT)
+C
+        DO J=1,COMPT2
+          I = INDEX_SLIP(J)
+          IF (ALDP(I) > ALDP_B2(I)) XKP_B2(I) = XKP(I)
+          IF (ALDP_B2(I) > ALDP(I)) XKP(I) = XKP_B2(I)
+        ENDDO
 
 C--     Computation of material flow for slipring and retractor
         CALL MATERIAL_FLOW(DFS,DFS_OLD,ALDP,SLIPRING_STRAND,XKP,
@@ -564,9 +583,9 @@ C--     Computation of material flow for slipring and retractor
      7                     VY3,VZ3,XC,RETRACTOR_ID,FLAG_RETRACTOR_UPDATE,
      8                     SENSOR_TAB,X0DP,FR_ID,DFX,FX,FX_B2,
      9                     ALDP_B2,X0DP_B2,EX2DP,EY2DP,EZ2DP,XL02,
-     A                     XKP_B2,COMPT,INDEX2)
+     A                     XKP_B2,COMPT,INDEX2,NSENSOR)
 C
-        DO I=LFT,LLT
+        DO I=1,NEL
           IF (SLIPRING_STRAND(I) > 0) THEN   
             FX(I) = FX(I) + DFX(I)
             E6(I,1) = E6(I,1) + (DX(I)-DXOLD(I))*DFX(I)*HALF
@@ -585,7 +604,7 @@ C
 C
 C---------------------
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         CC = UPARAM(IADBUF + NUPAR + 3)
         CN = UPARAM(IADBUF + NUPAR + 9)
         XA = UPARAM(IADBUF + NUPAR + 15)
@@ -632,7 +651,7 @@ C
         ENDIF
       ENDDO
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         IADBUF   = IPM(7,MID(I)) - 1
         IFUNC(I) = 0
         IFV(I)   = IPM(10 + IF2 + 2,MID(I))
@@ -653,16 +672,20 @@ C
 C
       KK = 1 + NUMELR * ANIM_FE(11)
       IF (NUVAR >= 2) COORD_OLD => UVAR(2,1:NEL)
-      CALL REDEF3(FY      ,YK     ,DY      ,FYEP       ,DYOLD   ,
-     .            DPY     ,TF     ,NPF     ,YC         ,OFF     ,
-     .            E6(1,2) ,DPY2   ,ANIM(KK),ANIM_FE(12),POSY    ,
-     .            FR_WAVE ,XL0    ,DMN     ,DMX        ,DV      ,
-     .            FF      ,LSCALE ,EE      ,GF3        ,IFUNC3  ,
-     .            YIELDY  ,ALDP   ,AK      ,B          ,D       ,
-     .            IECROU  ,IFUNC  ,IFV     ,IFUNC2     ,EPLA    ,
-     .            COORD_OLD,FX_MAX,NOT_USED,NOT_USED)
+      CALL REDEF3(
+     1   FY,         YK,         DY,         FYEP,
+     2   DYOLD,      DPY,        TF,         NPF,
+     3   YC,         OFF,        E6(1,2),    DPY2,
+     4   ANIM(KK),   ANIM_FE(12),POSY,       FR_WAVE,
+     5   XL0,        DMN,        DMX,        DV,
+     6   FF,         LSCALE,     EE,         GF3,
+     7   IFUNC3,     YIELDY,     ALDP,       AK,
+     8   B,          D,          IECROU,     IFUNC,
+     9   IFV,        IFUNC2,     EPLA,       COORD_OLD,
+     A   FX_MAX,     NOT_USED,   NOT_USED,   NEL,
+     B   NFT)
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         IADBUF   = IPM(7,MID(I)) - 1
         CC  = UPARAM(IADBUF + NUPAR + 4)
         CN  = UPARAM(IADBUF + NUPAR + 10)
@@ -710,7 +733,7 @@ C
         ENDIF
       ENDDO
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         IADBUF   = IPM(7,MID(I)) - 1
         IFUNC(I) = 0
         IFV(I)   = IPM(10 + IF2 + 3,MID(I))
@@ -731,16 +754,20 @@ C
 C
       KK = 1 + NUMELR * (ANIM_FE(11)+ANIM_FE(12))
       IF (NUVAR >= 3) COORD_OLD => UVAR(3,1:NEL)
-      CALL REDEF3(FZ      ,ZK     ,DZ      ,FZEP       ,DZOLD   ,
-     .            DPZ     ,TF     ,NPF     ,ZC         ,OFF     ,
-     .            E6(1,3) ,DPZ2   ,ANIM(KK),ANIM_FE(13),POSZ    ,
-     .            FR_WAVE ,XL0    ,DMN     ,DMX        ,DV      ,
-     .            FF      ,LSCALE ,EE      ,GF3        ,IFUNC3  ,
-     .            YIELDZ  ,ALDP   ,AK      ,B          ,D       ,
-     .            IECROU  ,IFUNC  ,IFV     ,IFUNC2     ,EPLA    ,
-     .            COORD_OLD,FX_MAX,NOT_USED,NOT_USED)
+      CALL REDEF3(
+     1   FZ,         ZK,         DZ,         FZEP,
+     2   DZOLD,      DPZ,        TF,         NPF,
+     3   ZC,         OFF,        E6(1,3),    DPZ2,
+     4   ANIM(KK),   ANIM_FE(13),POSZ,       FR_WAVE,
+     5   XL0,        DMN,        DMX,        DV,
+     6   FF,         LSCALE,     EE,         GF3,
+     7   IFUNC3,     YIELDZ,     ALDP,       AK,
+     8   B,          D,          IECROU,     IFUNC,
+     9   IFV,        IFUNC2,     EPLA,       COORD_OLD,
+     A   FX_MAX,     NOT_USED,   NOT_USED,   NEL,
+     B   NFT)
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         IADBUF   = IPM(7,MID(I)) - 1
         CC  = UPARAM(IADBUF + NUPAR + 5)
         CN  = UPARAM(IADBUF + NUPAR + 11)
@@ -790,7 +817,7 @@ C
 C---------------------
 C     ROTATIONS
 C---------------------
-      DO I=LFT,LLT
+      DO I=1,NEL
         IADBUF= IPM(7,MID(I)) - 1
         XIN(I)=  UINER(I)
         XK(I) =  UPARAM(IADBUF + I11 + 4)
@@ -811,21 +838,21 @@ C
         XCR(I)= MAX(XC(I),YC(I),ZC(I)) + XHR(I) +XCR(I)+XH(I)
       ENDDO
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         DXOLD(I)=RX(I)
         DYOLD(I)=RY(I)
         DZOLD(I)=RZ(I)
       ENDDO
 !
       IF ( INISPRI /= 0 .AND. TT == ZERO) THEN
-        DO I=LFT,LLT
+        DO I=1,NEL
           DXOLD(I)=RX0(I)
           DYOLD(I)=RY0(I)
           DZOLD(I)=RZ0(I)
         ENDDO
       ENDIF
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         X21  = (RX2(I)-RX1(I))*DT1
         Y21  = (RY2(I)-RY1(I))*DT1
         Z21  = (RZ2(I)-RZ1(I))*DT1
@@ -834,7 +861,7 @@ C
         RZ(I) = DZOLD(I) + X21*EXZ2(I)+Y21*EYZ2(I)+Z21*EZZ2(I)
       ENDDO
 C-------------------------------
-      DO I=LFT,LLT
+      DO I=1,NEL
         IADBUF   = IPM(7,MID(I)) - 1
         IFUNC(I) = 0
         IFV(I)   = IPM(10 + IF2 + 4,MID(I))
@@ -853,16 +880,20 @@ C-------------------------------
         DMX(I)   = UPARAM(IADBUF + I9 + 4)
       ENDDO
       IF (NUVAR >= 4) COORD_OLD => UVAR(4,1:NEL)
-      CALL REDEF3(XMOM    ,XK      ,RX      ,XMEP       ,DXOLD   ,
-     .            RPX     ,TF      ,NPF     ,XC         ,OFF     ,
-     .            E6(1,4) ,RPX2    ,ANIM    ,0          ,POSXX   ,
-     .            FR_WAVE ,XL0     ,DMN     ,DMX        ,DV      ,
-     .            FF      ,LSCALE  ,EE      ,GF3        ,IFUNC3  ,
-     .            YIELDX2 ,ALDP    ,AK      ,B          ,D       ,
-     .            IECROU  ,IFUNC   ,IFV     ,IFUNC2     ,EPLA    ,
-     .            COORD_OLD,MX_MAX ,NOT_USED,NOT_USED)
+      CALL REDEF3(
+     1   XMOM,     XK,       RX,       XMEP,
+     2   DXOLD,    RPX,      TF,       NPF,
+     3   XC,       OFF,      E6(1,4),  RPX2,
+     4   ANIM,     0,        POSXX,    FR_WAVE,
+     5   XL0,      DMN,      DMX,      DV,
+     6   FF,       LSCALE,   EE,       GF3,
+     7   IFUNC3,   YIELDX2,  ALDP,     AK,
+     8   B,        D,        IECROU,   IFUNC,
+     9   IFV,      IFUNC2,   EPLA,     COORD_OLD,
+     A   MX_MAX,   NOT_USED, NOT_USED, NEL,
+     B   NFT)
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         IADBUF= IPM(7,MID(I)) - 1
         CC  = UPARAM(IADBUF + NUPAR + 6)
         CN  = UPARAM(IADBUF + NUPAR + 12)
@@ -910,7 +941,7 @@ C
         ENDIF
       ENDDO
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         IADBUF   = IPM(7,MID(I)) - 1
         IFUNC(I) = 0
         IFV(I)   = IPM(10 + IF2 + 5,MID(I))
@@ -929,16 +960,20 @@ C
         DMX(I)   = UPARAM(IADBUF + I9 + 5)
       ENDDO
       IF (NUVAR >= 5) COORD_OLD => UVAR(5,1:NEL)
-      CALL REDEF3(YMOM    ,YK      ,RY      ,YMEP       ,DYOLD   ,
-     .            RPY     ,TF      ,NPF     ,YC         ,OFF     ,
-     .            E6(1,5) ,RPY2    ,ANIM    ,0          ,POSYY   ,
-     .            FR_WAVE ,XL0     ,DMN     ,DMX        ,DV      ,
-     .            FF      ,LSCALE  ,EE      ,GF3        ,IFUNC3  ,
-     .            YIELDY2 ,ALDP    ,AK      ,B          ,D       ,
-     .            IECROU  ,IFUNC   ,IFV     ,IFUNC2     ,EPLA    ,
-     .            COORD_OLD,MX_MAX ,NOT_USED,NOT_USED)
+      CALL REDEF3(
+     1   YMOM,     YK,       RY,       YMEP,
+     2   DYOLD,    RPY,      TF,       NPF,
+     3   YC,       OFF,      E6(1,5),  RPY2,
+     4   ANIM,     0,        POSYY,    FR_WAVE,
+     5   XL0,      DMN,      DMX,      DV,
+     6   FF,       LSCALE,   EE,       GF3,
+     7   IFUNC3,   YIELDY2,  ALDP,     AK,
+     8   B,        D,        IECROU,   IFUNC,
+     9   IFV,      IFUNC2,   EPLA,     COORD_OLD,
+     A   MX_MAX,   NOT_USED, NOT_USED, NEL,
+     B   NFT)
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         IADBUF= IPM(7,MID(I)) - 1
         CC  =  UPARAM(IADBUF + NUPAR + 7)
         CN  =  UPARAM(IADBUF + NUPAR + 13)
@@ -986,7 +1021,7 @@ C
         ENDIF
       ENDDO
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         IADBUF   = IPM(7,MID(I)) - 1
         IFUNC(I) = 0
         IFV(I)   = IPM(10 + IF2 + 6,MID(I))
@@ -1005,16 +1040,20 @@ C
         DMX(I)   = UPARAM(IADBUF + I9 + 6)
       ENDDO
       IF (NUVAR >= 6) COORD_OLD => UVAR(6,1:NEL)
-      CALL REDEF3(ZMOM    ,ZK      ,RZ      ,ZMEP       ,DZOLD    ,
-     .            RPZ     ,TF      ,NPF     ,ZC         ,OFF      ,
-     .            E6(1,6) ,RPZ2    ,ANIM    ,0          ,POSZZ    ,
-     .            FR_WAVE ,XL0     ,DMN     ,DMX        ,DV       ,
-     .            FF      ,LSCALE  ,EE      ,GF3        ,IFUNC3   ,
-     .            YIELDZ2 ,ALDP    ,AK      ,B          ,D        ,
-     .            IECROU  ,IFUNC   ,IFV     ,IFUNC2     ,EPLA     ,
-     .            COORD_OLD,MX_MAX ,NOT_USED,NOT_USED)
+      CALL REDEF3(
+     1   ZMOM,     ZK,       RZ,       ZMEP,
+     2   DZOLD,    RPZ,      TF,       NPF,
+     3   ZC,       OFF,      E6(1,6),  RPZ2,
+     4   ANIM,     0,        POSZZ,    FR_WAVE,
+     5   XL0,      DMN,      DMX,      DV,
+     6   FF,       LSCALE,   EE,       GF3,
+     7   IFUNC3,   YIELDZ2,  ALDP,     AK,
+     8   B,        D,        IECROU,   IFUNC,
+     9   IFV,      IFUNC2,   EPLA,     COORD_OLD,
+     A   MX_MAX,   NOT_USED, NOT_USED, NEL,
+     B   NFT)
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         IADBUF= IPM(7,MID(I)) - 1
         CC  = UPARAM(IADBUF + NUPAR + 8)
         CN  = UPARAM(IADBUF + NUPAR + 14)
@@ -1062,13 +1101,13 @@ C
         ENDIF
       ENDDO
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         E(I) = E6(I,1)+E6(I,2)+E6(I,3)+E6(I,4)+E6(I,5)+E6(I,6)
       ENDDO
 C-------------------------------
 C     RUPTURE COUPLEE
 C-------------------------------
-      DO I=LFT,LLT
+      DO I=1,NEL
         IADBUF   = IPM(7,MID(I)) - 1
         ISRATE = NINT(UPARAM(IADBUF + NUPAR + 27))
 C---- smoothing factor alpha = 2PI*fc*dt/(2PI*fc*dt+1) ---
@@ -1097,27 +1136,39 @@ C
 C-------------------------------
 C     PLASTICITE COUPLEE
 C-------------------------------
-      CALL REPLA3(XK   ,RPX ,TF  ,NPF  ,IECROU,
-     .            IFUNC,IFV ,EPLA)
-      CALL REPLA3(YK   ,RPY ,TF  ,NPF  ,IECROU,
-     .            IFUNC,IFV ,EPLA)
-      CALL REPLA3(ZK   ,RPZ ,TF  ,NPF  ,IECROU,
-     .            IFUNC,IFV ,EPLA)
+      CALL REPLA3(
+     1   XK,      RPX,     TF,      NPF,
+     2   IECROU,  IFUNC,   IFV,     EPLA,
+     3   NEL)
+      CALL REPLA3(
+     1   YK,      RPY,     TF,      NPF,
+     2   IECROU,  IFUNC,   IFV,     EPLA,
+     3   NEL)
+      CALL REPLA3(
+     1   ZK,      RPZ,     TF,      NPF,
+     2   IECROU,  IFUNC,   IFV,     EPLA,
+     3   NEL)
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
           IADBUF= IPM(7,MID(I)) - 1
           XK(I)=UPARAM(IADBUF + I11 + 1)
           YK(I)=UPARAM(IADBUF + I11 + 2)
           ZK(I)=UPARAM(IADBUF + I11 + 3)
       ENDDO
 C
-      CALL REPLA3(XK   ,DPX ,TF  ,NPF  ,IECROU,
-     .            IFUNC,IFV ,EPLA)
-      CALL REPLA3(YK   ,DPY ,TF  ,NPF  ,IECROU,
-     .            IFUNC,IFV ,EPLA)
-      CALL REPLA3(ZK   ,DPZ ,TF  ,NPF  ,IECROU,
-     .            IFUNC,IFV ,EPLA)
-      DO I=LFT,LLT
+      CALL REPLA3(
+     1   XK,      DPX,     TF,      NPF,
+     2   IECROU,  IFUNC,   IFV,     EPLA,
+     3   NEL)
+      CALL REPLA3(
+     1   YK,      DPY,     TF,      NPF,
+     2   IECROU,  IFUNC,   IFV,     EPLA,
+     3   NEL)
+      CALL REPLA3(
+     1   ZK,      DPZ,     TF,      NPF,
+     2   IECROU,  IFUNC,   IFV,     EPLA,
+     3   NEL)
+      DO I=1,NEL
 C        XM(I)=XM(I)*XL0(I)
         XKM(I)=XKM(I)/XL0(I)
         XCM(I)=XCM(I)/XL0(I)

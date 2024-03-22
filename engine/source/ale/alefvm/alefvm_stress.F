@@ -1,31 +1,31 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  ALEFVM_STRESS                 source/ale/alefvm/alefvm_stress.F
 Chd|-- called by -----------
 Chd|        SFORC3                        source/elements/solid/solide/sforc3.F
 Chd|-- calls ---------------
-Chd|        ALEFVM_MOD                    ../common_source/modules/alefvm_mod.F
+Chd|        ALEFVM_MOD                    ../common_source/modules/ale/alefvm_mod.F
 Chd|====================================================================
       SUBROUTINE ALEFVM_STRESS (
      1                          IXS,  NV46, SIG,  QVIS, 
@@ -60,15 +60,8 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "vect01_c.inc"
 #include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "com06_c.inc"
-#include      "com08_c.inc"
 #include      "nsvis_c.inc"
-#include      "fluid_scr_c.inc"
-#include      "inter22.inc"
 #include      "param_c.inc"
-#include      "alefvm.inc"
-#include      "task_c.inc"
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C----------------------------------------------- 
@@ -112,8 +105,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   P r e - C o n d i t i o n s
 C-----------------------------------------------      
-      IF(IALEFVM==0)RETURN
-      IMAT        = IXS(1,LFT+NFT)
+      IF(ALEFVM_Param%IEnabled==0)RETURN
+      IMAT        = IXS(1,1+NFT)
       IALEFVM_FLG = IPM(251,IMAT)  
       IF(IALEFVM_FLG <= 1)RETURN       
 C-----------------------------------------------
@@ -128,16 +121,16 @@ C-----------------------------------------------
       !-------------------------------------------------------------!
       ! TOTAL TENSOR                                                !
       !-------------------------------------------------------------! 
-      DO I=LFT,LLT                          
+      DO I=1,NEL                          
         S1(I) = SIG(I,1) + SVIS(I,1) - QVIS(I) 
         S2(I) = SIG(I,2) + SVIS(I,2) - QVIS(I) 
         S3(I) = SIG(I,3) + SVIS(I,3) - QVIS(I) 
         S4(I) = SIG(I,4) + SVIS(I,4)
         S5(I) = SIG(I,5) + SVIS(I,5) 
-        S6(I) = SIG(I,6) + SVIS(I,6)		   
+        S6(I) = SIG(I,6) + SVIS(I,6)       
       ENDDO 
       
-      DO I=LFT,LLT
+      DO I=1,NEL
         P(I)      = -THIRD*(S1(I)+S2(I)+S3(I))        
       ENDDO
       
@@ -146,9 +139,9 @@ C-----------------------------------------------
       ! NORMAL VECTOR FOR ALE                                       !
       !-------------------------------------------------------------!                                       
 !      IF(JALE==1 .OR. JEUL==0)THEN  !lagrangian bricks also
-        DO I=LFT,LLT
+        DO I=1,NEL
           II     = I + NFT
-	  !---8 local node numbers NC1 TO NC8 for solid element I ---!
+            !---8 local node numbers NC1 TO NC8 for solid element I ---!
           NC1(I)=IXS(2,II)
           NC2(I)=IXS(3,II)
           NC3(I)=IXS(4,II)
@@ -157,7 +150,7 @@ C-----------------------------------------------
           NC6(I)=IXS(7,II)
           NC7(I)=IXS(8,II)
           NC8(I)=IXS(9,II)
-	  !
+            !
           !---Coordinates of the 8 nodes
           X1(I)=X(1,NC1(I))
           Y1(I)=X(2,NC1(I))
@@ -191,7 +184,7 @@ C-----------------------------------------------
           Y8(I)=X(2,NC8(I))
           Z8(I)=X(3,NC8(I))
         ENDDO    
-        DO I=LFT,LLT        
+        DO I=1,NEL        
           ! Face-1
           N1X(I)=(Y3(I)-Y1(I))*(Z2(I)-Z4(I)) - (Z3(I)-Z1(I))*(Y2(I)-Y4(I))
           N1Y(I)=(Z3(I)-Z1(I))*(X2(I)-X4(I)) - (X3(I)-X1(I))*(Z2(I)-Z4(I))
@@ -225,7 +218,7 @@ C-----------------------------------------------
       ! 1:3 : INTEGRAL ON EACH FACE  from Integral(DIV(SIGMA),Volume)!
       ! 4   : max(u+x,u-c)                                           !
       !--------------------------------------------------------------!
-      DO I=LFT,  LLT
+      DO I=1,  NEL
         II                  = I + NFT
         MASS                = RHO(I)*VOL(I)
         NORM(1)             = SQRT(N1X(I)*N1X(I) + N1Y(I)*N1Y(I) + N1Z(I)*N1Z(I)) 
@@ -248,32 +241,32 @@ C-----------------------------------------------
         SURF(6)             = HALF*NORM(6)
         !---storage
         !   index1=1 centroid data
-        F_FACE(1  ,1  ,II)  = RHO(I)
-        F_FACE(1  ,2  ,II)  = SSP(I)
-        F_FACE(1  ,3  ,II)  = RHO(I)*SSP(I)
-        F_FACE(1  ,4  ,II)  = P(I)
-        F_FACE(1  ,5  ,II)  = SQRT(MOM(I,1)*MOM(I,1)+MOM(I,2)*MOM(I,2)+MOM(I,3)*MOM(I,3))/RHO(I)/VOL(I) / SSP(I)    ! material velocity (rho.U/rho) divided by sound speed is mach number : M=U/ssps
-        F_FACE(1  ,6  ,II)  = ZERO   !available
+        ALEFVM_Buffer%F_FACE(1  ,1  ,II)  = RHO(I)
+        ALEFVM_Buffer%F_FACE(1  ,2  ,II)  = SSP(I)
+        ALEFVM_Buffer%F_FACE(1  ,3  ,II)  = RHO(I)*SSP(I)
+        ALEFVM_Buffer%F_FACE(1  ,4  ,II)  = P(I)
+        ALEFVM_Buffer%F_FACE(1  ,5  ,II)  = SQRT(MOM(I,1)*MOM(I,1)+MOM(I,2)*MOM(I,2)+MOM(I,3)*MOM(I,3))/RHO(I)/VOL(I) / SSP(I)    ! material velocity (rho.U/rho) divided by sound speed is mach number : M=U/ssps
+        ALEFVM_Buffer%F_FACE(1  ,6  ,II)  = ZERO   !available
         !   index1=2 Surface
-        F_FACE(2  ,1:6,II)  = SURF(1:6)
+        ALEFVM_Buffer%F_FACE(2  ,1:6,II)  = SURF(1:6)
         !   index1=3 Normal Velocity
-        F_FACE(3  ,1:6,II)  = U_N(1:6)
+        ALEFVM_Buffer%F_FACE(3  ,1:6,II)  = U_N(1:6)
       ENDDO
 
         !DEBUG-OUTPUT---------------!
-        if(IALEFVM_OUTP_STRESS /= 0)then
+        if(ALEFVM_Param%IOUTP_STRESS /= 0)then
           debug_outp = .FALSE.
-          if(IALEFVM_OUTP_STRESS>0)then
+          if(ALEFVM_Param%IOUTP_STRESS>0)then
             do i=lft,llt
               ii = nft + i
-              if(ixs(11,ii)==IALEFVM_OUTP_STRESS)THEN
+              if(ixs(11,ii)==ALEFVM_Param%IOUTP_STRESS)THEN
                 debug_outp = .TRUE.
                 idbf   = i
                 idbl   = i
                 EXIT
               endif
              enddo
-          elseif(IALEFVM_OUTP_STRESS==-1)then
+          elseif(ALEFVM_Param%IOUTP_STRESS==-1)then
             debug_outp=.TRUE.
                 idbf   = lft
                 idbl   = llt          
@@ -301,19 +294,19 @@ C-----------------------------------------------
             write (*,FMT='(A,3E26.14,A)')  "                            |_", S6(I),S5(I),S3(I),"_|" 
             write (*,FMT='(A,2E26.14)')    "           p               =  ",-THIRD*SUM(SIG(I,1:3)),P(I)
             write (*,FMT='(A,1E26.14)')    "           q               =  ",QVIS(I)           
-            write (*,FMT='(A,1E26.14)')    "           M               =  ",F_FACE(1  ,5  ,II)  
-            write (*,FMT='(A,1E26.14)')    "         rho               =  ",F_FACE(1  ,1  ,II)
-            write (*,FMT='(A,1E26.14)')    "           u               =  ",F_FACE(1  ,5  ,II)*SSP(I)  
-            write (*,FMT='(A,1E26.14)')    "         ssp               =  ",F_FACE(1  ,2  ,II)
-            write (*,FMT='(A,1E26.14)')    "           z               =  ",F_FACE(1  ,3  ,II)   
+            write (*,FMT='(A,1E26.14)')    "           M               =  ",ALEFVM_Buffer%F_FACE(1  ,5  ,II)  
+            write (*,FMT='(A,1E26.14)')    "         rho               =  ",ALEFVM_Buffer%F_FACE(1  ,1  ,II)
+            write (*,FMT='(A,1E26.14)')    "           u               =  ",ALEFVM_Buffer%F_FACE(1  ,5  ,II)*SSP(I)  
+            write (*,FMT='(A,1E26.14)')    "         ssp               =  ",ALEFVM_Buffer%F_FACE(1  ,2  ,II)
+            write (*,FMT='(A,1E26.14)')    "           z               =  ",ALEFVM_Buffer%F_FACE(1  ,3  ,II)   
             write (*,FMT='(A,3E26.14)')    "       rho.U               =  ",MOM(I,1:3)  
             write (*,FMT='(A,3E26.14)')    "           V               =  ",VOL(I)                                                                                     
             write(*,FMT='(A34,6A26)')      "                                  ",    
      .                                     "#-------- face_1 ---------","#-------- face_2 ---------",
      .                                     "#-------- face_3 ---------","#-------- face_4 ---------",
      .                                     "#-------- face_5 ---------","#-------- face_6 --------#"  
-            write (*,FMT='(A,8E26.14)')    "    SURF                   =", F_FACE(1,1:6,II)          
-            write (*,FMT='(A,8E26.14)')    "    <U,n>                  =", F_FACE(2,1:6,II)
+            write (*,FMT='(A,8E26.14)')    "    SURF                   =", ALEFVM_Buffer%F_FACE(1,1:6,II)          
+            write (*,FMT='(A,8E26.14)')    "    <U,n>                  =", ALEFVM_Buffer%F_FACE(2,1:6,II)
             print *, "      "          
           enddo
 !#!include "lockoff.inc"       

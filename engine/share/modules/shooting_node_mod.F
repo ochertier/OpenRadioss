@@ -1,29 +1,31 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  SHOOTING_NODE_MOD             share/modules/shooting_node_mod.F
 Chd|-- called by -----------
 Chd|        CHECK_EDGE_STATE              source/interfaces/interf/check_edge_state.F
+Chd|        CHECK_REMOTE_SURFACE_STATE    source/interfaces/interf/check_remote_surface_state.F
+Chd|        CHECK_SURFACE_STATE           source/interfaces/interf/check_surface_state.F
 Chd|        COUNT_NB_ELEM_EDGE            source/interfaces/interf/count_nb_elem_edge.F
 Chd|        DEALLOC_SHOOT_INTER           source/interfaces/interf/dealloc_shoot_inter.F
 Chd|        FIND_EDGE_FROM_REMOTE_PROC    source/interfaces/interf/find_edge_from_remote_proc.F
@@ -51,8 +53,8 @@ C-----------------------------------------------
         END TYPE working_array
 
         TYPE remote_elm
-            INTEGER, DIMENSION(:), ALLOCATABLE :: REMOTE_ELM_M  ! number of remote element for the main edges
-            INTEGER, DIMENSION(:), ALLOCATABLE :: REMOTE_ELM_S  ! number of remote element for the secondary edges
+            INTEGER, DIMENSION(:), ALLOCATABLE :: REMOTE_ELM_M  ! list of remote element for the main edges
+            INTEGER, DIMENSION(:), ALLOCATABLE :: REMOTE_ELM_S  ! list of remote element for the secondary edges
         END TYPE remote_elm
 
         TYPE shooting_node_type 
@@ -64,7 +66,7 @@ C-----------------------------------------------
             INTEGER, DIMENSION(:), ALLOCATABLE :: SEC_NODE_ID ! ID of secondary nodes in each interface
             ! ------------------------------
             ! main node array
-            INTEGER :: MAX_PROC_NB      ! mamimun number of processor
+            INTEGER :: MAX_PROC_NB      ! maximun number of processor
             INTEGER :: SIZE_M_NODE_PROC ! size of M_NODE_PROC
             INTEGER, DIMENSION(:), ALLOCATABLE :: SHIFT_M_NODE_PROC ! shift to point to M_NODE_PROC array & number of processor per node
             INTEGER, DIMENSION(:), ALLOCATABLE :: M_NODE_PROC       ! list of processor per node
@@ -83,6 +85,12 @@ C-----------------------------------------------
             INTEGER, DIMENSION(:), ALLOCATABLE :: S_NODE_EDGE       ! list of edge per node (S node)
 
             INTEGER, DIMENSION(:,:), ALLOCATABLE :: SHIFT_INTERFACE   ! shift for surface ID
+            ! ------------------------------
+            ! surface array
+            INTEGER :: SIZE_REMOTE_SURF ! size of array REMOTE_SURF
+            INTEGER :: NUMBER_REMOTE_SURF ! number of potential rmote surface for type 24 & 25
+            INTEGER, DIMENSION(:), ALLOCATABLE :: REMOTE_SURF ! list of potential rmote surface for type 24 & 25
+            ! ------------------------------
             ! ------------------------------
             ! working array
             INTEGER, DIMENSION(:), ALLOCATABLE :: GLOBAL_NB_ELEM_OFF    ! number of deactivated element for each omp thread

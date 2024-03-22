@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  HM_READ_SUBSET                source/model/assembling/hm_read_subset.F
 Chd|-- called by -----------
@@ -58,6 +58,7 @@ C     LSUBMODEL       SUBMODEL STRUCTURE
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE MY_ALLOC_MOD
       USE MESSAGE_MOD
       USE GROUPDEF_MOD     
       USE SUBMODEL_MOD
@@ -81,12 +82,8 @@ C MODIFIED ARGUMENTS
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr03_c.inc"
 #include      "scr17_c.inc"
-#include      "param_c.inc"
 #include      "units_c.inc"
-#include      "my_allocate.inc"
-#include      "submod_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -152,12 +149,12 @@ C--------------------------------------------------
         SUBSET(ISU)%NPART  = 0
         SUBSET(ISU)%NCHILD = NSU
         SUBSET(ISU)%TH_FLAG = 0
-        MY_ALLOCATE(SUBSET(ISU)%NVARTH,10) 
+        CALL MY_ALLOC(SUBSET(ISU)%NVARTH,10) 
 c        /iTH , i=A,,B, ... I 
 c     (  /iTH --> 9 additional time history files + 1 for /TH )
         SUBSET(ISU)%NVARTH(1:10) = 0
         SUBSET(ISU)%THIAD = 0
-        MY_ALLOCATE(SUBSET(ISU)%CHILD,NSU)
+        CALL MY_ALLOC(SUBSET(ISU)%CHILD,NSU)
         DO K=1,NSU
           SUBSET(ISU)%CHILD(K) = 0
         ENDDO
@@ -232,7 +229,7 @@ c
       SUBSET(NSUBS)%NCHILD = 0
       SUBSET(NSUBS)%NPART  = 0
       SUBSET(NSUBS)%TH_FLAG = 0
-      MY_ALLOCATE(SUBSET(NSUBS)%NVARTH,10) !  /iTH , i=A,,B, ... I 
+      CALL MY_ALLOC(SUBSET(NSUBS)%NVARTH,10) !  /iTH , i=A,,B, ... I 
 !     (  /iTH --> 9 additional time history files + 1 for /TH )
       SUBSET(NSUBS)%NVARTH(1:10) = 0
       SUBSET(NSUBS)%THIAD = 0
@@ -247,7 +244,7 @@ c
       ENDDO
 !==================================================
       SUBSET(NSUBS)%NCHILD = NSU
-      MY_ALLOCATE(SUBSET(NSUBS)%CHILD,NSU)
+      CALL MY_ALLOC(SUBSET(NSUBS)%CHILD,NSU)
       DO I=1,NSU
         SUBSET(NSUBS)%CHILD(I) = BUFTMP(I)
       ENDDO
@@ -267,7 +264,7 @@ C-------------------------------------
           ENDIF
         ENDDO
         SUBSET(ISU)%NPART = NP   
-        MY_ALLOCATE(SUBSET(ISU)%PART,NP)
+        CALL MY_ALLOC(SUBSET(ISU)%PART,NP)
         DO K=1,NP
           SUBSET(ISU)%PART(K) = BUFTMP(K) 
         ENDDO
@@ -317,7 +314,7 @@ C-------------------------------------
           NC = SUBLVL(SUBSET,NSUBS,ISU,NTP,BUFTMP)               
         ENDDO
         SUBSET(ISU)%NTPART = NTP
-        MY_ALLOCATE(SUBSET(ISU)%TPART,NTP)
+        CALL MY_ALLOC(SUBSET(ISU)%TPART,NTP)
         DO I=1,NTP
           SUBSET(ISU)%TPART(I) = BUFTMP(I)
         ENDDO
@@ -458,14 +455,14 @@ c     ligne subset
       ELSE
         K = 3
       ENDIF
-Cmi+++
+C  +++
 !      if (ID == 50000005)then
 !        write(iout,*)'MIRC_STOP_SUBSETS',ID,ISU,NIVEAU,L
 !        write(iout,*)'MIRC_STOP_SUBSETS',LEN(SUBSET(ISU)%TITLE),
 !     . SUBSET(ISU)%TITLE
 !        stop
 !      endif
-Cmi---
+C  ---
       DO I=1,NIVEAU-1
         LIGNE(K:K+L-1)=BAR(I)(1:L)
         K=K+L

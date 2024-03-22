@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  OUTP_N_V                      source/output/sty/outp_n_v.F  
 Chd|-- called by -----------
@@ -37,7 +37,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "units_c.inc"
-#include      "scr05_c.inc"
 #include      "task_c.inc"
 #include      "scr16_c.inc"
 #include      "spmd_c.inc"
@@ -114,10 +113,8 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "scr05_c.inc"
 #include      "scr16_c.inc"
 #include      "scr17_c.inc"
-#include      "spmd_c.inc"
 #include      "task_c.inc"
 #include      "units_c.inc"
 #include      "com01_c.inc"
@@ -176,11 +173,9 @@ C----
       END IF
 C
 C----
-C     DO N=1,NUMELUR
-C     ENDDO
 C
 C----
-      WRITE(IUGEO,'(A)')'/SECTION   /VECTOR	/FORCE'
+      WRITE(IUGEO,'(A)')'/SECTION   /VECTOR  /FORCE'
       WRITE(IUGEO,'(A)')
      .  'Sections forces and moments'
       IF (OUTYY_FMT==2) THEN
@@ -201,15 +196,15 @@ C
 C----
       IF (OUTYY_FMT==2) THEN
         WRITE(IUGEO,'(I8,1P3E16.9,/,8X,1P3E16.9)')
-     .  	(NOM_SECT(1,N),(FOPT(I,N),I=1,3),
+     .    (NOM_SECT(1,N),(FOPT(I,N),I=1,3),
      .           (FOPT(I,N),I=4,6),N=1,NSECT)
       ELSE
         WRITE(IUGEO,'(I10,1P3E20.13,/,10X,1P3E20.13)')
-     .  	(NOM_SECT(1,N),(FOPT(I,N),I=1,3),
+     .    (NOM_SECT(1,N),(FOPT(I,N),I=1,3),
      .           (FOPT(I,N),I=4,6),N=1,NSECT)
       ENDIF
 C
-      WRITE(IUGEO,'(A)')'/RWALL    /VECTOR	/FORCE'
+      WRITE(IUGEO,'(A)')'/RWALL    /VECTOR  /FORCE'
       WRITE(IUGEO,'(A)')
      .  'Rigid wall forces'
       IF (OUTYY_FMT==2) THEN
@@ -252,7 +247,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "units_c.inc"
-#include      "scr05_c.inc"
 #include      "task_c.inc"
 #include      "scr16_c.inc"
 #include      "spmd_c.inc"

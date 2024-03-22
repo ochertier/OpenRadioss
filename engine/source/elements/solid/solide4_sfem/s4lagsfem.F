@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  S4LAGSFEM                     source/elements/solid/solide4_sfem/s4lagsfem.F
 Chd|-- called by -----------
@@ -30,9 +30,9 @@ Chd|        INITBUF                       share/resol/initbuf.F
 Chd|        S10VOLNOD3                    source/elements/solid/solide4_sfem/s10volnod3.F
 Chd|        S10VOLNODT3                   source/elements/solid/solide4_sfem/s10volnodt3.F
 Chd|        S4VOLNOD3                     source/elements/solid/solide4_sfem/s4volnod3.F
-Chd|        S4VOLNOD_SM                   source/elements/solid/solide4_sfem/s4volnod3.F
+Chd|        S4VOLNOD_SM                   source/elements/solid/solide4_sfem/s4volnod_sm.F
 Chd|        SPMD_EXCH_VOL                 source/mpi/nodes/spmd_exch_vol.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        INITBUF_MOD                   share/resol/initbuf.F         
 Chd|====================================================================
       SUBROUTINE S4LAGSFEM(IPARG,IXS,X,V,ELBUF_TAB,VARNOD,
@@ -56,12 +56,8 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com08_c.inc"
 #include      "vect01_c.inc"
-#include      "task_c.inc"
-#include      "scr01_c.inc"
 #include      "scr05_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -100,7 +96,7 @@ C
         NNOD = IPARG(28,NG)
         ICPRE  = IPARG(10,NG)
         IF(NNOD/=4 .AND. NNOD /= 10) CYCLE
-        CALL INITBUF (IPARG    ,NG      ,
+        CALL INITBUF(IPARG    ,NG      ,
      2        MTN     ,LLT     ,NFT     ,IAD     ,ITY     ,
      3        NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,
      4        JTHE    ,JLAG    ,JMULT   ,JHBE    ,JIVF    ,
@@ -124,7 +120,10 @@ C
 C
         GBUF => ELBUF_TAB(NG)%GBUF
         IF(NNOD==4 .AND.ISROT == 3) THEN
-          CALL S4VOLNOD3(VARNOD6,X,NC1,NC2,NC3,NC4,GBUF%OFF,XDP,NEL)
+          CALL S4VOLNOD3(
+     1   VARNOD6, X,       NC1,     NC2,
+     2   NC3,     NC4,     GBUF%OFF,XDP,
+     3   NEL,     ISMSTR)
           IF(IRESP==1)THEN
            LBUF => ELBUF_TAB(NG)%BUFLY(1)%LBUF(1,1,1)
            DO I=LFT,LLT
@@ -144,8 +143,10 @@ C
            ENDDO
           END IF !(IRESP==1)THEN
 C-----for small strain elements
-          CALL S4VOLNOD_SM(VARNOD6,V,NC1,NC2,NC3,NC4,VOL0,GBUF%AMU,GBUF%OFF,
-     2                     GBUF%SMSTR,NEL)
+          CALL S4VOLNOD_SM(
+     1   VARNOD6,   V,         NC1,       NC2,
+     2   NC3,       NC4,       VOL0,      GBUF%AMU,
+     3   GBUF%OFF,  GBUF%SMSTR,NEL,       ISMSTR)
           !Parith-On treatment
           CALL FOAT_TO_6_FLOAT(LFT  ,LLT  ,VOL0 ,VOL06 )
           DO I=LFT,LLT      
@@ -176,8 +177,11 @@ C-----T10 large strain first
             NC(LFT:LLT,5:10) = 0
           ENDIF
           IF (ISMSTR==10) THEN
-            CALL S10VOLNODT3(ELBUF_TAB(NG),VARNOD6,X,NC,GBUF%OFF,
-     +                       GBUF%SMSTR,XDP,NEL)
+            NPT = 4 
+            CALL S10VOLNODT3(
+     1   ELBUF_TAB(NG),VARNOD6,      X,            NC,
+     2   GBUF%OFF,     GBUF%SMSTR,   XDP,          NEL,
+     3   NPT)
             IBID = 1
             DO IP=1,NPT
               LBUF => ELBUF_TAB(NG)%BUFLY(IBID)%LBUF(IP,IBID,IBID)
@@ -196,7 +200,10 @@ C-----T10 large strain first
                ENDDO
             END DO !IP=1,NPT
           ELSE
-            CALL S10VOLNOD3(VARNOD6,X,NC,GBUF%OFF,VOLG,XDP,NEL)
+            CALL S10VOLNOD3(
+     1   VARNOD6, X,       NC,      GBUF%OFF,
+     2   VOLG,    XDP,     NEL,     NPT,
+     3   ISMSTR)
             DO I=LFT,LLT
              IF(GBUF%OFF(I) == ZERO) THEN
                VOL0(I)=ZERO

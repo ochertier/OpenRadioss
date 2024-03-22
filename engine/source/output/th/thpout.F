@@ -1,31 +1,31 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  THPOUT                        source/output/th/thpout.F     
 Chd|-- called by -----------
 Chd|        HIST2                         source/output/th/hist2.F      
 Chd|-- calls ---------------
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE THPOUT(IPARG , NTHGRP2  , ITHGRP ,GEO,  IXP,  
      .                  ITHBUF, ELBUF_TAB, WA     )
@@ -42,7 +42,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr05_c.inc"
 #include      "task_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
@@ -116,9 +115,7 @@ C
                             K=ITHBUF(IH)
                             IP=ITHBUF(IH+NN)
                             PID = IXP(5,NFT+I) 
-                            !IF (IGTYP == 3) AREA = GEO(1,PID) 
-                            AREA = GBUF%AREA(I)
-                            !AREAPT(I) = GEO(IPA+IPT,PID)    
+                            IF (IGTYP == 3) AREA = GEO(1,PID)   
                             IF(IGTYP == 18 ) THEN
                               AREA = ZERO
                               DO IPT = 1, NPT
@@ -198,7 +195,6 @@ C
                                              LBUF  => BUFLY%LBUF(1,1,IPT)
                                              WA(IJK) = WA(IJK)+ LBUF%SIG(KK(3)+I) * AREAPT/AREA
                                             ENDDO 
-
                                            END IF !(BUFLY%L_SIG > 0) 
                                         END IF! (IGTYP) 
                                     ELSEIF (ITHBUF(L) > 11 .AND.ITHBUF(L) <= 254 ) THEN
@@ -211,8 +207,12 @@ C
                                             WA(IJK) = LBUF%SIG(KK(IK)+I)
                                         ENDIF
                                     ELSEIF (ITHBUF(L) == 255) THEN
-                                        WA(IJK)=ZERO 
-                                        IF(IGTYP == 18 ) THEN
+                                        WA(IJK)=ZERO
+                                        IF(IGTYP == 3 ) THEN 
+                                          IF(GBUF%G_PLA>0)THEN
+                                            WA(IJK)=GBUF%PLA(I) 
+                                          ENDIF
+                                        ELSEIF(IGTYP == 18 ) THEN
                                            IF (BUFLY%L_PLA > 0) THEN                                            
                                             DO IPT = 1,NPT
                                              AREAPT  = GEO(IPA+IPT,PID) 
@@ -226,10 +226,13 @@ C
                                            IF (BUFLY%L_PLA > 0) THEN                                                                                     
                                             IPT = ITHBUF(L) - 255 
                                             LBUF  => BUFLY%LBUF(1,1,IPT) 
-                                            WA(IJK) = LBUF%SIG(KK(IK)+I)
+                                            WA(IJK) = LBUF%PLA(I)
                                            ENDIF
                                         ENDIF
-
+                                    ELSEIF (ITHBUF(L) == 337 ) THEN
+                                      IF(GBUF%G_EPSD>0)THEN
+                                        WA(IJK)=GBUF%EPSD(I) 
+                                      ENDIF
                                     ENDIF
                                 ENDDO
                                 IJK = IJK + 1

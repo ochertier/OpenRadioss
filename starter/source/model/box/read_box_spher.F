@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  READ_BOX_SPHER                source/model/box/read_box_spher.F
 Chd|-- called by -----------
@@ -27,7 +27,6 @@ Chd|        HM_READ_BOX                   source/model/box/hm_read_box.F
 Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
 Chd|        HM_GET_FLOATV                 source/devtools/hm_reader/hm_get_floatv.F
-Chd|        HM_GET_FLOATV_DIM             source/devtools/hm_reader/hm_get_floatv_dim.F
 Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
 Chd|        HM_OPTION_READ_KEY            source/devtools/hm_reader/hm_option_read_key.F
 Chd|        HM_OPTION_START               source/devtools/hm_reader/hm_option_start.F
@@ -56,24 +55,20 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
 #include      "scr17_c.inc"
 #include      "com04_c.inc"
-#include      "submod_c.inc"
-#include      "units_c.inc"
-#include      "sysunit.inc"
-#include      "warn_c.inc"
+#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER ,INTENT(IN)    :: NBOX
-      INTEGER ,INTENT(INOUT) :: IAD
-      INTEGER ,DIMENSION(NUMNOD)  ,INTENT(IN)  :: ITABM1
-      my_real            ,DIMENSION(3,NUMNOD)  ,INTENT(IN) :: X
-      my_real            ,DIMENSION(NTRANSF,*) ,INTENT(IN) :: RTRANS
-      TYPE (UNIT_TYPE_)                        ,INTENT(IN) :: UNITAB 
-      TYPE(SUBMODEL_DATA),DIMENSION(*)         ,INTENT(IN) :: LSUBMODEL
-      TYPE (BOX_)  , DIMENSION(NBBOX)  :: IBOX
+      INTEGER ,INTENT(IN)                                :: NBOX
+      INTEGER ,INTENT(INOUT)                             :: IAD
+      INTEGER ,DIMENSION(NUMNOD), INTENT(IN)             :: ITABM1
+      my_real, DIMENSION(3,NUMNOD), INTENT(IN)           :: X
+      my_real, DIMENSION(NTRANSF,NRTRANS), INTENT(IN)    :: RTRANS
+      TYPE (UNIT_TYPE_), INTENT(IN)                      :: UNITAB 
+      TYPE(SUBMODEL_DATA),DIMENSION(NSUBMOD), INTENT(IN) :: LSUBMODEL
+      TYPE (BOX_), DIMENSION(NBBOX)                      :: IBOX
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -124,7 +119,7 @@ c
 c-----------------------
         IF (UID > 0) THEN
           FLAGUNIT = 0
-          DO IUNIT=1,NUNITS
+          DO IUNIT=1,UNITAB%NUNITS
             IF (UNITAB%UNIT_ID(IUNIT) == UID) THEN
               FLAGUNIT = 1
               EXIT
@@ -149,15 +144,13 @@ c
 c-----------------------
 c       
         IF (N1 > 0) THEN
-          CALL HM_GET_FLOATV_DIM('sphere_diameter',FAC_L,IS_AVAILABLE,LSUBMODEL,UNITAB)
-          XP1 = X(1,USR2SYS(N1,ITABM1,MESS,BOXID)) * FAC_L
-          YP1 = X(2,USR2SYS(N1,ITABM1,MESS,BOXID)) * FAC_L
-          ZP1 = X(3,USR2SYS(N1,ITABM1,MESS,BOXID)) * FAC_L
-c
+          !using coordinates from user node identifiers
+          XP1 = X(1,USR2SYS(N1,ITABM1,MESS,BOXID))
+          YP1 = X(2,USR2SYS(N1,ITABM1,MESS,BOXID))
+          ZP1 = X(3,USR2SYS(N1,ITABM1,MESS,BOXID))
         ELSE
-c         Submodel rotation 
+          !Submodel rotation 
           IF (SUB_ID > 0) CALL SUBROTPOINT(XP1,YP1,ZP1,RTRANS,SUB_ID,LSUBMODEL)
-c
         ENDIF
 c
         IF (XP1 == ZERO .and. YP1 == ZERO .and. ZP1 == ZERO) THEN
@@ -188,6 +181,9 @@ c
         IBOX(IAD)%X2      = ZERO
         IBOX(IAD)%Y2      = ZERO
         IBOX(IAD)%Z2      = ZERO
+        IBOX(IAD)%SURFIAD = 0
+        IBOX(IAD)%NENTITY = 0
+        IBOX(IAD)%BOXIAD  = 0
 c
       ENDDO
 

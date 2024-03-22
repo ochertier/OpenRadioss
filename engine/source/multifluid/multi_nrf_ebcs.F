@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  MULTI_NRF_EBCS                source/multifluid/multi_nrf_ebcs.F
 Chd|-- called by -----------
@@ -27,14 +27,11 @@ Chd|        MULTI_EBCS                    source/multifluid/multi_ebcs.F
 Chd|-- calls ---------------
 Chd|        ARRET                         source/system/arret.F         
 Chd|        MULTI_SUBMATLAW               source/multifluid/multi_submatlaw.F
-Chd|        EBCS_MOD                      ../common_source/modules/ebcs_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        EBCS_MOD                      ../common_source/modules/boundary_conditions/ebcs_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|====================================================================
       SUBROUTINE MULTI_NRF_EBCS(ITASK, EBCS_ID, MULTI_FVM, NELEM, ELEM_LIST, FACE_LIST, 
      .     FVM_INLET_DATA, IXS, IXQ, IXTG, XGRID, WGRID, IPM, PM, FUNC_VALUE,EBCS,NPF,TF)
-C-----------------------------------------------
-C     D e s c r i p t i o n
-C-----------------------------------------------
 C-----------------------------------------------
 C     M o d u l e s
 C-----------------------------------------------
@@ -58,7 +55,6 @@ C-----------------------------------------------
 ! DT1
 #include      "com08_c.inc"
 !     SNPC, STF
-!#include      "tabsiz_c.inc" 
       COMMON /TABLESIZF/ STF,SNPC
       INTEGER STF,SNPC
 C-----------------------------------------------
@@ -186,10 +182,14 @@ C     VE formulation
                PHASE_EINTJJ(IMAT) = FVM_INLET_DATA%VAL_PRES(IMAT)
                   PHASE_EINTJJ(IMAT) = PHASE_EINTII(IMAT)
                IF (PHASE_ALPHAJJ(IMAT)  >  ZERO) THEN
-                  CALL MULTI_SUBMATLAW(0, MATLAW(IMAT), LOCAL_MATID(IMAT), 1, PHASE_EINTJJ(IMAT), 
-     .                 PHASE_PRESJJ(IMAT), PHASE_RHOJJ(IMAT), PHASE_SSPJJ(IMAT), ONE, DUMMY, 
-     .                 PM, IPM, NPROPM, NPROPMI, DUMMY, ONE, DUMMY, 
-     .                 MULTI_FVM%BFRAC(IMAT, ELEMID), MULTI_FVM%TBURN(ELEMID), DUMMY, DUMMY, DUMMY,NPF,TF)
+                  CALL MULTI_SUBMATLAW(
+     1   0,                           MATLAW(IMAT),                LOCAL_MATID(IMAT),           1,
+     2   PHASE_EINTJJ(IMAT),          PHASE_PRESJJ(IMAT),          PHASE_RHOJJ(IMAT),           PHASE_SSPJJ(IMAT),
+     3   ONE,                         DUMMY,                       PM,                          IPM,
+     4   NPROPM,                      NPROPMI,                     DUMMY,                       ONE,
+     5   DUMMY,                       MULTI_FVM%BFRAC(IMAT,ELEMID),MULTI_FVM%TBURN(ELEMID),     DUMMY,
+     6   DUMMY,                       DUMMY,                       NPF,                         TF,
+     7   DUMMY,                       1)
                   SSPJJ = SSPJJ + PHASE_ALPHAJJ(IMAT) * PHASE_RHOJJ(IMAT) * 
      .                 MAX(EM20, PHASE_SSPJJ(IMAT)) 
                   P_JJ = P_JJ + PHASE_PRESJJ(IMAT) * PHASE_ALPHAJJ(IMAT)

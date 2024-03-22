@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  ST_QAPRINT_SURF               source/output/qaprint/st_qaprint_surf.F
 Chd|-- called by -----------
@@ -41,13 +41,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
-#include      "scr03_c.inc"
-#include      "scr10_c.inc"
-#include      "scr17_c.inc"
-#include      "units_c.inc"
-#include      "nchar_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -123,7 +116,7 @@ C--------------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       CHARACTER (LEN=255) :: VARNAME
-      INTEGER KK,ID,LEN_,NEL,NEL_IGE,NN,TMP, IAD_CUR
+      INTEGER KK,ID,LEN_,NEL,NEL_IGE,NN,TMP, IAD_CUR,LEN_BUFSF
       DOUBLE PRECISION :: RTMP
 C-----------------------------------------------
 C   S o u r c e   L i n e s
@@ -301,13 +294,20 @@ C-----------------------------------------------
             ENDIF
             
             IAD_CUR=PTR_IGRSURF%IAD_BUFR
-            DO KK=MAX(1,IAD_PREV),IAD_CUR
+            LEN_BUFSF = 0
+            IF(PTR_IGRSURF%TYPE == 100) LEN_BUFSF = 43 ! mad ellipse
+            IF(PTR_IGRSURF%TYPE == 101) LEN_BUFSF = 36 ! radioss ellipse
+            IF(PTR_IGRSURF%TYPE == 200) LEN_BUFSF = 6  ! radioss plane
+            !DO KK=MAX(1,IAD_PREV),IAD_CUR
+            IF (PTR_IGRSURF%TYPE == 100 .OR. PTR_IGRSURF%TYPE == 101 .OR. PTR_IGRSURF%TYPE == 200) THEN
+            DO KK=IAD_CUR+1,IAD_CUR+LEN_BUFSF
               RTMP = BUFSF(KK)
               IF(RTMP /= ZERO)THEN
-                WRITE(VARNAME,'(A,I0,A,I0,A)')  GROUP_NAME//'(',ID,')--->BUFSF(',KK,')='
+                WRITE(VARNAME,'(A,I0,A,I0,A)')  GROUP_NAME//'(',ID,')--->BUFSF(',KK-IAD_CUR,')='
                 CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),0,RTMP)
               ENDIF
             ENDDO
+          ENDIF
 
                   
       END

@@ -1,35 +1,37 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  IGE3DZERO                     source/elements/ige3d/ige3dzero.F
 Chd|-- called by -----------
 Chd|        IG3DUFORC3                    source/elements/ige3d/ig3duforc3.F
 Chd|-- calls ---------------
 Chd|====================================================================
-      SUBROUTINE IGE3DZERO(NCTRL,VOLM ,SIGM ,EINTM,RHOM  ,
-     1                     QM   ,FX   ,FY   ,FZ   ,BtDBA ,
-     2                     STIG ,MASS ,MMUNK,AFACE,DETMIN,
-     3                     EPLASM,EPSDG,G_PLA,G_EPSD,NEL)
+      SUBROUTINE IGE3DZERO(
+     1   NCTRL,   VOLM,    SIGM,    EINTM,
+     2   RHOM,    QM,      FX,      FY,
+     3   FZ,      BtDBA,   STIG,    MASS,
+     4   MMUNK,   AFACE,   DETMIN,  EPLASM,
+     5   EPSDG,   G_PLA,   G_EPSD,  NEL)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -41,10 +43,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "vect01_c.inc"
-#include      "com01_c.inc"
-#include      "com08_c.inc"
-#include      "impl1_c.inc" 
 #include      "scr18_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -62,7 +60,7 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, J, ITEST
 C-----------------------------------------------
-      DO I=LFT,LLT
+      DO I=1,NEL
        SIGM(I,1) = ZERO
        SIGM(I,2) = ZERO
        SIGM(I,3) = ZERO
@@ -82,7 +80,7 @@ C-----------------------------------------------
       ENDDO
 
       IF(IDTMIN(101)==1)THEN
-       DO I=LFT,LLT
+       DO I=1,NEL
         DO J=1,NCTRL
          MMUNK(I)=EP10
          MASS(J,I)=ZERO
@@ -91,7 +89,7 @@ C-----------------------------------------------
       ENDIF 
 
       IF(IDTMIN(101)==2)THEN
-       DO I=LFT,LLT
+       DO I=1,NEL
         AFACE(1,I)=ZERO
         AFACE(2,I)=ZERO
         AFACE(3,I)=ZERO
@@ -103,12 +101,12 @@ C-----------------------------------------------
       ENDIF
 
       IF (G_PLA > 0) THEN
-        DO I=LFT,LLT
+        DO I=1,NEL
           EPLASM(I)=ZERO  
         ENDDO
       ENDIF
       IF (G_EPSD > 0) THEN
-        DO I=LFT,LLT
+        DO I=1,NEL
           EPSDG(I)=ZERO
         ENDDO
       ENDIF

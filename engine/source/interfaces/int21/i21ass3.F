@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  I21ASS3                       source/interfaces/int21/i21ass3.F
 Chd|-- called by -----------
@@ -27,26 +27,28 @@ Chd|        I21MAINF                      source/interfaces/int21/i21mainf.F
 Chd|-- calls ---------------
 Chd|        FOAT_TO_6_FLOAT               source/system/parit.F         
 Chd|        STRI                          source/tools/univ/stri.F      
+Chd|        ANIM_MOD                      ../common_source/modules/anim_mod.F
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|        INTSTAMP_MOD                  share/modules/intstamp_mod.F  
+Chd|        OUTPUTS_MOD                   ../common_source/modules/outputs_mod.F
 Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
-      SUBROUTINE I21ASS3(JLT   ,A      ,NIN    ,NOINT  ,FXN    ,
-     2                  FYN    ,FZN    ,FXT    ,FYT    ,FZT    ,
-     3                  IX1    ,IX2    ,IX3    ,IX4    ,NSVG   ,
-     4                  FCONT  ,FNCONT ,FTCONT ,LB     ,LC     ,
-     5                  ITRIA  ,STIFN  ,STIF   ,FSKYI  ,ISKY   ,
-     6                  ISECIN ,NSTRF  ,SECFCUM,FTXSAV ,FTYSAV ,
-     7                  FTZSAV ,CAND_N ,INTSTAMP,WEIGHT,MSR    ,
-     8                  INTTH  ,PHI    ,FTHE   ,FTHESKYI,MXI   ,
-     9                  MYI    ,MZI    ,STRI   ,NODGLOB,NCONT  ,
-     A                  INDEXCONT,TAGCONT,CONDN,CONDINT,CONDNSKYI,
-     B                  IFORM  ,PHI1   ,PHI2   ,PHI3  ,PHI4    ,
-     C                  H1     ,H2     ,H3     ,H4    ,NISKYFI ,
-     D                  MSRL   ,ITAB   ,H3D_DATA,NINSKID    ,
-     E                  PRATIO ,NINTERSKID,PSKIDS,IFLAGLOADP,
-     F                  TAGNCONT,KLOADPINTER,LOADPINTER,LOADP_HYD_INTER,
-     G                  DGAPLOADINT,DIST,GAPV,S_LOADPINTER   )
+      SUBROUTINE I21ASS3(JLT     ,A        ,NIN      ,NOINT    ,FXN    ,
+     2                  FYN      ,FZN      ,FXT      ,FYT      ,FZT    ,
+     3                  IX1      ,IX2      ,IX3      ,IX4      ,NSVG   ,
+     4                  FCONT    ,FNCONT   ,FTCONT   ,LB       ,LC     ,
+     5                  ITRIA    ,STIFN    ,STIF     ,FSKYI    ,ISKY   ,
+     6                  ISECIN   ,NSTRF    ,SECFCUM  ,FTXSAV   ,FTYSAV ,
+     7                  FTZSAV   ,CAND_N   ,INTSTAMP ,WEIGHT   ,MSR    ,
+     8                  INTTH    ,PHI      ,FTHE     ,FTHESKYI ,MXI   ,
+     9                  MYI      ,MZI      ,STRI     ,NODGLOB  ,NCONT  ,
+     A                  INDEXCONT,TAGCONT  ,CONDN    ,CONDINT  ,CONDNSKYI,
+     B                  IFORM    ,PHI1     ,PHI2     ,PHI3     ,PHI4    ,
+     C                  H1       ,H2       ,H3       ,H4       ,NISKYFI ,
+     D                  MSRL     ,ITAB     ,H3D_DATA ,NINSKID  ,PRATIO  ,
+     E                  NINTERSKID,PSKIDS  ,IFLAGLOADP,TAGNCONT ,KLOADPINTER,
+     F                  LOADPINTER,LOADP_HYD_INTER,DGAPLOADINT,DIST,GAPV,  
+     G                  S_LOADPINTER,EFRIC_L,FHEAT   ,EFRICT   ,INTEREFRIC)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -54,6 +56,8 @@ C-----------------------------------------------
       USE TRI7BOX
       USE H3D_MOD
       USE TRI7BOX
+      USE ANIM_MOD
+      USE OUTPUTS_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -70,14 +74,11 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "com06_c.inc"
 #include      "com08_c.inc"
-#include      "param_c.inc"
 #include      "parit_c.inc"
-#include      "scr05_c.inc"
 #include      "scr07_c.inc"
 #include      "scr14_c.inc"
 #include      "scr16_c.inc"
 #include      "scr18_c.inc"
-#include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -90,7 +91,10 @@ C-----------------------------------------------
       INTEGER  , INTENT(IN) :: S_LOADPINTER
       INTEGER  , INTENT(IN) :: KLOADPINTER(NINTER+1),LOADPINTER(S_LOADPINTER),
      .         LOADP_HYD_INTER(NLOADP_HYD)
+      INTEGER  , INTENT(IN) :: INTEREFRIC
+      my_real  , INTENT(IN) :: FHEAT
       my_real  , INTENT(IN) :: DGAPLOADINT(S_LOADPINTER),DIST(MVSIZ),GAPV(MVSIZ)
+      my_real  , INTENT(INOUT) :: EFRIC_L(MVSIZ),EFRICT(MVSIZ)
       my_real
      .   A(3,*), FCONT(3,*),FNCONT(3,*), FTCONT(3,*), STIFN(*),
      .   FSKYI(LSKYI,NFSKYI), SECFCUM(7,NUMNOD,NSECT),
@@ -109,14 +113,14 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, IG, J, JG , K0, NBINTER, K1S, K, NISKYL, IROT, I1,
-     .        NISKYL1,NISKYL2, NISKYFIL, ND , N,PP ,PPL
+     .        NISKYL1,NISKYL2, NISKYFIL, ND , N,PP ,PPL,INTF
       my_real
      .   FXI(MVSIZ), FYI(MVSIZ), FZI(MVSIZ), 
      .   FX1(MVSIZ), FX2(MVSIZ), FX3(MVSIZ), FX4(MVSIZ),
      .   FY1(MVSIZ), FY2(MVSIZ), FY3(MVSIZ), FY4(MVSIZ),
      .   FZ1(MVSIZ), FZ2(MVSIZ), FZ3(MVSIZ), FZ4(MVSIZ),
      .   H1(MVSIZ) , H2(MVSIZ) , H3(MVSIZ) , H4(MVSIZ)
-      my_real GAPP, H0 ,DGAPLOAD
+      my_real GAPP, H0 ,DGAPLOAD, EFRICSM
       DOUBLE PRECISION
      .   FX6(6,MVSIZ), FY6(6,MVSIZ), FZ6(6,MVSIZ), ST6(6,MVSIZ),
      .   FX, FY, FZ, STF, 
@@ -571,35 +575,15 @@ C
         END IF
       ENDIF
 
-      IF(NINSKID > 0)THEN
-C-------------SKID LINES OUTPUTTING ----------------
-#include "lockon.inc"
-         DO I=1,JLT
-          JG = NSVG(I)
-          IF(WEIGHT(JG)/=1)CYCLE
-          N = NODGLOB(JG)
-          PSKIDS(NINSKID,N)=MAX(PSKIDS(NINSKID,N),PRATIO(I))
-
-          N= IX1(I)
-          PSKIDS(NINSKID,N)=MAX(PSKIDS(NINSKID,N),PRATIO(I))
-          N= IX2(I)
-          PSKIDS(NINSKID,N)=MAX(PSKIDS(NINSKID,N),PRATIO(I))
-          N= IX3(I)
-          PSKIDS(NINSKID,N)=MAX(PSKIDS(NINSKID,N),PRATIO(I))
-          N= IX4(I)
-          PSKIDS(NINSKID,N)=MAX(PSKIDS(NINSKID,N),PRATIO(I))
-
-         ENDDO
-#include "lockoff.inc"
-
 C---------------------------------
       IF(.NOT.(    (ANIM_V(4)+OUTP_V(4)+H3D_DATA%N_VECT_CONT>0 .AND.
-     .                  (TT>=TANIM.OR.TT>=TOUTP.OR.TT>=H3D_DATA%TH3D.OR.
+     .                  ((TT>=TANIM .AND. TT<=TANIM_STOP).OR.TT>=TOUTP.OR.(TT>=H3D_DATA%TH3D.AND.TT<=H3D_DATA%TH3D_STOP).OR.
      .                  (MANIM>=4.AND.MANIM<=15) .OR. H3D_DATA%MH3D /= 0))
      .         .OR.(ANIM_V(12)+OUTP_V(12)+H3D_DATA%N_VECT_PCONT>0.AND.
-     .                  (TT>=TANIM.OR.TT>=TOUTP.OR.TT>=H3D_DATA%TH3D.OR.
+     .                  ((TT>=TANIM .AND. TT<=TANIM_STOP).OR.TT>=TOUTP.OR.(TT>=H3D_DATA%TH3D.AND.TT<=H3D_DATA%TH3D_STOP).OR.
      .                  (MANIM>=4.AND.MANIM<=15) .OR. H3D_DATA%MH3D /= 0))
-     .         .OR.ISECIN/=0)  ) RETURN
+     .         .OR.H3D_DATA%N_VECT_PCONT_MAX>0.OR.NINSKID > 0.OR.INTEREFRIC>0
+     .         .OR.H3D_DATA%N_SCAL_CSE_FRIC >0.OR.ISECIN/=0)  ) RETURN
 C--------------------------------- 
       DO I=1,JLT
         IF(IX3(I)/=IX4(I))THEN
@@ -678,9 +662,10 @@ C
         ENDIF
 
 C---------------------------------
-      IF(ANIM_V(12)+OUTP_V(12)+H3D_DATA%N_VECT_PCONT>0.AND.
-     .        (TT>=TANIM.OR.TT>=TOUTP.OR.TT>=H3D_DATA%TH3D.OR.
-     .            (MANIM>=4.AND.MANIM<=15).OR. H3D_DATA%MH3D /= 0))THEN
+      IF((ANIM_V(12)+OUTP_V(12)+H3D_DATA%N_VECT_PCONT>0.AND.
+     .        ((TT>=TANIM .AND. TT<=TANIM_STOP).OR.TT>=TOUTP.OR.(TT>=H3D_DATA%TH3D.AND.TT<=H3D_DATA%TH3D_STOP).OR.
+     .            (MANIM>=4.AND.MANIM<=15).OR. H3D_DATA%MH3D /= 0))
+     .   .OR.H3D_DATA%N_VECT_PCONT_MAX>0)THEN
 #include "lockon.inc"
          DO I=1,JLT
           JG = NSVG(I)
@@ -705,9 +690,10 @@ C
 #include "lockoff.inc"
       ENDIF
 C---------------------------------
-      IF(ANIM_V(12)+OUTP_V(12)+H3D_DATA%N_VECT_PCONT>0.AND.
-     .        (TT>=TANIM.OR.TT>=TOUTP.OR.TT>=H3D_DATA%TH3D.OR.
-     .            (MANIM>=4.AND.MANIM<=15).OR. H3D_DATA%MH3D /= 0))THEN
+      IF((ANIM_V(12)+OUTP_V(12)+H3D_DATA%N_VECT_PCONT>0.AND.
+     .        ((TT>=TANIM .AND. TT<=TANIM_STOP).OR.TT>=TOUTP.OR.(TT>=H3D_DATA%TH3D.AND.TT<=H3D_DATA%TH3D_STOP).OR.
+     .            (MANIM>=4.AND.MANIM<=15).OR. H3D_DATA%MH3D /= 0))
+     .   .OR.H3D_DATA%N_VECT_PCONT_MAX>0)THEN
 #include "lockon.inc"
          DO I=1,JLT
           JG = NSVG(I)
@@ -754,7 +740,7 @@ C
       ENDDO
 C-----------------------------------------------
       IF(ANIM_V(4)+OUTP_V(4)+H3D_DATA%N_VECT_CONT>0.AND.
-     .        (TT>=TANIM.OR.TT>=TOUTP.OR.TT>=H3D_DATA%TH3D.OR.
+     .        ((TT>=TANIM .AND. TT<=TANIM_STOP).OR.TT>=TOUTP.OR.(TT>=H3D_DATA%TH3D.AND.TT<=H3D_DATA%TH3D_STOP).OR.
      .            (MANIM>=4.AND.MANIM<=15) .OR. H3D_DATA%MH3D /= 0 ))THEN
 #include "lockon.inc"
          DO I=1,JLT
@@ -837,7 +823,73 @@ C +fsav(section)
 C       NSPMD > 1
       ENDIF 
 C
+      IF(NINSKID > 0)THEN
+C-------------SKID LINES OUTPUTTING ----------------
+#include "lockon.inc"
+         DO I=1,JLT
+          JG = NSVG(I)
+          IF(WEIGHT(JG)/=1)CYCLE
+          N = NODGLOB(JG)
+          PSKIDS(NINSKID,N)=MAX(PSKIDS(NINSKID,N),PRATIO(I))
 
+          N= IX1(I)
+          PSKIDS(NINSKID,N)=MAX(PSKIDS(NINSKID,N),PRATIO(I))
+          N= IX2(I)
+          PSKIDS(NINSKID,N)=MAX(PSKIDS(NINSKID,N),PRATIO(I))
+          N= IX3(I)
+          PSKIDS(NINSKID,N)=MAX(PSKIDS(NINSKID,N),PRATIO(I))
+          N= IX4(I)
+          PSKIDS(NINSKID,N)=MAX(PSKIDS(NINSKID,N),PRATIO(I))
+
+         ENDDO
+#include "lockoff.inc"
       ENDIF
+C
+C-------------FRICTION ENERGY OUTPUTTING ----------------
+      IF(INTEREFRIC > 0)THEN
+          INTF= INTEREFRIC - NINEFRIC
+#include "lockon.inc"
+         DO I=1,JLT
+          JG = NSVG(I)
+          IF(WEIGHT(JG)/=1)CYCLE
+          N = NODGLOB(JG)
+          EFRICSM = HALF*EFRIC_L(I)
+          EFRIC_STAMP(INTF,N)=EFRIC_STAMP(INTF,N) + (EFRICSM-FHEAT*EFRICT(I))
+
+          N= IX1(I)
+          EFRIC_STAMP(INTF,N)=EFRIC_STAMP(INTF,N) + EFRICSM*H1(I)
+          N= IX2(I)
+          EFRIC_STAMP(INTF,N)=EFRIC_STAMP(INTF,N) + EFRICSM*H2(I)
+          N= IX3(I)
+          EFRIC_STAMP(INTF,N)=EFRIC_STAMP(INTF,N) + EFRICSM*H3(I)
+          N= IX4(I)
+          EFRIC_STAMP(INTF,N)=EFRIC_STAMP(INTF,N) + EFRICSM*H4(I)
+
+         ENDDO
+#include "lockoff.inc"
+      ENDIF
+C---------------------------------
+      IF(H3D_DATA%N_SCAL_CSE_FRIC >0)THEN
+#include "lockon.inc"
+         DO I=1,JLT
+          JG = NSVG(I)
+          IF(WEIGHT(JG)/=1)CYCLE
+          N = NODGLOB(JG)
+          EFRICSM = HALF*EFRIC_L(I)
+          EFRICG_STAMP(N)=EFRICG_STAMP(N) + (EFRICSM-FHEAT*EFRICT(I))
+
+          N= IX1(I)
+          EFRICG_STAMP(N)=EFRICG_STAMP(N) + EFRICSM*H1(I)
+          N= IX2(I)
+          EFRICG_STAMP(N)=EFRICG_STAMP(N) + EFRICSM*H2(I)
+          N= IX3(I)
+          EFRICG_STAMP(N)=EFRICG_STAMP(N) + EFRICSM*H3(I)
+          N= IX4(I)
+          EFRICG_STAMP(N)=EFRICG_STAMP(N) + EFRICSM*H4(I)
+
+         ENDDO
+#include "lockoff.inc"
+      ENDIF
+C---------------------------------
       RETURN
       END

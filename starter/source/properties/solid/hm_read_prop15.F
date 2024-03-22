@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  HM_READ_PROP15                source/properties/solid/hm_read_prop15.F
 Chd|-- called by -----------
@@ -31,12 +31,13 @@ Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.
 Chd|        HM_OPTION_IS_ENCRYPTED        source/devtools/hm_reader/hm_option_is_encrypted.F
 Chd|        HM_READ_ALE_CLOSE             source/ale/hm_read_ale_close.F
 Chd|        USR2SYS                       source/system/sysfus.F        
+Chd|        ALE_MOD                       ../common_source/modules/ale/ale_mod.F
 Chd|        ELBUFTAG_MOD                  share/modules1/elbuftag_mod.F 
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
       SUBROUTINE HM_READ_PROP15 (IG , IGTYP , GEO   ,  IGEO   ,PROP_TAG  ,UNITAB ,
-     .                   LSUBMODEL,IDTITL ,ISKN  ,ITABM1    )
+     .                           LSUBMODEL,IDTITL ,ISKN  ,ITABM1    )
 C============================================================================
 C   M o d u l e s
 C-----------------------------------------------
@@ -44,37 +45,27 @@ C-----------------------------------------------
       USE ELBUFTAG_MOD            
       USE SUBMODEL_MOD
       USE MESSAGE_MOD
+      USE ALE_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "units_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com_xfem1.inc"
 #include      "param_c.inc"
-#include      "warn_c.inc"
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
 #include      "scr17_c.inc"
 #include      "scr21_c.inc"
 #include      "tablen_c.inc"
-#include      "submod_c.inc"
-#include      "sysunit.inc"
 #include      "sphcom.inc"
-#include      "fluid_scr_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       TYPE (UNIT_TYPE_),INTENT(IN) ::UNITAB 
-      INTEGER 
-     .        IGTYP , IGEO(*) ,ISKN(LISKN,*) ,ITABM1(*)
+      INTEGER IGTYP , IGEO(*) ,ISKN(LISKN,*) ,ITABM1(*)
       TYPE(SUBMODEL_DATA) LSUBMODEL(*)
       my_real GEO(*)
       CHARACTER IDTITL*nchartitle
@@ -83,14 +74,11 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER IG, ISMSTR, NIP, J,K ,NPTS , 
-     .   IHBE,ISH3N,ISROT ,I8PT ,ISK,IHON ,ITU ,IRB,
-     .    IGFLU ,IHBE_OLD
+     .        IHBE,ISH3N,ISROT ,I8PT ,ISK,IHON ,ITU ,IRB,
+     .        IGFLU ,IHBE_OLD
      
-      my_real
-     .    ANGL,PUN,CVIS,RBID,VX,VY,VZ,
-     .    FAC_L,FAC_T,FAC_M, PTHK, AN, PHI
-      CHARACTER*nchartitle,
-     .   TITR
+      my_real  ANGL,PUN,CVIS,RBID,VX,VY,VZ,FAC_L,FAC_T,FAC_M, PTHK, AN, PHI
+      CHARACTER*nchartitle,TITR
       CHARACTER MESS*40,KEY*ncharkey
       LOGICAL IS_AVAILABLE, IS_ENCRYPTED
 C-----------------------------------------------
@@ -142,17 +130,17 @@ C        Double stockage temporaire - supprimer GEO(12,I)=IGTYP apres tests
          IGEO(11)= IGTYP
          GEO(12) = IGTYP+PUN
 
-	 IF(ICAA==0 .AND. IGFLU==0)THEN
-	   IF(GEO(14)==ZERO) GEO(14)=ONEP1
-	   IF(GEO(15)==ZERO) GEO(15)=FIVEEM2
-	 ENDIF
-	 IF(GEO(13)==ZERO)GEO(13)=EM01
-	 IF(IHBE==0)THEN
-	   IHBE=IHBE_DS
-	 ENDIF
-	 I8PT=0
+           IF(ALE%GLOBAL%ICAA==0 .AND. IGFLU==0)THEN
+             IF(GEO(14)==ZERO) GEO(14)=ONEP1
+             IF(GEO(15)==ZERO) GEO(15)=FIVEEM2
+           ENDIF
+           IF(GEO(13)==ZERO)GEO(13)=EM01
+           IF(IHBE==0)THEN
+             IHBE=IHBE_DS
+           ENDIF
+           I8PT=0
 C
-	 IF(ISMSTR==0)ISMSTR=ISST_DS
+           IF(ISMSTR==0)ISMSTR=ISST_DS
          IF (ISMSTR < 0.OR.ISST_DS==-2) ISMSTR=4                            
          IF(ISMSTR==0)ISMSTR=4
          IF(ISMSTR==3)GEO(5)=EP06

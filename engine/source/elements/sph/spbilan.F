@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  SPBILAN                       source/elements/sph/spbilan.F 
 Chd|-- called by -----------
@@ -27,9 +27,12 @@ Chd|        SPSTRES                       source/elements/sph/spstres.F
 Chd|-- calls ---------------
 Chd|        GRELEM_SAV                    source/output/th/grelem_sav.F 
 Chd|====================================================================
-      SUBROUTINE SPBILAN(V, PARTSAV, NC1, EINT, RHO, RK,
-     .   VOL,VNEW,IPARTSP,OFFG,
-     .   GRESAV,GRTH,IGRTH,EINTTH,IEXPAN,X)
+      SUBROUTINE SPBILAN(
+     1   V,       PARTSAV, NC1,     EINT,
+     2   RHO,     RK,      VOL,     VNEW,
+     3   IPARTSP, OFFG,    GRESAV,  GRTH,
+     4   IGRTH,   EINTTH,  IEXPAN,  X,
+     5   LFT,     LLT,     JTUR,    IGRE)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -41,12 +44,14 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "param_c.inc"
-#include      "vect01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(INOUT) :: LFT
+      INTEGER, INTENT(INOUT) :: LLT
+      INTEGER, INTENT(INOUT) :: JTUR
+      INTEGER, INTENT(INOUT) :: IGRE
 C     REAL
       my_real
      .  V(3,*),X(3,*),

@@ -1,5 +1,5 @@
 //Copyright>    OpenRadioss
-//Copyright>    Copyright (C) 1986-2022 Altair Engineering Inc.
+//Copyright>    Copyright (C) 1986-2024 Altair Engineering Inc.
 //Copyright>
 //Copyright>    This program is free software: you can redistribute it and/or modify
 //Copyright>    it under the terms of the GNU Affero General Public License as published by
@@ -15,11 +15,11 @@
 //Copyright>    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //Copyright>
 //Copyright>
-//Copyright>    Commercial Alternative: Altair Radioss Software 
+//Copyright>    Commercial Alternative: Altair Radioss Software
 //Copyright>
-//Copyright>    As an alternative to this open-source version, Altair also offers Altair Radioss 
-//Copyright>    software under a commercial license.  Contact Altair to discuss further if the 
-//Copyright>    commercial version may interest you: https://www.altair.com/radioss/.    
+//Copyright>    As an alternative to this open-source version, Altair also offers Altair Radioss
+//Copyright>    software under a commercial license.  Contact Altair to discuss further if the
+//Copyright>    commercial version may interest you: https://www.altair.com/radioss/.
 #include "hardware.inc"
 #include <stdio.h>
 #include <string.h>
@@ -65,8 +65,6 @@ extern void GET_U_TABLE(int * itable,my_real *XX, my_real *YY);
 extern void GET_U_VTABLE(int * itable, int * nel0, int * ipos,my_real *XX, my_real*YY, my_real *DYDX1);
 extern void SET_U_SHLPLAS(int *USRNEL,my_real *SIGY,my_real *ETSE);
 extern void SET_U_SOLPLAS(int *USRNEL, my_real*SIGY, my_real*PLA);
-extern void USENS_SHIFT_AB(my_real * sensor);
-extern void USENS_SHIFT_BA(my_real * sensor);
 extern int GET_U_NUMSENS (int * idsens) ;
 extern int GET_U_SENS_ID (int * idsens);
 extern int SET_U_SENS_VALUE(int *nsens, int * ivar, my_real * var );
@@ -124,7 +122,8 @@ extern void MAT_SOLID_GET_NOD_X(my_real * USER_X);
 extern void MAT_SOLID_GET_NOD_V(my_real * USER_V);
 extern void USERWINDOW_GET_A(double * A_BUF);
 extern void USERWINDOW_GET_AR(double * AR_BUF);
-
+extern void GET_TABLE_VALUE_DYDX(int *ITABLE, double *XX, double *XXDIM, double *YY, double *DXDY);
+extern void GET_USER_WINDOW_NODES(int *INTERNAL_ID,int *USER_ID);
 
 void init_callback(void ** callback_array){
 
@@ -135,8 +134,6 @@ void init_callback(void ** callback_array){
   callback_array[ 3]= GET_U_VTABLE;
   callback_array[ 4]= SET_U_SHLPLAS;
   callback_array[ 5]= SET_U_SOLPLAS;
-  callback_array[ 6]= USENS_SHIFT_AB;
-  callback_array[ 7]= USENS_SHIFT_BA;
   callback_array[ 8]= GET_U_NUMSENS;
   callback_array[ 9]= GET_U_SENS_ID;
   callback_array[10]= SET_U_SENS_VALUE;
@@ -199,8 +196,9 @@ void init_callback(void ** callback_array){
 //  callback_array[67] = RAD_UMAT_INPUT_READ;       STARTER ROUTINE
 //  callback_array[68] = RAD_UMAT_INPUT_REWIND;     STARTER ROUTINE
 //  callback_array[69] = RAD_UMAT_CLOSE_INPUT;      STARTER ROUTINE
-
-
+  callback_array[71] = GET_TABLE_VALUE_DYDX;
+//  callback_array[72] = SET_USER_WINDOW_NODES;     STARTER ROUTINE
+  callback_array[73] = GET_USER_WINDOW_NODES;
 }
 #elif 1
 void init_callback(){

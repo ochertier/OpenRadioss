@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  HM_READ_LINES                 source/groups/hm_read_lines.F 
 Chd|-- called by -----------
@@ -63,6 +63,7 @@ Chd|====================================================================
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE MY_ALLOC_MOD
       USE UNITAB_MOD
       USE SUBMODEL_MOD
       USE MESSAGE_MOD
@@ -79,15 +80,9 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr17_c.inc"
-#include      "scr03_c.inc"
 #include      "scr23_c.inc"
 #include      "com04_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
 #include      "param_c.inc"
-#include      "sysunit.inc"
-#include      "my_allocate.inc"
-#include      "submod_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -159,7 +154,6 @@ C-----------------------------------------------
 !   2. Split lines accordingly
 !
 C-----------------------------------------------
-C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
       INTEGER USR2SYS
@@ -217,13 +211,13 @@ C-----------------------------------------------
           IF (FLAG == 0) THEN                                              
             CALL HM_GET_INTV('segmax',NSEG,IS_AVAILABLE,LSUBMODEL)                                             
             IGRSLIN(IGS)%NSEG = NSEG                                       
-            MY_ALLOCATE2D(IGRSLIN(IGS)%NODES,NSEG,2)                       
+            CALL MY_ALLOC(IGRSLIN(IGS)%NODES,NSEG,2)                       
             IGRSLIN(IGS)%NODES(1:NSEG,1:2) = 0                             
-            MY_ALLOCATE(IGRSLIN(IGS)%ELTYP,NSEG)                           
+            CALL MY_ALLOC(IGRSLIN(IGS)%ELTYP,NSEG)                           
             IGRSLIN(IGS)%ELTYP(1:NSEG) = 0                                 
-            MY_ALLOCATE(IGRSLIN(IGS)%ELEM,NSEG)                            
+            CALL MY_ALLOC(IGRSLIN(IGS)%ELEM,NSEG)                            
             IGRSLIN(IGS)%ELEM(1:NSEG) = 0                                  
-            MY_ALLOCATE(IGRSLIN(IGS)%PROC,NSEG)                            
+            CALL MY_ALLOC(IGRSLIN(IGS)%PROC,NSEG)                            
             IGRSLIN(IGS)%PROC(1:NSEG) = 0                                  
           ENDIF  
           IF(FLAG == 1) THEN                    
@@ -331,7 +325,7 @@ C-------------------------
               NSEG=0
               IADBOX = 1
               IFLAGUNIT = 0
-              DO J=1,NUNITS
+              DO J=1,UNITAB%NUNITS
                 IF (UNITAB%UNIT_ID(J) == UID) THEN
                   FAC_L = UNITAB%FAC_L(J)
                   IFLAGUNIT = 1
@@ -344,13 +338,13 @@ C-------------------------
 
               IF (FLAG == 1) THEN ! NSEG counted at FLAG = 0
                 NSEG0 = IGRSLIN(IGS)%NSEG
-                MY_ALLOCATE2D(IGRSLIN(IGS)%NODES,NSEG0,2)
+                CALL MY_ALLOC(IGRSLIN(IGS)%NODES,NSEG0,2)
                 IGRSLIN(IGS)%NODES(1:NSEG0,1:2) = 0
-                MY_ALLOCATE(IGRSLIN(IGS)%ELTYP,NSEG0)
+                CALL MY_ALLOC(IGRSLIN(IGS)%ELTYP,NSEG0)
                 IGRSLIN(IGS)%ELTYP(1:NSEG0) = 0
-                MY_ALLOCATE(IGRSLIN(IGS)%ELEM,NSEG0)
+                CALL MY_ALLOC(IGRSLIN(IGS)%ELEM,NSEG0)
                 IGRSLIN(IGS)%ELEM(1:NSEG0) = 0
-                MY_ALLOCATE(IGRSLIN(IGS)%PROC,NSEG0)
+                CALL MY_ALLOC(IGRSLIN(IGS)%PROC,NSEG0)
                 IGRSLIN(IGS)%PROC(1:NSEG0) = 0
               ENDIF
 
@@ -412,13 +406,13 @@ C=======================================================================
             IF (KEY(1:4) == 'PART'.OR.KEY(1:6) == 'SUBSET'.OR. KEY(1:3) == 'MAT' .OR.KEY(1:4) == 'PROP') THEN
               IF (FLAG == 1) THEN ! NSEG counted at FLAG = 0
                 NSEG0 = IGRSLIN(IGS)%NSEG
-                MY_ALLOCATE2D(IGRSLIN(IGS)%NODES,NSEG0,2)
+                CALL MY_ALLOC(IGRSLIN(IGS)%NODES,NSEG0,2)
                 IGRSLIN(IGS)%NODES(1:NSEG0,1:2) = 0
-                MY_ALLOCATE(IGRSLIN(IGS)%ELTYP,NSEG0)
+                CALL MY_ALLOC(IGRSLIN(IGS)%ELTYP,NSEG0)
                 IGRSLIN(IGS)%ELTYP(1:NSEG0) = 0
-                MY_ALLOCATE(IGRSLIN(IGS)%ELEM,NSEG0)
+                CALL MY_ALLOC(IGRSLIN(IGS)%ELEM,NSEG0)
                 IGRSLIN(IGS)%ELEM(1:NSEG0) = 0
-                MY_ALLOCATE(IGRSLIN(IGS)%PROC,NSEG0)
+                CALL MY_ALLOC(IGRSLIN(IGS)%PROC,NSEG0)
                 IGRSLIN(IGS)%PROC(1:NSEG0) = 0
               ENDIF
               CALL HM_TAGPART2(BUFTMP,IPART ,KEY   ,
@@ -465,13 +459,13 @@ C=======================================================================
             IF (KEY(1:6)=='SUBMOD') THEN
               IF (FLAG == 1) THEN ! NSEG counted at FLAG = 0
                 NSEG0 = IGRSLIN(IGS)%NSEG
-                MY_ALLOCATE2D(IGRSLIN(IGS)%NODES,NSEG0,2)
+                CALL MY_ALLOC(IGRSLIN(IGS)%NODES,NSEG0,2)
                 IGRSLIN(IGS)%NODES(1:NSEG0,1:2) = 0
-                MY_ALLOCATE(IGRSLIN(IGS)%ELTYP,NSEG0)
+                CALL MY_ALLOC(IGRSLIN(IGS)%ELTYP,NSEG0)
                 IGRSLIN(IGS)%ELTYP(1:NSEG0) = 0
-                MY_ALLOCATE(IGRSLIN(IGS)%ELEM,NSEG0)
+                CALL MY_ALLOC(IGRSLIN(IGS)%ELEM,NSEG0)
                 IGRSLIN(IGS)%ELEM(1:NSEG0) = 0
-                MY_ALLOCATE(IGRSLIN(IGS)%PROC,NSEG0)
+                CALL MY_ALLOC(IGRSLIN(IGS)%PROC,NSEG0)
                 IGRSLIN(IGS)%PROC(1:NSEG0) = 0
               ENDIF
 !
@@ -543,13 +537,13 @@ C=======================================================================
                 ENDIF                                                                      
               ENDDO
               IF (FLAG == 1) THEN ! NSEG counted at FLAG = 0
-                MY_ALLOCATE2D(IGRSLIN(IGS)%NODES, IGRSLIN(IGS)%NSEG,2)
+                CALL MY_ALLOC(IGRSLIN(IGS)%NODES, IGRSLIN(IGS)%NSEG,2)
                 IGRSLIN(IGS)%NODES(1:IGRSLIN(IGS)%NSEG,1:2) = 0
-                MY_ALLOCATE(IGRSLIN(IGS)%ELTYP,IGRSLIN(IGS)%NSEG)
+                CALL MY_ALLOC(IGRSLIN(IGS)%ELTYP,IGRSLIN(IGS)%NSEG)
                 IGRSLIN(IGS)%ELTYP(1:IGRSLIN(IGS)%NSEG) = 0
-                MY_ALLOCATE(IGRSLIN(IGS)%ELEM,IGRSLIN(IGS)%NSEG)
+                CALL MY_ALLOC(IGRSLIN(IGS)%ELEM,IGRSLIN(IGS)%NSEG)
                 IGRSLIN(IGS)%ELEM(1:IGRSLIN(IGS)%NSEG) = 0
-                MY_ALLOCATE(IGRSLIN(IGS)%PROC,IGRSLIN(IGS)%NSEG)
+                CALL MY_ALLOC(IGRSLIN(IGS)%PROC,IGRSLIN(IGS)%NSEG)
                 IGRSLIN(IGS)%PROC(1:IGRSLIN(IGS)%NSEG) = 0
               ENDIF
               IF (NSEG0 > 0) THEN
@@ -586,13 +580,13 @@ C=======================================================================
             IF (KEY(1:2) == 'GR'.OR.KEY(1:4) == 'WIRE') THEN
               IF (FLAG == 1) THEN ! NSEG counted at FLAG = 0
                 NSEG0 = IGRSLIN(IGS)%NSEG
-                MY_ALLOCATE2D(IGRSLIN(IGS)%NODES,NSEG0,2)
+                CALL MY_ALLOC(IGRSLIN(IGS)%NODES,NSEG0,2)
                 IGRSLIN(IGS)%NODES(1:NSEG0,1:2) = 0
-                MY_ALLOCATE(IGRSLIN(IGS)%ELTYP,IGRSLIN(IGS)%NSEG)
+                CALL MY_ALLOC(IGRSLIN(IGS)%ELTYP,IGRSLIN(IGS)%NSEG)
                 IGRSLIN(IGS)%ELTYP(1:IGRSLIN(IGS)%NSEG) = 0
-                MY_ALLOCATE(IGRSLIN(IGS)%ELEM,IGRSLIN(IGS)%NSEG)
+                CALL MY_ALLOC(IGRSLIN(IGS)%ELEM,IGRSLIN(IGS)%NSEG)
                 IGRSLIN(IGS)%ELEM(1:IGRSLIN(IGS)%NSEG) = 0
-                MY_ALLOCATE(IGRSLIN(IGS)%PROC,NSEG0)
+                CALL MY_ALLOC(IGRSLIN(IGS)%PROC,NSEG0)
                 IGRSLIN(IGS)%PROC(1:NSEG0) = 0
               ENDIF
               IF(KEY(1:6) == 'GRSPRI') THEN

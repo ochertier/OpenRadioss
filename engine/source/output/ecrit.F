@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  ECRIT                         source/output/ecrit.F         
 Chd|-- called by -----------
@@ -32,18 +32,21 @@ Chd|        MY_FLUSH                      source/system/machine.F
 Chd|        SPMD_EXCH_FVSTATS             source/mpi/airbags/spmd_exch_fvstats.F
 Chd|        SPMD_GLOB_DSUM9               source/mpi/interfaces/spmd_th.F
 Chd|        SPMD_RBCAST                   source/mpi/generic/spmd_rbcast.F
+Chd|        ANIM_MOD                      ../common_source/modules/anim_mod.F
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|        IMP_DYNA                      share/modules/impbufdef_mod.F 
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
+Chd|        OUTPUT_MOD                    ../common_source/modules/output/output_mod.F
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
+Chd|        STATE_MOD                     ../common_source/modules/state_mod.F
 Chd|====================================================================
-      SUBROUTINE ECRIT(PARTSAV    ,MS        ,V	       ,IN       ,R          ,
-     2                 RBY        ,NPBY      ,DMAS     ,DINER    ,WEIGHT     ,
+      SUBROUTINE ECRIT(PARTSAV    ,MS        ,V        ,IN       ,R          ,
+     2                 DMAS       ,WEIGHT    ,ENINTOT  ,EKINTOT  ,
      3                 A          ,AR        ,FXBIPM   ,FXBRPM   ,MONVOL     ,
-     4                 XMOM_SMS   ,SENSOR_TAB,QFRICINT ,IPARI    ,WEIGHT_MD  ,
+     4                 XMOM_SMS   ,SENSORS   ,QFRICINT ,IPARI    ,WEIGHT_MD  ,
      5                 TFEXTH     ,IFLAG     ,MS_2D    ,MULTI_FVM,MAS_ND     ,
-     6                 KEND       ,H3D_DATA  )
+     6                 KEND       ,H3D_DATA  ,DYNAIN_DATA,USREINT,OUTPUT)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -52,6 +55,9 @@ C-----------------------------------------------
       USE MULTI_FVM_MOD
       USE H3D_MOD
       USE SENSOR_MOD
+      USE ANIM_MOD
+      USE STATE_MOD
+      USE OUTPUT_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -64,8 +70,6 @@ C-----------------------------------------------
 #include      "com06_c.inc"
 #include      "com08_c.inc"
 #include      "scr02_c.inc"
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
 #include      "scr06_c.inc"
 #include      "scr07_c.inc"
 #include      "scr11_c.inc"
@@ -79,7 +83,6 @@ C-----------------------------------------------
 #include      "lagmult.inc"
 #include      "impl1_c.inc"
 #include      "fxbcom.inc"
-#include      "subc_c.inc"
 #include      "timeri_c.inc"
 #include      "sms_c.inc"
 #include      "rad2r_c.inc"
@@ -89,24 +92,26 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IFLAG
-      INTEGER NPBY(NNPBY,*),
-     .        WEIGHT(NUMNOD),FXBIPM(NBIPM,*),
+      INTEGER WEIGHT(NUMNOD),FXBIPM(NBIPM,*),
      .        IPARI(NPARI,NINTER),WEIGHT_MD(NUMNOD)
       INTEGER MONVOL(*)
-      my_real DMAS,DINER,TFEXTH,
+      my_real DMAS,TFEXTH,
      .   PARTSAV(NPSAV,*), MS(NUMNOD), V(3,NUMNOD), A(3,NUMNOD), 
-     .   IN(NUMNOD), R(3,NUMNOD), RBY(NRBY,*), AR(3,NUMNOD),FXBRPM(*),
+     .   IN(NUMNOD), R(3,NUMNOD), AR(3,NUMNOD),FXBRPM(*),
      .   XMOM_SMS(3,*),QFRICINT(*),MS_2D(*),KEND,MAS_ND
+      my_real, INTENT(IN) :: USREINT
       TYPE(MULTI_FVM_STRUCT), INTENT(IN) :: MULTI_FVM
-      TYPE(H3D_DATABASE), INTENT(INOUT) :: H3D_DATA
-      TYPE (SENSOR_STR_), DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE(H3D_DATABASE), INTENT(INOUT)  :: H3D_DATA
+      TYPE (SENSORS_)    ,INTENT(IN)     :: SENSORS
+      TYPE (DYNAIN_DATABASE), INTENT(INOUT) :: DYNAIN_DATA
+      TYPE(OUTPUT_), INTENT(INOUT) :: OUTPUT !< output structure
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER IPRI, INFO, I, J, M, JPRI, ILIGN, K, ITHIS, ADRRPM, ISENS,
-     .         NTY,INTHE,IABFIS,SENS_ID,SENS_TYPE
+      INTEGER IPRI, INFO, I,M, JPRI, ILIGN,ITHIS, ADRRPM, ISENS,
+     .         NTY,INTHE,IABFIS
       my_real
-     .   ENTOT, ENTOT1, ERR, ERR1, X99, EMASS,MAS,
+     .   ENTOT, ENTOT1, ERR, ERR1, X99, EMASS,MAS,ENINTOT,EKINTOT,
      .   VX,VY,VZ,DT05,ENTMP(12)  ,RTMP(10),
      .   MVX, MVY, MVZ, TS, MAS2, WEWE2, ENTOT1B,DMASND
       DOUBLE PRECISION ETIME, RETIME, TT0,
@@ -128,7 +133,7 @@ C-----------------------------------------------
      7           '     ','     ','     ','     ','     ',
      8           '     ','     ','     ','     ','     ',
      9           '     ','     ','     ','     ','     ',
-     A           '     ','     ','     ','     ','RENAU',
+     A           '     ','     ','     ','     ','     ',
      B           'SPCEL','FVBAG','     ','     ','     ',
      C           '     ','     ','     ','     ','     ',
      D           '     ','     ','     ','     ','     ',
@@ -149,7 +154,7 @@ C=======================================================================
       INFO=MDESS-MANIM
       ITHIS=0
       IABFIS=0
-      IF(TT<THIS)ITHIS=1
+      IF(TT<OUTPUT%TH%THIS)ITHIS=1
       IF(TT<TABFIS(1))IABFIS=1
 C--------Multidomains : control of time history for subdomains-----------
       IF ((IRAD2R==1).AND.(R2R_SIU==1).AND.(IDDOM/=0)) THEN
@@ -473,35 +478,38 @@ C     ENCIN + ENINT + ENROT + ENCIN2 + ENROT2
 C     ENTOT1B =
 C     (NC=0,ENCIN + ENINT + ENROT - TFEXT - TFEXT_MD) 
 C     + DEF + TFEXT + DELTAE + TFEXT_MD       
-
-      IF(ISPMD==0) THEN
-       ENTOT = ENCIN + ENINT + ENROT
-       ENTOTB = ENTOT + ENCIN2 + ENROT2       
-       IF(NCYCLE==0) THEN
-        ENTOT0=ENTOT - TFEXT - TFEXT_MD
-        DELTAE=ENCIN2 + ENROT2                
-        MASS0 = XMASS - DMAS
-       ENDIF
-       MASS0 = MASS0  + DMF
-       ENTOT0= ENTOT0 + DEF       
-       ENTOT1=ENTOT0 + TFEXT
-       ENTOT1B=ENTOT0 + TFEXT + DELTAE + TFEXT_MD       
-       IF(ABS(ENTOT1B)>EM20)THEN
-         ERR = ENTOTB/ENTOT1B - ONE
-         ERR1 = MAX(-X99, MIN(X99,ERR*HUNDRED))     
-       ELSE
-        ERR = ZERO
-        ERR1 =ZERO
-       ENDIF
-       EMASS = (XMASS - MASS0) / MAX(MASS0,EM20)
+c----------------------------------------------------
+      IF (ISPMD == 0) THEN
+c
+        ENTOT = ENCIN + ENINT + ENROT
+        ENTOTB = ENTOT + ENCIN2 + ENROT2       
+        IF(NCYCLE==0) THEN
+         ENTOT0=ENTOT - TFEXT - TFEXT_MD
+         DELTAE=ENCIN2 + ENROT2                
+         MASS0 = XMASS - DMAS
+        ENDIF
+        MASS0 = MASS0  + DMF
+        ENTOT0= ENTOT0 + DEF       
+        ENTOT1=ENTOT0 + TFEXT
+        ENTOT1B=ENTOT0 + TFEXT + DELTAE + TFEXT_MD       
+        IF(ABS(ENTOT1B)>EM20)THEN
+          ERR = ENTOTB/ENTOT1B - ONE
+          ERR1 = MAX(-X99, MIN(X99,ERR*HUNDRED))     
+        ELSE
+         ERR = ZERO
+         ERR1 =ZERO
+        ENDIF
+        EMASS = (XMASS - MASS0) / MAX(MASS0,EM20)
+        ENINTOT = ENINT
+        EKINTOT = ENCIN
 C-----------------------------------------------
 C       /STATE/LSENSOR
 C-----------------------------------------------
-        IF (NSTATSENS  > 0) THEN
+        IF (SENSORS%NSTAT  > 0) THEN
           MSTATT = 0
-          DO I=1,NSTATSENS
-             ISENS = LSTATSENS(I)
-             TS = SENSOR_TAB(ISENS)%TSTART      
+          DO I=1,SENSORS%NSTAT
+             ISENS = SENSORS%STAT(I)
+             TS = SENSORS%SENSOR_TAB(ISENS)%TSTART    
              IF (TT >= TS) THEN
                MSTAT(I) = MSTAT(I)+1    
              ENDIF
@@ -511,161 +519,106 @@ C-----------------------------------------------
 C-----------------------------------------------
 C       /OUTP/LSENSOR
 C-----------------------------------------------
-        IF (NOUTPSENS > 0) THEN
+        IF (SENSORS%NOUTP > 0) THEN
           MOUTPT = 0
-          DO I=1,NOUTPSENS
-             ISENS = LOUTPSENS(I)
-             TS = SENSOR_TAB(ISENS)%TSTART     
+          DO I=1,SENSORS%NOUTP
+             ISENS = SENSORS%OUTP(I)
+             TS = SENSORS%SENSOR_TAB(ISENS)%TSTART    
              IF (TT >= TS) THEN
                 MOUTP(I) = MOUTP(I)+1    
              ENDIF
              IF(MOUTP(I)==1)  MOUTPT=1
           ENDDO
         ENDIF
-C-----------------------------------------------
-C       STOP OR KILL 
-C-----------------------------------------------
-C       /STOP/LSENSOR
-C-----------------------------------------------
-        IF (NSTOPSENS > 0) THEN
-          DO I=1,NSTOPSENS
-             ISENS = LSTOPSENS(I)
-             SENS_TYPE = SENSOR_TAB(ISENS)%TYPE
-             TS = EP20
-             SENS_ID = SENSOR_TAB(ISENS)%SENS_ID  
-             IF (SENSOR_TAB(ISENS)%STATUS == 1) TS = TT
-             IF (TT >= TS) THEN
-                CALL ANCMSG(MSGID=234,ANMODE=ANINFO,
-     .                      I1 = SENS_ID)
-                IWARN=IWARN+1
-                MSTOP=1
-                MREST=1
-                IF(NSTH/=0)THEN  !IF THIST FILE
-                   THIS= TT
-                   IPRI= 0
-                ENDIF
-                IF(NSABF/=0)THEN  !IF ABF FILE
-                   DO J=1,10 
-                     IF(ABFILE(J)/=0) THEN
-                        TABFIS(J) = TT
-                        TABFWR(J) = TT
-                     ENDIF
-                   ENDDO
-                ENDIF
-                IF(NSANIM/=0)THEN !IF ANIM FILE 
-                   MDESS = 1
-                   TANIM = TT
-                   IPRI  = 0
-                ENDIF 
-                IF(NSSTAT/=0)THEN !IF STAT FILE 
-                   TSTAT = TT
-                   IPRI  = 0
-                ENDIF 
-                IF(NSOUTP/=0)THEN !IF OUTP FILE 
-                  TOUTP = TT
-                  IPRI  = 0
-               ENDIF 
-                IF(NSH3D/=0)THEN !IF H3D FILE 
-                   H3D_DATA%TH3D = TT
-                   IPRI  = 0
-                ENDIF 
-                IF(NSDYNANIN/=0)THEN !IF DYNAIN FILE 
-                   TDYNAIN = TT
-                   IPRI  = 0
-                ENDIF 
-            ENDIF
-          ENDDO
-       ENDIF
 C
-       IF((NERR_POSIT==0.AND.ABS(ERR)>DEMXK).OR.
-     .    (NERR_POSIT==1.AND.ERR>DEMXK))THEN
-         CALL ANCMSG(MSGID=205,ANMODE=ANINFO)
-         IERR=IERR+1
-         MSTOP=1
-         IF(NTH/=0)THEN
-          THIS= TT
-          IPRI= 0
-         ENDIF
-         IF(NANIM/=0)THEN
-          MDESS = 1
-          TANIM = TT
-          IPRI  = 0
-         ENDIF                 
-       ELSEIF((NERR_POSIT==0.AND.ABS(ERR)>DEMXS).OR.
-     .        (NERR_POSIT==1.AND.ERR>DEMXS))THEN
-         CALL ANCMSG(MSGID=206,ANMODE=ANINFO)
-         IWARN=IWARN+1
-         MSTOP=1
-         MREST=1
-         IF(NTH/=0)THEN
-          THIS= TT
-          IPRI= 0
-         ENDIF
-         IF(NANIM/=0)THEN
-          MDESS = 1
-          TANIM = TT
-          IPRI  = 0
-         ENDIF 
-       ENDIF
+        IF((NERR_POSIT==0.AND.ABS(ERR)>DEMXK).OR.
+     .     (NERR_POSIT==1.AND.ERR>DEMXK))THEN
+          CALL ANCMSG(MSGID=205,ANMODE=ANINFO)
+          IERR=IERR+1
+          MSTOP=1
+          IF(NTH/=0)THEN
+           OUTPUT%TH%THIS= TT
+           IPRI= 0
+          ENDIF
+          IF(NANIM/=0)THEN
+           MDESS = 1
+           TANIM = TT
+           IPRI  = 0
+          ENDIF                 
+        ELSEIF((NERR_POSIT==0.AND.ABS(ERR)>DEMXS).OR.
+     .         (NERR_POSIT==1.AND.ERR>DEMXS))THEN
+          CALL ANCMSG(MSGID=206,ANMODE=ANINFO)
+          IWARN=IWARN+1
+          MSTOP=1
+          MREST=1
+          IF(NTH/=0)THEN
+           OUTPUT%TH%THIS= TT
+           IPRI= 0
+          ENDIF
+          IF(NANIM/=0)THEN
+           MDESS = 1
+           TANIM = TT
+           IPRI  = 0
+          ENDIF 
+        ENDIF
 C
-       IF(EMASS>DMTMXK)THEN
-         CALL ANCMSG(MSGID=207,ANMODE=ANINFO)
-         IERR=IERR+1
-         MSTOP=1
-         IF(NTH/=0)THEN
-          THIS= TT
-          IPRI = 0
-         ENDIF
-         IF(NANIM/=0)THEN
-          MDESS = 1
-          TANIM = TT
-          IPRI  = 0
-         ENDIF 
-       ELSEIF(EMASS>DMTMXS)THEN
-         CALL ANCMSG(MSGID=208,ANMODE=ANINFO)
-         IWARN=IWARN+1
-         MSTOP=1
-         MREST=1
-         IF(NTH/=0)THEN
-          THIS= TT
-          IPRI = 0
-         ENDIF
-         IF(NANIM/=0)THEN
-          MDESS = 1
-          TANIM = TT
-          IPRI  = 0
-         ENDIF 
-       ENDIF
-      ENDIF
-C
+        IF(EMASS>DMTMXK)THEN
+          CALL ANCMSG(MSGID=207,ANMODE=ANINFO)
+          IERR=IERR+1
+          MSTOP=1
+          IF(NTH/=0)THEN
+           OUTPUT%TH%THIS= TT
+           IPRI = 0
+          ENDIF
+          IF(NANIM/=0)THEN
+           MDESS = 1
+           TANIM = TT
+           IPRI  = 0
+          ENDIF 
+        ELSEIF(EMASS>DMTMXS)THEN
+          CALL ANCMSG(MSGID=208,ANMODE=ANINFO)
+          IWARN=IWARN+1
+          MSTOP=1
+          MREST=1
+          IF(NTH/=0)THEN
+           OUTPUT%TH%THIS= TT
+           IPRI = 0
+          ENDIF
+          IF(NANIM/=0)THEN
+           MDESS = 1
+           TANIM = TT
+           IPRI  = 0
+          ENDIF 
+        ENDIF
+      ENDIF  ! ISPMD == 0
+C---------------------------------
 C     Communication MSTOP & MREST
-C
+C---------------------------------
       IF (NSPMD > 1) THEN
         IF (ISPMD==0) THEN
           RTMP(1)  = MSTOP
           RTMP(2)  = MREST
           RTMP(3)  = MDESS
           RTMP(4)  = TANIM
-          RTMP(5)  = THIS
+          RTMP(5)  = OUTPUT%TH%THIS
           RTMP(6)  = TSTAT
           RTMP(7)  = TOUTP
           RTMP(8)  = INFO
           RTMP(9)  = H3D_DATA%TH3D
-          RTMP(10) = TDYNAIN
+          RTMP(10) = DYNAIN_DATA%TDYNAIN
         ENDIF
 C
         CALL SPMD_RBCAST(RTMP,RTMP,10,1,0,2)
-        IF (ISPMD/=0) THEN
-          MSTOP = NINT(RTMP(1))
-          MREST = NINT(RTMP(2))
-          MDESS = NINT(RTMP(3))
-          TANIM = RTMP(4)
-          THIS =  RTMP(5)
-          TSTAT = RTMP(6)
-          TOUTP = RTMP(7)
-          H3D_DATA%TH3D = RTMP(9)
-          TDYNAIN = RTMP(10)
-        ENDIF
+
+        MSTOP = NINT(RTMP(1))
+        MREST = NINT(RTMP(2))
+        MDESS = NINT(RTMP(3))
+        TANIM = RTMP(4)
+        OUTPUT%TH%THIS =  RTMP(5)
+        TSTAT = RTMP(6)
+        TOUTP = RTMP(7)
+        H3D_DATA%TH3D = RTMP(9)
+        DYNAIN_DATA%TDYNAIN = RTMP(10)
 
         IF(INFO > 0) CALL SPMD_EXCH_FVSTATS(MONVOL)
 
@@ -747,7 +700,7 @@ C
        WRITE (IUSC3,'(A,G14.7)',ERR=990)     ' MASS.ERR (M-M0)/M0=',EMASS
 
        CALL FVSTATS1(IUSC3,MONVOL,1)
-	   
+             
        IF(IMON > 0 .AND. TT > ZERO) THEN
 C calcul temps restant
          RETIME = (ETIME*TSTOP) / TT - ETIME

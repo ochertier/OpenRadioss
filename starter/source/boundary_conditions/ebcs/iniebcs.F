@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  INIEBCS                       source/boundary_conditions/ebcs/iniebcs.F
 Chd|-- called by -----------
@@ -28,15 +28,15 @@ Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
 Chd|        FINDELE                       source/boundary_conditions/ebcs/findele.F
 Chd|        ICINVS                        source/boundary_conditions/ebcs/iniebcs.F
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
-Chd|        ALE_EBCS_MOD                  ../common_source/modules/ale_ebcs_mod.F
-Chd|        EBCS_MOD                      ../common_source/modules/ebcs_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
+Chd|        ALE_EBCS_MOD                  ../common_source/modules/ale/ale_ebcs_mod.F
+Chd|        EBCS_MOD                      ../common_source/modules/boundary_conditions/ebcs_mod.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        SENSOR_MOD                    share/modules1/sensor_mod.F   
 Chd|====================================================================
       SUBROUTINE INIEBCS(ALE_CONNECTIVITY, IFLAG,IGRSURF, IXS, IXQ, IXTG, 
-     .     PM, IGEO, X, SENSOR_TAB, IVOLU, MULTI_FVM_IS_USED, EBCS_TAB, EBCS_TAG_CELL_SPMD)
+     .     PM, IGEO, X, SENSORS, IVOLU, MULTI_FVM_IS_USED, EBCS_TAB, EBCS_TAG_CELL_SPMD)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -54,8 +54,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "scr17_c.inc"
-#include      "units_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "tabsiz_c.inc"
@@ -70,7 +68,7 @@ C-----------------------------------------------
       TYPE (SURF_)   , DIMENSION(NSURF)   :: IGRSURF
       TYPE(t_ebcs_tab), TARGET, INTENT(INOUT) :: EBCS_TAB
       INTEGER,INTENT(IN) :: IFLAG, IGEO(NPROPGI,NUMGEO)
-      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE (SENSORS_) ,INTENT(IN) :: SENSORS
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -79,6 +77,7 @@ C-----------------------------------------------
       INTEGER :: SIZ
       CLASS (T_EBCS), POINTER :: EBCS
 C=======================================================================
+      EBCS_TAG_CELL_SPMD(1:NUMELQ+NUMELTG+NUMELS)=0 
       IF (N2D == 0) THEN
          LENMWA = NUMNOD+2+8*NUMELS
          ALLOCATE(MWA(LENMWA),  STAT=ERR)
@@ -243,8 +242,8 @@ C=======================================================================
                 ENDIF
              ENDDO
              IF(IFLAG==1)THEN
-               DO J = 1, NSENSOR
-                  IF (SENS == SENSOR_TAB(J)%SENS_ID)THEN
+               DO J = 1, SENSORS%NSENSOR
+                  IF (SENS == SENSORS%SENSOR_TAB(J)%SENS_ID)THEN
                      EBCS%monvol_id = SENS
                   ENDIF
                ENDDO
@@ -305,15 +304,14 @@ C=======================================================================
           
           IF(.NOT.EBCS%is_multifluid .AND. (TYP == 0 .OR. TYP == 10))THEN                                           
             !2D quads & trias EBCS : all on domain 1 (ispmd=0)  --> TAG with  EBCS_TAG_CELL_SPMD
-            !-------------------------------------------------   
-            EBCS_TAG_CELL_SPMD(1:NUMELQ+NUMELTG+NUMELS)=0                    
+            !-------------------------------------------------                      
             DO KK=1,EBCS%nb_elem              
               ICELL = EBCS%ielem(KK) 
               K1=0
               IF (EBCS%itype(KK)==4)K1=0
               IF (EBCS%itype(KK)==3)K1=NUMELQ 
               IF (EBCS%itype(KK)==8)K1=NUMELQ+NUMELTG             
-              EBCS_TAG_CELL_SPMD(K1+ICELL)=1    !tag elem to send to domain #1                     
+              IF(TYP/=10) EBCS_TAG_CELL_SPMD(K1+ICELL)=1    !tag elem to send to domain #1                     
             ENDDO                                                
             !-------------------------------------------------   
                                                                  
@@ -343,7 +341,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -353,7 +350,6 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C---------------------`-------------------------
       INTEGER I, J, N
-C-----------------------------------------------
 C-----------------------------------------------
       IADD(1) = 1
       IADD(2) = 1

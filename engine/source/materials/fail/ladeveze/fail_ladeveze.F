@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  FAIL_LADEVEZE                 source/materials/fail/ladeveze/fail_ladeveze.F
 Chd|-- called by -----------
@@ -27,11 +27,11 @@ Chd|        MMAIN                         source/materials/mat_share/mmain.F
 Chd|-- calls ---------------
 Chd|====================================================================
       SUBROUTINE FAIL_LADEVEZE(
-     1     NEL     ,NUVAR   ,IP      ,ILAY    ,NPT0    ,
-     2     NPF     ,TF      ,TIME    ,TIMESTEP,UPARAM  ,
-     3     MAT     ,NGL     ,OFF     ,NOFF    ,SIGNXX  ,
+     1     NEL     ,NUVAR   ,ILAY    ,NPT0    ,
+     2     TIME    ,TIMESTEP,UPARAM  ,
+     3     NGL     ,OFF     ,NOFF    ,SIGNXX  ,
      4     SIGNYY  ,SIGNZZ  ,SIGNXY  ,SIGNYZ  ,SIGNZX  ,
-     5     UVAR    ,IPM     ,NUPARAM ,DFMAX   ,TDELE   )
+     5     UVAR    ,NUPARAM ,DFMAX   ,TDELE   )
 C-----------------------------------------------
 C    Ladeveze damage delamination model
 C-----------------------------------------------
@@ -78,15 +78,14 @@ C OFF    | NEL     | F |R/W| DELETED ELEMENT FLAG (=1. ON, =0. OFF)
 C---------+---------+---+---+--------------------------------------------
 #include "com01_c.inc"
 #include "mvsiz_p.inc"
-#include "scr17_c.inc"
 #include "units_c.inc"
 #include "comlock.inc"
 #include "param_c.inc"
 C-----------------------------------------------
 C   I N P U T   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER NEL,NUPARAM, NUVAR,ILAY,IP,NPT0
-      INTEGER NGL(NEL),IPM(NPROPMI,*),MAT(NEL)
+      INTEGER NEL,NUPARAM, NUVAR,ILAY,NPT0
+      INTEGER NGL(NEL)
       my_real 
      .   TIME,TIMESTEP,UPARAM(NUPARAM),
      .   SIGNXX(NEL),SIGNYY(NEL),SIGNZZ(NEL),
@@ -96,11 +95,6 @@ C   I N P U T   O U T P U T   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NOFF(NEL)
       my_real UVAR(NEL,NUVAR), OFF(NEL),DFMAX(NEL),TDELE(NEL)
-C-----------------------------------------------
-C   VARIABLES FOR FUNCTION INTERPOLATION 
-C-----------------------------------------------
-      INTEGER NPF(*)
-      my_real TF(*)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -129,16 +123,16 @@ C-----------------------------------------------
 C     USER VARIABLES INITIALIZATION
 C-----------------------------------------------
       IF(ISIGI == ZERO)THEN 
-        IF(TIME==ZERO)THEN
-         DO I=1,NEL
-          UVAR(I,12)  = ONE
-         ENDDO   
+        IF ((UVAR(1,12)==ZERO).AND.(UVAR(1,1)==ZERO)) THEN
+          DO I=1,NEL
+            UVAR(I,12) = ONE
+          ENDDO   
         ENDIF    
-      ENDIF   
+      ENDIF    
 C-----------------------------------------------
       DO I=1,NEL
         IF(OFF(I)<EM01) OFF(I)=ZERO
-        IF(OFF(I)<ONE) OFF(I)=OFF(I)*FOUR_OVER_5
+        IF(OFF(I)<ONE)  OFF(I)=OFF(I)*FOUR_OVER_5
       END DO
 C           
         NINDX=0 

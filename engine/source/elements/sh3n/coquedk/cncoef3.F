@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  CNCOEF3B                      source/elements/sh3n/coquedk/cncoef3.F
 Chd|-- called by -----------
@@ -48,7 +48,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "com04_c.inc"
 #include      "impl1_c.inc"
 #include      "impl2_c.inc"
 C-----------------------------------------------
@@ -56,7 +55,6 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER JFT, JLT,MTN,ITHK,NPT,IHBE,ISUBSTACK
       INTEGER MAT(*), PID(*), IGEO(NPROPGI,*)
-C     REAL
       my_real
      .   GEO(NPROPG,*), PM(NPROPM,*), AREA(*),
      .   SHF(*),THK0(*),THK02(*),THK(*),THKE(*),
@@ -69,7 +67,6 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,J,ISH,MX,IPID,IGTYP,IPGMAT,IGMAT
-C     REAL
       my_real FSH,VISCDEF,FAC1TMP,KFAC,DN,K58(3),
      .        RFAC,RFAT,R1,R2,R3,S1,S2,S3,T1,T2,T3,RS1,RS2,RS3,
      .        R12,S12,R22,S22,R3R3,S3S3,E11,E22,EMIN,K58I
@@ -137,7 +134,7 @@ C
                NUSR(I) =PM_STACK(13 ,ISUBSTACK)
                KRZ(I) =KFAC*G(I)
           ENDDO 
-      ELSEIF(MTN==58) THEN
+      ELSEIF(MTN == 58 .or. MTN == 158) THEN
            MX  =MAT(JFT)
 C---- due to too high young update (Starter) w/ input func            
            FAC1TMP = PM(23,MX)/PM(20,MX)
@@ -145,7 +142,7 @@ C---- due to too high young update (Starter) w/ input func
            K58(2) = UPARAM(10)  ! young dir2
            K58(3) = MAX(UPARAM(13),UPARAM(14))
            K58I = EM02
-           IF (FAC1TMP <ONE) K58I = HALF*K58I	   
+           IF (FAC1TMP <ONE) K58I = HALF*K58I     
            FAC58(JFT:JLT,1:2) = K58I
          IF(NPT==1) THEN
            DO I=JFT,JLT                                             
@@ -168,17 +165,17 @@ C---- due to too high young update (Starter) w/ input func
              G(I)  = HALF*FAC1TMP*YM(I)
              NU(I)  = ZERO
              NUSR(I) =EM01
-C---- for dt compute -> will be updated by cndt in case of dtnoda 			 
+C---- for dt compute -> will be updated by cndt in case of dtnoda        
              A11(I) = YM(I)
              A12(I) = NU(I)*A11(I)
              RFAC = EXP(UVAR(I,4)) 
              RFAT = EXP(UVAR(I,5))
-C----	FAC58(I,1:2) could be different values, but too complicated		 
+C----  FAC58(I,1:2) could be different values, but too complicated     
              IF (UVAR(I,11)/=ZERO.AND.UVAR(I,12)/=ZERO) THEN
                FAC58(I,1:2) = EM01*K58I
              ELSEIF (MIN(RFAC,RFAT)>ONE) THEN
                FAC58(I,1:2) = 1.2*K58I
-			 END IF
+           END IF
            ENDDO                                                    
          ELSE
            DO I=JFT,JLT                                             
@@ -188,11 +185,11 @@ C----	FAC58(I,1:2) could be different values, but too complicated
              G(I)  = HALF*YM(I)
              NU(I)  = ZERO
              NUSR(I) =EM01
-C---- for dt compute			 
+C---- for dt compute       
              A11(I) = YM(I)
              A12(I) = NU(I)*A11(I)
            ENDDO                                                    
-		 END IF
+           END IF
            MX  =MAT(JFT)
            DO I=JFT,JLT
              THK02(I) = THK0(I)*THK0(I)
@@ -242,7 +239,8 @@ C----- used in mem damping
       DO I=JFT,JLT
          GS(I)=G(I)*SHF(I)
       ENDDO
-      IF(MTN == 58 ) THEN
+      IF (MTN == 58  .or. MTN == 158) THEN
+        CONTINUE
       ELSEIF(MTN>=24)THEN
         DO I=JFT,JLT
           A12(I)  =NU(I)*A11(I)
@@ -283,14 +281,9 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "com04_c.inc"
 #include      "impl1_c.inc"
 #include      "impl2_c.inc"
 C-----------------------------------------------
@@ -430,10 +423,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "impl1_c.inc"
@@ -442,14 +431,12 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER JFT, JLT
-C     REAL
       my_real
      .   G(*),KRZ(*),AREA(*),THK(*)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I
-C     REAL
       my_real KFAC ,LMAX
 C-----------------------------------------------
       IF(IMPL_S>0)THEN
@@ -461,15 +448,7 @@ C
       DO I=JFT,JLT
         KRZ(I) =KFAC*G(I)
       ENDDO
-C
-c      DO I=JFT,JLT
-c       LMAX=HALF*ALDT(I)/MAX(EM20,AREA(I))
-c       KFAC=LMAX*SQRT(THREE*AREA(I)+THK(I)*THK(I))
-c       KFAC=LMAX*SQRT((EIGHT*AREA(I)+THREE*THK(I)*THK(I))*THIRD)
-c       KFAC=LMAX*SQRT((EIGHT*AREA(I)+THREE*THK(I)*THK(I))*ONE_OVER_9)
-c       KFAC= MIN(ONE,KFAC)
-c       ALDT(I)= KFAC*ALDT(I)
-c      ENDDO
+
       RETURN
       END
 Chd|====================================================================
@@ -482,14 +461,15 @@ Chd|        CCTOGLOB                      source/elements/shell/coqueba/cmatc3.F
 Chd|        GEPM_LC                       source/elements/shell/coqueba/cmatc3.F
 Chd|        LAYINI                        source/elements/shell/coque/layini.F
 Chd|        DRAPE_MOD                     share/modules/drape_mod.F     
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        STACK_MOD                     share/modules/stack_mod.F     
 Chd|====================================================================
       SUBROUTINE CNCOEFORT(JFT    ,JLT     ,PM        ,MAT     ,GEO    ,
      1                     PID    ,MTN     ,NPT       ,HM      ,HF     ,
      2                     HC     ,HMFOR   ,IORTH     ,DIR     ,IGEO   ,
      3                     ISUBSTACK,STACK ,ELBUF_STR ,NLAY    ,THK    ,
-     4                     DRAPE  ,NFT     ,NEL       )
+     4                     DRAPE  ,NFT     ,NEL       ,INDX_DRAPE, THKE,
+     5                     SEDRAPE,   NUMEL_DRAPE)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -508,21 +488,21 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "com04_c.inc"
-#include      "impl1_c.inc"
-#include      "impl2_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER JFT, JLT  ,MTN  , NPT,IORTH,NLAY,NEL,NFT
+      INTEGER ,    INTENT(IN)     ::        SEDRAPE,NUMEL_DRAPE
       INTEGER MAT(*), PID(*) ,IGEO(NPROPGI,*)
+      INTEGER, DIMENSION(SEDRAPE) :: INDX_DRAPE
 C     REAL
       my_real
      .   GEO(NPROPG,*), PM(NPROPM,*), DIR(*),
      .   HM(MVSIZ,6),HF(MVSIZ,6),HC(MVSIZ,2),HMFOR(MVSIZ,6),THK(*)
+      my_real, DIMENSION(NEL), INTENT(IN) :: THKE
       TYPE (STACK_PLY) :: STACK
       TYPE(ELBUF_STRUCT_) :: ELBUF_STR
-      TYPE (DRAPE_) :: DRAPE
+      TYPE (DRAPE_) :: DRAPE(NUMEL_DRAPE)
 C-----------------------------------------------
 c FUNCTION:   stiffness modulus matrix build For hourglass stress compute
 c
@@ -551,7 +531,6 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,MX,IPID,J,J1,J2,J3,JJ,MATLY(MVSIZ*100),L,IGTYP,
      .        ISUBSTACK,IGMAT,IPOS,IPT_ALL,ILAY,IPT,IT,NPTT
-C     REAL
       my_real
      .   WMC,FACG,COEF,WM
       my_real
@@ -615,8 +594,8 @@ C----------unify the factor ONE_OVER_12 after
               CALL LAYINI(ELBUF_STR,JFT      ,JLT      ,GEO      ,IGEO    , 
      .                    MAT      ,PID      ,THKLY    ,MATLY    ,POSLY   , 
      .                    IGTYP    ,0        ,0        ,NLAY     ,NPT     , 
-     .                    ISUBSTACK,STACK    ,DRAPE    ,NFT      ,THK     ,
-     .                    JLT      ,THK_LY   )                              
+     .                    ISUBSTACK,STACK    ,DRAPE    ,NFT      ,THKE    ,
+     .                    JLT      ,THK_LY   ,INDX_DRAPE, SEDRAPE,NUMEL_DRAPE)                              
               HM(JFT:JLT,1:6)=ZERO
               HF(JFT:JLT,1:6)=ZERO
               HC(JFT:JLT,1:2)=ZERO

@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  FAIL_ORTHSTRAIN               source/materials/fail/orthstrain/fail_orthstrain_s.F
 Chd|-- called by -----------
@@ -117,7 +117,9 @@ C-----------------------------------------------
       my_real  DAM(NEL,12),ODAM(NEL,12),EPSP(NEL,6),SIGO(NEL,6),FSIZE(NEL),
      .   ESCAL(NEL),DYDX(NEL)
       my_real ,DIMENSION(NEL)  :: EPS11,EPS22,EPS33,EPS12,EPS23,EPS31,
-     .     EPSP11,EPSP22,EPSP33,EPSP12,EPSP23,EPSP31 
+     .     EPSP11,EPSP22,EPSP33,EPSP12,EPSP23,EPSP31,
+     .     EPSM1,EPSM2,EPSM3,EPSM4,EPSM5,EPSM6,
+     .     EPSM7,EPSM8,EPSM9,EPSM10,EPSM11,EPSM12
       my_real  FRATE,EPSPREF,EPDOT,ALPHA,DEPSM,DEPS,FACT,P,I1,I2,I3,Q,R,R_INTER,
      .    PHI,ET1,ET2,ET12,EC1,EC2,EC12,ET3,EC3,EC23,ET23,EC31,ET31,
      .    ET1M,ET2M,ET12M,EC1M,EC2M,EC12M,ET3M,EC3M,EC23M,ET23M,EC31M,ET31M,
@@ -482,10 +484,11 @@ c
               FAILI = 1
               FMODE(I,MODE) = 1
               DAM(I,MODE) = ONE
+              EPSM1(I) = ET1M
             ENDIF
           ENDIF
 c
-c         MODE YY TRACTION				
+c         MODE YY TRACTION
 c
           MODE  = 2
           EPDOT = ABS(EPSP(I,YY))/EPSPREF
@@ -507,9 +510,10 @@ c
               FAILI = 1
               FMODE(I,MODE) = 1
               DAM(I,MODE) = ONE
+              EPSM2(I) = ET2M
             ENDIF
           ENDIF
-c		
+c
 c         MODE XY TRACTION
 c
           MODE  = 3
@@ -532,11 +536,12 @@ c
               FAILI = 1
               FMODE(I,MODE) = 1
               DAM(I,MODE) = ONE
+              EPSM3(I) = ET12M
             ENDIF
           ENDIF
 c
-c		       MODE XX COMPRESSION
-c         		
+c           MODE XX COMPRESSION
+c         
           MODE  = 4
           EPDOT = ABS(EPSP(I,XX))/EPSPREF
           IF (IFUNC(MODE) > 0) THEN
@@ -557,11 +562,12 @@ c
               FAILI = 1
               FMODE(I,MODE) = 1
               DAM(I,MODE) = ONE
+              EPSM4(I) = -EC1M
             ENDIF
           ENDIF
 c
-c		       MODE YY COMPRESSION	 
-c         	
+c           MODE YY COMPRESSION   
+c         
           MODE = 5
           EPDOT = ABS(EPSP(I,YY))/EPSPREF
           IF (IFUNC(MODE) > 0) THEN
@@ -582,10 +588,11 @@ c
               FAILI = 1
               FMODE(I,MODE) = 1
               DAM(I,MODE) = ONE
+              EPSM5(I) = -EC2M
             ENDIF
           ENDIF
-c		
-c         MODE XY COMPRESSION		
+c
+c         MODE XY COMPRESSION
 c
           MODE  = 6
           EPDOT = ABS(EPSP(I,XY))/EPSPREF
@@ -607,10 +614,11 @@ c
               FAILI = 1
               FMODE(I,MODE) = 1
               DAM(I,MODE) = ONE
+              EPSM6(I) = -EC12M
             ENDIF
           ENDIF
-c		
-c         MODE ZZ Traction		
+c
+c         MODE ZZ Traction
 c
           MODE  = M33T
           EPDOT = ABS(EPSP(I,ZZ))/EPSPREF
@@ -632,10 +640,11 @@ c
               FAILI = 1
               FMODE(I,MODE) = 1
               DAM(I,MODE) = ONE
+              EPSM7(I) = ET3M
             ENDIF
           ENDIF
-c		
-c         MODE ZZ Compression		
+c
+c         MODE ZZ Compression
 c
           MODE  = M33C
           EPDOT = ABS(EPSP(I,ZZ))/EPSPREF
@@ -657,9 +666,10 @@ c
               FAILI = 1
               FMODE(I,MODE) = 1
               DAM(I,MODE) = ONE
+              EPSM8(I) = -EC3M
             ENDIF
           ENDIF
-c		
+c
 c         MODE YZ TRACT
 c
           MODE  = M23T
@@ -682,10 +692,11 @@ c
               FAILI = 1
               FMODE(I,MODE) = 1
               DAM(I,MODE) = ONE
+              EPSM9(I) = ET23M
             ENDIF
           ENDIF
-c		
-c         MODE YZ COMP		
+c
+c         MODE YZ COMP
 c
           MODE  = M23C
           EPDOT = ABS(EPSP(I,YZ))/EPSPREF
@@ -707,9 +718,10 @@ c
               FAILI = 1
               FMODE(I,MODE) = 1
               DAM(I,MODE) = ONE
+              EPSM10(I) = -EC23M
             ENDIF
           ENDIF
-c		
+c
 c         MODE ZX Traction
 c
           MODE  = M31T
@@ -732,10 +744,11 @@ c
               FAILI = 1
               FMODE(I,MODE) = 1
               DAM(I,MODE) = ONE
+              EPSM11(I) = ET31M
             ENDIF
           ENDIF
-c		
-c         mode ZX comp		
+c
+c         mode ZX comp
 c
           MODE  = M31C  ! Mode 12
           EPDOT = ABS(EPSP(I,ZX))/EPSPREF
@@ -757,6 +770,7 @@ c
               FAILI = 1
               FMODE(I,MODE) = 1
               DAM(I,MODE) = ONE
+              EPSM12(I) = -EC31M
             ENDIF
           ENDIF
 c
@@ -853,18 +867,18 @@ c------------------------
 #include  "lockon.inc"      
             WRITE(ISTDO,1000) NGL(I),IPT
             WRITE(IOUT, 2000) NGL(I),IPT
-            IF (FMODE(I,1)  == 1) WRITE(IOUT,4000) 1 ,EPSP(I,XX)
-            IF (FMODE(I,2)  == 1) WRITE(IOUT,4000) 2 ,EPSP(I,YY)
-            IF (FMODE(I,3)  == 1) WRITE(IOUT,4000) 3 ,EPSP(I,XY)
-            IF (FMODE(I,4)  == 1) WRITE(IOUT,4000) 4 ,EPSP(I,XX)
-            IF (FMODE(I,5)  == 1) WRITE(IOUT,4000) 5 ,EPSP(I,YY)
-            IF (FMODE(I,6)  == 1) WRITE(IOUT,4000) 6 ,EPSP(I,XY)
-            IF (FMODE(I,7)  == 1) WRITE(IOUT,4000) 7 ,EPSP(I,ZZ)
-            IF (FMODE(I,8)  == 1) WRITE(IOUT,4000) 8 ,EPSP(I,ZZ)
-            IF (FMODE(I,9)  == 1) WRITE(IOUT,4000) 9 ,EPSP(I,YZ)
-            IF (FMODE(I,10) == 1) WRITE(IOUT,4000) 10,EPSP(I,YZ)
-            IF (FMODE(I,11) == 1) WRITE(IOUT,4000) 11,EPSP(I,ZX)
-            IF (FMODE(I,12) == 1) WRITE(IOUT,4000) 12,EPSP(I,ZX)
+            IF (FMODE(I,1)  == 1) WRITE(IOUT,4000) '1 - TRACTION XX',EPS11(I),EPSM1(I),EPSP(I,XX)
+            IF (FMODE(I,2)  == 1) WRITE(IOUT,4000) '2 - TRACTION YY',EPS22(I),EPSM2(I),EPSP(I,YY)
+            IF (FMODE(I,3)  == 1) WRITE(IOUT,4000) '3 - POSITIVE SHEAR XY',EPS12(I),EPSM3(I),EPSP(I,XY)
+            IF (FMODE(I,4)  == 1) WRITE(IOUT,4000) '4 - COMPRESSION XX',EPS11(I),EPSM4(I),EPSP(I,XX)
+            IF (FMODE(I,5)  == 1) WRITE(IOUT,4000) '5 - COMPRESSION YY',EPS22(I),EPSM5(I),EPSP(I,YY)
+            IF (FMODE(I,6)  == 1) WRITE(IOUT,4000) '6 - NEGATIVE SHEAR XY',EPS12(I),EPSM6(I),EPSP(I,XY)
+            IF (FMODE(I,7)  == 1) WRITE(IOUT,4000) '7 - TRACTION ZZ',EPS33(I),EPSM7(I),EPSP(I,ZZ)
+            IF (FMODE(I,8)  == 1) WRITE(IOUT,4000) '8 - COMPRESSION ZZ',EPS33(I),EPSM8(I),EPSP(I,ZZ)
+            IF (FMODE(I,9)  == 1) WRITE(IOUT,4000) '9 - POSITIVE SHEAR YZ',EPS23(I),EPSM9(I),EPSP(I,YZ)
+            IF (FMODE(I,10) == 1) WRITE(IOUT,4000) '10 - NEGATIVE SHEAR YZ',EPS23(I),EPSM10(I),EPSP(I,YZ)
+            IF (FMODE(I,11) == 1) WRITE(IOUT,4000) '11 - POSITIVE SHEAR ZX',EPS31(I),EPSM11(I),EPSP(I,ZX)
+            IF (FMODE(I,12) == 1) WRITE(IOUT,4000) '12 - NEGATIVE SHEAR ZX',EPS31(I),EPSM12(I),EPSP(I,ZX)
             IF (OFF(I) == ZERO)   WRITE(IOUT, 3000) NGL(I),TIME
 #include  "lockoff.inc"
         END DO
@@ -873,7 +887,8 @@ c-----------------------------------------------------------------------
  1000 FORMAT(1X,'FAILURE (ORTHSTR) OF SOLID ELEMENT ',I10,1X,',GAUSS PT ',I5)
  2000 FORMAT(1X,'FAILURE (ORTHSTR) OF SOLID ELEMENT ',I10,1X,',GAUSS PT ',I5)
  3000 FORMAT(1X,'RUPTURE OF ELEMENT #',I10,1X,'AT TIME # ',1PE12.4)   
- 4000 FORMAT(1X,'MODE',1X,I2,' STRAIN RATE',1PE12.4) 
+ 4000 FORMAT(1X,'MODE',1X,A,', STRAIN',1PE12.4,', CRITICAL VALUE',1PE12.4,
+     .       ', STRAIN RATE',1PE12.4) 
 c-----------------------------------------------------------------------
       RETURN          
       END

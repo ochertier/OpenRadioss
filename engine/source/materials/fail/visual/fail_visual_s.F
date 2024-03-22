@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  FAIL_VISUAL_S                 source/materials/fail/visual/fail_visual_s.F
 Chd|-- called by -----------
@@ -64,9 +64,6 @@ C---------+--------+--+--+-------------------------------------------
 C I N P U T A r g u m e n t s
 C-----------------------------------------------
 #include "units_c.inc"
-#include "param_c.inc"
-#include "scr17_c.inc"
-#include "scr19_c.inc"
 #include "comlock.inc"
 C-----------------------------------------------
         INTEGER NEL,NUPARAM,NUVAR,ISMSTR
@@ -84,13 +81,14 @@ C-----------------------------------------------
 C L o c a l V a r i a b l e s
 C-----------------------------------------------
         INTEGER I,J,NINDX,INDX(NEL),TYPE_MAX,F_FLAG,STRDEF,STRFLAG
-        my_real PLAMAX,SCAL_1,SCAL_2,SCAL_3,SOC
         my_real I1,I2,I3,E11,E22,E33,E_EQ,E_EQ1,E_EQ2,Q,R,R_INTER,PHI,
-     .    C_MIN,C_MAX,EMA,DAMAGE,ALPHA,F,FF,
-     .    PI1,PI8,PI38,SPI8,SPI38,C0,C1,C2,C3,C4,C5,C6,C7,C8,C9,
-     .    X1,X2,X3,Y1,Y2,Y3,Z1,Z2,Z3,D,DD,D2,DP,E,G
-        my_real A0(2),A1(2),A2(2),AS(3),VS(3)      
-        my_real ,DIMENSION(NEL) :: EPS1,EPS2,EPS3
+     .    C_MIN,C_MAX,EMA,DAMAGE
+        DOUBLE PRECISION :: A0(2),A1(2),A2(2),C0,C1,C2,C3,C4,C5,C6,C7,C8,C9,
+     .    X1,X2,X3,Y1,Y2,Y3,Z1,Z2,Z3,F,FF,D,DD,D2,DP,E,G
+        DOUBLE PRECISION, PARAMETER :: PI8   = 0.3926990817D0 
+        DOUBLE PRECISION, PARAMETER :: PI38  = 1.178097245D0
+        DOUBLE PRECISION, PARAMETER :: SPI8  = 0.3826834324D0
+        DOUBLE PRECISION, PARAMETER :: SPI38 = 0.9238795325D0
 C=======================================================================
 C USER VARIABLES
 
@@ -227,15 +225,8 @@ c! ---    EMA or Butterworth filtering
 C-----------------------------------------------
 C           INITIALIALISATION OF THE FILTER-COEFFICIENTS 
 C-----------------------------------------------
-
-            PI1     = TWO*ATAN2(ONE,ZERO)
-            PI8     = PI1*ONE_OVER_8
-            PI38    = THREE*PI8
-            SPI8    = SIN(PI8)
-            SPI38   = SIN(PI38)
 C         
-            D  = TAN(PI1*F*TIMESTEP)
-          
+            D  = TAN(PI*F*TIMESTEP)  
             DD = D*D
             D2 = TWO*D
             DP = ONE + DD
@@ -262,13 +253,13 @@ C
 C-----------------------------------------------
 C BUTTERWORTH FILTERING
 C-----------------------------------------------
-         
-            A0(1)     = UVAR(I,3)
-            A0(2)     = UVAR(I,4) 
-            A1(1)     = UVAR(I,5) 
-            A1(2)     = UVAR(I,6) 
-            A2(1)     = UVAR(I,7) 
-            A2(2)     = UVAR(I,8) 
+
+            A0(1) = UVAR(I,3)*UVAR(I,9) 
+            A0(2) = UVAR(I,4)*UVAR(I,9) 
+            A1(1) = UVAR(I,5)*UVAR(I,10) 
+            A1(2) = UVAR(I,6)*UVAR(I,10)  
+            A2(1) = UVAR(I,7)*UVAR(I,11)  
+            A2(2) = UVAR(I,8)*UVAR(I,11)  
 
             X1 = A0(2)
             X2 = A0(1)
@@ -276,12 +267,18 @@ C-----------------------------------------------
             X3 = E11
             Y1 = A1(2)
             Y2 = A1(1)
-            Y3 = C0 * X3 + C1 * X2 + C2 * X1
-     .         + C3 * Y2 + C4 * Y1
+            Y3 = C0 * X3
+            Y3 = Y3 + C1 * X2 
+            Y3 = Y3 + C2 * X1
+            Y3 = Y3 + C3 * Y2
+            Y3 = Y3 + C4 * Y1
             Z1 = A2(2)
             Z2 = A2(1)
-            Z3 = C5 * Y3 + C6 * Y2 + C7 * Y1
-     .         + C8 * Z2 + C9 * Z1
+            Z3 = C5 * Y3 
+            Z3 = Z3 + C6 * Y2 
+            Z3 = Z3 + C7 * Y1
+            Z3 = Z3 + C8 * Z2 
+            Z3 = Z3 + C9 * Z1
 C         
             A0(2) = X2
             A0(1) = X3
@@ -290,15 +287,29 @@ C
             A2(2) = Z2
             A2(1) = Z3
           
-            UVAR(I,3) = A0(1)
-            UVAR(I,4) = A0(2)
-            UVAR(I,5) = A1(1)
-            UVAR(I,6) = A1(2)
-            UVAR(I,7) = A2(1)
-            UVAR(I,8) = A2(2)
+            IF ((X3 /= ZERO).AND.(X2 /= ZERO)) THEN 
+              UVAR(I,3)  = A0(1)/X2
+              UVAR(I,4)  = A0(2)/X2
+              UVAR(I,5)  = A1(1)/(C0*X3)
+              UVAR(I,6)  = A1(2)/(C0*X3)
+              UVAR(I,7)  = A2(1)/(C0*Y3)
+              UVAR(I,8)  = A2(2)/(C0*Y3)
+              UVAR(I,9)  = X2
+              UVAR(I,10) = C0*X3
+              UVAR(I,11) = C0*Y3
+            ELSE
+              UVAR(I,3)  = A0(1)
+              UVAR(I,4)  = A0(2)
+              UVAR(I,5)  = A1(1)
+              UVAR(I,6)  = A1(2)
+              UVAR(I,7)  = A2(1)
+              UVAR(I,8)  = A2(2)
+              UVAR(I,9)  = ONE
+              UVAR(I,10) = ONE
+              UVAR(I,11) = ONE
+            ENDIF
           
-            E11       = A2(1)
-          
+            E11 = A2(1)     
            
           ELSE           
 c!    

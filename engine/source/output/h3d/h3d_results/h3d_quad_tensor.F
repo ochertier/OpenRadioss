@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 
 Chd|====================================================================
 Chd|  H3D_QUAD_TENSOR               source/output/h3d/h3d_results/h3d_quad_tensor.F
@@ -28,7 +28,7 @@ Chd|        GENH3D                        source/output/h3d/h3d_results/genh3d.F
 Chd|-- calls ---------------
 Chd|        H3D_WRITE_TENSOR              source/output/h3d/h3d_results/h3d_write_tensor.F
 Chd|        QROTA_GROUP                   source/output/anim/generate/qrota_group.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        STACK_MOD                     share/modules/stack_mod.F     
 Chd|====================================================================
       SUBROUTINE H3D_QUAD_TENSOR(ELBUF_TAB,QUAD_TENSOR,IPARG ,ITENS ,INVERT,NELCUT,
@@ -43,12 +43,11 @@ C   M o d u l e s
 C-----------------------------------------------
       USE ELBUFDEF_MOD
       USE STACK_MOD
+      USE NAMES_AND_TITLES_MOD, ONLY: NCHARLINE100
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "chara_c.inc"
-#include      "nchara_c.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -57,13 +56,6 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "rnur_c.inc"
-#include      "scr01_c.inc"
-#include      "scr05_c.inc"
-#include      "scr14_c.inc"
-#include      "scr25_c.inc"
-#include      "spmd_c.inc"
-#include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -79,7 +71,7 @@ C     REAL
      .   TENS(3,*),EPSDOT(6,*),X(3,*),QUAD_TENSOR(6,*)
       TYPE (ELBUF_STRUCT_), DIMENSION(NGROUP), TARGET :: ELBUF_TAB
       TYPE (STACK_PLY) :: STACK
-      CHARACTER*ncharline KEYWORD
+      CHARACTER(LEN=NCHARLINE100) :: KEYWORD
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -230,7 +222,9 @@ c
 
                 IF (JCVT == 0 .OR. ISORTH /= 0) THEN
 C                OUTPUT TENSOR STORED IN GLOBAL SYSTEM TO BE TRANSFERRED IN THE ELEMENT LOCAL ONE
-                 CALL QROTA_GROUP(X,IXQ(1,NFT+1),JCVT,EVAR,GBUF%GAMA,NEL)
+                 CALL QROTA_GROUP(
+     1   X,           IXQ(1,NFT+1),JCVT,        EVAR,
+     2   GBUF%GAMA,   NEL,         ISORTH)
                 ENDIF
 c
               ELSEIF ( ILAY == -1 .AND. IABS(IT) == 1 .AND. IR >= 0 .AND. 
@@ -264,7 +258,9 @@ c
 c
                 IF (JCVT == 0 .OR. ISORTH /= 0) THEN
 C                OUTPUT TENSOR STORED IN GLOBAL SYSTEM TO BE TRANSFERRED IN THE ELEMENT LOCAL ONE
-                 CALL QROTA_GROUP(X,IXQ(1,NFT+1),JCVT,EVAR,GBUF%GAMA,NEL)
+                 CALL QROTA_GROUP(
+     1   X,           IXQ(1,NFT+1),JCVT,        EVAR,
+     2   GBUF%GAMA,   NEL,         ISORTH)
                 ENDIF
 c
               ENDIF
@@ -291,7 +287,9 @@ c
 
                 IF (JCVT == 0 .OR. ISORTH /= 0) THEN
 C                OUTPUT TENSOR STORED IN GLOBAL SYSTEM TO BE TRANSFERRED IN THE ELEMENT LOCAL ONE
-                 CALL QROTA_GROUP(X,IXQ(1,NFT+1),JCVT,EVAR,GBUF%GAMA,NEL)
+                 CALL QROTA_GROUP(
+     1   X,           IXQ(1,NFT+1),JCVT,        EVAR,
+     2   GBUF%GAMA,   NEL,         ISORTH)
                 ENDIF
 c
               ELSEIF ( ILAY == -1 .AND. IABS(IT) == 1 .AND. IR >= 0 .AND. 
@@ -308,7 +306,9 @@ c
 
                 IF (JCVT == 0 .OR. ISORTH /= 0) THEN
 C                OUTPUT TENSOR STORED IN GLOBAL SYSTEM TO BE TRANSFERRED IN THE ELEMENT LOCAL ONE
-                 CALL QROTA_GROUP(X,IXQ(1,NFT+1),JCVT,EVAR,GBUF%GAMA,NEL)
+                 CALL QROTA_GROUP(
+     1   X,           IXQ(1,NFT+1),JCVT,        EVAR,
+     2   GBUF%GAMA,   NEL,         ISORTH)
                 ENDIF
 c
               ENDIF
@@ -324,10 +324,12 @@ c
                    DO IT=1,NPTT
                     DO IR=1,NPTR
                      LBUF =>  ELBUF_TAB(NG)%BUFLY(1)%LBUF(IR,IS,IT)                                         
-                     EVAR(1,I) = EVAR(1,I)+LBUF%DGLO(JJ(1) + I)/NPT
-                     EVAR(2,I) = EVAR(2,I)+LBUF%DGLO(JJ(2) + I)/NPT
-                     EVAR(4,I) = EVAR(4,I)+LBUF%DGLO(JJ(4) + I)/NPT
-                     IS_WRITTEN_TENSOR(I) = 1
+                     IF(ELBUF_TAB(NG)%BUFLY(1)%L_DGLO > 0) THEN
+                       EVAR(1,I) = EVAR(1,I)+LBUF%DGLO(JJ(1) + I)/NPT
+                       EVAR(2,I) = EVAR(2,I)+LBUF%DGLO(JJ(2) + I)/NPT
+                       EVAR(4,I) = EVAR(4,I)+LBUF%DGLO(JJ(4) + I)/NPT
+                       IS_WRITTEN_TENSOR(I) = 1
+                     ENDIF
                    ENDDO                                                   
                   ENDDO                                                    
                  ENDDO                                                     
@@ -337,13 +339,15 @@ c
      .                IR <= NPTR .AND. IS >= 0 .AND. IS <= NPTS) THEN 
 c
                 LBUF =>  ELBUF_TAB(NG)%BUFLY(1)%LBUF(IR,IS,1)        
-                DO I=1,NEL
-                  N = I + NFT                                                     
-                  EVAR(1,I) = EVAR(1,I)+LBUF%DGLO(JJ(1) + I)
-                  EVAR(2,I) = EVAR(2,I)+LBUF%DGLO(JJ(2) + I)
-                  EVAR(4,I) = EVAR(4,I)+LBUF%DGLO(JJ(4) + I)
-                  IS_WRITTEN_TENSOR(I) = 1
-                ENDDO                                                      
+                IF (ELBUF_TAB(NG)%BUFLY(1)%L_DGLO > 0) THEN
+                  DO I=1,NEL
+                    N = I + NFT                                                   
+                    EVAR(1,I) = EVAR(1,I)+LBUF%DGLO(JJ(1) + I)
+                    EVAR(2,I) = EVAR(2,I)+LBUF%DGLO(JJ(2) + I)
+                    EVAR(4,I) = EVAR(4,I)+LBUF%DGLO(JJ(4) + I)
+                    IS_WRITTEN_TENSOR(I) = 1
+                  ENDDO                                                    
+                ENDIF
 c
               ENDIF
 C-----------------------------------------------
@@ -368,7 +372,9 @@ c
 
                 IF (JCVT == 0 .OR. ISORTH /= 0) THEN
 C                OUTPUT TENSOR STORED IN GLOBAL SYSTEM TO BE TRANSFERRED IN THE ELEMENT LOCAL ONE
-                 CALL QROTA_GROUP(X,IXQ(1,NFT+1),JCVT,EVAR,GBUF%GAMA,NEL)
+                 CALL QROTA_GROUP(
+     1   X,           IXQ(1,NFT+1),JCVT,        EVAR,
+     2   GBUF%GAMA,   NEL,         ISORTH)
                 ENDIF
 c
               ELSEIF ( ILAY == -1 .AND. IABS(IT) == 1 .AND. IR >= 0 .AND. 
@@ -385,7 +391,9 @@ c
 
                 IF (JCVT == 0 .OR. ISORTH /= 0) THEN
 C                OUTPUT TENSOR STORED IN GLOBAL SYSTEM TO BE TRANSFERRED IN THE ELEMENT LOCAL ONE
-                 CALL QROTA_GROUP(X,IXQ(1,NFT+1),JCVT,EVAR,GBUF%GAMA,NEL)
+                 CALL QROTA_GROUP(
+     1   X,           IXQ(1,NFT+1),JCVT,        EVAR,
+     2   GBUF%GAMA,   NEL,         ISORTH)
                 ENDIF
 c
               ENDIF

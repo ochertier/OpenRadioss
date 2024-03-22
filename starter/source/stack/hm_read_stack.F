@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  HM_READ_STACK                 source/stack/hm_read_stack.F  
 Chd|-- called by -----------
@@ -40,9 +40,9 @@ Chd|        STACK_MOD                     share/modules1/stack_mod.F
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
       SUBROUTINE HM_READ_STACK(
-     .           GEO      ,IGEO     ,PM       ,IPM       ,ISKN     ,  
-     .           PROP_ID  ,RTRANS   ,SUB_ID   ,STACK_INFO,
-     .           TITR     ,UNITAB   ,LSUBMODEL)
+     .           GEO_STACK ,IGEO_STACK ,PM        ,IPM       ,ISKN     ,  
+     .           PROP_ID   ,RTRANS     ,SUB_ID    ,STACK_INFO,
+     .           TITR      ,UNITAB     ,LSUBMODEL)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -61,23 +61,19 @@ C-----------------------------------------------
 #include      "units_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "warn_c.inc"
-#include      "scr03_c.inc"
 #include      "scr16_c.inc"
 #include      "scr17_c.inc"
 #include      "scr21_c.inc"
-#include      "tablen_c.inc"
-#include      "submod_c.inc"
 #include      "sphcom.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER, INTENT(IN) :: PROP_ID,SUB_ID
-      INTEGER, INTENT(INOUT) :: IGEO(NPROPGI)
-      INTEGER, INTENT(IN) :: IPM(NPROPMI,*)
+      INTEGER, INTENT(INOUT) :: IGEO_STACK(NPROPGI)
+      INTEGER, INTENT(IN) :: IPM(NPROPMI,NUMMAT)
       INTEGER :: ISKN(LISKN,*)
-      my_real, INTENT(INOUT) :: GEO(NPROPG)
-      my_real, INTENT(IN) ::  PM(NPROPM,*),RTRANS(NTRANSF,*)
+      my_real, INTENT(INOUT) :: GEO_STACK(NPROPG)
+      my_real, INTENT(IN) ::  PM(NPROPM,NUMMAT),RTRANS(NTRANSF,*)
       CHARACTER(LEN = nchartitle) :: TITR
       TYPE (UNIT_TYPE_), INTENT(IN) :: UNITAB
       TYPE (SUBMODEL_DATA), DIMENSION(NSUBMOD), INTENT(IN) :: LSUBMODEL
@@ -87,7 +83,8 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER :: I,J,K,KK,M1,ISHELL,ISH3N,ISMSTR,ISROT,ISTRAIN,IINT,ITHK,
      .   IORTH,IPOS,IGMAT,ISHEAR,IPLAST,NPLY,NP,NSUB,NISUB,IGTYP,IMID,
-     .   ISK,IDSK,PLY_ID,IPID0,IDSUB,INTER,IS,LAMIN,IPID1,IPID2,NPT_SUB,IRP
+     .   ISK,IDSK,PLY_ID,IPID0,IDSUB,INTER,IS,LAMIN,IPID1,IPID2,NPT_SUB,IRP,
+     .   NPLY_MAX
       my_real :: PTHK,ZSHIFT,HM,HF,HR,DM,DN,ASHEAR,VX,VY,VZ,FAILEXP,CVIS,
      .           NORM,ANG,POS,PTHKLY,WEIGHT
       LOGICAL :: IS_AVAILABLE, IS_ENCRYPTED, LFOUND
@@ -114,7 +111,7 @@ card1
       CALL HM_GET_INTV('LAM_Ismstr', ISMSTR, IS_AVAILABLE, LSUBMODEL)
       CALL HM_GET_INTV('LAM_ISH3N' , ISH3N , IS_AVAILABLE, LSUBMODEL)
       CALL HM_GET_INTV('LAM_Idrill', ISROT , IS_AVAILABLE, LSUBMODEL)
-!!      CALL HM_GET_FLOATV('P_Thick_Fail', PTHK, IS_AVAILABLE, LSUBMODEL, UNITAB)  
+      CALL HM_GET_FLOATV('P_Thick_Fail', PTHK, IS_AVAILABLE, LSUBMODEL, UNITAB)  
       CALL HM_GET_FLOATV('LAM_Z0'          , ZSHIFT, IS_AVAILABLE, LSUBMODEL, UNITAB)
       
 card2      
@@ -158,19 +155,23 @@ c
           STACK_INFO%SUB(2*(IS-1) + 2) = NPT_SUB  
 c
           DO I = 1,NPT_SUB
-            NPLY = NPLY + 1
             CALL HM_GET_INT_ARRAY_2INDEXES('plyidlist',PLY_ID,IS,I,IS_AVAILABLE,LSUBMODEL)
             CALL HM_GET_FLOAT_ARRAY_2INDEXES('LAM_Stack_phi',ANG,IS,I,IS_AVAILABLE,LSUBMODEL,UNITAB)
             CALL HM_GET_FLOAT_ARRAY_2INDEXES('LAM_Stack_Zi',POS,IS,I,IS_AVAILABLE,LSUBMODEL,UNITAB)
             CALL HM_GET_FLOAT_ARRAY_2INDEXES('P_thick_fail_lam',PTHKLY,IS,I,IS_AVAILABLE,LSUBMODEL,UNITAB)
             CALL HM_GET_FLOAT_ARRAY_2INDEXES('F_weight_i',WEIGHT,IS,I,IS_AVAILABLE,LSUBMODEL,UNITAB)
-            IF (PTHKLY == ZERO) PTHKLY = EM03
-            IF (WEIGHT == ZERO) WEIGHT = ONE
-            STACK_INFO%PID(NPLY) = PLY_ID
-            STACK_INFO%ANG(NPLY) = ANG
-            STACK_INFO%POS(NPLY) = POS
-            STACK_INFO%THKLY(NPLY)  = PTHKLY
-            STACK_INFO%WEIGHT(NPLY) = WEIGHT
+            IF(PLY_ID > 0) THEN
+                NPLY = NPLY + 1
+               IF (PTHKLY == ZERO) PTHKLY = ONE-EM06
+               PTHKLY = MIN(PTHKLY, ONE)
+               PTHKLY = MAX(PTHKLY,-ONE)
+               IF (WEIGHT == ZERO) WEIGHT = ONE
+               STACK_INFO%PID(NPLY) = PLY_ID
+               STACK_INFO%ANG(NPLY) = ANG
+               STACK_INFO%POS(NPLY) = POS
+               STACK_INFO%THKLY(NPLY)  = PTHKLY
+               STACK_INFO%WEIGHT(NPLY) = WEIGHT
+           ENDIF    
           END DO
         END DO
 c
@@ -183,28 +184,35 @@ c
           END DO
         END IF  
       ELSE  ! property defined by a list of plies
-        CALL HM_GET_INTV('plyidlistmax' ,NPLY ,IS_AVAILABLE ,LSUBMODEL)
-        DO I=1,NPLY
+        CALL HM_GET_INTV('plyidlistmax' ,NPLY_MAX ,IS_AVAILABLE ,LSUBMODEL)
+        NPLY =  0
+        DO I=1,NPLY_MAX
           CALL HM_GET_INT_ARRAY_INDEX  ('plyidlist' ,PLY_ID,I,IS_AVAILABLE,LSUBMODEL)
           CALL HM_GET_FLOAT_ARRAY_INDEX('LAM_Stack_phi',ANG,I,IS_AVAILABLE,LSUBMODEL,UNITAB)   
           CALL HM_GET_FLOAT_ARRAY_INDEX('LAM_Stack_Zi' ,POS,I,IS_AVAILABLE,LSUBMODEL,UNITAB)   
           CALL HM_GET_FLOAT_ARRAY_INDEX('P_thick_fail_lam' ,PTHKLY,I,IS_AVAILABLE,LSUBMODEL,UNITAB)   
           CALL HM_GET_FLOAT_ARRAY_INDEX('F_weight_i' ,WEIGHT,I,IS_AVAILABLE,LSUBMODEL,UNITAB)   
-c
-          IF (PTHKLY == ZERO) PTHKLY = EM03
-          IF (WEIGHT == ZERO) WEIGHT = ONE
-          STACK_INFO%PID(I) = PLY_ID
-          STACK_INFO%ANG(I) = ANG
-          STACK_INFO%POS(I) = POS
-          STACK_INFO%THKLY(I)  = PTHKLY
-          STACK_INFO%WEIGHT(I) = WEIGHT
-          ! old format of interply not supported
+c       
+          IF(PLY_ID > 0) THEN
+             NPLY = NPLY + 1
+             IF (PTHKLY == ZERO) PTHKLY = ONE-EM06
+             PTHKLY = MIN(PTHKLY, ONE)
+             PTHKLY = MAX(PTHKLY,-ONE)
+             IF (WEIGHT == ZERO) WEIGHT = ONE
+             STACK_INFO%PID(NPLY) = PLY_ID
+             STACK_INFO%ANG(NPLY) = ANG
+             STACK_INFO%POS(NPLY) = POS
+             STACK_INFO%THKLY(NPLY)  = PTHKLY
+             STACK_INFO%WEIGHT(NPLY) = WEIGHT
+          ENDIF
         END DO
       END IF
 c--------------------------------------------
 c     Default values
 c--------------------------------------------
-!!      PTHK = MIN(PTHK, ONE-EM06)
+      IF (PTHK == ZERO) PTHK = ONE-EM06
+      PTHK = MIN(PTHK, ONE)
+      PTHK = MAX(PTHK,-ONE)
       IF (ISHELL == 0) ISHELL = IHBE_D
 c      IHBEOUTP = ISHELL
       IF (ISH3N  == 0) ISH3N = ISH3N_D
@@ -351,52 +359,52 @@ C     isub stack
   300   CONTINUE
       ENDIF 
 c--------------------------------------------
-      IF (DM == ZERO) IGEO(31) = 1
-      IGEO(1)  = PROP_ID
-      IGEO(2)  = ISK
-      IGEO(4)  = NPLY
-      IGEO(5)  = ISMSTR
-      IGEO(6)  = IORTH  ! IREP
-      IGEO(10) = ISHELL
-      IGEO(11) = IGTYP
-      IGEO(18) = ISH3N
-      IGEO(20) = ISROT
-      IGEO(43) = NSUB   ! number of substack               
-      IGEO(44) = NISUB  ! number of interface 
-      IGEO(47) = IINT
-      IGEO(48) = 0 
-      IGEO(98) = IGMAT
-      IGEO(99) = IPOS
-      IGEO(14) = IRP
+      IF (DM == ZERO) IGEO_STACK(31) = 1
+      IGEO_STACK(1)  = PROP_ID
+      IGEO_STACK(2)  = ISK
+      IGEO_STACK(4)  = NPLY
+      IGEO_STACK(5)  = ISMSTR
+      IGEO_STACK(6)  = IORTH  ! IREP
+      IGEO_STACK(10) = ISHELL
+      IGEO_STACK(11) = IGTYP
+      IGEO_STACK(18) = ISH3N
+      IGEO_STACK(20) = ISROT
+      IGEO_STACK(43) = NSUB   ! number of substack               
+      IGEO_STACK(44) = NISUB  ! number of interface 
+      IGEO_STACK(47) = IINT
+      IGEO_STACK(48) = 0 
+      IGEO_STACK(98) = IGMAT
+      IGEO_STACK(99) = IPOS
+      IGEO_STACK(14) = IRP
 c
-      GEO(3)  = ISMSTR
-      GEO(6)  = NPLY    ! double stockage
-      GEO(7)  = VX
-      GEO(8)  = VY
-      GEO(9)  = VZ
-      GEO(11) = ISTRAIN
-      GEO(12) = IGTYP
-      GEO(13) = HM
-      GEO(14) = HF
-      GEO(15) = HR
-      GEO(16) = DM
-      GEO(17) = DN
-      GEO(35) = ITHK
-      GEO(37) = ISHEAR
-      GEO(39) = IPLAST
-      GEO(38) = ASHEAR
-      GEO(42) = ZERO
-      GEO(43) = ONE
-      GEO(199)= ZSHIFT
-      GEO(212) = GEO(212) * PI / HUNDRED80
+      GEO_STACK(3)  = ISMSTR
+      GEO_STACK(6)  = NPLY    ! double stockage
+      GEO_STACK(7)  = VX
+      GEO_STACK(8)  = VY
+      GEO_STACK(9)  = VZ
+      GEO_STACK(11) = ISTRAIN
+      GEO_STACK(12) = IGTYP
+      GEO_STACK(13) = HM
+      GEO_STACK(14) = HF
+      GEO_STACK(15) = HR
+      GEO_STACK(16) = DM
+      GEO_STACK(17) = DN
+      GEO_STACK(35) = ITHK
+      GEO_STACK(37) = ISHEAR
+      GEO_STACK(39) = IPLAST
+      GEO_STACK(38) = ASHEAR
+      GEO_STACK(42) = PTHK
+      GEO_STACK(43) = ONE
+      GEO_STACK(199)= ZSHIFT
+      GEO_STACK(212) = GEO_STACK(212) * PI / HUNDRED80
       IF (ISHELL==0) THEN
-        GEO(171) = 0
+        GEO_STACK(171) = 0
       ELSEIF (ISHELL == 1) THEN
-        GEO(171)=1
+        GEO_STACK(171)=1
       ELSEIF (ISHELL == 2) THEN
-        GEO(171)=0
+        GEO_STACK(171)=0
       ELSEIF (ISHELL >= 3 .AND. ISHELL < 100 .AND. ISHELL /= 4) THEN
-        GEO(171)=ISHELL-1
+        GEO_STACK(171)=ISHELL-1
       ENDIF      
 c--------------------------------------------
 c     OUTPUT 
@@ -408,22 +416,22 @@ c--------------------------------------------
         IF (ISK == 0) THEN
           IF (ISHELL > 11 .AND. ISHELL < 29) THEN
             WRITE(IOUT,2100)ISTRAIN,ISMSTR,ISHELL,ISH3N,ISROT,
-     .               GEO(16),GEO(13),GEO(38),ISHEAR,ITHK,
-     .               IPLAST,IORTH,GEO(7),GEO(8),GEO(9),IGEO(47),IGEO(14)
+     .               GEO_STACK(16),GEO_STACK(13),GEO_STACK(38),PTHK,ISHEAR,ITHK,
+     .               IPLAST,IORTH,GEO_STACK(7),GEO_STACK(8),GEO_STACK(9),IGEO_STACK(47),IGEO_STACK(14)
           ELSE 
             WRITE(IOUT,2200)ISTRAIN,ISMSTR,ISHELL,ISH3N,ISROT,
      .               HM,HF,HR,DM,ASHEAR,
-     .               ISHEAR,ITHK,IPLAST,IORTH,
-     .               VX,VY,VZ,IINT,IGEO(14)
+     .               PTHK,ISHEAR,ITHK,IPLAST,IORTH,
+     .               VX,VY,VZ,IINT,IGEO_STACK(14)
           ENDIF
         ELSE
           IF (ISHELL > 11 .AND. ISHELL < 29) THEN 
             WRITE(IOUT,2300)ISTRAIN,ISMSTR,ISHELL,ISH3N,ISROT,
-     .               GEO(16),GEO(13),GEO(38),ISHEAR,ITHK,
-     .               IPLAST,IORTH,IDSK,IGEO(47),IGEO(14)
+     .               GEO_STACK(16),GEO_STACK(13),GEO_STACK(38),PTHK,ISHEAR,ITHK,
+     .               IPLAST,IORTH,IDSK,IGEO_STACK(47),IGEO_STACK(14)
           ELSE
             WRITE(IOUT,2400)ISTRAIN,ISMSTR,ISHELL,ISH3N,HM,HF,HR,DM,
-     .            ASHEAR,ISHEAR,ITHK,IPLAST,IORTH,IDSK,IINT,IGEO(14)
+     .            ASHEAR,PTHK,ISHEAR,ITHK,IPLAST,IORTH,IDSK,IINT,IGEO_STACK(14)
           ENDIF
         ENDIF
 c---
@@ -477,8 +485,9 @@ c-----------------------------------------------------------------------
      & 5X,'SHELL MEMBRANE DAMPING. . . . . . . . .=',1PG20.13/,
      & 5X,'SHELL NUMERICAL DAMPING . . . . . . . .=',1PG20.13/,
      & 5X,'SHEAR AREA REDUCTION FACTOR . . . . . .=',1PG20.13/,
-!!     & 5X,'% OF ELEMENT THICKNESS TO FAIL. . . . .=',1PG20.13/,
-!!     & 5X,'COMPOSITE FAILURE EXPONENT. . . . . . .=',1PG20.13/,
+     & 5X,'ELEMENT DELETION PARAMETER. . . . . . .=',1PG20.13/,
+     & 5X,' > 0.0 : FRACTION OF FAILED THICKNESS   ',/,
+     & 5X,' < 0.0 : FRACTION OF FAILED LAYERS/PLYS ',/,
      & 5X,'SHEAR FORMULATION FLAG. . . . . . . . .=',I10/,
      & 5X,'THICKNESS VARIATION FLAG. . . . . . . .=',I10/,
      & 5X,'PLASTICITY FORMULATION FLAG . . . . . .=',I10/,
@@ -499,8 +508,9 @@ c-----------------------------------------------------------------------
      & 5X,'SHELL HOURGLASS ROTATIONAL DAMPING. . .=',1PG20.13/,
      & 5X,'SHELL MEMBRANE DAMPING. . . . . . . . .=',1PG20.13/,
      & 5X,'SHEAR AREA REDUCTION FACTOR . . . . . .=',1PG20.13/,
-!!     & 5X,'% OF ELEMENT THICKNESS TO FAIL. . . . .=',1PG20.13/,
-!!     & 5X,'COMPOSITE FAILURE EXPONENT. . . . . . .=',1PG20.13/,
+     & 5X,'ELEMENT DELETION PARAMETER. . . . . . .=',1PG20.13/,
+     & 5X,' > 0.0 : FRACTION OF FAILED THICKNESS   ',/,
+     & 5X,' < 0.0 : FRACTION OF FAILED LAYERS/PLYS ',/,
      & 5X,'SHEAR FORMULATION FLAG. . . . . . . . .=',I10/,
      & 5X,'THICKNESS VARIATION FLAG. . . . . . . .=',I10/,
      & 5X,'PLASTICITY FORMULATION FLAG . . . . . .=',I10/,
@@ -519,8 +529,9 @@ c-----------------------------------------------------------------------
      & 5X,'SHELL MEMBRANE DAMPING. . . . . . . . .=',1PG20.13/,
      & 5X,'SHELL NUMERICAL DAMPING . . . . . . . .=',1PG20.13/,
      & 5X,'SHEAR AREA REDUCTION FACTOR . . . . . .=',1PG20.13/,
-!!     & 5X,'% OF ELEMENT THICKNESS TO FAIL. . . . .=',1PG20.13/,
-!!     & 5X,'COMPOSITE FAILURE EXPONENT. . . . . . .=',1PG20.13/,
+     & 5X,'ELEMENT DELETION PARAMETER. . . . . . .=',1PG20.13/,
+     & 5X,' > 0.0 : FRACTION OF FAILED THICKNESS   ',/,
+     & 5X,' < 0.0 : FRACTION OF FAILED LAYERS/PLYS ',/,
      & 5X,'SHEAR FORMULATION FLAG. . . . . . . . .=',I10/,
      & 5X,'THICKNESS VARIATION FLAG. . . . . . . .=',I10/,
      & 5X,'PLASTICITY FORMULATION FLAG . . . . . .=',I10/,
@@ -537,8 +548,9 @@ c-----------------------------------------------------------------------
      & 5X,'SHELL HOURGLASS FLEXURAL DAMPING. . . .=',1PG20.13/,
      & 5X,'SHELL HOURGLASS ROTATIONAL DAMPING. . .=',1PG20.13/,
      & 5X,'SHELL MEMBRANE DAMPING. . . . . . . . .=',1PG20.13/,
-!!     & 5X,'% OF ELEMENT THICKNESS TO FAIL. . . . .=',1PG20.13/,
-!!     & 5X,'COMPOSITE FAILURE EXPONENT. . . . . . .=',1PG20.13/,
+     & 5X,'ELEMENT DELETION PARAMETER. . . . . . .=',1PG20.13/,
+     & 5X,' > 0.0 : FRACTION OF FAILED THICKNESS   ',/,
+     & 5X,' < 0.0 : FRACTION OF FAILED LAYERS/PLYS ',/,
      & 5X,'SHEAR AREA REDUCTION FACTOR . . . . . .=',1PG20.13/,
      & 5X,'SHEAR FORMULATION FLAG. . . . . . . . .=',I10/,
      & 5X,'THICKNESS VARIATION FLAG. . . . . . . .=',I10/,
@@ -551,7 +563,9 @@ c-----------------------------------------------------------------------
      & 5X,'    PLY ',I3/,
      & 5X,'      PLY PID NUMBER  . . . . . . . . .=',I10/
      & 5X,'      ANGLE (DIR 1,PROJ(DIR 1 / SHELL).=',1PG20.13/,
-     & 5X,'      % OF PLY THICKNESS TO FAIL. . . .=',1PG20.13/,
+     & 5X,'      PLY FAILURE PARAMETER . . . . . .=',1PG20.13/,
+     & 5X,'        > 0.0 : FRACTION OF FAILED THICKNESS   ',/,
+     & 5X,'        < 0.0 : FRACTION OF FAILED INTG. POINTS',/,
      & 5X,'      WEIGHT FACTOR FOR PLY FAILURE . .=',1PG20.13/)
  3000 FORMAT(
      & 5X,' COMPOSITE SUBSTACK SHELL NUMBER . . . =',I10/ ) 

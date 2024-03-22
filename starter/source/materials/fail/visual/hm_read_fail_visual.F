@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  HM_READ_FAIL_VISUAL           source/materials/fail/visual/hm_read_fail_visual.F
 Chd|-- called by -----------
@@ -28,75 +28,58 @@ Chd|-- calls ---------------
 Chd|        HM_GET_FLOATV                 source/devtools/hm_reader/hm_get_floatv.F
 Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
 Chd|        HM_OPTION_IS_ENCRYPTED        source/devtools/hm_reader/hm_option_is_encrypted.F
+Chd|        FAIL_PARAM_MOD                ../common_source/modules/mat_elem/fail_param_mod.F
 Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
        SUBROUTINE HM_READ_FAIL_VISUAL( 
-     .             UPARAM ,  MAXUPARAM,  NUPARAM,  NUVAR, NFUNC,  IFUNC,
-     .             MAXFUNC,  LSUBMODEL, UNITAB )
+     .            FAIL    ,MAT_ID   ,FAIL_ID  ,IRUPT    ,
+     .            LSUBMODEL,UNITAB   )
 C-----------------------------------------------
-c  IRUP = 36
+c    ROUTINE DESCRIPTION :
+c    Read Visual failure estimation model parameters
+C      Only visualization by damage of stress or strain is between to limited values
+C            (no element deletion)
+c     ! User variable # 1, to store the previous damage value
+c     ! User variable # 2, to store the previous stress or strain value (for EMA filtering)
+      ! What it should be is like this:
+      ! Value = USER_INPUT * 2 * Pi * DT1
+      ! Alpha = Value / (Value + 1)
+      ! Actual_filtered_stress = Alpha * actual_Stress + (1-Alpha) * previous_filtered_stress
+      ! UPARAM(4) = EMA  * TWO * 3.14159265
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE FAIL_PARAM_MOD
       USE UNITAB_MOD
       USE SUBMODEL_MOD
       USE HM_OPTION_READ_MOD
 C---------------------------------------------------------------------
 C I m p l i c i t T y p e s
 C---------------------------------------------------------------------
-#include      "implicit_f.inc"
-C----------+--------+---+---+-------------------------------------------
-C VAR      | SIZE   |TYP|RW | DEFINITION
-C----------+--------+---+---+-------------------------------------------
-C IIN      | 1      | I | R | INPUT FILE UNIT (ROOT_nnn0.rad file)
-C IOUT     | 1      | I | R | OUTPUT FILE UNIT (ROOT_nnn0.out file)
-C UPARAM   | NUPARAM| F | W | USER FAILURE MODEL PARAMETER ARRAY
-C MAXUPARAM| 1      | I | R | MAXIMUM SIZE OF UPARAM
-C NUPARAM  | 1      | I | W | SIZE OF UPARAM =< MAXUPARAM
-C NUVAR    | 1      | I | W | NUMBER OF USER VARIABLES
-C----------+--------+---+---+-------------------------------------------
-C IFUNC    | NFUNC  | I | W | FUNCTION NUMBER ARRAY
-C MAXFUNC  | 1      | I | R | MAXIMUM SIZE OF IFUNC
-C NFUNC    | 1      | I | W | SIZE OF IFUNC =< MAXFUNC
-C----------+--------+---+---+-------------------------------------------
-#include      "scr17_c.inc"
-#include      "submod_c.inc"
-#include      "units_c.inc"
-#include      "sysunit.inc"
+#include  "implicit_f.inc"
+#include  "units_c.inc"
 C-----------------------------------------------
 C D u m m y A r g u m e n t s
 C-----------------------------------------------
-      TYPE (UNIT_TYPE_),INTENT(IN)   ::UNITAB 
-      TYPE(SUBMODEL_DATA),INTENT(IN) ::LSUBMODEL(*)
-      INTEGER MAXUPARAM,NUPARAM,NUVAR,MAXFUNC,NFUNC,
-     . IFUNC(MAXFUNC),IUNIT
-      my_real UPARAM(MAXUPARAM)           
+      INTEGER            ,INTENT(IN) :: FAIL_ID         ! failure model ID
+      INTEGER            ,INTENT(IN) :: MAT_ID          ! material law ID
+      INTEGER            ,INTENT(IN) :: IRUPT           ! failure model type number
+      TYPE(UNIT_TYPE_)   ,INTENT(IN) :: UNITAB          ! table of input units
+      TYPE(SUBMODEL_DATA),INTENT(IN) :: LSUBMODEL(*)    ! submodel table
+      TYPE(FAIL_PARAM_)  ,INTENT(INOUT) :: FAIL         ! failure model data structure
 C-----------------------------------------------
 C L o c a l V a r i a b l e s
 C-----------------------------------------------
-       INTEGER TYPE_MAX,F_FLAG,STRDEF
+       INTEGER TYPE_MAX,F_FLAG,STRDEF,NUVAR
        my_real C_MIN , C_MAX,EMA,BUTTER
        LOGICAL :: IS_AVAILABLE,IS_ENCRYPTED
 C=======================================================================
-C
-C      Only visualization by damage of stress or strain is between to limited values
-C            (no element deletion)
-C
-C=======================================================================
-      IS_ENCRYPTED   = .FALSE.
+      IS_ENCRYPTED = .FALSE.
       IS_AVAILABLE = .FALSE.
 
       CALL HM_OPTION_IS_ENCRYPTED(IS_ENCRYPTED)
 C--------------------------------------------------
-       
-       NFUNC     = 0
-       NUPARAM   = 7
-       NUVAR     = 2
-       
-c! User variable # 1, to store the previous damage value
-c! User variable # 2, to store the previous stress or strain value (for EMA filtering)
-       
        TYPE_MAX  = 0
        C_MIN     = ZERO
        C_MAX     = ZERO
@@ -109,33 +92,42 @@ c!CARD1
       CALL HM_GET_FLOATV ('f_cutoff'            ,EMA       ,IS_AVAILABLE,LSUBMODEL,UNITAB)
       CALL HM_GET_INTV   ('f_flag'              ,F_FLAG    ,IS_AVAILABLE,LSUBMODEL) 
       CALL HM_GET_INTV   ('Strdef'              ,STRDEF    ,IS_AVAILABLE,LSUBMODEL) 
-
-
-
+c-----------------------------------------------------------------------
       IF (F_FLAG == 0 .OR. F_FLAG == 1 ) THEN
          F_FLAG = 1
          IF (EMA == ZERO) EMA = ONE
+         NUVAR  = 2
       ELSE
          BUTTER = EMA 
          EMA    = ONE       
-         NUVAR  = 8! User variable # 3-8, Storage values for the Butterworth filter
+         NUVAR  = 11! User variable # 3-8, Storage values for the Butterworth filter
       ENDIF
 
       IF (TYPE_MAX == 0) TYPE_MAX = 1
       IF (STRDEF == 0)   STRDEF   = 1
 c-----------------------------------------------------------------------
-      UPARAM(1) = REAL(TYPE_MAX) + 1e-4
-      UPARAM(2) = C_MIN
-      UPARAM(3) = C_MAX
-      ! What it should be is like this:
-      ! Value = USER_INPUT * 2 * Pi * DT1
-      ! Alpha = Value / (Value + 1)
-      ! Actual_filtered_stress = Alpha * actual_Stress + (1-Alpha) * previous_filtered_stress
-      ! UPARAM(4) = EMA  * TWO * 3.14159265
-      UPARAM(4) = EMA
-      UPARAM(5) = BUTTER
-      UPARAM(6) = REAL(F_FLAG) +0.00001
-      UPARAM(7) = REAL(STRDEF)
+      FAIL%KEYWORD = 'VISUAL' 
+      FAIL%IRUPT   = IRUPT 
+      FAIL%FAIL_ID = FAIL_ID 
+      FAIL%NUPARAM = 7
+      FAIL%NIPARAM = 0
+      FAIL%NUVAR   = NUVAR
+      FAIL%NFUNC   = 0
+      FAIL%NTABLE  = 0
+      FAIL%NMOD    = 0
+c            
+      ALLOCATE (FAIL%UPARAM(FAIL%NUPARAM))
+      ALLOCATE (FAIL%IPARAM(FAIL%NIPARAM))
+      ALLOCATE (FAIL%IFUNC (FAIL%NFUNC))
+      ALLOCATE (FAIL%TABLE (FAIL%NTABLE))
+c
+      FAIL%UPARAM(1) = REAL(TYPE_MAX) + 1e-4
+      FAIL%UPARAM(2) = C_MIN
+      FAIL%UPARAM(3) = C_MAX
+      FAIL%UPARAM(4) = EMA
+      FAIL%UPARAM(5) = BUTTER
+      FAIL%UPARAM(6) = REAL(F_FLAG) +0.00001
+      FAIL%UPARAM(7) = REAL(STRDEF)
 c-----------------------------------------------------------------------
       IF (IS_ENCRYPTED) THEN
         WRITE (IOUT,'(5X,A,//)') 'CONFIDENTIAL DATA'

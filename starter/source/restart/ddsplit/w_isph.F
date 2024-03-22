@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
 Chd|====================================================================
 Chd|  W_ISPH                        source/restart/ddsplit/w_isph.F
@@ -27,7 +27,7 @@ Chd|-- called by -----------
 Chd|        DDSPLIT                       source/restart/ddsplit/ddsplit.F
 Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
-Chd|        WRITE_I_C                     source/output/tools/write_routines.c
+Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
       SUBROUTINE W_ISPH(KXSP    ,IXSP    ,NUMSPH_L,CEPSP ,PROC   ,
@@ -49,7 +49,6 @@ C-----------------------------------------------
 #include      "param_c.inc"
 #include      "sphcom.inc"
 #include      "tabsiz_c.inc"
-#include      "warn_c.inc"
 C-----------------------------------------------      
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -72,7 +71,7 @@ C-----------------------------------------------
       INTEGER I, J, IE_L, NG, NG_L,
      .        KXSP_L(NISP,NUMSPH_L),
      .        SUIVSPH_L,IPRT,
-     .        N,STAT, INULL, IUN
+     .        N,STAT, INULL, IUN, NUMSPH_EL
       INTEGER, DIMENSION(:), ALLOCATABLE ::  NOD2SP_L,NGLOCAL,ISPHIO_L
 C-----------------------------------------------
 !     allocate 1d array
@@ -272,12 +271,15 @@ c
 C
         IE_L = 0
         DO I=1,NUMELS8
-          IF(CEP(I)==PROC)THEN
+          IF (CEP(I)==PROC) THEN
             IE_L = IE_L + 1
-C           SOL2SPH(1,N)+1<=I<=SOLSPH(2,N) <=> N==SPH2SOL(I)
-            SOL2SPH_L(1,IE_L)=CELSPH(SOL2SPH(1,I)+1)-1
-            SOL2SPH_L(2,IE_L)=CELSPH(SOL2SPH(2,I))
-            SOL2SPH_TYPL(IE_L)=SOL2SPH_TYP(I)
+            NUMSPH_EL = SOL2SPH(2,I) - SOL2SPH(1,I)
+            IF (NUMSPH_EL > 0) THEN
+C             SOL2SPH(1,N)+1<=I<=SOLSPH(2,N) <=> N==SPH2SOL(I)
+              SOL2SPH_L(1,IE_L)=CELSPH(SOL2SPH(1,I)+1)-1
+              SOL2SPH_L(2,IE_L)=CELSPH(SOL2SPH(2,I))
+              SOL2SPH_TYPL(IE_L)=SOL2SPH_TYP(I)
+            ENDIF
           END IF
         END DO
 C

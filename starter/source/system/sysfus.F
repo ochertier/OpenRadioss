@@ -1,29 +1,28 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  USR2SYS                       source/system/sysfus.F        
 Chd|-- called by -----------
-Chd|        ELSTAGBOX2                    source/model/box/rdbox.F      
 Chd|        FSDCOD                        source/system/fsdcod.F        
 Chd|        HM_LECGRN                     source/groups/hm_lecgrn.F     
 Chd|        HM_PRELECGRNS                 source/groups/hm_prelecgrns.F 
@@ -84,7 +83,6 @@ Chd|        HM_READ_TRIA                  source/elements/reader/hm_read_tria.F
 Chd|        HM_READ_TRUSS                 source/elements/reader/hm_read_truss.F
 Chd|        HM_READ_XREF                  source/loads/reference_state/xref/hm_read_xref.F
 Chd|        HM_SETFXRBYON                 source/constraints/fxbody/hm_setfxrbyon.F
-Chd|        INIVEL                        source/initial_conditions/general/inivel/inivel.F
 Chd|        LECACC                        source/tools/accele/lecacc.F  
 Chd|        LECIG3D                       source/elements/ige3d/lecig3d.F
 Chd|        LECREFSTA                     source/loads/reference_state/refsta/lecrefsta.F
@@ -112,6 +110,7 @@ Chd|        READ_SENSOR_VEL               source/tools/sensor/read_sensor_vel.F
 Chd|        READ_SENSOR_WORK              source/tools/sensor/read_sensor_work.F
 Chd|        SENSOR_USER_CONVERT_LOCAL_ID  source/tools/sensor/sensor_user_convert_local_id.F
 Chd|        SETRB2ON                      source/constraints/general/rbe2/hm_read_rbe2.F
+Chd|        SET_USER_WINDOW_NODES         source/user_interface/user_windows_tools.F
 Chd|        UELT_SPMD_ADDITIONAL_NODE     source/user_interface/uaccess.F
 Chd|        W_ITABM1                      source/restart/ddsplit/w_itabm1.F
 Chd|-- calls ---------------
@@ -137,15 +136,10 @@ C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
       INTEGER R2R_SYS      
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "hash_id.inc"
 #include      "com04_c.inc"
-#include      "warn_c.inc"
-#include      "units_c.inc"
 #include      "r2r_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -201,7 +195,6 @@ C
 Chd|====================================================================
 Chd|  USRTOS                        source/system/sysfus.F        
 Chd|-- called by -----------
-Chd|        ELSTAGBOX2                    source/model/box/rdbox.F      
 Chd|        HM_READ_NODE                  source/elements/reader/hm_read_node.F
 Chd|        INIVEL                        source/initial_conditions/general/inivel/inivel.F
 Chd|        LECTRANS                      source/model/transformation/lectrans.F
@@ -332,10 +325,16 @@ Chd|        ANCMSG                        source/output/message/message.F
 Chd|        R2R_SYS                       source/coupling/rad2rad/routines_r2r.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
-      INTEGER FUNCTION USR2SYS2(IU,ITABM1,MESS,JINDEX)
+      INTEGER FUNCTION USR2SYS2(IU,ITABM1,MESS,JINDEX,ID)
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
       USE MESSAGE_MOD
-C      IDENTIQUE A USR2SYS, RENVOYE L'INDEX JINDEX
-C      FONCTION DONNE N0 SYSTEME DU NOEUD USER IU
+C-----------------------------------------------
+C   D e s c r i p t i o n
+C-----------------------------------------------
+C      SAME AS USR2SYS, SENDING INDEX JINDEX CORRESPONDING TO
+C      INTERNAL IDENTIFIER OF USER NODE IDENTIFIER IU
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -345,20 +344,16 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IU, JINDEX
       CHARACTER MESS*40
-      INTEGER ITABM1(*)     
+      INTEGER ITABM1(*) 
+      INTEGER,INTENT(IN) :: ID    
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
       INTEGER R2R_SYS      
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
-#include      "warn_c.inc"
-#include      "units_c.inc"
 #include      "r2r_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -370,7 +365,7 @@ C-----------------------------------------------
       J=MAX(1,NUMNOD/2)
    10 IF(JSUP<=JINF.AND.(IU-ITABM1(J))/=0) THEN
         IF (NSUBDOM>0) THEN
-C------------Multidomaines -> On check dans la liste des noeuds suprimes-----
+C------------Multidomaines -> checking in list of deleted nodes-----
           NN=R2R_SYS(IU,ITABM1,MESS)
           IF (NN==0) THEN
             CALL ANCMSG(MSGID=895,
@@ -384,21 +379,22 @@ C-----------------------------------------------------------
      .                MSGTYPE=MSGERROR,
      .                ANMODE=ANINFO,
      .                C1=MESS,
-     .                I1=IU)
+     .                I1=ID,
+     .                I2=IU)
           USR2SYS2=0
         ENDIF     
         RETURN
       ENDIF
       IF((IU-ITABM1(J))==0)THEN
-C     >CAS IU=TABM FIN DE LA RECHERCHE
+C     >CASE IU=TABM : ENDING THE SEARCH ALGORITHM
          JINDEX=J
          USR2SYS2=ITABM1(J+NUMNOD)
          RETURN
       ELSE IF (IU-ITABM1(J)<0) THEN
-C     >CAS IU<TABM
+C     >CASE IU<TABM
          JSUP=J-1
       ELSE
-C     >CAS IU>TABM
+C     >CASE IU>TABM
          JINF=J+1
       ENDIF
       J=(JSUP+JINF)/2
@@ -416,8 +412,14 @@ Chd|        USR2SYS2                      source/system/sysfus.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
       INTEGER FUNCTION ULIST2S(LIST,NLIST,ITABM1,MESS,INDEX,ID)
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
       USE MESSAGE_MOD
-C      FONCTION DONNE N0 SYSTEME D'UNE LISTE DE NOEUDS USER
+C-----------------------------------------------
+C   D e s c r i p t i o n
+C-----------------------------------------------
+C      Function is sending back Internal node identifiers from a list of user node identifiers
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -429,28 +431,22 @@ C-----------------------------------------------
       CHARACTER MESS*40
       INTEGER ITABM1(*),INDEX(*)
 C     ITABM1(1:NUMNOD) NO USER TRIE
-C     ITABM1(1+NUMNOD:2*NUMNOD) INDEX SYSTEM 
-C             ITABM1(NUMNOD+J) NO SYSTEM DU NOEUDS USER ITABM1(J)
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
+C     ITABM1(1+NUMNOD:2*NUMNOD) INDEX NUMBER
+C             ITABM1(NUMNOD+J) INTERNAL NODE IDENTIFIER IN ITABM1(J)
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
-#include      "warn_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J,NNOD,NOLD,K,
-     .        IWORK(70000)
+      INTEGER I, J,NNOD,NOLD,K, IWORK(70000)
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
         INTEGER USR2SYS2
 C-----------------------
-C TRI DE LIST EN ORDRE CROISSANT
+C SORT (ASCENDING ORDER)
 C-----------------------
         CALL MY_ORDERS(0,IWORK,LIST,INDEX,NLIST,1)
         DO I=1,NLIST
@@ -465,38 +461,41 @@ C-----------------------
         ENDDO
         NNOD=K
 C-----------------------
-C RECHERCHE DES NOEUDS DE LIST() DANS ITABM1()
+C SEARCH NODES FROM LIST() IN ITABM1()
 C  ALGO < NLIST+NUMNOD
 C-----------------------
 C        I=1
 C        J=1
-C USR2SYS2 renvoie J, index dans ITABM1 tq LIST(1)=ITABM1(J)
-C de maniere a se positionner directement a la bonne adresse dans ITABM1
-        LIST(1)=USR2SYS2(LIST(1),ITABM1,MESS,J)
+C USR2SYS2 is sending back J, index in ITABM1 array such as LIST(1)=ITABM1(J)
+C cursor is then directly positioned on the correct address in ITABM1
+        LIST(1)=USR2SYS2(LIST(1),ITABM1,MESS,J,ID)
         IF(J==0)THEN
-C cas d erreur
+          ! in case of error, node does not exist
           ULIST2S=0
-        END IF
+        ELSE
 C
-        DO I=2,NNOD
-          DO WHILE(LIST(I)>ITABM1(J).AND.J<NUMNOD)
-            J=J+1
+          DO I=2,NNOD
+            DO WHILE(LIST(I)>ITABM1(J).AND.J<NUMNOD)
+              J=J+1
+            ENDDO
+            IF(LIST(I)==ITABM1(J))THEN
+              LIST(I)=ITABM1(NUMNOD+J)
+            ELSE
+              CALL ANCMSG(MSGID=78,
+     .                    MSGTYPE=MSGERROR,
+     .                    ANMODE=ANINFO,
+     .                    C1=MESS,
+     .                    I1=ID,
+     .                    I2=LIST(I))
+              ULIST2S=I-1
+              RETURN
+            ENDIF
           ENDDO
-          IF(LIST(I)==ITABM1(J))THEN
-            LIST(I)=ITABM1(NUMNOD+J)
-          ELSE
-            CALL ANCMSG(MSGID=78,
-     .                  MSGTYPE=MSGERROR,
-     .                  ANMODE=ANINFO,
-     .                  C1=MESS,
-     .                  I1=ID,
-     .                  I2=LIST(I))
-            ULIST2S=I-1
-            RETURN
-          ENDIF
-        ENDDO
 C
-        ULIST2S=NNOD
+          ULIST2S=NNOD
+          
+        ENDIF
+
         RETURN
         END
 C
@@ -529,7 +528,6 @@ Chd|        HM_READ_THGRNE                source/output/th/hm_read_thgrne.F
 Chd|        HM_READ_THGROU                source/output/th/hm_read_thgrou.F
 Chd|        HM_READ_THPART                source/output/thpart/hm_read_thpart.F
 Chd|        HM_READ_XELEM                 source/elements/reader/hm_read_xelem.F
-Chd|        INIVEL                        source/initial_conditions/general/inivel/inivel.F
 Chd|        LECIG3D                       source/elements/ige3d/lecig3d.F
 Chd|        LECSEC42                      source/tools/sect/hm_read_sect.F
 Chd|        LECSEC4BOLT                   source/tools/sect/lecsec4bolt.F
@@ -553,12 +551,6 @@ C remonte la declaration des entiers pour la compile sur Compaq
       CHARACTER MESS*40
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com04_c.inc"
-#include      "scr03_c.inc"
-#include      "warn_c.inc"
-#include      "units_c.inc"
-#include      "hardware.inc"
 C-----------------------------------------------
 C   ALLOC FREE
 C-----------------------------------------------
@@ -609,12 +601,6 @@ C remonte la declaration des entiers pour la compile sur Compaq
 
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com04_c.inc"
-#include      "scr03_c.inc"
-#include      "warn_c.inc"
-#include      "units_c.inc"
-#include      "hardware.inc"
 C-----------------------------------------------
 C   ALLOC FREE
 C-----------------------------------------------
@@ -677,15 +663,6 @@ C-----------------------------------------------
       my_real
      .    RLIST(ILIST,NLIST)     
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com04_c.inc"
-#include      "warn_c.inc"
-#include      "units_c.inc"
-C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, J,NNOD,NOLD,K,ID,IDM,
@@ -744,11 +721,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com04_c.inc"
 #include      "scr03_c.inc"
-#include      "warn_c.inc"
-#include      "units_c.inc"
-#include      "hardware.inc"
 C-----------------------------------------------
 C   ALLOC FREE
 C-----------------------------------------------
@@ -799,15 +772,6 @@ C-----------------------------------------------
       INTEGER NLIST,ILIST,ERRID,STATUS
       INTEGER TAB(*), INDEX(NLIST,3),LIST(ILIST,NLIST)
       INTEGER NOM_OPT(LNOPT1,*)
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com04_c.inc"
-#include      "warn_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -881,14 +845,6 @@ C-----------------------------------------------
      .    RLIST(ILIST,NLIST)     
       CHARACTER MESS*40
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com04_c.inc"
-#include      "scr03_c.inc"
-#include      "warn_c.inc"
-#include      "units_c.inc"
-#include      "hardware.inc"
-C-----------------------------------------------
 C   ALLOC FREE
 C-----------------------------------------------
 #if CPP_comp == f90
@@ -939,15 +895,6 @@ C-----------------------------------------------
       INTEGER INDEX(NLIST,3),LIST(ILIST,NLIST)
       my_real
      .    RLIST(ILIST,NLIST)     
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com04_c.inc"
-#include      "warn_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -1006,12 +953,6 @@ C remonte la declaration des entiers pour la compile sur Compaq
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com04_c.inc"
-#include      "scr03_c.inc"
-#include      "warn_c.inc"
-#include      "units_c.inc"
-#include      "hardware.inc"
-C-----------------------------------------------
 C   ALLOC FREE
 C-----------------------------------------------
 #if CPP_comp == f90
@@ -1064,15 +1005,6 @@ C-----------------------------------------------
       INTEGER INDEX(NLIST,3),LIST(ILIST,NLIST)
       my_real
      .    RLIST(ILIST,NLIST)     
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com04_c.inc"
-#include      "warn_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -1132,12 +1064,6 @@ C remonte la declaration des entiers pour la compile sur Compaq
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com04_c.inc"
-#include      "scr03_c.inc"
-#include      "warn_c.inc"
-#include      "units_c.inc"
-#include      "hardware.inc"
-C-----------------------------------------------
 C   ALLOC FREE
 C-----------------------------------------------
 #if CPP_comp == f90
@@ -1190,15 +1116,6 @@ C-----------------------------------------------
       INTEGER INDEX(NLIST,3),LIST(ILIST,NLIST)
       my_real
      .    RLIST(ILIST,NLIST)     
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com04_c.inc"
-#include      "warn_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -1267,12 +1184,6 @@ C remonte la declaration des entiers pour la compile sur Compaq
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com04_c.inc"
-#include      "scr03_c.inc"
-#include      "warn_c.inc"
-#include      "units_c.inc"
-#include      "hardware.inc"
-C-----------------------------------------------
 C   ALLOC FREE
 C-----------------------------------------------
 #if CPP_comp == f90
@@ -1323,12 +1234,6 @@ C remonte la declaration des entiers pour la compile sur Compaq
       CHARACTER MESS*40
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com04_c.inc"
-#include      "scr03_c.inc"
-#include      "warn_c.inc"
-#include      "units_c.inc"
-#include      "hardware.inc"
 C-----------------------------------------------
 C   ALLOC FREE
 C-----------------------------------------------
@@ -1382,15 +1287,6 @@ C-----------------------------------------------
       INTEGER INDEX(NLIST,3),LIST(NLIST)
       my_real
      .    RLIST(NLIST)     
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com04_c.inc"
-#include      "warn_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -1449,15 +1345,6 @@ C-----------------------------------------------
       INTEGER INDEX(NLIST,3),LIST(NLIST)
       my_real
      .    RLIST(NLIST)     
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com04_c.inc"
-#include      "warn_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

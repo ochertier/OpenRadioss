@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  SET_INIT                      source/model/sets/set_init.F  
 Chd|-- called by -----------
@@ -50,9 +50,6 @@ C-----------------------------------------------
       CHARACTER SET_TITLE*nchartitle
 C-----------------------------------------------
       TYPE (SET_), DIMENSION(NSETS)   :: SET
-C-----------------------------------------------
-C   L o c a l   V a r i a b l e s
-C-----------------------------------------------
 C-----------------------------------------------
 !
       SET(IGS)%SET_ID = SET_ID
@@ -94,6 +91,27 @@ C-----------------------------------------------
       SET(IGS)%NB_LINE_SEG= 0         ! SET nb of line/edge's segments
       SET(IGS)%HAS_SURF_SEG= 0        ! Flag if a surface was created from surface (QA Print)
       SET(IGS)%HAS_LINE_SEG= 0        ! Flag if a line was created from surface (QA Print)
+      SET(IGS)%NB_ELLIPSE=0           ! Flag nb of ellipses (one per /SET)
+
+      SET(IGS)%NB_ELLIPSE= 0          ! SET nb of Ellipses (max = 1, one per /SET)
+      SET(IGS)%ELLIPSE_IAD_BUFR= 0    ! surface buffer adress in SET
+      SET(IGS)%ELLIPSE_ID_MADYMO=0    ! ID of Madymo surface
+      SET(IGS)%ELLIPSE_N=0            ! Degree of the hyper-ellipsoid
+      SET(IGS)%ELLIPSE_XC=0           ! Center coordinate X of the hyper-ellipsoid
+      SET(IGS)%ELLIPSE_YC=0           ! Center coordinate Y of the hyper-ellipsoid
+      SET(IGS)%ELLIPSE_ZC=0           ! Center coordinate Z of the hyper-ellipsoid
+      SET(IGS)%ELLIPSE_A=0            ! Semi-axis length along X direction of the hyper-ellipsoid
+      SET(IGS)%ELLIPSE_B=0            ! Semi-axis length along Y direction of the hyper-ellipsoid
+      SET(IGS)%ELLIPSE_C=0            ! Semi-axis length along Z direction of the hyper-ellipsoid
+
+      SET(IGS)%NB_PLANE= 0            ! SET nb of Planes (max = 1, one per /SET)
+      SET(IGS)%PLANE_IAD_BUFR= 0      ! surface buffer adress in SET
+      SET(IGS)%PLANE_XM=0             ! X coordinate of M (end of normal vector) in PLANE surface
+      SET(IGS)%PLANE_YM=0             ! Y coordinate of M (end of normal vector) in PLANE surface
+      SET(IGS)%PLANE_ZM=0             ! Z coordinate of M (end of normal vector) in PLANE surface
+      SET(IGS)%PLANE_XM1=0            ! X coordinate of M1 (head of normal vector) in PLANE surface
+      SET(IGS)%PLANE_YM1=0            ! Y coordinate of M1 (head of normal vector) in PLANE surface
+      SET(IGS)%PLANE_ZM1=0            ! Z coordinate of M1 (head of normal vector) in PLANE surface
 C-----
       RETURN
       END

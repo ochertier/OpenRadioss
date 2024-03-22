@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  CHVIS3                        source/elements/shell/coque/chvis3.F
 Chd|-- called by -----------
@@ -52,15 +52,11 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com06_c.inc"
-#include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "parit_c.inc"
 #include      "remesh_c.inc"
 #include      "scr02_c.inc"
-#include      "scr05_c.inc"
 #include      "scr06_c.inc"
 #include      "scr14_c.inc"
 #include      "scr16_c.inc"
@@ -193,7 +189,7 @@ C-----------------------------------
         END IF       
       END DO
 C-----------------------------------
-C     RIGIDITE-DT
+C     STIFFNESS - DT
 C-----------------------------------
       DO I=JFT,JLT
           SCALE(I) = ZERO
@@ -241,7 +237,6 @@ C
           END IF   
         ELSE
           IF(NADMESH==0)THEN
-#include   "simd.inc"
              DO I=JFT,JLT
                 IF (OFF(I)==ZERO) THEN
                   STI(I) = ZERO
@@ -255,7 +250,6 @@ c     ..                   + 0.5 * SHF(I) * AREA(I) * G(I)/A11(I))
                 ENDIF 
              ENDDO
          ELSE
-#include   "simd.inc"
              DO I=JFT,JLT
                 IF (OFF(I)==ZERO) THEN
                   STI(I) = ZERO
@@ -271,7 +265,7 @@ c     ..                   + 0.5 * SHF(I) * AREA(I) * G(I)/A11(I))
        ENDIF! IGTYP
       ENDIF 
 C-----------------------------------
-C     FORCES ANTISABLIER DE MEMBRANE
+C     ANTI-HOURGLASS MEMBRANE FORCES
 C-----------------------------------
       IF(ISMSTR==1.OR.ISMSTR==11.OR.IHBE<1)THEN
         DO I=JFT,JLT
@@ -303,7 +297,7 @@ C         H24(I)=HOUR2A*GAMA4(I)
       ENDDO
 C
 C----------------------------------
-C     FORCES ANTISABLIER DE FLEXION
+C     ANTI-HOURGLASS BENDING FORCES
 C----------------------------------
       IF(ISMSTR==1.OR.ISMSTR==11.OR.IHBE<1)THEN
         DO I=JFT,JLT
@@ -326,7 +320,7 @@ C         H34(I)=HOUR3(I)*GAMA4(I)
       ENDDO
 C
 C------------------------
-C     MOMENTS ANTISABLIER
+C     ANTI-HOURGLASS MOMENTS
 C------------------------
       DO I=JFT,JLT
        HG1(I)=RX1(I)-RX2(I)+RX3(I)-RX4(I)
@@ -350,7 +344,6 @@ C       EHOURT  = EHOURT + EHOU(I)
        B24(I)=-HOUR(I,5)*OFF(I)
       ENDDO
 C separate loop that does not vectorize w/o simd directive
-#include "simd.inc"       
       DO I=JFT,JLT
         EHOURT  = EHOURT + EHOU(I)
       ENDDO
@@ -367,19 +360,16 @@ C
       JST(IC+1)=JLT+1
       IF(IC==1) THEN
         MX = IPARTC(JFT)
-#include "simd.inc"
         DO I=JFT,JLT
           PARTSAV(8,MX)=PARTSAV(8,MX) + EHOU(I)
         ENDDO
 
       ELSEIF(IC==2.AND.KFTS>0)THEN
         MX = IPARTC(JFT)
-#include "simd.inc"
         DO I=JFT, KFTS-1
           PARTSAV(8,MX)=PARTSAV(8,MX) + EHOU(I)
         ENDDO
         MX = IPARTC(JLT)
-#include "simd.inc"
         DO I=KFTS,JLT
           PARTSAV(8,MX)=PARTSAV(8,MX) + EHOU(I)
         ENDDO
@@ -389,7 +379,6 @@ C
            DO II=1,IC
               MX=IPARTC(JST(II))
               IF (JST(II+1)-JST(II)>15) THEN
-#include "simd.inc"
                  DO J=JST(II),JST(II+1)-1
                     PARTSAV(8,MX)=PARTSAV(8,MX)+EHOU(J)
                  ENDDO
@@ -405,12 +394,9 @@ C
         EHOUR = EHOUR + EHOURT
 #include "atomend.inc"
 C
-      IF((ANIM_E(25)==1).OR.(ANIM_CE(25)==1).OR.
-     &             (OUTP_CS(25)==1)) THEN
-        DO I=JFT,JLT
-          EANI(NFT+NUMELS+I) = EANI(NFT+NUMELS+I) + EHOU(I)
-        ENDDO
-      ENDIF
+      DO I=JFT,JLT
+        EANI(NFT+NUMELS+I) = EANI(NFT+NUMELS+I) + EHOU(I)
+      ENDDO
 C
       RETURN
       END

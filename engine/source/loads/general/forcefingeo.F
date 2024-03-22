@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  FORCEFINGEO                   source/loads/general/forcefingeo.F
 Chd|-- called by -----------
@@ -28,14 +28,16 @@ Chd|-- calls ---------------
 Chd|        FINTER                        source/tools/curve/finter.F   
 Chd|        FINTER_SMOOTH                 source/tools/curve/finter_smooth.F
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
+Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
 Chd|====================================================================
       SUBROUTINE FORCEFINGEO(IBFV  ,NPC    ,TF     ,A     ,V    ,X     ,
-     2                       VEL   ,SENSOR ,LSENSOR,FSKY  ,FEXT ,ITABM1,
-     3                       H3D_DATA)
+     2                       VEL   ,SENSOR_TAB,FSKY  ,FEXT ,ITABM1,
+     3                       H3D_DATA,NSENSOR)
 C-----------------------------------------------
 C   M o d u l e s
 C----------------------------------------------- 
       USE H3D_MOD 
+      USE SENSOR_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -61,13 +63,13 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER IBFV(NIFV,*), NPC(*), LSENSOR(NSENSI,*)
+      INTEGER ,INTENT(IN) :: NSENSOR
+      INTEGER IBFV(NIFV,*), NPC(*)
       INTEGER ITABM1(*)
-      my_real 
-     .   TF(*), A(3,*), V(3,*), X(3,*),
-     .   VEL(LFXVELR,*), SENSOR(NSENSR,*),
-     .   FSKY(8,LSKY),FEXT(3,*)
+      my_real TF(*), A(3,*), V(3,*), X(3,*),
+     .   VEL(LFXVELR,*),FSKY(8,LSKY),FEXT(3,*)
       TYPE(H3D_DATABASE) :: H3D_DATA
+      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -103,12 +105,12 @@ c        N2 = SYSFUS2(N2,ITABM1,NUMNOD)
 C
         ISENS=0
         DO K=1,NSENSOR
-          IF(IBFV(4,N)==LSENSOR(1,K))ISENS=K
+          IF(IBFV(4,N)==SENSOR_TAB(K)%SENS_ID) ISENS=K
         ENDDO
         IF(ISENS==0)THEN
            TS=TT
         ELSE
-           TS = TT-SENSOR(2,ISENS)
+           TS = TT-SENSOR_TAB(ISENS)%TSTART
            IF(TS < ZERO) CYCLE
         ENDIF
 C

@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  SUFORC3                       source/user_interface/suforc3.F
 Chd|-- called by -----------
@@ -33,7 +33,7 @@ Chd|        SUCOOR3                       source/user_interface/suforc3.F
 Chd|        SUCUMU3                       source/user_interface/suforc3.F
 Chd|        SUCUMU3P                      source/user_interface/suforc3.F
 Chd|        SUSER43                       source/elements/solid/sconnect/suser43.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        MAT_ELEM_MOD                  ../common_source/modules/mat_elem/mat_elem_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        TABLE_MOD                     share/modules/table_mod.F     
 Chd|====================================================================
@@ -42,7 +42,7 @@ Chd|====================================================================
      2           PM       ,GEO      ,IPM     ,IGEO    ,X       ,       
      3           A        ,AR       ,V       ,VR      ,W       ,       
      4           D        ,MS       ,IN      ,TF      ,NPF     ,       
-     5           BUFMAT   ,IPARG    ,IPARTS  ,PARTSAV ,         
+     5           BUFMAT   ,IPARG    ,IPARTS  ,PARTSAV ,MAT_PARAM,         
      6           FSKY     ,FR_WAVE  ,IADS    ,EANI    ,STIFN   ,
      7           STIFR    ,FX       ,FY      ,FZ      ,IFAILURE,
      8           MTN      ,IGTYP    ,NPT     ,JSMS    ,MSSA    ,
@@ -51,7 +51,7 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE TABLE_MOD
-      USE ELBUFDEF_MOD
+      USE MAT_ELEM_MOD
       USE MESSAGE_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -66,17 +66,11 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com06_c.inc"
 #include      "com08_c.inc"
-#include      "scr07_c.inc"
-#include      "scr01_c.inc"
-#include      "scr03_c.inc"
-#include      "scr06_c.inc"
 #include      "parit_c.inc"
 #include      "units_c.inc"
 #include      "param_c.inc"
 #include      "userlib.inc"
-#include      "chara_c.inc"
 #include      "com04_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -94,6 +88,7 @@ C     REAL
      .   MSSA(*), DMELS(*)
       TYPE (ELBUF_STRUCT_), TARGET :: ELBUF_STR
       TYPE (TTABLE)  , DIMENSION(NTABLE) ::  TABLE
+      TYPE (MATPARAM_STRUCT_) ,DIMENSION(NUMMAT) ,INTENT(IN) :: MAT_PARAM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -188,14 +183,22 @@ C----------------------------
      K MZ(1,1),MZ(1,2),MZ(1,3),MZ(1,4),MZ(1,5),MZ(1,6),MZ(1,7),MZ(1,8),
      L STI    ,STIR   ,VISCM  ,VISCR)
        IF(NFILSOL/=0) THEN
-        CALL SFILLOPT(GBUF%FILL,STI,
-     B    FX(1,1),FX(1,2),FX(1,3),FX(1,4),FX(1,5),FX(1,6),FX(1,7),FX(1,8),     
-     F    FY(1,1),FY(1,2),FY(1,3),FY(1,4),FY(1,5),FY(1,6),FY(1,7),FY(1,8),     
-     G    FZ(1,1),FZ(1,2),FZ(1,3),FZ(1,4),FZ(1,5),FZ(1,6),FZ(1,7),FZ(1,8))     
-        CALL SFILLOPT(GBUF%FILL,STIR,
-     B    MX(1,1),MX(1,2),MX(1,3),MX(1,4),MX(1,5),MX(1,6),MX(1,7),MX(1,8),     
-     F    MY(1,1),MY(1,2),MY(1,3),MY(1,4),MY(1,5),MY(1,6),MY(1,7),MY(1,8),     
-     G    MZ(1,1),MZ(1,2),MZ(1,3),MZ(1,4),MZ(1,5),MZ(1,6),MZ(1,7),MZ(1,8)) 
+        CALL SFILLOPT(
+     1   GBUF%FILL,STI,      FX(1,1),  FX(1,2),
+     2   FX(1,3),  FX(1,4),  FX(1,5),  FX(1,6),
+     3   FX(1,7),  FX(1,8),  FY(1,1),  FY(1,2),
+     4   FY(1,3),  FY(1,4),  FY(1,5),  FY(1,6),
+     5   FY(1,7),  FY(1,8),  FZ(1,1),  FZ(1,2),
+     6   FZ(1,3),  FZ(1,4),  FZ(1,5),  FZ(1,6),
+     7   FZ(1,7),  FZ(1,8),  NEL)
+        CALL SFILLOPT(
+     1   GBUF%FILL,STIR,     MX(1,1),  MX(1,2),
+     2   MX(1,3),  MX(1,4),  MX(1,5),  MX(1,6),
+     3   MX(1,7),  MX(1,8),  MY(1,1),  MY(1,2),
+     4   MY(1,3),  MY(1,4),  MY(1,5),  MY(1,6),
+     5   MY(1,7),  MY(1,8),  MZ(1,1),  MZ(1,2),
+     6   MZ(1,3),  MZ(1,4),  MZ(1,5),  MZ(1,6),
+     7   MZ(1,7),  MZ(1,8),  NEL)
         END IF    
        ELSE
         ! ----------------
@@ -259,14 +262,22 @@ C----------------------------
      K MZ(1,1),MZ(1,2),MZ(1,3),MZ(1,4),MZ(1,5),MZ(1,6),MZ(1,7),MZ(1,8),
      L STI    ,STIR   ,VISCM  ,VISCR)
        IF(NFILSOL/=0) THEN
-        CALL SFILLOPT(GBUF%FILL,STI,
-     B    FX(1,1),FX(1,2),FX(1,3),FX(1,4),FX(1,5),FX(1,6),FX(1,7),FX(1,8),     
-     F    FY(1,1),FY(1,2),FY(1,3),FY(1,4),FY(1,5),FY(1,6),FY(1,7),FY(1,8),     
-     G    FZ(1,1),FZ(1,2),FZ(1,3),FZ(1,4),FZ(1,5),FZ(1,6),FZ(1,7),FZ(1,8))     
-        CALL SFILLOPT(GBUF%FILL,STIR,
-     B    MX(1,1),MX(1,2),MX(1,3),MX(1,4),MX(1,5),MX(1,6),MX(1,7),MX(1,8),     
-     F    MY(1,1),MY(1,2),MY(1,3),MY(1,4),MY(1,5),MY(1,6),MY(1,7),MY(1,8),     
-     G    MZ(1,1),MZ(1,2),MZ(1,3),MZ(1,4),MZ(1,5),MZ(1,6),MZ(1,7),MZ(1,8)) 
+        CALL SFILLOPT(
+     1   GBUF%FILL,STI,      FX(1,1),  FX(1,2),
+     2   FX(1,3),  FX(1,4),  FX(1,5),  FX(1,6),
+     3   FX(1,7),  FX(1,8),  FY(1,1),  FY(1,2),
+     4   FY(1,3),  FY(1,4),  FY(1,5),  FY(1,6),
+     5   FY(1,7),  FY(1,8),  FZ(1,1),  FZ(1,2),
+     6   FZ(1,3),  FZ(1,4),  FZ(1,5),  FZ(1,6),
+     7   FZ(1,7),  FZ(1,8),  NEL)
+        CALL SFILLOPT(
+     1   GBUF%FILL,STIR,     MX(1,1),  MX(1,2),
+     2   MX(1,3),  MX(1,4),  MX(1,5),  MX(1,6),
+     3   MX(1,7),  MX(1,8),  MY(1,1),  MY(1,2),
+     4   MY(1,3),  MY(1,4),  MY(1,5),  MY(1,6),
+     5   MY(1,7),  MY(1,8),  MZ(1,1),  MZ(1,2),
+     6   MZ(1,3),  MZ(1,4),  MZ(1,5),  MZ(1,6),
+     7   MZ(1,7),  MZ(1,8),  NEL)
         END IF    
        ELSE
         ! ----------------
@@ -330,14 +341,22 @@ C----------------------------
      K MZ(1,1),MZ(1,2),MZ(1,3),MZ(1,4),MZ(1,5),MZ(1,6),MZ(1,7),MZ(1,8),
      L STI    ,STIR   ,VISCM  ,VISCR)
        IF(NFILSOL/=0) THEN
-        CALL SFILLOPT(GBUF%FILL,STI,
-     B    FX(1,1),FX(1,2),FX(1,3),FX(1,4),FX(1,5),FX(1,6),FX(1,7),FX(1,8),     
-     F    FY(1,1),FY(1,2),FY(1,3),FY(1,4),FY(1,5),FY(1,6),FY(1,7),FY(1,8),     
-     G    FZ(1,1),FZ(1,2),FZ(1,3),FZ(1,4),FZ(1,5),FZ(1,6),FZ(1,7),FZ(1,8))     
-        CALL SFILLOPT(GBUF%FILL,STIR,
-     B    MX(1,1),MX(1,2),MX(1,3),MX(1,4),MX(1,5),MX(1,6),MX(1,7),MX(1,8),     
-     F    MY(1,1),MY(1,2),MY(1,3),MY(1,4),MY(1,5),MY(1,6),MY(1,7),MY(1,8),     
-     G    MZ(1,1),MZ(1,2),MZ(1,3),MZ(1,4),MZ(1,5),MZ(1,6),MZ(1,7),MZ(1,8)) 
+        CALL SFILLOPT(
+     1   GBUF%FILL,STI,      FX(1,1),  FX(1,2),
+     2   FX(1,3),  FX(1,4),  FX(1,5),  FX(1,6),
+     3   FX(1,7),  FX(1,8),  FY(1,1),  FY(1,2),
+     4   FY(1,3),  FY(1,4),  FY(1,5),  FY(1,6),
+     5   FY(1,7),  FY(1,8),  FZ(1,1),  FZ(1,2),
+     6   FZ(1,3),  FZ(1,4),  FZ(1,5),  FZ(1,6),
+     7   FZ(1,7),  FZ(1,8),  NEL)
+        CALL SFILLOPT(
+     1   GBUF%FILL,STIR,     MX(1,1),  MX(1,2),
+     2   MX(1,3),  MX(1,4),  MX(1,5),  MX(1,6),
+     3   MX(1,7),  MX(1,8),  MY(1,1),  MY(1,2),
+     4   MY(1,3),  MY(1,4),  MY(1,5),  MY(1,6),
+     5   MY(1,7),  MY(1,8),  MZ(1,1),  MZ(1,2),
+     6   MZ(1,3),  MZ(1,4),  MZ(1,5),  MZ(1,6),
+     7   MZ(1,7),  MZ(1,8),  NEL)
         END IF    
        ELSE
         ! ----------------
@@ -386,12 +405,16 @@ C-----------
      G  FZ(1,1),FZ(1,2),FZ(1,3),FZ(1,4),FZ(1,5),FZ(1,6),FZ(1,7),FZ(1,8),     
      H  STI    ,STIR   ,VISCM  ,VISCR  ,PARTSAV,IPARTS ,BUFMAT ,IOUTPRT,     
      L  IFAILURE,NPF   ,TF     ,IPM    ,IGEO   ,NPT    ,NEL    ,JSMS   ,     
-     M  DMELS  ,PM     ,GEO    ,ITASK  ,JTHE   ,TABLE )   
+     M  DMELS  ,PM     ,GEO    ,ITASK  ,JTHE   ,TABLE  ,MAT_PARAM)   
        IF(NFILSOL/=0) THEN
-        CALL SFILLOPT(GBUF%FILL,STI,
-     B    FX(1,1),FX(1,2),FX(1,3),FX(1,4),FX(1,5),FX(1,6),FX(1,7),FX(1,8),     
-     F    FY(1,1),FY(1,2),FY(1,3),FY(1,4),FY(1,5),FY(1,6),FY(1,7),FY(1,8),     
-     G    FZ(1,1),FZ(1,2),FZ(1,3),FZ(1,4),FZ(1,5),FZ(1,6),FZ(1,7),FZ(1,8))     
+        CALL SFILLOPT(
+     1   GBUF%FILL,STI,      FX(1,1),  FX(1,2),
+     2   FX(1,3),  FX(1,4),  FX(1,5),  FX(1,6),
+     3   FX(1,7),  FX(1,8),  FY(1,1),  FY(1,2),
+     4   FY(1,3),  FY(1,4),  FY(1,5),  FY(1,6),
+     5   FY(1,7),  FY(1,8),  FZ(1,1),  FZ(1,2),
+     6   FZ(1,3),  FZ(1,4),  FZ(1,5),  FZ(1,6),
+     7   FZ(1,7),  FZ(1,8),  NEL)
         END IF    
 C
       ENDIF
@@ -592,8 +615,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "vect01_c.inc"
-#include      "scr18_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

@@ -1,42 +1,51 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  WRCOMIP                       source/restart/ddsplit/wrcommp.F
 Chd|-- called by -----------
 Chd|        DDSPLIT                       source/restart/ddsplit/ddsplit.F
 Chd|-- calls ---------------
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
-Chd|        ALE_EBCS_MOD                  ../common_source/modules/ale_ebcs_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        ALEFVM_MOD                    ../common_source/modules/ale/alefvm_mod.F
+Chd|        ALEMUSCL_MOD                  ../common_source/modules/ale/alemuscl_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
+Chd|        ALE_EBCS_MOD                  ../common_source/modules/ale/ale_ebcs_mod.F
+Chd|        ALE_MOD                       ../common_source/modules/ale/ale_mod.F
+Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|        OUTMAX_MOD                    ../common_source/modules/outmax_mod.F
+Chd|        PARAMETERS_MOD                ../common_source/modules/interfaces/parameters_mod.F
 Chd|        PINCHTYPE_MOD                 ../common_source/modules/pinchtype_mod.F
+Chd|        PLOAD_CYL_MOD                 ../common_source/modules/loads/pload_cyl_mod.F
+Chd|        SENSOR_MOD                    share/modules1/sensor_mod.F   
+Chd|        STATE_MOD                     ../common_source/modules/state_mod.F
+Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
       SUBROUTINE WRCOMIP(
      1   LMXVINT   ,LVARINT   ,TABVINT   ,NGROUP_L  ,LBUFEL_L ,
      2   LENWA_L   ,INTBAG_L  ,NUMELQ_L  ,NUMELS_L  ,NUMELC_L ,
      3   NUMELT_L  ,NUMELR_L  ,NUMELP_L  ,NUMELX_L  ,ISUMNX_L ,
      4   NUMELS10_L,NUMELS20_L,NUMELS8_L ,NUMELS16_L,LNOM_OPT ,
-     5   NUMELUR_L ,NUMELTG_L ,NUMELTG6_L,NSLARB_L  ,NUMNOD_L ,
+     5   NUMELTG_L ,NUMELTG6_L,NSLARB_L  ,NUMNOD_L ,
      6   NUMEL_L   ,NSVOIS_L  ,NQVOIS_L  ,NTGVOIS_L, LENLAS   ,
      7   NLLINK_L  ,LLGRAV_L  ,LLBVEL_L  ,NSLAW_L  ,
      8   NESLAW_L  ,NSKYLL_L  ,NSTRF_L   ,LJOINT_L ,
@@ -47,7 +56,7 @@ Chd|====================================================================
      D   NISKYI2_L ,I2NSNT_L  ,NCONLD_L  ,NNMV_L    ,NNMVC_L  ,
      E   NBDDNCJ_L ,NBDDNRBM_L,NSKYRBM_L ,NNODT_L   ,NNODL_L  ,
      F   NMADSH4_L ,NMADSH3_L ,NMADSOL_L ,NMADNOD_L ,IMAXIMP_L,
-     G   ISP0   ,NUM16SHIFT_L ,NSHFRONT_L,NUMSPH_L  ,LWASPH_L ,
+     G   ISP0   ,NUM16SHIFT_L ,NUMSPH_L  ,LWASPH_L ,
      H   SPHSHIFT_L,NRCVVOIS_L,NSNDVOIS_L,NERVOIS_L,
      I   NESVOIS_L ,ILAW11_L  ,NSEGFL_L  ,
      J   NBI18_L   ,NSKYI18_L ,LEIBUF_L ,
@@ -58,8 +67,8 @@ Chd|====================================================================
      O   NRBE3_L   ,LLRBE3_L  ,NBDDNRBE3_L,NSKYRBE3_L, NSLARBM_L ,
      O   NSKYRBMK_L,NBDDNRBYM_L,MADCL_NMADNOD_L,NRADIA_L,NRBE2_L,
      Q   LLRBE2_L  ,NBDDNRBE2_L,NUMELCPXFE_L,
-     R   NUMNODPXFE_L,LCNEPXFEM_L,LLCFIELD_L,SFR_USERWI_L,SUSERW_L,
-     S SIUSERW_L ,LLLOADP_L,NUMELCRKXFE_L,NUMNODCRKXFE_L,LCNECRKXFEM_L,
+     R   NUMNODPXFE_L,LCNEPXFEM_L,LLCFIELD_L,
+     S   LLLOADP_L,NUMELCRKXFE_L,NUMNODCRKXFE_L,LCNECRKXFEM_L,
      T   SLONFSPH_L ,SLPRTSPH_L,SSPHVELN_L,I2NSN25_L,NUMELCCRKXFE_L,
      U   NUMELTGCRKXFE_L,NUMEDGES_L,NBDDEDGE_L,SDD_R2R_ELEM,NUMNODXFE_L,
      V   NSPHSOL_L,FIRST_SPHSOL_L,NCLUSTER_L,LENTHBUFR,NUMNOR_L  ,
@@ -70,7 +79,9 @@ Chd|====================================================================
      1   LENIGRSH3N_L,LENISURF_L,LENISLIN_L,NE_NERVOIS_L, NE_NESVOIS_L, 
      2   NE_NSVOIS_L, NE_NQVOIS_L, NE_NTGVOIS_L,NBCSCYC_L,LLBCSCYC_L,
      3   ALE_CONNECTIVITY,N_SLIPRING_L,N_RETRACTOR_L,N_ANCHOR_REMOTE_L,
-     4   N_ANCHOR_REMOTE_SEND_L,N_SEATBELT_L,N_SEATBELT_2D_L)
+     4   N_ANCHOR_REMOTE_SEND_L,N_SEATBELT_L,N_SEATBELT_2D_L,DYNAIN_DATA,
+     5   NUMSH4N_L,NUMSH3N_L,INTER_PARAMETERS,SENSORS,NLOAD_CYL,
+     6   NCLOAD_L,NPLOAD_L,NDAMP_VREL_L, UNITAB)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -79,6 +90,16 @@ C-----------------------------------------------
       USE ALE_EBCS_MOD
       USE ALE_CONNECTIVITY_MOD
       USE OUTMAX_MOD
+      USE PLOAD_CYL_MOD
+      USE STATE_MOD
+      USE INTBUFDEF_MOD
+      USE ALEMUSCL_MOD , only:ALEMUSCL_Param
+      USE ALEFVM_MOD , only:ALEFVM_Param
+      USE ALE_MOD
+      USE PARAMETERS_MOD
+      USE SENSOR_MOD
+      USE SUBMODEL_MOD , ONLY : NSUBMOD
+      USE UNITAB_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -95,12 +116,12 @@ C-----------------------------------------------
      .        NESLAW_L,NSTRF_L,LJOINT_L,NUMPOR_L,
      .        LENVOLU,INTBAG_L,LENTHG,LBUFMAT,LBUFGEO,NCONLD_L,
      .        LBUFSF,LENXLAS,LWSAV_L,LSECBUF_L,I2NSNT_L,
-     .        NUMELUR_L,NUMELTG_L,NUMELTG6_L,NSLARB_L,NUMNOD_L,
+     .        NUMELTG_L,NUMELTG6_L,NSLARB_L,NUMNOD_L,
      .        NPTS,NBDDNOD_L,NFXVEL_L,NBDDNRB_L,LCNE_L,
      .        NSKYRW_L,NSKYRBK_L,NBDDI2M_L,LCNI2_L,NISKYI2_L,NNMV_L,
      .        NNMVC_L,NSKYLL_L,NBDDNCJ_L,NBDDNRBM_L,NSKYRBM_L, NNODT_L,
      .        NNODL_L, NMADSH4_L ,NMADSH3_L ,NMADSOL_L ,NMADNOD_L,
-     .        IMAXIMP_L, NUM16SHIFT_L ,NSHFRONT_L, NUMSPH_L, LWASPH_L,
+     .        IMAXIMP_L, NUM16SHIFT_L ,NUMSPH_L, LWASPH_L,
      .        ISP0, SPHSHIFT_L, NRCVVOIS_L, NSNDVOIS_L,
      .        NERVOIS_L, NESVOIS_L, ILAW11_L, NSEGFL_L, 
      .        NBI18_L, NSKYI18_L, 
@@ -113,7 +134,7 @@ C-----------------------------------------------
      .        NSKYRBMK_L,NBDDNRBYM_L,MADCL_NMADNOD_L, NRADIA_L,
      .        NRBE2_L,LLRBE2_L,NBDDNRBE2_L,
      .        NUMELCPXFE_L,NUMNODPXFE_L,LCNEPXFEM_L,LLCFIELD_L,
-     .        SFR_USERWI_L,SUSERW_L, SIUSERW_L,LLLOADP_L,NUMELCRKXFE_L,
+     .        LLLOADP_L,NUMELCRKXFE_L,
      .        NUMNODCRKXFE_L,LCNECRKXFEM_L,
      .        SLONFSPH_L ,SLPRTSPH_L,SSPHVELN_L,I2NSN25_L,
      .        NUMELCCRKXFE_L,NUMELTGCRKXFE_L,NUMEDGES_L,NBDDEDGE_L,
@@ -124,32 +145,26 @@ C-----------------------------------------------
      .        LENIGRNOD_L,LENIGRBRIC_L,LENIGRQUAD_L,LENIGRSH4N_L,
      .        LENIGRTRUS_L,LENIGRBEAM_L,LENIGRSPRI_L,LENIGRSH3N_L,LENISURF_L,
      .        LENISLIN_L,NE_NERVOIS_L, NE_NESVOIS_L, NE_NSVOIS_L, NE_NQVOIS_L, NE_NTGVOIS_L,NBCSCYC_L,LLBCSCYC_L,
-     .        N_SLIPRING_L,N_RETRACTOR_L,N_ANCHOR_REMOTE_L,N_ANCHOR_REMOTE_SEND_L,N_SEATBELT_L,N_SEATBELT_2D_L
+     .        N_SLIPRING_L,N_RETRACTOR_L,N_ANCHOR_REMOTE_L,N_ANCHOR_REMOTE_SEND_L,N_SEATBELT_L,N_SEATBELT_2D_L,
+     .        NUMSH4N_L,NUMSH3N_L,NLOAD_CYL,NDAMP_VREL_L
+      INTEGER, INTENT(IN) :: NCLOAD_L,NPLOAD_L
       TYPE(MULTI_FVM_STRUCT) :: MULTI_FVM
       TYPE(t_ale_connectivity), INTENT(IN) :: ALE_CONNECTIVITY
+      TYPE (DYNAIN_DATABASE), INTENT(INOUT) :: DYNAIN_DATA
+      TYPE (PARAMETERS_) ,INTENT(INOUT)     :: INTER_PARAMETERS
+      TYPE (SENSORS_)    ,INTENT(IN)        :: SENSORS
+      TYPE (UNIT_TYPE_), INTENT(IN)         :: UNITAB
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "alefvm.inc"
-#include      "alemuscl.inc"
-#include      "alesolver.inc"
 #include      "com01_c.inc"
-#include      "com02_c.inc"
-#include      "com03_c.inc"
 #include      "com04_c.inc"
-#include      "com05_c.inc"
-#include      "com06_c.inc"
-#include      "com07_c.inc"
-#include      "com08_c.inc"
 #include      "com09_c.inc"
 #include      "com10_c.inc"
 #include      "com_xfem1.inc"
-#include      "conv_c.inc"
-#include      "couple_c.inc"
 #include      "drape_c.inc"
 #include      "eigcom.inc"
 #include      "flowcom.inc"
-#include      "fluid_scr_c.inc"
 #include      "fxbcom.inc"
 #include      "ige3d_c.inc"
 #include      "inter18.inc"
@@ -157,33 +172,17 @@ C-----------------------------------------------
 #include      "intstamp_c.inc"
 #include      "lagmult.inc"
 #include      "param_c.inc"
-#include      "ale_param.inc"
 #include      "r2r_c.inc"
 #include      "remesh_c.inc"
-#include      "scr02_c.inc"
 #include      "scr03_c.inc"
-#include      "scr04_c.inc"
-#include      "scr05_c.inc"
-#include      "scr06_c.inc"
-#include      "scr07_c.inc"
-#include      "scr14_c.inc"
 #include      "scr16_c.inc"
 #include      "scr17_c.inc"
-#include      "scr18_c.inc"
 #include      "scr23_c.inc"
-#include      "scrcut_c.inc"
 #include      "sms_c.inc"
 #include      "sphcom.inc"
 #include      "spmd_c.inc"
-#include      "stati_c.inc"
-#include      "submod_c.inc"
-#include      "sysunit.inc"
 #include      "tabsiz_c.inc"
 #include      "thermal_c.inc"
-#include      "thknod_c.inc"
-#include      "timeri_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -198,7 +197,7 @@ C-----
 C-----
       TABVINT(1)  =N2D
       TABVINT(2)  =NCPRI
-      TABVINT(3)  =IUSERWI
+      TABVINT(3)  =0 ! IUSERWI
       TABVINT(4)  =IALE
       TABVINT(5)  =NGROUP_L
       TABVINT(6)  =NCYCLE
@@ -221,7 +220,7 @@ C-----
       TABVINT(23) =NSPMD
       TABVINT(24) =LENWA_L
       TABVINT(25) =ISGIFL
-      TABVINT(26) =ISUB
+      TABVINT(26) = 0 !no longer used
       TABVINT(27) =NNODS
       TABVINT(28) =NCNOIS
       TABVINT(29) =LCNE_L
@@ -236,21 +235,19 @@ C -------- Tailles des tableaux entiers --------
 C taille locale inutile
       TABVINT(36) = 0
       TABVINT(37) = NUMNOD_L
-      TABVINT(38) = NSHFRONT_L
+      TABVINT(38) = 0 ! no longer used
       TABVINT(39) = NUMNOD_L
-      TABVINT(40) = LISKN*(NUMSKW+1)+LISKN*MIN(1,NSPCOND)*NUMSPH_L
-     &              +LISKN*NSUBMOD
+      TABVINT(40) = LISKN*(NUMSKW+1)+LISKN*MIN(1,NSPCOND)*NUMSPH_L+LISKN*NSUBMOD
       TABVINT(41) = LISKN*(NUMFRAM+1)
       TABVINT(42) = 0
       TABVINT(43) = 5*NBCSLAG
       TABVINT(44) = LIPART1*(NPART+NTHPART)+2*9*(NPART+NTHPART)+NUMEL_L
       TABVINT(45) = LNOM_OPT*ISP0
       TABVINT(46) = 3*NFUNCT+1
-      TABVINT(47) = NIXUR*NUMELUR_L
+      TABVINT(47) = 0
       TABVINT(48) = NIXTG*NUMELTG_L + NIXTG * NTGVOIS_L
       TABVINT(49) = 4*NUMELTG6_L
-      TABVINT(50) = NIXS*NUMELS_L+NSVOIS_L*NIXS+6*NUMELS10_L
-     +                        +12*NUMELS20_L+8*NUMELS16_L
+      TABVINT(50) = NIXS*NUMELS_L+NSVOIS_L*NIXS+6*NUMELS10_L+12*NUMELS20_L+8*NUMELS16_L
       TABVINT(51) = NIXQ*NUMELQ_L+NIXQ*NQVOIS_L
       TABVINT(52) = NIXC*NUMELC_L
       TABVINT(53) = NIXT*NUMELT_L
@@ -260,14 +257,12 @@ C taille locale inutile
       TABVINT(57) = 2*NUMNOD_L
       TABVINT(58) = LKJNI*NGJOINT*ISP0
       TABVINT(59) = NUMNOD_L*MAX(IALE,IEULER, IALELAG)
-      TABVINT(60) = (NUMELS_L*6+NUMELQ_L*4+NUMELTG_L*3)
-     *                     *MAX(IALE,IEULER,ITHERM,IALELAG)
+      TABVINT(60) = (NUMELS_L*6+NUMELQ_L*4+NUMELTG_L*3)*MAX(IALE,IEULER,ITHERM,IALELAG)
       IF(ALE_CONNECTIVITY%has_nn_connect)THEN
-        TABVINT(61) = MAX(IALE,IALELAG)*NALENOVS*NUMNOD_L
+        TABVINT(61) = MAX(IALE,IALELAG)*ALE%GLOBAL%NALENOVS*NUMNOD_L
       ELSE
         TABVINT(61) = 0
       END IF
-C 2 tableaux multi mat en mono SPMD
       TABVINT(62) = SIFILL
       TABVINT(63) = SIMS
 !! to empty (still available)+++
@@ -306,10 +301,10 @@ c si cas Inl Outl on passe LPRTSPH_L et LONFSPH_L en tableaux locaux
       TABVINT(82) = LENLAS*ISP0
       TABVINT(83) = 0
       TABVINT(84) = 3*NACCELM
-      TABVINT(85) = NSENSI*NSENSOR
+      TABVINT(85) = 0 ! NSENSI*NSENSOR
       TABVINT(86) = 10*NLINK
       TABVINT(87) = NLLINK_L
-      TABVINT(88) = SIUSERW_L
+      TABVINT(88) = 0 ! SIUSERW_L
       TABVINT(89) = NPARG*NGROUP_L
       TABVINT(90) = (NSPMD+1)*NSPGROUP
       TABVINT(91) = NIGRV*NGRAV
@@ -349,9 +344,8 @@ c si cas Inl Outl on passe LPRTSPH_L et LONFSPH_L en tableaux locaux
       TABVINT(117) = NUMPOR_L
       TABVINT(118) = LENVOLU
       TABVINT(119) = 0
-      IF(LAG_NCF>0)
-     +  TABVINT(119) = (LAG_NHF+3*LAG_NCF+2)*ISP0
-      TABVINT(120) = LENTHG
+      IF(LAG_NCF>0) TABVINT(119) = (LAG_NHF+3*LAG_NCF+2)*ISP0
+!      TABVINT(120) = LENTHG  - obsolete
       TABVINT(121) = 2*(NSPMD+1)
       TABVINT(122) = (NSPMD+1)
       TABVINT(123) = 4*(NSPMD+1)
@@ -430,8 +424,7 @@ C -------- Tailles des tableaux flottants --------
       TABVINT(163) = 3*(NUMNOD_L+NRCVVOIS_L)
       TABVINT(164) = 3*(NUMNOD_L+NRCVVOIS_L)
       TABVINT(165) = 3*NUMNOD_L*IRODDL
-      IF(ISECUT>0.OR.ISUB>0.OR.MSHSUB>0.OR.IISROT>0.OR.
-     .   IMPOSE_DR/=0 .OR. IDROT>0)THEN
+      IF(ISECUT > 0 .OR. IISROT > 0 .OR. IMPOSE_DR /= 0 .OR. IDROT > 0)THEN
         TABVINT(166) = 3*NUMNOD_L*IRODDL
       ELSE
         TABVINT(166) = 0
@@ -451,8 +444,7 @@ C
       TABVINT(171) = NUMNOD_L*IRODDL
       TABVINT(172) = NPTS
       TABVINT(173) = NPROPM*NUMMAT
-      TABVINT(174) = LSKEW*(NUMSKW+1)+
-     &               LSKEW*MIN(1,NSPCOND)*NUMSPH_L+LSKEW*NSUBMOD
+      TABVINT(174) = LSKEW*(NUMSKW+1) + LSKEW*MIN(1,NSPCOND)*NUMSPH_L+LSKEW*NSUBMOD
       TABVINT(175) = NXFRAME*(NUMFRAM+1)
       TABVINT(176) = NPROPG*NUMGEO
       TABVINT(177) = NUMELS_L+NUMELQ_L+NUMELC_L+NUMELTG_L
@@ -467,26 +459,23 @@ C
         TABVINT(183) = 0
       ENDIF
       IF(MULTI_FVM%ARE_ALL_PARTS_151)THEN
-         TABVINT(184) = 0
+        TABVINT(184) = 0
       ELSE
-      TABVINT(184) = IEULER*(NUMELS_L*LVEUL+NUMELQ_L*10)
+        TABVINT(184) = IEULER*(NUMELS_L*LVEUL+NUMELQ_L*10)
       ENDIF
 C 3 tableaux multi mat spmd mono
       TABVINT(185) = SFILL
       TABVINT(186) = SDFILL
       TABVINT(187) = SALPH
-      IF (NWALE == 2) THEN
+      IF (ALE%GRID%NWALE == 2) THEN
         TABVINT(188) = 3*NUMNOD_L
-      ELSEIF(NWALE == 4) THEN
+      ELSEIF(ALE%GRID%NWALE == 4) THEN
         TABVINT(188) = 4*NUMNOD_L
       ELSE
         TABVINT(188) = 0
       END IF
 
-      IF(MSHSUB==1)THEN
-        TABVINT(189) = 3*NUMNOD_L
-        TABVINT(190) = 3*NUMNOD_L
-      ELSEIF(ILAG==1.AND.(IALE+IEULER)/=0)THEN
+      IF(ILAG==1.AND.(IALE+IEULER)/=0)THEN
         TABVINT(189) = 3*NUMNOD_L
         TABVINT(190) = 0
       ELSE
@@ -494,13 +483,7 @@ C 3 tableaux multi mat spmd mono
         TABVINT(190) = 0
       END IF
 
-      IF(MSHSUB==1)THEN
-         TABVINT(191) = 3*NUMNOD_L
-         TABVINT(192) = 3*NUMNOD_L
-         TABVINT(193) = NUMNOD_L
-         TABVINT(194) = NUMNOD_L
-         TABVINT(195) = NTHVKI*NSECT
-      ELSE IF (ILAG==1.AND.(IALE+IEULER)/=0)THEN
+      IF (ILAG==1.AND.(IALE+IEULER)/=0)THEN
          TABVINT(191) = 3*NUMNOD_L
          TABVINT(192) = 0
          TABVINT(193) = 0
@@ -543,7 +526,7 @@ c si cas Inl Outl on passe SSPHVELN en tableau local
       TABVINT(207)  = LENXLAS*ISP0
       TABVINT(208)  = 0
       TABVINT(209)  = NACCELM*LLACCELM
-      TABVINT(210)  = NSENSOR*NSENSR
+      TABVINT(210)  = 0 ! NSENSOR*NSENSR
       TABVINT(211)  = 3*NIBVEL
       TABVINT(212)  = LFACGRV*NGRAV
 
@@ -553,7 +536,7 @@ c si cas Inl Outl on passe SSPHVELN en tableau local
          TABVINT(213) = 0
       ENDIF
       TABVINT(214)  = NPART
-      TABVINT(215)  = SUSERW_L
+      TABVINT(215)  = 0 !SUSERW_L
       TABVINT(216)  = LBUFEL_L
       TABVINT(217)  = 0 !LBUFIN_L
       TABVINT(218)  = NRWLP*NRWALL
@@ -570,9 +553,7 @@ c si cas Inl Outl on passe SSPHVELN en tableau local
       TABVINT(229)  = NL_DDR2R*(NSPMD+1)
       TABVINT(230)  = NSLAW_L+NESLAW_L
       TABVINT(231)  = 0 !obsolete option removed
-      TABVINT(232)  = (NMADPRT*ISP0 + NMADSH4_L + NMADSH3_L +
-     .                  NMADSOL_L+NMADNOD_L+NUMELC_L+NUMELTG_L+
-     .                  NUMELS_L)*NEXMAD
+      TABVINT(232)  = (NMADPRT*ISP0+NMADSH4_L+NMADSH3_L+NMADSOL_L+NMADNOD_L+NUMELC_L+NUMELTG_L+NUMELS_L)*NEXMAD
       TABVINT(233)  = NPROPGI*NUMGEO
       TABVINT(234)  = NPROPMI*NUMMAT
       TABVINT(235)  = SKIPPON_L
@@ -615,13 +596,13 @@ C-----
       TABVINT(261)=NSECT
       TABVINT(262)=NRBAG
       TABVINT(263)=NJOINT
-      TABVINT(264)=NWALE
+      TABVINT(264)=ALE%GRID%NWALE
       TABVINT(265)=NUMELTG_L
       TABVINT(266)=NSLAG
       TABVINT(267)=NFACX
       TABVINT(268)=NUMPOR
       TABVINT(269)=NACCELM
-      TABVINT(270)=NSENSOR
+      TABVINT(270)=SENSORS%NSENSOR
       TABVINT(271)=NPRETEN
       TABVINT(272)=NVOLU
       TABVINT(273)=NPART
@@ -646,7 +627,7 @@ C-----
       TABVINT(292)=NANIM1D
       TABVINT(293)=NR2RLNK
 C-----
-      TABVINT(294)=IPAT
+      TABVINT(294)=0! no linger used
       TABVINT(295)=IANIM
       TABVINT(296)=IOUTP
       TABVINT(297)=NHIN2
@@ -678,7 +659,7 @@ C-----
       TABVINT(321)=NIXP
       TABVINT(322)=NIXR
       TABVINT(323)=NIXTG
-      TABVINT(324)=NIXUR
+      TABVINT(324)=0
       TABVINT(325)=NIXFR1
       TABVINT(326)=NIXFR2
       TABVINT(327)=NPARI
@@ -720,8 +701,8 @@ C-----
       TABVINT(430)=IDAMPG
       TABVINT(431)=ICLOSE
 C
-      TABVINT(432)=NSENSI
-      TABVINT(433)=NSENSR
+      TABVINT(432)=0  ! NSENSI
+      TABVINT(433)=0  ! NSENSR
       TABVINT(434)=NIBVEL
       TABVINT(435)=LWASPH_L
       TABVINT(436)=NUMELS16_L
@@ -755,15 +736,15 @@ C
       TABVINT(464)=NGJOINT
       TABVINT(465)=NUMMPC
       TABVINT(466)=LVSPHIO
-      TABVINT(467)= SITHGRPA
-      TABVINT(468)= SITHGRPB
-      TABVINT(469)= SITHGRPC
-      TABVINT(470)= SITHGRPD
-      TABVINT(471)= SITHGRPE
-      TABVINT(472)= SITHGRPF
-      TABVINT(473)= SITHGRPG
-      TABVINT(474)= SITHGRPH
-      TABVINT(475)= SITHGRPI
+      !TABVINT(467)= SITHGRPA  removed variable
+      !TABVINT(468)= SITHGRPB  removed variable
+      !TABVINT(469)= SITHGRPC  removed variable
+      !TABVINT(470)= SITHGRPD  removed variable
+      !TABVINT(471)= SITHGRPE  removed variable
+      !TABVINT(472)= SITHGRPF  removed variable
+      !TABVINT(473)= SITHGRPG  removed variable
+      !TABVINT(474)= SITHGRPH  removed variable
+      !TABVINT(475)= SITHGRPI  removed variable
 C
       TABVINT(476)=NTHGRP01(1)
       TABVINT(477)=NTHGRP01(2)
@@ -791,13 +772,13 @@ C-----  debut chk pt restart
 C
       !OUTP_V, ...OUTP_RT,ANIM_V,...,ANIM_FT
       DO I=1,19
-      LVARINT=LVARINT+1
-      TABVINT(LVARINT)=0
+        LVARINT=LVARINT+1
+        TABVINT(LVARINT)=0
       ENDDO
       !ANIM_M,ANIM_K,...,ANIM_VERS
       DO I=1,8
-      LVARINT=LVARINT+1
-      TABVINT(LVARINT)=0
+        LVARINT=LVARINT+1
+        TABVINT(LVARINT)=0
       ENDDO
       TABVINT(LVARINT)=40    
       LVARINT=LVARINT+1
@@ -824,15 +805,15 @@ C
       LVARINT=LVARINT+1
       TABVINT(LVARINT)=SEGINDX
       LVARINT=LVARINT+1
-      TABVINT(LVARINT)=NVCONV
-      DO I=1,LCONV
-        TABVINT(LVARINT+I)=CODV(I)
+      TABVINT(LVARINT)=ALE%GLOBAL%NVCONV
+      DO I=1,ALE%GLOBAL%LCONV
+        TABVINT(LVARINT+I)=ALE%GLOBAL%CODV(I)
       ENDDO
-      LVARINT=LVARINT+LCONV
+      LVARINT=LVARINT+ALE%GLOBAL%LCONV
       LVARINT=LVARINT+1
       TABVINT(LVARINT)=NPEBC
       LVARINT=LVARINT+1
-      TABVINT(LVARINT)=NEBCS*ISP0
+      TABVINT(LVARINT)=NEBCS
       LVARINT=LVARINT+1
       TABVINT(LVARINT)=NRBYKIN
       LVARINT=LVARINT+1
@@ -842,32 +823,32 @@ C
       LVARINT=LVARINT+1
       TABVINT(LVARINT)=NUMELTG6_L
 C espace memoire reserv pour les checks points restarts.
-       DO I=1,58
-         TABVINT(LVARINT+I)=0
-       ENDDO
-       LVARINT=LVARINT + 58     
-       LVARINT=LVARINT+1
-       TABVINT(LVARINT)=0 !SIZE OF ANIM_N 
-c       
-       LVARINT=LVARINT+1
-       TABVINT(LVARINT)=IOUTP_FMT
-       
-       LVARINT=LVARINT+1
-       TABVINT(LVARINT)=NPROPGI
-       LVARINT=LVARINT+1
-       TABVINT(LVARINT)=NPROPMI
-       LVARINT=LVARINT+1
-       TABVINT(LVARINT)=NEXMAD
-       LVARINT=LVARINT+1
-       TABVINT(LVARINT)=NMADPRT*ISP0
-       LVARINT=LVARINT+1
-       TABVINT(LVARINT)=NMADSH4_L
-       LVARINT=LVARINT+1
-       TABVINT(LVARINT)=NMADSH3_L
-       LVARINT=LVARINT+1
-       TABVINT(LVARINT)=NMADSOL_L
-       LVARINT=LVARINT+1
-       TABVINT(LVARINT)=NMADNOD_L
+      DO I=1,58                          
+        TABVINT(LVARINT+I)=0             
+      ENDDO                              
+      LVARINT=LVARINT + 58               
+      LVARINT=LVARINT+1                  
+      TABVINT(LVARINT)=0 !SIZE OF ANIM_N  
+c                                        
+      LVARINT=LVARINT+1                  
+      TABVINT(LVARINT)=IOUTP_FMT         
+                                         
+      LVARINT=LVARINT+1                  
+      TABVINT(LVARINT)=NPROPGI           
+      LVARINT=LVARINT+1                  
+      TABVINT(LVARINT)=NPROPMI           
+      LVARINT=LVARINT+1                  
+      TABVINT(LVARINT)=NEXMAD            
+      LVARINT=LVARINT+1                  
+      TABVINT(LVARINT)=NMADPRT*ISP0      
+      LVARINT=LVARINT+1                  
+      TABVINT(LVARINT)=NMADSH4_L         
+      LVARINT=LVARINT+1                  
+      TABVINT(LVARINT)=NMADSH3_L         
+      LVARINT=LVARINT+1                  
+      TABVINT(LVARINT)=NMADSOL_L         
+      LVARINT=LVARINT+1                  
+      TABVINT(LVARINT)=NMADNOD_L         
       LVARINT=LVARINT+1
       TABVINT(LVARINT)=ISHFRAM
       LVARINT=LVARINT+1
@@ -910,38 +891,38 @@ c
       TABVINT(LVARINT)= NSKYRBE3_L
       LVARINT=LVARINT+1
       TABVINT(LVARINT)= NPARIR
-       LVARINT=LVARINT+1
-       TABVINT(LVARINT)= NUMNODG
-       LVARINT=LVARINT+1
-       TABVINT(LVARINT)= NUMNODM
-       LVARINT=LVARINT+1
-       TABVINT(LVARINT)= NUMELQG
-       LVARINT=LVARINT+1
-       TABVINT(LVARINT)= NUMELCG
-       LVARINT=LVARINT+1
-       TABVINT(LVARINT)= NUMELTGG
-       LVARINT=LVARINT+1
-       TABVINT(LVARINT)= NUMELURG
-       LVARINT=LVARINT+1
-       TABVINT(LVARINT)= NUMELSG
-       LVARINT=LVARINT+1
-       TABVINT(LVARINT)= NUMELPG
-       LVARINT=LVARINT+1
-       TABVINT(LVARINT)= NUMELRG
-       LVARINT=LVARINT+1
-       TABVINT(LVARINT)= NUMELTRG
-       LVARINT=LVARINT+1
-       TABVINT(LVARINT)= NB1DG
-       LVARINT=LVARINT+1
-       TABVINT(LVARINT)= NSKEWAG
-       LVARINT=LVARINT+1
-       TABVINT(LVARINT)= SECTIOM
-       LVARINT=LVARINT+1
-       TABVINT(LVARINT)= NUMELS16G
-       LVARINT=LVARINT+1
-       TABVINT(LVARINT)= NUM16SHIFT_L
-       LVARINT=LVARINT+1
-       TABVINT(LVARINT)= OUTYY_FMT
+      LVARINT=LVARINT+1              
+      TABVINT(LVARINT)= NUMNODG      
+      LVARINT=LVARINT+1              
+      TABVINT(LVARINT)= NUMNODM      
+      LVARINT=LVARINT+1              
+      TABVINT(LVARINT)= NUMELQG      
+      LVARINT=LVARINT+1              
+      TABVINT(LVARINT)= NUMELCG      
+      LVARINT=LVARINT+1              
+      TABVINT(LVARINT)= NUMELTGG     
+      LVARINT=LVARINT+1              
+      TABVINT(LVARINT)= 0            
+      LVARINT=LVARINT+1              
+      TABVINT(LVARINT)= NUMELSG      
+      LVARINT=LVARINT+1              
+      TABVINT(LVARINT)= NUMELPG      
+      LVARINT=LVARINT+1              
+      TABVINT(LVARINT)= NUMELRG      
+      LVARINT=LVARINT+1              
+      TABVINT(LVARINT)= NUMELTRG     
+      LVARINT=LVARINT+1              
+      TABVINT(LVARINT)= NB1DG        
+      LVARINT=LVARINT+1              
+      TABVINT(LVARINT)= NSKEWAG      
+      LVARINT=LVARINT+1              
+      TABVINT(LVARINT)= SECTIOM      
+      LVARINT=LVARINT+1              
+      TABVINT(LVARINT)= NUMELS16G    
+      LVARINT=LVARINT+1              
+      TABVINT(LVARINT)= NUM16SHIFT_L 
+      LVARINT=LVARINT+1              
+      TABVINT(LVARINT)= OUTYY_FMT    
       LVARINT=LVARINT+1
       TABVINT(LVARINT)=NFXBODY
       LVARINT=LVARINT+1
@@ -986,10 +967,6 @@ c
       TABVINT(LVARINT)=LEIBUF_L
       LVARINT=LVARINT+1
       TABVINT(LVARINT)= NINTSUB
-      LVARINT=LVARINT+1
-      TABVINT(LVARINT)=MSHSUB
-      LVARINT=LVARINT+1
-      TABVINT(LVARINT)=NSHFRONT_L
       LVARINT=LVARINT+1
       TABVINT(LVARINT)=IROOTYY
 C
@@ -1048,7 +1025,7 @@ C partie commun spmd cfd
       LVARINT=LVARINT+1
       TABVINT(LVARINT)= NUMPOR_L
       LVARINT=LVARINT+1
-      TABVINT(LVARINT)= ICAA
+      TABVINT(LVARINT)= ALE%GLOBAL%ICAA
       LVARINT=LVARINT+1
       TABVINT(LVARINT)= ISPHBUC
       LVARINT=LVARINT+1
@@ -1082,35 +1059,13 @@ C partie commun spmd cfd
       LVARINT=LVARINT+1
       TABVINT(LVARINT)=IMPL_S0
       LVARINT=LVARINT+1
-      TABVINT(LVARINT)=LENTHBUF
-      LVARINT=LVARINT+1
-      TABVINT(LVARINT)=SITHBUFA
-      LVARINT=LVARINT+1
-      TABVINT(LVARINT)=SITHBUFB
-      LVARINT=LVARINT+1
-      TABVINT(LVARINT)=SITHBUFC
-      LVARINT=LVARINT+1
-      TABVINT(LVARINT)=SITHBUFD
-      LVARINT=LVARINT+1
-      TABVINT(LVARINT)=SITHBUFE
-      LVARINT=LVARINT+1
-      TABVINT(LVARINT)=SITHBUFF
-      LVARINT=LVARINT+1
-      TABVINT(LVARINT)=SITHBUFG
-      LVARINT=LVARINT+1
-      TABVINT(LVARINT)=SITHBUFH
-      LVARINT=LVARINT+1
-      TABVINT(LVARINT)=SITHBUFI
-      LVARINT=LVARINT+1
-      TABVINT(LVARINT)=ICONVCP
-      LVARINT=LVARINT+1
       TABVINT(LVARINT)=NFASOLFR_L
       LVARINT=LVARINT+1
       TABVINT(LVARINT)=NSEGQUADFR_L
       LVARINT=LVARINT+1
-      TABVINT(LVARINT)=3*(NSPMD+1)          !   DD_LAGF
+      TABVINT(LVARINT)=3*(NSPMD+1)          !  DD_LAGF
       LVARINT=LVARINT+1
-      TABVINT(LVARINT)=NLAGF_L                !   LAGF_L
+      TABVINT(LVARINT)=NLAGF_L              !  LAGF_L
       LVARINT=LVARINT+1
       TABVINT(LVARINT)=NVENTTOT
 C
@@ -1151,7 +1106,7 @@ C
       END IF
       IF(NUMSKW>0)THEN
         LVARINT=LVARINT+1
-        TABVINT(LVARINT)=NUMSKW+1             !  ISKWP
+        TABVINT(LVARINT)=NUMSKW+1           !  ISKWP
         LVARINT=LVARINT+1
         TABVINT(LVARINT)=NSPMD              !  NSKWP
       ELSE
@@ -1160,9 +1115,9 @@ C
         LVARINT=LVARINT+1
         TABVINT(LVARINT)=0
       END IF
-      IF(NSENSOR>0)THEN
+      IF(SENSORS%NSENSOR>0)THEN
         LVARINT=LVARINT+1
-        TABVINT(LVARINT)=NSENSOR*2            !  ISENSP
+        TABVINT(LVARINT)=SENSORS%NSENSOR*2   !  ISENSP
         LVARINT=LVARINT+1
         TABVINT(LVARINT)=NSPMD              !  NSENSP
       ELSE
@@ -1195,14 +1150,15 @@ C .sta files
       ENDDO
 C .dynain files
       LVARINT=LVARINT+1
-      TABVINT(LVARINT)=IDYNAINF
-      DO I=1, MX_DYNAIN
+      DYNAIN_DATA%IDYNAINF = 0
+      TABVINT(LVARINT)=DYNAIN_DATA%IDYNAINF
+      DO I=1, DYNAIN_DATA%MX_DYNAIN
        LVARINT=LVARINT+1
-       DYNAIN_C(I) = 0
-       TABVINT(LVARINT)=DYNAIN_C(I)
+       DYNAIN_DATA%DYNAIN_C(I) = 0
+       TABVINT(LVARINT)=DYNAIN_DATA%DYNAIN_C(I)
       ENDDO
       LVARINT=LVARINT+1
-      TABVINT(LVARINT)=DYNAIN_CHECK
+      TABVINT(LVARINT)=DYNAIN_DATA%DYNAIN_CHECK
 C  heat transfer + int7
       LVARINT=LVARINT+1
       TABVINT(LVARINT) = INTHEAT
@@ -1224,11 +1180,11 @@ C Defense Lic Flag
       TABVINT(LVARINT)=LIRNUR
 C     Unit info
       LVARINT=LVARINT+1
-      TABVINT(LVARINT)=LUNIT
+      TABVINT(LVARINT)= 4 ! old LUNIT, deprecated 
       LVARINT=LVARINT+1
-      TABVINT(LVARINT)=NUNIT0
+      TABVINT(LVARINT)=UNITAB%NUNIT0
       LVARINT=LVARINT+1
-      TABVINT(LVARINT)=NUNITS
+      TABVINT(LVARINT)=UNITAB%NUNITS
 C
       LVARINT=LVARINT+1
       TABVINT(LVARINT)=LSH4TRIM
@@ -1245,7 +1201,7 @@ C
       TABVINT(LVARINT) = NINTSTAMP
 C
       LVARINT=LVARINT+1
-      TABVINT(LVARINT) = ITHKNOD
+      TABVINT(LVARINT) = INTER_ITHKNOD !defined in interface module (common_source directory)
 
 C  rigid material
       LVARINT=LVARINT+1
@@ -1414,8 +1370,6 @@ C
       TABVINT(LVARINT)=LLCFIELD_L
       LVARINT=LVARINT+1
       TABVINT(LVARINT)=NLOAD
-      LVARINT=LVARINT+1
-      TABVINT(LVARINT)=SFR_USERWI_L
 C
       LVARINT=LVARINT+1
       TABVINT(LVARINT)=IDAMP_RDOF
@@ -1463,7 +1417,7 @@ c new tab specific inl outl ibufssg_io
       LVARINT=LVARINT+1
       TABVINT(LVARINT)= NSUBMOD
       LVARINT=LVARINT+1
-      TABVINT(LVARINT)= NALENOVS
+      TABVINT(LVARINT)= ALE%GLOBAL%NALENOVS
 C
       LVARINT=LVARINT+1
       TABVINT(LVARINT)= LNOPT1
@@ -1603,10 +1557,10 @@ C
       TABVINT(LVARINT) = NFILSOL
 C
       LVARINT=LVARINT+1
-      TABVINT(LVARINT) = SFSAV6
+      TABVINT(LVARINT) = SENSORS%SFSAV
 C
       LVARINT=LVARINT+1
-      TABVINT(LVARINT) = STABSEN
+      TABVINT(LVARINT) = SENSORS%STABSEN
 C Stack info
       LVARINT=LVARINT+1
       TABVINT(LVARINT)=IPART_STACK 
@@ -1615,17 +1569,16 @@ C Stack info
       LVARINT=LVARINT+1
       TABVINT(LVARINT)=NS_STACK  
       LVARINT=LVARINT+1
-      TABVINT(LVARINT)=IALEFVM             
+      TABVINT(LVARINT)=ALEFVM_Param%IEnabled
       LVARINT=LVARINT+1
-      TABVINT(LVARINT)=I_ALE_SOLVER  
+      TABVINT(LVARINT)=ALEFVM_Param%ISOLVER
       LVARINT=LVARINT+1
-      TABVINT(LVARINT)=IALEMUSCL
+      TABVINT(LVARINT)=ALEMUSCL_Param%IALEMUSCL
       LVARINT=LVARINT+1
-      TABVINT(LVARINT)=I_BETA
+      TABVINT(LVARINT)=ALEMUSCL_Param%BETA
       LVARINT=LVARINT+1
-      TABVINT(LVARINT)=I_LAW
+      TABVINT(LVARINT)=ALEMUSCL_Param%I_LAW
 C
-
 C ITETRA=3
       LVARINT=LVARINT+1
       TABVINT(LVARINT)=ISFEM  
@@ -1634,6 +1587,9 @@ C /LOAD/PBLAST
       TABVINT(LVARINT) = NLOADP_F
       LVARINT=LVARINT+1
       TABVINT(LVARINT) = NLOADP_B           
+C /LOAD/PCYL
+      LVARINT=LVARINT+1
+      TABVINT(LVARINT) = NLOAD_CYL           
 C espace memoire reserv pour les checks points restarts.
 C     IDTMIN(51)
       LVARINT=LVARINT+1
@@ -1700,7 +1656,7 @@ C SOL2SPH flag
       TABVINT(LVARINT) = ITSOL2SPH
 C ISFINT (ALESOLVER) with caa method                                                   
       LVARINT=LVARINT+1
-      TABVINT(LVARINT) = ISFINT      
+      TABVINT(LVARINT) = ALE%GLOBAL%ISFINT      
 C ICNDS10 dyna condensation for S10                                                
       LVARINT=LVARINT+1
       TABVINT(LVARINT) = NS10E_L      
@@ -1740,7 +1696,7 @@ C
       TABVINT(LVARINT) = NUMELS20G   
 !
       LVARINT=LVARINT+1
-      TABVINT(LVARINT) = I_DT_NODA_ALE_ON
+      TABVINT(LVARINT) = ALE%GLOBAL%I_DT_NODA_ALE_ON
 C Interface Adhesion
       LVARINT=LVARINT+1
       TABVINT(LVARINT) = INTERADHESION               
@@ -1787,8 +1743,7 @@ C Friction interface
 C
 C-----  debut chk pt restart
 C
-!
-!     IDTS6, IDTHEPH, IDT1SOL, IDT1TET10, IDT1SH <=> CHKPT
+!     IDTS6, IDT1SOL, IDT1TET10, IDT1SH <=> CHKPT
       LVARINT=LVARINT+1
       TABVINT(LVARINT) = 0
       LVARINT=LVARINT+1
@@ -1797,16 +1752,36 @@ C
       TABVINT(LVARINT)=0  
       LVARINT=LVARINT+1
       TABVINT(LVARINT) = 0
-      LVARINT=LVARINT+1
-      TABVINT(LVARINT) = 0
 C
 C-----  fin chk pt restart
 C
-!
 !     H3D -> number of skid lines    
       LVARINT=LVARINT+1
       TABVINT(LVARINT) = 0
-!     H3D ANIM -> FCONT_MAX computing IFCONTMAX
+!     H3D ANIM -> FCONT_MAX computing IFCONTMAX/IFCONTPMAX/IFCONT2MAX/IFCONTP2MAX
+      LVARINT=LVARINT+1
+      TABVINT(LVARINT) = 0
+      LVARINT=LVARINT+1
+      TABVINT(LVARINT) = 0
+      LVARINT=LVARINT+1
+      TABVINT(LVARINT) = 0
+      LVARINT=LVARINT+1
+      TABVINT(LVARINT) = 0
+      LVARINT=LVARINT+1
+      TABVINT(LVARINT) = 0
+      LVARINT=LVARINT+1
+      TABVINT(LVARINT) = 0
+!     H3D output for frictional energy
+      LVARINT=LVARINT+1
+      TABVINT(LVARINT) = 0
+      LVARINT=LVARINT+1
+      TABVINT(LVARINT) = 0
+      LVARINT=LVARINT+1
+      TABVINT(LVARINT) = 0
+      LVARINT=LVARINT+1
+      TABVINT(LVARINT) = 0
+      LVARINT=LVARINT+1
+      TABVINT(LVARINT) = 0
       LVARINT=LVARINT+1
       TABVINT(LVARINT) = 0
 C Nitsche Method  
@@ -1828,13 +1803,13 @@ C I_SUPG_ON_OFF
       TABVINT(LVARINT) = INISPRI
 !
       LVARINT=LVARINT+1
-      TABVINT(LVARINT)=0 ! NSTOPSENS
+      TABVINT(LVARINT) = SENSORS%NSTOP
       LVARINT=LVARINT+1
-      TABVINT(LVARINT)=0 ! NSTATSENS
+      TABVINT(LVARINT) = SENSORS%NSTAT
       LVARINT=LVARINT+1
-      TABVINT(LVARINT)=0 ! NOUTPSENS
+      TABVINT(LVARINT) = SENSORS%NOUTP
       LVARINT=LVARINT+1
-      TABVINT(LVARINT)=0 ! IANISENS
+      TABVINT(LVARINT) = SENSORS%NANIM
 !
       LVARINT=LVARINT+1
       TABVINT(LVARINT)=NIBCLD
@@ -1862,16 +1837,16 @@ C-----SLBCSCYC
       IF(INTER18_IS_VARIABLE_GAP_DEFINED)TABVINT(LVARINT) = 1
       
       IF (ALE_CONNECTIVITY%has_ne_connect) THEN
-         LVARINT=LVARINT+1
-         TABVINT(LVARINT) = NE_NERVOIS_L
-         LVARINT=LVARINT+1
-         TABVINT(LVARINT) = NE_NESVOIS_L
-         LVARINT=LVARINT+1
-         TABVINT(LVARINT) = NE_NSVOIS_L
-         LVARINT=LVARINT+1
-         TABVINT(LVARINT) = NE_NQVOIS_L
-         LVARINT=LVARINT+1
-         TABVINT(LVARINT) = NE_NTGVOIS_L
+        LVARINT=LVARINT+1
+        TABVINT(LVARINT) = NE_NERVOIS_L
+        LVARINT=LVARINT+1
+        TABVINT(LVARINT) = NE_NESVOIS_L
+        LVARINT=LVARINT+1
+        TABVINT(LVARINT) = NE_NSVOIS_L
+        LVARINT=LVARINT+1
+        TABVINT(LVARINT) = NE_NQVOIS_L
+        LVARINT=LVARINT+1
+        TABVINT(LVARINT) = NE_NTGVOIS_L
       ENDIF
 C
       LVARINT=LVARINT+1
@@ -1907,7 +1882,6 @@ C-----Seatbelts - slipring / retractors
 
       LVARINT=LVARINT+1
       TABVINT(LVARINT)=0
-
 C
 C---- Starter input version
       LVARINT=LVARINT+1
@@ -1927,7 +1901,29 @@ C---- MAX (/H3D)
       TABVINT(LVARINT)=LMAX_NSTRA
 C---- Time history strain flag
       LVARINT=LVARINT+1
-      TABVINT(LVARINT)=TH_STRAIN
+      TABVINT(LVARINT)=TH_STRAIN      
+C  draped shell element
+      LVARINT       = LVARINT + 1
+      TABVINT(LVARINT) = NUMSH4N_L
+      LVARINT       = LVARINT + 1
+      TABVINT(LVARINT) = NUMSH3N_L
+C  
+      LVARINT       = LVARINT + 1
+      TABVINT(LVARINT) = INTER_PARAMETERS%ISTIF_DT
+C  
+      LVARINT       = LVARINT + 1
+      TABVINT(LVARINT) = INTER_PARAMETERS%INTCAREA
+C
+C /LOAD/CLOAD
+      LVARINT=LVARINT+1
+      TABVINT(LVARINT) = NCLOAD_L
+C /LOAD/PLOAD
+      LVARINT=LVARINT+1
+      TABVINT(LVARINT) = NPLOAD_L
+C
+C-----/DAMP/VREL
+      LVARINT=LVARINT+1
+      TABVINT(LVARINT) = NDAMP_VREL_L        
 C----------------------------------------------------------------
 C    warning to radioss developers : Check LVARINT < LMXVINT
 C----------------------------------------------------------------

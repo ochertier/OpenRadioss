@@ -1,40 +1,40 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  AFLUX3_INT22_FVM              source/ale/alefvm/cut_cells/aflux3_int22_fvm.F
 Chd|-- called by -----------
 Chd|        AFLUX0                        source/ale/aflux0.F           
 Chd|-- calls ---------------
 Chd|        MY_BARRIER                    source/system/machine.F       
-Chd|        ALEFVM_MOD                    ../common_source/modules/alefvm_mod.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
-Chd|        I22BUFBRIC_MOD                ../common_source/modules/cut-cell-search_mod.F
-Chd|        I22TRI_MOD                    ../common_source/modules/cut-cell-search_mod.F
+Chd|        ALEFVM_MOD                    ../common_source/modules/ale/alefvm_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
+Chd|        I22BUFBRIC_MOD                ../common_source/modules/interfaces/cut-cell-search_mod.F
+Chd|        I22TRI_MOD                    ../common_source/modules/interfaces/cut-cell-search_mod.F
 Chd|====================================================================
       SUBROUTINE AFLUX3_INT22_FVM(
-     .           PM         , IXS   , V      , FLUX     , FLU1    ,
-     .           VEUL       , IPARG  , ELBUF_TAB, ITASK   ,
-     .           NV46       , IPM   , X      , W)
+     .           PM         , IXS    , V        , FLUX     , FLU1    ,
+     .           VEUL       , IPARG  , ELBUF_TAB, ITASK    ,
+     .           NV46       , IPM    , X        , W)
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C----------------------------------------------- 
@@ -76,15 +76,12 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "vect01_c.inc"
 #include      "param_c.inc"
 #include      "inter22.inc"
-#include      "i22edges.inc"
 #include      "task_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
-#include      "alefvm.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -117,14 +114,6 @@ C-----------------------------------------------
       my_real :: Wface(3), WfaceV(3), WfaceB(3,6)
       LOGICAL debug_outp,bFOUND
       INTEGER                             :: NC1,NC2,NC3,NC4,NC5,NC6,NC7,NC8
-C-----------------------------------------------
-!      EQUIVALENCE
-!     +  (X1,BV(1,1 )),(X2,BV(1,2 )),(X3,BV(1,3 )),(X4,BV(1,4 )),
-!     +  (X5,BV(1,5 )),(X6,BV(1,6 )),(X7,BV(1,7 )),(X8,BV(1,8 )),
-!     +  (Y1,BV(1,9 )),(Y2,BV(1,10)),(Y3,BV(1,11)),(Y4,BV(1,12)),
-!     +  (Y5,BV(1,13)),(Y6,BV(1,14)),(Y7,BV(1,15)),(Y8,BV(1,16)),
-!     +  (Z1,BV(1,17)),(Z2,BV(1,18)),(Z3,BV(1,19)),(Z4,BV(1,20)),
-!     +  (Z5,BV(1,21)),(Z6,BV(1,22)),(Z7,BV(1,23)),(Z8,BV(1,24))
 C-----------------------------------------------
 C   P r e - C o n d i t i o n 
 C-----------------------------------------------
@@ -260,12 +249,12 @@ C-----------------------------------------------
           IDm                           = BRICK_LIST(NIN,IBm)%ID
           NGm                           = BRICK_LIST(NIN,IBm)%NG
           GBUF                          =>ELBUF_TAB(NGm)%GBUF                                
-          VALEL(1)                      = FCELL(1,IEm) !rho.ux
-          VALEL(2)                      = FCELL(2,IEm) !rho.uy
-          VALEL(3)                      = FCELL(3,IEm) !rho.uz
-          VALEL(4)                      = FCELL(4,IEm) !rho
-          VALEL(5)                      = FCELL(5,IEm) !ssp
-          VALEL(6)                      = FCELL(6,IEm) !P  
+          VALEL(1)                      = ALEFVM_Buffer%FCELL(1,IEm) !rho.ux
+          VALEL(2)                      = ALEFVM_Buffer%FCELL(2,IEm) !rho.uy
+          VALEL(3)                      = ALEFVM_Buffer%FCELL(3,IEm) !rho.uz
+          VALEL(4)                      = ALEFVM_Buffer%FCELL(4,IEm) !rho
+          VALEL(5)                      = ALEFVM_Buffer%FCELL(5,IEm) !ssp
+          VALEL(6)                      = ALEFVM_Buffer%FCELL(6,IEm) !P  
           SR1                           = SQRT(VALEL(4))     
           DO J=1,NV46
             NAdj                        = BRICK_LIST(NIN,IB)%POLY(ICELL)%FACE(J)%NAdjCell
@@ -285,20 +274,20 @@ C-----------------------------------------------
                   IBvm                    = BRICK_LIST(NIN,IBv)%POLY(ICELLv)%WhereIsMain(4) 
                   NGvm                    = BRICK_LIST(NIN,IBvm)%NG
                   IDvm                    = BRICK_LIST(NIN,IBvm)%IDLOC
-                  VALVOIS(J,1,IADj)       = FCELL(1,IEvm)
-                  VALVOIS(J,2,IADj)       = FCELL(2,IEvm)
-                  VALVOIS(J,3,IADj)       = FCELL(3,IEvm)
-                  VALVOIS(J,4,IADj)       = FCELL(4,IEvm)
-                  VALVOIS(J,5,IADj)       = FCELL(5,IEvm)
-                  VALVOIS(J,6,IADj)       = FCELL(6,IEvm)
+                  VALVOIS(J,1,IADj)       = ALEFVM_Buffer%FCELL(1,IEvm)
+                  VALVOIS(J,2,IADj)       = ALEFVM_Buffer%FCELL(2,IEvm)
+                  VALVOIS(J,3,IADj)       = ALEFVM_Buffer%FCELL(3,IEvm)
+                  VALVOIS(J,4,IADj)       = ALEFVM_Buffer%FCELL(4,IEvm)
+                  VALVOIS(J,5,IADj)       = ALEFVM_Buffer%FCELL(5,IEvm)
+                  VALVOIS(J,6,IADj)       = ALEFVM_Buffer%FCELL(6,IEvm)
                 ELSE
                 !NOT IN CUT CELL (FRONTIER TO USUAL DOMAIN)
-                  VALVOIS(J,1,IADj)       = FCELL(1,IEv)
-                  VALVOIS(J,2,IADj)       = FCELL(2,IEv)
-                  VALVOIS(J,3,IADj)       = FCELL(3,IEv)
-                  VALVOIS(J,4,IADj)       = FCELL(4,IEv)
-                  VALVOIS(J,5,IADj)       = FCELL(5,IEv)  
-                  VALVOIS(J,6,IADj)       = FCELL(6,IEv)                                   
+                  VALVOIS(J,1,IADj)       = ALEFVM_Buffer%FCELL(1,IEv)
+                  VALVOIS(J,2,IADj)       = ALEFVM_Buffer%FCELL(2,IEv)
+                  VALVOIS(J,3,IADj)       = ALEFVM_Buffer%FCELL(3,IEv)
+                  VALVOIS(J,4,IADj)       = ALEFVM_Buffer%FCELL(4,IEv)
+                  VALVOIS(J,5,IADj)       = ALEFVM_Buffer%FCELL(5,IEv)  
+                  VALVOIS(J,6,IADj)       = ALEFVM_Buffer%FCELL(6,IEv)                                   
                 ENDIF                                             
               ENDIF
               SR2                         = SQRT(VALVOIS(J,4,IADj))
@@ -307,10 +296,10 @@ C-----------------------------------------------
               !======================================================!
               IMAT                          = IXS(1,IE)
               IALEFVM_FLG                   = IPM(251,IMAT)
-              IF(IALEFVM_IFORM/=0)IALEFVM_FLG = IALEFVM_IFORM !for debug purpose if set in alefvm_init.F
+              IF(ALEFVM_Param%IFORM/=0)IALEFVM_FLG = ALEFVM_Param%IFORM !for debug purpose if set in alefvm_init.F
               
               
-              SELECT CASE(I_ALE_SOLVER)
+              SELECT CASE(ALEFVM_Param%ISOLVER)
                 CASE(1)
                   !CENTERED FVM - U average              
                   VF(1)                     = HALF * (VALEL(1)/VALEL(4)+VALVOIS(J,1,IADj)/VALVOIS(J,4,IADj))
@@ -475,7 +464,7 @@ C                 endif
               K                             = 0
               DO L=1,NUMNOD_                                     
                 iNOD                        = BRICK_LIST(NIN,IB)%POLY(ICELL)%ListNodID(L)               
-                IF(IsNodeOnFace(iNOD,J))K   = K +1                         
+                IF(INT22_BUF%IsNodeOnFace(iNOD,J))K   = K +1                         
               ENDDO
               Face                          = BRICK_LIST(NIN,IB)%POLY(ICELL)%FACE(J)%Surf
               IF(IBv==0)THEN
@@ -489,7 +478,7 @@ C                 endif
                 Kv                          = 0
                 DO L=1,NUMNOD_                                     
                   iNOD                      = BRICK_LIST(NIN,IBv)%POLY(ICELLv)%ListNodID(L)               
-                  IF(IsNodeOnFace(iNOD,Jv))Kv= Kv +1                         
+                  IF(INT22_BUF%IsNodeOnFace(iNOD,Jv))Kv= Kv +1                         
                 ENDDO   
               ENDIF
               Face                          = min(Face,FaceV)

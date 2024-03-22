@@ -1,26 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
-#include "hardware.inc"
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C=======================================================================
 C     // MEMOIRE PARTAGEE
 C=======================================================================
@@ -51,6 +50,7 @@ Chd|        ALETHE                        source/ale/alethe.F
 Chd|        ALEW                          source/ale/grid/alew.F        
 Chd|        ALEW5                         source/ale/grid/alew5.F       
 Chd|        ALEW6                         source/ale/grid/alew6.F       
+Chd|        ALEW7                         source/ale/grid/alew7.F       
 Chd|        ALEWDX                        source/ale/grid/alewdx.F      
 Chd|        AL_CONSTRAINTH1               source/implicit/nl_solv.F     
 Chd|        AL_CONSTRAINTH2               source/implicit/nl_solv.F     
@@ -64,6 +64,7 @@ Chd|        BFGS_H1P                      source/implicit/imp_bfgs.F
 Chd|        BFGS_H2                       source/implicit/imp_bfgs.F    
 Chd|        BFGS_H2P                      source/implicit/imp_bfgs.F    
 Chd|        CFIELD_1                      source/loads/general/load_centri/cfield.F
+Chd|        CHECK_SURFACE_STATE           source/interfaces/interf/check_surface_state.F
 Chd|        CHK11MSR3N                    source/interfaces/interf/chkstfn3.F
 Chd|        CHK11MSR3NB                   source/interfaces/interf/chkstfn3.F
 Chd|        CHK20EMSR3N                   source/interfaces/interf/chkstfn3.F
@@ -199,7 +200,6 @@ Chd|        S10CNDF2                      source/elements/solid/solide10/s10cndf
 Chd|        S10CNDFND                     source/elements/solid/solide10/s10cndf.F
 Chd|        S10STFE_POFF                  source/elements/solid/solide10/s10cndf.F
 Chd|        SEGGETV                       source/interfaces/interf/seggetv.F
-Chd|        SHSUB3                        source/elements/shell/subcycling/shsub3.F
 Chd|        SINIT22_FVM                   source/interfaces/int22/sinit22_fvm.F
 Chd|        SMS_ADMESH_2                  source/ams/sms_admesh.F       
 Chd|        SMS_BUILD_DIAG                source/ams/sms_build_diag.F   
@@ -242,28 +242,15 @@ Chd|        UPDATE_STRUCT_INT21           source/interfaces/int21/update_struct_
 Chd|        UPD_TMAX                      source/output/upd_outmax.F    
 Chd|        WRITE_CUT_CELL_BUFFER         source/interfaces/int22/write_cut_cell_buffer.F
 Chd|-- calls ---------------
-Chd|        ARRET                         source/system/arret.F         
 Chd|====================================================================
       SUBROUTINE MY_BARRIER
+#include     "implicit_f.inc"
 #include     "comlock.inc"
-#include     "my_real.inc"
 #include     "task_c.inc"
 #include     "units_c.inc"
 #if defined(_OPENMP)
 !$OMP BARRIER
 #endif
-        IF(PARALLEL_END==1) THEN
-#if defined(_OPENMP)
-          CALL OMP_SET_LOCK(LLOCK(1,1))
-          IF(IOCLOSE==0) THEN
-           CLOSE(UNIT=IOUT)
-           CLOSE(UNIT=IUHIS)
-           IOCLOSE = 1
-          ENDIF  
-          CALL OMP_UNSET_LOCK(LLOCK(1,1))
-#endif
-          CALL ARRET(7)
-        END IF
       RETURN
       END
 C
@@ -275,7 +262,7 @@ Chd|        BAFIL2                        source/ale/bimat/bafil2.F
 Chd|        BALPH2                        source/ale/bimat/balph2.F     
 Chd|        BEFIL2                        source/ale/bimat/befil2.F     
 Chd|        QMASS2                        source/elements/solid_2d/quad/qmass2.F
-Chd|        QMASSREAL2                    source/elements/solid_2d/quad/qmass2.F
+Chd|        QMASSREAL2                    source/elements/solid_2d/quad/qmassreal2.F
 Chd|        USER_LOCK                     source/system/machine.F       
 Chd|-- calls ---------------
 Chd|====================================================================
@@ -307,7 +294,7 @@ Chd|        BAFIL2                        source/ale/bimat/bafil2.F
 Chd|        BALPH2                        source/ale/bimat/balph2.F     
 Chd|        BEFIL2                        source/ale/bimat/befil2.F     
 Chd|        QMASS2                        source/elements/solid_2d/quad/qmass2.F
-Chd|        QMASSREAL2                    source/elements/solid_2d/quad/qmass2.F
+Chd|        QMASSREAL2                    source/elements/solid_2d/quad/qmassreal2.F
 Chd|        USER_FREE                     source/system/machine.F       
 Chd|-- calls ---------------
 Chd|====================================================================
@@ -337,8 +324,6 @@ Chd|-- called by -----------
 Chd|-- calls ---------------
 Chd|====================================================================
       SUBROUTINE WAIT_TASK(ITID)
-#include      "my_real.inc"
-#include      "task_c.inc"
       INTEGER ITID(*),IT,JT
 #if defined(_OPENMP)
 #endif
@@ -456,6 +441,7 @@ Chd|  MY_FLUSH                      source/system/machine.F
 Chd|-- called by -----------
 Chd|        ECRIT                         source/output/ecrit.F         
 Chd|        IMP_STOP                      source/implicit/imp_solv.F    
+Chd|        MULTI_MUSCL_FLUXES_COMPUTATIONsource/multifluid/multi_muscl_fluxes_computation.F
 Chd|-- calls ---------------
 Chd|====================================================================
       SUBROUTINE MY_FLUSH(IUNIT)
@@ -464,9 +450,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -493,9 +476,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -527,9 +507,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       LOGICAL MKL_DYN,OMP_NEST
@@ -559,19 +536,16 @@ Chd|-- calls ---------------
 Chd|====================================================================
       SUBROUTINE CHECK_KMP_STACK()
 C-----------------------------------------------
-C   I m p l i c i t   T y p e s
-C-----------------------------------------------
 #ifdef __INTEL_COMPILER
       use omp_lib
+C-----------------------------------------------      
+C   I m p l i c i t   T y p e s
+C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "task_c.inc"
-#include      "com01_c.inc"
-C-----------------------------------------------
-C   D u m m y   A r g u m e n t s
-C-----------------------------------------------
+#include      "task_c.inc"     
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -593,6 +567,7 @@ C
          ENDIF
       ENDIF
 #elif 1
+#include      "implicit_f.inc"
 
 #endif
       RETURN
@@ -609,12 +584,6 @@ C-----------------------------------------------
 #ifdef __INTEL_COMPILER
       use omp_lib
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
-C   D u m m y   A r g u m e n t s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -658,6 +627,7 @@ Chd|        CHECK_KMP_STACK               source/system/machine.F
 Chd|        SET_STACK_C                   source/system/stacksize_c.c   
 Chd|====================================================================
       SUBROUTINE SET_STACK_VALUES( )
+#include      "implicit_f.inc"
 #include      "task_c.inc"
 C Check & Set Stacksize value
        INTEGER Stack
@@ -675,22 +645,21 @@ Chd|-- called by -----------
 Chd|-- calls ---------------
 Chd|====================================================================
       SUBROUTINE WRITE_IOUT(LINE,LEN1)
+C-----------------------------------------------
+C   I m p l i c i t   T y p e s
+C-----------------------------------------------
 #include "implicit_f.inc"
-#include      "comlock.inc"
+#include  "comlock.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include "units_c.inc"
 C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-#ifndef ncharline
-#define ncharline 500
-#endif
-      CHARACTER(len=ncharline)  LINE
       INTEGER LEN1
-
+      CHARACTER(len=LEN1)  LINE
+C-----------------------------------------------
 #include "lockon.inc"
       WRITE(IOUT,'(A)') LINE(1:LEN1)
 #include "lockoff.inc"

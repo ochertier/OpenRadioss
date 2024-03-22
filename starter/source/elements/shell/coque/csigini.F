@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  CSIGINI                       source/elements/shell/coque/csigini.F
 Chd|-- called by -----------
@@ -31,7 +31,7 @@ Chd|        CG2LEPS                       source/elements/shell/coqueba/scigini4
 Chd|        CG2LSIG                       source/elements/shell/coqueba/scigini4.F
 Chd|        FRETITL2                      source/starter/freform.F      
 Chd|        LOC2ORTH                      source/elements/shell/coqueba/scigini4.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
       SUBROUTINE CSIGINI(ELBUF_STR,
@@ -64,8 +64,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
 #include      "com01_c.inc"
 #include      "scr17_c.inc"
 C-----------------------------------------------
@@ -89,7 +87,8 @@ C-----------------------------------------------
      .        ILAY,IPT_ALL,IPT,PTN,JDIR,ILAW,NPTT,IT
       my_real 
      .         TXX,TYY,TZZ,TXY,TYZ,TZX,UXX,UYY,UZZ,UXY,UYZ,UZX,A,B,C,
-     .         E1(6),E2(6),Z1,Z2,Z0,AA,S6(6),POSI(MVSIZ,NPT)
+     .         E1(6),E2(6),Z1,Z2,Z0,AA,S6(6),POSI(MVSIZ,NPT),
+     .         FORJ(5),MOMJ(3),TJ,UNPT,NPGI,F2M
       CHARACTER*nchartitle, TITR1
       TYPE(L_BUFEL_) ,POINTER :: LBUF
       TYPE(BUF_LAY_) ,POINTER :: BUFLY    
@@ -103,16 +102,17 @@ C=======================================================================
 !
       DO I=JFT,JLT
         IF(ABS(ISIGI) /= 3.AND.ABS(ISIGI) /= 4.AND.ABS(ISIGI) /= 5)THEN
-          II = I+NFT
+          II = PTSH(I+NFT)
+          IF(II == 0 ) GOTO 100
           N = NINT(SIGSH(1,II))
-          IF(N == IX(NIX,II))THEN
-            JJ = II
+          IF(N == IX(NIX,I+NFT))THEN
+            JJ = I+NFT
           ELSE
-            JJ = II
+            JJ = I+NFT
             DO J = 1,NUMEL
               II= J
               N = NINT(SIGSH(1,II))
-	             IF (N == 0) GOTO 100
+                IF (N == 0) GOTO 100
               IF (N == IX(NIX,JJ)) GOTO 60
             ENDDO
             GOTO 100
@@ -124,7 +124,9 @@ C=======================================================================
           II=PTSH(JJ)
           IF(II == 0)GOTO 100
         END IF
+        IF(SIGSH(NVSHELL - 1 ,II) == ZERO ) CYCLE
 c
+        NPGI=NINT(SIGSH(NVSHELL,II))
         NPTI=NINT(SIGSH(2,II))
         IF(SIGSH(3,II) /= ZERO) THEN
           THK(I)=SIGSH(3,II)
@@ -137,27 +139,28 @@ c
           HH(I,2)= SIGSH(15,II)
           HH(I,3)= SIGSH(16,II)
         ENDIF
-        IF(NPT /= NPTI ) THEN
-          IPID=IX(NIX-1,NFT+I)
-          PID=IGEO(1,IPID)            
-          CALL FRETITL2(TITR1,IGEO(NPROPGI-LTITR+1,IPID),LTITR)
-          IF(NPTI == 0)THEN
-            CALL ANCMSG(MSGID=2020,
-     .                ANMODE=ANINFO,
-     .                MSGTYPE=MSGERROR,
-     .                C1=TITR1,
-     .                I1=PID,
-     .                I2=N,
-     .                PRMOD=MSG_CUMU)
-          ELSE
-            CALL ANCMSG(MSGID=26,
-     .                  ANMODE=ANINFO,
-     .                  MSGTYPE=MSGERROR,
-     .                  I2=N,
-     .                  I1=PID,
-     .                  C1=TITR1)
-          ENDIF
-        ENDIF
+  
+        IF(NPT /= NPTI .AND. NPT/=0.OR.NPGI>1) THEN
+                IPID=IX(NIX-1,NFT+I)
+                PID=IGEO(1,IPID)            
+                CALL FRETITL2(TITR1,IGEO(NPROPGI-LTITR+1,IPID),LTITR)
+                IF(NPTI == 0 .AND. ITHKSHEL /= 2)THEN
+                  CALL ANCMSG(MSGID=2020,
+     .                      ANMODE=ANINFO,
+     .                      MSGTYPE=MSGERROR,
+     .                      C1=TITR1,
+     .                      I1=PID,
+     .                      I2=N,
+     .                      PRMOD=MSG_CUMU)
+                ELSEIF(ISIGSH /= 0) THEN
+                  CALL ANCMSG(MSGID=26,
+     .                        ANMODE=ANINFO,
+     .                        MSGTYPE=MSGERROR,
+     .                        I2=N,
+     .                        I1=PID,
+     .                        C1=TITR1)
+                ENDIF
+         ENDIF   
         IF (ISTRAIN /= 0.AND.ITHKSHEL==2) THEN
           IF(SIGSH(17,II) == ONE)THEN
 C--- in global sys
@@ -217,6 +220,28 @@ c             error out
         IF (ISIGSH==0) CYCLE
         IF (NPT == 0) THEN
            IF(SIGSH(17,II) == ONE)THEN
+            IF (NPTI>1) THEN
+             UNPT = ONE/NPTI
+              FORJ(1:5) = ZERO
+              F2M = ZERO
+               DO IT=1,NPTI
+                 PT = 22 + 6*(IT-1)
+                 S6(1:2)=SIGSH(PT:PT+1,II)
+                 S6(3)=SIGSH(INISHVAR+IT,II)
+                 S6(4:6)=SIGSH(PT+2:PT+4,II)
+                 TJ=SIX*SIGSH(INISHVAR+NPTI+IT,II)
+                CALL CG2LSIG(
+     7           E1X(I) ,E2X(I),E3X(I),E1Y(I),E2Y(I),E3Y(I),
+     8           E1Z(I) ,E2Z(I),E3Z(I),S6   )
+                FORJ(1:5) = FORJ(1:5) + UNPT*S6(1:5)
+                IF (TJ>ZERO) THEN
+                  F2M = ONE/TJ
+                  MOMJ(1:3) = S6(1:3)
+                END IF 
+               ENDDO
+               SIGSH(22:26,II)=FORJ(1:5)
+               SIGSH(28:30,II)=F2M*(MOMJ(1:3)-FORJ(1:3))
+            ELSE
              TXX = SIGSH(22,II)
              TYY = SIGSH(23,II)
              TZZ = SIGSH(18,II)
@@ -262,6 +287,7 @@ C
               SIGSH(28,II) = UXX
               SIGSH(29,II) = UYY
               SIGSH(30,II) = UXY
+            END IF !(NPTI>1) THEN
           ENDIF
           FOR(I,1)=SIGSH(22,II)
           FOR(I,2)=SIGSH(23,II)
@@ -330,8 +356,8 @@ C
                   S6(3)=SIGSH(PTN,II)
                   S6(4:6)=SIGSH(PT+2:PT+4,II)
                   CALL CG2LSIG(
-     7            E1X    ,E2X   ,E3X   ,E1Y   ,E2Y  ,E3Y,
-     8            E1Z    ,E2Z   ,E3Z   ,S6    )
+     7            E1X(I) ,E2X(I),E3X(I),E1Y(I),E2Y(I),E3Y(I),
+     8            E1Z(I) ,E2Z(I),E3Z(I),S6   )
                   CALL LOC2ORTH(S6,DIR_A,DIR_B,JJ,ILAW,IGTYP,NEL)
                   SIGSH(PT:PT+4,II) = S6(1:5)
                   POSI(I,IPT)=SIGSH(PTN+NPT,II)
@@ -347,11 +373,11 @@ C
             L_PLA = ELBUF_STR%BUFLY(ILAY)%L_PLA
             DO IT=1,NPTT
               LBUF => ELBUF_STR%BUFLY(ILAY)%LBUF(1,1,IT)
-              LBUF%SIG(KK(1)+I)=SIGSH(PT,II)	     
-              LBUF%SIG(KK(2)+I)=SIGSH(PT+1,II)	     
-              LBUF%SIG(KK(3)+I)=SIGSH(PT+2,II)	     
-              LBUF%SIG(KK(4)+I)=SIGSH(PT+3,II)	     
-              LBUF%SIG(KK(5)+I)=SIGSH(PT+4,II)	     
+              LBUF%SIG(KK(1)+I)=SIGSH(PT,II)       
+              LBUF%SIG(KK(2)+I)=SIGSH(PT+1,II)       
+              LBUF%SIG(KK(3)+I)=SIGSH(PT+2,II)       
+              LBUF%SIG(KK(4)+I)=SIGSH(PT+3,II)       
+              LBUF%SIG(KK(5)+I)=SIGSH(PT+4,II)       
               IF (L_PLA > 0) LBUF%PLA(I) = SIGSH(PT+5,II)        
               PT = PT + 6
             END DO !IT=1,NPTT

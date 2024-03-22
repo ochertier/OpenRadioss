@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  READ_DYNAIN                   source/output/dynain/read_dynain.F
 Chd|-- called by -----------
@@ -31,12 +31,14 @@ Chd|        MY_ORDERS                     ../common_source/tools/sort/my_orders.
 Chd|        SPMD_GATHERV_INT              source/mpi/generic/spmd_gatherv_int.F
 Chd|        SPMD_GATHER_INT               source/mpi/generic/spmd_gather_int.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
+Chd|        STATE_MOD                     ../common_source/modules/state_mod.F
 Chd|====================================================================
-      SUBROUTINE READ_DYNAIN(IPART,IPART_DYNAIN,IPARTC,IPARTTG,IXC,IXTG)
+      SUBROUTINE READ_DYNAIN(IPART,DYNAIN_DATA,IPARTC,IPARTTG,IXC,IXTG)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
+      USE STATE_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -45,9 +47,7 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
-#include      "param_c.inc"
 #include      "units_c.inc"
-#include      "scr05_c.inc"
 #include      "scr16_c.inc"
 #include      "scr17_c.inc"
 #include      "task_c.inc"
@@ -55,9 +55,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER IPART(LIPART1,*), IPART_DYNAIN(*), IXC(NIXC,*), IXTG(NIXTG,*),
-     .        IPARTC(*), IPARTTG(*)
-C     REAL
+      INTEGER IPART(LIPART1,*), IXC(NIXC,*), IXTG(NIXTG,*),IPARTC(*), IPARTTG(*)
+      TYPE (DYNAIN_DATABASE), INTENT(INOUT) :: DYNAIN_DATA
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -75,30 +74,32 @@ C
       my_real
      .   T0,DT0
 C-----------------------------------------------
-      IF (NDYNAINPRT /= 0) THEN
-     	  DO I=1,NDYNAINPRT
-     	    READ(IIN,'(I10)') IDPRT
-          IP=0
-     	    DO J=1,NPART
-     	      IF(IPART(4,J)==IDPRT)IP=J
-     	    END DO
-     	    IF(IP==0)THEN
-     	     CALL ANCMSG(MSGID=290,ANMODE=ANINFO,I1=IDPRT)
+      ALLOCATE( DYNAIN_DATA%IPART_DYNAIN(NPART))
+      DYNAIN_DATA%IPART_DYNAIN(1:NPART) = 0 
+      IF (DYNAIN_DATA%NDYNAINPRT /= 0) THEN
+            DO I=1,DYNAIN_DATA%NDYNAINPRT
+              READ(IIN,'(I10)') IDPRT
+            IP=0
+              DO J=1,NPART
+                IF(IPART(4,J)==IDPRT)IP=J
+              END DO
+              IF(IP==0)THEN
+               CALL ANCMSG(MSGID=290,ANMODE=ANINFO,I1=IDPRT)
              CALL ARRET(2)
           END IF
-          IPART_DYNAIN(IP)=1
+          DYNAIN_DATA%IPART_DYNAIN(IP)=1
         END DO
-      ELSEIF(NDYNAINALL /= 0) THEN
-     	  DO J=1,NPART
-     	    IPART_DYNAIN(J) = 1
-     	  END DO
+      ELSEIF(DYNAIN_DATA%NDYNAINALL /= 0) THEN
+            DO J=1,NPART
+              DYNAIN_DATA%IPART_DYNAIN(J) = 1
+            END DO
       ENDIF
 
 C-------------------------------------------------------------------------------
 C     CHECK FOR DYNAIN FILE OUTPUT : 3node shell and 4node shell have same ID
 C-------------------------------------------------------------------------------  
 
-      IF(DYNAIN_CHECK == 0.AND.(NDYNAINPRT /=0 .OR.NDYNAINALL /= 0) ) THEN
+      IF(DYNAIN_DATA%DYNAIN_CHECK == 0.AND.(DYNAIN_DATA%NDYNAINPRT /=0 .OR.DYNAIN_DATA%NDYNAINALL /= 0) ) THEN
    
         NELC = 0
         NELTG = 0 
@@ -108,7 +109,7 @@ C-------------------------------------------------------------------------------
         IF(NUMELC/=0) ALLOCATE(NELIDC(NUMELC),STAT=IERR)
         IF(NUMELTG/=0) ALLOCATE(NELIDTG(NUMELTG),STAT=IERR)
 
-        IF(NDYNAINALL /= 0) THEN
+        IF(DYNAIN_DATA%NDYNAINALL /= 0) THEN
 
           IF(NUMELC/=0)THEN
             DO I=1,NUMELC
@@ -127,7 +128,7 @@ C-------------------------------------------------------------------------------
           NELC = 0 
           DO I=1,NUMELC
               IP = IPARTC(I)
-              IF(IPART_DYNAIN(IP)==1) THEN
+              IF(DYNAIN_DATA%IPART_DYNAIN(IP)==1) THEN
                  NELC = NELC + 1
                  NELIDC(NELC) = IXC(NIXC,I)
               ENDIF
@@ -135,7 +136,7 @@ C-------------------------------------------------------------------------------
            NELTG = 0 
            DO I=1,NUMELTG
               IP = IPARTTG(I)
-              IF(IPART_DYNAIN(IP)==1) THEN
+              IF(DYNAIN_DATA%IPART_DYNAIN(IP)==1) THEN
                  NELTG = NELTG + 1
                  NELIDTG(NELTG) = IXTG(NIXTG,I)
               ENDIF

@@ -1,31 +1,32 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  EMOMT2                        source/ale/euler2d/emomt2.F   
 Chd|-- called by -----------
 Chd|        QFORC2                        source/elements/solid_2d/quad/qforc2.F
 Chd|-- calls ---------------
 Chd|        UPWIND                        source/elements/solid/solide/upwind.F
+Chd|        ALE_MOD                       ../common_source/modules/ale/ale_mod.F
 Chd|====================================================================
       SUBROUTINE EMOMT2(PM,RHO,
      .                  Y1,Y2,Y3,Y4,Z1,Z2,Z3,Z4,
@@ -37,6 +38,10 @@ Chd|====================================================================
      .                  NC1,NC2,NC3,NC4,MAT,
      .                  QMV,BUFMAT)
 C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
+      USE ALE_MOD
+C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
@@ -47,12 +52,10 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
 #include      "vect01_c.inc"
 #include      "param_c.inc"
-#include      "scrupw_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -84,23 +87,24 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   S o u r c e   L i n e s 
 C-----------------------------------------------
+C
 C-----------------------------------------------
 C     Reynolds transportation theorem
 C-----------------------------------------------
 C   DMi = 0.5*DT1*QMV(i,I)  incoming mass from face i
-      IF(MTN == 51 .AND. UPWM /= 3)THEN
+      IF(MTN == 51 .AND. ALE%UPWIND%UPWM /= 3)THEN
         IADBUF = NINT(PM(27,MAT(1)))
         IFLG = NINT(BUFMAT(31+IADBUF-1))
 C
         IF(IFLG > 1)RETURN
 C
-        IF(UPWM == 0.)THEN
+        IF(ALE%UPWIND%UPWM == 0.)THEN
          DO I=LFT,LLT
           GAM(I)= PM(15,MAT(I))
          ENDDO
         ELSE
          DO I=LFT,LLT
-          GAM(I)= CUPWM
+          GAM(I)= ALE%UPWIND%CUPWM
          ENDDO
         ENDIF
 C
@@ -146,13 +150,13 @@ C
         ENDDO
         RETURN
       ENDIF
-      IF(UPWM == 0.AND.MTN == 11)RETURN
-      IF(UPWM > 1)THEN
+      IF(ALE%UPWIND%UPWM == 0.AND.MTN == 11)RETURN
+      IF(ALE%UPWIND%UPWM > 1)THEN
        PC=FOURTH
        PD=ONE_OVER_16
        PS=ONE_OVER_16
        PP=ONE_OVER_16
-       DT1H=HALF*DT1*CUPWM
+       DT1H=HALF*DT1*ALE%UPWIND%CUPWM
        DO I=LFT,LLT
         Y13(I)=Y3(I)-Y1(I)
         Z13(I)=Z3(I)-Z1(I)
@@ -171,15 +175,18 @@ C
          S(2,I)=HALF*(Y12(I)-Y34(I))
          S(3,I)=HALF*(Z12(I)-Z34(I))
          T(2,I)=HALF*(-Y41(I)+Y23(I))
-         T(3,I)=HALF*(-Z41(I)+Z23(I))	 
+         T(3,I)=HALF*(-Z41(I)+Z23(I))   
        ENDDO
       ENDIF
 C
 C FORCE AT CENTROID
 C
-      IF(UPWM < 2.OR.MTN == 11)THEN
-       IF(MTN == 11.AND.UPWM > 1)THEN
-        CALL UPWIND(RHO,VIS,VDY,VDY,VDZ,S,S,T,DELTAX,GAM)
+      IF(ALE%UPWIND%UPWM < 2.OR.MTN == 11)THEN
+       IF(MTN == 11.AND.ALE%UPWIND%UPWM > 1)THEN
+        CALL UPWIND(
+     1   RHO,     VIS,     VDY,     VDY,
+     2   VDZ,     S,       S,       T,
+     3   DELTAX,  GAM,     LLT)
         DO I=LFT,LLT
          FAC=4.*GAM(I)/AIRE(I)
          A1(I) = FAC*(PY1(I)*VDY(I)+PZ1(I)*VDZ(I))
@@ -241,7 +248,10 @@ C P1Y4=-Z34/TR4 P1Z4= Y34/TR4
 C P3Y4=-Z41/TR4 P3Z4= Y41/TR4 P4Y4=-Z13/TR4 P4Z4= Y13/TR4
 C
 C NODE 1      
-       CALL UPWIND(RHO,VIS,VY1,VY1,VZ1,S,S,T,DELTAX,GAM)
+       CALL UPWIND(
+     1   RHO,     VIS,     VY1,     VY1,
+     2   VZ1,     S,       S,       T,
+     3   DELTAX,  GAM,     LLT)
        DO I=LFT,LLT
         TR(I)=(Y41(I)*Z12(I)-Y12(I)*Z41(I))
         DYYP(I)=(-Z24(I)*VY1(I)-Z41(I)*VY2(I)-Z12(I)*VY4(I))
@@ -265,7 +275,7 @@ C
         T24(I) =  T24(I)+(PS+A3(I))*F2P(I)
        ENDDO
 C
-       IF(UPWM == 2)THEN
+       IF(ALE%UPWIND%UPWM == 2)THEN
         DO I=LFT,LLT
          FAC=-DT1H/TR(I)
          F1(I)=FAC*(-F1P(I)*DZZP(I)+F2P(I)*DYZP(I))
@@ -281,7 +291,10 @@ C
         ENDDO
        ENDIF
 C NODE 2      
-       CALL UPWIND(RHO,VIS,VY2,VY2,VZ2,S,S,T,DELTAX,GAM)
+       CALL UPWIND(
+     1   RHO,     VIS,     VY2,     VY2,
+     2   VZ2,     S,       S,       T,
+     3   DELTAX,  GAM,     LLT)
        DO I=LFT,LLT
         TR(I)=(Y12(I)*Z23(I)-Y23(I)*Z12(I))
         DYYP(I)=(-Z23(I)*VY1(I)+Z13(I)*VY2(I)-Z12(I)*VY3(I))
@@ -303,7 +316,7 @@ C NODE 2
         T23(I) =  T23(I)+(PS+A3(I))*F2P(I)
         T24(I) =  T24(I)+PD*F2P(I)
        ENDDO
-       IF(UPWM == 2)THEN
+       IF(ALE%UPWIND%UPWM == 2)THEN
         DO I=LFT,LLT
          FAC=-DT1H/TR(I)
          F1(I)=FAC*(-F1P(I)*DZZP(I)+F2P(I)*DYZP(I))
@@ -319,7 +332,10 @@ C NODE 2
         ENDDO
        ENDIF
 C NODE 3      
-       CALL UPWIND(RHO,VIS,VY3,VY3,VZ3,S,S,T,DELTAX,GAM)
+       CALL UPWIND(
+     1   RHO,     VIS,     VY3,     VY3,
+     2   VZ3,     S,       S,       T,
+     3   DELTAX,  GAM,     LLT)
        DO I=LFT,LLT
         TR(I)=(Y23(I)*Z34(I)-Y34(I)*Z23(I))
         DYYP(I)=(-Z34(I)*VY2(I)+Z24(I)*VY3(I)-Z23(I)*VY4(I))
@@ -341,7 +357,7 @@ C NODE 3
         T23(I) =  T23(I)+(PP+A2(I))*F2P(I)
         T24(I) =  T24(I)+(PS+A3(I))*F2P(I)
        ENDDO
-       IF(UPWM == 2)THEN
+       IF(ALE%UPWIND%UPWM == 2)THEN
         DO I=LFT,LLT
          FAC=-DT1H/TR(I)
          F1(I)=FAC*(-F1P(I)*DZZP(I)+F2P(I)*DYZP(I))
@@ -357,7 +373,10 @@ C NODE 3
         ENDDO
        ENDIF
 C NODE  4      
-       CALL UPWIND(RHO,VIS,VY4,VY4,VZ4,S,S,T,DELTAX,GAM)
+       CALL UPWIND(
+     1   RHO,     VIS,     VY4,     VY4,
+     2   VZ4,     S,       S,       T,
+     3   DELTAX,  GAM,     LLT)
        DO I=LFT,LLT
         TR(I)=(Y34(I)*Z41(I)-Y41(I)*Z34(I))
         DYYP(I)=(-Z34(I)*VY1(I)-Z41(I)*VY3(I)-Z13(I)*VY4(I))
@@ -379,7 +398,7 @@ C NODE  4
         T23(I) =  T23(I)+(PS+A2(I))*F2P(I)
         T24(I) =  T24(I)+(PP+A3(I))*F2P(I)
        ENDDO
-       IF(UPWM == 2)THEN
+       IF(ALE%UPWIND%UPWM == 2)THEN
         DO I=LFT,LLT
          FAC=-DT1H/TR(I)
          F1(I)=FAC*(-F1P(I)*DZZP(I)+F2P(I)*DYZP(I))

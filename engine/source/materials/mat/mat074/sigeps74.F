@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  SIGEPS74                      source/materials/mat/mat074/sigeps74.F
 Chd|-- called by -----------
@@ -104,9 +104,7 @@ C---------+---------+---+---+--------------------------------------------
 #include      "com08_c.inc"
 #include      "impl1_c.inc"
 #include      "param_c.inc"
-#include      "parit_c.inc"
 #include      "scr17_c.inc"
-#include      "scr05_c.inc"
 #include      "units_c.inc"
 C=======================================================================
       INTEGER NEL, NUPARAM, NUVAR,IPT,IPLA, JTHE,
@@ -373,7 +371,7 @@ C
           XX2(I,2)=EPSP(I)*XFAC
         END DO      
 C
-        CALL TABLE_VINTERP(TABLE(ITABLE),NEL,IPOS2,XX2,YLD,DYDX)
+        CALL TABLE_VINTERP(TABLE(ITABLE),NEL,NEL,IPOS2,XX2,YLD,DYDX)
 C
         DO I=1,NEL
           YLD(I) = YFAC*YLD(I)
@@ -390,7 +388,7 @@ C
            XX2(I,1)=ZERO
            XX2(I,2)=EPSP(I)*XFAC
          END DO      
-         CALL TABLE_VINTERP(TABLE(ITABLE),NEL,IPOS2,XX2,YK,DYDX)
+         CALL TABLE_VINTERP(TABLE(ITABLE),NEL,NEL,IPOS2,XX2,YK,DYDX)
 
          DO I=1,NEL
 C          ECROUISSAGE CINEMATIQUE
@@ -430,7 +428,7 @@ C
           XX3(I,3)=TEMP(I)
         END DO      
 C
-        CALL TABLE_VINTERP(TABLE(ITABLE),NEL,IPOS3,XX3,YLD,DYDX)
+        CALL TABLE_VINTERP(TABLE(ITABLE),NEL,NEL,IPOS3,XX3,YLD,DYDX)
 C
         DO I=1,NEL
           YLD(I) = YFAC*YLD(I)
@@ -449,7 +447,7 @@ C
            XX3(I,2)=EPSP(I)*XFAC
            XX3(I,3)=TEMP(I)
          END DO      
-         CALL TABLE_VINTERP(TABLE(ITABLE),NEL,IPOS3,XX3,YK,DYDX)
+         CALL TABLE_VINTERP(TABLE(ITABLE),NEL,NEL,IPOS3,XX3,YK,DYDX)
 
          DO I=1,NEL
 C          ECROUISSAGE CINEMATIQUE
@@ -729,7 +727,7 @@ C
           XX2(I,2)=EPSP(I)*XFAC
         END DO      
 C
-        CALL TABLE_VINTERP(TABLE(ITABLE),NEL,IPOS2,XX2,YLD,DYDX)
+        CALL TABLE_VINTERP(TABLE(ITABLE),NEL,NEL,IPOS2,XX2,YLD,DYDX)
 C
         DO I=1,NEL
           YLD(I) = YFAC*YLD(I)
@@ -746,7 +744,7 @@ C
            XX2(I,1)=ZERO
            XX2(I,2)=EPSP(I)*XFAC
          END DO      
-         CALL TABLE_VINTERP(TABLE(ITABLE),NEL,IPOS2,XX2,YK,DYDX)
+         CALL TABLE_VINTERP(TABLE(ITABLE),NEL,NEL,IPOS2,XX2,YK,DYDX)
 
          DO I=1,NEL
 C          ECROUISSAGE CINEMATIQUE
@@ -786,7 +784,7 @@ C
           XX3(I,3)=TEMP(I)
         END DO      
 C
-        CALL TABLE_VINTERP(TABLE(ITABLE),NEL,IPOS3,XX3,YLD,DYDX)
+        CALL TABLE_VINTERP(TABLE(ITABLE),NEL,NEL,IPOS3,XX3,YLD,DYDX)
 C
         DO I=1,NEL
           YLD(I) = YFAC*YLD(I)
@@ -805,7 +803,7 @@ C
            XX3(I,2)=EPSP(I)*XFAC
            XX3(I,3)=TEMP(I)
          END DO      
-         CALL TABLE_VINTERP(TABLE(ITABLE),NEL,IPOS3,XX3,YK,DYDX)
+         CALL TABLE_VINTERP(TABLE(ITABLE),NEL,NEL,IPOS3,XX3,YK,DYDX)
 
          DO I=1,NEL
 C          ECROUISSAGE CINEMATIQUE

@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  CZKEL3                        source/elements/shell/coquez/czkel3.F
 Chd|-- called by -----------
@@ -35,7 +35,8 @@ Chd|        CZLKECT3                      source/elements/shell/coquez/czlkect3.
 Chd|        CZLKEN3                       source/elements/shell/coquez/czlken3.F
 Chd|        CZLKENR3                      source/elements/shell/coquez/czlken3.F
 Chd|        CZSUMG3                       source/elements/shell/coquez/czsumg3.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        DRAPE_MOD                     share/modules/drape_mod.F     
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
        SUBROUTINE CZKEL3 (
      1            JFT    ,JLT    ,NFT    ,NPT    ,MTN    ,
@@ -46,12 +47,13 @@ Chd|====================================================================
      7            IPM    ,IGEO   ,IEXPAN ,IPARG  ,
      8            KE11   ,KE22   ,KE33   ,KE44   ,   
      9            KE12   ,KE13   ,KE14   ,KE23   ,   
-     A            KE24   ,KE34   ,UI     ,RI     ,IDRAPE,
-     B            RDRAPE )
+     A            KE24   ,KE34   ,UI     ,RI     ,DRAPE_SH4N,
+     B            INDX_DRAPE ,SEDRAPE,NUMEL_DRAPE)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
-      USE ELBUFDEF_MOD            
+      USE ELBUFDEF_MOD 
+      USE DRAPE_MOD 
 C-----------------------------------------------
 C   I M P L I C I T   T Y P E S
 C-----------------------------------------------
@@ -63,24 +65,21 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C O M M O N   B L O C K S
 C-----------------------------------------------
-#include      "scr01_c.inc"
-#include      "parit_c.inc"
-#include      "com04_c.inc"
 #include      "param_c.inc"
 #include      "impl1_c.inc"
-#include      "impl2_c.inc"
 C-----------------------------------------------
 C   D U M M Y   A R G U M E N T S
 C-----------------------------------------------
       INTEGER JFT     ,JLT    ,NFT    ,NPT    ,
      .        MTN     ,ITHK   ,
      .        ISTRAIN ,IPLA   ,OFFSET,IHBE    ,ISMSTR,IKGEO,IEXPAN
-      INTEGER IXC(NIXC,*),IGEO(NPROPGI,*),IPM(*),IPARG(*),IDRAPE(*)
+      INTEGER ,    INTENT(IN)     ::        SEDRAPE,NUMEL_DRAPE
+      INTEGER IXC(NIXC,*),IGEO(NPROPGI,*),IPM(*),IPARG(*)
       INTEGER INDXOF(MVSIZ)
+      INTEGER, DIMENSION(SEDRAPE) :: INDX_DRAPE
 C     REAL OU REAL*8
       my_real
-     .   PM(NPROPM,*),GEO(NPROPG,*), BUFMAT(*),   X(3,*),THKE(*),
-     .   RDRAPE(*)
+     .   PM(NPROPM,*),GEO(NPROPG,*), BUFMAT(*),   X(3,*),THKE(*)
       my_real    
      .   OFF(MVSIZ),UI(3,4,*),RI(3,4,*)
       my_real    
@@ -89,6 +88,7 @@ C     REAL OU REAL*8
      .   KE14(6,6,MVSIZ),KE23(6,6,MVSIZ),
      .   KE24(6,6,MVSIZ),KE34(6,6,MVSIZ)
       TYPE (ELBUF_STRUCT_), TARGET :: ELBUF_STR
+      TYPE (DRAPE_) :: DRAPE_SH4N(NUMELC_DRAPE)
 C=======================================================================
 c FUNCTION: [K] stiffness Matrix of QEPH element
 c
@@ -254,8 +254,8 @@ C
      3             HM     ,HF        ,HC     ,HZ      ,IGTYP    ,
      4             IORTH  ,HMOR      ,HFOR   ,DIR_A   ,IGEO     ,
      5             IDRIL  ,IHBE      ,HMFOR  ,GS      ,ISUBSTACK,
-     6             BID    ,ELBUF_STR ,NLAY   ,IDRAPE  ,RDRAPE   ,
-     7             NEL    )
+     6             BID    ,ELBUF_STR ,NLAY   ,DRAPE_SH4N ,NFT   , 
+     7             NEL    ,INDX_DRAPE,SEDRAPE,NUMEL_DRAPE)
       ELSE
 C
        CALL CMATC3(JFT    ,JLT       ,PM     ,MAT     ,GEO      ,
@@ -264,10 +264,9 @@ C
      3             HM     ,HF        ,HC     ,HZ      ,IGTYP    ,
      4             IORTH  ,HMOR      ,HFOR   ,DIRA    ,IGEO     ,
      5             IDRIL  ,IHBE      ,HMFOR  ,GS      ,ISUBSTACK,
-     6             BID    ,ELBUF_STR ,NLAY   ,IDRAPE  ,RDRAPE   ,
-     7             NEL    )
+     6             BID    ,ELBUF_STR ,NLAY   ,DRAPE_SH4N,  NFT   ,
+     7             NEL    ,INDX_DRAPE,SEDRAPE,NUMEL_DRAPE)
       ENDIF
-       print *,'HZ=',HZ(1)
 C-----------------------------------------------
 C     MATRICE [B]---index changed from here JFT-NPLAT (plat els)+,JLT(warped)
 C-----------------------------------------------
@@ -387,8 +386,8 @@ C-----------keep isotropic for hourglass part (36 to avoid A12=0 for LAW25)-----
      3             HM     ,HF        ,HC     ,HZ      ,IGTYP    ,
      4             IBID1  ,HMOR      ,HFOR   ,DIRA    ,IGEO     ,
      5             IDRIL  ,IHBE      ,HMFOR  ,GS      ,ISUBSTACK,
-     6             BID    ,ELBUF_STR ,NLAY   ,IDRAPE  ,RDRAPE   ,
-     7             NEL    )
+     6             BID    ,ELBUF_STR ,NLAY   ,DRAPE_SH4N   ,NFT      ,
+     7             NEL    ,INDX_DRAPE ,SEDRAPE,NUMEL_DRAPE)
       ENDIF
        CALL CZLKEN3(JFT ,JLT  ,VOL  ,THK0 ,THK2 ,
      2              HM  ,HZ   ,A_I  ,PX1  ,PX2  ,

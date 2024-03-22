@@ -1,38 +1,42 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  ENG_QAPRINT_ANIMINPUT         source/output/qaprint/eng_qaprint_animinput.F
 Chd|-- called by -----------
 Chd|        ENG_QAPRINT_DRIVER            source/output/qaprint/eng_qaprint_driver.F
 Chd|-- calls ---------------
+Chd|        ANIM_MOD                      ../common_source/modules/anim_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
+Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
 Chd|====================================================================
-      SUBROUTINE ENG_QAPRINT_ANIMINPUT()
+      SUBROUTINE ENG_QAPRINT_ANIMINPUT(SENSORS)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE QA_OUT_MOD
       USE MESSAGE_MOD
+      USE ANIM_MOD
+      USE SENSOR_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -43,17 +47,12 @@ C-----------------------------------------------
 #include      "scr14_c.inc"
 #include      "scr25_c.inc"
 C-----------------------------------------------
-C   D u m m y   A r g u m e n t s
-C-----------------------------------------------
-C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I
       CHARACTER (LEN=255) :: VARNAME
       DOUBLE PRECISION TEMP_DOUBLE
-C-----------------------------------------------
-C   E x t e r n a l   F u n c t i o n s
-C-----------------------------------------------
+      TYPE (SENSORS_) ,INTENT(IN) :: SENSORS
 C=======================================================================
 C-----------------------------------------------
 C     QA PRINT FOR ANIM INPUTS
@@ -70,12 +69,16 @@ C-----------------------------------------------
         WRITE(VARNAME,'(A)') 'DTANIM0'
         TEMP_DOUBLE = DTANIM0
         CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),0,TEMP_DOUBLE)
+        
+        WRITE(VARNAME,'(A)') 'TANIM_STOP0'
+        TEMP_DOUBLE = TANIM_STOP0
+        CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),0,TEMP_DOUBLE)        
 
-        WRITE(VARNAME,'(A)') 'IANISENS'
-        CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),IANISENS,0.0_8)
+        WRITE(VARNAME,'(A)') 'SENSORS%ANIM_ID'
+        CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),SENSORS%ANIM_ID,0.0_8)
 
-        WRITE(VARNAME,'(A)') 'NLSENS'
-        CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),NLSENS,0.0_8)
+        WRITE(VARNAME,'(A)') 'SENSORS%NANIM'
+        CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),SENSORS%NANIM,0.0_8)
 
         WRITE(VARNAME,'(A)') 'MX_ANI'
         CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),MX_ANI,0.0_8)
@@ -141,10 +144,10 @@ C-----------------------------------------------
           ENDIF
         ENDDO
 
-        DO I = 1,MX_ANI
+        DO I = 1,SENSORS%NANIM
           IF(ANIM_FE(I)/=0)THEN
-            WRITE(VARNAME,'(A,I0)') 'LANISENS_',I
-            CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),LANISENS(I),0.0_8)
+            WRITE(VARNAME,'(A,I0)') 'SENSORS_NANIM_',I
+            CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),SENSORS%ANIM(I),0.0_8)
           ENDIF
         ENDDO
 

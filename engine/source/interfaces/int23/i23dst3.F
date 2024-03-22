@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  I23DST3                       source/interfaces/int23/i23dst3.F
 Chd|-- called by -----------
@@ -27,17 +27,17 @@ Chd|        I23MAINF                      source/interfaces/int23/i23mainf.F
 Chd|-- calls ---------------
 Chd|====================================================================
       SUBROUTINE I23DST3(
-     1  		JLT    ,CAND_N_N ,CAND_E_N ,CN_LOC ,CE_LOC ,
-     2  		X1     ,X2     ,X3     ,X4     ,Y1     ,
-     3  		Y2     ,Y3     ,Y4     ,Z1     ,Z2     ,
-     4  		Z3     ,Z4     ,XI     ,YI     ,ZI     ,
-     6  		IX1    ,IX2    ,IX3    ,IX4    ,NSVG   ,
-     7  		GAPV   ,INACTI ,INDEX  ,
-     8  		VXM    ,VYM    ,VZM    ,H1     ,H2     ,
-     9  		H3     ,H4     ,IRECT  ,CAND_P ,
-     A  		IFPEN  ,NX     ,NY     ,NZ     ,FTXSAV ,
-     B  		FTYSAV ,FTZSAV ,FXT    ,FYT   ,FZT     ,
-     C  		PENE   ,V      ,VXI    ,VYI   ,VZI     ,
+     1      JLT    ,CAND_N_N ,CAND_E_N ,CN_LOC ,CE_LOC ,
+     2      X1     ,X2     ,X3     ,X4     ,Y1     ,
+     3      Y2     ,Y3     ,Y4     ,Z1     ,Z2     ,
+     4      Z3     ,Z4     ,XI     ,YI     ,ZI     ,
+     6      IX1    ,IX2    ,IX3    ,IX4    ,NSVG   ,
+     7      GAPV   ,INACTI ,INDEX  ,
+     8      VXM    ,VYM    ,VZM    ,H1     ,H2     ,
+     9      H3     ,H4     ,IRECT  ,CAND_P ,
+     A      IFPEN  ,NX     ,NY     ,NZ     ,FTXSAV ,
+     B      FTYSAV ,FTZSAV ,FXT    ,FYT   ,FZT     ,
+     C      PENE   ,V      ,VXI    ,VYI   ,VZI     ,
      D                  MSI    ,STIF   ,JLT_NEW,NSMS  ,KINI    )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -47,10 +47,8 @@ C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
-#include      "com01_c.inc"
 #include      "com08_c.inc"
 #include      "sms_c.inc"
-#include      "warn_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -71,11 +69,6 @@ C-----------------------------------------------
      .     FXT(MVSIZ), FYT(MVSIZ), FZT(MVSIZ), 
      .     VXI(MVSIZ), VYI(MVSIZ), VZI(MVSIZ), MSI(MVSIZ), STIF(MVSIZ),
      .     H1(MVSIZ), H2(MVSIZ), H3(MVSIZ), H4(MVSIZ), V(3,*)
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "scr05_c.inc"
-#include      "parit_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -294,7 +287,7 @@ C
         Y12 = Y2(I) - Y1(I)
         Z12 = Z2(I) - Z1(I)
         LA = ONE - LB1(I) - LC1(I)
-Cel     HLA, HLB1, HLC1 necessaires pour triangle angle obtu
+C       HLA, HLB1, HLC1 necessaires pour triangle angle obtu
         AAA = ONE / MAX(EM20,X12*X12+Y12*Y12+Z12*Z12)
         HLA= LA*ABS(LA) * AAA
         INPROJ(1,I)=0
@@ -323,17 +316,17 @@ C
         Y23 = Y3(I) - Y2(I)
         Z23 = Z3(I) - Z2(I)
         LA = ONE - LB2(I) - LC2(I)
-Cel     HLA, HLB1, HLC1 necessaires pour triangle angle obtu
+C       HLA, HLB1, HLC1 necessaires pour triangle angle obtu
         AAA = ONE / MAX(EM20,X23*X23+Y23*Y23+Z23*Z23)
         HLA= LA*ABS(LA) * AAA
         INPROJ(2,I)=0
-	IF(LA<ZERO.AND.
+          IF(LA<ZERO.AND.
      +     HLA<=HLB2(I).AND.HLA<=HLC2(I))THEN
-	  LB2(I) = (XI3(I)*X23+YI3(I)*Y23+ZI3(I)*Z23)*AAA
-	  LB2(I) = MAX(ZERO,MIN(ONE,LB2(I)))
-	  LC2(I) = ONE - LB2(I)
+            LB2(I) = (XI3(I)*X23+YI3(I)*Y23+ZI3(I)*Z23)*AAA
+            LB2(I) = MAX(ZERO,MIN(ONE,LB2(I)))
+            LC2(I) = ONE - LB2(I)
           INPROJ(2,I)=1
-	ELSEIF(LB2(I)<ZERO.AND.
+          ELSEIF(LB2(I)<ZERO.AND.
      +          HLB2(I)<=HLC2(I).AND.HLB2(I)<=HLA)THEN
          LB2(I) = ZERO
          LC2(I) = AL3(I)
@@ -352,7 +345,7 @@ C
         Y34 = Y4(I) - Y3(I)
         Z34 = Z4(I) - Z3(I)
         LA = ONE - LB3(I) - LC3(I)
-Cel     HLA, HLB1, HLC1 necessaires pour triangle angle obtu
+C       HLA, HLB1, HLC1 necessaires pour triangle angle obtu
         AAA = ONE / MAX(EM20,X34*X34+Y34*Y34+Z34*Z34)
         HLA= LA*ABS(LA) * AAA
         INPROJ(3,I)=0
@@ -381,7 +374,7 @@ C
         Y41 = Y1(I) - Y4(I)
         Z41 = Z1(I) - Z4(I)
         LA = ONE - LB4(I) - LC4(I)
-Cel     HLA, HLB1, HLC1 necessaires pour triangle angle obtu
+C       HLA, HLB1, HLC1 necessaires pour triangle angle obtu
         AAA = ONE / MAX(EM20,X41*X41+Y41*Y41+Z41*Z41)
         HLA= LA*ABS(LA) * AAA
         INPROJ(4,I)=0

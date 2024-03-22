@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  SIGEPS36C                     source/materials/mat/mat036/sigeps36c.F
 Chd|-- called by -----------
@@ -29,20 +29,21 @@ Chd|        VINTER                        source/tools/curve/vinter.F
 Chd|        VINTER2                       source/tools/curve/vinter.F   
 Chd|====================================================================
       SUBROUTINE SIGEPS36C(
-     1     NEL    ,NUPARAM,NUVAR   ,NVARTMP ,MFUNC  ,
-     2     KFUNC  ,NPF    ,NPT0    ,IPT     ,IPLAS  ,
-     2     TF     ,TIME   ,TIMESTEP,UPARAM  ,RHO0   ,
-     3     AREA   ,EINT   ,THKLY   ,ASRATE  ,
-     4     EPSPXX ,EPSPYY ,EPSPXY  ,EPSPYZ  ,EPSPZX  ,
-     5     DEPSXX ,DEPSYY ,DEPSXY  ,DEPSYZ  ,DEPSZX  ,
-     6     EPSXX  ,EPSYY  ,EPSXY   ,EPSYZ   ,EPSZX   ,
-     7     SIGOXX ,SIGOYY ,SIGOXY  ,SIGOYZ  ,SIGOZX  ,
-     8     SIGNXX ,SIGNYY ,SIGNXY  ,SIGNYZ  ,SIGNZX  ,
-     9     SOUNDSP,VISCMAX,THK     ,PLA     ,UVAR    ,
-     A     VARTMP ,OFF    ,NGL     ,IPM     ,IMAT    ,
-     B     ETSE   ,GS     ,YLD     ,EPSP    ,ISRATE  ,
+     1     NEL    ,NUVAR   ,NVARTMP ,MFUNC  ,
+     2     KFUNC  ,NPF    ,IPLAS  ,
+     2     TF     ,TIMESTEP,UPARAM  ,RHO0   ,
+     3     THKLY   ,ASRATE  ,
+     4     EPSPXX ,EPSPYY ,EPSPXY  ,
+     5     DEPSXX ,DEPSYY ,DEPSXY  ,DEPSYZ  ,DEPSZX ,
+     6     EPSXX  ,EPSYY  ,EPSXY   ,
+     7     SIGOXX ,SIGOYY ,SIGOXY  ,SIGOYZ  ,SIGOZX ,
+     8     SIGNXX ,SIGNYY ,SIGNXY  ,SIGNYZ  ,SIGNZX ,
+     9     SOUNDSP,VISCMAX,THK     ,PLA     ,UVAR   ,
+     A     VARTMP ,OFF    ,IPM     ,IMAT   ,
+     B     ETSE   ,GS     ,YLD     ,EPSP    ,ISRATE ,
      C     DPLA_I ,GAMA_IMP,SIGNOR ,SHF     ,HARDM  ,
-     D     FACYLDI,SIGB   ,INLOC   ,DPLANL  )
+     D     FACYLDI,INLOC   ,DPLANL  ,DMG    ,PLANL  ,
+     E     SIGBXX,SIGBYY,SIGBXY  )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -61,8 +62,7 @@ C---------+---------+---+---+--------------------------------------------
 C NFUNC   |  1      | I | R | NUMBER FUNCTION USED FOR THIS USER LAW
 C IFUNC   | NFUNC   | I | R | FUNCTION INDEX 
 C NPF     |  *      | I | R | FUNCTION ARRAY   
-C NPT0    |  1      | I | R | NUMBER OF LAYERS OR INTEGRATION POINTS   
-C IPT     |  1      | I | R | LAYER OR INTEGRATION POINT NUMBER   
+C NPT0    |  1      | I | R | NUMBER OF LAYERS OR INTEGRATION POINTS    
 C IPLAS   |  *      | I | R | GEOMETRICAL FLAGS   
 C TF      |  *      | F | R | FUNCTION ARRAY 
 C---------+---------+---+---+--------------------------------------------
@@ -70,8 +70,6 @@ C TIME    |  1      | F | R | CURRENT TIME
 C TIMESTEP|  1      | F | R | CURRENT TIME STEP
 C UPARAM  | NUPARAM | F | R | USER MATERIAL PARAMETER ARRAY
 C RHO0    | NEL    | F | R | INITIAL DENSITY
-C AREA    | NEL    | F | R | AREA
-C EINT    | 2*NEL  | F | R | INTERNAL ENERGY(MEMBRANE,BENDING)
 C THKLY   | NEL    | F | R | LAYER THICKNESS
 C EPSPXX  | NEL    | F | R | STRAIN RATE XX
 C EPSPYY  | NEL    | F | R | STRAIN RATE YY
@@ -100,24 +98,21 @@ C---------+---------+---+---+--------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "parit_c.inc"
-#include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "scr05_c.inc"
 #include      "impl1_c.inc"
 C-----------------------------------------------
 C   I N P U T   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER NEL, NUPARAM, NUVAR, NVARTMP,NPT0,IMAT,IPT,ISRATE,INLOC
-      INTEGER IPLAS(*),NGL(NEL),IPM(NPROPMI,*)
-      my_real :: TIME,TIMESTEP,ASRATE
-      my_real :: UPARAM(*),SIGB(*),AREA(NEL),RHO0(NEL),EINT(NEL,2),
+      INTEGER NEL, NUVAR, NVARTMP,IMAT,ISRATE,INLOC
+      INTEGER IPLAS(*),IPM(NPROPMI,*)
+      my_real :: TIMESTEP,ASRATE
+      my_real :: UPARAM(*),RHO0(NEL),
      .   THKLY(NEL),PLA(NEL),FACYLDI(NEL),
-     .   EPSPXX(NEL),EPSPYY(NEL),EPSPXY(NEL),EPSPYZ(NEL),EPSPZX(NEL),
+     .   EPSPXX(NEL),EPSPYY(NEL),EPSPXY(NEL),
      .   DEPSXX(NEL),DEPSYY(NEL),DEPSXY(NEL),DEPSYZ(NEL),DEPSZX(NEL),
-     .   EPSXX(NEL) ,EPSYY(NEL),EPSXY(NEL),EPSYZ(NEL),EPSZX(NEL) ,
+     .   EPSXX(NEL) ,EPSYY(NEL),EPSXY(NEL),
      .   SIGOXX(NEL),SIGOYY(NEL),SIGOXY(NEL),SIGOYZ(NEL),SIGOZX(NEL),
-     .   GS(NEL),EPSP(NEL),SHF(NEL),HARDM(NEL),DPLANL(NEL)
+     .   GS(NEL),EPSP(NEL),SHF(NEL),HARDM(NEL),DPLANL(NEL),DMG(NEL),
+     .   PLANL(NEL)
 C-----------------------------------------------
 C   O U T P U T   A r g u m e n t s
 C-----------------------------------------------
@@ -131,6 +126,7 @@ C-----------------------------------------------
       my_real
      .    UVAR(NEL,NUVAR), OFF(NEL),THK(NEL),YLD(NEL)
       INTEGER, INTENT(INOUT) :: VARTMP(NEL,NVARTMP)
+      my_real, DIMENSION(NEL), INTENT(INOUT)  :: SIGBXX,SIGBYY,SIGBXY
 C-----------------------------------------------
 C   VARIABLES FOR FUNCTION INTERPOLATION 
 C-----------------------------------------------
@@ -139,30 +135,29 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER ::  I,J,K,N,II,J1,J2,NINDX,VP,IFAIL,OPTE,NINDEX_PLA,
-     .        NITER,NRATE,IPFUN,NFUNC,PFUN,IFUNCE,FUN1,FUN2,YLDCHECK
+      INTEGER ::  I,J,N,II,J1,J2,NINDX,VP,IFAIL,OPTE,NINDEX_PLA,
+     .        NITER,NRATE,IPFUN,NFUNC,PFUN,IFUNCE,FUN1,FUN2,YLDCHECK,
+     .        ISMOOTH
       INTEGER IAD1(MVSIZ),IPOS1(MVSIZ),ILEN1(MVSIZ),
      .        IAD2(MVSIZ),IPOS2(MVSIZ),ILEN2(MVSIZ),
      .        JJ(MVSIZ),INDEX(MVSIZ),IPOSP(MVSIZ),IPOSPE(MVSIZ),
      .        IFUNC(100),IADP(MVSIZ),ILENP(MVSIZ)
       INTEGER, DIMENSION(MVSIZ) :: INDEX_PLA
-      my_real :: A,B,C,P,P2,R,CC,FAC,DEZZ,SVM,
-     .        HKIN,DTINV,AAA,SOUNDSP1,ALPHA,CE,EINF,
-     .        ERR,F,DF,PLA_I,Q2,YLD_I,SIGPXX,SIGPYY,SIGPXY,
+      my_real :: A,P2,R,FAC,DEZZ,SVM,
+     .        HKIN,DTINV,AAA,SOUNDSP1,ALPHA,CE,EINF,EPSP1,EPSP2,
+     .        F,DF,Q2,YLD_I,SIGPXX,SIGPYY,SIGPXY,
      .        E1,A11,A21,G1,G31,NU11,NU21,NU_MNU,U_MNU,T_PNU,NUX,NU3,
-     .        EPSMAX,EPSR1,EPSR2,EPSF,FISOKIN,S1,S2,S3,DPLA,VM2,YLD0
+     .        EPSMAX,EPSR1,EPSR2,EPSF,FISOKIN,S1,S2,S3,YLD0
       my_real ::  FACT(NEL),E(MVSIZ),A1(MVSIZ),A2(MVSIZ),G(MVSIZ),
-     .        DYDX1(MVSIZ),DYDX2(MVSIZ),RATE(MVSIZ),
+     .        DYDX1(MVSIZ),DYDX2(MVSIZ),RFAC(MVSIZ),
      .        Y1(MVSIZ),Y2(MVSIZ),DR(MVSIZ),YFAC(MVSIZ,2),ESCALE(MVSIZ),
      .        AA(MVSIZ),BB(MVSIZ),DPLA_J(MVSIZ),  
      .        PP(MVSIZ),QQ(MVSIZ),FAIL(MVSIZ),H(MVSIZ),HK(MVSIZ),
      .        SIGEXX(MVSIZ),SIGEYY(MVSIZ),SIGEXY(MVSIZ),
      .        SVM2(MVSIZ),YLD2(MVSIZ),HI(MVSIZ),G3(MVSIZ),EPST(MVSIZ), 
      .        PFAC(MVSIZ),P0(MVSIZ),DFDP(MVSIZ),PSCALE(MVSIZ),   
-     .        DYDXE(MVSIZ),E0(MVSIZ),PLAP(MVSIZ)
-      my_real, DIMENSION(MVSIZ) :: TAB_LOC,VECNUL
-      my_real, DIMENSION(:) ,POINTER  :: SIGBXX,SIGBYY,SIGBXY,SIGBYZ,SIGBZX
-      TARGET  :: SIGB ,VECNUL   
+     .        DYDXE(MVSIZ),PLAP(MVSIZ)
+      my_real, DIMENSION(MVSIZ) :: TAB_LOC
 c------------------
       DATA NITER/3/
 C=======================================================================
@@ -197,22 +192,8 @@ C
       VP       = NINT(UPARAM(2*NRATE + 26)) ! flag for plastic strain dependency
       IFAIL    = NINT(UPARAM(2*NRATE + 27)) ! flag for failure
       YLDCHECK = NINT(UPARAM(2*NRATE + 28))
+      ISMOOTH  = NINT(UPARAM(2*NRATE + 29)) ! strain rate interpolation flag
 c-----------------------------
-      IF (FISOKIN > 0) THEN
-        SIGBXX => SIGB(1       :  NEL) 
-        SIGBYY => SIGB(NEL+1  :2*NEL)
-        SIGBXY => SIGB(2*NEL+1:3*NEL)
-        SIGBYZ => SIGB(3*NEL+1:4*NEL)
-        SIGBZX => SIGB(4*NEL+1:5*NEL)
-      ELSE
-        VECNUL(1:NEL) = ZERO
-        SIGBXX => VECNUL(1:NEL)
-        SIGBYY => VECNUL(1:NEL)
-        SIGBXY => VECNUL(1:NEL)
-        SIGBYZ => VECNUL(1:NEL)
-        SIGBZX => VECNUL(1:NEL)     
-      ENDIF
-c
       NINDEX_PLA = 0 
       VISCMAX(1:NEL) = ZERO
       ETSE(1:NEL) = ONE
@@ -272,6 +253,7 @@ c-------------------
      .   + SQRT( (EPSXX(1:NEL)-EPSYY(1:NEL))*(EPSXX(1:NEL)-EPSYY(1:NEL))
      .   + EPSXY(1:NEL)*EPSXY(1:NEL) ) )
         FAIL(1:NEL) = MAX(EM20,MIN(ONE,(EPSR2-EPST(1:NEL))/(EPSR2-EPSR1)))
+        DMG(1:NEL)  = ONE - MAX(ZERO,MIN(ONE,(EPSR2-EPST(1:NEL))/(EPSR2-EPSR1)))
       ELSE
         FAIL(1:NEL) = ONE
       ENDIF
@@ -353,13 +335,25 @@ c
               IF (EPSP(I) >= UPARAM(6+J)) JJ(I) = J
             ENDDO
           ENDDO
-#include "vectorize.inc"
-          DO I=1,NEL
-            FAC = UPARAM(6+JJ(I))
-            RATE(I) = (EPSP(I) - FAC)/(UPARAM(7+JJ(I)) - FAC)
-            YFAC(I,1)=UPARAM(6+NRATE+JJ(I))*FACYLDI(I)
-            YFAC(I,2)=UPARAM(6+NRATE+JJ(I)+1)*FACYLDI(I)
-          ENDDO
+          IF (ISMOOTH == 2) THEN      ! log_n  based interpolation of strain rate
+#include    "vectorize.inc"
+            DO I=1,NEL
+              EPSP1 = MAX(UPARAM(6+JJ(I)), EM20)
+              EPSP2 = UPARAM(7+JJ(I))
+              RFAC(I) = LOG(MAX(EPSP(I),EM20)/EPSP1) / LOG(EPSP2/EPSP1)
+              YFAC(I,1) = UPARAM(6+NRATE+JJ(I))  * FACYLDI(I)
+              YFAC(I,2) = UPARAM(7+NRATE+JJ(I))  * FACYLDI(I)
+            ENDDO
+          ELSE                        ! linear interpolation of strain rate
+#include    "vectorize.inc"
+            DO I=1,NEL
+              EPSP1 = UPARAM(6+JJ(I))
+              EPSP2 = UPARAM(7+JJ(I))
+              RFAC(I) = (EPSP(I) - EPSP1) / (EPSP2 - EPSP1)
+              YFAC(I,1) = UPARAM(6+NRATE+JJ(I)) * FACYLDI(I)
+              YFAC(I,2) = UPARAM(7+NRATE+JJ(I)) * FACYLDI(I)
+            ENDDO
+          END IF
 
 #include  "vectorize.inc"
           DO I=1,NEL
@@ -383,10 +377,10 @@ c
             DO I=1,NEL
              J1 = JJ(I)
              J2 = J1+1
-             Y1(I)=Y1(I)*YFAC(I,1)
-             Y2(I)=Y2(I)*YFAC(I,2)
-             FAC   = RATE(I)
-             YLD(I) = FAIL(I)*(Y1(I)    + FAC*(Y2(I)-Y1(I)))
+             Y1(I) = Y1(I)*YFAC(I,1)
+             Y2(I) = Y2(I)*YFAC(I,2)
+             FAC   = RFAC(I)
+             YLD(I) = FAIL(I)*(Y1(I) + FAC*(Y2(I)-Y1(I)))
              YLD(I) = MAX(YLD(I),EM20)
              DYDX1(I)=DYDX1(I)*YFAC(I,1)
              DYDX2(I)=DYDX2(I)*YFAC(I,2)
@@ -407,7 +401,7 @@ c
              J2 = J1+1
              FUN1 = IFUNC(J1)
              FUN2 = IFUNC(J2)
-             FAC   = RATE(I)
+             FAC   = RFAC(I)
              DYDX1(I)=DYDX1(I)*YFAC(I,1)
              DYDX2(I)=DYDX2(I)*YFAC(I,2)
              H(I)   = FAIL(I)*(DYDX1(I) + FAC*(DYDX2(I)-DYDX1(I)))
@@ -435,7 +429,7 @@ C           ECROUISSAGE CINEMATIQUE
               FUN2 = IFUNC(J2)
               Y1(I)=Y1(I)*YFAC(I,1)
               Y2(I)=Y2(I)*YFAC(I,2)
-              FAC   = RATE(I)
+              FAC   = RFAC(I)
               YLD(I) = FAIL(I)*(Y1(I)    + FAC*(Y2(I)-Y1(I)))
               YLD(I) = MAX(YLD(I),EM20)
               DYDX1(I)=DYDX1(I)*YFAC(I,1)
@@ -484,7 +478,13 @@ c         projection radiale
               DPLA_I(I) = OFF(I)*SVM*(ONE-R)/(G3(I)+H(I))
               PLA(I) = PLA(I) + DPLA_I(I)
               IF (INLOC == 0) THEN 
-                DEZZ = DPLA_I(I) * HALF*(SIGNXX(I)+SIGNYY(I)) / YLD(I)
+                IF(YLD(I) .NE. 0) THEN
+                  !YLD may be 0 when SIGNXX+SIGNYY == 0, that will cause floating point
+                  !exception in debug mode
+                  DEZZ = DPLA_I(I) * HALF*(SIGNXX(I)+SIGNYY(I)) / YLD(I)
+                ELSE
+                  DEZZ = ZERO 
+                ENDIF
                 DEZZ=-(DEPSXX(I)+DEPSYY(I))*NU_MNU-NU3*DEZZ
                 THK(I) = THK(I) + DEZZ*THKLY(I)*OFF(I)
               ENDIF
@@ -504,11 +504,13 @@ C-------------------------
             AA(I)= FOURTH*S1*S1
             BB(I)= THREE_OVER_4*S2*S2 + THREE*S3*S3
             SVM2(I)= AA(I)+BB(I)
-            IF (INLOC == 0) THEN   
+          ENDDO
+          IF (INLOC == 0) THEN 
+            DO I=1,NEL  
               DEZZ = -(DEPSXX(I)+DEPSYY(I))*NU_MNU
               THK(I) = THK(I) + DEZZ*THKLY(I)*OFF(I)
-            ENDIF
-          ENDDO
+            ENDDO
+          ENDIF
 C-------------------------
 C         GATHER PLASTIC FLOW
 C-------------------------
@@ -577,7 +579,7 @@ C------------------------------------------
                DEZZ = - NU3*DR(I)*S1/E(I) 
                THK(I) = THK(I) + DEZZ*THKLY(I)*OFF(I)
              ENDIF
-C-----       for kin hardening	   
+C-----       for kin hardening
              YLD(I) =YLD(I)+HI(I)*DPLA_I(I) 
             ENDDO
           ENDIF
@@ -697,12 +699,26 @@ C-------------------
             IF (PLAP(I) >= UPARAM(6+J)) JJ(I) = J  
           ENDDO                                    
         ENDDO                                      
+c
+        IF (ISMOOTH == 2) THEN       ! log_n  based interpolation of strain rate
+#include  "vectorize.inc"
+          DO I=1,NEL
+            EPSP1 = MAX(UPARAM(6+JJ(I)), EM20)
+            EPSP2 = UPARAM(7+JJ(I))
+            RFAC(I) = LOG(MAX(PLAP(I),EM20)/EPSP1) / LOG(EPSP2/EPSP1)
+          ENDDO
+        ELSE                        ! linear interpolation of strain rate
+#include  "vectorize.inc"
+          DO I=1,NEL
+            EPSP1 = UPARAM(6+JJ(I))
+            EPSP2 = UPARAM(7+JJ(I))
+            RFAC(I) = (PLAP(I) - EPSP1) / (EPSP2 - EPSP1)
+          ENDDO
+        END IF
 #include  "vectorize.inc"
         DO I=1,NEL
-          FAC = UPARAM(6+JJ(I))
-          RATE(I) = (PLAP(I) - FAC)/(UPARAM(7+JJ(I)) - FAC)
-          YFAC(I,1) = UPARAM(6+NRATE+JJ(I))  *FACYLDI(I)
-          YFAC(I,2) = UPARAM(6+NRATE+JJ(I)+1)*FACYLDI(I)
+          YFAC(I,1) = UPARAM(6+NRATE+JJ(I))  * FACYLDI(I)
+          YFAC(I,2) = UPARAM(7+NRATE+JJ(I))  * FACYLDI(I)
         ENDDO
 
 #include"vectorize.inc"
@@ -728,16 +744,16 @@ c-------------------------------
           DO I=1,NEL
             J1 = JJ(I)
             J2 = J1+1
-            Y1(I)=Y1(I)*YFAC(I,1)
-            Y2(I)=Y2(I)*YFAC(I,2)
-            FAC   = RATE(I)
-            YLD(I) = FAIL(I)*(Y1(I)    + FAC*(Y2(I)-Y1(I)))
-            YLD(I) = MAX(YLD(I),EM20)
-            DYDX1(I)=DYDX1(I)*YFAC(I,1)
-            DYDX2(I)=DYDX2(I)*YFAC(I,2)
-            H(I)   = FAIL(I)*(DYDX1(I) + FAC*(DYDX2(I)-DYDX1(I)))
-            YLD(I) = YLD(I)*MAX(ZERO,PFAC(I))
-            H(I)   = H(I)*MAX(ZERO,PFAC(I))          
+            Y1(I)= Y1(I)*YFAC(I,1)
+            Y2(I)= Y2(I)*YFAC(I,2)
+            FAC  = RFAC(I)
+            YLD(I)  = FAIL(I)*(Y1(I)    + FAC*(Y2(I)-Y1(I)))
+            YLD(I)  = MAX(YLD(I),EM20)
+            DYDX1(I)= DYDX1(I)*YFAC(I,1)
+            DYDX2(I)= DYDX2(I)*YFAC(I,2)
+            H(I)    = FAIL(I)*(DYDX1(I) + FAC*(DYDX2(I)-DYDX1(I)))
+            YLD(I)  = YLD(I)*MAX(ZERO,PFAC(I))
+            H(I)    = H(I)*MAX(ZERO,PFAC(I))          
           ENDDO
           DO I=1,NEL
            J1 = JJ(I)
@@ -754,14 +770,14 @@ c-------------------------------
             J2 = J1+1
             FUN1 = IFUNC(J1)
             FUN2 = IFUNC(J2)
-            FAC   = RATE(I)
+            FAC  = RFAC(I)
             DYDX1(I)=DYDX1(I)*YFAC(I,1)
             DYDX2(I)=DYDX2(I)*YFAC(I,2)
             H(I)   = FAIL(I)*(DYDX1(I) + FAC*(DYDX2(I)-DYDX1(I)))
-            Y1(I)=TF(NPF(FUN1)+1)
-            Y2(I)=TF(NPF(FUN2)+1)
-            Y1(I)=Y1(I)*YFAC(I,1)
-            Y2(I)=Y2(I)*YFAC(I,2)
+            Y1(I)  = TF(NPF(FUN1)+1)
+            Y2(I)  = TF(NPF(FUN2)+1)
+            Y1(I)  = Y1(I)*YFAC(I,1)
+            Y2(I)  = Y2(I)*YFAC(I,2)
             YLD(I) = FAIL(I)*(Y1(I) + FAC*(Y2(I)-Y1(I)))
             YLD(I) = YLD(I)*MAX(ZERO,PFAC(I))
             H(I)   = H(I)*MAX(ZERO,PFAC(I)) 
@@ -781,19 +797,19 @@ c-------------------------------
             J2 = J1+1
             FUN1 = IFUNC(J1)
             FUN2 = IFUNC(J2)
-            Y1(I)=Y1(I)*YFAC(I,1)
-            Y2(I)=Y2(I)*YFAC(I,2)
-            FAC   = RATE(I)
-            YLD(I) = FAIL(I)*(Y1(I)    + FAC*(Y2(I)-Y1(I)))
-            YLD(I) = MAX(YLD(I),EM20)
-            DYDX1(I)=DYDX1(I)*YFAC(I,1)
-            DYDX2(I)=DYDX2(I)*YFAC(I,2)
-            H(I)   = FAIL(I)*(DYDX1(I) + FAC*(DYDX2(I)-DYDX1(I)))
-            Y1(I)=TF(NPF(FUN1)+1)
-            Y2(I)=TF(NPF(FUN2)+1)
-            Y1(I)=Y1(I)*YFAC(I,1)
-            Y2(I)=Y2(I)*YFAC(I,2)
-            YLD(I) = (ONE - FISOKIN) * YLD(I) + 
+            Y1(I)= Y1(I)*YFAC(I,1)
+            Y2(I)= Y2(I)*YFAC(I,2)
+            FAC  = RFAC(I)
+            YLD(I)  = FAIL(I)*(Y1(I)    + FAC*(Y2(I)-Y1(I)))
+            YLD(I)  = MAX(YLD(I),EM20)
+            DYDX1(I)= DYDX1(I)*YFAC(I,1)
+            DYDX2(I)= DYDX2(I)*YFAC(I,2)
+            H(I)    = FAIL(I)*(DYDX1(I) + FAC*(DYDX2(I)-DYDX1(I)))
+            Y1(I)   = TF(NPF(FUN1)+1)
+            Y2(I)   = TF(NPF(FUN2)+1)
+            Y1(I)   = Y1(I)*YFAC(I,1)
+            Y2(I)   = Y2(I)*YFAC(I,2)
+            YLD(I)  = (ONE - FISOKIN) * YLD(I) + 
      .           FISOKIN * (FAIL(I)*(Y1(I)    + FAC*(Y2(I)-Y1(I))))
             YLD(I) = YLD(I)*MAX(ZERO,PFAC(I))
             H(I)   = H(I)*MAX(ZERO,PFAC(I))      
@@ -891,7 +907,7 @@ C------------------------------------------
                DEZZ = - NU3*DR(I)*S1/E(I) 
                THK(I) = THK(I) + DEZZ*THKLY(I)*OFF(I)
              ENDIF
-             !-----for kin hardening	   
+             !-----for kin hardening
              YLD(I) =YLD(I)+HI(I)*DPLA_I(I) 
           ENDDO 
         ENDIF 
@@ -902,13 +918,29 @@ c----------------------------------------------------------------------
 c     Element failure
 c----------------------------------------------------------------------
       IF (IFAIL == 1) THEN
-        DO I=1,NEL
-          IF (OFF(I) == ONE .and. PLA(I) > EPSMAX) OFF(I) = FOUR_OVER_5
-        ENDDO
+        IF (INLOC > 0) THEN 
+          DO I=1,NEL
+            IF (EPSMAX < EP20) DMG(I) = PLANL(I)/EPSMAX
+            IF (OFF(I) == ONE .AND. PLANL(I) > EPSMAX) OFF(I) = FOUR_OVER_5
+          ENDDO
+        ELSE 
+          DO I=1,NEL
+            IF (EPSMAX < EP20) DMG(I) = PLA(I)/EPSMAX
+            IF (OFF(I) == ONE .AND. PLA(I) > EPSMAX)   OFF(I) = FOUR_OVER_5
+          ENDDO
+        ENDIF
       ELSEIF (IFAIL == 2) THEN
-        DO I=1,NEL
-          IF (OFF(I) == ONE .and. (PLA(I) > EPSMAX .or. EPST(I) > EPSF)) OFF(I) = FOUR_OVER_5
-        ENDDO
+        IF (INLOC > 0) THEN
+          DO I=1,NEL 
+            IF (EPSMAX < EP20) DMG(I) = MAX(DMG(I),PLANL(I)/EPSMAX)
+            IF (OFF(I) == ONE .AND. (PLANL(I) > EPSMAX .OR. EPST(I) > EPSF)) OFF(I) = FOUR_OVER_5
+          ENDDO
+        ELSE
+          DO I=1,NEL 
+            IF (EPSMAX < EP20) DMG(I) = MAX(DMG(I),PLA(I)/EPSMAX)
+            IF (OFF(I) == ONE .AND. (PLA(I) > EPSMAX .OR. EPST(I) > EPSF))   OFF(I) = FOUR_OVER_5
+          ENDDO
+        ENDIF
       ENDIF     
 c----------------------------------------------------------------------
       IF (IMPL_S > 0) THEN
@@ -945,7 +977,7 @@ C     ECROUISSAGE CINE
 C------------------------------------------
       IF (FISOKIN > ZERO) THEN
         DO I=1,NEL
-	         HKIN  = FISOKIN*H(I)
+          HKIN  = FISOKIN*H(I)
           ALPHA = HKIN*DPLA_I(I)/YLD(I)
           SIGPXX = ALPHA*SIGNXX(I) 
           SIGPYY = ALPHA*SIGNYY(I) 

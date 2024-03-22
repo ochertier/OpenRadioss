@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  LAG_MULT_SOLV                 source/tools/lagmul/lag_mult_solv.F
 Chd|-- called by -----------
@@ -43,18 +43,11 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
 #include      "lagmult.inc"
-#include      "com04_c.inc"
-#include      "com06_c.inc"
 #include      "com08_c.inc"
-#include      "scr07_c.inc"
-#include      "scr14_c.inc"
-#include      "scr16_c.inc"
 #include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -80,7 +73,6 @@ C    External Functions
 C-----------------------------------------------
       INTEGER  CHOLFACT
       EXTERNAL CHOLFACT
-C-----------------------------------------------
 C-----------------------------------------------
 C
 C       | M | Lt| | a    | M ao
@@ -431,20 +423,12 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
 #include      "lagmult.inc"
-#include      "com04_c.inc"
-#include      "com06_c.inc"
 #include      "com08_c.inc"
-#include      "scr07_c.inc"
-#include      "scr14_c.inc"
-#include      "scr16_c.inc"
 #include      "units_c.inc"
-#include      "spmd_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -470,7 +454,6 @@ C    External Functions
 C-----------------------------------------------
       INTEGER  CHOLFACT
       EXTERNAL CHOLFACT
-C-----------------------------------------------
 C-----------------------------------------------
 C
 C       | M | Lt| | a    | M ao
@@ -800,7 +783,6 @@ C
 Chd|====================================================================
 Chd|  LAG_MULT_SDP                  source/tools/lagmul/lag_mult_solv.F
 Chd|-- called by -----------
-Chd|        LAG_MULTP                     source/tools/lagmul/lag_mult.F
 Chd|-- calls ---------------
 Chd|        ARRET                         source/system/arret.F         
 Chd|        LAG_MULT_HP                   source/tools/lagmul/lag_mult_h.F
@@ -822,23 +804,15 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
-#include      "lagmult.inc"
-#include      "com04_c.inc"
-#include      "com06_c.inc"
-#include      "com08_c.inc"
-#include      "scr07_c.inc"
-#include      "scr14_c.inc"
-#include      "scr16_c.inc"
-#include      "units_c.inc"
+#include "param_c.inc"
+#include "task_c.inc"
+#include "com08_c.inc"
 #ifdef MUMPS5
-#include      "dmumps_struc.h"
+#include "dmumps_struc.h"
+#include "lagmult.inc"
 #endif
-#include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -846,7 +820,6 @@ C-----------------------------------------------
       INTEGER LLL(*),JLL(*),IADLL(*),IADH(*),JCIH(*),IADHF(*),
      .        JCIHF(*),NPBYL(NNPBY,*),WORK2(*),WORK3(*),
      .        ICFTAG(*),JCFTAG(*), INDEXLAG(*)
-C     REAL
       my_real
      .  MAS(*),IN(*), A(3,*),AR(3,*),V(3,*),VR(3,*),
      .  XLL(*),P(*),R(*),Q(*),LAMBDA(*),RBYL(NRBY,*),
@@ -866,7 +839,6 @@ C    External Functions
 C-----------------------------------------------
       INTEGER  CHOLFACT
       EXTERNAL CHOLFACT
-C-----------------------------------------------
 C-----------------------------------------------
 C
 C       | M | Lt| | a    | M ao

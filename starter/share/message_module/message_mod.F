@@ -1,35 +1,40 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|-- called by -----------
 Chd|        INTBUF_INI                    ../common_source/interf/intbuf_ini.F
-Chd|        PBLAST_DEALLOCATE             ../common_source/modules/pblast_mod.F
-Chd|        PBLAST_LOAD                   ../common_source/modules/pblast_mod.F
-Chd|        PBLAST_WRITE_ENGINE           ../common_source/modules/pblast_mod.F
-Chd|        PBLAST_WRITE_STARTER          ../common_source/modules/pblast_mod.F
+Chd|        PBLAST_DEALLOCATE             ../common_source/modules/loads/pblast_mod.F
+Chd|        PBLAST_LOAD                   ../common_source/modules/loads/pblast_mod.F
+Chd|        PBLAST_PARAMETERS__AIR_BURST  ../common_source/modules/loads/pblast_mod.F
+Chd|        PBLAST_PARAMETERS__FREE_AIR   ../common_source/modules/loads/pblast_mod.F
+Chd|        PBLAST_PARAMETERS__SURFACE_BURST../common_source/modules/loads/pblast_mod.F
+Chd|        PBLAST_WRITE_ENGINE           ../common_source/modules/loads/pblast_mod.F
+Chd|        PBLAST_WRITE_STARTER          ../common_source/modules/loads/pblast_mod.F
 Chd|        PLOT_CURVE                    ../common_source/sortie/plot_curve.F
 Chd|        READ_UNITS                    ../common_source/comm/write_units.F
+Chd|        THSURF_READ_RESTART           ../common_source/modules/interfaces/th_surf_mod.F
+Chd|        TH_ALLOC                      ../common_source/modules/output/time_history_mod.F
 Chd|        ADDMASPART                    source/tools/admas/addmaspart.F
 Chd|        ADD_MASS_STAT                 source/tools/admas/add_mass_stat.F
 Chd|        ADMBCS                        source/model/remesh/admbcs.F  
@@ -38,7 +43,6 @@ Chd|        ADMLIST                       source/model/remesh/admlist.F
 Chd|        ALELEC                        source/ale/alelec.F           
 Chd|        ALE_CHECK_LAG                 source/ale/ale_check_lag.F    
 Chd|        ALE_EULER_INIT                source/materials/ale/ale_euler_init.F
-Chd|        ALE_SET_CONVECTION_CODES      source/materials/ale/ale_set_convection_codes.F
 Chd|        ALLOCBUF_AUTO                 source/elements/elbuf_init/allocbuf_auto.F
 Chd|        ANPRINT                       source/output/analyse/analyse_arret.F
 Chd|        AREA                          source/properties/spring/hm_read_prop32.F
@@ -88,6 +92,8 @@ Chd|        CHECKMP                       source/elements/initia/initia.F
 Chd|        CHECKRBY                      source/constraints/general/rbody/checkrby.F
 Chd|        CHECK_DYNAIN                  source/starter/check_dynain.F 
 Chd|        CHECK_ELTYP                   source/model/sets/check_eltyp.F
+Chd|        CHECK_MAT_ELEM_PROP_COMPATIBILITYsource/materials/mat/check_mat_elem_prop_compatibility.F
+Chd|        CHECK_PTHICKFAIL              source/materials/fail/check_pthickfail.F
 Chd|        CHECK_SURF                    source/groups/check_surf.F    
 Chd|        CHEKMP2                       source/elements/initia/initia.F
 Chd|        CHKFUNCT                      source/tools/curve/lecfun.F   
@@ -106,6 +112,7 @@ Chd|        CREATE_BOX_CLAUSE             source/model/sets/create_box_clause.F
 Chd|        CREATE_CHILD                  source/coupling/rad2rad/r2r_fork.F
 Chd|        CREATE_ELEMENT_FROM_PART      source/model/sets/create_element_from_part.F
 Chd|        CREATE_ELEM_ALL_CLAUSE        source/model/sets/create_elem_all_clause.F
+Chd|        CREATE_ELLIPSE_CLAUSE         source/model/sets/create_ellipse_clause.F
 Chd|        CREATE_ELT_BOX                source/model/sets/create_elt_box.F
 Chd|        CREATE_ELT_CLAUSE             source/model/sets/create_element_clause.F
 Chd|        CREATE_ELT_LIST               source/model/sets/create_element_clause.F
@@ -147,6 +154,7 @@ Chd|        CREATE_SURFACE_FROM_ELEMENT   source/model/sets/create_surface_from_
 Chd|        CRITYLD2000                   source/materials/mat/mat087/law87_upd.F
 Chd|        CSIGINI                       source/elements/shell/coque/csigini.F
 Chd|        CSIGINI4                      source/elements/shell/coqueba/scigini4.F
+Chd|        CSTRAINI4                     source/elements/shell/coqueba/cstraini4.F
 Chd|        CUSERINI4                     source/elements/shell/coqueba/cuserini4.F
 Chd|        DDSPLIT                       source/restart/ddsplit/ddsplit.F
 Chd|        DEALLOCATE_ELBUF              source/elements/elbuf_init/deallocate_buffer.F
@@ -156,15 +164,17 @@ Chd|        DEFINTER                      source/interfaces/interf1/definter.F
 Chd|        DOMDEC2                       source/spmd/domdec2.F         
 Chd|        DOMETIS                       source/spmd/domain_decomposition/grid2mat.F
 Chd|        DOMETIS2                      source/spmd/domain_decomposition/domdecs.F
+Chd|        DTNODA_STIFINT                source/interfaces/inter3d1/dtnoda_stifint.F
 Chd|        ECRAN1                        source/initial_conditions/detonation/ecran1.F
 Chd|        ECRSUB2                       source/model/assembling/hm_read_subset.F
 Chd|        EIGRLINE                      source/general_controls/computation/hm_read_eig.F
 Chd|        ELBUF_INI                     source/elements/elbuf_init/elbuf_ini.F
-Chd|        ELSTAGBOX2                    source/model/box/rdbox.F      
 Chd|        ELSTAGBOXBOX                  source/model/box/boxbox.F     
 Chd|        ERROR_ALLOC                   source/system/error_alloc.F   
 Chd|        FACEBOX                       source/model/box/bigbox.F     
 Chd|        FAILWAVE_INIT                 source/materials/fail/failwave_init.F
+Chd|        FAIL_FUN2SYS                  source/materials/tools/fail_fun2sys.F
+Chd|        FAIL_TAB2SYS                  source/materials/tools/fail_tab2sys.F
 Chd|        FCT_FIBER                     source/materials/mat/mat098/lossfun_98.F
 Chd|        FCT_FIBER_2                   source/materials/mat/mat098/lossfun_98.F
 Chd|        FILL_BUFFER_51                source/materials/mat/mat051/fill_buffer_51.F
@@ -177,6 +187,7 @@ Chd|        FILL_IGR                      source/model/sets/fill_igr.F
 Chd|        FILL_INTERCEP                 source/spmd/node/ddtools.F    
 Chd|        FILL_LINE                     source/model/sets/fill_gr.F   
 Chd|        FILL_SURF                     source/model/sets/fill_gr.F   
+Chd|        FILL_SURF_ELLIPSE             source/model/sets/fill_gr_surf_ellipse.F
 Chd|        FINDELE                       source/boundary_conditions/ebcs/findele.F
 Chd|        FIND_DT1BRICK_ENGINE          source/starter/contrl.F       
 Chd|        FIND_DT_ENGINE                source/coupling/rad2rad/r2r_speedup.F
@@ -241,6 +252,7 @@ Chd|        HM_GET_STRING                 source/devtools/hm_reader/hm_get_strin
 Chd|        HM_GET_STRING_INDEX           source/devtools/hm_reader/hm_get_string_index.F
 Chd|        HM_GROGRO                     source/groups/hm_grogro.F     
 Chd|        HM_GROGRONOD                  source/groups/hm_grogronod.F  
+Chd|        HM_GROUP_IS_USED              source/devtools/hm_reader/hm_group_is_used.F
 Chd|        HM_LECGRE                     source/groups/hm_lecgre.F     
 Chd|        HM_LECGRN                     source/groups/hm_lecgrn.F     
 Chd|        HM_LINENGR                    source/groups/hm_linengr.F    
@@ -335,28 +347,21 @@ Chd|        HM_READ_EOS_TABULATED         source/materials/eos/hm_read_eos_tabul
 Chd|        HM_READ_EOS_TILLOTSON         source/materials/eos/hm_read_eos_tillotson.F
 Chd|        HM_READ_EREF                  source/loads/reference_state/eref/hm_read_eref.F
 Chd|        HM_READ_FAIL                  source/materials/fail/hm_read_fail.F
-Chd|        HM_READ_FAIL_ALTER            source/materials/fail/windshield_alter/hm_read_fail_alter.F
 Chd|        HM_READ_FAIL_BIQUAD           source/materials/fail/biquad/hm_read_fail_biquad.F
-Chd|        HM_READ_FAIL_CHANG            source/materials/fail/changchang/hm_read_fail_chang.F
-Chd|        HM_READ_FAIL_CONNECT          source/materials/fail/connect/hm_read_fail_connect.F
-Chd|        HM_READ_FAIL_EMC              source/materials/fail/emc/hm_read_fail_emc.F
 Chd|        HM_READ_FAIL_ENERGY           source/materials/fail/energy/hm_read_fail_energy.F
 Chd|        HM_READ_FAIL_FABRIC           source/materials/fail/fabric/hm_read_fail_fabric.F
 Chd|        HM_READ_FAIL_FLD              source/materials/fail/fld/hm_read_fail_fld.F
 Chd|        HM_READ_FAIL_GENE1            source/materials/fail/gene1/hm_read_fail_gene1.F
 Chd|        HM_READ_FAIL_GURSON           source/materials/fail/gurson/hm_read_fail_gurson.F
-Chd|        HM_READ_FAIL_HASHIN           source/materials/fail/hashin/hm_read_fail_hashin.F
 Chd|        HM_READ_FAIL_HC_DSSE          source/materials/fail/hc_dsse/hm_read_fail_hc_dsse.F
+Chd|        HM_READ_FAIL_HOFFMAN          source/materials/fail/hoffman/hm_read_fail_hoffman.F
 Chd|        HM_READ_FAIL_INIEVO           source/materials/fail/inievo/hm_read_fail_inievo.F
 Chd|        HM_READ_FAIL_JOHNSON          source/materials/fail/johnson_cook/hm_read_fail_johnson.F
 Chd|        HM_READ_FAIL_LADEVEZE         source/materials/fail/ladeveze/hm_read_fail_ladeveze.F
-Chd|        HM_READ_FAIL_NXT              source/materials/fail/nxt/hm_read_fail_nxt.F
+Chd|        HM_READ_FAIL_MAXSTRAIN        source/materials/fail/max_strain/hm_read_fail_maxstrain.F
 Chd|        HM_READ_FAIL_ORTHBIQUAD       source/materials/fail/orthbiquad/hm_read_fail_orthbiquad.F
-Chd|        HM_READ_FAIL_ORTHSTRAIN       source/materials/fail/orthstrain/hm_read_fail_orthstrain.F
-Chd|        HM_READ_FAIL_PUCK             source/materials/fail/puck/hm_read_fail_puck.F
-Chd|        HM_READ_FAIL_RTCL             source/materials/fail/rtcl/hm_read_fail_rtcl.F
+Chd|        HM_READ_FAIL_ORTHENERG        source/materials/fail/orthenerg/hm_read_fail_orthenerg.F
 Chd|        HM_READ_FAIL_SAHRAEI          source/materials/fail/sahraei/hm_read_fail_sahraei.F
-Chd|        HM_READ_FAIL_SNCONNECT        source/materials/fail/snconnect/hm_read_fail_snconnect.F
 Chd|        HM_READ_FAIL_SPALLING         source/materials/fail/spalling/hm_read_fail_spalling.F
 Chd|        HM_READ_FAIL_SYAZWAN          source/materials/fail/syazwan/hm_read_fail_syazwan.F
 Chd|        HM_READ_FAIL_TAB1             source/materials/fail/tabulated/hm_read_fail_tab1.F
@@ -364,9 +369,9 @@ Chd|        HM_READ_FAIL_TAB2             source/materials/fail/tabulated/hm_rea
 Chd|        HM_READ_FAIL_TAB_OLD          source/materials/fail/tabulated/hm_read_fail_tab_old.F
 Chd|        HM_READ_FAIL_TBUTCHER         source/materials/fail/tuler_butcher/hm_read_fail_tbutcher.F
 Chd|        HM_READ_FAIL_TENSSTRAIN       source/materials/fail/tensstrain/hm_read_fail_tensstrain.F
+Chd|        HM_READ_FAIL_TSAIHILL         source/materials/fail/tsaihill/hm_read_fail_tsaihill.F
+Chd|        HM_READ_FAIL_TSAIWU           source/materials/fail/tsaiwu/hm_read_fail_tsaiwu.F
 Chd|        HM_READ_FAIL_USER             source/materials/fail/failuser/hm_read_fail_user.F
-Chd|        HM_READ_FAIL_WIERZBICKI       source/materials/fail/wierzbicki/hm_read_fail_wierzbicki.F
-Chd|        HM_READ_FAIL_WILKINS          source/materials/fail/wilkins/hm_read_fail_wilkins.F
 Chd|        HM_READ_FRICTION              source/interfaces/friction/reader/hm_read_friction.F
 Chd|        HM_READ_FRICTION_MODELS       source/interfaces/friction/reader/hm_read_friction_models.F
 Chd|        HM_READ_FRICTION_ORIENTATIONS source/interfaces/friction/reader/hm_read_friction_orientations.F
@@ -463,13 +468,17 @@ Chd|        HM_READ_MAT11_K_EPS           source/materials/mat/mat011/hm_read_ma
 Chd|        HM_READ_MAT12                 source/materials/mat/mat012/hm_read_mat12.F
 Chd|        HM_READ_MAT120                source/materials/mat/mat120/hm_read_mat120.F
 Chd|        HM_READ_MAT121                source/materials/mat/mat121/hm_read_mat121.F
+Chd|        HM_READ_MAT122                source/materials/mat/mat122/hm_read_mat122.F
+Chd|        HM_READ_MAT124                source/materials/mat/mat124/hm_read_mat124.F
 Chd|        HM_READ_MAT13                 source/materials/mat/mat013/hm_read_mat13.F
 Chd|        HM_READ_MAT14                 source/materials/mat/mat014/hm_read_mat14.F
 Chd|        HM_READ_MAT15                 source/materials/mat/mat015/hm_read_mat15.F
 Chd|        HM_READ_MAT151                source/materials/mat/mat151/hm_read_mat151.F
+Chd|        HM_READ_MAT158                source/materials/mat/mat158/hm_read_mat158.F
 Chd|        HM_READ_MAT16                 source/materials/mat/mat016/hm_read_mat16.F
 Chd|        HM_READ_MAT18                 source/materials/mat/mat018/hm_read_mat18.F
 Chd|        HM_READ_MAT19                 source/materials/mat/mat019/hm_read_mat19.F
+Chd|        HM_READ_MAT190                source/materials/mat/mat190/hm_read_mat190.F
 Chd|        HM_READ_MAT20                 source/materials/mat/mat020/hm_read_mat20.F
 Chd|        HM_READ_MAT21                 source/materials/mat/mat021/hm_read_mat21.F
 Chd|        HM_READ_MAT22                 source/materials/mat/mat022/hm_read_mat22.F
@@ -523,7 +532,7 @@ Chd|        HM_READ_MAT79                 source/materials/mat/mat079/hm_read_ma
 Chd|        HM_READ_MAT80                 source/materials/mat/mat080/hm_read_mat80.F
 Chd|        HM_READ_MAT81                 source/materials/mat/mat081/hm_read_mat81.F
 Chd|        HM_READ_MAT82                 source/materials/mat/mat082/hm_read_mat82.F
-Chd|        HM_READ_MAT83                 source/materials/mat/mat083/hm_read_law83.F
+Chd|        HM_READ_MAT83                 source/materials/mat/mat083/hm_read_mat83.F
 Chd|        HM_READ_MAT84                 source/materials/mat/mat084/hm_read_mat84.F
 Chd|        HM_READ_MAT87                 source/materials/mat/mat087/hm_read_mat87.F
 Chd|        HM_READ_MAT88                 source/materials/mat/mat088/hm_read_mat88.F
@@ -549,13 +558,13 @@ Chd|        HM_READ_MONVOL_TYPE7          source/airbag/hm_read_monvol_type7.F
 Chd|        HM_READ_MONVOL_TYPE8          source/airbag/hm_read_monvol_type8.F
 Chd|        HM_READ_MONVOL_TYPE9          source/airbag/hm_read_monvol_type9.F
 Chd|        HM_READ_MPC                   source/constraints/general/mpc/hm_read_mpc.F
-Chd|        HM_READ_MULLINS_OR            source/materials/fail/mullins_or/hm_read_fail_mullins_or.F
 Chd|        HM_READ_NBCS                  source/constraints/general/bcs/hm_read_nbcs.F
 Chd|        HM_READ_NODE                  source/elements/reader/hm_read_node.F
 Chd|        HM_READ_NONLOCAL              source/materials/nonlocal/hm_read_nonlocal.F
 Chd|        HM_READ_OUTP                  source/general_controls/engine/hm_read_outp.F
 Chd|        HM_READ_PART                  source/model/assembling/hm_read_part.F
 Chd|        HM_READ_PBLAST                source/loads/pblast/hm_read_pblast.F
+Chd|        HM_READ_PCYL                  source/loads/general/load_pcyl/hm_read_pcyl.F
 Chd|        HM_READ_PERTURB               source/general_controls/computation/hm_read_perturb.F
 Chd|        HM_READ_PERTURB_FAIL          source/general_controls/computation/hm_read_perturb_fail.F
 Chd|        HM_READ_PERTURB_PART_SHELL    source/general_controls/computation/hm_read_perturb_part_shell.F
@@ -662,6 +671,7 @@ Chd|        HM_READ_THGRNS                source/output/th/hm_read_thgrns.F
 Chd|        HM_READ_THGROU                source/output/th/hm_read_thgrou.F
 Chd|        HM_READ_THGRPA                source/output/th/hm_read_thgrpa.F
 Chd|        HM_READ_THGRPA_SUB            source/output/th/hm_read_thgrpa.F
+Chd|        HM_READ_THGRSENS              source/output/th/hm_read_thgrsens.F
 Chd|        HM_READ_THGRSURF              source/output/th/hm_read_thgrsurf.F
 Chd|        HM_READ_THPART                source/output/thpart/hm_read_thpart.F
 Chd|        HM_READ_TRIA                  source/elements/reader/hm_read_tria.F
@@ -669,6 +679,7 @@ Chd|        HM_READ_TRUSS                 source/elements/reader/hm_read_truss.F
 Chd|        HM_READ_UNIT                  source/general_controls/computation/hm_read_unit.F
 Chd|        HM_READ_UPWIND                source/general_controls/computation/hm_read_upwind.F
 Chd|        HM_READ_VISC                  source/materials/visc/hm_read_visc.F
+Chd|        HM_READ_VISC_LPRONY           source/materials/visc/hm_read_visc_lprony.F
 Chd|        HM_READ_VISC_PRONY            source/materials/visc/hm_read_visc_prony.F
 Chd|        HM_READ_WINDOW_USER           source/tools/userwi/hm_read_window_user.F
 Chd|        HM_READ_XELEM                 source/elements/reader/hm_read_xelem.F
@@ -731,6 +742,7 @@ Chd|        I24TRI                        source/interfaces/inter3d1/i24tri.F
 Chd|        I25BUCE_EDG                   source/interfaces/inter3d1/i25buce_edg.F
 Chd|        I25BUC_VOX1                   source/interfaces/inter3d1/i25buc_vox1.F
 Chd|        I25GAPM                       source/interfaces/inter3d1/i25sti3.F
+Chd|        I25NEIGH                      source/interfaces/inter3d1/i25neigh.F
 Chd|        I25NEIGH_MSG_ERR              source/interfaces/inter3d1/i25neigh.F
 Chd|        I25PEN3                       source/interfaces/inter3d1/i25pen3.F
 Chd|        I25PWR3                       source/interfaces/inter3d1/i25pwr3.F
@@ -776,6 +788,7 @@ Chd|        INIGUSER                      source/system/iniguser.F
 Chd|        ININT2                        source/interfaces/inter2d1/inint2.F
 Chd|        ININT3                        source/interfaces/inter3d1/inint3.F
 Chd|        ININT3_THKVAR                 source/interfaces/inter3d1/inint3_thkvar.F
+Chd|        ININTMASS                     source/interfaces/inter3d1/inintmass.F
 Chd|        ININTR                        source/interfaces/interf1/inintr.F
 Chd|        ININTR2                       source/interfaces/inter3d1/inintr2.F
 Chd|        ININTR_ORTHDIRFRIC            source/interfaces/interf1/inintr_orthdirfric.F
@@ -810,6 +823,7 @@ Chd|        INI_RACK                      source/tools/lagmul/ini_rack.F
 Chd|        INI_SEATBELT                  source/tools/seatbelts/ini_seatbelt.F
 Chd|        INRCH2                        source/interfaces/inter2d1/inrch2.F
 Chd|        INSERT_CLAUSE_IN_SET          source/model/sets/insert_clause_in_set.F
+Chd|        INSOL3D                       source/interfaces/inter3d1/insol3.F
 Chd|        INSOLT10                      source/interfaces/inter3d1/insolt10.F
 Chd|        INSPCND                       source/elements/sph/inspcnd.F 
 Chd|        INSURF                        source/interfaces/interf1/insurf.F
@@ -838,13 +852,17 @@ Chd|        LAW112_UPD                    source/materials/mat/mat112/law112_upd
 Chd|        LAW113_UPD                    source/materials/mat/mat113/law113_upd.F
 Chd|        LAW114_UPD                    source/materials/mat/mat114/law114_upd.F
 Chd|        LAW119_UPD                    source/materials/mat/mat119/law119_upd.F
+Chd|        LAW158_UPD                    source/materials/mat/mat158/law158_upd.F
 Chd|        LAW36_UPD                     source/materials/mat/mat036/law36_upd.F
 Chd|        LAW42_UPD                     source/materials/mat/mat042/law42_upd.F
 Chd|        LAW58_UPD                     source/materials/mat/mat058/law58_upd.F
 Chd|        LAW62_UPD                     source/materials/mat/mat062/law62_upd.F
 Chd|        LAW69_NLSQF                   source/materials/tools/nlsqf.F
+Chd|        LAW69_NLSQF_AUTO              source/materials/tools/law69_nlsqf_auto.F
 Chd|        LAW69_UPD                     source/materials/mat/mat069/law69_upd.F
+Chd|        LAW70_UPD                     source/materials/mat/mat070/law70_upd.F
 Chd|        LAW76_UPD                     source/materials/mat/mat076/law76_upd.F
+Chd|        LAW77_UPD                     source/materials/mat/mat077/law77_upd.F
 Chd|        LAW87_UPD                     source/materials/mat/mat087/law87_upd.F
 Chd|        LAW88_UPD                     source/materials/mat/mat088/law88_upd.F
 Chd|        LAW90_UPD                     source/materials/mat/mat090/law90_upd.F
@@ -894,6 +912,7 @@ Chd|        M5IN3                         source/initial_conditions/detonation/m
 Chd|        M75INIT                       source/materials/mat/mat075/m75init.F
 Chd|        MASS_FLUID_QD                 source/fluid/mass-fluid_qd.F  
 Chd|        MASS_FLUID_TG                 source/fluid/mass-fluid_tg.F  
+Chd|        MAT11CHECK                    source/materials/mat/mat011/mat11check.F
 Chd|        MATFUN_USR2SYS                source/materials/tools/matfun_usr2sys.F
 Chd|        MATINI                        source/materials/mat_share/matini.F
 Chd|        MATTAB_USR2SYS                source/materials/tools/mattab_usr2sys.F
@@ -901,7 +920,6 @@ Chd|        MERGE                         source/model/submodel/merge.F
 Chd|        MERGE_BUCKET_SEARCH           source/elements/nodes/merge_bucket_search.F
 Chd|        MERGE_CNOD_CNOD               source/model/submodel/merge_cnod_cnod.F
 Chd|        MERGE_NODE                    source/elements/nodes/merge_node.F
-Chd|        MESHGEMS_TETRA                stub/fvmbags_stub.F           
 Chd|        MONVOL_BUILD_EDGES            share/modules1/monvol_struct_mod.F
 Chd|        MONVOL_CHECK_DELETE_DUPLICATEDsource/airbag/monvol_check_delete_duplicated.F
 Chd|        MONVOL_CHECK_SURFCLOSE        share/modules1/monvol_struct_mod.F
@@ -939,6 +957,7 @@ Chd|        PRELECSEC4BOLT                source/tools/sect/prelecsec4bolt.F
 Chd|        PREPARE_INT25                 source/model/mesh/build_cnel.F
 Chd|        PREPARE_SPLIT_I25E2E          source/spmd/prepare_split_i25e2e.F
 Chd|        PREREAD_RBODY_SET             source/model/sets/preread_rbody_set.F
+Chd|        PRE_STACKGROUP                source/stack/pres_stackgroup.F
 Chd|        PRINTBCS                      source/constraints/general/bcs/printbcs.F
 Chd|        PRINTGROUP                    source/output/outfile/printgroup.F
 Chd|        Q4DERI2                       source/elements/solid_2d/quad4/q4deri2.F
@@ -1007,9 +1026,9 @@ Chd|        READ_SENSOR_VEL               source/tools/sensor/read_sensor_vel.F
 Chd|        READ_SENSOR_WORK              source/tools/sensor/read_sensor_work.F
 Chd|        REALLOC_IDDCONNECT            source/spmd/node/ddtools.F    
 Chd|        REALLOC_IFRONT                source/spmd/node/ddtools.F    
-Chd|        REMN_I2                       source/interfaces/inter3d1/i7remnode.F
 Chd|        REMN_I2OP                     source/interfaces/inter3d1/i7remnode.F
 Chd|        REMN_I2OP_EDG25               source/interfaces/int25/i25remlin.F
+Chd|        REMN_SELF24                   source/interfaces/inter3d1/remn_self24.F
 Chd|        RETRIRBY                      source/constraints/general/merge/hm_read_merge.F
 Chd|        RIGID_MAT                     source/materials/mat/mat019/rigid_mat.F
 Chd|        RIGMODIF_ND                   source/elements/solid/solide10/dim_s10edg.F
@@ -1026,6 +1045,7 @@ Chd|        R_YLD2000                     source/materials/mat/mat087/law87_upd.
 Chd|        S10COOR3                      source/elements/solid/solide10/s10coor3.F
 Chd|        S10COOR3_OLD                  source/elements/solid/solide10/s10coor3.F
 Chd|        S10DERI3                      source/elements/solid/solide10/s10deri3.F
+Chd|        S10EDG_RLINK                  source/elements/solid/solide10/s10edg_rlink.F
 Chd|        S10INIT3                      source/elements/solid/solide10/s10init3.F
 Chd|        S16COOR3                      source/elements/thickshell/solide16/s16coor3.F
 Chd|        S16DERI3                      source/elements/thickshell/solide16/s16deri3.F
@@ -1062,9 +1082,11 @@ Chd|        SETRBYON                      source/constraints/general/rbody/hm_re
 Chd|        SET_ADMESH                    source/model/remesh/set_admesh.F
 Chd|        SET_INIT                      source/model/sets/set_init.F  
 Chd|        SET_INTERCEP                  source/spmd/node/ddtools.F    
+Chd|        SET_USER_WINDOW_NODES         source/user_interface/user_windows_tools.F
 Chd|        SGRHEAD                       source/elements/solid/solide/sgrhead.F
 Chd|        SGRTAILS                      source/elements/solid/solide/sgrtails.F
 Chd|        SINIT3                        source/elements/solid/solide/sinit3.F
+Chd|        SJACIDP                       source/elements/solid/solide/sjacidp.F
 Chd|        SJAC_I                        source/elements/solid/solide/sderi3.F
 Chd|        SMORTH3                       source/elements/solid/solide/smorth3.F
 Chd|        SMS_INIT                      source/ams/sms_init.F         
@@ -1074,6 +1096,7 @@ Chd|        SOLTOSPHV4                    source/elements/sph/soltosph.F
 Chd|        SOLTOSPHV8                    source/elements/sph/soltosph.F
 Chd|        SOLTOSPHX4                    source/elements/sph/soltosph.F
 Chd|        SOLTOSPHX8                    source/elements/sph/soltosph.F
+Chd|        SORT_LOGICAL_SENSORS          source/tools/sensor/sort_logical_sensors.F
 Chd|        SPCOOR3                       source/elements/solid/sconnect/spcoor3.F
 Chd|        SPGRHEAD                      source/elements/sph/spgrhead.F
 Chd|        SPGRTAILS                     source/elements/sph/spgrtails.F
@@ -1084,6 +1107,7 @@ Chd|        SPLIT_CAND_I20_EDGE           source/restart/ddsplit/inter_tools.F
 Chd|        SPLIT_CAND_I24                source/restart/ddsplit/inter_tools.F
 Chd|        SPLIT_CAND_I25                source/restart/ddsplit/inter_tools.F
 Chd|        SPLIT_CAND_I7                 source/restart/ddsplit/inter_tools.F
+Chd|        SPLIT_EBCS                    source/boundary_conditions/ebcs/split_ebcs.F
 Chd|        SPLIT_INTERFACES              source/restart/ddsplit/split_interfaces.F
 Chd|        SPLIT_NISUB_I25               source/restart/ddsplit/inter_tools.F
 Chd|        SPLIT_NISUB_I7                source/restart/ddsplit/inter_tools.F
@@ -1093,11 +1117,13 @@ Chd|        SPLIT_REMNODE_I25             source/restart/ddsplit/inter_tools.F
 Chd|        SPLIT_REMNODE_I25_E2S         source/restart/ddsplit/inter_tools.F
 Chd|        SPLIT_REMNODE_I25_EDGE        source/restart/ddsplit/inter_tools.F
 Chd|        SPLIT_REMNODE_I7              source/restart/ddsplit/inter_tools.F
+Chd|        SPMD_USERWI_REST              source/user_interface/user_windows_tools.F
 Chd|        SPTRI                         source/elements/sph/sptri.F   
 Chd|        SRCOOR3                       source/elements/solid/solide/srcoor3.F
 Chd|        SREFDERI3                     source/elements/solid/solide/srefsta3.F
 Chd|        SREFSTA3                      source/elements/solid/solide/srefsta3.F
 Chd|        STACKGROUP                    source/stack/stackgroup.F     
+Chd|        STACKGROUP_DRAPE              source/stack/stackgroup_drape.F
 Chd|        STARTER0                      source/starter/starter0.F     
 Chd|        STATE_ADMESH                  source/model/remesh/state_admesh.F
 Chd|        STOCK_MSG                     source/output/message/stock_msg.F
@@ -1111,14 +1137,17 @@ Chd|        SZDERI3                       source/elements/solid/solidez/szderi3.
 Chd|        SZREFDERI3                    source/elements/solid/solide/srefsta3.F
 Chd|        T3GRHEAD                      source/elements/solid_2d/tria/t3grhead.F
 Chd|        T3GRTAILS                     source/elements/solid_2d/tria/t3grtails.F
+Chd|        TABLE_SLOPE                   source/materials/tools/table_slope.F
 Chd|        TAGNODS                       source/groups/tagnod.F        
 Chd|        TAGNODS_R2R                   source/coupling/rad2rad/tagnod_r2r.F
 Chd|        TAGNOD_R2R                    source/coupling/rad2rad/tagnod_r2r.F
+Chd|        TAGNOD_R2R_NL                 source/coupling/rad2rad/tagnod_r2r_nl.F
 Chd|        TAG_NODE_FROM_1D_2D_ELEM      source/model/sets/tag_node_from_1D_2D_elem.F
 Chd|        TAG_NODE_FROM_RBODY           source/model/sets/tag_node_from_rbody.F
 Chd|        TAG_NODE_FROM_SOLID           source/model/sets/tag_node_from_solid.F
 Chd|        TETA45_YLD2000                source/materials/mat/mat087/law87_upd.F
 Chd|        THICKINI                      source/elements/shell/coqueba/thickini.F
+Chd|        TH_SURF_LOAD_PRESSURE         source/output/th/th_surf_load_pressure.F
 Chd|        TINIT3                        source/elements/truss/tinit3.F
 Chd|        TRACE_PRINT                   source/system/trace_back.F    
 Chd|        TRIINTFRIC                    source/interfaces/interf1/trintfric.F
@@ -1133,8 +1162,11 @@ Chd|        UNIFY_X                       source/tools/curve/func_slope.F
 Chd|        UNIT_CODE                     source/general_controls/computation/unit_code.F
 Chd|        UPDMAT                        source/materials/updmat.F     
 Chd|        VDOUBL2                       source/system/sysfus.F        
+Chd|        WRITE_PCYL                    source/loads/general/load_pcyl/write_pcyl.F
 Chd|        W_ISPH                        source/restart/ddsplit/w_isph.F
 Chd|        W_RSPH                        source/restart/ddsplit/w_rsph.F
+Chd|        W_TH_SURF_LOADP               source/restart/ddsplit/w_th_surf_loadp.F
+Chd|        W_TH_SURF_PLOAD               source/restart/ddsplit/w_th_surf_pload.F
 Chd|        W_TYPE8                       source/restart/ddsplit/split_interfaces.F
 Chd|        XGRHEAD                       source/elements/xelem/xgrhead.F
 Chd|        XGRTAILS                      source/elements/xelem/xgrtails.F

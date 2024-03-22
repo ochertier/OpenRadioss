@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  SIGEPS120_CONNECT_TAB_VM      source/materials/mat/mat120/sigeps120_connect_tab_vm.F
 Chd|-- called by -----------
@@ -35,7 +35,7 @@ Chd|====================================================================
      3     AREA    ,DEPSZZ  ,DEPSYZ  ,DEPSZX  ,NUPARAM ,
      4     SIGOZZ  ,SIGOYZ  ,SIGOZX  ,SIGNZZ  ,SIGNYZ  ,SIGNZX  ,
      5     PLA     ,JSMS    ,DMELS   ,UVAR    ,NUVAR   ,
-     6     NUMTABL ,ITABLE  ,TABLE   ,NVARTMP ,VARTMP  ,TEMP    )
+     6     NUMTABL ,ITABLE  ,TABLE   ,NVARTMP ,VARTMP  ,TEMP    ,DMG)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -67,7 +67,7 @@ c
       my_real ,DIMENSION(NEL) ,INTENT(OUT) :: EPSD
       my_real ,DIMENSION(NEL) ,INTENT(OUT) :: 
      .                   SIGNZZ,SIGNYZ,SIGNZX
-      my_real ,DIMENSION(NEL) ,INTENT(INOUT) :: OFF,PLA,STIFM,DMELS
+      my_real ,DIMENSION(NEL) ,INTENT(INOUT) :: OFF,PLA,STIFM,DMELS,DMG
       my_real ,DIMENSION(NEL,NUVAR) ,INTENT(INOUT) :: UVAR
       INTEGER ,DIMENSION(NEL,NVARTMP) ,INTENT(INOUT) :: VARTMP
       TYPE(TTABLE) ,DIMENSION(NTABLE) ,INTENT(IN)    :: TABLE
@@ -142,7 +142,8 @@ C---------------------------------------------
       STF(1:NEL)     = YOUNG *  AREA(1:NEL)                                            
       STIFM(1:NEL)   = STIFM(1:NEL)  + STF(1:NEL)*OFF(1:NEL)                                              
 C---------------------------------------------
-      DAM (1:NEL) = UVAR(1:NEL,2)
+      DAM (1:NEL) = DMG(1:NEL)
+      DPLA(1:NEL) = ZERO
       FDAM(1:NEL) = ONE - DAM(1:NEL)
       DO I = 1,NEL
         IF (OFF(I) < 0.001) OFF(I) = ZERO
@@ -185,7 +186,7 @@ c----------------------------------------------------
         XVEC1(1:NEL,1) = PLA(1:NEL)
         IPOS1(1:NEL,1) = VARTMP(1:NEL,1)
 c
-        CALL TABLE_VINTERP(TABLE(FUNC_YLD),NEL,IPOS1,XVEC1,YLD,HARDP)
+        CALL TABLE_VINTERP(TABLE(FUNC_YLD),NEL,NEL,IPOS1,XVEC1,YLD,HARDP)
 c
         YLD(1:NEL)   = YLD(1:NEL)   * YSCALE * JCRATE(1:NEL)
         HARDP(1:NEL) = HARDP(1:NEL) * YSCALE * JCRATE(1:NEL)
@@ -197,7 +198,7 @@ c
         IPOS2(1:NEL,1) = VARTMP(1:NEL,1)
         IPOS2(1:NEL,2) = 1
 c
-        CALL TABLE_VINTERP(TABLE(FUNC_YLD),NEL,IPOS2,XVEC2,YLD,HARDP)
+        CALL TABLE_VINTERP(TABLE(FUNC_YLD),NEL,NEL,IPOS2,XVEC2,YLD,HARDP)
 c
         YLD(1:NEL)   = YLD(1:NEL)   * YSCALE
         HARDP(1:NEL) = HARDP(1:NEL) * YSCALE
@@ -215,7 +216,7 @@ c
         IPOS3(1:NEL,2) = 1
         IPOS3(1:NEL,3) = 1
 c
-        CALL TABLE_VINTERP(TABLE(FUNC_YLD),NEL,IPOS3,XVEC3,YLD,HARDP)
+        CALL TABLE_VINTERP(TABLE(FUNC_YLD),NEL,NEL,IPOS3,XVEC3,YLD,HARDP)
 c
         YLD(1:NEL)   = YLD(1:NEL)   * YSCALE
         HARDP(1:NEL) = HARDP(1:NEL) * YSCALE
@@ -274,7 +275,6 @@ c
      .             -(  NF_YZ*NP_YZ + NF_ZX*NP_ZX)*TWO*G2
 c
             DPLA_DLAM = TWO*SQRT((J2(I) + TP*AS*I1(I)))
-            DPLA_DLAM = DPLA_DLAM / FDAM(I)
             DPHI_DLAM = DFDLAM - TWO*YLD(I)*HARDP(I)*DPLA_DLAM
 c----------------------------------------------------------------
             DLAM = -PHI(I) / DPHI_DLAM
@@ -306,7 +306,7 @@ c
               IPOS1(II,1) = VARTMP(I,1)
             ENDDO
 c      
-            CALL TABLE_VINTERP(TABLE(FUNC_YLD),NEL,IPOS1,XVEC1,YLD_I,HARDP_I)
+            CALL TABLE_VINTERP(TABLE(FUNC_YLD),NEL,NEL,IPOS1,XVEC1,YLD_I,HARDP_I)
 c      
             DO II = 1, NINDX 
               I = INDX(II)
@@ -323,7 +323,7 @@ c
               IPOS2(II,1) = VARTMP(I,1)
             ENDDO
 c      
-            CALL TABLE_VINTERP(TABLE(FUNC_YLD),NINDX,IPOS2,XVEC2,YLD_I,HARDP_I)
+            CALL TABLE_VINTERP(TABLE(FUNC_YLD),NEL,NINDX,IPOS2,XVEC2,YLD_I,HARDP_I)
 c      
             DO II = 1, NINDX 
               I = INDX(II)
@@ -341,7 +341,7 @@ c
               IPOS3(II,1) = VARTMP(I,1)
             ENDDO
 c      
-            CALL TABLE_VINTERP(TABLE(FUNC_YLD),NEL,IPOS3,XVEC3,YLD_I,HARDP_I)
+            CALL TABLE_VINTERP(TABLE(FUNC_YLD),NEL,NEL,IPOS3,XVEC3,YLD_I,HARDP_I)
 c      
             DO II = 1, NINDX 
               I = INDX(II)
@@ -388,14 +388,16 @@ c
         DO II = 1,NINDX
           I = INDX(II)
 c
+          TRIAX = ZERO
+          FACT = ONE
           FACR = ONE + D_JC * JCR_LOG(I)  ! total strain rate factor on damage
-          IF (ITRX == 1) THEN
-            TRIAX = THIRD * I1(I) / SQRT(THREE*J2(I))
+          IF ( J2(I)/= ZERO)TRIAX = THIRD * I1(I) / SQRT(THREE*J2(I))
+          IF (ITRX == 1 ) THEN
             FACT  = EXP(-D_TRX*TRIAX)
-          ELSE IF (I1(I) <= ZERO) THEN  ! ITRX = 2 => no triaxiality influence in compression
-            FACT = ONE
-          END IF
-          GAMC = (D1C + D2C * FACT) * FACR
+          ELSE
+           IF (TRIAX > ZERO )FACT  = EXP(-D_TRX*TRIAX)
+          ENDIF
+         GAMC = (D1C + D2C * FACT) * FACR
           GAMF = (D1F + D2F * FACT) * FACR
           IF (GAMMA(I) > GAMC) THEN
             IF (DAM(I) == ZERO) THEN
@@ -412,7 +414,7 @@ c
               DAM(I) = ONE
               OFF(I) = FOUR_OVER_5
             END IF
-            UVAR(I,2) = DAM(I)
+            DMG(I) = DAM(I)
           END IF ! GAMMA > GAMC
         ENDDO
 c       Update damaged stress

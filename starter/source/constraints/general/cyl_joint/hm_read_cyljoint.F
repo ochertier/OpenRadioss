@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  HM_READ_CYLJOINT              source/constraints/general/cyl_joint/hm_read_cyljoint.F
 Chd|-- called by -----------
@@ -66,12 +66,9 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr17_c.inc"
-#include      "scr03_c.inc"
-#include      "com01_c.inc"
 #include      "units_c.inc"
 #include      "com04_c.inc"
 #include      "r2r_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -115,9 +112,9 @@ C
         NY=NY+1
 C----------Multidomaines --> on ignore les cyljoint non tags----------
         IF(NSUBDOM>0)THEN
-	        IF(TAGCYL(NY)==0)CALL HM_SZ_R2R(TAGCYL,NY,LSUBMODEL)
+                  IF(TAGCYL(NY)==0)CALL HM_SZ_R2R(TAGCYL,NY,LSUBMODEL)
         END IF
-C----------------------------------------------------------------------	
+C----------------------------------------------------------------------
         CALL HM_OPTION_READ_KEY(LSUBMODEL,
      .                       OPTION_ID = ID,
      .                       UNIT_ID = UID,
@@ -146,7 +143,7 @@ C
         DO LJ=1,NS
             NU = ITAB(LJOINT(K+LJ))
             CYL_JOIN(I)%SECONDARY_NODE(LJ) = LJOINT(K+LJ)
-	        IF(JOINT_SMS) CALL IFRONTPLUS(LJOINT(K+LJ),1)
+                  IF(JOINT_SMS) CALL IFRONTPLUS(LJOINT(K+LJ),1)
             !   ----------------------
             DO IDIR=1,6
                 CALL KINSET(64,NU,IKINE(LJOINT(K+LJ)),IDIR,0

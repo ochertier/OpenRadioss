@@ -1,33 +1,33 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  ANIOFFC_PLY                   source/output/anim/generate/anioffc_ply.F
 Chd|-- called by -----------
 Chd|        GENANI                        source/output/anim/generate/genani.F
 Chd|-- calls ---------------
 Chd|        SPMD_IGET_PARTN               source/mpi/anim/spmd_iget_partn.F
-Chd|        WRITE_C_C                     source/output/tools/sortie_c.c
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        WRITE_C_C                     ../common_source/tools/input_output/write_routtines.c
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        PLYXFEM_MOD                   share/modules/plyxfem_mod.F   
 Chd|        STACK_MOD                     share/modules/stack_mod.F     
 Chd|====================================================================
@@ -54,12 +54,7 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "param_c.inc"
 #include      "remesh_c.inc"
-#include      "rnur_c.inc"
-#include      "scr01_c.inc"
-#include      "scr05_c.inc"
-#include      "scr14_c.inc"
 #include      "scr17_c.inc"
-#include      "spmd_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -74,9 +69,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-C     REAL
       INTEGER I, NG, NEL, NFT, IAD, ITY, LFT, NPT,
-     .        N, J, LLT, MLW, NBX, IP,  NN, K1, K2,MT,JALE, IMID, 
+     .        N, J, LLT, MLW,  IP,  NN, K1, K2,MT,JALE, IMID, 
      .        N1,N2,N3,N4, NN1,NN2,NN3,NN4,NN5,NN6,NN7,NN8,NN9,NN10,
      .        N_FA, IHBE, SH_IH, ISTRAIN, IEXPAN,ISHPLYXFEM,NELXFE,IE,
      .        PLYELEMS(NUMELC),IPT,ELC,MPT,NGL(MVSIZ),ISUBSTACK,IPMAT_IPLY,
@@ -124,11 +118,6 @@ C
           ISUBSTACK = IPARG(71,NG)
           LFT=1
           LLT=NEL
-          NBX = IAD - 1
-C        ccc        NPT    =IPARG(6,NG)
-C-----------------------------------------------
-C       QUAD
-C-----------------------------------------------
 C-----------------------------------------------
 C       COQUES 4 N
 C-----------------------------------------------
@@ -147,7 +136,6 @@ C
              IFAILURE =  IPARG(43,NG)
              N_FA =NEL_PLY
              NELXFE = NELXFE + NEL
-             NBX  = NB6
              
               DO I=1,NEL
                 PID(I) = IXC(6,NFT + I)
@@ -159,12 +147,7 @@ C---+----1----+----2----+----3----+----4----+----5----+----6----+----7--
                  NEL5 = NEL*5
                  NEL8 = NEL*8
                  NPTM = MAX(1,MPT)
-                 NN13=NB12 + NPG*NEL8
-                 NN14=NN13 + NPG*NEL8*ISTRAIN
-                 NN15=NN14 + NPTM*NPG*NEL
                  IF (MPT >= ONE) THEN
-                   NN16=NN15 + NPG*MPT*NEL5
-                   NN16A=NN16 + 2*MPT*NEL
                  ENDIF
                  NBM_S = 6*NEL*MPT+NEL
                  NUVARR = ZERO
@@ -186,17 +169,12 @@ C
                       NUVARR = MAX(NUVARR,IPM(221,MATLY))
                  ENDDO
               ENDIF 
-               NBM_S = NBM_S + NEL*MPT*NUVARR
-               NBX = NN16A  + NBM_S*MAX(NPG,1) 
-               IF(IFAILURE == 1)NBX= NBX + NEL 
-C                NBX = NN16A  + NBM_S*MAX(NPG,1) + NEL 
-C     .                       + MAX(NPG,1)*NUVARD*NPT*NEL       
+              NBM_S = NBM_S + NEL*MPT*NUVARR
 C-----------------------------------------------
 C       COQUES 3 N
 C-----------------------------------------------
            ELSEIF(ITY==7)THEN
 c it's not available for T3  
-             NBX = NBX+16*NEL
            ENDIF
 C-----------------------------------------------
            IF(ITY == 3)THEN
@@ -229,8 +207,6 @@ C-----------------------------------------------
                               IOFF(EL2FA(N_FA+IE)) = MIN(IOFF(EL2FA(N_FA+IE)),OFFIPLY)
                         ENDDO
                     ENDDO   
-C!!     .               NINT(MIN(BUFLY%DMG(I),ONE))  ! on traite OFF de layer comme DMG
-C!!     .               NINT(MIN(BUFEL(NBX+(IPT- 1)*NEL + I),ONE)) 
                   ENDIF
                 ENDDO
              ELSE
@@ -249,8 +225,6 @@ C!!     .               NINT(MIN(BUFEL(NBX+(IPT- 1)*NEL + I),ONE))
                            IOFF(EL2FA(N_FA+IE))=MIN(IOFF(EL2FA(N_FA+IE)),OFFIPLY)
                         ENDDO
                      ENDDO      
-cc     .              NINT(MAX(ZERO,MIN(BUFLY%DMG(I),ONE)))
-!!     .              NINT(MAX(ZERO,MIN(BUFLY%LBUF(1,1,1)%OFF(I),ONE)))
                   ELSE
                     DO IS = 1,NPTS
                         DO IR = 1,NPTR 
@@ -259,8 +233,6 @@ cc     .              NINT(MAX(ZERO,MIN(BUFLY%DMG(I),ONE)))
                              IOFF(EL2FA(N_FA+IE)) =MIN(IOFF(EL2FA(N_FA+IE)),OFFIPLY) 
                         ENDDO
                      ENDDO   
-cc     .               NINT(MIN(BUFLY%DMG(I),ONE))
-!!     .               NINT(MIN(BUFLY%LBUF(1,1,1)%OFF(I),ONE))
                   END IF
                 ENDIF
               ENDDO

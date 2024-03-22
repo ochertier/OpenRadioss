@@ -1,35 +1,35 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
-Copyright>        but WITHOUT ANY WARRAITY; without even the implied warraITY of
+Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  SPMD_EXCH_DELETED_SURF_EDGE   source/mpi/interfaces/spmd_exch_deleted_surf_edge.F
 Chd|-- called by -----------
 Chd|        RESOL                         source/engine/resol.F         
 Chd|-- calls ---------------
-Chd|        ALLOC_1D_ARRAY                share/modules/array_mod.F     
-Chd|        DEALLOC_1D_ARRAY              share/modules/array_mod.F     
+Chd|        ALLOC_1D_ARRAY                ../common_source/modules/array_mod.F
+Chd|        DEALLOC_1D_ARRAY              ../common_source/modules/array_mod.F
 Chd|        FIND_EDGE_FROM_REMOTE_PROC    source/interfaces/interf/find_edge_from_remote_proc.F
 Chd|        FIND_SURFACE_FROM_REMOTE_PROC source/interfaces/interf/find_surface_from_remote_proc.F
-Chd|        ARRAY_MOD                     share/modules/array_mod.F     
+Chd|        ARRAY_MOD                     ../common_source/modules/array_mod.F
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
 Chd|        SHOOTING_NODE_MOD             share/modules/shooting_node_mod.F
 Chd|====================================================================
@@ -53,7 +53,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -67,7 +66,6 @@ C-----------------------------------------------
 #include      "task_c.inc"
 #include      "com04_c.inc"
 #include      "scr17_c.inc"
-#include      "rnur_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -88,7 +86,7 @@ C-----------------------------------------------
         my_real, DIMENSION(NPROPG,NUMGEO), INTENT(in) :: GEO
         INTEGER, DIMENSION(0:LCNEL), INTENT(in) :: CNEL ! connectivity node-->element
         INTEGER, DIMENSION(NUMNOD), INTENT(inout) :: TAG_NODE
-        INTEGER, DIMENSION(NUMELS+NUMELQ+NUMELC+NUMELT+NUMELP+NUMELR+NUMELTG+NUMELUR), INTENT(inout) :: TAG_ELEM
+        INTEGER, DIMENSION(NUMELS+NUMELQ+NUMELC+NUMELT+NUMELP+NUMELR+NUMELTG), INTENT(inout) :: TAG_ELEM
 #ifdef MPI
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
@@ -240,8 +238,10 @@ C-----------------------------------------------
             NB_SURFACE = REMOTE_SURF_PER_PROC_2(1,K)
             ADDRESS = INDEX_BUFFER_R_2(K)
 
-            CALL FIND_SURFACE_FROM_REMOTE_PROC(SHOOT_STRUCT,NB_SURFACE,BUFFER_R(ADDRESS),INTBUF_TAB,ITABM1 )
-
+            CALL FIND_SURFACE_FROM_REMOTE_PROC(SHOOT_STRUCT,NB_SURFACE,BUFFER_R(ADDRESS),INTBUF_TAB,ITABM1,
+     .                                         IPARI,GEO,
+     .                                         IXS,IXC,IXT,IXP,IXR,IXTG,
+     .                                         ADDCNEL,CNEL,TAG_NODE,TAG_ELEM )
             NB_EDGE = REMOTE_SURF_PER_PROC_2(2,K)
             ADDRESS = INDEX_BUFFER_R_2(K)+4*NB_SURFACE  
             CALL FIND_EDGE_FROM_REMOTE_PROC( SHOOT_STRUCT,NB_EDGE,BUFFER_R(ADDRESS),INTBUF_TAB,ITABM1,

@@ -1,32 +1,44 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  WRCOMR                        source/restart/ddsplit/wrcomm.F
 Chd|-- called by -----------
 Chd|        DDSPLIT                       source/restart/ddsplit/ddsplit.F
 Chd|-- calls ---------------
+Chd|        ALE_MOD                       ../common_source/modules/ale/ale_mod.F
+Chd|        ANIM_MOD                      ../common_source/modules/anim_mod.F
+Chd|        OUTPUTS_MOD                   ../common_source/modules/outputs_mod.F
+Chd|        PARAMETERS_MOD                ../common_source/modules/interfaces/parameters_mod.F
 Chd|====================================================================
-      SUBROUTINE WRCOMR(LMXVREA,LVARREA,TABVREA,MS_ND,P)
+      SUBROUTINE WRCOMR(LMXVREA,LVARREA,TABVREA,MS_ND,P,INTER_PARAMETERS, UNITAB)
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
+      USE ANIM_MOD
+      USE OUTPUTS_MOD
+      USE ALE_MOD
+      USE PARAMETERS_MOD
+      USE UNITAB_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -35,33 +47,18 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER LMXVREA,LVARREA, I
-      my_real
-     .       TABVREA(*),MS_ND
+      my_real TABVREA(*),MS_ND
+      TYPE(UNIT_TYPE_), INTENT(IN) :: UNITAB
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com02_c.inc"
-#include      "com03_c.inc"
-#include      "com04_c.inc"
-#include      "com05_c.inc"
 #include      "com06_c.inc"
-#include      "com07_c.inc"
 #include      "com08_c.inc"
-#include      "com09_c.inc"
-#include      "com10_c.inc"
 #include      "lagmult.inc"
-#include      "param_c.inc"
 #include      "remesh_c.inc"
-#include      "scr03_c.inc"
-#include      "scr04_c.inc"
-#include      "scr05_c.inc"
-#include      "scr16_c.inc"
 #include      "scr18_c.inc"
 #include      "sms_c.inc"
 #include      "sphcom.inc"
-#include      "sysunit.inc"
-#include      "units_c.inc"
 #include      "inter22.inc"
 #include      "mmale51_c.inc"
 #include      "thermal_c.inc"
@@ -72,6 +69,7 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER IVAR,J,RVARINT,P
+      TYPE (PARAMETERS_) ,INTENT(IN):: INTER_PARAMETERS
 C--------------------------------------
 C     PREPARATION DES VARIABLES REELLES POUR ECRITURE SUR RFILE.
 C--------------------------------------
@@ -86,18 +84,18 @@ C-----
       TABVREA(4)=DT12
       TABVREA(5)=DT2OLD
       TABVREA(6)=TSTOP
-      TABVREA(7)=TDES
+      TABVREA(7)=0 !no longer used
       TABVREA(8)=THIS
 C-----
-      TABVREA(9)=DTDES
+      TABVREA(9)=0 !no longer used
       TABVREA(10)=DTHIS
       TABVREA(11)=DTFAC
       TABVREA(12)=DTMIN
       TABVREA(13)=VOLMIN
-          TABVREA(14)=TFEXT
+      TABVREA(14)=TFEXT
       TABVREA(15)=REINT
-      TABVREA(16)=DTPAT
-      TABVREA(17)=TPAT
+      TABVREA(16)=0 !no longer used
+      TABVREA(17)=0 !no longer used
       TABVREA(18)=DTANIM
       TABVREA(19)=TANIM
       TABVREA(20)=UREINT
@@ -108,18 +106,18 @@ C-----
       TABVREA(25)=T1S
       TABVREA(26)=DT2S
       TABVREA(27)=DT12S
-      TABVREA(28)=USREINT
+      TABVREA(28)=ZERO     !old USREINT
       TABVREA(29)=R2RFX1
       TABVREA(30)=R2RFX2
       TABVREA(31)=DAMPA
       TABVREA(32)=DAMPB
       TABVREA(33)=DAMPW
 C-----
-      TABVREA(34)=ALPHA
-      TABVREA(35)=GAMMA
-      TABVREA(36)=VGX
-      TABVREA(37)=VGY
-      TABVREA(38)=VGZ
+      TABVREA(34)=ALE%GRID%ALPHA
+      TABVREA(35)=ALE%GRID%GAMMA
+      TABVREA(36)=ALE%GRID%VGX
+      TABVREA(37)=ALE%GRID%VGY
+      TABVREA(38)=ALE%GRID%VGZ
 C-----
       TABVREA(39)=SPASORT
       TABVREA(40)=SPATRUE
@@ -145,11 +143,11 @@ C
       LVARREA= 105
       TABVREA(106)=DWMAD
       LVARREA=106
-      TABVREA(107)=FAC_MASS
-      TABVREA(108)=FAC_LENGTH
-      TABVREA(109)=FAC_TIME
+      TABVREA(107)=UNITAB%FAC_MASS
+      TABVREA(108)=UNITAB%FAC_LENGTH
+      TABVREA(109)=UNITAB%FAC_TIME
       TABVREA(110)=T1SH
-      TABVREA(111) =  UPWSM
+      TABVREA(111) =  ALE%UPWIND%UPWSM
       RVARINT = 111
       RVARINT = RVARINT + 1
       TABVREA(RVARINT) = TPSREF
@@ -237,9 +235,9 @@ C .sta files
       TABVREA(RVARINT) = TSTAT
 C .dynain files
       RVARINT = RVARINT + 1
-      TABVREA(RVARINT) = DTDYNAIN
+      TABVREA(RVARINT) = ZERO !DTDYNAIN
       RVARINT = RVARINT + 1
-      TABVREA(RVARINT) = TDYNAIN
+      TABVREA(RVARINT) = ZERO !TDYNAIN
 C
       RVARINT = RVARINT + 1
       TABVREA(RVARINT) = TADMESH
@@ -320,7 +318,20 @@ C  INITIAL MASS FROM STARTER
       TABVREA(RVARINT) = MASS0_START
       RVARINT = RVARINT + 1
       TABVREA(RVARINT) = ZERO    
-C      
+C ANIM FILES STOP TIME
+      RVARINT = RVARINT + 1
+      TABVREA(RVARINT) = TANIM_STOP       
+C INITIAL COORDS OF SPH RESERVE 
+      RVARINT = RVARINT + 1
+      TABVREA(RVARINT) = XI_RES  
+      RVARINT = RVARINT + 1
+      TABVREA(RVARINT) = YI_RES  
+      RVARINT = RVARINT + 1
+      TABVREA(RVARINT) = ZI_RES 
+C
+      RVARINT = RVARINT + 1
+      TABVREA(RVARINT) = INTER_PARAMETERS%DT_STIFINT   
+C
 C---- fin check point restart      
 C      
       LVARREA=RVARINT

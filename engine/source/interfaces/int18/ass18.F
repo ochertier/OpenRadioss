@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  ASS18                         source/interfaces/int18/ass18.F
 Chd|-- called by -----------
@@ -28,6 +28,7 @@ Chd|-- calls ---------------
 Chd|        MYQSORT                       ../common_source/tools/sort/myqsort.F
 Chd|        SPMD_EXCH_FR6                 source/mpi/kinematic_conditions/spmd_exch_fr6.F
 Chd|        SUM_6_FLOAT                   source/system/parit.F         
+Chd|        ANIM_MOD                      ../common_source/modules/anim_mod.F
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|====================================================================
       SUBROUTINE ASS18(NRTM  ,IRECT,A    ,X   ,SURF   ,
@@ -38,7 +39,8 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE H3D_MOD
-C=======================================================================
+      USE ANIM_MOD
+C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
@@ -47,10 +49,8 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "com06_c.inc"
 #include      "com08_c.inc"
-#include      "scr05_c.inc"
 #include      "scr07_c.inc"
 #include      "scr14_c.inc"
 #include      "scr16_c.inc"
@@ -62,21 +62,19 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NRTM,IBAG,IRECT(4,*),FR_I18(*),ISKY(*)
-      my_real 
-     .    A(3,*),X(3,*),SURF(3,*),PRES(*),FCONT(3,*),FSAV(*),
-     .    FSAVBAG(NTHVKI,*), FSKYI(LSKYI,*)
-c     .    SURFN(NUMNOD),CDGX,CDGY,CDGZ,VOLUME,PBAG,ALPHA
+      my_real A(3,*),X(3,*),SURF(3,*),PRES(*),FCONT(3,*),FSAV(*),
+     .        FSAVBAG(NTHVKI,*), FSKYI(LSKYI,*)
       TYPE(H3D_DATABASE) :: H3D_DATA
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER  ERROR,NSKYI18G,PMAIN,I,J,K,L,N,NN,NBAG,
-     .         PERM(NRTM)
-      my_real 
-     .    PRESMED,PRESMOY,SURFACE,SURFLOC,AAA,BBB,PRESM,PRESVOL,
-     .    CDGX,CDGY,CDGZ,VOLUME,PBAG,ALPHA,
-     .   F1(NRTM), F2(NRTM), F3(NRTM), F4(NRTM), F5(NRTM)
+      INTEGER ERROR,NSKYI18G,PMAIN,I,J,K,L,N,NN,NBAG,PERM(NRTM)
+      my_real PRESMED,PRESMOY,SURFACE,SURFLOC,AAA,BBB,PRESM,PRESVOL,
+     .        CDGX,CDGY,CDGZ,VOLUME,PBAG,ALPHA,
+     .        F1(NRTM), F2(NRTM), F3(NRTM), F4(NRTM), F5(NRTM)
        DOUBLE PRECISION I18F6(5,6), I18FB6(2,6)
+C-----------------------------------------------
+C   S o u r c e   L i n e s
 C-----------------------------------------------
 C
 c      PRESMOY = ZERO
@@ -143,15 +141,15 @@ C
       ENDIF
 
       SURFACE = I18F6(1,1)+I18F6(1,2)+I18F6(1,3)+
-     +  	I18F6(1,4)+I18F6(1,5)+I18F6(1,6)
+     +    I18F6(1,4)+I18F6(1,5)+I18F6(1,6)
       PRESMOY = I18F6(2,1)+I18F6(2,2)+I18F6(2,3)+
-     +  	I18F6(2,4)+I18F6(2,5)+I18F6(2,6)
+     +    I18F6(2,4)+I18F6(2,5)+I18F6(2,6)
       CDGX    = I18F6(3,1)+I18F6(3,2)+I18F6(3,3)+
-     +  	I18F6(3,4)+I18F6(3,5)+I18F6(3,6)
+     +    I18F6(3,4)+I18F6(3,5)+I18F6(3,6)
       CDGY    = I18F6(4,1)+I18F6(4,2)+I18F6(4,3)+
-     +  	I18F6(4,4)+I18F6(4,5)+I18F6(4,6)
+     +    I18F6(4,4)+I18F6(4,5)+I18F6(4,6)
       CDGZ    = I18F6(5,1)+I18F6(5,2)+I18F6(5,3)+
-     +  	I18F6(5,4)+I18F6(5,5)+I18F6(5,6)
+     +    I18F6(5,4)+I18F6(5,5)+I18F6(5,6)
 
 C
       PRESMOY = PRESMOY / SURFACE
@@ -216,7 +214,7 @@ c        ENDDO
 c      ENDIF
       
 c      IF(ANIM_V(4)+OUTP_V(4)>0.AND.
-c     .          (TT>=TANIM.OR.TT>=TOUTP.OR.
+c     .          ((TT>=TANIM .AND. TT<=TANIM_STOP).OR.TT>=TOUTP.OR.
 c     .              (MANIM>=4.AND.MANIM<=15)))THEN
 c       DO I=1,NRTM
 c        NN = 4
@@ -274,7 +272,7 @@ c      IF(IBAG/=5)THEN
              N = IRECT(J,I)
              NISKY = NISKY + 1
              ISKY(NISKY) = N
-             FSKYI(NISKY,1)= -PRESM*SURF(1,I)	    ! addition en P/ON idem interface
+             FSKYI(NISKY,1)= -PRESM*SURF(1,I)      ! addition en P/ON idem interface
              FSKYI(NISKY,2)= -PRESM*SURF(2,I)
              FSKYI(NISKY,3)= -PRESM*SURF(3,I)
              FSKYI(NISKY,4)= ZERO
@@ -288,7 +286,7 @@ c      IF(IBAG/=5)THEN
              N = IRECT(J,I)
              NISKY = NISKY + 1
              ISKY(NISKY) = N
-             FSKYI(NISKY,1)= -PRESM*SURF(1,I)	    ! addition en P/ON idem interface
+             FSKYI(NISKY,1)= -PRESM*SURF(1,I)      ! addition en P/ON idem interface
              FSKYI(NISKY,2)= -PRESM*SURF(2,I)
              FSKYI(NISKY,3)= -PRESM*SURF(3,I)
              FSKYI(NISKY,4)= ZERO
@@ -300,7 +298,7 @@ c      IF(IBAG/=5)THEN
 C------------------------------------------------------
 C
       IF(ANIM_V(4)+OUTP_V(4)+H3D_DATA%N_VECT_CONT >0.AND.
-     .              (TT>=TANIM.OR.TT>=TOUTP.OR.TT>=H3D_DATA%TH3D .OR.
+     .              ((TT>=TANIM .AND. TT<=TANIM_STOP).OR.TT>=TOUTP.OR.(TT>=H3D_DATA%TH3D.AND.TT<=H3D_DATA%TH3D_STOP) .OR.
      .                  (MANIM>=4.AND.MANIM<=15).OR. H3D_DATA%MH3D /= 0))THEN
 C
             DO I=1,NRTM

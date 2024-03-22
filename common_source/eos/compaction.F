@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  COMPACTION                    eos/compaction.F              
 Chd|-- called by -----------
@@ -51,11 +51,15 @@ C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "comlock.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
+C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
 #include      "param_c.inc"
 #include      "com04_c.inc"
+#include      "com06_c.inc"
+#include      "com08_c.inc"
+#include      "vect01_c.inc"
+#include      "scr06_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -67,13 +71,6 @@ C-----------------------------------------------
      .        DPDE(NEL) ,THETA(NEL),ECOLD(NEL),
      .        SIG(NEL,6),POLD(NEL) ,DF(NEL)   
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com06_c.inc"
-#include      "com08_c.inc"
-#include      "vect01_c.inc"
-#include      "scr06_c.inc"
-C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, MX, IFORM
@@ -84,20 +81,20 @@ C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
 
-       MX           = MAT(1)
-       E0           = PM(23,MX)         
-       C0           = PM(49,MX)
-       C1           = PM(32,MX)
-       C2           = PM(33,MX)
-       C3           = PM(34,MX)
-       PSH(1:NEL)   = PM(88,MX)
-       BUNL         = PM(45,MX)
-       MU_MAX       = PM(46,MX)
-       SPH          = PM(69,MX)
-       P0           = PM(31,MX)
-       PFRAC        = PM(37,MX)
-       MUMIN        = PM(47,MX)
-       IFORM        = NINT(PM(48,MX))
+       MX         = MAT(1)
+       E0         = PM(23,MX)         
+       C0         = PM(49,MX)
+       C1         = PM(32,MX)
+       C2         = PM(33,MX)
+       C3         = PM(34,MX)
+       PSH(1:NEL) = PM(88,MX)
+       BUNL       = PM(45,MX)
+       MU_MAX     = PM(46,MX)
+       SPH        = PM(69,MX)
+       P0         = PM(31,MX)
+       PFRAC      = PM(37,MX)
+       MUMIN      = PM(47,MX)
+       IFORM      = NINT(PM(48,MX))
        
        TFEXTT       = ZERO
        BULK(1:NEL)  = BUNL

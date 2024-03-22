@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  CHECK_DYNAIN                  source/starter/check_dynain.F 
 Chd|-- called by -----------
@@ -30,7 +30,7 @@ Chd|        MY_ORDERS                     ../common_source/tools/sort/my_orders.
 Chd|        INOUTFILE_MOD                 ../common_source/modules/inoutfile_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
-      SUBROUTINE CHECK_DYNAIN(IPART,IPARTC,IPARTTG,IXC,IXTG)
+      SUBROUTINE CHECK_DYNAIN(IPART,IPARTC,IPARTTG,IXC,IXTG,DYNAIN_CHECK)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -44,18 +44,16 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
-#include      "param_c.inc"
 #include      "scr17_c.inc"
 #include      "scr15_c.inc"
 #include      "units_c.inc"
-#include      "com01_c.inc"
-#include      "scr16_c.inc"
 #include      "scr03_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IPART(LIPART1,*), IXC(NIXC,*), IXTG(NIXTG,*),
      .        IPARTC(*), IPARTTG(*)
+      INTEGER , INTENT(INOUT) :: DYNAIN_CHECK
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -130,9 +128,9 @@ C--     Check dynain file is requested --
           NPRT = NPART
           IPRTALL = 1
 
-     	  DO J=1,NPART
-     	    IPART_DYNAIN(J) = 1
-     	  END DO
+            DO J=1,NPART
+              IPART_DYNAIN(J) = 1
+            END DO
 
          IS_READ = 1
 
@@ -150,11 +148,11 @@ C--     Counting and storing parts id --
             DO WHILE (J<=LEN_TRIM(CARTE))
                IF(CARTE(J:J)/=' ') THEN
                  K=J
-                 DO WHILE(CARTE(K:K)/=' '.AND.K<=LEN_TRIM(CARTE))
+                 DO WHILE(CARTE(K:K)/=' '.AND.CARTE(K:K)/=CHAR(13).AND.K<=LEN_TRIM(CARTE))
                    K=K+1
                  ENDDO
                  NPRT = NPRT + 1
-                 READ(CARTE(J:K),'(I10)') IPRT
+                 READ(CARTE(J:K-1),'(I10)') IPRT
                  DYNPART(NPRT) = IPRT
                  J = K
                ENDIF
@@ -181,13 +179,13 @@ C
 C
 C--     parts id to local part --
 
-    	     DO I=1,NPRT
+               DO I=1,NPRT
                 IP=0
                 IPRT = DYNPART(I)
-     	        DO J=1,NPART
-     	           IF(IPART(4,J)==IPRT)IP=J
-     	        END DO
-     	        IF(IP==0)THEN
+                  DO J=1,NPART
+                     IF(IPART(4,J)==IPRT)IP=J
+                  END DO
+                  IF(IP==0)THEN
                    CALL ANCMSG(MSGID=1908,
      .                        MSGTYPE=MSGERROR,
      .                        ANMODE=ANINFO_BLIND_1,

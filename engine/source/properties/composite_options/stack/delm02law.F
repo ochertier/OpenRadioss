@@ -1,38 +1,42 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C power   delamination model ------
 Chd|====================================================================
 Chd|  DELM02LAW                     source/properties/composite_options/stack/delm02law.F
 Chd|-- called by -----------
 Chd|        DELAMINATION                  source/properties/composite_options/stack/delamination.F
 Chd|-- calls ---------------
+Chd|        FAIL_PARAM_MOD                ../common_source/modules/mat_elem/fail_param_mod.F
 Chd|====================================================================
-      SUBROUTINE DELM02LAW(
-     1     NEL    ,NUPARAM ,NUVAR  ,MFUNC    ,KFUNC   ,
-     2     NPF    ,TF      ,TIME   ,TIMESTEP ,UPARAM  ,
-     3     NGL    ,IPLY    ,IPM    ,MAT      ,IP      ,
-     4     OFF    ,SIGNYZ  ,SIGNXZ ,SIGNZZ   ,DU      ,
+      SUBROUTINE DELM02LAW(FAIL    ,
+     1     NEL    ,NUVAR  ,TIME   ,TIMESTEP ,
+     2     NGL    ,IPLY    ,
+     3     OFF    ,SIGNYZ  ,SIGNXZ ,SIGNZZ   ,DU      ,
      4     UVAR  , OFFI    ,REDUC,COUNT)
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
+      USE FAIL_PARAM_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -78,7 +82,6 @@ C UVAR    |NEL*NUVAR| F |R/W| USER ELEMENT VARIABLE ARRAY
 C OFF     | NEL     | F |R/W| DELETED ELEMENT FLAG (=1. ON, =0. OFF)
 C---------+---------+---+---+--------------------------------------------
 #include "mvsiz_p.inc"
-#include "scr17_c.inc"
 #include "units_c.inc"
 #include  "comlock.inc"
 #include  "param_c.inc"
@@ -86,39 +89,22 @@ C-----------------------------------------------
 C   I N P U T   A r g u m e n t s
 C-----------------------------------------------
 C
-      INTEGER NEL, NUPARAM, NUVAR,NGL(*),IPM(NPROPMI,*),
-     .        MAT(*),IP, IPLY
+      INTEGER NEL, NUPARAM, NUVAR,NGL(*),
+     .        IPLY
       my_real 
-     .   TIME,TIMESTEP(*),UPARAM(*),SIGNZZ(*),
+     .   TIME,TIMESTEP(*),SIGNZZ(*),
      .   SIGNYZ(*),SIGNXZ(*), DU(3,MVSIZ),OFFI(*),REDUC(*),COUNT(*)
-C-----------------------------------------------
-C   O U T P U T   A r g u m e n t s
-C-----------------------------------------------
-cc      my_real
- 
+      TYPE (FAIL_PARAM_) ,INTENT(IN) :: FAIL
 C-----------------------------------------------
 C   I N P U T   O U T P U T   A r g u m e n t s 
 C-----------------------------------------------
       my_real UVAR(NEL,NUVAR), OFF(NEL)
 C-----------------------------------------------
-C   VARIABLES FOR FUNCTION INTERPOLATION 
-C-----------------------------------------------
-      INTEGER NPF(*), MFUNC, KFUNC(MFUNC)
-      my_real FINTER ,TF(*)
-      EXTERNAL FINTER
-C        Y = FINTER(IFUNC(J),X,NPF,TF,DYDX)
-C        Y       : y = f(x)
-C        X       : x
-C        DYDX    : f'(x) = dy/dx
-C        IFUNC(J): FUNCTION INDEX
-C              J : FIRST(J=1), SECOND(J=2) .. FUNCTION USED FOR THIS LAW
-C        NPF,TF  : FUNCTION PARAMETER
-C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER 
-     .        I,J,IDEL,IDEL_L,IFLAG(MVSIZ),INDX(MVSIZ),IADBUF,NINDX,
-     .        NINDEX,INDEX(MVSIZ),IFAIL,JST(MVSIZ),IR,JJ,IMATLY
+     .        I,J,IDEL,IDEL_L,IFLAG(MVSIZ),INDX(MVSIZ),NINDX,
+     .        NINDEX,INDEX(MVSIZ),JST(MVSIZ),IR,JJ
       my_real 
      .   GIC(MVSIZ),GIIC(MVSIZ),K(MVSIZ),ETA(MVSIZ),
      .   D0(MVSIZ),DS0(MVSIZ), CC1,CC2,DELTAF,DELTA0,DAM,
@@ -127,26 +113,19 @@ C--------------------------------------------------------------
 C
       IR = 0
       DO I=1,NEL
+        IF (OFF(I)==ZERO) CYCLE
+        GIC(I)     = FAIL%UPARAM(1)
+        GIIC(I)    = FAIL%UPARAM(2)
+        ETA(I)     = FAIL%UPARAM(3)
+        K(I)       = FAIL%UPARAM(4)
+        D0(I)      = FAIL%UPARAM(5)
+        DS0(I)     = FAIL%UPARAM(6)
+        REDUC(I)   = FAIL%UPARAM(7) 
+        IR = IR + 1
+        JST(IR) = I 
 C
-        IF(OFF(I)==ZERO) CYCLE
-C
-        IMATLY=MAT(I)  
-        IFAIL = IPM(111 +IP,IMATLY)
-        IF(IFAIL == 19)THEN  
-         IADBUF     =  IPM(114 +IP, IMATLY)
-         GIC(I)     = UPARAM(IADBUF )
-         GIIC(I)    = UPARAM(IADBUF + 1)
-         ETA(I)     = UPARAM(IADBUF + 2)
-         K(I)       = UPARAM(IADBUF + 3)
-         D0(I)      = UPARAM(IADBUF + 4)
-         DS0(I)     = UPARAM(IADBUF + 5)
-         REDUC(I)   = UPARAM(IADBUF + 6) 
-         IR = IR + 1
-         JST(IR) = I 
-        ENDIF 
-C
-         INDX(I) = 0
-         INDEX(I) = 0
+        INDX(I) = 0
+        INDEX(I) = 0
       ENDDO      
 C-----------------------------------------------
 C     USER VARIABLES INITIALIZATION

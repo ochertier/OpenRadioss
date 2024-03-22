@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  S16BILAN                      source/elements/thickshell/solide16/s16bilan.F
 Chd|-- called by -----------
@@ -31,7 +31,8 @@ Chd|====================================================================
       SUBROUTINE S16BILAN(PARTSAV,EINTG,RHOG ,VOLG  ,VOL0G  ,
      .                    VX     ,VY   ,VZ   ,IPARTS,GRESAV ,
      .                    GRTH   ,IGRTH,IEXPAN,EINTTH,FILL  ,
-     .                    X      ,Y    ,Z    ,ITASK ,IPARG  )
+     .                    X      ,Y    ,Z    ,ITASK ,IPARG  ,
+     .                    OFFG   )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -43,7 +44,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "param_c.inc"
 #include      "vect01_c.inc"
 C-----------------------------------------------
@@ -56,6 +56,7 @@ C-----------------------------------------------
      .  VX(MVSIZ,*),VY(MVSIZ,*),VZ(MVSIZ,*),
      .  VOLG(*),VOL0G(*),GRESAV(*),EINTTH(*), FILL(*),
      .  X(MVSIZ,*),Y(MVSIZ,*),Z(MVSIZ,*)
+      my_real, INTENT(IN) :: OFFG(MVSIZ)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -145,7 +146,7 @@ C
         PARTSAV(3,M)=PARTSAV(3,M) + XMAS(I)*VXA(I)
         PARTSAV(4,M)=PARTSAV(4,M) + XMAS(I)*VYA(I)
         PARTSAV(5,M)=PARTSAV(5,M) + XMAS(I)*VZA(I)
-        PARTSAV(6,M)=PARTSAV(6,M) + XMAS(I) 
+        IF (OFFG(I) >= ONE) PARTSAV(6,M)=PARTSAV(6,M) + XMAS(I) 
       ENDDO
 C
 C-----------------------------------------------
@@ -285,6 +286,14 @@ C
       ENDIF
 
       OFF_L(LFT:LLT) = ONE
+C
+      DO I = LFT,LLT
+        M=IPARTS(I)
+        IF (OFFG(I) < ONE) THEN 
+          PARTSAV(25,M) = PARTSAV(25,M) + ONE
+        ENDIF
+      ENDDO
+C
       CALL SENSOR_ENERGY_BILAN(LFT,LLT,EI,EK,OFF_L,IPARTS,ITASK) 
 C-----------
       RETURN

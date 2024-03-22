@@ -1,25 +1,23 @@
-//Copyright>        OpenRadioss
-//Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-//Copyright>    
-//Copyright>        This program is free software: you can redistribute it and/or modify
-//Copyright>        it under the terms of the GNU Affero General Public License as published by
-//Copyright>        the Free Software Foundation, either version 3 of the License, or
-//Copyright>        (at your option) any later version.
-//Copyright>    
-//Copyright>        This program is distributed in the hope that it will be useful,
-//Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
-//Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//Copyright>        GNU Affero General Public License for more details.
-//Copyright>    
-//Copyright>        You should have received a copy of the GNU Affero General Public License
-//Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-//Copyright>    
-//Copyright>    
-//Copyright>        Commercial Alternative: Altair Radioss Software 
-//Copyright>    
-//Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-//Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-//Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+//Copyright>
+//Copyright> Copyright (C) 1986-2024 Altair Engineering Inc.
+//Copyright>
+//Copyright> Permission is hereby granted, free of charge, to any person obtaining 
+//Copyright> a copy of this software and associated documentation files (the "Software"), 
+//Copyright> to deal in the Software without restriction, including without limitation 
+//Copyright> the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or 
+//Copyright> sell copies of the Software, and to permit persons to whom the Software is 
+//Copyright> furnished to do so, subject to the following conditions:
+//Copyright> 
+//Copyright> The above copyright notice and this permission notice shall be included in all 
+//Copyright> copies or substantial portions of the Software.
+//Copyright> 
+//Copyright> THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+//Copyright> IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+//Copyright> FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+//Copyright> AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, 
+//Copyright> WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR 
+//Copyright> IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+//Copyright>
 
 // For linux compilation :
 // gcc -o th_to_csv.linux64.exe th_to_csv.c
@@ -78,7 +76,7 @@ int main( int argc, char *argv[] )
 
     if (argc == 2)
     {
-        printf("\n T01 TO CSV CONVERTOR\n\n");
+        printf("\n T01 TO CSV CONVERTER\n\n");
         printf("FILE    = %s\n", argv[1]);
         printf("OUTPUT FILE    = %s.csv",argv[1]);
         printf("\n");
@@ -114,7 +112,7 @@ int main( int argc, char *argv[] )
      END
 -----------------------------*/
     printf(" ** CONVERSION COMPLETED\n");
-    return 1;         
+    return 0;         
 }
 
 /***************************************************************************/
@@ -356,7 +354,7 @@ C           2ND RECORD : FAC_MASS,FAC_LENGTH,FAC_TIME */
 /*        printf("*********************************\n");
         printf("GEO DESCRIPTION _%d_\n",NUMGEO);
         printf("*********************************\n");*/
-    if(NUMMAT > 0)
+    if(NUMGEO > 0)
     {
         for(i=0;i<NUMGEO;i++){
             eor_c_read(length);
@@ -867,7 +865,7 @@ C           2ND RECORD : FAC_MASS,FAC_LENGTH,FAC_TIME */
 /*        printf("*********************************\n");
         printf("GEO DESCRIPTION _%d_\n",NUMGEO);
         printf("*********************************\n");*/
-    if(NUMMAT > 0)
+    if(NUMGEO > 0)
     {
         for(i=0;i<NUMGEO;i++){
             eor_c_read(length);
@@ -1163,7 +1161,7 @@ void csvFileWrite(char* csvFilename,char* titleFilename,int *nbglobVar,int *nbPa
 {
     int i,j;
     int cpt;
-    char buffer[100];
+    char buffer[11];
     float *tmpImpulse;
     int outpuType = 0;
     int nbData = *cptData / *nbTimeStep ;
@@ -1255,7 +1253,6 @@ void csvFileWrite(char* csvFilename,char* titleFilename,int *nbglobVar,int *nbPa
             if((strcmp(buffer,"FNX       ")==0 || strcmp(buffer,"FNY       ")==0 || strcmp(buffer,"FNZ       ")==0  ||
                 strcmp(buffer,"FTX       ")==0 || strcmp(buffer,"FTY       ")==0 || strcmp(buffer,"FTZ       ")==0  ||
                 strcmp(buffer,"MX        ")==0 || strcmp(buffer,"MY        ")==0 || strcmp(buffer,"MZ        ")==0  ||
-                strcmp(buffer,"FX        ")==0 || strcmp(buffer,"FY        ")==0 || strcmp(buffer,"FZ        ")==0  ||
                 strcmp(buffer,"REACX     ")==0 || strcmp(buffer,"REACY     ")==0 || strcmp(buffer,"REACZ     ")==0  ||
                 strcmp(buffer,"REACXX    ")==0 || strcmp(buffer,"REACYY    ")==0 || strcmp(buffer,"REACZZ    ")==0  ||
                 strcmp(buffer,"|FNX|     ")==0 || strcmp(buffer,"|FNY|     ")==0 || strcmp(buffer,"|FNZ|     ")==0  ||
@@ -1263,6 +1260,8 @@ void csvFileWrite(char* csvFilename,char* titleFilename,int *nbglobVar,int *nbPa
                 strcmp(buffer,"||FN||    ")==0 || strcmp(buffer,"||F||     ")==0 ||
                 strcmp(buffer,"FXI       ")==0 || strcmp(buffer,"FYI       ")==0 || strcmp(buffer,"FZI       ")==0  ||
                 strcmp(buffer,"MXI       ")==0 || strcmp(buffer,"MYI       ")==0 || strcmp(buffer,"MZI       ")==0)  ||
+                ((strcmp(buffer,"FX        ")==0 || strcmp(buffer,"FY        ")==0 || strcmp(buffer,"FZ        ")==0 ) &&  
+                outpuType != 6) ||
                 ((strcmp(buffer,"F1        ")==0 || strcmp(buffer,"F2        ")==0 || strcmp(buffer,"F3        ")==0 ||
                     strcmp(buffer,"M1        ")==0 || strcmp(buffer,"M2        ")==0 || strcmp(buffer,"M3        ")==0 ) && 
                 outpuType == 102) )

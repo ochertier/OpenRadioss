@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  SIGEPS57C                     source/materials/mat/mat057/sigeps57c.F
 Chd|-- called by -----------
@@ -51,7 +51,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   G L O B A L   P A R A M E T E R S
 C-----------------------------------------------
-#include      "param_c.inc"
 #include      "com01_c.inc"
 #include      "impl1_c.inc"
 #include      "sms_c.inc"
@@ -539,7 +538,7 @@ C
       DO I = 1,NEL
         K1 = (SIGNXX(I) + A03*SIGNYY(I))/TWO
         K2 = SQRT(((SIGNXX(I) - A03*SIGNYY(I))/TWO)**TWO + (A12*SIGNXY(I))**TWO)
-        SEQ_OUTPUT(I) = A01*ABS(K1+K2)**M + A01*ABS(K1-K2)**M + A02*ABS(TWO*K2)**M
+        SEQ_OUTPUT(I) = A01*ABS(K1+K2)**M + A01*ABS(K1-K2)**M + A02*ABS(K2)**M
         IF (SEQ_OUTPUT(I) > ZERO) THEN 
           SEQ_OUTPUT(I) = (HALF*SEQ_OUTPUT(I))**(ONE/M)
         ELSE
@@ -563,13 +562,10 @@ C   I M P L I C I T   T Y P E S
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G L O B A L   P A R A M E T E R S
-C-----------------------------------------------
-C-----------------------------------------------
 C   I N P U T   A r g u m e n t s
 C-----------------------------------------------
-	INTEGER NEL, NEL0, NPARAM
-	my_real 
+          INTEGER NEL, NEL0, NPARAM
+          my_real 
      .   F(NEL)   ,PARAM(NEL0,NPARAM),
      .   B_1(NEL), B_2(NEL), B_3(NEL)  ,SIGYM(NEL)
 C-----------------------------------------------
@@ -641,7 +637,7 @@ C
 C-------------------------------------------------------------------------------------------
 C                Derive de f
 C-------------------------------------------------------------------------------------------
-	     C_1=HALF*(SIGXX(I)-A03*SIGYY(I))
+               C_1=HALF*(SIGXX(I)-A03*SIGYY(I))
          C_2=A12*SIGXY(I)
          B_3(I)=SQRT(C_1*C_1+C_2*C_2)
          B3_1=ONE/MAX(EM20,B_3(I))
@@ -753,12 +749,12 @@ C                            JACOBIAN
 C------------------------------------------------------------------------------
 C
         DO I=1,NEL
-	     B(I,1,1) = ONE+DG(I)*(GM(I,1)*G(I,1)+GM(I,4)*G(I,4))
-	     B(I,1,2) =    DG(I)*(GM(I,1)*G(I,4)+GM(I,4)*G(I,2))
-	     B(I,1,3) =    DG(I)*GM(I,5)*G(I,3)
-	     B(I,2,2) = ONE+DG(I)*(GM(I,4)*G(I,4)+GM(I,2)*G(I,2))
-	     B(I,2,3) =    DG(I)*GM(I,6)*G(I,3)
-	     B(I,3,3) = ONE+DG(I)*GM(I,3)*G(I,3)
+               B(I,1,1) = ONE+DG(I)*(GM(I,1)*G(I,1)+GM(I,4)*G(I,4))
+               B(I,1,2) =    DG(I)*(GM(I,1)*G(I,4)+GM(I,4)*G(I,2))
+               B(I,1,3) =    DG(I)*GM(I,5)*G(I,3)
+               B(I,2,2) = ONE+DG(I)*(GM(I,4)*G(I,4)+GM(I,2)*G(I,2))
+               B(I,2,3) =    DG(I)*GM(I,6)*G(I,3)
+               B(I,3,3) = ONE+DG(I)*GM(I,3)*G(I,3)
         ENDDO
 C
         DO I=1,NEL  
@@ -853,7 +849,7 @@ C-----------------------------------------------
 C-------------------------------------------------------------------------------
 C                            JACOBIAN
 C------------------------------------------------------------------------------
-C	
+C
          CALL DERIVE_F(
      1     NEL    ,NPARAM ,PARAM , SIGXX  ,SIGYY  ,
      2    SIGXY   ,SIGY_OLD,B_1   ,B_2     ,B_3    ,  
@@ -928,9 +924,9 @@ C-----------------------------------------------
      .   GM44(NEL)   ,F(NEL), MF(NEL,4),D(NEL,4),dDG
 C      DATA  NINC/4/
 C-----------normalize F By SIGY**M-----------------------------------------------------------------
-	     DO I=1,NEL
-	       SIGYM(I) = SIGY(I)**PARAM(I,5)
-	     ENDDO
+               DO I=1,NEL
+                 SIGYM(I) = SIGY(I)**PARAM(I,5)
+               ENDDO
 C
          CALL DERIVE_F(
      1     NEL    ,NPARAM ,PARAM , SIGXX  ,SIGYY  ,
@@ -951,10 +947,10 @@ C
 C-----------------------------------------------------------------------------
 C                         PRODUIT SCALAIRE DE GRAD(F)*J
 C-----------------------------------------------------------------------------
-	DO I=1,NEL
-	 P(I) = (JJ(I,1)*MF(I,1)+JJ(I,2)*MF(I,2)+JJ(I,3)*MF(I,3)+
-     .	        JJ4(I)*MF(I,4))/SIGYM(I)
-	ENDDO
+          DO I=1,NEL
+           P(I) = (JJ(I,1)*MF(I,1)+JJ(I,2)*MF(I,2)+JJ(I,3)*MF(I,3)+
+     .          JJ4(I)*MF(I,4))/SIGYM(I)
+          ENDDO
 C-----------------------------------------------------------------------------
 C                         CALCUL DE F
 C------------------------------------------------------------------------------
@@ -969,7 +965,7 @@ C-------------------------------------------------------------------------------
        dDG = F(I)/P(I)
        DG(I) = MAX(ZERO,(DG(I)+dDG))
       ENDDO
-	
+
       DO N=1,NINC
        CALL DCPPM_LOWC(
      1     NEL    ,NPARAM ,PARAM,

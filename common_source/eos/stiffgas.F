@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  STIFFGAS                      eos/stiffgas.F                
 Chd|-- called by -----------
@@ -41,28 +41,25 @@ C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "comlock.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
+C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
 #include      "param_c.inc"
-C-----------------------------------------------
-C   D u m m y   A r g u m e n t s
-C-----------------------------------------------
-      INTEGER MAT(*), IFLAG, NEL
-      my_real
-     .   PM(NPROPM,*), 
-     .   OFF(*)  ,EINT(*) ,MU(*)   , 
-     .   MU2(*)  ,ESPE(*) ,DVOL(*) ,DF(*)  , 
-     .   VNEW(*) ,PNEW(*) ,DPDM(*),
-     .   DPDE(*) ,THETA(*),ECOLD(*)
-      my_real, INTENT(INOUT) :: PSH(*)
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
+#include      "com04_c.inc"
 #include      "com06_c.inc"
 #include      "com08_c.inc"
 #include      "vect01_c.inc"
 #include      "scr06_c.inc"
+C-----------------------------------------------
+C   D u m m y   A r g u m e n t s
+C-----------------------------------------------
+      INTEGER MAT(NEL), IFLAG, NEL
+      my_real PM(NPROPM,NUMMAT), 
+     .        OFF(NEL)  ,EINT(NEL) ,MU(NEL)   , 
+     .        MU2(NEL)  ,ESPE(NEL) ,DVOL(NEL) ,DF(NEL)  , 
+     .        VNEW(NEL) ,PNEW(NEL) ,DPDM(NEL),
+     .        DPDE(NEL) ,THETA(NEL),ECOLD(NEL)
+      my_real, INTENT(INOUT) :: PSH(NEL)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -76,21 +73,21 @@ C-----------------------------------------
 C     COMPUTE BULK MODULUS FOR SOUND SPEED
 C     COMPUTE COLD COMPRESSION ENERGY
 C-----------------------------------------
-         MX           = MAT(1)
-         E0           = PM(23,MX)         
-         GAMMA        = PM(34,MX)
-         P0           = PM(32,MX)
-         PSH(LFT:LLT) = PM(88,MX)
-         PSTAR        = PM(35,MX)
-         SPH          = PM(69,MX)
+         MX         = MAT(1)
+         E0         = PM(23,MX)         
+         GAMMA      = PM(34,MX)
+         P0         = PM(32,MX)
+         PSH(1:NEL) = PM(88,MX)
+         PSTAR      = PM(35,MX)
+         SPH        = PM(69,MX)
          
-       DO I=LFT,LLT
+       DO I=1,NEL
          PP      = -GAMMA*PSTAR-PSH(I) + (GAMMA-ONE)*(ONE+MU(I))*ESPE(I)
          DPDM(I) =  (GAMMA-ONE) *ESPE(I)+(GAMMA-ONE)*(ONE+MU(I))*DF(I)*DF(I)*(PP+PSH(I) )
          DPDE(I) = (GAMMA-ONE)*(ONE+MU(I))
        ENDDO
 
-       DO I=LFT,LLT
+       DO I=1,NEL
          ECOLD(I)=-THREE100*SPH
          IF(MU(I)>ZERO) ECOLD(I)=ECOLD(I)*(ONE+(GAMMA-ONE)*MU(I)*(ONE-MU(I)))
        ENDDO
@@ -99,16 +96,16 @@ C-----------------------------------------
 C----------------------------------------
 C     UPDATE PRESSURE AND INTERNAL ENERGY
 C----------------------------------------
-       TFEXTT       = ZERO
-       MX           = MAT(1)
-       E0           = PM(23,MX)
-       GAMMA        = PM(34,MX)
-       P0           = PM(32,MX)
-       PSH(LFT:LLT) = PM(88,MX)
-       PSTAR        = PM(35,MX)
-       SPH          = PM(69,MX)
-       PC           = PM(37, MX)
-       DO I=LFT,LLT
+       TFEXTT     = ZERO
+       MX         = MAT(1)
+       E0         = PM(23,MX)
+       GAMMA      = PM(34,MX)
+       P0         = PM(32,MX)
+       PSH(1:NEL) = PM(88,MX)
+       PSTAR      = PM(35,MX)
+       SPH        = PM(69,MX)
+       PC         = PM(37, MX)
+       DO I=1,NEL
          AA      = -GAMMA*PSTAR-PSH(I)
          BB      = (GAMMA-ONE)*(ONE+MU(I))
          DVV     = HALF*DVOL(I)*DF(I) / MAX(EM15,VNEW(I))
@@ -129,7 +126,7 @@ C------------------------
          MX     = MAT(1)
          SPH    = PM(69,MX)
 
-       DO I=LFT,LLT
+       DO I=1,NEL
          IF(OFF(I)<1..OR.SPH<=0.) CYCLE
          THETA(I) = (DF(I)*EINT(I)/VNEW(I)-ECOLD(I))/SPH
          THETA(I) = MAX(ZERO,THETA(I))

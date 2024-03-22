@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  ALE_CHECK_LAG                 source/ale/ale_check_lag.F    
 Chd|-- called by -----------
@@ -51,8 +51,6 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "warn_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -86,7 +84,7 @@ C--------------------------------------------------------------
             N=IXQ(I,M)
             IF(IABS(NALE(N)) == 2)THEN
               JWARN=1
-              !WARNING NODE CONNECTS LAGRANGIAN QUAD TO EULERIAN QUAD	      
+              !WARNING NODE CONNECTS LAGRANGIAN QUAD TO EULERIAN QUAD        
               CALL ANCMSG(MSGID=336,MSGTYPE=MSGWARNING,ANMODE=ANINFO_BLIND_1,I1=ITAB(N),PRMOD=MSG_CUMU,C1='QUAD')
             ENDIF
           NALE(N)=0
@@ -129,7 +127,7 @@ C---------------------------------------------------
             N=IXC(I,M)
             IF(IABS(NALE(N)) == 2)THEN
               JWARN=1
-	      !WARNING NODE CONNECTS SHELL (LAGRANGIAN) TO EULERIAN SOLID
+                !WARNING NODE CONNECTS SHELL (LAGRANGIAN) TO EULERIAN SOLID
               CALL ANCMSG(MSGID=336,MSGTYPE=MSGWARNING,ANMODE=ANINFO_BLIND_1,I1=ITAB(N),PRMOD=MSG_CUMU,C1='SHELL')
             ENDIF
           NALE(N)=0

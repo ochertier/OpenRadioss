@@ -1,31 +1,35 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  VINTER                        source/tools/curve/vinter.F   
 Chd|-- called by -----------
-Chd|        FAIL_TAB_C                    source/materials/fail/tabulated/fail_tab_c.F
+Chd|        FAIL_FLD_C                    source/materials/fail/fld/fail_fld_c.F
 Chd|        FAIL_TAB_OLD_C                source/materials/fail/tabulated/fail_tab_old_c.F
 Chd|        FIXTEMP                       source/constraints/thermic/fixtemp.F
+Chd|        MAT122C_NEWTON                source/materials/mat/mat122/mat122c_newton.F
+Chd|        MAT122C_NICE                  source/materials/mat/mat122/mat122c_nice.F
+Chd|        MAT122_NEWTON                 source/materials/mat/mat122/mat122_newton.F
+Chd|        MAT122_NICE                   source/materials/mat/mat122/mat122_nice.F
 Chd|        MAT87C_TABULATED_TOTALSR      source/materials/mat/mat087/mat87c_tabulated_totalsr.F
 Chd|        SIGEPS100                     source/materials/mat/mat100/sigeps100.F
 Chd|        SIGEPS187                     source/materials/mat/mat187/sigeps187.F
@@ -97,16 +101,19 @@ Chd|  VINTER2                       source/tools/curve/vinter.F
 Chd|-- called by -----------
 Chd|        FAIL_ORTHSTRAIN               source/materials/fail/orthstrain/fail_orthstrain_s.F
 Chd|        FAIL_ORTHSTRAIN_C             source/materials/fail/orthstrain/fail_orthstrain_c.F
+Chd|        FAIL_TAB_C                    source/materials/fail/tabulated/fail_tab_c.F
 Chd|        M36ITER_IMP                   source/materials/mat/mat036/m36iter_imp.F
 Chd|        MAT121C_NEWTON                source/materials/mat/mat121/mat121c_newton.F
 Chd|        MAT121C_NICE                  source/materials/mat/mat121/mat121c_nice.F
 Chd|        MAT121_NEWTON                 source/materials/mat/mat121/mat121_newton.F
 Chd|        MAT121_NICE                   source/materials/mat/mat121/mat121_nice.F
 Chd|        REDEF3                        source/elements/spring/redef3.F
+Chd|        REDEF3_LAW113                 source/elements/spring/redef3_law113.F
 Chd|        REDEF_SEATBELT                source/tools/seatbelts/redef_seatbelt.F
 Chd|        RKENONL                       source/elements/spring/r4mat3.F
 Chd|        SIGEPS121                     source/materials/mat/mat121/sigeps121.F
 Chd|        SIGEPS121C                    source/materials/mat/mat121/sigeps121c.F
+Chd|        SIGEPS158C                    source/materials/mat/mat158/sigeps158c.F
 Chd|        SIGEPS28                      source/materials/mat/mat028/sigeps28.F
 Chd|        SIGEPS36                      source/materials/mat/mat036/sigeps36.F
 Chd|        SIGEPS36C                     source/materials/mat/mat036/sigeps36c.F
@@ -179,6 +186,7 @@ Chd|  VINTER2DP                     source/tools/curve/vinter.F
 Chd|-- called by -----------
 Chd|        M36ITER_IMP                   source/materials/mat/mat036/m36iter_imp.F
 Chd|        REDEF3                        source/elements/spring/redef3.F
+Chd|        REDEF3_LAW113                 source/elements/spring/redef3_law113.F
 Chd|        RKENONL                       source/elements/spring/r4mat3.F
 Chd|        SIGEPS28                      source/materials/mat/mat028/sigeps28.F
 Chd|        SIGEPS68                      source/materials/mat/mat068/sigeps68.F

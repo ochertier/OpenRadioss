@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  SREFSTA3                      source/elements/solid/solide/srefsta3.F
 Chd|-- called by -----------
@@ -39,25 +39,22 @@ Chd|        SRROTA3                       source/elements/solid/solide/srrota3.F
 Chd|        STORTH3                       source/elements/solid/solidez/szorth3.F
 Chd|        SZORDEF3                      source/elements/solid/solidez/szorth3.F
 Chd|        SZREFDERI3                    source/elements/solid/solide/srefsta3.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        MAT_ELEM_MOD                  ../common_source/modules/mat_elem/mat_elem_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
       SUBROUTINE SREFSTA3(ELBUF_STR,IXS     ,PM     ,GEO     ,IPARG  ,
      .                    IPM      ,IGEO    ,SKEW   ,X       ,XREFS  ,
-     .                    NEL      ,IPARTS  ,IPART  ,BUFMAT  ,
-     .                    NPF      ,TF      )
+     .                    NEL      ,IPARTS  ,IPART  ,BUFMAT  ,MAT_PARAM,
+     .                    NPF      ,TF      ,NUMMAT )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
-      USE ELBUFDEF_MOD            
+      USE MAT_ELEM_MOD
       USE MESSAGE_MOD             
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
 C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
@@ -65,19 +62,14 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "scr01_c.inc"
 #include      "scr03_c.inc"
 #include      "scr17_c.inc"
-#include      "units_c.inc"
 #include      "vect01_c.inc"
-#include      "warn_c.inc"
-#include      "titr_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER ,INTENT(IN) :: NUMMAT
       INTEGER IXS(NIXS,*), IPARG(*),IPARTS(*), IGEO(*),
      .    IPM(NPROPMI,*),IPART(LIPART1,*), NEL, NPF(*)
 C     REAL
@@ -85,11 +77,12 @@ C     REAL
      .   PM(NPROPM,*), X(3,*), XREFS(8,3,*), GEO(NPROPG,*),
      .   SKEW(LSKEW,*), BUFMAT(*), TF(*)
       TYPE (ELBUF_STRUCT_), TARGET :: ELBUF_STR
+      TYPE (MATPARAM_STRUCT_) ,DIMENSION(NUMMAT) ,INTENT(INOUT) :: MAT_PARAM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER NF1, I,II(6), N, JHBE, IREP, IGTYP, ITRS, IBID,
-     .        NITSAV,J,I1,I2,ID,MAT_ID
+     .        NITSAV,J,I1,I2,ID,IMAT,MAT_ID
       INTEGER MAT(MVSIZ), PID(MVSIZ), NGL(MVSIZ),
      .   IX1(MVSIZ),IX2(MVSIZ),IX3(MVSIZ),IX4(MVSIZ),
      .   IX5(MVSIZ),IX6(MVSIZ),IX7(MVSIZ),IX8(MVSIZ)
@@ -191,6 +184,7 @@ C---------------------------------------------------------
           PID(I)=IXS(NIXS-1,N)
           NGL(I)=IXS(NIXS,N)
         END DO
+        IMAT = MAT(1)
 C----------------------------
 C Coordinates
 C----------------------------
@@ -636,8 +630,8 @@ C-----------
 C-----------
           CALL MMAIN(PM   ,ELBUF_STR,IXS    ,NIXS    ,X      ,
      2             GEO    ,IPARG    ,NEL    ,SKEW    ,BUFMAT ,
-     3             IPART   ,IPARTS ,
-     4             MAT    ,IPM      ,NGL    ,PID     ,NPF    ,
+     3             IPART  ,IPARTS   ,NUMMAT ,MAT_PARAM,
+     4             IMAT   ,IPM      ,NGL    ,PID     ,NPF    ,
      5             TF     ,MFXX     ,MFXY   ,MFXZ    ,MFYX   ,
      6             MFYY   ,MFYZ     ,MFZX   ,MFZY    ,MFZZ   ,
      7             RX     ,RY       ,RZ     ,SX      ,SY     ,
@@ -675,9 +669,6 @@ C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER :: NEL
@@ -691,9 +682,6 @@ C-----------------------------------------------
      .   DXX(*), DXY(*), DXZ(*),
      .   DYX(*), DYY(*), DYZ(*),
      .   DZX(*), DZY(*), DZZ(*)
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -757,10 +745,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER :: NEL
@@ -768,9 +752,6 @@ C-----------------------------------------------
      .   MXX(*), MXY(*), MXZ(*),MYX(*), MYY(*), MYZ(*),  
      .   MZX(*), MZY(*), MZZ(*),G1X(*),G1Y(*),G1Z(*),
      .   G2X(*),G2Y(*),G2Z(*),G3X(*),G3Y(*),G3Z(*)
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -830,7 +811,6 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
-C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------

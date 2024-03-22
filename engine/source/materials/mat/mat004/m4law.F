@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C|============================================================
 C|   M4LAW                                 /materb/m4law.F
 C|------------------------------------------------------------
@@ -33,11 +33,14 @@ Chd|-- called by -----------
 Chd|        MMAIN                         source/materials/mat_share/mmain.F
 Chd|-- calls ---------------
 Chd|====================================================================
-      SUBROUTINE M4LAW(PM,OFF     ,SIG     ,EPXE    ,MAT     ,
-     2           TEMPER  ,SSP     ,D1      ,D2      ,D3      ,
-     3           D4      ,D5      ,D6      ,RHO0    ,DPDM    ,
-     4           EPD     ,IPLA    ,SIGY    ,DEFP    ,DPLA    ,
-     5           EPSP    ,TSTAR   ,TEMPEL  ,NEL     )     
+      SUBROUTINE M4LAW(
+     1   PM,      OFF,     SIG,     EPXE,
+     2   MAT,     TEMPER,  SSP,     D1,
+     3   D2,      D3,      D4,      D5,
+     4   D6,      RHO0,    DPDM,    EPD,
+     5   IPLA,    SIGY,    DEFP,    DPLA,
+     6   EPSP,    TSTAR,   TEMPEL,  NEL,
+     7   JTHE)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -51,12 +54,10 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "vect01_c.inc"
-#include      "units_c.inc"
-#include      "scr17_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: JTHE
       INTEGER MAT(MVSIZ),NEL
 C     REAL
       my_real
@@ -83,7 +84,7 @@ C---+----1----+----2----+----3----+----4----+----5----+----6----+----7--
 C--------------------------------------------------------------
 C
         
-      DO I=LFT,LLT
+      DO I=1,NEL
         MX =MAT(I)
         G(I)    =PM(22,MX)
         CA(I)   =PM(38,MX)
@@ -99,7 +100,7 @@ C
         T0(I)=PM(79,MX)
       ENDDO
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         P(I)  =-THIRD*(SIG(I,1)+SIG(I,2)+SIG(I,3))
         DAV(I)=-THIRD*(D1(I)+D2(I)+D3(I))
         G1(I)=DT1*G(I)*OFF(I)
@@ -108,14 +109,14 @@ C
 C-----------------------
 C     SOUND SPEED
 C-----------------------
-      DO I=LFT,LLT
+      DO I=1,NEL
         DPDM(I) = DPDM(I) + ONEP333*G(I)
         SSP(I)=SQRT(ABS(DPDM(I))/RHO0(I))
       ENDDO
 C-------------------------------
 C     CONTRAINTES DEVIATORIQUES
 C-------------------------------
-      DO I=LFT,LLT
+      DO I=1,NEL
         SIG(I,1)=SIG(I,1)+P(I)+G2(I)*(D1(I)+DAV(I))
         SIG(I,2)=SIG(I,2)+P(I)+G2(I)*(D2(I)+DAV(I))
         SIG(I,3)=SIG(I,3)+P(I)+G2(I)*(D3(I)+DAV(I))
@@ -124,7 +125,7 @@ C-------------------------------
         SIG(I,6)=SIG(I,6)+G1(I)*D6(I)
       ENDDO
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         EPD(I)=OFF(I)*MAX(   ABS(D1(I)),   ABS(D2(I)),   ABS(D3(I)),
      .         HALF*ABS(D4(I)),HALF*ABS(D5(I)),HALF*ABS(D6(I)))
 C
@@ -137,19 +138,19 @@ C-----------------
 C     TEMPERATURE
 C-----------------
       IF(JTHE >= 0) THEN
-        DO I=LFT,LLT
+        DO I=1,NEL
            THETA(I)=TEMPER(I)
            IF(THETA(I)>T0(I)) TSTAR(I)=(THETA(I)- T0(I))/(TMELT(I)-T0(I))
         ENDDO
       ELSE
-        DO I=LFT,LLT
+        DO I=1,NEL
            THETA(I)=TEMPEL(I)
         ENDDO
       ENDIF
 C-------------------------------
 C     CRITERE
 C-------------------------------
-      DO I=LFT,LLT
+      DO I=1,NEL
        IF(THETA(I)>=TMELT(I)) THEN
         AJ2(I)=ZERO
         QH(I)=ZERO
@@ -202,7 +203,7 @@ C-------------------------------
       ENDDO
 C
       IF(IPLA==0)THEN
-       DO I=LFT,LLT
+       DO I=1,NEL
        SIG(I,1)=SCALE(I)*SIG(I,1)
        SIG(I,2)=SCALE(I)*SIG(I,2)
        SIG(I,3)=SCALE(I)*SIG(I,3)
@@ -215,7 +216,7 @@ C
       ENDDO
 C
       ELSEIF(IPLA==2)THEN
-       DO I=LFT,LLT
+       DO I=1,NEL
        SIG(I,1)=SCALE(I)*SIG(I,1)
        SIG(I,2)=SCALE(I)*SIG(I,2)
        SIG(I,3)=SCALE(I)*SIG(I,3)
@@ -228,7 +229,7 @@ C
        ENDDO
 C
       ELSEIF(IPLA==1)THEN
-       DO I=LFT,LLT
+       DO I=1,NEL
 C      plastic strain increment.
        DPLA(I)=(ONE -SCALE(I))*AJ2(I)/(THREE*G(I)+QH(I))
 C      actual yield stress.
@@ -245,7 +246,7 @@ C      actual yield stress.
        ENDDO
       ENDIF
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
        SIGY(I)=AK(I)
        DEFP(I)=EPXE(I)
       ENDDO 

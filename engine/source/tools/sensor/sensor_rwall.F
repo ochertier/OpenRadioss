@@ -1,30 +1,29 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  ConTSTART Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C=======================================================================
 Chd|====================================================================
 Chd|  SENSOR_RWALL                  source/tools/sensor/sensor_rwall.F
 Chd|-- called by -----------
-Chd|        SENSOR1                       source/tools/sensor/sensor1.F 
 Chd|        SENSOR_BASE                   source/tools/sensor/sensor_base.F
 Chd|-- calls ---------------
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
@@ -42,9 +41,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
-#include      "scr17_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
 #include      "units_c.inc"
@@ -60,23 +56,26 @@ C-----------------------------------------------
 C----------------------------------------------------------
 C Local Variables
 C----------------------------------------------------------
-      INTEGER :: RW_ID,IDIR,ICRIT,ISECT,N5
-      my_real :: FMIN,FMAX,FF,FX,FY,FZ,TMIN,TDELAY,INFINITY
+      INTEGER :: RW_ID,IDIR,ICRIT,ISECT,N5,ACTI
+      my_real :: FMIN,FMAX,FF,FX,FY,FZ,TMIN,TDELAY,TSTART,TSTOPS,INFINITY
       PARAMETER (INFINITY = 1.0E20)
 C=======================================================================
       TMIN   = SENSOR%TMIN
       TDELAY = SENSOR%TDELAY
+      TSTART = SENSOR%TSTART
+      TSTOPS = SENSOR%VALUE
 c      
       RW_ID = SENSOR%IPARAM(1) 
       IDIR  = SENSOR%IPARAM(2) 
       FMIN  = SENSOR%RPARAM(1) 
       FMAX  = SENSOR%RPARAM(2) 
+      ICRIT = 0
+      ACTI  = 0
 c
       ISECT = TABS(NSECT+RW_ID+1)-TABS(NSECT+RW_ID)
-      ICRIT = 0
       N5 = RW_ID + 4*NRWALL
 c
-      IF (NPRW(N5) == 1) THEN
+      IF (NPRW(N5) == 1) THEN   ! NPRW(N5) = ICONT - rigid wall contact flag
         ISECT = TABS(RW_ID+NSECT+NINTER+NINTSUB+1)-TABS(RW_ID+NSECT+NINTER+NINTSUB)
         IF (IDIR == 1) THEN
           FX = FBSAV6(1,1,ISECT)+FBSAV6(1,2,ISECT)+
@@ -116,49 +115,62 @@ c
      .         FBSAV6(6,5,ISECT)+FBSAV6(6,6,ISECT)
           FF = SQRT(FX*FX + FY*FY + FZ*FZ) 
         ENDIF
-        IF (FF < FMIN .OR. FF > FMAX) ICRIT = 1
 c
-        IF (SENSOR%TCRIT + TMIN > TT) THEN
-          IF (ICRIT == 0) THEN
-            SENSOR%TCRIT = INFINITY
-          ELSE IF (SENSOR%TCRIT == INFINITY) THEN
-            SENSOR%TCRIT = MIN(SENSOR%TCRIT, TT)
+        IF (FF < FMIN .OR. FF > FMAX .OR. IDIR == 0) ICRIT = 1
+c  
+        ! check activation
+c 
+        IF (ICRIT == 1) THEN
+          SENSOR%TCRIT = MIN(SENSOR%TCRIT, TT)
+        ELSE
+          SENSOR%TCRIT = INFINITY
+        END IF
+        IF (SENSOR%TCRIT + TMIN <= TT) THEN
+          TSTOPS = TT + TDELAY
+          SENSOR%VALUE = TSTOPS
+          IF (SENSOR%STATUS == 0) THEN
+            SENSOR%STATUS = 1
+            SENSOR%TSTART = TT
+            ACTI = 1
           END IF
-        ELSE IF (SENSOR%TSTART == INFINITY) THEN
-          SENSOR%TSTART = SENSOR%TCRIT + TMIN + TDELAY
         END IF
 c
-        IF (SENSOR%TSTART <= TT) THEN   ! sensor activation
-          SENSOR%STATUS = 1
+      ELSE   ! ICONT = 0 => no contact
+        IF (TT > TSTOPS .AND. SENSOR%STATUS == 1) THEN 
+          SENSOR%STATUS = 0
+          SENSOR%TSTART = INFINITY
+          SENSOR%VALUE  = INFINITY
+          ACTI = 2
         END IF
+      END IF
 c
-        IF (SENSOR%STATUS == 1 .and. ISPMD == 0) THEN
+c-----------------------------------------------------------------------
+      ! Output   
+      IF (ACTI == 1) THEN    
+        IF (ISPMD == 0) THEN
 #include "lockon.inc"
-            WRITE (ISTDO,1100) SENSOR%SENS_ID,SENSOR%TSTART
-            IF (FF < FMIN) THEN
-              WRITE (IOUT ,1200) SENSOR%SENS_ID,SENSOR%TSTART,FMIN
-            ELSE IF (FF > FMAX) THEN
-              WRITE (IOUT ,1200) SENSOR%SENS_ID,SENSOR%TSTART,FMAX
-            END IF
+          WRITE (ISTDO,1100) SENSOR%SENS_ID,SENSOR%TSTART
+          IF (FF < FMIN) THEN
+            WRITE (IOUT ,1200) SENSOR%SENS_ID,SENSOR%TSTART,FMIN,FF
+          ELSE IF (FF > FMAX) THEN
+            WRITE (IOUT ,1200) SENSOR%SENS_ID,SENSOR%TSTART,FMAX,FF
+          END IF
 #include "lockoff.inc"
         ENDIF
-c
-      ELSE IF (TT > SENSOR%TSTART .AND. SENSOR%STATUS == 1) THEN  ! deactivation
-        SENSOR%STATUS = 0
-        SENSOR%TSTART = INFINITY
-        SENSOR%TCRIT  = INFINITY
-#include "lockon.inc"
+      ELSE IF (ACTI == 2) THEN
         IF (ISPMD == 0) THEN
+#include   "lockon.inc"
           WRITE (ISTDO,1300) SENSOR%SENS_ID,SENSOR%TSTART
           WRITE (IOUT ,1300) SENSOR%SENS_ID,SENSOR%TSTART
 #include "lockoff.inc"
         END IF
-      ENDIF
+      END IF
 c-----------------------------------------------------------------------      
 1100  FORMAT(' SENSOR (RWALL) NUMBER ',I10,' ,ACTIVATED AT TIME '  ,1PE12.5)
-1200  FORMAT(' SENSOR NUMBER ',I10,' ,DEACTIVATED AT TIME ',1PE12.5,      
-     .       ' TARGET VALUE =',1PE12.5,' CURRENT VALUE AT TMIN + TDELAY =',1PE12.5)
-1300  FORMAT(' SENSOR NUMBER ',I10,' ,DEACTIVATED AT TIME ',1PE12.5)     
+1200  FORMAT(' SENSOR (RWALL) NUMBER ',I10,' ,ACTIVATED AT TIME ',1PE12.5/     
+     .       '      TARGET FORCE VALUE =',1PE12.5/
+     .       '      CURRENT VALUE AT TMIN + TDELAY =',1PE12.5)
+1300  FORMAT(' SENSOR (RWALL) NUMBER ',I10,' ,DEACTIVATED AT TIME ',1PE12.5)     
 c-----------------------------------------------------------------------      
       RETURN
       END SUBROUTINE

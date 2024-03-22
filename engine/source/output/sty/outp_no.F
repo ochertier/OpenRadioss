@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  OUTP_NO                       source/output/sty/outp_no.F   
 Chd|-- called by -----------
@@ -30,10 +30,7 @@ Chd|====================================================================
       SUBROUTINE OUTP_NO(KEY ,TEXT  ,LEN       ,ANIN   ,NUMNOD,
      2                   ITAB,INNODA,ITABG,LENG,NODGLOB,WEIGHT)
 C-----------------------------------------------
-C SORTIE DES VARIABLES SCALAIRES NODALES DANS 
-C LES FICHIERS OUTP
-C JBM LE 23/9/96
-C-----------------------------------------------
+C NODAL VALUES IN OUTP FILES
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -42,7 +39,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "units_c.inc"
-#include      "scr05_c.inc"
 #include      "task_c.inc"
 #include      "scr16_c.inc"
 #include      "spmd_c.inc"
@@ -52,18 +48,13 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       CHARACTER*10 KEY
       CHARACTER*40 TEXT
-      INTEGER ITAB(*), LEN, NUMNOD, INNODA,
-     .       ITABG(*),LENG,NODGLOB(*),WEIGHT(*)
-
-      my_real
-     .   ANIN(*)
+      INTEGER ITAB(*), LEN, NUMNOD, INNODA,ITABG(*),LENG,NODGLOB(*),WEIGHT(*)
+      my_real ANIN(*)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,J,N
-
-      my_real
-     .  VGLOB(LENG)
+      my_real VGLOB(LENG)
 C-----------------------------------------------
 
       IF (NSPMD > 1) THEN

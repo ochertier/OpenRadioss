@@ -1,31 +1,31 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  C_IEBCS                       source/restart/ddsplit/c_iebcs.F
 Chd|-- called by -----------
 Chd|        DDSPLIT                       source/restart/ddsplit/ddsplit.F
 Chd|-- calls ---------------
-Chd|        EBCS_MOD                      ../common_source/modules/ebcs_mod.F
+Chd|        EBCS_MOD                      ../common_source/modules/boundary_conditions/ebcs_mod.F
 Chd|====================================================================
        SUBROUTINE C_IEBCS(IXS, IXQ, IXTG, 
      .     NUMELS, NUMELQ, NUMELTG,
@@ -44,7 +44,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "mvsiz_p.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -90,31 +89,40 @@ C-----------------------------------------------
 
       LENGTH = 0
 
+      ! ----------------------------
+      ! loop over the ebcs
       DO I = 1, NEBCS
          TYP = EBCS_TAB%tab(i)%poly%type
          IEBCS_TYPE(I) = TYP
          NSEG = EBCS_TAB%tab(i)%poly%nb_elem
          NSEG_L = 0
-         IF (EBCS_TAB%tab(i)%poly%has_ielem .AND. allocated(EBCS_TAB%tab(i)%poly%ielem) ) THEN  !ebcs staggered allocated on proc 1 only
+         ! ---------------------   
+         IF (EBCS_TAB%tab(i)%poly%has_ielem ) THEN  
+            ! --------------------- 
+            ! loop over the element of the surface
             DO ISEG = 1, NSEG
                IELEM = EBCS_TAB%tab(i)%poly%ielem(ISEG)
                DP0=ZERO
                IF(EBCS_TAB%tab(i)%poly%has_dp0) DP0 = EBCS_TAB%tab(i)%poly%dp0(ISEG)
-               !IF (IPM(2, IX(1, IELEM)) == 151) THEN
-                  IF (CEP(IELEM)  == PROC) THEN
-                     NSEG_L = NSEG_L + 1
-                     IF(FLAG == 1) THEN
-                       IEBCS_LISTELEM_L(LENGTH + NSEG_L) = LOCALID(IELEM)
-                       IEBCS_LISTFAC_L(LENGTH + NSEG_L) = EBCS_TAB%tab(i)%poly%iface(ISEG)
+               ! --------------
+               ! if the element is on the current proc, convert the global id IELEM/iface(ISEG) to local id
+               IF (CEP(IELEM)  == PROC) THEN
+                    NSEG_L = NSEG_L + 1
+                    IF(FLAG == 1) THEN
+                       IEBCS_LISTELEM_L(LENGTH + NSEG_L) = LOCALID(IELEM) ! element id
+                       IEBCS_LISTFAC_L(LENGTH + NSEG_L) = EBCS_TAB%tab(i)%poly%iface(ISEG) ! face id
                        IEBCS_LISTDP0_L(LENGTH + NSEG_L) = DP0
-                     ENDIF
-                  ENDIF
-               !ENDIF
+                    ENDIF
+               ENDIF
+               ! --------------
             ENDDO
+            ! --------------------- 
          ENDIF
+         ! --------------------- 
          IEBCS_NELEM_L(I) = NSEG_L
          LENGTH = LENGTH + NSEG_L
       ENDDO ! I = 1, NEBCS
+      ! ----------------------------
 
       DEALLOCATE(LOCALID)
       RETURN

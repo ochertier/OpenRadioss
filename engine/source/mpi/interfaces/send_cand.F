@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 CC Message TAGS Rules
 C TAGS are represented by variable integer MSGOFF
 C MSGOFF is a 4 digit integer of the form
@@ -42,7 +42,6 @@ C 11000 -> 11999 => spmd_rest.F
 C 12000 -> 12999 => spmd_lag.F
 C 13000 -> 13999 => spmd_dsreso.F
 
-#include "hardware.inc"
 C
 Chd|====================================================================
 Chd|  SPMD_GET_INACTI7              source/mpi/interfaces/send_cand.F
@@ -68,13 +67,8 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com03_c.inc"
 #include      "com04_c.inc"
-#include      "scr05_c.inc"
-#include      "scr18_c.inc"
 #include      "task_c.inc"
-#include      "param_c.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -101,7 +95,7 @@ C
         RETURN
       ENDIF
 C
-Cel determination du proc main (celui qui fait joue le role de P0)
+C   determination du proc main (celui qui fait joue le role de P0)
 C
       DO K = 1, NSPMD
         IF (isendto(NIN,K)/=0.OR.
@@ -183,14 +177,9 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com03_c.inc"
 #include      "com04_c.inc"
-#include      "scr05_c.inc"
 #include      "scr17_c.inc"
-#include      "scr18_c.inc"
 #include      "task_c.inc"
-#include      "param_c.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -221,7 +210,7 @@ C
         RETURN
       ENDIF
 C
-Cel determination du proc main (celui qui fait joue le role de P0)
+C   determination du proc main (celui qui fait joue le role de P0)
 C
       DO K = 1, NSPMD
         IF (ISENDTO(NIN,K)/=0.OR.
@@ -268,7 +257,7 @@ Candidat frontiere
       IENVOI(LOC_PROC) = LEN
 C
       IF (LOC_PROC/=PMAIN) THEN
-Cel pack des candidats ayant stifness negative
+C   pack des candidats ayant stifness negative
 C
         MSGTYP=MSGOFF        
         CALL MPI_SEND(LEN,1,MPI_INTEGER,IT_SPMD(PMAIN),MSGTYP,
@@ -339,14 +328,8 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com03_c.inc"
 #include      "com04_c.inc"
-#include      "scr05_c.inc"
-#include      "scr17_c.inc"
-#include      "scr18_c.inc"
 #include      "task_c.inc"
-#include      "param_c.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -377,7 +360,7 @@ C
         RETURN
       ENDIF
 C
-Cel determination du proc main (celui qui fait joue le role de P0)
+C   determination du proc main (celui qui fait joue le role de P0)
 C
       DO K = 1, NSPMD
         IF (ISENDTO(NIN,K)/=0.OR.
@@ -410,7 +393,7 @@ C traitement sur tout NSN pour les nds precedemment impactes (ne figurent pas da
       IENVOI(LOC_PROC) = LEN
 C
       IF (LOC_PROC/=PMAIN) THEN
-Cel pack des candidats ayant stifness negative
+C   pack des candidats ayant stifness negative
 C
         MSGTYP=MSGOFF        
         CALL MPI_SEND(LEN,1,MPI_INTEGER,IT_SPMD(PMAIN),MSGTYP,
@@ -482,14 +465,9 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com03_c.inc"
 #include      "com04_c.inc"
-#include      "scr05_c.inc"
 #include      "scr17_c.inc"
-#include      "scr18_c.inc"
 #include      "task_c.inc"
-#include      "param_c.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -520,7 +498,7 @@ C
         RETURN
       ENDIF
 C
-Cel determination du proc main (celui qui fait joue le role de P0)
+C   determination du proc main (celui qui fait joue le role de P0)
 C
       DO K = 1, NSPMD
         IF (ISENDTO(NIN,K)/=0.OR.
@@ -567,7 +545,7 @@ Candidat frontiere
       IENVOI(LOC_PROC) = LEN
 C
       IF (LOC_PROC/=PMAIN) THEN
-Cel pack des candidats ayant stifness negative
+C   pack des candidats ayant stifness negative
 C
         MSGTYP=MSGOFF        
         CALL MPI_SEND(LEN,1,MPI_INTEGER,IT_SPMD(PMAIN),MSGTYP,
@@ -639,14 +617,9 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com03_c.inc"
 #include      "com04_c.inc"
-#include      "scr05_c.inc"
 #include      "scr17_c.inc"
-#include      "scr18_c.inc"
 #include      "task_c.inc"
-#include      "param_c.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -677,7 +650,7 @@ C
         RETURN
       ENDIF
 C
-Cel determination du proc main (celui qui fait joue le role de P0)
+C   determination du proc main (celui qui fait joue le role de P0)
 C
       DO K = 1, NSPMD
         IF (ISENDTO(NIN,K)/=0.OR.
@@ -724,7 +697,7 @@ Candidat frontiere
       IENVOI(LOC_PROC) = LEN
 C
       IF (LOC_PROC/=PMAIN) THEN
-Cel pack des candidats ayant stifness negative
+C   pack des candidats ayant stifness negative
 C
         MSGTYP=MSGOFF        
         CALL MPI_SEND(LEN,1,MPI_INTEGER,IT_SPMD(PMAIN),MSGTYP,
@@ -796,14 +769,9 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com03_c.inc"
 #include      "com04_c.inc"
-#include      "scr05_c.inc"
 #include      "scr17_c.inc"
-#include      "scr18_c.inc"
 #include      "task_c.inc"
-#include      "param_c.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -834,7 +802,7 @@ C
         RETURN
       ENDIF
 C
-Cel determination du proc main (celui qui fait joue le role de P0)
+C   determination du proc main (celui qui fait joue le role de P0)
 C
       DO K = 1, NSPMD
         IF (ISENDTO(NIN,K)/=0.OR.
@@ -881,7 +849,7 @@ Candidat frontiere
       IENVOI(LOC_PROC) = LEN
 C
       IF (LOC_PROC/=PMAIN) THEN
-Cel pack des candidats ayant stifness negative
+C   pack des candidats ayant stifness negative
 C
         MSGTYP=MSGOFF        
         CALL MPI_SEND(LEN,1,MPI_INTEGER,IT_SPMD(PMAIN),MSGTYP,
@@ -952,14 +920,9 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com03_c.inc"
 #include      "com04_c.inc"
-#include      "scr05_c.inc"
 #include      "scr17_c.inc"
-#include      "scr18_c.inc"
 #include      "task_c.inc"
-#include      "param_c.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1022,7 +985,7 @@ Candidat frontiere
       END IF
 C
       IF (LOC_PROC/=PMAIN) THEN
-Cel pack des candidats ayant stifness negative
+C   pack des candidats ayant stifness negative
 C
         MSGTYP=MSGOFF        
         IF(LEN>0) THEN
@@ -1111,14 +1074,8 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com03_c.inc"
 #include      "com04_c.inc"
-#include      "scr05_c.inc"
-#include      "scr17_c.inc"
-#include      "scr18_c.inc"
 #include      "task_c.inc"
-#include      "param_c.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1165,7 +1122,7 @@ C traitement sur tout NSN pour les nds precedemment impactes (ne figurent pas da
       END DO
 C
       IF (LOC_PROC/=PMAIN) THEN
-Cel pack des candidats ayant stifness negative
+C   pack des candidats ayant stifness negative
 C
         MSGTYP=MSGOFF        
         IF(LEN>0) THEN
@@ -1254,14 +1211,9 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com03_c.inc"
 #include      "com04_c.inc"
-#include      "scr05_c.inc"
 #include      "scr17_c.inc"
-#include      "scr18_c.inc"
 #include      "task_c.inc"
-#include      "param_c.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1324,7 +1276,7 @@ Candidat frontiere
       END IF
 C
       IF (LOC_PROC/=PMAIN) THEN
-Cel pack des candidats ayant stifness negative
+C   pack des candidats ayant stifness negative
 C
         MSGTYP=MSGOFF        
         IF(LEN>0) THEN
@@ -1413,14 +1365,9 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com03_c.inc"
 #include      "com04_c.inc"
-#include      "scr05_c.inc"
 #include      "scr17_c.inc"
-#include      "scr18_c.inc"
 #include      "task_c.inc"
-#include      "param_c.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1496,7 +1443,7 @@ Candidat frontiere
       ENDIF
 C
       IF (LOC_PROC/=PMAIN) THEN
-Cel pack des candidats ayant stifness negative
+C   pack des candidats ayant stifness negative
 C
         MSGTYP=MSGOFF        
         IF(LEN>0) THEN
@@ -1591,14 +1538,9 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com03_c.inc"
 #include      "com04_c.inc"
-#include      "scr05_c.inc"
 #include      "scr17_c.inc"
-#include      "scr18_c.inc"
 #include      "task_c.inc"
-#include      "param_c.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1678,7 +1620,7 @@ Candidat frontiere
       ENDIF
 C
       IF (LOC_PROC/=PMAIN) THEN
-Cel pack des candidats ayant stifness negative
+C   pack des candidats ayant stifness negative
 C
         MSGTYP=MSGOFF        
         IF(LEN>0) THEN
@@ -1760,7 +1702,7 @@ Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
 Chd|====================================================================
       SUBROUTINE SPMD_IFRONT_STAMP(
-     1   IPARI   ,INTBUF_TAB, RETRI,TEMP    ,SENSOR_TAB  ,ITAB,
+     1   IPARI   ,NSENSOR ,INTBUF_TAB, RETRI,TEMP    ,SENSOR_TAB  ,ITAB,
      2   NBINTC21,INTLIST21)
 C============================================================================
 C   M o d u l e s
@@ -1787,26 +1729,18 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "units_c.inc"
-#include      "scr03_c.inc"
-#include      "scr04_c.inc"
-#include      "scr05_c.inc"
-#include      "scr18_c.inc"
-#include      "warn_c.inc"
 #include      "task_c.inc"
-#include      "parit_c.inc"
-#include      "spmd_c.inc"
-#include      "impl1_c.inc"
 #include      "intstamp_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER ,INTENT(IN) :: NSENSOR
       INTEGER IPARI(NPARI,NINTER),RETRI(*),ITAB(*),
      .        NBINTC21 ,INTLIST21(*)
 C     REAL
       my_real :: TEMP(*)
       TYPE(INTBUF_STRUCT_) INTBUF_TAB(*)
-      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) ,INTENT(IN) :: SENSOR_TAB
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -2161,7 +2095,7 @@ Chd|        INTSTAMP_MOD                  share/modules/intstamp_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
 Chd|====================================================================
-      SUBROUTINE SPMD_I21TEMPCOM(IPARI,TEMP,INTBUF_TAB,SENSOR_TAB) 
+      SUBROUTINE SPMD_I21TEMPCOM(IPARI,TEMP,INTBUF_TAB,NSENSOR,SENSOR_TAB) 
 C============================================================================
 C   M o d u l e s
 C-----------------------------------------------
@@ -2186,20 +2120,18 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
-#include      "fxbcom.inc"
-#include      "spmd_c.inc"
 #include      "param_c.inc"
 #include      "task_c.inc"
-#include      "parit_c.inc"
 #include      "intstamp_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER  ,INTENT(IN) :: NSENSOR
       INTEGER  IPARI(NPARI,NINTER)
 C     REAL
       my_real :: TEMP(*)
       TYPE(INTBUF_STRUCT_) INTBUF_TAB(*)
-      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) ,INTENT(IN) :: SENSOR_TAB
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -2365,7 +2297,7 @@ Chd|        SENSOR_MOD                    share/modules/sensor_mod.F
 Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
       SUBROUTINE SPMD_I21FTHECOM(IPARI    ,FTHE  ,INTBUF_TAB,SENSOR_TAB,NISKYFI ,
-     .                           FTHESKYI ,ISKY  ,FSKYI     ,CONDNSKYI ) 
+     .                           FTHESKYI ,ISKY  ,FSKYI     ,CONDNSKYI ,NSENSOR ) 
 C============================================================================
 C   M o d u l e s
 C-----------------------------------------------
@@ -2391,8 +2323,6 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
-#include      "fxbcom.inc"
-#include      "spmd_c.inc"
 #include      "param_c.inc"
 #include      "task_c.inc"
 #include      "parit_c.inc"
@@ -2401,11 +2331,12 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER  ,INTENT(IN) :: NSENSOR
       INTEGER  IPARI(NPARI,NINTER), ISKY(*), NISKYFI(*)
 C     REAL
       my_real :: FTHE(*),FTHESKYI(*),FSKYI(LSKYI,*),CONDNSKYI(*)
       TYPE(INTBUF_STRUCT_) INTBUF_TAB(*)
-      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR),INTENT(IN) :: SENSOR_TAB
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -2545,7 +2476,7 @@ C RECEIVE comm structure
                    N = NINT(RBUFR(IDEB+1))
                    NOD = INTBUF_TAB(NIN)%MSR_L(N)
                    FTHE(NOD) = FTHE(NOD) + RBUFR(IDEB+2)
-                   IDEB = IDEB + 2	   
+                   IDEB = IDEB + 2     
                 ENDDO
                 IDEBUT2(NI) = IDEBUT2(NI) + LEN 
               ENDIF
@@ -2638,7 +2569,7 @@ C
                 CALL ANCMSG(MSGID=20,ANMODE=ANINFO)
                 CALL ARRET(2)
               END IF
-	                    
+                              
               DO J=1,NIF
                  INDEX(J)=J
                  TEMPO(J)=FTHESKYFI(NIN)%P(J)
@@ -2656,7 +2587,7 @@ C precomptage du nombre de contacts par processeur+calcul nsnfi total
 
              IF (NIF > 0 ) THEN
                DEALLOCATE(TEMPO,INDEX)
-	     ENDIF
+               ENDIF
           ENDIF
 
         ENDDO
@@ -2791,7 +2722,7 @@ C
                       FSKYI(NISKY,3)=ZERO
                       FSKYI(NISKY,4)=ZERO
                       IF(NODADT_THERM == 1 )  CONDNSKYI(NISKY)=ZERO
-                      FTHESKYI(NISKY)=RBUFR(IDEB+2)	
+                      FTHESKYI(NISKY)=RBUFR(IDEB+2)
                       ISKY(NISKY) = NOD  
                       IDEB = IDEB + 2
                    ENDDO
@@ -2853,14 +2784,7 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com03_c.inc"
-#include      "com04_c.inc"
-#include      "scr05_c.inc"
-#include      "scr18_c.inc"
 #include      "task_c.inc"
-#include      "param_c.inc"
-#include      "r4r8_p.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -3045,14 +2969,7 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com03_c.inc"
-#include      "com04_c.inc"
-#include      "scr05_c.inc"
-#include      "scr18_c.inc"
 #include      "task_c.inc"
-#include      "param_c.inc"
-#include      "r4r8_p.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

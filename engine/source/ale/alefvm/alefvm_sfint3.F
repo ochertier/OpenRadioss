@@ -1,34 +1,34 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  ALEFVM_SFINT3                 source/ale/alefvm/alefvm_sfint3.F
 Chd|-- called by -----------
 Chd|        ALEFVM_MAIN                   source/ale/alefvm/alefvm_main.F
 Chd|-- calls ---------------
-Chd|        ALEFVM_MOD                    ../common_source/modules/alefvm_mod.F
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
-Chd|        I22BUFBRIC_MOD                ../common_source/modules/cut-cell-search_mod.F
-Chd|        I22TRI_MOD                    ../common_source/modules/cut-cell-search_mod.F
+Chd|        ALEFVM_MOD                    ../common_source/modules/ale/alefvm_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
+Chd|        I22BUFBRIC_MOD                ../common_source/modules/interfaces/cut-cell-search_mod.F
+Chd|        I22TRI_MOD                    ../common_source/modules/interfaces/cut-cell-search_mod.F
 Chd|====================================================================
       SUBROUTINE ALEFVM_SFINT3 (
      1                          IXS,  NV46 ,  ALE_CONNECT, IALEFVM_FLG, ITASK,
@@ -62,16 +62,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "com08_c.inc"
 #include      "vect01_c.inc"
-#include      "nsvis_c.inc"
-#include      "fluid_scr_c.inc"
 #include      "inter22.inc"
 #include      "param_c.inc"
-#include      "alefvm.inc"
-#include      "task_c.inc"
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C----------------------------------------------- 
@@ -108,8 +101,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   P r e - C o n d i t i o n s
 C-----------------------------------------------      
-      IF(IALEFVM==0)    RETURN
-      IMAT        = IXS(1,LFT+NFT)
+      IF(ALEFVM_Param%IEnabled==0)    RETURN
+      IMAT        = IXS(1,1+NFT)
       ILAW        = IPM(2,IMAT)
       IALEFVM_FLG = IPM(251,IMAT)
       IF(IALEFVM_FLG <= 1)RETURN       
@@ -126,9 +119,9 @@ C-----------------------------------------------
       ! NORMAL VECTOR FOR ALE                                       !
       !-------------------------------------------------------------!                                       
 !      IF(JALE==1 .OR. JEUL==0)THEN  !lagrangian bricks also
-        DO I=LFT,LLT
+        DO I=1,NEL
           II     = I + NFT
-	  !---8 local node numbers NC1 TO NC8 for solid element I ---!
+            !---8 local node numbers NC1 TO NC8 for solid element I ---!
           NC1=IXS(2,II)
           NC2=IXS(3,II)
           NC3=IXS(4,II)
@@ -137,7 +130,7 @@ C-----------------------------------------------
           NC6=IXS(7,II)
           NC7=IXS(8,II)
           NC8=IXS(9,II)
-	  !
+            !
           !---Coordinates of the 8 nodes
           X1(I)=X(1,NC1)
           Y1(I)=X(2,NC1)
@@ -171,7 +164,7 @@ C-----------------------------------------------
           Y8(I)=X(2,NC8)
           Z8(I)=X(3,NC8)
         ENDDO    
-        DO I=LFT,LLT        
+        DO I=1,NEL        
           ! Face-1
           NX(1,I)=(Y3(I)-Y1(I))*(Z2(I)-Z4(I)) - (Z3(I)-Z1(I))*(Y2(I)-Y4(I))
           NY(1,I)=(Z3(I)-Z1(I))*(X2(I)-X4(I)) - (X3(I)-X1(I))*(Z2(I)-Z4(I))
@@ -206,18 +199,18 @@ C-----------------------------------------------
       !IPRES_MOM = 0,1,2,3,4  : (P1+P2)/2
       !IPRES_MOM =   5        : (rho1c1P1+rho2c2P2)/(rho1c1+rho2c2) + (rho1c1*rho2c2/(rho1c1+rho2c2)) <uel-uadj,nel>  acoustic solver 
       
-      IPRES_MOM = I_ALE_SOLVER
+      IPRES_MOM = ALEFVM_Param%ISOLVER
       
 !      print *, "IPRES_MOM, SFINT3", IPRES_MOM
       
       SELECT CASE (IPRES_MOM)
         CASE(5) ! acoustic solver
-          DO I=LFT,LLT
+          DO I=1,NEL
             II               = I + NFT
             IAD2 = ALE_CONNECT%ee_connect%iad_connect(II)
-            P1               = F_FACE(1,4,II)
-            M1               = F_FACE(1,5,II)
-            Z_1              = F_FACE(1,3,II) ! impedance
+            P1               = ALEFVM_Buffer%F_FACE(1,4,II)
+            M1               = ALEFVM_Buffer%F_FACE(1,5,II)
+            Z_1              = ALEFVM_Buffer%F_FACE(1,3,II) ! impedance
             DO J=1,NV46
               IV  = ALE_CONNECT%ee_connect%connected(IAD2 + J - 1)
               IF(IV > 0)THEN
@@ -226,11 +219,11 @@ C-----------------------------------------------
                 DO JV=1,NV46
                   IF(ALE_CONNECT%ee_connect%connected(IAD3 + JV - 1)==II)EXIT
                 ENDDO
-                U1N1         = + F_FACE(3, J,II)
-                U2N1         = - F_FACE(3,JV,IV)     !UN2 = <U2,N2> = <U2,-N1> 
-                Z_2          =   F_FACE(1, 3,IV)
-                P2           =   F_FACE(1, 4,IV)
-                M2           =   F_FACE(1, 5,IV)
+                U1N1         = + ALEFVM_Buffer%F_FACE(3, J,II)
+                U2N1         = - ALEFVM_Buffer%F_FACE(3,JV,IV)     !UN2 = <U2,N2> = <U2,-N1> 
+                Z_2          =   ALEFVM_Buffer%F_FACE(1, 3,IV)
+                P2           =   ALEFVM_Buffer%F_FACE(1, 4,IV)
+                M2           =   ALEFVM_Buffer%F_FACE(1, 5,IV)
                 DENOM        =   Z_1 + Z_2
                 Mf           = MIN(M1,M2)
                 THETA        = MIN(ONE,Mf)                 !see dellacherie,omnes,raviart : fixing low mach issue
@@ -238,7 +231,7 @@ C-----------------------------------------------
               ELSE
               !--ADJACENT ELEM DOES NOT EXIST
                 !SLIDING RWALL BC
-                U1N1         = + F_FACE(3, J,II)
+                U1N1         = + ALEFVM_Buffer%F_FACE(3, J,II)
                 !Pf          =  P1
                 Mf           = M1
                 THETA        = MIN(ONE,Mf)                 !see dellacherie,omnes,raviart : fixing low mach issue
@@ -251,10 +244,10 @@ C-----------------------------------------------
             ENDDO!next J
           ENDDO!next I     
         CASE DEFAULT
-          DO I=LFT,LLT                                                       
+          DO I=1,NEL                                                       
             II    = I + NFT 
             IAD2 = ALE_CONNECT%ee_connect%iad_connect(II)
-            P1    = F_FACE(1,4,II)                                                
+            P1    = ALEFVM_Buffer%F_FACE(1,4,II)                                                
             DO J=1,NV46                                                      
               IV  = ALE_CONNECT%ee_connect%connected(IAD2 + J - 1)
               IF(IV > 0)THEN                                              
@@ -263,7 +256,7 @@ C-----------------------------------------------
                 DO JV=1,NV46                                                 
                   IF(ALE_CONNECT%ee_connect%connected(IAD3 + JV - 1)==II)EXIT                                   
                 ENDDO                                                        
-                P2           = F_FACE(1,4,IV)
+                P2           = ALEFVM_Buffer%F_FACE(1,4,IV)
                 Pf           = HALF*(P1+P2) 
               ELSE                                                           
               !--ADJACENT ELEM DOES NOT EXIST                                
@@ -284,7 +277,7 @@ c     ." id=", ixs(11,ii)," ncycle=", NCYCLE, " F=", FFACE(1:3,J,I) , "Pf=", Pf
       !-------------------------------------------------------------!
       ! INTEGRAL ON EACH FACE  from Integral(DIV(SIGMA),Volume)     !
       !-------------------------------------------------------------!
-      DO I=LFT,LLT
+      DO I=1,NEL
         II           = I + NFT
         IF(INT22/=0)THEN
           IB           = NINT(IAD22(I))
@@ -297,14 +290,14 @@ c     ." id=", ixs(11,ii)," ncycle=", NCYCLE, " F=", FFACE(1:3,J,I) , "Pf=", Pf
               !  write (*,FMT='(A,I6,A,3F30.16)') "   brick ID=", ixs(11,II),"  Fint=", F0(1:3,I)
 
         
-        FINT_CELL(1,II) = F0(1,I)
-        FINT_CELL(2,II) = F0(2,I)
-        FINT_CELL(3,II) = F0(3,I)
+        ALEFVM_Buffer%FINT_CELL(1,II) = F0(1,I)
+        ALEFVM_Buffer%FINT_CELL(2,II) = F0(2,I)
+        ALEFVM_Buffer%FINT_CELL(3,II) = F0(3,I)
         
         !Fcell already contains gravity force, so do not erase but add               
-        FCELL(1,II)  = FCELL(1,II) + F0(1,I) + FEXT_CELL(1,II)
-        FCELL(2,II)  = FCELL(2,II) + F0(2,I) + FEXT_CELL(2,II)
-        FCELL(3,II)  = FCELL(3,II) + F0(3,I) + FEXT_CELL(3,II)              
+        ALEFVM_Buffer%FCELL(1,II)  = ALEFVM_Buffer%FCELL(1,II) + F0(1,I) + ALEFVM_Buffer%FEXT_CELL(1,II)
+        ALEFVM_Buffer%FCELL(2,II)  = ALEFVM_Buffer%FCELL(2,II) + F0(2,I) + ALEFVM_Buffer%FEXT_CELL(2,II)
+        ALEFVM_Buffer%FCELL(3,II)  = ALEFVM_Buffer%FCELL(3,II) + F0(3,I) + ALEFVM_Buffer%FEXT_CELL(3,II)              
       ENDDO!next I
 
 

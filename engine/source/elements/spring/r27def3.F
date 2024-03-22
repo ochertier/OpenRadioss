@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  R27DEF3                       source/elements/spring/r27def3.F
 Chd|-- called by -----------
@@ -27,12 +27,14 @@ Chd|        RFORC3                        source/elements/spring/rforc3.F
 Chd|-- calls ---------------
 Chd|        FINTER                        source/tools/curve/finter.F   
 Chd|====================================================================
-      SUBROUTINE R27DEF3(F       ,E       ,DL      ,AL0     ,
-     2                   IPOS    ,GEO     ,IGEO    ,
-     3                   NPF     ,TF      ,V       ,OFF     ,ANIM    ,
-     4                   AL0_ERR ,X1DP    ,X2DP    ,NGL     ,
-     5                   MGN     ,EX      ,EY      ,EZ      ,XK      ,
-     6                   XM      ,XC      ,FSCALE  )
+      SUBROUTINE R27DEF3(
+     1   F,       E,       DL,      AL0,
+     2   IPOS,    GEO,     IGEO,    NPF,
+     3   TF,      V,       OFF,     ANIM,
+     4   AL0_ERR, X1DP,    X2DP,    NGL,
+     5   MGN,     EX,      EY,      EZ,
+     6   XK,      XM,      XC,      FSCALE,
+     7   NEL,     NFT,     CRIT)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -48,15 +50,13 @@ C-----------------------------------------------
 #include      "units_c.inc"
 #include      "scr17_c.inc"
 #include      "scr14_c.inc"
-#include      "scr03_c.inc"
 #include      "param_c.inc"
-#include      "com04_c.inc"
 #include      "com08_c.inc"
-#include      "vect01_c.inc"
-#include      "com01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: NEL
+      INTEGER, INTENT(IN) :: NFT
       INTEGER NPF(*),IGEO(NPROPGI,*),NGL(*),MGN(*)
 C     REAL
       my_real
@@ -65,6 +65,8 @@ C     REAL
      .   AL0_ERR(*),EX(MVSIZ),EY(MVSIZ),EZ(MVSIZ),XK(MVSIZ),
      .   XM(MVSIZ),XC(MVSIZ),FSCALE(MVSIZ)
       DOUBLE PRECISION X1DP(3,*),X2DP(3,*)
+      my_real, DIMENSION(NEL), INTENT(INOUT) :: 
+     .   CRIT
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -93,7 +95,7 @@ c
 C     ==================================================================
 C     RECOVERING SPRING PARAMETERS
 C     ==================================================================
-      DO I=LFT,LLT
+      DO I=1,NEL
         PID        = MGN(I) 
         XM(I)      = GEO(1,PID)          ! Spring mass
         XK(I)      = GEO(2,PID)          ! Spring linear stiffness
@@ -120,7 +122,7 @@ C
 C     ==================================================================
 C     COMPUTATION OF THE NEW SPRING LENGTH
 C     ==================================================================
-      DO I=LFT,LLT
+      DO I=1,NEL
         EXDP(I)  = X2DP(1,I)-X1DP(1,I)
         EYDP(I)  = X2DP(2,I)-X1DP(2,I)
         EZDP(I)  = X2DP(3,I)-X1DP(3,I)
@@ -130,18 +132,18 @@ C     ==================================================================
 C
       ! Conversion DOUBLE -> MY_REAL if TT = ZERO
       IF (TT == ZERO) THEN
-        DO I=LFT,LLT
+        DO I=1,NEL
           AL0(I)     = ALDP(I)             ! cast double to My_real
           AL0_ERR(I) = ALDP(I)-AL0(I)      ! difference between double and My_real
         ENDDO
       ENDIF
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         AL0DP(I) = AL0(I)                  ! cast My_real to double
         AL0DP(I) = AL0DP(I) + AL0_ERR(I)   ! AL_DP doit etre recalcule ainsi afin de garantir la coherence absolue entre AL0_DP et AL_DP   
       ENDDO
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         SUM     = MAX(ALDP(I),EM15)
         EXDP(I) = EXDP(I)/SUM
         EYDP(I) = EYDP(I)/SUM
@@ -152,12 +154,12 @@ C
       ENDDO
 C
       ! Spring total elongation
-      DO I=LFT,LLT
+      DO I=1,NEL
         DL(I) = ALDP(I) - AL0DP(I)
       ENDDO
 C
       ! ILENG flag 
-      DO I=LFT,LLT
+      DO I=1,NEL
         ! Value per length unit
         IF (ILENG(I) /= 0) THEN
           XL0(I) = AL0DP(I)
@@ -176,7 +178,7 @@ C     ==================================================================
       IF (DT11 == ZERO) DT11 = EP30
 C
       ! Recovering spring variables + Unit conversion if needed (ILENG)
-      DO I = LFT,LLT
+      DO I = 1,NEL
         ! Current total elongation
         DL(I)    = DL(I)/XL0(I)
         ! Old elongation
@@ -194,7 +196,7 @@ C
 C     ------------------------------------------------------------------
 C     LOOP OVER THE ELEMENTS
 C     ------------------------------------------------------------------
-      DO I=LFT,LLT
+      DO I=1,NEL
 c
         ! Computation if the element is not broken only
         IF ((OFF(I) == ONE).AND.(DL(I) < GAP(I) .OR. ITENS(I) > 0)) THEN 
@@ -254,7 +256,7 @@ c
 C
       ! Computation of damage variable for animations
       IF (ANIM_FE(11) /= 0) THEN
-        DO I=LFT,LLT
+        DO I=1,NEL
           J = I+NFT
           IF (IFAIL(I) == 1) THEN 
             IF (ITENS(I) > 0) THEN 
@@ -280,7 +282,7 @@ C
       ENDIF
 c
       ! Computation of the Spring energy + Unit conversion if needed (ILENG)
-      DO I=LFT,LLT
+      DO I=1,NEL
         E(I)     = E(I) + (DL(I)-DLOLD(I))*(F(I)+FOLD(I)) * HALF
         E(I)     = E(I)*XL0(I)
         DL(I)    = DL(I)*XL0(I)
@@ -295,18 +297,26 @@ C     ==================================================================
 C     CHECKING BROKEN SPRINGS
 C     ==================================================================
       NINDX = 0
-      DO I=LFT,LLT
+      DO I=1,NEL
         IF (OFF(I) == ONE .AND. IFAIL(I) /= 0) THEN
           IF (IFAIL(I) == 1) THEN
             IF (ITENS(I) > 0) THEN
+              CRIT(I) = MAX(DL(I)/(DMX(I)*XL0(I)),DL(I)/(DMN(I)*XL0(I)))
+              CRIT(I) = MIN(CRIT(I),ONE)
+              CRIT(I) = MAX(CRIT(I),ZERO)
               IF (DL(I) > DMX(I)*XL0(I) .OR. DL(I) < DMN(I)*XL0(I)) THEN
+                CRIT(I) = ONE
                 OFF(I) = ZERO
                 NINDX  = NINDX + 1
                 INDX(NINDX) = I
                 IDEL7NOK = 1
               ENDIF
             ELSE
+              CRIT(I) = DL(I)/(DMN(I)*XL0(I))
+              CRIT(I) = MIN(CRIT(I),ONE)
+              CRIT(I) = MAX(CRIT(I),ZERO)
               IF (DL(I) < DMN(I)*XL0(I)) THEN
+                CRIT(I) = ONE
                 OFF(I) = ZERO
                 NINDX  = NINDX + 1
                 INDX(NINDX) = I
@@ -314,15 +324,23 @@ C     ==================================================================
               ENDIF
             ENDIF
           ELSEIF (IFAIL(I) == 2) THEN
-            IF (ITENS(I) > 0) THEN 
+            IF (ITENS(I) > 0) THEN
+              CRIT(I) = MAX(F(I)/DMX(I),F(I)/DMN(I)) 
+              CRIT(I) = MIN(CRIT(I),ONE)
+              CRIT(I) = MAX(CRIT(I),ZERO)
               IF (F(I)  > DMX(I) .OR. F(I)  < DMN(I)) THEN
+                CRIT(I) = ONE
                 OFF(I) = ZERO
                 NINDX  = NINDX + 1
                 INDX(NINDX) = I
                 IDEL7NOK = 1
               ENDIF
             ELSE
+              CRIT(I) = F(I)/DMN(I)
+              CRIT(I) = MIN(CRIT(I),ONE)
+              CRIT(I) = MAX(CRIT(I),ZERO)
               IF (F(I)  < DMN(I)) THEN
+                CRIT(I) = ONE
                 OFF(I) = ZERO
                 NINDX  = NINDX + 1
                 INDX(NINDX) = I

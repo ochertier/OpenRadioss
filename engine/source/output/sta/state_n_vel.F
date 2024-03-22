@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  STAT_N_VEL                    source/output/sta/state_n_vel.F
 Chd|-- called by -----------
@@ -38,10 +38,8 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "units_c.inc"
-#include      "scr05_c.inc"
 #include      "task_c.inc"
 #include      "scr14_c.inc"
-#include      "scr16_c.inc"
 #include      "spmd_c.inc"
 #include      "com01_c.inc"
 C-----------------------------------------------
@@ -58,7 +56,8 @@ C-----------------------------------------------
       INTEGER NODTAGLOB(LENG)
       my_real
      . VG(3,LENG),VRG(3,LENG)
-      CHARACTER*100 LINE
+      CHARACTER(LEN=100) :: LINE
+      INTEGER LEN_LINE
 C-----------------------------------------------
 !
       IF (NSPMD > 1) THEN
@@ -73,9 +72,14 @@ C-----------------------------------------------
         WRITE(IUGEO,'(A)') '/INIVEL/NODE/1'
         WRITE(IUGEO,'(A)') 'INITIAL NODAL VELOCITY'
       ELSE
-        WRITE(IUGEO,'(A)') '/INIVEL/NODE/1'
-        WRITE(IUGEO,'(A)') 'INITIAL NODAL VELOCITY'
-        CALL STRS_TXT50(LINE,100)
+        ! Write STATE File in GZIP format
+        WRITE(LINE,'(A)') '/INIVEL/NODE/1'
+        LEN_LINE=LEN_TRIM(LINE)
+        CALL STRS_TXT50(LINE,LEN_LINE)
+!
+        WRITE(LINE,'(A)') 'INITIAL NODAL VELOCITY'
+        LEN_LINE=LEN_TRIM(LINE)
+        CALL STRS_TXT50(LINE,LEN_LINE)
       ENDIF
 !
       IF (NSPMD == 1) THEN
@@ -85,12 +89,17 @@ C-----------------------------------------------
                WRITE(IUGEO,'(2I10,1P3E20.9)') ITAB(I),0,(V(J,I),J=1,3)
                IF (IRODDL /= 0) WRITE(IUGEO,'(20X,1P3E20.9)') (VR(J,I),J=1,3)
              ELSE
+               ! Write STATE File in GZIP format
                WRITE(LINE,'(2I10,1P3E20.9)')  ITAB(I),0,(V(J,I),J=1,3)
-               CALL STRS_TXT50(LINE,100)
+               LEN_LINE=LEN_TRIM(LINE)
+               CALL STRS_TXT50(LINE,LEN_LINE)
+
                IF (IRODDL /= 0) THEN
                  WRITE(LINE,'(20X,1P3E20.9)')(VR(J,I),J=1,3)
-                 CALL STRS_TXT50(LINE,100)
+                 LEN_LINE=LEN_TRIM(LINE)
+                 CALL STRS_TXT50(LINE,LEN_LINE)
                END IF
+
              END IF
            END IF
         END DO
@@ -101,12 +110,17 @@ C-----------------------------------------------
                WRITE(IUGEO,'(2I10,1P3E20.9)') ITABG(I),0,(VG(J,I),J=1,3)
                IF (IRODDL /= 0) WRITE(IUGEO,'(20X,1P3E20.9)') (VRG(J,I),J=1,3)
              ELSE
-               WRITE(IUGEO,'(2I10,1P3E20.9)')  ITABG(I),0,(VG(J,I),J=1,3)
-               CALL STRS_TXT50(LINE,100)
+               ! Write STATE File in GZIP format
+               WRITE(LINE,'(2I10,1P3E20.9)')  ITABG(I),0,(VG(J,I),J=1,3)
+               LEN_LINE=LEN_TRIM(LINE)
+               CALL STRS_TXT50(LINE,LEN_LINE)
+
                IF (IRODDL /= 0) THEN
-                 WRITE(IUGEO,'(20X,1P3E20.9)')          (VRG(J,I),J=1,3)
-                 CALL STRS_TXT50(LINE,100)
+                 WRITE(LINE,'(20X,1P3E20.9)')          (VRG(J,I),J=1,3)
+                 LEN_LINE=LEN_TRIM(LINE)
+                 CALL STRS_TXT50(LINE,LEN_LINE)
                END IF
+
              END IF
           END IF
         END DO

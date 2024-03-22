@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  SIGEPS45C                     source/materials/mat/mat045/sigeps45c.F
 Chd|-- called by -----------
@@ -47,10 +47,6 @@ C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
-#include      "task_c.inc"
-#include      "com08_c.inc"
-#include      "scr20_c.inc"
-#include      "units_c.inc"
 C---------+---------+---+---+--------------------------------------------
 C VAR     | SIZE    |TYP| RW| DEFINITION
 C---------+---------+---+---+--------------------------------------------
@@ -209,7 +205,7 @@ C-----------------------------------------------
         NNU1 = ANU / (ONE - ANU)
         NU1 = ONE/(ONE-ANU)
         NU2 = ONE/(ONE+ANU)
-        NU3 = ONE - NNU1	
+        NU3 = ONE - NNU1
 C        NNU2    = NNU1*NNU1
 C        NU4 = 1. + NNU2 + NNU1
 C        NU5 = 1. + NNU2 - 2.*NNU1
@@ -360,7 +356,7 @@ C#include "vectorize.inc"
              YLD_I =UVAR(I,3)+UVAR(I,4)*DPLA_I(I)
              DR(I) =HALF*YOUNG*DPLA_I(I)/YLD_I
              PP(I)  =ONE/(ONE+DR(I)*NU1)
-             QQ(I)  =ONE/(ONE + THREE*DR(I)*NU2)	     
+             QQ(I)  =ONE/(ONE + THREE*DR(I)*NU2)       
              P2    =PP(I)*PP(I)
              Q2    =QQ(I)*QQ(I)
              F     =AA(I)*P2+BB(I)*Q2-YLD_I*YLD_I

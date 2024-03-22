@@ -1,31 +1,31 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  ALEFVM_EXPAND_MOM2            source/ale/alefvm/alefvm_expand_mom2.F
 Chd|-- called by -----------
 Chd|        ALEFVM_SCHEME                 source/ale/alefvm/alefvm_scheme.F
 Chd|-- calls ---------------
-Chd|        ALEFVM_MOD                    ../common_source/modules/alefvm_mod.F
+Chd|        ALEFVM_MOD                    ../common_source/modules/ale/alefvm_mod.F
 Chd|====================================================================
       SUBROUTINE ALEFVM_EXPAND_MOM2 (
      1                               X  , V   ,   IXS, NV46, 
@@ -54,15 +54,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com08_c.inc"
 #include      "vect01_c.inc"
-#include      "nsvis_c.inc"
-#include      "fluid_scr_c.inc"
-#include      "inter22.inc"
 #include      "param_c.inc"
-#include      "alefvm.inc"
-#include      "task_c.inc"
 #include      "comlock.inc"
 C-----------------------------------------------
 C   D e s c r i p t i o n
@@ -91,7 +84,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   P r e - C o n d i t i o n s
 C-----------------------------------------------      
-      IF(IALEFVM==0)    RETURN    
+      IF(ALEFVM_Param%IEnabled==0)    RETURN    
 C-----------------------------------------------
 C   S o u r c e   L i n e s 
 C-----------------------------------------------
@@ -100,7 +93,7 @@ C-----------------------------------------------
       ! EXPANDING CELL VALUE TO FACES AND NODES                     !
       !   SPECIFIC TREATMENT IS DONE TO HAVE WALL BCS WITH NODES    !
       !-------------------------------------------------------------!
-      DO I=LFT,LLT
+      DO I=1,NEL
         !!---DETECT BORDER FACES---!
         !IBORDER(1:6) = 0 !0=not a border face. 1:otherwise
         !DO J=1,NV46
@@ -121,10 +114,10 @@ C-----------------------------------------------
         IN(8)             = IXS(9,II)
 #include "lockon.inc"         
         DO K=1,8
-          VERTEX(1,IN(K)) = VERTEX(1,IN(K)) + MOM(I,1)/EIGHT 
-          VERTEX(2,IN(K)) = VERTEX(2,IN(K)) + MOM(I,2)/EIGHT
-          VERTEX(3,IN(K)) = VERTEX(3,IN(K)) + MOM(I,3)/EIGHT		   
-          VERTEX(4,IN(K)) = VERTEX(4,IN(K)) + ONE
+          ALEFVM_Buffer%VERTEX(1,IN(K)) = ALEFVM_Buffer%VERTEX(1,IN(K)) + MOM(I,1)/EIGHT 
+          ALEFVM_Buffer%VERTEX(2,IN(K)) = ALEFVM_Buffer%VERTEX(2,IN(K)) + MOM(I,2)/EIGHT
+          ALEFVM_Buffer%VERTEX(3,IN(K)) = ALEFVM_Buffer%VERTEX(3,IN(K)) + MOM(I,3)/EIGHT       
+          ALEFVM_Buffer%VERTEX(4,IN(K)) = ALEFVM_Buffer%VERTEX(4,IN(K)) + ONE
         ENDDO
 #include "lockoff.inc"
       ENDDO        

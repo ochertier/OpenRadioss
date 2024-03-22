@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  SSURFTAGIGEO                  source/groups/ssurftagigeo.F  
 Chd|-- called by -----------
@@ -46,7 +46,6 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "param_c.inc"
 #include      "scr17_c.inc"
-#include      "ige3d_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -203,44 +202,44 @@ C           looks for an elt sharing the face.
               END DO
               IF(NN==NF)THEN ! il faut que la face ait 4 points en commun avec uen autre pour eventuellement etre exclue
                 DO KK=1,6
-            	  DO II=1,4
-            	    MS(II)=IXIG3D(KXIG3D(4,KS)+FACEIGEO(II,KK)-1) 
-            	  END DO
+            DO II=1,4
+              MS(II)=IXIG3D(KXIG3D(4,KS)+FACEIGEO(II,KK)-1) 
+            END DO
 C
 C                 permute
-           	  MMIN=MS(1)
-           	  DO II=2,MF
-           	    MMIN=MIN(MMIN,MS(II))
-           	  END DO
-            	  DO IPERM=1,MF
-            	    IF(MMIN==MS(IPERM).AND.
+            MMIN=MS(1)
+            DO II=2,MF
+              MMIN=MIN(MMIN,MS(II))
+            END DO
+            DO IPERM=1,MF
+              IF(MMIN==MS(IPERM).AND.
      .                 MS(MOD(IPERM,MF)+1)/=MS(IPERM))THEN
-            	      DO II=1,MF
-            	  	    MI(II)=MS(MOD(II+IPERM-2,MF)+1)
-            	      END DO
-            	      EXIT
-            	    END IF
-            	  END DO
+                DO II=1,MF
+                  MI(II)=MS(MOD(II+IPERM-2,MF)+1)
+                END DO
+                EXIT
+              END IF
+            END DO
 C
                   IF(CROSSFACEIGEO(1,KK)/=0) THEN
-              	    DO II=1,4
-              	      MS(II)=IXIG3D(KXIG3D(4,KS)+CROSSFACEIGEO(II,KK)-1) 
-            	    END DO
+              DO II=1,4
+                MS(II)=IXIG3D(KXIG3D(4,KS)+CROSSFACEIGEO(II,KK)-1) 
+              END DO
 C
 C                   permute
-           	    MMIN=MS(1)
-           	    DO II=2,MF
-           	      MMIN=MIN(MMIN,MS(II))
-           	    END DO
-            	    DO IPERM=1,MF
-            	      IF(MMIN==MS(IPERM).AND.
+              MMIN=MS(1)
+              DO II=2,MF
+                MMIN=MIN(MMIN,MS(II))
+              END DO
+              DO IPERM=1,MF
+                IF(MMIN==MS(IPERM).AND.
      .                   MS(MOD(IPERM,MF)+1)/=MS(IPERM))THEN
-            	        DO II=1,MF
-            	          MI2(II)=MS(MOD(II+IPERM-2,MF)+1)
-            	        END DO
-            	        EXIT
-            	      END IF
-            	    END DO
+                  DO II=1,MF
+                    MI2(II)=MS(MOD(II+IPERM-2,MF)+1)
+                  END DO
+                  EXIT
+                END IF
+              END DO
                   ENDIF
 C
                   IF((MI(1)==NI(1).AND.MI(NF)==NI(2)).OR.
@@ -822,8 +821,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
 #include      "com04_c.inc"
-#include      "tabsiz_c.inc"
-#include      "ige3d_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

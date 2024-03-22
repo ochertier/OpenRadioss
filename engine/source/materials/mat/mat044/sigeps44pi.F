@@ -1,34 +1,34 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  SIGEPS44PI                    source/materials/mat/mat044/sigeps44pi.F
 Chd|-- called by -----------
-Chd|        MULAWP                        source/elements/beam/mulawp.F 
+Chd|        MULAW_IB                      source/elements/beam/mulaw_ib.F
 Chd|-- calls ---------------
 Chd|        VINTER                        source/tools/curve/vinter.F   
 Chd|====================================================================
       SUBROUTINE SIGEPS44PI(
-     1               NEL     ,NUPARAM ,UPARAM  ,IPM     ,MAT     ,
+     1               NEL     ,NUPARAM ,UPARAM  ,IPM     ,IMAT    ,
      2               OFF     ,PLA     ,DEPSXX  ,DEPSXY  ,DEPSXZ  ,        
      3               SIGOXX  ,SIGOXY  ,SIGOXZ  ,EPST    ,EPSP    ,      
      4               SIGNXX  ,SIGNXY  ,SIGNXZ  ,ETSE    ,NUVAR   ,
@@ -42,18 +42,16 @@ C---------+---------+---+---+--------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "scr05_c.inc"
 #include      "scr17_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
 C-----------------------------------------------
 C   I N P U T   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER ,INTENT(IN) :: IMAT
       INTEGER ,INTENT(IN) :: NEL,NUPARAM,NUVAR,
      .   NFUNC,IFUNC(NFUNC),NPF(*),NVARTMP
       INTEGER ,DIMENSION(NPROPMI,NUMMAT) ,INTENT(IN) :: IPM
-      INTEGER ,DIMENSION(NEL) ,INTENT(IN) :: MAT
       my_real ,DIMENSION(NEL) ,INTENT(IN) :: EPST,
      .   DEPSXX,DEPSXY,DEPSXZ,SIGOXX,SIGOXY,SIGOXZ
       my_real ,DIMENSION(*) ,INTENT(IN) :: UPARAM
@@ -78,8 +76,8 @@ C=======================================================================
       SHFACT = FIVE_OVER_6
       EPIF   = ZERO
 c
+      IADBUF   = IPM(7,IMAT)-1
       DO I=1,NEL
-        IADBUF   = IPM(7,MAT(I))-1
         E(I)     = UPARAM(IADBUF+1)
         NU(I)    = UPARAM(IADBUF+2)
         CA(I)    = UPARAM(IADBUF+3)
@@ -178,8 +176,8 @@ c-------------------
           SIGNXX(I) = SIGNXX(I)*R                                  
           SIGNXY(I) = SIGNXY(I)*R                                  
           SIGNXZ(I) = SIGNXZ(I)*R   
-          DPLA(I) = OFF(I)*SVM*(ONE - R) / G3(I)                       
-          PLA(I) = PLA(I) + OFF(I)*SVM*(ONE - R) / G3(I)
+          DPLA(I) = OFF(I)*SVM*(ONE - R) / E(I)                    
+          PLA(I) = PLA(I) + OFF(I)*SVM*(ONE - R) / E(I)
         ENDIF                                   
       ENDDO     
 c--------------------------------

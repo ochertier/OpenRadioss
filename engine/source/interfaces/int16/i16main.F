@@ -1,25 +1,36 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
+Chd|====================================================================
+Chd|  I16MAIN_MOD                   source/interfaces/int16/i16main.F
+Chd|-- called by -----------
+Chd|        I16CRIT                       source/interfaces/int16/i16crit.F
+Chd|        I16MAIN                       source/interfaces/int16/i16main.F
+Chd|-- calls ---------------
+Chd|====================================================================
+      MODULE I16MAIN_MOD
+#include "my_real.inc"
+        my_real :: XSLVG(7), XMSRG(7)
+      END MODULE
 Chd|====================================================================
 Chd|  I16MAIN                       source/interfaces/int16/i16main.F
 Chd|-- called by -----------
@@ -33,6 +44,7 @@ Chd|        I20LAGM                       source/interfaces/int16/i20lagm.F
 Chd|        I8LAGM                        source/interfaces/int16/i8lagm.F
 Chd|        MY_BARRIER                    source/system/machine.F       
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
+Chd|        I16MAIN_MOD                   source/interfaces/int16/i16main.F
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE I16MAIN(
@@ -44,6 +56,7 @@ Chd|====================================================================
 C-----------------------------------------------
 C   M o d u l e s
 C----------------------------------------------- 
+      USE I16MAIN_MOD
       USE INTBUFDEF_MOD
       USE GROUPDEF_MOD
 C-----------------------------------------------
@@ -69,18 +82,11 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "units_c.inc"
-#include      "scr17_c.inc"
 #include      "task_c.inc"
 
       COMMON /i16tmp/size
@@ -150,9 +156,9 @@ C=======================================================================
 C      TEST pour savoir s'il faut retrier + initialisation
 C=======================================================================
        CALL I16CRIT(
-     1   X	  ,IGRNOD(IGN)%ENTITY,IGRBRIC(IGE)%ENTITY ,NSN	,EMINX      ,
-     2   NME	  ,ITASK       ,INTBUF_TAB(NIN)%XSAV ,IXS	,IXS16      ,
-     3   IXS20    ,IXS10       ,V	     ,A 	)
+     1   X    ,IGRNOD(IGN)%ENTITY,IGRBRIC(IGE)%ENTITY ,NSN  ,EMINX      ,
+     2   NME    ,ITASK       ,INTBUF_TAB(NIN)%XSAV ,IXS  ,IXS16      ,
+     3   IXS20    ,IXS10       ,V       ,A   )
 
 C -------------------------------------------------------------
        CALL MY_BARRIER
@@ -168,16 +174,16 @@ C -------------------------------------------------------------
 C=======================================================================
 C        TRI
 C=======================================================================
-	IPARI(35,NIN) = 0
+          IPARI(35,NIN) = 0
 C -------------------------------------------------------------
          CALL MY_BARRIER
 C -------------------------------------------------------------
-	 CALL I16BUCE(
-     1   IGRNOD(IGN)%ENTITY,IXS	 ,IXS16   ,IXS20	,IGRBRIC(IGE)%ENTITY ,
-     2   NME_T      ,WAT	 ,NSN	  ,INTBUF_TAB(NIN)%CAND_E,INTBUF_TAB(NIN)%CAND_N,
-     3   NOINT      ,IPARI(35,NIN) ,TZINF   ,MINBOX	  ,EMINX      ,
-     4   INTBUF_TAB(NIN)%XSAV,ITASK	 ,X	  ,V		,A	      ,
-     5   MX_CAND    ,IXS10	 ,ESH_T)
+           CALL I16BUCE(
+     1   IGRNOD(IGN)%ENTITY,IXS   ,IXS16   ,IXS20  ,IGRBRIC(IGE)%ENTITY ,
+     2   NME_T      ,WAT   ,NSN    ,INTBUF_TAB(NIN)%CAND_E,INTBUF_TAB(NIN)%CAND_N,
+     3   NOINT      ,IPARI(35,NIN) ,TZINF   ,MINBOX    ,EMINX      ,
+     4   INTBUF_TAB(NIN)%XSAV,ITASK   ,X    ,V    ,A        ,
+     5   MX_CAND    ,IXS10   ,ESH_T)
 C -------------------------------------------------------------
          CALL MY_BARRIER
 C -------------------------------------------------------------
@@ -186,11 +192,11 @@ C=======================================================================
 C      CONTACT
 C=======================================================================
        CALL I8LAGM(
-     1   X	 ,V	       ,LLL	  ,JLL  	 ,SLL	      ,
-     2   XLL	 ,INTBUF_TAB(NIN)%CAND_N,INTBUF_TAB(NIN)%CAND_E,IPARI(35,NIN),IXS	,
+     1   X   ,V         ,LLL    ,JLL     ,SLL        ,
+     2   XLL   ,INTBUF_TAB(NIN)%CAND_N,INTBUF_TAB(NIN)%CAND_E,IPARI(35,NIN),IXS  ,
      3   IADLL   ,EMINX        ,IGRNOD(IGN)%ENTITY,IGRBRIC(IGE)%ENTITY,
-     4   N_MUL_MX     ,ITASK	 ,A	       ,IPARI(30,NIN),
-     5   NIN	 ,NKMAX        ,COMNTAG   )
+     4   N_MUL_MX     ,ITASK   ,A         ,IPARI(30,NIN),
+     5   NIN   ,NKMAX        ,COMNTAG   )
        CALL I10LAGM(
      1   X       ,V            ,LLL       ,JLL           ,SLL         ,
      2   XLL     ,INTBUF_TAB(NIN)%CAND_N,INTBUF_TAB(NIN)%CAND_E,IPARI(35,NIN),IXS       ,
@@ -198,17 +204,17 @@ C=======================================================================
      4   N_MUL_MX     ,ITASK     ,A            ,IPARI(30,NIN),
      5   NIN     ,NKMAX        ,COMNTAG   )
        CALL I16LAGM(
-     1   X	 ,V	       ,LLL	  ,JLL  	 ,SLL	      ,
-     2   XLL	 ,INTBUF_TAB(NIN)%CAND_N,INTBUF_TAB(NIN)%CAND_E,IPARI(35,NIN),IXS ,
-     3   IXS16   ,IADLL        ,EMINX	  ,IGRNOD(IGN)%ENTITY,IGRBRIC(IGE)%ENTITY,
-     4   N_MUL_MX     ,ITASK	 ,A	       ,IPARI(30,NIN),
-     5   NIN	 ,NKMAX        ,COMNTAG   )
+     1   X   ,V         ,LLL    ,JLL     ,SLL        ,
+     2   XLL   ,INTBUF_TAB(NIN)%CAND_N,INTBUF_TAB(NIN)%CAND_E,IPARI(35,NIN),IXS ,
+     3   IXS16   ,IADLL        ,EMINX    ,IGRNOD(IGN)%ENTITY,IGRBRIC(IGE)%ENTITY,
+     4   N_MUL_MX     ,ITASK   ,A         ,IPARI(30,NIN),
+     5   NIN   ,NKMAX        ,COMNTAG   )
        CALL I20LAGM(
-     1   X	 ,V	       ,LLL	  ,JLL  	 ,SLL	      ,
-     2   XLL	 ,INTBUF_TAB(NIN)%CAND_N,INTBUF_TAB(NIN)%CAND_E,IPARI(35,NIN),IXS       ,
-     3   IXS20   ,IADLL        ,EMINX	  ,IGRNOD(IGN)%ENTITY,IGRBRIC(IGE)%ENTITY,
-     4   N_MUL_MX     ,ITASK	 ,A	       ,IPARI(30,NIN),
-     5   NIN	 ,NKMAX        ,COMNTAG   )
+     1   X   ,V         ,LLL    ,JLL     ,SLL        ,
+     2   XLL   ,INTBUF_TAB(NIN)%CAND_N,INTBUF_TAB(NIN)%CAND_E,IPARI(35,NIN),IXS       ,
+     3   IXS20   ,IADLL        ,EMINX    ,IGRNOD(IGN)%ENTITY,IGRBRIC(IGE)%ENTITY,
+     4   N_MUL_MX     ,ITASK   ,A         ,IPARI(30,NIN),
+     5   NIN   ,NKMAX        ,COMNTAG   )
 !
       CALL MY_BARRIER
 !

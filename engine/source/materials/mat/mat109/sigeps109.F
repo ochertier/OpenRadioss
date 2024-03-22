@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  SIGEPS109                     source/materials/mat/mat109/sigeps109.F
 Chd|-- called by -----------
@@ -38,7 +38,7 @@ Chd|====================================================================
      5     DEPSXX  ,DEPSYY  ,DEPSZZ  ,DEPSXY  ,DEPSYZ  ,DEPSZX  ,
      6     SIGOXX  ,SIGOYY  ,SIGOZZ  ,SIGOXY  ,SIGOYZ  ,SIGOZX  ,
      7     SIGNXX  ,SIGNYY  ,SIGNZZ  ,SIGNXY  ,SIGNYZ  ,SIGNZX  ,
-     8     INLOC   ,DPLANL  )
+     8     INLOC   ,DPLANL  ,IEOS    )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -51,13 +51,11 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc" 
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr17_c.inc"
 C-----------------------------------------------
 C   D u m m y A r g u m e n t s
 C-----------------------------------------------
+      INTEGER ,INTENT(IN) :: IEOS
       INTEGER NEL,NUPARAM,NUVAR,NVARTMP,NUMTABL,JTHE,INLOC
       INTEGER ,DIMENSION(NUMTABL),INTENT(IN)  :: ITABLE
       INTEGER ,DIMENSION(NEL)    ,INTENT(IN)  :: NGL
@@ -173,7 +171,7 @@ c---  self heating factor and temperatiure initialization
               IPOS_ETA(1:NEL,3) = VARTMP(1:NEL,5)
             END IF
 
-            CALL TABLE_VINTERP(TABLE(FUNC_ETA),NEL,IPOS_ETA,XVEC_ETA,FACT_ETA,DXDYV)          
+            CALL TABLE_VINTERP(TABLE(FUNC_ETA),NEL,NEL,IPOS_ETA,XVEC_ETA,FACT_ETA,DXDYV)          
       
             IF (NDIM_ETA > 1) VARTMP(1:NEL,4) = IPOS_ETA(1:NEL,2)
             IF (NDIM_ETA > 2) VARTMP(1:NEL,5) = IPOS_ETA(1:NEL,3)
@@ -213,7 +211,7 @@ c----------------------------------------------------
       IPOS(1:NEL,1) = VARTMP(1:NEL,1)
       IPOS(1:NEL,2) = 1
 c
-      CALL TABLE2D_VINTERP_LOG(TABLE(FUNC_YLD),ISMOOTH,NEL,IPOS,XVEC  ,YLD  ,HARDP,HARDR)               
+      CALL TABLE2D_VINTERP_LOG(TABLE(FUNC_YLD),ISMOOTH,NEL,NEL,IPOS,XVEC  ,YLD  ,HARDP,HARDR)               
 c
       YLD(1:NEL)   = YLD(1:NEL)   * YSCALE
       HARDP(1:NEL) = HARDP(1:NEL) * YSCALE
@@ -226,12 +224,12 @@ c        XVEC(1:NEL,1) = PLA(1:NEL)
         XVEC(1:NEL,2) = TREF
         IPOS(1:NEL,1) = VARTMP(1:NEL,2)
         IPOS(1:NEL,2) = VARTMP(1:NEL,3)
-        CALL TABLE_VINTERP(TABLE(FUNC_TEMP),NEL,IPOS,XVEC,YLD_TREF,DYDX)  
+        CALL TABLE_VINTERP(TABLE(FUNC_TEMP),NEL,NEL,IPOS,XVEC,YLD_TREF,DYDX)  
         VARTMP(1:NEL,2) = IPOS(1:NEL,1)     
         VARTMP(1:NEL,3) = IPOS(1:NEL,2)     
 c     
         XVEC(1:NEL,2) = TEMP(1:NEL)
-        CALL TABLE_VINTERP(TABLE(FUNC_TEMP),NEL,IPOS,XVEC,YLD_TEMP,DYDX)          
+        CALL TABLE_VINTERP(TABLE(FUNC_TEMP),NEL,NEL,IPOS,XVEC,YLD_TEMP,DYDX)          
 c     
         TFAC(1:NEL)  = YLD_TEMP(1:NEL) / YLD_TREF(1:NEL)      
         YLD(1:NEL)   = YLD(1:NEL)   * TFAC(1:NEL)      
@@ -294,7 +292,7 @@ c
             IPOS(II,2) = 1
           ENDDO
 c
-          CALL TABLE2D_VINTERP_LOG(TABLE(FUNC_YLD),ISMOOTH,NINDX,IPOS,XVEC,YLD_I,HARDP_I,HARDR_I)
+          CALL TABLE2D_VINTERP_LOG(TABLE(FUNC_YLD),ISMOOTH,NEL,NINDX,IPOS,XVEC,YLD_I,HARDP_I,HARDR_I)
 c
           DO II = 1, NINDX 
             I = INDEX(II)
@@ -345,8 +343,19 @@ c
           ENDDO                      
         ENDIF
 c
-c            
-      END IF     !  NINDX > 0
+      END IF     !  NINDX > 0  (plasticity)
+!-----------------------------------------------------------------------------
+      ! if EOS is used, material law calculates only deviatoric stress tensor
+      IF (IEOS > 0) THEN
+        DO I = 1, NEL
+          SIGNXX(I) = SIGNXX(I) - SIGM(I)
+          SIGNYY(I) = SIGNYY(I) - SIGM(I)
+          SIGNZZ(I) = SIGNZZ(I) - SIGM(I)
+          SIGNXY(I) = SIGNXY(I)
+          SIGNYZ(I) = SIGNYZ(I)
+          SIGNZX(I) = SIGNZX(I)
+        ENDDO
+      END IF                
 c
       SOUNDSP(1:NEL)= SQRT((BULK + FOUR_OVER_3*G) / RHO(1:NEL))
       SIGY(1:NEL)   = YLD(1:NEL)

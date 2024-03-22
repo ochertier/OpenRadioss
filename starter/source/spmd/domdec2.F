@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  DOMDEC2                       source/spmd/domdec2.F         
 Chd|-- called by -----------
@@ -28,24 +28,29 @@ Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
 Chd|        CHECK_SKEW                    source/spmd/domain_decomposition/check_skew.F
 Chd|        C_DOMS10                      source/spmd/domdec2.F         
+Chd|        DOMAIN_DECOMPOSITION_PCYL     source/loads/general/load_pcyl/domain_decomposition_pcyl.F
 Chd|        FRONTPLUS_RM                  source/spmd/node/frontplus.F  
 Chd|        IFRONTPLUS                    source/spmd/node/frontplus.F  
 Chd|        SPLIT_JOINT                   source/constraints/general/cyl_joint/split_joint.F
 Chd|        NLOCAL                        source/spmd/node/ddtools.F    
+Chd|        ALE_EBCS_MOD                  ../common_source/modules/ale/ale_ebcs_mod.F
+Chd|        EBCS_MOD                      ../common_source/modules/boundary_conditions/ebcs_mod.F
 Chd|        FRONT_MOD                     share/modules1/front_mod.F    
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
+Chd|        LOADS_MOD                     ../common_source/modules/loads/loads_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        MONVOL_STRUCT_MOD             share/modules1/monvol_struct_mod.F
 Chd|        SENSOR_MOD                    share/modules1/sensor_mod.F   
 Chd|        SKEW_MOD                      share/modules1/skew_mod.F     
+Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
       SUBROUTINE DOMDEC2(
      1   DD_IAD ,IPARI  ,IB     ,NPBY  ,
      2   LPBY   ,IXRI   ,IBVEL  ,LBVEL ,
      3   IPARG  ,CEL    ,IXS    ,IXS10 ,IXS20 ,
      4   IXS16  ,IXQ    ,IXC    ,IXT   ,IXP   ,
-     5   IXR    ,IXUR   ,IXTG   ,IXTG6 ,T_MONVOL,
+     5   IXR    ,IXTG   ,IXTG6 ,T_MONVOL,
      6   IGRSURF,ADSKY  ,LCNE   ,GEO   ,
      7   NPRW   ,LPRW   ,LCNI2  ,ADSKYI2,CEPI2,
      8   CELI2  ,I2NSNT ,ISKN   ,ISKWP,NSKWP  ,
@@ -56,7 +61,7 @@ Chd|====================================================================
      D   LGAUGE ,IGAUP  ,NGAUP  ,INTBUF_TAB,IBFFLUX,
      E   ICNDS10,ITAGND ,IGEO   ,TAG_SKN,MULTIPLE_SKEW,
      F   IBFV   ,IBCSCYC,LBCSCYC,R_SKEW,IPM     ,
-     G   SENSOR_TAB)
+     G   SENSORS, LEN_CEP,EBCS_TAB,LOADS,IFRAME)
 C
 C-----------------------------------------------
 C   M o d u l e s
@@ -68,29 +73,21 @@ C-----------------------------------------------
       USE SKEW_MOD
       USE MONVOL_STRUCT_MOD
       USE SENSOR_MOD
+      USE ALE_EBCS_MOD
+      USE EBCS_MOD
+      USE LOADS_MOD
+      USE SUBMODEL_MOD , ONLY : NSUBMOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "rnur_c.inc"
-#include      "units_c.inc"
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
-#include      "scr17_c.inc"
-#include      "warn_c.inc"
-#include      "fluid_scr_c.inc"
 #include      "sphcom.inc"
-#include      "submod_c.inc"
 #include      "thermal_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -102,16 +99,16 @@ C-----------------------------------------------
      .        IXS(NIXS,*),IXQ(NIXQ,*),IXC(NIXC,*),IXTG(NIXTG,*),
      .        IXT(NIXT,*),IXP(NIXP,*),IXR(NIXR,*),
      .        IXS10(6,*),IXS20(12,*),IXS16(8,*),IXTG6(4,*),IB(NIBCLD,*),
-     .        IXUR(NIXUR,*),I2NSNT,ISKN(LISKN,*),ISKWP(*),NSKWP(*),
+     .        I2NSNT,ISKN(LISKN,*),ISKWP(*),NSKWP(*),
      .        ADSKY(0:*), LCNE, LCNI2, ADSKYI2(0:*),CEPI2(*),CELI2(*),
      .        ISENSP(2,*), NSENSP(*), IACCP(*), NACCP(*),
      .        LACCELM(3,*),IBCV(NICONV, *),IRBE3(NRBE3L,*), LRBE3(*),
-     .        FRONT_RM(NRBYM,NSPMD), IRBYM(NIRBYM,*) ,LCRBYM(*), CEP(*),
+     .        FRONT_RM(NRBYM,NSPMD), IRBYM(NIRBYM,*) ,LCRBYM(*), CEP(LEN_CEP),
      .        IBCR(NIRADIA,*),IRBE2(NRBE2L,*), LRBE2(*),
      .        CEPSP(NUMSPH), CELSPH(NUMSPH),ILOADP(SIZLOADP,*),LLOADP(*),
      .        LGAUGE(3,*), IGAUP(*), NGAUP(*), IBFFLUX(NITFLUX,*),
      .        ICNDS10(3,*),ITAGND(*),IBFV(NIFV,*),IBCSCYC(4,*),LBCSCYC(2,*),
-     .        R_SKEW(*),IPM(NPROPMI,*)
+     .        R_SKEW(*),IPM(NPROPMI,*),LEN_CEP
         INTEGER, DIMENSION(NPROPGI,*), INTENT(IN) :: IGEO
         INTEGER, DIMENSION(NUMSKW+NSUBMOD+1), INTENT(INOUT) :: TAG_SKN
         TYPE(SKEW_TYPE), DIMENSION(NUMSKW+1), INTENT(INOUT) :: MULTIPLE_SKEW
@@ -125,17 +122,15 @@ C-----------------------------------------------
 !                       MULTIPLE_SKEW(I)%PLIST(:) is a list of processor
 !                       where the SKEW is stuck
 !       -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-**-*-*-*-*-*-*-*-*-*-*-*-*
-      my_real
-     .        GEO(NPROPG,*)
+      my_real :: GEO(NPROPG,*)
 
       TYPE(INTBUF_STRUCT_) INTBUF_TAB(*)
       TYPE (SURF_)   , DIMENSION(NSURF)   :: IGRSURF
       TYPE(MONVOL_STRUCT_), DIMENSION(NVOLU), INTENT(IN) :: T_MONVOL
-!       -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-**-*-*-*-*-*-*-*-*-*-*-*-*
-!       SENSOR_TAB : structure, dimension = NSENSOR
-!                    new structure for SENSOR
-!       -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-**-*-*-*-*-*-*-*-*-*-*-*-*
-      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE(SENSORS_)   ,INTENT(IN)    :: SENSORS
+      TYPE(T_EBCS_TAB), INTENT(INOUT) :: EBCS_TAB ! ebcs data structure
+      TYPE (LOADS_), INTENT(INOUT) :: LOADS ! load data structure
+      INTEGER ,DIMENSION(LISKN,NUMFRAM+1)   ,INTENT(IN) :: IFRAME ! frame data structure
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
@@ -155,10 +150,11 @@ C-----------------------------------------------
       INTEGER :: ISENS
       my_real
      .        ECT_AK,FR_AK
+      INTEGER :: IJK
+      INTEGER :: SURF_ID,NUMBER_NODE,NODE_ID
+      INTEGER :: NUMBER_PROC,NUMBER_SEGMENT
 C-----------------------------------------------------
 C   S o u r c e  L i n e s
-C-----------------------------------------------------
-C
 C-----------------------------------------------------
       INT2FLAG=0
       CNT = 0
@@ -168,24 +164,26 @@ c      CNT = CNT+1
 c      print*,'Count:',CNT
       INT2FRPLUS=0
 C-----------------------------------------------------
+
+      CALL DOMAIN_DECOMPOSITION_PCYL(LOADS,IFRAME)
       ! ------------------------
-      DO ISENS=1,NSENSOR
+      DO ISENS=1,SENSORS%NSENSOR
             ! ------------------------   
             ! dist-surf sensor : for plane defined by 3 nodes, 
             !                    add the 3 nodes and the reference node
             !                    on all spmd processors
-            IF (SENSOR_TAB(ISENS)%TYPE==16) THEN
+            IF (SENSORS%SENSOR_TAB(ISENS)%TYPE==15) THEN
                 ! -------------
                 ! reference node : %IPARAM(1)
-                N1 = SENSOR_TAB(ISENS)%IPARAM(1)
+                N1 = SENSORS%SENSOR_TAB(ISENS)%IPARAM(1)
                 DO P=1,NSPMD
                     CALL IFRONTPLUS(N1,P)
                 ENDDO
                 ! -------------
-                IF(SENSOR_TAB(ISENS)%IPARAM(2)==0) THEN
+                IF(SENSORS%SENSOR_TAB(ISENS)%IPARAM(2)==0) THEN
                     ! plane nodes : %IPARAM(3:5)
                     DO I=1,3
-                        N1 = SENSOR_TAB(ISENS)%IPARAM(3+I-1)
+                        N1 = SENSORS%SENSOR_TAB(ISENS)%IPARAM(3+I-1)
                         DO P=1,NSPMD
                             CALL IFRONTPLUS(N1,P)
                         ENDDO
@@ -217,11 +215,11 @@ C skew global fixe
        DO P = 1, NSPMD
          NSKWP(P) = 0
        END DO        
-       IF(N2D==0)THEN
+       IF(N2D==0 .AND. LEN_CEP > 0)THEN
         OFFSET = NUMELS + NUMELQ + NUMELC + NUMELT + NUMELP
 !       check if a SPRING is linked with a SKEW
-        CALL CHECK_SKEW(IXR,IGEO,ISKN,CEP(OFFSET+1),ISKWP,NSKWP,TAG_SKN,MULTIPLE_SKEW,
-     .                  R_SKEW,IPM)
+        CALL CHECK_SKEW(IXR,IGEO,ISKN,CEP,ISKWP,NSKWP,TAG_SKN,MULTIPLE_SKEW,
+     .                  R_SKEW,IPM,OFFSET)
 
 
         DO I=1,NUMSKW
@@ -658,7 +656,7 @@ C-----------------------------------------------------
             ENDIF
           ENDDO
         ENDDO
-Cel traitement noeuds non connectes
+C   traitement noeuds non connectes
         DO N = 1, NRBE2
           NSN = IRBE2(5,N)
           M   = IRBE2(3,N)
@@ -808,7 +806,7 @@ C--------------------------------------------------------------
           ENDDO
           K = K + NSN
         ENDDO
-Cel traitement noeuds non connectes
+C   traitement noeuds non connectes
         K=0
         DO N = 1, NRBYKIN
           NSN = NPBY(2,N)
@@ -926,7 +924,7 @@ C-----------------------------------------------------
           ENDDO
           K = K + NSN
         ENDDO
-Cel traitement noeuds non connectes
+C   traitement noeuds non connectes
         K=0
         DO N = 1, NIBVEL
           NSN = IBVEL(3,N)
@@ -1161,12 +1159,12 @@ C mise sur Pi des noeuds non affectes (round robbin)
 C-----------------------------------------------------
 C Traitement special sensor type2
 C-----------------------------------------------------
-      IF(NSENSOR>0) THEN
+      IF(SENSORS%NSENSOR>0) THEN
        DO P = 1, NSPMD
          NSENSP(P) = 0
        END DO
-       DO I=1,NSENSOR
-        TYP = SENSOR_TAB(I)%TYPE
+       DO I=1,SENSORS%NSENSOR
+        TYP = SENSORS%SENSOR_TAB(I)%TYPE
         ISENSP(1,I) = 0
         ISENSP(2,I) = 0
 C
@@ -1176,7 +1174,7 @@ C
 C--------------------------------
 C         CAPTEUR - DEPLACEMENT
 C--------------------------------
-          N1 = SENSOR_TAB(I)%IPARAM(1)
+          N1 = SENSORS%SENSOR_TAB(I)%IPARAM(1)
           DO P = 1, NSPMD
             IF(NLOCAL(N1,P)==1)THEN
               ISENSP(1,I) = P
@@ -1185,7 +1183,7 @@ C--------------------------------
             END IF
           END DO
  500      CONTINUE
-          N2 = SENSOR_TAB(I)%IPARAM(2)
+          N2 = SENSORS%SENSOR_TAB(I)%IPARAM(2)
           DO P = 1, NSPMD
             IF(NLOCAL(N2,P)==1)THEN
               ISENSP(2,I) = P
@@ -1202,7 +1200,7 @@ C--------------------------------
         ELSEIF(TYP==8)THEN
 c
         ELSEIF(TYP==13)THEN  ! SENSOR WORK
-          N1 = SENSOR_TAB(I)%IPARAM(1)
+          N1 = SENSORS%SENSOR_TAB(I)%IPARAM(1)
           DO P = 1, NSPMD
             IF (NLOCAL(N1,P)==1) THEN
               ISENSP(1,I) = P
@@ -1210,7 +1208,7 @@ c
               EXIT
             END IF
           END DO
-          N2 = SENSOR_TAB(I)%IPARAM(2)
+          N2 = SENSORS%SENSOR_TAB(I)%IPARAM(2)
           IF (N2 > 0) THEN
             DO P = 1, NSPMD
               IF (NLOCAL(N2,P)==1) THEN
@@ -1266,7 +1264,8 @@ C
                 EXIT
               END IF
             END DO
-          ELSE
+          !!ELSE
+          ELSEIF(N1<0)THEN
             N1 = -N1 + NUMELS
             P  = CEP(N1  ) + 1
             IGAUP(I) = P
@@ -1277,7 +1276,6 @@ C
 
       IF(NJOINT>0) CALL SPLIT_JOINT( )
 
-C-----------------------------------------------------
 C-----------------------------------------------------
 C dd_iad => dd_grp : nb de groupes par sous domaine
       NGROU = 0
@@ -1379,7 +1377,7 @@ C
         ENDDO
       ENDDO
 C
-Cel traitement a part du 3eme noeud optionnel sauf type 12
+C   traitement a part du 3eme noeud optionnel sauf type 12
       DO K=2,3
         DO I=1,NUMELR
           N = IXR(K,I) + 1
@@ -1408,14 +1406,8 @@ C elem penta6
         END DO
       END IF
 C
-      DO K=2,5
-        DO I=1,NUMELUR
-          N = IXUR(K,I) + 1
-          ADSKY(N) = ADSKY(N) + 1
-        ENDDO
-      ENDDO
 C--------------------------------------
-Cel prise en compte des forces des mv
+C   prise en compte des forces des mv
 C--------------------------------------
       IF (NVOLU>0) THEN
         K3 = 1 + NIMV * NVOLU + NICBAG * NVOLU * NVOLU
@@ -1567,6 +1559,48 @@ C--------------------------------------
         ENDDO
         ENDDO
       ENDIF
+
+!   -------------------------------------
+!   Euler boundary conditions : non-relecting frontier
+!   add 1 contribution per node of element
+!   ------------
+      IF(NEBCS>0) THEN
+        DO I=1,NEBCS
+            IF(EBCS_TAB%tab(I)%poly%type==10) THEN
+                SURF_ID = EBCS_TAB%tab(I)%poly%surf_id ! surface id
+                NUMBER_NODE = 4
+                IF(N2D/=0) NUMBER_NODE = 2
+                ! ------------
+                ! loop over the elements of the EBCS
+                DO J=1,EBCS_TAB%tab(I)%poly%nb_elem
+                    ! loop over the 4 nodes of the surfaces
+                    DO IJK=1,NUMBER_NODE
+                        NODE_ID = IGRSURF(SURF_ID)%NODES(J,IJK) + 1 
+                        ADSKY(NODE_ID) = ADSKY(NODE_ID) + 1
+                    ENDDO
+                ENDDO
+                ! ------------
+            ENDIF
+        ENDDO
+      ENDIF
+!   -------------------------------------
+!   /LOAD/PCYL : add 1 contribution per node per segment
+!   ------------
+    ! loop over the /LOAD/PCYL
+      DO I=1,LOADS%NLOAD_CYL
+            NUMBER_SEGMENT = LOADS%LOAD_CYL(I)%NSEG ! number of segment for the PCYL I
+            ! ------------
+            DO J=1,NUMBER_SEGMENT ! loop over the segments of the surface
+                DO K=1,4
+                    NODE_ID = LOADS%LOAD_CYL(I)%SEGNOD(J,K) + 1! get the node id + 1 (if the segment is a triangle, NODE_ID(node 4) = 0))
+                    NUMBER_PROC = 0
+                    IF(NODE_ID/=0) ADSKY(NODE_ID) = ADSKY(NODE_ID) + 1
+                ENDDO
+            ENDDO
+            ! ------------
+        ENDDO
+!   -------------------------------------
+
 C-----------------------------------------------
 C   CALCUL DES ADRESSES DU VECTEUR SKYLINE
 C-----------------------------------------------
@@ -1592,7 +1626,7 @@ C-----------------------------------------------
             NIN = 0
             ITY_OLD = ITY
           ENDIF
-Cel SPH non pris en comp
+C   SPH non pris en comp
           IF(ITY/=51) THEN
            IF (P==PROC) THEN
             DO I = 1, NEL
@@ -1985,39 +2019,37 @@ Chd|        LECTUR                        source/starter/lectur.F
 Chd|-- calls ---------------
 Chd|        MY_ORDERS                     ../common_source/tools/sort/my_orders.c
 Chd|        NLOCAL                        source/spmd/node/ddtools.F    
+Chd|        ALE_EBCS_MOD                  ../common_source/modules/ale/ale_ebcs_mod.F
+Chd|        EBCS_MOD                      ../common_source/modules/boundary_conditions/ebcs_mod.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
+Chd|        LOADS_MOD                     ../common_source/modules/loads/loads_mod.F
 Chd|        MONVOL_STRUCT_MOD             share/modules1/monvol_struct_mod.F
 Chd|====================================================================
       SUBROUTINE FILLCNE(
      1   CNE    ,LCNE   ,IXS  ,IXS10  ,IXS20  ,
      2   IXS16  ,IXQ    ,IXC  ,IXT    ,IXP    ,
-     3   IXR    ,IXUR   ,IXTG ,IXTG6  ,T_MONVOL ,
+     3   IXR    ,IXTG ,IXTG6  ,T_MONVOL ,
      4   IGRSURF,IB   ,ADDCNE ,CEP    ,
      5   ILEN   ,GEO    ,IBCV ,IBCR   ,IBFFLUX,
-     6   ILOADP ,LLOADP ,CEL  )
+     6   ILOADP ,LLOADP ,CEL  ,EBCS_TAB,LOADS)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------    
       USE GROUPDEF_MOD
       USE MONVOL_STRUCT_MOD
+      USE ALE_EBCS_MOD
+      USE EBCS_MOD
+      USE LOADS_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "rnur_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "scr17_c.inc"
 #include      "thermal_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -2025,7 +2057,7 @@ C-----------------------------------------------
       INTEGER IXS(NIXS,*),IXQ(NIXQ,*),IXC(NIXC,*),IXTG(NIXTG,*),
      .        IXT(NIXT,*),IXP(NIXP,*),IXR(NIXR,*),CEP(*),
      .        IXS10(6,*),IXS20(12,*),IXS16(8,*),IXTG6(4,*),
-     .        IXUR(NIXUR,*),IB(NIBCLD,*),
+     .        IB(NIBCLD,*),
      .        ADDCNE(0:*), CNE(*), LCNE, ILEN,
      .        IBCV(NICONV,*), IBCR(NIRADIA,*),IBFFLUX(NITFLUX,*),
      .        ILOADP(SIZLOADP,*),LLOADP(*)
@@ -2034,6 +2066,8 @@ C-----------------------------------------------
      .        GEO(NPROPG,*)
       TYPE (SURF_)   , DIMENSION(NSURF)   :: IGRSURF
       TYPE(MONVOL_STRUCT_), DIMENSION(NVOLU), INTENT(IN) :: T_MONVOL
+      TYPE(T_EBCS_TAB), INTENT(INOUT) :: EBCS_TAB ! ebcs data structure
+      TYPE (LOADS_), INTENT(INOUT) :: LOADS ! load data structure
 C-----------------------------------------------
 C   F u n c t i o n
 C-----------------------------------------------
@@ -2047,10 +2081,13 @@ C-----------------------------------------------
      .        ADSKY(0:NUMNOD+1), ITRI(ILEN), INDEX(2*ILEN),
      .        WORK(70000)
 c     .        ADSKY(0:1000000), ITRI(1000000), INDEX(2000000),
-      INTEGER :: NELEM
+      INTEGER :: IJK,NUMBER_NODE
+      INTEGER :: NELEM,ELEM_ID,NODE_ID
+      INTEGER :: SURF_ID ! surface id
+      INTEGER :: LOCAL_SEGMENT,NUMBER_SEGMENT ! number of segment for /LOAD
+      INTEGER :: PROC_ID ! processor id
 C-----------------------------------------------
 C   S o u r c e  L i n e s
-C-----------------------------------------------
 C-----------------------------------------------
 C   CALCUL DE CNE ADDCNE
 C-----------------------------------------------
@@ -2254,24 +2291,10 @@ C
 C
       OFFTG = OFF
       OFF = OFF + NUMELTG
-C
-      DO I = 1, NUMELUR
-        ITRI(I) = IXUR(6,I)
-      ENDDO
-      CALL MY_ORDERS(0,WORK,ITRI,INDEX,NUMELUR,1)
-      DO J=1,NUMELUR
-        I = INDEX(J)
-        DO K=1,4
-          N = IXUR(K+1,I)
-          CNE(ADSKY(N)) = I+OFF
-          ADSKY(N) = ADSKY(N) + 1
-        ENDDO
-      ENDDO
-      OFF = OFF + NUMELUR
       OFF = OFF + NUMELX
 C
 C---------------------------------------------
-Cel mv
+C   mv
       IF (NVOLU>0) THEN
         K1 = 1
         DO N = 1, NVOLU
@@ -2718,6 +2741,58 @@ C-----------------------------------------------
          OFF = OFF + ILOADP(1,NL)/4
         ENDDO
       ENDIF
+
+!   -------------------------------------
+!   Euler boundary conditions : non-relecting frontier
+!   ------------
+      IF(NEBCS>0) THEN
+        DO I=1,NEBCS
+            IF(EBCS_TAB%tab(I)%poly%type==10) THEN
+                SURF_ID = EBCS_TAB%tab(I)%poly%surf_id ! surface id
+                NUMBER_NODE = 4
+                IF(N2D/=0) NUMBER_NODE = 2
+                
+                ! ------------
+                ! loop over the elements of the EBCS
+                DO J=1,EBCS_TAB%tab(I)%poly%nb_elem
+                    ! loop over the 4 nodes of the surfaces
+                    ELEM_ID = EBCS_TAB%tab(I)%poly%ielem(J) ! element id
+                    DO IJK=1,NUMBER_NODE
+                        NODE_ID = IGRSURF(SURF_ID)%NODES(J,IJK) ! node id
+                        CNE(ADSKY(NODE_ID)) = ELEM_ID ! element id
+                        ADSKY(NODE_ID) = ADSKY(NODE_ID) + 1
+                    ENDDO
+                ENDDO
+                ! ------------
+            ENDIF
+        ENDDO
+      ENDIF
+!   -------------------------------------
+
+!   -------------------------------------
+!   /LOAD/PCYL : add 1 contribution per node per segment
+!   ------------
+    ! loop over the /LOAD/PCYL
+      LOCAL_SEGMENT = 0
+      DO I=1,LOADS%NLOAD_CYL
+            NUMBER_SEGMENT = LOADS%LOAD_CYL(I)%NSEG ! number of segment for the PCYL I
+            ! ------------
+            ! loop over the segments of the surface to find where the node are defined 
+            DO J=1,NUMBER_SEGMENT ! loop over the segments of the surface
+                PROC_ID = LOADS%CYL_RESTART(I)%SEGMENT_TO_PROC(J)
+                DO K=1,4
+                    NODE_ID = LOADS%LOAD_CYL(I)%SEGNOD(J,K) ! get the node id (if the segment is a triangle, NODE_ID(node 4) = 0))
+                    IF(NODE_ID/=0) THEN
+                        CEP(OFF+LOCAL_SEGMENT+J) = PROC_ID - 1 ! force the proc for the fake element
+                        CNE(ADSKY(NODE_ID)) = OFF+LOCAL_SEGMENT+J ! fake element id
+                        ADSKY(NODE_ID) = ADSKY(NODE_ID) + 1
+                    ENDIF
+                ENDDO
+            ENDDO
+            LOCAL_SEGMENT = LOCAL_SEGMENT + NUMBER_SEGMENT
+            ! ------------
+        ENDDO
+!   -------------------------------------
 C
       RETURN
       END
@@ -2739,19 +2814,12 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "rnur_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -2760,9 +2828,6 @@ C-----------------------------------------------
 
       TYPE(INTBUF_STRUCT_) INTBUF_TAB(*)
 C-----------------------------------------------
-C   F u n c t i o n
-C-----------------------------------------------
-C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, J, L, K, N, OFF, NTY, NRTS, NRTM, NSN, NMN,
@@ -2770,7 +2835,6 @@ C-----------------------------------------------
      .        ADSKYI2(0:NUMNOD+1)
 C-----------------------------------------------
 C   S o u r c e  L i n e s
-C-----------------------------------------------
 C-----------------------------------------------
 C   CALCUL DE CNE ADDCNE
 C-----------------------------------------------
@@ -2816,26 +2880,25 @@ Chd|-- called by -----------
 Chd|        LECTUR                        source/starter/lectur.F       
 Chd|-- calls ---------------
 Chd|====================================================================
-      SUBROUTINE  DDPRINT(DDSTAT, DSMEMORY, MEMFLOW)
+      SUBROUTINE  DDPRINT(DDSTAT,  MEMFLOW)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
-C-----------------------------------------------
+C----------------------------------------------- 
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "commandline.inc"
 #include      "units_c.inc"
-#include      "rnur_c.inc"
 #include      "sphcom.inc"
 #include      "scr05_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER DDSTAT(50,*)
-      INTEGER(KIND=8) :: DSMEMORY(7,*), MEMFLOW(2,*)
+      INTEGER(KIND=8) :: MEMFLOW(2,*)
 C DDSTAT
 C 1 : NUMNOD Local
 C 2 : NELEM Local
@@ -2845,7 +2908,7 @@ C 5 : NUMELC_L
 C 6 : NUMELP_L
 C 7 : NUMELT_L
 C 8 : NUMELR_L
-C 9 : NUMELUR_L
+C 9 : -
 C 10: NUMELTG_L
 C 11: NUMELX_L
 C 12: NBDDPROC :  nb de proc frontiere
@@ -2976,8 +3039,6 @@ C
      .    WRITE(IOUT,*)'NUMBER OF TRUSS ELEMENTS........ :',DDSTAT(7,P)
         IF(NUMELR>0)
      .    WRITE(IOUT,*)'NUMBER OF SPRING ELEMENTS....... :',DDSTAT(8,P)
-        IF(NUMELUR>0)
-     .    WRITE(IOUT,*)'NUMBER OF USER ELEMENTS......... :',DDSTAT(9,P)
         IF(NUMELTG>0)
      .    WRITE(IOUT,*)'NUMBER OF 3-N SHELL ELEMENTS.... :',DDSTAT(10,P)
         IF(NUMELX>0)
@@ -3120,14 +3181,9 @@ Chd|        NLOCAL                        source/spmd/node/ddtools.F
 Chd|====================================================================
       SUBROUTINE C_DOMS10(ICNDS10,ITAGND,IPLUS)
 C-----------------------------------------------
-C   M o d u l e s
-C-----------------------------------------------
-
-C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------

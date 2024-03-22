@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  SREP2GLO                      source/elements/sph/srep2glo.F
 Chd|-- called by -----------
@@ -27,13 +27,19 @@ Chd|        SOLTOSPHP                     source/elements/sph/soltosph.F
 Chd|-- calls ---------------
 Chd|        SCORTHO3                      source/elements/thickshell/solidec/scortho3.F
 Chd|        SORTHO3                       source/elements/solid/solide/sortho3.F
-Chd|        SREPISOT3                     source/elements/solid/solide/srepiso3.F
+Chd|        SREPISOT3                     source/elements/solid/solide/srepisot3.F
 Chd|====================================================================
-      SUBROUTINE SREP2GLO(X     ,IXS   ,GAMA  ,
-     .                    RX ,RY ,RZ, SX ,SY ,SZ ,TX ,TY ,TZ ,
-     .                    R11,R12,R13,R21,R22,R23,R31,R32,R33,
-     .                    T11,T12,T13,T21,T22,T23,T31,T32,T33,
-     .                    JR0,JS0,JT0,NEL)
+      SUBROUTINE SREP2GLO(
+     1   X,       IXS,     GAMA,    RX,
+     2   RY,      RZ,      SX,      SY,
+     3   SZ,      TX,      TY,      TZ,
+     4   R11,     R12,     R13,     R21,
+     5   R22,     R23,     R31,     R32,
+     6   R33,     T11,     T12,     T13,
+     7   T21,     T22,     T23,     T31,
+     8   T32,     T33,     JR0,     JS0,
+     9   JT0,     NEL,     LFT,     LLT,
+     A   JHBE,    JCVT,    ISORTH)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -45,13 +51,14 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com08_c.inc"
-#include      "vect01_c.inc"
-#include      "scr18_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(INOUT) :: LFT
+      INTEGER, INTENT(INOUT) :: LLT
+      INTEGER, INTENT(INOUT) :: JHBE
+      INTEGER, INTENT(INOUT) :: JCVT
+      INTEGER, INTENT(INOUT) :: ISORTH
       INTEGER NEL
 C     REAL
       my_real
@@ -123,25 +130,39 @@ C----------------------------
 C-----------
 C isoparametric system (non orthomalized)
       CALL SREPISOT3(
-     .       X1, X2, X3, X4, X5, X6, X7, X8,
-     .       Y1, Y2, Y3, Y4, Y5, Y6, Y7, Y8,
-     .       Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8,
-     .       RX, RY, RZ, SX, SY, SZ, TX, TY, TZ )
+     1   X1,      X2,      X3,      X4,
+     2   X5,      X6,      X7,      X8,
+     3   Y1,      Y2,      Y3,      Y4,
+     4   Y5,      Y6,      Y7,      Y8,
+     5   Z1,      Z2,      Z3,      Z4,
+     6   Z5,      Z6,      Z7,      Z8,
+     7   RX,      RY,      RZ,      SX,
+     8   SY,      SZ,      TX,      TY,
+     9   TZ,      NEL)
 
 C-----------
 C GLOBAL => Corotational
       IF (JHBE == 14 .OR. JHBE == 24) THEN
         CALL SORTHO3(
-     .       RX , RY , RZ , SX , SY , SZ , TX , TY , TZ ,
-     .       R12, R13, R11, R22, R23, R21, R32, R33, R31)
+     1   RX,      RY,      RZ,      SX,
+     2   SY,      SZ,      TX,      TY,
+     3   TZ,      R12,     R13,     R11,
+     4   R22,     R23,     R21,     R32,
+     5   R33,     R31,     NEL)
       ELSEIF (JHBE == 15 ) THEN
         CALL SCORTHO3(
-     .       RX , RY , RZ , SX , SY , SZ , TX , TY , TZ ,
-     .       R11, R12, R13, R21, R22, R23, R31, R32, R33)
+     1   RX,      RY,      RZ,      SX,
+     2   SY,      SZ,      TX,      TY,
+     3   TZ,      R11,     R12,     R13,
+     4   R21,     R22,     R23,     R31,
+     5   R32,     R33,     NEL)
       ELSEIF(JCVT /= 0)THEN
         CALL SORTHO3(
-     .       RX , RY , RZ , SX , SY , SZ , TX , TY , TZ ,
-     .       R11, R12, R13, R21, R22, R23, R31, R32, R33)
+     1   RX,      RY,      RZ,      SX,
+     2   SY,      SZ,      TX,      TY,
+     3   TZ,      R11,     R12,     R13,
+     4   R21,     R22,     R23,     R31,
+     5   R32,     R33,     NEL)
       ENDIF
 C-----------
 C orthomalized isoparametric system

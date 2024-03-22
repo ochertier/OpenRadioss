@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  THRNUR                        source/output/th/thrnur.F     
 Chd|-- called by -----------
@@ -37,7 +37,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "scr05_c.inc"
-C  _clean#include      "vect04_c.inc"
 #include      "task_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
@@ -58,12 +57,9 @@ C-----------------------------------------------
      .   LWA,NEL,NFT
       my_real
      .   WWA(100),XFN
-C-------------------------
-C           ELEMENTS RENAULT
-C-------------------------
       II=0
       IH=IAD
-Cel specifique spmd
+C   specifique spmd
       IF (IMACH==3) THEN
         LWA = NN*NVAR
         DO I = 1, LWA
@@ -78,7 +74,7 @@ C decalage IH
       ENDIF
 C
       DO NG=1,NGROUP
-Cel        IF(IMACH==3) IWA(NG) = II+1
+C          IF(IMACH==3) IWA(NG) = II+1
         ITY=IPARG(5,NG)
         IF(ITY==50) THEN
           MTE=IPARG(1,NG)
@@ -98,7 +94,7 @@ C
 C
             IF (K==N)THEN
               IH=IH+1
-Cel traitement specifique spmd
+C   traitement specifique spmd
               IF (IMACH==3) THEN
 C recherche du ii correct
                 II = ((IH-1) - IAD)*NVAR
@@ -110,7 +106,7 @@ C    .                   (IH<=IAD+NN))
               ENDIF
 C
               IF(IH>IAD+NN) RETURN
-Cel           IF (IP==ISPMD)THEN
+C             IF (IP==ISPMD)THEN
 C
               M1=NB2+3*I-3
               M2=NB5+3*I-3
@@ -133,7 +129,7 @@ C
                 II=II+1
                 WA(II)=WWA(K)
               ENDDO
-Cel           ENDIF
+C             ENDIF
             ENDIF
           ENDDO 
         ENDIF

@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  RGWALL                        source/constraints/general/rwall/rgwall.F
 Chd|-- called by -----------
@@ -41,11 +41,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com06_c.inc"
 #include      "com08_c.inc"
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
 #include      "scr11_c.inc"
 #include      "impl1_c.inc"
 #include      "sms_c.inc"
@@ -94,7 +91,7 @@ C
          M3=3*MSR
          M2=M3-1
          M1=M2-1
-Cel changement formulation : plus d'impasse sur contribution force
+C   changement formulation : plus d'impasse sur contribution force
          VXW=V(M1)+A(M1)*DT12
          VYW=V(M2)+A(M2)*DT12
          VZW=V(M3)+A(M3)*DT12
@@ -193,7 +190,7 @@ C
          M3=3*MSR
          M2=M3-1
          M1=M2-1
-Cel changement formulation : plus d'impasse sur contribution force
+C   changement formulation : plus d'impasse sur contribution force
          VXW=V(M1)+A(M1)*DT12
          VYW=V(M2)+A(M2)*DT12
          VZW=V(M3)+A(M3)*DT12

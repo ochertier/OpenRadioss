@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  MULTI_INLET_EBCS              source/multifluid/multi_inlet_ebcs.F
 Chd|-- called by -----------
@@ -28,13 +28,10 @@ Chd|-- calls ---------------
 Chd|        ARRET                         source/system/arret.F         
 Chd|        MULTI_SUBMATLAW               source/multifluid/multi_submatlaw.F
 Chd|        SOLVE_EINT                    source/multifluid/multi_inlet_ebcs.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|====================================================================
       SUBROUTINE MULTI_INLET_EBCS(ITASK, EBCS_ID, MULTI_FVM, NELEM, ELEM_LIST, FACE_LIST, 
      .     FVM_INLET_DATA, IXS, IXQ, IXTG, XGRID, WGRID, IPM, PM, FUNC_VALUE, NPF,TF)
-C-----------------------------------------------
-C     D e s c r i p t i o n
-C-----------------------------------------------
 C-----------------------------------------------
 C     M o d u l e s
 C-----------------------------------------------
@@ -51,7 +48,6 @@ C-----------------------------------------------
 ! ISPMD
 #include      "task_c.inc"
 ! ALE
-#include      "com01_c.inc"
 ! NUMELS, NUMELQ, NUMELTG
 #include      "com04_c.inc"
 ! SNPC,STF
@@ -183,10 +179,14 @@ C     VE formulation
                   PHASE_EINTJJ(IMAT) = PHASE_EINTII(IMAT)
                ENDIF
                IF (PHASE_ALPHAJJ(IMAT)  >  ZERO) THEN
-                  CALL MULTI_SUBMATLAW(0, MATLAW(IMAT), LOCAL_MATID(IMAT), 1, PHASE_EINTJJ(IMAT), 
-     .                 PHASE_PRESJJ(IMAT), PHASE_RHOJJ(IMAT), PHASE_SSPJJ(IMAT), ONE, DUMMY, 
-     .                 PM, IPM, NPROPM, NPROPMI, DUMMY, ONE, DUMMY, 
-     .                 MULTI_FVM%BFRAC(IMAT, ELEMID), MULTI_FVM%TBURN(ELEMID), DUMMY, DUMMY, DUMMY,NPF,TF)
+                  CALL MULTI_SUBMATLAW(
+     1   0,                           MATLAW(IMAT),                LOCAL_MATID(IMAT),           1,
+     2   PHASE_EINTJJ(IMAT),          PHASE_PRESJJ(IMAT),          PHASE_RHOJJ(IMAT),           PHASE_SSPJJ(IMAT),
+     3   ONE,                         DUMMY,                       PM,                          IPM,
+     4   NPROPM,                      NPROPMI,                     DUMMY,                       ONE,
+     5   DUMMY,                       MULTI_FVM%BFRAC(IMAT,ELEMID),MULTI_FVM%TBURN(ELEMID),     DUMMY,
+     6   DUMMY,                       DUMMY,                       NPF,                         TF,
+     7   DUMMY(1),                    1)
                   SSPJJ = SSPJJ + PHASE_ALPHAJJ(IMAT) * PHASE_RHOJJ(IMAT) * 
      .                 MAX(EM20, PHASE_SSPJJ(IMAT)) 
                   PJJ = PJJ + PHASE_PRESJJ(IMAT) * PHASE_ALPHAJJ(IMAT)
@@ -214,7 +214,7 @@ C     INITIALIZE INTERNAL ENERGY
                CALL SOLVE_EINT(MATLAW(IMAT), LOCAL_MATID(IMAT), PM, IPM, NPROPM, NPROPMI, 
      .              PHASE_EINTJJ(IMAT), PHASE_RHOJJ(IMAT), PHASE_PRESJJ(IMAT), PHASE_SSPJJ(IMAT),
      .              MULTI_FVM%BFRAC(IMAT, ELEMID), MULTI_FVM%TBURN(ELEMID), DUMMY(1), DUMMY,
-     .              DUMMY, ONE, NPF, TF)
+     .              DUMMY, ONE, NPF, TF, DUMMY, 1)
                
                SSPJJ = SSPJJ + PHASE_ALPHAJJ(IMAT) * PHASE_RHOJJ(IMAT) * 
      .              MAX(EM20, PHASE_SSPJJ(IMAT)) 
@@ -480,10 +480,10 @@ Chd|        MULTI_INLET_EBCS              source/multifluid/multi_inlet_ebcs.F
 Chd|-- calls ---------------
 Chd|        MULTI_SUBMATLAW               source/multifluid/multi_submatlaw.F
 Chd|====================================================================
-      SUBROUTINE SOLVE_EINT(MATLAW, LOCAL_MATID, PM, IPM, NPROPM, NPROPMI, 
-     .     EINT, RHO, PRES, SSP, 
-     .     BURNFRAC, BURNTIME, DELTAX, CURRENT_TIME,
-     .     BUFMAT, OFF,NPF,TF)
+      SUBROUTINE SOLVE_EINT(MATLAW  , LOCAL_MATID, PM    , IPM         ,NPROPM, NPROPMI, 
+     .                      EINT    , RHO        , PRES  , SSP         , 
+     .                      BURNFRAC, BURNTIME   , DELTAX, CURRENT_TIME,
+     .                      BUFMAT  , OFF        , NPF   , TF          ,VAREOS, NVAREOS)
 C-----------------------------------------------
 C     I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -496,8 +496,8 @@ C-----------------------------------------------
       my_real, INTENT(INOUT) :: SSP, PRES, EINT
       my_real, INTENT(INOUT) :: BURNFRAC, BURNTIME, DELTAX, CURRENT_TIME, BUFMAT(*)
       my_real, INTENT(OUT) :: OFF
-      INTEGER, INTENT(IN) :: NPF(SNPC)
-      my_real, INTENT(IN) :: TF(STF)
+      INTEGER, INTENT(IN) :: NPF(SNPC),NVAREOS
+      my_real, INTENT(IN) :: TF(STF),VAREOS(NVAREOS*1)
 
       INTEGER :: ITER, MAX_ITER
       my_real :: TOL, ERROR
@@ -518,9 +518,14 @@ C     Initialization
       CONT = .TRUE.
       DO WHILE (CONT .AND. ITER  <  MAX_ITER) 
          ITER = ITER + 1
-         CALL MULTI_SUBMATLAW(0, MATLAW, LOCAL_MATID, 1, EINT, PRESK, RHO, SSP, VOL, GRUN, 
-     .        PM, IPM, NPROPM, NPROPMI, BUFMAT, OFF, TEMP, 
-     .        BURNFRAC, BURNTIME, DELTAX, CURRENT_TIME, DUMMY, NPF, TF)
+         CALL MULTI_SUBMATLAW(
+     1   0,           MATLAW,      LOCAL_MATID, 1,
+     2   EINT,        PRESK,       RHO,         SSP,
+     3   VOL,         GRUN,        PM,          IPM,
+     4   NPROPM,      NPROPMI,     BUFMAT,      OFF,
+     5   TEMP,        BURNFRAC,    BURNTIME,    DELTAX,
+     6   CURRENT_TIME,DUMMY,       NPF,         TF,
+     7   VAREOS,      NVAREOS)
          FUNC = PRESK - PRES
          ERROR  = ABS(FUNC)
          IF (ERROR  <  TOL * (ABS(PRES) + ONE)) THEN

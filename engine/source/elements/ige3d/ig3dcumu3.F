@@ -1,34 +1,36 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  IG3DCUMU3                     source/elements/ige3d/ig3dcumu3.F
 Chd|-- called by -----------
 Chd|        IG3DUFORC3                    source/elements/ige3d/ig3duforc3.F
 Chd|-- calls ---------------
 Chd|====================================================================
-      SUBROUTINE IG3DCUMU3(IXIG3D,KXIG3D,NCTRL ,OFFG    ,E    ,
-     1                     FX    ,FY    ,FZ    ,BtDBAloc,
-     2                     STIG  ,STIFN )
+      SUBROUTINE IG3DCUMU3(
+     1   IXIG3D,  KXIG3D,  NCTRL,   OFFG,
+     2   E,       FX,      FY,      FZ,
+     3   BtDBAloc,STIG,    STIFN,   NEL,
+     4   NFT)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -42,12 +44,11 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C------------------------------
-#include      "vect01_c.inc"
-#include      "com01_c.inc"
-#include      "scr18_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: NEL
+      INTEGER, INTENT(IN) :: NFT
       INTEGER NCTRL,KXIG3D(NIXIG3D,*),IXIG3D(*)
       my_real
      .   OFFG(*),E(3,*),BtDBAloc(3*NCTRL,*),
@@ -61,11 +62,11 @@ C-----------------------------------------------
      .   OFF_L
 C-----------------------------------------------
       OFF_L = ZERO
-      DO I=LFT,LLT
+      DO I=1,NEL
         OFF_L = MIN(OFF_L,OFFG(I))
       ENDDO
       IF(OFF_L<ZERO)THEN
-        DO I=LFT,LLT
+        DO I=1,NEL
          IF(OFFG(I)<ZERO)THEN
            DO J=1,NCTRL    
             FX(I,J)=ZERO
@@ -76,7 +77,7 @@ C-----------------------------------------------
         ENDDO
       ENDIF
 
-      DO I=LFT,LLT
+      DO I=1,NEL
        DO J=1,NCTRL
         IF( J <= KXIG3D(3,I+NFT) ) THEN
          INCTRL = IXIG3D(KXIG3D(4,I+NFT)+J-1)                   

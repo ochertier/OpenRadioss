@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  I25COR3T                      source/interfaces/inter3d1/i25cor3t.F
 Chd|-- called by -----------
@@ -36,8 +36,7 @@ Chd|====================================================================
      6                   MARGE   ,GAP_S ,GAP_M   ,GAPV  ,ITYP   ,
      7                   IGAP  ,GAP_S_L ,GAP_M_L ,EDGE_L2,MSEGTYP,
      8                   ETYP    ,ICODE ,ISKEW   ,IBC    ,DRAD  ,
-     9                   DGAPLOAD)
-C============================================================================
+     9                   DGAPLOAD,NRTMT)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -51,21 +50,13 @@ C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "scr02_c.inc"
-#include      "scr05_c.inc"
-#include      "com01_c.inc"
-#include      "com06_c.inc"
-#include      "com08_c.inc"
-#include      "sms_c.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IRECT(4,*), NSV(*), CAND_E(*), CAND_N(*),
      .    JLT,IDT, NOINT, NSN , NRTM,ITYP, IGAP, MSEGTYP(*), ICODE(*), ISKEW(*)
       INTEGER IX1(MVSIZ), IX2(MVSIZ), IX3(MVSIZ), IX4(MVSIZ),
      .        ETYP(MVSIZ), IBC(MVSIZ)
+      INTEGER , INTENT(IN) :: NRTMT
 C     REAL
       my_real
      .   X(3,*), GAPV(*), GAP_S(*), GAP_M(*), 
@@ -91,7 +82,7 @@ C
           J = CAND_N(I)
           L = CAND_E(I)
           GAPV(I)=GAP_S(J) + GAP_M(L)
-          IF(MSEGTYP(L)==0.OR.MSEGTYP(L)>NRTM)THEN
+          IF(MSEGTYP(L)==0.OR.MSEGTYP(L)>NRTMT)THEN
             GAPV(I)=MAX(GAPV(I)+MARGE,GAPV(I)+EDGE_L2(J))
           ELSE
             GAPV(I)=GAPV(I)+MARGE
@@ -104,7 +95,7 @@ C
           L = CAND_E(I)
           GAPV(I)=GAP_S(J) + GAP_M(L)
           GAPV(I)=MIN(GAP_S_L(J)+GAP_M_L(L),GAPV(I))
-          IF(MSEGTYP(L)==0.OR.MSEGTYP(L)>NRTM)THEN
+          IF(MSEGTYP(L)==0.OR.MSEGTYP(L)>NRTMT)THEN
             GAPV(I)=MAX(GAPV(I)+MARGE,GAPV(I)+EDGE_L2(J))
           ELSE
             GAPV(I)=GAPV(I)+MARGE

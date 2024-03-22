@@ -1,53 +1,56 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  SIGEPS80C                     source/materials/mat/mat080/sigeps80c.F
 Chd|-- called by -----------
 Chd|        MULAWC                        source/materials/mat_share/mulawc.F
 Chd|-- calls ---------------
-Chd|        KIRKALDYKINETICS              source/materials/mat/mat080/sigeps80.F
-Chd|        PHASEKINETIC2                 source/materials/mat/mat080/sigeps80.F
+Chd|        KIRKALDYKINETICS              source/materials/mat/mat080/kirkaldykinetics.F
+Chd|        PHASEKINETIC2                 source/materials/mat/mat080/phasekinetic2.F
 Chd|        TABLE_VINTERP                 source/tools/curve/table_tools.F
 Chd|        FINTER                        source/tools/curve/finter.F   
 Chd|        INTERFACE_TABLE_MOD           share/modules/table_mod.F     
 Chd|        TABLE_MOD                     share/modules/table_mod.F     
 Chd|====================================================================
       SUBROUTINE SIGEPS80C(
-     1     NEL    ,NUPARAM,NUVAR   ,MFUNC   ,KFUNC  ,
-     2     NPF    ,NPT0   ,IPT     ,IFLAG   ,
-     2     TF     ,TIME   ,TIMESTEP,UPARAM  ,RHO0   ,
-     3     AREA   ,EINT   ,THKLY   ,
-     4     EPSPXX ,EPSPYY ,EPSPXY  ,EPSPYZ  ,EPSPZX ,
-     5     DEPSXX ,DEPSYY ,DEPSXY  ,DEPSYZ  ,DEPSZX ,
-     6     EPSXX  ,EPSYY  ,EPSXY   ,EPSYZ   ,EPSZX  ,
-     7     SIGOXX ,SIGOYY ,SIGOXY  ,SIGOYZ ,SIGOZX  ,
-     8     SIGNXX ,SIGNYY ,SIGNXY  ,SIGNYZ ,SIGNZX  ,
-     9     SIGVXX ,SIGVYY  ,SIGVXY ,SIGVYZ  ,SIGVZX ,
-     A     SOUNDSP,VISCMAX,THK     ,PLA     ,UVAR   ,
-     B     OFF    ,NGL    ,PM      ,IPM     ,MAT    ,
-     C     ETSE   ,GS     ,VOL     ,YLD    , TEMP   ,
-     D     DIE    ,COEF   , SHF    ,EPSP    ,TABLE  ,
-     E     ITHK   ,NVARTMP , VARTMP,EPSTHTOT) 
+     1   NEL,     NUPARAM, NUVAR,   MFUNC,
+     2   KFUNC,   NPF,     NPT0,    IPT,
+     3   IFLAG,   TF,      TIME,    TIMESTEP,
+     4   UPARAM,  RHO0,    AREA,    EINT,
+     5   THKLY,   EPSPXX,  EPSPYY,  EPSPXY,
+     6   EPSPYZ,  EPSPZX,  DEPSXX,  DEPSYY,
+     7   DEPSXY,  DEPSYZ,  DEPSZX,  EPSXX,
+     8   EPSYY,   EPSXY,   EPSYZ,   EPSZX,
+     9   SIGOXX,  SIGOYY,  SIGOXY,  SIGOYZ,
+     A   SIGOZX,  SIGNXX,  SIGNYY,  SIGNXY,
+     B   SIGNYZ,  SIGNZX,  SIGVXX,  SIGVYY,
+     C   SIGVXY,  SIGVYZ,  SIGVZX,  SOUNDSP,
+     D   VISCMAX, THK,     PLA,     UVAR,
+     E   OFF,     NGL,     PM,      IPM,
+     F   MAT,     ETSE,    GS,      VOL,
+     G   YLD,     TEMP,    DIE,     COEF,
+     H   SHF,     EPSP,    TABLE,   ITHK,
+     I   NVARTMP, VARTMP,  EPSTHTOT,JTHE)
 
 C-----------------------------------------------
       USE TABLE_MOD
@@ -59,7 +62,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
-#include      "mvsiz_p.inc"
 C---------+---------+---+---+--------------------------------------------
 C VAR     | SIZE    |TYP| RW| DEFINITION
 C---------+---------+---+---+--------------------------------------------
@@ -112,17 +114,14 @@ C---------+---------+---+---+--------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "parit_c.inc"
-#include      "com04_c.inc"
-#include      "scr05_c.inc"
 #include      "com01_c.inc"
-#include      "vect01_c.inc"
 #include      "scr18_c.inc"
 #include      "scr_thermal_c.inc"
 C-----------------------------------------------
 C   I N P U T   A r g u m e n t s
 C-----------------------------------------------
 C
+      INTEGER, INTENT(IN) :: JTHE
       INTEGER NEL, NUPARAM, NUVAR,NVARTMP, NPT0, IPT,IFLAG(*),
      .   NGL(NEL),MAT(NEL),IPM(NPROPMI,*),ITHK
       my_real TIME,TIMESTEP,UPARAM(*),
@@ -383,7 +382,7 @@ c
             IPOS1(I,2) = 0
             IPOS1(I,3) = 0 
           ENDDO 
-          CALL TABLE_VINTERP(TABLE(ITABLE(1)),NEL,IPOS1,XX1,Y1,DYDX1)!  initial yield
+          CALL TABLE_VINTERP(TABLE(ITABLE(1)),NEL,NEL,IPOS1,XX1,Y1,DYDX1)!  initial yield
           DO I=1,NEL        
            UVAR(I,9)= Y1 (I)
           ENDDO 
@@ -586,11 +585,11 @@ C
         XX5(I,3)=EPSP(I)*XFAC(5)
       END DO
 C
-      CALL TABLE_VINTERP(TABLE(ITABLE(1)),NEL,IPOS1,XX1,Y1,DYDX1)
-      CALL TABLE_VINTERP(TABLE(ITABLE(2)),NEL,IPOS2,XX2,Y2,DYDX2)
-      CALL TABLE_VINTERP(TABLE(ITABLE(3)),NEL,IPOS3,XX3,Y3,DYDX3)
-      CALL TABLE_VINTERP(TABLE(ITABLE(4)),NEL,IPOS4,XX4,Y4,DYDX4)
-      CALL TABLE_VINTERP(TABLE(ITABLE(5)),NEL,IPOS5,XX5,Y5,DYDX5)
+      CALL TABLE_VINTERP(TABLE(ITABLE(1)),NEL,NEL,IPOS1,XX1,Y1,DYDX1)
+      CALL TABLE_VINTERP(TABLE(ITABLE(2)),NEL,NEL,IPOS2,XX2,Y2,DYDX2)
+      CALL TABLE_VINTERP(TABLE(ITABLE(3)),NEL,NEL,IPOS3,XX3,Y3,DYDX3)
+      CALL TABLE_VINTERP(TABLE(ITABLE(4)),NEL,NEL,IPOS4,XX4,Y4,DYDX4)
+      CALL TABLE_VINTERP(TABLE(ITABLE(5)),NEL,NEL,IPOS5,XX5,Y5,DYDX5)
       DO I=1,NEL
         Y1(I)=Y1(I)*YSCALE(1)       
         Y2(I)=Y2(I)*YSCALE(2)       
@@ -877,11 +876,11 @@ C
             XX5(I,1)=PLA5(I)
           END DO
 C
-          CALL TABLE_VINTERP(TABLE(ITABLE(1)),NEL,IPOS1,XX1,Y1,DYDX1)
-          CALL TABLE_VINTERP(TABLE(ITABLE(2)),NEL,IPOS2,XX2,Y2,DYDX2)
-          CALL TABLE_VINTERP(TABLE(ITABLE(3)),NEL,IPOS3,XX3,Y3,DYDX3)
-          CALL TABLE_VINTERP(TABLE(ITABLE(4)),NEL,IPOS4,XX4,Y4,DYDX4)
-          CALL TABLE_VINTERP(TABLE(ITABLE(5)),NEL,IPOS5,XX5,Y5,DYDX5)
+          CALL TABLE_VINTERP(TABLE(ITABLE(1)),NEL,NEL,IPOS1,XX1,Y1,DYDX1)
+          CALL TABLE_VINTERP(TABLE(ITABLE(2)),NEL,NEL,IPOS2,XX2,Y2,DYDX2)
+          CALL TABLE_VINTERP(TABLE(ITABLE(3)),NEL,NEL,IPOS3,XX3,Y3,DYDX3)
+          CALL TABLE_VINTERP(TABLE(ITABLE(4)),NEL,NEL,IPOS4,XX4,Y4,DYDX4)
+          CALL TABLE_VINTERP(TABLE(ITABLE(5)),NEL,NEL,IPOS5,XX5,Y5,DYDX5)
           DO  II = 1,NINDXGLOB         
             I = INDXGLOB(II)  
             Y1(I)=Y1(I)*YSCALE(1)       
@@ -1041,11 +1040,11 @@ C
             
          END DO
 C
-         CALL TABLE_VINTERP(TABLE(ITABLE(1)),NEL,IPOS1,XX1,Y1,DYDX1)
-         CALL TABLE_VINTERP(TABLE(ITABLE(2)),NEL,IPOS2,XX2,Y2,DYDX2)
-         CALL TABLE_VINTERP(TABLE(ITABLE(3)),NEL,IPOS3,XX3,Y3,DYDX3)
-         CALL TABLE_VINTERP(TABLE(ITABLE(4)),NEL,IPOS4,XX4,Y4,DYDX4)
-         CALL TABLE_VINTERP(TABLE(ITABLE(5)),NEL,IPOS5,XX5,Y5,DYDX5)
+         CALL TABLE_VINTERP(TABLE(ITABLE(1)),NEL,NEL,IPOS1,XX1,Y1,DYDX1)
+         CALL TABLE_VINTERP(TABLE(ITABLE(2)),NEL,NEL,IPOS2,XX2,Y2,DYDX2)
+         CALL TABLE_VINTERP(TABLE(ITABLE(3)),NEL,NEL,IPOS3,XX3,Y3,DYDX3)
+         CALL TABLE_VINTERP(TABLE(ITABLE(4)),NEL,NEL,IPOS4,XX4,Y4,DYDX4)
+         CALL TABLE_VINTERP(TABLE(ITABLE(5)),NEL,NEL,IPOS5,XX5,Y5,DYDX5)
          DO  II = 1,NINDXLOC         
             I = INDXLOC(II)  
             Y1(I)=Y1(I)*YSCALE(1)       

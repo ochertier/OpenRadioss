@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  MONVOL0                       source/airbag/monvol0.F       
 Chd|-- called by -----------
@@ -38,7 +38,7 @@ Chd|        VOLPVGA                       source/airbag/volpvg.F
 Chd|        VOLPVGB                       source/airbag/volpvg.F        
 Chd|        VOLP_LFLUID                   source/airbag/volp_lfluid.F   
 Chd|        VOLUM0                        source/airbag/volum0.F        
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|        MONVOL_STRUCT_MOD             share/modules/monvol_struct_mod.F
@@ -46,8 +46,8 @@ Chd|        SENSOR_MOD                    share/modules/sensor_mod.F
 Chd|====================================================================
       SUBROUTINE MONVOL0(MONVOL   ,VOLMON  ,X       ,A      ,
      2                   NPC      ,TF      ,V       ,N      ,
-     3                   FSAV     ,SENSOR_TAB,IGRSURF,
-     4                   FR_MV   ,IADMV   ,
+     3                   FSAV     ,NSENSOR ,SENSOR_TAB,IGRSURF,
+     4                   FR_MV    ,IADMV   ,
      5                   FSKY     ,ICONTACT,PORO    ,IPARG  ,
      6                   ELBUF_TAB,GEO     ,IGEO    ,
      7                   PM       ,IPM     ,IPART   ,IPARTC ,
@@ -71,15 +71,12 @@ C-----------------------------------------------
 #include      "param_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com06_c.inc"
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
 #include      "parit_c.inc"
 #include      "task_c.inc"
-#include      "scr17_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER ,INTENT(IN) :: NSENSOR
       INTEGER NPC(*),MONVOL(*),FR_MV(NSPMD+2,NVOLU),
      .   IADMV(4,*),ICONTACT(*),IPARG(NPARG,*),
      .   IGEO(NPROPGI,*),
@@ -95,7 +92,7 @@ C     REAL
       TYPE(H3D_DATABASE) :: H3D_DATA
       TYPE (SURF_)   , DIMENSION(NSURF)   :: IGRSURF
       TYPE(MONVOL_STRUCT_), DIMENSION(NVOLU), INTENT(IN) :: T_MONVOL
-      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR), INTENT(IN) :: SENSOR_TAB
 C-----------------------------------------------
 C     N(3,*)  NORMALE STOCKEE DANS WA
 C     PORO(*) STOCKE DANS WA
@@ -185,7 +182,7 @@ C         AIRBAGS
 C=======================================================================
            CALL AIRBAGA(MONVOL(K1),NJET ,MONVOL(IADJET),NVENT ,MONVOL(IADHOL),
      2 MONVOL(K2),VOLMON(KK1),VOLMON(RADJET),VOLMON(RADHOL),VOLMON(KK2),
-     3 VOLMON  ,NPC     ,TF      ,SENSOR_TAB ,
+     3 VOLMON  ,NPC     ,TF      ,NSENSOR ,SENSOR_TAB ,
      4 VOL     ,PMAIN )
         ELSEIF(ITYP==7.OR.ITYP==9)THEN
 C=======================================================================
@@ -193,7 +190,7 @@ C         AIRBAGS1 (NOUVEAUX INJECTEURS)
 C=======================================================================
            CALL AIRBAGA1(MONVOL(K1),NJET ,MONVOL(IADJET),NVENT ,MONVOL(IADHOL),
      2 MONVOL(K2),VOLMON(KK1),VOLMON(RADJET),VOLMON(RADHOL),VOLMON(KK2),
-     3 VOLMON  ,NPC     ,TF      ,SENSOR_TAB ,
+     3 VOLMON  ,NPC     ,TF      ,NSENSOR ,SENSOR_TAB ,
      4 VOL     ,PMAIN ,GEO     ,IGEO    ,PM)
         ELSEIF(ITYP==10)THEN
 C=======================================================================
@@ -206,12 +203,12 @@ C=======================================================================
         IF(ITYP/=1)THEN
          IF (IPARIT==0) THEN
             CALL VOLPRE(MONVOL(K1),VOLMON(KK1),NJET ,MONVOL(IADJET),VOLMON(RADJET),
-     2                 SENSOR_TAB ,X       ,V       ,A       ,
+     2                 NSENSOR ,SENSOR_TAB ,X       ,V       ,A       ,
      3                 N       ,NPC     ,TF      ,NN  ,IGRSURF(IS)%NODES,
      4                 FEXT    ,H3D_DATA,IGRSURF(IS)%ELTYP,IGRSURF(IS)%ELEM)
          ELSE
             CALL VOLPREP(MONVOL(K1),VOLMON(KK1),NJET ,MONVOL(IADJET),VOLMON(RADJET),
-     2                 SENSOR_TAB  ,X       ,V       ,A       ,
+     2                 NSENSOR ,SENSOR_TAB  ,X       ,V       ,A       ,
      3                 N       ,NPC     ,TF      ,NN  ,IGRSURF(IS)%NODES,
      4                 IADMV(1,K6),FSKY ,FSKY    ,FEXT, H3D_DATA ,
      5                 IGRSURF(IS)%ELTYP,IGRSURF(IS)%ELEM)

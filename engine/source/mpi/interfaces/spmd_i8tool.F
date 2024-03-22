@@ -1,31 +1,31 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  SPMD_I8_ILOC                  source/mpi/interfaces/spmd_i8tool.F
 Chd|-- called by -----------
 Chd|        INTVO8                        source/interfaces/inter3d/intvo8.F
 Chd|-- calls ---------------
-Chd|        INT8_MOD                      ../common_source/modules/int8_mod.F
+Chd|        INT8_MOD                      ../common_source/modules/interfaces/int8_mod.F
 Chd|====================================================================
       SUBROUTINE SPMD_I8_ILOC(ILOC    ,MSR,ITAB,BUFFER,
      .                        DISTANCE)
@@ -195,7 +195,7 @@ Chd|  SPMD_I8_INDEX                 source/mpi/interfaces/spmd_i8tool.F
 Chd|-- called by -----------
 Chd|        INTVO8                        source/interfaces/inter3d/intvo8.F
 Chd|-- calls ---------------
-Chd|        INT8_MOD                      ../common_source/modules/int8_mod.F
+Chd|        INT8_MOD                      ../common_source/modules/interfaces/int8_mod.F
 Chd|====================================================================
       SUBROUTINE SPMD_I8_INDEX(NMN,FRONTIER,INDEX_IN_COMM,S_COMM)
 C-----------------------------------------------
@@ -217,17 +217,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   M e s s a g e   P a s s i n g
-C-----------------------------------------------
-#ifdef MPI
-#include      "mpif.h"
-#endif
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -252,7 +241,7 @@ Chd|  SPMD_I8_COMMSLV               source/mpi/interfaces/spmd_i8tool.F
 Chd|-- called by -----------
 Chd|        INTVO8                        source/interfaces/inter3d/intvo8.F
 Chd|-- calls ---------------
-Chd|        INT8_MOD                      ../common_source/modules/int8_mod.F
+Chd|        INT8_MOD                      ../common_source/modules/interfaces/int8_mod.F
 Chd|====================================================================
       SUBROUTINE SPMD_I8_COMMSLV(NBSECNDS,ILOC,NSV,
      .            ITAB,BUFFER,FRONTIER,INDEX_IN_COMM)
@@ -459,7 +448,7 @@ Chd|  SPMD_I8_UPDBUF                source/mpi/interfaces/spmd_i8tool.F
 Chd|-- called by -----------
 Chd|        INTVO8                        source/interfaces/inter3d/intvo8.F
 Chd|-- calls ---------------
-Chd|        INT8_MOD                      ../common_source/modules/int8_mod.F
+Chd|        INT8_MOD                      ../common_source/modules/interfaces/int8_mod.F
 Chd|====================================================================
       SUBROUTINE SPMD_I8_UPDBUF(NBSECNDS,ILOC,NSV,
      .            ITAB,BUFFER,FRONTIER,INDEX_IN_COMM)
@@ -477,12 +466,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   M e s s a g e   P a s s i n g
-C-----------------------------------------------
-#ifdef MPI
-#include      "mpif.h"
-#endif
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -579,7 +562,7 @@ Chd|  SPMD_I8_IRTL                  source/mpi/interfaces/spmd_i8tool.F
 Chd|-- called by -----------
 Chd|        INTVO8                        source/interfaces/inter3d/intvo8.F
 Chd|-- calls ---------------
-Chd|        INT8_MOD                      ../common_source/modules/int8_mod.F
+Chd|        INT8_MOD                      ../common_source/modules/interfaces/int8_mod.F
 Chd|====================================================================
       SUBROUTINE SPMD_I8_IRTL(
      .            IRTL,     HAS_MOVED,
@@ -731,8 +714,8 @@ C
           ! in the following cases
             IF(HAS_MOVED_ON_REMOTE == 0) THEN
           ! the main face has not changed on the remote proc.
-              IRTL(K) =  0			  
-            ELSEIF( RMAX1 < RMAX2 .OR. (RMAX1 == RMAX2 .AND. IFLAG == 1)) THEN			  
+              IRTL(K) =  0        
+            ELSEIF( RMAX1 < RMAX2 .OR. (RMAX1 == RMAX2 .AND. IFLAG == 1)) THEN        
               IRTL(K) =  0
             ENDIF
           ENDIF
@@ -780,7 +763,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s

@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  STARTER0                      source/starter/starter0.F     
 Chd|-- called by -----------
@@ -29,7 +29,7 @@ Chd|        ANINIT                        source/output/analyse/analyse.c
 Chd|        BUILD_MSG                     source/output/message/build_msg.F
 Chd|        CHECK_MESSAGE_DEFINITION      ../common_source/modules/check_mod.F
 Chd|        CONTRL                        source/starter/contrl.F       
-Chd|        CUR_FIL_C                     source/output/tools/write_routines.c
+Chd|        CUR_FIL_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|        DYN_USERLIB_INIT              source/user_interface/dyn_userlib.c
 Chd|        EXECARGCHECK                  source/starter/execargcheck.F 
 Chd|        FREFORM                       source/starter/freform.F      
@@ -47,6 +47,8 @@ Chd|        INITIME                       source/system/timer.F
 Chd|        INI_MSG                       source/output/message/inimsg.F
 Chd|        LECTUR                        source/starter/lectur.F       
 Chd|        MY_EXIT                       source/output/analyse/analyse.c
+Chd|        NAMES_AND_TITLE_INIT          ../common_source/modules/names_and_titles_mod.F
+Chd|        OPEN_C                        ../common_source/tools/input_output/write_routtines.c
 Chd|        PRHELPINFO                    source/starter/execargcheck.F 
 Chd|        PRINTCENTER                   source/starter/radioss_title.F
 Chd|        PRINTCPU                      source/system/printcpu.F      
@@ -59,20 +61,34 @@ Chd|        STARTIME                      source/system/timer.F
 Chd|        STOPTIME                      source/system/timer.F         
 Chd|        ST_UACCESS_DUM                source/user_interface/uaccess.F
 Chd|        ST_UTABLE_DUM                 source/user_interface/utable.F
+Chd|        TH_CLEAN                      ../common_source/modules/output/time_history_mod.F
 Chd|        TITRE1                        source/output/outfile/titre1.F
 Chd|        TRACE_IN1                     source/system/trace_back.F    
 Chd|        TRACE_OUT1                    source/system/trace_back.F    
-Chd|        WRITE_C_C                     source/output/tools/write_routines.c
+Chd|        USER_WINDOWS_CLEAN            ../common_source/modules/user_windows_mod.F
+Chd|        USER_WINDOWS_INIT             ../common_source/modules/user_windows_mod.F
+Chd|        WRITE_C_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|        ANEND                         source/output/analyse/analyse_arret.F
+Chd|        ALEFVM_MOD                    ../common_source/modules/ale/alefvm_mod.F
+Chd|        ALEMUSCL_MOD                  ../common_source/modules/ale/alemuscl_mod.F
+Chd|        ALE_MOD                       ../common_source/modules/ale/ale_mod.F
 Chd|        CHECK_MOD                     ../common_source/modules/check_mod.F
 Chd|        DETONATORS_MOD                share/modules1/detonators_mod.F
-Chd|        EBCS_MOD                      ../common_source/modules/ebcs_mod.F
+Chd|        EBCS_MOD                      ../common_source/modules/boundary_conditions/ebcs_mod.F
 Chd|        INOUTFILE_MOD                 ../common_source/modules/inoutfile_mod.F
+Chd|        MAT_ELEM_MOD                  ../common_source/modules/mat_elem/mat_elem_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
+Chd|        OUTPUT_MOD                    ../common_source/modules/output/output_mod.F
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
+Chd|        USER_INTERFACE_MOD            share/modules1/user_interface_mod.F
+Chd|        USER_SENSOR_MOD               share/modules1/user_interface_mod.F
+Chd|        USER_WINDOWS_MOD              ../common_source/modules/user_windows_mod.F
 Chd|====================================================================
       SUBROUTINE STARTER0   
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
       USE MESSAGE_MOD
       USE MULTI_FVM_MOD
       USE SUBMODEL_MOD
@@ -80,6 +96,15 @@ Chd|====================================================================
       USE INOUTFILE_MOD
       USE DETONATORS_MOD
       USE EBCS_MOD
+      USE ALEMUSCL_MOD , only:ALEMUSCL_Param
+      USE ALEFVM_MOD , only:ALEFVM_Param
+      USE USER_WINDOWS_MOD
+      USE USER_SENSOR_MOD
+      USE USER_INTERFACE_MOD
+      USE ALE_MOD
+      USE OUTPUT_MOD
+      USE MAT_ELEM_MOD
+      USE NAMES_AND_TITLES_MOD, only: NAMES_AND_TITLES_
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -96,11 +121,8 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com02_c.inc"
-#include      "com03_c.inc"
 #include      "com04_c.inc"
 #include      "com06_c.inc"
-#include      "com07_c.inc"
 #include      "com08_c.inc"
 #include      "com09_c.inc"
 #include      "com10_c.inc"
@@ -117,11 +139,8 @@ C-----------------------------------------------
 #include      "scr17_c.inc"
 #include      "scr23_c.inc"
 #include      "param_c.inc"
-#include      "lon_c.inc"
 #include      "lagmult.inc"
-#include      "fluid_scr_c.inc"
 #include      "flowcom.inc"
-#include      "submod_c.inc"
 #include      "xtimscr_c.inc"
 #include      "sysunit.inc"
 #include      "build_info.inc"
@@ -131,12 +150,9 @@ C-----------------------------------------------
 #include      "commandline.inc"
 #include      "userlib.inc"
 #include      "ngr2usr_c.inc"
-#include      "alefvm.inc"
 #include      "inter22.inc"
 #include      "ige3d_c.inc"
 #include      "thermal_c.inc"
-#include      "alesolver.inc"
-#include      "alemuscl.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -162,14 +178,22 @@ C
       CHARACTER(len=8)  :: STARTDATE
       CHARACTER(len=10) :: STARTTIME
       CHARACTER(len=2048) :: TMP_NAME 
+      INTEGER :: NB_DYNA_INCLUDE
 C
-      my_real
-     .   UNITE, RTITR
+      my_real UNITE, RTITR
 C
-      TYPE(MULTI_FVM_STRUCT) :: MULTI_FVM
+      TYPE(MULTI_FVM_STRUCT)                          :: MULTI_FVM
       TYPE(SUBMODEL_DATA) , DIMENSION(:), ALLOCATABLE :: LSUBMODEL
-      TYPE(DETONATOR_STRUCT_),TARGET :: DETONATORS
-      TYPE(t_ebcs_tab) :: EBCS_TAB
+      TYPE(DETONATORS_STRUCT_),TARGET                  :: DETONATORS
+      TYPE(t_ebcs_tab)                                :: EBCS_TAB
+      TYPE(OUTPUT_)                                   :: OUTPUT
+c      TYPE(SENSORS_) :: SENSORS    ! declared as global in USER_SENSOR_MOD
+      TYPE(MAT_ELEM_)                                 :: MAT_ELEM
+      CHARACTER CWD*ncharline
+      CHARACTER GLOBAL_PATH*(ncharline+2048)
+      INTEGER :: LEN_CWD
+      INTEGER*4 GETCWD, STATUS_CWD
+      TYPE(NAMES_AND_TITLES_)   :: NAMES_AND_TITLES    !< NAMES_AND_TITLES host the input deck names and titles for outputs
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
@@ -179,7 +203,7 @@ C     LAM MAX LENGTH REAL ARRAY
 C     LMA MAX LENGTH INTEGER ARRAY
 C------------------------------------------------
 C     MACHINE.INC CONTAINS MACHINE SPECIFICATIONS
-C     (MALLOC,IGFORM,TYPE MACHINE...)
+C     (MALLOC,TYPE MACHINE...)
 C------------------------------------------------
 #include      "machine.inc"
 C=======================================================================
@@ -193,6 +217,8 @@ C     Constants
     
 C     timers initialization
       CALL INITIME()
+c
+      CALL NAMES_AND_TITLE_INIT(NAMES_AND_TITLES)
 C=======================================================================
 C while waiting IOUT to be initialized set to stdout 
 C Needs to be done in the early beginning
@@ -200,8 +226,7 @@ C ===================================================
       IOUT=6 
       ISTDO=6
 C=======================================================================
-      CALL  RADIOSS_TITLE(ISTDO,CPUNAM,ARCHTITLE,
-     *                      FILNAM,ROOTLEN,CHRUN,IRESP,1)
+      CALL  RADIOSS_TITLE(ISTDO,CPUNAM,ARCHTITLE,FILNAM,ROOTLEN,CHRUN,IRESP,1)
 C=======================================================================
 
 C-------------------------------------------------------------------
@@ -212,9 +237,8 @@ C
 C CODVERS : VERSION CODE        = 2019 IF RELEASE 2019
 C IMINVER : MINOR VERSION CODE  = 1 IF MINOR RELEASE A(A~1) OF 4.4 RELEASE
 C ISRCVER : SOURCE VERSION CODE = 41*100+9
-C                                   IF RELEASE WAS BUILT FROM SOURCE Bug41i
 C-------------------------------------------------------------------
-      CODVERS          = 2022
+      CODVERS          = 2024
       IMINVER          = 1
       ISRCVER          = 1
 C-------------------------------------------------------------------
@@ -273,12 +297,10 @@ C-------------------------------------------------------------------
       IDDOM = 0
       FLG_SWALE = 0
 #if CPP_mach == CPP_w95 || CPP_mach == CPP_win64_spmd || CPP_mach == CPP_p4win64_spmd || CPP_mach == CPP_wnt || CPP_mach == CPP_wmr || CPP_mach == CPP_p4win64 || CPP_mach == CPP_p4win32
-      CALL GET_ENVIRONMENT_VARIABLE("R2R_ENV_IPID",VAL,
-     .       LEN_ENV,STATUS,.TRUE.)
+      CALL GET_ENVIRONMENT_VARIABLE("R2R_ENV_IPID",VAL,LEN_ENV,STATUS,.TRUE.)
 C---------> IPID = 0 --> Multidomains starter fils--------------
       IF (LEN_ENV==1) IPID = 0
-      CALL GET_ENVIRONMENT_VARIABLE("R2R_ENV_SWALE",VAL,
-     .       LEN_ENV,STATUS,.TRUE.)
+      CALL GET_ENVIRONMENT_VARIABLE("R2R_ENV_SWALE",VAL,LEN_ENV,STATUS,.TRUE.)
 C---------> IPID = 0 --> Multidomains switch ALE----------------
       IF (LEN_ENV==1) FLG_SWALE = 1
 #endif
@@ -289,61 +311,60 @@ C      To be modified when structure of rst file is modified
 C-------------------------------------------------------------------
 C ITESTV Format   [Version][YY][MM][DD]
       ITESTV           = 210290720
-      ICAA             = 0
-      ISFINT           = 3 !ALE default : surface integration for total stress tensor
-      IALEFVM          = 0
-      I_ALE_SOLVER     = 0
-      IALEFVM_IPRINT_1 = 0
-      IALEFVM_IPRINT_2 = 0
+      
+      CALL ALE%init()
+      
+      ALEFVM_Param%IEnabled = 0
+      ALEFVM_Param%ISOLVER  = 0
+      ALEFVM_Param%IPRINT_1 = 0
+      ALEFVM_Param%IPRINT_2 = 0
 C MUSCL Activation
-      IALEMUSCL        = 1
+      ALEMUSCL_Param%IALEMUSCL = 1
 C MUSCL compression coefficient, default value set to 1.
-      I_BETA           = TWO
-      RATIO22          = ONE + TEN/HUNDRED
-      RADIOSSV         = 100090402
-      IFLEXPIPE        = 1
-      LEN              = ncharfield*2
+      ALEMUSCL_Param%BETA = TWO
+      RATIO22 = ONE + TEN/HUNDRED
+      RADIOSSV = 100090402
+      IFLEXPIPE = 1
+      LEN = ncharfield*2
 C
 C No Decay for Starter
-      TAGLEN           = 0
-      CHECKSUMLEN      = 0
-      ALTDOCTAG        = '0'
-      CHECKSUM         = '0'
-      UNITMAX          = 0
+      TAGLEN      = 0
+      CHECKSUMLEN = 0
+      ALTDOCTAG   = '0'
+      CHECKSUM    = '0'
+      UNITMAX     = 0
 C---
 C init to 0 variable position writing double precision (XDP)
-      IRXDP            = 0
+      IRXDP       = 0
 C
       IF(IR4R8==2) ITESTV=-ITESTV
-C
-C Dynamical Libraries initialization
+C------------------------------------------------
+C Dynamic Libraries initialization
+C------------------------------------------------
+        CALL USER_WINDOWS_INIT(USER_WINDOWS)
         USERLIB_LIST(1:100)=0
         IF(GOT_USERL_ALTNAME==1)THEN
           DLIBFILE(1:LEN_USERL_ALTNAME)=USERL_ALTNAME(1:LEN_USERL_ALTNAME)
           DLIBFILE_SIZE=LEN_USERL_ALTNAME
         ELSE
-	      DLIBFILE='libraduser_'
+                DLIBFILE='libraduser_'
           DLIBFILE_SIZE=LEN_TRIM(DLIBFILE)
         ENDIF
         USERL_AVAIL=0
 #ifndef SANITIZE 
-        CALL DYN_USERLIB_INIT(DLIBFILE,DLIBFILE_SIZE,USERL_AVAIL,
-     *                        DLIBTKVERS,IRESP,GOT_USERL_ALTNAME)
+        CALL DYN_USERLIB_INIT(DLIBFILE,DLIBFILE_SIZE,USERL_AVAIL,DLIBTKVERS,IRESP,GOT_USERL_ALTNAME)
 C------------------------------------------------
 C Mds lib initialization
 C------------------------------------------------
 #ifdef DNC
-       CALL MDS_USERLIB_INIT (IRESP,
-     .                        MDS_AVAIL, 
-     .                        MDS_VER,
-     .                        MDS_PATH,
-     .                        MDS_PATH_LEN)
+       CALL MDS_USERLIB_INIT (IRESP, MDS_AVAIL, MDS_VER, MDS_PATH, MDS_PATH_LEN)
 #else
       MDS_AVAIL=0
 #endif
 #endif
 C-----------------------------------------------------
 C Avoid linking issue with dynamical libraries
+C-----------------------------------------------------
         IERR=0
         CALL ST_UACCESS_DUM(IERR)      
         CALL ST_UTABLE_DUM(IERR)
@@ -391,6 +412,7 @@ C Read DYNA model & convert DYNA -> Radioss objects
 C------------------------------------------------
       CALL STARTIME(15,1)
 
+      NB_DYNA_INCLUDE = 0
       IF(IS_DYNA == 1) THEN
         CALL CPP_READ_DYNA_AND_CONVERT(FNAME, LFNAME,EDI_RES,FILNAM,ROOTLEN+9+OUTFILE_NAME_LEN)
       ENDIF
@@ -425,7 +447,7 @@ C-------------------------------------------------------------------
 C     message file id
 C-------------------------------------------------------------------
       WRITE(CHRUN,'(I4.4)')IRUN
-C	  
+C    
       IF (IPID==1) THEN
       FILNAM  =OUTFILE_NAME(1:OUTFILE_NAME_LEN)//
      .         ROOTNAM(1:ROOTLEN)//'_'//CHRUN//'.out'
@@ -453,8 +475,6 @@ C------------------------------------------------
       ERR_MSG='OPEN OUTPUT FILE'
       ERR_CATEGORY='OPEN OUTPUT FILE'
 C------------------------------------------------
-      MAXLA = 0
-      MAXLM = 0
       IUGEO=4
       IIN=8
       IIN2=11
@@ -486,17 +506,15 @@ C     IUSC2=9 ou 10
 C new composite shell pid max nbs 200
       NPROPG =1000
       NPROPM =250
-      NPARG  = 91
+      NPARG  = 100
       NPARI  = 100
-      NPARIR=46
+      NPARIR=48
       LFXVELR = 9
-      NIBCLD = 8 
+      NIBCLD = 9
       LFACCLD = 2
       NIGRV   = 6 
       LFACGRV = 2
-      LFACLOAD = 12
-      LUNIT   = 4
-      LSUBMOD = 1
+      LFACLOAD = 13
       NRVOLU =73
       NICBAG=5
       NRCBAG=9
@@ -511,13 +529,12 @@ C new composite shell pid max nbs 200
       NISX   = 6
       NPEBC  =14
       NPEBCR =10
-      NIMV   = 74
+      NIMV   = 75 ! array size for Monitored Volumes
       NRBY   = 30
       NRBYLAG= 0
       NNPBY  = 18
       NMGRBY = 7
       NRWLP  = 26
-      NSENSR = 223
       NIBVEL = 0
       NBVELP = 6
       NRCNX  = 12
@@ -537,14 +554,13 @@ C      LTITR   = 40
       LISUB1  = 20 + LTITR
       LIBOX1  = 20 + LTITR
       LIPART1 = 20 + LTITR
-      NSENSI  = 15 + LTITR
       NPROPGI = 750 + LTITR
       NPROPMI = 300 + LTITR
 C     npsav not used by starter
       NPSAV  = 0
       NR2R = 2
       NISP    = 8
-      NSPBUF  = 12
+      NSPBUF  = 13
       NISPCOND= 6
       KVOISPH = 0
 c 2 new values for ISPHIO, NSEG and IAS for inlet outlet in spmd
@@ -564,7 +580,7 @@ c 2 new values for ISPHIO, NSEG and IAS for inlet outlet in spmd
       SEGINDX=0
       NHIN2 =0
       NIFV = 16
-      NALENOVS = 6
+      ALE%GLOBAL%NALENOVS = 6
       NLEDGE  = 15
       NRTRANS = 19
 C
@@ -601,9 +617,7 @@ C
       NMADSOL=0
       NMADNOD=0
       I7STIFS=0
-      MSHSUB  =0
-      NSHFRONT=0
-      NRDAMP=20
+      NRDAMP=30
       NIFLOW=28
       NRFLOW=24
       NIIOFLOW=4
@@ -631,7 +645,7 @@ C
       LLACCELM = 25
       LLGAUGE  = 37
 C    
-      I_DT_NODA_ALE_ON = 0 ! by default DT NODA * options are no longer available for ALE grid points.
+      ALE%GLOBAL%I_DT_NODA_ALE_ON = 0 ! by default DT NODA * options are no longer available for ALE grid points.
 C
       INP = ISTDI
       FLAG_KEY_M = 0
@@ -653,15 +667,37 @@ C-------------------------------------------------
       CALL INICOD
 C-------------------------------------------------------------------
 C Runnumber is taken from input name or previous treatments
+C-------------------------------------------------------------------
       IRUN = RUNN
       CALL TRACE_IN1(ERR_MSG,LEN_TRIM(ERR_MSG))
+      ALLOCATE(LSUBMODEL(1))
       CALL FREFORM(MULTI_FVM,LSUBMODEL,ISUB_HIERARCHY,TRALL_MAXVAL,DETONATORS)
+      IF(ALLOCATED(LSUBMODEL)) DEALLOCATE(LSUBMODEL)
+
 C------------------------------------------------
 C Build model in memory (Radioss format)
 C------------------------------------------------
       IF (GOT_INPUT == 1 .AND. IS_DYNA == 0)THEN
+C
         CALL STARTIME(16,1)
-        CALL CPP_BUILD_MODEL(FNAME,LFNAME,EDI_RES)
+        STATUS_CWD = GETCWD(CWD)
+        LEN_CWD = LEN_TRIM(CWD)
+        GLOBAL_PATH = TRIM(PATH)
+c
+        CALL CPP_BUILD_MODEL_INC(FNAME,LFNAME,EDI_RES,NB_DYNA_INCLUDE,GLOBAL_PATH,LEN_TRIM(GLOBAL_PATH) )
+c
+        IF(NB_DYNA_INCLUDE .NE. 0) THEN
+          DYNA_MESSAGE=1
+          CLOSE(IOUT)
+          CALL CPP_PRINT_DYNA(FILNAM,ROOTLEN+9+OUTFILE_NAME_LEN)
+          OPEN(UNIT=IOUT,FILE=FILNAM(1:ROOTLEN+9+OUTFILE_NAME_LEN),
+     .    ACCESS='SEQUENTIAL',FORM='FORMATTED',STATUS='UNKNOWN',POSITION="APPEND")   
+          WRITE(IOUT,'(A)')''
+          WRITE(IOUT,'(A)')''
+          WRITE(IOUT,'(A)')'************************************************************************'
+          WRITE(IOUT,'(A)')'* RADIOSS STARTER PROCESS'
+          WRITE(IOUT,'(A)')'************************************************************************'
+        ENDIF
         CALL STOPTIME(16,1)
       ENDIF
 C-------------------------------------------------------------------
@@ -736,10 +772,8 @@ C-------------------------------------------------------------------
 c Count number of translated shell elements
       NB_SEATBELT_SHELLS = 0
       CALL HM_COUNT_2D_ELEMENT_SEATBELT(NB_SEATBELT_SHELLS,LSUBMODEL)
-      IF(NB_SEATBELT_SHELLS > 0)  THEN
-        ALLOCATE (SEATBELT_CONVERTED_ELEMENTS(3,NB_SEATBELT_SHELLS),STAT=stat)
-        SEATBELT_CONVERTED_ELEMENTS(1:3,1:NB_SEATBELT_SHELLS) = 0
-      ENDIF
+      ALLOCATE (SEATBELT_CONVERTED_ELEMENTS(3,NB_SEATBELT_SHELLS),STAT=stat)
+      SEATBELT_CONVERTED_ELEMENTS(1:3,1:NB_SEATBELT_SHELLS) = 0
       IF (STAT /= 0) CALL ANCMSG(MSGID=268,ANMODE=ANINFO,
      .                             MSGTYPE=MSGERROR,
      .                         C1='SEATBELT_CONVERTED_ELEMENTS')
@@ -761,7 +795,7 @@ c 2d seatbelt translation
 C-------------------------------------------------------------------
 C     Control variables (count options)
 C-------------------------------------------------------------------
-      CALL CONTRL(MULTI_FVM,LSUBMODEL,IS_DYNA,DETONATORS)
+      CALL CONTRL(MULTI_FVM,LSUBMODEL,IS_DYNA,DETONATORS,USER_WINDOWS,MAT_ELEM,NAMES_AND_TITLES,LIPART1)
 C-------------------------------------------------------------------
 C     Parameters modification and parameters write (-HSTP_READ -HSTP_WRITE ARGUMENTS)
 C-------------------------------------------------------------------
@@ -854,7 +888,10 @@ c       start CPU timer for lectur
 C--------------------------------------------------
 C      Main reading routine
 C--------------------------------------------------
-        CALL LECTUR(MULTI_FVM,LSUBMODEL,IS_DYNA,DETONATORS,EBCS_TAB,SEATBELT_CONVERTED_ELEMENTS,NB_SEATBELT_SHELLS)
+        CALL LECTUR(
+     .       MULTI_FVM                   ,LSUBMODEL         ,IS_DYNA          ,DETONATORS   ,EBCS_TAB,
+     .       SEATBELT_CONVERTED_ELEMENTS ,NB_SEATBELT_SHELLS,NB_DYNA_INCLUDE  ,USER_WINDOWS ,OUTPUT  ,
+     .       MAT_ELEM,NAMES_AND_TITLES  )
 
 c       stop CPU timer for lectur
         CALL STOPTIME(2,1)
@@ -874,6 +911,8 @@ C --------------------------------------------------
       ENDIF
 C
       IF(ALLOCATED(SEATBELT_CONVERTED_ELEMENTS)) DEALLOCATE(SEATBELT_CONVERTED_ELEMENTS)  
+      CALL USER_WINDOWS_CLEAN(USER_WINDOWS)
+      CALL TH_CLEAN(OUTPUT%TH)
 C
       IF (IERR==0)THEN
         !   -----------------------------

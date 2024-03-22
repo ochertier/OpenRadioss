@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>    
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,7 +27,7 @@ C.../COM04/
      .   NRWALL, NRBODY, NODMAS, NFXVEL, NRIVET, 
      .   NUMELR, NUMELP, NSECT , NRBAG ,
      .   NJOINT, NUMELTG,NSLAG , NFACX ,
-     .   NUMPOR, NACCELM,NSENSOR,NPRETEN,NVOLU,
+     .   NUMPOR, NACCELM,NPRETEN,NVOLU,
      .   NPART,  NSURF,  NSUBS,  NGRAV,  NRBY2 ,
      .   NGRNOD, NGRBRIC,NGRQUAD,NGRSHEL,NGRSH3N,
      .   NGRBEAM,NGRTRUS,NGRSPRI,NLINK,  INVSTR,
@@ -47,8 +47,7 @@ C.../COM04/
      .   ISFEM,NLOADP_F, NLOADP_B, NUMNOR, NINTER25,
      .   NINTER25E,NUMPLY,NUMSTACK,NS10E,NINTERFRIC,
      .   NUMSKIN,NBCSCYC,NRBFAIL,NLOADP_HYD,NINTLOADP,
-     .   NINTLOADP21,NLOADP_HYD_INTER,NUMSKINP,NTSHEG,
-     .   NRBODY0
+     .   NINTLOADP21,NLOADP_HYD_INTER,NTSHEG,NRBODY0
   
       INTEGER NUMMAT, NUMNOD, NUMSKW, NUMBCS, NANALY,
      .   NUMELQ, NUMELS, NUMELC, NUMELT, NUMGEO,
@@ -56,7 +55,7 @@ C.../COM04/
      .   NRWALL, NRBODY, NODMAS, NFXVEL, NRIVET, 
      .   NUMELR, NUMELP, NSECT , NRBAG ,
      .   NJOINT, NUMELTG,NSLAG , NFACX ,
-     .   NUMPOR, NACCELM,NSENSOR,NPRETEN,NVOLU,
+     .   NUMPOR, NACCELM,NPRETEN,NVOLU,
      .   NPART,  NSURF,  NSUBS,  NGRAV,  NRBY2 ,
      .   NGRNOD, NGRBRIC,NGRQUAD,NGRSHEL,NGRSH3N,
      .   NGRBEAM,NGRTRUS,NGRSPRI,NLINK,  INVSTR,
@@ -76,7 +75,6 @@ C.../COM04/
      .   ISFEM,NLOADP_F, NLOADP_B, NUMNOR, NINTER25,
      .   NINTER25E,NUMPLY,NUMSTACK,NS10E,NINTERFRIC,
      .   NUMSKIN,NBCSCYC,NRBFAIL,NLOADP_HYD,NINTLOADP,
-     .   NINTLOADP21,NLOADP_HYD_INTER,NUMSKINP,NTSHEG,
-     .   NRBODY0
+     .   NINTLOADP21,NLOADP_HYD_INTER,NTSHEG,NRBODY0
 C--------1---------2---------3---------4---------5---------6---------7--
 

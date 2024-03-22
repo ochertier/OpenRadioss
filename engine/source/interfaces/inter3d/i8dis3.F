@@ -1,55 +1,51 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  I8DIS3                        source/interfaces/inter3d/i8dis3.F
 Chd|-- called by -----------
 Chd|        INTVO8                        source/interfaces/inter3d/intvo8.F
 Chd|-- calls ---------------
 Chd|====================================================================
-      SUBROUTINE I8DIS3(IGIMP,NTY,DIST,
-     .                  X1,Y1,Z1,
-     .                  X2,Y2,Z2,
-     .                  X3,Y3,Z3,
-     .                  X4,Y4,Z4,
-     .                  XI,YI,ZI,
-     .                  XP,YP,ZP,
-     .                  N1,N2,N3,
-     .                  ANS,SSC,TTC,
-     .                  H1,H2,H3,
-     .                  H4,XFACE,
-     .                  ALP)
+      SUBROUTINE I8DIS3(
+     1   IGIMP,   NTY,     DIST,    X1,
+     2   Y1,      Z1,      X2,      Y2,
+     3   Z2,      X3,      Y3,      Z3,
+     4   X4,      Y4,      Z4,      XI,
+     5   YI,      ZI,      XP,      YP,
+     6   ZP,      N1,      N2,      N3,
+     7   ANS,     SSC,     TTC,     H1,
+     8   H2,      H3,      H4,      XFACE,
+     9   ALP,     LFT,     LLT)
 
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(INOUT) :: LFT
+      INTEGER, INTENT(INOUT) :: LLT
       INTEGER IGIMP,NTY
       my_real DIST(*)
       my_real
@@ -61,7 +57,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "vect07_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -80,10 +75,9 @@ C=======================================================================
         ANS(I) = ZERO
         DIST(I) = ZERO
 
- 
+
         IF (XFACE(I) == ZERO) CYCLE
         IF (ABS(SSC(I))>ONE+ALP(I) .OR. ABS(TTC(I))>ONE+ALP(I)) THEN
-         !WRITE(6,*) "XFACE(",I,")=0",SSC(I),TTC(I),ALP(I)
           XFACE(I)=ZERO
         ELSE
           IF(ABS(SSC(I)) > ONE) SSC(I)=SSC(I)/ABS(SSC(I))
@@ -91,22 +85,11 @@ C=======================================================================
         ENDIF
       END DO
 C
-c     IGIMP=0
-c     DO I=LFT,LLT
-c       IGIMP = IGIMP + ABS(XFACE(I))
-c     END DO
-c     WRITE(6,*) "IGIMP=",IGIMP
-c     IF (IGIMP == 0) RETURN
-C
       DO I=LFT,LLT
         H1(I) = FOURTH*(ONE-TTC(I))*(ONE-SSC(I))
         H2(I) = FOURTH*(ONE-TTC(I))*(ONE+SSC(I))
         H3(I) = FOURTH*(ONE+TTC(I))*(ONE+SSC(I))
         H4(I) = FOURTH*(ONE+TTC(I))*(ONE-SSC(I))
-c       IF(H3(I) /= H3(I) .OR. H1(I) /= H1(I) .OR. 
-c    .  H4(I) /= H4(I)  ) THEN 
-c       WRITE(6,*) "BUG! :",TTC(I),SSC(I)
-c       ENDIF
       END DO
 C
       DO I=LFT,LLT

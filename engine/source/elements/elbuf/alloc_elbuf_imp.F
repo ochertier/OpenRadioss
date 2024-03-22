@@ -1,31 +1,31 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  ALLOC_ELBUF_IMP               source/elements/elbuf/alloc_elbuf_imp.F
 Chd|-- called by -----------
 Chd|        RESOL                         source/engine/resol.F         
 Chd|-- calls ---------------
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE ALLOC_ELBUF_IMP(ELBUF_TAB,ELBUF_IMP,NGROUP,IPARG)
 C-----------------------------------------------
@@ -39,7 +39,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "tabsiz_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -51,7 +50,7 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER NG,ITY,ERR,BUFLEN,NEL,NPT,NPG,NLAY,NPTR,NPTS,NPTT,NUVAR,NVARTMP,
-     .   NFAIL,K,IL,IR,IS,IT,IGTYP,NPTTOT,I,NONL,INLOC
+     .   NFAIL,K,IL,IR,IS,IT,IGTYP,NPTTOT,I,NONL,INLOC,NVAR_EOS
       INTEGER ! global variables 
      .   G_GAMA,G_SIG,G_OFF,G_NOFF,G_EINT,G_EINS,G_TEMP,
      .   G_RHO,G_PLA,G_VOL,G_EPSD,G_QVIS,G_DELTAX,G_TB,G_RK,G_RE,
@@ -79,13 +78,16 @@ C-----------------------------------------------
      .   L_THK,L_FOR,L_MOM,L_SMSTR,L_BFRAC,L_DMG,L_FORTH,L_EINTTH,L_SEQ,
      .   L_SIGPLY,L_FAC_YLD,L_ABURN,L_MU
       INTEGER  ! failure variables
-     .   LF_DAM,LF_DAMMX,LF_TDEL,LF_INDX,LF_OFF
+     .   LF_DAM,LF_DAMMX,LF_DAMINI,LF_TDEL,LF_INDX,LF_OFF
       TYPE(BUF_LAY_)  , POINTER :: BUFLY,BUFLY_IMP
       TYPE(G_BUFEL_)  , POINTER :: GBUF
       TYPE(L_BUFEL_)  , POINTER :: LBUF
       TYPE(FAIL_LOC_) , POINTER :: FLOC
       TYPE(BUF_NLOC_) , POINTER :: BUFNL
-C=======================================================================
+      TYPE(BUF_NLOCTS_),POINTER :: BUFNLTS
+C-----------------------------------------------
+C   S o u r c e   L i n e s
+C-----------------------------------------------
       DO NG = 1,NGROUP                                                 
        ITY = IPARG(5,NG)    
        INLOC = IPARG(78,NG) ! Non-local regularization flag                                                        
@@ -265,7 +267,7 @@ c
             ALLOCATE(LBUF%STRA  (NEL*BUFLY%L_STRA)  ,STAT=ERR)                           
             ALLOCATE(LBUF%FRAC (NEL*BUFLY%L_FRAC) ,STAT=ERR)                           
             ALLOCATE(LBUF%BFRAC(NEL*BUFLY%L_BFRAC)  ,STAT=ERR)                             
-            ALLOCATE(LBUF%EINT(NEL*BUFLY%L_EINT)  ,STAT=ERR)	    
+            ALLOCATE(LBUF%EINT(NEL*BUFLY%L_EINT)  ,STAT=ERR)      
             ALLOCATE(LBUF%EINS(NEL*BUFLY%L_EINS)  ,STAT=ERR)                             
             ALLOCATE(LBUF%RHO(NEL*BUFLY%L_RHO)   ,STAT=ERR)                              
             ALLOCATE(LBUF%DP_DRHO(NEL*BUFLY%L_DP_DRHO)   ,STAT=ERR)                     
@@ -367,6 +369,8 @@ c-------------------------------
      .            ELBUF_TAB(NG)%BUFLY(IL)%FAIL(IR,IS,IT)%FLOC(K)%LF_DAM 
                  LF_DAMMX=
      .            ELBUF_TAB(NG)%BUFLY(IL)%FAIL(IR,IS,IT)%FLOC(K)%LF_DAMMX 
+                 LF_DAMINI=
+     .            ELBUF_TAB(NG)%BUFLY(IL)%FAIL(IR,IS,IT)%FLOC(K)%LF_DAMINI
                  LF_TDEL=
      .            ELBUF_TAB(NG)%BUFLY(IL)%FAIL(IR,IS,IT)%FLOC(K)%LF_TDEL 
                  LF_INDX=
@@ -378,6 +382,7 @@ c-------------------------------
                  ALLOCATE(FLOC%VAR(NEL*NUVAR), STAT=ERR)  
                  ALLOCATE(FLOC%DAM(NEL*LF_DAM), STAT=ERR)  
                  ALLOCATE(FLOC%DAMMX(NEL*LF_DAMMX), STAT=ERR)  
+                 ALLOCATE(FLOC%DAMINI(NEL*LF_DAMINI), STAT=ERR)
                  ALLOCATE(FLOC%TDEL(NEL*LF_TDEL), STAT=ERR)  
                  ALLOCATE(FLOC%INDX(NEL*LF_INDX), STAT=ERR)  
                  ALLOCATE(FLOC%OFF(NEL*LF_OFF)  , STAT=ERR)  
@@ -400,8 +405,7 @@ c-------------------------------
           DO IR = 1,NPTR                                                  
             DO IS = 1,NPTS                                                
               DO IT = 1,NPTT                                              
-                ALLOCATE (ELBUF_IMP(NG)%BUFLY(IL)%VISC(IR,IS,IT)
-     .                                 %VAR(NEL*NUVAR), STAT=ERR)
+                ALLOCATE (ELBUF_IMP(NG)%BUFLY(IL)%VISC(IR,IS,IT)%VAR(NEL*NUVAR), STAT=ERR)
               ENDDO                                                           
             ENDDO                                                            
           ENDDO                                                           
@@ -437,7 +441,53 @@ c-------------------------------
               ENDDO
             ENDDO  
           ENDIF
+c-------------------------------
+c         Non-local regularization in the thickshell thickness                 
+c-------------------------------
+        ELSEIF (ITY==1) THEN
+          ! Number of integration points in the thickness
+          NPTT = ELBUF_TAB(NG)%NLAY
+          IF ((INLOC>0).AND.(NPTT>1)) THEN
+            ! Allocation of the non-local buffer structure
+            ALLOCATE(ELBUF_TAB(NG)%NLOCTS(NPTR,NPTS), STAT=ERR)
+            ! Number of non-local nodes in the thickness
+            NONL = NPTT+1
+            ! Loop over the integration points in the plane of the shell
+            DO IR = 1,NPTR
+              DO IS = 1,NPTS
+                ! Pointing the non-local buffer
+                BUFNLTS => ELBUF_TAB(NG)%NLOCTS(IR,IS)
+                ! Non-local in-thickness masses
+                ALLOCATE(BUFNLTS%MASSTH(NEL,NONL), STAT=ERR) 
+                ! Non-local in-thickness cumulated variables
+                ALLOCATE(BUFNLTS%UNLTH(NEL,NONL), STAT=ERR) 
+                ! Non-local in-thickness velocities
+                ALLOCATE(BUFNLTS%VNLTH(NEL,NONL), STAT=ERR) 
+                ! Non-local in-thickness forces
+                ALLOCATE(BUFNLTS%FNLTH(NEL,NONL), STAT=ERR) 
+              ENDDO
+            ENDDO  
+          ENDIF
         ENDIF
+        
+c-------------------------------
+c         EoS buffer
+c-------------------------------
+      DO IL = 1, NLAY 
+        NVAR_EOS = ELBUF_TAB(NG)%BUFLY(IL)%NVAR_EOS                                                                                         
+        IF (IGTYP == 51 .OR. IGTYP == 52) THEN
+          NPTT = ELBUF_TAB(NG)%BUFLY(IL)%NPTT
+        ELSE
+          NPTT = ELBUF_TAB(NG)%NPTT
+        ENDIF
+        DO IR = 1,NPTR                                                    
+          DO IS = 1,NPTS                                                  
+            DO IT = 1,NPTT                                                           
+              ALLOCATE( ELBUF_TAB(NG)%BUFLY(IL)%EOS(IR,IS,IT)%VAR(NEL*NVAR_EOS), STAT=ERR)                                                                                                                                      
+            ENDDO                                                             
+          ENDDO                                                              
+        ENDDO                                                             
+      ENDDO         
 c-------------------------------------------------
 c       allocation of global buffer variables
 c-------------------------------------------------
@@ -494,6 +544,7 @@ C
         ELBUF_IMP(NG)%GBUF%G_MU     = GBUF%G_MU    
         ELBUF_IMP(NG)%GBUF%G_PLANL  = GBUF%G_PLANL  
         ELBUF_IMP(NG)%GBUF%G_EPSDNL = GBUF%G_EPSDNL
+        ELBUF_IMP(NG)%GBUF%G_DMGSCL = GBUF%G_DMGSCL
         ELBUF_IMP(NG)%GBUF%G_TSAIWU = GBUF%G_TSAIWU
         ELBUF_IMP(NG)%GBUF%G_BPRELD  = GBUF%G_BPRELD    
         ELBUF_IMP(NG)%GBUF%G_COR_NF  = GBUF%G_COR_NF   
@@ -506,32 +557,32 @@ C
 c---
 c 1-D elements (TRUSS, BEAM, SPRING, NSTRAND)
 c---
-        ELBUF_IMP(NG)%GBUF%G_AREA	 = GBUF%G_AREA
-        ELBUF_IMP(NG)%GBUF%G_SKEW	 = GBUF%G_SKEW
-        ELBUF_IMP(NG)%GBUF%G_LENGTH	 = GBUF%G_LENGTH
-        ELBUF_IMP(NG)%GBUF%G_TOTDEPL	 = GBUF%G_TOTDEPL
-        ELBUF_IMP(NG)%GBUF%G_TOTROT	 = GBUF%G_TOTROT
-        ELBUF_IMP(NG)%GBUF%G_FOREP	 = GBUF%G_FOREP
-        ELBUF_IMP(NG)%GBUF%G_MOMEP	 = GBUF%G_MOMEP
+        ELBUF_IMP(NG)%GBUF%G_AREA   = GBUF%G_AREA
+        ELBUF_IMP(NG)%GBUF%G_SKEW   = GBUF%G_SKEW
+        ELBUF_IMP(NG)%GBUF%G_LENGTH   = GBUF%G_LENGTH
+        ELBUF_IMP(NG)%GBUF%G_TOTDEPL   = GBUF%G_TOTDEPL
+        ELBUF_IMP(NG)%GBUF%G_TOTROT   = GBUF%G_TOTROT
+        ELBUF_IMP(NG)%GBUF%G_FOREP   = GBUF%G_FOREP
+        ELBUF_IMP(NG)%GBUF%G_MOMEP   = GBUF%G_MOMEP
         ELBUF_IMP(NG)%GBUF%G_DEP_IN_TENS = GBUF%G_DEP_IN_TENS
         ELBUF_IMP(NG)%GBUF%G_DEP_IN_COMP = GBUF%G_DEP_IN_COMP
         ELBUF_IMP(NG)%GBUF%G_ROT_IN_TENS = GBUF%G_ROT_IN_TENS
         ELBUF_IMP(NG)%GBUF%G_ROT_IN_COMP = GBUF%G_ROT_IN_COMP
-        ELBUF_IMP(NG)%GBUF%G_POSX	 = GBUF%G_POSX
-        ELBUF_IMP(NG)%GBUF%G_POSY	 = GBUF%G_POSY
-        ELBUF_IMP(NG)%GBUF%G_POSZ	 = GBUF%G_POSZ
-        ELBUF_IMP(NG)%GBUF%G_POSXX	 = GBUF%G_POSXX
-        ELBUF_IMP(NG)%GBUF%G_POSYY	 = GBUF%G_POSYY
-        ELBUF_IMP(NG)%GBUF%G_POSZZ	 = GBUF%G_POSZZ
-        ELBUF_IMP(NG)%GBUF%G_YIELD	 = GBUF%G_YIELD
+        ELBUF_IMP(NG)%GBUF%G_POSX   = GBUF%G_POSX
+        ELBUF_IMP(NG)%GBUF%G_POSY   = GBUF%G_POSY
+        ELBUF_IMP(NG)%GBUF%G_POSZ   = GBUF%G_POSZ
+        ELBUF_IMP(NG)%GBUF%G_POSXX   = GBUF%G_POSXX
+        ELBUF_IMP(NG)%GBUF%G_POSYY   = GBUF%G_POSYY
+        ELBUF_IMP(NG)%GBUF%G_POSZZ   = GBUF%G_POSZZ
+        ELBUF_IMP(NG)%GBUF%G_YIELD   = GBUF%G_YIELD
         ELBUF_IMP(NG)%GBUF%G_LENGTH_ERR  = GBUF%G_LENGTH_ERR
-        ELBUF_IMP(NG)%GBUF%G_DV 	 = GBUF%G_DV
-        ELBUF_IMP(NG)%GBUF%G_DFS	 = GBUF%G_DFS
-        ELBUF_IMP(NG)%GBUF%G_SKEW_ERR	 = GBUF%G_SKEW_ERR
-        ELBUF_IMP(NG)%GBUF%G_E6 	 = GBUF%G_E6
-        ELBUF_IMP(NG)%GBUF%G_RUPTCRIT	 = GBUF%G_RUPTCRIT
-        ELBUF_IMP(NG)%GBUF%G_MASS	 = GBUF%G_MASS
-        ELBUF_IMP(NG)%GBUF%G_V_REPCVT	 = GBUF%G_V_REPCVT
+        ELBUF_IMP(NG)%GBUF%G_DV    = GBUF%G_DV
+        ELBUF_IMP(NG)%GBUF%G_DFS   = GBUF%G_DFS
+        ELBUF_IMP(NG)%GBUF%G_SKEW_ERR   = GBUF%G_SKEW_ERR
+        ELBUF_IMP(NG)%GBUF%G_E6    = GBUF%G_E6
+        ELBUF_IMP(NG)%GBUF%G_RUPTCRIT   = GBUF%G_RUPTCRIT
+        ELBUF_IMP(NG)%GBUF%G_MASS   = GBUF%G_MASS
+        ELBUF_IMP(NG)%GBUF%G_V_REPCVT   = GBUF%G_V_REPCVT
         ELBUF_IMP(NG)%GBUF%G_VR_REPCVT   = GBUF%G_VR_REPCVT
         ELBUF_IMP(NG)%GBUF%G_NUVAR       = GBUF%G_NUVAR
         ELBUF_IMP(NG)%GBUF%G_NUVARN      = GBUF%G_NUVARN
@@ -539,7 +590,7 @@ c---
         ELBUF_IMP(NG)%GBUF%G_FORINI      = GBUF%G_FORINI
         ELBUF_IMP(NG)%GBUF%G_INIFRIC     = GBUF%G_INIFRIC
         ELBUF_IMP(NG)%GBUF%G_STRHG       = GBUF%G_STRHG
-        ELBUF_IMP(NG)%GBUF%G_SKEW_ID	 = GBUF%G_SKEW_ID
+        ELBUF_IMP(NG)%GBUF%G_SKEW_ID   = GBUF%G_SKEW_ID
 c---
 c seatbelt elements
 c---
@@ -602,7 +653,10 @@ c
           ALLOCATE (ELBUF_IMP(NG)%GBUF%MU(NEL*GBUF%G_MU)         ,STAT=ERR)                  
         ENDIF
 c
-        IF (NPG > 1) THEN
+        IF (NPG == 1) THEN
+          IF (GBUF%G_STRPG > GBUF%G_STRA) 
+     .      ALLOCATE(ELBUF_IMP(NG)%GBUF%STRPG(NEL*GBUF%G_STRPG),STAT=ERR)                  
+        ELSEIF (NPG > 1) THEN
           ALLOCATE(ELBUF_IMP(NG)%GBUF%FORPG(NEL*GBUF%G_FORPG),STAT=ERR)                  
           ALLOCATE(ELBUF_IMP(NG)%GBUF%MOMPG(NEL*GBUF%G_MOMPG),STAT=ERR)
 C

@@ -1,25 +1,25 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
-Copyright>    
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
 Copyright>        the Free Software Foundation, either version 3 of the License, or
 Copyright>        (at your option) any later version.
-Copyright>    
+Copyright>
 Copyright>        This program is distributed in the hope that it will be useful,
 Copyright>        but WITHOUT ANY WARRANTY; without even the implied warranty of
 Copyright>        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 Copyright>        GNU Affero General Public License for more details.
-Copyright>    
+Copyright>
 Copyright>        You should have received a copy of the GNU Affero General Public License
 Copyright>        along with this program.  If not, see <https://www.gnu.org/licenses/>.
-Copyright>    
-Copyright>    
-Copyright>        Commercial Alternative: Altair Radioss Software 
-Copyright>    
-Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
-Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
-Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
+Copyright>
+Copyright>
+Copyright>        Commercial Alternative: Altair Radioss Software
+Copyright>
+Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
+Copyright>        software under a commercial license.  Contact Altair to discuss further if the
+Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
 Chd|  FRESTAT                       source/input/frestat.F        
 Chd|-- called by -----------
@@ -31,14 +31,17 @@ Chd|        FREDEC_8KEY_I                 source/input/fredec_8key_i.F
 Chd|        WRIUSC2                       source/input/wriusc2.F        
 Chd|        NVAR                          source/input/nvar.F           
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
+Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
 Chd|        STATE_INIMAP_MOD              share/modules/state_inimap_mod.F
 Chd|====================================================================
-      SUBROUTINE FRESTAT(IKAD,KEY0,KSTATF)
+      SUBROUTINE FRESTAT(IKAD,KEY0,KSTATF,SENSORS)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
       USE STATE_INIMAP_MOD
+      USE SENSOR_MOD
+      USE NAMES_AND_TITLES_MOD, ONLY: NCHARLINE100,NCHARKEY,LINE120
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -49,17 +52,14 @@ C-----------------------------------------------
       INTEGER IKAD(0:*),
      .        KSTATF
       CHARACTER KEY0(*)*5
+      TYPE (SENSORS_), INTENT(INOUT) :: SENSORS
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "units_c.inc"
 #include      "scr14_c.inc"
 #include      "scr16_c.inc"
-#include      "chara_c.inc"
-#include      "nchara_c.inc"
-#include      "nchar_c.inc"
 #include      "state_c.inc"
-#include      "com01_c.inc" 
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
@@ -68,10 +68,16 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, NBC, K, IKEY, N1, KK, IV2(10), K_STAT, J
-      CHARACTER KEY2*ncharkey, KEY3*ncharkey, KEY4*ncharkey, KEY5*ncharkey, 
-     .          KEY6*ncharkey,KEY7*ncharkey, KEY8*ncharkey, CARTE*ncharline, 
-     .          LINE*line120
-      LOGICAL BOOL
+      CHARACTER(LEN=NCHARKEY)::KEY2
+      CHARACTER(LEN=NCHARKEY)::KEY3
+      CHARACTER(LEN=NCHARKEY)::KEY4
+      CHARACTER(LEN=NCHARKEY)::KEY5
+      CHARACTER(LEN=NCHARKEY)::KEY6
+      CHARACTER(LEN=NCHARKEY)::KEY7
+      CHARACTER(LEN=NCHARKEY)::KEY8
+      CHARACTER(LEN=NCHARLINE100)::CARTE
+      CHARACTER(LEN=LINE120) :: LINE
+      LOGICAL BOOL,IS_STAT_LSENS
 C-----------------------------------------------
 C   S o u r c e   L i n e s 
 C-----------------------------------------------
@@ -140,8 +146,8 @@ c---
               K=K+1
               READ(IUSC2,*,ERR=9990,END=9990)(IV2(J),J=1,NVAR(CARTE))
               DO J=1,NVAR(CARTE)
-           	WRITE(IIN,'(I10)')IV2(J)
-           	NSTATPRT=NSTATPRT+1
+          WRITE(IIN,'(I10)')IV2(J)
+          NSTATPRT=NSTATPRT+1
               ENDDO
             ENDDO ! DO I=2,NBC
             IF(NSTATPRT == 0)THEN
@@ -174,7 +180,7 @@ c---
               STAT_C(2) = 1
             ELSEIF (KEY3(1:5) == 'EPSP ') THEN
               IF (KEY4(1:5) == 'FULL ') THEN
-                STAT_C(3) = 1	    
+                STAT_C(3) = 1      
               ELSE
                 GOTO 9990
               ENDIF
@@ -200,9 +206,9 @@ c---
               ELSE
                 GOTO 9990
               ENDIF
-	    ELSEIF (KEY3(1:5) == 'ORTHL') THEN
+              ELSEIF (KEY3(1:5) == 'ORTHL') THEN
               STAT_C(7) = 1
-	    ELSEIF (KEY3(1:4) == 'FAIL') THEN
+              ELSEIF (KEY3(1:4) == 'FAIL') THEN
               STAT_C(8) = 1
             ELSE
               GOTO 9990
@@ -251,8 +257,8 @@ c---
               CALL WRIUSC2(IKAD(IKEY)+K,1,KEY0(IKEY))
               K=K+1
               READ(IUSC2,*,ERR=9990,END=9990)
-     .            (LSTATSENS(J),J=1,NVAR(CARTE))
-              NSTATSENS=NSTATSENS+NVAR(CARTE)
+     .            (SENSORS%STAT_TMP(J),J=1,NVAR(CARTE))
+              SENSORS%NSTAT = SENSORS%NSTAT + NVAR(CARTE)
             ENDDO 
           ELSEIF (KEY2(1:5) == 'NO_DE') THEN
             IS_STAT_NO_DE = .TRUE.
