@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -35,7 +35,7 @@ Chd|        SIGEPS56G                     source/materials/mat/mat056/sigeps56g.
 Chd|        SIGEPS60G                     source/materials/mat/mat060/sigeps60g.F
 Chd|        SIGEPS86G                     source/materials/mat/mat086/sigeps86g.F
 Chd|        UROTO                         source/airbag/uroto.F         
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        TABLE_MOD                     share/modules/table_mod.F     
 Chd|====================================================================
       SUBROUTINE MULAWGLC(ELBUF_STR,
@@ -65,12 +65,9 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "units_c.inc"
-#include      "scr06_c.inc"
 #include      "scr17_c.inc"
 #include      "param_c.inc"
-#include      "com04_c.inc"
 #include      "com08_c.inc"
-#include      "com20_c.inc"
 #include      "impl1_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -90,7 +87,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER IGTYP, I, NUVAR ,NINDX,IGEO(NPROPGI,*),NVARTMP,
+      INTEGER IGTYP, I, NUVAR ,VP,NINDX,IGEO(NPROPGI,*),NVARTMP,
      .        MX,IOFF_DUCT(MVSIZ),ISRATE
       my_real 
      .   DEGMB(MVSIZ) ,DEGFX(MVSIZ) ,THKN(MVSIZ),
@@ -323,6 +320,7 @@ C-------------------------------------------
      6                 SIGNYY  ,SIGNXY  ,SIGNYZ  ,SIGNZX  ,MOMNXX  ,
      7                 MOMNYY  ,MOMNXY  )
       ELSEIF (MTN == 2) THEN
+        VP = IPM(255,MX)
         CALL SIGEPS02G(ELBUF_STR,
      1                 JFT     ,JLT     ,PM      ,FOR     ,MOM     ,
      2                 THKN    ,EINT    ,OFF     ,DT1C    ,ISRATE  ,
@@ -335,7 +333,7 @@ C-------------------------------------------
      9                 SIGOZX  ,MOMOXX  ,MOMOYY  ,MOMOXY  ,SIGNXX  ,
      A                 SIGNYY  ,SIGNXY  ,SIGNYZ  ,SIGNZX  ,MOMNXX  ,
      B                 MOMNYY  ,MOMNXY  ,ETSE    ,EXZ     ,EYZ     ,
-     C                 NEL    ,IOFF_DUCT)
+     C                 NEL    ,IOFF_DUCT,VP      , NUVAR  ,UVAR )
       ELSEIF (MTN == 22) THEN
         CALL SIGEPS22G(ELBUF_STR,
      1            JFT     ,JLT     ,PM      ,FOR     ,MOM      ,
@@ -517,9 +515,9 @@ C---------------------------
         DO I=JFT,JLT                                                   
           VISCMX(I) = MAX(VISCMX(I),DM)
           VISC = ONEP414*DM*RHO(I)*SSP(I)*SQRT(AREA(I))*DT_INV(I)        
-          FOR(I,1) = FOR(I,1) + VISC*(EXX(I)+HALF*EYY(I))		  
-          FOR(I,2) = FOR(I,2) + VISC*(EYY(I)+HALF*EXX(I))		  
-          FOR(I,3) = FOR(I,3) + VISC* EXY(I)*THIRD			     
+          FOR(I,1) = FOR(I,1) + VISC*(EXX(I)+HALF*EYY(I))      
+          FOR(I,2) = FOR(I,2) + VISC*(EYY(I)+HALF*EXX(I))      
+          FOR(I,3) = FOR(I,3) + VISC* EXY(I)*THIRD           
         ENDDO
       ENDIF
 C

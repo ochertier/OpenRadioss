@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -52,12 +52,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "com04_c.inc"
 #include      "param_c.inc"
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -65,7 +60,6 @@ C-----------------------------------------------
       INTEGER J_STOK,MULNSN,NOINT,IFORM,IGAP
       INTEGER IRECT(4,*),LEDGE(NLEDGE,*),ADMSR(4,*),CAND_S(*),CAND_M(*),II_STOK,CAND_A(*)
       INTEGER PROV_S(MVSIZ),PROV_M(MVSIZ)
-C     REAL
       my_real
      .   X(3,*), DRAD, MARGE, GAPE(*), GAP_E_L(*), CAND_P(*)
       my_real , INTENT(IN) :: DGAPLOAD
@@ -79,10 +73,10 @@ C     REAL
       my_real
      .   PENE(MVSIZ)
 C-----------------------------------------------
-      CALL I25PEN3_EDG( J_STOK,PROV_S ,PROV_M ,DRAD    ,IGAP0	,
-     .  		NEDGE ,LEDGE  ,MARGE  ,GAPE    ,GAP_E_L ,
-     .  		IGAP   ,X     ,IRECT  ,PENE    ,ADMSR	,
-     .  		EDG_BISECTOR,VTX_BISECTOR ,ITAB,DGAPLOAD)
+      CALL I25PEN3_EDG( J_STOK,PROV_S ,PROV_M ,DRAD    ,IGAP0  ,
+     .      NEDGE ,LEDGE  ,MARGE  ,GAPE    ,GAP_E_L ,
+     .      IGAP   ,X     ,IRECT  ,PENE    ,ADMSR  ,
+     .      EDG_BISECTOR,VTX_BISECTOR ,ITAB,DGAPLOAD)
 C-----------------------------------------------
 C SUPPRESSION DES ANCIENS CANDIDATS DEJA STOCKES (PENE INITIALE)
 C-----------------------------------------------

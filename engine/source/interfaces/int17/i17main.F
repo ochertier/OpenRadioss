@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,6 +21,16 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
+Chd|  I17MAIN_MOD                   source/interfaces/int17/i17main.F
+Chd|-- called by -----------
+Chd|        I17MAIN                       source/interfaces/int17/i17main.F
+Chd|-- calls ---------------
+Chd|====================================================================
+      MODULE I17MAIN_MOD
+#include "my_real.inc"
+         my_real :: XSLVG(7), XMSRG(7)
+      END MODULE
+Chd|====================================================================
 Chd|  I17MAIN                       source/interfaces/int17/i17main.F
 Chd|-- called by -----------
 Chd|        LAG_MULT                      source/tools/lagmul/lag_mult.F
@@ -31,6 +41,7 @@ Chd|        I17LAGM                       source/interfaces/int17/i17lagm.F
 Chd|        I21LAGM                       source/interfaces/int17/i21lagm.F
 Chd|        MY_BARRIER                    source/system/machine.F       
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
+Chd|        I17MAIN_MOD                   source/interfaces/int17/i17main.F
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE I17MAIN(
@@ -42,6 +53,7 @@ Chd|====================================================================
 C-----------------------------------------------
 C   M o d u l e s
 C----------------------------------------------- 
+      USE I17MAIN_MOD
       USE INTBUFDEF_MOD
       USE GROUPDEF_MOD
 C-----------------------------------------------
@@ -69,19 +81,12 @@ C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "comlock.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "units_c.inc"
 #include      "task_c.inc"
-#include      "scr17_c.inc"
       COMMON /I17TRIC/SIZE
       my_real
      .        SIZE
@@ -168,8 +173,8 @@ C -------------------------------------------------------------
        CALL MY_BARRIER
 C -------------------------------------------------------------
        CALL I17CRIT(
-     1   X	  ,V	       ,A	,IGRBRIC(IGN)%ENTITY,EMINX(1,NME+1),
-     2   NMES	  ,ITASK       ,INTBUF_TAB%XSAV,IXS	   ,IXS16         ,
+     1   X    ,V         ,A  ,IGRBRIC(IGN)%ENTITY,EMINX(1,NME+1),
+     2   NMES    ,ITASK       ,INTBUF_TAB%XSAV,IXS     ,IXS16         ,
      3   IXS20    ,XSLVG       ,SIZE_T  )
 C -------------------------------------------------------------
 #include "lockon.inc"
@@ -200,14 +205,14 @@ C=======================================================================
 C -------------------------------------------------------------
          CALL MY_BARRIER
 C -------------------------------------------------------------
-	 CALL I17BUCE(
-     1   IGRBRIC(IGN)%ENTITY,IXS	 ,IXS16   ,IXS20	,IGRBRIC(IGE)%ENTITY ,
-     2   NME_T      ,LWAT	 ,NMES    ,INTBUF_TAB%CAND_E,INTBUF_TAB%CAND_N,
-     3   NOINT      ,IPARI(35,NIN) ,TZINF ,MINBOX	,EMINX        ,
-     4   INTBUF_TAB%XSAV,ITASK	 ,X	  ,V		,A	      ,
+           CALL I17BUCE(
+     1   IGRBRIC(IGN)%ENTITY,IXS   ,IXS16   ,IXS20  ,IGRBRIC(IGE)%ENTITY ,
+     2   NME_T      ,LWAT   ,NMES    ,INTBUF_TAB%CAND_E,INTBUF_TAB%CAND_N,
+     3   NOINT      ,IPARI(35,NIN) ,TZINF ,MINBOX  ,EMINX        ,
+     4   INTBUF_TAB%XSAV,ITASK   ,X    ,V    ,A        ,
      5   MX_CAND    ,EMINX(1,NME+1),ESH_T ,INTBUF_TAB%FROTS,INTBUF_TAB%KS,
-     6   IDUM1      ,IDUM2	 ,IDUM3   ,NIN  	,NMESR        ,
-     7   V	    )
+     6   IDUM1      ,IDUM2   ,IDUM3   ,NIN    ,NMESR        ,
+     7   V      )
 C IDUM1 & IDUM2 replace ISENDTO, IRCVFROM useful for SPMD i17 pena
 C -------------------------------------------------------------
          CALL MY_BARRIER
@@ -217,11 +222,11 @@ C=======================================================================
 C      CONTACT
 C=======================================================================
        CALL I17LAGM(
-     1   X	 ,V	       ,LLL	  ,JLL  	 ,SLL	      ,
-     2   XLL	 ,INTBUF_TAB%CAND_N,INTBUF_TAB%CAND_E,IPARI(35,NIN),IXS,
-     3   IXS16   ,IADLL        ,EMINX	  ,IGRBRIC(IGN)%ENTITY,IGRBRIC(IGE)%ENTITY,
-     4   NC	 ,N_MUL_MX     ,ITASK	  ,A		,IPARI(30,NIN),
-     5   NIN	 ,NKMAX        ,EMINX(1,NME+1),COMNTAG  )
+     1   X   ,V         ,LLL    ,JLL     ,SLL        ,
+     2   XLL   ,INTBUF_TAB%CAND_N,INTBUF_TAB%CAND_E,IPARI(35,NIN),IXS,
+     3   IXS16   ,IADLL        ,EMINX    ,IGRBRIC(IGN)%ENTITY,IGRBRIC(IGE)%ENTITY,
+     4   NC   ,N_MUL_MX     ,ITASK    ,A    ,IPARI(30,NIN),
+     5   NIN   ,NKMAX        ,EMINX(1,NME+1),COMNTAG  )
        CALL I21LAGM(
      1   X       ,V            ,LLL       ,JLL           ,SLL         ,
      2   XLL     ,INTBUF_TAB%CAND_N,INTBUF_TAB%CAND_E,IPARI(35,NIN),IXS,

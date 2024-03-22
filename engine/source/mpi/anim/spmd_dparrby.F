@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,7 +26,7 @@ Chd|-- called by -----------
 Chd|        GENANI                        source/output/anim/generate/genani.F
 Chd|-- calls ---------------
 Chd|        SPMD_GLOB_ISUM9               source/mpi/interfaces/spmd_th.F
-Chd|        WRITE_I_C                     source/output/tools/sortie_c.c
+Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|====================================================================
       SUBROUTINE SPMD_DPARRBY(NPBY,LPBY,FR_RBY2,IAD_RBY2,
      .                        SBUFSPM,SBUFRECVM,
@@ -38,7 +38,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------

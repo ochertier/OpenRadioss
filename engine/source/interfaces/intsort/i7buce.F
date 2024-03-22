@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -55,15 +55,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
-#include      "warn_c.inc"
 #include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "com08_c.inc"
-#include      "scr05_c.inc"
-#include      "task_c.inc"
-#include      "param_c.inc"
-#include      "timeri_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -81,10 +73,6 @@ C     REAL
      .   X(3,*), CAND_P(*), STFN(*),
      .   STF(*), GAP_S(*), GAP_M(*), 
      .   GAP_S_L(*), GAP_M_L(*), CAND_F(*)
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -205,7 +193,8 @@ Chd|====================================================================
      B   GAPMIN   ,GAPMAX  ,CURV_MAX_MAX,NUM_IMP,GAP_S_L ,
      C   GAP_M_L  ,INTTH   ,ITASK   ,BGAPSMX  ,I_MEM   ,  
      D   KREMNOD  ,REMNOD  ,ITAB    ,FLAGREMNODE, DRAD ,
-     E   ITIED    ,CAND_F  ,DGAPLOAD,REMOTE_S_NODE,LIST_REMOTE_S_NODE)
+     E   ITIED    ,CAND_F  ,DGAPLOAD,REMOTE_S_NODE,LIST_REMOTE_S_NODE,
+     F   TOTAL_NB_NRTM)
 C============================================================================
 C   M o d u l e s
 C-----------------------------------------------
@@ -222,16 +211,12 @@ C-----------------------------------------------
 #include      "units_c.inc"
 #include      "warn_c.inc"
 #include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "com08_c.inc"
-#include      "scr05_c.inc"
-#include      "task_c.inc"
-#include      "param_c.inc"
-#include      "timeri_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER NMN, NRTM, NSN, NOINT,IDT,INACTI,IFQ, NIN, NSNR, NSNROLD
+      INTEGER NMN,NSN, NOINT,IDT,INACTI,IFQ, NIN, NSNR, NSNROLD
+      INTEGER, INTENT(in) :: NRTM !< number of segments per threads
+      INTEGER, INTENT(in) :: TOTAL_NB_NRTM !< total number of segments
       INTEGER IRECT(4,*),NSV(*),MWAG(*), RENUM(*),NUM_IMP, ITASK
       INTEGER CAND_E(*),CAND_N(*),IFPEN(*),KREMNOD(*),REMNOD(*),ITAB(*)
       INTEGER NCONTACT,ESHIFT,ILD,NB_N_B, IGAP, NCONT,INTTH,I_MEM,
@@ -247,10 +232,6 @@ C     REAL
      .   X(3,*), CAND_P(*), STFN(*),
      .   STF(*), GAP_S(*), GAP_M(*), 
      .   GAP_S_L(*), GAP_M_L(*), CAND_F(*)
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -396,7 +377,8 @@ C (en // SMP il y a possibilite de redondance de traitement mais no pb)
      8   GAP_M   ,GAPMIN   ,GAPMAX   ,MARGE    ,CURV_MAX,
      9   NIN     ,ITASK    ,BGAPSMX  ,KREMNOD  ,REMNOD  ,
      A   ITAB    ,FLAGREMNODE,DRAD   ,ITIED    ,CAND_F  ,
-     B   DGAPLOAD,REMOTE_S_NODE,LIST_REMOTE_S_NODE)
+     B   DGAPLOAD,REMOTE_S_NODE,LIST_REMOTE_S_NODE,
+     C   TOTAL_NB_NRTM)
  
  234  CONTINUE
 

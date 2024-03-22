@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -41,7 +41,7 @@ Chd|        USR2SYS                       source/system/sysfus.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
       SUBROUTINE HM_READ_INIVEL(V         ,W      ,ITAB     ,ITABM1 ,VR       ,
@@ -70,8 +70,6 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "units_c.inc"
 #include      "scr03_c.inc"
-#include      "submod_c.inc"
-#include      "sysunit.inc"
 #include      "param_c.inc"
 #include      "sphcom.inc"
 C-----------------------------------------------
@@ -155,7 +153,7 @@ C--------------------------------------------------
      .                       KEYWORD2 = KEY)
 C
         IFLAGUNIT = 0
-        DO J=1,NUNITS
+        DO J=1,UNITAB%NUNITS
           IF (UNITAB%UNIT_ID(J) == UID) THEN
             IFLAGUNIT = 1
             EXIT
@@ -715,20 +713,10 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "submod_c.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr17_c.inc"
-#include      "units_c.inc"
-#include      "param_c.inc"
-#include      "warn_c.inc"
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
-#include      "scr21_c.inc"
-#include      "tabsiz_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

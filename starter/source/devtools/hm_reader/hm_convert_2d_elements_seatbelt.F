@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -68,7 +68,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "nchar_c.inc"
-#include      "submod_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -77,9 +76,6 @@ C INPUT ARGUMENTS
      .                    NB_SEATBELT_SHELLS
       INTEGER,INTENT(INOUT)::SEATBELT_CONVERTED_ELEMENTS(3,NB_SEATBELT_SHELLS)
       TYPE(SUBMODEL_DATA),INTENT(IN)::LSUBMODEL(NSUBMOD)
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -91,9 +87,6 @@ C-----------------------------------------------
       INTEGER :: WORK(70000)
       INTEGER :: INDEX(2*NB_SEATBELT_SHELLS)
 C-----------------------------------------------
-C   E x t e r n a l   F u n c t i o n s
-C-----------------------------------------------
-C=======================================================================
       NB_MAT_119 = 0
 C-----------------------------------------------
 C   Check existence of Mat laws 119 in the model

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>    
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -31,10 +31,10 @@ C--------------------------------------
      . TWO, THREE,FOUR,FIVE,SIX ,SEVEN, EIGHT,NINE,TEN,
      . ELEVEN,TWELVE ,FOURTEEN,FIFTEEN,SIXTEEN,TWENTY, TWENTY4,TWENTY5,
      . TWENTY7,THIRTY ,THIRTY2,THIRTY6,FOURTY,FOURTY5,FOURTY8,
-     . FIVEUANTE, SIXTY4,EIGHTY,EIGHTY16,EIGHTY19,
+     . FIFTY, SIXTY4,EIGHTY,EIGHTY16,EIGHTY19,
      . HUNDRED,HUNDRED28,HUNDRED50,HUNDRED80,THREE100,TWOHUNDRED25,TWOHUNDRED95,
      . TWOHUNDRED98,TWOHUNDRED93, THREEHUNDRED24,FIVEHUNDRED12,THREE1000,
-     . TWO1000,DIXHUIT,CINQUANTE4,
+     . TWO1000,EIGHTEEN,CINQUANTE4,
 C--------------------------------------
 C      10^n
 C--------------------------------------          
@@ -138,10 +138,10 @@ C--------------------------------------
      . TWO, THREE,FOUR,FIVE,SIX ,SEVEN, EIGHT,NINE,TEN,
      . ELEVEN,TWELVE ,FOURTEEN,FIFTEEN,SIXTEEN,TWENTY, TWENTY4,TWENTY5,
      . TWENTY7,THIRTY ,THIRTY2,THIRTY6,FOURTY,FOURTY5,FOURTY8,
-     . FIVEUANTE, SIXTY4,EIGHTY,EIGHTY16,EIGHTY19,
+     . FIFTY, SIXTY4,EIGHTY,EIGHTY16,EIGHTY19,
      . HUNDRED,HUNDRED28,HUNDRED50,HUNDRED80,THREE100,TWOHUNDRED25,TWOHUNDRED95,
      . TWOHUNDRED98,TWOHUNDRED93, THREEHUNDRED24,FIVEHUNDRED12,THREE1000,
-     . TWO1000,DIXHUIT,CINQUANTE4,
+     . TWO1000,EIGHTEEN,CINQUANTE4,
 C--------------------------------------
 C      10^n
 C--------------------------------------          

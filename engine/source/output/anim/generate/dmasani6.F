@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,7 +26,7 @@ Chd|-- called by -----------
 Chd|        GENANI                        source/output/anim/generate/genani.F
 Chd|-- calls ---------------
 Chd|        INITBUF                       share/resol/initbuf.F         
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        INITBUF_MOD                   share/resol/initbuf.F         
 Chd|====================================================================
       SUBROUTINE DMASANIS(ELBUF_TAB,X       ,D       ,GEO     ,IPARG   ,
@@ -49,12 +49,9 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "sphcom.inc"
-#include      "scr01_c.inc"
 #include      "scr05_c.inc"
-#include      "scr14_c.inc"
 #include      "scr17_c.inc"
 #include      "param_c.inc"
-#include      "rnur_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -92,7 +89,7 @@ C-----------------------------------------------
       NEL_OLD = 0
       ITY_OLD = 0
       DO 490 NG=1,NGROUP
-        CALL INITBUF (IPARG    ,NG      ,                    
+        CALL INITBUF(IPARG    ,NG      ,                    
      2          MLW     ,NEL     ,NFT     ,IAD     ,ITY     ,  
      3          NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,  
      4          JTHE    ,JLAG    ,JMULT   ,JHBE    ,JIVF    ,  

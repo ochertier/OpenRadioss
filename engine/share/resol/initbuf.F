@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -36,9 +36,10 @@ Chd|        ALE51_INIT                    source/ale/ale51/ale51_init.F
 Chd|        ALEFLUX                       source/ale/porous/aleflux.F   
 Chd|        ALEFVM_MAIN                   source/ale/alefvm/alefvm_main.F
 Chd|        ALEMAIN                       source/ale/alemain.F          
+Chd|        ANIM_NODAL_P_ELEMS            source/output/anim/generate/anim_nodal_p_elems.F
 Chd|        AREZON                        source/ale/arezon.F           
 Chd|        ATHERM                        source/ale/atherm.F           
-Chd|        CUTFUNCE                      source/tools/sect/cutfunc.F   
+Chd|        CUTFUNCE                      source/tools/sect/cutfunce.F  
 Chd|        DFUNC0                        source/output/anim/generate/dfunc0.F
 Chd|        DFUNCC                        source/output/anim/generate/dfuncc.F
 Chd|        DFUNCC_CRK                    source/output/anim/generate/dfuncc_crk.F
@@ -99,11 +100,15 @@ Chd|        MULTI_TIMEEVOLUTION           source/multifluid/multi_timeevolution.
 Chd|        MULTI_UPDATE_GLOBAL           source/multifluid/multi_update_global.F
 Chd|        MULTI_UPDATE_PARTIAL          source/multifluid/multi_update_partial.F
 Chd|        NODALD                        source/output/anim/generate/nodald.F
+Chd|        NODALDT                       source/output/anim/generate/nodaldt.F
 Chd|        NODALP                        source/output/anim/generate/nodalp.F
+Chd|        NODALSSP                      source/output/anim/generate/nodalssp.F
 Chd|        NODALT                        source/output/anim/generate/nodalt.F
 Chd|        NODALVFRAC                    source/output/anim/generate/nodalvfrac.F
+Chd|        NODALVOL                      source/output/anim/generate/nodalvol.F
 Chd|        NODALZVOL                     source/output/anim/generate/nodalzvol.F
 Chd|        NODAL_SCHLIEREN               source/output/anim/generate/nodal_schlieren.F
+Chd|        OUTPUT_SCHLIEREN              source/output/anim/generate/output_schlieren.F
 Chd|        OUTP_SP_S                     source/output/sty/outp_sp_s.F 
 Chd|        OUTP_SP_T                     source/output/sty/outp_sp_t.F 
 Chd|        OUTP_SP_TT                    source/output/sty/outp_sp_t.F 
@@ -115,7 +120,6 @@ Chd|        RGWAT2                        source/interfaces/int09/rgwat2.F
 Chd|        RGWAT3                        source/interfaces/int09/rgwat3.F
 Chd|        S4ALESFEM                     source/elements/solid/solide4_sfem/s4alesfem.F
 Chd|        S4LAGSFEM                     source/elements/solid/solide4_sfem/s4lagsfem.F
-Chd|        SCHLIEREN                     source/output/anim/generate/schlieren.F
 Chd|        SCHLIEREN_BUFFER_GATHERING    source/output/anim/generate/schlieren_buffer_gathering.F
 Chd|        SEGGETV                       source/interfaces/interf/seggetv.F
 Chd|        SIGEPS37_SINGLE_CELL          source/interfaces/int22/sigeps37_single_cell.F
@@ -168,7 +172,7 @@ Chd|        ALEFVM_MAIN                   source/ale/alefvm/alefvm_main.F
 Chd|        ALEMAIN                       source/ale/alemain.F          
 Chd|        AREZON                        source/ale/arezon.F           
 Chd|        ATHERM                        source/ale/atherm.F           
-Chd|        CUTFUNCE                      source/tools/sect/cutfunc.F   
+Chd|        CUTFUNCE                      source/tools/sect/cutfunce.F  
 Chd|        DFUNCC                        source/output/anim/generate/dfuncc.F
 Chd|        DFUNCC_CRK                    source/output/anim/generate/dfuncc_crk.F
 Chd|        DFUNCC_PLY                    source/output/anim/generate/dfuncc_ply.F
@@ -283,7 +287,6 @@ C=======================================================================
       ITY     = IPARG(5,NG)    
       NPT     = IPARG(6,NG)     
       JALE    = IPARG(7,NG)     
-
       ISMSTR  = IPARG(9,NG)     
 
       IF(ITY==1.OR.ITY==2)THEN

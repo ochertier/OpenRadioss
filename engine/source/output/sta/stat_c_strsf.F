@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -29,7 +29,7 @@ Chd|        SPMD_RGATHER9_DP              source/mpi/interfaces/spmd_outp.F
 Chd|        SPMD_STAT_PGATHER             source/mpi/output/spmd_stat.F 
 Chd|        STRS_TXT50                    source/output/sta/sta_txt.F   
 Chd|        TAB_STRS_TXT50                source/output/sta/sta_txt.F   
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE STAT_C_STRSF(
      1                  ELBUF_TAB  ,IPARG     ,IPM        ,IGEO  ,IXC    ,
@@ -48,13 +48,9 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "mvsiz_p.inc"
 #include      "param_c.inc"
 #include      "units_c.inc"
-#include      "scr01_c.inc"
-#include      "scr05_c.inc"
 #include      "task_c.inc"
-#include      "scr03_c.inc"
 #include      "scr14_c.inc"
 #include      "scr16_c.inc"
 C-----------------------------------------------
@@ -227,7 +223,7 @@ c---------
               IF (MPT == 0) THEN  ! global integration
                 IF (MLW == 0 .or. MLW == 13) THEN
                   DO IPG=1,NPG 
-                    DO J=1,8        ! forces and moments           	
+                    DO J=1,8        ! forces and moments           
                       JJ = JJ + 1
                       WA(JJ) = ZERO
                     ENDDO                                                               
@@ -246,7 +242,7 @@ c---------
 c
                   JJ = JJ + 1                                      
                   IF (GBUF%G_PLA > 0) THEN    
-            	    WA(JJ) = GBUF%PLA(I)       
+              WA(JJ) = GBUF%PLA(I)       
                   ELSE                         
                     WA(JJ) = ZERO              
                   ENDIF                        
@@ -276,7 +272,7 @@ c
 c
                       JJ = JJ + 1
                       IF (GBUF%G_PLA > 0) THEN    
-            	        WA(JJ) = LBUF%PLA(I)
+                  WA(JJ) = LBUF%PLA(I)
                       ELSE                         
                         WA(JJ) = ZERO              
                       ENDIF                        
@@ -286,7 +282,7 @@ c
                       WA(JJ) = GBUF%MOMPG(K + KK(1) + I)         
                       JJ = JJ + 1               
                       WA(JJ) = GBUF%MOMPG(K + KK(2) + I)         
-                      JJ = JJ + 1          	    
+                      JJ = JJ + 1                
                       WA(JJ) = GBUF%MOMPG(K + KK(3) + I)       
                     ENDDO                                                               
                   ENDDO
@@ -319,14 +315,14 @@ C           (MPT /=0 ):
                       WA(JJ) = LBUF%SIG(KK(4)+I)
                       JJ = JJ + 1
                       WA(JJ) = LBUF%SIG(KK(5)+I)
-            	      JJ = JJ + 1
+                JJ = JJ + 1
                       IF (BUFLY%L_PLA > 0) THEN
                         WA(JJ) = LBUF%PLA(I)
                       ELSE
                         WA(JJ) = ZERO
                       ENDIF
                     ENDDO      
-                  ENDDO	    
+                  ENDDO      
                 ENDDO  !  DO IPT = 1,NPTT
               ELSE  !  NLAY > 1, PID10,PID11,PID16,PID17,PID51
                 II = 5*(I-1)
@@ -349,13 +345,13 @@ C           (MPT /=0 ):
                         WA(JJ) = LBUF%SIG(KK(5)+I)
                         JJ = JJ + 1
                         IF (BUFLY%L_PLA > 0) THEN
-            	          WA(JJ) = LBUF%PLA(I)
+                    WA(JJ) = LBUF%PLA(I)
                         ELSE
                           WA(JJ) = ZERO
                         ENDIF
                       ENDDO
-                    ENDDO	    
-                  ENDDO	    
+                    ENDDO      
+                  ENDDO      
                 ENDDO
               ENDIF    ! MPT, NLAY
 c---------
@@ -383,7 +379,7 @@ c---------
                   ENDDO               
                 ELSE
                   DO IPG=1,NPG
-              	   DO J=1,6         
+             DO J=1,6         
                      JJ = JJ + 1      
                      WA(JJ) = ZERO
                    ENDDO                                                               
@@ -408,25 +404,25 @@ c
                 DO IPG=1,NPG
                   JJ = JJ + 1
                   WA(JJ) = GBUF%FOR(KK(1)+I)
-     .	    	            + ST(1)*QPG(2,IPG) + SK(1)*QPG(1,IPG)
+     .                    + ST(1)*QPG(2,IPG) + SK(1)*QPG(1,IPG)
                   JJ = JJ + 1
                   WA(JJ) = GBUF%FOR(KK(2)+I)
-     .	    	            + ST(2)*QPG(2,IPG)+SK(2)*QPG(1,IPG)
+     .                    + ST(2)*QPG(2,IPG)+SK(2)*QPG(1,IPG)
                   JJ = JJ + 1
                   WA(JJ) = GBUF%FOR(KK(3)+I)
                   JJ = JJ + 1
                   WA(JJ) = GBUF%FOR(KK(4)+I)
-     .	    	           + SHT(2)*QPG(2,IPG)+SHK(2)*QPG(1,IPG)
+     .                   + SHT(2)*QPG(2,IPG)+SHK(2)*QPG(1,IPG)
                   JJ = JJ + 1
                   WA(JJ) = GBUF%FOR(KK(5)+I)
-     .	    	           + SHT(1)*QPG(2,IPG)+SHK(1)*QPG(1,IPG)
+     .                   + SHT(1)*QPG(2,IPG)+SHK(1)*QPG(1,IPG)
 c
                   JJ = JJ + 1
                   WA(JJ) = GBUF%MOM(KK(1)+I)
-     .	    	            + MT(1)*QPG(2,IPG)+MK(1)*QPG(1,IPG)
+     .                    + MT(1)*QPG(2,IPG)+MK(1)*QPG(1,IPG)
                   JJ = JJ + 1
                   WA(JJ) = GBUF%MOM(KK(2)+I)
-     .	    	            + MT(2)*QPG(2,IPG)+MK(2)*QPG(1,IPG)
+     .                    + MT(2)*QPG(2,IPG)+MK(2)*QPG(1,IPG)
                   JJ = JJ + 1
                   WA(JJ) = GBUF%MOM(KK(3)+I)
                 ENDDO
@@ -468,7 +464,7 @@ C
                         WA(JJ) = LBUF%PLA(I) 
                       ELSE                                              
                         WA(JJ) = ZERO                                   
-                      ENDIF	                                            
+                      ENDIF                                              
                     ENDDO  !  DO IPG=1,NPG      
                   ENDDO  !  DO IT=1,NPTT
                 ENDDO  !  DO IL=1,NLAY           
@@ -739,7 +735,7 @@ c
                   K = (IPG-1)*NEL*5
                   JJ = JJ + 1                                    
                   WA(JJ) = GBUF%FORPG(K + KK(1) + I)               
-                  JJ = JJ + 1          	                          
+                  JJ = JJ + 1                                      
                   WA(JJ) = GBUF%FORPG(K + KK(2) + I)               
                   JJ = JJ + 1                                    
                   WA(JJ) = GBUF%FORPG(K + KK(3) + I)               
@@ -750,7 +746,7 @@ c
 c
                   JJ = JJ + 1                                      
                   IF (GBUF%G_PLA > 0) THEN         
-            	    WA(JJ) = LBUF%PLA(I)       
+              WA(JJ) = LBUF%PLA(I)       
                   ELSE                             
                     WA(JJ) = ZERO                  
                   ENDIF                            

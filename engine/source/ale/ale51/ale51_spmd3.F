@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,7 +26,7 @@ Chd|-- called by -----------
 Chd|        AFLUXT                        source/ale/ale51/afluxt.F     
 Chd|-- calls ---------------
 Chd|        SYSFUS2                       source/system/sysfus.F        
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
 Chd|====================================================================
       SUBROUTINE ALE51_SPMD3(IXS      ,FLUX   ,FLU1  ,ALE_CONNECT,
      .                       FLUX_VOIS,N4_VOIS,ITABM1,NV46)
@@ -39,18 +39,11 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr05_c.inc"
 #include      "spmd_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "vect01_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

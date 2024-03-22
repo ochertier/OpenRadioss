@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -61,6 +61,8 @@ Chd|        CHECKMP                       source/elements/initia/initia.F
 Chd|        CHECKRBY                      source/constraints/general/rbody/checkrby.F
 Chd|        CHECK_DYNAIN                  source/starter/check_dynain.F 
 Chd|        CHECK_ELTYP                   source/model/sets/check_eltyp.F
+Chd|        CHECK_MAT_ELEM_PROP_COMPATIBILITYsource/materials/mat/check_mat_elem_prop_compatibility.F
+Chd|        CHECK_PTHICKFAIL              source/materials/fail/check_pthickfail.F
 Chd|        CHECK_SURF                    source/groups/check_surf.F    
 Chd|        CHEKMP2                       source/elements/initia/initia.F
 Chd|        CHKFUNCT                      source/tools/curve/lecfun.F   
@@ -74,6 +76,7 @@ Chd|        CMATINI4                      source/materials/mat_share/cmatini4.F
 Chd|        CONTRL                        source/starter/contrl.F       
 Chd|        CORTHINI                      source/elements/shell/coque/corthini.F
 Chd|        CREATE_CHILD                  source/coupling/rad2rad/r2r_fork.F
+Chd|        CREATE_ELLIPSE_CLAUSE         source/model/sets/create_ellipse_clause.F
 Chd|        CREATE_ELT_LIST               source/model/sets/create_element_clause.F
 Chd|        CREATE_MAP_TABLES             source/model/sets/map_tables.F
 Chd|        CREATE_NODE_LIST              source/model/sets/create_node_clause.F
@@ -87,6 +90,7 @@ Chd|        CREATE_SUBM_LIST              source/model/sets/create_subm_clause.F
 Chd|        CREATE_SUBS_LIST              source/model/sets/create_subs_clause.F
 Chd|        CSIGINI                       source/elements/shell/coque/csigini.F
 Chd|        CSIGINI4                      source/elements/shell/coqueba/scigini4.F
+Chd|        CSTRAINI4                     source/elements/shell/coqueba/cstraini4.F
 Chd|        CUSERINI4                     source/elements/shell/coqueba/cuserini4.F
 Chd|        DEFBEAM_SECT                  source/properties/beam/hm_read_prop18.F
 Chd|        DEFINTER                      source/interfaces/interf1/definter.F
@@ -96,10 +100,11 @@ Chd|        DOMETIS2                      source/spmd/domain_decomposition/domde
 Chd|        ECRAN1                        source/initial_conditions/detonation/ecran1.F
 Chd|        ECRSUB2                       source/model/assembling/hm_read_subset.F
 Chd|        EIGRLINE                      source/general_controls/computation/hm_read_eig.F
-Chd|        ELSTAGBOX2                    source/model/box/rdbox.F      
 Chd|        ELSTAGBOXBOX                  source/model/box/boxbox.F     
 Chd|        ERROR_ALLOC                   source/system/error_alloc.F   
 Chd|        FACEBOX                       source/model/box/bigbox.F     
+Chd|        FAIL_FUN2SYS                  source/materials/tools/fail_fun2sys.F
+Chd|        FAIL_TAB2SYS                  source/materials/tools/fail_tab2sys.F
 Chd|        FILL_BUFFER_51                source/materials/mat/mat051/fill_buffer_51.F
 Chd|        FIND_DT1BRICK_ENGINE          source/starter/contrl.F       
 Chd|        FIND_YIELD_ENGINE             source/general_controls/computation/hm_read_sms.F
@@ -188,6 +193,7 @@ Chd|        HM_READ_EOS_STIFFENED_GAS     source/materials/eos/hm_read_eos_stiff
 Chd|        HM_READ_EOS_TABULATED         source/materials/eos/hm_read_eos_tabulated.F
 Chd|        HM_READ_EREF                  source/loads/reference_state/eref/hm_read_eref.F
 Chd|        HM_READ_FAIL                  source/materials/fail/hm_read_fail.F
+Chd|        HM_READ_FAIL_BIQUAD           source/materials/fail/biquad/hm_read_fail_biquad.F
 Chd|        HM_READ_FAIL_ENERGY           source/materials/fail/energy/hm_read_fail_energy.F
 Chd|        HM_READ_FAIL_FABRIC           source/materials/fail/fabric/hm_read_fail_fabric.F
 Chd|        HM_READ_FAIL_FLD              source/materials/fail/fld/hm_read_fail_fld.F
@@ -199,6 +205,7 @@ Chd|        HM_READ_FAIL_ORTHBIQUAD       source/materials/fail/orthbiquad/hm_re
 Chd|        HM_READ_FAIL_SPALLING         source/materials/fail/spalling/hm_read_fail_spalling.F
 Chd|        HM_READ_FAIL_SYAZWAN          source/materials/fail/syazwan/hm_read_fail_syazwan.F
 Chd|        HM_READ_FAIL_TAB1             source/materials/fail/tabulated/hm_read_fail_tab1.F
+Chd|        HM_READ_FAIL_TAB2             source/materials/fail/tabulated/hm_read_fail_tab2.F
 Chd|        HM_READ_FAIL_TAB_OLD          source/materials/fail/tabulated/hm_read_fail_tab_old.F
 Chd|        HM_READ_FAIL_TBUTCHER         source/materials/fail/tuler_butcher/hm_read_fail_tbutcher.F
 Chd|        HM_READ_FAIL_TENSSTRAIN       source/materials/fail/tensstrain/hm_read_fail_tensstrain.F
@@ -210,6 +217,7 @@ Chd|        HM_READ_FRM                   source/tools/skew/hm_read_frm.F
 Chd|        HM_READ_FUNCT                 source/tools/curve/hm_read_funct.F
 Chd|        HM_READ_FXB1                  source/constraints/fxbody/hm_read_fxb.F
 Chd|        HM_READ_FXB2                  source/constraints/fxbody/hm_read_fxb.F
+Chd|        HM_READ_GAUGE                 source/output/gauge/hm_read_gauge.F
 Chd|        HM_READ_GRAV                  source/loads/general/grav/hm_read_grav.F
 Chd|        HM_READ_IMPACC                source/constraints/general/impvel/hm_read_impacc.F
 Chd|        HM_READ_IMPFLUX               source/constraints/thermic/hm_read_impflux.F
@@ -274,14 +282,18 @@ Chd|        HM_READ_MAT113                source/materials/mat/mat113/hm_read_ma
 Chd|        HM_READ_MAT114                source/materials/mat/mat114/hm_read_mat114.F
 Chd|        HM_READ_MAT115                source/materials/mat/mat115/hm_read_mat115.F
 Chd|        HM_READ_MAT116                source/materials/mat/mat116/hm_read_mat116.F
+Chd|        HM_READ_MAT117                source/materials/mat/mat117/hm_read_mat117.F
 Chd|        HM_READ_MAT119                source/materials/mat/mat119/hm_read_mat119.F
 Chd|        HM_READ_MAT11_K_EPS           source/materials/mat/mat011/hm_read_mat11_k_eps.F
 Chd|        HM_READ_MAT12                 source/materials/mat/mat012/hm_read_mat12.F
 Chd|        HM_READ_MAT121                source/materials/mat/mat121/hm_read_mat121.F
+Chd|        HM_READ_MAT122                source/materials/mat/mat122/hm_read_mat122.F
+Chd|        HM_READ_MAT124                source/materials/mat/mat124/hm_read_mat124.F
 Chd|        HM_READ_MAT13                 source/materials/mat/mat013/hm_read_mat13.F
 Chd|        HM_READ_MAT14                 source/materials/mat/mat014/hm_read_mat14.F
 Chd|        HM_READ_MAT15                 source/materials/mat/mat015/hm_read_mat15.F
 Chd|        HM_READ_MAT151                source/materials/mat/mat151/hm_read_mat151.F
+Chd|        HM_READ_MAT158                source/materials/mat/mat158/hm_read_mat158.F
 Chd|        HM_READ_MAT16                 source/materials/mat/mat016/hm_read_mat16.F
 Chd|        HM_READ_MAT19                 source/materials/mat/mat019/hm_read_mat19.F
 Chd|        HM_READ_MAT20                 source/materials/mat/mat020/hm_read_mat20.F
@@ -330,7 +342,7 @@ Chd|        HM_READ_MAT79                 source/materials/mat/mat079/hm_read_ma
 Chd|        HM_READ_MAT80                 source/materials/mat/mat080/hm_read_mat80.F
 Chd|        HM_READ_MAT81                 source/materials/mat/mat081/hm_read_mat81.F
 Chd|        HM_READ_MAT82                 source/materials/mat/mat082/hm_read_mat82.F
-Chd|        HM_READ_MAT83                 source/materials/mat/mat083/hm_read_law83.F
+Chd|        HM_READ_MAT83                 source/materials/mat/mat083/hm_read_mat83.F
 Chd|        HM_READ_MAT87                 source/materials/mat/mat087/hm_read_mat87.F
 Chd|        HM_READ_MAT88                 source/materials/mat/mat088/hm_read_mat88.F
 Chd|        HM_READ_MAT90                 source/materials/mat/mat090/hm_read_mat90.F
@@ -357,6 +369,7 @@ Chd|        HM_READ_NODE                  source/elements/reader/hm_read_node.F
 Chd|        HM_READ_NONLOCAL              source/materials/nonlocal/hm_read_nonlocal.F
 Chd|        HM_READ_PART                  source/model/assembling/hm_read_part.F
 Chd|        HM_READ_PBLAST                source/loads/pblast/hm_read_pblast.F
+Chd|        HM_READ_PCYL                  source/loads/general/load_pcyl/hm_read_pcyl.F
 Chd|        HM_READ_PERTURB_FAIL          source/general_controls/computation/hm_read_perturb_fail.F
 Chd|        HM_READ_PERTURB_PART_SHELL    source/general_controls/computation/hm_read_perturb_part_shell.F
 Chd|        HM_READ_PERTURB_PART_SOLID    source/general_controls/computation/hm_read_perturb_part_solid.F
@@ -458,6 +471,7 @@ Chd|        HM_READ_TRUSS                 source/elements/reader/hm_read_truss.F
 Chd|        HM_READ_UNIT                  source/general_controls/computation/hm_read_unit.F
 Chd|        HM_READ_UPWIND                source/general_controls/computation/hm_read_upwind.F
 Chd|        HM_READ_VISC                  source/materials/visc/hm_read_visc.F
+Chd|        HM_READ_VISC_LPRONY           source/materials/visc/hm_read_visc_lprony.F
 Chd|        HM_READ_VISC_PRONY            source/materials/visc/hm_read_visc_prony.F
 Chd|        HM_READ_WINDOW_USER           source/tools/userwi/hm_read_window_user.F
 Chd|        HM_READ_XELEM                 source/elements/reader/hm_read_xelem.F
@@ -562,7 +576,6 @@ Chd|        INISRF                        source/constraints/general/rbody/inisr
 Chd|        INITIA                        source/elements/initia/initia.F
 Chd|        INIT_MONVOL                   source/airbag/init_monvol.F   
 Chd|        INIT_SKEW45                   source/elements/joint/rjoint/rini45.F
-Chd|        INIVEL                        source/initial_conditions/general/inivel/inivel.F
 Chd|        INIVOID                       source/elements/initia/inivoid.F
 Chd|        INIVOL_SET                    source/initial_conditions/inivol/inivol_set.F
 Chd|        INI_BCSCYC                    source/constraints/general/bcs/lecbcscyc.F
@@ -573,6 +586,7 @@ Chd|        INI_INIMAP1D                  source/initial_conditions/inimap/ini_i
 Chd|        INI_RACK                      source/tools/lagmul/ini_rack.F
 Chd|        INI_SEATBELT                  source/tools/seatbelts/ini_seatbelt.F
 Chd|        INRCH2                        source/interfaces/inter2d1/inrch2.F
+Chd|        INSOL3D                       source/interfaces/inter3d1/insol3.F
 Chd|        INSOLT10                      source/interfaces/inter3d1/insolt10.F
 Chd|        INSPCND                       source/elements/sph/inspcnd.F 
 Chd|        INSURF                        source/interfaces/interf1/insurf.F
@@ -592,11 +606,15 @@ Chd|        LAW112_UPD                    source/materials/mat/mat112/law112_upd
 Chd|        LAW113_UPD                    source/materials/mat/mat113/law113_upd.F
 Chd|        LAW114_UPD                    source/materials/mat/mat114/law114_upd.F
 Chd|        LAW119_UPD                    source/materials/mat/mat119/law119_upd.F
+Chd|        LAW158_UPD                    source/materials/mat/mat158/law158_upd.F
 Chd|        LAW36_UPD                     source/materials/mat/mat036/law36_upd.F
 Chd|        LAW58_UPD                     source/materials/mat/mat058/law58_upd.F
 Chd|        LAW69_NLSQF                   source/materials/tools/nlsqf.F
+Chd|        LAW69_NLSQF_AUTO              source/materials/tools/law69_nlsqf_auto.F
 Chd|        LAW69_UPD                     source/materials/mat/mat069/law69_upd.F
+Chd|        LAW70_UPD                     source/materials/mat/mat070/law70_upd.F
 Chd|        LAW76_UPD                     source/materials/mat/mat076/law76_upd.F
+Chd|        LAW77_UPD                     source/materials/mat/mat077/law77_upd.F
 Chd|        LAW87_UPD                     source/materials/mat/mat087/law87_upd.F
 Chd|        LAW88_UPD                     source/materials/mat/mat088/law88_upd.F
 Chd|        LAW92_NLSQF                   source/materials/mat/mat092/law92_nlsqf.F
@@ -637,6 +655,7 @@ Chd|        M20DCOD                       source/system/fsdcod.F
 Chd|        M75INIT                       source/materials/mat/mat075/m75init.F
 Chd|        MASS_FLUID_QD                 source/fluid/mass-fluid_qd.F  
 Chd|        MASS_FLUID_TG                 source/fluid/mass-fluid_tg.F  
+Chd|        MAT11CHECK                    source/materials/mat/mat011/mat11check.F
 Chd|        MATFUN_USR2SYS                source/materials/tools/matfun_usr2sys.F
 Chd|        MATINI                        source/materials/mat_share/matini.F
 Chd|        MATTAB_USR2SYS                source/materials/tools/mattab_usr2sys.F
@@ -667,6 +686,7 @@ Chd|        PINIT3                        source/elements/beam/pinit3.F
 Chd|        PORNOD                        source/ale/pornod.F           
 Chd|        PRELECSEC                     source/tools/sect/prelecsec.F 
 Chd|        PREPARE_INT25                 source/model/mesh/build_cnel.F
+Chd|        PRE_STACKGROUP                source/stack/pres_stackgroup.F
 Chd|        PRINTGROUP                    source/output/outfile/printgroup.F
 Chd|        Q4DERI2                       source/elements/solid_2d/quad4/q4deri2.F
 Chd|        Q4INIT2                       source/elements/solid_2d/quad4/q4init2.F
@@ -717,9 +737,9 @@ Chd|        READ_SENSOR_SECT              source/tools/sensor/read_sensor_sect.F
 Chd|        READ_SENSOR_USER              source/tools/sensor/read_sensor_user.F
 Chd|        REALLOC_IDDCONNECT            source/spmd/node/ddtools.F    
 Chd|        REALLOC_IFRONT                source/spmd/node/ddtools.F    
-Chd|        REMN_I2                       source/interfaces/inter3d1/i7remnode.F
 Chd|        REMN_I2OP                     source/interfaces/inter3d1/i7remnode.F
 Chd|        REMN_I2OP_EDG25               source/interfaces/int25/i25remlin.F
+Chd|        REMN_SELF24                   source/interfaces/inter3d1/remn_self24.F
 Chd|        RIGID_MAT                     source/materials/mat/mat019/rigid_mat.F
 Chd|        RIGMODIF_ND                   source/elements/solid/solide10/dim_s10edg.F
 Chd|        RINI32                        source/properties/spring/hm_read_prop32.F
@@ -731,6 +751,7 @@ Chd|        RIVET0                        source/elements/reader/rivet0.F
 Chd|        RKINI3                        source/elements/spring/rkini3.F
 Chd|        RM_CAND24                     source/interfaces/inter3d1/i7remnode.F
 Chd|        S10DERI3                      source/elements/solid/solide10/s10deri3.F
+Chd|        S10EDG_RLINK                  source/elements/solid/solide10/s10edg_rlink.F
 Chd|        S10INIT3                      source/elements/solid/solide10/s10init3.F
 Chd|        S16DERI3                      source/elements/thickshell/solide16/s16deri3.F
 Chd|        S16INIT3                      source/elements/thickshell/solide16/s16init3.F
@@ -917,9 +938,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "units_c.inc"
-C-----------------------------------------------
-C   E x t e r n a l   F u n c t i o n s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -1284,26 +1302,26 @@ C         ------------------------------------------
               I=2
               IOLD=1
               DO WHILE (I+1<=LEN_TRIM(TMPLINE))
-          	IF (TMPLINE(I:I)=='%') THEN
-          	  I=I+1
-          	  IF (TMPLINE(I:I)=='d') THEN       ! %d format
-          	    I=I+1
-          	    INDXI_INC=INDXI_INC+1
-          	  ELSE IF (TMPLINE(I:I)=='f') THEN  ! %f format
-          	    I=I+1
-          	    INDXR_INC=INDXR_INC+1
-          	  ELSE IF (TMPLINE(I:I)=='s') THEN  ! %s format
-          	    I=I+1
-          	    INDXC_INC=INDXC_INC+1
+          IF (TMPLINE(I:I)=='%') THEN
+            I=I+1
+            IF (TMPLINE(I:I)=='d') THEN       ! %d format
+              I=I+1
+              INDXI_INC=INDXI_INC+1
+            ELSE IF (TMPLINE(I:I)=='f') THEN  ! %f format
+              I=I+1
+              INDXR_INC=INDXR_INC+1
+            ELSE IF (TMPLINE(I:I)=='s') THEN  ! %s format
+              I=I+1
+              INDXC_INC=INDXC_INC+1
                   ELSE IF (TMPLINE(I:I)=='i') THEN  ! %ixxx format
-          	    I=I+1
+              I=I+1
                     IF(DYNA_MESSAGE == 1) THEN
-          	      INDXD_INC=INDXD_INC+1
+                INDXD_INC=INDXD_INC+1
                     ENDIF
-        	  ENDIF
-          	ELSE
-          	  I=I+1
-          	END IF
+            ENDIF
+          ELSE
+            I=I+1
+          END IF
               END DO
               ENDIF
             ENDDO
@@ -1388,26 +1406,26 @@ c
                     NO_PRINT=0
                     DO WHILE (I+1<=LEN_TRIM(TMPLINE))
                       IF (TMPLINE(I:I)=='%') THEN
-                	I=I+1
-                	IF (TMPLINE(I:I)=='d') THEN
-                	  I=I+1
-                	  IOLD=I
-                	  INDXI=INDXI+1
-                	  CPT=CPT+1
+          I=I+1
+          IF (TMPLINE(I:I)=='d') THEN
+            I=I+1
+            IOLD=I
+            INDXI=INDXI+1
+            CPT=CPT+1
                           READ(RES_MES,'(A)',END=130) TMPIN
                           READ(TMPIN,'(I10)') INT_TMP
-                	  TMP_INTEGER(INDXI) = INT_TMP
+            TMP_INTEGER(INDXI) = INT_TMP
                           ITRI(CPT,NBREPET) = INT_TMP
-                	  IF(CPT == INDXI_INC) CPT = 0
-                	ELSE IF (TMPLINE(I:I)=='f') THEN
-                	  I=I+1
-                	  IOLD=I
-                	  INDXR=INDXR+1
+            IF(CPT == INDXI_INC) CPT = 0
+          ELSE IF (TMPLINE(I:I)=='f') THEN
+            I=I+1
+            IOLD=I
+            INDXR=INDXR+1
                           READ(RES_MES,'(A)',END=130) TMPIN
                           READ(TMPIN,*) REAL_TMP
-                	  TMP_REAL(INDXR) = REAL_TMP
-                	ELSE IF (TMPLINE(I:I)=='s') THEN
-                	  I=I+1
+            TMP_REAL(INDXR) = REAL_TMP
+          ELSE IF (TMPLINE(I:I)=='s') THEN
+            I=I+1
                           IOLD=I
                           INDXC=INDXC+1
                           READ(RES_MES,'(A)',END=130) TMPIN
@@ -1428,9 +1446,9 @@ c
                           ELSE
                               NO_PRINT=1
                           ENDIF
-                	ENDIF
+          ENDIF
                       ELSE
-                	I=I+1
+          I=I+1
                       END IF
                     END DO
                   ENDIF
@@ -1488,29 +1506,29 @@ c   MESSAGE SUMMARY
 c-----------------------------------------------------------
 c
         MYFMT='(A,X,A)' 
-	IF(MSGTYPE == 0) THEN 
-	  WRITE(RES_CHECK,MYFMT) 'M_OPTION=',ERR_CATEGORY(1:LEN_TRIM(ERR_CATEGORY))
-	ELSEIF(MSGTYPE == 1) THEN
-	  WRITE(RES_CHECK,MYFMT) 'W_OPTION=',ERR_CATEGORY(1:LEN_TRIM(ERR_CATEGORY))
-	ELSEIF(MSGTYPE == 2) THEN
-	  WRITE(RES_CHECK,MYFMT) 'E_OPTION=',ERR_CATEGORY(1:LEN_TRIM(ERR_CATEGORY))
-	ENDIF
-	MYFMT='(A,I10,X)' 
-	WRITE(RES_CHECK,MYFMT) 'OPTION_TYPE=',0
-	IF(PRESENT(I1))THEN
-	  WRITE(RES_CHECK,MYFMT) 'OPTION_ID=',I1
-	ELSE
-	  WRITE(RES_CHECK,MYFMT) 'OPTION_ID=',0
-	ENDIF
-	MYFMT='(A,X,A)'
-	IF(PRESENT(C1))THEN
-	  WRITE(RES_CHECK,MYFMT) 'TITLE=',C1(1:LEN_TRIM(C1))
-	ELSE
-	  WRITE(RES_CHECK,MYFMT) 'TITLE=',''
-	ENDIF
-	MYFMT='(A,I10,X)'
-	WRITE(RES_CHECK,MYFMT) 'ID_MES=',MSGID
-	WRITE(RES_CHECK,MYFMT) 'NB_REPET=',NBREPET
+          IF(MSGTYPE == 0) THEN 
+            WRITE(RES_CHECK,MYFMT) 'M_OPTION=',ERR_CATEGORY(1:LEN_TRIM(ERR_CATEGORY))
+          ELSEIF(MSGTYPE == 1) THEN
+            WRITE(RES_CHECK,MYFMT) 'W_OPTION=',ERR_CATEGORY(1:LEN_TRIM(ERR_CATEGORY))
+          ELSEIF(MSGTYPE == 2) THEN
+            WRITE(RES_CHECK,MYFMT) 'E_OPTION=',ERR_CATEGORY(1:LEN_TRIM(ERR_CATEGORY))
+          ENDIF
+          MYFMT='(A,I10,X)' 
+          WRITE(RES_CHECK,MYFMT) 'OPTION_TYPE=',0
+          IF(PRESENT(I1))THEN
+            WRITE(RES_CHECK,MYFMT) 'OPTION_ID=',I1
+          ELSE
+            WRITE(RES_CHECK,MYFMT) 'OPTION_ID=',0
+          ENDIF
+          MYFMT='(A,X,A)'
+          IF(PRESENT(C1))THEN
+            WRITE(RES_CHECK,MYFMT) 'TITLE=',C1(1:LEN_TRIM(C1))
+          ELSE
+            WRITE(RES_CHECK,MYFMT) 'TITLE=',''
+          ENDIF
+          MYFMT='(A,I10,X)'
+          WRITE(RES_CHECK,MYFMT) 'ID_MES=',MSGID
+          WRITE(RES_CHECK,MYFMT) 'NB_REPET=',NBREPET
 C
         CMSGTYPE=' '
         IF (MSGTYPE==0) THEN
@@ -1789,11 +1807,11 @@ c          WRITE(RES_MES,'(A)') TMPIN
 c        ENDDO
 c140     CONTINUE
 c        CLOSE (UNIT=RES_TMP,STATUS='DELETE')
-	REWIND RES_TMP
-	CLOSE (UNIT=RES_MES)
-	ITMP = RES_MES
-	RES_MES = RES_TMP
-	RES_TMP = ITMP
+          REWIND RES_TMP
+          CLOSE (UNIT=RES_MES)
+          ITMP = RES_MES
+          RES_MES = RES_TMP
+          RES_TMP = ITMP
 
        ENDIF
       ELSE                  ! PRMODE Was not set / No Message Stacking.
@@ -1802,30 +1820,30 @@ C
 c-----------------------------------------------------------
 c   MESSAGE SUMMARY
 c-----------------------------------------------------------
-	MYFMT='(A,X,A)'
-	IF(MSGTYPE == 0) THEN 
-	  WRITE(RES_CHECK,MYFMT) 'M_OPTION=',ERR_CATEGORY(1:LEN_TRIM(ERR_CATEGORY))
-	ELSEIF(MSGTYPE == 1) THEN
-	  WRITE(RES_CHECK,MYFMT) 'W_OPTION=',ERR_CATEGORY(1:LEN_TRIM(ERR_CATEGORY))
-	ELSEIF(MSGTYPE == 2) THEN
-	  WRITE(RES_CHECK,MYFMT) 'E_OPTION=',ERR_CATEGORY(1:LEN_TRIM(ERR_CATEGORY))
-	ENDIF
-	MYFMT='(A,I10,X)' 
-	WRITE(RES_CHECK,MYFMT) 'OPTION_TYPE=',0
-	IF(PRESENT(I1))THEN
-	  WRITE(RES_CHECK,MYFMT) 'OPTION_ID=',I1
-	ELSE
-	  WRITE(RES_CHECK,MYFMT) 'OPTION_ID=',0
-	ENDIF
-	MYFMT='(A,X,A)'
-	IF(PRESENT(C1))THEN
-	  WRITE(RES_CHECK,MYFMT) 'TITLE=',C1(1:LEN_TRIM(C1))
-	ELSE
-	  WRITE(RES_CHECK,MYFMT) 'TITLE=',''
-	ENDIF
-	MYFMT='(A,I10,X)'
-	WRITE(RES_CHECK,MYFMT) 'ID_MES=',MSGID
-	WRITE(RES_CHECK,MYFMT) 'NB_REPET=',1
+          MYFMT='(A,X,A)'
+          IF(MSGTYPE == 0) THEN 
+            WRITE(RES_CHECK,MYFMT) 'M_OPTION=',ERR_CATEGORY(1:LEN_TRIM(ERR_CATEGORY))
+          ELSEIF(MSGTYPE == 1) THEN
+            WRITE(RES_CHECK,MYFMT) 'W_OPTION=',ERR_CATEGORY(1:LEN_TRIM(ERR_CATEGORY))
+          ELSEIF(MSGTYPE == 2) THEN
+            WRITE(RES_CHECK,MYFMT) 'E_OPTION=',ERR_CATEGORY(1:LEN_TRIM(ERR_CATEGORY))
+          ENDIF
+          MYFMT='(A,I10,X)' 
+          WRITE(RES_CHECK,MYFMT) 'OPTION_TYPE=',0
+          IF(PRESENT(I1))THEN
+            WRITE(RES_CHECK,MYFMT) 'OPTION_ID=',I1
+          ELSE
+            WRITE(RES_CHECK,MYFMT) 'OPTION_ID=',0
+          ENDIF
+          MYFMT='(A,X,A)'
+          IF(PRESENT(C1))THEN
+            WRITE(RES_CHECK,MYFMT) 'TITLE=',C1(1:LEN_TRIM(C1))
+          ELSE
+            WRITE(RES_CHECK,MYFMT) 'TITLE=',''
+          ENDIF
+          MYFMT='(A,I10,X)'
+          WRITE(RES_CHECK,MYFMT) 'ID_MES=',MSGID
+          WRITE(RES_CHECK,MYFMT) 'NB_REPET=',1
 C   
         CMSGTYPE=' '
         IF (MSGTYPE==0) THEN
@@ -2269,10 +2287,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "scr17_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

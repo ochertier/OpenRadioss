@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -51,9 +51,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "vect01_c.inc"
-#include      "units_c.inc"
-#include      "scr17_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -81,7 +78,7 @@ C---+----1----+----2----+----3----+----4----+----5----+----6----+----7--
       my_real
      .    QA, QB, QC, QE
 C======================================================================|
-      MX      =MAT(LFT)
+      MX      =MAT(1)
       G0   =PM(22,MX)
       SIG0 =PM(38,MX)
       CB   =PM(39,MX)
@@ -96,7 +93,7 @@ C======================================================================|
       T0   =PM(78,MX)
       TMELT=PM(46,MX)
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         P(I)  =-(SIG(I,1)+SIG(I,2)+SIG(I,3))*THIRD
         DAV(I)=-(D1(I)+D2(I)+D3(I))*THIRD
         EMELT(I) = ECOLD(I) + SPH*TMELT
@@ -104,7 +101,7 @@ C
 C----------------------------
 C     SHEAR MODULUS & YIELD
 C----------------------------
-      DO I=LFT,LLT
+      DO I=1,NEL
         QA = P(I)*DF(I)**THIRD
         QB = ONE - CH*(THETA(I)-T0)
         IF(EMELT(I)<=ZERO .OR. CF<=ZERO) THEN
@@ -128,7 +125,7 @@ C----------------------------
 C--------------------------------      
 C     DEVIATORIC STRESS ESTIMATE
 C--------------------------------
-      DO I=LFT,LLT
+      DO I=1,NEL
         G1(I) = DT1*G(I)*OFF(I)
         G2(I) = TWO*G1(I)*OFF(I)
         SIG(I,1)=SIG(I,1)+P(I)+G2(I)*(D1(I)+DAV(I))
@@ -139,12 +136,12 @@ C--------------------------------
         SIG(I,6)=SIG(I,6)+G1(I)*D6(I)
       ENDDO
 C---     dP/dRHO
-      DO I=LFT,LLT
+      DO I=1,NEL
         DPDM(I) = DPDM(I) + FOUR_OVER_3*G(I)
         CXX(I)=SQRT(ABS(DPDM(I))/RHO0(I))
       ENDDO
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         EPD(I)=OFF(I)*MAX(ABS(D1(I)),   ABS(D2(I)),   ABS(D3(I)),
      .      HALF*ABS(D4(I)),HALF*ABS(D5(I)),HALF*ABS(D6(I)))
         AJ2(I)=HALF*(SIG(I,1)**2+SIG(I,2)**2+SIG(I,3)**2)
@@ -152,14 +149,14 @@ C
         AJ2(I)=SQRT(THREE*AJ2(I))
       ENDDO
 C---
-      DO I=LFT,LLT
+      DO I=1,NEL
 C---      Melting
         IF(THETA(I)>=TMELT) THEN
           QH(I) =ZERO
           G(I)  =ZERO
           YLD(I)=ZERO
           AJ2(I)=ZERO
-          SCALE(I)=ZERO	  
+          SCALE(I)=ZERO    
         ELSE
 C---      Hardening rule
           IF(CN>=1) THEN
@@ -182,7 +179,7 @@ C---      Radial return
         ENDIF
       ENDDO
 C---    Radial return
-      DO I=LFT,LLT
+      DO I=1,NEL
 C---    plastic strain increment.
         DPLA(I)=(ONE -SCALE(I))*AJ2(I)/MAX((THREE*G(I)+QH(I)),EM15)
 C---    actual yield stress.
@@ -197,7 +194,7 @@ C---    actual yield stress.
         EPXE(I) =EPXE(I)*OFF(I)
       ENDDO
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
        SIGY(I)=YLD(I)
        DEFP(I)=EPXE(I)
       ENDDO

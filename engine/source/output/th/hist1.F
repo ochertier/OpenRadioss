@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,15 +25,15 @@ Chd|  HIST1                         source/output/th/hist1.F
 Chd|-- called by -----------
 Chd|        RADIOSS2                      source/engine/radioss2.F      
 Chd|-- calls ---------------
-Chd|        CUR_FIL_C                     source/output/tools/sortie_c.c
-Chd|        EOR_C                         source/output/tools/sortie_c.c
-Chd|        FLU_FIL_C                     source/output/tools/sortie_c.c
+Chd|        CUR_FIL_C                     ../common_source/tools/input_output/write_routtines.c
+Chd|        EOR_C                         ../common_source/tools/input_output/write_routtines.c
+Chd|        FLU_FIL_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|        FRETITL2                      source/input/freform.F        
 Chd|        MY_CTIME                      source/system/timer_c.c       
-Chd|        OPEN_C                        source/output/tools/sortie_c.c
-Chd|        WRITE_C_C                     source/output/tools/sortie_c.c
-Chd|        WRITE_I_C                     source/output/tools/sortie_c.c
-Chd|        WRITE_R_C                     source/output/tools/sortie_c.c
+Chd|        OPEN_C                        ../common_source/tools/input_output/write_routtines.c
+Chd|        WRITE_C_C                     ../common_source/tools/input_output/write_routtines.c
+Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
+Chd|        WRITE_R_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|        WRTDES                        source/output/th/wrtdes.F     
 Chd|        STRI                          source/tools/univ/stri.F      
 Chd|        STRR                          source/tools/univ/strr.F      
@@ -45,13 +45,15 @@ Chd|====================================================================
      2                 IWA  ,PM     ,GEO  ,IPART,
      3                 SUBSET,ITHGRP,ITHBUF,IGEO ,
      4                 IPM  ,IPARTH ,NPARTH ,NVPARTH ,
-     5                 NVSUBTH ,ITTYP,ITHFLAG,ITHVAR,IFILTITL)
+     5                 NVSUBTH ,ITTYP,ITHFLAG,ITHVAR,IFILTITL,
+     6                 SITHBUF,NAMES_AND_TITLES)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE GROUPDEF_MOD
       USE INOUTFILE_MOD
       USE TH_MOD
+      USE NAMES_AND_TITLES_MOD, only:NAMES_AND_TITLES_,LTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -59,20 +61,13 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com05_c.inc"
-#include      "com08_c.inc"
-#include      "com10_c.inc"
 #include      "units_c.inc"
 #include      "param_c.inc"
-#include      "scr03_c.inc"
 #include      "scr05_c.inc"
-#include      "scr12_c.inc"
 #include      "scr13_c.inc"
 #include      "scrfs_c.inc"
 #include      "chara_c.inc"
-#include      "rnur_c.inc"
 #include      "titr_c.inc"
 #include      "scr07_c.inc"
 #include      "scr17_c.inc"
@@ -82,10 +77,12 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER,INTENT(IN)                     :: SITHBUF  ! Size of ithbuf
+      INTEGER,INTENT(IN), DIMENSION(SITHBUF) :: ITHBUF   ! Time history buffer
       INTEGER 
      .   IWA(*),
      .   IPART(LIPART1,*),IPM(NPROPMI,*),IGEO(NPROPGI,*),
-     .   ITHGRP(NITHGR,*),ITHBUF(*), IFIL,
+     .   ITHGRP(NITHGR,*), IFIL,
      .   NTHGRP2, LONG,
      .   NPARTH,IPARTH(NPARTH,*),NVPARTH,NVSUBTH,
      .   ITTYP,ITHFLAG,ITHVAR(*),IFILTITL
@@ -94,6 +91,7 @@ C     REAL
      .   PM(NPROPM,*),GEO(NPROPG,*)
       CHARACTER FILNAM*100
       TYPE (SUBSET_) , DIMENSION(NSUBS) :: SUBSET
+      TYPE(NAMES_AND_TITLES_),INTENT(IN) :: NAMES_AND_TITLES  !< NAMES_AND_TITLES host the input deck names and titles for outputs
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -104,10 +102,13 @@ C-----------------------------------------------
      .   SEEK_LOC,IPART1,IPART2    
 C     REAL
       my_real
-     .   TITLE(20),TIT40(10),TIT80(20),TIT100(25)
-      CHARACTER EOR*8, CH8*8, CARD*80, BLA*7, CH8M*8, CH8L*8, CH8T*8 
+     .   TIT40(10),TIT80(20),TIT100(25)
+      my_real,DIMENSION(20) :: TITLE
+      CHARACTER EOR*8, CH8*8,BLA*7, CH8M*8, CH8L*8, CH8T*8 
+      CHARACTER (LEN=LTITLE) :: CARD
       CHARACTER CH80*80,TITL*100,VAR*10
       INTEGER :: LEN_TMP_NAME, TITLSUM
+      INTEGER, DIMENSION(20) :: TEXT
       CHARACTER(len=2148) :: TMP_NAME
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
@@ -119,8 +120,7 @@ C-----------------------------------------------
       DATA EOR/'ZZZZZEOR'/
 C=======================================================================
 C
-      WRITE(CARD,'(20A4)')TEXT
-      READ(CARD,'(20A4)')TITLE
+      CARD(1:LTITLE)=NAMES_AND_TITLES%TITLE(1:LTITLE)
 C      ICODE=3017
 C      ICODE=3023
 C      ICODE=3030
@@ -183,8 +183,8 @@ C
       ENDIF
 C-------TITRE------------
       IF(ITTYP==0)THEN
-       WRITE(IUNIT)ICODE,TITLE
-
+        READ(CARD,'(20A4)')TITLE
+        WRITE(IUNIT)ICODE,TITLE
       ELSEIF(ITTYP==1)THEN
         CH8=STRI(ICODE)
         WRITE(IUNIT,'(A)')FILNAM(1:ROOTLEN+LONG)         
@@ -214,8 +214,8 @@ C-------ivers date------------
          ITITLE(I)=ICHAR(CH80(I:I))
       ENDDO
       IF(ITTYP==0)THEN
-        READ(CH80,'(20A4)')TITLE
-      WRITE(IUNIT)TITLE
+        READ(CH80,'(20A4)')TITLE  
+        WRITE(IUNIT)TITLE  
       ELSEIF(ITTYP==1)THEN
         WRITE(IUNIT,'(A)')CH80
       ELSEIF(ITTYP==2)THEN

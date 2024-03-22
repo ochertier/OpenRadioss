@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -40,15 +40,10 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "units_c.inc"
-#include      "warn_c.inc"
 #include      "scr03_c.inc"
-#include      "scr07_c.2.inc"
 #include      "scr17_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -72,6 +67,7 @@ C-----------------------------------------------
 C     REAL
       my_real
      .   N1, N2, N3, PEN, ALP
+      my_real :: XX1(4), XX2(4),XX3(4),XS1,YS1,ZS1,XC,YC,ZC
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
@@ -91,7 +87,7 @@ C
         XS1=X(1,I)
         YS1=X(2,I)
         ZS1=X(3,I)
-        CALL INIST3(N1,N2,N3,CST(1,II),CST(2,II),IER,ALP)
+        CALL INIST3(N1,N2,N3,CST(1,II),CST(2,II),IER,ALP,XX1,XX2,XX3,XS1,YS1,ZS1,XC,YC,ZC)
         IF(IER==-1)THEN
 C         ** ERROR INTERFACE SEGMENT DEFINITION
 C         ** ERROR NULL SEGMENT AREA
@@ -147,27 +143,19 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NSN,INACTI
-C     REAL
       my_real
      .   GAP
       INTEGER IRECT(4,*), MSR(*), NSV(*), ILOC(*), IRTL(*), IRTL0(*),
      .   ITAB(*)
-C     REAL
       my_real
      .   X(3,*), CST(2,*)
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "scr03_c.inc"
-#include      "scr07_c.2.inc"
 #include      "scr17_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -176,6 +164,7 @@ C-----------------------------------------------
 C     REAL
       my_real
      .   N1, N2, N3, PEN, ALP
+      my_real ::   XX1(4), XX2(4),XX3(4),XS1,YS1,ZS1,XC,YC,ZC
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
@@ -195,7 +184,7 @@ C
         XS1=X(1,I)
         YS1=X(2,I)
         ZS1=X(3,I)
-        CALL INIST3(N1,N2,N3,CST(1,II),CST(2,II),IER,ALP)
+        CALL INIST3(N1,N2,N3,CST(1,II),CST(2,II),IER,ALP,XX1,XX2,XX3,XS1,YS1,ZS1,XC,YC,ZC)
         IF(IER==0)THEN
          PEN=N1*(XS1-XC)+N2*(YS1-YC)+N3*(ZS1-ZC)-GAP
          IF(PEN<ZERO) THEN

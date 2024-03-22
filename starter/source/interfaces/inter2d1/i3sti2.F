@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -40,14 +40,10 @@ Chd|====================================================================
      4 ID     ,TITR   ,AREAS  ,KNOD2ELQ,NOD2ELQ,
      5 NTY    ,NSNS   ,NSVS   ,SEGQUADFR)
       USE MESSAGE_MOD
-C-------------------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -59,12 +55,10 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NRT, NINT, NSN, NOINT, NTY, NSNS, IPM(NPROPMI,*)
-C     REAL
       my_real
      .   SLSFAC
       INTEGER IRECT(4,*), IXQ(7,*), NSEG(*), LNSV(*), NSV(*),
      .        KNOD2ELQ(*),NOD2ELQ(*), NSVS(*), SEGQUADFR(2,*)
-C     REAL
       my_real
      .   X(3,*), STF(*), PM(NPROPM,*), STFN(*),AREAS(*)
       INTEGER ID
@@ -137,7 +131,7 @@ C---------------------------------------------
           LL=LNSV(NPT+JJ)
           STFN(J)=STFN(J) + HALF*STF(LL)
         ENDDO
-      ENDDO	  
+      ENDDO    
 
 C---------------------------------------------
 C     SECND NODAL SURFACE COMPUTATION

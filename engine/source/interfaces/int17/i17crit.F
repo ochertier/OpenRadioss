@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -46,15 +46,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com06_c.inc"
-#include      "com08_c.inc"
-#include      "scr05_c.inc"
 #include      "task_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -73,8 +66,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
-C-----------------------------------------------
-C------------------------------------
       NMEF = 1 + ITASK*NME / NTHREAD
       NMEL = (ITASK+1)*NME / NTHREAD
 C--------------------------------------------------------------

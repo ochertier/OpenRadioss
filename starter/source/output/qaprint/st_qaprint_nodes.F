@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,7 +27,7 @@ Chd|        ST_QAPRINT_DRIVER             source/output/qaprint/st_qaprint_drive
 Chd|-- calls ---------------
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
-      SUBROUTINE ST_QAPRINT_NODES(ITAB,X,IMERGE,MERGE_NODE_TOL,MERGE_NODE_TAB,NMERGE_TOT)
+      SUBROUTINE ST_QAPRINT_NODES(ITAB,X,IMERGE,MERGE_NODE_TOL,MERGE_NODE_TAB,NMERGE_TOT,MS)
 C============================================================================
 C   M o d u l e s
 C-----------------------------------------------
@@ -38,21 +38,16 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "param_c.inc"
 #include      "scr17_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER, INTENT(IN) :: ITAB(*),IMERGE(*),MERGE_NODE_TAB(4,*),NMERGE_TOT
       my_real, INTENT(IN) ::
-     .                       X(3,NUMNOD),MERGE_NODE_TOL(*)
+     .                       X(3,NUMNOD),MERGE_NODE_TOL(*),MS(NUMNOD)
 C--------------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -97,6 +92,19 @@ C
           ENDDO
 C
         ENDIF
+C
+      ELSEIF (MYQAKEY('NODES_MASS')) THEN
+C
+        DO I=1,NUMNOD
+C
+          MY_ID = ITAB(I)
+          CALL QAPRINT('NODE_ID', MY_ID,0.0_8)
+C
+          WRITE(VARNAME,'(A)') 'MASS_'
+          TEMP_DOUBLE = MS(I)
+          CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),0,TEMP_DOUBLE)
+C
+        END DO ! DO I=1,NUMNOD        
 C
       END IF
 C-----------------------------------------------

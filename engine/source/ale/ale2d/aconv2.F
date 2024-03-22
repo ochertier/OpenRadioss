@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,7 +25,7 @@ Chd|  ACONV2                        source/ale/ale2d/aconv2.F
 Chd|-- called by -----------
 Chd|        ACONVE                        source/ale/aconve.F           
 Chd|-- calls ---------------
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
 Chd|====================================================================
       SUBROUTINE ACONV2(VTOT,PHI,FLUX,FLU1,ALE_CONNECT,QMV,IFLG, IXQ, X,NVAR, IOFF, ITRIMAT)
       USE ALE_CONNECTIVITY_MOD
@@ -37,7 +37,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
-#include      "param_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"

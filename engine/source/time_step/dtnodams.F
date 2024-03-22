@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -52,23 +52,19 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "rad2r_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "task_c.inc"
 #include      "scr02_c.inc"
-#include      "scr05_c.inc"
 #include      "scr07_c.inc"
 #include      "scr14_c.inc"
 #include      "scr16_c.inc"
 #include      "scr18_c.inc"
 #include      "units_c.inc"
 #include      "com08_c.inc"
-#include      "couple_c.inc"
 #include      "param_c.inc"
 #include      "parit_c.inc"
 #include      "sms_c.inc"
-#include      "scr17_c.inc"
 C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -134,7 +130,9 @@ C----------------------------------------------------------
 C----------------------------------------------------------
 C     ANIM TIME STEP 
 C----------------------------------------------------------
+!$OMP SINGLE
       IMSCH = 0
+!$OMP END SINGLE
       IF(ANIM_N(1)+OUTP_N(1)+H3D_DATA%N_SCAL_DT >0)THEN
 #include      "vectorize.inc"
         DO NN=NODFT,NODLT
@@ -462,19 +460,19 @@ C--------------------------------
           WRITE(ISTDO,*)
      .     ' **ERROR : NEGATIVE STIFFNESS NODE',-ISTOP
              IF ( ISTAMPING == 1) THEN
-	       WRITE(ISTDO,'(A)')'The run encountered a problem in an in
+                 WRITE(ISTDO,'(A)')'The run encountered a problem in an in
      .terface Type 7.'
                WRITE(ISTDO,'(A)')'You may need to check if there is enou 
      .gh clearance between the tools,'
                WRITE(ISTDO,'(A)')'and that they do not penetrate each ot
      .her during their travel'
-	       WRITE(IOUT, '(A)')'The run encountered a problem in an in
+                 WRITE(IOUT, '(A)')'The run encountered a problem in an in
      .terface Type 7.'
                WRITE(IOUT, '(A)')'You may need to check if there is enou
      .gh clearance between the tools,'
                WRITE(IOUT, '(A)')'and that they do not penetrate each ot
      .her during their travel'
-	     ENDIF
+               ENDIF
 #include "lockoff.inc"
         ENDIF
        ELSE
@@ -494,19 +492,19 @@ C--------------------------------
           WRITE(ISTDO,*)
      .     ' **ERROR : NEGATIVE STIFFNESS NODE',-ISTOP
              IF ( ISTAMPING == 1) THEN
-	       WRITE(ISTDO,'(A)')'The run encountered a problem in an in
+                 WRITE(ISTDO,'(A)')'The run encountered a problem in an in
      .terface Type 7.'
                WRITE(ISTDO,'(A)')'You may need to check if there is enou 
      .gh clearance between the tools,'
                WRITE(ISTDO,'(A)')'and that they do not penetrate each ot
      .her during their travel'
-	       WRITE(IOUT, '(A)')'The run encountered a problem in an in
+                 WRITE(IOUT, '(A)')'The run encountered a problem in an in
      .terface Type 7.'
                WRITE(IOUT, '(A)')'You may need to check if there is enou
      .gh clearance between the tools,'
                WRITE(IOUT, '(A)')'and that they do not penetrate each ot
      .her during their travel'
-	     ENDIF
+               ENDIF
 #include "lockoff.inc"
         ENDIF
        ENDIF

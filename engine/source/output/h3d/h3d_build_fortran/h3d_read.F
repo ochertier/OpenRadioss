@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -34,9 +34,10 @@ Chd|        NVAR                          source/input/nvar.F
 Chd|        ANIM_MOD                      ../common_source/modules/anim_mod.F
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
+Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
 Chd|        STACK_MOD                     share/modules/stack_mod.F     
 Chd|====================================================================
-      SUBROUTINE H3D_READ(IKAD,KEY0,KH3D,NSLASH,H3D_DATA)
+      SUBROUTINE H3D_READ(IKAD,KEY0,KH3D,NSLASH,H3D_DATA,SENSORS)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -44,6 +45,8 @@ C-----------------------------------------------
       USE STACK_MOD
       USE H3D_MOD
       USE ANIM_MOD
+      USE SENSOR_MOD
+      USE NAMES_AND_TITLES_MOD, ONLY: NCHARLINE100,NCHARKEY
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -51,23 +54,15 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER IKAD(0:*),KH3D,IFID,MFID,NSLASH(*)
+      INTEGER IKAD(0:*),KH3D,NSLASH(*)
       CHARACTER KEY0(*)*5
       TYPE (H3D_DATABASE) :: H3D_DATA
+      TYPE (SENSORS_)  ,INTENT(INOUT) :: SENSORS
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "units_c.inc"
-#include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "warn_c.inc"
-#include      "scr05_c.inc"
 #include      "scr14_c.inc"
-#include      "scr25_c.inc"
-#include      "scrcut_c.inc"
-#include      "chara_c.inc"
-#include      "sms_c.inc"
-#include      "nchara_c.inc"
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
@@ -77,9 +72,17 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, NBC, L, KCUR, N1, N2, N3, ITYP,IADG, J,NTITLE,IUS,
      .        NH3D,IREC,NBSENS
-      CHARACTER  TITLE*72, KEY2*ncharkey, KEY3*ncharkey, KEY4*ncharkey, KEY5*ncharkey, 
-     .           KEY6*ncharkey,KEY7*ncharkey, KEY8*ncharkey,KEYTMP*ncharkey,
-     .           CARTE*ncharline,TITLE2*80,LINE*120
+      CHARACTER  TITLE*72,TITLE2*80,LINE*120
+      CHARACTER(LEN=NCHARKEY)::KEY2
+      CHARACTER(LEN=NCHARKEY)::KEY3
+      CHARACTER(LEN=NCHARKEY)::KEY4
+      CHARACTER(LEN=NCHARKEY)::KEY5
+      CHARACTER(LEN=NCHARKEY)::KEY6
+      CHARACTER(LEN=NCHARKEY)::KEY7
+      CHARACTER(LEN=NCHARKEY)::KEY8
+      CHARACTER(LEN=NCHARKEY)::KEYTMP
+      CHARACTER(LEN=NCHARLINE100)::CARTE
+C
       my_real X0,Y0,Z0,VNX,VNY,VNZ,V0
 C-----------------------------------------------
 C   S o u r c e   L i n e s
@@ -115,7 +118,8 @@ c
 !
         ELSEIF(KEY2=='SENSO')THEN
           CALL WRIUSC2(IREC,1,KEY0(KCUR))
-          READ(IUSC2,*,ERR=9990)IANISENS,DTANISENS
+          READ(IUSC2,*,ERR=9990) SENSORS%ANIM_ID,SENSORS%ANIM_DT
+!
         ELSEIF(KEY2=='LSENSOR')THEN
           DO I=1,NBC
             READ(IUSC1,REC=IREC+I-1,FMT='(A)',ERR=9990)CARTE
@@ -130,6 +134,7 @@ c
      .          (H3D_DATA%LSENS_H3D(J+NBSENS),J=1,NVAR(CARTE))
             NBSENS = NBSENS + NVAR(CARTE)
           ENDDO
+!
         ELSEIF(KEY2=='COMPRESS')THEN
           CALL WRIUSC2(IREC,1,KEY0(KCUR))
           READ(IUSC2,*,ERR=9990)H3D_DATA%PERCENTAGE_ERROR
@@ -183,30 +188,47 @@ C----- TMIN automatically created /w TMAX  (/H3D/?/TENS/STRESS/TMAX ;/H3D/NODA/G
           CALL CREATE_H3D_INPUT(H3D_DATA,IKAD,KCUR,IREC,NBC,KEY0,KEY2,KEY3,KEY4,KEY5,KEY6,KEY7,KEY8)
           KEY4 = 'TMIN'
           CALL CREATE_H3D_INPUT(H3D_DATA,IKAD,KCUR,IREC,NBC,KEY0,KEY2,KEY3,KEY4,KEY5,KEY6,KEY7,KEY8)
-        ELSEIF(KEY3=='VECT' .AND. KEY4=='PEXT') THEN
-          IF(KEY2 == 'ELEM') THEN
+        ELSEIF(KEY2 == 'ELEM'.AND.(KEY3=='THICK' .OR. KEY3=='THIN')) THEN
              KEYTMP = 'SOLID'
              CALL CREATE_H3D_INPUT(H3D_DATA,IKAD,KCUR,IREC,NBC,KEY0,KEYTMP,KEY3,KEY4,KEY5,KEY6,KEY7,KEY8)
              KEYTMP = 'SHELL'
              CALL CREATE_H3D_INPUT(H3D_DATA,IKAD,KCUR,IREC,NBC,KEY0,KEYTMP,KEY3,KEY4,KEY5,KEY6,KEY7,KEY8)
-          END IF
+        ELSEIF(KEY2 == 'ELEM'.AND.(KEY3=='VECT' .AND. KEY4=='PEXT')) THEN
+             KEYTMP = 'SOLID'
+             CALL CREATE_H3D_INPUT(H3D_DATA,IKAD,KCUR,IREC,NBC,KEY0,KEYTMP,KEY3,KEY4,KEY5,KEY6,KEY7,KEY8)
+             KEYTMP = 'SHELL'
+             CALL CREATE_H3D_INPUT(H3D_DATA,IKAD,KCUR,IREC,NBC,KEY0,KEYTMP,KEY3,KEY4,KEY5,KEY6,KEY7,KEY8)
         ELSEIF(KEY3=='PEXT') THEN
           IF(KEY2 == 'ELEM') THEN
              KEYTMP = 'SOLID'
              CALL CREATE_H3D_INPUT(H3D_DATA,IKAD,KCUR,IREC,NBC,KEY0,KEYTMP,KEY3,KEY4,KEY5,KEY6,KEY7,KEY8)
              KEYTMP = 'SHELL'
              CALL CREATE_H3D_INPUT(H3D_DATA,IKAD,KCUR,IREC,NBC,KEY0,KEYTMP,KEY3,KEY4,KEY5,KEY6,KEY7,KEY8)
-          END IF
 C---- add /VECT/PEXT
-          KEY3 = 'VECT'
-          KEY4 = 'PEXT'
-          IF(KEY2 == 'ELEM') THEN
+             KEY3 = 'VECT'
+             KEY4 = 'PEXT'
              KEYTMP = 'SOLID'
              CALL CREATE_H3D_INPUT(H3D_DATA,IKAD,KCUR,IREC,NBC,KEY0,KEYTMP,KEY3,KEY4,KEY5,KEY6,KEY7,KEY8)
              KEYTMP = 'SHELL'
              CALL CREATE_H3D_INPUT(H3D_DATA,IKAD,KCUR,IREC,NBC,KEY0,KEYTMP,KEY3,KEY4,KEY5,KEY6,KEY7,KEY8)
-          ELSEIF(KEY2 == 'SHELL'.OR.KEY2 == 'SOLID') THEN
-            CALL CREATE_H3D_INPUT(H3D_DATA,IKAD,KCUR,IREC,NBC,KEY0,KEY2,KEY3,KEY4,KEY5,KEY6,KEY7,KEY8)
+           ELSEIF(KEY2 == 'SHELL'.OR.KEY2 == 'SOLID') THEN
+             CALL CREATE_H3D_INPUT(H3D_DATA,IKAD,KCUR,IREC,NBC,KEY0,KEY2,KEY3,KEY4,KEY5,KEY6,KEY7,KEY8)
+             KEY3 = 'VECT'
+             KEY4 = 'PEXT'
+             CALL CREATE_H3D_INPUT(H3D_DATA,IKAD,KCUR,IREC,NBC,KEY0,KEY2,KEY3,KEY4,KEY5,KEY6,KEY7,KEY8)
+           END IF
+        ELSEIF(KEY2=='SHELL'.AND.KEY3=='TENS'.AND.KEY4=='STRESS') THEN
+          CALL CREATE_H3D_INPUT(H3D_DATA,IKAD,KCUR,IREC,NBC,KEY0,KEY2,KEY3,KEY4,KEY5,KEY6,KEY7,KEY8)
+          IF(KEY5 == 'NPT=ALL') THEN
+             KEY5 = 'NPT=LOWER'
+             CALL CREATE_H3D_INPUT(H3D_DATA,IKAD,KCUR,IREC,NBC,KEY0,KEY2,KEY3,KEY4,KEY5,KEY6,KEY7,KEY8)
+             KEY5 = 'NPT=UPPER'
+             CALL CREATE_H3D_INPUT(H3D_DATA,IKAD,KCUR,IREC,NBC,KEY0,KEY2,KEY3,KEY4,KEY5,KEY6,KEY7,KEY8)
+          ELSEIF(KEY6 == 'NPT=ALL') THEN
+             KEY6 = 'NPT=LOWER'
+             CALL CREATE_H3D_INPUT(H3D_DATA,IKAD,KCUR,IREC,NBC,KEY0,KEY2,KEY3,KEY4,KEY5,KEY6,KEY7,KEY8)
+             KEY6 = 'NPT=UPPER'
+             CALL CREATE_H3D_INPUT(H3D_DATA,IKAD,KCUR,IREC,NBC,KEY0,KEY2,KEY3,KEY4,KEY5,KEY6,KEY7,KEY8)
           END IF
         ELSE
           CALL CREATE_H3D_INPUT(H3D_DATA,IKAD,KCUR,IREC,NBC,KEY0,KEY2,KEY3,KEY4,KEY5,KEY6,KEY7,KEY8)

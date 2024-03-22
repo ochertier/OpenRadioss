@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -52,32 +52,17 @@ C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
-C   D u m m y   A r g u m e n t s
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "vect07_c.inc"
-#include      "scr03_c.inc"
-#include      "scr17_c.inc"
-#include      "param_c.inc"
 #include      "scr05_c.inc"
-#include      "com04_c.inc"
 C-----------------------------------------------
       INTEGER JLT, NSVG(*), NSN, MSEGLO(*), MSEGTYP(*), NRTM, IVIS2, ISHARP
       INTEGER , INTENT(IN) :: INACTI, ILEV
-C     REAL
       my_real
      .   GAPS(*), GAP_NM(4,*), GAPMXL(*)
       INTEGER IRECT(4,*), ITAB(*),CAND_E(*),CAND_N(*),IRTLM(4,*)
       INTEGER IX1(MVSIZ),IX2(MVSIZ),IX3(MVSIZ),IX4(MVSIZ),
      .        MVOISN(MVSIZ,4), IBOUND(4,MVSIZ)
-C     REAL
       my_real
      .   PENMAX,PENMIN,PENE_OLD(5,NSN),TIME_S(NSN)
       my_real
@@ -93,7 +78,6 @@ C-----------------------------------------------
      .        NINDX, INDX(MVSIZ), I4N(MVSIZ), 
      .        FAR(MVSIZ,4), SUBTRIA(MVSIZ), I1, I2, ITRIA(2,4), JJ
       INTEGER IB1, IB2, IB3, IBX, IX, IY, IZ, NBORD, KBORD(MVSIZ)
-C     REAL
       my_real
      .   UNP,ZEROM,EPS,UNPT,ZEROMT,AAA,BB(MVSIZ,4)
       my_real
@@ -770,7 +754,13 @@ C
         I1=ITRIA(1,IT)
         I2=ITRIA(2,IT)
 C
-        IF(PENT(I,IT)==ZERO) CYCLE
+        NN1(I) = ZERO
+        NN2(I) = ZERO
+        NN3(I) = ZERO
+
+        IF(PENT(I,IT)==ZERO) THEN
+         CYCLE
+        ENDIF
 C
         IF(IX3(I) /= IX4(I))THEN
 C
@@ -856,8 +846,8 @@ C
 
             ELSE
 
-c              print *,' ** possible internal error wrt p1,p2 in i25pen3',ib1,ib2,
-c     .        itab(nsvg(i)),itab(ix1(i)),itab(ix2(i)),itab(ix3(i)),itab(ix4(i)),p1,p2
+C              print *,' ** possible internal error wrt p1,p2 in i25pen3',ib1,ib2,
+C     .        itab(nsvg(i)),itab(ix1(i)),itab(ix2(i)),itab(ix3(i)),itab(ix4(i)),p1,p2
 
             END IF
 

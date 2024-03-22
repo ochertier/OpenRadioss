@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,15 +26,12 @@ Chd|-- called by -----------
 Chd|        MULTI_TIMEEVOLUTION           source/multifluid/multi_timeevolution.F
 Chd|-- calls ---------------
 Chd|        MULTI_BILAN                   source/multifluid/multi_bilan.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        INITBUF_MOD                   share/resol/initbuf.F         
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|====================================================================
       SUBROUTINE MULTI_UPDATE_GLOBAL(NG, ELBUF_TAB, IPARG, ITASK, MULTI_FVM, 
-     .     PARTSAV, IPARTS, GRESAV, IGRTH, GRTH, VOLNEW, PRED)
-C-----------------------------------------------
-C     D e s c r i p t i o n
-C-----------------------------------------------
+     .     PARTSAV, IPARTS, GRESAV, IGRTH, GRTH, VOLNEW, PRED, TIMESTEP)
 C-----------------------------------------------
 C     M o d u l e s
 C-----------------------------------------------
@@ -50,8 +47,6 @@ C     C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "param_c.inc"
-#include      "task_c.inc"
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C     D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -62,7 +57,7 @@ C-----------------------------------------------
       TYPE(MULTI_FVM_STRUCT), INTENT(INOUT) :: MULTI_FVM
       my_real, INTENT(INOUT) :: PARTSAV(*), GRESAV(*)
       INTEGER, INTENT(IN) :: IPARTS(*), IGRTH(*), GRTH(*)
-      my_real, INTENT(IN) :: VOLNEW(*)
+      my_real, INTENT(IN) :: VOLNEW(*),TIMESTEP
       LOGICAL, INTENT(IN) :: PRED
 C-----------------------------------------------
 C     L o c a l   V a r i a b l e s
@@ -104,6 +99,16 @@ C     Balance for output
       IF (.NOT. PRED) THEN
          CALL MULTI_BILAN(PARTSAV, VOLNEW, MULTI_FVM, 
      .        NEL, NFT, IPARTS(1 + NFT), GRESAV, IGRTH, GRTH)
+         IF(ALLOCATED(MULTI_FVM%ACC))THEN
+           DO II = 1, NEL
+             I = II + NFT
+             !derivative of velocity increment
+             !  (%ACC contains previous velocity)
+             MULTI_FVM%ACC(1,I) = (MULTI_FVM%VEL(1,I)-MULTI_FVM%ACC(1,I))/TIMESTEP
+             MULTI_FVM%ACC(2,I) = (MULTI_FVM%VEL(2,I)-MULTI_FVM%ACC(2,I))/TIMESTEP
+             MULTI_FVM%ACC(3,I) = (MULTI_FVM%VEL(3,I)-MULTI_FVM%ACC(3,I))/TIMESTEP
+           ENDDO
+         ENDIF
       ENDIF
 C-----------------------------------------------
 C     E n d  o f   s u b r o u t i n e

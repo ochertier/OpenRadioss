@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -47,7 +47,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------
-      DO I=LFT,LLT
+      DO I=1,NEL
         GRAD(1,I)= GRD(I,1)
         GRAD(2,I)= GRD(I,2)
         GRAD(3,I)= GRD(I,3)

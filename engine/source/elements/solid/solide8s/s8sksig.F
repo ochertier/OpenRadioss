@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -39,8 +39,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "vect01_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -76,12 +74,12 @@ C-----------------------------------------------
      .   XI7, YI7, ZI7, XI8, YI8, ZI8
 C=======================================================================
             
-      KS(1:24,1:24,LFT:LLT) = ZERO
+      KS(1:24,1:24,1:NEL) = ZERO
       
       DO INOD=1,8
         II = 3*(INOD-1)
         DO J=1,3
-          DO I=LFT,LLT
+          DO I=1,NEL
             Q1 = QF(I,II+1)
             Q2 = QF(I,II+2)
             Q3 = QF(I,II+3)
@@ -123,7 +121,7 @@ C=======================================================================
       DO INOD=1,8
         II = 3*(INOD-1)
         DO J=1,3
-          DO I=LFT,LLT
+          DO I=1,NEL
             Q1 = QF(I,II+1)
             Q2 = QF(I,II+2)
             Q3 = QF(I,II+3)
@@ -162,7 +160,7 @@ C=======================================================================
         ENDDO
       ENDDO
       
-      DO I=LFT,LLT
+      DO I=1,NEL
         NC1(I)=IXS(2,I)
         NC2(I)=IXS(3,I)
         NC3(I)=IXS(4,I)
@@ -172,7 +170,7 @@ C=======================================================================
         NC7(I)=IXS(8,I)
         NC8(I)=IXS(9,I)
       ENDDO
-      DO I=LFT,LLT
+      DO I=1,NEL
         X1(I)=X(1,NC1(I))
         Y1(I)=X(2,NC1(I))
         Z1(I)=X(3,NC1(I))
@@ -198,7 +196,7 @@ C=======================================================================
         Y8(I)=X(2,NC8(I))
         Z8(I)=X(3,NC8(I))
       ENDDO
-      DO I=LFT,LLT
+      DO I=1,NEL
         XI1 = ZERO
         YI1 = ZERO
         ZI1 = ZERO

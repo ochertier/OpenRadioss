@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -41,7 +41,7 @@ Chd|====================================================================
      *                               LSUBMODEL  ,SUBSET,
      *                               IPART,
      *                               IXS  ,IXQ, IXC ,IXTG ,
-     *                               IXT  ,IXP ,IXR ,IXUR,KXSP,LRIVET,
+     *                               IXT  ,IXP ,IXR ,KXSP,LRIVET,
      *                               RBY_MSN)
 C-----------------------------------------------
 C   M o d u l e s
@@ -60,12 +60,8 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
-#include      "nchar_c.inc"
 #include      "scr17_c.inc"
-#include      "param_c.inc"
 #include      "sphcom.inc"
-#include      "submod_c.inc"
-#include      "rnur_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s 
 C-----------------------------------------------
@@ -82,7 +78,6 @@ C-----------------------------------------------
       INTEGER, INTENT(IN), DIMENSION(NIXT,NUMELT)    :: IXT
       INTEGER, INTENT(IN), DIMENSION(NIXP,NUMELP)    :: IXP
       INTEGER, INTENT(IN), DIMENSION(NIXR,NUMELR)    :: IXR
-      INTEGER, DIMENSION(NIXUR,NUMELUR), INTENT(in)  :: IXUR
       INTEGER, DIMENSION(NISP,NUMSPH), INTENT(in)    :: KXSP
       INTEGER, DIMENSION(4,NRIVET), INTENT(in)       :: LRIVET
       INTEGER, INTENT(IN), DIMENSION(2,NRBODY)       :: RBY_MSN
@@ -242,8 +237,7 @@ C Submodel
           ALLOCATE(INDEX_SORT(2*NSUBMOD))
 
           DO I=1,NSUBMOD
-             OFFSET = LSUBMODEL(I)%OFF_SUBMOD - LSUBMODEL(I)%OFF_SUBMOD0
-             ISORT(I) = LSUBMODEL(I)%NOSUBMOD - OFFSET
+             ISORT(I) = LSUBMODEL(I)%NOSUBMOD
              INDEX_SORT(I)=I
           ENDDO
           CALL MY_ORDERS(0,IWORK,ISORT,INDEX_SORT,NSUBMOD,1)
@@ -301,9 +295,6 @@ C Beam
 C Spring
         IF(MODE==1) ALLOCATE( MAP_TABLES%ISPRINGM(NUMELR,2))
         CALL MAP_ORDER(IXR,NIXR,NIXR,NUMELR,MAP_TABLES%ISPRINGM)    
-C Renault element
-        IF(MODE==1) ALLOCATE( MAP_TABLES%IELMURM(NUMELUR,2))
-        CALL MAP_ORDER(IXUR,NIXUR,NIXUR,NUMELUR,MAP_TABLES%IELMURM)      
 C SPH 
         IF(MODE==1) ALLOCATE( MAP_TABLES%ISPHM(NUMSPH,2))
         MAP_TABLES%ISPHM(1:NUMSPH,1:2) = 0

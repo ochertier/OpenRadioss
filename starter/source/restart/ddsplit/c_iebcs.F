@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,7 +25,7 @@ Chd|  C_IEBCS                       source/restart/ddsplit/c_iebcs.F
 Chd|-- called by -----------
 Chd|        DDSPLIT                       source/restart/ddsplit/ddsplit.F
 Chd|-- calls ---------------
-Chd|        EBCS_MOD                      ../common_source/modules/ebcs_mod.F
+Chd|        EBCS_MOD                      ../common_source/modules/boundary_conditions/ebcs_mod.F
 Chd|====================================================================
        SUBROUTINE C_IEBCS(IXS, IXQ, IXTG, 
      .     NUMELS, NUMELQ, NUMELTG,
@@ -44,7 +44,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "mvsiz_p.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s

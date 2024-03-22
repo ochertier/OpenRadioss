@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,7 +27,7 @@ Chd|        GENANI                        source/output/anim/generate/genani.F
 Chd|-- calls ---------------
 Chd|        SPMD_IGET_PARTN_PLY           source/mpi/anim/spmd_iget_partn_ply.F
 Chd|        SPMD_IGLOB_PARTN              source/mpi/anim/spmd_iglob_partn.F
-Chd|        WRITE_I_C                     source/output/tools/sortie_c.c
+Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|        GET_PLY_NOD                   source/output/anim/generate/anin_ply_init.F
 Chd|        GET_PLY_NODID                 source/output/anim/generate/anin_ply_init.F
 Chd|        PLYXFEM_MOD                   share/modules/plyxfem_mod.F   
@@ -47,12 +47,7 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "scr05_c.inc"
-#include      "scr14_c.inc"
 #include      "task_c.inc"
-#include      "rnur_c.inc"
-#include      "spmd_c.inc"
-#include      "scr01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -174,7 +169,7 @@ C
       ENDDO
 
       IF (NSPMD > 1) THEN
-Cel construction tableau global des parts sur p0
+C   construction tableau global des parts sur p0
 
         IF (ISPMD==0) THEN
          CALL SPMD_IGLOB_PARTN(IADPLY,NPLYPART,IADPLYG,NPLYPART)

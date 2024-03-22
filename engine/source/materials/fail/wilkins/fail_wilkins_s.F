@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -31,11 +31,10 @@ Chd|        USERMAT_SOLID                 source/materials/mat_share/usermat_sol
 Chd|-- calls ---------------
 Chd|====================================================================
       SUBROUTINE FAIL_WILKINS_S(
-     1     NEL    ,NUPARAM,NUVAR   ,MFUNC   ,KFUNC   ,
-     2     NPF    ,TF     ,TIME   ,TIMESTEP ,UPARAM  ,
-     3     NGL    , IPM    ,MAT,
+     1     NEL    ,NUPARAM,NUVAR   ,
+     2     TIME   ,TIMESTEP ,UPARAM  ,NGL    ,
      4     SIGNXX ,SIGNYY ,SIGNZZ  ,SIGNXY  ,SIGNYZ  ,SIGNZX ,
-     5     DPLA   ,UVAR    ,OFF    ,IP      ,DFMAX   ,TDELE  )
+     5     DPLA   ,UVAR    ,OFF    ,DFMAX   ,TDELE  )
 C-----------------------------------------------
 C     3D Wilkins Failure model
 C-----------------------------------------------
@@ -48,11 +47,6 @@ C---------+---------+---+---+--------------------------------------------
 C NEL     |  1      | I | R | SIZE OF THE ELEMENT GROUP NEL 
 C NUPARAM |  1      | I | R | SIZE OF THE USER PARAMETER ARRAY
 C NUVAR   |  1      | I | R | NUMBER OF USER ELEMENT VARIABLES
-C---------+---------+---+---+--------------------------------------------
-C MFUNC   |  1      | I | R | NUMBER FUNCTION USED FOR THIS USER LAW not used
-C KFUNC   | NFUNC   | I | R | FUNCTION INDEX not used
-C NPF     |  *      | I | R | FUNCTION ARRAY   
-C TF      |  *      | F | R | FUNCTION ARRAY 
 C---------+---------+---+---+--------------------------------------------
 C TIME    |  1      | F | R | CURRENT TIME
 C TIMESTEP|  1      | F | R | CURRENT TIME STEP
@@ -92,8 +86,7 @@ C-----------------------------------------------
 C   I N P U T   A r g u m e n t s
 C-----------------------------------------------
 C
-      INTEGER NEL, NUPARAM, NUVAR,NGL(NEL),IPM(NPROPMI,*),
-     .        MAT(NEL),IP
+      INTEGER NEL, NUPARAM, NUVAR,NGL(NEL)
       my_real TIME,TIMESTEP,UPARAM(*),
      .   SIGNXX(NEL),SIGNYY(NEL),SIGNZZ(NEL),
      .   SIGNXY(NEL),SIGNYZ(NEL),SIGNZX(NEL),
@@ -107,11 +100,6 @@ C-----------------------------------------------
 C   I N P U T   O U T P U T   A r g u m e n t s 
 C-----------------------------------------------
       my_real UVAR(NEL,NUVAR), OFF(NEL),DFMAX(NEL),TDELE(NEL)
-C-----------------------------------------------
-C   VARIABLES FOR FUNCTION INTERPOLATION 
-C-----------------------------------------------
-      INTEGER NPF(*), MFUNC, KFUNC(MFUNC)
-      my_real TF(*)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -215,14 +203,14 @@ c         yp= 3 x^2 + c
           W1 =  ONE - P/PC
           W1 = (MAX(EM20,ONE/W1))**AL
           UVAR(I,1) = UVAR(I,1) + W1*W2*DPLA(I)
-          IF(UVAR(I,1)>=DC) THEN	  
+          IF(UVAR(I,1)>=DC) THEN    
            OFF(I) = FOUR_OVER_5
            IDEL7NOK = 1
            NINDX=NINDX+1
            INDX(NINDX)=I
            TDELE(I) = TIME  
           ENDIF
-	 ENDIF
+           ENDIF
         ENDDO
         IF(NINDX>0.AND.IMCONV==1)THEN
          DO J=1,NINDX
@@ -303,7 +291,7 @@ c         yp= 3 x^2 + c
           W1 = ONE - ONE*P/PC
           W1 = (MAX(EM20,ONE/W1))**AL
           UVAR(I,1) = UVAR(I,1) + W1*W2*DPLA(I)      
-          IF(UVAR(I,1)>=DC) THEN	   
+          IF(UVAR(I,1)>=DC) THEN     
            NINDX=NINDX+1
            INDX(NINDX)=I
            SIGNXX(I) =  P

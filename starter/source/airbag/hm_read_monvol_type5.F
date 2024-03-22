@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -45,7 +45,7 @@ Chd|        SENSOR_MOD                    share/modules1/sensor_mod.F
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
       SUBROUTINE HM_READ_MONVOL_TYPE5(T_MONVOLN, T_MONVOL_METADATA, IPM, IGEO, ITABM1,
-     .     SENSOR_TAB, NPT, PLD,
+     .     SENSORS, NPT, PLD,
      .     UNITAB, LUID, NPC, IGRSURF, ITAB, X, PM, GEO, IXC, IXTG, 
      .     LSUBMODEL)
 C-----------------------------------------------
@@ -67,17 +67,12 @@ C-----------------------------------------------
 C     NSURF
 #include      "com04_c.inc"
 C     KMONVO, IREC
-#include      "scr17_c.inc"
 C     NIMV, NRVOLU
 #include      "param_c.inc"
 C     IIN
 #include      "units_c.inc"
-C     LUNIT
-#include      "sysunit.inc"
 C     IPRI
 #include      "scr03_c.inc"
-C     NSUBMOD
-#include      "submod_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -89,7 +84,7 @@ C-----------------------------------------------
       TYPE(MONVOL_STRUCT_), INTENT(INOUT) :: T_MONVOLN
       TYPE(MONVOL_METADATA_), INTENT(INOUT) :: T_MONVOL_METADATA
       TYPE(SUBMODEL_DATA), DIMENSION(NSUBMOD), INTENT(IN) :: LSUBMODEL
-      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE (SENSORS_)  ,INTENT(IN) :: SENSORS
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -360,7 +355,7 @@ C     ==============
       ENDIF
       IF (AMU == ZERO) AMU = EM02
       IF(PEXT == ZERO) THEN
-         PEXT = 101325.D0 * (FAC_L_WORK * FAC_T_WORK * FAC_T_WORK) / FAC_M_WORK
+         PEXT = 101325.D0 * (UNITAB%FAC_L_WORK * UNITAB%FAC_T_WORK * UNITAB%FAC_T_WORK) / UNITAB%FAC_M_WORK
       ENDIF
       PINI = PEXT
       IF (TI == ZERO) TI = TWOHUNDRED95
@@ -408,10 +403,10 @@ C     ==============
       DO II = 1, NJET
          IF (ISENS(II) > 0) THEN
             FOUND = .FALSE.
-            DO IS = 1, NSENSOR
-               IF (ISENS(II) == SENSOR_TAB(IS)%SENS_ID) THEN
+            DO IS = 1, SENSORS%NSENSOR
+               IF (ISENS(II) == SENSORS%SENSOR_TAB(IS)%SENS_ID) THEN
                   T_MONVOLN%IBAGJET(4, II) = IS
-                  IF (SENSOR_TAB(IS)%TCRIT < TTFIRE) TTFIRE = SENSOR_TAB(IS)%TCRIT
+                  IF (SENSORS%SENSOR_TAB(IS)%TCRIT < TTFIRE) TTFIRE = SENSORS%SENSOR_TAB(IS)%TCRIT
                   FOUND = .TRUE.
                   EXIT
                ENDIF

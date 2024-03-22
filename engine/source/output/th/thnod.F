@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,13 +21,13 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
-Chd|  THNOD                         source/output/th/thnod.F
+Chd|  THNOD                         source/output/th/thnod.F      
 Chd|-- called by -----------
-Chd|        HIST2                         source/output/th/hist2.F
+Chd|        HIST2                         source/output/th/hist2.F      
 Chd|-- calls ---------------
-Chd|        RELFRAM                       source/tools/skew/relfram.F
+Chd|        RELFRAM                       source/tools/skew/relfram.F   
 Chd|        PINCHTYPE_MOD                 ../common_source/modules/pinchtype_mod.F
-Chd|        PLYXFEM_MOD                   share/modules/plyxfem_mod.F
+Chd|        PLYXFEM_MOD                   share/modules/plyxfem_mod.F   
 Chd|====================================================================
       SUBROUTINE THNOD(ITHBUF ,
      2             WA      ,X       ,D       ,V       ,A      ,
@@ -51,12 +51,9 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "sphcom.inc"
 #include      "scr03_c.inc"
-#include      "scr05_c.inc"
 #include      "scr16_c.inc"
-#include      "task_c.inc"
 #include      "param_c.inc"
 #include      "submodel.inc"
-#include      "tabsiz_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -207,24 +204,21 @@ C workaround for possible PGI bug
                       WA(IJK) = ZERO
                     ENDIF
                   ELSEIF(K == 626) THEN
-                    IF ((IDROT == 1 .OR. ISECUT>0 .OR. ISUB>0 .OR.
-     .                  MSHSUB>0 .OR. IISROT>0 .OR. IMPOSE_DR>0) .AND.
+                    IF ((IDROT == 1 .OR. ISECUT>0 .OR. IISROT>0 .OR. IMPOSE_DR>0) .AND.
      .                  IRODDL/=0 )THEN
                       WA(IJK) = DR(1,I)
                     ELSE
                       WA(IJK) = ZERO
                     ENDIF
                   ELSEIF(K == 627) THEN
-                    IF ((IDROT == 1 .OR. ISECUT>0 .OR. ISUB>0 .OR.
-     .                   MSHSUB>0 .OR. IISROT>0 .OR. IMPOSE_DR>0) .AND.
+                    IF ((IDROT == 1 .OR. ISECUT>0 .OR. IISROT>0 .OR. IMPOSE_DR>0) .AND.
      .                   IRODDL/=0 )THEN
                       WA(IJK) = DR(2,I)
                     ELSE
                       WA(IJK) = ZERO
                     ENDIF
                   ELSEIF(K == 628) THEN
-                    IF ((IDROT == 1 .OR. ISECUT>0 .OR. ISUB>0 .OR.
-     .                   MSHSUB>0 .OR. IISROT>0 .OR. IMPOSE_DR>0) .AND.
+                    IF ((IDROT == 1 .OR. ISECUT>0 .OR. IISROT>0 .OR. IMPOSE_DR>0) .AND.
      .                   IRODDL/=0 )THEN
                       WA(IJK) = DR(3,I)
                     ELSE
@@ -421,8 +415,7 @@ C workaround for possible PGI bug
                       WA(IJK) = ZERO
                     ENDIF
                   ELSEIF(K == 626) THEN
-                    IF ((IDROT == 1 .OR. ISECUT>0 .OR. ISUB>0 .OR.
-     .                   MSHSUB>0 .OR. IISROT>0 .OR. IMPOSE_DR>0) .AND.
+                    IF ((IDROT == 1 .OR. ISECUT>0 .OR. IISROT>0 .OR. IMPOSE_DR>0) .AND.
      .                   IRODDL/=0 )THEN
                       WA(IJK) = DR(1,I)*SKEW(1,ISK)
      .                       + DR(2,I)*SKEW(2,ISK)
@@ -431,8 +424,7 @@ C workaround for possible PGI bug
                       WA(IJK) = ZERO
                     ENDIF
                   ELSEIF(K == 627) THEN
-                    IF ((IDROT == 1 .OR. ISECUT>0 .OR. ISUB>0 .OR.
-     .                   MSHSUB>0 .OR. IISROT>0 .OR. IMPOSE_DR>0) .AND.
+                    IF ((IDROT == 1 .OR. ISECUT>0 .OR. IISROT>0 .OR. IMPOSE_DR>0) .AND.
      .                   IRODDL/=0 )THEN
                       WA(IJK) = DR(1,I)*SKEW(4,ISK)
      .                       + DR(2,I)*SKEW(5,ISK)
@@ -441,8 +433,7 @@ C workaround for possible PGI bug
                       WA(IJK) = ZERO
                     ENDIF
                   ELSEIF(K == 628) THEN
-                    IF ((IDROT == 1 .OR. ISECUT>0 .OR. ISUB>0 .OR.
-     .                   MSHSUB>0 .OR. IISROT>0 .OR. IMPOSE_DR>0) .AND.
+                    IF ((IDROT == 1 .OR. ISECUT>0 .OR. IISROT>0 .OR. IMPOSE_DR>0) .AND.
      .                   IRODDL/=0 )THEN
                       WA(IJK) = DR(1,I)*SKEW(7,ISK)
      .                       + DR(2,I)*SKEW(8,ISK)
@@ -687,24 +678,21 @@ C workaround for possible PGI bug
                       WA(IJK) = ZERO
                     ENDIF
                   ELSEIF(K == 626) THEN
-                    IF ((IDROT == 1 .OR. ISECUT>0 .OR. ISUB>0 .OR.
-     .                   MSHSUB>0 .OR. IISROT>0 .OR. IMPOSE_DR>0) .AND.
+                    IF ((IDROT == 1 .OR. ISECUT>0 .OR. IISROT>0 .OR. IMPOSE_DR>0) .AND.
      .                   IRODDL/=0 )THEN
                       WA(IJK) = DR(1,I)
                     ELSE
                       WA(IJK) = ZERO
                     ENDIF
                   ELSEIF(K == 627) THEN
-                    IF ((IDROT == 1 .OR. ISECUT>0 .OR. ISUB>0 .OR.
-     .                   MSHSUB>0 .OR. IISROT>0 .OR. IMPOSE_DR>0) .AND.
+                    IF ((IDROT == 1 .OR. ISECUT>0 .OR. IISROT>0 .OR. IMPOSE_DR>0) .AND.
      .                   IRODDL/=0 )THEN
                       WA(IJK) = DR(2,I)
                     ELSE
                       WA(IJK) = ZERO
                     ENDIF
                   ELSEIF(K == 628) THEN
-                    IF ((IDROT == 1 .OR. ISECUT>0 .OR. ISUB>0 .OR.
-     .                   MSHSUB>0 .OR. IISROT>0 .OR. IMPOSE_DR>0) .AND.
+                    IF ((IDROT == 1 .OR. ISECUT>0 .OR. IISROT>0 .OR. IMPOSE_DR>0) .AND.
      .                   IRODDL/=0 )THEN
                       WA(IJK) = DR(3,I)
                     ELSE
@@ -829,8 +817,7 @@ C workaround for possible PGI bug
                       WA(IJK) = ZERO
                     ENDIF
                   ELSEIF(K == 626) THEN
-                    IF ((IDROT == 1 .OR. ISECUT>0 .OR. ISUB>0 .OR.
-     .                  MSHSUB>0 .OR. IISROT>0 .OR. IMPOSE_DR>0) .AND.
+                    IF ((IDROT == 1 .OR. ISECUT>0 .OR. IISROT>0 .OR. IMPOSE_DR>0) .AND.
      .                  IRODDL/=0 )THEN
                       WA(IJK) = DR(1,I)*SKEW(1,ISK)
      .                + DR(2,I)*SKEW(2,ISK)
@@ -839,8 +826,7 @@ C workaround for possible PGI bug
                       WA(IJK) = ZERO
                     ENDIF
                   ELSEIF(K == 627) THEN
-                    IF ((IDROT == 1 .OR. ISECUT>0 .OR. ISUB>0 .OR.
-     .                   MSHSUB>0 .OR. IISROT>0 .OR. IMPOSE_DR>0) .AND.
+                    IF ((IDROT == 1 .OR. ISECUT>0 .OR. IISROT>0 .OR. IMPOSE_DR>0) .AND.
      .                   IRODDL/=0 )THEN
                       WA(IJK) = DR(1,I)*SKEW(4,ISK)
      .                       + DR(2,I)*SKEW(5,ISK)
@@ -849,8 +835,7 @@ C workaround for possible PGI bug
                       WA(IJK) = ZERO
                     ENDIF
                   ELSEIF(K == 628) THEN
-                    IF ((IDROT == 1 .OR. ISECUT>0 .OR. ISUB>0 .OR.
-     .                  MSHSUB>0 .OR. IISROT>0 .OR. IMPOSE_DR>0) .AND.
+                    IF ((IDROT == 1 .OR. ISECUT>0 .OR. IISROT>0 .OR. IMPOSE_DR>0) .AND.
      .                  IRODDL/=0 )THEN
                       WA(IJK) = DR(1,I)*SKEW(7,ISK)
      .                       + DR(2,I)*SKEW(8,ISK)

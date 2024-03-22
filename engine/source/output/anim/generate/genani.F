@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,7 +25,6 @@ Chd|  GENANI_MOD                    source/output/anim/generate/genani.F
 Chd|-- called by -----------
 Chd|        EIG                           stub/eig.F                    
 Chd|        EIG1                          stub/eig1.F                   
-Chd|        EIGCOND                       stub/eigcond.F                
 Chd|        EIGP                          stub/eigp.F                   
 Chd|        IMP_BUCK                      source/implicit/imp_buck.F    
 Chd|        SORTIE_MAIN                   source/output/sortie_main.F   
@@ -59,12 +58,12 @@ Chd|        ANIVFLOWP                     source/output/anim/generate/genani.F
 Chd|        ANI_TXT                       source/output/anim/generate/ani_txt.F
 Chd|        ANI_TXT50                     source/output/anim/generate/ani_txt.F
 Chd|        ARRET                         source/system/arret.F         
-Chd|        CLOSE_C                       source/output/tools/sortie_c.c
+Chd|        CLOSE_C                       ../common_source/tools/input_output/write_routtines.c
 Chd|        CNTSKEW                       source/output/anim/generate/aniskewf.F
-Chd|        CUR_FIL_C                     source/output/tools/sortie_c.c
+Chd|        CUR_FIL_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|        CUTCNT                        source/tools/sect/cutcnt.F    
 Chd|        CUTFUNC                       source/tools/sect/cutfunc.F   
-Chd|        CUTFUNCE                      source/tools/sect/cutfunc.F   
+Chd|        CUTFUNCE                      source/tools/sect/cutfunce.F  
 Chd|        CUTMAIN                       source/tools/sect/cutmain.F   
 Chd|        CUTMASS                       source/tools/sect/cutmass.F   
 Chd|        DELNUMB0                      source/output/anim/generate/delnumb0.F
@@ -108,7 +107,7 @@ Chd|        DSRGNOR                       source/output/anim/generate/dsrgnor.F
 Chd|        DXYZSECT                      source/output/anim/generate/dxyzsect.F
 Chd|        DXYZSPH                       source/output/anim/generate/dxyzsph.F
 Chd|        DXYZSRG                       source/output/anim/generate/dxyzsrg.F
-Chd|        FILE_SIZE                     source/output/tools/sortie_c.c
+Chd|        FILE_SIZE                     ../common_source/tools/input_output/write_routtines.c
 Chd|        FRETITL2                      source/input/freform.F        
 Chd|        NODALD                        source/output/anim/generate/nodald.F
 Chd|        NODALP                        source/output/anim/generate/nodalp.F
@@ -117,7 +116,7 @@ Chd|        NODALVFRAC                    source/output/anim/generate/nodalvfrac
 Chd|        NODALZVOL                     source/output/anim/generate/nodalzvol.F
 Chd|        NODAL_SCHLIEREN               source/output/anim/generate/nodal_schlieren.F
 Chd|        NORCUT                        source/tools/sect/norcut.F    
-Chd|        OPEN_C                        source/output/tools/sortie_c.c
+Chd|        OPEN_C                        ../common_source/tools/input_output/write_routtines.c
 Chd|        PARCUT                        source/tools/sect/parcut.F    
 Chd|        PARSOR0                       source/output/anim/generate/parsor0.F
 Chd|        PARSORC                       source/output/anim/generate/parsorc.F
@@ -174,10 +173,10 @@ Chd|        VELVECC21                     source/output/anim/generate/velvec.F
 Chd|        VELVECC22                     source/output/anim/generate/velvec.F
 Chd|        VELVECC_MAX                   source/output/anim/generate/velvec.F
 Chd|        VELVECZ22                     source/output/anim/generate/velvecz22.F
-Chd|        WRITE_C_C                     source/output/tools/sortie_c.c
-Chd|        WRITE_I_C                     source/output/tools/sortie_c.c
-Chd|        WRITE_R_C                     source/output/tools/sortie_c.c
-Chd|        WRITE_S_C                     source/output/tools/sortie_c.c
+Chd|        WRITE_C_C                     ../common_source/tools/input_output/write_routtines.c
+Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
+Chd|        WRITE_R_C                     ../common_source/tools/input_output/write_routtines.c
+Chd|        WRITE_S_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|        XFECUT                        source/output/anim/generate/xfecut.F
 Chd|        XYZ16                         source/output/anim/generate/genani.F
 Chd|        XYZCUT                        source/tools/sect/xyzcut.F    
@@ -190,16 +189,17 @@ Chd|        XYZNOR16                      source/output/anim/generate/genani.F
 Chd|        XYZNOR_CRK                    source/output/anim/generate/xyznor_crk.F
 Chd|        XYZNOR_PLY                    source/output/anim/generate/xyznor_ply.F
 Chd|        ALEANIM_MOD                   share/modules/aleanim_mod.F   
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
 Chd|        CLUSTER_MOD                   share/modules/cluster_mod.F   
 Chd|        CRACKXFEM_MOD                 share/modules/crackxfem_mod.F 
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        FVBAG_MOD                     share/modules/fvbag_mod.F     
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|        INOUTFILE_MOD                 ../common_source/modules/inoutfile_mod.F
+Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|        PLYXFEM_MOD                   share/modules/plyxfem_mod.F   
 Chd|        STACK_MOD                     share/modules/stack_mod.F     
 Chd|====================================================================
@@ -210,7 +210,7 @@ Chd|====================================================================
      5                  SINVERT  ,CONT     ,SMATER      ,ICUT        ,SKEW     ,
      6                  XCUT     ,FINT     ,ITAB        ,SEL2FA      ,FEXT     ,
      7                  FOPT     ,ANIN     ,LPBY        ,NPBY        ,NSTRF    ,
-     8                  RWBUF    ,NPRW     ,IXUR        ,TANI        ,ELBUF_TAB,
+     8                  RWBUF    ,NPRW     ,TANI        ,ELBUF_TAB   ,MAT_PARAM,
      A                  DD_IAD   ,WEIGHT   ,EANI        ,IPART       ,CLUSTER  ,
      B                  IPARTS   ,IPARTQ   ,IPARTC      ,IPARTT      ,IPARTP   ,
      C                  IPARTR   ,IPARTUR  ,IPARTTG     ,
@@ -255,6 +255,7 @@ C-----------------------------------------------
       USE MULTI_FVM_MOD 
       USE INOUTFILE_MOD
       USE ALE_CONNECTIVITY_MOD
+      USE MATPARAM_DEF_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -264,7 +265,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com05_c.inc"
 #include      "com08_c.inc"
 #include      "com09_c.inc"
 #include      "com_xfem1.inc"
@@ -272,9 +272,7 @@ C-----------------------------------------------
 #include      "param_c.inc"
 #include      "units_c.inc"
 #include      "scr03_c.inc"
-#include      "scr05_c.inc"
 #include      "scr06_c.inc"
-#include      "scr13_c.inc"
 #include      "scr14_c.inc"
 #include      "scr16_c.inc"
 #include      "scr17_c.inc"
@@ -282,17 +280,12 @@ C-----------------------------------------------
 #include      "scr25_c.inc"
 #include      "chara_c.inc"
 #include      "scrcut_c.inc"
-#include      "rnur_c.inc"
-#include      "r4r8_p.inc"
 #include      "task_c.inc"
-#include      "couple_c.inc"
 #include      "spmd_c.inc"
 #include      "flowcom.inc"
 #include      "impl1_c.inc"
 #include      "sms_c.inc"
 #include      "filescount_c.inc"
-#include      "tabsiz_c.inc"
-#include      "parit_c.inc"
 #include      "intstamp_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -327,7 +320,7 @@ C-----------------------------------------------
      .        IXS(NIXS,*),IXQ(NIXQ,*),IXC(NIXC,*),IXTG(NIXTG,*),
      .        IXT(NIXT,*),IXP(NIXP,*),IXR(NIXR,*),MONVOL(*) ,
      .        IXS10(6,*) ,IXS16(8,*)  ,IXS20(12,*) ,
-     .        ICUT(*), ITAB(*),NPBY(NNPBY,*),NPRW(*),IXUR(NIXUR,*),
+     .        ICUT(*), ITAB(*),NPBY(NNPBY,*),NPRW(*),
      .        WEIGHT(*),IPART(LIPART1,*),IPARTS(*),IPARTQ(*),IPARTC(*),
      .        IPARTT(*),IPARTP(*),IPARTR(*),IPARTUR(*),IPARTTG(*),
      .        NOM_OPT(*),
@@ -356,6 +349,7 @@ C-----------------------------------------------
       TYPE (SURF_)   , DIMENSION(NSURF)  :: IGRSURF
       TYPE(MULTI_FVM_STRUCT), INTENT(IN) :: MULTI_FVM
       TYPE(t_ale_connectivity), INTENT(IN) :: ALE_CONNECTIVITY
+      TYPE (MATPARAM_STRUCT_) ,DIMENSION(NUMMAT) ,INTENT(IN) :: MAT_PARAM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -374,7 +368,7 @@ C-----------------------------------------------
      .        SZ16,SHFT16,IADGPS,NSN,IADISO     , IG3DSOLID(SIG3DSOLID),
      .        FIRST_NODE_IG3D
       REAL
-     .       , DIMENSION(:), ALLOCATABLE :: WA4, MAS4
+     .       , DIMENSION(:), ALLOCATABLE :: WA4, MAS4, WA4_FVM
       my_real
      .   X_TEMP(3,64*NUMELIG3D),D_TEMP(3,64*NUMELIG3D),
      .   V_TEMP(3,64*NUMELIG3D),A_TEMP(3,64*NUMELIG3D),TABSTRESL(6,64*NUMELIG3D),
@@ -427,7 +421,7 @@ C-----------------------------------------------
       INTEGER FVOFF(2,NFVBAG), INOD(4), INORM(3), NFVTR, NFVNOD,
      .        NFVPART, NFVSUBS, IDMAX, KK, NN, FVIAD, JJ, OFFPART,
      .        ELOFF, IDCMAX, NND, NBID1, NBID2, NBID3, NFVNODT, IDP,
-     .        NBPART2D, ISUBG,NRBE2T,NRBE3T,EMPSIZPL
+     .        NBPART2D,NRBE2T,NRBE3T,EMPSIZPL
       my_real
      .        GAMA, SSP, FAC
       INTEGER, DIMENSION(:), ALLOCATABLE :: OFFTR, ITAGT, FVEL2FA,
@@ -467,6 +461,8 @@ C
       INTEGER :: LEN_TMP_NAME
       CHARACTER(len=2048) :: TMP_NAME
       LOGICAL :: CONDITION
+      INTEGER :: IS_WRITTEN_NODE_FVM(AIRBAGS_TOTAL_FVM_IN_H3D)
+      INTEGER :: IS_WRITTEN_NODE(NUMNOD)
 C=======================================================================
       ALLOCATE(WAFT(SWAFT)   , MAS(SMAS)     , XNORM(SXNORM) ,
      .         XMASS1(SMASS1), XMASS2(SMASS2), XMASS3(SMASS3),
@@ -475,6 +471,7 @@ C=======================================================================
       WAFT(1:SWAFT) = ZERO
  
       ALLOCATE (WA4(SWA4), MAS4(SMAS))
+      ALLOCATE (WA4_FVM(AIRBAGS_TOTAL_FVM_IN_H3D))
 
       ALLOCATE(VFLU(3,NUMNOD), VVAR1(3,NUMNOD), AFLU(3,NUMNOD),
      .        VFLU_ALE(3,NUMNOD),FANREACT(3,NUMNOD),FANREACR(3,NUMNOD))
@@ -767,10 +764,10 @@ C
         NBPART = NBPART + MATER(I)
       ENDDO
 C
-      NBF =  NUMELQ + NUMELC + NUMELTG + NUMELUR
+      NBF =  NUMELQ + NUMELC + NUMELTG
       NBF_L = NBF
-      NBF = NUMELQG+NUMELCG+NUMELTGG+NUMELURG
-      DO I=1,NUMELQ + NUMELC + NUMELTG + NUMELUR + 1
+      NBF = NUMELQG+NUMELCG+NUMELTGG
+      DO I=1,NUMELQ + NUMELC + NUMELTG +  1
         EL2FA(I)=0
       ENDDO
 C
@@ -782,7 +779,7 @@ C
        NBF_PXFEMG  = 0
        NFNOD_PXFEMG = 0
 
-       IF(ANIM_PLY > 0 ) THEN
+       IF (ANIM_PLY > 0 ) THEN
 
          IF (NSPMD > 1) THEN
 C Xfem init for NSPMD > 1
@@ -1277,7 +1274,7 @@ C   PART SORT
 C-----------------------------------------------
       CALL PARSORC(X  ,D    ,XNORM,IAD  ,CDG   ,
      .            BUFEL,IPARG,IXQ  ,IXC   ,IXTG ,
-     .            ELBUF_TAB,INVERT,EL2FA,IXUR ,IADG ,
+     .            ELBUF_TAB,INVERT,EL2FA,IADG ,
      .            MATER,IPARTQ,IPARTC,IPARTUR,IPARTTG,
      .            NODGLOB)
 C
@@ -1842,7 +1839,7 @@ C-----------------------------------------------
      .   ANIM_CE(25)==1)THEN
          CALL DMASANIC(ELBUF_TAB,X    ,D    ,GEO  ,IPARG,
      .               IXQ  ,IXC  ,IXTG ,MAS  ,PM   ,
-     .               EL2FA,NBF  ,IXUR ,IGEO , STACK )
+     .               EL2FA,NBF  ,IGEO , STACK )
       ENDIF
 C-----------------------------------------------
 C   N FUNC TEXT
@@ -1934,12 +1931,12 @@ c stress gps
        IF(ANIM_N(IADGPS+6)==1) CALL ANI_TXT('GPS SIGXZ',9)
 c stress isogeo
        IADISO = IAD_GPS+300
-       IF(ANIM_N(IADISO+1)==1) CALL ANI_TXT('STRESS ISOGEO SIGXX',20)
-       IF(ANIM_N(IADISO+2)==1) CALL ANI_TXT('STRESS ISOGEO SIGYY',20)
-       IF(ANIM_N(IADISO+3)==1) CALL ANI_TXT('STRESS ISOGEO SIGZZ',20)
-       IF(ANIM_N(IADISO+4)==1) CALL ANI_TXT('STRESS ISOGEO SIGXY',20)
-       IF(ANIM_N(IADISO+5)==1) CALL ANI_TXT('STRESS ISOGEO SIGZY',20)
-       IF(ANIM_N(IADISO+6)==1) CALL ANI_TXT('STRESS ISOGEO SIGXZ',20)
+       IF(ANIM_N(IADISO+1)==1) CALL ANI_TXT('STRESS ISOGEO SIGXX',19)
+       IF(ANIM_N(IADISO+2)==1) CALL ANI_TXT('STRESS ISOGEO SIGYY',19)
+       IF(ANIM_N(IADISO+3)==1) CALL ANI_TXT('STRESS ISOGEO SIGZZ',19)
+       IF(ANIM_N(IADISO+4)==1) CALL ANI_TXT('STRESS ISOGEO SIGXY',19)
+       IF(ANIM_N(IADISO+5)==1) CALL ANI_TXT('STRESS ISOGEO SIGZY',19)
+       IF(ANIM_N(IADISO+6)==1) CALL ANI_TXT('STRESS ISOGEO SIGXZ',19)
 c strain gps
        IADGPS = IAD_GPS+400
        IF(ANIM_N(IADGPS+1)==1) CALL ANI_TXT('GPSTRAIN EPSXX',14)
@@ -1976,7 +1973,7 @@ C-----------------------------------------------
         IF(ANIM_CE(22)==1) CALL ANI_TXT('User Var 3',10)
         IF(ANIM_CE(23)==1) CALL ANI_TXT('User Var 4',10)
         IF(ANIM_CE(24)==1) CALL ANI_TXT('User Var 5',10)
-        IF(ANIM_CE(25)==1) CALL ANI_TXT('Hourglass Energy',16)
+        IF(ANIM_CE(25)==1) CALL ANI_TXT('Hourglass Energy per unit mass',30)
         IF(ANIM_CE(26)==1) CALL ANI_TXT('Strain Rate',11)
         IF(ANIM_CE(27)==1) CALL ANI_TXT('User Var 6',10)
         IF(ANIM_CE(28)==1) CALL ANI_TXT('User Var 7',10)
@@ -2022,14 +2019,14 @@ C-----------------------------------------------
         IF(ANIM_CE(2145)==1) CALL ANI_TXT('FVMBAG - Mass',13)
         IF(ANIM_CE(2146)==1) CALL ANI_TXT('FVMBAG - Pressure',17)
         IF(ANIM_CE(2147)==1)
-     .     CALL ANI_TXT('FVMBAG - Fluid velocity X',26)
+     .     CALL ANI_TXT('FVMBAG - Fluid velocity X',25)
         IF(ANIM_CE(2148)==1)
-     .     CALL ANI_TXT('FVMBAG - Fluid velocity Y',26)
+     .     CALL ANI_TXT('FVMBAG - Fluid velocity Y',25)
         IF(ANIM_CE(2149)==1)
-     .     CALL ANI_TXT('FVMBAG - Fluid velocity Z',26)
+     .     CALL ANI_TXT('FVMBAG - Fluid velocity Z',25)
         IF(ANIM_CE(2150)==1) CALL ANI_TXT('FVMBAG - Density',16)
         IF(ANIM_CE(2151)==1)
-     .     CALL ANI_TXT('FVMBAG - Specific Energy',25)
+     .     CALL ANI_TXT('FVMBAG - Specific Energy',24)
         IF(ANIM_CE(2152)==1) CALL ANI_TXT('FVMBAG - Sound Speed',20)
         IF(ANIM_CE(2153)==1) CALL ANI_TXT('FVMBAG - Gama',13)
         IF(ANIM_CE(2154)==1)
@@ -2060,14 +2057,13 @@ C
            ENDIF
         ENDDO
         IF(ANIM_CE(10240)==1) CALL  ANI_TXT('INTER PLY - MIN-DAMAGE',22)     
-        IF(ANIM_CE(10241)==1) CALL  ANI_TXT('INTER PLY -SIGZZ',17) 
-        IF(ANIM_CE(10242)==1) CALL  ANI_TXT('INTER PLY -SIGYZ',17) 
-        IF(ANIM_CE(10243)==1) CALL  ANI_TXT('INTER PLY -SIGXZ',17)    
-        IF(ANIM_CE(10244)==1) CALL  ANI_TXT('INTER PLY -EPSZZ',17) 
-        IF(ANIM_CE(10245)==1) CALL  ANI_TXT('INTER PLY -EPSYZ',17) 
-        IF(ANIM_CE(10246)==1) CALL  ANI_TXT('INTER PLY -EPSXZ',17) 
-        IF(ANIM_CE(10247)==1) CALL  ANI_TXT('INTER PLY -EINT',16)
-       
+        IF(ANIM_CE(10241)==1) CALL  ANI_TXT('INTER PLY -SIGZZ',16) 
+        IF(ANIM_CE(10242)==1) CALL  ANI_TXT('INTER PLY -SIGYZ',16) 
+        IF(ANIM_CE(10243)==1) CALL  ANI_TXT('INTER PLY -SIGXZ',16)    
+        IF(ANIM_CE(10244)==1) CALL  ANI_TXT('INTER PLY -EPSZZ',16) 
+        IF(ANIM_CE(10245)==1) CALL  ANI_TXT('INTER PLY -EPSYZ',16) 
+        IF(ANIM_CE(10246)==1) CALL  ANI_TXT('INTER PLY -EPSXZ',16) 
+        IF(ANIM_CE(10247)==1) CALL  ANI_TXT('INTER PLY -EINT',15)
         IF(ANIM_CE(10248)==1) CALL ANI_TXT('Volumetric Fraction 1',21)
         IF(ANIM_CE(10249)==1) CALL ANI_TXT('Volumetric Fraction 2',21)
         IF(ANIM_CE(10250)==1) CALL ANI_TXT('Volumetric Fraction 3',21)
@@ -2076,17 +2072,16 @@ C
 C-----------------------------------------------
 C   ELEMENT FAILURE COEFFECIENT : NXT CRITRIA
 C-----------------------------------------------
-        IF(ANIM_CE(10253)==1) CALL  ANI_TXT('NXT FAILURE FACTOR',19)
-        IF(ANIM_CE(10254)==1) CALL  ANI_TXT('SIGMA1/h',9)
-        IF(ANIM_CE(10255)==1) CALL  ANI_TXT('SIGMA2/h',9)
+        IF(ANIM_CE(10253)==1) CALL  ANI_TXT('NXT FAILURE FACTOR',18)
+        IF(ANIM_CE(10254)==1) CALL  ANI_TXT('SIGMA1/h',8)
+        IF(ANIM_CE(10255)==1) CALL  ANI_TXT('SIGMA2/h',8)
 C-----------------------------------------------
 C   DAMAGE FACTOR : MAX of ALL CRITRIA BY LAYER
 C-----------------------------------------------
-C 
         IF(ANIM_CE(10256)==1) CALL ANI_TXT('MAX DAMAGE ELEMENT',18)
-        IF(ANIM_CE(10257)==1) CALL ANI_TXT('MAX DAMAGE UPPER',18)
-        IF(ANIM_CE(10258)==1) CALL ANI_TXT('MAX DAMAGE LOWER',18)
-        IF(ANIM_CE(10259)==1) CALL ANI_TXT('MAX DAMAGE MEMBRANE',21)
+        IF(ANIM_CE(10257)==1) CALL ANI_TXT('MAX DAMAGE UPPER',16)
+        IF(ANIM_CE(10258)==1) CALL ANI_TXT('MAX DAMAGE LOWER',16)
+        IF(ANIM_CE(10259)==1) CALL ANI_TXT('MAX DAMAGE MEMBRANE',19)
         DO I=10260,10359
            IF(ANIM_CE(I)==1)THEN
             II = I - 10259
@@ -2095,9 +2090,9 @@ C
             CALL ANI_TXT(MES,20)
            ENDIF
         ENDDO   
-        IF(ANIM_CE(10360)==1) CALL ANI_TXT('NXT FAILURE FACTOR UPPER',25)
-        IF(ANIM_CE(10361)==1) CALL ANI_TXT('NXT FAILURE FACTOR LOWER',25)
-        IF(ANIM_CE(10362)==1) CALL ANI_TXT('NXT FAILURE FACTOR MEMBRANE',28)
+        IF(ANIM_CE(10360)==1) CALL ANI_TXT('NXT FAILURE FACTOR UPPER',24)
+        IF(ANIM_CE(10361)==1) CALL ANI_TXT('NXT FAILURE FACTOR LOWER',24)
+        IF(ANIM_CE(10362)==1) CALL ANI_TXT('NXT FAILURE FACTOR MEMBRANE',27)
         DO I=10363,10462
            IF(ANIM_CE(I)==1)THEN
             II = I - 10362
@@ -2106,9 +2101,9 @@ C
             CALL ANI_TXT(MES,32)
            ENDIF
         ENDDO  
-        IF(ANIM_CE(10463)==1) CALL ANI_TXT('SIGMA1/h UPPER',15)
-        IF(ANIM_CE(10464)==1) CALL ANI_TXT('SIGMA1/h LOWER',15)
-        IF(ANIM_CE(10465)==1) CALL ANI_TXT('SIGMA1/h MEMBRANE',18)
+        IF(ANIM_CE(10463)==1) CALL ANI_TXT('SIGMA1/h UPPER',14)
+        IF(ANIM_CE(10464)==1) CALL ANI_TXT('SIGMA1/h LOWER',14)
+        IF(ANIM_CE(10465)==1) CALL ANI_TXT('SIGMA1/h MEMBRANE',17)
         DO I=10466,10565
            IF(ANIM_CE(I)==1)THEN
             II = I - 10465
@@ -2117,9 +2112,9 @@ C
             CALL ANI_TXT(MES,22)
            ENDIF
         ENDDO 
-        IF(ANIM_CE(10566)==1) CALL ANI_TXT('SIGMA2/h UPPER',15)
-        IF(ANIM_CE(10567)==1) CALL ANI_TXT('SIGMA2/h LOWER',15)
-        IF(ANIM_CE(10568)==1) CALL ANI_TXT('SIGMA2/h MEMBRANE',18)
+        IF(ANIM_CE(10566)==1) CALL ANI_TXT('SIGMA2/h UPPER',14)
+        IF(ANIM_CE(10567)==1) CALL ANI_TXT('SIGMA2/h LOWER',14)
+        IF(ANIM_CE(10568)==1) CALL ANI_TXT('SIGMA2/h MEMBRANE',17)
         DO I=10569,10668
            IF(ANIM_CE(I)==1)THEN
             II = I - 10568
@@ -2183,10 +2178,10 @@ C-----------------------------------------------
         IF(ANIM_CE(11889)==1)CALL ANI_TXT('Detonation Time',15) 
         
         !multumaterial law 20 ouptus
-        IF(ANIM_CE(11890)==1)CALL ANI_TXT('Density-1',15) 
-        IF(ANIM_CE(11891)==1)CALL ANI_TXT('Density-2',15) 
-        IF(ANIM_CE(11892)==1)CALL ANI_TXT('Density-3',15) 
-        IF(ANIM_CE(11893)==1)CALL ANI_TXT('Density-4',15)                         
+        IF(ANIM_CE(11890)==1)CALL ANI_TXT('Density-1',9) 
+        IF(ANIM_CE(11891)==1)CALL ANI_TXT('Density-2',9) 
+        IF(ANIM_CE(11892)==1)CALL ANI_TXT('Density-3',9) 
+        IF(ANIM_CE(11893)==1)CALL ANI_TXT('Density-4',9)                         
 
         IF(ANIM_CE(11894)==1)CALL ANI_TXT('Specific Energy-1',17)                         
         IF(ANIM_CE(11895)==1)CALL ANI_TXT('Specific Energy-2',17)                         
@@ -2563,29 +2558,36 @@ C-----------------------------------------------
               WA4(N)=TEMP(N)
              ENDDO
            ELSE
-             !ALE Nodal Pressure
+             ! Nodal Pressure (from elems and/or fvmbags)
              IF (I==3) THEN
-               IF(N2D==0)CALL NODALP(I, WA4, IFLOW, RFLOW,IPARG,ELBUF_TAB,IXS,NIXS,ITAB,NV46)
-               IF(N2D/=0)CALL NODALP(I, WA4, IFLOW, RFLOW,IPARG,ELBUF_TAB,IXQ,NIXQ,ITAB,NV46)
+               IF(N2D==0)CALL NODALP(I, WA4, WA4_FVM, IFLOW, RFLOW,IPARG,ELBUF_TAB,IXS,NIXS,NUMELS,ITAB,NV46,MONVOL,VOLMON,
+     .                               0, IS_WRITTEN_NODE, IS_WRITTEN_NODE_FVM, ISPMD, FVDATA, SWA4, 0)
+               IF(N2D/=0)CALL NODALP(I, WA4, WA4_FVM, IFLOW, RFLOW,IPARG,ELBUF_TAB,IXQ,NIXQ,NUMELQ,ITAB,NV46,MONVOL,VOLMON,
+     .                               0, IS_WRITTEN_NODE, IS_WRITTEN_NODE_FVM, ISPMD, FVDATA, SWA4, 0)
              ENDIF
-             !ALE Nodal Density
+             ! Nodal Density (from elems and/or fvmbags)
              IF (I==4) THEN
-               IF(N2D==0)CALL NODALD(I, WA4, IFLOW, RFLOW,IPARG,ELBUF_TAB,IXS,NIXS,ITAB,NV46) 
-               IF(N2D/=0)CALL NODALD(I, WA4, IFLOW, RFLOW,IPARG,ELBUF_TAB,IXQ,NIXQ,ITAB,NV46) 
+               IF(N2D==0)CALL NODALD(I, WA4, WA4_FVM, IFLOW, RFLOW,IPARG,ELBUF_TAB,IXS,NIXS,NUMELS,ITAB,NV46,MONVOL,VOLMON,
+     .                               0, IS_WRITTEN_NODE, IS_WRITTEN_NODE_FVM, ISPMD, FVDATA, SWA4, 0) 
+               IF(N2D/=0)CALL NODALD(I, WA4, WA4_FVM, IFLOW, RFLOW,IPARG,ELBUF_TAB,IXQ,NIXQ,NUMELQ,ITAB,NV46,MONVOL,VOLMON,
+     .                               0, IS_WRITTEN_NODE, IS_WRITTEN_NODE_FVM, ISPMD, FVDATA, SWA4, 0) 
              ENDIF
-             !ALE Nodal Temperature
+             ! Nodal Temperature (from elems and/or fvmbags)
              IF (I==6) THEN
-               IF(N2D==0)CALL NODALT(I, WA4, IFLOW, RFLOW,IPARG,ELBUF_TAB,IXS,NIXS,ITAB,NV46)
-               IF(N2D/=0)CALL NODALT(I, WA4, IFLOW, RFLOW,IPARG,ELBUF_TAB,IXQ,NIXQ,ITAB,NV46)
+               IF(N2D==0)CALL NODALT(I, WA4, WA4_FVM, IFLOW, RFLOW,IPARG,ELBUF_TAB,IXS,NIXS,NUMELS,ITAB,NV46,MONVOL,VOLMON,
+     .                               0, IS_WRITTEN_NODE, IS_WRITTEN_NODE_FVM, ISPMD, FVDATA, SWA4, 0)
+               IF(N2D/=0)CALL NODALT(I, WA4, WA4_FVM, IFLOW, RFLOW,IPARG,ELBUF_TAB,IXQ,NIXQ,NUMELQ,ITAB,NV46,MONVOL,VOLMON,
+     .                               0, IS_WRITTEN_NODE, IS_WRITTEN_NODE_FVM, ISPMD, FVDATA, SWA4, 0)
              ENDIF
 
              !Then Monitored Volumes (Pressure,Density,Temperature,Sound Speed)
              CALL ANIMBALE(I, WA4, MONVOL, VOLMON ,2)
            ENDIF
 
-          !Nodal Potential
+          !Nodal Potential (/BEM/FLOW)
           ELSEIF (I==13) THEN
-            CALL NODALP(I, WA4, IFLOW, RFLOW,IPARG,ELBUF_TAB,IXS,NIXS,ITAB,NV46)
+            CALL NODALP(I, WA4, WA4_FVM, IFLOW, RFLOW,IPARG,ELBUF_TAB,IXS,NIXS,NUMELS,ITAB,NV46,MONVOL,VOLMON,
+     .                               0, IS_WRITTEN_NODE, IS_WRITTEN_NODE_FVM, ISPMD, FVDATA, SWA4, 0)
      
 C------------ams : diagonale mass change
           ELSEIF(I==14)THEN
@@ -3161,7 +3163,7 @@ C  en spmd localement NBF = 0 mais pas la somme sur pi !
      .      (I>=10253.AND.I<=10675) .OR. (I >= 10676 .AND. I <= 1000000)) THEN
             CALL DFUNCC(ELBUF_TAB ,WAFT        ,IFUNC         ,IPARG,GEO    ,
      .                  IXQ       ,IXC         ,IXTG          ,MAS          ,PM         ,
-     .                  EL2FA     ,NBF         ,IXUR          ,IAD          ,
+     .                  EL2FA     ,NBF         ,IAD          ,
      .                  NBF_L     ,EANI        ,ANIN(NDMA2+1) ,NBPART       ,IADG       ,
      .                  IPM       ,IGEO        ,THKE          ,ERR_THK_SH4  ,ERR_THK_SH3,
      .                  INVERT    ,X           ,V             ,W            ,ALE_CONNECTIVITY,
@@ -3323,8 +3325,8 @@ C-----------------------------------------------
         IF(ANIM_V(16)==1) CALL ANI_TXT('Gaz Velocity',12)
         IF(ANIM_V(17)==1) CALL ANI_TXT('Reaction Forces',15)
         IF(ANIM_V(18)==1) CALL ANI_TXT('Reaction Moments',16)
-        IF(ANIM_V(19)==1) CALL ANI_TXT('Cluster Forces',16)
-        IF(ANIM_V(20)==1) CALL ANI_TXT('Cluster Moments',16)
+        IF(ANIM_V(19)==1) CALL ANI_TXT('Cluster Forces',14)
+        IF(ANIM_V(20)==1) CALL ANI_TXT('Cluster Moments',15)
         IF(ANIM_V(21)==1) CALL ANI_TXT('inter22 - Centroid Velocity',27)          !inter22
         IF(ANIM_V(22)==1) CALL ANI_TXT('inter22 - Faces Velocity',24)             !inter22
         IF(ANIM_V(23)==1) 
@@ -3381,15 +3383,13 @@ C     ENDIF
      .       NFNOD_CRKXFEMG)
 
       IF(ANIM_V(7)==1) CALL VELVEC2(ICBUF(MIC2),BID_TEMP,CBUF(MAC2),
-     .    NODCUT,FOPT(1,1),NPBY,NNWL,NNNSRG,IXUR,
+     .    NODCUT,FOPT(1,1),NPBY,NNWL,NNNSRG,
      .    NODGLOB,WEIGHT,FR_SEC,NFVNOD,NFNOD_PXFEM,NFNOD_PXFEMG,
      .    NFNOD_CRKXFEMG)
       IF(ANIM_V(8)==1) CALL VELVEC2(ICBUF(MIC2),BID_TEMP,CBUF(MAC2),
-     .    NODCUT,FOPT(4,1),NPBY,NNWL,NNNSRG,IXUR,
+     .    NODCUT,FOPT(4,1),NPBY,NNWL,NNNSRG,
      .    NODGLOB,WEIGHT,FR_SEC,NFVNOD,NFNOD_PXFEM,NFNOD_PXFEMG,
      .    NFNOD_CRKXFEMG)
-c     .                 MSHSUB>0 .OR. IISROT>0 .OR. IMPOSE_DR>0 ) .AND.
-c     .                 IRODDL/=0) THEN
       IF(ANIM_V(9)==1 .AND. IRODDL/=0) THEN
           CALL VELVEC(VR,BID_TEMP,ICBUF(MIC2),CBUF(MAC2),NODCUT,
      .                NNWL,NNNSRG,NODGLOB,WEIGHT,NFVNOD,9,
@@ -3479,9 +3479,7 @@ C
      .       NFNOD_CRKXFEMG)
       ENDIF
 C
-      IF(ANIM_V(14)==1 .AND.(IDROT == 1 .OR. ISECUT>0 .OR. ISUB>0 .OR.
-     .            MSHSUB>0 .OR. IISROT>0 .OR. IMPOSE_DR>0 ) .AND.
-     .           IRODDL/=0) THEN
+      IF(ANIM_V(14)==1 .AND.(IDROT == 1 .OR. ISECUT>0 .OR. IISROT>0 .OR. IMPOSE_DR>0 ) .AND. IRODDL/=0) THEN
         CALL VELVEC(DR,BID_TEMP,ICBUF(MIC2),CBUF(MAC2),NODCUT,NNWL,
      .       NNNSRG,NODGLOB,WEIGHT,NFVNOD,14,
      .       NFNOD_PXFEM,NOD_PXFEM,INDX_PLY,NFNOD_CRKXFEMG,ITAB)
@@ -3594,7 +3592,7 @@ C   2D TENSOR TEXT
 C-----------------------------------------------
 C  en spmd localement NBF = 0 mais pas la somme sur p0 !
 C  sur p0 nbf global
-       IF(ISPMD==0.AND.NBF+NELCUT+NESBW2/=0)THEN
+      IF (ISPMD==0.AND.NBF+NELCUT+NESBW2/=0)THEN
         IF(ANIM_CT(1)==1) CALL ANI_TXT('Stress (membrane)',17)
         IF(ANIM_CT(2)==1) CALL ANI_TXT('Stress (moment/t^2)',19)
         IF(ANIM_CT(3)==1) CALL ANI_TXT('Stress (upper)',14)
@@ -3772,55 +3770,84 @@ C-----------------------------------------------
             END IF
           ENDDO
         ENDDO
+
+c-----------------------------------------------------------
+c       Stress output in material (orthotropic) coordinates
+c-----------------------------------------------------------
+        IDX = 3120 + 3*MX_PLY_ANIM
+
+        IF (ANIM_CT(IDX+1)==1) CALL ANI_TXT('Mstress (membrane)',18)
+        IF (ANIM_CT(IDX+2)==1) CALL ANI_TXT('Mstress (upper)',15)
+        IF (ANIM_CT(IDX+3)==1) CALL ANI_TXT('Mstress (lower)',15)
+c
+        IDX = 3120 + 3*MX_PLY_ANIM + 3
+        DO I = IDX+1,IDX+100
+         IF (ANIM_CT(I)==1) THEN
+           WRITE(MES,'(A,I3,A)')'Mstress (layer',I,')'
+           CALL ANI_TXT(MES,18)
+         ENDIF
+        ENDDO
+c
+c       /ANIM/SHELL/IDPLY/MSTRESS/KEY5/KEY6  (prop type 17, 51 and 52 only)
+c
+        IDX = 3120 + 3*MX_PLY_ANIM + 103
+        DO I = IDX+1,IDX + MX_PLY_ANIM
+          IF (ANIM_CT(I) == 1) THEN
+            WRITE(MES,'(A,I10,X,I3,A)')
+     .      'Mstress (PLY/IPT',PLY_ANIM_STRESS( 3 * (I - 1) + 1),
+     .      PLY_ANIM_STRESS(3 * (I - 1) + 3),')'
+            CALL ANI_TXT(MES,30)
+          END IF
+        ENDDO
 !
-       ENDIF  ! IF(ISPMD==0.AND.NBF+NELCUT+NESBW2/=0)
+      ENDIF  ! IF(ISPMD==0.AND.NBF+NELCUT+NESBW2/=0)
 C-----------------------------------------------
 C   2D TENSOR
 C-----------------------------------------------
-       DO I = 1,MX_ANI
-         IFUNC = I
-         IF(ANIM_CT(I)==1)THEN
-           CALL TENSORC(ELBUF_TAB,IPARG ,IFUNC ,INVERT,NELCUT,
-     .                  EL2FA    ,NBF   ,WAFT  ,TANI  ,IAD   ,
-     .                  NBF_L    ,NBPART,IADG  ,X     ,IXC   ,
-     .                  IGEO     ,IXTG  ,IPM   ,STACK )
-           IF (ISPMD==0) THEN
-             R4 = ZERO
-             DO J=1,NESBW2
-              CALL WRITE_R_C(R4,1)
-              CALL WRITE_R_C(R4,1)
-              CALL WRITE_R_C(R4,1)
-             ENDDO
-           ENDIF
-C
-           IF(ANIM_PLY > 0 .AND. ANIM_CT(I) == 1) THEN
-              CALL TENSORC_PLY( IPLY,    NEL_PLY,  ELBUF_TAB ,IPARG,
-     .                          IFUNC,   INVERT,   EL2FA_PLY ,NBF_PXFEM,
-     .                          WAFT_PLY,TANI,     IAD,       PLYNUMC,
-     .                          NBPART,  IAD_PLYG, X,         IXC,
-     .                          IGEO,    IXTG,     NBF_PXFEMG,IPM, STACK )
+      DO I = 1,MX_ANI
+        IFUNC = I
+        IF (ANIM_CT(I) == 1) THEN
+          CALL TENSORC(ELBUF_TAB,IPARG ,IFUNC ,INVERT,NELCUT,
+     .                 EL2FA    ,NBF   ,WAFT  ,TANI  ,IAD   ,
+     .                 NBF_L    ,NBPART,IADG  ,X     ,IXC   ,
+     .                 IGEO     ,IXTG  ,IPM   ,STACK ,MAT_PARAM)
+          IF (ISPMD==0) THEN
+            R4 = ZERO
+            DO J=1,NESBW2
+             CALL WRITE_R_C(R4,1)
+             CALL WRITE_R_C(R4,1)
+             CALL WRITE_R_C(R4,1)
+            ENDDO
           ENDIF
 C
-           IF(ANIM_CRK > 0 .AND. ANIM_CT(I) == 1) THEN
-              CALL TENSORC_CRK(
-     .                ELBUF_TAB,XFEM_TAB ,IPARG    ,IPM         ,
-     .                IFUNC    ,INVERT   ,EL2FA_CRK,NBF_CRKXFEMG,
-     .                LEN_CRKX ,TANI     ,IAD      ,NBF_CRKXFEM ,
-     .                NBPART   ,IAD_CRKG ,X        ,IXC         ,
-     .                IGEO     ,IXTG     ,IEL_CRK  ,IADC_CRK    ,
-     .                CRKEDGE  ,INDX_CRK )
+          IF (ANIM_PLY > 0) THEN    ! prop type 17 only
+             CALL TENSORC_PLY(IPLY,    NEL_PLY,  ELBUF_TAB ,IPARG,
+     .                        IFUNC,   INVERT,   EL2FA_PLY ,NBF_PXFEM,
+     .                        WAFT_PLY,TANI,     IAD,       PLYNUMC,
+     .                        NBPART,  IAD_PLYG, X,         IXC,
+     .                        IGEO,    IXTG,     NBF_PXFEMG,IPM, STACK )
+          ENDIF
+C
+          IF (ANIM_CRK > 0) THEN
+             CALL TENSORC_CRK(
+     .               ELBUF_TAB,XFEM_TAB ,IPARG    ,IPM         ,
+     .               IFUNC    ,INVERT   ,EL2FA_CRK,NBF_CRKXFEMG,
+     .               LEN_CRKX ,TANI     ,IAD      ,NBF_CRKXFEM ,
+     .               NBPART   ,IAD_CRKG ,X        ,IXC         ,
+     .               IGEO     ,IXTG     ,IEL_CRK  ,IADC_CRK    ,
+     .               CRKEDGE  ,INDX_CRK )
           ENDIF
 C
           IF (ISPMD==0.AND.NFVTR>0) THEN
-              R4=ZERO
-              DO J=1,NFVTR
-                 CALL WRITE_R_C(R4,1)
-                 CALL WRITE_R_C(R4,1)
-                 CALL WRITE_R_C(R4,1)
-              ENDDO
-           ENDIF
-         ENDIF
-       ENDDO
+            R4 = ZERO
+            DO J=1,NFVTR
+               CALL WRITE_R_C(R4,1)
+               CALL WRITE_R_C(R4,1)
+               CALL WRITE_R_C(R4,1)
+            ENDDO
+          ENDIF
+        ENDIF
+      ENDDO
 
 C-----------------------------------------------
 C   ELEMENT MASS
@@ -3845,7 +3872,7 @@ C xfem crack for layered shells ---
            MAS4(I) = MAS(I)
          ENDDO
          IF(ISPMD==0) THEN
-           BUF = (NUMELQG+NUMELCG+NUMELTGG+NUMELURG)
+           BUF = (NUMELQG+NUMELCG+NUMELTGG)
          ELSE
            BUF=1
          END IF
@@ -4063,7 +4090,7 @@ C  Traitment equivalent monoproc
 C
       CALL DELNUMBC(IPARG,IXQ  ,IXC   ,IXTG ,INVERT,
      .             EL2FA,NBF  ,WAFT ,NELCUT,
-     .             IXUR       ,DD_IAD,IAD ,NBF_L,
+     .             DD_IAD,IAD ,NBF_L,
      .             NBPART,IADG,NODGLOB,IDCMAX)
       IF (ISPMD==0) THEN
          DO J=1,NESBW2
@@ -4077,7 +4104,7 @@ C
           CALL DELNUMBC_PLY(IPLY,NEL_PLY,IPARG,
      .             IXC   ,IXTG ,INVERT,
      .             EL2FA_PLY,NBF_PXFEM  ,WAFT_PLY ,NELCUT,
-     .             IXUR  ,DD_IAD,IAD ,PLYNUMC,
+     .             DD_IAD,IAD ,PLYNUMC,
      .             NBPART,IAD_PLYG,NODGLOB,IDCMAX,NBF_PXFEMG)
        ENDIF
 C
@@ -4365,7 +4392,7 @@ C-----------------------------------------------
        IF(ANIM_SE(22)==1) CALL ANI_TXT('User Var 3',10)
        IF(ANIM_SE(23)==1) CALL ANI_TXT('User Var 4',10)
        IF(ANIM_SE(24)==1) CALL ANI_TXT('User Var 5',10)       
-       IF(ANIM_SE(25)==1) CALL ANI_TXT('Hourglass Energy',16)
+       IF(ANIM_SE(25)==1) CALL ANI_TXT('Hourglass Energy per unit mass',30)
        IF(ANIM_SE(26)==1) CALL ANI_TXT('Strain Rate',11)
        IF(ANIM_SE(27)==1) CALL ANI_TXT('User Var 6',10)
        IF(ANIM_SE(28)==1) CALL ANI_TXT('User Var 7',10)
@@ -4511,10 +4538,10 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   LAW51 OUTPUTS
 C-----------------------------------------------
-        IF(ANIM_SE(4897)==1)CALL ANI_TXT('Density-1',15) 
-        IF(ANIM_SE(4898)==1)CALL ANI_TXT('Density-2',15) 
-        IF(ANIM_SE(4899)==1)CALL ANI_TXT('Density-3',15) 
-        IF(ANIM_SE(4900)==1)CALL ANI_TXT('Density-4',15)                         
+        IF(ANIM_SE(4897)==1)CALL ANI_TXT('Density-1',9) 
+        IF(ANIM_SE(4898)==1)CALL ANI_TXT('Density-2',9) 
+        IF(ANIM_SE(4899)==1)CALL ANI_TXT('Density-3',9) 
+        IF(ANIM_SE(4900)==1)CALL ANI_TXT('Density-4',9)                         
 
         IF(ANIM_SE(4901)==1)CALL ANI_TXT('Specific Energy-1',17)                         
         IF(ANIM_SE(4902)==1)CALL ANI_TXT('Specific Energy-2',17)                         
@@ -4633,7 +4660,7 @@ C-----------------------------------------------
      4              IADG      ,SPBUF     ,IPART       ,IPARTSP     ,ISPH3D       ,
      5              X         ,V         ,W           ,ALE_CONNECTIVITY,
      6              NERCVOIS  ,NESDVOIS  ,LERCVOIS    ,LESDVOIS    ,BUFMAT       ,
-     7              FANI_CELL ,MULTI_FVM)
+     7              FANI_CELL ,MULTI_FVM ,MAT_PARAM   )
         ENDIF
       ENDDO
 C-----------------------------------------------
@@ -5097,9 +5124,10 @@ C-----------------------------------------------
            CALL ANI_TXT(MES,21)
          END IF
        ENDDO
-!
-       ! For TRUSS element only
-       IF (ANIM_FE(123)==1) CALL ANI_TXT('Strain X ',9)
+!       
+       IF (ANIM_FE(123)==1) CALL ANI_TXT('Strain X ',9)! For TRUSS element only
+       IF (ANIM_FE(124)==1) CALL ANI_TXT('Strain rate',11)
+       IF (ANIM_FE(125)==1) CALL ANI_TXT('Damage ',7)
 !
       ENDIF
 C-----------------------------------------------
@@ -6283,7 +6311,7 @@ C
        IF(ANIM_SE(22)==1) CALL ANI_TXT('User Var 3',10)
        IF(ANIM_SE(23)==1) CALL ANI_TXT('User Var 4',10)
        IF(ANIM_SE(24)==1) CALL ANI_TXT('User Var 5',10)
-       IF(ANIM_SE(25)==1) CALL ANI_TXT('Hourglass Energy',16)
+       IF(ANIM_SE(25)==1) CALL ANI_TXT('Hourglass Energy per unit mass',30)
        IF(ANIM_SE(26)==1) CALL ANI_TXT('Strain Rate',11)
        IF(ANIM_SE(27)==1) CALL ANI_TXT('User Var 6',10)
        IF(ANIM_SE(28)==1) CALL ANI_TXT('User Var 7',10)
@@ -6614,6 +6642,7 @@ C
      .            XFUNC1,XFUNC2,XFUNC3,XUSR)
  
        DEALLOCATE(WA4,MAS4)
+       DEALLOCATE(WA4_FVM)
 
        DEALLOCATE(VFLU,VVAR1,AFLU,VFLU_ALE,FANREACT,FANREACR)
 
@@ -6629,7 +6658,7 @@ Chd|-- called by -----------
 Chd|        GENANI                        source/output/anim/generate/genani.F
 Chd|-- calls ---------------
 Chd|        SPMD_GATHER_XYZ16             source/mpi/anim/spmd_gather_xyz16.F
-Chd|        WRITE_R_C                     source/output/tools/sortie_c.c
+Chd|        WRITE_R_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|====================================================================
       SUBROUTINE XYZ16(IXS,IXS10,IXS20,IXS16,X)
 C-----------------------------------------------
@@ -6642,8 +6671,6 @@ C-----------------------------------------------
 #include      "task_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "param_c.inc"
-#include      "scr05_c.inc"
 #include      "spmd_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -6744,7 +6771,7 @@ Chd|  XYZNOR16                      source/output/anim/generate/genani.F
 Chd|-- called by -----------
 Chd|        GENANI                        source/output/anim/generate/genani.F
 Chd|-- calls ---------------
-Chd|        WRITE_S_C                     source/output/tools/sortie_c.c
+Chd|        WRITE_S_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|====================================================================
       SUBROUTINE XYZNOR16(IXS,IXS10,IXS20,IXS16,X)
 C-----------------------------------------------
@@ -6754,9 +6781,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com04_c.inc"
-#include      "param_c.inc"
-#include      "scr05_c.inc"
 #include      "spmd_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -6810,10 +6834,6 @@ C-----------------------------------------------
 #include      "param_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
-#include      "parit_c.inc"
-#include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -6960,7 +6980,7 @@ Chd|        GENANI                        source/output/anim/generate/genani.F
 Chd|-- calls ---------------
 Chd|        SPMD_FVB_SCAT_NUM_NODA        source/mpi/anim/spmd_fvb_scat_num_noda.F
 Chd|        FVBAG_MOD                     share/modules/fvbag_mod.F     
-Chd|        FVMBAG_MESHCONTROL_MOD        ../common_source/modules/fvmbag_meshcontrol_mod.F
+Chd|        FVMBAG_MESHCONTROL_MOD        ../common_source/modules/airbag/fvmbag_meshcontrol_mod.F
 Chd|====================================================================
       SUBROUTINE ALEVFLU(VFLU , NNT, IBUF, U, NNA,
      .                   IBUFA, UA,  IFV)
@@ -6973,12 +6993,7 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "task_c.inc"
-#include      "param_c.inc"
 #include      "com01_c.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -7028,9 +7043,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NNO, NNI, IBUF(*), IBUFI(*)
@@ -7069,10 +7081,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "task_c.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NNO, NNI, NNO_L, NNI_L, IBUF(*), IBUFI(*),
@@ -7107,7 +7115,7 @@ Chd|-- called by -----------
 Chd|        GENANI                        source/output/anim/generate/genani.F
 Chd|-- calls ---------------
 Chd|        SPMD_R4GET_PARTN              source/mpi/anim/spmd_r4get_partn.F
-Chd|        WRITE_R_C                     source/output/tools/sortie_c.c
+Chd|        WRITE_R_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|====================================================================
       SUBROUTINE ANIMCALE(IANIM , MONVOL, VOLMON, NBF, EL2FA,
      .                    NBPART, IADG  , NBF_L )
@@ -7120,7 +7128,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr05_c.inc"
 #include      "param_c.inc"
 #include      "task_c.inc"
 #include      "spmd_c.inc"
@@ -7188,7 +7195,7 @@ C
         ENDDO
       ELSE
         IF (ISPMD==0) THEN
-           BUF = (NUMELQG+NUMELCG+NUMELTGG+NUMELURG)*4
+           BUF = (NUMELQG+NUMELCG+NUMELTGG)*4
         ELSE
            BUF=1
         ENDIF
@@ -7203,7 +7210,7 @@ Chd|  ALEVEC                        source/output/anim/generate/genani.F
 Chd|-- called by -----------
 Chd|        GENANI                        source/output/anim/generate/genani.F
 Chd|-- calls ---------------
-Chd|        WRITE_R_C                     source/output/tools/sortie_c.c
+Chd|        WRITE_R_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|        FVBAG_MOD                     share/modules/fvbag_mod.F     
 Chd|====================================================================
       SUBROUTINE ALEVEC()
@@ -7215,13 +7222,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com01_c.inc"
-C-----------------------------------------------
-C   D u m m y   A r g u m e n t s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

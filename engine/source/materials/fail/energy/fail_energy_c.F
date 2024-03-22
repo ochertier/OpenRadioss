@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -32,8 +32,10 @@ Chd|====================================================================
      1     NEL      ,NUPARAM  ,NUVAR    ,NFUNC    ,IFUNC    ,
      2     UPARAM   ,UVAR     ,NPF      ,TF       ,TIME     , 
      3     NGL      ,IPG      ,ILAY     ,IPT      ,EPSP     ,
-     4     EINT     ,AREA     ,THK      ,PTHKF    ,DMG_FLAG ,
-     5     DMG_SCALE,OFF      ,FOFF     ,DFMAX    ,TDEL     )
+     4     AREA     ,THK      ,DMG_FLAG ,
+     5     DMG_SCALE,OFF      ,FOFF     ,DFMAX    ,TDEL     ,
+     6     SIGNXX   ,SIGNYY   ,SIGNXY   ,SIGNYZ   ,SIGNZX   ,
+     7     DEPSXX   ,DEPSYY   ,DEPSXY   ,DEPSYZ   ,DEPSZX   )
 C-----------------------------------------------
 C    energy failure model
 C-----------------------------------------------
@@ -60,7 +62,6 @@ C EINT    | NEL     | F | R | INTERNAL ENERGY
 C---------+---------+---+---+--------------------------------------------
 C OFF     | NEL     | F | R | DELETED ELEMENT FLAG (=1. ON, =0. OFF)
 C FOFF    | NEL     | I |R/W| DELETED INTEGRATION POINT FLAG (=1 ON, =0 OFF)
-C PTHKF   |  1      | F | W | PERCENTAGE OF LAYER THICKNESS TO FAIL
 C DFMAX   | NEL     | F |R/W| MAX DAMAGE FACTOR 
 C TDEL    | NEL     | F | W | FAILURE TIME
 C DMG_FLAG|  1      | I | W | STRESS REDUCTION FLAG DUE TO DAMAGE
@@ -76,15 +77,15 @@ C-----------------------------------------------
       INTEGER ,INTENT(IN) :: NEL,NUPARAM,NUVAR,IPG,ILAY,IPT
       INTEGER ,DIMENSION(NEL) ,INTENT(IN) :: NGL
       my_real ,INTENT(IN) :: TIME
-      my_real ,DIMENSION(NEL) ,INTENT(IN)    :: AREA,THK,EPSP,OFF
+      my_real ,DIMENSION(NEL) ,INTENT(IN)    :: AREA,THK,EPSP,OFF,
+     .  SIGNXX,SIGNYY,SIGNXY,SIGNYZ,SIGNZX,DEPSXX,DEPSYY,DEPSXY,
+     .  DEPSYZ,DEPSZX
       my_real,DIMENSION(NUPARAM) ,INTENT(IN) :: UPARAM
-      my_real ,DIMENSION(NEL,2) ,INTENT(IN)  :: EINT
 C-----------------------------------------------
 C   I N P U T   O U T P U T   A r g u m e n t s 
 C-----------------------------------------------
       INTEGER ,INTENT(OUT) ::DMG_FLAG
       INTEGER ,DIMENSION(NEL) ,INTENT(INOUT) :: FOFF
-      my_real ,INTENT(OUT) :: PTHKF
       my_real ,DIMENSION(NEL) ,INTENT(INOUT) :: DFMAX
       my_real ,DIMENSION(NEL) ,INTENT(OUT)   :: TDEL,DMG_SCALE
       my_real ,DIMENSION(NEL,NUVAR) ,INTENT(INOUT) :: UVAR
@@ -111,7 +112,6 @@ C-----------------------------------------------
 C=======================================================================
       RIEF1    = UPARAM(1)             
       RIEF2    = UPARAM(2)           
-      PTHKF    = UPARAM(3)
       XFAC     = UPARAM(4)           
       DMG_FLAG = INT(UPARAM(5))
       NINDX    = 0  
@@ -127,8 +127,12 @@ C-----------------------------------------------
           R1 = RIEF1*RFAC
           R2 = RIEF2*RFAC
 
-          IE_SP = (EINT(I,1) + EINT(I,2))/AREA(I)/THK(I)
-
+          UVAR(I,1) = UVAR(I,1) + SIGNXX(I)*DEPSXX(I) + 
+     .                            SIGNYY(I)*DEPSYY(I) +
+     .                            SIGNXY(I)*DEPSXY(I) + 
+     .                            SIGNYZ(I)*DEPSYZ(I) + 
+     .                            SIGNZX(I)*DEPSZX(I)
+          IE_SP = UVAR(I,1)
           IF (IE_SP > R1) THEN
             DAMAGE(I) = (IE_SP-R1)/(R2-R1)
             DAMAGE(I) = MIN(ONE,DAMAGE(I))

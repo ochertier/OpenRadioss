@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,13 +27,13 @@ Chd|        ALEWDX                        source/ale/grid/alewdx.F
 Chd|-- calls ---------------
 Chd|        INTERP                        source/tools/curve/interp.F   
 Chd|        RGWATH                        source/interfaces/int09/rgwath.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
-      SUBROUTINE RGWAL1(X       ,A	,V	  ,W	  ,RWBUF   ,
-     2                  LPRW    ,NPRW	, 
-     3                  ICODT   ,ISKEW  ,SKEW	  ,MS	  ,FSAV    ,
-     4                  IXS     ,IXQ	,ELBUF_TAB,IPARG  ,
-     5                  PM      ,NALE	,TF	  ,NPF	  ,WEIGHT  ,
+      SUBROUTINE RGWAL1(X       ,A  ,V    ,W    ,RWBUF   ,
+     2                  LPRW    ,NPRW  , 
+     3                  ICODT   ,ISKEW  ,SKEW    ,MS    ,FSAV    ,
+     4                  IXS     ,IXQ  ,ELBUF_TAB,IPARG  ,
+     5                  PM      ,NALE  ,TF    ,NPF    ,WEIGHT  ,
      6                  IAD_ELEM,FR_ELEM,FR_WALL )
 C-----------------------------------------------
 C   M o d u l e s
@@ -48,14 +48,8 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "task_c.inc"
 #include      "param_c.inc"
-#include      "secur_c.inc"
-#include      "units_c.inc"
-#include      "scr05_c.inc"
-#include      "parit_c.inc"
 #include      "com08_c.inc"
-#include      "tabsiz_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -96,11 +90,11 @@ C-----------------------
               CALL INTERP(TF(NPF(IFUNC)),TIME,NPOINT,TEMP,BID)
               TEMP = TEMP * RWBUF(10,N)
               CALL RGWATH(
-     1          X       ,V	     ,W       ,RWBUF(1,N),LPRW(K)    ,
-     2          NSN     ,NPRW(N3)    ,MS      ,FSAV(1,N) ,IXS	     ,
-     3          IXQ     ,ELBUF_TAB   ,IPARG   ,PM	 ,
-     4          NTAG    ,LPRW(K+NSN) ,NE      ,TEMP	 ,RWBUF(11,N),
-     5          E       ,A	     ,NPRW(N2),WEIGHT	 ,IAD_ELEM   ,
+     1          X       ,V       ,W       ,RWBUF(1,N),LPRW(K)    ,
+     2          NSN     ,NPRW(N3)    ,MS      ,FSAV(1,N) ,IXS       ,
+     3          IXQ     ,ELBUF_TAB   ,IPARG   ,PM   ,
+     4          NTAG    ,LPRW(K+NSN) ,NE      ,TEMP   ,RWBUF(11,N),
+     5          E       ,A       ,NPRW(N2),WEIGHT   ,IAD_ELEM   ,
      6          FR_ELEM ,FR_WALL(1,N))
               K=K+NINT(RWBUF(8,N))
             ENDIF

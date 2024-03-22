@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -34,9 +34,9 @@ Chd|        SENSOR_MOD                    share/modules/sensor_mod.F
 Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
       SUBROUTINE I25MAIND_2(
-     1       IPARI    ,ITAB     ,SENSOR_TAB,INTLIST25,INTBUF_TAB ,
+     1       IPARI    ,ITAB    ,SENSOR_TAB,INTLIST25,INTBUF_TAB ,
      2       X        ,V       ,KINET   ,JTASK    ,NB_DST2    ,
-     3       ICODT    ,ISKEW   )
+     3       ICODT    ,ISKEW   ,NSENSOR )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -54,28 +54,19 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "scr04_c.inc"
-#include      "scr05_c.inc"
-#include      "scr06_c.inc"
-#include      "secur_c.inc"
-#include      "spmd_c.inc"
 #include      "task_c.inc"
-#include      "timeri_c.inc"
-#include      "warn_c.inc" 
-#include      "scr17_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER ,INTENT(IN) :: NSENSOR
       INTEGER IPARI(NPARI,*), ITAB(*), INTLIST25(*), JTASK,
      .        KINET(*), NB_DST2(PARASIZ), ICODT(*), ISKEW(*)
       my_real :: X(3,*), V(3,*)
       TYPE(INTBUF_STRUCT_),DIMENSION(NINTER) :: INTBUF_TAB
-      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE (SENSOR_STR_)  ,DIMENSION(NSENSOR) ,INTENT(IN) :: SENSOR_TAB
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

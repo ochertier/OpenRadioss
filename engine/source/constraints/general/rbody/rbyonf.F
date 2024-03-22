@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -28,7 +28,7 @@ Chd|-- calls ---------------
 Chd|        RBYPID                        source/constraints/general/rbody/rbypid.F
 Chd|        SPMD_GLOB_ISUM9               source/mpi/interfaces/spmd_th.F
 Chd|        SPMD_IBCAST                   source/mpi/generic/spmd_ibcast.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE RBYONF(IPARG   ,IPARI         ,MS     ,IN     ,
      2                  IXS     ,IXQ    ,IXC   ,IXT    ,IXP    ,
@@ -52,7 +52,6 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "param_c.inc"
 #include      "units_c.inc"
-#include      "scr05_c.inc"
 #include      "task_c.inc"
 #include      "scr17_c.inc"
 C-----------------------------------------------
@@ -205,7 +204,7 @@ C
       ENDDO
 C
       DO K=1,NLOADC
-	NN   = ICFIELD(1,K) 
+          NN   = ICFIELD(1,K) 
         IAD  = ICFIELD(4,K)
         DO I=1,NN
          N=LCFIELD(IAD+I-1)
@@ -221,13 +220,13 @@ Chd|-- called by -----------
 Chd|        RESOL                         source/engine/resol.F         
 Chd|-- calls ---------------
 Chd|        RBYPID                        source/constraints/general/rbody/rbypid.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
 Chd|====================================================================
       SUBROUTINE RBYSENS(IPARG,IPARI      ,MS    ,IN   ,
      2                  IXS  ,IXQ  ,IXC   ,IXT   ,IXP  ,
      3                  IXR  ,SKEW ,ITAB  ,ITABM1,ISKWN,
-     4                  NPBY ,ITAG  ,LPBY ,FSKY  ,
+     4                  NPBY ,ITAG  ,LPBY ,FSKY  ,NSENSOR,
      5                  RBY  ,X    ,V     ,VR    ,IXTG ,
      6                  IGRV ,IBGR ,SENSOR_TAB,A     ,AR   ,
      7                  FSAV,STIFN,STIFR  ,FANI  ,WEIGHT,
@@ -250,13 +249,13 @@ C-----------------------------------------------
 #include      "com08_c.inc"
 #include      "param_c.inc"
 #include      "units_c.inc"
-#include      "scr05_c.inc"
 #include      "task_c.inc"
 #include      "parit_c.inc"
 #include      "scr17_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER ,INTENT(IN) :: NSENSOR
       INTEGER IPARG(NPARG,*), IPARI(*), IXS(NIXS,*), IXQ(NIXQ,*),
      .   IXC(NIXC,*), IXT(NIXT,*), IXP(NIXP,*), IXR(NIXR,*),
      .   ITAB(*), ITABM1(*),IGRV(NIGRV,*),IBGR(*),
@@ -269,7 +268,7 @@ C     REAL
      .   FSAV(NTHVKI,*), STIFN(*),STIFR(*),FANI(3,*),
      .   DMAST, DINERT, BUFSF(*),PARTSAV(*)
       TYPE(ELBUF_STRUCT_), DIMENSION(NGROUP) :: ELBUF_TAB
-      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE(SENSOR_STR_)  ,DIMENSION(NSENSOR) ,INTENT(IN) :: SENSOR_TAB
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -616,7 +615,7 @@ C
       ENDDO
 C
       DO K=1,NLOADC
-	NN   = ICFIELD(1,K) 
+          NN   = ICFIELD(1,K) 
         IAD  = ICFIELD(4,K)
         DO I=1,NN
          N=LCFIELD(IAD+I-1)

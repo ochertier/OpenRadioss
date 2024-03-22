@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -43,19 +43,7 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
-C   D u m m y   A r g u m e n t s
-C-----------------------------------------------
-C-----------------------------------------------
-C   E x t e r n a l   F u n c t i o n s
-C-----------------------------------------------
-C-----------------------------------------------
-C   L o c a l   V a r i a b l e s
+C   S o u r c e   L i n e s
 C-----------------------------------------------
         SENSOR_USER_STRUCT%IS_USED = .FALSE.
 

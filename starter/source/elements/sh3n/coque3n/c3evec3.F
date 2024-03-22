@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -60,15 +60,9 @@ C-----------------------------------------------
      .        X21(MVSIZ), Y21(MVSIZ), Z21(MVSIZ), AREA(MVSIZ),
      .        X2L(MVSIZ), X3L(MVSIZ), Y3L(MVSIZ)
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "vect01_c.inc"
-C-----------------------------------------------
-C   L o c a l   V a r i a b l e s
-C-----------------------------------------------
       INTEGER I
       my_real SUM
-C=======================================================================
+C-----------------------------------------------
       DO I=JFT,JLT
         X21(I)=X2(I)-X1(I)
         Y21(I)=Y2(I)-Y1(I)

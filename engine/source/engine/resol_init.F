@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -34,13 +34,13 @@ Chd|        CHKINIT                       source/interfaces/interf/chkstfn3.F
 Chd|        CNDMASI2_DIM                  source/elements/solid/solide10/s10cndf.F
 Chd|        CNDMASI2_INI                  source/elements/solid/solide10/s10cndf.F
 Chd|        CNDORDR                       source/model/remesh/cndordr.F 
-Chd|        DIM_TSHEDG                    source/elements/thickshell/solidec/scdtdc3.F
+Chd|        DIM_TSHEDG                    source/elements/thickshell/solidec/dim_tshedg.F
 Chd|        FILLIPARTL                    source/engine/resol_init.F    
 Chd|        FINDGROUPC                    source/elements/findgroup.F   
 Chd|        FINDGROUPS                    source/elements/findgroup.F   
 Chd|        GRPSPLIT                      source/engine/resol_init.F    
 Chd|        IMP_INIT                      source/implicit/imp_init.F    
-Chd|        IND_TSHEDG                    source/elements/thickshell/solidec/scdtdc3.F
+Chd|        IND_TSHEDG                    source/elements/thickshell/solidec/ind_tshedg.F
 Chd|        INITIMEG                      source/system/timer.F         
 Chd|        INIT_KYNE                     source/engine/resol_init.F    
 Chd|        INIT_REAC_NOD                 source/output/th/init_reac_nod.F
@@ -55,20 +55,21 @@ Chd|        S10CNDI2_INI                  source/elements/solid/solide10/s10cndf
 Chd|        S10CNDS_DIM                   source/elements/solid/solide10/s10cndf.F
 Chd|        S10CNDS_INI                   source/elements/solid/solide10/s10cndf.F
 Chd|        S10CND_INI                    source/elements/solid/solide10/s10cndf.F
-Chd|        SECT_INI                      source/tools/sect/sectio.F    
+Chd|        SECTION_INIT                  source/tools/sect/section_init.F
 Chd|        SPMD_ANIM_PLY_INIT            source/mpi/anim/spmd_anim_ply_init.F
 Chd|        SPMD_FAILWAVE_BOUNDARIES      source/mpi/output/spmd_exch_failwave.F
 Chd|        SPMD_MAX_I                    source/mpi/implicit/imp_spmd.F
 Chd|        SPMD_SUB_BOUNDARIES           source/mpi/spmd_exch_sub.F    
 Chd|        TMAX_IPART                    source/output/tmax_ipart.F    
-Chd|        TSHCDCOM_DIM                  source/elements/thickshell/solidec/scdtdc3.F
-Chd|        TSHCDCOM_INI                  source/elements/thickshell/solidec/scdtdc3.F
+Chd|        TSHCDCOM_DIM                  source/elements/thickshell/solidec/tshcdcom_dim.F
+Chd|        TSHCDCOM_INI                  source/elements/thickshell/solidec/tshcdcom_ini.F
 Chd|        ZERO1                         source/system/zero.F          
 Chd|        ZEROR                         source/system/zero.F          
+Chd|        ALEMUSCL_MOD                  ../common_source/modules/ale/alemuscl_mod.F
 Chd|        CRACKXFEM_MOD                 share/modules/crackxfem_mod.F 
 Chd|        DTDC_MOD                      share/modules/dtdc_mod.F      
 Chd|        ECND_MOD                      share/modules/ecdn_mod.F      
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        FAILWAVE_MOD                  ../common_source/modules/failwave_mod.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        H3D_INC_MOD                   share/modules/h3d_inc_mod.F   
@@ -78,7 +79,8 @@ Chd|        INTER_SORTING_MOD             share/modules/inter_sorting_mod.F
 Chd|        NLOCAL_REG_MOD                ../common_source/modules/nlocal_reg_mod.F
 Chd|        OUTMAX_MOD                    ../common_source/modules/outmax_mod.F
 Chd|        OUTPUTS_MOD                   ../common_source/modules/outputs_mod.F
-Chd|        PBLAST_MOD                    ../common_source/modules/pblast_mod.F
+Chd|        OUTPUT_MOD                    ../common_source/modules/output/output_mod.F
+Chd|        PBLAST_MOD                    ../common_source/modules/loads/pblast_mod.F
 Chd|        PINCHTYPE_MOD                 ../common_source/modules/pinchtype_mod.F
 Chd|        PLYXFEM_MOD                   share/modules/plyxfem_mod.F   
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
@@ -101,8 +103,8 @@ Chd|====================================================================
      E  X       ,D        ,MS      ,IN        ,STIFN     ,
      F  STIFR   ,DMAS     ,DINER   ,FANI      ,ANIN      ,
      G           WA       ,UWA     ,PM        ,GEO       ,
-     H  PARTSAV ,PARTS0    ,MONVOL    ,
-     I  I87H    ,I87I     ,I87J    ,I87K      ,IXUR      ,
+     H  PARTSAV ,PARTS0   ,MONVOL    ,
+     I  I87H    ,I87I     ,I87J    ,I87K      ,
      J  I15J    ,KXX      ,
      K  SECBUF  ,SECFCUM  ,NSTRF   ,IGRNOD    ,IEXLNK    ,
      L  XFRAME  ,I8A      ,I8AR    ,I8STIFN   ,I8STIFR   ,
@@ -126,8 +128,8 @@ Chd|====================================================================
      e  IRLEN20E,ISLEN20E ,NISKYFIE,IRBE3     ,R3SIZE    ,
      f  MCP     ,MS0      ,INOD_PXFEM,IEL_PXFEM,IADC_PXFEM,
      g  ADSKY_PXFEM,ICODT,ICODR    ,IBFV      ,ADMSMS    ,
-     h  ITHGRP ,ITHBUF  ,NODREAC   ,IGROUC    ,NGROUC    ,
-     i  IGROUNC  ,NGROUNC ,FR_RBY  ,FR_RBY6   ,NPBY      ,
+     h  NODREAC  ,IGROUC  ,NGROUC  ,IGROUNC   ,NGROUNC ,
+     i  FR_RBY   ,FR_RBY6 ,NPBY    ,
      j  NOM_SECT ,MCPC    ,MCPTG   ,GRTH      ,IGRTH     ,
      k  NELEM    ,LAG_SEC ,NPRW    ,DIAG_SMS  ,DMELC     ,
      l  DMELTG   ,NGRTH   ,NFT2    ,DMELS     ,DMELTR    ,
@@ -139,18 +141,18 @@ Chd|====================================================================
      r  ADSKY_CRKXFEM,PROCNE_CRKXFEM,ISENDP_CRKXFEM,IRECVP_CRKXFEM,
      s  IADSDP_CRKXFEM,IADRCP_CRKXFEM ,INT24USE,NDAMA2  ,
      t  IGROUPC  ,IGROUPTG ,IGROUPS ,IGROUPFLG ,DMINT2  ,IRBKIN_L,
-     u  NRBYKIN_L,KINDRBY  ,ELBUF_TAB ,SENSOR_TAB,DD_R2R_ELEM,
+     u  NRBYKIN_L,KINDRBY  ,ELBUF_TAB ,SENSORS ,DD_R2R_ELEM,
      v  SDD_R2R_ELEM ,KINET, WEIGHT_MD,DMSPH ,IOLDSECT,LBUFIDEL24,
      w  INTBUF_TAB   ,NUMSPH_GLO_R2R, FLG_SPHINOUT_R2R,I15K,
      y  CONDN    ,CONDNSKY ,KXFENOD2ELC  ,ELCUTC ,NODEDGE,
      z  IAD_EDGE ,CRKNODIAD,FR_EDGE     ,FR_NBEDGE ,NODLEVXF,
      x  CRKEDGE  ,XFEM_TAB   ,ISENSINT  , NISUBMAX,
-     1  STABSEN  ,TABSENSOR,INTLIST25  ,INT24E2EUSE  ,TABMP_L   , 
+     1  INTLIST25  ,INT24E2EUSE  ,TABMP_L   , 
      2  I87N ,TAB_MAT,H3D_DATA,TAGTRIMC,TAGTRIMTG,
      3  IGRBRIC ,IGRQUAD  ,IGRSH4N  ,IGRSH3N  ,IGRTRUSS   ,
      4  IGRBEAM ,IGRSPRING,IGRPART  ,FORNEQS  ,INT7ITIED ,
      5  FXVEL_FGEO,FAILWAVE,NLOC_DMG,PINCH_DATA,SLLOADP  ,
-     6  TAGSLV_RBY,NFNCA2 ,NFTCA2  ,IN0  ,SORT_COMM,STACK)
+     6  TAGSLV_RBY,NFNCA2 ,NFTCA2  ,IN0  ,SORT_COMM,STACK,OUTPUT)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -172,14 +174,12 @@ C-----------------------------------------------
       USE SENSOR_MOD
       USE H3D_INC_MOD
       USE OUTPUTS_MOD
+      USE ALEMUSCL_MOD , only:ALEMUSCL_Param
+      USE OUTPUT_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -191,36 +191,26 @@ C-----------------------------------------------
 #include      "param_c.inc"
 #include      "scr02_c.inc"
 #include      "scr03_c.inc"
-#include      "scr05_c.inc"
-#include      "scr06_c.inc"
 #include      "scr07_c.inc"
 #include      "scr12_c.inc"
 #include      "scr14_c.inc"
 #include      "scr16_c.inc"
 #include      "scr17_c.inc"
 #include      "scr23_c.inc"
-#include      "secur_c.inc" 
 #include      "units_c.inc"
 #include      "cong2_c.inc"
 #include      "task_c.inc"
 #include      "parit_c.inc"
-#include      "rnur_c.inc"
 #include      "timerc_c.inc"
-#include      "timeri_c.inc"
-#include      "couple_c.inc"
 #include      "rad2r_c.inc"
 #include      "scr18_c.inc"
 #include      "spmd_c.inc"
 #include      "fxbcom.inc"
-#include      "subc_c.inc"
 #include      "flowcom.inc"
 #include      "remesh_c.inc"
 #include      "sms_c.inc"
 #include      "lagmult.inc"
 #include      "sphcom.inc"
-#include      "inter22.inc"
-#include      "thermal_c.inc"
-#include      "alemuscl.inc"
 #include      "intstamp_c.inc"
 C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -242,7 +232,7 @@ C-----------------------------------------------
      .        IXS(NIXS,*),IXS10(6,*) ,IXS20(12,*),IADS10(6,*),
      .        IADS20(12,*),IXS16(6,*) ,IADS16(12,*), IGEO(NPROPGI,*),
      .        IXQ(NIXQ,*),IXC(NIXC,*), IXT(NIXT,*), IXP(NIXP,*),
-     .        IXR(NIXR,*), IXTG(NIXTG,*), IXUR(NIXUR,*), IXTG1(4,*),
+     .        IXR(NIXR,*), IXTG(NIXTG,*), IXTG1(4,*),
      .        ITAB(*), IPARG(NPARG,*), IPARI(NPARI,*), ADSKY(*),
      .        IADS(*), IEXLNK(NR2R,*),
      .        WEIGHT(*), NSTRF(*), IB(NIBCLD,*), ITABM1(*),
@@ -260,8 +250,7 @@ C-----------------------------------------------
      .        ICODT(*), ICODR(*),IBFV(NIFV,*),  
      .        INOD_PXFEM(*),IEL_PXFEM(*) ,IADC_PXFEM(4,*),ELCUTC(2,*),
      .        ADSKY_PXFEM(*), KXFENOD2ELC(*),NODLEVXF(*),CRKNODIAD(*),
-     .        NODEDGE(*),IAD_EDGE(*),FR_EDGE(*),FR_NBEDGE(*),
-     .        ITHGRP(NITHGR,*) ,ITHBUF(*) ,NODREAC(*),
+     .        NODEDGE(*),IAD_EDGE(*),FR_EDGE(*),FR_NBEDGE(*), NODREAC(*),
      .        IGROUC(*),IGROUNC(*),FR_RBY(*),FR_RBY6(*),NPBY(*),
      .        NOM_SECT(*), GRTH(*),IGRTH(*), NPRW(*),IAD_RBE2(*),
      .        FR_RBE2(*),FR_RBE2M(*),R2SIZE, IRBE2(NRBE2L,*),LRBE2(*),
@@ -274,8 +263,8 @@ C-----------------------------------------------
      .        IGROUPC(*),IGROUPTG(*),IGROUPS(*),IGROUPFLG(2),
      .        IRBKIN_L(*), KINDRBY(*), DD_R2R_ELEM(*),SDD_R2R_ELEM,
      .        KINET(*),WEIGHT_MD(*),NUMSPH_GLO_R2R,FLG_SPHINOUT_R2R,
-     .        ISENSINT(NISUBMAX+1,NINTER),NISUBMAX,STABSEN,
-     .        TABSENSOR(STABSEN), INTLIST25(NINTER25) ,INT24E2EUSE ,FXVEL_FGEO,
+     .        ISENSINT(NISUBMAX+1,NINTER),NISUBMAX,
+     .        INTLIST25(NINTER25) ,INT24E2EUSE ,FXVEL_FGEO,
      .        TAGSLV_RBY(NUMNOD)
 !     INT7ITIED : check if an interface type 7 with ITIED /= 0 is used
 !                 in order to force the communication of a list of candidate nodes 
@@ -310,7 +299,7 @@ C
       TYPE (XFEM_EDGE_)   , DIMENSION(*)           :: CRKEDGE
       TYPE(H3D_DATABASE) :: H3D_DATA
       TYPE (PINCH) :: PINCH_DATA
-      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE (SENSORS_) :: SENSORS
 C-----------------------------------------------
       TYPE (GROUP_)  , DIMENSION(NGRBRIC) :: IGRBRIC
       TYPE (GROUP_)  , DIMENSION(NGRQUAD) :: IGRQUAD
@@ -327,14 +316,16 @@ C-----------------------------------------------
       TYPE(sorting_comm_type), DIMENSION(NINTER), INTENT(inout) :: SORT_COMM   ! structure for interface sorting comm
       TYPE (STACK_PLY) :: STACK
 C-----------------------------------------------
+      TYPE(OUTPUT_),INTENT(INOUT)    :: OUTPUT
+C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER IMUEL, I, J, K, NG, NINT7,NNOD,K2S,K0,IAD1,IDUM,LLL,
      .        LRBUF, LIBUF, ITY, IAD, NNBEM, ITYP,IROTG,NS,LF,LT,LL,L,
-     .        L1,L2,ISECTR,NFR,IC,ICR,NISUB, NI25,NBR
+     .        L1,L2,ISECTR,NFR,IC,ICR,NISUB, NI25,NBR,NSENSOR
       INTEGER JD(50),KD(50),JFI,KFI,NMN,II,NINOUT,NNO,NEL,IFLGADM,
      .        NAD_SMS(NUMNOD),MAD_SMS(NUMNOD),N,JJ,KK, NFT, ISOLNOD,NBS
-      INTEGER, DIMENSION(NSENSOR) :: INDEX_SENSOR
+      INTEGER, DIMENSION(SENSORS%NSENSOR) :: INDEX_SENSOR
       INTEGER, DIMENSION(:), ALLOCATABLE :: ISEND,IRECV
       INTEGER :: ITIED
       my_real
@@ -344,31 +335,29 @@ C-----------------------------------------------
 C=======================================================================
        IDUM = 0 
        RDUM = ZERO
-       ISECTR = 0         
-C-----------------------------------------------
+       ISECTR  = 0  
+       NSENSOR = SENSORS%NSENSOR       
 C-----------------------------------------------
 C //
 C-----------------------------------------------
 C
-C Partie Sequentielle
+C Sequential part
 C
       IF (ITASK == 0)THEN
-C Initialisation ITYPTS a 0 pour DTIX
+C zeroing ITYPTS for DTIX
 C
         ITYPTS=0
 C
-C initialisation tableau de conditions cinematique 
-C (actuellement utilise uniquement pour RBY et INT20)
+C kinematic conditions : arrays init. (RBY & INT20)
 C
       CALL INIT_KYNE(IKINE,NPBY,LPBY,TAGSLV_RBY)
 C
-C initialisation tableau de noeuds pour forces de reaction
+C reaction force (node array)
 C
         CPTREAC = 0
-        IF (IREAC == 1 ) 
-     .      CALL INIT_REAC_NOD(CPTREAC,NODREAC,NTHGRP,ITHGRP,ITHBUF)
+        IF (IREAC == 1 ) CALL INIT_REAC_NOD(CPTREAC,NODREAC,NTHGRP,OUTPUT%TH%ITHGRP,OUTPUT%TH%ITHBUF)
 C
-C initialisation tableau d elements pour TH de GROUPE D ELEMENTS
+C TH init for group of elems
 C
         NGRTH = 0
         IF (IGRELEM == 1 ) THEN
@@ -382,7 +371,7 @@ C----- reset initial mass
           IF (IRODDL /=0) IN(1:NUMNOD)=IN0(1:NUMNOD)
         END IF
 C
-C initialisation des structures paralleles
+C parallel structures init.
 C
         IROTG=0
         DO I=1,NRBE3
@@ -419,7 +408,7 @@ C---------RBE2----
         ENDIF
 
 c        
-C Initialisation IRBE2
+C  IRBE2 init.
         CALL RBE2_INIT(IRBE2   ,LRBE2   ,NMRBE2 ,FR_RBE2 ,FR_RBE2M,NFR)
 C
         CALL MPP_INIT(
@@ -429,14 +418,14 @@ C
      4       NME17   ,ISLEN17 ,IRLEN17 ,IRLEN7T ,ISLEN7T ,
      5       LINDIDEL,LBUFIDEL,IRLEN20 ,ISLEN20 ,IRLEN20T,
      6       ISLEN20T,NBINT20 ,IRLEN20E,ISLEN20E,FR_RBY  ,
-     7       FR_RBY6 ,NPBY    ,IRBKIN_L,
-     8       NRBYKIN_L,KINDRBY,SENSOR_TAB,LBUFIDEL24, INTBUF_TAB,
+     7       FR_RBY6 ,NPBY    ,IRBKIN_L,NRBYKIN_L,KINDRBY,
+     8       NSENSOR ,SENSORS%SENSOR_TAB,LBUFIDEL24, INTBUF_TAB,
      9       SORT_COMM)
 C
-        IF(IDEL7NG>0.OR.IRAD2R>0.OR.IALEMUSCL>0.OR.PDEL>0) THEN
+        IF(IDEL7NG>0.OR.IRAD2R>0.OR.ALEMUSCL_Param%IALEMUSCL>0.OR.PDEL>0) THEN
            CALL CHKINIT(
      2       IXS        ,IXQ       ,IXC       ,IXT         ,IXP       ,
-     3       IXR        ,IXTG      ,IXUR      ,IXS10       ,IXS20     ,
+     3       IXR        ,IXTG      ,IXS10       ,IXS20     ,
      4       IXS16      ,IXTG1     ,GEO       ,ADDCNEL     ,CNEL      ,
      5       ADDTMPL    ,IPARG     )
         ENDIF
@@ -456,7 +445,7 @@ C
         NFNCA= NFEA + NUMNOD*MIN(1,ANIM_V(6)+OUTP_V(6)+H3D_DATA%N_VECT_FEXT)
         NFTCA= NFNCA+ NUMNOD*MIN(1,ANIM_V(12)+OUTP_V(12)+H3D_DATA%N_VECT_PCONT)
         NFOA = NFTCA+ NUMNOD*MIN(1,ANIM_V(12)+OUTP_V(12)+H3D_DATA%N_VECT_PCONT)
-        NFT2 = NFOA+ 2*(NSECT+NRBODY+NRWALL+NUMELUR)
+        NFT2 = NFOA+ 2*(NSECT+NRBODY+NRWALL)
         NFNCA2= NFT2  + NUMNOD*MIN(1,ANIM_V(13)+H3D_DATA%N_VECT_CONT2)
         NFTCA2= NFNCA2+ NUMNOD*MIN(1,ANIM_V(27)+H3D_DATA%N_VECT_PCONT2)
         NDMA = NUMNOD*MIN(1,ANIM_N(1)+OUTP_N(1)+H3D_DATA%N_SCAL_DT)
@@ -480,8 +469,7 @@ C               For multidomains inertia of main nodes on multidomains interface
         DMAS = ZERO
         DINER = ZERO
 C
-        IF(MCHECK==0)NCYCLE=  0
-        IF(MCHECK==0)NCYCLSH=0
+        IF(MCHECK==0)NCYCLE=0
         I7KGLO = 0
         NABFWR = 0
 C
@@ -492,7 +480,6 @@ C
         I13E=I13D+NSELT
         I13F=I13E+NSELP
         I13G=I13F+NSELR
-C       I13H=I13G+NSELUR
         I13H=I13G+NSELU
         I13I=I13H+NSELTG
         I15ATH=1+LIPART1*(NPART+NTHPART)
@@ -503,15 +490,14 @@ C       I13H=I13G+NSELUR
         I15E=I15D+NUMELT
         I15F=I15E+NUMELP
         I15G=I15F+NUMELR
-        I15H=I15G+NUMELUR
+        I15H=I15G
         I15I=I15H+NUMELTG
         I15J=I15I+NUMELX
         I15K=I15J+NUMSPH
         I35ATH=1+LISUB1*NSUBS
 C
         I87A = 1
-        I87B = I87A +  8 * NUMELS   + 6 * NUMELS10
-     .              + 12 * NUMELS20 + 8 * NUMELS16
+        I87B = I87A +  8 * NUMELS + 6 * NUMELS10 + 12 * NUMELS20 + 8 * NUMELS16
         I87C = I87B + 4 * NUMELQ
         I87D = I87C + 4 * NUMELC
         I87E = I87D + 2 * NUMELT
@@ -519,7 +505,7 @@ C
         I87G = I87F + 3 * NUMELR
         I87H = I87G + 3 * NUMELTG
         I87H = I87H + 3 * NUMELTG6
-        I87I = I87H + 4 * NUMELUR
+        I87I = I87H
         I87J = I87I + 4 * NSKYMV0
         I87K = I87J + 4 * NCONLD
         I87L = I87K + 4 * NUMCONV
@@ -539,10 +525,8 @@ C----------------------------
 C---------------------------- 
         IF (ISPMD==0)THEN
           CALL DATE_AND_TIME(STARTDATE, STARTTIME, ZONE, VALUES)
-          WRITE(ISTDO,'(A,I2.2,A,I2.2,A,I4.4)') 
-     *     ' ',VALUES(3),'/',VALUES(2),'/',VALUES(1)
-          WRITE(IOUT,'(A,I2.2,A,I2.2,A,I4.4)') 
-     *     ' ',VALUES(3),'/',VALUES(2),'/',VALUES(1)
+          WRITE(ISTDO,'(A,I2.2,A,I2.2,A,I4.4)') ' ',VALUES(3),'/',VALUES(2),'/',VALUES(1)
+          WRITE(IOUT,'(A,I2.2,A,I2.2,A,I4.4)') ' ',VALUES(3),'/',VALUES(2),'/',VALUES(1)
         END IF
 C
         MANIM = 0
@@ -644,14 +628,13 @@ C------------------------
 C--------------------------
 C     FIND GROUP FOR SHELLS
 C--------------------------
-        IF(IGROUPFLG(1) == 1 )
-     1          CALL FINDGROUPC(IPARG, IGROUC, NGROUC, IGROUPC, IGROUPTG)
+        IF(IGROUPFLG(1) == 1 ) CALL FINDGROUPC(IPARG, IGROUC, NGROUC, IGROUPC, IGROUPTG)
 C--------------------------
 C     FIND GROUP FOR BRICKS
 C--------------------------
         IF(IGROUPFLG(2) == 1 ) CALL FINDGROUPS(IPARG, IGROUPS)
 C----------------------------------------------------------
-C   ON TAGUE TOUS LES NOEUDS DE TOUTES LES SECTIONS
+C   TAG : NODES FROM ALL SECTIONS
 C----------------------------------------------------------
         IF(ISECUT/=0)THEN
           K0=NSTRF(25)
@@ -665,10 +648,10 @@ C----------------------------------------------------------
             IF (NSTRF(K0) >= 100 ) ISECTR = I
             K0=NSTRF(K0+24)
           ENDDO
-          CALL SECT_INI(NSTRF,SECBUF,NOM_SECT,ISECTR,NSECT,IOLDSECT)
+          CALL SECTION_INIT(NSTRF,SECBUF,NOM_SECT,ISECTR,NSECT,IOLDSECT)
         ENDIF
 C-----------------------------------------------------
-C   Calcul SQRT H1, H2, H3 pour elements coques
+C  SQRT H1, H2, H3 for shell elements
 C-----------------------------------------------------
         DO I = 1, NUMGEO      
           IGTYP = IGEO(11,I)  
@@ -679,7 +662,7 @@ C-----------------------------------------------------
           ENDIF                                                
         ENDDO                                                  
 C-----------------------------------------------------
-C   Calcul optionel SQRT(G), SQRT(A11) SQRT(A12), SQRT(NU), SQRT(SHF) pour ancien restart
+C   optionnal SQRT(G), SQRT(A11) SQRT(A12), SQRT(NU), SQRT(SHF) forformer restart file
 C-----------------------------------------------------
         IF(PMINVER<6)THEN
           DO I = 1, NUMGEO
@@ -708,7 +691,7 @@ C----------------------------------------------------------
           ENDDO
        ENDIF          
 C----------------------------------------------------------
-C   LONGUEUR DES TABLEAUX DE TRAVAIL POUR AIRBAG BEM
+C   LWORKING ARRAY SIZES - AIRBAG BEM
 C----------------------------------------------------------
        IAD=0
        LWIBEM=0
@@ -723,7 +706,7 @@ C----------------------------------------------------------
           IAD=IAD+NIMV
        ENDDO
 C----------------------------------------------------------
-C   LONGUEUR DES TABLEAUX DE TRAVAIL POUR FLOW BEM
+C   WORKING ARRAY SIZES - FLOW BEM
 C----------------------------------------------------------
        IAD=0
        LWIFLOW=0
@@ -763,7 +746,7 @@ C   INIT MULTIPLICATEURS LAGRANGES (sequentielle)
 C----------------------------------------------------------
        IF(LAG_NCF+LAG_NCL > 0)THEN
          LAG_SEC=0
-C compatibilisation des options non supportees si NSPMD > 1
+C numbering incompatible options if NSPMD > 1
          DO I = 1, NINTER
            IF(IPARI(33,I)/=0)LAG_SEC=1
          END DO
@@ -797,22 +780,6 @@ C-----------------------
         IF(ITYP==10) INT7ITIED = 1
       ENDDO
 C-----------------------
-C INTERFACE TYPE 22 CEL
-C-----------------------       
-!      !Interface22: counting the number of int22 and buffer size for allocation
-!      II = 0
-!      J  = 0
-!      DO I=1,NINTER
-!         !NBRIC_G = IPARI(32,I)
-!         !NBRIC_L = IGRN(2, IPARI(45,I) )
-!         IF(IPARI(7,I)==22)THEN
-!           II=II+1
-!           J = MAX( J , IGRN(2,IPARI(45,I)) )     
-!         END IF
-!      ENDDO
-!      INT22  = II  !number of int22 interfaces.
-!      I22LEN = J   !maximum nb of 3D elem.
-C-----------------------
 C INTERFACE TYPE 24 FLAG
 C-----------------------
       INT24USE = 0
@@ -836,10 +803,10 @@ C-----------------------
 C-----------------------
 C SENSOR INTERFACE
 C-----------------------
-      IF (STABSEN /= 0) THEN 
+      IF (SENSORS%STABSEN > 0) THEN 
         DO N=1,NINTER
           NISUB =IPARI(36,N)
-          ISENSINT(1,N) = TABSENSOR(N+1 + NSECT) - TABSENSOR(N + NSECT)
+          ISENSINT(1,N) = SENSORS%TABSENSOR(N+1 + NSECT) - SENSORS%TABSENSOR(N + NSECT)
 C
           IF (IPARI(71,N)>0) THEN
 C--         sensor associated to all interfaces of type19
@@ -847,8 +814,8 @@ C--         sensor associated to all interfaces of type19
           ENDIF
 C
           DO I=1,NISUB
-            ISENSINT(I+1,N) = TABSENSOR(I +1 + NSECT + NINTER) -
-     .                        TABSENSOR(I + NSECT + NINTER)
+            ISENSINT(I+1,N) = SENSORS%TABSENSOR(I +1 + NSECT + NINTER) -
+     .                        SENSORS%TABSENSOR(I + NSECT + NINTER)
           ENDDO
         ENDDO
       ENDIF
@@ -877,17 +844,14 @@ C-----------------------
 
       ENDIF   ! ITASK==0
 C-----------------------------------------------------
-C Fin partie sequentielle
+C END OF SEQUENTIAL PART
 C-----------------------------------------------------
-C
-C Partie Parallelle
 C
       CALL MY_BARRIER()
 C--- // --------------------------------------
-C         INITIALISATION DES FORCES ET MOMENTS
+C         FORCE & MOMENTUM INIT
 C---------------------------------------------
-      IF(NINTER/=0.AND.ANIM_V(4)+OUTP_V(4)+H3D_DATA%N_VECT_CONT >0) 
-     .               CALL ZEROR(FANI(1,NODFT),NUMNTHREAD)
+      IF(NINTER/=0.AND.ANIM_V(4)+OUTP_V(4)+H3D_DATA%N_VECT_CONT >0) CALL ZEROR(FANI(1,NODFT),NUMNTHREAD)
       IF(ANIM_V(12)+OUTP_V(12)+H3D_DATA%N_VECT_PCONT>0) THEN
         CALL ZEROR(FANI(1,NFNCA+NODFT),NUMNTHREAD)
         CALL ZEROR(FANI(1,NFTCA+NODFT),NUMNTHREAD)
@@ -911,13 +875,6 @@ C---------------------------------------------
           ANIN(NDAMA2+2*(I-1)+2) = ZERO
         ENDDO
       ENDIF
-C-----------------------------------------------
-      XMIN_GLOB = EP30
-      YMIN_GLOB = EP30
-      ZMIN_GLOB = EP30
-      XMAX_GLOB = -EP30
-      YMAX_GLOB = -EP30
-      ZMAX_GLOB = -EP30
 C-----------------------------------------------
 C  RESTARTING RADIOSS ENGINE.
         IF (IPARIT==0) THEN
@@ -1162,9 +1119,9 @@ C-----------------------
      .   CALL TMAX_IPART(IPARG   ,IPART   ,IPART(I15A),IPART(I15C),
      .                 IPART(I15I),H3D_DATA)
        CALL INI_TMAX(ELBUF_TAB,IPARG   ,GEO     ,PM   ,
-     .  	       IXS	,IXS10   ,IXS16   ,IXS20   ,IXQ     ,
-     .  	       IXC	,IXTG	 ,IXT	  ,IXP     ,IXR     ,
-     .  	       X	,D       ,V       ,IAD_ELEM,FR_ELEM ,
+     .           IXS  ,IXS10   ,IXS16   ,IXS20   ,IXQ     ,
+     .           IXC  ,IXTG   ,IXT    ,IXP     ,IXR     ,
+     .           X  ,D       ,V       ,IAD_ELEM,FR_ELEM ,
      .             WEIGHT ,IPM   ,IGEO    ,STACK   ,ITASK   )
 !$OMP SINGLE
        IF (FAILWAVE%WAVE_MOD > 0) THEN
@@ -1229,16 +1186,11 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "param_c.inc"
 #include      "com04_c.inc"
-#include      "task_c.inc"
 C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1486,16 +1438,9 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "task_c.inc"
-#include      "rnur_c.inc"
 #include      "sphcom.inc"
 C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -1540,10 +1485,6 @@ C
          IPARTL(IPARTR(I))=1
        END DO
 C
-       DO I = 1, NUMELUR
-         IPARTL(IPARTUR(I))=1
-       END DO
-C
        DO I = 1, NUMELTG
          IPARTL(IPARTTG(I))=1
        END DO
@@ -1586,13 +1527,9 @@ Chd|====================================================================
      2   IPMTSK,PARTFTSK,PARTLTSK,NWAFTSK,IGMTSK,
      3   GREFTSK,GRELTSK)
 C-----------------------------------------------
-C   M o d u l e s
-C-----------------------------------------------
-C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -1650,16 +1587,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com08_c.inc"
 #include      "lagmult.inc"
-#include      "scr05_c.inc"
 #include      "param_c.inc"
-#include      "task_c.inc"
-#include      "parit_c.inc"
-#include      "timeri_c.inc"
-#include      "spmd_c.inc"
 C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

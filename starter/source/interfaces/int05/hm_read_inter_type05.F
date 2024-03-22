@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -38,7 +38,7 @@ Chd|====================================================================
       SUBROUTINE HM_READ_INTER_TYPE05(
      1        IPARI      ,STFAC      ,FRIGAP     ,NOINT     ,NI       ,    
      2        IGRNOD     ,IGRSURF    ,NOM_OPT    ,XFILTR    ,FRIC_P   ,
-     3        SENSOR_TAB ,UNITAB     ,LSUBMODEL  ,TITR       )
+     3        SENSORS    ,UNITAB     ,LSUBMODEL  ,TITR       )
 C============================================================================
 C
 C-----------------------------------------------
@@ -72,22 +72,14 @@ C-----------------------------------------------
       TYPE (GROUP_)  ,TARGET, DIMENSION(NGRNOD)  :: IGRNOD
       TYPE (SURF_)   ,TARGET , DIMENSION(NSURF)   :: IGRSURF
       TYPE(SUBMODEL_DATA) LSUBMODEL(*)
-      TYPE (UNIT_TYPE_),INTENT(IN) ::UNITAB 
-      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE (UNIT_TYPE_),INTENT(IN) :: UNITAB 
+      TYPE (SENSORS_)  ,INTENT(IN) :: SENSORS
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
-#include      "scr06_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com09_c.inc"
 #include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "scr12_c.inc"
-#include      "sysunit.inc"
 #include      "remesh_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -326,7 +318,7 @@ C------------------------------------------------------------
 C     RENUMBERING OF FUNCTIONS AND SENSOR - USER TO INTERNAL ID
 C------------------------------------------------------------
 C
-        CALL INTER_DCOD_SENSOR (NTYP,NI,IPARI,NOM_OPT,SENSOR_TAB)
+        CALL INTER_DCOD_SENSOR (NTYP,NI,IPARI,NOM_OPT,SENSORS)
 C
 C------------------------------------------------------------
 C     PRINTOUT

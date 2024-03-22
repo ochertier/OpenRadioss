@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,7 +27,7 @@ Chd|        GENOUTP                       source/output/sty/genoutp.F
 Chd|-- calls ---------------
 Chd|        INITBUF                       share/resol/initbuf.F         
 Chd|        SPMD_RGATHER9_1COMM           source/mpi/interfaces/spmd_outp.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        INITBUF_MOD                   share/resol/initbuf.F         
 Chd|====================================================================
       SUBROUTINE OUTP_S_S(NBX     ,KEY     ,TEXT   ,ELBUF_TAB,
@@ -46,12 +46,9 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "vect01_c.inc"
-#include      "scr01_c.inc"
 #include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "param_c.inc"
 #include      "units_c.inc"
-#include      "scr05_c.inc"
 #include      "task_c.inc"
 #include      "scr16_c.inc"
 C-----------------------------------------------
@@ -107,7 +104,7 @@ C
           IF (ITY /= 1 .AND. ITY /= 2) CYCLE
            ISOLNOD = IABS(IPARG(28,NG))
            NUVAR = 0
-           CALL INITBUF (IPARG    ,NG      ,                    
+           CALL INITBUF(IPARG    ,NG      ,                    
      2          MLW     ,NEL     ,NFT     ,IAD     ,ITY     ,  
      3          NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,  
      4          JTHE    ,JLAG    ,JMULT   ,JHBE    ,JIVF    ,  
@@ -144,12 +141,12 @@ c-------------------------------
              DO I=LFT,LLT
                JJ = JJ + 1
                N = I + NFT            
-               P = - (GBUF%SIG(II(1)+I) 	   
-     .             +  GBUF%SIG(II(2)+I) 	   
-     .             +  GBUF%SIG(II(3)+I)) / THREE		  
-               S1 = GBUF%SIG(II(1)+I) + P			  
-               S2 = GBUF%SIG(II(2)+I) + P			  
-               S3 = GBUF%SIG(II(3)+I) + P			  
+               P = - (GBUF%SIG(II(1)+I)      
+     .             +  GBUF%SIG(II(2)+I)      
+     .             +  GBUF%SIG(II(3)+I)) / THREE      
+               S1 = GBUF%SIG(II(1)+I) + P        
+               S2 = GBUF%SIG(II(2)+I) + P        
+               S3 = GBUF%SIG(II(3)+I) + P        
                VONM2 = THREE*(GBUF%SIG(II(4)+I)**2 +               
      .                        GBUF%SIG(II(5)+I)**2 +               
      .                        GBUF%SIG(II(6)+I)**2 +               
@@ -291,9 +288,9 @@ C  equivalent stress - other then VON MISES
                 P = - (GBUF%SIG(II(1)+I)
      .              +  GBUF%SIG(II(2)+I)
      .              +  GBUF%SIG(II(3)+I)) / THREE
-                S1 = GBUF%SIG(II(1)+I) + P			   
-                S2 = GBUF%SIG(II(2)+I) + P			   
-                S3 = GBUF%SIG(II(3)+I) + P			   
+                S1 = GBUF%SIG(II(1)+I) + P         
+                S2 = GBUF%SIG(II(2)+I) + P         
+                S3 = GBUF%SIG(II(3)+I) + P         
                 VONM2 = THREE*(GBUF%SIG(II(4)+I)**2 +               
      .                         GBUF%SIG(II(5)+I)**2 +               
      .                         GBUF%SIG(II(6)+I)**2 +               

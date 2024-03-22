@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -31,7 +31,7 @@ Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.
 Chd|        HM_OPTION_IS_ENCRYPTED        source/devtools/hm_reader/hm_option_is_encrypted.F
 Chd|        INIT_MAT_KEYWORD              source/materials/mat/init_mat_keyword.F
 Chd|        ELBUFTAG_MOD                  share/modules1/elbuftag_mod.F 
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/matparam_def_mod.F
+Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
@@ -59,10 +59,7 @@ C-----------------------------------------------
 #include      "param_c.inc"
 #include      "scr17_c.inc"
 #include      "com01_c.inc"
-#include      "scr03_c.inc"
 #include      "units_c.inc"
-#include      "sysunit.inc"
-#include      "submod_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -350,6 +347,15 @@ c
       MTAG%L_EPE    = 6  ! strain in crack directions
       MTAG%G_TSAIWU = 1
       MTAG%L_TSAIWU = 1
+
+      ! MATPARAM keywords
+      CALL INIT_MAT_KEYWORD(MATPARAM,"HOOK")
+      CALL INIT_MAT_KEYWORD(MATPARAM,"ORTHOTROPIC")
+
+      ! Properties compatibility
+      CALL INIT_MAT_KEYWORD(MATPARAM,"SOLID_ORTHOTROPIC")
+      CALL INIT_MAT_KEYWORD(MATPARAM,"SPH")
+
 c-----------
       CALL INIT_MAT_KEYWORD(MATPARAM,"ELASTO_PLASTIC")
       CALL INIT_MAT_KEYWORD(MATPARAM,"COMPRESSIBLE")

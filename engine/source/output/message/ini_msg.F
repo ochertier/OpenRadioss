@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -28,7 +28,11 @@ Chd|-- calls ---------------
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
       SUBROUTINE INI_MSG()
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
       USE MESSAGE_MOD
+      USE NAMES_AND_TITLES_MOD, ONLY: NCHARLINE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------

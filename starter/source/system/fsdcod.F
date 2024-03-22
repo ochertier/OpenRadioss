@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -36,16 +36,19 @@ Chd|        SENSOR_MOD                    share/modules1/sensor_mod.F
 Chd|        TABLE_MOD                     share/modules1/table_mod.F    
 Chd|====================================================================
       SUBROUTINE FSDCOD(BUFMAT    ,PM        ,GEO       ,IBCL      ,IPRES   ,
-     .                  IBFV      ,ISKEW     ,ISKN      ,SENSOR_TAB,
+     .                  IBFV      ,ISKEW     ,ISKN      ,SENSORS   ,
      .                  ITABM1    ,SKEW      ,LACCELM   ,INSEL     ,BUFGEO  ,
      .                  IBCSLAG   ,IGEO      ,IPM       ,
-     .                  DAMPR     ,IBFT      ,IBCV      ,IBFVEL    ,
+     .                  IBFT      ,IBCV      ,IBFVEL    ,
      .                  IBCR      ,TABLE     ,NPC1      ,NPC       ,PLD     ,
      .                  NOM_OPT   ,IBFFLUX   )  
 C-----------------------------------------------
-C     SOUS PROGRAMME DE DECODAGE DES NOS USERS DES SKEW ET FCTS
-C          ENTREES NOS USER DES SKEW ET FCTS
-C          SORTIES NOS SYSTEME DES SKEW ET FCTS STOCKES AU MEME ENDROIT
+C   D e s c r i p t i o n
+C-----------------------------------------------C     
+C CONVERTING USER IDENTIFIER INTO INTERNAL IDENTIFIERS (/SKEW, /FUNCT, /TABLE, /SENSOR, ...)
+C    user_funct_id -> [1, NFUNCT]
+C    user_skew_id  -> [1, NSKEW]
+C    ...
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -60,18 +63,10 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "lagmult.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
 #include      "scr03_c.inc"
-#include      "com01_c.inc"
-#include      "com10_c.inc"
-#include      "warn_c.inc"
-#include      "units_c.inc"
-#include      "sphcom.inc"
-#include      "scr10_c.inc"
 #include      "scr17_c.inc"
-#include      "intstamp_c.inc"
 #include      "thermal_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -79,26 +74,26 @@ C-----------------------------------------------
       INTEGER IBFV(NIFV,*),NPC(*), NPC1(*), IBCL(NIBCLD,*), IPRES(NIBCLD,*),
      .   ISKEW(*), ISKN(LISKN,*), ITABM1(*),
      .   LACCELM(3,*),INSEL(*),IBCSLAG(5,*), 
-     .   IPM(NPROPMI,*), IGEO(NPROPGI,*),IBCV(NICONV,*),
+     .   IPM(NPROPMI,NUMMAT), IGEO(NPROPGI,NUMGEO),IBCV(NICONV,*),
      .   IBCR(NIRADIA,*),IBFFLUX(NITFLUX,*)
       INTEGER ,DIMENSION(NIFV,NFXVEL)  ,INTENT(INOUT) :: IBFVEL
       INTEGER ,DIMENSION(NIFT,NFXTEMP) ,INTENT(INOUT) :: IBFT
       my_real
-     .   PM(NPROPM,*), GEO(NPROPG,*),SKEW(LSKEW,*),
-     .   DAMPR(NRDAMP,*), PLD(*),BUFMAT(*)
+     .   PM(NPROPM,NUMMAT), GEO(NPROPG,NUMGEO),SKEW(LSKEW,*),
+     .   PLD(*),BUFMAT(*)
       TYPE(TTABLE) , DIMENSION(NTABLE) :: TABLE
       DOUBLE PRECISION BUFGEO(*)
       INTEGER NOM_OPT(LNOPT1,*)
-      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE (SENSORS_) ,INTENT(IN) :: SENSORS
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER ISERV(18), IFLAG1, IFLAG2, IFLAG3, I,II,ILAW,J,JJ,K,I1,
      .  IS,IGTYP,NF,NOSKEW,ND,IUN,IFAIL,IADD,NFUNC,NFUND,IEXPAN,IFUNC,
-     .  IERR1,IERR2,INUM_FAIL,IP,IR, KDIR, ICOND, IFUNCT, OK, ITABLE,
+     .  IERR1,IERR2,IP,IR, KDIR, ICOND, IFUNCT, OK, ITABLE,
      .  ISK,IFC,IFD,IC1,IC2,ID1,ID2,NMUAL,NOGD,NC,IFLAG,ITENS,
      .  ICHK, IFLAG0, NI,EFUNC,IE,IE2,IFE,NRATE,ERRF,H,NP1,NP2,J1,K1,
-     .  LOAD,UNLOAD, NTY, IRUP,IDN,IDT,PN1,PN2,PT1,PT2,KK,
+     .  LOAD,UNLOAD, NTY,IDN,IDT,PN1,PN2,PT1,PT2,KK,
      .  IFRIC1,IFRIC2,IDAMP1,IDAMP2,LOAD0,UNLOAD0,NF2,FUNC,FUND,IOK,ISENS,IMAT,IEOS,
      .  A_FUNC, B_FUNC
      
@@ -139,17 +134,19 @@ C-----------------------------------------------
 C
       DATA MESS/'11TH MATERIAL LAW DEFINITION            '/
       DATA PUN/0.1/
-C=======================================================================
+C-----------------------------------------------
+C   S o u r c e   L i n e s
+C-----------------------------------------------
       IFLAG1=0
       IFLAG2=0
 C----------------------------
-C     (I) TRAITEMENT DES FCTS
+C     (I) FUNCTIONS (/FUNCT)
 C----------------------------
 C
 C
  15   CONTINUE
 C
-C         2) LOIS 11 18 20 21 28-31
+C         2) MATERIAL LAWS 11 18 20 21 28-31
 C
       DO 300 I=1,NUMMAT
 C
@@ -159,7 +156,7 @@ C
 C
         IF(ILAW == 11) THEN
 C
-C         CHANGEMENT DU NO DE NOEUD
+C         UPDATING NODE IDENTIFIER
           IF(NINT(PM(51,I))/=0)THEN
             PM(51,I) = USR2SYS(NINT(PM(51,I)),ITABM1,MESS,ID)+PUN
           ENDIF
@@ -172,13 +169,30 @@ C
               DO J=1,NFUNCT
                 IF(ISERV(K) == NPC1(J)) THEN
                   IPM(10+K,I)=J
+                  
+                  !check density function : IPM(11)
+                  IF(K == 1)THEN
+                    IC1 = NPC(J)
+                    IC2 = NPC(J+1)
+                    JJ=0
+                    DO II = IC1,IC2-2,2
+                      JJ = JJ+1
+                      Y0 = PLD(II+1)
+                      IF(Y0 <= ZERO)THEN
+                        CALL ANCMSG(MSGID=132,MSGTYPE=MSGERROR,ANMODE=ANINFO,
+     .                              I1=ID, I2=ISERV(K), I3=JJ,
+     .                              C1=TITR,
+     .                              R1=Y0)
+                        EXIT
+                      ENDIF
+                    ENDDO
+                  ENDIF ! !end check 
+                                 
                   GOTO 230
                 ENDIF
               ENDDO!next J
               IPM(10+K,I) = 0 !function does not exist. Avoid check bounds issues
-              CALL ANCMSG(MSGID=126,
-     .                    MSGTYPE=MSGERROR,
-     .                    ANMODE=ANINFO_BLIND_1,
+              CALL ANCMSG(MSGID=126,MSGTYPE=MSGERROR,ANMODE=ANINFO_BLIND_1,
      .                    I1=ID,
      .                    C1=TITR,
      .                    I2=ISERV(K))
@@ -535,138 +549,6 @@ c                 PLD(JJ) = PLD(II) + DX
            ENDDO
          ENDIF
 C
-C law 70
-        ELSE IF (ILAW == 70 .OR. ILAW == 77) THEN
-         NF = IPM(10,I)
-         DO 298 K=1,NF
-           IS = IPM(10+K,I)
-          IF (IS /=0)THEN
-             DO J=1,NFUNCT
-               IF(IS == NPC1(J))  THEN
-                 IPM(10+K,I)=J
-                 GOTO 298
-               ENDIF
-             ENDDO
-             IF(ILAW == 70) MESS1='A MATERIAL LAW 70'
-             IF(ILAW == 77) MESS1='A MATERIAL LAW 77'
-             CALL ANCMSG(MSGID=126,
-     .                   MSGTYPE=MSGERROR,
-     .                   ANMODE=ANINFO_BLIND_1,
-     .                   I1=ID,
-     .                   C1=TITR,
-     .                   I2=IS)
-           ENDIF
- 298     CONTINUE
-C
-         IFLAG = 0
-         IF (NF > 0) THEN
-           IADD = IPM(7,I) - 1
-           NC      = INT( BUFMAT(IADD + 7))
-           EMAX    = BUFMAT(IADD + 2*NF + 12)
-!!           IF(EMAX==ZERO) EMAX = EP30
-           E0      = BUFMAT(IADD + 2)
-           EPSMAX  = BUFMAT(IADD + 4)
-           ITENS = BUFMAT(IADD + 2*NF + 13)
-C When Emax=0 we consider the max curve slope.
-           IF(EMAX == ZERO) THEN
-             DO K=1,NC
-                  IFC = IPM(10+K,I)
-                  ICHK = 0
-                  IF (IFC > 0 ) THEN
-                     YFAC = BUFMAT(IADD + 8 + NF + K)
-                     IC1 = NPC(IFC)
-                     IC2 = NPC(IFC+1)
-C  loading function
-                     X0 = PLD(IC1)
-                     DO II = IC1,IC2-4,2
-                          JJ = II+2
-                          DX = PLD(JJ)   - X0
-                          DY = PLD(JJ+1) - PLD(II+1)
-                          Y0 =  YFAC*PLD(II+1)
-                          Y1 =  YFAC*PLD(JJ+1)
-                          DERI = YFAC * DY / DX
-                          X1 =  PLD(JJ)
-                          EMAX = MAX(EMAX, DERI)
-                          X0 =  PLD(JJ)
-                     ENDDO
-                  ENDIF
-               ENDDO
-               BUFMAT(IADD + 2*NF + 12) = EMAX
-               BUFMAT(IADD + 3) = (EMAX - E0)/EPSMAX
-               CALL ANCMSG(MSGID=1219,
-     .                     MSGTYPE=MSGINFO,
-     .                     ANMODE=ANINFO_BLIND_1,
-     .                     I1=ID,
-     .                     C1=TITR,
-     .                     R1=EMAX)
-            ENDIF ! Emax
-C automatic modification of EPST1 and E0
-            EPS0 = ONE
-            IFLAG = 0
-            IFLAG0= 0
-            EPST1 = ONE            
-            DO K=1,NC
-               IFC = IPM(10+K,I)
-               ICHK = 0
-               IF (IFC > 0 ) THEN
-                  YFAC = BUFMAT(IADD + 8 + NF + K)
-                  IC1 = NPC(IFC)
-                  IC2 = NPC(IFC+1)
-C              loading function
-                  X0 = PLD(IC1)
-                  DO II = IC1,IC2-4,2
-                    JJ = II+2
-                    DX = PLD(JJ)   - X0
-                    DY = PLD(JJ+1) - PLD(II+1)
-                    Y0 =  YFAC*PLD(II+1)
-                    Y1 =  YFAC*PLD(JJ+1)
-                    DERI = YFAC * DY / DX
-                    X1 =  PLD(JJ)
-                    IF(X1 > ZERO .AND. ICHK == 0 ) THEN
-                       ICHK = 1
-C check of initial rigidity
-                       IF(DERI > E0) THEN
-                         IFLAG0 = 1
-                         E0 = DERI
-                         IF(EMAX <E0)EMAX = E0
-                       ENDIF
-                    ENDIF
-                    IF ( DERI >= EMAX .AND. X0 > ZERO) THEN
-                      EPS0 = MIN(EPS0, X0 )
-                      IFLAG = 1
-                      IF(X0 == EPS0) THEN
-                         EPST1 = MIN(EPST1,ABS(EPS0 - Y0/EMAX))
-                      ENDIF
-                    ENDIF
-                    X0 =  PLD(JJ)
-                  ENDDO
-               ENDIF
-           ENDDO ! NC
-C           
-           IF(IFLAG == 1) THEN
-               E0 = MIN(E0, EMAX)
-               BUFMAT(IADD + 3) = (EMAX - E0)/EPST1
-               BUFMAT(IADD + 4) = EPS0
-               CALL ANCMSG(MSGID=864,
-     .                     MSGTYPE=MSGINFO,
-     .                     ANMODE=ANINFO_BLIND_1,
-     .                     I1=ID,
-     .                     C1=TITR,
-     .                     R1=EPS0)
-           ENDIF
-           IF(IFLAG0 == 1) THEN
-               E0 = MIN(E0, EMAX)
-               BUFMAT(IADD + 3) = (EMAX - E0)/EPST1
-               BUFMAT(IADD + 2) = E0
-               CALL ANCMSG(MSGID=865,
-     .                     MSGTYPE=MSGWARNING,
-     .                     ANMODE=ANINFO_BLIND_1,
-     .                     I1=ID,
-     .                     C1=TITR,
-     .                     R1=E0)
-           ENDIF
-         ENDIF
-C
         ELSE IF (ILAW == 75) THEN
 C CHANGE USER MATERIAL NUMBER TO INTERNAL 
           IADD = IPM(7,I)-1
@@ -743,93 +625,6 @@ C
             ENDDO
           ENDIF
         ENDIF
-C------------
-         INUM_FAIL = IPM(220,I)
-         IF(INUM_FAIL > 0) THEN
-           DO IR = 1,INUM_FAIL
-            IRUP = IPM(111 + 15*(IR-1),I)
-c
-            IF (IRUP == 23 ) THEN
-               IP = (IR -1)*15
-               !numbering for ifunc(1) in lecr23.F
-               ITABLE=IPM(115 + IP + 1,I)
-               IF(ITABLE /= 0)THEN
-                DO J=1,NTABLE
-                  IF(ITABLE == TABLE(J)%NOTABLE)  THEN
-                   IPM(115 + IP + 1,I)=J
-                   GOTO 923
-                  ENDIF
-                ENDDO
-                CALL ANCMSG(MSGID=779,
-     .                 MSGTYPE=MSGERROR,
-     .                 ANMODE=ANINFO,
-     .                 I1=ID,
-     .                 C1=TITR,
-     .                 I2=ITABLE)
-               ENDIF
- 923           CONTINUE
-
-               !numbering for ifunc(5) in lecr23.F
-               ITABLE=IPM(115 + IP + 5,I)
-               IF(ITABLE /= 0)THEN
-                DO J=1,NTABLE
-                  IF(ITABLE == TABLE(J)%NOTABLE)  THEN
-                   IPM(115 + IP + 5,I)=J
-                   GOTO 823
-                  ENDIF
-                ENDDO
-                CALL ANCMSG(MSGID=779,
-     .                 MSGTYPE=MSGERROR,
-     .                 ANMODE=ANINFO,
-     .                 I1=ID,
-     .                 C1=TITR,
-     .                 I2=ITABLE)
-               ENDIF
- 823           CONTINUE
-
-               !numbering for ifunc(2-3-6)
-               NF=IPM(115 +IP ,I)
-               DO 223 K=2,NF
-                 IS=IPM(115 + IP + K,I)
-                 IF(IS /= 0.AND. K /= 5)THEN
-                   DO 323 J=1,NFUNCT
-                    IF(IS == NPC1(J))  THEN
-                     IPM(115+ IP + K ,I)=J
-                     GOTO 223
-                    ENDIF
- 323                CONTINUE
-                    CALL ANCMSG(MSGID=126,
-     .                        MSGTYPE=MSGERROR,
-     .                        ANMODE=ANINFO_BLIND_1,
-     .                        I1=ID,
-     .                        C1=TITR,
-     .                        I2=IS)
-                 ENDIF
- 223           CONTINUE
-c
-            ELSE ! IRUP /= 23
-            IP = (IR -1)*15
-              NF=IPM(115 +IP ,I)
-              DO 291 K=1,NF
-                IS=IPM(115 + IP + K,I)
-                IF(IS/=0)THEN
-                  DO 292 J=1,NFUNCT
-                    IF(IS == NPC1(J))  THEN
-                     IPM(115+ IP + K ,I)=J
-                      GOTO 291
-                    ENDIF
- 292              CONTINUE
-                  CALL ANCMSG(MSGID=126,
-     .                        MSGTYPE=MSGERROR,
-     .                        ANMODE=ANINFO_BLIND_1,
-     .                        I1=ID,
-     .                        C1=TITR,
-     .                        I2=IS)
-                ENDIF
- 291          CONTINUE
-            ENDIF
-           ENDDO
-         ENDIF
 C------------
 183         IEXPAN =  IPM(218,I)
          IF(IEXPAN > 0)THEN
@@ -1916,26 +1711,9 @@ c        CALL ANSTCKI(NOSKEW)
 c        CALL ANCERR(137,ANINFO_BLIND_1)
 c 890  CONTINUE
 C
-C     Raileigh DAMPING
-C
-c      IF(NRDAMP>=15)THEN
-c       DO 670 I=1,NDAMP
-c        NOSKEW=NINT(DAMPR(15,I))
-c        DO 675 J=0,NUMSKW
-c          IF(NOSKEW == ISKN(4,J+1)) THEN
-c            DAMPR(15,I)=J+1
-c            GO TO 670
-c          ENDIF
-c 675    CONTINUE
-c        CALL ANSTCKC(16,'RAILEIGH DAMPING')
-c        CALL ANSTCKI(NOSKEW)
-c        CALL ANCERR(137,ANINFO_BLIND_1)
-c 670   CONTINUE
-c      END IF
-
 C=======================================================================
 C
-C    (II) SENSOR NUMBERING
+C    (III) SENSOR NUMBERING
 C
 C=======================================================================
 C----------------------------
@@ -1951,8 +1729,8 @@ C
           ISENS = BUFMAT(IADD+13)
           IOK = 0
           IF (ISENS > 0) THEN
-            DO J=1,NSENSOR
-              IF (ISENS == SENSOR_TAB(J)%SENS_ID) THEN
+            DO J=1,SENSORS%NSENSOR
+              IF (ISENS == SENSORS%SENSOR_TAB(J)%SENS_ID) THEN
                 BUFMAT(IADD+13) = J
                 IOK = 1
                 EXIT
@@ -1972,8 +1750,8 @@ C-------------------------
        DO I=1,NUMCONV
           ISENS = IBCV(6,I)
           IF(ISENS/=0) THEN
-            DO J=1,NSENSOR
-              IF(ISENS == SENSOR_TAB(J)%SENS_ID) THEN
+            DO J=1,SENSORS%NSENSOR
+              IF(ISENS == SENSORS%SENSOR_TAB(J)%SENS_ID) THEN
                  IBCV(6,I) = J
                  GO TO 801
               ENDIF
@@ -1989,8 +1767,8 @@ C------------------------
        DO I=1,NUMRADIA
           ISENS = IBCR(6,I)
           IF(ISENS/=0) THEN
-            DO J=1,NSENSOR
-              IF(ISENS == SENSOR_TAB(J)%SENS_ID) THEN
+            DO J=1,SENSORS%NSENSOR
+              IF(ISENS == SENSORS%SENSOR_TAB(J)%SENS_ID) THEN
                  IBCR(6,I) = J
                  GO TO 802
               ENDIF
@@ -2006,8 +1784,8 @@ C---------------------
        DO I=1,NFXFLUX
           ISENS = IBFFLUX(6,I)
           IF(ISENS/=0) THEN
-            DO J=1,NSENSOR
-              IF(ISENS == SENSOR_TAB(J)%SENS_ID) THEN
+            DO J=1,SENSORS%NSENSOR
+              IF(ISENS == SENSORS%SENSOR_TAB(J)%SENS_ID) THEN
                  IBFFLUX(6,I) = J
                  GO TO 803
               ENDIF
@@ -2024,8 +1802,8 @@ C---------------------
       DO I=1,NFXTEMP
         ISENS = IBFT(3,I)
         IF (ISENS > 0) THEN
-          DO J=1,NSENSOR
-            IF (ISENS == SENSOR_TAB(J)%SENS_ID) THEN
+          DO J=1,SENSORS%NSENSOR
+            IF (ISENS == SENSORS%SENSOR_TAB(J)%SENS_ID) THEN
                IBFT(3,I) = J
                EXIT
             ENDIF
@@ -2039,8 +1817,8 @@ C---------------------
       DO I=1,NFXVEL
         ISENS = IBFVEL(4,I)
         IF (ISENS > 0) THEN
-          DO J=1,NSENSOR
-            IF (ISENS == SENSOR_TAB(J)%SENS_ID) THEN
+          DO J=1,SENSORS%NSENSOR
+            IF (ISENS == SENSORS%SENSOR_TAB(J)%SENS_ID) THEN
                IBFVEL(4,I) = J
                EXIT
             ENDIF
@@ -2049,7 +1827,7 @@ C---------------------
       ENDDO
 c
 C----------------------------
-C     (III) TRAITEMENT DES TABLES
+C     (IV) TRAITEMENT DES TABLES
 C----------------------------
 C
 C         1) LOIS 73
@@ -2228,7 +2006,7 @@ Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
 Chd|        ARRET                         source/system/arret.F         
 Chd|        FRETITL2                      source/starter/freform.F      
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        ELBUFTAG_MOD                  share/modules1/elbuftag_mod.F 
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
@@ -2245,23 +2023,17 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "scr03_c.inc"
 #include      "scr17_c.inc"
-#include      "tablen_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       TYPE(MLAW_TAG_), TARGET, DIMENSION(NUMMAT)  :: MLAW_TAG
-      INTEGER IPM(NPROPMI,*)
-      my_real
-     .        PM(NPROPM,*)
+      INTEGER IPM(NPROPMI,NUMMAT)
+      my_real  PM(NPROPM,NUMMAT)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -2307,14 +2079,14 @@ C
      .                   ANMODE=ANINFO_BLIND_1,
      .                   I1=ID,C1=TITR,
      .                   I2=IS)
-	    CALL ARRET(2)
+              CALL ARRET(2)
  200        CONTINUE !found
             !LAW20 material buffer is dimensioned from submaterial buffer dimensions.
             IF(PASSED)THEN
               ILAWk = IPM(2,J)            
               MTAG  => MLAW_TAG(I)   
               MTAGk => MLAW_TAG(J) 
-              MTAG%L_BFRAC= MAX(MTAG%L_BFRAC, MTAGk%L_BFRAC)  	        
+              MTAG%L_BFRAC= MAX(MTAG%L_BFRAC, MTAGk%L_BFRAC)            
               MTAG%L_TEMP = MAX(MTAG%L_TEMP , MTAGk%L_TEMP )
               MTAG%L_PLA  = MAX(MTAG%L_PLA  , MTAGk%L_PLA  )       
               MTAG%G_BFRAC= MAX(MTAG%G_BFRAC, MTAGk%G_BFRAC)        
@@ -2337,8 +2109,8 @@ C
                     ILAWk = IPM(2,J)            
                     MTAG  => MLAW_TAG(I)   
                     MTAGk => MLAW_TAG(J) 
-                    MTAG%L_BFRAC= MAX(MTAG%L_BFRAC, MTAGk%L_BFRAC)  	        
-                    MTAG%L_TB= MAX(MTAG%L_BFRAC, MTAGk%L_TB)  	        
+                    MTAG%L_BFRAC= MAX(MTAG%L_BFRAC, MTAGk%L_BFRAC)            
+                    MTAG%L_TB= MAX(MTAG%L_BFRAC, MTAGk%L_TB)            
                     MTAG%L_TEMP = MAX(MTAG%L_TEMP , MTAGk%L_TEMP )
                     MTAG%L_PLA  = MAX(MTAG%L_PLA  , MTAGk%L_PLA  )       
                     MTAG%G_BFRAC= MAX(MTAG%G_BFRAC, MTAGk%G_BFRAC)        

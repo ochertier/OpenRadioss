@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -31,7 +31,7 @@ Chd|  SIGEPS22G                     source/materials/mat/mat022/sigeps22g.F
 Chd|-- called by -----------
 Chd|        MULAWGLC                      source/materials/mat_share/mulawglc.F
 Chd|-- calls ---------------
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE SIGEPS22G(ELBUF_STR,
      1            JFT     ,JLT     ,PM      ,FOR     ,MOM      ,
@@ -62,8 +62,6 @@ Chd|====================================================================
 !-----------------------------------------------
 #include      "units_c.inc"
 #include      "param_c.inc"
-#include      "scr06_c.inc"
-#include      "scr05_c.inc"
 #include      "scr17_c.inc"
 #include      "com08_c.inc"
 #include      "impl1_c.inc"

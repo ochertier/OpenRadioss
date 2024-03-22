@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -35,39 +35,33 @@ Chd|        INTBUF_FRIC_MOD               share/modules1/intbuf_fric_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
       SUBROUTINE I25STI3(
-     1 X     ,IRECT ,STF   ,IXS   ,PM    ,
-     2 GEO   ,NRT   ,IXC   ,NINT  ,STFAC ,
-     3        NTY   ,GAP   ,NOINT ,
-     4 STFN  ,NSN   ,MS    ,NSV   ,IXTG  ,
-     5 IGAP  ,WA    ,GAP_S ,GAP_M ,GAPMIN,
-     6 GAPSCALE,IXT ,IXP   ,GAPINF,GAPMAX_S,
-     9 INACTI ,KNOD2ELS ,KNOD2ELC ,KNOD2ELTG ,NOD2ELS ,
-     A NOD2ELC,NOD2ELTG ,INTTH,
-     B IELES  ,IELEM    ,AREAS    ,SH4TREE ,SH3TREE ,
-     C IPART  ,IPARTC   ,IPARTTG  ,THK ,THK_PART    ,
-     D IXR    ,ITAB    ,BGAPSMX   ,IXS10   ,MSEGTYP ,
-     E NRT_SH ,IXS16    ,IXS20    ,GAP_N   ,
-     F ILEV   ,GAPMAX_M ,ID,TITR ,IGAP0    ,
-     G PEN_OLD,IPARTS   ,IGEO    ,FILLSOL ,
-     H PM_STACK, IWORKSH,PERCENT_SIZE,GAP_S_L ,GAP_M_L,
-     I KNOD2EL1D,NOD2EL1D,INTFRIC,TAGPRT_FRIC,IPARTFRICS,
-     J IPARTFRICM,INTBUF_FRIC_TAB,IVIS2 ,GAPM_MX,GAPS_MX,
-     K GAPM_L_MX,GAPS_L_MX ,IPARTSM,DRAD)
+     1 X         ,IRECT      ,STF       ,IXS       ,PM         ,
+     2 GEO       ,NRT        ,IXC       ,NINT      ,STFAC      ,
+     3 NTY       ,GAP        ,NOINT     , 
+     4 STFN      ,NSN        ,MS        ,NSV       ,IXTG       ,
+     5 IGAP      ,WA         ,GAP_S     ,GAP_M     ,GAPMIN     ,
+     6 GAPSCALE  ,IXT ,IXP   ,GAPINF    ,GAPMAX_S  ,
+     9 INACTI    ,KNOD2ELS   ,KNOD2ELC  ,KNOD2ELTG ,NOD2ELS    ,
+     A NOD2ELC   ,NOD2ELTG   ,INTTH,
+     B IELES     ,IELEM      ,AREAS     ,SH4TREE   ,SH3TREE    ,
+     C IPART     ,IPARTC     ,IPARTTG   ,THK       ,THK_PART   ,
+     D IXR       ,ITAB       ,BGAPSMX   ,IXS10     ,MSEGTYP    ,
+     E NRT_SH    ,IXS16      ,IXS20     ,GAP_N     ,
+     F ILEV      ,GAPMAX_M   ,ID,TITR   ,IGAP0     ,
+     G PEN_OLD   ,IPARTS     ,IGEO      ,FILLSOL   ,
+     H PM_STACK  , IWORKSH   ,PERCENT_SIZE,GAP_S_L ,GAP_M_L    ,
+     I KNOD2EL1D ,NOD2EL1D   ,INTFRIC   ,TAGPRT_FRIC,IPARTFRICS,
+     J IPARTFRICM,INTBUF_FRIC_TAB,IVIS2 ,GAPM_MX   ,GAPS_MX    ,
+     K GAPM_L_MX ,GAPS_L_MX  ,IPARTSM   ,DRAD      ,IPARTT     ,
+     J IPARTP    ,IPARTR   )
 C-----------------------------------------------
+      USE MY_ALLOC_MOD
       USE INTBUF_FRIC_MOD
       USE MESSAGE_MOD
-C
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -76,11 +70,8 @@ C-----------------------------------------------
 #include      "param_c.inc"
 #include      "remesh_c.inc"
 #include      "scr03_c.inc"
-#include      "scr05_c.inc"
-#include      "scr08_c.inc"
 #include      "scr17_c.inc"
 #include      "units_c.inc"
-#include      "warn_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -106,6 +97,9 @@ C     REAL
      .   AREAS(*),THK(*),THK_PART(*),PEN_OLD(5,NSN), FILLSOL(*),
      .   PM_STACK(20,*),GAP_S_L(*),GAP_M_L(*)
       INTEGER ID,IPARTS(*)
+      INTEGER, DIMENSION(NUMELT), INTENT(IN) :: IPARTT
+      INTEGER, DIMENSION(NUMELP), INTENT(IN) :: IPARTP
+      INTEGER, DIMENSION(NUMELR), INTENT(IN) :: IPARTR
       CHARACTER*nchartitle,
      .   TITR
       TYPE(INTBUF_FRIC_STRUCT_) INTBUF_FRIC_TAB(*)
@@ -259,15 +253,36 @@ C       MSEGTYP==0 <=> Solide
 C-------
       DO I=1,NUMELT
         MG=IXT(4,I)
-        DX=HALF*SQRT(GEO(1,MG))
+        IP = IPARTT(I)
+        IF ( THK_PART(IP) > ZERO ) THEN
+          DX=HALF*THK_PART(IP)
+        ELSE
+          DX=HALF*SQRT(GEO(1,MG))
+        END IF
         WA(IXT(2,I))=MAX(WA(IXT(2,I)),DX)
         WA(IXT(3,I))=MAX(WA(IXT(3,I)),DX)
       ENDDO
       DO I=1,NUMELP
         MG=IXP(5,I)
-        DX=0.5*SQRT(GEO(1,MG))
+        IP = IPARTP(I)
+        IF ( THK_PART(IP) > ZERO ) THEN
+          DX=HALF*THK_PART(IP)
+        ELSE
+          DX=HALF*SQRT(GEO(1,MG))
+        END IF
         WA(IXP(2,I))=MAX(WA(IXP(2,I)),DX)
         WA(IXP(3,I))=MAX(WA(IXP(3,I)),DX)
+      ENDDO
+      DO I=1,NUMELR
+        IP = IPARTR(I)
+        IF ( THK_PART(IP) > ZERO ) THEN
+          MG=IXR(1,I)
+          IGTYP = IGEO(11,MG)
+          DX=HALF*THK_PART(IP)
+          WA(IXR(2,I))=MAX(WA(IXR(2,I)),DX)
+          WA(IXR(3,I))=MAX(WA(IXR(3,I)),DX)
+          IF (IGTYP==12) WA(IXR(4,I))=MAX(WA(IXR(4,I)),DX)
+       END IF
       ENDDO
       DO I=1,NSN
         GAP_S(I)=GAPSCALE * WA(NSV(I))
@@ -709,30 +724,19 @@ Chd|====================================================================
 C-----------------------------------------------
       USE MESSAGE_MOD
       USE INTBUF_FRIC_MOD
-C
+      USE MY_ALLOC_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
 #include      "scr17_c.inc"
 #include      "scr08_c.inc"
-#include      "scr05_c.inc"
-#include      "scr03_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -766,7 +770,8 @@ C-----------------------------------------------
       INTEGER I, J, INRT, NELS, MT, JJ, JJJ, NELC,
      .   MG, NUM, NPT, LL, L, NN, NELTG,N1,N2,N3,N4,IE,
      .   IP, NLEV, MYLEV, K, P, R, T,IAD,NREV,IGTYP,IPGMAT,IGMAT,
-     .   ISUBSTACK,IPL,IPG,ISOL
+     .   ISUBSTACK,IPL,IPG,ISOL,NINV
+      INTEGER, DIMENSION(:),ALLOCATABLE  :: TAGELEMS,INDEXE
 C     REAL
       my_real
      .   AREA, VOL, DX, GAPM, DDX,
@@ -776,6 +781,13 @@ C----------------------
       ISOL = 0
       NREV=0
       IPGMAT = 700
+      IF(NUMELS > 0) THEN
+        CALL MY_ALLOC(TAGELEMS,NUMELS)
+        TAGELEMS = 0
+        CALL MY_ALLOC(INDEXE,NUMELS)
+        INDEXE = 0
+      ENDIF
+      NINV = 0
       DO I=1,NRT
         STF(I)=ZERO
         IF(INTTH > 0 ) IELEM(I) = 0
@@ -788,7 +800,8 @@ C      ELEMENTS SOLIDES
 C----------------------
         CALL INSOL3D(X,IRECT,IXS,NINT,NELS,I   ,
      .             AREA,NOINT,KNOD2ELS ,NOD2ELS ,0,
-     .             IXS10,IXS16,IXS20)
+     .             IXS10,IXS16,IXS20,TAGELEMS,INDEXE,
+     .             NINV )
         IF(NELS/=0) THEN
           MT=IXS(1,NELS)
           IF(INTTH > 0 ) IELEM(I) = MT
@@ -1054,6 +1067,36 @@ C      en SPMD il faut un element associe a l'arrete sinon erreur
         ENDIF
       END DO
 C
+      IF(NUMELS > 0) DEALLOCATE(TAGELEMS,INDEXE)
+C
+      CALL ANCMSG(MSGID=3022,
+     .             MSGTYPE=MSGWARNING,
+     .             ANMODE=ANINFO_BLIND_1,
+     .             I1=ID,
+     .             C1=TITR,
+     .             PRMOD=MSG_PRINT)
+      CALL ANCMSG(MSGID=3024,
+     .             MSGTYPE=MSGWARNING,
+     .             ANMODE=ANINFO_BLIND_1,
+     .             I1=ID,
+     .             C1=TITR,
+     .             PRMOD=MSG_PRINT)
+      IF(NINV > 0 .AND.NINT>0)
+     .    CALL ANCMSG(MSGID=3023,
+     .             MSGTYPE=MSGWARNING,
+     .             ANMODE=ANINFO_BLIND_1,
+     .             I1=ID,
+     .             C1=TITR,
+     .             I2=NINV)
+C
+      IF(NINV > 0 .AND.NINT< 0)
+     .    CALL ANCMSG(MSGID=3025,
+     .             MSGTYPE=MSGWARNING,
+     .             ANMODE=ANINFO_BLIND_1,
+     .             I1=ID,
+     .             C1=TITR,
+     .             I2=NINV)
+C
       IF(IVIS2 ==-1.AND.ISOL /=0) THEN
         CALL ANCMSG(MSGID=2096,
      .              MSGTYPE=MSGERROR,
@@ -1083,12 +1126,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

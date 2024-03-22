@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,12 +26,12 @@ Chd|-- called by -----------
 Chd|        I7BUCE_VOX                    source/interfaces/intsort/i7buce.F
 Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
-Chd|        ARRET                         source/system/arret.F
+Chd|        ARRET                         source/system/arret.F         
 Chd|        I7STO                         source/interfaces/intsort/i7sto.F
-Chd|        MY_BARRIER                    source/system/machine.F
+Chd|        MY_BARRIER                    source/system/machine.F       
 Chd|        SPMD_OLDNUMCD                 source/mpi/interfaces/spmd_i7tool.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        TRI7BOX                       share/modules/tri7box.F
+Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
       SUBROUTINE I7TRIVOX(
      1      NSN    ,RENUM       ,NSNR    ,ISZNSNR  ,I_MEM    ,
@@ -44,7 +44,8 @@ Chd|====================================================================
      8      GAP_M  ,GAPMIN      ,GAPMAX  ,MARGE    ,CURV_MAX ,
      9      NIN    ,ITASK       ,BGAPSMX ,KREMNOD  ,REMNOD   ,
      A      ITAB   ,FLAGREMNODE ,DRAD    ,ITIED    ,CAND_F   ,
-     B      DGAPLOAD,REMOTE_S_NODE,LIST_REMOTE_S_NODE)
+     B      DGAPLOAD,REMOTE_S_NODE,LIST_REMOTE_S_NODE,
+     C      TOTAL_NB_NRTM)
 C============================================================================
 C   M o d u l e s
 C-----------------------------------------------
@@ -64,14 +65,9 @@ c     parameter setting the size for the vector (orig version is 128)
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
-#include      "warn_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "parit_c.inc"
-#include      "scr05_c.inc"
-#include      "sms_c.inc"
 #include      "task_c.inc"
 #include      "ige3d_c.inc"
 C-----------------------------------------------
@@ -112,11 +108,13 @@ C                       noeud au dernier
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER I_MEM,ESHIFT,NSN,ISZNSNR,NRTM,NSNROLD,NIN,ITASK,
+      INTEGER I_MEM,ESHIFT,NSN,ISZNSNR,NSNROLD,NIN,ITASK,
      .        MULNSN,NOINT,INACTI,IFQ,NSNR,IGAP,NBX,NBY,NBZ,
      .        NSV(*),CAND_N(*),CAND_E(*),CAND_A(*),IFPEN(*),RENUM(*),
      .        INTTH,IRECT(4,*), VOXEL(NBX+2,NBY+2,NBZ+2),II_STOK,
      .        KREMNOD(*),REMNOD(*),ITAB(*),FLAGREMNODE,ITIED
+      INTEGER, INTENT(in) :: NRTM !< number of segments per threads
+      INTEGER, INTENT(in) :: TOTAL_NB_NRTM !< total number of segments
       my_real
      .   X(3,*),XYZM(12),CAND_P(*),STF(*),STFN(*),GAP_S(*),GAP_M(*),
      .   TZINF,MARGE,GAP,GAPMIN,GAPMAX,BGAPSMX,
@@ -152,6 +150,8 @@ c provisoire
       SAVE IIX,IIY,IIZ
 C-----------------------------------------------
       IF(ITASK == 0)THEN
+        REMOTE_S_NODE = 0
+        CPT_VOX0 = 0
         ALLOCATE(NEXT_NOD(NSN+NSNR),STAT=IERROR)
         IF(IERROR/=0) THEN
           CALL ANCMSG(MSGID=19,ANMODE=ANINFO,
@@ -207,9 +207,8 @@ C-----------------------------------------------
 C=======================================================================
 C 1   NODE CLUSTERING
 C=======================================================================
-      IF(ITASK == 0)THEN
+      IF(ITASK==0.AND.TOTAL_NB_NRTM>0)THEN
         !==========LAGRANGIAN and STAGGERED ALE==========!
-        CPT_VOX0 = 0
         TEST_V0 = FIRST_TEST(NIN)
         DO I=1,NSN
           IIX(I)=0
@@ -263,7 +262,6 @@ C=======================================================================
 C=======================================================================
 C 2   REMOTE NODE CLUSTERING
 C=======================================================================
-        REMOTE_S_NODE = 0
         DO J = 1, NSNR
 
           IF(XREM(1,J) < XMIN)  CYCLE
@@ -292,12 +290,12 @@ C=======================================================================
           ENDIF
 
           IF(FIRST == 0)THEN
-            ! voxel vide
+            ! empty cell
             VOXEL(IIX(NSN+J),IIY(NSN+J),IIZ(NSN+J)) = NSN+J ! first
             NEXT_NOD(NSN+J)     = 0 ! last one
             LAST_NOD(NSN+J)     = 0 ! no last
           ELSEIF(LAST_NOD(FIRST) == 0)THEN
-            ! cell containing one node add as next node
+            ! cell containing one node, add it as next node
             NEXT_NOD(FIRST) = NSN+J  ! next
             LAST_NOD(FIRST) = NSN+J  ! last
             NEXT_NOD(NSN+J)  = 0     ! last one
@@ -319,7 +317,7 @@ C=======================================================================
 !then the box is not reduced anymore
         CALL MY_BARRIER
         IF(ITASK == 0) THEN
-          IF(CPT_VOX0 > 5*(NSNR + NSN)/100) TO_TRIM(NIN) = .FALSE.
+          IF(CPT_VOX0 > 5*(REMOTE_S_NODE + NSN)/100) TO_TRIM(NIN) = .FALSE.
           FIRST_TEST(NIN) = .FALSE.
         ENDIF
         CALL MY_BARRIER
@@ -548,20 +546,22 @@ C=======================================================================
   100 CONTINUE
       ! Barrier to avoid reinitialization before end of sorting
       CALL MY_BARRIER
-      NSNF = 1 + ITASK*NSN / NTHREAD
-      NSNL = (ITASK+1)*NSN / NTHREAD
-      DO I=NSNF,NSNL
-        IF(IIX(I)/=0)THEN
-          VOXEL(IIX(I),IIY(I),IIZ(I))=0
-        ENDIF
-      ENDDO
-      NSNF = 1 + ITASK*REMOTE_S_NODE / NTHREAD
-      NSNL = (ITASK+1)*REMOTE_S_NODE / NTHREAD
-      IF(ITASK+1==NTHREAD) NSNL=REMOTE_S_NODE
-      DO JJ = NSNF, NSNL
-        J = LIST_REMOTE_S_NODE(JJ)
-        VOXEL(IIX(NSN+J),IIY(NSN+J),IIZ(NSN+J))=0
-      ENDDO
+      IF(TOTAL_NB_NRTM>0) THEN
+        NSNF = 1 + ITASK*NSN / NTHREAD
+        NSNL = (ITASK+1)*NSN / NTHREAD
+        DO I=NSNF,NSNL
+            IF(IIX(I)/=0)THEN
+              VOXEL(IIX(I),IIY(I),IIZ(I))=0
+            ENDIF
+        ENDDO
+        NSNF = 1 + ITASK*REMOTE_S_NODE / NTHREAD
+        NSNL = (ITASK+1)*REMOTE_S_NODE / NTHREAD
+        IF(ITASK+1==NTHREAD) NSNL=REMOTE_S_NODE
+        DO JJ = NSNF, NSNL
+            J = LIST_REMOTE_S_NODE(JJ)
+            VOXEL(IIX(NSN+J),IIY(NSN+J),IIZ(NSN+J))=0
+        ENDDO
+      ENDIF
       CALL MY_BARRIER()
 
 C=======================================================================

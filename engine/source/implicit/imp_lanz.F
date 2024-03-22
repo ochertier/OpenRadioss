@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,7 +20,6 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-#ifdef MUMPS5
 Chd|====================================================================
 Chd|  IMP_LANZP                     source/implicit/imp_lanz.F    
 Chd|-- called by -----------
@@ -61,13 +60,13 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
-#include      "com04_c.inc"
-#include      "dmumps_struc.h"
+#if defined(MUMPS5)
+#include "dmumps_struc.h"
+#endif
+#include "com04_c.inc"
+#include "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -90,6 +89,7 @@ C     REAL
 
       TYPE(INTBUF_STRUCT_) INTBUF_TAB(*)
       TYPE (SURF_)   , DIMENSION(NSURF)   :: IGRSURF
+#ifdef MUMPS5
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -594,5 +594,5 @@ C*     ------------------------------------------------------------------
      .       E12.4,2X,'OLDB =', E12.4)
 C*     ------------------------------------------------------------------
 C*     END OF SYMMLQ
-      END
 #endif
+      END

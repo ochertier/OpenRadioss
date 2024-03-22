@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -38,6 +38,7 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
+      USE NAMES_AND_TITLES_MOD, ONLY: NCHARLINE100
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -51,16 +52,12 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "units_c.inc"
-#include      "chara_c.inc"
-#include      "nchara_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I
-C     REAL
-      my_real
-     .   REC, ERR
-      CHARACTER CARTE*ncharline
+      my_real REC, ERR
+      CHARACTER(LEN=NCHARLINE100)::CARTE
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
@@ -68,15 +65,14 @@ C-----------------------------------------------
 C-----------------------------------------------
       REWIND(IUSC2)
       N=0
-      DO 100 I=1,NBC
-       READ(IUSC1,'(A)',REC=IREC,ERR=999)CARTE
-       N=N+NVAR(CARTE)
-       WRITE(IUSC2,'(A)')CARTE
- 100  CONTINUE
+      DO I=1,NBC
+        READ(IUSC1,'(A)',REC=IREC,ERR=999)CARTE
+        N=N+NVAR(CARTE)
+        WRITE(IUSC2,'(A)')CARTE
+      ENDDO
       REWIND(IUSC2)
       RETURN
  999  CONTINUE
-      CALL ANCMSG(MSGID=73,ANMODE=ANINFO,
-     .            C1=KEY0)
+      CALL ANCMSG(MSGID=73,ANMODE=ANINFO,C1=KEY0)
       CALL ARRET(0)
       END

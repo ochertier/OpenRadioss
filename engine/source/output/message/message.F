@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -171,6 +171,7 @@ Chd|        IMP_STOP                      source/implicit/imp_solv.F
 Chd|        IND_KTOT                      source/implicit/ind_glob_k.F  
 Chd|        INI_K0H                       source/implicit/imp_solv.F    
 Chd|        INI_KISC                      source/implicit/lin_solv.F    
+Chd|        INTER7_COLLISION_DETECTION    source/interfaces/inter7_collision_detection.F
 Chd|        INTER_COUNT_NODE_CURV         source/interfaces/generic/inter_count_node_curv.F
 Chd|        IQELA2                        source/ale/inter/iqela2.F     
 Chd|        KTBUF_INI                     source/implicit/imp_init.F    
@@ -226,26 +227,26 @@ Chd|        S16DERI3                      source/elements/thickshell/solide16/s1
 Chd|        S20DERI3                      source/elements/solid/solide20/s20deri3.F
 Chd|        S6CDERI3                      source/elements/thickshell/solide6c/s6cderi3.F
 Chd|        S8DERI3                       source/elements/solid/solide8/s8deri3.F
-Chd|        S8EDERIC3                     source/elements/solid/solide8e/s8ederi3.F
-Chd|        S8EDERICM3                    source/elements/solid/solide8e/s8ederi3.F
-Chd|        S8EDERICT3                    source/elements/solid/solide8e/s8ederi3.F
+Chd|        S8EDERIC3                     source/elements/solid/solide8e/s8ederic3.F
+Chd|        S8EDERICM3                    source/elements/solid/solide8e/s8edericm3.F
+Chd|        S8EDERICT3                    source/elements/solid/solide8e/s8ederict3.F
 Chd|        S8EFORC3                      source/elements/solid/solide8e/s8eforc3.F
 Chd|        S8SFORC3                      source/elements/solid/solide8s/s8sforc3.F
-Chd|        S8ZDERIC3                     source/elements/solid/solide8z/s8zderi3.F
-Chd|        S8ZDERICM3                    source/elements/solid/solide8z/s8zderi3.F
-Chd|        S8ZDERICT3                    source/elements/solid/solide8z/s8zderi3.F
-Chd|        S8ZDERICTO3                   source/elements/solid/solide8z/s8zderi3.F
+Chd|        S8ZDERIC3                     source/elements/solid/solide8z/s8zderic3.F
+Chd|        S8ZDERICM3                    source/elements/solid/solide8z/s8zdericm3.F
+Chd|        S8ZDERICT3                    source/elements/solid/solide8z/s8zderict3.F
+Chd|        S8ZDERICTO3                   source/elements/solid/solide8z/s8zdericto3.F
 Chd|        S8ZFORC3                      source/elements/solid/solide8z/s8zforc3.F
 Chd|        SCDERI3                       source/elements/thickshell/solidec/scderi3.F
-Chd|        SCHKJAB3                      source/elements/solid/solide/sderi3.F
-Chd|        SCHKJABT3                     source/elements/solid/solide4/s4deri3.F
-Chd|        SECT_INI                      source/tools/sect/sectio.F    
-Chd|        SECT_READ                     source/tools/sect/sectio.F    
-Chd|        SECT_READP                    source/tools/sect/sectio.F    
+Chd|        SCHKJAB3                      source/elements/solid/solide/schkjab3.F
+Chd|        SCHKJABT3                     source/elements/solid/solide4/schkjabt3.F
+Chd|        SECTION_INIT                  source/tools/sect/section_init.F
+Chd|        SECTION_READ                  source/tools/sect/section_read.F
+Chd|        SECTION_READP                 source/tools/sect/section_readp.F
 Chd|        SENSOR_BASE                   source/tools/sensor/sensor_base.F
 Chd|        SIGEPS53                      source/materials/mat/mat053/sigeps53.F
 Chd|        SIGEPS75                      source/materials/mat/mat075/sigeps75.F
-Chd|        SMALLGEO3                     source/elements/solid/solide/small3.F
+Chd|        SMALLGEO3                     source/elements/solid/solide/smallgeo3.F
 Chd|        SMS_BUILD_MAT_2               source/ams/sms_build_mat_2.F  
 Chd|        SMS_CHECK                     source/ams/sms_fsa_inv.F      
 Chd|        SMS_ENCIN_2                   source/ams/sms_encin_2.F      
@@ -331,14 +332,15 @@ Chd|        STAT_INIMAP1D_FILE_SPMD       source/output/sta/stat_inimap1d_file_s
 Chd|        STAT_INIMAP1D_SPMD            source/output/sta/stat_inimap1d_spmd.F
 Chd|        STAT_INIMAP2D_FILE_SPMD       source/output/sta/stat_inimap2d_file_spmd.F
 Chd|        STAT_INIMAP2D_SPMD            source/output/sta/stat_inimap2d_spmd.F
+Chd|        STOP_SENSOR                   source/tools/sensor/stop_sensor.F
 Chd|        SUFORC3                       source/user_interface/suforc3.F
 Chd|        SWITCH_TO_DTNODA              source/time_step/switch_to_dtnoda.F
 Chd|        TABLE2D_VINTERP_LOG           source/tools/curve/table2d_vinterp_log.F
 Chd|        TABLE_INTERP                  source/tools/curve/table_tools.F
 Chd|        TABLE_INTERP_DYDX             source/tools/curve/table_tools.F
 Chd|        TABLE_INTERP_LAW76            source/tools/curve/table_tools.F
+Chd|        TABLE_MAT_VINTERP             source/materials/tools/table_mat_vinterp.F
 Chd|        TABLE_RRESTI                  source/tools/curve/table_tools.F
-Chd|        TABLE_RRESTI_MAT              source/tools/curve/table_tools.F
 Chd|        TABLE_VINTERP                 source/tools/curve/table_tools.F
 Chd|        TMAX_IPART                    source/output/tmax_ipart.F    
 Chd|        TRACE_PRINT                   source/system/trace_back.F    
@@ -347,6 +349,7 @@ Chd|        UPD_ASPC0                     source/constraints/general/bcs/bc_imp0
 Chd|        UPGRADE_REM_2RY               source/mpi/interfaces/spmd_i7tool.F
 Chd|        USERMAT_SHELL                 source/materials/mat_share/usermat_shell.F
 Chd|        USERMAT_SOLID                 source/materials/mat_share/usermat_solid.F
+Chd|        USER_WINDOWS_ROUTINE          source/user_interface/user_windows.F
 Chd|        WCIUSC2                       source/input/wciusc2.F        
 Chd|        WRIUSC2                       source/input/wriusc2.F        
 Chd|        XANIM28                       source/elements/xelem/xanim28.F
@@ -365,7 +368,11 @@ Chd|====================================================================
      .                  R5    ,R6    ,R7    ,R8    ,R9   ,
      .                  C1    ,C2    ,C3    ,C4    ,
      .                  C5    ,C6    ,C7    ,C8    ,C9    )
-      USE MESSAGE_MOD2 
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
+      USE MESSAGE_MOD2
+      USE NAMES_AND_TITLES_MOD, ONLY: NCHARLINE100
 C-----------------------------------------------
 C Usage sample :
 C      USE MESSAGE_MOD 
@@ -395,7 +402,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "nchara_c.inc"
+#include      "units_c.inc"
+#include      "comlock.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -419,27 +427,18 @@ C-----------------------------------------------
      .                 C1,C2,C3,C4,
      .                 C5,C6,C7,C8,C9
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "task_c.inc"
-#include      "units_c.inc"
-#include      "comlock.inc"
-C-----------------------------------------------
-C   E x t e r n a l   F u n c t i o n s
-C-----------------------------------------------
-C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER             IBUF(10)
       my_real             RBUF(10)
-      CHARACTER*ncharline CBUF(10)
+      CHARACTER(LEN=NCHARLINE100):: CBUF(10)
 C
-      CHARACTER*ncharline TMPLINE,MYFMT,TMPBUF
+      CHARACTER(LEN=NCHARLINE100):: TMPLINE,MYFMT,TMPBUF
       CHARACTER(LEN=NCHAROUT) ::  TMPOUT
       INTEGER ITYPE,ILINE,I,I0,J,J0,SBUFMSG(2),IFILE,IOLD,
      .        INDXI,INDXR,INDXC,INDXTMPOUT,BUFLEN,
      .        STMP
-      CHARACTER*ncharline BUFMSG(2,100),BUFFMT(2,100)
+      CHARACTER(LEN=NCHARLINE100):: BUFMSG(2,100),BUFFMT(2,100)
 C
       WRITE(ISTDO,'(/A,I10)')'MESSAGE ID : ',MSGID
       IF (IOUT/=0) THEN

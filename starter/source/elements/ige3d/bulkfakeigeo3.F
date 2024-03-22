@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,7 +25,7 @@ Chd|  BULKFAKEIGEO3                 source/elements/ige3d/bulkfakeigeo3.F
 Chd|-- called by -----------
 Chd|        LECTUR                        source/starter/lectur.F       
 Chd|-- calls ---------------
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|====================================================================
       SUBROUTINE BULKFAKEIGEO3(ELBUF_TAB,IPARG,PM,KXIG3D,IGRSURF,STIFINT)
@@ -43,11 +43,7 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr05_c.inc"
 #include      "param_c.inc"
-#include      "tabsiz_c.inc"
-#include      "scr17_c.inc"
-#include      "ige3d_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

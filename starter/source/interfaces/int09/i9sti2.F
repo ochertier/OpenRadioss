@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -37,7 +37,6 @@ Chd|====================================================================
      3 NSN    ,NSV   ,SLSFAC,NOINT ,IELE  ,
      4 ID,TITR)
 C-----------------------------------------------
-C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
@@ -50,11 +49,9 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NRT, NINT, NSN, NOINT
-C     REAL
       my_real
      .   SLSFAC
       INTEGER IRECT(4,*), IXQ(7,*), NSEG(*), LNSV(*), NSV(*), IELE(*)
-C     REAL
       my_real
      .   X(3,*), STF(*), PM(NPROPM,*), STFN(*)
       INTEGER ID

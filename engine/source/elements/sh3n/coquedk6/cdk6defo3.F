@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -38,15 +38,9 @@ C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "scr14_c.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-C  ds007  18/2/00   +1
       INTEGER JFT, JLT
-C     REAL
       my_real
      .   PX2(*),PY2(*),PX3(*),PY3(*),PB1(MVSIZ,3,3),PB2(MVSIZ,3,3),PB3(MVSIZ,3,6),
      .   VLX(MVSIZ,2),VLY(MVSIZ,2),VLZ(MVSIZ,6),VZ4(MVSIZ,3),VZ5(MVSIZ,3),VZ6(MVSIZ,3),VDEF(MVSIZ,8)

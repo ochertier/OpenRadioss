@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -38,7 +38,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -50,10 +49,8 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 ctmp+1
-#include      "com04_c.inc"
 #include      "task_c.inc"
 #include      "sphcom.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -200,8 +197,8 @@ ctmp+1
             BUFS(3,IDEB+NN) = V(1,INOD)
             BUFS(4,IDEB+NN) = V(2,INOD)
             BUFS(5,IDEB+NN) = V(3,INOD)
-            BUFS(6,IDEB+NN) = KXSP(2,ICELL)	    
-            BUFS(7,IDEB+NN) = IPARTSP(ICELL)	    
+            BUFS(6,IDEB+NN) = KXSP(2,ICELL)      
+            BUFS(7,IDEB+NN) = IPARTSP(ICELL)      
           END IF
         END DO
         IDEB = IDEB + PSPHS(P)
@@ -247,8 +244,8 @@ C
               XSPHR(9,IDEB+N) = BUFR(3,IDEB+NN)
               XSPHR(10,IDEB+N)= BUFR(4,IDEB+NN)
               XSPHR(11,IDEB+N)= BUFR(5,IDEB+NN) 
-	          XSPHR(13,IDEB+N)= BUFR(6,IDEB+NN)
-	          XSPHR(14,IDEB+N)= BUFR(7,IDEB+NN)
+                    XSPHR(13,IDEB+N)= BUFR(6,IDEB+NN)
+                    XSPHR(14,IDEB+N)= BUFR(7,IDEB+NN)
             ELSEIF(ISPHR(IDEB+N)==1) THEN
               NN = NN + 1
               XSPHR(7,IDEB+N) = BUFR(1,IDEB+NN)
@@ -256,8 +253,8 @@ C
               XSPHR(9,IDEB+N) = BUFR(3,IDEB+NN)
               XSPHR(10,IDEB+N)= BUFR(4,IDEB+NN)
               XSPHR(11,IDEB+N)= BUFR(5,IDEB+NN)
-	          XSPHR(13,IDEB+N)= BUFR(6,IDEB+NN)      
-	          XSPHR(14,IDEB+N)= BUFR(7,IDEB+NN)   
+                    XSPHR(13,IDEB+N)= BUFR(6,IDEB+NN)      
+                    XSPHR(14,IDEB+N)= BUFR(7,IDEB+NN)   
             END IF
           END DO
           IDEB = IDEB + PSPHR(P)
@@ -292,7 +289,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -304,10 +300,8 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 ctmp+1
-#include      "com04_c.inc"
 #include      "task_c.inc"
 #include      "sphcom.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -384,8 +378,8 @@ ctmp+1
             BUFS(3,NN+IDEB) = V(1,INOD)
             BUFS(4,NN+IDEB) = V(2,INOD)
             BUFS(5,NN+IDEB) = V(3,INOD)
-            BUFS(6,NN+IDEB) = KXSP(2,ICELL)	    
-            BUFS(7,NN+IDEB) = IPARTSP(ICELL)	    
+            BUFS(6,NN+IDEB) = KXSP(2,ICELL)      
+            BUFS(7,NN+IDEB) = IPARTSP(ICELL)      
           END IF
         END DO
         MSGTYP = MSGOFF2
@@ -415,8 +409,8 @@ C
               XSPHR(9,IDEB+N) = BUFR(3,NN)
               XSPHR(10,IDEB+N)= BUFR(4,NN)
               XSPHR(11,IDEB+N)= BUFR(5,NN)     
-	      XSPHR(13,IDEB+N)= BUFR(6,NN) 
-	      XSPHR(14,IDEB+N)= BUFR(7,NN) 
+                XSPHR(13,IDEB+N)= BUFR(6,NN) 
+                XSPHR(14,IDEB+N)= BUFR(7,NN) 
             ELSEIF(ISPHR(IDEB+N)==1) THEN
               NN = NN + 1
               XSPHR(7,IDEB+N) = BUFR(1,NN)
@@ -424,8 +418,8 @@ C
               XSPHR(9,IDEB+N) = BUFR(3,NN)
               XSPHR(10,IDEB+N)= BUFR(4,NN)
               XSPHR(11,IDEB+N)= BUFR(5,NN)
-	      XSPHR(13,IDEB+N)= BUFR(6,NN)      
-	      XSPHR(14,IDEB+N)= BUFR(7,NN)      
+                XSPHR(13,IDEB+N)= BUFR(6,NN)      
+                XSPHR(14,IDEB+N)= BUFR(7,NN)      
             END IF
           END DO
           IDEB = IDEB + PSPHR(P)

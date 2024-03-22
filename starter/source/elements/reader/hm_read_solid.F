@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -34,7 +34,7 @@ Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F
 Chd|====================================================================
       SUBROUTINE HM_READ_SOLID(IXS   ,PM     ,ITAB ,ITABM1,
      .                  IPART,IPARTS,ISOLNOD,IXS10 ,IXS20,IXS16 ,
-     .                  IGEO ,LSUBMODEL,IS_DYNA)
+     .                  IGEO ,LSUBMODEL,IS_DYNA,X  )
 C-----------------------------------------------
 C   ROUTINE DESCRIPTION :
 C   ===================
@@ -74,14 +74,8 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr17_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com10_c.inc"
-#include      "units_c.inc"
-#include      "scr03_c.inc"
 #include      "param_c.inc"
-#include      "titr_c.inc"
-#include      "submod_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -93,6 +87,7 @@ C INPUT ARGUMENTS
       INTEGER,INTENT(IN)::IS_DYNA
       my_real,
      .  INTENT(IN)::PM(NPROPM,*)
+      my_real, DIMENSION(3,NUMNOD), INTENT(IN):: X
       TYPE(SUBMODEL_DATA),INTENT(IN)::LSUBMODEL(*)
 C OUTPUT ARGUMENTS
       INTEGER,INTENT(OUT)::ISOLNOD(*)
@@ -112,6 +107,11 @@ C-----------------------------------------------
      .   BID 
       CHARACTER MESS*40, MESS2*40
       INTEGER, DIMENSION(:), ALLOCATABLE :: SUB_SOL
+C-----------------------------------------------
+C   E x t e r n a l  F u n c t i o n s
+C-----------------------------------------------
+      my_real
+     .   CHECKVOLUME_4N
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
@@ -148,6 +148,14 @@ C--------------------------------------------------
           IXS(4,I)=IXS(3,I)
           IXS(3,I)=IXS(2,I)
           ISOLNOD(I)=4
+          IF (CHECKVOLUME_4N(X ,IXS(1,I)) < ZERO) THEN
+            IC2=IXS(6,I)
+            IC4=IXS(4,I)
+            IXS(4,I)=IC2
+            IXS(6,I)=IC4
+            IXS(5,I)=IC2
+            IXS(9,I)=IC4
+          END IF
         ELSEIF(IXS(8,I)+IXS(9,I)==0)THEN
           IXS(9,I)=IXS(5,I)
           IXS(8,I)=IXS(7,I)
@@ -231,6 +239,14 @@ C--------------------------------------------------
         IXS(4,I)=IXS(3,I)
         IXS(3,I)=IXS(2,I)
         ISOLNOD(I)=4
+        IF (CHECKVOLUME_4N(X ,IXS(1,I)) < ZERO) THEN
+          IC2=IXS(6,I)
+          IC4=IXS(4,I)
+          IXS(4,I)=IC2
+          IXS(6,I)=IC4
+          IXS(5,I)=IC2
+          IXS(9,I)=IC4
+        END IF
       ENDDO
 C--------------------------------------------------
 C      READING PENTA6 INPUTS IN HM STRUCTURE
@@ -465,9 +481,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com10_c.inc"
 #include      "units_c.inc"
 #include      "scr03_c.inc"
 #include      "sphcom.inc"
@@ -752,13 +766,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com10_c.inc"
-#include      "units_c.inc"
-#include      "scr03_c.inc"
 #include      "param_c.inc"
-#include      "titr_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -816,20 +825,11 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr17_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com10_c.inc"
-#include      "units_c.inc"
-#include      "scr03_c.inc"
 #include      "param_c.inc"
-#include      "titr_c.inc"
-#include      "submod_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -889,22 +889,26 @@ C--------------------------------------------------
           CALL ANCMSG(MSGID=509,ANMODE=ANINFO,MSGTYPE=MSGERROR,
      .                I1=IXS(11,I),C1=LINE,C2='/SOLID')
         ENDIF
-        NSPHDIR=IGEO(37,IPART(2,IPARTS(I)))
-        IF(IXS(6,I)+IXS(7,I)+IXS(8,I)+IXS(9,I)==0)THEN
-          NT=0
-          DO IT=1,NSPHDIR
-            NT=NT+IT
-            NSPHSOL=NSPHSOL+NT
-          END DO
-        ELSEIF(IXS(8,I)+IXS(9,I)==0)THEN
-          NT=0
-          DO IT=1,NSPHDIR
-            NT=NT+IT
-          END DO
-          NSPHSOL=NSPHSOL+NSPHDIR*NT
-        ELSE
-          NSPHSOL=NSPHSOL+NSPHDIR*NSPHDIR*NSPHDIR
+C
+        IF (IPART(2,IPARTS(I)) > 0) THEN
+          NSPHDIR=IGEO(37,IPART(2,IPARTS(I)))
+          IF(IXS(6,I)+IXS(7,I)+IXS(8,I)+IXS(9,I)==0)THEN
+            NT=0
+            DO IT=1,NSPHDIR
+              NT=NT+IT
+              NSPHSOL=NSPHSOL+NT
+            END DO
+          ELSEIF(IXS(8,I)+IXS(9,I)==0)THEN
+            NT=0
+            DO IT=1,NSPHDIR
+              NT=NT+IT
+            END DO
+            NSPHSOL=NSPHSOL+NSPHDIR*NT
+          ELSE
+            NSPHSOL=NSPHSOL+NSPHDIR*NSPHDIR*NSPHDIR
+          ENDIF
         ENDIF
+C
       ENDDO
 C
         FLAG_FMT = 0

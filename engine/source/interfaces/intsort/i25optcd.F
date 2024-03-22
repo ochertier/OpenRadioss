@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -59,9 +59,7 @@ C-----------------------------------------------
 #include      "com08_c.inc"
 #include      "param_c.inc"
 #include      "task_c.inc"
-#include      "impl1_c.inc"
 #include      "parit_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -69,7 +67,7 @@ C-----------------------------------------------
      .        IGAP, IRECT(4,*), NSV(*), CAND_E(*), CAND_N(*),
      .        IRTLM(4,NSN),MSEGLO(*),COUNT_REMSLV(*), ITAB(*),
      .        MSEGTYP(*), CAND_OPT_E(*), CAND_OPT_N(*), SIZOPT
-      INTEGER , INTENT(OUT) :: ICONT_I(NSN)
+      INTEGER , INTENT(INOUT) :: ICONT_I(NSN)
       my_real , INTENT(IN) :: DGAPLOAD ,DRAD
       my_real
      .        GAP,PMAX_GAP,
@@ -101,8 +99,6 @@ C-----------------------------------------------
          PREC = EM8
       ENDIF
 C------
-C initialize PMAX_GAP to Zero for future treatments in force computation.
-      PMAX_GAP   = ZERO
 C
 C CONT_I contains Starter infos, it must be flushed when IRTLM(1,xxx) is no more Zero.
 C
@@ -150,7 +146,7 @@ C
            GAPV(IS)=GAP_S(CAND_N(I)) + GAP_M(CAND_E(I))
            IF(IGAP==3)
      .       GAPV(IS)=MIN(GAPV(IS),
-     .     	GAP_S_L(CAND_N(I))+GAP_M_L(CAND_E(I)))
+     .       GAP_S_L(CAND_N(I))+GAP_M_L(CAND_E(I)))
          ENDDO
        ELSE
          NLS = NSEG
@@ -159,7 +155,7 @@ C
            GAPV(IS)=GAP_S(CAND_N(I)) + GAP_M(CAND_E(I))
            IF(IGAP==3)
      .       GAPV(IS)=MIN(GAPV(IS),
-     .     	GAP_S_L(CAND_N(I))+GAP_M_L(CAND_E(I)))
+     .       GAP_S_L(CAND_N(I))+GAP_M_L(CAND_E(I)))
            LISTI(IS)=IS
          ENDDO
        ENDIF
@@ -169,7 +165,7 @@ C
        NLS=0
 #include      "vectorize.inc"
         DO LS = NLF, NLT
-Cel conserver LISTI et LIST pour optimiser le code genere (IA64)
+C   conserver LISTI et LIST pour optimiser le code genere (IA64)
           IS = LISTI(LS)
           I=JS+IS
           L  = CAND_E(I)
@@ -389,6 +385,8 @@ C
         LSKYI_COUNT=LSKYI_COUNT+I_OPT_STOK*5
         COUNT_REMSLV(NIN)=COUNT_REMSLV(NIN)+I_OPT_STOK
       END IF
+C initialize PMAX_GAP to Zero for future treatments in force computation.
+      PMAX_GAP   = ZERO
 !$OMP END SINGLE
 C
 c     print *,'i_stok',ispmd+1,i_stok,i_opt_stok

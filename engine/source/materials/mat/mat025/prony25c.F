@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,7 +27,7 @@ Chd|        SIGEPS25C                     source/materials/mat/mat025/sigeps25c.
 Chd|-- calls ---------------
 Chd|        ROTO_SIG                      source/airbag/roto.F          
 Chd|====================================================================
-      SUBROUTINE PRONY25C(NEL    ,NPRONY  ,NPMAX  ,BETA   ,KV     ,
+      SUBROUTINE PRONY25C(NEL    ,NPRONY  ,BETA   ,KV     ,
      2                    GV     ,TIMESTEP,RHO0   ,OFF    ,DIR    ,
      3                    EPSPXX ,EPSPYY  ,EPSPXY ,EPSPYZ ,EPSPZX ,
      4                    SIGVXX ,SIGVYY  ,SIGVXY ,SIGVYZ ,SIGVZX ,
@@ -64,20 +64,13 @@ C---------+---------+---+---+--------------------------------------------
 C UVAR    |NEL*NUVAR| F |R/W| USER ELEMENT VARIABLE ARRAY
 C OFF     | NEL    | F |R/W| DELETED ELEMENT FLAG (=1. ON, =0. OFF)
 C---------+---------+---+---+--------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "param_c.inc"
-#include      "parit_c.inc"
-#include      "com04_c.inc"
-#include      "scr05_c.inc"
-#include      "com01_c.inc"
 C-----------------------------------------------
 C   I N P U T   A r g u m e n t s
 C-----------------------------------------------
 C
-      INTEGER NEL ,NPRONY,NPMAX,IGTYP
+      INTEGER NEL ,NPRONY,IGTYP
       my_real
-     .   TIME,TIMESTEP(*),KV(*),GV(NPMAX),BETA(NPMAX),
+     .   TIME,TIMESTEP,KV,GV(NPRONY),BETA(NPRONY),
      .   RHO0(*),EPSPXX(*),EPSPYY(*),
      .   EPSPXY(*),EPSPYZ(*),EPSPZX(*),SIGV(NEL,5),DIR(NEL,2)
 C-----------------------------------------------
@@ -110,8 +103,8 @@ C-----------------------------------------------
       my_real 
      .  CC,G1,DAV,EPXX(MVSIZ),EPYY(MVSIZ),EPZZ(MVSIZ),SVXX,
      .  SVYY,SVZZ,P(MVSIZ),
-     .  AA(MVSIZ,NPMAX),BB(MVSIZ,NPMAX),H0(6),EPSPZZ(MVSIZ),
-     .  H(MVSIZ,6,NPMAX),S(MVSIZ,6),A1(MVSIZ),A2(MVSIZ),FAC,H01,H02,H03,H04,
+     .  AA(MVSIZ,NPRONY),BB(MVSIZ,NPRONY),H0(6),EPSPZZ(MVSIZ),
+     .  H(MVSIZ,6,NPRONY),S(MVSIZ,6),A1(MVSIZ),A2(MVSIZ),FAC,H01,H02,H03,H04,
      .  H05,H06
 C-----------------------------------------------
 C     USER VARIABLES INITIALIZATION
@@ -121,8 +114,8 @@ C   estiamte stress
 C------------------------------------------
 C      
        G1 = ZERO
-       DO J=1,NPRONY
-             G1 = G1 + GV(J)
+       DO I=1,NPRONY
+         G1 = G1 + GV(I)
        ENDDO 
 C  
        A1(1:NEL) = ZERO
@@ -131,8 +124,8 @@ C
 C
        DO J=1,NPRONY
          DO I=  1,NEL
-          AA(I,J)=  EXP(-BETA(J)*TIMESTEP(I)) 
-          BB(I,J)=TIMESTEP(I)*GV(J)*EXP(-HALF*BETA(J)*TIMESTEP(I))
+          AA(I,J)=  EXP(-BETA(J)*TIMESTEP) 
+          BB(I,J)=TIMESTEP*GV(J)*EXP(-HALF*BETA(J)*TIMESTEP)
 C
 C  for computing epszz_dot (sigzz=0)
 C
@@ -145,15 +138,15 @@ C
 C  compute epszz_dot  sig33= 0
 C            
        DO I=  1,NEL
-         FAC = ONE/MAX(EM20,TWO_THIRD*A2(I) + KV(I))
-         EPSPZZ(I) = -A1(I)+(THIRD*A2(I)-KV(I))*(EPSPXX(I)+EPSPYY(I))
+         FAC = ONE/MAX(EM20,TWO_THIRD*A2(I) + KV)
+         EPSPZZ(I) = -A1(I)+(THIRD*A2(I)-KV)*(EPSPXX(I)+EPSPYY(I))
          EPSPZZ(I)= FAC*EPSPZZ(I)
        ENDDO
 C                
        DO I=  1,NEL
 C spherique part
           DAV = THIRD*(EPSPXX(I) + EPSPYY(I) + EPSPZZ(I))
-          P(I) = -THREE*KV(I)*DAV
+          P(I) = -THREE*KV*DAV
 c deviatorique part           
           EPXX(I) = EPSPXX(I) - DAV
           EPYY(I) = EPSPYY(I) - DAV

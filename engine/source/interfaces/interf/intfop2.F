@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -38,15 +38,17 @@ Chd|        INT18_LAW151_NSV_SHIFT        source/interfaces/int18/int18_law151_n
 Chd|        INT_STARTIME                  source/system/timer_interf.F  
 Chd|        INT_STOPTIME                  source/system/timer_interf.F  
 Chd|        MY_BARRIER                    source/system/machine.F       
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
+Chd|        ARRAY_MOD                     ../common_source/modules/array_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
 Chd|        INTBUF_FRIC_MOD               share/modules/intbuf_fric_mod.F
+Chd|        INTERFACES_MOD                ../common_source/modules/interfaces/interfaces_mod.F
 Chd|        INTSTAMP_MOD                  share/modules/intstamp_mod.F  
 Chd|        METRIC_MOD                    ../common_source/modules/metric_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|        OUTPUTS_MOD                   ../common_source/modules/outputs_mod.F
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
 Chd|====================================================================
@@ -61,7 +63,7 @@ Chd|====================================================================
      9       FR_I18    ,IGRBRIC    ,EMINX      ,
      A       IXS       ,IXS16      ,IXS20      ,FNCONT    ,FTCONT          ,
      B       IAD_ELEM  ,FR_ELEM    ,RCONTACT   ,ACONTACT  ,PCONTACT        ,
-     C       TEMP      ,FTHE       ,FTHESKYI   ,IPARG     ,
+     C       TEMP      ,FTHE       ,FTHESKYI   ,IPARG     ,NSENSOR         ,
      D       PM        ,INTSTAMP   ,WEIGHT     ,NISKYFIE  ,IRLEN20         ,
      E       ISLEN20   ,IRLEN20T   ,ISLEN20T   ,IRLEN20E  ,ISLEN20E        ,
      F       MSKYI_SMS ,ISKYI_SMS  ,NODNX_SMS  ,INT18ADD  ,FCONTG          ,
@@ -69,13 +71,14 @@ Chd|====================================================================
      H       WA        ,SENSOR_TAB ,QFRICINT   ,NCONT     ,INDEXCONT       ,
      I       TAGCONT   ,INOD_PXFEM ,MS_PLY     ,WAGAP     ,ELBUF_TAB       ,
      J       CONDN     ,CONDNSKYI  ,INTBUF_TAB ,NV46      ,
-     K       DIMFB      ,FBSAV6    ,STABSEN_   ,
-     L       TABSENSOR ,ISENSINT   ,NISUBMAX   ,NB25_CANDT,NB25_IMPCT      ,
+     K       SFBSAV6   ,FBSAV6     ,
+     L       ISENSINT  ,NISUBMAX   ,NB25_CANDT,NB25_IMPCT      ,
      M       NB25_DST1 ,NB25_DST2  ,IXIG3D     ,KXIG3D    ,WIGE     ,
      N       KNOT      ,IGEO       ,MULTI_FVM  ,H3D_DATA  ,INTBUF_FRIC_TAB,
      P       PSKIDS    ,T2MAIN_SMS ,FORNEQS    ,KNOTLOCPC,KNOTLOCEL,
      Q       APINCH    ,STIFPINCH   ,T2FAC_SMS ,TAGNCONT ,
-     R       KLOADPINTER,LOADPINTER ,LOADP_HYD_INTER,DGAPLOADINT,S_LOADPINTER)
+     R       KLOADPINTER,LOADPINTER ,LOADP_HYD_INTER,DGAPLOADINT,S_LOADPINTER,
+     S       INTERFACES,XCELL_REMOTE)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -90,41 +93,34 @@ C-----------------------------------------------
       USE ALE_CONNECTIVITY_MOD
       USE SENSOR_MOD
       USE OUTPUTS_MOD
+      USE INTERFACES_MOD
+      USE ARRAY_MOD 
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "comlock.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
-#include      "scr04_c.inc"
-#include      "scr06_c.inc"
 #include      "task_c.inc"
 #include      "param_c.inc"
 #include      "warn_c.inc"
 #include      "units_c.inc"
 #include      "parit_c.inc"
-#include      "scr05_c.inc"
 #include      "impl1_c.inc"
-#include      "scr17_c.inc"
-#include      "ige3d_c.inc"
 #include      "timeri_c.inc"
 #include      "tabsiz_c.inc"
-#include      "spmd_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------     
+      INTEGER ,INTENT(IN) :: NSENSOR
       INTEGER NELTST,ITYPTST,NEWFRONT(*),NSTRF(*),
      .        IRLEN20, ISLEN20, IRLEN20T, ISLEN20T,
-     .        IRLEN20E, ISLEN20E,INT18ADD(*),NCONT,NV46,DIMFB, STABSEN_,IGROUPS(NUMELS)
+     .        IRLEN20E, ISLEN20E,INT18ADD(*),NCONT,NV46,SFBSAV6,IGROUPS(NUMELS)
       INTEGER IPARI(NPARI,*), ICODT(*),ITAB(*),
      .        ISKY(*), JTASK, NISKYFI(*),ICONTACT(*),
      .        IPARG(NPARG,*),INOD_PXFEM(*),TAGNCONT(NLOADP_HYD_INTER,*)
@@ -136,7 +132,7 @@ C-----------------------------------------------
       INTEGER NUM_IMP(*),NS_IMP(*),NE_IMP(*),IND_IMP(*),NT_IMP
       INTEGER IXS(*)  ,IXS16(*) ,IXS20(*)
       INTEGER WEIGHT(*), ISKYI_SMS(*), NODNX_SMS(*), NODGLOB(*), NPC(*)
-      INTEGER INDEXCONT(*),TAGCONT(*),TABSENSOR(STABSEN_),
+      INTEGER INDEXCONT(*),TAGCONT(*),
      .        IPARSENS,NISUB,I,NISUBMAX,
      .        NB25_CANDT(PARASIZ),NB25_IMPCT(PARASIZ),
      .        NB25_DST1(PARASIZ) ,NB25_DST2(PARASIZ)
@@ -162,13 +158,15 @@ C-----------------------------------------------
       TYPE(INTSTAMP_DATA) INTSTAMP(*)
       TYPE (ELBUF_STRUCT_), DIMENSION(NGROUP) :: ELBUF_TAB
       TYPE(INTBUF_STRUCT_) INTBUF_TAB(*)
-      DOUBLE PRECISION FBSAV6(12,6,DIMFB)
+      DOUBLE PRECISION FBSAV6(12,6,SFBSAV6)
       INTEGER ISENSINT(NISUBMAX+1,NINTER)
       TYPE(MULTI_FVM_STRUCT), INTENT(INOUT), TARGET :: MULTI_FVM
       TYPE(H3D_DATABASE) :: H3D_DATA
       TYPE(INTBUF_FRIC_STRUCT_) INTBUF_FRIC_TAB(*)
       TYPE(t_ale_connectivity), INTENT(IN) :: ALE_CONNECTIVITY
       TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE (INTERFACES_) ,INTENT(IN):: INTERFACES
+      TYPE(array_type), DIMENSION(NINTER), INTENT(in) :: XCELL_REMOTE !< remote data structure for interface 18 
 C-----------------------------------------------
       TYPE (GROUP_)  , DIMENSION(NGRBRIC) :: IGRBRIC
 C-----------------------------------------------  
@@ -190,6 +188,7 @@ c      INTEGER, ALLOCATABLE, DIMENSION(:) :: ISENSINT
       INTEGER :: INACTI
       LOGICAL :: M151_ALLOC
       SAVE XE,VE,MSE, KINETE,M151_ALLOC
+      INTEGER :: NTY
 C-----------------------------------------------
       BID = ZERO
 C-----------------------------------------------
@@ -220,8 +219,10 @@ C
         NTY   =IPARI(7,N)
 C       LINDMAX = NCONT*MULTIMP
         LINDMAX  = IPARI(18,N)*IPARI(23,N)
-        IF(INT18ADD(NINTER+1) >= 0.and.JTASK == 1)THEN
-          INT18ADD(N+1) = INT18ADD(N)
+        IF(JTASK == 1) THEN
+          IF(INT18ADD(NINTER+1) >= 0) THEN
+            INT18ADD(N+1) = INT18ADD(N)
+          ENDIF
         ENDIF
 C
         ISENS = 0
@@ -307,11 +308,11 @@ C
      E  PM             ,IPARG          ,IAD17            ,MSKYI_SMS       ,ISKYI_SMS   ,
      F  NODNX_SMS      ,MS0            ,QFRICINT         ,NPC             ,TF          ,
      G  CONDN          ,CONDNSKYI      ,INTBUF_TAB(N)    ,
-     H  FBSAV6         ,ISENSINT(1,N)  ,DIMFB            ,IXIG3D          ,
+     H  FBSAV6         ,ISENSINT(1,N)  ,SFBSAV6            ,IXIG3D          ,
      I  KXIG3D         ,WIGE           ,KNOT             ,IGEO            ,MULTI_FVM   , 
      J  H3D_DATA       ,INTBUF_FRIC_TAB,KNOTLOCPC      ,KNOTLOCEL        ,JTASK        ,
      K  TAGNCONT       ,KLOADPINTER    ,LOADPINTER       ,LOADP_HYD_INTER ,DGAPLOADINT ,
-     L  S_LOADPINTER   ,INTEREFRIC     ,EFRIC(INTEREFRIC,1))
+     L  S_LOADPINTER   ,INTEREFRIC     ,XCELL_REMOTE(N)%SIZE_MY_REAL_ARRAY_1D,XCELL_REMOTE(N)%MY_REAL_ARRAY_1D)
           ELSE
            NULLIFY(ptr_FR_I18)
            IF(NI18>0) ptr_FR_I18 => FR_I18(1,NI18)           
@@ -331,11 +332,11 @@ C
      E  PM        ,IPARG          ,IAD17            ,MSKYI_SMS       ,ISKYI_SMS   ,
      F  NODNX_SMS ,MS0            ,QFRICINT         ,NPC             ,TF          ,
      G  CONDN      ,CONDNSKYI     ,INTBUF_TAB(N)    ,
-     H  FBSAV6     ,ISENSINT(1,N) ,DIMFB            ,IXIG3D          ,              
+     H  FBSAV6     ,ISENSINT(1,N) ,SFBSAV6            ,IXIG3D          ,              
      I  KXIG3D     ,WIGE          ,KNOT             ,IGEO            ,MULTI_FVM,     
      J  H3D_DATA   ,INTBUF_FRIC_TAB,KNOTLOCPC       ,KNOTLOCEL       ,JTASK       ,
      K  TAGNCONT    ,KLOADPINTER  ,LOADPINTER       ,LOADP_HYD_INTER ,DGAPLOADINT ,
-     L  S_LOADPINTER,INTEREFRIC   ,EFRIC(INTEREFRIC,1))
+     L  S_LOADPINTER,INTEREFRIC   ,XCELL_REMOTE(N)%SIZE_MY_REAL_ARRAY_1D,XCELL_REMOTE(N)%MY_REAL_ARRAY_1D)
            IAD=IAD+NUM_IMP(N)
           END IF
           IF(NTY == 17 .AND. IPARI(33,N) == 0)THEN            ! ILAGM == 0
@@ -364,7 +365,7 @@ C
      .                                                     +NFXBODY)  ,
      9      IDUM      ,IDUM         ,IDUM         ,IDUM      ,FNCONT  ,
      A      FTCONT    ,MSKYI_SMS    ,ISKYI_SMS    ,NODNX_SMS ,
-     B      ICONTACT  ,INTBUF_TAB(N),FBSAV6,ISENSINT(1,N),DIMFB       ,
+     B      ICONTACT  ,INTBUF_TAB(N),FBSAV6,ISENSINT(1,N),SFBSAV6       ,
      C      H3D_DATA  )
           ELSE
            CALL I10MAINF(
@@ -378,7 +379,7 @@ C
      .                                                     +NFXBODY)  ,
      9     NUM_IMP(N),NS_IMP(IAD)  ,NE_IMP(IAD)  ,IND_IMP(IAD),FNCONT  ,
      A      FTCONT   ,MSKYI_SMS    ,ISKYI_SMS    ,NODNX_SMS   ,
-     B      ICONTACT ,INTBUF_TAB(N),FBSAV6,ISENSINT(1,N),DIMFB       ,
+     B      ICONTACT ,INTBUF_TAB(N),FBSAV6,ISENSINT(1,N),SFBSAV6       ,
      C      H3D_DATA )
            IAD=IAD+NUM_IMP(N)
           ENDIF
@@ -400,7 +401,7 @@ C
      7  IDUM       ,MSKYI_SMS    ,ISKYI_SMS    ,NODNX_SMS,ICONTACT    ,
      8  INTBUF_TAB(N),PM         ,TEMP         , FTHE        ,FTHESKYI,
      9  NPC        , TF          ,CONDN        ,CONDNSKYI ,FBSAV6     ,
-     A  ISENSINT(1,N),DIMFB      ,FSAV(1,NN1)  ,H3D_DATA  ,INTBUF_FRIC_TAB,
+     A  ISENSINT(1,N),SFBSAV6      ,FSAV(1,NN1)  ,H3D_DATA  ,INTBUF_FRIC_TAB,
      B  JTASK      ,TAGNCONT      ,KLOADPINTER ,LOADPINTER,LOADP_HYD_INTER,
      C  DGAPLOADINT,S_LOADPINTER )
           ELSE
@@ -414,7 +415,7 @@ C
      7  NE_IMP(IAD),MSKYI_SMS    ,ISKYI_SMS    ,NODNX_SMS,ICONTACT    ,
      8  INTBUF_TAB(N),PM         ,TEMP         , FTHE    ,FTHESKYI    , 
      9  NPC        , TF          ,CONDN        ,CONDNSKYI ,FBSAV6     ,
-     A  ISENSINT(1,N),DIMFB      ,FSAV(1,NN1)  ,H3D_DATA  ,INTBUF_FRIC_TAB,
+     A  ISENSINT(1,N),SFBSAV6      ,FSAV(1,NN1)  ,H3D_DATA  ,INTBUF_FRIC_TAB,
      B  JTASK      ,TAGNCONT      ,KLOADPINTER ,LOADPINTER,LOADP_HYD_INTER,
      C  DGAPLOADINT,S_LOADPINTER )
           ENDIF
@@ -452,7 +453,7 @@ C
      E  PM        ,IPARG        ,IAD17        ,WEIGHT     ,NISKYFIE(N) ,
      F  IRLEN20   ,ISLEN20      ,IRLEN20T     ,ISLEN20T   ,IRLEN20E    ,
      G  ISLEN20E  ,MSKYI_SMS    ,ISKYI_SMS    ,NODNX_SMS  ,NPC         ,
-     H  TF        ,INTBUF_TAB(N),FBSAV6,ISENSINT(1,N)     ,DIMFB       ,
+     H  TF        ,INTBUF_TAB(N),FBSAV6,ISENSINT(1,N)     ,SFBSAV6       ,
      I  H3D_DATA  )
 
           IF(IMPL_S == 1) IAD=IAD+NUM_IMP(N)
@@ -480,19 +481,15 @@ C
      9  ISKYI_SMS ,NODNX_SMS    ,NODGLOB    ,NPC          ,TF          ,
      A  QFRICINT  ,NCONT        ,INDEXCONT  ,TAGCONT      ,CONDN       ,
      B  CONDNSKYI ,DT2T         ,NELTST     ,ITYPTST      ,KINET       ,
-     C  FBSAV6    ,ISENSINT(1,N),DIMFB      ,NISKYFI(N)   ,H3D_DATA    ,
+     C  FBSAV6    ,ISENSINT(1,N),SFBSAV6      ,NISKYFI(N)   ,H3D_DATA    ,
      D  PSKIDS    ,TAGNCONT     ,KLOADPINTER,LOADPINTER   ,LOADP_HYD_INTER,
-     E  DGAPLOADINT,S_LOADPINTER,INTEREFRIC ,EFRIC_STAMP(INTEREFRIC-NINEFRIC,1))
+     E  DGAPLOADINT,S_LOADPINTER,INTEREFRIC )
 C-----------------------------------------------------------------------
 C
 C-----------------------------------------------------------------------
         ELSEIF(NTY == 22) THEN
 C-----------------------------------------------------------------------
-c          IF(IPARI(44,N)/=0)THEN
-            NRTMDIM=IPARI(4,N)
-c          ELSE
-c            NRTMDIM=0
-c          END IF
+          NRTMDIM=IPARI(4,N)
 C
           NN1 = NINTER+NRWALL+NRBODY+NSECT+NJOINT
      .         +NVOLU+NRBAG+NFXBODY+1
@@ -512,7 +509,7 @@ C
      D  PCONTACT    ,TEMP          ,FTHE              ,FTHESKYI         ,
      E  PM          ,IPARG         ,IAD17             ,MSKYI_SMS        ,ISKYI_SMS   ,
      F  NODNX_SMS   ,MS0         ,ELBUF_TAB           ,NV46             ,FBSAV6      ,
-     G  ISENSINT(1,N),DIMFB      ,H3D_DATA            )
+     G  ISENSINT(1,N),SFBSAV6      ,H3D_DATA            )
 
 C-----------------------------------------------------------------------
         ELSEIF(NTY == 23) THEN
@@ -534,7 +531,7 @@ C
      7  FTCONT    ,RCONTACT     ,ACONTACT     ,PCONTACT   ,KINET       ,
      8  WEIGHT    ,MSKYI_SMS   ,ISKYI_SMS     ,NODNX_SMS  ,NODGLOB     ,
      9  NPC       ,TF          ,NISKYFI(N)    ,NEWFRONT(N),WA          ,
-     A  FBSAV6,ISENSINT(1,N)   ,DIMFB         ,DT2T       ,H3D_DATA    )
+     A  FBSAV6,ISENSINT(1,N)   ,SFBSAV6         ,DT2T       ,H3D_DATA    )
 C-----------------------------------------------------------------------
         ELSEIF(NTY == 24.AND.TT>=TS) THEN
 C----------------------------------------------------------------------- 
@@ -564,10 +561,10 @@ C
      E  PM         ,IPARG       ,IAD17       ,MSKYI_SMS   ,ISKYI_SMS   ,
      F  NODNX_SMS  ,MS0         ,INOD_PXFEM  ,MS_PLY      ,WAGAP       ,
      G  FBSAV6      ,ISENSINT(1,N),
-     H  DIMFB      ,H3D_DATA    ,INTBUF_FRIC_TAB  ,T2MAIN_SMS,FORNEQS ,
+     H  SFBSAV6      ,H3D_DATA    ,INTBUF_FRIC_TAB  ,T2MAIN_SMS,FORNEQS ,
      I  T2FAC_SMS  ,NPC         ,TF          ,TAGNCONT    ,KLOADPINTER ,
      J  LOADPINTER ,LOADP_HYD_INTER,DGAPLOADINT,S_LOADPINTER,INTEREFRIC,
-     K  EFRIC(INTEREFRIC,1)     )
+     K  INTERFACES,NISUBMAX)
 
           ELSE
            CALL I24MAINF(
@@ -586,10 +583,10 @@ C
      E  PM        ,IPARG        ,IAD17        ,MSKYI_SMS  ,ISKYI_SMS   ,
      F  NODNX_SMS ,MS0          ,INOD_PXFEM   ,MS_PLY     ,WAGAP       ,
      G  FBSAV6     ,ISENSINT(1,N),
-     H  DIMFB     ,H3D_DATA     ,INTBUF_FRIC_TAB  ,T2MAIN_SMS,FORNEQS ,
+     H  SFBSAV6     ,H3D_DATA     ,INTBUF_FRIC_TAB  ,T2MAIN_SMS,FORNEQS ,
      I  T2FAC_SMS ,NPC         ,TF           ,TAGNCONT    ,KLOADPINTER ,
      J  LOADPINTER ,LOADP_HYD_INTER,DGAPLOADINT,S_LOADPINTER,INTEREFRIC,
-     K  EFRIC(INTEREFRIC,1)    )
+     K  INTERFACES,NISUBMAX)
            IAD=IAD+NUM_IMP(N)
           END IF
 C-----------------------------------------------------------------------
@@ -624,10 +621,10 @@ C
      E  PM         ,IPARG       ,IAD17       ,MSKYI_SMS   ,ISKYI_SMS   ,
      F  NODNX_SMS  ,MS0         ,INOD_PXFEM  ,MS_PLY      ,WAGAP       ,
      G  FBSAV6     ,ISENSINT(1,N),
-     H  DIMFB      ,H3D_DATA    ,INTBUF_FRIC_TAB,NISKYFIE(N),
+     H  SFBSAV6    ,H3D_DATA    ,INTBUF_FRIC_TAB,NISKYFIE(N),
      I  APINCH     ,STIFPINCH   ,NPC         ,TF         , CONDN      ,
      J  CONDNSKYI  ,QFRICINT    ,TAGNCONT    ,KLOADPINTER,LOADPINTER  ,
-     K  LOADP_HYD_INTER,DGAPLOADINT,S_LOADPINTER,INTEREFRIC,EFRIC(INTEREFRIC,1))
+     K  LOADP_HYD_INTER,DGAPLOADINT,S_LOADPINTER,INTEREFRIC,INTERFACES)
 
          IF(IMPL_S == 1) IAD=IAD+NUM_IMP(N)
 C-----------------------------------------------------------------------

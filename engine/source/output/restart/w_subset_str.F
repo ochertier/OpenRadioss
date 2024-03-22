@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,7 +26,7 @@ Chd|-- called by -----------
 Chd|        WRRESTP                       source/output/restart/wrrestp.F
 Chd|-- calls ---------------
 Chd|        FRETITL                       source/input/freform.F        
-Chd|        WRITE_I_C                     source/output/tools/sortie_c.c
+Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|====================================================================
       SUBROUTINE W_SUBSET_STR(SUBSET)
@@ -34,6 +34,7 @@ C-----------------------------------------------
 C   M o d u l e s
 C----------------------------------------------- 
       USE GROUPDEF_MOD
+      USE NAMES_AND_TITLES_MOD, ONLY: NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -44,7 +45,6 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "scr17_c.inc"
 #include      "tabsiz_c.inc"
-#include      "nchar_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -54,7 +54,7 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,J,ID,ISU,NCHILD,NBPART,NBTPART,ICHILD,IPART,IPARTTOT,
      .        PARENT,LEVEL,TH_PART,L_SUB,ERR,ITITLE(LTITR),THIAD,IVARTH
-      CHARACTER(LEN=nchartitle) :: TITR
+      CHARACTER(LEN=NCHARTITLE) :: TITR
       INTEGER, ALLOCATABLE, DIMENSION (:)  ::  ISUB
 C-----------------------------------------------
       DO ISU=1,NSUBS

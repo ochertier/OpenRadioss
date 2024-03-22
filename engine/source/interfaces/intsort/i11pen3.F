@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -45,11 +45,6 @@ C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "scr05_c.inc"
-#include      "task_c.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER JLT, NRTS,IGAP
@@ -60,9 +55,6 @@ C-----------------------------------------------
      .     X(3,*), PENE(MVSIZ), 
      .     GAP_S(*), GAP_M(*), GAP_S_L(*), GAP_M_L(*)
       my_real , INTENT(IN) :: DGAPLOAD,DRAD
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -246,11 +238,6 @@ C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "scr05_c.inc"
-#include      "task_c.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER JLT, NRTS
@@ -259,9 +246,6 @@ C-----------------------------------------------
      .     GAP
       my_real
      .     X(3,*), PENE(MVSIZ)
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -308,7 +292,7 @@ C
           L = CAND_S(I)
           IF(L<=NRTS) THEN
             NI=0 
-	    N1=IRECTS(1,CAND_S(I))
+              N1=IRECTS(1,CAND_S(I))
             N2=IRECTS(2,CAND_S(I))
             X11 = X(1,N1)
             X12 = X(2,N1)

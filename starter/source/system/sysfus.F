@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -23,7 +23,6 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 Chd|====================================================================
 Chd|  USR2SYS                       source/system/sysfus.F        
 Chd|-- called by -----------
-Chd|        ELSTAGBOX2                    source/model/box/rdbox.F      
 Chd|        FSDCOD                        source/system/fsdcod.F        
 Chd|        HM_LECGRN                     source/groups/hm_lecgrn.F     
 Chd|        HM_PRELECGRNS                 source/groups/hm_prelecgrns.F 
@@ -84,7 +83,6 @@ Chd|        HM_READ_TRIA                  source/elements/reader/hm_read_tria.F
 Chd|        HM_READ_TRUSS                 source/elements/reader/hm_read_truss.F
 Chd|        HM_READ_XREF                  source/loads/reference_state/xref/hm_read_xref.F
 Chd|        HM_SETFXRBYON                 source/constraints/fxbody/hm_setfxrbyon.F
-Chd|        INIVEL                        source/initial_conditions/general/inivel/inivel.F
 Chd|        LECACC                        source/tools/accele/lecacc.F  
 Chd|        LECIG3D                       source/elements/ige3d/lecig3d.F
 Chd|        LECREFSTA                     source/loads/reference_state/refsta/lecrefsta.F
@@ -112,6 +110,7 @@ Chd|        READ_SENSOR_VEL               source/tools/sensor/read_sensor_vel.F
 Chd|        READ_SENSOR_WORK              source/tools/sensor/read_sensor_work.F
 Chd|        SENSOR_USER_CONVERT_LOCAL_ID  source/tools/sensor/sensor_user_convert_local_id.F
 Chd|        SETRB2ON                      source/constraints/general/rbe2/hm_read_rbe2.F
+Chd|        SET_USER_WINDOW_NODES         source/user_interface/user_windows_tools.F
 Chd|        UELT_SPMD_ADDITIONAL_NODE     source/user_interface/uaccess.F
 Chd|        W_ITABM1                      source/restart/ddsplit/w_itabm1.F
 Chd|-- calls ---------------
@@ -137,15 +136,10 @@ C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
       INTEGER R2R_SYS      
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "hash_id.inc"
 #include      "com04_c.inc"
-#include      "warn_c.inc"
-#include      "units_c.inc"
 #include      "r2r_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -201,7 +195,6 @@ C
 Chd|====================================================================
 Chd|  USRTOS                        source/system/sysfus.F        
 Chd|-- called by -----------
-Chd|        ELSTAGBOX2                    source/model/box/rdbox.F      
 Chd|        HM_READ_NODE                  source/elements/reader/hm_read_node.F
 Chd|        INIVEL                        source/initial_conditions/general/inivel/inivel.F
 Chd|        LECTRANS                      source/model/transformation/lectrans.F
@@ -361,8 +354,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
-#include      "warn_c.inc"
-#include      "units_c.inc"
 #include      "r2r_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -446,8 +437,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
-#include      "warn_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -539,7 +528,6 @@ Chd|        HM_READ_THGRNE                source/output/th/hm_read_thgrne.F
 Chd|        HM_READ_THGROU                source/output/th/hm_read_thgrou.F
 Chd|        HM_READ_THPART                source/output/thpart/hm_read_thpart.F
 Chd|        HM_READ_XELEM                 source/elements/reader/hm_read_xelem.F
-Chd|        INIVEL                        source/initial_conditions/general/inivel/inivel.F
 Chd|        LECIG3D                       source/elements/ige3d/lecig3d.F
 Chd|        LECSEC42                      source/tools/sect/hm_read_sect.F
 Chd|        LECSEC4BOLT                   source/tools/sect/lecsec4bolt.F
@@ -563,12 +551,6 @@ C remonte la declaration des entiers pour la compile sur Compaq
       CHARACTER MESS*40
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com04_c.inc"
-#include      "scr03_c.inc"
-#include      "warn_c.inc"
-#include      "units_c.inc"
-#include      "hardware.inc"
 C-----------------------------------------------
 C   ALLOC FREE
 C-----------------------------------------------
@@ -619,12 +601,6 @@ C remonte la declaration des entiers pour la compile sur Compaq
 
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com04_c.inc"
-#include      "scr03_c.inc"
-#include      "warn_c.inc"
-#include      "units_c.inc"
-#include      "hardware.inc"
 C-----------------------------------------------
 C   ALLOC FREE
 C-----------------------------------------------
@@ -687,15 +663,6 @@ C-----------------------------------------------
       my_real
      .    RLIST(ILIST,NLIST)     
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com04_c.inc"
-#include      "warn_c.inc"
-#include      "units_c.inc"
-C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, J,NNOD,NOLD,K,ID,IDM,
@@ -754,11 +721,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com04_c.inc"
 #include      "scr03_c.inc"
-#include      "warn_c.inc"
-#include      "units_c.inc"
-#include      "hardware.inc"
 C-----------------------------------------------
 C   ALLOC FREE
 C-----------------------------------------------
@@ -809,15 +772,6 @@ C-----------------------------------------------
       INTEGER NLIST,ILIST,ERRID,STATUS
       INTEGER TAB(*), INDEX(NLIST,3),LIST(ILIST,NLIST)
       INTEGER NOM_OPT(LNOPT1,*)
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com04_c.inc"
-#include      "warn_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -891,14 +845,6 @@ C-----------------------------------------------
      .    RLIST(ILIST,NLIST)     
       CHARACTER MESS*40
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com04_c.inc"
-#include      "scr03_c.inc"
-#include      "warn_c.inc"
-#include      "units_c.inc"
-#include      "hardware.inc"
-C-----------------------------------------------
 C   ALLOC FREE
 C-----------------------------------------------
 #if CPP_comp == f90
@@ -949,15 +895,6 @@ C-----------------------------------------------
       INTEGER INDEX(NLIST,3),LIST(ILIST,NLIST)
       my_real
      .    RLIST(ILIST,NLIST)     
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com04_c.inc"
-#include      "warn_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -1016,12 +953,6 @@ C remonte la declaration des entiers pour la compile sur Compaq
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com04_c.inc"
-#include      "scr03_c.inc"
-#include      "warn_c.inc"
-#include      "units_c.inc"
-#include      "hardware.inc"
-C-----------------------------------------------
 C   ALLOC FREE
 C-----------------------------------------------
 #if CPP_comp == f90
@@ -1074,15 +1005,6 @@ C-----------------------------------------------
       INTEGER INDEX(NLIST,3),LIST(ILIST,NLIST)
       my_real
      .    RLIST(ILIST,NLIST)     
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com04_c.inc"
-#include      "warn_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -1142,12 +1064,6 @@ C remonte la declaration des entiers pour la compile sur Compaq
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com04_c.inc"
-#include      "scr03_c.inc"
-#include      "warn_c.inc"
-#include      "units_c.inc"
-#include      "hardware.inc"
-C-----------------------------------------------
 C   ALLOC FREE
 C-----------------------------------------------
 #if CPP_comp == f90
@@ -1200,15 +1116,6 @@ C-----------------------------------------------
       INTEGER INDEX(NLIST,3),LIST(ILIST,NLIST)
       my_real
      .    RLIST(ILIST,NLIST)     
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com04_c.inc"
-#include      "warn_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -1277,12 +1184,6 @@ C remonte la declaration des entiers pour la compile sur Compaq
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com04_c.inc"
-#include      "scr03_c.inc"
-#include      "warn_c.inc"
-#include      "units_c.inc"
-#include      "hardware.inc"
-C-----------------------------------------------
 C   ALLOC FREE
 C-----------------------------------------------
 #if CPP_comp == f90
@@ -1333,12 +1234,6 @@ C remonte la declaration des entiers pour la compile sur Compaq
       CHARACTER MESS*40
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com04_c.inc"
-#include      "scr03_c.inc"
-#include      "warn_c.inc"
-#include      "units_c.inc"
-#include      "hardware.inc"
 C-----------------------------------------------
 C   ALLOC FREE
 C-----------------------------------------------
@@ -1392,15 +1287,6 @@ C-----------------------------------------------
       INTEGER INDEX(NLIST,3),LIST(NLIST)
       my_real
      .    RLIST(NLIST)     
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com04_c.inc"
-#include      "warn_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -1459,15 +1345,6 @@ C-----------------------------------------------
       INTEGER INDEX(NLIST,3),LIST(NLIST)
       my_real
      .    RLIST(NLIST)     
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com04_c.inc"
-#include      "warn_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

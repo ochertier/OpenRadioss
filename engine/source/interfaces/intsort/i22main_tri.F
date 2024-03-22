@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -40,15 +40,15 @@ Chd|        SPMD_TRI7GAT                  source/mpi/interfaces/spmd_int.F
 Chd|        STARTIME                      source/system/timer.F         
 Chd|        STOPTIME                      source/system/timer.F         
 Chd|        UPGRADE_MULTIMP               ../common_source/interf/upgrade_multimp.F
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
-Chd|        I22BUFBRIC_MOD                ../common_source/modules/cut-cell-search_mod.F
-Chd|        I22TRI_MOD                    ../common_source/modules/cut-cell-search_mod.F
+Chd|        I22BUFBRIC_MOD                ../common_source/modules/interfaces/cut-cell-search_mod.F
+Chd|        I22TRI_MOD                    ../common_source/modules/interfaces/cut-cell-search_mod.F
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
 Chd|        INTBUFMOD                     share/modules/restart_mod.F   
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
       SUBROUTINE I22MAIN_TRI(
@@ -78,22 +78,12 @@ C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "comlock.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "units_c.inc"
-#include      "scr03_c.inc"
-#include      "scr04_c.inc"
-#include      "scr05_c.inc"
-#include      "scr17_c.inc"
-#include      "warn_c.inc"
 #include      "task_c.inc"
 #include      "parit_c.inc"
 #include      "timeri_c.inc"
@@ -155,11 +145,8 @@ C-----------------------------------------------
      .   BMINMA_AND_R(6), !intersection fluid in local domain and remote lag faces
      .   BMINMA_AND(6),  !intersection fluid in local domain and all faces
      .   vel(4), vel_max
+      INTEGER :: NRTM,NSN,NTY,NMN
 C-----------------------------------------------
-#include "sync_dir.inc"
-C-----------------------------------------------
-    !  if(itask==0.and.ibug22_tri==1)print *, 
-    ! .        "entree subroutine i22main_tri.F"
       I_MEMG = 0
       I_MEM = 0
       IS_CONTACT=.FALSE.
@@ -719,8 +706,8 @@ Chd|  I22SOLID_GETMINMAX            source/interfaces/intsort/i22main_tri.F
 Chd|-- called by -----------
 Chd|        I22MAIN_TRI                   source/interfaces/intsort/i22main_tri.F
 Chd|-- calls ---------------
-Chd|        I22BUFBRIC_MOD                ../common_source/modules/cut-cell-search_mod.F
-Chd|        I22TRI_MOD                    ../common_source/modules/cut-cell-search_mod.F
+Chd|        I22BUFBRIC_MOD                ../common_source/modules/interfaces/cut-cell-search_mod.F
+Chd|        I22TRI_MOD                    ../common_source/modules/interfaces/cut-cell-search_mod.F
 Chd|====================================================================
       SUBROUTINE I22SOLID_GETMINMAX(
      1                                  X,   IXS, BUFBRIC, NBRIC, 
@@ -738,8 +725,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
-#include      "mvsiz_p.inc"
-#include      "param_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
@@ -813,7 +798,7 @@ Chd|  I22SHELL_GETMINMAX            source/interfaces/intsort/i22main_tri.F
 Chd|-- called by -----------
 Chd|        I22MAIN_TRI                   source/interfaces/intsort/i22main_tri.F
 Chd|-- calls ---------------
-Chd|        I22TRI_MOD                    ../common_source/modules/cut-cell-search_mod.F
+Chd|        I22TRI_MOD                    ../common_source/modules/interfaces/cut-cell-search_mod.F
 Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
       SUBROUTINE I22SHELL_GETMINMAX(
@@ -828,16 +813,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-#include      "param_c.inc"
-#include      "task_c.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

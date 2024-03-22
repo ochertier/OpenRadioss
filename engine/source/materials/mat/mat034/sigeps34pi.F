@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -23,11 +23,11 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 Chd|====================================================================
 Chd|  SIGEPS34PI                    source/materials/mat/mat034/sigeps34pi.F
 Chd|-- called by -----------
-Chd|        MULAWP                        source/elements/beam/mulawp.F 
+Chd|        MULAW_IB                      source/elements/beam/mulaw_ib.F
 Chd|-- calls ---------------
 Chd|====================================================================
       SUBROUTINE SIGEPS34PI(
-     1               NEL     ,NUPARAM ,UPARAM  ,IPM     ,MAT     ,
+     1               NEL     ,NUPARAM ,UPARAM  ,IPM     ,IMAT    ,
      2               NUVAR   ,UVAR    ,DEPSXX  ,DEPSXY  ,DEPSXZ  ,
      3               EPSXX   ,SIGOXX  ,SIGOXY  ,SIGOXZ  , 
      5               SIGNXX  ,SIGNXY  ,SIGNXZ  ,TIMESTEP,
@@ -40,17 +40,13 @@ C---------+---------+---+---+--------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "scr05_c.inc"
-#include      "scr17_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com08_c.inc"
 C-----------------------------------------------
 C   I N P U T   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER ,INTENT(IN) :: IMAT
       INTEGER ,INTENT(IN) :: NEL,NUPARAM,NUVAR
       INTEGER ,DIMENSION(NPROPMI,NUMMAT) ,INTENT(IN) :: IPM
-      INTEGER ,DIMENSION(NEL) ,INTENT(IN) :: MAT
       my_real :: TIMESTEP
       my_real ,DIMENSION(NEL) ,INTENT(IN) :: 
      .   EPSXX,DEPSXX,DEPSXY,DEPSXZ,SIGOXX,SIGOXY,SIGOXZ,
@@ -71,8 +67,8 @@ C-----------------------------------------------
 C=======================================================================
 !!      SHFACT = FIVE_OVER_6
 c
+      IADBUF = IPM(7,IMAT)-1
       DO I=1,NEL
-        IADBUF   = IPM(7,MAT(I))-1
         BULK(I)  = UPARAM(IADBUF+1)
         G_INS(I) = UPARAM(IADBUF+2)
         G_INF(I) = UPARAM(IADBUF+3)

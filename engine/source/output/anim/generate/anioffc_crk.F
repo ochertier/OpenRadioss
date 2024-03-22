@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,9 +26,9 @@ Chd|-- called by -----------
 Chd|        GENANI                        source/output/anim/generate/genani.F
 Chd|-- calls ---------------
 Chd|        SPMD_IGET_PARTN               source/mpi/anim/spmd_iget_partn.F
-Chd|        WRITE_C_C                     source/output/tools/sortie_c.c
+Chd|        WRITE_C_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|        CRACKXFEM_MOD                 share/modules/crackxfem_mod.F 
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE ANIOFFC_CRK( 
      .                  XFEM_TAB ,IPARG  ,IPART,IPARTC,IPARTTG ,
@@ -52,7 +52,6 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "com_xfem1.inc"
 #include      "scr17_c.inc"
-#include      "spmd_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s

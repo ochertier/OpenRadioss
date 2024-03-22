@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -31,14 +31,12 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "parit_c.inc"
 #include      "sms_c.inc"
-#include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -106,15 +104,11 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "parit_c.inc"
-#include      "sms_c.inc"
-#include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -164,7 +158,6 @@ C Interface type2
       RETURN
       END
 C
-#include "hardware.inc"
 #if defined(MPI)
 Chd|====================================================================
 Chd|  SPMD_NLIST_SMS                source/mpi/ams/spmd_sms.F     
@@ -177,7 +170,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -186,7 +178,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "sms_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -253,7 +244,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -263,7 +253,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "param_c.inc"
-#include      "parit_c.inc"
 #include      "sms_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
@@ -439,7 +428,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -448,7 +436,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "parit_c.inc"
 #include      "sms_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
@@ -539,7 +526,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -600,7 +586,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -664,7 +649,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -674,9 +658,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "param_c.inc"
-#include      "parit_c.inc"
-#include      "sms_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -761,7 +742,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -770,9 +750,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "param_c.inc"
-#include      "parit_c.inc"
-#include      "sms_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -829,7 +806,7 @@ C   echange messages
 C
 c      SIZ=1
 c      CALL MPI_ALLTOALL(NNZP,SIZ,MPI_INTEGER,MNZP,SIZ,MPI_INTEGER,
-c     .  		MPI_COMM_WORLD,IERROR)
+c     .      MPI_COMM_WORLD,IERROR)
 C
 C sur dimensionne
       DO P = 1, NSPMD
@@ -839,44 +816,44 @@ C-----
       L = 1
       DO P=1,NSPMD
 C
-	SIZ = IAD_ELEM(1,P+1)-IAD_ELEM(1,P)
-	IF(SIZ/=0)THEN
-	  MSGTYP = MSGOFF2 
-	  CALL MPI_IRECV(
+          SIZ = IAD_ELEM(1,P+1)-IAD_ELEM(1,P)
+          IF(SIZ/=0)THEN
+            MSGTYP = MSGOFF2 
+            CALL MPI_IRECV(
      .      RBUF(L),SIZ,MPI_INTEGER,IT_SPMD(P),MSGTYP,
      .      MPI_COMM_WORLD,REQ_R(P),IERROR    )
 C
-	  DO J=IAD_ELEM(1,P), IAD_ELEM(1,P+1)-1
-	    NOD = FR_ELEM(J)
-	    SBUF(J)=IADK(NOD+1)-IADK(NOD)
-	  END DO
+            DO J=IAD_ELEM(1,P), IAD_ELEM(1,P+1)-1
+              NOD = FR_ELEM(J)
+              SBUF(J)=IADK(NOD+1)-IADK(NOD)
+            END DO
 C
-	  MSGTYP= MSGOFF2
-	  CALL MPI_ISEND(
+            MSGTYP= MSGOFF2
+            CALL MPI_ISEND(
      .      SBUF(L),SIZ,MPI_INTEGER,IT_SPMD(P),MSGTYP,
      .      MPI_COMM_WORLD,REQ_S(P),IERROR    )
-	  L = L + SIZ
-	END IF
+            L = L + SIZ
+          END IF
 C
       END DO
 C
       L = 1
       DO P=1,NSPMD
-	SIZ = IAD_ELEM(1,P+1)-IAD_ELEM(1,P)
-	IF(SIZ/=0)THEN
-	  CALL MPI_WAIT(REQ_R(P),STATUS,IERROR)
-	  DO J=IAD_ELEM(1,P),IAD_ELEM(1,P+1)-1
-	    NOD = FR_ELEM(J)
-	    KADM(NOD)=KADM(NOD)+RBUF(L)
-	    L = L + 1
-	  END DO
-	END IF
+          SIZ = IAD_ELEM(1,P+1)-IAD_ELEM(1,P)
+          IF(SIZ/=0)THEN
+            CALL MPI_WAIT(REQ_R(P),STATUS,IERROR)
+            DO J=IAD_ELEM(1,P),IAD_ELEM(1,P+1)-1
+              NOD = FR_ELEM(J)
+              KADM(NOD)=KADM(NOD)+RBUF(L)
+              L = L + 1
+            END DO
+          END IF
       END DO
 C
       DO P=1,NSPMD
-	IF(IAD_ELEM(1,P+1)-IAD_ELEM(1,P)/=0)THEN
-	  CALL MPI_WAIT(REQ_S(P),STATUS,IERROR)
-	END IF
+          IF(IAD_ELEM(1,P+1)-IAD_ELEM(1,P)/=0)THEN
+            CALL MPI_WAIT(REQ_S(P),STATUS,IERROR)
+          END IF
       END DO
 C--------------------------------------------------------------------
       RETURN
@@ -904,7 +881,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -914,11 +890,7 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "param_c.inc"
-#include      "parit_c.inc"
-#include      "sms_c.inc"
 #include      "task_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1022,7 +994,7 @@ C
           IF(SIZR(P)/=0)THEN
             MSGTYP = MSGOFF2                          
             CALL MPI_IRECV(RBUF(L),SIZR(P),REAL ,IT_SPMD(P),
-     .    		  MSGTYP,MPI_COMM_WORLD,REQ_R(P),IERROR)
+     .          MSGTYP,MPI_COMM_WORLD,REQ_R(P),IERROR)
             L = L +SIZR(P)
           END IF
         END IF
@@ -1043,17 +1015,17 @@ C
             DO K=IADK(NOD),IADK(NOD+1)-1
               M=JDIK(K)
               IF(ITAG(M)/=0.AND.ITAG(M)<ITAG(NOD))THEN
-        	SBUF(LL  ) = ITAG(NOD)
-        	SBUF(LL+1) = ITAG(M)
-        	SBUF(LL+2) = LT_K(K)
-        	LL = LL + 3
+          SBUF(LL  ) = ITAG(NOD)
+          SBUF(LL+1) = ITAG(M)
+          SBUF(LL+2) = LT_K(K)
+          LL = LL + 3
               END IF
             END DO
           END DO
 C
           MSGTYP = MSGOFF2                               
           CALL MPI_ISEND(SBUF(L),SIZS(P),REAL ,IT_SPMD(P),
-     .  		MSGTYP,MPI_COMM_WORLD,REQ_S2(P),IERROR)
+     .      MSGTYP,MPI_COMM_WORLD,REQ_S2(P),IERROR)
           L = L + SIZS(P)
 C
 C reset
@@ -1107,7 +1079,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -1115,11 +1086,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr06_c.inc"
 #include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "task_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1177,7 +1145,7 @@ C
       DO I=1,NSPMD
 C--------------------------------------------------------------------
 C envoi a N+I mod P
-Cel test si msg necessaire a envoyer a completer par test interface
+C   test si msg necessaire a envoyer a completer par test interface
        IF(IAD_ELEM(1,I+1)-IAD_ELEM(1,I)>0)THEN
           MSGTYP = MSGOFF 
           SIZ = IAD_SEND(I+1)-IAD_SEND(I)
@@ -1192,7 +1160,7 @@ C
 C decompactage
 C
       DO I = 1, NSPMD
-Cel test si msg necessaire a envoyer a completer par test interface
+C   test si msg necessaire a envoyer a completer par test interface
         NB_NOD = IAD_ELEM(1,I+1)-IAD_ELEM(1,I)
         IF(NB_NOD>0)THEN
           CALL MPI_WAIT(REQ_R(I),STATUS,IERROR)
@@ -1209,7 +1177,7 @@ C ---
         ENDIF
       END DO
 C
-Cel wait terminaison isend
+C   wait terminaison isend
 C
       DO I = 1, NSPMD
         IF(IAD_ELEM(1,I+1)-IAD_ELEM(1,I)>0)THEN
@@ -1232,7 +1200,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -1243,9 +1210,7 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "task_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

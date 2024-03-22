@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -52,7 +52,6 @@ Chd|====================================================================
 C-------------------------------------
 C     LECTURE MUR RIGIDE
 C-----------------------------------------------
-C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE UNITAB_MOD
@@ -73,15 +72,11 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "lagmult.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "units_c.inc"
-#include      "warn_c.inc"
 #include      "scr03_c.inc"
 #include      "scr17_c.inc"
 #include      "param_c.inc"
-#include      "sysunit.inc"
-#include      "submod_c.inc"
 #include      "tabsiz_c.inc"
 #include      "r2r_c.inc"
 C-----------------------------------------------
@@ -147,7 +142,7 @@ C
 C
         ! Checking flag unit
         IFLAGUNIT = 0        
-        DO J=1,NUNITS                           
+        DO J=1,UNITAB%NUNITS                           
           IF (UNITAB%UNIT_ID(J) == UID) THEN          
             IFLAGUNIT = 1                         
             EXIT                                
@@ -185,6 +180,7 @@ C
         CALL HM_GET_INTV('Filteringflag'    ,IFQ        ,IS_AVAILABLE, LSUBMODEL)  
         IF (FREQ == 0 .AND. IFQ /= 0) IFQ = 0
         IF (IFQ == 0) FREQ = ONE
+        ALPHA = ZERO
         IF (IFQ >= 0) THEN
           IF (IFQ <= 1) ALPHA = FREQ                         
           IF (IFQ == 2) ALPHA = FOUR*ATAN2(ONE,ZERO) / FREQ 

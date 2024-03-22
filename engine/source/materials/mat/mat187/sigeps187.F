@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -52,9 +52,7 @@ C-----------------------------------------------
 C   G L O B A L   P A R A M E T E R S
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "scr17_c.inc"
 #include      "param_c.inc"
-#include      "vect01_c.inc"
 C-----------------------------------------------
 C   C O M M O N
 C-----------------------------------------------
@@ -379,7 +377,7 @@ C      ----------------------------------------------------
        DO II=1,NINDX                                              
         I = INDX(II)                                             
         !IF (SIG(I)>YLD(I).AND.OFF(I) == ONE)THEN
-	   DPLA(I)= UVAR(I,3)+ EM09
+             DPLA(I)= UVAR(I,3)+ EM09
 
         !DPLA(I)= (SIG(I)-YLD(I))/(THREE*G+DYDX(I))
         DEPLXX(I)=ZERO
@@ -555,7 +553,7 @@ c     .        -G * (DU * DF6) **2
          ENDIF
   
         ENDDO  ! iter  
-	   UVAR(I,3)=DPLA(I)       
+             UVAR(I,3)=DPLA(I)       
        ENDDO ! NINDX
 C-------------------
 C-------------------
@@ -681,9 +679,9 @@ C     ----------------------------------------------------
         !--------------------
         !PLASTIC FLOW
         !--------------------
-	       !DPLA(I)= UVAR(I,3)
+                 !DPLA(I)= UVAR(I,3)
          !DPLA(I)= (SIG(I)-YLD(I))/(THREE*G+DYDX(I))
-	    DPLA(I)= UVAR(I,3)+ EM09
+              DPLA(I)= UVAR(I,3)+ EM09
          DEPLXX(I)=ZERO
          DEPLYY(I)=ZERO
          DEPLZZ(I)=ZERO
@@ -810,7 +808,7 @@ C     ----------------------------------------------------
           ENDIF
 
          ENDDO !iter   
-	        UVAR(I,3)=DPLA(I)       
+                  UVAR(I,3)=DPLA(I)       
        ENDDO ! NINDX
 C=======================================================================
       ELSE !IFLAGSR PLASTIC STRAIN RATE ******************************
@@ -847,7 +845,7 @@ C=======================================================================
 
 
        
-	       !DPLA(I)= UVAR(I,3)
+                 !DPLA(I)= UVAR(I,3)
         !DPLA(I)= (SIG(I)-YLD(I))/(THREE*G+DYDX(I))
          DEPLXX(I)=ZERO
          DEPLYY(I)=ZERO

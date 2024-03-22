@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -33,6 +33,7 @@ Chd|        PHELPINFO                     source/engine/execargcheck.F
 Chd|        READ_MSGFILE                  source/output/message/read_msgfile.F
 Chd|        UPCASE                        source/engine/execargcheck.F  
 Chd|        CHECK_MOD                     ../common_source/modules/check_mod.F
+Chd|        COMMAND_LINE_ARGS_MOD         share/modules/command_line_args.F
 Chd|        INOUTFILE_MOD                 ../common_source/modules/inoutfile_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
@@ -41,6 +42,7 @@ Chd|====================================================================
       USE MESSAGE_MOD
       USE CHECK_MOD
       USE INOUTFILE_MOD
+      USE COMMAND_LINE_ARGS_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -60,19 +62,18 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-       INTEGER ARGN,J,K,L
+       INTEGER ARGN
        INTEGER PHELPI,PEXECI,PINPUTI, PNTHI,PUSERLNAMI,MDS_PATHI
        INTEGER I,STRL,STRLN,ERR,LENLIST,ISIN,BEGIN,IERRMSG
        INTEGER IDUM
-       CHARACTER*2096  ARGS,INPUTC,INPUTR,ARGP,MSG,STRING,INPUTE,
-     .                 ARGREAD
+       CHARACTER*2096  ARGS,INPUTC,INPUTR,MSG,STRING
        LOGICAL :: CONDITION
        CHARACTER C
        INTEGER IARGC,CDL_CASE,IJK
        CHARACTER :: LAST_LETTER,SEPARATOR
-       character(len=2096) ARGS2,ARGS_REDUCE
-       CHARACTER(len=4096) ULIBC
-       PARAMETER (LENLIST=18)
+       CHARACTER(LEN=2096) ARGS2,ARGS_REDUCE,ARGP
+       CHARACTER(LEN=4096) ULIBC
+       PARAMETER (LENLIST=19)
        CHARACTER(LEN=12):: ARGLIST(LENLIST)
        EXTERNAL IARGC
        DATA ARGLIST/
@@ -86,6 +87,7 @@ C-----------------------------------------------
      .    '-DYLIB',
      .    '-MEM-MAP' ,
      .    '-INSPIRE',
+     .    '-PREVIEW',
      .    '-INSPIRE_ALM','-NORST',
      .    '-MDS_LIBPATH'/
 C-----------------------------------------------
@@ -106,6 +108,7 @@ C-----------------------------------------------
        GOT_INSPIRE_ALM=0
        MDS_PATH_LEN = 0
        MDS_PATHI = 0
+       GOT_PREVIEW= 0
 
        ! Initialize MDS_PATH Array
        MDS_PATH=''
@@ -200,6 +203,8 @@ C------------------------------------------------
 C -MEM-MAP
           CASE ( '-MEM-MAP')
              GOT_MEM_MAP=1
+          CASE ( '-PREVIEW')  
+             GOT_PREVIEW=1
           CASE ( '-INSPIRE_ALM')
              GOT_INSPIRE_ALM=1
           CASE ( '-INSPIRE')
@@ -516,16 +521,13 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
        CHARACTER*(*) STRING
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-       INTEGER  STLEN,LS,LC
+       INTEGER  LS,LC
 C
        LS = LEN (STRING)
 C
@@ -550,9 +552,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -582,7 +581,15 @@ C-----------------------------------------------
 
 
 
-	SUBROUTINE PEXECINFO(IDUM)
+Chd|====================================================================
+Chd|  PEXECINFO                     source/engine/execargcheck.F  
+Chd|-- called by -----------
+Chd|        EXECARGCHECK                  source/engine/execargcheck.F  
+Chd|-- calls ---------------
+Chd|        MY_EXIT                       source/system/my_exit.c       
+Chd|        PREXECINFO                    source/engine/execargcheck.F  
+Chd|====================================================================
+          SUBROUTINE PEXECINFO(IDUM)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -594,13 +601,10 @@ C-----------------------------------------------
 #include "mpif.h"
 #endif
 C-----------------------------------------------
-C   D u m m y   A r g u m e n t s
-C-----------------------------------------------
-C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER STATUS(MPI_STATUS_SIZE),IERROR,ICODE
+      INTEGER IERROR
       INTEGER MYRANK, NNODES
       INTEGER KEY, IERR
 #endif
@@ -625,7 +629,13 @@ C-----------------------------------------------
         CALL MY_EXIT(0)
         END
 
-	SUBROUTINE PREXECINFO(IDUM)
+Chd|====================================================================
+Chd|  PREXECINFO                    source/engine/execargcheck.F  
+Chd|-- called by -----------
+Chd|        PEXECINFO                     source/engine/execargcheck.F  
+Chd|-- calls ---------------
+Chd|====================================================================
+          SUBROUTINE PREXECINFO(IDUM)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -637,19 +647,15 @@ C-----------------------------------------------
 #include      "build_info.inc"
 #include      "titr_c.inc"
 C-----------------------------------------------
-C   D u m m y   A r g u m e n t s
-C-----------------------------------------------
-C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
         CHARACTER*256 RFLEXNAM,GPUTITLE,ARCHTIT*66
         INTEGER LEN,LBT
-C machine.inc include
         INTEGER RDFLEXCOMP
         INTEGER IDUM
-
 C-----------------------------------------------
 #include "machine.inc"
+C-----------------------------------------------
 
          LBT = LEN_TRIM(BTAG)
          WRITE(6,'(A,A)') ' '
@@ -670,7 +676,16 @@ C-----------------------------------------------
 
         END
 
-	SUBROUTINE PHELPINFO(ERRN,EMSG,SMSG)
+Chd|====================================================================
+Chd|  PHELPINFO                     source/engine/execargcheck.F  
+Chd|-- called by -----------
+Chd|        EXECARGCHECK                  source/engine/execargcheck.F  
+Chd|        GET_FILE_NAME_INFO            source/system/get_file_name_info.F
+Chd|-- calls ---------------
+Chd|        ARRET                         source/system/arret.F         
+Chd|        PRHELPINFO                    source/engine/execargcheck.F  
+Chd|====================================================================
+          SUBROUTINE PHELPINFO(ERRN,EMSG,SMSG)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -684,13 +699,13 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER ERRN,STRLN,SMSG
+      INTEGER ERRN,SMSG
       CHARACTER*256 ARGP,EMSG*256
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
 #ifdef MPI
-      INTEGER STATUS(MPI_STATUS_SIZE),IERROR,ICODE
+      INTEGER STATUS(MPI_STATUS_SIZE),IERROR
       INTEGER MYRANK, NNODES
       INTEGER KEY, IERR
 #endif
@@ -732,11 +747,10 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER ERRN,SMSG,STRLNA
-      CHARACTER EMSG*256, ARGP*256
+      INTEGER ERRN,SMSG
+      CHARACTER EMSG*256
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
-C-----------------------------------------------
 C-----------------------------------------------
        IF (ERRN == 1)THEN
          WRITE(6,'(A)') ' '

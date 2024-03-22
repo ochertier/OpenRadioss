@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,7 +25,7 @@ Chd|  ALESO2T                       source/ale/ale2d/aleso2t.F
 Chd|-- called by -----------
 Chd|        ALELEC                        source/ale/alelec.F           
 Chd|-- calls ---------------
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
 Chd|====================================================================
       SUBROUTINE ALESO2T(ALE_CONNECTIVITY, PM, IXTG, IGEO)
 C-----------------------------------------------
@@ -46,12 +46,10 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "units_c.inc"
 #include      "param_c.inc"
 #include      "scr03_c.inc"
-#include      "scr17_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

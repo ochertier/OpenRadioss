@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -23,7 +23,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 Chd|====================================================================
 Chd|  SPMD_EXCH_TAG_TSH             source/mpi/elements/spmd_exch_dttsh.F
 Chd|-- called by -----------
-Chd|        TSHCDCOM_DIM                  source/elements/thickshell/solidec/scdtdc3.F
+Chd|        TSHCDCOM_DIM                  source/elements/thickshell/solidec/tshcdcom_dim.F
 Chd|-- calls ---------------
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
@@ -36,7 +36,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -47,7 +46,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"     
-#include      "com04_c.inc"     
 #include      "task_c.inc"      
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -123,7 +121,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -255,7 +252,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------

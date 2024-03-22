@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -31,7 +31,7 @@ Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.
 Chd|        NGR2USR                       source/system/nintrr.F        
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
       SUBROUTINE HM_READ_INTER_TYPE18(
@@ -62,7 +62,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr17_c.inc"
-#include      "submod_c.inc" 
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -82,16 +81,9 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
 #include      "scr06_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com09_c.inc"
 #include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "scr12_c.inc"
-#include      "sysunit.inc"
 #include      "inter18.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -286,7 +278,7 @@ c          ENDIF
         IPARI(7)  = NTYP
         IPARI(12) = 0                
         IPARI(13) = IS1*10+IS2             
-        IPARI(14) = 0       !IVIS2
+        IPARI(14) = 0        ! tag for collocated scheme
         IPARI(17) = IDEL7N         
         IPARI(18) = INACTI 
         IPARI(20) = 0

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -36,7 +36,7 @@ Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        SENSOR_MOD                    share/modules1/sensor_mod.F   
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
-      SUBROUTINE HM_READ_ACTIV(IACTIV   ,FACTIV   ,SENSOR_TAB,IGRBRIC,
+      SUBROUTINE HM_READ_ACTIV(IACTIV   ,FACTIV   ,SENSORS,IGRBRIC,
      .                   IGRQUAD  ,IGRSH4N  ,IGRSH3N ,IGRTRUSS ,IGRBEAM,
      .                   IGRSPRING,LSUBMODEL,UNITAB)
 C-----------------------------------------------
@@ -52,9 +52,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -77,7 +74,7 @@ C-----------------------------------------------
       TYPE (GROUP_)  , DIMENSION(NGRSPRI) :: IGRSPRING
       TYPE (SUBMODEL_DATA),INTENT(IN)::LSUBMODEL(*)
       TYPE (UNIT_TYPE_),INTENT(IN) :: UNITAB 
-      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE (SENSORS_)  ,INTENT(IN) :: SENSORS
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -120,8 +117,8 @@ C
 C
         IF (ISEN  >  0) THEN
           IERR1 = 1
-          DO J=1,NSENSOR
-            IF (ISEN  ==  SENSOR_TAB(J)%SENS_ID) THEN
+          DO J=1,SENSORS%NSENSOR
+            IF (ISEN  ==  SENSORS%SENSOR_TAB(J)%SENS_ID) THEN
               IACTIV(2,I) = J
               IERR1 = 0
               EXIT
@@ -143,12 +140,12 @@ C
           IF (STOPT == ZERO) STOPT= INFINITY
           IF (ISEN > 0) THEN
              J = IACTIV(2,I)
-             FACTIV(1,I) = STARTT + SENSOR_TAB(J)%TCRIT
-             FACTIV(2,I) = STOPT  + SENSOR_TAB(J)%TCRIT
+             FACTIV(1,I) = STARTT + SENSORS%SENSOR_TAB(J)%TCRIT
+             FACTIV(2,I) = STOPT  + SENSORS%SENSOR_TAB(J)%TCRIT
           ELSE
              FACTIV(1,I) = STARTT  
              FACTIV(2,I) = STOPT
-          ENDIF			 
+          ENDIF       
         ENDIF
 C
         IF (IGBR > 0) THEN

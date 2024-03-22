@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,7 +27,7 @@ Chd|        GENOUTP                       source/output/sty/genoutp.F
 Chd|-- calls ---------------
 Chd|        SPMD_RGATHER9_1COMM           source/mpi/interfaces/spmd_outp.F
 Chd|        S_USER                        source/output/sty/s_user.F    
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE OUTP_C_S(NBXX,KEY,TEXT,ELBUF_TAB,IPARG ,EANI,
      .                    IPM ,IGEO,IXC ,IXTG ,DD_IAD,SIZLOC,SIZP0,THKE,SIZ_WR)
@@ -46,10 +46,7 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "param_c.inc"
 #include      "units_c.inc"
-#include      "scr01_c.inc"
-#include      "scr05_c.inc"
 #include      "task_c.inc"
-#include      "scr03_c.inc"
 #include      "scr16_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s

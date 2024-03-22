@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,7 +26,7 @@ Chd|-- called by -----------
 Chd|        SIGEPS15C                     source/materials/mat/mat015/sigeps15c.F
 Chd|-- calls ---------------
 Chd|====================================================================
-      SUBROUTINE M15CRAK(JFT  ,JLT   ,PM    ,DAMT ,DIR ,
+      SUBROUTINE M15CRAK(JFT  ,JLT   ,PM    ,DAMT ,
      1                   SIGR ,IMAT ,ILAYER ,SIG  ,NGL ,
      2                   NEL  )
 Cx-----------------------------------------------
@@ -43,8 +43,6 @@ C-----------------------------------------------
 #include      "com08_c.inc"
 #include      "units_c.inc"
 #include      "param_c.inc"
-#include      "com01_c.inc"
-#include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -52,12 +50,12 @@ C-----------------------------------------------
       INTEGER JFT, JLT,ILAYER,ICHA,IFLAG,NEL
 C     REAL
       my_real
-     .   PM(NPROPM,*),DAMT(NEL,2),DIR(NEL,2),
+     .   PM(NPROPM,*),DAMT(NEL,2),
      .   SIGR(NEL,6),SIG(MVSIZ,5)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,IDIR
+      INTEGER I,J
       INTEGER, DIMENSION(MVSIZ) :: FAILURE
        my_real
      .   EF2,EFC2,EM22,EMC2
@@ -149,7 +147,6 @@ C
           IF (EF2 >= ONE .OR. EFC2 >= ONE) THEN
             DAMT(I,1) = ZEP9
             SIGR(I,6) = TT
-!            IDIR = 1 
             SCH1(I,1) = SIG(I,1)
             SCH1(I,2) = SIG(I,2)
             SCH1(I,3) = SIG(I,3)

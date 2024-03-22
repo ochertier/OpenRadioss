@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -29,11 +29,13 @@ Chd|        ANCMSG                        source/output/message/message.F
 Chd|        ARRET                         source/system/arret.F         
 Chd|        FUNC_INTERS                   source/tools/curve/func_inters.F
 Chd|        FUNC_INTERS_C                 source/tools/curve/func_inters.F
+Chd|        FUNC_SLOPE                    source/tools/curve/func_slope.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        TABLE_MOD                     share/modules1/table_mod.F    
 Chd|====================================================================
       SUBROUTINE LAW88_UPD(IOUT   ,TITR   ,UPARAM ,NPC    ,PLD    ,  
-     .                     NFUNC  ,IFUNC  ,MAT_ID ,FUNC_ID)
+     .                     NFUNC  ,IFUNC  ,MAT_ID ,FUNC_ID,PM     ,
+     .                     NFUNCT )
       USE MESSAGE_MOD
 C-----------------------------------------------
 C   M o d u l e s
@@ -48,15 +50,17 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "com04_c.inc"
 #include      "scr17_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       CHARACTER*nchartitle  :: TITR
-      INTEGER MAT_ID,IOUT,NFUNC
-      INTEGER NPC(*), FUNC_ID(*),IFUNC(NFUNC)
+      INTEGER MAT_ID,IOUT
+      INTEGER ,INTENT(IN) :: NFUNC
+      INTEGER ,INTENT(IN) :: NFUNCT
+      INTEGER NPC(*), FUNC_ID(NFUNCT),IFUNC(NFUNC)
       my_real UPARAM(*),PLD(*)
+      my_real , DIMENSION(NPROPM), INTENT(INOUT) :: PM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -65,6 +69,8 @@ C-----------------------------------------------
       my_real KC,KT,KFC,KFT,GMAX,DERI,STIFF,STIFFMIN,STIFFINI, 
      .  STIFFMAX,STIFFAVG,XINT1,YINT1,XINT2,YINT2,FAC,FAC1,FAC2,
      .  DX,DY, XINC,YINC,XINT,YINT
+      my_real 
+     .     EMAX, EMIN,EINI,SCALEFAC,E0,EC_MAX,NU,GS
       my_real , DIMENSION(:), ALLOCATABLE :: STRESS,STRETCH
 C=======================================================================
 C----------------------------
@@ -130,48 +136,63 @@ c
         YINC = ZERO
         XINT = ZERO
         YINT = ZERO
-        IF( ICASE == 3) THEN
-          FUNC = IFUNC(1)
-          FUND = IFUNC(NL + 1)
-          FAC1 = UPARAM(11  )
-          FAC2 = UPARAM(11 + 2*NL  )
+        FUNC = IFUNC(1)
+        IF(NFUNC > NL ) THEN
+           FUND = IFUNC(NL + 1)
+           FAC1 = UPARAM(11  )
+           FAC2 = UPARAM(11 + 2*NL  )
 C intersection pt of tension if existing
-          UPARAM(NV + 1) = 0  ! not existing
-          CALL FUNC_INTERS(TITR   ,MAT_ID ,FUNC   ,FUND   ,FAC1   ,
-     .                     FAC2   ,NPC    ,PLD    ,XINT  ,YINT  )
-          UPARAM(NV + 2) = XINT   
-          UPARAM(NV + 3) = YINT
-          IF(XINT*YINT /= ZERO)UPARAM(NV + 1) = 1 ! only tension 
+           UPARAM(NV + 1) = 0  ! not existing
+           IF(FUNC /= 0 .AND. FUND /= 0) THEN
+               CALL FUNC_INTERS(TITR   ,MAT_ID ,FUNC   ,FUND   ,FAC1   ,
+     .                            FAC2   ,NPC    ,PLD    ,XINT  ,YINT  )
+               UPARAM(NV + 2) = XINT   
+               UPARAM(NV + 3) = YINT
+               IF(XINT*YINT /= ZERO)UPARAM(NV + 1) = 1 ! only tension 
 C intersection pt of compression if existing 
-          CALL FUNC_INTERS_C(TITR   ,MAT_ID ,FUNC   ,FUND   ,FAC1   ,
-     .                     FAC2   ,NPC    ,PLD    ,XINC  ,YINC  )
-          UPARAM(NV + 4) = XINC   
-          UPARAM(NV + 5) = YINC
-          IF(XINC*YINC /= ZERO ) THEN
-           IF(INT(UPARAM(NV + 1)) == 0 )THEN
-              UPARAM(NV + 1) = -1  ! only compression 
-            ELSE  
-               UPARAM(NV + 1) = 2  ! tension & compression
-            ENDIF
-          ENDIF
-          IF(UPARAM(NV + 1) /= 2 .AND. ITENS == -2) THEN
-              CALL ANCMSG(MSGID=2040,                        
-     .              MSGTYPE=MSGERROR,                             
-     .              ANMODE=ANINFO,                                
-     .              I1=MAT_ID,                                    
-     .              C1=TITR,                                      
-     .              I2=FUNC_ID(FUNC),   ! Id function             
-     .              I3=FUNC_ID(FUND) ) ! Id_function              
-             CALL ARRET(2)
-          
-          ENDIF
-            
-        ENDIF  
+               CALL FUNC_INTERS_C(TITR   ,MAT_ID ,FUNC   ,FUND   ,FAC1   ,
+     .                            FAC2   ,NPC    ,PLD    ,XINC  ,YINC  )
+               UPARAM(NV + 4) = XINC   
+               UPARAM(NV + 5) = YINC
+               IF(XINC*YINC /= ZERO ) THEN
+                  IF(INT(UPARAM(NV + 1)) == 0 )THEN
+                     UPARAM(NV + 1) = -1  ! only compression 
+                   ELSE  
+                      UPARAM(NV + 1) = 2  ! tension & compression
+                   ENDIF
+               ENDIF
+               IF(UPARAM(NV + 1) /= 2 .AND. ITENS == -2) THEN
+                     CALL ANCMSG(MSGID=2040,                        
+     .                     MSGTYPE=MSGERROR,                             
+     .                     ANMODE=ANINFO,                                
+     .                     I1=MAT_ID,                                    
+     .                     C1=TITR,                                      
+     .                     I2=FUNC_ID(FUNC),   ! Id function             
+     .                     I3=FUNC_ID(FUND) ) ! Id_function              
+                    CALL ARRET(2)
+               ENDIF
+           ENDIF  
+        ENDIF 
         WRITE(IOUT,1000)
-         
-         IF(XINT*YINT > ZERO) WRITE(IOUT,1600) XINT,YINT
-         IF(XINC*YINC > ZERO) WRITE(IOUT,1700) XINC,YINC
-            
+        IF(XINT*YINT > ZERO) WRITE(IOUT,1600) XINT,YINT
+        IF(XINC*YINC > ZERO) WRITE(IOUT,1700) XINC,YINC
+C-----check E_MAX        
+           EMAX = ZERO
+           EMIN = EP20
+           EINI = ZERO
+          DO J = 1, NFUNC 
+              SCALEFAC= UPARAM(9 + 2*J )  
+              CALL FUNC_SLOPE(IFUNC(J),SCALEFAC,NPC,PLD,STIFFMIN,STIFFMAX,STIFFINI,STIFFAVG)  
+              EMAX = MAX(EMAX,  STIFFMAX )
+              EMIN = MIN(EMIN,  STIFFMIN)
+              EINI = MAX(EINI, STIFFINI)
+          ENDDO ! NFUNC 
+          NU =UPARAM(2)
+          GS =UPARAM(3)
+          E0 = TWO*GS*(ONE + NU)
+          EC_MAX = MAX(E0,EMAX)
+          PM(24) = EC_MAX
+          WRITE(IOUT,1003) EC_MAX       
 c----- ------
  1000 FORMAT
      & (5X,'TABULATED OGDEN LAW',/,
@@ -183,5 +204,7 @@ c----- ------
  1700 FORMAT
      & (5X,  'STRAIN COMPRESSION OF INTERSECTION PT BETWEEN QUASISTAIC AND UNLOADING CURVES. . . . .  . . .=',1PG20.13/
      & ,5X,  'STRESS COMPRESSION OF INTERSECTION PT BETWEEN QUASISTAIC AND UNLOADING CURVES. . . . . . . . =',1PG20.13//)
+ 1003   FORMAT(
+     & 5X,'YOUNG''S MODULUS FOR HG COMPUTE . . . .=',1PG20.13/)
       RETURN
       END

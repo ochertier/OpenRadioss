@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -103,7 +103,7 @@ C Accelerations locales SPMD
         WI(1,2)=THIRD
         WI(2,2)=THIRD
         WI(3,2)=ONE_OVER_6
-        WI(4,2)=ONE_OVER_6	  
+        WI(4,2)=ONE_OVER_6    
         DO I = 1,NEL
           N1 = ELEM(1,I)
           N2 = ELEM(2,I)
@@ -116,7 +116,7 @@ C Accelerations locales SPMD
           ACCF(I) = AX*NORMAL(1,I)+AY*NORMAL(2,I)+AZ*NORMAL(3,I)
         ENDDO
       ENDIF
-C	  
+C    
       RETURN
       END
       

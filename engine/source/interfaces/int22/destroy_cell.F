@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,8 +25,8 @@ Chd|  DESTROY_CELL                  source/interfaces/int22/destroy_cell.F
 Chd|-- called by -----------
 Chd|        SINIT22_FVM                   source/interfaces/int22/sinit22_fvm.F
 Chd|-- calls ---------------
-Chd|        I22BUFBRIC_MOD                ../common_source/modules/cut-cell-search_mod.F
-Chd|        I22TRI_MOD                    ../common_source/modules/cut-cell-search_mod.F
+Chd|        I22BUFBRIC_MOD                ../common_source/modules/interfaces/cut-cell-search_mod.F
+Chd|        I22TRI_MOD                    ../common_source/modules/interfaces/cut-cell-search_mod.F
 Chd|====================================================================
       SUBROUTINE DESTROY_CELL(NIN,IB,ICELL_TARGET,ICELLv,IBv,J,Jv, IXS, ITASK)
 C-----------------------------------------------
@@ -69,11 +69,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "param_c.inc"
-#include      "com01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

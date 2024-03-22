@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -55,7 +55,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -67,11 +66,7 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr02_c.inc"
-#include      "scr18_c.inc"
 #include      "task_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
 #include      "timeri_c.inc"
 #include      "sms_c.inc"
 C-----------------------------------------------
@@ -159,7 +154,7 @@ C
          END DO
       END IF
 C
-Cel boite minmax pour le tri provenant de i7buce BMINMA
+C   boite minmax pour le tri provenant de i7buce BMINMA
 C
       IF(IRCVFROM(NIN,LOC_PROC)==0.AND.
      .   ISENDTO(NIN,LOC_PROC)==0) RETURN
@@ -234,11 +229,11 @@ C
       ENDIF
 
 C
-Cel envoi voxel + boite min/max
+C   envoi voxel + boite min/max
 C
 
 C
-Cel envoi de XREM
+C   envoi de XREM
 C
 C computation of real and integer sending buffers sizes
 c general case
@@ -340,13 +335,18 @@ C
             NOD = NSV(I)
             IF(WEIGHT(NOD)==1)THEN
              IF(STIFN(I)>ZERO)THEN
-               IF(ITYP==25.AND.IRTLM(4*(I-1)+4)==P)THEN
-                 NB = NB + 1
-                 INDEX(NB) = I
-               ELSEIF(ITIED/=0.AND.ITYP==7.AND.CANDF_SI(NIN)%P(I)/=0) THEN
+               IF(ITIED/=0.AND.ITYP==7.AND.CANDF_SI(NIN)%P(I)/=0) THEN
                  NB = NB + 1
                  INDEX(NB) = I
                ELSE
+                 IF(ITYP==25) THEN
+                   IF(IRTLM(4*(I-1)+4)==P)THEN
+                     NB = NB + 1
+                     INDEX(NB) = I
+                     CYCLE
+                   ENDIF
+                 ENDIF
+
                  IF(X(1,NOD) < XMINB)  CYCLE
                  IF(X(1,NOD) > XMAXB)  CYCLE
                  IF(X(2,NOD) < YMINB)  CYCLE
@@ -663,7 +663,7 @@ C reset old tag for next P
 C
       IF(ITYP==25) DEALLOCATE(ITAGNSNFI)
 C
-Cel reception  des donnees XREM
+C   reception  des donnees XREM
 C
       IF(IRCVFROM(NIN,LOC_PROC)/=0) THEN
         NSNR = 0

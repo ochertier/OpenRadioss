@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -112,7 +112,7 @@ C-----
         WPRIMR =-THREE_OVER_4*RHM2/(H*H*R)
       ELSE
         W      =ZERO
-        WPRIMR =ZERO	
+        WPRIMR =ZERO
       ENDIF
       WGRAD(1)=WPRIMR*(XI-XJ)
       WGRAD(2)=WPRIMR*(YI-YJ)

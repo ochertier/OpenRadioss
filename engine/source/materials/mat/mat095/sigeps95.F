@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -49,41 +49,33 @@ Chd|====================================================================
      A      MFXX   ,MFXY    ,MFXZ,MFYX, MFYY  , MFYZ  ,  
      B      MFZX   ,MFZY    ,MFZZ     ,                  
      C      SOUNDSP, VISCMAX, UVAR    , OFF   , ISMSTR, ET  ,
-     D      IHET   ,OFFG    , EPSTH3  , IEXPAN,
+     D      IHET   ,OFFG    , EPSTH3  , IEXPAN, NPARF ,
      E      UPARAMF,UVARF   ,NVARF    ,JCVT   ,GAMA_R)
 C-----------------------------------------------
 C   I M P L I C I T   T Y P E S
 C-----------------------------------------------
 #include "implicit_f.inc"
 C-----------------------------------------------
-C   G L O B A L   P A R A M E T E R S
-C-----------------------------------------------
-#include "scr17_c.inc"
-C-----------------------------------------------
 C   C O M M O N 
 C-----------------------------------------------
-#include "scr05_c.inc"
 #include "impl1_c.inc"
-#include "units_c.inc"
-#include "com01_c.inc"
 C----------------------------------------------------------------
 C  I N P U T   A R G U M E N T S
 C----------------------------------------------------------------
-      INTEGER       NEL, JCVT,    NUPARAM, NUVAR,ISMSTR,NGL(*),IHET,IEXPAN,NVARF 
-      my_real
-     .      TIME       , TIMESTEP   , UPARAM(NUPARAM),UPARAMF(NUPARAM),
-     .      RHO   (NEL), RHO0  (NEL), VOLUME(NEL), EINT(NEL),
-     .      EPSPXX(NEL), EPSPYY(NEL), EPSPZZ(NEL),
-     .      EPSPXY(NEL), EPSPYZ(NEL), EPSPZX(NEL),
-     .      DEPSXX(NEL), DEPSYY(NEL), DEPSZZ(NEL),
-     .      DEPSXY(NEL), DEPSYZ(NEL), DEPSZX(NEL),
-     .      EPSXX (NEL), EPSYY (NEL), EPSZZ (NEL),
-     .      EPSXY (NEL), EPSYZ (NEL), EPSZX (NEL),
-     .      SIGOXX(NEL), SIGOYY(NEL), SIGOZZ(NEL),
-     .      SIGOXY(NEL), SIGOYZ(NEL), SIGOZX(NEL),OFFG(NEL),
-     .      MFXX(NEL)  , MFXY(NEL)  ,MFXZ(NEL)  ,MFYX(NEL) ,
-     .      MFYY(NEL)  , MFYZ(NEL)  ,MFZX(NEL)  ,MFZY(NEL)  ,MFZZ(NEL), 
-     .      EPSTH3(NEL), GAMA_R(NEL,6)
+      INTEGER ,INTENT(IN) ::  NPARF
+      INTEGER ,INTENT(IN) ::  NEL,JCVT,NVARF,NUPARAM,NUVAR,ISMSTR,IHET,IEXPAN
+      INTEGER ,INTENT(IN) ::  NGL(NEL)
+      my_real :: TIME,TIMESTEP
+      my_real ,DIMENSION(NUPARAM) ,INTENT(IN) :: UPARAM
+      my_real ,DIMENSION(NPARF)   ,INTENT(IN) :: UPARAMF
+      my_real ,DIMENSION(NEL)  ::  RHO,RHO0,VOLUME,EINT,EPSTH3,
+     .      EPSPXX, EPSPYY, EPSPZZ, EPSPXY, EPSPYZ, EPSPZX,
+     .      DEPSXX, DEPSYY, DEPSZZ, DEPSXY, DEPSYZ, DEPSZX,
+     .      EPSXX , EPSYY , EPSZZ , EPSXY , EPSYZ , EPSZX ,
+     .      SIGOXX, SIGOYY, SIGOZZ, SIGOXY, SIGOYZ, SIGOZX,OFFG,
+     .      MFXX,MFXY,MFXZ,MFYX,MFYY,MFYZ,MFZX,MFZY,MFZZ
+   
+      my_real ::  GAMA_R(NEL,6)
 C----------------------------------------------------------------
 C  O U T P U T   A R G U M E N T S
 C----------------------------------------------------------------
@@ -107,7 +99,7 @@ C----------------------------------------------------------------
 C----------------------------------------------------------------
 C  L O C A L  V A R I B L E S
 C----------------------------------------------------------------
-      INTEGER   I,J,K,KK,LL,FLAGBB,DIRECT,ITER,NITER,FLAG_MUL,IAVIS
+      INTEGER   I,J,K,KK,LL,FLAGBB,DIRECT,ITER,NITER,FLAG_MUL,IAVIS,IFORM
 
       my_real
      .   ET1,ET2,ET3,A1,A10,KSI,MU,D,LAM,G,RBULK,AA,BB,CC,SB, TEMP,
@@ -157,11 +149,12 @@ c    material parameters
       G    =  UPARAM(19) 
       RBULK=  UPARAM(20) 
       TAUREF= UPARAM(22) 
+      IFORM = NINT(UPARAM(23))
       !
       STIFF0 = FOUR_OVER_3*G + RBULK
       MAXL = ONE
-	  IAVIS =1
-	  IF (A10*SB==ZERO) IAVIS=0
+            IAVIS =1
+            IF (A10*SB==ZERO) IAVIS=0
 
       FLAG_MUL   =  UPARAM(21)  !CALCULATED IN UPDMAT = 1 IF IRUP==33
       IF (FLAG_MUL > ZERO)THEN
@@ -170,21 +163,8 @@ c    material parameters
        COEFM = UPARAMF(3)    
       ENDIF
 
-      IF(TIME == ZERO)THEN
-        DO  I = 1, NEL
-         UVAR(I,1) = ONE
-         UVAR(I,2) = ONE
-         UVAR(I,3) = ONE
-         UVAR(I,4) = ZERO
-         UVAR(I,5) = ZERO
-         UVAR(I,6) = ZERO
-         UVAR(I,7) = ZERO
-         UVAR(I,8) = ZERO
-         UVAR(I,9) = ZERO
-        ENDDO
-      ENDIF
-C	  
-      IF (IAVIS>0) THEN	  
+C    
+      IF (IAVIS>0) THEN    
       DO  I = 1, NEL
          !retrieve previous viscous deformation gradient
          FPO(I,1,1)  = UVAR(I,1) 
@@ -244,14 +224,15 @@ C
       !-------------------------
       !entry B=F*FT matrix --  output hyperelastic stress 
        CALL POLYSTREST2(
-     1                NEL , FFT , C10, C01, C20, 
-     2                C11 ,C02, C30, C21, C12,
-     3                C03 ,D1 ,D2  ,  D3, SIGA ,
-     4                BI1,BI2,JDET ,FLAG_MUL,
-     5                NVARF,COEFR, BETAF,COEFM  ,UVARF,CAII)
+     1                NEL  , FFT , C10 , C01, C20, 
+     2                C11  ,C02  , C30 , C21, C12,
+     3                C03  ,D1   , D2  ,  D3, SIGA ,
+     4                BI1  ,BI2  ,JDET ,FLAG_MUL,
+     5                NVARF,COEFR,BETAF,COEFM   ,
+     6                UVARF,CAII ,RBULK,IFORM)
      
       
-      IF (IAVIS>0) THEN	  
+      IF (IAVIS>0) THEN    
       !-------------------------
       !chain B: compute stress : 
       !-------------------------
@@ -279,7 +260,8 @@ C
      2                C11 ,C02, C30, C21, C12,
      3                C03 ,D1 ,D2  ,  D3, SIGB ,
      4                BI1,BI2,JDET ,FLAG_MUL,
-     5                NVARF,COEFR, BETAF,COEFM  ,UVARF)
+     5                NVARF,COEFR, BETAF,COEFM ,
+     6                UVARF,RBULK,IFORM)
      
      
         DO I=1,NEL  !     scale trial cauchy stress in chain B
@@ -313,6 +295,7 @@ C
      .                EXPM, KSI, TAUREF  , DGAMMA ) 
 
 
+        IF (TIME == ZERO) DGAMMA(1:NEL) = UVAR(1:NEL,10)
         DO I=1,NEL ! calcul lde Lb
           UVAR(I,10)= DGAMMA(I)
           FACTOR    = DGAMMA(I)/TBNORM(I)
@@ -359,7 +342,8 @@ C
      2                C11 ,C02, C30, C21, C12,
      3                C03 ,D1 ,D2  ,  D3, SIGB ,
      4                BI1,BI2,JDET ,FLAG_MUL,
-     5                NVARF,COEFR, BETAF,COEFM  ,UVARF,CBII)
+     5                NVARF,COEFR, BETAF,COEFM  ,
+     6                UVARF,CBII,RBULK,IFORM)
 
         DO I=1,NEL  !     scale  cauchy stress in chain B
          SIGB(I,1,1) = SB *  SIGB(I,1,1)
@@ -385,13 +369,13 @@ C
          UVAR(I,8)   =   FP(I,3,2)
          UVAR(I,9)   =   FP(I,1,3)               
        ENDDO
-C----- A10*SB=0 ->sigB=sigA		
-	  ELSE	
+C----- A10*SB=0 ->sigB=sigA
+            ELSE
         DO I=1,NEL  !     scale  cauchy stress in chain B
          SIGB(I,1:3,1:3) = SB *  SIGA(I,1:3,1:3)
-		 CBII(I,1:3) = CAII(I,1:3)
+           CBII(I,1:3) = CAII(I,1:3)
         ENDDO
-      END IF !(IAVIS>0) THEN	  
+      END IF !(IAVIS>0) THEN    
 
       !--------------------
       !UPDATE TOTAL STRESS : sum of the stresses of each network
@@ -408,7 +392,7 @@ C----- A10*SB=0 ->sigB=sigA
       
        DO I=1,NEL  
          CII(1:3)=CAII(I,1:3)+SB*CBII(I,1:3)
-		 C_MAX(I)=MAX(STIFF0,CII(1),CII(2),CII(3))
+           C_MAX(I)=MAX(STIFF0,CII(1),CII(2),CII(3))
        ENDDO
 
        DO I=1,NEL
@@ -451,9 +435,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -515,9 +496,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

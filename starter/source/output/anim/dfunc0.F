@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,8 +25,8 @@ Chd|  DFUNC0                        source/output/anim/dfunc0.F
 Chd|-- called by -----------
 Chd|        GENANI1                       source/output/anim/genani1.F  
 Chd|-- calls ---------------
-Chd|        WRITE_R_C                     source/output/tools/write_routines.c
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        WRITE_R_C                     ../common_source/tools/input_output/write_routtines.c
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE DFUNC0(ELBUF_TAB ,FUNC    ,IFUNC   ,IPARG   ,PM      ,
      2                  EL2FA   ,NBF   ,SPBUF   ,IPART   ,IPARTSP )                                         
@@ -45,8 +45,6 @@ C-----------------------------------------------
 #include      "mvsiz_p.inc"                                            
 #include      "sphcom.inc"
 #include      "com01_c.inc"                                             
-#include      "com04_c.inc"                                             
-#include      "scr01_c.inc"                                             
 #include      "scr17_c.inc"
 #include      "param_c.inc"                                             
 C-----------------------------------------------                        
@@ -122,9 +120,9 @@ c
      .                 + GBUF%SIG(II(3) + I) ) * THIRD
                   VALUE = P
                   IF(IFUNC == 7) THEN                                   
-                    S1=GBUF%SIG(II(1) + I) + P  	      
-                    S2=GBUF%SIG(II(2) + I) + P  	      
-                    S3=GBUF%SIG(II(3) + I) + P  	      
+                    S1=GBUF%SIG(II(1) + I) + P          
+                    S2=GBUF%SIG(II(2) + I) + P          
+                    S3=GBUF%SIG(II(3) + I) + P          
                     VONM2= THREE*(GBUF%SIG(II(4) + I)**2 +    
      .                            GBUF%SIG(II(5) + I)**2 +    
      .                            GBUF%SIG(II(6) + I)**2 +    

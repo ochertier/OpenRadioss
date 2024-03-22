@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,7 +27,7 @@ Chd|        LECH3D                        source/output/h3d/h3d_build_fortran/le
 Chd|-- calls ---------------
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|        STACK_MOD                     share/modules/stack_mod.F     
 Chd|====================================================================
       SUBROUTINE H3D_LIST_QUAD_SCALAR(H3D_KEYWORD_QUAD_SCALAR,GEO,IGEO,MULTI_FVM,NKEY)
@@ -53,7 +53,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "chara_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
@@ -148,7 +147,7 @@ c-----------------------------------------------
 c-----------------------------------------------
       I = I + 1
       H3D_KEYWORD_QUAD_SCALAR(I)%KEY3  = 'HOURGLASS'
-      H3D_KEYWORD_QUAD_SCALAR(I)%TEXT1  = 'Hourglass Energy'
+      H3D_KEYWORD_QUAD_SCALAR(I)%TEXT1  = 'Hourglass Energy per unit mass'
 c-----------------------------------------------
       IF (MULTI_FVM%IS_USED) THEN
 c
@@ -269,6 +268,18 @@ c-----------------------------------------------
       H3D_KEYWORD_QUAD_SCALAR(I)%IS_IPT = 1
       H3D_KEYWORD_QUAD_SCALAR(I)%IS_IPT_ALL = 1
       H3D_KEYWORD_QUAD_SCALAR(I)%TEXT1  = 'DAMAGE'
+c-----------------------------------------------
+      I = I + 1
+      H3D_KEYWORD_QUAD_SCALAR(I)%KEY3  = 'FAILURE'
+      H3D_KEYWORD_QUAD_SCALAR(I)%IS_PLY = 1
+      H3D_KEYWORD_QUAD_SCALAR(I)%IS_PLY_ALL = 1
+      H3D_KEYWORD_QUAD_SCALAR(I)%IS_LAYER = 1
+      H3D_KEYWORD_QUAD_SCALAR(I)%IS_LAYER_ALL = 1
+      H3D_KEYWORD_QUAD_SCALAR(I)%IS_IPT = 1
+      H3D_KEYWORD_QUAD_SCALAR(I)%IS_IPT_ALL = 1
+      H3D_KEYWORD_QUAD_SCALAR(I)%IS_ID = 1
+      H3D_KEYWORD_QUAD_SCALAR(I)%TEXT1  = 'Failure'
+      H3D_KEYWORD_QUAD_SCALAR(I)%COMMENT = 'Damage of current failue criterion'
 c-----------------------------------------------
       I = I + 1
       H3D_KEYWORD_QUAD_SCALAR(I)%KEY3  = 'DAMA/MEMB'
@@ -448,6 +459,11 @@ c-----------------------------------------------
       H3D_KEYWORD_QUAD_SCALAR(I)%KEY3  = 'TILLOTSON'
       H3D_KEYWORD_QUAD_SCALAR(I)%TEXT1  = 'Region identifier in p,v diagram'
       H3D_KEYWORD_QUAD_SCALAR(I)%COMMENT  = '1:compressed, 2:expanded cold, 3:transition, 4:hot expansion'
+c-----------------------------------------------
+      I = I + 1
+      H3D_KEYWORD_QUAD_SCALAR(I)%KEY3  = 'DIV(U)'
+      H3D_KEYWORD_QUAD_SCALAR(I)%TEXT1  = 'div(u)'
+      H3D_KEYWORD_QUAD_SCALAR(I)%COMMENT  = 'Volumetric dilatation rate'
 c-----------------------------------------------
       NKEY=I
 c-----------------------------------------------

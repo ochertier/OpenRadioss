@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>    
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,7 +27,7 @@ C.../SPMDV5/
      .                NBDDI2M ,NISKYI2 ,LCNI2  ,I2NSNT  ,NSKYMV0 ,
      .                NSKYMVC0,NSKYLL0 ,NBDDNCJ,NBDDNRBM,NSKYRBM0,
      .                NNODTCUT,NNODLCUT, NUMNODG,NUMNODM,NUMELQG,
-     .                NUMELCG,NUMELTGG,NUMELURG,NUMELSG,NUMELPG,
+     .                NUMELCG,NUMELTGG,NUMELSG,NUMELPG,
      .                NUMELRG,NUMELTRG,NB1DG,NSKEWAG,SECTIOM,
      .                NUMELS16G,NUM16SHIFT,SPHSHIFT,NUMSPHG,NUMELXG,
      .                NBI18   ,NSKYI18,SKIPPON,IISROTS, NBDDRBE3M,
@@ -42,7 +42,7 @@ C.../SPMDV5/
      .        NBDDI2M ,NISKYI2 ,LCNI2  ,I2NSNT  ,NSKYMV0 ,
      .        NSKYMVC0,NSKYLL0 ,NBDDNCJ,NBDDNRBM,NSKYRBM0,
      .        NNODTCUT,NNODLCUT,NUMNODG,NUMNODM,NUMELQG ,
-     .        NUMELCG,NUMELTGG,NUMELURG ,NUMELSG,NUMELPG,
+     .        NUMELCG,NUMELTGG,NUMELSG,NUMELPG,
      .        NUMELRG ,NUMELTRG,NB1DG,NSKEWAG,SECTIOM,
      .        NUMELS16G,NUM16SHIFT,SPHSHIFT,NUMSPHG,NUMELXG,
      .        NBI18   ,NSKYI18,SKIPPON,IISROTS, NBDDRBE3M,
@@ -50,16 +50,14 @@ C.../SPMDV5/
      .        NBDDEDGE,I24COM3,I24COM4,NBDDNORT ,NBDDNOR_MAX,
      .        NBCCFR25,NBCCNOR, NSNT25,NBDDEDGT,NBDDEDG_MAX,
      .        NRTMX25, LCNCND,NUMELS10G,NUMELS20G,NUMSKING
-Cel51b4+++
-C variables specifiques CFD/SPMD
+C CFD/SPMD
 C.../COMCFD/
       INTEGER LCOMCFD
       PARAMETER (LCOMCFD = 10)
 C
       COMMON /COMCFD/NSVOIS ,NQVOIS ,NTGVOIS,NRCVVOIS,NSNDVOIS,NERVOIS,
      .               NESVOIS,ILAW11 ,NLWALE  ,NSEGCOM, NUMPORL, NE_NSVOIS, NE_NQVOIS, 
-     .		     NE_NTGVOIS
+     .         NE_NTGVOIS
       INTEGER NSVOIS ,NQVOIS ,NTGVOIS,NRCVVOIS,NSNDVOIS,NERVOIS,
      .        NESVOIS,ILAW11 ,NLWALE  ,NSEGCOM, NUMPORL, NE_NSVOIS, NE_NQVOIS, 
-     .		     NE_NTGVOIS
-Cel51b4---
+     .         NE_NTGVOIS

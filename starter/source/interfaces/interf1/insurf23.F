@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -34,7 +34,6 @@ Chd|====================================================================
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
-C-----------------------------------------------------------------------
 C     LECTURE DES SURFACES ET DECOMPTE DES SEGMENTS
 C           ENTREE : 
 C                    NRT NOMBRE DE RENSEIGNEMENTS A LIRE
@@ -45,17 +44,12 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "units_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "param_c.inc"
 #include      "scr03_c.inc"
-#include      "warn_c.inc"
 #include      "scr17_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -83,10 +77,10 @@ C=======================================================================
         N4=SURF_NODES(J,4)
 C       IF(N4==0.OR.N4==N3)THEN 
          NRTNEW=NRTNEW+1
-         IRECT(1,NRTNEW)=N1			     
-         IRECT(2,NRTNEW)=N2			     
-         IRECT(3,NRTNEW)=N3			     
-         IRECT(4,NRTNEW)=N4			     
+         IRECT(1,NRTNEW)=N1           
+         IRECT(2,NRTNEW)=N2           
+         IRECT(3,NRTNEW)=N3           
+         IRECT(4,NRTNEW)=N4           
 C       ELSE
 C         X13=X(1,N1)-X(1,N3)
 C         Y13=X(2,N1)-X(2,N3)
@@ -98,26 +92,26 @@ C         Z24=X(3,N2)-X(3,N4)
 C         D2=X24*X24+Y24*Y24+Z24*Z24
 C         IF(D1 <= D2)THEN
 C           NRTNEW=NRTNEW+1
-C           IRECT(1,NRTNEW)=N1  			
-C           IRECT(2,NRTNEW)=N2  			
-C           IRECT(3,NRTNEW)=N3  			
-C           IRECT(4,NRTNEW)=N3  			
+C           IRECT(1,NRTNEW)=N1  
+C           IRECT(2,NRTNEW)=N2  
+C           IRECT(3,NRTNEW)=N3  
+C           IRECT(4,NRTNEW)=N3  
 C           NRTNEW=NRTNEW+1
-C           IRECT(1,NRTNEW)=N1  			
-C           IRECT(2,NRTNEW)=N3  			
-C           IRECT(3,NRTNEW)=N3  			
-C           IRECT(4,NRTNEW)=N4  			
+C           IRECT(1,NRTNEW)=N1  
+C           IRECT(2,NRTNEW)=N3  
+C           IRECT(3,NRTNEW)=N3  
+C           IRECT(4,NRTNEW)=N4  
 C         ELSE
 C           NRTNEW=NRTNEW+1
-C           IRECT(1,NRTNEW)=N1  			
-C           IRECT(2,NRTNEW)=N2  			
-C           IRECT(3,NRTNEW)=N4  			
-C           IRECT(4,NRTNEW)=N4  			
+C           IRECT(1,NRTNEW)=N1  
+C           IRECT(2,NRTNEW)=N2  
+C           IRECT(3,NRTNEW)=N4  
+C           IRECT(4,NRTNEW)=N4  
 C           NRTNEW=NRTNEW+1
-C           IRECT(1,NRTNEW)=N2  			
-C           IRECT(2,NRTNEW)=N3  			
-C           IRECT(3,NRTNEW)=N4  			
-C           IRECT(4,NRTNEW)=N4  			
+C           IRECT(1,NRTNEW)=N2  
+C           IRECT(2,NRTNEW)=N3  
+C           IRECT(3,NRTNEW)=N4  
+C           IRECT(4,NRTNEW)=N4  
 C         END IF
 c       END IF                                          
       ENDDO                                                 

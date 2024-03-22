@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,7 +20,6 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-#ifdef MUMPS5
 C---------------------solves [L][D][L]^t{z}={v}--DIAG_M(deja inverse)-----
 C---------------------or  {z}=[Z][D]^-1[Z]^t{v}-----for inverse option IPREC>=6
 Chd|====================================================================
@@ -49,11 +48,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER  NDDL  ,NNZ   ,IADM(*) ,JDIM(*),IPREC,ITASK,IPRINT
@@ -65,6 +59,7 @@ C     REAL
       my_real
      .  DIAG_K(*),LT_K(*),FAC_K(*)
       TYPE(PRGRAPH) :: GRAPHE(*)
+#ifdef MUMPS5
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -127,6 +122,7 @@ C-----------------------------
       ENDIF
 C--------------------------------------------
       RETURN
+#endif
       END
 C-----------spmd----------solves [L][D][L]^t{z}={v}--DIAG_M(deja inverse)-----
 Chd|====================================================================
@@ -156,11 +152,11 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "dmumps_struc.h"
+#if defined(MUMPS5)
+#include "dmumps_struc.h"
+#endif
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -169,13 +165,18 @@ C-----------------------------------------------
      .        ITAB(*), IPRINT, 
      .        INSOLV, IT, IPIV_K(*), NK, CDDLP(*), ISOLV, IDSC,
      .        IDDL(*), IKC(*), INLOC(*), NDOF(*)
-C     REAL
-      my_real
-     .  DIAG_M(*), Z(*), LT_M(*)  ,V(*) 
-      my_real
-     .        DIAG_K(*), LT_K(*),FAC_K(*)
+      my_real DIAG_M(*), Z(*), LT_M(*)  ,V(*) 
+      my_real DIAG_K(*), LT_K(*),FAC_K(*)
       TYPE(PRGRAPH) :: GRAPHE(*)
+C
+#ifdef MUMPS5
       TYPE(DMUMPS_STRUC) MUMPS_PAR
+#else
+      ! Fake declaration as DMUMPS_STRUC is shipped with MUMPS
+      INTEGER MUMPS_PAR 
+#endif
+
+#ifdef MUMPS5
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -220,6 +221,7 @@ C-----------------------------
 C
 C--------------------------------------------
       RETURN
+#endif
       END
 C---------------------solves [L][D][L]^t{z}={v}--DIAG_M(deja inverse)-----
 Chd|====================================================================
@@ -239,17 +241,13 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER  NDDL  ,NNZ   ,IADM(*)  ,JDIM(*)
 C     REAL
       my_real
      .  DIAG_M(*), Z(*), LT_M(*)  ,V(*) 
+#ifdef MUMPS5
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -282,6 +280,7 @@ C --------Backword----[LT_M]{z}={v}---
       ENDIF
 C--------------------------------------------
       RETURN
+#endif
       END
 C-------------solves  {z}=[Z][D]^-1[Z]^t{v}-----
 Chd|====================================================================
@@ -297,17 +296,13 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER  NDDL  ,NNZ   ,IADM(*)  ,JDIM(*),IPREC
 C     REAL
       my_real
      .  DIAG_M(*), Z(*), LT_M(*)  ,V(*) 
+#ifdef MUMPS5
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -340,6 +335,7 @@ C --------[Z]{z}-------
        ENDDO
 C--------------------------------------------
       RETURN
+#endif
       END
 C-------------solves  {z}=[Z][D]^-1[Z]^t{v}----[Z] en colonne-
 Chd|====================================================================
@@ -357,17 +353,13 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER  NDDL  ,NNZ   ,IADM(*)  ,JDIM(*),IPREC
 C     REAL
       my_real
      .  DIAG_M(*), Z(*), LT_M(*)  ,V(*) 
+#ifdef MUMPS5
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -401,6 +393,7 @@ C --------{z}=[Z]{z}-------
        ENDDO
 C--------------------------------------------
       RETURN
+#endif
       END
 C------------hibrid version-solves  {z}=[Z][D]^-1[Z]^t{v}----[Z] en colonne-
 Chd|====================================================================
@@ -418,17 +411,13 @@ C-----------------------------------------------
 #include "implicit_f.inc"
 #include "comlock.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER  NDDL  ,NNZ   ,IADM(*)  ,JDIM(*),F_DDL ,L_DDL
 C     REAL
       my_real
      .  DIAG_M(*), Z(*), LT_M(*)  ,V(*) 
+#ifdef MUMPS5
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -473,6 +462,7 @@ C---------------------
 #include "lockoff.inc"
 C--------------------------------------------
       RETURN
+#endif
       END
 C------------hibrid version-solves  {z}=[Z][D]^-1[Z]^t{v}----[Z] en colonne-
 Chd|====================================================================
@@ -496,17 +486,13 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER  NDDL  ,NNZ   ,IADM(*)  ,JDIM(*),F_DDL ,L_DDL
 C     REAL
       my_real
      .  DIAG_M(*), Z(*), LT_M(*)  ,V(*) 
+#ifdef MUMPS5
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -547,6 +533,7 @@ C --------{z}=[Z]{z}-------
        ENDDO
 C--------------------------------------------
       RETURN
+#endif
       END
 Chd|====================================================================
 Chd|  PREC2H_SOLV                   source/implicit/prec_solv.F   
@@ -562,17 +549,13 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER  F_DDL ,L_DDL  
 C     REAL
       my_real
      .  DIAG_M(*), Z(*) ,V(*) 
+#ifdef MUMPS5
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -582,6 +565,7 @@ C-----------------------------------------------
        ENDDO
 C--------------------------------------------
       RETURN
+#endif
       END
 C-----------spmd----------solves [L][D][L]^t{z}={v}--DIAG_M(deja inverse)-----
 Chd|====================================================================
@@ -617,13 +601,13 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "dmumps_struc.h"
-#include      "com01_c.inc"
-#include      "timeri_c.inc"
+#if defined(MUMPS5)
+#include "dmumps_struc.h"
+#endif
+#include "timeri_c.inc"
+#include "com01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -632,13 +616,18 @@ C-----------------------------------------------
      .        ITAB(*), IPRINT, 
      .        INSOLV, IT, IPIV_K(*), NK, CDDLP(*), ISOLV, IDSC,
      .        IDDL(*), IKC(*), INLOC(*), NDOF(*),F_DDL  ,L_DDL
-C     REAL
-      my_real
-     .  DIAG_M(*), Z(*), LT_M(*)  ,V(*) 
-      my_real
-     .        DIAG_K(*), LT_K(*),FAC_K(*)
+      my_real DIAG_M(*), Z(*), LT_M(*)  ,V(*) 
+      my_real DIAG_K(*), LT_K(*),FAC_K(*)
       TYPE(PRGRAPH) :: GRAPHE(*)
+C
+#ifdef MUMPS5
       TYPE(DMUMPS_STRUC) MUMPS_PAR
+#else
+      ! Fake declaration as DMUMPS_STRUC is shipped with MUMPS
+      INTEGER MUMPS_PAR 
+#endif
+
+#ifdef MUMPS5
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -647,8 +636,7 @@ c     iprec=2 => jacobien NNZ=0
 c     iprec=5 => fsai .r same indice than [K]
 C-----------------------------
       INTEGER I,J,K,IBID,NI0,NNZK
-      my_real
-     .        RBID
+      my_real RBID
 C-----------------------------
       IF (IPREC==1) THEN
        IF (ISOLV>2.AND.ISOLV<7) THEN
@@ -713,6 +701,7 @@ C----------------------
       ENDIF
 C--------------------------------------------
       RETURN
+#endif
       END
 Chd|====================================================================
 Chd|  PREC_SOLVGH                   source/implicit/prec_solv.F   
@@ -727,26 +716,20 @@ Chd|====================================================================
      6                      DIAG_M , LT_M  ,V     ,Z      ,F_DDL  ,
      7                      L_DDL  )
 C-----------------------------------------------
-C   M o d u l e s
-C-----------------------------------------------
-C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
+#include "com01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER  NDDL  ,IADM(*)  ,JDIM(*),IPREC, ITASK,
      .         F_DDL  ,L_DDL
-C     REAL
-      my_real
-     .  DIAG_M(*), Z(*), LT_M(*)  ,V(*) 
+      my_real DIAG_M(*), Z(*), LT_M(*)  ,V(*) 
+#ifdef MUMPS5
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -755,8 +738,7 @@ c     iprec=2 => jacobien NNZ=0
 c     iprec=5 => fsai .r same indice than [K]
 C-----------------------------
       INTEGER I,J,K,IBID,NI0,NNZ
-      my_real
-     .        RBID
+      my_real RBID
 C-----------------------------
       IF (IPREC==1) THEN
         DO I = F_DDL  ,L_DDL
@@ -779,5 +761,5 @@ C---------------------
       ENDIF
 C--------------------------------------------
       RETURN
-      END
 #endif
+      END

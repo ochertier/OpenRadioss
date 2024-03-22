@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -23,6 +23,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 Chd|====================================================================
 Chd|  HM_GET_FLOAT_ARRAY_2INDEXES   source/devtools/hm_reader/hm_get_float_array_2indexes.F
 Chd|-- called by -----------
+Chd|        HM_READ_DRAPE                 source/properties/composite_options/drape/hm_read_drape.F
 Chd|        HM_READ_PROP17                source/properties/shell/hm_read_prop17.F
 Chd|        HM_READ_PROP51                source/properties/shell/hm_read_prop51.F
 Chd|        HM_READ_STACK                 source/stack/hm_read_stack.F  
@@ -65,9 +66,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "nchar_c.inc"
-#include      "submod_c.inc"
-#include      "sysunit.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C----------------------------------------------- 
@@ -81,9 +79,6 @@ C OUTPUT ARGUMENTS
      .  INTENT(OUT)::RVAL
       LOGICAL,INTENT(OUT)::IS_AVAILABLE
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,J,VALUE_TYPE,SUB_ID,IFLAGUNIT,UID
@@ -92,10 +87,6 @@ C-----------------------------------------------
       REAL*8 DVAL,LENGTH_DIM,MASS_DIM,TIME_DIM
       LOGICAL(KIND=C_BOOL) C_IS_AVAILABLE
 C-----------------------------------------------
-C   E x t e r n a l   F u n c t i o n s
-C-----------------------------------------------
-C=======================================================================
-C--------------------------------------------------
         C_IS_AVAILABLE = .FALSE.
         LENGTH_DIM = ZERO
         MASS_DIM = ZERO
@@ -120,7 +111,7 @@ C--------------------------------------------------
         FAC_M = ZERO
         FAC_L = ZERO
         FAC_T = ZERO  
-        DO J=1,NUNITS                         
+        DO J=1,UNITAB%NUNITS                         
           IF (UNITAB%UNIT_ID(J) == UID) THEN    
             FAC_M = UNITAB%FAC_M(J)
             FAC_L = UNITAB%FAC_L(J)

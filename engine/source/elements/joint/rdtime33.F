@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,12 +26,15 @@ Chd|-- called by -----------
 Chd|        RGJOINT                       source/elements/joint/rgjoint.F
 Chd|-- calls ---------------
 Chd|====================================================================
-      SUBROUTINE RDTIME33(JFT   ,JLT    ,DT2T  ,NELTST,ITYPTST,
-     2                    IXR   ,EINT   ,STI   ,STIR  ,OFF   ,
-     3                    XKM   ,XKR   ,XCM    ,XCR   ,UMAS  ,
-     4                    UINER ,FX     ,FY    ,FZ    ,
-     5                    XMOM  ,YMOM  ,ZMOM   ,ROT1  ,ROT2  ,
-     6                    MSRT  ,DMELRT,NUVAR  ,UVAR  ,JNTYP)
+      SUBROUTINE RDTIME33(
+     1   JFT,     JLT,     DT2T,    NELTST,
+     2   ITYPTST, IXR,     EINT,    STI,
+     3   STIR,    OFF,     XKM,     XKR,
+     4   XCM,     XCR,     UMAS,    UINER,
+     5   FX,      FY,      FZ,      XMOM,
+     6   YMOM,    ZMOM,    ROT1,    ROT2,
+     7   MSRT,    DMELRT,  NUVAR,   UVAR,
+     8   JNTYP,   JSMS)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -40,18 +43,15 @@ C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr02_c.inc"
-#include      "com08_c.inc"
 #include      "sms_c.inc"
-#include      "units_c.inc"
-#include      "vect01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: JSMS
       INTEGER JFT, JLT, IXR(NIXR,*), NELTST, ITYPTST,
      .   NUVAR,JNTYP
       my_real DT2T, STI(3,*), STIR(3,*), OFF(*), EINT(*) ,  
@@ -66,7 +66,7 @@ C-----------------------------------------------
 C     REAL
       my_real DX(3),THETA(3),E0(MVSIZ),TH1,TH2,TH3,
      .   DT(JLT-JFT+1), DTC(1), DTINV,  A, MASS2, IN2, DTA, DTB, MX2,
-     .   MS, IN	 
+     .   MS, IN   
 C=======================================================================
 C     nodal time step
 C--------------------------------------------
@@ -77,21 +77,21 @@ C
         STIR(1,I) = XKR(I)
         STI(2,I) = STI(1,I) 
         STIR(2,I) = STIR(1,I)
-	
+
 C-------- Masse harmonique --------------
         MS = (UVAR(34,I)*UVAR(35,I))/MAX(EM20,UVAR(34,I)+UVAR(35,I))
         IN = (UVAR(36,I)*UVAR(37,I))/MAX(EM20,UVAR(36,I)+UVAR(37,I))
-				
+
 C-------- Node 1--------------
-	IF (MS>EM15)
-     .    STI(1,I) = ((XCM(I)+SQRT(XCM(I)**2+XKM(I)*MS))**2)/MS		
-	IF (IN>EM15)
+          IF (MS>EM15)
+     .    STI(1,I) = ((XCM(I)+SQRT(XCM(I)**2+XKM(I)*MS))**2)/MS
+          IF (IN>EM15)
      .    STIR(1,I) = ((XCR(I)+SQRT(XCR(I)**2+XKR(I)*IN))**2)/IN
      
-C-------- Node 2--------------					
+C-------- Node 2--------------
         STI(2,I) = STI(1,I) 
         STIR(2,I) = STIR(1,I)
-	 
+           
       ENDDO
 C
       IF(IDTMINS==2.AND.JSMS/=0)THEN

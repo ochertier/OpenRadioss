@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -128,16 +128,13 @@ C----------------------------------------------------------
      .        STIFR(NX),VISCM(NX) ,VISCR(NX) ,UVAR(NUVAR) ,
      .        UVARN(NUVARN*NX), DTE,
      .        GET_U_MAT,GET_U_GEO,GET_U_FUNC
-c jbm024
       EXTERNAL GET_U_PNU,GET_U_MNU,GET_U_MAT,GET_U_GEO,GET_U_PID,
      .         GET_U_MID,GET_U_FUNC
       PARAMETER (KFUNC=29)
       PARAMETER (KMAT=31)
       PARAMETER (KPROP=33)
-C=======================================================================
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
-C-----------------------------------------------
 C-----------------------------------------------
       RETURN
       END

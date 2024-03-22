@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -31,9 +31,9 @@ Chd|====================================================================
      1           NEL      ,NUPARAM  ,NUVAR    ,UPARAM   ,UVAR     ,
      2           TIME     ,NGL      ,IPT      ,ILAY     ,IPTT     ,
      3           SIGNXX   ,SIGNYY   ,SIGNXY   ,SIGNYZ   ,SIGNZX   ,
-     4           DPLA     ,OFF      ,FOFF     ,PTHKF    ,
-     5           DFMAX    ,TDEL     ,UEL      ,NPTOT    ,IGTYP  )
-
+     4           DPLA     ,OFF      ,FOFF     ,
+     5           DFMAX    ,TDEL     ,UEL      ,NPTOT    ,
+     6           FLD_IDX  ,DAM      ,PLA      )
 C-----------------------------------------------
 C I m p l i c i t T y p e s
 C-----------------------------------------------
@@ -60,7 +60,6 @@ C! NGL     | NEL    | I | R | ELEMENT NUMBER
 C! IPG     |        |   |   | CURRENT GAUSS POINT (in plane)
 C! ILAY    |        |   |   | CURRENT LAYER
 C! FOFF    | NEL    | I |R/W| DELETED INTEGRATION POINT FLAG (=1 ON, =0 OFF)
-C! PTHKF   |  1      | F | W | PERCENTAGE OF LAYER THICKNESS TO FAIL
 C! DFMAX   | NEL     | F |R/W| MAX DAMAGE FACTOR 
 C! TDEL    | NEL     | F | W | FAILURE TIME
 C!---------+--------+---+---+-------------------------------------------
@@ -85,20 +84,19 @@ C! OFF     | NEL    | F |R/W| DELETED ELEMENT FLAG (=1. ON, =0. OFF)
 C!---------+--------+--+--+-------------------------------------------
 C! I N P U T A r g u m e n t s
 C!-----------------------------------------------
-      INTEGER ,INTENT(IN) :: NEL,NUPARAM,NUVAR,ILAY,IPT,NPTOT,IPTT,IGTYP
+      INTEGER ,INTENT(IN) :: NEL,NUPARAM,NUVAR,ILAY,IPT,NPTOT,IPTT
       INTEGER ,DIMENSION(NEL), INTENT(IN) :: NGL
        my_real ,DIMENSION(NUPARAM), INTENT(IN) :: UPARAM
-       my_real ,DIMENSION(NEL), INTENT(IN)  :: DPLA
+       my_real ,DIMENSION(NEL), INTENT(IN)  :: DPLA,PLA
 c!       my_real OFF(NEL), UEL(NEL)
 C
 C-----------------------------------------------
 C I N P U T  O U T P U T  A r g u m e n t s
 C-----------------------------------------------
-       INTEGER ,DIMENSION(NEL), INTENT(INOUT) :: FOFF
+       INTEGER ,DIMENSION(NEL), INTENT(INOUT) :: FOFF,FLD_IDX
        my_real, INTENT(IN) :: TIME
        my_real ,DIMENSION(NEL), INTENT(IN)  :: SIGNXX,SIGNYY,SIGNXY,SIGNYZ,SIGNZX
-       my_real :: PTHKF
-       my_real ,DIMENSION(NEL), INTENT(INOUT) :: DFMAX, UEL,OFF
+       my_real ,DIMENSION(NEL), INTENT(INOUT) :: DFMAX, UEL,OFF,DAM
        my_real ,DIMENSION(NEL), INTENT(OUT)   :: TDEL
        my_real, DIMENSION(NEL,NUVAR), INTENT(INOUT) :: UVAR
 C-----------------------------------------------
@@ -124,27 +122,19 @@ C-----------------------------------------------
        CFRAC        = UPARAM(3)
        NFRAC        = UPARAM(4)
        INST         = UPARAM(5)
-       P_THICKFAIL  = UPARAM(6)
        IFAIL_SH     = UPARAM(7)
-       CONDITION1(1:NEL)   = 0
-       CONDITION2(1:NEL)   = 0
-       CONDITION3(1:NEL)   = 0
+       CONDITION1(1:NEL) = 0
+       CONDITION2(1:NEL) = 0
+       CONDITION3(1:NEL) = 0
        NINDX        = 0  
-c---------------------------
-       IF (P_THICKFAIL > ZERO .and. IFAIL_SH > 1 .and. IGTYP <= 10) THEN
-         PTHKF = P_THICKFAIL
-       ELSEIF (IFAIL_SH == 1) THEN
-         PTHKF = EM06
-       ELSEIF (IFAIL_SH == 2) THEN
-         PTHKF = ONE - EM06
-       ENDIF
 c-----------------------------
 C USER VARIABLES INITIALIZATION
 C-----------------------------------------------
        DO I =1,NEL
        
          DAM1 = DFMAX(I)
-         DAM2 = UVAR(I,2)
+         DAM2 = UVAR(I,2) 
+         IF (FLD_IDX(I) == 0) FLD_IDX(I) = 1
          
          IF (DPLA(I) > ZERO .and. OFF(I) == ONE .and. DAM1 < ONE) THEN
            SIGM   = (SIGNXX(I)+ SIGNYY(I))*THIRD
@@ -206,7 +196,7 @@ C-----------------------------------------------
              
            DAM1     = DAM1 + DPLA(I)/MAX(EM6,EPSF)
            DFMAX(I) = MIN(ONE,DAM1)
-           IF (DAM1 >= ONE) THEN                    ! failure of integrateion points
+           IF ((DAM1 >= ONE).AND.(IFAIL_SH < 3)) THEN                    ! failure of integrateion points
              NINDX = NINDX + 1
              INDX(NINDX) = I  
              FOFF(I) = 0
@@ -215,7 +205,7 @@ C-----------------------------------------------
              CONDITION1(NINDX) = IPT
            ENDIF
            
-           IF (DAM2 >= ONE .AND. UVAR(I,1) == ZERO .AND. FOFF(I) == 1)THEN  
+           IF (DAM2 >= ONE .AND. UVAR(I,1) == ZERO .AND. FOFF(I) == 1 .AND. IFAIL_SH < 3)THEN  
              UVAR(I,1) = ONE           
              UEL(I) = UEL(I) + ONE
              IF (INT(UEL(I)+1e-6) == NPTOT) THEN   ! rupture due localized necking !!!
@@ -226,6 +216,22 @@ C-----------------------------------------------
                CONDITION2(NINDX) = 1
                CONDITION3(NINDX) = 1
              ENDIF
+           ENDIF
+
+           ! Index
+           DAM(I) = MIN(PLA(I)/MAX(EM6,EPSF),ONE)
+           
+           ! Zone contour
+           !  -> Below HC and DSSE failure curves 
+           IF (((ETA < THIRD) .AND.(DAM1<ONE)).OR.
+     .         ((ETA >= THIRD).AND.(DAM2<ONE))) THEN
+             FLD_IDX(I) = 1 
+           !  -> Between HC and DSSE failure curves 
+           ELSEIF ((ETA >= THIRD).AND.(DAM2>=ONE).AND.(DAM1<ONE)) THEN
+             FLD_IDX(I) = 2
+           !  -> Above all curves
+           ELSEIF (DAM1 >= ONE) THEN 
+             FLD_IDX(I) = 3
            ENDIF
            
          ENDIF

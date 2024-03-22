@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,17 +27,19 @@ Chd|        INITIA                        source/elements/initia/initia.F
 Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
 Chd|        SOLVE_EINT                    source/initial_conditions/inimap/ini_inimap1d.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ALEFVM_MOD                    ../common_source/modules/ale/alefvm_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        INIMAP1D_MOD                  share/modules1/inimap1d_mod.F 
+Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|====================================================================
       SUBROUTINE INI_INIMAP1D(INIMAP1D ,ELBUF_TAB ,IPART  ,IPARG   ,IPARTS   ,
      .                        IPARTQ   ,XGRID     ,VEL    ,IXS     ,IXQ      ,
      .                        IXTG     ,PM        ,IPM    ,BUFMAT  ,MULTI_FVM, 
      .                        PLD      ,NPC       ,IGRBRIC,IGRQUAD ,IGRSH3N  ,
-     .                        NPTS     )
+     .                        NPTS     ,MAT_PARAM )
 C-----------------------------------------------
 C     M o d u l e s
 C-----------------------------------------------
@@ -46,6 +48,8 @@ C-----------------------------------------------
       USE MULTI_FVM_MOD
       USE GROUPDEF_MOD
       USE MESSAGE_MOD
+      USE ALEFVM_MOD , only:ALEFVM_Param
+      USE MATPARAM_DEF_MOD
 C-----------------------------------------------
 C     I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -61,10 +65,6 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 !     MVSIZ
 #include      "mvsiz_p.inc"
-!     IOUT
-#include      "units_c.inc"
-!     IALEFVM
-#include      "alefvm.inc"
 !     N0PHAS, NVPHAS
 #include      "mmale51_c.inc"
 C-----------------------------------------------
@@ -79,6 +79,7 @@ C-----------------------------------------------
       my_real, INTENT(IN), TARGET :: PLD(2, NPTS/2)
       my_real, INTENT(INOUT) :: VEL(3, *)
       TYPE(MULTI_FVM_STRUCT), INTENT(INOUT) :: MULTI_FVM
+      TYPE(MATPARAM_STRUCT_) ,DIMENSION(NUMMAT), INTENT(IN) :: MAT_PARAM
 C-----------------------------------------------
       TYPE (GROUP_)  , DIMENSION(NGRBRIC) :: IGRBRIC
       TYPE (GROUP_)  , DIMENSION(NGRQUAD) :: IGRQUAD
@@ -638,7 +639,7 @@ C     Burn Fraction / Detonation Times
                ENDIF  
                                                                                                                                    
 
-               IF (.NOT. MULTI_FVM%IS_USED .AND. IALEFVM  ==  0) THEN
+               IF (.NOT. MULTI_FVM%IS_USED .AND. ALEFVM_Param%IEnabled  ==  0) THEN
 C     VEL
                   DO INODE = 1, NBNODE
                      IF (ITY  ==  1) THEN
@@ -810,7 +811,7 @@ C     CYLINDRICAL
                      MULTI_FVM%VEL(1, ELEMID) = VALUE * NX                                   
                      MULTI_FVM%VEL(2, ELEMID) = VALUE * NY                                   
                      MULTI_FVM%VEL(3, ELEMID) = VALUE * NZ                                   
-                  ELSE IF (IALEFVM  >  0) THEN                                              
+                  ELSE IF (ALEFVM_Param%IEnabled  >  0) THEN                                              
                      GBUF%MOM(ELEMID - NFT + 0 * NEL) = VALUE * NX * GBUF%RHO(ELEMID - NFT)  
                      GBUF%MOM(ELEMID - NFT + 1 * NEL) = VALUE * NY * GBUF%RHO(ELEMID - NFT)  
                      GBUF%MOM(ELEMID - NFT + 2 * NEL) = VALUE * NZ * GBUF%RHO(ELEMID - NFT)  
@@ -851,7 +852,8 @@ C     Compute EINT from pressure
                   EBUF => ELBUF_TAB(NG)%BUFLY(1)%EOS(1,1,1)
                   NVAREOS = ELBUF_TAB(NG)%BUFLY(1)%NVAR_EOS 
                   CALL SOLVE_EINT(MATID, NFT, NEL, PRES(:, 1), GBUF%EINT, GBUF%RHO, IFIRST, ILAST, ELEM_LIST, 
-     .                 IPM, PM, BUFMAT, MLW,NG,0,SUBMAT(1)%TEMP,NPC,PLD, EBUF%VAR, NVAREOS)
+     .                 IPM, PM, BUFMAT, MLW,NG,0,SUBMAT(1)%TEMP,NPC,PLD, EBUF%VAR, NVAREOS,
+     .                    MAT_PARAM)
                ELSE IF (MLW == 151) THEN
                   DO IMAT = 1, NBMAT
                      IF (ITY  ==  1) THEN
@@ -866,7 +868,8 @@ C     Compute EINT from pressure
                      NVAREOS = ELBUF_TAB(NG)%BUFLY(IMAT)%NVAR_EOS                      
                      CALL SOLVE_EINT(MATID, NFT, NEL, PRES(:, IMAT), ELBUF_TAB(NG)%BUFLY(IMAT)%LBUF(1,1,1)%EINT, 
      .                    ELBUF_TAB(NG)%BUFLY(IMAT)%LBUF(1,1,1)%RHO, IFIRST, ILAST, ELEM_LIST, 
-     .                    IPM, PM, BUFMAT, MLW, NG,IMAT,SUBMAT(IMAT)%TEMP,NPC,PLD,EBUF%VAR,NVAREOS)
+     .                    IPM, PM, BUFMAT, MLW, NG,IMAT,SUBMAT(IMAT)%TEMP,NPC,PLD,EBUF%VAR,NVAREOS,
+     .                    MAT_PARAM)
                   ENDDO
                ELSE
                   DO IMAT = 1, NBMAT
@@ -884,7 +887,8 @@ C     Compute EINT from pressure
                      CALL SOLVE_EINT(MATID, NFT, NEL, PRES(:, IMAT), EINT(:, IMAT), 
      .                    ELBUF_TAB(NG)%BUFLY(1)%MAT(1,1,1)%VAR(1 + NEL * (9 + KPHASE - 1):NEL + NEL * (9 + KPHASE - 1)), 
      .                    IFIRST, ILAST, ELEM_LIST, 
-     .                    IPM, PM, BUFMAT, MLW, NG,IMAT,SUBMAT(IMAT)%TEMP,NPC,PLD,EBUF%VAR,NVAREOS)
+     .                    IPM, PM, BUFMAT, MLW, NG,IMAT,SUBMAT(IMAT)%TEMP,NPC,PLD,EBUF%VAR,NVAREOS,
+     .                    MAT_PARAM)
                      DO II = IFIRST, ILAST
                         ELEMID = ELEM_LIST(II)
                         RES = EINT(ELEMID - NFT, IMAT)
@@ -934,9 +938,15 @@ Chd|-- called by -----------
 Chd|        INI_INIMAP1D                  source/initial_conditions/inimap/ini_inimap1d.F
 Chd|-- calls ---------------
 Chd|        EOSMAIN                       ../common_source/eos/eosmain.F
+Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
 Chd|====================================================================
       SUBROUTINE SOLVE_EINT(MATID, NFT,    NEL, PRESIN, EINT, RHO,   IFIRST, ILAST, ELEM_LIST, IPM, 
-     .                      PM   , BUFMAT, MLW, NG,     IMAT, THETA, NPC,    TF, VAREOS, NVAREOS)
+     .                      PM   , BUFMAT, MLW, NG,     IMAT, THETA, NPC,    TF, VAREOS, NVAREOS,
+     .                      MAT_PARAM)
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
+      USE MATPARAM_DEF_MOD
 C-----------------------------------------------
 C     I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -946,7 +956,6 @@ C     C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
 !     MVSIZ
-#include      "mvsiz_p.inc"
 #include      "com04_c.inc"
 #include      "tabsiz_c.inc"
 C-----------------------------------------------
@@ -959,11 +968,12 @@ C-----------------------------------------------
       INTEGER,INTENT(IN) :: IMAT !debug purpose
       INTEGER,INTENT(IN)::NPC(SNPC)
       my_real,INTENT(IN)::TF(STF)
+      TYPE(MATPARAM_STRUCT_) ,DIMENSION(NUMMAT), INTENT(IN) :: MAT_PARAM
 C-----------------------------------------------
 C     L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER :: II, ELEMID, LOCALID, REMAINING_ELTS, ITER, MAX_ITER
-      INTEGER :: EOSTYPE, MAT(NEL)
+      INTEGER :: II, ELEMID, EOSTYPE,LOCALID, REMAINING_ELTS, ITER, MAX_ITER
+      INTEGER :: MAT(NEL)
       my_real :: VOL(NEL), ERROR(NEL), TOL, OFF(NEL), RHOZERO(NEL), RHO0
       my_real :: MU(NEL), DF(NEL), MU2(NEL), ESPE(NEL), DVOL(NEL), PSH(NEL),
      .     SSP(NEL), DPDE(NEL), ECOLD(NEL), PRES(NEL), POLD(NEL)
@@ -979,6 +989,7 @@ C-----------------------------------------------
 C     S o u r c e   L i n e s
 C-----------------------------------------------
 
+      EOSTYPE = MAT_PARAM(MATID)%IEOS  ! should use that except law5 with intenal EOS
       EOSTYPE = IPM(4, MATID)
       RHO0 = PM(1, MATID)
 

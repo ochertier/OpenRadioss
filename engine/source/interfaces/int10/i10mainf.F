@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -71,12 +71,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "units_c.inc"
-#include      "scr04_c.inc"
 #include      "warn_c.inc"
 #include      "parit_c.inc"
 #include      "task_c.inc"
@@ -140,6 +137,7 @@ C     REAL
      .   VXI(MVSIZ),VYI(MVSIZ),VZI(MVSIZ),MSI(MVSIZ)
 
       my_real, DIMENSION(:,:,:), ALLOCATABLE :: FSAVPARIT
+      INTEGER :: NTY,NSN
 C
       IDUM = 0
       NSN   =IPARI(5)
@@ -195,7 +193,7 @@ C inbuf == cand_n
             I_STOK = I_STOK + 1
             INDEX2(I_STOK) = I
           ELSE
-Cel remise a 0 de cand_f de 1, 2, 3    
+C   remise a 0 de cand_f de 1, 2, 3    
             INTBUF_TAB%CAND_F(6*(I-1)+1) = ZERO
             INTBUF_TAB%CAND_F(6*(I-1)+2) = ZERO
             INTBUF_TAB%CAND_F(6*(I-1)+3) = ZERO    
@@ -241,21 +239,21 @@ C preparation candidats retenus
          CALL I7CDCOR3(
      1         JLT,INDEX2(NFT+1),INTBUF_TAB%CAND_E,INTBUF_TAB%CAND_N,CAND_E_N,
      2         CAND_N_N)
-	 CALL I7COR3(
-     1  JLT	  ,X	     ,INTBUF_TAB%IRECTM,INTBUF_TAB%NSV,CAND_E_N,
-     2  CAND_N_N  ,INTBUF_TAB%STFM,INTBUF_TAB%STFNS,X1  ,X2  	    ,
-     3  X3	  ,X4	     ,Y1	,Y2	   ,Y3  	    ,
-     4  Y4	  ,Z1	     ,Z2	,Z3	   ,Z4  	    ,
-     5  XI	  ,YI	     ,ZI	,STIF	   ,IX1 	    ,
-     6  IX2	  ,IX3       ,IX4	,NSVG	   ,IGAP	    ,
-     7  GAP	  ,INTBUF_TAB%GAP_S,INTBUF_TAB%GAP_M,GAPV,
-     9  MS	  ,VXI    ,VYI  	   ,
-     A  VZI	  ,MSI        ,NSN	 ,V	   ,IDUM	    ,
-     B  IDUM	  ,NTY        ,NIN	 ,IGSTI    ,KMIN	    ,
-     C  KMAX	  ,GAPMAX     ,GAPMIN	 ,IADM     ,RBID	    ,
-     D  RBID	  ,RBID       ,RBID	 ,IBID     ,RBID	    ,
-     E  RBID	  ,RBID       ,RBID	 ,IBID     ,RBID	    ,
-     F  IBID	  ,NODNX_SMS  ,NSMS	 ,RBID     ,RBID	    ,
+           CALL I7COR3(
+     1  JLT    ,X       ,INTBUF_TAB%IRECTM,INTBUF_TAB%NSV,CAND_E_N,
+     2  CAND_N_N  ,INTBUF_TAB%STFM,INTBUF_TAB%STFNS,X1  ,X2        ,
+     3  X3    ,X4       ,Y1  ,Y2     ,Y3        ,
+     4  Y4    ,Z1       ,Z2  ,Z3     ,Z4        ,
+     5  XI    ,YI       ,ZI  ,STIF     ,IX1       ,
+     6  IX2    ,IX3       ,IX4  ,NSVG     ,IGAP      ,
+     7  GAP    ,INTBUF_TAB%GAP_S,INTBUF_TAB%GAP_M,GAPV,
+     9  MS    ,VXI    ,VYI       ,
+     A  VZI    ,MSI        ,NSN   ,V     ,IDUM      ,
+     B  IDUM    ,NTY        ,NIN   ,IGSTI    ,KMIN      ,
+     C  KMAX    ,GAPMAX     ,GAPMIN   ,IADM     ,RBID      ,
+     D  RBID    ,RBID       ,RBID   ,IBID     ,RBID      ,
+     E  RBID    ,RBID       ,RBID   ,IBID     ,RBID      ,
+     F  IBID    ,NODNX_SMS  ,NSMS   ,RBID     ,RBID      ,
      G  IBID      ,IBID       ,IBID      ,IBID     ,IBID            ,
      H  IBID      ,IBID       ,RBID      ,IBID     ,RBID            )
          JLT_NEW = 0

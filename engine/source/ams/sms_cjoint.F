@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -122,7 +122,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "param_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -194,7 +193,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "param_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -262,7 +260,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com08_c.inc"
-#include      "scr06_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -410,9 +407,9 @@ C
       VZ=VZ-N3*A0
 C
       IF (MASSE>ZERO) THEN
-	VX=VX/MASSE
-	VY=VY/MASSE
-	VZ=VZ/MASSE
+          VX=VX/MASSE
+          VY=VY/MASSE
+          VZ=VZ/MASSE
       ENDIF
 C
       DT05=HALF*DT1
@@ -440,9 +437,9 @@ C
       VZZ=VZZ-N3*A0
 C
       IF (INER>ZERO) THEN
-	VXX=VXX/INER
-	VYY=VYY/INER
-	VZZ=VZZ/INER
+          VXX=VXX/INER
+          VYY=VYY/INER
+          VZZ=VZZ/INER
       ENDIF
 C
 C store sum(diag_i)
@@ -498,20 +495,12 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NOD(0:*), IDOWN
-C     REAL
-      my_real
-     .   A(3,*), DMS(*), CJWORK(*)
-CMasParINCLUDE 'telesc.intmap.inc'
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
+      my_real A(3,*), DMS(*), CJWORK(*)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER NSN, NA, NB, I, N
-C     REAL
-      my_real
-     .   AX, AY, AZ, A0, N1, N2, N3, DMASSE
+      my_real AX, AY, AZ, A0, N1, N2, N3, DMASSE
 C-----------------------------------------------
       NSN =NOD(0)
 C----------------------------
@@ -608,21 +597,15 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NOD(0:*)
-C     REAL
-      my_real
-     .   A(3,*), AR(3,*), V(3,*), VR(3,*), X(3,*), MS(*),
-     .   IN(*), CJWORK(*)
-CMasParINCLUDE 'telesc.intmap.inc'
+      my_real A(3,*), AR(3,*), V(3,*), VR(3,*), X(3,*), MS(*),IN(*), CJWORK(*)
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com08_c.inc"
-#include      "scr06_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER NSN, NA, NB, I, N
-C     REAL
       my_real
      .   N1, N2, N3, AX, AY, AZ, AXX, AYY, AZZ, 
      .   XCDG, YCDG, ZCDG, XX, YY, ZZ, RR, A0, 
@@ -645,11 +628,11 @@ C
 C
       VX=CJWORK(12)
       VY=CJWORK(13)
-      VZ=CJWORK(14)	 
+      VZ=CJWORK(14)   
 C
       VXX=CJWORK(15)
       VYY=CJWORK(16)
-      VZZ=CJWORK(17)	 
+      VZZ=CJWORK(17)   
 C
       VG(1)=VXX+AXX*DT12
       VG(2)=VYY+AYY*DT12

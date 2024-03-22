@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -46,6 +46,7 @@ Chd|        HM_READ_INTER_TYPE24          source/interfaces/int24/hm_read_inter_
 Chd|        HM_READ_INTER_TYPE25          source/interfaces/int25/hm_read_inter_type25.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        INTBUF_FRIC_MOD               share/modules1/intbuf_fric_mod.F
+Chd|        INTERFACES_MOD                ../common_source/modules/interfaces/interfaces_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        SENSOR_MOD                    share/modules1/sensor_mod.F   
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
@@ -55,9 +56,9 @@ Chd|====================================================================
      2        IGRNOD      ,IGRSURF    ,IGRSLIN        ,NPC      ,ILAGM     ,   
      3        ITABM1      ,ITAB       ,ISKN           ,UNITAB   ,I2RUPT    ,
      4        AREASL      ,NI         ,NOM_OPT        ,TITR     ,DEF_INTER ,
-     5        IDINT7      ,IDINT7B    ,IDINT11        ,NPC1     ,SENSOR_TAB,
+     5        IDINT7      ,IDINT7B    ,IDINT11        ,NPC1     ,SENSORS   ,
      6        NOM_OPTFRIC,INTBUF_FRIC_TAB,IGRBRIC     ,NOINT    ,KEY       ,
-     7        LSUBMODEL  ,TF          )
+     7        LSUBMODEL  ,TF          ,INTERFACES  )
 C============================================================================
 
 C-----------------------------------------------
@@ -69,6 +70,7 @@ C-----------------------------------------------
       USE GROUPDEF_MOD
       USE SUBMODEL_MOD
       USE SENSOR_MOD
+      USE INTERFACES_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -77,7 +79,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr17_c.inc"
-#include      "sphcom.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -93,31 +94,19 @@ C-----------------------------------------------
      .   FRIGAP(*),FRIC_P(*),I2RUPT(*),TF(*)
       CHARACTER TITR*nchartitle
       TYPE(INTBUF_FRIC_STRUCT_) INTBUF_FRIC_TAB(*)
-      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE (SENSORS_) ,INTENT(IN) :: SENSORS
 C-----------------------------------------------
       TYPE (GROUP_)  ,TARGET, DIMENSION(NGRNOD)  :: IGRNOD
       TYPE (GROUP_)  ,TARGET, DIMENSION(NGRBRIC) :: IGRBRIC
       TYPE (SURF_)   ,TARGET , DIMENSION(NSURF)   :: IGRSURF
       TYPE (SURF_)   ,TARGET , DIMENSION(NSLIN)   :: IGRSLIN
+      TYPE (INTERFACES_) ,INTENT(INOUT):: INTERFACES
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
-#include      "scr06_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com09_c.inc"
-#include      "intstamp_c.inc"
 #include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "fluid_scr_c.inc"
-#include      "scr12_c.inc"
-#include      "remesh_c.inc"
-#include      "sysunit.inc"
-#include      "thknod_c.inc"
-#include      "inter22.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -168,8 +157,9 @@ C--------------------------------------------------
               CALL HM_READ_INTER_TYPE25(
      1         IPARI      ,STFAC      ,FRIGAP     ,NOINT     ,NI         ,
      2         IGRNOD     ,IGRSURF    ,XFILTR     ,FRIC_P    ,DEF_INTER  ,
-     3         SENSOR_TAB ,NOM_OPT    ,UNITAB    ,LSUBMODEL  ,TITR       ,
-     4         NOM_OPTFRIC,INTBUF_FRIC_TAB,NPC   ,NPC1       ,TF         )
+     3         SENSORS    ,NOM_OPT    ,UNITAB    ,LSUBMODEL  ,TITR       ,
+     4         NOM_OPTFRIC,INTBUF_FRIC_TAB,NPC   ,NPC1       ,TF         ,
+     5         INTERFACES%PARAMETERS)
 
           CASE ('TYPE24')
 C--------------------------------------------------
@@ -179,8 +169,8 @@ C--------------------------------------------------
               CALL HM_READ_INTER_TYPE24(
      1        IPARI      ,STFAC      ,FRIGAP     ,NOINT     ,NI          ,
      2        IGRNOD     ,IGRSURF    ,XFILTR     ,FRIC_P     ,DEF_INTER  ,
-     3        SENSOR_TAB ,NOM_OPT     ,UNITAB     ,LSUBMODEL  ,TITR      ,
-     4        NOM_OPTFRIC,INTBUF_FRIC_TAB )
+     3        SENSORS    ,NOM_OPT     ,UNITAB     ,LSUBMODEL  ,TITR      ,
+     4        NOM_OPTFRIC,INTBUF_FRIC_TAB,INTERFACES%PARAMETERS )
 
           CASE ('TYPE23')
 C--------------------------------------------------
@@ -200,7 +190,7 @@ C--------------------------------------------------
               NTYP=21
               CALL HM_READ_INTER_TYPE21(
      1          IPARI      ,STFAC      ,FRIGAP     ,NOINT     ,NI       ,
-     2          IGRSURF    ,XFILTR     ,FRIC_P     ,NPC1     ,SENSOR_TAB,
+     2          IGRSURF    ,XFILTR     ,FRIC_P     ,NPC1     ,SENSORS   ,
      3          NOM_OPT    ,UNITAB     ,LSUBMODEL  ,TITR     ,NPC       ,
      4          TF         )
 
@@ -263,7 +253,7 @@ C--------------------------------------------------
              NTYP = 11
              CALL HM_READ_INTER_TYPE11(
      1        IPARI      ,STFAC      ,FRIGAP     ,NOINT     ,NI       ,
-     2        IGRSURF    ,IGRSLIN    ,SENSOR_TAB ,DEF_INTER ,TITR      ,
+     2        IGRSURF    ,IGRSLIN    ,SENSORS    ,DEF_INTER ,TITR      ,
      3        NOM_OPT    ,UNITAB     ,LSUBMODEL  ,NOM_OPTFRIC,INTBUF_FRIC_TAB,
      4        ID_TYPE19)
 
@@ -293,7 +283,7 @@ C--------------------------------------------------
              CALL HM_READ_INTER_TYPE07(
      1           IPARI      ,STFAC      ,FRIGAP     ,NOINT     ,NI         ,    
      2           IGRNOD     ,IGRSURF    ,XFILTR     ,FRIC_P    ,NOM_OPT    ,
-     3           DEF_INTER  ,NPC1       ,SENSOR_TAB ,UNITAB    ,LSUBMODEL  ,
+     3           DEF_INTER  ,NPC1       ,SENSORS    ,UNITAB    ,LSUBMODEL  ,
      4           TITR       ,NOM_OPTFRIC,INTBUF_FRIC_TAB,NPC   ,TF         ,
      5           ID_TYPE19)
 
@@ -314,7 +304,7 @@ C--------------------------------------------------
            CALL HM_READ_INTER_TYPE05(
      1          IPARI      ,STFAC      ,FRIGAP     ,NOINT     ,NI       ,    
      2          IGRNOD     ,IGRSURF    ,NOM_OPT    ,XFILTR    ,FRIC_P   ,
-     3          SENSOR_TAB ,UNITAB     ,LSUBMODEL  ,TITR       )
+     3          SENSORS    ,UNITAB     ,LSUBMODEL  ,TITR       )
 
           CASE ('TYPE4')
 C--------------------------------------------------

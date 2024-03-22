@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,7 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-	SUBROUTINE TKEG3(JFT     ,JLT     ,
+Chd|====================================================================
+Chd|  TKEG3                         source/elements/truss/tkeg3.F 
+Chd|-- called by -----------
+Chd|        R4KE3                         source/elements/spring/r4ke3.F
+Chd|        RUSER32KE3                    source/elements/spring/ruser32ke3.F
+Chd|        TKE3                          source/elements/truss/tke3.F  
+Chd|-- calls ---------------
+Chd|====================================================================
+          SUBROUTINE TKEG3(JFT     ,JLT     ,
      1                   FX      ,AL      ,KE11    ,KE12    ,KE22   )
 C-----------------------------------------------
 C   I M P L I C I T   T Y P E S

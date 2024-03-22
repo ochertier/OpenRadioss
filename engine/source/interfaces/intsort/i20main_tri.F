@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -28,6 +28,7 @@ Chd|        INTTRI                        source/interfaces/intsort/inttri.F
 Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
 Chd|        ARRET                         source/system/arret.F         
+Chd|        I20BUCE                       source/interfaces/intsort/i20buce.F
 Chd|        I20BUC_EDGE                   source/interfaces/intsort/i20buce.F
 Chd|        I20XSAVE                      source/interfaces/intsort/i20xsave.F
 Chd|        I20XSINIR                     source/interfaces/intsort/i20main_tri.F
@@ -38,6 +39,7 @@ Chd|        SPMD_GET_INACTI7              source/mpi/interfaces/send_cand.F
 Chd|        SPMD_RNUMCD20                 source/mpi/interfaces/spmd_i7tool.F
 Chd|        SPMD_TRI20BOX                 source/mpi/interfaces/spmd_tri20box.F
 Chd|        SPMD_TRI20BOXE                source/mpi/interfaces/spmd_tri20boxe.F
+Chd|        SPMD_TRI20GAT                 source/mpi/interfaces/spmd_i7crit.F
 Chd|        SPMD_TRI20GATE                source/mpi/interfaces/spmd_i7crit.F
 Chd|        STARTIME                      source/system/timer.F         
 Chd|        STOPTIME                      source/system/timer.F         
@@ -68,23 +70,13 @@ C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "comlock.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "units_c.inc"
-#include      "scr03_c.inc"
-#include      "scr04_c.inc"
-#include      "scr05_c.inc"
-#include      "warn_c.inc"
 #include      "task_c.inc"
-#include      "parit_c.inc"
 #include      "timeri_c.inc"
 C-----------------------------------------------
       COMMON /I20MAINC/BMINMA,BMINMAE,CURV_MAX_MAX,
@@ -123,9 +115,11 @@ C     REAL
      .   XMAXL, YMAXL, ZMAXL, XMINL, YMINL, ZMINL, GAPMIN, GAPMAX,
      .   XMAXEL, YMAXEL, ZMAXEL, XMINEL, YMINEL, ZMINEL, C_MAXL,
      .   CURV_MAX(NRTM_T),GAP_SHIFT,RBID
+
+      INTEGER :: NRTM,NSN,NMN,NTY
+      INTEGER :: NSNE,NMNE
+      INTEGER :: NLINSA,NLINMA,NLINM,NLINS
 C-----------------------------------------------
-#include "sync_dir.inc"
-C=======================================================================
       I_MEM = 0
       I_MEMG = 0
 C
@@ -180,7 +174,7 @@ C
       IF (DIST>ZERO) THEN
 C Appel routine calcul XS VS remote stocke dans XFI et VFI + partie edge
         IF (NSPMD>1)THEN
-	  CALL I20XSINIR(
+          CALL I20XSINIR(
      1      IPARI(24,NIN),IPARI(57,NIN),ITASK,NIN,INTBUF_TAB%STFAC(1))
         ENDIF
         RETURN
@@ -220,19 +214,18 @@ C
           INACTII=INACTI
           IF (NUM_IMP>0.AND.
      .        (INACTI/=5.AND.INACTI/=6.AND.IFQ<=0)) THEN
-	   INACIMP = 0
-	  ELSE
-	   INACIMP = 1
-	  ENDIF
+        INACIMP = 0
+      ELSE
+        INACIMP = 1
+      ENDIF
           IP0 = 1
 
           IP1 = IP0 + NSN + NSNROLD + 3
-
           I_SK_OLD = INTBUF_TAB%I_STOK(1)
-	  CALL I7TRC(
+          CALL I7TRC(
      1    NSN+NSNROLD      ,I_SK_OLD          ,INTBUF_TAB%CAND_N ,INTBUF_TAB%CAND_E ,
      2    INTBUF_TAB%CAND_P,INTBUF_TAB%CAND_FX,INTBUF_TAB%CAND_FY,INTBUF_TAB%CAND_FZ,
-     3    MWAG(IP0)        ,INTBUF_TAB%IFPEN  ,INACTI	         ,IFQ 	            ,
+     3    MWAG(IP0)        ,INTBUF_TAB%IFPEN  ,INACTI          ,IFQ               ,
      4    NUM_IMP          ,IND_IMP           ,INTBUF_TAB%STFA  ,NIN               ,
      5    NSN              ,ITIED             ,RBID)
 
@@ -257,15 +250,15 @@ C -------------------------------------------------------------
 C eshift : decalage sur cand_e
 C sauvegarde de XSAV (tableau BUFIN(JD(19)))
       CALL I20XSAVE(
-     1 ITASK	    ,INTBUF_TAB%XA,NTY  	,NSN	      ,
-     2 NMN	    ,NSNE	  ,NMNE 	,NLN	      ,
+     1 ITASK      ,INTBUF_TAB%XA,NTY    ,NSN        ,
+     2 NMN      ,NSNE   ,NMNE   ,NLN        ,
      3 INTBUF_TAB%NSV,INTBUF_TAB%MSR,INTBUF_TAB%XSAV,
      4 INTBUF_TAB%NSVL,INTBUF_TAB%MSRL,INTBUF_TAB%CRITX,
-     5 XMINL	    ,YMINL	  ,ZMINL	,XMAXL        ,
-     6 YMAXL	    ,ZMAXL	  ,C_MAXL	,CURV_MAX     ,
+     5 XMINL      ,YMINL    ,ZMINL  ,XMAXL        ,
+     6 YMAXL      ,ZMAXL    ,C_MAXL ,CURV_MAX     ,
      7 IPARI(39,NIN),INTBUF_TAB%IRECTM(1+4*ESHIFT) ,NRTM_T,XMINEL ,   
-     8 YMINEL	    ,ZMINEL	  ,XMAXEL	, YMAXEL      ,
-     9 ZMAXEL	    )
+     8 YMINEL     ,ZMINEL   ,XMAXEL , YMAXEL      ,
+     9 ZMAXEL     )
 #include "lockon.inc"
       BMINMA(1) = MAX(BMINMA(1),XMAXL)
       BMINMA(2) = MAX(BMINMA(2),YMAXL)
@@ -304,15 +297,15 @@ C BARRIER II_STOK et RESULT
 C
 C recuperation des noeuds remote NSNR stockes dans XREM
 C
-	  CALL SPMD_TRI20BOX(
-     1      INTBUF_TAB%NSV,NSN	  ,INTBUF_TAB%XA,INTBUF_TAB%VA,MS     ,
-     2      BMINMA	 ,WEIGHT  ,INTBUF_TAB%STFA,NIN	      ,ISENDTO,
-     3      IRCVFROM	 ,IAD_ELEM,FR_ELEM	,NSNR	      ,IGAP   ,
-     4      INTBUF_TAB%GAP_S,ITAB    ,KINET	,IFQ ,IPARI(22,NIN)   ,
+       CALL SPMD_TRI20BOX(
+     1      INTBUF_TAB%NSV,NSN    ,INTBUF_TAB%XA,INTBUF_TAB%VA,MS     ,
+     2      BMINMA   ,WEIGHT  ,INTBUF_TAB%STFA,NIN        ,ISENDTO,
+     3      IRCVFROM   ,IAD_ELEM,FR_ELEM  ,NSNR       ,IGAP   ,
+     4      INTBUF_TAB%GAP_S,ITAB    ,KINET ,IFQ ,IPARI(22,NIN)   ,
      5      NSNFIOLD,IPARI(47,NIN),INTBUF_TAB%IELEC,INTBUF_TAB%AREAS,TEMP   ,
-     6      NUM_IMP	 ,INTBUF_TAB%NLG,INTBUF_TAB%PENIS,INTBUF_TAB%PENIA   ,
-     +  					      DIAG_SMS        ,
-     7      NODNX_SMS	 ,INTBUF_TAB%NBINFLG,INTBUF_TAB%AVX_ANCR(1),INTBUF_TAB%AVX_ANCR(1+3*NLN) )
+     6      NUM_IMP  ,INTBUF_TAB%NLG,INTBUF_TAB%PENIS,INTBUF_TAB%PENIA   ,
+     +                  DIAG_SMS        ,
+     7      NODNX_SMS  ,INTBUF_TAB%NBINFLG,INTBUF_TAB%AVX_ANCR(1),INTBUF_TAB%AVX_ANCR(1+3*NLN) )
 C
 C renumerotation locale des anciens candidats
 C
@@ -320,8 +313,8 @@ C
           IF(INACTI==5.OR.INACTI==6.OR.INACTI==7.OR.IFQ>0
      .        .OR.NUM_IMP>0)THEN
 
-	    CALL SPMD_RNUMCD20(INTBUF_TAB%CAND_N,RENUM   ,INTBUF_TAB%I_STOK(1),
-     1  		     NIN, NSN	  ,NSNFIOLD,NSNROLD	   )
+      CALL SPMD_RNUMCD20(INTBUF_TAB%CAND_N,RENUM   ,INTBUF_TAB%I_STOK(1),
+     1           NIN, NSN   ,NSNFIOLD,NSNROLD    )
           END IF
         END IF
       END IF
@@ -339,15 +332,15 @@ C
 C
       IF (IMONM > 0) CALL STARTIME(30,1)
       IF(NRTM_T/=0)THEN
-	CALL I20BUCE(
+        CALL I20BUCE(
      1   INTBUF_TAB%XA,INTBUF_TAB%IRECTM(1+4*ESHIFT),INTBUF_TAB%NSV,IPARI(22,NIN),
-     1  						 INTBUF_TAB%CAND_P,
-     2   NMN   ,NRTM_T      ,NSN	  ,INTBUF_TAB%CAND_E,INTBUF_TAB%CAND_N,
-     3   GAP   ,NOINT	    ,INTBUF_TAB%I_STOK(1) ,TZINF      ,MAXBOX	    ,
-     4   MINBOX,MWAG	    ,CURV_MAX	  ,NCONTACT	,BMINMA       ,
-     5   NB_N_B,ESHIFT      ,ILD	  ,IFQ  	,INTBUF_TAB%IFPEN,
-     6   INTBUF_TAB%STFA,NIN  ,INTBUF_TAB%STFM(1+ESHIFT) ,IGAP 	,INTBUF_TAB%GAP_S,
-     7   NSNR  ,NCONT	    ,RENUM	  ,NSNROLD	,INTBUF_TAB%GAP_M(1+ESHIFT),
+     1               INTBUF_TAB%CAND_P,
+     2   NMN   ,NRTM_T      ,NSN    ,INTBUF_TAB%CAND_E,INTBUF_TAB%CAND_N,
+     3   GAP   ,NOINT     ,INTBUF_TAB%I_STOK(1) ,TZINF      ,MAXBOX     ,
+     4   MINBOX,MWAG      ,CURV_MAX   ,NCONTACT ,BMINMA       ,
+     5   NB_N_B,ESHIFT      ,ILD    ,IFQ    ,INTBUF_TAB%IFPEN,
+     6   INTBUF_TAB%STFA,NIN  ,INTBUF_TAB%STFM(1+ESHIFT) ,IGAP  ,INTBUF_TAB%GAP_S,
+     7   NSNR  ,NCONT     ,RENUM    ,NSNROLD  ,INTBUF_TAB%GAP_M(1+ESHIFT),
      8   GAPMIN,GAPMAX      ,NUM_IMP      ,NLN          ,INTBUF_TAB%NLG,
      9   INTBUF_TAB%GAP_SH,INTBUF_TAB%NBINFLG,INTBUF_TAB%MBINFLG,ISYM ,I_MEM     )
 
@@ -411,9 +404,9 @@ C mono tache
         IF (IMONM > 0) CALL STARTIME(26,1)
         INTBUF_TAB%VARIABLES(5) = -INTBUF_TAB%VARIABLES(5)
 
-	CALL SPMD_TRI20GAT(
+        CALL SPMD_TRI20GAT(
      1    RESULT       ,NSN ,INTBUF_TAB%CAND_N,INTBUF_TAB%I_STOK(1),NIN,
-     2    IGAP         ,NSNR,MULTIMP	  ,NTY        ,IPARI(47,NIN),
+     2    IGAP         ,NSNR,MULTIMP    ,NTY        ,IPARI(47,NIN),
      3    IPARI(22,NIN),H3D_DATA  )
         IPARI(24,NIN) = NSNR
 
@@ -467,11 +460,11 @@ C recuperation des noeuds remote NLINSR stockes dans XREM
 C
           NLINSR = 0
           IF(NSPMD>1) THEN
-	    CALL SPMD_TRI20BOXE(
+      CALL SPMD_TRI20BOXE(
      1       INTBUF_TAB%IXLINS,NLINSA  ,INTBUF_TAB%XA,INTBUF_TAB%VA,MS     ,
-     2       BMINMAE	  ,WEIGHT  ,INTBUF_TAB%STFS,NIN	       ,ISENDTO,
-     3       IRCVFROM	  ,IAD_ELEM,FR_ELEM	 ,NLINSR ,IPARI(22,NIN),
-     4       INTBUF_TAB%GAP_SE,INTBUF_TAB%PENISE,ITAB	 ,IGAP   ,TZINF  ,
+     2       BMINMAE    ,WEIGHT  ,INTBUF_TAB%STFS,NIN        ,ISENDTO,
+     3       IRCVFROM   ,IAD_ELEM,FR_ELEM  ,NLINSR ,IPARI(22,NIN),
+     4       INTBUF_TAB%GAP_SE,INTBUF_TAB%PENISE,ITAB  ,IGAP   ,TZINF  ,
      5       INTBUF_TAB%NLG,INTBUF_TAB%PENIA,DIAG_SMS,NODNX_SMS)
           END IF
         END IF
@@ -495,12 +488,12 @@ c fait dans le starter          TZINF = TZINF + GAP_SH
         IF(NRTM_T/=0)THEN
           CALL I20BUC_EDGE(
      1 INTBUF_TAB%XA,INTBUF_TAB%IXLINS,INTBUF_TAB%IXLINM(1+2*ITASK*NRTM_T),INTBUF_TAB%NLG,
-     2 NLINSA  ,NMNE	     ,NRTM_T	   ,INTBUF_TAB%LCAND_N,INTBUF_TAB%LCAND_S,
-     3 GAP     ,NOINT	     ,INTBUF_TAB%I_STOK_E(1),BMINMAE   ,TZINF	   ,
-     4 MAXBOX  ,MINBOX       ,NB_N_B	   , ESHIFT	 ,ILD	       ,
-     6 NCONTACTE,INTBUF_TAB%ADCCM20(1+ITASK*NRTM_T) ,INTBUF_TAB%CHAIN20,NIN	 ,ITAB    ,
-     7 NLINSR	,NCONT      ,INTBUF_TAB%GAP_SE,INTBUF_TAB%STFS,INTBUF_TAB%PENISE ,
-     8 IGAP	,INTBUF_TAB%STF(1+ITASK*NRTM_T),IPARI(42,NIN) , I_MEM	    )
+     2 NLINSA  ,NMNE       ,NRTM_T     ,INTBUF_TAB%LCAND_N,INTBUF_TAB%LCAND_S,
+     3 GAP     ,NOINT      ,INTBUF_TAB%I_STOK_E(1),BMINMAE   ,TZINF    ,
+     4 MAXBOX  ,MINBOX       ,NB_N_B     , ESHIFT  ,ILD        ,
+     6 NCONTACTE,INTBUF_TAB%ADCCM20(1+ITASK*NRTM_T) ,INTBUF_TAB%CHAIN20,NIN  ,ITAB    ,
+     7 NLINSR ,NCONT      ,INTBUF_TAB%GAP_SE,INTBUF_TAB%STFS,INTBUF_TAB%PENISE ,
+     8 IGAP ,INTBUF_TAB%STF(1+ITASK*NRTM_T),IPARI(42,NIN) , I_MEM     )
        ENDIF
 
 C Upgrade MultiMP
@@ -559,9 +552,9 @@ C mono tache
           IF (IMONM > 0) CALL STARTIME(26,1)
 
           IF(INTBUF_TAB%VARIABLES(5)>=ZERO) INTBUF_TAB%VARIABLES(5)= -INTBUF_TAB%VARIABLES(5)
-	  CALL SPMD_TRI20GATE(
-     1 RESULT	    ,NLINSA,INTBUF_TAB%LCAND_S,INTBUF_TAB%I_STOK_E(1),NIN,
-     2 IPARI(22,NIN),NLINSR,MULTIMP	 ,IGAP      )
+       CALL SPMD_TRI20GATE(
+     1 RESULT     ,NLINSA,INTBUF_TAB%LCAND_S,INTBUF_TAB%I_STOK_E(1),NIN,
+     2 IPARI(22,NIN),NLINSR,MULTIMP  ,IGAP      )
        IPARI(57,NIN) = NLINSR
 
           IF (IMONM > 0) CALL STOPTIME(26,1)
@@ -589,22 +582,14 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NSNR, NLINSR, ITASK, NIN
       my_real
      .   STFAC
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com08_c.inc"
 #include      "task_c.inc"
 #include      "sms_c.inc"

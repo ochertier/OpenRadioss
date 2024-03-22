@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -47,11 +47,7 @@ C-----------------------------------------------
 #include      "param_c.inc"
 #include      "remesh_c.inc"
 #include      "scr17_c.inc"
-#include      "task_c.inc"
 #include      "scr18_c.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -114,7 +110,7 @@ C
             AR(J,N2)=AR(J,N2)+AC
             AR(J,N3)=AR(J,N3)+AC
             AR(J,N4)=AR(J,N4)+AC
-          END DO	    
+          END DO      
           AC=FOURTH*STIFR(MC)
           STIFR(N1)=STIFR(N1)+AC
           STIFR(N2)=STIFR(N2)+AC
@@ -159,14 +155,14 @@ C
             STCONT(N2)=STCONT(N2)+A1
           END IF
 
-	  DO J=1,3
-	    A1=HALF*AR(J,M1)
-	    AR(J,N1)=AR(J,N1)+A1
-	    AR(J,N2)=AR(J,N2)+A1
-	  END DO
-	  A1=HALF*STIFR(M1)
-	  STIFR(N1)=STIFR(N1)+A1
-	  STIFR(N2)=STIFR(N2)+A1
+            DO J=1,3
+              A1=HALF*AR(J,M1)
+              AR(J,N1)=AR(J,N1)+A1
+              AR(J,N2)=AR(J,N2)+A1
+            END DO
+            A1=HALF*STIFR(M1)
+            STIFR(N1)=STIFR(N1)+A1
+            STIFR(N2)=STIFR(N2)+A1
 
           IF(ITHERM_FE > 0)THEN
             A1= HALF*FTHE(M1)
@@ -202,14 +198,14 @@ C
             STCONT(N3)=STCONT(N3)+A2
           END IF
 
-	  DO J=1,3
-	    A2=HALF*AR(J,M2)
+            DO J=1,3
+              A2=HALF*AR(J,M2)
             AR(J,N2)=AR(J,N2)+A2
             AR(J,N3)=AR(J,N3)+A2
-	  END DO
-	  A2=HALF*STIFR(M2)
-	  STIFR(N2)=STIFR(N2)+A2
-	  STIFR(N3)=STIFR(N3)+A2
+            END DO
+            A2=HALF*STIFR(M2)
+            STIFR(N2)=STIFR(N2)+A2
+            STIFR(N3)=STIFR(N3)+A2
 
           IF(ITHERM_FE > 0)THEN
             A2= HALF*FTHE(M2)
@@ -245,12 +241,12 @@ C
             STCONT(N4)=STCONT(N4)+A3
           END IF
 
-	  DO J=1,3
-	    A3=HALF*AR(J,M3)
+            DO J=1,3
+              A3=HALF*AR(J,M3)
             AR(J,N3)=AR(J,N3)+A3
             AR(J,N4)=AR(J,N4)+A3
-	  END DO
-   	  A3=HALF*STIFR(M3)
+            END DO
+            A3=HALF*STIFR(M3)
           STIFR(N3)=STIFR(N3)+A3
           STIFR(N4)=STIFR(N4)+A3
 
@@ -288,12 +284,12 @@ C
             STCONT(N4)=STCONT(N4)+A4
           END IF
 
-	  DO J=1,3
-	    A4=HALF*AR(J,M4)
+            DO J=1,3
+              A4=HALF*AR(J,M4)
             AR(J,N1)=AR(J,N1)+A4
             AR(J,N4)=AR(J,N4)+A4
-	  END DO
- 	  A4=HALF*STIFR(M4)
+            END DO
+            A4=HALF*STIFR(M4)
           STIFR(N1)=STIFR(N1)+A4
           STIFR(N4)=STIFR(N4)+A4
 
@@ -343,14 +339,14 @@ C
             STCONT(N2)=STCONT(N2)+A1
           END IF
 
-	  DO J=1,3
-	    A1=HALF*AR(J,M1)
-	    AR(J,N1)=AR(J,N1)+A1
-	    AR(J,N2)=AR(J,N2)+A1
-	  END DO
-	  A1=HALF*STIFR(M1)
-	  STIFR(N1)=STIFR(N1)+A1
-	  STIFR(N2)=STIFR(N2)+A1
+            DO J=1,3
+              A1=HALF*AR(J,M1)
+              AR(J,N1)=AR(J,N1)+A1
+              AR(J,N2)=AR(J,N2)+A1
+            END DO
+            A1=HALF*STIFR(M1)
+            STIFR(N1)=STIFR(N1)+A1
+            STIFR(N2)=STIFR(N2)+A1
 
           IF(ITHERM_FE > 0)THEN
             A1= HALF*FTHE(M1)
@@ -386,14 +382,14 @@ C
             STCONT(N3)=STCONT(N3)+A2
           END IF
 
-	  DO J=1,3
-	    A2=HALF*AR(J,M2)
+            DO J=1,3
+              A2=HALF*AR(J,M2)
             AR(J,N2)=AR(J,N2)+A2
             AR(J,N3)=AR(J,N3)+A2
-	  END DO
-	  A2=HALF*STIFR(M2)
-	  STIFR(N2)=STIFR(N2)+A2
-	  STIFR(N3)=STIFR(N3)+A2
+            END DO
+            A2=HALF*STIFR(M2)
+            STIFR(N2)=STIFR(N2)+A2
+            STIFR(N3)=STIFR(N3)+A2
 
           IF(ITHERM_FE > 0)THEN
             A2= HALF*FTHE(M2)
@@ -429,12 +425,12 @@ C
             STCONT(N1)=STCONT(N1)+A3
           END IF
 
-	  DO J=1,3
-	    A3=HALF*AR(J,M3)
+            DO J=1,3
+              A3=HALF*AR(J,M3)
             AR(J,N3)=AR(J,N3)+A3
             AR(J,N1)=AR(J,N1)+A3
-	  END DO
-   	  A3=HALF*STIFR(M3)
+            END DO
+            A3=HALF*STIFR(M3)
           STIFR(N3)=STIFR(N3)+A3
           STIFR(N1)=STIFR(N1)+A3
 

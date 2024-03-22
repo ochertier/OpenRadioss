@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -34,9 +34,6 @@ Chd|====================================================================
      4                  IFVPOLY,IFVTADR,IFVPOLH, 
      5                  IFVPADR,IBPOLH ,DLH    )
 C-----------------------------------------------
-C   M o d u l e s 
-C-----------------------------------------------
-C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
@@ -69,7 +66,6 @@ C-----------------------------------------------
       my_real
      .        X12, Y12, Z12, X23, Y23, Z23, X31, Y31, Z31, 
      .        L12, L23, L31, DL0, DL1, DL2, DLL, DLBR1, DLBR2, DLBR3
-C---+----1----+----2----+----3----+----4----+----5----+----6----+----7--
 C---------------------------------------------------
 C Noeuds des volumes finis
 C---------------------------------------------------

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,7 +26,7 @@ Chd|-- called by -----------
 Chd|        DDSPLIT                       source/restart/ddsplit/ddsplit.F
 Chd|-- calls ---------------
 Chd|        FRETITL                       source/starter/freform.F      
-Chd|        WRITE_I_C                     source/output/tools/write_routines.c
+Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|====================================================================
       SUBROUTINE W_SUBSET_STR(SUBSET,LEN_IA)

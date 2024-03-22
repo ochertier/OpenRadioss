@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -49,7 +49,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "com01_c.inc"
 #include      "scr18_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -72,27 +71,13 @@ CMasParINCLUDE 'cupdt3.intmap.inc'
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NVC1, NVC2, NVC3, NVC4, I, J, MX,IOFF,MT
+      INTEGER NVC1, NVC2, NVC3, NVC4, I, J, MX,MT
       my_real
      .   OFF_L,CF(MVSIZ)
 C-----------------------------------------------
 C
 C cumul de l'energie des elements deletes AU moment du delete
             
-      IOFF=0
-      DO I=JFT,JLT
-        IF(OFF(I)==ZERO.AND.OFFG(I)>ZERO)IOFF=1
-      ENDDO
-      IF(IOFF==1)THEN
-       MT = MAT(JFT)
-       DO I=JFT,JLT
-        IF(OFF(I)==ZERO.AND.OFFG(I)>ZERO)THEN
-           MX = IPARTC(I)
-           PARTSAV(24,MX)=PARTSAV(24,MX) + EINT(I,1) + EINT(I,2)
-           PARTSAV(25,MX)=PARTSAV(25,MX) + PM(1,MT)*AREA(I)*THK(I)
-        ENDIF
-       ENDDO
-      ENDIF
       OFF_L = ZERO
       DO I=JFT,JLT
         IF(OFF(I)<ONE)OFFG(I) = OFF(I)
@@ -519,7 +504,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "task_c.inc"
 #include      "parit_c.inc"
 #include      "scr18_c.inc"
 C-----------------------------------------------
@@ -548,25 +532,11 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
 C ds 41i 001 13/16/00 +1
 C     INTEGER I, II, K
-      INTEGER I, II, K, J, MX,IOFF, MT
+      INTEGER I, II, K, J, MX,MT
       my_real
      .   OFF_L
 C-----------------------------------------------
 C cumul de l'energie des elements deletes AU moment du delete 
-      IOFF=0
-      DO I=JFT,JLT
-        IF(OFF(I)==ZERO.AND.OFFG(I)>ZERO)IOFF=1
-      ENDDO
-      IF(IOFF==1)THEN
-       MT = MAT(JFT)
-       DO I=JFT,JLT
-        IF(OFF(I)==ZERO.AND.OFFG(I)>ZERO)THEN
-           MX = IPARTC(I)
-           PARTSAV(24,MX)=PARTSAV(24,MX) + EINT(I,1) + EINT(I,2)
-           PARTSAV(25,MX)=PARTSAV(25,MX) + PM(1,MT)*AREA(I)*THK(I)
-        ENDIF
-       ENDDO
-      ENDIF
       OFF_L = ZERO
       DO I=JFT,JLT
         IF(OFF(I)<ONE)OFFG(I) = OFF(I)
@@ -725,7 +695,6 @@ C
 C
          IF(JTHE > 0 ) THEN
           DO I=JFT,JLT
-c#include "cupdt3_pf.inc"
             FTHESKY(IADC(1,I)) = THEM(I,1)
             FTHESKY(IADC(2,I)) = THEM(I,2)
             FTHESKY(IADC(3,I)) = THEM(I,3)

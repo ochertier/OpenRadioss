@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,15 +26,16 @@ Chd|-- called by -----------
 Chd|        HM_READ_INIMAP1D              source/initial_conditions/inimap/hm_read_inimap1d.F
 Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
-Chd|        CLOSE_C                       source/output/tools/write_routines.c
-Chd|        CUR_FIL_C                     source/output/tools/write_routines.c
+Chd|        CLOSE_C                       ../common_source/tools/input_output/write_routtines.c
+Chd|        CUR_FIL_C                     ../common_source/tools/input_output/write_routtines.c
+Chd|        OPEN_C                        ../common_source/tools/input_output/write_routtines.c
 Chd|        READ_DB                       source/restart/ddsplit/wrrest.F
-Chd|        READ_I_C                      source/output/tools/write_routines.c
+Chd|        READ_I_C                      ../common_source/tools/input_output/write_routtines.c
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        INIMAP1D_MOD                  share/modules1/inimap1d_mod.F 
 Chd|        INOUTFILE_MOD                 ../common_source/modules/inoutfile_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|====================================================================
       SUBROUTINE LEC_INIMAP1D_FILE(INIMAP1D, FILENAME, ID, TITLE)
 C-----------------------------------------------
@@ -55,7 +56,6 @@ C-----------------------------------------------
 #include      "units_c.inc"
 #include      "scr17_c.inc"
 !NFUNCT
-#include      "com04_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

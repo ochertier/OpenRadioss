@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -39,14 +39,10 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
 #include      "com04_c.inc"
-#include      "scr17_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -92,7 +88,7 @@ C
             ITAGVENT(N4)=IVENT
          ENDDO
       ENDDO
-C			
+C
       DO IEL=1,NEL
          IF(ITAGEL(IEL) > 0) CYCLE   ! injecteur
          N1=ELEM(1,IEL)
@@ -102,7 +98,7 @@ C
          IF(NALL/=0) THEN
             NN1=ITAGVENT(N2)-ITAGVENT(N1)
             NN2=ITAGVENT(N3)-ITAGVENT(N1)
-            IF (NN1 == 0 .AND. NN2 == 0) ITAGEL(IEL)=-ITAGVENT(N1)					
+            IF (NN1 == 0 .AND. NN2 == 0) ITAGEL(IEL)=-ITAGVENT(N1)
          ENDIF 
       ENDDO
 C

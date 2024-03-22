@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,6 +25,7 @@ Chd|  S6MASS3                       source/elements/thickshell/solide6c/s6mass3.
 Chd|-- called by -----------
 Chd|        S6CINIT3                      source/elements/thickshell/solide6c/s6cinit3.F
 Chd|-- calls ---------------
+Chd|        S6FRACA                       source/elements/thickshell/solide6c/s6fraca3.F
 Chd|====================================================================
       SUBROUTINE S6MASS3(RHO,MS,PARTSAV,X,V,IPART,MSS,
      .     RHOCP,MCP ,MCPS,MSSA,FILL, VOLU, 
@@ -51,14 +52,14 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "vect01_c.inc"
-#include      "scr05_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER  I, IP,I1,I2,I3,I4,I5,I6, J
       my_real
-     .   XX,YY,ZZ,XY,YZ,ZX,MASS(MVSIZ),MSS(8,*), MASSP
+     .   XX,YY,ZZ,XY,YZ,ZX,MASS(MVSIZ),MSS(8,*), MASSP,PTG(MVSIZ,3)
 C-----------------------------------------------------------------------
+       CALL S6FRACA(X,NC1, NC2, NC3, NC4, NC5, NC6 ,PTG   ,LLT )
        DO I=LFT,LLT
         MASS(I)=FILL(I)*RHO(I)*VOLU(I)*ONE_OVER_6
         I1 = NC1(I)
@@ -67,13 +68,13 @@ C-----------------------------------------------------------------------
         I4 = NC4(I)
         I5 = NC5(I)
         I6 = NC6(I)
-        MSS(1,I)=MASS(I)
-        MSS(2,I)=MASS(I)
-        MSS(3,I)=MASS(I)
+        MSS(1,I)=MASS(I)*PTG(I,1)
+        MSS(2,I)=MASS(I)*PTG(I,2)
+        MSS(3,I)=MASS(I)*PTG(I,3)
         MSS(4,I)=ZERO
-        MSS(5,I)=MASS(I)
-        MSS(6,I)=MASS(I)
-        MSS(7,I)=MASS(I)
+        MSS(5,I)=MASS(I)*PTG(I,1)
+        MSS(6,I)=MASS(I)*PTG(I,2)
+        MSS(7,I)=MASS(I)*PTG(I,3)
         MSS(8,I)=ZERO
 C
         IP=IPART(I)
@@ -154,13 +155,13 @@ C
            I4 = NC4(I)
            I5 = NC5(I)
            I6 = NC6(I)
-           MCPS(1,I)=MASSP
-           MCPS(2,I)=MASSP
-           MCPS(3,I)=MASSP
+           MCPS(1,I)=MASSP*PTG(I,1)
+           MCPS(2,I)=MASSP*PTG(I,2)
+           MCPS(3,I)=MASSP*PTG(I,3)
            MCPS(4,I)=ZERO
-           MCPS(5,I)=MASSP
-           MCPS(6,I)=MASSP
-           MCPS(7,I)=MASSP
+           MCPS(5,I)=MASSP*PTG(I,1)
+           MCPS(6,I)=MASSP*PTG(I,2)
+           MCPS(7,I)=MASSP*PTG(I,3)
            MCPS(8,I)=ZERO
           ENDDO
         ENDIF   

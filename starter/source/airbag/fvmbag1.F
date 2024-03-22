@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,9 +21,9 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
-Chd|  ALENO                         source/airbag/fvmbag1.F
+Chd|  ALENO                         source/airbag/fvmbag1.F       
 Chd|-- called by -----------
-Chd|        INIT_MONVOL                   source/airbag/init_monvol.F
+Chd|        INIT_MONVOL                   source/airbag/init_monvol.F   
 Chd|-- calls ---------------
 Chd|        MONVOL_STRUCT_MOD             share/modules1/monvol_struct_mod.F
 Chd|====================================================================
@@ -41,7 +41,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -267,7 +266,7 @@ C
       RETURN
       END
 Chd|====================================================================
-Chd|  ALETG                         source/airbag/fvmbag1.F
+Chd|  ALETG                         source/airbag/fvmbag1.F       
 Chd|-- called by -----------
 Chd|-- calls ---------------
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
@@ -284,11 +283,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com04_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -373,7 +367,7 @@ C
       RETURN
       END
 Chd|====================================================================
-Chd|  FVBAG_TAGELE                  source/airbag/fvmbag1.F
+Chd|  FVBAG_TAGELE                  source/airbag/fvmbag1.F       
 Chd|-- called by -----------
 Chd|-- calls ---------------
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
@@ -387,11 +381,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com04_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -426,9 +415,9 @@ C
       RETURN
       END
 Chd|====================================================================
-Chd|  FVVERIF                       source/airbag/fvmbag1.F
+Chd|  FVVERIF                       source/airbag/fvmbag1.F       
 Chd|-- called by -----------
-Chd|        FVMESH0                       source/airbag/fvmesh0.F
+Chd|        FVMESH0                       source/airbag/fvmesh0.F       
 Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
@@ -444,9 +433,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
@@ -459,8 +445,7 @@ C-----------------------------------------------
       INTEGER, INTENT(IN) :: IBUF(*), IBUFA(*), TAGELA(*)
       my_real, INTENT(INOUT) :: LX, LY, LZ
       CHARACTER(LEN = nchartitle), INTENT(IN) :: TITR
-      my_real
-     .     X(3,*), VX3, VY3, VZ3, VX1, VY1, VZ1, XB0, YB0, ZB0
+      my_real X(3,NUMNOD), VX3, VY3, VZ3, VX1, VY1, VZ1, XB0, YB0, ZB0
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -468,7 +453,9 @@ C-----------------------------------------------
       my_real
      .        NORM, SS, VX2, VY2, VZ2, LXMAX, LYMAX, XX, YY, ZZ, XL, YL,
      .        LZMAX, ZL, LX_OLD, LY_OLD, LZ_OLD
-C
+C-----------------------------------------------
+C   S o u r c e   L i n e s
+C-----------------------------------------------
       NORM=SQRT(VX3**2+VY3**2+VZ3**2)
       IF (NORM==ZERO) THEN
         CALL ANCMSG(MSGID=630,
@@ -583,9 +570,9 @@ C
       RETURN
       END
 Chd|====================================================================
-Chd|  FVNODI                        source/airbag/fvmbag1.F
+Chd|  FVNODI                        source/airbag/fvmbag1.F       
 Chd|-- called by -----------
-Chd|        INIT_MONVOL                   source/airbag/init_monvol.F
+Chd|        INIT_MONVOL                   source/airbag/init_monvol.F   
 Chd|-- calls ---------------
 Chd|        MONVOL_STRUCT_MOD             share/modules1/monvol_struct_mod.F
 Chd|====================================================================
@@ -602,8 +589,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
-#include      "param_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -675,7 +660,7 @@ C-----------------------------------------------
       ENDDO
       T_MONVOLN%NNI = NNB
 
-      CALL INTVECTOR_COPY_TO(VEC_PTR_SURFINT, T_MONVOLN%NODES(NNS + 1))
+      IF(NNB>0)CALL INTVECTOR_COPY_TO(VEC_PTR_SURFINT, T_MONVOLN%NODES(NNS + 1))
 
       CALL INTVECTOR_DELETE(VEC_PTR_SURFINT)
       DEALLOCATE(BUFNODE)
@@ -686,7 +671,7 @@ C
       RETURN
       END
 Chd|====================================================================
-Chd|  FVTGI                         source/airbag/fvmbag1.F
+Chd|  FVTGI                         source/airbag/fvmbag1.F       
 Chd|-- called by -----------
 Chd|-- calls ---------------
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
@@ -702,12 +687,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com04_c.inc"
-#include      "param_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -769,11 +748,11 @@ C
       RETURN
       END
 Chd|====================================================================
-Chd|  FVNODBR                       source/airbag/fvmbag1.F
+Chd|  FVNODBR                       source/airbag/fvmbag1.F       
 Chd|-- called by -----------
-Chd|        FVMESH0                       source/airbag/fvmesh0.F
+Chd|        FVMESH0                       source/airbag/fvmesh0.F       
 Chd|-- calls ---------------
-Chd|        FVBAG_MOD                     share/modules1/fvbag_mod.F
+Chd|        FVBAG_MOD                     share/modules1/fvbag_mod.F    
 Chd|====================================================================
       SUBROUTINE FVNODBR(IBUFA, NNA, NNFV, IFV, NB_NODE)
 C-----------------------------------------------
@@ -784,10 +763,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com04_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -817,13 +792,13 @@ C
       RETURN
       END
 Chd|====================================================================
-Chd|  FVNORMAL                      source/airbag/fvmbag1.F
+Chd|  FVNORMAL                      source/airbag/fvmbag1.F       
 Chd|-- called by -----------
-Chd|        FVBRIC1                       source/airbag/fvbric1.F
-Chd|        FVELAREA                      source/airbag/fvelarea.F
-Chd|        FVLENGTH                      source/airbag/fvlength.F
-Chd|        FVMESH1                       source/airbag/fvmesh.F
-Chd|        FVVOLU                        source/airbag/fvvolu.F
+Chd|        FVBRIC1                       source/airbag/fvbric1.F       
+Chd|        FVELAREA                      source/airbag/fvelarea.F      
+Chd|        FVLENGTH                      source/airbag/fvlength.F      
+Chd|        FVMESH1                       source/airbag/fvmesh.F        
+Chd|        FVVOLU                        source/airbag/fvvolu.F        
 Chd|-- calls ---------------
 Chd|====================================================================
       SUBROUTINE FVNORMAL(X, N1, N2, N3, N4, NX, NY, NZ)
@@ -831,9 +806,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

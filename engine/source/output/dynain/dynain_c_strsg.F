@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -31,22 +31,25 @@ Chd|        SHELL_LOCAL_FRAME             source/output/dynain/shell_rota.F
 Chd|        SHELL_ROTA                    source/output/dynain/shell_rota.F
 Chd|        SPMD_RGATHER9_DP              source/mpi/interfaces/spmd_outp.F
 Chd|        SPMD_STAT_PGATHER             source/mpi/output/spmd_stat.F 
+Chd|        STRS_TXT50                    source/output/sta/sta_txt.F   
 Chd|        DRAPE_MOD                     share/modules/drape_mod.F     
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        STACK_MOD                     share/modules/stack_mod.F     
+Chd|        STATE_MOD                     ../common_source/modules/state_mod.F
 Chd|====================================================================
       SUBROUTINE DYNAIN_C_STRSG(
      1                  ELBUF_TAB  ,IPARG     ,IPM        ,IGEO  ,IXC    ,
      2                  IXTG       ,WA        ,WAP0       ,IPARTC,IPARTTG,
-     3                  IPART_DYNAIN,DYNAIN_INDXC,DYNAIN_INDXTG,SIZP0  ,
-     4                  GEO        ,STACK     ,DRAPE_Q4   ,DRAPE_T3,X   ,
-     5                  THKE       )
+     3                  DYNAIN_DATA,DYNAIN_INDXC,DYNAIN_INDXTG,SIZP0  ,
+     4                  GEO        ,STACK     ,DRAPE_SH4N   ,DRAPE_SH3N,X   ,
+     5                  THKE       ,DRAPEG)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE ELBUFDEF_MOD   
       USE STACK_MOD
-      USE DRAPE_MOD      
+      USE DRAPE_MOD     
+      USE STATE_MOD 
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -55,30 +58,26 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "mvsiz_p.inc"
 #include      "param_c.inc"
 #include      "units_c.inc"
-#include      "scr01_c.inc"
-#include      "scr05_c.inc"
 #include      "task_c.inc"
-#include      "scr03_c.inc"
-#include      "scr14_c.inc"
-#include      "scr16_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER SIZLOC,SIZP0
       INTEGER IXC(NIXC,*),IXTG(NIXTG,*),
      .        IPARG(NPARG,*),IPM(NPROPMI,*),IGEO(NPROPGI,*),
-     .        IPARTC(*), IPARTTG(*), IPART_DYNAIN(*),
+     .        IPARTC(*), IPARTTG(*), 
      .        DYNAIN_INDXC(*), DYNAIN_INDXTG(*)
       my_real   
      .   GEO(NPROPG,*) , X(*) ,THKE(*)
       TYPE (ELBUF_STRUCT_), DIMENSION(NGROUP), TARGET :: ELBUF_TAB
       TYPE (STACK_PLY) :: STACK
-      TYPE (DRAPE_)  :: DRAPE_Q4,DRAPE_T3
+      TYPE (DRAPE_)  :: DRAPE_SH4N(NUMELC_DRAPE),DRAPE_SH3N(NUMELTG_DRAPE)
+      TYPE (DRAPEG_) :: DRAPEG
       double precision WA(*),WAP0(*)
+      TYPE (DYNAIN_DATABASE), INTENT(INOUT) :: DYNAIN_DATA
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -88,7 +87,7 @@ C-----------------------------------------------
      .   IGTYP,NPT_ALL,IL,KK(12),LARGE,IREP,IPID,IVISC,
      .   IPMAT,IXFEM,IXLAY,ISUBSTACK,IPTT,IS_WRITTEN,
      ,   LAYNPT_MAX,LAY_MAX,IERR,L_DIRA,L_DIRB,IORTH,
-     .   JDIR,ILAY,J1,J2
+     .   JDIR,ILAY,J1,J2,SEDRAPE,NUMEL_DRAPE
       PARAMETER (LAYNPT_MAX = 10)
       PARAMETER (LAY_MAX = 100)
       INTEGER ,  DIMENSION(:),ALLOCATABLE :: PTWA, PTWA_P0
@@ -100,9 +99,9 @@ C-----------------------------------------------
       my_real   
      .   PG,MPG,QPG(2,4),
      .   SK(2),ST(2),MK(2),MT(2),SHK(2),SHT(2),ZZ
-      my_real
-     .   THKLY(MVSIZ*LAY_MAX*LAYNPT_MAX),POSLY(MVSIZ,LAY_MAX*LAYNPT_MAX),
-     .   THK_LY(MVSIZ,LAY_MAX*LAYNPT_MAX)
+      my_real, dimension(:,:), allocatable ::
+     .   THKLY,POSLY,
+     .   THK_LY
       my_real
      .   E1X(MVSIZ), E1Y(MVSIZ), E1Z(MVSIZ), 
      .   E2X(MVSIZ), E2Y(MVSIZ), E2Z(MVSIZ), 
@@ -129,15 +128,20 @@ C=======================================================================
 C-----------------------
 C    Allocation Tabs
 C-----------------------
-      ALLOCATE(PTWA(MAX(DYNAIN_NUMELC ,DYNAIN_NUMELTG)),STAT=IERR)
-      ALLOCATE(PTWA_P0(0:MAX(1,DYNAIN_NUMELC_G,DYNAIN_NUMELTG_G)),STAT=IERR)
+      ALLOCATE(PTWA(MAX(DYNAIN_DATA%DYNAIN_NUMELC ,
+     .             DYNAIN_DATA%DYNAIN_NUMELTG)),STAT=IERR)
+      ALLOCATE(PTWA_P0(0:MAX(1,DYNAIN_DATA%DYNAIN_NUMELC_G,
+     .         DYNAIN_DATA%DYNAIN_NUMELTG_G)),STAT=IERR)
+      ALLOCATE( THKLY(MVSIZ,LAY_MAX*LAYNPT_MAX),POSLY(MVSIZ,LAY_MAX*LAYNPT_MAX))
+      ALLOCATE( THK_LY(MVSIZ,LAY_MAX*LAYNPT_MAX))
+
 C*********************************************
 C     4-NODE SHELLS
 C*********************************************
       JJ = 0
 C
       IE=0
-      IF (DYNAIN_NUMELC/=0) THEN
+      IF (DYNAIN_DATA%DYNAIN_NUMELC/=0) THEN
        DO NG=1,NGROUP
         ITY = IPARG(5,NG)
         IF (ITY == 3) THEN
@@ -193,12 +197,14 @@ C------------------------------------------------
           ELSE
              THK0(LFT:LLT) = THKE(LFT:LLT)
           END IF
+          NUMEL_DRAPE = NUMELC_DRAPE
+          SEDRAPE = SCDRAPE
           CALL LAYINI(
      .           ELBUF_TAB(NG),LFT      ,LLT        ,GEO        ,IGEO      ,
      .           MAT        ,PID        ,THKLY      ,MATLY      ,POSLY     ,
      .           IGTYP      ,IXFEM      ,IXLAY      ,NLAY       ,NPT       ,
-     .           ISUBSTACK  ,STACK      ,DRAPE_Q4   ,NFT        ,THK0      , 
-     .           NEL        ,THK_LY )
+     .           ISUBSTACK  ,STACK      ,DRAPE_SH4N   ,NFT        ,THKE      , 
+     .           NEL        ,THK_LY     ,DRAPEG%INDX_SH4N ,SEDRAPE,NUMEL_DRAPE)
 
 C-------------------------------------------------------
 C     ELEMENT LOCAL FRAME : for rotation local -> Global
@@ -274,7 +280,7 @@ C-------------------------------------------------------
           DO I=LFT,LLT
             N = I + NFT
             IPRT=IPARTC(N)
-            IF (IPART_DYNAIN(IPRT)==0) CYCLE
+            IF (DYNAIN_DATA%IPART_DYNAIN(IPRT)==0) CYCLE
             JJ = JJ + 1
             IF (MLW /= 0 .AND. MLW /= 13) THEN
               WA(JJ) = GBUF%OFF(I)
@@ -301,7 +307,7 @@ c---------
                   DO IPG=1,NPG 
                     JJ = JJ + 1
                     WA(JJ) = ZERO
-                    DO J=1,8        ! forces            	
+                    DO J=1,8        ! forces            
                       JJ = JJ + 1
                       WA(JJ) = ZERO
                     ENDDO                                                               
@@ -348,7 +354,7 @@ c---------
 c
                   JJ = JJ + 1                                      
                   IF (GBUF%G_PLA > 0) THEN    
-            	    WA(JJ) = GBUF%PLA(I)       
+              WA(JJ) = GBUF%PLA(I)       
                   ELSE                         
                     WA(JJ) = ZERO              
                   ENDIF    
@@ -392,7 +398,7 @@ c
 c
                   JJ = JJ + 1                                      
                   IF (GBUF%G_PLA > 0) THEN    
-            	    WA(JJ) = GBUF%PLA(I)       
+              WA(JJ) = GBUF%PLA(I)       
                   ELSE                         
                     WA(JJ) = ZERO              
                   ENDIF   
@@ -437,7 +443,7 @@ c
 c
                   JJ = JJ + 1                                      
                   IF (GBUF%G_PLA > 0) THEN    
-            	    WA(JJ) = GBUF%PLA(I)       
+              WA(JJ) = GBUF%PLA(I)       
                   ELSE                         
                     WA(JJ) = ZERO              
                   ENDIF                       
@@ -466,19 +472,19 @@ c
                    DO IPG=1,NPG
 
                       SIG(1) = GBUF%FOR(KK(1)+I)
-     .	    	              + ST(1)*QPG(2,IPG)+SK(1)*QPG(1,IPG)
+     .                      + ST(1)*QPG(2,IPG)+SK(1)*QPG(1,IPG)
                       SIG(2) = GBUF%FOR(KK(2)+I)
-     .	    	              + ST(2)*QPG(2,IPG)+SK(2)*QPG(1,IPG)
+     .                      + ST(2)*QPG(2,IPG)+SK(2)*QPG(1,IPG)
                       SIG(3) = GBUF%FOR(KK(3)+I)
                       SIG(4) = GBUF%FOR(KK(4)+I)
-     .	    	             + SHT(2)*QPG(2,IPG)+SHK(2)*QPG(1,IPG)
+     .                     + SHT(2)*QPG(2,IPG)+SHK(2)*QPG(1,IPG)
                       SIG(5) = GBUF%FOR(KK(5)+I)
-     .	    	              + SHT(1)*QPG(2,IPG)+SHK(1)*QPG(1,IPG)
+     .                      + SHT(1)*QPG(2,IPG)+SHK(1)*QPG(1,IPG)
 
                       MOM(1) = GBUF%MOM(KK(1)+I)
-     .	    	            + MT(1)*QPG(2,IPG)+MK(1)*QPG(1,IPG)
+     .                    + MT(1)*QPG(2,IPG)+MK(1)*QPG(1,IPG)
                       MOM(2) = GBUF%MOM(KK(2)+I)
-     .	    	            + MT(2)*QPG(2,IPG)+MK(2)*QPG(1,IPG)
+     .                    + MT(2)*QPG(2,IPG)+MK(2)*QPG(1,IPG)
                       MOM(3) = GBUF%MOM(KK(3)+I)
                       SIG(1) = A1*SIG(1) + A2*MOM(1) 
                       SIG(2) = A1*SIG(2) + A2*MOM(2)    
@@ -514,7 +520,7 @@ c
 c
                        JJ = JJ + 1
                        IF (GBUF%G_PLA > 0) THEN    
-            	          WA(JJ) = GBUF%PLA(I)
+                    WA(JJ) = GBUF%PLA(I)
                        ELSE                         
                           WA(JJ) = ZERO              
                        ENDIF 
@@ -528,19 +534,19 @@ c
                    DO IPG=1,NPG
 
                       SIG(1) = GBUF%FOR(KK(1)+I)
-     .	    	              + ST(1)*QPG(2,IPG)+SK(1)*QPG(1,IPG)
+     .                      + ST(1)*QPG(2,IPG)+SK(1)*QPG(1,IPG)
                       SIG(2) = GBUF%FOR(KK(2)+I)
-     .	    	              + ST(2)*QPG(2,IPG)+SK(1)*QPG(1,IPG)
+     .                      + ST(2)*QPG(2,IPG)+SK(1)*QPG(1,IPG)
                       SIG(3) = GBUF%FOR(KK(3)+I)
                       SIG(4) = GBUF%FOR(KK(4)+I)
-     .	    	             + SHT(2)*QPG(2,IPG)+SHK(2)*QPG(1,IPG)
+     .                     + SHT(2)*QPG(2,IPG)+SHK(2)*QPG(1,IPG)
                       SIG(5) = GBUF%FOR(KK(5)+I)
-     .	    	              + SHT(1)*QPG(2,IPG)+SHK(1)*QPG(1,IPG)
+     .                      + SHT(1)*QPG(2,IPG)+SHK(1)*QPG(1,IPG)
 
                       MOM(1) = GBUF%MOM(KK(1)+I)
-     .	    	            + MT(1)*QPG(2,IPG)+MK(1)*QPG(1,IPG)
+     .                    + MT(1)*QPG(2,IPG)+MK(1)*QPG(1,IPG)
                       MOM(2) = GBUF%MOM(KK(2)+I)
-     .	    	            + MT(2)*QPG(2,IPG)+MK(2)*QPG(1,IPG)
+     .                    + MT(2)*QPG(2,IPG)+MK(2)*QPG(1,IPG)
                       MOM(3) = GBUF%MOM(KK(3)+I)
                       SIG(1) = A1*SIG(1) + A2*MOM(1) 
                       SIG(2) = A1*SIG(2) + A2*MOM(2)    
@@ -576,7 +582,7 @@ c
 c
                        JJ = JJ + 1
                        IF (GBUF%G_PLA > 0) THEN    
-            	          WA(JJ) = GBUF%PLA(I)
+                    WA(JJ) = GBUF%PLA(I)
                        ELSE                         
                           WA(JJ) = ZERO              
                        ENDIF 
@@ -589,19 +595,19 @@ c
                    DO IPG=1,NPG
 
                       SIG(1) = GBUF%FOR(KK(1)+I)
-     .	    	              + ST(1)*QPG(2,IPG)+SK(1)*QPG(1,IPG)
+     .                      + ST(1)*QPG(2,IPG)+SK(1)*QPG(1,IPG)
                       SIG(2) = GBUF%FOR(KK(2)+I)
-     .	    	              + ST(2)*QPG(2,IPG)+SK(2)*QPG(1,IPG)
+     .                      + ST(2)*QPG(2,IPG)+SK(2)*QPG(1,IPG)
                       SIG(3) = GBUF%FOR(KK(3)+I)
                       SIG(4) = GBUF%FOR(KK(4)+I)
-     .	    	             + SHT(2)*QPG(2,IPG)+SHK(2)*QPG(1,IPG)
+     .                     + SHT(2)*QPG(2,IPG)+SHK(2)*QPG(1,IPG)
                       SIG(5) = GBUF%FOR(KK(5)+I)
-     .	    	              + SHT(1)*QPG(2,IPG)+SHK(1)*QPG(1,IPG)
+     .                      + SHT(1)*QPG(2,IPG)+SHK(1)*QPG(1,IPG)
 
                       MOM(1) = GBUF%MOM(KK(1)+I)
-     .	    	            + MT(1)*QPG(2,IPG)+MK(1)*QPG(1,IPG)
+     .                    + MT(1)*QPG(2,IPG)+MK(1)*QPG(1,IPG)
                       MOM(2) = GBUF%MOM(KK(2)+I)
-     .	    	            + MT(2)*QPG(2,IPG)+MK(2)*QPG(1,IPG)
+     .                    + MT(2)*QPG(2,IPG)+MK(2)*QPG(1,IPG)
                       MOM(3) = GBUF%MOM(KK(3)+I)
                       SIG(1) = A1*SIG(1) + A2*MOM(1) 
                       SIG(2) = A1*SIG(2) + A2*MOM(2)    
@@ -637,7 +643,7 @@ c
 c
                        JJ = JJ + 1
                        IF (GBUF%G_PLA > 0) THEN    
-            	          WA(JJ) = GBUF%PLA(I)
+                    WA(JJ) = GBUF%PLA(I)
                        ELSE                         
                           WA(JJ) = ZERO              
                        ENDIF 
@@ -691,7 +697,7 @@ c
 c
                          JJ = JJ + 1
                          IF (GBUF%G_PLA > 0) THEN    
-            	           WA(JJ) = GBUF%PLA(I)
+                     WA(JJ) = GBUF%PLA(I)
                          ELSE                         
                            WA(JJ) = ZERO              
                          ENDIF 
@@ -744,7 +750,7 @@ c
 c
                          JJ = JJ + 1
                          IF (GBUF%G_PLA > 0) THEN    
-            	           WA(JJ) = GBUF%PLA(I)
+                     WA(JJ) = GBUF%PLA(I)
                          ELSE                         
                            WA(JJ) = ZERO              
                          ENDIF 
@@ -796,7 +802,7 @@ c
 c
                          JJ = JJ + 1
                          IF (GBUF%G_PLA > 0) THEN    
-            	           WA(JJ) = GBUF%PLA(I)
+                     WA(JJ) = GBUF%PLA(I)
                          ELSE                         
                            WA(JJ) = ZERO              
                          ENDIF 
@@ -851,15 +857,15 @@ C-------------------------
 
                       SIG(1) = LBUF%SIG(KK(1)+I)
      .                       + (ST(1)+ZZ*MT(1))*QPG(2,IPG)              
-     .                       + (SK(1)+ZZ*MK(1))*QPG(1,IPG)  			
+     .                       + (SK(1)+ZZ*MK(1))*QPG(1,IPG)  
                       SIG(2) = LBUF%SIG(KK(2)+I)
      .                       + (ST(2)+ZZ*MT(2))*QPG(2,IPG)              
-     .                       + (SK(2)+ZZ*MK(2))*QPG(1,IPG)  			
-                      SIG(3) = LBUF%SIG(KK(3)+I)			
+     .                       + (SK(2)+ZZ*MK(2))*QPG(1,IPG)  
+                      SIG(3) = LBUF%SIG(KK(3)+I)
                       SIG(4) = LBUF%SIG(KK(4)+I)
-     .	    	             + SHT(2)*QPG(2,IPG)+SHK(2)*QPG(1,IPG)			
+     .                     + SHT(2)*QPG(2,IPG)+SHK(2)*QPG(1,IPG)
                       SIG(5) = LBUF%SIG(KK(5)+I)
-     .	    	             + SHT(1)*QPG(2,IPG)+SHK(1)*QPG(1,IPG)
+     .                     + SHT(1)*QPG(2,IPG)+SHK(1)*QPG(1,IPG)
                       SIG(6) = ZERO 
  
                       CALL SHELL_ROTA(
@@ -887,7 +893,7 @@ C-------------------------
                       WA(JJ) = SIG(6)
                       JJ = JJ + 1
                       IF (BUFLY%L_PLA > 0) THEN
-            	        WA(JJ) = LBUF%PLA(I)
+                  WA(JJ) = LBUF%PLA(I)
                       ELSE
                         WA(JJ) = ZERO
                      ENDIF
@@ -909,10 +915,10 @@ C-------------------------
                     DO IR=1,NPTR                                                         
                       LBUF => BUFLY%LBUF(IR,IS,IT)
                       IPG = NPTR*(IS-1) + IR
-                      SIG(1) = LBUF%SIG(KK(1)+I)			
-                      SIG(2) = LBUF%SIG(KK(2)+I)			
-                      SIG(3) = LBUF%SIG(KK(3)+I)			
-                      SIG(4) = LBUF%SIG(KK(4)+I)			
+                      SIG(1) = LBUF%SIG(KK(1)+I)
+                      SIG(2) = LBUF%SIG(KK(2)+I)
+                      SIG(3) = LBUF%SIG(KK(3)+I)
+                      SIG(4) = LBUF%SIG(KK(4)+I)
                       SIG(5) = LBUF%SIG(KK(5)+I)
                       SIG(6) = ZERO    
 C
@@ -920,10 +926,10 @@ C                 viscous stress added
 C 
                      IF (IVISC > 0) THEN
 
-                      SIG(1) = SIG(1) + LBUF%VISC(KK(1)+I)			
-                      SIG(2) = SIG(2) + LBUF%VISC(KK(2)+I)			
-                      SIG(3) = SIG(3) + LBUF%VISC(KK(3)+I)			
-                      SIG(4) = SIG(4) + LBUF%VISC(KK(4)+I)			
+                      SIG(1) = SIG(1) + LBUF%VISC(KK(1)+I)
+                      SIG(2) = SIG(2) + LBUF%VISC(KK(2)+I)
+                      SIG(3) = SIG(3) + LBUF%VISC(KK(3)+I)
+                      SIG(4) = SIG(4) + LBUF%VISC(KK(4)+I)
                       SIG(5) = SIG(5) + LBUF%VISC(KK(5)+I)
 
                      ENDIF  !  IF (IVISC > 0)
@@ -937,9 +943,9 @@ C
      3                      RX       ,RY      ,RZ      ,SX     ,SY           ,  
      4                      SZ       ,E1X     ,E2X     ,E3X    ,E1Y          , 
      5                      E2Y      ,E3Y     ,E1Z     ,E2Z    ,E3Z          ,
-     6                      DIR_A    ,DIR_B    )	
+     6                      DIR_A    ,DIR_B    )
 
-					
+
 
                      JJ = JJ + 1
                      WA(JJ) = TWO * POSLY(I,IT)
@@ -958,13 +964,13 @@ C
                      WA(JJ) = SIG(6)
                      JJ = JJ + 1
                      IF (BUFLY%L_PLA > 0) THEN
-            	        WA(JJ) = LBUF%PLA(I)
+                  WA(JJ) = LBUF%PLA(I)
                      ELSE
                         WA(JJ) = ZERO
                      ENDIF
 
                     ENDDO      
-                  ENDDO	    
+                  ENDDO      
                 ENDDO  !  DO IPT = 1,NPTT
 
 
@@ -983,20 +989,20 @@ C
                       DO IR=1,NPTR                                                         
                         LBUF => BUFLY%LBUF(IR,IS,IT)
 
-                        SIG(1) = LBUF%SIG(KK(1)+I)			
-                        SIG(2) = LBUF%SIG(KK(2)+I)			
-                        SIG(3) = LBUF%SIG(KK(3)+I)			
-                        SIG(4) = LBUF%SIG(KK(4)+I)			
+                        SIG(1) = LBUF%SIG(KK(1)+I)
+                        SIG(2) = LBUF%SIG(KK(2)+I)
+                        SIG(3) = LBUF%SIG(KK(3)+I)
+                        SIG(4) = LBUF%SIG(KK(4)+I)
                         SIG(5) = LBUF%SIG(KK(5)+I)
                         SIG(6) = ZERO   
 C
 C                 viscous stress added 
 C 
                         IF (IVISC > 0) THEN
-                           SIG(1) = SIG(1) + LBUF%VISC(KK(1)+I)			
-                           SIG(2) = SIG(2) + LBUF%VISC(KK(2)+I)			
-                           SIG(3) = SIG(3) + LBUF%VISC(KK(3)+I)			
-                           SIG(4) = SIG(4) + LBUF%VISC(KK(4)+I)			
+                           SIG(1) = SIG(1) + LBUF%VISC(KK(1)+I)
+                           SIG(2) = SIG(2) + LBUF%VISC(KK(2)+I)
+                           SIG(3) = SIG(3) + LBUF%VISC(KK(3)+I)
+                           SIG(4) = SIG(4) + LBUF%VISC(KK(4)+I)
                            SIG(5) = SIG(5) + LBUF%VISC(KK(5)+I)
                         ENDIF  !  IF (IVISC > 0) 
 
@@ -1006,8 +1012,8 @@ C
      3                      RX       ,RY      ,RZ      ,SX     ,SY           ,  
      4                      SZ       ,E1X     ,E2X     ,E3X    ,E1Y          , 
      5                      E2Y      ,E3Y     ,E1Z     ,E2Z    ,E3Z          ,
-     6                      DIR_A    ,DIR_B    )	
-		
+     6                      DIR_A    ,DIR_B    )
+
                         JJ = JJ + 1
                         WA(JJ) = TWO * POSLY(I,IPT)
 
@@ -1025,13 +1031,13 @@ C
                         WA(JJ) = SIG(6)
                         JJ = JJ + 1
                         IF (BUFLY%L_PLA > 0) THEN
-            	          WA(JJ) = LBUF%PLA(I)
+                    WA(JJ) = LBUF%PLA(I)
                         ELSE
                           WA(JJ) = ZERO
                         ENDIF
                       ENDDO
-                    ENDDO	    
-                  ENDDO	
+                    ENDDO      
+                  ENDDO
                   IPTT = IPTT + NPTT
                 ENDDO
               ENDIF    ! MPT, NLAY
@@ -1056,7 +1062,7 @@ c-----------------------------------------------------------------------
       IF (NSPMD == 1) THEN
 C       recopying for code simplification
         PTWA_P0(0)=0
-        DO N=1,DYNAIN_NUMELC
+        DO N=1,DYNAIN_DATA%DYNAIN_NUMELC
           PTWA_P0(N)=PTWA(N)
         ENDDO
         LEN=JJ
@@ -1065,26 +1071,48 @@ C       recopying for code simplification
         ENDDO
       ELSE
 C      Global pointers WAP0
-        CALL SPMD_STAT_PGATHER(PTWA,DYNAIN_NUMELC,PTWA_P0,DYNAIN_NUMELC_G)
+        CALL SPMD_STAT_PGATHER(PTWA,DYNAIN_DATA%DYNAIN_NUMELC,PTWA_P0,DYNAIN_DATA%DYNAIN_NUMELC_G)
         LEN = 0
         CALL SPMD_RGATHER9_DP(WA,JJ,WAP0,SIZP0,LEN)
       ENDIF
 c-------------------------------------
       IS_WRITTEN = 0
       IF (ISPMD == 0.AND.LEN > 0) THEN
-          WRITE(IUDYNAIN,'(A)') DELIMIT
-          WRITE(IUDYNAIN,'(A)')'*INITIAL_STRESS_SHELL'
-          WRITE(IUDYNAIN,'(A)')
-     .    '$  SHELLID       NPG     NBINT                         LARGE  ' 
-          WRITE(IUDYNAIN,'(A)')
-     .     '$ IF(NPT == 0), REPEAT I=1,NPG :'
-          WRITE(IUDYNAIN,'(A)')
-     .    '$ IF(NPT /= 0) REPEAT K=1,NPT : REPEAT I=1,NPG :'      
-           WRITE(IUDYNAIN,'(A)')
-     .     '$         T    SIGXX     SIGYY     SIGZZ     SIGXY     SIGYZ     SIGZX       EPSP '
+         IF(DYNAIN_DATA%ZIPDYNAIN==0) THEN       
             WRITE(IUDYNAIN,'(A)') DELIMIT
+            WRITE(IUDYNAIN,'(A)')'*INITIAL_STRESS_SHELL'
+            WRITE(IUDYNAIN,'(A)')
+     .      '$  SHELLID       NPG     NBINT                         LARGE  ' 
+            WRITE(IUDYNAIN,'(A)')
+     .       '$ IF(NPT == 0), REPEAT I=1,NPG :'
+            WRITE(IUDYNAIN,'(A)')
+     .      '$ IF(NPT /= 0) REPEAT K=1,NPT : REPEAT I=1,NPG :'      
+            WRITE(IUDYNAIN,'(A)')
+     .       '$         T    SIGXX     SIGYY     SIGZZ     SIGXY     SIGYZ     SIGZX       EPSP '
+            WRITE(IUDYNAIN,'(A)') DELIMIT
+         ELSE
+            WRITE(LINE,'(A)') DELIMIT
+            CALL STRS_TXT50(LINE,100)
+            WRITE(LINE,'(A)')'*INITIAL_STRESS_SHELL'
+            CALL STRS_TXT50(LINE,100)
+            WRITE(LINE,'(A)')
+     .      '$  SHELLID       NPG     NBINT                         LARGE  ' 
+            CALL STRS_TXT50(LINE,100)
+            WRITE(LINE,'(A)')
+     .       '$ IF(NPT == 0), REPEAT I=1,NPG :'
+            CALL STRS_TXT50(LINE,100)
+            WRITE(LINE,'(A)')
+     .      '$ IF(NPT /= 0) REPEAT K=1,NPT : REPEAT I=1,NPG :'    
+            CALL STRS_TXT50(LINE,100)  
+            WRITE(LINE,'(A)')
+     .       '$         T    SIGXX     SIGYY     SIGZZ     SIGXY     SIGYZ     SIGZX       EPSP '
+            CALL STRS_TXT50(LINE,100)
+            WRITE(LINE,'(A)') DELIMIT
+            CALL STRS_TXT50(LINE,100)
+
+         ENDIF 
          IS_WRITTEN = 1
-        DO N=1,DYNAIN_NUMELC_G
+        DO N=1,DYNAIN_DATA%DYNAIN_NUMELC_G
 C         Retrieving shell ID in increasing order 
           K=DYNAIN_INDXC(N)
 C         Adress in  WAP0
@@ -1099,21 +1127,38 @@ c
             LARGE = NINT(WAP0(J + 5)) 
 
             J = J + 5
-
-            WRITE(IUDYNAIN,'(3I10,20X,I10)')ID,NPG,NPT,LARGE
+            IF(DYNAIN_DATA%ZIPDYNAIN==0) THEN       
+               WRITE(IUDYNAIN,'(3I8,16X,I8)')ID,NPG,NPT,LARGE
+            ELSE
+               WRITE(LINE,'(3I8,16X,I8)')ID,NPG,NPT,LARGE
+               CALL STRS_TXT50(LINE,100)
+            ENDIF
             IF (NPT == 0) THEN
               DO IPG=1,NPG
-                WRITE(IUDYNAIN,'(1P5G16.9)')(WAP0(JJ + K),K=1,5)
-                WRITE(IUDYNAIN,'(1P3G16.9)')(WAP0(JJ + K),K=6,8)
+                IF(DYNAIN_DATA%ZIPDYNAIN==0) THEN       
+                   WRITE(IUDYNAIN,'(1P5G16.9)')(WAP0(JJ + K),K=1,5)
+                   WRITE(IUDYNAIN,'(1P3G16.9)')(WAP0(JJ + K),K=6,8)
+                ELSE
+                  WRITE(LINE,'(1P5G16.9)')(WAP0(JJ + K),K=1,5)
+                  CALL STRS_TXT50(LINE,100)
+                  WRITE(LINE,'(1P3G16.9)')(WAP0(JJ + K),K=6,8)
+                  CALL STRS_TXT50(LINE,100)
+                ENDIF
                 J = J + 8
               ENDDO
             ELSE
               DO IPT=1,NPT 
                 DO IPG=1,NPG
-
-                   WRITE(IUDYNAIN,'(1P5G16.9)')(WAP0(J + K),K=1,5)
-                   WRITE(IUDYNAIN,'(1P3G16.9)')(WAP0(J + K),K=6,8)
-                   J = J + 8
+                  IF(DYNAIN_DATA%ZIPDYNAIN==0) THEN       
+                    WRITE(IUDYNAIN,'(1P5G16.9)')(WAP0(J + K),K=1,5)
+                    WRITE(IUDYNAIN,'(1P3G16.9)')(WAP0(J + K),K=6,8)
+                  ELSE
+                    WRITE(LINE,'(1P5G16.9)')(WAP0(J + K),K=1,5)
+                    CALL STRS_TXT50(LINE,100)
+                    WRITE(LINE,'(1P3G16.9)')(WAP0(J + K),K=6,8)
+                    CALL STRS_TXT50(LINE,100)
+                  ENDIF
+                  J = J + 8
                 ENDDO
               ENDDO
 
@@ -1128,7 +1173,7 @@ C***********************************************
       JJ = 0
       IE=0
 C
-      IF(DYNAIN_NUMELTG/=0) THEN
+      IF(DYNAIN_DATA%DYNAIN_NUMELTG/=0) THEN
        DO NG=1,NGROUP
         ITY = IPARG(5,NG)
         IF (ITY == 7) THEN
@@ -1179,13 +1224,14 @@ C------------------------------------------------
           ELSE
              THK0(LFT:LLT) = THKE(LFT:LLT)
           END IF
-
+          NUMEL_DRAPE = NUMELTG_DRAPE
+          SEDRAPE = STDRAPE
           CALL LAYINI(
      .           ELBUF_TAB(NG),LFT      ,LLT        ,GEO        ,IGEO      ,
      .           MAT        ,PID        ,THKLY      ,MATLY      ,POSLY     ,
      .           IGTYP      ,IXFEM      ,IXLAY      ,NLAY       ,NPT       ,
-     .           ISUBSTACK  ,STACK      ,DRAPE_Q4   ,NFT        ,THK0      , 
-     .           NEL        ,THK_LY )
+     .           ISUBSTACK  ,STACK      ,DRAPE_SH3N   ,NFT        ,THKE      , 
+     .           NEL        ,THK_LY     ,DRAPEG%INDX_SH3N,SEDRAPE,NUMEL_DRAPE)
 
 C-------------------------------------------------------
 C     ELEMENT LOCAL FRAME : for rotation local -> Global
@@ -1259,7 +1305,7 @@ C-------------------------------------------------------
           DO I=LFT,LLT
             N = I + NFT
             IPRT=IPARTTG(N)
-            IF (IPART_DYNAIN(IPRT) == 0) CYCLE
+            IF (DYNAIN_DATA%IPART_DYNAIN(IPRT) == 0) CYCLE
             JJ = JJ + 1
             IF (MLW /= 0 .AND. MLW /= 13) THEN
               WA(JJ) = GBUF%OFF(I)
@@ -1329,7 +1375,7 @@ c----
 c
                   JJ = JJ + 1                                      
                   IF (GBUF%G_PLA > 0) THEN    
-            	    WA(JJ) = GBUF%PLA(I)       
+              WA(JJ) = GBUF%PLA(I)       
                   ELSE                         
                     WA(JJ) = ZERO              
                   ENDIF    
@@ -1373,7 +1419,7 @@ c
 c
                   JJ = JJ + 1                                      
                   IF (GBUF%G_PLA > 0) THEN    
-            	    WA(JJ) = GBUF%PLA(I)       
+              WA(JJ) = GBUF%PLA(I)       
                   ELSE                         
                     WA(JJ) = ZERO              
                   ENDIF   
@@ -1418,7 +1464,7 @@ c
 c
                   JJ = JJ + 1                                      
                   IF (GBUF%G_PLA > 0) THEN    
-            	    WA(JJ) = GBUF%PLA(I)       
+              WA(JJ) = GBUF%PLA(I)       
                   ELSE                         
                     WA(JJ) = ZERO              
                   ENDIF                 
@@ -1450,7 +1496,7 @@ c
      3                      RX       ,RY      ,RZ      ,SX     ,SY           ,  
      4                      SZ       ,E1X     ,E2X     ,E3X    ,E1Y          , 
      5                      E2Y      ,E3Y     ,E1Z     ,E2Z    ,E3Z          ,
-     6                      DIR_A    ,DIR_B    )		
+     6                      DIR_A    ,DIR_B    )
 
                       JJ = JJ + 1
                       WA(JJ) = -ONE
@@ -1469,7 +1515,7 @@ c
 c
                       JJ = JJ + 1
                       IF (GBUF%G_PLA > 0) THEN    
-            	        WA(JJ) = LBUF%PLA(I)
+                  WA(JJ) = LBUF%PLA(I)
                       ELSE                         
                         WA(JJ) = ZERO              
                       ENDIF 
@@ -1502,7 +1548,7 @@ c
      3                      RX       ,RY      ,RZ      ,SX     ,SY           ,  
      4                      SZ       ,E1X     ,E2X     ,E3X    ,E1Y          , 
      5                      E2Y      ,E3Y     ,E1Z     ,E2Z    ,E3Z          ,
-     6                      DIR_A    ,DIR_B    )		
+     6                      DIR_A    ,DIR_B    )
 
                       JJ = JJ + 1
                       WA(JJ) = ZERO
@@ -1521,7 +1567,7 @@ c
 c
                       JJ = JJ + 1
                       IF (GBUF%G_PLA > 0) THEN    
-            	        WA(JJ) = LBUF%PLA(I)
+                  WA(JJ) = LBUF%PLA(I)
                       ELSE                         
                         WA(JJ) = ZERO              
                       ENDIF    
@@ -1554,7 +1600,7 @@ c
      3                      RX       ,RY      ,RZ      ,SX     ,SY           ,  
      4                      SZ       ,E1X     ,E2X     ,E3X    ,E1Y          , 
      5                      E2Y      ,E3Y     ,E1Z     ,E2Z    ,E3Z          ,
-     6                      DIR_A    ,DIR_B    )		
+     6                      DIR_A    ,DIR_B    )
 
                       JJ = JJ + 1
                       WA(JJ) = ONE
@@ -1573,7 +1619,7 @@ c
 c
                       JJ = JJ + 1
                       IF (GBUF%G_PLA > 0) THEN    
-            	        WA(JJ) = LBUF%PLA(I)
+                  WA(JJ) = LBUF%PLA(I)
                       ELSE                         
                         WA(JJ) = ZERO              
                       ENDIF                              
@@ -1599,10 +1645,10 @@ c
                     DO IR=1,NPTR                                                         
                       LBUF => BUFLY%LBUF(IR,IS,IT)
                       IPG = NPTR*(IS-1) + IR
-                      SIG(1) = LBUF%SIG(KK(1)+I)			
-                      SIG(2) = LBUF%SIG(KK(2)+I)			
-                      SIG(3) = LBUF%SIG(KK(3)+I)			
-                      SIG(4) = LBUF%SIG(KK(4)+I)			
+                      SIG(1) = LBUF%SIG(KK(1)+I)
+                      SIG(2) = LBUF%SIG(KK(2)+I)
+                      SIG(3) = LBUF%SIG(KK(3)+I)
+                      SIG(4) = LBUF%SIG(KK(4)+I)
                       SIG(5) = LBUF%SIG(KK(5)+I)
                       SIG(6) = ZERO    
 C
@@ -1610,10 +1656,10 @@ C                 viscous stress added for animation
 C 
                      IF (IVISC > 0) THEN
 
-                      SIG(1) = SIG(1) + LBUF%VISC(KK(1)+I)			
-                      SIG(2) = SIG(2) + LBUF%VISC(KK(2)+I)			
-                      SIG(3) = SIG(3) + LBUF%VISC(KK(3)+I)			
-                      SIG(4) = SIG(4) + LBUF%VISC(KK(4)+I)			
+                      SIG(1) = SIG(1) + LBUF%VISC(KK(1)+I)
+                      SIG(2) = SIG(2) + LBUF%VISC(KK(2)+I)
+                      SIG(3) = SIG(3) + LBUF%VISC(KK(3)+I)
+                      SIG(4) = SIG(4) + LBUF%VISC(KK(4)+I)
                       SIG(5) = SIG(5) + LBUF%VISC(KK(5)+I)
 
                      ENDIF  !  IF (IVISC > 0)
@@ -1627,7 +1673,7 @@ C
      3                      RX       ,RY      ,RZ      ,SX     ,SY           ,  
      4                      SZ       ,E1X     ,E2X     ,E3X    ,E1Y          , 
      5                      E2Y      ,E3Y     ,E1Z     ,E2Z    ,E3Z          ,
-     6                      DIR_A    ,DIR_B    )			
+     6                      DIR_A    ,DIR_B    )
 
                       JJ = JJ + 1
                       WA(JJ) = TWO * POSLY(I,IT)
@@ -1643,14 +1689,14 @@ C
                       WA(JJ) = SIG(5)
                       JJ = JJ + 1
                       WA(JJ) = SIG(6)
-            	      JJ = JJ + 1
+                JJ = JJ + 1
                       IF (BUFLY%L_PLA > 0) THEN
                         WA(JJ) = LBUF%PLA(I)
                       ELSE
                         WA(JJ) = ZERO
                       ENDIF
                     ENDDO      
-                  ENDDO	    
+                  ENDDO      
                 ENDDO  !  DO IPT = 1,NPTT
 
               ELSE
@@ -1663,10 +1709,10 @@ C
                       LBUF => BUFLY%LBUF(IPG,1,IT)
                       L_PLA = BUFLY%L_PLA
 
-                      SIG(1) = LBUF%SIG(KK(1)+I)			
-                      SIG(2) = LBUF%SIG(KK(2)+I)			
-                      SIG(3) = LBUF%SIG(KK(3)+I)			
-                      SIG(4) = LBUF%SIG(KK(4)+I)			
+                      SIG(1) = LBUF%SIG(KK(1)+I)
+                      SIG(2) = LBUF%SIG(KK(2)+I)
+                      SIG(3) = LBUF%SIG(KK(3)+I)
+                      SIG(4) = LBUF%SIG(KK(4)+I)
                       SIG(5) = LBUF%SIG(KK(5)+I)
                       SIG(6) = ZERO    
 C
@@ -1674,10 +1720,10 @@ C                 viscous stress added for animation
 C 
                      IF (IVISC > 0) THEN
 
-                      SIG(1) = SIG(1) + LBUF%VISC(KK(1)+I)			
-                      SIG(2) = SIG(2) + LBUF%VISC(KK(2)+I)			
-                      SIG(3) = SIG(3) + LBUF%VISC(KK(3)+I)			
-                      SIG(4) = SIG(4) + LBUF%VISC(KK(4)+I)			
+                      SIG(1) = SIG(1) + LBUF%VISC(KK(1)+I)
+                      SIG(2) = SIG(2) + LBUF%VISC(KK(2)+I)
+                      SIG(3) = SIG(3) + LBUF%VISC(KK(3)+I)
+                      SIG(4) = SIG(4) + LBUF%VISC(KK(4)+I)
                       SIG(5) = SIG(5) + LBUF%VISC(KK(5)+I)
 
                      ENDIF  !  IF (IVISC > 0)
@@ -1691,7 +1737,7 @@ C
      3                      RX       ,RY      ,RZ      ,SX     ,SY           ,  
      4                      SZ       ,E1X     ,E2X     ,E3X    ,E1Y          , 
      5                      E2Y      ,E3Y     ,E1Z     ,E2Z    ,E3Z          ,
-     6                      DIR_A    ,DIR_B    )				
+     6                      DIR_A    ,DIR_B    )
                       JJ = JJ + 1
                       WA(JJ) = TWO * POSLY(I,IPTT)
                       JJ = JJ + 1
@@ -1739,35 +1785,52 @@ C       recopying for code simplification
           WAP0(J)=WA(J)
         ENDDO
         PTWA_P0(0)=0
-        DO N=1,DYNAIN_NUMELTG
+        DO N=1,DYNAIN_DATA%DYNAIN_NUMELTG
           PTWA_P0(N)=PTWA(N)
         ENDDO
       ELSE
 C      Global pointers WAP0
-        CALL SPMD_STAT_PGATHER(PTWA,DYNAIN_NUMELTG,PTWA_P0,DYNAIN_NUMELTG_G)
+        CALL SPMD_STAT_PGATHER(PTWA,DYNAIN_DATA%DYNAIN_NUMELTG,PTWA_P0,DYNAIN_DATA%DYNAIN_NUMELTG_G)
         LEN = 0
         CALL SPMD_RGATHER9_DP(WA,JJ,WAP0,SIZP0,LEN)
       ENDIF
 
       IF (ISPMD == 0.AND.LEN > 0) THEN
         IF(IS_WRITTEN == 0 ) THEN
-          WRITE(IUDYNAIN,'(A)') DELIMIT
-          WRITE(IUDYNAIN,'(A)')'*INITIAL_STRESS_SHELL'
-          WRITE(IUDYNAIN,'(A)')
-     .    '$  SHELLID       NPG     NBINT                         LARGE  ' 
-          WRITE(IUDYNAIN,'(A)')
-     .     '$ IF(NPT == 0), REPEAT I=1,NPG :'
-          WRITE(IUDYNAIN,'(A)')
-     .    '$ IF(NPT /= 0) REPEAT K=1,NPT : REPEAT I=1,NPG :'      
-          WRITE(IUDYNAIN,'(A)')
-     .     '$         T    SIGXX     SIGYY     SIGZZ     SIGXY     SIGYZ     SIGZX       EPSP '
-          WRITE(IUDYNAIN,'(A)') DELIMIT
-
+          IF(DYNAIN_DATA%ZIPDYNAIN==0) THEN       
+            WRITE(IUDYNAIN,'(A)') DELIMIT
+            WRITE(IUDYNAIN,'(A)')'*INITIAL_STRESS_SHELL'
+            WRITE(IUDYNAIN,'(A)')
+     .       '$  SHELLID       NPG     NBINT                         LARGE  ' 
+            WRITE(IUDYNAIN,'(A)')
+     .       '$ IF(NPT == 0), REPEAT I=1,NPG :'
+            WRITE(IUDYNAIN,'(A)')
+     .       '$ IF(NPT /= 0) REPEAT K=1,NPT : REPEAT I=1,NPG :'      
+            WRITE(IUDYNAIN,'(A)')
+     .       '$         T    SIGXX     SIGYY     SIGZZ     SIGXY     SIGYZ     SIGZX       EPSP '
+            WRITE(IUDYNAIN,'(A)') DELIMIT
+          ELSE
+            WRITE(LINE,'(A)')'*INITIAL_STRESS_SHELL'
+            CALL STRS_TXT50(LINE,100)
+            WRITE(LINE,'(A)')
+     .       '$  SHELLID       NPG     NBINT                         LARGE  ' 
+            CALL STRS_TXT50(LINE,100)
+            WRITE(LINE,'(A)')
+     .       '$ IF(NPT == 0), REPEAT I=1,NPG :'
+            CALL STRS_TXT50(LINE,100)
+            WRITE(LINE,'(A)')
+     .       '$ IF(NPT /= 0) REPEAT K=1,NPT : REPEAT I=1,NPG :'  
+            CALL STRS_TXT50(LINE,100)    
+            WRITE(LINE,'(A)')
+     .       '$         T    SIGXX     SIGYY     SIGZZ     SIGXY     SIGYZ     SIGZX       EPSP '
+            CALL STRS_TXT50(LINE,100)
+            WRITE(LINE,'(A)') DELIMIT
+            CALL STRS_TXT50(LINE,100)
+          ENDIF
           IS_WRITTEN = 1
-
          ENDIF
 
-        DO N=1,DYNAIN_NUMELTG_G
+        DO N=1,DYNAIN_DATA%DYNAIN_NUMELTG_G
 C         Retrieving shell ID in increasing order 
           K=DYNAIN_INDXTG(N)
 C         Adress in  WAP0
@@ -1780,21 +1843,38 @@ C
             NPG = NINT(WAP0(J + 4)) 
             LARGE = NINT(WAP0(J + 5)) 
             J = J + 5
-
-            WRITE(IUDYNAIN,'(3I10,20X,I10)')ID,NPG,NPT,LARGE
+            IF(DYNAIN_DATA%ZIPDYNAIN==0) THEN       
+              WRITE(IUDYNAIN,'(3I8,16X,I8)')ID,NPG,NPT,LARGE
+            ELSE
+              WRITE(LINE,'(3I8,16X,I8)')ID,NPG,NPT,LARGE
+              CALL STRS_TXT50(LINE,100)
+            ENDIF
             IF (NPT == 0) THEN
               DO IPG=1,NPG
-                WRITE(IUDYNAIN,'(1P5G16.9)')(WAP0(JJ + K),K=1,5)
-                WRITE(IUDYNAIN,'(1P3G16.9)')(WAP0(JJ + K),K=6,8)
+                IF(DYNAIN_DATA%ZIPDYNAIN==0) THEN       
+                  WRITE(IUDYNAIN,'(1P5G16.9)')(WAP0(JJ + K),K=1,5)
+                  WRITE(IUDYNAIN,'(1P3G16.9)')(WAP0(JJ + K),K=6,8)
+                ELSE
+                  WRITE(LINE,'(1P5G16.9)')(WAP0(JJ + K),K=1,5)
+                  CALL STRS_TXT50(LINE,100)
+                  WRITE(LINE,'(1P3G16.9)')(WAP0(JJ + K),K=6,8)
+                  CALL STRS_TXT50(LINE,100)
+                ENDIF
                 J = J + 8
               ENDDO
             ELSE
               DO IPT=1,NPT 
                 DO IPG=1,NPG
-
-                   WRITE(IUDYNAIN,'(1P5G16.9)')(WAP0(J + K),K=1,5)
-                   WRITE(IUDYNAIN,'(1P3G16.9)')(WAP0(J + K),K=6,8)
-                   J = J + 8
+                  IF(DYNAIN_DATA%ZIPDYNAIN==0) THEN       
+                    WRITE(IUDYNAIN,'(1P5G16.9)')(WAP0(J + K),K=1,5)
+                    WRITE(IUDYNAIN,'(1P3G16.9)')(WAP0(J + K),K=6,8)
+                  ELSE
+                    WRITE(LINE,'(1P5G16.9)')(WAP0(J + K),K=1,5)
+                    CALL STRS_TXT50(LINE,100)
+                    WRITE(LINE,'(1P3G16.9)')(WAP0(J + K),K=6,8)
+                    CALL STRS_TXT50(LINE,100)
+                  ENDIF
+                  J = J + 8
                 ENDDO
               ENDDO
 
@@ -1803,6 +1883,9 @@ C
         ENDDO  !  DO N=1,DYNAIN_NUMELTG_G
       ENDIF  !  IF (ISPMD == 0.AND.LEN > 0)
 C
+      DEALLOCATE( THKLY,POSLY)
+      DEALLOCATE( THK_LY)
+
       DEALLOCATE(PTWA,PTWA_P0)
 C
       RETURN

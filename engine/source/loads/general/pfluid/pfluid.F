@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -28,12 +28,13 @@ Chd|-- calls ---------------
 Chd|        FINTER                        source/tools/curve/finter.F   
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
+Chd|        TH_SURF_MOD                   ../common_source/modules/interfaces/th_surf_mod.F
 Chd|====================================================================
-      SUBROUTINE PFLUID(ILOADP     ,RLOAD   ,NPC    ,TF     ,A       ,
-     2                  V          ,X       ,XFRAME ,AR     ,VR      ,
-     3                  SENSOR_TAB ,WEIGHT  ,TFEXC  ,IADC   ,
-     4                  FSKY       ,FSKYV   ,LLOADP ,FEXT   ,H3D_DATA
-     5                  )
+      SUBROUTINE PFLUID(ILOADP     ,RLOAD   ,NPC    ,TF     ,A          ,
+     2                  V          ,X       ,XFRAME ,       
+     3                  NSENSOR    ,SENSOR_TAB ,TFEXC,IADC       ,
+     4                  FSKY       ,FSKYV   ,LLOADP ,FEXT   ,H3D_DATA   ,
+     5                  TH_SURF    ,FSAVSURF,NSEG_LOADP)
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C----------------------------------------------- 
@@ -73,6 +74,7 @@ C   M o d u l e s
 C----------------------------------------------- 
       USE H3D_MOD 
       USE SENSOR_MOD
+      USE TH_SURF_MOD , ONLY : TH_SURF_
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -86,12 +88,9 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "com06_c.inc"
 #include      "com08_c.inc"
-#include      "scr05_c.inc"
-#include      "task_c.inc"
 #include      "parit_c.inc"
 #include      "scr14_c.inc"
 #include      "scr16_c.inc"
-#include      "scr17_c.inc"
 #include      "tabsiz_c.inc"
 #include      "mvsiz_p.inc"
 C-----------------------------------------------
@@ -102,24 +101,28 @@ C-----------------------------------------------
 C-----------------------------------------------,
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER ,INTENT(IN) :: NSENSOR
       INTEGER NPC(SNPC),LLOADP(SLLOADP)
       INTEGER ILOADP(SIZLOADP,NLOADP)
-      INTEGER WEIGHT(SWEIGHT), IADC(DSNCOL)
-      my_real RLOAD(LFACLOAD,NLOADP), TF(STF), A(3,NUMNOD), V(3,NUMNOD), AR(3,NUMNOD), VR(3,NUMNOD),
+      INTEGER IADC(DSNCOL)
+      my_real RLOAD(LFACLOAD,NLOADP), TF(STF), A(3,NUMNOD), V(3,NUMNOD),
      .        X(3,NUMNOD), XFRAME(NXFRAME,NUMFRAM+1),TFEXC,
      .        FSKY(8,SFSKY/8), FSKYV(SFSKY/8,8),FEXT(3,NUMNOD)
       TYPE(H3D_DATABASE) :: H3D_DATA
       TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) ,INTENT(IN) :: SENSOR_TAB
+      TYPE (TH_SURF_) , INTENT(IN) :: TH_SURF
+      my_real, INTENT(INOUT) :: FSAVSURF(5,NSURF)
+      INTEGER, INTENT(INOUT) :: NSEG_LOADP(NSURF)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NL, N1, ISK, N2, N3, N4, FUN_HSP, K1, K2, K3, ISENS,K,LL,
-     .        IERR,ICODE,IAD,N_OLD,IFRA1,N1FRAM,DIR_HSP,I,
-     .        FUN_CX,FUN_VEL,DIR_VEL,IFRA2, IANIM,IJK,UP_BOUND
-      my_real NX, NY, NZ, AXI, AA, A0, VV, FX, FY, FZ, AX, DYDX, TS,
-     .        SIXTH,TFEXTT,X_OLD, F1, F2,XSENS,FCX,FCY, VSEGX, VSEGY, VSEGZ,
-     .        FCX1,FCY1,FCX2,FCY2,VX,VY,VZ,VEL,VSEG,FINTER,
-     .        CENTROID_DEPTH,YMEAN,ZMEAN,PVEL,NORM,NSIGN,AREA
+      INTEGER NL, N1, N2, N3, N4, FUN_HSP, K1, K2, K3, ISENS,K,
+     .        IAD,N_OLD,IFRA1,DIR_HSP,I,
+     .        FUN_CX,FUN_VEL,DIR_VEL,IFRA2, IANIM,IJK,UP_BOUND,NS,KSURF,NSEGPL
+      my_real NX, NY, NZ, AA,FX, FY, FZ, DYDX, TS,
+     .        SIXTH,TFEXTT,X_OLD,XSENS,FCX,FCY,
+     .        FCX1,FCY1,FCX2,FCY2,VEL,VSEG,FINTER,
+     .        CENTROID_DEPTH,PVEL,NORM,NSIGN,AREA,PA
       EXTERNAL FINTER
 C-----------------------------------------------
 C   S o u r c e   L i n e s
@@ -131,6 +134,7 @@ C-----------------------------------------------
       TFEXTT = ZERO
       N_OLD  = 0
       X_OLD  = ZERO
+      NSEGPL = 0
       IANIM  = ANIM_V(5)+OUTP_V(5) + H3D_DATA%N_VECT_FINT + ANIM_V(6)+OUTP_V(6) + H3D_DATA%N_VECT_FEXT
 
 C---------------------------------------
@@ -197,7 +201,8 @@ C---------------------------------------
               NY=(X(3,N3)-X(3,N1))*(X(1,N4)-X(1,N2)) - (X(1,N3)-X(1,N1))*(X(3,N4)-X(3,N2))        
               NZ=(X(1,N3)-X(1,N1))*(X(2,N4)-X(2,N2)) - (X(2,N3)-X(2,N1))*(X(1,N4)-X(1,N2))        
               NORM = SQRT(NX*NX+NY*NY+NZ*NZ)                                                       
-              AREA = HALF * NORM                                                                   
+              AREA = HALF * NORM 
+              PA = AA                                                                  
               AA = AA * AREA                                                                                                                                                                      
               
               !face velocity
@@ -274,7 +279,17 @@ C---------------------------------------
                 FEXT(1,N4) = FEXT(1,N4)+FX                                                         
                 FEXT(2,N4) = FEXT(2,N4)+FY                                                         
                 FEXT(3,N4) = FEXT(3,N4)+FZ  
-              ENDIF                                                         
+              ENDIF  
+C 
+             IF(TH_SURF%LOADP_FLAG >0 ) THEN
+                NSEGPL = NSEGPL + 1
+                DO NS=TH_SURF%LOADP_KSEGS(NSEGPL) +1,TH_SURF%LOADP_KSEGS(NSEGPL+1)
+                   KSURF = TH_SURF%LOADP_SEGS(NS)
+                   NSEG_LOADP(KSURF) = NSEG_LOADP(KSURF) + 1
+                   FSAVSURF(4,KSURF)= FSAVSURF(4,KSURF) + PA
+                   FSAVSURF(5,KSURF)= FSAVSURF(5,KSURF) + AREA
+                ENDDO
+             ENDIF                                                     
 #include "lockoff.inc"                                                                    
     
 
@@ -316,7 +331,8 @@ C---------------------------------------
               NY   = (X(3,N3)-X(3,N1))*(X(1,N3)-X(1,N2)) - (X(1,N3)-X(1,N1))*(X(3,N3)-X(3,N2))                                                                                                                         
               NZ   = (X(1,N3)-X(1,N1))*(X(2,N3)-X(2,N2)) - (X(2,N3)-X(2,N1))*(X(1,N3)-X(1,N2))                                                                                                                         
               NORM = SQRT(NX*NX+NY*NY+NZ*NZ)                                                                                                                                                                           
-              AREA = HALF * NORM                                                                                                                                                                                       
+              AREA = HALF * NORM   
+              PA = AA                                                                                                                                                                                    
               AA = AA * AREA                                                                                                                                                                                           
 
               !face velocity                                                                                                                                                                                           
@@ -387,6 +403,18 @@ C---------------------------------------
                 FEXT(3,N3) = FEXT(3,N3)+FZ                                     
 #include "lockoff.inc"                                                                    
               ENDIF        
+C
+             IF(TH_SURF%LOADP_FLAG >0 ) THEN
+                NSEGPL = NSEGPL + 1
+                DO NS=TH_SURF%LOADP_KSEGS(NSEGPL) +1,TH_SURF%LOADP_KSEGS(NSEGPL+1)
+#include "lockon.inc"
+                   KSURF = TH_SURF%LOADP_SEGS(NS)
+                   NSEG_LOADP(KSURF) = NSEG_LOADP(KSURF) + 1
+                   FSAVSURF(4,KSURF)= FSAVSURF(4,KSURF) + PA
+                   FSAVSURF(5,KSURF)= FSAVSURF(5,KSURF) + AREA
+#include "lockoff.inc"                                                                    
+                ENDDO
+             ENDIF  
                                                        
             ENDIF! quadrangle / triangle                                                                                  
           ENDDO !next I   
@@ -495,6 +523,7 @@ C---------------------------------------
                NZ   = (X(1,N3)-X(1,N1))*(X(2,N4)-X(2,N2))-(X(2,N3)-X(2,N1))*(X(1,N4)-X(1,N2))
                NORM = SQRT(NX*NX+NY*NY+NZ*NZ)
                AREA = HALF * NORM
+               PA = AA
                AA = AA * AREA
 
                !structural face velocity
@@ -578,8 +607,20 @@ C---------------------------------------
                 FEXT(2,N4) = FEXT(2,N4)+FY                                                         
                 FEXT(3,N4) = FEXT(3,N4)+FZ                                      
 #include "lockoff.inc"                                                                    
+              ENDIF 
+C 
+              IF(TH_SURF%LOADP_FLAG >0 ) THEN
+                NSEGPL = NSEGPL + 1
+                DO NS=TH_SURF%LOADP_KSEGS(NSEGPL) +1,TH_SURF%LOADP_KSEGS(NSEGPL+1)
+#include "lockon.inc"
+                   KSURF = TH_SURF%LOADP_SEGS(NS)
+                   NSEG_LOADP(KSURF) = NSEG_LOADP(KSURF) + 1
+                   FSAVSURF(4,KSURF)= FSAVSURF(4,KSURF) + PA
+                   FSAVSURF(5,KSURF)= FSAVSURF(5,KSURF) + AREA
+#include "lockoff.inc"                                                                    
+                ENDDO
               ENDIF       
-
+C
              ELSE
 
               !---TRIANGLE--------------------------------------------                                                                                                     
@@ -620,6 +661,7 @@ C---------------------------------------
                NZ   = (X(1,N3)-X(1,N1))*(X(2,N3)-X(2,N2))-(X(2,N3)-X(2,N1))*(X(1,N3)-X(1,N2))
                NORM = SQRT(NX*NX+NY*NY+NZ*NZ)
                AREA = HALF * NORM
+               PA = AA
                AA = AA * AREA
 
                !structural face velocity
@@ -693,8 +735,20 @@ C---------------------------------------
                 FEXT(2,N3) = FEXT(2,N3)+FY                                                         
                 FEXT(3,N3) = FEXT(3,N3)+FZ                                  
 #include "lockoff.inc"                                                                    
-              ENDIF  
-                   
+              ENDIF
+C 
+              IF(TH_SURF%LOADP_FLAG >0 ) THEN
+                NSEGPL = NSEGPL + 1
+                DO NS=TH_SURF%LOADP_KSEGS(NSEGPL) +1,TH_SURF%LOADP_KSEGS(NSEGPL+1)
+#include "lockon.inc"
+                   KSURF = TH_SURF%LOADP_SEGS(NS)
+                   NSEG_LOADP(KSURF) = NSEG_LOADP(KSURF) + 1
+                   FSAVSURF(4,KSURF)= FSAVSURF(4,KSURF) + PA
+                   FSAVSURF(5,KSURF)= FSAVSURF(5,KSURF) + AREA
+#include "lockoff.inc"                                                                    
+                ENDDO
+              ENDIF       
+C                   
              ENDIF
            ENDDO!next I
 !$OMP END DO           
@@ -771,6 +825,7 @@ C-----------------------------------
                NZ   = (X(1,N3)-X(1,N1))*(X(2,N4)-X(2,N2)) - (X(2,N3)-X(2,N1))*(X(1,N4)-X(1,N2))
                NORM = SQRT(NX*NX+NY*NY+NZ*NZ)
                AREA = HALF * NORM
+               PA = AA
                AA = AA * AREA
 
                !structural face velocity
@@ -855,6 +910,18 @@ C-----------------------------------
                 FEXT(3,N4) = FEXT(3,N4)+FZ                                      
 #include "lockoff.inc"                                                                    
               ENDIF       
+C 
+              IF(TH_SURF%LOADP_FLAG >0 ) THEN
+                NSEGPL = NSEGPL + 1
+                DO NS=TH_SURF%LOADP_KSEGS(NSEGPL) +1,TH_SURF%LOADP_KSEGS(NSEGPL+1)
+#include "lockon.inc"
+                   KSURF = TH_SURF%LOADP_SEGS(NS)
+                   NSEG_LOADP(KSURF) = NSEG_LOADP(KSURF) + 1
+                   FSAVSURF(4,KSURF)= FSAVSURF(4,KSURF) + PA
+                   FSAVSURF(5,KSURF)= FSAVSURF(5,KSURF) + AREA
+#include "lockoff.inc"                                                                    
+                ENDDO
+              ENDIF 
                
              ELSE
 
@@ -896,6 +963,7 @@ C-----------------------------------
                NZ   = (X(1,N3)-X(1,N1))*(X(2,N3)-X(2,N2)) - (X(2,N3)-X(2,N1))*(X(1,N3)-X(1,N2))
                NORM = SQRT(NX*NX+NY*NY+NZ*NZ)
                AREA = HALF * NORM
+               PA = AA
                AA = AA * AREA
 
                !structural face velocity
@@ -970,7 +1038,19 @@ C-----------------------------------
                  FEXT(3,N3) = FEXT(3,N3)+FZ
 #include "lockoff.inc"                 
                ENDIF
-               
+C 
+              IF(TH_SURF%LOADP_FLAG >0 ) THEN
+                NSEGPL = NSEGPL + 1
+                DO NS=TH_SURF%LOADP_KSEGS(NSEGPL) +1,TH_SURF%LOADP_KSEGS(NSEGPL+1)
+#include "lockon.inc"
+                   KSURF = TH_SURF%LOADP_SEGS(NS)
+                   NSEG_LOADP(KSURF) = NSEG_LOADP(KSURF) + 1
+                   FSAVSURF(4,KSURF)= FSAVSURF(4,KSURF) + PA
+                   FSAVSURF(5,KSURF)= FSAVSURF(5,KSURF) + AREA
+#include "lockoff.inc"                                                                    
+                ENDDO
+              ENDIF 
+                
                !external force work
                TFEXTT=TFEXTT+DT1*(FX*(V(1,N1)+V(1,N2)+V(1,N3))
      +                           +FY*(V(2,N1)+V(2,N2)+V(2,N3))

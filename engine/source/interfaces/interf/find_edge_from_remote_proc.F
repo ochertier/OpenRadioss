@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -53,13 +53,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "task_c.inc"
-#include      "scr05_c.inc"
 #include      "com04_c.inc"
-#include      "com01_c.inc"
 #include      "param_c.inc"
 #include      "scr17_c.inc"
-#include      "rnur_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -69,22 +65,22 @@ C-----------------------------------------------
         TYPE(shooting_node_type), INTENT(inout) :: SHOOT_STRUCT ! structure for shooting node algo  
         TYPE(INTBUF_STRUCT_), DIMENSION(NINTER), INTENT(inout) :: INTBUF_TAB    ! interface data         
          INTEGER, DIMENSION(NINTER), INTENT(inout) :: NEWFRONT   ! array for sorting : 1 --> need to sort the interface NIN
-        INTEGER, DIMENSION(NIXS,NUMELS),TARGET, INTENT(in) :: IXS   ! solid array
-        INTEGER, DIMENSION(NIXC,NUMELC),TARGET, INTENT(in) :: IXC   ! shell array
-        INTEGER, DIMENSION(NIXT,NUMELT),TARGET, INTENT(in) :: IXT! truss array
-        INTEGER, DIMENSION(NIXP,NUMELP),TARGET, INTENT(in) :: IXP! beam array
-        INTEGER, DIMENSION(NIXR,NUMELR),TARGET, INTENT(in) :: IXR! spring array
-        INTEGER, DIMENSION(NIXTG,NUMELTG),TARGET, INTENT(in) :: IXTG! triangle array
+        INTEGER, DIMENSION(NIXS,NUMELS), INTENT(in) :: IXS   ! solid array
+        INTEGER, DIMENSION(NIXC,NUMELC), INTENT(in) :: IXC   ! shell array
+        INTEGER, DIMENSION(NIXT,NUMELT), INTENT(in) :: IXT! truss array
+        INTEGER, DIMENSION(NIXP,NUMELP), INTENT(in) :: IXP! beam array
+        INTEGER, DIMENSION(NIXR,NUMELR), INTENT(in) :: IXR! spring array
+        INTEGER, DIMENSION(NIXTG,NUMELTG), INTENT(in) :: IXTG! triangle array
         INTEGER, DIMENSION(0:NUMNOD+1), INTENT(in) :: ADDCNEL ! address for the CNEL array
         INTEGER, DIMENSION(NPARI,NINTER), INTENT(in) :: IPARI
         my_real, DIMENSION(NPROPG,NUMGEO), INTENT(in) :: GEO
         INTEGER, DIMENSION(0:LCNEL), INTENT(in) :: CNEL ! connectivity node-->element
         INTEGER, DIMENSION(NUMNOD), INTENT(inout) :: TAG_NODE
-        INTEGER, DIMENSION(NUMELS+NUMELQ+NUMELC+NUMELT+NUMELP+NUMELR+NUMELTG+NUMELUR), INTENT(inout) :: TAG_ELEM
+        INTEGER, DIMENSION(NUMELS+NUMELQ+NUMELC+NUMELT+NUMELP+NUMELR+NUMELTG), INTENT(inout) :: TAG_ELEM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-        INTEGER :: I,J,K,NODE_ID
+        INTEGER :: I,J,NODE_ID
         INTEGER :: MY_SIZE
         INTEGER :: NB_EDGE_R_PROC_M,NB_EDGE_R_PROC_S
         INTEGER, DIMENSION(2) :: LOCAL_NODE,GLOBAL_NODE
@@ -205,7 +201,7 @@ C-----------------------------------------------
      .                         LIST_EDGE_R_PROC(1),LIST_EDGE_R_PROC(1+NB_EDGE_R_PROC_M),
      .                         SHOOT_STRUCT%SHIFT_INTERFACE,INTBUF_TAB,NEWFRONT,IPARI,GEO,
      .                         IXS,IXC,IXT,IXP,IXR,IXTG,
-     .                         ADDCNEL,ITABM1,CNEL,TAG_NODE,TAG_ELEM,SHOOT_STRUCT )
+     .                         ADDCNEL,CNEL,TAG_NODE,TAG_ELEM,SHOOT_STRUCT )
 
         DEALLOCATE( LIST_EDGE_R_PROC )
         DEALLOCATE( RESULT_INTERSECT )

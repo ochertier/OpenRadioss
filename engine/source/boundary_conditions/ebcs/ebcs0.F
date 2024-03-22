@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,8 +25,8 @@ Chd|  EBCS0                         source/boundary_conditions/ebcs/ebcs0.F
 Chd|-- called by -----------
 Chd|        EBCS_MAIN                     source/boundary_conditions/ebcs/ebcs_main.F
 Chd|-- calls ---------------
-Chd|        EBCS_MOD                      ../common_source/modules/ebcs_mod.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        EBCS_MOD                      ../common_source/modules/boundary_conditions/ebcs_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        SEGVAR_MOD                    share/modules/segvar_mod.F    
 Chd|====================================================================
       SUBROUTINE EBCS0(NSEG,ISEG,SEGVAR,
@@ -53,7 +53,6 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
-#include      "conv_c.inc"
 #include      "scr11_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -118,7 +117,7 @@ C
         N4=IRECT(4,IS)
         IF(N4==0 .OR. N4==N3) THEN
           FAC=ONE_OVER_6*ORIENT
-	         N4=N3
+                   N4=N3
         ELSE
           FAC=ONE_OVER_8*ORIENT
         ENDIF

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>    
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,14 +21,12 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
 C.../SCR16/
-C...recopie par defaut en spmd
       COMMON /SCR16R/ DTOUTP0,TOUTP0
       my_real
      .    DTOUTP0,TOUTP0
 C
       INTEGER MX_OUTP,MX_OUTP2
       PARAMETER (MX_OUTP = 140,MX_OUTP2 = 50000)
-C...recopie par defaut en spmd
       COMMON /SCR16/NV_OUTP,OUTP_V(MX_OUTP),NN_OUTP,OUTP_N(MX_OUTP),
      .        NSS_OUTP,OUTP_SS(MX_OUTP),NCS_OUTP,OUTP_CS(MX_OUTP),
      .        NTS_OUTP,OUTP_TS(MX_OUTP),NPS_OUTP,OUTP_PS(MX_OUTP),
@@ -37,8 +35,7 @@ C...recopie par defaut en spmd
      .        NTT_OUTP,OUTP_TT(MX_OUTP),NPT_OUTP,OUTP_PT(MX_OUTP),
      .        NRT_OUTP,OUTP_RT(MX_OUTP),IOUTP_FMT,OUTYY_FMT,
      .        NSPS_OUTP,OUTP_SPS(MX_OUTP),NSPT_OUTP,OUTP_SPT(MX_OUTP),
-     .        IROOTYY,IDROT,MOUTPT,MOUTP(MX_OUTP2),NOUTPSENS,
-     .        LOUTPSENS(MX_OUTP2),NOUTPSENS_OLD,LOUTPSENS_OLD(MX_OUTP2),
+     .        IROOTYY,IDROT,MOUTPT,MOUTP(MX_OUTP2),
      .        IROOTYY_R,S0FILE
       INTEGER NV_OUTP,OUTP_V,NN_OUTP,OUTP_N,
      .        NSS_OUTP,OUTP_SS,NCS_OUTP,OUTP_CS,
@@ -48,8 +45,7 @@ C...recopie par defaut en spmd
      .        NTT_OUTP,OUTP_TT,NPT_OUTP,OUTP_PT,
      .        NRT_OUTP,OUTP_RT,IOUTP_FMT,OUTYY_FMT,
      .        NSPS_OUTP,OUTP_SPS,NSPT_OUTP,OUTP_SPT, 
-     .        IROOTYY,IDROT,MOUTPT,MOUTP,NOUTPSENS,LOUTPSENS,
-     .        NOUTPSENS_OLD,LOUTPSENS_OLD,IROOTYY_R
+     .        IROOTYY,IDROT,MOUTPT,MOUTP,IROOTYY_R
       CHARACTER S0FILE*500
  
 C.../SCR16_STATR/
@@ -64,18 +60,15 @@ C.../SCR16_STATI/
      .              STAT_NUMELC_G,STAT_NUMELTG_G,
      .              STAT_S(MX_STAT),STAT_NUMELS,STAT_NUMELT,
      .              STAT_NUMELS_G,STAT_NUMELT_G,
-     .              STAT_N(MX_STAT),MSTATT,MSTAT,NSTATSENS,LSTATSENS,
+     .              STAT_N(MX_STAT),MSTATT,MSTAT,
      .              STAT_NUMELR,STAT_NUMELR_G,STAT_R(MX_STAT),
      .              STAT_NUMELP,STAT_NUMELP_G,STAT_P(MX_STAT),
-     .              STAT_T(MX_STAT),NSTATALL,NSTATSENS_OLD,LSTATSENS_OLD,
-     .              IDYNAINF,DYNAIN_C(MX_DYNAIN),DYNAIN_CHECK
+     .              STAT_T(MX_STAT),NSTATALL
       INTEGER MX_STAT0,NSTATPRT,NC_STAT,STAT_C,
      .        STAT_NUMELC,STAT_NUMELTG,
      .        STAT_NUMELC_G,STAT_NUMELTG_G,
      .        STAT_S,STAT_NUMELS,STAT_NUMELT,
      .        STAT_NUMELS_G,STAT_NUMELT_G,
-     .        STAT_N,MSTATT,MSTAT(MX_STAT2),NSTATSENS,
-     .        LSTATSENS(MX_STAT2),STAT_NUMELR,STAT_NUMELR_G,STAT_R,
-     .        STAT_NUMELP,STAT_NUMELP_G,STAT_P,STAT_T,NSTATALL,
-     .        NSTATSENS_OLD,LSTATSENS_OLD(MX_STAT2),
-     .        IDYNAINF,DYNAIN_C,DYNAIN_CHECK
+     .        STAT_N,MSTATT,MSTAT(MX_STAT2),
+     .        STAT_NUMELR,STAT_NUMELR_G,STAT_R,
+     .        STAT_NUMELP,STAT_NUMELP_G,STAT_P,STAT_T,NSTATALL

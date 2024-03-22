@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -37,14 +37,15 @@ Chd|        SBULK3                        source/elements/solid/solide/sbulk3.F
 Chd|        SCMORTH3                      source/elements/thickshell/solidec/scmorth3.F
 Chd|        SCOOR3                        source/elements/solid/solide/scoor3.F
 Chd|        SCZERO3                       source/elements/thickshell/solidec/scinit3.F
-Chd|        SDLENSH                       source/elements/thickshell/solidec/scinit3.F
+Chd|        SDLENSH14                     source/elements/thickshell/solide8c/sdlensh14.F
 Chd|        SIGIN20B                      source/elements/solid/solide20/s20mass3.F
 Chd|        SMASS3                        source/elements/solid/solide/smass3.F
 Chd|        SRCOOR3                       source/elements/solid/solide/srcoor3.F
 Chd|        SVALUE0                       source/elements/thickshell/solidec/scinit3.F
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
 Chd|        DETONATORS_MOD                share/modules1/detonators_mod.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
+Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
       SUBROUTINE S8CINIT3(ELBUF_STR,MAS     ,IXS     ,PM       ,X        ,
@@ -54,14 +55,13 @@ Chd|====================================================================
      .                    IPART    ,
      .                    SIGSP    ,NSIGI   ,MSNF    ,MSSF     ,IPM      ,
      .                    IUSER    ,NSIGS   ,VOLNOD  ,BVOLNOD  ,VNS      ,
-     .		                  BNS      ,WMA     ,PTSOL   ,BUFMAT   ,MCP      ,
+     .                      BNS      ,WMA     ,PTSOL   ,BUFMAT   ,MCP      ,
      .                    MCPS     ,TEMP    ,NPF     ,TF       ,XREFS    ,
      .                    MSSA     ,STRSGLOB,STRAGLOB,ORTHOGLOB,FAIL_INI ,
-     .                    ILOADP   ,FACLOAD ,RNOISE  ,PERTURB  )
+     .                    ILOADP   ,FACLOAD ,RNOISE  ,PERTURB  ,MAT_PARAM)
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C   Initialize 8-nodes thick shell HA8
-C-----------------------------------------------
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -69,6 +69,7 @@ C-----------------------------------------------
       USE MESSAGE_MOD  
       USE DETONATORS_MOD                
       USE ALE_CONNECTIVITY_MOD
+      USE MATPARAM_DEF_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -80,17 +81,13 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "scr01_c.inc"
 #include      "scr03_c.inc"
 #include      "scr12_c.inc"
 #include      "scr17_c.inc"
 #include      "scry_c.inc"
-#include      "units_c.inc"
 #include      "vect01_c.inc"
-#include      "warn_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -109,8 +106,9 @@ C-----------------------------------------------
       TYPE(ELBUF_STRUCT_), TARGET :: ELBUF_STR
       INTEGER,INTENT(IN) :: ILOADP(SIZLOADP,*)
       my_real,INTENT(IN) :: FACLOAD(LFACLOAD,*)
-      TYPE(DETONATOR_STRUCT_)::DETONATORS
+      TYPE(DETONATORS_STRUCT_)::DETONATORS
       TYPE(t_ale_connectivity), INTENT(INOUT) :: ALE_CONNECTIVITY
+      TYPE (MATPARAM_STRUCT_) ,DIMENSION(NUMMAT) ,INTENT(INOUT) :: MAT_PARAM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -294,7 +292,7 @@ c
         MTN0  = MTN
         DO I=1,NEL
           MAT0(I) = MAT(I)
-       	  DTX0(I) = EP20
+            DTX0(I) = EP20
         ENDDO
       END SELECT
 c
@@ -306,10 +304,10 @@ c
      .     YD1  ,YD2  ,YD3  ,YD4  ,YD5  ,YD6  ,YD7  ,YD8   ,
      .     ZD1  ,ZD2  ,ZD3  ,ZD4  ,ZD5  ,ZD6  ,ZD7  ,ZD8   )
       IF (IDTTSH > 0) THEN
-         CALL SDLENSH(NEL,LLSH,
+         CALL SDLENSH14(NEL,LLSH,
      .   X1, X2, X3, X4, X5, X6, X7, X8,
      .   Y1, Y2, Y3, Y4, Y5, Y6, Y7, Y8,
-     .   Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8)
+     .   Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8,ICSTR,IDT1SOL)
       END IF        
 C
       IP=0
@@ -343,7 +341,6 @@ C-----------
           L_PLA = ELBUF_STR%BUFLY(IL)%L_PLA
           L_SIGB= ELBUF_STR%BUFLY(IL)%L_SIGB
 C
-         IF (IGTYP == 21.OR.IGTYP == 22) THEN
           IF (IGTYP == 22) THEN
             WT = GEO(IPTHK+IL,IG)
             ZZ = GEO(IPPOS+IL,IG)
@@ -371,12 +368,6 @@ C----------------
             ZS = A_GAUSS(IR,NPTR)
             ZT = A_GAUSS(IS,NPTS)
           ENDIF
-         ELSE
-           ZR = A_GAUSS(IR,NPTR)
-           ZS = A_GAUSS(IS,NPTS)
-           ZT = A_GAUSS(IL,NLAY)
-           WT = W_GAUSS(IL,NLAY)
-         ENDIF
          IP = IR + ( (IS-1) + (IL-1)*NPTS )*NPTR
          WI = W_GAUSS(IR,NPTR)*W_GAUSS(IS,NPTS)*WT
 C
@@ -437,7 +428,7 @@ C
             AIRE(:) = ZERO
             CALL DTMAIN(GEO       ,PM        ,IPM         ,PID     ,MAT     ,FV    ,
      .           LBUF%EINT ,LBUF%TEMP ,LBUF%DELTAX ,LBUF%RK ,LBUF%RE ,BUFMAT, DELTAX, AIRE, 
-     .           VOLU, DTX,IGEO)
+     .           VOLU, DTX,IGEO,IGTYP)
 C Average density, stresses, ...
             CALL SVALUE0(
      .           LBUF%RHO,LBUF%VOL,LBUF%OFF,LBUF%SIG,LBUF%EINT,DTX,       
@@ -482,13 +473,13 @@ C
 C Failure model initialization
       CALL FAILINI(ELBUF_STR,NPTR,NPTS,NPTT,NLAY,
      .             IPM,SIGSP,NSIGI,FAIL_INI ,
-     .             SIGI,NSIGS,IXS,NIXS,PTSOL,RNOISE,PERTURB,BUFMAT)
+     .             SIGI,NSIGS,IXS,NIXS,PTSOL,RNOISE,PERTURB,MAT_PARAM)
 C
 C Element time step
         AIRE(:) = ZERO
         CALL DTMAIN(GEO       ,PM        ,IPM         ,PID     ,MAT     ,FV    ,
      .       LBUF%EINT ,LBUF%TEMP ,LBUF%DELTAX ,LBUF%RK ,LBUF%RE ,BUFMAT, DELTAX, AIRE, 
-     .       VOLU, DTX,IGEO)
+     .       VOLU, DTX,IGEO,IGTYP)
 c
        IF (IGTYP == 22) THEN
          DO I=1,NEL

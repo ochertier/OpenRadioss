@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -48,7 +48,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -191,7 +190,7 @@ C MISE EN ORDRE DES NOEUDS SELON LEUR COSINUS
 C------------------------------------------------
             XM=ZERO
             YM=ZERO
-            ZM=ZERO	    
+            ZM=ZERO      
             DO 130 K=1,NODEL
               XM=XM+XC(K)/FLOAT(NODEL)
               YM=YM+YC(K)/FLOAT(NODEL)

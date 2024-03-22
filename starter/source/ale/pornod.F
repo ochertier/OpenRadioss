@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -51,8 +51,6 @@ C-----------------------------------------------
 #include      "param_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "warn_c.inc"
-#include      "units_c.inc"
 #include      "scr05_c.inc"
 #include      "scr17_c.inc"
 C-----------------------------------------------
@@ -98,7 +96,7 @@ C-----------------------------------------------
             END DO ! J=2,5
           END DO !I=1,NUMELQ
         ENDIF
-	
+
       !--------------------!
       !  COUNT AND STORE   !
       !--------------------!
@@ -166,7 +164,7 @@ C-----------------------------------------------
         ! main node RB replicate on all procs for SPMD calculation of porosity
           IF(IMACH == 3) THEN
             DO P = 1, NSPMD
-	      CALL IFRONTPLUS(IRB,P) 
+                CALL IFRONTPLUS(IRB,P) 
             ENDDO
           ENDIF
         ENDIF !IF (GEO(33,IG) == ZERO)

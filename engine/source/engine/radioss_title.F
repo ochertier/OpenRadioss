@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -46,10 +46,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER LEN,LEN_RAD,LENBT,LENCPUNAM,LENARCHTIT,CT,LBT,
-     *        LENGPU
+      INTEGER LEN,LEN_RAD,LENBT,LENCPUNAM,LENARCHTIT,LBT
       CHARACTER RADVERS*68,COPYRIGHTLINE*68,
-     *          ARCH_TIT*66,GPUTITLE*66
+     *          ARCH_TIT*66
 C-----------------------------------------------
        LENARCHTIT=LEN_TRIM(ARCHTITLE)
        ARCH_TIT(1:66)=''

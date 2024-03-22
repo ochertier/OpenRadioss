@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,8 +25,8 @@ Chd|  MULTI_I18_FORCE_POFF          source/interfaces/int18/multi_i18_force_poff
 Chd|-- called by -----------
 Chd|        I18FOR3                       source/interfaces/int18/i18for3.F
 Chd|-- calls ---------------
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
       SUBROUTINE MULTI_I18_FORCE_POFF(DT, JLT   ,IX1  ,IX2  ,IX3  ,IX4    ,
@@ -66,9 +66,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "scr05_c.inc"
-#include      "task_c.inc"
-#include      "scr18_c.inc"
 #include      "com04_c.inc"
 #include      "com01_c.inc"
 C-----------------------------------------------

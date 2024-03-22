@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,14 +27,13 @@ Chd|  SPMD_GATHER_XYZ16             source/mpi/anim/spmd_gather_xyz16.F
 Chd|-- called by -----------
 Chd|        XYZ16                         source/output/anim/generate/genani.F
 Chd|-- calls ---------------
-Chd|        WRITE_R_C                     source/output/tools/sortie_c.c
+Chd|        WRITE_R_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|====================================================================
       SUBROUTINE SPMD_GATHER_XYZ16(V,NUM)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 #ifdef MPI
 #include      "mpif.h"
 #endif
@@ -43,9 +42,7 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr05_c.inc"
 #include      "task_c.inc"
-#include      "spmd_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -81,7 +78,7 @@ C   Reception du buffer entier des adresses NODGLOB
 
             CALL MPI_PROBE(IT_SPMD(I),MSGTYP,
      .                    MPI_COMM_WORLD,STATUS,ierror)
-	    CALL MPI_GET_COUNT(STATUS,MPI_INTEGER,SIZ,ierror)
+              CALL MPI_GET_COUNT(STATUS,MPI_INTEGER,SIZ,ierror)
 
             CALL MPI_RECV(XGLOB,SIZ,MPI_REAL,IT_SPMD(I),MSGTYP,
      .                  MPI_COMM_WORLD,STATUS,ierror)

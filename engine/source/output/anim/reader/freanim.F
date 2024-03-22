@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -35,15 +35,18 @@ Chd|        WRIUSC2                       source/input/wriusc2.F
 Chd|        NVAR                          source/input/nvar.F           
 Chd|        ANIM_MOD                      ../common_source/modules/anim_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
+Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
 Chd|        STACK_MOD                     share/modules/stack_mod.F     
 Chd|====================================================================
-      SUBROUTINE FREANIM(IKAD,KEY0,KANIM,IFID,MFID)
+      SUBROUTINE FREANIM(IKAD,KEY0,KANIM,SENSORS)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE NAMES_AND_TITLES_MOD, ONLY: NCHARLINE100,NCHARKEY,LINE120
       USE MESSAGE_MOD
       USE STACK_MOD
       USE ANIM_MOD
+      USE SENSOR_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -53,23 +56,16 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "units_c.inc"
 #include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "warn_c.inc"
-#include      "scr05_c.inc"
 #include      "scr06_c.inc"
 #include      "scr14_c.inc"
-#include      "scr25_c.inc"
 #include      "scrcut_c.inc"
-#include      "nchara_c.inc"
-#include      "nchar_c.inc"
-#include      "chara_c.inc"
-#include      "sms_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER IKAD(0:*),
-     .        KANIM,IFID,MFID
+      INTEGER IKAD(0:*),KANIM
       CHARACTER KEY0(*)*5
+      TYPE (SENSORS_), INTENT(INOUT) :: SENSORS
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
@@ -78,9 +74,17 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, IDX, NBC, K, IKEY, N1, N2, N3, ITYP,IADG, J,NTITLE,IUS, IXITKEY
-      CHARACTER  TITLE*72, KEY2*ncharkey, KEY3*ncharkey, KEY4*ncharkey, KEY5*ncharkey,
-     .           KEY6*ncharkey,KEY7*ncharkey, KEY8*ncharkey, CARTE*ncharline,TITLE2*80,
-     .           LINE*line120
+      CHARACTER  TITLE*72,  TITLE2*80
+      CHARACTER(LEN=LINE120)::LINE
+      CHARACTER(LEN=NCHARLINE100)::CARTE
+      CHARACTER(LEN=NCHARKEY)::KEY2
+      CHARACTER(LEN=NCHARKEY)::KEY3
+      CHARACTER(LEN=NCHARKEY)::KEY4
+      CHARACTER(LEN=NCHARKEY)::KEY5
+      CHARACTER(LEN=NCHARKEY)::KEY6
+      CHARACTER(LEN=NCHARKEY)::KEY7
+      CHARACTER(LEN=NCHARKEY)::KEY8
+
       my_real X0,Y0,Z0,VNX,VNY,VNZ,V0
 C-----------------------------------------------
       IKEY              = KANIM
@@ -88,7 +92,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C     Set all indexes and some other variables for ANIM to zero
 C-----------------------------------------------
-      CALL ANIM_SET2ZERO_STRUCT()
+      CALL ANIM_SET2ZERO_STRUCT(SENSORS)
 C-----------------------------------------------
 C     Loop over /ANIM cards
 C-----------------------------------------------
@@ -127,16 +131,19 @@ C----------------------------
 !
          ELSEIF(KEY2(1:5)=='SENSO')THEN
            CALL WRIUSC2(IKAD(IKEY)+K,1,KEY0(IKEY))
-           READ(IUSC2,*,ERR=9990)IANISENS,DTANISENS
+           READ(IUSC2,*,ERR=9990) SENSORS%ANIM_ID,SENSORS%ANIM_DT
+!
          ELSEIF(KEY2(1:5)=='LSENS')THEN
           DO I=1,NBC
              READ(IUSC1,REC=IKAD(IKEY)+K+I-1,FMT='(A)',ERR=9990)CARTE
              CALL WRIUSC2(IKAD(IKEY)+K+I-1,1,KEY0(IKEY))
-             READ(IUSC2,*,ERR=9990,END=9990)(LANISENS(J+NLSENS),J=1,NVAR(CARTE))
+             READ(IUSC2,*,ERR=9990,END=9990)
+     .           (SENSORS%ANIM_TMP(J+SENSORS%NANIM),J=1,NVAR(CARTE))
              DO J=1,NVAR(CARTE)
-               NLSENS=NLSENS+1
+               SENSORS%NANIM = SENSORS%NANIM + 1
              ENDDO
           ENDDO
+!
          ELSEIF(KEY2(1:5)=='TITLE')THEN
           DO I=1,NBC
              READ(IUSC1,REC=IKAD(IKEY)+K+I-1,FMT='(A)',ERR=9990)CARTE

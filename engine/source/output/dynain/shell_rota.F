@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,7 +25,7 @@ Chd|  SHELL_ROTA                    source/output/dynain/shell_rota.F
 Chd|-- called by -----------
 Chd|        DYNAIN_C_STRSG                source/output/dynain/dynain_c_strsg.F
 Chd|-- calls ---------------
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE SHELL_ROTA(I        ,ILAY    ,NEL    ,IORTH  ,ITY      ,
      2                      IGTYP    ,MLW     ,JDIR   ,SIG    ,ELBUF_STR,
@@ -45,8 +45,6 @@ C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
-#include      "param_c.inc"
-#include      "scr01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -219,7 +217,7 @@ Chd|-- called by -----------
 Chd|        DYNAIN_C_STRSG                source/output/dynain/dynain_c_strsg.F
 Chd|-- calls ---------------
 Chd|        CLSKEW3                       source/elements/sh3n/coquedk/cdkcoor3.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE SHELL_LOCAL_FRAME(JFT    , JLT   ,ITY      ,IHBE     ,IGTYP   ,
      2                             IXC    ,IXTG   ,NFT      ,X        ,OFFG    ,
@@ -238,8 +236,6 @@ C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
-#include      "param_c.inc"
-#include      "scr01_c.inc"
 #include      "com01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s

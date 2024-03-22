@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -42,7 +42,6 @@ C       ENTREES :  NEL,NG,VQN,VXYZ,VASM,VASTN
 C       SORTIES : VDEF,BM (MEMBRANE),BMF(COUPLAGE MEM-FLEXION),BF (FLEXION),BC(C.T)
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8
 C-----------------------------------------------
-C-----------------------------------------------
 C   I M P L I C I T   T Y P E S
 C-----------------------------------------------
 #include      "implicit_f.inc"
@@ -83,7 +82,6 @@ C     INITIALISATION
 C--------------------------
       DATA IUN/1/
 C      
-!!       NPLAT0 = JLT
         NPLAT0 = NPLAT
        DO J= 1, NPT
 #include "vectorize.inc"
@@ -260,7 +258,6 @@ C
        RETURN
        END
 C
-C ----nouvelle routine ---
 Chd|====================================================================
 Chd|  CBADEFSH_PLY                  source/properties/composite_options/stack/cbadef_ply.F
 Chd|-- called by -----------

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -30,15 +30,17 @@ Chd|        HM_GET_FLOATV                 source/devtools/hm_reader/hm_get_float
 Chd|        HM_GET_FLOATV_DIM             source/devtools/hm_reader/hm_get_floatv_dim.F
 Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
 Chd|        HM_OPTION_IS_ENCRYPTED        source/devtools/hm_reader/hm_option_is_encrypted.F
+Chd|        INIT_MAT_KEYWORD              source/materials/mat/init_mat_keyword.F
 Chd|        ELBUFTAG_MOD                  share/modules1/elbuftag_mod.F 
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/matparam_def_mod.F
+Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
-      SUBROUTINE HM_READ_MAT74(UPARAM ,MAXUPARAM,NUPARAM  ,ISRATE   , IMATVIS  ,
-     .                         NUVAR  ,IFUNC    ,MAXFUNC  ,NFUNC    , PARMAT   , 
-     .                         UNITAB ,MAT_ID   ,TITR     ,MTAG     , LSUBMODEL,
-     .                         ITABLE   ,MAXTABL  ,NTABLE,PM     ,IPM       )
+      SUBROUTINE HM_READ_MAT74(UPARAM  ,MAXUPARAM,NUPARAM  ,ISRATE   , IMATVIS  ,
+     .                         NUVAR   ,IFUNC    ,MAXFUNC  ,NFUNC    , PARMAT   , 
+     .                         UNITAB  ,MAT_ID   ,TITR     ,MTAG     , LSUBMODEL,
+     .                         ITABLE  ,MAXTABL  ,NTABLE   ,PM       ,IPM       ,
+     .                         MATPARAM)
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C-----------------------------------------------
@@ -71,12 +73,7 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr17_c.inc"
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
 #include      "units_c.inc"
-#include      "com01_c.inc"
-#include      "submod_c.inc"
-#include      "sysunit.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -90,6 +87,7 @@ C-----------------------------------------------
       CHARACTER*nchartitle,INTENT(IN)       :: TITR
 
       TYPE(SUBMODEL_DATA),INTENT(IN)        :: LSUBMODEL(*)
+      TYPE(MATPARAM_STRUCT_) ,INTENT(INOUT) :: MATPARAM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -277,6 +275,12 @@ C
 CC     Formulation for solid elements time step computation.
       PARMAT(16) = 2
       PARMAT(17) =  (ONE - TWO*NU)/(ONE - NU) ! == TWO*G/(C1+FOUR_OVER_3*G)
+C
+      ! MATPARAM keywords
+      CALL INIT_MAT_KEYWORD(MATPARAM,"ORTHOTROPIC")
+C
+      ! Properties compatibility  
+      CALL INIT_MAT_KEYWORD(MATPARAM,"SOLID_ORTHOTROPIC")        
 C
         WRITE(IOUT,1001) TRIM(TITR),MAT_ID,ILAW
         WRITE(IOUT,1000)        

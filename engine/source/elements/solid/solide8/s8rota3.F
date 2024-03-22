@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,7 +26,9 @@ Chd|-- called by -----------
 Chd|        S8FORC3                       source/elements/solid/solide8/s8forc3.F
 Chd|-- calls ---------------
 Chd|====================================================================
-      SUBROUTINE S8ROTA3(SIG,WXX,WYY,WZZ,NEL)
+      SUBROUTINE S8ROTA3(
+     1   SIG,     WXX,     WYY,     WZZ,
+     2   NEL,     JCVT)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -38,6 +40,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: JCVT
       INTEGER NEL
 C     REAL
       my_real
@@ -45,7 +48,6 @@ C     REAL
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "vect01_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -56,7 +58,7 @@ C     REAL
      . Q1, Q2, Q3
 C-----------------------------------------------
       IF (JCVT == 0) THEN
-        DO I=LFT,LLT
+        DO I=1,NEL
          S1=SIG(I,1)
          S2=SIG(I,2)
          S3=SIG(I,3)

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -39,9 +39,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
@@ -51,7 +48,6 @@ C-----------------------------------------------
 #include      "scr17_c.inc"
 #include      "scr03_c.inc"
 #include      "units_c.inc"
-#include      "warn_c.inc"
 C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -168,7 +164,7 @@ C----------------------------------------------------------
 C - no-autorised hierarchy :Check des noeuds mains des RBE2 SECONDARY de INT2
 C----------------------------------------------------------
       DO I=1,NRBE2
-	     M = IRBE2(3,I)
+               M = IRBE2(3,I)
          ID=NOM_OPT(1,PTR_NOPT_RBE2+I)
            CALL FRETITL2(TITR,
      .                   NOM_OPT(LNOPT1-LTITR+1,PTR_NOPT_RBE2+I),LTITR)
@@ -224,8 +220,8 @@ C----------------------------------------------------------
 C - Check des noeuds mains des RBE2 sont mains de RBODY
 C----------------------------------------------------------
       DO I=1,NRBE2
-	     M = IRBE2(3,I)
-	     DO J =1,NRBODY
+               M = IRBE2(3,I)
+               DO J =1,NRBODY
           IF(NPBY(1,J)==M)THEN
            ID=NOM_OPT(1,PTR_NOPT_RBE2+I)
            CALL FRETITL2(TITR,
@@ -1163,18 +1159,11 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "kincod_c.inc"
 #include      "param_c.inc"
-#include      "scr17_c.inc"
-#include      "scr03_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
 C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1245,19 +1234,11 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
-#include      "kincod_c.inc"
 #include      "lagmult.inc"
 #include      "param_c.inc"
-#include      "scr17_c.inc"
-#include      "scr03_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
 C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1332,9 +1313,6 @@ C     REAL
       my_real
      .   X(3,*), D(3,*),DR(3,*)
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, N
@@ -1372,17 +1350,10 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com06_c.inc"
-#include      "com08_c.inc"
-#include      "scr05_c.inc"
 #include      "param_c.inc"
 #include      "tabsiz_c.inc"
 C-----------------------------------------------
@@ -1413,41 +1384,41 @@ C======================================================================|
         NS  = IRBE3(3,N)
         IF (NS==0) CYCLE
         NML = IRBE3(5,N)
-	IROT =MIN(IRBE3(6,N),IRODDL)
+          IROT =MIN(IRBE3(6,N),IRODDL)
         CALL RBE3CL(LRBE3(IAD+1),LRBE3(IADS+IAD+1),NS     ,X    ,
      .              FRBE3(6*IAD+1),SKEW    ,NML     ,IROT   ,FDSTNB ,
      .              MDSTNB  )
         DO J = 1,3
-	 VS(J) = ZERO
-	 VRS(J) = ZERO
-	ENDDO
+           VS(J) = ZERO
+           VRS(J) = ZERO
+          ENDDO
         DO I=1,NML
          M = LRBE3(IAD+I)
          DO J = 1,3
           DO K = 1,3
-	   VS(J) = VS(J)+FDSTNB(K,J,I)*D(K,M)
-	   VRS(J) = VRS(J)+FDSTNB(K,J+3,I)*D(K,M)
-	  ENDDO
-	 ENDDO
+             VS(J) = VS(J)+FDSTNB(K,J,I)*D(K,M)
+             VRS(J) = VRS(J)+FDSTNB(K,J+3,I)*D(K,M)
+            ENDDO
+           ENDDO
         ENDDO
         IF (IROT>0) THEN
          DO I=1,NML
           M = LRBE3(IAD+I)
           DO J = 1,3
            DO K = 1,3
-	    VS(J) = VS(J)+MDSTNB(K,J,I)*DR(K,M)
-	    VRS(J) = VRS(J)+MDSTNB(K,J+3,I)*DR(K,M)
-	   ENDDO
-	  ENDDO
+              VS(J) = VS(J)+MDSTNB(K,J,I)*DR(K,M)
+              VRS(J) = VRS(J)+MDSTNB(K,J+3,I)*DR(K,M)
+             ENDDO
+            ENDDO
          ENDDO
         ENDIF
         DO J = 1,3
-	 D(J,NS) = VS(J) *JT(J,N)
-	ENDDO
+           D(J,NS) = VS(J) *JT(J,N)
+          ENDDO
         IF ((JR(1,N)+JR(2,N)+JR(3,N))>0) THEN
          DO J = 1,3
-	  DR(J,NS) = VRS(J) *JR(J,N)
-	 ENDDO
+            DR(J,NS) = VRS(J) *JR(J,N)
+           ENDDO
         ENDIF
       ENDDO
 C
@@ -1468,12 +1439,8 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
@@ -1489,17 +1456,17 @@ C======================================================================|
       MAX_M=0
       IROTG=0
       DO N=1,NRBE3
-	NML = IRBE3(5,N)
-	IROT =IRBE3(6,N)
+          NML = IRBE3(5,N)
+          IROT =IRBE3(6,N)
         MAX_M=MAX(MAX_M,NML)
         IROTG=MAX(IROTG,IROT)
-	IC=IRBE3(4,N)
+          IC=IRBE3(4,N)
         ICT=IC/512
         ICR=(IC-512*(ICT))/64
-	DO J =1,3
+          DO J =1,3
            JT(J,N)=0
            JR(J,N)=0
-	ENDDO
+          ENDDO
         SELECT CASE (ICT)
           CASE(1)
            JT(3,N)=1
@@ -1564,13 +1531,9 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "units_c.inc"
-#include      "com01_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -1910,13 +1873,8 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
@@ -1939,7 +1897,7 @@ C======================================================================|
         M  = IRBE2(3,N)
         NSL = IRBE2(5,N)
         ISK = IRBE2(7,N)
-	IF (ISK>1) THEN
+          IF (ISK>1) THEN
             CALL RBE2DL(NSL   ,LRBE2(IAD+1),X     ,D     ,DR    ,
      1                  JT(1,N),JR(1,N),M     ,SKEW(1,ISK))
         ELSE
@@ -1962,9 +1920,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
@@ -1981,14 +1936,14 @@ C-----------------------------------------------
       INTEGER I, J, N,NML,IC,ICT,ICR,IROT
 C======================================================================|
       DO N=1,NRBE2
-	IC=IRBE2(4,N)
+          IC=IRBE2(4,N)
         ICT=IC/512
         ICR=(IC-512*(ICT))/64
-	IF (IRODDL==0) ICR =0
-	DO J =1,3
+          IF (IRODDL==0) ICR =0
+          DO J =1,3
            JT(J,N)=0
            JR(J,N)=0
-	ENDDO
+          ENDDO
         SELECT CASE (ICT)
           CASE(1)
            JT(3,N)=1
@@ -2048,16 +2003,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "param_c.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NSL,ISL(*),JT(3),JR(3),M
@@ -2073,22 +2018,22 @@ C     REAL
      .     XS, YS, ZS,VRM(3)
 C======================================================================|
         DO J = 1,3
-	 IF (JT(J)/=0) THEN
+           IF (JT(J)/=0) THEN
           DO I=1,NSL
            NS = ISL(I)
-	   V(J,NS)= V(J,M)
-	  ENDDO
+             V(J,NS)= V(J,M)
+            ENDDO
          ENDIF
         ENDDO
        IF ((JR(1)+JR(2)+JR(3))>0) THEN
         DO J = 1,3
-	 IF (JR(J)/=0) THEN
+           IF (JR(J)/=0) THEN
           DO I=1,NSL
            NS = ISL(I)
-	   VR(J,NS)= VR(J,M)
-	  ENDDO
+             VR(J,NS)= VR(J,M)
+            ENDDO
          ENDIF
-	 VRM(J)= VR(J,M)*JR(J)
+           VRM(J)= VR(J,M)*JR(J)
         ENDDO
         DO I=1,NSL
          NS = ISL(I)
@@ -2115,16 +2060,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

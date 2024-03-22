@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -33,7 +33,7 @@ Chd|        HM_OPTION_IS_ENCRYPTED        source/devtools/hm_reader/hm_option_is
 Chd|        INIT_MAT_KEYWORD              source/materials/mat/init_mat_keyword.F
 Chd|        ELBUFTAG_MOD                  share/modules1/elbuftag_mod.F 
 Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/matparam_def_mod.F
+Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|        TABLE_MOD                     share/modules1/table_mod.F    
@@ -77,8 +77,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr17_c.inc"
 #include      "units_c.inc"
-#include      "submod_c.inc"
-#include      "sysunit.inc"
 #include      "param_c.inc"
 #include      "com04_c.inc"
 C-----------------------------------------------
@@ -159,7 +157,7 @@ c    input check
 C------------
 c
       IF (FCUT == ZERO) THEN
-        FCUT = 500.0D0*FAC_T_WORK
+        FCUT = 500.0D0*UNITAB%FAC_T_WORK
       END IF 
       ISRAT  = 0
       ISRATE = 0
@@ -238,7 +236,7 @@ c-----------------------------------------------
       UPARAM(29) = YFAC(2)
 c
       NUPARAM = 29 
-      NUVAR   = 9
+      NUVAR   = 7
       NFUNC   = 2
       NUMTABL = 3
 c                
@@ -259,6 +257,8 @@ c
       MTAG%L_EPSD = 1
       MTAG%G_PLA  = 1
       MTAG%L_PLA  = 1
+      MTAG%G_DMG  = 1
+      MTAG%L_DMG  = 1
 c
       MATPARAM%NTABLE = 3
       IF (ICAS == 0) THEN 
@@ -268,6 +268,11 @@ c
       ENDIF
       CALL INIT_MAT_KEYWORD(MATPARAM ,"INCREMENTAL" )
       CALL INIT_MAT_KEYWORD(MATPARAM ,"LARGE_STRAIN")
+      CALL INIT_MAT_KEYWORD(MATPARAM ,"HOOK")
+C
+      ! Properties compatibility  
+      CALL INIT_MAT_KEYWORD(MATPARAM,"SOLID_ISOTROPIC")  
+      CALL INIT_MAT_KEYWORD(MATPARAM,"SHELL_ISOTROPIC")  
 C-----------------------      
 C
       WRITE(IOUT,1010) TRIM(TITR),ID,76

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,8 +26,8 @@ Chd|-- called by -----------
 Chd|        INITIA                        source/elements/initia/initia.F
 Chd|-- calls ---------------
 Chd|        INIPHASE                      source/initial_conditions/inivol/iniphase.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|====================================================================
       SUBROUTINE INIFILL(IXS       ,IPM    ,NEL       ,IPART_   ,IPHASE  ,
      .                   IDP       ,KVOL   ,BUFMAT    ,ITAGNSOL ,ISOLNOD ,
@@ -50,7 +50,6 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "param_c.inc"
 #include      "vect01_c.inc"
-#include      "scr01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

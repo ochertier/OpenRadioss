@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -601,8 +601,8 @@ C---------------------------
         NUM1(I) = ONE+QTIER(I)
         NUM2(I) = FIVEP5*GAMA2(I)
         LFN(I)=NUM2(I)
-	QFN(I)=SIXTEENP5*GAMA2(I)*GAMA2(I)
-	QFNM(I)=-NUM2(I)
+          QFN(I)=SIXTEENP5*GAMA2(I)*GAMA2(I)
+          QFNM(I)=-NUM2(I)
         DPLA_J(I)=(SVM(I)-YLD(I))/(G3*QTIER(I)+H(I))
         ETSE(I)= H(I)/(H(I)+E)
       ENDDO
@@ -632,8 +632,8 @@ C-------------------------------
         DFMQ=ONEP8333*(XQ+ONE)
         DFNMP=QFNM(I)*XP
         DFNMQ=QFNM(I)*XQ
-	XP = HALF*XP
-	XQ = HALF*XQ
+          XP = HALF*XP
+          XQ = HALF*XQ
         FNP=ONE+(DFNP+LFN(I))*XP
         FNQ=ONE+(DFNP+LFN(I))*XQ
         FMP=ONE+(DFMP+ONEP8333)*XP

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,7 +26,7 @@ Chd|-- called by -----------
 Chd|        RDRESB                        source/output/restart/rdresb.F
 Chd|-- calls ---------------
 Chd|        READ_DB                       source/output/tools/read_db.F 
-Chd|        READ_I_C                      source/output/tools/sortie_c.c
+Chd|        READ_I_C                      ../common_source/tools/input_output/write_routtines.c
 Chd|        CLUSTER_MOD                   share/modules/cluster_mod.F   
 Chd|====================================================================
       SUBROUTINE READ_CLUSTER(CLUSTER)
@@ -41,9 +41,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
 #include      "com04_c.inc"
-#include      "scr17_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

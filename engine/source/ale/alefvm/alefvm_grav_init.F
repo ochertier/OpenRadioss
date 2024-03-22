@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,11 +26,11 @@ Chd|-- called by -----------
 Chd|        ALEMAIN                       source/ale/alemain.F          
 Chd|-- calls ---------------
 Chd|        FINTER                        source/tools/curve/finter.F   
-Chd|        ALEFVM_MOD                    ../common_source/modules/alefvm_mod.F
+Chd|        ALEFVM_MOD                    ../common_source/modules/ale/alefvm_mod.F
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
 Chd|====================================================================
       SUBROUTINE ALEFVM_GRAV_INIT(
-     1                          AGRV, IGRV, LGRAV, SENSOR_TAB,
+     1                          AGRV, IGRV, LGRAV, NSENSOR,SENSOR_TAB,
      2                          IXS , ITASK, NPC , TF    ,SKEW    ,
      3                          ITAB )
 C-----------------------------------------------
@@ -59,15 +59,9 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "vect01_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com06_c.inc"
 #include      "com08_c.inc"
-#include      "nsvis_c.inc"
-#include      "fluid_scr_c.inc"
-#include      "inter22.inc"
 #include      "param_c.inc"
-#include      "alefvm.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
 C   D e s c r i p t i o n
@@ -77,6 +71,7 @@ C finite volume scheme (IALEFVM==1)
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER ,INTENT(IN) :: NSENSOR
       INTEGER :: IXS(NIXS,*), IGRV(NIGRV,*), ITASK,LGRAV(*),NPC(*),ITAB(*)
       my_real :: AGRV(LFACGRV,*),TF(*)
 C-----------------------------------------------
@@ -143,10 +138,10 @@ C-----------------------------------------------
           DO J=IADF,IADL
             !Acceleration on FVM vertexes
             N1=IABS(LGRAV(J))
-            VERTEX(1,N1) =  SKEW(K1,ISK)*AA
-            VERTEX(2,N1) =  SKEW(K2,ISK)*AA
-            VERTEX(3,N1) =  SKEW(K3,ISK)*AA
-            VERTEX(4,N1) = ONE
+            ALEFVM_Buffer%VERTEX(1,N1) =  SKEW(K1,ISK)*AA
+            ALEFVM_Buffer%VERTEX(2,N1) =  SKEW(K2,ISK)*AA
+            ALEFVM_Buffer%VERTEX(3,N1) =  SKEW(K3,ISK)*AA
+            ALEFVM_Buffer%VERTEX(4,N1) = ONE
             !--- TODO : TFEXTT            
             ! VV = SKEW(K1,ISK)*V(1,N1)+SKEW(K2,ISK)*V(2,N1)+SKEW(K3,ISK)*V(3,N1)
             ! IF(LGRAV(J)>0)TFEXTT=TFEXTT+HALF*(A0+AA)*MS(N1)*VV*DT1*WEIGHT(N1)
@@ -157,10 +152,10 @@ C-----------------------------------------------
           DO J=IADF,IADL
             !Acceleration on FVM vertexes
             N1=IABS(LGRAV(J))
-            VERTEX(1,N1) = VERTEX(1,N1)+SKEW(K1,ISK)*AA
-            VERTEX(2,N1) = VERTEX(2,N1)+SKEW(K2,ISK)*AA
-            VERTEX(3,N1) = VERTEX(3,N1)+SKEW(K3,ISK)*AA
-            VERTEX(4,N1) = ONE
+            ALEFVM_Buffer%VERTEX(1,N1) = ALEFVM_Buffer%VERTEX(1,N1)+SKEW(K1,ISK)*AA
+            ALEFVM_Buffer%VERTEX(2,N1) = ALEFVM_Buffer%VERTEX(2,N1)+SKEW(K2,ISK)*AA
+            ALEFVM_Buffer%VERTEX(3,N1) = ALEFVM_Buffer%VERTEX(3,N1)+SKEW(K3,ISK)*AA
+            ALEFVM_Buffer%VERTEX(4,N1) = ONE
             !--- TODO : TFEXTT            
             ! VV = SKEW(K1,ISK)*V(1,N1)+SKEW(K2,ISK)*V(2,N1)+SKEW(K3,ISK)*V(3,N1)
             ! IF(LGRAV(J)>0)TFEXTT=TFEXTT+HALF*(A0+AA)*MS(N1)*VV*DT1*WEIGHT(N1)

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,7 +27,7 @@ Chd|        STAT_C_STRSFG                 source/output/sta/stat_c_strsfg.F
 Chd|-- calls ---------------
 Chd|        CLSKEW3                       source/elements/sh3n/coquedk/cdkcoor3.F
 Chd|        CORTDIR3                      source/elements/shell/coque/cortdir3.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
         SUBROUTINE GET_Q4LSYS(JFT    ,JLT    ,IXC    ,X    ,OFFG   ,
      .                        IREL   ,VQ     ,NLAY   ,IREP ,NEL    ,
@@ -42,8 +42,6 @@ c-----------------------------------------------
 c   g l o b a l   p a r a m e t e r s
 c-----------------------------------------------
 #include      "mvsiz_p.inc"
-#include      "param_c.inc"
-#include      "com01_c.inc"
 C-----------------------------------------------
 C   D U M M Y   A R G U M E N T S
 C-----------------------------------------------

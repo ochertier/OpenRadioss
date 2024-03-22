@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,10 +25,13 @@ Chd|  FIND_SURFACE_INTER            source/interfaces/interf/find_surface_inter.
 Chd|-- called by -----------
 Chd|        RESOL                         source/engine/resol.F         
 Chd|-- calls ---------------
+Chd|        MYQSORT_INT                   ../common_source/tools/sort/myqsort_int.F
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
 Chd|        SHOOTING_NODE_MOD             share/modules/shooting_node_mod.F
 Chd|====================================================================
-        SUBROUTINE FIND_SURFACE_INTER(ITASK,ITAB,SHOOT_STRUCT,IXS,IXS10,IXC,IXTG )
+        SUBROUTINE FIND_SURFACE_INTER(ITAB  ,SHOOT_STRUCT  ,IXS  ,IXS10  ,IXC  ,
+     .                                IXTG  ,
+     .                                NGROUP,NPARG,IGROUPS,IPARG )
 !$COMMENT
 !       FIND_EDGE_INTER description
 !           this routine finds the surface id and the interfaces id of a list of deleted elements
@@ -49,20 +52,19 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "task_c.inc"
-#include      "scr05_c.inc"
 #include      "com04_c.inc"
-#include      "param_c.inc"
-#include      "com01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-        INTEGER, INTENT(in) :: ITASK ! omp thread ID
         INTEGER, DIMENSION(NIXS,NUMELS),TARGET, INTENT(in) :: IXS   ! solid array
         INTEGER, DIMENSION(6,NUMELS10),TARGET, INTENT(in) :: IXS10  ! tetra10 array
         INTEGER, DIMENSION(NIXC,NUMELC),TARGET, INTENT(in) :: IXC   ! shell array
         INTEGER, DIMENSION(NIXTG,NUMELTG),TARGET, INTENT(in) :: IXTG! triangle array
         INTEGER, DIMENSION(NUMNOD), INTENT(in) :: ITAB ! array to convert local id to global id
-        TYPE(shooting_node_type), INTENT(inout) :: SHOOT_STRUCT ! structure for shooting node algo       
+        INTEGER, INTENT(in) :: NGROUP,NPARG !< size of iparg
+        INTEGER, DIMENSION(NUMELS), INTENT(in) :: IGROUPS !< array to point to the element group
+        INTEGER, DIMENSION(NPARG,NGROUP), INTENT(in) :: IPARG !< element group data
+        TYPE(shooting_node_type), INTENT(inout) :: SHOOT_STRUCT ! structure for shooting node algo  
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -71,11 +73,13 @@ C-----------------------------------------------
         INTEGER :: OFFSET_SOLID,OFFSET_QUAD,OFFSET_SHELL,OFFSET_TRUSS
         INTEGER :: OFFSET_BEAM,OFFSET_SPRING,OFFSET_TRIANGLE,OFFSET_UR
         INTEGER, DIMENSION(4,6), TARGET :: FACES ! definition of faces for solid
+        INTEGER, DIMENSION(4,5), TARGET :: FACES6 ! definition of faces for penta6
+        INTEGER, DIMENSION(3,4), TARGET :: FACES4 ! definition of faces for tetra10
         INTEGER, DIMENSION(3,16), TARGET :: FACES10 ! definition of faces for tetra10
         INTEGER, DIMENSION(4,1), TARGET :: FACES_SHELL ! definition of face for shell/quad/triangle
         INTEGER,DIMENSION(:,:), POINTER :: POINTER_FACE,IX
 
-        LOGICAL :: NO_SURF,DO_COMPUTATION
+        LOGICAL :: DO_COMPUTATION
         INTEGER :: SHIFT,SHIFT_ELM,OLD_SIZE
         INTEGER :: SURFACE_NUMBER
         INTEGER :: NB_PROC_1,NB_PROC_2,NODE_SURF_NB,SEVERAL_PROC,SEVERAL_SURF
@@ -84,14 +88,29 @@ C-----------------------------------------------
         INTEGER, DIMENSION(:), ALLOCATABLE :: RESULT_INTERSECT_2,INTERSECT_3,INTERSECT_4
         INTEGER, DIMENSION(:), ALLOCATABLE :: TMP_ARRAY
         INTEGER, DIMENSION(4) :: LOCAL_NODE
+        INTEGER :: DICHOTOMIC_SEARCH_I_ASC  ! function
+        INTEGER :: GROUP_NUMBER
+        INTEGER :: KIND_SOLID,OLD_J,MERGED_NODE,ERROR
+        INTEGER, DIMENSION(4) :: LIST_NODE_ID,PERM_LIST_NODE_ID,NB_APPAREANCE
+        LOGICAL :: NEED_COMPUTE
+        INTEGER :: N1,N2,N3,N4
         DATA FACES_SHELL/1,2,3,4/
 
-        DATA FACES/1,2,3,4,
-     .             1,2,6,5,
-     .             2,3,7,6,
-     .             3,4,8,7,
-     .             1,5,8,4,
-     .             5,6,7,8/
+        DATA FACES/1,2,3,4,   
+     .             1,2,6,5,  
+     .             2,3,7,6,  
+     .             3,4,8,7, 
+     .             1,5,8,4,  
+     .             5,6,7,8/  
+        DATA FACES4/2,3,6,   
+     .             2,3,5,  
+     .             2,6,5,
+     .             3,6,5/
+        DATA FACES6/1,2,3,1,   !-> tri
+     .             1,2,6,5,    !->quad
+     .             2,3,7,6,    !->quad
+     .             3,4,8,7,    !->quad
+     .             5,6,7,5/    !->tri
         DATA FACES10/1,11,14,
      .               3,11,15,
      .               5,14,15,
@@ -146,6 +165,7 @@ C-----------------------------------------------
         DO I=1,SHOOT_STRUCT%S_GLOBAL_ELEM_INDEX
             ELEM_ID = SHOOT_STRUCT%GLOBAL_ELEM_INDEX(I) ! get the id of the deleted element
             DO_COMPUTATION = .TRUE.
+            KIND_SOLID = 0
             ! ----------------------
             IF(ELEM_ID<=NUMELS8) THEN
                 ! solid element : 8 nodes --> 6 surfaces
@@ -155,10 +175,45 @@ C-----------------------------------------------
                 !   | o++|+o
                 !   |+   |/
                 !   o----o
-                SURFACE_NUMBER = 6 ! number of surface
-                NODE_SURF_NB = 4   ! number of node per surface
+                ! penta element : 6 nodes --> 5 surfaces
+                !        o
+                !       /+\
+                !      o+  \
+                !     /\o++/o
+                !    /+ \ /
+                !   o----o
+                ! tetra4 element : 4 nodes --> 4 surfaces  
+                !       o      
+                !      /+\         
+                !     / + \  
+                !    /  +  \ 
+                !   /   o   \ 
+                !  /  +    + \
+                ! o-----------o
+                GROUP_NUMBER = IGROUPS(ELEM_ID)
+                KIND_SOLID = IPARG(28,GROUP_NUMBER)
+                ! -------------
+                ! tetra4 
+                IF(KIND_SOLID==4) THEN 
+                    SURFACE_NUMBER = 4 ! number of surface
+                    NODE_SURF_NB = 3   ! number of node per surface
+                    POINTER_FACE => FACES4(1:3,1:4)
+                ! -------------
+                ! penta6                 
+                ELSEIF(KIND_SOLID==6) THEN
+                    SURFACE_NUMBER = 5 ! number of surface
+                    NODE_SURF_NB = 4   ! number of node per surface (3 surface with 4 nodes, 2 with 3 nodes)
+                    POINTER_FACE => FACES6(1:4,1:5)
+                ! -------------
+                ! solid8 
+                ELSE
+                    KIND_SOLID = 8
+                    SURFACE_NUMBER = 6 ! number of surface
+                    NODE_SURF_NB = 4   ! number of node per surface
+                    POINTER_FACE => FACES(1:4,1:6)
+                ENDIF
+                ! -------------
                 IX => IXS(1:NIXS,1:NUMELS)
-                POINTER_FACE => FACES(1:4,1:6)
                 SHIFT_ELM = OFFSET_SOLID
             ELSEIF(ELEM_ID<=NUMELS8+NUMELS10) THEN
                 ! solid element : tetra10 --> 10 surfaces
@@ -235,16 +290,74 @@ C-----------------------------------------------
                 ! ----------------------
                 ! loop over the surfaces of the element
                 DO K=1,SURFACE_NUMBER
-                    SEVERAL_PROC = 0
-                    SEVERAL_SURF = 0
-                    NO_SURF = .FALSE.
+                  SEVERAL_PROC = 0
+                  SEVERAL_SURF = 0
+                  NEED_COMPUTE = .TRUE.
+                  ! ---------------------------
+                  ! solid element 8 can be degenerated (penta, pyramid...)
+                  ! --> need to check if the face of the element is a real face
+                  IF(KIND_SOLID==8) THEN
+                    ! ----------------
+                    ! sort the node id list
+                    DO J=1,4
+                        N = POINTER_FACE(J,K)
+                        LIST_NODE_ID(J) = IX(N+1,ELEM_ID-SHIFT_ELM)
+                    ENDDO
+                    CALL MYQSORT_INT(4,LIST_NODE_ID,PERM_LIST_NODE_ID,ERROR)
+                    ! ----------------
+
+                    ! ----------------
+                    ! check if the face has 3 or 4 nodes
+                    NODE_ID = LIST_NODE_ID(1)
+                    OLD_J = 1
+                    NB_APPAREANCE(1) = 1
+                    NB_APPAREANCE(2:4) = 0
+                    ! ----------------
+                    ! number of appareance of the node
+                    DO J=2,4
+                        IF(NODE_ID/=LIST_NODE_ID(J)) THEN
+                            NB_APPAREANCE(J) = NB_APPAREANCE(J) + 1
+                            NODE_ID = LIST_NODE_ID(J)
+                            OLD_J = J
+                        ELSE
+                            NB_APPAREANCE(OLD_J) = NB_APPAREANCE(OLD_J) + 1
+                        ENDIF
+                    ENDDO
+                    ! ----------------
+            
+                    ! ----------------
+                    ! check the number of nodes
+                    MERGED_NODE = 0
+                    DO J=1,4
+                        IF(NB_APPAREANCE(J)>=3) NEED_COMPUTE=.FALSE. ! only 2 nodes or 1 node 
+                        IF(NB_APPAREANCE(J)==2) MERGED_NODE = MERGED_NODE + 1 ! check if there are 2 nodes
+                    ENDDO
+                    IF(MERGED_NODE>1) NEED_COMPUTE=.FALSE. ! only 2 nodes
+                    ! ----------------
+                  ENDIF
+                  ! ---------------------------
+                  IF(NEED_COMPUTE) THEN
+
                     ! ------------------
                     ! first node of the surface face(1:4,k)
                     J = 1
                     N = POINTER_FACE(J,K)                ! get the node of the surfaces
                     NODE_ID = IX(N+1,ELEM_ID-SHIFT_ELM)    ! get the node ID    
+
+                    N1 =  NODE_ID
+                    N = POINTER_FACE(2,K) 
+                    N2 = IX(N+1,ELEM_ID-SHIFT_ELM) 
+                    N = POINTER_FACE(3,K) 
+                    N3 = IX(N+1,ELEM_ID-SHIFT_ELM) 
+                    IF(NODE_SURF_NB==4) THEN
+                        N = POINTER_FACE(4,K)
+                        N4 = IX(N+1,ELEM_ID-SHIFT_ELM) 
+                    ELSE
+                        N4 = N3
+                    ENDIF
+
                     LOCAL_NODE(1) = NODE_ID     
-       
+         
                     NB_RESULT_INTERSECT = SHOOT_STRUCT%SHIFT_M_NODE_SURF(NODE_ID+1) - SHOOT_STRUCT%SHIFT_M_NODE_SURF(NODE_ID)   ! get the number of surface of the node
                     SHIFT = SHOOT_STRUCT%SHIFT_M_NODE_SURF(NODE_ID)
                     RESULT_INTERSECT(1:NB_RESULT_INTERSECT) = SHOOT_STRUCT%M_NODE_SURF( SHIFT+1:SHIFT+NB_RESULT_INTERSECT )
@@ -367,6 +480,8 @@ C-----------------------------------------------
                     ELSE
                         ! no surface on the current processor or on a remote processor
                     ENDIF
+                  ENDIF
+                  ! ---------------------------
                 ENDDO
                 ! end : loop over the surfaces of the element
                 ! ----------------------

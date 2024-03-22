@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -28,9 +28,6 @@ Chd|        USERMAT_SOLID                 source/materials/mat_share/usermat_sol
 Chd|-- calls ---------------
 Chd|====================================================================
       MODULE LAW_USERSO
-C-----------------------------------------------
-C   D e r i v e d   T y p e   D e f i n i t i o n s
-C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -69,7 +66,6 @@ C DPLA    | NEL     | F |R/W| INCREMENTAL PLASTIC STRAIN
 C---------+---------+---+---+--------------------------------------------
 C
       TYPE ULAWINTBUF
-#include "sequence.inc"
 C integer
         INTEGER  NCYCLE
         INTEGER  ID
@@ -113,7 +109,7 @@ C--------when Ismstr=10 we input [F] et [U]
         my_real FPSYX(MVSIZ)
         my_real FPSZY(MVSIZ)
         my_real FPSXZ(MVSIZ)
-C	
+C
         my_real UPSXX(MVSIZ)
         my_real UPSYY(MVSIZ)
         my_real UPSZZ(MVSIZ)

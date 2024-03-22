@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,27 +26,26 @@ Chd|-- called by -----------
 Chd|        SPSTRES                       source/elements/sph/spstres.F 
 Chd|-- calls ---------------
 Chd|====================================================================
-      SUBROUTINE SPLOAD3(SPBUF  ,WA  ,RHOA ,RHON ,DELTAX ,
-     1        OFFG, DXX, DXY, DXZ, DYX,
-     2        DYY, DYZ, DZX, DZY, DZZ ,
-     3        MUMAX)
-C----6---------------------------------------------------------------7---------8
+      SUBROUTINE SPLOAD3(
+     1   SPBUF,   WA,      RHOA,    RHON,
+     2   DELTAX,  OFFG,    DXX,     DXY,
+     3   DXZ,     DYX,     DYY,     DYZ,
+     4   DZX,     DZY,     DZZ,     MUMAX,
+     5   LFT,     LLT,     NFT)
+C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "vect01_c.inc"
 #include      "sphcom.inc"
-C-----------------------------------------------------------------
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-C     REAL
+      INTEGER, INTENT(INOUT) :: LFT
+      INTEGER, INTENT(INOUT) :: LLT
+      INTEGER, INTENT(INOUT) :: NFT
       my_real
      .   SPBUF(NSPBUF,*) ,WA(KWASPH,*)  ,
      .   RHOA(*) ,RHON(*) ,DELTAX(*) ,OFFG(*) ,
@@ -115,7 +114,7 @@ C        for stability time step computation:
          DXZ(I)   =ZERO
          DYX(I)   =ZERO
          DZY(I)   =ZERO
-         DZX(I)   =ZERO	 
+         DZX(I)   =ZERO   
 C        for stability time step computation:
          DELTAX(I)=EP20
          MUMAX(I) =ZERO

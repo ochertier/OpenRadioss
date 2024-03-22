@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -24,6 +24,7 @@ Chd|====================================================================
 Chd|  INOUTFILE_MOD                 modules/inoutfile_mod.F       
 Chd|-- called by -----------
 Chd|        CHECK_DYNAIN                  starter/source/starter/check_dynain.F
+Chd|        CHECK_QEPH_STRA               starter/source/starter/check_qeph_stra.F
 Chd|        CONTRL                        starter/source/starter/contrl.F
 Chd|        DDSPLIT                       starter/source/restart/ddsplit/ddsplit.F
 Chd|        DD_ANI                        starter/source/output/anim/dd_ani.F
@@ -80,9 +81,9 @@ Chd|        PRINTIME                      engine/source/system/timer.F
 Chd|        RADIOSS0                      engine/source/engine/radioss0.F
 Chd|        RADIOSS2                      engine/source/engine/radioss2.F
 Chd|        REPORT                        engine/source/output/report/report.F
-Chd|        SECT_INI                      engine/source/tools/sect/sectio.F
-Chd|        SECT_READ                     engine/source/tools/sect/sectio.F
-Chd|        SECT_READP                    engine/source/tools/sect/sectio.F
+Chd|        SECTION_INIT                  engine/source/tools/sect/section_init.F
+Chd|        SECTION_READ                  engine/source/tools/sect/section_read.F
+Chd|        SECTION_READP                 engine/source/tools/sect/section_readp.F
 Chd|        SORTIE_MAIN                   engine/source/output/sortie_main.F
 Chd|        SORTIE_MVW                    engine/source/output/report/sortie_mvw.F
 Chd|        SPMD_COLLECT                  engine/source/mpi/output/spmd_collect.F

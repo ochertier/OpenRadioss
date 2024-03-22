@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -38,8 +38,9 @@ Chd|        SPMD_FIADD_POFF               source/mpi/interfaces/spmd_i7tool.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
+Chd|        INTERFACES_MOD                ../common_source/modules/interfaces/interfaces_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|        TRI25EBOX                     share/modules/tri25ebox.F     
 Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
@@ -51,7 +52,8 @@ Chd|====================================================================
      5   IXS     ,IXS16   ,FTHE    ,IRLEN7T ,
      6   ISLEN7T ,IRLEN20 ,ISLEN20 ,IRLEN20T,ISLEN20T,
      7   IRLEN20E,ISLEN20E,CONDN   ,IFLAG   ,INTBUF_TAB, 
-     8   H3D_DATA, MULTI_FVM,TAGNCONT,KLOADPINTER,LOADPINTER,LOADP_HYD_INTER)
+     8   H3D_DATA, MULTI_FVM,TAGNCONT,KLOADPINTER,LOADPINTER,
+     9   LOADP_HYD_INTER  ,FSAV    ,INTERFACES)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -62,11 +64,11 @@ C-----------------------------------------------
       USE H3D_MOD
       USE MULTI_FVM_MOD
       USE GROUPDEF_MOD
+      USE INTERFACES_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -76,19 +78,12 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "i25edge_c.inc"
 #include      "scr05_c.inc"
-#include      "scr17_c.inc"
 #include      "scr18_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
 #include      "task_c.inc"
-#include      "parit_c.inc"
-#include      "timeri_c.inc"
-#include      "warn_c.inc"
-#include      "spmd_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -102,10 +97,12 @@ C-----------------------------------------------
       my_real
      .        A(*), STIFN(*), VISCN(*),
      .        SECFCUM(7,NUMNOD,NSECT), FCONT(3,*), FTHE(*),CONDN(*)
+      my_real, INTENT(INOUT) :: FSAV(NTHVKI,*) 
 
       TYPE(INTBUF_STRUCT_) INTBUF_TAB(*)
       TYPE(H3D_DATABASE) :: H3D_DATA
       TYPE(MULTI_FVM_STRUCT), INTENT(INOUT) :: MULTI_FVM
+      TYPE (INTERFACES_)    ,INTENT(IN)     :: INTERFACES
 C-----------------------------------------------
       TYPE (GROUP_)  , DIMENSION(NGRBRIC) :: IGRBRIC
 C-----------------------------------------------
@@ -123,7 +120,7 @@ c parasiz car variable en save
      .        ADDS(PARASIZ+1), ADDR(PARASIZ+1),
      .        REQ_SI(PARASIZ),REQ_RI(PARASIZ)
       INTEGER, PARAMETER :: LEN25E = 11 
-      INTEGER :: NEDGE
+      INTEGER :: NEDGE, INTCAREA
       DATA MSGOFF/143/
       LOGICAL ITEST
       my_real       ,DIMENSION(:), ALLOCATABLE :: BBUFS, BBUFR
@@ -201,7 +198,7 @@ C
           ADDR(P) = ADD
           SIZ = 0
           IF(P/=LOC_PROC)THEN
-Cel test en plus pour savoir si com globale necessaire entre les 2 procs
+C   test en plus pour savoir si com globale necessaire entre les 2 procs
             DO II = 1, NBINTC
               NIN = INTLIST(II)
               NB = NSNSI(NIN)%P(P)
@@ -255,7 +252,7 @@ C
           ADDS(P) = ADD
           SIZ = 0
           IF(P/=LOC_PROC)THEN
-Cel test en plus pour savoir si com globale necessaire entre les 2 procs
+C   test en plus pour savoir si com globale necessaire entre les 2 procs
             DO II = 1, NBINTC
               NIN = INTLIST(II)
               IDEB = DEBUT(NIN)
@@ -1137,6 +1134,7 @@ C
                 ISECIN=IPARI(28,NIN)
                 IBAG  =IPARI(32,NIN)
                 IADM  =IPARI(44,NIN)
+                INTCAREA=IPARI(99,NIN)
 C
                 IF(NTY==7.OR.NTY==10.OR.NTY==22.OR.NTY==23
      *       .OR.NTY==24.OR.NTY==25 )THEN
@@ -1148,7 +1146,8 @@ C
      3              IBAG    ,ICODT   ,SECFCUM , NSTRF       ,ICONTACT,
      4              FCONT   ,INACTI  ,IADM    ,INTTH , FTHE ,CONDN   ,
      5              H3D_DATA, MULTI_FVM,NIN   ,TAGNCONT,KLOADPINTER  ,
-     6              LOADPINTER,LOADP_HYD_INTER)
+     6              LOADPINTER,LOADP_HYD_INTER,INTCAREA,FSAV(1,NIN)  ,
+     7              INTERFACES%PARAMETERS)
                     L = L + NB*LEN
                   ELSE
                      CALL SPMD_FIADD_POFF(
@@ -1157,7 +1156,8 @@ C
      3              IBAG    ,ICODT   ,SECFCUM , NSTRF       ,ICONTACT,
      4              FCONT   ,INACTI  ,IADM    ,INTTH , FTHE ,CONDN   ,
      5              H3D_DATA, MULTI_FVM,NIN   ,TAGNCONT,KLOADPINTER  ,
-     6              LOADPINTER,LOADP_HYD_INTER)
+     6              LOADPINTER,LOADP_HYD_INTER,INTCAREA,FSAV(1,NIN)  ,
+     7              INTERFACES%PARAMETERS)
                     L = L + NB*LEN7T
                   ENDIF
                 ELSEIF(NTY==11)THEN

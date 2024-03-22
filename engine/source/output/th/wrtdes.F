@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -37,9 +37,9 @@ Chd|        THSURF                        source/output/th/thsurf.F
 Chd|        WRITE_TH                      source/output/th/write_th.F   
 Chd|        WRTDES0                       source/output/th/wrtdes0.F    
 Chd|-- calls ---------------
-Chd|        EOR_C                         source/output/tools/sortie_c.c
-Chd|        WRITE_I_C                     source/output/tools/sortie_c.c
-Chd|        WRITE_R_C                     source/output/tools/sortie_c.c
+Chd|        EOR_C                         ../common_source/tools/input_output/write_routtines.c
+Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
+Chd|        WRITE_R_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|        STRI                          source/tools/univ/stri.F      
 Chd|        STRR                          source/tools/univ/strr.F      
 Chd|====================================================================

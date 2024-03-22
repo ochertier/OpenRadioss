@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -29,15 +29,16 @@ Chd|        SPMD_RGATHER9_DP              source/mpi/interfaces/spmd_outp.F
 Chd|        SPMD_STAT_PGATHER             source/mpi/output/spmd_stat.F 
 Chd|        STRS_TXT50                    source/output/sta/sta_txt.F   
 Chd|        TAB_STRS_TXT50                source/output/sta/sta_txt.F   
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        MAT_ELEM_MOD                  ../common_source/modules/mat_elem/mat_elem_mod.F
 Chd|====================================================================
       SUBROUTINE STAT_C_FAIL(ELBUF_TAB ,IPARG ,IPM ,IGEO ,IXC ,
-     2                        IXTG  ,WA,WAP0 ,IPARTC, IPARTTG,
-     3                      IPART_STATE,STAT_INDXC,STAT_INDXTG,SIZP0)
+     2                       IXTG  ,WA,WAP0 ,IPARTC, IPARTTG,
+     3                       IPART_STATE,STAT_INDXC,STAT_INDXTG,SIZP0,
+     4                       NUMMAT,MAT_PARAM)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
-      USE ELBUFDEF_MOD         
+      USE MAT_ELEM_MOD         
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -46,17 +47,12 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "param_c.inc"
 #include      "units_c.inc"
-#include      "scr01_c.inc"
-#include      "scr05_c.inc"
 #include      "task_c.inc"
-#include      "scr03_c.inc"
 #include      "scr14_c.inc"
 #include      "scr16_c.inc"
 #include      "mvsiz_p.inc"
-#include      "tabsiz_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -66,10 +62,12 @@ C-----------------------------------------------
      .        IPARTC(*), IPARTTG(*), IPART_STATE(*),
      .        STAT_INDXC(*), STAT_INDXTG(*)
       TYPE (ELBUF_STRUCT_), DIMENSION(NGROUP), TARGET :: ELBUF_TAB
+      TYPE (MATPARAM_STRUCT_) ,DIMENSION(NUMMAT) ,INTENT(INOUT) :: MAT_PARAM
       double precision WA(*),WAP0(*)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
+      INTEGER ,INTENT(IN) :: NUMMAT
       INTEGER I,N,J,K,L,II,JJ,ID,IE,LEN,NG,NEL,NFT,ITY,LFT,LLT,NPT,
      .   MLW,IGTYP,IPRT0,IPRT,IVAR,IMAT,
      .   NPG,IPG,NLAY,NPTR,NPTS,NPTT,IL,IR,IS,IT,IPT,IC,IFAIL,NV,
@@ -148,21 +146,21 @@ cc           WA(JJ) = NPTT
             WA(JJ) = NPG
 c
             DO IL = 1,NLAY
-              NFAIL = ELBUF_TAB(NG)%BUFLY(IL)%NFAIL			       
+              NFAIL = ELBUF_TAB(NG)%BUFLY(IL)%NFAIL             
               IMAT  = ELBUF_TAB(NG)%BUFLY(IL)%IMAT
               FBUF => ELBUF_TAB(NG)%BUFLY(IL)%FAIL(1,1,1)   
               NPTT = ELBUF_TAB(NG)%BUFLY(IL)%NPTT
               JJ = JJ + 1
               WA(JJ) = NFAIL
               JJ = JJ + 1  
-              IMAT  = ELBUF_TAB(NG)%BUFLY(IL)%IMAT			     
+              IMAT  = ELBUF_TAB(NG)%BUFLY(IL)%IMAT           
               WA(JJ) = IPM(1,IMAT)   
               JJ = JJ + 1
               WA(JJ) = NPTT
 c
               DO IFAIL = 1,NFAIL 
-                IRUPT = IPM(236+IFAIL,IMAT)
-                IRUPT_TYPE = IPM(241+IFAIL,IMAT) 			 
+                IRUPT = MAT_PARAM(IMAT)%FAIL(IFAIL)%FAIL_ID 
+                IRUPT_TYPE = MAT_PARAM(IMAT)%FAIL(IFAIL)%IRUPT 
                 NVAR_RUPT = FBUF%FLOC(IFAIL)%NVAR		       
                 JJ = JJ + 1
                 WA(JJ) = NVAR_RUPT + 1
@@ -174,9 +172,9 @@ c
                 IF (IRUPT == 0) CYCLE
 !
                 DO IT=1,NPTT  
-                  DO IS=1,NPTS					     
-                    DO IR=1,NPTR			   
-                      FBUF => ELBUF_TAB(NG)%BUFLY(IL)%FAIL(IR,IS,IT)				     
+                  DO IS=1,NPTS               
+                    DO IR=1,NPTR         
+                      FBUF => ELBUF_TAB(NG)%BUFLY(IL)%FAIL(IR,IS,IT)             
                       UVARF => FBUF%FLOC(IFAIL)%VAR 
                       DFMAX => FBUF%FLOC(IFAIL)%DAMMX   
                       JJ = JJ + 1
@@ -382,7 +380,7 @@ cc           WA(JJ) = NPTT
             WA(JJ) = NPG
 c
             DO IL = 1,NLAY
-              NFAIL = ELBUF_TAB(NG)%BUFLY(IL)%NFAIL			       
+              NFAIL = ELBUF_TAB(NG)%BUFLY(IL)%NFAIL             
               IMAT = ELBUF_TAB(NG)%BUFLY(IL)%IMAT
               FBUF => ELBUF_TAB(NG)%BUFLY(IL)%FAIL(1,1,1)   
               NPTT = ELBUF_TAB(NG)%BUFLY(IL)%NPTT
@@ -395,33 +393,33 @@ c
               WA(JJ) = NPTT 
 c
               DO IFAIL = 1,NFAIL 
-           	IRUPT = IPM(236+IFAIL,IMAT)
-           	IRUPT_TYPE = IPM(241+IFAIL,IMAT)			   
-           	NVAR_RUPT  = FBUF%FLOC(IFAIL)%NVAR			 
-           	JJ = JJ + 1
-           	WA(JJ) = NVAR_RUPT + 1
-           	JJ = JJ + 1
-           	WA(JJ) = IRUPT
-           	JJ = JJ + 1
-           	WA(JJ) = IRUPT_TYPE	
+                IRUPT = MAT_PARAM(IMAT)%FAIL(IFAIL)%FAIL_ID 
+                IRUPT_TYPE = MAT_PARAM(IMAT)%FAIL(IFAIL)%IRUPT 
+           	    NVAR_RUPT  = FBUF%FLOC(IFAIL)%NVAR			 
+           	    JJ = JJ + 1
+           	    WA(JJ) = NVAR_RUPT + 1
+           	    JJ = JJ + 1
+           	    WA(JJ) = IRUPT
+           	    JJ = JJ + 1
+           	    WA(JJ) = IRUPT_TYPE	
 !
                 IF (IRUPT == 0) CYCLE
 !
                 DO IT = 1,NPTT 		     
-           	  DO IS=1,NPTS					       
+           	    DO IS=1,NPTS					       
            	    DO IR=1,NPTR 		     
-                      FBUF => ELBUF_TAB(NG)%BUFLY(IL)%FAIL(IR,IS,IT)				       
+                  FBUF => ELBUF_TAB(NG)%BUFLY(IL)%FAIL(IR,IS,IT)				       
            	      UVARF => FBUF%FLOC(IFAIL)%VAR  
-                      DFMAX => FBUF%FLOC(IFAIL)%DAMMX   
-                      JJ = JJ + 1
-                      WA(JJ) = DFMAX(I)
-           	      DO NV=1,NVAR_RUPT
-           	        JJ = JJ + 1
-           	        WA(JJ) = UVARF((NV-1)*LLT+I)
-           	      ENDDO
-           	    ENDDO
+                  DFMAX => FBUF%FLOC(IFAIL)%DAMMX   
+                  JJ = JJ + 1
+                  WA(JJ) = DFMAX(I)
+                  DO NV=1,NVAR_RUPT
+                    JJ = JJ + 1
+                    WA(JJ) = UVARF((NV-1)*LLT+I)
                   ENDDO
-           	ENDDO    ! IT = 1,NPTT
+                ENDDO
+                ENDDO
+                ENDDO    ! IT = 1,NPTT
               ENDDO  ! IFAIL = 1,NFAIL
             ENDDO      ! IL = 1,NLAY
 c                                                          

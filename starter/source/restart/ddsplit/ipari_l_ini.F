@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -29,7 +29,7 @@ Chd|        NLOCAL                        source/spmd/node/ddtools.F
 Chd|        FRONT_MOD                     share/modules1/front_mod.F    
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|====================================================================
       SUBROUTINE IPARI_L_INI(IPARI ,PROC   ,NUMNOD_L,
      +                NBDDI2M  ,I2NSN_L,PROBINT,IMAXIMP_L,NBI18_L ,
@@ -48,16 +48,13 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "scr17_c.inc"
 #include      "inter22.inc"
-#include      "ige3d_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -578,7 +575,7 @@ C
           ELSEIF(ITY==24)THEN
 C
 C----NLS1_L,NLS2_L, NLN_L will be calculated after MBINFLG in w_ipari
-Cmis a jour dans w_ipari          
+C  s a jour dans w_ipari          
 c          IPARI_L(35,NI) = NLN_L
 c          IPARI_L(51,NI) = NLINS_L
 c          IPARI_L(52,NI) = NLINM_L
@@ -1401,18 +1398,18 @@ C-----------------
           IPARI_L(18,NI) = NCONT
           IPARI_L(23,NI)= MULTIMP
           IPARI_L(24,NI) = 0
-Cmis a jour dans w_ipari          IF(INACTI==5.OR.INACTI==6.OR.INACTI==7)
-Cmis a jour dans w_ipari     .      IPARI_L(24,NI)= NSNR
-Cmis a jour dans w_ipari          IPARI_L(25,NI) = 0
+C  s a jour dans w_ipari          IF(INACTI==5.OR.INACTI==6.OR.INACTI==7)
+C  s a jour dans w_ipari     .      IPARI_L(24,NI)= NSNR
+C  s a jour dans w_ipari          IPARI_L(25,NI) = 0
           IPARI_L(35,NI) = NLN_L
           IPARI_L(51,NI) = NLINS_L
           IPARI_L(52,NI) = NLINM_L
-Cmis a jour dans w_ipari          IPARI_L(53,NI) = NLINSA_L
-Cmis a jour dans w_ipari          IPARI_L(54,NI) = NLINMA_L
+C  s a jour dans w_ipari          IPARI_L(53,NI) = NLINSA_L
+C  s a jour dans w_ipari          IPARI_L(54,NI) = NLINMA_L
           IPARI_L(55,NI) = NSNE_L
           IPARI_L(56,NI) = NMNE_L
-Cmis a jour dans w_ipari          IF(INACTI==5.OR.INACTI==6.OR.INACTI==7)
-Cmis a jour dans w_ipari     .      IPARI_L(57,NI)= NLINSR
+C  s a jour dans w_ipari          IF(INACTI==5.OR.INACTI==6.OR.INACTI==7)
+C  s a jour dans w_ipari     .      IPARI_L(57,NI)= NLINSR
           IF(NISUB>0) THEN
             IPARI_L(37,NI)= NISUBS_L
             IPARI_L(38,NI)= NISUBM_L

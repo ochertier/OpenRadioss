@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -29,12 +29,15 @@ Chd|        GRELEM_SAV                    source/output/th/grelem_sav.F
 Chd|        SENSOR_ENERGY_BILAN           source/tools/sensor/sensor_energy_bilan.F
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|====================================================================
-      SUBROUTINE TBILAN(PM    ,V      ,EINT   ,AREA   ,PARTSAV,
-     .                  IPARTT,TANI   ,FOR    ,GRESAV ,GRTH   ,
-     .                  IGRTH ,MAT    ,AL     ,VX1    ,VX2    ,
-     .                  VY1   ,VY2    ,VZ1    ,VZ2    ,X1     ,
-     .                  X2    ,Y1     ,Y2     ,Z1     ,Z2     ,
-     .                  ITASK ,H3D_DATA)
+      SUBROUTINE TBILAN(
+     1   PM,      V,       EINT,    AREA,
+     2   PARTSAV, IPARTT,  TANI,    FOR,
+     3   GRESAV,  GRTH,    IGRTH,   MAT,
+     4   AL,      VX1,     VX2,     VY1,
+     5   VY2,     VZ1,     VZ2,     X1,
+     6   X2,      Y1,      Y2,      Z1,
+     7   Z2,      ITASK,   H3D_DATA,NEL,
+     8   IGRE)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -50,13 +53,13 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "param_c.inc"
-#include      "vect01_c.inc"
 #include      "scr14_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: NEL
+      INTEGER, INTENT(IN) :: IGRE
       INTEGER IPARTT(*),GRTH(*),IGRTH(*),MAT(MVSIZ),ITASK
       my_real
      .   PM(NPROPM,*),V(3,*),EINT(*),AREA(*),PARTSAV(NPSAV,*),
@@ -83,11 +86,11 @@ C-----------------------------------------------
 C-----------------------------------------------
       OFF(1:MVSIZ)    = ZERO
 c
-      DO I=LFT,LLT
+      DO I=1,NEL
         RHO(I)=PM(1,MAT(I))
       ENDDO
 c
-      DO I=LFT,LLT
+      DO I=1,NEL
         XX(I)=X1(I)+X2(I)
         YY(I)=Y1(I)+Y2(I)
         ZZ(I)=Z1(I)+Z2(I)
@@ -99,7 +102,7 @@ c
      .        +VZ1(I)*VZ1(I)+VZ2(I)*VZ2(I)
       ENDDO
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         XX(I)=XX(I)*HALF
         YY(I)=YY(I)*HALF
         ZZ(I)=ZZ(I)*HALF
@@ -109,11 +112,11 @@ C
         VA2(I)=VA2(I)*HALF
       ENDDO
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         XMAS(I)=RHO(I)*AREA(I)*AL(I)
       ENDDO
 c
-      DO I=LFT,LLT
+      DO I=1,NEL
         EI(I)= EINT(I)
         EK(I)= XMAS(I)*VA2(I)*HALF
         XM(I)= XMAS(I)*VXA(I)
@@ -121,7 +124,7 @@ c
         ZM(I)= XMAS(I)*VZA(I)   
       ENDDO
 
-      DO I=LFT,LLT
+      DO I=1,NEL
         XCG(I)= XMAS(I)*XX(I)
         YCG(I)= XMAS(I)*YY(I)
         ZCG(I)= XMAS(I)*ZZ(I)
@@ -144,10 +147,10 @@ c
 c
       FLAG = 0
       IF (IGRE /= 0) THEN
-          DO I=LFT,LLT
+          DO I=1,NEL
             OFF(I) = ONE
           ENDDO
-          CALL GRELEM_SAV(LFT   ,LLT   ,GRESAV,IGRTH ,GRTH  ,
+          CALL GRELEM_SAV(1   ,NEL   ,GRESAV,IGRTH ,GRTH  ,
      2                    OFF   ,EI    ,EK    ,XM    ,YM    ,
      3                    ZM    ,XMAS  ,XCG   ,YCG   ,ZCG   ,
      4                    XXM   ,YYM   ,ZZM   ,IXX   ,IYY   ,
@@ -156,7 +159,7 @@ c
 
       ENDIF
 c
-      DO I=LFT,LLT
+      DO I=1,NEL
         M = IPARTT(I)
         PARTSAV(1,M)=PARTSAV(1,M) + EINT(I)
         PARTSAV(2,M)=PARTSAV(2,M) + EK(I)
@@ -181,7 +184,7 @@ c
       ENDDO
 c
       IF (ANIM_FT(1) /= 0 .OR. H3D_DATA%UND_FORC /= 0) THEN
-        DO I=LFT,LLT
+        DO I=1,NEL
           TANI(1,I)= FOR(I)
           TANI(2,I)= ZERO
           TANI(3,I)= ZERO
@@ -190,11 +193,11 @@ c
           TANI(6,I)= ZERO
           TANI(7,I)= ZERO
           TANI(8,I)= ZERO
-          TANI(9,I)= ZERO	
+          TANI(9,I)= ZERO
         ENDDO
       ENDIF
-      OFF(LFT:LLT) = ONE
-      CALL SENSOR_ENERGY_BILAN(LFT,LLT,EINT,EK,OFF,IPARTT,ITASK) 
+      OFF(1:NEL) = ONE
+      CALL SENSOR_ENERGY_BILAN(1,NEL,EINT,EK,OFF,IPARTT,ITASK) 
 C-----------------------------------------------
       RETURN
       END

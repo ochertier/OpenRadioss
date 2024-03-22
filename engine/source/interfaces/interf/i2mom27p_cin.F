@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,6 +26,7 @@ Chd|-- called by -----------
 Chd|        I2FOR27P                      source/interfaces/interf/i2for27p.F
 Chd|-- calls ---------------
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
+Chd|        OUTMAX_MOD                    ../common_source/modules/outmax_mod.F
 Chd|====================================================================
       SUBROUTINE I2MOM27P_CIN(NSN  ,NMN  ,AR    ,IRECT,CRST  ,
      2                    MSR  ,NSV  ,IRTL  ,IN   ,MS    ,
@@ -37,6 +38,7 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE H3D_MOD
+      USE OUTMAX_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -56,16 +58,12 @@ C     REAL
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com08_c.inc"
-#include      "scr05_c.inc"
 #include      "scr14_c.inc"
 #include      "scr16_c.inc"
-#include      "task_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, K, II, L, NN, I0BASE
+      INTEGER I, J, K, II, L, NN, I0BASE, JJ
 C     REAL
       my_real
      .   SS, ST, XMSI, FXI, FYI, FZI, MXI, MYI, MZI,INS,
@@ -176,6 +174,18 @@ C
          MXI = AR(1,I) + YC0 * FZI - ZC0 * FYI
          MYI = AR(2,I) + ZC0 * FXI - XC0 * FZI
          MZI = AR(3,I) + XC0 * FYI - YC0 * FXI
+C
+         IF ((H3D_DATA%N_VECT_CONT2M > 0).AND.(MSEGTYP2(L) == 1)) THEN
+           MCONT2(1,I) =  -AR(1,I)*WEIGHT(I)
+           MCONT2(2,I) =  -AR(2,I)*WEIGHT(I)
+           MCONT2(3,I) =  -AR(3,I)*WEIGHT(I)
+           DO J=1,NIR
+             JJ = IRECT(J,L)
+             MCONT2(1,JJ) = MCONT2(1,JJ) + MXI*H(J)
+             MCONT2(2,JJ) = MCONT2(2,JJ) + MYI*H(J)
+             MCONT2(3,JJ) = MCONT2(3,JJ) + MZI*H(J)
+           ENDDO
+         ENDIF         
 C
          I0 = I0BASE + IADX(K)
          DO J = 1,NIR

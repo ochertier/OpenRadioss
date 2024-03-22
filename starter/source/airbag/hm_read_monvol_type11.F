@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -45,14 +45,18 @@ Chd|        SENSOR_MOD                    share/modules1/sensor_mod.F
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
       SUBROUTINE HM_READ_MONVOL_TYPE11(T_MONVOLN, IPM, IGEO, ITABM1, 
-     .     SENSOR_TAB, NPT, PLD, IFRAME, XFRAME, IGRBRIC,
+     .     SENSORS, NPT, PLD, IFRAME, XFRAME, IGRBRIC,
      .     UNITAB, LUID, NPC, IGRSURF, ITAB, X, PM, GEO, IXC, IXTG, 
      .     LSUBMODEL)
+C-----------------------------------------------
+C   D e s c r i p t i o n
+C-----------------------------------------------
+C Reader for options "/MONVOL/FVMBAG2"
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE UNITAB_MOD
-      USE GROUPDEF_MOD
+      USE GROUPDEF_MOD , only:GROUP_,SURF_
       USE MESSAGE_MOD
       USE MONVOL_STRUCT_MOD
       USE SUBMODEL_MOD
@@ -72,25 +76,21 @@ C     NIMV, NRVOLU
 #include      "param_c.inc"
 C     IIN
 #include      "units_c.inc"
-C     LUNIT
-#include      "sysunit.inc"
 C     IPRI
-#include      "scr03_c.inc"  
-C     NSUBMOD
-#include      "submod_c.inc"
+#include      "scr03_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       TYPE(UNIT_TYPE_), INTENT(IN) :: UNITAB
-      INTEGER, INTENT(IN) :: LUID, IPM(NPROPMI, *), IGEO(NPROPGI, *), ITABM1(*), IFRAME(LISKN,*), NPT(*)
-      INTEGER, INTENT(IN) :: NPC(*), ITAB(*), IXC(NIXC, *), IXTG(NIXTG, *)
-      my_real, INTENT(IN) :: X(3, *), GEO(NPROPG, *), PM(NPROPM, *),
-     .     XFRAME(NXFRAME, *), PLD(2, *)
+      INTEGER, INTENT(IN) :: LUID, IPM(NPROPMI, NUMMAT), IGEO(NPROPGI, NUMGEO), ITABM1(NUMNOD), IFRAME(LISKN,NUMFRAM+1), NPT(*)
+      INTEGER, INTENT(IN) :: NPC(*), ITAB(NUMNOD), IXC(NIXC, NUMELC), IXTG(NIXTG, NUMELTG)
+      my_real, INTENT(IN) :: X(3, NUMNOD), GEO(NPROPG, NUMGEO), PM(NPROPM, NUMMAT),
+     .     XFRAME(NXFRAME, NUMFRAM+1), PLD(2, *)
       TYPE (SURF_), INTENT(INOUT), DIMENSION(NSURF) :: IGRSURF
       TYPE(MONVOL_STRUCT_), INTENT(INOUT) :: T_MONVOLN
       TYPE (GROUP_)  , DIMENSION(NGRBRIC), INTENT(IN) :: IGRBRIC
       TYPE(SUBMODEL_DATA), DIMENSION(NSUBMOD), INTENT(IN) :: LSUBMODEL
-      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE (SENSORS_) ,INTENT(IN) :: SENSORS
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -120,13 +120,13 @@ C-----------------------------------------------
       my_real :: MI, RHOI, TI2, ESPECI, CPA, CPB, CPC, CPD, CPE, CPF, MW_TMP, RMWG, 
      .     CPG, CVG, GAMA, SHOL
       LOGICAL lFOUND
-      INTEGER KFRAME, IMESH_ALL, NSWITCH, AUTO_UP_SWITCH, NBX, NBY, NBZ, IBRIC
+      INTEGER KFRAME, IMESH_ALL, NSWITCH, ISWITCH, NBX, NBY, NBZ, IBRIC
       INTEGER IREF, IGMERG, ILVOUT, NLAYER, NFACMAX, NPPMAX, IFVANI
       INTEGER I1,I2,I3, I4, IGBRIC, NBRIC, NN, ISH34
-      my_real TSWITCH, PARAM, LX, LY, LZ, CNMERG, QA, QB, PTOLE,HMIN, CFL_COEF, DTMIN, SJET, CGMERG
+      my_real TSWITCH, PSWITCH, LX, LY, LZ, CNMERG, QA, QB, PTOLE,HMIN, CFL_COEF, DTMIN, SJET, CGMERG
       my_real NX, NY, NZ, XX, YY, ZZ, X13, Y13, Z13, X24, Y24, Z24
       my_real ORIGX, ORIGY, ORIGZ, DIR2X, DIR2Y, DIR2Z, DIR, DS, DIRX, DIRY, DIRZ, TMP
-      INTEGER :: KMESH,ID_DT_OPTION
+      INTEGER :: KMESH,ID_DT_OPTION, IH3D_FLAG
       LOGICAL :: IS_AVAILABLE
 C-----------------------------------------------
 C     E x t e r n a l   F u n c t i o n s
@@ -146,13 +146,16 @@ C     =======
       CALL HM_GET_INTV('surf_IDex', SURFID, IS_AVAILABLE, LSUBMODEL)
       CALL HM_GET_INTV('surf_IDin', SURFID_INT, IS_AVAILABLE, LSUBMODEL)
       CALL HM_GET_FLOATV('HEAT_T0',HCONV, IS_AVAILABLE, LSUBMODEL, UNITAB)
+      CALL HM_GET_INTV('IH3D', IH3D_FLAG, IS_AVAILABLE, LSUBMODEL)
+
 !     Line 2
       CALL HM_GET_INTV('mat_ID', MID_INI, IS_AVAILABLE, LSUBMODEL)
       CALL HM_GET_FLOATV('Pext', PEXT, IS_AVAILABLE, LSUBMODEL, UNITAB)
       CALL HM_GET_FLOATV('T0', TI, IS_AVAILABLE, LSUBMODEL, UNITAB)
       CALL HM_GET_INTV('Ittf', ITTF, IS_AVAILABLE, LSUBMODEL)
 !     Injectors
-      CALL HM_GET_INTV('Njet', NJET, IS_AVAILABLE, LSUBMODEL)      
+      CALL HM_GET_INTV('Njet', NJET, IS_AVAILABLE, LSUBMODEL) 
+           
       T_MONVOLN%NJET = NJET
       T_MONVOLN%IVOLU(8) = NJET
       IF (NJET > 0) THEN
@@ -290,8 +293,8 @@ C     =======
       IMESH_ALL = 0
       CALL HM_GET_FLOATV('Cgmerg', CGMERG, IS_AVAILABLE, LSUBMODEL, UNITAB)
       CALL HM_GET_FLOATV('Tswitch', TSWITCH, IS_AVAILABLE, LSUBMODEL, UNITAB)
-      CALL HM_GET_INTV('Iswitch', AUTO_UP_SWITCH, IS_AVAILABLE, LSUBMODEL)
-      CALL HM_GET_FLOATV('Pswitch', PARAM, IS_AVAILABLE, LSUBMODEL, UNITAB)
+      CALL HM_GET_INTV('Iswitch', ISWITCH, IS_AVAILABLE, LSUBMODEL)
+      CALL HM_GET_FLOATV('Pswitch', PSWITCH, IS_AVAILABLE, LSUBMODEL, UNITAB)
 
       CALL HM_GET_FLOATV('Dtsca', CFL_COEF, IS_AVAILABLE, LSUBMODEL, UNITAB)
       CALL HM_GET_FLOATV('Dtmin', DTMIN, IS_AVAILABLE, LSUBMODEL, UNITAB)
@@ -435,7 +438,13 @@ C     internal surface check
       IF(T_MONVOLN%INT_SURFID/=0) SURFID_INT=IGRSURF(T_MONVOLN%INT_SURFID)%ID
                       
    !-----------------------------------------------   
- 
+
+      !IH3D_FLAG
+      IF(IH3D_FLAG /= 0)THEN
+        IF(IH3D_FLAG /= -1 .AND. IH3D_FLAG /= 1)THEN
+          IH3D_FLAG = -1
+        ENDIF
+      ENDIF    
 
 C     ==============
 C     Default values
@@ -447,7 +456,7 @@ C     ==============
       SCAL_D = ONE
       AMU = EM02
       IF (PEXT == ZERO) THEN
-         PEXT = 101325.D0 * (FAC_L_WORK * FAC_T_WORK * FAC_T_WORK) / FAC_M_WORK
+         PEXT = 101325.D0 * (UNITAB%FAC_L_WORK * UNITAB%FAC_T_WORK * UNITAB%FAC_T_WORK) / UNITAB%FAC_M_WORK
       ENDIF
       PINI = PEXT
       LX = ZERO
@@ -483,7 +492,7 @@ C     ==============
                FPZ(II) = ONE
             ENDIF
             IVEL(II) = ZERO
-            FVEL(II) = THREE100 * FAC_T_WORK / FAC_L_WORK
+            FVEL(II) = THREE100 * UNITAB%FAC_T_WORK / UNITAB%FAC_L_WORK
          ENDDO
       ENDIF
 !     Ventholes
@@ -520,7 +529,7 @@ C     ==============
         IF (FVEL(II) == ZERO)  FVEL(II) = ONE 
       ENDDO 
 
-      IF(TSWITCH == ZERO) TSWITCH=EP30
+      IF(TSWITCH == ZERO) TSWITCH=EP20
       
       IF (NBX==0) NBX=1
       IF (NBY==0) NBY=1
@@ -536,7 +545,7 @@ C     ==============
       
       IF(CFL_COEF/=ZERO .AND. DTMIN/=ZERO)ID_DT_OPTION=1
       IF(CFL_COEF==ZERO)CFL_COEF=ZEP9        
-      IF(DTMIN==ZERO)DTMIN=EM20      
+      IF(DTMIN==ZERO)DTMIN=EM20       
 
          !------------------------------------------------------!  
 C     =====
@@ -560,7 +569,8 @@ C     =====
       T_MONVOLN%IVOLU(59)=IREF
       T_MONVOLN%IVOLU(60)=IGMERG 
       T_MONVOLN%IVOLU(65)=NBZ
-      T_MONVOLN%IVOLU(74) = AUTO_UP_SWITCH !Parameter for autoswitching to uniform pressure airbag
+      T_MONVOLN%IVOLU(74) = ISWITCH !Parameter for autoswitching to uniform pressure airbag
+      T_MONVOLN%IVOLU(75) = IH3D_FLAG
 
       T_MONVOLN%RVOLU(19) = HCONV
       T_MONVOLN%RVOLU(26) = ONE / SCAL_T
@@ -589,7 +599,7 @@ C     =====
       T_MONVOLN%RVOLU(70) = TSWITCH
       T_MONVOLN%RVOLU(71) = CFL_COEF
       T_MONVOLN%RVOLU(72) = DTMIN
-      T_MONVOLN%RVOLU(73) = PARAM 
+      T_MONVOLN%RVOLU(73) = PSWITCH 
 
                      
       MID_INISYS = T_MONVOLN%IVOLU(66)
@@ -721,10 +731,10 @@ C     =====
          ENDIF
          IF (ISENS(II) > 0) THEN
             FOUND = .FALSE.
-            DO JJ = 1, NSENSOR
-               IF (ISENS(II) == SENSOR_TAB(JJ)%SENS_ID) THEN
+            DO JJ = 1, SENSORS%NSENSOR
+               IF (ISENS(II) == SENSORS%SENSOR_TAB(JJ)%SENS_ID) THEN
                   T_MONVOLN%IBAGJET(4, II) = JJ
-                  IF (SENSOR_TAB(JJ)%TCRIT < TTFIRE) TTFIRE = SENSOR_TAB(JJ)%TCRIT
+                  IF (SENSORS%SENSOR_TAB(JJ)%TCRIT < TTFIRE) TTFIRE = SENSORS%SENSOR_TAB(JJ)%TCRIT
                   FOUND = .TRUE.
                   EXIT
                ENDIF
@@ -978,10 +988,15 @@ C     =========
       ENDIF
       WRITE(IOUT,1415) MWI, GAMAI, CPAI, CPBI, CPCI, CPDI, CPEI, CPFI
       WRITE(IOUT,1700)
-      WRITE(IOUT,2703) TSWITCH
-      IF (AUTO_UP_SWITCH > 0) THEN
-         WRITE (IOUT, 1789) AUTO_UP_SWITCH, PARAM, TSWITCH, PARAM, TSWITCH
+      
+      IF(ISWITCH /= 0 .OR. TSWITCH /= ZERO .OR. PSWITCH /= ZERO)THEN      
+        WRITE(IOUT,1789) ISWITCH
+        WRITE(IOUT,1790)
+        WRITE(IOUT,1791)        
+        WRITE(IOUT,2703) TSWITCH
+        WRITE(IOUT,2704) PSWITCH 
       ENDIF
+              
       IF (T_MONVOLN%IMESH_ALL > 0) THEN
          WRITE(IOUT, 1706) T_MONVOLN%IMESH_ALL
       ENDIF
@@ -1056,6 +1071,7 @@ C     =========
          ENDIF
          DO JJ = 1, 20
             TITREVENT(JJ) = T_MONVOLN%IBAGHOL(JJ + 14, II)
+            VENTTITLE(JJ:JJ) = ACHAR(TITREVENT(JJ))
          ENDDO
          WRITE(IOUT,1476) VENTTITLE
          IF (IPVENT(II)==0) THEN                      
@@ -1095,6 +1111,12 @@ C     =========
             ENDIF
          ENDIF
       ENDDO
+      
+      IF(T_MONVOLN%IVOLU(75) == 1)THEN
+        WRITE(IOUT,3001)1
+      ENDIF
+      
+            
 C     ===================
 C     Memory deallocation
 C     ===================
@@ -1362,12 +1384,13 @@ C-----------------------------------------------
      .     /15X,'       FACETS PER CUTTING CELL. . . . .=',I10,
      .     /15X,'   ESTIMATED MAXIMUM NUMBER OF POINTS   ',
      .     /15X,'       PER POLYGON. . . . . . . . . . .=',I10,
-     .     /15X,'FLAG FOR ANIMATION FILE A000. . . . . .=',I10)
- 1789 FORMAT(15X,'AUTOSWITCH TO UNIFORM PRESSURE OPTION .=',I10,
-     .     /15X,'       = 1 DISPERSION BASED WITH ', 1PG20.13, ' TOLERANCE AROUND AVERAGE OR TIME > ', 1PG20.13,
-     .     /15X,'       = 2 DISPERSION BASED WITH ', 1PG20.13, ' TOLERANCE AROUND AVERAGE AND TIME > ', 1PG20.13)
- 2703 FORMAT(15X,'TIME TO SWITCH TO UNIFORM PRESSURE. . .=',1PG20.13)
- 1711 FORMAT(/15X,'INTERNAL SURFACE ID. .  . . . . . . . .=',I10,
+     .     /15X,  'FLAG FOR ANIMATION FILE A000. . . . . .=',I10)
+ 1789 FORMAT(15X, 'SWITCH OPTION (ISWITCH). . . . . . . . =',I10)
+ 1790 FORMAT(15X, '       = 1 SWITCH TO UNIFORM PRESSURE')
+ 1791 FORMAT(15X, '       = 2 MERGE TO SINGLE FV INSIDE EACH CHAMBER') 
+ 2703 FORMAT(15X, '   TIME (TSWITCH) . . . . . . .  . . . =',1PG20.13)
+ 2704 FORMAT(15X, '   PRESSURE DEVIATION RATIO (PSWITCH)  =',1PG20.13)
+ 1711 FORMAT(/15X,'INTERNAL SURFACE ID .  . . . . . . . =',I10,
      .     /15X,'CELL MERGING STRATEGY:                  ',
      .     /15X,'   GLOBAL MERGING TYPE. . . . . . . . .=',I10,
      .     /15X,'   GLOBAL MERGING COEFFICIENT . . . . .=',1PG20.13,
@@ -1375,4 +1398,9 @@ C-----------------------------------------------
      .     /15X,'DT SCALE FACTOR . . . . . . . . . . . .=',1PG20.13,
      .     /15X,'MINIMUM TIMESTEP. . . . . . . . . . . .=',1PG20.13)      
  2435 FORMAT(15X,'INCOMING GAS VELOCITY. . . . . . . . .=',1PG20.13)
+ 3001 FORMAT(
+     .     /5X,'DEBUG OPTIONS',
+     .     /5X,'-------------',
+     .     /5X,'   IH3D_FLAG (H3D OUTPUT). . . . . . . .=', I10)
+      
       END SUBROUTINE HM_READ_MONVOL_TYPE11

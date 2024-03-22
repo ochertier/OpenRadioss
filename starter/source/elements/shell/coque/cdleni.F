@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,7 +25,7 @@ Chd|  CDLENI                        source/elements/shell/coque/cdleni.F
 Chd|-- called by -----------
 Chd|        CINIT3                        source/elements/shell/coque/cinit3.F
 Chd|-- calls ---------------
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/matparam_def_mod.F
+Chd|        GROUP_PARAM_MOD               ../common_source/modules/mat_elem/group_param_mod.F
 Chd|====================================================================
       SUBROUTINE CDLENI(PM  ,GEO ,STIFN ,STIFR,IXC,
      .                  PX1 ,PX2 ,PY1   ,PY2  ,THK,
@@ -37,7 +37,7 @@ Chd|====================================================================
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
-      USE MATPARAM_DEF_MOD            
+      USE GROUP_PARAM_MOD            
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -49,26 +49,21 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com06_c.inc"
-#include      "com08_c.inc"
 #include      "param_c.inc"
 #include      "remesh_c.inc"
-#include      "scr03_c.inc"
-#include      "units_c.inc"
 #include      "vect01_c.inc"
-#include      "com01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IMAT,IPROP
       INTEGER IXC(NIXC,*), IGEO(NPROPGI,*), SH4TREE(KSH4TREE,*),
-     .   IPM(NPROPMI,*),NLAY,ISUBSTACK,IGEO_STACK(3* NPT_STACK+2,*)
+     .   IPM(NPROPMI,*),NLAY,ISUBSTACK,IGEO_STACK(4*NPT_STACK+2,*)
       my_real
      .   PM(NPROPM,*), GEO(NPROPG,*),STIFN(*),STIFR(*),UPARAM(*),
      .   PX1(*),PX2(*),PY1(*),PY2(*),THK(*),DT(*),ALDT(*),PM_STACK(20,*),
      .   AREA(MVSIZ), STRC(*),
      .   X2L(MVSIZ),X3L(MVSIZ),X4L(MVSIZ),Y2L(MVSIZ),Y3L(MVSIZ),Y4L(MVSIZ)
-      TYPE (GRP_PARAM_STRUCT_)  :: GROUP_PARAM
+      TYPE (GROUP_PARAM_)  :: GROUP_PARAM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -443,7 +438,7 @@ C----------------------------------------------------------
         ENDDO
       ELSE
         DO I=LFT,LLT
-	         PX1(I)= ZERO
+                   PX1(I)= ZERO
           PX2(I)= ZERO
           PY1(I)= ZERO
           PY2(I)= ZERO

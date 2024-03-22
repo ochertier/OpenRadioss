@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -23,9 +23,14 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 Chd|====================================================================
 Chd|  ALEANIM_MOD                   share/modules/aleanim_mod.F   
 Chd|-- called by -----------
+Chd|        DFUNCS                        source/output/anim/generate/dfunc6.F
 Chd|        GENANI                        source/output/anim/generate/genani.F
 Chd|        GENH3D                        source/output/h3d/h3d_results/genh3d.F
+Chd|        H3D_SOLID_SCALAR              source/output/h3d/h3d_results/h3d_solid_scalar.F
+Chd|        H3D_SOLID_SCALAR_1            source/output/h3d/h3d_results/h3d_solid_scalar_1.F
+Chd|        H3D_SOLID_VECTOR              source/output/h3d/h3d_results/h3d_solid_vector.F
 Chd|        I18FOR3                       source/interfaces/int18/i18for3.F
+Chd|        INIRESA                       source/output/restart/rdresa.F
 Chd|        RESTALLOC                     source/output/restart/arralloc.F
 Chd|        SDEFO3                        source/elements/solid/solide/sdefo3.F
 Chd|        SORTIE_MAIN                   source/output/sortie_main.F   
@@ -35,7 +40,18 @@ Chd|====================================================================
       
 #include "my_real.inc"
 
-        my_real , 
-     .    DIMENSION(:), ALLOCATABLE ::  FANI_CELL
+        TYPE FANI_CELL_
+          LOGICAL IS_F18_FVM_REQUESTED
+          LOGICAL IS_VORT_X_REQUESTED
+          LOGICAL IS_VORT_Y_REQUESTED
+          LOGICAL IS_VORT_Z_REQUESTED
+          my_real,DIMENSION(:,:), ALLOCATABLE :: F18
+          my_real,DIMENSION(:), ALLOCATABLE :: VORT_X
+          my_real,DIMENSION(:), ALLOCATABLE :: VORT_Y
+          my_real,DIMENSION(:), ALLOCATABLE :: VORT_Z
+        END TYPE
+
+        TYPE(FANI_CELL_) :: FANI_CELL
+
 
       END MODULE ALEANIM_MOD

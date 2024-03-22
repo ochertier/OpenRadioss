@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -29,7 +29,7 @@ Chd|        INITBUF                       share/resol/initbuf.F
 Chd|        STARTIMEG                     source/system/timer.F         
 Chd|        STOPTIMEG                     source/system/timer.F         
 Chd|        XFORC3                        source/elements/xelem/xforc3.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        INITBUF_MOD                   share/resol/initbuf.F         
 Chd|====================================================================
       SUBROUTINE FORINTS(
@@ -54,26 +54,15 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "com06_c.inc"
-#include      "com08_c.inc"
-#include      "com10_c.inc"
 #include      "param_c.inc"
 #include      "vect01_c.inc"
-#include      "scr05_c.inc"
-#include      "scr07_c.inc"
 #include      "scr17_c.inc"
 #include      "task_c.inc"
 #include      "parit_c.inc"
 #include      "scr23_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -112,7 +101,7 @@ C---
 C
             OFFSET = NELEM - 1
 C
-           CALL INITBUF (IPARG    ,NG      ,
+           CALL INITBUF(IPARG    ,NG      ,
      2        MTN     ,NEL     ,NFT     ,IAD     ,ITY     ,
      3        NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,
      4        JTHE    ,JLAG    ,JMULT   ,JHBE    ,JIVF    ,
@@ -129,14 +118,16 @@ C
             LLT=MIN(NVSIZ,NEL-NELEM+1)
 C           Multi-purpose element Groups are constituted,
 C           but Multi-purpose element is not supposed to be vectorized ..
-             CALL XFORC3(NFT,NEL ,GEO    ,PM     ,ITAB  ,
-     2                   KXX    ,IXX  ,X     ,V      ,VR    ,
-     3                   A      ,AR   ,ELBUF(IAD),NPC    ,TF    ,
-     4                   SKEW   ,DT2T   ,NELTST ,ITYPTST ,
-     5                   STIFN  ,STIFR ,MS      ,IN     ,
-     6                   FSKYI ,ISKY   ,PARTSAV,IPARTX,
-     7                   BUFMAT ,BUFGEO ,
-     8                   GRESAV ,GRTH  ,IGRTH,ELBUF_TAB(NG))
+             CALL XFORC3(
+     1   NFT,          NEL,          GEO,          PM,
+     2   ITAB,         KXX,          IXX,          X,
+     3   V,            VR,           A,            AR,
+     4   ELBUF(IAD),   NPC,          TF,           SKEW,
+     5   DT2T,         NELTST,       ITYPTST,      STIFN,
+     6   STIFR,        MS,           IN,           FSKYI,
+     7   ISKY,         PARTSAV,      IPARTX,       BUFMAT,
+     8   BUFGEO,       GRESAV,       GRTH,         IGRTH,
+     9   ELBUF_TAB(NG),IGRE)
             IF (IDDW>0) CALL STOPTIMEG(NG)
          END DO
  240  CONTINUE

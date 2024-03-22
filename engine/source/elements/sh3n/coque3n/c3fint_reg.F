@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,14 +25,16 @@ Chd|  C3FINT_REG                    source/elements/sh3n/coque3n/c3fint_reg.F
 Chd|-- called by -----------
 Chd|        C3FORC3                       source/elements/sh3n/coque3n/c3forc3.F
 Chd|-- calls ---------------
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        NLOCAL_REG_MOD                ../common_source/modules/nlocal_reg_mod.F
 Chd|====================================================================
-      SUBROUTINE C3FINT_REG(NLOC_DMG,VAR_REG ,THK     ,NEL     ,
-     .                      OFF     ,AREA    ,NC1     ,NC2     ,
-     .                      NC3     ,PX1     ,PY1     ,PY2     , 
-     .                      BUFNL   ,IMAT    ,NDDL    ,ITASK   ,
-     .                      DT2T    ,LE      ,THK0    ,AREA0   )
+      SUBROUTINE C3FINT_REG(
+     1   NLOC_DMG,VAR_REG, THK,     NEL,
+     2   OFF,     AREA,    NC1,     NC2,
+     3   NC3,     PX1,     PY1,     PY2,
+     4   BUFNL,   IMAT,    NDDL,    ITASK,
+     5   DT2T,    LE,      THK0,    AREA0,
+     6   NFT)
 C-----------------------------------------------
 C   M o d u l e s
 C----------------------------------------------- 
@@ -45,9 +47,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
-#include      "param_c.inc"
 #include      "parit_c.inc"
-#include      "vect01_c.inc"
 #include      "com20_c.inc"
 #include      "com08_c.inc"
 #include      "scr02_c.inc"
@@ -55,6 +55,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: NFT
       INTEGER                                    :: NEL,IMAT,NDDL,ITASK
       INTEGER, DIMENSION(NEL)                    :: NC1,NC2,NC3
       my_real, DIMENSION(NEL,NDDL), INTENT(INOUT):: 

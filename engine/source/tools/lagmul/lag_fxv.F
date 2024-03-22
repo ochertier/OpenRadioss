@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -32,7 +32,9 @@ Chd|====================================================================
      2                   BLL    ,IADLL  ,LLL    ,JLL    ,SLL    ,
      3                   XLL    ,COMNTAG,ICFTAG ,JCFTAG ,MS     ,
      4                   IN     ,V      ,VR     ,A      ,AR     ,
-     5                   ISKIP  ,NCF_S  ,NC     )
+     5                   ISKIP  ,NCF_S  ,NC     ,PYTHON)
+
+      USE PYTHON_FUNCT_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -41,7 +43,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "lagmult.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
 C-----------------------------------------------
@@ -53,6 +54,7 @@ C-----------------------------------------------
       my_real
      .  XLL(*),BLL(*),SKEW(LSKEW,*),VEL(LFXVELR,*),TF(*),MS(*),IN(*),
      .  V(3,*),VR(3,*),A(3,*),AR(3,*)
+      TYPE(PYTHON_), INTENT(INOUT) :: PYTHON
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -86,8 +88,10 @@ C======================================================================|
           IF (IFUN > 0) ISMOOTH = NPF(2*NFUNCT+IFUN+1)
           IF (ISMOOTH == 0) THEN
             VF = FINTER(IFUN, TS, NPF, TF, DERI)
-          ELSE
+          ELSE IF (ISMOOTH > 0) THEN
             VF = FINTER_SMOOTH(IFUN, TS, NPF, TF, DERI)
+          ELSE
+            CALL PYTHON_CALL_FUNCT1D(PYTHON, -ISMOOTH, TS, VF) 
           ENDIF ! IF (ISMOOTH == 0)
           NC = NC + 1
           BLL(NC) = -VF*FAC / DT12
@@ -160,7 +164,8 @@ Chd|        FINTER_SMOOTH                 source/tools/curve/finter_smooth.F
 Chd|====================================================================
       SUBROUTINE LAG_FXVP(IBFV   ,VEL    ,SKEW   ,NPF    ,TF     ,
      2                    LAGCOMC,LAGCOMK,NC     ,NODGLOB,WEIGHT ,
-     3                    IK     )
+     3                    IK     ,PYTHON)
+      USE PYTHON_FUNCT_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -169,7 +174,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "lagmult.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
 C-----------------------------------------------
@@ -180,6 +184,7 @@ C-----------------------------------------------
       my_real
      .        LAGCOMK(4,*),LAGCOMC(2,*),SKEW(LSKEW,*),VEL(LFXVELR,*),
      .        TF(*)
+      TYPE(PYTHON_), INTENT(INOUT) :: PYTHON
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -205,7 +210,7 @@ C======================================================================|
         IF (IBFV(8,N)/=0) THEN
          NNO = IABS(IBFV(1,N))
          IF(WEIGHT(NNO)==1) THEN  ! une seule fois en SPMD
-Cel numerotation globale
+C   numerotation globale
           FACX   = VEL(5,N)
           TS = (TT + HALF*DT2)*FACX
           NNO = NODGLOB(NNO)
@@ -218,8 +223,10 @@ Cel numerotation globale
 !!          VF = FINTER(IFUN, TS, NPF, TF, DERI)
           IF (ISMOOTH == 0) THEN
             VF = FINTER(IFUN, TS, NPF, TF, DERI)
-          ELSE
+          ELSE IF(ISMOOTH > 0) THEN
             VF = FINTER_SMOOTH(IFUN, TS, NPF, TF, DERI)
+          ELSE
+            CALL PYTHON_CALL_FUNCT1D(PYTHON, -ISMOOTH, TS, VF) 
           ENDIF
           NC = NC + 1
           LAGCOMC(2,NC) = -VF*FAC / DT12

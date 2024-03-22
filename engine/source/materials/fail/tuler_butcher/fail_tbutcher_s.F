@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -31,11 +31,10 @@ Chd|        USERMAT_SOLID                 source/materials/mat_share/usermat_sol
 Chd|-- calls ---------------
 Chd|====================================================================
       SUBROUTINE FAIL_TBUTCHER_S(
-     1     NEL    ,NUPARAM,NUVAR   ,MFUNC   ,KFUNC   ,
-     2     NPF    ,TF     ,TIME   ,TIMESTEP ,UPARAM  ,
-     3     NGL    , IPM    ,MAT,
-     4     SIGNXX ,SIGNYY ,SIGNZZ  ,SIGNXY  ,SIGNYZ  ,SIGNZX ,
-     5     UVAR    ,OFF    ,IP     ,DFMAX   ,TDELE   )
+     1     NEL    ,NUPARAM,NUVAR   ,
+     2     TIME   ,TIMESTEP ,UPARAM  ,NGL    ,
+     3     SIGNXX ,SIGNYY ,SIGNZZ  ,SIGNXY  ,SIGNYZ  ,SIGNZX ,
+     4     UVAR    ,OFF    ,DFMAX   ,TDELE   )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -49,10 +48,7 @@ C NEL     |  1      | I | R | SIZE OF THE ELEMENT GROUP NEL
 C NUPARAM |  1      | I | R | SIZE OF THE USER PARAMETER ARRAY
 C NUVAR   |  1      | I | R | NUMBER OF USER ELEMENT VARIABLES
 C---------+---------+---+---+--------------------------------------------
-C MFUNC   |  1      | I | R | NUMBER FUNCTION USED FOR THIS USER LAW not used
-C KFUNC   | NFUNC   | I | R | FUNCTION INDEX not used
-C NPF     |  *      | I | R | FUNCTION ARRAY   
-C TF      |  *      | F | R | FUNCTION ARRAY 
+
 C---------+---------+---+---+--------------------------------------------
 C TIME    |  1      | F | R | CURRENT TIME
 C TIMESTEP|  1      | F | R | CURRENT TIME STEP
@@ -87,13 +83,12 @@ C---------+---------+---+---+--------------------------------------------
 #include "units_c.inc"
 #include  "comlock.inc"
 #include  "param_c.inc"
-#include      "impl1_c.inc"
+#include  "impl1_c.inc"
 C-----------------------------------------------
 C   I N P U T   A r g u m e n t s
 C-----------------------------------------------
 C
-      INTEGER NEL, NUPARAM, NUVAR,NGL(NEL),IPM(NPROPMI,*),
-     .        MAT(NEL),IP
+      INTEGER NEL, NUPARAM, NUVAR,NGL(NEL)
       my_real 
      .   TIME,TIMESTEP,UPARAM(*),
      .   SIGNXX(NEL),SIGNYY(NEL),SIGNZZ(NEL),
@@ -107,11 +102,6 @@ C-----------------------------------------------
 C   I N P U T   O U T P U T   A r g u m e n t s 
 C-----------------------------------------------
       my_real UVAR(NEL,NUVAR), OFF(NEL),DFMAX(NEL),TDELE(NEL)
-C-----------------------------------------------
-C   VARIABLES FOR FUNCTION INTERPOLATION 
-C-----------------------------------------------
-      INTEGER NPF(*), MFUNC, KFUNC(MFUNC)
-      my_real TF(*)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -128,11 +118,6 @@ c=======================================================================
       SIGR  = UPARAM(3)
       IFLAG = INT(UPARAM(5))
 
-      IF(TIME == ZERO)THEN
-        DO I=1,NEL
-         TDELE(I)  = ZERO
-        ENDDO   
-      ENDIF 
 C-----------------------------------------------
       IDEL=0
       IDEV=0
@@ -204,7 +189,7 @@ c         yp= 3 x^2 + c
           IF(YP/=ZERO)SIGMAX = SIGMAX - Y/YP
          ENDIF 
          SIGMAX = SIGMAX + P  
-         IF(SIGMAX>=SIGR)            	 
+         IF(SIGMAX>=SIGR)               
      .    UVAR(I,1)=UVAR(I,1) + TIMESTEP*(SIGMAX - SIGR)**TBA  
 cc          UVAR(I,2)=UVAR(I,2) + TIMESTEP  
          IF (UVAR(I,1)>TBK) THEN
@@ -214,7 +199,7 @@ cc          UVAR(I,2)=UVAR(I,2) + TIMESTEP
           INDX(NINDX)=I
           TDELE(I) = TIME  
          ENDIF
-	ENDIF
+          ENDIF
        ENDDO
        IF(NINDX>0.AND.IMCONV==1)THEN
         DO J=1,NINDX
@@ -277,10 +262,10 @@ c         yp= 3 x^2 + c
            IF(YP/=ZERO)SIGMAX = SIGMAX - Y/YP
           ENDIF   
           SIGMAX = SIGMAX + P          
-          IF(SIGMAX>=SIGR)            	 
+          IF(SIGMAX>=SIGR)               
      .     UVAR(I,1)=UVAR(I,1) + TIMESTEP*(SIGMAX - SIGR)**TBA    
 cc          UVAR(I,2)=UVAR(I,2) + TIMESTEP  
-          IF(UVAR(I,1)>TBK) THEN	  
+          IF(UVAR(I,1)>TBK) THEN    
            NINDX=NINDX+1
            INDX(NINDX)=I
            SIGNXX(I) =   P

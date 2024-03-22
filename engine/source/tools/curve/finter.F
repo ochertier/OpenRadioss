@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -36,13 +36,16 @@ Chd|        CONVEC                        source/constraints/thermic/convec.F
 Chd|        DAASOLV                       source/fluid/daasolv.F        
 Chd|        DAASOLVP                      source/fluid/daasolvp.F       
 Chd|        DAM_FLD_SOL                   source/output/h3d/h3d_results/h3d_sol_skin_scalar.F
+Chd|        FAIL_BIQUAD_B                 source/materials/fail/biquad/fail_biquad_b.F
 Chd|        FAIL_BIQUAD_C                 source/materials/fail/biquad/fail_biquad_c.F
+Chd|        FAIL_BIQUAD_IB                source/materials/fail/biquad/fail_biquad_ib.F
 Chd|        FAIL_BIQUAD_S                 source/materials/fail/biquad/fail_biquad_s.F
 Chd|        FAIL_CONNECT                  source/materials/fail/connect/fail_connect.F
+Chd|        FAIL_ENERGY_B                 source/materials/fail/energy/fail_energy_b.F
 Chd|        FAIL_ENERGY_C                 source/materials/fail/energy/fail_energy_c.F
+Chd|        FAIL_ENERGY_IB                source/materials/fail/energy/fail_energy_ib.F
 Chd|        FAIL_ENERGY_S                 source/materials/fail/energy/fail_energy_s.F
 Chd|        FAIL_FABRIC_C                 source/materials/fail/fabric/fail_fabric_c.F
-Chd|        FAIL_FLD_C                    source/materials/fail/fld/fail_fld_c.F
 Chd|        FAIL_FLD_TSH                  source/materials/fail/fld/fail_fld_tsh.F
 Chd|        FAIL_FLD_XFEM                 source/materials/fail/fld/fail_fld_xfem.F
 Chd|        FAIL_GENE1_C                  source/materials/fail/gene1/fail_gene1_c.F
@@ -55,6 +58,7 @@ Chd|        FAIL_ORTHSTRAIN_C             source/materials/fail/orthstrain/fail_
 Chd|        FAIL_SAHRAEI_S                source/materials/fail/sahraei/fail_sahraei_s.F
 Chd|        FAIL_SNCONNECT                source/materials/fail/snconnect/fail_snconnect.F
 Chd|        FAIL_SYAZWAN_C                source/materials/fail/syazwan/fail_syazwan_c.F
+Chd|        FAIL_SYAZWAN_S                source/materials/fail/syazwan/fail_syazwan_s.F
 Chd|        FAIL_TAB2_C                   source/materials/fail/tabulated/fail_tab2_c.F
 Chd|        FAIL_TAB2_S                   source/materials/fail/tabulated/fail_tab2_s.F
 Chd|        FAIL_TAB_C                    source/materials/fail/tabulated/fail_tab_c.F
@@ -62,7 +66,9 @@ Chd|        FAIL_TAB_OLD_C                source/materials/fail/tabulated/fail_t
 Chd|        FAIL_TAB_OLD_XFEM             source/materials/fail/tabulated/fail_tab_old_xfem.F
 Chd|        FAIL_TAB_S                    source/materials/fail/tabulated/fail_tab_s.F
 Chd|        FAIL_TAB_XFEM                 source/materials/fail/tabulated/fail_tab_xfem.F
+Chd|        FAIL_TENSSTRAIN_B             source/materials/fail/tensstrain/fail_tensstrain_b.F
 Chd|        FAIL_TENSSTRAIN_C             source/materials/fail/tensstrain/fail_tensstrain_c.F
+Chd|        FAIL_TENSSTRAIN_IB            source/materials/fail/tensstrain/fail_tensstrain_ib.F
 Chd|        FAIL_TENSSTRAIN_S             source/materials/fail/tensstrain/fail_tensstrain_s.F
 Chd|        FAIl_TAB_OLD_S                source/materials/fail/tabulated/fail_tab_old_s.F
 Chd|        FIXFLUX                       source/constraints/thermic/fixflux.F
@@ -137,9 +143,9 @@ Chd|        SIGEPS60G                     source/materials/mat/mat060/sigeps60g.
 Chd|        SIGEPS66                      source/materials/mat/mat066/sigeps66.F
 Chd|        SIGEPS66C                     source/materials/mat/mat066/sigeps66c.F
 Chd|        SIGEPS69                      source/materials/mat/mat069/sigeps69.F
-Chd|        SIGEPS70                      source/materials/mat/mat070/sigeps70.F
 Chd|        SIGEPS73C                     source/materials/mat/mat073/sigeps73c.F
 Chd|        SIGEPS74                      source/materials/mat/mat074/sigeps74.F
+Chd|        SIGEPS76                      source/materials/mat/mat076/sigeps76.F
 Chd|        SIGEPS76C                     source/materials/mat/mat076/sigeps76c.F
 Chd|        SIGEPS77                      source/materials/mat/mat077/sigeps77.F
 Chd|        SIGEPS78                      source/materials/mat/mat078/sigeps78.F

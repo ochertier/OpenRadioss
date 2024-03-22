@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -48,7 +48,6 @@ C-----------------------------------------------
 C   C O M M O N
 C-----------------------------------------------
 #include "param_c.inc"
-#include "scr17_c.inc"
 #include "com01_c.inc"
 C----------------------------------------------------------------
 C  I N P U T   A R G U M E N T S
@@ -150,7 +149,7 @@ C     principal stretch (def gradient eigenvalues)
         TRAV(I)  = EPSXX(I)+EPSYY(I)
         ROOTV(I) = SQRT((EPSXX(I)-EPSYY(I))*(EPSXX(I)-EPSYY(I))
      .           + EPSXY(I)*EPSXY(I))
-	       EVV(I,1) = HALF*(TRAV(I)+ROOTV(I))
+                 EVV(I,1) = HALF*(TRAV(I)+ROOTV(I))
         EVV(I,2) = HALF*(TRAV(I)-ROOTV(I))
         EVV(I,3) = ZERO
       ENDDO

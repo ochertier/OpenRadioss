@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -30,8 +30,9 @@ Chd|-- calls ---------------
 Chd|        INITBUF                       share/resol/initbuf.F         
 Chd|        MY_BARRIER                    source/system/machine.F       
 Chd|        VARCONDEC                     source/interfaces/interf/varcondec.F
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
+Chd|        ALE_MOD                       ../common_source/modules/ale/ale_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        INITBUF_MOD                   share/resol/initbuf.F         
 Chd|        SEGVAR_MOD                    share/modules/segvar_mod.F    
 Chd|====================================================================
@@ -43,6 +44,7 @@ C-----------------------------------------------
       USE ELBUFDEF_MOD    
       USE SEGVAR_MOD              
       USE ALE_CONNECTIVITY_MOD
+      USE ALE_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -50,14 +52,10 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr01_c.inc"
 #include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "vect01_c.inc"
 #include      "param_c.inc"
 #include      "task_c.inc"
-#include      "conv_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -68,7 +66,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NG, I, J, IV, KVAR, KK, JCODV(LCONV),CODTOT, SEGAD, IAD2, LGTH
+      INTEGER NG, I, J, IV, KVAR, KK, JCODV(ALE%GLOBAL%LCONV),CODTOT, SEGAD, IAD2, LGTH
       TYPE(G_BUFEL_)  ,POINTER :: GBUF     
       TYPE(BUF_MAT_)  ,POINTER :: MBUF  
 C=======================================================================
@@ -80,7 +78,7 @@ C
 c
          CALL VARCONDEC(JCODV,IPARG(34,NG),CODTOT)
          IF (CODTOT == 0) GOTO 100
-         CALL INITBUF (IPARG    ,NG      ,                     
+         CALL INITBUF(IPARG    ,NG      ,                     
      2         MTN     ,LLT     ,NFT     ,IAD     ,ITY     ,   
      3         NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,   
      4         JTHE    ,JLAG    ,JMULT   ,JHBE    ,JIVF    ,   

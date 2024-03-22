@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -37,10 +37,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -123,10 +119,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "r4r8_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
@@ -151,13 +143,13 @@ C
       IF(IMACH==3) THEN
         DO I = 1, NINTER
           MULTIMP = IPARI(23,I)
-	  IF(MULTIMP<=4) THEN
-	    MULTIMAX = MAX(MULTIMAX,4*MULTIMP)
-	  ELSEIF(MULTIMP<=12)THEN
-	    MULTIMAX= MAX(MULTIMAX,3*MULTIMP)
-	  ELSEIF(MULTIMP>12)THEN
-	    MULTIMAX= MAX(MULTIMAX,2*MULTIMP)
-	  END IF
+            IF(MULTIMP<=4) THEN
+              MULTIMAX = MAX(MULTIMAX,4*MULTIMP)
+            ELSEIF(MULTIMP<=12)THEN
+              MULTIMAX= MAX(MULTIMAX,3*MULTIMP)
+            ELSEIF(MULTIMP>12)THEN
+              MULTIMAX= MAX(MULTIMAX,2*MULTIMP)
+            END IF
           ITY = IPARI(7,I)
           IF(ITY==7.OR.ITY==10.OR.ITY==11.OR.
      .       ITY==22)ICONT=1

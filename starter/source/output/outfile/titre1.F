@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -70,7 +70,7 @@ C     CONTROL
 C------------------------------------
       TITRE(110)       ='    CONTROL  PARAMETERS'                                                  
       TITRE(111)       ='    -------------------'                                                  
-      TITRE(112)       = '    DTDES : TIME STEP FOR DRAWINGS  . . . . . . . . . . .'               
+      TITRE(112)       = '' ! no longer used
       TITRE(113)       = '    DTHIS : TIME STEP FOR TIME HISTORIES  . . . . . . . .'               
       TITRE(114)       = '    DTINI : INITIAL TIME STEP . . . . . . . . . . . . . .'               
       TITRE(115)       = '    DTFAC : TIME STEP SCALE FACTOR  . . . . . . . . . . .'               

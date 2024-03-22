@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -50,9 +50,6 @@ Chd|====================================================================
       !=======================================================================
       !      Common
       !=======================================================================
-#include      "param_c.inc" 
-#include      "com01_c.inc"
-#include      "scr17_c.inc"
 #include      "com04_c.inc"
       !=======================================================================
       !      Dummy arguments
@@ -215,7 +212,7 @@ c
         !   -> Tensile yield stress in direction 1 (MD)
         IPOS(1:NEL,1) = VARTMP(1:NEL,1)
         IPOS(1:NEL,2) = 1
-        CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(1)),ISMOOTH,NEL,IPOS,XVEC,SIGY1,DSIGY1_DP,HARDR)
+        CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(1)),ISMOOTH,NEL,NEL,IPOS,XVEC,SIGY1,DSIGY1_DP,HARDR)
         SIGY1(1:NEL)    = SIGY1(1:NEL) * YSCALE1
         DSIGY1_DP(1:NEL)= DSIGY1_DP(1:NEL) * YSCALE1
         VARTMP(1:NEL,1) = IPOS(1:NEL,1)
@@ -223,7 +220,7 @@ c
         XVEC(1:NEL,2)   = EPSD(1:NEL,2) * XSCALE2
         IPOS(1:NEL,1)   = VARTMP(1:NEL,2)
         IPOS(1:NEL,2)   = 1
-        CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(2)),ISMOOTH,NEL,IPOS,XVEC,SIGY2,DSIGY2_DP,HARDR)
+        CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(2)),ISMOOTH,NEL,NEL,IPOS,XVEC,SIGY2,DSIGY2_DP,HARDR)
         SIGY2(1:NEL)    = SIGY2(1:NEL) * YSCALE2
         DSIGY2_DP(1:NEL)= DSIGY2_DP(1:NEL) * YSCALE2
         VARTMP(1:NEL,2) = IPOS(1:NEL,1)  
@@ -231,7 +228,7 @@ c
         XVEC(1:NEL,2) = EPSD(1:NEL,2) * XSCALE3
         IPOS(1:NEL,1) = VARTMP(1:NEL,3)
         IPOS(1:NEL,2) = 1
-        CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(3)),ISMOOTH,NEL,IPOS,XVEC,SIGY3,DSIGY3_DP,HARDR)
+        CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(3)),ISMOOTH,NEL,NEL,IPOS,XVEC,SIGY3,DSIGY3_DP,HARDR)
         SIGY3(1:NEL)    = SIGY3(1:NEL) * YSCALE3
         DSIGY3_DP(1:NEL)= DSIGY3_DP(1:NEL) * YSCALE3
         VARTMP(1:NEL,3) = IPOS(1:NEL,1)
@@ -239,7 +236,7 @@ c
         XVEC(1:NEL,2) = EPSD(1:NEL,2) * XSCALE4
         IPOS(1:NEL,1) = VARTMP(1:NEL,4)
         IPOS(1:NEL,2) = 1
-        CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(4)),ISMOOTH,NEL,IPOS,XVEC,SIGY4,DSIGY4_DP,HARDR)
+        CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(4)),ISMOOTH,NEL,NEL,IPOS,XVEC,SIGY4,DSIGY4_DP,HARDR)
         SIGY4(1:NEL)    = SIGY4(1:NEL) * YSCALE4
         DSIGY4_DP(1:NEL)= DSIGY4_DP(1:NEL) * YSCALE4
         VARTMP(1:NEL,4) = IPOS(1:NEL,1) 
@@ -247,7 +244,7 @@ c
         XVEC(1:NEL,2) = EPSD(1:NEL,2) * XSCALE5
         IPOS(1:NEL,1) = VARTMP(1:NEL,5)
         IPOS(1:NEL,2) = 1
-        CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(5)),ISMOOTH,NEL,IPOS,XVEC,SIGY5,DSIGY5_DP,HARDR)
+        CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(5)),ISMOOTH,NEL,NEL,IPOS,XVEC,SIGY5,DSIGY5_DP,HARDR)
         SIGY5(1:NEL)    = SIGY5(1:NEL) * YSCALE5
         DSIGY5_DP(1:NEL)= DSIGY5_DP(1:NEL) * YSCALE5
         VARTMP(1:NEL,5) = IPOS(1:NEL,1)
@@ -257,7 +254,7 @@ c
         !   -> Transverse shear yield stress
         IPOS(1:NEL,1) = VARTMP(1:NEL,7)
         IPOS(1:NEL,2) = 1
-        CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(7)),ISMOOTH,NEL,IPOS,XVEC,SIGYS,DSIGYS_DP,HARDR)
+        CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(7)),ISMOOTH,NEL,NEL,IPOS,XVEC,SIGYS,DSIGYS_DP,HARDR)
         SIGYS(1:NEL)    = SIGYS(1:NEL) * YSCALES
         DSIGYS_DP(1:NEL)= DSIGYS_DP(1:NEL) * YSCALES
         VARTMP(1:NEL,7) = IPOS(1:NEL,1)
@@ -358,12 +355,12 @@ c
           ! a plastic multiplier allowing to update internal variables to satisfy
           ! the consistency condition using the cutting plane method
           ! Its expression at each iteration is : DLAMBDA = - PHI/DPHI_DLAMBDA
-	  ! -> PHI          : current value of yield function (known)
+            ! -> PHI          : current value of yield function (known)
           ! -> DPHI_DLAMBDA : derivative of PHI with respect to DLAMBDA by taking
           !                   into account of internal variables kinetic : 
           !                   hardening parameters
 c        
-	  ! 1 - Computation of DPHI_DSIG the normal to the yield criterion
+            ! 1 - Computation of DPHI_DSIG the normal to the yield criterion
           !-------------------------------------------------------------
 c  
           ! Computation of derivatives to the yield criterion
@@ -432,7 +429,7 @@ c
           !   a) Computation of the plastic multiplier
           DLAM = -PHI(I) / DPHI_DLAM
 c        
-	  !   b) Plastic strains tensor update
+            !   b) Plastic strains tensor update
           DPXX = DLAM * NORMPXX
           DPYY = DLAM * NORMPYY
           DPXY = TWO * DLAM * NORMPXY 
@@ -500,7 +497,7 @@ c
             !   -> Tensile yield stress in direction 1 (MD)
             IPOS(1:NEL,1)   = VARTMP(1:NEL,1)
             IPOS(1:NEL,2)   = 1
-            CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(1)),ISMOOTH,NEL,IPOS,XVEC,SIGY1,DSIGY1_DP,HARDR)
+            CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(1)),ISMOOTH,NEL,NEL,IPOS,XVEC,SIGY1,DSIGY1_DP,HARDR)
             SIGY1(1:NEL)    = SIGY1(1:NEL) * YSCALE1
             DSIGY1_DP(1:NEL)= DSIGY1_DP(1:NEL) * YSCALE1
             VARTMP(1:NEL,1) = IPOS(1:NEL,1)
@@ -508,7 +505,7 @@ c
             XVEC(1:NEL,2)   = EPSD(1:NEL,2) * XSCALE2
             IPOS(1:NEL,1)   = VARTMP(1:NEL,2)
             IPOS(1:NEL,2)   = 1
-            CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(2)),ISMOOTH,NEL,IPOS,XVEC,SIGY2,DSIGY2_DP,HARDR)
+            CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(2)),ISMOOTH,NEL,NEL,IPOS,XVEC,SIGY2,DSIGY2_DP,HARDR)
             SIGY2(1:NEL)    = SIGY2(1:NEL) * YSCALE2
             DSIGY2_DP(1:NEL)= DSIGY2_DP(1:NEL) * YSCALE2
             VARTMP(1:NEL,2) = IPOS(1:NEL,1)  
@@ -516,7 +513,7 @@ c
             XVEC(1:NEL,2) = EPSD(1:NEL,2) * XSCALE3
             IPOS(1:NEL,1) = VARTMP(1:NEL,3)
             IPOS(1:NEL,2) = 1
-            CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(3)),ISMOOTH,NEL,IPOS,XVEC,SIGY3,DSIGY3_DP,HARDR)
+            CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(3)),ISMOOTH,NEL,NEL,IPOS,XVEC,SIGY3,DSIGY3_DP,HARDR)
             SIGY3(1:NEL)    = SIGY3(1:NEL) * YSCALE3
             DSIGY3_DP(1:NEL)= DSIGY3_DP(1:NEL) * YSCALE3
             VARTMP(1:NEL,3) = IPOS(1:NEL,1)
@@ -524,7 +521,7 @@ c
             XVEC(1:NEL,2) = EPSD(1:NEL,2) * XSCALE4
             IPOS(1:NEL,1) = VARTMP(1:NEL,4)
             IPOS(1:NEL,2) = 1
-            CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(4)),ISMOOTH,NEL,IPOS,XVEC,SIGY4,DSIGY4_DP,HARDR)
+            CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(4)),ISMOOTH,NEL,NEL,IPOS,XVEC,SIGY4,DSIGY4_DP,HARDR)
             SIGY4(1:NEL)    = SIGY4(1:NEL) * YSCALE4
             DSIGY4_DP(1:NEL)= DSIGY4_DP(1:NEL) * YSCALE4
             VARTMP(1:NEL,4) = IPOS(1:NEL,1) 
@@ -532,7 +529,7 @@ c
             XVEC(1:NEL,2) = EPSD(1:NEL,2) * XSCALE5
             IPOS(1:NEL,1) = VARTMP(1:NEL,5)
             IPOS(1:NEL,2) = 1
-            CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(5)),ISMOOTH,NEL,IPOS,XVEC,SIGY5,DSIGY5_DP,HARDR)
+            CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(5)),ISMOOTH,NEL,NEL,IPOS,XVEC,SIGY5,DSIGY5_DP,HARDR)
             SIGY5(1:NEL)    = SIGY5(1:NEL) * YSCALE5
             DSIGY5_DP(1:NEL)= DSIGY5_DP(1:NEL) * YSCALE5
             VARTMP(1:NEL,5) = IPOS(1:NEL,1)
@@ -573,12 +570,12 @@ c
           ! a plastic multiplier allowing to update internal variables to satisfy
           ! the consistency condition using the cutting plane method
           ! Its expression at each iteration is : DLAMBDA = - PHI/DPHI_DLAMBDA
-	  ! -> PHI          : current value of yield function (known)
+            ! -> PHI          : current value of yield function (known)
           ! -> DPHI_DLAMBDA : derivative of PHI with respect to DLAMBDA by taking
           !                   into account of internal variables kinetic : 
           !                   hardening parameters
 c        
-	  ! 1 - Computation of DPHI_DSIG the normal to the yield criterion
+            ! 1 - Computation of DPHI_DSIG the normal to the yield criterion
           !-------------------------------------------------------------
 c          
           ! Computation of derivatives to the yield criterion
@@ -614,7 +611,7 @@ c
           !   a) Computation of the plastic multiplier
           DLAM = - PSI(I) / DPSI_DLAM
 c        
-	  !   b) Plastic strains tensor update
+            !   b) Plastic strains tensor update
           DPYZ = TWO*DLAM * NORMYZ
           DPZX = TWO*DLAM * NORMZX
 c        
@@ -646,7 +643,7 @@ c
             ! Transverse shear yield stress
             IPOS(1:NEL,1) = VARTMP(1:NEL,7)
             IPOS(1:NEL,2) = 1
-            CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(7)),ISMOOTH,NEL,IPOS,XVEC,SIGYS,DSIGYS_DP,HARDR)
+            CALL TABLE2D_VINTERP_LOG(TABLE(ITABLE(7)),ISMOOTH,NEL,NEL,IPOS,XVEC,SIGYS,DSIGYS_DP,HARDR)
             SIGYS(1:NEL)    = SIGYS(1:NEL) * YSCALES
             DSIGYS_DP(1:NEL)= DSIGYS_DP(1:NEL) * YSCALES
             VARTMP(1:NEL,7) = IPOS(1:NEL,1)

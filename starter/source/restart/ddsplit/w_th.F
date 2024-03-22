@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -24,13 +24,13 @@ C
 Chd|====================================================================
 Chd|  W_TH                          source/restart/ddsplit/w_th.F 
 Chd|-- called by -----------
-Chd|        DDSPLIT                       source/restart/ddsplit/ddsplit.F
+Chd|        WRITE_TH_BUFFER               source/restart/ddsplit/write_th_buffer.F
 Chd|-- calls ---------------
-Chd|        WRITE_I_C                     source/output/tools/write_routines.c
+Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|        NLOCAL                        source/spmd/node/ddtools.F    
 Chd|====================================================================
       SUBROUTINE W_TH(ITHGRP ,ITHBUF ,LENTHG,NODLOCAL,CEL   ,
-     2                NTHGRP0,NTHGRP2,PROC    ,LEN_IA,
+     2                NTHGRP0,NTHGRP2,PROC    ,
      3                CELSPH, NUMLOCCLUSTER ,NBR_TH_MONVOL)
 C-----------------------------------------------
 C   M o d u l e s
@@ -40,17 +40,15 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "rnur_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-       INTEGER  PROC, LENTHG, LEN_IA, NTHGRP0, NTHGRP2,
+       INTEGER  PROC, LENTHG, NTHGRP0, NTHGRP2,
      .          ITHGRP(NITHGR,*), ITHBUF(*), NODLOCAL(*),
      .          CEL(*), CELSPH(*), NUMLOCCLUSTER(*)
        INTEGER :: NBR_TH_MONVOL ! number of /TH/MONV
@@ -68,7 +66,6 @@ C
 C Header recopie
 C
       CALL WRITE_I_C(ITHGRP,NITHGR*(NTHGRP0+NBR_TH_MONVOL))
-      LEN_IA = LEN_IA + NITHGR*(NTHGRP0+NBR_TH_MONVOL)
 C
 C buffer renumerote localement
 C
@@ -82,7 +79,7 @@ C
         IAD =ITHGRP(5,NT)
         IF ((ITYP>=1.AND.ITYP<=7).OR.
      .       ITYP==50.OR.ITYP==51.OR.ITYP==100) THEN
-Cel elements
+C   elements
           DO IH = 1, NNE
             K = ITHBUF_L(IAD-1+IH)
             P = ITHBUF_L(IAD+NNE-1+IH)+1
@@ -100,11 +97,8 @@ Cel elements
               ESHIFT = NUMELS+NUMELQ+NUMELC+NUMELT+NUMELP
             ELSEIF(ITYP==7) THEN
               ESHIFT = NUMELS+NUMELQ+NUMELC+NUMELT+NUMELP+NUMELR
-            ELSEIF(ITYP==50) THEN
-              ESHIFT = NUMELS+NUMELQ+NUMELC+NUMELT+NUMELP+NUMELR+NUMELTG
             ELSEIF(ITYP==100) THEN
               ESHIFT = NUMELS+NUMELQ+NUMELC+NUMELT+NUMELP+NUMELR+NUMELTG
-     .                 +NUMELUR
             ENDIF
             IF(P==PROC) THEN
               IF(ITYP==51)THEN
@@ -115,14 +109,14 @@ Cel elements
             ENDIF
           ENDDO
         ELSEIF (ITYP==0) THEN
-Cel noeuds
+C   noeuds
           DO IH = 1, NNE
             K = ITHBUF_L(IAD-1+IH)
             IF(NLOCAL(K,PROC)==1) THEN
-Cel noeud present => nodlocal
+C   noeud present => nodlocal
               ITHBUF_L(IAD-1+IH) = NODLOCAL(K)
             ELSE
-Cel noeud abscent => 0
+C   noeud abscent => 0
               ITHBUF_L(IAD-1+IH) = 0
             ENDIF
           ENDDO
@@ -136,7 +130,6 @@ c            local number of cluster, or zero
       ENDDO
 C
       CALL WRITE_I_C(ITHBUF_L,LENTHG)
-      LEN_IA = LEN_IA + LENTHG
 C
       RETURN
       END

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,8 +26,8 @@ Chd|-- called by -----------
 Chd|        I25BUCE                       source/interfaces/intsort/i25buce.F
 Chd|-- calls ---------------
 Chd|        I25STO                        source/interfaces/intsort/i25sto.F
-Chd|        MY_BARRIER                    source/system/machine.F
-Chd|        TRI7BOX                       share/modules/tri7box.F
+Chd|        MY_BARRIER                    source/system/machine.F       
+Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
       SUBROUTINE I25TRIVOX(
      1      NSN    ,NSNR    ,ISZNSNR ,I_MEM   ,VMAXDT   ,
@@ -59,14 +59,8 @@ c     parameter setting the size for the vector (orig version is 128)
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "parit_c.inc"
-#include      "scr05_c.inc"
-#include      "sms_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
 C   ROLE DE LA ROUTINE:

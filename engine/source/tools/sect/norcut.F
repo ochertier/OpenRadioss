@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,7 +25,7 @@ Chd|  NORCUT                        source/tools/sect/norcut.F
 Chd|-- called by -----------
 Chd|        GENANI                        source/output/anim/generate/genani.F
 Chd|-- calls ---------------
-Chd|        WRITE_S_C                     source/output/tools/sortie_c.c
+Chd|        WRITE_S_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|====================================================================
       SUBROUTINE NORCUT(VN,LASTN)
 C-----------------------------------------------
@@ -36,17 +36,13 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-C     REAL
       my_real
      .   VN(7,*)
-C     REAL
       my_real
      .   S3000
       INTEGER IC,I,INORM(3),IFT,ILT,LASTN(*)
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com04_c.inc"
 C-----------------------------------------------
       S3000 = THREE1000
 C

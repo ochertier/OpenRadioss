@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -33,7 +33,7 @@ Chd|        TENSGPS1                      source/output/anim/generate/tensor6.F
 Chd|        TENSGPS2                      source/output/anim/generate/tensor6.F
 Chd|        TENSGPS3                      source/output/anim/generate/tensor6.F
 Chd|        TENSGPSTRAIN                  source/output/anim/generate/tensgpstrain.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        OUTMAX_MOD                    ../common_source/modules/outmax_mod.F
 Chd|====================================================================
       SUBROUTINE H3D_NODAL_TENSOR(
@@ -52,33 +52,20 @@ Chd|====================================================================
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE NAMES_AND_TITLES_MOD, ONLY: NCHARLINE100
       USE ELBUFDEF_MOD 
       USE OUTMAX_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "chara_c.inc"
-#include      "nchara_c.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "vect01_c.inc"
-#include      "mvsiz_p.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "intstamp_c.inc"
-#include      "scr01_c.inc"
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
-#include      "scr14_c.inc"
-#include      "scr25_c.inc"
 #include      "param_c.inc"
-#include      "rnur_c.inc"
-#include      "task_c.inc"
 #include      "sphcom.inc"
-#include      "spmd_c.inc"
-#include      "sms_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -86,15 +73,15 @@ C-----------------------------------------------
       my_real
      .   NODAL_TENSOR(*),MASS(*),GEO(NPROPG,*),
      .   PM(NPROPM,*),ANIN(*),TEMP(*),RFLOW(*),VOLMON(*), DIAG_SMS(*),MS(*),
-     .   PDAMA2(2,*),X(*),STIFR(*),STIFN(*),A(3,*),D(3,*),V(3,*), CONT(3,*),
-     .   FCONTG(3,*), FINT(3,*), FEXT(3,*),BUFMAT(*)
+     .   PDAMA2(2,*),X(*),STIFR(*),STIFN(*),A(3,*),D(3,*),V(3,*), 
+     .   CONT(3,*),FCONTG(3,*), FINT(3,*), FEXT(3,*),BUFMAT(*)
       INTEGER IPARG(NPARG,*),IFUNC,NODE_ID(*),
      .   INFO1,INFO2,IS_WRITTEN_NODE(*),H3D_PART(*),ITAB(*),
      .   IXC(NIXC,*),IXTG(NIXTG,*),IPARTC(*),IPARTTG(*),IFLOW(*),
      .   IXS(NIXS,*),IXQ(NIXQ,*),NV46,MONVOL(*),
      .   IXS10(6,*) ,IXS16(8,*) ,IXS20(12,*) ,
      .   IXT(NIXT,*),IXP(NIXP,*),IXR(NIXR,*),IAD_ELEM(2,*),FR_ELEM(*),WEIGHT(*)
-      CHARACTER*ncharline KEYWORD
+      CHARACTER(LEN=NCHARLINE100) :: KEYWORD
       INTEGER ,INTENT(IN) :: IPARTSP(NUMSPH),IPARTR(NUMELR),IPARTP(NUMELP),
      .                       IPARTT(NUMELT),IPARTS(NUMELS),IPARTQ(NUMELQ)
       INTEGER ,INTENT(IN) :: KXSP(NISP,NUMSPH)
@@ -204,10 +191,10 @@ C-----------------------------------------------
            AFLU(J,N) = ZERO
           ENDDO
          ENDDO
-         CALL TENSGPS3(ELBUF_TAB,VFLU	 ,AFLU    ,IPARG   ,GEO     ,
-     .  	       IXS	,IXS10   ,IXS16   ,IXS20   ,IXQ     ,
-     .  	       IXC	,IXTG	 ,IXT	  ,IXP     ,IXR     ,
-     .  	       X	,ITAGPS  ,PM	  )
+         CALL TENSGPS3(ELBUF_TAB,VFLU   ,AFLU    ,IPARG   ,GEO     ,
+     .           IXS  ,IXS10   ,IXS16   ,IXS20   ,IXQ     ,
+     .           IXC  ,IXTG   ,IXT    ,IXP     ,IXR     ,
+     .           X  ,ITAGPS  ,PM    )
 
          IF(NSPMD > 1)THEN
            LENR = IAD_ELEM(1,NSPMD+1)-IAD_ELEM(1,1)
@@ -239,10 +226,10 @@ C-----------------------------------------------
           AFLU(J,N) = ZERO
          ENDDO
         ENDDO
-        CALL TENSGPS1(VFLU    ,AFLU    ,IPARG	,GEO	 ,
-     .  	      IXS   ,IXS10   ,IXS16   ,IXS20   ,IXQ	,
-     .  	      IXC   ,IXTG    ,IXT     ,IXP     ,IXR	,
-     .  	      X     ,ITAGPS  ,ELBUF_TAB)
+        CALL TENSGPS1(VFLU    ,AFLU    ,IPARG  ,GEO   ,
+     .          IXS   ,IXS10   ,IXS16   ,IXS20   ,IXQ  ,
+     .          IXC   ,IXTG    ,IXT     ,IXP     ,IXR  ,
+     .          X     ,ITAGPS  ,ELBUF_TAB)
 
          IF(NSPMD > 1)THEN
            LENR = IAD_ELEM(1,NSPMD+1)-IAD_ELEM(1,1)
@@ -275,10 +262,10 @@ C-----------------------------------------------
           AFLU(J,N) = ZERO
          ENDDO
         ENDDO
-        CALL TENSGPS2(VFLU    ,AFLU    ,IPARG	,GEO	 ,
-     .  	      IXS   ,IXS10   ,IXS16   ,IXS20   ,IXQ	,
-     .  	      IXC   ,IXTG    ,IXT     ,IXP     ,IXR	,
-     .  	      X     ,VGPS   ,ELBUF_TAB )
+        CALL TENSGPS2(VFLU    ,AFLU    ,IPARG  ,GEO   ,
+     .          IXS   ,IXS10   ,IXS16   ,IXS20   ,IXQ  ,
+     .          IXC   ,IXTG    ,IXT     ,IXP     ,IXR  ,
+     .          X     ,VGPS   ,ELBUF_TAB )
 
          IF(NSPMD > 1)THEN
            LENR = IAD_ELEM(1,NSPMD+1)-IAD_ELEM(1,1)
@@ -311,10 +298,10 @@ C-----------------------------------------------
            AFLU(J,N) = ZERO
           ENDDO
          ENDDO
-         CALL TENSGPSTRAIN(ELBUF_TAB,VFLU	 ,AFLU    ,IPARG   ,GEO     ,
-     .  	       IXS	,IXS10   ,IXS16   ,IXS20   ,IXQ     ,
-     .  	       IXC	,IXTG	 ,IXT	  ,IXP     ,IXR     ,
-     .  	       X	,ITAGPS  ,PM	  )
+         CALL TENSGPSTRAIN(ELBUF_TAB,VFLU   ,AFLU    ,IPARG   ,GEO     ,
+     .           IXS  ,IXS10   ,IXS16   ,IXS20   ,IXQ     ,
+     .           IXC  ,IXTG   ,IXT    ,IXP     ,IXR     ,
+     .           X  ,ITAGPS  ,PM    )
      
          IF(NSPMD > 1)THEN
            LENR = IAD_ELEM(1,NSPMD+1)-IAD_ELEM(1,1)
@@ -379,9 +366,6 @@ C-----------------------------------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -59,11 +59,11 @@ Chd|        DT51LAW                       source/materials/time_step/dt51law.F
 Chd|        DT5LAW                        source/materials/time_step/dt5law.F
 Chd|        DT6LAW                        source/materials/time_step/dt6law.F
 Chd|        DT70LAW                       source/materials/time_step/dt70law.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE DTMAIN(GEO  ,PM   ,IPM   ,PID   ,MAT   ,FV    ,
      .                  EINT ,TEMP ,DELTAX,RK    ,RE    ,BUFMAT, DDELTAX, AIRE, VOL, DTX,
-     .                  IGEO )
+     .                  IGEO ,IGTYP)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -75,14 +75,13 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "vect01_c.inc"
-#include      "scr01_c.inc"
 #include      "units_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER ,INTENT(IN) :: IGTYP
       INTEGER             :: IPM(*), PID(*), MAT(*),IGEO(NPROPGI,*)
       my_real             :: PM(*),GEO(*),FV,EINT(*),TEMP(*),DELTAX(*),RK(*),RE(*), DDELTAX(*),
      .     AIRE(*), VOL(*), DTX(*)
@@ -130,9 +129,16 @@ c
         CALL DT42LAW(PM,GEO,PID,MAT, DDELTAX, AIRE, VOL, DTX, LLT )
       CASE (51)
         CALL DT51LAW(PM,GEO,PID,MAT,BUFMAT,IPM, DDELTAX, AIRE, VOL, DTX)
-      CASE (59,83,116,117,120)
-        DTX(LFT:LLT) = EP20
-        WRITE(IOUT,1000) MTN
+      CASE (59,83,116,117)
+          DTX(LFT:LLT) = EP20
+          WRITE(IOUT,1000) MTN
+      CASE (120)
+        IF (IGTYP == 43)THEN
+          DTX(LFT:LLT) = EP20
+          WRITE(IOUT,1000) MTN
+        ELSE
+          CALL DT1LAW(PM,GEO,PID,MAT, DDELTAX, AIRE, VOL, DTX )
+        ENDIF
       CASE (105)
         CALL DT105LAW(PM,GEO,PID,MAT, DDELTAX, AIRE, VOL, DTX)
       CASE (70)

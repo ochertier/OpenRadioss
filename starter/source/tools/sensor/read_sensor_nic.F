@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -58,10 +58,7 @@ C-----------------------------------------------
 #include      "tabsiz_c.inc"
 #include      "com04_c.inc"
 #include      "sphcom.inc"
-#include      "warn_c.inc"
 #include      "units_c.inc"
-#include      "sysunit.inc"
-#include      "submod_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -134,14 +131,14 @@ c
           ENDIF
         ENDDO
       END IF
-      FAC_FORC = FAC_M_WORK * FAC_L_WORK / FAC_T_WORK**2
-      FAC_MOM  = FAC_FORC * FAC_L_WORK
+      FAC_FORC = UNITAB%FAC_M_WORK * UNITAB%FAC_L_WORK / UNITAB%FAC_T_WORK**2
+      FAC_MOM  = FAC_FORC * UNITAB%FAC_L_WORK
       IF (FTENS == 0) FTENS = 6806.0 / FAC_FORC 
       IF (FCOMP == 0) FCOMP = 6160.0 / FAC_FORC 
       IF (MFLEX == 0) MFLEX = 310.0  / FAC_MOM
       IF (MEXT  == 0) MEXT  = 135.0  / FAC_MOM
       IF (ALPHA == 0) ALPHA = 2.0775
-      IF (CFC == ZERO) CFC  = 600.0 * FAC_T_WORK
+      IF (CFC == ZERO) CFC  = 600.0 * UNITAB%FAC_T_WORK
 c--------------------------------------------------
 c     sensor data structure
 c--------------------------------------------------

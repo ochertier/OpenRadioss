@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -37,16 +37,16 @@ Chd|        SPMD_FVB_IGATH                source/mpi/airbags/spmd_fvb_igath.F
 Chd|        FINTER                        source/tools/curve/finter.F   
 Chd|        GET_U_FUNC                    source/user_interface/ufunc.F 
 Chd|        ANIM_MOD                      ../common_source/modules/anim_mod.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        FVBAG_MOD                     share/modules/fvbag_mod.F     
-Chd|        FVMBAG_MESHCONTROL_MOD        ../common_source/modules/fvmbag_meshcontrol_mod.F
+Chd|        FVMBAG_MESHCONTROL_MOD        ../common_source/modules/airbag/fvmbag_meshcontrol_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
 Chd|====================================================================
       SUBROUTINE FV_UP_SWITCH(NN, NEL, ELEM, NJET, NPOLY,LENH,NBA,
      2     IBAGJET, RBAGJET, NVENT    , IBAGHOL, RBAGHOL ,
      3     P      , RHO    , TK       , U      , SSPK    ,
-     4     X      , V        , A      , SENSOR_TAB,
+     4     X      , V        , A      , NSENSOR, SENSOR_TAB,
      5     FSAV   , NPC    , TF       , IVOLU  , RVOLU   ,
      6     MPOLH  , QPOLH  , EPOLH    ,
      7     PPOLH  , RPOLH  , GPOLH    ,
@@ -73,7 +73,7 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE ELBUFDEF_MOD
       USE FVMBAG_MESHCONTROL_MOD
-      USE OMP_LIB
+!     USE OMP_LIB
       USE SENSOR_MOD
       USE ANIM_MOD
 C-----------------------------------------------
@@ -89,21 +89,16 @@ C-----------------------------------------------
 #include      "com08_c.inc"
 #include      "scr02_c.inc"
 #include      "scr07_c.inc"
-#include      "scr18_c.inc"
 #include      "param_c.inc"
 #include      "units_c.inc"
-#include      "scr05_c.inc"
 #include      "task_c.inc"
 #include      "warn_c.inc"
-#include      "scr14_c.inc"
-#include      "scr16_c.inc"
-#include      "scr17_c.inc"
 #include      "tabsiz_c.inc"
 #include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   D U M M Y   A R G U M E N T S
 C-----------------------------------------------
-      INTEGER, INTENT(IN) :: NPOLY, LENH, NPOLH, NBA
+      INTEGER, INTENT(IN) :: NPOLY, LENH, NPOLH, NBA,NSENSOR
       INTEGER, INTENT(IN) :: NN, NEL, NELT, ELEM(3, NELT), NJET, IBAGJET(NIBJET, NJET),
      .        NVENT, NPC(SNPC),  IFVNOD(3,NNS), IFVTRI(6,NNTR),
      .        IFVPOLY(NNTR),IFVTADR(NPOLY+1), IFVPOLH(LENH), IFVPADR(NPOLH + 1),
@@ -126,7 +121,7 @@ C-----------------------------------------------
      .     DTPOLH(NPOLH), FSAV(NTHVKI), TPOLH(NPOLH), CPDPOLH(NPOLH), CPEPOLH(NPOLH),
      .     CPFPOLH(NPOLH), RBAGHOL(NRBHOL,NVENT), PDISP, ELFEHPY(NELT), RVOLU(NRVOLU)
       TYPE(ELBUF_STRUCT_), DIMENSION(NGROUP), INTENT(IN) :: ELBUF_TAB
-      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) ,INTENT(IN) :: SENSOR_TAB
 C-----------------------------------------------
 C   L O C A L   V A R I A B L E S
 C-----------------------------------------------
@@ -586,11 +581,11 @@ C---------------------------------------------------
 C
       SCALT =RVOLU(26)
       IF(ITYP==6) THEN
-        CALL FVINJT6(NJET, IBAGJET, RBAGJET, NPC, TF, SENSOR_TAB,
-     .               SCALT, DATAINJ )
+        CALL FVINJT6(NJET, IBAGJET, RBAGJET, NPC, TF,NSENSOR, 
+     .               SENSOR_TAB,SCALT, DATAINJ )
       ELSEIF(ITYP==8) THEN
-        CALL FVINJT8(NJET, IBAGJET, RBAGJET, NPC, TF, SENSOR_TAB,
-     .               SCALT, IGEO, GEO, PM, IVOLU, DATAINJ )
+        CALL FVINJT8(NJET, IBAGJET, RBAGJET, NPC, TF,NSENSOR,  
+     .               SENSOR_TAB,SCALT, IGEO, GEO, PM, IVOLU, DATAINJ )
       ENDIF
 C
       DO IINJ=1,NJET

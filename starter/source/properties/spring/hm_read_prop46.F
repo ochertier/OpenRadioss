@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -59,16 +59,10 @@ C          |         |   |   | 3)FRONT WAVE OPTION
 C          |         |   |   | 4)... not yet used
 C----------+---------+---+---+--------------------------------------------
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com04_c.inc"
 #include      "scr17_c.inc"
-#include      "submod_c.inc"
 #include      "tablen_c.inc"
-C----------+---------+---+---+--------------------------------------------
 C----------+---------+---+---+--------------------------------------------
 C
 C     This subroutine read the user geometry parameters.

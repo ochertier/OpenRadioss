@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -48,9 +48,10 @@ Chd|        FAIL_HOFFMAN_C                source/materials/fail/hoffman/fail_hof
 Chd|        FAIL_INIEVO_C                 source/materials/fail/inievo/fail_inievo_c.F
 Chd|        FAIL_JOHNSON_C                source/materials/fail/johnson_cook/fail_johnson_c.F
 Chd|        FAIL_JOHNSON_XFEM             source/materials/fail/johnson_cook/fail_johnson_xfem.F
-Chd|        FAIL_MAXSTRN_C                source/materials/fail/max_strain/fail_maxstrn_c.F
+Chd|        FAIL_MAXSTRAIN_C              source/materials/fail/max_strain/fail_maxstrain_c.F
 Chd|        FAIL_NXT_C                    source/materials/fail/nxt/fail_nxt_c.F
 Chd|        FAIL_ORTHBIQUAD_C             source/materials/fail/orthbiquad/fail_orthbiquad_c.F
+Chd|        FAIL_ORTHENERG_C              source/materials/fail/orthenerg/fail_orthenerg_c.F
 Chd|        FAIL_ORTHSTRAIN_C             source/materials/fail/orthstrain/fail_orthstrain_c.F
 Chd|        FAIL_PUCK_C                   source/materials/fail/puck/fail_puck_c.F
 Chd|        FAIL_RTCL_C                   source/materials/fail/rtcl/fail_rtcl_c.F
@@ -82,15 +83,15 @@ Chd|        STARTIME                      source/system/timer.F
 Chd|        STOPTIME                      source/system/timer.F         
 Chd|        UROTOV                        source/airbag/uroto.F         
 Chd|        XFEM_CRK_DIR                  source/elements/xfem/xfem_crk_dir.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
 Chd|        FAILWAVE_MOD                  ../common_source/modules/failwave_mod.F
 Chd|        LAW_USERSH                    source/user_interface/law_usersh.F
+Chd|        MAT_ELEM_MOD                  ../common_source/modules/mat_elem/mat_elem_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        NLOCAL_REG_MOD                ../common_source/modules/nlocal_reg_mod.F
 Chd|        STACK_MOD                     share/modules/stack_mod.F     
 Chd|        TABLE_MOD                     share/modules/table_mod.F     
 Chd|====================================================================
-      SUBROUTINE USERMAT_SHELL (ELBUF_STR ,
+      SUBROUTINE USERMAT_SHELL (ELBUF_STR ,MAT_ELEM  ,
      1       JFT      ,JLT      ,NEL      ,PM        ,FOR      ,MOM      ,    
      2       GSTR     ,THK      ,EINT     ,OFF       ,DIR_A    ,DIR_B    ,    
      3       MAT      ,AREA     ,EXX      ,EYY       ,EXY      ,EXZ      ,    
@@ -108,13 +109,14 @@ Chd|====================================================================
      F       IXEL     ,ITHK     ,F_DEF    ,ISHPLYXFEM,                        
      G       ITASK    ,PM_STACK , ISUBSTACK,STACK    ,TSTAR    ,ALPE     ,
      H       PLY_EXX  ,PLY_EYY  ,PLY_EXY  ,PLY_EXZ   ,PLY_EYZ  ,PLY_F    ,
-     I       VARNL    ,NLOC_DMG )
+     I       VARNL    ,NLOC_DMG ,NLAY_MAX ,LAYNPT_MAX)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE NAMES_AND_TITLES_MOD, ONLY: NCHARLINE100
       USE LAW_USERSH
       USE TABLE_MOD
-      USE ELBUFDEF_MOD
+      USE MAT_ELEM_MOD
       USE STACK_MOD
       USE FAILWAVE_MOD
       USE MESSAGE_MOD
@@ -129,8 +131,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "usrplas_c.inc"
 #include      "units_c.inc"
-#include      "scr03_c.inc"
-#include      "scr06_c.inc"
 #include      "scr17_c.inc"
 #include      "scr19_c.inc"
 #include      "param_c.inc"
@@ -142,7 +142,6 @@ C-----------------------------------------------
 #include      "userlib.inc"
 #include      "com_xfem1.inc"
 #include      "timeri_c.inc"
-#include      "nchara_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -152,6 +151,7 @@ C-----------------------------------------------
       INTEGER MAT(*),MATLY(*),PID(*),NPF(*),NGL(MVSIZ),INDX(MVSIZ),
      .   IGEO(NPROPGI,*),IPM(NPROPMI,*),ELCRKINI(NXLAYMAX,*),
      .   IPARG(*),FWAVE_EL(NEL)
+      INTEGER, INTENT(IN) :: NLAY_MAX, LAYNPT_MAX
       my_real DM
       my_real FOR(NEL,5),MOM(NEL,3),GSTR(NEL,8),THK(*),EINT(JLT,2),OFF(*),
      .   DIR_A(*),DIR_B(*),VISCMX(*),PM(NPROPM,*),THK_LY(NEL,*),
@@ -172,19 +172,20 @@ C-----------------------------------------------
       TYPE (STACK_PLY) :: STACK
       TYPE (FAILWAVE_STR_) ,TARGET :: FAILWAVE 
       TYPE (NLOCAL_STR_) :: NLOC_DMG 
+      TYPE (MAT_ELEM_) ,INTENT(IN) ,TARGET :: MAT_ELEM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,II,JJ,IC,J,JMLY,IPG,IP,IT,IFL,ILAY,NPG,MPT,IMAT,
+      INTEGER I,II,JJ,IC,J,JMLY,IPG,IT,IFL,ILAY,NPG,MPT,IMAT,
      .   IRUPT,NFAIL,IADBUF,IADBUFR,MAXNULVAR,IGTYP,NUVAR,NVARF,JDIR,
-     .   NFUNC, JPOS, NINDX,NUPAR,NUPARAM,NFUNC1,IFAILWV,NLOCAL,
+     .   NFUNC, JPOS, NINDX,NUPAR,NUPARAM,NFUNC_FAIL,NTABL_FAIL,IFAILWV,NLOCAL,
      .   IUN,IBID,IBIDON1,IBIDON2,IBIDON3,IBIDON4,IBIDON5,
      .   FAC,ICUT,ILAW_USER,IPTX,FAILEND,ILAYER,IROT,DMG_FLAG,
      .   IGMAT,IPGMAT,KK,MX,NPTT,IPT_ALL,NPTTOT,NUVARV,ILAW,
      .   FAILNPT,JOFF,SIZNUL,PLY_ID,IJ(5),K,ISEQ,PROGRESSIVE_CRACK,
-     .   ORTH_DAMAGE,L_DMG,IPRONY,ISRATE,NVARTMP,INLOC
+     .   ORTH_DAMAGE,L_DMG,IPRONY,ISRATE,NVARTMP,INLOC,IDRAPE
       INTEGER :: IJ1,IJ2,IJ3,IJ4,IJ5
-      INTEGER IFAIL(MVSIZ),IFUNC1(MAXFUNC),
+      INTEGER IFAIL(MVSIZ),
      .   IFUNC(MAXFUNC),MATF(MVSIZ),IFLAG(1),IOFF_DUCT(MVSIZ),
      .   NFIS1(MVSIZ),NFIS2(MVSIZ),NFIS3(MVSIZ)
 c
@@ -218,12 +219,12 @@ c
      .   BIDON1,BIDON2,BIDON3,BIDON4,BIDON5,RATIO,VV,AA
       my_real COPY_PLA(MVSIZ)
       my_real, DIMENSION(MVSIZ) :: DT_INV
+      my_real, DIMENSION(NEL,5) :: DMG_ORTH_SCALE
       my_real  SCALE1(NEL)
       my_real ,DIMENSION(NEL), TARGET :: LE_MAX
       my_real TT_LOCAL
       my_real, DIMENSION(:) ,POINTER  :: EL_TEMP,YLDFAC,CRKLEN,CRKDIR,DADV,TFAIL,EL_LEN,
      .                                   EL_PLA
-      my_real, DIMENSION(NLAY,10)  :: PTHKF
       TARGET :: TEMPEL,BUFMAT,EPSXX,EPSYY,DEPSXX,DEPSYY,SCALE1,POSLY,THKLY
 C
       INTEGER , DIMENSION(MVSIZ) :: ADDITIONAL_INT_PARAMETERS
@@ -238,7 +239,8 @@ c----
       TYPE(BUF_FAIL_),POINTER :: FBUF
       TYPE(BUF_VISC_),POINTER :: VBUF
 c----
-      INTEGER, DIMENSION(:) ,POINTER  :: FLD_IDX,FOFF,OFFLY,ITABLE,VARTMP
+      INTEGER, DIMENSION(:) ,POINTER  :: FLD_IDX,FOFF,OFFLY,ITABLE,IFUNC_FAIL,
+     .                                   ITABL_FAIL,VARTMP
       my_real, DIMENSION(:) ,POINTER  :: UVAR,UVARF,UELR,UELR1,DAM,
      .   DFMAX,TDEL ,OFFL,UVARV,UPARAM,UPARAMF,EPS1,EPS2,DEPS1,DEPS2,
      .   DIRDMG,DIR_ORTH,ZZ,THLY,DAMINI
@@ -250,7 +252,7 @@ c----
 !
       CHARACTER OPTION*256
       INTEGER SIZE
-      CHARACTER IUSER_KEY*ncharline
+      CHARACTER (LEN=NCHARLINE100):: IUSER_KEY
 C-----------------------------------------------
 C   S o u r c e   L i n e s 
 C-----------------------------------------------
@@ -260,6 +262,7 @@ C-----------------------------------------------
       IGTYP = IGEO(11,PID(1))
       IGMAT = IGEO(98,PID(1))
       INLOC = IPARG(78)                     ! Flag for non-local regularization
+      IDRAPE = ELBUF_STR%IDRAPE
 !
       LOGICAL_USERL_AVAIL=.FALSE.
       IF (USERL_AVAIL > 0) LOGICAL_USERL_AVAIL=.TRUE.
@@ -497,6 +500,7 @@ c
           UVARV => BUFLY%VISC(IR,IS,IT)%VAR
           VARTMP=> BUFLY%MAT(IR,IS,IT)%VARTMP
           DIRDMG => LBUF%DMG(1:L_DMG*NEL)
+          IF(IDRAPE > 0 ) JDIR = 1 + (IPT - 1)*JLT*2
 c
           ! -> Make sure the non-local increment is positive
           IF (INLOC > 0) THEN 
@@ -1217,6 +1221,7 @@ c
 C
             SIGOFF(1:NEL) = ONE
             DMG_LOC_SCALE(1:NEL) = ONE
+            DMG_ORTH_SCALE(1:NEL,1:5) = ONE
 c                                        
             MPT  = NPTTOT * MAX(1,NPG)
             FBUF => BUFLY%FAIL(IR,IS,IT)   
@@ -1266,7 +1271,6 @@ c---
             ZT   = ZZ(1)
 c---
             DO IFL = 1, NFAIL      ! loop over fail models in current layer                                      
-              IP   = (IFL - 1)*15                                             
               UVARF  => FBUF%FLOC(IFL)%VAR
               NVARF  =  FBUF%FLOC(IFL)%NVAR                                 
               IRUPT  =  FBUF%FLOC(IFL)%ILAWF                                
@@ -1276,14 +1280,13 @@ c---
               TDEL   => FBUF%FLOC(IFL)%TDEL   
               FLD_IDX=> FBUF%FLOC(IFL)%INDX
               FOFF   => FBUF%FLOC(IFL)%OFF
-              NUPAR   = IPM(112 + IP, IMAT)
-              NFUNC1  = IPM(115 + IP, IMAT)
-              IADBUFR = IPM(114 + IP ,IMAT)
-              UPARAMF => BUFMAT(IADBUFR:IADBUFR+NUPAR)
-              IF (IXFEM == 0) PTHKF(ILAYER,IFL) = ZERO
-              DO I=1,NFUNC1                
-                IFUNC1(I) = IPM(115+ IP + I,IMAT)
-              ENDDO 
+              NUPAR      =  MAT_ELEM%MAT_PARAM(IMAT)%FAIL(IFL)%NUPARAM
+              NFUNC_FAIL =  MAT_ELEM%MAT_PARAM(IMAT)%FAIL(IFL)%NFUNC
+              NTABL_FAIL =  MAT_ELEM%MAT_PARAM(IMAT)%FAIL(IFL)%NTABLE
+              UPARAMF    => MAT_ELEM%MAT_PARAM(IMAT)%FAIL(IFL)%UPARAM(1:NUPAR)
+              IFUNC_FAIL => MAT_ELEM%MAT_PARAM(IMAT)%FAIL(IFL)%IFUNC(1:NFUNC_FAIL)
+              ITABL_FAIL => MAT_ELEM%MAT_PARAM(IMAT)%FAIL(IFL)%TABLE(1:NTABL_FAIL)
+!              IF (IXFEM == 0) PTHKF(ILAYER,IFL) = ZERO
 c------------------------------------            
               SELECT CASE (IRUPT)                                            
 c------------------------------------            
@@ -1294,7 +1297,7 @@ c------------------------------------
      2               TT        ,NGL       ,IPG       ,ILAYER    ,IT        ,
      3               SIGNXX    ,SIGNYY    ,SIGNXY    ,SIGNYZ    ,SIGNZX    ,
      4               DPLA      ,EPSPL     ,TSTAR     ,OFF       ,FOFF      ,
-     5               PTHKF(ILAYER,IFL),DFMAX,TDEL    )
+     5               DFMAX     ,TDEL      )
                 ELSE
                   CALL FAIL_JOHNSON_XFEM(
      1                NEL      ,NUPAR    ,UPARAMF  ,NVARF    ,UVARF    ,
@@ -1311,8 +1314,7 @@ c
      1               NEL       ,NUPARAM   ,NVARF     ,UPARAM    ,UVARF     , 
      2               TT        ,DT1C      ,IPG       ,ILAYER    ,IT        , 
      3               SIGNXX    ,SIGNYY    ,SIGNXY    ,SIGNYZ    ,SIGNZX    , 
-     4               NGL       ,OFF       ,FOFF ,PTHKF(ILAYER,IFL),DFMAX   , 
-     5               TDEL      )
+     4               NGL       ,OFF       ,FOFF      ,DFMAX     ,TDEL      )
                 ELSE
                   CALL FAIL_TBUTCHER_XFEM(
      1                NEL      ,NUPAR    ,UPARAMF  ,NVARF    ,UVARF    ,
@@ -1328,7 +1330,7 @@ c
      1               NEL       ,NUPAR     ,NVARF     ,UPARAMF   ,UVARF     ,
      2               TT        ,NGL       ,IPG       ,ILAYER    ,IT        ,
      3               SIGNXX    ,SIGNYY    ,SIGNXY    ,SIGNYZ    ,SIGNZX    ,
-     4               DPLA      ,FOFF ,PTHKF(ILAYER,IFL),DFMAX   ,TDEL      )      
+     4               DPLA      ,FOFF      ,DFMAX     ,TDEL      )      
 c
               CASE (4)     !    User1         
                   DO I=JFT,JLT
@@ -1336,7 +1338,7 @@ c
                   ENDDO
                 IF (LOGICAL_USERL_AVAIL)THEN
                   TT_LOCAL = TT
-                  CALL ENG_USERLIB_FLAWC(IRUPT,NEL ,NUPAR,NVARF,NFUNC1,IFUNC1,NPF,
+                  CALL ENG_USERLIB_FLAWC(IRUPT,NEL ,NUPAR,NVARF,NFUNC_FAIL,IFUNC_FAIL,NPF,
      2                     TF  ,TT_LOCAL    ,DT1C  ,UPARAMF,NGL ,IPT, 
      3                     MPT ,IPG ,IBIDON2,IBIDON3  , 
      4                     SIGNXX   ,SIGNYY ,SIGNXY ,SIGNYZ ,SIGNZX  ,
@@ -1345,7 +1347,7 @@ c
      7                     COPY_PLA ,DPLA   ,EPSPL  ,UVARF  ,UELR    ,
      8                     OFF      ,ALDT   ,AREA   ,BIDON3,BIDON4,BIDON5 )
                 ELSE
-!                  CALL F04LAWC(NEL ,NUPAR,NVARF,NFUNC1,IFUNC1,NPF,
+!                  CALL F04LAWC(NEL ,NUPAR,NVARF,NFUNC_FAIL,IFUNC_FAIL,NPF,
 !     2                     TF  ,TT  ,DT1C   ,UPARAMF,NGL ,IPT, 
 !     3                     MPT ,IPG ,IBIDON2,IBIDON3  , 
 !     4                     SIGNXX   ,SIGNYY ,SIGNXY ,SIGNYZ ,SIGNZX  ,
@@ -1374,7 +1376,7 @@ c
                 ENDDO
                 IF (LOGICAL_USERL_AVAIL)THEN
                   TT_LOCAL = TT
-                  CALL ENG_USERLIB_FLAWC(IRUPT,NEL ,NUPAR,NVARF,NFUNC1,IFUNC1,NPF,
+                  CALL ENG_USERLIB_FLAWC(IRUPT,NEL ,NUPAR,NVARF,NFUNC_FAIL,IFUNC_FAIL,NPF,
      2                 TF  ,TT_LOCAL,DT1C  ,UPARAMF,NGL ,IPT, 
      3                 MPT ,IPG ,IBIDON2,IBIDON3  , 
      4                 SIGNXX   ,SIGNYY ,SIGNXY ,SIGNYZ ,SIGNZX  ,
@@ -1383,7 +1385,7 @@ c
      7                 COPY_PLA ,DPLA   ,EPSPL  ,UVARF  ,UELR    ,
      8                 OFF      ,ALDT   ,AREA   ,BIDON3,BIDON4,BIDON5 )
                 ELSE
-!                  CALL F05LAWC (NEL ,NUPAR,NVARF,NFUNC1,IFUNC1,NPF,
+!                  CALL F05LAWC (NEL ,NUPAR,NVARF,NFUNC_FAIL,IFUNC_FAIL,NPF,
 !     2                     TF  ,TT   ,DT1C  ,UPARAMF,NGL,IPT, 
 !     3                     MPT ,IPG ,IBIDON2,IBIDON3   ,  
 !     4                     SIGNXX   ,SIGNYY ,SIGNXY ,SIGNYZ ,SIGNZX  ,
@@ -1412,7 +1414,7 @@ c
                 ENDDO
                 IF (LOGICAL_USERL_AVAIL)THEN
                   TT_LOCAL = TT
-                  CALL ENG_USERLIB_FLAWC(IRUPT,NEL ,NUPAR,NVARF,NFUNC1,IFUNC1,NPF,
+                  CALL ENG_USERLIB_FLAWC(IRUPT,NEL ,NUPAR,NVARF,NFUNC_FAIL,IFUNC_FAIL,NPF,
      2                 TF  ,TT_LOCAL      ,DT1C  ,UPARAMF,NGL ,IPT, 
      3                 MPT ,IPG ,IBIDON2,IBIDON3  , 
      4                 SIGNXX   ,SIGNYY ,SIGNXY ,SIGNYZ ,SIGNZX  ,
@@ -1421,7 +1423,7 @@ c
      7                 COPY_PLA ,DPLA   ,EPSPL  ,UVARF  ,UELR    ,
      8                 OFF      ,ALDT   ,AREA   ,BIDON3,BIDON4,BIDON5 )
                 ELSE
-!                  CALL F06LAWC(NEL   ,NUPAR,NVARF,NFUNC1,IFUNC1,NPF,
+!                  CALL F06LAWC(NEL   ,NUPAR,NVARF,NFUNC_FAIL,IFUNC_FAIL,NPF,
 !     2              TF       ,TT     ,DT1C   ,UPARAMF,NGL   ,       
 !     3              IPT      ,MPT    ,IPG,IBIDON2,IBIDON3,              
 !     4              SIGNXX   ,SIGNYY ,SIGNXY ,SIGNYZ ,SIGNZX  ,             
@@ -1454,20 +1456,20 @@ c
                 ENDDO
                 IF (IXFEM == 0) THEN
                   CALL FAIL_FLD_C(
-     1            NEL       ,NUPAR     ,NVARF     ,NFUNC1   ,IFUNC1     ,
-     2            NPF       ,TF        ,TT        ,DT1C     ,UPARAMF    ,   
-     3            UVAR      ,NGL       ,IPG       ,ILAYER   ,IT         ,
-     4            EPSXX     ,EPSYY     ,EPSXY     ,EPSYZ    ,EPSZX      ,
-     5            ZT        ,OFF       ,FOFF    ,PTHKF(ILAYER,IFL),TDEL ,
+     1            NEL       ,NUPAR     ,NFUNC_FAIL   ,IFUNC_FAIL     ,
+     2            NPF       ,TF        ,TT        ,UPARAMF    ,   
+     3            NGL       ,IPG       ,ILAYER    ,IT         ,
+     4            EPSXX     ,EPSYY     ,EPSXY     ,
+     5            ZT        ,OFF       ,FOFF      ,TDEL ,
      6            FLD_IDX   ,DAM       ,DFMAX     )
                 ELSE
                   CALL FAIL_FLD_XFEM(                                      
-     1            NEL       ,NUPAR    ,NVARF    ,NFUNC1   ,IFUNC1    ,
+     1            NEL       ,NUPAR    ,NVARF    ,NFUNC_FAIL   ,IFUNC_FAIL    ,
      2            NPF       ,TF       ,TT       ,UPARAMF  ,
      3            NGL       ,IPT      ,MPT      ,SSP      ,TENSX     ,
      4            SIGNXX    ,SIGNYY   ,SIGNXY   ,SIGNYZ   ,SIGNZX    ,  
      5            EPSXX     ,EPSYY    ,EPSXY    ,EPSYZ    ,EPSZX     ,  
-     6            UVARF     ,GBUF%NOFF,OFF      ,IP       ,
+     6            UVARF     ,GBUF%NOFF,OFF      ,
      7            ELCRKINI  ,IXFEM    ,IXEL     ,ILAYER   ,IT        ,  
      8            OFFL      ,NPTT     ,UELR1    ,DFMAX    ,TDEL      ,
      9            DAM       ,FLD_IDX  )
@@ -1478,33 +1480,35 @@ c
      1               NEL       ,NUPAR     ,UPARAMF   ,NVARF     ,UVARF     , 
      2               TT        ,NGL       ,IPG       ,ILAYER    ,IT        , 
      3               SIGNXX    ,SIGNYY    ,SIGNXY    ,SIGNYZ    ,SIGNZX    ,               
-     4               DPLA      ,OFF       ,FOFF ,PTHKF(ILAYER,IFL),DFMAX   ,
+     4               DPLA      ,OFF       ,FOFF      ,DFMAX     ,
      5               TDEL      )           
 c
               CASE (10)     !    Tension Strain failure model
                 CALL FAIL_TENSSTRAIN_C(                                         
-     1               NEL       ,NFUNC1    ,NUPAR     ,NVARF     ,IFUNC1    ,
+     1               NEL       ,NFUNC_FAIL    ,NUPAR     ,NVARF     ,IFUNC_FAIL    ,
      2               UPARAMF   ,UVARF     ,NPF       ,TF        ,TT        ,
      3               NGL       ,IPG       ,ILAYER    ,IT        ,EPSPL     ,
      4               EPSXX     ,EPSYY     ,EPSXY     ,EPSYZ     ,EPSZX     ,
-     5               OFF       ,FOFF ,PTHKF(ILAYER,IFL),DFMAX   ,TDEL      ,
+     5               OFF       ,FOFF      ,DFMAX     ,TDEL      ,
      6               DMG_FLAG  ,DMG_LOC_SCALE ,ALDT  ,TSTAR     ,ISMSTR    )                                
 c
               CASE (11)     !    Energy failure model
-                CALL FAIL_ENERGY_C(                                            
-     1               NEL       ,NUPAR     ,NVARF     ,NFUNC1   ,IFUNC1     , 
+                CALL FAIL_ENERGY_C(
+     1               NEL       ,NUPAR     ,NVARF     ,NFUNC_FAIL   ,IFUNC_FAIL     , 
      2               UPARAMF   ,UVARF     ,NPF       ,TF       ,TT         , 
      3               NGL       ,IPG       ,ILAYER    ,IT       ,EPSPL      ,  
-     4               EINT      ,AREA      ,THKN ,PTHKF(ILAYER,IFL),DMG_FLAG, 
-     5               DMG_LOC_SCALE ,OFF       ,FOFF      ,DFMAX    ,TDEL       )
+     4               AREA      ,THKN      ,DMG_FLAG  , 
+     5               DMG_LOC_SCALE ,OFF   ,FOFF      ,DFMAX    ,TDEL       ,
+     6               SIGNXX    ,SIGNYY    ,SIGNXY    ,SIGNYZ   ,SIGNZX     ,
+     7               DEPSXX    ,DEPSYY    ,DEPSXY    ,DEPSYZ   ,DEPSZX     )     
 c
               CASE (13)     !    Chang-Chang failure model
                 CALL FAIL_CHANGCHANG_C(
      1               NEL       ,NUPAR     ,NVARF     ,UPARAMF   ,UVARF     ,
      2               TT        ,DT1C      ,IPG       ,ILAYER    ,IT        ,
-     3               NGL       ,DMG_FLAG  ,DMG_LOC_SCALE ,DFMAX     ,TDEL      ,
-     4          SIGNXX   ,SIGNYY  ,SIGNXY  ,SIGNYZ   ,SIGNZX    ,        
-     5               OFF       ,FOFF      ,PTHKF(ILAYER,IFL))
+     3               NGL       ,DMG_FLAG  ,DMG_LOC_SCALE ,DFMAX ,TDEL      ,
+     4               SIGNXX    ,SIGNYY    ,SIGNXY    ,SIGNYZ    ,SIGNZX    ,        
+     5               OFF       ,FOFF      )
 c
               CASE (14)     !    Hashin failure model  
                 DO I=JFT,JLT        
@@ -1516,7 +1520,7 @@ c
      2               TT        ,DT1C      ,IPG       ,ILAYER    ,IT         ,
      3               NGL       ,DMG_FLAG  ,DMG_LOC_SCALE ,DFMAX     ,TDEL       ,
      4               SIGNXX    ,SIGNYY    ,SIGNXY    ,SIGNYZ    ,SIGNZX     ,        
-     5               OFF       ,FOFF ,PTHKF(ILAYER,IFL),IGTYP   ,PLY_ID     ,
+     5               OFF       ,FOFF      ,PLY_ID    ,
      6               EPSP      ,FWAVE_EL  ,DADV      ) 
 c
               CASE (16)     !    Modified Puck failure model
@@ -1524,24 +1528,24 @@ c
      1               NEL       ,NUPAR     ,NVARF     ,UPARAMF   ,UVARF     ,
      2               TT        ,NGL       ,IPG       ,ILAYER    ,IT        ,
      3               SIGNXX    ,SIGNYY    ,SIGNXY    ,SIGNYZ    ,SIGNZX    ,
-     4               OFF       ,FOFF ,PTHKF(ILAYER,IFL),DMG_FLAG,DMG_LOC_SCALE ,
+     4               OFF       ,FOFF      ,DMG_FLAG  ,DMG_LOC_SCALE ,
      5               DFMAX     ,TDEL      ,DT1C      )
 c
               CASE (23)     !    Tabulated failure model
                 IF (IXFEM == 0) THEN
                   CALL FAIL_TAB_C(
      1                NEL       ,NUPAR     ,NVARF     ,UPARAMF   ,UVARF     ,
-     2                NFUNC1    ,IFUNC1    ,TABLE     ,NPF       ,TF        ,
+     2                NFUNC_FAIL    ,IFUNC_FAIL    ,TABLE     ,NPF       ,TF        ,
      3                TT        ,NGL       ,IPG       ,ILAYER    ,IT        , 
-     4                SIGNXX    ,SIGNYY    ,SIGNXY    ,SIGNYZ    ,SIGNZX    ,      
+     4                SIGNXX    ,SIGNYY    ,SIGNXY    ,NTABL_FAIL,ITABL_FAIL,    
      5                DPLA      ,EPSPL     ,THKN      ,EL_LEN    ,TSTAR     ,
-     6                PTHKF(ILAYER,IFL),DMG_FLAG,DMG_LOC_SCALE ,OFF  ,FOFF      ,
-     7                DFMAX     ,TDEL      ,IGTYP     ,INLOC     )
+     6                DMG_FLAG,DMG_LOC_SCALE ,OFF     ,FOFF      ,
+     7                DFMAX     ,TDEL      ,INLOC     )
                 ELSE
                   CALL FAIL_TAB_XFEM(
      1                NEL      ,NUPAR    ,NVARF    ,NPF      ,TF       ,
      2                TT       ,DT1C     ,UPARAMF  ,NGL      ,IPT      , 
-     3                MPT      ,IP       ,NFUNC1   ,IFUNC1   ,TABLE    ,
+     3                MPT      ,NFUNC_FAIL   ,IFUNC_FAIL   ,TABLE    ,
      4                SIGNXX   ,SIGNYY   ,SIGNXY   ,SIGNYZ   ,SIGNZX   ,
      5                DPLA     ,EPSPL    ,TSTAR    ,TENSX    ,UVARF    ,
      6                GBUF%NOFF,ALDT     ,OFF      ,OFFL     ,ELCRKINI ,
@@ -1552,21 +1556,20 @@ c
               CASE (24)     !    Orthotropic strain failure model
                 CALL FAIL_ORTHSTRAIN_C(
      1              NEL       ,NUPAR     ,NVARF     ,UPARAMF   ,UVARF     ,
-     2              NFUNC1    ,IFUNC1    ,NPF       ,TF        ,NGL       ,
+     2              NFUNC_FAIL    ,IFUNC_FAIL    ,NPF       ,TF        ,NGL       ,
      3              TT        ,DT1       ,IPG       ,ILAYER    ,IT        , 
      4              EPSXX     ,EPSYY     ,EPSXY     ,DMG_FLAG  ,DMG_LOC_SCALE ,
      5              EPSPXX    ,EPSPYY    ,EPSPXY    ,ALDT      ,ISMSTR    ,
-     6              SIGNXX    ,SIGNYY    ,SIGNXY    ,PTHKF(ILAYER,IFL)    ,       
+     6              SIGNXX    ,SIGNYY    ,SIGNXY    ,   
      7              OFF       ,OFFLY     ,FOFF      ,DFMAX     ,TDEL      )
 c
               CASE (25)     !    NXT Failure
                 CALL FAIL_NXT_C(
      1               NEL       ,NUPAR     ,NVARF     ,UPARAMF   ,UVARF     ,
-     2               TT        ,NPF       ,TF        ,NFUNC1    ,IFUNC1    ,   
+     2               TT        ,NPF       ,TF        ,NFUNC_FAIL    ,IFUNC_FAIL    ,   
      3               NGL       ,IPG       ,ILAYER    ,IT        ,HARDM     ,   
      4               SIGNXX    ,SIGNYY    ,SIGNXY    ,SIGNYZ    ,SIGNZX    ,
-     5               OFF       ,FOFF ,PTHKF(ILAYER,IFL),DFMAX   ,TDEL      ,   
-     6               DAM       )
+     5               OFF       ,FOFF      ,DFMAX     ,TDEL      ,DAM       )
 c
               CASE (28)     !    windshield failure (Christian Alter model)
                 IROT   =  ELBUF_STR%BUFLY(ILAYER)%LY_DIRA
@@ -1605,9 +1608,10 @@ c
      1          JLT      ,NVARF   ,
      2          TT       ,UPARAMF ,NGL      ,IPT      ,MPT      ,
      3          SIGNXX   ,SIGNYY  ,SIGNXY   ,SIGNYZ   ,SIGNZX   ,
-     4          DPLA     ,EPSPL   ,UVARF    ,GBUF%NOFF,UELR1    ,
-     5          OFF      ,OFFL    ,DFMAX    ,TDEL     ,NFUNC1   ,
-     6          IFUNC1   ,NPF     ,TF       ,EL_LEN   ,FOFF     , IGTYP)
+     4          DPLA     ,EPSPL   ,UVARF    ,UELR1    ,
+     5          OFF      ,OFFL    ,DFMAX    ,TDEL     ,NFUNC_FAIL,
+     6          IFUNC_FAIL,NPF    ,TF       ,EL_LEN   ,FOFF     ,IPG      ,
+     7          DMG_FLAG ,DMG_LOC_SCALE)
 c
               CASE (31)     !    Anisotropic fabric failure model
 c
@@ -1625,8 +1629,8 @@ c
                   EPS2  => UVAR(JJ:JJ+NEL)
                 ENDIF
                 CALL FAIL_FABRIC_C(
-     1               NEL      ,NGL       ,NUPAR     ,NVARF     ,NFUNC1    ,
-     2               UPARAMF  ,UVARF     ,IFUNC1    ,TT        ,DT1       ,    
+     1               NEL      ,NGL       ,NUPAR     ,NVARF     ,NFUNC_FAIL    ,
+     2               UPARAMF  ,UVARF     ,IFUNC_FAIL    ,TT        ,DT1       ,    
      3               NPF      ,TF        ,DEPS1     ,DEPS2     ,EPS1      ,
      4               EPS2     ,SIGNXX    ,SIGNYY    ,DFMAX     ,TDEL      ,
      5               IPG      ,ILAYER    ,IT        ,OFF       ,FOFF      )                     
@@ -1636,8 +1640,9 @@ c
      1           NEL      ,NUPAR    ,NVARF    ,UPARAMF   ,UVARF     ,
      2           TT       ,NGL      ,IPT      ,ILAYER    ,IT        ,
      3           SIGNXX   ,SIGNYY   ,SIGNXY   ,SIGNYZ   ,SIGNZX     ,
-     4           DPLA     ,OFF      ,FOFF     ,PTHKF(ILAYER,IFL)    ,
-     5           DFMAX    ,TDEL     ,UELR1    ,MPT      ,IGTYP      )
+     4           DPLA     ,OFF      ,FOFF     ,
+     5           DFMAX    ,TDEL     ,UELR1    ,MPT      ,
+     6           FLD_IDX  ,DAM      ,EL_PLA   )
 c
               CASE (34)     !    Cockcroft-Latham failure model
                 CALL FAIL_COCKROFT_C(
@@ -1659,17 +1664,16 @@ c
                 IF (IXFEM == 0) THEN
                   CALL FAIL_TAB_OLD_C(
      1                NEL       ,NUPAR     ,NVARF     ,UPARAMF   ,UVARF     ,
-     2                NFUNC1    ,IFUNC1    ,NPF       ,TF        ,
+     2                NFUNC_FAIL    ,IFUNC_FAIL    ,NPF       ,TF        ,
      3                TT        ,NGL       ,IPG       ,ILAYER    ,IT        , 
      4                SIGNXX    ,SIGNYY    ,SIGNXY    ,SIGNYZ    ,SIGNZX    ,      
      5                DPLA      ,EPSPL     ,THKN      ,EL_LEN    ,TSTAR     ,
-     6                PTHKF(ILAYER,IFL)    ,OFF       ,FOFF      ,
-     7                DFMAX     ,TDEL      ,IGTYP     )
+     6                OFF       ,FOFF      ,DFMAX     ,TDEL      )
                 ELSE
                   CALL FAIL_TAB_OLD_XFEM(
      1                NEL      ,NUPAR    ,NVARF    ,NPF      ,TF       ,
      2                TT       ,DT1C     ,UPARAMF  ,NGL      ,IPT      , 
-     3                MPT      ,IP       ,NFUNC1   ,IFUNC1   ,DMG_FLAG ,
+     3                MPT      ,NFUNC_FAIL   ,IFUNC_FAIL   ,DMG_FLAG ,
      4                SIGNXX   ,SIGNYY   ,SIGNXY   ,SIGNYZ   ,SIGNZX   ,
      5                DPLA     ,EPSPL    ,TSTAR    ,TENSX    ,UVARF    ,
      6                GBUF%NOFF,ALDT     ,OFF      ,OFFL     ,ELCRKINI ,
@@ -1683,21 +1687,20 @@ c
      2            TT       ,UPARAMF ,NGL      ,IPT      ,MPT      ,
      3            SIGNXX   ,SIGNYY  ,SIGNXY   ,SIGNYZ   ,SIGNZX   ,
      4            DPLA     ,EPSPL   ,UVARF    ,GBUF%NOFF,UELR1    ,
-     5            OFF      ,OFFL    ,DFMAX    ,TDEL     ,NFUNC1   ,
-     6            IFUNC1   ,NPF     ,TF       ,EL_LEN   ,FOFF     , 
+     5            OFF      ,OFFL    ,DFMAX    ,TDEL     ,NFUNC_FAIL   ,
+     6            IFUNC_FAIL,NPF    ,TF       ,EL_LEN   ,FOFF     , 
      7            IGTYP    )
 c
               CASE (39)     !    GENE1
 c
                 CALL FAIL_GENE1_C(
-     1            JLT      ,NUPAR    ,NVARF    ,NFUNC1   ,IFUNC1   ,LBUF%OFF ,
+     1            JLT      ,NUPAR    ,NVARF    ,NFUNC_FAIL   ,IFUNC_FAIL   ,
      2            NPF      ,TF       ,TT       ,DT1C     ,UPARAMF  ,IPG      ,
-     3            NGL      ,GBUF%DT  ,EPSPL    ,UVARF    ,OFF      ,NPG      ,     
-     4            EPSXX    ,EPSYY    ,EPSXY    ,EPSYZ    ,EPSZX    ,AREA     ,            
-     5            SIGNXX   ,SIGNYY   ,SIGNXY   ,SIGNYZ   ,SIGNZX   ,THKN     , 
-     6            TEMPEL   ,DFMAX    ,TDEL     ,ALDT     ,TABLE    ,IFL      ,
-     7            THK0     ,ELBUF_STR,IPT      ,MPT      ,GBUF%NOFF,FOFF     ,
-     8            IGTYP    ,THKLYL   ,ILAY     )
+     3            NGL      ,GBUF%DT  ,EPSPL    ,UVARF    ,OFF      ,    
+     4            EPSXX    ,EPSYY    ,EPSXY    ,AREA     ,THKN     ,            
+     5            SIGNXX   ,SIGNYY   ,SIGNXY   ,SIGNYZ   ,SIGNZX   , 
+     6            EL_TEMP  ,DFMAX    ,ALDT     ,TABLE    ,TDEL     ,
+     7            THK0     ,IPT      ,FOFF     ,THKLYL   )
 c
               CASE (40)     !    RTCL
 c
@@ -1710,24 +1713,23 @@ c
               CASE (41)     !    TAB2
 c
                 CALL FAIL_TAB2_C(
-     1            JLT      ,NUPAR    ,NVARF    ,NFUNC1   ,IFUNC1   ,
+     1            JLT      ,NUPAR    ,NVARF    ,NFUNC_FAIL   ,IFUNC_FAIL   ,
      2            NPF      ,TABLE    ,TF       ,TT       ,UPARAMF  , 
      3            NGL      ,EL_LEN   ,DPLA     ,EPSPL    ,UVARF    ,     
      4            SIGNXX   ,SIGNYY   ,SIGNXY   ,SIGNYZ   ,SIGNZX   ,              
      5            EL_TEMP  ,FOFF     ,DFMAX    ,TDEL     ,IPT      ,
-     6            IPG      ,DMG_FLAG ,DMG_LOC_SCALE,PTHKF(ILAYER,IFL)) 
+     6            IPG      ,DMG_FLAG ,DMG_LOC_SCALE,NTABL_FAIL,ITABL_FAIL) 
 c
               CASE (42)     !    INIEVO
 c
                 CALL FAIL_INIEVO_C(
-     1            JLT      ,NUPAR    ,NVARF    ,NFUNC1   ,IFUNC1   ,
-     2            NPF      ,TABLE    ,TF       ,TT       ,UPARAMF  , 
+     1            JLT      ,NUPAR    ,NVARF    ,
+     2            TABLE    ,NTABL_FAIL,ITABL_FAIL   ,TT       ,UPARAMF  , 
      3            NGL      ,EL_LEN   ,DPLA     ,EPSPL    ,UVARF    ,     
      4            SIGNXX   ,SIGNYY   ,SIGNXY   ,SIGNYZ   ,SIGNZX   ,              
      5            EL_PLA   ,EL_TEMP  ,SIGY     ,FOFF     ,DFMAX    ,
      6            TDEL     ,IPT      ,IPG      ,DMG_FLAG ,DMG_LOC_SCALE,
-     7            PTHKF(ILAYER,IFL)  ,DAMINI   ,AREA     ,INLOC    ,
-     8            NPG      )
+     7            DAMINI   ,AREA     ,INLOC    ,NPG      )
 c
               CASE (43)     !    Syazwan failure model
 c
@@ -1736,7 +1738,7 @@ c
      2            TT       ,NGL      ,IPT      ,DPLA     ,EL_PLA   ,
      3            SIGNXX   ,SIGNYY   ,SIGNXY   ,SIGNYZ   ,SIGNZX   ,
      4            EPSXX    ,EPSYY    ,EPSXY    ,EPSYZ    ,EPSZX    ,
-     5            DFMAX    ,NFUNC1   ,IFUNC1   ,EL_LEN   ,FOFF     ,
+     5            DFMAX    ,NFUNC_FAIL   ,IFUNC_FAIL   ,EL_LEN   ,FOFF     ,
      6            IPG      ,DMG_FLAG ,DMG_LOC_SCALE,NPF  ,TF       )
 c
               CASE (44)     !    Tsai-Wu failure model
@@ -1745,7 +1747,7 @@ c
      1            NEL       ,NUPAR     ,NVARF     ,UPARAMF   ,UVARF     ,
      2            TT        ,NGL       ,IPG       ,ILAYER    ,IT        ,
      3            SIGNXX    ,SIGNYY    ,SIGNXY    ,SIGNYZ    ,SIGNZX    ,
-     4            OFF       ,FOFF ,PTHKF(ILAYER,IFL),DMG_FLAG,DMG_LOC_SCALE ,
+     4            OFF       ,FOFF      ,DMG_FLAG  ,DMG_LOC_SCALE ,
      5            DFMAX     ,TDEL      ,DT1C      )
 c
               CASE (45)     !    Tsai-Hill failure model
@@ -1754,7 +1756,7 @@ c
      1            NEL       ,NUPAR     ,NVARF     ,UPARAMF   ,UVARF     ,
      2            TT        ,NGL       ,IPG       ,ILAYER    ,IT        ,
      3            SIGNXX    ,SIGNYY    ,SIGNXY    ,SIGNYZ    ,SIGNZX    ,
-     4            OFF       ,FOFF ,PTHKF(ILAYER,IFL),DMG_FLAG,DMG_LOC_SCALE ,
+     4            OFF       ,FOFF      ,DMG_FLAG  ,DMG_LOC_SCALE ,
      5            DFMAX     ,TDEL      ,DT1C      )
 c 
               CASE (46)     !    Hoffman failure model
@@ -1763,17 +1765,26 @@ c
      1            NEL       ,NUPAR     ,NVARF     ,UPARAMF   ,UVARF     ,
      2            TT        ,NGL       ,IPG       ,ILAYER    ,IT        ,
      3            SIGNXX    ,SIGNYY    ,SIGNXY    ,SIGNYZ    ,SIGNZX    ,
-     4            OFF       ,FOFF ,PTHKF(ILAYER,IFL),DMG_FLAG,DMG_LOC_SCALE ,
+     4            OFF       ,FOFF      ,DMG_FLAG  ,DMG_LOC_SCALE ,
      5            DFMAX     ,TDEL      ,DT1C      )
 c
               CASE (47)     !    Maximum Strain failure model
 c
-                CALL FAIL_MAXSTRN_C(
+                CALL FAIL_MAXSTRAIN_C(
      1            NEL       ,NUPAR     ,NVARF     ,UPARAMF   ,UVARF     ,
      2            TT        ,NGL       ,IPG       ,ILAYER    ,IT        ,
      3            EPSXX     ,EPSYY     ,EPSXY     ,EPSYZ     ,EPSZX     ,
-     4            OFF       ,FOFF ,PTHKF(ILAYER,IFL),DMG_FLAG,DMG_LOC_SCALE ,
+     4            OFF       ,FOFF      ,DMG_FLAG  ,DMG_LOC_SCALE ,
      5            DFMAX     ,TDEL      ,DT1C      )
+c
+              CASE (48)     !    Orthotropic energy failure model
+c               
+                CALL FAIL_ORTHENERG_C(
+     1            NEL       ,NUPAR     ,NVARF     ,UPARAMF   ,UVARF     ,
+     2            NGL       ,TT        ,IPG       ,ILAYER    ,IT        , 
+     3            DEPSXX    ,DEPSYY    ,DEPSXY    ,DMG_FLAG  ,DMG_ORTH_SCALE,
+     4            ALDT      ,FOFF      ,DFMAX     ,TDEL      ,
+     5            SIGNXX    ,SIGNYY    ,SIGNXY    ,IGTYP     ,PLY_ID    )
 c 
 c-------------
               END SELECT
@@ -1822,7 +1833,13 @@ C
                TENS(JFT:JLT,2) = (SIGNYY(JFT:JLT)+SIGVYY(JFT:JLT))*DMG_LOC_SCALE(JFT:JLT)                               
                TENS(JFT:JLT,3) = (SIGNXY(JFT:JLT)+SIGVXY(JFT:JLT))*DMG_LOC_SCALE(JFT:JLT)                               
                TENS(JFT:JLT,4) = (SIGNYZ(JFT:JLT)+SIGVYZ(JFT:JLT))*DMG_LOC_SCALE(JFT:JLT)                               
-               TENS(JFT:JLT,5) = (SIGNZX(JFT:JLT)+SIGVZX(JFT:JLT))*DMG_LOC_SCALE(JFT:JLT)                               
+               TENS(JFT:JLT,5) = (SIGNZX(JFT:JLT)+SIGVZX(JFT:JLT))*DMG_LOC_SCALE(JFT:JLT)  
+            CASE (2)                                                           
+               TENS(JFT:JLT,1) = (SIGNXX(JFT:JLT)+SIGVXX(JFT:JLT))*DMG_ORTH_SCALE(JFT:JLT,1)                               
+               TENS(JFT:JLT,2) = (SIGNYY(JFT:JLT)+SIGVYY(JFT:JLT))*DMG_ORTH_SCALE(JFT:JLT,2)                               
+               TENS(JFT:JLT,3) = (SIGNXY(JFT:JLT)+SIGVXY(JFT:JLT))*DMG_ORTH_SCALE(JFT:JLT,3)                               
+               TENS(JFT:JLT,4) = (SIGNYZ(JFT:JLT)+SIGVYZ(JFT:JLT))*DMG_ORTH_SCALE(JFT:JLT,4)                               
+               TENS(JFT:JLT,5) = (SIGNZX(JFT:JLT)+SIGVZX(JFT:JLT))*DMG_ORTH_SCALE(JFT:JLT,5)                 
             END SELECT
 c
             IF (IGTYP == 16) THEN                                                  
@@ -1892,7 +1909,16 @@ c
                 FOR(1:NEL,5) = FOR(1:NEL,5) + THLY(1:NEL)*(SIGNZX(1:NEL)+SIGVZX(1:NEL))*DMG_LOC_SCALE(1:NEL)   
                 MOM(1:NEL,1) = MOM(1:NEL,1) + WMC(1:NEL) *(SIGNXX(1:NEL)+SIGVXX(1:NEL))*DMG_LOC_SCALE(1:NEL)   
                 MOM(1:NEL,2) = MOM(1:NEL,2) + WMC(1:NEL) *(SIGNYY(1:NEL)+SIGVYY(1:NEL))*DMG_LOC_SCALE(1:NEL)   
-                MOM(1:NEL,3) = MOM(1:NEL,3) + WMC(1:NEL) *(SIGNXY(1:NEL)+SIGVXY(1:NEL))*DMG_LOC_SCALE(1:NEL)   
+                MOM(1:NEL,3) = MOM(1:NEL,3) + WMC(1:NEL) *(SIGNXY(1:NEL)+SIGVXY(1:NEL))*DMG_LOC_SCALE(1:NEL) 
+            CASE (3)  ! orthotropic softening with DMG_ORTH_SCALE from failure model          
+                FOR(1:NEL,1) = FOR(1:NEL,1) + THLY(1:NEL)*(SIGNXX(1:NEL)+SIGVXX(1:NEL))*DMG_ORTH_SCALE(1:NEL,1)   
+                FOR(1:NEL,2) = FOR(1:NEL,2) + THLY(1:NEL)*(SIGNYY(1:NEL)+SIGVYY(1:NEL))*DMG_ORTH_SCALE(1:NEL,2)   
+                FOR(1:NEL,3) = FOR(1:NEL,3) + THLY(1:NEL)*(SIGNXY(1:NEL)+SIGVXY(1:NEL))*DMG_ORTH_SCALE(1:NEL,3)   
+                FOR(1:NEL,4) = FOR(1:NEL,4) + THLY(1:NEL)*(SIGNYZ(1:NEL)+SIGVYZ(1:NEL))*DMG_ORTH_SCALE(1:NEL,4)   
+                FOR(1:NEL,5) = FOR(1:NEL,5) + THLY(1:NEL)*(SIGNZX(1:NEL)+SIGVZX(1:NEL))*DMG_ORTH_SCALE(1:NEL,5)   
+                MOM(1:NEL,1) = MOM(1:NEL,1) + WMC(1:NEL) *(SIGNXX(1:NEL)+SIGVXX(1:NEL))*DMG_ORTH_SCALE(1:NEL,1)   
+                MOM(1:NEL,2) = MOM(1:NEL,2) + WMC(1:NEL) *(SIGNYY(1:NEL)+SIGVYY(1:NEL))*DMG_ORTH_SCALE(1:NEL,2)   
+                MOM(1:NEL,3) = MOM(1:NEL,3) + WMC(1:NEL) *(SIGNXY(1:NEL)+SIGVXY(1:NEL))*DMG_ORTH_SCALE(1:NEL,3) 
             END SELECT                                                             
 c
           ENDIF   ! IGTYP                                                          
@@ -1947,24 +1973,28 @@ c--------------------------------------------------
         IF (ORTH_DAMAGE == 1) THEN   ! /fail/alter + front_wave only
           TFAIL => GBUF%DMG(1+NEL:NEL*2)  ! only for /FAIL/ALTER          
           CALL FAIL_SETOFF_WIND_FRWAVE(
-     .                       ELBUF_STR,GEO      ,PID(1)   ,NGL      ,
-     .                       NEL      ,IR       ,IS       ,NLAY     ,
-     .                       NPTTOT   ,PTHKF    ,THK_LY   ,THKLY    ,
+     .                       ELBUF_STR,MAT_ELEM ,GEO      ,PID(1)   ,
+     .                       NGL      ,NEL      ,IR       ,IS       ,
+     .                       NLAY     ,NPTTOT   ,THK_LY   ,THKLY    ,
      .                       OFF      ,NPG      ,STACK    ,ISUBSTACK, 
      .                       IGTYP    ,FAILWAVE ,FWAVE_EL ,DMG_FLAG ,
      .                       TT       ,TRELAX   ,TFAIL    ,DMG_GLOB_SCALE)
         ELSEIF (NPG == 1) THEN
-          CALL FAIL_SETOFF_C(ELBUF_STR,GEO      ,PID(1)   ,NGL      ,
-     .                       NEL      ,NLAY     ,NPTTOT   ,PTHKF    ,
+          CALL FAIL_SETOFF_C(ELBUF_STR,MAT_ELEM ,GEO      ,PID(1)   ,
+     .                       NGL      ,NEL      ,NLAY     ,NPTTOT   ,
      .                       THK_LY   ,THKLY    ,OFF      ,STACK    ,
-     .                       ISUBSTACK,IGTYP    ,FAILWAVE ,FWAVE_EL )
+     .                       ISUBSTACK,IGTYP    ,FAILWAVE ,FWAVE_EL ,
+     .                       NLAY_MAX ,LAYNPT_MAX,NUMGEO  ,NUMSTACK ,
+     .                       IGEO     )
         ELSE
           CALL FAIL_SETOFF_NPG_C(
-     .                       ELBUF_STR,GEO      ,PID(1)   ,NGL      ,
-     .                       NEL      ,IR       ,IS       ,NLAY     ,
-     .                       NPTTOT   ,PTHKF    ,THK_LY   ,THKLY    ,
+     .                       ELBUF_STR,MAT_ELEM ,GEO      ,PID(1)   ,
+     .                       NGL      ,NEL      ,IR       ,IS       ,
+     .                       NLAY     ,NPTTOT   ,THK_LY   ,THKLY    ,
      .                       OFF      ,NPG      ,STACK    ,ISUBSTACK, 
-     .                       IGTYP    ,FAILWAVE ,FWAVE_EL )
+     .                       IGTYP    ,FAILWAVE ,FWAVE_EL ,NLAY_MAX ,
+     .                       LAYNPT_MAX,NUMGEO  ,IPG      ,NUMSTACK ,
+     .                       IGEO     )
         ENDIF
       ENDIF  
 c---

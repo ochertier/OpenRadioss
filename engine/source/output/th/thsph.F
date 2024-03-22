@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,7 +26,7 @@ Chd|-- called by -----------
 Chd|        HIST2                         source/output/th/hist2.F      
 Chd|-- calls ---------------
 Chd|        INITBUF                       share/resol/initbuf.F         
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        INITBUF_MOD                   share/resol/initbuf.F         
 Chd|====================================================================
       SUBROUTINE THSPH(ELBUF_TAB, NTHGRP2, ITHGRP, IPARG, ITHBUF,
@@ -45,9 +45,7 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "vect01_c.inc"
 #include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "sphcom.inc"
-#include      "scr01_c.inc"
 #include      "scr05_c.inc"
 #include      "task_c.inc"
 #include      "param_c.inc"
@@ -148,7 +146,7 @@ C======================================================================|
                     ITY=IPARG(5,NG)
 
                     IF(ITY==51.OR.ITY==52) THEN
-                        CALL INITBUF (IPARG    ,NG      ,                    
+                        CALL INITBUF(IPARG    ,NG      ,                    
      2                                MTE     ,NEL     ,NFT     ,IAD     ,ITY     ,  
      3                                NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,  
      4                                JTHE    ,JLAG    ,JMULT   ,JHBE    ,JIVF    ,  

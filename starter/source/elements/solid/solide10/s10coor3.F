@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -40,9 +40,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
@@ -50,7 +47,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "vect01_c.inc"
-#include      "param_c.inc"
 #include      "com04_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -171,7 +167,7 @@ C
             ZZ(I,N) = HALF*(ZZ(I,N1)+ZZ(I,N2))
             VX(I,N) = HALF*(VX(I,N1)+VX(I,N2))
             VY(I,N) = HALF*(VY(I,N1)+VY(I,N2))
-            VZ(I,N) = HALF*(VZ(I,N1)+VZ(I,N2))	    
+            VZ(I,N) = HALF*(VZ(I,N1)+VZ(I,N2))      
           ENDIF
         ENDDO
       ENDDO
@@ -195,7 +191,7 @@ C
           ENDDO
          ENDIF   
         ENDIF
-C	
+C
         IF(ISMSTR>=10.AND.ISMSTR<=12)THEN
           DO N=1,10
            DO I=LFT,LLT
@@ -228,9 +224,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
@@ -238,7 +231,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "vect01_c.inc"
-#include      "param_c.inc"
 #include      "com04_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -359,7 +351,7 @@ C
             ZZ(I,N) = HALF*(ZZ(I,N1)+ZZ(I,N2))
             VX(I,N) = HALF*(VX(I,N1)+VX(I,N2))
             VY(I,N) = HALF*(VY(I,N1)+VY(I,N2))
-            VZ(I,N) = HALF*(VZ(I,N1)+VZ(I,N2))	    
+            VZ(I,N) = HALF*(VZ(I,N1)+VZ(I,N2))      
           ENDIF
         ENDDO
       ENDDO

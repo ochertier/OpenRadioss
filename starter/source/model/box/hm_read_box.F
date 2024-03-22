@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -42,6 +42,7 @@ Chd|====================================================================
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE MY_ALLOC_MOD
       USE UNITAB_MOD
       USE SUBMODEL_MOD
       USE MESSAGE_MOD
@@ -55,12 +56,8 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
-#include      "scr03_c.inc"
 #include      "scr17_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
 #include      "param_c.inc"
-#include      "my_allocate.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -125,7 +122,7 @@ c
 c-----------------------------------------------
       IAD = 0
       LEN = 5*NBBOX
-      MY_ALLOCATE(BUFTMP  ,LEN)
+      CALL MY_ALLOC(BUFTMP  ,LEN)
 c--------------------------------------------------
 c
       CALL READ_BOX_SPHER(
@@ -145,7 +142,7 @@ c
 c--------------------------------------------------
 c     Recherche des ID doubles
 c
-      MY_ALLOCATE (IBOXTMP  ,NBOX )
+      CALL MY_ALLOC (IBOXTMP  ,NBOX )
       IBOXTMP(1:NBOX) = IBOX(1:NBOX)%ID
       CALL UDOUBLE_IGR(IBOXTMP,NBOX,MESS,0,ZERO)
 c

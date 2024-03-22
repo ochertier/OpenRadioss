@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -23,11 +23,11 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 Chd|====================================================================
 Chd|  SIGEPS71PI                    source/materials/mat/mat071/sigeps71pi.F
 Chd|-- called by -----------
-Chd|        MULAWP                        source/elements/beam/mulawp.F 
+Chd|        MULAW_IB                      source/elements/beam/mulaw_ib.F
 Chd|-- calls ---------------
 Chd|====================================================================
       SUBROUTINE SIGEPS71PI(
-     1               NEL     ,NUPARAM ,UPARAM  ,IPM     ,MAT     ,
+     1               NEL     ,NUPARAM ,UPARAM  ,IPM     ,IMAT    ,
      2               OFF     ,DEPSXX  ,DEPSXY  ,DEPSXZ  ,        
      3               SIGOXX  ,SIGOXY  ,SIGOXZ  ,EPSXX   ,EPSXY  ,    
      4               EPSXZ   ,SIGNXX  ,SIGNXY  ,SIGNXZ  ,ETSE    ,
@@ -44,18 +44,14 @@ C---------+---------+---+---+--------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "scr05_c.inc"
-#include      "scr17_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com08_c.inc"
 C-----------------------------------------------
 C   I N P U T   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER ,INTENT(IN) :: IMAT
       INTEGER ,INTENT(IN) :: NEL,NUPARAM,NUVAR,
      .   NFUNC,IFUNC(NFUNC),NPF(*),JTHE
       INTEGER ,DIMENSION(NPROPMI,NUMMAT) ,INTENT(IN) :: IPM
-      INTEGER ,DIMENSION(NEL) ,INTENT(IN) :: MAT
       my_real ,DIMENSION(NEL) ,INTENT(IN) :: EPSXX,EPSXY,EPSXZ,
      .   DEPSXX,DEPSXY,DEPSXZ,SIGOXX,SIGOXY,SIGOXZ,TEMPEL
       my_real ,DIMENSION(*) ,INTENT(IN) :: UPARAM
@@ -74,8 +70,9 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER :: I,IADBUF,KK
       INTEGER ,DIMENSION(NEL) ::EFLAG
-      my_real :: FASS,FSAS,FASF,FSAF,RSAS,RFAS,FS0,RSSA,RFSA,DFM, FSS,
-     .           SQDT,AA,BB,CC,FCT,FCTP,BETA,DGT,GS,DET,SHFACT,DFMSA,DFMAS 
+      my_real :: FASS,FSAS,FASF,FSAF,RSAS,RFAS,FS0,RSSA,RFSA,DFM, FSS,SCALE_SIG,
+     .           SQDT,AA,BB,CC,FCT,FCTP,BETA,DGT,GS,DET,SHFACT,DFMSA,DFMAS ,
+     .           delta, sol1,sol2
       my_real, DIMENSION(NEL) ::E,K,EMART,G,G2, ALPHA,EPSL,GM,KM,
      .           YLD_ASS,YLD_ASF,YLD_SAS,TINI,
      .           YLD_SAF,CAS,CSA,TSAS,TFAS, TSSA,TFSA, 
@@ -85,10 +82,11 @@ c    UVAR  2= FS0
 c    UVAR  3= FS0 
 c    UVAR 11=  TEMP
 C=======================================================================
-      SHFACT = FIVE_OVER_6       
 
+      SHFACT = FIVE_OVER_6       
+      SQDT   = SQRT(TWO/THREE)
+      IADBUF       = IPM(7,IMAT)-1               
       DO I=1,NEL                                 
-        IADBUF       = IPM(7,MAT(I))-1               
         E(I)         = UPARAM(IADBUF+1)                        
         G(I)         = UPARAM(IADBUF+3)              
         K(I)         = UPARAM(IADBUF+4)                  
@@ -129,6 +127,15 @@ C=======================================================================
         RFAS = YLD_ASF(I) -CAS(I)*TFAS(I) !end from aust to martensite
         RSSA = YLD_SAS(I) -CSA(I)*TSSA(I) !start from martensite to austenite
         RFSA = YLD_SAF(I) -CSA(I)*TFSA(I) !end from martensite to austenite
+        IF (EPSXX(I)< ZERO)THEN
+          SCALE_SIG = (ONE + ALPHA(I))/(ONE - ALPHA(I)) 
+          SCALE_SIG = (SQRT(TWO_THIRD) + ALPHA(I))/(SQRT(TWO_THIRD) - ALPHA(I)) 
+          RSAS = YLD_ASS(I) * SCALE_SIG -CAS(I)*TSAS(I) !start from aust to martensite compression
+          RFAS = YLD_ASF(I) * SCALE_SIG -CAS(I)*TFAS(I) !end from aust to martensite compression
+          RSSA = YLD_SAS(I) * SCALE_SIG -CSA(I)*TSSA(I) !start from martensite to austenite compression
+          RFSA = YLD_SAF(I) * SCALE_SIG -CSA(I)*TFSA(I) !end from martensite to austenite compression
+          EPSL(I) = EPSL(I) / SCALE_SIG
+        ENDIF
    
         IF (EFLAG(I) > ZERO)THEN ! young modulus dependent on martensite fraction
           GT(I) = G(I) + FM(I) * (GM(I)    - G(I)) !G_n
@@ -143,42 +150,42 @@ C=======================================================================
           BETA      =   ET(I)*EPSL(I)* SIGN(ONE,EPSXX(I))-(EMART(I)- E(I))*EPSXX(I) 
      .                                        + (EMART(I) - E(I)) *EPSL(I)* SIGN(ONE,EPSXX(I)) *FM(I)  
           DFMSA = ZERO
-          DFMAS = ZERO 
+          DFMAS = ZERO  
           !---------------
           !Check Austenite -----> martensite  
           !---------------
-	     FS(I)     =   ABS (SIGNXX(I) ) -CAS(I)*TEMP(I)! trial
+          FS(I)     =   ABS (SIGNXX(I) ) -CAS(I)*TEMP(I)! trial
           FASS = FS(I) -  RSAS
           FASF = FS(I) -  RFAS
           FS0  = UVAR(I,2)
-          IF((FS(I) - FS0) > ZERO .AND. FASS > ZERO.AND. FASF < ZERO .AND. FM(I) < ONE )THEN
+          IF((FS(I) - FS0) > ZERO .AND. FASS > ZERO.AND. FM(I) <= ONE )THEN   
             AA = (ONE - FM(I))*(EMART(I) - E(I))*EPSL(I)
             BB = -(FS0 - RFAS - (ONE - FM(I))*BETA* SIGN(ONE,EPSXX(I)))
             CC = -(ONE - FM(I)) * (FS(I) - FS0)
             DFMAS =  MIN(ONE , - (ONE - FM(I))*(FS(I) - FS0 ) / (FS0-RFAS - (ONE - FM(I))*E(I)*EPSL(I)  )  ) 
             DO KK = 1,3
-             FCT   = DFMAS*DFMAS *AA+ DFMAS*   BB  + CC
-             FCTP  = TWO*DFMAS *AA+ BB
-             DFMAS = DFMAS - FCT / FCTP     
+              FCT   = DFMAS*DFMAS *AA+ DFMAS*   BB  + CC
+              FCTP  = TWO*DFMAS *AA+ BB
+              DFMAS = DFMAS - FCT / FCTP     
             ENDDO
             DFMAS = MIN(ONE,DFMAS  )  
           ENDIF
           !---------------
           !Check marteniste -----> austenite
           !---------------
-	     FS(I)     =   ABS (SIGNXX(I) ) -CSA(I)*TEMP(I)! trial
+          FS(I)     =   ABS (SIGNXX(I) ) -CSA(I)*TEMP(I)! trial
           FSAS = FS(I) - RSSA
           FSAF = FS(I) - RFSA
           FS0  = UVAR(I,3)
-          IF((FS(I) - FS0) < ZERO .AND. FSAS < ZERO.AND. FSAF > ZERO .AND. FM(I) >ZERO)THEN
+          IF((FS(I) - FS0) < ZERO .AND. FSAS < ZERO .AND. FM(I) >ZERO)THEN  
             AA =  FM(I)*(EMART(I) - E(I))*EPSL(I)
             BB =  FS0-RFSA   +  FM(I)*BETA* SIGN(ONE,EPSXX(I))
             CC =  -FM(I) * (FS(I)-FS0 )
             DFMSA =  MAX(-ONE , FM(I) * ( FS(I) - FS0 ) / (FS0 - RFSA + FM (I)* E(I)*EPSL(I) ))
             DO KK = 1,3
-             FCT  = DFMSA*DFMSA *AA+ DFMSA*   BB  +CC
-             FCTP = TWO*DFMSA *AA+ BB
-             DFMSA = DFMSA - FCT / FCTP
+              FCT  = DFMSA*DFMSA *AA+ DFMSA*   BB  +CC
+              FCTP = TWO*DFMSA *AA+ BB
+              DFMSA = DFMSA - FCT / FCTP
             ENDDO
             DFMSA =  MAX(-ONE , DFMSA )
           ENDIF
@@ -186,6 +193,7 @@ C=======================================================================
          !new martensite fraction increment        
          !--------------------------
           DFM =  DFMAS + DFMSA 
+
           IF(DFM < ZERO .AND. FM(I) == ZERO) DFM = ZERO
          ! --------------------------
          ! UPDATE
@@ -194,6 +202,7 @@ C=======================================================================
           DET = DFM * (EMART(I) - E(I))
           SIGNXX(I) = SIGNXX(I) + DET * ( EPSXX(I) - EPSL(I) * (FM(I) + DFM)* SIGN(ONE,EPSXX(I))   ) 
      .                                           - ET(I) * EPSL(I) * DFM* SIGN(ONE,EPSXX(I))
+     
 
           FS(I) =  ABS (SIGNXX(I) )   
           FM(I) = FM(I) + DFM
@@ -208,12 +217,12 @@ C=======================================================================
         ELSE ! constant young modulus    
           GS   = SHFACT*G(I)                             
           !trial stress(sigma_tr_n+1)
-          SIGNXX(I) =   E(I)*(EPSXX(I) - EPSL(I)*FM(I)* SIGN(ONE,EPSXX(I)))
+          SIGNXX(I) =   E(I)*(EPSXX(I) - EPSL(I)*FM(I)* SIGN(ONE,EPSXX(I))) ! deviator of stress
           SIGNXY(I) =   GS  * EPSXY(I)
           SIGNXZ(I) =   GS  * EPSXZ(I)
 
           ETSE(I)   =   ONE                        
-	     FS(I)     =   ABS (SIGNXX(I) ) - CAS(I)*TEMP(I)! trial
+          FS(I)     =   ABS (SIGNXX(I) ) - CAS(I)*TEMP(I)! trial
           !---------------
           !Check Austenite -----> martensite  
           !---------------
@@ -222,7 +231,7 @@ C=======================================================================
           FS0 = UVAR(I,2)
           DFMSA = ZERO
           DFMAS = ZERO 
-          IF((FS(I) - FS0) > ZERO .AND. FASS > ZERO.AND. FASF < ZERO .AND. FM(I) < ONE )THEN
+          IF((FS(I) - FS0) > ZERO .AND. FASS > ZERO.AND. FM(I) < ONE )THEN
             ! transformation to martensite 
             ! compute martensite phase fraction increment
              DFMAS =  MIN(ONE , - (FS(I) - FS0 )*(ONE - FM(I)) / (FS0-RFAS - (ONE - FM(I))*E(I)*EPSL(I)  )  ) 
@@ -230,11 +239,11 @@ C=======================================================================
          !---------------
          !Check marteniste -----> austenite  
          !---------------
-	    FS(I)     =   ABS (SIGNXX(I) ) - CSA(I)*TEMP(I)! trial
+         FS(I)     =   ABS (SIGNXX(I) ) - CSA(I)*TEMP(I)! trial
          FSAS = FS(I) - RSSA  
          FSAF = FS(I) - RFSA  
          FS0 = UVAR(I,3)
-         IF((FS(I) - FS0) < ZERO .AND. FSAS < ZERO.AND. FSAF > ZERO  )THEN 
+         IF((FS(I) - FS0) < ZERO .AND. FSAS < ZERO .AND. FM(I) >ZERO )THEN 
             ! transformation to austenite 
             ! compute martensite phase fraction increment
            DFMSA =  MAX(-ONE , FM(I) * ( FS(I) - FS0 ) / (FS0 - RFSA + FM(I) * E(I)*EPSL(I) ))

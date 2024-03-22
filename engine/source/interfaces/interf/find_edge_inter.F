@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -28,9 +28,9 @@ Chd|-- calls ---------------
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
 Chd|        SHOOTING_NODE_MOD             share/modules/shooting_node_mod.F
 Chd|====================================================================
-        SUBROUTINE FIND_EDGE_INTER( ITASK,ITAB,SHOOT_STRUCT,IXS,IXS10,
+        SUBROUTINE FIND_EDGE_INTER( ITAB,SHOOT_STRUCT,IXS,IXS10,
      1                              IXC,IXTG,IXQ,IXT,IXP,
-     2                              IXR,GEO )
+     2                              IXR,GEO,NGROUP,IGROUPS,IPARG )
 !$COMMENT
 !       FIND_EDGE_INTER description
 !           this routine finds the edge id and the interfaces id of a list of deleted elements
@@ -51,14 +51,11 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "task_c.inc"
-#include      "scr05_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "com01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-        INTEGER, INTENT(in) :: ITASK ! omp thread ID
         INTEGER, DIMENSION(NIXS,NUMELS),TARGET, INTENT(in) :: IXS   ! solid array
         INTEGER, DIMENSION(6,NUMELS10),TARGET, INTENT(in) :: IXS10  ! tetra10 array
         INTEGER, DIMENSION(NIXC,NUMELC),TARGET, INTENT(in) :: IXC   ! shell array
@@ -69,6 +66,9 @@ C-----------------------------------------------
         INTEGER, DIMENSION(NIXR,NUMELR),TARGET, INTENT(in) :: IXR! spring array
         INTEGER, DIMENSION(NUMNOD), INTENT(in) :: ITAB ! array to convert local id to global id
         my_real, DIMENSION(NPROPG,NUMGEO), INTENT(in) :: GEO
+        INTEGER, INTENT(in) :: NGROUP !< size of iparg
+        INTEGER, DIMENSION(NUMELS), INTENT(in) :: IGROUPS !< array to point to the element group
+        INTEGER, DIMENSION(NPARG,NGROUP), INTENT(in) :: IPARG !< element group data
         TYPE(shooting_node_type), INTENT(inout) :: SHOOT_STRUCT ! structure for shooting node algo       
 
 !        INTEGER, DIMENSION(SIZE_SEC_NODE), INTENT(in) :: INTER_SEC_NODE,SEC_NODE_ID ! list of interface of the nodes & ID of secondary nodes in each interface
@@ -80,6 +80,8 @@ C-----------------------------------------------
         INTEGER :: OFFSET_SOLID,OFFSET_QUAD,OFFSET_SHELL,OFFSET_TRUSS
         INTEGER :: OFFSET_BEAM,OFFSET_SPRING,OFFSET_TRIANGLE,OFFSET_UR
         INTEGER, DIMENSION(2,12), TARGET :: EDGES_SOL ! definition of edge for solid
+        INTEGER, DIMENSION(2,6), TARGET :: EDGES_TETRA4 ! definition of edge for tetra4
+        INTEGER, DIMENSION(2,9), TARGET :: EDGES_PENTA6 ! definition of edge for penta6
         INTEGER, DIMENSION(2,24), TARGET :: EDGES_TETRA10 ! definition of edge for tetra10
         INTEGER, DIMENSION(2,4), TARGET :: EDGES_SHELL ! definition of edge for shell/quad
         INTEGER, DIMENSION(2,3), TARGET :: EDGES_TRI ! definition of edge for triangle & spring type12
@@ -98,6 +100,8 @@ C-----------------------------------------------
         INTEGER, DIMENSION(:), ALLOCATABLE :: RESULT_INTERSECT_3
         INTEGER, DIMENSION(:), ALLOCATABLE :: TMP_ARRAY
         INTEGER, DIMENSION(4) :: LOCAL_NODE
+        INTEGER :: GROUP_NUMBER
+        INTEGER :: KIND_SOLID
 
         DATA EDGES_SHELL/1,2,
      .                   2,3,
@@ -111,6 +115,23 @@ C-----------------------------------------------
      .                          2,3/
 
         DATA EDGES_2DELM/1,2/
+
+        DATA EDGES_TETRA4/2,3,
+     .                    3,6,
+     .                    2,6,
+     .                    2,5,
+     .                    3,5,
+     .                    6,5/
+
+        DATA EDGES_PENTA6/1,2,
+     .                    2,3,
+     .                    3,1,
+     .                    2,6,
+     .                    6,5,
+     .                    5,1,
+     .                    3,7,
+     .                    7,6,
+     .                    7,5/
 
         DATA EDGES_SOL/1,2,
      .                 2,3,
@@ -197,6 +218,7 @@ C-----------------------------------------------
             ELEM_ID = SHOOT_STRUCT%GLOBAL_ELEM_INDEX(I) ! get the id of the deleted element
             DO_COMPUTATION = .TRUE.
             ! ----------------------
+            KIND_SOLID = 0
             IF(ELEM_ID<=NUMELS8) THEN
                 ! solid element : 8 nodes --> 12 edges
                 !     o----o
@@ -205,9 +227,42 @@ C-----------------------------------------------
                 !   | o++|+o
                 !   |+   |/
                 !   o----o
-                EDGE_NUMBER = 12 ! number of edge
+                ! penta element : 6 nodes --> 9 edges
+                !        o
+                !       /+\
+                !      o+  \
+                !     /\o++/o
+                !    /+ \ /
+                !   o----o
+                ! tetra4 element : 4 nodes --> 6 edges
+                !       o      
+                !      /+\         
+                !     / + \  
+                !    /  +  \ 
+                !   /   o   \ 
+                !  /  +    + \
+                ! o-----------o
+                GROUP_NUMBER = IGROUPS(ELEM_ID)
+                KIND_SOLID = IPARG(28,GROUP_NUMBER)
+                ! -------------
+                ! tetra4 
+                IF(KIND_SOLID==4) THEN 
+                    EDGE_NUMBER = 6 ! number of edge
+                    POINTER_EDGE => EDGES_TETRA4(1:2,1:6)
+                ! -------------
+                ! penta6                 
+                ELSEIF(KIND_SOLID==6) THEN
+                    EDGE_NUMBER = 9 ! number of edge
+                    POINTER_EDGE => EDGES_PENTA6(1:2,1:9)
+                ! -------------
+                ! solid8 
+                ELSE
+                    KIND_SOLID = 8
+                    EDGE_NUMBER = 12 ! number of edge
+                    POINTER_EDGE => EDGES_SOL(1:2,1:12)
+                ENDIF
+                ! -------------
                 IX => IXS(1:NIXS,1:NUMELS)
-                POINTER_EDGE => EDGES_SOL(1:2,1:12)
                 SHIFT_ELM = OFFSET_SOLID
             ELSEIF(ELEM_ID<=NUMELS8+NUMELS10) THEN
                 ! solid element : tetra10 --> 10 surfaces

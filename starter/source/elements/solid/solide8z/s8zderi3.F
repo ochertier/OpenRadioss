@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -51,8 +51,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com06_c.inc"
-#include      "units_c.inc"
 #include      "vect01_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
@@ -154,10 +152,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com06_c.inc"
-#include      "units_c.inc"
 #include      "vect01_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -334,10 +329,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com06_c.inc"
-#include      "units_c.inc"
 #include      "vect01_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -503,10 +495,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com06_c.inc"
-#include      "units_c.inc"
 #include      "vect01_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -681,9 +670,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
 C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
@@ -936,7 +922,7 @@ Chd|        S8EDERI_BIJ                   source/elements/solid/solide8z/s8zderi
 Chd|        S8EGETPIJ                     source/elements/solid/solide8z/s8zderi3.F
 Chd|        S8ESELECSH                    source/elements/solid/solide8z/s8zderi3.F
 Chd|        SETMATRANS                    source/elements/solid/solide8z/s8zderi3.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE S8E_PIJ(NPTR,NPTS,NPTT,NNPT,NEL,
      .                   PXC1, PXC2, PXC3, PXC4, 
@@ -952,9 +938,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
 C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
@@ -1162,9 +1145,6 @@ Chd|====================================================================
      .    PZ5, PZ6, PZ7, PZ8,
      .    PIJ,NEL)
 C-----------------------------------------------
-C   M o d u l e s
-C-----------------------------------------------
-C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
@@ -1185,9 +1165,6 @@ C     REAL
      .  PZ1(MVSIZ),PZ2(MVSIZ),PZ3(MVSIZ),PZ4(MVSIZ),
      .  PZ5(MVSIZ),PZ6(MVSIZ),PZ7(MVSIZ),PZ8(MVSIZ),
      .  PIJ(NEL,*)
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -1392,14 +1369,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "vect01_c.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
 C     REAL
@@ -1474,10 +1443,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "vect01_c.inc"
@@ -1544,8 +1509,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "vect01_c.inc"
-#include      "com01_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1814,7 +1777,7 @@ C-----------------------------------------------
           E3(I,J)=QT(I,3,J)
         ENDDO
        ENDDO
-C	
+C
        DO J= 1,3
         DO I=LFT,LLT
          QC(I,1,J)=E1(I,J)*E1(I,J)
@@ -1910,8 +1873,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "vect01_c.inc"
-#include      "com01_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -2281,7 +2242,7 @@ C
        HZ4PG2(I)=HZ(4,I)*PG2
       ENDDO
       IP=1
-C - - -	  
+C - - -    
       DO I=LFT,LLT
        JAC1(I,IP)=CJ1(I)-HX3PG(I)-HX2PG(I)+HX4PG2(I)
        JAC2(I,IP)=CJ2(I)-HY3PG(I)-HY2PG(I)+HY4PG2(I)
@@ -2295,8 +2256,8 @@ C
        JAC8(I,IP)=CJ8(I)-HY2PG(I)-HY1PG(I)+HY4PG2(I)
        JAC9(I,IP)=CJ9(I)-HZ2PG(I)-HZ1PG(I)+HZ4PG2(I)
       ENDDO
-      IP=2	  
-C + - -	  
+      IP=2    
+C + - -    
       DO I=LFT,LLT
        JAC1(I,IP)=CJ1(I)-HX3PG(I)-HX2PG(I)+HX4PG2(I)
        JAC2(I,IP)=CJ2(I)-HY3PG(I)-HY2PG(I)+HY4PG2(I)
@@ -2310,8 +2271,8 @@ C
        JAC8(I,IP)=CJ8(I)+HY2PG(I)-HY1PG(I)-HY4PG2(I)
        JAC9(I,IP)=CJ9(I)+HZ2PG(I)-HZ1PG(I)-HZ4PG2(I)
       ENDDO
-      IP=3	  
-C - + -	  
+      IP=3    
+C - + -    
       DO I=LFT,LLT
        JAC1(I,IP)=CJ1(I)+HX3PG(I)-HX2PG(I)-HX4PG2(I)
        JAC2(I,IP)=CJ2(I)+HY3PG(I)-HY2PG(I)-HY4PG2(I)
@@ -2325,8 +2286,8 @@ C
        JAC8(I,IP)=CJ8(I)-HY2PG(I)+HY1PG(I)-HY4PG2(I)
        JAC9(I,IP)=CJ9(I)-HZ2PG(I)+HZ1PG(I)-HZ4PG2(I)
       ENDDO
-      IP=4	  
-C + + -	  
+      IP=4    
+C + + -    
       DO I=LFT,LLT
        JAC1(I,IP)=CJ1(I)+HX3PG(I)-HX2PG(I)-HX4PG2(I)
        JAC2(I,IP)=CJ2(I)+HY3PG(I)-HY2PG(I)-HY4PG2(I)
@@ -2340,8 +2301,8 @@ C
        JAC8(I,IP)=CJ8(I)+HY2PG(I)+HY1PG(I)+HY4PG2(I)
        JAC9(I,IP)=CJ9(I)+HZ2PG(I)+HZ1PG(I)+HZ4PG2(I)
       ENDDO
-      IP=5	  
-C - - +	  
+      IP=5    
+C - - +    
       DO I=LFT,LLT
        JAC1(I,IP)=CJ1(I)-HX3PG(I)+HX2PG(I)-HX4PG2(I)
        JAC2(I,IP)=CJ2(I)-HY3PG(I)+HY2PG(I)-HY4PG2(I)
@@ -2355,8 +2316,8 @@ C
        JAC8(I,IP)=CJ8(I)-HY2PG(I)-HY1PG(I)+HY4PG2(I)
        JAC9(I,IP)=CJ9(I)-HZ2PG(I)-HZ1PG(I)+HZ4PG2(I)
       ENDDO
-      IP=6	  
-C + - +	  
+      IP=6    
+C + - +    
       DO I=LFT,LLT
        JAC1(I,IP)=CJ1(I)-HX3PG(I)+HX2PG(I)-HX4PG2(I)
        JAC2(I,IP)=CJ2(I)-HY3PG(I)+HY2PG(I)-HY4PG2(I)
@@ -2370,8 +2331,8 @@ C
        JAC8(I,IP)=CJ8(I)+HY2PG(I)-HY1PG(I)-HY4PG2(I)
        JAC9(I,IP)=CJ9(I)+HZ2PG(I)-HZ1PG(I)-HZ4PG2(I)
       ENDDO
-      IP=7	  
-C - + +	  
+      IP=7    
+C - + +    
       DO I=LFT,LLT
        JAC1(I,IP)=CJ1(I)+HX3PG(I)+HX2PG(I)+HX4PG2(I)
        JAC2(I,IP)=CJ2(I)+HY3PG(I)+HY2PG(I)+HY4PG2(I)
@@ -2385,8 +2346,8 @@ C
        JAC8(I,IP)=CJ8(I)-HY2PG(I)+HY1PG(I)-HY4PG2(I)
        JAC9(I,IP)=CJ9(I)-HZ2PG(I)+HZ1PG(I)-HZ4PG2(I)
       ENDDO
-      IP=8	  
-C + + +	  
+      IP=8    
+C + + +    
       DO I=LFT,LLT
        JAC1(I,IP)=CJ1(I)+HX3PG(I)+HX2PG(I)+HX4PG2(I)
        JAC2(I,IP)=CJ2(I)+HY3PG(I)+HY2PG(I)+HY4PG2(I)
@@ -2422,17 +2383,12 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com06_c.inc"
-#include      "units_c.inc"
 #include      "vect01_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------

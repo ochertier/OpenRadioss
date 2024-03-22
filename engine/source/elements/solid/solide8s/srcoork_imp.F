@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,7 +25,7 @@ Chd|  S8SCOORK_IMP                  source/elements/solid/solide8s/srcoork_imp.F
 Chd|-- called by -----------
 Chd|        S8SKE3                        source/elements/solid/solide8s/s8ske3.F
 Chd|-- calls ---------------
-Chd|        CRTRANS_IMP                   source/elements/solid/solide8s/srcoor3_imp.F
+Chd|        CRTRANS_IMP                   source/elements/solid/solide8s/crtrans_imp.F
 Chd|====================================================================
       SUBROUTINE S8SCOORK_IMP(X,IXS,
      .   X1, X2, X3, X4, X5, X6, X7, X8,
@@ -50,10 +50,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com08_c.inc"
-#include      "vect01_c.inc"
-#include      "scr18_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -104,8 +100,8 @@ C     REAL
       DOUBLE PRECISION X0(8),Y0(8),Z0(8),DETM1,DETJ0
 C-----------------------------------------------
 C
-      MXT_1 = IXS(1,LFT)
-      DO I=LFT,LLT
+      MXT_1 = IXS(1,1)
+      DO I=1,NEL
         NGEO(I)=IXS(10,I)
         NGL(I)=IXS(11,I)
         MXT(I)=MXT_1
@@ -121,7 +117,7 @@ C
 C----------------------------
 C     NODAL COORDINATES     |
 C----------------------------
-      DO I=LFT,LLT
+      DO I=1,NEL
         X1(I)=X(1,NC1(I))
         Y1(I)=X(2,NC1(I))
         Z1(I)=X(3,NC1(I))
@@ -150,7 +146,7 @@ C----------------------------
 C-----------
 C     Local system
 C-----------
-      DO I=LFT,LLT
+      DO I=1,NEL
         X0(1) = ZERO
         Y0(1) = ZERO
         Z0(1) = ZERO
@@ -200,16 +196,21 @@ C-----------
         INVJ(I,2,3) = (DX_DT*DY_DR-DX_DR*DY_DT)*DETM1
         INVJ(I,3,3) = (DX_DR*DY_DS-DX_DS*DY_DR)*DETM1
       ENDDO
-      CALL CRTRANS_IMP(SAV,INVJ,
-     .             X1, X2, X3, X4, X5, X6, X7, X8,
-     .             Y1, Y2, Y3, Y4, Y5, Y6, Y7, Y8,
-     .             Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8,
-     .             V1,  V2,  V3,  V4,  V5,  V6,  V7,  V8,
-     .             R, TRM, NEL)
+      CALL CRTRANS_IMP(
+     1   SAV,     INVJ,    X1,      X2,
+     2   X3,      X4,      X5,      X6,
+     3   X7,      X8,      Y1,      Y2,
+     4   Y3,      Y4,      Y5,      Y6,
+     5   Y7,      Y8,      Z1,      Z2,
+     6   Z3,      Z4,      Z5,      Z6,
+     7   Z7,      Z8,      V1,      V2,
+     8   V3,      V4,      V5,      V6,
+     9   V7,      V8,      R,       TRM,
+     A   NEL)
 C-----------
 C
 C-----------
-      DO I = LFT,LLT
+      DO I = 1,NEL
         X1(I) = ZERO
         Y1(I) = ZERO
         Z1(I) = ZERO
@@ -235,17 +236,17 @@ C-----------
         Y8(I) = SAV(I,20)
         Z8(I) = SAV(I,21)
       ENDDO
-      DO I=LFT,LLT
+      DO I=1,NEL
         IF(OFFG(I)>ONE)THEN
           OFF(I) = OFFG(I)-ONE
         ENDIF
       ENDDO
-      DO I=LFT,LLT
+      DO I=1,NEL
         OFF(I) = MIN(ONE,OFFG(I))
       ENDDO
 C-----------
       DO J=1,9
-        DO I=LFT,LLT
+        DO I=1,NEL
           K11(J,I)=ZERO
           K12(J,I)=ZERO
           K13(J,I)=ZERO
@@ -285,7 +286,7 @@ C-----------
         ENDDO
       ENDDO
 
-      DO J=LFT,LLT
+      DO J=1,NEL
         DO I=1,576
           KL(I,J)=ZERO
         ENDDO

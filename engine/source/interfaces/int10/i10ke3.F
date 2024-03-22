@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -53,17 +53,8 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "units_c.inc"
-#include      "scr03_c.inc"
-#include      "scr04_c.inc"
-#include      "scr07_c.inc"
-#include      "warn_c.inc"
-#include      "task_c.inc"
-#include      "parit_c.inc"
-#include      "timeri_c.inc"
 #include      "impl2_c.inc"
 #include      "scr05_c.inc"
 C-----------------------------------------------
@@ -109,6 +100,7 @@ C     REAL
      .    KK11(9,MVSIZ),KL11(9,MVSIZ),KI12(9,MVSIZ),
      .    KJ12(9,MVSIZ),KK12(9,MVSIZ),KL12(9,MVSIZ)
 C-----------------------------------------------
+      INTEGER :: NSN, NTY
 C
       NSN   =IPARI(5)
       NTY   =IPARI(7)
@@ -312,19 +304,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "units_c.inc"
-#include      "scr03_c.inc"
-#include      "scr04_c.inc"
-#include      "scr07_c.inc"
-#include      "warn_c.inc"
-#include      "task_c.inc"
-#include      "parit_c.inc"
-#include      "timeri_c.inc"
-#include      "scr05_c.inc"
 #include      "impl2_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -366,6 +347,7 @@ C     REAL
      .    DXI(MVSIZ),DYI(MVSIZ), DZI(MVSIZ), 
      .    MSI(MVSIZ)
 C-----------------------------------------------
+      INTEGER :: NTY,NSN
       IF(NUM_IMP==0) RETURN
 C
       NSN   =IPARI(5)
@@ -463,20 +445,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "units_c.inc"
-#include      "scr03_c.inc"
-#include      "scr04_c.inc"
-#include      "scr07_c.inc"
-#include      "warn_c.inc"
 #include      "task_c.inc"
-#include      "parit_c.inc"
-#include      "timeri_c.inc"
-#include      "impl2_c.inc"
-#include      "scr05_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -521,6 +492,7 @@ C     REAL
      .    KK11(9,MVSIZ),KL11(9,MVSIZ),KI12(9,MVSIZ),
      .    KJ12(9,MVSIZ),KK12(9,MVSIZ),KL12(9,MVSIZ)
 C-----------------------------------------------
+      INTEGER :: NTY,NSN
 C
       NSN   =IPARI(5)
       NTY   =IPARI(7)

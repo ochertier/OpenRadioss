@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,6 +27,7 @@ Chd|        ALEWDX                        source/ale/grid/alewdx.F
 Chd|-- calls ---------------
 Chd|        SPMD_EXALEW                   source/mpi/fluid/spmd_cfd.F   
 Chd|        SPMD_EXALEW_PON               source/mpi/fluid/spmd_cfd.F   
+Chd|        ALE_MOD                       ../common_source/modules/ale/ale_mod.F
 Chd|====================================================================
       SUBROUTINE ALEW2(
      1   X       ,D      ,V       ,W     ,WA    ,
@@ -43,6 +44,10 @@ C      in grid subroutine it may needed to access nodes which
 C      are connected to a remote elem. They are sored in X(1:3,NUMNOD+1:)
 C      Consequently X is defined here X(3,SX/3) instead of X(3,NUMNOD) as usually
 C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
+      USE ALE_MOD
+C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
@@ -55,11 +60,8 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com07_c.inc"
 #include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "scr05_c.inc"
-#include      "task_c.inc"
 #include      "parit_c.inc"
 #include      "tabsiz_c.inc"
 C-----------------------------------------------
@@ -107,11 +109,11 @@ C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------
       DLMIN = EM01
-      GAM1=HALF*(GAMMA-ONE)
+      GAM1=HALF*(ALE%GRID%GAMMA-ONE)
       DO I=13,24
-       FAC(I)=VGY
+       FAC(I)=ALE%GRID%VGY
       ENDDO
-      BETA=SIX*(ONE + TWO*VGY)
+      BETA=SIX*(ONE + TWO*ALE%GRID%VGY)
 C-----------------------------------------------
 C SPMD code makes difference between Parith/ON & OFF
 C-----------------------------------------------
@@ -205,9 +207,9 @@ C
               DL(I)=(XX(I)*DX(I)+XY(I)*DY(I)+XZ(I)*DZ(I))/XL(I)
               DDL(I)=(XX(I)*DDX(I)+XY(I)*DDY(I)+XZ(I)*DDZ(I))/XL(I)
               DLM=MIN(DLM,DL(I)/XL(I))
-              DL1(I)=GAMMA+GAM1*MIN(DL(I)/XL(I),ZERO)
-              DL(I) = FAC(ITR)/XL(I) /ALPHA/ALPHA *DDL(I)*DL1(I)
-              DDL(I)= FAC(ITR)/XL(I) * VGX/ALPHA*DDL(I)
+              DL1(I)=ALE%GRID%GAMMA+GAM1*MIN(DL(I)/XL(I),ZERO)
+              DL(I) = FAC(ITR)/XL(I) /ALE%GRID%ALPHA/ALE%GRID%ALPHA *DDL(I)*DL1(I)
+              DDL(I)= FAC(ITR)/XL(I) * ALE%GRID%VGX/ALE%GRID%ALPHA*DDL(I)
             ENDDO!next I
            
             ! --- SPMD PARITH/OFF
@@ -291,7 +293,7 @@ C
         ENDIF!IF (ITY == 1 .AND. MQE == 1)
       ENDDO!next NG
 C
-      VGZ=DLM
+      ALE%GRID%VGZ=DLM
 C-----------------------------------------------
 C CODE SPMD : CUMUL WA WB
 C-----------------------------------------------

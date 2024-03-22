@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -39,12 +39,10 @@ Chd|        FVINJECT                      source/airbag/fvinject.F
 Chd|        FVNODI                        source/airbag/fvmbag1.F       
 Chd|        FVVENTHOLE                    source/airbag/fvventhole.F    
 Chd|        HYPERMESH_TETRA               stub/fvmbags_stub.F           
-Chd|        LOAD_MESHGEMS_LIBRARY         stub/fvmbags_stub.F           
-Chd|        MESHGEMS_TETRA                stub/fvmbags_stub.F           
 Chd|        MONVOL_CHECK_DELETE_DUPLICATEDsource/airbag/monvol_check_delete_duplicated.F
 Chd|        MONVOL_TRIANGULATE_SURFACE    source/airbag/monvol_triangulate_surface.F
 Chd|        WRITEMESH                     source/airbag/writeMesh.F     
-Chd|        FVMBAG_MESHCONTROL_MOD        ../common_source/modules/fvmbag_meshcontrol_mod.F
+Chd|        FVMBAG_MESHCONTROL_MOD        ../common_source/modules/airbag/fvmbag_meshcontrol_mod.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        MONVOL_STRUCT_MOD             share/modules1/monvol_struct_mod.F
@@ -55,7 +53,7 @@ Chd|====================================================================
      2     GEO       ,PM      ,
      3     IXC       ,IXTG    ,X       ,NPC     ,
      4     ITABM1    ,ITAB    ,IGRSURF ,
-     5     SENSOR_TAB,IGRBRIC ,MFI     ,
+     5     SENSORS   ,IGRBRIC ,MFI     ,
      6     NAIRWA    ,IXS     ,V       ,LIBAGALE,
      7     NPT       ,PLD     ,LRBAGALE,IPM     ,IGEO    ,
      8     UNITAB    )
@@ -69,6 +67,7 @@ C-----------------------------------------------
       USE GROUPDEF_MOD
       USE MONVOL_STRUCT_MOD
       USE SENSOR_MOD
+      USE MY_ALLOC_MOD
 C-----------------------------------------------
 C     I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -79,12 +78,9 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "scr03_c.inc"
-#include      "scr05_c.inc"
 #include      "scr17_c.inc"
 #include      "param_c.inc"
 #include      "units_c.inc"
-#include      "sysunit.inc"
-#include      "my_allocate.inc"
 C-----------------------------------------------
 C     D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -92,17 +88,16 @@ C-----------------------------------------------
       INTEGER  IXC(NIXC,*),IXTG(NIXTG,*),NPC(*),
      .     ITABM1(*),ITAB(*),
      .     MFI,NAIRWA ,IXS(NIXS,*),
-     .     LIBAGALE,NPT(*),LRBAGALE,IPM(NPROPMI,*),IGEO(NPROPGI,*)
-C     REAL
+     .     LIBAGALE,NPT(*),LRBAGALE,IPM(NPROPMI,NUMMAT),IGEO(NPROPGI,NUMGEO)
       my_real
-     .     GEO(NPROPG,*), PM(NPROPM,*), X(3,*), V(3,*),
+     .     GEO(NPROPG,NUMGEO), PM(NPROPM,NUMMAT), X(3,*), V(3,*),
      .     PLD(2,*), MEMBAG
 C-----------------------------------------------
       TYPE (GROUP_)  , DIMENSION(NGRBRIC) :: IGRBRIC
       TYPE (SURF_)   , DIMENSION(NSURF)   :: IGRSURF
       TYPE(MONVOL_STRUCT_), DIMENSION(NVOLU), INTENT(INOUT) :: T_MONVOL
       TYPE(MONVOL_METADATA_), INTENT(INOUT) :: T_MONVOL_METADATA
-      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE (SENSORS_) ,INTENT(IN) :: SENSORS
 C-----------------------------------------------
 C     L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -163,7 +158,7 @@ C
       CHARACTER*20 VENTTITLE
       INTEGER :: NB_TETRA, NB_VERTICES, NB_EXTRA_VERTICES
       INTEGER :: EXT_SURFID, INT_SURFID
-      LOGICAL :: FOUND, MGM_USED
+      LOGICAL :: FOUND
       INTEGER :: SIZE1, SIZE2,LENGTH
       INTEGER :: COMM_TAG(NVOLU), NCOMMU
       INTEGER, DIMENSION(:, :), ALLOCATABLE :: IBAGJET_SAVE
@@ -181,7 +176,7 @@ C-----------------------------------------------
      .     '    AIRBAG','     COMMU','    FVMBAG',
      .     '   AIRBAG1','   FVMBAG1','    COMMU1',
      .     '    LFLUID','   FVMBAG2'/
-C---  +----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8----+----9----+----A----+----B
+C-----------------------------------------------
       K   = 0
       MFI = 0
       NVB = 0
@@ -241,21 +236,6 @@ C     FVMABG2 are in fact FVMBAG1 with simplified input
          ENDIF
          IF (KMESH(N) >= 2) TETRAMESHER_USED = .TRUE.
       ENDDO
-      MGM_USED = .FALSE.
-      DO N = 1, NVOLU
-         IF (KMESH(N) == 2 .OR. KMESH(N) == 4) THEN
-            MGM_USED = .TRUE.
-         ENDIF
-      ENDDO
-C------------------------------------------
-C     If meshgems is to be used, then
-C     replace bufalei by bufalei_mgm
-C------------------------------------------
-      IF (MGM_USED) THEN
-C     MESHGEMS TETRAMESHER
-         RET_VAL=0
-         CALL LOAD_MESHGEMS_LIBRARY(RET_VAL)
-      ENDIF
 
       DO N=1,NVOLU
          ITYPE = T_MONVOL(N)%TYPE
@@ -327,8 +307,8 @@ C
             ENDIF
 !     Keep track of original elements ids
             LENGTH=2 * (SIZE1 + SIZE2 + T_MONVOL(N)%NB_FILL_TRI)
-            MY_ALLOCATE(T_MONVOL(N)%FVBAG_ELEMID,LENGTH)
-            MY_ALLOCATE(T_MONVOL(N)%ELTG, (2 * (SIZE1 + SIZE2)))
+            CALL MY_ALLOC(T_MONVOL(N)%FVBAG_ELEMID,LENGTH)
+            CALL MY_ALLOC(T_MONVOL(N)%ELTG, (2 * (SIZE1 + SIZE2)))
             T_MONVOL(N)%ELTG(1:SIZE1 + SIZE2) = 0
             CALL MONVOL_TRIANGULATE_SURFACE(T_MONVOL(N), IGRSURF, ITABINV, ITABINV1, TAGE, 
      .           X, KMESH(N), NNS, NNI, NTG, NTGI, SIZE1, SIZE2, T_MONVOL(N)%FVBAG_ELEMID)
@@ -365,10 +345,6 @@ C
             IF (KMESH(N) >= 2) THEN
 !     Automatic tetrameshing
                SELECT CASE (KMESH(N))
-               CASE (2, 4)
-!     Meshgems (2), Meshgems + writing of mesh as an include file (4)
-                  CALL MESHGEMS_TETRA(T_MONVOL(N), NIXS, N, KMESH(N),
-     .                 NB_EXTRA_VERTICES, NB_TETRA, NB_VERTICES)
                CASE (12, 14) 
 !     Hypermesh (12), Hypermesh + writing of mesh as an include file (14)
                   CALL HYPERMESH_TETRA(T_MONVOL(N), NIXS, N, KMESH(N),
@@ -949,7 +925,7 @@ C
                   IF(ITEMP/=0)ITEMP=NPC(ITEMP)
                   FTEMP=T_MONVOL(N)%RBAGJET(6, I)
                   ISENS=T_MONVOL(N)%IBAGJET(4, I)
-                  IF (ISENS > 0) ISENS = SENSOR_TAB(ISENS)%SENS_ID
+                  IF (ISENS > 0) ISENS = SENSORS%SENSOR_TAB(ISENS)%SENS_ID
                   WRITE(IOUT,1430)I,
      .                 IMASS,IFLU,FMASS,ITEMP,FTEMP,ISENS
 C     

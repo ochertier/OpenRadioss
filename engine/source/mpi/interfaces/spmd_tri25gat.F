@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -36,7 +36,7 @@ Chd|====================================================================
      3                        ILEV  ,NSNFIOLD,IPARI,NSNROLD ,
      4                        RENUM ,H3D_DATA,INTFRIC,FLAGREMN,
      5                        LREMNORMAX,NRTM,KREMNOD,REMNOD,
-     6                        IVIS2)
+     6                        IVIS2,ISTIF_MSDT,IFSUB_CAREA)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -47,13 +47,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
-C-----------------------------------------------
-C   M e s s a g e   P a s s i n g
-C-----------------------------------------------
-#ifdef MPI
-#include "mpif.h"
-#endif
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -61,7 +54,6 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "com08_c.inc"
 #include      "task_c.inc"
-#include      "units_c.inc"
 #include      "scr14_c.inc"
 #include      "scr16_c.inc"
 #include      "scr18_c.inc"
@@ -78,6 +70,7 @@ C-----------------------------------------------
      .        NSNFIOLD(*), IPARI(NPARI,NINTER), NSNROLD, RENUM(*),
      .        KREMNOD(*), REMNOD(*)
       TYPE(H3D_DATABASE) :: H3D_DATA
+      INTEGER , INTENT(IN) :: ISTIF_MSDT, IFSUB_CAREA
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -119,7 +112,9 @@ C         STIFI was not set at time=0 (not read from restart)
           IF((TT==ZERO.OR.STIFI(NIN)%P(NI)>ZERO).AND.IRTLM_FI(NIN)%P(4,NI)==LOC_PROC)THEN
             NODFI = NODFI + 1
             NN = RENUM(NI)
-            IREM(1,NN) = -IREM(1,NN)
+            IF( NN >0)THEN
+              IREM(1,NN) = -IREM(1,NN)
+            ENDIF
           END IF
         END DO
 C
@@ -217,6 +212,14 @@ c IF_ADHFI allocation is done later once NSNR_OLD is calculated
             IF(ASSOCIATED(GAP_LFI(NIN)%P)) DEALLOCATE(GAP_LFI(NIN)%P)
             ALLOCATE(GAP_LFI(NIN)%P(NODFI),STAT=IERROR7)
           ENDIF
+        ENDIF
+        IF(ISTIF_MSDT > 0) THEN
+           IF(ASSOCIATED(STIF_MSDT_FI(NIN)%P))DEALLOCATE(STIF_MSDT_FI(NIN)%P)
+           ALLOCATE(STIF_MSDT_FI(NIN)%P(NODFI),STAT=IERROR7)        
+        ENDIF
+        IF(IFSUB_CAREA > 0) THEN
+           IF(ASSOCIATED(INTAREANFI(NIN)%P))DEALLOCATE(INTAREANFI(NIN)%P)
+           ALLOCATE(INTAREANFI(NIN)%P(NODFI),STAT=IERROR7)        
         ENDIF
 C
         NSNR_OLD=IPARI(24,NIN)
@@ -452,6 +455,29 @@ C Friction model
             ENDDO
             ISHIFT = ISHIFT + 1
           ENDIF
+
+C Stif based on mass and dt
+
+          IF(ISTIF_MSDT > 0) THEN
+#include      "vectorize.inc"                    
+             DO J = 1, NN
+                I = IAUX(J)
+                STIF_MSDT_FI(NIN)%P(NN2+J) = XREM(RSHIFT,I+IDEB)
+             ENDDO
+               RSHIFT = RSHIFT + 1
+          ENDIF
+
+C CAREA output in case of NISUB
+
+          IF(IFSUB_CAREA > 0) THEN
+#include      "vectorize.inc"                    
+             DO J = 1, NN
+                I = IAUX(J)
+                INTAREANFI(NIN)%P(NN2+J) = XREM(RSHIFT,I+IDEB)
+             ENDDO
+               RSHIFT = RSHIFT + 1
+          ENDIF
+
 C -- IDTMINS==2
           IF(IDTMINS==2)THEN
 #include      "vectorize.inc"
@@ -741,7 +767,7 @@ C
           DO J = 1, NODFI
             EFRICFI(NIN)%P(J)=ZERO
           END DO                  
-        END IF  		      
+        END IF            
        END IF
       ENDIF
 
@@ -755,7 +781,7 @@ C
           DO J = 1, NODFI
             EFRICGFI(NIN)%P(J)=ZERO
           END DO                  
-        END IF  		      
+        END IF            
       END IF
 C
 C Renumbering candidate

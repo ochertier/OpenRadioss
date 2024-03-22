@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,14 +27,14 @@ Chd|        I25BUCE_EDG                   source/interfaces/intsort/i25buce_edg.
 Chd|-- calls ---------------
 Chd|        I25STO_E2S                    source/interfaces/intsort/i25sto_e2s.F
 Chd|        I25STO_EDG                    source/interfaces/intsort/i25sto_edg.F
-Chd|        MY_BARRIER                    source/system/machine.F
+Chd|        MY_BARRIER                    source/system/machine.F       
 Chd|        BITGET                        source/interfaces/intsort/i20sto.F
-Chd|        INT_CHECKSUM                  share/modules/debug_mod.F
-Chd|        DEBUG_MOD                     share/modules/debug_mod.F
-Chd|        REALLOC_MOD                   share/modules/realloc_mod.F
-Chd|        TRI11                         share/modules/tri11_mod.F
-Chd|        TRI25EBOX                     share/modules/tri25ebox.F
-Chd|        TRI7BOX                       share/modules/tri7box.F
+Chd|        INT_CHECKSUM                  share/modules/debug_mod.F     
+Chd|        DEBUG_MOD                     share/modules/debug_mod.F     
+Chd|        REALLOC_MOD                   share/modules/realloc_mod.F   
+Chd|        TRI11                         share/modules/tri11_mod.F     
+Chd|        TRI25EBOX                     share/modules/tri25ebox.F     
+Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
       SUBROUTINE I25TRIVOX_EDG(
      1      I_MEM   ,VMAXDT  ,INACTI ,IRECT   ,
@@ -79,16 +79,7 @@ c     parameter setting the size for the vector (orig version is 128)
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "parit_c.inc"
-#include      "scr05_c.inc"
-#include      "sms_c.inc"
-#include      "task_c.inc"
 #include      "assert.inc"
 #include      "i25edge_c.inc"
 C-----------------------------------------------

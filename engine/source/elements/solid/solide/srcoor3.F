@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -66,7 +66,6 @@ C-----------------------------------------------
 #include      "vect01_c.inc"
 #include      "scr05_c.inc"
 #include      "scr18_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -168,9 +167,9 @@ C----------------------------
           ZD7(I)=XDP(3,NC7(I))  
           XD8(I)=XDP(1,NC8(I))  
           YD8(I)=XDP(2,NC8(I))  
-          ZD8(I)=XDP(3,NC8(I))  	  	  	  
+          ZD8(I)=XDP(3,NC8(I))              
         ENDDO
-      ELSE	
+      ELSE
         DO I=LFT,LLT
           XD1(I)=X(1,NC1(I))  
           YD1(I)=X(2,NC1(I))  
@@ -264,23 +263,37 @@ C-----------
 C     REPERE CONVECTE (ITERATIONS).
 C-----------
       CALL SREPISO3(
-     .       XD1, XD2, XD3, XD4, XD5, XD6, XD7, XD8,
-     .       YD1, YD2, YD3, YD4, YD5, YD6, YD7, YD8,
-     .       ZD1, ZD2, ZD3, ZD4, ZD5, ZD6, ZD7, ZD8,
-     .       RX, RY, RZ, SX, SY, SZ, TX, TY, TZ )
+     1   XD1,     XD2,     XD3,     XD4,
+     2   XD5,     XD6,     XD7,     XD8,
+     3   YD1,     YD2,     YD3,     YD4,
+     4   YD5,     YD6,     YD7,     YD8,
+     5   ZD1,     ZD2,     ZD3,     ZD4,
+     6   ZD5,     ZD6,     ZD7,     ZD8,
+     7   RX,      RY,      RZ,      SX,
+     8   SY,      SZ,      TX,      TY,
+     9   TZ,      NEL)
 C---
       IF (JHBE == 14 .OR. JHBE == 24) THEN
         CALL SORTHO3(
-     .       RX , RY , RZ , SX , SY , SZ , TX , TY , TZ ,
-     .       R12, R13, R11, R22, R23, R21, R32, R33, R31)
+     1   RX,      RY,      RZ,      SX,
+     2   SY,      SZ,      TX,      TY,
+     3   TZ,      R12,     R13,     R11,
+     4   R22,     R23,     R21,     R32,
+     5   R33,     R31,     NEL)
       ELSEIF (JHBE == 15 ) THEN
         CALL SCORTHO3(
-     .       RX , RY , RZ , SX , SY , SZ , TX , TY , TZ ,
-     .       R11, R12, R13, R21, R22, R23, R31, R32, R33)
+     1   RX,      RY,      RZ,      SX,
+     2   SY,      SZ,      TX,      TY,
+     3   TZ,      R11,     R12,     R13,
+     4   R21,     R22,     R23,     R31,
+     5   R32,     R33,     NEL)
       ELSE
         CALL SORTHO3(
-     .       RX , RY , RZ , SX , SY , SZ , TX , TY , TZ ,
-     .       R11, R12, R13, R21, R22, R23, R31, R32, R33)
+     1   RX,      RY,      RZ,      SX,
+     2   SY,      SZ,      TX,      TY,
+     3   TZ,      R11,     R12,     R13,
+     4   R21,     R22,     R23,     R31,
+     5   R32,     R33,     NEL)
       ENDIF
 C------stocker [R] in %GAMA_R--------------     
        GAMA_R(LFT:LLT,1) = R11(LFT:LLT) ! Dir1_x                            
@@ -301,10 +314,13 @@ C-------sauf thick shells --------------
             GAMA(I,6) = ZERO
           ENDDO      
         ELSE    
-          CALL SORTHDIR3(                                            
-     .        RX   ,RY   ,RZ   ,SX   ,SY   ,SZ   ,TX   ,TY   ,TZ   , 
-     .        R11  ,R12  ,R13  ,R21  ,R22  ,R23  ,R31  ,R32  ,R33  , 
-     .        GAMA0,GAMA )                                           
+          CALL SORTHDIR3(
+     1   RX,      RY,      RZ,      SX,
+     2   SY,      SZ,      TX,      TY,
+     3   TZ,      R11,     R12,     R13,
+     4   R21,     R22,     R23,     R31,
+     5   R32,     R33,     GAMA0,   GAMA,
+     6   NEL,     IREP)
         ENDIF
       ENDIF
 C-----------
@@ -388,13 +404,13 @@ C     X=RX' <=> X'=t(R)X chgt de base.
             ZDL=R13(I)*XD8(I)+R23(I)*YD8(I)+R33(I)*ZD8(I)
             XD8(I)=XDL
             YD8(I)=YDL
-            ZD8(I)=ZDL		    	    
+            ZD8(I)=ZDL              
             OFF(I) = ABS(OFFG(I))
             OFF_L  = MIN(OFF_L,OFFG(I))
           ENDIF
         ENDDO
         IF((ISMSTR==12.AND.IDTMIN(1)==3).AND.JLAG>0) THEN
-         DO I=LFT,LLT	  
+         DO I=LFT,LLT    
           IF(ABS(OFFG(I)) > ONE)THEN
           XDL=R11(I)*XD1(I)+R21(I)*YD1(I)+R31(I)*ZD1(I)
           YDL=R12(I)*XD1(I)+R22(I)*YD1(I)+R32(I)*ZD1(I)
@@ -443,13 +459,13 @@ C     X=RX' <=> X'=t(R)X chgt de base.
           ZDL=R13(I)*XD8(I)+R23(I)*YD8(I)+R33(I)*ZD8(I)
           XD8(I)=XDL
           YD8(I)=YDL
-          ZD8(I)=ZDL		   	 
+          ZD8(I)=ZDL          
           END IF
-	 ENDDO
+           ENDDO
         END IF
 C
       ELSE    ! Ismstr = 4
-        DO I=LFT,LLT	  
+        DO I=LFT,LLT    
           XDL=R11(I)*XD1(I)+R21(I)*YD1(I)+R31(I)*ZD1(I)
           YDL=R12(I)*XD1(I)+R22(I)*YD1(I)+R32(I)*ZD1(I)
           ZDL=R13(I)*XD1(I)+R23(I)*YD1(I)+R33(I)*ZD1(I)
@@ -497,7 +513,7 @@ C
           ZDL=R13(I)*XD8(I)+R23(I)*YD8(I)+R33(I)*ZD8(I)
           XD8(I)=XDL
           YD8(I)=YDL
-          ZD8(I)=ZDL		   	    	   
+          ZD8(I)=ZDL                  
           OFF(I) = ABS(OFFG(I))
           OFF_L  = MIN(OFF_L,OFFG(I))
         ENDDO
@@ -537,7 +553,7 @@ C------save for SAV update
          Z0(I,8) = ZD8(I)
         END DO
        END IF
-C	
+C
         DO I=LFT,LLT
 C         Extration de G tq Xortho=Transpose(G) Xcvt
 C                                 =Transpose(G) Transpose(R) Xglobal.
@@ -652,10 +668,15 @@ C-----------
 C     PASSAGE DES VITESSES AU REPERE CONVECTE (OU ORTHOTROPE).
 C-----------
       CALL SRROTA3(
-     .   R11, R12, R13, R21, R22, R23, R31, R32, R33,
-     .   VX1, VX2, VX3, VX4, VX5, VX6, VX7, VX8,
-     .   VY1, VY2, VY3, VY4, VY5, VY6, VY7, VY8,
-     .   VZ1, VZ2, VZ3, VZ4, VZ5, VZ6, VZ7, VZ8)
+     1   R11,     R12,     R13,     R21,
+     2   R22,     R23,     R31,     R32,
+     3   R33,     VX1,     VX2,     VX3,
+     4   VX4,     VX5,     VX6,     VX7,
+     5   VX8,     VY1,     VY2,     VY3,
+     6   VY4,     VY5,     VY6,     VY7,
+     7   VY8,     VZ1,     VZ2,     VZ3,
+     8   VZ4,     VZ5,     VZ6,     VZ7,
+     9   VZ8,     NEL)
 
 
       
@@ -694,424 +715,6 @@ C-----------
       DO I=LFT,LLT
         VD2(I)=ZERO
       ENDDO
-C-----------
-      RETURN
-      END
-Chd|====================================================================
-Chd|  S8SAV3                        source/elements/solid/solide/srcoor3.F
-Chd|-- called by -----------
-Chd|        S8CFORC3                      source/elements/thickshell/solide8c/s8cforc3.F
-Chd|        S8EFORC3                      source/elements/solid/solide8e/s8eforc3.F
-Chd|        S8ZFORC3                      source/elements/solid/solide8z/s8zforc3.F
-Chd|        SCFORC3                       source/elements/thickshell/solidec/scforc3.F
-Chd|        SFORC3                        source/elements/solid/solide/sforc3.F
-Chd|        SZFORC3                       source/elements/solid/solidez/szforc3.F
-Chd|-- calls ---------------
-Chd|====================================================================
-      SUBROUTINE S8SAV3(OFFG   ,SAV   ,
-     .   XD1   ,XD2   ,XD3   ,XD4   ,XD5   ,XD6   ,XD7   ,XD8   ,
-     .   YD1   ,YD2   ,YD3   ,YD4   ,YD5   ,YD6   ,YD7   ,YD8   ,
-     .   ZD1   ,ZD2   ,ZD3   ,ZD4   ,ZD5   ,ZD6   ,ZD7   ,ZD8   ,
-     .   NEL   ) 
-C-----------------------------------------------
-C   I m p l i c i t   T y p e s
-C-----------------------------------------------
-#include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "vect01_c.inc"
-C-----------------------------------------------
-C   D u m m y   A r g u m e n t s
-C-----------------------------------------------
-      INTEGER NEL
-C     REAL
-      my_real
-     .   OFFG(*)
-      
-      DOUBLE PRECISION 
-     .   XD1(*), XD2(*), XD3(*), XD4(*), XD5(*), XD6(*), XD7(*), XD8(*), 
-     .   YD1(*), YD2(*), YD3(*), YD4(*), YD5(*), YD6(*), YD7(*), YD8(*), 
-     .   ZD1(*), ZD2(*), ZD3(*), ZD4(*), ZD5(*), ZD6(*), ZD7(*), ZD8(*),      
-     .   SAV(NEL,21)
-C-----------------------------------------------
-C   L o c a l   V a r i a b l e s
-C-----------------------------------------------
-      INTEGER I      
-C=======================================================================
-        DO I=LFT,LLT
-          IF(ABS(OFFG(I)) <= ONE )THEN
-           SAV(I,1)=XD1(I)-XD8(I)
-           SAV(I,2)=YD1(I)-YD8(I)
-           SAV(I,3)=ZD1(I)-ZD8(I)
-           SAV(I,4)=XD2(I)-XD8(I)
-           SAV(I,5)=YD2(I)-YD8(I)
-           SAV(I,6)=ZD2(I)-ZD8(I)
-           SAV(I,7)=XD3(I)-XD8(I)
-           SAV(I,8)=YD3(I)-YD8(I)
-           SAV(I,9)=ZD3(I)-ZD8(I)
-           SAV(I,10)=XD4(I)-XD8(I)
-           SAV(I,11)=YD4(I)-YD8(I)
-           SAV(I,12)=ZD4(I)-ZD8(I)
-           SAV(I,13)=XD5(I)-XD8(I)
-           SAV(I,14)=YD5(I)-YD8(I)
-           SAV(I,15)=ZD5(I)-ZD8(I)
-           SAV(I,16)=XD6(I)-XD8(I)
-           SAV(I,17)=YD6(I)-YD8(I)
-           SAV(I,18)=ZD6(I)-ZD8(I)
-           SAV(I,19)=XD7(I)-XD8(I)
-           SAV(I,20)=YD7(I)-YD8(I)
-           SAV(I,21)=ZD7(I)-ZD8(I)
-          ENDIF
-        ENDDO
-C-----------
-      RETURN
-      END
-Chd|====================================================================
-Chd|  S8SAVSR3                      source/elements/solid/solide/srcoor3.F
-Chd|-- called by -----------
-Chd|        S8EFORC3                      source/elements/solid/solide8e/s8eforc3.F
-Chd|        SFORC3                        source/elements/solid/solide/sforc3.F
-Chd|-- calls ---------------
-Chd|====================================================================
-      SUBROUTINE S8SAVSR3(OFFG  ,SAV   ,XD   ,YD   ,ZD, NEL) 
-C-----------------------------------------------
-C   I m p l i c i t   T y p e s
-C-----------------------------------------------
-#include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "vect01_c.inc"
-#include      "param_c.inc"
-C-----------------------------------------------
-C   D u m m y   A r g u m e n t s
-C-----------------------------------------------
-      INTEGER NEL
-C     REAL
-      my_real
-     .   OFFG(*)
-      
-      DOUBLE PRECISION 
-     .   XD(MVSIZ,8),YD(MVSIZ,8),ZD(MVSIZ,8), SAV(NEL,21)
-C-----------------------------------------------
-C   L o c a l   V a r i a b l e s
-C-----------------------------------------------
-      INTEGER I      
-C=======================================================================
-        DO I=LFT,LLT
-          IF(ABS(OFFG(I)) <= ONE )THEN
-           SAV(I,1)=XD(I,1)-XD(I,8)
-           SAV(I,2)=YD(I,1)-YD(I,8)
-           SAV(I,3)=ZD(I,1)-ZD(I,8)
-           SAV(I,4)=XD(I,2)-XD(I,8)
-           SAV(I,5)=YD(I,2)-YD(I,8)
-           SAV(I,6)=ZD(I,2)-ZD(I,8)
-           SAV(I,7)=XD(I,3)-XD(I,8)
-           SAV(I,8)=YD(I,3)-YD(I,8)
-           SAV(I,9)=ZD(I,3)-ZD(I,8)
-           SAV(I,10)=XD(I,4)-XD(I,8)
-           SAV(I,11)=YD(I,4)-YD(I,8)
-           SAV(I,12)=ZD(I,4)-ZD(I,8)
-           SAV(I,13)=XD(I,5)-XD(I,8)
-           SAV(I,14)=YD(I,5)-YD(I,8)
-           SAV(I,15)=ZD(I,5)-ZD(I,8)
-           SAV(I,16)=XD(I,6)-XD(I,8)
-           SAV(I,17)=YD(I,6)-YD(I,8)
-           SAV(I,18)=ZD(I,6)-ZD(I,8)
-           SAV(I,19)=XD(I,7)-XD(I,8)
-           SAV(I,20)=YD(I,7)-YD(I,8)
-           SAV(I,21)=ZD(I,7)-ZD(I,8)
-          ENDIF
-        ENDDO
-C-----------
-      RETURN
-      END
-Chd|====================================================================
-Chd|  S8SAV12                       source/elements/solid/solide/srcoor3.F
-Chd|-- called by -----------
-Chd|        S8EFORC3                      source/elements/solid/solide8e/s8eforc3.F
-Chd|        S8ZFORC3                      source/elements/solid/solide8z/s8zforc3.F
-Chd|        SFORC3                        source/elements/solid/solide/sforc3.F
-Chd|        SZFORC3                       source/elements/solid/solidez/szforc3.F
-Chd|-- calls ---------------
-Chd|====================================================================
-      SUBROUTINE S8SAV12(OFFG   ,OFFG0  ,SAV   ,X  ,XDP  ,
-     .     NC1   ,NC2   ,NC3   ,NC4   ,NC5   ,NC6   ,NC7   ,NC8   ,NEL)
-C-----------------------------------------------
-C   I m p l i c i t   T y p e s
-C-----------------------------------------------
-#include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "vect01_c.inc"
-#include      "scr05_c.inc"
-C-----------------------------------------------
-C   D u m m y   A r g u m e n t s
-C-----------------------------------------------
-      INTEGER NEL
-C     REAL
-      INTEGER 
-     .        NC1(*),NC2(*),NC3(*),NC4(*),NC5(*),NC6(*),NC7(*),NC8(*)
-      my_real
-     .   OFFG(*),OFFG0(*),X(3,*)
-      DOUBLE PRECISION 
-     .   XDP(3,*)
-C-----------------------------------------------
-C   L o c a l   V a r i a b l e s
-C-----------------------------------------------
-      INTEGER I ,IH    
-      DOUBLE PRECISION 
-     .   XD1(MVSIZ), XD2(MVSIZ), XD3(MVSIZ), XD4(MVSIZ),
-     .   XD5(MVSIZ), XD6(MVSIZ), XD7(MVSIZ), XD8(MVSIZ),
-     .   YD1(MVSIZ), YD2(MVSIZ), YD3(MVSIZ), YD4(MVSIZ),
-     .   YD5(MVSIZ), YD6(MVSIZ), YD7(MVSIZ), YD8(MVSIZ),
-     .   ZD1(MVSIZ), ZD2(MVSIZ), ZD3(MVSIZ), ZD4(MVSIZ),
-     .   ZD5(MVSIZ), ZD6(MVSIZ), ZD7(MVSIZ), ZD8(MVSIZ), SAV(NEL,21)
-C=======================================================================
-C-----Always in global system and fixed then (not like Ismstr=11
-C-----for JCVT>0 Fixed SAV is rotated w/ local system not like Ismstr=1
-        IH=0
-        DO I=LFT,LLT
-         IF(OFFG(I)/=OFFG0(I).AND.ABS(OFFG(I)) > ONE ) IH=1
-	END DO
-	IF (IH==0) RETURN
-C	
-      IF(IRESP==1)THEN 
-        DO I=LFT,LLT
-          XD1(I)=XDP(1,NC1(I))  
-          YD1(I)=XDP(2,NC1(I))  
-          ZD1(I)=XDP(3,NC1(I))  
-          XD2(I)=XDP(1,NC2(I))  
-          YD2(I)=XDP(2,NC2(I))  
-          ZD2(I)=XDP(3,NC2(I))  
-          XD3(I)=XDP(1,NC3(I))  
-          YD3(I)=XDP(2,NC3(I))  
-          ZD3(I)=XDP(3,NC3(I))  
-          XD4(I)=XDP(1,NC4(I))  
-          YD4(I)=XDP(2,NC4(I))  
-          ZD4(I)=XDP(3,NC4(I))  
-          XD5(I)=XDP(1,NC5(I))  
-          YD5(I)=XDP(2,NC5(I))  
-          ZD5(I)=XDP(3,NC5(I))  
-          XD6(I)=XDP(1,NC6(I))  
-          YD6(I)=XDP(2,NC6(I))  
-          ZD6(I)=XDP(3,NC6(I))  
-          XD7(I)=XDP(1,NC7(I))  
-          YD7(I)=XDP(2,NC7(I))  
-          ZD7(I)=XDP(3,NC7(I))  
-          XD8(I)=XDP(1,NC8(I))  
-          YD8(I)=XDP(2,NC8(I))  
-          ZD8(I)=XDP(3,NC8(I))  	  	  	  
-        ENDDO
-      ELSE	
-        DO I=LFT,LLT
-          XD1(I)=X(1,NC1(I))  
-          YD1(I)=X(2,NC1(I))  
-          ZD1(I)=X(3,NC1(I))  
-          XD2(I)=X(1,NC2(I))  
-          YD2(I)=X(2,NC2(I))  
-          ZD2(I)=X(3,NC2(I))  
-          XD3(I)=X(1,NC3(I))  
-          YD3(I)=X(2,NC3(I))  
-          ZD3(I)=X(3,NC3(I))  
-          XD4(I)=X(1,NC4(I))  
-          YD4(I)=X(2,NC4(I))  
-          ZD4(I)=X(3,NC4(I))  
-          XD5(I)=X(1,NC5(I))  
-          YD5(I)=X(2,NC5(I))  
-          ZD5(I)=X(3,NC5(I))  
-          XD6(I)=X(1,NC6(I))  
-          YD6(I)=X(2,NC6(I))  
-          ZD6(I)=X(3,NC6(I))  
-          XD7(I)=X(1,NC7(I))  
-          YD7(I)=X(2,NC7(I))  
-          ZD7(I)=X(3,NC7(I))  
-          XD8(I)=X(1,NC8(I))  
-          YD8(I)=X(2,NC8(I))  
-          ZD8(I)=X(3,NC8(I))  
-        ENDDO      
-      ENDIF
-C   -----attention, format is different to Ismstr=10,11
-        DO I=LFT,LLT
-          IF(OFFG(I)/=OFFG0(I).AND.ABS(OFFG(I)) > ONE )THEN
-           SAV(I,1)=XD1(I)-XD8(I)
-           SAV(I,2)=YD1(I)-YD8(I)
-           SAV(I,3)=ZD1(I)-ZD8(I)
-           SAV(I,4)=XD2(I)-XD8(I)
-           SAV(I,5)=YD2(I)-YD8(I)
-           SAV(I,6)=ZD2(I)-ZD8(I)
-           SAV(I,7)=XD3(I)-XD8(I)
-           SAV(I,8)=YD3(I)-YD8(I)
-           SAV(I,9)=ZD3(I)-ZD8(I)
-           SAV(I,10)=XD4(I)-XD8(I)
-           SAV(I,11)=YD4(I)-YD8(I)
-           SAV(I,12)=ZD4(I)-ZD8(I)
-           SAV(I,13)=XD5(I)-XD8(I)
-           SAV(I,14)=YD5(I)-YD8(I)
-           SAV(I,15)=ZD5(I)-ZD8(I)
-           SAV(I,16)=XD6(I)-XD8(I)
-           SAV(I,17)=YD6(I)-YD8(I)
-           SAV(I,18)=ZD6(I)-ZD8(I)
-           SAV(I,19)=XD7(I)-XD8(I)
-           SAV(I,20)=YD7(I)-YD8(I)
-           SAV(I,21)=ZD7(I)-ZD8(I)
-          ENDIF
-        ENDDO
-C-----------
-      RETURN
-      END
-Chd|====================================================================
-Chd|  SRCOOR12                      source/elements/solid/solide/srcoor3.F
-Chd|-- called by -----------
-Chd|        S8EFORC3                      source/elements/solid/solide8e/s8eforc3.F
-Chd|        SFORC3                        source/elements/solid/solide/sforc3.F
-Chd|-- calls ---------------
-Chd|        SORTHO12                      source/elements/solid/solide/sortho3.F
-Chd|        SREPISO12                     source/elements/solid/solide/srepiso3.F
-Chd|====================================================================
-      SUBROUTINE SRCOOR12(OFF,X     ,XDP   ,
-     .   NC1   ,NC2   ,NC3   ,NC4   ,NC5   ,NC6   ,NC7   ,NC8   ,
-     .   R11   ,R12   ,R13   ,R21   ,R22   ,R23   ,R31   ,R32   ,R33  ) 
-C-----------------------------------------------
-C   I m p l i c i t   T y p e s
-C-----------------------------------------------
-#include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "vect01_c.inc"
-#include      "scr05_c.inc"
-#include      "scr18_c.inc"
-#include      "param_c.inc"
-C-----------------------------------------------
-C   D u m m y   A r g u m e n t s
-C-----------------------------------------------
-C     REAL
-      my_real
-     .   R11(MVSIZ),R12(MVSIZ),R13(MVSIZ),
-     .   R21(MVSIZ),R22(MVSIZ),R23(MVSIZ),
-     .   R31(MVSIZ),R32(MVSIZ),R33(MVSIZ),
-     .   X(3,*),OFF(*)
-      INTEGER 
-     .        NC1(*),NC2(*),NC3(*),NC4(*),NC5(*),NC6(*),NC7(*),NC8(*)
-      
-      DOUBLE PRECISION 
-     .   XDP(3,*)      
-C-----------------------------------------------
-C   L o c a l   V a r i a b l e s
-C-----------------------------------------------
-      INTEGER I
-      
-C     REAL
-      my_real
-     .   RX(MVSIZ) , RY(MVSIZ) , RZ(MVSIZ) ,
-     .   SX(MVSIZ) , SY(MVSIZ) , SZ(MVSIZ) ,
-     .   TX(MVSIZ) , TY(MVSIZ) , TZ(MVSIZ) 
-      DOUBLE PRECISION 
-     .   XD1(MVSIZ), XD2(MVSIZ), XD3(MVSIZ), XD4(MVSIZ),
-     .   XD5(MVSIZ), XD6(MVSIZ), XD7(MVSIZ), XD8(MVSIZ),
-     .   YD1(MVSIZ), YD2(MVSIZ), YD3(MVSIZ), YD4(MVSIZ),
-     .   YD5(MVSIZ), YD6(MVSIZ), YD7(MVSIZ), YD8(MVSIZ),
-     .   ZD1(MVSIZ), ZD2(MVSIZ), ZD3(MVSIZ), ZD4(MVSIZ),
-     .   ZD5(MVSIZ), ZD6(MVSIZ), ZD7(MVSIZ), ZD8(MVSIZ)
-C=======================================================================
-C
-C----------------------------
-C     NODAL COORDINATES     |
-C----------------------------
-      IF(IRESP==1)THEN 
-        DO I=LFT,LLT
-         IF (OFF(I) <= ONE ) CYCLE 
-          XD1(I)=XDP(1,NC1(I))  
-          YD1(I)=XDP(2,NC1(I))  
-          ZD1(I)=XDP(3,NC1(I))  
-          XD2(I)=XDP(1,NC2(I))  
-          YD2(I)=XDP(2,NC2(I))  
-          ZD2(I)=XDP(3,NC2(I))  
-          XD3(I)=XDP(1,NC3(I))  
-          YD3(I)=XDP(2,NC3(I))  
-          ZD3(I)=XDP(3,NC3(I))  
-          XD4(I)=XDP(1,NC4(I))  
-          YD4(I)=XDP(2,NC4(I))  
-          ZD4(I)=XDP(3,NC4(I))  
-          XD5(I)=XDP(1,NC5(I))  
-          YD5(I)=XDP(2,NC5(I))  
-          ZD5(I)=XDP(3,NC5(I))  
-          XD6(I)=XDP(1,NC6(I))  
-          YD6(I)=XDP(2,NC6(I))  
-          ZD6(I)=XDP(3,NC6(I))  
-          XD7(I)=XDP(1,NC7(I))  
-          YD7(I)=XDP(2,NC7(I))  
-          ZD7(I)=XDP(3,NC7(I))  
-          XD8(I)=XDP(1,NC8(I))  
-          YD8(I)=XDP(2,NC8(I))  
-          ZD8(I)=XDP(3,NC8(I))  	  	  	  
-        ENDDO
-      ELSE	
-        DO I=LFT,LLT
-         IF (OFF(I) <= ONE ) CYCLE 
-          XD1(I)=X(1,NC1(I))  
-          YD1(I)=X(2,NC1(I))  
-          ZD1(I)=X(3,NC1(I))  
-          XD2(I)=X(1,NC2(I))  
-          YD2(I)=X(2,NC2(I))  
-          ZD2(I)=X(3,NC2(I))  
-          XD3(I)=X(1,NC3(I))  
-          YD3(I)=X(2,NC3(I))  
-          ZD3(I)=X(3,NC3(I))  
-          XD4(I)=X(1,NC4(I))  
-          YD4(I)=X(2,NC4(I))  
-          ZD4(I)=X(3,NC4(I))  
-          XD5(I)=X(1,NC5(I))  
-          YD5(I)=X(2,NC5(I))  
-          ZD5(I)=X(3,NC5(I))  
-          XD6(I)=X(1,NC6(I))  
-          YD6(I)=X(2,NC6(I))  
-          ZD6(I)=X(3,NC6(I))  
-          XD7(I)=X(1,NC7(I))  
-          YD7(I)=X(2,NC7(I))  
-          ZD7(I)=X(3,NC7(I))  
-          XD8(I)=X(1,NC8(I))  
-          YD8(I)=X(2,NC8(I))  
-          ZD8(I)=X(3,NC8(I))  
-        ENDDO      
-      ENDIF         
-C-----------
-C     REPERE CONVECTE (ITERATIONS).
-C-----------
-      CALL SREPISO12(OFF,
-     .       XD1, XD2, XD3, XD4, XD5, XD6, XD7, XD8,
-     .       YD1, YD2, YD3, YD4, YD5, YD6, YD7, YD8,
-     .       ZD1, ZD2, ZD3, ZD4, ZD5, ZD6, ZD7, ZD8,
-     .       RX, RY, RZ, SX, SY, SZ, TX, TY, TZ )
-C---
-      IF (JHBE == 14 .OR. JHBE == 24) THEN
-        CALL SORTHO12(OFF,
-     .       RX , RY , RZ , SX , SY , SZ , TX , TY , TZ ,
-     .       R12, R13, R11, R22, R23, R21, R32, R33, R31)
-      ELSE
-        CALL SORTHO12(OFF,
-     .       RX , RY , RZ , SX , SY , SZ , TX , TY , TZ ,
-     .       R11, R12, R13, R21, R22, R23, R31, R32, R33)
-      ENDIF
 C-----------
       RETURN
       END

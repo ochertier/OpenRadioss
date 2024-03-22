@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -54,7 +54,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -69,10 +68,6 @@ C-----------------------------------------------
 #include      "com_xfem1.inc"
 #include      "task_c.inc"
 #include      "parit_c.inc"
-#include      "spmd_c.inc"
-#include      "units_c.inc"
-#include      "timeri_c.inc"
-#include      "warn_c.inc"
 #include      "param_c.inc"
 #include      "tabsiz_c.inc"
 #include      "sphcom.inc"
@@ -539,7 +534,7 @@ C a optimiser
           IF(IFSUBM==0)THEN
 C prepar  ation envoi a proc I partie fixe (elem)
            IF(IVECTOR==1) THEN
-Cel cas 3D seul possible
+C   cas 3D seul possible
              IF(IRODDL/=0) THEN
 #include "vectorize.inc"
                DO J=IADSDP(I),IADSDP(I+1)-1
@@ -566,8 +561,8 @@ Cel cas 3D seul possible
                END DO
              ENDIF
            ELSE
-Cel ivec  tor = 0
-Cel cas   3D seul possible
+C   ivec  tor = 0
+C   cas   3D seul possible
              IF(IRODDL/=0) THEN
 #include "vectorize.inc"
                DO J=IADSDP(I),IADSDP(I+1)-1
@@ -602,7 +597,7 @@ C
 C prepar  ation envoi partie fixe (elem) a proc I
 C
            IF(IVECTOR==1) THEN
-Cel cas   3D seul possible
+C   cas   3D seul possible
              IF(IRODDL/=0) THEN
 #include "vectorize.inc"
                DO J=IADSDP(I),IADSDP(I+1)-1
@@ -631,8 +626,8 @@ Cel cas   3D seul possible
                 END DO
              ENDIF
            ELSE
-Cel ivec  tor = 0
-Cel cas   3D seul possible
+C   ivec  tor = 0
+C   cas   3D seul possible
              IF(IRODDL/=0) THEN
 #include "vectorize.inc"
                DO J=IADSDP(I),IADSDP(I+1)-1
@@ -669,7 +664,7 @@ C
           IF(IFSUBM==0)THEN
 C prepar  ation envoi a proc I partie fixe (elem)
            IF(IVECTOR==1) THEN
-Cel cas 3D seul possible
+C   cas 3D seul possible
              IF(IRODDL/=0) THEN
 #include "vectorize.inc"
                DO J=IADSDP(I),IADSDP(I+1)-1
@@ -870,7 +865,7 @@ C
           IF(IFSUBM==0)THEN
 C prepar  ation envoi a proc I partie fixe (elem)
            IF(IVECTOR==1) THEN
-Cel cas 3D seul possible
+C   cas 3D seul possible
              IF(IRODDL/=0) THEN
 #include "vectorize.inc"
                DO J=IADSDP(I),IADSDP(I+1)-1
@@ -907,8 +902,8 @@ C
                END DO
              ENDIF
            ELSE
-Cel ivec  tor = 0
-Cel cas   3D seul possible
+C   ivec  tor = 0
+C   cas   3D seul possible
              IF(IRODDL/=0) THEN
 #include "vectorize.inc"
                DO J=IADSDP(I),IADSDP(I+1)-1
@@ -953,7 +948,7 @@ C
 C prepar  ation envoi partie fixe (elem) a proc I
 C
            IF(IVECTOR==1) THEN
-Cel cas   3D seul possible
+C   cas   3D seul possible
              IF(IRODDL/=0) THEN
 #include "vectorize.inc"
                DO J=IADSDP(I),IADSDP(I+1)-1
@@ -992,8 +987,8 @@ cc                 SBUF(L+8) = FSKYM(CC)
                 END DO
              ENDIF
            ELSE
-Cel ivec  tor = 0
-Cel cas   3D seul possible
+C   ivec  tor = 0
+C   cas   3D seul possible
              IF(IRODDL/=0) THEN
 #include "vectorize.inc"
                DO J=IADSDP(I),IADSDP(I+1)-1
@@ -1038,7 +1033,7 @@ C
           IF(IFSUBM==0)THEN
 C prepar  ation envoi a proc I partie fixe (elem)
            IF(IVECTOR==1) THEN
-Cel cas 3D seul possible
+C   cas 3D seul possible
              IF(IRODDL/=0) THEN
 #include "vectorize.inc"
                DO J=IADSDP(I),IADSDP(I+1)-1
@@ -1499,7 +1494,6 @@ C cas 3D    seul possible
                ENDIF
              ENDIF
            ELSE
-Cel46b5    N2D==0 .AND. IFSUBM==1
              IF(IVECTOR==1) THEN
 C cas 3D    seul possible
                IF(IRODDL/=0) THEN
@@ -1838,7 +1832,6 @@ C
                ENDIF
              ENDIF
            ELSE
-Cel46b5    N2D==0 .AND. IFSUBM==1
              IF(IVECTOR==1) THEN
 C cas 3D    seul possible
                IF(IRODDL/=0) THEN
@@ -2289,7 +2282,7 @@ C
      4    CONDNSKYIF,FSKYIF_PXFEM)
       END IF
 C      
-Cel wait terminaison isend
+C   wait terminaison isend
 C
       DO I = 1, NSPMD
         IF(IAD_ELEM(1,I+1)-IAD_ELEM(1,I)>0)

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,11 +25,14 @@ Chd|  I8LOC3                        source/interfaces/inter3d/i8loc3.F
 Chd|-- called by -----------
 Chd|        INTVO8                        source/interfaces/inter3d/intvo8.F
 Chd|-- calls ---------------
-Chd|        INT8_MOD                      ../common_source/modules/int8_mod.F
+Chd|        INT8_MOD                      ../common_source/modules/interfaces/int8_mod.F
 Chd|====================================================================
-      SUBROUTINE I8LOC3(X,IRECT,LMSR,MSR,NSV,ILOC,NSEG,
-     .                  XI,YI,ZI,XFACE,ITAB,DISTANCE,
-     .                  IFLINEAR,DISTLIN)
+      SUBROUTINE I8LOC3(
+     1   X,       IRECT,   LMSR,    MSR,
+     2   NSV,     ILOC,    NSEG,    XI,
+     3   YI,      ZI,      XFACE,   ITAB,
+     4   DISTANCE,IFLINEAR,DISTLIN, NSN,
+     5   LFT,     LLT,     NFT)
 
 C-----------------------------------------------
 C   I n f o r m a t i o n s            
@@ -47,15 +50,14 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(INOUT) :: LFT
+      INTEGER, INTENT(INOUT) :: LLT
+      INTEGER, INTENT(INOUT) :: NFT
       INTEGER :: IRECT(4,*), LMSR(*), MSR(*), NSV(*), ILOC(*), NSEG(*)
       INTEGER :: ITAB(*)
-      INTEGER  , INTENT(IN) :: IFLINEAR
+      INTEGER  , INTENT(IN) :: IFLINEAR,NSN
 C     REAL
       my_real
      .   X(3,*),DISTANCE(*),
@@ -65,8 +67,6 @@ C     REAL
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr04_c.inc"
-#include      "vect07_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -77,9 +77,6 @@ C     REAL
      .   GMS, CMS,
      .   DMS, EMS, FMS
 C-----------------------------------------------
-c     EQUIVALENCE (XJ,BV(1,1)) ,(YJ,BV(1,2)) ,(ZJ,BV(1,3))
-c     EQUIVALENCE (XI,BV(1,13)),(YI,BV(1,14)),(ZI,BV(1,15))
-c     EQUIVALENCE (XFACE,BV(1,29))
       DO 100 I=LFT,LLT
       XFACE(I)=ONE
       IL=I+NFT

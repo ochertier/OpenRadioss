@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -24,21 +24,27 @@ Chd|====================================================================
 Chd|  S6RCOORK                      source/elements/thickshell/solide6c/s6rcoork.F
 Chd|-- called by -----------
 Chd|        S6CKE3                        source/elements/thickshell/solide6c/s6cke3.F
-Chd|        S6CKEL3                       source/elements/thickshell/solide6c/s6cke3.F
 Chd|-- calls ---------------
 Chd|        S6CORTHO3                     source/elements/thickshell/solide6c/s6cortho3.F
 Chd|        VRROTA3                       source/elements/thickshell/solide6c/vrrota3.F
 Chd|====================================================================
-      SUBROUTINE S6RCOORK(X,IXS,
-     .   X1, X2, X3, X4, X5, X6, 
-     .   Y1, Y2, Y3, Y4, Y5, Y6, 
-     .   Z1, Z2, Z3, Z4, Z5, Z6, 
-     .   OFFG,OFF,SAV,
-     .   R11, R12, R13, R21, R22, R23, R31, R32, R33,
-     .   NC1,NC2,NC3,NC4,NC5,NC6,NGL,MXT,NGEO,
-     .   K11,K12,K13,K14,K15,K16,K22,K23,
-     .   K24,K25,K26,K33,K34,K35,K36,K44,
-     .   K45,K46,K55,K56,K66,NEL)
+      SUBROUTINE S6RCOORK(
+     1   X,       IXS,     X1,      X2,
+     2   X3,      X4,      X5,      X6,
+     3   Y1,      Y2,      Y3,      Y4,
+     4   Y5,      Y6,      Z1,      Z2,
+     5   Z3,      Z4,      Z5,      Z6,
+     6   OFFG,    OFF,     SAV,     R11,
+     7   R12,     R13,     R21,     R22,
+     8   R23,     R31,     R32,     R33,
+     9   NC1,     NC2,     NC3,     NC4,
+     A   NC5,     NC6,     NGL,     MXT,
+     B   NGEO,    K11,     K12,     K13,
+     C   K14,     K15,     K16,     K22,
+     D   K23,     K24,     K25,     K26,
+     E   K33,     K34,     K35,     K36,
+     F   K44,     K45,     K46,     K55,
+     G   K56,     K66,     NEL,     ISMSTR)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -50,13 +56,11 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com08_c.inc"
-#include      "vect01_c.inc"
 #include      "scr18_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: ISMSTR
       INTEGER NEL
 C     REAL
       my_real
@@ -92,7 +96,7 @@ C     REAL
      .   TX(MVSIZ) , TY(MVSIZ) , TZ(MVSIZ) 
 C-----------------------------------------------
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
       NGEO(I)=IXS(10,I)
       NGL(I)=IXS(11,I)
       MXT(I)=IXS(1,I)
@@ -106,7 +110,7 @@ C
 C----------------------------
 C     NODAL COORDINATES     |
 C----------------------------
-      DO I=LFT,LLT
+      DO I=1,NEL
         X1(I)=X(1,NC1(I))
         Y1(I)=X(2,NC1(I))
         Z1(I)=X(3,NC1(I))
@@ -130,7 +134,7 @@ C----------------------------
 C-----------
 C     REPERE CONVECTE (ITERATIONS).
 C-----------
-      DO I=LFT,LLT
+      DO I=1,NEL
         XL=ONE_OVER_6*(X1(I)+X2(I)+X3(I)+X4(I)+X5(I)+X6(I))
         YL=ONE_OVER_6*(Y1(I)+Y2(I)+Y3(I)+Y4(I)+Y5(I)+Y6(I))
         ZL=ONE_OVER_6*(Z1(I)+Z2(I)+Z3(I)+Z4(I)+Z5(I)+Z6(I))
@@ -154,17 +158,22 @@ C-----------
         Z6(I)=Z6(I)-ZL
       ENDDO
        CALL S6CORTHO3(
-     .   X1, X2, X3, X4, X5, X6,
-     .   Y1, Y2, Y3, Y4, Y5, Y6,
-     .   Z1, Z2, Z3, Z4, Z5, Z6, 
-     .   R11, R12, R13, R21, R22, R23, R31, R32, R33,
-     .   RX , RY , RZ , SX , SY , SZ , TX , TY , TZ )
+     1   X1,      X2,      X3,      X4,
+     2   X5,      X6,      Y1,      Y2,
+     3   Y3,      Y4,      Y5,      Y6,
+     4   Z1,      Z2,      Z3,      Z4,
+     5   Z5,      Z6,      R11,     R12,
+     6   R13,     R21,     R22,     R23,
+     7   R31,     R32,     R33,     RX,
+     8   RY,      RZ,      SX,      SY,
+     9   SZ,      TX,      TY,      TZ,
+     A   NEL)
 C-----------
 C     PASSAGE AU REPERE CONVECTE.
 C-----------
       IF((ISMSTR==1.OR.ISMSTR==3).OR.
      .   (ISMSTR==2.AND.IDTMIN(1)==3))THEN
-       DO I=LFT,LLT
+       DO I=1,NEL
        IF(OFFG(I)==TWO)THEN
         X1(I)=SAV(I,1)
         Y1(I)=SAV(I,2)
@@ -262,15 +271,21 @@ C       SAV(I,15)=Z5(I)-Z6(I)
 C
       ELSE
       CALL VRROTA3(
-     .   R11, R12, R13, R21, R22, R23, R31, R32, R33,
-     .   X1, Y1, Z1)
+     1   R11,     R12,     R13,     R21,
+     2   R22,     R23,     R31,     R32,
+     3   R33,     X1,      Y1,      Z1,
+     4   NEL)
       CALL VRROTA3(
-     .   R11, R12, R13, R21, R22, R23, R31, R32, R33,
-     .   X2, Y2, Z2)
+     1   R11,     R12,     R13,     R21,
+     2   R22,     R23,     R31,     R32,
+     3   R33,     X2,      Y2,      Z2,
+     4   NEL)
       CALL VRROTA3(
-     .   R11, R12, R13, R21, R22, R23, R31, R32, R33,
-     .   X3, Y3, Z3)
-       DO I=LFT,LLT
+     1   R11,     R12,     R13,     R21,
+     2   R22,     R23,     R31,     R32,
+     3   R33,     X3,      Y3,      Z3,
+     4   NEL)
+       DO I=1,NEL
         XL=R11(I)*X4(I)+R21(I)*Y4(I)+R31(I)*Z4(I)
         YL=R12(I)*X4(I)+R22(I)*Y4(I)+R32(I)*Z4(I)
         X4(I)=XL
@@ -292,7 +307,7 @@ C
        ENDIF
 C-----------
       DO J=1,9      
-      DO I=LFT,LLT
+      DO I=1,NEL
         K11(J,I)=ZERO
         K12(J,I)=ZERO
         K13(J,I)=ZERO

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -47,10 +47,7 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "units_c.inc"
-#include      "param_c.inc"
 #include      "com04_c.inc"
-#include      "scr07_c.2.inc"
-#include      "scr03_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -68,6 +65,7 @@ C-----------------------------------------------
      .        NUSER, NUSERM
       my_real
      .   N1, N2, N3, DDS
+      my_real ::  XX1(4), XX2(4),XX3(4),XS1,YS1,ZS1,XC,YC,ZC
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
@@ -147,7 +145,7 @@ C-----------------------------------------------
        YS1=YS1+FOURTH*X(2,NN)
   100  ZS1=ZS1+FOURTH*X(3,NN)
 C
-       CALL NORMA1(N1,N2,N3,AREA)
+       CALL NORMA1(N1,N2,N3,AREA,XX1,XX2,XX3)
        XC=ZERO
        YC=ZERO
        ZC=ZERO
@@ -187,58 +185,59 @@ Chd|        I24GAPM                       source/interfaces/inter3d1/i24sti3.F
 Chd|        I25GAPM                       source/interfaces/inter3d1/i25sti3.F
 Chd|        I7STI3                        source/interfaces/inter3d1/i7sti3.F
 Chd|-- calls ---------------
+Chd|        ANCMSG                        source/output/message/message.F
 Chd|        NORMA1D                       source/interfaces/inter3d1/norma1.F
+Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
       SUBROUTINE INSOL3D(X   ,IRECT ,IXS     ,NINT   ,NEL,I ,
      .                  AREA ,NOINT ,KNOD2ELS,NOD2ELS,IR ,
-     .                  IXS10,IXS16,IXS20 )
+     .                  IXS10,IXS16,IXS20    ,TAGELEMS,INDEXE,
+     .                  NINV )
+C-----------------------------------------------
+C   M o d u l e s
+C----------------------------------------------- 
+      USE MESSAGE_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "units_c.inc"
-#include      "param_c.inc"
 #include      "com04_c.inc"
-#include      "scr07_c.2.inc"
-#include      "scr03_c.inc" 
-C-----------------------------------------------
-C   L o c a l   V a r i a b l e s
-C-----------------------------------------------
+#include      "scr03_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER NINT, NEL, I, NOINT,IR,J
-C     REAL
+      INTEGER NINT, NEL, I, NOINT,IR,J,NINV
       my_real
      .   AREA
       INTEGER IRECT(4,*), IXS(NIXS,*), KNOD2ELS(*), NOD2ELS(*), 
      .        IXS10(6,*), IXS16(8,*), IXS20(12,*)
-C     REAL
+      INTEGER  , INTENT(INOUT) :: TAGELEMS(NUMELS),INDEXE(NUMELS)
       my_real
      .   X(3,*)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER IY(4), N, JJ, II, K, NN, KK, IC, IAD,
-     .        NUSER, NUSERM
+     .        NUSER, NUSERM, NINDEXE
 C     REAL
       my_real
      .   N1, N2, N3, DDS
+      my_real :: XX1(4),XX2(4),XX3(4),XS1,YS1,ZS1,XC,YC,ZC
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
 C
       NEL=0
       IC=0
+
       IF(NUMELS==0) RETURN
        IF(IRECT(1,I)>NUMNOD) RETURN
+
+       NINDEXE = 0
        NUSERM = -1
        DO 230 IAD=KNOD2ELS(IRECT(1,I))+1,KNOD2ELS(IRECT(1,I)+1)
         N = NOD2ELS(IAD)
@@ -250,11 +249,16 @@ C
             ENDDO
             GOTO 230
   210     CONTINUE
-          IC=IC+1
           NUSER = IXS(11,N)
-          IF (NUSER>NUSERM) THEN
-            NEL = N
-            NUSERM = NUSER
+          IF(TAGELEMS(N)==0) THEN
+             IC=IC+1
+             TAGELEMS(N) = 1
+             NINDEXE = NINDEXE + 1
+             INDEXE(NINDEXE) = N
+             IF (NUSER>NUSERM) THEN
+                NEL = N
+                NUSERM = NUSER
+             ENDIF
           ENDIF
         ELSEIF(N <= NUMELS8+NUMELS10)THEN
           DO 220 JJ=1,4
@@ -267,11 +271,16 @@ C
             ENDDO
             GOTO 230
   220     CONTINUE
-          IC=IC+1
           NUSER = IXS(11,N)
-          IF (NUSER>NUSERM) THEN
-            NEL = N
-            NUSERM = NUSER
+          IF(TAGELEMS(N)==0) THEN
+             IC=IC+1
+             TAGELEMS(N) = 1
+             NINDEXE = NINDEXE + 1
+             INDEXE(NINDEXE) = N
+             IF (NUSER>NUSERM) THEN
+                NEL = N
+                NUSERM = NUSER
+             ENDIF
           ENDIF
         ELSEIF(N <= NUMELS8+NUMELS10+NUMELS20)THEN
           DO 222 JJ=1,4
@@ -284,11 +293,16 @@ C
             ENDDO
             GOTO 230
   222     CONTINUE
-          IC=IC+1
           NUSER = IXS(11,N)
-          IF (NUSER>NUSERM) THEN
-            NEL = N
-            NUSERM = NUSER
+          IF(TAGELEMS(N)==0) THEN
+             IC=IC+1
+             TAGELEMS(N) = 1
+             NINDEXE = NINDEXE + 1
+             INDEXE(NINDEXE) = N
+             IF (NUSER>NUSERM) THEN
+                NEL = N
+                NUSERM = NUSER
+             ENDIF
           ENDIF
         ELSEIF(N <= NUMELS8+NUMELS10+NUMELS20+NUMELS16)THEN
           DO 224 JJ=1,4
@@ -301,19 +315,30 @@ C
             ENDDO
             GOTO 230
   224     CONTINUE
-          IC=IC+1
           NUSER = IXS(11,N)
-          IF (NUSER>NUSERM) THEN
-            NEL = N
-            NUSERM = NUSER
+          IF(TAGELEMS(N)==0) THEN
+             IC=IC+1
+             TAGELEMS(N) = 1
+             NINDEXE = NINDEXE + 1
+             INDEXE(NINDEXE) = N
+             IF (NUSER>NUSERM) THEN
+                NEL = N
+                NUSERM = NUSER
+             ENDIF
           ENDIF
         ELSE
           GOTO 230
         END IF
   230  CONTINUE
+       DO JJ= 1,NINDEXE
+          N = INDEXE(JJ)
+          TAGELEMS(N) = 0
+          INDEXE(JJ) = 0
+       ENDDO
+
        IF (NUSERM==-1) RETURN
 C-----------------------------------------------
-C     VERIFICATION DE L'ORIENTATION DES SEGMENTS
+C     SEGMENTS ORIENTATION CHECKING 
 C-----------------------------------------------
        XS1=ZERO
        YS1=ZERO
@@ -328,7 +353,8 @@ C-----------------------------------------------
        YS1=YS1+FOURTH*X(2,NN)
   100  ZS1=ZS1+FOURTH*X(3,NN)       
 C
-       CALL NORMA1D(N1,N2,N3,AREA)
+       CALL NORMA1D(N1,N2,N3,AREA,XX1,XX2,XX3)
+
        XC=0.
        YC=0.
        ZC=0.
@@ -341,9 +367,11 @@ C
        XC=XC*ONE_OVER_8
        YC=YC*ONE_OVER_8
        ZC=ZC*ONE_OVER_8
+
        IF(IR/=0) RETURN
        IF(IC>=2)RETURN
        DDS=N1*(XC-XS1)+N2*(YC-YS1)+N3*(ZC-ZS1)
+
        IF(DDS<ZERO) RETURN
        IF(IY(3)==IY(4)) THEN
         IRECT(1,I)=IY(2)
@@ -352,8 +380,24 @@ C
         DO 120 KK=1,4
   120   IRECT(KK,I)=IY(4-KK+1)
        ENDIF
-       IF(NINT>0) WRITE (IOUT,1300) I,NOINT
-       IF(NINT<0) WRITE (IOUT,1400) I,NOINT
+c       IF(NINT>0) WRITE (IOUT,1300) I,NOINT
+c       IF(NINT<0) WRITE (IOUT,1400) I,NOINT
+       NINV = NINV + 1
+       IF(IPRI>=5.AND.NINT>0) 
+     .         CALL ANCMSG(MSGID=3022,
+     .                         MSGTYPE=MSGWARNING,
+     .                         ANMODE=ANINFO_BLIND_1,
+     .                         I1=I,
+     .                         I2=NOINT,
+     .                         PRMOD=MSG_CUMU)
+       IF(IPRI>=5.AND.NINT< 0) 
+     .         CALL ANCMSG(MSGID=3024,
+     .                         MSGTYPE=MSGWARNING,
+     .                         ANMODE=ANINFO_BLIND_1,
+     .                         I1=I,
+     .                         I2=NOINT,
+     .                         PRMOD=MSG_CUMU)
+
        RETURN
  1300 FORMAT(' NODE NUMBERING OF SECONDARY  SEGMENT',I5,' OF INTERFACE',I10,
      + ' REVERSED')
@@ -383,11 +427,7 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "units_c.inc"
-#include      "param_c.inc"
 #include      "com04_c.inc"
-#include      "scr07_c.2.inc"
-#include      "scr03_c.inc"
-#include      "warn_c.inc"
 #include      "scr17_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -411,6 +451,7 @@ C-----------------------------------------------
 C     REAL
       my_real
      .   N1, N2, N3, DDS
+      my_real :: XX1(4), XX2(4),XX3(4),XS1,YS1,ZS1,XC,YC,ZC
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
@@ -493,7 +534,7 @@ C-----------------------------------------------
        YS1=YS1+FOURTH*X(2,NN)
   100  ZS1=ZS1+FOURTH*X(3,NN)       
 C
-       CALL NORMA1(N1,N2,N3,AREA)
+       CALL NORMA1(N1,N2,N3,AREA,XX1,XX2,XX3)
        XC=ZERO
        YC=ZERO
        ZC=ZERO

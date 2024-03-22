@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,12 +26,12 @@ Chd|-- called by -----------
 Chd|        DIM_GLOB_K                    source/implicit/ind_glob_k.F  
 Chd|-- calls ---------------
 Chd|        REORDER_I                     source/implicit/ind_glob_k.F  
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE DIM_ELEMS1(
      1    IGEO      ,ELBUF     ,IPARG     ,IXS       ,IXQ       ,
      2    IXC       ,IXT       ,IXP       ,IXR       ,IXTG      ,
-     3    IXTG1     ,IXS10     ,IXS20     ,IXS16     ,IXUR      ,
+     3    IXTG1     ,IXS10     ,IXS20     ,IXS16     ,
      4    NDOF      ,NROW      ,ELBUF_TAB )
 C-----------------------------------------------
 C   M o d u l e s
@@ -41,10 +41,6 @@ C----6---------------------------------------------------------------7---------8
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -57,7 +53,7 @@ C-----------------------------------------------
       INTEGER IPARG(NPARG,*),IGEO(NPROPGI,*)
       INTEGER 
      .   IXS(NIXS,*),IXQ(NIXQ,*),IXC(NIXC,*), IXT(NIXT,*), IXP(NIXP,*),
-     .   IXR(NIXR,*), IXTG(NIXTG,*),IXUR(*),IXS10(6,*),IXS20(12,*),
+     .   IXR(NIXR,*), IXTG(NIXTG,*),IXS10(6,*),IXS20(12,*),
      .   IXS16(8,*),IXTG1(4,*),NDOF(*),NROW(*)
 C     REAL
       my_real
@@ -325,12 +321,12 @@ Chd|        DIM_KINMAX                    source/implicit/ind_glob_k.F
 Chd|        IND_GLOB_K                    source/implicit/ind_glob_k.F  
 Chd|-- calls ---------------
 Chd|        REORDER_A                     source/implicit/ind_glob_k.F  
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE DIM_ELEMS3(
      1    ELBUF     ,IPARG     ,IXS       ,IXQ       ,IXC       ,
      2    IXT       ,IXP       ,IXR       ,IXTG      ,IXTG1     ,
-     3    IXS10     ,IXS20     ,IXS16     ,IXUR      ,NROW      ,
+     3    IXS10     ,IXS20     ,IXS16     ,NROW      ,
      4    INLOC     ,NKMAX     ,ICOK      ,IGEO      ,ELBUF_TAB )
 C-----------------------------------------------
 C   M o d u l e s
@@ -340,10 +336,6 @@ C----6---------------------------------------------------------------7---------8
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -356,7 +348,7 @@ C-----------------------------------------------
       INTEGER IPARG(NPARG,*),NKMAX,IGEO(NPROPGI,*)
       INTEGER 
      .   IXS(NIXS,*),IXQ(NIXQ,*),IXC(NIXC,*), IXT(NIXT,*), IXP(NIXP,*),
-     .   IXR(NIXR,*), IXTG(NIXTG,*),IXUR(*),IXS10(6,*),IXS20(12,*),
+     .   IXR(NIXR,*), IXTG(NIXTG,*),IXS10(6,*),IXS20(12,*),
      .   IXS16(8,*),IXTG1(4,*),NROW(*),ICOK(NKMAX,*),INLOC(*)
 C     REAL
       my_real
@@ -424,7 +416,7 @@ C-----------------------
           NC(J)=IXS(J+1,EP)
          ENDDO 
          
-Czg add solid element 20
+C   add solid element 20
          ELSEIF (ISNOD==20) THEN
           NNOD=20
          DO J=1,8
@@ -623,12 +615,12 @@ Chd|-- called by -----------
 Chd|        DIM_KINMAX                    source/implicit/ind_glob_k.F  
 Chd|-- calls ---------------
 Chd|        REORDER_A                     source/implicit/ind_glob_k.F  
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE DIM_ELEMS2(
      1    ELBUF     ,IPARG     ,IXS       ,IXQ       ,IXC       ,
      2    IXT       ,IXP       ,IXR       ,IXTG      ,IXTG1     ,
-     3    IXS10     ,IXS20     ,IXS16     ,IXUR      ,NROW      ,
+     3    IXS10     ,IXS20     ,IXS16     ,NROW      ,
      4    INLOC     ,NNMAX     ,ICOK      ,NKMAX     ,ICOKM     ,
      5    INK       ,IGEO      ,ELBUF_TAB )
 C-----------------------------------------------
@@ -639,10 +631,6 @@ C----6---------------------------------------------------------------7---------8
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -655,7 +643,7 @@ C-----------------------------------------------
       INTEGER IPARG(NPARG,*),NNMAX,NKMAX,IGEO(NPROPGI,*)
       INTEGER 
      .   IXS(NIXS,*),IXQ(NIXQ,*),IXC(NIXC,*), IXT(NIXT,*), IXP(NIXP,*),
-     .   IXR(NIXR,*), IXTG(NIXTG,*),IXUR(*),IXS10(6,*),IXS20(12,*),
+     .   IXR(NIXR,*), IXTG(NIXTG,*),IXS10(6,*),IXS20(12,*),
      .   IXS16(8,*),IXTG1(4,*),
      .    NROW(*),ICOK(NNMAX,*),ICOKM(NKMAX,*),INLOC(*),INK
 C     REAL
@@ -723,7 +711,7 @@ C-----------------------
           NC(J)=IXS(J+1,EP)
          ENDDO 
          
-Czg add solid element 20
+C   add solid element 20
          ELSEIF (ISNOD==20) THEN
           NNOD=20
          DO J=1,8
@@ -963,12 +951,12 @@ Chd|-- called by -----------
 Chd|        IND_GLOB_K                    source/implicit/ind_glob_k.F  
 Chd|-- calls ---------------
 Chd|        REORDER_A                     source/implicit/ind_glob_k.F  
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE DIM_ELEMS4(
      1    ELBUF     ,IPARG     ,IXS       ,IXQ       ,IXC       ,
      2    IXT       ,IXP       ,IXR       ,IXTG      ,IXTG1     ,
-     3    IXS10     ,IXS20     ,IXS16     ,IXUR      ,NROW      ,
+     3    IXS10     ,IXS20     ,IXS16     ,NROW      ,
      4    INLOC     ,NNMAX     ,ICOK      ,NKMAX     ,ICOKM     ,
      5    INK       ,IGEO      ,ELBUF_TAB )
 C-----------------------------------------------
@@ -979,10 +967,6 @@ C----6---------------------------------------------------------------7---------8
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -995,7 +979,7 @@ C-----------------------------------------------
       INTEGER IPARG(NPARG,*),NNMAX,NKMAX,IGEO(NPROPGI,*)
       INTEGER 
      .   IXS(NIXS,*),IXQ(NIXQ,*),IXC(NIXC,*), IXT(NIXT,*), IXP(NIXP,*),
-     .   IXR(NIXR,*), IXTG(NIXTG,*),IXUR(*),IXS10(6,*),IXS20(12,*),
+     .   IXR(NIXR,*), IXTG(NIXTG,*),IXS10(6,*),IXS20(12,*),
      .   IXS16(8,*),IXTG1(4,*),
      .    NROW(*),ICOK(NNMAX,*),ICOKM(NKMAX,*),INLOC(*),INK
 C     REAL
@@ -1064,7 +1048,7 @@ C-----------------------
           NC(J)=IXS(J+1,EP)
          ENDDO 
          
-Czg add solid element 20
+C   add solid element 20
          ELSEIF (ISNOD==20) THEN
           NNOD=20
          DO J=1,8
@@ -1315,12 +1299,12 @@ Chd|        IND_FR_K                      source/mpi/implicit/imp_fri.F
 Chd|        INI_FR_K                      source/mpi/implicit/imp_fri.F 
 Chd|-- calls ---------------
 Chd|        REORDER_A                     source/implicit/ind_glob_k.F  
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE DIM_ELEMSP(
      1    ELBUF     ,IPARG     ,IXS       ,IXQ       ,IXC       ,
      2    IXT       ,IXP       ,IXR       ,IXTG      ,IXTG1     ,
-     3    IXS10     ,IXS20     ,IXS16     ,IXUR      ,NROW      ,
+     3    IXS10     ,IXS20     ,IXS16     ,NROW      ,
      4    INLOC     ,NKMAX     ,ICOK      ,IGEO      ,ELBUF_TAB )
 C-----------------------------------------------
 C   M o d u l e s
@@ -1330,10 +1314,6 @@ C----6---------------------------------------------------------------7---------8
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -1346,7 +1326,7 @@ C-----------------------------------------------
       INTEGER IPARG(NPARG,*),NKMAX,IGEO(NPROPGI,*)
       INTEGER 
      .   IXS(NIXS,*),IXQ(NIXQ,*),IXC(NIXC,*), IXT(NIXT,*), IXP(NIXP,*),
-     .   IXR(NIXR,*), IXTG(NIXTG,*),IXUR(*),IXS10(6,*),IXS20(12,*),
+     .   IXR(NIXR,*), IXTG(NIXTG,*),IXS10(6,*),IXS20(12,*),
      .   IXS16(8,*),IXTG1(4,*),NROW(*),ICOK(NKMAX,*),INLOC(*)
 C     REAL
       my_real
@@ -1414,7 +1394,7 @@ C-----------------------
           NC(J)=IXS(J+1,EP)
          ENDDO 
          
-Czg add solid element 20
+C   add solid element 20
          ELSEIF (ISNOD==20) THEN
           NNOD=20
          DO J=1,8
@@ -1620,12 +1600,12 @@ Chd|-- called by -----------
 Chd|        DIM_GLOB_K                    source/implicit/ind_glob_k.F  
 Chd|-- calls ---------------
 Chd|        DIM_ELEMS3                    source/implicit/ind_glob_k.F  
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE DIM_ELEMAX(
      1    IXS       ,IXQ       ,IXC       ,IXT       ,IXP       ,
      2    IXR       ,IXTG      ,IXTG1     ,IXS10     ,IXS20     ,
-     3    IXS16     ,IXUR      ,IPARG     ,ELBUF     ,NDOF      ,
+     3    IXS16     ,IPARG     ,ELBUF     ,NDOF      ,
      4    NROW      ,INLOC     ,NNMAX     ,L_MAX     ,C_MAX     ,
      5    IGEO      ,ELBUF_TAB )
 C-----------------------------------------------
@@ -1636,10 +1616,6 @@ C----6---------------------------------------------------------------7---------8
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -1652,7 +1628,7 @@ C-----------------------------------------------
       INTEGER IPARG(NPARG,*),IGEO(NPROPGI,*)
       INTEGER 
      .   IXS(NIXS,*),IXQ(NIXQ,*),IXC(NIXC,*), IXT(NIXT,*), IXP(NIXP,*),
-     .   IXR(NIXR,*), IXTG(NIXTG,*),IXUR(*),IXS10(6,*),IXS20(12,*),
+     .   IXR(NIXR,*), IXTG(NIXTG,*),IXS10(6,*),IXS20(12,*),
      .   IXS16(8,*),IXTG1(4,*),NDOF(*),NROW(*),INLOC(*),
      .   NNMAX,L_MAX,C_MAX
 C     REAL
@@ -1678,14 +1654,14 @@ C-----------------------------------------------
        CALL DIM_ELEMS3(
      1    ELBUF     ,IPARG     ,IXS       ,IXQ       ,IXC       ,
      2    IXT       ,IXP       ,IXR       ,IXTG      ,IXTG1     ,
-     3    IXS10     ,IXS20     ,IXS16     ,IXUR      ,NROW(NFT+1) ,
+     3    IXS10     ,IXS20     ,IXS16     ,NROW(NFT+1) ,
      4    INLOC     ,L_MAX     ,ICOL      ,IGEO      ,ELBUF_TAB )
        DO NK=1,JLT
         N=NK+NFT
         INLOC(N)=0
         NNMAX=MAX(NNMAX,NROW(N))
        ENDDO
-      ENDDO	   
+      ENDDO     
 C----6---------------------------------------------------------------7---------8
       RETURN
       END
@@ -1712,18 +1688,11 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com09_c.inc"
 #include      "param_c.inc"
-#include      "scr05_c.inc"
-C-----------------------------------------------------------------
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NPBY(NNPBY,*),LPBY(*),ITAB(*),NRBYAC,IRBYAC(*)
@@ -1756,9 +1725,9 @@ C----- rbe2 main------
          INLOC(M)=NKINE
        ENDIF
       ENDDO
-C-----will be stored in ICOKM(NKMAX,*)	  
+C-----will be stored in ICOKM(NKMAX,*)    
       NKINM=NKINE
-C-----pour IND_GLOB_K, passer NKINM par include ou module, modifier dans IND_KINE_	  
+C-----pour IND_GLOB_K, passer NKINM par include ou module, modifier dans IND_KINE_    
 C      K=0
 C------interface 2-------------- 
       DO I=1,NINT2
@@ -1833,10 +1802,6 @@ C----6---------------------------------------------------------------7---------8
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -1948,16 +1913,10 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "com01_c.inc"
-#include      "com09_c.inc"
-C-----------------------------------------------------------------
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NINT2,IINT2(*),IPARI(NPARI,*),NDOF(*),
@@ -2067,16 +2026,13 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "scr05_c.inc"
-C-----------------------------------------------------------------
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NPBY(NNPBY,*),LPBY(*),NRBYAC,IRBYAC(*)
@@ -2143,18 +2099,11 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com09_c.inc"
 #include      "param_c.inc"
-#include      "scr05_c.inc"
-C-----------------------------------------------------------------
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NNMAX
@@ -2329,8 +2278,8 @@ C-----Due to hierarchy----
          IF (NROW(NS)>NROWI(NKS)) NROW(M)=NROW(M)+ NROW(NS)-NROWI(NKS)
 C+++++++Knsns -> Kmns      
           IF (IC>0) THEN
-	       NROW(M)=NROW(M)+1
-	       NROW(NS)=NROW(NS)+1
+                 NROW(M)=NROW(M)+1
+                 NROW(NS)=NROW(NS)+1
           ENDIF 
          ENDIF 
        ENDDO 
@@ -2365,14 +2314,8 @@ C-----Due to hierarchy----
            K12 = NROW(NS)-NROWI(NKS)
            DO M=1,NNOD
             NM=LRBE3(IAD+M)
-C  ----          not sufficient
             NROW(NM)=NROW(NM)+ K12 + K12
            ENDDO
-C-----------bug fixing Pi_215563,216361          
-C           DO NK=1,NROWI(NKS)
-C            NJ=ICOK(NK,NKS)
-C            NROW(NJ)=NROW(NJ)+ K12
-C           END DO
          END IF
 C-----with Kij (i,j -> NSi,NSj-----
         DO I1=I+1,NRBE3
@@ -2393,7 +2336,7 @@ C-----with Kij (i,j -> NSi,NSj-----
             ENDDO
          ENDIF
         ENDDO
-C	
+C
         DO M=1,NNOD
          NM=LRBE3(IAD+M)
          IF (INLOC(NM)==0.AND.NDOF(NM)>0) THEN
@@ -2463,18 +2406,11 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com09_c.inc"
 #include      "param_c.inc"
-#include      "scr05_c.inc"
-C-----------------------------------------------------------------
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NNMAX
@@ -2616,13 +2552,13 @@ C------Rbe2------
           ENDIF
          ENDDO 
          IF (IC>0) THEN
-	      CALL REORDER_A(NROWI(NKE1),ICOKM(1,NKE1),NS)
+                CALL REORDER_A(NROWI(NKE1),ICOKM(1,NKE1),NS)
           IF (NKS > INK) THEN
            CALL REORDER_A(NROWI(NKS),ICOK(1,NKS),M)
-          ELSEIF (NKS > 0) THEN		   
+          ELSEIF (NKS > 0) THEN       
            CALL REORDER_A(NROWI(NKS),ICOKM(1,NKS),M)
           END IF
-	     ENDIF
+               ENDIF
         ENDIF 
        ENDDO 
       ENDDO
@@ -2643,15 +2579,15 @@ C
             NM1=LRBE3(IAD+J1)
             IF (NKE1>INK.AND.NM/=NM1) THEN
              CALL REORDER_A(NROWI(NKE1),ICOK(1,NKE1),NM1) 
-	        ELSEIF (NKE1>0.AND.NM/=NM1) THEN
+                  ELSEIF (NKE1>0.AND.NM/=NM1) THEN
              CALL REORDER_A(NROWI(NKE1),ICOKM(1,NKE1),NM1) 
-	        ENDIF
+                  ENDIF
             NKE2=INLOC(NM1) 
             IF (NKE2>INK) THEN
              CALL REORDER_A(NROWI(NKE2),ICOK(1,NKE2),NM) 
-	        ELSEIF (NKE2>0) THEN
+                  ELSEIF (NKE2>0) THEN
              CALL REORDER_A(NROWI(NKE2),ICOKM(1,NKE2),NM)              
-	        ENDIF
+                  ENDIF
            ENDDO
           ENDIF 
          ENDDO
@@ -2670,19 +2606,19 @@ C-----due to change of RBE2- (M used ICOKM now) --
             NM=LRBE3(IAD+M)
              IF (NDOF(NM)>0) THEN
               NKE1=INLOC(NM)
-	       
+                 
               IF (NKE1>INK) THEN
                CALL REORDER_A(NROWI(NKE1),ICOK(1,NKE1),NJ) 
-	          ELSEIF (NKE1>0) THEN
+                    ELSEIF (NKE1>0) THEN
                CALL REORDER_A(NROWI(NKE1),ICOKM(1,NKE1),NJ) 
-	          ENDIF
-	      
+                    ENDIF
+                
               IF (NKE2>INK) THEN
                CALL REORDER_A(NROWI(NKE2),ICOK(1,NKE2),NM) 
               ELSEIF (NKE2>0) THEN
                CALL REORDER_A(NROWI(NKE2),ICOKM(1,NKE2),NM) 
               ENDIF 
-	              
+                        
              ENDIF 
            ENDDO
           ENDIF
@@ -2825,18 +2761,12 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "scr05_c.inc"
 #include      "remesh_c.inc"
-C-----------------------------------------------------------------
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NNMAX,NKMAX
@@ -2996,13 +2926,13 @@ C-----RBE2------
            ENDIF 
           ENDDO 
           IF (IC>0) THEN
-	       CALL REORDER_A(NROWK(NKE1),ICOKM(1,NKE1-INK),NI)
+                 CALL REORDER_A(NROWK(NKE1),ICOKM(1,NKE1-INK),NI)
            IF (NKE <= INK) THEN
             CALL REORDER_A(NROWK(NKE),ICOK(1,NKE),M)
-           ELSEIF (NKE > 0) THEN		   
+           ELSEIF (NKE > 0) THEN       
             CALL REORDER_A(NROWK(NKE),ICOKM(1,NKE-INK),M)
            END IF
-	      ENDIF
+                ENDIF
          ENDIF
         ENDDO
        IRBE2(8,N) = NS
@@ -3046,19 +2976,19 @@ C------------RBE3-----
             NM=LRBE3(IAD+M)
             IF (NDOF(NM)>0) THEN
              NKE1=INLOC(NM)
-	      
+                
              IF (NKE1<=INK) THEN
               CALL REORDER_A(NROWK(NKE1),ICOK(1,NKE1),NJ) 
-	         ELSE
+                   ELSE
               CALL REORDER_A(NROWK(NKE1),ICOKM(1,NKE1-INK),NJ) 
-	         ENDIF
-	     
+                   ENDIF
+               
              IF (NKE2<=INK) THEN
               CALL REORDER_A(NROWK(NKE2),ICOK(1,NKE2),NM) 
-	         ELSE
+                   ELSE
               CALL REORDER_A(NROWK(NKE2),ICOKM(1,NKE2-INK),NM) 
-	         ENDIF
-	     
+                   ENDIF
+               
             ENDIF 
            ENDDO
           ENDIF 
@@ -3223,7 +3153,7 @@ Chd|        KIN_NRMAX                     source/mpi/implicit/imp_fri.F
 Chd|        KIN_NRMAX0                    source/mpi/implicit/imp_fri.F 
 Chd|        RMDIM_IMP                     source/model/remesh/rm_imp0.F 
 Chd|        SPMD_MAX_I                    source/mpi/implicit/imp_spmd.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE DIM_KINMAX(
@@ -3231,7 +3161,7 @@ Chd|====================================================================
      2    IRBYAC    ,NINT2     ,IINT2     ,IPARI     ,
      3    INTBUF_TAB,IXS       ,IXQ       ,IXC       ,IXT       ,
      4    IXP       ,IXR       ,IXTG      ,IXTG1     ,IXS10     ,
-     5    IXS20     ,IXS16     ,IXUR      ,IPARG     ,NDOF      ,     
+     5    IXS20     ,IXS16     ,IPARG     ,NDOF      ,     
      6    NSI2      ,NSRB      ,ELBUF     ,NKINE     ,INLOC     ,
      7    NROW      ,NNMAX     ,NKMAX     ,NSS       ,NSIJ      ,
      8    NMIJ      ,NSS2      ,NSIJ2     ,NMIJ2     ,FR_ELEM   ,
@@ -3242,14 +3172,10 @@ C   M o d u l e s
 C-----------------------------------------------
       USE ELBUFDEF_MOD    
       USE INTBUFDEF_MOD
-C----6---------------------------------------------------------------7---------8
+C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -3259,7 +3185,7 @@ C-----------------------------------------------
 #include      "scr05_c.inc"
 #include      "impl1_c.inc"
 #include      "remesh_c.inc"
-C-----------------------------------------------------------------
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IPARG(NPARG,*),IGEO(*),IRBE3(*),LRBE3(*)
@@ -3268,7 +3194,7 @@ C-----------------------------------------------
       INTEGER FR_ELEM(*),IAD_ELEM(2,*),SH4TREE(*),SH3TREE(*)
       INTEGER 
      .   IXS(NIXS,*),IXQ(NIXQ,*),IXC(NIXC,*), IXT(NIXT,*), IXP(NIXP,*),
-     .   IXR(NIXR,*), IXTG(NIXTG,*),IXUR(*),IXS10(6,*),IXS20(12,*),
+     .   IXR(NIXR,*), IXTG(NIXTG,*),IXS10(6,*),IXS20(12,*),
      .   IXS16(8,*),IXTG1(4,*),NDOF(*),NROW(*),NNMAX,NKINE,
      .   INLOC(*),NKMAX,NSS,NSIJ,NMIJ,NSS2,NSIJ2,NMIJ2,NSS3,
      .   IRBE2(*),LRBE2(*),NSB2
@@ -3292,7 +3218,7 @@ c-----2. prepare icol for secnd nodes using ikine;
      3    NDOF      ,NSI2      ,NSRB      ,NKINE     ,
      7    INLOC     ,IRBE3     ,IRBE2     ,LRBE2     ,LNK       ,
      8    INTBUF_TAB       )
-C----- pass for IND_GLOB_K, including RBE2 main	 
+C----- pass for IND_GLOB_K, including RBE2 main   
       LCOKM=LNK
       NKINE0=NKINE
       IF (NKINE0>0) THEN
@@ -3305,7 +3231,7 @@ C----- pass for IND_GLOB_K, including RBE2 main
       CALL DIM_ELEMS3(
      1    ELBUF     ,IPARG     ,IXS       ,IXQ       ,IXC       ,
      2    IXT       ,IXP       ,IXR       ,IXTG      ,IXTG1     ,
-     3    IXS10     ,IXS20     ,IXS16     ,IXUR      ,NROWI     ,
+     3    IXS10     ,IXS20     ,IXS16     ,NROWI     ,
      4    INLOC     ,NNMAX     ,ICOK      ,IGEO      ,ELBUF_TAB )
       IF (IMACH==3.AND.NSPMD>1) THEN
          CALL KIN_NRMAX(
@@ -3356,7 +3282,7 @@ C
          CALL DIM_ELEMS2(
      1    ELBUF     ,IPARG     ,IXS       ,IXQ       ,IXC       ,
      2    IXT       ,IXP       ,IXR       ,IXTG      ,IXTG1     ,
-     3    IXS10     ,IXS20     ,IXS16     ,IXUR      ,NROWI     ,
+     3    IXS10     ,IXS20     ,IXS16     ,NROWI     ,
      4    INLOC     ,NNMAX     ,ICOK(L2)  ,NKMAX     ,ICOK(L1)  ,
      5    LNK       ,IGEO      ,ELBUF_TAB )
 c
@@ -3414,7 +3340,7 @@ Chd|        MONV_PREM                     source/airbag/monv_imp0.F
 Chd|        NDOF_FV                       source/implicit/ind_glob_k.F  
 Chd|        SET_IKIN2G                    source/mpi/implicit/imp_fri.F 
 Chd|        SPMD_NDOF                     source/mpi/implicit/imp_spmd.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
 Chd|====================================================================
@@ -3423,7 +3349,7 @@ Chd|====================================================================
      2    IRBYAC    ,NINT2     ,IINT2     ,IPARI     ,
      3    IXS       ,IXQ       ,IXC       ,IXT       ,
      4    IXP       ,IXR       ,IXTG      ,IXTG1     ,IXS10     ,
-     5    IXS20     ,IXS16     ,IXUR      ,IPARG     ,NDOF      ,     
+     5    IXS20     ,IXS16     ,IPARG     ,NDOF      ,     
      6    IDDL      ,NDDL      ,NNZK      ,ELBUF     ,INLOC     ,
      7    LSIZE     ,FR_ELEM   ,IAD_ELEM  ,FR_I2M    ,IAD_I2M   ,
      8    NPRW      ,NMONV     ,IMONV     ,MONVOL    ,IGRSURF   ,
@@ -3437,14 +3363,10 @@ C-----------------------------------------------
       USE ELBUFDEF_MOD            
       USE INTBUFDEF_MOD
       USE GROUPDEF_MOD
-C----6---------------------------------------------------------------7---------8
+C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -3453,9 +3375,8 @@ C-----------------------------------------------
 #include      "param_c.inc"
 #include      "scr05_c.inc"
 #include      "impl1_c.inc"
-#include      "scr17_c.inc"
 #include      "task_c.inc" 
-C-----------------------------------------------------------------
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IPARG(NPARG,*),FR_ELEM(*)  ,IAD_ELEM(2,*)
@@ -3467,7 +3388,7 @@ C-----------------------------------------------
       INTEGER IPM(NPROPMI,*),IGEO(NPROPGI,*),IFRAME(LISKN,*)
       INTEGER 
      .   IXS(NIXS,*),IXQ(NIXQ,*),IXC(NIXC,*), IXT(NIXT,*), IXP(NIXP,*),
-     .   IXR(NIXR,*), IXTG(NIXTG,*),IXUR(*),IXS10(6,*),IXS20(12,*),
+     .   IXR(NIXR,*), IXTG(NIXTG,*),IXS10(6,*),IXS20(12,*),
      .   IXS16(8,*),IXTG1(4,*),IDDL(*),NDOF(*),IRBE3(*),LRBE3(*),
      .   NDDL ,NNZK,INLOC(*),LSIZE(*),SH4TREE(*), SH3TREE(*),
      .   IRBE2(*),LRBE2(*),IBFV(*)
@@ -3508,7 +3429,7 @@ c-----1. calcule NNMAX,NDOF;
       CALL DIM_ELEMS1(
      1    IGEO      ,ELBUF     ,IPARG     ,IXS       ,IXQ       ,
      2    IXC       ,IXT       ,IXP       ,IXR       ,IXTG      ,
-     3    IXTG1     ,IXS10     ,IXS20     ,IXS16     ,IXUR      ,
+     3    IXTG1     ,IXS10     ,IXS20     ,IXS16     ,
      4    NDOF      ,IDDL      ,ELBUF_TAB )
       CALL DIM_NDOF_II(
      1    NINT2     ,IINT2     ,IPARI     ,NDOF      ,
@@ -3548,7 +3469,7 @@ C
        CALL DIM_FR_K(
      1    ELBUF     ,IPARG     ,IXS       ,IXQ       ,IXC       ,
      2    IXT       ,IXP       ,IXR       ,IXTG      ,IXTG1     ,
-     3    IXS10     ,IXS20     ,IXS16     ,IXUR      ,NDOF      ,
+     3    IXS10     ,IXS20     ,IXS16     ,NDOF      ,
      4    NKINE0    ,INLOC     ,FR_ELEM   ,IAD_ELEM  ,NPP       ,
      5    IGEO      ,FR_M      ,IAD_M     ,ELBUF_TAB )
        DEALLOCATE(FR_M)
@@ -3556,7 +3477,7 @@ C
       CALL DIM_ELEMAX(
      1    IXS       ,IXQ       ,IXC       ,IXT       ,IXP       ,
      2    IXR       ,IXTG      ,IXTG1     ,IXS10     ,IXS20     ,
-     3    IXS16     ,IXUR      ,IPARG     ,ELBUF     ,NDOF      ,
+     3    IXS16     ,IPARG     ,ELBUF     ,NDOF      ,
      4    IDDL      ,INLOC     ,NNMAX     ,NKINE0    ,NNSIZ     ,
      5    IGEO      ,ELBUF_TAB )
       IF (IMACH==3.AND.NSPMD>1) THEN 
@@ -3568,7 +3489,7 @@ C
      2    IRBYAC    ,NINT2     ,IINT2     ,IPARI     ,
      3    INTBUF_TAB,IXS       ,IXQ       ,IXC       ,IXT       ,
      4    IXP       ,IXR       ,IXTG      ,IXTG1     ,IXS10     ,
-     5    IXS20     ,IXS16     ,IXUR      ,IPARG     ,NDOF      ,     
+     5    IXS20     ,IXS16     ,IPARG     ,NDOF      ,     
      6    NSI2      ,NSRB      ,ELBUF     ,NKINE     ,INLOC     ,
      7    IDDL      ,NNMAX     ,NKMAX     ,NSS       ,NSIJ      ,
      8    NMIJ      ,NSS2      ,NSIJ2     ,NMIJ2     ,FR_ELEM   ,
@@ -3708,17 +3629,11 @@ Chd|====================================================================
       SUBROUTINE SET_IND_K(
      1    IDDL      ,NDOF      ,IADK      ,JDIK      ,NDDL      ,     
      2    NNZK      ,NROW      ,ICOL      ,N         ,IKPAT     )
-C----6---------------------------------------------------------------7---------8
+C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER 
@@ -3787,7 +3702,7 @@ Chd|        REORDER_L                     source/implicit/ind_glob_k.F
 Chd|        SET_IND_K                     source/implicit/ind_glob_k.F  
 Chd|        SPC_FR_K                      source/mpi/implicit/imp_fri.F 
 Chd|        ZERO_IKIN2G                   source/mpi/implicit/imp_fri.F 
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE IND_GLOB_K(NPBY,LPBY,
@@ -3797,7 +3712,7 @@ Chd|====================================================================
      4    NSS2      ,ISS2      ,IPARG     ,ELBUF     ,ELBUF_TAB ,
      5    IXS       ,IXQ       ,IXC       ,IXT       ,IXP       ,
      6    IXR       ,IXTG      ,IXTG1     ,IXS10     ,IXS20     ,
-     7    IXS16     ,IXUR      ,IDDL      ,NDOF      ,IADK      ,     
+     7    IXS16     ,IDDL      ,NDOF      ,IADK      ,     
      8    JDIK      ,NDDL      ,NNZK      ,NNMAX     ,NKINE     ,
      9    INLOC     ,NKMAX     ,NROWK     ,ICOK      ,ICOKM     ,
      A    NMC2      ,IMIJ2     ,IRK       ,NPN       ,NPP       ,
@@ -3809,23 +3724,18 @@ C   M o d u l e s
 C-----------------------------------------------
       USE ELBUFDEF_MOD   
       USE INTBUFDEF_MOD
-C----6---------------------------------------------------------------7---------8
+C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "scr05_c.inc"
 #include      "impl1_c.inc"
-C-----------------------------------------------------------------
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IPARG(NPARG,*),NNMAX,IRK,NKMAX
@@ -3836,7 +3746,7 @@ C-----------------------------------------------
       INTEGER IPM(NPROPMI,*),IGEO(NPROPGI,*)
       INTEGER 
      .   IXS(NIXS,*),IXQ(NIXQ,*),IXC(NIXC,*), IXT(NIXT,*), IXP(NIXP,*),
-     .   IXR(NIXR,*), IXTG(NIXTG,*),IXUR(*),IXS10(6,*),IXS20(12,*),
+     .   IXR(NIXR,*), IXTG(NIXTG,*),IXS10(6,*),IXS20(12,*),
      .   IXS16(8,*),IXTG1(4,*),IDDL(*),NDOF(*),IADK(*),JDIK(*),
      .   NDDL ,NNZK,NKINE,INLOC(*),NMC2,IMIJ2(*),NPN ,NPP,
      .   FR_ELEM(*),IAD_ELEM(2,*),IRBE3(*),LRBE3(*),ISS3(*),
@@ -3896,7 +3806,7 @@ c        INK=NKINE-NRBYAC
          CALL DIM_ELEMS4(
      1    ELBUF     ,IPARG     ,IXS       ,IXQ       ,IXC       ,
      2    IXT       ,IXP       ,IXR       ,IXTG      ,IXTG1     ,
-     3    IXS10     ,IXS20     ,IXS16     ,IXUR      ,NROWK     ,
+     3    IXS10     ,IXS20     ,IXS16     ,NROWK     ,
      4    ILOC      ,NNMAX     ,ICOK      ,NKMAX     ,ICOKM     ,
      5    INK       ,IGEO      ,ELBUF_TAB )
          CALL KIN_NRMAX(
@@ -3921,7 +3831,7 @@ C
        CALL INI_FR_K(
      1    ELBUF     ,IPARG     ,IXS       ,IXQ       ,IXC       ,
      2    IXT       ,IXP       ,IXR       ,IXTG      ,IXTG1     ,
-     3    IXS10     ,IXS20     ,IXS16     ,IXUR      ,NDOF      ,
+     3    IXS10     ,IXS20     ,IXS16     ,NDOF      ,
      4    NNMAX     ,ILOC      ,FR_ELEM   ,IAD_ELEM  ,N_FR      ,
      5    IGEO      ,FR_M      ,IAD_M     ,ELBUF_TAB ,NRMAX     )
        DEALLOCATE(FR_M)
@@ -3942,7 +3852,7 @@ C
         CALL DIM_ELEMS3(
      1    ELBUF     ,IPARG     ,IXS       ,IXQ       ,IXC       ,
      2    IXT       ,IXP       ,IXR       ,IXTG      ,IXTG1     ,
-     3    IXS10     ,IXS20     ,IXS16     ,IXUR      ,NROW      ,
+     3    IXS10     ,IXS20     ,IXS16     ,NROW      ,
      4    ILOC      ,NNMAX     ,ICOL      ,IGEO      ,ELBUF_TAB )
         CALL IND_NRFR(
      1    NFT       ,JLT       ,NPN       ,NPP       ,NNMAX     ,     
@@ -4012,7 +3922,7 @@ C
        CALL IND_FR_K(
      1    ELBUF     ,IPARG     ,IXS       ,IXQ       ,IXC       ,
      2    IXT       ,IXP       ,IXR       ,IXTG      ,IXTG1     ,
-     3    IXS10     ,IXS20     ,IXS16     ,IXUR      ,NDOF      ,
+     3    IXS10     ,IXS20     ,IXS16     ,NDOF      ,
      4    NNMAX     ,ILOC      ,FR_ELEM   ,IAD_ELEM  ,N_FR      ,
      5    IGEO      ,ELBUF_TAB )
        IF(IAUTSPC>0) THEN
@@ -4045,7 +3955,7 @@ C
        CALL DIM_ELEMS3(
      1    ELBUF     ,IPARG     ,IXS       ,IXQ       ,IXC       ,
      2    IXT       ,IXP       ,IXR       ,IXTG      ,IXTG1     ,
-     3    IXS10     ,IXS20     ,IXS16     ,IXUR      ,NROW      ,
+     3    IXS10     ,IXS20     ,IXS16     ,NROW      ,
      4    ILOC      ,NNMAX     ,ICOL      ,IGEO      ,ELBUF_TAB )
        IF (IKPAT==0) THEN
         DO NK=1,JLT
@@ -4095,7 +4005,7 @@ C      INK=NKINE-NRBYAC
        CALL DIM_ELEMS4(
      1    ELBUF     ,IPARG     ,IXS       ,IXQ       ,IXC       ,
      2    IXT       ,IXP       ,IXR       ,IXTG      ,IXTG1     ,
-     3    IXS10     ,IXS20     ,IXS16     ,IXUR      ,NROWK     ,
+     3    IXS10     ,IXS20     ,IXS16     ,NROWK     ,
      4    ILOC      ,NNMAX     ,ICOK      ,NKMAX     ,ICOKM     ,
      5    INK       ,IGEO      ,ELBUF_TAB )
 C
@@ -4176,7 +4086,7 @@ C        INK=NKINE-NRBYAC
         CALL DIM_ELEMS4(
      1    ELBUF     ,IPARG     ,IXS       ,IXQ       ,IXC       ,
      2    IXT       ,IXP       ,IXR       ,IXTG      ,IXTG1     ,
-     3    IXS10     ,IXS20     ,IXS16     ,IXUR      ,NROWK     ,
+     3    IXS10     ,IXS20     ,IXS16     ,NROWK     ,
      4    ILOC      ,NNMAX     ,ICOK      ,NKMAX     ,ICOKM     ,
      5    INK       ,IGEO      ,ELBUF_TAB )
 C
@@ -4234,7 +4144,7 @@ C---main nodes of rbodies first----
         CALL DIM_ELEMS3(
      1    ELBUF     ,IPARG     ,IXS       ,IXQ       ,IXC       ,
      2    IXT       ,IXP       ,IXR       ,IXTG      ,IXTG1     ,
-     3    IXS10     ,IXS20     ,IXS16     ,IXUR      ,NROW      ,
+     3    IXS10     ,IXS20     ,IXS16     ,NROW      ,
      4    ILOC      ,NNMAX     ,ICOL      ,IGEO      ,ELBUF_TAB )
         DO NK=1,JLT
          N=NK+NFT
@@ -4570,7 +4480,7 @@ C----6---------------------------------------------------------------7---------8
 Chd|====================================================================
 Chd|  INTAB                         source/implicit/ind_glob_k.F  
 Chd|-- called by -----------
-Chd|        DEGENES8                      source/elements/solid/solide/sdlen3.F
+Chd|        DEGENES8                      source/elements/solid/solide/degenes8.F
 Chd|        DIM_FR_K                      source/mpi/implicit/imp_fri.F 
 Chd|        DIM_KINE_I                    source/implicit/ind_glob_k.F  
 Chd|        DIM_KINE_S                    source/implicit/ind_glob_k.F  
@@ -4632,18 +4542,11 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "scr05_c.inc"
 #include      "task_c.inc"
-#include      "units_c.inc"
-#include      "tabsiz_c.inc"
 #include      "impl1_c.inc"
 C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -4668,7 +4571,7 @@ C------interface --------------
        NIMP(NIN) = 0
 C----------deleted int NTY->0       
        IF (NTY ==0 ) CYCLE
-	   IF (NTY ==2 ) THEN
+             IF (NTY ==2 ) THEN
         ILEV   =IPARI(20,NIN)
         NOINT =IPARI(15,NIN)
         IF (ILEV>=10.AND.ILEV<=25) THEN
@@ -4681,8 +4584,8 @@ C----------deleted int NTY->0
        STOPT =INTBUF_TAB(NIN)%VARIABLES(11)
        IF(STARTT<TSTOP) 
      .   CALL ANCMSG(MSGID=232,ANMODE=ANINFO,I1=NTY )
-	   END IF
-C-----as int5 uses only ISPMD=0	; some values are not initialized w/ ISPMD/=0   
+             END IF
+C-----as int5 uses only ISPMD=0  ; some values are not initialized w/ ISPMD/=0   
        IF (ISPMD/=0.AND.(NTY<7.OR.NTY==8
      .                     .OR.NTY==14.OR.NTY==15)) CYCLE
        STARTT=INTBUF_TAB(NIN)%VARIABLES(3)
@@ -4753,13 +4656,8 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------------------------
@@ -4934,19 +4832,10 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com10_c.inc"
 #include      "param_c.inc"
-#include      "scr03_c.inc"
-#include      "scr17_c.inc"
-#include      "task_c.inc"
 #include      "impl1_c.inc"
 C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -5134,9 +5023,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
@@ -5182,12 +5068,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER JLT,NS_IMP(*),NE_IMP(*),IRECT(4,*),NSV(*),NROW(*),
@@ -5250,13 +5130,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com04_c.inc"
-C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NNMAX
@@ -5310,13 +5183,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com04_c.inc"
-C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NNMAX,NKMAX
@@ -5405,12 +5271,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER JLT,NS_IMP(*),NE_IMP(*),IRECT(4,*),NSV(*),NROW(*),
@@ -5469,13 +5329,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com04_c.inc"
-C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NNMAX
@@ -5527,13 +5380,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com04_c.inc"
-C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NNMAX,NKMAX
@@ -5620,13 +5466,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com04_c.inc"
-C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER JLT,NS_IMP(*),NE_IMP(*),IRECT(4,*),NSV(*),NROW(*),
@@ -5698,13 +5537,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com04_c.inc"
-C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NNMAX
@@ -5765,13 +5597,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com04_c.inc"
-C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NNMAX,NKMAX
@@ -5882,18 +5707,11 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com09_c.inc"
 #include      "param_c.inc"
-#include      "scr05_c.inc"
-C-----------------------------------------------------------------
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NNMAX,NKINE,N_IMPM
@@ -6057,17 +5875,17 @@ C-----RBE2------
            IF (INLOC(NJ)>0.AND.NJ/=NI) NROW1(NJ)=NROW1(NJ)+1+NHRBE2 
            LNSB2= LNSB2+1
           ENDDO
-	      IF (INLOC(M)==0) THEN
+                IF (INLOC(M)==0) THEN
            NKINE=NKINE+1
            INLOC(M)=NKINE
-	      ENDIF
+                ENDIF
           NROW1(M)=NROW1(M)+NROW(NI)+NROW1(NI)
           IF (IC>0) THEN
            NROW1(M)=NROW1(M)+1
            NROW1(NI)=NROW1(NI)+1
           END IF
          ENDIF
-C---------for the case with main node--------	 
+C---------for the case with main node--------   
          LNSB2= LNSB2+1
         ENDDO
         IF (INLOC(M)>0) NDOFI(M)=NDOF(M)
@@ -6206,10 +6024,10 @@ C------------case hierarchy w/ RBE3----
             CALL REORDER_A(NROW(NJ),ICOK(1,NKE2),M) 
            END IF
           ENDDO
-	      IF (IC>0) THEN
-	       CALL REORDER_A(NROW(M),ICOK(1,NKE1),NI)
+                IF (IC>0) THEN
+                 CALL REORDER_A(NROW(M),ICOK(1,NKE1),NI)
            CALL REORDER_A(NROW(NI),ICOK(1,NKE),M) 
-	      END IF
+                END IF
          ENDIF
         ENDDO
       ENDDO
@@ -6340,17 +6158,11 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "scr05_c.inc"
-C-----------------------------------------------------------------
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NNMAX,NKMAX,LRB       ,LI2
@@ -6477,10 +6289,10 @@ C-----RBE2------
              NSB2(ID)=NSB2(ID)+1
            END IF
           END DO
-	      IF (IC>0) THEN
-	       CALL REORDER_A(NROWK(NKE1),ICOK(1,NKE1),NI)
+                IF (IC>0) THEN
+                 CALL REORDER_A(NROWK(NKE1),ICOK(1,NKE1),NI)
            CALL REORDER_A(NROWK(NKE),ICOK(1,NKE),M) 
-	      END IF
+                END IF
          END IF
         END DO
        END IF
@@ -6533,15 +6345,15 @@ c---------RBE3-------------
              NKE1=INLOC(NM) 
              IF (NKE1<=INK) THEN
               CALL REORDER_A(NROWK(NKE1),ICOK(1,NKE1),NJ) 
-	         ELSE
+                   ELSE
               CALL REORDER_A(NROWK(NKE1),ICOKM(1,NKE1-INK),NJ) 
-	         ENDIF
-	     
+                   ENDIF
+               
              IF (NKE2<=INK) THEN
               CALL REORDER_A(NROWK(NKE2),ICOK(1,NKE2),NM) 
-	         ELSE
+                   ELSE
               CALL REORDER_A(NROWK(NKE2),ICOKM(1,NKE2-INK),NM) 
-	         ENDIF
+                   ENDIF
             ENDIF 
            ENDDO
           ENDIF 
@@ -6606,17 +6418,10 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER JLT,NS_IMP(*),NE_IMP(*),IRECTS(2,*),IRECTM(2,*),NROW(*),
      .        ILOC(*),NDOFI,N_IMPN,NSN,NSREM
-C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -6674,13 +6479,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com04_c.inc"
-C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NNMAX
@@ -6735,13 +6533,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com04_c.inc"
-C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NNMAX,NKMAX
@@ -6839,17 +6630,13 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
 #include      "scr05_c.inc" 
-C-----------------------------------------------------------------
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IPARI(NPARI,*),NUM_IMP(*),IND_IMP(*),
@@ -6960,12 +6747,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER JLT,NS_IMP(*),NE_IMP(*),IRECT(4,*),NSV(*),
@@ -7011,12 +6792,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER JLT,NS_IMP(*),NE_IMP(*),IRECTS(2,*),IRECTM(2,*),
@@ -7060,12 +6835,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER JLT,NS_IMP(*),NE_IMP(*),IRECT(4,*),NSV(*),
@@ -7107,11 +6876,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER  NDDL,IADK(*),JDIK(*),L_NZ
@@ -7119,7 +6883,7 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER  I,J,K,JD,ICOL(NDDL),NRI
-C----6---------------------------------------------------------------7---------8
+C-----------------------------------------------
       L_NZ = 0
       DO I = 1,NDDL
        NRI = IADK(I+1)-IADK(I)
@@ -7150,15 +6914,9 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER  NDDL,IADK(*),JDIK(*),IADM(*),JDIM(*),L_MAX
-C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -7248,12 +7006,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -7443,12 +7195,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com01_c.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER  NDDL,IADK(*),JDIK(*),IADM(*),JDIM(*),L_MAX,NN,NDF,NDMAX
@@ -7502,7 +7248,7 @@ C
        DO I = NDF+1,NDDL
         NRI = IADK(I+1)-IADK(I)
         CALL CP_INT(NRI,JDIK(IADK(I)),ICOL)
-	IF (ICRI(I)==1) THEN
+          IF (ICRI(I)==1) THEN
          NR0 = NRI
          DO J=IADK(I),IADK(I+1)-1
           JD = JDIK(J)
@@ -7511,7 +7257,7 @@ C
           ENDDO
          ENDDO
          IF (NRI>NR0) CALL REORDER_M(NRI,ICOL)
-	ENDIF 
+          ENDIF 
         DO J=1,NRI
          L_NZ = L_NZ + 1
          JDIM(L_NZ) = ICOL(J)
@@ -7533,7 +7279,7 @@ C
        DO I = NDF+1,NDDL
         NRI = IADK(I+1)-IADK(I)
         CALL CP_INT(NRI,JDIK(IADK(I)),ICOL)
-	IF (ICRI(I)==1) THEN
+          IF (ICRI(I)==1) THEN
          NR0 = NRI
          DO J=IADK(I),IADK(I+1)-1
           JD = JDIK(J)
@@ -7542,7 +7288,7 @@ C
           ENDDO
          ENDDO
          IF (NRI>NR0) CALL REORDER_M(NRI,ICOL)
-	ENDIF 
+          ENDIF 
         DO J=1,NRI
          L_NZ = L_NZ + 1
          JDIM(L_NZ) = ICOL(J)
@@ -7557,7 +7303,7 @@ C
         DO I = NDF+1,NDDL
          NRI = IADL(I+1)-IADL(I)
          CALL CP_INT(NRI,JDIL(IADL(I)),ICOL)
-	 IF (ICRI(I)==1) THEN
+           IF (ICRI(I)==1) THEN
           NR0 = NRI
           DO J=IADL(I),IADL(I+1)-1
            JD = JDIL(J)
@@ -7566,7 +7312,7 @@ C
            ENDDO
           ENDDO
           IF (NRI>NR0) CALL REORDER_M(NRI,ICOL)
-	 ENDIF 
+           ENDIF 
          DO J=1,NRI
            L_NZ = L_NZ + 1
            JDIM(L_NZ) = ICOL(J)
@@ -7581,7 +7327,7 @@ C
        DO I = 1,NDDL
         NRI = IADK(I+1)-IADK(I)
         CALL CP_INT(NRI,JDIK(IADK(I)),ICOL)
-	IF (ICRI(I)==1) THEN
+          IF (ICRI(I)==1) THEN
          NR0 = NRI
          DO J=IADK(I),IADK(I+1)-1
           JD = JDIK(J)
@@ -7590,7 +7336,7 @@ C
           ENDDO
          ENDDO
          IF (NRI>NR0) CALL REORDER_M(NRI,ICOL)
-	ENDIF 
+          ENDIF 
         DO J=1,NRI
          L_NZ = L_NZ + 1
          JDIM(L_NZ) = ICOL(J)
@@ -7637,7 +7383,7 @@ C
         DO I = NDF+1,NDDL
          NRI = IADL(I+1)-IADL(I)
          CALL CP_INT(NRI,JDIL(IADL(I)),ICOL)
-	 IF (ICRI(I)==1) THEN
+           IF (ICRI(I)==1) THEN
           NR0 = NRI
           DO J=IADL(I),IADL(I+1)-1
            JD = JDIL(J)
@@ -7646,7 +7392,7 @@ C
            ENDDO
           ENDDO
           IF (NRI>NR0) CALL REORDER_M(NRI,ICOL)
-	 ENDIF 
+           ENDIF 
          DO J=1,NRI
            L_NZ = L_NZ + 1
            JDIM(L_NZ) = ICOL(J)
@@ -7676,8 +7422,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -7723,8 +7467,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
@@ -7762,7 +7504,7 @@ C
        IFIX=0
        DO J=1,NDOF(M)
         IF (IKC(ID+J)==0) THEN
-	 IFIX=IFIX+1
+           IFIX=IFIX+1
          PRE_FPAT(IDM+IFIX) = 0
         ENDIF 
        ENDDO
@@ -7784,11 +7526,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -7846,12 +7583,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -7961,12 +7692,9 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include "impl1_c.inc"
-#include "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -8135,7 +7863,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
 #include      "param_c.inc"
@@ -8215,17 +7942,9 @@ Chd|-- calls ---------------
 Chd|====================================================================
       SUBROUTINE I24MSEGV(IE    ,IRTLMV  ,SUBTRIA,IRTLM ,NVOISIN)
 C-----------------------------------------------
-C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

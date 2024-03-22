@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -50,7 +50,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 #include      "assert.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
@@ -61,16 +60,10 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr18_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
 #include      "task_c.inc"
-#include      "parit_c.inc"
-#include      "timeri_c.inc"
-#include      "warn_c.inc"
-#include      "spmd_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -135,7 +128,7 @@ C
           ADDR(P) = ADD
           SIZ = 0
           IF(P/=LOC_PROC)THEN
-Cel test en plus pour savoir si com globale necessaire entre les 2 procs
+C   test en plus pour savoir si com globale necessaire entre les 2 procs
             DO II = 1, NBINTC
               NIN = INTLIST(II)
               NB = NSNSI(NIN)%P(P)
@@ -167,7 +160,7 @@ C
           ADDS(P) = ADD
           SIZ = 0
           IF(P/=LOC_PROC)THEN
-Cel test en plus pour savoir si com globale necessaire entre les 2 procs
+C   test en plus pour savoir si com globale necessaire entre les 2 procs
             DO II = 1, NBINTC
               NIN = INTLIST(II)
               IDEB = DEBUT(NIN)
@@ -181,7 +174,7 @@ Cel test en plus pour savoir si com globale necessaire entre les 2 procs
                 L = L + 1
                 DO N = 1, NB
                   IF(NSVFI(NIN)%P(IDEB+N)<0)THEN
-C noeud generant une force
+C node generating force
                     BBUFS(L+1) = -NSVFI(NIN)%P(IDEB+N)
                     BBUFS(L+2) = FNCONTI(NIN)%P(1,IDEB+N)
                     BBUFS(L+3) = FNCONTI(NIN)%P(2,IDEB+N)
@@ -208,6 +201,29 @@ C noeud generant une force
                     FTCONTI(NIN)%P(1,IDEB+N) = ZERO
                     FTCONTI(NIN)%P(2,IDEB+N) = ZERO
                     FTCONTI(NIN)%P(3,IDEB+N) = ZERO  
+                    L = L + LEN
+                  ELSEIF(INTERFRIC > 0.OR.N_SCAL_CSE_EFRIC>0) THEN
+C node not generating force but energy is cumulated
+                    BBUFS(L+1) = NSVFI(NIN)%P(IDEB+N)
+                    BBUFS(L+2) = ZERO
+                    BBUFS(L+3) = ZERO
+                    BBUFS(L+4) = ZERO
+                    BBUFS(L+5) = ZERO
+                    BBUFS(L+6) = ZERO
+                    BBUFS(L+7) = ZERO
+                    LF = 7
+                    IF(INTERFRIC>0) THEN
+                        BBUFS(L+LF+1) = EFRICFI(NIN)%P(IDEB+N)
+                        EFRICFI(NIN)%P(IDEB+N) = ZERO
+                        LF=LF+1
+                    ELSEIF(NINEFRIC>0) THEN
+                        BBUFS(L+LF+1) = ZERO
+                        LF=LF+1
+                    ENDIF
+                    IF(N_SCAL_CSE_EFRIC>0) THEN
+                        BBUFS(L+LF+1) = EFRICGFI(NIN)%P(IDEB+N)
+                        EFRICGFI(NIN)%P(IDEB+N) = ZERO
+                    ENDIF
                     L = L + LEN
                   ENDIF
                 ENDDO

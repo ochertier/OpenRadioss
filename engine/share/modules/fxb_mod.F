@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,6 +25,7 @@ Chd|  FXB_MOD                       share/modules/fxb_mod.F
 Chd|-- called by -----------
 Chd|        FXBRESB                       source/output/restart/rdresb.F
 Chd|        FXBWREST                      source/output/restart/wrrest.F
+Chd|        LECTUR                        source/input/lectur.F         
 Chd|        RESOL_HEAD                    source/engine/resol_head.F    
 Chd|        RESTALLOC                     source/output/restart/arralloc.F
 Chd|-- calls ---------------

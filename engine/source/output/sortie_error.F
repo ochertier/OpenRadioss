@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -32,9 +32,6 @@ Chd|====================================================================
      1                        MS0,PARAM,PARTSAV,IPART,PM,
      2                        IGEO)
 C-----------------------------------------------
-C   M o d u l e s
-C-----------------------------------------------
-C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
@@ -45,8 +42,6 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "scr05_c.inc"
-#include      "scr14_c.inc"
 #include      "scr17_c.inc"
 #include      "scr18_c.inc"
 #include      "spmd_c.inc"
@@ -315,6 +310,7 @@ C
           CALL SPMD_VGATH_ERR(V,MS,MS0,NODGLOB,WEIGHT,PARAM,4,ITAB,LENG) 
         ENDIF
       ENDIF
+      IF(ISPMD == 0) CALL FLUSH(IOUT)
       
  1600 FORMAT('***  NODES WITH HIGHEST MASS CHANGE')
  1601 FORMAT('      NODE       MASS      MASS0   DM/MASS0')

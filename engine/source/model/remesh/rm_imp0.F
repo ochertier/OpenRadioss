@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -80,11 +80,11 @@ C
           M(2)=IXC(4,SON+1)
           M(3)=IXC(5,SON+2)
           M(4)=IXC(2,SON+3)
-	  DO J = 1 , 4
-	   MN = M(J)
+            DO J = 1 , 4
+             MN = M(J)
            IF(TAGNOD(MN)==0.AND.NDOF(MN)>0) NSH_KIN= NSH_KIN + 1
            TAGNOD(MN)=1
-	  END DO 
+            END DO 
         END DO
 
         DO NN=PSH3KIN(LEVEL)+1,PSH3KIN(LEVEL+1)
@@ -95,11 +95,11 @@ C
           M(1)=IXTG(4,SON+3)
           M(2)=IXTG(2,SON+3)
           M(3)=IXTG(3,SON+3)
-	  DO J = 1 , 3
-	   MN = M(J)
+            DO J = 1 , 3
+             MN = M(J)
            IF(TAGNOD(MN)==0.AND.NDOF(MN)>0) NSH_KIN= NSH_KIN + 1
            TAGNOD(MN)=1
-	  END DO 
+            END DO 
         END DO
 
       END DO
@@ -117,10 +117,10 @@ C
 
           SON=SH4TREE(2,N)
 
-	  DO J = 1 , 4
-	   NI(J) = IXC(J+1,N)
-	  END DO 
-	  NI(5) = NI(1)
+            DO J = 1 , 4
+             NI(J) = IXC(J+1,N)
+            END DO 
+            NI(5) = NI(1)
 C
           MC=IXC(4,SON)
 
@@ -130,16 +130,16 @@ C
           M(2)=IXC(4,SON+1)
           M(3)=IXC(5,SON+2)
           M(4)=IXC(2,SON+3)
-	  DO J = 1 , 4
-	   MN = M(J)
+            DO J = 1 , 4
+             MN = M(J)
            IF(TAGNOD(MN)==0.AND.NDOF(MN)>0) THEN
-	    NS= NS + 1
-	    ISH_NS(NS) = MN
-	    ISH_MS(1,NS) = NI(J)
-	    ISH_MS(2,NS) = NI(J+1)
+              NS= NS + 1
+              ISH_NS(NS) = MN
+              ISH_MS(1,NS) = NI(J)
+              ISH_MS(2,NS) = NI(J+1)
            END IF
            TAGNOD(MN)=1
-	  END DO 
+            END DO 
         END DO
 
 
@@ -148,24 +148,24 @@ C
 
           SON=SH3TREE(2,N)
 
-	  DO J = 1 , 3
-	   NI(J) = IXTG(J+1,N)
-	  END DO 
-	  NI(4) = NI(1)
+            DO J = 1 , 3
+             NI(J) = IXTG(J+1,N)
+            END DO 
+            NI(4) = NI(1)
 C
           M(1)=IXTG(4,SON+3)
           M(2)=IXTG(2,SON+3)
           M(3)=IXTG(3,SON+3)
-	  DO J = 1 , 3
-	   MN = M(J)
+            DO J = 1 , 3
+             MN = M(J)
            IF(TAGNOD(MN)==0.AND.NDOF(MN)>0) THEN
-	    NS= NS + 1
-	    ISH_NS(NS) = MN
-	    ISH_MS(1,NS) = NI(J)
-	    ISH_MS(2,NS) = NI(J+1)
+              NS= NS + 1
+              ISH_NS(NS) = MN
+              ISH_MS(1,NS) = NI(J)
+              ISH_MS(2,NS) = NI(J+1)
            END IF
            TAGNOD(MN)=1
-	  END DO 
+            END DO 
         END DO
 
       END DO
@@ -183,11 +183,11 @@ C
 C-------i,j<->j,i
       DO NN=1,NSH4ACT
         N    =LSH4ACT(NN)
-	 IS = 0
+           IS = 0
          DO J=1,4
           M(J)=IXC(J+1,N)
           MN = TAGNOD(M(J))
-	  IF (MN>0.AND.MN<=NKS) IS = MN 
+            IF (MN>0.AND.MN<=NKS) IS = MN 
          ENDDO 
          IF (IS > 0) THEN
           DO J=1,4
@@ -201,11 +201,11 @@ C-------i,j<->j,i
       END DO 
       DO NN=1,NSH3ACT
         N    =LSH3ACT(NN)
-	 IS = 0
+           IS = 0
          DO J=1,3
           M(J)=IXTG(J+1,N)
           MN = TAGNOD(M(J))
-	  IF (MN>0.AND.MN<=NKS) IS = MN 
+            IF (MN>0.AND.MN<=NKS) IS = MN 
          ENDDO 
          IF (IS > 0) THEN
           DO J=1,3
@@ -265,8 +265,8 @@ C-----------------new connectivity due to kin-----
        MK1 = TAGNOD(M1)
        MK2 = TAGNOD(M2)
        DO J=1,NROWK(K)
-	NN = ICOK(J,K)
-	MN = TAGNOD(NN)
+          NN = ICOK(J,K)
+          MN = TAGNOD(NN)
         IF (NN/=M1) THEN
          CALL REORDER_A(NROWK(MK1),ICOK(1,MK1),NN) 
          CALL REORDER_A(NROWK(MN),ICOK(1,MN),M1) 
@@ -288,8 +288,8 @@ C
        END IF
        NROW(NS)=MAX(NROW(NS),NROWK(K))
        DO J=1,NROWK(K)
-	NN = ICOK(J,K)
-	MN = TAGNOD(NN)
+          NN = ICOK(J,K)
+          MN = TAGNOD(NN)
         NNMAX=MAX(NNMAX,NROWK(MN))
         IF (INLOC(NN)==0) THEN
          NKINE=NKINE+1
@@ -336,20 +336,10 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "param_c.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NNMAX
       INTEGER INLOC(*),NROWK(*),ICOK(NNMAX,*)
-C-----------------------------------------------
-C   External function
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -397,12 +387,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -456,10 +440,6 @@ C-----------------------------------------------
 C     REAL
       my_real
      .   DIAG_K(*),LT_K(*),B(*)
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com01_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -553,9 +533,6 @@ C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "param_c.inc"
 #include      "remesh_c.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

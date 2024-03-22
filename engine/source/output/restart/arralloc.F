@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -31,10 +31,12 @@ Chd|        ARRET                         source/system/arret.F
 Chd|        MULTI_ALLOCATE                source/multifluid/multi_allocate.F
 Chd|        SZ_PRINT                      source/output/restart/arralloc.F
 Chd|        ALEANIM_MOD                   share/modules/aleanim_mod.F   
-Chd|        ALEFVM_MOD                    ../common_source/modules/alefvm_mod.F
-Chd|        ALEMUSCL_MOD                  ../common_source/modules/alemuscl_mod.F
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
+Chd|        ALEFVM_MOD                    ../common_source/modules/ale/alefvm_mod.F
+Chd|        ALEMUSCL_MOD                  ../common_source/modules/ale/alemuscl_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
+Chd|        ALE_MOD                       ../common_source/modules/ale/ale_mod.F
 Chd|        CLUSTER_MOD                   share/modules/cluster_mod.F   
+Chd|        DAMP_MOD                      share/modules/damp_mod.F      
 Chd|        DRAPE_MOD                     share/modules/drape_mod.F     
 Chd|        ECND_MOD                      share/modules/ecdn_mod.F      
 Chd|        EIG_MOD                       share/modules/eig_mod.F       
@@ -45,8 +47,9 @@ Chd|        INTBUFFRIC_MOD                share/modules/restart_mod.F
 Chd|        INTBUFMOD                     share/modules/restart_mod.F   
 Chd|        INTBUF_MOD                    share/modules/restart_mod.F   
 Chd|        INTSTAMP_GLOB_MOD             share/modules/intstamp_glob_mod.F
+Chd|        LOADS_MOD                     ../common_source/modules/loads/loads_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|        OUTMAX_MOD                    ../common_source/modules/outmax_mod.F
 Chd|        OUTPUTS_MOD                   ../common_source/modules/outputs_mod.F
 Chd|        PINCHTYPE_MOD                 ../common_source/modules/pinchtype_mod.F
@@ -58,7 +61,7 @@ Chd|        SPH_MOD                       share/modules/sph_mod.F
 Chd|        STACK_MOD                     share/modules/stack_mod.F     
 Chd|        TRIMAT_MOD                    share/modules/trimat.F        
 Chd|====================================================================
-      SUBROUTINE RESTALLOC(MULTI_FVM,H3D_DATA,PINCH_DATA,ALE_CONNECTIVITY,SEGVAR)
+      SUBROUTINE RESTALLOC(MULTI_FVM,H3D_DATA,PINCH_DATA,ALE_CONNECTIVITY,SEGVAR,LOADS)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -89,6 +92,9 @@ C-----------------------------------------------
       USE SEGVAR_MOD 
       USE OUTMAX_MOD
       USE OUTPUTS_MOD
+      USE ALE_MOD
+      USE LOADS_MOD
+      USE DAMP_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -96,8 +102,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "my_allocate.inc"
-#include      "r4r8_p.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com_xfem1.inc"
@@ -109,7 +113,6 @@ C-----------------------------------------------
 #include      "scr16_c.inc"
 #include      "sms_c.inc"
 #include      "tabsiz_c.inc"
-#include      "units_c.inc"
 #include      "task_c.inc"
 #include      "couple_c.inc"
 #include      "warn_c.inc"
@@ -117,26 +120,22 @@ C-----------------------------------------------
 #include      "intstamp_c.inc"
 #include      "spmd_c.inc"
 #include      "sphcom.inc"
-#include      "alefvm.inc"
-#include      "drape_c.inc"
 #include      "thermal_c.inc"
-#include      "alemuscl.inc"
-#include      "ale_param.inc"
 #include      "fxbcom.inc"
 #include      "eigcom.inc"
 #include      "inter18.inc"
 #include      "stati_c.inc"
-#include      "com09_c.inc"
 C-----------------------------------------------
       TYPE(MULTI_FVM_STRUCT) :: MULTI_FVM
       TYPE(H3D_DATABASE) :: H3D_DATA
       TYPE(PINCH) :: PINCH_DATA
       TYPE(t_ale_connectivity), INTENT(INOUT) :: ALE_CONNECTIVITY
       TYPE(t_SEGVAR) :: SEGVAR
+      TYPE (LOADS_),INTENT(IN) :: LOADS
 C----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER IERR0,IERROR, NBMAT,I,NPT
+      INTEGER IERR0,IERROR, NBMAT,I,NPT,ISIZ1,ISIZ2
 C-----------------------------------------------
       IERROR = 0
 C pour eviter conflit avec IERR dans commun
@@ -149,10 +148,6 @@ C
         ALLOCATE (ICODE(SICODE),STAT=IERR)
         IF (IERR/=0) GOTO 1000
         ICODE = 0
-
-        ALLOCATE (LSHSUB(SLSHSUB),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        LSHSUB = 0
 
         ALLOCATE (ISKEW(SISKEW),STAT=IERR)
         IF (IERR/=0) GOTO 1000
@@ -185,10 +180,6 @@ C
         ALLOCATE (NPC(SNPC),STAT=IERR)
         IF (IERR/=0) GOTO 1000
         NPC = 0
-
-        ALLOCATE (IXUR(SIXUR),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        IXUR = 0  
 
         ALLOCATE (IXTG(SIXTG),STAT=IERR)
         IF (IERR/=0) GOTO 1000
@@ -234,15 +225,15 @@ C
         IF (IERR/=0) GOTO 1000
         GJBUFI = 0
 
-        ALLOCATE (ALE_CONNECTIVITY%NALE(SNALE),STAT=IERR)
+        ALLOCATE (ALE_CONNECTIVITY%NALE(ALE%GLOBAL%SNALE),STAT=IERR)
         IF (IERR/=0) GOTO 1000
-        ALE_CONNECTIVITY%NALE(1:SNALE) = 0  
+        ALE_CONNECTIVITY%NALE(1:ALE%GLOBAL%SNALE) = 0  
 
-        ALLOCATE (ID_GLOBAL_VOIS(SIELVS),STAT=IERR)
+        ALLOCATE (ID_GLOBAL_VOIS(ALE%GLOBAL%SIELVS),STAT=IERR)
         IF (IERR/=0) GOTO 1000
         ID_GLOBAL_VOIS = 0 
 
-        ALLOCATE (FACE_VOIS(SIELVS),STAT=IERR)
+        ALLOCATE (FACE_VOIS(ALE%GLOBAL%SIELVS),STAT=IERR)
         IF (IERR/=0) GOTO 1000
         FACE_VOIS = 0 
 
@@ -325,10 +316,6 @@ C
         ALLOCATE (LNLINK(SLNLINK),STAT=IERR)
         IF (IERR/=0) GOTO 1000
         LNLINK = 0  
-
-        ALLOCATE (IUSER(SIUSER),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        IUSER = 0  
 
         ALLOCATE (IPARG(SIPARG),STAT=IERR)
         IF (IERR/=0) GOTO 1000
@@ -502,89 +489,9 @@ c        IF (IERR/=0) GOTO 1000
         IF (IERR/=0) GOTO 1000
         LAGBUF = 0
 
-        ALLOCATE (ITHGRP(SITHGRP),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        ITHGRP = 0
-
-        ALLOCATE (ITHBUF(SITHBUF),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        ITHBUF = 0
-
         ALLOCATE (RTHBUF(SRTHBUF),STAT=IERR)
         IF (IERR/=0) GOTO 1000
         RTHBUF = ZERO
-
-        ALLOCATE (ITHGRPA(SITHGRPA),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        ITHGRPA = 0 
-
-        ALLOCATE (ITHBUFA(SITHBUFA),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        ITHBUFA = 0 
-
-        ALLOCATE (ITHGRPB(SITHGRPB),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        ITHGRPB = 0 
-
-        ALLOCATE (ITHBUFB(SITHBUFB),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        ITHBUFB = 0 
-
-        ALLOCATE (ITHGRPC(SITHGRPC),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        ITHGRPC = 0 
-
-        ALLOCATE (ITHBUFC(SITHBUFC),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        ITHBUFC = 0 
-
-        ALLOCATE (ITHGRPD(SITHGRPD),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        ITHGRPD = 0 
-
-        ALLOCATE (ITHBUFD(SITHBUFD),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        ITHBUFD = 0 
-
-        ALLOCATE (ITHGRPE(SITHGRPE),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        ITHGRPE = 0 
-
-        ALLOCATE (ITHBUFE(SITHBUFE),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        ITHBUFE = 0 
-
-        ALLOCATE (ITHGRPF(SITHGRPF),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        ITHGRPF = 0 
-
-        ALLOCATE (ITHBUFF(SITHBUFF),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        ITHBUFF = 0 
-
-        ALLOCATE (ITHGRPG(SITHGRPG),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        ITHGRPG = 0 
-
-        ALLOCATE (ITHBUFG(SITHBUFG),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        ITHBUFG = 0 
-
-        ALLOCATE (ITHGRPH(SITHGRPH),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        ITHGRPH = 0 
-
-        ALLOCATE (ITHBUFH(SITHBUFH),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        ITHBUFH = 0 
-
-        ALLOCATE (ITHGRPI(SITHGRPI),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        ITHGRPI = 0 
-
-        ALLOCATE (ITHBUFI(SITHBUFI),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        ITHBUFI = 0 
 
         ALLOCATE (IAD_ELEM(SIAD_ELEM),STAT=IERR)
         IF (IERR/=0) GOTO 1000
@@ -991,10 +898,6 @@ C
         IF (IERR/=0) GOTO 1000
         IPART_STATE = 0 
 
-        ALLOCATE (IPART_DYNAIN(NPART),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        IPART_DYNAIN = 0 
-
         ALLOCATE (ICONTACT(SICONTACT),STAT=IERR)
         IF (IERR/=0) GOTO 1000
         ICONTACT = 0  
@@ -1029,11 +932,6 @@ C
         ALLOCATE (LCFIELD(SLCFIELD),STAT=IERR)
         IF (IERR/=0) GOTO 1000
         LCFIELD = 0
-  
-        IF(IUSERWI /= 0)THEN
-          ALLOCATE(IADUSERW(NSPMD+1))
-          ALLOCATE(FR_USERWI(SFR_USERWI))
-        ENDIf
 
         ALLOCATE (ILOADP(SIZLOADP*NLOADP),STAT=IERR)
         IF (IERR/=0) GOTO 1000
@@ -1089,6 +987,7 @@ C
         ALLOCATE (LBCSCYC(SLBCSCYC),STAT=IERR)
         IF (IERR/=0) GOTO 1000
         LBCSCYC = 0  
+
 C   -----------------------------------------------
 C             allocations flottantes
 C   -----------------------------------------------
@@ -1205,29 +1104,9 @@ C   -----------------------------------------------
         IF (IERR/=0) GOTO 1000
         DSAVE = 0 
 
-        ALLOCATE (DRSAVE(SDRSAVE),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        DRSAVE = 0
-
         ALLOCATE (ASAVE(SASAVE),STAT=IERR)
         IF (IERR/=0) GOTO 1000
         ASAVE = 0 
-
-        ALLOCATE (ARSAVE(SARSAVE),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        ARSAVE = 0
-
-        ALLOCATE (STSAVE(SSTSAVE),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        STSAVE = 0
-
-        ALLOCATE (STRSAVE(SSTRSAVE),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        STRSAVE = 0 
-
-        ALLOCATE (FSAVSAV(SFSAVSAV),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        FSAVSAV = 0 
 
         ALLOCATE (SPBUF(SSPBUF),STAT=IERR)
         IF (IERR/=0) GOTO 1000
@@ -1257,14 +1136,6 @@ C
         ALLOCATE (FSAV(SFSAV),STAT=IERR)
         IF (IERR/=0) GOTO 1000
         FSAV = 0 
-
-        ALLOCATE (FBSAV6(12,6,SFSAV6),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        FBSAV6 = 0
-
-        ALLOCATE (TABSENSOR(STABSEN),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        TABSENSOR = 0
 
         ALLOCATE (TAB_UMP(7,TAILLE),STAT=IERR)
         IF (IERR/=0) GOTO 1000
@@ -1327,10 +1198,6 @@ C
         ALLOCATE (PARTS0(SPARTS0),STAT=IERR)
         IF (IERR/=0) GOTO 1000
         PARTS0 = 0  
-
-        ALLOCATE (USER(SUSER),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        USER = 0    
 
         ALLOCATE (ELBUF(SELBUF),STAT=IERR)
         IF (IERR/=0) GOTO 1000
@@ -1468,10 +1335,35 @@ C
         IF (IERR/=0) GOTO 1000
         FANI = 0  
 
-        ALLOCATE (FANI_CELL(SFANI_CELL),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        FANI_CELL = 0 
-        
+        ISIZ1=2
+        ISIZ2=NUMELQ+NUMELTG
+        IF(N2D == 0)THEN
+          ISIZ1=3
+          ISIZ2=NUMELS
+        ENDIF
+        !
+        IF(FANI_CELL%IS_VORT_X_REQUESTED)THEN
+          ALLOCATE (FANI_CELL%VORT_X(ISIZ2),STAT=IERR)
+          IF (IERR/=0) GOTO 1000
+          FANI_CELL%VORT_X(:) = ZERO
+        ENDIF
+        IF(FANI_CELL%IS_VORT_Y_REQUESTED)THEN
+          ALLOCATE (FANI_CELL%VORT_Y(ISIZ2),STAT=IERR)
+          IF (IERR/=0) GOTO 1000
+          FANI_CELL%VORT_Y(:) = ZERO
+        ENDIF
+        IF(FANI_CELL%IS_VORT_Z_REQUESTED)THEN
+          ALLOCATE (FANI_CELL%VORT_Z(ISIZ2),STAT=IERR)
+          IF (IERR/=0) GOTO 1000
+          FANI_CELL%VORT_Z(:) = ZERO
+        ENDIF
+        !
+        IF(FANI_CELL%IS_F18_FVM_REQUESTED)THEN
+          ALLOCATE (FANI_CELL%F18(ISIZ1,ISIZ2),STAT=IERR)
+          IF (IERR/=0) GOTO 1000
+          FANI_CELL%F18(:,:) = ZERO
+        ENDIF
+
         ALLOCATE (XCUT(SXCUT),STAT=IERR)
         IF (IERR/=0) GOTO 1000
         XCUT = 0  
@@ -1845,6 +1737,7 @@ C
             ALLOCATE(FTCONT2_MAX(0),STAT=IERR)
          END IF
 C
+C
          IF(H3D_DATA%N_VECT_CONT2_MIN >0.OR.IFCONT2MIN > 0)THEN
             ALLOCATE(FCONT2_MIN(3*NUMNOD),STAT=IERR)
             IF (IERR/=0) GOTO 1000
@@ -1862,31 +1755,42 @@ C
             ALLOCATE(FNCONT2_MIN(0),STAT=IERR)
             ALLOCATE(FTCONT2_MIN(0),STAT=IERR)
          END IF
+C
+         IF(H3D_DATA%N_VECT_CONT2M > 0)THEN
+            ALLOCATE(MCONT2(3,NUMNOD),STAT=IERR)
+            IF (IERR/=0) GOTO 1000
+            MCONT2=ZERO
+            MCONT2=ZERO
+         ELSE
+            ALLOCATE(MCONT2(3,0),STAT=IERR)
+            ALLOCATE(MCONT2(3,0),STAT=IERR)
+         END IF
+C        
 C----Frictional energy output  when it is coming from restart
 C
          IF(S_EFRICINT > 0)THEN
            IF(NINEFRIC > 0) THEN 
-            MY_ALLOCATE2D(EFRIC,NINEFRIC,NUMNOD)
+            ALLOCATE(EFRIC(NINEFRIC,NUMNOD))
            ELSE 
-            MY_ALLOCATE2D(EFRIC,0,0)
+            ALLOCATE(EFRIC(0,0))
            ENDIF
            IF(NINEFRIC_STAMP > 0) THEN
-              MY_ALLOCATE2D(EFRIC_STAMP,NINEFRIC_STAMP,NUMNODG)
+             ALLOCATE(EFRIC_STAMP(NINEFRIC_STAMP,NUMNODG))
            ELSE
-            MY_ALLOCATE2D(EFRIC_STAMP,0,0)
+             ALLOCATE(EFRIC_STAMP(0,0))
            ENDIF
          END IF 
 C
          IF(H3D_DATA%N_SCAL_CSE_FRIC >0.OR.S_EFRIC > 0)THEN
-            MY_ALLOCATE(EFRICG,NUMNOD)
+            ALLOCATE(EFRICG(NUMNOD))
             IF(NINTSTAMP/=0) THEN
-              MY_ALLOCATE(EFRICG_STAMP,NUMNODG)
+              ALLOCATE(EFRICG_STAMP(NUMNODG))
             ELSE
-              MY_ALLOCATE(EFRICG_STAMP,0)
+              ALLOCATE(EFRICG_STAMP(0))
             ENDIF
          ELSE
-            MY_ALLOCATE(EFRICG,0)
-            MY_ALLOCATE(EFRICG_STAMP,0)
+            ALLOCATE(EFRICG(0))
+            ALLOCATE(EFRICG_STAMP(0))
          ENDIF
 C
          IF(NINTSTAMP/=0.AND.(ANIM_V(12)+OUTP_V(12)+H3D_DATA%N_VECT_PCONT>0.OR.
@@ -2078,31 +1982,31 @@ C
           ALLOCATE (ENRTAG(1))
         END IF
         
-        IF(IALEFVM == 1)THEN
+        IF(ALEFVM_Param%IEnabled == 1)THEN
 C        
-          ALLOCATE (WFEXT_CELL(NUMELS)  ,STAT=IERR)
+          ALLOCATE (ALEFVM_Buffer%WFEXT_CELL(NUMELS)   ,STAT=IERR)
           IF (IERR /= 0) GOTO 1000
-          WFEXT_CELL(:) = ZERO
+          ALEFVM_Buffer%WFEXT_CELL(:) = ZERO
+C       
+          ALLOCATE (ALEFVM_Buffer%FEXT_CELL(3,NUMELS)  ,STAT=IERR)
+          IF (IERR /= 0) GOTO 1000
+          ALEFVM_Buffer%FEXT_CELL(:,:) = ZERO
 C        
-          ALLOCATE (FEXT_CELL(3,NUMELS)   ,STAT=IERR)
+          ALLOCATE (ALEFVM_Buffer%FCELL(6,NUMELS)      ,STAT=IERR)
           IF (IERR /= 0) GOTO 1000
-          FEXT_CELL(:,:) = ZERO
-C        
-          ALLOCATE (FCELL(6,NUMELS)       ,STAT=IERR)
-          IF (IERR /= 0) GOTO 1000
-          FCELL(:,:) = ZERO    
+          ALEFVM_Buffer%FCELL(:,:) = ZERO    
 C   
-          ALLOCATE (FINT_CELL(3,NUMELS)       ,STAT=IERR)
+          ALLOCATE (ALEFVM_Buffer%FINT_CELL(3,NUMELS)  ,STAT=IERR)
           IF (IERR /= 0) GOTO 1000
-          FCELL(:,:) = ZERO    
+          ALEFVM_Buffer%FCELL(:,:) = ZERO    
 C     
-          ALLOCATE (VERTEX(4,NUMNOD)      ,STAT=IERR)
+          ALLOCATE (ALEFVM_Buffer%VERTEX(4,NUMNOD)     ,STAT=IERR)
           IF (IERR /= 0) GOTO 1000
-          VERTEX(:,:) = ZERO
+          ALEFVM_Buffer%VERTEX(:,:) = ZERO
 C      
-          ALLOCATE (F_FACE(1:3,6,NUMELS)    ,STAT=IERR)
+          ALLOCATE (ALEFVM_Buffer%F_FACE(1:3,6,NUMELS) ,STAT=IERR)
           IF (IERR /= 0) GOTO 1000
-          F_FACE(:,:,:) = ZERO
+          ALEFVM_Buffer%F_FACE(:,:,:) = ZERO
           
           !          index 2:    1                       2                       3                       4                       5                       6     
           ! index 1 
@@ -2115,39 +2019,39 @@ C
 C          
         ENDIF
 
-        IF (IALEMUSCL > 0 .AND. .NOT. MULTI_FVM%IS_USED) THEN
-           IF (I_LAW == 51) THEN
+        IF (ALEMUSCL_Param%IALEMUSCL > 0 .AND. .NOT. MULTI_FVM%IS_USED) THEN
+           IF (ALEMUSCL_Param%I_LAW == 51) THEN
               NBMAT = TRIMAT
-           ELSEIF (I_LAW == 37) THEN
+           ELSEIF (ALEMUSCL_Param%I_LAW == 37) THEN
               NBMAT = 1
            ELSE
               NBMAT = 0
            ENDIF
            IF(NBMAT>0)THEN
-             ALLOCATE(VOLUME_FRACTION(NUMELS + NSVOIS + NUMELQ + NQVOIS,NBMAT), STAT = IERR)
+             ALLOCATE(ALEMUSCL_Buffer%VOLUME_FRACTION(NUMELS + NSVOIS + NUMELQ + NQVOIS,NBMAT), STAT = IERR)
              IF (IERR /= 0) GOTO 1000
-             VOLUME_FRACTION(:, :) = ZERO
-             ALLOCATE(NODE_MAX_VALUE(NUMNOD,NBMAT), STAT = IERR)
+             ALEMUSCL_Buffer%VOLUME_FRACTION(:, :) = ZERO
+             ALLOCATE(ALEMUSCL_Buffer%NODE_MAX_VALUE(NUMNOD,NBMAT), STAT = IERR)
              IF (IERR /= 0) GOTO 1000
-             NODE_MAX_VALUE(:, :) = ZERO
-             ALLOCATE(NODE_MIN_VALUE(NUMNOD,NBMAT), STAT = IERR)
+             ALEMUSCL_Buffer%NODE_MAX_VALUE(:, :) = ZERO
+             ALLOCATE(ALEMUSCL_Buffer%NODE_MIN_VALUE(NUMNOD,NBMAT), STAT = IERR)
              IF (IERR /= 0) GOTO 1000
-             NODE_MIN_VALUE(:, :) = ZERO
-             ALLOCATE(GRAD(NUMELS + NSVOIS + NUMELQ + NQVOIS,3,NBMAT), STAT = IERR)
+             ALEMUSCL_Buffer%NODE_MIN_VALUE(:, :) = ZERO
+             ALLOCATE(ALEMUSCL_Buffer%GRAD(NUMELS + NSVOIS + NUMELQ + NQVOIS,3,NBMAT), STAT = IERR)
              IF (IERR /= 0) GOTO 1000
-             GRAD(:, :, :) = ZERO
-             ALLOCATE(ELCENTER(NUMELS + NSVOIS + NUMELQ + NQVOIS,3), STAT = IERR)
+             ALEMUSCL_Buffer%GRAD(:, :, :) = ZERO
+             ALLOCATE(ALEMUSCL_Buffer%ELCENTER(NUMELS + NSVOIS + NUMELQ + NQVOIS,3), STAT = IERR)
              IF (IERR /= 0) GOTO 1000
-             ELCENTER(:, :) = ZERO
+             ALEMUSCL_Buffer%ELCENTER(:, :) = ZERO
            ENDIF
         ENDIF
         
         !/EBCS/NRF VOLUME FRACTION ALLOCATION
         IF(MULTI_FVM%IS_USED)THEN
            NBMAT = MULTI_FVM%NBMAT
-        ELSEIF (I_LAW == 51) THEN       
+        ELSEIF (ALEMUSCL_Param%I_LAW == 51) THEN       
            NBMAT = TRIMAT             
-        ELSEIF (I_LAW == 37) THEN   
+        ELSEIF (ALEMUSCL_PAram%I_LAW == 37) THEN   
            NBMAT = 1                  
         ELSE                          
            NBMAT = 0                  
@@ -2156,11 +2060,11 @@ C
 
         
         IF (MULTI_FVM%IS_USED) THEN
-           CALL MULTI_ALLOCATE(MULTI_FVM)
-           ALLOCATE (VERTEX(4,NUMNOD)      ,STAT=IERR)
+           CALL MULTI_ALLOCATE(MULTI_FVM,H3D_DATA)
+           ALLOCATE (ALEFVM_Buffer%VERTEX(4,NUMNOD)      ,STAT=IERR)
            IF (IERR /= 0) GOTO 1000
-           VERTEX(:,:) = ZERO
-           ALLOCATE(MULTI_FVM%FVM_CONNECTIVITY%KVOIS(SIELVS), STAT = IERR)
+           ALEFVM_Buffer%VERTEX(:,:) = ZERO
+           ALLOCATE(MULTI_FVM%FVM_CONNECTIVITY%KVOIS(ALE%GLOBAL%SIELVS), STAT = IERR)
            IF (IERR /= 0) GOTO 1000
            MULTI_FVM%FVM_CONNECTIVITY%KVOIS = 0
         ENDIF
@@ -2221,24 +2125,24 @@ C--------2D Mass----------------------------
         ENDIF
 C-------shell pinching----------------------
 C       IF(NPINCH > 0) THEN
-          MY_ALLOCATE2D(PINCH_DATA%XPINCH,3,MAX(1,NPINCH))
+          ALLOCATE(PINCH_DATA%XPINCH(3,MAX(1,NPINCH)))
           PINCH_DATA%XPINCH = ZERO
-          MY_ALLOCATE2D(PINCH_DATA%DPINCH,3,MAX(1,NPINCH))
+          ALLOCATE(PINCH_DATA%DPINCH(3,MAX(1,NPINCH)))
           PINCH_DATA%DPINCH = ZERO
-          MY_ALLOCATE2D(PINCH_DATA%VPINCH,3,MAX(1,NPINCH))
+          ALLOCATE(PINCH_DATA%VPINCH(3,MAX(1,NPINCH)))
           PINCH_DATA%VPINCH = ZERO
-          MY_ALLOCATE2D(PINCH_DATA%APINCH,3,MAX(1,PINCH_DATA%SAPINCH))
+          ALLOCATE(PINCH_DATA%APINCH(3,MAX(1,PINCH_DATA%SAPINCH)))
           PINCH_DATA%APINCH = ZERO
-          MY_ALLOCATE(PINCH_DATA%STIFPINCH,MAX(1,PINCH_DATA%SAPINCH))
+          ALLOCATE(PINCH_DATA%STIFPINCH(MAX(1,PINCH_DATA%SAPINCH)))
           PINCH_DATA%STIFPINCH = ZERO 
-          MY_ALLOCATE(PINCH_DATA%MSPINCH,MAX(1,PINCH_DATA%SAPINCH))
+          ALLOCATE(PINCH_DATA%MSPINCH(MAX(1,PINCH_DATA%SAPINCH)))
           PINCH_DATA%MSPINCH = 0   
 C       ENDIF
 C------end shell pinching-------------------
 C-------TAG_SKINS6----------------------
          ALLOCATE(TAG_SKINS6(NUMELS),STAT=IERR)
 C-------ALE BUFFER----------------------
-         IF ((IALE > 0 .AND. NWALE_RST == 6) ) THEN
+         IF ((IALE > 0 .AND. ALE%GRID%NWALE_RST == 6) ) THEN
             SXCELL = NUMELS + NUMELQ + NE_NSVOIS + NE_NQVOIS
             ALLOCATE(XCELL(3, SXCELL),STAT=IERR)
             IF (IERR/=0) GOTO 1000
@@ -2250,7 +2154,8 @@ C-------INTER18 BUFFER (IAUTO=1)--------
             SXCELL = NUMELS + NUMELQ + NE_NSVOIS + NE_NQVOIS
             IF(.NOT.ALLOCATED(XCELL))ALLOCATE(XCELL(3, SXCELL),STAT=IERR)
             IF (IERR/=0) GOTO 1000
-         ENDIF         
+         ENDIF       
+         XCELL(1:3,1:SXCELL) = ZERO
 C-------FXBODY (moved from radioss2.F) -----
         ALLOCATE (FXBIPM(NBIPM,NFXBODY),STAT=IERR)
         IF (IERR/=0) GOTO 1000
@@ -2369,6 +2274,21 @@ C-------TMAX(H3D) -----
            ALLOCATE(GPSTMP(6*NUMNOD),P2TMP(2*NUMNOD),STAT=IERR)
            IF (IERR/=0) GOTO 1000 
          END IF
+         IF (LOADS%NLOAD_CLOAD > 0) THEN
+           ALLOCATE (DPL0CLD(6*LOADS%NLOAD_CLOAD),STAT=IERR)
+           IF (IERR/=0) GOTO 1000
+           DPL0CLD = ZERO
+           ALLOCATE (VEL0CLD(6*LOADS%NLOAD_CLOAD),STAT=IERR)
+           IF (IERR/=0) GOTO 1000
+           VEL0CLD = ZERO
+         ELSE
+           ALLOCATE(DPL0CLD(0),VEL0CLD(0))
+         END IF
+C-------/DAMP/VREL----------------------         
+        ALLOCATE (ID_DAMP_VREL(NDAMP_VREL),STAT=IERR)
+        IF (IERR/=0) GOTO 1000    
+        ALLOCATE (FR_DAMP_VREL(NDAMP_VREL*(NSPMD+2)),STAT=IERR)
+        IF (IERR/=0) GOTO 1000          
 C
 C  DEBUG MEMORY ALLOCATIONS
 C
@@ -2397,6 +2317,7 @@ Chd|        SPMD_CHKW                     source/mpi/generic/spmd_chkw.F
 Chd|        SPMD_GLOB_ISUM9               source/mpi/interfaces/spmd_th.F
 Chd|        SPMD_IBCAST                   source/mpi/generic/spmd_ibcast.F
 Chd|        SPMD_WIOUT                    source/mpi/generic/spmd_wiout.F
+Chd|        ALE_MOD                       ../common_source/modules/ale/ale_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
         SUBROUTINE SZ_PRINT()
@@ -2404,6 +2325,7 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
+      USE ALE_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -2413,7 +2335,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "tabsiz_c.inc"
 #include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "units_c.inc"
 #include      "task_c.inc"
 C----------------------------------------------
@@ -2438,8 +2359,6 @@ C
 C   I10
         WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SICODE :  ',SICODE
 C   I10A
-        WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SLSHSUB : ',SLSHSUB
-C   I11
         WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SISKEW :  ',SISKEW
 C   I12
         WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SISKWN :  ',SISKWN
@@ -2455,8 +2374,6 @@ C   I16
         WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SNOM_OPT :',SNOM_OPT
 C   I17
         WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SNPC :    ',SNPC
-C   I18
-        WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SIXUR :   ',SIXUR
 C   I19
         WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SIXTG :   ',SIXTG
 C   I19A
@@ -2482,9 +2399,9 @@ C   I28
 C   I29
         WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SGJBUFI : ',SGJBUFI
 C   I30
-        WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SNALE :   ',SNALE
+        WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SNALE :   ',ALE%GLOBAL%SNALE
 C   I31
-        WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SIELVS :  ',SIELVS
+        WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SIELVS :  ',ALE%GLOBAL%SIELVS
 C   I33
         WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SIFILL :  ',SIFILL
 C   I34
@@ -2538,8 +2455,6 @@ C   I48
 C   I48A
         WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SLNLINK : ',SLNLINK
 C   I49
-        WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SIUSER :  ',SIUSER
-C   I50
         WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SIPARG :  ',SIPARG
 C   I51
         WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SDD_IAD : ',SDD_IAD
@@ -2607,37 +2522,6 @@ C   I74
         WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SMONVOL : ',SMONVOL
 C   I75
         WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SLAGBUF : ',SLAGBUF
-C   I76
-        WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SITHGRP : ',SITHGRP
-        WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SITHBUF : ',SITHBUF
-        WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SRTHBUF : ',SRTHBUF
-C   I76A - I76TH(1
-        WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SITHGRPA: ',SITHGRPA
-        WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SITHBUFA: ',SITHBUFA
-C   I76B - I76TH(2
-        WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SITHGRPB: ',SITHGRPB
-        WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SITHBUFB: ',SITHBUFB
-C   I76C - I76TH(3
-        WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SITHGRPC: ',SITHGRPC
-        WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SITHBUFC: ',SITHBUFC
-C   I76D - I76TH(4
-        WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SITHGRPD: ',SITHGRPD
-        WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SITHBUFD: ',SITHBUFD
-C   I76E - I76TH(5
-        WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SITHGRPE: ',SITHGRPE
-        WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SITHBUFE: ',SITHBUFE
-C   I76F - I76TH(6
-        WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SITHGRPF: ',SITHGRPF
-        WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SITHBUFF: ',SITHBUFF
-C   I76G - I76TH(7
-        WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SITHGRPG: ',SITHGRPG
-        WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SITHBUFG: ',SITHBUFG
-C   I76H - I76TH(8
-        WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SITHGRPH: ',SITHGRPH
-        WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SITHBUFH: ',SITHBUFH
-C   I76I - I76TH(9
-        WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SITHGRPI: ',SITHGRPI
-        WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SITHBUFI: ',SITHBUFI
 C   I77
         WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SIAD_ELEM:',SIAD_ELEM
 C   I77B
@@ -2784,9 +2668,7 @@ C   I93
         WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SICUT : ',SICUT
 C   ICONTACT
         WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SICONTACT : ',SICONTACT
-Csv TH VARIABLE NAMES
-        WRITE(IOUT,'(A,I8)') 'SITHVAR : ',SITHVAR
-cow
+C
        IF(NSPMD>1) THEN
 C traitement necessaire pour recuperer les output dans l'ordre
          IWIOUT = 0
@@ -2864,18 +2746,8 @@ C   M35
         WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SWB : ',SWB
 C   M36
         WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SDSAVE : ',SDSAVE
-C   M36A
-        WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SDRSAVE : ',SDRSAVE
 C   M37
         WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SASAVE : ',SASAVE
-C   M37A
-        WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SARSAVE : ',SARSAVE
-C   M37B
-        WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SSTSAVE : ',SSTSAVE
-C   M37C
-        WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SSTRSAVE : ',SSTRSAVE
-C   M37D
-        WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SFSAVSAV : ',SFSAVSAV
 C   M38
         WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SSPBUF : ',SSPBUF
 C   M38E
@@ -2927,8 +2799,6 @@ C
 C   M58
 C
 C   M59
-        WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SUSER : ',SUSER
-C   M60
         WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SELBUF : ',SELBUF
 C   M64B
         WRITE(IOUT,'(I4,A13,I8)') ISPMD+1,' SDBUFIN : ',SDBUFIN

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -28,9 +28,9 @@ Chd|-- calls ---------------
 Chd|        INIEBCSP                      source/boundary_conditions/ebcs/iniebcsp.F
 Chd|        INIEBCS_DP                    source/boundary_conditions/ebcs/iniebcs_dp.F
 Chd|        INIEBCS_NRF_TCAR              source/boundary_conditions/ebcs/iniebcs_nrf_tcar.F
-Chd|        ALE_EBCS_MOD                  ../common_source/modules/ale_ebcs_mod.F
-Chd|        EBCS_MOD                      ../common_source/modules/ebcs_mod.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ALE_EBCS_MOD                  ../common_source/modules/ale/ale_ebcs_mod.F
+Chd|        EBCS_MOD                      ../common_source/modules/boundary_conditions/ebcs_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        INIGRAV                       share/modules1/inigrav_mod.F  
 Chd|====================================================================
       SUBROUTINE INIEBCSP0(X, IPARG, ELBUF_STR, EBCS_TAB, IXS, IXQ, IXTG, IPARTS, IPARTQ, IPARTTG, PM, IPM)

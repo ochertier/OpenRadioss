@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -43,21 +43,13 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "units_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "warn_c.inc"
-#include      "scr03_c.inc"
 #include      "scr17_c.inc"
-#include      "scr21_c.inc"
 #include      "drape_c.inc"
-C     NSUBMOD
-#include      "submod_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -177,11 +169,11 @@ c-----------
       RETURN
 c-----------
  2000 FORMAT(/,
-     & 5X,'LAYER PROPERTY SET ',/,
+     & 5X,'PLY PROPERTY SET ',/,
      & 5X,'PROPERTY SET NUMBER . . . . . . . . . . . .  . .=',I10/,
      & 5X,'MATERIAL NUMBER . . . . . . . . . . . . . .  . .=',I10/,
      & 5X,'LAYER THICKNESS . . . . . . . . . . . . . . .  .=',1PG20.13/,
-     & 5X,'INCRMENTAL ANGLE (DIR 1,PROJ(DIR 1 / SHELL). . .=',1PG20.13/,      
+     & 5X,'INCREMENTAL ANGLE (DIR 1,PROJ(DIR 1 / SHELL). . .=',1PG20.13/,      
      & 5X,'SHELL 4-nodes GROUP IDENTIFIER. . . . . . .  . .=',I10/,
      & 5X,'SHELL 3-nodes GROUP IDENTIFIER. . . . . . .  . .=',I10/,
      & 5X,'NUMBER OF INTEGRATION POINTS THROUGH LAYER.  . .=',I10/,

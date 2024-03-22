@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -33,11 +33,12 @@ Chd|        IXYZ                          source/input/ixyz.F
 Chd|        NVAR                          source/input/nvar.F           
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
-      SUBROUTINE FRELNK(IKAD,KEY0,KVEL,NRLINK,IFID,VEL_SK_FR)
+      SUBROUTINE FRELNK(IKAD,KEY0,KVEL,NRLINK,VEL_SK_FR)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
+      USE NAMES_AND_TITLES_MOD, ONLY: NCHARLINE100
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -45,8 +46,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER IKAD(0:*),
-     .        KVEL,NRLINK,IFID,VEL_SK_FR(*)
+      INTEGER IKAD(0:*),KVEL,NRLINK,VEL_SK_FR(*)
       CHARACTER KEY0(*)*5
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
@@ -55,8 +55,6 @@ C-----------------------------------------------
 #include      "task_c.inc"
 #include      "scr05_c.inc"
 #include      "scr07_c.inc"
-#include      "chara_c.inc"
-#include      "nchara_c.inc"
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
@@ -65,17 +63,19 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, N, NBC, K, KK, NS, K4,IKEY,NVEL
-      CHARACTER KEYA*80, CARTE*ncharline, KEY2*5, KEY3*5
-C
+      CHARACTER KEYA*80, KEY2*5, KEY3*5
+      CHARACTER(LEN=NCHARLINE100)::CARTE
+C-----------------------------------------------
+C   S o u r c e   L i n e s
+C-----------------------------------------------
       K=0
-      NVEL = 0 
+      NVEL=0 
       LLLINK=0
       IKEY=KVEL
       DO N=1,NRLINK
        NVEL = NVEL + 1
  605  CONTINUE
-       READ(IUSC1,REC=IKAD(IKEY)+K,FMT='(7X,A,1X,A,1X,I5,25X,I10)',
-     .        ERR=9990)KEY2,KEY3,K4,NBC
+       READ(IUSC1,REC=IKAD(IKEY)+K,FMT='(7X,A,1X,A,1X,I5,25X,I10)', ERR=9990)KEY2,KEY3,K4,NBC
        IF ( VEL_SK_FR(NVEL)>99999) K4 = VEL_SK_FR(NVEL)
        K=K+1
        IF(KEY2=='ALE  ')THEN
@@ -89,12 +89,7 @@ C
         K=K+1
         NS=NS+NVAR(CARTE)
        ENDDO
-C       IFID=IFID+NS
        LLLINK=LLLINK+NS
-C version spmd 
-       IF(IMACH==3) THEN
-         S_FRLINK = S_FRLINK + 4*NS
-       END IF
        IF(KEY2=='TRA  ')THEN
         WRITE(IIN,'(I8,1X,I3.3,4X,I10)')NS,IXYZ(KEY3),K4
        ELSEIF(KEY2=='ROT  ')THEN
@@ -104,11 +99,10 @@ C version spmd
        ENDIF
        CALL READ10(IKAD(IKEY)+KK,NBC,KEY0(IKEY))
       ENDDO
-C
+C-----------------------------------------------
       RETURN
-C
+C-----------------------------------------------
  9990 CONTINUE
-      CALL ANCMSG(MSGID=73,ANMODE=ANINFO,
-     .            C1=KEY0(IKEY))
+      CALL ANCMSG(MSGID=73,ANMODE=ANINFO,C1=KEY0(IKEY))
       CALL ARRET(0)
       END

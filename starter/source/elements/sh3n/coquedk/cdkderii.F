@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,7 +25,7 @@ Chd|  CDKDERII                      source/elements/sh3n/coquedk/cdkderii.F
 Chd|-- called by -----------
 Chd|        CDKINIT3                      source/elements/sh3n/coquedk/cdkinit3.F
 Chd|-- calls ---------------
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/matparam_def_mod.F
+Chd|        GROUP_PARAM_MOD               ../common_source/modules/mat_elem/group_param_mod.F
 Chd|====================================================================
       SUBROUTINE CDKDERII(JFT   ,JLT,PM ,GEO ,PX2,PY2,PX3,PY3,
      .                    STIFN ,STIFR  ,IXTG ,THK ,SH3TREE ,
@@ -38,7 +38,7 @@ Chd|====================================================================
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
-      USE MATPARAM_DEF_MOD            
+      USE GROUP_PARAM_MOD            
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -52,7 +52,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
 #include      "remesh_c.inc"
-#include      "scr03_c.inc"
 #include      "vect01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -69,7 +68,7 @@ C-----------------------------------------------
      .   E1X(MVSIZ), E1Y(MVSIZ), E1Z(MVSIZ),
      .   E2X(MVSIZ), E2Y(MVSIZ), E2Z(MVSIZ),
      .   E3X(MVSIZ), E3Y(MVSIZ), E3Z(MVSIZ)
-      TYPE (GRP_PARAM_STRUCT_)  :: GROUP_PARAM
+      TYPE (GROUP_PARAM_)  :: GROUP_PARAM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

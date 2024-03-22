@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -60,12 +60,13 @@ Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F
 Chd|        SURF_MOD                      share/modules1/surf_mod.F     
 Chd|====================================================================
       SUBROUTINE HM_READ_SENSORS(
-     .           SENSOR_TAB,LACCELM   ,ITABM1    ,IPART     ,LGAUGE    ,
+     .           SENSORS   ,LACCELM   ,ITABM1    ,IPART     ,LGAUGE    ,
      .           SUBSET    ,NSETS     ,IGRSURF   ,IGRNOD    ,BUFSF     ,
      .           SKEW      ,ISKWN     ,UNITAB    ,LSUBMODEL ,HM_NSENS  )
 C-----------------------------------------------
 C   M o d u l e s
-C-----------------------------------------------  
+C-----------------------------------------------
+      USE MY_ALLOC_MOD  
       USE UNITAB_MOD
       USE MESSAGE_MOD
       USE GROUPDEF_MOD
@@ -82,12 +83,9 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "warn_c.inc"
 #include      "scr17_c.inc"
 #include      "com04_c.inc"
 #include      "units_c.inc"
-#include      "sysunit.inc"
-#include      "submod_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -99,7 +97,7 @@ C-----------------------------------------------
       INTEGER ,DIMENSION(LIPART1,*) ,INTENT(IN) :: IPART
       my_real ,DIMENSION(LSKEW,*) :: SKEW
       my_real ,DIMENSION(*)       :: BUFSF
-      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR), TARGET :: SENSOR_TAB
+      TYPE (SENSORS_) ,INTENT(INOUT) ,TARGET   :: SENSORS
       TYPE (SURF_)       ,DIMENSION(NSURF+NSETS)     :: IGRSURF
       TYPE (GROUP_)      ,DIMENSION(NGRNOD)    :: IGRNOD
       TYPE (SUBSET_)     ,DIMENSION(NSUBS)     :: SUBSET
@@ -115,32 +113,33 @@ C-----------------------------------------------
       INTEGER ISEN,IUNIT,IFLAGUNIT,NS,TYP,UNIT_ID,SENS_ID
       my_real :: BID
       CHARACTER TITR*nchartitle,KEY*40,MESS*40
-      INTEGER ,DIMENSION(NSENSOR)    :: SID
+      INTEGER ,DIMENSION(:) ,ALLOCATABLE   :: SID
       TYPE (SENSOR_STR_)    ,POINTER :: SENSOR_PTR
       DATA MESS/'SENSOR DEFINITION                       '/
 C=======================================================================
 c     Initialize sensor data structure
 c---------------------------------------------
-c
-      CALL SENSOR_TAB_INIT(SENSOR_TAB,NSENSOR)
-c
-c--------------------------------------------------
-c     START READING SENSOR OPTION CARDS
-c--------------------------------------------------
-      IF (NSENSOR > 0) THEN
+      CALL HM_OPTION_COUNT('/SENSOR', HM_NSENS)
+
+      IF (HM_NSENS > 0) THEN
         WRITE(ISTDO,'(A)')' .. SENSORS'
         WRITE (IOUT,'(///,A)')'          SENSORS'
         WRITE (IOUT,'(A/)')   '          -------'
       END IF
 c---------------------------------------------
-      CALL HM_OPTION_COUNT('/SENSOR', HM_NSENS)
+      IF (ALLOCATED(SENSORS%SENSOR_TAB)) DEALLOCATE(SENSORS%SENSOR_TAB)
+      ALLOCATE(SENSORS%SENSOR_TAB(HM_NSENS))
+      CALL MY_ALLOC (SID,HM_NSENS)
+      SENSORS%NSENSOR = HM_NSENS
+c
+      CALL SENSOR_TAB_INIT(SENSORS)
 c
       CALL HM_OPTION_START('/SENSOR')
 c
 c---------------------------------------------------
 c
       DO ISEN = 1,HM_NSENS
-        SENSOR_PTR => SENSOR_TAB(ISEN)
+        SENSOR_PTR => SENSORS%SENSOR_TAB(ISEN)
 c            
         CALL HM_OPTION_READ_KEY(LSUBMODEL,
      .                          OPTION_ID   = SENS_ID,
@@ -151,7 +150,7 @@ c--------------------------------------------------
 c       CHECK IF UNIT_ID EXISTS
 c--------------------------------------------------
         IFLAGUNIT = 0
-        DO IUNIT=1,NUNITS
+        DO IUNIT=1,UNITAB%NUNITS
           IF (UNITAB%UNIT_ID(IUNIT) == UNIT_ID) THEN
             IFLAGUNIT = 1
             EXIT
@@ -255,18 +254,19 @@ c---
      .                  C1=TITR)        
         END SELECT 
 c
-        SENSOR_TAB(ISEN)%TITLE = TITR
+        SENSOR_PTR%TITLE = TITR
 c-----------------
       END DO  ! NSENSOR
 c-------------------------------------
 c     Recherche des ID doubles  : activate this code when lecsen is removed
 c-------------------------------------
-      DO ISEN = 1,NSENSOR
-        IF (SENSOR_TAB(ISEN)%SENS_ID > 0)  THEN
-          SID(ISEN) = SENSOR_TAB(ISEN)%SENS_ID
+      DO ISEN = 1,SENSORS%NSENSOR
+        IF (SENSORS%SENSOR_TAB(ISEN)%SENS_ID > 0)  THEN
+          SID(ISEN) = SENSORS%SENSOR_TAB(ISEN)%SENS_ID
         END IF
       END DO
-      CALL UDOUBLE(SID,1,NSENSOR,MESS,0,BID)
+      CALL UDOUBLE(SID,1,SENSORS%NSENSOR,MESS,0,BID)
+      DEALLOCATE(SID)
 c-----------
       RETURN
       END

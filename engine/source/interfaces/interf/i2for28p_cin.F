@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -61,9 +61,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "com08_c.inc"
-#include      "scr05_c.inc"
 #include      "scr14_c.inc"
 #include      "scr16_c.inc"
 C-----------------------------------------------
@@ -337,8 +334,8 @@ C
         ENDIF
 C
 C---    output of tied contact forces
- 	CALL I2FORCES(X      ,V	,A	 ,MS	  ,I	  ,
-     .	              IRECT(1,L),H	,NIR     ,FSAV    ,FNCONT ,
+          CALL I2FORCES(X      ,V  ,A   ,MS    ,I    ,
+     .                IRECT(1,L),H  ,NIR     ,FSAV    ,FNCONT ,
      .                FNCONTP,FTCONTP ,WEIGHT  ,H3D_DATA)   
 C----
 C stokage ZERO pour noeuds delete par idel2

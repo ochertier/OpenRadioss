@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -33,7 +33,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 #ifdef MPI
 #include "mpif.h"
 #endif
@@ -42,10 +41,8 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr05_c.inc"
 #include      "scr18_c.inc"
 #include      "task_c.inc"
-#include      "spmd_c.inc"
 #include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -130,9 +127,9 @@ c
            END IF
          END DO
 
-Csv a cause de la version simple precision, on ne peux pas metre l'entier
-Csv dans le buffer flottant car on n a que 2puiss 24 bits dispo ~ 16 Million
-Csv de noeuds au max
+C   a cause de la version simple precision, on ne peux pas metre l'entier
+C   dans le buffer flottant car on n a que 2puiss 24 bits dispo ~ 16 Million
+C   de noeuds au max
 
          MSGTYP = MSGOFF
          CALL MPI_SEND(IDNOD0,SIZ,MPI_INTEGER,IT_SPMD(1),MSGTYP,
@@ -175,17 +172,17 @@ Csv de noeuds au max
 
           DO I=2,NSPMD
 
-Csv Reception 
+C   Reception 
             MSGTYP = MSGOFF
 
             CALL MPI_PROBE(IT_SPMD(I),MSGTYP,
      .                    MPI_COMM_WORLD,STATUS,ierror)
-	    CALL MPI_GET_COUNT(STATUS,MPI_INTEGER,SIZ,ierror)
+              CALL MPI_GET_COUNT(STATUS,MPI_INTEGER,SIZ,ierror)
 
             CALL MPI_RECV(IDNOD0,SIZ,MPI_INTEGER,IT_SPMD(I),MSGTYP,
      .                  MPI_COMM_WORLD,STATUS,ierror)
 
-Csv Reception
+C   Reception
 
             MSGTYP = MSGOFF2 
             CALL MPI_RECV(MAXV0,SIZ,MPI_REAL,IT_SPMD(I),MSGTYP,

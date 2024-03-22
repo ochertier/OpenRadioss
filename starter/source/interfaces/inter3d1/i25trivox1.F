@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,7 +26,7 @@ Chd|-- called by -----------
 Chd|        I25BUC_VOX1                   source/interfaces/inter3d1/i25buc_vox1.F
 Chd|-- calls ---------------
 Chd|        I25STO                        source/interfaces/inter3d1/i25sto.F
-Chd|        TRI7BOX                       share/modules1/tri7box.F
+Chd|        TRI7BOX                       share/modules1/tri7box.F      
 Chd|====================================================================
       SUBROUTINE I25TRIVOX1(
      1      NSN    ,I_MEM   ,IRECT  ,X       ,STF     ,
@@ -39,7 +39,7 @@ Chd|====================================================================
      8      IREMNODE,FLAGREMNODE,KREMNODE,REMNODE,INACTI,
      9      IPARTS  ,NPARTNS ,LPARTNS ,IELEM ,ICODE   ,
      A      ISKEW   ,DRAD, IS_LARGE_NODE, LARGE_NODE  ,
-     B      NB_LARGE_NODES,PEN_OLD      , DGAPLOAD)
+     B      NB_LARGE_NODES,PEN_OLD      , DGAPLOAD,NRTMT,FLAG_REMOVED_NODE)
 C============================================================================
 C   M o d u l e s
 C-----------------------------------------------
@@ -58,12 +58,8 @@ c     parameter setting the size for the vector (orig version is 128)
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "scr05_c.inc"
 C-----------------------------------------------
 C   ROLE DE LA ROUTINE:
 C   ===================
@@ -108,6 +104,7 @@ C-----------------------------------------------
      .        NBINFLG(*),MBINFLG(*),ILEV,MSEGTYP(*),
      .        IREMNODE,FLAGREMNODE,KREMNODE(*),REMNODE(*),
      .        INACTI, IPARTS(*), NPARTNS(*), LPARTNS(*), IELEM(*), ICODE(*), ISKEW(*)
+      LOGICAL, INTENT(in) :: FLAG_REMOVED_NODE !< flag to remove some S node from the list of candidates
 C     REAL
       my_real
      .   X(3,*),XYZM(6),STF(*),STFN(*),GAP_S(*),GAP_M(*),
@@ -118,7 +115,7 @@ C     REAL
       INTEGER :: LARGE_NODE(NSN) ! list of nodes that have large research distance wrt solids
       INTEGER :: IS_LARGE_NODE(NSN) ! tag nodes that have large research distance wrt solids
       INTEGER :: NB_LARGE_NODES
-
+      INTEGER , INTENT(IN) :: NRTMT
 
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -233,7 +230,7 @@ c     en 2(4,3,6,9...) si la facette est grande devant AAA et inclinee
         M3 = IRECT(3,NE)
         M4 = IRECT(4,NE)
 
-        IF(FLAGREMNODE==2.AND.IREMNODE==2)THEN
+        IF(FLAG_REMOVED_NODE)THEN
           K = KREMNODE(NE)+1
           L = KREMNODE(NE+1)
           DO M=K,L
@@ -241,7 +238,7 @@ c     en 2(4,3,6,9...) si la facette est grande devant AAA et inclinee
           ENDDO
         ENDIF
 
-        IF (MSEGTYP(NE)==0 .OR. MSEGTYP(NE)>NRTM)THEN
+        IF (MSEGTYP(NE)==0 .OR. MSEGTYP(NE)>NRTMT)THEN
           ! LEDGMAX /=0 <=> INACTI=5 or -1 and IDDLEVEL=1 !
           AAA = MAX(MARGE+MAX(BGAPSMX+GAP_M(NE)+DGAPLOAD,DRAD),LEDGMAX+BGAPSMX+GAP_M(NE)+DGAPLOAD)
         ELSE
@@ -296,7 +293,7 @@ c        indice des voxels occupes par la facette
         IY2=MAX(1,2+MIN(NBY,IY2))
         IZ2=MAX(1,2+MIN(NBZ,IZ2))
 
-        IF (MSEGTYP(NE)==0 .OR. MSEGTYP(NE)>NRTM)THEN
+        IF (MSEGTYP(NE)==0 .OR. MSEGTYP(NE)>NRTMT)THEN
 C Check for "large" nodes separately
 C if the current segment belongs to a solid or a coating shell
           DO I = 1, NB_LARGE_NODES
@@ -361,7 +358,7 @@ c               END IF
      4           NRTM  ,GAP_S  ,GAP_M ,NBINFLG  ,MBINFLG,
      5           ILEV,MSEGTYP,ITAB  ,IGAP ,GAP_S_L,
      6           GAP_M_L,EDGE_L2,ICODE,ISKEW,DRAD ,
-     7           DGAPLOAD)
+     7           DGAPLOAD,NRTMT)
               IF(I_MEM==2)GOTO 100
               J_STOK = 0
             ENDIF
@@ -396,7 +393,7 @@ c NEED to communicate in SPMD
 c VMAXDT is a local overestimate of relative incremental displacement
 c NO need to communicate in SPMD
 
-                IF (MSEGTYP(NE)==0 .OR. MSEGTYP(NE)>NRTM)THEN
+                IF (MSEGTYP(NE)==0 .OR. MSEGTYP(NE)>NRTMT)THEN
                   IF(IS_LARGE_NODE(JJ)==1) GOTO 300 ! node already checked before
                   ! LEDGMAX /=0 <=> INACTI=5 or -1 and IDDLEVEL=1 !
                   AAA = MAX(MARGE+MAX(GAP_S(JJ)+GAP_M(NE)+DGAPLOAD,DRAD),EDGE_L2(JJ)+GAP_S(JJ)+GAP_M(NE)+DGAPLOAD)
@@ -457,7 +454,7 @@ cc             nnr0pelem = nnr0pelem + 1
      4               NRTM  ,GAP_S  ,GAP_M ,NBINFLG  ,MBINFLG,
      5               ILEV,MSEGTYP,ITAB  ,IGAP ,GAP_S_L,
      6               GAP_M_L,EDGE_L2,ICODE,ISKEW,DRAD ,
-     7               DGAPLOAD)
+     7               DGAPLOAD,NRTMT)
                   IF(I_MEM==2)GOTO 100
                   J_STOK = 0
                 ENDIF
@@ -472,7 +469,7 @@ cc             nnr0pelem = nnr0pelem + 1
           ENDDO
         ENDDO
 
-        IF(FLAGREMNODE==2.AND.IREMNODE==2)THEN
+        IF(FLAG_REMOVED_NODE)THEN
           K = KREMNODE(NE)+1
           L = KREMNODE(NE+1)
           DO M=K,L
@@ -491,7 +488,7 @@ C-------------------------------------------------------------------------
      4                NRTM  ,GAP_S  ,GAP_M ,NBINFLG  ,MBINFLG,
      5                ILEV,MSEGTYP,ITAB  ,IGAP ,GAP_S_L,
      6                GAP_M_L,EDGE_L2,ICODE,ISKEW,DRAD ,
-     7                DGAPLOAD)
+     7                DGAPLOAD,NRTMT)
 C 4   remise a zero des noeuds dans les boites
 C=======================================================================
   100 CONTINUE

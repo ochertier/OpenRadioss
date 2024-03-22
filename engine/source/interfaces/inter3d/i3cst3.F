@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -31,19 +31,23 @@ Chd|        INTVO3                        source/interfaces/inter3d/intvo3.F
 Chd|        UD_INT5                       source/implicit/upd_glob_k.F  
 Chd|-- calls ---------------
 Chd|====================================================================
-      SUBROUTINE I3CST3(X1    ,X2      ,X3    ,X4    ,XI ,
-     1                  Y1    ,Y2      ,Y3    ,Y4    ,YI ,
-     2                  Z1    ,Z2      ,Z3    ,Z4    ,ZI ,
-     3                  XFACE ,N1      ,N2    ,N3    ,SSC,
-     4                  TTC   ,X0      ,Y0    ,Z0    ,XX1,
-     5                  XX2   ,XX3     ,XX4   ,YY1   ,YY2,
-     6                  YY3   ,YY4     ,ZZ1   ,ZZ2   ,ZZ3,
-     7                  ZZ4   ,XI1     ,XI2   ,XI3   ,XI4,
-     8                  YI1   ,YI2     ,YI3   ,YI4   ,ZI1,
-     9                  ZI2   ,ZI3     ,ZI4   ,XN1   ,XN2,
-     1                  XN3   ,XN4     ,YN1   ,YN2   ,YN3,
-     2                  YN4   ,ZN1     ,ZN2   ,ZN3   ,ZN4,
-     3                  AREA)
+      SUBROUTINE I3CST3(
+     1   X1,      X2,      X3,      X4,
+     2   XI,      Y1,      Y2,      Y3,
+     3   Y4,      YI,      Z1,      Z2,
+     4   Z3,      Z4,      ZI,      XFACE,
+     5   N1,      N2,      N3,      SSC,
+     6   TTC,     X0,      Y0,      Z0,
+     7   XX1,     XX2,     XX3,     XX4,
+     8   YY1,     YY2,     YY3,     YY4,
+     9   ZZ1,     ZZ2,     ZZ3,     ZZ4,
+     A   XI1,     XI2,     XI3,     XI4,
+     B   YI1,     YI2,     YI3,     YI4,
+     C   ZI1,     ZI2,     ZI3,     ZI4,
+     D   XN1,     XN2,     XN3,     XN4,
+     E   YN1,     YN2,     YN3,     YN4,
+     F   ZN1,     ZN2,     ZN3,     ZN4,
+     G   AREA,    LFT,     LLT)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -55,10 +59,11 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "vect07_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(INOUT) :: LFT
+      INTEGER, INTENT(INOUT) :: LLT
       my_real, DIMENSION(MVSIZ), INTENT(IN) ::  X1,X2,X3,X4,XI
       my_real, DIMENSION(MVSIZ), INTENT(IN) ::  Y1,Y2,Y3,Y4,YI
       my_real, DIMENSION(MVSIZ), INTENT(IN) ::  Z1,Z2,Z3,Z4,ZI
@@ -84,33 +89,6 @@ C-----------------------------------------------
      .     B12(MVSIZ), B23(MVSIZ), B34(MVSIZ), B41(MVSIZ),
      .     AB1(MVSIZ), AB2(MVSIZ), AN     
 C-----------------------------------------------
-!      EQUIVALENCE (X1,BV(1,1)) ,(Y1,BV(1,2)) ,(Z1,BV(1,3))
-!      EQUIVALENCE (X2,BV(1,4)) ,(Y2,BV(1,5)) ,(Z2,BV(1,6))
-!      EQUIVALENCE (X3,BV(1,7)) ,(Y3,BV(1,8)) ,(Z3,BV(1,9))
-!      EQUIVALENCE (X4,BV(1,10)),(Y4,BV(1,11)),(Z4,BV(1,12))
-!      EQUIVALENCE (YI,BV(1,14)),(ZI,BV(1,15))
-!      EQUIVALENCE (N1,BV(1,19)) ,(N2,BV(1,20)) ,(N3,BV(1,21))
-!      EQUIVALENCE (SSC,BV(1,23)),(TTC,BV(1,24))
-!      EQUIVALENCE (XFACE,BV(1,29))
-!      EQUIVALENCE (X0,BV(1,31)) ,(Y0,BV(1,32)) ,(Z0,BV(1,33))
-!      EQUIVALENCE (XX1,BV(1,34)),(YY1,BV(1,35)),(ZZ1,BV(1,36))
-!      EQUIVALENCE (XX2,BV(1,37)),(YY2,BV(1,38)),(ZZ2,BV(1,39))
-!      EQUIVALENCE (XX3,BV(1,40)),(YY3,BV(1,41)),(ZZ3,BV(1,42))
-!      EQUIVALENCE (XX4,BV(1,43)),(YY4,BV(1,44)),(ZZ4,BV(1,45))
-!      EQUIVALENCE (XI1,BV(1,46)),(YI1,BV(1,47)),(ZI1,BV(1,48))
-!      EQUIVALENCE (XI2,BV(1,49)),(YI2,BV(1,50)),(ZI2,BV(1,51))
-!      EQUIVALENCE (XI3,BV(1,52)),(YI3,BV(1,53)),(ZI3,BV(1,54))
-!      EQUIVALENCE (XI4,BV(1,55)),(YI4,BV(1,56)),(ZI4,BV(1,57))
-!      EQUIVALENCE (XN1,BV(1,58)),(YN1,BV(1,59)),(ZN1,BV(1,60))
-!      EQUIVALENCE (XN2,BV(1,61)),(YN2,BV(1,62)),(ZN2,BV(1,63))
- !     EQUIVALENCE (XN3,BV(1,64)),(YN3,BV(1,65)),(ZN3,BV(1,66))
-!      EQUIVALENCE (XN4,BV(1,67)),(YN4,BV(1,68)),(ZN4,BV(1,69))
-!      EQUIVALENCE (AREA,BV(1,71))
-C
-!      EQUIVALENCE (A12,X0),(A23,Y0),(A34,Z0),(A41,XX1)
-!      EQUIVALENCE (B12,YY1),(B23,ZZ1),(B34,XX2),(B41,YY2)
-!      EQUIVALENCE (AB1,ZZ2),(AB2,XX3)
-C=======================================================================
       DO 100 I=LFT,LLT
       X0(I) = FOURTH*(X1(I)+X2(I)+X3(I)+X4(I))
       Y0(I) = FOURTH*(Y1(I)+Y2(I)+Y3(I)+Y4(I))

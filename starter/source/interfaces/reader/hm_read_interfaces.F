@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -38,8 +38,9 @@ Chd|        USR2SYS                       source/system/sysfus.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
 Chd|        INTBUF_FRIC_MOD               share/modules1/intbuf_fric_mod.F
+Chd|        INTERFACES_MOD                ../common_source/modules/interfaces/interfaces_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|        R2R_MOD                       share/modules1/r2r_mod.F      
 Chd|        SENSOR_MOD                    share/modules1/sensor_mod.F   
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
@@ -49,9 +50,9 @@ Chd|====================================================================
      2           IGRNOD   ,IGRSURF  ,IGRSLIN   ,IGRBRIC    ,IGRSH3N    ,
      3           IGRTRUSS ,NPC      ,ISKN      ,XFILTR     ,STFAC      , 
      4           FRIC_P   ,I2RUPT   ,AREASL    ,UNITAB     ,NOM_OPT    ,
-     5           DEF_INTER,NPC1     ,SENSOR_TAB,MULTI_FVM  ,NOM_OPTFRIC,
+     5           DEF_INTER,NPC1     ,SENSORS   ,MULTI_FVM  ,NOM_OPTFRIC,
      6           INTBUF_FRIC_TAB    ,IDDLEVEL  ,LSUBMODEL  ,TF         ,
-     7           KLOADPINTER        ,DGAPINT   )
+     7           KLOADPINTER        ,DGAPINT   ,INTERFACES)
 C============================================================================
 C   M o d u l e s
 C-----------------------------------------------
@@ -64,6 +65,7 @@ C-----------------------------------------------
       USE SUBMODEL_MOD
       USE HM_OPTION_READ_MOD
       USE SENSOR_MOD
+      USE INTERFACES_MOD
 C-----------------------------------------------      
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -72,20 +74,13 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com02_c.inc"
-#include      "com03_c.inc"
 #include      "com04_c.inc"
 #include      "units_c.inc"
-#include      "warn_c.inc"
 #include      "param_c.inc"
-#include      "scr03_c.inc"
 #include      "scr05_c.inc"
-#include      "scr12_c.inc"
 #include      "scr17_c.inc"
-#include      "conv_c.inc"
 #include      "r2r_c.inc"
 #include      "inter22.inc"
-#include      "sysunit.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -102,7 +97,7 @@ C-----------------------------------------------
       TYPE(MULTI_FVM_STRUCT), INTENT(IN) :: MULTI_FVM
       TYPE(INTBUF_FRIC_STRUCT_) INTBUF_FRIC_TAB(*)
       TYPE (SUBMODEL_DATA), DIMENSION(*),INTENT(IN) :: LSUBMODEL
-      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE (SENSORS_) ,INTENT(IN) :: SENSORS
 C-----------------------------------------------
       TYPE (GROUP_)  , DIMENSION(NGRNOD)  :: IGRNOD
       TYPE (GROUP_)  , DIMENSION(NGRBRIC) :: IGRBRIC
@@ -110,6 +105,7 @@ C-----------------------------------------------
       TYPE (GROUP_)  , DIMENSION(NGRTRUS) :: IGRTRUSS
       TYPE (SURF_)   , DIMENSION(NSURF) ,TARGET   :: IGRSURF
       TYPE (SURF_)   , DIMENSION(NSLIN) ,TARGET   :: IGRSLIN
+      TYPE (INTERFACES_) ,INTENT(INOUT):: INTERFACES
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -188,7 +184,7 @@ C--------------------------------------------------
 C CHECK IF UID IS EXISTING
 C--------------------------------------------------
       IFLAGUNIT = 0
-      DO J=1,NUNITS
+      DO J=1,UNITAB%NUNITS
           IF (UNITAB%UNIT_ID(J) == UID) THEN    
             IFLAGUNIT = 1
             EXIT
@@ -196,8 +192,8 @@ C--------------------------------------------------
       ENDDO
       IF (UID /= 0.AND.IFLAGUNIT == 0) THEN
            CALL ANCMSG(MSGID=659,ANMODE=ANINFO,MSGTYPE=MSGERROR,
-     .  	       I2=UID,I1=NOINT,C1='INTERFACE',
-     .  	       C2='INTERFACE',
+     .           I2=UID,I1=NOINT,C1='INTERFACE',
+     .           C2='INTERFACE',
      .                 C3=TITR)
       ENDIF
 C--------------------------------------------------
@@ -206,7 +202,16 @@ C--------------------------------------------------
         WRITE(IOUT,1300) 
 
         STR_TMP = KEY(1:LEN_TRIM(KEY))
-
+C--------------------------------------------------
+C CHECK INTERFACE AVAILABILITY WITH 2D ANALYSIS
+C--------------------------------------------------
+        IF(N2D /= 0 .AND.
+     .     STR_TMP /= 'TYPE1' .AND. STR_TMP /= 'TYPE2' .AND.
+     .     STR_TMP /= 'TYPE3' .AND. STR_TMP /= 'TYPE5') THEN
+              CALL ANCMSG(MSGID=2097,ANMODE=ANSTOP,MSGTYPE=MSGERROR,
+     .           I1=NOINT,C1=TITR,C2=STR_TMP)
+        ENDIF
+C--------------------------------------------------
         SELECT CASE(STR_TMP)
         CASE ('KINE', 'TYPE1', 'TYPE9', 'TYPE12','TYPE18',  'TYPE22')
 C--------------------------------------------------
@@ -246,9 +251,9 @@ C---------------------------------------------------------------
      2          IGRNOD       ,IGRSURF    ,IGRSLIN        ,NPC       ,ILAGM       ,
      3          ITABM1       ,ITAB       ,ISKN           ,UNITAB    ,I2RUPT(1,NI),
      4          AREASL(NI)   ,NI         ,NOM_OPT        ,TITR      ,DEF_INTER   ,
-     5          IDINT7       ,IDINT7B    ,IDINT11        ,NPC1     , SENSOR_TAB  ,
+     5          IDINT7       ,IDINT7B    ,IDINT11        ,NPC1     , SENSORS     ,
      6          NOM_OPTFRIC,INTBUF_FRIC_TAB,IGRBRIC      ,NOINT    , KEY         ,
-     7          LSUBMODEL    ,TF         )
+     7          LSUBMODEL    ,TF         ,INTERFACES  )
 
         END SELECT
 
@@ -270,7 +275,7 @@ C-------
            IPARI(40,NI)=USR2SYS(IPARI(40,NI),ITABM1,MESS,IPARI(15,NI))
            IF(IMACH == 3)THEN
              DO P = 1, NSPMD
-	       CALL IFRONTPLUS(IPARI(40,NI),P) 
+                 CALL IFRONTPLUS(IPARI(40,NI),P) 
              END DO
            END IF
          ELSEIF(IPARI(39,NI) == 2)THEN
@@ -279,7 +284,7 @@ C-------
            IF(IMACH == 3)THEN
               DO P = 1, NSPMD
                 CALL IFRONTPLUS(IPARI(40,NI),P)
-                CALL IFRONTPLUS(IPARI(41,NI),P)	      
+                CALL IFRONTPLUS(IPARI(41,NI),P)        
               END DO
             END IF
          ENDIF

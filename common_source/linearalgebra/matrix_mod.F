@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -23,6 +23,9 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 Chd|====================================================================
 Chd|  MATRIX_MOD                    linearalgebra/matrix_mod.F    
 Chd|-- called by -----------
+Chd|        SET_MATRIX                    engine/share/modules/linear_solver_mod.F
+Chd|        SET_MATRIX_CG                 engine/share/modules/linear_solver_mod.F
+Chd|        SET_MATRIX_MUMPS              engine/share/modules/linear_solver_mod.F
 Chd|        DIFFUSION_MOD                 engine/share/modules/diffusion_mod.F
 Chd|        LINEAR_SOLVER_MOD             engine/share/modules/linear_solver_mod.F
 Chd|-- calls ---------------

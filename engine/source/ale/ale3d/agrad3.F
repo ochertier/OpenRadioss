@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,7 +26,7 @@ Chd|-- called by -----------
 Chd|        AGRAD0                        source/ale/agrad0.F           
 Chd|        NODAL_SCHLIEREN               source/output/anim/generate/nodal_schlieren.F
 Chd|-- calls ---------------
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
 Chd|====================================================================
       SUBROUTINE AGRAD3(IXS,X,ALE_CONNECTIVITY,GRAD)
 C-----------------------------------------------
@@ -44,9 +44,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
-#include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "vect01_c.inc"
 #include      "tabsiz_c.inc"
 C-----------------------------------------------

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -30,7 +30,7 @@ Chd|        ARRET                         source/system/arret.F
 Chd|        MY_BARRIER                    source/system/machine.F       
 Chd|        STARTIMEG                     source/system/timer.F         
 Chd|        STOPTIMEG                     source/system/timer.F         
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        SOLTOSPH_MOD                  share/modules/soltosph_mod.F  
 Chd|====================================================================
@@ -50,18 +50,14 @@ C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "comlock.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com06_c.inc"
 #include      "param_c.inc"
 #include      "parit_c.inc"
 #include      "sphcom.inc"
 #include      "task_c.inc"
-#include      "units_c.inc"
 #include      "vect01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -516,7 +512,7 @@ Chd|        SIG_HEPH1                     source/elements/sph/soltosph_hour.F
 Chd|        SREP2GLO                      source/elements/sph/srep2glo.F
 Chd|        STARTIMEG                     source/system/timer.F         
 Chd|        STOPTIMEG                     source/system/timer.F         
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        INITBUF_MOD                   share/resol/initbuf.F         
 Chd|====================================================================
       SUBROUTINE SOLTOSPHP(
@@ -538,12 +534,10 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com06_c.inc"
 #include      "com08_c.inc"
 #include      "param_c.inc"
 #include      "sphcom.inc"
 #include      "task_c.inc"
-#include      "units_c.inc"
 #include      "vect01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -625,7 +619,7 @@ C-----------------------------------------------
         IF(ITY==1.AND.IPARTSPH/=0) THEN
 C
 C---
-          CALL INITBUF (IPARG    ,NG      ,                              
+          CALL INITBUF(IPARG    ,NG      ,                              
      2       MLW     ,NEL     ,NFT     ,IAD     ,ITY     ,               
      3       NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,               
      4       JTHE    ,JLAG    ,JMULT   ,JHBE    ,JIVF    ,               
@@ -644,18 +638,26 @@ C-----------
           LBUF => ELBUF_TAB(NG)%BUFLY(1)%LBUF(1,1,1)
           MBUF => ELBUF_TAB(NG)%BUFLY(1)%MAT(1,1,1)
 C-----------
-          CALL SREP2GLO(X,IXS(1,NFT+1),GBUF%GAMA,
-     .                  RX ,RY ,RZ, SX ,SY ,SZ ,TX ,TY ,TZ ,
-     .                  R11,R12,R13,R21,R22,R23,R31,R32,R33,
-     .                  T11,T12,T13,T21,T22,T23,T31,T32,T33,
-     .                  JR0,JS0,JT0,NEL)
+          CALL SREP2GLO(
+     1   X,           IXS(1,NFT+1),GBUF%GAMA,   RX,
+     2   RY,          RZ,          SX,          SY,
+     3   SZ,          TX,          TY,          TZ,
+     4   R11,         R12,         R13,         R21,
+     5   R22,         R23,         R31,         R32,
+     6   R33,         T11,         T12,         T13,
+     7   T21,         T22,         T23,         T31,
+     8   T32,         T33,         JR0,         JS0,
+     9   JT0,         NEL,         LFT,         LLT,
+     A   JHBE,        JCVT,        ISORTH)
 C
 C----------- HEPH -------
           IF (JHBE==24) THEN
 C------------------------
           SIG_HEPH(1:MVSIZ,1:6,1:7) = ZERO
-          CALL SIG_HEPH1(JR0     ,JS0  ,JT0  ,GBUF%SIG  ,GBUF%HOURG,
-     .                   SIG_HEPH,PM   ,IXS  ,II        ,NEL       )          
+          CALL SIG_HEPH1(
+     1   JR0,       JS0,       JT0,       GBUF%SIG,
+     2   GBUF%HOURG,SIG_HEPH,  PM,        IXS,
+     3   II,        NEL,       LFT,       LLT)
 C
           IF(ISORTH==0)THEN
            DO J=1,7

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -44,23 +44,14 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "com04_c.inc"
-#include      "param_c.inc"
 #include      "com08_c.inc"
 C-----------------------------------------------
 C   ROLE DE LA ROUTINE:
 C   ===================
 C   TRI sur N de CAND_N CAND_E CAND_F
 C   et elimination des noeuds en rebond 
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -90,7 +81,7 @@ C------for travelling nodes detected in imp_solv-----
          IPUT(I)=0
         END DO
         DO N=1,NUM_IMP
-	  I= IND_IMP(N)
+            I= IND_IMP(N)
           IPUT(I)=1
         END DO
        IF(IFQ>0)THEN
@@ -157,18 +148,18 @@ C
               !at previous cycle IFEN should be updated 
               NI = CAND_N(I)
               IF(NI>NSNL) THEN
-	  	    !remote node
-          	NI = NI-NSNL
-          	IF(STIFI(NIN)%P(NI) == ZERO)THEN
-          	  IFPEN(I)    = 0
-          	  CAND_N(I)   = NSN+1
-          	ENDIF
+              !remote node
+          NI = NI-NSNL
+          IF(STIFI(NIN)%P(NI) == ZERO)THEN
+            IFPEN(I)    = 0
+            CAND_N(I)   = NSN+1
+          ENDIF
               ELSE
-	  	    !local node
-          	IF(STFNS(NI) == ZERO)THEN 
-          	  IFPEN(I)    = 0
-          	  CAND_N(I)   = NSN+1
-          	ENDIF
+              !local node
+          IF(STFNS(NI) == ZERO)THEN 
+            IFPEN(I)    = 0
+            CAND_N(I)   = NSN+1
+          ENDIF
               ENDIF
             ENDIF
           ENDDO
@@ -182,20 +173,20 @@ C
               !at previous cycle IFEN should be updated 
               NI = CAND_N(I)
               IF(NI>NSNL) THEN
-	  	    !remote node
-          	NI = NI-NSNL
-          	IF(STIFI(NIN)%P(NI) == ZERO)THEN
-          	  IFPEN(I)  = 0
+              !remote node
+          NI = NI-NSNL
+          IF(STIFI(NIN)%P(NI) == ZERO)THEN
+            IFPEN(I)  = 0
                   CAND_F(1,I) = ZERO
-          	  CAND_N(I) = NSN+1
-          	ENDIF
+            CAND_N(I) = NSN+1
+          ENDIF
               ELSE
-	  	    !local node
-          	IF(STFNS(NI) == ZERO)THEN 
-          	  IFPEN(I)  = 0
+              !local node
+          IF(STFNS(NI) == ZERO)THEN 
+            IFPEN(I)  = 0
                   CAND_F(1,I) = ZERO
-          	  CAND_N(I) = NSN+1
-          	ENDIF
+            CAND_N(I) = NSN+1
+          ENDIF
               ENDIF
             ENDIF
           ENDDO
@@ -217,18 +208,18 @@ C
               !at previous cycle CAND_F should be updated 
               NI = CAND_N(I)
               IF(NI>NSNL) THEN
-	  	    !remote node
-          	NI = NI-NSNL
-          	IF(STIFI(NIN)%P(NI) == ZERO)THEN
+              !remote node
+          NI = NI-NSNL
+          IF(STIFI(NIN)%P(NI) == ZERO)THEN
                   CAND_F(1,I) = ZERO
-          	  CAND_N(I) = NSN+1
-          	ENDIF
+            CAND_N(I) = NSN+1
+          ENDIF
               ELSE
-	  	    !local node
-          	IF(STFNS(NI) == ZERO)THEN 
+              !local node
+          IF(STFNS(NI) == ZERO)THEN 
                   CAND_F(1,I) = ZERO
-          	  CAND_N(I) = NSN+1
-          	ENDIF
+            CAND_N(I) = NSN+1
+          ENDIF
               ENDIF
             ENDIF
           ENDDO
@@ -242,16 +233,16 @@ C
             !at previous cycle CAND_F should be updated 
             NI = CAND_N(I)
             IF(NI>NSNL) THEN
-	          !remote node
+                    !remote node
               NI = NI-NSNL
               IF(STIFI(NIN)%P(NI) == ZERO)THEN
-          	CAND_F(1,I) = ZERO
+          CAND_F(1,I) = ZERO
                 CAND_N(I)   = NSN+1
               ENDIF
             ELSE
-	          !local node
+                    !local node
               IF(STFNS(NI) == ZERO)THEN 
-          	CAND_F(1,I) = ZERO
+          CAND_F(1,I) = ZERO
                 CAND_N(I) = NSN+1
               ENDIF
             ENDIF
@@ -677,23 +668,12 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "com04_c.inc"
-#include      "param_c.inc"
-#include      "com08_c.inc"
 C-----------------------------------------------
 C   ROLE DE LA ROUTINE:
 C   ===================
 C   TRI sur N de CAND_N CAND_E CAND_F
 C   et elimination des noeuds en rebond 
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

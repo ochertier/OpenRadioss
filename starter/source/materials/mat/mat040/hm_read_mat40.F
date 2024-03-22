@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -31,7 +31,7 @@ Chd|        HM_OPTION_IS_ENCRYPTED        source/devtools/hm_reader/hm_option_is
 Chd|        INIT_MAT_KEYWORD              source/materials/mat/init_mat_keyword.F
 Chd|        ELBUFTAG_MOD                  share/modules1/elbuftag_mod.F 
 Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/matparam_def_mod.F
+Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
@@ -56,14 +56,8 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr17_c.inc"
-#include      "submod_c.inc"
-#include      "sysunit.inc"
 #include      "units_c.inc"
 #include      "param_c.inc"
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -185,13 +179,17 @@ c-----------------
       ELSE
         CALL INIT_MAT_KEYWORD(MATPARAM,"COMPRESSIBLE")
       END IF
+      CALL INIT_MAT_KEYWORD(MATPARAM,"HOOK")
+      ! Properties compatibility
+      CALL INIT_MAT_KEYWORD(MATPARAM,"SOLID_ISOTROPIC")  
+      CALL INIT_MAT_KEYWORD(MATPARAM,"SPH")  
 c-----------------
       WRITE(IOUT, 800) TRIM(TITR), MAT_ID, 40
       WRITE(IOUT,1000)
       IF(IS_ENCRYPTED)THEN
          WRITE(IOUT,'(5X,A,//)')'CONFIDENTIAL DATA'
       ELSE
-         WRITE(IOUT, 850) RHO0, RHOR
+         WRITE(IOUT, 850) RHO0
          WRITE(IOUT,1100)AK,G0,G1,G2,G3,G4,G5,
      .        BETA1,BETA2,BETA3,BETA4,BETA5,
      .        ASTAS,BSTAS,VMISK
@@ -202,8 +200,7 @@ C
      & 5X,'MATERIAL NUMBER. . . . . . . . . . . . . . .=',I10/,
      & 5X,'MATERIAL LAW . . . . . . . . . . . . . . . .=',I10/)
   850 FORMAT(
-     & 5X,'INITIAL DENSITY    . . . . . . . . . . . . .=',1PG20.13/,
-     & 5X,'EOS REFERENCE DENSITY. . . . . . . . . . . .=',1PG20.13/)
+     & 5X,'INITIAL DENSITY  . . . . . . . . . . . . . .=',1PG20.13/)
  1000 FORMAT(
      & 5X,'  MAXWELL VISCO-ELASTIC LAW ',/,
      & 5X,'  ------------------------- ',//)

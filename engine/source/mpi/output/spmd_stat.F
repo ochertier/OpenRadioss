@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,7 +20,6 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-#include "hardware.inc"
 
 Chd|====================================================================
 Chd|  SPMD_STAT_PGATHER             source/mpi/output/spmd_stat.F 
@@ -52,16 +51,13 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 #ifdef MPI
 #include      "mpif.h"
 #endif
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr05_c.inc"
 #include      "task_c.inc"
-#include      "spmd_c.inc"
 #include      "com01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -130,7 +126,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -143,10 +138,7 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "param_c.inc"
 #include      "task_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -184,11 +176,11 @@ C
           MSGTYP=MSGOFF
 
           CALL MPI_PROBE(IT_SPMD(K),MSGTYP,
-     .    		   MPI_COMM_WORLD,STATUS,ierror)
+     .           MPI_COMM_WORLD,STATUS,ierror)
           CALL MPI_GET_COUNT(STATUS,MPI_INTEGER,NB_TMP,ierror)
 C                                                                     12
           CALL MPI_RECV(NPGLOB(IDEB),NB_TMP,MPI_INTEGER,IT_SPMD(K),
-     .    		  MSGTYP,MPI_COMM_WORLD,STATUS,ierror)
+     .          MSGTYP,MPI_COMM_WORLD,STATUS,ierror)
 
           IDEB = IDEB + NB_TMP
         END DO
@@ -215,7 +207,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 #ifdef MPI
 #include      "mpif.h"
 #endif
@@ -224,7 +215,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr05_c.inc"
 #include      "task_c.inc"
 #include      "spmd_c.inc"
 C-----------------------------------------------
@@ -334,7 +324,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 #ifdef MPI
 #include      "mpif.h"
 #endif
@@ -343,7 +332,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr05_c.inc"
 #include      "task_c.inc"
 #include      "spmd_c.inc"
 C-----------------------------------------------
@@ -448,7 +436,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 #ifdef MPI
 #include      "mpif.h"
 #endif
@@ -457,7 +444,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr05_c.inc"
 #include      "task_c.inc"
 #include      "spmd_c.inc"
 C-----------------------------------------------

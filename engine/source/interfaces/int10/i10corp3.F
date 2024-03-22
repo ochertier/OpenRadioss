@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -49,9 +49,6 @@ C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IRECT(4,*), CAND_E(*), CAND_N(*),
@@ -66,9 +63,6 @@ C     REAL
      .   NT1(MVSIZ), NT2(MVSIZ), NT3(MVSIZ),
      .   H1(MVSIZ), H2(MVSIZ), H3(MVSIZ), H4(MVSIZ),
      .   DXI(MVSIZ),DYI(MVSIZ),DZI(MVSIZ)
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -92,21 +86,21 @@ C
            IX2(JLT_NEW)  = IRECT(2,L)
            IX3(JLT_NEW)  = IRECT(3,L)
            IX4(JLT_NEW)  = IRECT(4,L)
-	   NS=IND_INT(NIN)%P(NN)
- 	   NE=SHF_INT(NIN)+JLT_NEW+LREM
+             NS=IND_INT(NIN)%P(NN)
+             NE=SHF_INT(NIN)+JLT_NEW+LREM
            NSVG(JLT_NEW) = NS
            H1(JLT_NEW)  = H_E(1,NE)
            H2(JLT_NEW)  = H_E(2,NE)
            H3(JLT_NEW)  = H_E(3,NE)
            H4(JLT_NEW)  = H_E(4,NE)
-	   STIF(JLT_NEW)=STIFS(NE)
-	   N1(JLT_NEW)=N_E(1,NE)
-	   N2(JLT_NEW)=N_E(2,NE)
-	   N3(JLT_NEW)=N_E(3,NE)
+             STIF(JLT_NEW)=STIFS(NE)
+             N1(JLT_NEW)=N_E(1,NE)
+             N2(JLT_NEW)=N_E(2,NE)
+             N3(JLT_NEW)=N_E(3,NE)
 C----------displacement
-	   DXI(JLT_NEW)=DFI(1,NS)
-	   DYI(JLT_NEW)=DFI(2,NS)
-	   DZI(JLT_NEW)=DFI(3,NS)
+             DXI(JLT_NEW)=DFI(1,NS)
+             DYI(JLT_NEW)=DFI(2,NS)
+             DZI(JLT_NEW)=DFI(3,NS)
            T1 = X(1,IX3(JLT_NEW)) - X(1,IX1(JLT_NEW))
            T2 = X(2,IX3(JLT_NEW)) - X(2,IX1(JLT_NEW))
            T3 = X(3,IX3(JLT_NEW)) - X(3,IX1(JLT_NEW))

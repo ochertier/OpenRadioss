@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -82,9 +82,9 @@ C--------------------------
                 IVENT  =-ITAGEL(I)
                 IVENTYP=IBAGHOL(13,IVENT)
                 IF(IVENTYP == 0) THEN
-			       WRITE(IOUT,1112) I,IXTG(NIXTG,IFOUND-NUMELQ-NUMELC),IVENT
+                 WRITE(IOUT,1112) I,IXTG(NIXTG,IFOUND-NUMELQ-NUMELC),IVENT
                 ELSE
-			       WRITE(IOUT,1113) I,IXTG(NIXTG,IFOUND-NUMELQ-NUMELC),IVENT
+                 WRITE(IOUT,1113) I,IXTG(NIXTG,IFOUND-NUMELQ-NUMELC),IVENT
                 ENDIF
             ENDIF
          ENDIF

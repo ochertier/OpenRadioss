@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,7 +26,7 @@ Chd|-- called by -----------
 Chd|        RESOL                         source/engine/resol.F         
 Chd|        RESOL_INIT                    source/engine/resol_init.F    
 Chd|-- calls ---------------
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        REMESH_MOD                    share/modules/remesh_mod.F    
 Chd|====================================================================
       SUBROUTINE ADMGVID(IPARG ,ELBUF_TAB,FSKYV,FSKY  ,FTHESKY,
@@ -43,22 +43,13 @@ C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "comlock.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "vect01_c.inc"
-#include      "scr01_c.inc"
 #include      "com01_c.inc"
 #include      "param_c.inc"
 #include      "parit_c.inc"
-#include      "remesh_c.inc"
-#include      "task_c.inc"
 #include      "scr18_c.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

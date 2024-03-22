@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,36 +26,31 @@ Chd|-- called by -----------
 Chd|        R23LAW114                     source/elements/spring/r23law114.F
 Chd|-- calls ---------------
 Chd|====================================================================
-      SUBROUTINE R23_114_COOR3(X   ,V   ,IXR  ,XDP  ,X3DP,
-     2                         NC3 ,VX3  ,VY3  ,VZ3)
+      SUBROUTINE R23_114_COOR3(
+     1   X,       V,       IXR,     XDP,
+     2   X3DP,    NC3,     VX3,     VY3,
+     3   VZ3,     NEL)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "vect01_c.inc"
 #include      "scr05_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: NEL
       INTEGER IXR(NIXR,*),NC3(*)
-C     REAL
-      my_real
-     .   X(3,*),V(3,*),VX3(*),VY3(*),VZ3(*)
+      my_real X(3,*),V(3,*),VX3(*),VY3(*),VZ3(*)
       DOUBLE PRECISION XDP(3,*),X3DP(3,*)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,J
 C-----------------------------------------------
-      DO I=LFT,LLT
+      DO I=1,NEL
 C--     to prevent NC3 to be zero fo seatblet outside slipring
         IF (IXR(4,I) > 0) THEN
           NC3(I)=IXR(4,I)
@@ -67,20 +62,20 @@ C----------------------------
 C     COORDONNEES NOEUD ADDITIONEL
 C----------------------------
       IF (IRESP == 1) THEN
-        DO I=LFT,LLT
+        DO I=1,NEL
           X3DP(1,I)=XDP(1,NC3(I))
           X3DP(2,I)=XDP(2,NC3(I))
           X3DP(3,I)=XDP(3,NC3(I))
         ENDDO
       ELSE
-        DO I=LFT,LLT
+        DO I=1,NEL
           X3DP(1,I)=X(1,NC3(I))
           X3DP(2,I)=X(2,NC3(I))
           X3DP(3,I)=X(3,NC3(I))
         ENDDO
       ENDIF
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         VX3(I)=V(1,NC3(I))
         VY3(I)=V(2,NC3(I))
         VZ3(I)=V(3,NC3(I))

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -43,8 +43,6 @@ C!---------+---------+---+---+-------------------
 #include "scr17_c.inc"
 #include "units_c.inc"
 #include "comlock.inc"
-#include "param_c.inc"
-#include "impl1_c.inc"
 C!-----------------------------------------------
       INTEGER NEL, NUPARAM, NUVAR,NGL(NEL)
       my_real TIME,TIMESTEP,UPARAM(*),

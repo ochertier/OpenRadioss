@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -44,7 +44,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
 #include      "com08_c.inc"
-#include      "parit_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -118,7 +117,6 @@ C----------------------------
       END DO
 C
       OFF_L = ZERO
-#include      "simd.inc"
       DO I=JFT,JLT
         DT1C(I) = DT1
         OFF(I) = MIN(ONE,ABS(OFFG(I)))
@@ -179,11 +177,6 @@ C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "param_c.inc"
-#include      "com08_c.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER JFT, JLT,NEL
@@ -198,7 +191,6 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, J, II(9),NN(4)
-C     REAL
       my_real 
      .   X0G2(MVSIZ),X0G3(MVSIZ),X0G4(MVSIZ),Y0G2(MVSIZ),
      .   Y0G3(MVSIZ),Y0G4(MVSIZ),Z0G2(MVSIZ),Z0G3(MVSIZ),Z0G4(MVSIZ),
@@ -206,7 +198,6 @@ C     REAL
      .   XL2(MVSIZ),XL3(MVSIZ),XL4(MVSIZ),YL2(MVSIZ),YL3(MVSIZ),
      .   YL4(MVSIZ),UXYZ(MVSIZ,3,4),A_I(MVSIZ)
 C-----------------------------------------------
-C=======================================================================
       DO I=1,9
         II(I) = NEL*(I-1)
       ENDDO
@@ -260,7 +251,7 @@ C
             SMSTR(II(9)+I)= Z0G4(I)
           ENDIF
         ENDDO
-C		
+C
       DO I=JFT,JLT
         XL2(I)=E1X(I)*X0G2(I)+E1Y(I)*Y0G2(I)+E1Z(I)*Z0G2(I)
         XL3(I)=E1X(I)*X0G3(I)+E1Y(I)*Y0G3(I)+E1Z(I)*Z0G3(I)
@@ -290,7 +281,7 @@ C
         V24X(I)=E1X(I)*VG24(1)+E1Y(I)*VG24(2)+E1Z(I)*VG24(3)
         V13Y(I)=E2X(I)*VG13(1)+E2Y(I)*VG13(2)+E2Z(I)*VG13(3)
         V24Y(I)=E2X(I)*VG24(1)+E2Y(I)*VG24(2)+E2Z(I)*VG24(3)
-C	
+C
        PX1(I)=A_I(I)*PX1(I) 
        PY1(I)=A_I(I)*PY1(I)
        PX2(I)=A_I(I)*PX2(I)

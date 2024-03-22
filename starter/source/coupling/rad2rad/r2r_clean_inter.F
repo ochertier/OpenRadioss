@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -34,75 +34,65 @@ Chd|====================================================================
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
-      USE RESTMOD
-      USE R2R_MOD
-      USE INTBUFDEF_MOD       
+        USE RESTMOD
+        USE R2R_MOD
+        USE INTBUFDEF_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "scr03_c.inc"
-#include      "scr17_c.inc"
-#include      "scr15_c.inc"
 #include      "param_c.inc"
-#include      "r2r_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER IPARI2(NPARI,*),IPARTC(*),IPARTG(*),IPARTS(*),ISOLNOD(*)
-      TYPE(INTBUF_STRUCT_) INTBUF_TAB(*)
+        INTEGER IPARI2(NPARI,*),IPARTC(*),IPARTG(*),IPARTS(*),ISOLNOD(*)
+        TYPE(INTBUF_STRUCT_) INTBUF_TAB(*)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NI,I,J,K,L,NTYP,CUR_ID,IAD,NSN,NRTM,NRTS
-      INTEGER ELTAG,FACE(4)
+        INTEGER NI,I,J,K,L,NTYP,CUR_ID,IAD,NSN,NRTM,NRTS
+        INTEGER ELTAG,FACE(4)
 C-----------------------------------------------
 
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
-      INTEGER USR2SYS
-      INTEGER NLOCAL          
-C----------------------------------------------- 
+        INTEGER USR2SYS
+        INTEGER NLOCAL
+C-----------------------------------------------
 
-      DO NI=1,NINTER
-        NTYP = IPARI2(7,NI)
-        IF ((NTYP==7).OR.(NTYP==18).OR.(NTYP==10).OR.(NTYP==24)) THEN
-     	  NSN   =IPARI2(5,NI)
-     	  NRTS  =IPARI2(3,NI)
-     	  NRTM  =IPARI2(4,NI)
+        DO NI=1,NINTER
+          NTYP = IPARI2(7,NI)
+          IF ((NTYP==7).OR.(NTYP==18).OR.(NTYP==10).OR.(NTYP==24)) THEN
+            NSN   =IPARI2(5,NI)
+            NRTS  =IPARI2(3,NI)
+            NRTM  =IPARI2(4,NI)
 C------------------------>   check of secondary nodes  <----------C
-          DO J=1,NSN   
-	    CUR_ID = INTBUF_TAB(NI)%NSV(J)
-            IF ((TAGNO(CUR_ID+NPART)==2).AND.(TAGNO(CUR_ID+NPART+NUMNOD)==-1)) THEN
-              INTBUF_TAB(NI)%STFNS(J) = ZERO      
-            ENDIF 		   		       	
-          ENDDO
+            DO J=1,NSN
+              CUR_ID = INTBUF_TAB(NI)%NSV(J)
+              IF ((TAGNO(CUR_ID+NPART)==2).AND.(TAGNO(CUR_ID+NPART+NUMNOD)==-1)) THEN
+                INTBUF_TAB(NI)%STFNS(J) = ZERO
+              ENDIF
+            ENDDO
 
 C------------------------>   check of main elements <--------------C
-          DO J=1,NRTM
-            FACE(1) = INTBUF_TAB(NI)%IRECTM(4*(J-1)+1)
-            FACE(2) = INTBUF_TAB(NI)%IRECTM(4*(J-1)+2)
-            FACE(3) = INTBUF_TAB(NI)%IRECTM(4*(J-1)+3)
-            FACE(4) = INTBUF_TAB(NI)%IRECTM(4*(J-1)+4)
-            IF (FACE(4)==0) FACE(4)=FACE(3)         
-            CALL R2R_CHECK_SEG(ELTAG,FACE,IPARTC,IPARTG,IPARTS,ISOLNOD)
-            IF (ELTAG==0) INTBUF_TAB(NI)%STFM(J) = ZERO
-          ENDDO
+            DO J=1,NRTM
+              FACE(1) = INTBUF_TAB(NI)%IRECTM(4*(J-1)+1)
+              FACE(2) = INTBUF_TAB(NI)%IRECTM(4*(J-1)+2)
+              FACE(3) = INTBUF_TAB(NI)%IRECTM(4*(J-1)+3)
+              FACE(4) = INTBUF_TAB(NI)%IRECTM(4*(J-1)+4)
+              IF (FACE(4)==0) FACE(4)=FACE(3)
+              CALL R2R_CHECK_SEG(ELTAG,FACE,IPARTC,IPARTG,IPARTS,ISOLNOD)
+              IF (ELTAG==0) INTBUF_TAB(NI)%STFM(J) = ZERO
+            ENDDO
 
-        ENDIF
-      END DO
-                    
+          ENDIF
+        END DO
+
 C-----------
-  
-      RETURN
-      END                             
+
+        RETURN
+      END SUBROUTINE R2R_CLEAN_INTER

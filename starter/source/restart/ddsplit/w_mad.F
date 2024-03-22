@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,12 +26,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 c#include      "implicit_f.inc"
-c#include      "mvsiz_p.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-c#include      "com04_c.inc"
-c#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -39,9 +33,6 @@ c      INTEGER PROC, NRIVET_L, LEN_AM,
 c     .        IXRI(4,*), FRONT(NUMNOD,*)
 c      my_real
 c     .        RIVET(NRIVF,*)
-C-----------------------------------------------
-C   F u n c t i o n
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -73,7 +64,7 @@ Chd|  W_MAD                         source/restart/ddsplit/w_mad.F
 Chd|-- called by -----------
 Chd|        DDSPLIT                       source/restart/ddsplit/ddsplit.F
 Chd|-- calls ---------------
-Chd|        WRITE_I_C                     source/output/tools/write_routines.c
+Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|        NLOCAL                        source/spmd/node/ddtools.F    
 Chd|====================================================================
       SUBROUTINE W_MAD(IEXMAD  ,NMADSH4_L,NMADSH3_L,NMADSOL_L,NMADNOD_L,
@@ -87,13 +78,10 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

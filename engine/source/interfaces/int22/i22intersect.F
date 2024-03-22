@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -28,8 +28,8 @@ Chd|-- calls ---------------
 Chd|        ARRET                         source/system/arret.F         
 Chd|        MY_BARRIER                    source/system/machine.F       
 Chd|        ISONSH3N                      source/interfaces/int22/i22intersect.F
-Chd|        I22BUFBRIC_MOD                ../common_source/modules/cut-cell-search_mod.F
-Chd|        I22TRI_MOD                    ../common_source/modules/cut-cell-search_mod.F
+Chd|        I22BUFBRIC_MOD                ../common_source/modules/interfaces/cut-cell-search_mod.F
+Chd|        I22TRI_MOD                    ../common_source/modules/interfaces/cut-cell-search_mod.F
 Chd|        REALLOC_MOD                   share/modules/realloc_mod.F   
 Chd|====================================================================
       SUBROUTINE I22INTERSECT(
@@ -63,18 +63,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "param_c.inc"
-#include      "parit_c.inc"
-#include      "scr05_c.inc"
-#include      "sms_c.inc"
 #include      "task_c.inc"
-#include      "timerr_c.inc"
-#include      "i22edges.inc"
-C-----------------------------------------------s
+C-----------------------------------------------
 C=======================================================================
 C 6   creation of edge list and addresses for each candidate cell
 C================================================================     
@@ -248,7 +238,7 @@ C================================================================
         d_3 = zero
         DO J=1,12
           K=(I-1)*12+J
-          EDGE_LIST(NIN,K)%NODE(1:2)    = IXS(iEDGE(1:2,J)+1,BRICK_LIST(NIN,I)%ID)                        ! ids cell nodes
+          EDGE_LIST(NIN,K)%NODE(1:2)    = IXS(INT22_BUF%iEDGE(1:2,J)+1,BRICK_LIST(NIN,I)%ID)                        ! ids cell nodes
           EDGE_LIST(NIN,K)%NBCUT        = 0
           EDGE_LIST(NIN,K)%CUTSHELL     = 0
           EDGE_LIST(NIN,K)%CUTCOOR(1:2) = ZERO
@@ -343,7 +333,7 @@ C================================================================
       DO I=NBF,NBL !each thread handle its bricks (no duplicate work)
         BRICK_LIST(NIN,I)%Seg_add_LFT = IADF(I)    ! corresponding window in CAND_B(i)  : CAND_B(IADFL(I):IADL(I)) = I
         BRICK_LIST(NIN,I)%Seg_add_LLT = IADL(I) 
-	CAND_B(IADF(I):IADL(I)) = I        !TRANSFORM CAND_B(I) into ADD into brick_list()
+          CAND_B(IADF(I):IADL(I)) = I        !TRANSFORM CAND_B(I) into ADD into brick_list()
 c        print *, "IB           =", I
 c        print *, "....IADF,IADL=", IADF(I), IADL(I)   
         IB  = LIST_B(I)            !local ID in group IBUFSSG(IAD+(/1:NBRIC/))
@@ -379,7 +369,7 @@ C          END IF
             N_CUT_EDGE    = 0
             DO J=1,12                                                   !12 edges !opposite sign for nodes power ?
               K       = (I-1)*12+J                                      !k : address number in EDGE_LIST
-              POW(1:2)= POWER(iEDGE(1:2, J))
+              POW(1:2)= POWER(INT22_BUF%iEDGE(1:2, J))
               iN(1:2) = EDGE_LIST(NIN,K)%NODE(1:2)                      !IXS(1+iEDGE(1, J),NS)
               DEJA    = EDGE_LIST(NIN,K)%NBCUT                                 !is edge already cut by another shell ?
               NBCUT   = -1

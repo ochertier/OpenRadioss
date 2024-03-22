@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -29,9 +29,6 @@ Chd|        ARRET                         source/system/arret.F
 Chd|====================================================================
       SUBROUTINE ANI_FASOLFR1(IXS ,IXC     ,IXTG    ,FASTAG, ISOLNOD)
 C-----------------------------------------------
-C   M o d u l e s
-C-----------------------------------------------
-C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
@@ -40,7 +37,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "param_c.inc"
 #include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -252,7 +248,7 @@ C
               IF(MOD(LL,PWR(JJ+1))/PWR(JJ)==0)THEN
                 NN=0
                 DO KK=1,4
-          	  IF(IXS(FACES(KK,JJ)+1,JS)/=0) 
+            IF(IXS(FACES(KK,JJ)+1,JS)/=0) 
      .              NN=NN+NODTAG(IXS(FACES(KK,JJ)+1,JS))
                 END DO
                 IF(NN == 4)THEN
@@ -279,7 +275,7 @@ C
               IF(MOD(LL,PWR(JJ+1))/PWR(JJ)==0)THEN
                 NN=0
                 DO KK=1,4
-          	  IF(IXS(FACES(KK,JJ)+1,JS)/=0) 
+            IF(IXS(FACES(KK,JJ)+1,JS)/=0) 
      .              NN=NN+NODTAG(IXS(FACES(KK,JJ)+1,JS))
                 END DO
                 IF(NN==4)THEN
@@ -305,7 +301,7 @@ C
               IF(MOD(LL,PWR(JJ+1))/PWR(JJ)==0)THEN
                 NN=0
                 DO KK=1,4
-          	  IF(IXS(FACES(KK,JJ)+1,JS)/=0) 
+            IF(IXS(FACES(KK,JJ)+1,JS)/=0) 
      .              NN=NN+NODTAG(IXS(FACES(KK,JJ)+1,JS))
                 END DO
                 IF(NN==4)THEN
@@ -341,9 +337,6 @@ Chd|-- calls ---------------
 Chd|====================================================================
       SUBROUTINE ANI_FASOLFR2(FASTAG  ,FASOLFR, ISOLNOD )
 C-----------------------------------------------
-C   M o d u l e s
-C-----------------------------------------------
-C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
@@ -352,8 +345,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "param_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

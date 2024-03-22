@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -29,7 +29,8 @@ Chd|        FUNC_SLOPE                    source/tools/curve/func_slope.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        TABLE_MOD                     share/modules1/table_mod.F    
 Chd|====================================================================
-      SUBROUTINE LAW90_UPD(IOUT,TITR,MAT_ID,UPARAM,IPM, FUNC_ID,NPC,PLD,PM)
+      SUBROUTINE LAW90_UPD(IOUT,TITR,MAT_ID,UPARAM,IPM, FUNC_ID,NPC,PLD,PM,
+     .                     NFUNCT)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -43,14 +44,14 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "com04_c.inc"
 #include      "scr17_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       CHARACTER*nchartitle  :: TITR
+      INTEGER ,INTENT(IN) :: NFUNCT
       INTEGER MAT_ID,IOUT,ID_F1,ID_F2
-      INTEGER NPC(*), FUNC_ID(*), IPM(NPROPMI)
+      INTEGER NPC(*), FUNC_ID(NFUNCT), IPM(NPROPMI)
       my_real 
      .         UPARAM(*),PLD(*),PM(NPROPM)
 !      TYPE(TTABLE) TABLE(*)
@@ -65,7 +66,7 @@ C-----------------------------------------------
       my_real 
      .      STIFF,STIFFC,STIFFT, EMAX, EMIN,EINI,
      .     STIFFMIN,STIFFMAX,STIFFINI,STFAVG,SCALEFAC,E0,
-     .     EPSMAX
+     .     EPSMAX,EC_MAX
 
       COMMON /MINCFPRT/IPRINT, LP
       COMMON /INDEX_SQP/IndexDesign0
@@ -86,6 +87,7 @@ c
               EINI = MAX(EINI, STIFFINI)
           ENDDO ! NFUNC 
           E0 = UPARAM(1)
+          EC_MAX = MAX(E0,EMAX)
           IF(EMAX <= E0) THEN
             EMAX = E0
           ELSE  
@@ -94,10 +96,12 @@ c
           ENDIF   
           UPARAM(11 + 2*NFUNC) = EMAX
           UPARAM(12 + 2*NFUNC) = EPSMAX
+          PM(24) = EC_MAX
 !
          WRITE(IOUT,1000)
          WRITE(IOUT,1001) TRIM(TITR),MAT_ID,90   
          WRITE(IOUT,1002) EMAX       
+         WRITE(IOUT,1003) EC_MAX       
 c----------------
       RETURN
 1000  FORMAT(
@@ -108,6 +112,8 @@ c----------------
      & 5X,'MATERIAL NUMBER . . . . . . . . . . . .=',I10/,
      & 5X,'MATERIAL LAW. . . . . . . . . . . . . .=',I10/)
 1002   FORMAT(
-     & 5X,'MAXIMAM YOUNG''S MODULUS. . . . . . . .=',1PG20.13/)
+     & 5X,'MAXIMUM YOUNG''S MODULUS. . . . . . . .=',1PG20.13/)
+1003   FORMAT(
+     & 5X,'YOUNG''S MODULUS FOR HG COMPUTE . . . .=',1PG20.13/)
 
       END

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -55,14 +55,8 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr05_c.inc"
 #include      "scr17_c.inc"
-#include      "param_c.inc"
-#include      "units_c.inc"
 #include      "flowcom.inc"
-#include      "sysunit.inc"
-C     NSUBMOD
-#include      "submod_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -236,7 +230,7 @@ C
             CALL ANCMSG(MSGID = 1711, ANMODE=ANINFO, MSGTYPE = MSGERROR, 
      .           I1 = INT(SQRT(REAL(HG))))
             CALL ARRET(2)
-         ENDIF			
+         ENDIF
          IF(NEL < NELMAX) THEN
             LRFLOW=LRFLOW+NRFLOW+7*NEL+NEL*NEL+3*NEL
          ELSE
@@ -295,13 +289,9 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "scr17_c.inc"
-#include      "scr05_c.inc"
 #include      "param_c.inc"
 #include      "units_c.inc"
 #include      "flowcom.inc"
-#include      "sysunit.inc"
-C     NSUBMOD
-#include      "submod_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -955,8 +945,8 @@ C     Initialization
          XA=ZERO
          YA=ZERO
          ZA=ZERO 
-         DIRX=ZERO			
-         DIRY=ZERO			
+         DIRX=ZERO
+         DIRY=ZERO
          DIRZ=ZERO   
          IF(FREESURF == 2 .OR. GRAV_ID > 0)THEN
             CALL HM_GET_FLOATV('XA', XA, IS_AVAILABLE, LSUBMODEL, UNITAB)
@@ -964,7 +954,7 @@ C     Initialization
             CALL HM_GET_FLOATV('ZA', ZA, IS_AVAILABLE, LSUBMODEL, UNITAB)
             CALL HM_GET_FLOATV('Dir-X', DIRX, IS_AVAILABLE, LSUBMODEL, UNITAB)
             CALL HM_GET_FLOATV('Dir-Y', DIRY, IS_AVAILABLE, LSUBMODEL, UNITAB)
-            CALL HM_GET_FLOATV('Dir-Z', DIRZ, IS_AVAILABLE, LSUBMODEL, UNITAB)              			
+            CALL HM_GET_FLOATV('Dir-Z', DIRZ, IS_AVAILABLE, LSUBMODEL, UNITAB)              
             NORM=SQRT(DIRX**2+DIRY**2+DIRZ**2)
             IF (NORM==ZERO) THEN
                CALL ANCMSG(MSGID=622,

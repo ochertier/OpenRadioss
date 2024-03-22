@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -42,7 +42,7 @@ Chd|        CZLKEN3                       source/elements/shell/coquez/czlken3.F
 Chd|        CZLKENR3                      source/elements/shell/coquez/czlken3.F
 Chd|        CZSUMG3                       source/elements/shell/coquez/czsumg3.F
 Chd|        DRAPE_MOD                     share/modules/drape_mod.F     
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        STACK_MOD                     share/modules/stack_mod.F     
 Chd|====================================================================
        SUBROUTINE CZKE3 (
@@ -53,7 +53,7 @@ Chd|====================================================================
      5            K_DIAG ,K_LT  , IADK  ,JDIK  ,     
      6            IHBE   ,THKE   ,ISMSTR ,X      ,IKGEO  ,
      7            IPM    ,IGEO   ,IEXPAN ,IPARG  ,ISUBSTACK,
-     8            STACK  ,DRAPE )
+     8            STACK  ,DRAPE_SH4N , INDX_DRAPE,SEDRAPE,NUMEL_DRAPE)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -71,28 +71,28 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C O M M O N   B L O C K S
 C-----------------------------------------------
-#include      "scr01_c.inc"
-#include      "parit_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
 #include      "impl1_c.inc"
-#include      "impl2_c.inc"
 C-----------------------------------------------
 C   D U M M Y   A R G U M E N T S
 C-----------------------------------------------
       INTEGER JFT     ,JLT    ,NFT    ,NPT    , 
      .        MTN     ,ITHK   ,NCYCLE,ISUBSTACK,
      .        ISTRAIN ,IPLA   ,OFFSET,IHBE    ,ISMSTR,IKGEO,IEXPAN
+      INTEGER ,    INTENT(IN)     ::        SEDRAPE,NUMEL_DRAPE
       INTEGER IXC(NIXC,*),IGEO(NPROPGI,*),IPM(*),IPARG(*)
       INTEGER INDXOF(MVSIZ),
      .         ETAG(*),IDDL(*)  ,NDOF(*)  ,IADK(*) ,JDIK(*)
+      INTEGER, DIMENSION(SEDRAPE) :: INDX_DRAPE
+     
 C     REAL OU REAL*8
       my_real
      .   PM(NPROPM,*),GEO(NPROPG,*),BUFMAT(*),X(3,*),THKE(*),
      .   OFF(MVSIZ),K_DIAG(*) ,K_LT(*)
       TYPE (ELBUF_STRUCT_), TARGET :: ELBUF_STR
       TYPE (STACK_PLY) :: STACK
-      TYPE (DRAPE_) :: DRAPE
+      TYPE (DRAPE_) :: DRAPE_SH4N(NUMELC_DRAPE)
 C=======================================================================
 c FUNCTION: [K] stiffness Matrix of QEPH element
 c
@@ -251,8 +251,8 @@ C
      3             HM     ,HF        ,HC     ,HZ      ,IGTYP    ,
      4             IORTH  ,HMOR      ,HFOR   ,DIR_A   ,IGEO     ,
      5             IDRIL  ,IHBE      ,HMFOR  ,GS      ,ISUBSTACK,
-     6             STACK  ,ELBUF_STR ,NLAY   ,DRAPE   ,NFT      ,
-     7             NEL )
+     6             STACK  ,ELBUF_STR ,NLAY   ,DRAPE_SH4N   ,NFT      ,
+     7             NEL    ,INDX_DRAPE,SEDRAPE,NUMEL_DRAPE)
       ELSE
        CALL CMATC3(JFT    ,JLT       ,PM     ,MAT     ,GEO      ,
      1             PID    ,AREA      ,THK0   ,THK2    ,GBUF%THK ,
@@ -260,8 +260,8 @@ C
      3             HM     ,HF        ,HC     ,HZ      ,IGTYP    ,
      4             IORTH  ,HMOR      ,HFOR   ,DIRA    ,IGEO     ,
      5             IDRIL  ,IHBE      ,HMFOR  ,GS      ,ISUBSTACK,
-     6             STACK  ,ELBUF_STR ,NLAY   ,DRAPE   ,NFT      ,
-     7             NEL)
+     6             STACK  ,ELBUF_STR ,NLAY   ,DRAPE_SH4N   ,NFT      ,
+     7             NEL    ,INDX_DRAPE,SEDRAPE,NUMEL_DRAPE)
       ENDIF
 C-----------------------------------------------
 C     IF [KT]
@@ -437,13 +437,9 @@ C   G L O B A L   P A R A M E T E R S
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
 C-----------------------------------------------
-C   C O M M O N   B L O C K S
-C-----------------------------------------------
-C-----------------------------------------------
 C   D U M M Y   A R G U M E N T S
 C-----------------------------------------------
       INTEGER JFT     ,JLT 
-C     REAL OU REAL*8
       my_real    
      .   UI(3,4,MVSIZ),RI(3,4,MVSIZ),FI(3,4,MVSIZ),MI(3,4,MVSIZ)
       my_real    
@@ -615,24 +611,16 @@ C   I M P L I C I T   T Y P E S
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G L O B A L   P A R A M E T E R S
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
-C   C O M M O N   B L O C K S
-C-----------------------------------------------
-C-----------------------------------------------
 C   D U M M Y   A R G U M E N T S
 C-----------------------------------------------
       INTEGER ITRAN
-C     REAL OU REAL*8
       my_real    
      .   UJ(3),RJ(3),FI(3),MI(3)
       my_real    
      .   KEIJ(6,6)
-C---+----1----+----2----+----3----+----4----+----5----+----6----+----7--
+C-----------------------------------------------
 C   L O C A L   V A R I A B L E S
-C--------------------------------
+C-----------------------------------------------
       INTEGER 
      .   I, J, M  
 C

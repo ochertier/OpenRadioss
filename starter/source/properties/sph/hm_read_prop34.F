@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -51,7 +51,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr05_c.inc"
 #include      "scr17_c.inc"
 #include      "com01_c.inc"
 #include      "param_c.inc"
@@ -108,7 +107,6 @@ C=======================================================================
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "warn_c.inc"
 #include      "com04_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -164,7 +162,7 @@ C
 
       IF(QA==ZERO)QA=TWO
       IF(QB==ZERO)QB=ONE
-      IF (ZSTAB>0) NSPBUF=13
+      IF (ZSTAB>0) NSPBUF=14
 C
       IF(ISK /= 0)THEN
         DO K=1,NUMSKW
@@ -183,12 +181,12 @@ C
         K = 1
       ENDIF
 C------
-      IF(NSPMD > 1 .AND. IORDER==1)THEN
-        CALL ANCMSG(MSGID=755,
-     .              MSGTYPE=MSGERROR,
-     .              ANMODE=ANINFO,
-     .              C1='SPH CORRECTION ORDER 1')
-      END IF
+C      IF(NSPMD > 1 .AND. IORDER==1)THEN
+C        CALL ANCMSG(MSGID=755,
+C     .              MSGTYPE=MSGERROR,
+C     .              ANMODE=ANINFO,
+C     .              C1='SPH CORRECTION ORDER 1')
+C      END IF
 C
       IF (IFLG_H_1D==0) THEN
         RFLG_H_1D = THIRD

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -23,24 +23,26 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 Chd|====================================================================
 Chd|  AGAUGE                        source/ale/agauge.F           
 Chd|-- called by -----------
-Chd|        ALETHE                        source/ale/alethe.F           
+Chd|        ALEMAIN                       source/ale/alemain.F          
 Chd|-- calls ---------------
 Chd|        AGAUG3                        source/ale/agauge.F           
 Chd|        AGAUG30                       source/ale/agauge.F           
+Chd|        AGAUG3Q                       source/ale/agaug3q.F          
+Chd|        AGAUG3T                       source/ale/agaug3t.F          
 Chd|        INITBUF                       share/resol/initbuf.F         
 Chd|        MY_BARRIER                    source/system/machine.F       
 Chd|        SPMD_E1VOIS                   source/mpi/fluid/spmd_cfd.F   
 Chd|        SPMD_RBCAST                   source/mpi/generic/spmd_rbcast.F
 Chd|        SPMD_SD_GAUG                  source/mpi/output/spmd_sd_gaug.F
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        INITBUF_MOD                   share/resol/initbuf.F         
 Chd|====================================================================
       SUBROUTINE AGAUGE(
      1  IPARG    ,ELBUF_STR   ,PHI     ,IXS      ,IXQ     ,
      2  X        ,ALE_CONNECT ,ITASK   ,NERCVOIS ,NESDVOIS,
      3  LERCVOIS ,LESDVOIS    ,LENCOM  ,LGAUGE   ,
-     4  GAUGE    ,V           ,IGAUP   ,NGAUP   )
+     4  GAUGE    ,V           ,IGAUP   ,NGAUP    ,IXTG)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -55,78 +57,74 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr01_c.inc"
-#include      "scr05_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
 #include      "vect01_c.inc"
 #include      "param_c.inc"
 #include      "task_c.inc"
-#include      "conv_c.inc"
-#include      "spmd_c.inc"
-#include      "units_c.inc"
+#include      "tabsiz_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER IPARG(NPARG,NGROUP), ITASK, LENCOM,
+      INTEGER IPARG(NPARG,NGROUP), ITASK, LENCOM,IXTG(NIXTG,NUMELTG),
      .        NERCVOIS(*),NESDVOIS(*),LERCVOIS(*),LESDVOIS(*),
      .        IXS(NIXS,NUMELS),IXQ(NIXQ,NUMELQ),LGAUGE(3,NBGAUGE),IGAUP(NBGAUGE),NGAUP(NSPMD)   
 C     REAL
-      my_real PHI(*),GAUGE(LLGAUGE,NBGAUGE),X(3,NUMNOD),V(3,NUMNOD)
+      my_real PHI(SPHI),GAUGE(LLGAUGE,NBGAUGE),X(3,NUMNOD),V(3,NUMNOD)
       TYPE(ELBUF_STRUCT_), TARGET, DIMENSION(NGROUP) :: ELBUF_STR
       TYPE(t_ale_connectivity), INTENT(IN) :: ALE_CONNECT
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER NG, JMUL, IADR, I, II,J,JJ(6), K,N,IG,IS,IGAUGE,IG0,
-     .        ITAG(NBGAUGE),NEL
+     .        ITAG(NBGAUGE),NEL,NUMEL,NCONNECT
       my_real P,RHO,E,PA,U2,ALPHA(NBGAUGE)
       TYPE(G_BUFEL_) ,POINTER :: GBUF
 C-----------------------------------------------
-c     GAUGE(3,*)
-c 1:  -Isolid				   -(NUMELS_G+1) if SPH gauge
+c     LGAUGE(3,*)
+c 1:  -Isolid           -(NUMELS_G+1) if SPH gauge
 c 2:  GaugeId
 c 3:  +Node or -Shell
 c
 c     => GAUGE(LLGAUGE,*), LLGAUGE = 37
-c 1:  Dist (distance from Shell)	   Dist (distance from Shell)
-c 2:  XG				   XG
-c 3:  YG				   YG
-c 4:  ZG				   ZG
-c 5:  Alpha (Solid penetration ratio)	   not yet used
-c 6:    				   XSAV (SPH sorting)
-c 7:    				   YSAV (SPH sorting)
-c 8:    				   ZSAV (SPH sorting)
-c 9:    				   FF (sph only)
-c 10:   				   intantaneous Pressure
-c 11:   				   intantaneous PA
-c 12:   				   intantaneous Rho
-c 13:   				   intantaneous E
-c 14:   				   ! Butterworth !
-c 15:   				   ! Butterworth !
-c 16:   				   ! Butterworth !
-c 17:   				   ! Butterworth !
-c 18:   				   ! Butterworth !
-c 19:   				   ! Butterworth !
-c 20:   			           ! Butterworth !
-c 21: 				           ! Butterworth !
-c 22: 				           ! Butterworth !
-c 23: 				           ! Butterworth !  
-c 24:   				   ! Butterworth !
-c 25:   				   ! Butterworth !
-c 26:   				   ! Butterworth !
-c 27:   				   ! Butterworth !
-c 28:   				   ! Butterworth !
-c 29:   				   ! Butterworth !
-c 30:  Pressure      		  	   filtered Pressure
-c 31:  PA            			   filtered PA
-c 32:  Rho           			   filtered Rho
-c 33:  E             			   filtered E	     
-c 34:   				   ! Butterworth !
-c 35:   				   ! Butterworth !
-c 36:   				   ! Butterworth !
-c 37:   				   ! Butterworth !
+c 1:  Dist (distance from Shell)     Dist (distance from Shell)
+c 2:  XG           XG
+c 3:  YG           YG
+c 4:  ZG           ZG
+c 5:  Alpha (Solid penetration ratio)     not yet used
+c 6:               XSAV (SPH sorting)
+c 7:               YSAV (SPH sorting)
+c 8:               ZSAV (SPH sorting)
+c 9:               FF (sph only)
+c 10:              intantaneous Pressure
+c 11:              intantaneous PA
+c 12:              intantaneous Rho
+c 13:              intantaneous E
+c 14:              ! Butterworth !
+c 15:              ! Butterworth !
+c 16:              ! Butterworth !
+c 17:              ! Butterworth !
+c 18:              ! Butterworth !
+c 19:              ! Butterworth !
+c 20:                  ! Butterworth !
+c 21:            ! Butterworth !
+c 22:            ! Butterworth !
+c 23:            ! Butterworth !  
+c 24:              ! Butterworth !
+c 25:              ! Butterworth !
+c 26:              ! Butterworth !
+c 27:              ! Butterworth !
+c 28:              ! Butterworth !
+c 29:              ! Butterworth !
+c 30:  Pressure                 filtered Pressure
+c 31:  PA                     filtered PA
+c 32:  Rho                    filtered Rho
+c 33:  E                      filtered E       
+c 34:              ! Xpoint      !
+c 35:              ! Ypoint      !
+c 36:              ! Zpoint      !
+c 37:              ! Butterworth !
 C-----------------------------------------------
 
 C-----------------------------------------------
@@ -134,7 +132,8 @@ C   S o u r c e   L i n e s
 C-----------------------------------------------
       IGAUGE=0
       DO IG=1,NBGAUGE
-        IF(LGAUGE(1,IG) <= 0 .AND. LGAUGE(1,IG) >= -NUMELS) IGAUGE=1
+        IF(LGAUGE(1,IG) <= 0 .AND. LGAUGE(1,IG) >= -(NUMELS+NUMELQ+NUMELTG))
+     .     IGAUGE=1
       END DO
 C      
       CALL MY_BARRIER
@@ -146,8 +145,9 @@ C       Recherche des elements T=0
 C-----------------------------
       IF(TT==ZERO)THEN
        DO NG=ITASK+1,NGROUP,NTHREAD
-        IF(IPARG(5,NG) /= 1) CYCLE
-        CALL INITBUF (IPARG    ,NG      ,
+        IF( IPARG(5,NG) /= 1 .AND. IPARG(5,NG) /= 2 .AND.
+     .     (IPARG(5,NG) /= 7 .AND. N2D == 0) ) CYCLE
+        CALL INITBUF(IPARG    ,NG      ,
      2        MTN     ,LLT     ,NFT     ,IADR    ,ITY     ,
      3        NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,
      4        JTHE    ,JLAG    ,JMUL    ,JHBE    ,JIVF    ,
@@ -156,23 +156,38 @@ C-----------------------------
      7        ICSEN   ,ISORTH  ,ISORTHG ,IFAILURE,JSMS    )
         IF (IPARG(8,NG) == 1)       CYCLE
         LFT=1
-        CALL AGAUG30(LGAUGE,GAUGE,IXS ,X  )
+        IF (IPARG(5,NG) == 1) THEN
+          ! solid (8N)
+          NUMEL = NUMELS
+          NCONNECT = 8
+          CALL AGAUG30(LGAUGE,GAUGE,IXS ,X  ,NIXS,NUMEL,NCONNECT)
+        ELSEIF (IPARG(5,NG) == 2) THEN
+          ! quad 2D
+          NUMEL = NUMELQ
+          NCONNECT = 4
+          CALL AGAUG30(LGAUGE,GAUGE,IXQ ,X  ,NIXQ,NUMEL,NCONNECT)
+        ELSEIF (IPARG(5,NG) == 7) THEN
+          ! tria 2D
+          NUMEL = NUMELTG
+          NCONNECT = 3
+          CALL AGAUG30(LGAUGE,GAUGE,IXTG ,X  ,NIXTG,NUMEL,NCONNECT)
+        ENDIF
        ENDDO
        CALL MY_BARRIER 
       ENDIF
 C
       IF(ITASK==0)THEN
-        DO I=1,MAX(NUMELS,NUMELQ)
+        DO I=1,MAX(NUMELS,NUMELQ,NUMELTG)
           PHI(I)=ZERO
         END DO
 C
         DO IG=1,NBGAUGE
           IS = -LGAUGE(1,IG)
-          IF(IS > 0 .AND. IS <= NUMELS)THEN
+          IF(IS > 0 .AND. IS <= NUMELS+NUMELQ+NUMELTG)THEN
                PHI(IS)= IG 
 C
-Csm            PHI(IS)=I
-c taux de penetration dans l'element (initialisation)             
+C              PHI(IS)=I
+c penetration ratio within element (initialisation)
             GAUGE(5,IG)=ZERO
           ENDIF
         END DO
@@ -183,21 +198,17 @@ C-----------------------------
 C       SPMD EXCHANGE
 C-----------------------------
       IF (NSPMD > 1) THEN
-C
-C Part not parallel smt
-C
 !$OMP SINGLE
-        CALL SPMD_E1VOIS(PHI     ,NERCVOIS,NESDVOIS,LERCVOIS,
-     2                     LESDVOIS,LENCOM  )
-C END part not parallel smt
+        CALL SPMD_E1VOIS(PHI,NERCVOIS,NESDVOIS,LERCVOIS,LESDVOIS,LENCOM)
 !$OMP END SINGLE
       ENDIF
 C-----------------------------
 C       Searching for new elements
 C-----------------------------
       DO NG=ITASK+1,NGROUP,NTHREAD
-        IF(IPARG(5,NG) /= 1) CYCLE
-        CALL INITBUF (IPARG    ,NG      ,
+        IF( IPARG(5,NG) /= 1 .AND. IPARG(5,NG) /= 2 .AND.
+     .     (IPARG(5,NG) /= 7 .AND. N2D == 0) ) CYCLE
+        CALL INITBUF(IPARG    ,NG      ,
      2        MTN     ,LLT     ,NFT     ,IADR    ,ITY     ,
      3        NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,
      4        JTHE    ,JLAG    ,JMUL    ,JHBE    ,JIVF    ,
@@ -207,12 +218,21 @@ C-----------------------------
         IF(IPARG(8,NG) == 1)       CYCLE
          
         LFT=1    
-        CALL AGAUG3(LGAUGE,GAUGE,PHI,IXS  ,X  ,ALE_CONNECT )
+        IF (IPARG(5,NG) == 1) THEN
+          ! solid (8N)
+          CALL AGAUG3(LGAUGE,GAUGE,PHI,IXS  ,X  ,ALE_CONNECT )
+        ELSEIF (IPARG(5,NG) == 2) THEN
+          ! quad 2D
+          CALL AGAUG3Q(LGAUGE,GAUGE,PHI,IXQ  ,X  ,ALE_CONNECT )
+        ELSEIF (IPARG(5,NG) == 7) THEN
+          ! tria 2D
+          CALL AGAUG3T(LGAUGE,GAUGE,PHI,IXTG ,X  ,ALE_CONNECT )
+        ENDIF
       END DO
 C      
        CALL MY_BARRIER
        IF(ITASK==0)THEN
-        DO I=1,MAX(NUMELS,NUMELQ)
+        DO I=1,MAX(NUMELS,NUMELQ,NUMELTG)
           PHI(I)=ZERO
         END DO
 C
@@ -224,7 +244,7 @@ c
 C
         DO IG=1,NBGAUGE
           IS = -LGAUGE(1,IG)
-          IF(IS > 0 .AND. IS <= NUMELS)THEN
+          IF(IS > 0 .AND. IS <= (NUMELS+NUMELQ+NUMELTG))THEN
             IG0 = NINT(PHI(IS))
             IF(IG0 > 0) THEN
               ITAG(IG) = IG0
@@ -240,13 +260,8 @@ C-----------------------------
 C       SPMD EXCHANGE
 C-----------------------------
       IF (NSPMD > 1) THEN
-C
-C Part not parallel smt
-C
 !$OMP SINGLE
-        CALL SPMD_E1VOIS(PHI     ,NERCVOIS,NESDVOIS,LERCVOIS,
-     2                     LESDVOIS,LENCOM  )
-C END part not parallel smt
+        CALL SPMD_E1VOIS(PHI,NERCVOIS,NESDVOIS,LERCVOIS,LESDVOIS,LENCOM)
 !$OMP END SINGLE
       ENDIF  
 C-----------------------------
@@ -254,8 +269,9 @@ C     CALCULATION OF GAUGE MEASURES
 C-----------------------------
       DO NG=ITASK+1,NGROUP,NTHREAD
 C-----------------------------
-        IF(IPARG(5,NG) /= 1) CYCLE
-        CALL INITBUF (IPARG    ,NG      ,
+        IF( IPARG(5,NG) /= 1 .AND. IPARG(5,NG) /= 2 .AND.
+     .     (IPARG(5,NG) /= 7 .AND. N2D == 0) ) CYCLE
+        CALL INITBUF(IPARG    ,NG      ,
      2        MTN     ,LLT     ,NFT     ,IADR    ,ITY     ,
      3        NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,
      4        JTHE    ,JLAG    ,JMUL    ,JHBE    ,JIVF    ,
@@ -277,15 +293,35 @@ C-----------------------------
           IF (IG <= 0) CYCLE
 c         
           P = (GBUF%SIG(JJ(1)+I) + GBUF%SIG(JJ(2)+I) + GBUF%SIG(JJ(3)+I))/THREE
-          RHO = GBUF%RHO(I) /GBUF%VOL(I)
-          E   = GBUF%EINT(I)/GBUF%VOL(I)
+          RHO = GBUF%RHO(I)
+          E   = GBUF%EINT(I)
           U2 = ZERO
-          DO J=2,9
-            N = IXS(J,II)
-            U2 = U2+ V(1,N)*V(1,N)
-            U2 = U2+ V(2,N)*V(2,N)
-            U2 = U2+ V(3,N)*V(3,N)
-          ENDDO
+c
+          IF (IPARG(5,NG) == 1) THEN
+            ! Solid (8N)
+            DO J=2,9
+              N = IXS(J,II)
+              U2 = U2+ V(1,N)*V(1,N)
+              U2 = U2+ V(2,N)*V(2,N)
+              U2 = U2+ V(3,N)*V(3,N)
+            ENDDO
+          ELSEIF (IPARG(5,NG) == 2) THEN
+            ! Quad 2D
+            DO J=2,5
+              N = IXQ(J,II)
+              U2 = U2+ V(1,N)*V(1,N)
+              U2 = U2+ V(2,N)*V(2,N)
+              U2 = U2+ V(3,N)*V(3,N)
+            ENDDO
+          ELSEIF (IPARG(5,NG) == 7) THEN
+            ! Tria 2D
+            DO J=2,4
+              N = IXTG(J,II)
+              U2 = U2+ V(1,N)*V(1,N)
+              U2 = U2+ V(2,N)*V(2,N)
+              U2 = U2+ V(3,N)*V(3,N)
+            ENDDO
+          ENDIF
           PA = P - RHO*U2/SIXTEEN
 #include "lockon.inc"
           GAUGE(30,IG)= -P
@@ -333,7 +369,7 @@ Chd|-- called by -----------
 Chd|        AGAUGE                        source/ale/agauge.F           
 Chd|-- calls ---------------
 Chd|====================================================================
-      SUBROUTINE AGAUG30(LGAUGE ,GAUGE ,IXS  ,X )
+      SUBROUTINE AGAUG30(LGAUGE ,GAUGE ,IX  ,X ,NIX, NUMEL,NCONNECT)
 C-----------------------------------------------
 C   Description
 C-----------------------------------------------
@@ -348,20 +384,14 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr01_c.inc"
-#include      "scr05_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com08_c.inc"
 #include      "vect01_c.inc"
 #include      "param_c.inc"
-#include      "task_c.inc"
-#include      "conv_c.inc"
-#include      "spmd_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER IXS(NIXS,NUMELS),LGAUGE(3,NBGAUGE)
+      INTEGER NIX,NUMEL,NCONNECT
+      INTEGER IX(NIX,NUMEL),LGAUGE(3,NBGAUGE)
       my_real X(3,NUMNOD),GAUGE(LLGAUGE,NBGAUGE)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -379,29 +409,43 @@ C-----------------------------------------------
           XX2 = -EP30
           YY2 = -EP30
           ZZ2 = -EP30
-          DO J=2,9
-            XX1 = MIN(XX1,X(1,IXS(J,II)))
-            YY1 = MIN(YY1,X(2,IXS(J,II)))
-            ZZ1 = MIN(ZZ1,X(3,IXS(J,II)))
-            XX2 = MAX(XX2,X(1,IXS(J,II)))
-            YY2 = MAX(YY2,X(2,IXS(J,II)))
-            ZZ2 = MAX(ZZ2,X(3,IXS(J,II)))
+          DO J=2,NCONNECT+1
+            XX1 = MIN(XX1,X(1,IX(J,II)))
+            YY1 = MIN(YY1,X(2,IX(J,II)))
+            ZZ1 = MIN(ZZ1,X(3,IX(J,II)))
+            XX2 = MAX(XX2,X(1,IX(J,II)))
+            YY2 = MAX(YY2,X(2,IX(J,II)))
+            ZZ2 = MAX(ZZ2,X(3,IX(J,II)))
           ENDDO
 C          
           IGAUGE = 0 
           DO IG=1,NBGAUGE
-           IF(LGAUGE(1,IG) > 0 .OR. LGAUGE(1,IG) < -NUMELS) CYCLE
-           XG  = GAUGE(2,IG)
-           IF(XG < XX1)CYCLE
-           IF(XG > XX2)CYCLE
-           YG  = GAUGE(3,IG)
-           IF(YG < YY1)CYCLE
-           IF(YG > YY2)CYCLE
-           ZG  = GAUGE(4,IG)
-           IF(ZG < ZZ1)CYCLE
-           IF(ZG > ZZ2)CYCLE
+            IF(LGAUGE(1,IG) > 0 .OR. 
+     .         LGAUGE(1,IG) < -(NUMELS+NUMELQ+NUMELTG)) CYCLE
+            XG  = GAUGE(2,IG)
+            YG  = GAUGE(3,IG)
+            ZG  = GAUGE(4,IG)
+            IF (NCONNECT == 8) THEN
+              ! solid (8N)
+              IF(XG < XX1)CYCLE
+              IF(XG > XX2)CYCLE
+
+              IF(YG < YY1)CYCLE
+              IF(YG > YY2)CYCLE
+
+              IF(ZG < ZZ1)CYCLE
+              IF(ZG > ZZ2)CYCLE
+            ELSEIF (NCONNECT == 3 . OR. NCONNECT == 4) THEN
+              ! tria 2D + quad 2D
+              IF(YG < YY1)CYCLE
+              IF(YG > YY2)CYCLE
+
+              IF(ZG < ZZ1)CYCLE
+              IF(ZG > ZZ2)CYCLE
+            ENDIF
+
             IGAUGE=IG
-          IF(IGAUGE == 0)CYCLE
+            IF(IGAUGE == 0)CYCLE
 c element associated to the gauge
 c in case of multiple solutions do not need to choose the best one : AGAUG3 will update it.           
 #include "lockon.inc"
@@ -417,7 +461,7 @@ Chd|  AGAUG3                        source/ale/agauge.F
 Chd|-- called by -----------
 Chd|        AGAUGE                        source/ale/agauge.F           
 Chd|-- calls ---------------
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
 Chd|====================================================================
       SUBROUTINE AGAUG3(LGAUGE,GAUGE,PHI,IXS  ,X    ,ALE_CONNECT )
       USE ALE_CONNECTIVITY_MOD
@@ -429,21 +473,15 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr01_c.inc"
-#include      "scr05_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com08_c.inc"
 #include      "vect01_c.inc"
 #include      "param_c.inc"
-#include      "task_c.inc"
-#include      "conv_c.inc"
-#include      "spmd_c.inc"
+#include      "tabsiz_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IXS(NIXS,NUMELS),LGAUGE(3,NBGAUGE)
-      my_real PHI(*),X(3,NUMNOD),GAUGE(LLGAUGE,NBGAUGE)
+      my_real PHI(SPHI),X(3,NUMNOD),GAUGE(LLGAUGE,NBGAUGE)
       TYPE(t_ale_connectivity), INTENT(IN) :: ALE_CONNECT
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -492,9 +530,6 @@ C
             YY2 = X(2,N4)-X(2,N2)
             ZZ2 = X(3,N4)-X(3,N2)
 c incoming vector surface
-cc            A1 = YY1*YY2 - ZZ1*ZZ2            
-cc            A2 = ZZ1*ZZ2 - XX1*XX2            
-cc            A3 = XX1*XX2 - YY1*YY2
             A1  = YY1*ZZ2 - YY2*ZZ1
             A2  = XX2*ZZ1 - XX1*ZZ2
             A3  = XX1*YY2 - XX2*YY1
@@ -527,49 +562,49 @@ Chd|====================================================================
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C-----------------------------------------------
-c     GAUGE(3,*)
-c 1:  -Isolid				   -(NUMELS_G+1) if SPH gauge
+c     LGAUGE(3,*)
+c 1:  -Isolid           -(NUMELS_G+1) if SPH gauge
 c 2:  GaugeId
 c 3:  +Node or -Shell
 c
 c     => GAUGE(LLGAUGE,*), LLGAUGE = 37
-c 1:  Dist (distance from Shell)	   Dist (distance from Shell)
-c 2:  XG				   XG
-c 3:  YG				   YG
-c 4:  ZG				   ZG
-c 5:  Alpha (Solid penetration ratio)	   not yet used
-c 6:    				   XSAV (SPH sorting)
-c 7:    				   YSAV (SPH sorting)
-c 8:    				   ZSAV (SPH sorting)
-c 9:    				   FF (sph only)
-c 10:   				   intantaneous Pressure
-c 11:   				   intantaneous PA
-c 12:   				   intantaneous Rho
-c 13:   				   intantaneous E
-c 14:   				   ! Butterworth !
-c 15:   				   ! Butterworth !
-c 16:   				   ! Butterworth !
-c 17:   				   ! Butterworth !
-c 18:   				   ! Butterworth !
-c 19:   				   ! Butterworth !
-c 20:   			           ! Butterworth !
-c 21: 				           ! Butterworth !
-c 22: 				           ! Butterworth !
-c 23: 				           ! Butterworth !  
-c 24:   				   ! Butterworth !
-c 25:   				   ! Butterworth !
-c 26:   				   ! Butterworth !
-c 27:   				   ! Butterworth !
-c 28:   				   ! Butterworth !
-c 29:   				   ! Butterworth !
-c 30:  Pressure      		  	   filtered Pressure
-c 31:  PA            			   filtered PA
-c 32:  Rho           			   filtered Rho
-c 33:  E             			   filtered E	     
-c 34:   				   ! Butterworth !
-c 35:   				   ! Butterworth !
-c 36:   				   ! Butterworth !
-c 37:   				   ! Butterworth !
+c 1:  Dist (distance from Shell)     Dist (distance from Shell)
+c 2:  XG           XG
+c 3:  YG           YG
+c 4:  ZG           ZG
+c 5:  Alpha (Solid penetration ratio)     not yet used
+c 6:               XSAV (SPH sorting)
+c 7:               YSAV (SPH sorting)
+c 8:               ZSAV (SPH sorting)
+c 9:               FF (sph only)
+c 10:              intantaneous Pressure
+c 11:              intantaneous PA
+c 12:              intantaneous Rho
+c 13:              intantaneous E
+c 14:              ! Butterworth !
+c 15:              ! Butterworth !
+c 16:              ! Butterworth !
+c 17:              ! Butterworth !
+c 18:              ! Butterworth !
+c 19:              ! Butterworth !
+c 20:                  ! Butterworth !
+c 21:            ! Butterworth !
+c 22:            ! Butterworth !
+c 23:            ! Butterworth !  
+c 24:              ! Butterworth !
+c 25:              ! Butterworth !
+c 26:              ! Butterworth !
+c 27:              ! Butterworth !
+c 28:              ! Butterworth !
+c 29:              ! Butterworth !
+c 30:  Pressure                 filtered Pressure
+c 31:  PA                     filtered PA
+c 32:  Rho                    filtered Rho
+c 33:  E                      filtered E       
+c 34:              ! Xpoint      !
+c 35:              ! Ypoint      !
+c 36:              ! Zpoint      !
+c 37:              ! Butterworth !
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -577,15 +612,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr01_c.inc"
-#include      "scr05_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "vect01_c.inc"
 #include      "param_c.inc"
-#include      "task_c.inc"
-#include      "conv_c.inc"
-#include      "spmd_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -644,6 +673,10 @@ cc            A3 = XX1*XX2 - YY1*YY2
             GAUGE(3,IG) = YY0 + AA*A2
             GAUGE(4,IG) = ZZ0 + AA*A3
           ELSE
+            ! point coordinates
+            GAUGE(2,IG) = GAUGE(34,IG)
+            GAUGE(3,IG) = GAUGE(35,IG)
+            GAUGE(4,IG) = GAUGE(36,IG)
           ENDIF
         ENDIF
       END DO

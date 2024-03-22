@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -36,7 +36,7 @@ Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
       SUBROUTINE SPMD_CHKW(IWIOUT,IOUT)
       USE MESSAGE_MOD 
-	  USE IO_MOD
+            USE IO_MOD
 C----6---------------------------------------------------------------7---------8
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -51,7 +51,7 @@ C-----------------------------------------------
       INTEGER IOS
       CHARACTER(LEN=NCHAROUT) :: LINE
 C-----------------------------------------------
-	  IWIOUT_SAVE = 0
+            IWIOUT_SAVE = 0
       REWIND(UNIT=IOUT)
       READ(UNIT=IOUT,IOSTAT=IOS,FMT='(A)')
       IOS = 0
@@ -62,7 +62,7 @@ C calcul du nombre exacte de ligne de 80c
           IWIOUT = IWIOUT + NCHAROUT
         ENDIF
       ENDDO
-	  IWIOUT_SAVE = IWIOUT
+            IWIOUT_SAVE = IWIOUT
 C ajout rewind ds ts les cas (necessaire sur sgi au moins)
       REWIND(UNIT=IOUT)
       READ(UNIT=IOUT,IOSTAT=IOS,FMT='(A)')

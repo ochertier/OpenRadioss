@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -31,7 +31,6 @@ Chd|        INITWG_SHELL                  source/spmd/domain_decomposition/initw
 Chd|        INITWG_SOLID                  source/spmd/domain_decomposition/initwg_solid.F
 Chd|        INITWG_TRI                    source/spmd/domain_decomposition/initwg_tri.F
 Chd|        INITWG_TRUSS                  source/spmd/domain_decomposition/initwg_truss.F
-Chd|        INITWG_UR                     source/spmd/domain_decomposition/initwg_ur.F
 Chd|        INITWG_X                      source/spmd/domain_decomposition/initwg_x.F
 Chd|        INIT_MAT_WEIGHT               source/user_interface/set_dd_mat_weight.F
 Chd|        LECTUR                        source/starter/lectur.F       

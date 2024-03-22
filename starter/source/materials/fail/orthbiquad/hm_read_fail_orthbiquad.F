@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -31,33 +31,21 @@ Chd|        HM_GET_FLOATV_DIM             source/devtools/hm_reader/hm_get_float
 Chd|        HM_GET_FLOAT_ARRAY_INDEX      source/devtools/hm_reader/hm_get_float_array_index.F
 Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
 Chd|        HM_OPTION_IS_ENCRYPTED        source/devtools/hm_reader/hm_option_is_encrypted.F
+Chd|        FAIL_PARAM_MOD                ../common_source/modules/mat_elem/fail_param_mod.F
 Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
-       SUBROUTINE HM_READ_FAIL_ORTHBIQUAD(
-     .            UPARAM  ,MAXUPARAM ,NUPARAM ,NUVAR   ,IFUNC    ,
-     .            MAXFUNC ,NFUNC     ,UNITAB  ,FAIL_ID ,MAT_ID   ,
-     .            TITR    ,LSUBMODEL )
+      SUBROUTINE HM_READ_FAIL_ORTHBIQUAD(
+     .           FAIL    ,MAT_ID   ,FAIL_ID  ,IRUPT    ,
+     .           TITR    ,LSUBMODEL,UNITAB   )
 C-----------------------------------------------
+c    ROUTINE DESCRIPTION :
 c    Orthotropic strain  failure model
-C-----------------------------------------------
-C   ROUTINE DESCRIPTION :
-C   ===================
-C   READ FAILURE ORTHBIQUAD
-C-----------------------------------------------
-C   DUMMY ARGUMENTS DESCRIPTION:
-C   ===================
-C
-C     NAME            DESCRIPTION                         
-C
-C     UNITAB          UNITS ARRAY
-C     FAIL_ID         FAILURE ID(INTEGER)
-C     TITR            MATERIAL TITLE
-C     LSUBMODEL       SUBMODEL STRUCTURE   
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE FAIL_PARAM_MOD
       USE UNITAB_MOD
       USE MESSAGE_MOD
       USE SUBMODEL_MOD
@@ -67,48 +55,35 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C----------+---------+---+---+--------------------------------------------
-C VAR      | SIZE    |TYP| RW| DEFINITION
-C----------+---------+---+---+--------------------------------------------
-C UPARAM   | NUPARAM | F | W | USER FAILURE MODEL PARAMETER ARRAY
-C MAXUPARAM|  1      | I | R | MAXIMUM SIZE OF UPARAM 
-C NUPARAM  |  1      | I | W | SIZE OF UPARAM =< MAXUPARAM
-C NUVAR    |  1      | I | W | NUMBER OF USER  VARIABLES
-C----------+---------+---+---+--------------------------------------------
-C IFUNC    | NFUNC   | I | W | FUNCTION NUMBER ARRAY
-C MAXFUNC  |  1      | I | R | MAXIMUM SIZE OF IFUNC
-C NFUNC    |  1      | I | W | SIZE OF IFUNC =< MAXFUNC
-C----------+---------+---+---+--------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr17_c.inc"
 #include      "units_c.inc"
-#include      "submod_c.inc"
-#include      "sysunit.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-C INPUT ARGUMENTS
-      TYPE (UNIT_TYPE_),INTENT(IN)   :: UNITAB 
-      INTEGER,INTENT(IN)             :: MAXUPARAM,MAXFUNC,FAIL_ID,MAT_ID
-      TYPE(SUBMODEL_DATA),INTENT(IN) :: LSUBMODEL(*)
-C MODIFIED ARGUMENT
-      INTEGER,INTENT(INOUT)          :: IFUNC(MAXFUNC),NFUNC
-      my_real,INTENT(INOUT)          :: UPARAM(MAXUPARAM)
-      INTEGER,INTENT(INOUT)            :: NUPARAM,NUVAR
-      CHARACTER TITR*nchartitle
+      INTEGER            ,INTENT(IN) :: FAIL_ID         ! failure model ID
+      INTEGER            ,INTENT(IN) :: MAT_ID          ! material law ID
+      INTEGER            ,INTENT(IN) :: IRUPT           ! failure model type number
+      CHARACTER          ,INTENT(IN) :: TITR*nchartitle ! material model title
+      TYPE(UNIT_TYPE_)   ,INTENT(IN) :: UNITAB          ! table of input units
+      TYPE(SUBMODEL_DATA),INTENT(IN) :: LSUBMODEL(*)    ! submodel table
+      TYPE(FAIL_PARAM_)  ,INTENT(INOUT) :: FAIL         ! failure model data structure
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NANGLE,I,J,K,INFO,REG_FUNC,MFLAG,SFLAG,RATE_FUNC,IPIV2(2),IPIV3(3)
-      my_real 
-     .    PTHK,REF_SIZ,REF_SIZ_UNIT,EPSD0,CJC,RATE_SCALE,REF_RATE_UNIT,
-     .    R1,R2,R4,R5,C5,C5_MIN
+      INTEGER :: NANGLE,I,J,K,INFO,REG_FUNC,MFLAG,SFLAG,RATE_FUNC,NFUNC,NUPARAM,NUVAR
+      INTEGER :: IPIV2(2),IPIV3(3)
+      INTEGER ,PARAMETER :: NSIZE = 2
+      INTEGER ,DIMENSION(NSIZE) :: IFUNC
+      my_real :: PTHK,REF_SIZ,REF_SIZ_UNIT,EPSD0,CJC,RATE_SCALE,REF_RATE_UNIT,
+     .    R1,R2,R4,R5,C5,C5_MIN,THETA_MYREAL
       my_real, DIMENSION(:), ALLOCATABLE :: C1,C2,C3,C4,INST
       DOUBLE PRECISION A_1(2,2),B_1(2),A_2(3,3),B_2(3),
      .                 TRIAX_1_LIN,TRIAX_2_LIN,TRIAX_3_LIN,
      .                 TRIAX_4_LIN,TRIAX_5_LIN,TRIAX_1_QUAD,
      .                 TRIAX_2_QUAD,TRIAX_3_QUAD,TRIAX_4_QUAD,
-     .                 TRIAX_5_QUAD,COS2(10,10)
+     .                 TRIAX_5_QUAD,COS2(10,10),XMIN,YMIN
       DOUBLE PRECISION, DIMENSION(:), ALLOCATABLE :: THETA,THETA_RAD,Q_X11,Q_X12,Q_X13,
      .                                               Q_X21,Q_X22,Q_X23,Q_INST
       DOUBLE PRECISION, DIMENSION(:,:), ALLOCATABLE :: X_1,X_2,AMAT,BVEC
@@ -133,15 +108,16 @@ C
      9 1.   ,0.   ,-32. ,0.   ,160. ,0.   ,-256.,0.   ,128. ,0.   ,     
      A 0.   ,9.   ,0.   ,-120.,0.   ,432. ,0.   ,-576 ,0.   ,256. /
 C=======================================================================
-      IS_ENCRYPTED   = .FALSE.
+      IS_ENCRYPTED = .FALSE.
       IS_AVAILABLE = .FALSE.
 C--------------------------------------------------
-C EXTRACT DATA (IS OPTION CRYPTED)
+C     (IS OPTION CRYPTED)
 C--------------------------------------------------
+
       CALL HM_OPTION_IS_ENCRYPTED(IS_ENCRYPTED)
+
 C======================================================================================
-C EXTRACT DATAS (REAL VALUES)
-C======================================================================================
+C     EXTRACT DATA
 !---------------
 ! -> Card1
 !---------------
@@ -158,9 +134,9 @@ C===============================================================================
       CALL HM_GET_INTV   ('fct_IDel' ,REG_FUNC    ,IS_AVAILABLE,LSUBMODEL)
       CALL HM_GET_FLOATV ('EI_ref'   ,REF_SIZ     ,IS_AVAILABLE,LSUBMODEL,UNITAB)
 ! Default values      
-      IF (PTHK  == ZERO) PTHK  = ONE
-      PTHK = MIN(PTHK,ONE)
-      PTHK = MAX(ZERO,PTHK)
+      IF (PTHK == ZERO) PTHK = ONE - EM06
+      PTHK = MIN(PTHK, ONE)
+      PTHK = MAX(PTHK,-ONE)
       IF (SFLAG == 0)    SFLAG = 2
 ! Units
       IF ((REF_SIZ == ZERO).AND.(REG_FUNC > 0)) THEN
@@ -335,7 +311,7 @@ C===============================================================================
       !================================================
       DO J = 1,NANGLE
 C
-        ! Coefficient for the first parable
+        ! Coefficient for the first parabole
         ! ---------------------------------------
         A_1(1,1) = TRIAX_1_LIN
         A_1(1,2) = TRIAX_1_QUAD
@@ -353,7 +329,7 @@ C
         X_1(J,1)   = C2(J)
         X_1(J,2:3) = B_1(1:2)
 C      
-        ! Coefficient for the second parable
+        ! Coefficient for the second parabole
         !----------------------------------------
         A_2(1,1) = ONE
         A_2(1,2) = TRIAX_3_LIN
@@ -383,7 +359,7 @@ c
       IF (.NOT.ALLOCATED(THETA))     ALLOCATE(THETA(NANGLE))
       IF (.NOT.ALLOCATED(THETA_RAD)) ALLOCATE(THETA_RAD(NANGLE))
 c
-      ! Computation of angles
+      ! Computation of angles and check curves
       DO J = 1, NANGLE
         IF (NANGLE > 1) THEN 
           THETA(J)     = (J-1)*(90.0D0/(NANGLE-1))
@@ -392,6 +368,37 @@ c
           THETA(J)     = ZERO
           THETA_RAD(J) = ZERO
         ENDIF
+c
+        ! Check if minimum of first parabola is negative 
+        XMIN = -X_1(J,2)/(TWO*X_1(J,3))
+        YMIN = X_1(J,3)*(XMIN**2) + X_1(J,2)*XMIN + X_1(J,1)
+        IF (YMIN < ZERO) THEN 
+          THETA_MYREAL = THETA(J)
+          CALL ANCMSG(MSGID=3002,
+     .                MSGTYPE=MSGWARNING,
+     .                ANMODE=ANINFO_BLIND_1,
+     .                I1=MAT_ID,
+     .                C1=TITR,
+     .                I2=J,
+     .                R1=THETA_MYREAL)          
+        ENDIF
+c
+        ! Check if minimum of second parabola is negative 
+        IF (SFLAG == 1) THEN 
+          XMIN = -X_2(J,2)/(TWO*X_2(J,3))
+          YMIN = X_2(J,3)*(XMIN**2) + X_2(J,2)*XMIN + X_2(J,1)
+          IF (YMIN < ZERO) THEN 
+            THETA_MYREAL = THETA(J)
+            CALL ANCMSG(MSGID=3003,
+     .                  MSGTYPE=MSGWARNING,
+     .                  ANMODE=ANINFO_BLIND_1,
+     .                  I1=MAT_ID,
+     .                  C1=TITR,
+     .                  I2=J,
+     .                  R1=THETA_MYREAL)              
+          ENDIF
+        ENDIF
+c
       ENDDO
 c
       ! Allocation of the A-MATRIX and the Pivot vector
@@ -460,9 +467,7 @@ c
       Q_X23(1:NANGLE)  = BVEC(1:NANGLE,6)
       IF (SFLAG == 3) Q_INST(1:NANGLE) = BVEC(1:NANGLE,7)
 c
-C======================================================================================
-c     Filling buffer tables
-C======================================================================================
+c----------------------------------
       ! -> Number of parameters
       NUPARAM = 7
       IF (SFLAG == 3) THEN 
@@ -482,35 +487,54 @@ C===============================================================================
       ENDIF
       ! -> Number of user variables
       NUVAR = 3   
-c-----------------------------------------------------    
-      UPARAM(1) = PTHK
-      UPARAM(2) = SFLAG
-      UPARAM(3) = REF_SIZ
-      UPARAM(4) = EPSD0
-      UPARAM(5) = CJC
-      UPARAM(6) = RATE_SCALE
-      UPARAM(7) = NANGLE
+C======================================================================================
+c     Filling buffer tables
+C======================================================================================
+      FAIL%KEYWORD = 'ORTH-BIQUAD' 
+      FAIL%IRUPT   = IRUPT 
+      FAIL%FAIL_ID = FAIL_ID 
+      FAIL%NUPARAM = NUPARAM
+      FAIL%NIPARAM = 0
+      FAIL%NUVAR   = NUVAR
+      FAIL%NFUNC   = NFUNC
+      FAIL%NTABLE  = 0
+      FAIL%NMOD    = 0
+      FAIL%PTHK    = PTHK
+c            
+      ALLOCATE (FAIL%UPARAM(FAIL%NUPARAM))
+      ALLOCATE (FAIL%IPARAM(FAIL%NIPARAM))
+      ALLOCATE (FAIL%IFUNC (FAIL%NFUNC))
+      ALLOCATE (FAIL%TABLE (FAIL%NTABLE))
+c
+      FAIL%IFUNC(1:NFUNC) = IFUNC(1:NFUNC)
+c
+      FAIL%UPARAM(1) = PTHK
+      FAIL%UPARAM(2) = SFLAG
+      FAIL%UPARAM(3) = REF_SIZ
+      FAIL%UPARAM(4) = EPSD0
+      FAIL%UPARAM(5) = CJC
+      FAIL%UPARAM(6) = RATE_SCALE
+      FAIL%UPARAM(7) = NANGLE
       IF (SFLAG == 3) THEN 
         DO J = 1,NANGLE
-          UPARAM(8  + 7*(J-1)) = Q_X11(J)
-          UPARAM(9  + 7*(J-1)) = Q_X12(J)
-          UPARAM(10 + 7*(J-1)) = Q_X13(J)
-          UPARAM(11 + 7*(J-1)) = Q_X21(J)
-          UPARAM(12 + 7*(J-1)) = Q_X22(J)
-          UPARAM(13 + 7*(J-1)) = Q_X23(J)
-          UPARAM(14 + 7*(J-1)) = Q_INST(J)
+          FAIL%UPARAM(8  + 7*(J-1)) = Q_X11(J)
+          FAIL%UPARAM(9  + 7*(J-1)) = Q_X12(J)
+          FAIL%UPARAM(10 + 7*(J-1)) = Q_X13(J)
+          FAIL%UPARAM(11 + 7*(J-1)) = Q_X21(J)
+          FAIL%UPARAM(12 + 7*(J-1)) = Q_X22(J)
+          FAIL%UPARAM(13 + 7*(J-1)) = Q_X23(J)
+          FAIL%UPARAM(14 + 7*(J-1)) = Q_INST(J)
         ENDDO    
       ELSE
         DO J = 1,NANGLE
-          UPARAM(8  + 6*(J-1)) = Q_X11(J)
-          UPARAM(9  + 6*(J-1)) = Q_X12(J)
-          UPARAM(10 + 6*(J-1)) = Q_X13(J)
-          UPARAM(11 + 6*(J-1)) = Q_X21(J)
-          UPARAM(12 + 6*(J-1)) = Q_X22(J)
-          UPARAM(13 + 6*(J-1)) = Q_X23(J)
+          FAIL%UPARAM(8  + 6*(J-1)) = Q_X11(J)
+          FAIL%UPARAM(9  + 6*(J-1)) = Q_X12(J)
+          FAIL%UPARAM(10 + 6*(J-1)) = Q_X13(J)
+          FAIL%UPARAM(11 + 6*(J-1)) = Q_X21(J)
+          FAIL%UPARAM(12 + 6*(J-1)) = Q_X22(J)
+          FAIL%UPARAM(13 + 6*(J-1)) = Q_X23(J)
         ENDDO          
       ENDIF
-c-----------------------------------------------------
 c--------------------------
 c     Printout data
 c-------------------------- 
@@ -520,10 +544,11 @@ c--------------------------
         WRITE(IOUT,1000)
         IF (MFLAG /= 0) WRITE(IOUT, 1100) MFLAG
         DO J = 1,NANGLE
-          WRITE(IOUT,1200) THETA(J),C1(J),C2(J),C3(J),C4(J),C5
+          WRITE(IOUT,1200) THETA(J),C1(J),C2(J),C3(J),C4(J),C5,
+     &    X_1(J,3),X_1(J,2),X_1(J,1),X_2(J,3),X_2(J,2),X_2(J,1)           
           IF (SFLAG == 3) WRITE(IOUT, 1900) INST(J)
         ENDDO
-        WRITE(IOUT,1300) ABS(PTHK),SFLAG
+        WRITE(IOUT,1300) PTHK,SFLAG
         IF (REG_FUNC > 0) WRITE(IOUT,1400) REG_FUNC,REF_SIZ
         IF (EPSD0 > ZERO) THEN 
           WRITE(IOUT,1500) EPSD0,CJC
@@ -563,29 +588,39 @@ c-----------------------------------------------------
  1200 FORMAT(     
      & 5X,'|| FAILURE STRAINS FOR ANGLE',F5.1,' DEG',/,
      & 5X,'  -------------------------------------------------',/,
-     & 5X,'  Simple Compression C1  . . . . . . . . . . . . .=',1PG20.13/
-     & 5X,'  Shear C2 . . . . . . . . . . . . . . . . . . . .=',1PG20.13/
-     & 5X,'  Simple Tension C3  . . . . . . . . . . . . . . .=',1PG20.13/
-     & 5X,'  Plane strain C4  . . . . . . . . . . . . . . . .=',1PG20.13/
-     & 5X,'  Biaxial Tension C5 . . . . . . . . . . . . . . .=',1PG20.13/)
+     & 5X,'  SIMPLE COMPRESSION C1  . . . . . . . . . . . . .=',1PG20.13/
+     & 5X,'  SHEAR C2 . . . . . . . . . . . . . . . . . . . .=',1PG20.13/
+     & 5X,'  SIMPLE TENSION C3  . . . . . . . . . . . . . . .=',1PG20.13/
+     & 5X,'  PLANE STRAIN C4  . . . . . . . . . . . . . . . .=',1PG20.13/
+     & 5X,'  BIAXIAL TENSION C5 . . . . . . . . . . . . . . .=',1PG20.13/
+     & 5X,'                                                   ',/
+     & 5X,'  LOW STRESS TRIAXIALITY PARABOLA PARAMETER A. . .=',1PG20.13/ 
+     & 5X,'  LOW STRESS TRIAXIALITY PARABOLA PARAMETER B. . .=',1PG20.13/ 
+     & 5X,'  LOW STRESS TRIAXIALITY PARABOLA PARAMETER C. . .=',1PG20.13/ 
+     & 5X,'                                                   ',/
+     & 5X,'  HIGH STRESS TRIAXIALITY PARABOLA PARAMETER D . .=',1PG20.13/ 
+     & 5X,'  HIGH STRESS TRIAXIALITY PARABOLA PARAMETER E . .=',1PG20.13/ 
+     & 5X,'  HIGH STRESS TRIAXIALITY PARABOLA PARAMETER F . .=',1PG20.13/)
  1300 FORMAT(
      & 5X,'ELEMENT DELETION :',/,
-     & 5X,'Fraction of failed IPs for shell deletion  . . . .=',F5.1,/
-     & 5X,'S-Flag . . . . . . . . . . . . . . . . . . . . . .=',I10,/)
+     & 5X,'SHELL ELEMENT DELETION PARAMETER PTHICKFAIL. . . .=',1PG20.13,/,
+     & 5X,'  > 0.0 : FRACTION OF FAILED THICKNESS             ',/,
+     & 5X,'  < 0.0 : FRACTION OF FAILED INTG. POINTS OR LAYERS',/,
+     & 5X,'S-FLAG . . . . . . . . . . . . . . . . . . . . . .=',I10,/)
  1400 FORMAT(
      & 5X,'ELEMENT LENGTH REGULARIZATION USED:',/,
-     & 5X,'Regularization function ID . . . . . . . . . . . .=',I10,/,
-     & 5X,'Reference Element Length . . . . . . . . . . . . .=',1PG20.13,/)
+     & 5X,'REGULARIZATION FUNCTION ID . . . . . . . . . . . .=',I10,/,
+     & 5X,'REFERENCE ELEMENT LENGTH . . . . . . . . . . . . .=',1PG20.13,/)
  1500 FORMAT(
      & 5X,'JOHNSON-COOK STRAIN-RATE DEPENDENCY:',/,
-     & 5X,'Reference strain-rate  . . . . . . . . . . . . . .=',1PG20.13,/,
-     & 5X,'Johnson-Cook parameter . . . . . . . . . . . . . .=',1PG20.13,/)
+     & 5X,'REFERENCE STRAIN-RATE  . . . . . . . . . . . . . .=',1PG20.13,/,
+     & 5X,'JOHNSON-COOK PARAMETER . . . . . . . . . . . . . .=',1PG20.13,/)
  1600 FORMAT(
      & 5X,'TABULATED STRAIN-RATE DEPENDENCY:',/,
-     & 5X,'Strain-rate dependency function ID . . . . . . . .=',I10,/,
-     & 5X,'Strain-rate scale factor . . . . . . . . . . . . .=',1PG20.13,/)
+     & 5X,'STRAIN-RATE DEPENDENCY FUNCTION ID . . . . . . . .=',I10,/,
+     & 5X,'STRAIN-RATE SCALE FACTOR . . . . . . . . . . . . .=',1PG20.13,/)
  1900 FORMAT(
-     & 5X,'  Instability strain . . . . . . . . . . . . . . .=',1PG20.13,//)
+     & 5X,'  INSTABILITY STRAIN . . . . . . . . . . . . . . .=',1PG20.13,//)
  2000 FORMAT(
      & 5X,' --------------------------------------------------',//)
 c----------- 

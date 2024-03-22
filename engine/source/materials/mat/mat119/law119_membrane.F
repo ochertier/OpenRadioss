@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -50,8 +50,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -173,7 +171,7 @@ c
           XX1(1:NEL,1) = EPSQ(1:NEL)
           IPOS1(1:NEL,1) = 1
 c
-          CALL TABLE_VINTERP(TABLE(FUNC),NEL,IPOS1,XX1,SIGF,ETL)                   
+          CALL TABLE_VINTERP(TABLE(FUNC),NEL,NEL,IPOS1,XX1,SIGF,ETL)                   
 c
           DO II=1,NINDXT
             I = INDXT(II)
@@ -211,7 +209,7 @@ c
           XX1(1:NEL,1) = EPSQ(1:NEL)
           IPOS1(1:NEL,1) = 1
 c
-          CALL TABLE_VINTERP(TABLE(FUNC),NEL,IPOS1,XX1,SIGF,ETL)                    
+          CALL TABLE_VINTERP(TABLE(FUNC),NEL,NEL,IPOS1,XX1,SIGF,ETL)                    
 c
           DO II=1,NREAC
             I = INDXX(II)
@@ -239,7 +237,7 @@ c
         XX1(1:NEL,1) = EPSQ(1:NEL)
         IPOS1(1:NEL,1) = 1
 c
-        CALL TABLE_VINTERP(TABLE(FUNC),NEL,IPOS1,XX1,SIGF,ETL)                    
+        CALL TABLE_VINTERP(TABLE(FUNC),NEL,NEL,IPOS1,XX1,SIGF,ETL)                    
 c
         DO II=1,NINDXT
           I = INDXT(II)
@@ -309,7 +307,7 @@ c       reloading
           END IF
 
           IPOS1(1:NEL,1) = 1
-          CALL TABLE_VINTERP(TABLE(FUNCR),NEL,IPOS1,XX1,SIGF,ETX)                    
+          CALL TABLE_VINTERP(TABLE(FUNCR),NEL,NEL,IPOS1,XX1,SIGF,ETX)                    
 c
           IF (IRELOAD == 1) THEN! reloading follows loading curve
             DO II=1,NINDXR
@@ -354,7 +352,7 @@ c       unloading
           END DO
           IPOS1(1:NEL,1) = 1
 
-          CALL TABLE_VINTERP(TABLE(FUND),NEL,IPOS1,XX1,SIGF,ETU)                    
+          CALL TABLE_VINTERP(TABLE(FUND),NEL,NEL,IPOS1,XX1,SIGF,ETU)                    
 c
           DO II=1,NINDXU
             I = INDXU(II)

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>    
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -57,10 +57,6 @@ C     NTHREAD=n n processeurs
       IEXPM=1
 C     IEXPM=0  standard
 C     IEXPM=1  allocation dynamique
-      IGFORM=3
-C     IGFORM=0  fichiers de dessin binaire
-C     IGFORM=1  fichiers de dessin code
-C     IGFORM=3  fichiers de dessin IEEE
       ITFORM=3
 C     ITFORM=0  fichiers de T. H. binaire
 C     ITFORM=1  fichiers de T. H. code

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,7 +25,7 @@ Chd|  W_ITHFLUX                     source/restart/ddsplit/w_ithflux.F
 Chd|-- called by -----------
 Chd|        DDSPLIT                       source/restart/ddsplit/ddsplit.F
 Chd|-- calls ---------------
-Chd|        WRITE_I_C                     source/output/tools/write_routines.c
+Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|====================================================================
       SUBROUTINE W_ITHFLUX(IBFFLUX,CEP,PROC,NODLOCAL,NFXFLUX_L,LEN_IA,CEL,IXS)
 
@@ -36,27 +36,20 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "param_c.inc"
-#include      "rnur_c.inc"
 #include      "thermal_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER LEN_IA, PROC, NFXFLUX_L, IBFFLUX(NITFLUX,*),CEP(*)
       INTEGER NODLOCAL(*), CEL(*), IXS(NIXS,*)
-
-C-----------------------------------------------
-C   F u n c t i o n
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, J, IBTMP(NITFLUX,NFXFLUX_L), N1, N2, N3, N4, OFF, NB_L
       INTEGER N, NEL, NUSR
 C
-      OFF = NUMELC+NUMELTG+NUMELS+NUMELQ+NUMELT+NUMELP+NUMELR+NUMELUR
+      OFF = NUMELC+NUMELTG+NUMELS+NUMELQ+NUMELT+NUMELP+NUMELR
      +     +NUMELX+NCONLD+NUMCONV+NUMRADIA
       NB_L = 0
 C
@@ -109,10 +102,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
-#include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "scr17_c.inc"
 
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s

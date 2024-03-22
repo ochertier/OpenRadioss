@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,8 +27,13 @@ Chd|-- called by -----------
 Chd|        DDSPLIT                       source/restart/ddsplit/ddsplit.F
 Chd|-- calls ---------------
 Chd|        WRITE_DB                      source/restart/ddsplit/wrrest.F
+Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
       SUBROUTINE W_SKWSUB(SKEW,LEN_AM)
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
+      USE SUBMODEL_MOD , ONLY : NSUBMOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -36,22 +41,17 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "sphcom.inc"
-#include      "submod_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER LEN_AM
-     .
-      my_real
-     .        SKEW(LSKEW,*)
+      my_real SKEW(LSKEW,*)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, J, IE_L
-      my_real
-     .        SKEW_L(LSKEW,NSUBMOD)
+      my_real SKEW_L(LSKEW,NSUBMOD)
 C
       IE_L = 0
 C

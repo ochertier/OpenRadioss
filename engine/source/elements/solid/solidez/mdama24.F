@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -24,12 +24,12 @@ Chd|====================================================================
 Chd|  MDAMA24                       source/elements/solid/solidez/mdama24.F
 Chd|-- called by -----------
 Chd|        SZHOUR3                       source/elements/solid/solidez/szhour3.F
-Chd|        SZHOUR3_OR                    source/elements/solid/solidez/szhour3.F
+Chd|        SZHOUR3_OR                    source/elements/solid/solidez/szhour3_or.F
 Chd|-- calls ---------------
-Chd|        CBATRAN3V                     source/elements/solid/solidez/szhour3.F
-Chd|        GETTRANSV                     source/elements/solid/solidez/szhour3.F
-Chd|        MMODUL24C                     source/elements/solid/solidez/szhour3.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        CBATRAN3V                     source/elements/solid/solidez/cbatran3v.F
+Chd|        GETTRANSV                     source/elements/solid/solidez/gettransv.F
+Chd|        MMODUL24C                     source/elements/solid/solidez/mmodul24c.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE MDAMA24(ELBUF_STR,JFT     ,JLT     ,PM    ,MAT    ,
      .                   DAMA_G )
@@ -49,7 +49,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "com04_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -75,14 +74,14 @@ C     REAL
 C-----------------------------------------------
        LBUF => ELBUF_STR%BUFLY(1)%LBUF(1,1,1)
         MX = MAT(1)
-C-------get concrete part (CC,G3) and ANG in damage system	 
+C-------get concrete part (CC,G3) and ANG in damage system   
         CALL MMODUL24C(JLT    ,PM(1,MX),LBUF%DAM,LBUF%CRAK ,
      .                 CC     ,G3      ,LBUF%ANG,DAMANG ,NBDAMA)
        IF (NBDAMA==0) THEN
         DAMA_G(JFT:JLT,1:3)= ZERO
        ELSE
          C3(JFT:JLT,1:3)=PM(24,MX)
-C----- 	
+C----- 
          CALL GETTRANSV(JFT,JLT,DAMANG ,QC,QCG,QGC,QG)
         B(JFT:JLT,1:3,1:3)=ZERO
 C      

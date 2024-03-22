@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -29,10 +29,10 @@ Chd|        I22ASS0                       source/interfaces/int22/i22assembly.F
 Chd|        I22ASS2                       source/interfaces/int22/i22assembly.F
 Chd|        I7ASS3                        source/interfaces/int07/i7ass3.F
 Chd|        ANIM_MOD                      ../common_source/modules/anim_mod.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
-Chd|        I22BUFBRIC_MOD                ../common_source/modules/cut-cell-search_mod.F
-Chd|        I22TRI_MOD                    ../common_source/modules/cut-cell-search_mod.F
+Chd|        I22BUFBRIC_MOD                ../common_source/modules/interfaces/cut-cell-search_mod.F
+Chd|        I22TRI_MOD                    ../common_source/modules/interfaces/cut-cell-search_mod.F
 Chd|====================================================================
       SUBROUTINE I22FOR3(JLT       ,A        ,V         ,IBC      ,ICODT  ,
      2                   FSAV      ,GAP      ,FRIC      ,MS       ,VISC   ,
@@ -89,20 +89,12 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "com06_c.inc"
 #include      "com08_c.inc"
-#include      "scr02_c.inc"
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
 #include      "scr07_c.inc"
 #include      "scr11_c.inc"
 #include      "scr14_c.inc"
 #include      "scr16_c.inc"
-#include      "scr18_c.inc"
-#include      "units_c.inc"
 #include      "parit_c.inc"
-#include      "warn_c.inc"
-#include      "couple_c.inc"
 #include      "param_c.inc"
-#include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -201,8 +193,6 @@ C-----------------------------------------------
         my_real :: P(3,NPTS), I22AERA(3), C(3)
         END FUNCTION
       END INTERFACE     
-C-----------------------------------------------
-#include "sync_dir.inc"
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------  

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -31,7 +31,7 @@ Chd|        SPMD_STAT_PGATHER             source/mpi/output/spmd_stat.F
 Chd|        SROTORTH                      source/elements/solid/srotorth.F
 Chd|        STRS_TXT50                    source/output/sta/sta_txt.F   
 Chd|        TAB_STRS_TXT50                source/output/sta/sta_txt.F   
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        INITBUF_MOD                   share/resol/initbuf.F         
 Chd|====================================================================
       SUBROUTINE STAT_S_ORTHO(ELBUF_TAB,IPARG ,IPM ,IGEO ,IXS ,
@@ -50,13 +50,9 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "param_c.inc"
 #include      "units_c.inc"
-#include      "scr01_c.inc"
-#include      "scr05_c.inc"
 #include      "task_c.inc"
-#include      "scr03_c.inc"
 #include      "scr14_c.inc"
 #include      "scr16_c.inc"
 #include      "vect01_c.inc"
@@ -108,7 +104,7 @@ C======================================================================|
         LLT = NEL
 c
         IF (ITY == 1) THEN
-          CALL INITBUF (IPARG    ,NG      ,                    
+          CALL INITBUF(IPARG    ,NG      ,                    
      2          MLW     ,NEL     ,NFT     ,IAD     ,ITY     ,  
      3          NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,  
      4          JTHE    ,JLAG    ,JMULT   ,JHBE    ,JIVF    ,  
@@ -120,6 +116,7 @@ c
           PID = IPART(2,IPRT)
 C          JHBE   = IGEO(10,PID)
 c
+          IF (JHBE==17.AND.IINT==2) JHBE = 18
           GBUF => ELBUF_TAB(NG)%GBUF
           LBUF => ELBUF_TAB(NG)%BUFLY(1)%LBUF(1,1,1)
           IF(IGTYP == 22) THEN
@@ -364,7 +361,7 @@ c
               ENDIF
             ENDIF
           ENDIF !IOFF
-        ENDDO		    
+        ENDDO        
       ENDIF
 c-----------
       RETURN

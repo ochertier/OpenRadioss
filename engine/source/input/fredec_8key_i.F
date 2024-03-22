@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -32,20 +32,18 @@ Chd|-- calls ---------------
 Chd|====================================================================
       SUBROUTINE FREDEC_8KEY_I(CART, KEY2, KEY3, KEY4, KEY5, KEY6, KEY7, KEY8, NBC)
 C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
+      USE NAMES_AND_TITLES_MOD, ONLY: NCHARKEY
+C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "nchara_c.inc"
-#include      "chara_c.inc"
-#include      "scr17_c.inc"
-C-----------------------------------------------
 C   G l o b a l   V a r i a b l e s
 C-----------------------------------------------
       CHARACTER CART*(*), KEY2*(*), KEY3*(*), KEY4*(*), KEY5*(*), KEY6*(*), KEY7*(*), KEY8*(*)
-      CHARACTER MOT1*ncharkey
+      CHARACTER(LEN=NCHARKEY) ::  MOT1
       INTEGER   I1,I2,NBC
 C======================================================================|
 C     /Key1/KEY2/KEY3/KEY4/KEY5/KEY6/KEY7/KEY8/NBC

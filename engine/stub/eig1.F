@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,17 +25,18 @@ Chd|====================================================================
 Chd|  EIG1                          stub/eig1.F                   
 Chd|-- called by -----------
 Chd|-- calls ---------------
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
 Chd|        CLUSTER_MOD                   share/modules/cluster_mod.F   
 Chd|        CRACKXFEM_MOD                 share/modules/crackxfem_mod.F 
 Chd|        DRAPE_MOD                     share/modules/drape_mod.F     
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        GENANI_MOD                    source/output/anim/generate/genani.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
+Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|        STACK_MOD                     share/modules/stack_mod.F     
 Chd|====================================================================
       SUBROUTINE EIG1(K_DIAG   , K_LT      , IADK        ,JDIK        , MS        , 
@@ -45,7 +46,7 @@ Chd|====================================================================
      5                IXTG     , PM        , GEO         ,CONT        , ICUT      , 
      6                SKEW     , XCUT      , FINT        ,ITAB        , FEXT      , 
      7                FOPT     , ANIN      , LPBY        ,NPBY        , NSTRF     , 
-     8                RWBUF    , NPRW      , IXUR        ,TANI        , ELBUF_TAB , 
+     8                RWBUF    , NPRW      , TANI        ,ELBUF_TAB   ,MATPARAM_TAB, 
      9                DD_IAD   , FR_IAD    , DD_FRONT    ,CLUSTER     ,             
      A                WEIGHT   , EANI      , IPART       , 
      B                RBY      , NOM_OPT   , IGRSURF     ,BUFSF       , IDATA     , 
@@ -81,6 +82,7 @@ C-----------------------------------------------
       USE MULTI_FVM_MOD
       USE DRAPE_MOD
       USE ALE_CONNECTIVITY_MOD
+      USE MATPARAM_DEF_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -95,7 +97,6 @@ C-----------------------------------------------
 #include      "com08_c.inc"
 #include      "com09_c.inc"
 #include      "com_xfem1.inc"
-#include      "rnur_c.inc"
 #include      "sphcom.inc"
 #include      "scr05_c.inc"
 #include      "scr14_c.inc"
@@ -110,7 +111,7 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IADK(*), JDIK(*), NDDL, NDOF(*),
      .   IPARG(NPARG,*), IXS(*), IXQ(*), IXC(*), IXT(*), IXP(*),
-     .   IXS10(6,*) ,IXS16(8,*)  ,IXS20(12,*) ,NPRW(*),IXUR(*),
+     .   IXS10(6,*) ,IXS16(8,*)  ,IXS20(12,*) ,NPRW(*),
      .   IPART(*), IXR(*), IXTG(*), ITAB(*),ICUT(*),NSTRF(*),LPBY(*),
      .   NPBY(NNPBY,*),INDX_CRK(*),
      .   DD_IAD(NSPMD+1,*),XEDGE4N(4,*),XEDGE3N(3,*),
@@ -147,6 +148,7 @@ C-----------------------------------------------
       TYPE (SURF_)   , DIMENSION(NSURF)  :: IGRSURF
       TYPE (DRAPE_)   :: DRAPE_Q4, DRAPE_T3
       TYPE(t_ale_connectivity), INTENT(IN) :: ALE_CONNECTIVITY
+      TYPE (MATPARAM_STRUCT_) ,DIMENSION(NUMMAT) ,INTENT(IN) :: MATPARAM_TAB
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

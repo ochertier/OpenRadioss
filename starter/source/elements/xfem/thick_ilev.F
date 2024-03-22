@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,7 +25,7 @@ Chd|  THICK_ILEV                    source/elements/xfem/thick_ilev.F
 Chd|-- called by -----------
 Chd|        CBUFXFE                       source/elements/xfem/cbufxfe.F
 Chd|-- calls ---------------
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE THICK_ILEV(ELBUF_STR,XFEM_STR,
      .                      LFT      ,LLT  ,NLAY  ,IR  ,IS  ,
@@ -40,8 +40,6 @@ C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
 #include  "mvsiz_p.inc"
-#include  "param_c.inc"
-#include  "com01_c.inc"
 C-----------------------------------------------
 C   I N P U T   A r g u m e n t s
 C-----------------------------------------------

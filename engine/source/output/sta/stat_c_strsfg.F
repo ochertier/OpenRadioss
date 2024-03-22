@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -36,14 +36,14 @@ Chd|        SPMD_STAT_PGATHER             source/mpi/output/spmd_stat.F
 Chd|        STRS_TXT50                    source/output/sta/sta_txt.F   
 Chd|        TAB_STRS_TXT50                source/output/sta/sta_txt.F   
 Chd|        DRAPE_MOD                     share/modules/drape_mod.F     
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        STACK_MOD                     share/modules/stack_mod.F     
 Chd|====================================================================
       SUBROUTINE STAT_C_STRSFG(ELBUF_TAB,
      1                        X    ,IPARG ,IPM ,IGEO ,IXC ,
      2                        IXTG  ,WA,WAP0 ,IPARTC, IPARTTG,
      3                        IPART_STATE,STAT_INDXC,STAT_INDXTG,THKE,SIZP0,
-     4                        GEO   ,STACK,DRAPE_Q4,DRAPE_T3)
+     4                        GEO   ,STACK,DRAPE_SH4N,DRAPE_SH3N,DRAPEG)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -62,10 +62,7 @@ C-----------------------------------------------
 #include      "mvsiz_p.inc"
 #include      "param_c.inc"
 #include      "units_c.inc"
-#include      "scr01_c.inc"
-#include      "scr05_c.inc"
 #include      "task_c.inc"
-#include      "scr03_c.inc"
 #include      "scr14_c.inc"
 #include      "scr16_c.inc"
 C-----------------------------------------------
@@ -80,7 +77,8 @@ C-----------------------------------------------
      .   THKE(*),X(3,*),GEO(*)
       TYPE (ELBUF_STRUCT_), DIMENSION(NGROUP), TARGET :: ELBUF_TAB
       TYPE (STACK_PLY) :: STACK
-      TYPE (DRAPE_)  :: DRAPE_Q4, DRAPE_T3
+      TYPE (DRAPE_)  :: DRAPE_SH4N(NUMELC_DRAPE), DRAPE_SH3N(NUMELTG_DRAPE)
+      TYPE (DRAPEG_) :: DRAPEG
       double precision WA(*),WAP0(*)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -88,7 +86,8 @@ C-----------------------------------------------
       INTEGER I,J,K,N,II,JJ,LEN,IOFF,IE,NG,NEL,NFT,LFT,NPT,
      .   LLT,ITY,MLW,IH,IHBE, ID, IPRT0, IPRT,IR,IS,IT,J1,J2,
      .   NPG,IPG,MPT,IPT,NPTR,NPTS,NPTT,NLAY,L_PLA,ITHK,NF3,
-     .   IGTYP,NPT_ALL,IL,KK(12),NF1,IREL,IBID0,MAT_1,PID_1,ILAY
+     .   IGTYP,NPT_ALL,IL,KK(12),NF1,IREL,IBID0,MAT_1,PID_1,ILAY,IDRAPE,
+     .   SEDRAPE,NUMEL_DRAPE
       INTEGER PTWA(MAX(STAT_NUMELC ,STAT_NUMELTG)),
      .        PTWA_P0(0:MAX(1,STAT_NUMELC_G,STAT_NUMELTG_G))
       double precision   
@@ -108,9 +107,11 @@ C-----------------------------------------------
      .   DIMENSION(:),POINTER  :: DIR_A,DIR_B    
       my_real 
      .   QT(9,MVSIZ),TENS(6),ZH,THKP ,THK0(MVSIZ)   
-      my_real
-     .   THKLY(MVSIZ*LAY_MAX*LAYNPT_MAX),POSLY(MVSIZ,LAY_MAX*LAYNPT_MAX),
-     .   THK_LY(MVSIZ,LAY_MAX*LAYNPT_MAX)
+
+      my_real, dimension(:,:), allocatable ::
+     .   THKLY,POSLY,
+     .   THK_LY
+
       my_real, ALLOCATABLE, DIMENSION(:) , TARGET :: DIRA,DIRB
 C-----------------------------------------------
       PARAMETER (PG = .577350269189626)
@@ -120,6 +121,10 @@ C-----------------------------------------------
      ./'#---1----|----2----|----3----|----4----|----5----|----6----|'/
       DATA DELIMIT(61:100)
      ./'----7----|----8----|----9----|----10---|'/
+
+      ALLOCATE( THKLY(MVSIZ,LAY_MAX*LAYNPT_MAX),POSLY(MVSIZ,LAY_MAX*LAYNPT_MAX))
+      ALLOCATE( THK_LY(MVSIZ,LAY_MAX*LAYNPT_MAX))
+
 C=======================================================================
 C     4-NODE SHELLS
 C-----------------------------------------------
@@ -140,6 +145,7 @@ C
           IGTYP= IPARG(38,NG)
           IREP = IPARG(35,NG)
           ISUBSTACK=IPARG(71,NG)
+          IDRAPE= IPARG(92,NG)
           NPTR = ELBUF_TAB(NG)%NPTR    
           NPTS = ELBUF_TAB(NG)%NPTS    
           NPTT = ELBUF_TAB(NG)%NPTT    
@@ -170,11 +176,13 @@ C
          ELSE
           THK0(LFT:LLT) = THKE(LFT+NFT:LLT+NFT)
          END IF
+         NUMEL_DRAPE = NUMELC_DRAPE  
+         SEDRAPE = SCDRAPE
          CALL LAYINI(ELBUF_TAB(NG),LFT      ,LLT      ,GEO      ,IGEO    ,
      .              MAT_1    ,PID_1    ,THKLY    ,MATLY    ,POSLY    , 
      .              IGTYP    ,IBID0    ,IBID0    ,NLAY     ,MPT      ,   
-     .              ISUBSTACK,STACK    ,DRAPE_Q4 ,NFT      ,THK0     ,
-     .              NEL      ,THK_LY   )
+     .              ISUBSTACK,STACK    ,DRAPE_SH4N ,NFT    ,THKE     ,
+     .              NEL      ,THK_LY   ,DRAPEG%INDX_SH4N,SEDRAPE,NUMEL_DRAPE)
          L_DIRA = ELBUF_TAB(NG)%BUFLY(1)%LY_DIRA
          L_DIRB = ELBUF_TAB(NG)%BUFLY(1)%LY_DIRB
          ALLOCATE(DIRA(NLAY*NEL*L_DIRA))
@@ -184,11 +192,19 @@ C
          IF (L_DIRA == 0) THEN
            CONTINUE
          ELSEIF (IREP == 0) THEN
+          IF(IDRAPE > 0 .AND. (IGTYP == 51 .OR. IGTYP == 52)) THEN
+            DO J=1,NLAY
+             J1 = 1+(J-1)*L_DIRA*NEL
+             J2 = J*L_DIRA*NEL
+             DIRA(J1:J2) = ELBUF_TAB(NG)%BUFLY(J)%LBUF_DIR(1)%DIRA(1:NEL*L_DIRA)
+           ENDDO
+          ELSE
            DO J=1,NLAY
              J1 = 1+(J-1)*L_DIRA*NEL
              J2 = J*L_DIRA*NEL
              DIRA(J1:J2) = ELBUF_TAB(NG)%BUFLY(J)%DIRA(1:NEL*L_DIRA)
            ENDDO
+          ENDIF 
          ENDIF
          DIR_A => DIRA(1:NLAY*NEL*L_DIRA)
          DIR_B => DIRB(1:NLAY*NEL*L_DIRB)
@@ -266,7 +282,7 @@ c---------6 x2 +1(eps) for MPT=0
               IF (MPT == 0) THEN  ! global integration
                 IF (MLW == 0 .or. MLW == 13) THEN
                   DO IPG=1,NPG 
-                    DO J=1,13        ! forces and moments           	
+                    DO J=1,13        ! forces and moments           
                       JJ = JJ + 1
                       WA(JJ) = ZERO
                     ENDDO                                                               
@@ -288,7 +304,7 @@ c
 c
                   JJ = JJ + 1                                      
                   IF (GBUF%G_PLA > 0) THEN    
-            	    WA(JJ) = GBUF%PLA(I)       
+              WA(JJ) = GBUF%PLA(I)       
                   ELSE                         
                     WA(JJ) = ZERO              
                   ENDIF                        
@@ -308,7 +324,7 @@ C
 c
                       JJ = JJ + 1
                       IF (GBUF%G_PLA > 0) THEN    
-            	        WA(JJ) = LBUF%PLA(I)
+                  WA(JJ) = LBUF%PLA(I)
                       ELSE                         
                         WA(JJ) = ZERO              
                       ENDIF                        
@@ -355,15 +371,15 @@ C           (MPT >0 ):
                         END DO
                         JJ = JJ + 1
                         IF (BUFLY%L_PLA > 0) THEN
-            	          WA(JJ) = LBUF%PLA(I)
+                    WA(JJ) = LBUF%PLA(I)
                         ELSE
                           WA(JJ) = ZERO
                         ENDIF
                         JJ    = JJ + 1
                         WA(JJ) = POSLY(I,IPT)*TWO
                       ENDDO
-                    ENDDO	    
-                  ENDDO	    
+                    ENDDO      
+                  ENDDO      
                   IPT_ALL = IPT_ALL + NPTT
                 ENDDO
               ENDIF    ! MPT, NLAY
@@ -392,7 +408,7 @@ c---------
                   ENDDO               
                 ELSE
                   DO IPG=1,NPG
-              	   DO J=1,8         
+             DO J=1,8         
                      JJ = JJ + 1      
                      WA(JJ) = ZERO
                    ENDDO                                                               
@@ -416,19 +432,19 @@ c
               IF (MPT == 0 .and. MLW /= 0 .and. MLW /= 13) THEN
                 DO IPG=1,NPG
                   TENS(1:2) = GBUF%FOR(KK(1:2)+I)
-     .	    	             + ST(1:2)*QPG(2,IPG)+SK(1:2)*QPG(1,IPG)
+     .                     + ST(1:2)*QPG(2,IPG)+SK(1:2)*QPG(1,IPG)
                   TENS(3) = GBUF%FOR(KK(3)+I)
                   TENS(4) = GBUF%FOR(KK(4)+I)
-     .	    	           + SHT(2)*QPG(2,IPG)+SHK(2)*QPG(1,IPG)
+     .                   + SHT(2)*QPG(2,IPG)+SHK(2)*QPG(1,IPG)
                   TENS(5) = GBUF%FOR(KK(5)+I)
-     .	    	           + SHT(1)*QPG(2,IPG)+SHK(1)*QPG(1,IPG)
+     .                   + SHT(1)*QPG(2,IPG)+SHK(1)*QPG(1,IPG)
                   CALL SHELL2G(TENS,QT(1,I))
                   DO J =1,6
                    JJ = JJ + 1                                      
                    WA(JJ) = TENS(J)             
                   END DO
                   TENS(1:2) = GBUF%MOM(KK(1:2)+I)
-     .	    	            + MT(1:2)*QPG(2,IPG)+MK(1:2)*QPG(1,IPG)
+     .                    + MT(1:2)*QPG(2,IPG)+MK(1:2)*QPG(1,IPG)
                   TENS(3) = GBUF%MOM(KK(3)+I)
                   CALL SHEML2G(TENS,QT(1,I))
                   DO J =1,6
@@ -438,7 +454,7 @@ c
 c
                   JJ = JJ + 1                                      
                   IF (GBUF%G_PLA > 0) THEN    
-            	    WA(JJ) = GBUF%PLA(I)       
+              WA(JJ) = GBUF%PLA(I)       
                   ELSE                         
                     WA(JJ) = ZERO              
                   ENDIF                        
@@ -462,9 +478,9 @@ c
      .                           + (SK(1:2)+ZZ*MK(1:2))*QPG(1,IPG)              
                       TENS(3) = LBUF%SIG(KK(3)+I)
                       TENS(4) = LBUF%SIG(KK(4)+I)
-     .	    	               + SHT(2)*QPG(2,IPG)+SHK(2)*QPG(1,IPG)
+     .                       + SHT(2)*QPG(2,IPG)+SHK(2)*QPG(1,IPG)
                       TENS(5) = LBUF%SIG(KK(5)+I)
-     .	    	               + SHT(1)*QPG(2,IPG)+SHK(1)*QPG(1,IPG)
+     .                       + SHT(1)*QPG(2,IPG)+SHK(1)*QPG(1,IPG)
                       CALL ORTH2LOC(TENS,DIR_A,DIR_B,II,ILAW,IGTYP,NEL)
                       CALL SHELL2G(TENS,QT(1,I))
                       DO J =1,6
@@ -473,7 +489,7 @@ c
                       END DO
                       JJ = JJ + 1                                      
                       IF (L_PLA > 0) THEN    
-            	        WA(JJ) = LBUF%PLA(I)       
+                  WA(JJ) = LBUF%PLA(I)       
                       ELSE                         
                         WA(JJ) = ZERO              
                       ENDIF                        
@@ -681,11 +697,14 @@ C
           NF3 = NFT+NUMELC
           THK0(LFT:LLT) = THKE(LFT+NF3:LLT+NF3)
          END IF
+         
+         NUMEL_DRAPE = NUMELTG_DRAPE  
+         SEDRAPE = STDRAPE
          CALL LAYINI(ELBUF_TAB(NG),LFT      ,LLT      ,GEO      ,IGEO    ,
      .              MAT_1    ,PID_1    ,THKLY    ,MATLY    ,POSLY    , 
      .              IGTYP    ,IBID0    ,IBID0    ,NLAY     ,MPT      ,   
-     .              ISUBSTACK,STACK    ,DRAPE_T3 ,NFT      ,THK0     ,
-     .              NEL      ,THK_LY   )
+     .              ISUBSTACK,STACK    ,DRAPE_SH3N ,NFT      ,THKE     ,
+     .              NEL      ,THK_LY   ,DRAPEG%INDX_SH3N, SEDRAPE,NUMEL_DRAPE)
 !
          L_DIRA = ELBUF_TAB(NG)%BUFLY(1)%LY_DIRA
          L_DIRB = ELBUF_TAB(NG)%BUFLY(1)%LY_DIRB
@@ -789,7 +808,7 @@ c
 c
                   JJ = JJ + 1                                      
                   IF (GBUF%G_PLA > 0) THEN    
-            	    WA(JJ) = GBUF%PLA(I)       
+              WA(JJ) = GBUF%PLA(I)       
                   ELSE                         
                     WA(JJ) = ZERO              
                   ENDIF                        
@@ -809,7 +828,7 @@ C
 c
                       JJ = JJ + 1
                       IF (GBUF%G_PLA > 0) THEN    
-            	        WA(JJ) = LBUF%PLA(I)
+                  WA(JJ) = LBUF%PLA(I)
                       ELSE                         
                         WA(JJ) = ZERO              
                       ENDIF                        
@@ -855,14 +874,14 @@ c
                       END DO
                       JJ = JJ + 1
                       IF (BUFLY%L_PLA > 0) THEN
-            	        WA(JJ) = LBUF%PLA(I)
+                  WA(JJ) = LBUF%PLA(I)
                       ELSE
                         WA(JJ) = ZERO
                       ENDIF
                       JJ    = JJ + 1
                       WA(JJ) = POSLY(I,IPT)*TWO
-                    ENDDO !IPG=1,NPG	    
-                  ENDDO	    
+                    ENDDO !IPG=1,NPG      
+                  ENDDO      
                   IPT_ALL = IPT_ALL + NPTT
                 ENDDO
               ENDIF  !  IF (MLW == 0 .or. MLW == 13)
@@ -1015,6 +1034,9 @@ C
           ENDIF  !  IF (IOFF >= 1)
         ENDDO  !  DO N=1,STAT_NUMELTG_G
       ENDIF  !  IF (ISPMD == 0.AND.LEN > 0)
+      DEALLOCATE( THKLY,POSLY)
+      DEALLOCATE( THK_LY)
+
 C
       RETURN
       END
@@ -1036,23 +1058,15 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER II,ILAW,IGTYP,NEL
-C     REAL
       my_real
      .   TENS(5), DIR_A(*),DIR_B(*)
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER J
-C     REAL
       my_real
      .   R1,R2,R3,S1,S2,S3,R12A,R22A,S12B,S22B,RS1,RS2,RS3,
      .   T1,T2,T3,PHI,SUM1,SUM2,FACT,R3R3,S3S3 
@@ -1130,22 +1144,14 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-C     REAL
       my_real
      .   SIG(5), DIR1,DIR2
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I
-C     REAL
       my_real
      .   S1, S2, S3, S4, S5
 C-----------------------------------------------

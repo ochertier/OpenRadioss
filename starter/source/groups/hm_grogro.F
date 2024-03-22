@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -41,6 +41,7 @@ Chd|====================================================================
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE MY_ALLOC_MOD
       USE MESSAGE_MOD
       USE GROUPDEF_MOD
       USE SUBMODEL_MOD
@@ -53,13 +54,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr17_c.inc"
-#include      "scr03_c.inc"
-#include      "com04_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "param_c.inc"
-#include      "my_allocate.inc"
-#include      "submod_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -81,7 +75,6 @@ C-----------------------------------------------
       INTERFACE
        SUBROUTINE GROUPS_GET_ELEM_LIST(arg1,arg2,arg3)
         USE SUBMODEL_MOD
-#include      "submod_c.inc"
         INTEGER,DIMENSION(:),ALLOCATABLE       :: arg1
         INTEGER,INTENT(INOUT)                  :: arg2
         TYPE(SUBMODEL_DATA)                    :: arg3(NSUBMOD)
@@ -168,7 +161,7 @@ C                  sorted group
                 ENDIF                               
 C
                 IGRELEM(IGS)%NENTITY = NEL
-                MY_ALLOCATE(IGRELEM(IGS)%ENTITY,NEL)
+                CALL MY_ALLOC(IGRELEM(IGS)%ENTITY,NEL)
                 IGRELEM(IGS)%ENTITY = 0
               ENDIF                                 
 C-----------                                             

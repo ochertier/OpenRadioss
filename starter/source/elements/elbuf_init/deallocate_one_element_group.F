@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,7 +25,7 @@ Chd|  DEALLOCATE_ONE_ELEMENT_GROUP  source/elements/elbuf_init/deallocate_one_el
 Chd|-- called by -----------
 Chd|        DEALLOCATE_ELBUF              source/elements/elbuf_init/deallocate_buffer.F
 Chd|-- calls ---------------
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
       SUBROUTINE DEALLOCATE_ONE_ELEMENT_GROUP(
@@ -40,14 +40,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-#include      "analyse_name.inc"
-C-----------------------------------------------
-C   M y  A l l o c a t e                           
-C-----------------------------------------------
-#include      "my_allocate.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -151,8 +143,8 @@ C No allocation in this case
         IF (ASSOCIATED(ELBUF_TAB(NG)%GBUF%FORTH)) DEALLOCATE(ELBUF_TAB(NG)%GBUF%FORTH)
         IF (ASSOCIATED(ELBUF_TAB(NG)%GBUF%EINTTH)) DEALLOCATE(ELBUF_TAB(NG)%GBUF%EINTTH)
         IF (ASSOCIATED(ELBUF_TAB(NG)%GBUF%SEQ)) DEALLOCATE(ELBUF_TAB(NG)%GBUF%SEQ)
-        IF (ASSOCIATED(ELBUF_TAB(NG)%GBUF%ABURN	)) DEALLOCATE(ELBUF_TAB(NG)%GBUF%ABURN)
-        IF (ASSOCIATED(ELBUF_TAB(NG)%GBUF%MU	)) DEALLOCATE(ELBUF_TAB(NG)%GBUF%MU)
+        IF (ASSOCIATED(ELBUF_TAB(NG)%GBUF%ABURN  )) DEALLOCATE(ELBUF_TAB(NG)%GBUF%ABURN)
+        IF (ASSOCIATED(ELBUF_TAB(NG)%GBUF%MU  )) DEALLOCATE(ELBUF_TAB(NG)%GBUF%MU)
 
       ENDIF  ! NPT
 

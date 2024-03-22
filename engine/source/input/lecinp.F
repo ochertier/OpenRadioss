@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,13 +26,22 @@ Chd|-- called by -----------
 Chd|        RADIOSS2                      source/engine/radioss2.F      
 Chd|-- calls ---------------
 Chd|        FREFORM                       source/input/freform.F        
+Chd|        DT_MOD                        share/modules/dt_mod.F        
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
+Chd|        OUTPUT_MOD                    ../common_source/modules/output/output_mod.F
+Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
+Chd|        STATE_MOD                     ../common_source/modules/state_mod.F
 Chd|====================================================================
-      SUBROUTINE LECINP(IRUN,IRFL,IRFE,H3D_DATA,FLAG_CST_AMS)
+      SUBROUTINE LECINP(IRUN,IRFL,IRFE,H3D_DATA,FLAG_CST_AMS,DYNAIN_DATA,
+     .                  SENSORS ,DT, OUTPUT )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE H3D_MOD
+      USE STATE_MOD
+      USE SENSOR_MOD
+      USE DT_MOD
+      USE OUTPUT_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -42,26 +51,27 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IRUN, IRFL, IRFE,FLAG_CST_AMS
       TYPE(H3D_DATABASE), INTENT(INOUT) :: H3D_DATA
+      TYPE(DYNAIN_DATABASE), INTENT(INOUT) :: DYNAIN_DATA
+      TYPE(SENSORS_), INTENT(INOUT) :: SENSORS
+      TYPE (DT_), INTENT(INOUT) :: DT
+      TYPE(OUTPUT_), INTENT(INOUT) :: OUTPUT !< output structure
+
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "units_c.inc"
-#include      "lon_c.inc"
 #include      "scr02_c.inc"
 #include      "scr07_c.inc"
 #include      "scr18_c.inc"
-#include      "chara_c.inc"
 #include      "scrnoi_c.inc"
 #include      "scrcut_c.inc"
-#include      "nchara_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I
-      CHARACTER CART*ncharline
 C-----------------------------------------------
-      IFID=0
-      MFID=0
+C   S o u r c e   L i n e s
+C-----------------------------------------------
       NNOISE=0
       NCUTS=0
 C
@@ -73,7 +83,8 @@ C
       NODADT = 0
 C
       IFREEF=1
-      CALL FREFORM(IRUN,IRFL,IRFE,H3D_DATA,FLAG_CST_AMS)
+      CALL FREFORM(IRUN,IRFL,IRFE,H3D_DATA,FLAG_CST_AMS,DYNAIN_DATA,
+     .             SENSORS,DT,OUTPUT)
 C
       REWIND IIN
 C

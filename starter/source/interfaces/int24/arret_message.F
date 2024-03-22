@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -41,17 +41,11 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER ITY,INTID
       my_real
      *  IPENMAX
-C-----------------------------------------------
-C   L o c a l   V a r i a b l e s
-C-----------------------------------------------
 C-----------------------------------------------
       IF(ITY==24)THEN
         CALL ANCMSG(MSGID=1096,ANMODE=ANINFO,
@@ -87,15 +81,9 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER ITY,INTID
-C-----------------------------------------------
-C   L o c a l   V a r i a b l e s
-C-----------------------------------------------
 C-----------------------------------------------
         CALL ANCMSG(MSGID=1182,ANMODE=ANINFO, 
      .              MSGTYPE=MSGERROR,

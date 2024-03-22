@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,8 +25,8 @@ Chd|====================================================================
 Chd|  BASISF                        source/elements/solid/solide8/basisf.F
 Chd|-- called by -----------
 Chd|        S8DERI3                       source/elements/solid/solide8/s8deri3.F
-Chd|        SDLEN8                        source/elements/solid/solidez/szforc3.F
-Chd|        SDLEN_SMS                     source/elements/solid/solidez/szforc3.F
+Chd|        SDLEN8                        source/elements/solid/solidez/sdlen8.F
+Chd|        SDLEN_SMS                     source/elements/solid/solidez/sdlen_sms.F
 Chd|-- calls ---------------
 Chd|        BASIS8                        source/elements/solid/solide8/basis8.F
 Chd|====================================================================

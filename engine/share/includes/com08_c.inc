@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>    
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,18 +21,17 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
 C.../COM08/
-C...recopie par defaut en spmd
       INTEGER LCOM08
       PARAMETER (LCOM08 = 38) 
 C
-      COMMON /COM08/ TT, DT1, DT2, DT12, DT2OLD, TSTOP, TDES, THIS,
-     .               THIS1(9),TABFIS(10),TABFWR(10),XMIN_GLOB,XMAX_GLOB,
+      COMMON /COM08/ TT, DT1, DT2, DT12, DT2OLD, TSTOP, 
+     .               TABFIS(10),TABFWR(10),XMIN_GLOB,XMAX_GLOB,
      .    YMIN_GLOB,YMAX_GLOB,
      .    ZMIN_GLOB,ZMAX_GLOB
-	  COMMON /COM08DP/TT_DP
+      COMMON /COM08DP/TT_DP
 C     REAL ou REAL*8
       my_real
-     .    TT,DT1, DT2, DT12, DT2OLD, TSTOP, TDES, THIS, THIS1,
+     .    TT,DT1, DT2, DT12, DT2OLD, TSTOP, 
      .    TABFIS,TABFWR,XMIN_GLOB,XMAX_GLOB,YMIN_GLOB,YMAX_GLOB,
      .    ZMIN_GLOB,ZMAX_GLOB
       DOUBLE PRECISION TT_DP

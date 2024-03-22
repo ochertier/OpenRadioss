@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -39,7 +39,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "vect01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -53,13 +52,13 @@ C-----------------------------------------------
       my_real
      .   P(MVSIZ)
 C-----------------------------------------------
-      DO I=LFT,LLT
+      DO I=1,NEL
        P(I)=P01(I)
        EINT(I)=MAX(ZERO,EINT(I)-DV2(I)*(P(I)+QNEW(I)))
        EINT(I)=EINT(I)/MAX(EM30,VOL(I))
       ENDDO
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
        SIG(I,1)=SIG(I,1)-P(I)
        SIG(I,2)=SIG(I,2)-P(I)
        SIG(I,3)=SIG(I,3)-P(I)

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -36,18 +36,17 @@ Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
       SUBROUTINE HM_READ_LEAK(IPM,PM,UNITAB,LSUBMODEL)
-      
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------      
       USE UNITAB_MOD
       USE MESSAGE_MOD
       USE SUBMODEL_MOD 
       USE HM_OPTION_READ_MOD
-C============================================================================
+C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -55,8 +54,6 @@ C-----------------------------------------------
 #include      "units_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "sysunit.inc"
-#include      "submod_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -105,7 +102,7 @@ c
 c
         ! Checking unit IDs
         IFLAGUNIT = 0
-        DO IUNIT=1,NUNITS                           
+        DO IUNIT=1,UNITAB%NUNITS                           
           IF (UNITAB%UNIT_ID(IUNIT) == UID) THEN
             IFLAGUNIT = 1               
             EXIT                                

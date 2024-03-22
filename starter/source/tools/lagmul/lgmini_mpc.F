@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -38,9 +38,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NC, IADLL(*), JLL(*), LLL(*), 
@@ -54,7 +51,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "lagmult.inc"
 #include      "param_c.inc"
-#include      "com04_c.inc"
 #include      "scr17_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -89,8 +85,8 @@ C======================================================================|
           NDL = IBUFDL(KF)
           ISK = IBUFSK(KF)
 C---
-	  IF(MASS(NN)==0.)THEN
-	        CALL ANCMSG(MSGID=535,
+            IF(MASS(NN)==0.)THEN
+                  CALL ANCMSG(MSGID=535,
      .                  MSGTYPE=MSGERROR,
      .                  ANMODE=ANINFO_BLIND_1,
      .                  C1='MULTI-POINT CONSTRAINTS',
@@ -98,7 +94,7 @@ C---
      .                  C2='MULTI-POINT CONSTRAINTS',
      .                  C3=TITR,C4=' ',
      .                  I2=ITAB(NN))
-	  ENDIF
+            ENDIF
           IF(ISK==1)THEN
             NK = NK+1
             IK = IK+1
@@ -128,7 +124,7 @@ C---
               JLL(IK) = 6
             ENDIF
           ENDIF
-	      IF(NDL>3.AND.INER(NN)==0.)THEN
+                IF(NDL>3.AND.INER(NN)==0.)THEN
                 CALL ANCMSG(MSGID=536,
      .                      MSGTYPE=MSGERROR,
      .                      ANMODE=ANINFO_BLIND_1,
@@ -137,7 +133,7 @@ C---
      .                      C2='MULTI-POINT CONSTRAINTS',
      .                      C3=TITR,
      .                      I2=ITAB(NN))
-	      ENDIF
+                ENDIF
           IADLL(NC+1)=IADLL(NC) + NK
           IF(IADLL(NC+1)-1>LAG_NKF)THEN
             CALL ANCMSG(MSGID=469,

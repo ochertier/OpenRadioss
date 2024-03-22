@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -58,12 +58,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
@@ -71,8 +65,6 @@ C-----------------------------------------------
 #include      "remesh_c.inc"
 #include      "scr17_c.inc"
 #include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "submod_c.inc"
 #include      "tabsiz_c.inc"
 #include      "ige3d_c.inc"
 C-----------------------------------------------
@@ -107,7 +99,7 @@ C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
       INTEGER NINTRI
 C-----------------------------------------------
-      DATA MESS /'OPTIONS FOR ISOGEOMETRIC MESHING DEFINITION '/
+      DATA MESS /'OPTIONS FOR ISOGEOMETRIC MESH DEFINITION'/
 C-----------------------------------------------
       IPART=0
       NCTRLMAX=0
@@ -421,12 +413,12 @@ C--------------------------------------------------
         IF(SUBID_NODES(I) /= 0)THEN
           IF(ITAB(I) /= 0) ITAB(I) = ITAB(I) + OFF_NOD(SUBID_NODES(I))
         ENDIF
-	IF (ITAB(I) > ID_LIMIT_ADMESH
+          IF (ITAB(I) > ID_LIMIT_ADMESH
      .        .AND. (ITAB(I) <  IDFT_NODE_AUTO.OR.
      .               ITAB(I) >= IDLT_NODE_AUTO)) THEN
               CALL ANCMSG(MSGID=1069,ANMODE=ANINFO,MSGTYPE=MSGERROR,
      .                    I1=ITAB(I),C1=LINE,C2='/NODE') 
-	ENDIF 			 
+          ENDIF        
       ENDDO
       IF(ALLOCATED(SUBID_NODES)) DEALLOCATE(SUBID_NODES)
 C--------------------------------------------------
@@ -444,7 +436,7 @@ C--------------------------------------------------
           N=N+1 
           READ(LINE,ERR=999,FMT=FMT_I)             
      .           ITAB(N)        
-	  IF (ITAB(N) > ID_LIMIT_ADMESH
+            IF (ITAB(N) > ID_LIMIT_ADMESH
      .        .AND. (ITAB(N) <  IDFT_NODE_AUTO.OR.
      .               ITAB(N) >= IDLT_NODE_AUTO)) THEN       
               CALL ANCMSG(MSGID=1069,ANMODE=ANINFO,MSGTYPE=MSGERROR,

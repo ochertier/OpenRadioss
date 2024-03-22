@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -38,9 +38,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com08_c.inc"
@@ -64,7 +61,7 @@ C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------
 C---------------------------------------------------- 
-C	Calcul des adresses des buffers d'interfaces. 
+C  Calcul des adresses des buffers d'interfaces. 
 C----------------------------------------------------
 C
       NSN   =IPARI(5,NIN)
@@ -77,9 +74,9 @@ C
       FIRST = 1 + NSN*ITASK / NTHREAD
       LAST = NSN*(ITASK+1) / NTHREAD
       DO N=FIRST,LAST
-	INTBUF_TAB%IRTLM(2*(N-1)+1)=0
-	INTBUF_TAB%CSTS(2*(N-1)+1)  =-ONE
-	INTBUF_TAB%CSTS(2*(N-1)+2)=-ONE
+          INTBUF_TAB%IRTLM(2*(N-1)+1)=0
+          INTBUF_TAB%CSTS(2*(N-1)+1)  =-ONE
+          INTBUF_TAB%CSTS(2*(N-1)+2)=-ONE
       END DO
 C
       RETURN

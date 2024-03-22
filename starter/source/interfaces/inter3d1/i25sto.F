@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -37,7 +37,7 @@ Chd|====================================================================
      4      NRTM  ,GAP_S  ,GAP_M ,NBINFLG,MBINFLG,
      5      ILEV ,MSEGTYP,ITAB ,IGAP,GAP_S_L,
      6      GAP_M_L,EDGE_L2,ICODE,ISKEW,DRAD,
-     7      DGAPLOAD)
+     7      DGAPLOAD,NRTMT)
 C============================================================================
       USE TRI7BOX
 C-----------------------------------------------
@@ -49,15 +49,6 @@ C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "com04_c.inc"
-#include      "param_c.inc"
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -72,6 +63,7 @@ C     REAL
      .        MARGE, 
      .        GAP_S_L(*), GAP_M_L(*), EDGE_L2(*)
       my_real , INTENT(IN) :: DGAPLOAD ,DRAD
+      INTEGER , INTENT(IN) :: NRTMT
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -96,14 +88,14 @@ C-----------------------------------------------
      6               MARGE   ,GAP_S,GAP_M   ,GAPV  ,ITYPE   ,
      7               IGAP ,GAP_S_L ,GAP_M_L ,EDGE_L2,MSEGTYP,
      8               ETYP ,ICODE   ,ISKEW    ,IBC   ,DRAD   ,
-     9               DGAPLOAD )
+     9               DGAPLOAD ,NRTMT)
 C-----------------------------------------------
       CALL I25PEN3A( J_STOK ,X1    ,X2     ,X3   ,X4    ,
      .                Y1    ,Y2    ,Y3     ,Y4   ,
      .                Z1    ,Z2    ,Z3    ,Z4     ,XI   ,
      .                YI    ,ZI    ,PENE  ,IX1    ,IX2  ,
      .                IX3   ,IX4   ,GAPV  ,NRTM   ,ETYP ,
-     .                IBC   )
+     .                IBC   ,NRTMT )
 C-----------------------------------------------
       IF (ILEV==2) 
      .  CALL I25S1S2(J_STOK,PROV_N,PROV_E,NBINFLG,MBINFLG,PENE)
@@ -156,20 +148,14 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER J_STOK,PROV_N(*),PROV_E(*),NBINFLG(*),MBINFLG(*)
-C     REAL
       my_real
      .   PENE(MVSIZ)
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,N,NE,IMS1,IMS2,ISS1,ISS2
-C     REAL
 C-----------------------------------------------
 C
-!      EQUIVALENCE (PENE,BV(1,22))
       INTEGER BITGET
       EXTERNAL BITGET
 C=======================================================================

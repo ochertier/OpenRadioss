@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,33 +26,26 @@ Chd|-- called by -----------
 Chd|        THQUAD                        source/output/th/thquad.F     
 Chd|-- calls ---------------
 Chd|====================================================================
-      SUBROUTINE QROTA3(X, IXQ, KCVT, TENS, GAMA)
+      SUBROUTINE QROTA3(
+     1   X,       IXQ,     KCVT,    TENS,
+     2   GAMA,    ISORTH)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com08_c.inc"
-#include      "vect01_c.inc"
-#include      "scr18_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-C     REAL
+      INTEGER, INTENT(IN) :: ISORTH
       my_real
      .   X(3,*),TENS(6),GAMA(6)
       INTEGER IXQ(NIXQ), KCVT
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-C     REAL
       my_real
      .   X1, X2, X3, X4,
      .   Y1, Y2, Y3, Y4,

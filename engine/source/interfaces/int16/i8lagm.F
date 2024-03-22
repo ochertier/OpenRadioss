@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -44,15 +44,8 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "task_c.inc"
-#include      "warn_c.inc"
-#include      "scr05_c.inc"
-#include      "scr07_c.inc"
-#include      "scr18_c.inc"
-#include      "units_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
-#include      "param_c.inc"
-#include      "couple_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -228,7 +221,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com08_c.inc"
-#include      "units_c.inc"
       COMMON /LAGGLOB/N_MULT
       INTEGER N_MULT
 C-----------------------------------------------
@@ -349,7 +341,7 @@ C
           NK = 9
           VX = ZERO
           VY = ZERO
-          VZ = ZERO	  
+          VZ = ZERO    
           DO IK=1,NK
             VX = VX - (V(1,III(I,IK))+DT12*A(1,III(I,IK)))*NI(I,IK)
             VY = VY - (V(2,III(I,IK))+DT12*A(2,III(I,IK)))*NI(I,IK)
@@ -526,9 +518,6 @@ C     REAL
       my_real
      .   R(MVSIZ),S(MVSIZ),T(MVSIZ),NI(MVSIZ,9) ,
      .   NX(MVSIZ),NY(MVSIZ),NZ(MVSIZ)
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -812,9 +801,6 @@ C     REAL
      .   DRDZ(MVSIZ), DSDZ(MVSIZ), DTDZ(MVSIZ),
      .   XX(MVSIZ,9) ,YY(MVSIZ,9),ZZ(MVSIZ,9),
      .   NI(MVSIZ,9) ,RR(MVSIZ) ,SS(MVSIZ) ,TT(MVSIZ)
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -35,17 +35,12 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
 #ifdef MPI
 #include "mpif.h"
 #endif
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -69,7 +64,7 @@ C-----------------------------------------------
         ELSEIF(MY_OPERATION(1:3)=="MAX") THEN
                 MPI_OPERATION=MPI_MAX
         ELSEIF(MY_OPERATION(1:3)=="MIN") THEN
-                MPI_OPERATION=MPI_MIN               
+                MPI_OPERATION=MPI_MIN
         ENDIF
 
 !       ------------------
@@ -81,5 +76,60 @@ C-----------------------------------------------
 #endif
         RETURN
         END SUBROUTINE SPMD_ALLREDUCE_DB
+!       ----------------------------------------
+
+
+Chd|====================================================================
+Chd|  SPMD_ALLREDUCE_INT            source/mpi/generic/spmd_allreduce_db.F
+Chd|-- called by -----------
+Chd|        RADIOSS2                      source/engine/radioss2.F      
+Chd|-- calls ---------------
+Chd|====================================================================
+        SUBROUTINE SPMD_ALLREDUCE_INT(VALUE,RES,MY_SIZE,MY_OPERATION)
+C-----------------------------------------------
+C   I m p l i c i t   T y p e s
+C-----------------------------------------------
+#include      "implicit_f.inc"
+C-----------------------------------------------------------------
+C   M e s s a g e   P a s s i n g
+C-----------------------------------------------
+#ifdef MPI
+#include "mpif.h"
+#endif
+C-----------------------------------------------
+C   D u m m y   A r g u m e n t s
+C-----------------------------------------------
+        CHARACTER(len=4), INTENT(in) :: MY_OPERATION
+        INTEGER, INTENT(in) :: MY_SIZE
+        INTEGER, DIMENSION(MY_SIZE), INTENT(in) :: VALUE
+        INTEGER, DIMENSION(MY_SIZE), INTENT(out) :: RES
+
+#ifdef MPI
+C-----------------------------------------------
+C   L o c a l  V a r i a b l e s
+C-----------------------------------------------
+        INTEGER :: error
+        INTEGER :: MPI_OPERATION
+!       ----------------------------------------
+
+        IF(MY_OPERATION(1:3)=="SUM") THEN
+                MPI_OPERATION=MPI_SUM
+        ELSEIF(MY_OPERATION(1:4)=="PROD") THEN
+                MPI_OPERATION=MPI_PROD
+        ELSEIF(MY_OPERATION(1:3)=="MAX") THEN
+                MPI_OPERATION=MPI_MAX
+        ELSEIF(MY_OPERATION(1:3)=="MIN") THEN
+                MPI_OPERATION=MPI_MIN
+        ENDIF
+
+!       ------------------
+!       mpi comm allreduce
+        CALL MPI_ALLREDUCE(VALUE,RES,MY_SIZE,MPI_INTEGER,MPI_OPERATION,MPI_COMM_WORLD,error)
+!       ------------------
+#else
+        RES = 0
+#endif
+        RETURN
+        END SUBROUTINE SPMD_ALLREDUCE_INT
 !       ----------------------------------------
 

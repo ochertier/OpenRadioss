@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -73,7 +73,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include "com01_c.inc"
-#include "scr17_c.inc"
 #include "units_c.inc"
 #include "comlock.inc"
 C-----------------------------------------------
@@ -123,13 +122,17 @@ C-----------------------------------------------
 C     USER VARIABLES INITIALIZATION
 C-----------------------------------------------
       IF (ISIGI == ZERO) THEN
-        IF (TIME == ZERO) THEN
+        IF ((UVAR(1,6) == ZERO).AND.(OFFL(1) == ONE)) THEN 
           DO I=1,NEL
-            UVAR(I,6)= ONE         
+            UVAR(I,6)= ONE  
+          ENDDO
+        ENDIF
+        IF (UVAR(1,13) == ZERO) THEN
+          DO I=1,NEL         
             UVAR(I,13)= AREA(I)  
-          ENDDO   
-        ENDIF     
-      ENDIF  
+          ENDDO  
+        ENDIF 
+      ENDIF 
 C-----------------------------------------------
       DO I=1,NEL
         DAM1(I) = UVAR(I,7)                   

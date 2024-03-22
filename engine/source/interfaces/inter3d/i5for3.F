@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -56,11 +56,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr05_c.inc"
 #include      "scr07_c.inc"
 #include      "scr14_c.inc"
 #include      "scr16_c.inc"
-#include      "com01_c.inc"
 #include      "com06_c.inc"
 #include      "com08_c.inc"
 #include      "parit_c.inc"
@@ -89,21 +87,6 @@ C-----------------------------------------------
      .   FXI(MVSIZ), FYI(MVSIZ), FZI(MVSIZ), FX1(MVSIZ), FX2(MVSIZ), FX3(MVSIZ), FX4(MVSIZ),
      .   FY1(MVSIZ), FY2(MVSIZ), FY3(MVSIZ), FY4(MVSIZ), FZ1(MVSIZ), FZ2(MVSIZ), FZ3(MVSIZ), FZ4(MVSIZ)
 C-----------------------------------------------
-!      EQUIVALENCE (IX1,IV(1,1)) ,(IX2,IV(1,2)) ,(IX3,IV(1,3))
-!      EQUIVALENCE (IX4,IV(1,4))
-C
-!      EQUIVALENCE (XI,BV(1,13)),(YI,BV(1,14)),(ZI,BV(1,15))
-!      EQUIVALENCE (N1,BV(1,19)) ,(N2,BV(1,20)) ,(N3,BV(1,21))
-!      EQUIVALENCE (ANS,BV(1,22)),(SSC,BV(1,23)),(TTC,BV(1,24))
-!      EQUIVALENCE (H1,BV(1,25)) ,(H2,BV(1,26)) ,(H3,BV(1,27))
-!      EQUIVALENCE (H4,BV(1,28)) ,(XFACE,BV(1,29)),(STIF,BV(1,30))
-!      EQUIVALENCE (FNI,BV(1,40))
-!      EQUIVALENCE (FXI,BV(1,41)),(FYI,BV(1,42)),(FZI,BV(1,43))         --> local
-!      EQUIVALENCE (FX1,BV(1,44)),(FY1,BV(1,45)),(FZ1,BV(1,46))         --> local
-!      EQUIVALENCE (FX2,BV(1,47)),(FY2,BV(1,48)),(FZ2,BV(1,49))         --> local
-!      EQUIVALENCE (FX3,BV(1,50)),(FY3,BV(1,51)),(FZ3,BV(1,52))         --> local
-!      EQUIVALENCE (FX4,BV(1,53)),(FY4,BV(1,54)),(FZ4,BV(1,55))         --> local
-!      EQUIVALENCE (THK,BV(1,70))
 C
       DO 100 I=LFT,LLT
       ANS(I)= MIN(ZERO,(ANS(I)*XFACE(I)-THK(I)))

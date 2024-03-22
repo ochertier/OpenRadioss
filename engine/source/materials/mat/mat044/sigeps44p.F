@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -23,13 +23,13 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 Chd|====================================================================
 Chd|  SIGEPS44P                     source/materials/mat/mat044/sigeps44p.F
 Chd|-- called by -----------
-Chd|        PFORC3                        source/elements/beam/pforc3.F 
+Chd|        MAIN_BEAM3                    source/elements/beam/main_beam3.F
 Chd|-- calls ---------------
 Chd|        FINTER                        source/tools/curve/finter.F   
 Chd|====================================================================
       SUBROUTINE SIGEPS44P(
      .    NEL     ,NGL     ,MAT     ,PID     ,NUPARAM ,UPARAM  ,
-     .    IPM     ,GEO     ,OFF     ,PLA     ,EINT    ,AL      ,
+     .    GEO     ,OFF     ,PLA     ,AL      ,
      .    EXX     ,EXY     ,EXZ     ,KXX     ,KYY     ,KZZ     ,
      .    FA1     ,FA2     ,FA3     ,MA1     ,MA2     ,MA3     ,
      .    FOR     ,MOM     ,PM      ,NUVAR   ,UVAR    ,NFUNC   , 
@@ -54,12 +54,10 @@ C-----------------------------------------------
       INTEGER ,INTENT(IN)  :: NEL,NUPARAM,NUVAR,NFUNC,IFUNC(NFUNC),
      .                        NPF(*)
       INTEGER ,DIMENSION(NEL) ,INTENT(IN) :: MAT,PID,NGL
-      INTEGER ,DIMENSION(NPROPMI,NUMMAT) ,INTENT(IN) :: IPM
       my_real ,DIMENSION(NPROPM ,NUMMAT) ,INTENT(IN) :: PM
       my_real ,DIMENSION(NPROPG ,NUMGEO) ,INTENT(IN) :: GEO
       my_real ,DIMENSION(NUPARAM)        ,INTENT(IN) :: UPARAM
       my_real ,DIMENSION(NEL,NUVAR) :: UVAR
-      my_real ,DIMENSION(NEL,2) :: EINT
       my_real ,DIMENSION(NEL,3) :: FOR,MOM
       my_real ,DIMENSION(NEL)   :: OFF,PLA,AL,EXX,EXY,EXZ,KXX,KYY,KZZ,
      .   FA1,FA2,FA3,MA1,MA2,MA3
@@ -70,7 +68,7 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER ,DIMENSION(NEL) :: INDX,ICC,ISRATE,VFLAG,IPOS,IAD,ILEN
-      INTEGER :: I,J,IPID,IADBUF,NINDX
+      INTEGER :: I,J,IPID,NINDX
       my_real :: DMG,FACT,EPIF,FRATE,ALPHA,EPSDOT
       my_real ,DIMENSION(NEL) :: E,G,G3,CA,CB,CN,CP,A1,B1,B2,B3,SHF,
      .   DEGMB,DEGFX,DMPM,DMPF,F1,M1,M2,M3,DEGSH,YEQ,YLD,YMA2,YLDMAX,
@@ -92,26 +90,25 @@ C
       ENDIF                                 
 C
       DO I=1,NEL
-        IADBUF   = IPM(7,MAT(I))-1
         IPID     = PID(I)
-        E(I)     = UPARAM(IADBUF+1)
-        CA(I)    = UPARAM(IADBUF+3)
-        YLDMAX(I)= UPARAM(IADBUF+4)
-        EPMAX(I) = UPARAM(IADBUF+5)
-        EPSR1(I) = UPARAM(IADBUF+6)
-        EPSR2(I) = UPARAM(IADBUF+7)
-        CB(I)    = UPARAM(IADBUF+8)
-        CN(I)    = UPARAM(IADBUF+9)
-        ICC(I)   = NINT(UPARAM(IADBUF+10))
-        EPDR(I)  = UPARAM(IADBUF+11)
+        E(I)     = UPARAM(1)
+        CA(I)    = UPARAM(3)
+        YLDMAX(I)= UPARAM(4)
+        EPMAX(I) = UPARAM(5)
+        EPSR1(I) = UPARAM(6)
+        EPSR2(I) = UPARAM(7)
+        CB(I)    = UPARAM(8)
+        CN(I)    = UPARAM(9)
+        ICC(I)   = NINT(UPARAM(10))
+        EPDR(I)  = UPARAM(11)
         EPIF     = MAX(EPIF,EPDR(I))              
-        CP(I)    = UPARAM(IADBUF+12)
-        G(I)     = UPARAM(IADBUF+16)
-        G3(I)    = UPARAM(IADBUF+18)
-        ISRATE(I)= NINT(UPARAM(IADBUF+13))
-        ASRATE(I)= UPARAM(IADBUF+14)
-        VFLAG(I) = NINT(UPARAM(IADBUF+23))
-        YSCALE(I)= UPARAM(IADBUF+24)
+        CP(I)    = UPARAM(12)
+        G(I)     = UPARAM(16)
+        G3(I)    = UPARAM(18)
+        ISRATE(I)= NINT(UPARAM(13))
+        ASRATE(I)= UPARAM(14)
+        VFLAG(I) = NINT(UPARAM(23))
+        YSCALE(I)= UPARAM(24)
 c
         RHO(I)   = PM(1,MAT(I))
 c
@@ -123,17 +120,6 @@ c
         DPLA(I)  = ZERO
       ENDDO
 C-----------------------------
-C     DAMPING terms removed to pforce3
-C-----------------------------
-C
-      DO I=1,NEL
-        EXX(I)=EXX(I)*DT1
-        EXY(I)=EXY(I)*DT1
-        EXZ(I)=EXZ(I)*DT1
-        KXX(I)=KXX(I)*DT1
-        KYY(I)=KYY(I)*DT1
-        KZZ(I)=KZZ(I)*DT1
-      ENDDO
 C
       DO I=1,NEL
         DEGMB(I) = FOR(I,1)*EXX(I)
@@ -264,8 +250,6 @@ C
         DWPLA(I) = DEGMB(I) + DEGFX(I) - DWELM(I) - DWELF(I)
         DEGSH(I) = DEGSH(I) + FOR(I,2)*EXY(I) + FOR(I,3)*EXZ(I)
         FACT = HALF*OFF(I)*AL(I)
-        EINT(I,1) = EINT(I,1) + (DEGSH(I)+DEGMB(I))*FACT
-        EINT(I,2) = EINT(I,2) +  FACT*DEGFX(I)
       ENDDO
 C-----------------------
 C     EPS PLASTIQUE
@@ -327,22 +311,13 @@ c--------------------------------
       ENDIF
 C
       DO I=1,NEL
-        FOR(I,1)=F1(I)*OFF(I)
-        FOR(I,2)=FOR(I,2)*OFF(I)
-        FOR(I,3)=FOR(I,3)*OFF(I)
-        MOM(I,1)=M1(I)*OFF(I)
-        MOM(I,2)=M2(I)*OFF(I)
-        MOM(I,3)=M3(I)*OFF(I)
+        FA1(I) = F1(I)
+        FA2(I) = FOR(I,2) 
+        FA3(I) = FOR(I,3)  
+        MA1(I) = M1(I) 
+        MA2(I) = M2(I) 
+        MA3(I) = M3(I) 
       ENDDO
-C
-      DO I=1,NEL
-        FA1(I) =  FOR(I,1)
-        FA2(I) =  FOR(I,2) 
-        FA3(I) =  FOR(I,3)  
-        MA1(I) =  MOM(I,1) 
-        MA2(I) =  MOM(I,2) 
-        MA3(I) =  MOM(I,3) 
-      ENDDO               
 c-----------------------------------------------
  1000 FORMAT(1X,'-- RUPTURE OF BEAM ELEMENT NUMBER ',I10)
  1100 FORMAT(1X,'-- RUPTURE OF BEAM ELEMENT :',I10,' AT TIME :',G11.4)

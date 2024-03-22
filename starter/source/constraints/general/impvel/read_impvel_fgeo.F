@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -58,15 +58,10 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr03_c.inc"
 #include      "scr17_c.inc"
 #include      "param_c.inc"
-#include      "submod_c.inc"
 #include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "sysunit.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -270,7 +265,7 @@ c
             END IF
           END DO
         END IF  ! PART_ID > 0
-c----------------------------------------------------------------------	  
+c----------------------------------------------------------------------    
 c       /IMPVEL/FGEO CALCULE LE NOMBRE D'OCCURENCES D'ONE NOEUD DE DESTINATION
 c--------------------------------------------------
         DO N = 1,INUM
@@ -286,7 +281,7 @@ c--------------------------------------------------
         END DO
 c-----------
       END DO  ! IFGEO = 1,NFGEO
-c----------------------------------------------------------------------	  
+c----------------------------------------------------------------------    
  1000 FORMAT(//
      .'     IMPOSED VELOCITIES  PRESCRIBED FINAL GEOMETRY '/
      .'     ----------------------------------------------'/
@@ -294,6 +289,6 @@ c----------------------------------------------------------------------
      .'      FSCALE           ASCALE       START_TIME           ',
      .'      DMIN   LOAD_SCALE')
  2000 FORMAT(5(1X,I10),5(1X,1PG16.9))
-c----------------------------------------------------------------------	  
+c----------------------------------------------------------------------    
       RETURN
       END

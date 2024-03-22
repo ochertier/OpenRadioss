@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -40,18 +40,15 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
 #include      "scr17_c.inc"
-#include      "tabsiz_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER, INTENT(IN) :: IGEO(NPROPGI,NUMGEO),IGEO_STACK(3* NPT_STACK+2,*)
-      my_real, INTENT(IN) :: GEO(NPROPG,NUMGEO),GEO_STACK(6*NPT_STACK+1,*),
-     .                       PM_STACK(20,*),BUFGEO(*)
+      INTEGER, INTENT(IN) :: IGEO(NPROPGI,NUMGEO),IGEO_STACK(4* NPT_STACK+2,NS_STACK)
+      my_real, INTENT(IN) :: GEO(NPROPG,NUMGEO),GEO_STACK(6*NPT_STACK+1,NS_STACK),
+     .                       PM_STACK(20,NS_STACK),BUFGEO(*)
 C--------------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

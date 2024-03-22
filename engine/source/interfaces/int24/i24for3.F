@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -30,13 +30,15 @@ Chd|        I24ASS2                       source/interfaces/int24/i24for3.F
 Chd|        I24FOR1_FIC                   source/interfaces/int24/i24for3e.F
 Chd|        I24FOR1_FICR                  source/interfaces/int24/i24for3e.F
 Chd|        I24SMS2                       source/interfaces/int24/i24for3.F
+Chd|        I24_SAVE_SUB                  source/interfaces/int24/i24_save_sub.F
 Chd|        IBCOFF                        source/interfaces/interf/ibcoff.F
 Chd|        BITGET                        source/interfaces/intsort/i20sto.F
 Chd|        ANIM_MOD                      ../common_source/modules/anim_mod.F
-Chd|        H3D_MOD                       share/modules/h3d_mod.F
+Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|        OUTPUTS_MOD                   ../common_source/modules/outputs_mod.F
-Chd|        PLYXFEM_MOD                   share/modules/plyxfem_mod.F
-Chd|        TRI7BOX                       share/modules/tri7box.F
+Chd|        PARAMETERS_MOD                ../common_source/modules/interfaces/parameters_mod.F
+Chd|        PLYXFEM_MOD                   share/modules/plyxfem_mod.F   
+Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
       SUBROUTINE I24FOR3(JLT ,A  ,V       ,IBCC        ,ICODT     ,
      2    FSAV        ,GAP       ,FRIC    ,MS          ,VISC      ,
@@ -72,7 +74,9 @@ Chd|====================================================================
      X    INDEXORTH   , INDEXISOT,DIR1      ,DIR2      ,T2FAC_SMS ,
      Y    F_PFIT      ,TAGNCONT  ,KLOADPINTER,LOADPINTER,LOADP_HYD_INTER,
      Z    TYPSUB      ,INFLG_SUBS,INFLG_SUBM ,NINLOADP  ,DGAPLOADINT,
-     1    S_LOADPINTER,DIST      ,IXX        ,INTEREFRIC,EFRICINT  )
+     1    S_LOADPINTER,DIST      ,IXX        ,INTEREFRIC,INTCAREA,
+     2    PARAMETERS  ,PENREF    ,KMAX       ,S_ADDSUBM, S_LISUBM,S_TYPSUB,
+     3    NISUBMAX,I_STOK)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -81,6 +85,7 @@ C-----------------------------------------------
       USE H3D_MOD
       USE ANIM_MOD
       USE OUTPUTS_MOD
+      USE PARAMETERS_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -97,8 +102,6 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "com06_c.inc"
 #include      "com08_c.inc"
-#include      "scr02_c.inc"
-#include      "scr03_c.inc"
 #include      "scr05_c.inc"
 #include      "scr07_c.inc"
 #include      "scr11_c.inc"
@@ -106,17 +109,17 @@ C-----------------------------------------------
 #include      "scr16_c.inc"
 #include      "scr18_c.inc"
 #include      "sms_c.inc"
-#include      "units_c.inc"
 #include      "parit_c.inc"
-#include      "warn_c.inc"
-#include      "couple_c.inc"
 #include      "param_c.inc"
 #include      "impl1_c.inc"
-#include      "task_c.inc"
-#include      "kincod_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER S_ADDSUBM                            ! Size of ADDSUBM
+      INTEGER S_LISUBM                             ! Size of LISUBM
+      INTEGER S_TYPSUB                             ! Size of TYPSUB
+      INTEGER NISUBMAX                             ! Size of ISENSINT
+      INTEGER I_STOK                               ! Number of contact candidates / Size of FSAVPARIT
       INTEGER NELTST,ITYPTST,JLT,IBCC,IBCM,IBCS,IVIS2,INACTI,IBAG,NIN,
      .        INTNITSCHE,IORTHFRIC,NFORTH ,NFISOT,
      .        NSN,ICODT(*), ITAB(*), ISKY(*), KINET(*),IRTLM(2,NSN),
@@ -125,19 +128,19 @@ C-----------------------------------------------
      .        KINI(*),SUBTRIA(MVSIZ),MBINFLG(*),ILEV,
      .        ISET, NISKYFI,IADM,INTTH,IFORM,CAND_N_N(*),INTPLY,
      .        MSEGTYP(*),TAGNCONT(NLOADP_HYD_INTER,NUMNOD),
-     .        TYPSUB(*),JTASK
+     .        TYPSUB(S_TYPSUB),JTASK
       INTEGER IX1(MVSIZ), IX2(MVSIZ), IX3(MVSIZ), IX4(MVSIZ),
      .        CN_LOC(MVSIZ),CE_LOC(MVSIZ),INDEX(MVSIZ),NSVG(MVSIZ),
-     .        NISUB, LISUB(*), ADDSUBS(*), ADDSUBM(*), LISUBS(*),
+     .        NISUB, LISUB(*), ADDSUBS(*), ADDSUBM(S_ADDSUBM), LISUBS(*),
      .        LISUBM(*),ILAGM,ICURV(3), NREBOU,
      .        ISKYI_SMS(*), NSMS(*),IGSTI,IPLY(4,*),INOD_PXFEM(*),
-     .        IRTSE(5,*),NSNE ,IS2SE(2,*),IS2PT(*), ISENSINT(*),NFT,T2MAIN_SMS(6,*),
+     .        IRTSE(5,*),NSNE ,IS2SE(2,*),IS2PT(*), ISENSINT(NISUBMAX+1),NFT,T2MAIN_SMS(6,*),
      .        INDEXORTH(MVSIZ)  ,INDEXISOT(MVSIZ),INFLG_SUBS(*), INFLG_SUBM(*)
       INTEGER  , INTENT(IN) :: NINLOADP,S_LOADPINTER
       INTEGER  , INTENT(IN) :: KLOADPINTER(NINTER+1),LOADPINTER(S_LOADPINTER),
      .        LOADP_HYD_INTER(NLOADP_HYD)
       INTEGER  , INTENT(IN) :: IXX(MVSIZ,13)
-      INTEGER  , INTENT(IN) :: INTEREFRIC
+      INTEGER  , INTENT(IN) :: INTEREFRIC, INTCAREA
       my_real
      .   STIGLO,FROT_P(*), X(3,*),
      .   A(3,*), MS(*), V(3,*), FSAV(*),FCONT(3,*),
@@ -173,9 +176,11 @@ C-----------------------------------------------
      .     PENE_OLD(5,NSN),STIF_OLD(2,NSN),F_PFIT
       my_real  , INTENT(IN) :: DGAPLOADINT(S_LOADPINTER)
       my_real  , INTENT(INOUT) :: DIST(MVSIZ)
-      my_real  , INTENT(INOUT) :: EFRICINT(S_EFRICINT)
+      my_real, DIMENSION(MVSIZ), INTENT(IN) :: PENREF
+      my_real, INTENT(IN) :: KMAX
 
       TYPE(H3D_DATABASE) :: H3D_DATA
+      TYPE (PARAMETERS_) ,INTENT(IN):: PARAMETERS
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -200,7 +205,7 @@ C-----------------------------------------------
      .   D1,D2,D3,D4,A1,A2,A3,A4,
      .   FSAV1, FSAV2, FSAV3, FSAV4, FSAV5, FSAV6, FSAV7, FSAV8,
      .   FSAV9, FSAV10, FSAV11, FSAV12, FSAV13, FSAV14, FSAV15,
-     .   FSAV22, FSAV23, FSAV24, FFO,
+     .   FSAV22, FSAV23, FSAV24, FFO,FSAV29,
      .   E10, H0D, S2D, SUM,
      .   LA1D,LA2D,LA3D,LA4D,T1,T1D,T2,T2D,FFD,VISD,FACD,D1D,
      .   P1S(MVSIZ),P2S(MVSIZ),P3S(MVSIZ),P4S(MVSIZ),
@@ -221,22 +226,21 @@ C-----------------------------------------------
      .   CS(MVSIZ),C1(MVSIZ),C2(MVSIZ),C3(MVSIZ),C4(MVSIZ),
      .   CX,CY,CFI,AUX, FX6(6,MVSIZ), FY6(6,MVSIZ), FZ6(6,MVSIZ),
      .   PHI1(MVSIZ), PHI2(MVSIZ), PHI3(MVSIZ), PHI4(MVSIZ),
-     .   DTMINI,STIF0_IMP(MVSIZ),PENN,TINY,
+     .   DTMINI,STIF0_IMP(MVSIZ),PENN,TINY,PENDR,
      .   FNNIT1,FNNIT2,FNNIT3,FNNITSCHE,T3,FNITXT(MVSIZ),FNITYT(MVSIZ),FNITZT(MVSIZ),
-     .   XMU2(MVSIZ)
+     .   XMU2(MVSIZ),FACN,FNON,STIFKT(MVSIZ),FACKT
       INTEGER JSUB,KSUB,JJ,KK,IN,NSUB,ibug,ip,NCFIT
       INTEGER  ISEGTYP(MVSIZ),IXSS(4),NOD1,NOD2,NS
       my_real
-     .   FSAVSUB1(24,NISUB),IMPX,IMPY,IMPZ,VNM(MVSIZ),SFAC,STMIN,
+     .   FSAVSUB1(25,NISUB),IMPX,IMPY,IMPZ,VNM(MVSIZ),SFAC,STMIN,
      .   FXS(4),FYS(4),FZS(4),HH,FINC,FA,FB,DDP,PREC1
 
       DOUBLE PRECISION RP1,RP2,STIF_N
-      INTEGER TAGIP(MVSIZ)
+      INTEGER TAGIP(MVSIZ),ISPDO
 C
       INTEGER BITGET
       EXTERNAL BITGET
 C-----------------------------------------------
-#include "sync_dir.inc"
       DTMINI=ZERO
       IF (IRESP==1) THEN
         PREC = FIVEEM4
@@ -257,6 +261,7 @@ C-----------------------------------------------
       ECONTDT = ZERO
       DO I=1,JLT
         STIF0(I) = STIF(I)
+        STIFKT(I) = STIF(I)
       ENDDO
       EFRIC_L(1:JLT) = ZERO
 C---------------------
@@ -272,6 +277,9 @@ C---------------------
       ELSE
         IFIT = 0
       END IF
+      FNON = EP02
+      FMAX = EP03
+      IF (IGSTI==-1) FMAX = KMAX
 C-------------------------------------------
 C     PENE Offset removed to i24dst3.F
 C-------------------------------------------
@@ -412,12 +420,34 @@ C-------------------------------------------
 C     stifness reduction to avoid positive
 C     force jump and energy generation
 C-------------------------------------------
-      IF (IFIT >0) THEN
+      IF (IFIT >0.OR.(INACTI==-1.AND.IMPL_S==0)) THEN
         DO I=1,JLT
           IF(PENE(I) == ZERO)CYCLE
           STIF(I) = STIF0(I)
-c          STIF(I) = FINC*STIF0(I)
           IF(STIGLO<=ZERO) STIF(I) = HALF*STIF(I)
+C---- nonlinear stif          
+          IF(PENREF(I) > ZERO) THEN
+            PENDR  = (PENE(I)/PENREF(I))**2
+            FACKT = MIN(FMAX,(ONE+THREE*FNON*PENDR))
+            FACN = MIN(FMAX,(ONE+FNON*PENDR))
+            STIFKT(I)= STIFKT(I)*FACKT
+            STIF(I)= STIF(I)*FACN
+          END IF
+          FNI(I)= -STIF(I) * PENE(I)
+        ENDDO
+      ELSEIF (IGSTI==-1.AND.IMPL_S==0) THEN
+c----- first version w/o force jump treatment      
+        DO I=1,JLT
+          IF(PENE(I) == ZERO)CYCLE
+          STIF(I) = STIF0(I)
+C---- nonlinear stif          
+          IF(PENREF(I) > ZERO) THEN
+            PENDR  = (PENE(I)/PENREF(I))**2
+            FACN = MIN(FMAX,(ONE+FNON*PENDR))
+            STIF(I)= MIN(KMAX,STIF(I)*FACN)
+            FACKT = THREE*(STIF(I)/STIF0(I)-ONE)
+            STIFKT(I)= MAX(STIF(I),STIFKT(I)*FACKT)
+          END IF
           FNI(I)= -STIF(I) * PENE(I)
         ENDDO
       ELSEIF(IMPL_S>0.AND.IGSTI==6)THEN
@@ -485,8 +515,6 @@ C---------if multi-contact in the same groupe---
                   STIF(I) = FACM1*STIF0_IMP(I)
 C-----------never higher than STIF0----------------
                   STIF(I) = MIN(STIF(I),STIF0(I))
-c             IF(ip>0.and.INCONV ==1 )
-c     +    write(iout,*)'FACM1,STIF(I),STIF0(I)=',FACM1,STIF(I),STIF0(I)
                 ENDIF
 C------------quand  PENE_OLD(2,N)=PENE_OLD(1,N)
                 IF(INCONV ==1 )THEN
@@ -563,8 +591,7 @@ C------explicit or implicit+Istif/=6
           N  = CAND_N_N(I)
           IF(JG > 0)THEN
             IF(TT /= ZERO.AND.(PENE_OLD(2,N)/= ZERO.OR.PENE_OLD(5,N)/= ZERO))THEN
-              DDP = PENE(I)-PENE_OLD(2,N)-DPENE(I)-PREC1
-              IF(PENE_OLD(5,N)> ZERO) DDP = DDP+PREC1
+              DDP = PENE(I)-PENE_OLD(2,N)-DPENE(I)
               IF(PENE(I) > PENE_OLD(2,N) .AND.DDP>ZERO)THEN
                 RP1 = PENE_OLD(2,N)/PENE(I)
                 RP2 = DPENE(I)/PENE(I)
@@ -588,8 +615,7 @@ c new impact, possible multi impact
             JG = -JG
             IF(TT /= ZERO.AND.(PENE_OLDFI(NIN)%P(2,JG)/= ZERO.OR.
      .                         PENE_OLDFI(NIN)%P(5,JG)/= ZERO))THEN
-              DDP = PENE(I)-PENE_OLDFI(NIN)%P(2,JG)-DPENE(I)-PREC1
-              IF(PENE_OLDFI(NIN)%P(5,JG)> ZERO) DDP = DDP+PREC1
+              DDP = PENE(I)-PENE_OLDFI(NIN)%P(2,JG)-DPENE(I)
               IF(PENE(I) > PENE_OLDFI(NIN)%P(2,JG) .AND.DDP>ZERO)THEN
                 RP1 = PENE_OLDFI(NIN)%P(2,JG)/PENE(I)
                 RP2 = DPENE(I)/PENE(I)
@@ -735,22 +761,6 @@ C           ECONTDT = ECONTDT + FF * VN(I) * DT1
               STIF(I) = MAX(STIF(I) ,CF(I)*DT1INV)
             ENDDO
           ENDIF
-        ELSEIF(IVIS2==2)THEN
-C---------------------------------
-C         VISC QUAD TYPE
-C---------------------------------
-          DO I=1,JLT
-            IF(PENE(I) == ZERO)CYCLE
-            VIS2(I) = TWO* STIF(I) * MSI(I)
-            FAC = STIF(I) / MAX(EM30,STIF(I))
-            VIS = SQRT(VIS2(I))
-            FF  = FAC * VISC * VIS
-            STIF(I) = STIF0(I) + TWO * FF * DT1INV
-            STIF(I) = MAX(STIF(I) ,FAC*SQRT(VISCFFRIC(I))*VIS*DT1INV)
-            FF = FF * VN(I)
-C          ECONTDT = ECONTDT + FF * VN(I) * DT1
-            FNI(I)  = FNI(I) + FF
-          ENDDO
         ELSEIF(IVIS2==3)THEN
 C---------------------------------
 C         VISC QUAD = 0
@@ -1071,7 +1081,7 @@ C     SORTIES TH PAR SOUS INTERFACE
 C---------------------------------
       IF(NISUB/=0)THEN
         DO JSUB=1,NISUB
-          DO J=1,24
+          DO J=1,25
             FSAVSUB1(J,JSUB)=ZERO
           END DO
         ENDDO
@@ -1116,6 +1126,8 @@ C
                     FSAVSUB1(10,JSUB)=FSAVSUB1(10,JSUB)+ABS(IMPZ)
 C
                     FSAVSUB1(11,JSUB)=FSAVSUB1(11,JSUB)+FNI(I)*DT12
+
+                    IF(PARAMETERS%INTCAREA > 0)  FSAVSUB1(25,JSUB) = FSAVSUB1(25,JSUB) + PARAMETERS%INTAREAN(NN) 
 C
                   END IF
 
@@ -1145,6 +1157,8 @@ C
                   FSAVPARIT(JSUB+1,2,I+NFT) =  FYI(I)
                   FSAVPARIT(JSUB+1,3,I+NFT) =  FZI(I)
                 ENDIF
+
+                IF(PARAMETERS%INTCAREA > 0)  FSAVSUB1(25,JSUB) = FSAVSUB1(25,JSUB) + PARAMETERS%INTAREAN(NN) 
 
                 JJ=JJ+1
 
@@ -1196,6 +1210,7 @@ C
                     FSAVSUB1(9,JSUB) =FSAVSUB1(9,JSUB) +ABS(IMPY)
                     FSAVSUB1(10,JSUB)=FSAVSUB1(10,JSUB)+ABS(IMPZ)
 C
+                    IF(PARAMETERS%INTCAREA > 0)  FSAVSUB1(25,JSUB) = FSAVSUB1(25,JSUB) + PARAMETERS%INTAREAN(NN) 
                   END IF
 
                   KK=KK+1
@@ -1214,43 +1229,20 @@ C
             IE = CE_LOC(I)
           ENDIF
 
-          KK  =ADDSUBM(IE)
-          DO WHILE(KK<ADDSUBM(IE+1))
-            KSUB=LISUBM(KK)
-
-            ITYPSUB = TYPSUB(KSUB)
-            IF(ITYPSUB == 2 ) THEN   ! Inter =0 : collecting forces from all inter with only 1 surface : main side
-
-              IMPX=-FXI(I)*DT12
-              IMPY=-FYI(I)*DT12
-              IMPZ=-FZI(I)*DT12
-
-              FSAVSUB1(1,KSUB)=FSAVSUB1(1,KSUB)+IMPX
-              FSAVSUB1(2,KSUB)=FSAVSUB1(2,KSUB)+IMPY
-              FSAVSUB1(3,KSUB)=FSAVSUB1(3,KSUB)+IMPZ
-
-              FSAVSUB1(8,KSUB) =FSAVSUB1(8,KSUB) +ABS(IMPX)
-              FSAVSUB1(9,KSUB) =FSAVSUB1(9,KSUB) +ABS(IMPY)
-              FSAVSUB1(10,KSUB)=FSAVSUB1(10,KSUB)+ABS(IMPZ)
-
-              FSAVSUB1(11,KSUB)=FSAVSUB1(11,KSUB)-FNI(I)*DT12
-
-              IF(ISENSINT(KSUB+1)/=0) THEN
-                FSAVPARIT(KSUB+1,1,I+NFT) =  -FXI(I)
-                FSAVPARIT(KSUB+1,2,I+NFT) =  -FYI(I)
-                FSAVPARIT(KSUB+1,3,I+NFT) =  -FZI(I)
-              ENDIF
-
-
-            ENDIF
-            KK=KK+1
-          ENDDO
+          ! Compiler issue workaround,
+          ! Loop packed in suboutine to avoid optimization breaking the code.
+          CALL I24_SAVE_SUB(NUMNOD,MVSIZ,NISUB,S_ADDSUBM,S_LISUBM,S_TYPSUB,NISUBMAX,I_STOK,
+     *                      IE,ITYPSUB,NIN,I,NN,NFT,
+     *                      ADDSUBM,LISUBM,TYPSUB,
+     *                      PARAMETERS%INTAREAN,PARAMETERS%INTCAREA,ISENSINT,
+     *                      FXI,FYI,FZI,FNI,DT12,
+     *                      FSAVSUB1,FSAVPARIT )
 
         END DO
 
 
+
         IF(NSPMD>1) THEN
-C loop split because of a PGI bug
           DO I=1,JLT
             IF(PENE(I) == ZERO)CYCLE
             NN = NSVG(I)
@@ -1292,6 +1284,8 @@ C
 C
                       FSAVSUB1(11,JSUB)=FSAVSUB1(11,JSUB)+FNI(I)*DT12
 C
+                      IF(PARAMETERS%INTCAREA > 0) FSAVSUB1(25,JSUB) = FSAVSUB1(25,JSUB) + INTAREANFI(NIN)%P(NN)
+
                     END IF
 
                     KK=KK+1
@@ -1320,6 +1314,8 @@ C
                     FSAVPARIT(JSUB+1,2,I+NFT) =  FYI(I)
                     FSAVPARIT(JSUB+1,3,I+NFT) =  FZI(I)
                   ENDIF
+
+                  IF(PARAMETERS%INTCAREA > 0) FSAVSUB1(25,JSUB) = FSAVSUB1(25,JSUB) + INTAREANFI(NIN)%P(NN)
 
                   JJ=JJ+1
 
@@ -1370,6 +1366,8 @@ C
                       FSAVSUB1(8,JSUB) =FSAVSUB1(8,JSUB) +ABS(IMPX)
                       FSAVSUB1(9,JSUB) =FSAVSUB1(9,JSUB) +ABS(IMPY)
                       FSAVSUB1(10,JSUB)=FSAVSUB1(10,JSUB)+ABS(IMPZ)
+
+                      IF(PARAMETERS%INTCAREA > 0) FSAVSUB1(25,JSUB) = FSAVSUB1(25,JSUB) + INTAREANFI(NIN)%P(NN)
 
                     ENDIF
                     KK=KK+1
@@ -1433,7 +1431,7 @@ C---      Viscous friction
             XMU(I) = MAX(XMU(I),EM30)
           ENDDO
         ELSEIF(MFROT==2)THEN
-C---        Loi Darmstad
+C---      Darmstad LAW
           DO I=1,JLT
             IF(PENE(I) == 0) THEN
               XMU(I) = ZERO
@@ -1463,7 +1461,7 @@ C---        Loi Darmstad
             XMU(I) = MAX(XMU(I),EM30)
           ENDDO
         ELSEIF (MFROT==3) THEN
-C---        Loi Renard
+C---      Renard LAW
           DO I=1,JLT
             IF(PENE(I) == 0) THEN
               XMU(I) = ZERO
@@ -1489,6 +1487,18 @@ C---        Loi Renard
             ENDIF
             XMU(I) = MAX(XMU(I),EM30)
           ENDDO
+         ELSEIF(MFROT==4)THEN
+C---        Exponential decay model
+            DO I=1,JLT
+              AA = N1(I)*VX(I) + N2(I)*VY(I) + N3(I)*VZ(I)
+              V2 = (VX(I) - N1(I)*AA)**2
+     .           + (VY(I) - N2(I)*AA)**2
+     .           + (VZ(I) - N3(I)*AA)**2
+              VV = SQRT(MAX(EM30,V2))
+              XMU(I) = FRICC(I)
+     .             + (FRIC_COEFS(I,1)-FRICC(I))*EXP(-FRIC_COEFS(I,2)*VV)
+              XMU(I) = MAX(XMU(I),EM30)
+            ENDDO
         ENDIF
 
       ELSE
@@ -1529,7 +1539,6 @@ C---      Viscous friction
 #include   "vectorize.inc"
           DO K=1,NFISOT  ! isotropic friction couples
             I = INDEXISOT(K)
-            IE=CE_LOC(I)
             AA = N1(I)*VX(I) + N2(I)*VY(I) + N3(I)*VZ(I)
             V2 = (VX(I) - N1(I)*AA)**2
      .         + (VY(I) - N2(I)*AA)**2
@@ -1777,6 +1786,70 @@ c
               BN(K)=ONE/BN(K)
             ENDIF
           ENDDO
+
+
+        ELSEIF(MFROT==4)THEN
+C---        Exponential decay model
+#include   "vectorize.inc"
+            DO K=1,NFISOT  ! isotropic friction couples
+              I = INDEXISOT(K)
+              IF(PENE(I) == 0) THEN
+                 XMU(I) = ZERO
+                 XMU2(I) = ZERO
+                 CYCLE
+              ENDIF
+              AA = N1(I)*VX(I) + N2(I)*VY(I) + N3(I)*VZ(I)
+              V2 = (VX(I) - N1(I)*AA)**2
+     .           + (VY(I) - N2(I)*AA)**2
+     .           + (VZ(I) - N3(I)*AA)**2
+              VV = SQRT(MAX(EM30,V2))
+              XMU(I) = FRICC(I)
+     .               + (FRIC_COEFS(I,1)-FRICC(I))*EXP(-FRIC_COEFS(I,2)*VV)
+              XMU(I) = MAX(XMU(I),EM30)
+            ENDDO
+c
+#include   "vectorize.inc"
+            DO K=1,NFORTH ! Orthotropic friction couples
+              I = INDEXORTH(K)
+              IF(PENE(I) == 0) THEN
+                 XMU(I) = ZERO
+                 XMU2(I) = ZERO
+                 CYCLE
+              ENDIF
+c
+              V2 = VX(I)*DIR1(I,1) +VY(I)*DIR1(I,2)+VZ(I)*DIR1(I,3)
+              VV  = MAX(EM30,V2)
+              XMU(I) = FRICC(I)
+     .               + (FRIC_COEFS(I,1)-FRICC(I))*EXP(-FRIC_COEFS(I,2)*VV)
+c
+              V2 = VX(I)*DIR2(I,1) +VY(I)*DIR2(I,2)+VZ(I)*DIR2(I,3)
+              VV  = MAX(EM30,V2)
+              XMU2(I) = FRICC2(I)
+     .             + (FRIC_COEFS2(I,1)-FRICC2(I))*EXP(-FRIC_COEFS2(I,2)*VV)
+              XMU(I) = MAX(XMU(I),EM30)
+              XMU2(I) = MAX(XMU2(I),EM30)
+           ENDDO
+
+#include   "vectorize.inc"
+           DO K=1,NFORTH ! Orthotropic friction couples : treat differently cases where mu1=0 AND/OR mu2=0
+              I = INDEXORTH(K)
+              IF(XMU(I)<=EM30) THEN
+                XMU(I) = EM30
+                DIR1(I,1:3) = ZERO
+                AN(K) = ZERO
+              ELSE
+                AN(K)=XMU(I)**2
+                AN(K)=ONE/AN(K)
+              ENDIF
+              IF(XMU2(I)<=EM30) THEN
+                XMU2(I) = EM30
+                DIR2(I,1:3) = ZERO
+                BN(K) = ZERO
+              ELSE
+                BN(K)=XMU2(I)**2
+                BN(K)=ONE/BN(K)
+              ENDIF
+            ENDDO
 
         ENDIF
 
@@ -2220,7 +2293,6 @@ C--------implicit non converge---
             DO K=1,NFISOT  ! isotropic friction couples
               I = INDEXISOT(K)
               IF(PENE(I) == ZERO)CYCLE
-              IF(PENE(I) == ZERO)CYCLE
               FX = STIF0(I)*VX(I)*DT12
               FY = STIF0(I)*VY(I)*DT12
               FZ = STIF0(I)*VZ(I)*DT12
@@ -2277,7 +2349,6 @@ C            IFPEN(INDEX(I)) = 1
 #include   "vectorize.inc"
             DO K=1,NFORTH  ! Orthotropic friction couples
               I = INDEXORTH(K)
-              IF(PENE(I) == ZERO)CYCLE
               IF(PENE(I) == ZERO)CYCLE
               FX = STIF0(I)*VX(I)*DT12
               FY = STIF0(I)*VY(I)*DT12
@@ -2486,6 +2557,7 @@ C---------------------------------
       FSAV22= ZERO
       FSAV23= ZERO
       FSAV24= ZERO
+      FSAV29= ZERO
       DO I=1,JLT
         IF(PENE(I) == ZERO)CYCLE
         IMPX=FXT(I)*DT12
@@ -2508,6 +2580,15 @@ C---------------------------------
         FSAV23=FSAV23+ZP(I)*IMPX-XP(I)*IMPZ
         FSAV24=FSAV24+XP(I)*IMPY-YP(I)*IMPX
       ENDDO
+      IF(INTCAREA > 0) THEN
+        DO I=1,JLT
+           IF(PENE(I) == ZERO)CYCLE
+           JG = NSVG(I)
+           IF(JG>0) THEN   ! Only local nodes in i25for3, remote nodes will be taken into account later
+              FSAV29=FSAV29+PARAMETERS%INTAREAN(JG) 
+           ENDIF    
+        ENDDO
+      ENDIF
 #include "lockon.inc"
       FSAV(4) = FSAV(4) + FSAV4
       FSAV(5) = FSAV(5) + FSAV5
@@ -2522,6 +2603,7 @@ C---------------------------------
       FSAV(26) = FSAV(26) + ECONTT
       FSAV(27) = FSAV(27) + ECONVT
       FSAV(28) = FSAV(28) + ECONTDT
+      FSAV(29) = FSAV(29) + FSAV29
 #include "lockoff.inc"
 C
       IF(ISENSINT(1)/=0) THEN
@@ -2687,6 +2769,7 @@ C
      .                          +ZP(I)*IMPX-XP(I)*IMPZ
                     FSAVSUB1(24,JSUB)=FSAVSUB1(24,JSUB)
      .                          +XP(I)*IMPY-YP(I)*IMPX
+C
                   ENDIF
                   KK=KK+1
                   KSUB=LISUBM(KK)
@@ -2801,6 +2884,7 @@ C
      .                                             +ZP(I)*IMPX-XP(I)*IMPZ
                       FSAVSUB1(24,JSUB)=FSAVSUB1(24,JSUB)
      .                               +XP(I)*IMPY-YP(I)*IMPX
+
 C
                     END IF
 
@@ -2912,6 +2996,7 @@ C
           FSAVSUB(22,NSUB)=FSAVSUB(22,NSUB)+FSAVSUB1(22,JSUB)
           FSAVSUB(23,NSUB)=FSAVSUB(23,NSUB)+FSAVSUB1(23,JSUB)
           FSAVSUB(24,NSUB)=FSAVSUB(24,NSUB)+FSAVSUB1(24,JSUB)
+          IF(PARAMETERS%INTCAREA > 0) FSAVSUB(29,NSUB)=FSAVSUB(29,NSUB)+FSAVSUB1(25,JSUB)
         END DO
 #include "lockoff.inc"
       END IF
@@ -2931,14 +3016,14 @@ C---------------------------------
           DO I=1,JLT
             IF(PENE(I) == ZERO)CYCLE
             EFRIC_LM = HALF*EFRIC_L(I)
-            EFRICINT(IX1(I)) = EFRICINT(IX1(I)) + H1(I)*EFRIC_LM
-            EFRICINT(IX2(I)) = EFRICINT(IX2(I)) + H2(I)*EFRIC_LM
-            EFRICINT(IX3(I)) = EFRICINT(IX3(I)) + H3(I)*EFRIC_LM
-            EFRICINT(IX4(I)) = EFRICINT(IX4(I)) + H4(I)*EFRIC_LM
+            EFRIC(INTEREFRIC,IX1(I)) = EFRIC(INTEREFRIC,IX1(I)) + H1(I)*EFRIC_LM
+            EFRIC(INTEREFRIC,IX2(I)) = EFRIC(INTEREFRIC,IX2(I)) + H2(I)*EFRIC_LM
+            EFRIC(INTEREFRIC,IX3(I)) = EFRIC(INTEREFRIC,IX3(I)) + H3(I)*EFRIC_LM
+            EFRIC(INTEREFRIC,IX4(I)) = EFRIC(INTEREFRIC,IX4(I)) + H4(I)*EFRIC_LM
             JG = NSVG(I)
             EFRIC_LS = HALF*EFRIC_L(I)
             IF(JG>0) THEN
-              EFRICINT(JG) = EFRICINT(JG) + EFRIC_LS
+              EFRIC(INTEREFRIC,JG) = EFRIC(INTEREFRIC,JG) + EFRIC_LS
             ELSE ! node remote
               JG = -JG
               EFRICFI(NIN)%P(JG)=EFRICFI(NIN)%P(JG)+ EFRIC_LS
@@ -3339,6 +3424,7 @@ ctmp+1 mic only
       ENDIF
 
 C
+      IF (IMPL_S ==0.AND.(INACTI==-1.OR.IGSTI==-1)) STIF(1:JLT)=MAX(STIF(1:JLT),STIFKT(1:JLT))
       IF(IPARIT==3)THEN
         stop 789
       ELSEIF(IPARIT==0)THEN
@@ -3535,19 +3621,18 @@ C en SPMD : traitement a refaire apres reception noeud remote si JG < 0
 C
       RETURN
       END
-Cel nouvelle routine
 Chd|====================================================================
 Chd|  I24ASS2                       source/interfaces/int24/i24for3.F
 Chd|-- called by -----------
 Chd|        I24FOR3                       source/interfaces/int24/i24for3.F
 Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
-Chd|        ARRET                         source/system/arret.F
+Chd|        ARRET                         source/system/arret.F         
 Chd|        I24FORC_FIC                   source/interfaces/int24/i24for3e.F
-Chd|        DEBUG_MOD                     share/modules/debug_mod.F
+Chd|        DEBUG_MOD                     share/modules/debug_mod.F     
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        PLYXFEM_MOD                   share/modules/plyxfem_mod.F
-Chd|        TRI7BOX                       share/modules/tri7box.F
+Chd|        PLYXFEM_MOD                   share/modules/plyxfem_mod.F   
+Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
       SUBROUTINE I24ASS2(JLT   ,IX1   ,IX2  ,IX3  ,IX4   ,
      2                  NSVG  ,H1    ,H2   ,H3   ,H4    ,STIF   ,
@@ -3576,13 +3661,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
-#include      "scr05_c.inc"
 #include      "parit_c.inc"
-#include      "task_c.inc"
-#include      "units_c.inc"
-#include      "com01_c.inc"
-#include      "warn_c.inc"
 #include      "com04_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -4185,8 +4264,8 @@ Chd|-- called by -----------
 Chd|        I24FOR3                       source/interfaces/int24/i24for3.F
 Chd|-- calls ---------------
 Chd|        I24FORC_FIC                   source/interfaces/int24/i24for3e.F
-Chd|        PLYXFEM_MOD                   share/modules/plyxfem_mod.F
-Chd|        TRI7BOX                       share/modules/tri7box.F
+Chd|        PLYXFEM_MOD                   share/modules/plyxfem_mod.F   
+Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
       SUBROUTINE I24ASS0(JLT   ,IX1  ,IX2  ,IX3  ,IX4    ,
      2                  NSVG  ,H1   ,H2   ,H3   ,H4     ,STIF ,
@@ -4212,10 +4291,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
-#include      "scr05_c.inc"
-#include      "task_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -4512,10 +4587,10 @@ Chd|-- called by -----------
 Chd|        I24FOR3                       source/interfaces/int24/i24for3.F
 Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
-Chd|        ARRET                         source/system/arret.F
+Chd|        ARRET                         source/system/arret.F         
 Chd|        I24FORC_FIC                   source/interfaces/int24/i24for3e.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        TRI7BOX                       share/modules/tri7box.F
+Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
       SUBROUTINE I24SMS2(JLT   ,IX1   ,IX2  ,IX3  ,IX4   ,
      2                  NSVG  ,H1    ,H2   ,H3   ,H4    ,STIF   ,
@@ -4540,14 +4615,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
-#include      "scr05_c.inc"
 #include      "parit_c.inc"
 #include      "task_c.inc"
-#include      "units_c.inc"
-#include      "com01_c.inc"
 #include      "sms_c.inc"
-#include      "warn_c.inc"
 #include      "com04_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -4640,7 +4710,6 @@ C
         MAS= DTS * ( DTS * KT(I) + C(I) )
         MAS = HALF * MAX( MAS, DTS * CF(I) )
 C
-C-----------------------------------------------
 C-----------------------------------------------
 C      FAC = 1.0 for all cases
 C      FAC = 0.5 for type2 crossed connections - T2MAIN(i)*T2MAIN(j)=16

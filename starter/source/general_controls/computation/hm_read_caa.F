@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -28,6 +28,7 @@ Chd|-- calls ---------------
 Chd|        HM_OPTION_COUNT               source/devtools/hm_reader/hm_option_count.F
 Chd|        HM_OPTION_READ_KEY            source/devtools/hm_reader/hm_option_read_key.F
 Chd|        HM_OPTION_START               source/devtools/hm_reader/hm_option_start.F
+Chd|        ALE_MOD                       ../common_source/modules/ale/ale_mod.F
 Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
@@ -46,23 +47,19 @@ C   M o d u l e s
 C-----------------------------------------------
       USE HM_OPTION_READ_MOD
       USE SUBMODEL_MOD
+      USE ALE_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "fluid_scr_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
 C INPUT ARGUMENTS
-      TYPE(SUBMODEL_DATA),INTENT(IN)::LSUBMODEL(*)
+      TYPE(SUBMODEL_DATA),INTENT(IN)::LSUBMODEL(NSUBMOD)
 C OUTPUT ARGUMENTS
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -75,10 +72,9 @@ C----------------------------------------------
       CALL HM_OPTION_COUNT('/CAA', NB_CAA)
       CALL HM_OPTION_START('/CAA')
       DO I=1,NB_CAA
-        CALL HM_OPTION_READ_KEY(LSUBMODEL,
-     .                       SUBMODEL_ID = SUB_ID)
+        CALL HM_OPTION_READ_KEY(LSUBMODEL,SUBMODEL_ID = SUB_ID)
         IF(SUB_ID == 0) THEN
-          ICAA=1
+          ALE%GLOBAL%ICAA=1
           EXIT
         END IF        
       ENDDO

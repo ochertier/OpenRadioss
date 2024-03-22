@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -52,19 +52,16 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
 #include      "scr17_c.inc"
 #include      "com04_c.inc"
 #include      "units_c.inc"
-#include      "sysunit.inc"
-#include      "submod_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER ,INTENT(IN) :: SENS_ID
       INTEGER ,DIMENSION(3,*) ,INTENT(IN) :: LACCELM
       CHARACTER (len=nchartitle) TITR
-      TYPE (SENSOR_STR_)  :: SENSOR_PTR
+      TYPE (SENSOR_STR_) ,INTENT(INOUT) :: SENSOR_PTR
       TYPE (SUBMODEL_DATA) ,DIMENSION(NSUBMOD) :: LSUBMODEL
       TYPE (UNIT_TYPE_)    ,INTENT(IN) ::UNITAB 
 C-----------------------------------------------
@@ -141,16 +138,16 @@ c--------------------
       END IF 
 c--------------------             
       IF (GRAVITY == ZERO) THEN
-        FAC_GRAV  = FAC_T_WORK**2 / FAC_L_WORK
+        FAC_GRAV  = UNITAB%FAC_T_WORK**2 / UNITAB%FAC_L_WORK
         GRAVITY   = DEF_GRAVITY * FAC_GRAV
       END IF
       IF (HIC_CRIT == ZERO) HIC_CRIT = INFINITY
       IF (PERIOD == ZERO) THEN
         PERIOD = 0.036     ! m/s
-        PERIOD = PERIOD / FAC_T_WORK
+        PERIOD = PERIOD / UNITAB%FAC_T_WORK
       END IF
 c
-      Time_Unit = FAC_T_WORK
+      Time_Unit = UNITAB%FAC_T_WORK
 c-------------------------------                          
       SENSOR_PTR%TYPE    = SENS_TYPE
       SENSOR_PTR%SENS_ID = SENS_ID

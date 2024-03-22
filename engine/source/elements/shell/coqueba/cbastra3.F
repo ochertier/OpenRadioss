@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -44,15 +44,10 @@ C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com01_c.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER JFT, JLT, NFT, IEPSDOT, ISTRAIN, NPG,II,NEL
       INTEGER ISMSTR ,MTN ,NPLAT,IPLAT(*),ISROT
-C     REAL
       my_real
      .   VDEF(MVSIZ,8),GSTR(NEL,8),GSTRPG(NEL,8),DT1C(*),EPSDOT(6,*),
      .   EXX(*),EYY(*),EXY(*),EXZ(*),EYZ(*),KXX(*),KYY(*),KXY(*),
@@ -112,7 +107,7 @@ C
          GSTRPG(I,6)=GSTRPG(I,6)+KXX(I)
          GSTRPG(I,7)=GSTRPG(I,7)+KYY(I)
          GSTRPG(I,8)=GSTRPG(I,8)+KXY(I)
-C		 
+C     
          GSTRWPG(I)=GSTRWPG(I)+WXY(I)* DT1C(I)
         ENDDO
 C----- use ISTRAIN temporarily for KXX.. cumulated

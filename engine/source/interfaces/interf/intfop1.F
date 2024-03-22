@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -42,7 +42,8 @@ Chd|====================================================================
      4       NPC   ,TF      ,FSKYI   ,ISKY   ,VR   ,
      5       FCONT ,IN      ,IGRSURF ,BUFSF  ,FNCONT,
      6       FTCONT,ICONTACT,RCONTACT,NUM_IMP,NS_IMP,
-     8       NE_IMP ,NT_IMP  ,SENSOR_TAB,INTBUF_TAB,H3D_DATA)
+     8       NE_IMP ,NT_IMP  ,SENSOR_TAB,INTBUF_TAB,H3D_DATA,
+     9       NSENSOR)
 C-----------------------------------------------
 C   M o d u l e s
 C----------------------------------------------- 
@@ -61,16 +62,14 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
-#include      "scr04_c.inc"
-#include      "scr06_c.inc"
 #include      "task_c.inc"
 #include      "param_c.inc"
 #include      "parit_c.inc"
 #include      "impl1_c.inc"
-#include      "scr17_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER ,INTENT(IN) :: NSENSOR
       INTEGER NELTST,ITYPTST 
       INTEGER NUM_IMP(*),NS_IMP(*),NE_IMP(*),NT_IMP
       INTEGER IPARI(NPARI,*), ICODT(*),ITAB(*), 
@@ -89,10 +88,8 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER N, IAD,IDUM, ISENS
+      INTEGER N, IAD,IDUM, ISENS, NTY
       my_real TS
-C-----------------------------------------------
-#include "sync_dir.inc"
 C-----------------------------------------------
       IF (IMPL_S==1) IAD = 1
 C

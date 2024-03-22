@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,14 +27,11 @@ Chd|        MULTI_TIMEEVOLUTION           source/multifluid/multi_timeevolution.
 Chd|-- calls ---------------
 Chd|        MULTI_INLET_EBCS              source/multifluid/multi_inlet_ebcs.F
 Chd|        MULTI_NRF_EBCS                source/multifluid/multi_nrf_ebcs.F
-Chd|        EBCS_MOD                      ../common_source/modules/ebcs_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        EBCS_MOD                      ../common_source/modules/boundary_conditions/ebcs_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|====================================================================
       SUBROUTINE MULTI_EBCS(ITASK, MULTI_FVM, IXS, IXQ, IXTG, XGRID, WGRID, IPM, PM, 
      .     FUNC_VALUE, EBCS_TAB,NPF,TF)
-C-----------------------------------------------
-C     D e s c r i p t i o n
-C-----------------------------------------------
 C-----------------------------------------------
 C     M o d u l e s
 C-----------------------------------------------
@@ -48,11 +45,9 @@ C-----------------------------------------------
 C     C o m m o n   B l o c k s
 C-----------------------------------------------
 ! NEBCS
-#include      "com04_c.inc"
 ! NPEBC, NIXS
 #include      "param_c.inc"
 ! LISURF1
-#include      "scr17_c.inc"
 ! SNPC,STF
 #include      "tabsiz_c.inc"
 C-----------------------------------------------

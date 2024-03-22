@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,8 +25,8 @@ Chd|  DTDC_MOD                      share/modules/dtdc_mod.F
 Chd|-- called by -----------
 Chd|        RESOL                         source/engine/resol.F         
 Chd|        RESOL_INIT                    source/engine/resol_init.F    
-Chd|        SCUMUALPHA                    source/elements/thickshell/solidec/scdtdc3.F
-Chd|        SCUMUALPHA6                   source/elements/thickshell/solidec/scdtdc3.F
+Chd|        SCUMUALPHA                    source/elements/thickshell/solidec/scumualpha.F
+Chd|        SCUMUALPHA6                   source/elements/thickshell/solidec/scumualpha6.F
 Chd|-- calls ---------------
 Chd|====================================================================
       MODULE DTDC_MOD 

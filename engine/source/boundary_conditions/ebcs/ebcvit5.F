@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,7 +25,7 @@ Chd|  EBCVIT5                       source/boundary_conditions/ebcs/ebcvit5.F
 Chd|-- called by -----------
 Chd|        EBCCLAP                       source/boundary_conditions/ebcs/ebcclap.F
 Chd|-- calls ---------------
-Chd|        EBCS_MOD                      ../common_source/modules/ebcs_mod.F
+Chd|        EBCS_MOD                      ../common_source/modules/boundary_conditions/ebcs_mod.F
 Chd|====================================================================
       SUBROUTINE EBCVIT5(V, A, LISTE, NOD, FV, RESO, LA, EBCS)
       USE EBCS_MOD
@@ -64,12 +64,12 @@ C
       ALPDT=ALP*DT1
 C
       IF(TT==ZERO)THEN
-     	  DO I=1,NOD
-	    N=LISTE(I)
-	    RESO(1,I)=A(1,N)
-	    RESO(2,I)=A(2,N)
-	    RESO(3,I)=A(3,N)
-     	  ENDDO
+            DO I=1,NOD
+              N=LISTE(I)
+              RESO(1,I)=A(1,N)
+              RESO(2,I)=A(2,N)
+              RESO(3,I)=A(3,N)
+            ENDDO
       ENDIF
 C
       IF(ALP>ZERO)THEN

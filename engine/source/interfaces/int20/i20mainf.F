@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -28,7 +28,9 @@ Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
 Chd|        ARRET                         source/system/arret.F         
 Chd|        I11CDCOR3                     source/interfaces/int11/i11cdcor3.F
+Chd|        I20COR3                       source/interfaces/int20/i20cor3.F
 Chd|        I20COR3E                      source/interfaces/int20/i20cor3.F
+Chd|        I20DST3                       source/interfaces/int20/i20dst3.F
 Chd|        I20DST3E                      source/interfaces/int20/i20cor3.F
 Chd|        I20FOR3                       source/interfaces/int20/i20for3.F
 Chd|        I20FOR3C                      source/interfaces/int20/i20for3.F
@@ -97,16 +99,10 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "units_c.inc"
-#include      "scr03_c.inc"
-#include      "scr04_c.inc"
-#include      "scr05_c.inc"
-#include      "scr07_c.inc"
 #include      "warn_c.inc"
 #include      "task_c.inc"
 #include      "parit_c.inc"
 #include      "timeri_c.inc"
-C#include      "impl1_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -205,6 +201,7 @@ C     REAL
      .        CS_LOC(MVSIZ), CM_LOC(MVSIZ), NSMS(MVSIZ)
       INTEGER ICURV,IMPL_S0
       my_real, DIMENSION(:,:,:), ALLOCATABLE :: FSAVPARIT
+      INTEGER NSN, NTY,  NLINSA
 C
       NSN   =IPARI(5)
       NTY   =IPARI(7)
@@ -253,7 +250,7 @@ C
       TINT    = INTBUF_TAB%VARIABLES(22)
       FRAD  = ZERO
       DRAD  = ZERO
-C----deactive implicit part	  
+C----deactive implicit part   
       IMPL_S0 =0
       IF (IMPL_S0 == 1) THEN
          NUM_IMP = 0
@@ -289,9 +286,9 @@ C allocation partie non edge sur taille NSNR (nb noeuds secnd remote)
             ALLOCATE(SOLIDN_NORMAL_F (3,IPARI(24)))
 C allocation partie edge sur taille NLINR (nb lignes secnd remote)
             ALLOCATE(SOLIDN_NORMAL_FE(3,2*IPARI(57)))
-	    CALL SPMD_I20NORMF(
+      CALL SPMD_I20NORMF(
      1 SOLIDN_NORMAL,SOLIDN_NORMAL_F,SOLIDN_NORMAL_FE,NIN     ,IRLEN20 ,
-     2 ISLEN20      ,IRLEN20T	    ,ISLEN20T	     ,IRLEN20E,ISLEN20E,
+     2 ISLEN20      ,IRLEN20T     ,ISLEN20T      ,IRLEN20E,ISLEN20E,
      3 INTBUF_TAB%NSV,INTBUF_TAB%NLG ,INTBUF_TAB%IXLINS   )
           END IF
 C il s agit de la barriere matchant celle de i20norm sur tache1
@@ -318,16 +315,16 @@ cc        CALL MY_BARRIER()
 C Traitement d'assemblage parith/on spmd a optimiser si besoin
             LENR = IAD_ELEM(1,NSPMD+1)-IAD_ELEM(1,1)
             IF(NSPMD > 1)THEN
-	      CALL SPMD_I20CURVSZ(
+        CALL SPMD_I20CURVSZ(
      1        IPARI(4),INTBUF_TAB%IRECTM,NUMNOD,IAD_ELEM,FR_ELEM,
-     2        ISDSIZ	  ,IRCSIZ	,ITAG  ,LENR	,LENT	,
-     3        MAXCC	  ,NLN    ,INTBUF_TAB%NLG)
+     2        ISDSIZ    ,IRCSIZ ,ITAG  ,LENR  ,LENT ,
+     3        MAXCC   ,NLN    ,INTBUF_TAB%NLG)
             ELSE
               CALL I20NORMCNT(
      1        IPARI(4),INTBUF_TAB%IRECTM,NUMNOD      ,ITAG    ,LENT   ,
      2        MAXCC       ,NLN     ,INTBUF_TAB%NLG)
             ENDIF
-	    CALL I20NORMP(
+      CALL I20NORMP(
      1        IPARI(4),INTBUF_TAB%IRECTM,NUMNOD ,X    ,NOD_NORMAL,
      2        IPARI(6),INTBUF_TAB%MSR,LENT   ,MAXCC,ISDSIZ    ,
      3        IRCSIZ  ,IAD_ELEM     ,FR_ELEM,ITAG ,NLN,INTBUF_TAB%NLG)
@@ -349,9 +346,9 @@ c----------------------------------------------------
            ALLOCATE(NOD_NORMAL (3,NUMNOD))
 
            IF(IPARIT==0)THEN
-	     CALL I20NORMN(
+       CALL I20NORMN(
      .         IPARI(4),INTBUF_TAB%IRECTM,NUMNOD,X ,NOD_NORMAL,
-     .  		 IPARI(6),INTBUF_TAB%MSR,NLN,INTBUF_TAB%NLG)
+     .       IPARI(6),INTBUF_TAB%MSR,NLN,INTBUF_TAB%NLG)
 cc             CALL MY_BARRIER()
              IF(NSPMD>1)THEN
                LENR = IAD_ELEM(1,NSPMD+1)-IAD_ELEM(1,1)
@@ -361,20 +358,20 @@ cc             CALL MY_BARRIER()
 C Traitement d'assemblage parith/on spmd a optimiser si besoin
              LENR = IAD_ELEM(1,NSPMD+1)-IAD_ELEM(1,1)
              IF(NSPMD > 1)THEN
-	      CALL SPMD_I20CURVSZ(
+        CALL SPMD_I20CURVSZ(
      1        IPARI(4),INTBUF_TAB%IRECTM,NUMNOD,IAD_ELEM,FR_ELEM,
-     2        ISDSIZ	  ,IRCSIZ	,ITAG  ,LENR	,LENT	,
-     3        MAXCC	  ,NLN    ,INTBUF_TAB%NLG)
+     2        ISDSIZ    ,IRCSIZ ,ITAG  ,LENR  ,LENT ,
+     3        MAXCC   ,NLN    ,INTBUF_TAB%NLG)
              ELSE
-	      CALL I20NORMCNT(
-     1        IPARI(4),INTBUF_TAB%IRECTM,NUMNOD	 ,ITAG    ,LENT   ,
-     2        MAXCC	  ,NLN     ,INTBUF_TAB%NLG)
+        CALL I20NORMCNT(
+     1        IPARI(4),INTBUF_TAB%IRECTM,NUMNOD  ,ITAG    ,LENT   ,
+     2        MAXCC   ,NLN     ,INTBUF_TAB%NLG)
 
              ENDIF
-	     CALL I20NORMNP(
+       CALL I20NORMNP(
      1         IPARI(4),INTBUF_TAB%IRECTM,NUMNOD ,X    ,NOD_NORMAL,
      2         IPARI(6),INTBUF_TAB%MSR,LENT   ,MAXCC,ISDSIZ    ,
-     3         IRCSIZ	   ,IAD_ELEM  ,FR_ELEM,ITAG ,NLN,INTBUF_TAB%NLG)
+     3         IRCSIZ    ,IAD_ELEM  ,FR_ELEM,ITAG ,NLN,INTBUF_TAB%NLG)
 
            END IF
 cc         ELSE
@@ -386,7 +383,7 @@ C il s agit de la barriere matchant celle de I7NORMN sur tache1
          NMNFT=1+(JTASK-1)*IPARI(6)/NTHREAD
          NMNLT=JTASK*IPARI(6)/NTHREAD
 
-	  CALL I20NORME(
+         CALL I20NORME(
      .       NMNFT,NMNLT,NOD_NORMAL,INTBUF_TAB%MSR,NLN,INTBUF_TAB%NLG)
           CALL MY_BARRIER()
 
@@ -465,44 +462,44 @@ C preparation candidats retenus
      1         JLT,INDEX2(NFT+1),INTBUF_TAB%CAND_E,INTBUF_TAB%CAND_N,
      2         CAND_E_N,CAND_N_N)
 C cand_n et cand_e remplace par cand_n_n et cand_e_n
-	CALL I20COR3(
-     1  JLT	  ,INTBUF_TAB%XA,INTBUF_TAB%IRECTM,INTBUF_TAB%NSV,CAND_E_N,
-     2  CAND_N_N  ,INTBUF_TAB%STFM,INTBUF_TAB%STFA,X1      ,X2	     ,
-     3  X3	  ,X4	      ,Y1	 ,Y2	       ,Y3	     ,
-     4  Y4	  ,Z1	      ,Z2	 ,Z3	       ,Z4	     ,
-     5  XI	  ,YI	      ,ZI	 ,STIF         ,IX1	     ,
-     6  IX2	  ,IX3        ,IX4	 ,NSVG         ,IGAP	     ,
-     7  GAP	  ,INTBUF_TAB%GAP_S,INTBUF_TAB%GAP_M,GAPV    ,GAPR	     ,
-     8  MS	  ,VXI        ,VYI	 ,NLN	       ,INTBUF_TAB%NLG,
-     9  VZI	  ,MSI        ,NSN	 ,INTBUF_TAB%VA,KINET	     ,
-     A  KINI	  ,NTY        ,NIN	 ,IGSTI        ,KMIN	     ,  
-     B  KMAX	  ,GAPMAX     ,GAPMIN	 ,IADM         ,RCURV	     ,
-     C  RCURVI    ,ANGLM      ,ANGLMI	 ,INTTH        ,TEMP	     ,
-     D  TEMPI	  ,PHI        ,INTBUF_TAB%AREAS,INTBUF_TAB%IELEC,AREASI    ,
-     E  IELECI    ,INTBUF_TAB%GAP_SH,INTBUF_TAB%STFAC,NODNX_SMS,NSMS	     )
+        CALL I20COR3(
+     1  JLT   ,INTBUF_TAB%XA,INTBUF_TAB%IRECTM,INTBUF_TAB%NSV,CAND_E_N,
+     2  CAND_N_N  ,INTBUF_TAB%STFM,INTBUF_TAB%STFA,X1      ,X2       ,
+     3  X3    ,X4       ,Y1  ,Y2         ,Y3       ,
+     4  Y4    ,Z1       ,Z2  ,Z3         ,Z4       ,
+     5  XI    ,YI       ,ZI  ,STIF         ,IX1      ,
+     6  IX2   ,IX3        ,IX4   ,NSVG         ,IGAP       ,
+     7  GAP   ,INTBUF_TAB%GAP_S,INTBUF_TAB%GAP_M,GAPV    ,GAPR       ,
+     8  MS    ,VXI        ,VYI   ,NLN        ,INTBUF_TAB%NLG,
+     9  VZI   ,MSI        ,NSN   ,INTBUF_TAB%VA,KINET      ,
+     A  KINI    ,NTY        ,NIN   ,IGSTI        ,KMIN       ,  
+     B  KMAX    ,GAPMAX     ,GAPMIN  ,IADM         ,RCURV      ,
+     C  RCURVI    ,ANGLM      ,ANGLMI  ,INTTH        ,TEMP       ,
+     D  TEMPI   ,PHI        ,INTBUF_TAB%AREAS,INTBUF_TAB%IELEC,AREASI    ,
+     E  IELECI    ,INTBUF_TAB%GAP_SH,INTBUF_TAB%STFAC,NODNX_SMS,NSMS       )
 C
         JLT_NEW = 0
 C
-	CALL I20DST3(
-     1 JLT	    ,CAND_N_N	 ,CAND_E_N   ,CN_LOC	,CE_LOC       ,
-     2 X1	    ,X2 	 ,X3	     ,X4	,Y1	      ,
-     3 Y2	    ,Y3 	 ,Y4	     ,Z1	,Z2	      ,
-     4 Z3	    ,Z4 	 ,XI	     ,YI	,ZI	      ,
-     5 NX1	    ,NX2	 ,NX3	     ,NX4	,NY1	      ,
-     6 NY2	    ,NY3	 ,NY4	     ,NZ1	,NZ2	      ,
-     7 NZ3	    ,NZ4	 ,LB1	     ,LB2	,LB3	      ,
-     8 LB4	    ,LC1	 ,LC2	     ,LC3	,LC4	      ,
-     9 P1	    ,P2 	 ,P3	     ,P4	,IX1	      ,
-     A IX2	    ,IX3	 ,IX4	     ,NSVG	,STIF	      ,
-     B JLT_NEW  		 ,GAPV       ,INACTI	,SOLIDN_NORMAL,
-     C INDEX2(NFT+1),VXI	 ,VYI	     ,GAPR	,INTBUF_TAB%GAP_SH,
-     D VZI	    ,MSI	 ,KINI       ,ICURV	,INTBUF_TAB%IRECTM,
-     E NNX1	    ,NNX2	 ,NNX3       ,NNX4	,NNY1	      ,
-     F NNY2	    ,NNY3	 ,NNY4       ,NNZ1	,NNZ2	      ,
-     G NNZ3	    ,NNZ4	 ,NOD_NORMAL ,IADM	,RCURVI       ,
-     H ANGLMI	    ,INTTH	 ,TEMPI      ,PHI	,AREASI       ,
-     I IELECI	    ,NLN	 ,INTBUF_TAB%NLG,IGAP	,GAPMAX       ,
-     J SOLIDN_NORMAL_F  	 ,NSMS    ,INTBUF_TAB%NBINFLG,INTBUF_TAB%GAP_M,
+        CALL I20DST3(
+     1 JLT      ,CAND_N_N  ,CAND_E_N   ,CN_LOC  ,CE_LOC       ,
+     2 X1     ,X2    ,X3       ,X4  ,Y1       ,
+     3 Y2     ,Y3    ,Y4       ,Z1  ,Z2       ,
+     4 Z3     ,Z4    ,XI       ,YI  ,ZI       ,
+     5 NX1      ,NX2   ,NX3      ,NX4 ,NY1        ,
+     6 NY2      ,NY3   ,NY4      ,NZ1 ,NZ2        ,
+     7 NZ3      ,NZ4   ,LB1      ,LB2 ,LB3        ,
+     8 LB4      ,LC1   ,LC2      ,LC3 ,LC4        ,
+     9 P1     ,P2    ,P3       ,P4  ,IX1        ,
+     A IX2      ,IX3   ,IX4      ,NSVG  ,STIF       ,
+     B JLT_NEW       ,GAPV       ,INACTI  ,SOLIDN_NORMAL,
+     C INDEX2(NFT+1),VXI   ,VYI      ,GAPR  ,INTBUF_TAB%GAP_SH,
+     D VZI      ,MSI   ,KINI       ,ICURV ,INTBUF_TAB%IRECTM,
+     E NNX1     ,NNX2  ,NNX3       ,NNX4  ,NNY1       ,
+     F NNY2     ,NNY3  ,NNY4       ,NNZ1  ,NNZ2       ,
+     G NNZ3     ,NNZ4  ,NOD_NORMAL ,IADM  ,RCURVI       ,
+     H ANGLMI     ,INTTH   ,TEMPI      ,PHI ,AREASI       ,
+     I IELECI     ,NLN   ,INTBUF_TAB%NLG,IGAP ,GAPMAX       ,
+     J SOLIDN_NORMAL_F     ,NSMS    ,INTBUF_TAB%NBINFLG,INTBUF_TAB%GAP_M,
      K CMAJ)
         JLT = JLT_NEW
         IF (IMONM > 0 .AND. JTASK == 1) CALL STARTIME(20,1)
@@ -548,9 +545,9 @@ C
      K  KINI         ,NIN       ,NISUB   ,INTBUF_TAB%LISUB,INTBUF_TAB%ADDSUBS,
      L  INTBUF_TAB%ADDSUBM,INTBUF_TAB%LISUBS,INTBUF_TAB%LISUBM,FSAVSUB,INTBUF_TAB%CAND_N,
      M  IPARI(33)    ,IPARI(39) ,NOD_NORMAL  ,FNCONT     ,FTCONT   ,
-     N  X1	     ,X2        ,X3          ,X4         ,Y1	     ,
-     O  Y2	     ,Y3        ,Y4          ,Z1         ,Z2	     ,
-     P  Z3	     ,Z4        ,XI          ,YI         ,ZI	     ,
+     N  X1       ,X2        ,X3          ,X4         ,Y1       ,
+     O  Y2       ,Y3        ,Y4          ,Z1         ,Z2       ,
+     P  Z3       ,Z4        ,XI          ,YI         ,ZI       ,
      Q  IADM         ,RCURVI    ,RCONTACT    ,ACONTACT   ,PCONTACT   ,
      R  ANGLMI       ,PADM      ,INTTH       , PHI       , FTHE      ,
      S  FTHESKYI     ,INTBUF_TAB%DAANC6,TEMP     ,TEMPI      ,RSTIF      ,
@@ -575,7 +572,7 @@ C
 c
       IF (SFSAVPARIT /= 0)THEN
           CALL SUM_6_FLOAT_SENS(FSAVPARIT, NISUB+1, 11, I_STOK,1,I_STOK,
-     .  			FBSAV6, 12, 6, DIMFB, ISENSINT )
+     .        FBSAV6, 12, 6, DIMFB, ISENSINT )
       ENDIF
       IF(ALLOCATED(FSAVPARIT)) DEALLOCATE (FSAVPARIT)
 C----------------------------------------------------------------------
@@ -583,14 +580,6 @@ C     2- EDGES
 C----------------------------------------------------------------------
       NLINSA =IPARI(53)
       IF(NLINSA /= 0)THEN
-
-        NLINS  =IPARI(51)
-        NLINM  =IPARI(52)
-        NLINSA =IPARI(53)
-        NLINMA =IPARI(54)
-        NSNE   =IPARI(55)
-        NMNE   =IPARI(56)
-
         I_STOK = INTBUF_TAB%I_STOK_E(1)
 C  cette partie est effectuee en // apres le calcul des forces des elem.
 C decoupage statique
@@ -648,27 +637,27 @@ C
         DO NFT = 0 , I_STOK - 1 , NVSIZ
           JLT = MIN( NVSIZ, I_STOK - NFT )
 C         preparation candidats retenus
-	  CALL I11CDCOR3(
+      CALL I11CDCOR3(
      1       JLT,INDEX2(NFT+1),INTBUF_TAB%LCAND_N,INTBUF_TAB%LCAND_S,CM_LOC,
      2       CS_LOC)
-	  CALL I20COR3E(
+      CALL I20COR3E(
      1 JLT     ,INTBUF_TAB%IXLINS,INTBUF_TAB%IXLINM,INTBUF_TAB%XA,INTBUF_TAB%VA,
-     2 CS_LOC	    ,CM_LOC	  ,INTBUF_TAB%STFS,INTBUF_TAB%STF,GAPMIN  ,
-     3 INTBUF_TAB%GAP_SE,INTBUF_TAB%GAP_ME,IGAP 	,GAPV	      ,MS      ,
-     4 STIF	    ,XXS1	  ,XXS2 	,XYS1	      ,XYS2    ,
-     5 XZS1	    ,XZS2	  ,XXM1 	,XXM2	      ,XYM1    ,
-     6 XYM2	    ,XZM1	  ,XZM2 	,VXS1	      ,VXS2    ,
-     7 VYS1	    ,VYS2	  ,VZS1 	,VZS2	      ,VXM1    ,
-     8 VXM2	    ,VYM1	  ,VYM2 	,VZM1	      ,VZM2    ,
-     9 MS1	    ,MS2	  ,MM1  	,MM2	      ,N1      ,
-     A N2	    ,M1 	  ,M2		,NLINSA       ,NIN     ,
-     B NL1	    ,NL2	  ,ML1  	,ML2	 ,INTBUF_TAB%NLG,
-     C INTBUF_TAB%STFAC,NODNX_SMS    ,NSMS 	)
+     2 CS_LOC     ,CM_LOC   ,INTBUF_TAB%STFS,INTBUF_TAB%STF,GAPMIN  ,
+     3 INTBUF_TAB%GAP_SE,INTBUF_TAB%GAP_ME,IGAP   ,GAPV       ,MS      ,
+     4 STIF     ,XXS1   ,XXS2   ,XYS1       ,XYS2    ,
+     5 XZS1     ,XZS2   ,XXM1   ,XXM2       ,XYM1    ,
+     6 XYM2     ,XZM1   ,XZM2   ,VXS1       ,VXS2    ,
+     7 VYS1     ,VYS2   ,VZS1   ,VZS2       ,VXM1    ,
+     8 VXM2     ,VYM1   ,VYM2   ,VZM1       ,VZM2    ,
+     9 MS1      ,MS2    ,MM1    ,MM2        ,N1      ,
+     A N2     ,M1     ,M2   ,NLINSA       ,NIN     ,
+     B NL1      ,NL2    ,ML1    ,ML2   ,INTBUF_TAB%NLG,
+     C INTBUF_TAB%STFAC,NODNX_SMS    ,NSMS  )
 
-	  CALL I20DST3E(
-     1      JLT    ,CS_LOC,CM_LOC ,HS1   ,HS2	,
-     2      HM1    ,HM2   ,NX	  ,NY	 ,NZ	,
-     3      STIF   ,N1    ,N2	  ,M1	 ,M2	,
+      CALL I20DST3E(
+     1      JLT    ,CS_LOC,CM_LOC ,HS1   ,HS2 ,
+     2      HM1    ,HM2   ,NX   ,NY  ,NZ  ,
+     3      STIF   ,N1    ,N2   ,M1  ,M2  ,
      4      JLT_NEW,XXS1  ,XXS2   ,XYS1  ,XYS2  ,
      5      XZS1   ,XZS2  ,XXM1   ,XXM2  ,XYM1  ,
      6      XYM2   ,XZM1  ,XZM2   ,VXS1  ,VXS2  ,

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -43,8 +43,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
-#include      "param_c.inc"
-#include      "scr17_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -75,10 +73,12 @@ C------------------------------------
 C     CHECK SURFACE FOR TH/SURF
 C------------------------------------
         DO I=1,NSURF
-           IF(IGRSURF(I)%TH_SURF /= 1) CYCLE
-           IF(IGRSURF(I)%ISH4N3N == 1) CYCLE
+           IF(IGRSURF(I)%TH_SURF ==2 ) THEN
+              IGRSURF(I)%TH_SURF = 1
+              IF(IGRSURF(I)%ISH4N3N == 1) CYCLE
               CALL ANCMSG(MSGID=1135,ANMODE=ANINFO,
      .                    MSGTYPE=MSGERROR,I1=IGRSURF(I)%ID)
+           ENDIF
         ENDDO
       ENDIF
       RETURN

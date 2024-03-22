@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -31,8 +31,8 @@ Chd|        I7ASS05                       source/interfaces/int07/i7ass3.F
 Chd|        I7ASS2                        source/interfaces/int07/i7ass3.F
 Chd|        I7ASS25                       source/interfaces/int07/i7ass3.F
 Chd|        ANIM_MOD                      ../common_source/modules/anim_mod.F
-Chd|        H3D_MOD                       share/modules/h3d_mod.F
-Chd|        TRI7BOX                       share/modules/tri7box.F
+Chd|        H3D_MOD                       share/modules/h3d_mod.F       
+Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
       SUBROUTINE I10FOR3(
      1    JLT    ,A      ,MS     ,V     ,FSAV  ,
@@ -76,15 +76,11 @@ C-----------------------------------------------
 #include      "com08_c.inc"
 #include      "com04_c.inc"
 #include      "com06_c.inc"
-#include      "scr02_c.inc"
-#include      "scr05_c.inc"
 #include      "scr07_c.inc"
-#include      "scr11_c.inc"
 #include      "scr14_c.inc"
 #include      "scr16_c.inc"
 #include      "scr18_c.inc"
 #include      "sms_c.inc"
-#include      "units_c.inc"
 #include      "parit_c.inc"
 #include      "param_c.inc"
 #include      "impl1_c.inc"
@@ -150,7 +146,6 @@ C-----------------------------------------------
      .   FXN(MVSIZ), FYN(MVSIZ), FZN(MVSIZ),
      .   FXT(MVSIZ), FYT(MVSIZ), FZT(MVSIZ),BID ,DTI
 C-----------------------------------------------
-#include "sync_dir.inc"
       IF(DT1>ZERO)THEN
         DT1INV = ONE/DT1
       ELSE
@@ -331,7 +326,7 @@ C------------------------------------
 C           REBOND
 C------------------------------------
             IF(PENE(I)==ZERO)THEN
-Cel on ne devrait plus passer par ici (teste dans i10dst3)
+C   on ne devrait plus passer par ici (teste dans i10dst3)
               CAND_F(1,INDEX(I)) =ZERO
             ELSE
               CAND_F(1,INDEX(I)) = SIGN(EM30,CAND_F(1,INDEX(I)))
@@ -649,7 +644,7 @@ C
 C
   160 CONTINUE
 C
-Cel spmd : identification des noeuds interf. utiles a envoyer (exchange_a)
+C   spmd : identification des noeuds interf. utiles a envoyer (exchange_a)
       IF (NSPMD>1) THEN
 Ctmp+1 mic only to avoid compiler bug
 #include "mic_lockon.inc"

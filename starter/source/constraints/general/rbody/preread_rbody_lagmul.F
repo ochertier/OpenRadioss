@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -48,15 +48,8 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "lagmult.inc"
-#include      "param_c.inc"
-#include      "units_c.inc"
-#include      "scr03_c.inc"
 #include      "scr17_c.inc"
 #include      "com04_c.inc"
 #include      "r2r_c.inc"
@@ -96,10 +89,10 @@ C--------------------------------------------------
 C--------------------------------------------------
        IF(KEY(1:6)=='LAGMUL')THEN
         NRB=NRB+1
-C----------Multidomaines --> on ignore les rby tagés---------------	
+C----------Multidomaines --> on ignore les rby tagés---------------
         IF(NSUBDOM>0)THEN
-	  IF(TAGRBY(NRB)==0)CALL HM_SZ_R2R(TAGRBY,NRB,LSUBMODEL)
-	END IF
+            IF(TAGRBY(NRB)==0)CALL HM_SZ_R2R(TAGRBY,NRB,LSUBMODEL)
+          END IF
 C--------
          CALL HM_GET_INTV('grnd_ID',IGU,IS_AVAILABLE,LSUBMODEL)
          NN = GRSIZEN(IGU,IGRNOD,NGRNOD) 

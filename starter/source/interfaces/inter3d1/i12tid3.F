@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -38,12 +38,10 @@ Chd|====================================================================
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C-----------------------------------------------
-C-----------------------------------------------
 C     TIED/SLIDING INTERFACE TYPE 12
 C     (FLUID/FLUID)
 C     COMPUTATION OF S,T (secnd node coordinates)
 C     check if secnd is facing a main segment
-C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -62,14 +60,13 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "units_c.inc"
 #include      "scr03_c.inc"
-#include      "scr07_c.2.inc"
-#include      "warn_c.inc"
 #include      "com04_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER :: II, I, J, K, L, JJ, NN, IER
       my_real :: N1, N2, N3, SS, TT
+      my_real :: XX1(4),XX2(4),XX3(4),XS1,YS1,ZS1,XC,YC,ZC
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------
@@ -88,9 +85,9 @@ C-----------------------------------------------
           XX1(JJ) = X(1,NN)
           XX2(JJ) = X(2,NN)
           XX3(JJ) = X(3,NN)
-	END DO
+              END DO
         
-        CALL INIST3(N1,N2,N3,SS,TT,IER,ALP)
+        CALL INIST3(N1,N2,N3,SS,TT,IER,ALP,XX1,XX2,XX3,XS1,YS1,ZS1,XC,YC,ZC)
         IF(IPRI>=1)WRITE(IOUT,FMT=FMW_7I_2F) ITAB(I),ITAB(K),L,(ITAB(MSR(IRECT(JJ,L))),JJ=1,4),SS,TT
         IF(IER==-1)THEN                          
           CALL ANCMSG(MSGID=1247,                  
@@ -118,17 +115,17 @@ C-----------------------------------------------
         CRST(2,II) = TT
       END DO !II=1,NSN
       CALL ANCMSG(MSGID=1247,
-     .  	      MSGTYPE=MSGERROR,
-     .  	      ANMODE=ANSTOP,
-     .  	      I1=ID,
-     .  	      C1=TITR,
-     .  	      PRMOD=MSG_PRINT)
+     .          MSGTYPE=MSGERROR,
+     .          ANMODE=ANSTOP,
+     .          I1=ID,
+     .          C1=TITR,
+     .          PRMOD=MSG_PRINT)
       CALL ANCMSG(MSGID=1248,
-     .  	      MSGTYPE=MSGWARNING,
-     .  	      ANMODE=ANINFO_BLIND,
-     .  	      I1=ID,
-     .  	      C1=TITR,
-     .  	      PRMOD=MSG_PRINT) 
+     .          MSGTYPE=MSGWARNING,
+     .          ANMODE=ANINFO_BLIND,
+     .          I1=ID,
+     .          C1=TITR,
+     .          PRMOD=MSG_PRINT) 
 
       RETURN
       END

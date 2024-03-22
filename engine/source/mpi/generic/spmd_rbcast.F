@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -43,8 +43,8 @@ Chd|        MOVFRA2                       source/tools/skew/movfram.F
 Chd|        MOVFRA_IMP                    source/tools/skew/movfram.F   
 Chd|        R2R_INPUT_INIT                source/coupling/rad2rad/r2r_input_init.F
 Chd|        RESOL                         source/engine/resol.F         
-Chd|        SECT_INI                      source/tools/sect/sectio.F    
-Chd|        SECT_READP                    source/tools/sect/sectio.F    
+Chd|        SECTION_INIT                  source/tools/sect/section_init.F
+Chd|        SECTION_READP                 source/tools/sect/section_readp.F
 Chd|        SENSOR_SPMD                   source/tools/sensor/sensor_spmd.F
 Chd|        SMS_PCG                       source/ams/sms_pcg.F          
 Chd|        SMS_PRODUT3                   source/ams/sms_proj.F         
@@ -61,7 +61,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -71,7 +70,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s

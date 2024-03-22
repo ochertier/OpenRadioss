@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -41,9 +41,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr04_c.inc"
 #include      "com04_c.inc"
-#include      "param_c.inc"
 #include      "tabsiz_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -54,22 +52,15 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-C
+      INTEGER :: NSN 
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------
-      NRTS=IPARI(3)
-      NRTM=IPARI(4)
       NSN=IPARI(5)
-      NMN=IPARI(6)
-      NTY=IPARI(7)
-      NST=IPARI(8)
-      MST=IPARI(9)
-
       CALL IQELA3
      1  (V               ,VG              ,INTBUF_TAB%IRECTM,INTBUF_TAB%CSTS,INTBUF_TAB%NSV,
      2   INTBUF_TAB%ILOCS,INTBUF_TAB%IRTLM,ICODE            ,IBCS           ,BCS       ,
-     3   INTBUF_TAB%MSR)
+     3   INTBUF_TAB%MSR, NSN)
 C
       RETURN
       END

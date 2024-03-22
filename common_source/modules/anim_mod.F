@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -91,6 +91,7 @@ Chd|        SPMD_FIADD_POFF               engine/source/mpi/interfaces/spmd_i7to
 Chd|        SPMD_FIADD_PON                engine/source/mpi/interfaces/spmd_i7tool.F
 Chd|        SPMD_I18KINE_PENE_COM_POFF    engine/source/mpi/interfaces/spmd_i18kine_pene_com_poff.F
 Chd|        SPMD_SD_XV                    engine/source/mpi/nodes/spmd_sd_xv.F
+Chd|        STOP_SENSOR                   engine/source/tools/sensor/stop_sensor.F
 Chd|        WRCOMI                        engine/source/output/restart/wrcomm.F
 Chd|        WRCOMR                        engine/source/output/restart/wrcomm.F
 Chd|-- calls ---------------
@@ -104,9 +105,5 @@ Chd|====================================================================
         my_real DTANIM, DTANIM0          !time frequency
         my_real TANIM_STOP, TANIM_STOP0  !stop time
         my_real TANIMSENS  
-        my_real DTANISENS
-              
-        !INTEGER VARIABLES FOR ANIMATION FILES
-        ! refer to scr14_c.inc
-          
+
       END MODULE ANIM_MOD

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -33,6 +33,7 @@ Chd|====================================================================
 Chd|  MRQMIN                        source/materials/tools/nlsqf.F
 Chd|-- called by -----------
 Chd|        LAW69_NLSQF                   source/materials/tools/nlsqf.F
+Chd|        LAW69_NLSQF_AUTO              source/materials/tools/law69_nlsqf_auto.F
 Chd|-- calls ---------------
 Chd|        COVSRT                        source/materials/tools/nlsqf.F
 Chd|        INVERSION                     source/materials/tools/nlsqf.F
@@ -40,67 +41,57 @@ Chd|        MRQCOF                        source/materials/tools/nlsqf.F
 Chd|====================================================================
       SUBROUTINE MRQMIN(X,Y,SIG,NDATA,A,IA,
      .                 MA,COVAR,ALPHA,NCA, ERRNOW, 
-     .                 IFUNCS,GAMMA,IRET,ICOMP)  
+     .                 IFUNCS,GAMMA,IRET,ICOMP,MMAX,ATRY )  
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com04_c.inc"
-#include      "param_c.inc"
-#include      "scr03_c.inc"
-#include      "com01_c.inc"
-#include      "com10_c.inc"
-#include      "warn_c.inc"
 #include      "units_c.inc"
-#include      "scr10_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER  , INTENT(IN)    :: MMAX 
+      my_real  , INTENT(INOUT) :: ATRY(MMAX)
 C----------------------------------------------------------------
 C  L O C A L  V A R I B L E S
 C----------------------------------------------------------------
-      INTEGER MA,NCA,NDATA,IA(MA),MMAX ,ICOMP
+      INTEGER MA,NCA,NDATA,IA(MA) ,ICOMP
       my_real 
      .        GAMMA,ERRNOW,A(MA),ALPHA(NCA,NCA),
-     .        COVAR(NCA,NCA),X(NDATA),Y(NDATA),SIG(NDATA)
-      PARAMETER (MMAX=20)  
-      INTEGER J,K,L,MFIT  
-      my_real ERRPRE,ATRY(MMAX),BETA(MMAX),DA(MMAX)  
-      SAVE ERRPRE,ATRY,BETA,DA,MFIT  
+     .        COVAR(NCA,NCA),X(NDATA),Y(NDATA),SIG(NDATA)      
+      INTEGER J,K,L,MFIT ,NMAX
+      PARAMETER (NMAX = 20) ! NMAX = MMAX 
+      my_real ERRPRE,BETA(NMAX),DA(NMAX)  
+      SAVE ERRPRE,BETA,DA,MFIT  
       INTEGER IFUNCS, IRET
 C=======================================================================
 
-      IRET = 0
+      IRET = 0  
 
       IF (GAMMA < ZERO) THEN  
         MFIT=0  
         DO J=1,MA  
           IF (IA(J)/=0) MFIT=MFIT+1  
-        ENDDO  
-
+        ENDDO 
 !       in Numerical Recript, 0.001 is used, however from my tests, the
 !       difference is small (0.01 vs 0.001)
         GAMMA=0.01
-       
         CALL MRQCOF(X,Y,SIG,NDATA,
      .              A,IA,MA,ALPHA,BETA,NCA,ERRNOW,
      .              IFUNCS,ICOMP)  
 
         ERRPRE=ERRNOW  
         DO J=1,MA  
-          ATRY(J)=A(J)  
-        ENDDO  
+          ATRY(J)=A(J)
+        ENDDO 
       ENDIF  
 C
       DO J=1,MFIT  
         DO K=1,MFIT  
-          COVAR(J,K)=ALPHA(J,K)  
+          COVAR(J,K)=ALPHA(J,K) 
         ENDDO  
         COVAR(J,J)=ALPHA(J,J)*(1.+GAMMA)  
         DA(J)=BETA(J)  
@@ -126,7 +117,7 @@ C
       DO L=1,MA  
         IF(IA(L)/=0) THEN  
           J=J+1  
-          ATRY(L)=A(L)+DA(J)  
+          ATRY(L)=A(L)+DA(J) 
         ENDIF  
       ENDDO  
 
@@ -198,10 +189,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "units_c.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -279,7 +266,7 @@ c           IF (Y(I)<EM5) DY=EM5
            ENDIF
 
            DY=Y(I)-YMOD
-           ERRNOW=ERRNOW + DY*DY
+           ERRNOW = ERRNOW + DY*DY
            J=0  
            DO  L=1,MA  
              IF(IA(L)/=0) THEN  
@@ -481,6 +468,7 @@ Chd|====================================================================
 Chd|  OGDEN0                        source/materials/tools/nlsqf.F
 Chd|-- called by -----------
 Chd|        LAW69_NLSQF                   source/materials/tools/nlsqf.F
+Chd|        LAW69_NLSQF_AUTO              source/materials/tools/law69_nlsqf_auto.F
 Chd|        MRQCOF                        source/materials/tools/nlsqf.F
 Chd|-- calls ---------------
 Chd|====================================================================
@@ -489,7 +477,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -584,21 +571,10 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com04_c.inc"
-#include      "param_c.inc"
-#include      "scr03_c.inc"
 #include      "scr17_c.inc"
-#include      "com01_c.inc"
-#include      "com10_c.inc"
-#include      "warn_c.inc"
 #include      "units_c.inc"
-#include      "scr10_c.inc"
-#include      "intstamp_c.inc"
 C-----------------------------------------------
       INTEGER MAXA 
       PARAMETER (MAXA=20)
@@ -641,7 +617,9 @@ C-----------------------------------------------
       my_real A0(MAXA)
       my_real ERRMIN, ERRMAX, ERRAVE, ERRAVE_MIN, ERR
 
-      INTEGER ISTART, NPSAVED, IVALID,ICOMP
+      INTEGER ISTART, NPSAVED, IVALID,ICOMP, MMAX
+      PARAMETER (MMAX =20)
+      my_real  ATRY(MMAX)
 
       INTEGER ICURV
       LOGICAL lopened
@@ -777,7 +755,7 @@ c     calculate MCOF_MIN, MCOF_MAX
 
 c     initialize random number generator in LAW69_GUESS1
       IRND1 = 205
-
+      ATRY(1:MMAX) = ZERO ! Initialization of ATRY
       DO 111 WHILE ( ISTART < NSTART )
 c       get one guess point A0(1:NMUAL)        
         CALL LAW69_GUESS1(
@@ -825,7 +803,7 @@ C
         GAMMA=-1
         CALL MRQMIN(STRETCH,Y,SIG,NPT,A0,NONZERO,
      $       NMUAL,COVAR,ALPHA,MA,ERRNOW, 
-     $       IFUNCS,GAMMA,IRET,ICOMP)  
+     $       IFUNCS,GAMMA,IRET,ICOMP,MMAX,ATRY)  
         IF (IRET /= 0) GOTO 111
 
         IF (IDEBUG > 0) THEN
@@ -859,7 +837,7 @@ C
         ITER = ITER + 1
         CALL MRQMIN(STRETCH,Y,SIG,NPT,A0,NONZERO,
      $       MA,COVAR,ALPHA, MA, ERRNOW, 
-     $       IFUNCS,GAMMA,IRET,ICOMP)  
+     $       IFUNCS,GAMMA,IRET,ICOMP,MMAX,ATRY)
         IF (IRET /= 0) GOTO 111
 
         IF (IDEBUG == 1) THEN
@@ -1122,6 +1100,7 @@ Chd|====================================================================
 Chd|  LAW69_GUESS1                  source/materials/tools/nlsqf.F
 Chd|-- called by -----------
 Chd|        LAW69_NLSQF                   source/materials/tools/nlsqf.F
+Chd|        LAW69_NLSQF_AUTO              source/materials/tools/law69_nlsqf_auto.F
 Chd|-- calls ---------------
 Chd|        LAW69_CHECK                   source/materials/tools/nlsqf.F
 Chd|        ZERO2SMALL                    source/materials/tools/nlsqf.F
@@ -1134,7 +1113,6 @@ Chd|====================================================================
 C-----------------------------------------------
 C   A n a l y s e   M o d u l e
 C-----------------------------------------------
-#include      "units_c.inc"
 
       REAL RAND1
       EXTERNAL RAND1
@@ -1148,7 +1126,7 @@ C-----------------------------------------------
       save SMALL
 
       my_real MCOF_MIN(NMUAL) ! lower bounds of material parameters
-      my_real MCOF_MAX(NMUAL) ! lower bounds of material parameters
+      my_real MCOF_MAX(NMUAL) ! upper bounds of material parameters
 
       REAL*4 randnum
 
@@ -1196,6 +1174,7 @@ Chd|  LAW69_CHECK                   source/materials/tools/nlsqf.F
 Chd|-- called by -----------
 Chd|        LAW69_GUESS1                  source/materials/tools/nlsqf.F
 Chd|        LAW69_NLSQF                   source/materials/tools/nlsqf.F
+Chd|        LAW69_NLSQF_AUTO              source/materials/tools/law69_nlsqf_auto.F
 Chd|-- calls ---------------
 Chd|====================================================================
       SUBROUTINE LAW69_CHECK(LAWID, A, NMUAL, 
@@ -1291,6 +1270,7 @@ Chd|====================================================================
 Chd|  LAW69_GUESS_BOUNDS            source/materials/tools/nlsqf.F
 Chd|-- called by -----------
 Chd|        LAW69_NLSQF                   source/materials/tools/nlsqf.F
+Chd|        LAW69_NLSQF_AUTO              source/materials/tools/law69_nlsqf_auto.F
 Chd|-- calls ---------------
 Chd|====================================================================
       SUBROUTINE LAW69_GUESS_BOUNDS(LAWID, ICHECK, X, Y, NPT, 
@@ -1410,4 +1390,3 @@ Chd|====================================================================
       
       RETURN
       END FUNCTION RAND1
-

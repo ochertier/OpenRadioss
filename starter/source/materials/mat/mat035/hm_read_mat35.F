@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -30,7 +30,9 @@ Chd|        HM_GET_FLOATV                 source/devtools/hm_reader/hm_get_float
 Chd|        HM_GET_FLOATV_DIM             source/devtools/hm_reader/hm_get_floatv_dim.F
 Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
 Chd|        HM_OPTION_IS_ENCRYPTED        source/devtools/hm_reader/hm_option_is_encrypted.F
+Chd|        INIT_MAT_KEYWORD              source/materials/mat/init_mat_keyword.F
 Chd|        ELBUFTAG_MOD                  share/modules1/elbuftag_mod.F 
+Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
@@ -38,7 +40,7 @@ Chd|====================================================================
      .           UPARAM   ,MAXUPARAM,NUPARAM  ,NUVAR    ,IFUNC    ,
      .           MAXFUNC  ,NFUNC    ,PARMAT   ,UNITAB   ,PM       ,
      .           ISRATE   ,ID       ,TITR     ,LSUBMODEL,IMATVIS  ,
-     .           MTAG     )
+     .           MTAG     ,MATPARAM )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -46,6 +48,7 @@ C-----------------------------------------------
       USE MESSAGE_MOD 
       USE SUBMODEL_MOD
       USE ELBUFTAG_MOD
+      USE MATPARAM_DEF_MOD          
 C-----------------------------------------------
 C   ROUTINE DESCRIPTION :
 C   ===================
@@ -66,8 +69,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr17_c.inc"
 #include      "units_c.inc"
-#include      "submod_c.inc"
-#include      "sysunit.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -83,6 +84,7 @@ C-----------------------------------------------
       my_real, DIMENSION(100),INTENT(INOUT) :: PARMAT
       TYPE(SUBMODEL_DATA), DIMENSION(*),INTENT(IN) :: LSUBMODEL
       TYPE(MLAW_TAG_),INTENT(INOUT)   :: MTAG
+      TYPE(MATPARAM_STRUCT_) ,INTENT(INOUT) :: MATPARAM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -147,7 +149,7 @@ C
       ELSE
         ! If no filtering frequency is given but the flag is activated
         IF (ISRATE /= 0) THEN
-          ASRATE  = 10000.0D0*FAC_T_WORK  
+          ASRATE  = 10000.0D0*UNITAB%FAC_T_WORK  
         ! If no filtering frequency and no flag is activated => no filtering
         ELSE
           ASRATE  = ZERO
@@ -208,6 +210,14 @@ c-----------------
       ELSE
         NUVAR = 4
       ENDIF
+c-----------------
+      ! MATPARAM keywords
+      CALL INIT_MAT_KEYWORD(MATPARAM,"HOOK")
+c
+      ! Properties compatibility
+      CALL INIT_MAT_KEYWORD(MATPARAM,"SHELL_ISOTROPIC")
+      CALL INIT_MAT_KEYWORD(MATPARAM,"SOLID_ISOTROPIC")
+      CALL INIT_MAT_KEYWORD(MATPARAM,"SPH")   
 c-----------------
       WRITE(IOUT,1100) TRIM(TITR),ID,35
       WRITE(IOUT,1000)

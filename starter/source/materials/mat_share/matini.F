@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -62,20 +62,22 @@ Chd|        M6IN                          source/materials/mat/mat006/m6in.F
 Chd|        M70INIT                       source/materials/mat/mat070/m70init.F
 Chd|        M75INIT                       source/materials/mat/mat075/m75init.F
 Chd|        M77INIT                       source/materials/mat/mat077/m77init.F
+Chd|        M95INIT                       source/materials/mat/mat095/m95init.F
 Chd|        M97INIT                       source/materials/mat/mat097/m97init.F
+Chd|        MAT11CHECK                    source/materials/mat/mat011/mat11check.F
 Chd|        MATING                        source/materials/mat_share/mating.F
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
 Chd|        DETONATORS_MOD                share/modules1/detonators_mod.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
-      SUBROUTINE MATINI(PM       ,IX     ,NIX         ,X         ,
-     .                  GEO      ,ALE_CONNECTIVITY  ,DETONATORS  ,IPARG     ,
-     .                  SIGI     ,NEL    ,SKEW        ,IGEO   ,
-     .                  IPART    ,IPARTEL,
-     .                  MAT      ,IPM    ,NSIG        ,NUMS      ,PT     ,
-     .                  IPT      ,NGL    ,NPF         ,TF        ,BUFMAT ,
-     .                  GBUF     ,LBUF   ,MBUF        ,ELBUF_STR ,ILOADP ,
+      SUBROUTINE MATINI(PM       ,IX               ,NIX         ,X         ,
+     .                  GEO      ,ALE_CONNECTIVITY ,DETONATORS  ,IPARG     ,
+     .                  SIGI     ,NEL              ,SKEW        ,IGEO      ,
+     .                  IPART    ,IPARTEL          ,
+     .                  MAT      ,IPM              ,NSIG        ,NUMS      ,PT     ,
+     .                  IPT      ,NGL              ,NPF         ,TF        ,BUFMAT ,
+     .                  GBUF     ,LBUF             ,MBUF        ,ELBUF_STR ,ILOADP ,
      .                  FACLOAD  ,DDELTAX)   
 C-----------------------------------------------
 C   M o d u l e s
@@ -98,46 +100,38 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "scr01_c.inc"
 #include      "scr19_c.inc"
 #include      "units_c.inc"
 #include      "vect01_c.inc"
-#include      "warn_c.inc"
 #include      "scr17_c.inc"
-#include      "inter22.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER NIX,NEL,NSIG, NUMS, IPT
-      INTEGER IX(NIX,*), IPARG(*),
-     .        IPART(LIPART1,*),IPARTEL(*),MAT(*),IPM(NPROPMI,*),IGEO(*),
-     .        PT(*), NGL(*),NPF(*)
-      my_real
-     .   X(*), GEO(*), PM(NPROPM,*),
-     .   SIGI(NSIG,*),SKEW(LSKEW,*),BUFMAT(*),TF(*)
+      INTEGER NIX,NEL,NSIG,NUMS,IPT,JALE_FROM_PROP,JALE_FROM_MAT,JALE_MAX
+      INTEGER IX(NIX,*), IPARG(*),IPART(LIPART1,*),IPARTEL(*),MAT(*),IPM(NPROPMI,*),PT(*), NGL(*),NPF(*)
+      INTEGER,INTENT(IN) :: IGEO(NPROPGI,NUMGEO)
+      INTEGER,INTENT(IN) :: ILOADP(SIZLOADP,*)
+      my_real X(*), GEO(*), PM(NPROPM,*),SIGI(NSIG,*),SKEW(LSKEW,*),BUFMAT(*),TF(*)
+      my_real,INTENT(IN) :: FACLOAD(LFACLOAD,*)
+      my_real, INTENT(IN) :: DDELTAX(*)
       TYPE(G_BUFEL_), TARGET  :: GBUF     
       TYPE(L_BUFEL_), TARGET  :: LBUF     
       TYPE(BUF_MAT_) :: MBUF
       TYPE(ELBUF_STRUCT_), TARGET :: ELBUF_STR
-      INTEGER,INTENT(IN) :: ILOADP(SIZLOADP,*)
-      my_real,INTENT(IN) :: FACLOAD(LFACLOAD,*)
-      my_real, INTENT(IN) :: DDELTAX(*)
-      TYPE(DETONATOR_STRUCT_)::DETONATORS
+      TYPE(DETONATORS_STRUCT_)::DETONATORS
       TYPE(t_ale_connectivity), INTENT(INOUT) :: ALE_CONNECTIVITY
       TARGET  :: BUFMAT
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,IADBUF,NPAR,NFUNC,NUVAR,IFORM
+      CHARACTER*nchartitle, TITR
+      INTEGER I,IADBUF,NPAR,NFUNC,NUVAR,IFORM,NUMEL
       INTEGER IFUNC(MAXFUNC)
+      INTEGER ID
       my_real RHO0(MVSIZ)
       my_real ,DIMENSION(MVSIZ) ,TARGET :: TMP,EPL,FILLO
       my_real ,DIMENSION(:) ,POINTER ::
-     .   OFF,SIG,EINT,RHO,VOL,EPSD,DELTAX,TB,ANG,SF,VK,ROB,UVAR,EPLAS,
-     .   FILL,DTEL,UPARAM,TEMP
-C
-      INTEGER ID
-      CHARACTER*nchartitle, TITR
+     .   OFF,SIG,EINT,RHO,VOL,EPSD,DELTAX,TB,ANG,SF,VK,ROB,UVAR,EPLAS,FILL,DTEL,UPARAM,TEMP
 C=======================================================================
       TMP(1:NEL)=ZERO
       EPL(1:NEL)=ZERO
@@ -227,7 +221,17 @@ C---------------------------
         IPARG(16)=1
       ELSEIF (MTN == 11) THEN
         IPARG(63)=1 !Loi fluide
-        IPARG(64)=1 !Loi frontiere        
+        IPARG(64)=1 !Loi frontiere
+        IF(N2D == 0)THEN
+          NUMEL=NUMELS
+        ELSE
+          NUMEL=NUMELQ+NUMELTG
+        ENDIF
+        JALE_FROM_PROP = IGEO(62,IABS(IX(NIX-1,1))) !ALE/EULER from /PROP/TYPE14(SOLID)
+        JALE_FROM_MAT = IPARG(7)+IPARG(11)          !ALE/EULER from /ALE/MAT or /EULER/MAT
+        JALE_MAX = MAX(JALE_FROM_PROP, JALE_FROM_MAT)
+        ID = IPM(1,MAT(1))
+        CALL MAT11CHECK(PM,NIX,IX,ALE_CONNECTIVITY,NUMEL,JALE_MAX,NEL,NFT,ID,NUMMAT,NPROPM)
       ELSEIF (MTN == 12) THEN
         IPARG(15)=1
         IPARG(16)=1
@@ -265,8 +269,8 @@ C---------------------------
           CALL ANCMSG(MSGID=129,
      .                MSGTYPE=MSGERROR,
      .                ANMODE=ANINFO)
-          CALL ARRET(2)             	  
-	       ENDIF
+          CALL ARRET(2)                 
+                 ENDIF
       ELSEIF (MTN == 21.OR.MTN == 22.OR.MTN == 23) THEN
         IPARG(15)=1
         IPARG(16)=1
@@ -335,10 +339,8 @@ c
      .                 ALE_CONNECTIVITY   ,BUFMAT     ,RHO0     ,
      .                 GBUF               ,NEL        ,SIG)
         ELSEIF (MTN == 70) THEN
-          CALL M70INIT(
-     1       NEL   ,NPAR   ,NUVAR    ,NFUNC  ,IFUNC  ,
-     2       NPF   ,TF     ,UPARAM   ,RHO0   ,VOL    ,
-     3       EINT  ,MBUF%VAR)
+          CALL M70INIT(NEL   ,NPAR   ,NUVAR    ,UPARAM   ,MBUF%VAR)
+
         ELSEIF (MTN == 75) THEN
           ID=IPM(1,MAT(1))
           CALL FRETITL2(TITR,IPM(NPROPMI-LTITR+1,MAT(1)),LTITR)
@@ -352,6 +354,8 @@ c
      2       NPF   ,TF      ,UPARAM  ,RHO0   ,VOL    ,
      3       EINT  ,MBUF%VAR)
 c
+        ELSEIF (MTN == 95) THEN
+          CALL M95INIT(NEL   ,NUVAR   ,MBUF%VAR)
         ELSEIF (MTN == 97)THEN
           IPARG(16)=1   !  FLAG REZONE (BURNING TIME same index for EPS PLAST.)
           IPARG(63)=1   !  FLAG FOR FLUID MATERIAL

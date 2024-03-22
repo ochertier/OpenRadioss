@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,7 +25,7 @@ Chd|  THPOUT                        source/output/th/thpout.F
 Chd|-- called by -----------
 Chd|        HIST2                         source/output/th/hist2.F      
 Chd|-- calls ---------------
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE THPOUT(IPARG , NTHGRP2  , ITHGRP ,GEO,  IXP,  
      .                  ITHBUF, ELBUF_TAB, WA     )
@@ -42,7 +42,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr05_c.inc"
 #include      "task_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
@@ -230,7 +229,10 @@ C
                                             WA(IJK) = LBUF%PLA(I)
                                            ENDIF
                                         ENDIF
-
+                                    ELSEIF (ITHBUF(L) == 337 ) THEN
+                                      IF(GBUF%G_EPSD>0)THEN
+                                        WA(IJK)=GBUF%EPSD(I) 
+                                      ENDIF
                                     ENDIF
                                 ENDDO
                                 IJK = IJK + 1

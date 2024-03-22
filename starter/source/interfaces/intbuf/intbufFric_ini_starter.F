@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -32,6 +32,7 @@ Chd|====================================================================
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE MY_ALLOC_MOD
       USE INTBUF_FRIC_MOD                     
       USE MESSAGE_MOD
 C-----------------------------------------------
@@ -41,13 +42,10 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
 #include      "com04_c.inc"
-#include      "ige3d_c.inc"
 C-----------------------------------------------
 C   M y  A l l o c a t e                         
 C----------------------------------------------- 
-#include      "my_allocate.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -75,23 +73,23 @@ C=======================================================================
 c       ALLOCATIONS
 C=======================================================================
 
-          MY_ALLOCATE(INTBUF_FRIC_TAB(NINF)%TABCOUPLEPARTS_FRIC,NSET) 
+          CALL MY_ALLOC(INTBUF_FRIC_TAB(NINF)%TABCOUPLEPARTS_FRIC,NSET) 
           INTBUF_FRIC_TAB(NINF)%TABCOUPLEPARTS_FRIC(1:NSET) = 0 
 
-          MY_ALLOCATE(INTBUF_FRIC_TAB(NINF)%TABPARTS_FRIC,S_TABPARTS_FRIC) 
+          CALL MY_ALLOC(INTBUF_FRIC_TAB(NINF)%TABPARTS_FRIC,S_TABPARTS_FRIC) 
           INTBUF_FRIC_TAB(NINF)%TABPARTS_FRIC(1:S_TABPARTS_FRIC) = 0 
 
-          MY_ALLOCATE(INTBUF_FRIC_TAB(NINF)%ADPARTS_FRIC,S_TABPARTS_FRIC+1) 
+          CALL MY_ALLOC(INTBUF_FRIC_TAB(NINF)%ADPARTS_FRIC,S_TABPARTS_FRIC+1) 
           INTBUF_FRIC_TAB(NINF)%ADPARTS_FRIC(1:S_TABPARTS_FRIC+1) = 0 
 
-          MY_ALLOCATE(INTBUF_FRIC_TAB(NINF)%IFRICORTH,NSET) 
+          CALL MY_ALLOC(INTBUF_FRIC_TAB(NINF)%IFRICORTH,NSET) 
           INTBUF_FRIC_TAB(NINF)%IFRICORTH(1:NSET) = 0 
 
           IF (IORTH == 0 ) THEN
-             MY_ALLOCATE(INTBUF_FRIC_TAB(NINF)%TABCOEF_FRIC,LENC*(NSET+1)) 
+             CALL MY_ALLOC(INTBUF_FRIC_TAB(NINF)%TABCOEF_FRIC,LENC*(NSET+1)) 
               INTBUF_FRIC_TAB(NINF)%TABCOEF_FRIC(1:LENC*(NSET+1)) = ZERO 
           ELSE
-             MY_ALLOCATE(INTBUF_FRIC_TAB(NINF)%TABCOEF_FRIC,LENC+2*LENC*NSET) 
+             CALL MY_ALLOC(INTBUF_FRIC_TAB(NINF)%TABCOEF_FRIC,LENC+2*LENC*NSET) 
               INTBUF_FRIC_TAB(NINF)%TABCOEF_FRIC(1:2*LENC*NSET+LENC) = ZERO 
           ENDIF
 
@@ -109,13 +107,14 @@ Chd|  INTFRIC_WRESTI                source/interfaces/intbuf/intbufFric_ini_star
 Chd|-- called by -----------
 Chd|        DDSPLIT                       source/restart/ddsplit/ddsplit.F
 Chd|-- calls ---------------
-Chd|        WRITE_I_C                     source/output/tools/write_routines.c
+Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|        INTBUF_FRIC_MOD               share/modules1/intbuf_fric_mod.F
 Chd|====================================================================
       SUBROUTINE INTFRIC_WRESTI(INTBUF_FRIC_TAB, LENI)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE MY_ALLOC_MOD
       USE INTBUF_FRIC_MOD                     
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -194,8 +193,8 @@ Chd|====================================================================
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE MY_ALLOC_MOD
       USE INTBUF_FRIC_MOD                     
-C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------

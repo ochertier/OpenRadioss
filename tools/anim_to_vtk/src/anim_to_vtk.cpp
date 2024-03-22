@@ -1,25 +1,23 @@
-//Copyright>    OpenRadioss
-//Copyright>    Copyright (C) 1986-2023 Altair Engineering Inc.
 //Copyright>
-//Copyright>    This program is free software: you can redistribute it and/or modify
-//Copyright>    it under the terms of the GNU Affero General Public License as published by
-//Copyright>    the Free Software Foundation, either version 3 of the License, or
-//Copyright>    (at your option) any later version.
+//Copyright> Copyright (C) 1986-2024 Altair Engineering Inc.
 //Copyright>
-//Copyright>    This program is distributed in the hope that it will be useful,
-//Copyright>    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//Copyright>    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//Copyright>    GNU Affero General Public License for more details.
+//Copyright> Permission is hereby granted, free of charge, to any person obtaining 
+//Copyright> a copy of this software and associated documentation files (the "Software"), 
+//Copyright> to deal in the Software without restriction, including without limitation 
+//Copyright> the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or 
+//Copyright> sell copies of the Software, and to permit persons to whom the Software is 
+//Copyright> furnished to do so, subject to the following conditions:
+//Copyright> 
+//Copyright> The above copyright notice and this permission notice shall be included in all 
+//Copyright> copies or substantial portions of the Software.
+//Copyright> 
+//Copyright> THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+//Copyright> IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+//Copyright> FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+//Copyright> AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, 
+//Copyright> WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR 
+//Copyright> IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //Copyright>
-//Copyright>    You should have received a copy of the GNU Affero General Public License
-//Copyright>    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-//Copyright>
-//Copyright>
-//Copyright>    Commercial Alternative: Altair Radioss Software
-//Copyright>
-//Copyright>    As an alternative to this open-source version, Altair also offers Altair Radioss
-//Copyright>    software under a commercial license.  Contact Altair to discuss further if the
-//Copyright>    commercial version may interest you: https://www.altair.com/radioss/.
 
 // For linux compilation :
 // g++ -DLINUX -o anim_to_vtk.linux64.exe anim_to_vtk.cpp
@@ -1203,6 +1201,42 @@ void readRadiossAnim(char *fileName)
                 cout << 0 << "\n";
             }
             cout << "\n";
+        }
+
+        for (int iefun = 0; iefun < nbTors1D; iefun++)
+        {
+            for (int j = 0; j < 9; j++)
+            {
+                replaceUnderscore(tText1DA[iefun]);
+                if (j == 0) cout << "SCALARS 1DELEM_" << tText1DA[iefun] << "F1" << " float 1" << "\n";
+                if (j == 1) cout << "SCALARS 1DELEM_" << tText1DA[iefun] << "F2" << " float 1" << "\n";
+                if (j == 2) cout << "SCALARS 1DELEM_" << tText1DA[iefun] << "F3" << " float 1" << "\n";
+                if (j == 3) cout << "SCALARS 1DELEM_" << tText1DA[iefun] << "M1" << " float 1" << "\n";
+                if (j == 4) cout << "SCALARS 1DELEM_" << tText1DA[iefun] << "M2" << " float 1" << "\n";
+                if (j == 5) cout << "SCALARS 1DELEM_" << tText1DA[iefun] << "M3" << " float 1" << "\n";
+                if (j == 6) cout << "SCALARS 1DELEM_" << tText1DA[iefun] << "M4" << " float 1" << "\n";
+                if (j == 7) cout << "SCALARS 1DELEM_" << tText1DA[iefun] << "M5" << " float 1" << "\n";
+                if (j == 8) cout << "SCALARS 1DELEM_" << tText1DA[iefun] << "M6" << " float 1" << "\n";
+                cout << "LOOKUP_TABLE default"
+                     << "\n";
+                for (int iel = 0; iel < nbElts1D; iel++)
+                {
+                    cout << torsVal1DA[(9 * iefun * nbElts1D) + iel * 9 + j] << "\n";
+                }
+                for (int iel = 0; iel < nbFacets; iel++)
+                {
+                    cout << 0 << "\n";
+                }
+                for (int iel = 0; iel < nbElts3D; iel++)
+                {
+                    cout << 0 << "\n";
+                }
+                for (int iel = 0; iel < nbEltsSPH; iel++)
+                {
+                    cout << 0 << "\n";
+                }
+                cout << "\n";
+            }
         }
 
         for (int iefun = 0; iefun < nbEFunc; iefun++)

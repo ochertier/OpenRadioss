@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -28,15 +28,15 @@ Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
 Chd|        FINDELE                       source/boundary_conditions/ebcs/findele.F
 Chd|        ICINVS                        source/boundary_conditions/ebcs/iniebcs.F
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
-Chd|        ALE_EBCS_MOD                  ../common_source/modules/ale_ebcs_mod.F
-Chd|        EBCS_MOD                      ../common_source/modules/ebcs_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
+Chd|        ALE_EBCS_MOD                  ../common_source/modules/ale/ale_ebcs_mod.F
+Chd|        EBCS_MOD                      ../common_source/modules/boundary_conditions/ebcs_mod.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        SENSOR_MOD                    share/modules1/sensor_mod.F   
 Chd|====================================================================
       SUBROUTINE INIEBCS(ALE_CONNECTIVITY, IFLAG,IGRSURF, IXS, IXQ, IXTG, 
-     .     PM, IGEO, X, SENSOR_TAB, IVOLU, MULTI_FVM_IS_USED, EBCS_TAB, EBCS_TAG_CELL_SPMD)
+     .     PM, IGEO, X, SENSORS, IVOLU, MULTI_FVM_IS_USED, EBCS_TAB, EBCS_TAG_CELL_SPMD)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -54,8 +54,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "scr17_c.inc"
-#include      "units_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "tabsiz_c.inc"
@@ -70,7 +68,7 @@ C-----------------------------------------------
       TYPE (SURF_)   , DIMENSION(NSURF)   :: IGRSURF
       TYPE(t_ebcs_tab), TARGET, INTENT(INOUT) :: EBCS_TAB
       INTEGER,INTENT(IN) :: IFLAG, IGEO(NPROPGI,NUMGEO)
-      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE (SENSORS_) ,INTENT(IN) :: SENSORS
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -244,8 +242,8 @@ C=======================================================================
                 ENDIF
              ENDDO
              IF(IFLAG==1)THEN
-               DO J = 1, NSENSOR
-                  IF (SENS == SENSOR_TAB(J)%SENS_ID)THEN
+               DO J = 1, SENSORS%NSENSOR
+                  IF (SENS == SENSORS%SENSOR_TAB(J)%SENS_ID)THEN
                      EBCS%monvol_id = SENS
                   ENDIF
                ENDDO
@@ -343,7 +341,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -353,7 +350,6 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C---------------------`-------------------------
       INTEGER I, J, N
-C-----------------------------------------------
 C-----------------------------------------------
       IADD(1) = 1
       IADD(2) = 1

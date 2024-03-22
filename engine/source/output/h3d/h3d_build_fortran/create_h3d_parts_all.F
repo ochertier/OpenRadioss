@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -32,6 +32,7 @@ Chd|====================================================================
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE NAMES_AND_TITLES_MOD, ONLY: NCHARLINE100
       USE H3D_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -46,9 +47,7 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
-#include      "nchara_c.inc"
 #include      "scr17_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
@@ -56,7 +55,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      CHARACTER(LEN=ncharline) :: CARTE,CARTE1
+      CHARACTER(LEN=NCHARLINE100) :: CARTE,CARTE1
       INTEGER I,J,L,N_H3D_PART
 C=========================================================================
 

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -43,7 +43,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
 #include      "com08_c.inc"
 #include      "scr05_c.inc"
 C-----------------------------------------------
@@ -198,12 +197,6 @@ C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "param_c.inc"
-#include      "com08_c.inc"
-#include      "com01_c.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER JFT, JLT,ISROT,NEL
@@ -221,7 +214,6 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, J, NC1, NC2, NC3,II(6),NN(3)
-C     REAL
       my_real 
      .   X0G2(MVSIZ),X0G3(MVSIZ),Y0G2(MVSIZ),Y0G3(MVSIZ),OFF_L,
      .   Z0G2(MVSIZ),Z0G3(MVSIZ),AXYZ(MVSIZ,3,3),
@@ -231,7 +223,6 @@ C     REAL
      .   Y0L2(MVSIZ),Y0L3(MVSIZ),SUM(MVSIZ),NORM,XL,YL,VR1_12,VR1_21,
      .   RLZ1,RLZ2,RLZ3,AREAI,X0G32,Y0G32,Z0G32,DIRZ(MVSIZ,2)
 C-----------------------------------------------
-C=======================================================================
       DO I=1,6
         II(I) = NEL*(I-1)
       ENDDO
@@ -325,7 +316,7 @@ C----------------------------
         X0L3(I)=XL
         Y0L3(I)=YL
       ENDDO
-C------U21,U31 in actual local system	  
+C------U21,U31 in actual local system    
       DO I=JFT,JLT
         V21X(I)=XL2(I)-X0L2(I)
         V31X(I)=XL3(I)-X0L3(I)
@@ -339,7 +330,7 @@ C------U21,U31 in actual local system
         Y3_T(I) = Y0L3(I)
       ENDDO 
       IF (ISROT>0) THEN
-C------RZ13,RZ23 in actual local system	  
+C------RZ13,RZ23 in actual local system    
        DO I=JFT,JLT
         AREAI=HALF/MAX(EM20,AREA(I))
         RLZ1 =E3X(I)*AXYZ(I,1,1)+E3Y(I)*AXYZ(I,2,1)+E3Z(I)*AXYZ(I,3,1)

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -40,8 +40,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "scr23_c.inc"
-#include      "rnur_c.inc"
 #include      "tabsiz_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -58,7 +56,7 @@ C-----------------------------------------------
       my_real
      .        KNOTLOCPC_L(SKNOTLOCPC),KNOTLOCEL_L(SKNOTLOCEL)
 C
-      OFF = NUMELC+NUMELTG+NUMELS+NUMELQ+NUMELT+NUMELP+NUMELR+NUMELUR+
+      OFF = NUMELC+NUMELTG+NUMELS+NUMELQ+NUMELT+NUMELP+NUMELR+
      .      NUMCONV+NUMRADIA+SLLOADP/4
       IE_L = 0
       MAXGEO=1

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -43,7 +43,7 @@ Chd|        H3D_MOD                       share/modules/h3d_mod.F
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
 Chd|        INTBUFMOD                     share/modules/restart_mod.F   
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
       SUBROUTINE I23MAIN_TRI(
@@ -68,20 +68,14 @@ C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "comlock.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "scr04_c.inc"
 #include      "task_c.inc"
 #include      "timeri_c.inc"
-#include      "warn_c.inc"
 C common pour variable globale en memoire partagee
       COMMON /I7MAINC/BMINMA,CURV_MAX_MAX,RESULT,NSNR,NSNROLD,I_MEMG,NMN_G
       INTEGER RESULT,NSNR,NSNROLD,I_MEMG,NMN_G
@@ -118,8 +112,7 @@ C     REAL
      .   XMAXL, YMAXL, ZMAXL, XMINL, YMINL, ZMINL, GAPMIN, GAPMAX,
      .   SX,SY,SZ,SX2,SY2,SZ2,
      .   C_MAXL,CURV_MAX(NRTM_T),RDUM1(1)
-C-----------------------------------------------
-#include "sync_dir.inc"
+      INTEGER :: NMN,NSN,NTY
 C-----------------------------------------------
       I_MEM = 0
       I_MEMG = 0
@@ -132,7 +125,6 @@ C     Specific TYPE7 :
       ITIED = 0 
 C
       LOC_PROC=ISPMD+1
-      NRTM   =IPARI(4,NIN)
       NSN    =IPARI(5,NIN)
       NMN    =IPARI(6,NIN)
       NTY    =IPARI(7,NIN)
@@ -224,7 +216,7 @@ C BARRIER II_STOK et RESULT
      +      ABS(BMINMA(5)-BMINMA(2))>2*EP30.OR.
      +      ABS(BMINMA(4)-BMINMA(1))>2*EP30)THEN
            CALL ANCMSG(MSGID=87,ANMODE=ANINFO,
-     .   	       I1=NOINT,C1='(I23BUCE)')
+     .            I1=NOINT,C1='(I23BUCE)')
            CALL ARRET(2)
          END IF
 C
@@ -267,20 +259,20 @@ C recuperation des noeuds remote NSNR stockes dans XREM
 C
           IFQ  =0
           INTTH=0
-	  CALL SPMD_TRI7VOX(
-     1      INTBUF_TAB%NSV,NSN	  ,X		,V	      ,MS     ,
-     2      BMINMA	 ,WEIGHT  ,INTBUF_TAB%STFNS,NIN	      ,ISENDTO,
-     3      IRCVFROM	 ,IAD_ELEM,FR_ELEM	,NSNR	,IPARI(21,NIN),
-     4      INTBUF_TAB%GAP_S,ITAB    ,KINET	,IFQ	      ,INACTI ,
+            CALL SPMD_TRI7VOX(
+     1      INTBUF_TAB%NSV,NSN    ,X    ,V        ,MS     ,
+     2      BMINMA   ,WEIGHT  ,INTBUF_TAB%STFNS,NIN        ,ISENDTO,
+     3      IRCVFROM   ,IAD_ELEM,FR_ELEM  ,NSNR  ,IPARI(21,NIN),
+     4      INTBUF_TAB%GAP_S,ITAB    ,KINET  ,IFQ        ,INACTI ,
      5      NSNFIOLD,INTTH,IDUM1,RDUM1,RDUM1  ,
-     6      NUM_IMP	,NODNX_SMS,RDUM1,NTY	      ,IDUM1  ,
-     7      RDUM1	,RDUM1,RDUM1,RDUM1	,IDUM1        ,ILEV,IDUM1,
+     6      NUM_IMP  ,NODNX_SMS,RDUM1,NTY        ,IDUM1  ,
+     7      RDUM1  ,RDUM1,RDUM1,RDUM1  ,IDUM1        ,ILEV,IDUM1,
      8      INTFRIC      ,IDUM1  ,ITIED, IVIS2, INTBUF_TAB%IF_ADH)
 c 300      continue
 C
 C renumerotation locale des anciens candidats
 C
-	  CALL SPMD_RNUMCD(
+            CALL SPMD_RNUMCD(
      1     INTBUF_TAB%CAND_N,RENUM  ,INTBUF_TAB%I_STOK(1), NIN, NSN,
      2     NSNFIOLD    ,NSNROLD)
          END IF

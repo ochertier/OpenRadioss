@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -29,16 +29,13 @@ Chd|        ARRET                         source/system/arret.F
 Chd|        LIMITER                       source/multifluid/multi_muscl_gradients.F
 Chd|        STARTIME                      source/system/timer.F         
 Chd|        STOPTIME                      source/system/timer.F         
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        INITBUF_MOD                   share/resol/initbuf.F         
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|====================================================================
       SUBROUTINE MULTI_MUSCL_GRADIENTS(ELBUF_TAB, IPARG, ITASK, IXS, IXQ, IXTG,
      .     PM, IPM, MULTI_FVM, ALE_CONNECTIVITY, WGRID, XGRID, ITAB, NBMAT, CURRENT_TIME, BUFMAT)
-C-----------------------------------------------
-C     D e s c r i p t i o n
-C-----------------------------------------------
 C-----------------------------------------------
 C     M o d u l e s
 C-----------------------------------------------
@@ -55,12 +52,9 @@ C     C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 !     NUMELS      
-#include      "com04_c.inc"
 #include      "param_c.inc"
 #include      "task_c.inc"
-#include      "mvsiz_p.inc"
 !     DTFAC1
-#include      "scr18_c.inc" 
 #include      "macro.inc"
 C-----------------------------------------------
 C     D u m m y   A r g u m e n t s

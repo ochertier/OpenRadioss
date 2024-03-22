@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -61,12 +61,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "units_c.inc"
 #include      "warn_c.inc"
-#include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "com08_c.inc"
-#include      "scr05_c.inc"
-#include      "task_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -85,10 +79,6 @@ C     REAL
       my_real
      .   X(3,*),STIFS(*),PENIS(2,*),STIFM(*),
      .   GAP_S(*),GAP_M(*),GAP_S_L(*),GAP_M_L(*)
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -111,7 +101,6 @@ C-----------------------------------------------
 C              
 C-----------------------------------------------
 C   S o u r c e  L i n e s
-C-----------------------------------------------
 C-----------------------------------------------
 C
 C----- TRI PAR BOITES 
@@ -475,9 +464,9 @@ C --- --- ---         NBZ = INT((NBZ+2)*AAA)-2
 C --- --- ---         NBX = MAX(NBX,1)
 C --- --- ---         NBY = MAX(NBY,1)
 C --- --- ---         NBZ = MAX(NBZ,1)
-C --- --- --- 	NBX8 = NBX
-C --- --- --- 	NBY8 = NBY
-C --- --- --- 	NBZ8 = NBZ
+C --- --- ---   NBX8 = NBX
+C --- --- ---   NBY8 = NBY
+C --- --- ---   NBZ8 = NBZ
 C --- --- ---         RES8=(NBX8+2)*(NBY8+2)*(NBZ8+2)
 C --- --- ---       END IF
 C --- --- ---           

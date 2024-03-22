@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -87,7 +87,7 @@ C
          END IF
        ELSEIF (NTY==24)THEN
          IGSTI=IPARI(34,N)
-         IF(IGSTI>1)THEN
+         IF(IGSTI>1 .OR. IGSTI==-1)THEN
            CALL I24STSECND(
      1      IPARI(1,N),STIFINT,INTBUF_TAB(N),STFAC(N))
          ENDIF

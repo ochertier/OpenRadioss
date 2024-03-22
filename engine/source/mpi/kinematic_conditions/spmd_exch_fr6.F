@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,6 +27,7 @@ Chd|-- called by -----------
 Chd|        AIRBAGB                       source/airbag/airbag2.F       
 Chd|        AIRBAGB1                      source/airbag/airbagb1.F      
 Chd|        ASS18                         source/interfaces/int18/ass18.F
+Chd|        DAMPING_VREF                  source/assembly/damping_vref.F
 Chd|        PORO                          source/ale/porous/poro.F      
 Chd|        RBYACT                        source/constraints/general/rbody/rbyact.F
 Chd|        RBYPID                        source/constraints/general/rbody/rbypid.F
@@ -50,7 +51,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------

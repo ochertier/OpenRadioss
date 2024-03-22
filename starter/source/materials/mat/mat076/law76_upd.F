@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,9 +27,9 @@ Chd|        UPDMAT                        source/materials/updmat.F
 Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
 Chd|        FUNC_COMP                     source/materials/mat/mat076/law76_upd.F
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/matparam_def_mod.F
+Chd|        TABLE2D_INTERSECT             source/tools/curve/table2d_intersect.F
+Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        TABLE_MOD                     share/modules1/table_mod.F    
 Chd|====================================================================
       SUBROUTINE LAW76_UPD(IOUT   ,TITR    ,MAT_ID   ,NUPARAM ,MATPARAM ,
      .                     UPARAM ,NUMTABL ,ITABLE   ,TABLE   ,NFUNC    ,
@@ -39,7 +39,6 @@ C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD      
       USE MATPARAM_DEF_MOD
-      USE TABLE_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -57,16 +56,16 @@ C-----------------------------------------------
       my_real PLD(*)
       CHARACTER*nchartitle  :: TITR
       TYPE(MATPARAM_STRUCT_)  ,TARGET :: MATPARAM
-      TYPE(TTABLE), DIMENSION(NTABLE) ,TARGET ::  TABLE
+      TYPE(TTABLE), DIMENSION(NTABLE) ,INTENT(INOUT) ,TARGET ::  TABLE
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER :: I,NDIM,NPT,FUNC_ID,FUNC_T,FUNC_C,FUNC_S,ICAS,ICONV,STAT,
-     .           NPT_TRAC,NPT_COMP,NPT_SHEAR,NPTMAX,IFUN_NUP,IFX,IFY
+      INTEGER :: I,J,NDIM,NPT,NEPSP,FUNC_ID,FUNC_T,FUNC_C,FUNC_S,ICAS,ICONV,
+     .           NPT_TRAC,NPT_COMP,NPT_SHEAR,NPTMAX,IFUN_NUP,IFX,IFY,STAT,LEN2
       my_real :: XFAC,EPDT_MIN,EPDT_MAX,EPDC_MIN,EPDC_MAX,EPDS_MIN,EPDS_MAX,
-     .           NUP
+     .           NUP,XINT,YINT
       my_real ,DIMENSION(:)  ,ALLOCATABLE :: X_COMP,Y_COMP
-      TYPE(TTABLE), DIMENSION(:) ,POINTER ::  TABLE_MAT
+      TYPE(TABLE_4D_), DIMENSION(:) ,POINTER ::  TABLE_MAT
 C=======================================================================
       FUNC_T = ITABLE(1)
       FUNC_C = ITABLE(2)
@@ -98,33 +97,90 @@ c-----------------------------------------------------------------------------
       ENDDO
 c---------------------------------------------------------------
 c    check max and min strain rates by direction in yield tables
+c    check if yield curves for different strain rates do not intersect
 c---------------------------------------------------------------
       NDIM = TABLE(FUNC_T)%NDIM
       IF (NDIM == 2) THEN
-        NPT = SIZE(TABLE(FUNC_T)%X(2)%VALUES)
+        NPT      = SIZE(TABLE(FUNC_T)%X(1)%VALUES)
+        NEPSP    = SIZE(TABLE(FUNC_T)%X(2)%VALUES)
         EPDT_MIN = TABLE(FUNC_T)%X(2)%VALUES(1)*XFAC
-        EPDT_MAX = TABLE(FUNC_T)%X(2)%VALUES(NPT)*XFAC
+        EPDT_MAX = TABLE(FUNC_T)%X(2)%VALUES(NEPSP)*XFAC
         UPARAM(19) = EPDT_MIN
         UPARAM(20) = EPDT_MAX
+c
+        DO I = 2,NEPSP
+          DO J = I+1,NEPSP
+            CALL TABLE2D_INTERSECT(TABLE(FUNC_T) ,I ,J ,NPT  ,
+     .                             XFAC  ,XINT ,YINT)
+            IF (XINT > ZERO .and. YINT > ZERO) THEN
+              CALL ANCMSG(MSGID=3010, MSGTYPE=MSGWARNING, ANMODE=ANINFO,        
+     .                    I1 = MAT_ID,                                               
+     .                    I2 = TABLE(FUNC_T)%NOTABLE,                                               
+     .                    C1 = TITR  ,
+     .                    R1 = TABLE(FUNC_T)%X(2)%VALUES(I)*XFAC,                                               
+     .                    R2 = TABLE(FUNC_T)%X(2)%VALUES(J)*XFAC,                                               
+     .                    R3 = XINT,
+     .                    R4 = YINT)
+            END IF
+          END DO
+        END DO
       END IF
+c---
       IF (FUNC_C > 0) THEN
         NDIM = TABLE(FUNC_C)%NDIM
         IF (NDIM == 2) THEN
-          NPT = SIZE(TABLE(FUNC_C)%X(2)%VALUES)
+          NPT      = SIZE(TABLE(FUNC_C)%X(1)%VALUES)
+          NEPSP    = SIZE(TABLE(FUNC_C)%X(2)%VALUES)
           EPDC_MIN = TABLE(FUNC_C)%X(2)%VALUES(1)*XFAC
-          EPDC_MAX = TABLE(FUNC_C)%X(2)%VALUES(NPT)*XFAC
+          EPDC_MAX = TABLE(FUNC_C)%X(2)%VALUES(NEPSP)*XFAC
           UPARAM(21) = EPDC_MIN
           UPARAM(22) = EPDC_MAX
+c
+          DO I = 2,NEPSP
+            DO J = I+1,NEPSP
+              CALL TABLE2D_INTERSECT(TABLE(FUNC_C) ,I ,J ,NPT  ,
+     .                               XFAC  ,XINT ,YINT)
+              IF (XINT > ZERO .and. YINT > ZERO) THEN
+                CALL ANCMSG(MSGID=3010, MSGTYPE=MSGWARNING, ANMODE=ANINFO,        
+     .                      I1 = MAT_ID,                                             
+     .                      I2 = TABLE(FUNC_T)%NOTABLE,                                             
+     .                      C1 = TITR  ,
+     .                      R1 = TABLE(FUNC_T)%X(2)%VALUES(I)*XFAC,                                             
+     .                      R2 = TABLE(FUNC_T)%X(2)%VALUES(J)*XFAC,                                             
+     .                      R3 = XINT,
+     .                      R4 = YINT)
+              END IF
+            END DO
+          END DO
         END IF
       END IF
+c---
       IF (FUNC_S > 0) THEN
         NDIM = TABLE(FUNC_S)%NDIM
         IF (NDIM == 2) THEN
-          NPT = SIZE(TABLE(FUNC_S)%X(2)%VALUES)
+          NPT      = SIZE(TABLE(FUNC_S)%X(1)%VALUES)
+          NEPSP    = SIZE(TABLE(FUNC_S)%X(2)%VALUES)
           EPDS_MIN = TABLE(FUNC_S)%X(2)%VALUES(1)*XFAC
-          EPDS_MAX = TABLE(FUNC_S)%X(2)%VALUES(NPT)*XFAC
+          EPDS_MAX = TABLE(FUNC_S)%X(2)%VALUES(NEPSP)*XFAC
           UPARAM(23) = EPDS_MIN
           UPARAM(24) = EPDS_MAX
+c
+          DO I = 2,NEPSP
+            DO J = I+1,NEPSP
+              CALL TABLE2D_INTERSECT(TABLE(FUNC_S) ,I ,J ,NPT  ,
+     .                               XFAC  ,XINT ,YINT)
+              IF (XINT > ZERO .and. YINT > ZERO) THEN
+                CALL ANCMSG(MSGID=3010, MSGTYPE=MSGWARNING, ANMODE=ANINFO,      
+     .                      I1 = MAT_ID,                                             
+     .                      I2 = TABLE(FUNC_T)%NOTABLE,                                             
+     .                      C1 = TITR  ,
+     .                      R1 = TABLE(FUNC_T)%X(2)%VALUES(I)*XFAC,                                             
+     .                      R2 = TABLE(FUNC_T)%X(2)%VALUES(J)*XFAC,                                             
+     .                      R3 = XINT,
+     .                      R4 = YINT)
+              END IF
+            END DO
+          END DO
         END IF
       END IF
 c--------------------------------------------------------------------------
@@ -141,7 +197,6 @@ c
         NDIM = TABLE(FUNC_T)%NDIM
         TABLE_MAT(1)%NDIM  = NDIM
         ALLOCATE (TABLE_MAT(1)%X(NDIM)    ,STAT=stat)      
-        ALLOCATE (TABLE_MAT(1)%Y          ,STAT=stat)
 c        
         DO I = 1,NDIM
           NPT = SIZE(TABLE(FUNC_T)%X(I)%VALUES)
@@ -149,9 +204,20 @@ c
           TABLE_MAT(1)%X(I)%VALUES(1:NPT) = TABLE(FUNC_T)%X(I)%VALUES(1:NPT)
         END DO
 c
-        NPT = SIZE(TABLE(FUNC_T)%Y%VALUES)
-        ALLOCATE (TABLE_MAT(1)%Y%VALUES(NPT) ,STAT=stat)
-        TABLE_MAT(1)%Y%VALUES(1:NPT) = TABLE(FUNC_T)%Y%VALUES(1:NPT)
+        IF (NDIM == 1) THEN
+          NPT = SIZE(TABLE(FUNC_T)%X(1)%VALUES)
+          ALLOCATE (TABLE_MAT(1)%Y1D(NPT) ,STAT=stat)
+          TABLE_MAT(1)%Y1D(1:NPT) = TABLE(FUNC_T)%Y%VALUES(1:NPT)
+        ELSE IF (NDIM == 2) THEN
+          NPT  = SIZE(TABLE(FUNC_T)%X(1)%VALUES)
+          LEN2 = SIZE(TABLE(FUNC_T)%X(2)%VALUES)
+          ALLOCATE (TABLE_MAT(1)%Y2D(NPT,LEN2) ,STAT=stat)
+          DO I=1,NPT
+            DO J=1,LEN2
+              TABLE_MAT(1)%Y2D(I,J) = TABLE(FUNC_T)%Y%VALUES((J-1)*NPT+I)
+            END DO
+          END DO
+        END IF
       END IF
 c      
 c     copy compression table
@@ -162,7 +228,6 @@ c
         NDIM = TABLE(FUNC_C)%NDIM
         TABLE_MAT(2)%NDIM  = NDIM
         ALLOCATE (TABLE_MAT(2)%X(NDIM)    ,STAT=stat)      
-        ALLOCATE (TABLE_MAT(2)%Y          ,STAT=stat)
 c
         DO I = 1,NDIM
           NPT = SIZE(TABLE(FUNC_C)%X(I)%VALUES)
@@ -170,9 +235,20 @@ c
           TABLE_MAT(2)%X(I)%VALUES(1:NPT) = TABLE(FUNC_C)%X(I)%VALUES(1:NPT)
         END DO      
 c
-        NPT = SIZE(TABLE(FUNC_C)%Y%VALUES)
-        ALLOCATE (TABLE_MAT(2)%Y%VALUES(NPT)  ,STAT=stat)
-        TABLE_MAT(2)%Y%VALUES(1:NPT) = TABLE(FUNC_C)%Y%VALUES(1:NPT)
+        IF (NDIM == 1) THEN
+          NPT = SIZE(TABLE(FUNC_C)%X(1)%VALUES)
+          ALLOCATE (TABLE_MAT(2)%Y1D(NPT) ,STAT=stat)
+          TABLE_MAT(2)%Y1D(1:NPT) = TABLE(FUNC_C)%Y%VALUES(1:NPT)
+        ELSE IF (NDIM == 2) THEN
+          NPT  = SIZE(TABLE(FUNC_C)%X(1)%VALUES)
+          LEN2 = SIZE(TABLE(FUNC_C)%X(2)%VALUES)
+          ALLOCATE (TABLE_MAT(2)%Y2D(NPT,LEN2) ,STAT=stat)
+          DO I=1,NPT
+            DO J=1,LEN2
+              TABLE_MAT(2)%Y2D(I,J) = TABLE(FUNC_C)%Y%VALUES((J-1)*NPT+I)
+            END DO
+          END DO
+        END IF
       END IF      
 c
 c     copy shear table
@@ -183,7 +259,6 @@ c
         NDIM = TABLE(FUNC_S)%NDIM
         TABLE_MAT(3)%NDIM  = NDIM
         ALLOCATE (TABLE_MAT(3)%X(NDIM)    ,STAT=stat)      
-        ALLOCATE (TABLE_MAT(3)%Y          ,STAT=stat)
 c
         DO I = 1,NDIM
           NPT = SIZE(TABLE(FUNC_S)%X(I)%VALUES)
@@ -191,9 +266,20 @@ c
           TABLE_MAT(3)%X(I)%VALUES(1:NPT) = TABLE(FUNC_S)%X(I)%VALUES(1:NPT)
         END DO      
 c
-        NPT = SIZE(TABLE(FUNC_S)%Y%VALUES)
-        ALLOCATE (TABLE_MAT(3)%Y%VALUES(NPT)  ,STAT=stat)
-        TABLE_MAT(3)%Y%VALUES(1:NPT) = TABLE(FUNC_S)%Y%VALUES(1:NPT)
+        IF (NDIM == 1) THEN
+          NPT = SIZE(TABLE(FUNC_S)%X(1)%VALUES)
+          ALLOCATE (TABLE_MAT(3)%Y1D(NPT) ,STAT=stat)
+          TABLE_MAT(3)%Y1D(1:NPT) = TABLE(FUNC_S)%Y%VALUES(1:NPT)
+        ELSE IF (NDIM == 2) THEN
+          NPT  = SIZE(TABLE(FUNC_S)%X(1)%VALUES)
+          LEN2 = SIZE(TABLE(FUNC_S)%X(2)%VALUES)
+          ALLOCATE (TABLE_MAT(3)%Y2D(NPT,LEN2) ,STAT=stat)
+          DO I=1,NPT
+            DO J=1,LEN2
+              TABLE_MAT(3)%Y2D(I,J) = TABLE(FUNC_S)%Y%VALUES((J-1)*NPT+I)
+            END DO
+          END DO
+        END IF
       END IF      
 c--------------------------------------------------------
 c     Initialize plastic Poisson ratio if needed
@@ -208,7 +294,7 @@ c--------------------------------------------------------
       END IF
 c--------------------------------------------------------
       IF (ICAS == 2) THEN      
-        !     create new compression table
+        !     create new static compression table (1D)
         NDIM = 1
         TABLE_MAT(2)%NOTABLE = 2
         TABLE_MAT(2)%NDIM = NDIM
@@ -229,13 +315,10 @@ c
         NPT = NPT_COMP
         ALLOCATE (TABLE_MAT(2)%X(NDIM)          ,STAT=stat)      
         ALLOCATE (TABLE_MAT(2)%X(1)%VALUES(NPT) ,STAT=stat)
-        ALLOCATE (TABLE_MAT(2)%Y                ,STAT=stat)
-        ALLOCATE (TABLE_MAT(2)%Y%VALUES(NPT)    ,STAT=stat)
+        ALLOCATE (TABLE_MAT(2)%Y1D(NPT)         ,STAT=stat)
 c
-        DO I = 1,NPT
-          TABLE_MAT(2)%X(1)%VALUES(I) = X_COMP(I)
-          TABLE_MAT(2)%Y%VALUES(I)    = Y_COMP(I)
-        END DO
+        TABLE_MAT(2)%X(1)%VALUES(1:NPT) = X_COMP(1:NPT)
+        TABLE_MAT(2)%Y1D(1:NPT)         = Y_COMP(1:NPT)
               
         ICAS  =-1
         ICONV = 1
@@ -254,9 +337,8 @@ Chd|  FUNC_COMP                     source/materials/mat/mat076/law76_upd.F
 Chd|-- called by -----------
 Chd|        LAW76_UPD                     source/materials/mat/mat076/law76_upd.F
 Chd|-- calls ---------------
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/matparam_def_mod.F
+Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        TABLE_MOD                     share/modules1/table_mod.F    
 Chd|====================================================================
       SUBROUTINE FUNC_COMP(TABLE   ,NTABLE  ,NPTMAX  ,NPT_TRAC ,NPT_SHEAR ,
      .                     NPT_COMP,X_COMP  ,Y_COMP  ,NUP      )
@@ -264,7 +346,6 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
-      USE TABLE_MOD
       USE MATPARAM_DEF_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -274,7 +355,7 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER  NTABLE,NPTMAX, NPT_TRAC,NPT_SHEAR,NPT_COMP
-      TYPE(TTABLE), DIMENSION(NTABLE) ::  TABLE
+      TYPE(TABLE_4D_), DIMENSION(NTABLE) ::  TABLE
       my_real :: NUP
       my_real ,DIMENSION(NPTMAX) :: X_COMP,Y_COMP
 C-----------------------------------------------
@@ -305,32 +386,32 @@ C=======================================================================
           XJ = X_T_SHEAR(J) 
           IF (XI < XJ   ) THEN    
              X_COMP(K) = XI
-             Y_T(K)    = TABLE(FUNC_TRAC )%Y%VALUES(I)
+             Y_T(K)    = TABLE(FUNC_TRAC )%Y1D(I)
              IF (J ==1) THEN
-              Y_S(K)    = TABLE(FUNC_SHEAR)%Y%VALUES(1) +
+              Y_S(K)    = TABLE(FUNC_SHEAR)%Y1D(1) +
      .                   (XI - X_T_SHEAR(1) )*
-     .                   (TABLE(FUNC_SHEAR)%Y%VALUES(2)   - TABLE(FUNC_SHEAR)%Y%VALUES(1))/
+     .                   (TABLE(FUNC_SHEAR)%Y1D(2)   - TABLE(FUNC_SHEAR)%Y1D(1))/
      .                   (X_T_SHEAR(2)- X_T_SHEAR(1)) 
              ELSE
-              Y_S(K)    = TABLE(FUNC_SHEAR)%Y%VALUES(J-1) +
+              Y_S(K)    = TABLE(FUNC_SHEAR)%Y1D(J-1) +
      .                   (XI - X_T_SHEAR(J-1) )*
-     .                   (TABLE(FUNC_SHEAR)%Y%VALUES(J)   - TABLE(FUNC_SHEAR)%Y%VALUES(J-1))/
+     .                   (TABLE(FUNC_SHEAR)%Y1D(J)   - TABLE(FUNC_SHEAR)%Y1D(J-1))/
      .                   (X_T_SHEAR(J)- X_T_SHEAR(J-1)) 
              ENDIF
              I = I + 1
              K = K + 1     
           ELSEIF (XJ < XI    ) THEN                            
              X_COMP(K) = XJ
-             Y_S(K)    = TABLE(FUNC_SHEAR )%Y%VALUES(J)
+             Y_S(K)    = TABLE(FUNC_SHEAR )%Y1D(J)
              IF (I ==1) THEN
-              Y_T(K)    = TABLE(FUNC_TRAC)%Y%VALUES(1) +
+              Y_T(K)    = TABLE(FUNC_TRAC)%Y1D(1) +
      .                   (XJ - TABLE(FUNC_TRAC)%X(1)%VALUES(1) )*
-     .                   (TABLE(FUNC_TRAC)%Y%VALUES(2)   - TABLE(FUNC_TRAC)%Y%VALUES(1))/
+     .                   (TABLE(FUNC_TRAC)%Y1D(2)   - TABLE(FUNC_TRAC)%Y1D(1))/
      .                   (TABLE(FUNC_TRAC)%X(1)%VALUES(2)- TABLE(FUNC_TRAC)%X(1)%VALUES(1)) 
              ELSE
-              Y_T(K)    = TABLE(FUNC_TRAC)%Y%VALUES(I-1) +
+              Y_T(K)    = TABLE(FUNC_TRAC)%Y1D(I-1) +
      .                   (XJ - TABLE(FUNC_TRAC)%X(1)%VALUES(I-1) )*
-     .                   (TABLE(FUNC_TRAC)%Y%VALUES(I)   - TABLE(FUNC_TRAC)%Y%VALUES(I-1))/
+     .                   (TABLE(FUNC_TRAC)%Y1D(I)   - TABLE(FUNC_TRAC)%Y1D(I-1))/
      .                   (TABLE(FUNC_TRAC)%X(1)%VALUES(I)- TABLE(FUNC_TRAC)%X(1)%VALUES(I-1)) 
              ENDIF
 
@@ -338,8 +419,8 @@ C=======================================================================
              K = K + 1                             
           ELSEIF (XI == XJ ) THEN
              X_COMP(K) = XI
-             Y_T(K)    = TABLE(FUNC_TRAC  )%Y%VALUES(I)
-             Y_S(K)    = TABLE(FUNC_SHEAR )%Y%VALUES(J)
+             Y_T(K)    = TABLE(FUNC_TRAC  )%Y1D(I)
+             Y_S(K)    = TABLE(FUNC_SHEAR )%Y1D(J)
              I = I + 1
              J = J + 1
              K = K + 1                             
@@ -347,20 +428,20 @@ C=======================================================================
         ELSEIF (I > NPT_TRAC .AND. J <= NPT_SHEAR)THEN
              XJ=X_T_SHEAR(J) 
              X_COMP(K) = XJ
-             Y_S(K)    = TABLE(FUNC_SHEAR )%Y%VALUES(J)
-             Y_T(K)    = TABLE(FUNC_TRAC)%Y%VALUES(I-2) +
+             Y_S(K)    = TABLE(FUNC_SHEAR )%Y1D(J)
+             Y_T(K)    = TABLE(FUNC_TRAC)%Y1D(I-2) +
      .                  (XJ - TABLE(FUNC_TRAC)%X(1)%VALUES(I-2) )*
-     .                  (TABLE(FUNC_TRAC)%Y%VALUES(I-1)  - TABLE(FUNC_TRAC)%Y%VALUES(I-2))/
+     .                  (TABLE(FUNC_TRAC)%Y1D(I-1)  - TABLE(FUNC_TRAC)%Y1D(I-2))/
      .                  (TABLE(FUNC_TRAC)%X(1)%VALUES(I-1)- TABLE(FUNC_TRAC)%X(1)%VALUES(I-2)) 
              J = J + 1
              K = K + 1                             
         ELSEIF (I <= NPT_TRAC .AND. J > NPT_SHEAR)THEN
              XI=TABLE(FUNC_TRAC )%X(1)%VALUES(I) 
              X_COMP(K) = XI
-             Y_T(K)    = TABLE(FUNC_TRAC )%Y%VALUES(I)
-             Y_S(K)    = TABLE(FUNC_SHEAR)%Y%VALUES(J-2) +
+             Y_T(K)    = TABLE(FUNC_TRAC )%Y1D(I)
+             Y_S(K)    = TABLE(FUNC_SHEAR)%Y1D(J-2) +
      .                  (XI - X_T_SHEAR(J-2) )*
-     .                  (TABLE(FUNC_SHEAR)%Y%VALUES(J-1)  - TABLE(FUNC_SHEAR)%Y%VALUES(J-2))/
+     .                  (TABLE(FUNC_SHEAR)%Y1D(J-1)  - TABLE(FUNC_SHEAR)%Y1D(J-2))/
      .                  (X_T_SHEAR(J-1)- X_T_SHEAR(J-2)) 
              I = I + 1
              K = K + 1     

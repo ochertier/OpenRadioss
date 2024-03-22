@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -30,7 +30,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -40,12 +39,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr06_c.inc"
 #include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "task_c.inc"
 #include      "units_c.inc"
-#include      "spmd_c.inc"
 #include      "chara_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -73,12 +69,12 @@ C-----------------------------------------------
       LOC_PROC = ISPMD + 1
       IF(ISPMD==0) THEN
         DO I = 2, NSPMD
-	  SIZ = SIZE*(IAD_ELEM(1,I+1)-IAD_ELEM(1,I))
+            SIZ = SIZE*(IAD_ELEM(1,I+1)-IAD_ELEM(1,I))
           MSGTYP=MSGOFF 
           CALL MPI_IRECV(RBUF(1,I-1),SIZ,MPI_DOUBLE_PRECISION,IT_SPMD(I),MSGTYP,
      .                   MPI_COMM_WORLD,REQ_R(I-1),IERROR)
         END DO
-	IFIL = IDBG5+2
+          IFIL = IDBG5+2
         WRITE(CYCLENUM,'(I7.7)')NCYCLE
         FILNAM=ROOTNAM(1:ROOTLEN)//'_'//CHRUN//'_'//CYCLENUM//'.dadb'
 
@@ -91,7 +87,7 @@ C
         DO N = 1, NSPMD-1
           CALL MPI_WAITANY(NSPMD-1,REQ_R,INDEX,STATUS,IERROR)
           I = INDEX+1
-	  L=1
+            L=1
           DO J=IAD_ELEM(1,I),IAD_ELEM(1,I+1)-1
             NOD = FR_ELEM(J)
             AX = RBUF(L,INDEX)  -A(1,NOD)
@@ -111,7 +107,7 @@ C
       ELSE
 C preparation envoi  partie fixe (elem) a proc I
           I = 1
-	  SIZ = 0
+            SIZ = 0
           DO J=IAD_ELEM(1,I),IAD_ELEM(1,I+1)-1
             NOD = FR_ELEM(J)
             SBUF(SIZ+1  ) =  A(1,NOD)

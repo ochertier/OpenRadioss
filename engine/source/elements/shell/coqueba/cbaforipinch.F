@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,7 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-	SUBROUTINE CBAFORIPINCH(    
+Chd|====================================================================
+Chd|  CBAFORIPINCH                  source/elements/shell/coqueba/cbaforipinch.F
+Chd|-- called by -----------
+Chd|        CBAFORC3                      source/elements/shell/coqueba/cbaforc3.F
+Chd|-- calls ---------------
+Chd|====================================================================
+          SUBROUTINE CBAFORIPINCH(    
      1                          JFT   ,JLT   ,NG    ,NEL   ,NPLAT ,IPLAT ,
      2                          CDET  ,THK0  ,TH12  ,VOL,
      3                          FF    ,MM    ,    

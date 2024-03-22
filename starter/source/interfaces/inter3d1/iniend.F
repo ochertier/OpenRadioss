@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -52,18 +52,11 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "units_c.inc"
-#include      "scr03_c.inc"
 #include      "scr17_c.inc"
-#include      "warn_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -127,20 +120,20 @@ C
          ENDDO
 C
        ELSEIF(NTY/=2) THEN
-	     IF(INCREM==1)THEN
+               IF(INCREM==1)THEN
             DO I=1,NSN
-	           CALL IFRONTPLUS(INTBUF_TAB%NSV(I),1)
+                     CALL IFRONTPLUS(INTBUF_TAB%NSV(I),1)
             END DO
             DO I=1,NMN
-               CALL IFRONTPLUS(INTBUF_TAB%MSR(I),1)	   
+               CALL IFRONTPLUS(INTBUF_TAB%MSR(I),1)     
             END DO
-	     ENDIF
+               ENDIF
 C  interface ALE -> c. c. traitees par P0
          IF(NTY==1.OR.NTY==9.OR.NTY==12)THEN
            INCREM = 10
            DO I=1,NSN
              !set FLAGKIN to 1 for boundary node with
-	            !kinematic constraints (old FRONT TAG=10)	   
+                      !kinematic constraints (old FRONT TAG=10)     
              FLAGKIN(INTBUF_TAB%NSV(I)) = 1
            END DO
            DO I=1,NMN
@@ -199,13 +192,13 @@ C
        WRITE(IOUT,2002)
        CALL I6PEN3
      1   (X         ,INTBUF_TAB%IRECTM,INTBUF_TAB%MSR,INTBUF_TAB%NSV  ,INTBUF_TAB%ILOCS,
-     2    INTBUF_TAB%IRTLM,INTBUF_TAB%CSTS,INTBUF_TAB%IRTLOM,INTBUF_TAB%VARIABLES(2),NSN	 ,
+     2    INTBUF_TAB%IRTLM,INTBUF_TAB%CSTS,INTBUF_TAB%IRTLOM,INTBUF_TAB%VARIABLES(2),NSN   ,
      3    ITAB      ,IWPENE    ,INTBUF_TAB%FCONT,ICOR        ,ID,
      4    INACTI    ,TITR)
        WRITE(IOUT,2003)
        CALL I6PEN3
      1   (X         ,INTBUF_TAB%IRECTS,INTBUF_TAB%NSV,INTBUF_TAB%MSR  ,INTBUF_TAB%ILOCM,
-     2    INTBUF_TAB%IRTLS,INTBUF_TAB%CSTM,INTBUF_TAB%IRTLOS,INTBUF_TAB%VARIABLES(2),NMN	 ,
+     2    INTBUF_TAB%IRTLS,INTBUF_TAB%CSTM,INTBUF_TAB%IRTLOS,INTBUF_TAB%VARIABLES(2),NMN   ,
      3    ITAB      ,IWPENE    ,INTBUF_TAB%FCONT,ICOR        ,ID,
      4    INACTI    ,TITR)
 C
@@ -352,7 +345,6 @@ C-----------------------------------------------------------------------
 C-----------------------------------------------------------------------
       END
 
-C nouvelle routine servant uniquement a l initialisation de front pour le spmd
 Chd|====================================================================
 Chd|  INIEND2D                      source/interfaces/inter3d1/iniend.F
 Chd|-- called by -----------
@@ -377,12 +369,7 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "units_c.inc"
-#include      "scr03_c.inc"
 #include      "scr05_c.inc"
-#include      "warn_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -429,7 +416,7 @@ C interface ALE -> c. c. traitees par P0
            INCREM = 10
            DO I=1,NSN
               !set FLAGKIN to 1 for boundary node with
-	      !kinematic constraints (old FRONT TAG=10)
+                !kinematic constraints (old FRONT TAG=10)
               FLAGKIN(INTBUF_TAB%NSV(I)) = 1
            END DO
            DO I=1,NMN
@@ -452,7 +439,7 @@ C interface ALE -> c. c. traitees par P0
 C pas d optimisation possible
  100         DO JJ=1,NIR
                K = INTBUF_TAB%IRECTM((L-1)*4+JJ)
-	           CALL IFRONTPLUS(K,P)
+                     CALL IFRONTPLUS(K,P)
              ENDDO
 C optimisation possible
  200         CONTINUE

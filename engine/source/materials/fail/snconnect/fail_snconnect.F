@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -68,7 +68,6 @@ C        NPF,TF  : FUNCTION PARAMETER
 CC-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include "scr17_c.inc"
 #include "units_c.inc"
 #include "comlock.inc"
 C-----------------------------------------------
@@ -122,7 +121,7 @@ C=======================================================================
       IFUN3N  = IFUNC(3)
       IFUN3T  = IFUNC(4)
 C-----------------------------------------------
-      IF (TIME == ZERO) THEN
+      IF (UVAR(1,3) == ZERO) THEN
         DO I=1,NEL
           UVAR(I,3)= AREA(I)    ! initial area at time = 0
         ENDDO   

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -34,14 +34,17 @@ Chd|        M18TH                         source/materials/mat/mat018/m18th.F
 Chd|        M26TH                         source/materials/mat/mat026/m26th.F
 Chd|        M51TH                         source/materials/mat/mat051/heat51.F
 Chd|        SPMD_EVOIS                    source/mpi/fluid/spmd_cfd.F   
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        INITBUF_MOD                   share/resol/initbuf.F         
 Chd|====================================================================
-      SUBROUTINE ATHERM(IPARG   ,PM      ,ELBUF_TAB,FLUX  ,VAL2    ,
-     2                  T       ,ALE_CONNECT   ,IXS     ,IXQ   ,FV      ,
-     3                  X       ,BUFMAT  ,TF      ,NPF   ,NERCVOIS,
-     4                  NESDVOIS,LERCVOIS,LESDVOIS,LENCOM,IPM     )
+      SUBROUTINE ATHERM(
+     1   IPARG,      PM,         ELBUF_TAB,  FLUX,
+     2   VAL2,       T,          ALE_CONNECT,IXS,
+     3   IXQ,        FV,         X,          BUFMAT,
+     4   TF,         NPF,        NERCVOIS,   NESDVOIS,
+     5   LERCVOIS,   LESDVOIS,   LENCOM,     IPM,
+     6   NEL)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -59,17 +62,15 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr01_c.inc"
-#include      "scr05_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "vect01_c.inc"
 #include      "param_c.inc"
 #include      "mmale51_c.inc"
-#include      "tabsiz_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: NEL
       INTEGER  IPARG(NPARG,NGROUP), IXS(NIXS,NUMELS), IXQ(7,NUMELQ), NPF(*),
      .         NERCVOIS(*),NESDVOIS(*),LERCVOIS(*),LESDVOIS(*),
      .         IPM(NPROPMI,NUMMAT), LENCOM
@@ -93,7 +94,7 @@ c
 C     ALE ON / OFF
         IF (IPARG(76, NG) == 1) CYCLE ! --> OFF
         GBUF => ELBUF_TAB(NG)%GBUF
-        CALL INITBUF (IPARG    ,NG      ,                  
+        CALL INITBUF(IPARG    ,NG      ,                  
      2     MTN     ,LLT     ,NFT     ,IAD     ,ITY     ,   
      3     NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,   
      4     JTHE    ,JLAG    ,JMULT   ,JHBE    ,JIVF    ,   
@@ -144,9 +145,14 @@ c
             VAL2(J)=VAL2(J) * RPR*AX*YPLUS / (A*LOG(E*YPLUS) + AX*P)
           ENDDO!next I
         ELSEIF (MTN == 18)THEN
-          CALL M18TH(GBUF%TEMP,VAL2,MAT,PM,IPM,TF,NPF)
+          CALL M18TH(
+     1   GBUF%TEMP,VAL2,     MAT,      PM,
+     2   IPM,      TF,       NPF,      NEL)
         ELSEIF (MTN == 26)THEN
-          CALL M26TH(MAT,GBUF%RHO,GBUF%TEMP,VAL2,PM,BUFMAT,GBUF%RE)
+          CALL M26TH(
+     1   MAT,      GBUF%RHO, GBUF%TEMP,VAL2,
+     2   PM,       BUFMAT,   GBUF%RE,  NEL,
+     3   NFT)
         ELSEIF (MTN == 51) THEN
           NPH1 = (N0PHAS)*LLT
           NPH2 = (N0PHAS + NVPHAS)*LLT
@@ -155,8 +161,9 @@ c
           PH1 =>ELBUF_TAB(NG)%BUFLY(1)%MAT(1,1,1)%VAR(NPH1+1:NPH1+1+LLT)
           PH2 =>ELBUF_TAB(NG)%BUFLY(1)%MAT(1,1,1)%VAR(NPH2+1:NPH2+1+LLT)
           PH3 =>ELBUF_TAB(NG)%BUFLY(1)%MAT(1,1,1)%VAR(NPH3+1:NPH3+1+LLT)
-          CALL M51TH(T(1+NFT),PH1,PH2,PH3,
-     .               BUFMAT(IADBUF),VAL2(1+NFT))
+          CALL M51TH(
+     1   T(1+NFT),      PH1,           PH2,           PH3,
+     2   BUFMAT(IADBUF),VAL2(1+NFT),   NEL)
         ELSEIF (JTUR /= 0.AND.MTN /= 11) THEN
           DO I=LFT,LLT
             J=I+NFT
@@ -190,7 +197,6 @@ C     ALE ON / OFF
         NFT=IPARG(3,NG)
         IAD=IPARG(4,NG)
         LFT=1
-        NB3 =IAD +   7*LLT
         IF(N2D == 0)THEN
           CALL AFIMP3(PM,X,IXS,T,FLUX(6*NFT+1),VAL2,ALE_CONNECT,FV)
         ELSE
@@ -203,7 +209,7 @@ C     ALE ON / OFF
         IF (IPARG(76, NG) == 1) CYCLE ! --> OFF
 
         GBUF => ELBUF_TAB(NG)%GBUF
-        CALL INITBUF (IPARG    ,NG      ,                  
+        CALL INITBUF(IPARG    ,NG      ,                  
      2     MTN     ,LLT     ,NFT     ,IAD     ,ITY     ,   
      3     NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,   
      4     JTHE    ,JLAG    ,JMULT   ,JHBE    ,JIVF    ,   

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -23,7 +23,6 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 Chd|====================================================================
 Chd|  SPMD_CHECK_ALE_NEIGHBOUR      source/mpi/fluid/spmd_check_ale_neighbour.F
 Chd|-- called by -----------
-Chd|        CHECK_ALE_COMM                source/ale/check_ale_comm.F   
 Chd|-- calls ---------------
 Chd|====================================================================
         SUBROUTINE SPMD_CHECK_ALE_NEIGHBOUR(ACTIVE_ELEMENT,NB_RCV_NEIGH,NB_SEND_NEIGH,
@@ -45,9 +44,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
 #ifdef MPI
@@ -59,7 +55,6 @@ C-----------------------------------------------
 #include "com01_c.inc"
 #include "com04_c.inc"
 #include "task_c.inc"
-#include "spmd_c.inc"
 #include "tabsiz_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s

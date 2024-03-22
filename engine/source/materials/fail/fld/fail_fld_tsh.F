@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -24,7 +24,6 @@ Chd|====================================================================
 Chd|  FAIL_FLD_TSH                  source/materials/fail/fld/fail_fld_tsh.F
 Chd|-- called by -----------
 Chd|        H3D_FLD_TSH                   source/output/h3d/h3d_results/h3d_fld_tsh.F
-Chd|        USERMAT_SOLID                 source/materials/mat_share/usermat_solid.F
 Chd|-- calls ---------------
 Chd|        FINTER                        source/tools/curve/finter.F   
 Chd|        FINTERFLD                     source/materials/fail/fld/fail_fld_c.F
@@ -44,7 +43,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
-#include  "units_c.inc"
 #include  "comlock.inc"
 C---------+---------+---+---+--------------------------------------------
 C VAR     | SIZE    |TYP| RW| DEFINITION
@@ -152,7 +150,7 @@ c-----
 c
         DO J = 1,NINDX
           I = INDX(J)
-          EM(I)    = FINTERFLD(EMIN(I),IFUNC(1),LENF,XF)
+          EM(I)    = FINTERFLD(EMIN(I),LENF,XF)
           DAM(I)   = EMAJ(I) / EM(I)
           DFMAX(I) = MIN(ONE, DAM(I))
         ENDDO

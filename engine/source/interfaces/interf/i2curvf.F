@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -46,16 +46,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "param_c.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com08_c.inc"
-#include      "scr05_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -218,8 +208,8 @@ C
           ENDDO
 C
 C---      output of tied contact forces
- 	  CALL I2FORCES(X      ,V	,A	 ,MS	  ,IS	  ,
-     .	                INOD(1),H	,NIR     ,FSAV    ,FNCONT ,
+            CALL I2FORCES(X      ,V  ,A   ,MS    ,IS    ,
+     .                  INOD(1),H  ,NIR     ,FSAV    ,FNCONT ,
      .                  FNCONTP,FTCONTP ,WEIGHT  ,H3D_DATA)                         
 C---
           IF (IDEL2/=0.AND.MS(IS)/=ZERO) SMASS(II)=MS(IS)

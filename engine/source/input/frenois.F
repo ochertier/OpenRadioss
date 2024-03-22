@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -32,11 +32,12 @@ Chd|        WRIUSC2                       source/input/wriusc2.F
 Chd|        NVAR                          source/input/nvar.F           
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
-      SUBROUTINE FRENOIS(IKAD,KEY0,KNOISE,IFID,MFID)
+      SUBROUTINE FRENOIS(IKAD,KEY0,KNOISE)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
+      USE NAMES_AND_TITLES_MOD, ONLY: NCHARLINE100
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -46,13 +47,10 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "units_c.inc"
 #include      "scrnoi_c.inc"
-#include      "chara_c.inc"
-#include      "nchara_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER IKAD(0:*),
-     .        KNOISE,IFID,MFID
+      INTEGER IKAD(0:*),KNOISE
       CHARACTER KEY0(*)*5, KEY2*5, KEY3*5, KEY4*5, KEY5*5
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
@@ -62,14 +60,14 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, NBC, K, KK, IKEY
-      CHARACTER CARTE*ncharline
-C
+      CHARACTER(LEN=NCHARLINE100)::CARTE
+C-----------------------------------------------
+C   S o u r c e   L i n e s
+C-----------------------------------------------
       IKEY=KNOISE
       IF(IKAD(IKEY)/=IKAD(IKEY+1))THEN
        K=0
- 1160  READ(IUSC1,REC=IKAD(IKEY)+K,
-     .      FMT='(7X,A,1X,A,1X,A,1X,A,19X,I10)',
-     .      ERR=9990)KEY2,KEY3,KEY4,KEY5,NBC
+ 1160  READ(IUSC1,REC=IKAD(IKEY)+K, FMT='(7X,A,1X,A,1X,A,1X,A,19X,I10)',ERR=9990)KEY2,KEY3,KEY4,KEY5,NBC
        K=K+1
        IF(KEY2(1:3)=='VEL')THEN
         NOISEV=1
@@ -94,7 +92,6 @@ c         K=K+1
           NNOISE=NNOISE+NVAR(CARTE)
  1300    CONTINUE
          CALL READ10(IKAD(IKEY)+KK,NBC-1,KEY0(IKEY))
-C        IFID=IFID + NNOISE
          IF(KEY2(1:4)=='INIT')RNOI=2
         ELSE
          RNOI=1

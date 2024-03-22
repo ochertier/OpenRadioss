@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -33,13 +33,13 @@ Chd|        BUILD_MSG                     source/output/message/build_msg.F
 Chd|        CDK6BC3                       source/elements/sh3n/coquedk6/cdk6bc3.F
 Chd|        CFIELDREST                    source/output/restart/rdresb.F
 Chd|        CHECK_MESSAGE_DEFINITION      ../common_source/modules/check_mod.F
-Chd|        CLOSE_C                       source/output/tools/sortie_c.c
+Chd|        CLOSE_C                       ../common_source/tools/input_output/write_routtines.c
 Chd|        CONDRMAT                      source/materials/mat/mat013/condrmat.F
 Chd|        CONVRREST                     source/output/restart/rdresb.F
 Chd|        COQINI                        source/elements/shell/coqini.F
 Chd|        CRKXFEM_RREST                 source/output/restart/rdresb.F
 Chd|        CRKXFEM_RRESTANIM             source/output/restart/rdresb.F
-Chd|        CUR_FIL_C                     source/output/tools/sortie_c.c
+Chd|        CUR_FIL_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|        DELETE_USER_FILE              source/user_interface/dyn_userlib.c
 Chd|        DRAPE_RREST                   source/output/restart/rdresb.F
 Chd|        DYN_USERLIB_INIT              source/user_interface/dyn_userlib.c
@@ -68,9 +68,11 @@ Chd|        LECTUR                        source/input/lectur.F
 Chd|        LF_CONVERT_C_FLAT             source/engine/lf_convert_c.c  
 Chd|        LOADPREST                     source/output/restart/rdresb.F
 Chd|        MY_GETPID                     source/system/pid.c           
+Chd|        NAMES_AND_TITLE_INIT          ../common_source/modules/names_and_titles_mod.F
 Chd|        NFRREST                       source/output/restart/rdresb.F
 Chd|        NITSCHERREST                  source/output/restart/rdresb.F
-Chd|        OPEN_C                        source/output/tools/sortie_c.c
+Chd|        OPEN_C                        ../common_source/tools/input_output/write_routtines.c
+Chd|        OPEN_F_SCRATCH_FILE           source/system/open_tempfile.F 
 Chd|        PLYXFEM_RAVUPLY               source/output/restart/rdresb.F
 Chd|        PLYXFEM_RREST                 source/output/restart/rdresb.F
 Chd|        PLYXFEM_RRESTANIM             source/output/restart/rdresb.F
@@ -82,7 +84,7 @@ Chd|        RADIARREST                    source/output/restart/rdresb.F
 Chd|        RADIOSS_TITLE                 source/engine/radioss_title.F 
 Chd|        RDRESA                        source/output/restart/rdresa.F
 Chd|        RDRESB                        source/output/restart/rdresb.F
-Chd|        READ_C_C                      source/output/tools/sortie_c.c
+Chd|        READ_C_C                      ../common_source/tools/input_output/write_routtines.c
 Chd|        READ_DB                       source/output/tools/read_db.F 
 Chd|        READ_DPDB                     source/output/tools/read_db.F 
 Chd|        READ_UNITS                    ../common_source/comm/write_units.F
@@ -93,32 +95,36 @@ Chd|        RTHBUFREST                    source/output/restart/rdresb.F
 Chd|        SETIGNORECORE                 source/system/traceback_handler.c
 Chd|        SET_STACK_VALUES              source/system/machine.F       
 Chd|        SPMD_ALLREDUCE_DB             source/mpi/generic/spmd_allreduce_db.F
+Chd|        SPMD_ALLREDUCE_INT            source/mpi/generic/spmd_allreduce_db.F
 Chd|        SPMD_REDUCE_DB                source/mpi/generic/spmd_reduce_db.F
 Chd|        SPMD_RST_CHECK                source/mpi/init/spmd_rst_check.F
 Chd|        STACK_RREST                   source/output/restart/rdresb.F
 Chd|        SWITCH_TO_DTNODA              source/time_step/switch_to_dtnoda.F
 Chd|        TABLE_ZERO                    source/tools/curve/table_tools.F
 Chd|        THCRREST                      source/output/restart/rdresb.F
+Chd|        TH_CLEAN                      ../common_source/modules/output/time_history_mod.F
 Chd|        TRACE_IN                      source/system/trace_back.F    
 Chd|        TRACE_OUT                     source/system/trace_back.F    
 Chd|        UACCESS_DUM                   source/user_interface/uaccess.F
 Chd|        UFUNC_DUM                     source/user_interface/ufunc.F 
 Chd|        UPIDMID_DUM                   source/user_interface/upidmid.F
 Chd|        USENSOR_DUM                   source/user_interface/usensor.F
+Chd|        USER_WINDOWS_CLEAN            ../common_source/modules/user_windows_mod.F
 Chd|        USRPLAS_DUM                   source/user_interface/usrplas.F
 Chd|        UTABLE_DUM                    source/user_interface/utable.F
 Chd|        WIGEREST                      source/output/restart/rdresb.F
 Chd|        WRITE_TPL_FILE                source/implicit/imp_solv.F    
-Chd|        ALEFVM_MOD                    ../common_source/modules/alefvm_mod.F
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
+Chd|        ALEFVM_MOD                    ../common_source/modules/ale/alefvm_mod.F
+Chd|        ALEMUSCL_MOD                  ../common_source/modules/ale/alemuscl_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
+Chd|        ALE_MOD                       ../common_source/modules/ale/ale_mod.F
 Chd|        CHECK_MOD                     ../common_source/modules/check_mod.F
 Chd|        DIFFUSION_MOD                 share/modules/diffusion_mod.F 
 Chd|        DRAPE_MOD                     share/modules/drape_mod.F     
 Chd|        DSGRAPH_MOD                   share/modules/dsgraph_mod.F   
+Chd|        DT_MOD                        share/modules/dt_mod.F        
 Chd|        DYNLIB_MOD                    share/modules/dynlib_mod.F    
-Chd|        EBCS_MOD                      ../common_source/modules/ebcs_mod.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
-Chd|        ELBUF_MOD                     share/modules/elbuf_mod.F     
+Chd|        EBCS_MOD                      ../common_source/modules/boundary_conditions/ebcs_mod.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        GROUP_MOD                     share/modules/group_mod.F     
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
@@ -126,13 +132,16 @@ Chd|        INOUTFILE_MOD                 ../common_source/modules/inoutfile_mod
 Chd|        INTBUFFRIC_MOD                share/modules/restart_mod.F   
 Chd|        INTBUFMOD                     share/modules/restart_mod.F   
 Chd|        INTBUF_MOD                    share/modules/restart_mod.F   
+Chd|        INTERFACES_MOD                ../common_source/modules/interfaces/interfaces_mod.F
 Chd|        INTSTAMP_GLOB_MOD             share/modules/intstamp_glob_mod.F
 Chd|        LINEAR_SOLVER_MOD             share/modules/linear_solver_mod.F
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/matparam_def_mod.F
+Chd|        LOADS_MOD                     ../common_source/modules/loads/loads_mod.F
+Chd|        MAT_ELEM_MOD                  ../common_source/modules/mat_elem/mat_elem_mod.F
 Chd|        MDS_RESTART_MOD               ../common_source/modules/mds_rest.mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        MONVOL_STRUCT_MOD             share/modules/monvol_struct_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
+Chd|        OUTPUT_MOD                    ../common_source/modules/output/output_mod.F
 Chd|        PINCHTYPE_MOD                 ../common_source/modules/pinchtype_mod.F
 Chd|        RAD2R_MOD                     share/modules/rad2r.F         
 Chd|        RBODY_MOD                     share/modules/rbody_mod.F     
@@ -140,12 +149,12 @@ Chd|        RESTMOD                       share/modules/restart_mod.F
 Chd|        SCRATCHFILE_MOD               share/modules/scratchfiles_mod.F
 Chd|        SEGVAR_MOD                    share/modules/segvar_mod.F    
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
-Chd|        SENSOR_VARIABLE_MOD           share/modules/sensor_mod.F    
 Chd|        SOLTOSPH_MOD                  share/modules/soltosph_mod.F  
 Chd|        STACK_MOD                     share/modules/stack_mod.F     
+Chd|        STATE_MOD                     ../common_source/modules/state_mod.F
 Chd|        TABLE_GLOB_MOD                share/modules/table_glob_mod.F
 Chd|        TIME_MOD                      share/modules/time_mod.F      
-Chd|        UNITS_MOD                     share/modules/units_mod.F     
+Chd|        USER_INTERFACE_MOD            share/modules/user_interface_mod.F
 Chd|====================================================================
       SUBROUTINE RADIOSS2(IDATA,MIDATA,RDATA,MRDATA) 
 C-----------------------------------------------
@@ -155,12 +164,9 @@ C-----------------------------------------------
       USE INTBUF_MOD
       USE DSGRAPH_MOD
       USE RESTMOD
-      USE UNITS_MOD
       USE INTSTAMP_GLOB_MOD
       USE TABLE_GLOB_MOD
       USE MESSAGE_MOD
-      USE ELBUFDEF_MOD      
-      USE ELBUF_MOD      
       USE RAD2R_MOD
       USE SOLTOSPH_MOD
       USE STACK_MOD
@@ -170,7 +176,7 @@ C-----------------------------------------------
       USE INTBUFFRIC_MOD
       USE GROUP_MOD
       USE GROUPDEF_MOD
-      USE MATPARAM_DEF_MOD
+      USE MAT_ELEM_MOD
       USE TIME_MOD
       USE PINCHTYPE_MOD
       USE CHECK_MOD
@@ -188,7 +194,17 @@ C-----------------------------------------------
       USE MDS_RESTART_MOD
       USE SEGVAR_MOD
       USE SCRATCHFILE_MOD
-      USE SENSOR_VARIABLE_MOD
+      USE STATE_MOD
+      USE ALEMUSCL_MOD , only:ALEMUSCL_Param
+      USE USER_INTERFACE_MOD
+      USE ALE_MOD
+      USE OUTPUT_MOD
+      USE INTERFACES_MOD
+      USE DT_MOD
+      USE LOADS_MOD
+      USE PYTHON_FUNCT_MOD
+      USE NAMES_AND_TITLES_MOD, only: NAMES_AND_TITLES_
+      USE UNITAB_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -202,15 +218,10 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com02_c.inc"
 #include      "com04_c.inc"
-#include      "com05_c.inc"
 #include      "com06_c.inc"
-#include      "com07_c.inc"
 #include      "com08_c.inc"
-#include      "com09_c.inc"
 #include      "com10_c.inc"
-#include      "com20_c.inc"
 #include      "com_xfem1.inc"
 #include      "intstamp_c.inc"
 #include      "sphcom.inc"
@@ -221,63 +232,37 @@ C-----------------------------------------------
 #include      "scr05_c.inc"
 #include      "scr06_c.inc"
 #include      "scr07_c.inc"
-#include      "scr12_c.inc"
 #include      "scr13_c.inc"
 #include      "scr14_c.inc"
-#include      "scr16_c.inc"
 #include      "scr17_c.inc"
 #include      "scr18_c.inc"
 #include      "scr20_c.inc"
 #include      "scr23_c.inc"
 #include      "scr_fac_c.inc"
-#include      "chrasc_c.inc"
-#include      "ascchr_c.inc"
 #include      "chara_c.inc"
 #include      "task_c.inc"
 #include      "warn_c.inc"
-#include      "lon_c.inc"
-#include      "rnur_c.inc"
 #include      "parit_c.inc"
 #include      "titr_c.inc"
-#include      "timeri_c.inc"
-#include      "couple_c.inc"
-#include      "fluid_scr_c.inc"
-#include      "spmd_c.inc"
-#include      "fxbcom.inc"
-#include      "eigcom.inc"
 #include      "flowcom.inc"
-#include      "buckcom.inc"
 #include      "impl1_c.inc"
 #include      "tabsiz_c.inc"
-#include      "sysunit.inc"
 #include      "sms_c.inc"
 #include      "filescount_c.inc"
 #include      "rad2r_c.inc"
 #include      "userlib.inc"
-#include      "alefvm.inc"
 #include      "drape_c.inc"
-#include      "ige3d_c.inc"
 #include      "thermal_c.inc"
 #include      "inter22.inc"
-#include      "alesolver.inc"
-#include      "alemuscl.inc"
-#include      "nchara_c.inc"
+#include      "couple_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER MRDATA,MIDATA
       INTEGER IDATA(*)
-      my_real
-     .  RDATA(*)
+      my_real RDATA(*)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
-C-----------------------------------------------
-c in machine.inc
-c     POINTER (IADI,IA(1))
-c     POINTER (IADR,A(1))
-c     INTEGER IA
-c     my_real
-c    .        A
 C-----------------------------------------------
       INTEGER ITASK, ITID(PARASIZ), NBTASK(PARASIZ+1),
      .        IFILNAM(2148), IFILNAM_TMP(2148)
@@ -298,12 +283,12 @@ C-----------------------------------------------
       CHARACTER*10 CPID
       CHARACTER*6 CISPMD
       INTEGER MY_PID
+      INTEGER NFXFLUX_GLOB
 
       CHARACTER ABC(26)*1, FILNAMTH*100, FILTH*3, LINE*256,
      .          FILNAMABF*100,FILNAMABF_TMP*100
-      DATA ABC/'a','b','c','d','e','f','g','h','i','j','k','l','m','n',
-     .           'o','p','q','r','s','t','u','v','w','x','y','z'/
-      EXTERNAL RESOL_HEAD
+      DATA ABC/'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'/
+  
       INTEGER LHEADER, LVARINT, LVARREA
       INTEGER PRADIOS,PRESFIL
       INTEGER I15A,I15B,I15C,I15D,I15E,I15F,I15G,I15H,I15I,I15J,
@@ -312,8 +297,7 @@ C-----------------------------------------------
 C Madymo Stuff
       INTEGER IERROR,MADSTRLEN
       CHARACTER MAD_OPTION_STRING*256,RMAD_OPTION_STRING*256
-      INTEGER KMADPRT,KMADSH4,KMADSH3,KMADSOL,KMADNOD,KMADFAIL,
-     .        K1,K2,K3,K4,K5,K6,K7,K8,K9,K10,K11
+      INTEGER KMADPRT,KMADSH4,KMADSH3,KMADSOL,KMADNOD,KMADFAIL,K1,K2,K3,K4,K5,K6,K7,K8,K9,K10,K11
       INTEGER BUFTEST(100),NB_MAN,NB_MAN_TOT,TOPINT,FLAG_MAIN,J, ILAW51,ILAW37,ILAW20
 
       my_real, DIMENSION(:), ALLOCATABLE :: MCP,TEMP
@@ -321,22 +305,22 @@ C Madymo Stuff
       TYPE(PRGRAPH), DIMENSION(:), ALLOCATABLE :: GRAPHE
       INTEGER, DIMENSION(:), ALLOCATABLE :: IFLOW
       CHARACTER*128 MESS1,MESS2,MESS3
-      my_real
-     .       , DIMENSION(:), ALLOCATABLE :: RFLOW
-      my_real
-     .   RNB_INDEX_ABF,RMAXINT
+      my_real, DIMENSION(:), ALLOCATABLE :: RFLOW
+      my_real RNB_INDEX_ABF,RMAXINT
       SAVE ITASK, IRFE, ITID
       SAVE IXDP
       INTEGER MLN,IMID,MMALE,IFAILURE_NXT,FLAG_CST_AMS
       INTEGER  IPPID ,IPMAT,NPT, IPMAT_IPLY ,IPANG,IPTHK  ,IPPOS,IS,IPT
+
       TYPE (STACK_PLY) :: STACK
       TYPE (MULTI_FVM_STRUCT) :: MULTI_FVM
       TYPE (H3D_DATABASE) :: H3D_DATA
-      TYPE(MATPARAM_STRUCT_)  , DIMENSION(:), ALLOCATABLE :: MATPARAM_TAB     ! NUMMAT
-      TYPE(GRP_PARAM_STRUCT_) , DIMENSION(:), ALLOCATABLE :: GROUP_PARAM_TAB  ! NGROUP
 
       TYPE (PINCH)  :: PINCH_DATA
-      TYPE(DRAPE_) :: DRAPE_Q4,DRAPE_T3
+      TYPE(DRAPE_), DIMENSION(:), ALLOCATABLE        :: DRAPE_SH4N,DRAPE_SH3N
+      TYPE(DRAPEG_)                                  :: DRAPEG
+      TYPE(OUTPUT_)                                  :: OUTPUT
+      TYPE(PYTHON_)                                  :: PYTHON
 C      
       INTEGER :: CURRENT_RUN,PREVIOUS_RUN
       REAL(kind=8) :: LOCAL_STARTER_TIME,LOCAL_ENGINE_TIME,RESULT
@@ -346,6 +330,12 @@ C
       INTEGER :: DYN_LIB_MODE
       INTEGER :: RADFLEX_PROCESS_PID
       INTEGER IUTITLHIS,IUTITLHI(9)
+      TYPE (DYNAIN_DATABASE) :: DYNAIN_DATA
+      TYPE (INTERFACES_)  :: INTERFACES
+c      TYPE (SENSORS_)  :: SENSORS    ! defined as global in user_interface_mod
+      TYPE (DT_)       :: DT
+      TYPE (LOADS_)    :: LOADS
+      TYPE (MAT_ELEM_) :: MAT_ELEM
 C----------------------------------------------------------------------------------
 C MDS Table
       INTEGER, DIMENSION(:), ALLOCATABLE :: MDS_OUTPUT_TABLE
@@ -362,18 +352,18 @@ C MDS Table
 #endif
       TYPE(T_DIFFUSION) :: DIFFUSION
       TYPE(t_segvar) :: SEGVAR
+C----------------------------------------------------------------------------------
+      TYPE(NAMES_AND_TITLES_) :: NAMES_AND_TITLES  !< NAMES_AND_TITLES host the input deck names and titles for outputs
+      TYPE(UNIT_TYPE_) :: UNITAB !< units conversion
 C------------------------------------------------------------------
 C to build a IBM PARALLEL version
 C In starter : define install parameter nspmd 
 C uncomment:
 C     In CUPDT3(COQUE) : @PROCESS DIRECTIVE ...
 C------------------------------------------------------------------
-C------------------------------------------------------------------
-C---+----1----+----2----+----3----+----4----+----5----+----6----+----7--
 #include      "build_info.inc"
 C------------------------------------------------------------------
 #include      "machine.inc"
-C=======================================================================
 C------------------------------------------------
 C     Init Timer (from beginning of radioss2 (reading timer)
 C------------------------------------------------    
@@ -384,6 +374,8 @@ C------------------------------------------------
       CALL CHECK_MESSAGE_DEFINITION()
 C
       CALL INITIME()
+c
+      CALL NAMES_AND_TITLE_INIT(NAMES_AND_TITLES)
 C------------------------------------------------
 C   VERSIO(2) used for Time History output
 c      DATA VERSIO(2)/'VERSION 5.2main,                    '/
@@ -398,7 +390,8 @@ C Constant initialization
 C------------------------------------------------------------------
       CODVERS= 101
       MSGID  =  38
-      ICAA   =   0    ! active dans input par /CAA et transmis ds restart
+      
+      CALL ALE%init()
 C CODVERS : VERSION CODE        = 44 IF RELEASE 4.4
 C IMINVER : MINOR VERSION CODE  = 1 IF MINOR RELEASE A(A~1) OF 4.4 RELEASE
 C ISRCVER : SOURCE VERSION CODE = 41*100+9
@@ -407,11 +400,10 @@ C                                   IF RELEASE WAS BUILT FROM SOURCE
       ISRCVER=1
       ABINP = 0
       ABOUT = 0
-C------------------------------------------------------------------
-C------------------------------------------------------------------
-C-------------------------------------------------------------------
+      
 #include      "machine2.inc"
-C-------------------------------------------------------------------
+      
+C------------------------------------------------------------------
 C     Version number & date
 C      To be modified when structure of rst file is modified
 C      should be identical to ITESTV in starter
@@ -483,8 +475,6 @@ C------------------------------------------------------------------
       NBVELP = 6
       NRVOLU=24
       LFACLOAD =13
-      NSENSI = 15
-      NSENSR = 223
       LKJNI = 6
       LKJNR = 19
       KWASPH = 16
@@ -500,8 +490,7 @@ C------------------------------------------------------------------
       NRBE2L = 11
       NSMSPCG=0
       IUDYNAIN = 19833333
-      I_DT_NODA_ALE_ON_KEY = 0
-      I_MUSCL_OFF = 0
+      ALEMUSCL_Param%I_MUSCL_OFF = 0
       IUTITLHIS=110
       IUTITLHI(1)=110
       IUTITLHI(2)=111
@@ -515,6 +504,7 @@ C------------------------------------------------------------------
       USE_IFXM = 0
       USE_IFXS = 0
       USE_IEIGM = 0
+      MAX_DEPVAR=0
 C--------------------------------------------------
 C Initialize ProcessID variable for scratch filesqq
       CALL MY_GETPID(MY_PID)
@@ -557,7 +547,6 @@ C--------------------------------------------------
 #endif
 C--------------------------------------------------
 C Error messages initialization
-C--------------------------------------------------
 C--------------------------------------------------
 C Common initialization for arrays size
       TOTALFILECOUNT = 0
@@ -635,18 +624,14 @@ C--------------------------------------------------
       HVISC=HALF
       HVLIN=ZERO
 C--------------------------------------------------
-      WRITE(CPID,'(I10.10)') MY_PID
-      WRITE(CISPMD,'(I6.6)') ISPMD
-      IINFNA='8_'//ROOTN(1:LENROOTN)//'_'//CPID//'_'//CISPMD//'.tmp'
-      OPEN(UNIT=IIN,FORM='FORMATTED',FILE=TRIM(IINFNA))   ! Create tempo file
+      CALL OPEN_F_SCRATCH_FILE(8,1,ROOTN,LENROOTN,IINFNA)
 
       IF ( GOT_INPUT == 0)THEN
        IF (ISPMD/=0) THEN
 C redirect IOUT to tmp file  fichier temporaire when SPMD on pi <> 0
          IOUT = IUSC4
-         IUSC4_FNAM='70_'//ROOTN(1:LENROOTN)//'_'//CPID//'_'//CISPMD//'.tmp'
+         CALL OPEN_F_SCRATCH_FILE(IOUT,1,ROOTN,LENROOTN,IUSC4_FNAM)
          LEN_IUSC4_FNAM=LEN_TRIM(IUSC4_FNAM)
-         OPEN(UNIT=IOUT,ACCESS='SEQUENTIAL',FORM='FORMATTED',FILE=TRIM(IUSC4_FNAM) )
 
          WRITE(UNIT=IOUT,IOSTAT=IOS,FMT='(A)')
          OPEN(UNIT=ISTDI,FORM='FORMATTED',FILE=INPUTNAM,STATUS='OLD',IOSTAT=IO_ERR)
@@ -659,17 +644,16 @@ C redirect IOUT to tmp file  fichier temporaire when SPMD on pi <> 0
       ELSE
        IF (ISPMD/=0) THEN
          IOUT = IUSC4
-         IUSC4_FNAM='70_'//ROOTN(1:LENROOTN)//'_'//CPID//'_'//CISPMD//'.tmp'
+         CALL OPEN_F_SCRATCH_FILE(IOUT,1,ROOTN,LENROOTN,IUSC4_FNAM)
          LEN_IUSC4_FNAM=LEN_TRIM(IUSC4_FNAM)
-         OPEN(UNIT=IOUT,ACCESS='SEQUENTIAL',FORM='FORMATTED',FILE=TRIM(IUSC4_FNAM))
-
          WRITE(UNIT=IOUT,IOSTAT=IOS,FMT='(A)')
        ENDIF
       ENDIF
 C------------------------------------------------
 C     Standard input reading
 C------------------------------------------------
-      CALL LECINP(IRUNN,IRFL,IRFE,H3D_DATA,FLAG_CST_AMS)
+      CALL LECINP(IRUNN,IRFL,IRFE,H3D_DATA,FLAG_CST_AMS,DYNAIN_DATA,
+     .            SENSORS,DT,OUTPUT)
       NFSKYI=5
       IF(KDTINT==0 )NFSKYI=4
       
@@ -869,7 +853,9 @@ C     .rst file reading 1
 C------------------------------------------------
       CALL RDRESA(ITSTV1 ,LHEADER ,LVARINT ,LVARREA ,PRADIOS ,
      .            PRESFIL, MULTI_FVM, H3D_DATA,
-     .            PINCH_DATA)
+     .            PINCH_DATA,DYNAIN_DATA,INTERFACES,SENSORS,LOADS,
+     .            MAT_ELEM,NAMES_AND_TITLES )
+
 C------------------------------------------------
 C     Test of .rst file compatibility
 C------------------------------------------------
@@ -894,12 +880,28 @@ C      CALL TRACE_IN(19,0,ZERO)
 C      IF(ISPMD==0) CALL XTIME0(NNODES)
 C      CALL TRACE_OUT(19)
 
+
+      CALL INIPAR(ITID,3,NNODES,INPUTNAM,GOT_INPUT,NBTASK)
+
+      IF(NSPMD > 1 ) THEN
+        CALL SPMD_ALLREDUCE_INT(NFXFLUX,NFXFLUX_GLOB,1,"SUM ")
+      ELSE
+        NFXFLUX_GLOB = NFXFLUX
+      ENDIF
+      IF(NFXFLUX_GLOB >0 .AND. (IPARIT > 0 .OR. IPARIT == -1)) THEN
+        IPARIT=0
+        IF(ISPMD == 0) THEN
+          WRITE(6,*) "WARNING: /IMPFLUX is not compatible with",
+     .               " /PARITH/ON, switching to /PARITH/OFF"
+        ENDIF
+      ENDIF
+
       CALL TRACE_IN(17,1,ZERO)
 C end init rdresa after call xtime0
       CALL INIRESA(H3D_DATA,PINCH_DATA)
       CALL TRACE_OUT(17)
 
-      CALL INIPAR(ITID,3,NNODES,INPUTNAM,GOT_INPUT,NBTASK)
+
       IF(ISPMD==0) THEN
 
        WRITE(IOUT, '(1X,A,I5)')'NUMBER OF SPMD DOMAINS       ',
@@ -975,7 +977,7 @@ C
       SIPM  = NPROPMI*NUMMAT
 
       IF (MULTI_FVM%IS_USED) THEN
-           MULTI_FVM%MUSCL = IALEMUSCL
+           MULTI_FVM%MUSCL = ALEMUSCL_Param%IALEMUSCL
       ENDIF
 
       CALL ALE_CONNECTIVITY%ALE_CONNECTIVITY_INIT()
@@ -984,7 +986,7 @@ C------------------------------------------------
 C     .rst file reading 2
 C------------------------------------------------
       CALL TRACE_IN(17,2,ZERO)
-      CALL RESTALLOC(MULTI_FVM,H3D_DATA,PINCH_DATA,ALE_CONNECTIVITY,SEGVAR)
+      CALL RESTALLOC(MULTI_FVM,H3D_DATA,PINCH_DATA,ALE_CONNECTIVITY,SEGVAR,LOADS)
       ALLOCATE(T_MONVOL(NVOLU))
       IGEO = 0
       IPM = 0
@@ -1012,25 +1014,19 @@ C     allocations structure TABLE
       ELSE
         ALLOCATE(TABLE(0))
       END IF
-c     allocation of material parameters
-      ALLOCATE (MATPARAM_TAB(NUMMAT) )
-c     allocation of element group parameters
-      ALLOCATE (GROUP_PARAM_TAB(NGROUP) )
 !     allocation of engine time array
       ALLOCATE(GLOBAL_COMP_TIME%ENGINE_TIME(IRUNN))
-c
-      ALLOCATE (SENSOR_TAB(NSENSOR) )
 c
       GLOBAL_COMP_TIME%ENGINE_TIME(1:IRUNN) = ZERO
       GLOBAL_COMP_TIME%RUN_NBR = IRUNN
       GLOBAL_COMP_TIME%RST_NAME(1:1000)=''
       GLOBAL_COMP_TIME%RST_NAME=
      .   ROOTNAM(1:ROOTLEN)//'_'//CHRUN//'_0001.rst'
-
-      CALL RDRESB(AF       ,IAF     ,LVARREA ,XDP    ,
-     .            IRUNN , MULTI_FVM,H3D_DATA,MATPARAM_TAB,GROUP_PARAM_TAB,
-     .           PINCH_DATA, ALE_CONNECTIVITY, T_MONVOL    ,
-     .           SENSOR_TAB, EBCS_TAB)
+c
+      CALL RDRESB(AF                ,IAF      ,LVARREA      ,XDP             ,IRUNN     , 
+     .            MULTI_FVM        ,H3D_DATA  ,PINCH_DATA,
+     .            ALE_CONNECTIVITY ,T_MONVOL  ,SENSORS      ,EBCS_TAB        ,DYNAIN_DATA,
+     .            USER_WINDOWS     ,OUTPUT    ,INTERFACES   ,LOADS           ,MAT_ELEM, PYTHON)
 
       IF (NSPMD > 1)  CALL SPMD_RST_CHECK()
 c----------
@@ -1118,11 +1114,11 @@ C--------------------------------------------
             ANIM_CE(I)=0
             NCE_ANI=NCE_ANI-1
           END IF      
-        ENDDO  	
+        ENDDO
         !/ANIM/ELEM/VFRAC not relevant in this case
-        NN_ANI     = NN_ANI - ANIM_N(20) 	
-        NN_ANI     = NN_ANI - ANIM_N(21) 
-        NN_ANI     = NN_ANI - ANIM_N(22) 
+        NN_ANI     = NN_ANI - ANIM_N(20)
+        NN_ANI     = NN_ANI - ANIM_N(21)
+        NN_ANI     = NN_ANI - ANIM_N(22)
         NN_ANI     = NN_ANI - ANIM_N(23)                         
         ANIM_N(20) = 0
         ANIM_N(21) = 0
@@ -1132,8 +1128,8 @@ C--------------------------------------------
 
       IF(MMALE==0 .OR. INT22==0)THEN
         !/ANIM/ELEM/ZVFRAC not relevant in this case               
-        NN_ANI     = NN_ANI - ANIM_N(24) 	
-        NN_ANI     = NN_ANI - ANIM_N(25) 
+        NN_ANI     = NN_ANI - ANIM_N(24)
+        NN_ANI     = NN_ANI - ANIM_N(25)
         NN_ANI     = NN_ANI - ANIM_N(26) 
         NN_ANI     = NN_ANI - ANIM_N(27)                                         
         ANIM_N(24) = 0
@@ -1169,8 +1165,8 @@ C--------------------------------------------
       !COMMUN LAW51/LAW37
       !if multimaterial law then removing useless phases output (phases 3 or/and 4)
       IF(MMALE==1)THEN     
-	IF(N2D==0)THEN 
-	  !no 2D output 
+          IF(N2D==0)THEN 
+            !no 2D output 
           DO I=10248,10251
             IF(ANIM_CE(I)==1)THEN
               ANIM_CE(I)=0
@@ -1190,9 +1186,9 @@ C--------------------------------------------
               ANIM_SE(285)=0
               NSE_ANI=NSE_ANI-1
             END IF      
-          ENDIF	
-	ELSEIF(N2D>0)THEN 
-	  !no 3D output	
+          ENDIF
+          ELSEIF(N2D>0)THEN 
+            !no 3D output
           DO I=283,286
             IF(ANIM_SE(I)==1)THEN
               ANIM_SE(I)=0
@@ -1214,7 +1210,7 @@ C--------------------------------------------
           !    END IF      
           !  ENDDO
           !ENDIF          
-	ENDIF	
+          ENDIF
       ENDIF
       
       IF(MMALE==1)THEN 
@@ -1224,13 +1220,9 @@ C--------------------------------------------
       !no need to output zero contour for ALE ANIM keywords if ALE not defined. (example: schlieren +SH3N)
       IF(IALE+IEULER+ITHERM == 0)THEN
         NCE_ANI = NCE_ANI - ANIM_CE(10672)
-        NCE_ANI = NCE_ANI - ANIM_CE(10671)
         NSE_ANI = NSE_ANI - ANIM_SE(4892)
-        NSE_ANI = NSE_ANI - ANIM_SE(4891)
         ANIM_CE(10672) = 0 !quad schlieren
         ANIM_SE(4892)  = 0 !solid schlieren
-        ANIM_CE(10671) = 0 !quad ssp
-        ANIM_SE(4891)  = 0 !solid ssp        
       ENDIF
             
       !no need to output phase contour if no law51
@@ -1308,7 +1300,7 @@ C--------------------------------------------
         ENDDO
       ENDIF !IF(ILAW20 == 0)
 
-      IF(I_DT_NODA_ALE_ON_KEY==1) I_DT_NODA_ALE_ON = 1
+      IF(ALE%GLOBAL%I_DT_NODA_ALE_ON_KEY==1) ALE%GLOBAL%I_DT_NODA_ALE_ON = 1
                           
 C--------------------------------------------
 C     UNIT restart info
@@ -1338,7 +1330,7 @@ C--------------------------------------------
       ENDIF
       IF(ICRACK3D > 0) CALL CRKXFEM_RREST(INOD_CRKXFEM,IEL_CRKXFEM,NODLEVXF)
       CALL CRKXFEM_RRESTANIM()
-      IF(IALEFVM  > 0) CALL READ_DB(FCELL ,6*NUMELS)
+      IF(ALEFVM_Param%IEnabled  > 0) CALL READ_DB(ALEFVM_Buffer%FCELL ,6*NUMELS)
       IF(IALELAG  > 0) CALL ALELAG_RREST()
 C--------------------------------------
       IF(SRTHBUF > 0) CALL RTHBUFREST(RTHBUF,SRTHBUF)
@@ -1348,7 +1340,7 @@ C--------------------------------------------
       IF(SKNOTLOCEL > 0) CALL KNOTLOCELREST(KNOTLOCEL)
       IF(NUMELIG3D > 0) CALL WIGEREST(WIGE)
       IF(IPART_STACK >0) THEN
-          ALLOCATE(STACK%IGEO(3*NPT_STACK+2,NS_STACK),STAT=IERR)
+          ALLOCATE(STACK%IGEO(4*NPT_STACK+2,NS_STACK),STAT=IERR)
           IF(IERR/=0) THEN
             CALL ANCMSG(MSGID=19,ANMODE=ANINFO,
      .            C1='(/PROP/STACK/...)')
@@ -1373,12 +1365,17 @@ C--------------------------------------------
       ELSE
          ALLOCATE(STACK%IGEO(0,0),STACK%GEO(0,0),STACK%PM(0,0))
       ENDIF 
+      SCDRAPE = 0
+      STDRAPE = 0
       IF (NDRAPE > 0) THEN
-        CALL DRAPE_RREST(DRAPE_Q4,DRAPE_T3)
+         ALLOCATE(DRAPE_SH4N(NUMELC_DRAPE),DRAPE_SH3N(NUMELTG_DRAPE))
+         ALLOCATE(DRAPEG%INDX_SH4N(NUMELC),DRAPEG%INDX_SH3N(NUMELTG))
+         DRAPEG%INDX_SH4N = 0
+         DRAPEG%INDX_SH3N = 0
+         CALL DRAPE_RREST(DRAPE_SH4N,DRAPE_SH3N, DRAPEG)  
       ELSE
-        ALLOCATE(DRAPE_Q4%NPT(0), DRAPE_Q4%INDX(0),DRAPE_Q4%IDRAPE(0),
-     .     DRAPE_Q4%RDRAPE(0,0), DRAPE_T3%NPT(0), DRAPE_T3%INDX(0),DRAPE_T3%IDRAPE(0),
-     .     DRAPE_T3%RDRAPE(0,0)  )   
+       ALLOCATE(DRAPE_SH4N(0),DRAPE_SH3N(0),DRAPEG%INDX_SH4N(0),
+     .                                      DRAPEG%INDX_SH3N(0) )
       ENDIF 
 C--------------------------------------------
       IF (NUMPLY > 0) CALL PLY_INFO_REST(PLY_INFO)
@@ -1514,7 +1511,7 @@ C     ... Switch for cohesive elements should also be done here ...
 C-----------------------------------------------------
       IF(MCHECK==0)THEN
         CALL SWITCH_TO_DTNODA(
-     .                    IXR      ,GEO      ,PM       ,IPARG    ,ELBUF_TAB,
+     .                    IXR      ,GEO      ,PM       ,IPARG    ,MAT_ELEM%ELBUF,
      .                    MS       ,IN       ,ITAB     ,IGEO     ,IPM    ,
      .                    BUFMAT   ,IPART    ,IGRNOD   ,IGRPART)
       END IF
@@ -1544,7 +1541,7 @@ C------------------------------------------------
       CALL LECTUR(  ICODE ,  ISKEW ,  ISKWN ,  IXTG  ,   IXS ,
      2              IXQ ,    IXC ,    IXT ,    IXP ,     IXR ,
      3              ITAB ,   ITABM1  ,NPC,     IPARG,    IGRV ,
-     4              LGRAV ,IPARI,
+     4              LGRAV   ,IPARI,
      5              NPBY ,   LPBY    ,ILINK,   LLINK  ,LINALE ,
      6              NEFLSW , NNFLSW , ICUT ,   IAF(IF01),
      7              X  ,     V  ,     VR  ,    MS   ,IN  ,
@@ -1553,13 +1550,13 @@ C------------------------------------------------
      A              IGRNOD ,KXSP,WEIGHT ,FR_RBY2 ,FR_RL,
      B              PARTSAV,IPART,PM,
      C              MONVOL ,VOLMON, IPART_STATE,GEO,TABLE,
-     D              IFRAME,XFRAME,ELBUF_TAB,IGEO,INTBUF_TAB,
-     E              IPM   ,H3D_DATA, MULTI_FVM,FLAG_CST_AMS,
+     D              IFRAME,XFRAME,MAT_ELEM%ELBUF,IGEO,INTBUF_TAB,
+     E              IPM   ,H3D_DATA, MULTI_FVM,
      F              IGRPART,TAG_SKINS6,ICFIELD,LCFIELD,TAGSLV_RBY,
-     G              IPART_DYNAIN,MDS_LABEL,MDS_OUTPUT_TABLE,MDS_NMAT,
-     H              MAX_DEPVAR,MDS_NDEPSVAR,STACK,IBCL,ILOADP,LLOADP,
-     I              SENSOR_TAB)
-
+     G              MDS_LABEL,MDS_OUTPUT_TABLE,MDS_NMAT,MAX_DEPVAR,
+     H              MDS_NDEPSVAR,STACK,IBCL,ILOADP,LLOADP,SENSORS,
+     I              DYNAIN_DATA,DT ,LOADS ,OUTPUT,NAMES_AND_TITLES,
+     J              MAT_ELEM%MAT_PARAM)
 C------------------------------------------------
 C Close & Delete scratch file
       CLOSE (UNIT=IIN)
@@ -1572,7 +1569,7 @@ C------------------------------------------------
       CALL TRACE_OUT(19)
 C------------------------------------------------
       IF ((IRAD2R==1).AND.(R2R_SIU==1))THEN
-        CALL R2R_INPUT_INIT(IRUNN)          
+        CALL R2R_INPUT_INIT(IRUNN,OUTPUT)          
       ENDIF         
 C------------------------------------------------
 C     Check NXT FAIL for output 
@@ -1672,11 +1669,12 @@ C------------------------------------------------
           IFIL = 1
           IFILTITL = IUTITLHIS
           ITHFLAG = 10
-          CALL HIST1(FILNAMTH,IFIL, NTHGRP,LONG,
-     2    WA    ,PM      ,GEO   ,IPART ,
-     3    SUBSETS ,ITHGRP  ,ITHBUF,IGEO  ,
-     4    IPM   ,IPART   ,LIPART1    ,8     ,
-     5    12	 ,ITFORM,ITHFLAG,ITHVAR,IFILTITL)
+          CALL HIST1( FILNAMTH ,IFIL              ,NTHGRP            ,LONG,
+     2                 WA      ,PM                ,GEO               ,IPART,
+     3                 SUBSETS ,OUTPUT%TH%ITHGRP  ,OUTPUT%TH%ITHBUF  ,IGEO,
+     4                 IPM     ,IPART   ,LIPART1  ,8,
+     5                 12      ,ITFORM  ,ITHFLAG ,ITHVAR,
+     6                 IFILTITL,OUTPUT%TH%SITHBUF ,NAMES_AND_TITLES)
           WA(1:SWA) = ZERO
 C   Multiple th files
             IF(NTHGRP01(1)/=0)THEN
@@ -1694,11 +1692,12 @@ C   Multiple th files
               IFIL= IUNIT
               IFILTITL = IUTITLHI(1)
               ITHFLAG = 1
-              CALL HIST1(FILNAMTH,IFIL,NTHGRP1(1),LONG,
-     2                WA  ,PM  ,GEO ,IPART ,
-     3         SUBSETS ,ITHGRPA,ITHBUFA,IGEO ,
-     4         IPM   ,IPART(1+LIPART1*(NPART+NTHPART)) ,2    ,1   ,
-     5         1      ,AFORM(1),ITHFLAG,ITHVAR,IFILTITL)
+              CALL HIST1( FILNAMTH ,IFIL              ,NTHGRP1(1)        ,LONG ,
+     2                    WA       ,PM                ,GEO               ,IPART,
+     3                    SUBSETS  ,OUTPUT%TH%ITHGRPA ,OUTPUT%TH%ITHBUFA ,IGEO ,
+     4                    IPM      ,IPART(1+LIPART1*(NPART+NTHPART)) ,2  ,1    ,
+     5                    1       ,AFORM(1)           ,ITHFLAG       ,ITHVAR,
+     6                    IFILTITL,OUTPUT%TH%SITHBUFA ,NAMES_AND_TITLES)
             END IF
 
             IF(NTHGRP01(2)/=0)THEN
@@ -1716,11 +1715,12 @@ C   Multiple th files
               IFIL= IUNIT
               IFILTITL = IUTITLHI(2)
               ITHFLAG = 2
-              CALL HIST1(FILNAMTH,IFIL,NTHGRP1(2),LONG,
-     2                WA  ,PM  ,GEO ,IPART ,
-     3         SUBSETS ,ITHGRPB,ITHBUFB,IGEO ,
-     4         IPM,IPART(1+LIPART1*(NPART+NTHPART)+2*(NPART+NTHPART)),2,1,
-     5         1      ,AFORM(2),ITHFLAG,ITHVAR,IFILTITL)
+              CALL HIST1(FILNAMTH,IFIL              ,NTHGRP1(2)        ,LONG,
+     2                   WA      ,PM                ,GEO               ,IPART ,
+     3                   SUBSETS ,OUTPUT%TH%ITHGRPB ,OUTPUT%TH%ITHBUFB ,IGEO ,
+     4                   IPM     ,IPART(1+LIPART1*(NPART+NTHPART)+2*(NPART+NTHPART)),2,1,
+     5                   1       ,AFORM(2)          ,ITHFLAG          ,ITHVAR,
+     6                   IFILTITL,OUTPUT%TH%SITHBUFB,NAMES_AND_TITLES)
             END IF
 
             IF(NTHGRP01(3)/=0)THEN
@@ -1738,11 +1738,12 @@ C   Multiple th files
               IFIL= IUNIT
               IFILTITL = IUTITLHI(3)
               ITHFLAG = 3
-              CALL HIST1(FILNAMTH,IFIL,NTHGRP1(3),LONG,
-     2                WA  ,PM  ,GEO ,IPART ,
-     3         SUBSETS ,ITHGRPC,ITHBUFC,IGEO ,
-     4         IPM,IPART(1+LIPART1*(NPART+NTHPART)+4*(NPART+NTHPART)),2,1,
-     5         1      ,AFORM(3),ITHFLAG,ITHVAR,IFILTITL)
+              CALL HIST1(FILNAMTH ,IFIL             ,NTHGRP1(3)        ,LONG,
+     2                   WA       ,PM               ,GEO               ,IPART ,
+     3                   SUBSETS ,OUTPUT%TH%ITHGRPC ,OUTPUT%TH%ITHBUFC ,IGEO ,
+     4                   IPM     ,IPART(1+LIPART1*(NPART+NTHPART)+4*(NPART+NTHPART)) ,2 ,1,
+     5                   1       ,AFORM(3)          ,ITHFLAG           ,ITHVAR,
+     6                   IFILTITL,OUTPUT%TH%SITHBUFC,NAMES_AND_TITLES)
             END IF
 
             IF(NTHGRP01(4)/=0)THEN
@@ -1761,10 +1762,11 @@ C   Multiple th files
               IFIL= IUNIT
               ITHFLAG = 4
               CALL HIST1(FILNAMTH,IFIL,NTHGRP1(4),LONG,
-     2                WA  ,PM  ,GEO ,IPART ,
-     3         SUBSETS ,ITHGRPD,ITHBUFD,IGEO ,
-     4         IPM,IPART(1+LIPART1*(NPART+NTHPART)+6*(NPART+NTHPART)),2,1,
-     5         1      ,AFORM(4),ITHFLAG,ITHVAR,IFILTITL)
+     2                   WA  ,PM  ,GEO ,IPART ,
+     3                   SUBSETS ,OUTPUT%TH%ITHGRPD ,OUTPUT%TH%ITHBUFD ,IGEO,
+     4                   IPM     ,IPART(1+LIPART1*(NPART+NTHPART)+6*(NPART+NTHPART)) ,2 ,1,
+     5                   1       ,AFORM(4)          ,ITHFLAG           ,ITHVAR,
+     6                   IFILTITL ,OUTPUT%TH%SITHBUFD,NAMES_AND_TITLES)
             END IF
 
             IF(NTHGRP01(5)/=0)THEN
@@ -1782,11 +1784,12 @@ C   Multiple th files
               IFIL= IUNIT
               IFILTITL = IUTITLHI(5)
               ITHFLAG = 5
-              CALL HIST1(FILNAMTH,IFIL,NTHGRP1(5),LONG,
-     2                WA  ,PM  ,GEO ,IPART ,
-     3         SUBSETS ,ITHGRPE,ITHBUFE,IGEO ,
-     4         IPM,IPART(1+LIPART1*(NPART+NTHPART)+8*(NPART+NTHPART)),2,1,
-     5         1      ,AFORM(5),ITHFLAG,ITHVAR,IFILTITL)
+              CALL HIST1(FILNAMTH,IFIL              ,NTHGRP1(5)        ,LONG,
+     2                   WA      ,PM                ,GEO               ,IPART,
+     3                   SUBSETS ,OUTPUT%TH%ITHGRPE ,OUTPUT%TH%ITHBUFE ,IGEO,
+     4                   IPM     ,IPART(1+LIPART1*(NPART+NTHPART)+8*(NPART+NTHPART)),2,1,
+     5                   1       ,AFORM(5)          ,ITHFLAG           ,ITHVAR,
+     6                   IFILTITL,OUTPUT%TH%SITHBUFE,NAMES_AND_TITLES)
             END IF
 
             IF(NTHGRP01(6)/=0)THEN
@@ -1804,11 +1807,12 @@ C   Multiple th files
               IFIL= IUNIT
               IFILTITL = IUTITLHI(6)
               ITHFLAG = 6
-              CALL HIST1(FILNAMTH,IFIL,NTHGRP1(6),LONG,
-     2                WA  ,PM  ,GEO ,IPART ,
-     3         SUBSETS ,ITHGRPF,ITHBUFF,IGEO ,
-     4         IPM,IPART(1+LIPART1*(NPART+NTHPART)+10*(NPART+NTHPART)),2,1,
-     5         1      ,AFORM(6),ITHFLAG,ITHVAR,IFILTITL)
+              CALL HIST1(FILNAMTH,IFIL              ,NTHGRP1(6)        ,LONG,
+     2                   WA      ,PM                ,GEO               ,IPART ,
+     3                   SUBSETS ,OUTPUT%TH%ITHGRPF ,OUTPUT%TH%ITHBUFF ,IGEO ,
+     4                   IPM     ,IPART(1+LIPART1*(NPART+NTHPART)+10*(NPART+NTHPART)),2,1,
+     5                   1       ,AFORM(6)          ,ITHFLAG           ,ITHVAR,
+     6                   IFILTITL,OUTPUT%TH%SITHBUFF,NAMES_AND_TITLES)
             END IF
 
             IF(NTHGRP01(7)/=0)THEN
@@ -1826,11 +1830,12 @@ C   Multiple th files
               IFIL= IUNIT
               IFILTITL = IUTITLHI(7)
               ITHFLAG = 7
-              CALL HIST1(FILNAMTH,IFIL,NTHGRP1(7),LONG,
-     2                WA  ,PM  ,GEO ,IPART ,
-     3         SUBSETS ,ITHGRPG,ITHBUFG,IGEO ,
-     4         IPM,IPART(1+LIPART1*(NPART+NTHPART)+12*(NPART+NTHPART)),2,1,
-     5         1      ,AFORM(7),ITHFLAG,ITHVAR,IFILTITL)
+              CALL HIST1(FILNAMTH,IFIL              ,NTHGRP1(7)        ,LONG,
+     2                   WA      ,PM                ,GEO               ,IPART ,
+     3                   SUBSETS ,OUTPUT%TH%ITHGRPG ,OUTPUT%TH%ITHBUFG ,IGEO ,
+     4                   IPM,IPART(1+LIPART1*(NPART+NTHPART)+12*(NPART+NTHPART)),2,1,
+     5                   1       ,AFORM(7)          ,ITHFLAG           ,ITHVAR,
+     6                   IFILTITL,OUTPUT%TH%SITHBUFG ,NAMES_AND_TITLES)
             END IF
 
             IF(NTHGRP01(8)/=0)THEN
@@ -1848,11 +1853,12 @@ C   Multiple th files
               IFIL= IUNIT
               IFILTITL = IUTITLHI(8)
               ITHFLAG = 8
-              CALL HIST1(FILNAMTH,IFIL,NTHGRP1(8),LONG,
-     2                WA  ,PM  ,GEO ,IPART ,
-     3         SUBSETS ,ITHGRPH,ITHBUFH,IGEO ,
-     4         IPM,IPART(1+LIPART1*(NPART+NTHPART)+14*(NPART+NTHPART)),2,1,
-     5         1      ,AFORM(8),ITHFLAG,ITHVAR,IFILTITL)
+              CALL HIST1(FILNAMTH ,IFIL              ,NTHGRP1(8),LONG,
+     2                   WA       ,PM                ,GEO               ,IPART,
+     3                   SUBSETS  ,OUTPUT%TH%ITHGRPH ,OUTPUT%TH%ITHBUFH ,IGEO,
+     4                   IPM      ,IPART(1+LIPART1*(NPART+NTHPART)+14*(NPART+NTHPART)),2,1,
+     5                   1       ,AFORM(8)           ,ITHFLAG           ,ITHVAR,
+     6                   IFILTITL,OUTPUT%TH%SITHBUFH,NAMES_AND_TITLES)
             END IF
 
             IF(NTHGRP01(9)/=0)THEN
@@ -1871,19 +1877,21 @@ C   Multiple th files
               IFILTITL = IUTITLHI(9)
               ITHFLAG = 9
               CALL HIST1(FILNAMTH,IFIL,NTHGRP1(9),LONG,
-     2                WA  ,PM  ,GEO ,IPART ,
-     3         SUBSETS ,ITHGRPI,ITHBUFI,IGEO ,
-     4         IPM,IPART(1+LIPART1*(NPART+NTHPART)+16*(NPART+NTHPART)),2,1,
-     5         1      ,AFORM(9),ITHFLAG,ITHVAR,IFILTITL)
+     2                   WA  ,PM  ,GEO ,IPART ,
+     3                   SUBSETS ,OUTPUT%TH%ITHGRPI ,OUTPUT%TH%ITHBUFI ,IGEO,
+     4                   IPM     ,IPART(1+LIPART1*(NPART+NTHPART)+16*(NPART+NTHPART)),2,1,
+     5                   1       ,AFORM(9)          ,ITHFLAG           ,ITHVAR,
+     6                   IFILTITL,OUTPUT%TH%SITHBUFI,NAMES_AND_TITLES)
             END IF
         ELSE
           WRITE(CHR_OLD,'(I2.2)')IRUNN
           CALL HIST13(
      1           IPARG ,IXS ,IXQ ,IXC ,IXT ,
      2           IXP ,IXR ,WA  ,ITAB ,PM  ,
-     3           NPBYL ,IXTG ,IRFE    ,IXUR,LACCELM ,
-     4           IPARI ,IPART ,ITHGRP ,ITHBUF ,CHR_OLD)
+     3           NPBYL ,IXTG ,IRFE    ,LACCELM ,
+     4           IPARI ,IPART ,OUTPUT%TH%ITHGRP ,OUTPUT%TH%ITHBUF ,CHR_OLD,NAMES_AND_TITLES)
         ENDIF
+
         IF(NABFILE /= 0) THEN
 #ifdef DNC
           IF(ABFILE(1) /=0)THEN
@@ -1891,11 +1899,11 @@ C   Multiple th files
             LONG_TMP = 9
             IFILABF = 11
             ITHFLAG = 10
-            CALL ABFHIST1(FILNAMABF_TMP,IFILABF,NTHGRP,LONG_TMP,
-     2        WA  ,PM  ,GEO ,IPART ,
-     3        SUBSETS ,ITHGRP,ITHBUF,IGEO    ,
-     4        IPM   ,IPART   ,LIPART1    ,8     ,
-     5        12	 ,ITHVAR  ,ITHFLAG)
+            CALL ABFHIST1(FILNAMABF_TMP ,IFILABF          ,NTHGRP           ,LONG_TMP,
+     2                    WA            ,PM               ,GEO              ,IPART,
+     3                    SUBSETS       ,OUTPUT%TH%ITHGRP ,OUTPUT%TH%ITHBUF ,IGEO,
+     4                    IPM           ,IPART            ,LIPART1          ,8,
+     5                    12            ,ITHVAR           ,ITHFLAG,NAMES_AND_TITLES )
             FILNAMABF=ROOTNAM(1:ROOTLEN)//'_'//CHRUN//'.abf'
             LONG = 9
             LEN_TMP_NAME = OUTFILE_NAME_LEN + ROOTLEN + LONG        
@@ -1924,11 +1932,11 @@ c
               IFILABF = 12
               IFIL= IUNIT
               ITHFLAG = 1
-              CALL ABFHIST1(FILNAMABF_TMP,IFILABF,NTHGRP1(1),LONG_TMP,
-     2                      WA  ,PM  ,GEO ,IPART ,
-     3                      SUBSETS ,ITHGRPA,ITHBUFA,IGEO    ,
-     4                      IPM ,IPART(1+LIPART1*(NPART+NTHPART)),2,1,
-     5                      1   ,ITHVAR,ITHFLAG)
+              CALL ABFHIST1(FILNAMABF_TMP ,IFILABF           ,NTHGRP1(1)        ,LONG_TMP,
+     2                      WA            ,PM                ,GEO               ,IPART,
+     3                      SUBSETS       ,OUTPUT%TH%ITHGRPA ,OUTPUT%TH%ITHBUFA ,IGEO,
+     4                      IPM           ,IPART(1+LIPART1*(NPART+NTHPART))     ,2,1,
+     5                      1             ,ITHVAR            ,ITHFLAG,NAMES_AND_TITLES)
               FILNAMABF=ROOTNAM(1:ROOTLEN)//'_'//CHRUN//'_a.abf'
               LONG = 11
               LEN_TMP_NAME = OUTFILE_NAME_LEN + ROOTLEN + LONG        
@@ -1954,11 +1962,11 @@ c
               IFILABF = 13
               IFIL= IUNIT
               ITHFLAG = 2
-              CALL ABFHIST1(FILNAMABF_TMP,IFILABF,NTHGRP1(2),LONG_TMP,
-     2                      WA  ,PM  ,GEO ,IPART ,
-     3                      SUBSETS ,ITHGRPB,ITHBUFB,IGEO    ,
-     4                      IPM   ,IPART(1+LIPART1*(NPART+NTHPART)+2*(NPART+NTHPART)),2,1,
-     5                      1   ,ITHVAR,ITHFLAG)
+              CALL ABFHIST1(FILNAMABF_TMP ,IFILAB F         ,NTHGRP1(2)        ,LONG_TMP,
+     2                      WA            ,PM               ,GEO               ,IPART,
+     3                      SUBSETS       ,OUTPUT%TH%ITHGRPB,OUTPUT%TH%ITHBUFB ,IGEO,
+     4                      IPM           ,IPART(1+LIPART1*(NPART+NTHPART)+2*(NPART+NTHPART)),2,1,
+     5                      1             ,ITHVAR           ,ITHFLAG,NAMES_AND_TITLES)
               FILNAMABF=ROOTNAM(1:ROOTLEN)//'_'//CHRUN//'_b.abf'
               LONG = 11
               LEN_TMP_NAME = OUTFILE_NAME_LEN + ROOTLEN + LONG        
@@ -1985,11 +1993,11 @@ c
               IFILABF = 14
               IFIL= IUNIT
               ITHFLAG = 3
-              CALL ABFHIST1(FILNAMABF_TMP,IFILABF,NTHGRP1(3),LONG_TMP,
-     2                      WA  ,PM  ,GEO ,IPART ,
-     3                      SUBSETS ,ITHGRPC,ITHBUFC,IGEO    ,
-     4                      IPM   ,IPART   ,2     ,1     ,
-     5                      1   ,ITHVAR,ITHFLAG)
+              CALL ABFHIST1(FILNAMABF_TMP ,IFILABF ,NTHGRP1(3) ,LONG_TMP,
+     2                      WA            ,PM      ,GEO        ,IPART ,
+     3                      SUBSETS       ,OUTPUT%TH%ITHGRPC   ,OUTPUT%TH%ITHBUFC ,IGEO,
+     4                      IPM           ,IPART               ,2 ,1,
+     5                      1             ,ITHVAR              ,ITHFLAG,NAMES_AND_TITLES)
               FILNAMABF=ROOTNAM(1:ROOTLEN)//'_'//CHRUN//'_c.abf'
               LONG = 11
               LEN_TMP_NAME = OUTFILE_NAME_LEN + ROOTLEN + LONG        
@@ -2015,11 +2023,11 @@ c
               IFILABF = 15
               IFIL= IUNIT
               ITHFLAG = 4
-              CALL ABFHIST1(FILNAMABF_TMP,IFILABF,NTHGRP1(4),LONG_TMP,
-     2      WA  ,PM  ,GEO ,IPART ,
-     3      SUBSETS ,ITHGRPD,ITHBUFD,IGEO    ,
-     4      IPM   ,IPART   ,2     ,1     ,
-     5      1   ,ITHVAR,ITHFLAG)
+              CALL ABFHIST1( FILNAMABF_TMP ,IFILABF ,NTHGRP1(4) ,LONG_TMP,
+     2                       WA            ,PM      ,GEO        ,IPART,
+     3                       SUBSETS       ,OUTPUT%TH%ITHGRPD   ,OUTPUT%TH%ITHBUFD ,IGEO,
+     4                       IPM           ,IPART   ,2     ,1   ,
+     5                       1             ,ITHVAR  ,ITHFLAG,NAMES_AND_TITLES)
               FILNAMABF=ROOTNAM(1:ROOTLEN)//'_'//CHRUN//'_d.abf'
               LONG = 11
             LEN_TMP_NAME = OUTFILE_NAME_LEN + ROOTLEN + LONG        
@@ -2043,11 +2051,11 @@ c
               IFILABF = 16
               IFIL= IUNIT
               ITHFLAG = 5
-              CALL ABFHIST1(FILNAMABF_TMP,IFILABF,NTHGRP1(5),LONG_TMP,
-     2      WA  ,PM  ,GEO ,IPART ,
-     3      SUBSETS ,ITHGRPE,ITHBUFE,IGEO    ,
-     4      IPM   ,IPART   ,2     ,1     ,
-     5      1   ,ITHVAR,ITHFLAG)
+              CALL ABFHIST1( FILNAMABF_TMP ,IFILABF,NTHGRP1(5),LONG_TMP,
+     2                       WA            ,PM     ,GEO       ,IPART,
+     3                       SUBSETS       ,OUTPUT%TH%ITHGRPE ,OUTPUT%TH%ITHBUFE ,IGEO,
+     4                       IPM           ,IPART             ,2     ,1     ,
+     5                       1             ,ITHVAR            ,ITHFLAG,NAMES_AND_TITLES)
               FILNAMABF=ROOTNAM(1:ROOTLEN)//'_'//CHRUN//'_e.abf'
               LONG = 11
             LEN_TMP_NAME = OUTFILE_NAME_LEN + ROOTLEN + LONG        
@@ -2073,10 +2081,10 @@ c
               IFIL= IUNIT
               ITHFLAG = 6
               CALL ABFHIST1(FILNAMABF_TMP,IFILABF,NTHGRP1(6),LONG_TMP,
-     2      WA  ,PM  ,GEO ,IPART ,
-     3      SUBSETS ,ITHGRPF,ITHBUFF,IGEO    ,
-     4      IPM   ,IPART   ,2     ,1     ,
-     5      1   ,ITHVAR,ITHFLAG)
+     2                      WA  ,PM  ,GEO ,IPART ,
+     3                      SUBSETS ,OUTPUT%TH%ITHGRPF,OUTPUT%TH%ITHBUFF,IGEO    ,
+     4                      IPM   ,IPART   ,2     ,1     ,
+     5                      1   ,ITHVAR,ITHFLAG,NAMES_AND_TITLES)
               FILNAMABF=ROOTNAM(1:ROOTLEN)//'_'//CHRUN//'_f.abf'
               LONG = 11
             LEN_TMP_NAME = OUTFILE_NAME_LEN + ROOTLEN + LONG        
@@ -2103,9 +2111,9 @@ c
               ITHFLAG = 7
               CALL ABFHIST1(FILNAMABF_TMP,IFILABF,NTHGRP1(7),LONG_TMP,
      2                      WA  ,PM  ,GEO ,IPART ,
-     3                      SUBSETS ,ITHGRPG,ITHBUFG,IGEO    ,
-     4                      IPM   ,IPART   ,2     ,1     ,
-     5                      1   ,ITHVAR,ITHFLAG)
+     3                      SUBSETS ,OUTPUT%TH%ITHGRPG,OUTPUT%TH%ITHBUFG,IGEO    ,
+     4                      IPM     ,IPART   ,2     ,1     ,
+     5                      1       ,ITHVAR,ITHFLAG,NAMES_AND_TITLES)
      
               FILNAMABF=ROOTNAM(1:ROOTLEN)//'_'//CHRUN//'_g.abf'
               LONG = 11
@@ -2135,11 +2143,11 @@ c
               IFIL= IUNIT
               ITHFLAG = 8
               
-              CALL ABFHIST1(FILNAMABF_TMP,IFILABF,NTHGRP1(8),LONG_TMP,
-     2                      WA  ,PM  ,GEO ,IPART ,
-     3                      SUBSETS ,ITHGRPH,ITHBUFH,IGEO    ,
-     4                      IPM   ,IPART   ,2     ,1     ,
-     5                      1   ,ITHVAR,ITHFLAG)
+              CALL ABFHIST1(FILNAMABF_TMP ,IFILABF ,NTHGRP1(8) ,LONG_TMP,
+     2                      WA            ,PM                  ,GEO              ,IPART,
+     3                      SUBSETS       ,OUTPUT%TH%ITHGRPH  ,OUTPUT%TH%ITHBUFH ,IGEO,
+     4                      IPM   ,IPART  ,2                  ,1     ,
+     5                      1     ,ITHVAR ,ITHFLAG ,NAMES_AND_TITLES)
      
               FILNAMABF=ROOTNAM(1:ROOTLEN)//'_'//CHRUN//'_h.abf'
               LONG = 11
@@ -2168,11 +2176,11 @@ c
               IFILABF = 20
               IFIL= IUNIT
               ITHFLAG = 9
-              CALL ABFHIST1(FILNAMABF_TMP,IFILABF,NTHGRP1(9),LONG_TMP,
-     2                      WA  ,PM  ,GEO ,IPART ,
-     3                      SUBSETS ,ITHGRPI,ITHBUFI,IGEO    ,
-     4                      IPM,IPART(1+LIPART1*(NPART+NTHPART)+16*(NPART+NTHPART)),2,1,
-     5                      1   ,ITHVAR,ITHFLAG)
+              CALL ABFHIST1(FILNAMABF_TMP ,IFILABF,NTHGRP1(9) ,LONG_TMP ,
+     2                      WA            ,PM                 ,GEO               ,IPART,
+     3                      SUBSETS       ,OUTPUT%TH%ITHGRPI  ,OUTPUT%TH%ITHBUFI ,IGEO    ,
+     4                      IPM           ,IPART(1+LIPART1*(NPART+NTHPART)+16*(NPART+NTHPART)),2,1,
+     5                      1             ,ITHVAR ,ITHFLAG,NAMES_AND_TITLES)
      
               FILNAMABF=ROOTNAM(1:ROOTLEN)//'_'//CHRUN//'_i.abf'
               LONG = 11
@@ -2200,12 +2208,7 @@ c
 #endif
         ENDIF
       ENDIF
-      CALL INIT_TH0( IPARG,ELBUF_TAB,IGEO,IXR,
-     .               ITHGRP,ITHGRPA,ITHGRPB,ITHGRPC,ITHGRPD,
-     .               ITHGRPE,ITHGRPF,ITHGRPG,ITHGRPH,ITHGRPI,
-     .               ITHBUF,ITHBUFA,ITHBUFB,ITHBUFC,ITHBUFD,
-     .               ITHBUFE,ITHBUFF,ITHBUFG,ITHBUFH,ITHBUFI,
-     .               WEIGHT)
+      CALL INIT_TH0( IPARG,MAT_ELEM%ELBUF,IGEO,IXR,OUTPUT%TH,WEIGHT)
       CALL TRACE_OUT(18)
 C---------------------------------------------------------------------
 #ifdef DNC
@@ -2222,7 +2225,7 @@ C Send Data / Fem Structures
         K5=K4+NUMELT
         K6=K5+NUMELP
         K7=K6+NUMELR
-        K8=K7+NUMELUR
+        K8=K7
         K9=K8+NUMELTG
         K10=K9+NUMELX
         K11=K10+NUMSPH
@@ -2237,15 +2240,18 @@ C Send Data / Fem Structures
 C---------------------------------------------------------------------
          ITASK=0
          IRUNN_BIS = IRUNN
-         CALL RESOL_HEAD(ITASK,AF,IAF,IDATA,RDATA,XDP,
-     .                   GRAPHE , IFLOW,   RFLOW , MCP    , TEMP  ,
-     .                   ELBUF_TAB,XFEM_TAB,INTBUF_TAB,STACK,IRUNN_BIS,
-     .                   MULTI_FVM,H3D_DATA,INTBUF_FRIC_TAB,SUBSETS,IGRNOD,
-     .                   IGRBRIC, IGRQUAD, IGRSH4N,IGRSH3N,IGRTRUSS,
-     .                   IGRBEAM, IGRSPRING,IGRPART,IGRSURF,IGRSLIN,
-     .                   FORNEQS  ,MATPARAM_TAB,GROUP_PARAM_TAB,
-     .                   PINCH_DATA, ALE_CONNECTIVITY, T_MONVOL,
-     .                   DRAPE_Q4 ,DRAPE_T3,SENSOR_TAB,EBCS_TAB,DIFFUSION,SEGVAR)
+
+         CALL RESOL_HEAD(ITASK        ,AF              ,IAF             ,IDATA      ,RDATA,XDP ,
+     .                   GRAPHE       ,IFLOW           ,RFLOW           ,MCP        ,TEMP      ,
+     .                   INTBUF_TAB   ,STACK           ,IRUNN_BIS       ,
+     .                   MULTI_FVM    ,H3D_DATA        ,INTBUF_FRIC_TAB ,SUBSETS    ,IGRNOD    ,
+     .                   IGRBRIC      ,IGRQUAD         ,IGRSH4N         ,IGRSH3N    ,IGRTRUSS  ,
+     .                   IGRBEAM      ,IGRSPRING       ,IGRPART         ,IGRSURF    ,IGRSLIN   ,
+     .                   FORNEQS      ,PINCH_DATA      ,ALE_CONNECTIVITY,
+     .                   DRAPE_SH4N   ,DRAPE_SH3N      ,T_MONVOL        ,SENSORS    ,EBCS_TAB        ,
+     .                   DIFFUSION    ,SEGVAR          ,DYNAIN_DATA     ,DRAPEG     ,USER_WINDOWS    ,
+     .                   OUTPUT       ,INTERFACES      ,DT              ,LOADS      ,MAT_ELEM  , PYTHON,
+     .                   NAMES_AND_TITLES, UNITAB)
 C---------------------------------------------------------------------
       CURRENT_RUN = GLOBAL_COMP_TIME%RUN_NBR
       CALL SPMD_REDUCE_DB(GLOBAL_COMP_TIME%ENGINE_TIME(CURRENT_RUN),RESULT,1,0,"MAX ")
@@ -2264,6 +2270,9 @@ C---------------------------------------------------------------------
       ELSE
         N = 1
       ENDIF
+      
+      CALL USER_WINDOWS_CLEAN(USER_WINDOWS)
+      CALL TH_CLEAN(OUTPUT%TH)
       DEALLOCATE(GRAPHE)
       DEALLOCATE(IFLOW, RFLOW)
       CALL FVDEAL()

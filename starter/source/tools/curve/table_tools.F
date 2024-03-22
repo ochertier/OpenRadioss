@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -37,10 +37,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr05_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -63,7 +60,7 @@ Chd|  TABLE_WRESTI                  source/tools/curve/table_tools.F
 Chd|-- called by -----------
 Chd|        DDSPLIT                       source/restart/ddsplit/ddsplit.F
 Chd|-- calls ---------------
-Chd|        WRITE_I_C                     source/output/tools/write_routines.c
+Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|        TABLE_MOD                     share/modules1/table_mod.F    
 Chd|====================================================================
       SUBROUTINE TABLE_WRESTI(TABLE, LENI)
@@ -76,10 +73,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr05_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -127,10 +121,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr05_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -156,100 +147,6 @@ c-----------
       RETURN
       END SUBROUTINE TABLE_WRESTR
 Chd|====================================================================
-Chd|  TABLE_WRESTI_MAT              source/tools/curve/table_tools.F
-Chd|-- called by -----------
-Chd|        WRITE_MATPARAM                source/materials/mat/write_matparam.F
-Chd|-- calls ---------------
-Chd|        WRITE_I_C                     source/output/tools/write_routines.c
-Chd|        TABLE_MOD                     share/modules1/table_mod.F    
-Chd|====================================================================
-      SUBROUTINE TABLE_WRESTI_MAT(TABLE, NUMTABL, LENI)
-C-----------------------------------------------
-      USE TABLE_MOD
-C-----------------------------------------------
-C   I m p l i c i t   T y p e s
-C-----------------------------------------------
-#include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "scr05_c.inc"
-#include      "units_c.inc"
-C-----------------------------------------------
-C   D u m m y   A r g u m e n t s
-C-----------------------------------------------
-      INTEGER NUMTABL,LENI
-      TYPE(TTABLE) TABLE(*)
-C-----------------------------------------------
-C   L o c a l   V a r i a b l e s
-C-----------------------------------------------
-      INTEGER LEN, N, K
-C--------------------------------------
-      LENI=0
-      DO N=1,NUMTABL
-        LEN = 1
-        CALL WRITE_I_C(TABLE(N)%NOTABLE,LEN)
-        LENI = LENI + LEN
-        IF (TABLE(N)%NOTABLE > 0) THEN
-          LEN  = 1
-          CALL WRITE_I_C(TABLE(N)%NDIM,LEN)
-          LENI = LENI + LEN
-          DO K=1,TABLE(N)%NDIM
-            LEN = 1
-            CALL WRITE_I_C( SIZE(TABLE(N)%X(K)%VALUES) , LEN)
-            LENI = LENI + LEN
-          END DO
-          LEN  = 1
-          CALL WRITE_I_C(SIZE(TABLE(N)%Y%VALUES),LEN)
-          LENI = LENI + LEN
-        END IF
-      END DO
-c-----------
-      RETURN
-      END SUBROUTINE TABLE_WRESTI_MAT
-Chd|====================================================================
-Chd|  TABLE_WRESTR_MAT              source/tools/curve/table_tools.F
-Chd|-- called by -----------
-Chd|        WRITE_MATPARAM                source/materials/mat/write_matparam.F
-Chd|-- calls ---------------
-Chd|        WRITE_DB                      source/restart/ddsplit/wrrest.F
-Chd|        TABLE_MOD                     share/modules1/table_mod.F    
-Chd|====================================================================
-      SUBROUTINE TABLE_WRESTR_MAT(TABLE, NUMTABL, LENR)
-C-----------------------------------------------
-      USE TABLE_MOD
-C-----------------------------------------------
-C   I m p l i c i t   T y p e s
-C-----------------------------------------------
-#include      "implicit_f.inc"
-C-----------------------------------------------
-C   D u m m y   A r g u m e n t s
-C-----------------------------------------------
-      INTEGER NUMTABL,LENR
-      TYPE(TTABLE) TABLE(*)
-C-----------------------------------------------
-C   L o c a l   V a r i a b l e s
-C-----------------------------------------------
-      INTEGER LEN, N, K
-C--------------------------------------
-      LENR=0
-      DO N=1,NUMTABL
-        IF (TABLE(N)%NOTABLE > 0) THEN
-          DO K=1,TABLE(N)%NDIM
-            LEN    =SIZE( TABLE(N)%X(K)%VALUES)
-            CALL WRITE_DB(TABLE(N)%X(K)%VALUES,LEN)
-            LENR=LENR+LEN
-          END DO
-          LEN = SIZE( TABLE(N)%Y%VALUES)
-          CALL WRITE_DB(TABLE(N)%Y%VALUES,LEN)
-          LENR=LENR+LEN
-        END IF
-      END DO
-c-----------
-      RETURN
-      END SUBROUTINE TABLE_WRESTR_MAT
-Chd|====================================================================
 Chd|  TABLE_INTERP                  source/tools/curve/table_tools.F
 Chd|-- called by -----------
 Chd|        GET_U_TABLE                   source/user_interface/utable.F
@@ -267,9 +164,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "scr05_c.inc"
 #include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -435,8 +329,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "scr05_c.inc"
 #include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s

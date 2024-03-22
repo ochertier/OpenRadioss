@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -62,9 +62,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr05_c.inc"
@@ -72,10 +69,7 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "units_c.inc"
-#include      "warn_c.inc"
 #include      "param_c.inc"
-#include      "tabsiz_c.inc"
-#include      "submod_c.inc"
 #include      "r2r_c.inc"
 #include      "sphcom.inc"
 #include      "scr03_c.inc"
@@ -110,7 +104,7 @@ C
       DATA MESS/'RBE2 RIGID BODY  '/
 C-----------------------------------------------
 C     IRBE2(1,I) : IAD0 for LRBE2
-C     IRBE2(2,I) : TYPE 	usr' id temporaire (print)
+C     IRBE2(2,I) : TYPE   usr' id temporaire (print)
 C     IRBE2(3,I) : INDEPENDENT NODE
 C     IRBE2(4,I) : REF_DOF
 C     IRBE2(5,I) : NUMBER OF DEPENDENT NODES
@@ -137,8 +131,8 @@ C
         NRB=NRB+1
 C----------Multidomaines --> on ignore les rbe3 non tages---------
         IF(NSUBDOM>0)THEN
-	     IF(TAGRB2(NRB)==0)CALL HM_SZ_R2R(TAGRB2,NRB,LSUBMODEL)
-	    END IF
+               IF(TAGRB2(NRB)==0)CALL HM_SZ_R2R(TAGRB2,NRB,LSUBMODEL)
+              END IF
 C-----------------------------------------------------------------
         CALL HM_OPTION_READ_KEY(LSUBMODEL,
      .                       OPTION_ID = NUSER,
@@ -176,7 +170,7 @@ C
         IF (NS10E > 0) THEN
 C----partial dof of RBE2 will be treated correctly
 C         
-	 IF (ITAGND(M)/=0) THEN
+           IF (ITAGND(M)/=0) THEN
           CALL ANCMSG(MSGID=1211,
      .               MSGTYPE=MSGERROR,
      .               ANMODE=ANINFO,
@@ -184,7 +178,7 @@ C
      .               C1='RBE2',
      .               I2=NUSER,
      .               C2='RBE2')
-	 END IF
+           END IF
         END IF
         ISKS = 0
         IF ((J6(1)+J6(2)+J6(3)+J6(4)+J6(5)+J6(6))==0) THEN
@@ -292,7 +286,7 @@ C--------for decompo
 C  noeud main sur les procs ayant au moins 1 SECONDARY
           DO P = 1, NSPMD
             IF (FMAIN(P)==1) THEN
-	      CALL IFRONTPLUS(M,P)
+                CALL IFRONTPLUS(M,P)
             ENDIF
           ENDDO
         ENDIF
@@ -343,9 +337,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
 #include      "param_c.inc"
-#include      "scr17_c.inc"
 #include      "com04_c.inc"
 #include      "r2r_c.inc"
 C-----------------------------------------------
@@ -374,7 +366,7 @@ C========================================================================|
         NRB=NRB+1
 C----------Multidomaines --> on ignore les rbe2 non tages---------
         IF(NSUBDOM>0)THEN
-	  IF(TAGRB2(NRB)==0)CALL HM_SZ_R2R(TAGRB2,NRB,LSUBMODEL)
+            IF(TAGRB2(NRB)==0)CALL HM_SZ_R2R(TAGRB2,NRB,LSUBMODEL)
         END IF
 C-----------------------------------------------------------------
         CALL HM_OPTION_READ_KEY(LSUBMODEL,
@@ -403,17 +395,9 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr05_c.inc"
-#include      "scr17_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
 #include      "param_c.inc"
 #include      "tabsiz_c.inc"
 C-----------------------------------------------
@@ -558,9 +542,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
@@ -618,17 +599,9 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr05_c.inc"
-#include      "scr17_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
 #include      "param_c.inc"
 #include      "tabsiz_c.inc"
 C-----------------------------------------------
@@ -741,19 +714,13 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr05_c.inc"
 #include      "scr17_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "units_c.inc"
-#include      "warn_c.inc"
 #include      "param_c.inc"
-#include      "tabsiz_c.inc"
 #include      "scr03_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -1025,15 +992,9 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr17_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1108,15 +1069,10 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "units_c.inc"
-#include      "scr17_c.inc"
 #include      "scr03_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
@@ -1220,17 +1176,9 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "units_c.inc"
-#include      "scr17_c.inc"
-#include      "scr03_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1370,19 +1318,10 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr05_c.inc"
-#include      "scr17_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
 #include      "param_c.inc"
-#include      "tabsiz_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1443,12 +1382,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NSL,LRBE2_1(*)  ,LRBE2_2(*),ITAG(*),ISAME
@@ -1481,12 +1414,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1528,12 +1455,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

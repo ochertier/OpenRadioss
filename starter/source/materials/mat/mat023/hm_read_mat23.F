@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -29,8 +29,9 @@ Chd|        ANCMSG                        source/output/message/message.F
 Chd|        HM_GET_FLOATV                 source/devtools/hm_reader/hm_get_floatv.F
 Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
 Chd|        HM_OPTION_IS_ENCRYPTED        source/devtools/hm_reader/hm_option_is_encrypted.F
+Chd|        INIT_MAT_KEYWORD              source/materials/mat/init_mat_keyword.F
 Chd|        ELBUFTAG_MOD                  share/modules1/elbuftag_mod.F 
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/matparam_def_mod.F
+Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
@@ -38,10 +39,9 @@ Chd|====================================================================
      .           UPARAM   ,MAXUPARAM ,NUPARAM  ,NUVAR    ,IFUNC    ,
      .           MAXFUNC  ,NFUNC     ,PARMAT   ,IMATVIS  ,IFORM    ,
      .           UNITAB   ,ID        ,TITR     ,LSUBMODEL,MTAG     ,
-     .           PM       ,IPM       ,ISRATE) 
+     .           PM       ,IPM       ,ISRATE   ,MATPARAM ) 
 C-----------------------------------------------
 C   D e s c r i p t i o n
-C-----------------------------------------------
 C-----------------------------------------------
 C   ROUTINE DESCRIPTION :
 C   ===================
@@ -73,8 +73,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr17_c.inc"
 #include      "units_c.inc"
-#include      "submod_c.inc"
-#include      "sysunit.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -89,7 +87,8 @@ C-----------------------------------------------
       INTEGER, DIMENSION(MAXFUNC), INTENT(INOUT) :: IFUNC
       my_real, DIMENSION(MAXUPARAM), INTENT(INOUT) :: UPARAM
       my_real, INTENT(INOUT) :: PARMAT(*)
-      TYPE(MLAW_TAG_),INTENT(INOUT)         :: MTAG
+      TYPE(MLAW_TAG_),INTENT(INOUT) :: MTAG
+      TYPE(MATPARAM_STRUCT_) ,INTENT(INOUT) :: MATPARAM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -228,6 +227,14 @@ c
 c
       MTAG%L_EPSD  = 1   
       MTAG%L_PLA   = 1   
+c 
+      ! MATPARAM keywords
+      CALL INIT_MAT_KEYWORD(MATPARAM,"ELASTO_PLASTIC")
+c
+      ! Properties compatibility
+      CALL INIT_MAT_KEYWORD(MATPARAM,"SOLID_ISOTROPIC")
+      CALL INIT_MAT_KEYWORD(MATPARAM,"SPH")      
+c
 c-------------------
       RETURN
 c-------------------

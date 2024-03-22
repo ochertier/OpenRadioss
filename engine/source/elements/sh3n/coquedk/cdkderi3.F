@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -46,9 +46,6 @@ C-----------------------------------------------
      .     PX2(*), PY2(*), PX3(*), PY3(*), 
      .     PX(MVSIZ,3), PY(MVSIZ,3), PXY(MVSIZ,3), PYY(MVSIZ,3), 
      .     ALDT(*),ALPE(*),VOL(*),VOLG(*),NU(*),THK2(*)
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -134,13 +131,9 @@ C-----------------------------------------------
      .     BRX2(MVSIZ,3),BRX3(MVSIZ,3),BRY1(MVSIZ,3),BRY2(MVSIZ,3),BRY3(MVSIZ,3),
      .     KSI, ETA
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, J
-C     REAL
       MY_REAL
      .   XR1,XR2,XR3,YR1,YR2,YR3,XS1,XS2,XS3,YS1,YS2,YS3,
      .   X2Y,Y2X,X6,Y6,XY6,RXY1(3),RXY2(3)

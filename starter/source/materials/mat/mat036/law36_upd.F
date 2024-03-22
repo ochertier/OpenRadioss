@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,16 +27,19 @@ Chd|        UPDMAT                        source/materials/updmat.F
 Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
 Chd|        FUNC_INTERS                   source/tools/curve/func_inters.F
+Chd|        ELBUFTAG_MOD                  share/modules1/elbuftag_mod.F 
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        TABLE_MOD                     share/modules1/table_mod.F    
 Chd|====================================================================
       SUBROUTINE LAW36_UPD(IOUT   ,TITR   ,MAT_ID ,NUPARAM,UPARAM ,
-     .                     NFUNC  ,IFUNC  ,FUNC_ID,NPC    ,PLD    )
+     .                     NFUNC  ,IFUNC  ,FUNC_ID,NPC    ,PLD    ,
+     .                     MTAG   ,NFUNCT )
 C----------------------------------------------- 
 C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
       USE TABLE_MOD
+      USE ELBUFTAG_MOD            
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -44,17 +47,19 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
-#include      "com04_c.inc"
 #include      "scr17_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER MAT_ID,IOUT,NUPARAM,NFUNC
-      INTEGER, DIMENSION(NFUNC) :: IFUNC, FUNC_ID
+      INTEGER ,INTENT(IN) :: MAT_ID,IOUT,NUPARAM
+      INTEGER ,INTENT(IN) :: NFUNC    ! number of functions defined in the law
+      INTEGER ,INTENT(IN) :: NFUNCT   ! total number of functions in the system
+      INTEGER, DIMENSION(NFUNC)  :: IFUNC
+      INTEGER, DIMENSION(NFUNCT) :: FUNC_ID
       INTEGER NPC(*)
       my_real UPARAM(NUPARAM),PLD(*)
       CHARACTER*nchartitle  :: TITR
+      TYPE(MLAW_TAG_),INTENT(INOUT)   :: MTAG
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -98,20 +103,24 @@ c
         IF (EPSLAST < EPSMAX) UPARAM(2*NRATE + 7 ) = EPSLAST
         IF (IFAIL == 0)       UPARAM(2*NRATE + 27) = 1    ! IFAIL
         UPARAM(2*NRATE + 28) = 1    ! YLDCHECK
+        MTAG%G_DMG = 1
+        MTAG%L_DMG = 1        
       ELSE IF (Y1 > Y2) THEN                 ! yield function slope is negative 
         EPSLAST = (X2*Y1 - X1*Y2) / (Y1 - Y2)
         IF (EPSLAST < EPSMAX) UPARAM(2*NRATE + 7 ) = EPSLAST
         IF (IFAIL == 0)       UPARAM(2*NRATE + 27) = 1    ! IFAIL
         UPARAM(2*NRATE + 28) = 1    ! YLDCHECK
+        MTAG%G_DMG = 1
+        MTAG%L_DMG = 1        
       ENDIF                                      
 c-----------------------------------------------------------------------    
 c     Check if yield curves for different strain rates do not intersect
 c-----------------------------------------------------------------------
       DO I = 1,NRATE
+        FUNC1 = IFUNC(I)
+        FAC1  = UPARAM(NRATE + 6 + I)
         DO J = I+1,NRATE
-          FUNC1 = IFUNC(I)
           FUNC2 = IFUNC(J)
-          FAC1  = UPARAM(NRATE + 6 + I)
           FAC2  = UPARAM(NRATE + 6 + J)
           IF (FUNC1 > 0 .and. FUNC2 > 0 .and. FUNC1 /= FUNC2) THEN
             CALL FUNC_INTERS(TITR,MAT_ID,FUNC1 ,FUNC2 ,FAC1 ,FAC2 ,

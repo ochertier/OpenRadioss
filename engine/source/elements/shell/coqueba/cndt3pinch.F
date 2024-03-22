@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -45,13 +45,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com06_c.inc"
 #include      "com08_c.inc"
-#include      "couple_c.inc"
-#include      "param_c.inc"
 #include      "scr02_c.inc"
-#include      "scr06_c.inc"
 #include      "scr07_c.inc"
 #include      "scr17_c.inc"
 #include      "scr18_c.inc"
@@ -113,9 +108,9 @@ c dmelc = 2*dmelc !!
 c w^2 < 2k / (m+dmelc+dmelc/3) < 2k / (m+dmelc)
 c dt = 2/w = sqrt( 2*(m+dmelc)/k)
             DMELC(I)=MAX(DMELC(I),
-     .  		(DTMINS/DTFACS)**2 * STI(I) - TWO*MSC(I))
+     .      (DTMINS/DTFACS)**2 * STI(I) - TWO*MSC(I))
             DT(I)  = DTFACS*
-     .  	     SQRT((TWO*MSC(I)+DMELC(I))/MAX(EM20,STI(I)))
+     .         SQRT((TWO*MSC(I)+DMELC(I))/MAX(EM20,STI(I)))
             IF(DT(I)<DT2T)THEN
               DT2T    = DT(I)
               NELTST  = NGL(I)
@@ -132,9 +127,9 @@ c dmelc = 2*dmelc !!
 c w^2 < 2k / (m+dmelc+dmelc/2) < 2k / (m+dmelc)
 c dt = 2/w = sqrt( 2*(m+dmelc)/k)
             DMELC(I)=MAX(DMELC(I),
-     .  		(DTMINS/DTFACS)**2 * STI(I) - TWO*MMIN)
+     .      (DTMINS/DTFACS)**2 * STI(I) - TWO*MMIN)
             DT(I)  = DTFACS*
-     .  	     SQRT((TWO*MMIN+DMELC(I))/MAX(EM20,STI(I)))
+     .         SQRT((TWO*MMIN+DMELC(I))/MAX(EM20,STI(I)))
             IF(DT(I)<DT2T)THEN
               DT2T    = DT(I)
               NELTST  = NGL(I)

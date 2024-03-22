@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,7 +25,7 @@ Chd|  EPORIN3                       source/ale/ale3d/eporin3.F
 Chd|-- called by -----------
 Chd|        INITIA                        source/elements/initia/initia.F
 Chd|-- calls ---------------
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
 Chd|====================================================================
       SUBROUTINE EPORIN3(IXS ,VEUL,ALE_CONNECTIVITY,GEO,NFT,NEL)
 C-----------------------------------------------
@@ -39,7 +39,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
-#include      "mvsiz_p.inc"
 #include      "param_c.inc"
 #include      "com04_c.inc"
 C-----------------------------------------------

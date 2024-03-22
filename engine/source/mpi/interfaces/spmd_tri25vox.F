@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -34,29 +34,21 @@ Chd|        TRI25EBOX                     share/modules/tri25ebox.F
 Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
       SUBROUTINE SPMD_TRI25VOX(
-     1   NSV     ,NSN      ,X      ,V     ,MS     ,
-     2   BMINMAL ,WEIGHT   ,STIFN  ,NIN   ,ISENDTO,
-     3   IRCVFROM,IAD_ELEM ,FR_ELEM,NSNR  ,IGAP   ,
-     4   GAP_S   ,ITAB     ,KINET  ,IFQ   ,INACTI ,
-     5   NSNFIOLD,INTTH    ,IELES  ,AREAS ,TEMP   ,
-     6   NUM_IMP ,NODNX_SMS,GAP_S_L       ,ITYP,
-     7   IRTLM   ,I24_TIME_S,I24_FRFI,I24_PENE_OLD,
-     8   I24_STIF_OLD ,NBINFLG,ILEV ,I24_ICONT_I  ,
-     9   INTFRIC ,IPARTFRICS,ITIED  ,IVIS2, IF_ADH,
-     A   LEDGE, NEDGE, LNDEDGE, STFM, NEDGE_LOCAL,
-     B   GAPE,
-     C   GAP_E_L,
-     D   STFE,
-     E   EDG_BISECTOR,
-     F   VTX_BISECTOR,
-     G   ADMSR,
-     H   IRECT,
-     I   EBINFLG,
-     J   MVOISIN, 
-     K   IEDGE, 
-     L   ICODT,
-     M   ISKEW,IPARTFRIC_E,
-     N   E2S_NOD_NORMAL)
+     1   NSV       ,NSN       ,X        ,V       ,MS         ,
+     2   BMINMAL   ,WEIGHT    ,STIFN    ,NIN     ,ISENDTO    ,
+     3   IRCVFROM  ,IAD_ELEM  ,FR_ELEM  ,NSNR    ,IGAP       ,
+     4   GAP_S     ,ITAB      ,KINET    ,IFQ     ,INACTI     ,
+     5   NSNFIOLD  ,INTTH     ,IELES    ,AREAS   ,TEMP       ,
+     6   NUM_IMP   ,NODNX_SMS ,GAP_S_L  ,ITYP    ,IRTLM      ,
+     7   I24_TIME_S,I24_FRFI  ,I24_PENE_OLD,I24_STIF_OLD     ,
+     8   NBINFLG   ,ILEV      ,I24_ICONT_I,INTFRIC,IPARTFRICS ,
+     9   ITIED     ,IVIS2     , IF_ADH  ,LEDGE   , NEDGE     ,
+     A   LNDEDGE   , STFM     , NEDGE_LOCAL,GAPE , GAP_E_L   ,
+     B   STFE      ,EDG_BISECTOR,VTX_BISECTOR,ADMSR,IRECT    ,
+     D   EBINFLG   ,MVOISIN   ,IEDGE    , ICODT  ,ISKEW      ,
+     E   IPARTFRIC_E,E2S_NOD_NORMAL,ISTIF_MSDT,STIFMSDT_S    ,
+     .                                        STIFMSDT_EDG   ,
+     F  IFSUB_CAREA ,INTAREAN)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -67,7 +59,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -77,14 +68,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "my_allocate.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr02_c.inc"
-#include      "scr18_c.inc"
 #include      "task_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
 #include      "timeri_c.inc"
 #include      "sms_c.inc"
 #include      "i25edge_c.inc"
@@ -108,6 +94,7 @@ C-----------------------------------------------
       INTEGER, INTENT(IN) :: IEDGE
       INTEGER, INTENT(IN) :: ICODT(*)
       INTEGER, INTENT(IN) :: ISKEW(*)
+      INTEGER, INTENT(IN) :: ISTIF_MSDT, IFSUB_CAREA
 
 C     INTEGER :: NSNFIEOLD(*)
 
@@ -119,6 +106,8 @@ C     INTEGER :: NSNFIEOLD(*)
      .        GAP_E_L(*),
      .        STFE(*)
       REAL*4  EDG_BISECTOR(3,4,*),VTX_BISECTOR(3,2,*),E2S_NOD_NORMAL(3,*)
+      my_real , INTENT(IN) ::  STIFMSDT_S(NSN), STIFMSDT_EDG(NEDGE) 
+      my_real , INTENT(IN) :: INTAREAN(NUMNOD)
 
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
@@ -200,10 +189,17 @@ C
          END DO
       END IF
 C
-Cel boite minmax pour le tri provenant de i7buce BMINMA
+C   boite minmax pour le tri provenant de i7buce BMINMA
 C
+      NEDGE_REMOTE = 0
+      DO P = 1, NSPMD
+        NSNFI(NIN)%P(P) = 0
+        IF(IEDGE /= 0) NSNFIE(NIN)%P(P) = 0
+      ENDDO
+
       IF(IRCVFROM(NIN,LOC_PROC)==0.AND.
      .   ISENDTO(NIN,LOC_PROC)==0) RETURN
+
       IF (IMONM > 0) CALL STARTIME(25,1)
       BMINMA(1,LOC_PROC) = BMINMAL(1)
       BMINMA(2,LOC_PROC) = BMINMAL(2)
@@ -212,7 +208,7 @@ C
       BMINMA(5,LOC_PROC) = BMINMAL(5)
       BMINMA(6,LOC_PROC) = BMINMAL(6)
 C
-Cel envoi voxel + boite min/max
+C   envoi voxel + boite min/max
 C
       IF(IRCVFROM(NIN,LOC_PROC)/=0) THEN
         DO P = 1, NSPMD
@@ -233,7 +229,7 @@ C
         ENDDO
       ENDIF
 C
-Cel reception voxel + boites min-max
+C   reception voxel + boites min-max
 C
       IF(ISENDTO(NIN,LOC_PROC)/=0) THEN
         NBIRECV=0
@@ -257,7 +253,7 @@ C
         ENDDO
       ENDIF
 C
-Cel envoi de XREM
+C   envoi de XREM
 C
 C computation of real and integer sending buffers sizes
 c general case
@@ -293,6 +289,11 @@ C Friction
       IF(INTFRIC > 0 ) THEN    
         ISIZ = ISIZ + 1
       ENDIF
+
+C---Stiffness based on mass and time step
+      IF(ISTIF_MSDT > 0) RSIZ = RSIZ + 1
+C---CAREA output 
+      IF(IFSUB_CAREA > 0) RSIZ = RSIZ + 1
 
 C -- IDTMINS==2      
       IF(IDTMINS == 2)THEN     
@@ -512,8 +513,8 @@ C
 C Alloc buffer
 C
           IF( NB_EDGE > 0) THEN
-            MY_ALLOCATE(IBUF_EDGE(P)%P,E_IBUF_SIZE*NB_EDGE)
-            MY_ALLOCATE(RBUF_EDGE(P)%P,E_RBUF_SIZE*NB_EDGE)
+            ALLOCATE(IBUF_EDGE(P)%P(E_IBUF_SIZE*NB_EDGE))
+            ALLOCATE(RBUF_EDGE(P)%P(E_RBUF_SIZE*NB_EDGE))
 
             L = 0
             DO J=1,NB_EDGE
@@ -634,6 +635,8 @@ C TO DO: single precision
                L2 = L2 + 3
                RBUF_EDGE(P)%p(L2:L2+2) = E2S_NOD_NORMAL(1:3,NN2)
 
+               IF(ISTIF_MSDT > 0) RBUF_EDGE(P)%p(E_STIFE_MSDT_FI+ L) = STIFMSDT_EDG(I) 
+              
                L = L + E_RBUF_SIZE
             ENDDO
             
@@ -770,6 +773,30 @@ C Friction
                END DO
                ISHIFT = ISHIFT + 1             
             ENDIF
+
+            IF(ISTIF_MSDT > 0) THEN
+               L = 0
+#include      "vectorize.inc"
+               DO J = 1, NB
+                 I = INDEX(J)
+                 RBUF(P)%p(L+RSHIFT)    =STIFMSDT_S(I)
+                 L = L + RSIZ
+               END DO 
+                 RSHIFT = RSHIFT + 1
+            ENDIF 
+
+
+            IF(IFSUB_CAREA > 0) THEN
+               L = 0
+#include      "vectorize.inc"
+               DO J = 1, NB
+                 I = INDEX(J)
+                 NOD = NSV(I)
+                 RBUF(P)%p(L+RSHIFT)    =INTAREAN(NOD)
+                 L = L + RSIZ
+               END DO 
+                 RSHIFT = RSHIFT + 1
+            ENDIF 
                
 C -- IDTMINS==2
             IF(IDTMINS==2)THEN
@@ -950,7 +977,7 @@ C
         DEALLOCATE(INDEX_EDGE) 
       ENDIF
 C
-Cel reception  des donnees XREM
+C   reception  des donnees XREM
 C
       NEDGE_REMOTE = 0
       IF(IRCVFROM(NIN,LOC_PROC)/=0) THEN

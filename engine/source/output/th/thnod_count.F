@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,7 +27,7 @@ Chd|        INIT_TH                       source/output/th/init_th.F
 Chd|-- calls ---------------
 Chd|        PLYXFEM_MOD                   share/modules/plyxfem_mod.F   
 Chd|====================================================================
-      SUBROUTINE THNOD_COUNT(ITHGRP, NTHGRP2, WA_SIZE, INDEX_WA_NOD, ITHBUF, WEIGHT)
+      SUBROUTINE THNOD_COUNT(ITHGRP, NTHGRP2, WA_SIZE, INDEX_WA_NOD, ITHBUF, WEIGHT,SITHBUF)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -41,17 +41,12 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "sphcom.inc"
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
-#include      "scr16_c.inc"
-#include      "task_c.inc"
 #include      "param_c.inc"
 #include      "submodel.inc"
-#include      "tabsiz_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER,INTENT(IN) :: SITHBUF
       INTEGER ITHBUF(*),WEIGHT(NUMNOD)
       INTEGER, INTENT(inout) :: WA_SIZE,NTHGRP2
       INTEGER, DIMENSION(2*NTHGRP2+1), INTENT(inout) :: INDEX_WA_NOD

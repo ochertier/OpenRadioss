@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,7 +20,6 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-C  -------linear only----------------------------
 Chd|====================================================================
 Chd|  R4MAT3                        source/elements/spring/r4mat3.F
 Chd|-- called by -----------
@@ -43,13 +42,11 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "impl2_c.inc"
 #include      "impl1_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER JFT    ,JLT, MGN(*),NPF(*),IGEO(NPROPGI,*)
-C     REAL
       my_real
      .   GEO(NPROPG,*), KX(*),AL0(*),FX(*),DX(*),TF(*),POS(*)
 C-----------------------------------------------
@@ -57,7 +54,6 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,ILEN,ILENG
       INTEGER IECROU(MVSIZ), IFUNC(MVSIZ),IFUNC2(MVSIZ)
-C     REAL
       my_real
      .   A(MVSIZ)
 C-----------------------------------------------
@@ -124,24 +120,17 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER JFT,JLT,NPF(*),IECROU(*), IFUNC(*),IFUNC2(*)
-C     REAL
       my_real
      .   FX(*), KX(*), DX(*), TF(*), POS(4,*),A(*)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-C----s---1----+----2----+----3----+----4----+----5----+----6----+----7--
       INTEGER 
      . I, J,JPOS(MVSIZ), JLEN(MVSIZ),JAD(MVSIZ),
      . JPOS0(MVSIZ),JFUNC,JFUNC2,INDEX(MVSIZ),NC
       my_real
      .   XX(MVSIZ) ,DYDX(MVSIZ) ,YY(MVSIZ),E_SEG,E_T,E_MIN,
      .   X0(MVSIZ),F0(MVSIZ)
-C----s---1----+----2----+----3----+----4----+----5----+----6----+----7--
-C-c'est fait deja--
-C      DO I=JFT,JLT
-C        DX(I)=DX(I)/XL0(I)
-C      ENDDO
 C-------------------------------------
 C        VECTOR INTERPOLATION (ADRESS)
 C-------------------------------------
@@ -211,11 +200,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-#include      "scr05_c.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NPF(*),IFUNCT
@@ -225,12 +209,11 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-C----s---1----+----2----+----3----+----4----+----5----+----6----+----7--
       INTEGER 
      . J,J1,NPOINT,N0
       my_real
      .   X,Y,Y0,E1,E2,XN,YN
-C----s---1----+----2----+----3----+----4----+----5----+----6----+----7--
+C-----------------------------------------------
       E_S = ZERO 
        NPOINT=(NPF(IFUNCT+1)-NPF(IFUNCT))/2+1
        Y0 = ZERO
@@ -253,7 +236,7 @@ C------only traction--------
         IF (X==ZERO) THEN
          X=TF(NPF(IFUNCT)+2)
          Y=TF(NPF(IFUNCT)+3)-Y0
-	ELSE
+          ELSE
          X=TF(NPF(IFUNCT)+2)-X
          Y=TF(NPF(IFUNCT)+3)-Y
         ENDIF
@@ -263,7 +246,7 @@ C------only compression--------
         J1=2*(N0-3)
         X=TF(NPF(IFUNCT)+J1)
         Y=TF(NPF(IFUNCT)+J1+1)-Y0
-C------w/o zero point--------------	
+C------w/o zero point--------------
         IF (N0==(NPOINT+1)) THEN
          J1=2*(N0-4)
          X=TF(NPF(IFUNCT)+J1)-X
@@ -288,7 +271,7 @@ C------traction 1er point
          IF (ABS(X)>ZERO) E2= Y/X
          E_S= HALF*(E1+E2)
 C------w/o point (0,0)-----
-	ELSE
+          ELSE
          Y=TF(NPF(IFUNCT)+J1+1)-Y0
          E_S= ZERO
          IF (ABS(X-XN)>ZERO) E_S= (Y-YN)/(X-XN)

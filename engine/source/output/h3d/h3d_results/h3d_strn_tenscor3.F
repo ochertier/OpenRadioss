@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,8 +26,8 @@ Chd|-- called by -----------
 Chd|        H3D_SOLID_TENSOR_1            source/output/h3d/h3d_results/h3d_solid_tensor_1.F
 Chd|-- calls ---------------
 Chd|        SROTA6                        source/output/anim/generate/srota6.F
-Chd|        SZSTRAINGPS                   source/elements/solid/solidez/szhour3.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        SZSTRAINGPS                   source/elements/solid/solidez/szstraingps.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        INITBUF_MOD                   share/resol/initbuf.F         
 Chd|====================================================================
       SUBROUTINE STRN_TENSCOR3(ELBUF_TAB,IPARG   ,IXS      ,IXS10   ,X        ,
@@ -46,13 +46,7 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "vect01_c.inc"
 #include      "mvsiz_p.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr01_c.inc"
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
-#include      "scr14_c.inc"
-#include      "scr18_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -187,7 +181,8 @@ C
            NPTR = 2
            NPTS = 2
            NPTT = 2
-           CALL SZSTRAINGPS(LBUF%STRA,STR_IS24,GBUF%STRHG,NEL  )
+           CALL SZSTRAINGPS(
+     1   LBUF%STRA, STR_IS24,  GBUF%STRHG,NEL)
          ENDIF
 C----------
          IF(ISOLNOD == 6 .OR. ISOLNOD == 8 .OR. 
@@ -310,7 +305,9 @@ c       STRHG(NEL,6,8)
                    EVAR_TMP(5) = LBUF%STRA(JJ(5) + I)*HALF
                    EVAR_TMP(6) = LBUF%STRA(JJ(6) + I)*HALF
                    IF (KCVT /= 0)
-     .             CALL SROTA6(X,IXS(1,N),KCVT,EVAR_TMP,GAMA,JHBE,IGTYP)
+     .             CALL SROTA6(
+     1   X,       IXS(1,N),KCVT,    EVAR_TMP,
+     2   GAMA,    JHBE,    IGTYP,   ISORTH)
                    EVAR(1:6,J,I) = EVAR(1:6,J,I) + N1 * EVAR_TMP(1:6)
                  ENDIF
                ENDDO
@@ -444,7 +441,9 @@ c
                    EVAR_TMP(6) =  LBUF%STRA(JJ(6) + I)*HALF
                  ENDIF
                  IF (KCVT /= 0)
-     .           CALL SROTA6(X,IXS(1,N),KCVT,EVAR_TMP,GAMA, JHBE,IGTYP)
+     .           CALL SROTA6(
+     1   X,       IXS(1,N),KCVT,    EVAR_TMP,
+     2   GAMA,    JHBE,    IGTYP,   ISORTH)
                  EVAR(1:6,J,I) = EVAR(1:6,J,I) + N1 * EVAR_TMP(1:6)
                ENDDO
              ENDDO
@@ -482,7 +481,9 @@ c
                  EVAR_TMP(5) = LBUF%STRA(JJ(5) + I)*HALF
                  EVAR_TMP(6) = LBUF%STRA(JJ(6) + I)*HALF
                  IF (KCVT /= 0)
-     .           CALL SROTA6(X,IXS(1,N),KCVT,EVAR_TMP,GAMA, JHBE,IGTYP)
+     .           CALL SROTA6(
+     1   X,       IXS(1,N),KCVT,    EVAR_TMP,
+     2   GAMA,    JHBE,    IGTYP,   ISORTH)
              DO J=1,4
                EVAR(1:6,J,I) = EVAR(1:6,J,I) + N1 * EVAR_TMP(1:6)
              ENDDO
@@ -532,7 +533,9 @@ C
                  EVAR_T10(6,J) = EVAR_T10(6,J)+ N1 *LBUF%STRA(JJ(6) + I)*HALF
                ENDDO
                  IF (KCVT /= 0)
-     .           CALL SROTA6(X,IXS(1,N),KCVT,EVAR_T10(1,J),GAMA, JHBE,IGTYP)
+     .           CALL SROTA6(
+     1   X,            IXS(1,N),     KCVT,         EVAR_T10(1,J),
+     2   GAMA,         JHBE,         IGTYP,        ISORTH)
              ENDDO
              DO J=5,10
                 NN1=IPERM1(J)

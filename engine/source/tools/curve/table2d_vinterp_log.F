@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -45,7 +45,7 @@ Chd|        ARRET                         source/system/arret.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        TABLE_MOD                     share/modules/table_mod.F     
 Chd|====================================================================
-      SUBROUTINE TABLE2D_VINTERP_LOG(TABLE,ISMOOTH,NEL,IPOS,XX,YY,DYDX1,DYDX2)
+      SUBROUTINE TABLE2D_VINTERP_LOG(TABLE,ISMOOTH,DIMX,NEL,IPOS,XX,YY,DYDX1,DYDX2)
 C-----------------------------------------------
       USE TABLE_MOD
       USE MESSAGE_MOD
@@ -67,23 +67,22 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "scr05_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       TYPE(TTABLE)            :: TABLE
-      INTEGER                 :: ISMOOTH,NEL
-      INTEGER ,DIMENSION(:,:) :: IPOS
-      my_real ,DIMENSION(:,:) :: XX
+      INTEGER ,INTENT(IN)                  :: ISMOOTH
+      INTEGER ,INTENT(IN)                  :: NEL
+      INTEGER ,VALUE ,INTENT(IN)           :: DIMX
+      INTEGER ,DIMENSION(DIMX,TABLE%NDIM)  :: IPOS
+      my_real ,DIMENSION(DIMX,TABLE%NDIM)  :: XX
       my_real ,DIMENSION(NEL) :: YY, DYDX1, DYDX2
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER  NXK(2), IB(2,2,NEL) 
       INTEGER :: I,I1,I2,J1,J2,K,N,M,L,IN,IM,IL,N1,IL1,IL2,NDIM
-      my_real :: DX1,DX2,YA1,YA2,YB1,YB2,X1_1,X1_2,X2_1,X2_2,
+      my_real :: DX1,DX2,YA1,YA2,YB1,YB2,X1_1,X1_2,X2_1,X2_2,XX2,
      .           X1,X2,Y1,Y2,R1,R2,UNR1,UNR2
       TYPE(TTABLE_XY)                ,POINTER :: TY
       TYPE(TTABLE_XY), DIMENSION(:)  ,POINTER :: TX
@@ -201,9 +200,11 @@ c
             X1_2 = TX(1)%VALUES(I2)                                
             X2_1 = TX(2)%VALUES(J1)                                  
             X2_2 = TX(2)%VALUES(J2)
+            XX2  = MAX(XX(I,2), EM10)
+            X2_1 = MAX(X2_1, EM10)                                
 c            
             R1   = (X1_2 - XX(I,1)) / (X1_2 - X1_1)
-            R2   = (LOG10(X2_2) - LOG10(XX(I,2))) / (LOG10(X2_2) - LOG10(X2_1))
+            R2   = (LOG10(X2_2) - LOG10(XX2)) / (LOG10(X2_2) - LOG10(X2_1))
             UNR1 = ONE - R1                                                  
             UNR2 = ONE - R2                                                              
 c                                         
@@ -230,9 +231,11 @@ c
             X1_2 = TX(1)%VALUES(I2)                                
             X2_1 = TX(2)%VALUES(J1)                                  
             X2_2 = TX(2)%VALUES(J2)
+            XX2  = MAX(XX(I,2), EM10)
+            X2_1 = MAX(X2_1, EM10)                                
 c            
             R1   = (X1_2 - XX(I,1)) / (X1_2 - X1_1)
-            R2   = (LOG(X2_2) - LOG(XX(I,2))) / (LOG(X2_2) - LOG(X2_1))
+            R2   = (LOG(X2_2) - LOG(XX2)) / (LOG(X2_2) - LOG(X2_1))
             UNR1 = ONE - R1                                                  
             UNR2 = ONE - R2                                                              
 c                                         

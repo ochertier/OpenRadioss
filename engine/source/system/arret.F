@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -24,7 +24,7 @@ Chd|====================================================================
 Chd|  ARRET                         source/system/arret.F         
 Chd|-- called by -----------
 Chd|        INTBUF_INI                    ../common_source/interf/intbuf_ini.F
-Chd|        PBLAST_LOAD                   ../common_source/modules/pblast_mod.F
+Chd|        PBLAST_LOAD                   ../common_source/modules/loads/pblast_mod.F
 Chd|        UPGRADE_CAND_OPT              ../common_source/interf/upgrade_multimp.F
 Chd|        UPGRADE_LCAND_E2S             ../common_source/interf/upgrade_multimp.F
 Chd|        UPGRADE_LCAND_EDG             ../common_source/interf/upgrade_multimp.F
@@ -228,6 +228,7 @@ Chd|        IND_KTOT                      source/implicit/ind_glob_k.F
 Chd|        INIPAR                        source/mpi/init/inipar.F      
 Chd|        INI_K0H                       source/implicit/imp_solv.F    
 Chd|        INI_KISC                      source/implicit/lin_solv.F    
+Chd|        INTER7_COLLISION_DETECTION    source/interfaces/inter7_collision_detection.F
 Chd|        INTER_COUNT_NODE_CURV         source/interfaces/generic/inter_count_node_curv.F
 Chd|        JOINT_BLOCK_STIFFNESS         source/elements/joint/joint_block_stiffness.F
 Chd|        KTBUF_INI                     source/implicit/imp_init.F    
@@ -265,7 +266,6 @@ Chd|        MULTI_MUSCL_GRADIENTS         source/multifluid/multi_muscl_gradient
 Chd|        MULTI_NRF_EBCS                source/multifluid/multi_nrf_ebcs.F
 Chd|        MULTI_SUBMATLAW               source/multifluid/multi_submatlaw.F
 Chd|        MULTI_TIMEEVOLUTION           source/multifluid/multi_timeevolution.F
-Chd|        MY_BARRIER                    source/system/machine.F       
 Chd|        NDOF_FV                       source/implicit/ind_glob_k.F  
 Chd|        PBLAST_1                      source/loads/pblast/pblast_1.F
 Chd|        PBLAST_2                      source/loads/pblast/pblast_2.F
@@ -294,14 +294,14 @@ Chd|        R_BUFBRIC_22                  source/interfaces/int22/r_bufbric_22.F
 Chd|        S16DERI3                      source/elements/thickshell/solide16/s16deri3.F
 Chd|        S20DERI3                      source/elements/solid/solide20/s20deri3.F
 Chd|        S8DERI3                       source/elements/solid/solide8/s8deri3.F
-Chd|        S8EDERIC3                     source/elements/solid/solide8e/s8ederi3.F
-Chd|        S8EDERICT3                    source/elements/solid/solide8e/s8ederi3.F
+Chd|        S8EDERIC3                     source/elements/solid/solide8e/s8ederic3.F
+Chd|        S8EDERICT3                    source/elements/solid/solide8e/s8ederict3.F
 Chd|        S8SLKE3                       source/elements/solid/solide8s/s8slke3.F
-Chd|        S8ZDERIC3                     source/elements/solid/solide8z/s8zderi3.F
-Chd|        S8ZDERICT3                    source/elements/solid/solide8z/s8zderi3.F
-Chd|        S8ZDERICTO3                   source/elements/solid/solide8z/s8zderi3.F
-Chd|        SECT_READ                     source/tools/sect/sectio.F    
-Chd|        SECT_READP                    source/tools/sect/sectio.F    
+Chd|        S8ZDERIC3                     source/elements/solid/solide8z/s8zderic3.F
+Chd|        S8ZDERICT3                    source/elements/solid/solide8z/s8zderict3.F
+Chd|        S8ZDERICTO3                   source/elements/solid/solide8z/s8zdericto3.F
+Chd|        SECTION_READ                  source/tools/sect/section_read.F
+Chd|        SECTION_READP                 source/tools/sect/section_readp.F
 Chd|        SENSOR_BASE                   source/tools/sensor/sensor_base.F
 Chd|        SIGEPS53                      source/materials/mat/mat053/sigeps53.F
 Chd|        SIGEPS75                      source/materials/mat/mat075/sigeps75.F
@@ -395,8 +395,8 @@ Chd|        TABLE2D_VINTERP_LOG           source/tools/curve/table2d_vinterp_log
 Chd|        TABLE_INTERP                  source/tools/curve/table_tools.F
 Chd|        TABLE_INTERP_DYDX             source/tools/curve/table_tools.F
 Chd|        TABLE_INTERP_LAW76            source/tools/curve/table_tools.F
+Chd|        TABLE_MAT_VINTERP             source/materials/tools/table_mat_vinterp.F
 Chd|        TABLE_RRESTI                  source/tools/curve/table_tools.F
-Chd|        TABLE_RRESTI_MAT              source/tools/curve/table_tools.F
 Chd|        TABLE_VINTERP                 source/tools/curve/table_tools.F
 Chd|        TRACE_PRINT                   source/system/trace_back.F    
 Chd|        TRIBOX3                       stub/fvmbags_stub.F           
@@ -406,6 +406,7 @@ Chd|        UPD_ASPC0                     source/constraints/general/bcs/bc_imp0
 Chd|        UPGRADE_REM_2RY               source/mpi/interfaces/spmd_i7tool.F
 Chd|        USERMAT_SHELL                 source/materials/mat_share/usermat_shell.F
 Chd|        USERMAT_SOLID                 source/materials/mat_share/usermat_solid.F
+Chd|        USER_WINDOWS_ROUTINE          source/user_interface/user_windows.F
 Chd|        WCIUSC2                       source/input/wciusc2.F        
 Chd|        WRITE_INTBUF                  source/output/restart/write_intbuf.F
 Chd|        WRIUSC2                       source/input/wriusc2.F        
@@ -414,8 +415,8 @@ Chd|        XFORC28                       source/elements/xelem/xforc28.F
 Chd|        GET_U_FUNC_X                  source/user_interface/ufunc.F 
 Chd|        GET_U_FUNC_Y                  source/user_interface/ufunc.F 
 Chd|-- calls ---------------
-Chd|        CUR_FIL_C                     source/output/tools/sortie_c.c
-Chd|        DELETE_TMPFILE                source/output/tools/sortie_c.c
+Chd|        CUR_FIL_C                     ../common_source/tools/input_output/write_routtines.c
+Chd|        DELETE_TMPFILE                ../common_source/tools/input_output/write_routtines.c
 Chd|        DELETE_USER_FILE              source/user_interface/dyn_userlib.c
 Chd|        ENGINE_USER_FINALIZE          source/user_interface/dyn_userlib.c
 Chd|        MY_EXIT                       source/system/my_exit.c       
@@ -442,18 +443,15 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "tlock_c.inc"
 #include      "comlock.inc"
-#include      "chara_c.inc"
 #include      "scr20_c.inc"
-
 #include      "com01_c.inc"
 #include      "units_c.inc"
 #include      "task_c.inc"
-#include      "scr05_c.inc"
 #include      "scr06_c.inc"
 #include      "scr07_c.inc"
 #include      "rad2r_c.inc"
+#include      "chara_c.inc"
 #include      "userlib.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -634,7 +632,7 @@ C
 
                 IF (IHTML == 1) CALL REPORT(IH3DREADER,N,IMVW)                ! Htlm report
                 IF (IMVW /= 0) CALL SORTIE_MVW(IMVW,IMVW_REF)               ! MVW output
-                IF ((IRAD2R==1).AND.(ISPMD==0)) CALL SEND_IBUF_C(1,1)	    ! Rad2rad termination
+                IF ((IRAD2R==1).AND.(ISPMD==0)) CALL SEND_IBUF_C(1,1)      ! Rad2rad termination
 
               ENDIF
 

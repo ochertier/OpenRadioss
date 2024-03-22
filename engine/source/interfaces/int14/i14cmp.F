@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -51,10 +51,8 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
-#include      "task_c.inc"
 #include      "param_c.inc"
 #include      "parit_c.inc"
-#include      "scr17_c.inc"
 C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -95,7 +93,7 @@ C-----------------------------------------------
       NDAMP1 =IPARI(10)
       NDAMP2 =IPARI(11)
 C-----------------------------------------------
-      CALL I14ELA(X	,INTBUF_TAB%KSURF ,IGRSURF  ,BUFSF ,NSC    ,
+      CALL I14ELA(X  ,INTBUF_TAB%KSURF ,IGRSURF  ,BUFSF ,NSC    ,
      2      WA(1) ,NSP ,WA(NUMNOD+1) ,INTBUF_TAB%NSV,INTBUF_TAB%IMPACT,
      3      INTBUF_TAB%CIMP ,INTBUF_TAB%NIMP   ,STFAC ,NLO ,GAPMIN   ,
      4      NPC ,PLD   ,WA(2*NUMNOD+1) ,STF  )
@@ -107,10 +105,10 @@ C-----------------------------------------------
      5      WA(2*NUMNOD+1) ,WA(3*NUMNOD+1) ,STF )
 C-----------------------------------------------
 C     Frottement calcule apres amortissement.
-      CALL I14FRT(A	,X     ,V     ,INTBUF_TAB%KSURF ,IGRSURF  ,
+      CALL I14FRT(A  ,X     ,V     ,INTBUF_TAB%KSURF ,IGRSURF  ,
      2      BUFSF ,NSC  ,WA(1) ,NSP   ,WA(NUMNOD+1) ,
      3      INTBUF_TAB%NSV,INTBUF_TAB%IMPACT,INTBUF_TAB%CIMP,INTBUF_TAB%NIMP,
-     4      FRIC   ,NFRIC ,NPC    ,PLD  ,GAPMIN ,STF	,
+     4      FRIC   ,NFRIC ,NPC    ,PLD  ,GAPMIN ,STF  ,
      5      WA(2*NUMNOD+1),WA(3*NUMNOD+1),INTBUF_TAB%VARIABLES(9),MS,STIFN ,
      6      FSAV   ,FCONT  ,FSKYI ,ISKY  ,H3D_DATA)
 C-----------------------------------------------

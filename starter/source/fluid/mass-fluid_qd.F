@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -398,7 +398,7 @@ c$$$      ENDDO
             MFLE(IN,JN)=HALF*RHO*AF(IN)*(CBEM(IN,JN)+CBEM(JN,IN))
             BBEM(IN,JN)=MFLE(IN,JN)
          ENDDO
-      ENDDO	  
+      ENDDO    
 C
       IF(ILVOUT>=3) THEN
         WRITE (*,'(//,A)') ' FLUID MASS MATRIX'
@@ -425,8 +425,8 @@ C---------------------------------
             MASSX=MASSX+NORMAL(1,IN)*MFLE(IN,JN)*NORMAL(1,JN)
             MASSY=MASSY+NORMAL(2,IN)*MFLE(IN,JN)*NORMAL(2,JN)
             MASSZ=MASSZ+NORMAL(3,IN)*MFLE(IN,JN)*NORMAL(3,JN)
-         ENDDO	  
-      ENDDO	  
+         ENDDO    
+      ENDDO    
       WRITE (IOUT,'(/7X,A,E13.5)')  'DAA : RIGID BODY FLUID MASS XX', MASSX
       WRITE (IOUT,'( 7X,A,E13.5)')  'DAA : RIGID BODY FLUID MASS YY', MASSY
       WRITE (IOUT,'( 7X,A,E13.5)')  'DAA : RIGID BODY FLUID MASS ZZ', MASSZ
@@ -465,7 +465,7 @@ C
         ENDDO
       ENDIF
       IF (ALLOCATED(BBEM)) DEALLOCATE(BBEM)
-      IF (ALLOCATED(EBEM))DEALLOCATE(EBEM)	  
-	  
+      IF (ALLOCATED(EBEM))DEALLOCATE(EBEM)    
+            
       RETURN
       END

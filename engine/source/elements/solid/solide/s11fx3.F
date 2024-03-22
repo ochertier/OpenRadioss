@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,9 +26,12 @@ Chd|-- called by -----------
 Chd|        S4FORC3                       source/elements/solid/solide4/s4forc3.F
 Chd|        SFORC3                        source/elements/solid/solide/sforc3.F
 Chd|-- calls ---------------
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
 Chd|====================================================================
-      SUBROUTINE S11FX3(PM,FLUX,ALE_CONNECT,IXS,IPM,BUFMAT)
+      SUBROUTINE S11FX3(
+     1   PM,         FLUX,       ALE_CONNECT,IXS,
+     2   IPM,        BUFMAT,     NEL,        NFT,
+     3   JALE,       JEUL)
       USE ALE_CONNECTIVITY_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -42,13 +45,13 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
-#include      "com08_c.inc"
-#include      "vect01_c.inc"
-#include      "scr06_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: NEL
+      INTEGER, INTENT(IN) :: NFT
+      INTEGER, INTENT(IN) :: JALE
+      INTEGER, INTENT(IN) :: JEUL
       my_real
      .  PM(NPROPM,*),FLUX(6,*),BUFMAT(*)
       INTEGER
@@ -62,7 +65,7 @@ C-----------------------------------------------
 C     Enthalpie entrante par loi 11
 C-----------------------------------------------
       IF(JEUL+JALE==1)THEN
-          DO I=LFT,LLT
+          DO I=1,NEL
              IAD2 = ALE_CONNECT%ee_connect%iad_connect(I + NFT)
             DO K=1,6
             JJ = ALE_CONNECT%ee_connect%connected(IAD2 + K - 1)

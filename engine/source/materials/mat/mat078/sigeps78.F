@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -46,8 +46,6 @@ C-----------------------------------------------
 C   C O M M O N
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "scr17_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   I N P U T   A r g u m e n t s
 C-----------------------------------------------
@@ -243,7 +241,7 @@ C   PROJECTION
 C------------------------------------------------------------
 C=======================================================================
 C       Compute the effective strain increment with Newton algorithm
-	   DEP(I)=UVAR(I,5)
+             DEP(I)=UVAR(I,5)
 C=======================================================================
 C                                  Newton
 C=======================================================================

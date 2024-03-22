@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -33,8 +33,8 @@ Chd|        ANISKEW                       source/output/anim/aniskew.F
 Chd|        ANISKEWF                      source/output/anim/aniskewf.F 
 Chd|        ANI_TXT                       source/output/anim/ani_txt.F  
 Chd|        ANI_TXT50                     source/output/anim/ani_txt.F  
-Chd|        CLOSE_C                       source/output/tools/write_routines.c
-Chd|        CUR_FIL_C                     source/output/tools/write_routines.c
+Chd|        CLOSE_C                       ../common_source/tools/input_output/write_routtines.c
+Chd|        CUR_FIL_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|        DELNUMB0                      source/output/anim/delnumb0.F 
 Chd|        DELNUMBC                      source/output/anim/delnumbc.F 
 Chd|        DELNUMBF                      source/output/anim/delnumbf.F 
@@ -66,6 +66,7 @@ Chd|        DXYZSECT                      source/output/anim/dxyzsect.F
 Chd|        DXYZSPH                       source/output/anim/dxyzsph.F  
 Chd|        DXYZSRG                       source/output/anim/dxyzsrg.F  
 Chd|        FRETITL2                      source/starter/freform.F      
+Chd|        OPEN_C                        ../common_source/tools/input_output/write_routtines.c
 Chd|        PARSOR0                       source/output/anim/parsor0.F  
 Chd|        PARSORC                       source/output/anim/parsorc.F  
 Chd|        PARSORF                       source/output/anim/parsorf.F  
@@ -74,14 +75,14 @@ Chd|        TENSOR0                       source/output/anim/tensor0.F
 Chd|        TENSORC                       source/output/anim/tensorc.F  
 Chd|        TENSORS                       source/output/anim/tensors.F  
 Chd|        VELVEC                        source/output/anim/velvec.F   
-Chd|        WRITE_C_C                     source/output/tools/write_routines.c
-Chd|        WRITE_I_C                     source/output/tools/write_routines.c
-Chd|        WRITE_R_C                     source/output/tools/write_routines.c
-Chd|        WRITE_S_C                     source/output/tools/write_routines.c
+Chd|        WRITE_C_C                     ../common_source/tools/input_output/write_routtines.c
+Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
+Chd|        WRITE_R_C                     ../common_source/tools/input_output/write_routtines.c
+Chd|        WRITE_S_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|        XYZ16                         source/output/anim/genani1.F  
 Chd|        XYZNOR                        source/output/anim/xyznor.F   
 Chd|        XYZNOR16                      source/output/anim/genani1.F  
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        FVBAG_MOD                     share/modules1/fvbag_mod.F    
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        INOUTFILE_MOD                 ../common_source/modules/inoutfile_mod.F
@@ -91,8 +92,8 @@ Chd|====================================================================
      2                   IXT    , IXP    , IXR   , IXTG   , SWAFT   ,
      3                   IPARG  , PM     , GEO   , SKEW   , ITAB    ,
      4                   LPBY   , NPBY   , NSTRF , RWBUF  , NPRW    ,
-     5                   IXUR   , IPART  , IPARTS, IPARTQ , IPARTC  ,
-     6                   IPARTT , IPARTP , IPARTR, IPARTUR, IPARTTG ,
+     5                   IPART  , IPARTS, IPARTQ , IPARTC  ,
+     6                   IPARTT , IPARTP , IPARTR, IPARTTG ,
      7                   RBY   , SWA4   , 
      8                   IGRSURF, BUFSF  , IPARTX, KXSP   , IXSP    ,
      9                   IPARTSP, SPBUF  , IXS10 , IXS20  , IXS16   ,
@@ -120,8 +121,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com05_c.inc"
-#include      "com08_c.inc"
 #include      "com09_c.inc"
 #include      "sphcom.inc"
 #include      "param_c.inc"
@@ -130,8 +129,6 @@ C-----------------------------------------------
 #include      "scr14_c.inc"
 #include      "scr15_c.inc"
 #include      "scr16_c.inc"
-#include      "scr23_c.inc"
-#include      "rnur_c.inc"
 #include      "scr12_c.inc"
 #include      "scr17_c.inc"
 C-----------------------------------------------
@@ -140,9 +137,9 @@ C-----------------------------------------------
       INTEGER IXS(NIXS,*), IXQ(NIXQ,*), IXC(NIXC,*), IXT(NIXT,*),
      .        IXP(NIXP,*), IXR(NIXR,*), IXTG(NIXTG,*), SWAFT,
      .        IPARG(NPARG,*), ITAB(*), LPBY(*), NPBY(NNPBY,*),
-     .        NSTRF(*), NPRW(*), IXUR(NIXUR,*), IPART(LIPART1,*),
+     .        NSTRF(*), NPRW(*), IPART(LIPART1,*),
      .        IPARTS(*), IPARTQ(*), IPARTC(*), IPARTT(*),
-     .        IPARTP(*), IPARTR(*), IPARTUR(*), IPARTTG(*),SWA4, 
+     .        IPARTP(*), IPARTR(*),  IPARTTG(*),SWA4, 
      .        IPARTX(*), KXSP(NISP,*),IXSP(KVOISPH,*),
      .        IPARTSP(*), IXS10(6,*), IXS20(12,*), IXS16(8,*),
      .        IPM(NPROPMI,*), IGEO(NPROPGI,*), SMATER, SEL2FA,
@@ -199,7 +196,7 @@ Cf51e11 +2
       CHARACTER*80 STRZZ
 C
         LTITL = 40
-Cvf      ENDIF
+C        ENDIF
       IF(ANIM_VERS<44)THEN
        ISPH3D=1
       ELSE
@@ -284,19 +281,16 @@ C=======================================================================
       DO I=1,NUMELTG
         MATER(IPARTTG(I))=1
       ENDDO
-      DO I=1,NUMELUR
-        MATER(IPARTUR(I))=1
-      ENDDO
 C
       NBPART = 0
       DO I=1,NPART
         NBPART = NBPART + MATER(I)
       ENDDO
 C
-      NBF =  NUMELQ + NUMELC + NUMELTG + NUMELUR
+      NBF =  NUMELQ + NUMELC + NUMELTG
       NBF_L = NBF
 C
-      DO I=1,NUMELQ + NUMELC + NUMELTG + NUMELUR + 1
+      DO I=1,NUMELQ + NUMELC + NUMELTG + 1
         EL2FA(I)=0
       ENDDO
 C-----------------------------------------------
@@ -532,8 +526,8 @@ C   PART SORT
 C-----------------------------------------------
       CALL PARSORC(X   ,D, XNORM,IAD  ,CDG   ,
      .            BUFEL,IPARG,IXQ  ,IXC   ,IXTG ,
-     .            INVERT,EL2FA,IXUR ,
-     .            MATER,IPARTQ,IPARTC,IPARTUR,IPARTTG,
+     .            INVERT,EL2FA,
+     .            MATER,IPARTQ,IPARTC,IPARTTG,
      .            ELBUF_TAB)
 C
       IF(NSECT+NRWALL>0) CALL DPARRWS(
@@ -837,11 +831,8 @@ C-----------------------------------------------
      .   ANIM_CE(25)==1)THEN
          CALL DMASANIC(ELBUF_TAB, X    ,D    ,GEO  ,IPARG,
      .               IXQ  ,IXC  ,IXTG ,MAS  ,PM   ,
-     .               EL2FA,NBF  ,IXUR )
+     .               EL2FA,NBF  )
       ENDIF
-C-----------------------------------------------
-C   N FUNC TEXT
-C-----------------------------------------------
 C-----------------------------------------------
 C   E(quad+shell+truss+..) FUNC TEXT
 C-----------------------------------------------
@@ -883,9 +874,6 @@ C-----------------------------------------------
           CALL ANI_TXT(CTITR(1),25)
        ENDIF
       ENDIF
-C-----------------------------------------------
-C   NODAL FUNC
-C-----------------------------------------------
 C-----------------------------------------------
 C   ELEMENT FUNC (quad+coque)
 C-----------------------------------------------
@@ -1141,7 +1129,7 @@ C
 C--------------------
 C   ELEMENT NUMBERING
 C--------------------
-      CALL DELNUMBC(IPARG,IXQ  ,IXC  ,IXTG ,IXUR,
+      CALL DELNUMBC(IPARG,IXQ  ,IXC  ,IXTG ,
      .              EL2FA,NBF  ,WAFT ,NELCUT,
      .              NBPART,IDCMAX)
       DO J=1,NESBW2
@@ -2585,9 +2573,6 @@ C
          ENDDO
       ENDIF
 C-----------------------------------------------
-C   3D TENSOR TEXT
-C-----------------------------------------------
-C-----------------------------------------------
 C   3D TENSOR (SPH)
 C-----------------------------------------------
       DO I = 1,MX_ANI
@@ -2717,7 +2702,7 @@ Chd|  XYZ16                         source/output/anim/genani1.F
 Chd|-- called by -----------
 Chd|        GENANI1                       source/output/anim/genani1.F  
 Chd|-- calls ---------------
-Chd|        WRITE_R_C                     source/output/tools/write_routines.c
+Chd|        WRITE_R_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|====================================================================
       SUBROUTINE XYZ16(IXS,IXS10,IXS20,IXS16,X)
 C-----------------------------------------------
@@ -2728,8 +2713,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
-#include      "param_c.inc"
-#include      "scr05_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -2806,7 +2789,7 @@ Chd|  XYZNOR16                      source/output/anim/genani1.F
 Chd|-- called by -----------
 Chd|        GENANI1                       source/output/anim/genani1.F  
 Chd|-- calls ---------------
-Chd|        WRITE_S_C                     source/output/tools/write_routines.c
+Chd|        WRITE_S_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|====================================================================
       SUBROUTINE XYZNOR16(IXS,IXS10,IXS20,IXS16,X)
 C-----------------------------------------------
@@ -2817,8 +2800,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
-#include      "param_c.inc"
-#include      "scr05_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

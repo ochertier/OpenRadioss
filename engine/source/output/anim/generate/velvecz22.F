@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,11 +25,11 @@ Chd|  VELVECZ22                     source/output/anim/generate/velvecz22.F
 Chd|-- called by -----------
 Chd|        GENANI                        source/output/anim/generate/genani.F
 Chd|-- calls ---------------
-Chd|        WRITE_R_C                     source/output/tools/sortie_c.c
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        WRITE_R_C                     ../common_source/tools/input_output/write_routtines.c
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        I22BUFBRIC_MOD                ../common_source/modules/cut-cell-search_mod.F
-Chd|        I22TRI_MOD                    ../common_source/modules/cut-cell-search_mod.F
+Chd|        I22BUFBRIC_MOD                ../common_source/modules/interfaces/cut-cell-search_mod.F
+Chd|        I22TRI_MOD                    ../common_source/modules/interfaces/cut-cell-search_mod.F
 Chd|        INITBUF_MOD                   share/resol/initbuf.F         
 Chd|====================================================================
       SUBROUTINE VELVECZ22(ELBUF_TAB,IPARG ,IPARI ,IGRNOD ,   X,
@@ -56,13 +56,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "task_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr05_c.inc"
-#include      "scr14_c.inc"
-#include      "scr17_c.inc"
-#include      "spmd_c.inc"
 #include      "param_c.inc"
 #include      "inter22.inc"
 C-----------------------------------------------

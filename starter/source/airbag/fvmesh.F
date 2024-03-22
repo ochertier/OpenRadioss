@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -61,8 +61,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
-#include      "com04_c.inc"
 #include      "scr17_c.inc"
 #include      "units_c.inc"
 #include      "sysunit.inc"
@@ -1623,7 +1621,7 @@ C Face interne brique/brique
                           N2=FAC6(2,J)
                           N3=FAC6(3,J)
                           N4=FAC6(4,J)
-						ENDIF
+          ENDIF
                      ELSEIF (NTYPE==4) THEN
                         IF(J <= 4) THEN
                           IQUAD=0
@@ -1636,14 +1634,14 @@ C Face interne brique/brique
                           N2=FAC5(2,J)
                           N3=FAC5(3,J)
                           N4=FAC5(4,J)
-						ENDIF
+          ENDIF
                      ELSEIF (NTYPE==1) THEN
                         IQUAD=1
                         N1=FAC(1,J)
                         N2=FAC(2,J)
                         N3=FAC(3,J)
                         N4=FAC(4,J)
-                     ENDIF						  
+                     ENDIF              
 C
                      IF(IQUAD==0) THEN
 C Face=triangle
@@ -1693,7 +1691,7 @@ C
                         NNP=NNP+1
                         POLH_F(2+NNP,NPOLH+I)=NPOLY
                      ELSEIF(IQUAD==1) THEN
-C Face=quadrangle					 
+C Face=quadrangle           
                         NN1=IXS(1+N1,II)
                         NN2=IXS(1+N2,II)
                         NN3=IXS(1+N3,II)
@@ -3420,9 +3418,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       my_real
@@ -3469,9 +3464,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -3516,9 +3509,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 C
 #include      "scr05_c.inc"
-C-----------------------------------------------
-C   D u m m y   A r g u m e n t s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

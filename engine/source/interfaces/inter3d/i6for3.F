@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,15 +26,18 @@ Chd|-- called by -----------
 Chd|        I6MAIN                        source/interfaces/inter3d/i6main.F
 Chd|-- calls ---------------
 Chd|====================================================================
-      SUBROUTINE I6FOR3(IRECT ,MSR   ,NSV   ,IRTL  ,STF   ,
-     2                  STFN  ,IGIMP ,ES    ,EM    ,ANSMX ,
-     3                  FMX   ,FMY   ,FMZ   ,PENI  ,
-     4                  N1    ,N2    ,N3    ,XFACE ,ANS   ,
-     5                  H1    ,H2    ,H3    ,H4    ,THK   ,
-     6                  FNI   ,FXI   ,FYI   ,FZI   ,FX1   ,
-     7                  FX2   ,FX3   ,FX4   ,FY1   ,FY2   ,
-     8                  FY3   ,FY4   ,FZ1   ,FZ2   ,FZ3   ,
-     9                  FZ4)
+      SUBROUTINE I6FOR3(
+     1   IRECT,   MSR,     NSV,     IRTL,
+     2   STF,     STFN,    IGIMP,   ES,
+     3   EM,      ANSMX,   FMX,     FMY,
+     4   FMZ,     PENI,    N1,      N2,
+     5   N3,      XFACE,   ANS,     H1,
+     6   H2,      H3,      H4,      THK,
+     7   FNI,     FXI,     FYI,     FZI,
+     8   FX1,     FX2,     FX3,     FX4,
+     9   FY1,     FY2,     FY3,     FY4,
+     A   FZ1,     FZ2,     FZ3,     FZ4,
+     B   LFT,     LLT,     NFT)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -46,6 +49,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(INOUT) :: LFT
+      INTEGER, INTENT(INOUT) :: LLT
+      INTEGER, INTENT(INOUT) :: NFT
       INTEGER IGIMP
 C     REAL
       my_real
@@ -65,8 +71,6 @@ C     REAL
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com08_c.inc"
-#include      "vect07_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -75,18 +79,6 @@ C     REAL
       my_real
      .   PENET
 C-----------------------------------------------
-!      EQUIVALENCE (N1,BV(1,19)) ,(N2,BV(1,20)) ,(N3,BV(1,21))
-!      EQUIVALENCE (ANS,BV(1,22))
-!      EQUIVALENCE (H1,BV(1,25)) ,(H2,BV(1,26)) ,(H3,BV(1,27))
-!      EQUIVALENCE (H4,BV(1,28)) ,(XFACE,BV(1,29))
-!      EQUIVALENCE (FNI,BV(1,40))
-!      EQUIVALENCE (FXI,BV(1,41)),(FYI,BV(1,42)),(FZI,BV(1,43))
-!      EQUIVALENCE (FX1,BV(1,44)),(FY1,BV(1,45)),(FZ1,BV(1,46))
-!      EQUIVALENCE (FX2,BV(1,47)),(FY2,BV(1,48)),(FZ2,BV(1,49))
-!      EQUIVALENCE (FX3,BV(1,50)),(FY3,BV(1,51)),(FZ3,BV(1,52))
-!      EQUIVALENCE (FX4,BV(1,53)),(FY4,BV(1,54)),(FZ4,BV(1,55))
-!      EQUIVALENCE (THK,BV(1,70))
-C=======================================================================
       DO I=LFT,LLT
         PENET = (ANS(I)-THK(I))*XFACE(I)
         ANSMX = MIN(ANSMX,PENET)

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -39,17 +39,12 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       TYPE (SET_) ::  CLAUSE
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-C-----------------------------------------------
-!
       CLAUSE%NB_NODE= 0             ! CLAUSE nb of nodes
       CLAUSE%NB_PART= 0             ! CLAUSE nb of parts
       CLAUSE%NB_SOLID= 0            ! CLAUSE nb of solids
@@ -63,6 +58,26 @@ C-----------------------------------------------
       CLAUSE%NB_SURF_SEG= 0         ! CLAUSE nb of surfacce's segments
       CLAUSE%NB_LINE_SEG= 0         ! CLAUSE nb of line/edge's segments
       CLAUSE%NB_RBODY= 0            ! CLAUSE nb of Rbodys
+
+      CLAUSE%NB_ELLIPSE= 0          ! CLAUSE nb of Ellipses within a SET (max = 1, one per /SET)
+      CLAUSE%ELLIPSE_IAD_BUFR= 0
+      CLAUSE%ELLIPSE_ID_MADYMO=0
+      CLAUSE%ELLIPSE_N=0
+      CLAUSE%ELLIPSE_XC=0
+      CLAUSE%ELLIPSE_YC=0
+      CLAUSE%ELLIPSE_ZC=0
+      CLAUSE%ELLIPSE_A=0
+      CLAUSE%ELLIPSE_B=0
+      CLAUSE%ELLIPSE_C=0
+
+      CLAUSE%NB_PLANE= 0          ! CLAUSE nb of Planes within a SET (max = 1, one per /SET)
+      CLAUSE%PLANE_IAD_BUFR= 0
+      CLAUSE%PLANE_XM=0
+      CLAUSE%PLANE_YM=0
+      CLAUSE%PLANE_ZM=0
+      CLAUSE%PLANE_XM1=0
+      CLAUSE%PLANE_YM1=0
+      CLAUSE%PLANE_ZM1=0
 !---
       IF(ALLOCATED( CLAUSE%NODE ))          DEALLOCATE( CLAUSE%NODE )
       IF(ALLOCATED( CLAUSE%PART ))          DEALLOCATE( CLAUSE%PART )
@@ -81,6 +96,7 @@ C-----------------------------------------------
       IF(ALLOCATED( CLAUSE%LINE_ELTYP ))    DEALLOCATE( CLAUSE%LINE_ELTYP )
       IF(ALLOCATED( CLAUSE%LINE_ELEM ))     DEALLOCATE( CLAUSE%LINE_ELEM )
       IF(ALLOCATED( CLAUSE%RBODY ))         DEALLOCATE( CLAUSE%RBODY )
+      IF(ALLOCATED( CLAUSE%ELLIPSE_SKEW ))  DEALLOCATE( CLAUSE%ELLIPSE_SKEW )
 C-----
       RETURN
       END

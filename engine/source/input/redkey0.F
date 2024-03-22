@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -29,17 +29,19 @@ Chd|        ERRMSG                        source/input/errmsg.F
 Chd|====================================================================
       SUBROUTINE REDKEY0(KEY0,NKEY,CARTE,IKEY,NSLASH) 
 C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
+      USE NAMES_AND_TITLES_MOD, ONLY: NCHARLINE100
+C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "chara_c.inc"
-#include      "nchara_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NKEY, IKEY,NSLASH(*)
-      CHARACTER(len=ncharline) :: CARTE
-      CHARACTER(len=5) ::  KEY0(NKEY)
+      CHARACTER(LEN=NCHARLINE100) :: CARTE
+      CHARACTER(LEN=5) ::  KEY0(NKEY)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -49,7 +51,7 @@ C-----------------------------------------------
       J=0
       KEY(1:5)='     '
 
-      DO I=2,ncharline 
+      DO I=2,NCHARLINE100 
       IF(CARTE(I:I)=='/')EXIT
       IF(CARTE(I:I)==' ')CYCLE
        J=J+1

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -39,24 +39,18 @@ C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
       USE H3D_MOD
+      USE NAMES_AND_TITLES_MOD, ONLY: NCHARKEY
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "nchara_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IS_ALL, IS_UPPER, IS_LOWER, S_ARG, VALUE, IS_ARG, IS_ARG_ALL, IS_ARG_LOWER, IS_ARG_UPPER,
      .        IS_DEF, IS_ARG_DEF
-      CHARACTER(LEN=ncharkey) ::  KEY2, KEY3, KEY4,KEY5,KEY6,KEY7,KEY8
+      CHARACTER(LEN=NCHARKEY) ::  KEY2, KEY3, KEY4,KEY5,KEY6,KEY7,KEY8
       CHARACTER(LEN=S_ARG) ::  ARG
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
-C   E x t e r n a l   F u n c t i o n s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

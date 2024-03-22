@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -42,7 +42,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
-#include      "com08_c.inc"
 #include      "param_c.inc"
 #include      "impl1_c.inc"
 C-----------------------------------------------
@@ -121,11 +120,7 @@ C     REAL
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com08_c.inc"
 #include      "scr05_c.inc"
-#include      "scr06_c.inc"
-#include      "units_c.inc"
-#include      "parit_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -170,13 +165,9 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER M,N
-C     REAL
       my_real
      .   X(3,*), D(3,*),DR(3,*), A(3,*), AR(3,*)
 C-----------------------------------------------
@@ -224,7 +215,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
-#include      "com08_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -282,17 +272,11 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER N1,N2,M
-C     REAL
-      my_real
-     .   X(3,*),D(3,*),DR(3,*)
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
+      my_real X(3,*),D(3,*),DR(3,*)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, N ,K,IT,NP
-C     REAL
       my_real
      .   XS,YS,ZS,X1(3),X2(3),DRX,DRY,DRZ,L0,L1,S
 C-----------------------------------------------
@@ -381,12 +365,7 @@ C     REAL
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com08_c.inc"
 #include      "scr05_c.inc"
-#include      "scr06_c.inc"
-#include      "units_c.inc"
-#include      "parit_c.inc"
-#include      "com01_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -411,10 +390,10 @@ C---determine iteration num.
         XS=X(1,N)-X(1,M)
         YS=X(2,N)-X(2,M)
         ZS=X(3,N)-X(3,M)
-	LSM(I) = XS*XS+YS*YS+ZS*ZS
+          LSM(I) = XS*XS+YS*YS+ZS*ZS
         LMAX = MAX(LMAX,LSM(I))
        ENDDO
-       NP = RMAX*SQRT(LMAX)*FIVEUANTE
+       NP = RMAX*SQRT(LMAX)*FIFTY
        NP = MIN(ITRMAX,NP)
       IF (NP<=1) THEN
        DO I=1,NSN
@@ -474,8 +453,8 @@ C
          XS=X(1,N)-X(1,M)+D(1,N)-D(1,M)
          YS=X(2,N)-X(2,M)+D(2,N)-D(2,M)
          ZS=X(3,N)-X(3,M)+D(3,N)-D(3,M)
-	 LSM1 =XS*XS+YS*YS+ZS*ZS
-	 A = SQRT(LSM(I)/LSM1)-ONE
+           LSM1 =XS*XS+YS*YS+ZS*ZS
+           A = SQRT(LSM(I)/LSM1)-ONE
          D(1,N)=D(1,N)+A*XS
          D(2,N)=D(2,N)+A*YS
          D(3,N)=D(3,N)+A*ZS
@@ -511,12 +490,7 @@ C     REAL
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com08_c.inc"
 #include      "scr05_c.inc"
-#include      "scr06_c.inc"
-#include      "units_c.inc"
-#include      "parit_c.inc"
-#include      "com01_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C PURPOSE: calculate displacement increment of secnd node by displacement increment of main node.

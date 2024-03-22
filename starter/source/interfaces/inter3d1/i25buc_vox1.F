@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -44,8 +44,7 @@ Chd|====================================================================
      A   IPARTS,KNOD2ELS,NOD2ELS,
      B   IREMNODE,FLAGREMNODE,KREMNODE,REMNODE,
      C   IXS, IXS10, IXS16, IXS20,ICODE,ISKEW ,
-     D   DRAD ,PEN_OLD,DGAPLOAD)
-      USE MESSAGE_MOD
+     D   DRAD ,PEN_OLD,DGAPLOAD,NRTMT,FLAG_REMOVED_NODE)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -56,24 +55,12 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "units_c.inc"
-#include      "warn_c.inc"
 #include      "com04_c.inc"
-#include      "vect07_c.inc"
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
 #include      "scr06_c.inc"
 #include      "scr17_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -85,6 +72,7 @@ C-----------------------------------------------
       INTEGER ITAB(*),NBINFLG(*),MBINFLG(*),ILEV,MSEGTYP(*)
       INTEGER KREMNODE(*),REMNODE(*)
       INTEGER IXS(*), IXS10(*), IXS16(*), IXS20(*)
+      LOGICAL, INTENT(in) :: FLAG_REMOVED_NODE !< flag to remove some S node from the list of candidates
 C     REAL
       my_real
      .   STF(*),STFN(*),X(3,*),GAP_S(*),GAP_M(*),PEN_OLD(5,NSN),
@@ -97,6 +85,7 @@ C     REAL
       CHARACTER*nchartitle,
      .   TITR
       my_real :: LENGTH_TRESHOLD
+      INTEGER , INTENT(IN) :: NRTMT
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -117,7 +106,7 @@ C     REAL
       INTEGER TAGP(NPART),IAD,N,IE,IL,IP
       INTEGER, DIMENSION(:), ALLOCATABLE :: NPARTNS,IELEM,LPARTNS
       INTEGER NBX,NBY,NBZ
-      INTEGER, DIMENSION(:), ALLOCATABLE :: IS_LARGE_NODE,LARGE_NODE
+      INTEGER, DIMENSION(:), ALLOCATABLE :: IS_LARGE_NODE,LARGE_NODE, TAGNOD
       INTEGER :: NB_LARGE_NODES
       INTEGER (KIND=8) :: NBX8,NBY8,NBZ8,RES8,LVOXEL8   
 C-----------------------------------------------
@@ -163,7 +152,7 @@ C      LONGUEUR COTE 4
        DD4=SQRT(DX6**2+DY6**2+DZ6**2)
        DD=DD+ (DD1+DD2+DD3+DD4)
 C-------only for solid---  and coating shell
-       IF (MSEGTYP(L)==0.OR.MSEGTYP(L)>NRTM) THEN
+       IF (MSEGTYP(L)==0.OR.MSEGTYP(L)>NRTMT) THEN
         D_MAX=MAX(DD1,DD2,DD3,DD4)
         D_MAX=MIN(D_MAX,GAP_N(1,L))
 C--------correction of too huge GAP_N(1,L) w/ irregular mesh         
@@ -195,11 +184,11 @@ C       IF (N_SOL>0) THEN
 C        D_MOY  = D_MOY/N_SOL
 C        DD_ST = D_MOY
 C       END IF 
-C       PENSOL  = MIN(HALF*DD_ST,PENSOL)
-C       MARGE_ST  = MAX(MARGE_ST,PENSOL)
+c       PENSOL  = MIN(HALF*DD_ST,PENSOL)
+C       MARGE_ST  = MAX(MARGE_ST,HALF*DD_ST)
 C--------should also think about shells---- 
-C       PENSOL = MAX(PENSOL,HALF*GAP)
-C       PENMAX = PENSOL
+c       PENSOL = MAX(PENSOL,HALF*GAP)
+c       PENMAX = PENSOL
 C       IF (IDDLEVEL == 1 ) WRITE(IOUT,2500) PENMAX
 C      END IF!(PENMAX/=ZERO)
 C     ELSE
@@ -329,12 +318,12 @@ C
 C     LENGTH_TRESHOLD = ((XMAX-XMIN)/ (ONE*NBX+2.0))
 C     LENGTH_TRESHOLD = MAX(LENGTH_TRESHOLD,((YMAX-YMIN)/ (ONE*NBY+2.0)))
 C     LENGTH_TRESHOLD = MAX(LENGTH_TRESHOLD,((ZMAX-ZMIN)/ (ONE*NBZ+2.0)))
-      LENGTH_TRESHOLD = ((XMAX-XMIN))
-      LENGTH_TRESHOLD = MAX(LENGTH_TRESHOLD,((YMAX-YMIN)))
-      LENGTH_TRESHOLD = MAX(LENGTH_TRESHOLD,((ZMAX-ZMIN)))
-      LENGTH_TRESHOLD = LENGTH_TRESHOLD / 4.0
+cccLEDGE removing       LENGTH_TRESHOLD = ((XMAX-XMIN))
+cccLEDGE removing       LENGTH_TRESHOLD = MAX(LENGTH_TRESHOLD,((YMAX-YMIN)))
+cccLEDGE removing       LENGTH_TRESHOLD = MAX(LENGTH_TRESHOLD,((ZMAX-ZMIN)))
+cccLEDGE removing       LENGTH_TRESHOLD = LENGTH_TRESHOLD / 4.0
 ! Heuristic:
-      LENGTH_TRESHOLD = MAX(LENGTH_TRESHOLD,MARGE_ST+BGAPSMX)
+cccLEDGE removing       LENGTH_TRESHOLD = MAX(LENGTH_TRESHOLD,MARGE_ST+BGAPSMX)
      
 
 C--------------------------------
@@ -347,12 +336,17 @@ C--------------------------------
       EDGE_L2(1:NSN)   = ZERO 
       LEDGMAX          = ZERO
 C--------------------------------
-      NB_LARGE_NODES = 0
-      ALLOCATE(LARGE_NODE(NSN))
-      ALLOCATE(IS_LARGE_NODE(NSN))
-      IS_LARGE_NODE(1:NSN) = 0
-      LARGE_NODE(1:NSN) = 0
-      NB_LARGE_NODES = 0
+
+ 
+
+       NB_LARGE_NODES = 0
+       ALLOCATE(LARGE_NODE(NSN))
+       ALLOCATE(IS_LARGE_NODE(NSN))
+       ALLOCATE(TAGNOD(NUMNOD))
+       IS_LARGE_NODE(1:NSN) = 0
+       LARGE_NODE(1:NSN) = 0
+       NB_LARGE_NODES = 0
+       TAGNOD(1:NUMNOD) = 0
 
       IF(IDDLEVEL==1)THEN
         ! Looking for initial penetration (vs solids) if and only if IDDLEVEL=1
@@ -365,11 +359,12 @@ C
            IELEM(IE)=NELS
         END DO
 
+cccLEDGE removing 
         IF(INACTI==5.OR.INACTI==-1)THEN 
 
           ALLOCATE(EDGE_L2_TMP(NUMNOD))
           EDGE_L2_TMP(1:NUMNOD)=ZERO
-C
+          N_SOL = 0
           DO IE=1,NRTM
             IF(STF(IE)/=ZERO)THEN ! Solids only
               DO IL=1,4
@@ -381,6 +376,16 @@ C
      .              + (X(3,N2)-X(3,N1))*(X(3,N2)-X(3,N1)) 
                 EDGE_L2_TMP(N1) = MAX(EDGE_L2_TMP(N1), AAA )
                 EDGE_L2_TMP(N2) = MAX(EDGE_L2_TMP(N2), AAA )
+                IF (MSEGTYP(IE)==0.OR.MSEGTYP(IE)>NRTMT) THEN ! Solids only
+                   IF(TAGNOD(N1)==0) THEN
+                      N_SOL= N_SOL + 1
+                      TAGNOD(N1) = 1
+                   ENDIF
+                   IF(TAGNOD(N2)==0) THEN
+                      N_SOL= N_SOL + 1
+                      TAGNOD(N2) = 1
+                   ENDIF
+                ENDIF
               END DO
             ENDIF
 
@@ -390,29 +395,30 @@ C
           DO I=1,NSN
             N=NSV(I)
             IF(STFN(I)/=ZERO) THEN
-              EDGE_L2(I) = SQRT(EDGE_L2_TMP(N))
-              IF(EDGE_L2(I) > LENGTH_TRESHOLD) THEN
+              EDGE_L2(I) = HALF*SQRT(EDGE_L2_TMP(N))
+c              IF(EDGE_L2(I) > LENGTH_TRESHOLD) THEN
 ! because of LEDGE_MAX, too many voxcell will be checked 
 ! in i24trivox1. In order to avoid that, we deal with large
 ! 'nodes' separately. They will be checked versus every segment, but they 
 ! will not increase LEDGMAX 
-C               WRITE(6,*) "LENGTH_TRESHOLD=",LENGTH_TRESHOLD,EDGE_L2(I)
-                NB_LARGE_NODES = NB_LARGE_NODES + 1 
-                IS_LARGE_NODE(I) = 1 
-                LARGE_NODE(NB_LARGE_NODES) = I
-              ELSE
-                LEDGMAX=MAX(LEDGMAX,EDGE_L2(I))
-              ENDIF
+Cc               WRITE(6,*) "LENGTH_TRESHOLD=",LENGTH_TRESHOLD,EDGE_L2(I)
+c                NB_LARGE_NODES = NB_LARGE_NODES + 1 
+c                IS_LARGE_NODE(I) = 1 
+c                LARGE_NODE(NB_LARGE_NODES) = I
+c              ELSE
+                IF(TAGNOD(N)==1) LEDGMAX=LEDGMAX+EDGE_L2(I)!MAX(LEDGMAX,EDGE_L2(I))
+c              ENDIF
             END IF
           END DO 
 
-          LEDGMAX=ONEP03*LEDGMAX
-C
+          IF(N_SOL > 0) LEDGMAX=HALF*LEDGMAX/N_SOL
 
-C 
+ 
           DEALLOCATE(EDGE_L2_TMP)
-C
+
         ENDIF
+
+cccLEDGE removing 
 
 c        IF(INACTI==5.OR.INACTI==-1)THEN ! Do it for all Inacti ( warnings initial penetrations)
           TAGP(1:NPART)   =0
@@ -498,12 +504,12 @@ C
      8   IREMNODE,FLAGREMNODE,KREMNODE,REMNODE,INACTI,
      9   IPARTS  ,NPARTNS ,LPARTNS ,IELEM   ,ICODE   ,
      A   ISKEW   ,DRAD, IS_LARGE_NODE, LARGE_NODE, NB_LARGE_NODES,
-     B   PEN_OLD ,DGAPLOAD)
+     B   PEN_OLD ,DGAPLOAD,NRTMT,FLAG_REMOVED_NODE)
 C
 C     I_MEM = 2 ==> PAS ASSEZ DE MEMOIRE CANDIDATS
 C
       DEALLOCATE(EDGE_L2,NPARTNS,IELEM,LPARTNS)
-      DEALLOCATE(IS_LARGE_NODE,LARGE_NODE)
+      DEALLOCATE(IS_LARGE_NODE,LARGE_NODE,TAGNOD)
 C
       IF(I_MEM==2)RETURN
 C
@@ -538,28 +544,15 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
-#include      "param_c.inc"
 #include      "com04_c.inc"
-#include      "scr07_c.2.inc"
-#include      "scr03_c.inc" 
-C-----------------------------------------------
-C   L o c a l   V a r i a b l e s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NEL, I
-C     REAL
       INTEGER IRECT(4,*), IXS(NIXS,*), KNOD2ELS(*), NOD2ELS(*), 
      .        IXS10(6,*), IXS16(8,*), IXS20(12,*)
-C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

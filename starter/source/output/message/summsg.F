@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -32,7 +32,6 @@ Chd|====================================================================
       SUBROUTINE SUMMSG()
       USE MESSAGE_MOD
 C-----------------------------------------------
-C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
@@ -41,15 +40,9 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr17_c.inc"
 C-----------------------------------------------
-C   D u m m y   A r g u m e n t s
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "units_c.inc"
-C-----------------------------------------------
-C   E x t e r n a l   F u n c t i o n s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -159,23 +152,23 @@ c
 c
       J = 1
       IF(IWARN /=0) THEN
-	    W_CPT_TYP(J) = W_CPT_TYP(J) + 1
-	    W_OPTION_TYPE(J) = OPTIONTYPE(INDEXOPT(INDEX_WARN(1)))
+              W_CPT_TYP(J) = W_CPT_TYP(J) + 1
+              W_OPTION_TYPE(J) = OPTIONTYPE(INDEXOPT(INDEX_WARN(1)))
             W_OPTION_INDEX(J) = 1
       ENDIF
       DO I=2,CPT
-	  IF( ITAB(1,INDEX_WARN(I)) /= ITAB(1,INDEX_WARN(I-1))  )  THEN
+            IF( ITAB(1,INDEX_WARN(I)) /= ITAB(1,INDEX_WARN(I-1))  )  THEN
             J = J+1
             W_OPTION_INDEX(J) = I
           ENDIF
-	  W_CPT_TYP(J) = W_CPT_TYP(J) + 1
-	  W_OPTION_TYPE(J) = OPTIONTYPE(INDEXOPT(INDEX_WARN(I)))
+            W_CPT_TYP(J) = W_CPT_TYP(J) + 1
+            W_OPTION_TYPE(J) = OPTIONTYPE(INDEXOPT(INDEX_WARN(I)))
       ENDDO
        W_OPTION_INDEX(J+1) = CPT+1
 c
       DO I=2,CPT
-	IF(ITRI_WARN(3,INDEX_WARN(I)) == ITRI_WARN(3,INDEX_WARN(I-1)) ) THEN
-	  ITRI_WARN(4,INDEX_WARN(I)) = ITRI_WARN(4,INDEX_WARN(I-1)) + 1
+          IF(ITRI_WARN(3,INDEX_WARN(I)) == ITRI_WARN(3,INDEX_WARN(I-1)) ) THEN
+            ITRI_WARN(4,INDEX_WARN(I)) = ITRI_WARN(4,INDEX_WARN(I-1)) + 1
         ENDIF
       ENDDO
       CPTWARN = CPT
@@ -272,23 +265,23 @@ c
 c
       J = 1
       IF(IERR /=0) THEN
-	    E_CPT_TYP(J) = E_CPT_TYP(J) + 1
-	    E_OPTION_TYPE(J) = OPTIONTYPE(INDEXOPT(INDEX_ERR(1)))
+              E_CPT_TYP(J) = E_CPT_TYP(J) + 1
+              E_OPTION_TYPE(J) = OPTIONTYPE(INDEXOPT(INDEX_ERR(1)))
             E_OPTION_INDEX(J) = 1
       ENDIF
       DO I=2,CPT
-	  IF( ITAB(1,INDEX_ERR(I)) /= ITAB(1,INDEX_ERR(I-1))  )  THEN
+            IF( ITAB(1,INDEX_ERR(I)) /= ITAB(1,INDEX_ERR(I-1))  )  THEN
             J = J+1
             E_OPTION_INDEX(J) = I
           ENDIF
-	  E_CPT_TYP(J) = E_CPT_TYP(J) + 1
-	  E_OPTION_TYPE(J) = OPTIONTYPE(INDEXOPT(INDEX_ERR(I)))
+            E_CPT_TYP(J) = E_CPT_TYP(J) + 1
+            E_OPTION_TYPE(J) = OPTIONTYPE(INDEXOPT(INDEX_ERR(I)))
       ENDDO
        E_OPTION_INDEX(J+1) = CPT+1
 c
       DO I=2,CPT
-	IF(ITRI_ERR(3,INDEX_ERR(I)) == ITRI_ERR(3,INDEX_ERR(I-1)) ) THEN
-	  ITRI_ERR(4,INDEX_ERR(I)) = ITRI_ERR(4,INDEX_ERR(I-1)) + 1
+          IF(ITRI_ERR(3,INDEX_ERR(I)) == ITRI_ERR(3,INDEX_ERR(I-1)) ) THEN
+            ITRI_ERR(4,INDEX_ERR(I)) = ITRI_ERR(4,INDEX_ERR(I-1)) + 1
         ENDIF
       ENDDO
       CPTERR = CPT
@@ -314,7 +307,7 @@ c
               IF(W_CPT_TYP(J) /= 0) THEN 
                 NBWARN = NBWARN + 1
                 WRITE(TMP_CHAR ,'(2X,A,A,5X,I6,1X,A)') '---',
-     .          	 W_OPTION_TYPE(J),W_CPT_TYP(J),'WARNING(S) '
+     .             W_OPTION_TYPE(J),W_CPT_TYP(J),'WARNING(S) '
                 DO I=1,58
                   SUM_WARN(NBWARN)(I:I) = TMP_CHAR(I:I)
                 ENDDO 
@@ -388,7 +381,7 @@ c
               IF(E_CPT_TYP(J) /= 0) THEN 
                 NBERR = NBERR + 1
                 WRITE(TMP_CHAR ,'(2X,A,A,5X,I6,1X,A)') '---',
-     .          	 E_OPTION_TYPE(J),E_CPT_TYP(J),'  ERROR(S) '
+     .             E_OPTION_TYPE(J),E_CPT_TYP(J),'  ERROR(S) '
                 DO I=1,58
                   SUM_ERR(NBERR)(I:I) = TMP_CHAR(I:I)
                 ENDDO 

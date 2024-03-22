@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -32,7 +32,7 @@ Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.
 Chd|        HM_OPTION_IS_ENCRYPTED        source/devtools/hm_reader/hm_option_is_encrypted.F
 Chd|        INIT_MAT_KEYWORD              source/materials/mat/init_mat_keyword.F
 Chd|        ELBUFTAG_MOD                  share/modules1/elbuftag_mod.F 
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/matparam_def_mod.F
+Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
@@ -58,8 +58,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr17_c.inc"
 #include      "units_c.inc"
-#include      "submod_c.inc"
-#include      "sysunit.inc"
 #include      "param_c.inc"
 C
 C-----------------------------------------------
@@ -314,7 +312,8 @@ c
       ISRATE    = 0
       PARMAT(4) = ZERO
       PARMAT(5) = ZERO
-      IF (ITAB > 0) ASRATE = 10000.0D0*FAC_T_WORK
+      ASRATE = ZERO
+      IF (ITAB > 0) ASRATE = 10000.0D0*UNITAB%FAC_T_WORK
 c
       ! Elasticity parameter
       !  Plane stress elastic constant
@@ -449,6 +448,11 @@ c
       CALL INIT_MAT_KEYWORD(MATPARAM ,"ELASTO_PLASTIC")
       CALL INIT_MAT_KEYWORD(MATPARAM ,"INCREMENTAL"   )
       CALL INIT_MAT_KEYWORD(MATPARAM ,"LARGE_STRAIN"  )
+      CALL INIT_MAT_KEYWORD(MATPARAM ,"HOOK")
+c 
+      ! Properties compatibility
+      CALL INIT_MAT_KEYWORD(MATPARAM,"SOLID_ORTHOTROPIC")
+      CALL INIT_MAT_KEYWORD(MATPARAM,"SHELL_ORTHOTROPIC")
 c
 c--------------------------
 c     Parameters printout
@@ -458,7 +462,7 @@ c--------------------------
       IF (IS_ENCRYPTED) THEN
         WRITE(IOUT,'(5X,A,//)')'CONFIDENTIAL DATA'
       ELSE
-        WRITE(IOUT,1200) RHO0,RHOR
+        WRITE(IOUT,1200) RHO0
         WRITE(IOUT,1300) YOUNG1,YOUNG2,YOUNG3,NU12,NU21,G12,G23,G31
         WRITE(IOUT,1350) Ires
         WRITE(IOUT,1450) XI1,XI2,K1,K2,K3,K4,K5,K6,G1C,D1,D2
@@ -480,8 +484,7 @@ c-----------------------------------------------------------------------
      &(5X,'MATERIAL MODEL : PAPERBOARD LIGHT (PFEIFFER,2019)',/,
      & 5X,'-------------------------------------------------',/)
  1200 FORMAT(
-     & 5X,'INITIAL DENSITY . . . . . . . . . . . .=',1PG20.13/
-     & 5X,'REFERENCE DENSITY . . . . . . . . . . .=',1PG20.13/) 
+     & 5X,'INITIAL DENSITY . . . . . . . . . . . .=',1PG20.13/)
  1300 FORMAT(
      & 5X,'YOUNG MODULUS IN DIRECTION 1. . . . . .=',1PG20.13/
      & 5X,'YOUNG MODULUS IN DIRECTION 2. . . . . .=',1PG20.13/

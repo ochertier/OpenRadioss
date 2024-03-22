@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -49,11 +49,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr05_c.inc"
 #include      "scr17_c.inc"
 #include      "units_c.inc"
 #include      "com04_c.inc"
-#include      "sysunit.inc"
 #include      "tabsiz_c.inc"
 #include      "titr_c.inc"
 C-----------------------------------------------
@@ -109,8 +107,8 @@ C-----------------------------------------------
 
           !---------------------------------!
           !             UNITS               !
-          !---------------------------------!	
-          DO J=1,NUNITS
+          !---------------------------------!
+          DO J=1,UNITAB%NUNITS
             IF (UNITAB%UNIT_ID(J) == UID) THEN    
               FAC_M = UNITAB%FAC_M(J)
               FAC_L = UNITAB%FAC_L(J)
@@ -122,7 +120,7 @@ C-----------------------------------------------
 
           !---------------------------------!
           !             READING             !
-          !---------------------------------!	
+          !---------------------------------!
           I=I+1
 
           CALL HM_GET_FLOATV('SLAS'  ,FI       ,IS_AVAILABLE, LSUBMODEL, UNITAB)        

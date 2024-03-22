@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,7 +25,7 @@ Chd|  W_ICNDS10                     source/restart/ddsplit/w_icnds10.F
 Chd|-- called by -----------
 Chd|        DDSPLIT                       source/restart/ddsplit/ddsplit.F
 Chd|-- calls ---------------
-Chd|        WRITE_I_C                     source/output/tools/write_routines.c
+Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|        NLOCAL                        source/spmd/node/ddtools.F    
 Chd|====================================================================
       SUBROUTINE W_ICNDS10(ICNDS10,ITAGND,PROC,NODLOCAL,NS10E_L,
@@ -34,7 +34,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -45,9 +44,6 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER ICNDS10(3,*),PROC,NS10E_L,ITAGND(*),NODLOCAL(*),LEN_IA,
      .        ITABCNDM(*),NBDDCNDM,NUMNOD_L,itab(*)
-C-----------------------------------------------
-C   F u n c t i o n
-C-----------------------------------------------
 C-----------------------------------------------
 C   F u n c t i o n
 C-----------------------------------------------

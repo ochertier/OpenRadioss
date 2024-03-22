@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -44,6 +44,7 @@ Chd|        CNEVECI                       source/elements/shell/coqueba/cneveci.
 Chd|        CORTH3                        source/elements/shell/coque/corth3.F
 Chd|        CSIGINI4                      source/elements/shell/coqueba/scigini4.F
 Chd|        CSMS11_INI                    source/elements/shell/coque/cinit3.F
+Chd|        CSTRAINI4                     source/elements/shell/coqueba/cstraini4.F
 Chd|        CUSERINI                      source/elements/shell/coque/cuserini.F
 Chd|        CUSERINI4                     source/elements/shell/coqueba/cuserini4.F
 Chd|        CVEOK3                        source/elements/shell/coque/cveok3.F
@@ -52,9 +53,10 @@ Chd|        FRETITL2                      source/starter/freform.F
 Chd|        LAYINI1                       source/elements/shell/coqueba/layini1.F
 Chd|        THICKINI                      source/elements/shell/coqueba/thickini.F
 Chd|        DRAPE_MOD                     share/modules1/drape_mod.F    
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/matparam_def_mod.F
+Chd|        GROUP_PARAM_MOD               ../common_source/modules/mat_elem/group_param_mod.F
+Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        NLOCAL_REG_MOD                ../common_source/modules/nlocal_reg_mod.F
 Chd|        STACK_MOD                     share/modules1/stack_mod.F    
@@ -74,17 +76,20 @@ Chd|====================================================================
      C           NPF      ,TF       ,XFEM_STR ,ISUBSTACK,STACK  ,
      D           RNOISE   ,DRAPE    ,SH4ANG  ,GEO_STACK,
      E           IGEO_STACK,STRC    ,PERTURB  ,IYLDINI ,ELE_AREA,
-     F           NLOC_DMG ,NG       ,GROUP_PARAM)
+     F           NLOC_DMG ,NG       ,GROUP_PARAM, IDRAPE , DRAPEG,
+     G           MAT_PARAM)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE MY_ALLOC_MOD
       USE ELBUFDEF_MOD            
       USE MESSAGE_MOD
       USE STACK_MOD
       USE GROUPDEF_MOD
       USE NLOCAL_REG_MOD
-      USE MATPARAM_DEF_MOD      
+      USE GROUP_PARAM_MOD      
       USE DRAPE_MOD        
+      USE MATPARAM_DEF_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -101,17 +106,14 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "com_xfem1.inc"
 #include      "vect01_c.inc"
-#include      "units_c.inc"
-#include      "scr01_c.inc"
 #include      "scr03_c.inc"
-#include      "warn_c.inc"
 #include      "scry_c.inc"
 #include      "scr17_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NVC,NEL,ITHK,IHBE,ISIGSH,IXFEM,NSIGSH,IUSER,IYLDINI,
-     .        ISUBSTACK,NG
+     .        ISUBSTACK,NG,IDRAPE
       INTEGER IXC(NIXC,*),IPART(*),PTSHEL(*),ITAG(*),ITAGEL(*), 
      .        IGEO(NPROPGI,*), IPM(NPROPMI,*), NSHNOD(*),NPF(*),
      .        SH4TREE(*),IPARG(*),CPT_ELTENS,ITAGN(*),ITAGE(*),
@@ -129,9 +131,11 @@ C-----------------------------------------------
       TYPE (ELBUF_STRUCT_), TARGET ,DIMENSION(NGROUP,*):: XFEM_STR
       !   when XFEM is ON, XFEM_STR's dimension = NGROUP,NXEL
       TYPE (STACK_PLY) :: STACK
-      TYPE (NLOCAL_STR_) :: NLOC_DMG
-      TYPE (GRP_PARAM_STRUCT_)  :: GROUP_PARAM
-      TYPE (DRAPE_) ::  DRAPE(*)
+      TYPE (NLOCAL_STR_)   :: NLOC_DMG
+      TYPE (GROUP_PARAM_)  :: GROUP_PARAM
+      TYPE (DRAPE_)  ::  DRAPE(NUMELC_DRAPE + NUMELTG_DRAPE)
+      TYPE (DRAPEG_) ::  DRAPEG
+      TYPE (MATPARAM_STRUCT_) ,DIMENSION(NUMMAT) ,INTENT(INOUT) :: MAT_PARAM
 C-----------------------------------------------
       TYPE (GROUP_)  , DIMENSION(NGRSHEL) :: IGRSH4N
       TYPE (GROUP_)  , DIMENSION(NGRSH3N) :: IGRSH3N
@@ -157,14 +161,17 @@ c
       my_real , DIMENSION(:) ,POINTER   :: UVAR
       PARAMETER (LAYNPT_MAX = 10)
       PARAMETER (LAY_MAX = 100)
-      INTEGER MATLY(MVSIZ*LAY_MAX)
-      my_real
-     .   POSLY(MVSIZ,LAY_MAX*LAYNPT_MAX)
+      INTEGER, DIMENSION(:),ALLOCATABLE::MATLY
+      my_real, DIMENSION(:,:),ALLOCATABLE :: POSLY
 C-----------------------------------------------
       TYPE(BUF_LAY_) ,POINTER :: BUFLY
       TYPE(L_BUFEL_) ,POINTER :: LBUF     
       TYPE(G_BUFEL_) ,POINTER :: GBUF     
 C=======================================================================
+      ! Allocate buffers
+      CALL MY_ALLOC(MATLY,MVSIZ*LAY_MAX)
+      CALL MY_ALLOC(POSLY,MVSIZ,LAY_MAX*LAYNPT_MAX)
+
       GBUF => ELBUF_STR%GBUF
 c
       IMAT  = IXC(1,1+NFT)         ! mat N   
@@ -201,14 +208,30 @@ C
 C
       LENS = NEL*GBUF%G_STRPG/NPG
     
-      ALLOCATE(DIR_A(NLAY*NEL*2))
-      ALLOCATE(DIR_B(NLAY*NEL*2))
-      DIR_A = ZERO
-      DIR_B = ZERO
+      NPT_ALL = 0
+      DO IL=1,NLAY
+           NPT_ALL = NPT_ALL + ELBUF_STR%BUFLY(IL)%NPTT
+      ENDDO   
+      MPT  = MAX(1,NPT_ALL)
+      IF(NPT_ALL == 0 ) NPT_ALL = NLAY
+      IF (IPARG(6) == 0.OR.NPT==0) MPT=0
+      IF((IGTYP == 51 .OR. IGTYP == 52) .AND. IDRAPE > 0) THEN
+         ALLOCATE(DIR_A(NPT_ALL*NEL*2))
+         ALLOCATE(DIR_B(NPT_ALL*NEL*2))
+         DIR_A = ZERO
+         DIR_B = ZERO
+      ELSE
+         ALLOCATE(DIR_A(NLAY*NEL*2))
+         ALLOCATE(DIR_B(NLAY*NEL*2))
+         DIR_A = ZERO
+         DIR_B = ZERO
+         NPT_ALL = NLAY 
+      ENDIF
 !
       DO I=1,9  ! length max of GBUF%G_SMSTR = 9
         JJ(I) = NEL*(I-1)
       ENDDO
+      NPT_ALL = MAX(NLAY, NPT_ALL)
 !
 C
       IF (ISHXFEM_PLY > 0) THEN
@@ -264,15 +287,10 @@ C------------
      .            MS_LAYER, ZI_LAYER,MS_LAYERC,ZI_LAYERC,
      .            MSZ2C,ZPLY,ISUBSTACK,NLAY,ELBUF_STR,STACK,
      .            GBUF%THK_I,RNOISE   ,DRAPE       ,
-     .            PERTURB,IX1     ,IX2      ,IX3     ,IX4      )
+     .            PERTURB,IX1     ,IX2      ,IX3     ,IX4     ,
+     .            IDRAPE  ,DRAPEG%INDX)
 C-----------------------------------------------
       IF (MTN == 1 .OR. MTN == 3 .OR. MTN == 23 .OR. MTN == 91) NPT = 0
-      NPT_ALL = 0
-      DO IL=1,NLAY
-        NPT_ALL = NPT_ALL + ELBUF_STR%BUFLY(IL)%NPTT
-      ENDDO
-      MPT  = MAX(1,NPT_ALL)
-      IF (IPARG(6) == 0.OR.NPT==0) MPT=0
 C---------------------------
       CALL CDERII(PX1G,PX2G,PY1G,PY2G,
      .            X1  ,X2  ,X3  ,X4  ,Y1  ,Y2  , 
@@ -307,8 +325,9 @@ C
            CALL LAYINI1(
      .        ELBUF_STR  ,LFT        ,LLT        ,GEO        ,IGEO      ,
      .        MAT        ,PID        ,MATLY      ,POSLY      ,IGTYP     ,
-     .        NLAY       ,MPT        ,ISUBSTACK  ,STACK      ,DRAPE      ,
-     .        NFT        ,GBUF%THK   ,NEL        )
+     .        NLAY       ,MPT        ,ISUBSTACK  ,STACK      ,DRAPE     ,
+     .        NFT        ,GBUF%THK   ,NEL        ,IDRAPE     ,SCDRAPE    ,
+     .        DRAPEG%INDX)
         END IF
 c---------------------------
 c     Loop over Gauss points
@@ -320,6 +339,7 @@ c---------------------------
           PTM = (IPG-1)*LENM
           PTS = (IPG-1)*LENS
 c
+
           CALL CMAINI3(ELBUF_STR,PM       ,GEO      ,NEL       ,NLAY     ,
      .                 SKEW     ,IGEO     ,IXC(1,NFT+1),NIXC   ,NUMELC   ,
      .                 NSIGSH   ,SIGSH    ,PTSHEL   ,IGTYP     ,IORTHLOC ,
@@ -329,7 +349,8 @@ c
      .                 IGMAT    ,IMAT     ,IPROP   ,
      .                 X1  ,X2  ,X3  ,X4  ,Y1  ,Y2  ,
      .                 Y3  ,Y4  ,Z1  ,Z2  ,Z3  ,Z4  ,
-     .                 E1X ,E2X ,E3X ,E1Y ,E2Y ,E3Y ,E1Z ,E2Z ,E3Z ,X )
+     .                 E1X ,E2X ,E3X ,E1Y ,E2Y ,E3Y ,E1Z ,E2Z ,E3Z ,X ,
+     .                 NPT_ALL,IDRAPE ,SCDRAPE , DRAPEG%INDX)
 c
           IF (( ISIGSH/=0 .OR. ITHKSHEL == 2) .and. IHBE == 11) THEN
             IF (MPT>0) 
@@ -337,7 +358,8 @@ c
      .             NLAY     ,IREP    ,NEL     ,
      .             X1  ,X2  ,X3  ,X4  ,Y1  ,Y2  ,
      .             Y3  ,Y4  ,Z1  ,Z2  ,Z3  ,Z4  ,
-     .             E1X ,E2X ,E3X ,E1Y ,E2Y ,E3Y ,E1Z ,E2Z ,E3Z )
+     .             E1X ,E2X ,E3X ,E1Y ,E2Y ,E3Y ,E1Z ,E2Z ,E3Z ,
+     .             IDRAPE, IGTYP)
            CALL CSIGINI4(ELBUF_STR,IHBE     ,
      1          LFT      ,LLT      ,NFT      ,MPT      ,ISTRAIN,
      2          GBUF%THK ,GBUF%EINT,GBUF%STRPG(PTS+1),GBUF%HOURG,
@@ -347,6 +369,12 @@ c
      6          GBUF%PLA,THKE    ,IGTYP    ,NEL   ,ISIGSH  ,
      7          E1X   ,E2X      ,E3X      ,E1Y   ,E2Y  ,E3Y,
      8          E1Z   ,E2Z      ,E3Z     ,DIR_A  ,DIR_B,POSLY )
+           IF (ITHKSHEL == 2) THEN
+             DO I=LFT,LLT
+               GBUF%STRA(I+JJ(1:8))=GBUF%STRA(I+JJ(1:8))+
+     .                              FOURTH*GBUF%STRPG(PTS+I+JJ(1:8))
+             END DO
+           END IF 
           ELSEIF ( ITHKSHEL == 1 .AND. IHBE == 11 ) THEN
            CALL THICKINI(LFT     ,LLT   ,NFT    ,PTSHEL,NUMELC,
      2                   GBUF%THK,THKE  ,IXC    ,NIXC  ,NSIGSH,
@@ -376,22 +404,20 @@ c
 c-----------------------------------------------------------------------
 c     tag edge elements in local UVAR for /FAIL/ALTER (XFEM)
       IF (IFAIL > 0 .and. IHBE > 20 .AND. IHBE < 29) THEN
-        CALL FAIL_WINDSHIELD_INIT(
-     .       ELBUF_STR,NEL      ,NFT      ,ITY      ,NGL      ,
-     .       IPM      ,BUFMAT   ,IGRSH4N  ,IGRSH3N  )
+        CALL FAIL_WINDSHIELD_INIT(ELBUF_STR,MAT_PARAM,
+     .       NEL      ,NFT      ,ITY      ,IGRSH4N  ,IGRSH3N  )
       ENDIF
 c
       IF (IHBE == 11) THEN
 C to be checked for IGTYP = 51
-        CALL CFAILINI4(ELBUF_STR,IXC     ,NIXC    ,NPTR    ,NPTS    ,
-     .                 NPTT     ,NLAY    ,IPM     ,SIGSH   ,NSIGSH  ,
-     .                 NUMELC   ,PTSHEL  ,RNOISE  ,PERTURB ,BUFMAT  ,
-     .                 ALDT    ,THKE    )
+        CALL CFAILINI4(ELBUF_STR,NPTR    ,NPTS    ,NPTT    ,NLAY    ,
+     .                 SIGSH    ,NSIGSH  ,PTSHEL  ,RNOISE  ,PERTURB ,
+     .                 MAT_PARAM,ALDT    ,THKE    )
       ELSEIF (IHBE > 20 .AND. IHBE < 29) THEN
 C to be checked for IGTYP = 51
-        CALL CFAILINI(ELBUF_STR,IXC     ,NIXC    ,NPTT    ,NLAY    ,
-     .                IPM      ,SIGSH   ,NSIGSH  ,NUMELC  ,PTSHEL  ,
-     .                RNOISE   ,PERTURB ,BUFMAT  ,ALDT    ,THKE    )
+        CALL CFAILINI(ELBUF_STR,MAT_PARAM,
+     .                NPTT     ,NLAY     ,SIGSH   ,NSIGSH  ,PTSHEL  ,
+     .                RNOISE   ,PERTURB  ,ALDT    ,THKE    )
       ENDIF
 c
 C-----------------------------------------------------------------------
@@ -406,7 +432,7 @@ c----
         IF (ISTRAIN == 1 .AND. NXREF > 0) THEN
 c         REFERENCE STATE, QEPH
 c
-          UVAR => ELBUF_STR%BUFLY(1)%MAT(1,1,1)%VAR  ! 
+          UVAR => ELBUF_STR%BUFLY(1)%MAT(1,1,1)%VAR  !
           CALL CNEPSINI(ELBUF_STR,
      .        LFT      ,LLT     ,ISMSTR     ,MTN      ,ITHK   ,
      .        PM       ,GEO     ,IXC(1,NFT+1),X ,XREFC(1,1,NFT+1),
@@ -421,8 +447,8 @@ c
      .                 GBUF%STRA,THKE,NEL     ,CPT_ELTENS)
           IF (ISMSTR == 1 .AND. MTN==19) IPARG(9)=11
           IF (MTN==58) THEN
-C-------IINT to say NXREF > 0		  
-		    IPARG(36)=1
+C-------IINT to say NXREF > 0      
+              IPARG(36)=1
             DO I=LFT,LLT                          
               II = NFT + I            
               ELBUF_STR%GBUF%HOURG(JJ(1)+I) = XREFC(2,1,II)-XREFC(1,1,II)  
@@ -435,7 +461,7 @@ C-------IINT to say NXREF > 0
               ELBUF_STR%GBUF%HOURG(JJ(8)+I) = XREFC(4,2,II)-XREFC(1,2,II)  
               ELBUF_STR%GBUF%HOURG(JJ(9)+I) = XREFC(4,3,II)-XREFC(1,3,II)  
             ENDDO                                 
-		  END IF
+           END IF
 c
         ELSEIF (ISMSTR == 11 .OR. (ISMSTR==1 .AND. MTN==19) ) THEN
 c
@@ -475,7 +501,8 @@ c---
      .             NLAY     ,IREP    ,NEL     ,
      .             X1  ,X2  ,X3  ,X4  ,Y1  ,Y2  ,
      .             Y3  ,Y4  ,Z1  ,Z2  ,Z3  ,Z4  ,
-     .             E1X ,E2X ,E3X ,E1Y ,E2Y ,E3Y ,E1Z ,E2Z ,E3Z )
+     .             E1X ,E2X ,E3X ,E1Y ,E2Y ,E3Y ,E1Z ,E2Z ,E3Z ,
+     .             IDRAPE, IGTYP)
           CALL CSIGINI4(ELBUF_STR,IHBE   ,
      1         LFT     ,LLT    ,NFT      ,MPT      ,ISTRAIN,
      2         GBUF%THK,GBUF%EINT,GBUF%STRA,GBUF%HOURG,
@@ -485,7 +512,14 @@ c---
      6         GBUF%PLA,THKE    ,IGTYP    ,NEL   ,ISIGSH  ,
      7          E1X   ,E2X      ,E3X      ,E1Y   ,E2Y  ,E3Y,
      8          E1Z   ,E2Z      ,E3Z     ,DIR_A  ,DIR_B,POSLY )
-          ELSEIF ( ITHKSHEL == 1 ) THEN
+C--------to fill GBUF%STRPG     
+         IF (ITHKSHEL == 2.AND.GBUF%G_STRPG>GBUF%G_STRA) 
+     1     CALL CSTRAINI4(LFT   ,LLT    ,NFT    ,NEL    ,NUMSHEL,
+     2           ISTRAIN,GBUF%STRPG,SIGSH ,NSIGSH ,NUMELC ,
+     4           IXC    ,NIXC   ,PTSHEL   ,THKE   ,GBUF%STRA,
+     7           E1X    ,E2X   ,E3X   ,E1Y   ,E2Y  ,E3Y,
+     8           E1Z    ,E2Z   ,E3Z   )
+        ELSEIF ( ITHKSHEL == 1 ) THEN
            CALL THICKINI(LFT     ,LLT   ,NFT    ,PTSHEL,NUMELC,
      2                   GBUF%THK,THKE  ,IXC    ,NIXC  ,NSIGSH,
      3                   SIGSH   )
@@ -638,8 +672,19 @@ C------------
       DO I=LFT,LLT
         IF (GBUF%G_VOL > 0) GBUF%VOL(I) = AREA(I)*GBUF%THK(I)
       ENDDO
+      IF (IXFEM > 0) THEN
+        DO IXEL=1,NXEL
+          DO I=LFT,LLT
+            IF (XFEM_STR(NG,IXEL)%GBUF%G_VOL > 0) 
+     .      XFEM_STR(NG,IXEL)%GBUF%VOL(I) = AREA(I)*GBUF%THK(I)
+          END DO
+        ENDDO
+      ENDIF
 c-----------
       DEALLOCATE(DIR_A)
-      DEALLOCATE(DIR_B)
+      DEALLOCATE(DIR_B)      
+      DEALLOCATE(MATLY)
+      DEALLOCATE(POSLY)
+
       RETURN
       END

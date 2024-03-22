@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -46,7 +46,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "lagmult.inc"
-#include      "units_c.inc"
 #include      "com08_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -113,15 +112,15 @@ C---  second membre
       ENDDO
 C---  Factorise H (Full Cholesky)
       DO J=1,NCL
-	    IF (HLOC(J,J)<=ZERO) THEN
+              IF (HLOC(J,J)<=ZERO) THEN
           CALL ANCMSG(MSGID=112,ANMODE=ANINFO,
      .            I1=J)
           CALL ARRET(2)
-	    ENDIF
+              ENDIF
         HLOC(J,J) = SQRT(HLOC(J,J))
         DO K=1,J-1
           DO I=J+1,NCL
-	        HLOC(I,J) = HLOC(I,J) - HLOC(I,K)*HLOC(J,K)
+                  HLOC(I,J) = HLOC(I,J) - HLOC(I,K)*HLOC(J,K)
           ENDDO
         ENDDO
         DO I=J+1,NCL
@@ -135,7 +134,7 @@ C---  back subst Ly = r,
         DO J=1,I-1
           S = S - HLOC(I,J)*RLOC(J)
         ENDDO
-	    RLOC(I) = S / HLOC(I,I)
+              RLOC(I) = S / HLOC(I,I)
       ENDDO
 C---  back subst Lz = y
       DO I=NCL,1,-1
@@ -143,7 +142,7 @@ C---  back subst Lz = y
         DO J=I+1,NCL
           S = S - HLOC(J,I)*RLOC(J)
         ENDDO
-	    RLOC(I) = S / HLOC(I,I)
+              RLOC(I) = S / HLOC(I,I)
       ENDDO
 C---  update accelerations
       DO K=1,NCL

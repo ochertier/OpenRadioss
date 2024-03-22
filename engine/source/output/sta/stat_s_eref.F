@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -31,7 +31,7 @@ Chd|        SPMD_RGATHER9_DP              source/mpi/interfaces/spmd_outp.F
 Chd|        SPMD_STAT_PGATHER             source/mpi/output/spmd_stat.F 
 Chd|        STRS_TXT50                    source/output/sta/sta_txt.F   
 Chd|        TAB_STRS_TXT50                source/output/sta/sta_txt.F   
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        INITBUF_MOD                   share/resol/initbuf.F         
 Chd|====================================================================
       SUBROUTINE STAT_S_EREF(ELBUF_TAB,IPARG ,IPM ,IGEO ,IXS ,
@@ -58,10 +58,7 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "param_c.inc"
 #include      "units_c.inc"
-#include      "scr01_c.inc"
-#include      "scr05_c.inc"
 #include      "task_c.inc"
-#include      "scr03_c.inc"
 #include      "scr14_c.inc"
 #include      "scr16_c.inc"
 #include      "vect01_c.inc"
@@ -118,7 +115,7 @@ C----- not output all solid element
         ENDDO
 !
         IF (ITY == 1) THEN
-          CALL INITBUF (IPARG    ,NG      ,                    
+          CALL INITBUF(IPARG    ,NG      ,                    
      2          MLW     ,NEL     ,NFT     ,IAD     ,ITY     ,  
      3          NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,  
      4          JTHE    ,JLAG    ,JMULT   ,JHBE    ,JIVF    ,  
@@ -154,8 +151,8 @@ c------
               JJ = JJ + 7
               IF(ISMSTR==1.OR.ISMSTR>=10) THEN
                 IF(ISOLNOD == 8)THEN
-	             DO J = 1,ISOLNOD
-	               NC(J) = IXS(J+1,N)
+                       DO J = 1,ISOLNOD
+                         NC(J) = IXS(J+1,N)
                  ENDDO
                 ELSEIF(ISOLNOD0== 4)THEN
                   NC(1)=IXS(2,N)
@@ -179,13 +176,13 @@ c------
                     NC(J+4) = IXS10(J,NN1)
                   ENDDO
                 ELSEIF(ISOLNOD == 16)THEN
-	              NC(1:8) = IXS(2:9,N)
+                        NC(1:8) = IXS(2:9,N)
                   NN1 = N - (NUMELS8+NUMELS10+NUMELS20)
                   DO J=1,8
                    NC(J+8) = IXS16(J,NN1)
                   ENDDO
                 ELSEIF(ISOLNOD == 20)THEN
-	              NC(1:8) = IXS(2:9,N)
+                        NC(1:8) = IXS(2:9,N)
                   NN1 = N - (NUMELS8+NUMELS10)
                   DO J=1,12
                     NC(J+8) = IXS20(J,NN1)
@@ -314,7 +311,7 @@ c------------------------------------------------
             ENDDO                  
           ENDIF  !  IF (IOFF == 1)
 c---
-        ENDDO		    
+        ENDDO        
       ENDIF
 c-----------
       RETURN
@@ -335,13 +332,9 @@ C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NPE,NEL,IFT,ILT,ISMSTR
-C     REAL
       my_real
      .   X0(MVSIZ,*), Y0(MVSIZ,*), Z0(MVSIZ,*)
       DOUBLE PRECISION 
@@ -350,7 +343,6 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,NPE1,N,N2,N3
-C     REAL
 C-----------------------------------------------
 C
       NPE1=NPE-1

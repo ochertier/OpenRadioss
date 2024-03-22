@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,7 +26,7 @@ Chd|-- called by -----------
 Chd|        I21MAINF                      source/interfaces/int21/i21mainf.F
 Chd|-- calls ---------------
 Chd|        INTSTAMP_GLOB_MOD             share/modules/intstamp_glob_mod.F
-Chd|        TRI7BOX                       share/modules/tri7box.F
+Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
       SUBROUTINE I21COR3(JLT   ,NIN    ,X       ,IRECT ,NSN   ,
      2                NSV      ,CAND_E ,CAND_N  ,STF   ,STFN  ,
@@ -68,7 +68,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com08_c.inc"
 #include      "sms_c.inc"
 #include      "units_c.inc"

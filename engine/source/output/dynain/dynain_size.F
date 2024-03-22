@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,13 +26,15 @@ Chd|-- called by -----------
 Chd|        GENDYNAIN                     source/output/dynain/gendynain.F
 Chd|-- calls ---------------
 Chd|        SPMD_GLOB_ISUM9               source/mpi/interfaces/spmd_th.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
+Chd|        STATE_MOD                     ../common_source/modules/state_mod.F
 Chd|====================================================================
-      SUBROUTINE DYNAIN_SIZE_C(IPARG ,ELBUF_TAB, P0ARS   ,WASZ  )
+      SUBROUTINE DYNAIN_SIZE_C(IPARG ,ELBUF_TAB, P0ARS   ,WASZ  ,DYNAIN_DATA)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
-      USE ELBUFDEF_MOD         
+      USE ELBUFDEF_MOD  
+      USE STATE_MOD       
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -41,7 +43,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "scr05_c.inc"
 #include      "scr16_c.inc"
 #include      "param_c.inc"
 #include      "task_c.inc"
@@ -51,6 +52,7 @@ C-----------------------------------------------
       INTEGER IPARG(NPARG,*),
      .        WASZ,P0ARS
       TYPE (ELBUF_STRUCT_), DIMENSION(NGROUP), TARGET :: ELBUF_TAB
+      TYPE (DYNAIN_DATABASE), INTENT(INOUT) :: DYNAIN_DATA
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -65,7 +67,7 @@ C
       P0ARSZ2 = 0
       WASZ2   = 0
 C
-      IF (DYNAIN_C(4) == 1) THEN
+      IF (DYNAIN_DATA%DYNAIN_C(4) == 1) THEN
 C------------------------------
 C       4: *INITIAL_STRESS_SHELL
 C------------------------------
@@ -117,7 +119,7 @@ C
       P0ARSZ2 = 0
       WASZ2   = 0
 C
-      IF (DYNAIN_C(5) == 1) THEN
+      IF (DYNAIN_DATA%DYNAIN_C(5) == 1) THEN
 C------------------------------
 C       5: *INITIAL_STRAIN_SHELL
 C------------------------------

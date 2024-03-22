@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -41,6 +41,7 @@ Chd|        CREATE_SUBM_LIST_G            source/model/sets/create_subm_clause.F
 Chd|        CREATE_SUBS_LIST              source/model/sets/create_subs_clause.F
 Chd|        CREATE_SUBS_LIST_G            source/model/sets/create_subs_clause.F
 Chd|        HM_PREREAD_PROPERTIES         source/properties/hm_preread_properties.F
+Chd|        HM_READ_DRAPE                 source/properties/composite_options/drape/hm_read_drape.F
 Chd|        HM_READ_PROP17                source/properties/shell/hm_read_prop17.F
 Chd|        HM_READ_PROP51                source/properties/shell/hm_read_prop51.F
 Chd|        HM_READ_STACK                 source/stack/hm_read_stack.F  
@@ -81,11 +82,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "nchar_c.inc"
-#include      "submod_c.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
 C INPUT ARGUMENTS
@@ -97,17 +93,10 @@ C OUTPUT ARGUMENTS
       INTEGER,INTENT(OUT)::IVAL
       LOGICAL,INTENT(OUT)::IS_AVAILABLE
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,VALUE_TYPE,SUB_ID
 C-----------------------------------------------
-C   E x t e r n a l   F u n c t i o n s
-C-----------------------------------------------
-C=======================================================================
-C--------------------------------------------------
       VALUE_TYPE = 0
       SUB_ID = 0
 C--------------------------------------------------

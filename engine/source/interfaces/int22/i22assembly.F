@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -51,12 +51,6 @@ C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "param_c.inc"
-#include      "scr05_c.inc"
-#include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -117,8 +111,8 @@ Chd|        I22FOR3                       source/interfaces/int22/i22for3.F
 Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
 Chd|        ARRET                         source/system/arret.F         
-Chd|        I22BUFBRIC_MOD                ../common_source/modules/cut-cell-search_mod.F
-Chd|        I22TRI_MOD                    ../common_source/modules/cut-cell-search_mod.F
+Chd|        I22BUFBRIC_MOD                ../common_source/modules/interfaces/cut-cell-search_mod.F
+Chd|        I22TRI_MOD                    ../common_source/modules/interfaces/cut-cell-search_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
@@ -149,13 +143,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
-#include      "scr05_c.inc"
 #include      "parit_c.inc"
-#include      "task_c.inc"
-#include      "units_c.inc"
 #include      "com01_c.inc"
-#include      "warn_c.inc"
 #include      "inter22.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s

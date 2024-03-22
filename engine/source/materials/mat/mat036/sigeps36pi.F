@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -23,7 +23,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 Chd|====================================================================
 Chd|  SIGEPS36PI                    source/materials/mat/mat036/sigeps36pi.F
 Chd|-- called by -----------
-Chd|        MULAWP                        source/elements/beam/mulawp.F 
+Chd|        MULAW_IB                      source/elements/beam/mulaw_ib.F
 Chd|-- calls ---------------
 Chd|        VINTER                        source/tools/curve/vinter.F   
 Chd|        FINTER                        source/tools/curve/finter.F   
@@ -31,7 +31,7 @@ Chd|====================================================================
       SUBROUTINE SIGEPS36PI(
      1               NEL     ,KFUNC   ,IPT     ,NPF     ,TF      ,        
      2               NGL     ,TIME    ,TIMESTEP,UPARAM  ,IPM     ,       
-     3               MAT     ,E       ,G       ,OFF     ,DEPSXX  ,      
+     3               IMAT    ,E       ,G       ,OFF     ,DEPSXX  ,      
      4               DEPSXY  ,DEPSXZ  ,SIGOXX  ,SIGOXY  ,SIGOXZ  ,      
      5               SIGNXX  ,SIGNXY  ,SIGNXZ  ,ETSE    ,PLA     ,
      6               EPSP    ,NVARTMP ,VARTMP)      
@@ -74,14 +74,13 @@ C---------+---------+---+---+--------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "com01_c.inc"
-#include      "scr05_c.inc"
 #include      "units_c.inc"
 C-----------------------------------------------
 C   I N P U T   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER ,INTENT(IN) :: IMAT
       INTEGER NEL,NUPARAM,IPT,NVARTMP
-      INTEGER MAT(NEL),NGL(NEL),NPF(*),IPM(NPROPMI,*),KFUNC(*)
+      INTEGER NGL(NEL),NPF(*),IPM(NPROPMI,*),KFUNC(*)
       my_real
      . TIME,TIMESTEP,UPARAM(*),PLA(NEL),EPSP(NEL),
      .   DEPSXX(NEL),DEPSXY(NEL),DEPSXZ(NEL),
@@ -120,15 +119,15 @@ C=======================================================================
       IPLAS  = 1                        
       SHFACT = FIVE_OVER_6
       DO I=1,NEL                            
-        NFUNC  = IPM(10,MAT(I))   
+        NFUNC  = IPM(10,IMAT)   
         DO J=1,NFUNC                         
-          IFUNC(I,J)=IPM(10+J,MAT(I))   
+          IFUNC(I,J)=IPM(10+J,IMAT)   
         ENDDO                                
         FAIL(I) = ONE                            
       ENDDO                                  
 C
+      IADBUF = IPM(7,IMAT)-1                
       DO I=1,NEL                                
-        IADBUF = IPM(7,MAT(I))-1                
         E(I)   = UPARAM(IADBUF+2)                
         G(I)   = UPARAM(IADBUF+5)                
         G3(I)  = THREE*G(I)                      
@@ -139,8 +138,8 @@ c---------------------
         OPTE(I) = UPARAM(IADBUF+2*NRATE(I) + 23) 
         EINF(I) = UPARAM(IADBUF+2*NRATE(I) + 24) 
         CE(I)   = UPARAM(IADBUF+2*NRATE(I) + 25) 
-        IFAIL   = NINT(UPARAM(2*NRATE(I) + 27))    ! flag for failure
-        ISMOOTH = NINT(UPARAM(2*NRATE(I) + 29))    ! strain rate interpolation flag
+        IFAIL   = NINT(UPARAM(IADBUF+2*NRATE(I) + 27))    ! flag for failure
+        ISMOOTH = NINT(UPARAM(IADBUF+2*NRATE(I) + 29))    ! strain rate interpolation flag
 c--------------------
         IF (OPTE(I) == 1)THEN                                                     
            IF(PLA(I) > ZERO)THEN             
@@ -184,13 +183,13 @@ C     Yield Stress
 C-------------------
       JJ(1:NEL) = 1 
       DO I=1,NEL                                     
-        IADBUF = IPM(7,MAT(I))-1
+        IADBUF = IPM(7,IMAT)-1
         DO J=2,NRATE(I)-1                             
           IF (EPSP(I) > UPARAM(IADBUF+6+J)) JJ(I) = J 
         ENDDO                                         
       ENDDO                                           
       DO I=1,NEL                                               
-        IADBUF = IPM(7,MAT(I))-1
+        IADBUF = IPM(7,IMAT)-1
         RATE(I,1) = UPARAM(IADBUF+6+JJ(I))                        
         YFAC(I,1) = UPARAM(IADBUF+6+NRATE(I)+JJ(I))   
         IF (NRATE(I) > 1) THEN         
@@ -230,14 +229,10 @@ C
           J2 = J1+1                                               
           Y1(I) = Y1(I)*YFAC(I,1)                                 
           Y2(I) = Y2(I)*YFAC(I,2)
-          IF (ISMOOTH == 3) THEN       ! log_n  based interpolation of strain rate
+          IF (ISMOOTH == 2) THEN       ! log_n  based interpolation of strain rate
             EPSP1 = MAX(RATE(I,1), EM20)
             EPSP2 = RATE(I,2)
             FAC   = LOG(MAX(EPSP(I),EM20)/EPSP1) / LOG(EPSP2/EPSP1)   
-          ELSE IF (ISMOOTH == 2) THEN  ! log_10 based interpolation of strain rate
-            EPSP1 = MAX(RATE(I,1), EM20)
-            EPSP2 = RATE(I,2)
-            FAC   = LOG10(MAX(EPSP(I),EM20)/EPSP1) / LOG10(EPSP2/EPSP1)   
           ELSE                         ! linear interpolation of strain rate
             EPSP1 = RATE(I,1)
             EPSP2 = RATE(I,2)

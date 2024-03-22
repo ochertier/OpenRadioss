@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -30,6 +30,7 @@ Chd|        I2PEN_ROT27                   ../common_source/interf/i2pen_rot.F
 Chd|        I2REP                         ../common_source/interf/i2rep.F
 Chd|        I2SMS27                       source/interfaces/interf/i2sms27.F
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
+Chd|        OUTMAX_MOD                    ../common_source/modules/outmax_mod.F
 Chd|====================================================================
       SUBROUTINE I2FOR27_PEN(X       ,V       ,VR      ,A       ,AR      ,
      .                   MS_PENA ,IN      ,STIFN   ,STIFR   ,WEIGHT  ,
@@ -37,13 +38,13 @@ Chd|====================================================================
      .                   DR      ,FINI    ,FSAV    ,FNCONT  ,NSN     ,
      .                   STFN    ,STFR    ,VISC    ,PENFLAG ,IROTB   ,
      .                   NOINT   ,NODNX_SMS,DMINT2 ,SAV_FOR_PENA,IRECT,
-     .                   DT2T    ,NELTST   ,ITYPTST,
-     .                   INDXP   ,MINER   ,H3D_DATA,MSEGTYP2,
-     .                   FNCONTP ,FTCONTP)
+     .                   DT2T    ,NELTST  ,ITYPTST ,INDXP   ,SAV_INER_POFF,
+     .                   H3D_DATA,MSEGTYP2,FNCONTP ,FTCONTP)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE H3D_MOD
+      USE OUTMAX_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -68,17 +69,14 @@ C     REAL
      .   CRST(2,*),FSAV(*),FNCONT(3,*),
      .   DMINT2(4,*),SAV_FOR_PENA(8,*),FNCONTP(3,*)   ,FTCONTP(3,*) 
       my_real
-     .   MINER(*)
+     .   SAV_INER_POFF(*)
       TYPE (H3D_DATABASE) :: H3D_DATA
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
-#include      "param_c.inc"
 #include      "com01_c.inc"
 #include      "com06_c.inc"
 #include      "com08_c.inc"
-#include      "scr02_c.inc"
 #include      "scr11_c.inc"
 #include      "scr14_c.inc"
 #include      "sms_c.inc"
@@ -136,13 +134,14 @@ C
           IX3(K) = IRECT(3,L)                                       
           IX4(K) = IRECT(4,L)
 C
-          IF ((MSEGTYP2(L)==1).AND.(IN(I)>EM20)) THEN
-C-- shell main segment --
-            IROT = ONE
-          ELSE
 C-- solid main segment --
-            IROT = ZERO
-          ENDIF 
+          IROT = ZERO
+          IF ((MSEGTYP2(L)==1)) THEN
+C-- shell main segment --
+            IF(SAV_INER_POFF(I) > EM20) THEN
+              IROT = ONE
+            ENDIF 
+          ENDIF
 C
           IF (IX3(K) == IX4(K)) THEN
 C--        Shape functions of triangles
@@ -464,18 +463,19 @@ C
 C
 C--   Secnd node shell of  spring 
 C
-          IF(IN(I)==ZERO.OR.MINER(IX1(K))==ZERO.OR.
-     .                      MINER(IX2(K))==ZERO.OR.
-     .                      MINER(IX3(K))==ZERO.OR.
-     .                      MINER(IX4(K))==ZERO)THEN
+          IF(SAV_INER_POFF(I)==ZERO.OR.SAV_INER_POFF(IX1(K))==ZERO.OR.
+     .                      SAV_INER_POFF(IX2(K))==ZERO.OR.
+     .                      SAV_INER_POFF(IX3(K))==ZERO.OR.
+     .                      SAV_INER_POFF(IX4(K))==ZERO)THEN
             INHARM = ZERO
           ELSEIF(NIR==4)THEN
-            INHARM = ONE/IN(I) + 
-     .              ONE/MINER(IX1(K)) + ONE/MINER(IX2(K)) + ONE/MINER(IX3(K)) + ONE/MINER(IX4(K))
+            INHARM = ONE/SAV_INER_POFF(I) + 
+     .               ONE/SAV_INER_POFF(IX1(K)) + ONE/SAV_INER_POFF(IX2(K)) +
+     .               ONE/SAV_INER_POFF(IX3(K)) + ONE/SAV_INER_POFF(IX4(K))
             INHARM = ONE/INHARM
           ELSE
-            INHARM = ONE/IN(I) + 
-     .              ONE/MINER(IX1(K)) + ONE/MINER(IX2(K)) + ONE/MINER(IX3(K))
+            INHARM = ONE/SAV_INER_POFF(I) + 
+     .               ONE/SAV_INER_POFF(IX1(K)) + ONE/SAV_INER_POFF(IX2(K)) + ONE/SAV_INER_POFF(IX3(K))
             INHARM = ONE/INHARM
           END IF
 C
@@ -707,7 +707,26 @@ C
             FTCONTP(1,IX4(K)) = FTCONTP(1,IX4(K)) + FT(1)*H(4,K)*W
             FTCONTP(2,IX4(K)) = FTCONTP(2,IX4(K)) + FT(2)*H(4,K)*W
             FTCONTP(3,IX4(K)) = FTCONTP(3,IX4(K)) + FT(3)*H(4,K)*W
-         ENDIF
+          ENDIF
+
+C
+          IF ((H3D_DATA%N_VECT_CONT2M > 0).AND.(IROT > 0)) THEN ! Moment output in h3d
+             MCONT2(1,I) =  (-MGX + MRX)*W
+             MCONT2(2,I) =  (-MGY + MRY)*W
+             MCONT2(3,I) =  (-MGZ + MRZ)*W
+             MCONT2(1,IX1(K)) = MCONT2(1,IX1(K)) + MX(1)*H(1,K)*W
+             MCONT2(2,IX1(K)) = MCONT2(2,IX1(K)) + MY(1)*H(1,K)*W
+             MCONT2(3,IX1(K)) = MCONT2(3,IX1(K)) + MZ(1)*H(1,K)*W
+             MCONT2(1,IX2(K)) = MCONT2(1,IX2(K)) + MX(2)*H(2,K)*W
+             MCONT2(2,IX2(K)) = MCONT2(2,IX2(K)) + MY(2)*H(2,K)*W
+             MCONT2(3,IX2(K)) = MCONT2(3,IX2(K)) + MZ(2)*H(2,K)*W
+             MCONT2(1,IX3(K)) = MCONT2(1,IX3(K)) + MX(3)*H(3,K)*W
+             MCONT2(2,IX3(K)) = MCONT2(2,IX3(K)) + MY(3)*H(3,K)*W
+             MCONT2(3,IX3(K)) = MCONT2(3,IX3(K)) + MZ(3)*H(3,K)*W
+             MCONT2(1,IX4(K)) = MCONT2(1,IX4(K)) + MX(4)*H(4,K)*W
+             MCONT2(2,IX4(K)) = MCONT2(2,IX4(K)) + MY(4)*H(4,K)*W
+             MCONT2(3,IX4(K)) = MCONT2(3,IX4(K)) + MZ(4)*H(4,K)*W
+          ENDIF    
 
 C----------
         ELSE

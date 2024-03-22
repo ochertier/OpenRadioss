@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -49,11 +49,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "nchar_c.inc"
 #include      "com04_c.inc"
 #include      "scr17_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -135,7 +132,6 @@ C     KEYSET         KEYSET for  Error message
 C     BOXELTS         merged node array
 C     SZ_BOXELTS      number of stacked nodes in BOXELTS
 C============================================================================
-#include      "set_def.inc"
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -148,11 +144,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "nchar_c.inc"
 #include      "com04_c.inc"
 #include      "scr17_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s

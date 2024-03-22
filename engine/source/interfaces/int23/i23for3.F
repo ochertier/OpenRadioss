@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -80,7 +80,6 @@ C-----------------------------------------------
 #include      "com06_c.inc"
 #include      "com08_c.inc"
 #include      "impl1_c.inc"
-#include      "param_c.inc"
 #include      "parit_c.inc"
 #include      "scr05_c.inc"
 #include      "scr07_c.inc"
@@ -155,7 +154,6 @@ C-----------------------------------------------
 C-----------------------------------------------
       RBID = ZERO
       IBID = 0
-#include "sync_dir.inc"
       IF (IRESP==1) THEN
            PREC = FIVEEM4
       ELSE
@@ -384,7 +382,7 @@ C attention : normale <> normale a l'elt
           XMU(I) = MAX(XMU(I),EM30)
         ENDDO
       ELSEIF (MFROT==3) THEN
-C---    Loi Renard
+C---    Renard 
         DO I=1,JLT
 C attention : normale <> normale a l'elt
           AA = NX(I)*VX(I) + NY(I)*VY(I) + NZ(I)*VZ(I)
@@ -407,6 +405,18 @@ C attention : normale <> normale a l'elt
           ENDIF
           XMU(I) = MAX(XMU(I),EM30)
         ENDDO
+      ELSEIF(MFROT==4)THEN
+C---    Exponential decay model
+        DO I=1,JLT
+          AA = NX(I)*VX(I) + NY(I)*VY(I) + NZ(I)*VZ(I)
+          V2 = (VX(I) - NX(I)*AA)**2 
+     .       + (VY(I) - NY(I)*AA)**2 
+     .       + (VZ(I) - NZ(I)*AA)**2
+           VV = SQRT(MAX(EM30,V2))
+           XMU(I) = FRIC
+     .        + (FROT_P(1)-FRIC)*EXP(-FROT_P(2)*VV)
+           XMU(I) = MAX(XMU(I),EM30)
+         ENDDO
       ENDIF
 C------------------
 C    TANGENT FORCE CALCULATION

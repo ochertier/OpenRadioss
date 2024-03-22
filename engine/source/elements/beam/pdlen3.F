@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,10 +26,13 @@ Chd|-- called by -----------
 Chd|        PFORC3                        source/elements/beam/pforc3.F 
 Chd|-- calls ---------------
 Chd|====================================================================
-      SUBROUTINE PDLEN3(JFT  ,JLT    ,PM     ,GEO  ,OFFG ,
-     .                  DT2T ,NELTST ,ITYPTST,STI  ,STIR ,
-     .                  MSP  ,DMELP  ,G_DT   ,DTEL ,AL   ,
-     .                  MAT  ,PID    ,NGL    )
+      SUBROUTINE PDLEN3(
+     1   JFT,     JLT,     PM,      GEO,
+     2   OFFG,    DT2T,    NELTST,  ITYPTST,
+     3   STI,     STIR,    MSP,     DMELP,
+     4   G_DT,    DTEL,    AL,      MAT,
+     5   PID,     NGL,     NEL,     IGTYP,
+     6   JSMS)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -42,22 +45,20 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com04_c.inc"
-#include      "com06_c.inc"
 #include      "com08_c.inc"
-#include      "couple_c.inc"
 #include      "param_c.inc"
 #include      "scr02_c.inc"
-#include      "scr06_c.inc"
 #include      "scr07_c.inc"
 #include      "scr17_c.inc"
 #include      "scr18_c.inc"
 #include      "sms_c.inc"
 #include      "units_c.inc"
-#include      "vect01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: NEL
+      INTEGER, INTENT(IN) :: IGTYP
+      INTEGER, INTENT(IN) :: JSMS
       my_real,INTENT(INOUT) :: DTEL(JFT:JLT)
       INTEGER,INTENT(IN)    :: G_DT
       INTEGER JFT,JLT,NELTST ,ITYPTST,MAT(MVSIZ),PID(MVSIZ),
@@ -78,14 +79,14 @@ C-----------------------------------------------
 C-----------------------------------------------
       DT(1:MVSIZ) = ZERO
 !
-      DO I=LFT,LLT
+      DO I=1,NEL
         DMP(I)=MAX(GEO(16,PID(I)),GEO(17,PID(I)))
       ENDDO
 !
 C----------------------------------------------
 C     for new dt
 C----------------------------------------------
-      DO I=LFT,LLT
+      DO I=1,NEL
         YOUNG = PM (20,MAT(I))
         G = PM (22,MAT(I))
         CST = SIX_OVER_5*YOUNG/G
@@ -103,6 +104,10 @@ C----------------------------------------------
         FSH(I) = AL(I)/(FACDT(I)+CST)
         FSH(I) = MAX(ONE,FSH(I))
       ENDDO
+      IF (IGTYP == 18) THEN
+          FSH(1:NEL) = ONE
+          KPHI(1:NEL) = MAX(ONE,SL2I(1:NEL))   
+      END IF
       IF (IDTMINS /= 2 .OR. JSMS == 0) THEN
         IF (NODADT /= 0 .OR. IDTMINS == 2) THEN
           DO I=JFT,JLT

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -43,18 +43,6 @@ C-----------------------------------------------
 C   I M P L I C I T   T Y P E S
 C-----------------------------------------------
 #include "implicit_f.inc"
-C-----------------------------------------------
-C   G L O B A L   P A R A M E T E R S
-C-----------------------------------------------
-#include "scr17_c.inc"
-C-----------------------------------------------
-C   C O M M O N 
-C-----------------------------------------------
-#include "scr05_c.inc"
-#include "impl1_c.inc"
-#include "units_c.inc"
-#include "com01_c.inc"
-#include "com04_c.inc"
 C----------------------------------------------------------------
 C  I N P U T   A R G U M E N T S
 C----------------------------------------------------------------
@@ -304,12 +292,12 @@ c
           ! the consistency condition using the backward Euler implicit method
           ! with a Newton-Raphson iterative procedure
           ! Its expression at each iteration is : DLAMBDA = - PHI/DPHI_DLAMBDA
-	  ! -> PHI          : current value of yield function (known)
+            ! -> PHI          : current value of yield function (known)
           ! -> DPHI_DLAMBDA : derivative of PHI with respect to DLAMBDA by taking
           !                   into account of internal variables kinetic : 
           !                   plasticity, temperature and damage (to compute)
 c        
-	  ! 1 - Computation of DPHI_DSIG the normal to the yield surface
+            ! 1 - Computation of DPHI_DSIG the normal to the yield surface
           !------------------------------------------------------------- 
           NORMXX = (GG*(SIGNXX(I)-SIGNZZ(I)) + HH*(SIGNXX(I)-SIGNYY(I)))/(MAX(SIGHL(I),EM20))
           NORMYY = (FF*(SIGNYY(I)-SIGNZZ(I)) + HH*(SIGNYY(I)-SIGNXX(I)))/(MAX(SIGHL(I),EM20))
@@ -321,7 +309,7 @@ c
           ! 2 - Computation of DPHI_DLAMBDA
           !---------------------------------------------------------
 c        
-          !   a) Derivative with respect stress increments tensor DSIG			
+          !   a) Derivative with respect stress increments tensor DSIG
           !   --------------------------------------------------------
           DFDSIG2 = NORMXX * (D11 * NORMXX + D12 * NORMYY + D13 * NORMZZ )
      .            + NORMYY * (D12 * NORMXX + D22 * NORMYY + D23 * NORMZZ )
@@ -330,7 +318,7 @@ c
      .            + NORMYZ * NORMYZ * G23
      .            + NORMZX * NORMZX * G13      
 c
-          !   b) Derivatives with respect to plastic strain P 			
+          !   b) Derivatives with respect to plastic strain P 
           !   ------------------------------------------------  
 c          
           !     i) Derivative of the yield stress with respect to plastic strain dYLD / dPLA

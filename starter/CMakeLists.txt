@@ -16,15 +16,12 @@ enable_language (Fortran)
 enable_language (C)
 enable_language (CXX)
 
-
-
 if ( NOT DEFINED COM) 
 set (cdir "" )
 else()
 set (cdir "_c" )
 endif()
 
-include (CMake_Compilers${cdir}/cmake_${arch}_compilers.txt)
 
 # source files & include directories
 # -------------------------------------
@@ -38,7 +35,7 @@ set (include_directory "${CMAKE_CURRENT_SOURCE_DIR}/share" )
 if ( NOT DEFINED COM) 
 
 #Fortran source files
-file(GLOB_RECURSE source_files  ${source_directory}/source/*.F ${source_directory}/stub/*.F ${source_directory}/share/*.F  ${source_directory}/../common_source/*.F   )
+file(GLOB_RECURSE source_files  ${source_directory}/source/*.F ${source_directory}/stub/*.F ${source_directory}/share/*.F  ${source_directory}/../common_source/*.F ${source_directory}/source/*.F90 ${source_directory}/stub/*.F90 ${source_directory}/share/*.F90  ${source_directory}/../common_source/*.F90 ${source_directory}/source/*.f90 ${source_directory}/stub/*.f90 ${source_directory}/share/*.f90  ${source_directory}/../common_source/*.f90)
 
 #C source files
 file(GLOB_RECURSE c_source_files ${source_directory}/source/*.c ${source_directory}/stub/*.c ${source_directory}/share/*.c ${source_directory}/../common_source/*.c )
@@ -54,7 +51,7 @@ set (ex_version "starter")
 else()
 
 #Fortran source files
-file(GLOB_RECURSE source_files  ${source_directory}/source/*.F ${source_directory}/com/*.F ${source_directory}/share/*.F  ${source_directory}/../common_source/*.F   )
+file(GLOB_RECURSE source_files  ${source_directory}/source/*.F ${source_directory}/com/*.F ${source_directory}/share/*.F  ${source_directory}/../common_source/*.F  ${source_directory}/source/*.F90 ${source_directory}/com/*.F90 ${source_directory}/share/*.F90  ${source_directory}/../common_source/*.F90 ${source_directory}/source/*.f90 ${source_directory}/com/*.f90 ${source_directory}/share/*.f90  ${source_directory}/../common_source/*.f90)
 
 #C source files
 file(GLOB_RECURSE c_source_files ${source_directory}/source/*.c ${source_directory}/com/*.c ${source_directory}/share/*.c ${source_directory}/../common_source/*.c )
@@ -143,13 +140,6 @@ if ( NOT (arch STREQUAL "none") )
    include (${CMAKE_CURRENT_SOURCE_DIR}/CMake_Compilers${cdir}/cmake_${arch}.txt)
 endif ()
 
-
-#
-# executable name
-# ---------------------------------
-set ( EXEC_NAME "${ex_version}_${RELNAME}${exec_prec}${exec_deb}"  )
-
-
 #
 # Print some configuration messages
 # ---------------------------------
@@ -194,9 +184,9 @@ add_custom_command(
          OUTPUT 
             ${Build_includes_directory}/starter_message_description.inc
          COMMAND 
-            perl ../../Compiling_tools/script/merge_files.pl ${source_directory}/source/output/message/starter_message_description.txt ${source_directory}/../hm_cfg_files/messages/CONFIG/msg_hw_radioss_reader.txt >  ${Build_includes_directory}/fullstarter_message_description.txt
+            python ${source_directory}/../Compiling_tools/script/merge_files.py -file1=${source_directory}/source/output/message/starter_message_description.txt -file2=${source_directory}/../hm_cfg_files/messages/CONFIG/msg_hw_radioss_reader.txt -outfile=${Build_includes_directory}/fullstarter_message_description.txt
          COMMAND
-           perl ../../Compiling_tools/script/build_message.pl ${Build_includes_directory}/fullstarter_message_description.txt >  ${Build_includes_directory}/starter_message_description.inc
+            python ${source_directory}/../Compiling_tools/script/build_message.py -inputfile=${Build_includes_directory}/fullstarter_message_description.txt -outfile=${Build_includes_directory}/starter_message_description.inc
          DEPENDS 
               ${source_directory}/source/output/message/starter_message_description.txt ${source_directory}/../hm_cfg_files/messages/CONFIG/msg_hw_radioss_reader.txt
          )
@@ -206,12 +196,10 @@ if ( NOT DEFINED COM )
 #include always rebuild 
 add_custom_command(    
          OUTPUT 
-            ${Build_includes_directory}/__foo.inc 
-            ${Build_includes_directory}/build_info.inc
+         ${Build_includes_directory}/__foo.inc
+         ${Build_includes_directory}/build_info.inc
          COMMAND
-            bash ../../Compiling_tools/script/or_compile_info_cm.sh  linux64 0 s 0 linux64  > ${Build_includes_directory}/build_info.inc
-         COMMAND
-           ls  ${Build_includes_directory}
+            python ${source_directory}/../Compiling_tools/script/or_build_info.py -arch=${arch} -outfile=${Build_includes_directory}/build_info.inc
          DEPENDS 
          )
 else()
@@ -220,17 +208,12 @@ add_custom_command(
          OUTPUT 
             ${Build_includes_directory}/__foo.inc 
             ${Build_includes_directory}/build_info.inc
-            ${Build_includes_directory}/btag.inc
          COMMAND 
-            bash ../../Compiling_tools/script/compile_info_cm.sh  linux64 0 s 0 linux64  > ${Build_includes_directory}/build_info.inc
-         COMMAND
-           ls  ${Build_includes_directory}
+            python ${source_directory}/../Compiling_tools/script/build_info.py -version=${version} -titlevers=${titlevers} -arch=${arch} -solver=S -outfile=${Build_includes_directory}/build_info.inc
          DEPENDS 
          )
 endif()
 
-
-add_custom_target( alway_execute ALL DEPENDS ${Build_includes_directory}/__foo.inc )
 
 
 # make sure that the default is a RELEASE
@@ -243,7 +226,14 @@ endif (NOT CMAKE_BUILD_TYPE)
 
 
 
-add_executable (${EXEC_NAME} ${source_files} ${sfullstarter_message_description.txtource_files_common} ${c_source_files} ${cpp_source_files} ${Build_includes_directory}/starter_message_description.inc   ${Build_includes_directory}/build_info.inc)
+add_executable (${EXEC_NAME} ${source_files} ${c_source_files} ${cpp_source_files} ${Build_includes_directory}/starter_message_description.inc ${Build_includes_directory}/__foo.inc)
+
+add_custom_command(TARGET ${EXEC_NAME}
+                   POST_BUILD
+                   COMMAND ${CMAKE_COMMAND} -E make_directory ${source_directory}/../exec
+                   COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${EXEC_NAME}> ${source_directory}/../exec
+                  )
+
 
 target_include_directories(${EXEC_NAME} PRIVATE ${include_dir_list}  )
 target_link_libraries(${EXEC_NAME} ${LINK} )

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,9 +25,10 @@ Chd|  ALE51_ANTIDIFF3_INT22         source/ale/alefvm/cut_cells/ale51_antidiff3_
 Chd|-- called by -----------
 Chd|        AFLUXT                        source/ale/ale51/afluxt.F     
 Chd|-- calls ---------------
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
-Chd|        I22BUFBRIC_MOD                ../common_source/modules/cut-cell-search_mod.F
-Chd|        I22TRI_MOD                    ../common_source/modules/cut-cell-search_mod.F
+Chd|        ALE_MOD                       ../common_source/modules/ale/ale_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
+Chd|        I22BUFBRIC_MOD                ../common_source/modules/interfaces/cut-cell-search_mod.F
+Chd|        I22TRI_MOD                    ../common_source/modules/interfaces/cut-cell-search_mod.F
 Chd|====================================================================
       SUBROUTINE ALE51_ANTIDIFF3_INT22(FLUX   , ITRIMAT, IXS      , FLUX_VOIS,
      .                                 N4_VOIS, ITAB , NV46   , ELBUF_TAB, IPARG    ,
@@ -37,7 +38,8 @@ C   M o d u l e s
 C-----------------------------------------------
       USE ELBUFDEF_MOD 
       USE I22BUFBRIC_MOD 
-      USE I22TRI_MOD      
+      USE I22TRI_MOD   
+      USE ALE_MOD   
 C-----------------------------------------------
 C   D e c r i p t i o n
 C-----------------------------------------------
@@ -53,20 +55,13 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "spmd_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com07_c.inc"
 #include      "com08_c.inc"
-#include      "vect01_c.inc"
 #include      "param_c.inc"
-#include      "inter22.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -256,7 +251,7 @@ C-----------------------------------------------
               IFV    = BRICK_LIST(NIN,IB)%Adjacent_Brick(K,5)
               ICELLv = BRICK_LIST(NIN,IB)%POLY(ICELL)%FACE(K)%Adjacent_Cell(IADJ)                         
               IF(tmpFLUX(K,IADJ)>ZERO)THEN
-                FF(K,IADJ) = HALF * ( FF(K,IADJ)*(ONE-UPWSM)+ALPH*tmpFLUX(K,IADJ)*(ONE+UPWSM) )
+                FF(K,IADJ) = HALF * ( FF(K,IADJ)*(ONE-ALE%UPWIND%UPWSM)+ALPH*tmpFLUX(K,IADJ)*(ONE+ALE%UPWIND%UPWSM) )
 
                 
                 

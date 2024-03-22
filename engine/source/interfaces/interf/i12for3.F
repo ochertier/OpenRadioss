@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,7 +20,7 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Cel|         INTTI12F                        /interf/intti12.F
+C  |         INTTI12F                        /interf/intti12.F
 Chd|====================================================================
 Chd|  I12FOR3                       source/interfaces/interf/i12for3.F
 Chd|-- called by -----------
@@ -49,7 +49,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "scr05_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s

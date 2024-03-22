@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -29,7 +29,7 @@ Chd|        SPMD_RGATHER9_DP              source/mpi/interfaces/spmd_outp.F
 Chd|        SPMD_STAT_PGATHER             source/mpi/output/spmd_stat.F 
 Chd|        STRS_TXT50                    source/output/sta/sta_txt.F   
 Chd|        TAB_STRS_TXT50                source/output/sta/sta_txt.F   
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE STAT_C_EPSPF(ELBUF_TAB,IPARG ,IPM ,IGEO ,IXC ,
      2                        IXTG  ,WA,WAP0 ,IPARTC, IPARTTG,
@@ -50,11 +50,8 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "param_c.inc"
 #include      "units_c.inc"
-#include      "scr01_c.inc"
-#include      "scr05_c.inc"
 #include      "scr14_c.inc"
 #include      "task_c.inc"
-#include      "scr03_c.inc"
 #include      "scr16_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -175,7 +172,7 @@ c
                       ENDDO                   
                     ENDDO
                   ENDIF
-                ENDDO	 
+                ENDDO   
               ELSE  !  (IHBE /= 23)
                 DO K=1,NLAY                                            
                   BUFLY => ELBUF_TAB(NG)%BUFLY(K)
@@ -199,7 +196,7 @@ c
                       ENDDO                   
                     ENDDO
                   ENDIF
-                ENDDO	 
+                ENDDO   
               ENDIF ! IHBE
 c           NLAY = 1 :
             ELSEIF (ELBUF_TAB(NG)%BUFLY(1)%L_PLA > 0) THEN
@@ -218,7 +215,7 @@ c           NLAY = 1 :
                     DO IR=1,NPTR                                        
                       JJ = JJ + 1                                            
                       WA(JJ) = BUFLY%LBUF(IR,IS,IT)%PLA(I)         
-                    ENDDO	                                   
+                    ENDDO                                     
                   ENDDO                                         
                 ENDDO                                         
               ENDIF ! IHBE
@@ -333,7 +330,7 @@ C         retrouve l'adresse dans WAP0
               CALL TAB_STRS_TXT50(WAP0,NPTM*NPG,J,SIZP0,5)
             ENDIF
           ENDIF  !  IF (IOFF == 1)
-        ENDDO  !  DO N=1,STAT_NUMELC_G	    
+        ENDDO  !  DO N=1,STAT_NUMELC_G      
       ENDIF  !  IF (ISPMD == 0 .AND. LEN > 0)
 
 C-----------------------------------------------
@@ -437,7 +434,7 @@ c           NLAY = 1 :
                   DO IS=1,NPTS                                              
                     JJ = JJ + 1                              
                     WA(JJ) = BUFLY%LBUF(IR,IS,IT)%PLA(I)        
-                  ENDDO	  
+                  ENDDO    
                 ENDDO                                        
               ENDDO
             ELSE                       
@@ -542,7 +539,7 @@ C
               CALL TAB_STRS_TXT50(WAP0,NPTM*NPG,J,SIZP0,5)
             ENDIF
           ENDIF  !  IF (IOFF == 1)
-        ENDDO  !  DO N=1,STAT_NUMELTG_G	    
+        ENDDO  !  DO N=1,STAT_NUMELTG_G      
       ENDIF  !  IF(ISPMD == 0.AND.LEN>0)
 C
       RETURN

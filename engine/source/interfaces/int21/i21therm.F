@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -34,7 +34,7 @@ Chd|====================================================================
      5                   PENRAD ,TEMPM ,FHEAT ,EFRICT ,CONDINT,
      6                   IFORM  ,H1    ,H2    ,H3     ,H4     ,
      7                   PHI1   ,PHI2  ,PHI3  ,PHI4   ,X1     ,
-     8                   Y1	,Z1    ,X2    ,Y2     ,Z2     ,
+     8                   Y1  ,Z1    ,X2    ,Y2     ,Z2     ,
      9                   X3     ,Y3    ,Z3    ,X4     ,Y4     ,
      A                   Z4     ,ITAB  ,NSV    ,MSR   ,IX1    ,
      B                   IX2    ,IX3   ,IX4    ,TEMP  ,FCOND  ,
@@ -50,10 +50,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
 #include      "com08_c.inc"
-#include      "com01_c.inc"
-#include      "task_c.inc"
 #include      "scr_thermal_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -109,7 +106,7 @@ C
             AY  = AZ1*AX2 - AX1*AZ2
             AZ  = AX1*AY2 - AY1*AX2
 C                              
-            AREA = ONE_OVER_8*SQRT(AX*AX+AY*AY+AZ*AZ) 
+            AREA = HALF*SQRT(AX*AX+AY*AY+AZ*AZ) 
 C
             AREAC =AREA
 C
@@ -205,7 +202,7 @@ C
             AY  = AZ1*AX2 - AX1*AZ2
             AZ  = AX1*AY2 - AY1*AX2
 C                              
-            AREA = ONE_OVER_8*SQRT(AX*AX+AY*AY+AZ*AZ) 
+            AREA = HALF*SQRT(AX*AX+AY*AY+AZ*AZ) 
 C
             AREAC =AREA
 C

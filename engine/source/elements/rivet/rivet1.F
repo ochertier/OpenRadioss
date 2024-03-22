@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -292,7 +292,7 @@ C----------------------------
            DA1(3) = HALF*DT2*DT12M1*(VXX*VT1(1) - VYY*VT1(2))
            DA2(1) = HALF*DT2*DT12M1*(VYY*VT2(3) - VZZ*VT2(2))
            DA2(2) = HALF*DT2*DT12M1*(VZZ*VT2(1) - VXX*VT2(3))
-           DA2(3) = HALF*DT2*DT12M1*(VXX*VT2(1) - VYY*VT2(2))	   
+           DA2(3) = HALF*DT2*DT12M1*(VXX*VT2(1) - VYY*VT2(2))     
 C
            A(1,N1)=A(1,N1)+AX/MS(N1)+DA1(1)
            A(2,N1)=A(2,N1)+AY/MS(N1)+DA1(2)

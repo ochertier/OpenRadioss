@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,34 +26,29 @@ Chd|-- called by -----------
 Chd|        S4KE3                         source/elements/solid/solide4/s4ke3.F
 Chd|-- calls ---------------
 Chd|====================================================================
-      SUBROUTINE S4COORK(X,IXS,
-     .   X1, X2, X3, X4,  
-     .   Y1, Y2, Y3, Y4,  
-     .   Z1, Z2, Z3, Z4,  
-     .   OFFG,OFF,SAV,
-     .   NC1,NC2,NC3,NC4,NGL,MXT,NGEO,
-     .   K11,K12,K13,K14,K22,K23,
-     .   K24,K33,K34,K44,NEL)
+      SUBROUTINE S4COORK(
+     1   X,       IXS,     X1,      X2,
+     2   X3,      X4,      Y1,      Y2,
+     3   Y3,      Y4,      Z1,      Z2,
+     4   Z3,      Z4,      OFFG,    OFF,
+     5   SAV,     NC1,     NC2,     NC3,
+     6   NC4,     NGL,     MXT,     NGEO,
+     7   K11,     K12,     K13,     K14,
+     8   K22,     K23,     K24,     K33,
+     9   K34,     K44,     NEL,     ISMSTR)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com08_c.inc"
-#include      "vect01_c.inc"
 #include      "scr18_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: ISMSTR
       INTEGER NEL
-C     REAL
       my_real
      .   X(3,*),
      .   X1(*), X2(*), X3(*), X4(*),  
@@ -74,8 +69,8 @@ C-----------------------------------------------
 C     REAL
 C-----------------------------------------------
 C
-      MXT_1 = IXS(1,LFT)
-      DO I=LFT,LLT
+      MXT_1 = IXS(1,1)
+      DO I=1,NEL
       NGEO(I)=IXS(10,I)
       NGL(I)=IXS(11,I)
       MXT(I)=MXT_1
@@ -87,7 +82,7 @@ C
 C----------------------------
 C     NODAL COORDINATES     |
 C----------------------------
-      DO I=LFT,LLT
+      DO I=1,NEL
         X1(I)=X(1,NC1(I))
         Y1(I)=X(2,NC1(I))
         Z1(I)=X(3,NC1(I))
@@ -104,7 +99,7 @@ C----------------------------
       ENDDO
 C-----------
       IF(ISMSTR==1.OR.(ISMSTR==2.AND.IDTMIN(1)==3))THEN
-       DO I=LFT,LLT
+       DO I=1,NEL
        IF(ABS(OFFG(I))>ONE)THEN
         X1(I)=SAV(I,1)
         Y1(I)=SAV(I,2)
@@ -127,7 +122,7 @@ C
       ENDIF
 C-----------
       DO J=1,9      
-      DO I=LFT,LLT
+      DO I=1,NEL
         K11(J,I)=ZERO
         K12(J,I)=ZERO
         K13(J,I)=ZERO

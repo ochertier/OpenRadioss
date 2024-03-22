@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,10 +26,13 @@ Chd|-- called by -----------
 Chd|        Q4FORC2                       source/elements/solid_2d/quad4/q4forc2.F
 Chd|-- calls ---------------
 Chd|====================================================================
-      SUBROUTINE Q4FINTC2(PYC1,PYC2,PZC1,PZC2,AY,FAY,
-     2                    FY1,FZ1,FY2,FZ2,
-     3                    FY3,FZ3,FY4,FZ4,
-     4                    AIRE,VOLU,SIGM,PP,ICP,NEL)
+      SUBROUTINE Q4FINTC2(
+     1   PYC1,    PYC2,    PZC1,    PZC2,
+     2   AY,      FAY,     FY1,     FZ1,
+     3   FY2,     FZ2,     FY3,     FZ3,
+     4   FY4,     FZ4,     AIRE,    VOLU,
+     5   SIGM,    PP,      ICP,     NEL,
+     6   JHBE)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -41,13 +44,11 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "cong1_c.inc"
-#include      "vect01_c.inc"
 #include      "com01_c.inc"
-#include      "nsvis_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: JHBE
       INTEGER ICP,NEL
 C     REAL
       my_real
@@ -77,17 +78,17 @@ C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
       IF(N2D==1 .AND. JHBE==17) THEN
-        DO I=LFT,LLT
+        DO I=1,NEL
           FAC(I) = AIRE(I)
         ENDDO
       ELSE
-        DO I=LFT,LLT
+        DO I=1,NEL
           FAC(I) = VOLU(I)
         ENDDO
       ENDIF
 C
 C     FOR CONSTANT SHEAR STRAIN
-      DO I=LFT,LLT
+      DO I=1,NEL
         SV = SIGM(I,4)*FAC(I)
         SY = SV*PZC1(I)
         SZ = SV*PYC1(I)
@@ -105,7 +106,7 @@ C     FOR CONSTANT SHEAR STRAIN
 C
 C     FOR CONSTANT PRESSURE CASE
       IF(ICP==1) THEN
-        DO I=LFT,LLT
+        DO I=1,NEL
           SV = PP(I)*FAC(I)
           SY = SV*PYC1(I)
           SZ = SV*PZC1(I)
@@ -124,4 +125,4 @@ C     FOR CONSTANT PRESSURE CASE
 C
       RETURN
       END
-	  
+            

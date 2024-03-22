@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -33,19 +33,13 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr14_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-C  ds007  18/2/00  +1
       INTEGER JFT, JLT,NFT,ISTRAIN,NEL
-C     REAL
       my_real
      .   GSTR(NEL,8), EXX(*), EYY(*), EXY(*),KXX(*), KYY(*), KXY(*),
      .   EPSDOT(6,*),DT1,GSTRPG(NEL,8)
@@ -53,10 +47,8 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,J
-      my_real
-     .   ONE_OVER_3
-C---+----1----+----2----+----3----+----4----+----5----+----6----+----7--
-C
+      my_real ONE_OVER_3
+C-----------------------------------------------
       IF(IEPSDOT/=0)THEN
        DO I=JFT,JLT
         J = I + NFT
@@ -76,7 +68,7 @@ C
         DO I=JFT,JLT
          GSTR(I,6)=GSTR(I,6)+KXX(I)*THIRD
          GSTR(I,7)=GSTR(I,7)+KYY(I)*THIRD
-         GSTR(I,8)=GSTR(I,8)+KXY(I)*THIRD	 
+         GSTR(I,8)=GSTR(I,8)+KXY(I)*THIRD   
 C
          GSTRPG(I,1)=GSTRPG(I,1)+EXX(I)
          GSTRPG(I,2)=GSTRPG(I,2)+EYY(I)

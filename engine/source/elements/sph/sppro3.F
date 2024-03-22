@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -46,10 +46,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
 #include      "sphcom.inc"
-#include      "units_c.inc"
-#include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -95,12 +92,12 @@ C-----------------
                 TAB_DK(IL) = DK
 C-----------------
 C Choix des cellules a conserver tq distance < DK pour eviter pb de parith/on
-	            NVOIS=0
-	            DO K=1,KXSP(5,IL)
-	                IF(DVOIS(K)<DK)THEN
-	                    NVOIS=NVOIS+1
-	                END IF
-	            END DO
+                      NVOIS=0
+                      DO K=1,KXSP(5,IL)
+                          IF(DVOIS(K)<DK)THEN
+                              NVOIS=NVOIS+1
+                          END IF
+                      END DO
 
             ENDIF
 C-----------------
@@ -148,14 +145,14 @@ C Choix des cellules a conserver tq distance < DK pour eviter pb de parith/on
                         JSTOR(K)=JVOIS(K)
                         DSTOR(K)=DVOIS(K)
                     ENDDO
-	                NVOIS=0
-	                DO K=1,KXSPR(IL-NUMSPH)
-	                    IF(DSTOR(K)<DK)THEN
-	                        NVOIS=NVOIS+1
+                          NVOIS=0
+                          DO K=1,KXSPR(IL-NUMSPH)
+                              IF(DSTOR(K)<DK)THEN
+                                  NVOIS=NVOIS+1
                             JVOIS(NVOIS)=JSTOR(K)
                             DVOIS(NVOIS)=DSTOR(K)
-	                    END IF
-	                END DO
+                              END IF
+                          END DO
                     DEALLOCATE(DSTOR)
                     NVOIS=MIN(NVOIS,KVOISPH)
                 ENDIF
@@ -196,12 +193,12 @@ C-----------------
                 DK=DVOIS(KVOISPH)
 C-----------------
 C Choix des cellules a conserver tq distance < DK pour eviter pb de parith/on
-	            NVOIS=0
-	            DO K=1,KXSP(5,IL)
-	                IF(DVOIS(K)<DK)THEN
-	                    NVOIS=NVOIS+1
-	                END IF
-	            END DO
+                      NVOIS=0
+                      DO K=1,KXSP(5,IL)
+                          IF(DVOIS(K)<DK)THEN
+                              NVOIS=NVOIS+1
+                          END IF
+                      END DO
             ENDIF
 C-----------------
             NVOIS=MIN(NVOIS,KVOISPH)

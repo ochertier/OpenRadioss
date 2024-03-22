@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -100,24 +100,6 @@ C     REAL
 C-----------------------------------------------
       INTEGER BITUNSET,BITGET,BITSET
       EXTERNAL BITUNSET,BITGET,BITSET
-
-!      EQUIVALENCE (IX1,IV(1,1)) ,(IX2,IV(1,2)) ,(IX3,IV(1,3))
-!      EQUIVALENCE (IX4,IV(1,4)) ,(NSVG,IV(1,5))
-C
-!      EQUIVALENCE (X1,BV(1,1)) ,(Y1,BV(1,2)) ,(Z1,BV(1,3))
-!      EQUIVALENCE (X2,BV(1,4)) ,(Y2,BV(1,5)) ,(Z2,BV(1,6))
-!      EQUIVALENCE (X3,BV(1,7)) ,(Y3,BV(1,8)) ,(Z3,BV(1,9))
-!      EQUIVALENCE (X4,BV(1,10)),(Y4,BV(1,11)),(Z4,BV(1,12))
-!      EQUIVALENCE (XI,BV(1,13)),(YI,BV(1,14)),(ZI,BV(1,15))
-!      EQUIVALENCE (X0,BV(1,31)) ,(Y0,BV(1,32)) ,(Z0,BV(1,33))
-!      EQUIVALENCE (NX1,BV(1,58)),(NY1,BV(1,59)),(NZ1,BV(1,60))
-!      EQUIVALENCE (NX2,BV(1,61)),(NY2,BV(1,62)),(NZ2,BV(1,63))
-!      EQUIVALENCE (NX3,BV(1,64)),(NY3,BV(1,65)),(NZ3,BV(1,66))
-!      EQUIVALENCE (NX4,BV(1,67)),(NY4,BV(1,68)),(NZ4,BV(1,69))
-!      EQUIVALENCE (P1,BV(1,71)) ,(P2,BV(1,72)) ,(P3,BV(1,73))
-!      EQUIVALENCE (P4,BV(1,74)) ,(LB1,BV(1,75)),(LB2,BV(1,76))
-!      EQUIVALENCE (LB3,BV(1,77)),(LB4,BV(1,78)),(LC1,BV(1,79))
-!      EQUIVALENCE (LC2,BV(1,80)),(LC3,BV(1,81)),(LC4,BV(1,82))
 C
 C--------------------------------------------------------
 C  SHIFT DU GAP POUR SOLIDES AVEC GAP NUL
@@ -683,17 +665,11 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       my_real
      . X10,Y10,Z10,X20,Y20,Z20,X30,Y30,Z30,X40,Y40,Z40,
      . X1,Y1,Z1,X2,Y2,Z2,X3,Y3,Z3,X4,Y4,Z4,GAP_M
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -763,17 +739,11 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       my_real
      . X10,Y10,Z10,X20,Y20,Z20,X40,Y40,Z40,
      . X1,Y1,Z1,X2,Y2,Z2,X4,Y4,Z4,GAP_M
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -829,9 +799,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NRTM,NSN,NLN,NBINFLG(NLN),NSV(NSN),NLG(NLN),TAG(NUMNOD)
@@ -879,15 +846,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-c#include      "mvsiz_p.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-c#include      "param_c.inc"
-c#include      "scr05_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1052,9 +1010,6 @@ C-----------------------------------------------
       my_real
      .     GAP,
      . NX(*),NY(*),NZ(*),X(3,*),GAP_S(*),GAP_M(*), GAPV2(*)
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

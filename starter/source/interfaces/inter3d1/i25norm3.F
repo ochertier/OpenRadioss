@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -22,7 +22,6 @@ Copyright>        software under a commercial license.  Contact Altair to discus
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
       module MOD_I25NORM
       implicit none
-#include      "my_real.inc"
       REAL*4
      .       , DIMENSION(:,:,:), ALLOCATABLE :: WNOD_NORMAL
       END MODULE MOD_I25NORM
@@ -53,7 +52,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "scr05_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -67,9 +65,9 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, N, FIRST, LAST, IRM, IEDG, I1, I2, I3, I4, LENR
+      INTEGER I, J, FIRST, LAST, IRM, IEDG, I1, I2, I3, I4 
       INTEGER IX1(MVSIZ), IX2(MVSIZ), IX3(MVSIZ), IX4(MVSIZ),
-     .        JRM, JEDG, NEDG, IS1, IS2, ISH, SOL_EDGE
+     .        JRM, JEDG, IS1, IS2, ISH, SOL_EDGE
 C     REAL
       REAL*4
      .     X0(MVSIZ), Y0(MVSIZ), Z0(MVSIZ),
@@ -95,6 +93,7 @@ C-----------------------------------------------
       REM30 = RUN/REP30
 C
       NOD_NORMAL(1:3,1:4,1:NRTM) = RZERO
+      VTX_BISECTOR(1:3,1:2,1:NADMSR) = RZERO
 C optimisable en spmd si ajout flag pour routine de comm, spmd_exchange_n
       SOL_EDGE = 0 
       IF(IEDGE/=0) SOL_EDGE =IEDGE/10 ! solids
@@ -411,30 +410,30 @@ C
               IS1=ADMSR(IEDG,IRM)
 C             LBOUND(IS1)=1
               IF(VTX_BISECTOR(1,1,IS1)==RZERO.AND.
-     .  	 VTX_BISECTOR(2,1,IS1)==RZERO.AND.
-     .  	 VTX_BISECTOR(3,1,IS1)==RZERO)THEN
-        	VTX_BISECTOR(1,1,IS1)=VX
-        	VTX_BISECTOR(2,1,IS1)=VY
-        	VTX_BISECTOR(3,1,IS1)=VZ
+     .     VTX_BISECTOR(2,1,IS1)==RZERO.AND.
+     .     VTX_BISECTOR(3,1,IS1)==RZERO)THEN
+          VTX_BISECTOR(1,1,IS1)=VX
+          VTX_BISECTOR(2,1,IS1)=VY
+          VTX_BISECTOR(3,1,IS1)=VZ
               ELSE
-        	VTX_BISECTOR(1,2,IS1)=VX
-        	VTX_BISECTOR(2,2,IS1)=VY
-        	VTX_BISECTOR(3,2,IS1)=VZ
-              END IF	
+          VTX_BISECTOR(1,2,IS1)=VX
+          VTX_BISECTOR(2,2,IS1)=VY
+          VTX_BISECTOR(3,2,IS1)=VZ
+              END IF
 C
               IS2=ADMSR(MOD(IEDG,4)+1,IRM)
 C             LBOUND(IS2)=1
               IF(VTX_BISECTOR(1,1,IS2)==RZERO.AND.
-     .  	 VTX_BISECTOR(2,1,IS2)==RZERO.AND.
-     .  	 VTX_BISECTOR(3,1,IS2)==RZERO)THEN
-        	VTX_BISECTOR(1,1,IS2)=VX
-        	VTX_BISECTOR(2,1,IS2)=VY
-        	VTX_BISECTOR(3,1,IS2)=VZ
+     .     VTX_BISECTOR(2,1,IS2)==RZERO.AND.
+     .     VTX_BISECTOR(3,1,IS2)==RZERO)THEN
+          VTX_BISECTOR(1,1,IS2)=VX
+          VTX_BISECTOR(2,1,IS2)=VY
+          VTX_BISECTOR(3,1,IS2)=VZ
               ELSE
-        	VTX_BISECTOR(1,2,IS2)=VX
-        	VTX_BISECTOR(2,2,IS2)=VY
-        	VTX_BISECTOR(3,2,IS2)=VZ
-              END IF	
+          VTX_BISECTOR(1,2,IS2)=VX
+          VTX_BISECTOR(2,2,IS2)=VY
+          VTX_BISECTOR(3,2,IS2)=VZ
+              END IF
 
             END IF
           END IF

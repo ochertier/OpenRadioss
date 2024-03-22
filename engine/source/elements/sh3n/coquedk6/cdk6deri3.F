@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,7 +20,6 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-C---+----1----+----2----+----3----+----4----+----5----+----6----+----7--
 Chd|====================================================================
 Chd|  CDK6DERI3                     source/elements/sh3n/coquedk6/cdk6deri3.F
 Chd|-- called by -----------
@@ -51,13 +50,9 @@ C-----------------------------------------------
      .     N6Z(*),PX2(*), PY2(*), PX3(*), PY3(*), NU(*),THK2(*),
      .     ALDT(*),ALPE(*),PB1(MVSIZ,3,3),PB2(MVSIZ,3,3),PB3(MVSIZ,3,6)
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, J,EP
-C     REAL
       my_real
      .     AREAI(MVSIZ),
      .     AL1(MVSIZ), AL2(MVSIZ), AL3(MVSIZ), ALMAX, ALMIN
@@ -142,31 +137,31 @@ C------Hi inverse--------
        BETA16(I) = -HALF*(H6D+AL2(I))/SQRT(AL61)
       ENDDO
       DO I=JFT,JLT
-       C11(I,1,1) = H1(I) 	      
-       C11(I,2,1) = H1(I)*BETA3(I) 	      
-       C11(I,3,1) = H1(I)*BETA2(I) 	      
-       C11(I,1,2) = H2(I)*BETA3(I) 	      
-       C11(I,2,2) = H2(I) 	      
-       C11(I,3,2) = H2(I)*BETA1(I) 	      
-       C11(I,1,3) = H3(I)*BETA2(I) 	      
-       C11(I,2,3) = H3(I)*BETA1(I)	      
-       C11(I,3,3) = H3(I) 	      
+       C11(I,1,1) = H1(I)         
+       C11(I,2,1) = H1(I)*BETA3(I)         
+       C11(I,3,1) = H1(I)*BETA2(I)         
+       C11(I,1,2) = H2(I)*BETA3(I)         
+       C11(I,2,2) = H2(I)         
+       C11(I,3,2) = H2(I)*BETA1(I)         
+       C11(I,1,3) = H3(I)*BETA2(I)         
+       C11(I,2,3) = H3(I)*BETA1(I)        
+       C11(I,3,3) = H3(I)         
       ENDDO
       DO I=JFT,JLT
-       C21(I,1,1) = BETA24(I)*H14(I) 	      
-       C21(I,2,1) = 0.0 	      
-       C21(I,3,1) = BETA36(I)*H16(I) 	      
-       C21(I,1,2) = BETA14(I)*H24(I) 	      
-       C21(I,2,2) = BETA35(I)*H25(I) 	      
-       C21(I,3,2) = 0.0 	      
-       C21(I,1,3) = 0.0 	      
-       C21(I,2,3) = BETA25(I)*H35(I)	      
-       C21(I,3,3) = BETA16(I)*H36(I) 	      
+       C21(I,1,1) = BETA24(I)*H14(I)         
+       C21(I,2,1) = 0.0         
+       C21(I,3,1) = BETA36(I)*H16(I)         
+       C21(I,1,2) = BETA14(I)*H24(I)         
+       C21(I,2,2) = BETA35(I)*H25(I)         
+       C21(I,3,2) = 0.0         
+       C21(I,1,3) = 0.0         
+       C21(I,2,3) = BETA25(I)*H35(I)        
+       C21(I,3,3) = BETA16(I)*H36(I)         
       ENDDO
       DO I=JFT,JLT
-       C22(I,1) = H4(I) 	      
-       C22(I,2) = H5(I) 	      
-       C22(I,3) = H6(I) 	      
+       C22(I,1) = H4(I)         
+       C22(I,2) = H5(I)         
+       C22(I,3) = H6(I)         
       ENDDO
 C--------EN FUNCTION DES CONDITIONS LIMITES----------------------------------
       DO EP=NVS+1,JLT
@@ -174,49 +169,49 @@ C--------EN FUNCTION DES CONDITIONS LIMITES----------------------------------
 C--------cote node 4  ---------------------------------------
 C--------LIBRE ---------------------------------------
        IF (IXTG1(1,I)==0) THEN
-        C21(I,1,1) = -C11(I,3,1)	      
-        C21(I,1,2) = -C11(I,3,2)	      
+        C21(I,1,1) = -C11(I,3,1)        
+        C21(I,1,2) = -C11(I,3,2)        
         C21(I,1,3) = -C11(I,3,3)
-        C22(I,1)   = 0.0	      
+        C22(I,1)   = 0.0        
         H4(I)=EP20
 C--------BLOQUE ---------------------------------------
        ELSEIF (IXTG1(1,I)<0) THEN
-        C21(I,1,1) = C11(I,3,1)	      
-        C21(I,1,2) = C11(I,3,2)	      
-        C21(I,1,3) = C11(I,3,3)	      
-        C22(I,1)   = 0.0	      
+        C21(I,1,1) = C11(I,3,1)        
+        C21(I,1,2) = C11(I,3,2)        
+        C21(I,1,3) = C11(I,3,3)        
+        C22(I,1)   = 0.0        
         H4(I)=EP20
        ENDIF 
 C--------cote node 5  ---------------------------------------
 C--------LIBRE ---------------------------------------
        IF (IXTG1(2,I)==0) THEN
-        C21(I,2,1) = -C11(I,1,1)	      
-        C21(I,2,2) = -C11(I,1,2)	      
-        C21(I,2,3) = -C11(I,1,3)	      
-        C22(I,2)   = 0.0	      
+        C21(I,2,1) = -C11(I,1,1)        
+        C21(I,2,2) = -C11(I,1,2)        
+        C21(I,2,3) = -C11(I,1,3)        
+        C22(I,2)   = 0.0        
         H5(I)=EP20
 C--------BLOQUE ---------------------------------------
        ELSEIF (IXTG1(2,I)<0) THEN
-        C21(I,2,1) = C11(I,1,1)	      
-        C21(I,2,2) = C11(I,1,2)	      
-        C21(I,2,3) = C11(I,1,3)	      
-        C22(I,2)   = 0.0	      
+        C21(I,2,1) = C11(I,1,1)        
+        C21(I,2,2) = C11(I,1,2)        
+        C21(I,2,3) = C11(I,1,3)        
+        C22(I,2)   = 0.0        
         H5(I)=EP20
        ENDIF 
 C--------cote node 6  ---------------------------------------
 C--------LIBRE ---------------------------------------
        IF (IXTG1(3,I)==0) THEN
-        C21(I,3,1) = -C11(I,2,1)	      
-        C21(I,3,2) = -C11(I,2,2)	      
-        C21(I,3,3) = -C11(I,2,3)	      
-        C22(I,3)   = 0.0	      
+        C21(I,3,1) = -C11(I,2,1)        
+        C21(I,3,2) = -C11(I,2,2)        
+        C21(I,3,3) = -C11(I,2,3)        
+        C22(I,3)   = 0.0        
         H6(I)=EP20
 C--------BLOQUE ---------------------------------------
        ELSEIF (IXTG1(3,I)<0) THEN
-        C21(I,3,1) = C11(I,2,1)	      
-        C21(I,3,2) = C11(I,2,2)	      
-        C21(I,3,3) = C11(I,2,3)	      
-        C22(I,3)   = 0.0	      
+        C21(I,3,1) = C11(I,2,1)        
+        C21(I,3,2) = C11(I,2,2)        
+        C21(I,3,3) = C11(I,2,3)        
+        C22(I,3)   = 0.0        
         H6(I)=EP20
        ENDIF 
       ENDDO
@@ -238,42 +233,42 @@ C---+----1----+----2----+----3----+----4----+----5----+----6----+----7--
        B32=TWO*C2(I)*S2(I)*H26
        B33=TWO*C3(I)*S3(I)*H34
 C
-       PB1(I,1,1) =B11*C11(I,1,1)+B12*C11(I,2,1)+B13*C11(I,3,1)	      
+       PB1(I,1,1) =B11*C11(I,1,1)+B12*C11(I,2,1)+B13*C11(I,3,1)        
        PB1(I,1,2) =B11*C11(I,1,2)+B12*C11(I,2,2)+B13*C11(I,3,2)
        PB1(I,1,3) =B11*C11(I,1,3)+B12*C11(I,2,3)+B13*C11(I,3,3)
-       PB1(I,2,1) =B21*C11(I,1,1)+B22*C11(I,2,1)+B23*C11(I,3,1)	      
+       PB1(I,2,1) =B21*C11(I,1,1)+B22*C11(I,2,1)+B23*C11(I,3,1)        
        PB1(I,2,2) =B21*C11(I,1,2)+B22*C11(I,2,2)+B23*C11(I,3,2)
        PB1(I,2,3) =B21*C11(I,1,3)+B22*C11(I,2,3)+B23*C11(I,3,3)
-       PB1(I,3,1) =B31*C11(I,1,1)+B32*C11(I,2,1)+B33*C11(I,3,1)	      
+       PB1(I,3,1) =B31*C11(I,1,1)+B32*C11(I,2,1)+B33*C11(I,3,1)        
        PB1(I,3,2) =B31*C11(I,1,2)+B32*C11(I,2,2)+B33*C11(I,3,2)
        PB1(I,3,3) =B31*C11(I,1,3)+B32*C11(I,2,3)+B33*C11(I,3,3)
 C
-       PB2(I,1,1) =B13*C22(I,1)	      
+       PB2(I,1,1) =B13*C22(I,1)        
        PB2(I,1,2) =B11*C22(I,2)
        PB2(I,1,3) =B12*C22(I,3)
-       PB2(I,2,1) =B23*C22(I,1)	      
+       PB2(I,2,1) =B23*C22(I,1)        
        PB2(I,2,2) =B21*C22(I,2)
        PB2(I,2,3) =B22*C22(I,3)
-       PB2(I,3,1) =B33*C22(I,1)	      
+       PB2(I,3,1) =B33*C22(I,1)        
        PB2(I,3,2) =B31*C22(I,2)
        PB2(I,3,3) =B32*C22(I,3)
 C
-       PB3(I,1,1) =B11	      
+       PB3(I,1,1) =B11        
        PB3(I,1,2) =B12
        PB3(I,1,3) =B13
-       PB3(I,2,1) =B21	      
+       PB3(I,2,1) =B21        
        PB3(I,2,2) =B22
        PB3(I,2,3) =B23
-       PB3(I,3,1) =B31	      
+       PB3(I,3,1) =B31        
        PB3(I,3,2) =B32
        PB3(I,3,3) =B33
-       PB3(I,1,4) =C21(I,2,1)	      
+       PB3(I,1,4) =C21(I,2,1)        
        PB3(I,1,5) =C21(I,2,2)
        PB3(I,1,6) =C21(I,2,3)
-       PB3(I,2,4) =C21(I,3,1)	      
+       PB3(I,2,4) =C21(I,3,1)        
        PB3(I,2,5) =C21(I,3,2)
        PB3(I,2,6) =C21(I,3,3)
-       PB3(I,3,4) =C21(I,1,1)	      
+       PB3(I,3,4) =C21(I,1,1)        
        PB3(I,3,5) =C21(I,1,2)
        PB3(I,3,6) =C21(I,1,3)
       ENDDO

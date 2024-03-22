@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -29,11 +29,13 @@ Chd|        I10BOX                        source/interfaces/int16/i16crit.F
 Chd|        I16BOX                        source/interfaces/int16/i16crit.F
 Chd|        I20BOX                        source/interfaces/int16/i16crit.F
 Chd|        I8BOX                         source/interfaces/int16/i16crit.F
+Chd|        I16MAIN_MOD                   source/interfaces/int16/i16main.F
 Chd|====================================================================
        SUBROUTINE I16CRIT(
      1       X      ,NSV    ,NELEM ,NSN   ,EMINX  ,
      2       NME    ,ITASK  ,XSAV  ,IXS   ,IXS16  ,
      3       IXS20  ,IXS10  ,V      ,A     )
+       USE I16MAIN_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -46,15 +48,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com06_c.inc"
 #include      "com08_c.inc"
-#include      "scr05_c.inc"
 #include      "task_c.inc"
-#include      "param_c.inc"
       COMMON /I16TMP/SIZE
       my_real 
      .        SIZE
@@ -77,9 +73,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
-#include "sync_dir.inc"
-C-----------------------------------------------
-C------------------------------------
       NSNF = 1 + ITASK*NSN / NTHREAD
       NSNL = (ITASK+1)*NSN / NTHREAD
       NMEF = 1 + ITASK*NME / NTHREAD
@@ -231,15 +224,10 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "com08_c.inc"
-#include      "units_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -542,15 +530,10 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "com08_c.inc"
-#include      "units_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -616,101 +599,101 @@ C-----------------------------------------------------------------------
             XMSR(IDIR+3)=MIN(XMSR(IDIR+3),X8-XSAV(IDIR,J))
 C
             J = IXS20(1,N20)
-            IF(J/=0)THEN	
+            IF(J/=0)THEN
               X9  = X(IDIR,J)+DT2*(V(IDIR,J)+DT12*A(IDIR,J))
               XMSR(IDIR)  =MAX(XMSR(IDIR)  ,X9-XSAV(IDIR,J))
               XMSR(IDIR+3)=MIN(XMSR(IDIR+3),X9-XSAV(IDIR,J))
-	    ELSE
-	      X9=0.5*(X(IDIR,IXS(2,NE))+X(IDIR,IXS(3,NE)))
-	    ENDIF
+              ELSE
+                X9=0.5*(X(IDIR,IXS(2,NE))+X(IDIR,IXS(3,NE)))
+              ENDIF
             J = IXS20(2,N20)
             IF(J/=0)THEN
               X10 = X(IDIR,J)+DT2*(V(IDIR,J)+DT12*A(IDIR,J))
               XMSR(IDIR)  =MAX(XMSR(IDIR)  ,X10-XSAV(IDIR,J))
               XMSR(IDIR+3)=MIN(XMSR(IDIR+3),X10-XSAV(IDIR,J))
-	    ELSE
-	      X10=0.5*(X(IDIR,IXS(3,NE))+X(IDIR,IXS(4,NE)))
-	    ENDIF
+              ELSE
+                X10=0.5*(X(IDIR,IXS(3,NE))+X(IDIR,IXS(4,NE)))
+              ENDIF
             J = IXS20(3,N20)
             IF(J/=0)THEN
              X11 = X(IDIR,J)+DT2*(V(IDIR,J)+DT12*A(IDIR,J))
              XMSR(IDIR)  =MAX(XMSR(IDIR)  ,X11-XSAV(IDIR,J))
              XMSR(IDIR+3)=MIN(XMSR(IDIR+3),X11-XSAV(IDIR,J))
-	    ELSE
-	      X11=0.5*(X(IDIR,IXS(4,NE))+X(IDIR,IXS(5,NE)))
-	    ENDIF
+              ELSE
+                X11=0.5*(X(IDIR,IXS(4,NE))+X(IDIR,IXS(5,NE)))
+              ENDIF
             J = IXS20(4,N20)
-            IF(J/=0)THEN	
+            IF(J/=0)THEN
              X12 = X(IDIR,J)+DT2*(V(IDIR,J)+DT12*A(IDIR,J))
              XMSR(IDIR)  =MAX(XMSR(IDIR)  ,X12-XSAV(IDIR,J))
              XMSR(IDIR+3)=MIN(XMSR(IDIR+3),X12-XSAV(IDIR,J))
-	    ELSE
-	      X12=0.5*(X(IDIR,IXS(5,NE))+X(IDIR,IXS(2,NE)))
-	    ENDIF
+              ELSE
+                X12=0.5*(X(IDIR,IXS(5,NE))+X(IDIR,IXS(2,NE)))
+              ENDIF
             J = IXS20(5,N20)
-            IF(J/=0)THEN	
+            IF(J/=0)THEN
              X13 = X(IDIR,J)+DT2*(V(IDIR,J)+DT12*A(IDIR,J))
              XMSR(IDIR)  =MAX(XMSR(IDIR)  ,X13-XSAV(IDIR,J))
              XMSR(IDIR+3)=MIN(XMSR(IDIR+3),X13-XSAV(IDIR,J))
-	    ELSE
-	      X13=0.5*(X(IDIR,IXS(2,NE))+X(IDIR,IXS(6,NE)))
-	    ENDIF  	   
+              ELSE
+                X13=0.5*(X(IDIR,IXS(2,NE))+X(IDIR,IXS(6,NE)))
+              ENDIF       
             J = IXS20(6,N20)
-            IF(J/=0)THEN	
+            IF(J/=0)THEN
              X14 = X(IDIR,J)+DT2*(V(IDIR,J)+DT12*A(IDIR,J))
              XMSR(IDIR)  =MAX(XMSR(IDIR)  ,X14-XSAV(IDIR,J))
              XMSR(IDIR+3)=MIN(XMSR(IDIR+3),X14-XSAV(IDIR,J))
-	    ELSE
-	      X14=0.5*(X(IDIR,IXS(3,NE))+X(IDIR,IXS(6,NE)))
-	    ENDIF
+              ELSE
+                X14=0.5*(X(IDIR,IXS(3,NE))+X(IDIR,IXS(6,NE)))
+              ENDIF
             J = IXS20(7,N20)
-            IF(J/=0)THEN	
+            IF(J/=0)THEN
              X15 = X(IDIR,J)+DT2*(V(IDIR,J)+DT12*A(IDIR,J))
              XMSR(IDIR)  =MAX(XMSR(IDIR)  ,X15-XSAV(IDIR,J))
              XMSR(IDIR+3)=MIN(XMSR(IDIR+3),X15-XSAV(IDIR,J))
-	    ELSE
-	      X15=0.5*(X(IDIR,IXS(4,NE))+X(IDIR,IXS(8,NE)))
-	    ENDIF
+              ELSE
+                X15=0.5*(X(IDIR,IXS(4,NE))+X(IDIR,IXS(8,NE)))
+              ENDIF
             J = IXS20(8,N20)
             IF(J/=0)THEN
              X16 = X(IDIR,J)+DT2*(V(IDIR,J)+DT12*A(IDIR,J))
              XMSR(IDIR)  =MAX(XMSR(IDIR)  ,X16-XSAV(IDIR,J))
              XMSR(IDIR+3)=MIN(XMSR(IDIR+3),X16-XSAV(IDIR,J))
-	    ELSE
-	      X16=0.5*(X(IDIR,IXS(5,NE))+X(IDIR,IXS(9,NE)))
-	    ENDIF
+              ELSE
+                X16=0.5*(X(IDIR,IXS(5,NE))+X(IDIR,IXS(9,NE)))
+              ENDIF
             J = IXS20(9,N20)
-            IF(J/=0)THEN	
+            IF(J/=0)THEN
              X17 = X(IDIR,J)+DT2*(V(IDIR,J)+DT12*A(IDIR,J))
              XMSR(IDIR)  =MAX(XMSR(IDIR)  ,X17-XSAV(IDIR,J))
              XMSR(IDIR+3)=MIN(XMSR(IDIR+3),X17-XSAV(IDIR,J))
-	    ELSE
-	      X17=0.5*(X(IDIR,IXS(6,NE))+X(IDIR,IXS(7,NE)))
-	    ENDIF
+              ELSE
+                X17=0.5*(X(IDIR,IXS(6,NE))+X(IDIR,IXS(7,NE)))
+              ENDIF
             J = IXS20(10,N20)
             IF(J/=0)THEN
              X18 = X(IDIR,J)+DT2*(V(IDIR,J)+DT12*A(IDIR,J))
              XMSR(IDIR)  =MAX(XMSR(IDIR)  ,X18-XSAV(IDIR,J))
              XMSR(IDIR+3)=MIN(XMSR(IDIR+3),X18-XSAV(IDIR,J))
-	    ELSE
-	      X18=0.5*(X(IDIR,IXS(7,NE))+X(IDIR,IXS(8,NE)))
-	    ENDIF
+              ELSE
+                X18=0.5*(X(IDIR,IXS(7,NE))+X(IDIR,IXS(8,NE)))
+              ENDIF
             J = IXS20(11,N20)
-            IF(J/=0)THEN	
+            IF(J/=0)THEN
              X19 = X(IDIR,J)+DT2*(V(IDIR,J)+DT12*A(IDIR,J))
              XMSR(IDIR)  =MAX(XMSR(IDIR)  ,X19-XSAV(IDIR,J))
              XMSR(IDIR+3)=MIN(XMSR(IDIR+3),X19-XSAV(IDIR,J))
-	    ELSE
-	      X19=0.5*(X(IDIR,IXS(8,NE))+X(IDIR,IXS(9,NE)))
-	    ENDIF
+              ELSE
+                X19=0.5*(X(IDIR,IXS(8,NE))+X(IDIR,IXS(9,NE)))
+              ENDIF
             J = IXS20(12,N20)
             IF(J/=0)THEN
              X20 = X(IDIR,J)+DT2*(V(IDIR,J)+DT12*A(IDIR,J))
              XMSR(IDIR)  =MAX(XMSR(IDIR)  ,X20-XSAV(IDIR,J))
              XMSR(IDIR+3)=MIN(XMSR(IDIR+3),X20-XSAV(IDIR,J))
-	    ELSE
-	      X20=0.5*(X(IDIR,IXS(6,NE))+X(IDIR,IXS(9,NE)))
-	    ENDIF
+              ELSE
+                X20=0.5*(X(IDIR,IXS(6,NE))+X(IDIR,IXS(9,NE)))
+              ENDIF
 C
 C-----------------------------------------------------------------------
 C           Face 1 2 3 4
@@ -875,15 +858,10 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "com08_c.inc"
-#include      "units_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1002,15 +980,9 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com04_c.inc"
 #include      "com08_c.inc"
-#include      "units_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

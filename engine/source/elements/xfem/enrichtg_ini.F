@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -29,7 +29,7 @@ Chd|        ARRET                         source/system/arret.F
 Chd|        CLSKEW3                       source/elements/sh3n/coquedk/cdkcoor3.F
 Chd|        LSINT4                        source/elements/xfem/crklayer4n_adv.F
 Chd|        CRACKXFEM_MOD                 share/modules/crackxfem_mod.F 
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE ENRICHTG_INI(ELBUF_STR,
      .      IXTG     ,NFT      ,JFT     ,JLT    ,NXLAY   ,
@@ -49,10 +49,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "com_xfem1.inc"
-#include      "param_c.inc"
 #include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s

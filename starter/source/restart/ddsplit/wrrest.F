@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -24,8 +24,12 @@ Chd|====================================================================
 Chd|  WRITE_DB                      source/restart/ddsplit/wrrest.F
 Chd|-- called by -----------
 Chd|        COMPRESS_R_NNZ                ../common_source/comm/compress_nnz.F
-Chd|        PBLAST_WRITE_ENGINE           ../common_source/modules/pblast_mod.F
-Chd|        PBLAST_WRITE_STARTER          ../common_source/modules/pblast_mod.F
+Chd|        PBLAST_WRITE_ENGINE           ../common_source/modules/loads/pblast_mod.F
+Chd|        PBLAST_WRITE_STARTER          ../common_source/modules/loads/pblast_mod.F
+Chd|        WRITE_REAL                    ../common_source/comm/write_mod.F
+Chd|        WRITE_REAL_1D                 ../common_source/comm/write_mod.F
+Chd|        WRITE_REAL_2D                 ../common_source/comm/write_mod.F
+Chd|        WRITE_REAL_3D                 ../common_source/comm/write_mod.F
 Chd|        WRITE_UNITS                   ../common_source/comm/write_units.F
 Chd|        CONVWREST                     source/restart/ddsplit/wrrest.F
 Chd|        COPY_RVAL                     source/restart/ddsplit/inter_tools.F
@@ -47,14 +51,18 @@ Chd|        SPLIT_CAND_RVAL               source/restart/ddsplit/inter_tools.F
 Chd|        SPLIT_NODE_RVAL               source/restart/ddsplit/inter_tools.F
 Chd|        SPLIT_SEG_RVAL_I20            source/restart/ddsplit/inter_tools.F
 Chd|        SPLIT_XSAV                    source/restart/ddsplit/inter_tools.F
+Chd|        SPMD_USERWI_REST              source/user_interface/user_windows_tools.F
 Chd|        TABLE_WRESTR                  source/tools/curve/table_tools.F
-Chd|        TABLE_WRESTR_MAT              source/tools/curve/table_tools.F
 Chd|        THCWREST                      source/restart/ddsplit/wrrest.F
 Chd|        WRITE_DB_DEBUG                source/output/tools/write_debug.F
 Chd|        WRITE_ELGROUP_PARAM           source/restart/ddsplit/write_elgroup_param.F
+Chd|        WRITE_FAILPARAM               source/materials/fail/write_failparam.F
 Chd|        WRITE_MATPARAM                source/materials/mat/write_matparam.F
+Chd|        WRITE_MAT_TABLE               source/materials/tools/write_mat_table.F
 Chd|        WRITE_NLOC_STRUCT             source/restart/ddsplit/write_nloc_struct.F
-Chd|        WRITE_SENSOR_TAB              source/tools/sensor/write_sensor_tab.F
+Chd|        WRITE_PCYL                    source/loads/general/load_pcyl/write_pcyl.F
+Chd|        WRITE_SENSORS                 source/tools/sensor/write_sensors.F
+Chd|        WRITE_VISCPARAM               source/materials/mat/write_viscparam.F
 Chd|        W_ALELAG                      source/restart/ddsplit/w_alelag.F
 Chd|        W_ANIM_CRK                    source/restart/ddsplit/w_anim_crk.F
 Chd|        W_AVUPLY                      source/restart/ddsplit/w_avuply.F
@@ -62,6 +70,7 @@ Chd|        W_BID                         source/restart/ddsplit/w_bid.F
 Chd|        W_BUFBRIC_22                  source/interfaces/inter3d1/w_bufbric_22.F
 Chd|        W_BUFEL                       source/restart/ddsplit/w_bufel.F
 Chd|        W_CLUSTER                     source/restart/ddsplit/w_cluster.F
+Chd|        W_DISP0_VEL0_CLOAD            source/restart/ddsplit/w_disp0_vel0_cload.F
 Chd|        W_DRAPE                       source/restart/ddsplit/w_drape.F
 Chd|        W_ELBUF_STR                   source/restart/ddsplit/w_elbuf_str.F
 Chd|        W_FAC                         source/restart/ddsplit/w_fac.F
@@ -89,7 +98,7 @@ Chd|        W_SKWSUB                      source/restart/ddsplit/w_skwsub.F
 Chd|        W_STACK                       source/restart/ddsplit/w_stack.F
 Chd|        W_TABMAT_PROP                 source/restart/ddsplit/w_tabmat_prop.F
 Chd|-- calls ---------------
-Chd|        WRITE_DB_C                    source/output/tools/write_routines.c
+Chd|        WRITE_DB_C                    ../common_source/tools/input_output/write_routtines.c
 Chd|====================================================================
       SUBROUTINE WRITE_DB(A,N)
 C ecriture nombre reel : routine tampon
@@ -101,7 +110,6 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER N
-C     REAL
       my_real
      .   A(*)
 C-----------------------------------------------
@@ -162,11 +170,16 @@ C
 Chd|====================================================================
 Chd|  WRITE_DPDB                    source/restart/ddsplit/wrrest.F
 Chd|-- called by -----------
+Chd|        WRITE_DOUBLE                  ../common_source/comm/write_mod.F
+Chd|        WRITE_DOUBLE_1D               ../common_source/comm/write_mod.F
+Chd|        WRITE_DOUBLE_2D               ../common_source/comm/write_mod.F
+Chd|        WRITE_DOUBLE_3D               ../common_source/comm/write_mod.F
 Chd|        DDSPLIT                       source/restart/ddsplit/ddsplit.F
 Chd|        INTSTAMP_WRESTR               share/modules1/intstamp_mod.F 
+Chd|        WRITE_SENSORS                 source/tools/sensor/write_sensors.F
 Chd|        W_ELBUF_STR                   source/restart/ddsplit/w_elbuf_str.F
 Chd|-- calls ---------------
-Chd|        WRITE_DB_C                    source/output/tools/write_routines.c
+Chd|        WRITE_DB_C                    ../common_source/tools/input_output/write_routtines.c
 Chd|====================================================================
       SUBROUTINE WRITE_DPDB(A,N)
 C ecriture nombre reel : routine tampon
@@ -178,13 +191,8 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER N
-C     REAL
       DOUBLE PRECISION
      .   A(*)
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "scr05_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -221,13 +229,13 @@ Chd|  READ_DB                       source/restart/ddsplit/wrrest.F
 Chd|-- called by -----------
 Chd|        DECOMPRESS_R_NNZ              ../common_source/comm/decompress_nnz.F
 Chd|        INTBUF_INI                    ../common_source/interf/intbuf_ini.F
-Chd|        PBLAST_LOAD                   ../common_source/modules/pblast_mod.F
+Chd|        PBLAST_LOAD                   ../common_source/modules/loads/pblast_mod.F
 Chd|        READ_UNITS                    ../common_source/comm/write_units.F
 Chd|        INTSTAMP_RRESTR               share/modules1/intstamp_mod.F 
 Chd|        LEC_INIMAP1D_FILE             source/initial_conditions/inimap/lec_inimap1d_file.F
 Chd|        LEC_INIMAP2D_FILE             source/initial_conditions/inimap/lec_inimap2d_file.F
 Chd|-- calls ---------------
-Chd|        READ_DB_C                     source/output/tools/write_routines.c
+Chd|        READ_DB_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|====================================================================
       SUBROUTINE READ_DB(A,N)
 C lecture nombre reel : routine tampon
@@ -302,7 +310,7 @@ Chd|  READ_DPDB                     source/restart/ddsplit/wrrest.F
 Chd|-- called by -----------
 Chd|        INTSTAMP_RRESTR               share/modules1/intstamp_mod.F 
 Chd|-- calls ---------------
-Chd|        READ_DB_C                     source/output/tools/write_routines.c
+Chd|        READ_DB_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|====================================================================
       SUBROUTINE READ_DPDB(A,N)
 C lecture nombre reel : routine tampon
@@ -314,13 +322,8 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER N
-C     REAL
       DOUBLE PRECISION 
      .   A(*)
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "scr05_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -359,7 +362,7 @@ Chd|        DDSPLIT                       source/restart/ddsplit/ddsplit.F
 Chd|-- calls ---------------
 Chd|        DELETE_USER_FILE              source/user_interface/dyn_userlib.c
 Chd|        WRITE_DB                      source/restart/ddsplit/wrrest.F
-Chd|        WRITE_I_C                     source/output/tools/write_routines.c
+Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|        WRTSQI                        source/output/tools/wrtsqi.F  
 Chd|        WRTSQR                        source/output/tools/wrtsqr.F  
 Chd|====================================================================
@@ -380,7 +383,6 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "scr05_c.inc"
 #include      "scr15_c.inc"
-#include      "units_c.inc"
 #include      "units_fxbody_c.inc"
 #include      "fxbcom.inc"
 C-----------------------------------------------
@@ -528,12 +530,13 @@ C Ecriture des fichiers de modes et de contraintes
 C
       RETURN
       END
+
 Chd|====================================================================
 Chd|  EIGWREST                      source/restart/ddsplit/wrrest.F
 Chd|-- called by -----------
 Chd|-- calls ---------------
 Chd|        WRITE_DB                      source/restart/ddsplit/wrrest.F
-Chd|        WRITE_I_C                     source/output/tools/write_routines.c
+Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|        WRTSQI                        source/output/tools/wrtsqi.F  
 Chd|        WRTSQR                        source/output/tools/wrtsqr.F  
 Chd|====================================================================
@@ -606,7 +609,7 @@ Chd|-- called by -----------
 Chd|        DDSPLIT                       source/restart/ddsplit/ddsplit.F
 Chd|-- calls ---------------
 Chd|        WRITE_DB                      source/restart/ddsplit/wrrest.F
-Chd|        WRITE_I_C                     source/output/tools/write_routines.c
+Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|====================================================================
       SUBROUTINE EIGWRESTP(EIGIPM, EIGIBUF, EIGRPM, LEIBUF_L,LEN_AM)      
 C-----------------------------------------------
@@ -616,9 +619,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
 #include      "com04_c.inc"
-#include      "scr05_c.inc"
 #include      "eigcom.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -642,12 +643,13 @@ C--------------------------------------
 C
       RETURN
       END
+
 Chd|====================================================================
 Chd|  DSWREST                       source/restart/ddsplit/wrrest.F
 Chd|-- called by -----------
 Chd|-- calls ---------------
 Chd|        WRITE_DB                      source/restart/ddsplit/wrrest.F
-Chd|        WRITE_I_C                     source/output/tools/write_routines.c
+Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|        WRTSQI                        source/output/tools/wrtsqi.F  
 Chd|        WRTSQR                        source/output/tools/wrtsqr.F  
 Chd|        DSGRAPH_MOD                   share/modules1/dsgraph_mod.F  
@@ -766,12 +768,13 @@ C
 C
       RETURN
       END
+
 Chd|====================================================================
 Chd|  DSWRESTP                      source/restart/ddsplit/wrrest.F
 Chd|-- called by -----------
 Chd|-- calls ---------------
 Chd|        WRITE_DB                      source/restart/ddsplit/wrrest.F
-Chd|        WRITE_I_C                     source/output/tools/write_routines.c
+Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|        DSGRAPH_MOD                   share/modules1/dsgraph_mod.F  
 Chd|====================================================================
       SUBROUTINE DSWRESTP(PGRAPH,LEN_IA,LEN_AM)
@@ -783,9 +786,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -861,12 +861,13 @@ C--------------------------------------
 C
       RETURN
       END
+
 Chd|====================================================================
 Chd|  NFWREST                       source/restart/ddsplit/wrrest.F
 Chd|-- called by -----------
 Chd|-- calls ---------------
 Chd|        WRITE_DB                      source/restart/ddsplit/wrrest.F
-Chd|        WRITE_I_C                     source/output/tools/write_routines.c
+Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|        WRTSQI                        source/output/tools/wrtsqi.F  
 Chd|        WRTSQR                        source/output/tools/wrtsqr.F  
 Chd|====================================================================
@@ -914,7 +915,7 @@ Chd|-- called by -----------
 Chd|        DDSPLIT                       source/restart/ddsplit/ddsplit.F
 Chd|-- calls ---------------
 Chd|        WRITE_DB                      source/restart/ddsplit/wrrest.F
-Chd|        WRITE_I_C                     source/output/tools/write_routines.c
+Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|====================================================================
       SUBROUTINE NFWRESTP(IFLOW, RFLOW,LEN_IA,LEN_AM)
 C-----------------------------------------------
@@ -965,7 +966,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
 #include      "com04_c.inc"
 #include      "scr05_c.inc"
 C-----------------------------------------------
@@ -988,48 +988,6 @@ C--------------------------------------
       ENDIF
       RETURN
       END
-C ---  
-CCC Chd|====================================================================
-CCC Chd|  UNITWREST                     src/init1/wrrest.F            
-CCC Chd|-- called by -----------
-CCC Chd|-- calls ---------------
-CCC Chd|        WRITE_DB                      src/init1/wrrest.F            
-CCC Chd|        WRTSQR                        src/init1/wrtsqr.F            
-CCC Chd|====================================================================
-CCC       SUBROUTINE UNITWREST(UNITAB,LUNIT,NUNITS)
-CCC C-----------------------------------------------
-CCC C   I m p l i c i t   T y p e s
-CCC C-----------------------------------------------
-CCC #include      "implicit_f.inc"
-CCC C-----------------------------------------------
-CCC C   C o m m o n   B l o c k s
-CCC C-----------------------------------------------
-CCC #include      "com04_c.inc"
-CCC #include      "scr05_c.inc"
-CCC #include      "param_c.inc"
-CCC C-----------------------------------------------
-CCC C   D u m m y   A r g u m e n t s
-CCC C-----------------------------------------------
-CCC       INTEGER  LUNIT,NUNITS
-CCC       my_real 
-CCC      .   UNITAB(LUNIT,NUNITS)
-CCC C-----------------------------------------------
-CCC C   L o c a l   V a r i a b l e s
-CCC C-----------------------------------------------
-CCC       INTEGER LEN
-CCC C=======================================================================
-C     ECRITURE DES REELS
-CCC C-----------------------
-CCC      LEN=LUNIT*NUNITS
-CCC      IF (IRFORM/5<=1) THEN
-CCC        CALL WRTSQR (UNITAB,LEN,IRFORM)
-CCC     
-CCC      ELSE
-CCC        CALL WRITE_DB(UNITAB,LEN)
-CCC     ENDIF
-CCC C-----------
-CCC       RETURN
-CCC       END
 
 C convection flux 
 Chd|====================================================================
@@ -1037,7 +995,7 @@ Chd|  CONVWREST                     source/restart/ddsplit/wrrest.F
 Chd|-- called by -----------
 Chd|-- calls ---------------
 Chd|        WRITE_DB                      source/restart/ddsplit/wrrest.F
-Chd|        WRITE_I_C                     source/output/tools/write_routines.c
+Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|        WRTSQI                        source/output/tools/wrtsqi.F  
 Chd|        WRTSQR                        source/output/tools/wrtsqr.F  
 Chd|====================================================================
@@ -1049,7 +1007,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
 #include      "com04_c.inc"
 #include      "scr05_c.inc"
 #include      "param_c.inc"
@@ -1080,7 +1037,7 @@ Chd|  FXTEMPWREST                   source/restart/ddsplit/wrrest.F
 Chd|-- called by -----------
 Chd|-- calls ---------------
 Chd|        WRITE_DB                      source/restart/ddsplit/wrrest.F
-Chd|        WRITE_I_C                     source/output/tools/write_routines.c
+Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|        WRTSQI                        source/output/tools/wrtsqi.F  
 Chd|        WRTSQR                        source/output/tools/wrtsqr.F  
 Chd|====================================================================
@@ -1092,7 +1049,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
 #include      "com04_c.inc"
 #include      "scr05_c.inc"
 #include      "param_c.inc"
@@ -1117,14 +1073,14 @@ C--------------------------------------
       ENDIF
       RETURN
       END
+
 C for rigid_ material     
-C  /------------------------------------------------------------
 Chd|====================================================================
 Chd|  RIGMATWREST                   source/restart/ddsplit/wrrest.F
 Chd|-- called by -----------
 Chd|-- calls ---------------
 Chd|        WRITE_DB                      source/restart/ddsplit/wrrest.F
-Chd|        WRITE_I_C                     source/output/tools/write_routines.c
+Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|        WRTSQI                        source/output/tools/wrtsqi.F  
 Chd|        WRTSQR                        source/output/tools/wrtsqr.F  
 Chd|====================================================================
@@ -1136,8 +1092,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "scr05_c.inc"
 C-----------------------------------------------
@@ -1166,13 +1120,14 @@ C--------------------------------------
       ENDIF
       RETURN
       END
+
 C for shell composite xfem 
 Chd|====================================================================
 Chd|  PLYXFEM_WREST                 source/restart/ddsplit/wrrest.F
 Chd|-- called by -----------
 Chd|-- calls ---------------
 Chd|        WRITE_DB                      source/restart/ddsplit/wrrest.F
-Chd|        WRITE_I_C                     source/output/tools/write_routines.c
+Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|        WRTSQI                        source/output/tools/wrtsqi.F  
 Chd|        WRTSQR                        source/output/tools/wrtsqr.F  
 Chd|====================================================================
@@ -1184,7 +1139,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "scr05_c.inc"

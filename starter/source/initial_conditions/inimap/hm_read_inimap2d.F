@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -65,7 +65,6 @@ C-----------------------------------------------
 #include      "scr17_c.inc"
 !NFUNCT
 #include      "com04_c.inc"
-#include      "submod_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -329,7 +328,7 @@ C     ==============
             INIMAP2D(KK)%NODEID3 = LNODID3
          ENDIF
 
-         IF (LNODID1 * LNODID2 * LNODID3 == 0) THEN
+         IF (LNODID1==0 .or. LNODID2==0 .or. LNODID3==0) THEN
 C       Error here, we need 3 nodes to define a plane
          ELSE
             X0(1:3) = XGRID(1:3, LNODID1)

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -28,8 +28,8 @@ Chd|-- calls ---------------
 Chd|        FINTER                        source/tools/curve/finter.F   
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
 Chd|====================================================================
-      SUBROUTINE CONVEC (IBCV  ,FCONV    ,NPC   ,TF    , X      ,
-     1                   TEMP   , SENSOR_TAB ,FTHE   ,IAD ,
+      SUBROUTINE CONVEC (IBCV   ,FCONV    ,NPC   ,TF    , X      ,
+     1                   TEMP   ,NSENSOR  ,SENSOR_TAB   ,FTHE    ,IAD ,
      2                   FTHESKY)
 C-----------------------------------------------
 C   M o d u l e s
@@ -44,18 +44,15 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com06_c.inc"
 #include      "com08_c.inc"
-#include      "scr05_c.inc"
-#include      "task_c.inc"
 #include      "parit_c.inc"
 #include      "scr_thermal_c.inc"
 #include      "thermal_c.inc"
 C-----------------------------------------------,
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER ,INTENT(IN) :: NSENSOR
       INTEGER NPC(*),IAD(4,*)
       INTEGER IBCV(NICONV,*)
 C     REAL
@@ -297,6 +294,8 @@ C
             FTHESKY(IAD1) = ZERO
             IAD2 = IAD(2,NL)
             FTHESKY(IAD2) = ZERO
+            N3 = IBCV(3,NL)
+            N4 = IBCV(4,NL)
             IF(N4 > 0)THEN
               IAD3 = IAD(3,NL)
               FTHESKY(IAD3) = ZERO

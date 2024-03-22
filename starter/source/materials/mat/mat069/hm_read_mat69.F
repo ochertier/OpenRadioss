@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -32,7 +32,7 @@ Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.
 Chd|        HM_OPTION_IS_ENCRYPTED        source/devtools/hm_reader/hm_option_is_encrypted.F
 Chd|        INIT_MAT_KEYWORD              source/materials/mat/init_mat_keyword.F
 Chd|        ELBUFTAG_MOD                  share/modules1/elbuftag_mod.F 
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/matparam_def_mod.F
+Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
@@ -72,13 +72,7 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr17_c.inc"
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
 #include      "units_c.inc"
-#include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "submod_c.inc"
-#include      "sysunit.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -137,14 +131,19 @@ C-----------------------------------------------
       NFUNC   = 2
       NUVAR   = 9
 C-----------------------------------------------
-
       ZEP495 = ZEP4 + NINE*EM02 + FIVE*EM03
-
-      IF (ICHECK == 0)     ICHECK = -3
-      IF (NSTART == 0)     NSTART = 100
-      IF (ERRTOL == ZERO ) ERRTOL = FIVEEM3
-      IF (NMUAL == 0)      NMUAL = 2
-      IF (FSCAL == ZERO)   FSCAL = ONE*FSCAL_UNIT
+      IF(ICHECK == 0    ) ICHECK = -3
+      IF(NSTART == 0    ) NSTART = 100
+      IF(ERRTOL == ZERO ) ERRTOL = FIVEEM3
+      IF(NMUAL  == 0    ) NMUAL  = 2
+      IF(FSCAL  == ZERO ) FSCAL  = ONE*FSCAL_UNIT
+      IF(LAWID  == 0    ) LAWID  = -1
+      IF(LAWID == -1) THEN
+       ICHECK = -3
+       NSTART = 100
+       ERRTOL = FIVEEM3
+       NMUAL = 2
+      ENDIF
       IF (NTABLE_ == 0) THEN
         CALL ANCMSG(MSGID=894,
      .              MSGTYPE=MSGERROR,
@@ -153,7 +152,7 @@ C-----------------------------------------------
      .              C1=TITR)
       ENDIF
       IF (LAWID == 0)  LAWID = 1
-      IF (LAWID /= 1 .AND. LAWID /= 2) THEN
+      IF (LAWID /= 1 .AND. LAWID /= 2 .AND.  LAWID /= -1 ) THEN ! New flag (automatic fitting)
         CALL ANCMSG(MSGID=882,
      .              MSGTYPE=MSGERROR,
      .              ANMODE=ANINFO,
@@ -216,6 +215,10 @@ C---
 c-----------------
       CALL INIT_MAT_KEYWORD(MATPARAM,"INCOMPRESSIBLE")
       CALL INIT_MAT_KEYWORD(MATPARAM,"TOTAL")
+      CALL INIT_MAT_KEYWORD(MATPARAM,"HOOK")
+      ! Properties compatibility  
+      CALL INIT_MAT_KEYWORD(MATPARAM,"SHELL_ISOTROPIC")
+      CALL INIT_MAT_KEYWORD(MATPARAM,"SOLID_ISOTROPIC")
 c-----------------
       WRITE(IOUT,1100) TRIM(TITR),ID,69
       WRITE(IOUT,1000)

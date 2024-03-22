@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -36,9 +36,6 @@ C----------------------------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -80,7 +77,7 @@ C======================================================================|
      .                  C2='FIXED TRANSLATIONAL VELOCITY',
      .                  C3=TITR,C4=' ',
      .                  I2=ITAB(IABS(IBFV(1,N))))
-	  ELSEIF(J>3.AND.MASS(NNO)==0)THEN
+            ELSEIF(J>3.AND.MASS(NNO)==0)THEN
             CALL ANCMSG(MSGID=535,
      .                  MSGTYPE=MSGERROR,
      .                  ANMODE=ANINFO_BLIND_1,
@@ -89,9 +86,9 @@ C======================================================================|
      .                  C2='FIXED ROTATIONAL VELOCITY',
      .                  C3=TITR,C4=' ',
      .                  I2=ITAB(IABS(IBFV(1,N))))
-	  ENDIF
+            ENDIF
 Cm41u07---
-	  IF(NC>LAG_NCF)THEN
+            IF(NC>LAG_NCF)THEN
             CALL ANCMSG(MSGID=468,
      .                  MSGTYPE=MSGERROR,
      .                  ANMODE=ANINFO,
@@ -123,7 +120,7 @@ Cm41u07---
      .                     C2='FIXED ROTATIONAL VELOCITY',
      .                     C3=TITR,
      .                     I2=ITAB(IABS(IBFV(1,N))))
-	    ENDIF
+              ENDIF
           ELSE
             IADLL(NC+1)=IADLL(NC) + 3
             IF(IADLL(NC+1)-1>LAG_NKF)THEN
@@ -155,7 +152,7 @@ Cm41u07---
      .                     C2='FIXED ROTATIONAL VELOCITY',
      .                     C3=TITR,
      .                     I2=ITAB(IABS(IBFV(1,N))))
-	      ENDIF
+                ENDIF
               IK = IADLL(NC)
               LLL(IK) = NNO
               JLL(IK) = 4

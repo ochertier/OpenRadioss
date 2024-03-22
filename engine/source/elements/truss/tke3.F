@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -32,7 +32,7 @@ Chd|        R4SUMG3                       source/elements/spring/r4sumg3.F
 Chd|        TCOORK3                       source/elements/truss/tcoork3.F
 Chd|        TKEG3                         source/elements/truss/tkeg3.F 
 Chd|        TMAT3                         source/elements/truss/tmat3.F 
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE TKE3(JFT    ,JLT      ,PM      ,GEO    ,NCT   ,
      1                X      ,ELBUF_TAB,NEL     ,OFFSET ,IKGEO ,
@@ -51,10 +51,6 @@ C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
 #include      "com04_c.inc"
-#include      "param_c.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

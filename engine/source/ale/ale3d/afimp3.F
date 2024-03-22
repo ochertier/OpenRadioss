@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,7 +25,7 @@ Chd|  AFIMP3                        source/ale/ale3d/afimp3.F
 Chd|-- called by -----------
 Chd|        ATHERM                        source/ale/atherm.F           
 Chd|-- calls ---------------
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
 Chd|====================================================================
       SUBROUTINE AFIMP3(PM ,X, IXS, T,GRAD ,COEF ,ALE_CONNECT ,FV)
       USE ALE_CONNECTIVITY_MOD
@@ -42,7 +42,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
 #include      "com04_c.inc"
-#include      "com08_c.inc"
 #include      "vect01_c.inc"
 #include      "tabsiz_c.inc"
 C-----------------------------------------------

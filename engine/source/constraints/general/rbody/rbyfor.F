@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -28,6 +28,7 @@ Chd|-- calls ---------------
 Chd|        RGBODFP                       source/constraints/general/rbody/rgbodfp.F
 Chd|        SPMD_EXCH_A_RB6               source/mpi/kinematic_conditions/spmd_exch_a_rb6.F
 Chd|        SPMD_EXCH_A_RB6G              source/mpi/kinematic_conditions/spmd_exch_a_rb6g.F
+Chd|        SPMD_EXCH_A_RB6_VREL          source/mpi/kinematic_conditions/spmd_exch_a_rb6.F
 Chd|        STARTIME                      source/system/timer.F         
 Chd|        STOPTIME                      source/system/timer.F         
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
@@ -39,11 +40,16 @@ Chd|====================================================================
      4   IGRSURF  ,BUFSF  ,ICODR  ,ISKEW  ,SKEW    ,
      5   KIND     ,IAD_RBY,FR_RBY6,RBY6   ,IRBKIN_L,
      6   NRBYKIN_L,NATIV_SMS,DIMFB,FBSAV6 ,STABSEN ,
-     7   TABSENSOR,NODREAC,FTHREAC,CPTREAC)
+     7   TABSENSOR,NODREAC,FTHREAC,CPTREAC,DAMPR   ,
+     8   SDAMP    ,DAMP   ,NDAMP_VREL,ID_DAMP_VREL,IGRNOD,
+     9   TAGSLV_RBY,IPARIT,TFEXT,NDAMP_VREL_RBY,NDAMP_VREL_RBYG,
+     A   SIZE_RBY6_C,RBY6_C)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE GROUPDEF_MOD
+      USE damping_vref_rby_mod
+      USE damping_vref_rby_stiff_mod
 C----6---------------------------------------------------------------7---------8
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -55,13 +61,9 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
-#include      "scr05_c.inc"
 #include      "param_c.inc"
 #include      "task_c.inc"
-#include      "parit_c.inc"
 #include      "timeri_c.inc"
-#include      "spmd_c.inc"
-#include      "scr17_c.inc"
 #include      "intstamp_c.inc"
 C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -69,21 +71,28 @@ C-----------------------------------------------
       INTEGER ICODR(*),ISKEW(*),WEIGHT(*),LPBY(*),NPBY(NNPBY,*),
      .        KIND(NRBYKIN),FR_RBY6(*),IAD_RBY(*),IRBKIN_L(*),
      .        NRBYKIN_L, NATIV_SMS(*),DIMFB,STABSEN,TABSENSOR(*),
-     .        NODREAC(*),CPTREAC
+     .        NODREAC(*),CPTREAC,NDAMP_VREL_RBY,NDAMP_VREL_RBYG,
+     .        SIZE_RBY6_C
 C     REAL
       my_real
      .   RBY(NRBY,*) ,A(3,*) ,AR(3,*) ,X(3,*) ,VR(3,*),FSAV(NTHVKI,*),
      .   IN(*) ,STIFN(*),STIFR(*),FANI(3,*),MS(*),V(3,*) ,
      .   BUFSF(*), SKEW(LSKEW,*),FTHREAC(6,*)
-      DOUBLE PRECISION RBY6(8,6,NRBYKIN)
+      DOUBLE PRECISION RBY6(8,6,NRBYKIN),RBY6_C(2,6,SIZE_RBY6_C)
       DOUBLE PRECISION
-     .        FBSAV6(12,6,DIMFB),RBID(12,6)
+     .        FBSAV6(12,6,DIMFB),RBID(12,6),TFEXT
       TYPE (SURF_)   , DIMENSION(NSURF)   :: IGRSURF
+C
+      INTEGER ,INTENT(IN) :: NDAMP_VREL,IPARIT,SDAMP
+      INTEGER ,INTENT(IN) :: ID_DAMP_VREL(NDAMP_VREL),TAGSLV_RBY(NUMNOD)
+      my_real, INTENT(INOUT) :: DAMPR(NRDAMP,NDAMP),DAMP(SDAMP)
+      TYPE(GROUP_), INTENT(IN) :: IGRNOD(NGRNOD)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER  J,K,N,KK,N2,ILAGM,
-     .         ISU,ADRSRF,IM, L, LSEND, LRECV, NRBDIM,IPARSENS,ISECT
+     .         ISU,ADRSRF,IM, L, LSEND, LRECV, NRBDIM,IPARSENS,ISECT,
+     .         DIM    
 C-------------------------------------
 C INIT RBY6 to ZERO for desactivated Rigid Bodies (non multi-thread)
 C-------------------------------------
@@ -100,11 +109,11 @@ C-------------------------------------
             RBY6(5,K,N) = ZERO
             RBY6(6,K,N) = ZERO
             RBY6(7,K,N) = ZERO
-            RBY6(8,K,N) = ZERO          
+            RBY6(8,K,N) = ZERO 
           ENDDO
         ENDIF
       ENDDO
-!$OMP END SINGLE
+!$OMP END SINGLE 
 C-------------------------------------
 C CALCUL FORCE SUPER RIGID BODIES (non multi-thread)
 C-------------------------------------
@@ -148,7 +157,7 @@ c
            IPARSENS=0
            ISECT=0
            IF(STABSEN/=0) ISECT=TABSENSOR(N+NSECT+NINTSUB+NINTER+NRWALL+1)-
-     .     			TABSENSOR(N+NSECT+NINTSUB+NINTER+NRWALL)
+     .           TABSENSOR(N+NSECT+NINTSUB+NINTER+NRWALL)
            IF(ISECT/=0) THEN
              IPARSENS=1
              CALL RGBODFP(
@@ -220,7 +229,7 @@ c
            IPARSENS=0
            ISECT=0
            IF(STABSEN/=0) ISECT=TABSENSOR(N+NSECT+NINTSUB+NINTER+NRWALL+1)-
-     .     			TABSENSOR(N+NSECT+NINTSUB+NINTER+NRWALL)
+     .           TABSENSOR(N+NSECT+NINTSUB+NINTER+NRWALL)
            IF(ISECT/=0) THEN
              IPARSENS=1
              CALL RGBODFP(
@@ -244,6 +253,21 @@ c
       ENDDO
 
 !$OMP END DO
+   
+C-------------------------------------
+C Contribution of damping forces from /DAMP/VREL
+C-------------------------------------
+      IF ((NDAMP_VREL_RBY > 0).AND.(NRBYKIN_L > 0)) THEN
+!$OMP SINGLE
+        DIM = 3+3*IRODDL    
+        CALL damping_vref_rby(IGRNOD    ,NGRNOD   ,V        ,VR        ,A         ,
+     .                        X         ,MS       ,DAMPR    ,NRDAMP    ,NDAMP     ,
+     .                        NDAMP_VREL,IPARIT   ,NUMNOD  ,DT1       ,ID_DAMP_VREL,
+     .                        TT        ,NNPBY    ,NRBYKIN  ,NPBY      ,RBY6      ,
+     .                        RBY6_C    ,TAGSLV_RBY,WEIGHT  ,LSKEW     ,NUMSKW    ,
+     .                        DIM       ,DAMP     ,SKEW     ,TFEXT     ,SIZE_RBY6_C)
+!$OMP END SINGLE
+      ENDIF 
 
       IF (NSPMD > 1) THEN
 
@@ -254,11 +278,17 @@ C
 C Comm non multi-thread
 C
 C flag to enable/disable all to all communication for RBY.
-           IF(NINTSTAMP == 0) THEN
-C routine A2A de calcul Parith/ON de A AR STIFN STIFR noeuds main RB
-            NRBDIM=8
-            CALL SPMD_EXCH_A_RB6(
-     1        NRBDIM,IAD_RBY,FR_RBY6,IAD_RBY(NSPMD+1),RBY6)
+          IF(NINTSTAMP == 0) THEN
+            IF (NDAMP_VREL_RBYG == 0) THEN
+C routine A2A for Parith/ON computation of A AR STIFN STIFR on main nodes of RB
+              NRBDIM=8
+              CALL SPMD_EXCH_A_RB6(NRBDIM,IAD_RBY,FR_RBY6,IAD_RBY(NSPMD+1),RBY6)
+            ELSE
+C routine A2A for Parith/ON computation of A AR STIFN STIFR C CR on main nodes of RB for /DAMP/VREL
+              NRBDIM=10
+              CALL SPMD_EXCH_A_RB6_VREL(NRBDIM,IAD_RBY,FR_RBY6,IAD_RBY(NSPMD+1),RBY6,
+     .                                  RBY6_C,SIZE_RBY6_C)
+            ENDIF      
 C routine G/S de calcul Parith/ON de A AR STIFN STIFR noeuds main RB
           ELSE
             CALL SPMD_EXCH_A_RB6G(NPBY,RBY6)
@@ -283,7 +313,7 @@ c
            IPARSENS=0
            ISECT=0
            IF(STABSEN/=0) ISECT=TABSENSOR(N+NSECT+NINTSUB+NINTER+NRWALL+1)-
-     .     			TABSENSOR(N+NSECT+NINTSUB+NINTER+NRWALL)
+     .           TABSENSOR(N+NSECT+NINTSUB+NINTER+NRWALL)
            IF(ISECT/=0) THEN
              IPARSENS=1
              CALL RGBODFP(
@@ -306,7 +336,17 @@ c
       ENDDO
 
 !$OMP END DO
-
+C      
+C-------------------------------------
+C Computation of stability of main node for DAMP/VREL
+C-------------------------------------
+      IF (NDAMP_VREL_RBY > 0) THEN
+!$OMP SINGLE               
+        call damping_vref_rby_stiff(NUMNOD,NNPBY,NRBYKIN,NRBYKIN_L,NPBY,
+     .                              RBY6_C,MS,IN,STIFN,STIFR,SIZE_RBY6_C,  
+     .                              IRBKIN_L )
+!$OMP END SINGLE
+      ENDIF 
 C
       RETURN
       END

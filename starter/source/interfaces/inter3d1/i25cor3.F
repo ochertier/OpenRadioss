@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -46,17 +46,6 @@ C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "vect07_c.inc"
-#include      "scr03_c.inc"
-#include      "scr17_c.inc"
-#include      "param_c.inc"
-#include      "scr05_c.inc"
-#include      "com04_c.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IRECT(4,*), NSV(*), CAND_E(*), CAND_N(*),
@@ -64,12 +53,10 @@ C-----------------------------------------------
       INTEGER IX1(MVSIZ), IX2(MVSIZ), IX3(MVSIZ), IX4(MVSIZ), 
      .        NSVG(MVSIZ), ADMSR(4,*),
      .        MVOISIN(4,*), MVOISN(MVSIZ,4), LBOUND(*), IBOUND(4,MVSIZ)
-C     REAL
       my_real
      .   X(3,*), GAP_S(*), GAPS(MVSIZ), GAP_M(*), GAPM(*),
      .   GAP_NM(4,*), GAPNM(4,*), GAP_S_L(*), GAP_M_L(*),
      .   GAPMXL(*)
-C     REAL
       my_real
      .   XI(MVSIZ), YI(MVSIZ), ZI(MVSIZ), 
      .   X1(MVSIZ),Y1(MVSIZ),Z1(MVSIZ),

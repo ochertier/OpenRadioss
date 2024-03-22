@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -41,8 +41,6 @@ C-----------------------------------------------
 #include      "scr05_c.inc"
 #include      "scr06_c.inc"
 #include      "scr16_c.inc"
-#include      "parit_c.inc"
-#include      "task_c.inc"
 C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -62,9 +60,9 @@ C-----------------------------------------------
 C
       IF(N2D==1)THEN
 #include      "vectorize.inc"
- 	DO I=NODFT,NODLT
- 	  IF(X(2,I)+DT2*V(2,I)<ZERO) V(2,I)=ZERO
- 	ENDDO
+          DO I=NODFT,NODLT
+            IF(X(2,I)+DT2*V(2,I)<ZERO) V(2,I)=ZERO
+          ENDDO
       ENDIF
 C-------------------------------------------------------------
 C         CALCUL DES  DEPLACEMENTS TRANSLATIONS PUIS ROTATIONS
@@ -104,8 +102,7 @@ C-------------------------------------------------------------
           X(3,N)=X(3,N)+VDT
         ENDDO
       ENDIF 
-      IF((ISUB>0.OR.ISECUT>0.OR.IISROT>0.OR.ISHSUB/=0.OR.
-     .  IMPOSE_DR/=0 .OR. IDROT==1) .AND. IRODDL/=0) THEN
+      IF((ISECUT>0 .OR. IISROT>0 .OR. IMPOSE_DR/=0 .OR. IDROT == 1) .AND. IRODDL /= 0) THEN
 #include      "vectorize.inc"
         DO N=NODFT,NODLT
           DR(1,N)=DR(1,N)+DT2*VR(1,N)

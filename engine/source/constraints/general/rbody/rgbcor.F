@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -54,9 +54,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com08_c.inc"
-#include      "scr05_c.inc"
-#include      "scr06_c.inc"
-#include      "units_c.inc"
 #include      "parit_c.inc"
 #include      "impl1_c.inc"
 #include      "param_c.inc"
@@ -144,7 +141,6 @@ C
             XMASST=XMASST-MAS
            ENDDO
          ELSE
-#include "scalar.inc"
           DO I=1,NSN
            N = NOD(I)
            MAS=MS(N)*WEIGHT_MD(N)
@@ -206,7 +202,6 @@ C
             XMASST=XMASST-MAS
            ENDDO
          ELSE
-#include "scalar.inc"
           DO I=1,NSN
            N = NOD(I)
            MAS=MS_2D(N)*WEIGHT_MD(N)
@@ -291,7 +286,7 @@ C
         ENCIN2T=ZERO        
         ENROT2T=ZERO
 C
-Cel vectorisation si nsn>=10 ou si imach = 3 et p/on active
+C   vectorisation si nsn>=10 ou si imach = 3 et p/on active
         IF(N2D==0) THEN
          IF (NSN>=10.OR.IPARIT>0) THEN
            DO I=1,NSN
@@ -325,7 +320,6 @@ C
 C
            ENDDO
          ELSE
-#include "scalar.inc"
           DO I=1,NSN
 C
            N = NOD(I)
@@ -392,7 +386,6 @@ C
 C
            ENDDO
          ELSE
-#include "scalar.inc"
           DO I=1,NSN
 C
            N = NOD(I)
@@ -492,8 +485,6 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "scr11_c.inc"
 #include      "param_c.inc"
-#include      "task_c.inc"
-#include      "impl1_c.inc"
 C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -581,10 +572,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com08_c.inc"
-#include      "scr05_c.inc"
-#include      "scr06_c.inc"
-#include      "sms_c.inc"
-#include      "units_c.inc"
 #include      "parit_c.inc"
 #include      "impl1_c.inc"
 #include      "com01_c.inc"
@@ -671,7 +658,6 @@ C
           ENDDO
          END IF !(IRODDL/=0) THEN
         ELSE
-#include "scalar.inc"
          DO I=1,NSL
           N = ISL(I)
           MAS=MS(N)*WEIGHT_MD(N)*ITRA
@@ -724,7 +710,7 @@ C
      .           + VG(2)*VG(2)
      .           + VG(3)*VG(3))*IN(M)*WEIGHT_MD(M)*IROT
          END IF !(IRODDL/=0) THEN
-Cel vectorisation si nsn>=10 ou si imach = 3 et p/on active
+C   vectorisation si nsn>=10 ou si imach = 3 et p/on active
         IF (NSL>=10.OR.IPARIT>0) THEN
           DO I=1,NSL
 C
@@ -767,7 +753,6 @@ C
           ENDDO
          ENDIF !(IRODDL/=0) THEN
         ELSE
-#include "scalar.inc"
          DO I=1,NSL
 C
           N = ISL(I)

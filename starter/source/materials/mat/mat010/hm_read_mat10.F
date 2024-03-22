@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -29,20 +29,23 @@ Chd|        ANCMSG                        source/output/message/message.F
 Chd|        HM_GET_FLOATV                 source/devtools/hm_reader/hm_get_floatv.F
 Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
 Chd|        HM_OPTION_IS_ENCRYPTED        source/devtools/hm_reader/hm_option_is_encrypted.F
+Chd|        INIT_MAT_KEYWORD              source/materials/mat/init_mat_keyword.F
 Chd|        ELBUFTAG_MOD                  share/modules1/elbuftag_mod.F 
+Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
       SUBROUTINE HM_READ_MAT10(
-     .           LSUBMODEL ,MTAG     ,UNITAB   ,IPM     ,PM,
-     .           MAT_ID    ,TITR     ,EOS_TAG  ,MAXEOS ,ISRATE)
+     .           LSUBMODEL ,MTAG     ,UNITAB   ,IPM     ,PM      ,
+     .           MAT_ID    ,TITR     ,EOS_TAG  ,ISRATE  ,MATPARAM)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE UNITAB_MOD
-      USE ELBUFTAG_MOD            
+      USE ELBUFTAG_MOD !MAXEOS
       USE MESSAGE_MOD
       USE SUBMODEL_MOD
+      USE MATPARAM_DEF_MOD          
 C-----------------------------------------------
 C   ROUTINE DESCRIPTION :
 C   ===================
@@ -62,17 +65,13 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr17_c.inc"
-#include      "scr03_c.inc"
 #include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "sysunit.inc"
-#include      "submod_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       TYPE (UNIT_TYPE_),INTENT(IN) ::UNITAB 
-      INTEGER, INTENT(IN)                          :: MAT_ID,MAXEOS
+      INTEGER, INTENT(IN)                          :: MAT_ID
       INTEGER, INTENT(INOUT)                       :: ISRATE
       INTEGER, DIMENSION(NPROPMI) ,INTENT(INOUT)   :: IPM
       CHARACTER*nchartitle ,INTENT(IN)             :: TITR
@@ -80,6 +79,7 @@ C-----------------------------------------------
       TYPE(SUBMODEL_DATA), DIMENSION(NSUBMOD),INTENT(IN) :: LSUBMODEL
       TYPE(MLAW_TAG_), INTENT(INOUT)               :: MTAG
       TYPE(EOS_TAG_) , TARGET, DIMENSION(0:MAXEOS) ,INTENT(INOUT) :: EOS_TAG  
+      TYPE(MATPARAM_STRUCT_),INTENT(INOUT)         :: MATPARAM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -137,12 +137,16 @@ C-----------------------------------------------
       IF(COUNT == 5) THEN
         IFORM= 1 !old format (embedded EoS : C0,C1,C2, ... parameters)
         IEOS = 13
-        IPM(4)=IEOS
         EOS_TAG(IEOS)%L_MU = 1
+        MATPARAM%IEOS = IEOS
       ELSE
         IFORM=2 !new format (Eos defined from /EOS option)
+        IEOS = 18   ! linear EOS is used by default 
         IREC = IREC+1
       ENDIF
+!
+      MATPARAM%IEOS = IEOS
+      IPM(4)        = IEOS    ! keep this temporarily for output and fluid sections
 
       E0 = ZERO
 
@@ -340,7 +344,19 @@ C---- Buffer Size for specific element buffer allocations
       MTAG%G_EPSQ  = 1
 
       MTAG%L_PLA   = 1     ! /TH(VPLA)
-      MTAG%L_EPSQ  = 1     ! /TH(EPSP)  
+      MTAG%L_EPSQ  = 1     ! /TH(EPSP) 
+      
+      ! Material compatibility with /EOS option
+      CALL INIT_MAT_KEYWORD(MATPARAM,"EOS")
+
+      ! EOS/Thermo keyword for pressure treatment in elements
+      CALL INIT_MAT_KEYWORD(MATPARAM,"HYDRO_EOS")
+
+      CALL INIT_MAT_KEYWORD(MATPARAM,"ELASTO_PLASTIC")
+
+      ! Properties compatibility
+      CALL INIT_MAT_KEYWORD(MATPARAM,"SOLID_ISOTROPIC")
+      CALL INIT_MAT_KEYWORD(MATPARAM,"SPH")
 
       !--- OUTPUT IN STARTER LISTING FILE ---!
       WRITE(IOUT,1100) TRIM(TITR),MAT_ID,10
@@ -348,7 +364,7 @@ C---- Buffer Size for specific element buffer allocations
       IF(IS_ENCRYPTED)THEN
         WRITE(IOUT,'(5X,A,//)')'CONFIDENTIAL DATA'
       ELSE
-        WRITE(IOUT,1200) RHO0,RHOR
+        WRITE(IOUT,1200)RHO0,RHOR
         WRITE(IOUT,1300)YOUNG,ANU,G
         WRITE(IOUT,1400)A0,A1,A2,AMX
         IF(IFORM == 1)THEN
@@ -368,7 +384,7 @@ C-----------
      & 5X,'MATERIAL LAW. . . . . . . . . . . . . .=',I10/)
  1200 FORMAT(
      & 5X,'INITIAL DENSITY . . . . . . . . . . . .=',1PG20.13/,
-     & 5X,'EOS REFERENCE DENSITY . . . . . . . . .=',1PG20.13/)
+     & 5X,'REFERENCE DENSITY . . . . . . . . . . .=',1PG20.13/)
  1300 FORMAT(
      & 5X,40HYOUNG'S MODULUS . . . . . . . . . . . .=,E12.4/,
      & 5X,40HPOISSON'S RATIO . . . . . . . . . . . .=,E12.4/,

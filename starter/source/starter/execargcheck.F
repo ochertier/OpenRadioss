@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -44,6 +44,7 @@ Chd|====================================================================
       USE INOUTFILE_MOD
       USE RANDOM_MOD
       USE GRP_SIZE_MOD
+      USE PYTHON_FUNCT_MOD 
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -58,9 +59,6 @@ C-----------------------------------------------
 #include      "tablen_c.inc"
 #include      "ddspmd_c.inc"
 #include      "debug_rst.inc"
-C-----------------------------------------------
-C   D u m m y   A r g u m e n t s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -81,7 +79,7 @@ C-----------------------------------------------
        INTEGER :: RANDM_SEED,RANDM_ALEA
        REAL(kind=8) :: RANDM_SEED_NBR,RANDM_ALEA_NBR
        INTEGER :: GOT_GRP_SIZE
-       PARAMETER (LENLIST=28)
+       PARAMETER (LENLIST=30)
        CHARACTER (LEN=12) ::  ARGLIST(LENLIST)
        EXTERNAL IARGC
        DATA ARGLIST/
@@ -97,13 +95,15 @@ C-----------------------------------------------
      .    '-MEM-MAP' ,  '-INSPIRE', '-DD_TUNING',
      .    '-INSPIRE_ALM' , '-FLUSH_RST', '-CHECK',
      .    '-HSTP_READ' , '-HSTP_WRITE', '-RXALEA', '-RSEED',
-     .    '-GRP_SIZE' /
+     .    '-PREVIEW',
+     .    '-GRP_SIZE' , '-PYTHON' /
 
 C-----------------------------------------------
        IDUM=-1
        ITRACE=1
        IERRMSG=0
        GLOBAL_ERROR = 0
+       PYTHON_ERROR = 1
 
        GOT_INPUT = 0
        GOT_NCPU = 0
@@ -283,7 +283,9 @@ C------------------------------------------------
                 RANDM_ALEA = I
             CASE('-RSEED')
                 RANDM_SEED = I
-                
+            CASE('-PYTHON')
+                PYTHON_ERROR = 0
+            CASE('-PREVIEW')
 C------------------------------------------------
             CASE ( '-GRP_SIZE')
                 GOT_GRP_SIZE = I
@@ -976,9 +978,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
        CHARACTER*(*) STRING
@@ -1010,9 +1009,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1046,12 +1042,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
-C   D u m m y   A r g u m e n t s
-C-----------------------------------------------
-C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
         INTEGER IDUM
@@ -1078,9 +1068,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "build_info.inc"
 C-----------------------------------------------
-C   D u m m y   A r g u m e n t s
-C-----------------------------------------------
-C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
         INTEGER IDUM
@@ -1091,11 +1078,17 @@ C machine.inc include
         INTEGER RDFLEXCOMP
 
 C variables inutiles mais definies dans machine.inc
-        INTEGER IBUILTIN,NSPMD,BMUL0,IEXPM,ICRAY,
-     *          IRESP,IMACH,IRFORM,IGFORM,LENBT,READER_ID
-
+        INTEGER IBUILTIN,NSPMD,IEXPM,ICRAY,IRESP,IMACH,IRFORM,LENBT,READER_ID
+        INTEGER READER_COMMIT_ID_SIZE,READER_COMMIT_ID_LEN
+        CHARACTER(LEN=128):: READER_COMMIT_ID
+        my_real :: BMUL0
 C-----------------------------------------------
 #include "machine.inc"
+C-----------------------------------------------
+         ! Grab Build ID from hm_reader library
+         READER_COMMIT_ID_SIZE=128
+         CALL HM_BUILD_ID(READER_COMMIT_ID,READER_COMMIT_ID_SIZE,READER_COMMIT_ID_LEN)
+
 
          WRITE(6,'(A,A)') ' '
          WRITE(6,'(A,A)') 'OpenRadioss Starter '
@@ -1109,6 +1102,13 @@ C-----------------------------------------------
          WRITE(6,'(A,A)')   ' '
          WRITE(6,'(A,A)')   'Time of build : ',BTIME
          WRITE(6,'(A,A)')   'Date of build : ',BDATE
+         WRITE(6,'(A,A)') ' '
+         IF( BTAG(1:1) == ' ') THEN
+           WRITE(6,'(A)')   'CommitID : User Build'
+         ELSE
+           WRITE(6,'(A)')     BTAG(1:LEN_TRIM(BTAG))
+         ENDIF
+         WRITE(6,'(A,A)') 'Hm_reader : ',READER_COMMIT_ID(1:READER_COMMIT_ID_LEN)
          WRITE(6,'(A,A)')   ' '
 
         END
@@ -1127,14 +1127,7 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
-C   D u m m y   A r g u m e n t s
-C-----------------------------------------------
-C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
-C-----------------------------------------------
 C-----------------------------------------------
         CALL PRHELPINFO()
 
@@ -1160,11 +1153,7 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "build_info.inc"
 C-----------------------------------------------
-C   D u m m y   A r g u m e n t s
-C-----------------------------------------------
-C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
-C-----------------------------------------------
 C-----------------------------------------------
        WRITE(6,'(A)') ' '
        WRITE(6,'(A,A)') 'RADIOSS Starter version ',VERS(1:LEN_VERS)
@@ -1202,6 +1191,9 @@ C-----------------------------------------------
      *                  'Activation of nodal random noise with a [value] alea'
        WRITE(6,'(A,A)') '  -rseed [real value]                 : ',
      *                  'Optional value, set the seed value for nodal random noise'
+       WRITE(6,'(A,A)') '  -python                             : ',
+     *                  'Python function in model is safe and can be used'
+
        WRITE(6,'(A)') ' '
        WRITE(6,'(A)') ' '
        END

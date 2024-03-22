@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -28,9 +28,12 @@ Chd|-- calls ---------------
 Chd|        GRELEM_SAV                    source/output/th/grelem_sav.F 
 Chd|        SENSOR_ENERGY_BILAN           source/tools/sensor/sensor_energy_bilan.F
 Chd|====================================================================
-      SUBROUTINE RBILAN(EINT   ,PARTSAV,IXR   ,GEO ,V    ,
-     2                  IPARTR ,AL0    ,GRESAV,GRTH,IGRTH,
-     3                  OFF_DUM,NC1    ,NC2   ,X   ,VR   ,ITASK)
+      SUBROUTINE RBILAN(
+     1   EINT,    PARTSAV, IXR,     GEO,
+     2   V,       IPARTR,  AL0,     GRESAV,
+     3   GRTH,    IGRTH,   OFF_DUM, NC1,
+     4   NC2,     X,       VR,      ITASK,
+     5   NEL,     IGRE)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -43,14 +46,13 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com06_c.inc"
-#include      "scr11_c.inc"
-#include      "vect01_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: NEL
+      INTEGER, INTENT(IN) :: IGRE
       INTEGER IPARTR(*),IXR(NIXR,*),GRTH(*),IGRTH(*),
      .        NC1(*),NC2(*),ITASK
 C     REAL
@@ -85,7 +87,7 @@ C-----------------------------------------------
       FLAG = 0
       RBIDON = ZERO
       OFF    = ZERO
-      DO I=LFT,LLT
+      DO I=1,NEL
         REINTT=REINTT + EINT(I)
       ENDDO
 C
@@ -93,7 +95,7 @@ C
         REINT = REINT + REINTT
 #include "atomend.inc"
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         X1(I)=X(1,NC1(I))
         Y1(I)=X(2,NC1(I))
         Z1(I)=X(3,NC1(I))
@@ -114,7 +116,7 @@ C
         VR2(I,3)=VR(3,NC2(I))
       ENDDO
 c
-      DO I=LFT,LLT
+      DO I=1,NEL
         XX(I)= X1(I)+X2(I)
         YY(I)= Y1(I)+Y2(I)
         ZZ(I)= Z1(I)+Z2(I)
@@ -135,7 +137,7 @@ c
      .           +VR1(I,3)*VR1(I,3)+VR2(I,3)*VR2(I,3)
       ENDDO
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         ILENG=NINT(GEO(93,IXR(1,I)))
         IF (ILENG /= 0) THEN
           XMAS(I)=GEO(1,IXR(1,I))*AL0(I)
@@ -149,7 +151,7 @@ C
         EK(I)= XMAS2(I)*VA2(I)*HALF
       ENDDO
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         XCG(I)= XMAS2(I)*XX(I)
         YCG(I)= XMAS2(I)*YY(I)
         ZCG(I)= XMAS2(I)*ZZ(I)
@@ -183,10 +185,10 @@ C
       ENDDO
 C
       IF (IGRE /= 0) THEN
-          DO I=LFT,LLT
+          DO I=1,NEL
             OFF(I) = ONE
           ENDDO
-          CALL GRELEM_SAV(LFT   ,LLT   ,GRESAV,IGRTH ,GRTH  ,
+          CALL GRELEM_SAV(1   ,NEL   ,GRESAV,IGRTH ,GRTH  ,
      2                    OFF   ,EINT  ,EK    ,XM    ,YM    ,
      3                    ZM    ,XMAS  ,XCG   ,YCG   ,ZCG   ,
      4                    XXM   ,YYM   ,ZZM   ,IXX   ,IYY   ,
@@ -194,7 +196,7 @@ C
      6                    REK   ,FLAG  )
       ENDIF
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
          MX = IPARTR(I)
          PARTSAV(1,MX)=PARTSAV(1,MX) + EINT(I)
          PARTSAV(2,MX)=PARTSAV(2,MX) + EK(I)
@@ -218,7 +220,7 @@ C
       ENDDO
 
       OFF(1:MVSIZ) = ONE
-      CALL SENSOR_ENERGY_BILAN(LFT,LLT,EINT,EK,OFF,IPARTR,ITASK) 
+      CALL SENSOR_ENERGY_BILAN(1,NEL,EINT,EK,OFF,IPARTR,ITASK) 
 C
       RETURN
       END

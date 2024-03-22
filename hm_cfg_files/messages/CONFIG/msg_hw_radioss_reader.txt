@@ -122,7 +122,7 @@ Card cannot be read. Object might be incomplete
 /MESSAGE/100213/DESCRIPTION
 -- BLOCK: %s
 -- LINE: %s
-unsupported field exits at the end of line
+unsupported field exists at the end of line
 /MESSAGE/100213/SOLUTION
     Please check input format and fields description defined in the Reference Guide.
 
@@ -131,7 +131,7 @@ unsupported field exits at the end of line
 /MESSAGE/100214/DESCRIPTION
 -- BLOCK: %s
 -- LINE: %s
-unsupported field exits
+unsupported field exists
 /MESSAGE/100214/SOLUTION
     Please check input format and fields description defined in the Reference Guide.
 
@@ -293,4 +293,39 @@ duplicate %s id %d
 ** WARNING IN LS-DYNA IMPORT
 /MESSAGE/200030/DESCRIPTION
 %s (id: %u, name: %s) : Negative FAIL parameter is not supported
+
+/MESSAGE/200031/TITLE
+** ERROR IN LS-DYNA IMPORT
+/MESSAGE/200031/DESCRIPTION
+Only one %s card is allowed
+
+/MESSAGE/200032/TITLE
+** WARNING IN LS-DYNA IMPORT
+/MESSAGE/200032/DESCRIPTION
+%s (id: %u, name: %s) : OPTION DAMAGE-FAILURE is ignored
+
+/MESSAGE/200033/TITLE
+** WARNING IN LS-DYNA IMPORT
+/MESSAGE/200033/DESCRIPTION
+%s (id: %u, name: %s) : Positiv LCID function is expected
+
+/MESSAGE/200034/TITLE
+** WARNING IN LS-DYNA IMPORT
+/MESSAGE/200034/DESCRIPTION
+%s (id: %u, name: %s) : Load applied to non-rigid component
+
+/MESSAGE/200035/TITLE
+** WARNING IN LS-DYNA IMPORT
+/MESSAGE/200035/DESCRIPTION
+%s (id: %u, name: %s) : Inflator nozzles can be defined only by shells VID=-1 or VID=-2
+
+/MESSAGE/200036/TITLE
+** ERROR IN LS-DYNA IMPORT
+/MESSAGE/200036/DESCRIPTION
+%s (id: %u, name: %s) : Not existing node(s) used
+
+/MESSAGE/200037/TITLE
+** WARNING IN LS-DYNA IMPORT
+/MESSAGE/200037/DESCRIPTION
+%s (id: %u, name: %s) :  NSID is not defined, Radioss BCS will not be created
 #------------------------------------------------------------------------------

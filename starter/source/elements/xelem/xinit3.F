@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -33,7 +33,7 @@ Chd|        XINI29                        source/elements/xelem/xini29.F
 Chd|        XINI2U                        source/elements/xelem/xinit3.F
 Chd|        XINI30                        source/elements/xelem/xini30.F
 Chd|        XINI31                        source/elements/xelem/xini31.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
       SUBROUTINE XINIT3(ELBUF_STR,KXX    ,IXX    ,X      ,V      ,
@@ -58,8 +58,6 @@ C-----------------------------------------------
 #include      "param_c.inc"
 #include      "com04_c.inc"
 #include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "scr03_c.inc"
 #include      "scr17_c.inc"
 #include      "scr23_c.inc"
 C-----------------------------------------------

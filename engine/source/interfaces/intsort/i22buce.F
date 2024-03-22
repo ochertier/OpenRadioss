@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -32,9 +32,9 @@ Chd|        I22IDENT                      source/interfaces/int22/i22ident.F
 Chd|        I22INTERSECT                  source/interfaces/int22/i22intersect.F
 Chd|        I22TRIVOX                     source/interfaces/intsort/i22trivox.F
 Chd|        MY_BARRIER                    source/system/machine.F       
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
-Chd|        I22BUFBRIC_MOD                ../common_source/modules/cut-cell-search_mod.F
-Chd|        I22TRI_MOD                    ../common_source/modules/cut-cell-search_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
+Chd|        I22BUFBRIC_MOD                ../common_source/modules/interfaces/cut-cell-search_mod.F
+Chd|        I22TRI_MOD                    ../common_source/modules/interfaces/cut-cell-search_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
@@ -75,12 +75,7 @@ C-----------------------------------------------
 #include      "units_c.inc"
 #include      "warn_c.inc"
 #include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "com08_c.inc"
-#include      "scr05_c.inc"
-#include      "task_c.inc"
 #include      "param_c.inc"
-#include      "timeri_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -99,10 +94,6 @@ C-----------------------------------------------
      .   STF(*)
       INTEGER :: CANDB, CANDE, NB_SHORT, IPOS_, IREF,ILEN,IVAL
       TYPE(t_ale_connectivity), INTENT(IN) :: ALE_CONNECTIVITY
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

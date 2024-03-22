@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -28,16 +28,18 @@ Chd|-- calls ---------------
 Chd|        MY_ORDERS                     ../common_source/tools/sort/my_orders.c
 Chd|        SPMD_IGET_PARTN_STA           source/mpi/output/spmd_stat.F 
 Chd|        SPMD_RGATHER9_DP              source/mpi/interfaces/spmd_outp.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
+Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
       SUBROUTINE STAT_SHEL_SPMD(ITAB,ITABG,LENG,IPART,IGEO,
      .            IXC,IXTG,IPARTC,IPARTTG,IPART_STATE,
      .            NODTAG,STAT_INDXC,STAT_INDXTG,LENGC,LENGTG,
-     .            IPARG ,ELBUF_TAB,THKE,SIZP0,IDEL)
+     .            IPARG ,ELBUF_TAB,THKE,IDEL)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
-      USE ELBUFDEF_MOD 
+      USE ELBUFDEF_MOD
+      USE MESSAGE_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -48,7 +50,6 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "scr05_c.inc"
 #include      "scr16_c.inc"
 #include      "scr17_c.inc"
 #include      "spmd_c.inc"
@@ -61,7 +62,7 @@ C-----------------------------------------------
      .        IGEO(NPROPGI,*), IXC(NIXC,*), IXTG(NIXTG,*),
      .        IPARTC(*), IPARTTG(*), IPART_STATE(*),
      .        NODTAG(*), STAT_INDXC(*), STAT_INDXTG(*),
-     .        LENGC, LENGTG, IPARG(NPARG,*),SIZP0,IDEL
+     .        LENGC, LENGTG, IPARG(NPARG,*),IDEL
       TYPE (ELBUF_STRUCT_), DIMENSION(NGROUP), TARGET :: ELBUF_TAB
       my_real
      .   THKE(*)
@@ -74,16 +75,27 @@ C-----------------------------------------------
       INTEGER NP(MAX(7*NUMELC,6*NUMELTG)),
      .        NPGLOB(MAX(7*LENGC,6*LENGTG)),
      .        WORK(70000),CLEF(2,MAX(NUMELCG,NUMELTGG))
-      double precision   
-     .   THK(MAX(1,MAX(NUMELC,NUMELTG))),THK0(MAX(1,MAX(NUMELCG,NUMELTGG)))
-      TYPE(G_BUFEL_)  ,POINTER :: GBUF     
+      INTEGER THK_LEN,THK0_LEN
+      DOUBLE PRECISION, DIMENSION(:), ALLOCATABLE :: THK    ! Gather Thickness from Shell & Triangle elements
+      DOUBLE PRECISION, DIMENSION(:), ALLOCATABLE :: THK0   ! ISPMD=0 : Shell & Triangle Thicknesses after gather.
+      TYPE(G_BUFEL_)  ,POINTER :: GBUF   
+C-----------------------------------------------
+C INITIALIZATION
+C-----------------------------------------------
+      THK_LEN = MAX(1,MAX(NUMELC,NUMELTG))
+      ALLOCATE(THK(THK_LEN))
+      IF (ISPMD == 0) THEN
+            THK0_LEN = MAX(1,MAX(NUMELCG,NUMELTGG))
+      ELSE
+            THK0_LEN=1
+      ENDIF
+      ALLOCATE(THK0(THK0_LEN))
 C-----------------------------------------------
 C     4-NODE SHELLS
 C-----------------------------------------------
       IADD = 0
       NPGLOB(1:MAX(7*LENGC,6*LENGTG)) = 0
 C
-C en spmd il faut envoyer l'info meme qd on a 0 elem local
       JJ = 0
       II = 0
       DO NG=1,NGROUP
@@ -133,9 +145,9 @@ C en spmd il faut envoyer l'info meme qd on a 0 elem local
 C-----
       STAT_NUMELC_G=0
       CALL SPMD_IGET_PARTN_STA(7,STAT_NUMELC,STAT_NUMELC_G,LENGC,NP,
-     .  		       IADG,NPGLOB,STAT_INDXC)
+     .             IADG,NPGLOB,STAT_INDXC)
       LEN = 0
-      CALL SPMD_RGATHER9_DP(THK,II,THK0,SIZP0,LEN)
+      CALL SPMD_RGATHER9_DP(THK,II,THK0,THK0_LEN,LEN)
 
 C-----
       IF (ISPMD==0) THEN
@@ -170,7 +182,6 @@ C     3-NODE SHELLS
 C-----------------------------------------------
       IADD = 0
 C
-C en spmd il faut envoyer l'info meme qd on a 0 elem local
       JJ = 0
       II = 0
       DO NG=1,NGROUP
@@ -220,9 +231,9 @@ C
 C-----
       STAT_NUMELTG_G=0
       CALL SPMD_IGET_PARTN_STA(6,STAT_NUMELTG,STAT_NUMELTG_G,LENGTG,NP,
-     .  		       IADG,NPGLOB,STAT_INDXTG)
+     .             IADG,NPGLOB,STAT_INDXTG)
       LEN = 0
-      CALL SPMD_RGATHER9_DP(THK,II,THK0,SIZP0,LEN)
+      CALL SPMD_RGATHER9_DP(THK,II,THK0,THK0_LEN,LEN)
 C-----
       IF (ISPMD==0) THEN
         DO N=1,STAT_NUMELTG_G
@@ -251,6 +262,9 @@ C-----
           ENDIF
         END DO
       ENDIF
+
+      DEALLOCATE(THK)
+      DEALLOCATE(THK0)
 C-----------------------------------------------
       RETURN
       END

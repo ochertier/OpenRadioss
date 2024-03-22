@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -51,8 +51,6 @@ C-----------------------------------------------
 C   G L O B A L   P A R A M E T E R S
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
-#include      "param_c.inc"
-#include      "com01_c.inc"
 C-----------------------------------------------
 C   I N P U T   A R G U M E N T S
 C-----------------------------------------------
@@ -371,7 +369,7 @@ C------------------------------------------
           DR  =A1(I)*DR0
           P_1=ONE/(ONE + B_1(I)*DR)
           P_2=ONE/(ONE + B_2(I)*DR)
-          P_3=ONE/(ONE + B_3(I)*DR)	
+          P_3=ONE/(ONE + B_3(I)*DR)
          S1=S11(I)*P_1
          S2=S22(I)*P_2
          SIGNXX(I)=JQ(I)*(S1-S2*Q12(I))

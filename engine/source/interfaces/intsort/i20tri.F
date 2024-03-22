@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -58,13 +58,8 @@ c     parameter setting the size for the vector (orig version is 128)
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
-#include      "warn_c.inc"
 #include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "parit_c.inc"
-#include      "scr05_c.inc"
 C-----------------------------------------------
 C   ROLE DE LA ROUTINE:
 C   ===================
@@ -483,7 +478,7 @@ C       1- STOCKAGE DU OU DES  NOEUD CANDIDAT ET DES ELTS CORRESP.
 C          VIRER LES INUTILES
 C
 C       NCAND_PROV=NB_EC*NB_NC
-Cel NCAND_PROV negatif qd NB_EC*NB_NC > 2e31
+C   NCAND_PROV negatif qd NB_EC*NB_NC > 2e31
 C
         IF(NB_EC+NB_NC<=NVECSZ) THEN
           NCAND_PROV = NB_EC*NB_NC
@@ -700,11 +695,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "com04_c.inc"
-#include      "scr05_c.inc"
-#include      "scr18_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   ROLE DE LA ROUTINE:

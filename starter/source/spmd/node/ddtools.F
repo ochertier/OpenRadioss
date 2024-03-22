@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -36,7 +36,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "com01_c.inc"     
 #include      "com04_c.inc"      
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -79,7 +78,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -131,7 +129,9 @@ Chd|====================================================================
 Chd|  PLIST_IFRONT                  source/spmd/node/ddtools.F    
 Chd|-- called by -----------
 Chd|        C_IRBE2                       source/restart/ddsplit/c_irbe2.F
+Chd|        DOMAIN_DECOMPOSITION_PCYL     source/loads/general/load_pcyl/domain_decomposition_pcyl.F
 Chd|        GET_SIZE_NUMNOD_LOCAL         source/spmd/get_size_tag.F    
+Chd|        IGRSURF_SPLIT                 source/spmd/igrsurf_split.F   
 Chd|        PREPARE_SPLIT_I21             source/restart/ddsplit/inter_tools.F
 Chd|        R2R_DOMDEC                    source/coupling/rad2rad/r2r_domdec.F
 Chd|        SPLIT_CAND_I20                source/restart/ddsplit/inter_tools.F
@@ -140,6 +140,7 @@ Chd|        SPLIT_CAND_I25                source/restart/ddsplit/inter_tools.F
 Chd|        SPLIT_CAND_I7                 source/restart/ddsplit/inter_tools.F
 Chd|        SPLIT_CFD_SOLIDE              source/spmd/split_cfd_solide.F
 Chd|        SPLIT_JOINT                   source/constraints/general/cyl_joint/split_joint.F
+Chd|        SPMD_USERWI_REST              source/user_interface/user_windows_tools.F
 Chd|        W_FI                          source/restart/ddsplit/w_fi.F 
 Chd|        W_FRONT                       source/restart/ddsplit/w_front.F
 Chd|        print_JOINT                   source/constraints/general/cyl_joint/split_joint.F
@@ -158,7 +159,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "com01_c.inc"
-#include      "com04_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -173,7 +173,7 @@ C-----------------------------------------------
       TAB(1:NSPMD) = -1
       CPT=0
       IAD=IFRONT%IENTRY(N)
-
+      IF(IAD==-1) RETURN
 c if no proc set for this node     
 c nothing to do as init has been done to -1 
 
@@ -209,8 +209,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "com01_c.inc"
-#include      "com04_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -248,6 +246,7 @@ Chd|====================================================================
 Chd|  NLOCAL                        source/spmd/node/ddtools.F    
 Chd|-- called by -----------
 Chd|        C_CRKEDGE                     source/restart/ddsplit/c_crkedge.F
+Chd|        C_DAMPVREL                    source/restart/ddsplit/c_dampvrel.F
 Chd|        C_DOMS10                      source/spmd/domdec2.F         
 Chd|        C_FRONT                       source/restart/ddsplit/c_front.F
 Chd|        C_FVBAG                       source/airbag/c_fvbag.F       
@@ -261,7 +260,6 @@ Chd|        C_ICNDS10                     source/restart/ddsplit/c_icnds10.F
 Chd|        C_ILOADP                      source/restart/ddsplit/c_iloadp.F
 Chd|        C_IRBE2                       source/restart/ddsplit/c_irbe2.F
 Chd|        C_IRBE3                       source/restart/ddsplit/c_irbe3.F
-Chd|        C_ISHSUB                      source/restart/ddsplit/c_ishsub.F
 Chd|        C_JOINT_SMS                   source/constraints/general/cyl_joint/write_count_joint_sms.F
 Chd|        C_LLINK                       source/restart/ddsplit/c_llink.F
 Chd|        C_MAD                         source/restart/ddsplit/c_mad.F
@@ -303,8 +301,10 @@ Chd|        SPLIT_JOINT                   source/constraints/general/cyl_joint/s
 Chd|        SPLIT_REMNODE_I24             source/restart/ddsplit/inter_tools.F
 Chd|        SPLIT_XSAV                    source/restart/ddsplit/inter_tools.F
 Chd|        SPMDSET                       source/constraints/general/rbody/spmdset.F
+Chd|        SPMD_USERWI_REST              source/user_interface/user_windows_tools.F
 Chd|        THPINIT                       source/output/th/thpinit.F    
 Chd|        WRWEIGHT_RM                   source/restart/ddsplit/wrweight_rm.F
+Chd|        W_DAMPVREL                    source/restart/ddsplit/w_dampvrel.F
 Chd|        W_FBFT                        source/restart/ddsplit/w_fbft.F
 Chd|        W_FI                          source/restart/ddsplit/w_fi.F 
 Chd|        W_FIXVEL                      source/restart/ddsplit/w_fixvel.F
@@ -318,7 +318,6 @@ Chd|        W_ICNDS10                     source/restart/ddsplit/w_icnds10.F
 Chd|        W_IRBE2                       source/restart/ddsplit/w_irbe2.F
 Chd|        W_IRBE3                       source/restart/ddsplit/w_irbe3.F
 Chd|        W_IRIVET                      source/restart/ddsplit/w_irivet.F
-Chd|        W_ISHSUB                      source/restart/ddsplit/w_ishsub.F
 Chd|        W_ISKN                        source/restart/ddsplit/w_iskn.F
 Chd|        W_JOINT_SMS                   source/constraints/general/cyl_joint/write_count_joint_sms.F
 Chd|        W_LLINK                       source/restart/ddsplit/w_llink.F
@@ -347,11 +346,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "com01_c.inc"
-#include      "com04_c.inc"
-C-----------------------------------------------
-C   D u m m y   A r g u m e n t s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------    
@@ -398,7 +392,7 @@ Chd|-- called by -----------
 Chd|        LECTUR                        source/starter/lectur.F       
 Chd|-- calls ---------------
 Chd|        FRONT_MOD                     share/modules1/front_mod.F    
-Chd|        INT8_MOD                      ../common_source/modules/int8_mod.F
+Chd|        INT8_MOD                      ../common_source/modules/interfaces/int8_mod.F
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE SET_FRONT8(IPARI,INTERCEP,INTBUF_TAB,T8,NBT8,ITAB)
@@ -412,9 +406,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc" 
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
 C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
@@ -722,16 +713,12 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc" 
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "param_c.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -956,7 +943,7 @@ Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
       SUBROUTINE FILL_INTERCEP(IPARI,INTBUF_TAB,INTERCEP)
-Cel new routine called right after domdec1 to be used by interface sorting
+C   new routine called right after domdec1 to be used by interface sorting
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------      
@@ -968,17 +955,12 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc" 
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-#include      "analyse_name.inc"
-C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "param_c.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -1051,8 +1033,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "com01_c.inc"
-#include      "com04_c.inc"
 C-----------------------------------------------      
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1113,8 +1093,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "com01_c.inc"     
-#include      "com04_c.inc"      
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------      
@@ -1157,8 +1135,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "com01_c.inc"
-#include      "com04_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1222,8 +1198,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "com01_c.inc"
-#include      "com04_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1275,8 +1249,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "com01_c.inc"
-#include      "com04_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1327,9 +1299,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

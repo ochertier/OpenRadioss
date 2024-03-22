@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -29,7 +29,7 @@ Chd|        ANCMSG                        source/output/message/message.F
 Chd|        I12SOL3                       source/interfaces/inter3d1/insol3.F
 Chd|        ICINV3                        source/interfaces/inter3d1/icinv3.F
 Chd|        LOCAL_INDEX                   source/interfaces/interf1/local_index.F
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
       SUBROUTINE I12CHK3(X   ,IRECT,IXS,NRT   ,IXC,

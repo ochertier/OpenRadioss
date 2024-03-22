@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -58,6 +58,7 @@ Chd|        I17CUT                        source/interfaces/int17/i17tri.F
 Chd|        I17FOR3                       source/interfaces/int17/i17for3.F
 Chd|        I17LLL4_PENA                  source/interfaces/int17/i17for3.F
 Chd|        I17VIT_PENA                   source/interfaces/int17/i17for3.F
+Chd|        I18DST3                       source/interfaces/int18/i18dst3.F
 Chd|        I18FOR3                       source/interfaces/int18/i18for3.F
 Chd|        I18KINE_F                     source/interfaces/int18/i18main_kine.F
 Chd|        I18KINE_I                     source/interfaces/int18/i18main_kine.F
@@ -130,6 +131,7 @@ Chd|        I24SMS2                       source/interfaces/int24/i24for3.F
 Chd|        I24STO                        source/interfaces/intsort/i24sto.F
 Chd|        I24TRC                        source/interfaces/intsort/i7trc.F
 Chd|        I24TRIVOX                     source/interfaces/intsort/i24trivox.F
+Chd|        I24_SAVE_SUB                  source/interfaces/int24/i24_save_sub.F
 Chd|        I25ASS0                       source/interfaces/int25/i25ass3.F
 Chd|        I25ASS2                       source/interfaces/int25/i25ass3.F
 Chd|        I25ASS3                       source/interfaces/int25/i25ass3.F
@@ -218,9 +220,12 @@ Chd|        IMPL_SAV1                     source/interfaces/int24/i24main.F
 Chd|        IMP_FR7I                      source/mpi/implicit/imp_fri.F 
 Chd|        IMP_STIF24                    source/implicit/imp_solv.F    
 Chd|        INIT_TRIM                     source/interfaces/intsort/init_trim.F
+Chd|        INT18_ALLOC                   source/interfaces/int18/int18_alloc.F
 Chd|        INT18_LAW151_OMP_ACCUMULATION source/interfaces/int18/int18_law151_omp_accumulation.F
 Chd|        INTCRIT                       source/interfaces/intsort/intcrit.F
+Chd|        INTER7_COLLISION_DETECTION    source/interfaces/inter7_collision_detection.F
 Chd|        INTER_SORT_07                 source/interfaces/int07/inter_sort_07.F
+Chd|        INTMASS_UPDATE                source/interfaces/interf/intmass_update.F
 Chd|        INTTRI                        source/interfaces/intsort/inttri.F
 Chd|        I_CORPFIT3                    source/interfaces/int24/i24cor3.F
 Chd|        I_COR_EPFIT3                  source/interfaces/int24/i24cor3.F
@@ -241,6 +246,7 @@ Chd|        SPMD_CHECK_TAG                source/mpi/ams/spmd_check_tag.F
 Chd|        SPMD_EXCH_EFRIC               source/mpi/interfaces/spmd_exch_efric.F
 Chd|        SPMD_EXCH_I24                 source/mpi/interfaces/spmd_exch_i24.F
 Chd|        SPMD_EXCH_I25                 source/mpi/interfaces/spmd_exch_i25.F
+Chd|        SPMD_EXCH_INTER_18            source/mpi/interfaces/spmd_exch_inter_18.F
 Chd|        SPMD_EXCH_PRESS               source/mpi/interfaces/spmd_exch_press.F
 Chd|        SPMD_EXCH_SMST2               source/mpi/ams/spmd_exch_smst2.F
 Chd|        SPMD_EXCH_SORTING_EFRIC       source/mpi/interfaces/spmd_exch_sorting_efric.F
@@ -506,6 +512,7 @@ C Temporary array for VOXEL SORTING
       INTEGER , DIMENSION(:), ALLOCATABLE :: NEXT_NOD
       INTEGER , DIMENSION(:), ALLOCATABLE :: CHAIN_ELEM,CHAIN_NEXT
       INTEGER , DIMENSION(:), ALLOCATABLE :: CHAIN_LAST 
+      INTEGER , DIMENSION(:), ALLOCATABLE :: PREV_REMOTE_NUMBER 
       INTEGER LVOXEL
       PARAMETER(LVOXEL = 8000000)
       INTEGER INIVOXEL, VOXEL1(LVOXEL)
@@ -540,6 +547,9 @@ C Type 25 Interface
       TYPE(int_pointer) , DIMENSION(:), ALLOCATABLE :: KREMNOR_FI
       TYPE(int_pointer) , DIMENSION(:), ALLOCATABLE :: ISKEW_FI
       TYPE(int_pointer) , DIMENSION(:), ALLOCATABLE :: ICODT_FI
+      TYPE(real_pointer), DIMENSION(:), ALLOCATABLE :: STIF_MSDT_FI
+      TYPE(real_pointer), DIMENSION(:), ALLOCATABLE :: STIFE_MSDT_FI
+      TYPE(real_pointer), DIMENSION(:), ALLOCATABLE :: INTAREANFI
 
 C AMS TYPE2 + Contact
       TYPE(real_pointer), DIMENSION(:), ALLOCATABLE :: T2FAC_SMS_FI

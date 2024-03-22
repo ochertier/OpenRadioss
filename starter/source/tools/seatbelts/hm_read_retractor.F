@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -48,6 +48,7 @@ Chd|====================================================================
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE MY_ALLOC_MOD
       USE MESSAGE_MOD
       USE UNITAB_MOD
       USE SEATBELT_MOD
@@ -63,13 +64,10 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
 #include      "units_c.inc"
-#include      "scr03_c.inc"
 #include      "scr17_c.inc"
 #include      "com04_c.inc"
-#include      "submod_c.inc"
 #include      "random_c.inc"
 #include      "tabsiz_c.inc"
-#include      "my_allocate.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -95,7 +93,7 @@ C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
       INTEGER USR2SYS,NINTRI
 C=======================================================================
-      DATA MESS/'RETRACTOR DEFINITION                     '/
+      DATA MESS/'RETRACTOR DEFINITION                    '/
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------
@@ -105,7 +103,7 @@ C
 C
         WRITE(IOUT,1000)
 C
-        MY_ALLOCATE (RETRACTOR,NRETRACTOR)
+        ALLOCATE(RETRACTOR(NRETRACTOR))
         DO I=1,NRETRACTOR
           RETRACTOR(I)%ID = 0
           RETRACTOR(I)%IDG = 0

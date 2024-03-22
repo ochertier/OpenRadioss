@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -56,9 +56,7 @@ C     REAL
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr04_c.inc"
 #include      "com08_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -66,16 +64,12 @@ C     REAL
       my_real
      .   STARTT,PTMAX
 
-      INTEGER IBC
+      INTEGER IBC,NSN,NMN,NTY
 C-----------------------------------------------
 C
-      NRTS  =IPARI(3)
-      NRTM  =IPARI(4)
       NSN   =IPARI(5)
       NMN   =IPARI(6)
       NTY   =IPARI(7)
-      NST   =IPARI(8)
-      MST   =IPARI(9)
       IBC   =IPARI(11)
 C
 C
@@ -86,8 +80,8 @@ C
       IF(NTY==3) THEN
          PTMAX = PTMAX*HALF
       ENDIF
-      CALL INVOI2(X	  ,INTBUF_TAB%IRECTM,INTBUF_TAB%LMSR,INTBUF_TAB%MSR,
-     1  	INTBUF_TAB%NSV,INTBUF_TAB%ILOCS,INTBUF_TAB%IRTLM,INTBUF_TAB%NSEGM,NSN	   )
+      CALL INVOI2(X    ,INTBUF_TAB%IRECTM,INTBUF_TAB%LMSR,INTBUF_TAB%MSR,
+     1    INTBUF_TAB%NSV,INTBUF_TAB%ILOCS,INTBUF_TAB%IRTLM,INTBUF_TAB%NSEGM,NSN     )
       IF(NTY==3)THEN
        CALL INVOI2(X      ,INTBUF_TAB%IRECTS,INTBUF_TAB%LNSV,INTBUF_TAB%NSV,INTBUF_TAB%MSR,
      1          INTBUF_TAB%ILOCM,INTBUF_TAB%IRTLS,INTBUF_TAB%NSEGS,NMN       )

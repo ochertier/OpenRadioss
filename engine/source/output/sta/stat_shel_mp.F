@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,7 +26,7 @@ Chd|-- called by -----------
 Chd|        GENSTAT                       source/output/sta/genstat.F   
 Chd|-- calls ---------------
 Chd|        MY_ORDERS                     ../common_source/tools/sort/my_orders.c
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE STAT_SHEL_MP(ITAB,ITABG,LENG,IPART,IGEO,
      .            IXC,IXTG,IPARTC,IPARTTG,IPART_STATE,
@@ -48,11 +48,8 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "param_c.inc"
 #include      "remesh_c.inc"
-#include      "scr05_c.inc"
 #include      "scr16_c.inc"
 #include      "scr17_c.inc"
-#include      "spmd_c.inc"
-#include      "task_c.inc"
 #include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -88,7 +85,7 @@ C-----------------------------------------------
         ITY   =IPARG(5,NG)
         IF(ITY==3) THEN
           NEL   =IPARG(2,NG)
-          NFT	=IPARG(3,NG)
+          NFT  =IPARG(3,NG)
           GBUF => ELBUF_TAB(NG)%GBUF   
           MLW   =IPARG(1,NG)
           ITHK  =IPARG(28,NG)
@@ -210,7 +207,7 @@ C     Specific adaptive meshing :
          IF(IPRT /= IPRT0)THEN
            WRITE(IUGEO,'(A)')'/ADMESH/STATE/SHELL'
            WRITE(IUGEO,'(2A)')
-     .  '#  SHELLID       ID1       ID2	      ID3       ID4     LEVEL',
+     .  '#  SHELLID       ID1       ID2        ID3       ID4     LEVEL',
      .  '  IMAPPING'
            IPRT0=IPRT
          END IF
@@ -228,8 +225,8 @@ C-----------------------------------------------
        DO NG=1,NGROUP
         ITY   =IPARG(5,NG)
         IF(ITY==7) THEN
-          NEL	=IPARG(2,NG)
-          NFT	=IPARG(3,NG)
+          NEL  =IPARG(2,NG)
+          NFT  =IPARG(3,NG)
           GBUF => ELBUF_TAB(NG)%GBUF   
           MLW   =IPARG(1,NG)
           ITHK  =IPARG(28,NG)
@@ -305,8 +302,8 @@ C     Specific adaptive meshing :
         DO NG=1,NGROUP
          ITY   =IPARG(5,NG)
          IF(ITY==7) THEN
-           NEL	=IPARG(2,NG)
-           NFT	=IPARG(3,NG)
+           NEL  =IPARG(2,NG)
+           NFT  =IPARG(3,NG)
            LFT=1
            LLT=NEL
 C
@@ -353,7 +350,7 @@ C
          IF(IPRT /= IPRT0)THEN
            WRITE(IUGEO,'(A)')'/ADMESH/STATE/SH3N'
            WRITE(IUGEO,'(2A)')
-     .  '#   SH3NID       ID1       ID2	      ID3       ID4     LEVEL',
+     .  '#   SH3NID       ID1       ID2        ID3       ID4     LEVEL',
      .  '  IMAPPING'
            IPRT0=IPRT
          END IF

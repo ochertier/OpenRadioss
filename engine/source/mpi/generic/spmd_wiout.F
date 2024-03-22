@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -42,7 +42,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -69,8 +68,8 @@ C-----------------------------------------------
 
 
       INTEGER :: NINDX_PROC,SIZE_MESSAGE
-	  INTEGER, DIMENSION(NSPMD) :: IWIOUT_SPMD
-	  INTEGER, DIMENSION(NSPMD) :: PROC_RCV,DISPLACEMENT
+            INTEGER, DIMENSION(NSPMD) :: IWIOUT_SPMD
+            INTEGER, DIMENSION(NSPMD) :: PROC_RCV,DISPLACEMENT
       INTEGER :: INDX,REQ_S
       INTEGER, DIMENSION(NSPMD) :: REQ_R
 
@@ -121,7 +120,7 @@ C IWIOUT est utilise pour connaitre le nb max de characteres a echanger
             P = PROC_RCV(INDX)
             SIZ = IWIOUT_SPMD(P)
             DO N = 1, SIZ, LEN
-Cel traitement special pour eliminer les blancs de fin de chaine
+C   traitement special pour eliminer les blancs de fin de chaine
                 I = LEN
                 IBLANC = ICHAR(' ')
                 DO WHILE (IWA(DISPLACEMENT(INDX)+N+I)==IBLANC.AND.I>1)

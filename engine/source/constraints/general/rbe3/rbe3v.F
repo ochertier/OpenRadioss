@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -35,17 +35,10 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com06_c.inc"
-#include      "com08_c.inc"
-#include      "scr05_c.inc"
 #include      "param_c.inc"
 #include      "tabsiz_c.inc"
 C-----------------------------------------------
@@ -82,44 +75,44 @@ C======================================================================|
      .              FRBE3(6*IAD+1),SKEW    ,NML     ,IROT   ,FDSTNB ,
      .              MDSTNB  ,IRBE3(2,N))
         DO J = 1,3
-	 VS(J) = ZERO
-	 VRS(J) = ZERO
-	 AS(J) = ZERO
-	 ARS(J) = ZERO
-	ENDDO
+           VS(J) = ZERO
+           VRS(J) = ZERO
+           AS(J) = ZERO
+           ARS(J) = ZERO
+          ENDDO
         DO I=1,NML
          M = LRBE3(IAD+I)
          DO J = 1,3
           DO K = 1,3
-	   VS(J) = VS(J)+FDSTNB(K,J,I)*V(K,M)
-	   AS(J) = AS(J)+FDSTNB(K,J,I)*A(K,M)
-	   VRS(J) = VRS(J)+FDSTNB(K,J+3,I)*V(K,M)
-	   ARS(J) = ARS(J)+FDSTNB(K,J+3,I)*A(K,M)
-	  ENDDO
-	 ENDDO
+             VS(J) = VS(J)+FDSTNB(K,J,I)*V(K,M)
+             AS(J) = AS(J)+FDSTNB(K,J,I)*A(K,M)
+             VRS(J) = VRS(J)+FDSTNB(K,J+3,I)*V(K,M)
+             ARS(J) = ARS(J)+FDSTNB(K,J+3,I)*A(K,M)
+            ENDDO
+           ENDDO
         ENDDO
         IF (IROT>0) THEN
          DO I=1,NML
           M = LRBE3(IAD+I)
           DO J = 1,3
            DO K = 1,3
-	    VS(J) = VS(J)+MDSTNB(K,J,I)*VR(K,M)
-	    AS(J) = AS(J)+MDSTNB(K,J,I)*AR(K,M)
-	    VRS(J) = VRS(J)+MDSTNB(K,J+3,I)*VR(K,M)
-	    ARS(J) = ARS(J)+MDSTNB(K,J+3,I)*AR(K,M)
-	   ENDDO
-	  ENDDO
+              VS(J) = VS(J)+MDSTNB(K,J,I)*VR(K,M)
+              AS(J) = AS(J)+MDSTNB(K,J,I)*AR(K,M)
+              VRS(J) = VRS(J)+MDSTNB(K,J+3,I)*VR(K,M)
+              ARS(J) = ARS(J)+MDSTNB(K,J+3,I)*AR(K,M)
+             ENDDO
+            ENDDO
          ENDDO
         ENDIF 
         DO J = 1,3
-	 V(J,NS) = VS(J) *JT(J,N)
-	 A(J,NS) = AS(J) *JT(J,N)
-	ENDDO
+           V(J,NS) = VS(J) *JT(J,N)
+           A(J,NS) = AS(J) *JT(J,N)
+          ENDDO
         IF ((JR(1,N)+JR(2,N)+JR(3,N))>0) THEN
          DO J = 1,3
-	  VR(J,NS) = VRS(J) *JR(J,N)
-	  AR(J,NS) = ARS(J) *JR(J,N)
-	 ENDDO
+            VR(J,NS) = VRS(J) *JR(J,N)
+            AR(J,NS) = ARS(J) *JR(J,N)
+           ENDDO
         ENDIF 
       ENDDO
 C      
@@ -143,17 +136,10 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com06_c.inc"
-#include      "com08_c.inc"
-#include      "scr05_c.inc"
 #include      "param_c.inc"
 #include      "tabsiz_c.inc"
 C-----------------------------------------------
@@ -184,41 +170,41 @@ C======================================================================|
         NS  = IRBE3(3,N)
         IF (NS==0) CYCLE
         NML = IRBE3(5,N)
-	IROT =MIN(IRBE3(6,N),IRODDL)
+          IROT =MIN(IRBE3(6,N),IRODDL)
         CALL RBE3CL(LRBE3(IAD+1),LRBE3(IADS+IAD+1),NS     ,X    ,
      .              FRBE3(6*IAD+1),SKEW    ,NML     ,IROT   ,FDSTNB ,
      .              MDSTNB  ,IRBE3(2,N))
         DO J = 1,3
-	 VS(J) = ZERO
-	 VRS(J) = ZERO
-	ENDDO
+           VS(J) = ZERO
+           VRS(J) = ZERO
+          ENDDO
         DO I=1,NML
          M = LRBE3(IAD+I)
          DO J = 1,3
           DO K = 1,3
-	   VS(J) = VS(J)+FDSTNB(K,J,I)*D(K,M)
-	   VRS(J) = VRS(J)+FDSTNB(K,J+3,I)*D(K,M)
-	  ENDDO
-	 ENDDO
+             VS(J) = VS(J)+FDSTNB(K,J,I)*D(K,M)
+             VRS(J) = VRS(J)+FDSTNB(K,J+3,I)*D(K,M)
+            ENDDO
+           ENDDO
         ENDDO
         IF (IROT>0) THEN
          DO I=1,NML
           M = LRBE3(IAD+I)
           DO J = 1,3
            DO K = 1,3
-	    VS(J) = VS(J)+MDSTNB(K,J,I)*DR(K,M)
-	    VRS(J) = VRS(J)+MDSTNB(K,J+3,I)*DR(K,M)
-	   ENDDO
-	  ENDDO
+              VS(J) = VS(J)+MDSTNB(K,J,I)*DR(K,M)
+              VRS(J) = VRS(J)+MDSTNB(K,J+3,I)*DR(K,M)
+             ENDDO
+            ENDDO
          ENDDO
         ENDIF 
         DO J = 1,3
-	 D(J,NS) = VS(J) *JT(J,N)
-	ENDDO
+           D(J,NS) = VS(J) *JT(J,N)
+          ENDDO
         IF ((JR(1,N)+JR(2,N)+JR(3,N))>0) THEN
          DO J = 1,3
-	  DR(J,NS) = VRS(J) *JR(J,N)
-	 ENDDO
+            DR(J,NS) = VRS(J) *JR(J,N)
+           ENDDO
         ENDIF 
       ENDDO
 C      
@@ -241,60 +227,50 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com01_c.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NML,IML(*),NS,IROT,JT(*),JR(*)
-C     REAL
       my_real
      .   D(3,*), DR(3,*),  FDSTNB(3,6,*) ,MDSTNB(3,6,*)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, J, N, M, IAD,JJ,NM,NN,K
-C     REAL
       my_real 
      .        VS(3),VRS(3)
 
 C======================================================================|
         DO J = 1,3
-	 VS(J) = ZERO
-	 VRS(J) = ZERO
-	ENDDO
+           VS(J) = ZERO
+           VRS(J) = ZERO
+          ENDDO
         DO I=1,NML
          M = IML(I)
          DO J = 1,3
           DO K = 1,3
-	   VS(J) = VS(J)+FDSTNB(K,J,I)*D(K,M)
-	   VRS(J) = VRS(J)+FDSTNB(K,J+3,I)*D(K,M)
-	  ENDDO
-	 ENDDO
+             VS(J) = VS(J)+FDSTNB(K,J,I)*D(K,M)
+             VRS(J) = VRS(J)+FDSTNB(K,J+3,I)*D(K,M)
+            ENDDO
+           ENDDO
         ENDDO
         IF (IROT>0) THEN
          DO I=1,NML
           M = IML(I)
           DO J = 1,3
            DO K = 1,3
-	    VS(J) = VS(J)+MDSTNB(K,J,I)*DR(K,M)
-	    VRS(J) = VRS(J)+MDSTNB(K,J+3,I)*DR(K,M)
-	   ENDDO
-	  ENDDO
+              VS(J) = VS(J)+MDSTNB(K,J,I)*DR(K,M)
+              VRS(J) = VRS(J)+MDSTNB(K,J+3,I)*DR(K,M)
+             ENDDO
+            ENDDO
          ENDDO
         ENDIF 
         DO J = 1,3
-	 D(J,NS) = VS(J) *JT(J)
-	ENDDO
+           D(J,NS) = VS(J) *JT(J)
+          ENDDO
         IF ((JR(1)+JR(2)+JR(3))>0) THEN
          DO J = 1,3
-	  DR(J,NS) = VRS(J) *JR(J)
-	 ENDDO
+            DR(J,NS) = VRS(J) *JR(J)
+           ENDDO
         ENDIF 
 C---
       RETURN

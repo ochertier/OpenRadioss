@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -49,18 +49,10 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "param_c.inc"
-#include      "scr17_c.inc"
 #include      "scry_c.inc"
 #include      "sphcom.inc"
 C-----------------------------------------------
@@ -89,16 +81,17 @@ C----------------------------------------------------------------------
 C
 C SHELL 4-NODES
 C
-        NUMSHEL0=NUMSHEL
+        NUMSHEL0 = NUMSHEL
         IF(NUMSHEL>0)THEN
 C        tri des elts du Y000 par ID croissant
+          
           DO ISYS = 1, NUMSHEL
             ITRI(ISYS) =ID_SIGSH(ISYS)
           END DO
           CALL MY_ORDERS(0,WORK,ITRI,INDEX,NUMSHEL,1)
 C        checking INISHE : search for multiply define
-          ISYS=INDEX(1)
-          IE  =ID_SIGSH(ISYS)
+          ISYS = INDEX(1)
+          IE  = ID_SIGSH(ISYS)
           DO J = 2, NUMSHEL
             JSYS=INDEX(J)
             JE  =ID_SIGSH(JSYS)
@@ -144,8 +137,9 @@ C        checking INISHE : search for multiply define
 C
         IF(NUMSHEL>0)THEN
 C        tri des elts du Y000 par ID croissant
-          DO ISYS = 1, NUMSHEL
-            ITRI(ISYS) = ID_SIGSH(ISYS)
+         
+          DO ISYS = 1,NUMSHEL 
+              ITRI(ISYS) = ID_SIGSH(ISYS)
           END DO
           CALL MY_ORDERS(0,WORK,ITRI,INDEX,NUMSHEL,1)
           DO J = 1, NUMSHEL
@@ -166,13 +160,13 @@ C
         IF(NUMSH3N>0)THEN
 C        tri des elts du Y000 par ID croissant
           DO ISYS = 1, NUMSH3N
-            II=NUMSHEL0+ISYS
+            II= NUMSHEL0 + ISYS
             ITRI(ISYS) = ID_SIGSH(II)
           END DO
           CALL MY_ORDERS(0,WORK,ITRI,INDEX,NUMSH3N,1)
 C
-          ISYS=NUMSHEL0+INDEX(1)
-          IE  =ID_SIGSH(ISYS)
+          ISYS = NUMSHEL0 + INDEX(1)
+          IE   = ID_SIGSH(ISYS)
           DO J = 2, NUMSH3N
             JSYS=NUMSHEL0+INDEX(J)
             JE  =ID_SIGSH(JSYS)
@@ -199,8 +193,8 @@ C
           END DO
           COMPT=0
           DO J=1,NUMSH3N
-            IE=ID_SIGSH(NUMSHEL0+J)
-            IF(IE/=0)THEN
+            IE=ID_SIGSH(NUMSHEL0 + J)
+            IF(IE /=0 )THEN
               COMPT=COMPT+1
               IF(NUMSHEL+COMPT<NUMSHEL0+J)THEN
                 DO K=1,NSIGSH
@@ -219,22 +213,22 @@ C
         IF (NUMSH3N > 0) THEN
 C        tri des elts du Y000 par ID croissant
           DO ISYS = 1, NUMSH3N
-            II=NUMSHEL+ISYS
+            II = ISYS + NUMSHEL0
             ITRI(ISYS) = ID_SIGSH(II)
           END DO
           CALL MY_ORDERS(0,WORK,ITRI,INDEX,NUMSH3N,1)
 C
           DO J = 1, NUMSH3N
-            ISYS=INDEX(J)
-            II=NUMSHEL+ISYS
-            KSYSUSR(J)=ID_SIGSH(II)
-            KSYSUSR(NUMSH3N+J)=ISYS
+            ISYS = INDEX(J)
+            II   = ISYS + NUMSHEL0
+            KSYSUSR(J) = ID_SIGSH(II)
+            KSYSUSR(NUMSH3N + J) = ISYS
           END DO
 C
 C        Nos systeme dans le Y000, des elts du D00
           DO I=1,NUMELTG
-            ISYS=UEL2SYS(IXTG(NIXTG,I),KSYSUSR,NUMSH3N)
-            PTSH3N(I) =ISYS
+            ISYS = UEL2SYS(IXTG(NIXTG,I),KSYSUSR,NUMSH3N)
+            PTSH3N(I) =  ISYS 
           END DO
         ENDIF
 C

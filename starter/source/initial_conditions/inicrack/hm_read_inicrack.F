@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -39,6 +39,7 @@ Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F
 Chd|====================================================================
       SUBROUTINE HM_READ_INICRACK(ITABM1   ,INICRACK ,UNITAB   ,LSUBMODEL)
 C-----------------------------------------------
+      USE MY_ALLOC_MOD
       USE MESSAGE_MOD
       USE OPTIONDEF_MOD
       USE SUBMODEL_MOD
@@ -49,21 +50,10 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr17_c.inc"
-#include      "scr03_c.inc"
-#include      "com04_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "param_c.inc"
-#include      "my_allocate.inc"
 #include      "com_xfem1.inc"
-#include      "submod_c.inc"
-#include      "sysunit.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -118,9 +108,9 @@ C
         INICRACK(I)%NSEG  = NSEG
 C    
         ! Allocation of segment data structure
-        MY_ALLOCATE(INICRACK(I)%SEG,NSEG)
+        ALLOCATE(INICRACK(I)%SEG(NSEG))
         DO J = 1,NSEG
-          MY_ALLOCATE(INICRACK(I)%SEG(J)%NODES,2)
+          CALL MY_ALLOC(INICRACK(I)%SEG(J)%NODES,2)
         ENDDO
 C
         ! Filling the segment data structure

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -56,21 +56,11 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr03_c.inc"
-#include      "scr06_c.inc"
 #include      "scr17_c.inc"
-#include      "param_c.inc"
 #include      "units_c.inc"
-#include      "sphcom.inc"
-#include      "submod_c.inc"
-#include      "sysunit.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -374,10 +364,6 @@ C
           CALL HM_GET_FLOATV('position_x',RTRANS(I,15),IS_AVAILABLE,LSUBMODEL,UNITAB)
           CALL HM_GET_FLOATV('position_y',RTRANS(I,16),IS_AVAILABLE,LSUBMODEL,UNITAB)
           CALL HM_GET_FLOATV('position_z',RTRANS(I,17),IS_AVAILABLE,LSUBMODEL,UNITAB)
-C
-          RTRANS(I,15) = RTRANS(I,15) * FAC_L
-          RTRANS(I,16) = RTRANS(I,16) * FAC_L
-          RTRANS(I,17) = RTRANS(I,17) * FAC_L
 C
           EPS   = EM3
           NORM1 = SQRT(RTRANS(I,3)**2+RTRANS(I,6)**2+RTRANS(I,9)**2)

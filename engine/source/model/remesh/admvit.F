@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -44,16 +44,11 @@ C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "com06_c.inc"
 #include      "com08_c.inc"
 #include      "param_c.inc"
 #include      "remesh_c.inc"
 #include      "scr17_c.inc"
 #include      "task_c.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -103,12 +98,12 @@ C
             TAGNOD(MC)=1
             DO J=1,3
               VV= FOURTH*(V(J,N1)+V(J,N2)+V(J,N3)+V(J,N4)
-     .    	       +DT12*(A(J,N1)+A(J,N2)+A(J,N3)+A(J,N4)))
+     .             +DT12*(A(J,N1)+A(J,N2)+A(J,N3)+A(J,N4)))
               A(J,MC)=USDT*(VV-V(J,MC))
             END DO
             DO J=1,3
               VV= FOURTH*(VR(J,N1)+VR(J,N2)+VR(J,N3)+VR(J,N4)
-     .    	       +DT12*(AR(J,N1)+AR(J,N2)+AR(J,N3)+AR(J,N4)))
+     .             +DT12*(AR(J,N1)+AR(J,N2)+AR(J,N3)+AR(J,N4)))
               AR(J,MC)=USDT*(VV-VR(J,MC))
             END DO
             IF(ITHERM_FE > 0)

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -70,7 +70,6 @@ C---------+---------+---+---+--------------------------------------------
 C UVAR    |NEL*NUVAR| F |R/W| USER ELEMENT VARIABLE ARRAY
 C OFF     | NEL     | F |R/W| DELETED ELEMENT FLAG (=1. ON, =0. OFF)
 C---------+---------+---+---+--------------------------------------------
-#include      "scr17_c.inc"
 #include      "sms_c.inc"
 C----------------------------------------------------------
 C   D u m m y   A r g u m e n t s  

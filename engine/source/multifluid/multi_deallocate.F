@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,7 +26,7 @@ Chd|-- called by -----------
 Chd|        RESOL                         source/engine/resol.F         
 Chd|-- calls ---------------
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|====================================================================
       SUBROUTINE MULTI_DEALLOCATE(MULTI_FVM)
 C-----------------------------------------------
@@ -41,8 +41,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com04_c.inc"
-#include      "spmd_c.inc"
 C----------------------------------------------
 C     D u m m y   a r g u m e n t s
 C----------------------------------------------
@@ -61,6 +59,7 @@ C     Multifluid law
          IF (ALLOCATED(MULTI_FVM%SUBMASS_FLUXES)) DEALLOCATE(MULTI_FVM%SUBMASS_FLUXES)
          IF (ALLOCATED(MULTI_FVM%SUBENER_FLUXES)) DEALLOCATE(MULTI_FVM%SUBENER_FLUXES)
          IF (ALLOCATED(MULTI_FVM%VEL)) DEALLOCATE(MULTI_FVM%VEL)
+         IF (ALLOCATED(MULTI_FVM%ACC)) DEALLOCATE(MULTI_FVM%ACC)
          IF (ALLOCATED(MULTI_FVM%SOUND_SPEED)) DEALLOCATE(MULTI_FVM%SOUND_SPEED)
          IF (ALLOCATED(MULTI_FVM%RHO)) DEALLOCATE(MULTI_FVM%RHO)
          IF (ALLOCATED(MULTI_FVM%EINT)) DEALLOCATE(MULTI_FVM%EINT)

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -52,7 +52,7 @@ Chd|        STARTIMEG                     source/system/timer.F
 Chd|        STOPTIMEG                     source/system/timer.F         
 Chd|        WEIGHT0                       source/elements/sph/weight.F  
 Chd|        GET_U_GEO                     source/user_interface/upidmid.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        MOD_SPLISSV                   source/elements/sph/splissv.F 
 Chd|        SPHBOX                        share/modules/sphbox.F        
@@ -74,15 +74,11 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE SPHBOX
       USE MOD_SPLISSV
-C----6---------------------------------------------------------------7---------8
+C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "comlock.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -93,13 +89,9 @@ C-----------------------------------------------
 #include      "com08_c.inc"
 #include      "sphcom.inc"
 #include      "param_c.inc"
-#include      "parit_c.inc"
-#include      "scr05_c.inc"
 #include      "scr17_c.inc"
-#include      "scr18_c.inc"
 #include      "task_c.inc"
-#include      "units_c.inc"
-C-----------------------------------------------------------------
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER KXSP(NISP,*),IXSP(KVOISPH,*),NOD2SP(*),ITAB(*),
@@ -461,7 +453,7 @@ C-----------------------------------------------
            AN=AXI*NX+AYI*NY+AZI*NZ
            AXS=AXI-TWO*AN*NX
            AYS=AYI-TWO*AN*NY
-           AZS=AZI-TWO*AN*NZ	   
+           AZS=AZI-TWO*AN*NZ     
           ENDIF
           WASPSYM(1,JS)=AXS
           WASPSYM(2,JS)=AYS
@@ -488,7 +480,7 @@ C
            AN=AXI*NX+AYI*NY+AZI*NZ
            AXS=AXI-TWO*AN*NX
            AYS=AYI-TWO*AN*NY
-           AZS=AZI-TWO*AN*NZ	   
+           AZS=AZI-TWO*AN*NZ     
           ENDIF
           WASPSYM(1,JS)=AXS
           WASPSYM(2,JS)=AYS

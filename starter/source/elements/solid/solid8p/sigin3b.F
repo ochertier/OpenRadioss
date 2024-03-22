@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -28,7 +28,7 @@ Chd|-- calls ---------------
 Chd|        M38INIT                       source/materials/mat/mat038/m38init.F
 Chd|        M70INIT                       source/materials/mat/mat070/m70init.F
 Chd|        SROTA6_M1                     source/output/anim/srota6_M1.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE SIGIN3B(MAT     ,PM      ,IPM     ,SIG     ,VOL     ,
      2                   SIGSP   ,SIGI    ,EINT    ,RHO     ,
@@ -49,7 +49,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include       "com01_c.inc" 
-#include       "com04_c.inc"
 #include       "param_c.inc"
 #include       "vect01_c.inc"
 #include       "scr19_c.inc" 
@@ -111,10 +110,7 @@ C
      2         NPF   ,TF      , BUFMAT(IADBUF),RHO0    ,VOL ,  
      3         EINT  ,UVAR    ) 
           ELSEIF (MTN == 70) THEN
-            CALL M70INIT(
-     1         NEL   ,NPAR    ,NUVAR   ,NFUNC  ,IFUNC  ,
-     2         NPF   ,TF      ,BUFMAT(IADBUF),RHO0    ,VOL ,  
-     3         EINT  ,UVAR    ) 
+            CALL M70INIT(NEL,NPAR,NUVAR,BUFMAT(IADBUF),UVAR) 
           ENDIF
         END DO
       ENDIF
@@ -132,12 +128,12 @@ c
             IFLAGINI = 0                                  
             IF (STRAGLOB(I) == 1 .OR. STRSGLOB(I) == 1)THEN 
               IF (JCVT==2 .AND. JHBE/=14) THEN              
-                GAMA(1)=BUFGAMA(I	 )		    
-                GAMA(2)=BUFGAMA(I +   NEL)		    
-                GAMA(3)=BUFGAMA(I + 2*NEL)		    
-                GAMA(4)=BUFGAMA(I + 3*NEL)		    
-                GAMA(5)=BUFGAMA(I + 4*NEL)		    
-                GAMA(6)=BUFGAMA(I + 5*NEL)		    
+                GAMA(1)=BUFGAMA(I   )        
+                GAMA(2)=BUFGAMA(I +   NEL)        
+                GAMA(3)=BUFGAMA(I + 2*NEL)        
+                GAMA(4)=BUFGAMA(I + 3*NEL)        
+                GAMA(5)=BUFGAMA(I + 4*NEL)        
+                GAMA(6)=BUFGAMA(I + 5*NEL)        
               ELSE                                          
                 GAMA(1)=ONE                                  
                 GAMA(2)=ZERO                                
@@ -156,27 +152,27 @@ c---
             IF (IFLAGINI == 1) THEN
               IF (SIGSP(1,JJ) == 1) THEN                                         
                 IF (STRSGLOB(I) == 1) THEN
-                  TENS(1) = SIGSP(JPS+1,JJ)		    
-                  TENS(2) = SIGSP(JPS+2,JJ)		    
-                  TENS(3) = SIGSP(JPS+3,JJ)		    
-                  TENS(4) = SIGSP(JPS+4,JJ)		    
-                  TENS(5) = SIGSP(JPS+5,JJ)		    
+                  TENS(1) = SIGSP(JPS+1,JJ)        
+                  TENS(2) = SIGSP(JPS+2,JJ)        
+                  TENS(3) = SIGSP(JPS+3,JJ)        
+                  TENS(4) = SIGSP(JPS+4,JJ)        
+                  TENS(5) = SIGSP(JPS+5,JJ)        
                   TENS(6) = SIGSP(JPS+6,JJ)  
                   CALL SROTA6_M1(X,IX(1,II),JCVT,                
      .                           TENS,GAMA,JHBE,IGTYP)
-                 SIGSP(JPS+1,JJ) = TENS(1)				
-                 SIGSP(JPS+2,JJ) = TENS(2)				
-                 SIGSP(JPS+3,JJ) = TENS(3)				
-                 SIGSP(JPS+4,JJ) = TENS(4)				
-                 SIGSP(JPS+5,JJ) = TENS(5)				
+                 SIGSP(JPS+1,JJ) = TENS(1)
+                 SIGSP(JPS+2,JJ) = TENS(2)
+                 SIGSP(JPS+3,JJ) = TENS(3)
+                 SIGSP(JPS+4,JJ) = TENS(4)
+                 SIGSP(JPS+5,JJ) = TENS(5)
                  SIGSP(JPS+6,JJ) = TENS(6)
                 ENDIF 
-                 LBUF%SIG(KK(1)+I) = SIGSP(JPS+1,JJ)				  
-                 LBUF%SIG(KK(2)+I) = SIGSP(JPS+2,JJ)				  
-                 LBUF%SIG(KK(3)+I) = SIGSP(JPS+3,JJ)				  
-                 LBUF%SIG(KK(4)+I) = SIGSP(JPS+4,JJ)				  
-                 LBUF%SIG(KK(5)+I) = SIGSP(JPS+5,JJ)				  
-                 LBUF%SIG(KK(6)+I) = SIGSP(JPS+6,JJ)				  
+                 LBUF%SIG(KK(1)+I) = SIGSP(JPS+1,JJ)          
+                 LBUF%SIG(KK(2)+I) = SIGSP(JPS+2,JJ)          
+                 LBUF%SIG(KK(3)+I) = SIGSP(JPS+3,JJ)          
+                 LBUF%SIG(KK(4)+I) = SIGSP(JPS+4,JJ)          
+                 LBUF%SIG(KK(5)+I) = SIGSP(JPS+5,JJ)          
+                 LBUF%SIG(KK(6)+I) = SIGSP(JPS+6,JJ)          
                  IF(L_PLA /= 0 .AND. SIGSP(JPS+7,JJ) /= ZERO) 
      .                 LBUF%PLA(I)     = SIGSP(JPS+7,JJ)                              
                  IF (SIGSP(3,JJ) /= 0.0) EINT(I)=SIGSP(3,JJ)                    
@@ -184,60 +180,60 @@ c---
                    VOL(I) = SIGSP(4,JJ)*VOL(I) / RHO(I)                         
                    RHO(I) = SIGSP(4,JJ)                                         
                  ENDIF                                                          
-                 SIG(I,1) = SIG(I,1) + ONE_OVER_8*LBUF%SIG(KK(1)+I) 		  
-                 SIG(I,2) = SIG(I,2) + ONE_OVER_8*LBUF%SIG(KK(2)+I) 		  
-                 SIG(I,3) = SIG(I,3) + ONE_OVER_8*LBUF%SIG(KK(3)+I) 		  
-                 SIG(I,4) = SIG(I,4) + ONE_OVER_8*LBUF%SIG(KK(4)+I) 		  
-                 SIG(I,5) = SIG(I,5) + ONE_OVER_8*LBUF%SIG(KK(5)+I) 		  
-                 SIG(I,6) = SIG(I,6) + ONE_OVER_8*LBUF%SIG(KK(6)+I) 		  
+                 SIG(I,1) = SIG(I,1) + ONE_OVER_8*LBUF%SIG(KK(1)+I)       
+                 SIG(I,2) = SIG(I,2) + ONE_OVER_8*LBUF%SIG(KK(2)+I)       
+                 SIG(I,3) = SIG(I,3) + ONE_OVER_8*LBUF%SIG(KK(3)+I)       
+                 SIG(I,4) = SIG(I,4) + ONE_OVER_8*LBUF%SIG(KK(4)+I)       
+                 SIG(I,5) = SIG(I,5) + ONE_OVER_8*LBUF%SIG(KK(5)+I)       
+                 SIG(I,6) = SIG(I,6) + ONE_OVER_8*LBUF%SIG(KK(6)+I)       
               ELSE                                                             
-                LBUF%SIG(KK(1)+I)= SIG(I,1)					 
-                LBUF%SIG(KK(2)+I)= SIG(I,2)					 
-                LBUF%SIG(KK(3)+I)= SIG(I,3)					 
-                LBUF%SIG(KK(4)+I)= SIG(I,4)					 
-                LBUF%SIG(KK(5)+I)= SIG(I,5)					 
+                LBUF%SIG(KK(1)+I)= SIG(I,1)           
+                LBUF%SIG(KK(2)+I)= SIG(I,2)           
+                LBUF%SIG(KK(3)+I)= SIG(I,3)           
+                LBUF%SIG(KK(4)+I)= SIG(I,4)           
+                LBUF%SIG(KK(5)+I)= SIG(I,5)           
                 LBUF%SIG(KK(6)+I)= SIG(I,6)    
                 EINT(I)        = SIGI(9,JJ)                                    
                 IF (BUFLY%L_PLA > 0) LBUF%PLA(I) = SIGI(10,JJ)                                   
                 IF (STRSGLOB(I) == 1) THEN                                          
-                  TENS(1) = LBUF%SIG(KK(1)+I)		      
-                  TENS(2) = LBUF%SIG(KK(2)+I)		      
-                  TENS(3) = LBUF%SIG(KK(3)+I)		      
-                  TENS(4) = LBUF%SIG(KK(4)+I)		      
-                  TENS(5) = LBUF%SIG(KK(5)+I)		      
+                  TENS(1) = LBUF%SIG(KK(1)+I)          
+                  TENS(2) = LBUF%SIG(KK(2)+I)          
+                  TENS(3) = LBUF%SIG(KK(3)+I)          
+                  TENS(4) = LBUF%SIG(KK(4)+I)          
+                  TENS(5) = LBUF%SIG(KK(5)+I)          
                   TENS(6) = LBUF%SIG(KK(6)+I)
                   CALL SROTA6_M1(X    ,IX(1,II) ,JCVT ,          
      .                           TENS ,GAMA,JHBE ,IGTYP    )
-                  LBUF%SIG(KK(1)+I) = TENS(1)				  
-                  LBUF%SIG(KK(2)+I) = TENS(2)				  
-                  LBUF%SIG(KK(3)+I) = TENS(3)				  
-                  LBUF%SIG(KK(4)+I) = TENS(4)				  
-                  LBUF%SIG(KK(5)+I) = TENS(5)				  
+                  LBUF%SIG(KK(1)+I) = TENS(1)          
+                  LBUF%SIG(KK(2)+I) = TENS(2)          
+                  LBUF%SIG(KK(3)+I) = TENS(3)          
+                  LBUF%SIG(KK(4)+I) = TENS(4)          
+                  LBUF%SIG(KK(5)+I) = TENS(5)          
                   LBUF%SIG(KK(6)+I) = TENS(6)
                 ENDIF
               ENDIF  ! STRSGLOB(I) == 1                                        
 c
               IF (NVSOLID2 /= 0 .AND. IDEF /= 0) THEN                             
-                LBUF%STRA(KK(1)+I) = SIGSP(JPS1 + 1,JJ) 			  
-                LBUF%STRA(KK(2)+I) = SIGSP(JPS1 + 2,JJ) 			  
-                LBUF%STRA(KK(3)+I) = SIGSP(JPS1 + 3,JJ) 			  
-                LBUF%STRA(KK(4)+I) = SIGSP(JPS1 + 4,JJ) 			  
-                LBUF%STRA(KK(5)+I) = SIGSP(JPS1 + 5,JJ) 			  
-                LBUF%STRA(KK(6)+I) = SIGSP(JPS1 + 6,JJ) 			  
+                LBUF%STRA(KK(1)+I) = SIGSP(JPS1 + 1,JJ)         
+                LBUF%STRA(KK(2)+I) = SIGSP(JPS1 + 2,JJ)         
+                LBUF%STRA(KK(3)+I) = SIGSP(JPS1 + 3,JJ)         
+                LBUF%STRA(KK(4)+I) = SIGSP(JPS1 + 4,JJ)         
+                LBUF%STRA(KK(5)+I) = SIGSP(JPS1 + 5,JJ)         
+                LBUF%STRA(KK(6)+I) = SIGSP(JPS1 + 6,JJ)         
                 IF (STRAGLOB(I) == 1) THEN
-                  TENS(1) = LBUF%STRA(KK(1)+I)  	       
-                  TENS(2) = LBUF%STRA(KK(2)+I)  	       
-                  TENS(3) = LBUF%STRA(KK(3)+I)  	       
-                  TENS(4) = LBUF%STRA(KK(4)+I)  	       
-                  TENS(5) = LBUF%STRA(KK(5)+I)  	       
+                  TENS(1) = LBUF%STRA(KK(1)+I)           
+                  TENS(2) = LBUF%STRA(KK(2)+I)           
+                  TENS(3) = LBUF%STRA(KK(3)+I)           
+                  TENS(4) = LBUF%STRA(KK(4)+I)           
+                  TENS(5) = LBUF%STRA(KK(5)+I)           
                   TENS(6) = LBUF%STRA(KK(6)+I)
                   CALL SROTA6_M1(X    ,IX(1,II),JCVT  ,       
      .                           TENS ,GAMA,JHBE ,IGTYP   )
-                  LBUF%STRA(KK(1)+I) = TENS(1)  		       
-                  LBUF%STRA(KK(2)+I) = TENS(2)  		       
-                  LBUF%STRA(KK(3)+I) = TENS(3)  		       
-                  LBUF%STRA(KK(4)+I) = TENS(4)  		       
-                  LBUF%STRA(KK(5)+I) = TENS(5)  		       
+                  LBUF%STRA(KK(1)+I) = TENS(1)             
+                  LBUF%STRA(KK(2)+I) = TENS(2)             
+                  LBUF%STRA(KK(3)+I) = TENS(3)             
+                  LBUF%STRA(KK(4)+I) = TENS(4)             
+                  LBUF%STRA(KK(5)+I) = TENS(5)             
                   LBUF%STRA(KK(6)+I) = TENS(6)        
                 ENDIF
               ENDIF                                                             

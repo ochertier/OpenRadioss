@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -22,7 +22,6 @@ Copyright>        software under a commercial license.  Contact Altair to discus
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
       module MOD_SPGRHEAD
       implicit none
-#include      "my_real.inc"
       INTEGER, DIMENSION(:,:), ALLOCATABLE :: IXSPS
       END MODULE MOD_SPGRHEAD
 Chd|====================================================================
@@ -33,33 +32,27 @@ Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
 Chd|        MY_ORDERS                     ../common_source/tools/sort/my_orders.c
 Chd|        GET_U_GEO                     source/user_interface/uaccess.F
+Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
       SUBROUTINE SPGRHEAD(KXSP    ,IXSP    ,IPARG     ,PM  ,IPART,
      2                    IPARTSP ,EADD    ,CEPSP     ,ND  ,IPM  ,
-     3                    IGEO    ,SPBUF,SPH2SOL,
-     4                    SOL2SPH ,IRST    )
+     3                    IGEO    ,SPBUF   ,SPH2SOL   ,
+     4                    SOL2SPH ,IRST    ,MAT_PARAM )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE MOD_SPGRHEAD
       USE MESSAGE_MOD
+      USE MATPARAM_DEF_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "vect01_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "sphcom.inc"
 #include      "param_c.inc"
@@ -73,6 +66,7 @@ C-----------------------------------------------
      .        IPM(NPROPMI,NUMMAT), IGEO(NPROPGI,NUMGEO),
      .        ND, SPH2SOL(*), SOL2SPH(2,*), IRST(3,NSPHSOL)
       my_real PM(NPROPM,NUMMAT), SPBUF(NSPBUF,NUMSPH)
+      TYPE(MATPARAM_STRUCT_) ,DIMENSION(NUMMAT), INTENT(IN) :: MAT_PARAM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -203,7 +197,7 @@ C
         JTUR=NINT(PM(70,MT))
         JTHE=NINT(PM(71,MT))
         IFAIL = 0
-        IF(IPM(111,MT) > 0) IFAIL = 1
+        IF (MAT_PARAM(MT)%NFAIL > 0) IFAIL = 1
 Clef 1
         JTHE=MY_SHIFTL(JTHE,1)
         JTUR=MY_SHIFTL(JTUR,2)

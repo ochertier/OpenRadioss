@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -35,10 +35,6 @@ C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "comlock.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "param_c.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NRT, NEL
@@ -51,8 +47,6 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, IXS, IYS, J, K, N2, N1, JJ, LL,
      .        IY(4),IX(4)
-C-----------------------------------------------
-#include "sync_dir.inc"
 C-----------------------------------------------
       DO 400 I=1,NRT
       IF(STF(I)==ZERO)GOTO 400

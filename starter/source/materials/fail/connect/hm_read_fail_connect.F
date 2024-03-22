@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -28,33 +28,22 @@ Chd|-- calls ---------------
 Chd|        HM_GET_FLOATV                 source/devtools/hm_reader/hm_get_floatv.F
 Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
 Chd|        HM_OPTION_IS_ENCRYPTED        source/devtools/hm_reader/hm_option_is_encrypted.F
+Chd|        FAIL_PARAM_MOD                ../common_source/modules/mat_elem/fail_param_mod.F
 Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
-      SUBROUTINE HM_READ_FAIL_CONNECT(
-     .           UPARAM   ,MAXUPARAM,NUPARAM  ,NUVAR  ,IFUNC    ,
-     .           MAXFUNC  ,NFUNC    ,UNITAB   ,ID     ,FAIL_ID  ,
-     .           LSUBMODEL,UNIT_ID)
+      SUBROUTINE HM_READ_FAIL_CONNECT(FAIL ,
+     .           MAT_ID   ,FAIL_ID  ,IRUPT    ,UNIT_ID,
+     .           LSUBMODEL,UNITAB   )
 C-----------------------------------------------
 C   ROUTINE DESCRIPTION :
 C   ===================
 C   READ FAILURE CONNECT 
 C-----------------------------------------------
-C   DUMMY ARGUMENTS DESCRIPTION:
-C   ===================
-C
-C     NAME            DESCRIPTION                         
-C
-C     UNITAB          UNITS ARRAY
-C     FAIL_ID         FAILURE ID(INTEGER)
-C     TITR            MATERIAL TITLE
-C     LSUBMODEL       SUBMODEL STRUCTURE    
-C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE FAIL_PARAM_MOD
       USE UNITAB_MOD
-      USE MESSAGE_MOD 
       USE SUBMODEL_MOD
       USE HM_OPTION_READ_MOD 
 C-----------------------------------------------
@@ -64,33 +53,27 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr03_c.inc"
-#include      "scr17_c.inc"
 #include      "units_c.inc"
-#include      "submod_c.inc"
-#include      "sysunit.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-C INPUT ARGUMENTS
-      TYPE (UNIT_TYPE_),INTENT(IN) ::UNITAB 
-      INTEGER,INTENT(IN)             ::ID,FAIL_ID,UNIT_ID
-      TYPE(SUBMODEL_DATA),INTENT(IN) ::LSUBMODEL(*)
-C MODIFIED ARGUMENT
-      INTEGER,INTENT(INOUT)          ::IFUNC(MAXFUNC),NFUNC,MAXFUNC,MAXUPARAM
-      my_real,INTENT(INOUT)          ::UPARAM(MAXUPARAM)
-      INTEGER,INTENT(INOUT)            ::NUPARAM,NUVAR
+      INTEGER             ,INTENT(IN) :: FAIL_ID       ! failure model ID
+      INTEGER             ,INTENT(IN) :: MAT_ID        ! material law ID
+      INTEGER             ,INTENT(IN) :: UNIT_ID       ! 
+      INTEGER             ,INTENT(IN) :: IRUPT         ! failure model number
+      TYPE (UNIT_TYPE_)   ,INTENT(IN) :: UNITAB        ! table of input units
+      TYPE (SUBMODEL_DATA),INTENT(IN) :: LSUBMODEL(*) 
+      TYPE (FAIL_PARAM_)  ,INTENT(INOUT) :: FAIL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-C     REAL
       INTEGER    ::     IFUNN,IFUNT,IFAIL,IFAILS,IFAILE,ISOLID,NFAIL,ISYM,IUNIT,IFLAGUNIT
       my_real    ::     MAXDN,MAXDT,EXPN,EXPT,FACN,FACT,ASCALE,MAXEI,MAXEN,MAXET,NN,NT,
      .                  DTIME,DSOFT,AREASCALE, UNIT_T
 C-----------------------------------------------
       LOGICAL    ::     IS_AVAILABLE,IS_ENCRYPTED
 C=======================================================================
-      IS_ENCRYPTED   = .FALSE.
+      IS_ENCRYPTED = .FALSE.
       IS_AVAILABLE = .FALSE.
 C--------------------------------------------------
 C EXTRACT DATA (IS OPTION CRYPTED)
@@ -162,32 +145,43 @@ c-----------------------------------------------------------------------
       ENDIF
       ASCALE = ONE / UNIT_T
 c-----------------------------------------------------------------------
-      UPARAM(1)  = MAXDN
-      UPARAM(2)  = MAXDT
-      UPARAM(3)  = EXPN
-      UPARAM(4)  = EXPT
-      UPARAM(5)  = FACN
-      UPARAM(6)  = FACT
-      UPARAM(7)  = ASCALE
-      UPARAM(8)  = IFAILS
-      UPARAM(9)  = IFAILE
-      UPARAM(10) = NFAIL
-      UPARAM(11) = MAXEI
-      UPARAM(12) = MAXEN
-      UPARAM(13) = MAXET
-      UPARAM(14) = NN
-      UPARAM(15) = NT
-      UPARAM(16) = DTIME
-      UPARAM(17) = DSOFT
-      UPARAM(18) = ISYM
-      UPARAM(19) = AREASCALE
+      FAIL%KEYWORD = 'CONNECT' 
+      FAIL%IRUPT   = IRUPT 
+      FAIL%FAIL_ID = FAIL_ID 
+      FAIL%NUPARAM = 19
+      FAIL%NIPARAM = 0
+      FAIL%NUVAR   = 13
+      FAIL%NFUNC   = 2
+      FAIL%NTABLE  = 0
+      FAIL%NMOD    = 0
+c            
+      ALLOCATE (FAIL%UPARAM(FAIL%NUPARAM))
+      ALLOCATE (FAIL%IPARAM(FAIL%NIPARAM))
+      ALLOCATE (FAIL%IFUNC (FAIL%NFUNC))
+      ALLOCATE (FAIL%TABLE (FAIL%NTABLE))
+c
+      FAIL%UPARAM(1)  = MAXDN
+      FAIL%UPARAM(2)  = MAXDT
+      FAIL%UPARAM(3)  = EXPN
+      FAIL%UPARAM(4)  = EXPT
+      FAIL%UPARAM(5)  = FACN
+      FAIL%UPARAM(6)  = FACT
+      FAIL%UPARAM(7)  = ASCALE
+      FAIL%UPARAM(8)  = IFAILS
+      FAIL%UPARAM(9)  = IFAILE
+      FAIL%UPARAM(10) = NFAIL
+      FAIL%UPARAM(11) = MAXEI
+      FAIL%UPARAM(12) = MAXEN
+      FAIL%UPARAM(13) = MAXET
+      FAIL%UPARAM(14) = NN
+      FAIL%UPARAM(15) = NT
+      FAIL%UPARAM(16) = DTIME
+      FAIL%UPARAM(17) = DSOFT
+      FAIL%UPARAM(18) = ISYM
+      FAIL%UPARAM(19) = AREASCALE
 C    
-      IFUNC(1) = IFUNN
-      IFUNC(2) = IFUNT
-C    
-      NUPARAM = 19
-      NFUNC   = 2
-      NUVAR   = 13
+      FAIL%IFUNC(1) = IFUNN
+      FAIL%IFUNC(2) = IFUNT
 C--------------------------------------------------
       IF (IS_ENCRYPTED) THEN
         WRITE(IOUT, 1000)
@@ -195,7 +189,6 @@ C--------------------------------------------------
         WRITE(IOUT, 1100) MAXDN,MAXDT,EXPN,EXPT,IFAIL,ISOLID,ISYM,
      .                    IFUNN,IFUNT,FACN,FACT,
      .                    MAXEI,MAXEN,MAXET,NN,NT,DTIME,DSOFT,AREASCALE
-
       ENDIF
 C--------------------------------------------------
       RETURN

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -37,9 +37,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
@@ -72,30 +69,30 @@ C
       ENDDO
 C      
       DO I=LFT,LLT
-  	X(1,1)=X1(I)
-  	X(2,1)=Y1(I)
-  	X(3,1)=Z1(I)
-  	X(1,2)=X2(I)
-  	X(2,2)=Y2(I)
-  	X(3,2)=Z2(I)
-  	X(1,3)=X3(I)
-  	X(2,3)=Y3(I)
-  	X(3,3)=Z3(I)
-  	X(1,4)=X4(I)
-  	X(2,4)=Y4(I)
-  	X(3,4)=Z4(I)
-  	X(1,5)=X5(I)
-  	X(2,5)=Y5(I)
-  	X(3,5)=Z5(I)
-  	X(1,6)=X6(I)
-  	X(2,6)=Y6(I)
-  	X(3,6)=Z6(I)
-  	X(1,7)=X7(I)
-  	X(2,7)=Y7(I)
-  	X(3,7)=Z7(I)
-  	X(1,8)=X8(I)
-  	X(2,8)=Y8(I)
-  	X(3,8)=Z8(I)
+          X(1,1)=X1(I)
+          X(2,1)=Y1(I)
+          X(3,1)=Z1(I)
+          X(1,2)=X2(I)
+          X(2,2)=Y2(I)
+          X(3,2)=Z2(I)
+          X(1,3)=X3(I)
+          X(2,3)=Y3(I)
+          X(3,3)=Z3(I)
+          X(1,4)=X4(I)
+          X(2,4)=Y4(I)
+          X(3,4)=Z4(I)
+          X(1,5)=X5(I)
+          X(2,5)=Y5(I)
+          X(3,5)=Z5(I)
+          X(1,6)=X6(I)
+          X(2,6)=Y6(I)
+          X(3,6)=Z6(I)
+          X(1,7)=X7(I)
+          X(2,7)=Y7(I)
+          X(3,7)=Z7(I)
+          X(1,8)=X8(I)
+          X(2,8)=Y8(I)
+          X(3,8)=Z8(I)
 C
         DO K=1,3
            IX1=ICF1(1,K)
@@ -116,21 +113,22 @@ C
            SY(K)=Z13*X24-X13*Z24
            SZ(K)=X13*Y24-Y13*X24
            SN(K)=SQRT(SX(K)**2+SY(K)**2+SZ(K)**2)
-C	   SX(K)=SX(K)/SN(K)
-C	   SY(K)=SY(K)/SN(K)
-C	   SZ(K)=SZ(K)/SN(K)
+C     SX(K)=SX(K)/SN(K)
+C     SY(K)=SY(K)/SN(K)
+C     SZ(K)=SZ(K)/SN(K)
         ENDDO
         SNMAX=0
+        KMAX = 1
         DO K=1,3
-	  IF(SN(K)>SNMAX)THEN
-	     KMAX=K
-	     SNMAX=SN(K)
+            IF(SN(K)>SNMAX)THEN
+               KMAX=K
+               SNMAX=SN(K)
         SX(K)=SX(K)/SN(K)
         SY(K)=SY(K)/SN(K)
         SZ(K)=SZ(K)/SN(K)
-	  ENDIF
-	ENDDO
-C	
+            ENDIF
+          ENDDO
+C
         H=1.E30
         DO J=1,4
           J2=ICF2(J,KMAX)
@@ -140,8 +138,8 @@ C
      .      (X(2,J2)-X(2,J1))*SY(KMAX)+
      .      (X(3,J2)-X(3,J1))*SZ(KMAX)   )
         ENDDO
-C		
-	IF(H<HTEST(I))THEN
+C
+          IF(H<HTEST(I))THEN
           IX1=ICF1(1,KMAX)
           IX2=ICF1(2,KMAX)
           IX3=ICF1(3,KMAX)
@@ -151,59 +149,59 @@ C
           IX7=ICF2(3,KMAX)
           IX8=ICF2(4,KMAX)
           DH= HALF*(HTEST(I)-H)
-	  DHX=DH*SX(KMAX)
-	  DHY=DH*SY(KMAX)
-	  DHZ=DH*SZ(KMAX)
-	  X(1,IX1)=X(1,IX1)-DHX
-	  X(2,IX1)=X(2,IX1)-DHY
-	  X(3,IX1)=X(3,IX1)-DHZ
-	  X(1,IX2)=X(1,IX2)-DHX
-	  X(2,IX2)=X(2,IX2)-DHY
-	  X(3,IX2)=X(3,IX2)-DHZ
-	  X(1,IX3)=X(1,IX3)-DHX
-	  X(2,IX3)=X(2,IX3)-DHY
-	  X(3,IX3)=X(3,IX3)-DHZ
-	  X(1,IX4)=X(1,IX4)-DHX
-	  X(2,IX4)=X(2,IX4)-DHY
-	  X(3,IX4)=X(3,IX4)-DHZ
-	  X(1,IX5)=X(1,IX5)+DHX
-	  X(2,IX5)=X(2,IX5)+DHY
-	  X(3,IX5)=X(3,IX5)+DHZ
-	  X(1,IX6)=X(1,IX6)+DHX
-	  X(2,IX6)=X(2,IX6)+DHY
-	  X(3,IX6)=X(3,IX6)+DHZ
-	  X(1,IX7)=X(1,IX7)+DHX
-	  X(2,IX7)=X(2,IX7)+DHY
-	  X(3,IX7)=X(3,IX7)+DHZ
-	  X(1,IX8)=X(1,IX8)+DHX
-	  X(2,IX8)=X(2,IX8)+DHY
-	  X(3,IX8)=X(3,IX8)+DHZ
-  	  X1(I)=X(1,1)
-  	  Y1(I)=X(2,1)
-  	  Z1(I)=X(3,1)
-  	  X2(I)=X(1,2)
-  	  Y2(I)=X(2,2)
-  	  Z2(I)=X(3,2)
-  	  X3(I)=X(1,3)
-  	  Y3(I)=X(2,3)
-  	  Z3(I)=X(3,3)
-  	  X4(I)=X(1,4)
-  	  Y4(I)=X(2,4)
-  	  Z4(I)=X(3,4)
-  	  X5(I)=X(1,5)
-  	  Y5(I)=X(2,5)
-  	  Z5(I)=X(3,5)
-  	  X6(I)=X(1,6)
-  	  Y6(I)=X(2,6)
-  	  Z6(I)=X(3,6)
-  	  X7(I)=X(1,7)
-  	  Y7(I)=X(2,7)
-  	  Z7(I)=X(3,7)
-  	  X8(I)=X(1,8)
-  	  Y8(I)=X(2,8)
-  	  Z8(I)=X(3,8)
-	ENDIF
+            DHX=DH*SX(KMAX)
+            DHY=DH*SY(KMAX)
+            DHZ=DH*SZ(KMAX)
+            X(1,IX1)=X(1,IX1)-DHX
+            X(2,IX1)=X(2,IX1)-DHY
+            X(3,IX1)=X(3,IX1)-DHZ
+            X(1,IX2)=X(1,IX2)-DHX
+            X(2,IX2)=X(2,IX2)-DHY
+            X(3,IX2)=X(3,IX2)-DHZ
+            X(1,IX3)=X(1,IX3)-DHX
+            X(2,IX3)=X(2,IX3)-DHY
+            X(3,IX3)=X(3,IX3)-DHZ
+            X(1,IX4)=X(1,IX4)-DHX
+            X(2,IX4)=X(2,IX4)-DHY
+            X(3,IX4)=X(3,IX4)-DHZ
+            X(1,IX5)=X(1,IX5)+DHX
+            X(2,IX5)=X(2,IX5)+DHY
+            X(3,IX5)=X(3,IX5)+DHZ
+            X(1,IX6)=X(1,IX6)+DHX
+            X(2,IX6)=X(2,IX6)+DHY
+            X(3,IX6)=X(3,IX6)+DHZ
+            X(1,IX7)=X(1,IX7)+DHX
+            X(2,IX7)=X(2,IX7)+DHY
+            X(3,IX7)=X(3,IX7)+DHZ
+            X(1,IX8)=X(1,IX8)+DHX
+            X(2,IX8)=X(2,IX8)+DHY
+            X(3,IX8)=X(3,IX8)+DHZ
+            X1(I)=X(1,1)
+            Y1(I)=X(2,1)
+            Z1(I)=X(3,1)
+            X2(I)=X(1,2)
+            Y2(I)=X(2,2)
+            Z2(I)=X(3,2)
+            X3(I)=X(1,3)
+            Y3(I)=X(2,3)
+            Z3(I)=X(3,3)
+            X4(I)=X(1,4)
+            Y4(I)=X(2,4)
+            Z4(I)=X(3,4)
+            X5(I)=X(1,5)
+            Y5(I)=X(2,5)
+            Z5(I)=X(3,5)
+            X6(I)=X(1,6)
+            Y6(I)=X(2,6)
+            Z6(I)=X(3,6)
+            X7(I)=X(1,7)
+            Y7(I)=X(2,7)
+            Z7(I)=X(3,7)
+            X8(I)=X(1,8)
+            Y8(I)=X(2,8)
+            Z8(I)=X(3,8)
+          ENDIF
       ENDDO
       RETURN
-      END		
-	
+      END
+

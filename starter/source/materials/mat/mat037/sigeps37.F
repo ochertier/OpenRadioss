@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -45,14 +45,6 @@ C-----------------------------------------------
 C   I M P L I C I T   T Y P E S
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   G L O B A L   P A R A M E T E R S
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com01_c.inc"
 C----------------------------------------------------------------
 C  I N P U T   A R G U M E N T S
 C----------------------------------------------------------------

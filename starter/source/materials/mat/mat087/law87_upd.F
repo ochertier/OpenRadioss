@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -35,7 +35,7 @@ Chd|        FINTER                        source/tools/curve/finter.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        TABLE_MOD                     share/modules1/table_mod.F    
 Chd|====================================================================
-      SUBROUTINE LAW87_UPD(IOUT, TITR,MAT_ID,UPARAM,NFUNC, 
+      SUBROUTINE LAW87_UPD(IOUT, TITR,MAT_ID,UPARAM,NFUNC,NFUNCT,
      .                        IFUNC, FUNC_ID , NPC   , PLD , PM)
 C-----------------------------------------------
 C   M o d u l e s
@@ -50,18 +50,19 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "com04_c.inc"
 #include      "scr17_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       CHARACTER*nchartitle  :: TITR
-      INTEGER MAT_ID,IOUT, NFUNC
-      INTEGER NPC(*), FUNC_ID(*) 
-      my_real 
-     .         FINTER,UPARAM(*),PLD(*),PM(NPROPM)
+      INTEGER MAT_ID,IOUT
+      INTEGER ,INTENT(IN) :: NFUNCT
+      INTEGER ,INTENT(INOUT) :: NFUNC
+      INTEGER, DIMENSION(NFUNC) :: IFUNC
+      INTEGER, DIMENSION(NFUNCT):: FUNC_ID
+      INTEGER NPC(*)
+      my_real :: FINTER,UPARAM(*),PLD(*),PM(NPROPM)
       EXTERNAL FINTER
-      INTEGER, DIMENSION(NFUNC):: IFUNC
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -123,14 +124,14 @@ c-----    Yield
       !YIELD TO BE COMPUTED FROM VOCE OR TABULATED FOR 0.05 PLASTIC STRAIN
       AL(1:8) = ONE
 
-	!g1=2/3;
-	!d1=-1/3;
+          !g1=2/3;
+          !d1=-1/3;
 
-	!g2=-1/3;
-	!d2=2/3;
+          !g2=-1/3;
+          !d2=2/3;
 
-	!g3=-1/3;
-	!d3=-1/3;
+          !g3=-1/3;
+          !d3=-1/3;
       GAMMA = TWO_THIRD
       DELTA = -THIRD
 
@@ -244,10 +245,10 @@ C
       ENDDO ! WHILE ITERATIONS
 
       !COMPUTE AL(7) AND AL(8)
-	 X1=(AL(1)+AL(2))/3;
-	 X2=(AL(1)-AL(2))/3;
-	 X11=(AL(3)     + TWO*AL(4) + TWO*AL(5)+AL(6)      ) /NINE
-	 X22=(TWO*AL(5)+      AL(6) - AL(3)     -TWO *AL(4))/THREE
+           X1=(AL(1)+AL(2))/3;
+           X2=(AL(1)-AL(2))/3;
+           X11=(AL(3)     + TWO*AL(4) + TWO*AL(5)+AL(6)      ) /NINE
+           X22=(TWO*AL(5)+      AL(6) - AL(3)     -TWO *AL(4))/THREE
 
 
       !BOUCLE
@@ -260,16 +261,16 @@ C
       TAL8 = SQRT(MAX(ZERO,X22**2 + FOUR * AL(8)**2) )
       TF4A8=      (THREE*X11 + TAL8 ) / FOUR 
       CONJTF4A8 = (THREE*X11 - TAL8 ) / FOUR 
-	 V1 =EXPA*(TAL7)**(EXPA-1)
-	 V11=EXPA*(CONJTF4A8)*(ABS(CONJTF4A8))**(EXPA-2)
-	 W11=EXPA*(TF4A8)*(ABS(TF4A8))**(EXPA-2)
+           V1 =EXPA*(TAL7)**(EXPA-1)
+           V11=EXPA*(CONJTF4A8)*(ABS(CONJTF4A8))**(EXPA-2)
+           W11=EXPA*(TF4A8)*(ABS(TF4A8))**(EXPA-2)
 
       F1= TAL7**EXPA + ABS(CONJTF4A8)**EXPA + ABS(TF4A8)**EXPA
       F2 =v1* (X2**2/(TWO*TAL7) )   +  THREE_HALF*X11*(v11+w11) + HALF*(X22**2/TAL8) * (w11-v11)
 
             
-	 G(1) = F1 - TWO*(YIELD/S45)**EXPA
-	 G(2) = F2 - (TWO*EXPA/(ONE+R45))*(YIELD/S45)**EXPA
+           G(1) = F1 - TWO*(YIELD/S45)**EXPA
+           G(2) = F2 - (TWO*EXPA/(ONE+R45))*(YIELD/S45)**EXPA
       !DF(4,7)
       DG(1,1) = EXPA * (AL(7)/(TWO*TAL7) )* ABS(TAL7)**(EXPA-1)
       !DF(4,8)
@@ -377,12 +378,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "param_c.inc"
-#include      "com04_c.inc"
-#include      "scr17_c.inc"
-C-----------------------------------------------
 C     A r g u m e n t s
 C-----------------------------------------------
       INTEGER,  INTENT(IN) ::       AA
@@ -400,7 +395,7 @@ C=======================================================================
       F =  ( ABS(G*AL(1)      - D*AL(2) ) ) **AA 
      .   + ( ABS(G*AL(3)      + D*TWO*AL(4)) )**AA 
      .   + ( ABS(G*TWO*AL(5)+ D*AL(6)))**AA
-	
+
       !PRINT*, ' FK ', F
       RETURN
       END
@@ -421,12 +416,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "param_c.inc"
-#include      "com04_c.inc"
-#include      "scr17_c.inc"
 C-----------------------------------------------
 C     A r g u m e n t s
 C-----------------------------------------------
@@ -474,12 +463,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "param_c.inc"
-#include      "com04_c.inc"
-#include      "scr17_c.inc"
-C-----------------------------------------------
 C     A r g u m e n t s
 C-----------------------------------------------
       INTEGER,  INTENT(IN) ::       AA
@@ -496,15 +479,15 @@ C-----------------------------------------------
      .      T1,T2,T3,V1,V11,W11
 C-----------------------------------------------
 
-	 T1=SQRT(  MAX(ZERO, (X2**2  + FOUR *AL(7)**2) ) )   /TWO
-	 T2=(THREE*X11 - SQRT( MAX( ZERO,(X22**2 + FOUR*AL(8)**2 ) )   ) )/FOUR
-	 T3=(THREE*X11 + SQRT( MAX( ZERO,(X22**2 + FOUR*AL(8)**2 ) )   ) )/FOUR
+           T1=SQRT(  MAX(ZERO, (X2**2  + FOUR *AL(7)**2) ) )   /TWO
+           T2=(THREE*X11 - SQRT( MAX( ZERO,(X22**2 + FOUR*AL(8)**2 ) )   ) )/FOUR
+           T3=(THREE*X11 + SQRT( MAX( ZERO,(X22**2 + FOUR*AL(8)**2 ) )   ) )/FOUR
       F1= T1**AA + ABS(T2)**AA + ABS(T3)**AA
-	
-	 v1 =AA*(T1)**(AA-1);
-	 v11=AA*(T2)*(ABS(T2))**(AA-2)
-	 w11=AA*(T3)*(ABS(T3))**(AA-2)
-	 F2 =v1* (X2**2/(TWO*T1) )   +  THREE_HALF*X11*(v11+w11) + HALF*(X22**2/ (SQRT(X22**2+FOUR*AL(8)**2)  )) * (w11-v11)
+
+           v1 =AA*(T1)**(AA-1);
+           v11=AA*(T2)*(ABS(T2))**(AA-2)
+           w11=AA*(T3)*(ABS(T3))**(AA-2)
+           F2 =v1* (X2**2/(TWO*T1) )   +  THREE_HALF*X11*(v11+w11) + HALF*(X22**2/ (SQRT(X22**2+FOUR*AL(8)**2)  )) * (w11-v11)
       RETURN
       END
 C=======================================================================

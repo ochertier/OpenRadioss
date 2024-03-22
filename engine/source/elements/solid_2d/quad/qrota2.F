@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -28,8 +28,10 @@ Chd|        Q4FORC2                       source/elements/solid_2d/quad4/q4forc2
 Chd|        QFORC2                        source/elements/solid_2d/quad/qforc2.F
 Chd|-- calls ---------------
 Chd|====================================================================
-      SUBROUTINE QROTA2(SIG,
-     .                  S1,S2,S3,S4,S5,S6,WYZ,NEL)
+      SUBROUTINE QROTA2(
+     1   SIG,     S1,      S2,      S3,
+     2   S4,      S5,      S6,      WYZ,
+     3   NEL,     JCVT)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -41,6 +43,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: JCVT
       INTEGER NEL
 C     REAL
       my_real
@@ -48,7 +51,6 @@ C     REAL
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "vect01_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -57,7 +59,7 @@ C     REAL
       my_real
      .    Q1(MVSIZ)
 C-----------------------------------------------
-      DO 10 I=LFT,LLT
+      DO 10 I=1,NEL
       S1(I)=SIG(I,1)
       S2(I)=SIG(I,2)
       S3(I)=SIG(I,3)
@@ -67,10 +69,10 @@ C-----------------------------------------------
 C
       IF(JCVT/=0) RETURN
 C---------------------------------
-      DO 20 I=LFT,LLT
+      DO 20 I=1,NEL
    20 Q1(I)=TWO*S4(I)*WYZ(I)
 C
-      DO 30 I=LFT,LLT
+      DO 30 I=1,NEL
       SIG(I,1)=S1(I)+Q1(I)
       SIG(I,2)=S2(I)-Q1(I)
    30 SIG(I,4)=S4(I)+WYZ(I)*(S2(I)-S1(I))

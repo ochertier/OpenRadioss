@@ -1,5 +1,5 @@
 //Copyright>    OpenRadioss
-//Copyright>    Copyright (C) 1986-2023 Altair Engineering Inc.
+//Copyright>    Copyright (C) 1986-2024 Altair Engineering Inc.
 //Copyright>
 //Copyright>    This program is free software: you can redistribute it and/or modify
 //Copyright>    it under the terms of the GNU Affero General Public License as published by
@@ -122,7 +122,7 @@ extern void RAD_UMAT_INPUT_REWIND();
 extern void RAD_UMAT_CLOSE_INPUT();
 extern void WRITE_IOUT(char* line,int* len);
 extern int SET_U_SENS_SPMD_NODE_LIST(int *var, int * ivar);
-
+extern void SET_USER_WINDOW_NODES(int *USERNODS, int *NUMBER_USERNODS);
 
 void init_callback(void ** callback_array){
 
@@ -202,7 +202,9 @@ for (i=0; i<200; i++) callback_array[ i]=NULL;
   callback_array[68] = RAD_UMAT_INPUT_REWIND;
   callback_array[69] = RAD_UMAT_CLOSE_INPUT;
   callback_array[70] = SET_U_SENS_SPMD_NODE_LIST;
-
+// callback_array[65] = get_table_value_dydx    Engine Routine 
+  callback_array[72] = SET_USER_WINDOW_NODES;
+//  callback_array[73] = GET_USER_WINDOW_NODES;   Engine Routine 
 
 }
 

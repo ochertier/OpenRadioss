@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -63,8 +63,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -278,7 +276,7 @@ C----------------------
       CALL MY_BARRIER
 C---------------------
       CALL SMS_FSA_INVH(NNZM   ,JADM  ,JDIM2 , DIAG_M, LT_M2, 
-     1  	        NNDFT0,NNDFT1,ITASK  ,DIAG_INV)
+     1            NNDFT0,NNDFT1,ITASK  ,DIAG_INV)
 C----------------------
       CALL MY_BARRIER
 C---------------------
@@ -324,7 +322,7 @@ C--------------------------------------------
      .' **  WARNING : RADIOSS DETECTED A SEVERE ISSUE',/
      .'     PLEASE CHECK THE MODEL, ESPECIALLY KINEMATIC CONDITIONS',/
      .'     ISSUE MAY OCCUR NEARBY OR ON ENTITY LINKED ',/
-     .' 				   TO NODE ID =',I10/
+     .'            TO NODE ID =',I10/
      .'     (MINIMUM DIAGONAL TERM OF FSAI = ',1PG20.14,')')
  4001 FORMAT(' **  INFO : COULD NOT IDENTIFY THE ISSUE')
       RETURN
@@ -344,7 +342,7 @@ Chd|        SP_STAT0                      source/implicit/imp_fsa_inv.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
       SUBROUTINE SMS_FSA_INVH(NNZM   ,IADM  ,JDIM  , DIAG_M, LT_M, 
-     1  	              NNDFT0 ,NNDFT1,ITASK ,DIAG_INV)
+     1                  NNDFT0 ,NNDFT1,ITASK ,DIAG_INV)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -355,13 +353,9 @@ C-----------------------------------------------
 #include "implicit_f.inc"
 #include "comlock.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc" 
-#include      "task_c.inc" 
-#include      "units_c.inc" 
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -449,16 +443,10 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER  IADM(*), JDIM(*), IADA(*), JDIA(*)
       INTEGER  NC    , JM(*), NNDFT0, NNDFT1
-C     REAL
       my_real
      .  LT_A(*),DIAG_A(*),
      .  DIAG_M(*) ,LT_M(*)
@@ -511,12 +499,7 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 #include      "sms_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -549,8 +532,8 @@ C------X(I)=ZERO--------
        DIAG_M(I)=ONE/MAX(EM20,DIAG_K(I))
       ENDDO 
       CALL MAV_LT(
-     1  	 NDDL  ,IBID  ,IADK  ,JDIK  ,DIAG_K,   
-     2  	 LT_K  ,X     ,Z     )
+     1     NDDL  ,IBID  ,IADK  ,JDIK  ,DIAG_K,   
+     2     LT_K  ,X     ,Z     )
       DO I=1,NDDL
        R(I) = R(I)-Z(I)
       ENDDO 
@@ -562,8 +545,8 @@ C------X(I)=ZERO--------
       ENDDO 
       CALL PRODUT_V0(NDDL,R,Z,G0)
       CALL MAV_LT(
-     1  	 NDDL  ,IBID ,IADK  ,JDIK  ,DIAG_K,   
-     2  	 LT_K  ,P     ,Y     )
+     1     NDDL  ,IBID ,IADK  ,JDIK  ,DIAG_K,   
+     2     LT_K  ,P     ,Y     )
       CALL PRODUT_V0(NDDL,P,Y,S)
       ALPHA = G0/S
       TOLS2=TOLS*TOLS

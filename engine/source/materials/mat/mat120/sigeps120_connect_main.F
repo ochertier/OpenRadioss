@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -38,7 +38,8 @@ Chd|====================================================================
      3     AREA    ,DEPSZZ  ,DEPSYZ  ,DEPSZX  ,EPSZZ   ,NUPARAM ,
      4     SIGOZZ  ,SIGOYZ  ,SIGOZX  ,SIGNZZ  ,SIGNYZ  ,SIGNZX  ,
      5     PLA     ,JSMS    ,DMELS   ,UVAR    ,NUVAR   ,
-     6     NUMTABL ,ITABLE  ,TABLE   ,NVARTMP ,VARTMP  ,TEMP    )   
+     6     NUMTABL ,ITABLE  ,TABLE   ,NVARTMP ,VARTMP  ,TEMP    ,
+     7     DMG)   
 c====================================================================
 C-----------------------------------------------
 C   M o d u l e s
@@ -52,11 +53,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc" 
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr17_c.inc"
-#include      "sms_c.inc"
 C----------------------------------------------------------------
 C  D u m m y   A R G U M E N T S
 C----------------------------------------------------------------
@@ -65,7 +62,7 @@ C----------------------------------------------------------------
       INTEGER ,DIMENSION(NEL)     ,INTENT(IN) :: NGL
       INTEGER ,DIMENSION(NUMTABL) ,INTENT(IN) :: ITABLE
       my_real ,DIMENSION(NUPARAM) ,INTENT(IN) :: UPARAM
-      !my_real ,DIMENSION(NEL)     ,INTENT(OUT):: DMG
+      my_real ,DIMENSION(NEL)     ,INTENT(INOUT):: DMG
       my_real ,DIMENSION(NEL)     ,INTENT(IN) :: AREA,TEMP,EPSZZ,
      .         DEPSZZ,DEPSYZ,DEPSZX,
      .         SIGOZZ,SIGOYZ,SIGOZX
@@ -137,7 +134,8 @@ C-----------
      3     AREA    ,DEPSZZ  ,DEPSYZ  ,DEPSZX  ,NUPARAM ,
      4     SIGOZZ  ,SIGOYZ  ,SIGOZX  ,SIGNZZ  ,SIGNYZ  ,SIGNZX  ,
      5     PLA     ,JSMS    ,DMELS   ,UVAR    ,NUVAR   ,
-     6     NUMTABL ,ITABLE  ,TABLE   ,NVARTMP ,VARTMP  ,TEMP    )
+     6     NUMTABL ,ITABLE  ,TABLE   ,NVARTMP ,VARTMP  ,TEMP    ,
+     7     DMG)
 
         ELSE                     ! tabulated Von-Mises formulation
           CALL SIGEPS120_CONNECT_TAB_VM(
@@ -146,29 +144,30 @@ C-----------
      3     AREA    ,DEPSZZ  ,DEPSYZ  ,DEPSZX  ,NUPARAM ,
      4     SIGOZZ  ,SIGOYZ  ,SIGOZX  ,SIGNZZ  ,SIGNYZ  ,SIGNZX  ,
      5     PLA     ,JSMS    ,DMELS   ,UVAR    ,NUVAR   ,
-     6     NUMTABL ,ITABLE  ,TABLE   ,NVARTMP ,VARTMP  ,TEMP    )
+     6     NUMTABL ,ITABLE  ,TABLE   ,NVARTMP ,VARTMP  ,TEMP    ,
+     7     DMG)
         END IF
 
 
       ELSE
 c
         IF (IFORM == 1) THEN    ! analytical Drucker-Prager formulation
-          print*, 'dp '
           CALL SIGEPS120_CONNECT_DP(
      1     NEL     ,NGL     ,TIME    ,TIMESTEP,UPARAM  ,OFF     ,
      2     EPSD    ,STIFM   ,THICK   ,
      3     AREA    ,DEPSZZ  ,DEPSYZ  ,DEPSZX  ,NUPARAM ,
      4     SIGOZZ  ,SIGOYZ  ,SIGOZX  ,SIGNZZ  ,SIGNYZ  ,SIGNZX  ,
-     5     PLA     ,JSMS    ,DMELS   ,UVAR    ,NUVAR   )
+     5     PLA     ,JSMS    ,DMELS   ,UVAR    ,NUVAR   ,
+     6     DMG)
 
         ELSE                     ! analytical Von-Mises formulation
-           print*, 'vm '
          CALL SIGEPS120_CONNECT_VM(
      1     NEL     ,NGL     ,TIME    ,TIMESTEP,UPARAM  ,OFF     ,
      2     EPSD    ,STIFM   ,THICK,
      3     AREA    ,DEPSZZ  ,DEPSYZ  ,DEPSZX  ,NUPARAM ,
      4     SIGOZZ  ,SIGOYZ  ,SIGOZX  ,SIGNZZ  ,SIGNYZ  ,SIGNZX  ,
-     5     PLA     ,JSMS    ,DMELS   ,UVAR    ,NUVAR   )
+     5     PLA     ,JSMS    ,DMELS   ,UVAR    ,NUVAR   ,
+     6     DMG)
         END IF
       END IF
 

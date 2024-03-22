@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -37,8 +37,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "vect01_c.inc"
-#include      "scr01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -54,7 +52,7 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER  I
 C=======================================================================
-      DO I=LFT,LLT
+      DO I=1,NEL
          SIGM(I,1) = ZERO
          SIGM(I,2) = ZERO
          SIGM(I,3) = ZERO
@@ -63,19 +61,19 @@ C=======================================================================
          SIGM(I,6) = ZERO
          RHOM(I)   = ZERO
          EINTM(I)  = ZERO
-         QM(I)     = ZERO	 
+         QM(I)     = ZERO   
       ENDDO
       IF (G_PLA > 0) THEN
-       DO I=LFT,LLT
+       DO I=1,NEL
          EPSPLA(I) = ZERO
        ENDDO
       ENDIF
       IF (G_EPSD > 0) THEN
-       DO I=LFT,LLT
+       DO I=1,NEL
          EPSDM(I) = ZERO
        ENDDO
       ENDIF
-      DO I=LFT,LLT
+      DO I=1,NEL
        FX1(I)=ZERO
        FY1(I)=ZERO
        FZ1(I)=ZERO

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,8 +25,8 @@ Chd|  I22GET_PREV_DATA              source/interfaces/int22/i22get_prev_data.F
 Chd|-- called by -----------
 Chd|        I22BUCE                       source/interfaces/intsort/i22buce.F
 Chd|-- calls ---------------
-Chd|        I22BUFBRIC_MOD                ../common_source/modules/cut-cell-search_mod.F
-Chd|        I22TRI_MOD                    ../common_source/modules/cut-cell-search_mod.F
+Chd|        I22BUFBRIC_MOD                ../common_source/modules/interfaces/cut-cell-search_mod.F
+Chd|        I22TRI_MOD                    ../common_source/modules/interfaces/cut-cell-search_mod.F
 Chd|        REALLOC_MOD                   share/modules/realloc_mod.F   
 Chd|====================================================================
       SUBROUTINE I22GET_PREV_DATA(
@@ -62,24 +62,10 @@ C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "comlock.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "com08_c.inc"
-#include      "param_c.inc"
-#include      "parit_c.inc"
-#include      "scr05_c.inc"
-#include      "sms_c.inc"
 #include      "task_c.inc"
-#include      "timerr_c.inc"
-#include      "i22edges.inc"
 #include      "inter22.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,8 +27,8 @@ Chd|        IMP_GLOB_K0                   source/implicit/imp_glob_k.F
 Chd|-- calls ---------------
 Chd|        ASSEM_Q4                      source/implicit/assem_q4.F    
 Chd|        MMATS                         source/elements/solid/solide8z/mmats.F
-Chd|        MMAT_H1                       source/elements/solid/solide8z/s8zke3.F
-Chd|        MMSTIFS                       source/elements/solid/solide8z/mmats.F
+Chd|        MMAT_H1                       source/elements/solid/solide8z/mmat_h1.F
+Chd|        MMSTIFS                       source/elements/solid/solide8z/mmstifs.F
 Chd|        Q4DERI2                       source/elements/solid_2d/quad4/q4deri2.F
 Chd|        Q4DERIC2                      source/elements/solid_2d/quad4/q4deric2.F
 Chd|        Q4KEGA2                       source/elements/solid_2d/quad4/q4kega2.F
@@ -38,14 +38,18 @@ Chd|        Q4KEROT2                      source/elements/solid_2d/quad4/q4kerot
 Chd|        QCOOR2                        source/elements/solid_2d/quad/qcoor2.F
 Chd|        QRCOOR2                       source/elements/solid_2d/quad/qrcoor2.F
 Chd|        QVOLU2                        source/elements/solid_2d/quad/qvolu2.F
-Chd|        S8ZSIGP3                      source/elements/solid/solide8z/s8zforc3.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        S8ZSIGP3                      source/elements/solid/solide8z/s8zsigp3.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
-      SUBROUTINE Q4KE2 (PM     ,GEO    ,IXQ    ,X      ,ELBUF_STR,
-     1                  NEL    ,LIAD   ,ICP    ,ICSIG  ,ETAG   ,
-     2                  IDDL   ,NDOF   ,K_DIAG ,K_LT   ,IADK   ,
-     3                  JDIK   ,NPG    ,IPM    ,IGEO   ,IKGEO  ,
-     4                  BUFMAT )
+      SUBROUTINE Q4KE2(
+     1   PM,       GEO,      IXQ,      X,
+     2   ELBUF_STR,NEL,      LIAD,     ICP,
+     3   ICSIG,    ETAG,     IDDL,     NDOF,
+     4   K_DIAG,   K_LT,     IADK,     JDIK,
+     5   NPG,      IPM,      IGEO,     IKGEO,
+     6   BUFMAT,   NFT,      MTN,      JMULT,
+     7   JHBE,     JCVT,     IGTYP,    ISORTH,
+     8   ISMSTR)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -61,16 +65,19 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "vect01_c.inc"
 #include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "scr01_c.inc"
-#include      "scr03_c.inc"
-#include      "scr06_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: ISMSTR
+      INTEGER, INTENT(IN) :: NFT
+      INTEGER, INTENT(IN) :: MTN
+      INTEGER, INTENT(IN) :: JMULT
+      INTEGER, INTENT(IN) :: JHBE
+      INTEGER, INTENT(IN) :: JCVT
+      INTEGER, INTENT(IN) :: IGTYP
+      INTEGER, INTENT(IN) :: ISORTH
       INTEGER IXQ(NIXQ,*), ICP, ICSIG, IKGEO
       INTEGER NEL, LIAD, NPG,
      .   IPM(NPROPMI,*), IGEO(NPROPGI,*), ETAG(*), IDDL(*),
@@ -247,7 +254,7 @@ C   S o u r c e  L i n e s
 C-----------------------------------------------
       GBUF => ELBUF_STR%GBUF
       IF (ISORTH == 0) THEN
-        DO I=LFT,LLT
+        DO I=1,NEL
           GAMA(I,1) = ONE
           GAMA(I,2) = ZERO
           GAMA(I,3) = ZERO
@@ -256,7 +263,7 @@ C-----------------------------------------------
           GAMA(I,6) = ZERO
         ENDDO
       ELSE
-        DO I=LFT,LLT                                            
+        DO I=1,NEL                                            
           GAMA(I,1) = GBUF%GAMA(I        )
           GAMA(I,2) = GBUF%GAMA(I +   NEL)
           GAMA(I,3) = GBUF%GAMA(I + 2*NEL)
@@ -282,58 +289,71 @@ C     GATHER NODAL INFORMATION &
 C     COMPUTE INTRINSIC ROTATION FOR CO-ROTATIONAL CASE & 
 C     PROJECT NODAL COORDINATES INTO CO-ROTATIONAL SYSTEM
       IF (JCVT==0) THEN
-        CALL QCOOR2(X,IXQ(1,NF1),
-     2              Y1,Y2,Y3,Y4,Z1,Z2,Z3,Z4,
-     3              NC1,NC2,NC3,NC4,
-     4              NGL,MXT,NGEO,VD2,VIS)
+        CALL QCOOR2(
+     1   X,         IXQ(1,NF1),Y1,        Y2,
+     2   Y3,        Y4,        Z1,        Z2,
+     3   Z3,        Z4,        NC1,       NC2,
+     4   NC3,       NC4,       NGL,       MXT,
+     5   NGEO,      VD2,       VIS,       NEL)
       ELSE
-        CALL QRCOOR2(X,IXQ(1,NF1),
-     2              Y1,Y2,Y3,Y4,Z1,Z2,Z3,Z4,
-     3              NC1,NC2,NC3,NC4,
-     4              NGL,MXT,NGEO,VD2,
-     5              R11,R12,R13,R21,R22,R23,R31,R32,R33,
-     6              GAMA,Y234,Y124,VIS)
+        CALL QRCOOR2(
+     1   X,         IXQ(1,NF1),Y1,        Y2,
+     2   Y3,        Y4,        Z1,        Z2,
+     3   Z3,        Z4,        NC1,       NC2,
+     4   NC3,       NC4,       NGL,       MXT,
+     5   NGEO,      VD2,       R11,       R12,
+     6   R13,       R21,       R22,       R23,
+     7   R31,       R32,       R33,       GAMA,
+     8   Y234,      Y124,      VIS,       NEL,
+     9   ISORTH)
       ENDIF
 C
 C     COMPUTE FAC(*) FOR PRESSURE ACCORDING TO PLASTICITY STATE
 C---- now assumed strain is used, no effect for Isolid17
-        DO I=LFT,LLT
+        DO I=1,NEL
           NU(I)=MIN(HALF,PM(21,MXT(I)))
           C1 =PM(32,MXT(I))
           E0(I) =THREE*(ONE-TWO*NU(I))*C1
         ENDDO
       IF(ICP==2) THEN
-        CALL S8ZSIGP3(LFT  ,LLT       ,GBUF%SIG,E0  ,GBUF%PLA,
+        CALL S8ZSIGP3(1  ,NEL       ,GBUF%SIG,E0  ,GBUF%PLA,
      2                FAC  ,GBUF%G_PLA,NEL     )
-        DO I=LFT,LLT
+        DO I=1,NEL
           NUU(I)=NU(I)+(HALF-NU(I))*FAC(I)
         ENDDO
       ELSEIF(ICP==1) THEN
-        DO I=LFT,LLT
+        DO I=1,NEL
           NUU(I)=HALF
         ENDDO
       ELSE
-        DO I=LFT,LLT
+        DO I=1,NEL
           NUU(I)=ZERO
         ENDDO
       ENDIF 
 C     COMPUTE AREA & VOLUME/THICKNESS
-      CALL QVOLU2(GBUF%OFF,AIRE,VOLU,NGL,
-     2            Y1,Y2,Y3,Y4,Z1,Z2,Z3,Z4,
-     3            Y234,Y124)
+      CALL QVOLU2(
+     1   GBUF%OFF,AIRE,    VOLU,    NGL,
+     2   Y1,      Y2,      Y3,      Y4,
+     3   Z1,      Z2,      Z3,      Z4,
+     4   Y234,    Y124,    NEL,     JMULT,
+     5   JCVT)
 C
       IF(N2D==1) THEN
-        DO I=LFT,LLT
+        DO I=1,NEL
          YAVG(I) = X(2,NC1(I))+X(2,NC2(I))+X(2,NC3(I))+X(2,NC4(I))
         ENDDO
       ENDIF
 C     COMPUTE SHAPE DERIVATIVES AT ELEMENT CENTER
-      CALL Q4DERIC2(Y1,Y2,Y3,Y4,Z1,Z2,Z3,Z4,
-     2              Y12,Y34,Y13,Y24,Y14,Y23,
-     3              Z12,Z34,Z13,Z24,Z14,Z23,
-     4              PYC1,PYC2,PZC1,PZC2,AIRE,
-     5              VOLU,YAVG,RX ,RY ,RZ  ,
-     6              SX  ,SY ,SZ )
+      CALL Q4DERIC2(
+     1   Y1,      Y2,      Y3,      Y4,
+     2   Z1,      Z2,      Z3,      Z4,
+     3   Y12,     Y34,     Y13,     Y24,
+     4   Y14,     Y23,     Z12,     Z34,
+     5   Z13,     Z24,     Z14,     Z23,
+     6   PYC1,    PYC2,    PZC1,    PZC2,
+     7   AIRE,    VOLU,    YAVG,    RX,
+     8   RY,      RZ,      SX,      SY,
+     9   SZ,      NEL,     JHBE)
 C
 C     COMPUTE VOLUME/(2*PI) FOR AXISYMMETRIC CASE
 C     
@@ -351,17 +371,20 @@ C
       ELSE
         IADBUF = 0
       ENDIF
-      CALL MMATS(LFT    ,LLT     ,PM    ,MXT    ,HH    ,
+      CALL MMATS(1    ,NEL     ,PM    ,MXT    ,HH    ,
      .           MTN    ,IKORTH  ,IPM   ,IGEO   ,GAMA  ,
      .           BUFMAT(IADBUF)  ,DM    ,DGM    ,GM    ,
      .           JHBE  ,GBUF%SIG ,BID   ,NNPT   ,NEL   )
-      CALL MMAT_H1(HH    ,HH1   ,FAC  ,ICPG  ,IPREDU)
+      CALL MMAT_H1(
+     1   HH,      HH1,     FAC,     ICPG,
+     2   IPREDU,  NEL,     MTN,     ISMSTR,
+     3   JHBE)
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         OFFG(I) = GBUF%OFF(I)
       ENDDO
 C
-      DO EP=LFT,LLT
+      DO EP=1,NEL
       DO J=1,2
       DO I=1,2
         K11(I,J,EP)=ZERO
@@ -411,33 +434,42 @@ C     INITIALIZE WEIGHTING FACTORS
       WI = W_GAUSS(IR,NPTR)*W_GAUSS(IS,NPTS)
 C
 C     COMPUTE JACOBIAN & SHAPE DERIVATIVES AT INTEGRATION POINT
-        CALL Q4DERI2(OFFG,OFF,KSI,ETA,WI,YAVG,
-     2               Y12,Y34,Y13,Y24,Y14,Y23,
-     3               Z12,Z34,Z13,Z24,Z14,Z23,
-     4               PY1,PY2,PY3,PY4,
-     5               PZ1,PZ2,PZ3,PZ4,
-     7               PYC1,PYC2,PZC1,PZC2,
-     8               BYZ1,BYZ2,BYZ3,BYZ4,
-     9               BZY1,BZY2,BZY3,BZY4,
-     B               AIRN,VOLN,NUU)
+        CALL Q4DERI2(
+     1   OFFG,    OFF,     KSI,     ETA,
+     2   WI,      YAVG,    Y12,     Y34,
+     3   Y13,     Y24,     Y14,     Y23,
+     4   Z12,     Z34,     Z13,     Z24,
+     5   Z14,     Z23,     PY1,     PY2,
+     6   PY3,     PY4,     PZ1,     PZ2,
+     7   PZ3,     PZ4,     PYC1,    PYC2,
+     8   PZC1,    PZC2,    BYZ1,    BYZ2,
+     9   BYZ3,    BYZ4,    BZY1,    BZY2,
+     A   BZY3,    BZY4,    AIRN,    VOLN,
+     B   NUU,     NEL,     JHBE)
 C-------------add BYZj... later
 C
-      CALL MMSTIFS(PM   ,MXT  ,HH1   ,VOLN  ,ICSIG ,
-     .             DD   ,GG   ,DG    ,G33   ,DM    ,
-     .             GM   ,DGM  ,IKORTH,LBUF%SIG,IR  ,
-     .             IS   ,IT   ,NEL   )
+      CALL MMSTIFS(
+     1   PM,      MXT,     HH1,     VOLN,
+     2   ICSIG,   DD,      GG,      DG,
+     3   G33,     DM,      GM,      DGM,
+     4   IKORTH,  LBUF%SIG,IR,      IS,
+     5   IT,      NEL,     JHBE,    MTN)
 C
       CALL Q4KEL2(
-     1            PY1,PY2,PY3,PY4,
-     2            PZ1,PZ2,PZ3,PZ4,
-     3            PYC1,PYC2,PZC1,PZC2,AY,R22,R23,
-     4            K11,K12,K13,K14,K22,
-     5            K23,K24,K33,K34,K44,
-     4            K11U,K12U,K13U,K14U,K22U,
-     5            K23U,K24U,K33U,K34U,K44U,
-     4            K11L,K12L,K13L,K14L,K22L,
-     5            K23L,K24L,K33L,K34L,K44L,
-     6            DD,GG,DG,G33,IKORTH,ICPG,OFFG)
+     1   PY1,     PY2,     PY3,     PY4,
+     2   PZ1,     PZ2,     PZ3,     PZ4,
+     3   PYC1,    PYC2,    PZC1,    PZC2,
+     4   AY,      R22,     R23,     K11,
+     5   K12,     K13,     K14,     K22,
+     6   K23,     K24,     K33,     K34,
+     7   K44,     K11U,    K12U,    K13U,
+     8   K14U,    K22U,    K23U,    K24U,
+     9   K33U,    K34U,    K44U,    K11L,
+     A   K12L,    K13L,    K14L,    K22L,
+     B   K23L,    K24L,    K33L,    K34L,
+     C   K44L,    DD,      GG,      DG,
+     D   G33,     IKORTH,  ICPG,    OFFG,
+     E   NEL,     JCVT)
 C
 c      IF (IKGEO<0) THEN
 c        CALL Q4KEG2(
@@ -454,43 +486,47 @@ C     EXIT THE INTEGRATION POINTS LOOP <--
 C
       IF (IPREDU > 0) THEN
         CALL Q4KEP2(
-     1              PYC1,PYC2,PZC1,PZC2,AY,R22,R23,
-     2              K11,K12,K13,K14,K22,
-     3              K23,K24,K33,K34,K44,
-     4              HH,VOLU,FAC,ICPG,OFFG)
+     1   PYC1,    PYC2,    PZC1,    PZC2,
+     2   AY,      R22,     R23,     K11,
+     3   K12,     K13,     K14,     K22,
+     4   K23,     K24,     K33,     K34,
+     5   K44,     HH,      VOLU,    FAC,
+     6   ICPG,    OFFG,    NEL,     JCVT)
       ENDIF
 C
 c      IF (IKGEO>0) THEN
       IF (IKGEO/=0) THEN
         CALL Q4KEGA2(
-     1               PYC1,PYC2,PZC1,PZC2,AY,
-     2               K11,K12,K13,K14,K22,
-     3               K23,K24,K33,K34,K44,
-     4               GBUF%SIG,VOLU,OFFG,NEL)
+     1   PYC1,    PYC2,    PZC1,    PZC2,
+     2   AY,      K11,     K12,     K13,
+     3   K14,     K22,     K23,     K24,
+     4   K33,     K34,     K44,     GBUF%SIG,
+     5   VOLU,    OFFG,    NEL)
       ENDIF
 C
 c      IF (N2D==1 .AND. JHBE==17) THEN
-c        CALL Q4ASYM(LFT, LLT, K11, K11U, K11L)
-c        CALL Q4ASYM(LFT, LLT, K22, K22U, K22L)
-c        CALL Q4ASYM(LFT, LLT, K33, K33U, K33L)
-c        CALL Q4ASYM(LFT, LLT, K44, K44U, K44L)
-c        CALL Q4ASYM(LFT, LLT, K12, K12U, K12L)
-c        CALL Q4ASYM(LFT, LLT, K13, K13U, K13L)
-c        CALL Q4ASYM(LFT, LLT, K14, K14U, K14L)
-c        CALL Q4ASYM(LFT, LLT, K23, K23U, K23L)
-c        CALL Q4ASYM(LFT, LLT, K24, K24U, K24L)
-c        CALL Q4ASYM(LFT, LLT, K34, K34U, K34L)
+c        CALL Q4ASYM(1, NEL, K11, K11U, K11L)
+c        CALL Q4ASYM(1, NEL, K22, K22U, K22L)
+c        CALL Q4ASYM(1, NEL, K33, K33U, K33L)
+c        CALL Q4ASYM(1, NEL, K44, K44U, K44L)
+c        CALL Q4ASYM(1, NEL, K12, K12U, K12L)
+c        CALL Q4ASYM(1, NEL, K13, K13U, K13L)
+c        CALL Q4ASYM(1, NEL, K14, K14U, K14L)
+c        CALL Q4ASYM(1, NEL, K23, K23U, K23L)
+c        CALL Q4ASYM(1, NEL, K24, K24U, K24L)
+c        CALL Q4ASYM(1, NEL, K34, K34U, K34L)
 c      ENDIF
 C
       IF (JCVT/=0) THEN
         CALL Q4KEROT2(
-     1                R22,R32,R23,R33,
-     2                K11,K12,K13,K14,K22,
-     3                K23,K24,K33,K34,K44)
+     1   R22,     R32,     R23,     R33,
+     2   K11,     K12,     K13,     K14,
+     3   K22,     K23,     K24,     K33,
+     4   K34,     K44,     NEL)
       ENDIF
 C
 C     IF (NEIG>0) THEN
-C       CALL Q4EOFF(LFT, LLT, IXQ(1,NF1), ETAG, OFFG)
+C       CALL Q4EOFF(1, NEL, IXQ(1,NF1), ETAG, OFFG)
 C     ENDIF
 C
       CALL ASSEM_Q4(
@@ -501,61 +537,3 @@ C
 C
       RETURN
       END
-Chd|====================================================================
-Chd|  Q4ASYM                        source/elements/solid_2d/quad4/q4ke2.F
-Chd|-- called by -----------
-Chd|-- calls ---------------
-Chd|====================================================================
-      SUBROUTINE Q4ASYM (LFT, LLT, KIJ, KIJU, KIJL)
-C-----------------------------------------------
-C   I m p l i c i t   T y p e s
-C-----------------------------------------------
-#include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com01_c.inc"
-C-----------------------------------------------
-C   D u m m y   A r g u m e n t s
-C-----------------------------------------------
-      INTEGER LFT,LLT
-      my_real
-     .   KIJ(2,2,*), KIJU(2,2,*), KIJL(2,2,*)
-C-----------------------------------------------
-C   L o c a l   V a r i a b l e s
-C-----------------------------------------------
-      INTEGER EP,I,J
-      my_real
-     .    AA,BB
-C-----------------------------------------------
-C   S o u r c e  L i n e s
-C-----------------------------------------------
-      DO EP=LFT,LLT
-      DO J=1,2
-      DO I=1,2
-        AA = KIJ(I,J,EP) + KIJU(I,J,EP)
-        BB = KIJ(I,J,EP) + KIJL(I,J,EP)
-        IF (AA<ZERO .AND. BB<ZERO) THEN
-c          KIJ(I,J,EP) = 0.5*(AA+BB)
-c          KIJ(I,J,EP) = MIN(AA,BB)
-c          KIJ(I,J,EP) = MAX(AA,BB)
-        ELSEIF (AA>ZERO .AND. BB>ZERO) THEN
-c          KIJ(I,J,EP) = 0.5*(AA+BB)
-c          KIJ(I,J,EP) = MIN(AA,BB)
-c          KIJ(I,J,EP) = MAX(AA,BB)
-        ELSE
-c          KIJ(I,J,EP) = 0.5*(AA+BB)
-c          KIJ(I,J,EP) = MIN(AA,BB)
-c          KIJ(I,J,EP) = MAX(AA,BB)
-        ENDIF
-      ENDDO
-      ENDDO
-      ENDDO
-C
-      RETURN
-      END
-

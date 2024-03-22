@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -28,19 +28,16 @@ Chd|-- calls ---------------
 Chd|        INTBUF_FRIC_MOD               share/modules1/intbuf_fric_mod.F
 Chd|====================================================================
       SUBROUTINE I25STI_EDG(
-     1 NEDGE ,LEDGE  ,STFE  ,STFM  ,IGAP   ,
-     2 GAPE  ,GAP_E_L,GAP_M ,GAP_M_L,GAP_S_L,
-     3 BGAPEMX,INTFRIC,IPARTFRIC_E,IPARTFRICM,
-     4 IPARTSM,BGAPEMX_L,NSN ,NSV)
+     1 NEDGE    ,LEDGE     ,STFE       ,STFM      ,IGAP      ,
+     2 GAPE     ,GAP_E_L   ,GAP_M      ,GAP_M_L   ,GAP_S_L   ,
+     3 BGAPEMX  ,INTFRIC   ,IPARTFRIC_E,IPARTFRICM,IPARTSM   ,
+     4 BGAPEMX_L,NSN       ,NSV        )
 C-----------------------------------------------
       USE INTBUF_FRIC_MOD  
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -53,7 +50,6 @@ C-----------------------------------------------
      .   LEDGE(NLEDGE,*),IPARTFRIC_E(*) ,IPARTFRICM(*), IPARTSM(*)
       INTEGER , INTENT(IN) ::  NSN
       INTEGER , INTENT(IN) ::  NSV(NSN)
-C     REAL
       my_real
      .   STFE(*), GAPE(*), GAP_E_L(*), STFM(*), GAP_M(*), GAP_M_L(*), GAP_S_L(*), BGAPEMX,
      .   BGAPEMX_L
@@ -142,9 +138,6 @@ C
            ENDIF
         END DO
       ENDIF
-C
-
-
 C        
       RETURN
       END

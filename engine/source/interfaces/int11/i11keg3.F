@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -58,20 +58,7 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "com06_c.inc"
-#include      "com08_c.inc"
-#include      "scr02_c.inc"
-#include      "scr03_c.inc"
 #include      "scr05_c.inc"
-#include      "scr07_c.inc"
-#include      "scr11_c.inc"
-#include      "scr14_c.inc"
-#include      "scr16_c.inc"
-#include      "scr18_c.inc"
-#include      "units_c.inc"
-#include      "parit_c.inc"
-#include      "couple_c.inc"
 #include      "impl1_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -106,7 +93,6 @@ C-----------------------------------------------
      .   Q11,Q12,Q13,Q22,Q23,Q33,H00,VTX,VTY,VTZ,VT,
      .   KT1,KT2,KT3,KT4,Q1,Q2,FACF
 C-----------------------------------------------
-#include "sync_dir.inc"
       IF (IRESP == 1) THEN
          PREC = FIVEEM4
       ELSE 
@@ -395,57 +381,57 @@ C
        IF ((INTP_D)>0) THEN
         DO I=1,JLT
          IF(CS_LOC(I)>NRTS) THEN
-	  NN=CS_LOC(I)-NRTS
-	  NS=IND_INT(NIN)%P(NN)
+            NN=CS_LOC(I)-NRTS
+            NS=IND_INT(NIN)%P(NN)
 C---------pour temporairement diag_ss---
           NN1 = NS
-	  FFI(1,NN1)=ZERO
-	  FFI(2,NN1)=ZERO
-	  FFI(3,NN1)=ZERO
-	  DFI(1,NN1)=ZERO
-	  DFI(2,NN1)=ZERO
-	  DFI(3,NN1)=ZERO
+            FFI(1,NN1)=ZERO
+            FFI(2,NN1)=ZERO
+            FFI(3,NN1)=ZERO
+            DFI(1,NN1)=ZERO
+            DFI(2,NN1)=ZERO
+            DFI(3,NN1)=ZERO
           NN2 = NN1 + 1
-	  FFI(1,NN2)=ZERO
-	  FFI(2,NN2)=ZERO
-	  FFI(3,NN2)=ZERO
-	  DFI(1,NN2)=ZERO
-	  DFI(2,NN2)=ZERO
-	  DFI(3,NN2)=ZERO
-	 ENDIF
+            FFI(1,NN2)=ZERO
+            FFI(2,NN2)=ZERO
+            FFI(3,NN2)=ZERO
+            DFI(1,NN2)=ZERO
+            DFI(2,NN2)=ZERO
+            DFI(3,NN2)=ZERO
+           ENDIF
         ENDDO
        ELSE
         JLTF = 0
         DO I=1,JLT
          IF(CS_LOC(I)>NRTS) THEN
           JLTF = JLTF + 1
-	  NE=SHF_INT(NIN) + JLTF +LREM
-	  NN=CS_LOC(I)-NRTS
-	  NS=IND_INT(NIN)%P(NN)
-	  STIFS(NE)=STIF(I)
-	  H_E(1,NE)=HS1(I)
-	  H_E(2,NE)=HS2(I)
-	  H_E(3,NE)=HM1(I)
-	  H_E(4,NE)=HM2(I)
-	  N_E(1,NE)=NX(I)
-	  N_E(2,NE)=NY(I)
-	  N_E(3,NE)=NZ(I)
+            NE=SHF_INT(NIN) + JLTF +LREM
+            NN=CS_LOC(I)-NRTS
+            NS=IND_INT(NIN)%P(NN)
+            STIFS(NE)=STIF(I)
+            H_E(1,NE)=HS1(I)
+            H_E(2,NE)=HS2(I)
+            H_E(3,NE)=HM1(I)
+            H_E(4,NE)=HM2(I)
+            N_E(1,NE)=NX(I)
+            N_E(2,NE)=NY(I)
+            N_E(3,NE)=NZ(I)
 C---------pour temporairement diag_ss---
           NN1 = NS
-	  FFI(1,NN1)=ZERO
-	  FFI(2,NN1)=ZERO
-	  FFI(3,NN1)=ZERO
-	  DFI(1,NN1)=ZERO
-	  DFI(2,NN1)=ZERO
-	  DFI(3,NN1)=ZERO
+            FFI(1,NN1)=ZERO
+            FFI(2,NN1)=ZERO
+            FFI(3,NN1)=ZERO
+            DFI(1,NN1)=ZERO
+            DFI(2,NN1)=ZERO
+            DFI(3,NN1)=ZERO
           NN2 = NN1 + 1
-	  FFI(1,NN2)=ZERO
-	  FFI(2,NN2)=ZERO
-	  FFI(3,NN2)=ZERO
-	  DFI(1,NN2)=ZERO
-	  DFI(2,NN2)=ZERO
-	  DFI(3,NN2)=ZERO
-	 ENDIF
+            FFI(1,NN2)=ZERO
+            FFI(2,NN2)=ZERO
+            FFI(3,NN2)=ZERO
+            DFI(1,NN2)=ZERO
+            DFI(2,NN2)=ZERO
+            DFI(3,NN2)=ZERO
+           ENDIF
         ENDDO
        ENDIF 
        ENDIF 
@@ -481,9 +467,6 @@ C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -661,11 +644,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "scr03_c.inc"
 #include      "scr05_c.inc"
-#include      "parit_c.inc"
 #include      "impl1_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -700,42 +679,41 @@ C-----------------------------------------------
      .   V2, FM2, VISCA,  FAC,  FF,DXT,T1,T2,T3,FTN,
      .   FX, FY, FZ, F2, MAS2, FACM1, PPLUS,GAP2,PENE2,PREC
 C-----------------------------------------------
-#include "sync_dir.inc"
       IF (IRESP == 1) THEN
          PREC = FIVEEM4
       ELSE 
          PREC = EM10
       ENDIF
         DO I=1,JLT
-	  NM1 = M1(I)
-	  NM2 = M2(I)
-	  DXM1(I) = D(1,NM1)
-	  DYM1(I) = D(2,NM1)
-	  DZM1(I) = D(3,NM1)
-	  DXM2(I) = D(1,NM2)
-	  DYM2(I) = D(2,NM2)
-	  DZM2(I) = D(3,NM2)
+            NM1 = M1(I)
+            NM2 = M2(I)
+            DXM1(I) = D(1,NM1)
+            DYM1(I) = D(2,NM1)
+            DZM1(I) = D(3,NM1)
+            DXM2(I) = D(1,NM2)
+            DYM2(I) = D(2,NM2)
+            DZM2(I) = D(3,NM2)
         ENDDO
 c        DO I=1,JLT
 c         IF(CS_LOC(I)>NRTS) THEN
-c	  DXS1(I) = ZERO
-c	  DYS1(I) = ZERO
-c	  DZS1(I) = ZERO
-c	  DXS2(I) = ZERO
-c	  DYS2(I) = ZERO
-c	  DZS2(I) = ZERO
+c    DXS1(I) = ZERO
+c    DYS1(I) = ZERO
+c    DZS1(I) = ZERO
+c    DXS2(I) = ZERO
+c    DYS2(I) = ZERO
+c    DZS2(I) = ZERO
 c         ELSE
-c	  NN1 = N1(I)
-c	  NN2 = N2(I)
-c	  DXS1(I) = D(1,NN1)
-c	  DYS1(I) = D(2,NN1)
-c	  DZS1(I) = D(3,NN1)
-c	  DXS2(I) = D(1,NN2)
-c	  DYS2(I) = D(2,NN2)
-c	  DZS2(I) = D(3,NN2)
-c	 ENDIF
+c    NN1 = N1(I)
+c    NN2 = N2(I)
+c    DXS1(I) = D(1,NN1)
+c    DYS1(I) = D(2,NN1)
+c    DZS1(I) = D(3,NN1)
+c    DXS2(I) = D(1,NN2)
+c    DYS2(I) = D(2,NN2)
+c    DZS2(I) = D(3,NN2)
+c   ENDIF
 c        ENDDO
-C	
+C
       DO I=1,JLT
        GAP2 = GAPV(I)*GAPV(I)
        PENE2 = GAP2 - NX(I)*NX(I) - NY(I)*NY(I) - NZ(I)*NZ(I)
@@ -922,8 +900,8 @@ C
 C--------main part-------
 c
        DO I=1,JLT
-	NM1 = M1(I)
-	NM2 = M2(I)
+          NM1 = M1(I)
+          NM2 = M2(I)
         A(1,NM1)=A(1,NM1)+FXI(I)*HM1(I)
         A(2,NM1)=A(2,NM1)+FYI(I)*HM1(I)
         A(3,NM1)=A(3,NM1)+FZI(I)*HM1(I)
@@ -934,27 +912,27 @@ c
 C--------secnd part-------
        DO I=1,JLT
          IF(CS_LOC(I)<=NRTS) THEN
-	  NN1 = N1(I)
-	  NN2 = N2(I)
+            NN1 = N1(I)
+            NN2 = N2(I)
           A(1,NN1)=A(1,NN1)-FXI(I)*HS1(I)
           A(2,NN1)=A(2,NN1)-FYI(I)*HS1(I)
           A(3,NN1)=A(3,NN1)-FZI(I)*HS1(I)
           A(1,NN2)=A(1,NN2)-FXI(I)*HS2(I)
           A(2,NN2)=A(2,NN2)-FYI(I)*HS2(I)
           A(3,NN2)=A(3,NN2)-FZI(I)*HS2(I)
-	 ELSE
-	  NN=CS_LOC(I)-NRTS
-	  NS=IND_INT(NIN)%P(NN)
+           ELSE
+            NN=CS_LOC(I)-NRTS
+            NS=IND_INT(NIN)%P(NN)
 C---------pour temporairement diag_ss---
           NN1 = NS
-	  FFI(1,NN1)=FFI(1,NN1)-FXI(I)*HS1(I)
-	  FFI(2,NN1)=FFI(2,NN1)-FYI(I)*HS1(I)
-	  FFI(3,NN1)=FFI(3,NN1)-FZI(I)*HS1(I)
+            FFI(1,NN1)=FFI(1,NN1)-FXI(I)*HS1(I)
+            FFI(2,NN1)=FFI(2,NN1)-FYI(I)*HS1(I)
+            FFI(3,NN1)=FFI(3,NN1)-FZI(I)*HS1(I)
           NN2 = NN1 + 1
-	  FFI(1,NN2)= FFI(1,NN2)-FXI(I)*HS2(I)
-	  FFI(2,NN2)= FFI(2,NN2)-FYI(I)*HS2(I)
-	  FFI(3,NN2)= FFI(3,NN2)-FZI(I)*HS2(I)
-	 ENDIF
+            FFI(1,NN2)= FFI(1,NN2)-FXI(I)*HS2(I)
+            FFI(2,NN2)= FFI(2,NN2)-FYI(I)*HS2(I)
+            FFI(3,NN2)= FFI(3,NN2)-FZI(I)*HS2(I)
+           ENDIF
        ENDDO
 C
       RETURN

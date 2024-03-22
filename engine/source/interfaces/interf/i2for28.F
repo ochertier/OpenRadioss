@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -39,7 +39,7 @@ Chd|====================================================================
      .           NOINT       ,NODNX_SMS   ,DMINT2      ,DT2T        ,NELTST      ,
      .           ITYPTST     ,NSN         ,NMN         ,IDEL2       ,PENFLAG     ,
      .           IROT        ,SKEW        ,
-     .           DPARA       ,NMAS        ,DMAST       ,ADM         ,MINER       ,
+     .           DPARA       ,NMAS        ,DMAST       ,ADM        ,SAV_INER_POFF,
      .           H3D_DATA    ,FNCONTP     ,FTCONTP     )
 C-----------------------------------------------
 C   M o d u l e s
@@ -65,16 +65,8 @@ C-----------------------------------------------
      .   FTCONTP(3,*) 
       my_real
      .   DPARA(7,*),DMAST,ADM(*),
-     .   NMAS(*),MINER(*)
+     .   NMAS(*),SAV_INER_POFF(*)
       TYPE (H3D_DATABASE) :: H3D_DATA
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "units_c.inc"
-#include      "param_c.inc"
-#include      "com01_c.inc"
-#include      "com08_c.inc"
-#include      "scr05_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -103,7 +95,7 @@ c-----------
      3   AR        ,IN        ,X         ,STIFN      ,STIFR     ,
      4   FSAV      ,DMAST     ,ADM       ,NMAS       ,IDEL2     ,
      5   SMAS      ,SINER     ,V         ,CSTS       ,FNCONT    ,
-     6   INDXC     ,MINER     ,H3D_DATA  ,FNCONTP    ,FTCONTP   )
+     6   INDXC     ,SAV_INER_POFF,H3D_DATA ,FNCONTP  ,FTCONTP   )
 C
       ENDIF
 c
@@ -115,9 +107,8 @@ c
      .       DR        ,FINI      ,FSAV      ,FNCONT      ,NSN       ,
      .       STFN_PEN  ,STFR_PEN  ,VISC      ,PENFLAG     ,IROT      ,
      .       NOINT     ,NODNX_SMS ,DMINT2    ,SAV_FOR_PENA,IRECTM    ,
-     .       DT2T      ,NELTST    ,ITYPTST   ,
-     .       INDXP     ,MINER     ,H3D_DATA    ,FNCONTP   ,
-     .       FTCONTP   )
+     .       DT2T      ,NELTST    ,ITYPTST   ,INDXP       ,SAV_INER_POFF,
+     .       H3D_DATA  ,FNCONTP   ,FTCONTP)
 c
       ENDIF                                                            
 c-----------

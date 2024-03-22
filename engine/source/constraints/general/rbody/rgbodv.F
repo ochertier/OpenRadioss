@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -60,15 +60,10 @@ C     REAL
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "my_allocate.inc"
 #include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "com08_c.inc"
-#include      "scr05_c.inc"
-#include      "scr06_c.inc"
 #include      "param_c.inc"
 #include      "parit_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -109,8 +104,8 @@ C
         AM1 = A(1,M)
         AM2 = A(2,M)
         AM3 = A(3,M)
-Cel vectorisation si nsn>=10 ou si p/on active
-Cel sinon attention aux differences en mode vectoriel !
+C   vectorisation si nsn>=10 ou si p/on active
+C   sinon attention aux differences en mode vectoriel !
         IF (NSN>=10.OR.IPARIT>0) THEN
           DO I=1,NSN
             N = NOD(I)
@@ -137,7 +132,6 @@ C
      .        (V(3,M)+VX3+HALF*DT2*(VG(1)*VX2-VG(2)*VX1)-V(3,N))*USDT
           ENDDO
         ELSE
-#include "scalar.inc"
           DO I=1,NSN
             N = NOD(I)
             AR(1,N)= (VG(1)-VR(1,N)) * USDT
@@ -172,8 +166,8 @@ C
         AM1 = ZERO
         AM2 = A(2,M)
         AM3 = A(3,M)
-Cel vectorisation si nsn>=10 ou si p/on active
-Cel sinon attention aux differences en mode vectoriel !
+C   vectorisation si nsn>=10 ou si p/on active
+C   sinon attention aux differences en mode vectoriel !
         IF (NSN>=10.OR.IPARIT>0) THEN
          DO I=1,NSN
            N = NOD(I)
@@ -189,7 +183,6 @@ C
            A(3,N)= AM3 + (V(3,M)-V(3,N))*USDT
          ENDDO
         ELSE
-#include "scalar.inc"
          DO I=1,NSN
            N = NOD(I)
            AR(1,N)= ZERO
@@ -214,8 +207,8 @@ C
         AM1 = ZERO
         AM2 = A(2,M)
         AM3 = A(3,M)
-Cel vectorisation si nsn>=10 ou si p/on active
-Cel sinon attention aux differences en mode vectoriel !
+C   vectorisation si nsn>=10 ou si p/on active
+C   sinon attention aux differences en mode vectoriel !
         IF (NSN>=10.OR.IPARIT>0) THEN
          DO I=1,NSN
            N = NOD(I)
@@ -237,7 +230,6 @@ C
      .       (V(3,M)+VX3+HALF*DT2*VXX3-V(3,N))*USDT
          ENDDO
         ELSE
-#include "scalar.inc"
          DO I=1,NSN
            N = NOD(I)
            AR(1,N)= (VG(1)-VR(1,N)) * USDT
@@ -264,8 +256,8 @@ C-----------------------------------------------
 C     Reaction forces and/or failure
 C       Note : At this stage, Freac contains Fint+Fext+Fcont (Freac has not been finalized yet)
 C-----------------------------------------------
-      MY_ALLOCATE2D(R ,3,NSN)
-      MY_ALLOCATE2D(RR,3,NSN)
+      ALLOCATE(R (3,NSN))
+      ALLOCATE(RR(3,NSN))
 C
       DO I=1,NSN
         N = NOD(I)

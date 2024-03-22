@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -28,13 +28,10 @@ Chd|        MULTI_TIMEEVOLUTION           source/multifluid/multi_timeevolution.
 Chd|-- calls ---------------
 Chd|        QVOLU2                        source/elements/solid_2d/quad/qvolu2.F
 Chd|        SDERI3                        source/elements/solid/solide/sderi3.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE MULTI_COMPUTEVOLUME(NEL, NG, IPARG, SYM, 
      .     ELBUF_TAB, IXS, IXQ, IXTG, VOLNEW, XGRID)
-C-----------------------------------------------
-C     D e s c r i p t i o n
-C-----------------------------------------------
 C-----------------------------------------------
 C     M o d u l e s
 C-----------------------------------------------
@@ -72,6 +69,7 @@ C-----------------------------------------------
       my_real :: X6(MVSIZ), Y6(MVSIZ), Z6(MVSIZ)
       my_real :: X7(MVSIZ), Y7(MVSIZ), Z7(MVSIZ)
       my_real :: X8(MVSIZ), Y8(MVSIZ), Z8(MVSIZ)
+      my_real :: Y124(MVSIZ), Y234(MVSIZ)
       my_real :: JAC1(MVSIZ), JAC2(MVSIZ), JAC3(MVSIZ) 
       my_real :: JAC4(MVSIZ), JAC5(MVSIZ), JAC6(MVSIZ) 
       my_real :: B1, B2, B3, B4
@@ -140,20 +138,23 @@ C     Node 8
                   Z8(II) = XGRID(3, IX(9, II))
                   NGL(II) = IX(NIXS, II)
                ENDDO
-               CALL SDERI3(GBUF%OFF, VOLNEW, NGL,
-     .              X1, X2, X3, X4, X5, X6, X7, X8,
-     .              Y1, Y2, Y3, Y4, Y5, Y6, Y7, Y8,
-     .              Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8,
-     .              DUMMY, DUMMY, DUMMY, DUMMY,
-     .              DUMMY, DUMMY, DUMMY, DUMMY,
-     .              DUMMY, DUMMY, DUMMY, DUMMY,
-     .              DUMMY, DUMMY, DUMMY, 
-     .              DUMMY, DUMMY, DUMMY, 
-     .              DUMMY, DUMMY, DUMMY, 
-     .              DUMMY, DUMMY, DUMMY, 
-     .              JAC1, JAC2, JAC3, 
-     .              JAC4, JAC5, JAC6, 
-     .              GBUF%SMSTR, GBUF%OFF, NEL, VOLDP, JHBE, ISMSTR)
+               CALL SDERI3(
+     1   GBUF%OFF,  VOLNEW,    NGL,       X1,
+     2   X2,        X3,        X4,        X5,
+     3   X6,        X7,        X8,        Y1,
+     4   Y2,        Y3,        Y4,        Y5,
+     5   Y6,        Y7,        Y8,        Z1,
+     6   Z2,        Z3,        Z4,        Z5,
+     7   Z6,        Z7,        Z8,        DUMMY,
+     8   DUMMY,     DUMMY,     DUMMY,     DUMMY,
+     9   DUMMY,     DUMMY,     DUMMY,     DUMMY,
+     A   DUMMY,     DUMMY,     DUMMY,     DUMMY,
+     B   DUMMY,     DUMMY,     DUMMY,     DUMMY,
+     C   DUMMY,     DUMMY,     DUMMY,     DUMMY,
+     D   DUMMY,     DUMMY,     DUMMY,     JAC1,
+     E   JAC2,      JAC3,      JAC4,      JAC5,
+     F   JAC6,      GBUF%SMSTR,GBUF%OFF,  NEL,
+     G   VOLDP,     JHBE,      ISMSTR,    JLAG)
             ELSE
                DO II = 1, NEL
 C     Node 1
@@ -223,11 +224,18 @@ C     Node 3
 C     Node 4
                   Y4(II) = XGRID(2, IX(5, II))
                   Z4(II) = XGRID(3, IX(5, II))
-                  NGL(II) = IX(NIXS, II)
+
+                  Y234(II)=Y2(II)+Y3(II)+Y4(II)
+                  Y124(II)=Y1(II)+Y2(II)+Y4(II)
+
+                  NGL(II) = IX(NIXQ, II)
                ENDDO
-               CALL QVOLU2(GBUF%OFF, GBUF%AREA, VOLNEW, NGL, 
-     .              Y1, Y2, Y3, Y4, Z1, Z2, Z3, Z4, 
-     .              DUMMY, DUMMY) 
+               CALL QVOLU2(
+     1   GBUF%OFF, GBUF%AREA,VOLNEW,   NGL,
+     2   Y1,       Y2,       Y3,        Y4,
+     3   Z1,       Z2,       Z3,        Z4,
+     4   Y234,   Y124,      NEL,     JMULT,
+     5   JCVT)
             ELSEIF (ITY == 7) THEN
 C     TRIANGLES
                IX => IXTG(1:NIXTG, 1 + NFT:NEL + NFT)
@@ -242,6 +250,7 @@ C     TRIANGLES
                      GBUF%AREA(II) = ABS(HALF * ((Y2(II) - Y1(II)) * (Z3(II) - Z1(II)) - 
      .                    (Z2(II) - Z1(II)) * (Y3(II) - Y1(II))))
                      VOLNEW(II) = GBUF%AREA(II)
+                     NGL(II) = IX(NIXTG, II)
                   ENDDO            
                ELSE IF (SYM == 1) THEN
 C     Axisymmetric case
@@ -258,6 +267,7 @@ C     Axisymmetric case
      .                    Y1(II) * (Z2(II) - Z3(II)) + 
      .                    Y2(II) * (Z3(II) - Z1(II)) + 
      .                    Y3(II) * (Z1(II) - Z2(II))) * ONE_OVER_6
+                     NGL(II) = IX(NIXTG, II)
                   ENDDO            
                ENDIF
             ENDIF

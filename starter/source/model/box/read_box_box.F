@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -39,6 +39,7 @@ Chd|====================================================================
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE MY_ALLOC_MOD
       USE SUBMODEL_MOD
       USE MESSAGE_MOD
       USE OPTIONDEF_MOD
@@ -50,14 +51,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
 #include      "scr17_c.inc"
 #include      "com04_c.inc"
-#include      "submod_c.inc"
-#include      "units_c.inc"
-#include      "sysunit.inc"
-#include      "warn_c.inc"
-#include      "my_allocate.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -115,7 +110,7 @@ c
 c
         IAD = IAD + 1
         IBOX(IAD)%NBOXBOX = NLIST
-        MY_ALLOCATE(IBOX(IAD)%IBOXBOX  ,NLIST)
+        CALL MY_ALLOC(IBOX(IAD)%IBOXBOX  ,NLIST)
 c
         II = 0
         IF (NBOX_POS > 0) THEN
@@ -156,6 +151,9 @@ c
         IBOX(IAD)%X2      = ZERO
         IBOX(IAD)%Y2      = ZERO
         IBOX(IAD)%Z2      = ZERO
+        IBOX(IAD)%SURFIAD = 0
+        IBOX(IAD)%NENTITY = 0
+        IBOX(IAD)%BOXIAD  = 0
 c
       ENDDO
 c-----------

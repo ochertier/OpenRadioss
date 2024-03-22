@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>    
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,7 +27,7 @@ C.../SPMDV5/
      .                NBDDI2M ,NISKYI2 ,LCNI2  ,I2NSNT  ,NSKYMV0 ,
      .                NSKYMVC0,NSKYLL0 ,NBDDNCJ,NBDDNRBM,NSKYRBM0,
      .                NNODTCUT,NNODLCUT,NUMNODG,NUMNODM, NUMELQG, 
-     .                NUMELCG, NUMELTGG,NUMELURG,NUMELSG,NUMELPG, 
+     .                NUMELCG, NUMELTGG,NUMELSG,NUMELPG, 
      .                NUMELRG, NUMELTRG,NB1DG,  NSKEWAG, SECTIOM,
      .                NUMELS16G,NUM16SHIFT,SPHSHIFT,NUMSPHG,NUMELXG,
      .                NBI18   ,NSKYI18 ,SKIPPON,NSPMDN,NBDDRBE3M,
@@ -39,7 +39,7 @@ C.../SPMDV5/
      .        NBDDI2M ,NISKYI2 ,LCNI2  ,I2NSNT  ,NSKYMV0 ,
      .        NSKYMVC0,NSKYLL0 ,NBDDNCJ,NBDDNRBM,NSKYRBM0,
      .        NNODTCUT,NNODLCUT,NUMNODG,NUMNODM, NUMELQG,
-     .        NUMELCG, NUMELTGG,NUMELURG,NUMELSG,NUMELPG,
+     .        NUMELCG, NUMELTGG,NUMELSG,NUMELPG,
      .        NUMELRG, NUMELTRG,NB1DG,  NSKEWAG, SECTIOM,
      .        NUMELS16G,NUM16SHIFT,SPHSHIFT,NUMSPHG,NUMELXG,
      .        NBI18   ,NSKYI18,SKIPPON,NSPMDN,NBDDRBE3M,

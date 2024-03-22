@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,8 +27,8 @@ Chd|        AFLUXT                        source/ale/ale51/afluxt.F
 Chd|        ALE51_FINISH                  source/ale/ale51/ale51_finish.F
 Chd|        ALE51_INIT                    source/ale/ale51/ale51_init.F 
 Chd|-- calls ---------------
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
-Chd|        I22TRI_MOD                    ../common_source/modules/cut-cell-search_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
+Chd|        I22TRI_MOD                    ../common_source/modules/interfaces/cut-cell-search_mod.F
 Chd|====================================================================
       SUBROUTINE ALE51_UPWIND3(PM     ,IXS  ,FLUX ,FLU1 ,ALE_CONNECT,
      .                         ITRIMAT,DDVOL,QMV  ,IFLG ,
@@ -57,7 +57,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr05_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "vect01_c.inc"

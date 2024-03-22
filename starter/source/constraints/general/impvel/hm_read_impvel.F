@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -49,6 +49,7 @@ C-----------------------------------------------
       USE GROUPDEF_MOD
       USE SUBMODEL_MOD
       USE HM_OPTION_READ_MOD
+      USE UNITAB_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -56,15 +57,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr03_c.inc"
 #include      "scr17_c.inc"
 #include      "param_c.inc"
-#include      "my_allocate.inc"
-#include      "submod_c.inc"
-#include      "units_c.inc"
-#include      "sysunit.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -76,7 +71,7 @@ C-----------------------------------------------
       INTEGER ,DIMENSION(LNOPT1,*)          ,INTENT(OUT) :: NOM_OPT
       INTEGER ,DIMENSION(NIFV,NFXVEL)       ,INTENT(OUT) :: IBFVEL
       my_real ,DIMENSION(LFXVELR,NFXVEL)    ,INTENT(OUT) :: FBFVEL
-      my_real ,DIMENSION(LUNIT,*)           ,INTENT(IN)  :: UNITAB
+      TYPE(UNIT_TYPE_),INTENT(IN)  :: UNITAB
       my_real ,DIMENSION(3,NUMNOD)          ,INTENT(IN)  :: X0
       TYPE (GROUP_)      ,DIMENSION(NGRNOD) ,INTENT(IN)  :: IGRNOD
       TYPE(SUBMODEL_DATA),DIMENSION(*)      ,INTENT(IN)  :: LSUBMODEL

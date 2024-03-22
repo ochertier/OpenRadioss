@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -487,7 +487,7 @@ C
           V(3,1,NN) = ZERO
           V(1,2,NN) = ZERO
           V(2,2,NN) = ONE
-          V(3,2,NN) = ZERO	  
+          V(3,2,NN) = ZERO    
         ENDIF
       ENDDO
 C
@@ -680,7 +680,7 @@ C
           V(3,1,NN) = ZERO
           V(1,2,NN) = ZERO
           V(2,2,NN) = ONE
-          V(3,2,NN) = ZERO	  
+          V(3,2,NN) = ZERO    
         ELSEIF(XMAXV(NN)>TOL1(NN)) THEN
           NINDEX1 = NINDEX1 + 1
           INDEX1(NINDEX1) = NN
@@ -805,7 +805,7 @@ C
           V(3,1,NN) = ZERO
           V(1,2,NN) = ZERO
           V(2,2,NN) = ONE
-          V(3,2,NN) = ZERO	  
+          V(3,2,NN) = ZERO    
         ENDIF
       ENDDO
 C

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -29,7 +29,7 @@ Chd|        SPMD_RGATHER9_DP              source/mpi/interfaces/spmd_outp.F
 Chd|        SPMD_STAT_PGATHER             source/mpi/output/spmd_stat.F 
 Chd|        STRS_TXT50                    source/output/sta/sta_txt.F   
 Chd|        TAB_STRS_TXT50                source/output/sta/sta_txt.F   
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE STAT_C_AUXF(ELBUF_TAB ,IPARG ,IPM ,IGEO ,IXC ,
      2                       IXTG  ,WA,WAP0 ,IPARTC, IPARTTG,
@@ -46,12 +46,8 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "param_c.inc"
 #include      "units_c.inc"
-#include      "scr01_c.inc"
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
 #include      "scr14_c.inc"
 #include      "scr16_c.inc"
 #include      "task_c.inc"
@@ -80,7 +76,7 @@ C-----------------------------------------------
       TYPE(G_BUFEL_)  ,POINTER :: GBUF     
       TYPE(L_BUFEL_)  ,POINTER :: LBUF     
       TYPE(BUF_LAY_)  ,POINTER :: BUFLY     
-      my_real, DIMENSION(:)  ,POINTER :: UVAR,SIGA,SIGB,SIGC 
+      my_real, DIMENSION(:)  ,POINTER :: UVAR,SIGA,SIGB,SIGC
 C-----------------------------------------------
       DATA DELIMIT(1:60)
      ./'#---1----|----2----|----3----|----4----|----5----|----6----|'/
@@ -249,6 +245,25 @@ c
                 ENDDO
               ENDDO  ! DO IL = 1,NLAY
 c
+            ELSEIF (MLW == 112) THEN     ! STA/AUX 
+              MY_NUVAR = 3
+              JJ = JJ + 1
+              WA(JJ) = MY_NUVAR 
+c
+              DO IS=1,NPTS
+                DO IR=1,NPTR                                                       
+                  DO IL = 1,NLAY
+                    NPTT  = ELBUF_TAB(NG)%BUFLY(IL)%NPTT
+                    DO IT=1,NPTT
+                      DO IVAR=1,3
+                        JJ = JJ + 1
+                        WA(JJ) = ELBUF_TAB(NG)%BUFLY(IL)%LBUF(IR,IS,IT)%PLA(I + IVAR*NEL)
+                      ENDDO
+                    ENDDO
+                  ENDDO
+                ENDDO
+              ENDDO  ! DO IL = 1,NLAY
+c
             ELSE IF (MLW >= 28 .and. MLW /= 32) THEN
               MY_NUVAR = IPM(8,IXC(1,N))
               JJ = JJ + 1
@@ -387,7 +402,7 @@ C
               J=J+MY_NUVAR
             ENDDO
           ENDIF  !  IF (IOFF == 1 .AND. MY_NUVAR /= 0)
-        ENDDO  !  DO N=1,STAT_NUMELC_G		    
+        ENDDO  !  DO N=1,STAT_NUMELC_G        
       ENDIF  !  IF (ISPMD == 0.AND.LEN > 0)
 C-----------------------------------------------
 C     3-NODE SHELLS

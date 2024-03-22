@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -35,10 +35,6 @@ C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -85,7 +81,7 @@ Chd|        ANCMSG                        source/output/message/message.F
 Chd|        DOUBLE_FLOT_IEEE              source/elements/shell/coque/cinmas.F
 Chd|        FRETITL2                      source/starter/freform.F      
 Chd|        DRAPE_MOD                     share/modules1/drape_mod.F    
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        STACK_MOD                     share/modules1/stack_mod.F    
 Chd|====================================================================
@@ -98,7 +94,8 @@ Chd|====================================================================
      .          TEMP    ,MS_LAYER,ZI_LAYER,MS_LAYERC,ZI_LAYERC,
      .          MSZ2C   ,ZPLY    ,ISUBSTACK,NLAY    ,ELBUF_STR,
      .          STACK   ,THKI    ,RNOISE   ,DRAPE   ,
-     .          PERTURB ,IX1     ,IX2      ,IX3     ,IX4      )
+     .          PERTURB ,IX1     ,IX2      ,IX3     ,IX4      ,
+     .          IDRAPE  ,INDX)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -125,11 +122,9 @@ C-----------------------------------------------
 #include      "param_c.inc"
 #include      "scr03_c.inc"
 #include      "scr05_c.inc"
-#include      "scr06_c.inc"
 #include      "scr12_c.inc"
 #include      "scr17_c.inc"
 #include      "scr22_c.inc"
-#include      "units_c.inc"
 #include      "vect01_c.inc"
 #include      "drape_c.inc"
 C-----------------------------------------------
@@ -137,9 +132,10 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IX(NIXC,*),IPART(*),IHBE,IMID,IPROP,
      .        IGEO(NPROPGI,*),NSHNOD(*), SH4TREE(KSH4TREE,*),
-     .        ISUBSTACK,NLAY,PERTURB(NPERTURB)
+     .        ISUBSTACK,NLAY,PERTURB(NPERTURB),IDRAPE
       INTEGER, DIMENSION(MVSIZ), INTENT(IN)  :: IX1,IX2,IX3,IX4
       INTEGER*8 I8MI(6,*) 
+      INTEGER, DIMENSION(SCDRAPE) :: INDX
       my_real, DIMENSION(MVSIZ), INTENT(IN) :: AREA
       my_real
      .   X(3,*), GEO(NPROPG,*), PM(NPROPM,*), MS(*), TINER(*),THKE(*),
@@ -148,26 +144,30 @@ C-----------------------------------------------
      .   MS_LAYER(NUMNOD,*), ZI_LAYER(NUMNOD,*),XREFC(4,3,*),
      .   MS_LAYERC(NUMELC,*),ZI_LAYERC(NUMELC,*),MSZ2C(*),ZPLY(*),THKI(*),
      .   RNOISE(NPERTURB,*)
+      my_real
+     .   ZSHIFT
       TYPE(ELBUF_STRUCT_), TARGET :: ELBUF_STR
       TYPE (STACK_PLY) :: STACK
-      TYPE (DRAPE_)  :: DRAPE(*)
+      TYPE (DRAPE_) , DIMENSION(NUMELC_DRAPE+NUMELTG_DRAPE), TARGET :: DRAPE
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,II,J,K,N,IP,I1,I2,I3,I4,MATLY,IPTHK,IPMAT,IPPOS,ID,   
      .   ERRM,IDPROP,IPID,IPPID,ISTACK(MVSIZ,NPT),ISLV,IPID_LY,
-     .   IPANG,NTHK,IGTYP,IGMAT,ILAY,NPTT,IT,IINT,IPGMAT,MAX_NPTT
+     .   IPANG,NTHK,IGTYP,IGMAT,ILAY,NPTT,IT,IINT,IPGMAT,MAX_NPTT,
+     .   NSLICE,IPOS,IPT,IPT_ALL,IE,NLAY_MAX
       INTEGER*8 I8EMS(3,MVSIZ) 
       CHARACTER*nchartitle, TITR
-      PARAMETER (MAX_NPTT = 10)
       my_real 
-     .   FAC,MST,DMS,THICKT,THKLY,POSLY,MSE,INS,MZI,EMS_NPTT,ET,ZJ,
+     .   FAC,MST,DMS,THICKT,THKLY,LAYPOS,MSE,INS,MZI,EMS_NPTT,ET,ZJ,
      .   XX,YY,ZZ,XY,YZ,ZX,MSL,XIL,MS_NPTT,POS_0,THINNING
       my_real 
-     .   EMS_LAYER(MVSIZ,NLAY),LAYPOS(NPT,MVSIZ),RATIO_THKLY(NPT,MVSIZ),
-     .   THK_IT(MAX_NPTT),POS_IT(MAX_NPTT)
+     .   EMS_LAYER(MVSIZ,NLAY)
+      my_real, DIMENSION(:), ALLOCATABLE  :: POSLY,RATIO_THKLY, THK_IT,POS_IT
       my_real, DIMENSION(MVSIZ) :: RHO,RHOCP,EMS,EMSCP,XI,THK
 C
+
+      TYPE (DRAPE_PLY_),  POINTER :: DRAPE_PLY
       my_real A_GAUSS(9,9),W_GAUSS(9,9)
 C-----------------------------------------------
       DATA A_GAUSS /
@@ -232,7 +232,19 @@ C=======================================================================
         IPANG  =  1   !  NPT
         IPTHK  =  IPANG + NLAY   !  NPT
         IPPOS  =  IPTHK + NLAY   !  NPT
-C           
+ 
+C    
+       MAX_NPTT   = 1   
+       IF(IGTYP == 51 .OR. IGTYP == 52) THEN
+          DO ILAY=1,NLAY   !  NPT  
+              MAX_NPTT = MAX(MAX_NPTT ,ELBUF_STR%BUFLY(ILAY)%NPTT)
+          ENDDO
+          ALLOCATE(THK_IT(MAX_NPTT),POS_IT(MAX_NPTT))
+       ELSE
+          ALLOCATE(THK_IT(0),POS_IT(0))  
+       ENDIF 
+       NLAY_MAX = MAX(NLAY, NPT)
+       ALLOCATE(POSLY(NLAY_MAX*MAX_NPTT),RATIO_THKLY(NLAY_MAX*MAX_NPTT)) 
 c-----------------------------
       IF ((IGTYP == 17 .OR. IGTYP == 51) .AND. IGMAT < 0 ) THEN
 c-----------------------------
@@ -380,95 +392,157 @@ C! for igtyp=17 --->IGMAT= 0
 c--------------------------------------------
       ELSEIF(IGTYP == 17 ) THEN
 c--------------------------------------------
-     
         IPPID   = 2 
         IPMAT   = IPPID + NPT
         IPANG  =  1
         IPTHK  =  IPANG + NPT
         IPPOS  =  IPTHK + NPT
         NTHK   =  IPPOS + NPT 
-C        
-        DO I=LFT,LLT
-          EMS(I)=ZERO
-          MZI = ZERO
-          DO N=1,NPT
-            I1 = IPPID + N
-            I2 = IPMAT + N
-            I3 = IPTHK + N
-            I4 = IPPOS + N
-            IF (NDRAPE == 0) THEN
-              THICKT = STACK%GEO(1 ,ISUBSTACK)
-              THKLY  = STACK%GEO(I3 ,ISUBSTACK)*THICKT
-              MATLY  = STACK%IGEO(I2,ISUBSTACK)
-              EMS(I) = EMS(I) + PM(89,MATLY)*THKLY*AREA(I)*FOURTH
-              EMS_LAYER(I,N) =  PM(89,MATLY)*THKLY*AREA(I)*FOURTH
-              MZI = MZI + EMS_LAYER(I,N)*STACK%GEO(I4 ,ISUBSTACK)
-            ELSE
-              IF ( DRAPE(I+NFT)%IDRAPE(N) == 0) THEN
-                THICKT = STACK%GEO(1 ,ISUBSTACK)
-                THKLY  = STACK%GEO(I3 ,ISUBSTACK)*THICKT
-                MATLY  = STACK%IGEO(I2,ISUBSTACK)
-                EMS(I) = EMS(I) + PM(89,MATLY)*THKLY*AREA(I)*FOURTH
-                EMS_LAYER(I,N) =  PM(89,MATLY)*THKLY*AREA(I)*FOURTH
-                RATIO_THKLY(N,I) = THKLY/THK(I)
-                IF (N == 1) THEN
-                  LAYPOS(N,I) = -HALF + HALF*RATIO_THKLY(N,I)
-                ELSE
-                  LAYPOS(N,I) = LAYPOS(N-1,I)            
-     .              + HALF*(RATIO_THKLY(N,I)+RATIO_THKLY(N-1,I))
-                ENDIF ! IF (N == 1)
-                MZI = MZI + EMS_LAYER(I,N)*LAYPOS(N,I)
-              ELSEIF (DRAPE(I+NFT)%IDRAPE(N) > 0) THEN
-                THINNING = DRAPE(I+NFT)%RDRAPE(N,1)
-                THICKT = STACK%GEO(1 ,ISUBSTACK)
-                THKLY  = STACK%GEO(I3 ,ISUBSTACK)*THICKT ! initial
-                THKLY  = THKLY*THINNING
-                MATLY  = STACK%IGEO(I2,ISUBSTACK)
-                EMS(I) = EMS(I) + PM(89,MATLY)*THKLY*AREA(I)*FOURTH
-                EMS_LAYER(I,N) =  PM(89,MATLY)*THKLY*AREA(I)*FOURTH
-                RATIO_THKLY(N,I) = THKLY/THK(I)
-                IF (N == 1) THEN
-                  LAYPOS(N,I) = -HALF + HALF*RATIO_THKLY(N,I)
-                ELSE
-                  LAYPOS(N,I) = LAYPOS(N-1,I)            
-     .              + HALF*(RATIO_THKLY(N,I)+RATIO_THKLY(N-1,I))
-                ENDIF ! IF (N == 1)
-                MZI = MZI + EMS_LAYER(I,N)*LAYPOS(N,I)
-              ENDIF ! IF (IDRAPE(N,I) == 0)
-            ENDIF ! IF (NDRAPE == 0)
-            IPID   = STACK%IGEO(I1, ISUBSTACK)
-            ISTACK(I,N) = IGEO(102,IPID)
-          ENDDO
-          MST = RHO(I)*THK(I)*AREA(I)*FOURTH
-          DMS = ABS(EMS(I)-MST)/MST
-           IF(DMS  > EM02) ERRM = 1
-           IF(IGMAT <= 0) THEN  
-               IF(DMS  >  EM02) THEN
-                 IDPROP = IGEO(1,IPROP)
-                 CALL FRETITL2(TITR,
-     .                    IGEO(NPROPGI-LTITR+1,IPROP),LTITR)
-                 CALL ANCMSG(MSGID=519,
-     .                  MSGTYPE=MSGWARNING,
-     .                  ANMODE=ANINFO_BLIND_2,
-     .                  I1=IDPROP,
-     .                  C1=TITR,I2=IX(NIXC,NFT+I),
-     .                  R1=EMS(I),R2=MST)
-               ENDIF
-           ENDIF     
+C       
+        IF(IDRAPE == 0) THEN
+           DO I=LFT,LLT
+             EMS(I)=ZERO
+             MZI = ZERO
+             DO N=1,NPT
+               I1 = IPPID + N
+               I2 = IPMAT + N
+               I3 = IPTHK + N
+               I4 = IPPOS + N
+               THICKT = STACK%GEO(1 ,ISUBSTACK)
+               THKLY  = STACK%GEO(I3 ,ISUBSTACK)*THICKT
+               MATLY  = STACK%IGEO(I2,ISUBSTACK)
+               EMS(I) = EMS(I) + PM(89,MATLY)*THKLY*AREA(I)*FOURTH
+               EMS_LAYER(I,N) =  PM(89,MATLY)*THKLY*AREA(I)*FOURTH
+               MZI = MZI + EMS_LAYER(I,N)*STACK%GEO(I4 ,ISUBSTACK)
+               IPID   = STACK%IGEO(I1, ISUBSTACK)
+               ISTACK(I,N) = IGEO(102,IPID)
+             ENDDO
+             MST = RHO(I)*THK(I)*AREA(I)*FOURTH
+             DMS = ABS(EMS(I)-MST)/MST
+             IF(DMS  > EM02) ERRM = 1
+             IF(IGMAT <= 0) THEN  
+                  IF(DMS  >  EM02) THEN
+                    IDPROP = IGEO(1,IPROP)
+                    CALL FRETITL2(TITR,
+     .                        IGEO(NPROPGI-LTITR+1,IPROP),LTITR)
+                    CALL ANCMSG(MSGID=519,
+     .                      MSGTYPE=MSGWARNING,
+     .                      ANMODE=ANINFO_BLIND_2,
+     .                      I1=IDPROP,
+     .                      C1=TITR,I2=IX(NIXC,NFT+I),
+     .                      R1=EMS(I),R2=MST)
+                  ENDIF
+             ENDIF     
+            !!
+             DO N=1,NPT
+               I4 = IPPOS + N
+               IF(ABS(STACK%GEO(I4 ,ISUBSTACK)) < EM15)
+     .                         STACK%GEO(I4 ,ISUBSTACK)=ZERO
+             ENDDO         
+             IF(ABS(MZI) > EM02) THEN
+               DO N=1,NPT
+                 I4 = IPPOS + N
+                 DMS = MZI/EMS(I)
+                 STACK%GEO(I4 ,ISUBSTACK) = STACK%GEO(I4 ,ISUBSTACK) - DMS
+               ENDDO
+             ENDIF                      
+           ENDDO 
+        ELSE ! idrape > 0
+          DO I=LFT,LLT
+            EMS(I)=ZERO
+            MZI = ZERO
+            IE = INDX(NFT+I)
+            IF(IE == 0) THEN
+               DO N=1,NPT
+                 I1 = IPPID + N
+                 I2 = IPMAT + N
+                 I3 = IPTHK + N
+                 I4 = IPPOS + N 
+                 THICKT = STACK%GEO(1 ,ISUBSTACK)
+                 THKLY  = STACK%GEO(I3 ,ISUBSTACK)*THICKT
+                 MATLY  = STACK%IGEO(I2,ISUBSTACK)
+                 EMS(I) = EMS(I) + PM(89,MATLY)*THKLY*AREA(I)*FOURTH
+                 EMS_LAYER(I,N) =  PM(89,MATLY)*THKLY*AREA(I)*FOURTH
+                 MZI = MZI + EMS_LAYER(I,N)*STACK%GEO(I4 ,ISUBSTACK)
+                 IPID   = STACK%IGEO(I1, ISUBSTACK)
+                 ISTACK(I,N) = IGEO(102,IPID)
+               ENDDO
+             ELSE
+               DO N=1,NPT                                                          
+                 I1 = IPPID + N                                                    
+                 I2 = IPMAT + N
+                 I3 = IPTHK + N
+                 I4 = IPPOS + N
+                 IP = DRAPE(IE)%INDX_PLY(N) 
+                 IF(IP > 0 ) THEN                            
+                    DRAPE_PLY => DRAPE(IE)%DRAPE_PLY(IP)
+                    THINNING = DRAPE_PLY%RDRAPE(1,1) ! one slice by layer   
+                    THICKT = STACK%GEO(1 ,ISUBSTACK)                        
+                    THKLY  = STACK%GEO(I3 ,ISUBSTACK)*THICKT ! initial      
+                    THKLY  = THKLY*THINNING                                 
+                    MATLY  = STACK%IGEO(I2,ISUBSTACK)                       
+                    EMS(I) = EMS(I) + PM(89,MATLY)*THKLY*AREA(I)*FOURTH     
+                    EMS_LAYER(I,N) =  PM(89,MATLY)*THKLY*AREA(I)*FOURTH     
+                    RATIO_THKLY(N) = THKLY/THK(I)                           
+                    IF (N == 1) THEN                                        
+                      POSLY(N) = -HALF + HALF*RATIO_THKLY(N)               
+                    ELSE                                                    
+                       POSLY(N) = POSLY(N-1)                                
+     .                          + HALF*(RATIO_THKLY(N)+RATIO_THKLY(N-1))           
+                    ENDIF ! IF (N == 1)                                     
+                    MZI = MZI + EMS_LAYER(I,N)*POSLY(N)                     
+                    IPID   = STACK%IGEO(I1, ISUBSTACK)
+                    ISTACK(I,N) = IGEO(102,IPID)
+                 ELSE ! IP=0   
+                    THICKT = STACK%GEO(1 ,ISUBSTACK)                        
+                    THKLY  = STACK%GEO(I3 ,ISUBSTACK)*THICKT ! initial 
+                    MATLY  = STACK%IGEO(I2,ISUBSTACK)                       
+                    EMS(I) = EMS(I) + PM(89,MATLY)*THKLY*AREA(I)*FOURTH     
+                    EMS_LAYER(I,N) =  PM(89,MATLY)*THKLY*AREA(I)*FOURTH     
+                    RATIO_THKLY(N) = THKLY/THK(I)                           
+                    IF (N == 1) THEN                                        
+                      POSLY(N) = -HALF + HALF*RATIO_THKLY(N)               
+                    ELSE                                                    
+                       POSLY(N) = POSLY(N-1)                                
+     .                          + HALF*(RATIO_THKLY(N)+RATIO_THKLY(N-1))     
+                    ENDIF ! IF (N == 1)                                     
+                    MZI = MZI + EMS_LAYER(I,N)*POSLY(N)                     
+                    IPID   = STACK%IGEO(I1, ISUBSTACK)
+                    ISTACK(I,N) = IGEO(102,IPID)
+                 ENDIF
+               ENDDO
+             ENDIF ! IE
+             MST = RHO(I)*THK(I)*AREA(I)*FOURTH                   
+             DMS = ABS(EMS(I)-MST)/MST                            
+             IF(DMS  > EM02) ERRM = 1                            
+             IF(IGMAT <= 0) THEN                                 
+                 IF(DMS  >  EM02) THEN                           
+                   IDPROP = IGEO(1,IPROP)                        
+                   CALL FRETITL2(TITR,                           
+     .                      IGEO(NPROPGI-LTITR+1,IPROP),LTITR)   
+                   CALL ANCMSG(MSGID=519,                        
+     .                    MSGTYPE=MSGWARNING,                    
+     .                    ANMODE=ANINFO_BLIND_2,                 
+     .                    I1=IDPROP,                             
+     .                    C1=TITR,I2=IX(NIXC,NFT+I),             
+     .                    R1=EMS(I),R2=MST)                      
+                 ENDIF                                           
+             ENDIF                                               
 C correction la position de la surface neutre au CDG
-          DO N=1,NPT
-            I4 = IPPOS + N
-            IF(ABS(STACK%GEO(I4 ,ISUBSTACK)) < EM15)
-     .                     STACK%GEO(I4 ,ISUBSTACK)=ZERO
-          ENDDO         
-          IF(ABS(MZI) > EM02) THEN
             DO N=1,NPT
               I4 = IPPOS + N
-              DMS = MZI/EMS(I)
-              STACK%GEO(I4 ,ISUBSTACK) = STACK%GEO(I4 ,ISUBSTACK) - DMS
-            ENDDO
-          ENDIF                      
-        ENDDO 
+              IF(ABS(STACK%GEO(I4 ,ISUBSTACK)) < EM15)
+     .                       STACK%GEO(I4 ,ISUBSTACK)=ZERO
+            ENDDO         
+            IF(ABS(MZI) > EM02) THEN
+              DO N=1,NPT
+                I4 = IPPOS + N
+                DMS = MZI/EMS(I)
+                STACK%GEO(I4 ,ISUBSTACK) = STACK%GEO(I4 ,ISUBSTACK) - DMS
+              ENDDO
+            ENDIF                      
+          ENDDO 
+        ENDIF ! IDRAPE   
 c--------------------------------------------
       ELSEIF (IGTYP == 51 .OR. IGTYP == 52 ) THEN
 c--------------------------------------------
@@ -480,119 +554,289 @@ c--------------------------------------------
         IPPOS  =  IPTHK + NLAY   !  NPT
         NTHK   =  IPPOS + NLAY   !  NPT
 C           
-        DO I=LFT,LLT
-          EMS(I)=ZERO
-          MZI = ZERO
-          DO ILAY=1,NLAY   !  NPT
-            NPTT = ELBUF_STR%BUFLY(ILAY)%NPTT
-            I1 = IPPID + ILAY
-            I2 = IPMAT + ILAY
-            I3 = IPTHK + ILAY
-            I4 = IPPOS + ILAY
-            IF (NDRAPE == 0) THEN
-              THICKT  = STACK%GEO(1,ISUBSTACK)
-              THKLY   = STACK%GEO(I3,ISUBSTACK)*THICKT
-              POSLY   = STACK%GEO(I4,ISUBSTACK)*THICKT
-              IPID_LY = STACK%IGEO(I1,ISUBSTACK)
-              MATLY   = STACK%IGEO(I2,ISUBSTACK)
-            ELSE
-              IF (DRAPE(I+NFT)%IDRAPE(ILAY) == 0) THEN
-                THICKT  = STACK%GEO(1,ISUBSTACK)
-                THKLY   = STACK%GEO(I3,ISUBSTACK)*THICKT
-                POSLY   = STACK%GEO(I4,ISUBSTACK)*THICKT
-                IPID_LY = STACK%IGEO(I1,ISUBSTACK)
-                MATLY   = STACK%IGEO(I2,ISUBSTACK)
-                RATIO_THKLY(ILAY,I) = THKLY/THK(I)
-                IF (ILAY == 1) THEN
-                  LAYPOS(ILAY,I) = -HALF + HALF*RATIO_THKLY(ILAY,I)
-                ELSE
-                  LAYPOS(ILAY,I) = LAYPOS(ILAY-1,I)            
-     .              + HALF*(RATIO_THKLY(ILAY,I)+RATIO_THKLY(ILAY-1,I))
-                ENDIF ! IF (ILAY == 1)
-                POSLY   = LAYPOS(ILAY,I)*THK(I)
-              ELSEIF (DRAPE(I+NFT)%IDRAPE(ILAY) > 0) THEN
-                THINNING = DRAPE(I+NFT)%RDRAPE(ILAY,1)
-                THICKT  = STACK%GEO(1,ISUBSTACK)
-                THKLY   = STACK%GEO(I3 ,ISUBSTACK)*THICKT ! initial
-                THKLY   = THKLY*THINNING
-                IPID_LY = STACK%IGEO(I1,ISUBSTACK)
-                MATLY   = STACK%IGEO(I2,ISUBSTACK)
-                RATIO_THKLY(ILAY,I) = THKLY/THK(I)
-                IF (ILAY == 1) THEN
-                  LAYPOS(ILAY,I) = -HALF + HALF*RATIO_THKLY(ILAY,I)
-                ELSE
-                  LAYPOS(ILAY,I) = LAYPOS(ILAY-1,I)            
-     .              + HALF*(RATIO_THKLY(ILAY,I)+RATIO_THKLY(ILAY-1,I))
-                ENDIF ! IF (ILAY == 1)
-                POSLY   = LAYPOS(ILAY,I)*THK(I)
-              ENDIF ! IF (IDRAPE(ILAY,I) == 0)
-            ENDIF ! IF (NDRAPE == 0)
-cc            IINT = IGEO(47,IPID_LY)
-            IPID = STACK%IGEO(IPPID,ISUBSTACK)  ! or IPID = IX(NIXC-1,NFT+I)
-            IINT = IGEO(47,IPID)
-            IF (IINT == 1) THEN !  uniform distribution - by default
-C----
-              DO IT=1,NPTT
-                THK_IT(IT) = THKLY/NPTT  ! equally distribution of NPTT through layer
-              ENDDO 
-C 
-              POS_0 = POSLY - HALF*THKLY
-              IF (NLAY == 1) POS_0 = - HALF*THKLY !! special case
-              POS_IT(1) = POS_0 + HALF*THK_IT(1)
-cc              POS_IT(1) = POSLY - HALF*THKLY + HALF*THK_IT(1)
-              DO IT=2,NPTT
-                POS_IT(IT) = POS_IT(IT-1) + HALF*(THK_IT(IT) + THK_IT(IT-1))
-              ENDDO
-            ELSEIF (IINT == 2) THEN  !  Gauss distribution
-              DO IT=1,NPTT
-                THK_IT(IT) = HALF*THKLY*W_GAUSS(IT,NPTT)
-                POS_IT(IT) = POSLY + HALF*THKLY*A_GAUSS(IT,NPTT)
-              ENDDO
-            ENDIF
-C
-            DO IT=1,NPTT
-              EMS_NPTT = PM(89,MATLY)*THK_IT(IT)*AREA(I)*FOURTH
-              EMS(I) = EMS(I) + EMS_NPTT
-              MZI = MZI + EMS_NPTT * POS_IT(IT)/THK(I)
-            ENDDO
-C----  
-          ENDDO
-          MST = RHO(I)*THK(I)*AREA(I)*FOURTH
-          DMS = ABS(EMS(I)-MST)/MST
-          IF (DMS  > EM02) ERRM = 1
-          IF(IGTYP == 51 .AND. IGMAT < 0) THEN 
-           IF (DMS  > EM02) THEN
-              IDPROP = IGEO(1,IPROP)
-             CALL FRETITL2(TITR,
-     .                    IGEO(NPROPGI-LTITR+1,IPROP),LTITR)
-             CALL ANCMSG(MSGID=519,
-     .                  MSGTYPE=MSGWARNING,
-     .                  ANMODE=ANINFO_BLIND_2,
-     .                  I1=IDPROP,
-     .                  C1=TITR,I2=IX(NIXC,NFT+I),
-     .                  R1=EMS(I),R2=MST)
-           ENDIF
-          ENDIF 
-C correction la position de la surface neutre au CDG
-          DO ILAY=1,NLAY   !  NPT
-            I4 = IPPOS + ILAY
-            IF(ABS(STACK%GEO(I4,ISUBSTACK)) < EM15) 
-     .                   STACK%GEO(I4,ISUBSTACK)=ZERO
-          ENDDO         
-          IF(ABS(MZI) > EM02) THEN
-            DO ILAY=1,NLAY   !  NPT
+        IPOS = IGEO(99,IPROP)                   
+        THICKT = STACK%GEO(1,ISUBSTACK)
+        ZSHIFT = GEO(199,IPROP)
+        IF(IPOS == 0 )THEN                           
+          ZSHIFT = -HALF                             
+        ELSEIF(IPOS == 2 )THEN                        
+          ZSHIFT =  -  ZSHIFT /MAX(THICKT,EM20)       
+        ELSEIF(IPOS == 3) THEN                        
+          ZSHIFT = -ONE                               
+        ELSEIF(IPOS == 4) THEN                        
+          ZSHIFT = ZERO                               
+        ENDIF  
+        IF(IDRAPE == 0 ) THEN                                  
+          DO I=LFT,LLT
+            EMS(I)=ZERO
+            MZI = ZERO
+            IPT_ALL = 0
+            DO ILAY=1,NLAY   !  NPT  
+              NPTT = ELBUF_STR%BUFLY(ILAY)%NPTT
+              I1 = IPPID + ILAY
+              I2 = IPMAT + ILAY
+              I3 = IPTHK + ILAY
               I4 = IPPOS + ILAY
-              DMS = MZI/EMS(I)
-              STACK%GEO(I4,ISUBSTACK) = STACK%GEO(I4,ISUBSTACK) - DMS
-            ENDDO
-          ENDIF       
-        ENDDO 
+              IPID = STACK%IGEO(I1,ISUBSTACK)  ! or IPID = IX(NIXC-1,NFT+I)
+              IINT = IGEO(47,IPROP)
+              THICKT  = STACK%GEO(1,ISUBSTACK)
+              IF(IINT == 1) THEN
+                   THKLY    = STACK%GEO(I3,ISUBSTACK)*THICKT
+                   LAYPOS   = STACK%GEO(I4,ISUBSTACK)
+                   IPID_LY = STACK%IGEO(I1,ISUBSTACK)
+                   MATLY   = STACK%IGEO(I2,ISUBSTACK)
+                   DO IT=1,NPTT
+                      IPT = IPT_ALL + IT                                                                    
+                      THK_IT(IT) = THKLY/NPTT  ! uniform distribution of NPTT through layer
+                      RATIO_THKLY(IPT) = THK_IT(IT)/THK(I)              
+                      IF (IPT  == 1)  THEN                                                                 
+                         POSLY(IPT) = ZSHIFT + HALF*RATIO_THKLY(IPT)  ! integr. point "IT" position ratio
+                       ELSE                                                                                 
+                         POSLY(IPT) = POSLY(IPT-1)           ! integr. point "IT" position ratio            
+     .                     + HALF*(RATIO_THKLY(IPT) + RATIO_THKLY(IPT-1))                            
+                       ENDIF ! IF (IPT == 1)
+                       POS_IT(IT) = POSLY(IPT)*THK(I) 
+                    ENDDO 
+              ELSEIF(IINT == 2) THEN
+                   THKLY    = STACK%GEO(I3,ISUBSTACK)*THICKT
+                   LAYPOS   = STACK%GEO(I4,ISUBSTACK)
+                   IPID_LY = STACK%IGEO(I1,ISUBSTACK)
+                   MATLY   = STACK%IGEO(I2,ISUBSTACK)
+                   DO IT=1,NPTT
+                      IPT = IPT_ALL + IT                                                 
+                      THK_IT(IT) = HALF*THKLY*W_GAUSS(IT,NPTT)  ! Gauss distribution of NPTT through layer
+                      RATIO_THKLY(IPT) = THK_IT(IT)/THK(I)
+                      IF (IPT  == 1 ) THEN                                                                 
+                         POSLY(IPT) = ZSHIFT + HALF*RATIO_THKLY(IPT) ! integr. point "IT" position ratio  
+                       ELSE                                                                                 
+                         POSLY(IPT) = POSLY(IPT-1)           ! integr. point "IT" position ratio            
+     .                     + HALF*(RATIO_THKLY(IPT) + RATIO_THKLY(IPT-1))                 
+                       ENDIF ! IF (IPT  == 1)  
+                       POS_IT(IT) = POSLY(IPT)*THK(I) 
+                    ENDDO 
+             ENDIF  ! iint
+             DO IT=1,NPTT
+                  EMS_NPTT = PM(89,MATLY)*THK_IT(IT)*AREA(I)*FOURTH
+                  EMS(I) = EMS(I) + EMS_NPTT
+                  MZI = MZI + EMS_NPTT * POS_IT(IT)/THK(I)
+             ENDDO 
+             IPT_ALL = IPT_ALL + NPTT
+            ENDDO ! NLAY
+            !!
+            MST = RHO(I)*THK(I)*AREA(I)*FOURTH
+            DMS = ABS(EMS(I)-MST)/MST
+            IF (DMS  > EM02) ERRM = 1
+            IF(IGTYP == 51 .AND. IGMAT < 0) THEN 
+             IF (DMS  > EM02) THEN
+                IDPROP = IGEO(1,IPROP)
+               CALL FRETITL2(TITR,
+     .                      IGEO(NPROPGI-LTITR+1,IPROP),LTITR)
+               CALL ANCMSG(MSGID=519,
+     .                    MSGTYPE=MSGWARNING,
+     .                    ANMODE=ANINFO_BLIND_2,
+     .                    I1=IDPROP,
+     .                    C1=TITR,I2=IX(NIXC,NFT+I),
+     .                    R1=EMS(I),R2=MST)
+             ENDIF
+            ENDIF 
+          ENDDO ! LFT,LLT
 C------
-        IF( JTHE > 0 ) THEN
-           DO I=LFT,LLT
-              EMSCP(I)=RHOCP(I)*THK(I)*AREA(I)*FOURTH  
-           ENDDO
-        ENDIF
+          IF( JTHE > 0 ) THEN
+             DO I=LFT,LLT
+                EMSCP(I)=RHOCP(I)*THK(I)*AREA(I)*FOURTH  
+             ENDDO
+          ENDIF
+        ELSE ! idrape > 0
+          DO I=LFT,LLT
+            EMS(I)=ZERO
+            MZI = ZERO
+            IPT_ALL = 0
+            IE = INDX(NFT+I)
+            IF(IE == 0) THEN
+             DO ILAY=1,NLAY   !  NPT  
+              NPTT = ELBUF_STR%BUFLY(ILAY)%NPTT
+              I1 = IPPID + ILAY
+              I2 = IPMAT + ILAY
+              I3 = IPTHK + ILAY
+              I4 = IPPOS + ILAY
+              IPID = STACK%IGEO(I1,ISUBSTACK)  ! or IPID = IX(NIXC-1,NFT+I)
+              IINT = IGEO(47,IPROP)
+              THICKT  = STACK%GEO(1,ISUBSTACK)
+              IF(IINT == 1) THEN
+                   THKLY   = STACK%GEO(I3,ISUBSTACK)*THICKT
+                   LAYPOS  = STACK%GEO(I4,ISUBSTACK)
+                   IPID_LY = STACK%IGEO(I1,ISUBSTACK)
+                   MATLY   = STACK%IGEO(I2,ISUBSTACK)
+                   DO IT=1,NPTT
+                      IPT = IPT_ALL + IT                                                                    
+                      THK_IT(IT) = THKLY/NPTT  ! uniform distribution of NPTT through layer
+                      RATIO_THKLY(IPT) = THK_IT(IT)/THK(I)              
+                      IF (IPT  == 1)  THEN                                                                 
+                         POSLY(IPT) = ZSHIFT + HALF*RATIO_THKLY(IPT)  ! integr. point "IT" position ratio
+                       ELSE                                                                                 
+                         POSLY(IPT) = POSLY(IPT-1)           ! integr. point "IT" position ratio            
+     .                     + HALF*(RATIO_THKLY(IPT) + RATIO_THKLY(IPT-1))                            
+                       ENDIF ! IF (IPT == 1)
+                       POS_IT(IT) = POSLY(IPT)*THK(I)                                                      
+                    ENDDO 
+              ELSEIF(IINT == 2) THEN
+                   THKLY   = STACK%GEO(I3,ISUBSTACK)*THICKT
+                   LAYPOS   = STACK%GEO(I4,ISUBSTACK)
+                   IPID_LY = STACK%IGEO(I1,ISUBSTACK)
+                   MATLY   = STACK%IGEO(I2,ISUBSTACK)
+                   DO IT=1,NPTT
+                      IPT = IPT_ALL + IT                                                 
+                      THK_IT(IT) = HALF*THKLY*W_GAUSS(IT,NPTT)  ! Gauss distribution of NPTT through layer
+                      RATIO_THKLY(IPT) = THK_IT(IT)/THK(I)
+                      IF (IPT  == 1 ) THEN                                                                 
+                         POSLY(IPT) = ZSHIFT + HALF*RATIO_THKLY(IPT) ! integr. point "IT" position ratio  
+                       ELSE                                                                                 
+                         POSLY(IPT) = POSLY(IPT-1)           ! integr. point "IT" position ratio            
+     .                     + HALF*(RATIO_THKLY(IPT) + RATIO_THKLY(IPT-1))                 
+                       ENDIF ! IF (IPT  == 1)  
+                       POS_IT(IT) = POSLY(IPT)*THK(I) 
+                    ENDDO 
+             ENDIF  ! iint
+             DO IT=1,NPTT
+                  EMS_NPTT = PM(89,MATLY)*THK_IT(IT)*AREA(I)*FOURTH
+                  EMS(I) = EMS(I) + EMS_NPTT
+                  MZI = MZI + EMS_NPTT * POS_IT(IT)/THK(I)
+             ENDDO 
+             IPT_ALL = IPT_ALL + NPTT
+            ENDDO ! NLAY
+         ELSE ! IE
+            DO ILAY=1,NLAY   !  NPT
+              IP = DRAPE(IE)%INDX_PLY(ILAY)
+              NPTT = ELBUF_STR%BUFLY(ILAY)%NPTT ! = NSLICE
+              IF(IP > 0 ) THEN                             
+                DRAPE_PLY => DRAPE(IE)%DRAPE_PLY(IP)
+                NSLICE = DRAPE_PLY%NSLICE 
+                I1 = IPPID + ILAY
+                I2 = IPMAT + ILAY
+                I3 = IPTHK + ILAY
+                I4 = IPPOS + ILAY
+                IPID = STACK%IGEO(I1,ISUBSTACK)  ! or IPID = IX(NIXC-1,NFT+I)
+                IINT = IGEO(47,IPROP)
+                THICKT  = STACK%GEO(1,ISUBSTACK)
+                IF(IINT == 1) THEN
+                     THKLY   = STACK%GEO(I3 ,ISUBSTACK)*THICKT ! initial
+                     IPID_LY = STACK%IGEO(I1,ISUBSTACK)
+                     MATLY   = STACK%IGEO(I2,ISUBSTACK) 
+                     DO IT=1,NPTT
+                       IPT = IPT_ALL + IT
+                       THINNING = DRAPE_PLY%RDRAPE(IT,1)
+                       THK_IT(IT)   = THKLY*THINNING/NPTT
+                       RATIO_THKLY(IPT) = THK_IT(IT)/THK(I)
+                       IF (IPT  == 1) THEN
+                         POSLY(IPT) = ZSHIFT + HALF*RATIO_THKLY(IPT)
+                       ELSE
+                         POSLY(IPT) = POSLY(IPT-1)            
+     .                     + HALF*(RATIO_THKLY(IPT)+RATIO_THKLY(IPT-1))
+                       ENDIF ! IF (IPT ==  1)
+                       POS_IT(IT)   = POSLY(IPT)*THK(I)
+                     ENDDO  ! nptt
+                ELSEIF(IINT == 2) THEN
+                     THKLY   = STACK%GEO(I3 ,ISUBSTACK)*THICKT ! initial
+                     IPID_LY = STACK%IGEO(I1,ISUBSTACK)
+                     MATLY   = STACK%IGEO(I2,ISUBSTACK) 
+                     DO IT=1,NPTT
+                       IPT = IPT_ALL + IT
+                       THINNING     = DRAPE_PLY%RDRAPE(IT,1)
+                       THK_IT(IT)   = HALF*THKLY*W_GAUSS(IT,NPTT)*THINNING
+                       RATIO_THKLY(IPT) = THK_IT(IT)/THK(I)
+                       IF (IPT == 1) THEN
+                         POSLY(IPT) = ZSHIFT + HALF*RATIO_THKLY(IPT)
+                       ELSE
+                         POSLY(IPT) = POSLY(IPT-1)            
+     .                     + HALF*(RATIO_THKLY(IPT)+RATIO_THKLY(IPT-1))
+                       ENDIF ! IF (IPT  == 1)
+                       POS_IT(IT)   = POSLY(IPT)*THK(I)
+                     ENDDO  ! nptt      
+                 ENDIF  ! iint
+                 
+                 DO IT=1,NPTT
+                    EMS_NPTT = PM(89,MATLY)*THK_IT(IT)*AREA(I)*FOURTH
+                    EMS(I) = EMS(I) + EMS_NPTT
+                    MZI = MZI + EMS_NPTT * POS_IT(IT)/THK(I)
+                 ENDDO  
+              ELSE ! Ip not draped
+                NPTT = ELBUF_STR%BUFLY(ILAY)%NPTT
+                I1 = IPPID + ILAY
+                I2 = IPMAT + ILAY
+                I3 = IPTHK + ILAY
+                I4 = IPPOS + ILAY
+                IPID = STACK%IGEO(I1,ISUBSTACK)  ! or IPID = IX(NIXC-1,NFT+I)
+                IINT = IGEO(47,IPROP)
+                THICKT  = STACK%GEO(1,ISUBSTACK)
+                IF(IINT == 1) THEN
+                     THKLY   = STACK%GEO(I3 ,ISUBSTACK)*THICKT ! initial
+                     IPID_LY = STACK%IGEO(I1,ISUBSTACK)
+                     MATLY   = STACK%IGEO(I2,ISUBSTACK) 
+                     DO IT=1,NPTT
+                       IPT = IPT_ALL + IT
+                       THK_IT(IT)   = THKLY/NPTT
+                       RATIO_THKLY(IPT) = THK_IT(IT)/THK(I)
+                       IF (IPT  == 1) THEN
+                         POSLY(IPT) = ZSHIFT + HALF*RATIO_THKLY(IPT)
+                       ELSE
+                         POSLY(IPT) = POSLY(IPT-1)            
+     .                     + HALF*(RATIO_THKLY(IPT)+RATIO_THKLY(IPT-1))
+                       ENDIF ! IF (IPT ==  1)
+                       POS_IT(IT)   = POSLY(IPT)*THK(I)
+                     ENDDO  ! nptt
+                ELSEIF(IINT == 2) THEN
+                     THKLY   = STACK%GEO(I3 ,ISUBSTACK)*THICKT ! initial
+                     IPID_LY = STACK%IGEO(I1,ISUBSTACK)
+                     MATLY   = STACK%IGEO(I2,ISUBSTACK) 
+                     DO IT=1,NPTT
+                       IPT = IPT_ALL + IT
+                       THK_IT(IT)   = HALF*THKLY*W_GAUSS(IT,NPTT)
+                       RATIO_THKLY(IPT) = THK_IT(IT)/THK(I)
+                       IF (IPT == 1) THEN
+                         POSLY(IPT) = ZSHIFT + HALF*RATIO_THKLY(IPT)
+                       ELSE
+                         POSLY(IPT) = POSLY(IPT-1)            
+     .                     + HALF*(RATIO_THKLY(IPT)+RATIO_THKLY(IPT-1))
+                       ENDIF ! IF (IPT  == 1)
+                       POS_IT(IT)   = POSLY(IPT)*THK(I)
+                     ENDDO  ! nptt      
+                 ENDIF  ! iint
+                 DO IT=1,NPTT
+                    EMS_NPTT = PM(89,MATLY)*THK_IT(IT)*AREA(I)*FOURTH
+                    EMS(I) = EMS(I) + EMS_NPTT
+                    MZI = MZI + EMS_NPTT * POS_IT(IT)/THK(I)
+                    
+                 ENDDO
+              ENDIF     ! IP
+              IPT_ALL = IPT_ALL + NPTT
+            ENDDO ! NLAY
+          ENDIF ! IE 
+       
+          MST = RHO(I)*THK(I)*AREA(I)*FOURTH                  
+          DMS = ABS(EMS(I)-MST)/MST                           
+          IF (DMS  > EM02) ERRM = 1                           
+          IF(IGTYP == 51 .AND. IGMAT < 0) THEN                
+           IF (DMS  > EM02) THEN                              
+              IDPROP = IGEO(1,IPROP)                          
+             CALL FRETITL2(TITR,                              
+     .                    IGEO(NPROPGI-LTITR+1,IPROP),LTITR)  
+             CALL ANCMSG(MSGID=519,                           
+     .                  MSGTYPE=MSGWARNING,                   
+     .                  ANMODE=ANINFO_BLIND_2,                
+     .                  I1=IDPROP,                            
+     .                  C1=TITR,I2=IX(NIXC,NFT+I),            
+     .                  R1=EMS(I),R2=MST)                     
+           ENDIF                                              
+          ENDIF                                               
+C                              
+        ENDDO                                                          
+C------
+         IF( JTHE > 0 ) THEN                           
+            DO I=LFT,LLT                               
+               EMSCP(I)=RHOCP(I)*THK(I)*AREA(I)*FOURTH   
+            ENDDO                                      
+         ENDIF                                         
+        ENDIF ! idrape  
 c--------------------------------------------
       ELSE  ! IGTYP
 c--------------------------------------------
@@ -643,7 +887,6 @@ C
                   ZPLY(IP) = ZI_LAYERC(II,IP) 
                 ENDIF  
 cc                ZJ = ZI_LAYERC(II,IP)
-C to check
                  ZJ = THICKT*STACK%GEO(I4 ,ISUBSTACK)
                  MSZ2C(II) = MSZ2C(II)  +  EMS_LAYER(I,J)*ZJ*ZJ
              ENDDO 
@@ -687,11 +930,11 @@ C----------------------------------------------
             I3=IPPOS+N
             THICKT= GEO(200,IPROP)
             THKLY = GEO(I1,IPROP)*THICKT
-            POSLY = GEO(I3,IPROP)*THICKT
+            LAYPOS = GEO(I3,IPROP)*THICKT
             I2=IPMAT+N
             MATLY = IGEO(I2,IPROP)
             MSL   = PM(89,MATLY)*THKLY*AREA(I)*FOURTH
-            XIL   = MSL*(AREA(I)/FAC+THKLY*THKLY*ONE_OVER_12+POSLY*POSLY)
+            XIL   = MSL*(AREA(I)/FAC+THKLY*THKLY*ONE_OVER_12+LAYPOS*LAYPOS)
             XI(I) = XI(I) + XIL
           ENDDO
         ENDDO
@@ -703,133 +946,333 @@ C----------------------------------------------
         IPPOS  =  IPTHK + NPT
         NTHK   =  IPPOS + NPT          
 C         
-        DO I=LFT,LLT
-          XI(I)=ZERO
-          DO N=1,NPT
-            I1 = IPPID + N
-            I2 = IPMAT + N
-            I3 = IPTHK + N
-            I4 = IPPOS + N
-            IF (NDRAPE == 0) THEN
-              THICKT= STACK%GEO(1,ISUBSTACK)
-              THKLY = STACK%GEO(I3 ,ISUBSTACK )*THICKT
-              POSLY = STACK%GEO(I4,ISUBSTACK)*THICKT
-              MATLY = STACK%IGEO(I2 ,ISUBSTACK)
-            ELSE
-              IF (DRAPE(I+NFT)%IDRAPE(N) == 0) THEN
-                THICKT= STACK%GEO(1,ISUBSTACK)
-                THKLY = STACK%GEO(I3 ,ISUBSTACK )*THICKT
-                MATLY = STACK%IGEO(I2 ,ISUBSTACK)
-                RATIO_THKLY(N,I) = THKLY/THK(I)
-                IF (N == 1) THEN
-                  LAYPOS(N,I) = -HALF + HALF*RATIO_THKLY(N,I)
-                ELSE
-                  LAYPOS(N,I) = LAYPOS(N-1,I)            
-     .              + HALF*(RATIO_THKLY(N,I)+RATIO_THKLY(N-1,I))
-                ENDIF ! IF (N == 1)
-                POSLY = LAYPOS(N,I)*THK(I)
-              ELSEIF (DRAPE(I+NFT)%IDRAPE(N) > 0) THEN
-                THINNING = DRAPE(I+NFT)%RDRAPE(N,1)
-                THICKT= STACK%GEO(1,ISUBSTACK)
-                THKLY  = STACK%GEO(I3 ,ISUBSTACK)*THICKT ! initial
-                THKLY  = THKLY*THINNING
-                MATLY  = STACK%IGEO(I2,ISUBSTACK)
-                RATIO_THKLY(N,I) = THKLY/THK(I)
-                IF (N == 1) THEN
-                  LAYPOS(N,I) = -HALF + HALF*RATIO_THKLY(N,I)
-                ELSE
-                  LAYPOS(N,I) = LAYPOS(N-1,I)            
-     .              + HALF*(RATIO_THKLY(N,I)+RATIO_THKLY(N-1,I))
-                ENDIF ! IF (N == 1)
-                POSLY = LAYPOS(N,I)*THK(I)
-              ENDIF ! IF (IDRAPE(N,I) == 0)
-            ENDIF ! IF (NDRAPE == 0) THEN
-            MSL   = PM(89,MATLY)*THKLY*AREA(I)*FOURTH
-            XIL   = MSL*(AREA(I)/FAC+THKLY*THKLY*ONE_OVER_12+POSLY*POSLY)
-            XI(I) = XI(I) + XIL
-          ENDDO  
-        ENDDO        
+        IF(IDRAPE == 0) THEN
+           DO I=LFT,LLT
+             XI(I)=ZERO
+             DO N=1,NPT
+               I1 = IPPID + N
+               I2 = IPMAT + N
+               I3 = IPTHK + N
+               I4 = IPPOS + N
+               THICKT= STACK%GEO(1,ISUBSTACK)
+               THKLY = STACK%GEO(I3 ,ISUBSTACK )*THICKT
+               LAYPOS = STACK%GEO(I4,ISUBSTACK)*THICKT
+               MATLY = STACK%IGEO(I2 ,ISUBSTACK)
+               MSL   = PM(89,MATLY)*THKLY*AREA(I)*FOURTH
+               XIL   = MSL*(AREA(I)/FAC+THKLY*THKLY*ONE_OVER_12+LAYPOS*LAYPOS)
+               XI(I) = XI(I) + XIL
+             ENDDO  
+           ENDDO   
+         ELSE ! IDRAPE > 0
+           DO I=LFT,LLT
+             XI(I)=ZERO
+             IE = INDX(NFT + I) 
+             IF(IE == 0) THEN
+               DO N=1,NPT
+                 I1 = IPPID + N
+                 I2 = IPMAT + N
+                 I3 = IPTHK + N
+                 I4 = IPPOS + N
+                 THICKT= STACK%GEO(1,ISUBSTACK)
+                 THKLY = STACK%GEO(I3 ,ISUBSTACK )*THICKT
+                 LAYPOS = STACK%GEO(I4,ISUBSTACK)*THICKT
+                 MATLY = STACK%IGEO(I2 ,ISUBSTACK)
+                 MSL   = PM(89,MATLY)*THKLY*AREA(I)*FOURTH
+                 XIL   = MSL*(AREA(I)/FAC+THKLY*THKLY*ONE_OVER_12+LAYPOS*LAYPOS)
+                 XI(I) = XI(I) + XIL
+               ENDDO  
+             ELSE
+               DO N=1,NPT                           
+                 IP = DRAPE(IE)%INDX_PLY(N) 
+                 IF(IP > 0) THEN                            
+                   DRAPE_PLY => DRAPE(IE)%DRAPE_PLY(IP)
+                   I1 = IPPID + N
+                   I2 = IPMAT + N
+                   I3 = IPTHK + N
+                   I4 = IPPOS + N
+                   THINNING = DRAPE_PLY%RDRAPE(1,1)                      
+                   THICKT= STACK%GEO(1,ISUBSTACK)                        
+                   THKLY  = STACK%GEO(I3 ,ISUBSTACK)*THICKT ! initial    
+                   THKLY  = THKLY*THINNING                               
+                   MATLY  = STACK%IGEO(I2,ISUBSTACK)                     
+                   RATIO_THKLY(N) = THKLY/THK(I)                         
+                   IF (N == 1) THEN                                      
+                     POSLY(N) = -HALF + HALF*RATIO_THKLY(N)              
+                   ELSE                                                  
+                    POSLY(N) = POSLY(N-1)                               
+     .                 + HALF*(RATIO_THKLY(N)+RATIO_THKLY(N-1))          
+                   ENDIF ! IF (N == 1)                                   
+                   LAYPOS = POSLY(N)*THK(I)                              
+                   MSL   = PM(89,MATLY)*THKLY*AREA(I)*FOURTH
+                   XIL   = MSL*(AREA(I)/FAC+THKLY*THKLY*ONE_OVER_12+LAYPOS*LAYPOS)
+                   XI(I) = XI(I) + XIL
+                 ELSE !IP ==0
+                   I1 = IPPID + N
+                   I2 = IPMAT + N
+                   I3 = IPTHK + N
+                   I4 = IPPOS + N                    
+                   THICKT= STACK%GEO(1,ISUBSTACK)                        
+                   THKLY  = STACK%GEO(I3 ,ISUBSTACK)*THICKT ! initial  
+                   MATLY  = STACK%IGEO(I2,ISUBSTACK)                     
+                   RATIO_THKLY(N) = THKLY/THK(I)                         
+                   IF (N == 1) THEN                                      
+                     POSLY(N) = -HALF + HALF*RATIO_THKLY(N)              
+                   ELSE                                                  
+                    POSLY(N) = POSLY(N-1)                               
+     .                 + HALF*(RATIO_THKLY(N)+RATIO_THKLY(N-1))          
+                   ENDIF ! IF (N == 1)                                   
+                   LAYPOS = POSLY(N)*THK(I)                              
+                   MSL   = PM(89,MATLY)*THKLY*AREA(I)*FOURTH
+                   XIL   = MSL*(AREA(I)/FAC+THKLY*THKLY*ONE_OVER_12+LAYPOS*LAYPOS)
+                   XI(I) = XI(I) + XIL         
+                 ENDIF  
+               ENDDO  
+             ENDIF  
+           ENDDO 
+         ENDIF       
       ELSEIF (IGTYP == 51 .OR. IGTYP == 52) THEN
         IPANG  =  1
         IPPID  =  2
         IPMAT  =  IPPID + NLAY   !  NPT
         IPTHK  =  IPANG + NLAY   !  NPT
         IPPOS  =  IPTHK + NLAY   !  NPT
-        NTHK   =  IPPOS + NLAY   !  NPT         
-C         
-        DO I=LFT,LLT
-          XI(I)=ZERO
-          DO ILAY=1, NLAY   !  NPT
-            NPTT = ELBUF_STR%BUFLY(ILAY)%NPTT
-            I1 = IPPID + ILAY
-            I2 = IPMAT + ILAY
-            I3 = IPTHK + ILAY
-            I4 = IPPOS + ILAY
-            IPID_LY = STACK%IGEO(I1,ISUBSTACK)
-            MATLY   = STACK%IGEO(I2,ISUBSTACK)
-            IF (NDRAPE == 0) THEN
-              THICKT  = STACK%GEO(1,ISUBSTACK)
-              THKLY   = STACK%GEO(I3,ISUBSTACK)*THICKT
-              POSLY   = STACK%GEO(I4 ,ISUBSTACK)*THICKT
-            ELSE
-               
-              IF (DRAPE(I+NFT)%IDRAPE(ILAY) == 0) THEN
-                THICKT  = STACK%GEO(1,ISUBSTACK)
-                THKLY   = STACK%GEO(I3,ISUBSTACK)*THICKT
-                RATIO_THKLY(ILAY,I) = THKLY/THK(I)
-                IF (ILAY == 1) THEN
-                  LAYPOS(ILAY,I) = -HALF + HALF*RATIO_THKLY(ILAY,I)
-                ELSE
-                  LAYPOS(ILAY,I) = LAYPOS(ILAY-1,I)            
-     .              + HALF*(RATIO_THKLY(ILAY,I) + RATIO_THKLY(ILAY-1,I))
-                ENDIF ! IF (N == 1)
-                POSLY = LAYPOS(ILAY,I)*THK(I)
-              ELSEIF (DRAPE(I+NFT)%IDRAPE(ILAY) > 0) THEN
-                THINNING = DRAPE(I+NFT)%RDRAPE(ILAY,1)
-                THICKT = STACK%GEO(1,ISUBSTACK)
-                THKLY  = STACK%GEO(I3 ,ISUBSTACK)*THICKT ! initial
-                THKLY  = THKLY*THINNING ! reset layer thk by /DRAPE
-                RATIO_THKLY(ILAY,I) = THKLY/THK(I)
-                IF (ILAY == 1) THEN
-                  LAYPOS(ILAY,I) = -HALF + HALF*RATIO_THKLY(ILAY,I)
-                ELSE
-                  LAYPOS(ILAY,I) = LAYPOS(ILAY-1,I)            
-     .              + HALF*(RATIO_THKLY(ILAY,I)+RATIO_THKLY(ILAY-1,I))
-                ENDIF ! IF (N == 1)
-                POSLY = LAYPOS(ILAY,I)*THK(I)
-              ENDIF ! IF (IDRAPE(N,I) == 0)
-            ENDIF ! IF (NDRAPE == 0) THEN
-cc            IINT = IGEO(47,IPID_LY)
-            IPID = STACK%IGEO(IPPID,ISUBSTACK)  ! or IPID = IX(NIXC-1,NFT+I)
-            IINT = IGEO(47,IPID)
-            IF (IINT == 1) THEN !  uniform distribution - by default
-C----
-              DO IT=1,NPTT
-                THK_IT(IT) = THKLY/NPTT  ! equally distribution of NPTT through layer
-              ENDDO 
+        NTHK   =  IPPOS + NLAY   !  NPT 
+        IPOS = IGEO(99,IPROP)                   
+        THICKT  = STACK%GEO(1,ISUBSTACK)
+        ZSHIFT = GEO(199,IPROP)
+        IF(IPOS == 0 )THEN                           
+          ZSHIFT = - HALF                             
+        ELSEIF(IPOS == 2 )THEN                        
+          ZSHIFT =  -  ZSHIFT /MAX(THICKT,EM20)       
+        ELSEIF(IPOS == 3) THEN                        
+          ZSHIFT = -ONE                               
+        ELSEIF(IPOS == 4) THEN                        
+          ZSHIFT = ZERO                               
+        ENDIF          
+C       
+        IF(IDRAPE == 0) THEN  
+           DO I=LFT,LLT
+             XI(I)=ZERO
+             IPT_ALL = 0
+             DO ILAY=1, NLAY   !  NPT                                                                              
+               NPTT = ELBUF_STR%BUFLY(ILAY)%NPTT                                                                   
+               I1 = IPPID + ILAY                                                                                   
+               I2 = IPMAT + ILAY                                                                                   
+               I3 = IPTHK + ILAY                                                                                   
+               I4 = IPPOS + ILAY                                                                                   
+               IPID_LY = STACK%IGEO(I1,ISUBSTACK)                                                                  
+               MATLY   = STACK%IGEO(I2,ISUBSTACK)                                                                  
+               IINT = IGEO(47,IPROP)                                                                               
+               IF(IINT == 1) THEN                                                                                  
+                   THICKT  = STACK%GEO(1,ISUBSTACK)                                                                
+                   THKLY   = STACK%GEO(I3,ISUBSTACK)*THICKT                                                        
+                   LAYPOS   = STACK%GEO(I4 ,ISUBSTACK)*THICKT                                                      
+                   DO IT=1,NPTT                                                                                    
+                     IPT = IPT_ALL + IT                                                                            
+                     THK_IT(IT) = THKLY/NPTT  ! uniform distribution of NPTT through layer                         
+                     RATIO_THKLY(IPT) = THK_IT(IT)/THK(I)                                                          
+                     IF (IPT  == 1 ) THEN                                                                          
+                        POSLY(IPT) = ZSHIFT + HALF*RATIO_THKLY(IPT) ! integr. point "IT" position ratio            
+                     ELSE                                                                                          
+                        POSLY(IPT) = POSLY(IPT-1)           ! integr. point "IT" position ratio                    
+     .                    + HALF*(RATIO_THKLY(IPT) + RATIO_THKLY(IPT-1))                                           
+                     ENDIF ! IF (IPT == 1)                                                                         
+                     POS_IT(IT) = POSLY(IPT)*THK(I)                                                                
+                  ENDDO                                                                                            
+               ELSEIF(IINT == 2) THEN                                                                              
+                  THICKT  = STACK%GEO(1,ISUBSTACK)                                                                 
+                  THKLY   = STACK%GEO(I3,ISUBSTACK)*THICKT                                                         
+                  LAYPOS   = STACK%GEO(I4 ,ISUBSTACK)*THICKT                                                       
+                  DO IT=1,NPTT                                                                                     
+                     IPT = IPT_ALL + IT                                                                            
+                     THK_IT(IT)   =  HALF*THKLY*W_GAUSS(IT,NPTT)                                                   
+                     RATIO_THKLY(IPT) = THK_IT(IT)/THK(I)                                                          
+                     IF (IPT == 1) THEN                                                                            
+                       POSLY(IPT) = ZSHIFT + HALF*RATIO_THKLY(IPT)                                                 
+                     ELSE                                                                                          
+                       POSLY(IPT) = POSLY(IPT-1)                                                                   
+     .                   + HALF*(RATIO_THKLY(IPT)+RATIO_THKLY(IPT-1))                                              
+                     ENDIF ! IF (IPT 1)                                                                            
+                     POS_IT(IT)   = POSLY(IPT)*THK(I)                                                              
+                  ENDDO  ! nptt                                                                                    
+               ENDIF    ! iint                                                                                     
 C
-              POS_0 = POSLY - HALF*THKLY
-              IF (NLAY == 1) POS_0 = - HALF*THKLY !! special case
-              POS_IT(1) = POS_0 + HALF*THK_IT(1)
-cc              POS_IT(1) = POSLY - HALF*THKLY + HALF*THK_IT(1)
-              DO IT=2,NPTT
-                POS_IT(IT) = POS_IT(IT-1) + HALF*(THK_IT(IT) + THK_IT(IT-1))
-              ENDDO
-            ELSEIF (IINT == 2) THEN !  Gauss distribution
-              DO IT=1,NPTT
-                THK_IT(IT) = HALF*THKLY*W_GAUSS(IT,NPTT)
-                POS_IT(IT) = POSLY + HALF*THKLY*A_GAUSS(IT,NPTT)
-              ENDDO
-            ENDIF
+               DO IT=1,NPTT                                                                                        
+                 MS_NPTT = PM(89,MATLY)*THK_IT(IT)*AREA(I)*FOURTH                                                  
+                 XIL = MS_NPTT*(AREA(I)/FAC+THK_IT(IT)*THK_IT(IT)*ONE_OVER_12+                                     
+     .                          POS_IT(IT)*POS_IT(IT))                                                             
+                 XI(I) = XI(I) + XIL                                                                               
+               ENDDO                                                                                               
+               IPT_ALL = IPT_ALL + NPTT                                                                            
+              ENDDO  ! NLAY                                                                                      
+            ENDDO      ! LFT,LLT
 C
-            DO IT=1,NPTT
-              MS_NPTT = PM(89,MATLY)*THK_IT(IT)*AREA(I)*FOURTH
-              XIL = MS_NPTT*(AREA(I)/FAC+THK_IT(IT)*THK_IT(IT)*ONE_OVER_12+
-     .                       POS_IT(IT)*POS_IT(IT))
-              XI(I) = XI(I) + XIL
-            ENDDO
-           ENDDO  
-         ENDDO
+          ELSE ! IDRAPE > 0
+           DO I=LFT,LLT
+             XI(I)=ZERO
+             IPT_ALL = 0
+             IE = INDX(NFT + I)
+             IF(IE == 0) THEN
+               DO ILAY=1, NLAY   !  NPT
+                 NPTT = ELBUF_STR%BUFLY(ILAY)%NPTT
+                 I1 = IPPID + ILAY
+                 I2 = IPMAT + ILAY
+                 I3 = IPTHK + ILAY
+                 I4 = IPPOS + ILAY
+                 IPID_LY = STACK%IGEO(I1,ISUBSTACK)
+                 MATLY   = STACK%IGEO(I2,ISUBSTACK)
+                 IINT = IGEO(47,IPROP)
+                 IF(IINT == 1) THEN                                             
+                     THICKT  = STACK%GEO(1,ISUBSTACK)                                                          
+                     THKLY   = STACK%GEO(I3,ISUBSTACK)*THICKT                                                  
+                     LAYPOS   = STACK%GEO(I4 ,ISUBSTACK)*THICKT                                                 
+                     DO IT=1,NPTT                                                                              
+                       IPT = IPT_ALL + IT                                                                      
+                       THK_IT(IT) = THKLY/NPTT  ! uniform distribution of NPTT through layer
+                       RATIO_THKLY(IPT) = THK_IT(IT)/THK(I)                
+                       IF (IPT  == 1 ) THEN                                                                   
+                          POSLY(IPT) = ZSHIFT + HALF*RATIO_THKLY(IPT) ! integr. point "IT" position ratio     
+                       ELSE                                                                                    
+                          POSLY(IPT) = POSLY(IPT-1)           ! integr. point "IT" position ratio             
+     .                      + HALF*(RATIO_THKLY(IPT) + RATIO_THKLY(IPT-1))                                    
+                       ENDIF ! IF (IPT == 1) 
+                       POS_IT(IT) = POSLY(IPT)*THK(I)  
+                    ENDDO                                                          
+                 ELSEIF(IINT == 2) THEN
+                    THICKT  = STACK%GEO(1,ISUBSTACK)                         
+                    THKLY   = STACK%GEO(I3,ISUBSTACK)*THICKT                 
+                    LAYPOS   = STACK%GEO(I4 ,ISUBSTACK)*THICKT               
+                    DO IT=1,NPTT                                                                                   
+                       IPT = IPT_ALL + IT                                    
+                       THK_IT(IT)   =  HALF*THKLY*W_GAUSS(IT,NPTT)           
+                       RATIO_THKLY(IPT) = THK_IT(IT)/THK(I)                                                  
+                       IF (IPT == 1) THEN                                                                     
+                         POSLY(IPT) = ZSHIFT + HALF*RATIO_THKLY(IPT)                                      
+                       ELSE                                                                                    
+                         POSLY(IPT) = POSLY(IPT-1)                                                       
+     .                     + HALF*(RATIO_THKLY(IPT)+RATIO_THKLY(IPT-1))                                    
+                       ENDIF ! IF (IPT 1)                                                                  
+                       POS_IT(IT)   = POSLY(IPT)*THK(I)                                                         
+                    ENDDO  ! nptt                                             
+                 ENDIF    ! iint 
+C
+                 DO IT=1,NPTT
+                   MS_NPTT = PM(89,MATLY)*THK_IT(IT)*AREA(I)*FOURTH
+                   XIL = MS_NPTT*(AREA(I)/FAC+THK_IT(IT)*THK_IT(IT)*ONE_OVER_12+
+     .                            POS_IT(IT)*POS_IT(IT))
+                   XI(I) = XI(I) + XIL 
+                 ENDDO
+                 IPT_ALL = IPT_ALL + NPTT
+                ENDDO  ! NLAY
+              ELSE ! IE
+                DO ILAY=1, NLAY   !  NPT
+                  NPTT = ELBUF_STR%BUFLY(ILAY)%NPTT
+                  IP = DRAPE(IE)%INDX_PLY(ILAY)
+                  IF(IP > 0) THEN
+                    DRAPE_PLY => DRAPE(IE)%DRAPE_PLY(IP)
+                    NSLICE = DRAPE_PLY%NSLICE  ! NPTT
+                    I1 = IPPID + ILAY
+                    I2 = IPMAT + ILAY
+                    I3 = IPTHK + ILAY
+                    I4 = IPPOS + ILAY
+                    IPID_LY = STACK%IGEO(I1,ISUBSTACK)
+                    MATLY   = STACK%IGEO(I2,ISUBSTACK)
+                    IINT = IGEO(47,IPROP)
+                    IF(IINT == 1) THEN                                                                
+                       THICKT = STACK%GEO(1,ISUBSTACK)                                                            
+                       THKLY   = STACK%GEO(I3 ,ISUBSTACK)*THICKT ! initial                                        
+                       IPID_LY = STACK%IGEO(I1,ISUBSTACK)                                                         
+                       MATLY   = STACK%IGEO(I2,ISUBSTACK)                                                         
+                       DO IT=1,NPTT                                                                               
+                         IPT = IPT_ALL + IT                                                                       
+                         THINNING = DRAPE_PLY%RDRAPE(IT,1)                                       
+                         THK_IT(IT)   = THKLY*THINNING/NPTT                                                            
+                         RATIO_THKLY(IPT) = THK_IT(IT)/THK(I)                                                   
+                         IF (IPT == 1) THEN                                                                      
+                           POSLY(IPT) = ZSHIFT + HALF*RATIO_THKLY(IPT)                                          
+                         ELSE                                                                                     
+                           POSLY(IPT) = POSLY(IPT-1)                                                        
+     .                              + HALF*(RATIO_THKLY(IPT)+RATIO_THKLY(IPT-1))               
+                         ENDIF ! IF (IPT == 1)                                                                   
+                         POS_IT(IT)   = POSLY(IPT)*THK(I)
+                       ENDDO  ! nptt                                                                             
+                    ELSEIF(IINT == 2) THEN
+                       THICKT = STACK%GEO(1,ISUBSTACK)                              
+                       THKLY  = STACK%GEO(I3 ,ISUBSTACK)*THICKT ! initial           
+                       DO IT=1,NPTT                                                                                  
+                         IPT = IPT_ALL + IT                                                                    
+                         THINNING = DRAPE_PLY%RDRAPE(IT,1)                                     
+                         THK_IT(IT)   =  HALF*THKLY*W_GAUSS(IT,NPTT)*THINNING      
+                         RATIO_THKLY(IPT) = THK_IT(IT)/THK(I)                                                 
+                         IF (IPT == 1) THEN                                                                    
+                           POSLY(IPT) = ZSHIFT + HALF*RATIO_THKLY(IPT)                                     
+                         ELSE                                                                                   
+                           POSLY(IPT) = POSLY(IPT-1)                                                      
+     .                                + HALF*(RATIO_THKLY(IPT)+RATIO_THKLY(IPT-1))                                   
+                         ENDIF ! IF (IPT 1)                                                                 
+                         POS_IT(IT)   = POSLY(IPT)*THK(I)
+                        ENDDO  ! nptt                                               
+                    ENDIF    ! iint 
+                    DO IT=1,NPTT
+                      MS_NPTT = PM(89,MATLY)*THK_IT(IT)*AREA(I)*FOURTH
+                      XIL = MS_NPTT*(AREA(I)/FAC+THK_IT(IT)*THK_IT(IT)*ONE_OVER_12+
+     .                                POS_IT(IT)*POS_IT(IT))
+                      XI(I) = XI(I) + XIL
+                    ENDDO
+                  ELSE ! IP == 0
+                    NPTT = ELBUF_STR%BUFLY(ILAY)%NPTT
+                    I1 = IPPID + ILAY
+                    I2 = IPMAT + ILAY
+                    I3 = IPTHK + ILAY
+                    I4 = IPPOS + ILAY
+                    IPID_LY = STACK%IGEO(I1,ISUBSTACK)
+                    MATLY   = STACK%IGEO(I2,ISUBSTACK)
+                    IINT = IGEO(47,IPROP) 
+                    IF(IINT == 1) THEN                                                                              
+                       THICKT = STACK%GEO(1,ISUBSTACK)                                                            
+                       THKLY   = STACK%GEO(I3 ,ISUBSTACK)*THICKT ! initial                                        
+                       IPID_LY = STACK%IGEO(I1,ISUBSTACK)                                                         
+                       MATLY   = STACK%IGEO(I2,ISUBSTACK)                                                         
+                       DO IT=1,NPTT                                                                               
+                         IPT = IPT_ALL + IT                    
+                         THK_IT(IT)   = THKLY/NPTT                                                            
+                         RATIO_THKLY(IPT) = THK_IT(IT)/THK(I)                                                   
+                         IF (IPT == 1) THEN                                                                      
+                           POSLY(IPT) = ZSHIFT + HALF*RATIO_THKLY(IPT)                                          
+                         ELSE                                                                                     
+                           POSLY(IPT) = POSLY(IPT-1)                                                        
+     .                              + HALF*(RATIO_THKLY(IPT)+RATIO_THKLY(IPT-1))               
+                         ENDIF ! IF (IPT == 1)                                                                   
+                         POS_IT(IT)   = POSLY(IPT)*THK(I)
+                       ENDDO  ! nptt                                                                             
+                    ELSEIF(IINT == 2) THEN
+                       THICKT = STACK%GEO(1,ISUBSTACK)                              
+                       THKLY  = STACK%GEO(I3 ,ISUBSTACK)*THICKT ! initial           
+                       DO IT=1,NPTT                                                                                  
+                         IPT = IPT_ALL + IT          
+                         THK_IT(IT)   =  HALF*THKLY*W_GAUSS(IT,NPTT)     
+                         RATIO_THKLY(IPT) = THK_IT(IT)/THK(I)                                                 
+                         IF (IPT == 1) THEN                                                                    
+                           POSLY(IPT) = ZSHIFT + HALF*RATIO_THKLY(IPT)                                     
+                         ELSE                                                                                   
+                           POSLY(IPT) = POSLY(IPT-1)                                                      
+     .                                + HALF*(RATIO_THKLY(IPT)+RATIO_THKLY(IPT-1))                                   
+                         ENDIF ! IF (IPT 1)                                                                 
+                         POS_IT(IT)   = POSLY(IPT)*THK(I)                                                        
+                        ENDDO  ! nptt                                               
+                    ENDIF    ! iint 
+                    DO IT=1,NPTT
+                      MS_NPTT = PM(89,MATLY)*THK_IT(IT)*AREA(I)*FOURTH
+                      XIL = MS_NPTT*(AREA(I)/FAC+THK_IT(IT)*THK_IT(IT)*ONE_OVER_12+
+     .                                POS_IT(IT)*POS_IT(IT))
+                      XI(I) = XI(I) + XIL
+                    ENDDO                    
+                    ENDIF ! IP
+                    IPT_ALL = IPT_ALL + NPTT   
+                   ENDDO  ! NLAY
+              ENDIF ! IE 
+            ENDDO      ! LFT,LLT
+          ENDIF  ! idrape  
       ELSE
         DO I=LFT,LLT
           XI(I)=EMS(I)*(AREA(I)/FAC+THK(I)*THK(I)*ONE_OVER_12)
@@ -942,6 +1385,7 @@ C-----------------------
           I4 = IX4(I)
           IP = IPART(I)
 C
+
           PARTSAV(1,IP)=PARTSAV(1,IP) + FOUR*EMS(I)
           PARTSAV(2,IP)=PARTSAV(2,IP) + EMS(I)*
      .         (X(1,I1)+X(1,I2)+X(1,I3)+X(1,I4))
@@ -1322,6 +1766,7 @@ C----------------------------------------------
           ENDIF
          ENDIF
       ENDIF ! igmat      
+      DEALLOCATE(POSLY,RATIO_THKLY,THK_IT,POS_IT ) 
 C-----------
       RETURN
       END

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -29,18 +29,18 @@ Chd|        ARRET                         source/system/arret.F
 Chd|====================================================================
       SUBROUTINE FREDEC3(LINE,KEY)
 C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
+      USE NAMES_AND_TITLES_MOD, ONLY: NCHARLINE100
+C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "units_c.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "nchara_c.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      CHARACTER*ncharline LINE,KEY
+      CHARACTER(LEN=NCHARLINE100)::LINE,KEY
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -49,20 +49,20 @@ C-----------------------------------------------
       I=2
       DO WHILE(LINE(I:I)/='/')
         I=I+1
-        IF(I>ncharline) GOTO 900
+        IF(I>NCHARLINE100) GOTO 900
       ENDDO
       I=I+1
       DO WHILE(LINE(I:I)/='/')
         I=I+1
-        IF(I>ncharline) GOTO 900
+        IF(I>NCHARLINE100) GOTO 900
       ENDDO
       I=I+1
-      IF(I>ncharline) GOTO 900
+      IF(I>NCHARLINE100) GOTO 900
       J1=I
       DO WHILE(LINE(I:I)/='/')
         I=I+1
-        IF(I>ncharline) THEN
-          J2=ncharline
+        IF(I>NCHARLINE100) THEN
+          J2=NCHARLINE100
           GOTO 10
         END IF
       ENDDO

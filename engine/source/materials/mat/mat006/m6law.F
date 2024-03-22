@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,30 +26,31 @@ Chd|-- called by -----------
 Chd|        MMAIN                         source/materials/mat_share/mmain.F
 Chd|-- calls ---------------
 Chd|====================================================================
-      SUBROUTINE M6LAW(PM   ,OFF  ,SIG  ,EINT ,RHO  ,RK   ,
-     2                 RE   ,VORTI,VNEW ,RHO0 ,VIS  ,PSH  ,
-     3                 D1   ,D2   ,D3   ,D4   ,D5   ,D6   ,
-     4                 C1   ,C2   ,C3   ,C4   ,C5   ,C6   , 
-     5                 PC   ,AMU  ,AMU2 ,ESPE ,SSP  ,DF   ,
-     6                 TMU  ,MAT  ,WXX  ,WYY  ,WZZ  ,NEL  ,
-     7                 DPDM)
+      SUBROUTINE M6LAW(
+     1   PM,      OFF,     SIG,     EINT,
+     2   RHO,     RK,      RE,      VORTI,
+     3   VNEW,    RHO0,    VIS,     PSH,
+     4   D1,      D2,      D3,      D4,
+     5   D5,      D6,      C1,      C2,
+     6   C3,      C4,      C5,      C6,
+     7   PC,      AMU,     AMU2,    ESPE,
+     8   SSP,     DF,      TMU,     MAT,
+     9   WXX,     WYY,     WZZ,     NEL,
+     A   DPDM,    JTUR,    JPOR)
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com08_c.inc"
-#include      "vect01_c.inc"
 #include      "param_c.inc"
 #include      "scr14_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: JTUR
+      INTEGER, INTENT(IN) :: JPOR
       INTEGER MAT(*),NEL
       my_real
      .   PM(NPROPM,*), OFF(*), SIG(NEL,6), EINT(*), RHO(*), RK(*), RE(*),
@@ -75,16 +76,16 @@ C-----------------------------------------------
       IF((ANIM_E(10)==1 .OR. ANIM_SE(10)==1).AND. DT1/=ZERO)THEN
          FAC=FOUR/DT1
         IF(N2D==0)THEN
-          DO 5 I=LFT,LLT
+          DO 5 I=1,NEL
  5        VORTI(I)=FAC*SQRT(WXX(I)**2+WYY(I)**2+WZZ(I)**2)
         ELSE
-          DO 6 I=LFT,LLT
+          DO 6 I=1,NEL
  6        VORTI(I)=FAC*WZZ(I)
         ENDIF
       ENDIF
 
       !EOS COEFFICIENTS
-      MX     =MAT(LFT)
+      MX     =MAT(1)
       RHO0_1=PM( 1,MX)
       PC_1  =PM(37,MX)
       C1_1  =PM(104,MX)-PM(88,MX)
@@ -95,7 +96,7 @@ C-----------------------------------------------
       C6_1  =PM(36,MX)
       TMU_1 =PM(81,MX)
       PSH_1=PM(88,MX)
-      DO 10 I=LFT,LLT
+      DO 10 I=1,NEL
       RHO0(I)=RHO0_1
       VIS(I) =PM(24,MX)*RHO(I)
       PC(I)  =PC_1
@@ -112,23 +113,23 @@ C-----------------------------------------------
       !IF TURBULENT
       IF(JTUR/=0)THEN
         IF(JPOR/=2)THEN
-          DO I=LFT,LLT
+          DO I=1,NEL
             TMU(I)=TMU(I)*RK(I)*RK(I) / MAX(EM15,(RE(I)*VNEW(I)))
             VIS(I)=VIS(I)+TMU(I)
           ENDDO
         ELSE
-          DO I=LFT,LLT
+          DO I=1,NEL
             TMU(I)=ZERO
           ENDDO
         ENDIF
       ELSE
-        DO I=LFT,LLT
+        DO I=1,NEL
           RK(I)=ZERO
         ENDDO
       ENDIF
 
       !OUTPUT
-      DO I=LFT,LLT
+      DO I=1,NEL
        VIS2 = TWO*VIS(I)
        DAV  = -(D1(I)+D2(I)+D3(I))*THIRD
        !------------------------------!

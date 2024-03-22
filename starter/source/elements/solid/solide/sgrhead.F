@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -29,6 +29,7 @@ Chd|        ANCMSG                        source/output/message/message.F
 Chd|        MY_ORDERS                     ../common_source/tools/sort/my_orders.c
 Chd|        CLUSTER_MOD                   share/modules1/cluster_mod.F  
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
+Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        R2R_MOD                       share/modules1/r2r_mod.F      
 Chd|        REORDER_MOD                   share/modules1/reorder_mod.F  
@@ -39,7 +40,7 @@ Chd|====================================================================
      3       ND         ,IGRSURF       ,IGRBRIC   ,ISOLNOD ,
      4       CEP        ,XEP           ,IXS10     ,IXS20   ,IXS16  ,
      5       IGEO       ,IPM           ,NOD2ELS   ,ISOLOFF ,
-     6       TAGPRT_SMS ,SPH2SOL       ,SOL2SPH   ,
+     6       TAGPRT_SMS ,SPH2SOL       ,SOL2SPH   ,MAT_PARAM,
      7       SOL2SPH_TYP,IFLAG_BPRELOAD,CLUSTERS  ,RNOISE)
 C-----------------------------------------------
 C            A R G U M E N T S
@@ -63,33 +64,23 @@ C     ISOLOFF(NUMELS)      FLAG ELEM RBY ON/OFF                      E/S
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE MY_ALLOC_MOD
       USE MESSAGE_MOD
       USE R2R_MOD
       USE REORDER_MOD
       USE GROUPDEF_MOD
       USE CLUSTER_MOD
+      USE MATPARAM_DEF_MOD
 C-----------------------------------------------
 C   I M P L I C I T   T Y P E S
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
-C   G L O B A L   P A R A M E T E R S
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C O M M O N   B L O C K S
 C-----------------------------------------------
 #include      "vect01_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com10_c.inc"
-#include      "units_c.inc"
 #include      "param_c.inc"
-#include      "warn_c.inc"
-#include      "scr03_c.inc"
 #include      "scr05_c.inc"
 #include      "scr21_c.inc"
 #include      "sms_c.inc"
@@ -97,7 +88,6 @@ C-----------------------------------------------
 #include      "r2r_c.inc"
 #include      "sphcom.inc"
 #include      "boltpr_c.inc"
-#include      "my_allocate.inc"
 C-----------------------------------------------
 C   D U M M Y   A R G U M E N T S
 C-----------------------------------------------
@@ -116,6 +106,7 @@ C-----------------------------------------------
       TYPE (GROUP_)  , DIMENSION(NGRBRIC) :: IGRBRIC
       TYPE (SURF_)   , DIMENSION(NSURF)   :: IGRSURF
       TYPE (CLUSTER_) ,DIMENSION(NCLUSTER) :: CLUSTERS
+      TYPE(MATPARAM_STRUCT_) , TARGET, DIMENSION(NUMMAT),INTENT(IN) :: MAT_PARAM
 C-----------------------------------------------
 C   L O C A L   V A R I A B L E S
 C-----------------------------------------------
@@ -142,7 +133,7 @@ C-----------------------------------------------
 
 C   TRI GLOBAL SUR TOUS LES CRITERES POUR TOUS LES ELEMENTS
   
-      MY_ALLOCATE(INDEX2,NUMELS) 
+      CALL MY_ALLOC(INDEX2,NUMELS) 
 C
       IF (NPERTURB > 0) THEN
         ALLOCATE(XNUM_RNOISE(NPERTURB,NUMELS),STAT=stat)
@@ -202,7 +193,7 @@ C
           IF (MLN==6.AND.JPOR/=2) MLN=17
           IF (MLN==46) MLN=47
           MID = IABS(MID)
-        ENDIF	
+        ENDIF
         IF (MLN == 36 .or. MLN == 47) THEN
           NUVAR = IPM(8,MID)
         ELSE
@@ -215,8 +206,8 @@ C
         ICSTR = 0
         IREP = 0
         ISTRAIN = 0        
-        NFAIL0    = IPM(220 , MID)
-        NLOC_FAIL = IPM(253 , MID)
+        NFAIL0    = MAT_PARAM(MID)%NFAIL
+        NLOC_FAIL = MAT_PARAM(MID)%NLOC
         IEOS = 0
         IVISC0 = 0
         NLAY  = 1
@@ -239,10 +230,10 @@ C
             NLAY = IGEO(30,PID)                 
             DO IL=1,NLAY                        
               IMAT = IGEO(100+IL,PID)           
-              NFAIL0 = MAX(NFAIL0,IPM(220, IMAT))
-              IF (IPM(222,IMAT) > 0) IVISC0 = 1
+              NFAIL0 = MAX(NFAIL0,MAT_PARAM(IMAT)%NFAIL)
+              IF (MAT_PARAM(IMAT)%IVISC > 0) IVISC0 = 1
             ENDDO
-          ELSEIF (IPM(222,MID) > 0) THEN
+          ELSEIF (MAT_PARAM(MID)%IVISC > 0) THEN
             IVISC0 = 1
           ENDIF
 C IVISCO0 cannot put in the PID because is for MID (it can be used in IGEO)

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,30 +27,33 @@ Chd|        SFORC3                        source/elements/solid/solide/sforc3.F
 Chd|        SZFORC3                       source/elements/solid/solidez/szforc3.F
 Chd|-- calls ---------------
 Chd|====================================================================
-      SUBROUTINE FE_CLOSE(HH,RHO,VOLN,
-     .   VX1, VX2, VX3, VX4, VX5, VX6, VX7, VX8,
-     .   VY1, VY2, VY3, VY4, VY5, VY6, VY7, VY8,
-     .   VZ1, VZ2, VZ3, VZ4, VZ5, VZ6, VZ7, VZ8,
-     .   F11,F21,F31,F12,F22,F32,F13,F23,F33,F14,F24,F34,
-     .   F15,F25,F35,F16,F26,F36,F17,F27,F37,F18,F28,F38)
+      SUBROUTINE FE_CLOSE(
+     1   HH,      RHO,     VOLN,    VX1,
+     2   VX2,     VX3,     VX4,     VX5,
+     3   VX6,     VX7,     VX8,     VY1,
+     4   VY2,     VY3,     VY4,     VY5,
+     5   VY6,     VY7,     VY8,     VZ1,
+     6   VZ2,     VZ3,     VZ4,     VZ5,
+     7   VZ6,     VZ7,     VZ8,     F11,
+     8   F21,     F31,     F12,     F22,
+     9   F32,     F13,     F23,     F33,
+     A   F14,     F24,     F34,     F15,
+     B   F25,     F35,     F16,     F26,
+     C   F36,     F17,     F27,     F37,
+     D   F18,     F28,     F38,     NEL)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
-#include      "param_c.inc"
-#include      "vect01_c.inc"
 #include      "com08_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-C     REAL
+      INTEGER, INTENT(IN) :: NEL
       my_real
      .   F11(MVSIZ),F21(MVSIZ),F31(MVSIZ),
      .   F12(MVSIZ),F22(MVSIZ),F32(MVSIZ),
@@ -72,35 +75,35 @@ C-----------------------------------------------
      . FAC  
 C      
       IF(DT1==ZERO)RETURN
-      DO I=LFT,LLT
+      DO I=1,NEL
         FAC=-ONE_OVER_8*HH(I)*RHO(I)*VOLN(I)/DT1
- 	F11(I) = F11(I) + FAC*VX1(I)
- 	F12(I) = F12(I) + FAC*VX2(I)
- 	F13(I) = F13(I) + FAC*VX3(I)
- 	F14(I) = F14(I) + FAC*VX4(I)
- 	F15(I) = F15(I) + FAC*VX5(I)
- 	F16(I) = F16(I) + FAC*VX6(I)
- 	F17(I) = F17(I) + FAC*VX7(I)
- 	F18(I) = F18(I) + FAC*VX8(I)
+          F11(I) = F11(I) + FAC*VX1(I)
+          F12(I) = F12(I) + FAC*VX2(I)
+          F13(I) = F13(I) + FAC*VX3(I)
+          F14(I) = F14(I) + FAC*VX4(I)
+          F15(I) = F15(I) + FAC*VX5(I)
+          F16(I) = F16(I) + FAC*VX6(I)
+          F17(I) = F17(I) + FAC*VX7(I)
+          F18(I) = F18(I) + FAC*VX8(I)
 
- 	F21(I) = F21(I) + FAC*VY1(I)
- 	F22(I) = F22(I) + FAC*VY2(I)
- 	F23(I) = F23(I) + FAC*VY3(I)
- 	F24(I) = F24(I) + FAC*VY4(I)
- 	F25(I) = F25(I) + FAC*VY5(I)
- 	F26(I) = F26(I) + FAC*VY6(I)
- 	F27(I) = F27(I) + FAC*VY7(I)
- 	F28(I) = F28(I) + FAC*VY8(I)
+          F21(I) = F21(I) + FAC*VY1(I)
+          F22(I) = F22(I) + FAC*VY2(I)
+          F23(I) = F23(I) + FAC*VY3(I)
+          F24(I) = F24(I) + FAC*VY4(I)
+          F25(I) = F25(I) + FAC*VY5(I)
+          F26(I) = F26(I) + FAC*VY6(I)
+          F27(I) = F27(I) + FAC*VY7(I)
+          F28(I) = F28(I) + FAC*VY8(I)
 
- 	F31(I) = F31(I) + FAC*VZ1(I)
- 	F32(I) = F32(I) + FAC*VZ2(I)
- 	F33(I) = F33(I) + FAC*VZ3(I)
- 	F34(I) = F34(I) + FAC*VZ4(I)
- 	F35(I) = F35(I) + FAC*VZ5(I)
- 	F36(I) = F36(I) + FAC*VZ6(I)
- 	F37(I) = F37(I) + FAC*VZ7(I)
- 	F38(I) = F38(I) + FAC*VZ8(I)
+          F31(I) = F31(I) + FAC*VZ1(I)
+          F32(I) = F32(I) + FAC*VZ2(I)
+          F33(I) = F33(I) + FAC*VZ3(I)
+          F34(I) = F34(I) + FAC*VZ4(I)
+          F35(I) = F35(I) + FAC*VZ5(I)
+          F36(I) = F36(I) + FAC*VZ6(I)
+          F37(I) = F37(I) + FAC*VZ7(I)
+          F38(I) = F38(I) + FAC*VZ8(I)
       ENDDO
       RETURN
-      END		
-	
+      END
+

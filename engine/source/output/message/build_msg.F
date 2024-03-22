@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -32,23 +32,23 @@ Chd|        STOCK_MSG                     source/output/message/stock_msg.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
       SUBROUTINE BUILD_MSG()
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
       USE MESSAGE_MOD
+      USE NAMES_AND_TITLES_MOD, ONLY: NCHARLINE100
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "nchara_c.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      CHARACTER*ncharline BUFMSG(100)
+      CHARACTER(LEN=NCHARLINE100) BUFMSG(100)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      CHARACTER*ncharline LINE,KEY,KEYST
+      CHARACTER(LEN=NCHARLINE100) LINE,KEY,KEYST
       INTEGER I,J,ID,ITYPE,INDX,SBUFMSG,ISTYPE
 C predim
       SMESSAGES=1

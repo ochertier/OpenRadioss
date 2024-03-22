@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,7 +25,7 @@ Chd|  A4FLUX3                       source/ale/ale3d/a4flux3.F
 Chd|-- called by -----------
 Chd|        AFLUX0                        source/ale/aflux0.F           
 Chd|-- calls ---------------
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
 Chd|====================================================================
       SUBROUTINE A4FLUX3(PM,IXS,V,W,X,FLUX,FLU1,ALE_CONNECT)
 C-----------------------------------------------
@@ -90,7 +90,7 @@ C-----------------------------------------------
         NC2(I)=IXS(4,II)
         NC3(I)=IXS(7,II)
         NC4(I)=IXS(6,II)
-	!
+          !
         !---Coordinates of the 4 nodes
         X1(I)=X(1,NC1(I))
         Y1(I)=X(2,NC1(I))
@@ -107,13 +107,13 @@ C-----------------------------------------------
         X4(I)=X(1,NC4(I))
         Y4(I)=X(2,NC4(I))
         Z4(I)=X(3,NC4(I))
-	!
+          !
         !Relative velocity on the 4 nodes.
         !  [VD_node] = [V_node] - [W_node]
-	!  where
-	!    [V_node] : material velocity on node
-	!    [W_node] : grid velocity on node
-	!  
+          !  where
+          !    [V_node] : material velocity on node
+          !    [W_node] : grid velocity on node
+          !  
         VDX1(I)=V(1,NC1(I)) - W(1,NC1(I))
         VDY1(I)=V(2,NC1(I)) - W(2,NC1(I))
         VDZ1(I)=V(3,NC1(I)) - W(3,NC1(I))

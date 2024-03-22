@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,16 +27,16 @@ Chd|        LECTUR                        source/input/lectur.F
 Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
 Chd|        ARRET                         source/system/arret.F         
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        MAT_ELEM_MOD                  ../common_source/modules/mat_elem/mat_elem_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
       SUBROUTINE LECSTAT(IPART ,IPART_STATE,ELBUF_TAB,IPM,IPARG,
-     .                   IPARTS,IPARTC     ,IPARTG)
+     .                   IPARTS,IPARTC     ,IPARTG,MAT_PARAM)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
-      USE ELBUFDEF_MOD
+      USE MAT_ELEM_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -48,10 +48,8 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "param_c.inc"
 #include      "units_c.inc"
-#include      "scr05_c.inc"
 #include      "scr16_c.inc"
 #include      "scr17_c.inc"
-#include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -59,6 +57,7 @@ C-----------------------------------------------
       INTEGER,INTENT(INOUT) :: IPM(NPROPMI,NUMMAT),IPARG(NPARG,*)
 C     REAL
       TYPE (ELBUF_STRUCT_), DIMENSION(NGROUP), TARGET :: ELBUF_TAB
+      TYPE (MATPARAM_STRUCT_) ,DIMENSION(NUMMAT) ,INTENT(INOUT) :: MAT_PARAM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -84,7 +83,7 @@ C-----------------------------------------------
           ! for /INISHE/FAIL, fail_ID in /FAIL card is mandatory
           ! check if fail_ID is defined in failure model
           !-------------
-          IF ( IP > 0 .and. STAT_C(8) == 1) THEN
+          IF ( STAT_C(8) == 1) THEN
 !---
             DO NG=1,NGROUP
               ITY = IPARG(5,NG)
@@ -105,7 +104,7 @@ C-----------------------------------------------
                   IF (MAT_CHECKED(IMAT) == 0 ) THEN
                     MAT_CHECKED(IMAT) = 1
                     DO IFAIL = 1,NFAIL 
-                      FAIL_ID = IPM(236+IFAIL,IMAT)
+                      FAIL_ID = MAT_PARAM(IMAT)%FAIL(IFAIL)%FAIL_ID  
                       IF (FAIL_ID == 0)
      .                  CALL ANCMSG(MSGID=297,ANMODE=ANINFO,I1=MAT_ID)
                     ENDDO ! DO IFAIL

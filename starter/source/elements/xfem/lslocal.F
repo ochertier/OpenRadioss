@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -37,7 +37,7 @@ Chd|        PREINICRK3N                   source/elements/xfem/preinicrk3N.F
 Chd|        PREINICRK4N                   source/elements/xfem/preinicrk4N.F
 Chd|        XYZLOC3N                      source/elements/xfem/lslocal.F
 Chd|        XYZLOC4N                      source/elements/xfem/lslocal.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        XFEM2DEF_MOD                  ../common_source/modules/xfem2def_mod.F
 Chd|====================================================================
@@ -572,7 +572,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com_xfem1.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -620,10 +619,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c K s
-C-----------------------------------------------
-#include      "param_c.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IEL,IXC(NIXC,*),XNOD(2,2),EDGEC(4,*),FAC,IED
@@ -658,10 +653,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c K s
-C-----------------------------------------------
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -706,7 +697,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c K s
 C-----------------------------------------------
-#include      "param_c.inc"
 #include      "com_xfem1.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -765,7 +755,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c K s
 C-----------------------------------------------
-#include      "param_c.inc"
 #include      "com_xfem1.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s

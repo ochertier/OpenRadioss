@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -28,7 +28,7 @@ Chd|-- calls ---------------
 Chd|====================================================================
       SUBROUTINE BUILD_CNEL(
      2   IXS        ,IXQ        ,IXC        ,IXT      ,IXP      ,
-     3   IXR        ,IXTG       ,IXUR       ,IXS10    ,IXS20    ,
+     3   IXR        ,IXTG       ,IXS10      ,IXS20    ,
      4   IXS16      ,IXTG1      ,IGEO       ,KNOD2ELS ,KNOD2ELC ,
      5   KNOD2ELTG  ,NOD2ELS    ,NOD2ELC    ,NOD2ELTG ,CNEL     ,
      6   ADDCNEL    ,KXX        ,IXX        ,X        ,LELX     ,
@@ -39,22 +39,16 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "scr17_c.inc"
 #include      "scr23_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "rnur_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IXS(NIXS,*),IXQ(NIXQ,*),IXC(NIXC,*),IXTG(NIXTG,*),
-     .        IXT(NIXT,*),IXP(NIXP,*),IXR(NIXR,*), IXUR(NIXUR,*),
+     .        IXT(NIXT,*),IXP(NIXP,*),IXR(NIXR,*),
      .        IXS10(6,*),IXS20(12,*),IXS16(8,*),IXTG1(4,*),
      .        IGEO(NPROPGI,*),KNOD2ELS(*),KNOD2ELC(*),KNOD2ELTG(*),
      .        NOD2ELS(*),NOD2ELC(*),NOD2ELTG(*),ADDCNEL(*),CNEL(*),
@@ -184,13 +178,6 @@ C
       END DO
       KNOD2ELQ(1)=0
 C-----------------------------------------------
-C      DO K=2,5
-C        DO I=1,NUMELQ
-C          N = IXQ(K,I)
-C          ADDCNEL(N) = ADDCNEL(N) + 1
-C        END DO
-C      END DO
-C
       DO K=2,3
         DO I=1,NUMELT
           N = IXT(K,I)
@@ -231,13 +218,6 @@ c traitement a part du 3eme noeud optionnel sauf type 12
 c      DO I=1,NUMELR
 c        N = IXR(4,I)
 c        IF(IGEO(11,IXR(1,I))==12)  ADDCNEL(N) = ADDCNEL(N) + 1
-c      END DO
-
-c      DO K=2,5
-c        DO I=1,NUMELUR
-c          N = IXUR(K,I) + 1
-c          ADDCNEL(N) = ADDCNEL(N) + 1
-c        END DO
 c      END DO
 C
 C-----------------------------------------------
@@ -326,14 +306,6 @@ C
         KNOD2ELTG(N+1)=KNOD2ELTG(N)
       END DO
       KNOD2ELTG(1)=0
-C
-C      DO K=2,5
-C        DO I=1,NUMELQ
-C          N = IXQ(K,I)
-C          ADDCNEL(N) = ADDCNEL(N) + 1
-C          CNEL(ADDCNEL(N)) = OFFSET_Q+I
-C        END DO
-C      END DO
 
       DO K=2,3
         DO I=1,NUMELT
@@ -371,35 +343,18 @@ C      END DO
         ADDCNEL(N+1)=ADDCNEL(N)
       END DO
       ADDCNEL(1)=0
-c traitement a part du 3eme noeud optionnel sauf type 12
-c      DO I=1,NUMELR
-c        N = IXR(4,I)
-c        IF(IGEO(11,IXR(1,I))==12)  THEN
-c          ADDCNEL(N) = ADDCNEL(N) + 1
-c          CNEL(ADDCNEL(N)) = OFFSET_R+I
-c        END IF
-c      END DO
-
-c      DO K=2,5
-c        DO I=1,NUMELUR
-c          N = IXUR(K,I) + 1
-c          ADDCNEL(N) = ADDCNEL(N) + 1
-c          CNEL(ADDCNEL(N)) = NUMELT+NUMELP+NUMELR+I
-c        END DO
-c      END DO
-C
 
 c fill LELX (use in I11STI3 and I20STI3E)
       IF(NUMELX /= 0)THEN
-	LELX(1:NUMELX) = ZERO
-	DO I=1,NUMELX
-	  DO J=KXX(4,I)+1,KXX(3,I)+KXX(4,I)-1
-	    LELX(I) = LELX(I) + 
+        LELX(1:NUMELX) = ZERO
+        DO I=1,NUMELX
+          DO J=KXX(4,I)+1,KXX(3,I)+KXX(4,I)-1
+            LELX(I) = LELX(I) + 
      .       SQRT((X(1,IXX(J))-X(1,IXX(J-1)))**2
-     .  	 +(X(2,IXX(J))-X(2,IXX(J-1)))**2
-     .  	 +(X(3,IXX(J))-X(3,IXX(J-1)))**2)
-	  ENDDO
-	ENDDO
+     .     +(X(2,IXX(J))-X(2,IXX(J-1)))**2
+     .     +(X(3,IXX(J))-X(3,IXX(J-1)))**2)
+         ENDDO
+       ENDDO
       ENDIF
 C
       DO I=1,NUMELIG3D
@@ -459,17 +414,11 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "scr17_c.inc"
-#include      "scr23_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "rnur_c.inc"
 #include      "spmd_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -522,8 +471,8 @@ C
 
         ALLOCATE(IRTLM_L(NRTM),STAT=IERROR)
         IF (IERROR /= 0) CALL ANCMSG(MSGID=268,ANMODE=ANINFO,
-     .                           MSGTYPE=MSGERROR,
-     .                           C1='Prepare data related to /INTER/TYPE25')
+     .     MSGTYPE=MSGERROR,
+     .     C1='Prepare data related to /INTER/TYPE25')
 
         NRTLM_L(1:NSPMD)=0
         DO K=1,NRTM
@@ -534,7 +483,7 @@ C
 
         DO N=1,NSN
 C
-C         IRTLM(3,-) <=> n� de segment local sur IRTLM(4,-)
+C         IRTLM(3,-) <=> n de segment local sur IRTLM(4,-)
           K = INTBUF_TAB(NIN)%IRTLM(4*(N-1)+3)
           IF(K /= 0)THEN
             INTBUF_TAB(NIN)%IRTLM(4*(N-1)+3)=IRTLM_L(K)
@@ -565,17 +514,10 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "scr17_c.inc"
-#include      "scr23_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "rnur_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

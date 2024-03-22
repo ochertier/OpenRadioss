@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -38,6 +38,7 @@ Chd|        HM_READ_INTER_TYPE24          source/interfaces/int24/hm_read_inter_
 Chd|        HM_READ_INTER_TYPE25          source/interfaces/int25/hm_read_inter_type25.F
 Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
+Chd|        ALE_MOD                       ../common_source/modules/ale/ale_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
       SUBROUTINE DEFINTER(KEY,IVAL,FLAG,IPRINT,
@@ -46,16 +47,15 @@ C-----------------------------------------------
 C   M o d u l e s
 C----------------------------------------------- 
       USE MESSAGE_MOD
-C============================================================================
+      USE ALE_MOD
+C----------------------------------------------- 
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "warn_c.inc"
-#include      "fluid_scr_c.inc"
-#include      "com01_c.inc"
-C-----------------------------------------------
+C----------------------------------------------- 
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
+#include      "com01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -82,6 +82,7 @@ C DEF_INTER:  INTEGER ARRAY CONTAINING DEFAULT INTEGER VALUES
 C=======================================================================
       INDEX = 0
       IS_DEFAUT_1000 = .TRUE.
+      DEF_DEF = 0
       IF(ITYP == 2) THEN
         SELECT CASE (KEY)
 C
@@ -91,7 +92,7 @@ C
 C
           CASE ('ILEV')
             INDEX = 2
-            IF(ICAA == 1) THEN
+            IF(ALE%GLOBAL%ICAA == 1) THEN
               DEF_DEF = 4
             ELSE
               DEF_DEF = 5

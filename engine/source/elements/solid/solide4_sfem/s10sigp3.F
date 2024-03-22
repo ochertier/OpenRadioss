@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -50,9 +50,10 @@ C-----------------------------------------------
       INTEGER I
 C     REAL
       my_real
-     .   S1,S2,S3,SIGY,DEFT,RFAC,BASE
+     .   S1,S2,S3,SIGY,DEFT,RFAC,BASE,FMAX
 C-----------------------------------------------
       RFAC = ONE/FIFTEEN
+      FMAX = ZEP995
       IF (G_PLA == 0) THEN
         FAC(1:NEL)=ZERO
       ELSE
@@ -68,6 +69,7 @@ C-----------------------------------------------
            DEFT = SQRT(SIGY)/E0(I)+DEFP(I)
            BASE = DEFP(I)/DEFT
            FAC(I) =EXP(RFAC*LOG(BASE))
+           FAC(I) =MIN(FMAX,FAC(I))
          ENDIF
         ENDDO
       ENDIF

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -50,9 +50,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
-#include      "units_c.inc"
-#include      "scr17_c.inc"
 #include      "com04_c.inc"
 #include      "r2r_c.inc"
 C-----------------------------------------------
@@ -85,7 +82,7 @@ C
         IF(NSUBDOM>0)THEN
           IF(TAGCYL(NY)==0)CALL HM_SZ_R2R(TAGCYL,NY,LSUBMODEL)
         END IF
-C----------------------------------------------------------------------	   
+C----------------------------------------------------------------------     
         CALL HM_OPTION_READ_KEY(LSUBMODEL)
 C
         CALL HM_GET_INTV('dependentnodeset',IGU,IS_AVAILABLE,LSUBMODEL)

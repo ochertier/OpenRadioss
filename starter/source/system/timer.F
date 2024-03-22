@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -36,7 +36,7 @@ c     3                           ddsplit
 c     4                           freeform
 c     5                           IPARI_L_INI
 c     6                           INTBUF_INI
-c     7				  SPLIT_INTERFACES
+c     7          SPLIT_INTERFACES
 c     8                           W_FI
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -60,9 +60,6 @@ C-----------------------------------------------
        REAL(kind=8) OMP_get_wtime
        external OMP_get_wtime
 #endif
-C-----------------------------------------------
-C   D u m m y   A r g u m e n t s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -141,15 +138,10 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr05_c.inc"
 #include      "timer_c.inc"
-C-----------------------------------------------
-C   D u m m y   A r g u m e n t s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

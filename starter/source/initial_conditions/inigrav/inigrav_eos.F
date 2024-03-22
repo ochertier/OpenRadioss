@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,22 +26,20 @@ Chd|-- called by -----------
 Chd|        INIGRAV_LOAD                  source/initial_conditions/inigrav/inigrav_load.F
 Chd|-- calls ---------------
 Chd|        EOSMAIN                       ../common_source/eos/eosmain.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
+Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
 Chd|====================================================================
       SUBROUTINE INIGRAV_EOS(NELG, NEL, NG, MATID, IPM, GRAV0, RHO0, DEPTH, PM, BUFMAT,
-     .                       ELBUF_TAB,PSURF,LIST,PRES,IMAT,MLW,NPF,TF)
+     .                       ELBUF_TAB,PSURF,LIST,PRES,IMAT,MLW,NPF,TF,NUMMAT,MAT_PARAM)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE ELBUFDEF_MOD
+      USE MATPARAM_DEF_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -51,6 +49,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN)    :: NUMMAT
       INTEGER, INTENT(IN)    :: NEL, NG, MATID, IPM(NPROPMI, *), LIST(NEL),NELG, IMAT, MLW
       my_real, INTENT(IN)    :: GRAV0, DEPTH(*), PM(NPROPM, *), BUFMAT(*),PSURF
       my_real, INTENT(INOUT) :: PRES(NEL)
@@ -58,6 +57,7 @@ C-----------------------------------------------
       my_real, INTENT(IN) :: RHO0     
       INTEGER,INTENT(IN)::NPF(SNPC)
       my_real,INTENT(IN)::TF(STF)       
+      TYPE(MATPARAM_STRUCT_) ,DIMENSION(NUMMAT), INTENT(IN) :: MAT_PARAM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -93,7 +93,8 @@ C IMAT : relevant for multifluid eos. imat=0 => monomaterial law
         NVAREOS = ELBUF_TAB(NG)%BUFLY(IMAT)%NVAR_EOS
       ENDIF
       
-      EOSTYPE          = IPM(4, MATID)
+      EOSTYPE          = MAT_PARAM(MATID)%IEOS   
+      EOSTYPE          = IPM(4, MATID)    ! still used temporarily in this section
       ITER             = 0
       MAX_ITER         = 30
       CONT             =.TRUE.

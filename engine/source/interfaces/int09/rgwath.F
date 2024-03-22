@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -29,7 +29,7 @@ Chd|        RGWAT2                        source/interfaces/int09/rgwat2.F
 Chd|        RGWAT3                        source/interfaces/int09/rgwat3.F
 Chd|        SPMD_EXCH_FR6                 source/mpi/kinematic_conditions/spmd_exch_fr6.F
 Chd|        SUM_6_FLOAT                   source/system/parit.F         
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE RGWATH(
      1               X      ,V      ,W        ,RWL     ,NSW     ,
@@ -51,10 +51,8 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com06_c.inc"
 #include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "scr05_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -105,7 +103,7 @@ C-----------------------
 C
       DO 10 N=1,NUMNOD
         NTAG(N) = 0
-        E(N)	= ZERO
+        E(N)  = ZERO
  10   CONTINUE
 C
 c      FXN = ZERO
@@ -212,7 +210,7 @@ C
         CALL SUM_6_FLOAT(1, NSN, F6, FRWL6(6,1), 6)
         
         IF(NSPMD > 1) THEN
-Cel si proc concerne par le rgwall
+C   si proc concerne par le rgwall
           IF(FR_WALL(ISPMD+1)/=0) THEN
             CALL SPMD_EXCH_FR6(FR_WALL,FRWL6,6*6)
           ENDIF
