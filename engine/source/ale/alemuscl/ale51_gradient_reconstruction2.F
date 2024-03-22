@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -32,9 +32,9 @@ Chd|        MY_BARRIER                    source/system/machine.F
 Chd|        SPMD_E1VOIS                   source/mpi/fluid/spmd_cfd.F   
 Chd|        SPMD_EXCHANGE_GRAD            source/mpi/fluid/spmd_exchange_grad.F
 Chd|        SPMD_EXCH_MIN_MAX             source/mpi/ale/spmd_exch_min_max.F
-Chd|        ALEMUSCL_MOD                  ../common_source/modules/alemuscl_mod.F
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ALEMUSCL_MOD                  ../common_source/modules/ale/alemuscl_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        INITBUF_MOD                   share/resol/initbuf.F         
 Chd|        SEGVAR_MOD                    share/modules/segvar_mod.F    
 Chd|        TRIMAT_MOD                    share/modules/trimat.F        
@@ -47,12 +47,11 @@ C   D e s c r i p t i o n
 C   Computes limited gradients for volumic fractions
 C   of LAW51 species
 C-----------------------------------------------
-C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE INITBUF_MOD
       USE ELBUFDEF_MOD 
-      USE ALEMUSCL_MOD
+      USE ALEMUSCL_MOD , only : ALEMUSCL_Buffer
       USE TRIMAT_MOD
       USE SEGVAR_MOD
       USE ALE_CONNECTIVITY_MOD
@@ -63,23 +62,17 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   G l o b a l  P a r a m e t e r s
 C-----------------------------------------------
-#include "mvsiz_p.inc"
 #include "mmale51_c.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include "scr01_c.inc"
-#include "scr05_c.inc"
 #include "scr07_c.inc"
 #include "spmd_c.inc"
 #include "com01_c.inc"
 #include "com04_c.inc"
-#include "com08_c.inc"
 #include "vect01_c.inc"
 #include "param_c.inc"
 #include "task_c.inc"
-#include "parit_c.inc"
-#include "alemuscl.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C----------------------------------------------- 
@@ -107,7 +100,7 @@ C-----------------------------------------------
       DO NG=ITASK+1,NGROUP,NTHREAD      
 C     ALE ON / OFF
          IF (IPARG(76, NG)  ==  1) CYCLE ! --> OFF
-         CALL INITBUF (IPARG    ,NG      ,                  
+         CALL INITBUF(IPARG    ,NG      ,                  
      2        MTN     ,LLT     ,NFT     ,IAD     ,ITY     ,   
      3        NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,   
      4        JTHE    ,JLAG    ,JMULT   ,JHBE    ,JIVF    ,   
@@ -122,15 +115,15 @@ C     ALE ON / OFF
             DO I=LFT,LLT 
                II     = I+NFT    
                !!! Element centroid
-               ELCENTER(II,2) = FOURTH * (X(2, IXQ(2, II)) + X(2, IXQ(3, II)) + X(2, IXQ(4, II)) + X(2, IXQ(5, II)))
-               ELCENTER(II,3) = FOURTH * (X(3, IXQ(2, II)) + X(3, IXQ(3, II)) + X(3, IXQ(4, II)) + X(3, IXQ(5, II)))
+               ALEMUSCL_Buffer%ELCENTER(II,2) = FOURTH * (X(2, IXQ(2, II)) + X(2, IXQ(3, II)) + X(2, IXQ(4, II)) + X(2, IXQ(5, II)))
+               ALEMUSCL_Buffer%ELCENTER(II,3) = FOURTH * (X(3, IXQ(2, II)) + X(3, IXQ(3, II)) + X(3, IXQ(4, II)) + X(3, IXQ(5, II)))
             ENDDO  
          ENDIF
       ENDDO  ! NG=ITASK+1,NGROUP,NTHREAD
       DO NG=ITASK+1,NGROUP,NTHREAD      
 C     ALE ON / OFF
          IF (IPARG(76, NG)  ==  1) CYCLE ! --> OFF
-         CALL INITBUF (IPARG    ,NG      ,                  
+         CALL INITBUF(IPARG    ,NG      ,                  
      2                 MTN     ,LLT     ,NFT     ,IAD     ,ITY     ,   
      3                 NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,   
      4                 JTHE    ,JLAG    ,JMULT   ,JHBE    ,JIVF    ,   
@@ -151,8 +144,8 @@ C     ALE ON / OFF
             !!!   Volume fraction
             DO I=LFT,LLT 
                II     = I+NFT    
-               VOLUME_FRACTION(II,ITRIMAT) = VOLP(I)/VOLG(I)
-               VOLUME_FRACTION(II,ITRIMAT) = MAX(ZERO,MIN(ONE,VOLUME_FRACTION(II,ITRIMAT))) 
+               ALEMUSCL_Buffer%VOLUME_FRACTION(II,ITRIMAT) = VOLP(I)/VOLG(I)
+               ALEMUSCL_Buffer%VOLUME_FRACTION(II,ITRIMAT) = MAX(ZERO,MIN(ONE,ALEMUSCL_Buffer%VOLUME_FRACTION(II,ITRIMAT))) 
             ENDDO  
          ENDDO  
       ENDDO  ! NG=ITASK+1,NGROUP,NTHREAD
@@ -164,13 +157,11 @@ C     ALE ON / OFF
 !$OMP SINGLE
          !!! Volumic fractions comm
          DO ITRIMAT = 1, TRIMAT
-            CALL SPMD_E1VOIS(VOLUME_FRACTION(1,ITRIMAT), NERCVOIS, NESDVOIS,
-     .           LERCVOIS, LESDVOIS, LENCOM)
+            CALL SPMD_E1VOIS(ALEMUSCL_Buffer%VOLUME_FRACTION(1,ITRIMAT), NERCVOIS, NESDVOIS,LERCVOIS, LESDVOIS, LENCOM)
          ENDDO
          !!! Centroid coordinates comm
          DO JJ = 1, 3
-            CALL SPMD_E1VOIS(ELCENTER(1,JJ), NERCVOIS, NESDVOIS,
-     .           LERCVOIS, LESDVOIS, LENCOM)
+            CALL SPMD_E1VOIS(ALEMUSCL_Buffer%ELCENTER(1,JJ), NERCVOIS, NESDVOIS,LERCVOIS, LESDVOIS, LENCOM)
          ENDDO
 !$OMP END SINGLE
       ENDIF
@@ -178,19 +169,19 @@ C     ALE ON / OFF
       
       FIRST = 1 + ITASK * NUMNOD / NTHREAD
       LAST = (1 + ITASK) * NUMNOD / NTHREAD
-      NODE_MAX_VALUE(FIRST:LAST,1:TRIMAT) = -EP30
-      NODE_MIN_VALUE(FIRST:LAST,1:TRIMAT) = EP30
+      ALEMUSCL_Buffer%NODE_MAX_VALUE(FIRST:LAST,1:TRIMAT) = -EP30
+      ALEMUSCL_Buffer%NODE_MIN_VALUE(FIRST:LAST,1:TRIMAT) = EP30
       DO ITRIMAT = 1, TRIMAT
         DO NODE_ID = FIRST,LAST
-            JMIN = pADDCNEL(NODE_ID)
-            JMAX = pADDTMPL(NODE_ID) - 1
+            JMIN = ALEMUSCL_Buffer%pADDCNEL(NODE_ID)
+            JMAX = ALEMUSCL_Buffer%pADDTMPL(NODE_ID) - 1
             DO JJ = JMIN, JMAX
-               ELEM_ID = pCNEL(JJ)
+               ELEM_ID = ALEMUSCL_Buffer%pCNEL(JJ)
                IF (ELEM_ID   /=  0 .AND. ELEM_ID  <=  NUMELQ) THEN
-                  NODE_MAX_VALUE(NODE_ID,ITRIMAT) = MAX(NODE_MAX_VALUE(NODE_ID,ITRIMAT), 
-     .                 VOLUME_FRACTION(ELEM_ID,ITRIMAT))
-                  NODE_MIN_VALUE(NODE_ID,ITRIMAT) = MIN(NODE_MIN_VALUE(NODE_ID,ITRIMAT), 
-     .                 VOLUME_FRACTION(ELEM_ID,ITRIMAT))
+                  ALEMUSCL_Buffer%NODE_MAX_VALUE(NODE_ID,ITRIMAT) = MAX(ALEMUSCL_Buffer%NODE_MAX_VALUE(NODE_ID,ITRIMAT), 
+     .                 ALEMUSCL_Buffer%VOLUME_FRACTION(ELEM_ID,ITRIMAT))
+                  ALEMUSCL_Buffer%NODE_MIN_VALUE(NODE_ID,ITRIMAT) = MIN(ALEMUSCL_Buffer%NODE_MIN_VALUE(NODE_ID,ITRIMAT), 
+     .                 ALEMUSCL_Buffer%VOLUME_FRACTION(ELEM_ID,ITRIMAT))
                ENDIF
             ENDDO
          ENDDO
@@ -200,7 +191,8 @@ C     ALE ON / OFF
       IF(NSPMD > 1)THEN
 !$OMP SINGLE
          DO ITRIMAT = 1, TRIMAT
-            CALL  SPMD_EXCH_MIN_MAX(IAD_ELEM ,FR_ELEM ,NODE_MIN_VALUE(1,ITRIMAT), NODE_MAX_VALUE(1,ITRIMAT) )
+            CALL  SPMD_EXCH_MIN_MAX(IAD_ELEM ,FR_ELEM ,
+     .                              ALEMUSCL_Buffer%NODE_MIN_VALUE(1,ITRIMAT), ALEMUSCL_Buffer%NODE_MAX_VALUE(1,ITRIMAT) )
          ENDDO
 !$OMP END SINGLE
       ENDIF
@@ -209,7 +201,7 @@ C     ALE ON / OFF
       DO NG=ITASK+1,NGROUP,NTHREAD  
 C     ALE ON / OFF
          IF (IPARG(76, NG)  ==  1) CYCLE ! --> OFF
-         CALL INITBUF (IPARG   ,NG      ,                  
+         CALL INITBUF(IPARG   ,NG      ,                  
      2                 MTN     ,LLT     ,NFT     ,IAD     ,ITY     ,   
      3                 NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,   
      4                 JTHE    ,JLAG    ,JMULT   ,JHBE    ,JIVF    ,   
@@ -232,8 +224,8 @@ C     ALE ON / OFF
 C     MPI exchange for gradients
 !$OMP SINGLE
          DO ITRIMAT = 1, TRIMAT
-            CALL SPMD_EXCHANGE_GRAD(3, NUMELS + NSVOIS + NUMELQ + NQVOIS,3,GRAD(1,1,ITRIMAT), 
-     .           NERCVOIS, NESDVOIS, LERCVOIS, LESDVOIS, LENCOM)
+            CALL SPMD_EXCHANGE_GRAD(3, NUMELS + NSVOIS + NUMELQ + NQVOIS,3,ALEMUSCL_Buffer%GRAD(1,1,ITRIMAT), 
+     .                              NERCVOIS, NESDVOIS, LERCVOIS, LESDVOIS, LENCOM)
          ENDDO
 !$OMP END SINGLE         
       ENDIF
@@ -242,7 +234,7 @@ C     MPI exchange for gradients
       DO NG=ITASK+1,NGROUP,NTHREAD  
 C     ALE ON / OFF
          IF (IPARG(76, NG)  ==  1) CYCLE ! --> OFF
-         CALL INITBUF (IPARG    ,NG      ,                  
+         CALL INITBUF(IPARG    ,NG      ,                  
      2        MTN     ,LLT     ,NFT     ,IAD     ,ITY     ,   
      3        NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,   
      4        JTHE    ,JLAG    ,JMULT   ,JHBE    ,JIVF    ,   

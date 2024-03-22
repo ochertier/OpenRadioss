@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -47,14 +47,10 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "scr17_c.inc"
-#include      "submod_c.inc"
 #include      "param_c.inc"
 #include      "sphcom.inc"
 #include      "tablen_c.inc"
@@ -430,7 +426,7 @@ C
         IMYZ   = MAX(IYY,IZZ)
         YOUNG  = HALF*(YOUNG1+YOUNG2)
         G      = HALF*(G1+G2)
-	ATMP   = YOUNG/MAX(EM20,G*AREA)
+          ATMP   = YOUNG/MAX(EM20,G*AREA)
 C--------------------------------------
 C       ELEMENT CHECK
 C--------------------------------------

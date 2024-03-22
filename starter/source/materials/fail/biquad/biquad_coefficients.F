@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -30,20 +30,18 @@ Chd|        HM_READ_FAIL_BIQUAD           source/materials/fail/biquad/hm_read_f
 Chd|-- calls ---------------
 Chd|====================================================================
       SUBROUTINE BIQUAD_COEFFICIENTS(
-     .           C1    ,C2    ,C3    ,C4    ,C5    ,PTHK  ,L     ,
+     .           C1    ,C2    ,C3    ,C4    ,C5    ,L     ,
      .           X_1   ,X_2   ,E1    ,E2    ,E3    ,E4    )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "scr17_c.inc"
-#include      "com04_c.inc"
 #include      "scr05_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER L
-      my_real  C1,C2,C3,C4,C5,PTHK
+      my_real  C1,C2,C3,C4,C5
       my_real  E1,E2,E3,E4
       my_real  X_1(2),X_2(3)
 C-----------------------------------------------

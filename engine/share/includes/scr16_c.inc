@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>    
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,14 +21,12 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
 C.../SCR16/
-C...recopie par defaut en spmd
       COMMON /SCR16R/ DTOUTP0,TOUTP0
       my_real
      .    DTOUTP0,TOUTP0
 C
       INTEGER MX_OUTP,MX_OUTP2
       PARAMETER (MX_OUTP = 140,MX_OUTP2 = 50000)
-C...recopie par defaut en spmd
       COMMON /SCR16/NV_OUTP,OUTP_V(MX_OUTP),NN_OUTP,OUTP_N(MX_OUTP),
      .        NSS_OUTP,OUTP_SS(MX_OUTP),NCS_OUTP,OUTP_CS(MX_OUTP),
      .        NTS_OUTP,OUTP_TS(MX_OUTP),NPS_OUTP,OUTP_PS(MX_OUTP),
@@ -37,8 +35,7 @@ C...recopie par defaut en spmd
      .        NTT_OUTP,OUTP_TT(MX_OUTP),NPT_OUTP,OUTP_PT(MX_OUTP),
      .        NRT_OUTP,OUTP_RT(MX_OUTP),IOUTP_FMT,OUTYY_FMT,
      .        NSPS_OUTP,OUTP_SPS(MX_OUTP),NSPT_OUTP,OUTP_SPT(MX_OUTP),
-     .        IROOTYY,IDROT,MOUTPT,MOUTP,NOUTPSENS,LOUTPSENS,
-     .        NOUTPSENS_OLD,LOUTPSENS_OLD
+     .        IROOTYY,IDROT,MOUTPT,MOUTP
       INTEGER NV_OUTP,OUTP_V,NN_OUTP,OUTP_N,
      .        NSS_OUTP,OUTP_SS,NCS_OUTP,OUTP_CS,
      .        NTS_OUTP,OUTP_TS,NPS_OUTP,OUTP_PS,
@@ -47,8 +44,7 @@ C...recopie par defaut en spmd
      .        NTT_OUTP,OUTP_TT,NPT_OUTP,OUTP_PT,
      .        NRT_OUTP,OUTP_RT,IOUTP_FMT,OUTYY_FMT,
      .        NSPS_OUTP,OUTP_SPS,NSPT_OUTP,OUTP_SPT, 
-     .        IROOTYY,IDROT,MOUTPT,MOUTP(MX_OUTP2),NOUTPSENS,
-     .        LOUTPSENS(MX_OUTP2),NOUTPSENS_OLD,LOUTPSENS_OLD(MX_OUTP2)
+     .        IROOTYY,IDROT,MOUTPT,MOUTP(MX_OUTP2)
 
 C.../SCR16_STATR/
       COMMON /SCR16_STATR/ DTSTAT0,TSTAT0,DTABF0(10),DTABFWR0(10)
@@ -62,34 +58,17 @@ C.../SCR16_STATI/
      .              STAT_NUMELC_G,STAT_NUMELTG_G,
      .              STAT_S(MX_STAT),STAT_NUMELS,STAT_NUMELQ,STAT_NUMELT,
      .              STAT_NUMELS_G,STAT_NUMELQ_G,STAT_NUMELT_G,
-     .              STAT_N(MX_STAT),MSTATT,MSTAT,NSTATSENS,LSTATSENS,
+     .              STAT_N(MX_STAT),MSTATT,MSTAT,
      .              STAT_NUMELR,STAT_NUMELR_G,STAT_R(MX_STAT),
      .              STAT_NUMELP,STAT_NUMELP_G,STAT_P(MX_STAT),
-     .              STAT_T(MX_STAT),NSTATALL,NSTATSENS_OLD,LSTATSENS_OLD,
+     .              STAT_T(MX_STAT),NSTATALL,
      .              STAT_INIMAP(MX_STAT3)
       INTEGER MX_STAT0,NSTATPRT,NC_STAT,STAT_C,
      .        STAT_NUMELC,STAT_NUMELTG,
      .        STAT_NUMELC_G,STAT_NUMELTG_G,
      .        STAT_S,STAT_NUMELS,STAT_NUMELQ,STAT_NUMELT,
      .        STAT_NUMELS_G,STAT_NUMELQ_G,STAT_NUMELT_G,
-     .        STAT_N,MSTATT,MSTAT(MX_STAT2),NSTATSENS,
-     .        LSTATSENS(MX_STAT2),STAT_NUMELR,STAT_NUMELR_G,STAT_R,
+     .        STAT_N,MSTATT,MSTAT(MX_STAT2),
+     .        STAT_NUMELR,STAT_NUMELR_G,STAT_R,
      .        STAT_NUMELP,STAT_NUMELP_G,STAT_P,STAT_T,NSTATALL,
-     .        NSTATSENS_OLD,LSTATSENS_OLD(MX_STAT2),
      .        STAT_INIMAP
-
-C.../SCR16_DYNAINR/
-      COMMON /SCR16_DYNAINR/ DTDYNAIN0,TDYNAIN0
-      my_real
-     .    DTDYNAIN0,TDYNAIN0
-      INTEGER MX_DYNAIN,MX_DYNAIN2
-      PARAMETER (MX_DYNAIN = 20,MX_DYNAIN2 = 50000)
-C.../SCR16_DYNAINI/
-      COMMON /SCR16_DYNAINI/MX_DYNAIN0,NDYNAINPRT,NC_DYNAIN,DYNAIN_C(MX_DYNAIN),
-     .              DYNAIN_NUMELC,DYNAIN_NUMELTG,
-     .              DYNAIN_NUMELC_G,DYNAIN_NUMELTG_G,
-     .              NDYNAINALL,MDYNAINTT,MDYNAINT,IDYNAINF,DYNAIN_CHECK
-      INTEGER MX_DYNAIN0,NDYNAINPRT,NC_DYNAIN,DYNAIN_C,
-     .        DYNAIN_NUMELC,DYNAIN_NUMELTG,
-     .        DYNAIN_NUMELC_G,DYNAIN_NUMELTG_G,
-     .        MDYNAINTT,MDYNAINT(MX_DYNAIN2),NDYNAINALL,IDYNAINF,DYNAIN_CHECK

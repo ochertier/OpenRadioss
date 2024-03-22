@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -42,9 +42,7 @@ Chd|====================================================================
       !=======================================================================
       !      Common
       !=======================================================================
-#include      "param_c.inc" 
 #include      "com01_c.inc"
-#include      "scr17_c.inc"
       !=======================================================================
       !      Dummy arguments
       !=======================================================================
@@ -500,13 +498,13 @@ c
         ! a plastic multiplier allowing to update internal variables to satisfy
         ! the consistency condition. 
         ! Its expression is : DLAMBDA = - (PHI + DPHI) / DPHI_DLAMBDA
-	      ! -> PHI  : current value of yield function (known)
+                ! -> PHI  : current value of yield function (known)
         ! -> DPHI : yield function prediction (to compute)
         ! -> DPHI_DLAMBDA : derivative of PHI with respect to DLAMBDA by taking
         !                   into account of internal variables kinetic : 
         !                   plasticity, temperature and damage (to compute)
 c        
-	      ! 1 - Computation of DPHI_DSIG the normal to the yield surface
+                ! 1 - Computation of DPHI_DSIG the normal to the yield surface
         !-------------------------------------------------------------  
 c
         ! DPHI_DSIG already computed above
@@ -528,7 +526,7 @@ c
      .            + NORMYY(I) * (ONE-D(I))*(A11*NORMYY(I) + A12*NORMXX(I))
      .            + NORMXY(I) * (ONE-D(I))* NORMXY(I) * G  
 c  
-        !   b) Derivatives with respect to plastic strain P 			
+        !   b) Derivatives with respect to plastic strain P 
         !   ------------------------------------------------
 c        
         !     i) Derivative of the yield stress with respect to plastic strain dYLD / dPLA

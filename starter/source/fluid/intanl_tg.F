@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -36,9 +36,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IEL, JEL
@@ -70,7 +67,7 @@ C SIMPLIFICATION SI SOURCE LOIN DE L'ELEMENT
 
       IF(D2>TWENTY5*LM2) THEN  
         RVLG=AREA/SQRT(D2)
-        RVLH=AREA*(NRX*(X0-XP)+NRY*(Y0-YP)+NRZ*(Z0-ZP))/(D2**THREE_HALF)	  
+        RVLH=AREA*(NRX*(X0-XP)+NRY*(Y0-YP)+NRZ*(Z0-ZP))/(D2**THREE_HALF)    
       ELSE
 C
 C COORDONNEES LOCALES
@@ -124,7 +121,7 @@ C
         S(2)=SQRT(L22)
         S(3)=SQRT(L32)
         R(4)=R(1)
-	  
+            
         DO I=1,3
           CS(I)=DKSI(I)/S(I)
           SN(I)=DETA(I)/S(I)

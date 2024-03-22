@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,7 +25,7 @@ Chd|  ALEFVM_EPSDOT                 source/ale/alefvm/alefvm_epsdot.F
 Chd|-- called by -----------
 Chd|        SFORC3                        source/elements/solid/solide/sforc3.F
 Chd|-- calls ---------------
-Chd|        ALEFVM_MOD                    ../common_source/modules/alefvm_mod.F
+Chd|        ALEFVM_MOD                    ../common_source/modules/ale/alefvm_mod.F
 Chd|====================================================================
       SUBROUTINE ALEFVM_EPSDOT (
      1                          IXS,  NV46, SIG,  QVIS, VOL,
@@ -59,15 +59,7 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "vect01_c.inc"
 #include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "com06_c.inc"
-#include      "com08_c.inc"
-#include      "nsvis_c.inc"
-#include      "fluid_scr_c.inc"
-#include      "inter22.inc"
 #include      "param_c.inc"
-#include      "alefvm.inc"
-#include      "task_c.inc"
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C----------------------------------------------- 
@@ -103,8 +95,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   P r e - C o n d i t i o n s
 C-----------------------------------------------      
-      IF(IALEFVM==0)RETURN
-      MT          = IXS(1,NFT+LFT)
+      IF(ALEFVM_Param%IEnabled==0)RETURN
+      MT          = IXS(1,NFT+1)
       IALEFVM_FLG = IPM(251,MT)
       IF(IALEFVM_FLG <= 1)RETURN
 C-----------------------------------------------
@@ -115,9 +107,9 @@ C-----------------------------------------------
       ! NORMAL VECTOR FOR ALE                                       !
       !-------------------------------------------------------------!                                       
       IF(JALE==1)THEN
-        DO I=LFT,LLT
+        DO I=1,NEL
           II     = I + NFT
-	  !---8 local node numbers NC1 TO NC8 for solid element I ---!
+            !---8 local node numbers NC1 TO NC8 for solid element I ---!
           NC1(I)=IXS(2,II)
           NC2(I)=IXS(3,II)
           NC3(I)=IXS(4,II)
@@ -126,7 +118,7 @@ C-----------------------------------------------
           NC6(I)=IXS(7,II)
           NC7(I)=IXS(8,II)
           NC8(I)=IXS(9,II)
-	  !
+            !
           !---Coordinates of the 8 nodes
           X1(I)=X(1,NC1(I))
           Y1(I)=X(2,NC1(I))
@@ -160,7 +152,7 @@ C-----------------------------------------------
           Y8(I)=X(2,NC8(I))
           Z8(I)=X(3,NC8(I))
         ENDDO    
-        DO I=LFT,LLT        
+        DO I=1,NEL        
           ! Face-1
           N1X(I)=(Y3(I)-Y1(I))*(Z2(I)-Z4(I)) - (Z3(I)-Z1(I))*(Y2(I)-Y4(I))
           N1Y(I)=(Z3(I)-Z1(I))*(X2(I)-X4(I)) - (X3(I)-X1(I))*(Z2(I)-Z4(I))
@@ -191,14 +183,14 @@ C-----------------------------------------------
       !-------------------------------------------------------------!
       ! TOTAL TENSOR                                                !
       !-------------------------------------------------------------! 
-      DO I=LFT,LLT   
+      DO I=1,NEL   
         II           = I + NFT
-        Vface(1:3,1) = F_FACE(1:3,1,II)
-        Vface(1:3,2) = F_FACE(1:3,2,II)
-        Vface(1:3,3) = F_FACE(1:3,3,II)
-        Vface(1:3,4) = F_FACE(1:3,4,II)                
-        Vface(1:3,5) = F_FACE(1:3,5,II)
-        Vface(1:3,6) = F_FACE(1:3,6,II)                
+        Vface(1:3,1) = ALEFVM_Buffer%F_FACE(1:3,1,II)
+        Vface(1:3,2) = ALEFVM_Buffer%F_FACE(1:3,2,II)
+        Vface(1:3,3) = ALEFVM_Buffer%F_FACE(1:3,3,II)
+        Vface(1:3,4) = ALEFVM_Buffer%F_FACE(1:3,4,II)                
+        Vface(1:3,5) = ALEFVM_Buffer%F_FACE(1:3,5,II)
+        Vface(1:3,6) = ALEFVM_Buffer%F_FACE(1:3,6,II)                
       ENDDO  
       
       !-------------------------------------------------------------!
@@ -211,7 +203,7 @@ C-----------------------------------------------
       
       ! WARNING : Tangentiel velocity is here missing since F_FACE is godunov normal velocity
       
-      DO I=LFT,LLT
+      DO I=1,NEL
         II=I+NFT
         GradV(1,1) =  HALF/VOL(I) * ( Vface(1,1)*N1X(I) + Vface(1,2)*N2X(I) + Vface(1,3)*N3X(I) 
      .                                + Vface(1,4)*N4X(I) + Vface(1,5)*N5X(I) + Vface(1,6)*N6X(I) )
@@ -254,19 +246,19 @@ C-----------------------------------------------
       
 
         !DEBUG-OUTPUT---------------!
-        if(IALEFVM_OUTP_EPSDOT /= 0)then
+        if(ALEFVM_Param%IOUTP_EPSDOT /= 0)then
           debug_outp = .FALSE.
-          if(IALEFVM_OUTP_EPSDOT>0)then
+          if(ALEFVM_Param%IOUTP_EPSDOT>0)then
             do i=lft,llt
               ii = nft + i
-              if(ixs(11,ii)==IALEFVM_OUTP_EPSDOT)THEN
+              if(ixs(11,ii)==ALEFVM_Param%IOUTP_EPSDOT)THEN
                 debug_outp = .TRUE.
                 idbf   = i
                 idbl   = i
                 EXIT
               endif
              enddo
-          elseif(IALEFVM_OUTP_EPSDOT==-1)then
+          elseif(ALEFVM_Param%IOUTP_EPSDOT==-1)then
             debug_outp=.TRUE.
                 idbf   = lft
                 idbl   = llt          

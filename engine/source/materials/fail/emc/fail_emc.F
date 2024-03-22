@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -31,11 +31,11 @@ Chd|        USERMAT_SOLID                 source/materials/mat_share/usermat_sol
 Chd|-- calls ---------------
 Chd|====================================================================
       SUBROUTINE FAIL_EMC(
-     1     NEL     ,NUVAR   ,NPF     ,TF      ,TIME    ,TIMESTEP,
-     2     UPARAM  ,NGL     ,IPM     ,MAT     ,
+     1     NEL     ,NUVAR   ,TIME    ,TIMESTEP,
+     2     UPARAM  ,NGL     ,
      4     SIGNXX  ,SIGNYY  ,SIGNZZ  ,SIGNXY  ,SIGNYZ  ,SIGNZX   ,
      5     PLAS    ,DPLA    ,EPSP    ,UVAR    ,
-     6     OFF     ,IP      ,DFMAX   ,TDELE   )
+     6     OFF     ,DFMAX   ,TDELE   )
 C---------+---------+---+---+--------------------------------------------
 c---------+---------+---+---+--------------------------------------------
 C   /FAIL/EMC - tabulated rupture criteria for solids
@@ -49,9 +49,6 @@ C---------+---------+---+---+--------------------------------------------
 C NEL     |  1      | I | R | SIZE OF THE ELEMENT GROUP NEL 
 C NUPARAM |  1      | I | R | SIZE OF THE USER PARAMETER ARRAY
 C NUVAR   |  1      | I | R | NUMBER OF FAILURE ELEMENT VARIABLES
-C---------+---------+---+---+--------------------------------------------
-C NPF     |  *      | I | R | FUNCTION ARRAY   
-C TF      |  *      | F | R | FUNCTION ARRAY 
 C---------+---------+---+---+--------------------------------------------
 C TIME    |  1      | F | R | CURRENT TIME
 C TIMESTEP|  1      | F | R | CURRENT TIME STEP
@@ -68,15 +65,12 @@ C---------+---------+---+---+--------------------------------------------
 #include "units_c.inc"
 #include "param_c.inc"
 #include "scr17_c.inc"
-#include "scr19_c.inc"
-#include "impl1_c.inc"
 #include "comlock.inc"
-#include "com01_c.inc"
 C-----------------------------------------------
 C   I N P U T   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER NEL,NUVAR,IP
-      INTEGER NGL(NEL),IPM(NPROPMI,*),MAT(NEL)
+      INTEGER NEL,NUVAR
+      INTEGER NGL(NEL)
 c
       my_real TIME,TIMESTEP,UPARAM(*),
      .   SIGNXX(NEL),SIGNYY(NEL),SIGNZZ(NEL),
@@ -91,11 +85,6 @@ C   I N P U T   O U T P U T   A r g u m e n t s
 C-----------------------------------------------
       my_real 
      .   UVAR(NEL,NUVAR), OFF(NEL),DFMAX(NEL),TDELE(NEL)
-C-----------------------------------------------
-C   VARIABLES FOR FUNCTION INTERPOLATION 
-C-----------------------------------------------
-      INTEGER NPF(*)
-      my_real TF(*)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -147,7 +136,7 @@ C---      failure strain interpolation
      .                       +SIGNYZ(I)*SIGNYZ(I)
      .                       +SIGNZX(I)*SIGNZX(I))))
 
-          	  ! determinant du deviateur des contraintes
+            ! determinant du deviateur des contraintes
           INV2 = DEVXX * DEVYY * DEVZZ 
      .         + TWO*SIGNXY(I)*SIGNZX(I)*SIGNYZ(I)
      .         - DEVXX*SIGNYZ(I)**2 - DEVYY*SIGNZX(I)**2

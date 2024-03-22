@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -30,6 +30,7 @@ Chd|        I25NEIGH_SEG_EN               source/interfaces/inter3d1/i25neigh.F
 Chd|        MY_ORDERS                     ../common_source/tools/sort/my_orders.c
 Chd|        BITGET                        source/interfaces/inter3d1/bitget.F
 Chd|        BITSET                        source/interfaces/inter3d1/bitget.F
+Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
       SUBROUTINE I25NEIGH(NRTM ,NSN   ,NSV     ,IRECT  ,IRTLM,
      2                         MVOISIN,EVOISIN ,MSEGLO ,MSEGTYP,ITAB   ,
@@ -40,12 +41,14 @@ Chd|====================================================================
      7                         ADDSUBE,LISUBE ,INFLG_SUBE,NOINT,NMN,MSR,
      8                         NOM_OPT,ILEV   ,MBINFLG ,EBINFLG)
 C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
+      USE MY_ALLOC_MOD
+      USE MESSAGE_MOD
+C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -75,14 +78,13 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,J,K,L,IW,I1,I2,I3,I4,M,N,NMAX,E_MAX,E_ID,N_EI,
-     1        ITAG(NUMNOD),NE0,NRTM0,ISH,
+     1        NE0,NRTM0,ISH,NVERTX, IVERTX, JVERTX,
      2        J1,J2,J3,J4,K1,K2,L1,L2,KPERM1(4),KPERM2(4),IRR,
-     3        NFT,JLT,MI,II(4),JJ(4),IEDG,JEDG,IOK,
-     4        NVERTX, NTAG(4*NRTM), ROOT(4*NRTM), IVERTX, JVERTX,
-     5        IBASE, KBASE, KOLD, FIN, NE, EJ, NEDGE_TMP, 
-     6        SOL_EDGE, SH_EDGE, ISTORE,
-     7        LL, KK, CUR, NEXT, JSUB, KSUB, IMS1, IMS2, IMS3, IMS4, 
-     8        NISUBN, INFLG, MAXADD, STAT
+     3        NFT,JLT,MI,II(4),JJ(4),IEDG,JEDG,IOK,       
+     4        IBASE, KBASE, KOLD, FIN, NE, EJ, NEDGE_TMP, 
+     5        SOL_EDGE, SH_EDGE, ISTORE,
+     6        LL, KK, CUR, NEXT, JSUB, KSUB, IMS1, IMS2, IMS3, IMS4, 
+     7        NISUBN, INFLG, MAXADD, STAT
       INTEGER IX1, IX2, IX3, IX4,
      ,        JX1, JX2, JX3, JX4,
      .        NA, NB, EA, EB
@@ -99,7 +101,7 @@ C-----------------------------------------------
      .     XNA, YNA, ZNA, XNB, YNB, ZNB, AAA, BBB, ANG
       INTEGER WORK(70000)
       INTEGER,  DIMENSION(:,:),ALLOCATABLE :: CLEF,LEDGE_TMP1,LEDGE_TMP2
-      INTEGER,  DIMENSION(:),ALLOCATABLE :: INDEX
+      INTEGER,  DIMENSION(:),ALLOCATABLE :: INDEX, ITAG, NTAG, ROOT
       INTEGER, DIMENSION(:), ALLOCATABLE :: MLOC,KAD,ADDSUBN,ADDSUBN_TMP,
      .                                      LISUBN,INFLG_SUBN,IXSUB
 C-----------------------------------------------
@@ -111,6 +113,10 @@ C-----------------------------------------------
       DATA KPERM1/1,3,5,7/
       DATA KPERM2/2,4,6,8/
 C-----------------------------------------------
+      CALL MY_ALLOC(ITAG,NUMNOD)
+      CALL MY_ALLOC(NTAG,4*NRTM)
+      CALL MY_ALLOC(ROOT,4*NRTM)
+C
       DO I=1,NRTM
         MSEGLO(I)=I      
       ENDDO
@@ -360,6 +366,7 @@ C     Reset ADSKYN
       END DO
 C      
       DEALLOCATE(MVOI,EIDNOD)
+      DEALLOCATE(ITAG,NTAG,ROOT)
 C
       NRTM0=NRTM-NRTM_SH
 C
@@ -973,14 +980,10 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "units_c.inc"
 #include      "param_c.inc"
 #include      "scr17_c.inc"
 C-----------------------------------------------
@@ -1120,7 +1123,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
 C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1223,7 +1225,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
 C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1319,7 +1320,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
 C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1435,7 +1435,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
 C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1538,19 +1537,15 @@ Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
       SUBROUTINE I25NEIGH_MSG_ERR(I1,I2,ITAB,IRR)
       USE MESSAGE_MOD
-C----6---------------------------------------------------------------7---------8
+C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
 #include      "scr03_c.inc"
-C-----------------------------------------------------------------
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER I1,I2,ITAB(*),IRR

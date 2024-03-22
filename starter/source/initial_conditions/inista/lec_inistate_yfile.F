@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -32,18 +32,9 @@ Chd|====================================================================
      3                  ISIGSH    ,IUSER     ,
      4                  ID_SIGSH  , ID_SOLID_SIGI, ID_QUAD_SIGI  )
 C-----------------------------------------------
-C   M o d u l e s
-C-----------------------------------------------                     
-C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -70,7 +61,7 @@ C-----------------------------------------------
      .   NVARSH,NUMR,NUMSOLID,KK,
      .   JJHBE
       INTEGER KN
-      INTEGER IS_SOLID,IS_QUAD	 
+      INTEGER IS_SOLID,IS_QUAD   
       my_real
      .   THKI, EM, EB, H1, H2, H3, R0 , EIN, SMOOTHL
       my_real
@@ -557,7 +548,8 @@ C
          SIGSH(2,I) = NIP
          SIGSH(3,I) = THKI
          SIGSH(4,I) = EM
-         SIGSH(5,I) = EB
+         SIGSH(5,I) = EB 
+         SIGSH(NVSHELL - 1,I) = ONE
         IF (NPG == 0.OR.NPG == 1)THEN
          SIGSH(14,I) = H1
          SIGSH(15,I) = H2
@@ -659,7 +651,8 @@ C
        IF(LINE(1:1) == '/')GOTO 360
          J=J+1
          I=I+1
-         IF(J>NUMSHEL+NUMSH3N) GOTO 360
+         IF(J> NUMSHEL+NUMSH3N) GOTO 360
+         SIGSH(NVSHELL - 1,I) = ONE
          IF (IOUTP_FMT == 2) THEN
            READ(LINE,'(6F12.0)')SIGSH(6,I),SIGSH(7,I),SIGSH(8,I),
      .                          SIGSH(9,I),SIGSH(10,I),SIGSH(27,I)
@@ -695,6 +688,7 @@ C
          J=J+1
          I=I+1
          IF(J>NUMSHEL+NUMSH3N) GOTO 520
+         SIGSH(NVSHELL - 1,I) = ONE
          IF (IOUTP_FMT == 2) THEN
            READ(LINE,FMT='(6F12.0)')SIGLOC
          ELSE

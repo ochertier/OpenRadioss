@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -28,8 +28,9 @@ Chd|-- calls ---------------
 Chd|        M11VS2                        source/materials/mat/mat011/m11vs2.F
 Chd|        M11VS3                        source/materials/mat/mat011/m11vs3.F
 Chd|        FINTER                        source/tools/curve/finter.F   
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ALEFVM_MOD                    ../common_source/modules/ale/alefvm_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE M11LAW(PM   ,OFF ,SIG   ,EINT     ,RHO    ,
      2                  T    ,RK  ,RE    ,VO       ,
@@ -43,6 +44,7 @@ C   M o d u l e s
 C-----------------------------------------------
       USE ELBUFDEF_MOD            
       USE ALE_CONNECTIVITY_MOD
+      USE ALEFVM_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -58,9 +60,6 @@ C-----------------------------------------------
 #include      "com08_c.inc"
 #include      "vect01_c.inc"
 #include      "param_c.inc"
-#include      "scrupw_c.inc"
-#include      "task_c.inc"
-#include      "alefvm.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -100,7 +99,7 @@ C=======================================================================
       !-----------------------------------!
       !  READING USER INPUTS              !
       !-----------------------------------!      
-      MX          = MAT(LFT)
+      MX          = MAT(1)
       RHO0_1      = PM( 1,MX)
       GAM_1       = PM(25,MX)
       P0_1        = PM(31,MX)
@@ -135,7 +134,7 @@ C=======================================================================
       !-----------------------------------!
       !  ELEM INIT. FROM USER INPUTS      !
       !-----------------------------------!       
-      DO I=LFT,LLT
+      DO I=1,NEL
         RHO0(I)   = RHO0_1
         GAM(I)    = GAM_1
         P0(I)     = P0_1
@@ -148,14 +147,14 @@ C=======================================================================
         TV(I) = ZERO
       ENDDO
 
-      DO I=LFT,LLT
+      DO I=1,NEL
         STIF(I)   = ZERO
         EIS(I)    = EIS(I) + EINT(I) / VOL(I)
       ENDDO
 
-      IF(IALEFVM==1)THEN
+      IF(ALEFVM_Param%IEnabled == 1)THEN
         IF(ITYP /= 3)THEN        
-          DO I=LFT,LLT
+          DO I=1,NEL
             IF(IVxFUN>0)THEN
               VxN(I) = Vx0(I)*FINTER(IVxFUN,TSCAL,NPF,TF,DYDX)
             ELSE
@@ -173,11 +172,11 @@ C=======================================================================
             ENDIF                    
           ENDDO
         ELSE!IF(ITYP /= 3)  
-          DO I=LFT,LLT
+          DO I=1,NEL
             MASS   = RHO(I) * VOL(I)
             VxN(I) = MOM(I,1) / MASS
             VyN(I) = MOM(I,2) / MASS
-            VzN(I) = MOM(I,3) / MASS			
+            VzN(I) = MOM(I,3) / MASS
           ENDDO          
         ENDIF
       ELSE
@@ -209,8 +208,8 @@ C=======================================================================
        FAC=FOUR
       ENDIF
 
-      MX          = MAT(LFT)
-      DO I=LFT,LLT
+      MX          = MAT(1)
+      DO I=1,NEL
         CART      = PM(34,MX)
         QVIS(I)   = ZERO
         EXPT(I)   = EXP(CART*TT**2)
@@ -220,7 +219,7 @@ C=======================================================================
       !-----------------------------------!
       ! LOOP ON ELEMENTS                  !
       !-----------------------------------!
-      DO I=LFT,LLT    
+      DO I=1,NEL    
         
         IF(INOD/=0)THEN
          VEL(I)   = V(1,INOD)**2+V(2,INOD)**2+V(3,INOD)**2
@@ -245,14 +244,14 @@ C=======================================================================
           RKV(I)  = RK(I)/VOL(I)
           REV(I)  = RE(I)/VOL(I)
           TV(I)   = T(I)
-          IF(IALEFVM == 1)THEN !otherwise %MOM is not allocated
+          IF(ALEFVM_Param%IEnabled == 1)THEN !otherwise %MOM is not allocated
             MASS    = RHO(I) * VOL(I)
             VxV(I)  = MOM(I,1)/MASS
             VyV(I)  = MOM(I,2)/MASS
             VzV(I)  = MOM(I,3)/MASS 
             XmomV(I)= MOM(I,1)
             YmomV(I)= MOM(I,2)
-            ZmomV(I)= MOM(I,3)  			     
+            ZmomV(I)= MOM(I,3)             
           ENDIF
         ENDIF
 
@@ -307,7 +306,7 @@ C=======================================================================
           T(I)   =TV(I)
         ENDIF
         
-      IF(IALEFVM==1)THEN   
+      IF(ALEFVM_Param%IEnabled==1)THEN   
         IF(IVxFUN>0)THEN
           XmomN = Vx0(I)*FINTER(IVxFUN,TSCAL,NPF,TF,DYDX)*RHON*VOL(I)
         ELSE
@@ -365,10 +364,10 @@ C        LIQUIDE
          EINT(I)    = EN
          SSP_EQ(I)  = EP20
          IF(IPFUN/=0.AND.JTUR/=0)P(I)=P(I)+TWO_THIRD*RK(I)
-         IF(IALEFVM==1)THEN
+         IF(ALEFVM_Param%IEnabled==1)THEN
            MOM(I,1)   = XmomN
            MOM(I,2)   = YmomN
-           MOM(I,3)   = ZmomN			    
+           MOM(I,3)   = ZmomN          
          ENDIF
          
         !-------------------------------------------!
@@ -381,10 +380,10 @@ C        LIQUIDE
          ALP       = PM(98,MX)*DT1
          IF(IPFUN/=0.AND.JTUR/=0)PN=PN + TWO_THIRD*RK(I)
          IF(IPFUN/=0 .AND. VN(I)<=0)PN=PN - HALF*RHON*VN(I)**2
-         IF(IALEFVM==1)THEN
+         IF(ALEFVM_Param%IEnabled==1)THEN
            MOM(I,1) = XmomN
            MOM(I,2) = YmomN
-           MOM(I,3) = ZmomN		    
+           MOM(I,3) = ZmomN        
          ENDIF         
 C
          IF(TT>ZERO)THEN
@@ -458,7 +457,7 @@ C
       ENDDO !next I
 
 C-----------
-      DO I=LFT,LLT
+      DO I=1,NEL
         EIS(I)   = EIS(I) - EINT(I) 
         SIG(I,1) = -P(I)
         SIG(I,2) = -P(I)

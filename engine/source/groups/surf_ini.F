@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -45,11 +45,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
-#include      "my_allocate.inc"
-#include      "tabsiz_c.inc"
-C-----------------------------------------------
-C   D u m m y   A r g u m e n t s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -58,10 +53,10 @@ C-----------------------------------------------
 !
 !  --- READ IGRSURF ---
       IF (NSURF > 0)THEN 
-        MY_ALLOCATE(IGRSURF,NSURF)
+        ALLOCATE(IGRSURF(NSURF))
         CALL ALLOC_SURF_STR(IGRSURF)
       ELSE           
-        MY_ALLOCATE(IGRSURF,0)
+        ALLOCATE(IGRSURF(0))
       ENDIF
 !---------
       RETURN

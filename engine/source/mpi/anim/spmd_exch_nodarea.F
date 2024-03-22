@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -29,6 +29,7 @@ Chd|        ANI_PCONT                     source/output/anim/generate/ani_pcont.
 Chd|        ANI_PCONT21                   source/output/anim/generate/ani_pcont.F
 Chd|        ERR_THK                       source/elements/shell/err_thk.F
 Chd|        GENANI                        source/output/anim/generate/genani.F
+Chd|        INTER_NODAL_AREAS             source/output/inter_nodal_areas.F
 Chd|-- calls ---------------
 Chd|====================================================================
       SUBROUTINE SPMD_EXCH_NODAREA(
@@ -38,7 +39,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -49,7 +49,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s

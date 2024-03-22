@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -31,6 +31,7 @@ Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.
 Chd|        HM_OPTION_COUNT               source/devtools/hm_reader/hm_option_count.F
 Chd|        HM_OPTION_NEXT                source/devtools/hm_reader/hm_option_next.F
 Chd|        HM_OPTION_START               source/devtools/hm_reader/hm_option_start.F
+Chd|        ALEMUSCL_MOD                  ../common_source/modules/ale/alemuscl_mod.F
 Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
@@ -47,6 +48,7 @@ C-----------------------------------------------
       USE HM_OPTION_READ_MOD
       USE SUBMODEL_MOD
       USE MESSAGE_MOD
+      USE ALEMUSCL_MOD , only : ALEMUSCL_Param
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -54,9 +56,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include "submod_c.inc"
 #include "scr05_c.inc"
-#include "alemuscl.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -65,41 +65,48 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------     
-      INTEGER :: NALEMUSCL
+      INTEGER :: NALEMUSCL,IALEMUSCL
       LOGICAL :: IS_AVAILABLE
-      
+      my_real :: BETA
+C-----------------------------------------------
+C   S o u r c e   L i n e s
+C-----------------------------------------------       
       CALL HM_OPTION_COUNT('/ALE/MUSCL', NALEMUSCL)
       
       IF (NALEMUSCL > 0) THEN
          CALL HM_OPTION_START('/ALE/MUSCL')
          CALL HM_OPTION_NEXT()
-         CALL HM_GET_FLOATV('ALE_MUSCL_BETA', I_BETA, IS_AVAILABLE, LSUBMODEL, UNITAB)
+         CALL HM_GET_FLOATV('ALE_MUSCL_BETA', BETA, IS_AVAILABLE, LSUBMODEL, UNITAB)
          CALL HM_GET_INTV('MAT_Iflag', IALEMUSCL, IS_AVAILABLE, LSUBMODEL)
          
-         !---default I_BETA
-         IF (I_BETA == ZERO) THEN
-            I_BETA = TWO
+         !---default BETA
+         IF (BETA == ZERO) THEN
+           BETA = TWO
          ENDIF
 
          !---default IALEMUSCL
          IF (IALEMUSCL == 0) THEN
-            IALEMUSCL = 1
+           IALEMUSCL = 1
          ELSEIF (IALEMUSCL == 1) THEN
-            IALEMUSCL = 2
+           IALEMUSCL = 2
          ELSEIF (IALEMUSCL < -1 .OR. IALEMUSCL >= 2) THEN
-            IALEMUSCL = 1
+           IALEMUSCL = 1
          ENDIF
                   
          !---MUSCL off / disabled
          IF(IALEMUSCL == -1)THEN
            IALEMUSCL = 0
-           I_BETA = 1.0 ! was initialized this way in starter0.F beofre making MUSCL default formulation
+           BETA = TWO
            NALEMUSCL=0
          ENDIF
          
+         ALEMUSCL_Param%IALEMUSCL = IALEMUSCL
+         ALEMUSCL_Param%Beta = BETA
+         
          IF (IRESP == 1) THEN
-! Not available in single precision
+            ! Not available in single precision
             CALL ANCMSG(MSGID = 1563, ANMODE = ANINFO, MSGTYPE = MSGERROR)
          ENDIF
       ENDIF
+C-----------------------------------------------
       END SUBROUTINE HM_READ_ALE_MUSCL

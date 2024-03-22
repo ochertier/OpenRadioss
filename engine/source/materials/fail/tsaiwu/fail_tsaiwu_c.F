@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -31,7 +31,7 @@ Chd|====================================================================
      1     NEL       ,NUPARAM   ,NUVAR     ,UPARAM    ,UVAR      , 
      2     TIME      ,NGL       ,IPG       ,ILAY      ,IPT       ,                          
      3     SIGNXX    ,SIGNYY    ,SIGNXY    ,SIGNYZ    ,SIGNZX    ,  
-     4     OFF       ,FOFF      ,PTHKF     ,DMG_FLAG  ,DMG_SCALE ,
+     4     OFF       ,FOFF      ,DMG_FLAG  ,DMG_SCALE ,
      5     DFMAX     ,TDEL      ,TIMESTEP  )                               
 C-----------------------------------------------
 C    modified Puck model ------
@@ -58,7 +58,6 @@ C   I N P U T   O U T P U T   A r g u m e n t s
 C-----------------------------------------------
       INTEGER ,INTENT(OUT) ::DMG_FLAG
       INTEGER ,DIMENSION(NEL) ,INTENT(INOUT) :: FOFF
-      my_real ,INTENT(OUT) :: PTHKF
       my_real ,DIMENSION(NEL) ,INTENT(INOUT) :: DFMAX
       my_real ,DIMENSION(NEL) ,INTENT(OUT)   :: TDEL,DMG_SCALE
       my_real ,DIMENSION(NEL,NUVAR) ,INTENT(INOUT) :: UVAR
@@ -89,13 +88,6 @@ C!----------------------------------------------
 c
       ! Stress softening activation
       DMG_FLAG = 1    
-c
-      ! Shell element deletion flag
-      IF (IFAIL_SH == 1) THEN
-        PTHKF = EM06
-      ELSEIF (IFAIL_SH == 2) THEN 
-        PTHKF = ONE
-      ENDIF
 c
       ! Stress tensor filtering
       IF (FCUT > ZERO) THEN
@@ -144,7 +136,8 @@ c
           ENDIF
 c
           ! Damage variable update
-          DFMAX(I) = MIN(ONE,FINDEX)
+          FINDEX   = MAX(ZERO,FINDEX)
+          DFMAX(I) = MIN(ONE ,MAX(FINDEX,DFMAX(I)))
           IF (DFMAX(I) >= ONE) THEN
             NINDX = NINDX+1                                    
             INDX(NINDX) = I                                    

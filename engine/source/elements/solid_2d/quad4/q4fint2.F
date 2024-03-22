@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,16 +26,17 @@ Chd|-- called by -----------
 Chd|        Q4FORC2                       source/elements/solid_2d/quad4/q4forc2.F
 Chd|-- calls ---------------
 Chd|====================================================================
-      SUBROUTINE Q4FINT2(SIG,AY,FAY,FAZ,
-     2                   PY1,PY2,PY3,PY4,
-     3                   PZ1,PZ2,PZ3,PZ4,
-     8                   BYZ1,BYZ2,BYZ3,BYZ4,
-     9                   BZY1,BZY2,BZY3,BZY4,
-     5                   FY1,FZ1,FY2,FZ2,
-     6                   FY3,FZ3,FY4,FZ4,
-     7                   R22,R23,R32,R33,
-     8                   AIR,VOL,QVIS,ICP,
-     9                   NEL)
+      SUBROUTINE Q4FINT2(
+     1   SIG,     AY,      FAY,     FAZ,
+     2   PY1,     PY2,     PY3,     PY4,
+     3   PZ1,     PZ2,     PZ3,     PZ4,
+     4   BYZ1,    BYZ2,    BYZ3,    BYZ4,
+     5   BZY1,    BZY2,    BZY3,    BZY4,
+     6   FY1,     FZ1,     FY2,     FZ2,
+     7   FY3,     FZ3,     FY4,     FZ4,
+     8   R22,     R23,     R32,     R33,
+     9   AIR,     VOL,     QVIS,    ICP,
+     A   NEL,     JHBE,    JCVT)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -47,13 +48,13 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "cong1_c.inc"
-#include      "vect01_c.inc"
 #include      "com01_c.inc"
 #include      "nsvis_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: JHBE
+      INTEGER, INTENT(IN) :: JCVT
       INTEGER ICP,NEL
 C     REAL
       my_real
@@ -92,11 +93,11 @@ C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
       IF(N2D==1 .AND. JHBE==17) THEN
-        DO I=LFT,LLT
+        DO I=1,NEL
           FAC(I) = AIR(I)
         ENDDO
       ELSE
-        DO I=LFT,LLT
+        DO I=1,NEL
           FAC(I) = VOL(I)
         ENDDO
       ENDIF
@@ -104,20 +105,20 @@ C
 C     ADD VISCOUS STRESSES "SVIS" & "QVIS" INTO THE TOTAL ONES
 C     REMOVE PRESSURE FROM STRESSES FOR THE CONSTANT PRESSURE CASE
       IF(ICP==1) THEN
-        DO I=LFT,LLT
+        DO I=1,NEL
           P(I)=THIRD*(SIG(I,1)+SIG(I,2)+SIG(I,3)+
      .                SVIS(I,1)+SVIS(I,2)+SVIS(I,3))
           S1(I)=(SIG(I,1)+SVIS(I,1)-P(I))*FAC(I)
           S2(I)=(SIG(I,2)+SVIS(I,2)-P(I))*FAC(I)
         ENDDO
       ELSE
-        DO I=LFT,LLT
+        DO I=1,NEL
           S1(I)=(SIG(I,1)+SVIS(I,1)-QVIS(I))*FAC(I)
           S2(I)=(SIG(I,2)+SVIS(I,2)-QVIS(I))*FAC(I)
         ENDDO
       ENDIF
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         FY1(I) = FY1(I) - S1(I)*PY1(I)- S2(I)*BZY1(I)
         FY2(I) = FY2(I) - S1(I)*PY2(I)- S2(I)*BZY2(I)
         FY3(I) = FY3(I) - S1(I)*PY3(I)- S2(I)*BZY3(I)
@@ -130,18 +131,18 @@ C
 C
       IF(N2D==1.AND.JHBE==17) THEN
          IF(ICP==1) THEN
-          DO I=LFT,LLT
+          DO I=1,NEL
             S3(I)=(SIG(I,3)+SVIS(I,3)-P(I))*FAC(I)
             S4(I)=(SIG(I,4)+SVIS(I,4))*FAC(I)
           ENDDO
-	 ELSE
-          DO I=LFT,LLT
+           ELSE
+          DO I=1,NEL
             S3(I)=(SIG(I,3)+SVIS(I,3)-QVIS(I))*FAC(I)
             S4(I)=(SIG(I,4)+SVIS(I,4))*FAC(I)
           ENDDO
-	 END IF
+           END IF
          IF(JCVT/=0) THEN
-            DO I=LFT,LLT
+            DO I=1,NEL
               T1=S1(I)*R22(I)+S4(I)*R23(I)
               T2=S4(I)*R32(I)+S2(I)*R33(I)
               T3=S1(I)*R32(I)+S4(I)*R33(I)
@@ -151,7 +152,7 @@ C
               S4(I)=R22(I)*T3+R23(I)*T2
             ENDDO
           ENDIF
-          DO I=LFT,LLT
+          DO I=1,NEL
             FAY(I) = FAY(I) + (S1(I)-S3(I))*AY(I)
             FAZ(I) = FAZ(I) + S4(I)*AY(I)
           ENDDO
@@ -159,4 +160,4 @@ C
 C
       RETURN
       END
-	  
+            

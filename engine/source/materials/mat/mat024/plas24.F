@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -40,9 +40,7 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "com08_c.inc"
 #include      "comlock.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -296,7 +294,7 @@ c         AJOUT DILATANCE PLASTIQUE MAX fp 09/16
             DGS6=ZERO                           
           ENDIF                                 
 c         ECROUISSAGE
-          HPV = HV0*EXP( MIN(FIVEUANTE,(ROB(I)-RO0)*EXPO))
+          HPV = HV0*EXP( MIN(FIFTY,(ROB(I)-RO0)*EXPO))
           IF(SM(I)>ROK0)THEN
             HP=HBP
           ELSE
@@ -429,10 +427,10 @@ C . .       . . . . . . . . . . . . . . . . . . . . . . . . . .
      .                   +CP64*E4(I)+CP65*E5(I)+CP66*E6(I)
           ELSE
 c           PURE TRIAXIAL TO SOLVE UNDETERMINATION
-	           DP = BULK*HPV/(BULK+HPV)*(E1(I)+E2(I)+E3(I))
-	           SIG(I,1)=SIG(I,1)+DP
-	           SIG(I,2)=SIG(I,2)+DP
-          	 SIG(I,3)=SIG(I,3)+DP
+                     DP = BULK*HPV/(BULK+HPV)*(E1(I)+E2(I)+E3(I))
+                     SIG(I,1)=SIG(I,1)+DP
+                     SIG(I,2)=SIG(I,2)+DP
+           SIG(I,3)=SIG(I,3)+DP
           ENDIF
 C . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 C RECALCUL DES DEFORMATION ELASTIQUES POUR REOUVERTURE DES FISSURES

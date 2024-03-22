@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,7 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-C PRF : parallel rheological framework
+Chd|====================================================================
+Chd|  SIGEPS100_MOD                 source/materials/mat/mat100/sigeps100.F
+Chd|-- called by -----------
+Chd|        MULAW                         source/materials/mat_share/mulaw.F
+Chd|-- calls ---------------
+Chd|====================================================================
+      MODULE SIGEPS100_MOD
+      CONTAINS
 Chd|====================================================================
 Chd|  SIGEPS100                     source/materials/mat/mat100/sigeps100.F
 Chd|-- called by -----------
@@ -52,7 +59,7 @@ Chd|====================================================================
      A      MFXX   ,MFXY    ,MFXZ,MFYX, MFYY  , MFYZ  ,  
      B      MFZX   ,MFZY    ,MFZZ     , TEMPEL,                 
      C      SOUNDSP, VISCMAX, UVAR    , OFF   , ISMSTR, ET  ,
-     D      IHET   ,OFFG    , EPSTH   , IEXPAN    ,
+     D      IHET   ,OFFG    , EPSTH   , IEXPAN,NPARF  ,
      E      UPARAMF,UVARF   ,NVARF    ,JCVT   ,GAMA_R)
 C
 C-----------------------------------------------
@@ -60,22 +67,17 @@ C   I M P L I C I T   T Y P E S
 C-----------------------------------------------
 #include "implicit_f.inc"
 C-----------------------------------------------
-C   G L O B A L   P A R A M E T E R S
-C-----------------------------------------------
-#include "scr17_c.inc"
-C-----------------------------------------------
 C   C O M M O N 
 C-----------------------------------------------
-#include "scr05_c.inc"
 #include "impl1_c.inc"
-#include "units_c.inc"
-#include "com01_c.inc"
 C----------------------------------------------------------------
 C  I N P U T   A R G U M E N T S
 C----------------------------------------------------------------
-      INTEGER       NEL,  JCVT, NVARF,   NUPARAM, NUVAR,ISMSTR,NGL(*),IHET,IEXPAN
+      INTEGER ,INTENT(IN) ::  NPARF
+      INTEGER ,INTENT(IN) ::  NEL,JCVT,NVARF,NUPARAM,NUVAR,ISMSTR,IHET,IEXPAN
+      INTEGER ,INTENT(IN) ::  NGL(NEL)
       my_real
-     .      TIME       , TIMESTEP   , UPARAM(NUPARAM),UPARAMF(NUPARAM),
+     .      TIME       , TIMESTEP   , UPARAM(NUPARAM),UPARAMF(NPARF),
      .      RHO   (NEL), RHO0  (NEL), VOLUME(NEL), EINT(NEL),
      .      DEPSXX(NEL), DEPSYY(NEL), DEPSZZ(NEL),
      .      DEPSXY(NEL), DEPSYZ(NEL), DEPSZX(NEL),
@@ -110,7 +112,7 @@ C----------------------------------------------------------------
 C  L O C A L  V A R I B L E S
 C----------------------------------------------------------------
       INTEGER    I,J,KK,LL,N,FLAGBB,DIRECT,ITER,NITER,TAB,TABN,SHIFT,NINDX 
-      INTEGER  N_NETWORK, FLAG_HE, FLAG_MUL, FLAG_T,NHYPER,NPLAS,
+      INTEGER  N_NETWORK, FLAG_HE, FLAG_MUL, FLAG_T,NHYPER,NPLAS,IFORM,
      .        FLAG_PL,NET,EXPPL, NVISC(10),
      .        FLAG_VISC(10),
      .   IPOS1(NEL),ILEN1(NEL),IAD1(NEL),
@@ -146,7 +148,9 @@ C
       my_real
      .    COEFR,BETAF ,COEFM
 C----------------------------------------------------------------
-C----------------------------------------------------------------
+C     Material model : PRF : parallel rheological framework
+c=======================================================================
+      IFORM = 1
       COEFR = ONE
       BETAF = ZERO
       COEFM = ONE
@@ -433,7 +437,7 @@ C
      2                C11 ,C02, C30, C21, C12,
      3                C03 ,D1 ,D2  ,  D3, SIGA ,
      4                BI1,BI2,JDET ,FLAG_MUL,
-     5                NVARF,COEFR, BETAF,COEFM  ,UVARF)
+     5                NVARF,COEFR, BETAF,COEFM  ,UVARF,RBULK,IFORM)
       ELSEIF (FLAG_HE == 2) THEN 
         CALL SIGABOYCE(
      1                NEL , FFT ,C1,C2  ,C3,
@@ -503,7 +507,7 @@ C
      2                   C11 ,C02, C30, C21, C12,
      3                   C03 ,D1 ,D2  ,  D3, SIGA ,
      4                   BI1,BI2,JDET ,FLAG_MUL,
-     5                   NVARF,COEFR, BETAF,COEFM  ,UVARF)      
+     5                   NVARF,COEFR, BETAF,COEFM  ,UVARF,RBULK,IFORM)      
         ELSEIF (FLAG_HE == 2) THEN 
           CALL SIGABOYCE(
      1                   NEL , FFTN ,C1,C2  ,C3,
@@ -598,7 +602,7 @@ c
      2                C11 ,C02, C30, C21, C12,
      3                C03 ,D1 ,D2  ,  D3, SIGB ,
      4                BI1,BI2,JDET ,FLAG_MUL,
-     5                NVARF,COEFR, BETAF,COEFM  ,UVARF)
+     5                NVARF,COEFR, BETAF,COEFM  ,UVARF,RBULK,IFORM)
      
        ELSEIF (FLAG_HE == 2) THEN !arruda boyce
        CALL SIGABOYCE(
@@ -716,7 +720,7 @@ c
      2                C11 ,C02, C30, C21, C12,
      3                C03 ,D1 ,D2  ,  D3, SIGB ,
      4                BI1,BI2,JDET ,FLAG_MUL,
-     5                NVARF,COEFR, BETAF,COEFM  ,UVARF)
+     5                NVARF,COEFR, BETAF,COEFM  ,UVARF,RBULK,IFORM)
         ELSEIF (FLAG_HE == 2) THEN 
          CALL SIGABOYCE(
      1                NEL , MATB ,C1,C2  ,C3,
@@ -776,7 +780,7 @@ c
 
      
 C-------------------------------
-C cauchy to glabale
+C cauchy to global
 C-------------------------------
       DO I=1,NEL
         DSIG = SQRT((SIGNXX(I)-SIGOXX(I))**2+(SIGNYY(I)-SIGOYY(I))**2+(SIGNZZ(I)-SIGOZZ(I))**2
@@ -798,7 +802,8 @@ C
          ET(I)= MAX(ONE,STIFF(I))
        ENDDO
       ENDIF
-C   
+C-----------   
       RETURN
       END
-
+c
+      END MODULE

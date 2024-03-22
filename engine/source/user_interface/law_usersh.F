@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -29,9 +29,6 @@ Chd|        USERMAT_SHELL                 source/materials/mat_share/usermat_she
 Chd|-- calls ---------------
 Chd|====================================================================
       MODULE LAW_USERSH
-C-----------------------------------------------
-C   D e r i v e d   T y p e   D e f i n i t i o n s
-C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -71,7 +68,6 @@ C---------+---------+---+---+--------------------------------------------
 C
       TYPE ULAWCINTBUF
 C
-#include "sequence.inc"
 C integer
         INTEGER  NCYCLE
         INTEGER  ID

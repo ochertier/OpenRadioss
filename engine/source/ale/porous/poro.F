@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -55,13 +55,7 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "com06_c.inc"
 #include      "com08_c.inc"
-#include      "scr05_c.inc"
-#include      "task_c.inc"
-#include      "parit_c.inc"
 #include      "spmd_c.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -165,7 +159,7 @@ C
              F5(I-NAD)=RFM(1,I)*(X(3,JP)-X(3,JRB))
      +                -RFM(3,I)*(X(1,JP)-X(1,JRB))
              F6(I-NAD)=RFM(2,I)*(X(1,JP)-X(1,JRB))
-     +        	      -RFM(1,I)*(X(2,JP)-X(2,JRB))
+     +                -RFM(1,I)*(X(2,JP)-X(2,JRB))
            ELSE
              F1(I-NAD)=ZERO
              F2(I-NAD)=ZERO

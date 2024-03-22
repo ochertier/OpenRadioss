@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,7 +21,6 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C I17MAIN_LAG split in 3 routines for SPMD reorganization
-C nouvelle routine ne contenant plus que l'appel du critere de tri
 Chd|====================================================================
 Chd|  I17MAIN_CRIT_TRI              source/interfaces/int17/i17main_pena.F
 Chd|-- called by -----------
@@ -65,19 +64,11 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
-#include      "scr05_c.inc"
 #include      "param_c.inc"
-#include      "units_c.inc"
-#include      "scr17_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -123,8 +114,8 @@ C      TEST pour savoir s'il faut retrier + initialisation
 C=======================================================================
 C       SIZE_T(NIN)=ZERO init dans inttri
        CALL I17CRIT(
-     1   X     ,AZERO	     ,AZERO	   ,IGRBRIC(IGE)%ENTITY ,EMINX        ,
-     2   NME   ,ITASK	     ,INTBUF_TAB%XSAV,IXS 	 ,IXS16        ,
+     1   X     ,AZERO       ,AZERO     ,IGRBRIC(IGE)%ENTITY ,EMINX        ,
+     2   NME   ,ITASK       ,INTBUF_TAB%XSAV,IXS    ,IXS16        ,
      3   IXS20 ,XMSR_L       ,SIZE_T(NIN))
 C -------------------------------------------------------------
 C       CALL MY_BARRIER   inutile
@@ -137,7 +128,6 @@ C
       RETURN
       END
 C
-C nouvelle routine ne contenant plus que l'appel du tri
 Chd|====================================================================
 Chd|  I17MAIN_TRI                   source/interfaces/int17/i17main_pena.F
 Chd|-- called by -----------
@@ -194,22 +184,13 @@ C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "comlock.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
-#include      "scr05_c.inc"
 #include      "param_c.inc"
-#include      "units_c.inc"
-#include      "task_c.inc"
 #include      "timeri_c.inc"
-#include      "warn_c.inc" 
-#include      "scr17_c.inc"
       COMMON /I17MAINC/BMINMA,NMESR
       INTEGER NMESR
       my_real 
@@ -292,11 +273,11 @@ C BARRIER INIT BMINMA
 C -------------------------------------------------------------
 C     CALCUL BORNE DOMAINE REMONTE DANS I17XSAVE
 C -------------------------------------------------------------
-	 CALL I17XSAVE(
-     1       X     ,V	  ,AZERO	,IXS	     ,IXS16,
-     2       NMES  ,NME_T ,ESH_T	,IGRBRIC(IGE)%ENTITY,IGRBRIC(IGN)%ENTITY,
-     3       EMINX ,ITASK ,INTBUF_TAB%XSAV,XMINL       ,YMINL	  ,
-     3       ZMINL ,XMAXL ,YMAXL	,ZMAXL  		  )
+           CALL I17XSAVE(
+     1       X     ,V    ,AZERO  ,IXS       ,IXS16,
+     2       NMES  ,NME_T ,ESH_T  ,IGRBRIC(IGE)%ENTITY,IGRBRIC(IGN)%ENTITY,
+     3       EMINX ,ITASK ,INTBUF_TAB%XSAV,XMINL       ,YMINL    ,
+     3       ZMINL ,XMAXL ,YMAXL  ,ZMAXL        )
 #include "lockon.inc"
          BMINMA(1) = MIN(BMINMA(1),XMINL)
          BMINMA(2) = MIN(BMINMA(2),YMINL)
@@ -367,7 +348,6 @@ C
       RETURN
       END
 C
-C nouvelle routine ne contenant plus que le traitment de force
 Chd|====================================================================
 Chd|  I17MAIN_PENA                  source/interfaces/int17/i17main_pena.F
 Chd|-- called by -----------
@@ -413,21 +393,13 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
 #include      "scr05_c.inc"
 #include      "param_c.inc"
-#include      "units_c.inc"
-#include      "task_c.inc"
 #include      "parit_c.inc"
-#include      "scr17_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -510,15 +482,9 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "task_c.inc"
-#include      "warn_c.inc"
-#include      "scr05_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

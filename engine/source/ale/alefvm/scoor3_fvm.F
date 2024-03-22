@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,8 +27,8 @@ Chd|        SFORC3                        source/elements/solid/solide/sforc3.F
 Chd|-- calls ---------------
 Chd|        SREPISO3                      source/elements/solid/solide/srepiso3.F
 Chd|        SREPLOC3                      source/elements/solid/solide/sreploc3.F
-Chd|        I22BUFBRIC_MOD                ../common_source/modules/cut-cell-search_mod.F
-Chd|        I22TRI_MOD                    ../common_source/modules/cut-cell-search_mod.F
+Chd|        I22BUFBRIC_MOD                ../common_source/modules/interfaces/cut-cell-search_mod.F
+Chd|        I22TRI_MOD                    ../common_source/modules/interfaces/cut-cell-search_mod.F
 Chd|====================================================================
       SUBROUTINE SCOOR3_FVM(X,IXS,V,W,GAMA0,GAMA,
      .   X1, X2, X3, X4, X5, X6, X7, X8,
@@ -74,9 +74,7 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "vect01_c.inc"
 #include      "scr05_c.inc"
-#include      "scr18_c.inc"
 #include      "param_c.inc"
-#include      "alefvm.inc"
 #include      "inter22.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -122,8 +120,8 @@ C-----------------------------------------------
 C=======================================================================
 
       NIN       = 1
-      MXT_1     = IXS(1,LFT)
-      DO I=LFT,LLT
+      MXT_1     = IXS(1,1)
+      DO I=1,NEL
         VIS(I)  = ZERO
         NGEO(I) = IXS(10,I)
         NGL(I)  = IXS(11,I)
@@ -140,7 +138,7 @@ C=======================================================================
       ENDDO
 
 
-        DO I=LFT,LLT
+        DO I=1,NEL
          VDX1(I)=ZERO
          VDX2(I)=ZERO
          VDX3(I)=ZERO
@@ -172,7 +170,7 @@ C=======================================================================
       !     NODAL COORDINATES     |
       !----------------------------
       IF(IRESP==1)THEN
-        DO I=LFT,LLT
+        DO I=1,NEL
           XD1(I)=XDP(1,NC1(I))
           YD1(I)=XDP(2,NC1(I))
           ZD1(I)=XDP(3,NC1(I))
@@ -199,7 +197,7 @@ C=======================================================================
           ZD8(I)=XDP(3,NC8(I))
         ENDDO
       ELSE
-        DO I=LFT,LLT
+        DO I=1,NEL
           XD1(I)=X(1,NC1(I))
           YD1(I)=X(2,NC1(I))
           ZD1(I)=X(3,NC1(I))
@@ -228,13 +226,21 @@ C=======================================================================
       ENDIF
 
       CALL SREPISO3(
-     .       XD1, XD2, XD3, XD4, XD5, XD6, XD7, XD8,
-     .       YD1, YD2, YD3, YD4, YD5, YD6, YD7, YD8,
-     .       ZD1, ZD2, ZD3, ZD4, ZD5, ZD6, ZD7, ZD8,
-     .       RX, RY, RZ, SX, SY, SZ, TX, TY, TZ )
+     1   XD1,     XD2,     XD3,     XD4,
+     2   XD5,     XD6,     XD7,     XD8,
+     3   YD1,     YD2,     YD3,     YD4,
+     4   YD5,     YD6,     YD7,     YD8,
+     5   ZD1,     ZD2,     ZD3,     ZD4,
+     6   ZD5,     ZD6,     ZD7,     ZD8,
+     7   RX,      RY,      RZ,      SX,
+     8   SY,      SZ,      TX,      TY,
+     9   TZ,      NEL)
       CALL SREPLOC3(
-     .       RX , RY , RZ , SX , SY , SZ , TX , TY , TZ  ,
-     .       E1X, E2X, E3X, E1Y, E2Y, E3Y, E1Z, E2Z, E3Z )
+     1   RX,      RY,      RZ,      SX,
+     2   SY,      SZ,      TX,      TY,
+     3   TZ,      E1X,     E2X,     E3X,
+     4   E1Y,     E2Y,     E3Y,     E1Z,
+     5   E2Z,     E3Z,     LLT)
 
         GAMA(I,1) = ONE
         GAMA(I,2) = ZERO
@@ -243,13 +249,13 @@ C=======================================================================
         GAMA(I,5) = ONE
         GAMA(I,6) = ZERO
 
-      DO I=LFT,LLT
+      DO I=1,NEL
        OFF(I) = ABS(OFFG(I))
        OFF_L  = MIN(OFF_L,OFFG(I))
       ENDDO
 
       !copy and cast XD (DP) to X (SP) to assure coherence between XD and X
-      DO I=LFT,LLT
+      DO I=1,NEL
         X1(I)= XD1(I)
         Y1(I)= YD1(I)
         Z1(I)= ZD1(I)
@@ -276,7 +282,7 @@ C=======================================================================
         Z8(I)= ZD8(I)
       ENDDO
 
-      DO I=LFT,LLT
+      DO I=1,NEL
        VX1(I)=V(1,NC1(I))
        VY1(I)=V(2,NC1(I))
        VZ1(I)=V(3,NC1(I))
@@ -305,7 +311,7 @@ C=======================================================================
 
 
       IF(OFF_L<ZERO)THEN
-        DO I=LFT,LLT
+        DO I=1,NEL
           IF(OFFG(I)<ZERO)THEN
             VX1(I)=ZERO
             VY1(I)=ZERO
@@ -337,7 +343,7 @@ C=======================================================================
 
       IF(IPARG(64,NG)==1)THEN
         !boundary material
-        VD2(LFT:LLT)=ZERO
+        VD2(1:NEL)=ZERO
         RETURN
       ENDIF
 
@@ -348,7 +354,7 @@ C=======================================================================
 
       IF(INT22==0)THEN
         IF(JALE/=0)THEN
-          DO I=LFT,LLT
+          DO I=1,NEL
             WDX(I) = ONE_OVER_8*( W(1,NC1(I))+W(1,NC2(I))+W(1,NC3(I))+W(1,NC4(I))+W(1,NC5(I))+W(1,NC6(I))+W(1,NC7(I))+W(1,NC8(I)))
             WDY(I) = ONE_OVER_8*( W(2,NC1(I))+W(2,NC2(I))+W(2,NC3(I))+W(2,NC4(I))+W(2,NC5(I))+W(2,NC6(I))+W(2,NC7(I))+W(2,NC8(I)))
             WDZ(I) = ONE_OVER_8*( W(3,NC1(I))+W(3,NC2(I))+W(3,NC3(I))+W(3,NC4(I))+W(3,NC5(I))+W(3,NC6(I))+W(3,NC7(I))+W(3,NC8(I)))
@@ -358,7 +364,7 @@ C=======================================================================
             VD2(I) = VDX(I)*VDX(I)+VDY(I)*VDY(I)+VDZ(I)*VDZ(I)
           ENDDO
         ELSEIF(JEUL/=0)THEN
-          DO I=LFT,LLT
+          DO I=1,NEL
             VDX(I) = MOM(I,1)/RHO(I)
             VDY(I) = MOM(I,2)/RHO(I)
             VDZ(I) = MOM(I,3)/RHO(I)
@@ -367,7 +373,7 @@ C=======================================================================
         ENDIF
       ELSEIF(INT22/=0)THEN
        IF(JEUL/=0)THEN
-         DO I=LFT,LLT
+         DO I=1,NEL
            WDX(I) = ZERO
            WDY(I) = ZERO
            WDZ(I) = ZERO
@@ -377,7 +383,7 @@ C=======================================================================
            VD2(I) = VDX(I)*VDX(I)+VDY(I)*VDY(I)+VDZ(I)*VDZ(I)
           ENDDO !next I
        ELSEIF(JALE/=0)THEN
-         DO I=LFT,LLT
+         DO I=1,NEL
           IB = 0
           IF(INT22/=0)IB = NINT(TAG22(I))
           IsCutCell = .FALSE.
@@ -464,10 +470,10 @@ C=======================================================================
         enddo
       endif
 
-      ! VD2(LFT:LLT) = ZERO
-      ! VDX(LFT:LLT) = ZERO
-      ! VDY(LFT:LLT) = ZERO
-      ! VDZ(LFT:LLT) = ZERO
+      ! VD2(1:NEL) = ZERO
+      ! VDX(1:NEL) = ZERO
+      ! VDY(1:NEL) = ZERO
+      ! VDZ(1:NEL) = ZERO
 
 
       !Here due to convection subroutine aconve.F

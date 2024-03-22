@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,7 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-	SUBROUTINE NODM11(PM,IXS,IXQ,ICODE)
+Chd|====================================================================
+Chd|  NODM11                        source/materials/mat/mat011/nodm11.F
+Chd|-- called by -----------
+Chd|        LECTUR                        source/starter/lectur.F       
+Chd|-- calls ---------------
+Chd|====================================================================
+          SUBROUTINE NODM11(PM,IXS,IXQ,ICODE)
 C     BLOCAGE DES NOEUDS MATERIAU 11 HORS DOMAINE CALCULE
 C     FP 12/97
 C-----------------------------------------------
@@ -34,13 +40,9 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IXS(NIXS,*),IXQ(NIXQ,*),ICODE(*)
-C     REAL
       my_real
      .   PM(NPROPM,*)
 C-----------------------------------------------

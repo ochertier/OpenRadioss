@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,8 +27,8 @@ Chd|        GENANI1                       source/output/anim/genani1.F
 Chd|-- calls ---------------
 Chd|        INITBUF                       source/output/anim/initbuf.F  
 Chd|        SROTA6                        source/output/anim/srota6.F   
-Chd|        WRITE_R_C                     source/output/tools/write_routines.c
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        WRITE_R_C                     ../common_source/tools/input_output/write_routtines.c
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE TENSORS(ELBUF_TAB,IPARG   ,ITENS   ,IXS     ,PM      ,    
      2                   EL2FA   ,NBF     ,TENS    ,                      
@@ -49,7 +49,6 @@ C-----------------------------------------------
 #include      "com01_c.inc"                                             
 #include      "com04_c.inc"                                             
 #include      "param_c.inc"                                             
-#include      "scr01_c.inc"                                             
 #include      "scr17_c.inc"
 C-----------------------------------------------                        
 C   D u m m y   A r g u m e n t s                                       
@@ -116,12 +115,12 @@ C           STRESS
 C-----------------------------------------------                        
             DO I=LFT,LLT
               N = I + NFT                                               
-              EVAR(1,I) = GBUF%SIG(JJ(1) + I)			   
-              EVAR(2,I) = GBUF%SIG(JJ(2) + I)			   
-              EVAR(3,I) = GBUF%SIG(JJ(3) + I)			   
-              EVAR(4,I) = GBUF%SIG(JJ(4) + I)			   
-              EVAR(5,I) = GBUF%SIG(JJ(5) + I)			   
-              EVAR(6,I) = GBUF%SIG(JJ(6) + I)			   
+              EVAR(1,I) = GBUF%SIG(JJ(1) + I)         
+              EVAR(2,I) = GBUF%SIG(JJ(2) + I)         
+              EVAR(3,I) = GBUF%SIG(JJ(3) + I)         
+              EVAR(4,I) = GBUF%SIG(JJ(4) + I)         
+              EVAR(5,I) = GBUF%SIG(JJ(5) + I)         
+              EVAR(6,I) = GBUF%SIG(JJ(6) + I)         
             ENDDO                                                       
             IF (KCVT/=0) THEN                                         
 C             STRESS TENSOR IN GLOBAL SYSTEM                             
@@ -181,26 +180,26 @@ c
                  LBUF => ELBUF_TAB(NG)%BUFLY(1)%LBUF(1,1,1)                                        
                  DO I=LFT,LLT                                            
                    N  = I + NFT                                           
-                   EVAR(1,I) = LBUF%STRA(JJ(1)+I)*ONE_OVER_8		
-                   EVAR(2,I) = LBUF%STRA(JJ(2)+I)*ONE_OVER_8		
-                   EVAR(3,I) = LBUF%STRA(JJ(3)+I)*ONE_OVER_8		
-                   EVAR(4,I) = LBUF%STRA(JJ(4)+I)*ONE_OVER_8		
-                   EVAR(5,I) = LBUF%STRA(JJ(5)+I)*ONE_OVER_8		
-                   EVAR(6,I) = LBUF%STRA(JJ(6)+I)*ONE_OVER_8		
+                   EVAR(1,I) = LBUF%STRA(JJ(1)+I)*ONE_OVER_8
+                   EVAR(2,I) = LBUF%STRA(JJ(2)+I)*ONE_OVER_8
+                   EVAR(3,I) = LBUF%STRA(JJ(3)+I)*ONE_OVER_8
+                   EVAR(4,I) = LBUF%STRA(JJ(4)+I)*ONE_OVER_8
+                   EVAR(5,I) = LBUF%STRA(JJ(5)+I)*ONE_OVER_8
+                   EVAR(6,I) = LBUF%STRA(JJ(6)+I)*ONE_OVER_8
                  ENDDO                                                    
               ELSEIF(MLW == 14)THEN                                      
                  DO I=LFT,LLT                                             
                    N = I + NFT                                             
                    EVAR(1,I) = EVAR(1,I) + LBUF%EPE(JJ(1)+I)
                    EVAR(2,I) = EVAR(2,I) + LBUF%EPE(JJ(2)+I)
-                   EVAR(3,I) = EVAR(3,I) + LBUF%EPE(JJ(3)+I)	     
+                   EVAR(3,I) = EVAR(3,I) + LBUF%EPE(JJ(3)+I)       
                  ENDDO                                                      
               ELSEIF(MLW == 24)THEN                                      
                 DO I=LFT,LLT                                             
                   N = I + NFT                                              
                   EVAR(1,I) = LBUF%STRA(JJ(1)+I)
                   EVAR(2,I) = LBUF%STRA(JJ(2)+I)
-                  EVAR(3,I) = LBUF%STRA(JJ(3)+I)		     
+                  EVAR(3,I) = LBUF%STRA(JJ(3)+I)         
                   EVAR(4,I) = LBUF%STRA(JJ(4)+I)*HALF
                   EVAR(5,I) = LBUF%STRA(JJ(5)+I)*HALF
                   EVAR(6,I) = LBUF%STRA(JJ(6)+I)*HALF   
@@ -235,9 +234,9 @@ c
                     DO IT=1,NPTT                                           
                      DO IR=1,NPTR                                          
                        LBUF =>  ELBUF_TAB(NG)%BUFLY(IL)%LBUF(IR,IS,IT)
-                       EVAR(1,I) = EVAR(1,I) + LBUF%EPE(JJ(1)+I)/NPTG	      
-                       EVAR(2,I) = EVAR(2,I) + LBUF%EPE(JJ(2)+I)/NPTG	      
-                       EVAR(3,I) = EVAR(3,I) + LBUF%EPE(JJ(3)+I)/NPTG	      
+                       EVAR(1,I) = EVAR(1,I) + LBUF%EPE(JJ(1)+I)/NPTG        
+                       EVAR(2,I) = EVAR(2,I) + LBUF%EPE(JJ(2)+I)/NPTG        
+                       EVAR(3,I) = EVAR(3,I) + LBUF%EPE(JJ(3)+I)/NPTG        
                      ENDDO                                                 
                     ENDDO                                                  
                    ENDDO                                                   
@@ -285,9 +284,9 @@ c
                  N = I + NFT                                              
                  DO IPT=1,NPT                                          
                       LBUF =>  ELBUF_TAB(NG)%BUFLY(1)%LBUF(IPT,1,1)    
-                      EVAR(1,I) = EVAR(1,I) + LBUF%EPE(JJ(1)+I)/NPT	     
-                      EVAR(2,I) = EVAR(2,I) + LBUF%EPE(JJ(2)+I)/NPT	     
-                      EVAR(3,I) = EVAR(3,I) + LBUF%EPE(JJ(3)+I)/NPT	     
+                      EVAR(1,I) = EVAR(1,I) + LBUF%EPE(JJ(1)+I)/NPT       
+                      EVAR(2,I) = EVAR(2,I) + LBUF%EPE(JJ(2)+I)/NPT       
+                      EVAR(3,I) = EVAR(3,I) + LBUF%EPE(JJ(3)+I)/NPT       
                  ENDDO                                                 
                ENDDO                                                      
              ELSEIF (MLW == 24) THEN                                        
@@ -311,12 +310,12 @@ c
                   DO IL= 1,NLAY                                                  
                     DO IPT=1,NPTG                                                
                       LBUF =>  ELBUF_TAB(NG)%BUFLY(IL)%LBUF(IPT,1,1)             
-                      EVAR(1,I) = EVAR(1,I)+LBUF%STRA(JJ(1)+I)/NPTG		    
-                      EVAR(2,I) = EVAR(2,I)+LBUF%STRA(JJ(2)+I)/NPTG		    
-                      EVAR(3,I) = EVAR(3,I)+LBUF%STRA(JJ(3)+I)/NPTG		    
-                      EVAR(4,I) = EVAR(4,I)+LBUF%STRA(JJ(4)+I)/NPTG		    
-                      EVAR(5,I) = EVAR(5,I)+LBUF%STRA(JJ(5)+I)/NPTG		    
-                      EVAR(6,I) = EVAR(6,I)+LBUF%STRA(JJ(6)+I)/NPTG		    
+                      EVAR(1,I) = EVAR(1,I)+LBUF%STRA(JJ(1)+I)/NPTG        
+                      EVAR(2,I) = EVAR(2,I)+LBUF%STRA(JJ(2)+I)/NPTG        
+                      EVAR(3,I) = EVAR(3,I)+LBUF%STRA(JJ(3)+I)/NPTG        
+                      EVAR(4,I) = EVAR(4,I)+LBUF%STRA(JJ(4)+I)/NPTG        
+                      EVAR(5,I) = EVAR(5,I)+LBUF%STRA(JJ(5)+I)/NPTG        
+                      EVAR(6,I) = EVAR(6,I)+LBUF%STRA(JJ(6)+I)/NPTG        
                     ENDDO                                                        
                   ENDDO                                                          
                 ENDDO                                                           
@@ -326,9 +325,9 @@ c
                  DO IL= 1,NLAY                                            
                    DO IPT=1,NPTG                                          
                      LBUF =>  ELBUF_TAB(NG)%BUFLY(IL)%LBUF(IPT,1,1)       
-                     EVAR(1,I) = EVAR(1,I) + LBUF%EPE(JJ(1)+I)/NPTG	      
-                     EVAR(2,I) = EVAR(2,I) + LBUF%EPE(JJ(2)+I)/NPTG	      
-                     EVAR(3,I) = EVAR(3,I) + LBUF%EPE(JJ(3)+I)/NPTG	      
+                     EVAR(1,I) = EVAR(1,I) + LBUF%EPE(JJ(1)+I)/NPTG        
+                     EVAR(2,I) = EVAR(2,I) + LBUF%EPE(JJ(2)+I)/NPTG        
+                     EVAR(3,I) = EVAR(3,I) + LBUF%EPE(JJ(3)+I)/NPTG        
                    ENDDO                                                  
                  ENDDO                                                    
                ENDDO                                                       
@@ -338,12 +337,12 @@ c
                  DO IL= 1,NLAY                                              
                    DO IPT=1,NPTG                                             
                      LBUF =>  ELBUF_TAB(NG)%BUFLY(IL)%LBUF(IPT,1,1)           
-                     EVAR(1,I) = EVAR(1,I)+LBUF%STRA(JJ(1)+I)/NPTG		
-                     EVAR(2,I) = EVAR(2,I)+LBUF%STRA(JJ(2)+I)/NPTG		
-                     EVAR(3,I) = EVAR(3,I)+LBUF%STRA(JJ(3)+I)/NPTG		
-                     EVAR(4,I) = EVAR(4,I)+LBUF%STRA(JJ(4)+I)/NPTG	   
-                     EVAR(5,I) = EVAR(5,I)+LBUF%STRA(JJ(5)+I)/NPTG	   
-                     EVAR(6,I) = EVAR(6,I)+LBUF%STRA(JJ(6)+I)/NPTG	   
+                     EVAR(1,I) = EVAR(1,I)+LBUF%STRA(JJ(1)+I)/NPTG
+                     EVAR(2,I) = EVAR(2,I)+LBUF%STRA(JJ(2)+I)/NPTG
+                     EVAR(3,I) = EVAR(3,I)+LBUF%STRA(JJ(3)+I)/NPTG
+                     EVAR(4,I) = EVAR(4,I)+LBUF%STRA(JJ(4)+I)/NPTG     
+                     EVAR(5,I) = EVAR(5,I)+LBUF%STRA(JJ(5)+I)/NPTG     
+                     EVAR(6,I) = EVAR(6,I)+LBUF%STRA(JJ(6)+I)/NPTG     
                    ENDDO                                                     
                  ENDDO                                                      
                ENDDO                                                     
@@ -356,12 +355,12 @@ C           CRACKS
 C-----------------------------------------------                        
             LBUF =>  ELBUF_TAB(NG)%BUFLY(1)%LBUF(1,1,1)          
             DO I=LFT,LLT                                                 
-              EVAR(1,I) = LBUF%DGLO(JJ(1)+I)		    
-              EVAR(2,I) = LBUF%DGLO(JJ(2)+I)		    
-              EVAR(3,I) = LBUF%DGLO(JJ(3)+I)		    
-              EVAR(4,I) = LBUF%DGLO(JJ(4)+I)	      
-              EVAR(5,I) = LBUF%DGLO(JJ(5)+I)	      
-              EVAR(6,I) = LBUF%DGLO(JJ(6)+I)	      
+              EVAR(1,I) = LBUF%DGLO(JJ(1)+I)        
+              EVAR(2,I) = LBUF%DGLO(JJ(2)+I)        
+              EVAR(3,I) = LBUF%DGLO(JJ(3)+I)        
+              EVAR(4,I) = LBUF%DGLO(JJ(4)+I)        
+              EVAR(5,I) = LBUF%DGLO(JJ(5)+I)        
+              EVAR(6,I) = LBUF%DGLO(JJ(6)+I)        
             ENDDO                                                        
             IF (KCVT/=0) THEN                                          
 C             DAMAGE IN GLOBAL SYSTEM                                    
@@ -475,9 +474,9 @@ C-----------------------------------------------
             DO I=LFT,LLT                                                
               N = I + NFT                                               
               IF (EL2FA(NN3+N)/=0) THEN                                 
-                EVAR(1,I) = LBUF%DGLO(JJ(1)+I)  	    
-                EVAR(2,I) = LBUF%DGLO(JJ(2)+I)  	    
-                EVAR(3,I) = LBUF%DGLO(JJ(3)+I)  	    
+                EVAR(1,I) = LBUF%DGLO(JJ(1)+I)        
+                EVAR(2,I) = LBUF%DGLO(JJ(2)+I)        
+                EVAR(3,I) = LBUF%DGLO(JJ(3)+I)        
                 EVAR(4,I) = LBUF%DGLO(JJ(4)+I)        
                 EVAR(5,I) = LBUF%DGLO(JJ(5)+I)        
                 EVAR(6,I) = LBUF%DGLO(JJ(6)+I)        

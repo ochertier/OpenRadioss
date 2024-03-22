@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,10 +25,16 @@ Chd|  BPRELOAD_MOD                  share/modules1/bpreload_mod.F
 Chd|-- called by -----------
 Chd|        INITIA                        source/elements/initia/initia.F
 Chd|        LECTUR                        source/starter/lectur.F       
+Chd|        PGRTAILS                      source/elements/beam/pgrtails.F
+Chd|        PINIT3                        source/elements/beam/pinit3.F 
+Chd|        RGRTAILS                      source/elements/spring/rgrtails.F
+Chd|        RINIT3                        source/elements/spring/rinit3.F
 Chd|        S10INIT3                      source/elements/solid/solide10/s10init3.F
 Chd|        S4INIT3                       source/elements/solid/solide4/s4init3.F
 Chd|        S8ZINIT3                      source/elements/solid/solide8z/s8zinit3.F
 Chd|        SINIT3                        source/elements/solid/solide/sinit3.F
+Chd|        TGRTAILS                      source/elements/truss/tgrtails.F
+Chd|        TINIT3                        source/elements/truss/tinit3.F
 Chd|-- calls ---------------
 Chd|====================================================================
       MODULE BPRELOAD_MOD
@@ -45,7 +51,13 @@ C-----------------------------------------------
      .   DIMENSION(:),ALLOCATABLE :: PRELOAD
       my_real,
      .   DIMENSION(:),ALLOCATABLE :: VPRELOAD
-
+      INTEGER,
+     .   DIMENSION(:),ALLOCATABLE :: IPRELOAD1
+!--------------
+      TYPE PREL1D_
+        INTEGER   :: sens_id, fun_id
+        my_real   :: preload, damp
+      END TYPE PREL1D_
 
 C-----------------------------------------------
       END MODULE BPRELOAD_MOD

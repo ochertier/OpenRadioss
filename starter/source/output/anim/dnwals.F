@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,7 +25,7 @@ Chd|  DNWALS                        source/output/anim/dnwals.F
 Chd|-- called by -----------
 Chd|        DSECNOR                       source/output/anim/dsecnor.F  
 Chd|-- calls ---------------
-Chd|        WRITE_S_C                     source/output/tools/write_routines.c
+Chd|        WRITE_S_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|====================================================================
       SUBROUTINE DNWALS(X ,RWL ,MSR )                                   
 C-----------------------------------------------                        

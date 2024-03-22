@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,9 +26,8 @@ Chd|-- called by -----------
 Chd|        UPDMAT                        source/materials/updmat.F     
 Chd|-- calls ---------------
 Chd|        GET_LEMAX                     ../common_source/modules/nlocal_reg_mod.F
-Chd|        INIT_MAT_KEYWORD              source/materials/mat/init_mat_keyword.F
 Chd|        ELBUFTAG_MOD                  share/modules1/elbuftag_mod.F 
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/matparam_def_mod.F
+Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        NLOCAL_REG_MOD                ../common_source/modules/nlocal_reg_mod.F
 Chd|====================================================================
@@ -49,10 +48,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "com04_c.inc"
-#include      "scr17_c.inc"
-#include      "units_c.inc"
-#include      "sysunit.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -70,7 +65,7 @@ C-----------------------------------------------
      .  Q1,Q2,Q3,EPN,AS,KW,F0,FC,FR,RLEN,HKHI
 C=======================================================================
       IF (IFAILG == 1) THEN
-        ILOC  = NINT(UPARF(1))
+        ILOC  = MATPARAM%NLOC
         !IGURSON = 0  no damage (default) 
         IF (ILOC == 0) THEN
           IGURSON = 1 ! local damage
@@ -108,18 +103,15 @@ c
         IF (ILOC>0) THEN
           NLOC_DMG%LEN(IMAT) = MAX(NLOC_DMG%LEN(IMAT), RLEN)
           CALL GET_LEMAX(NLOC_DMG%LE_MAX(IMAT),NLOC_DMG%LEN(IMAT))
+          MLAW_TAG%G_PLANL  = 1
+          MLAW_TAG%L_PLANL  = 1
+          MLAW_TAG%G_EPSDNL = 1
+          MLAW_TAG%L_EPSDNL = 1
         ENDIF
 c
         ! Tag for damage output
         MLAW_TAG%G_DMG    = 1
         MLAW_TAG%L_DMG    = 1
-        MLAW_TAG%G_PLANL  = 1
-        MLAW_TAG%L_PLANL  = 1
-        MLAW_TAG%G_EPSDNL = 1
-        MLAW_TAG%L_EPSDNL = 1
-c
-        ! Update MATPARAM 
-        CALL INIT_MAT_KEYWORD(MATPARAM ,"COMPRESSIBLE")
 c
         ! Storage of damage parameters
         UPARAM(30) = IGURSON

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,7 +26,7 @@ Chd|-- called by -----------
 Chd|        I11MAINF                      source/interfaces/int11/i11mainf.F
 Chd|-- calls ---------------
 Chd|        BITGET                        source/interfaces/intsort/i20sto.F
-Chd|        TRI7BOX                       share/modules/tri7box.F
+Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
       SUBROUTINE I11FOR3(
      1                JLT      ,FSAV     ,GAP      ,FRIC    ,MS      ,
@@ -71,21 +71,14 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "com06_c.inc"
 #include      "com08_c.inc"
-#include      "scr02_c.inc"
-#include      "scr03_c.inc"
 #include      "scr05_c.inc"
 #include      "scr07_c.inc"
 #include      "scr11_c.inc"
-#include      "scr14_c.inc"
-#include      "scr16_c.inc"
 #include      "scr18_c.inc"
 #include      "units_c.inc"
-#include      "parit_c.inc"
-#include      "couple_c.inc"
 #include      "impl1_c.inc"
 #include      "sms_c.inc"
 #include      "param_c.inc"
-#include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -150,7 +143,6 @@ C-----------------------------------------------
      .   CX,CY,CFI,AUX,DTM,FT,FN,FTN,FXT(MVSIZ),FYT(MVSIZ),
      .   FZT(MVSIZ)
 C-----------------------------------------------
-#include "sync_dir.inc"
       IF (IRESP == 1) THEN
         PREC = FIVEEM4
       ELSE

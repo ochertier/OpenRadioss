@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,28 +26,23 @@ Chd|-- called by -----------
 Chd|        S4FORC3                       source/elements/solid/solide4/s4forc3.F
 Chd|-- calls ---------------
 Chd|====================================================================
-      SUBROUTINE S4MALLA3(SAV, OFFG ,OFF  ,WXX,WYY,
-     .                   WZZ,NEL)
+      SUBROUTINE S4MALLA3(
+     1   SAV,     OFFG,    OFF,     WXX,
+     2   WYY,     WZZ,     NEL,     ISMSTR,
+     3   JLAG)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "vect01_c.inc"
-#include      "com08_c.inc"
-#include      "scr18_c.inc"
-#include      "impl1_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: ISMSTR
+      INTEGER, INTENT(IN) :: JLAG
       INTEGER NEL
-C     REAL
       my_real
      .   OFFG(*),OFF(*),WXX(*),WYY(*),WZZ(*)
       DOUBLE PRECISION
@@ -64,7 +59,7 @@ C-----------------------------
 C     ROTATION RBY DES COORDONNEES POUR SMALL STRAIN
 C-----------------------------
       IF(ISMSTR==11)THEN
-       DO I=LFT,LLT
+       DO I=1,NEL
 C-----------------------------------------------
          IF(OFFG(I)==ZERO) CYCLE
          X=SAV(I,1)
@@ -90,7 +85,7 @@ C
 C
        ENDDO
       ELSEIF(ISMSTR<=4.AND.JLAG>0)THEN
-       DO I=LFT,LLT
+       DO I=1,NEL
        IF(OFFG(I)>ONE)THEN
 C-----------------------------------------------
          X=SAV(I,1)

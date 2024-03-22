@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -30,7 +30,7 @@ Chd|        C3FINT_REG_INI                source/elements/sh3n/coque3n/c3fint_re
 Chd|        CBAFINT_REG_INI               source/elements/shell/coqueba/cbafint_reg_ini.F
 Chd|        CDKFINT_REG_INI               source/elements/sh3n/coquedk/cdkfint_reg_ini.F
 Chd|        CFINT_REG_INI                 source/elements/shell/coque/cfint_reg_ini.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        NLOCAL_REG_MOD                ../common_source/modules/nlocal_reg_mod.F
 Chd|====================================================================
@@ -55,12 +55,6 @@ C-----------------------------------------------
 #include      "param_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "my_allocate.inc"
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
-#include      "scr17_c.inc"
-#include      "units_c.inc"
-#include      "tabsiz_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -184,6 +178,3 @@ C-----------------------------------------------
         ENDIF
 c-----------
       END
-c-----------
-C-----------------------------------------------------------------------
-C-----------------------------------------------------------------------

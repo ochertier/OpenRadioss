@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -28,17 +28,6 @@ Chd|        HM_READ_MAT_99                source/materials/mat/matuser/hm_read_m
 Chd|-- calls ---------------
 Chd|====================================================================
       MODULE LAW_USER
-C-----------------------------------------------
-C   D e r i v e d   T y p e   D e f i n i t i o n s
-C-----------------------------------------------
-C-----------------------------------------------
-C   I m p l i c i t   T y p e s
-C-----------------------------------------------
-#include "my_real.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
 C---------+---------+---+---+--------------------------------------------
 C VAR     | SIZE    |TYP| RW| DEFINITION
 C---------+---------+---+---+--------------------------------------------
@@ -47,7 +36,6 @@ C---------+---------+---+---+--------------------------------------------
 C NAME    |   100   | C | R | MATERIAL NAME
 C---------+---------+---+---+--------------------------------------------
 C ...     |         |   |   |
-C---------+---------+---+---+--------------------------------------------
 C---------+---------+---+---+--------------------------------------------
 C
       TYPE ULAWBUF

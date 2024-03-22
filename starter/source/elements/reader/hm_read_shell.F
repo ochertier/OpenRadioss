@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -81,16 +81,12 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr17_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com10_c.inc"
 #include      "units_c.inc"
 #include      "scr03_c.inc"
 #include      "param_c.inc"
 #include      "titr_c.inc"
 #include      "remesh_c.inc"
-#include      "sysunit.inc"
-#include      "submod_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -182,7 +178,7 @@ C--------------------------------------------------
         IF(UID_SHELL(I) /= UID )THEN
           UID = UID_SHELL(I)
           IFLAGUNIT = 0          
-          DO J=1,NUNITS                         
+          DO J=1,UNITAB%NUNITS                         
             IF (UNITAB%UNIT_ID(J) == UID) THEN  
               FAC_L = UNITAB%FAC_L(J)                 
               IFLAGUNIT = 1                     

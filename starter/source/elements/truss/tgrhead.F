@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -33,7 +33,7 @@ Chd|====================================================================
      2       ITR1,   EADD, INDEX,   ITRI    ,      
      3       IPARTT, ND,   IGRSURF, IGRTRUSS,
      4       CEP,    XEP,  ITRUOFF ,
-     5       TAGPRT_SMS)
+     5       TAGPRT_SMS,ITAGPRLD_TRUSS)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -57,24 +57,13 @@ C   I M P L I C I T   T Y P E S
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G L O B A L   P A R A M E T E R S
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C O M M O N   B L O C K S
 C-----------------------------------------------
 #include      "vect01_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com10_c.inc"
-#include      "units_c.inc"
 #include      "param_c.inc"
-#include      "warn_c.inc"
-#include      "scr03_c.inc"
 #include      "scr05_c.inc"
-#include      "scr21_c.inc"
 #include      "sms_c.inc"
-#include      "scr17_c.inc"
 C-----------------------------------------------
 C   D U M M Y   A R G U M E N T S
 C-----------------------------------------------
@@ -82,6 +71,7 @@ C-----------------------------------------------
      .        EADD(*),ITR1(*),INDEX(*),ITRI(4,*),
      .        ND, CEP(*), XEP(*),
      .        ITRUOFF(*), TAGPRT_SMS(*)
+      INTEGER ,INTENT(INOUT), DIMENSION(NUMELT) ::ITAGPRLD_TRUSS
 C     REAL OU REAL*8
       my_real
      .    PM(NPROPM,*), GEO(NPROPG,*)
@@ -95,7 +85,7 @@ C-----------------------------------------------
      .        I, K,  MLN, NG, ISSN, NN, N, MID, PID ,
      .        II, J, II2,JJ2,JJ,L,II3,JJ3,NGROU,
      .        MSKMLN,MSKISN,MSKPID, MSKMID, MODE,
-     .        WORK(70000)
+     .        WORK(70000),IPRLD
       EXTERNAL MY_SHIFTL,MY_SHIFTR,MY_AND
       INTEGER MY_SHIFTL,MY_SHIFTR,MY_AND
 C
@@ -136,6 +126,8 @@ C
         PID= IXT(4,II)
         ISSN = 0
         IF(GEO(5,PID)/=0.) ISSN=1
+        IPRLD = ITAGPRLD_TRUSS(II)
+        IF (IPRLD>0) MLN = MLN+IPRLD
 C
         ISSN=MY_SHIFTL(ISSN,6)
         MLN=MY_SHIFTL(MLN,21)
@@ -201,6 +193,11 @@ C
         DO J=1,NN
           IGRTRUSS(I)%ENTITY(J) = ITR1(IGRTRUSS(I)%ENTITY(J))
         ENDDO
+      ENDDO
+C REORDERING FOR ITAGPRLD_TRUSS
+      DO I=1,NUMELT
+        IF (ITAGPRLD_TRUSS(I) ==0) CYCLE
+        ITAGPRLD_TRUSS(I) = ITR1(ITAGPRLD_TRUSS(I))
       ENDDO
 C
 C--------------------------------------------------------------

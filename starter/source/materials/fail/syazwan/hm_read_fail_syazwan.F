@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -30,31 +30,21 @@ Chd|        HM_GET_FLOATV                 source/devtools/hm_reader/hm_get_float
 Chd|        HM_GET_FLOATV_DIM             source/devtools/hm_reader/hm_get_floatv_dim.F
 Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
 Chd|        HM_OPTION_IS_ENCRYPTED        source/devtools/hm_reader/hm_option_is_encrypted.F
+Chd|        FAIL_PARAM_MOD                ../common_source/modules/mat_elem/fail_param_mod.F
 Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
       SUBROUTINE HM_READ_FAIL_SYAZWAN(
-     .           UPARAM    ,MAXUPARAM ,NUPARAM ,NUVAR  ,IFUNC  ,
-     .           MAXFUNC   ,NFUNC     ,UNITAB  ,MAT_ID ,FAIL_ID,
-     .           TITR      ,LSUBMODEL )
+     .           FAIL    ,MAT_ID   ,FAIL_ID  ,IRUPT    ,
+     .           TITR    ,LSUBMODEL,UNITAB   )
 C-----------------------------------------------
-C   ROUTINE DESCRIPTION :
-C   ===================
-C   READ FAILURE SYAZWAN
-C-----------------------------------------------
-C   DUMMY ARGUMENTS DESCRIPTION:
-C   ===================
-C
-C     NAME            DESCRIPTION                         
-C
-C     UNITAB          UNITS ARRAY
-C     FAIL_ID         FAILURE ID(INTEGER)
-C     TITR            MATERIAL TITLE
-C     LSUBMODEL       SUBMODEL STRUCTURE   
+c    ROUTINE DESCRIPTION :
+c    Syazwan failure model
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE FAIL_PARAM_MOD
       USE UNITAB_MOD
       USE MESSAGE_MOD
       USE SUBMODEL_MOD
@@ -64,34 +54,19 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C----------+---------+---+---+--------------------------------------------
-C VAR      | SIZE    |TYP| RW| DEFINITION
+C   C o m m o n   B l o c k s
 C----------+---------+---+---+--------------------------------------------
-C UPARAM   | NUPARAM | F | W | USER FAILURE MODEL PARAMETER ARRAY
-C MAXUPARAM|  1      | I | R | MAXIMUM SIZE OF UPARAM 
-C NUPARAM  |  1      | I | W | SIZE OF UPARAM =< MAXUPARAM
-C NUVAR    |  1      | I | W | NUMBER OF USER  VARIABLES
-C----------+---------+---+---+--------------------------------------------
-C IFUNC    | NFUNC   | I | W | FUNCTION NUMBER ARRAY
-C MAXFUNC  |  1      | I | R | MAXIMUM SIZE OF IFUNC
-C NFUNC    |  1      | I | W | SIZE OF IFUNC =< MAXFUNC
-C FAIL_ID  |  1      | I | W | ID OF FAILURE CRITERIA
-C----------+---------+---+---+--------------------------------------------
-#include      "scr17_c.inc"
 #include      "units_c.inc"
-#include      "submod_c.inc"
-#include      "sysunit.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-C INPUT ARGUMENTS
-      TYPE (UNIT_TYPE_),INTENT(IN) :: UNITAB 
-      INTEGER,INTENT(IN) :: MAXUPARAM,MAXFUNC,FAIL_ID,MAT_ID
-      TYPE(SUBMODEL_DATA),INTENT(IN) :: LSUBMODEL(*)
-      CHARACTER TITR*nchartitle
-C MODIFIED ARGUMENT
-      INTEGER,INTENT(INOUT) :: IFUNC(MAXFUNC),NFUNC
-      my_real,INTENT(INOUT) :: UPARAM(MAXUPARAM)
-      INTEGER,INTENT(OUT)   :: NUPARAM,NUVAR
+      INTEGER            ,INTENT(IN) :: FAIL_ID         ! failure model ID
+      INTEGER            ,INTENT(IN) :: MAT_ID          ! material law ID
+      INTEGER            ,INTENT(IN) :: IRUPT           ! failure model type number
+      CHARACTER          ,INTENT(IN) :: TITR*500        ! material model title
+      TYPE(UNIT_TYPE_)   ,INTENT(IN) :: UNITAB          ! table of input units
+      TYPE(SUBMODEL_DATA),INTENT(IN) :: LSUBMODEL(*)    ! submodel table
+      TYPE(FAIL_PARAM_)  ,INTENT(INOUT) :: FAIL         ! failure model data structure
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -103,7 +78,7 @@ C-----------------------------------------------
      .        EPF_SHEAR,EPF_TENS,EPF_PLSTRN,EPF_BIAX
       my_real TRIAX,LODEP,COS3THETA,EPSFAIL
       DOUBLE PRECISION :: EPF(6),MAT(6,6)
-      INTEGER ICARD,IFORM,DINIT,INST,REG_FUNC,INFO,IPIV(6),I
+      INTEGER ICARD,IFORM,DINIT,INST,REG_FUNC,INFO,IPIV(6),I,FAILIP
       LOGICAL :: IS_AVAILABLE,IS_ENCRYPTED,NEGATIVE
 C-----------------------------------------------    
       IS_ENCRYPTED = .FALSE.
@@ -120,6 +95,7 @@ C--------------------------------------------------
       IF (ICARD <= 0) ICARD = 1
       ICARD = MIN(ICARD,2)
       CALL HM_GET_FLOATV ('EPFMIN'   ,EPFMIN  ,IS_AVAILABLE,LSUBMODEL,UNITAB)
+      CALL HM_GET_INTV   ('FAILIP'   ,FAILIP  ,IS_AVAILABLE,LSUBMODEL)
       ! 2nd Line : failure criterion parameters
       IF (ICARD == 1) THEN 
         CALL HM_GET_FLOATV ('C1'        ,C1        ,IS_AVAILABLE,LSUBMODEL,UNITAB)
@@ -265,39 +241,50 @@ C--------------------------------------------------
         TRIAX = TRIAX + (TWO*TWO_THIRD)/EP03
       ENDDO
       IF (NEGATIVE) THEN 
-        CALL ANCMSG(MSGID=2091,
-     .              MSGTYPE=MSGWARNING,
-     .              ANMODE=ANINFO_BLIND_1,
+        CALL ANCMSG(MSGID=2091, MSGTYPE=MSGWARNING, ANMODE=ANINFO_BLIND_1,
      .              I1=MAT_ID,
      .              C1=TITR,
      .              R1=EPFMIN)
       ENDIF
+      ! Default value for NUMFIP
+      IF (FAILIP == 0) FAILIP = 1
 C--------------------------------------------------
 C SAVE PARAMETERS
 C--------------------------------------------------
-      ! Number of functions
-      NFUNC      = 1
-      IFUNC(1)   = REG_FUNC
-      ! Number of parameters
-      NUPARAM    = 16
-      UPARAM(1)  = C1
-      UPARAM(2)  = C2
-      UPARAM(3)  = C3
-      UPARAM(4)  = C4
-      UPARAM(5)  = C5
-      UPARAM(6)  = C6
-      UPARAM(7)  = IFORM
-      UPARAM(8)  = DINIT
-      UPARAM(9)  = DAM_SF
-      UPARAM(10) = MAX_DAM
-      UPARAM(11) = INST
-      UPARAM(12) = N_VAL
-      UPARAM(13) = SOFTEXP
-      UPARAM(14) = REF_LEN
-      UPARAM(15) = REG_SCALE
-      UPARAM(16) = EPFMIN
-      ! Number of internal variables
-      NUVAR      = 3
+      FAIL%KEYWORD = 'SYAZWAN' 
+      FAIL%IRUPT   = IRUPT 
+      FAIL%FAIL_ID = FAIL_ID 
+      FAIL%NUPARAM = 17
+      FAIL%NIPARAM = 0
+      FAIL%NUVAR   = 3
+      FAIL%NFUNC   = 1
+      FAIL%NTABLE  = 0
+      FAIL%NMOD    = 0
+c            
+      ALLOCATE (FAIL%UPARAM(FAIL%NUPARAM))
+      ALLOCATE (FAIL%IPARAM(FAIL%NIPARAM))
+      ALLOCATE (FAIL%IFUNC (FAIL%NFUNC))
+      ALLOCATE (FAIL%TABLE (FAIL%NTABLE))
+c
+      FAIL%IFUNC(1) = REG_FUNC
+c
+      FAIL%UPARAM(1)  = C1
+      FAIL%UPARAM(2)  = C2
+      FAIL%UPARAM(3)  = C3
+      FAIL%UPARAM(4)  = C4
+      FAIL%UPARAM(5)  = C5
+      FAIL%UPARAM(6)  = C6
+      FAIL%UPARAM(7)  = IFORM
+      FAIL%UPARAM(8)  = DINIT
+      FAIL%UPARAM(9)  = DAM_SF
+      FAIL%UPARAM(10) = MAX_DAM
+      FAIL%UPARAM(11) = INST
+      FAIL%UPARAM(12) = N_VAL
+      FAIL%UPARAM(13) = SOFTEXP
+      FAIL%UPARAM(14) = REF_LEN
+      FAIL%UPARAM(15) = REG_SCALE
+      FAIL%UPARAM(16) = EPFMIN
+      FAIL%UPARAM(17) = FAILIP
 C--------------------------------------------------
 C PRINT OUT PARAMETERS
 C--------------------------------------------------
@@ -312,7 +299,7 @@ C--------------------------------------------------
         ELSE 
           WRITE(IOUT,1200) C1,C2,C3,C4,C5,C6
         ENDIF
-        WRITE(IOUT,1300) EPFMIN
+        WRITE(IOUT,1300) EPFMIN,FAILIP
         WRITE(IOUT,1400) DINIT,DAM_SF,MAX_DAM
         WRITE(IOUT,1500) INST,IFORM,N_VAL,SOFTEXP
         IF (REG_FUNC > 0) THEN 
@@ -347,7 +334,8 @@ C
      & 5X,'5TH FAILURE PARAMETER (C5). . . . . . . . . . . . . . . =',1PG20.13/
      & 5X,'6TH FAILURE PARAMETER (C6). . . . . . . . . . . . . . . =',1PG20.13/)
  1300 FORMAT(
-     & 5X,'MINIMUM PLASTIC STRAIN AT FAILURE (EPFMIN)  . . . . . . =',1PG20.13/)
+     & 5X,'MINIMUM PLASTIC STRAIN AT FAILURE (EPFMIN)  . . . . . . =',1PG20.13/
+     & 5X,'NUM. OF FAILED INTG. PTS. PRIOR TO SOLID ELM. DELETION. =',I10/)
  1400 FORMAT(
      & 5X,'DAMAGE VARIABLE INITIALIZATION FLAG (DINIT) . . . . . . =',I10/,
      & 5X,'   DINIT = 0: NO DAMAGE INITIALIZATION                   ',/,

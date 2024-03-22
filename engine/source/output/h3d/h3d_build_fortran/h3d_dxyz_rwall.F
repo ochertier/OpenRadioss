@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -40,10 +40,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr03_c.inc"
 #include      "param_c.inc"
 #include      "com04_c.inc"
-#include      "scr05_c.inc"
 #include      "task_c.inc"
 #include      "com01_c.inc"
 C-----------------------------------------------
@@ -171,30 +169,30 @@ c
           DY = YMAX - YMIN
           DZ = ZMAX - ZMIN
 
-  	  R =  HALF*RWBUF(7,N)
-  	  XL = HALF*MAX(DX,DY,DZ)
-  	  V1 = ZERO
-  	  V2 = ZEP707
-  	  V3 = ZEP707
-  	  VV1 = V2 * ZN - V3 * YN
-  	  VV2 = V3 * XN - V1 * ZN
-  	  VV3 = V1 * YN - V2 * XN
-  	  VV = SQRT(VV1*VV1 + VV2*VV2 + VV3*VV3)
-  	  IF(VV<=HALF)THEN
-  	    V1 = ZERO
-  	    V2 = -ZEP707
-  	    V3 = ZEP707
-  	    VV1 = V2 * ZN - V3 * YN
-  	    VV2 = V3 * XN - V1 * ZN
-  	    VV3 = V1 * YN - V2 * XN
-  	    VV = SQRT(VV1*VV1 + VV2*VV2 + VV3*VV3)
-  	  ENDIF
-  	  VV1 = R*VV1/VV
-  	  VV2 = R*VV2/VV
-  	  VV3 = R*VV3/VV
-  	  V1 = VV2 * ZN - VV3 * YN
-  	  V2 = VV3 * XN - VV1 * ZN
-  	  V3 = VV1 * YN - VV2 * XN
+            R =  HALF*RWBUF(7,N)
+            XL = HALF*MAX(DX,DY,DZ)
+            V1 = ZERO
+            V2 = ZEP707
+            V3 = ZEP707
+            VV1 = V2 * ZN - V3 * YN
+            VV2 = V3 * XN - V1 * ZN
+            VV3 = V1 * YN - V2 * XN
+            VV = SQRT(VV1*VV1 + VV2*VV2 + VV3*VV3)
+            IF(VV<=HALF)THEN
+              V1 = ZERO
+              V2 = -ZEP707
+              V3 = ZEP707
+              VV1 = V2 * ZN - V3 * YN
+              VV2 = V3 * XN - V1 * ZN
+              VV3 = V1 * YN - V2 * XN
+              VV = SQRT(VV1*VV1 + VV2*VV2 + VV3*VV3)
+            ENDIF
+            VV1 = R*VV1/VV
+            VV2 = R*VV2/VV
+            VV3 = R*VV3/VV
+            V1 = VV2 * ZN - VV3 * YN
+            V2 = VV3 * XN - VV1 * ZN
+            V3 = VV1 * YN - VV2 * XN
 
           RWALL_V1(N) = V1
           RWALL_V2(N) = V2

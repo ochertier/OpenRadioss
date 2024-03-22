@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,8 +25,8 @@ Chd|  DFUNCC                        source/output/anim/dfuncc.F
 Chd|-- called by -----------
 Chd|        GENANI1                       source/output/anim/genani1.F  
 Chd|-- calls ---------------
-Chd|        WRITE_R_C                     source/output/tools/write_routines.c
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        WRITE_R_C                     ../common_source/tools/input_output/write_routtines.c
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE DFUNCC(ELBUF_TAB,BUFEL,FUNC ,IFUNC,IPARG,                
      .                  IXQ      ,IXC  ,IXTG ,PM   ,EL2FA,                    
@@ -80,7 +80,7 @@ C La routine ne fonctionne que pour les IFUNC 3,6,7,14-19 (stress)
       NN9 = NN8                                                         
 C                                                                       
       DO 900 NG=1,NGROUP
-	    MLW = IPARG(1,NG)
+              MLW = IPARG(1,NG)
         NEL = IPARG(2,NG)                                            
         NFT = IPARG(3,NG)
         ITY = IPARG(5,NG)

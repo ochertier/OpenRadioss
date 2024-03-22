@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -28,7 +28,7 @@ Chd|-- calls ---------------
 Chd|        I9WALE                        source/interfaces/int09/i9wale.F
 Chd|        INT12W                        source/ale/inter/int12w.F     
 Chd|        INTAL4                        source/ale/inter/intal4.F     
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE INTAL3(IPARI,X        ,V      ,
@@ -50,11 +50,7 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "secur_c.inc"
 #include      "task_c.inc"
-#include      "units_c.inc"
-#include      "scr05_c.inc"
-#include      "tabsiz_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -87,7 +83,7 @@ C-----------------------------------------------
      4        PM        ,NALE         )
        ELSEIF(NTY == 12) THEN
         IF(ISPMD == 0)THEN
-	 ITIED=NINT(INTBUF_TAB(N)%VARIABLES(1))
+           ITIED=NINT(INTBUF_TAB(N)%VARIABLES(1))
 C Grid Velocities of secondary nodes are not interpolated
 C ONLY in case "TIED"
          IF (ITIED  == 1 .OR. ITIED == 2) CALL INT12W(

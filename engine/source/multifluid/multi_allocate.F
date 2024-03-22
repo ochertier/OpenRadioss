@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,15 +27,17 @@ Chd|        RESTALLOC                     source/output/restart/arralloc.F
 Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
 Chd|        ARRET                         source/system/arret.F         
+Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|====================================================================
-      SUBROUTINE MULTI_ALLOCATE(MULTI_FVM)
+      SUBROUTINE MULTI_ALLOCATE(MULTI_FVM,H3D_DATA)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE MULTI_FVM_MOD
       USE MESSAGE_MOD
+      USE H3D_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -51,6 +53,7 @@ C----------------------------------------------
 C     D u m m y   a r g u m e n t s
 C----------------------------------------------
       TYPE(MULTI_FVM_STRUCT) :: MULTI_FVM
+      TYPE (H3D_DATABASE) :: H3D_DATA
 C----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -137,6 +140,15 @@ C     Allocation of centroid velocities
               CALL ARRET(2)
            ENDIF     
            MULTI_FVM%VEL(:, :) = ZERO
+C     Allocation of centroid accelerations
+         IF(H3D_DATA%N_VECT_ACC == 1)THEN
+           ALLOCATE(MULTI_FVM%ACC(3, LEN), STAT = IERR)
+           IF (IERR /= 0) THEN
+              CALL ANCMSG(MSGID=20,ANMODE=ANINFO)
+              CALL ARRET(2)
+           ENDIF     
+           MULTI_FVM%ACC(:, :) = ZERO  
+         ENDIF         
 C     Allocation of soud speed
            ALLOCATE(MULTI_FVM%SOUND_SPEED(LEN), STAT = IERR)
            IF (IERR /= 0) THEN

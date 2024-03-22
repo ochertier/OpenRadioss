@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -56,19 +56,14 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr05_c.inc"
 #include      "scr17_c.inc"
 #include      "com04_c.inc"
 #include      "sphcom.inc"
-#include      "submod_c.inc"
 #include      "param_c.inc"
 #include      "units_c.inc"
-#include      "warn_c.inc"
 #include      "r2r_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -106,7 +101,7 @@ C
         NMP=NMP+1
 C----------Multidomaines --> on ignore les mpc non tages----------
         IF(NSUBDOM>0)THEN
-	  IF(TAGMPC(NMP)==0)CALL HM_SZ_R2R(TAGMPC,NMP,LSUBMODEL)
+            IF(TAGMPC(NMP)==0)CALL HM_SZ_R2R(TAGMPC,NMP,LSUBMODEL)
         END IF
 C-----------------------------------------------------------------
         CALL HM_OPTION_READ_KEY(LSUBMODEL,
@@ -129,7 +124,7 @@ C
           NOSYS = USR2SYS(NOD,ITABM,MESS,ID)
           IF (NS10E>0) THEN 
             IF(ITAGND(NOSYS)/=0) THEN
-C------- error out	
+C------- error out
            CALL ANCMSG(MSGID=1208,
      .                MSGTYPE=MSGERROR,
      .                ANMODE=ANINFO_BLIND_1,
@@ -141,7 +136,7 @@ C------- error out
           END IF
           CALL KINSET(512,ITAB(NOSYS),IKINE(NOSYS),7,0,IKINE1LAG(NOSYS))
           IBUFNN(KF) = NOSYS
-	  IF(IMACH==3) CALL IFRONTPLUS(NOSYS,1)
+            IF(IMACH==3) CALL IFRONTPLUS(NOSYS,1)
           IBUFDL(KF) = IDDL
           IBUFSK(KF) = 0
           DO J=0,NUMSKW+MIN(1,NSPCOND)*NUMSPH+NSUBMOD
@@ -207,8 +202,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "scr17_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

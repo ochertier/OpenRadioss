@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,10 +26,12 @@ Chd|-- called by -----------
 Chd|        CONC24                        source/materials/mat/mat024/conc24.F
 Chd|-- calls ---------------
 Chd|====================================================================
-      SUBROUTINE ROTLOC(NEL,GAMA,
-     .                  RX,RY,RZ,SX,SY,SZ,
-     .                  R11,R12,R13,R21,R22,
-     .                  R23,R31,R32,R33)
+      SUBROUTINE ROTLOC(
+     1   NEL,     GAMA,    RX,      RY,
+     2   RZ,      SX,      SY,      SZ,
+     3   R11,     R12,     R13,     R21,
+     4   R22,     R23,     R31,     R32,
+     5   R33,     JCVT,    JSPH)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -41,6 +43,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: JCVT
+      INTEGER, INTENT(IN) :: JSPH
       INTEGER NEL
       my_real, DIMENSION(NEL), INTENT(INOUT)  :: RX,RY,RZ,SX,SY,SZ
       my_real, DIMENSION(NEL), INTENT(OUT)    :: R11,R12,R13,R21,R22,
@@ -50,8 +54,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "param_c.inc"
-#include      "vect01_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

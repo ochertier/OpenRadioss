@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,6 +26,10 @@ Chd|-- called by -----------
 Chd|        LECTUR                        source/starter/lectur.F       
 Chd|-- calls ---------------
 Chd|        ADDMASPART                    source/tools/admas/addmaspart.F
+Chd|        ALE_BOX_COLORATION            source/initial_conditions/inivol/ale_box_coloration.F
+Chd|        ALE_BOX_CREATION              source/initial_conditions/inivol/ale_box_creation.F
+Chd|        ALE_ELEMENT_SIZE_COMPUTATION  source/initial_conditions/inivol/ale_element_size_computation.F
+Chd|        ALLOC_1D_ARRAY                ../common_source/modules/array_mod.F
 Chd|        ANCMSG                        source/output/message/message.F
 Chd|        ARRET                         source/system/arret.F         
 Chd|        ASSTIFI                       source/interfaces/inter3d1/asstifi.F
@@ -37,16 +41,20 @@ Chd|        CHECKMP                       source/elements/initia/initia.F
 Chd|        CHEKMP2                       source/elements/initia/initia.F
 Chd|        CINIT3                        source/elements/shell/coque/cinit3.F
 Chd|        CONNESURF                     source/initial_conditions/inivol/connesurf.F
+Chd|        DEALLOC_1D_ARRAY              ../common_source/modules/array_mod.F
+Chd|        DEALLOC_3D_ARRAY              ../common_source/modules/array_mod.F
+Chd|        DTNODA_STIFINT                source/interfaces/inter3d1/dtnoda_stifint.F
 Chd|        EPORIN3                       source/ale/ale3d/eporin3.F    
 Chd|        FRETITL2                      source/starter/freform.F      
 Chd|        FXBSINI                       source/constraints/fxbody/fxbsini.F
-Chd|        FXBVINI                       source/constraints/fxbody/fxbvini.F
+Chd|        FXBVINI                       ../common_source/fxbody/fxbvini.F
 Chd|        GETPHASE                      source/initial_conditions/inivol/getphase.F
 Chd|        IG3DINIT3                     source/elements/ige3d/ig3dinit3.F
 Chd|        INIBOLTPREL                   source/loads/bolt/iniboltprel.F
 Chd|        INIFILL                       source/initial_conditions/inivol/inifill.F
 Chd|        INIGRAV_LOAD                  source/initial_conditions/inigrav/inigrav_load.F
 Chd|        ININODE_RM                    source/materials/mat/mat019/ininode_rm.F
+Chd|        ININTMASS                     source/interfaces/inter3d1/inintmass.F
 Chd|        INIRBE2                       source/constraints/general/rbe2/hm_read_rbe2.F
 Chd|        INIRBY                        source/constraints/general/rbody/inirby.F
 Chd|        INIRBYS                       source/constraints/general/rbody/inirby.F
@@ -82,6 +90,7 @@ Chd|        RINI33_RB                     source/elements/joint/rjoint/rini33_rb
 Chd|        RINI45_RB                     source/elements/joint/rjoint/rini45_rb.F
 Chd|        RINIT3                        source/elements/spring/rinit3.F
 Chd|        S10INIT3                      source/elements/solid/solide10/s10init3.F
+Chd|        S10JACI3                      source/elements/solid/solide10/s10jaci3.F
 Chd|        S16INIT3                      source/elements/thickshell/solide16/s16init3.F
 Chd|        S20INIT3                      source/elements/solid/solide20/s20init3.F
 Chd|        S4INIT3                       source/elements/solid/solide4/s4init3.F
@@ -103,24 +112,28 @@ Chd|        SPMD_MSIN_ADDMASS             source/elements/initia/spmd_msin_addma
 Chd|        SPMD_PARTSAV_PON              source/elements/initia/spmd_msin_addmass.F
 Chd|        SREFSTA3                      source/elements/solid/solide/srefsta3.F
 Chd|        SUINIT3                       source/elements/elbuf_init/suinit3.F
+Chd|        SURFACE_MIN_MAX_COMPUTATION   source/initial_conditions/inivol/surface_min_max_computation.F
 Chd|        TINIT3                        source/elements/truss/tinit3.F
 Chd|        XINIT3                        source/elements/xelem/xinit3.F
 Chd|        STRR                          source/tools/univ/strr.F      
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
+Chd|        ARRAY_MOD                     ../common_source/modules/array_mod.F
 Chd|        BPRELOAD_MOD                  share/modules1/bpreload_mod.F 
 Chd|        DETONATORS_MOD                share/modules1/detonators_mod.F
 Chd|        DRAPE_MOD                     share/modules1/drape_mod.F    
-Chd|        EBCS_MOD                      ../common_source/modules/ebcs_mod.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        EBCS_MOD                      ../common_source/modules/boundary_conditions/ebcs_mod.F
 Chd|        FUNC2D_MOD                    share/modules1/func2d_mod.F   
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
+Chd|        GROUP_PARAM_MOD               ../common_source/modules/mat_elem/group_param_mod.F
 Chd|        INIMAP1D_MOD                  share/modules1/inimap1d_mod.F 
 Chd|        INIMAP2D_MOD                  share/modules1/inimap2d_mod.F 
 Chd|        INIVOL_ARRAY_MOD              share/modules1/inivol_mod.F   
 Chd|        INIVOL_DEF_MOD                share/modules1/inivol_mod.F   
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/matparam_def_mod.F
+Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
+Chd|        INTERFACES_MOD                ../common_source/modules/interfaces/interfaces_mod.F
+Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|        NLOCAL_REG_MOD                ../common_source/modules/nlocal_reg_mod.F
 Chd|        OPTIONDEF_MOD                 ../common_source/modules/optiondef_mod.F
 Chd|        STACK_MOD                     share/modules1/stack_mod.F    
@@ -129,22 +142,22 @@ Chd|====================================================================
       SUBROUTINE INITIA(IPARG      ,ELBUF        ,MS           ,IN           ,V       , 
      1                  X          ,IXS          ,IXQ          ,IXC          ,IXT     , 
      2                  IXP        ,IXR          ,DETONATORS   ,GEO          ,PM      , 
-     3                  RBY        ,NPBY         ,LPBY         ,NPC          ,NPTS    ,	        
+     3                  RBY        ,NPBY         ,LPBY         ,NPC          ,NPTS    ,          
      4                  PLD        ,VEUL         ,ALE_CONNECTIVITY ,SKEW     ,FILL    , 
-     5                  IPART      ,ITAB         ,IXUR         , 
+     5                  IPART      ,ITAB         , 
      6                  IXTG       ,THK          ,NLOC_DMG     ,GROUP_PARAM_TAB,
      7                  IGRNOD     ,IGRSURF      ,BUFSF        ,VR           , 
      8                  BUFMAT     ,XLAS         ,LAS          ,DTELEM       ,MSS     ,
      9                  MSQ        ,MSC          ,MST          ,MSP          ,MSR     , 
-     A                  MSTG       ,PTG          ,MSUR         ,EVUR         ,INC     , 
-     B                  INP        ,INR          ,INTG         ,INUR         ,INDEX   , 
-     C                  ITRI       ,KXX          ,IXX          ,XELEMWA      ,	        
+     A                  MSTG       ,PTG          ,INC     , 
+     B                  INP        ,INR          ,INTG         ,INDEX   , 
+     C                  ITRI       ,KXX          ,IXX          ,XELEMWA      ,          
      E                  IWA        ,
      F                  KXSP       ,IXSP         ,NOD2SP       ,ISPCOND      ,ICODE   , 
      G                  ISKEW      ,ISKN         ,ISPSYM       ,XFRAME       ,ISPTAG  , 
      H                  SPBUF      ,MSSX         ,NSIGI        ,
      I                  NPBYL      ,LPBYL        ,RBYL         ,MSNF         ,MSSF    , 
-     J                  NSIGSH     ,IGEO         ,IPM          ,NSIGS        ,	        
+     J                  NSIGSH     ,IGEO         ,IPM          ,NSIGS        ,          
      K                  NSIGSPH    ,VNS          ,VNSX         ,STC          ,STT     , 
      L                  STP        ,STR          ,STTG         ,STUR         ,BNS     , 
      M                  BNSX       ,VOLNOD       ,BVOLNOD      ,ETNOD        ,NSHNOD  , 
@@ -153,7 +166,7 @@ Chd|====================================================================
      P                  PTSHEL     ,PTSH3N       ,PTSOL        ,PTQUAD  ,
      Q                  WMA        ,PTSPH        ,FXBNOD       ,MBUFEL       ,MDEPL   , 
      R                  FXANI      ,NUMEL        ,NSIGRS       ,
-     T                  SH4TREE    ,SH3TREE      ,MCP          ,TEMP         ,	        
+     T                  SH4TREE    ,SH3TREE      ,MCP          ,TEMP         ,          
      U                  IMERGE2    ,IADMERGE2    ,
      V                  SLNRBM     ,NSLNRBM      ,RMSTIFN      ,RMSTIFR,
      U                  MS_LAYER   ,ZI_LAYER     ,ITAG         ,ITAGEL       ,MCPC    ,
@@ -181,12 +194,14 @@ Chd|====================================================================
      I                  FXBCPM     ,FXBCPS       ,FXBLM        ,FXBFLS       ,FXBDLS,
      J                  FXB_MATRIX ,FXB_MATRIX_ADD,FXB_LAST_ADRESS,PTR_NOPT_FXB,R_SKEW,
      K                  KNOD2EL1D  ,NOD2EL1D     ,EBCS_TAB     ,RBY_INIAXIS  ,ALEA    ,
-     K                  KNOD2ELC   ,NOD2ELC      ,DR           ,SLRBODY)
+     L                  KNOD2ELC   ,NOD2ELC      ,DR           ,SLRBODY      , DRAPEG ,
+     M                  IPARI      ,INTBUF_TAB   ,INTERFACES   ,MAT_PARAM    ,NPRELOAD_A,
+     N                  PRELOAD_A  )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------                     
       USE SUBMODEL_MOD
-      USE ELBUFDEF_MOD      
+      USE MATPARAM_DEF_MOD
       USE MESSAGE_MOD      
       USE STACK_MOD
       USE MULTI_FVM_MOD
@@ -197,20 +212,20 @@ C-----------------------------------------------
       USE GROUPDEF_MOD
       USE OPTIONDEF_MOD
       USE NLOCAL_REG_MOD
-      USE MATPARAM_DEF_MOD  
+      USE GROUP_PARAM_MOD  
       USE DETONATORS_MOD 
       USE DRAPE_MOD    
       USE INIVOL_DEF_MOD
       USE INIVOL_ARRAY_MOD
       USE EBCS_MOD
       USE ALE_CONNECTIVITY_MOD
+      USE ARRAY_MOD
+      USE INTERFACES_MOD
+      USE INTBUFDEF_MOD 
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
 C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
@@ -227,20 +242,14 @@ C-----------------------------------------------
 #include      "units_c.inc"
 #include      "param_c.inc"
 #include      "scr03_c.inc"
-#include      "scr05_c.inc"
 #include      "scr14_c.inc"
 #include      "scr17_c.inc"
 #include      "scr23_c.inc"
-#include      "warn_c.inc"
 #include      "tablen_c.inc"
 #include      "lagmult.inc"
-#include      "scry_c.inc"
 #include      "scr12_c.inc"
 #include      "fxbcom.inc"
-#include      "sysunit.inc"
-#include      "elbuf_c.inc"
 #include      "userlib.inc"
-#include      "drape_c.inc"
 #include      "sms_c.inc"
 #include      "boltpr_c.inc"
 #include      "mmale51_c.inc"
@@ -253,7 +262,7 @@ C-----------------------------------------------
      .   IGEO(NPROPGI,*), IXT(NIXT,*),IXP(NIXP,*), IXR(NIXR,*),
      .   NPBY(NNPBY,*),LPBY(*),NPBYL(NNPBY,*),LPBYL(*),NPC(*),
      .   ITAB(*), IPART(*),
-     .   LAS(*),IXUR(6,*),
+     .   LAS(*),
      .   IXTG(NIXTG,*),INDEX(*),ITRI(*),IWA(*),KXX(NIXX,*),IXX(*),
      .   KXSP(*)   ,IXSP(*)  ,NOD2SP(*),ISPCOND(*),ISPSYM(*),ISPTAG(*),
      .   ICODE(*),ISKEW(*),ISKN(LISKN,*), IPM(NPROPMI,*), NSHNOD(*),
@@ -277,14 +286,15 @@ C-----------------------------------------------
      .        NUMEL,STAT,
      .        NCTRLMAX,NSIGBEAM,NSIGTRUSS
       INTEGER,INTENT(IN) :: ILOADP(SIZLOADP,*),SLRBODY
+      INTEGER,INTENT(IN) :: IPARI(NPARI,NINTER) 
       my_real,INTENT(IN) :: FACLOAD(LFACLOAD,*)
       my_real
      .   ELBUF(*), MS(*), IN(*), V(*), X(*), GEO(*),PM(NPROPM,*),
      .   RBY(NRBY,*),PLD(*),VEUL(*),SKEW(LSKEW,*),FILL(*),
      .   THK(*),BUFSF(*), VR(3,*),BUFMAT(*),PTG(3,*),XLAS(*),
      .   DTELEM(*),MSS(*), MSQ(*),MSC(*),MST(*),MSP(*),MSR(*),
-     .   MSTG(*),MSUR(*),INC(*),RBYL(NRBY,*),
-     .   INP(*),INR(*),INTG(*),INUR(*),EVUR(*),
+     .   MSTG(*),INC(*),RBYL(NRBY,*),
+     .   INP(*),INR(*),INTG(*),
      .   XELEMWA(*),
      .   XFRAME(NXFRAME,*),SPBUF(*),MSSX(*),MSNF(*),
      .   MSSF(*), WMA(*),
@@ -313,6 +323,7 @@ C
       INTEGER NOM_OPT(LNOPT1,*),PTR_NOPT_RBE2,PTR_NOPT_ADM,
      .        PTR_NOPT_FUN,IOPT
       INTEGER FXBNOD(*), FXANI(2,*),ITAGND(*)
+      INTEGER,INTENT(IN) :: NPRELOAD_A
 C
       TYPE (ELBUF_STRUCT_), TARGET, DIMENSION(NGROUP) :: ELBUF_TAB
       TYPE (ELBUF_STRUCT_), TARGET, DIMENSION(NGROUP,NXEL) :: XFEM_TAB
@@ -323,7 +334,8 @@ C
       TYPE (FUNC2D_STRUCT), DIMENSION(NFUNC2D), INTENT(IN) :: FUNC2D
       TYPE (FVM_INIVEL_STRUCT), INTENT(IN) :: FVM_INIVEL(*)
       TYPE (NLOCAL_STR_)   :: NLOC_DMG 
-      TYPE (GRP_PARAM_STRUCT_), DIMENSION(NGROUP)  :: GROUP_PARAM_TAB
+      TYPE (GROUP_PARAM_), DIMENSION(NGROUP)  :: GROUP_PARAM_TAB
+      TYPE (MATPARAM_STRUCT_) ,DIMENSION(NUMMAT) ,INTENT(INOUT) :: MAT_PARAM
 C-----------------------------------------------
       TYPE (GROUP_)  , DIMENSION(NGRNOD)  :: IGRNOD
       TYPE (GROUP_)  , DIMENSION(NGRBRIC) :: IGRBRIC
@@ -334,9 +346,13 @@ C-----------------------------------------------
       TYPE (SURF_)   , DIMENSION(NSURF)   :: IGRSURF
       TYPE (ADMAS_)  , DIMENSION(NODMAS)  :: IPMAS
       TYPE (INIVOL_) , DIMENSION(NINIVOL) :: INIVOL
-      TYPE (DETONATOR_STRUCT_) :: DETONATORS
-      TYPE (DRAPE_) :: DRAPE(*)
+      TYPE (DETONATORS_STRUCT_) :: DETONATORS
+      TYPE (DRAPE_)  , DIMENSION(NUMELC_DRAPE + NUMELTG_DRAPE):: DRAPE 
+      TYPE (DRAPEG_)                            :: DRAPEG 
       TYPE(t_ale_connectivity), INTENT(INOUT) :: ALE_CONNECTIVITY
+      TYPE(INTBUF_STRUCT_) , INTENT(IN   ) ::  INTBUF_TAB(NINTER)
+      TYPE(INTERFACES_) , INTENT(INOUT   ) ::  INTERFACES
+      TYPE(PREL1D_) , INTENT(IN   ), DIMENSION(NPRELOAD_A) ::  PRELOAD_A
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -356,7 +372,7 @@ C      INTEGER *8 I8MI(6,NUMNOD)
      .   IFILE,IRCS,NELT,NELP,FXBID, ANOD, IRCM, NSNI, NSN, NMANI, IMIN, IMAX,
      .   NELEMR,CPT_ELTENS,IXFEM,ITG,ISUBSTACK,NCTRL, ITETRA10, KK,PX,PY,PZ,IPID
       INTEGER IFRAC,IDP,IDC,IDSURF,IFILL,JMID,JADCONTY, NBCONTY,NSEG_SWIFT_SURF,NSEG_USED,
-     .   NSURF_INVOL,IMAT,ICPRE
+     .   NSURF_INVOL,IMAT,ICPRE,IDRAPE
       INTEGER SOLMAT(0:MAXLAW), COQMAT(0:MAXLAW), TRUMAT(0:MAXLAW),
      .   POUMAT(0:MAXLAW),SPHMAT(0:MAXLAW),
      .   RESMAT(0:MAXLAW),RESPID(0:50), SPHPID(0:50),
@@ -388,6 +404,24 @@ C remove automatic allocation to reduce stack consumption
       CHARACTER*nchartitle,
      .   TITR
       LOGICAL :: ERROR_THROWN
+
+      ! ----------------
+      INTEGER :: LEADING_DIMENSION ! dimension of largest size
+      INTEGER :: ALE_ELEMENT_NUMBER ! number of ale element with material 51 or 151
+      my_real :: ELEMENT_SIZE ! max element size
+      my_real, DIMENSION(6) :: MIN_MAX_POSITION ! min/max position   
+      INTEGER, PARAMETER :: NB_BOX_LIMIT=128 ! maximum number of cell
+      INTEGER :: NB_CELL_X,NB_CELL_Y,NB_CELL_Z ! number of cell in x/y/z direction
+      TYPE(array_type), DIMENSION(:), ALLOCATABLE :: CELL ! voxcell
+      INTEGER, DIMENSION(:,:), ALLOCATABLE :: CELL_POSITION ! position of node/cell
+      TYPE(array_type), DIMENSION(:), ALLOCATABLE :: NODAL_PHASE ! phase of node
+
+      INTEGER :: ALE_NODE_NUMBER ! number of ale node
+      INTEGER, DIMENSION(:), ALLOCATABLE :: LIST_ALE_NODE ! list of ale node
+      my_real, DIMENSION(3) :: SIZE_CELL ! cell's size in x/y/z direction
+      ! ----------------
+
+
             
 C-----------------------------------------------
 C   D e r i v e d   T y p e   D e f i n i t i o n s
@@ -604,8 +638,11 @@ C     solids
       SOLMAT(117)= 1
       SOLMAT(120)= 1
       SOLMAT(121)= 1
+      SOLMAT(122)= 1
+      SOLMAT(124)= 1
       SOLMAT(151)= 1
       SOLMAT(187)= 1
+      SOLMAT(190)= 1
       SOLMAT(200)= 1
 C     shells
       COQMAT(0)  = 1
@@ -667,7 +704,9 @@ C     shells
       COQMAT(112) = 1
       COQMAT(119) = 1
       COQMAT(121) = 1
+      COQMAT(122) = 1
       COQMAT(151) = 1
+      COQMAT(158) = 1
       COQMAT(200) = 1
 C     truss
       TRUMAT(0)  = 1
@@ -845,6 +884,7 @@ C
         ISRAT  = IPARG(40,NG)
         ISORTH = IPARG(42,NG)
         ISROT  = IPARG(41,NG)
+        IDRAPE  = IPARG(92,NG)
         IF(ISOLNOD == 10) ISROT  = IPARG(74,NG)
         IEXPAN = IPARG(49,NG)
         ISHXFEM_PLY  = IPARG(50,NG)
@@ -941,7 +981,7 @@ C
      B        NINDX      ,XREFC      ,XREFTG     ,XREFS     ,MSSA     ,
      C        SH3TRIM    ,ISUBSTACK  ,BUFMAT     ,IPM       ,STACK    ,
      D        RNOISE     ,STRC       ,STRTG      ,PERTURB   ,NEL      ,
-     E        GROUP_PARAM_TAB(NG))
+     E        GROUP_PARAM_TAB(NG)    ,IGTYP)
 C
        ELSE
 C Element types
@@ -971,6 +1011,13 @@ C Element types
      .              XREFS, GEO, PM, FACLOAD, PLD, SKEW, SIGI, BUFMAT, X, 
      .              WMA, PARTSAV, MS, V, MSS, MSSF, MSSA, MSNF, MCPS, ERROR_THROWN, DETONATORS)
             ELSE
+               IF (ISTOT == 1) THEN
+                  CALL SGSAVINI(ISOLNOD,X,IXS(1,NFT+1),GBUF%SMSTR,NEL)
+                  IF (NSIGI > 0 ) THEN
+                    CALL SGSAVINIEREF(ISOLNOD,STRAGLOB(NF1),SIGSP,NSIGI,PTSOL(NF1),
+     .                                GBUF%SMSTR,GBUF%OFF,NEL)
+                  END IF
+               ENDIF   
                CALL S4INIT3(
      1              ELBUF_TAB(NG),MS          ,IXS      ,PM         ,X          ,  
      2              DETONATORS    ,GEO          ,VEUL   ,ALE_CONNECTIVITY  ,IPARG(1,NG),
@@ -981,24 +1028,22 @@ C Element types
      7              VNS          ,BNS         ,WMA      ,PTSOL      ,BUFMAT     ,  
      8              MCP          ,MCPS        ,TEMP     ,NPC        ,PLD        ,  
      9              IUSER        ,SIGSP       ,NSIGI    ,MSSA       ,XREFS      ,  
-     A              STRSGLOB(NF1),STRAGLOB(NF1),FAIL_INI ,SPBUF      ,SOL2SPH    ,
-     B              ILOADP       ,FACLOAD      ,RNOISE   ,PERTURB    )                            
-               IF (ISTOT == 1) THEN
-                  CALL SGSAVINI(ISOLNOD,X,IXS(1,NFT+1),GBUF%SMSTR,NEL)
-               ENDIF   
+     A              STRSGLOB(NF1),STRAGLOB(NF1),FAIL_INI ,SPBUF     ,SOL2SPH    ,
+     B              ILOADP       ,FACLOAD      ,RNOISE   ,PERTURB   ,MAT_PARAM)                            
                IF (NXREF > 0 .AND. JLAG/=0 .AND. JSPH==0)THEN
                   CALL S4REFSTA3(
      1                 ELBUF_TAB(NG),IXS        ,PM         ,GEO      ,IPARG(1,NG),
      2                 IPM        ,IGEO       ,SKEW       ,X        ,XREFS      ,
-     3                 NEL          ,IPART(I15A),IPART    ,BUFMAT     ,
-     4                 NPC          ,PLD        )
+     3                 NEL          ,IPART(I15A),IPART    ,BUFMAT   ,MAT_PARAM  ,
+     4                 NPC          ,PLD        ,NUMMAT   )
 C Case total strain
                   IF (ISTOT == 1) THEN
                      CALL SGSAVREF(ISOLNOD,XREFS(1,1,NFT+1),GBUF%SMSTR,NEL)
                   END IF
                ENDIF
                IF (NSIGI > 0 ) THEN
-                 CALL SGSAVINIEREF(ISOLNOD,STRAGLOB(NF1),SIGSP,NSIGI,PTSOL(NF1),
+                 IF (NXREF > 0 .OR. ISMSTR == 1) 
+     .           CALL SGSAVINIEREF(ISOLNOD,STRAGLOB(NF1),SIGSP,NSIGI,PTSOL(NF1),
      .                             GBUF%SMSTR,GBUF%OFF,NEL)
                END IF
             ENDIF
@@ -1016,14 +1061,16 @@ C Case total strain
      A         MCP         ,MCPS      ,MCPSX   ,TEMP       ,NPC        ,
      B         PLD         ,IN        ,STIFR   ,INS        ,MSSA       ,
      C         STRSGLOB(NF1),STRAGLOB(NF1),FAIL_INI,ILOADP ,FACLOAD    ,
-     D         PERTURB     ,RNOISE    )
-              IF (NSIGI > 0 ) THEN
-                 NNOD = 10
-                 NSROT = 0
-                 IF(ISOLNOD == 4 .AND.ISROT == 1) NSROT = 4
-                 CALL SGSAVINIEREFQ(NNOD,STRAGLOB(NF1),SIGSP,NSIGI,PTSOL(NF1),
-     .                            GBUF%SMSTR,GBUF%OFF,IXS(1,NF1),DR,NSROT,NEL)
-              END IF
+     D         PERTURB     ,RNOISE    ,MAT_PARAM)
+          IF (NSIGI > 0 ) THEN
+             NNOD = 10
+             NSROT = 0
+             IF(ISOLNOD == 4 .AND.ISROT == 1) NSROT = 4
+             CALL SGSAVINIEREFQ(NNOD,STRAGLOB(NF1),SIGSP,NSIGI,PTSOL(NF1),
+     .                        GBUF%SMSTR,GBUF%OFF,IXS(1,NF1),DR,NSROT,NEL)
+             IF (ISMSTR==10.OR.ISMSTR==12)
+     .           CALL S10JACI3(ELBUF_TAB(NG),GBUF%SMSTR,NPT,NEL)
+          END IF
          ELSEIF(ITY==1.AND.ISOLNOD==20)THEN
           KK1=1+NUMELS*NIXS+NUMELS10*6
           CALL S20INIT3(
@@ -1036,7 +1083,7 @@ C Case total strain
      8         VNS         ,BNS       ,VNSX   ,BNSX       ,PTSOL      ,
      9         BUFMAT      ,MCP       ,MCPS   ,MCPSX      ,TEMP       ,
      A         NPC         ,PLD       ,STRSGLOB(NF1),STRAGLOB(NF1),FAIL_INI   ,
-     B         ILOADP      ,FACLOAD   ,PERTURB,RNOISE     )
+     B         ILOADP      ,FACLOAD   ,PERTURB,RNOISE     ,MAT_PARAM  )
          ELSEIF(ITY==1.AND.ISOLNOD==16)THEN
           KK1=1+NUMELS*NIXS+NUMELS10*6+NUMELS20*12
           CALL S16INIT3(
@@ -1049,7 +1096,7 @@ C Case total strain
      7       VNS          ,BNS       ,VNSX    ,BNSX       ,PTSOL      ,    
      8       BUFMAT       ,MCP       ,MCPS    ,MCPSX      ,TEMP       ,    
      9       NPC          ,PLD       ,STRSGLOB(NF1),STRAGLOB(NF1),FAIL_INI   ,
-     A       ILOADP       ,FACLOAD   ,PERTURB ,RNOISE     )                
+     A       ILOADP       ,FACLOAD   ,PERTURB ,RNOISE     ,MAT_PARAM  )                
          ELSEIF(ITY==1)THEN
           JHBE=IPARG(23,NG)
           JCLOS=IPARG(33,NG)
@@ -1077,7 +1124,7 @@ C Case total strain
      .             BUFMAT       ,MCP      ,MCPS     ,MCPSX      ,TEMP    ,
      .             NPC          ,PLD      ,STRSGLOB(NF1),STRAGLOB(NF1),MSSA    ,
      .             ORTHOGLOB    ,FAIL_INI ,ILOADP   ,FACLOAD   ,PERTURB  ,
-     .             RNOISE       )
+     .             RNOISE       ,MAT_PARAM)
             ELSE
               CALL SCINIT3(ELBUF_TAB(NG),
      .             MS         ,IXS       ,PM        ,X           ,MSS        ,
@@ -1105,7 +1152,7 @@ C Case total strain
      .             BNS     ,WMA     ,PTSOL   ,BUFMAT  ,MCP     ,
      .             MCPS    ,TEMP    ,NPC     ,PLD     ,XREFS   ,
      .             MSSA    ,STRSGLOB,STRSGLOB(NF1),STRAGLOB(NF1),FAIL_INI,
-     .             ILOADP  ,FACLOAD ,PERTURB ,RNOISE  )
+     .             ILOADP  ,FACLOAD ,PERTURB ,RNOISE  ,MAT_PARAM)
             IF (ISTOT == 1) THEN
               CALL SGSAVINI(ISOLNOD,X,IXS(1,NFT+1),GBUF%SMSTR,NEL)
             ENDIF
@@ -1116,6 +1163,13 @@ C Case total strain
           ELSEIF (JHBE == 14 .OR. JHBE == 222 .OR. JHBE == 17) THEN
            !HA8 and H8E solid
             GBUF => ELBUF_TAB(NG)%GBUF
+            IF (ISTOT == 1) THEN
+              CALL SGSAVINI(ISOLNOD,X,IXS(1,NFT+1),GBUF%SMSTR,NEL)
+              IF (NSIGI > 0 ) THEN
+                 CALL SGSAVINIEREF(ISOLNOD,STRAGLOB(NF1),SIGSP,NSIGI,PTSOL(NF1),
+     .                             GBUF%SMSTR,GBUF%OFF,NEL)
+              END IF
+            END IF
             CALL S8ZINIT3(
      .           ELBUF_TAB(NG),MS        ,IXS     ,PM   ,X          ,
      .             DETONATORS,GEO       ,VEUL  ,ALE_CONNECTIVITY,IPARG(1,NG),
@@ -1128,14 +1182,11 @@ C Case total strain
      .             MCPS    ,TEMP    ,NPC     ,PLD     ,XREFS   ,
      .             MSSA    ,STRSGLOB(NF1),STRAGLOB(NF1),FAIL_INI,SPBUF   ,
      .             KXSP    ,IPART(I15J) ,NOD2SP  ,SOL2SPH ,IRST,
-     .             ILOADP  ,FACLOAD     ,PERTURB ,RNOISE  )
-            IF (ISTOT == 1) THEN
-              CALL SGSAVINI(ISOLNOD,X,IXS(1,NFT+1),GBUF%SMSTR,NEL)
-            END IF
-             IF (NSIGI > 0 ) THEN
+     .             ILOADP  ,FACLOAD     ,PERTURB ,RNOISE  ,MAT_PARAM)
+              IF (NSIGI > 0 .AND. ISMSTR == 1) THEN
                  CALL SGSAVINIEREF(ISOLNOD,STRAGLOB(NF1),SIGSP,NSIGI,PTSOL(NF1),
      .                             GBUF%SMSTR,GBUF%OFF,NEL)
-             END IF
+              END IF
           ELSEIF (IGTYP>=29) THEN
             CALL SUINIT3(ELBUF_TAB(NG),MS    ,IXS      ,PM   ,X          ,
      .             DETONATORS  ,GEO       ,VEUL  ,ALE_CONNECTIVITY ,IPARG(1,NG),
@@ -1145,9 +1196,16 @@ C Case total strain
      .             NSIGI ,IN        ,VR    ,IPM        ,NSIGS   ,
      .             VOLNOD ,BVOLNOD  ,VNS   ,BNS        ,PTSOL   ,
      .             BUFMAT ,NPC      ,PLD   ,FAIL_INI   ,INS     ,
-     .             ILOADP ,FACLOAD  ,PERTURB,RNOISE    )
+     .             ILOADP ,FACLOAD  ,PERTURB,RNOISE    ,MAT_PARAM)
           ELSE
             GBUF => ELBUF_TAB(NG)%GBUF
+            IF (NPT == 1 .AND. ISTOT == 1) THEN
+                CALL SGSAVINI(ISOLNOD,X,IXS(1,NFT+1),GBUF%SMSTR,NEL)
+               IF (NSIGI > 0 ) THEN
+                  CALL SGSAVINIEREF(ISOLNOD,STRAGLOB(NF1),SIGSP,NSIGI,PTSOL(NF1),
+     .                              GBUF%SMSTR,GBUF%OFF,NEL)
+               END IF
+            ENDIF    
             IF (JMULT == 0) THEN
                CALL SINIT3(
      1              ELBUF_TAB(NG),MS         ,IXS      ,PM         ,X          ,  
@@ -1162,7 +1220,7 @@ C Case total strain
      B              XREFS        ,NPC          ,PLD    ,MSSA       ,STRSGLOB(NF1),
      C              STRAGLOB(NF1),FAIL_INI     ,SPBUF  ,KXSP       ,IPART(I15J),
      D              NOD2SP       ,SOL2SPH      ,IRST   ,ILOADP     ,FACLOAD    ,
-     E              RNOISE       ,PERTURB      )        
+     E              RNOISE       ,PERTURB      ,MAT_PARAM)        
             ELSE IF (JMULT > 0 .AND. MTN == 151) THEN
       !Multifluid law
                CALL MULTIFLUID_INIT3 (
@@ -1181,21 +1239,19 @@ C Case total strain
      E              MULTI_FVM, ERROR_THROWN,DETONATORS)    
             ENDIF
            
-            IF (NPT == 1 .AND. ISTOT == 1) THEN
-                CALL SGSAVINI(ISOLNOD,X,IXS(1,NFT+1),GBUF%SMSTR,NEL)
-            ENDIF    
             CALL SREFSTA3(
      1        ELBUF_TAB(NG),IXS        ,PM         ,GEO      ,IPARG(1,NG),  
-     2        IPM        ,IGEO       ,SKEW       ,X        ,XREFS     ,
-     3        NEL          ,IPART(I15A),IPART      ,BUFMAT   ,              
-     6        NPC          ,PLD        )
+     2        IPM          ,IGEO       ,SKEW       ,X        ,XREFS     ,
+     3        NEL          ,IPART(I15A),IPART      ,BUFMAT   ,MAT_PARAM,              
+     6        NPC          ,PLD        ,NUMMAT     )
 C
 C Case total strain: conf_ref <- XREF
             IF (NXREF > 0 .AND. (NPT == 1 .AND. ISTOT == 1) ) THEN
              CALL SGSAVREF(ISOLNOD,XREFS(1,1,NFT+1),GBUF%SMSTR,NEL)
             END IF
             IF (NSIGI > 0 ) THEN
-               CALL SGSAVINIEREF(ISOLNOD,STRAGLOB(NF1),SIGSP,NSIGI,PTSOL(NF1),
+              IF (NXREF > 0 .OR. ISMSTR == 1 ) 
+     .         CALL SGSAVINIEREF(ISOLNOD,STRAGLOB(NF1),SIGSP,NSIGI,PTSOL(NF1),
      .                           GBUF%SMSTR,GBUF%OFF,NEL)
             END IF
             NC1 = NVC / 128
@@ -1289,7 +1345,8 @@ C 2D multifluid law
      C             NPC        ,PLD    ,XFEM_TAB,ISUBSTACK ,STACK    ,
      D             RNOISE     ,DRAPE  ,SH4ANG    ,GEO_STACK,
      E             IGEO_STACK ,STRC   ,PERTURB            ,IYLDINI ,ELE_AREA,
-     F             NLOC_DMG   ,NG        ,GROUP_PARAM_TAB(NG))
+     F             NLOC_DMG   ,NG        ,GROUP_PARAM_TAB(NG),IDRAPE,DRAPEG,
+     G             MAT_PARAM  )
           ELSE
             NULLIFY(ptr_ITAGE)
             IF (SITAGE>0) ptr_ITAGE => ITAGE(1)       
@@ -1306,7 +1363,8 @@ C 2D multifluid law
      C      IXFEM     ,NPC        ,PLD  ,XFEM_TAB,ISUBSTACK,
      D      STACK     ,RNOISE     ,DRAPE      ,SH4ANG     ,
      E      GEO_STACK,IGEO_STACK  ,STRC       ,PERTURB    ,IYLDINI    ,
-     F      ELE_AREA  ,NG         ,GROUP_PARAM_TAB(NG)    ,NLOC_DMG   )
+     F      ELE_AREA  ,NG         ,GROUP_PARAM_TAB(NG)    ,NLOC_DMG   ,
+     G      IDRAPE    ,DRAPEG     ,MAT_PARAM  )
           ENDIF
           NC1 = NVC / 8
           NC2 = (NVC-NC1*8) / 4
@@ -1327,18 +1385,19 @@ C 2D multifluid law
      1                IXT    ,PM         ,X        ,GEO    ,MS     ,
      2                DTELEM ,NFT        ,NEL      ,STIFN  ,PARTSAV,
      3                V      ,IPART(I15D),MST      ,STIFINT,STT    ,
-     4                IGEO   ,NSIGTRUSS  ,SIGTRUSS ,PTTRUSS)
+     4                IGEO   ,NSIGTRUSS  ,SIGTRUSS ,PTTRUSS,
+     5                PRELOAD_A(IBOLTP),IBOLTP    )
         !----------------------------------------!
         !   ITY == 5                        BEAM !
         !----------------------------------------!
         ELSEIF (ITY == 5) THEN
           CALL PINIT3(ELBUF_TAB(NG),
-     1                STP        ,IXP      ,PM      ,X       ,GEO	 ,
+     1                STP        ,IXP      ,PM      ,X       ,GEO   ,
      2                MS         ,IN       ,DTELEM  ,NFT     ,NEL  ,
      3                STIFN      ,STIFR    ,PARTSAV ,V       ,IPART(I15E),
      4                MSP        ,INP      ,IGEO    ,STIFINT ,STRP       ,
      5                NSIGBEAM   ,SIGBEAM  ,PTBEAM  ,IUSER   ,MCP        ,
-     6                MCPP       ,TEMP     )
+     6                MCPP       ,TEMP     ,PRELOAD_A(IBOLTP),IBOLTP    )
         !----------------------------------------!
         !   ITY == 6                      SPRING !
         !----------------------------------------!
@@ -1352,7 +1411,7 @@ C 2D multifluid law
      5                INR       ,STIFINT     ,STR(NFT+1),IGEO     ,SIGRS      ,
      6                NSIGRS    ,IMERGE2     ,IADMERGE2 ,MSRT(NFT+1),IXR_KJ   ,
      7                NOM_OPT(1,IOPT),STRR   ,PTSPRI    ,IPM       , PM     ,
-     8                BUFMAT    ,R_SKEW)
+     8                BUFMAT    ,R_SKEW      ,PRELOAD_A(IBOLTP),IBOLTP    )          
         !----------------------------------------!
         !   ITY == 7                SH3N or TRIA !
         !----------------------------------------!
@@ -1376,8 +1435,8 @@ C 2D multifluid law
      A          BUFMAT   ,SH3TREE,MCP    ,MCPTG ,  TEMP ,
      B          IPARG(1,NG),CPT_ELTENS,PART_AREA   ,NPC ,PLD      , 
      C          SH3TRIM ,ISUBSTACK,STACK ,RNOISE,
-     D          DRAPE(1+NUMELC),SH3ANG ,GEO_STACK,IGEO_STACK,STRTG,
-     E          PERTURB,IYLDINI ,ELE_AREA,NLOC_DMG)
+     D          DRAPE,SH3ANG ,GEO_STACK,IGEO_STACK,STRTG,
+     E          PERTURB,IYLDINI ,ELE_AREA,NLOC_DMG,IDRAPE, DRAPEG,MAT_PARAM)
           ELSEIF (MTN == 151 .OR. N2D > 0) THEN
              CALL MULTIFLUID_INIT2T(ELBUF_TAB(NG), NEL, NSIGS, NVC, IPARG, IXTG, ALE_CONNECTIVITY,
      .            IGEO, IPART, IPART(I15H), IPM, PTSH3N, NPC, ILOADP, 
@@ -1397,9 +1456,9 @@ C 2D multifluid law
      B          CPT_ELTENS,PART_AREA,ptr_ITAGE,ITAGN,IXFEM  ,
      C          NPC     ,PLD     ,SH3TRIM ,XFEM_TAB,
      D          ISUBSTACK , STACK,RNOISE  ,
-     E          DRAPE(1+NUMELC) ,SH3ANG,GEO_STACK,IGEO_STACK,STRTG,
+     E          DRAPE ,SH3ANG,GEO_STACK,IGEO_STACK,STRTG,
      F          PERTURB ,ISH3N,IYLDINI ,ELE_AREA,
-     G          NLOC_DMG,NG,GROUP_PARAM_TAB(NG))
+     G          NLOC_DMG,NG,GROUP_PARAM_TAB(NG),IDRAPE, DRAPEG,MAT_PARAM)
           ENDIF
           NC1 = NVC / 8
           NC2 = (NVC-NC1*8) / 4
@@ -1538,23 +1597,23 @@ C---------------------------------------------------------------
         CALL SPMD_PARTSAV_PON(
      1    IXS        ,IXS10      ,IXS20      ,IXS16        ,IXQ         ,
      2    IXC        ,IXT        ,IXP        ,IXR          ,IXTG        ,
-     3    IXUR       ,MSS        ,MSSX       ,MSQ          ,MSC         ,
-     4    MST        ,MSP        ,MSR        ,MSTG         ,MSUR        ,
+     3    MSS        ,MSSX       ,MSQ          ,MSC         ,
+     4    MST        ,MSP        ,MSR        ,MSTG         ,
      5    INDEX      ,ITRI       ,GEO        ,PARTSAV1_PON ,IPART(I15A) ,
      6    IPART(I15B),IPART(I15C),IPART(I15D),IPART(I15E)  ,IPART(I15F) ,
-     7    IPART(I15G),IPART(I15H),IPART      )
+     7    IPART(I15H),IPART      )
         CALL ADDMASPART(IPART,IPMAS,PARTSAV,
      .                  PART_AREA,PM,ADDEDMS,NOM_OPT(1,PTR_NOPT_ADM+1),
      .                  PARTSAV1_PON)
         CALL SPMD_MSIN_ADDMASS(
      1    IXS        ,IXS10      ,IXS20      ,IXS16      ,IXQ        ,
      2    IXC        ,IXT        ,IXP        ,IXR        ,IXTG       ,
-     3    IXUR       ,MSS        ,MSSX       ,MSQ        ,MSC        ,
-     4    MST        ,MSP        ,MSR        ,MSTG       ,MSUR       ,
-     5    PTG        ,EVUR       ,MS         ,INDEX      ,ITRI       ,
+     3    MSS        ,MSSX       ,MSQ        ,MSC        ,
+     4    MST        ,MSP        ,MSR        ,MSTG       ,
+     5    PTG        ,MS         ,INDEX      ,ITRI       ,
      6    GEO        ,SH4TREE    ,SH3TREE    ,PARTSAV    ,IPMAS      ,
      7    IPART(I15A),IPART(I15B),IPART(I15C),IPART(I15D),
-     8    IPART(I15E),IPART(I15F),IPART(I15G),IPART(I15H),TOTADDMAS  ,
+     8    IPART(I15E),IPART(I15F),IPART(I15H),TOTADDMAS  ,
      9    IPART      ,THK        ,PM         ,PART_AREA  ,
      A    ADDEDMS    ,ITAB       ,PARTSAV1_PON,ELE_AREA  )
       END IF
@@ -1566,11 +1625,11 @@ C---------------------------------------------------------------
         KK3=KK2+NUMELS20*12
         CALL SPMD_MSIN(
      1               IXS     ,IXQ  ,IXC  ,IXT     ,IXP     ,
-     2               IXR     ,IXTG ,IXUR ,MSS     ,MSQ     ,
+     2               IXR     ,IXTG ,MSS     ,MSQ     ,
      3               MSC     ,MST  ,MSP  ,MSR     ,MSTG    ,
-     4               MSUR    ,INC  ,INP  ,INR     ,INTG    ,
-     5               INUR    ,INDEX,ITRI ,MS      ,IN      ,
-     6               PTG     ,EVUR ,GEO  ,IXS10   ,IXS20   ,
+     4               INC     ,INP  ,INR     ,INTG    ,
+     5               INDEX   ,ITRI ,MS      ,IN      ,
+     6               PTG     ,GEO  ,IXS10   ,IXS20   ,
      7               IXS16   ,MSSX ,MSNF ,MSSF    ,VNS     ,
      8               VNSX    ,STC     ,STT     ,STP  ,STR  ,
      9               STTG    ,STUR    ,BNS     ,BNSX ,VOLNOD ,
@@ -1583,6 +1642,20 @@ C---------------------------------------------------------------
      G               MCPP )
       IF(I7STIFS/=0)
      .  CALL ASSTIFI(VOLNOD,BVOLNOD,ETNOD,NSHNOD,STIFINT)
+C---------------------------------------------------------------
+C Contact Stiffness based on mass and time step : 
+C        Initial time step estimation in starter
+C---------------------------------------------------------------
+        IF(INTERFACES%PARAMETERS%ISTIF_DT > 0) THEN
+
+            CALL ININTMASS( IPARI, INTBUF_TAB,MS , INTERFACES%PARAMETERS%ISTIF_DT )
+        ENDIF 
+       
+        INTERFACES%PARAMETERS%DT_STIFINT = ZERO
+        IF(INTERFACES%PARAMETERS%ISTIF_DT > 0) THEN
+           CALL DTNODA_STIFINT( MS   ,STIFN ,INTERFACES%PARAMETERS%DT_STIFINT)
+        ENDIF
+C
 C
 C--------------------------------------------
 C Laser impact
@@ -1620,6 +1693,9 @@ C-----------------------------------------------------
 C Option /INIVOL
 C-----------------------------------------------------
       IF (NINIVOL > 0) THEN
+        ALLOCATE( CELL_POSITION(3,NUMNOD) )
+        ALLOCATE( LIST_ALE_NODE(NUMNOD) )
+
         DO II=1,NINIVOL
           IFRAC   = INIVOL(II)%ID
           NBCONTY = INIVOL(II)%NBCONTY
@@ -1723,9 +1799,36 @@ C------------------------------------
           ALLOCATE(SEGTOSURF(NSEG_USED)        ,STAT=stat)
           SEGTOSURF(1:NSEG_USED) = 0
 !---
+          ! -----------------
+          ! compute the min / max position of ale elements
+          ALE_NODE_NUMBER = 0
+          CALL ALE_ELEMENT_SIZE_COMPUTATION(IPARG,IXS,IXQ,IXTG,
+     .               ELEMENT_SIZE,MIN_MAX_POSITION,X,
+     .               ALE_ELEMENT_NUMBER,ALE_NODE_NUMBER,LIST_ALE_NODE)
+          ! -----------------
+          ! compute the min/max position of surface elements
+          CALL SURFACE_MIN_MAX_COMPUTATION(NBCONTY,MIN_MAX_POSITION,X,IGRSURF,INIVOL(II))
+          ! -----------------
+          ! creation of the grid
+          CALL ALE_BOX_CREATION(NB_BOX_LIMIT,NB_CELL_X,NB_CELL_Y,NB_CELL_Z,
+     .                          ALE_ELEMENT_NUMBER,ELEMENT_SIZE,MIN_MAX_POSITION,
+     .                          LEADING_DIMENSION,SIZE_CELL)
+          ! -----------------
+          ! coloration of CELL with nodes of surface
+          ALLOCATE( CELL(NBCONTY) )
+
+          CALL ALE_BOX_COLORATION(NB_CELL_X,NB_CELL_Y,NB_CELL_Z,NBCONTY,
+     .                            MIN_MAX_POSITION,CELL,X,IGRSURF,INIVOL(II),CELL_POSITION,
+     .                            ALE_NODE_NUMBER,LIST_ALE_NODE)
+          ! -----------------
+
+          ALLOCATE( NODAL_PHASE(NBCONTY) )
+          NODAL_PHASE(1:NBCONTY)%SIZE_INT_ARRAY_1D = NUMNOD
           ITAGSURF(1:NSURF) = 0
           NSEG_SWIFT_SURF = 0
           DO IDC=1,NBCONTY
+            CALL ALLOC_1D_ARRAY(NODAL_PHASE(IDC))
+            NODAL_PHASE(IDC)%INT_ARRAY_1D(1:NUMNOD) = 0
             IDSURF     = INIVOL(II)%SURFCONTY(IDC)
             JMID       = INIVOL(II)%CONTY(IDC)%IPHASE
             IFILL      = INIVOL(II)%CONTY(IDC)%IFILL
@@ -1742,10 +1845,17 @@ C------------------------------------
      .        IGRSURF(IDSURF)%ELTYP  ,KNOD2SURF ,NNOD2SURF ,INOD2SURF,TAGN       ,
      .        IDSURF    ,NSEGSURF    ,BUFSF     ,NOD_NORM  ,IGRSURF(IDSURF)%NODES,
      .        IGRSURF(IDSURF)%IAD_BUFR,IDC      ,NBCONTY   ,NSEG_SWIFT_SURF,SWIFTSURF,
-     .        SEGTOSURF ,IVOLSURF,NSURF_INVOL,ITAB)
+     .        SEGTOSURF ,IVOLSURF,NSURF_INVOL,ITAB,NSEG_USED,
+     .        LEADING_DIMENSION,NB_CELL_X,NB_CELL_Y,NB_CELL_Z,
+     .        IPARG,IXS,IXQ,IXTG,
+     .        CELL(IDC)%INT_ARRAY_3D,CELL_POSITION,NODAL_PHASE(IDC)%INT_ARRAY_1D,NB_BOX_LIMIT)
             ENDIF
             DEALLOCATE(TAGN)
+            CALL DEALLOC_1D_ARRAY(NODAL_PHASE(IDC))
+            CALL DEALLOC_3D_ARRAY(CELL(IDC))
           ENDDO ! DO IDC=1,NBCONTY
+          DEALLOCATE( NODAL_PHASE )
+          DEALLOCATE( CELL )
 !-------------
           DO NG=1,NGROUP                                                                                   
 !---
@@ -1829,6 +1939,8 @@ C
           IF(ALLOCATED(SEGTOSURF))DEALLOCATE(SEGTOSURF)
 !---
         ENDDO ! next II=1,NINIVOL
+        DEALLOCATE( CELL_POSITION )
+        DEALLOCATE( LIST_ALE_NODE )
       ELSE
         ALLOCATE(IPHASE(0),NBIP(0,0),ITAGNSOL(0),KNOD2SURF(0),PART_FILL(0),IVOLSURF(0),
      .           SWIFTSURF(0),NSOLTOSF(0,0),INOD2SURF(0),DIS(0,0),NOD_NORM(0),SEGTOSURF(0))
@@ -1844,8 +1956,7 @@ C---------------------------------
      2                    IPART(I15A), IPART(I15B),   X      ,   IXS    ,   IXQ,
      3                    IXTG,        PM         ,   IPM    ,   BUFMAT ,   MULTI_FVM,
      4                    ALE_CONNECTIVITY, NV46       ,   IGRSURF,   ITAB   ,   EBCS_TAB,
-     5                    NPC        , PLD
-     .                    )
+     5                    NPC        , PLD             ,MAT_PARAM)
       ENDIF
 
 C---------------------------------------------------
@@ -1862,7 +1973,7 @@ C---------------------------------
      .                     IPART(I15B) ,X         ,V       ,IXS     ,IXQ        , 
      .                     IXTG        ,PM        ,IPM     ,BUFMAT  ,MULTI_FVM  ,
      .                     PLD         ,NPC       ,IGRBRIC ,IGRQUAD ,IGRSH3N    ,
-     .                     NPTS)
+     .                     NPTS        ,MAT_PARAM )
       ENDIF
 C---------------------------------
 C Initialization on 2D functions
@@ -1888,7 +1999,7 @@ C------------------------------------------------------------------
      .       IXS     ,IXQ      ,IXC     ,IXT     ,IXP       ,
      .       IXR     ,IXTG     ,IXS10   ,IXS16   ,IXS20     ,
      .       IPART(I15A)  ,IPART(I15B)   ,IPART(I15C)  ,IPART(I15D)  ,IPART(I15E)    ,
-     .       IPART(I15F)  ,IPART(I15G)   ,IPART(I15H)  ,IPART(I15I)  ,IPART          ,
+     .       IPART(I15F)  ,IPART(I15H)  ,IPART(I15I)  ,IPART          ,
      .       IPARG        ,ELBUF_TAB     ,IGEO         ,IDDLEVEL     ,TAGPRT_SMS     )
       ENDIF
 C
@@ -2113,7 +2224,7 @@ C------------------------------------------------------
         LLT = NEL
         IF (ITY == 6) THEN
           IPROP=IXR(1,1+NFT)
-          IGTYP =  NINT(GEO(NPROPG*(IPROP-1)+12))	 	  
+          IGTYP =  NINT(GEO(NPROPG*(IPROP-1)+12))       
           GBUF => ELBUF_TAB(NG)%GBUF
           IF (IGTYP==33) THEN 
             NUVAR =  NINT(GEO(NPROPG*(IPROP-1)+25))
@@ -2341,9 +2452,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "scr03_c.inc"
 #include      "scr17_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -2417,18 +2525,6 @@ C         WRITE(IOUT,*)'         FOR ',ELEM,IX(NE,I)
      .                 C1=ELEM,
      .                 I2=IX(NE,I),
      .                 PRMOD=MSG_CUMU)
-        ELSEIF(EMAT(IPM(2,MT)) == 0)THEN
-C         WRITE(IOUT,*)' **ERROR INVALID MATERIAL LAW',NINT(PM(19,MT))
-C         WRITE(IOUT,*)'         FOR ',ELEM,IX(NE,I)
-         CALL FRETITL2(TITR2,IPM(NPROPMI-LTITR+1,MT),LTITR)
-         CALL ANCMSG(MSGID=62,
-     .  	       MSGTYPE=MSGERROR,
-     .  	       ANMODE=ANINFO_BLIND_2,
-     .  	       I1=IPM(1,MT),
-     .  	       C1=TITR2,
-     .  	       I2=IPM(2,MT),
-     .  	       C2=ELEM,
-     .  	       I3=IX(NE,I))
         ENDIF
         IF (IG<=0) THEN
            CALL ANCMSG(MSGID=59,
@@ -2482,19 +2578,6 @@ C         WRITE(IOUT,*)'         FOR ',ELEM,IX(NE,I)
      .                 C1=ELEM,
      .                 I2=IX(NE,I),
      .                 PRMOD=MSG_CUMU)
-        ELSEIF(EMAT(IPM(2,MT)) == 0)THEN
-C         IERR = IERR + 1
-C         WRITE(IOUT,*)' **ERROR INVALID MATERIAL LAW',NINT(PM(19,MT))
-C         WRITE(IOUT,*)'         FOR ',ELEM,IX(NE,I)
-           CALL FRETITL2(TITR2,IPM(NPROPMI-LTITR+1,MT),LTITR)
-           CALL ANCMSG(MSGID=62,
-     .                 MSGTYPE=MSGERROR,
-     .                 ANMODE=ANINFO_BLIND_2,
-     .                 I1=IPM(1,MT),
-     .                 C1=TITR2,
-     .                 I2=IPM(2,MT),
-     .                 C2=ELEM,
-     .                 I3=IX(NE,I))
         ENDIF
         IF(IG/=0.AND.EPID(IGEO(11,IG)) == 0)THEN
 C         IERR = IERR + 1
@@ -2537,19 +2620,6 @@ C         WRITE(IOUT,*)'         FOR ',ELEM,IX(NE,I)
      .                     C1=ELEM,
      .                     I2=IX(NE,I),
      .                     PRMOD=MSG_CUMU)
-            ELSEIF(EMAT(IPM(2,MT)) == 0)THEN
-C
-C         WRITE(IOUT,*)' **ERROR INVALID MATERIAL LAW',NINT(PM(19,MT))
-C         WRITE(IOUT,*)'         FOR ',ELEM,IX(NE,I)
-               CALL FRETITL2(TITR2,IPM(NPROPMI-LTITR+1,MT),LTITR)
-               CALL ANCMSG(MSGID=62,
-     .                     MSGTYPE=MSGERROR,
-     .                     ANMODE=ANINFO_BLIND_2,
-     .                     I1=IPM(1,MT),
-     .                     C1=TITR2,
-     .                     I2=IPM(2,MT),
-     .                     C2=ELEM,
-     .                     I3=IX(NE,I))
             ENDIF
             IF(IG<=0)THEN
 C
@@ -2614,15 +2684,9 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "scr03_c.inc"
 #include      "scr17_c.inc"
 #include      "com01_c.inc"
 C-----------------------------------------------
@@ -2690,16 +2754,6 @@ C-----------------------------------------------
      .                 C1=ELEM,
      .                 I2=IX(NE,I),
      .                 PRMOD=MSG_CUMU)
-        ELSEIF(EMAT(IPM(2,MT)) == 0)THEN
-           CALL FRETITL2(TITR2,IPM(NPROPMI-LTITR+1,MT),LTITR)
-           CALL ANCMSG(MSGID=62,
-     .                 MSGTYPE=MSGERROR,
-     .                 ANMODE=ANINFO,
-     .                 I1=IPM(1,MT),
-     .                 C1=TITR2,
-     .                 I2=IPM(2,MT),
-     .                 C2=ELEM,
-     .                 I3=IX(NE,I))
         ENDIF
         IF (IG<=0) THEN
            CALL ANCMSG(MSGID=59,
@@ -2751,16 +2805,6 @@ C-----------------------------------------------
      .                 C1=ELEM,
      .                 I2=IX(NE,I),
      .                 PRMOD=MSG_CUMU)
-        ELSEIF(EMAT(IPM(2,MT)) == 0)THEN
-           CALL FRETITL2(TITR2,IPM(NPROPMI-LTITR+1,MT),LTITR)
-           CALL ANCMSG(MSGID=62,
-     .                 MSGTYPE=MSGERROR,
-     .                 ANMODE=ANINFO,
-     .                 I1=IPM(1,MT),
-     .                 C1=TITR2,
-     .                 I2=IX(NE,I),
-     .                 C2=ELEM,
-     .                 I3=IX(NE,I))
         ENDIF
         IF(IG/=0.AND.EPID(IGEO(11,IG)) == 0)THEN
            CALL FRETITL2(TITR2,IGEO(NPROPGI-LTITR+1,IG),LTITR)
@@ -2797,16 +2841,6 @@ c            IGTYP=IGEO(11,IG)
      .                     C1=ELEM,
      .                     I2=IX(NE,I),
      .                     PRMOD=MSG_CUMU)
-            ELSEIF(EMAT(IPM(2,MT)) == 0)THEN
-               CALL FRETITL2(TITR2,IPM(NPROPMI-LTITR+1,MT),LTITR)
-               CALL ANCMSG(MSGID=62,
-     .                     MSGTYPE=MSGERROR,
-     .                     ANMODE=ANINFO,
-     .                     I1=IPM(1,MT),
-     .                     C1=TITR2,
-     .                     I2=IPM(2,MT),
-     .                     C2=ELEM,
-     .                     I3=IX(NE,I))
             ENDIF
             IF(IG<=0)THEN
                CALL ANCMSG(MSGID=59,
@@ -2876,16 +2910,6 @@ c            IGTYP=IGEO(11,IG)
      .                     C1=ELEM,
      .                     I2=IX(NE,I),
      .                     PRMOD=MSG_CUMU)
-            ELSEIF(EMAT(IPM(2,MT)) == 0)THEN
-               CALL FRETITL2(TITR2,IPM(NPROPMI-LTITR+1,MT),LTITR)
-               CALL ANCMSG(MSGID=62,
-     .                     MSGTYPE=MSGERROR,
-     .                     ANMODE=ANINFO,
-     .                     I1=IPM(1,MT),
-     .                     C1=TITR2,
-     .                     I2=IPM(2,MT),
-     .                     C2=ELEM,
-     .                     I3=IX(NE,I))
             ENDIF
             IF(IPARTEL(I) == 0)THEN
               CONTINUE
@@ -3002,16 +3026,16 @@ C
         VZ = PARTSAV(13,I) * SM
         EK = PARTSAV(14,I)
         CALL FRETITL2(TEXT,IPART(LIPART1-LTITR+1,I),LTITR)
-        WRITE(IOUT,'(/,A,I10,A)')'PART : ',IPART(4,I),TRIM(TEXT)
-        WRITE(IOUT,'(A)')       '----'
+        WRITE(IOUT,'(/,A,I10,A,A)')'PART : ',IPART(4,I),', ',TRIM(TEXT)
+C        WRITE(IOUT,'(A)')       '----'
         WRITE(IOUT,'(2A)')
-     .  ' Mass        Ixx         Iyy         Izz         ',
-     .  'Ixy        Iyz        Izx'
-        WRITE(IOUT,'(1P4G20.13,3G20.13)')MAS,IXX,IYY,IZZ,IXY,IYZ,IZX
+     .  '            Mass             Ixx             Iyy             Izz',
+     .  '             Ixy             Iyz             Izx'
+        WRITE(IOUT,'(1P7ES16.8)')MAS,IXX,IYY,IZZ,IXY,IYZ,IZX
         WRITE(IOUT,'(2A)')
-     .  ' X           Y           Z           Kin. Energy ',
-     .  'Vx         Vy         Vz'
-        WRITE(IOUT,'(1P4G20.13,3G20.13)')XG,YG,ZG,EK,VX,VY,VZ
+     .  '               X               Y               Z     Kin. Energy',
+     .  '              Vx              Vy              Vz'
+        WRITE(IOUT,'(1P7ES16.8)')XG,YG,ZG,EK,VX,VY,VZ
       ENDDO
 C
       RETURN
@@ -3035,7 +3059,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "vect01_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -3082,14 +3105,9 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "vect01_c.inc"
-#include      "param_c.inc"
 #include      "com01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -3115,11 +3133,11 @@ C
        IIS0= NUSOLID+4+NVSOLID1 + NVSOLID2 + NVSOLID3 + NVSOLID4 + NVSOLID5
        DO I=LFT,LLT
         JJ=PTSOL(I)
-        IF(STRAGLOB(I) == 10.AND.JJ>0) THEN  		       
+        IF(STRAGLOB(I) == 10.AND.JJ>0) THEN             
           DO N=1,NPE
             IIS= IIS0 + (N-1)*3
-            XL(N)=SIGSP(IIS+1,JJ)			       
-            YL(N)=SIGSP(IIS+2,JJ)			       
+            XL(N)=SIGSP(IIS+1,JJ)             
+            YL(N)=SIGSP(IIS+2,JJ)             
             ZL(N)=SIGSP(IIS+3,JJ)
           END DO
           IF (ISMSTR==1) THEN
@@ -3155,14 +3173,9 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "vect01_c.inc"
-#include      "param_c.inc"
 #include      "com01_c.inc"
 #include      "tabsiz_c.inc"
 C-----------------------------------------------
@@ -3194,18 +3207,18 @@ C-----------------------------------------------
        END IF
        DO I=LFT,LLT
         JJ=PTSOL(I)
-        IF(STRAGLOB(I) == 10.AND.JJ>0) THEN  		       
+        IF(STRAGLOB(I) == 10.AND.JJ>0) THEN             
           DO N=1,NPE
             IIS= IIS0 + (N-1)*3
-            SAV(I,N)       = SIGSP(IIS+1,JJ)			       
-            SAV(I,N+NPE)   = SIGSP(IIS+2,JJ)			       
+            SAV(I,N)       = SIGSP(IIS+1,JJ)             
+            SAV(I,N+NPE)   = SIGSP(IIS+2,JJ)             
             SAV(I,N+2*NPE) = SIGSP(IIS+3,JJ)
           END DO
           DO N=1,NDR
             IIS= IIS0 +(NPE+N-1)*3
             NN = 3*(NC(I,N)-1)
-            DR(NN+1) = SIGSP(IIS+1,JJ)			       
-            DR(NN+2) = SIGSP(IIS+2,JJ)			       
+            DR(NN+1) = SIGSP(IIS+1,JJ)             
+            DR(NN+2) = SIGSP(IIS+2,JJ)             
             DR(NN+3) = SIGSP(IIS+3,JJ)
           END DO
          IF (ISMSTR==1) OFFG(I) =TWO 
@@ -3220,13 +3233,13 @@ Chd|-- called by -----------
 Chd|        INITIA                        source/elements/initia/initia.F
 Chd|-- calls ---------------
 Chd|        FRETITL2                      source/starter/freform.F      
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/matparam_def_mod.F
+Chd|        GROUP_PARAM_MOD               ../common_source/modules/mat_elem/group_param_mod.F
 Chd|====================================================================
       SUBROUTINE OUTPART5(GROUP_PARAM_TAB,IPART,IPARTS,IPARG,IGEO, GEO ,PM )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
-      USE MATPARAM_DEF_MOD            
+      USE GROUP_PARAM_MOD            
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -3246,15 +3259,15 @@ C-----------------------------------------------
       INTEGER IPART(LIPART1,*),IPARG(NPARG,*),IGEO(NPROPGI,*)
       my_real
      .   GEO(NPROPG,*),PM(NPROPM,*)
-      TYPE(GRP_PARAM_STRUCT_) , DIMENSION(NGROUP) :: GROUP_PARAM_TAB
+      TYPE(GROUP_PARAM_) , DIMENSION(NGROUP) :: GROUP_PARAM_TAB
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,J,NG,IPID,IMID,MID,PID,ITY,IGTYP,ETY,N_NOD,ISOLNOD,
      .        IHBE,ISMSTR,ICPRE,JCVT,IINT,IHKT,ITET4,ITET10,IMATVIS,NPT,NLY,
      .        ICSTR,IDRIL,ITHK,IPLAS,I2GEO(NUMGEO),NG2,NG1,NG0,JG,ETYE,
-     .        IH4,IH3,IGMAT,I2GEO1(NUMGEO),I2GEO2(NUMGEO),IHBE0,ISNN(NPART),
-     .        IP,NFT
+     .        IH4,IH3,IGMAT,I2GEO1(NUMGEO),I2GEO2(NUMGEO),IHBE0,
+     .        IP,NFT,IP2NG1(NPART),IP2NG2(NPART),LST
       my_real
      .   MAS,SM,XX,YY,ZZ,XY,YZ,ZX,XG,YG,ZG,
      .   IXX,IXY,IYY,IYZ,IZZ,IZX,EK,VX,VY,VZ,HM,HR,HF,DN,QA,QB,QH,
@@ -3264,13 +3277,13 @@ C-----------------------------------------------
       DATA EL_TYP / 'SOLID-HEXA ', 
      .    'TETRA4 ',
      .    'TETRA10 ',
-     .    'S20 ',      
+     .    'BRIC20 ',      
      .    'ELEM-USER ', 
      .    'SOLID-IGE ', 
      .    'THICK-SHELL HEXA ' ,
      .    'THICK-SHELL PENTA '  ,
-     .    'THICK-SHELL S16 '    ,
-     .    'THICK-SHELL S20 '    , 
+     .    'THICK-SHELL SHEL16'    ,
+     .    'THICK-SHELL BRIC20'    , 
      .    'SHELL-4nodes '         , 
      .    'SHELL-3nodes '         , 
      .    'QUAD-2D '            ,
@@ -3302,7 +3315,8 @@ C
        I2GEO(1:NUMGEO) = 0
        I2GEO1(1:NUMGEO) = 0
        I2GEO2(1:NUMGEO) = 0
-       ISNN(1:NPART) = 0
+       IP2NG1(1:NPART) = 0
+       IP2NG2(1:NPART) = 0
 C Up to 3 different elements using same PID (tetra4,tetra10,hexa) 
 C Only solid and shell have initialized surely IPARG(62,NG)  
       DO NG=1,NGROUP
@@ -3311,8 +3325,45 @@ C Only solid and shell have initialized surely IPARG(62,NG)
        IF (ITY ==1) THEN
          ISOLNOD = IPARG(28,NG)
          NFT=IPARG(3,NG)+1
+         LST=IPARG(3,NG)+IPARG(2,NG)
          IP = IPARTS(NFT)
-         ISNN(IP) = ISOLNOD 
+         IF (IP2NG1(IP)==0) THEN
+           IP2NG1(IP) = NG 
+         ELSEIF (IP2NG2(IP)==0.AND.IPARG(28,IP2NG1(IP)) /= ISOLNOD) THEN
+           IP2NG2(IP) = NG 
+         ELSEIF(IP2NG2(IP)>0) THEN
+C-------3 elem types in the same part 4+10+8        
+           N_NOD = ISOLNOD+IPARG(28,IP2NG1(IP))+IPARG(28,IP2NG2(IP))
+           IF(N_NOD==22) THEN
+             IF (IPARG(28,IP2NG1(IP))==8) THEN
+               IP2NG2(IP) = -IP2NG1(IP)
+             ELSEIF (IPARG(28,IP2NG2(IP))==8) THEN
+               IP2NG2(IP) = -IP2NG2(IP)
+             ELSE
+               IP2NG2(IP) = -NG
+             END IF
+           END IF
+         END IF
+C-----case 2 parts in same groupe         
+         IF (IPARTS(LST)/=IP) THEN
+           IP = IPARTS(LST)
+           IF (IP2NG1(IP)==0) THEN
+             IP2NG1(IP) = NG 
+           ELSEIF (IP2NG2(IP)==0.AND.IPARG(28,IP2NG1(IP)) /= ISOLNOD) THEN
+             IP2NG2(IP) = NG 
+           ELSEIF(IP2NG2(IP)>0) THEN
+             N_NOD = ISOLNOD+IPARG(28,IP2NG1(IP))+IPARG(28,IP2NG2(IP))
+             IF(N_NOD==22) THEN
+               IF (IPARG(28,IP2NG1(IP))==8) THEN
+                 IP2NG2(IP) = -IP2NG1(IP)
+               ELSEIF (IPARG(28,IP2NG2(IP))==8) THEN
+                 IP2NG2(IP) = -IP2NG2(IP)
+               ELSE
+                 IP2NG2(IP) = -NG
+               END IF
+             END IF
+           END IF
+         END IF
        END IF         
        IPID=IPARG(62,NG)
        IF (I2GEO(IPID)==0) THEN
@@ -3365,6 +3416,19 @@ C----                          4): solid hexa-tetra4, 5): solid hexa-tetra10,6):
 C---- case 3 elem use same pid 1): solid hexa-tetra4-tetra10 
 C-----case not-considered :  thick-shell hexa-S16 hexa-S20, hexa-S16-S20    
         ETY=ETYE
+       IF(IP2NG1(I)>0)THEN
+        IF (IP2NG2(I)<0) THEN
+          NG = -IP2NG2(I)
+        ELSEIF (IP2NG2(I)>0) THEN
+          IF (IPARG(28,IP2NG2(I))==8) THEN
+            NG = IP2NG2(I)
+          ELSE
+            NG = IP2NG1(I)
+          END IF
+        ELSE
+          NG = IP2NG1(I)
+        END IF
+       ELSE
         IF (NG0>2*NGROUP) THEN
          IF (I2GEO2(IPID)>0) THEN
           NG = I2GEO2(IPID)
@@ -3383,7 +3447,8 @@ C-----case not-considered :  thick-shell hexa-S16 hexa-S20, hexa-S16-S20
           I2GEO1(IPID)= -I2GEO1(IPID)
          END IF
         END IF
-C----- Limited to 3 parts used same pid     
+       END IF!(IP2NG1(I)>0)
+C-----     
         IF (NG >0) THEN
          ITY = IPARG(5,NG)
          ISOLNOD = IPARG(28,NG)
@@ -3396,11 +3461,12 @@ C------- set ele_type(ETY)
         SELECT CASE (IGTYP)
 C-------thick-shell        
          CASE(20,21,22)                                             
-          IF (NG0>NGROUP) THEN
+          IF (NG0>NGROUP.AND.IP2NG2(I)>0) THEN
            NG1 = IABS(I2GEO1(IPID))
-           IF((ISOLNOD+IPARG(28,NG1))==14) THEN
+           N_NOD = IPARG(28,IP2NG1(I))+IPARG(28,IP2NG2(I))
+           IF(N_NOD==14) THEN
             ETY = 17+2
-           ELSEIF((ISOLNOD+IPARG(28,NG1))==36) THEN
+           ELSEIF(N_NOD==36) THEN
             ETY = 17+3
            END IF
           ELSEIF (ISOLNOD==8) THEN
@@ -3434,17 +3500,16 @@ C-------thick-shell
          CASE DEFAULT 
 C---- solid         
           IF(ITY==1)THEN
-           IF (ISNN(I)==20) THEN
-            ETY=4
-           ELSEIF (NG0>2*NGROUP) THEN
+           IF (NG0>2*NGROUP.AND.IP2NG2(I)<0) THEN
             ETY = 17+7
-           ELSEIF (NG0>NGROUP) THEN
+           ELSEIF (NG0>NGROUP.AND.IP2NG2(I)>0) THEN
             NG1 = IABS(I2GEO1(IPID))
-            IF((ISOLNOD+IPARG(28,NG1))==12) THEN
+            N_NOD = IPARG(28,IP2NG1(I))+IPARG(28,IP2NG2(I))
+            IF(N_NOD==12) THEN
              ETY = 17+4
-            ELSEIF((ISOLNOD+IPARG(28,NG1))==18) THEN
+            ELSEIF(N_NOD==18) THEN
              ETY = 17+5
-            ELSEIF((ISOLNOD+IPARG(28,NG1))==14) THEN
+            ELSEIF(N_NOD==14) THEN
              ETY = 17+6
             END IF
            ELSEIF (ISOLNOD==8) THEN
@@ -3495,26 +3560,7 @@ C----- spring, KJOINT -----
 C-print in fonction of elem types ITY
         SELECT CASE (ITY)
          CASE(1)
-          ISOLNOD = ISNN(I)            
           QH =ZERO
-          IF (ETY==21.OR.ETY==22.OR.ETY==24) THEN
-           IHBE=IHBE0
-           NG0 = I2GEO(IPID)
-           IF (NG0>2*NGROUP) THEN
-            IF (I2GEO2(IPID)>0) THEN
-             NG0 = I2GEO2(IPID)
-             IF (IPARG(28,NG0)==8) NG = NG0
-            ELSEIF (I2GEO1(IPID)>0) THEN
-             NG0 = I2GEO1(IPID)
-             IF (IPARG(28,NG0)==8) NG = NG0
-            END IF
-           ELSEIF (NG0>NGROUP) THEN
-             NG0 = I2GEO1(IPID)
-             IF (IPARG(28,NG0)==8) NG = NG0
-           ELSE
-             IF (IPARG(28,NG0)==8) NG = NG0
-           END IF
-          END IF		   
            SELECT CASE (ISOLNOD)
              CASE(4,10)
                IHBE=1
@@ -3538,6 +3584,7 @@ C-------this is done in ENGINE, should be done in Starter
           NPT =IPARG(6,NG)
           IINT = IPARG(36,NG)
           IF (IHBE==17.AND.IINT==2) IHBE=18 
+          IF (IHBE==1.AND.IINT==3) IHBE=5 
           ISMSTR=IPARG(9,NG)
           ICPRE = IPARG(10,NG)
           IF (ICPRE==0.AND.ISOLNOD==8) ICPRE=3 
@@ -3599,6 +3646,7 @@ C-------- shell
           ITHK =IPARG(28,NG) 
           IPLAS =IPARG(29,NG) 
           IGMAT =IGEO(98,IPID)
+          NPT = IPARG(6,NG)
           QF = ZERO
           QM = ZERO
           QR = ZERO

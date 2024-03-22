@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,16 +26,25 @@ Chd|-- called by -----------
 Chd|        S10KE3                        source/elements/solid/solide10/s10ke3.F
 Chd|-- calls ---------------
 Chd|====================================================================
-      SUBROUTINE S10COORK(X,IXS,IXS10,
-     .   XX, YY, ZZ,  
-     .   OFFG,OFF,SAV,
-     .   NC,NGL,MXT,NGEO,
-     .   K11,K12,K13,K14,K15,K16,K17,K18,K19,K10,
-     .   K22,K23,K24,K25,K26,K27,K28,K29,K20,K33,
-     .   K34,K35,K36,K37,K38,K39,K30,K44,K45,K46,
-     .   K47,K48,K49,K40,K55,K56,K57,K58,K59,K50,
-     .   K66,K67,K68,K69,K60,K77,K78,K79,K70,K88,
-     .   K89,K80,K99,K90,K00,NEL)
+      SUBROUTINE S10COORK(
+     1   X,       IXS,     IXS10,   XX,
+     2   YY,      ZZ,      OFFG,    OFF,
+     3   SAV,     NC,      NGL,     MXT,
+     4   NGEO,    K11,     K12,     K13,
+     5   K14,     K15,     K16,     K17,
+     6   K18,     K19,     K10,     K22,
+     7   K23,     K24,     K25,     K26,
+     8   K27,     K28,     K29,     K20,
+     9   K33,     K34,     K35,     K36,
+     A   K37,     K38,     K39,     K30,
+     B   K44,     K45,     K46,     K47,
+     C   K48,     K49,     K40,     K55,
+     D   K56,     K57,     K58,     K59,
+     E   K50,     K66,     K67,     K68,
+     F   K69,     K60,     K77,     K78,
+     G   K79,     K70,     K88,     K89,
+     H   K80,     K99,     K90,     K00,
+     I   NEL,     ISMSTR)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -47,13 +56,11 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com08_c.inc"
-#include      "vect01_c.inc"
 #include      "scr18_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: ISMSTR
       INTEGER NEL
 C     REAL
       my_real
@@ -86,8 +93,8 @@ C     REAL
 C-----------------------------------------------
       IUN=1
 C
-      MXT_1 = IXS(1,LFT)
-      DO I=LFT,LLT
+      MXT_1 = IXS(1,1)
+      DO I=1,NEL
         NGEO(I)=IXS(10,I)
         NGL(I)=IXS(11,I)
         MXT(I)=MXT_1
@@ -106,7 +113,7 @@ C----------------------------
 C     NODAL COORDINATES     |
 C----------------------------
       DO N=1,10
-       DO I=LFT,LLT
+       DO I=1,NEL
         NN = MAX(IUN,NC(I,N))
         XX(I,N)=X(1,NN)
         YY(I,N)=X(2,NN)
@@ -117,7 +124,7 @@ C----------------------------
 C-----------
       IF(ISMSTR==1.OR.(ISMSTR==2.AND.IDTMIN(1)==3))THEN
       DO N=1,10
-       DO I=LFT,LLT
+       DO I=1,NEL
        IF(ABS(OFFG(I))>ONE)THEN
         XX(I,N)=SAV(I,N)
         YY(I,N)=SAV(I,N+10)
@@ -134,7 +141,7 @@ C
       DO N=5,10
         N1=IPERM1(N)
         N2=IPERM2(N)
-        DO I=LFT,LLT
+        DO I=1,NEL
           IF(NC(I,N)==0)THEN
             XX(I,N) = HALF*(XX(I,N1)+XX(I,N2))
             YY(I,N) = HALF*(YY(I,N1)+YY(I,N2))
@@ -144,7 +151,7 @@ C
       ENDDO
 C-----------
       DO J=1,9      
-      DO I=LFT,LLT
+      DO I=1,NEL
         K11(J,I)=ZERO
         K12(J,I)=ZERO
         K13(J,I)=ZERO

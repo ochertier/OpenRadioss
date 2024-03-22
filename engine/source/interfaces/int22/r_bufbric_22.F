@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,9 +27,10 @@ Chd|-- calls ---------------
 Chd|        ARRET                         source/system/arret.F         
 Chd|        I22DATAINIT                   source/interfaces/int22/i22datainit.F
 Chd|        READ_DB                       source/output/tools/read_db.F 
-Chd|        READ_I_C                      source/output/tools/sortie_c.c
-Chd|        I22BUFBRIC_MOD                ../common_source/modules/cut-cell-search_mod.F
-Chd|        I22TRI_MOD                    ../common_source/modules/cut-cell-search_mod.F
+Chd|        READ_I_C                      ../common_source/tools/input_output/write_routtines.c
+Chd|        ALE_MOD                       ../common_source/modules/ale/ale_mod.F
+Chd|        I22BUFBRIC_MOD                ../common_source/modules/interfaces/cut-cell-search_mod.F
+Chd|        I22TRI_MOD                    ../common_source/modules/interfaces/cut-cell-search_mod.F
 Chd|====================================================================
       SUBROUTINE R_BUFBRIC_22()
 C-----------------------------------------------
@@ -44,6 +45,7 @@ C   M o d u l e s
 C-----------------------------------------------
       USE I22BUFBRIC_MOD  
       USE I22TRI_MOD    
+      USE ALE_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -52,8 +54,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
-#include      "fluid_scr_c.inc"
-#include      "warn_c.inc"
 #include      "inter22.inc"
 #include      "task_c.inc"
 #include      "com01_c.inc"
@@ -149,7 +149,7 @@ C---------------------------------------------------------------------C
         IF(IERR1>0)GOTO 1000                                                                                 
 
         CALL I22DATAINIT()                                                                                                                                                                                                                                                                                                 
-        ICAA = 1                                                                                                                                                    
+        ALE%GLOBAL%ICAA = 1                                                                                                                                                    
       ENDIF 
       
       !CALL I22DATAINIT_DB()                                                                                                                                                          

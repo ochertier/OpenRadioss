@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -40,7 +40,7 @@ Chd|====================================================================
      5           DEPSXX  ,DEPSYY  ,DEPSZZ  ,DEPSXY  ,DEPSYZ  ,DEPSZX  ,
      6           SIGOXX  ,SIGOYY  ,SIGOZZ  ,SIGOXY  ,SIGOYZ  ,SIGOZX  ,
      7           SIGNXX  ,SIGNYY  ,SIGNZZ  ,SIGNXY  ,SIGNYZ  ,SIGNZX  ,
-     8           JTHE    ,INLOC   ,DPLANL  )
+     8           JTHE    ,INLOC   ,DPLANL  ,DMG     ,DMG_SCALE)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -53,10 +53,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc" 
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr17_c.inc"
 C----------------------------------------------------------------
 C  D u m m y   A R G U M E N T S
 C----------------------------------------------------------------
@@ -71,7 +68,7 @@ C----------------------------------------------------------------
      .         SIGOXX,SIGOYY,SIGOZZ,SIGOXY,SIGOYZ,SIGOZX
       my_real, DIMENSION(NEL) ,INTENT(INOUT) :: EPSD,SOUNDSP,
      .         SIGNXX,SIGNYY,SIGNZZ,SIGNXY,SIGNYZ,SIGNZX
-      my_real ,DIMENSION(NEL)         ,INTENT(INOUT) :: PLA,DPLANL,OFF
+      my_real ,DIMENSION(NEL)         ,INTENT(INOUT) :: PLA,DPLANL,OFF,DMG,DMG_SCALE
       my_real ,DIMENSION(NEL,NUVAR)   ,INTENT(INOUT) :: UVAR
       INTEGER ,DIMENSION(NEL,NVARTMP) ,INTENT(INOUT) :: VARTMP
       TYPE(TTABLE) ,DIMENSION(NTABLE) ,INTENT(IN)    :: TABLE
@@ -94,7 +91,7 @@ c------------------------------------------------------------------
      5         SIGOXX  ,SIGOYY  ,SIGOZZ  ,SIGOXY  ,SIGOYZ  ,SIGOZX  ,
      6         SIGNXX  ,SIGNYY  ,SIGNZZ  ,SIGNXY  ,SIGNYZ  ,SIGNZX  ,
      7         NUMTABL ,ITABLE  ,TABLE   ,NVARTMP ,VARTMP  ,TEMP    ,
-     8         JTHE    ,INLOC   ,DPLANL  )
+     8         JTHE    ,INLOC   ,DPLANL  ,DMG     , DMG_SCALE)
         ELSE                     ! tabulated Von-Mises formulation
           CALL SIGEPS120_TAB_VM(
      1         NEL     ,NGL     ,NUPARAM ,NUVAR   ,TIME    ,TIMESTEP,
@@ -104,7 +101,7 @@ c------------------------------------------------------------------
      5         SIGOXX  ,SIGOYY  ,SIGOZZ  ,SIGOXY  ,SIGOYZ  ,SIGOZX  ,
      6         SIGNXX  ,SIGNYY  ,SIGNZZ  ,SIGNXY  ,SIGNYZ  ,SIGNZX  ,
      7         NTABLE  ,ITABLE  ,TABLE   ,NVARTMP ,VARTMP  ,TEMP    ,
-     8         JTHE    ,INLOC   ,DPLANL  )
+     8         JTHE    ,INLOC   ,DPLANL  ,DMG     , DMG_SCALE)
         END IF
 c
       ELSE
@@ -117,7 +114,7 @@ c
      4         DEPSXX  ,DEPSYY  ,DEPSZZ  ,DEPSXY  ,DEPSYZ  ,DEPSZX  ,
      5         SIGOXX  ,SIGOYY  ,SIGOZZ  ,SIGOXY  ,SIGOYZ  ,SIGOZX  ,
      6         SIGNXX  ,SIGNYY  ,SIGNZZ  ,SIGNXY  ,SIGNYZ  ,SIGNZX  ,
-     7         INLOC   ,DPLANL  )
+     7         INLOC   ,DPLANL  ,DMG     , DMG_SCALE)
         ELSE                     ! analytical Von-Mises formulation
           CALL SIGEPS120_VM(
      1         NEL     ,NGL     ,NUPARAM ,NUVAR   ,TIME    ,TIMESTEP,
@@ -126,7 +123,7 @@ c
      4         DEPSXX  ,DEPSYY  ,DEPSZZ  ,DEPSXY  ,DEPSYZ  ,DEPSZX  ,
      5         SIGOXX  ,SIGOYY  ,SIGOZZ  ,SIGOXY  ,SIGOYZ  ,SIGOZX  ,
      6         SIGNXX  ,SIGNYY  ,SIGNZZ  ,SIGNXY  ,SIGNYZ  ,SIGNZX  ,
-     7         INLOC   ,DPLANL  )
+     7         INLOC   ,DPLANL  ,DMG     , DMG_SCALE)
         END IF
       END IF
 c-----------------------------------------------------------------

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,7 +26,7 @@ Chd|-- called by -----------
 Chd|        FORINTP                       source/elements/forintp.F     
 Chd|-- calls ---------------
 Chd|        INITBUF                       share/resol/initbuf.F         
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        INITBUF_MOD                   share/resol/initbuf.F         
 Chd|        SPHBOX                        share/modules/sphbox.F        
 Chd|====================================================================
@@ -41,30 +41,22 @@ C-----------------------------------------------
       USE INITBUF_MOD
       USE SPHBOX
       USE ELBUFDEF_MOD            
-C----6---------------------------------------------------------------7---------8
+C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "comlock.inc"
-#include      "task_c.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "vect01_c.inc"
 #include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "com06_c.inc"
 #include      "com08_c.inc"
 #include      "param_c.inc"
 #include      "sphcom.inc"
-#include      "scr01_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
 #include      "scr17_c.inc"
-C-----------------------------------------------------------------
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER KXSP(NISP,*),IXSP(KVOISPH,*),NOD2SP(*),ITAB(*),
@@ -193,7 +185,7 @@ C
           IF(IPPV>0)THEN
             NP=NOD2SP(IPPV)
             NG=MOD(KXSP(2,NP),NGROUP+1)
-            CALL INITBUF (IPARG    ,NG      ,                   
+            CALL INITBUF(IPARG    ,NG      ,                   
      2       MTN     ,NEL     ,NFT     ,KAD     ,ITY     ,    
      3       NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,    
      4       JTHE    ,JLAG    ,JMULT   ,JHBE    ,JIVF    ,    
@@ -221,7 +213,7 @@ C
          ENDIF
 C
          NG=MOD(KXSP(2,N),NGROUP+1)
-         CALL INITBUF (IPARG    ,NG      ,                   
+         CALL INITBUF(IPARG    ,NG      ,                   
      2       MTN     ,NEL     ,NFT     ,KAD     ,ITY     ,    
      3       NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,    
      4       JTHE    ,JLAG    ,JMULT   ,JHBE    ,JIVF    ,    
@@ -237,7 +229,7 @@ C
          K=N-NFT
 !
          PX=-( GBUF%SIG(KK(1)+K)          
-     .        +GBUF%SIG(KK(2)+K)	  
+     .        +GBUF%SIG(KK(2)+K)    
      .        +GBUF%SIG(KK(3)+K))*THIRD   
          GBUF%SIG(KK(1)+K)=GBUF%SIG(KK(1)+K)+PX-PN
          GBUF%SIG(KK(2)+K)=GBUF%SIG(KK(2)+K)+PX-PN
@@ -364,7 +356,7 @@ C
           PN=MAX(PN,PMIN)
 C
           NG=MOD(KXSP(2,N),NGROUP+1)
-          CALL INITBUF (IPARG    ,NG      ,                   
+          CALL INITBUF(IPARG    ,NG      ,                   
      2       MTN     ,NEL     ,NFT     ,KAD     ,ITY     ,    
      3       NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,    
      4       JTHE    ,JLAG    ,JMULT   ,JHBE    ,JIVF    ,    
@@ -395,7 +387,7 @@ C
           TFEXTT=TFEXTT+(PN-PX)*DVOL
          ELSE
           NG=MOD(KXSP(2,N),NGROUP+1)
-          CALL INITBUF (IPARG    ,NG      ,                   
+          CALL INITBUF(IPARG    ,NG      ,                   
      2       MTN     ,NEL     ,NFT     ,KAD     ,ITY     ,    
      3       NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,    
      4       JTHE    ,JLAG    ,JMULT   ,JHBE    ,JIVF    ,    

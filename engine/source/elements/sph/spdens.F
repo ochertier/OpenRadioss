@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -36,35 +36,22 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE SPHBOX
-C----6---------------------------------------------------------------7---------8
+C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "vect01_c.inc"
-#include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "com06_c.inc"
 #include      "com08_c.inc"
 #include      "sphcom.inc"
 #include      "param_c.inc"
-#include      "parit_c.inc"
-#include      "scr01_c.inc"
-#include      "scr18_c.inc"
-#include      "task_c.inc"
-#include      "units_c.inc"
-C-----------------------------------------------------------------
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER KXSP(NISP,*),IXSP(KVOISPH,*),NOD2SP(*),ITAB(*),
      .        ISPSYM(NSPCOND,*),IPARG(NPARG,*)
-C     REAL
       my_real
      .   X(3,*)    ,V(3,*)    ,MS(*)   ,
      .   SPBUF(NSPBUF,*) ,XSPSYM(3,*) ,VSPSYM(3,*) ,
@@ -131,9 +118,9 @@ C
        ROTVZ=ZERO    
 C------
        ALPHAI=WACOMP(1,N)
-       BETAXI=WACOMP(2,N)
-       BETAYI=WACOMP(3,N)
-       BETAZI=WACOMP(4,N)
+C       BETAXI=WACOMP(2,N)
+C       BETAYI=WACOMP(3,N)
+C       BETAZI=WACOMP(4,N)
        ALPHAXI=WACOMP( 5,N)
        ALPHAYI=WACOMP( 6,N)
        ALPHAZI=WACOMP( 7,N)
@@ -177,22 +164,23 @@ C------
           RHOJ=XSPHR(7,NN)
           VJ=XSPHR(8,NN)/MAX(EM20,RHOJ)
         END IF
-        BETAX=ONE +BETAXI*(XI-XJ)+BETAYI*(YI-YJ)+BETAZI*(ZI-ZJ)
-        WGRDX=
-     .   WGRAD(1)*ALPHAI*BETAX
-     .   +WGHT*
-     .     (ALPHAXI*BETAX+ALPHAI*
-     .       (BETAXXI*(XI-XJ)+BETAYXI*(YI-YJ)+BETAZXI*(ZI-ZJ)+BETAXI))
-        WGRDY=
-     .   WGRAD(2)*ALPHAI*BETAX
-     .   +WGHT*
-     .     (ALPHAYI*BETAX+ALPHAI*
-     .       (BETAXYI*(XI-XJ)+BETAYYI*(YI-YJ)+BETAZYI*(ZI-ZJ)+BETAYI))
-        WGRDZ=
-     .   WGRAD(3)*ALPHAI*BETAX
-     .   +WGHT*
-     .     (ALPHAZI*BETAX+ALPHAI*
-     .       (BETAXZI*(XI-XJ)+BETAYZI*(YI-YJ)+BETAZZI*(ZI-ZJ)+BETAZI))
+        WGRDX=WGRAD(1)*ALPHAI+WGHT*ALPHAXI
+     .       +WGRAD(1)*BETAXXI+WGRAD(2)*BETAXYI+WGRAD(3)*BETAXZI
+        WGRDY=WGRAD(2)*ALPHAI+WGHT*ALPHAYI
+     .       +WGRAD(1)*BETAYXI+WGRAD(2)*BETAYYI+WGRAD(3)*BETAYZI
+        WGRDZ=WGRAD(3)*ALPHAI+WGHT*ALPHAZI
+     .       +WGRAD(1)*BETAZXI+WGRAD(2)*BETAZYI+WGRAD(3)*BETAZZI      
+!        Old order1 correction        
+!        BETAX=ONE +BETAXI*(XI-XJ)+BETAYI*(YI-YJ)+BETAZI*(ZI-ZJ)
+!        WGRDX=WGRAD(1)*ALPHAI*BETAX
+!     .   +WGHT*(ALPHAXI*BETAX+ALPHAI*
+!     .    (BETAXXI*(XI-XJ)+BETAYXI*(YI-YJ)+BETAZXI*(ZI-ZJ)+BETAXI))
+!        WGRDY=WGRAD(2)*ALPHAI*BETAX
+!     .   +WGHT*(ALPHAYI*BETAX+ALPHAI*
+!     .    (BETAXYI*(XI-XJ)+BETAYYI*(YI-YJ)+BETAZYI*(ZI-ZJ)+BETAYI))
+!        WGRDZ=WGRAD(3)*ALPHAI*BETAX
+!     .   +WGHT*(ALPHAZI*BETAX+ALPHAI*
+!     .    (BETAXZI*(XI-XJ)+BETAYZI*(YI-YJ)+BETAZZI*(ZI-ZJ)+BETAZI))
         WGRAD(1)=WGRDX
         WGRAD(2)=WGRDY
         WGRAD(3)=WGRDZ
@@ -293,22 +281,24 @@ C      partie symetrique.
           CALL WEIGHT1(XI,YI,ZI,XJ,YJ,ZJ,DIJ,WGHT,WGRAD)
           VJ=XSPHR(8,SM)/MAX(EM20,RHOJ)
         END IF
-        BETAX=ONE + BETAXI*(XI-XJ)+BETAYI*(YI-YJ)+BETAZI*(ZI-ZJ)
-        WGRDX=
-     .   WGRAD(1)*ALPHAI*BETAX
-     .   +WGHT*
-     .     (ALPHAXI*BETAX+ALPHAI*
-     .       (BETAXXI*(XI-XJ)+BETAYXI*(YI-YJ)+BETAZXI*(ZI-ZJ)+BETAXI))
-        WGRDY=
-     .   WGRAD(2)*ALPHAI*BETAX
-     .   +WGHT*
-     .     (ALPHAYI*BETAX+ALPHAI*
-     .       (BETAXYI*(XI-XJ)+BETAYYI*(YI-YJ)+BETAZYI*(ZI-ZJ)+BETAYI))
-        WGRDZ=
-     .   WGRAD(3)*ALPHAI*BETAX
-     .   +WGHT*
-     .     (ALPHAZI*BETAX+ALPHAI*
-     .       (BETAXZI*(XI-XJ)+BETAYZI*(YI-YJ)+BETAZZI*(ZI-ZJ)+BETAZI))
+C
+        WGRDX=WGRAD(1)*ALPHAI+WGHT*ALPHAXI
+     .       +WGRAD(1)*BETAXXI+WGRAD(2)*BETAXYI+WGRAD(3)*BETAXZI
+        WGRDY=WGRAD(2)*ALPHAI+WGHT*ALPHAYI
+     .       +WGRAD(1)*BETAYXI+WGRAD(2)*BETAYYI+WGRAD(3)*BETAYZI
+        WGRDZ=WGRAD(3)*ALPHAI+WGHT*ALPHAZI
+     .       +WGRAD(1)*BETAZXI+WGRAD(2)*BETAZYI+WGRAD(3)*BETAZZI
+!        Old order1 correction        
+!        BETAX=ONE + BETAXI*(XI-XJ)+BETAYI*(YI-YJ)+BETAZI*(ZI-ZJ)
+!        WGRDX=WGRAD(1)*ALPHAI*BETAX
+!     .   +WGHT*(ALPHAXI*BETAX+ALPHAI*
+!     .    (BETAXXI*(XI-XJ)+BETAYXI*(YI-YJ)+BETAZXI*(ZI-ZJ)+BETAXI))
+!        WGRDY=WGRAD(2)*ALPHAI*BETAX
+!     .   +WGHT*(ALPHAYI*BETAX+ALPHAI*
+!     .    (BETAXYI*(XI-XJ)+BETAYYI*(YI-YJ)+BETAZYI*(ZI-ZJ)+BETAYI))
+!        WGRDZ=WGRAD(3)*ALPHAI*BETAX
+!     .   +WGHT*(ALPHAZI*BETAX+ALPHAI*
+!     .    (BETAXZI*(XI-XJ)+BETAYZI*(YI-YJ)+BETAZZI*(ZI-ZJ)+BETAZI))
         WGRAD(1)=WGRDX
         WGRAD(2)=WGRDY
         WGRAD(3)=WGRDZ

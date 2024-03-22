@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -23,18 +23,19 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 Chd|====================================================================
 Chd|  GENH3D                        source/output/h3d/h3d_results/genh3d.F
 Chd|-- called by -----------
-Chd|        SORTIE_MAIN                   source/output/sortie_main.F
+Chd|        SORTIE_MAIN                   source/output/sortie_main.F   
 Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
-Chd|        ARRET                         source/system/arret.F
+Chd|        ARRET                         source/system/arret.F         
 Chd|        DRBE2CNT                      source/output/anim/generate/drbe2cnt.F
 Chd|        DRBE3CNT                      source/output/anim/generate/drbe3cnt.F
 Chd|        DRBYCNT                       source/output/anim/generate/drbycnt.F
-Chd|        FRETITL                       source/input/freform.F
+Chd|        FRETITL                       source/input/freform.F        
 Chd|        GET_NODAL_IPART               source/output/h3d/h3d_results/h3d_skin_ixskin.F
 Chd|        H3DLIB_LOAD                   source/output/h3d/h3d_build_cpp/h3d_dl.c
 Chd|        H3D_CONSTIT                   source/output/h3d/h3d_build_fortran/h3d_constit.F
 Chd|        H3D_CREATE_DATATYPE           source/output/h3d/h3d_build_fortran/h3d_create_datatype.F
+Chd|        H3D_CREATE_FVMBAG_CENTROIDS   source/output/h3d/h3d_build_fortran/h3d_create_fvmbag_centroids.F
 Chd|        H3D_CREATE_RBE2_IMPI          source/output/h3d/h3d_build_fortran/h3d_create_rbe2_impi.F
 Chd|        H3D_CREATE_RBE3_IMPI          source/output/h3d/h3d_build_fortran/h3d_create_rbe3_impi.F
 Chd|        H3D_CREATE_RBODIES_IMPI       source/output/h3d/h3d_build_fortran/h3d_create_rbodies_impi.F
@@ -69,6 +70,7 @@ Chd|        H3D_SOLID_VECTOR              source/output/h3d/h3d_results/h3d_soli
 Chd|        H3D_SPH_OFF                   source/output/h3d/spmd/spmd_h3d_sph_off.F
 Chd|        H3D_SPH_SCALAR                source/output/h3d/h3d_results/h3d_sph_scalar.F
 Chd|        H3D_SPH_TENSOR                source/output/h3d/h3d_results/h3d_sph_tensor.F
+Chd|        H3D_UPDATE_FVMBAG_CENTROIDS   source/output/h3d/h3d_build_fortran/h3d_update_fvmbag_centroids.F
 Chd|        SCANOR                        source/output/anim/generate/scanor.F
 Chd|        SPMD_H3D_GATHER_I             source/output/h3d/spmd/spmd_h3d_gather_i.F
 Chd|        SPMD_H3D_GATHER_I_NODE        source/output/h3d/spmd/spmd_h3d_gather_i_node.F
@@ -83,26 +85,29 @@ Chd|        SPMD_H3D_SUM_R_NODAL          source/output/h3d/spmd/spmd_h3d_gather
 Chd|        SPMD_H3D_SUM_R_NODAL_21       source/output/h3d/spmd/spmd_h3d_gather_r_node.F
 Chd|        SPMD_H3D_SUM_R_NODAL_VALUE    source/output/h3d/spmd/spmd_h3d_sum_r_nodal_value.F
 Chd|        SPMD_OUTPITAB                 source/mpi/interfaces/spmd_outp.F
-Chd|        STARTIME                      source/system/timer.F
-Chd|        STOPTIME                      source/system/timer.F
-Chd|        SYSFUS2                       source/system/sysfus.F
-Chd|        ALEANIM_MOD                   share/modules/aleanim_mod.F
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
-Chd|        CLUSTER_MOD                   share/modules/cluster_mod.F
-Chd|        CRACKXFEM_MOD                 share/modules/crackxfem_mod.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
-Chd|        FVBAG_MOD                     share/modules/fvbag_mod.F
+Chd|        STARTIME                      source/system/timer.F         
+Chd|        STOPTIME                      source/system/timer.F         
+Chd|        SYSFUS2                       source/system/sysfus.F        
+Chd|        ALEANIM_MOD                   share/modules/aleanim_mod.F   
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
+Chd|        CLUSTER_MOD                   share/modules/cluster_mod.F   
+Chd|        CRACKXFEM_MOD                 share/modules/crackxfem_mod.F 
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
+Chd|        FVBAG_MOD                     share/modules/fvbag_mod.F     
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        H3D_INC_MOD                   share/modules/h3d_inc_mod.F
-Chd|        H3D_MOD                       share/modules/h3d_mod.F
+Chd|        H3D_INC_MOD                   share/modules/h3d_inc_mod.F   
+Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|        INOUTFILE_MOD                 ../common_source/modules/inoutfile_mod.F
+Chd|        LOADS_MOD                     ../common_source/modules/loads/loads_mod.F
+Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|        OUTMAX_MOD                    ../common_source/modules/outmax_mod.F
 Chd|        OUTPUTS_MOD                   ../common_source/modules/outputs_mod.F
-Chd|        PLYXFEM_MOD                   share/modules/plyxfem_mod.F
-Chd|        SENSOR_MOD                    share/modules/sensor_mod.F
-Chd|        STACK_MOD                     share/modules/stack_mod.F
+Chd|        PLYXFEM_MOD                   share/modules/plyxfem_mod.F   
+Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
+Chd|        STACK_MOD                     share/modules/stack_mod.F     
+Chd|        TABLE_MOD                     share/modules/table_mod.F     
 Chd|====================================================================
       SUBROUTINE GENH3D(X        ,D        ,V           ,A           ,BUFEL    ,
      2                  IXS      ,IXQ      ,IXC         ,IXT         ,IXP      ,
@@ -111,7 +116,7 @@ Chd|====================================================================
      5                  SINVERT  ,CONT     ,SMATER      ,ICUT        ,SKEW     ,
      6                  XCUT     ,FINT     ,ITAB        ,SEL2FA      ,FEXT     ,
      7                  FOPT     ,ANIN     ,LPBY        ,NPBY        ,NSTRF    ,
-     8                  RWBUF    ,NPRW     ,IXUR        ,TANI        ,ELBUF_TAB,
+     8                  RWBUF    ,NPRW     ,TANI        ,ELBUF_TAB   ,MAT_PARAM,
      A                  DD_IAD   ,WEIGHT   ,EANI        ,IPART       ,CLUSTER  ,
      B                  IPARTS   ,IPARTQ   ,IPARTC      ,IPARTT      ,IPARTP   ,
      C                  IPARTR   ,IPARTUR  ,IPARTTG     ,
@@ -141,13 +146,15 @@ Chd|====================================================================
      1                  SH4TREE  ,SH3TREE  ,H3D_DATA    ,MULTI_FVM   ,SUBSET    ,
      2                  PSKIDS   ,TAG_SKINS6,TF         ,NPF         ,FCONT_MAX ,
      3                  MDS_MATID,FNCONTP2 ,FTCONTP2    ,IBCL        ,ILOADP    ,
-     4                  LLOADP   ,FAC      ,SENSOR_TAB  ,TAGNCONT    ,LOADP_HYD_INTER,
+     4                  LLOADP   ,FAC      ,SENSORS     ,TAGNCONT    ,LOADP_HYD_INTER,
      5                  XFRAME   ,FORC     ,AR          ,CSEFRIC     ,CSEFRICG  ,
-     6                  CSEFRIC_STAMP,CSEFRICG_STAMP)
+     6                  CSEFRIC_STAMP,CSEFRICG_STAMP    ,TABLE       ,IFRAME    ,
+     7                  LOADS    )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
-      USE FVBAG_MOD
+      USE FVBAG_MOD , only:FVBAG_DATA, FVDATA, NFVBAG, AIRBAGS_TOTAL_FVM_IN_H3D, FVSPMD
+      USE NAMES_AND_TITLES_MOD, ONLY: NCHARLINE100
       USE PLYXFEM_MOD
       USE MESSAGE_MOD
       USE ELBUFDEF_MOD
@@ -164,12 +171,16 @@ C-----------------------------------------------
       USE OUTMAX_MOD
       USE H3D_INC_MOD
       USE OUTPUTS_MOD
+      USE TABLE_MOD
+      USE LOADS_MOD
+      USE MATPARAM_DEF_MOD
+      USE MY_ALLOC_MOD
+      USE OUTMAX_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 #ifdef MPI
-#include "mpif.h"
 #endif
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
@@ -177,41 +188,22 @@ C-----------------------------------------------
 #include      "build_info.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com05_c.inc"
 #include      "com08_c.inc"
-#include      "com09_c.inc"
 #include      "com_xfem1.inc"
 #include      "sphcom.inc"
 #include      "param_c.inc"
 #include      "units_c.inc"
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
-#include      "scr06_c.inc"
-#include      "scr13_c.inc"
 #include      "scr14_c.inc"
 #include      "scr16_c.inc"
 #include      "scr17_c.inc"
 #include      "scr23_c.inc"
-#include      "scr25_c.inc"
-#include      "submodel.inc"
 #include      "chara_c.inc"
-#include      "scrcut_c.inc"
-#include      "rnur_c.inc"
-#include      "r4r8_p.inc"
 #include      "task_c.inc"
-#include      "couple_c.inc"
 #include      "spmd_c.inc"
-#include      "flowcom.inc"
-#include      "impl1_c.inc"
-#include      "sms_c.inc"
 #include      "filescount_c.inc"
 #include      "tabsiz_c.inc"
-#include      "parit_c.inc"
 #include      "intstamp_c.inc"
-#include      "nchara_c.inc"
-#include      "timeri_c.inc"
 #include      "macro.inc"
-#include      "my_allocate.inc"
 #include      "sysunit.inc"
 C-----------------------------------------------
 C   E x t e r n a l  F u n c t i o n s
@@ -228,29 +220,29 @@ C-----------------------------------------------
      .  SNUMX2,SNUMX3,SOFFX1,SOFFX2,SOFFX3,SMASS1,SMASS2,
      .  SMASS3,SFUNC1,SFUNC2,SFUNC3,SFIN,SNFACPTX,NPF(*)
 
-      INTEGER  IGEO(NPROPGI,*),IPM(NPROPMI,*),INDX_CRK(*),
+      INTEGER  IGEO(NPROPGI,NUMGEO),IPM(NPROPMI,NUMMAT),INDX_CRK(*),
      .  LRBE2(*),LRBE3(*),FR_RBE2(3,*),FR_RBE3M(3,*),
      .  NOD_PXFEM(*), IEL_PXFEM(*),NODEDGE(2,*),XEDGE4N(4,*),XEDGE3N(3,*),
      .  INOD_CRK(*),IEL_CRK(*),ELCUTC(2,*),IADC_CRK(*)
       my_real
-     .   X(*), D(*), V(*), A(3,*), BUFEL(*),
-     .   PM(NPROPM,*), GEO(NPROPG,*),CONT(*),
-     .   XCUT(*) , FINT(3,*),MS(*),RWBUF(NRWLP,*),SKEW(LSKEW,*),
-     .   RBY(NRBY,*),FEXT(3,*) ,FOPT(6,*),ANIN(*),TANI(6,*),EANI(*),
+     .   X(3*NUMNOD), D(3*NUMNOD), V(3*NUMNOD), A(3,NUMNOD), BUFEL(*),
+     .   PM(NPROPM,NUMMAT), GEO(NPROPG,NUMGEO),CONT(*),
+     .   XCUT(*) , FINT(3,NUMNOD),MS(NUMNOD),RWBUF(NRWLP,*),SKEW(LSKEW,*),
+     .   RBY(NRBY,*),FEXT(3,NUMNOD) ,FOPT(6,*),ANIN(*),TANI(6,*),EANI(*),
      .   TORS(15,*),BUFSF(*), RDATA(*),
      .   BUFMAT(*),BUFGEO(*),
-     .   SPBUF(*), VR(*),VOLMON(*), RFLOW(*), FNCONT(3,*), FTCONT(3,*),
+     .   SPBUF(*), VR(3*NUMNOD),VOLMON(SVOLMON), RFLOW(*), FNCONT(3,*), FTCONT(3,*),
      .   TEMP(*), THKE(*), ERR_THK_SH4(*), ERR_THK_SH3(*), DIAG_SMS(*),
      .   FNCONT2(3,*), DR(3,*),DXANCG(3,*),ZI_PLY(*),VGAZ(*),
      .   FCONTG(*), FNCONTG(*), FTCONTG(*),FANREAC(6,*),PDAMA2(2,*),
-     .   RES_SMS(*),FCLUSTER(3,*),MCLUSTER(3,*),W(*),
+     .   RES_SMS(*),FCLUSTER(3,*),MCLUSTER(3,*),W(SW),
      .   WIGE(*),KNOT(*),STIFN(*),STIFR(*),PSKIDS(*),TF(*),FCONT_MAX(*),
      .   FNCONTP2(3,*) ,FTCONTP2(3,*)
-      INTEGER IPARG(NPARG,*),NSTRF(*),LPBY(*),
-     .        IXS(NIXS,*),IXQ(NIXQ,*),IXC(NIXC,*),IXTG(NIXTG,*),
-     .        IXT(NIXT,*),IXP(NIXP,*),IXR(NIXR,*),MONVOL(*) ,
+      INTEGER IPARG(NPARG,NGROUP),NSTRF(*),LPBY(*),
+     .        IXS(NIXS,NUMELS),IXQ(NIXQ,NUMELQ),IXC(NIXC,NUMELC),IXTG(NIXTG,NUMELTG),
+     .        IXT(NIXT,NUMELT),IXP(NIXP,NUMELP),IXR(NIXR,NUMELR),MONVOL(SMONVOL) ,
      .        IXS10(6,*) ,IXS16(8,*)  ,IXS20(12,*) ,
-     .        ICUT(*), ITAB(*),NPBY(NNPBY,*),NPRW(*),IXUR(NIXUR,*),
+     .        ICUT(*), ITAB(NUMNOD),NPBY(NNPBY,*),NPRW(*),
      .        WEIGHT(*),IPART(LIPART1,*),IPARTS(*),IPARTQ(*),IPARTC(*),
      .        IPARTT(*),IPARTP(*),IPARTR(*),IPARTUR(*),IPARTTG(*),
      .        NOM_OPT(*),
@@ -270,11 +262,12 @@ C-----------------------------------------------
       INTEGER LLOADP(SLLOADP)
       INTEGER ILOADP(SIZLOADP,*),IBCL(NIBCLD,*)
       INTEGER TAGNCONT(NLOADP_HYD_INTER,NUMNOD),LOADP_HYD_INTER(NLOADP_HYD)
+      INTEGER ,DIMENSION(LISKN,NUMFRAM+1), INTENT(IN) :: IFRAME
       my_real
      .       FAC(LFACCLD,*),XFRAME(NXFRAME,*),FORC(*)
       TYPE (ELBUF_STRUCT_), DIMENSION(NGROUP) :: ELBUF_TAB
       TYPE (ELBUF_STRUCT_), DIMENSION(NGROUP,NXEL) :: XFEM_TAB
-      TYPE (CLUSTER_) ,DIMENSION(NCLUSTER)    :: CLUSTER
+      TYPE (CLUSTER_) ,DIMENSION(NCLUSTER) :: CLUSTER
       TYPE (XFEM_EDGE_)   , DIMENSION(*) :: CRKEDGE
       TYPE (STACK_PLY) :: STACK
       TYPE (H3D_DATABASE) :: H3D_DATA
@@ -282,15 +275,17 @@ C-----------------------------------------------
       TYPE (GROUP_)  , DIMENSION(NGRNOD) :: IGRNOD
       TYPE (SUBSET_) , TARGET, DIMENSION(NSUBS) :: SUBSET
       TYPE(t_ale_connectivity), INTENT(IN) :: ALE_CONNECT
-      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE (SENSORS_) , INTENT(IN) :: SENSORS
+      TYPE (LOADS_)   , INTENT(IN) :: LOADS
+      TYPE (TTABLE),DIMENSION(NTABLE)  ,INTENT(IN) :: TABLE
+      TYPE (MATPARAM_STRUCT_) ,DIMENSION(NUMMAT) ,INTENT(IN) :: MAT_PARAM
       my_real , INTENT(IN) :: AR(SAR)
-      my_real  , INTENT(IN) :: CSEFRIC(NINEFRIC,S_EFRICINT) ,CSEFRICG(S_EFRIC),
-     .                         CSEFRIC_STAMP(NINEFRIC_STAMP,S_EFRICINTG) ,CSEFRICG_STAMP(S_EFRICG)
+      my_real , INTENT(IN) :: CSEFRIC(NINEFRIC,S_EFRICINT) ,CSEFRICG(S_EFRIC),
+     .                        CSEFRIC_STAMP(NINEFRIC_STAMP,S_EFRICINTG) ,CSEFRICG_STAMP(S_EFRICG)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      my_real
-     .       , DIMENSION(:), ALLOCATABLE :: WAFT  , MAS   , XNORM,
+      my_real, DIMENSION(:), ALLOCATABLE :: WAFT  , MAS   , XNORM,
      .                                      XMASS1, XMASS2, XMASS3,
      .                                      XFUNC1, XFUNC2, XFUNC3,
      .                                      XUSR, WAFT_P
@@ -315,9 +310,9 @@ C-----------------------------------------------
       SAVE CBUF,ICBUF
 
       CHARACTER*80 STR, MES*30, CAUX,TITL*100, H3DTITLE
-      CHARACTER*ncharline KEYWORD
+      CHARACTER(LEN=NCHARLINE100):: KEYWORD
       CHARACTER CH_H3D*4,FILNAM*100, CHANIM1*4
-      INTEGER I, NBF, NBPART, MAGIC, J, IFUNC, FILEN, NPSOL,
+      INTEGER I, NBF, NBPART, MAGIC, J, IFUNC, FILEN, NPSOL,NSENSOR,
      .        NODCUT,NELCUT,LENR,LENI,LENCUT,IXEL,
      .        MIC1,MIC2,MIC3,MIC4,MIC5,MAC1,MAC2,MAC3,NPSPR,N,K,
      .        I3000, NESCT,NERBY,NERWL,NNWL,TMPNBF,ISK(6),
@@ -370,6 +365,7 @@ C-----------------------------------------------
      .                                      QUAD_ID,QUAD_ID_P,IS_WRITEN_QUAD,IS_WRITEN_QUAD_P,
      .                                      SKIN_ID_P,IS_WRITEN_SKIN,IS_WRITEN_SKIN_P,
      .                                      ISOLNOD,ISOLNOD_P
+      INTEGER, DIMENSION(:), ALLOCATABLE :: IS_WRITEN_NODE_FVM,NODE_ID_FVM
       INTEGER  INFO1,INFO2,IS_CORNER_DATA, COMPID_RBODIES, COMPID_RBE2S, COMPID_RBE3S, MAX_PART_ID
       INTEGER  CPT,ERROR_LOAD,NUMNOD_H3DPART,WORK(70000)
 c a mettre en allocatable
@@ -445,7 +441,8 @@ C
      .                                      SPH_TENSOR,SPH_TENSOR_P,
      .                                      QUAD_SCALAR,QUAD_SCALAR_P,
      .                                      QUAD_VECTOR,QUAD_VECTOR_P,
-     .                                      QUAD_TENSOR,QUAD_TENSOR_P
+     .                                      QUAD_TENSOR,QUAD_TENSOR_P,NODAL_SCALAR_FVM,
+     .                                      NODAL_VECTOR_FVM
       INTEGER, DIMENSION(:), ALLOCATABLE :: TAGNOD,TAGNOD_P,TAGNOD_P_PART,
      .                                      ITAB_P_PART,ITABM1_P
       my_real
@@ -461,14 +458,52 @@ C
       INTEGER, DIMENSION(:), ALLOCATABLE :: SUB_ID
       INTEGER (KIND=8) :: H3DTOTALSIZE8
 
-      INTEGER :: LEN_TMP_NAME,LEN_RADVERS,OBJECT_ID
+      INTEGER :: LEN_TMP_NAME,LEN_RADVERS,OBJECT_ID, NPOLH, NPOLHG, NPOLH_ANIM, NPOLH_ANIM_G, NPOLH_P(0:NSPMD-1)
+      INTEGER :: AIRBAGS_TOTAL_FVM_IN_H3D_G
       CHARACTER(len=2148) :: TMP_NAME
       CHARACTER RADVERS*68
-C=======================================================================
+      
+      TYPE(FVBAG_DATA), DIMENSION(:), ALLOCATABLE :: FVDATA_P
+      my_real, DIMENSION(:), ALLOCATABLE :: FVDATA_1D_ARRAY,FVDATA_1D_ARRAY_P
+      my_real TMP
+      INTEGER ITMP
+
+      TYPE USER_NOD_ID_
+        !VIRTUAL NODES MANAGMENT
+        !some option are writing virtual entities in H3D files. it requires to generate nodes which must have identifiers.
+        !
+        !  +-----------------USER NODE IDENTIFIERS----------------------------------------------+
+        !  | INPUT FILE        | FVMBAG                      | ... | RWALL                      |
+        !  +-------------------+-----------------------------+-----|----------------------------+
+        !  | (real nodes)      | (virtual added nodes)       | ... | (virtual added nodes)      |
+        !  +-------------------+-----------------------------+-----|----------------------------+        
+        !  |    NUMNOD         | %FVMBAG_LEN                 | ... |  %RWALL_LEN                |  numbering
+        !  |     n/a           | %FVMBAG_SHIFT+1             | ... |  %RWALL_SHIFT+1            |  min identifier
+        !  |   %INPUT_MAX      | %FVMBAG_SHIFT+%FVMBAG_LEN   | ... |  %RWALL_SHIFT+%RWALL_LEN   |  max identifier        
+        !  +-------------------+-----------------------------+-----+----------------------------+
+        INTEGER INPUT_MAX     !input file maximum user identifier (/NODE)
+        INTEGER RWALL_SHIFT   !RWALL virtual nodes starts from uID = %RWALL_SHIFT + 1
+        INTEGER RWALL_LEN     !RWALL virtual nodes numbering
+        INTEGER FVMBAG_SHIFT  !FVMBAG has virtual nodes from uID = %FVMBAG_SHIFT+1
+        INTEGER FVMBAG_LEN    !FVMBAG virtual nodes numbering
+      END TYPE
+
+      TYPE(USER_NOD_ID_) :: USER_NOD_ID
+C-----------------------------------------------
+C   S o u r c e   L i n e s
+C-----------------------------------------------
       CALL STARTIME(MACRO_TIMER_GENH3D,1)
+      
+      USER_NOD_ID%INPUT_MAX=0
+      USER_NOD_ID%RWALL_SHIFT=0
+      USER_NOD_ID%RWALL_LEN=0
+      USER_NOD_ID%FVMBAG_SHIFT=0
+      USER_NOD_ID%FVMBAG_LEN=0                  
+      
       NDMA2 = NUMNOD*(MIN(1,ANIM_N(1)+OUTP_N(1)+H3D_DATA%N_SCAL_DT)
-     .              +MIN(1,ANIM_N(2)+OUTP_N(2)+H3D_DATA%N_SCAL_DMAS)
-     .              +MIN(1,ANIM_N(12)+OUTP_N(3)+H3D_DATA%N_SCAL_DINER))
+     .               +MIN(1,ANIM_N(2)+OUTP_N(2)+H3D_DATA%N_SCAL_DMAS)
+     .               +MIN(1,ANIM_N(12)+OUTP_N(3)+H3D_DATA%N_SCAL_DINER))
+      NSENSOR = SENSORS%NSENSOR
       ALLOCATE(MAS(SMAS))
       ALLOCATE(SUB_NCHILD(NSUBS))
       ALLOCATE(SUB_LEVEL(NSUBS))
@@ -507,46 +542,46 @@ c
 C----- same size of skin than quad
       NIXSKIN = NIXQ
 
-      MY_ALLOCATE(X_P,8*NUMNODG0)
-      MY_ALLOCATE(ITAB_P,NUMNODG0)
+      ALLOCATE(X_P(8*NUMNODG0))
+      ALLOCATE(ITAB_P(NUMNODG0))
 
-      MY_ALLOCATE2D( IXTG_P       ,NIXTG,NUMELTGG*IP0)
-      MY_ALLOCATE2D( IXS_P        ,NIXS,(NUMELSG-NUMELS10G-NUMELS16G-NUMELS20G)*IP0)
-      MY_ALLOCATE2D( IXP_P        ,NIXP,NUMELPG*IP0)
-      MY_ALLOCATE2D( IXR_P        ,NIXR,NUMELRG*IP0)
-      MY_ALLOCATE2D( KXSP_P       ,NISP,NUMSPHG*IP0)
-      MY_ALLOCATE2D( IXT_P        ,NIXT,NUMELTRG*IP0) !!
-      MY_ALLOCATE2D( IXC_P        ,NIXC,NUMELCG*IP0)
-      MY_ALLOCATE2D( IXS10_P      ,11,NUMELS10G*IP0)
-      MY_ALLOCATE2D( IXS16_P      ,17,NUMELS16G*IP0)
-      MY_ALLOCATE2D( IXS20_P      ,21,NUMELS20G*IP0)
-      MY_ALLOCATE  ( IPARTC_P     ,NUMELCG*IP0)
-      MY_ALLOCATE  ( IPARTTG_P    ,NUMELTGG*IP0)
-      MY_ALLOCATE  ( IPARTQ_P     ,NUMELQG*IP0)
-      MY_ALLOCATE  ( IPARTS_P     ,(NUMELSG-NUMELS10G-NUMELS16G-NUMELS20G)*IP0)
-      MY_ALLOCATE  ( IPARTR_P     ,NUMELRG*IP0)
-      MY_ALLOCATE  ( IPARTP_P     ,NUMELPG*IP0)
-      MY_ALLOCATE  ( IPARTT_P     ,NUMELTRG*IP0)
-      MY_ALLOCATE  ( IPARTSP_P    ,NUMSPHG*IP0)
-      MY_ALLOCATE  ( IPARTS10_P   ,NUMELS10G*IP0)
-      MY_ALLOCATE  ( IPARTS16_P   ,NUMELS16G*IP0)
-      MY_ALLOCATE  ( IPARTS20_P   ,NUMELS20G*IP0)
-      MY_ALLOCATE2D( IXQ_P        ,NIXQ,NUMELQG*IP0)
-      MY_ALLOCATE2D( IXC_TMP      ,NIXC,NUMELC)
-      MY_ALLOCATE2D( IXTG_TMP     ,NIXTG,NUMELTG)
-      MY_ALLOCATE2D( IXR_TMP      ,NIXR,NUMELR)
-      MY_ALLOCATE2D( IXP_TMP      ,NIXP,NUMELP)
-      MY_ALLOCATE2D( KXSP_TMP     ,NISP,NUMSPH)
-      MY_ALLOCATE2D( IXT_TMP      ,NIXT,NUMELT)
-      MY_ALLOCATE2D( IXS10_TMP    ,11,NUMELS10)
-      MY_ALLOCATE2D( IXS16_TMP    ,17,NUMELS16)
-      MY_ALLOCATE2D( IXS20_TMP    ,21,NUMELS20)
-      MY_ALLOCATE2D( IXQ_TMP      ,NIXQ,NUMELQ)
-      MY_ALLOCATE2D( IXSKIN_TMP   ,NIXSKIN,NUMSKIN)
-      MY_ALLOCATE2D( IXSKIN_P     ,NIXSKIN,NUMSKING*IP0)
-      MY_ALLOCATE  ( IPARTSKIN_P  ,NUMSKING*IP0)
+      CALL MY_ALLOC( IXTG_P       ,NIXTG,NUMELTGG*IP0)
+      CALL MY_ALLOC( IXS_P        ,NIXS,(NUMELSG-NUMELS10G-NUMELS16G-NUMELS20G)*IP0)
+      CALL MY_ALLOC( IXP_P        ,NIXP,NUMELPG*IP0)
+      CALL MY_ALLOC( IXR_P        ,NIXR,NUMELRG*IP0)
+      CALL MY_ALLOC( KXSP_P       ,NISP,NUMSPHG*IP0)
+      CALL MY_ALLOC( IXT_P        ,NIXT,NUMELTRG*IP0) !!
+      CALL MY_ALLOC( IXC_P        ,NIXC,NUMELCG*IP0)
+      CALL MY_ALLOC( IXS10_P      ,11,NUMELS10G*IP0)
+      CALL MY_ALLOC( IXS16_P      ,17,NUMELS16G*IP0)
+      CALL MY_ALLOC( IXS20_P      ,21,NUMELS20G*IP0)
+      ALLOCATE( IPARTC_P     (NUMELCG*IP0))
+      ALLOCATE( IPARTTG_P    (NUMELTGG*IP0))
+      ALLOCATE( IPARTQ_P     (NUMELQG*IP0))
+      ALLOCATE( IPARTS_P     ((NUMELSG-NUMELS10G-NUMELS16G-NUMELS20G)*IP0))
+      ALLOCATE( IPARTR_P     (NUMELRG*IP0))
+      ALLOCATE( IPARTP_P     (NUMELPG*IP0))
+      ALLOCATE( IPARTT_P     (NUMELTRG*IP0))
+      ALLOCATE( IPARTSP_P    (NUMSPHG*IP0))
+      ALLOCATE( IPARTS10_P   (NUMELS10G*IP0))
+      ALLOCATE( IPARTS16_P   (NUMELS16G*IP0))
+      ALLOCATE( IPARTS20_P   (NUMELS20G*IP0))
+      CALL MY_ALLOC( IXQ_P        ,NIXQ,NUMELQG*IP0)
+      CALL MY_ALLOC( IXC_TMP      ,NIXC,NUMELC)
+      CALL MY_ALLOC( IXTG_TMP     ,NIXTG,NUMELTG)
+      CALL MY_ALLOC( IXR_TMP      ,NIXR,NUMELR)
+      CALL MY_ALLOC( IXP_TMP      ,NIXP,NUMELP)
+      CALL MY_ALLOC( KXSP_TMP     ,NISP,NUMSPH)
+      CALL MY_ALLOC( IXT_TMP      ,NIXT,NUMELT)
+      CALL MY_ALLOC( IXS10_TMP    ,11,NUMELS10)
+      CALL MY_ALLOC( IXS16_TMP    ,17,NUMELS16)
+      CALL MY_ALLOC( IXS20_TMP    ,21,NUMELS20)
+      CALL MY_ALLOC( IXQ_TMP      ,NIXQ,NUMELQ)
+      CALL MY_ALLOC( IXSKIN_TMP   ,NIXSKIN,NUMSKIN)
+      CALL MY_ALLOC( IXSKIN_P     ,NIXSKIN,NUMSKING*IP0)
+      ALLOCATE( IPARTSKIN_P  (NUMSKING*IP0))
 c
-      MY_ALLOCATE(D_P,NUMNODG0*8)
+      ALLOCATE(D_P(NUMNODG0*8))
 
       IF(NSPMD > 1) THEN
         CALL STARTIME(MACRO_TIMER_SPMDH3D,1)
@@ -841,8 +876,8 @@ c*******************************************************************************
 C CREATE NODES
 C**********************************************************************************************
 c
+      MAX_NOD_ID = 0
       IF(NSPMD > 1 .AND. ISPMD==0)THEN
-        MAX_NOD_ID = 0
         DO I=1,NUMNODG
           MAX_NOD_ID = MAX(MAX_NOD_ID,ITAB_P(I))
         ENDDO
@@ -852,18 +887,157 @@ c
           MAX_NOD_ID = MAX(MAX_NOD_ID,ITAB(I))
         ENDDO
       ENDIF
+      USER_NOD_ID%INPUT_MAX = MAX_NOD_ID
+      
+      !Create /NODE entities
       IF(NSPMD > 1 .AND. ISPMD==0 .AND. H3D_DATA%IH3D == 1 )THEN
         CALL STARTIME(MACRO_TIMER_LIBH3D,1)
         CALL C_H3D_CREATE_NODES(ITAB_P,NUMNODG,X_P,TAGNOD_P,D_P)
         CALL STOPTIME(MACRO_TIMER_LIBH3D,1)
-
       ELSEIF(ISPMD==0  .AND. H3D_DATA%IH3D == 1)THEN
         CALL STARTIME(MACRO_TIMER_LIBH3D,1)
         CALL C_H3D_CREATE_NODES(ITAB,NUMNOD,X,TAGNOD_P,D)
         CALL STOPTIME(MACRO_TIMER_LIBH3D,1)
-
       ENDIF
-      DEALLOCATE(X_P)
+      DEALLOCATE(X_P)      
+      
+      !Create virtual nodes (FVMBAG polyhedra centroids)
+      AIRBAGS_TOTAL_FVM_IN_H3D_G = 0     
+              
+      USER_NOD_ID%FVMBAG_SHIFT = MAX_NOD_ID
+      USER_NOD_ID%FVMBAG_LEN = 0
+      
+      IF(NSPMD > 1)THEN
+        IF(NFVBAG >0 )THEN                                                                       
+          ALLOCATE (FVDATA_P(NFVBAG))
+          AIRBAGS_TOTAL_FVM_IN_H3D_G = 0  
+          DO J=1,NFVBAG 
+            !get %NPOLH form ISPMD=1 ; currently FVMBAG are stored on ISPMD=1. To be changed later                                                                
+            NPOLH = 0; IF(ISPMD == FVSPMD(J)%PMAIN-1)NPOLH = FVDATA(J)%NPOLH 
+            NPOLH_P(:) = 0   
+            CALL SPMD_H3D_GATHER_I(NPOLH, 1,NPOLH_P, NSPMD)        
+            NPOLHG = NPOLH_P(FVSPMD(J)%PMAIN-1) ! index 1 because NPOLH is on ISPMD == FVSPMD(J)%PMAIN-1 ; otherwise sum of NPOLH_P                                                      
+
+            !get %NPOLH_ANIM form (FVSPMD(J)%PMAIN-1)=1 ; currently FVMBAG are stored on ISPMD=1. To be changed later                                                                
+            NPOLH_ANIM = 0; IF(ISPMD == FVSPMD(J)%PMAIN-1)NPOLH_ANIM = FVDATA(J)%NPOLH_ANIM
+            NPOLH_P(:) = 0
+            CALL SPMD_H3D_GATHER_I(NPOLH_ANIM, 1,NPOLH_P, NSPMD)        
+            NPOLH_ANIM_G = NPOLH_P(FVSPMD(J)%PMAIN-1) ! index 1 because NPOLH is on (FVSPMD(J)%PMAIN-1) == 1 ; otherwise sum of NPOLH_P
+           
+            !get AIRBAGS_TOTAL_FVM_IN_H3D
+            NPOLH_P(:) = 0
+            CALL SPMD_H3D_GATHER_I(AIRBAGS_TOTAL_FVM_IN_H3D, 1,NPOLH_P, NSPMD)         
+            IF(ISPMD == 0)THEN
+              DO JJ=1,NSPMD
+                AIRBAGS_TOTAL_FVM_IN_H3D_G = AIRBAGS_TOTAL_FVM_IN_H3D_G + NPOLH_P(JJ-1)   !sum NPOLH_ANIM
+              ENDDO             
+            ENDIF                                           
+
+            !FVDATA data structure in a 1D array  
+            NPOLH = MAX(1, NPOLH)
+            ALLOCATE(FVDATA_1D_ARRAY(12*NPOLH))
+            
+            IF(NPOLH > 0)THEN
+              FVDATA_1D_ARRAY(00*NPOLH+1:01*NPOLH) = FVDATA(J)%CENTROID_POLH(1,1:NPOLH)
+              FVDATA_1D_ARRAY(01*NPOLH+1:02*NPOLH) = FVDATA(J)%CENTROID_POLH(2,1:NPOLH)
+              FVDATA_1D_ARRAY(02*NPOLH+1:03*NPOLH) = FVDATA(J)%CENTROID_POLH(3,1:NPOLH)
+              FVDATA_1D_ARRAY(03*NPOLH+1:04*NPOLH) = FVDATA(J)%QPOLH(1,1:NPOLH)
+              FVDATA_1D_ARRAY(04*NPOLH+1:05*NPOLH) = FVDATA(J)%QPOLH(2,1:NPOLH)
+              FVDATA_1D_ARRAY(05*NPOLH+1:06*NPOLH) = FVDATA(J)%QPOLH(3,1:NPOLH)
+              FVDATA_1D_ARRAY(06*NPOLH+1:07*NPOLH) = FVDATA(J)%PPOLH(1:NPOLH)
+              FVDATA_1D_ARRAY(07*NPOLH+1:08*NPOLH) = FVDATA(J)%SSPPOLH(1:NPOLH)
+              FVDATA_1D_ARRAY(08*NPOLH+1:09*NPOLH) = FVDATA(J)%DTPOLH(1:NPOLH)
+              FVDATA_1D_ARRAY(09*NPOLH+1:10*NPOLH) = FVDATA(J)%MPOLH(1:NPOLH)
+              FVDATA_1D_ARRAY(10*NPOLH+1:11*NPOLH) = FVDATA(J)%RPOLH(1:NPOLH)
+              FVDATA_1D_ARRAY(11*NPOLH+1:12*NPOLH) = FVDATA(J)%TPOLH(1:NPOLH)
+            ENDIF               
+
+            ! spmd gathering of 1d array
+            NPOLHG = MAX(NPOLHG,1)
+            ALLOCATE(FVDATA_1D_ARRAY_P(12*NPOLHG))
+            FVDATA_1D_ARRAY_P(:) = 0
+            CALL SPMD_H3D_GATHER_R(FVDATA_1D_ARRAY, 12*NPOLH,FVDATA_1D_ARRAY_P, 12*NPOLHG)
+   
+            ! on relevant domain (ispmd==0) retrieve FVBAG data structure from 1d array    
+            IF(ISPMD==0)THEN
+              ALLOCATE (FVDATA_P(J)%CENTROID_POLH(3,NPOLHG))
+              ALLOCATE (FVDATA_P(J)%QPOLH(3,NPOLHG))
+              ALLOCATE (FVDATA_P(J)%PPOLH(NPOLHG))
+              ALLOCATE (FVDATA_P(J)%SSPPOLH(NPOLHG))
+              ALLOCATE (FVDATA_P(J)%DTPOLH(NPOLHG))
+              ALLOCATE (FVDATA_P(J)%MPOLH(NPOLHG))
+              ALLOCATE (FVDATA_P(J)%RPOLH(NPOLHG))
+              ALLOCATE (FVDATA_P(J)%TPOLH(NPOLHG)) 
+              FVDATA_P(J)%NPOLH = NPOLHG
+              FVDATA_P(J)%NPOLH_ANIM = NPOLH_ANIM_G 
+              IF(NPOLHG > 0)THEN                                                                      
+                FVDATA_P(J)%CENTROID_POLH(1,1:NPOLHG) = FVDATA_1D_ARRAY_P(00*NPOLHG+1:01*NPOLHG) 
+                FVDATA_P(J)%CENTROID_POLH(2,1:NPOLHG) = FVDATA_1D_ARRAY_P(01*NPOLHG+1:02*NPOLHG) 
+                FVDATA_P(J)%CENTROID_POLH(3,1:NPOLHG) = FVDATA_1D_ARRAY_P(02*NPOLHG+1:03*NPOLHG) 
+                FVDATA_P(J)%QPOLH(1,1:NPOLHG)         = FVDATA_1D_ARRAY_P(03*NPOLHG+1:04*NPOLHG) 
+                FVDATA_P(J)%QPOLH(2,1:NPOLHG)         = FVDATA_1D_ARRAY_P(04*NPOLHG+1:05*NPOLHG) 
+                FVDATA_P(J)%QPOLH(3,1:NPOLHG)         = FVDATA_1D_ARRAY_P(05*NPOLHG+1:06*NPOLHG) 
+                FVDATA_P(J)%PPOLH(1:NPOLHG)           = FVDATA_1D_ARRAY_P(06*NPOLHG+1:07*NPOLHG)
+                FVDATA_P(J)%SSPPOLH(1:NPOLHG)         = FVDATA_1D_ARRAY_P(07*NPOLHG+1:08*NPOLHG) 
+                FVDATA_P(J)%DTPOLH(1:NPOLHG)          = FVDATA_1D_ARRAY_P(08*NPOLHG+1:09*NPOLHG) 
+                FVDATA_P(J)%MPOLH(1:NPOLHG)           = FVDATA_1D_ARRAY_P(09*NPOLHG+1:10*NPOLHG) 
+                FVDATA_P(J)%RPOLH(1:NPOLHG)           = FVDATA_1D_ARRAY_P(10*NPOLHG+1:11*NPOLHG) 
+                FVDATA_P(J)%TPOLH(1:NPOLHG)           = FVDATA_1D_ARRAY_P(11*NPOLHG+1:12*NPOLHG)
+              ENDIF 
+              USER_NOD_ID%FVMBAG_LEN = USER_NOD_ID%FVMBAG_LEN + NPOLHG 
+            ENDIF  
+            
+            DEALLOCATE(FVDATA_1D_ARRAY) 
+            DEALLOCATE(FVDATA_1D_ARRAY_P)
+
+          ENDDO
+        ENDIF!NFVBAG > 0 
+        
+      ELSE !IF NSPMD==1
+        
+        AIRBAGS_TOTAL_FVM_IN_H3D_G = AIRBAGS_TOTAL_FVM_IN_H3D
+        IF(NFVBAG > 0)THEN
+          ALLOCATE (FVDATA_P(NFVBAG))
+          DO J=1,NFVBAG
+            NPOLH = FVDATA(J)%NPOLH
+            NPOLH_ANIM = FVDATA(J)%NPOLH
+            NPOLH = MAX(1,NPOLH) !allocation size 1 if no polyhedron
+            ALLOCATE (FVDATA_P(J)%CENTROID_POLH(3,NPOLH))
+            ALLOCATE (FVDATA_P(J)%QPOLH(3,NPOLH))
+            ALLOCATE (FVDATA_P(J)%PPOLH(NPOLH))
+            ALLOCATE (FVDATA_P(J)%SSPPOLH(NPOLH))
+            ALLOCATE (FVDATA_P(J)%DTPOLH(NPOLH))
+            ALLOCATE (FVDATA_P(J)%MPOLH(NPOLH))
+            ALLOCATE (FVDATA_P(J)%RPOLH(NPOLH))
+            ALLOCATE (FVDATA_P(J)%TPOLH(NPOLH))
+            ! 10*NPOLH                                                                                                                   
+            FVDATA_P(J)%NPOLH = NPOLH 
+            FVDATA_P(J)%NPOLH_ANIM = NPOLH_ANIM                                                       
+            FVDATA_P(J)%CENTROID_POLH(1,1:NPOLH) = FVDATA(J)%CENTROID_POLH(1,1:NPOLH) 
+            FVDATA_P(J)%CENTROID_POLH(2,1:NPOLH) = FVDATA(J)%CENTROID_POLH(2,1:NPOLH) 
+            FVDATA_P(J)%CENTROID_POLH(3,1:NPOLH) = FVDATA(J)%CENTROID_POLH(3,1:NPOLH) 
+            FVDATA_P(J)%QPOLH(1,1:NPOLH)         = FVDATA(J)%QPOLH(1,1:NPOLH)              
+            FVDATA_P(J)%QPOLH(2,1:NPOLH)         = FVDATA(J)%QPOLH(2,1:NPOLH)              
+            FVDATA_P(J)%QPOLH(3,1:NPOLH)         = FVDATA(J)%QPOLH(3,1:NPOLH)              
+            FVDATA_P(J)%PPOLH(1:NPOLH)           = FVDATA(J)%PPOLH(1:NPOLH)              
+            FVDATA_P(J)%SSPPOLH(1:NPOLH)         = FVDATA(J)%SSPPOLH(1:NPOLH)            
+            FVDATA_P(J)%DTPOLH(1:NPOLH)          = FVDATA(J)%DTPOLH(1:NPOLH)             
+            FVDATA_P(J)%MPOLH(1:NPOLH)           = FVDATA(J)%MPOLH(1:NPOLH)              
+            FVDATA_P(J)%RPOLH(1:NPOLH)           = FVDATA(J)%RPOLH(1:NPOLH)              
+            FVDATA_P(J)%TPOLH(1:NPOLH)           = FVDATA(J)%TPOLH(1:NPOLH) 
+            USER_NOD_ID%FVMBAG_LEN = USER_NOD_ID%FVMBAG_LEN + NPOLH   
+          ENDDO 
+        ENDIF ! NFVBAG > 0
+      ENDIF 
+      
+      MAX_NOD_ID = MAX_NOD_ID + USER_NOD_ID%FVMBAG_LEN !incrementing MAX_NOD_ID for next option which is generating virtual nodes
+            
+      IF(NFVBAG > 0 .AND. ISPMD==0 .AND. H3D_DATA%IH3D == 1)THEN
+        CALL STARTIME(MACRO_TIMER_LIBH3D,1)
+        CALL H3D_CREATE_FVMBAG_CENTROIDS(MONVOL,VOLMON, FVDATA_P, NFVBAG, SMONVOL, SVOLMON, USER_NOD_ID%FVMBAG_SHIFT)
+        CALL STOPTIME(MACRO_TIMER_LIBH3D,1)
+      ENDIF
+
 c**********************************************************************************************
 C CREATE SPH
 C**********************************************************************************************
@@ -1185,6 +1359,9 @@ c*******************************************************************************
 C CREATE RWALLS
 C**********************************************************************************************
 c
+      MAX_NOD_ID = USER_NOD_ID%FVMBAG_SHIFT + USER_NOD_ID%FVMBAG_LEN
+      USER_NOD_ID%RWALL_SHIFT = MAX_NOD_ID
+      
       IF(H3D_DATA%IH3D  == 1 .AND. NRWALL>0) THEN
 
         CALL SCANOR(X,D,CDG,XMIN,YMIN,ZMIN,XMAX,YMAX,ZMAX,SCALE,
@@ -1200,9 +1377,10 @@ C
 
         IF(ISPMD==0) THEN
           CALL STARTIME(MACRO_TIMER_LIBH3D,1)
-          CALL C_H3D_CREATE_RWALLS(NOM_OPT, LNOPT1, I16D, NPRW, NRWALL, MAX_NOD_ID,
-     .                           XWL ,YWL , ZWL, V1, V2, V3, VV1, VV2, VV3, XL, XN, YN, ZN)
+          CALL C_H3D_CREATE_RWALLS(NOM_OPT, LNOPT1, I16D, NPRW, NRWALL, USER_NOD_ID%RWALL_SHIFT,
+     .                           XWL ,YWL , ZWL, V1, V2, V3, VV1, VV2, VV3, XL, XN, YN, ZN, USER_NOD_ID%RWALL_LEN )
           CALL STOPTIME(MACRO_TIMER_LIBH3D,1)
+          MAX_NOD_ID = MAX_NOD_ID + USER_NOD_ID%RWALL_LEN !incrementing MAX_NOD_ID for next option which is generating virtual nodes          
         ENDIF
 
       ENDIF
@@ -1413,14 +1591,14 @@ C-------------nodal_pid used for PLOAD---
         CALL GET_NODAL_IPART(ELBUF_TAB,IPARG,IPARTC,IPARTTG,IPARTS,
      .                        IXC, IXTG, IXS,IXS10,IXS16,IXS20,
      .                        NODAL_IPART)
-        CALL H3D_SKIN_PRE_MAP(IBCL  ,ILOADP  ,LLOADP ,IMAPSKP)
+        CALL H3D_SKIN_PRE_MAP(IBCL  ,ILOADP  ,LLOADP ,IMAPSKP,LOADS)
       END IF
       IF(H3D_DATA%IH3D == 1 .AND. NUMSKING>0 ) THEN
 C----create connectivity IXSKIN_P(NIXQ,NUMSKING),IPARTSKIN_P(NUMSKING)
         IXSKIN_TMP = 0
         CALL H3D_SKIN_IXSKIN(ELBUF_TAB,IPARG,IPARTS,IXS,IXS10,
      .                       ITAB ,IXSKIN_TMP  ,TAG_SKINS6,
-     .                       IBCL,ILOADP,LLOADP,NODAL_IPART,IMAPSKP)
+     .                       IBCL,ILOADP,LLOADP,NODAL_IPART,IMAPSKP,LOADS)
 c--------IXSKIN_TMP(1,i) :ipart (instead of mid)--IXSKIN_TMP(2-5,i) : Nj(user_id)
         IF(NSPMD > 1) THEN
 C
@@ -1501,7 +1679,7 @@ c
       IF(NSPMD > 1 .AND. ISPMD==0)THEN
         CALL STARTIME(MACRO_TIMER_LIBH3D,1)
         CALL C_H3D_UPDATE_NODES(H3DTITLE,LEN_H3DTITLE,TT,H3D_DATA%IH3D,
-     .                          ITAB_P,NUMNODG,D_P, NRWALL, MAX_NOD_ID,
+     .                          ITAB_P,NUMNODG,D_P, NRWALL, USER_NOD_ID%RWALL_SHIFT,
      .                          XWL ,YWL , ZWL, V1, V2,
      .                          V3, VV1, VV2, VV3,KXSP_P,
      .                          NISP,NUMSPHG,TAGNOD_P,NPRW)
@@ -1509,23 +1687,48 @@ c
       ELSEIF(ISPMD==0 )THEN
         CALL STARTIME(MACRO_TIMER_LIBH3D,1)
         CALL C_H3D_UPDATE_NODES(H3DTITLE,LEN_H3DTITLE,TT,H3D_DATA%IH3D,
-     .                          ITAB,NUMNOD,D, NRWALL, MAX_NOD_ID,
+     .                          ITAB,NUMNOD,D, NRWALL, USER_NOD_ID%RWALL_SHIFT,
      .                          XWL ,YWL , ZWL, V1, V2,
      .                          V3, VV1, VV2, VV3,KXSP_P,
      .                          NISP,NUMSPHG,TAGNOD_P,NPRW)
         CALL STOPTIME(MACRO_TIMER_LIBH3D,1)
       ENDIF
+      
+      !VIRTUAL NODES
+      !  FVMBAGS
+      IF(NFVBAG > 0 .AND. ISPMD==0)THEN
+        CALL STARTIME(MACRO_TIMER_LIBH3D,1)
+        CALL H3D_UPDATE_FVMBAG_CENTROIDS(H3DTITLE,LEN_H3DTITLE,H3D_DATA%IH3D,MONVOL,VOLMON, NFVBAG, SMONVOL, SVOLMON, 
+     .                                   FVDATA_P, USER_NOD_ID%FVMBAG_SHIFT)
+        CALL STOPTIME(MACRO_TIMER_LIBH3D,1)
+      ENDIF 
 c
 c**********************************************************************************************
 C OUTPUT RESULTS
 c**********************************************************************************************
       DEALLOCATE(D_P)
+      
       ALLOCATE(NODAL_SCALAR(NUMNOD))
       ALLOCATE(NODAL_VECTOR(3*NUMNOD))
       ALLOCATE(NODAL_TENSOR(6*NUMNOD))
       ALLOCATE(NODE_ID(NUMNOD))
       ALLOCATE(IS_WRITEN_NODE(NUMNOD))
       IS_WRITEN_NODE(1:NUMNOD) = 0
+
+      IF(ISPMD == 0)THEN
+        ALLOCATE(NODAL_SCALAR_FVM(AIRBAGS_TOTAL_FVM_IN_H3D_G))
+        ALLOCATE(NODAL_VECTOR_FVM(3*AIRBAGS_TOTAL_FVM_IN_H3D_G))
+        ALLOCATE(NODE_ID_FVM(AIRBAGS_TOTAL_FVM_IN_H3D_G))      
+        ALLOCATE(IS_WRITEN_NODE_FVM(AIRBAGS_TOTAL_FVM_IN_H3D_G))
+        IS_WRITEN_NODE_FVM(1:AIRBAGS_TOTAL_FVM_IN_H3D_G) = 0
+      ELSE
+        ALLOCATE(NODAL_SCALAR_FVM(1))
+        ALLOCATE(NODAL_VECTOR_FVM(3*1))
+        ALLOCATE(NODE_ID_FVM(1))      
+        ALLOCATE(IS_WRITEN_NODE_FVM(1))
+        IS_WRITEN_NODE_FVM(1:1) = 0
+      ENDIF
+
 c
       IF (ISPMD == 0 )THEN
         ALLOCATE(IS_WRITEN_NODE_P(NUMNODG))
@@ -1897,19 +2100,19 @@ c          IF(ISPMD == 0) print *,'nodal scalar',N_OUTP_DATA,'IFUNC',IFUNC,'INFO
 c          IF(ISPMD == 0) print *,'H3D_DATA%OUTPUT_LIST(I)%PART',H3D_DATA%OUTPUT_LIST(I)%PART(1:NPART)
 
           CALL H3D_NODAL_SCALAR(
-     .                     ELBUF_TAB, NODAL_SCALAR ,IFUNC         ,IPARG       ,GEO        ,
-     .                     MAS      ,PM            ,ANIN          , ITAB       , NODE_ID   ,
-     .                     INFO1    ,INFO2         ,IS_WRITEN_NODE,H3D_DATA%OUTPUT_LIST(I)%PART ,
-     .                                                                         IPARTC      ,
-     .                     IPARTTG  ,IXC           , IXTG         ,TEMP         ,IFLOW     ,
-     .                     RFLOW    ,IXS           ,IXQ           ,NV46         ,MONVOL    ,
-     .                     VOLMON   , ALE_CONNECT  ,DIAG_SMS      ,MS           ,PDAMA2    ,
-     .                     X        , STIFR        , STIFN        ,KEYWORD      ,H3D_DATA  ,
-     .                     NPBY     ,RBY           ,INTERSKID     ,H3D_DATA%N_SCAL_SKID,PSKIDS,
-     .                     NODGLOB  ,ITYSKID       ,IPARTSP       ,IPARTR       ,IPARTP    ,
-     .                     IPARTT   ,IPARTS        ,IPARTQ        ,KXSP         ,IXR       ,
-     .                     IXP      ,IXT           ,N_H3D_PART_LIST,INTERFRIC   ,CSEFRIC  ,
-     .                     CSEFRICG ,CSEFRIC_STAMP ,CSEFRICG_STAMP )
+     .                   ELBUF_TAB         ,NODAL_SCALAR  ,IFUNC          ,IPARG                        ,GEO       ,
+     .                   MAS               ,PM            ,ANIN           ,ITAB                         ,NODE_ID   ,
+     .                   INFO1             ,INFO2         ,IS_WRITEN_NODE ,H3D_DATA%OUTPUT_LIST(I)%PART ,IPARTC    ,
+     .                   IPARTTG           ,IXC           ,IXTG           ,TEMP                         ,IFLOW     ,
+     .                   RFLOW             ,IXS           ,IXQ            ,NV46                         ,MONVOL    ,
+     .                   VOLMON            ,ALE_CONNECT   ,DIAG_SMS       ,MS                           ,PDAMA2    ,
+     .                   X                 ,STIFR         ,STIFN          ,KEYWORD                      ,H3D_DATA  ,
+     .                   NPBY              ,RBY           ,INTERSKID      ,H3D_DATA%N_SCAL_SKID         ,PSKIDS  ,
+     .                   NODGLOB           ,ITYSKID       ,IPARTSP        ,IPARTR                       ,IPARTP  ,
+     .                   IPARTT            ,IPARTS        ,IPARTQ         ,KXSP                         ,IXR     ,
+     .                   IXP               ,IXT           ,N_H3D_PART_LIST,INTERFRIC                    ,CSEFRIC ,
+     .                   CSEFRICG          ,CSEFRIC_STAMP ,CSEFRICG_STAMP ,NODAL_SCALAR_FVM             ,AIRBAGS_TOTAL_FVM_IN_H3D_G,
+     .                   IS_WRITEN_NODE_FVM,ISPMD         ,FVDATA_P       ,USER_NOD_ID%FVMBAG_SHIFT )
 
 c
           IF (NSPMD > 1 ) THEN
@@ -1957,6 +2160,7 @@ c
             NODAL_SCALAR_P(1:NUMNOD) =  NODAL_SCALAR(1:NUMNOD)
           ENDIF
 c
+          ! nodal scalar for /NODE entities
           IF(ISPMD == 0) THEN
             CALL STARTIME(MACRO_TIMER_LIBH3D,1)
             CALL C_H3D_UPDATE_NODAL_SCALAR(TT,H3D_DATA%IH3D,ITAB,NUMNODG,NODAL_SCALAR_P,NODE_ID_P,
@@ -1964,6 +2168,20 @@ c
             CALL STOPTIME(MACRO_TIMER_LIBH3D,1)
 
           ENDIF
+
+          ! nodal scalar for virtual nodes (FVM centroids)
+          IF(ISPMD == 0) THEN
+            IF(AIRBAGS_TOTAL_FVM_IN_H3D_G > 0)THEN
+              DO J=1,AIRBAGS_TOTAL_FVM_IN_H3D_G
+                NODE_ID_FVM(J) = USER_NOD_ID%FVMBAG_SHIFT + J
+              ENDDO
+              CALL STARTIME(MACRO_TIMER_LIBH3D,1)
+              CALL C_H3D_UPDATE_NODAL_FVMBAG_SCALAR(TT,H3D_DATA%IH3D,AIRBAGS_TOTAL_FVM_IN_H3D_G,NODAL_SCALAR_FVM,NODE_ID_FVM,
+     .                                              N_OUTP_DATA,IS_WRITEN_NODE_FVM)
+              CALL STOPTIME(MACRO_TIMER_LIBH3D,1)
+            ENDIF
+          ENDIF          
+          
 c-----
 c nodal vector
 c-----
@@ -1981,24 +2199,29 @@ c          IF(ISPMD == 0) print *,'nodal vector',N_OUTP_DATA,'IFUNC',IFUNC,'INFO
 c          IF(ISPMD == 0) print *,'H3D_DATA%OUTPUT_LIST(I)%PART',H3D_DATA%OUTPUT_LIST(I)%PART(1:NPART)
 
           CALL H3D_NODAL_VECTOR(
-     .                     ELBUF_TAB, NODAL_VECTOR ,IFUNC      ,IPARG,GEO ,MAS       ,PM         ,
-     .                      ANIN , ITAB, NODE_ID   ,INFO1        ,INFO2      ,
-     .                     IS_WRITEN_NODE,H3D_DATA%OUTPUT_LIST(I)%PART ,IPARTC,IPARTTG,
-     .                  IXC, IXTG,TEMP,IFLOW,RFLOW,IXS,IXQ,NV46,MONVOL   ,VOLMON, DIAG_SMS,MS,
-     .                   PDAMA2,X, STIFR, STIFN, A, D, V, CONT, FCONTG, FINT, FEXT,KEYWORD,
-     .                   FNCONT  , FNCONTG , FTCONT , FTCONTG   , FNCONT2,
-     .                   DR      , DXANCG  , FANREAC, FCLUSTER  , MCLUSTER ,
-     .                   VR      , FOPT    , NPBY   , IXUR      , VGAZ     ,
-     .                   IPARI   , IGRNOD  , WEIGHT , NODGLOB   ,FCONT_MAX ,
-     .                   FNCONTP2, FTCONTP2, AR     , IPARTSP   ,IPARTR    ,
-     .                   IPARTP  , IPARTT  , IPARTS , IPARTQ    ,KXSP      ,
-     .                   IXR     , IXP     , IXT    , N_H3D_PART_LIST)
+     .                   ELBUF_TAB         ,NODAL_VECTOR             , IFUNC         ,IPARG                       ,GEO             ,
+     .                   MAS               ,PM                       , ANIN          ,ITAB                        ,NODE_ID         ,
+     .                   INFO1             ,INFO2                    , IS_WRITEN_NODE,H3D_DATA%OUTPUT_LIST(I)%PART,IPARTC          ,
+     .                   IPARTTG           ,IXC                      , IXTG          ,TEMP                        ,IFLOW           ,
+     .                   RFLOW             ,IXS                      , IXQ           ,NV46                        ,MONVOL          ,
+     .                   DIAG_SMS          ,MS                       , PDAMA2        ,X                           ,VOLMON          ,
+     .                   STIFR             ,STIFN                    , A             ,D                           ,V               ,
+     .                   CONT              ,FCONTG                   , FINT          ,FEXT                        ,KEYWORD         ,
+     .                   FNCONT            ,FNCONTG                  , FTCONT        ,FTCONTG                     ,FNCONT2         ,
+     .                   DR                ,DXANCG                   , FANREAC       ,FCLUSTER                    ,MCLUSTER        ,
+     .                   VR                ,FOPT                     , NPBY          ,VGAZ                        ,
+     .                   IPARI             ,IGRNOD                   , WEIGHT        ,NODGLOB                     ,FCONT_MAX       ,
+     .                   FNCONTP2          ,FTCONTP2                 , AR            ,IPARTSP                     ,IPARTR          ,
+     .                   IPARTP            ,IPARTT                   , IPARTS        ,IPARTQ                      ,KXSP            ,
+     .                   IXR               ,IXP                      , IXT           ,N_H3D_PART_LIST             ,NODAL_VECTOR_FVM,
+     .                   IS_WRITEN_NODE_FVM,AIRBAGS_TOTAL_FVM_IN_H3D_G,SMONVOL       ,SVOLMON                     ,ISPMD         ,
+     .                   FVDATA_P          ,USER_NOD_ID%FVMBAG_SHIFT ,W              ,SW)
 
 c
           IF (NSPMD > 1 ) THEN
             IF(KEYWORD == 'CONT'.OR.KEYWORD == 'PCONT/NORMAL'.OR.KEYWORD == 'PCONT/TANGENT'.OR.KEYWORD == 'FEXT'
-     .         .OR.(KEYWORD == 'CONT2'.OR.KEYWORD == 'PCONT2/NORMAL'.OR.KEYWORD == 'PCONT2/TANGENT')) THEN
-
+     .         .OR.(KEYWORD == 'CONT2'.OR.KEYWORD == 'PCONT2/NORMAL'.OR.KEYWORD == 'PCONT2/TANGENT')
+     .         .OR.(KEYWORD == 'CONT2/MOMENT')) THEN
               CALL STARTIME(MACRO_TIMER_SPMDH3D,1)
               CALL SPMD_OUTPITAB(NODE_ID,WEIGHT,NODGLOB,NODE_ID_P)
               CALL SPMD_OUTPITAB(IS_WRITEN_NODE,WEIGHT,NODGLOB,IS_WRITEN_NODE_P)
@@ -2011,6 +2234,8 @@ c
                 CALL SPMD_H3D_SUM_R_NODAL_21(NODGLOB,NODAL_VECTOR,3*NUMNOD,NODAL_VECTOR_P,3*NUMNODG,FNCONTG)
               ELSEIF(KEYWORD == 'PCONT/TANGENT')THEN
                 CALL SPMD_H3D_SUM_R_NODAL_21(NODGLOB,NODAL_VECTOR,3*NUMNOD,NODAL_VECTOR_P,3*NUMNODG,FTCONTG)
+              ELSEIF(KEYWORD == 'CONT2/MOMENT')THEN
+                CALL SPMD_H3D_SUM_R_NODAL_21(NODGLOB,NODAL_VECTOR,3*NUMNOD,NODAL_VECTOR_P,3*NUMNODG,MCONT2)
               ENDIF
               CALL STOPTIME(MACRO_TIMER_SPMDH3D,1)
 
@@ -2046,6 +2271,7 @@ c
 
           ENDIF
 c
+          ! vector update for /NODE entities
           IF(ISPMD == 0) THEN
             CALL STARTIME(MACRO_TIMER_LIBH3D,1)
             CALL C_H3D_UPDATE_NODAL_VECTOR(TT,H3D_DATA%IH3D,ITAB,NUMNODG,NODAL_VECTOR_P,NODE_ID_P,
@@ -2053,6 +2279,19 @@ c
             CALL STOPTIME(MACRO_TIMER_LIBH3D,1)
 
           ENDIF
+          
+          ! vector update for virtual entities (FVMBAG polyhedron centroids)
+          IF(ISPMD == 0 .AND. AIRBAGS_TOTAL_FVM_IN_H3D_G > 0) THEN
+            CALL STARTIME(MACRO_TIMER_LIBH3D,1)
+            DO J=1,AIRBAGS_TOTAL_FVM_IN_H3D_G
+              NODE_ID_FVM(J) = USER_NOD_ID%FVMBAG_SHIFT + J
+            ENDDO            
+            CALL C_H3D_UPDATE_NODAL_VECTOR(TT,H3D_DATA%IH3D,ITAB,AIRBAGS_TOTAL_FVM_IN_H3D_G,NODAL_VECTOR_FVM,NODE_ID_FVM,
+     .                           N_OUTP_DATA,IS_WRITEN_NODE_FVM)
+            CALL STOPTIME(MACRO_TIMER_LIBH3D,1)
+
+          ENDIF
+                    
 c-----
 c nodal tensor
 c-----
@@ -2292,6 +2531,7 @@ c-----
           IMDSVAR = H3D_DATA%OUTPUT_LIST(I)%IMDSVAR
           N_OUTP_DATA = H3D_DATA%OUTPUT_LIST(I)%N_OUTP
           KEYWORD = H3D_DATA%OUTPUT_LIST(I)%KEYWORD
+          OBJECT_ID = H3D_DATA%OUTPUT_LIST(I)%OBJECT_ID
 c         IF(ISPMD == 0)  print *,'shell scalar',N_OUTP_DATA,'IFUNC',IFUNC,'INFO1',INFO1,'INFO2',INFO2
 
 c         IF(ISPMD == 0)  print *,'H3D_DATA%OUTPUT_LIST(I)%PART',H3D_DATA%OUTPUT_LIST(I)%PART(1:NPART)
@@ -2299,7 +2539,7 @@ c         IF(ISPMD == 0)  print *,'H3D_DATA%OUTPUT_LIST(I)%PART',H3D_DATA%OUTPUT
           CALL H3D_SHELL_SCALAR(
      .                     ELBUF_TAB ,SHELL_SCALAR ,IFUNC      ,IPARG        ,GEO        ,
      .                     IXQ       ,IXC       ,IXTG          ,PM           ,BUFMAT     ,
-     .                     EL2FA     ,NBF       ,IXUR          ,IAD          ,
+     .                     EL2FA     ,NBF       ,IAD          ,
      .                     NBF_L     ,EANI      ,ANIN(NDMA2+1) ,NBPART       ,IADG       ,
      .                     IPM       ,IGEO      ,THKE          ,ERR_THK_SH4  ,ERR_THK_SH3,
      .                     INVERT    ,X         ,V             ,W            ,ALE_CONNECT,
@@ -2307,7 +2547,8 @@ c         IF(ISPMD == 0)  print *,'H3D_DATA%OUTPUT_LIST(I)%PART',H3D_DATA%OUTPUT
      .                     STACK     ,SHELL_ID  ,SHELL_ITY     ,INFO1        ,INFO2      ,
      .                     IS_WRITEN_SHELL,IPARTC ,IPARTTG     ,LAYER        ,IPT        ,
      .                     ID_PLY     ,GAUSS     ,IUVAR ,H3D_DATA%OUTPUT_LIST(I)%PART,KEYWORD,
-     .                     D          ,MULTI_FVM ,IDMDS        ,IMDSVAR      ,MDS_MATID  )
+     .                     D          ,MULTI_FVM ,IDMDS        ,IMDSVAR      ,MDS_MATID  ,
+     .                     OBJECT_ID  )
 c
           IF (NSPMD > 1 ) THEN
             CALL STARTIME(MACRO_TIMER_SPMDH3D,1)
@@ -2352,7 +2593,7 @@ c         IF(ISPMD == 0)  print *,'H3D_DATA%OUTPUT_LIST(I)%PART',H3D_DATA%OUTPUT
           CALL H3D_SHELL_VECTOR(
      .                     ELBUF_TAB ,SHELL_VECTOR ,IFUNC      ,IPARG,GEO    ,
      .                     IXQ       ,IXC       ,IXTG          ,PM       ,
-     .                     EL2FA     ,NBF       ,IXUR          ,IAD          ,
+     .                     EL2FA     ,NBF       ,IAD          ,
      .                     NBF_L     ,EANI      ,ANIN(NDMA2+1) ,NBPART       ,IADG       ,
      .                     IPM       ,IGEO      ,THKE          ,ERR_THK_SH4  ,ERR_THK_SH3,
      .                     INVERT    ,X         ,V             ,W            ,
@@ -2415,7 +2656,7 @@ c         IF(ISPMD == 0)   print *,'H3D_DATA%OUTPUT_LIST(I)%PART',H3D_DATA%OUTPU
      .                 IGEO     ,IXTG  ,IPM   ,STACK ,SHELL_ID   ,SHELL_ITY    ,INFO1,
      .                 INFO2    ,IS_WRITEN_SHELL ,IPARTC ,IPARTTG     ,LAYER        ,IPT        ,
      .                 ID_PLY     ,GAUSS     ,IUVAR ,H3D_DATA%OUTPUT_LIST(I)%PART ,KEYWORD,D    ,
-     .                 OBJECT_ID  ,BUFMAT    )
+     .                 OBJECT_ID  ,BUFMAT    ,MAT_PARAM)
 
 c
           IF (NSPMD > 1 ) THEN
@@ -2457,20 +2698,22 @@ c-----
           IMDSVAR = H3D_DATA%OUTPUT_LIST(I)%IMDSVAR
           N_OUTP_DATA = H3D_DATA%OUTPUT_LIST(I)%N_OUTP
           KEYWORD = H3D_DATA%OUTPUT_LIST(I)%KEYWORD
+          OBJECT_ID = H3D_DATA%OUTPUT_LIST(I)%OBJECT_ID
 c          IF(ISPMD == 0)  print *,'solid scalar',N_OUTP_DATA,'IFUNC',IFUNC,'INFO1',INFO1,'INFO2',INFO2
 
           CALL H3D_SOLID_SCALAR(
      .                    ELBUF_TAB ,SOLID_SCALAR ,IFUNC      ,IPARG        ,GEO        ,
      .                    IXQ       ,IXS       ,IXTG          ,PM           ,BUFMAT     ,
-     .                    EL2FA     ,NBF       ,IXUR          ,IAD          ,
+     .                    EL2FA     ,NBF       ,IAD          ,
      .                    NBF_L     ,EANI      ,ANIN(NDMA2+1) ,NBPART       ,IADG       ,
      .                    IPM       ,IGEO      ,THKE          ,ERR_THK_SH4  ,ERR_THK_SH3,
      .                    INVERT    ,X         ,V             ,W            ,ALE_CONNECT,
      .                    NV46      ,NERCVOIS  ,NESDVOIS      ,LERCVOIS     ,LESDVOIS   ,
      .                    STACK     ,SOLID_ID  ,SOLID_ITY     ,IPARTS       ,LAYER      ,
      .                    IR        ,IS        ,IT            ,IUVAR        ,H3D_DATA%OUTPUT_LIST(I)%PART,
-     .                    IS_WRITEN_SOLID,INFO1,KEYWORD       ,FANI_CELL    ,SFANI_CELL ,
-     .                    MULTI_FVM, H3D_DATA  ,IDMDS         ,IMDSVAR      ,MDS_MATID  )
+     .                    IS_WRITEN_SOLID,INFO1,KEYWORD       ,FANI_CELL    ,
+     .                    MULTI_FVM, H3D_DATA  ,IDMDS         ,IMDSVAR      ,MDS_MATID  ,
+     .                    OBJECT_ID)
 c
           IF (NSPMD > 1 ) THEN
             CALL STARTIME(MACRO_TIMER_SPMDH3D,1)
@@ -2512,14 +2755,14 @@ c          IF(ISPMD == 0)  print *,'solid scalar',N_OUTP_DATA,'IFUNC',IFUNC,'INF
           CALL H3D_SOLID_VECTOR(
      .                    ELBUF_TAB ,SOLID_VECTOR ,IFUNC      ,IPARG,GEO    ,
      .                    IXQ       ,IXS       ,IXTG          ,PM           ,
-     .                    EL2FA     ,NBF       ,IXUR          ,IAD          ,
+     .                    EL2FA     ,NBF       ,IAD          ,
      .                    NBF_L     ,EANI      ,ANIN(NDMA2+1) ,NBPART       ,IADG       ,
      .                    IPM       ,IGEO      ,THKE          ,ERR_THK_SH4  ,ERR_THK_SH3,
      .                    INVERT    ,X         ,V             ,W            ,
      .                    NV46      ,NERCVOIS  ,NESDVOIS      ,LERCVOIS     ,LESDVOIS   ,
      .                    STACK     ,SOLID_ID  ,SOLID_ITY     ,IPARTS       ,LAYER      ,
      .                    IR        ,IS        ,IT            ,IUVAR        ,H3D_DATA%OUTPUT_LIST(I)%PART,
-     .                    IS_WRITEN_SOLID,INFO1,KEYWORD       ,FANI_CELL    ,SFANI_CELL ,
+     .                    IS_WRITEN_SOLID,INFO1,KEYWORD       ,FANI_CELL    ,
      .                    H3D_DATA, MULTI_FVM)
 c
           IF (NSPMD > 1 ) THEN
@@ -2601,18 +2844,20 @@ c-----
           IUVAR = H3D_DATA%OUTPUT_LIST(I)%IUVAR
           N_OUTP_DATA = H3D_DATA%OUTPUT_LIST(I)%N_OUTP
           KEYWORD = H3D_DATA%OUTPUT_LIST(I)%KEYWORD
+          OBJECT_ID = H3D_DATA%OUTPUT_LIST(I)%OBJECT_ID
 c          IF(ISPMD == 0)  print *,'SPH scalar',N_OUTP_DATA,'IFUNC',IFUNC,'INFO1',INFO1,'INFO2',INFO2
 
           CALL H3D_SPH_SCALAR(
      .                    ELBUF_TAB ,SPH_SCALAR,IFUNC         ,IPARG        ,GEO        ,
      .                    KXSP      ,PM        ,IPART         ,
-     .                    EL2FA     ,NBF       ,IXUR          ,IAD          ,
+     .                    EL2FA     ,NBF       ,IAD          ,
      .                    NBF_L     ,EANI      ,ANIN(NDMA2+1) ,NBPART       ,IADG       ,
      .                    IPM       ,IGEO      ,THKE          ,ERR_THK_SH4  ,ERR_THK_SH3,
      .                    INVERT    ,X         ,V             ,W            ,
      .                    NV46      ,NERCVOIS  ,NESDVOIS      ,LERCVOIS     ,LESDVOIS   ,
      .                    STACK     ,SPH_ID  ,IPARTSP      ,IUVAR      ,
-     .                    H3D_DATA%OUTPUT_LIST(I)%PART,IS_WRITEN_SPH,INFO1,KEYWORD,SPBUF  )
+     .                    H3D_DATA%OUTPUT_LIST(I)%PART,IS_WRITEN_SPH,INFO1,KEYWORD,SPBUF,
+     .                    OBJECT_ID )
 c
           IF (NSPMD > 1 ) THEN
             CALL STARTIME(MACRO_TIMER_SPMDH3D,1)
@@ -2684,6 +2929,8 @@ c-----
           IT = H3D_DATA%OUTPUT_LIST(I)%IT
           IUVAR = H3D_DATA%OUTPUT_LIST(I)%IUVAR
           KEYWORD = H3D_DATA%OUTPUT_LIST(I)%KEYWORD
+          OBJECT_ID = H3D_DATA%OUTPUT_LIST(I)%OBJECT_ID
+
 
 c         IF(ISPMD == 0)  print *,'QUAD scalar',N_OUTP_DATA,'IFUNC',IFUNC,'INFO1',INFO1,'INFO2',INFO2
 
@@ -2692,7 +2939,7 @@ c         IF(ISPMD == 0)  print *,'H3D_DATA%OUTPUT_LIST(I)%PART',H3D_DATA%OUTPUT
           CALL H3D_QUAD_SCALAR(
      .                     ELBUF_TAB ,QUAD_SCALAR ,IFUNC      ,IPARG,GEO    ,
      .                     IXQ       ,IXC       ,IXTG          ,PM       ,
-     .                     EL2FA     ,NBF       ,IXUR          ,IAD          ,
+     .                     EL2FA     ,NBF       ,IAD          ,
      .                     NBF_L     ,EANI      ,ANIN(NDMA2+1) ,NBPART       ,IADG       ,
      .                     IPM       ,IGEO      ,THKE          ,ERR_THK_SH4  ,ERR_THK_SH3,
      .                     INVERT    ,X         ,V             ,W            ,ALE_CONNECT,
@@ -2700,7 +2947,8 @@ c         IF(ISPMD == 0)  print *,'H3D_DATA%OUTPUT_LIST(I)%PART',H3D_DATA%OUTPUT
      .                     STACK     ,QUAD_ID  ,INFO1        ,INFO2      ,
      .                     IS_WRITEN_QUAD,IPARTQ ,IPARTTG     ,LAYER        ,IPT        ,
      .                     ID_PLY     ,GAUSS     ,IUVAR ,H3D_DATA%OUTPUT_LIST(I)%PART,KEYWORD,
-     .                     BUFMAT     ,MULTI_FVM ,IR           ,IS           ,IT         )
+     .                     BUFMAT     ,MULTI_FVM ,IR           ,IS           ,IT         ,
+     .                     OBJECT_ID  )
 c
           IF (NSPMD > 1 ) THEN
             CALL STARTIME(MACRO_TIMER_SPMDH3D,1)
@@ -2746,7 +2994,7 @@ c         IF(ISPMD == 0)  print *,'H3D_DATA%OUTPUT_LIST(I)%PART',H3D_DATA%OUTPUT
           CALL H3D_QUAD_VECTOR(
      .                     ELBUF_TAB ,QUAD_VECTOR ,IFUNC      ,IPARG,GEO    ,
      .                     IXQ       ,IXC       ,IXTG          ,PM       ,
-     .                     EL2FA     ,NBF       ,IXUR          ,IAD          ,
+     .                     EL2FA     ,NBF       ,IAD          ,
      .                     NBF_L     ,EANI      ,ANIN(NDMA2+1) ,NBPART       ,IADG       ,
      .                     IPM       ,IGEO      ,THKE          ,ERR_THK_SH4  ,ERR_THK_SH3,
      .                     INVERT    ,X         ,V             ,W            ,
@@ -2848,8 +3096,8 @@ c-----
      .                    IS_WRITEN_SKIN,INFO1,KEYWORD       , H3D_DATA  ,
      6                    IAD_ELEM        ,FR_ELEM     , WEIGHT    ,TAG_SKINS6,
      7                    NPF  ,TF   ,BUFMAT,IBCL    ,ILOADP     ,LLOADP    ,FAC    ,
-     8                    SENSOR_TAB,TAGNCONT    ,LOADP_HYD_INTER,XFRAME,FORC  ,
-     9                    NODAL_IPART ,IMAPSKP )
+     8                    NSENSOR,SENSORS%SENSOR_TAB,TAGNCONT,LOADP_HYD_INTER,XFRAME,FORC  ,
+     9                    NODAL_IPART ,IMAPSKP ,LOADS ,TABLE,IFRAME,MAT_PARAM)
 c
           IF (NSPMD > 1 ) THEN
             CALL STARTIME(MACRO_TIMER_SPMDH3D,1)
@@ -2881,16 +3129,16 @@ c-----
           N_OUTP_DATA = H3D_DATA%OUTPUT_LIST(I)%N_OUTP
           INFO1 = H3D_DATA%OUTPUT_LIST(I)%INFO1
           KEYWORD = H3D_DATA%OUTPUT_LIST(I)%KEYWORD
-
-          CALL H3D_SKIN_VECTOR(SKIN_VECTOR,NODAL_IPART,
+           CALL H3D_SKIN_VECTOR(SKIN_VECTOR,NODAL_IPART,NSENSOR,
      .                   IS_WRITEN_SKIN  ,H3D_DATA%OUTPUT_LIST(I)%PART,INFO1   ,KEYWORD ,
-     .                   IBCL,ILOADP,LLOADP,FAC ,NPF,TF ,SENSOR_TAB,
-     .                   TAGNCONT,LOADP_HYD_INTER,FORC,XFRAME,X ,V ,IMAPSKP)
+     .                   IBCL,ILOADP,LLOADP,FAC ,NPF,TF ,SENSORS%SENSOR_TAB,
+     .                   TAGNCONT,LOADP_HYD_INTER,FORC,XFRAME,X ,V ,IMAPSKP,LOADS ,
+     .                   TABLE,IFRAME)
 c
           IF (NSPMD > 1 ) THEN
             CALL STARTIME(MACRO_TIMER_SPMDH3D,1)
             CALL SPMD_H3D_GATHER_I(IS_WRITEN_SKIN,NUMSKIN,IS_WRITEN_SKIN_P,NUMSKING)
-            CALL SPMD_H3D_GATHER_R(SKIN_VECTOR,NUMSKIN,SKIN_VECTOR_P,3*(NUMSKING))
+            CALL SPMD_H3D_GATHER_R(SKIN_VECTOR,3*NUMSKIN,SKIN_VECTOR_P,3*(NUMSKING))
             CALL STOPTIME(MACRO_TIMER_SPMDH3D,1)
           ELSE
             IS_WRITEN_SKIN_P(1:NUMSKIN) =  IS_WRITEN_SKIN(1:NUMSKIN)
@@ -2950,7 +3198,43 @@ c
         ENDIF
       ENDDO
 
-      DEALLOCATE(NODAL_SCALAR)
+c-----
+c virtual nodes
+c-----
+      !A POSTERIORI CHECK ---
+      !CHECK IF MAXIMUM VIRTUAL NODE IDENTIFIER IS WITHIN [0,2147483647=HUGE]
+      ITMP = USER_NOD_ID%FVMBAG_LEN + USER_NOD_ID%RWALL_LEN   !total number of virtual nodes
+      IF(ITMP > 0)THEN
+        IF(ITMP >= HUGE(ITMP) - USER_NOD_ID%INPUT_MAX)THEN      !test is in fact ( USER_NOD_ID%INPUT_MAX + ITMP >= HUGE)   but LHS might be over HUGE written like this.        
+          CALL ANCMSG(MSGID=305,ANMODE=ANINFO)
+          CALL ARRET(2)
+        END IF
+      ENDIF
+c-----
+c deallocate
+c-----
+      ! FVMBAG visualization
+      IF(ALLOCATED(NODAL_SCALAR_FVM))DEALLOCATE(NODAL_SCALAR_FVM)      
+      IF(ALLOCATED(NODAL_VECTOR_FVM))DEALLOCATE(NODAL_VECTOR_FVM)
+      IF(ALLOCATED(NODE_ID_FVM))DEALLOCATE(NODE_ID_FVM)
+      IF(ALLOCATED(IS_WRITEN_NODE_FVM))DEALLOCATE(IS_WRITEN_NODE_FVM)
+      
+      ! FVDATA_P deallocate
+      IF(ALLOCATED(FVDATA_P))THEN
+        DO J=1,NFVBAG
+          IF(ASSOCIATED(FVDATA_P(J)%CENTROID_POLH))DEALLOCATE (FVDATA_P(J)%CENTROID_POLH)
+          IF(ASSOCIATED(FVDATA_P(J)%PPOLH))DEALLOCATE (FVDATA_P(J)%PPOLH)
+          IF(ASSOCIATED(FVDATA_P(J)%SSPPOLH))DEALLOCATE (FVDATA_P(J)%SSPPOLH)
+          IF(ASSOCIATED(FVDATA_P(J)%DTPOLH))DEALLOCATE (FVDATA_P(J)%DTPOLH)
+          IF(ASSOCIATED(FVDATA_P(J)%QPOLH))DEALLOCATE (FVDATA_P(J)%QPOLH)
+          IF(ASSOCIATED(FVDATA_P(J)%MPOLH))DEALLOCATE (FVDATA_P(J)%MPOLH)
+          IF(ASSOCIATED(FVDATA_P(J)%RPOLH))DEALLOCATE (FVDATA_P(J)%RPOLH)
+          IF(ASSOCIATED(FVDATA_P(J)%TPOLH))DEALLOCATE (FVDATA_P(J)%TPOLH)
+        ENDDO
+        DEALLOCATE(FVDATA_P)
+      ENDIF
+      
+      DEALLOCATE(NODAL_SCALAR) 
       DEALLOCATE(NODAL_VECTOR)
       DEALLOCATE(NODE_ID)
       DEALLOCATE(IS_WRITEN_NODE)

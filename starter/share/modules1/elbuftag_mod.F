@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -66,13 +66,17 @@ Chd|        HM_READ_MAT11_K_EPS           source/materials/mat/mat011/hm_read_ma
 Chd|        HM_READ_MAT12                 source/materials/mat/mat012/hm_read_mat12.F
 Chd|        HM_READ_MAT120                source/materials/mat/mat120/hm_read_mat120.F
 Chd|        HM_READ_MAT121                source/materials/mat/mat121/hm_read_mat121.F
+Chd|        HM_READ_MAT122                source/materials/mat/mat122/hm_read_mat122.F
+Chd|        HM_READ_MAT124                source/materials/mat/mat124/hm_read_mat124.F
 Chd|        HM_READ_MAT13                 source/materials/mat/mat013/hm_read_mat13.F
 Chd|        HM_READ_MAT14                 source/materials/mat/mat014/hm_read_mat14.F
 Chd|        HM_READ_MAT15                 source/materials/mat/mat015/hm_read_mat15.F
 Chd|        HM_READ_MAT151                source/materials/mat/mat151/hm_read_mat151.F
+Chd|        HM_READ_MAT158                source/materials/mat/mat158/hm_read_mat158.F
 Chd|        HM_READ_MAT16                 source/materials/mat/mat016/hm_read_mat16.F
 Chd|        HM_READ_MAT18                 source/materials/mat/mat018/hm_read_mat18.F
 Chd|        HM_READ_MAT19                 source/materials/mat/mat019/hm_read_mat19.F
+Chd|        HM_READ_MAT190                source/materials/mat/mat190/hm_read_mat190.F
 Chd|        HM_READ_MAT20                 source/materials/mat/mat020/hm_read_mat20.F
 Chd|        HM_READ_MAT21                 source/materials/mat/mat021/hm_read_mat21.F
 Chd|        HM_READ_MAT22                 source/materials/mat/mat022/hm_read_mat22.F
@@ -90,6 +94,7 @@ Chd|        HM_READ_MAT36                 source/materials/mat/mat036/hm_read_ma
 Chd|        HM_READ_MAT37                 source/materials/mat/mat037/hm_read_mat37.F
 Chd|        HM_READ_MAT38                 source/materials/mat/mat038/hm_read_mat38.F
 Chd|        HM_READ_MAT40                 source/materials/mat/mat040/hm_read_mat40.F
+Chd|        HM_READ_MAT41                 source/materials/mat/mat041/hm_read_mat41.F
 Chd|        HM_READ_MAT43                 source/materials/mat/mat043/hm_read_mat43.F
 Chd|        HM_READ_MAT44                 source/materials/mat/mat044/hm_read_mat44.F
 Chd|        HM_READ_MAT46                 source/materials/mat/mat046/hm_read_mat46.F
@@ -122,7 +127,7 @@ Chd|        HM_READ_MAT78                 source/materials/mat/mat078/hm_read_ma
 Chd|        HM_READ_MAT79                 source/materials/mat/mat079/hm_read_mat79.F
 Chd|        HM_READ_MAT80                 source/materials/mat/mat080/hm_read_mat80.F
 Chd|        HM_READ_MAT81                 source/materials/mat/mat081/hm_read_mat81.F
-Chd|        HM_READ_MAT83                 source/materials/mat/mat083/hm_read_law83.F
+Chd|        HM_READ_MAT83                 source/materials/mat/mat083/hm_read_mat83.F
 Chd|        HM_READ_MAT84                 source/materials/mat/mat084/hm_read_mat84.F
 Chd|        HM_READ_MAT87                 source/materials/mat/mat087/hm_read_mat87.F
 Chd|        HM_READ_MAT88                 source/materials/mat/mat088/hm_read_mat88.F
@@ -133,6 +138,7 @@ Chd|        HM_READ_MAT94                 source/materials/mat/mat094/hm_read_ma
 Chd|        HM_READ_MAT95                 source/materials/mat/mat095/hm_read_mat95.F
 Chd|        HM_READ_MAT97                 source/materials/mat/mat097/hm_read_mat97.F
 Chd|        HM_READ_NONLOCAL              source/materials/nonlocal/hm_read_nonlocal.F
+Chd|        HM_READ_PART                  source/model/assembling/hm_read_part.F
 Chd|        HM_READ_PROP0                 source/properties/void/hm_read_prop0.F
 Chd|        HM_READ_PROP01                source/properties/shell/hm_read_prop01.F
 Chd|        HM_READ_PROP02                source/properties/truss/hm_read_prop02.F
@@ -180,6 +186,7 @@ Chd|        INI_EOS_VARS                  source/elements/elbuf_init/ini_eos_var
 Chd|        INI_MLAW_VARS                 source/elements/elbuf_init/ini_mlaw_vars.F
 Chd|        INI_PROP_VARS                 source/elements/elbuf_init/ini_prop_vars.F
 Chd|        LAW104_UPD                    source/materials/mat/mat104/law104_upd.F
+Chd|        LAW36_UPD                     source/materials/mat/mat036/law36_upd.F
 Chd|        LECSTACK_PLY                  source/properties/composite_options/stack/lecstack_ply.F
 Chd|        LECTUR                        source/starter/lectur.F       
 Chd|        M20DCOD                       source/system/fsdcod.F        
@@ -218,6 +225,7 @@ c
         INTEGER ::  G_DMG          ! 
         INTEGER ::  G_PLANL
         INTEGER ::  G_EPSDNL 
+        INTEGER ::  G_DMGSCL
         INTEGER ::  G_TSAIWU
 c for spring with mat
         INTEGER ::  G_TOTDEPL
@@ -320,9 +328,14 @@ c---    uvar
         INTEGER ::  L_BFRAC     !  burn fraction 
         
         INTEGER ::  NVAR        !  EOS%VAR buffer size     
-      END TYPE EOS_TAG_              
+      END TYPE EOS_TAG_    
+      
+      !EOS PARAM
+      INTEGER,SAVE :: MAXEOS
+      DATA MAXEOS /20/          !Number of EOS types :'LINEAR', 'POLYNOMIAL', 'IDEAL-GAS' , etc ...
+                
 
-C 
+C
       TYPE PROP_TAG_    ! element buffer variables depending on property
 c       global variables 
         INTEGER ::  G_GAMA 
@@ -423,7 +436,6 @@ c---    uvar
       END TYPE PROP_TAG_               
 C
       TYPE FAIL_TAG_   
-        INTEGER ::   NUVAR 
         INTEGER ::   LF_DAM
         INTEGER ::   LF_DAMMX  
         INTEGER ::   LF_DAMINI
@@ -432,10 +444,5 @@ C
         INTEGER ::   LF_OFF
         INTEGER ::   LF_DIR
       END TYPE FAIL_TAG_               
- 
-C
-      TYPE VISC_TAG_   
-        INTEGER ::   NUVAR
-      END TYPE VISC_TAG_               
 c---------------
       END MODULE ELBUFTAG_MOD

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -28,18 +28,24 @@ Chd|-- calls ---------------
 Chd|        MDTSPH                        source/materials/mat_share/mdtsph.F
 Chd|        MQVISCB                       source/materials/mat_share/mqviscb.F
 Chd|====================================================================
-      SUBROUTINE M22LAW (PM ,OFF ,SIG     ,EINT    ,RHO     ,
-     2           QOLD   ,EPXE    ,EPD     ,VOL     ,PDAM    ,
-     3           STIFN  ,DT2T    ,NELTST  ,ITYPTST ,OFFG    ,
-     4           GEO    ,PID     ,AMU     ,VOL_AVG ,
-     6           MUMAX  ,MAT     ,NGL     ,SSP     ,DVOL    ,
-     7           AIRE   ,VNEW    ,VD2     ,DELTAX  ,VIS     ,  
-     8           D1     ,D2      ,D3      ,D4      ,D5      ,
-     9           D6     ,PNEW    ,PSH     ,QNEW    ,SSP_EQ  ,
-     A           SOLD1  ,SOLD2   ,SOLD3   ,SOLD4   ,SOLD5   ,
-     B           SOLD6  ,IPLA    ,SIGY    ,DEFP    ,DPLA    ,
-     C           MSSA   ,DMELS   ,CONDE   ,DTEL    ,G_DT    ,
-     D           NEL    ,IPM     ,RHOREF  ,RHOSP   )
+      SUBROUTINE M22LAW(
+     1   PM,      OFF,     SIG,     EINT,
+     2   RHO,     QOLD,    EPXE,    EPD,
+     3   VOL,     PDAM,    STIFN,   DT2T,
+     4   NELTST,  ITYPTST, OFFG,    GEO,
+     5   PID,     AMU,     VOL_AVG, MUMAX,
+     6   MAT,     NGL,     SSP,     DVOL,
+     7   AIRE,    VNEW,    VD2,     DELTAX,
+     8   VIS,     D1,      D2,      D3,
+     9   D4,      D5,      D6,      PNEW,
+     A   PSH,     QNEW,    SSP_EQ,  SOLD1,
+     B   SOLD2,   SOLD3,   SOLD4,   SOLD5,
+     C   SOLD6,   IPLA,    SIGY,    DEFP,
+     D   DPLA,    MSSA,    DMELS,   CONDE,
+     E   DTEL,    G_DT,    NEL,     IPM,
+     F   RHOREF,  RHOSP,   NFT,     JSPH,
+     G   ITY,     JTUR,    JTHE,    ISMSTR,
+     H   JSMS,    NPG )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -54,13 +60,19 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "vect01_c.inc"
 #include      "scr03_c.inc"
 #include      "scr17_c.inc"
 #include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: ISMSTR
+      INTEGER, INTENT(IN) :: JSMS
+      INTEGER, INTENT(IN) :: ITY
+      INTEGER, INTENT(IN) :: JTUR
+      INTEGER, INTENT(IN) :: JTHE
+      INTEGER, INTENT(IN) :: NFT
+      INTEGER, INTENT(IN) :: JSPH,NPG
       INTEGER NELTST,ITYPTST ,PID(*), G_DT
       INTEGER MAT(*),NGL(*),IPLA,NEL,IPM(NPROPMI,*)
       my_real
@@ -103,7 +115,7 @@ C-----------------------------------------------
      
       FACQ0 = ONE
       IF(IPLA==0)THEN
-       MX = MAT(LFT)
+       MX = MAT(1)
        RHO0_1 =PM( 1,MX)
        C1_1   =PM(32,MX)
        CA_1   =PM(38,MX)
@@ -117,7 +129,7 @@ C-----------------------------------------------
        YLDL_1 =PM(47,MX)
        QL_1   =PM(48,MX)
        ICC_1  =NINT(PM(49,MX))
-       DO 10 I=LFT,LLT
+       DO 10 I=1,NEL
        RHO0(I) =RHO0_1
        G0(I)   =PM(22,MX)*OFF(I)
        C1(I)   =C1_1
@@ -135,7 +147,7 @@ C-----------------------------------------------
    10 CONTINUE
       ELSE
 
-      MX = MAT(LFT)
+      MX = MAT(1)
       RHO0_1 =PM( 1,MX)
       C1_1   =PM(32,MX)
       CA_1   =PM(38,MX)
@@ -149,7 +161,7 @@ C-----------------------------------------------
       QL_1   =PM(46,MX)
       YLDL_1 =PM(47,MX)
       ICC_1  =NINT(PM(49,MX))
-      DO 11 I=LFT,LLT
+      DO 11 I=1,NEL
        RHO0(I) =RHO0_1
        G0(I)   =PM(22,MX)*OFF(I)
        C1(I)   =C1_1
@@ -167,14 +179,14 @@ C-----------------------------------------------
    11 CONTINUE
       ENDIF
 
-      DO 15 I=LFT,LLT
+      DO 15 I=1,NEL
       EPD(I)=OFF(I) * MAX(   ABS(D1(I)), ABS(D2(I)), ABS(D3(I)), HALF*ABS(D4(I)),HALF*ABS(D5(I)),HALF*ABS(D6(I)))
       EPSP = MAX(EPD(I),EPDR(I))
       CE(I) = ONE +CC(I) * LOG(EPSP/EPDR(I))
  15   CONTINUE
 
       IF(IPLA/=2)THEN
-       DO 20 I=LFT,LLT
+       DO 20 I=1,NEL
        IF(CN(I)==ONE) THEN
         AK(I)= CA(I)+CB(I)*EPXE(I)
         QH(I)= CB(I)*CE(I)
@@ -196,7 +208,7 @@ C-----------------------------------------------
        IF(EPXE(I)>EPSL(I))QH(I)=QL(I)
  20    CONTINUE
       ELSE
-       DO I=LFT,LLT
+       DO I=1,NEL
        IF(CN(I)==ONE) THEN
         AK(I)= CA(I)+CB(I)*EPXE(I)
        ELSE
@@ -212,7 +224,7 @@ C-----------------------------------------------
       ENDIF
 
       IF(IPLA==0)THEN
-      DO I=LFT,LLT
+      DO I=1,NEL
        AK(I) = MIN(AK(I),SIGMX(I))
        HL    = THREE*G0(I)*QL(I)/(THREE*G0(I)+QL(I))
        DEPSL = MAX(ZERO,EPXE(I)-EPSL(I))
@@ -242,7 +254,7 @@ C-----------------------------------------------
        AJ2(I)=SQRT(THREE*AJ2(I))
       ENDDO
       ELSEIF(IPLA==2)THEN
-      DO I=LFT,LLT
+      DO I=1,NEL
        AK(I) = MIN(AK(I),SIGMX(I))
        DEPSL = MAX(ZERO,EPXE(I)-EPSL(I))
        AK(I) = MIN(AK(I),YLDL(I)+QL(I)*DEPSL)
@@ -281,7 +293,7 @@ C-----------------------------------------------
        ENDIF
       ENDDO
       ELSE
-      DO I=LFT,LLT
+      DO I=1,NEL
        AK(I) = MIN(AK(I),SIGMX(I))
        DEPSL = MAX(ZERO,EPXE(I)-EPSL(I))
        AK(I) = MIN(AK(I),YLDL(I)+QL(I)*DEPSL)
@@ -322,7 +334,7 @@ C-----------------------------------------------
       ENDIF
 
       IF(IPLA==0)THEN
-        DO I=LFT,LLT
+        DO I=1,NEL
          SCALE= MIN(ONE,AK(I) / MAX(AJ2(I),EM15))
          SIG(I,1)=SCALE*SIG(I,1)
          SIG(I,2)=SCALE*SIG(I,2)
@@ -334,7 +346,7 @@ C-----------------------------------------------
          DPLA(I) =  (ONE -SCALE)*AJ2(I)/MAX(THREE*G(I)+QH(I),EM15)      
         ENDDO
         ELSEIF(IPLA==2)THEN
-        DO I=LFT,LLT
+        DO I=1,NEL
          SCALE= MIN(ONE,AK(I) / MAX(AJ2(I),EM15))
          SIG(I,1)=SCALE*SIG(I,1)
          SIG(I,2)=SCALE*SIG(I,2)
@@ -346,7 +358,7 @@ C-----------------------------------------------
          DPLA(I) = (ONE -SCALE)*AJ2(I)/MAX(THREE*G(I),EM15)       
         ENDDO
         ELSEIF(IPLA==1)THEN
-        DO I=LFT,LLT
+        DO I=1,NEL
          SCALE= MIN(ONE,AK(I) / MAX(AJ2(I),EM15))
          DPLA(I)=(ONE -SCALE)*AJ2(I)*G0(I)/ MAX(G(I)*(THREE*G0(I)+QH(I)),EM15)
          AK(I)=MAX(ZERO,AK(I)+DPLA(I)*QH(I))
@@ -362,23 +374,33 @@ C-----------------------------------------------
         ENDIF
         
       IF (JSPH==0)THEN
-       CALL MQVISCB(PM,OFF     ,RHO    ,BID1   ,BID2   ,SSP   ,
-     2        BID3    ,STIFN   ,DT2T   ,NELTST ,ITYPTST,AIRE  ,
-     3        OFFG    ,GEO     ,PID    ,VNEW   ,VD2    ,DELTAX ,  
-     4        VIS     ,D1      ,D2      ,D3     ,PNEW   ,PSH   ,
-     5        MAT     ,NGL     ,QNEW    ,SSP_EQ ,VOL    ,MSSA  ,
-     6        DMELS   ,IBID    ,FACQ0   ,CONDE  ,DTEL   ,G_DT  ,
-     7        IPM     ,RHOREF  ,RHOSP   )
+       CALL MQVISCB(
+     1   PM,      OFF,     RHO,     BID1,
+     2   BID2,    SSP,     BID3,    STIFN,
+     3   DT2T,    NELTST,  ITYPTST, AIRE,
+     4   OFFG,    GEO,     PID,     VNEW,
+     5   VD2,     DELTAX,  VIS,     D1,
+     6   D2,      D3,      PNEW,    PSH,
+     7   MAT,     NGL,     QNEW,    SSP_EQ,
+     8   VOL,     MSSA,    DMELS,   IBID,
+     9   FACQ0,   CONDE,   DTEL,    G_DT,
+     A   IPM,     RHOREF,  RHOSP,   NEL,
+     B   ITY,     ISMSTR,  JTUR,    JTHE,
+     C   JSMS,    NPG )
       ELSE
-       CALL MDTSPH(PM ,OFF     ,RHO     ,BID1    ,BID2    ,
-     2        BID3    ,STIFN   ,DT2T    ,NELTST  ,ITYPTST ,
-     3        OFFG    ,GEO     ,PID     ,MUMAX   ,SSP     ,
-     4        VNEW    ,VD2     ,DELTAX  ,VIS     ,D1      ,
-     5        D2      ,D3      ,PNEW    ,PSH     ,MAT     ,
-     6        NGL     ,QNEW    ,SSP_EQ  ,G_DT    ,DTEL)
+       CALL MDTSPH(
+     1   PM,      OFF,     RHO,     BID1,
+     2   BID2,    BID3,    STIFN,   DT2T,
+     3   NELTST,  ITYPTST, OFFG,    GEO,
+     4   PID,     MUMAX,   SSP,     VNEW,
+     5   VD2,     DELTAX,  VIS,     D1,
+     6   D2,      D3,      PNEW,    PSH,
+     7   MAT,     NGL,     QNEW,    SSP_EQ,
+     8   G_DT,    DTEL,    NEL,     ITY,
+     9   JTUR,    JTHE)
       ENDIF
 
-      DO 120 I=LFT,LLT
+      DO 120 I=1,NEL
       PNEW(I)=C1(I)*AMU(I)
  120  CONTINUE
 
@@ -386,12 +408,12 @@ C----------------------------
 C     TEST DE RUPTURE DUCTILE
 C---------------------------
       IF(PDAM==ONE.AND.CODVERS>=42)THEN
-        DO I=LFT,LLT
+        DO I=1,NEL
           IF(OFF(I)<EM01) OFF(I)=ZERO
           IF(OFF(I)<ONE) OFF(I)=OFF(I)*FOUR_OVER_5
         ENDDO
 C
-        DO I=LFT,LLT
+        DO I=1,NEL
           IF(EPMX(I)/=ZERO.AND.OFF(I)>=ONE.AND. EPXE(I)>EPMX(I))THEN
             OFF(I)=OFF(I)*FOUR_OVER_5
             II=I+NFT
@@ -405,7 +427,7 @@ C
 
       DTA = HALF*DT1
 
-      DO I=LFT,LLT
+      DO I=1,NEL
        SIG(I,1)=(SIG(I,1)-PNEW(I))*OFF(I)
        SIG(I,2)=(SIG(I,2)-PNEW(I))*OFF(I)
        SIG(I,3)=(SIG(I,3)-PNEW(I))*OFF(I)
@@ -423,7 +445,7 @@ C
        QOLD(I)=QNEW(I)
       ENDDO
 
-      DO I=LFT,LLT
+      DO I=1,NEL
        DEFP(I)=EPXE(I)
        SIGY(I)=MAX(SIGY(I),AK(I))
       ENDDO

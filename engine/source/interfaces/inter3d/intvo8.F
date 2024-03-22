@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -38,7 +38,7 @@ Chd|        SPMD_I8_INDEX                 source/mpi/interfaces/spmd_i8tool.F
 Chd|        SPMD_I8_IRTL                  source/mpi/interfaces/spmd_i8tool.F
 Chd|        SPMD_I8_UPDBUF                source/mpi/interfaces/spmd_i8tool.F
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
-Chd|        INT8_MOD                      ../common_source/modules/int8_mod.F
+Chd|        INT8_MOD                      ../common_source/modules/interfaces/int8_mod.F
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE INTVO8(IPARI,X ,A  ,
@@ -59,24 +59,12 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
-#include      "param_c.inc"
-#include      "units_c.inc"
-#include      "vect07_c.inc"
-#include      "scr03_c.inc"
-#include      "scr04_c.inc"
-#include      "bucki_c.inc"
-#include      "warn_c.inc"
 #include      "parit_c.inc"
-#include      "impl1_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -135,19 +123,14 @@ C     REAL
       my_real
      .   STARTT, FRIC, GAP,  STOPT,  
      .   VISC,VISCF,FNOR,DEPTH,FRIC_LAST,FNOR_LAST
-
-C     INTEGER aa,bb,cc,dd 
-C     INTEGER FLAG
+      INTEGER :: NMN, NTY, NSN
+      INTEGER :: LFT, LLT, NFT
 C-----------------------------------------------
-C----     
 
-
-      NRTS   = IPARI(3)
-      NRTM   = IPARI(4)
       NSN    = IPARI(5)
       NMN    = IPARI(6)
+      NTY   = IPARI(7)
       IBC   =IPARI(11)
-      IBUC  =IPARI(12)
       NCIMP =IPARI(13)
       NRTM4 =IPARI(14)
       NOINT =IPARI(15)
@@ -221,9 +204,6 @@ C
         LFT=1
         LLT=NSN                   
         IF(NSPMD > 1) THEN
-        ! WRITE(6,*) "================================="
-        ! WRITE(6,*) __FILE__,__LINE__,T8%S_COMM,NMN,NSN
-        ! WRITE(6,*) "================================="
 
           CALL SPMD_I8_INDEX(NMN,T8%SPMD_COMM_PATTERN,INDEX_IN_COMM,T8%S_COMM)
 
@@ -239,9 +219,12 @@ C
 
         ENDIF
 
-        CALL I8LOC3(X ,INTBUF_TAB%IRECTM,INTBUF_TAB%LMSR,INTBUF_TAB%MSR,
-     .          INTBUF_TAB%NSV,INTBUF_TAB%ILOCS,INTBUF_TAB%NSEGM,
-     .          XI,YI,ZI,FACE, ITAB,DISTANCE,IFLINEAR,DISTLIN)
+        CALL I8LOC3(
+     1   X,                INTBUF_TAB%IRECTM,INTBUF_TAB%LMSR,  INTBUF_TAB%MSR,
+     2   INTBUF_TAB%NSV,   INTBUF_TAB%ILOCS, INTBUF_TAB%NSEGM, XI,
+     3   YI,               ZI,               FACE,             ITAB,
+     4   DISTANCE,         IFLINEAR,         DISTLIN,          NSN,
+     5   LFT,              LLT,              NFT)
         IF(NSPMD > 1) THEN
 
           CALL SPMD_I8_ILOC(INTBUF_TAB%ILOCS,    INTBUF_TAB%MSR,ITAB,T8%BUFFER,
@@ -254,10 +237,12 @@ C
           CALL SPMD_I8_UPDBUF(NSN,INTBUF_TAB%ILOCS,INTBUF_TAB%NSV,
      .              ITAB,T8%BUFFER,T8%SPMD_COMM_PATTERN,INDEX_IN_COMM)
         ENDIF
-        CALL I8MSR3(X ,INTBUF_TAB%IRECTM,INTBUF_TAB%LMSR,INTBUF_TAB%MSR,
-     .              INTBUF_TAB%NSV,INTBUF_TAB%ILOCS,
-     .              INTBUF_TAB%IRTLM,INTBUF_TAB%NSEGM,FACE,
-     .              NSN,ITAB, HAS_MOVED,TAB_RMAX,TAB_RMAX_UID)
+        CALL I8MSR3(
+     1   X,                INTBUF_TAB%IRECTM,INTBUF_TAB%LMSR,  INTBUF_TAB%MSR,
+     2   INTBUF_TAB%NSV,   INTBUF_TAB%ILOCS, INTBUF_TAB%IRTLM, INTBUF_TAB%NSEGM,
+     3   FACE,             NSN,              ITAB,             HAS_MOVED,
+     4   TAB_RMAX,         TAB_RMAX_UID,     LFT,              LLT,
+     5   NFT)
 
         IF(NSPMD > 1) THEN
          CALL SPMD_I8_IRTL(INTBUF_TAB%IRTLM,HAS_MOVED,
@@ -305,58 +290,54 @@ C
            NINSKID = H3D_DATA%N_SKID_INTER(NIN)
         ENDIF
 
-        CALL I8COR3(X ,INTBUF_TAB%IRECTM,INTBUF_TAB%MSR,NSV_A,
-     .  	IRTL_A, 
-     . IX1 ,IX2 ,IX3, 
-     . IX4, X1 ,Y1,
-     . Z1, X2 ,Y2 ,Z2,
-     . X3 ,Y3 ,Z3,
-     . X4 ,Y4 ,Z4)
-        CALL I8CST3(X1 ,Y1 ,Z1,
-     .              X2 ,Y2 ,Z2,
-     .              X3 ,Y3 ,Z3,
-     .              X4,Y4,Z4,
-     .              XI_A,YI_A,ZI_A,
-     .              N1,N2,N3,
-     .               ANS, SSC, TTC,
-     .              FACE_A,
-     .                X0,  Y0,  Z0,
-     .               XX1, YY1, ZZ1,
-     .               XX2, YY2, ZZ2,
-     .               XX3, YY3, ZZ3,
-     .               XX4, YY4, ZZ4,
-     .               XI1, YI1, ZI1,
-     .               XI2, YI2, ZI2,
-     .               XI3, YI3, ZI3,
-     .               XI4, YI4, ZI4,
-     .               XN1, YN1, ZN1,
-     .               XN2, YN2, ZN2,
-     .               XN3, YN3, ZN3,
-     .               XN4, YN4, ZN4,
-     .              AREA)
+        CALL I8COR3(
+     1   X,                INTBUF_TAB%IRECTM,INTBUF_TAB%MSR,   NSV_A,
+     2   IRTL_A,           IX1,              IX2,              IX3,
+     3   IX4,              X1,               Y1,               Z1,
+     4   X2,               Y2,               Z2,               X3,
+     5   Y3,               Z3,               X4,               Y4,
+     6   Z4,               LFT,              LLT,              NFT)
+        CALL I8CST3(
+     1   X1,      Y1,      Z1,      X2,
+     2   Y2,      Z2,      X3,      Y3,
+     3   Z3,      X4,      Y4,      Z4,
+     4   XI_A,    YI_A,    ZI_A,    N1,
+     5   N2,      N3,      ANS,     SSC,
+     6   TTC,     FACE_A,  X0,      Y0,
+     7   Z0,      XX1,     YY1,     ZZ1,
+     8   XX2,     YY2,     ZZ2,     XX3,
+     9   YY3,     ZZ3,     XX4,     YY4,
+     A   ZZ4,     XI1,     YI1,     ZI1,
+     B   XI2,     YI2,     ZI2,     XI3,
+     C   YI3,     ZI3,     XI4,     YI4,
+     D   ZI4,     XN1,     YN1,     ZN1,
+     E   XN2,     YN2,     ZN2,     XN3,
+     F   YN3,     ZN3,     XN4,     YN4,
+     G   ZN4,     AREA,    LFT,     LLT)
 
-        CALL I8GAP3(GAP, THK,AREA, ALP)
-        CALL I8DIS3(IGIMP,NTY,DIST,
-     .              X1 ,Y1 ,Z1,
-     .              X2 ,Y2 ,Z2,
-     .              X3 ,Y3 ,Z3,
-     .              X4,Y4,Z4,
-     .              XI_A,YI_A,ZI_A,
-     .              XP,YP,ZP,
-     .              N1,N2,N3,
-     .               ANS, SSC, TTC,
-     .                H1,  H2,  H3,
-     .                H4,FACE_A, ALP )
+        CALL I8GAP3(
+     1   GAP,     THK,     AREA,    ALP,
+     2   LFT,     LLT)
+        CALL I8DIS3(
+     1   IGIMP,   NTY,     DIST,    X1,
+     2   Y1,      Z1,      X2,      Y2,
+     3   Z2,      X3,      Y3,      Z3,
+     4   X4,      Y4,      Z4,      XI_A,
+     5   YI_A,    ZI_A,    XP,      YP,
+     6   ZP,      N1,      N2,      N3,
+     7   ANS,     SSC,     TTC,     H1,
+     8   H2,      H3,      H4,      FACE_A,
+     9   ALP,     LFT,     LLT)
 
-        CALL I8FOR3(LFT  ,LLT	,NFT   ,A   ,
+        CALL I8FOR3(LFT  ,LLT  ,NFT   ,A   ,
      2          INTBUF_TAB%MSR,NSV_A,IRTL_A,INTBUF_TAB%STFM,
      .          INTBUF_TAB%NSV,NSV2, INTBUF_TAB%ILOCS, 
-     3          INTBUF_TAB%STFNS,IBC     ,ICODT	    ,FSAV      ,IGIMP  , 
-     4          X	     ,V       ,MS	    ,FRIC      ,NSN    ,
-     5          FSKYI	     ,ISKY    ,FCONT	    ,RCONTACT  ,IFORM  ,
+     3          INTBUF_TAB%STFNS,IBC     ,ICODT      ,FSAV      ,IGIMP  , 
+     4          X       ,V       ,MS      ,FRIC      ,NSN    ,
+     5          FSKYI       ,ISKY    ,FCONT      ,RCONTACT  ,IFORM  ,
      6          INTBUF_TAB%FTSAVX,INTBUF_TAB%FTSAVY,INTBUF_TAB%FTSAVZ,VISC ,FNOR   ,
-     7          DEPTH	     ,DIST	   ,INTBUF_TAB%GAPN,INTBUF_TAB%STF8,
-     8          STIFN	     ,FNCONT	   ,FTCONT	 ,ITAB,   IFT0,
+     7          DEPTH       ,DIST     ,INTBUF_TAB%GAPN,INTBUF_TAB%STF8,
+     8          STIFN       ,FNCONT     ,FTCONT   ,ITAB,   IFT0,
      9          IX1     ,IX2       ,IX3      ,IX4, 
      A          XI_A    ,YI_A      ,ZI_A,
      B          N1    ,N2      ,N3,

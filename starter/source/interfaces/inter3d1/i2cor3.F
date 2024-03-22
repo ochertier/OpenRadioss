@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -98,16 +98,6 @@ C     REAL
      .     THKSECND,THKMAIN,DD,DX1,DY1,DZ1,DX3,DY3,DZ3,VOL,AREA,GAPMIN,GAPMAX
 C-----------------------------------------------
 C
-!      EQUIVALENCE (IX1,IV(1,1)) ,(IX2,IV(1,2)) ,(IX3,IV(1,3))
-!      EQUIVALENCE (IX4,IV(1,4)) ,(NSVG,IV(1,5))
-C
-!      EQUIVALENCE (X1,BV(1,1)) ,(Y1,BV(1,2)) ,(Z1,BV(1,3))
-!      EQUIVALENCE (X2,BV(1,4)) ,(Y2,BV(1,5)) ,(Z2,BV(1,6))
-!      EQUIVALENCE (X3,BV(1,7)) ,(Y3,BV(1,8)) ,(Z3,BV(1,9))
-!      EQUIVALENCE (X4,BV(1,10)),(Y4,BV(1,11)),(Z4,BV(1,12))
-!      EQUIVALENCE (XI,BV(1,13)),(YI,BV(1,14)),(ZI,BV(1,15))
-!      EQUIVALENCE (STIF,BV(1,30))
-C
       DO I=LFT,LLT
        IG = NSV(CAND_N(I))
        NSVG(I) = IG
@@ -136,27 +126,27 @@ C
           DO IAD = KNOD2ELC(NSVG(I))+1,KNOD2ELC(NSVG(I)+1)
             IEL  = NOD2ELC(IAD)
             MG=IXC(6,IEL)
-	    IP = IPARTC(IEL)
+              IP = IPARTC(IEL)
             IF ( THK_PART(IP) /= ZERO) THEN  
               THKSECND = THK_PART(IP)
-	    ELSEIF ( THK(IEL) /= ZERO) THEN
-	      THKSECND = THK(IEL)
-	    ELSE
+              ELSEIF ( THK(IEL) /= ZERO) THEN
+                THKSECND = THK(IEL)
+              ELSE
               THKSECND = GEO(1,MG)
-	    ENDIF
+              ENDIF
           ENDDO 
 C--         Cooques 3n
           DO IAD = KNOD2ELTG(NSVG(I))+1,KNOD2ELTG(NSVG(I)+1)
             IEL  = NOD2ELTG(IAD) 
             MG=IXTG(5,IEL)
-	    IP = IPARTTG(IEL)
+              IP = IPARTTG(IEL)
             IF ( THK_PART(IP) /= ZERO) THEN  
               THKSECND = THK_PART(IP)
-	    ELSEIF ( THK(NUMELC+IEL) /= ZERO) THEN
-	      THKSECND = THK(NUMELC+IEL)
-	    ELSE
+              ELSEIF ( THK(NUMELC+IEL) /= ZERO) THEN
+                THKSECND = THK(NUMELC+IEL)
+              ELSE
               THKSECND = GEO(1,MG)
-	    ENDIF
+              ENDIF
           ENDDO
           NELS = 0
           NELC = 0
@@ -170,24 +160,24 @@ C--         Cooques 3n
      .            PM_STACK , IWORKSH )
           IF(NELTG/=0) THEN
             MG=IXTG(5,NELTG)
-	    IP = IPARTTG(NELTG) 
+              IP = IPARTTG(NELTG) 
             IF ( THK_PART(IP) /= ZERO) THEN  
               THKMAIN = THK_PART(IP)
-	    ELSEIF ( THK(NUMELC+NELTG) /= ZERO) THEN
+              ELSEIF ( THK(NUMELC+NELTG) /= ZERO) THEN
               THKMAIN = THK(NUMELC+NELTG)
-	    ELSE
+              ELSE
               THKMAIN = GEO(1,MG)
-	    ENDIF
+              ENDIF
           ELSEIF(NELC/=0) THEN
             MG=IXC(6,NELC)
-	    IP = IPARTC(NELC) 
+              IP = IPARTC(NELC) 
             IF ( THK_PART(IP) /= ZERO) THEN  
               THKMAIN = THK_PART(IP)
-	    ELSEIF ( THK(NELC) /= ZERO) THEN
+              ELSEIF ( THK(NELC) /= ZERO) THEN
               THKMAIN = THK(NELC)
-	    ELSE
+              ELSE
               THKMAIN = GEO(1,MG)
-	    ENDIF
+              ENDIF
           ELSEIF(NELS/=0 .AND. NELS <= NUMELS8 .AND. IGNORE == 2) THEN
             DO JJ=1,8
               JJJ=IXS(JJ+1,NELS)

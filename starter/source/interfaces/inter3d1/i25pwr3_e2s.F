@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -39,15 +39,10 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr03_c.inc"
 #include      "scr17_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -79,15 +74,15 @@ C-----------------------------------------------
 C            True initial penetration
              IWPENE=IWPENE+1
              IF(IPRI>=5)
-     .    	 CALL ANCMSG(MSGID=1631,
-     .    			 MSGTYPE=MSGWARNING,
-     .    			 ANMODE=ANINFO_BLIND_1,
-     .    			 I1=ITAB(N1(I)),
-     .    			 I2=ITAB(N2(I)),
-     .    			 I3=ITAB(M1(EJ,I)),
-     .    			 I4=ITAB(M2(EJ,I)),
-     .    			 R1=PENE(EJ,I),
-     .    			 PRMOD=MSG_CUMU)
+     .       CALL ANCMSG(MSGID=1631,
+     .           MSGTYPE=MSGWARNING,
+     .           ANMODE=ANINFO_BLIND_1,
+     .           I1=ITAB(N1(I)),
+     .           I2=ITAB(N2(I)),
+     .           I3=ITAB(M1(EJ,I)),
+     .           I4=ITAB(M2(EJ,I)),
+     .           R1=PENE(EJ,I),
+     .           PRMOD=MSG_CUMU)
              IF(INACTI==0)THEN
 C              Ignore initial penetrations
 C            ELSEIF(INACTI==1) THEN

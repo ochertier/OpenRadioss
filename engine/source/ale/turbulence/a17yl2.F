@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,22 +26,19 @@ Chd|-- called by -----------
 Chd|        ATUR17                        source/ale/turbulence/atur17.F
 Chd|-- calls ---------------
 Chd|====================================================================
-      SUBROUTINE A17YL2(DELTAX, YL, AIRE)
+      SUBROUTINE A17YL2(
+     1   DELTAX,  YL,      AIRE,    NEL)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "vect01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: NEL
       my_real DELTAX(*), YL(*), AIRE(*)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -51,7 +48,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------
-      DO I=LFT,LLT
+      DO I=1,NEL
         R = DELTAX(I)**2/AIRE(I)
         A = MAX(ZERO,FOURTH-R**2)
         A = MAX(ZERO,HALF-SQRT(A))

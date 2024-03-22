@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,37 +27,31 @@ Chd|        SORTIE_MAIN                   source/output/sortie_main.F
 Chd|-- calls ---------------
 Chd|        ENG_QAPRINT_ANIMINPUT         source/output/qaprint/eng_qaprint_animinput.F
 Chd|        ENG_QAPRINT_DTINPUT           source/output/qaprint/eng_qaprint_dtinput.F
+Chd|        DT_MOD                        share/modules/dt_mod.F        
+Chd|        OUTPUT_MOD                    ../common_source/modules/output/output_mod.F
+Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
 Chd|====================================================================
-      SUBROUTINE ENG_QAPRINT_DRIVER(IRUNN_BIS)
+      SUBROUTINE ENG_QAPRINT_DRIVER(IRUNN_BIS ,SENSORS,DT,OUTPUT,IPARIT)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE QA_OUT_MOD
+      USE SENSOR_MOD
+      USE DT_MOD
+      USE OUTPUT_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "com01_c.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-c#include      "com01_c.inc"
-c#include      "com06_c.inc"
-c#include      "com08_c.inc"
-c#include      "scr02_c.inc"
-c#include      "scr11_c.inc"
-c#include      "task_c.inc"
-c#include      "units_c.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IRUNN_BIS
-C-----------------------------------------------
-C   L o c a l   V a r i a b l e s
-C-----------------------------------------------
-C-----------------------------------------------
-C   E x t e r n a l   F u n c t i o n s
-C-----------------------------------------------
+      TYPE (SENSORS_) ,INTENT(IN) :: SENSORS
+      TYPE (DT_)  , INTENT(INOUT) :: DT
+      TYPE(OUTPUT_), INTENT(INOUT) :: OUTPUT !< output structure
+      INTEGER,INTENT(IN)::  IPARIT
 C=======================================================================
 
       ! doqa is set in QA_OUT_MOD depending on DO_QA env variable setting
@@ -65,11 +59,11 @@ C=======================================================================
       IF ( doqa /= 1  ) RETURN
 
       IF(NCYCLE == 0) THEN ! ECRITURE QAPRINT AU CYCLE 0 ENGINE
-        CALL ENG_QAPRINT_GENERALCONTROLSINPUT(IRUNN_BIS)
+        CALL ENG_QAPRINT_GENERALCONTROLSINPUT(IRUNN_BIS,OUTPUT,IPARIT,SENSORS)
 
-        CALL ENG_QAPRINT_DTINPUT()
+        CALL ENG_QAPRINT_DTINPUT(DT)
 
-        CALL ENG_QAPRINT_ANIMINPUT()
+        CALL ENG_QAPRINT_ANIMINPUT(SENSORS)
       ENDIF
 C-----------------------------------------------------------------------
       RETURN

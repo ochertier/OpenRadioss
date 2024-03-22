@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -39,10 +39,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "scr17_c.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NIX,NIX1,NIX2,IELTYP,NSEG,IAD_SURF,OPT_O
@@ -57,10 +53,12 @@ C-----------------------------------------------
       DATA INV3/3,2,1/
 C=======================================================================
 !     ! SURF segments
+      NELEM = 0
       IF (IELTYP == 3) NELEM = CLAUSE%NB_SH4N
       IF (IELTYP == 7) NELEM = CLAUSE%NB_SH3N
 !
       DO J=1,NELEM
+        JJ = -HUGE(JJ)
         IF(IELTYP==3) JJ = CLAUSE%SH4N(J)
         IF(IELTYP==7) JJ = CLAUSE%SH3N(J)
 !

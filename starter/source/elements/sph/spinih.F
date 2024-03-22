@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -60,12 +60,25 @@ C-----------------------------------------------
         IMAT=IPART(1,IPRT)
         I0  =IPART(2,IPRT)
         DIST=GET_U_GEO(6,I0)
-        IF(DIST==ZERO) THEN
-          MP	=GET_U_GEO(1,I0)
+        IF (NINT(SPBUF(13,N))==1) THEN
+C--       type = 1 - particle with mass input   
+          MP  = SPBUF(12,N)
           RHO=PM(1,IMAT)
           VOL=MP/RHO
-          DIST=(SQ2*VOL)**THIRD
-        END IF
+          DIST=(SQ2*VOL)**THIRD    
+        ELSEIF (NINT(SPBUF(13,N))==2) THEN
+C--       type = 2 - particle with volume input          
+          VOL=SPBUF(12,N)
+          DIST=(SQ2*VOL)**THIRD             
+        ELSE           
+C--       type = 0 - particle without mass/vol input            
+          IF(DIST==ZERO) THEN
+            MP  =GET_U_GEO(1,I0)
+            RHO=PM(1,IMAT)
+            VOL=MP/RHO
+            DIST=(SQ2*VOL)**THIRD     
+          END IF
+        ENDIF  
         SPBUF(1,N)=DIST
       END DO
 C

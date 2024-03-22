@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -37,18 +37,12 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
 #include      "scr17_c.inc"
 #include      "tabsiz_c.inc"
-#include      "thermal_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -96,7 +90,6 @@ C
         END DO 
       END IF
 C-----------------------------------------------
-C-----------------------------------------------
 C     /GAUGE
 C-----------------------------------------------
       IF (MYQAKEY('/GAUGE')) THEN
@@ -104,10 +97,12 @@ C
        IF (NBGAUGE > 0) THEN 
         DO II = 1, NBGAUGE
           TITR(1:nchartitle)=''
+          ID = NOM_OPT(1, INOM_OPT(27) + II)
+          CALL FRETITL2(TITR, NOM_OPT(LNOPT1-LTITR+1, INOM_OPT(27) + II), LTITR)
           IF(LEN_TRIM(TITR)/=0)THEN
-            CALL QAPRINT(TITR(1:LEN_TRIM(TITR)),II,0.0_8)
+            CALL QAPRINT(TITR(1:LEN_TRIM(TITR)),ID,0.0_8)
           ELSE
-            CALL QAPRINT('A_GAUGE_FAKE_NAME', II,0.0_8)
+            CALL QAPRINT('A_GAUGE_FAKE_NAME', ID,0.0_8)
           END IF     
           DO I = 1, 3
            IF(LGAUGE(I,II) /=0)THEN

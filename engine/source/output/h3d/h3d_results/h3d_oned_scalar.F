@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,7 +26,7 @@ Chd|-- called by -----------
 Chd|        GENH3D                        source/output/h3d/h3d_results/genh3d.F
 Chd|-- calls ---------------
 Chd|        H3D_WRITE_SCALAR              source/output/h3d/h3d_results/h3d_write_scalar.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE H3D_ONED_SCALAR(
      .                  ELBUF_TAB      , IFUNC   , IPARG    , GEO   , IXT     ,
@@ -38,25 +38,19 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE ELBUFDEF_MOD
+      USE NAMES_AND_TITLES_MOD, ONLY: NCHARLINE100
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "chara_c.inc"
-#include      "nchara_c.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr05_c.inc"
 #include      "scr14_c.inc"
-#include      "scr23_c.inc"
 #include      "param_c.inc"
-#include      "rnur_c.inc"
-#include      "task_c.inc"
-#include      "spmd_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -72,7 +66,7 @@ C     REAL
       INTEGER BUF,INFO1,INFO2
 C
       TYPE (ELBUF_STRUCT_), DIMENSION(NGROUP), TARGET :: ELBUF_TAB
-      CHARACTER*ncharline KEYWORD
+      CHARACTER(LEN=NCHARLINE100) :: KEYWORD
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -80,12 +74,12 @@ C     REAL
       my_real
      .   EVAR(MVSIZ), MASS(MVSIZ) ,
      .   OFF, P, VONM2, VONM, S1, S2, S12, S3, VALUE(MVSIZ),
-     .   A1,B1,B2,B3,YEQ,F1,M1,M2,M3, XM,     
+     .   A1,B1,B2,B3,YEQ,F1,M1,M2,M3, XM, DAMMX, VOL,   
      .   FOR, AREA, FEQ, EPLAS, RHO0, A0, XX1, YY1, ZZ1, AL0,EFRAC
       INTEGER I, II, NG, NEL, NFT, IAD, ITY, LFT, NPT, ISS, ISC,
      .        IADD, N, J, LLT, MLW, NB1, NB2, NB3, NB4, NB5, 
      .        NB6, NB7, NB8, NB9, NB10, NB11, NB12, NB13, NB14, NB15,
-     .        NB16, LLL,NUVAR,IGTYP,
+     .        NB16, LLL,NUVAR,IGTYP,IFAIL,
      .        ISTRAIN,NN, K1, K2,JTURB,MT,JALE, IMID, IALEL,IPID,
      .        NN1,NN2,NN3,NN4,NN5,NN6,NN7,NN8,NN9,NN10,NF,
      .        OFFSET,K,INC,KK,IHBE,ISROT,ILAYER,IR,IS,JJ(6),IOK_PART(MVSIZ),
@@ -111,6 +105,7 @@ C
         NEL   =IPARG(2,NG)
         ITY   =IPARG(5,NG)
         IGTYP =IPARG(38,NG)
+        IFAIL =IPARG(43,NG)
 C---
         GBUF => ELBUF_TAB(NG)%GBUF
 C---
@@ -123,7 +118,7 @@ C---
         DO I=1,NEL
           VALUE(I) = ZERO
           IS_WRITTEN_VALUE(I) = 0
-        ENDDO	 
+        ENDDO   
 c
         IF (ITY == 4) OFFSET = 0
         IF (ITY == 5) OFFSET = NUMELT
@@ -153,60 +148,60 @@ c
 C-----------------------------------------------
 C Mass computation
 C-----------------------------------------------
-            IF (KEYWORD == 'MASS') THEN
+        IF (KEYWORD == 'MASS') THEN
 C-----------------------------------------------
 C       TRUSS
 C-----------------------------------------------
-   	      IF (ITY == 4) THEN
-   	        DO I=1,NEL
-   	          N = I + NFT
-   	          RHO0 = PM(1,IXT(1,N))
-   	          A0 = GEO(1,IXT(4,N))
-   	          N1 = IXT(2,N)
-   	          N2 = IXT(3,N)
-   	          XX1 = X(1,N2)-D(1,N2)-X(1,N1)+D(1,N1)
-   	          YY1 = X(2,N2)-D(2,N2)-X(2,N1)+D(2,N1)
-   	          ZZ1 = X(3,N2)-D(3,N2)-X(3,N1)+D(3,N1)
-   	          AL0  = HALF*SQRT(XX1*XX1 + YY1*YY1 + ZZ1*ZZ1)
-   	          MASS(I) = RHO0*AL0*A0
-   	        ENDDO
+                IF (ITY == 4) THEN
+                  DO I=1,NEL
+                    N = I + NFT
+                    RHO0 = PM(1,IXT(1,N))
+                    A0 = GEO(1,IXT(4,N))
+                    N1 = IXT(2,N)
+                    N2 = IXT(3,N)
+                    XX1 = X(1,N2)-D(1,N2)-X(1,N1)+D(1,N1)
+                    YY1 = X(2,N2)-D(2,N2)-X(2,N1)+D(2,N1)
+                    ZZ1 = X(3,N2)-D(3,N2)-X(3,N1)+D(3,N1)
+                    AL0  = HALF*SQRT(XX1*XX1 + YY1*YY1 + ZZ1*ZZ1)
+                    MASS(I) = RHO0*AL0*A0
+                  ENDDO
 C-----------------------------------------------
 C       POUTRES
 C-----------------------------------------------
-  	      ELSEIF (ITY == 5) THEN
-  	        DO I=1,NEL
-  	          N = I + NFT
-  	          RHO0 = PM(1,IXP(1,N))
-  	          A0 = GEO(1,IXP(5,N))
-  	          N1 = IXP(2,N)
-  	          N2 = IXP(3,N)
-  	          XX1 = X(1,N2)-D(1,N2)-X(1,N1)+D(1,N1)
-  	          YY1 = X(2,N2)-D(2,N2)-X(2,N1)+D(2,N1)
-  	          ZZ1 = X(3,N2)-D(3,N2)-X(3,N1)+D(3,N1)
-  	          AL0  = HALF*SQRT(XX1*XX1 + YY1*YY1 + ZZ1*ZZ1)
-  	          MASS(I) = RHO0*AL0*A0
-  	        ENDDO
+                ELSEIF (ITY == 5) THEN
+                  DO I=1,NEL
+                    N = I + NFT
+                    RHO0 = PM(1,IXP(1,N))
+                    A0 = GEO(1,IXP(5,N))
+                    N1 = IXP(2,N)
+                    N2 = IXP(3,N)
+                    XX1 = X(1,N2)-D(1,N2)-X(1,N1)+D(1,N1)
+                    YY1 = X(2,N2)-D(2,N2)-X(2,N1)+D(2,N1)
+                    ZZ1 = X(3,N2)-D(3,N2)-X(3,N1)+D(3,N1)
+                    AL0  = HALF*SQRT(XX1*XX1 + YY1*YY1 + ZZ1*ZZ1)
+                    MASS(I) = RHO0*AL0*A0
+                  ENDDO
 C-----------------------------------------------
 C       RESSORTS
 C-----------------------------------------------
-  	      ELSEIF (ITY == 6) THEN
-  	        IF(MLW==3)THEN
-  	          DO I=1,NEL
-  	            N = I + NFT
-  	            MASS(I) = HALF*GEO(1,IXR(1,N))
-  	          ENDDO
-  	        ELSEIF (MLW == 5) THEN
-  	          DO I=1,NEL
-  	            N = I + NFT
-  	            MASS(I) = GBUF%MASS(I)
-  	          ENDDO
-  	        ELSE
-  	          DO I=1,NEL
-  	            N = I + NFT
-  	            MASS(I) = GEO(1,IXR(1,N))
-  	          ENDDO
-  	        ENDIF ! IF(MLW)
-  	      ENDIF ! IF (ITY)
+                ELSEIF (ITY == 6) THEN
+                  IF(MLW==3)THEN
+                    DO I=1,NEL
+                      N = I + NFT
+                      MASS(I) = HALF*GEO(1,IXR(1,N))
+                    ENDDO
+                  ELSEIF (MLW == 5) THEN
+                    DO I=1,NEL
+                      N = I + NFT
+                      MASS(I) = GBUF%MASS(I)
+                    ENDDO
+                  ELSE
+                    DO I=1,NEL
+                      N = I + NFT
+                      MASS(I) = GEO(1,IXR(1,N))
+                    ENDDO
+                  ENDIF ! IF(MLW)
+                ENDIF ! IF (ITY)
             ENDIF
 C-----------
 !
@@ -372,6 +367,16 @@ ca mass a recalculer !!        VALUE(I) = (GBUF%EINT(I) + GBUF%EINT(I)) / MAX(EM
            
             ENDDO
 C--------------------------------------------------
+          ELSEIF(KEYWORD == 'EINTV')THEN
+C--------------------------------------------------
+            DO I=1,NEL
+              N  = I + NFT
+              IPID = IXP(5,N)
+              VOL = GEO(1,IPID)*GBUF%LENGTH(I)
+              VALUE(I) = (GBUF%EINT(I)+GBUF%EINT(I+NEL))/MAX(VOL,EM20)
+              IS_WRITTEN_VALUE(I) = 1             
+            ENDDO              
+C--------------------------------------------------
           ELSEIF(KEYWORD == 'VONM')THEN
 C--------------------------------------------------
             DO I=1,NEL  
@@ -504,7 +509,6 @@ C--------------------------------------------------
               VALUE(I) = GBUF%MAXFRAC(I)
               IS_WRITTEN_VALUE(I) = 1
             ENDDO
-            
 C--------------------------------------------------
           ELSEIF(KEYWORD == 'GROUP')THEN 
 C-------------------------------------------------- 
@@ -525,8 +529,33 @@ C--------------------------------------------------
             DO I=1,NEL
               VALUE(I) = I
               IS_WRITTEN_VALUE(I) = 1  
-            ENDDO              
-
+            ENDDO   
+C--------------------------------------------------
+          ELSEIF(KEYWORD == 'EPSD')THEN  
+C--------------------------------------------------                     
+            DO I=1,NEL
+              VALUE(I) = GBUF%EPSD(I)
+              IS_WRITTEN_VALUE(I) = 1
+            ENDDO          
+C--------------------------------------------------
+          ELSEIF (KEYWORD == 'DAMA' .and. IFAIL > 0) THEN  
+C--------------------------------------------------
+            IF (IGTYP == 3) THEN
+              DO I=1,NEL
+                VALUE(I) = GBUF%FAIL(1)%DAMMX(I)
+                IS_WRITTEN_VALUE(I) = 1
+              ENDDO
+            ELSE IF (IGTYP == 18) THEN
+              DO I=1,NEL
+                DAMMX  = ZERO
+                DO K = 1,ELBUF_TAB(NG)%BUFLY(1)%NPTT
+                  DAMMX = MAX(DAMMX ,ELBUF_TAB(NG)%BUFLY(1)%FAIL(1,1,K)%FLOC(1)%DAMMX(I))
+                ENDDO
+                VALUE(I) = DAMMX
+                IS_WRITTEN_VALUE(I) = 1
+              ENDDO
+            ENDIF
+c           
           ENDIF
 C-----------------------------------------------
 C       RESSORTS
@@ -661,7 +690,7 @@ C--------------------------------------------------
         
         IF (ITY == 4 .OR. ITY == 5 .OR. ITY == 6)
      .    CALL H3D_WRITE_SCALAR(IOK_PART,IS_WRITTEN_ONED,ONED_SCALAR,NEL,OFFSET,NFT,
-     .   		        VALUE,IS_WRITTEN_VALUE)
+     .               VALUE,IS_WRITTEN_VALUE)
       ENDDO ! DO NG=1,NGROUP
  
       RETURN

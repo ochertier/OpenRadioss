@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -32,7 +32,7 @@ Chd|        FINTER                        source/tools/curve/finter.F
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
 Chd|====================================================================
       SUBROUTINE FIXFLUX (IBFFLUX ,FBFFLUX ,NPC   ,TF  ,X  ,IXS,
-     1                    SENSOR_TAB,FTHE  ,IAD ,FTHESKY)
+     1                    NSENSOR ,SENSOR_TAB,FTHE  ,IAD ,FTHESKY)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------  
@@ -46,10 +46,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
-#include      "scr05_c.inc"
 #include      "parit_c.inc"
 #include      "thermal_c.inc"
 #include      "scr_thermal_c.inc"
@@ -57,6 +55,7 @@ C-----------------------------------------------
 C-----------------------------------------------,
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER ,INTENT(IN) :: NSENSOR
       INTEGER NPC(*),IAD(4,*)
       INTEGER IBFFLUX(NITFLUX,*),IXS(NIXS,*)
 C     REAL
@@ -117,7 +116,7 @@ C
             ELSE
                DT1N = DT1A
             ENDIF
-         ENDIF		 
+         ENDIF     
 C
          IFUNC = IBFFLUX(5,NL)
          FCY = FBFFLUX(1,NL)
@@ -172,7 +171,7 @@ C
            FTHE(N1) = FTHE(N1) + FLUX
            FTHE(N2) = FTHE(N2) + FLUX
            FTHE(N3) = FTHE(N3) + FLUX
-C		   
+C       
           ELSE !ANALYSE 2D
            NY=  -X(3,N2)+X(3,N1)
            NZ=   X(2,N2)-X(2,N1)
@@ -203,8 +202,8 @@ C----------------------------
            N6  = IXS(7,IEL)
            N7  = IXS(8,IEL)
            N8  = IXS(9,IEL)
-		   
-           IF(N1 == N2 .AND. N3 == N4 .AND. N5 == N8 .AND. N6 == N7) THEN		   
+             
+           IF(N1 == N2 .AND. N3 == N4 .AND. N5 == N8 .AND. N6 == N7) THEN       
              CALL S4VOLUME(X, VOLG, 1, N1, N3, N6, N5)
            ELSE  
              CALL S8EVOLUME(X, VOLG, BID, 1, 0, 0, 0, N1, N2, N3, N4, N5, N6, N7, N8)
@@ -343,7 +342,11 @@ C
 C----------------------------
 C       IMPOSED VOLUMIC FLUX
 C----------------------------
-             WRITE(IOUT,'(//A)') ' VOLUMIC HEAT FLUX IS NOT COMPATIBLE WITH /PARITH/ON : USE /PARITH/OFF'
+             WRITE(IOUT,'(//A)') ' VOLUMIC HEAT FLUX IS NOT 
+     . COMPATIBLE WITH /PARITH/ON: USE /PARITH/OFF'
+             WRITE(6,*) ' VOLUMIC HEAT FLUX IS NOT ',
+     .                   'COMPATIBLE WITH /PARITH/ON: USE /PARITH/OFF'
+             CALL FLUSH(6)
              CALL ARRET(2)
            ENDIF
         ENDDO       

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,10 +26,14 @@ Chd|-- called by -----------
 Chd|        GRAY20                        source/materials/mat/mat016/gray20.F
 Chd|-- calls ---------------
 Chd|====================================================================
-      SUBROUTINE GRAY21(PM,RHO,TEMP,XIST,MAT,RHO0,DSP,ALP,PCR,P1,EGG,
-     .     XIST0, XLAM, EM0, EM1, EM2,
-     .     ESPE, GEAX, G0AX, TM,
-     .     DELT, RP3, X, GP)
+      SUBROUTINE GRAY21(
+     1   PM,      RHO,     TEMP,    XIST,
+     2   MAT,     RHO0,    DSP,     ALP,
+     3   PCR,     P1,      EGG,     XIST0,
+     4   XLAM,    EM0,     EM1,     EM2,
+     5   ESPE,    GEAX,    G0AX,    TM,
+     6   DELT,    RP3,     X,       GP,
+     7   NEL)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -41,11 +45,11 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "vect01_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: NEL
       my_real
      .     PM(NPROPM,*), RHO(*), TEMP(*), XIST(*), RHO0(*), DSP(*), ALP(*), PCR(*), P1(*),
      .     EGG(*), XIST0(*), XLAM(*), EM0(*), EM1(*), EM2(*),
@@ -62,7 +66,6 @@ C-----------------------------------------------
      .   C2, C3, D1, D2, D3, THET, APY, VB, Z, ZJ, TZ, TZJ, FE, A2, BB,
      .   CC, FP, V1, XM, UNMM2
 C-----------------------------------------------
-C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------
 
@@ -74,7 +77,7 @@ C-----------------------------------------------
       UNMM2 = -O88P9844 + TWO
       XM    = NINEP38
          
-      DO I=LFT,LLT
+      DO I=1,NEL
         MX           = MAT(I)
         VJ           = PM(56,MX)
         XJ           = ONE-RHO0(I)*VJ

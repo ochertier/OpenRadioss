@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,9 +25,9 @@ Chd|  M11VS3                        source/materials/mat/mat011/m11vs3.F
 Chd|-- called by -----------
 Chd|        M11LAW                        source/materials/mat/mat011/m11law.F
 Chd|-- calls ---------------
-Chd|        ALEFVM_MOD                    ../common_source/modules/alefvm_mod.F
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ALEFVM_MOD                    ../common_source/modules/ale/alefvm_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE M11VS3(PM    , IPARG, IXS  , ALE_CONNECT  , ELBUF_TAB  , V  ,
      2                  X     , DVP  , VN   , W      , VEL        , VD2,
@@ -56,15 +56,12 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
-#include      "scr05_c.inc"
 #include      "vect01_c.inc"
 #include      "param_c.inc"
-#include      "alefvm.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER IPARG(NPARG,*), IXS(NIXS,*), MAT(*),IALEFVM_FLG,
-     .        NEL
+      INTEGER IPARG(NPARG,*), IXS(NIXS,*), MAT(*),IALEFVM_FLG,NEL
       my_real ::
      . PM(NPROPM,*), V(3,*),X(3,*),DVP(*),VN(MVSIZ),W(3,*),
      . VEL(MVSIZ),VD2(MVSIZ),VDX(MVSIZ) , VDY(MVSIZ) , VDZ(MVSIZ), 
@@ -90,8 +87,8 @@ C-----------------------------------------------
 C-----------------------------------------------
       DATA ICF/1,4,3,2,3,4,8,7,5,6,7,8,1,2,6,5,2,3,7,6,1,5,8,4/
 C-----------------------------------------------
-      MT = MAT(LFT)
-      DO I=LFT,LLT
+      MT = MAT(1)
+      DO I=1,NEL
         II=I+NFT
 !
         IAD2 = ALE_CONNECT%ee_connect%iad_connect(II)
@@ -149,7 +146,7 @@ C-----------------------------------------------
             ENDIF
             IF (JTHE>0) TV(I) = GBUF%TEMP(IS+1)
             !MOMENTUM
-            IF(IALEFVM==1)THEN
+            IF(ALEFVM_Param%IEnabled==1)THEN
             !USE INPUT VALUE, NOT THIS!
               IS       = IVOI-MFT
               MassV    = RHOV(I)*GBUF%VOL(IS)
@@ -158,7 +155,7 @@ C-----------------------------------------------
               VzV(I)   = GBUF%MOM(JJ(3) + IS)/MassV  
               XmomV(I) = GBUF%MOM(JJ(1) + IS)
               YmomV(I) = GBUF%MOM(JJ(2) + IS)
-              ZmomV(I) = GBUF%MOM(JJ(3) + IS)					
+              ZmomV(I) = GBUF%MOM(JJ(3) + IS)
             ENDIF
           ELSE
             !                                                        

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -30,7 +30,7 @@ Chd|        FXBODFP2                      source/constraints/fxbody/fxbodfp.F
 Chd|        SPMD_FXB_FOR                  source/mpi/kinematic_conditions/spmd_fxb_for.F
 Chd|        SPMD_FXB_FOR_PON              source/mpi/kinematic_conditions/spmd_fxb_for_pon.F
 Chd|        ANIM_MOD                      ../common_source/modules/anim_mod.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
 Chd|====================================================================
       SUBROUTINE FXBYFOR(FXBIPM, FXBRPM,  FXBNOD , FXBMOD  , FXBGLM ,
@@ -41,7 +41,7 @@ Chd|====================================================================
      .                   FSAV  , FXBFP ,  FXBEFW , FXBFC   , D      ,
      .                   DT2T  , ITYPTST, NELTST , FXBGRVI , FXBGRVR,
      .                   IGRV  , NPC    , TF     , FXBGRP  , FXBGRW ,
-     .                   IPARG , SENSOR_TAB, IAD_ELEM, FR_ELEM,
+     .                   IPARG , NSENSOR,SENSOR_TAB, IAD_ELEM, FR_ELEM,
      .                   AGRV  )
 C-----------------------------------------------
 C   M o d u l e s
@@ -58,10 +58,8 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com06_c.inc"
 #include      "com08_c.inc"
 #include      "scr03_c.inc"
-#include      "scr05_c.inc"
 #include      "scr07_c.inc"
 #include      "scr18_c.inc"
 #include      "param_c.inc"
@@ -71,6 +69,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER ,INTENT(IN) :: NSENSOR
       INTEGER FXBIPM(NBIPM,*), FXBNOD(*), FXBELM(*), ITYPTST, NELTST,
      .        FXBGRVI(*), IGRV(NIGRV,*), NPC(*), IPARG(NPARG,*),
      .        IAD_ELEM(2,*), FR_ELEM(*)
@@ -179,7 +178,7 @@ C
      .NME          ,NMOD        ,FXBMVN(ACP) ,FXBMCD(AMCD),FXBSE(ASE)  ,
      .FXBSV(ALM)   ,FSAV(1,NN2) ,FXBFP(AVAR) ,FXBEFW(NFX) ,FXBFC(ALM)  ,
      .FXBGRVI(AGRVI),FXBGRVR(AGRVR),NLGRAV   ,IGRV        ,NPC         ,
-     .TF           ,FXBGRP(AVAR),FXBGRW(NFX) ,SENSOR_TAB  ,
+     .TF           ,FXBGRP(AVAR),FXBGRW(NFX) ,SENSOR_TAB  ,NSENSOR     ,  
      .MFEXTP(AVAR) ,AGRV        )
          ENDIF
       ENDDO

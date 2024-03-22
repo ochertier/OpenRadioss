@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -70,17 +70,13 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "com06_c.inc"
 #include      "com08_c.inc"
-#include      "param_c.inc"
 #include      "scr05_c.inc"
 #include      "scr11_c.inc"
 #include      "sms_c.inc"
 #include      "scr18_c.inc"
 #include      "units_c.inc"
-#include      "couple_c.inc"
-#include      "scr07_c.inc"
 #include      "kincod_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -148,7 +144,6 @@ C-----------------------------------------------
       EXTERNAL FINTER
 C
 C-----------------------------------------------
-#include "sync_dir.inc"
       IF (IRESP==1) THEN
            PREC = FIVEEM4
       ELSE
@@ -428,7 +423,7 @@ C should be the current nodal surface instead of the initial one.
           XMU(I) = MAX(XMU(I),EM30)
         ENDDO
       ELSEIF(MFROT==2)THEN
-C---    Loi Darmstad
+C---    Darmstad LAW
         DO I=1,JLT
 C attention : normale <> normale a l'elt
           AA = NX(I)*VX(I) + NY(I)*VY(I) + NZ(I)*VZ(I)
@@ -447,7 +442,7 @@ C should be the current nodal surface instead of the initial one.
           XMU(I) = MAX(XMU(I),EM30)
         ENDDO
       ELSEIF (MFROT==3) THEN
-C---    Loi Renard
+C---    Renard LAW
         DO I=1,JLT
 C attention : normale <> normale a l'elt
           AA = NX(I)*VX(I) + NY(I)*VY(I) + NZ(I)*VZ(I)
@@ -469,6 +464,18 @@ C attention : normale <> normale a l'elt
             XMU(I) = FROT_P(2) - DMU / (ONE + DMU*VV2)
           ENDIF
           XMU(I) = MAX(XMU(I),EM30)
+        ENDDO
+      ELSEIF(MFROT==4)THEN
+C---        Exponential decay model
+        DO I=1,JLT
+          AA = NX(I)*VX(I) + NY(I)*VY(I) + NZ(I)*VZ(I)
+          V2 = (VX(I) - NX(I)*AA)**2 
+     .       + (VY(I) - NY(I)*AA)**2 
+     .       + (VZ(I) - NZ(I)*AA)**2
+           VV = SQRT(MAX(EM30,V2))
+           XMU(I) = FRIC
+     .            + (FROT_P(1)-FRIC)*EXP(-FROT_P(2)*VV)
+           XMU(I) = MAX(XMU(I),EM30)
         ENDDO
       ENDIF
 C------------------

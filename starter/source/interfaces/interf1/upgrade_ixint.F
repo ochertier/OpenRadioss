@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,13 +27,13 @@ Chd|        I20INI3                       source/interfaces/inter3d1/i20ini3.F
 Chd|        ININT3                        source/interfaces/inter3d1/inint3.F
 Chd|        LECTUR                        source/starter/lectur.F       
 Chd|-- calls ---------------
-Chd|        IXINTMOD                      share/modules1/restart_mod.F  
+Chd|        INTER_CAND_MOD                share/modules1/inter_cand_mod.F
 Chd|====================================================================
-      SUBROUTINE UPGRADE_IXINT(SIXINT,NELEMINT,NEW_SIZE)
+        SUBROUTINE UPGRADE_IXINT(INTER_CAND,NELEMINT,NEW_SIZE)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
-      USE IXINTMOD
+        USE INTER_CAND_MOD
 C-------------------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -41,18 +41,24 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER SIXINT,NELEMINT,NEW_SIZE
+        INTEGER, INTENT(in) :: NELEMINT !< number of pair of candidate
+        INTEGER, INTENT(in) :: NEW_SIZE !< number of pair of candidate for the current interface
+        TYPE(INTER_CAND_), INTENT(inout) :: INTER_CAND !< struture of pair of candidate
+C-----------------------------------------------
+C   L o c a l   V a r i a b l e s
+C-----------------------------------------------
+        INTEGER, DIMENSION(:,:), ALLOCATABLE :: TEMP
+C-----------------------------------------------
+        ALLOCATE(TEMP(INTER_CAND%S_IXINT_1,NELEMINT))
+        TEMP(1:INTER_CAND%S_IXINT_1,1:NELEMINT) = INTER_CAND%IXINT(1:INTER_CAND%S_IXINT_1,1:NELEMINT)
+        DEALLOCATE(INTER_CAND%IXINT)
 
-      INTEGER, DIMENSION(:), ALLOCATABLE :: TEMP
+        INTER_CAND%S_IXINT_2 = NELEMINT+NEW_SIZE
+        ALLOCATE(INTER_CAND%IXINT(INTER_CAND%S_IXINT_1,INTER_CAND%S_IXINT_2))
+        INTER_CAND%IXINT(1:INTER_CAND%S_IXINT_1,1:NELEMINT)=TEMP(1:INTER_CAND%S_IXINT_1,1:NELEMINT)
 
-      ALLOCATE(TEMP(NELEMINT*6))
-      TEMP(1:6*NELEMINT)=IXINT(1:6*NELEMINT)
-      DEALLOCATE (IXINT)
+        DEALLOCATE(TEMP)
+        RETURN
 
-      SIXINT = (NELEMINT+NEW_SIZE)*6
-      ALLOCATE(IXINT(SIXINT))
-      IXINT(1:6*NELEMINT)=TEMP(1:6*NELEMINT)
-
-      DEALLOCATE(TEMP)
-      END
+        END SUBROUTINE UPGRADE_IXINT
 C

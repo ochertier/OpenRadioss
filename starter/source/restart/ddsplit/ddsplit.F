@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,15 +25,17 @@ Chd|  DDSPLIT                       source/restart/ddsplit/ddsplit.F
 Chd|-- called by -----------
 Chd|        LECTUR                        source/starter/lectur.F       
 Chd|-- calls ---------------
-Chd|        CLOSE_C                       source/output/tools/write_routines.c
+Chd|        CLOSE_C                       ../common_source/tools/input_output/write_routtines.c
 Chd|        COMPRESS_I_NNZ                ../common_source/comm/compress_nnz.F
 Chd|        COMPRESS_R_NNZ                ../common_source/comm/compress_nnz.F
-Chd|        CUR_FIL_C                     source/output/tools/write_routines.c
+Chd|        CUR_FIL_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|        C_BUFEL                       source/restart/ddsplit/c_bufel.F
 Chd|        C_CLUSTER                     source/restart/ddsplit/w_cluster.F
 Chd|        C_CRKADD                      source/restart/ddsplit/c_crkadd.F
 Chd|        C_CRKEDGE                     source/restart/ddsplit/c_crkedge.F
 Chd|        C_CRKXFEM                     source/restart/ddsplit/c_crkxfem.F
+Chd|        C_DAMPVREL                    source/restart/ddsplit/c_dampvrel.F
+Chd|        C_DRAPE                       source/restart/ddsplit/c_drape.F
 Chd|        C_EIG                         source/restart/ddsplit/c_eig.F
 Chd|        C_ELIG3D                      source/restart/ddsplit/c_elig3d.F
 Chd|        C_ELMX                        source/restart/ddsplit/c_elmx.F
@@ -62,7 +64,6 @@ Chd|        C_ILOADP                      source/restart/ddsplit/c_iloadp.F
 Chd|        C_IRADIA                      source/restart/ddsplit/c_iradia.F
 Chd|        C_IRBE2                       source/restart/ddsplit/c_irbe2.F
 Chd|        C_IRBE3                       source/restart/ddsplit/c_irbe3.F
-Chd|        C_ISHSUB                      source/restart/ddsplit/c_ishsub.F
 Chd|        C_ISLIN_STR                   source/restart/ddsplit/c_islin_str.F
 Chd|        C_ISPH                        source/restart/ddsplit/c_isph.F
 Chd|        C_ISURF_STR                   source/restart/ddsplit/c_isurf_str.F
@@ -75,6 +76,7 @@ Chd|        C_MAD                         source/restart/ddsplit/c_mad.F
 Chd|        C_MULTI_VEL                   source/restart/ddsplit/c_multi_vel.F
 Chd|        C_NCRKXFEM                    source/restart/ddsplit/c_ncrkxfem.F
 Chd|        C_NGROUP                      source/restart/ddsplit/c_ngroup.F
+Chd|        C_NLOADS                      source/restart/ddsplit/c_nloads.F
 Chd|        C_PON                         source/restart/ddsplit/c_pon.F
 Chd|        C_PORO                        source/restart/ddsplit/c_poro.F
 Chd|        C_PXFEM                       source/restart/ddsplit/c_pxfem.F
@@ -88,7 +90,7 @@ Chd|        C_SPMD_NE_CONNECT             source/ale/spmd_ne_connect.F
 Chd|        C_VOIS                        source/restart/ddsplit/c_vois.F
 Chd|        EIGWRESTP                     source/restart/ddsplit/wrrest.F
 Chd|        ELAPSTIME_OMP                 source/system/timer.F         
-Chd|        FILE_SIZE_C                   source/output/tools/write_routines.c
+Chd|        FILE_SIZE_C                   ../common_source/tools/input_output/write_routtines.c
 Chd|        FVWRESTP                      source/restart/ddsplit/fvwrestp.F
 Chd|        FXBWRESTP                     source/restart/ddsplit/wrrest.F
 Chd|        F_NODLOC2                     source/restart/ddsplit/f_nodloc2.F
@@ -100,28 +102,32 @@ Chd|        INTSTAMP_WRESTR               share/modules1/intstamp_mod.F
 Chd|        IPARI_L_INI                   source/restart/ddsplit/ipari_l_ini.F
 Chd|        M_FLOW                        source/restart/ddsplit/m_flow.F
 Chd|        NFWRESTP                      source/restart/ddsplit/wrrest.F
-Chd|        PBLAST_WRITE_STARTER          ../common_source/modules/pblast_mod.F
+Chd|        OPEN_C                        ../common_source/tools/input_output/write_routtines.c
+Chd|        PBLAST_WRITE_STARTER          ../common_source/modules/loads/pblast_mod.F
 Chd|        SETLENWA                      source/restart/ddsplit/setlenwa.F
 Chd|        SPLIT_EBCS                    source/boundary_conditions/ebcs/split_ebcs.F
 Chd|        SPLIT_INTERFACES              source/restart/ddsplit/split_interfaces.F
 Chd|        SPLIT_SKEW                    source/restart/ddsplit/split_skew.F
 Chd|        SPMD_NE_CONNECT               source/ale/spmd_ne_connect.F  
-Chd|        SPMD_USERWI_REST              source/user_interface/userwis_ini_spmd.F
+Chd|        SPMD_USERWI_REST              source/user_interface/user_windows_tools.F
 Chd|        STARTIME                      source/system/timer.F         
 Chd|        STOPTIME                      source/system/timer.F         
 Chd|        TABLE_WRESTI                  source/tools/curve/table_tools.F
 Chd|        TABLE_WRESTR                  source/tools/curve/table_tools.F
+Chd|        THSURF_WRITE_RESTART          ../common_source/modules/interfaces/th_surf_mod.F
 Chd|        WRCOMIP                       source/restart/ddsplit/wrcommp.F
 Chd|        WRCOMR                        source/restart/ddsplit/wrcomm.F
-Chd|        WRITE_C_C                     source/output/tools/write_routines.c
+Chd|        WRITE_C_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|        WRITE_DB                      source/restart/ddsplit/wrrest.F
 Chd|        WRITE_DPDB                    source/restart/ddsplit/wrrest.F
 Chd|        WRITE_ELGROUP_PARAM           source/restart/ddsplit/write_elgroup_param.F
-Chd|        WRITE_I_C                     source/output/tools/write_routines.c
+Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|        WRITE_JOINT                   source/constraints/general/cyl_joint/write_joint.F
 Chd|        WRITE_MATPARAM                source/materials/mat/write_matparam.F
 Chd|        WRITE_NLOC_STRUCT             source/restart/ddsplit/write_nloc_struct.F
-Chd|        WRITE_SENSOR_TAB              source/tools/sensor/write_sensor_tab.F
+Chd|        WRITE_PCYL                    source/loads/general/load_pcyl/write_pcyl.F
+Chd|        WRITE_SENSORS                 source/tools/sensor/write_sensors.F
+Chd|        WRITE_TH_BUFFER               source/restart/ddsplit/write_th_buffer.F
 Chd|        WRITE_UNITS                   ../common_source/comm/write_units.F
 Chd|        WRWEIGHT_RM                   source/restart/ddsplit/wrweight_rm.F
 Chd|        W_ALELAG                      source/restart/ddsplit/w_alelag.F
@@ -133,6 +139,8 @@ Chd|        W_BUFBRIC_22                  source/interfaces/inter3d1/w_bufbric_2
 Chd|        W_BUFEL                       source/restart/ddsplit/w_bufel.F
 Chd|        W_CLUSTER                     source/restart/ddsplit/w_cluster.F
 Chd|        W_CRKXFEM                     source/restart/ddsplit/w_crkxfem.F
+Chd|        W_DAMPVREL                    source/restart/ddsplit/w_dampvrel.F
+Chd|        W_DISP0_VEL0_CLOAD            source/restart/ddsplit/w_disp0_vel0_cload.F
 Chd|        W_DRAPE                       source/restart/ddsplit/w_drape.F
 Chd|        W_ELBUF_STR                   source/restart/ddsplit/w_elbuf_str.F
 Chd|        W_ELIG3D                      source/restart/ddsplit/w_elig3d.F
@@ -171,7 +179,6 @@ Chd|        W_IRADIA                      source/restart/ddsplit/w_iradia.F
 Chd|        W_IRBE2                       source/restart/ddsplit/w_irbe2.F
 Chd|        W_IRBE3                       source/restart/ddsplit/w_irbe3.F
 Chd|        W_IRIVET                      source/restart/ddsplit/w_irivet.F
-Chd|        W_ISHSUB                      source/restart/ddsplit/w_ishsub.F
 Chd|        W_ISKEWSP                     source/restart/ddsplit/w_iskewsp.F
 Chd|        W_ISKN                        source/restart/ddsplit/w_iskn.F
 Chd|        W_ISLIN_STR                   source/restart/ddsplit/w_islin_str.F
@@ -216,34 +223,38 @@ Chd|        W_SKWSUB                      source/restart/ddsplit/w_skwsub.F
 Chd|        W_STACK                       source/restart/ddsplit/w_stack.F
 Chd|        W_SUBSET_STR                  source/restart/ddsplit/w_subset_str.F
 Chd|        W_TABMAT_PROP                 source/restart/ddsplit/w_tabmat_prop.F
-Chd|        W_TH                          source/restart/ddsplit/w_th.F 
-Chd|        ALEFVM_MOD                    ../common_source/modules/alefvm_mod.F
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
-Chd|        ALE_EBCS_MOD                  ../common_source/modules/ale_ebcs_mod.F
+Chd|        W_TH_SURF_LOADP               source/restart/ddsplit/w_th_surf_loadp.F
+Chd|        W_TH_SURF_PLOAD               source/restart/ddsplit/w_th_surf_pload.F
+Chd|        ALEFVM_MOD                    ../common_source/modules/ale/alefvm_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
+Chd|        ALE_EBCS_MOD                  ../common_source/modules/ale/ale_ebcs_mod.F
+Chd|        ALE_MOD                       ../common_source/modules/ale/ale_mod.F
 Chd|        CLUSTER_MOD                   share/modules1/cluster_mod.F  
 Chd|        DRAPE_MOD                     share/modules1/drape_mod.F    
 Chd|        DSGRAPH_MOD                   share/modules1/dsgraph_mod.F  
-Chd|        EBCS_MOD                      ../common_source/modules/ebcs_mod.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        EBCS_MOD                      ../common_source/modules/boundary_conditions/ebcs_mod.F
 Chd|        FAILWAVE_MOD                  ../common_source/modules/failwave_mod.F
 Chd|        FRONT_MOD                     share/modules1/front_mod.F    
 Chd|        FVBAG_MOD                     share/modules1/fvbag_mod.F    
-Chd|        FVMBAG_MESHCONTROL_MOD        ../common_source/modules/fvmbag_meshcontrol_mod.F
+Chd|        FVMBAG_MESHCONTROL_MOD        ../common_source/modules/airbag/fvmbag_meshcontrol_mod.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        INOUTFILE_MOD                 ../common_source/modules/inoutfile_mod.F
-Chd|        INT8_MOD                      ../common_source/modules/int8_mod.F
+Chd|        INT8_MOD                      ../common_source/modules/interfaces/int8_mod.F
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
 Chd|        INTBUF_FRIC_MOD               share/modules1/intbuf_fric_mod.F
+Chd|        INTERFACES_MOD                ../common_source/modules/interfaces/interfaces_mod.F
 Chd|        INTSTAMP_MOD                  share/modules1/intstamp_mod.F 
 Chd|        JOINT_MOD                     share/modules1/joint_mod.F    
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/matparam_def_mod.F
+Chd|        LOADS_MOD                     ../common_source/modules/loads/loads_mod.F
+Chd|        MAT_ELEM_MOD                  ../common_source/modules/mat_elem/mat_elem_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        MID_PID_MOD                   share/modules1/mid_pid_mod.F  
 Chd|        MONVOL_STRUCT_MOD             share/modules1/monvol_struct_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|        NLOCAL_REG_MOD                ../common_source/modules/nlocal_reg_mod.F
 Chd|        OUTMAX_MOD                    ../common_source/modules/outmax_mod.F
-Chd|        PBLAST_MOD                    ../common_source/modules/pblast_mod.F
+Chd|        OUTPUT_MOD                    ../common_source/modules/output/output_mod.F
+Chd|        PBLAST_MOD                    ../common_source/modules/loads/pblast_mod.F
 Chd|        PINCHTYPE_MOD                 ../common_source/modules/pinchtype_mod.F
 Chd|        SEATBELT_MOD                  ../common_source/modules/seatbelt_mod.F
 Chd|        SENSOR_MOD                    share/modules1/sensor_mod.F   
@@ -251,15 +262,18 @@ Chd|        SKEW_MOD                      share/modules1/skew_mod.F
 Chd|        SPLIT_CFD_MOD                 share/modules1/split_cfd_mod.F
 Chd|        STACK_MOD                     share/modules1/stack_mod.F    
 Chd|        STACK_VAR_MOD                 share/modules1/stack_var_mod.F
+Chd|        STATE_MOD                     ../common_source/modules/state_mod.F
+Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|        TABLE_MOD                     share/modules1/table_mod.F    
+Chd|        USER_WINDOWS_MOD              ../common_source/modules/user_windows_mod.F
 Chd|        XFEM2DEF_MOD                  ../common_source/modules/xfem2def_mod.F
 Chd|====================================================================
       SUBROUTINE DDSPLIT(
-     1   P            ,CEP          ,CEL            ,IGEO         ,MATPARAM_TAB,
+     1   P            ,CEP          ,CEL           ,IGEO          ,MAT_ELEM    ,
      2   IPM          ,ICODE        ,ISKEW          ,ISKN         ,INSEL       ,
      3   IBCSLAG      ,IPART        ,IPARTS         ,IPARTQ       ,IPARTC      ,
-     4   IPARTT       ,IPARTP       ,IPARTR         ,IPARTUR      ,IPARTTG     ,
-     5   IPARTX       ,NPC          ,IXUR           ,IXTG         ,GROUP_PARAM_TAB,
+     4   IPARTT       ,IPARTP       ,IPARTR         ,IPARTTG     ,
+     5   IPARTX       ,NPC          ,IXTG           ,GROUP_PARAM_TAB,
      6   IXTG6        ,IXS          ,IXS10          ,IXS20        ,IXS16       ,
      7   IXQ          ,IXC          ,IXT            ,IXP          ,IXR         ,
      8   ITAB         ,ITABM1       ,GJBUFI         ,NALE         ,
@@ -270,7 +284,7 @@ Chd|====================================================================
      D   IACTIV       ,FACTIV       ,KINET          ,IPARI        ,NPRW        ,
      E   LPRW         ,IEXMAD       ,NPBY        ,
      F   LPBY         ,IXRI         ,NSTRF          ,LJOINT       ,PORNOD      ,
-     G   MONVOL       ,ICONTACT     ,LAGBUF         ,ITHGRP       ,ITHBUF      ,
+     G   MONVOL       ,ICONTACT     ,LAGBUF         ,
      H   FR_IAD       ,X            ,D              ,V            ,VR          ,
      I   DR           ,THKE         ,DAMPR          ,DAMP         ,MS          ,
      J   IN           ,TF           ,PM             ,SKEW         ,XFRAME      ,
@@ -278,27 +292,23 @@ Chd|====================================================================
      L   BRMPC        ,GJBUFR       ,W              ,VEUL         ,FILL        ,
      M   DFILL        ,WB           ,DSAV           ,ASAV         ,MSNF        ,
      N   SPBUF        ,FAC          ,VEL            ,FSAV         ,FZERO       ,
-     O   XLAS         ,ACCELM       ,FBVEL        ,GRAVFAC     ,
-     P   FR_WAVE      ,FAILWAVE     ,PARTS0         ,USERW        ,ELBUF       ,
+     O   XLAS         ,ACCELM       ,FBVEL          ,GRAVFAC      ,
+     P   FR_WAVE      ,FAILWAVE     ,PARTS0         ,ELBUF        ,
      Q   RWL          ,RWSAV        ,RBY            ,RIVET        ,
      R   SECBUF       ,RVOLU        ,RCONX          ,NLOC_DMG     ,
-     S   FVMAIN     ,LIBAGALE     ,LENTHG         ,LBUFMAT      ,LBUFGEO     ,
+     S   FVMAIN       ,LIBAGALE     ,LENTHG         ,LBUFMAT      ,LBUFGEO     ,
      T   LBUFSF       ,LENXLAS                      ,LNOM_OPT     ,LENLAS      ,           
      U   LENVOLU                    ,NPTS           ,CNE          ,LCNE        ,           
      V   ADDCNE       ,CNI2         ,LCNI2G         ,ADDCNI2      ,CEPI2       ,           
      W   CELI2        ,I2NSNT       ,PROBINT        ,DDSTAT       ,PM1SHF      ,           
-     X   DD_IAD       ,LSHSUB       ,DRSAV          ,ARSAV        ,STSAV       ,           
-     y   STRSAV       ,FSAVSAV      ,
+     X   DD_IAD       ,
      Z                 KXSP         ,IXSP           ,NOD2SP       ,CEPSP       ,
      a   NTHWA        ,NAIRWA       ,NMNT           ,L_MUL_LAG1   ,L_MUL_LAG   ,
      b   LWASPIO      ,IPARTSP      ,ISPCOND        ,PM1SPH       ,
      c   WMA          ,
      d   EIGIPM       ,EIGIBUF      ,EIGRPM         ,
      e   IFLOW        ,RFLOW        ,MEMFLOW        ,IEXLNK       ,FASOLFR     ,
-     f   ITHGRPA      ,ITHGRPB      ,ITHGRPC        ,ITHGRPD      ,ITHGRPE     ,
-     g   ITHGRPF      ,ITHGRPG      ,ITHGRPH        ,ITHGRPI      ,ITHBUFA     ,
-     h   ITHBUFB      ,ITHBUFC      ,ITHBUFD        ,ITHBUFE      ,ITHBUFF     ,
-     i   ITHBUFG      ,ITHBUFH      ,ITHBUFI        ,IPARTH       ,
+     f   IPARTH       ,
      j   FXBIPM       ,FXBRPM       ,FXBNOD         ,FXBMOD       ,FXBGLM      ,
      k   FXBCPM       ,FXBCPS       ,FXBLM          ,FXBFLS       ,FXBDLS      ,
      l   FXBDEP       ,FXBVIT       ,FXBACC         ,FXBELM       ,FXBSIG      ,
@@ -311,7 +321,7 @@ Chd|====================================================================
      s   RBYM         ,IRBYM        ,LCRBYM         ,INOISE       ,FNOISE      ,
      t   MS0          ,ADMSMS       ,NOM_SECT       ,ISPSYM       ,
      u   SH4TREE      ,SH3TREE      ,IPADMESH       ,IBFFLUX      ,FBFFLUX     ,
-     v   SH4TRIM      ,SH3TRIM      ,PADMESH        ,MSC          ,MSTG        ,
+     v   SH4TRIM      ,SH3TRIM      ,PADMESH        ,MSC          ,MSTG        , 
      w   INC          ,INTG         ,PTG            ,MCPC         ,MCPTG       ,
      x   RCONTACT     ,ACONTACT     ,PCONTACT       ,MSCND        ,INCND       ,
      y   MSSA         ,MSTR         ,MSP            ,MSRT         ,IBCR        ,
@@ -322,12 +332,12 @@ Chd|====================================================================
      8   MS_PLY       ,
      9   ZI_PLY       ,INOD_PXFEM   ,IEL_PXFEM      ,ICODPLY      ,ISKWPLY     ,
      A   ADDCNE_PXFEM ,CNE_PXFEM    ,CEL_PXFEM      ,ITHVAR       ,XDP,TABLE   ,
-     B   CELSPH       ,ICFIELD      ,LCFIELD        ,CFIELD       ,USERNODS    ,IUSERW   ,
-     C   SUSERW       ,SIUSERW      ,MSZ2           ,ITASK        ,DIAG_SMS    ,
+     B   CELSPH       ,ICFIELD      ,LCFIELD        ,CFIELD       ,
+     C   MSZ2         ,ITASK        ,DIAG_SMS    ,
      D   ILOADP       ,LLOADP       ,LOADP,
      E   INOD_CRKXFEM ,IEL_CRKXFEM  ,ADDCNE_CRKXFEM ,CNE_CRKXFEM  ,CEL_CRKXFEM ,
      F   IBUFSSG_IO   ,INTERCEP     ,IBORDNODE      ,IEDGESH      ,IBORDEDGE   ,
-     G   LINALE       ,NODEDGE,IEDGE,CEP_CRKXFEM    ,IEDGE_TMP    ,
+     G   LINALE       ,NODEDGE      ,IEDGE          ,CEP_CRKXFEM  ,IEDGE_TMP   ,
      H   CRKNODIAD    ,ELBUF_TAB    ,NOM_OPT        ,LGAUGE       ,GAUGE       ,
      I   IGAUP        ,NGAUP        ,NODLEVXF       ,FRONTB_R2R   ,DFLOW       ,
      J   VFLOW        ,WFLOW        ,SPH2SOL        ,SOL2SPH      ,IRST        ,
@@ -335,10 +345,10 @@ Chd|====================================================================
      M   I11FLAG      ,XFEM_TAB     ,LENTHGR        ,RTHBUF       ,
      N   IXIG3D       ,KXIG3D       ,KNOT           ,IPARTIG3D    ,WIGE        ,
      O   NCRKPART     ,INDX_CRK     ,CRKLVSET       ,CRKSHELL     ,CRKSKY      ,
-     P   CRKAVX       ,CRKEDGE      ,FBSAV6         ,TABSENSOR    ,SENSOR_TAB  ,
+     P   CRKAVX       ,CRKEDGE      ,SENSORS        ,
      Q   STACK        ,XFEM_PHANTOM ,T8             ,TAB_UMP      ,POIN_UMP    ,
-     R   SOL2SPH_TYP  ,ADDCSRECT    ,CSRECT         ,DRAPE        ,
-     S   ITAGND        ,ICNDS10      ,ADDCNCND     ,
+     R   SOL2SPH_TYP  ,ADDCSRECT    ,CSRECT         ,DRAPE        ,LOADS       ,
+     S   ITAGND       ,ICNDS10      ,ADDCNCND       ,
      T   CEPCND       ,CELCND       ,CNCND          ,NATIV_SMS    ,I24MAXNSNE  ,
      U   MULTI_FVM    ,SEGQUADFR    ,INTBUF_FRIC_TAB,SUBSET       ,IGRNOD      ,
      V   IGRBRIC      ,IGRQUAD      ,IGRSH4N        ,IGRSH3N      ,IGRTRUSS    ,
@@ -349,7 +359,9 @@ Chd|====================================================================
      A   MULTIPLE_SKEW, IGRSURF_PROC,KNOTLOCPC      ,KNOTLOCEL    ,ALE_ELM,
      B   SIZE_ALE_ELM ,PINCH_DATA  ,TAG_SKINS6      ,IBCSCYC      ,LBCSCYC  ,T_MONVOL,
      C INDX_S,INDX_Q,INDX_TG,FACE_ELM_S,FACE_ELM_Q,FACE_ELM_TG,NBR_TH_MONVOL, EBCS_TAB,
-     D   KLOADPINTER  , LOADPINTER ,DGAPLOADINT     ,S_LOADPINTER, LEN_CEP)
+     D   KLOADPINTER  , LOADPINTER ,DGAPLOADINT     ,S_LOADPINTER, LEN_CEP ,DYNAIN_DATA,
+     E   DRAPEG       ,USER_WINDOWS,OUTPUT          ,INTERFACES  ,NUMBER_LOAD_CYL,
+     F   LOADS_PER_PROC, PYTHON,DPL0CLD,VEL0CLD,NAMES_AND_TITLES)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -358,7 +370,7 @@ C-----------------------------------------------
       USE FVBAG_MOD
       USE INTSTAMP_MOD
       USE TABLE_MOD
-      USE ELBUFDEF_MOD
+      USE MAT_ELEM_MOD
       USE MESSAGE_MOD
       USE FRONT_MOD
       USE CLUSTER_MOD
@@ -377,7 +389,6 @@ C-----------------------------------------------
       USE FAILWAVE_MOD
       USE NLOCAL_REG_MOD
       USE SKEW_MOD
-      USE MATPARAM_DEF_MOD
       USE SPLIT_CFD_MOD
       USE PINCHTYPE_MOD
       USE INOUTFILE_MOD
@@ -390,19 +401,24 @@ C-----------------------------------------------
       USE JOINT_MOD
       USE SEATBELT_MOD
       USE OUTMAX_MOD
+      USE LOADS_MOD
+      USE STATE_MOD
+      USE USER_WINDOWS_MOD
+      USE ALE_MOD
+      USE OUTPUT_MOD
+      USE INTERFACES_MOD
+      USE SUBMODEL_MOD , ONLY : NSUBMOD
+      USE PYTHON_FUNCT_MOD
+      USE NAMES_AND_TITLES_MOD,only: NAMES_AND_TITLES_,LTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com02_c.inc"
-#include      "com03_c.inc"
 #include      "com04_c.inc"
-#include      "com05_c.inc"
 #include      "com10_c.inc"
 #include      "com_xfem1.inc"
 #include      "eigcom.inc"
@@ -411,8 +427,6 @@ C-----------------------------------------------
 #include      "intstamp_c.inc"
 #include      "lagmult.inc"
 #include      "param_c.inc"
-#include      "ale_param.inc"
-#include      "rnur_c.inc"
 #include      "scr03_c.inc"
 #include      "scr05_c.inc"
 #include      "scr15_c.inc"
@@ -421,16 +435,11 @@ C-----------------------------------------------
 #include      "scr23_c.inc"
 #include      "sms_c.inc"
 #include      "sphcom.inc"
-#include      "sysunit.inc"
 #include      "tabsiz_c.inc"
 #include      "tablen_c.inc"
 #include      "remesh_c.inc"
-#include      "submod_c.inc"
 #include      "r2r_c.inc"
-#include      "elbuf_c.inc"
-#include      "inter18.inc"
 #include      "inter22.inc"
-#include      "alefvm.inc"
 #include      "drape_c.inc"
 #include      "thermal_c.inc"
 #include      "debug_rst.inc"
@@ -438,22 +447,27 @@ C-----------------------------------------------
       TYPE INTERMASURFEP
         INTEGER, DIMENSION(:), POINTER :: P
       END TYPE INTERMASURFEP
+      TYPE (DYNAIN_DATABASE), INTENT(INOUT)    :: DYNAIN_DATA
+      TYPE (OUTPUT_),INTENT(IN)             :: OUTPUT
+      TYPE (INTERFACES_)   ,INTENT(IN)      :: INTERFACES
+      TYPE(PYTHON_), INTENT(INOUT) :: PYTHON
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       TYPE (UNIT_TYPE_),INTENT(IN) ::UNITAB
-      INTEGER, INTENT(IN) :: LEN_CEP ! size of CEP
+      INTEGER, INTENT(IN) :: LEN_CEP !< size of CEP
+      INTEGER, DIMENSION(SCEL), INTENT(IN) :: CEL !< connectivity global element id --> local element 
       INTEGER P,
      .        LIBAGALE, LENTHG, LENLAS, NPTS,LEN,
      .        LBUFMAT, LBUFGEO, LBUFSF, LENXLAS, LNOM_OPT,
      .        LENVOLU, NTHWA, NAIRWA, NMNT, I2NSNT,
      .        L_MUL_LAG1, L_MUL_LAG, LWASPIO,PM1SPH,
      .        LCNI2G, PM1SHF, I11FLAG,LENTHGR,NCRKPART,
-     .        CEP(LEN_CEP),CEL(*),IGEO(*), IPM(*),
+     .        CEP(LEN_CEP),IGEO(*), IPM(*),
      .        ICODE(*),ISKEW(*),ISKN(*),INSEL(*),IBCSLAG(*),
      .        IPART(*),IPARTS(*),IPARTQ(*),IPARTC(*),IPARTT(*),
-     .        IPARTP(*),IPARTR(*),IPARTUR(*),IPARTTG(*),IPARTX(*),
-     .        NPC(*),IXUR(*),IXTG(NIXTG,*),IXTG6(4,*),
+     .        IPARTP(*),IPARTR(*),IPARTTG(*),IPARTX(*),
+     .        NPC(*),IXTG(NIXTG,*),IXTG6(4,*),
      .        IXS(NIXS,*),IXS10(6,*),IXS20(12,*),IXS16(8,*),
      .        IXQ(NIXQ,*),IXC(*),IXT(*),IXP(*),IXR(*),
      .        ITAB(*),ITABM1(*),GJBUFI(*),
@@ -464,18 +478,15 @@ C-----------------------------------------------
      .        IPARI(*),NPRW(*),LPRW(*),
      .        NPBY(*),LPBY(*), IEXLNK(*),
      .        IXRI(*),NSTRF(*),LJOINT(*),PORNOD(*),MONVOL(*),FVMAIN(*),
-     .        LAGBUF(*),ITHGRP(*),ITHBUF(*), FR_IAD(*),
+     .        LAGBUF(*), FR_IAD(*),
      .        ICONTACT(*), IPARTSP(*), ISPCOND(*),
      .        DDSTAT(50), CNE(*), LCNE, ADDCNE(0:*),
      .        CNI2(*), ADDCNI2(0:*), CEPI2(*), CELI2(*),
-     .        DD_IAD(*), LSHSUB(*),
+     .        DD_IAD(*),
      .        KXSP(*), IXSP(*), NOD2SP(*), CEPSP(*),
      .        EIGIPM(*), EIGIBUF(*), IFLOW(*), FASOLFR(2,*),
      .        IPARTH(*),
-     .        ITHGRPA(*),ITHGRPB(*),ITHGRPC(*),ITHGRPD(*),ITHGRPE(*),
-     .        ITHGRPF(*),ITHGRPG(*),ITHGRPH(*),ITHGRPI(*),ITHBUFA(*),
-     .        ITHBUFB(*),ITHBUFC(*),ITHBUFD(*),ITHBUFE(*),ITHBUFF(*),
-     .        ITHBUFG(*),ITHBUFH(*),ITHBUFI(*), FXBIPM(*), FXBNOD(*),
+     .        FXBIPM(*), FXBNOD(*),
      .        FXBELM(*), FXBGRVI(*), IADLL(*), LLL(*),IBMPC(*),LRBAGALE,
      .        ISKWP(*), NSKWP(*), ISENSP(2,*), NSENSP(*),
      .        IACCP(P), NACCP(*), IPART_STATE(*), IFRAME(*),
@@ -487,8 +498,7 @@ C-----------------------------------------------
      .        IRBE2(NRBE2L,*),LRBE2(*),INOD_PXFEM(*) ,
      .        IEL_PXFEM(*) ,ICODPLY(*),ISKWPLY(*) ,ADDCNE_PXFEM(0:*),
      .        CNE_PXFEM(*),CEL_PXFEM(*),ITHVAR(*), CELSPH(NUMSPH),
-     .        ICFIELD(*),LCFIELD(*),USERNODS(*),SUSERW,SIUSERW,
-     .        IUSERW(*),ILOADP(*),LLOADP(*),INOD_CRKXFEM(*),
+     .        ICFIELD(*),LCFIELD(*),ILOADP(*),LLOADP(*),INOD_CRKXFEM(*),
      .        IEL_CRKXFEM(*),ADDCNE_CRKXFEM(0:*),CNE_CRKXFEM(*),
      .        CEL_CRKXFEM(*),IBORDNODE(*),IEDGESH(*),IBORDEDGE(*),
      .        LINALE(*),NODEDGE(2,*),IEDGE(*),CEP_CRKXFEM(*),
@@ -496,7 +506,7 @@ C-----------------------------------------------
      .        NODLEVXF(*),FRONTB_R2R(SFRONTB_R2R,*),
      .        SPH2SOL(*), SOL2SPH(*), IRST(*),ELCUTC(2,*),NODENR(*),
      .        KXFENOD2ELC(*),ENRTAG(*),IXIG3D(*),KXIG3D(*),
-     .        IPARTIG3D(*),INDX_CRK(*),TABSENSOR(STABSEN),
+     .        IPARTIG3D(*),INDX_CRK(*),
      .        POIN_UMP(NUMMAT),SOL2SPH_TYP(*), ADDCSRECT(*), CSRECT(*),
      .        ITAGND(*),ICNDS10(*),
      .        ADDCNCND(0:*), CEPCND(*), CELCND(*),CNCND(*),NATIV_SMS(*),
@@ -521,10 +531,9 @@ C-----------------------------------------------
      .       WB(*), ASAV(*), DSAV(*), MSNF(*),
      .       SPBUF(*), FAC(*), VEL(*), FACTIV(*),
      .       FSAV(*), FZERO(*), XLAS(*), ACCELM(*),
-     .       FBVEL(*), GRAVFAC(*), FR_WAVE(*), USERW(*), ELBUF(*),
+     .       FBVEL(*), GRAVFAC(*), FR_WAVE(*), ELBUF(*),
      .       RWL(*), RWSAV(*), RBY(*), RIVET(*),
      .       SECBUF(*), RVOLU(*), PARTS0(*), RCONX(*),
-     .       DRSAV(*), ARSAV(*), STSAV(*), STRSAV(*), FSAVSAV(*),
      .       WMA(*), EIGRPM(*), RFLOW(*),
      .       PROBINT, FXBRPM(*), FXBMOD(*), FXBGLM(*), FXBCPM(*),
      .       FXBCPS(*), FXBLM(*), FXBFLS(*), FXBDLS(*), FXBDEP(*),
@@ -541,7 +550,7 @@ C-----------------------------------------------
      .       DIAG_SMS(*),LOADP(*),GAUGE(*),DFLOW(*),VFLOW(*),WFLOW(*),
      .       RTHBUF(*),KNOT(*),WIGE(*),TAB_UMP(7,TAILLE),
      .       KNOTLOCPC(*),KNOTLOCEL(*)
-      DOUBLE PRECISION, DIMENSION(12,6,SFSAV6) :: FBSAV6
+      my_real, INTENT(IN) :: DPL0CLD(6,NCONLD),VEL0CLD(6,NCONLD)
       TYPE (INTSTAMP_DATA) INTSTAMP(*)
       TYPE (TTABLE) TABLE(*)
       TYPE (INTBUF_STRUCT_) INTBUF_TAB(*)
@@ -562,8 +571,9 @@ C-----------------------------------------------
       TYPE(MID_PID_TYPE), DIMENSION(NUMMAT,7), INTENT(IN) :: MID_PID_SOL
       TYPE (FAILWAVE_STR_) :: FAILWAVE
       TYPE (NLOCAL_STR_)   :: NLOC_DMG
-      TYPE (DRAPE_)   :: DRAPE (*)
-      TYPE (SENSOR_STR_) ,DIMENSION(*) :: SENSOR_TAB
+      TYPE (DRAPE_)   :: DRAPE (NUMELC_DRAPE + NUMELTG_DRAPE)
+      TYPE (SENSORS_) ,INTENT(IN) :: SENSORS
+      TYPE (DRAPEG_)   :: DRAPEG
 C-----------------------------------------------
       TYPE (SUBSET_) , DIMENSION(NSUBS)   :: SUBSET
       TYPE (GROUP_)  , DIMENSION(NGRNOD)  :: IGRNOD
@@ -641,22 +651,25 @@ C-----------------------------------------------
 !                  of the remote connected element
 !       -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-**-*-*-*-*-*-*-*-*-*-*-*-*
         TYPE(t_ebcs_tab), INTENT(INOUT) :: EBCS_TAB
-C-----------------------------------------------
-C   F u n c t i o n
-C-----------------------------------------------
+        TYPE(USER_WINDOWS_),INTENT(IN) :: USER_WINDOWS
+
+        INTEGER, INTENT(IN) :: NUMBER_LOAD_CYL ! sum of load segment number
+        TYPE(LOADS_),INTENT(IN)    :: LOADS ! initial structure of load cyl
+        TYPE(LOADS_),INTENT(INOUT) :: LOADS_PER_PROC ! structure of load cyl for for the current proc P
+        TYPE(NAMES_AND_TITLES_),INTENT(IN) :: NAMES_AND_TITLES !< NAMES_AND_TITLES host the input deck names and titles for outputs
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, IR_, IM,IFILNAM(2148),IFILNAM2(2148),
      .        NUMELS_L,NUMELS8_L,NUMELS10_L,NUMELS20_L,NUMELS16_L,
      .        NUMELQ_L ,NUMELC_L, NCONLD_L,NSKYLL_L,
-     .        NUMELT_L,NUMELP_L,NUMELR_L,NUMELUR_L,NUMELTG_L,
+     .        NUMELT_L,NUMELP_L,NUMELR_L,NUMELTG_L,
      .        NUMELTG3,NUMELTG3_L,NUMELTG6_L,NUMELX_L,NUMPOR_L,
      .        NSVOIS,NQVOIS,NTGVOIS,NE_NSVOIS,NE_NQVOIS,NE_NTGVOIS,NRCVVOIS,NSNDVOIS,ILAW11,LJOINT_L,
      .        NSEGFL_L,NGROUP_L, NSTRF_L,
      .        NSLAW_L, NESLAW_L, LWSAV_L, NSLARB_L,
      .        LBUFEL_L, LENWA_L, INTBAG_L, ISUMNX_L, NUMEL_L,
-     .        NLLINK_L, LLGRAV_L, LLBVEL_L, NFXVEL_L, NSHFRONT_L, OFF1,
+     .        NLLINK_L, LLGRAV_L, LLBVEL_L, NFXVEL_L, OFF1,
      .        OFF, SHF, IUN, NUMEL, ISP0, NBDDACC, NBDDKIN, NBDDNOD,
      .        NBDDPROC, NBDDBOUN, NBDDNRB, NRBYKIN_L, NSKYRW_L,
      .        NSKYRBK_L, LENTHGT, NBDDI2M, NNMV_L, NNMVC_L, NBDDNCJ,
@@ -678,7 +691,7 @@ C-----------------------------------------------
      .        DD_RBYM2(3,NRBYM),NSKYRBMK_L, LAG_SEC,
      .        NRBE2_L,LLRBE2_L,NBDDRBE2,NUMELCPXFE_L,NUMNODPXFE_L,
      .        ITAG_PXFEM(NPLYXFE),INDEX_PXFEM(NPLYXFE),
-     .        LCNEPXFEM_L,LLCFIELD_L,SFR_USERWI_L,SUSERW_L,SIUSERW_L,
+     .        LCNEPXFEM_L,LLCFIELD_L,
      .        ITASK,LLLOADP_L,NUMELCRKXFE_L,NUMNODCRKXFE_L,LCNECRKXFEM_L,
      .        NUMELCCRKXFE_L,NUMELTGCRKXFE_L,
      .        NUMEDGES_L,NBDDEDGE_L,
@@ -692,7 +705,8 @@ C-----------------------------------------------
      .        LENIGRTRUS_L,LENIGRBEAM_L,LENIGRSPRI_L,
      .        LENIGRSH3N_L,LENISURF_L,LENISLIN_L,NBCSCYC_L,LLBCSCYC_L,NS_DIFF,
      .        N_SLIPRING_L,N_RETRACTOR_L,N_ANCHOR_REMOTE_L,N_ANCHOR_REMOTE_SEND_L,
-     .        N_SEATBELT_L,N_SEATBELT_2D_L
+     .        N_SEATBELT_L,N_SEATBELT_2D_L,NUMSH4N_L,NUMSH3N_L,NCLOAD_L,NPLOAD_L,
+     .        NDAMP_VREL_L,IDAMP_VREL_L(NDAMP)   
       INTEGER IPARI_L(NPARI,MAX(1,NINTER))
       INTEGER NCONV_L,NFXTEMP_L,NRADIA_L,NFXFLUX_L
       INTEGER , DIMENSION(:), ALLOCATABLE:: NUMLOCGROUP,NUMLOCCLUSTER
@@ -730,7 +744,7 @@ C SPH Modif Structures
       INTEGER ,DIMENSION(:,:), ALLOCATABLE :: SPH_SEND_ARR,SPH_RECV_ARR
       INTEGER ,DIMENSION(:), ALLOCATABLE :: SPHLOCAL
       INTEGER RECV_COUNT(NSPMD),SEND_COUNT(NSPMD)
-      INTEGER, DIMENSION(:), ALLOCATABLE :: IUSERW_L,IEDGECRK_L,
+      INTEGER, DIMENSION(:), ALLOCATABLE :: IEDGECRK_L,
      .       IBORDEDGE_L,NODEDGE_L,IEDGESH4_L,IEDGESH3_L,TAGEDGE,
      .       IEDGE_L,EDGELOCAL,EDGEGLOBAL
 
@@ -759,8 +773,8 @@ C-----------------------------------------------
       INTEGER, DIMENSION(:),ALLOCATABLE :: NODGLOBXFE
 
       TYPE(INTBUF_STRUCT_),DIMENSION(:),ALLOCATABLE :: INTBUF_TAB_L
-      TYPE(MATPARAM_STRUCT_)  , DIMENSION(NUMMAT)   :: MATPARAM_TAB
-      TYPE(GRP_PARAM_STRUCT_) , DIMENSION(NGROUP)   :: GROUP_PARAM_TAB
+      TYPE(MAT_ELEM_) ,INTENT(IN) :: MAT_ELEM
+      TYPE(GROUP_PARAM_)      ,DIMENSION(NGROUP)    :: GROUP_PARAM_TAB
 C-----------------------------------------------
 C     For Meshgems
 C-----------------------------------------------
@@ -777,7 +791,11 @@ C-----------------------------------------------
 C     Multifluid law
 C-----------------------------------------------
       my_real, DIMENSION(:,:), ALLOCATABLE :: MULTI_FVM_VEL_L
-
+C-----------------------------------------------
+C     Python interface
+C-----------------------------------------------
+      INTEGER, DIMENSION(:), ALLOCATABLE :: BUFFER
+      INTEGER :: BUFFER_SIZE
 C-----------------------------------------------
 C     FILE SIZE
 C-----------------------------------------------
@@ -796,6 +814,8 @@ C
       TYPE(t_connectivity_ext1) :: ee_connect_l
 C-----------------------------------------------
       TYPE(SEATBELT_REMOTE_NODES_STRUCT) ANCHOR_REMOTE_L,ANCHOR_REMOTE_SEND_L
+C-----------------------------------------------
+      INTEGER, DIMENSION(LTITLE) :: ITITLE   !< Store the title in Integer to be written in Restart files
 C=======================================================================
 C ALLOCATION
 C ----------
@@ -847,12 +867,6 @@ C--------------------------------------
 C count local NGROUP 
 C--------------------------------------
       CALL C_NGROUP(IPARG,P-1,NUMLOCGROUP,NGROUP_L)
-C--------------------------------------
-C count LSHSUB
-C--------------------------------------
-      NSHFRONT_L=0
-      IF (MSHSUB>0)
-     .  CALL C_ISHSUB(LSHSUB,NSHFRONT_L,P-1)
 C--------------------------------------------
 c count local elements 
 C--------------------------------------------
@@ -883,8 +897,6 @@ C--------------------------------------------
       CALL C_ELTLOC(CEP(MIN(OFF+1,LEN_CEP)),P-1,NUMELTG6,NUMELTG6_L)
       OFF = OFF + NUMELTG6
       NUMELTG_L = NUMELTG3_L+NUMELTG6_L
-      CALL C_ELTLOC(CEP(MIN(OFF+1,LEN_CEP)),P-1,NUMELUR,NUMELUR_L)
-      OFF = OFF + NUMELUR
       CALL C_ELTLOC(CEP(MIN(OFF+1,LEN_CEP)),P-1,NUMELX,NUMELX_L)
       OFF = OFF + NUMELX
       CALL C_ELTLOC(CEP(MIN(OFF+1,LEN_CEP)),P-1,NUMELIG3D,NUMELIG3D_L)
@@ -1126,8 +1138,8 @@ C--------------------------------------
      3         CEL         ,NODLOCAL    ,P-1         ,LENIGRNOD_L,LENIGRBRIC_L ,
      4         LENIGRQUAD_L,LENIGRSH4N_L,LENIGRTRUS_L,LENIGRBEAM_L,LENIGRSPRI_L,
      5         LENIGRSH3N_L,FRONTB_R2R  ,NUMNOD_L)
-      CALL C_ISURF_STR(IGRSURF ,LEN_IA    ,CEP  ,CEL  ,P-1,
-     .                 NODLOCAL,LENISURF_L)
+      CALL C_ISURF_STR(P-1,LENISURF_L,NSPMD,IGRSURF_PROC)
+
       CALL C_ISLIN_STR(IGRSLIN ,P-1, LENISLIN_L)
 C--------------------------------------------
 C count Buffer interface
@@ -1330,7 +1342,7 @@ C--------------------------------------
 C counts nb of local elts 
 C--------------------------------------
       NUMEL_L = NUMELS_L + NUMELQ_L + NUMELC_L + NUMELT_L + NUMELP_L
-     +        + NUMELR_L + NUMELUR_L+ NUMELTG_L+ NUMELX_L + NUMSPH_L
+     +        + NUMELR_L + NUMELTG_L+ NUMELX_L + NUMSPH_L
      +        + NUMELIG3D_L
 C--------------------------------------------
 C counts buffer TH
@@ -1343,11 +1355,11 @@ C--------------------------------------
       CALL C_FRONT(P        ,NBDDACC,NBDDKIN,NBDDNRB,
      2             NPBY     ,NRBYKIN_L,LJOINT ,NBDDNCJ,IBVEL  ,
      3             NBDDNRBM ,IADLL    ,LLL    ,NLAGF_L, FRONT_RM,
-     4             NRBYMK_L ,NBDDNRBYM,USERNODS,SFR_USERWI_L,
+     4             NRBYMK_L ,NBDDNRBYM,
      5             SDD_R2R_ELEM,ADDCSRECT,CSRECT  ,NBDDNORT_L,NBDDNOR_MAX_L,
      6             NBCCNOR_L,NBCCFR25_L,NBDDEDGT_L,NBDDEDG_MAX_L,NRTMX25_L ,
      7             IPARI    ,INTBUF_TAB,INTERCEP  ,NODGLOB      ,NODLOCAL  ,
-     8             NUMNOD_L)
+     8             NUMNOD_L ,NLOC_DMG)
       NBDDNOD = NBDDACC+NBDDKIN
 C--------------------------------------
 C counts Parith/ON SPMD
@@ -1360,8 +1372,7 @@ C--------------------------------------
      5             INOD_CRKXFEM,ADDCNCND,LCNCND_L,IGRSURF)
         NISKY0_L=8*NUMELS_L+6*NUMELS10_L+8*NUMELS16_L+12*NUMELS20_L+
      +         4*NUMELQ_L+4*NUMELC_L+2*NUMELT_L+2*NUMELP_L+
-     +         3*NUMELR_L+3*NUMELTG_L+3*NUMELTG6_L+4*NUMELUR_L+
-     +         4*NCONLD_L
+     +         3*NUMELR_L+3*NUMELTG_L+3*NUMELTG6_L+4*NCONLD_L
         NIR = 4
         IF(N2D/=0) NIR = 2
         NISKYI2_L = I2NSN_L*NIR
@@ -1644,20 +1655,49 @@ C--------------------------------------
       LLBCSCYC_L = 0
       IF (NBCSCYC>0)
      .  CALL C_IBCSCYC(IBCSCYC,LBCSCYC,P-1  ,NBCSCYC_L,LLBCSCYC_L)
+C--------------------------------------------
+C DRAPE option preparation
+C--------------------------------------------
+       NUMSH4N_L = 0
+       NUMSH3N_L = 0
+       IF (NDRAPE > 0) THEN
+         OFF  = NUMELS + NUMELQ
+         IF(NUMELC_DRAPE > 0 ) THEN
+            CALL C_DRAPE(DRAPEG%INDX,CEP(MIN(OFF+1,LEN_CEP)),P-1,
+     .                  NUMELC,NUMSH4N_L)
+         ENDIF
+         
+         OFF = OFF + NUMELC + NUMELT + NUMELP + NUMELR
+         
+         IF(NUMELTG_DRAPE > 0) THEN
+            CALL C_DRAPE(DRAPEG%INDX(NUMELC+1),CEP(MIN(OFF+1,LEN_CEP)),P-1,
+     .                    NUMELTG,NUMSH3N_L)
+         ENDIF
+       ENDIF      
 C--------------------------------------
-C Userwindow - preparation
+C counts CLOAD
 C--------------------------------------
-      IF (P==1) THEN
-        SIUSERW_L = SIUSERW
-        SUSERW_L = SUSERW
-      ELSE
-        SIUSERW_L = 0
-        SUSERW_L = 0
-      ENDIF
+       NCLOAD_L = 0
+       IF (LOADS%NLOAD_CLOAD>0)
+     .   CALL C_NLOADS(CEP,P-1,LOADS%NLOAD_CLOAD,NCLOAD_L)
+C--------------------------------------
+C counts PLOAD
+C--------------------------------------
+       NPLOAD_L = 0
+       IF (LOADS%NLOAD_PLOAD>0)
+     .   CALL C_NLOADS(CEP,P-1,LOADS%NLOAD_PLOAD,NPLOAD_L)
+C--------------------------------------
+C counts /DAMP/VREL
+C--------------------------------------    
+      NDAMP_VREL_L = 0 
+      IDAMP_VREL_L(1:NDAMP) = 0 
+      IF (NDAMP > 0) CALL C_DAMPVREL(DAMPR,IGRNOD,P,IDAMP_VREL_L,NDAMP_VREL_L,
+     .                               NGRNOD,NDAMP,NRDAMP)
 C--------------------------------------------
 C Open Restart FILE
 C--------------------------------------------
       LEN_IA = 0
+      LEN_AM = 0
       IR_ = P
       WRITE(CHRUN,'(I4.4)')IRUN
       WRITE(PROCNAM,'(I4.4)')P
@@ -1686,7 +1726,7 @@ C  Skippon_l for obsolide "modif" option.
       SKIPPON_L = NUMNOD_L+1 + LCNE_L + LCNI2_L +
      .  8*NUMELS_L + 6*NUMELS10_L + 8*NUMELS16_L + 12*NUMELS20_L +
      .  4*NUMELQ_L + 4*NUMELC_L   + 2*NUMELT_L + 2*NUMELP_L +
-     .  3*NUMELR_L + 3*NUMELTG_L  + 3*NUMELTG6_L + 4*NUMELUR_L +
+     .  3*NUMELR_L + 3*NUMELTG_L  + 3*NUMELTG6_L + 
      .  4*NNMV_L   + 4*NCONLD_L  + 4*NCONV_L  + NSKYRW_L + NSKYRBK_L +
      .  NISKYI2_L +
      .  NNMV_L     + NNMVC_L      + NSKYLL_L + NSKYRBM_L + NSKYI18_L +
@@ -1705,7 +1745,7 @@ C--------------------------------------------
      2   LENWA_L   ,INTBAG_L  ,NUMELQ_L  ,NUMELS_L  ,NUMELC_L ,
      3   NUMELT_L  ,NUMELR_L  ,NUMELP_L  ,NUMELX_L  ,ISUMNX_L ,
      4   NUMELS10_L,NUMELS20_L,NUMELS8_L ,NUMELS16_L,LNOM_OPT ,
-     5   NUMELUR_L ,NUMELTG_L ,NUMELTG6_L,NSLARB_L  ,NUMNOD_L ,
+     5   NUMELTG_L ,NUMELTG6_L,NSLARB_L  ,NUMNOD_L ,
      6   NUMEL_L   ,NSVOIS    ,NQVOIS    ,NTGVOIS,   LENLAS   ,
      7   NLLINK_L  ,LLGRAV_L  ,LLBVEL_L  ,NSLAW_L  ,
      8   NESLAW_L  ,NSKYLL_L  ,NSTRF_L   ,LJOINT_L ,
@@ -1716,7 +1756,7 @@ C--------------------------------------------
      D   NISKYI2_L ,I2NSNT    ,NCONLD_L  ,NNMV_L    ,NNMVC_L  ,
      E   NBDDNCJ   ,NBDDNRBM  ,NSKYRBM_L ,NNODT_L   ,NNODL_L  ,
      F   NMADSH4_L ,NMADSH3_L ,NMADSOL_L ,NMADNOD_L ,IMAXIMP_L,
-     G   ISP0   ,NUM16SHIFT_L ,NSHFRONT_L,NUMSPH_L  ,LWASPH_L ,
+     G   ISP0   ,NUM16SHIFT_L ,NUMSPH_L  ,LWASPH_L ,
      H   SPHSHIFT_L,NRCVVOIS  ,NSNDVOIS  ,NERVOIS  ,
      I   NESVOIS   ,ILAW11    ,NSEGFL_L  ,
      J   NBI18_L   ,NSKYI18_L ,LEIBUF_L ,
@@ -1727,8 +1767,8 @@ C--------------------------------------------
      O   NRBE3_L   ,LLRBE3_L  ,NBDDRBE3M ,NSKYRBE3_L,NSLARBM_L ,
      N   NSKYRBMK_L,NBDDNRBYM ,MADCL_NMADNOD_L,NRADIA_L,NRBE2_L,
      Q   LLRBE2_L  ,NBDDRBE2  ,NUMELCPXFE_L,
-     R   NUMNODPXFE_L,LCNEPXFEM_L,LLCFIELD_L,SFR_USERWI_L,SUSERW_L,
-     S SIUSERW_L,LLLOADP_L,NUMELCRKXFE_L,NUMNODCRKXFE_L,LCNECRKXFEM_L,
+     R   NUMNODPXFE_L,LCNEPXFEM_L,LLCFIELD_L,
+     S   LLLOADP_L,NUMELCRKXFE_L,NUMNODCRKXFE_L,LCNECRKXFEM_L,
      T   SLONFSPH_L,SLPRTSPH_L,SSPHVELN_L,I2NSN25_L,NUMELCCRKXFE_L,
      U   NUMELTGCRKXFE_L,NUMEDGES_L,NBDDEDGE_L,SDD_R2R_ELEM,NOD_XFE_L,
      V   NSPHSOL_L,FIRST_SPHSOL_L,NCLUSTER_L,LENTHGR,NUMNOR_L,
@@ -1739,14 +1779,19 @@ C--------------------------------------------
      1   LENIGRSH3N_L,LENISURF_L,LENISLIN_L, NE_NERVOIS, NE_NESVOIS,
      2   NE_NSVOIS, NE_NQVOIS, NE_NTGVOIS,NBCSCYC_L,LLBCSCYC_L,
      3   ALE_CONNECTIVITY,N_SLIPRING_L,N_RETRACTOR_L,N_ANCHOR_REMOTE_L,
-     4   N_ANCHOR_REMOTE_SEND_L,N_SEATBELT_L,N_SEATBELT_2D_L)
+     4   N_ANCHOR_REMOTE_SEND_L,N_SEATBELT_L,N_SEATBELT_2D_L,DYNAIN_DATA,
+     5   NUMSH4N_L,NUMSH3N_L,INTERFACES%PARAMETERS,SENSORS,LOADS_PER_PROC%NLOAD_CYL,
+     6   NCLOAD_L,NPLOAD_L,NDAMP_VREL_L, UNITAB)
+     
 
-      CALL WRCOMR(LMXVREA,LVARREA,TABVREA,MSNDP(P),P)
+      CALL WRCOMR(LMXVREA,LVARREA,TABVREA,MSNDP(P),P,INTERFACES%PARAMETERS,UNITAB)
 C--------------------------------------
 C     write TEXT
 C--------------------------------------
-      CALL WRITE_I_C(TEXT,LCOM05)
-      LEN_IA = LEN_IA + LCOM05
+      DO I=1,LTITLE
+        ITITLE(I) = ICHAR( NAMES_AND_TITLES%TITLE(I:I) )
+      ENDDO
+      CALL WRITE_I_C(ITITLE,LTITLE)
 C--------------------------------------
 C     Write HEADER.
 C--------------------------------------
@@ -1811,11 +1856,7 @@ C--------------------------------------
       LEN_M = NPROPMI*NUMMAT
       CALL W_INLOC(ICODE,NODGLOB,NUMNOD_L,LEN_IA)
 C--------------------------------------
-C Ecriture LSHSUB
-C--------------------------------------
-      IF (MSHSUB>0)
-     .  CALL W_ISHSUB(LSHSUB,NSHFRONT_L,P-1,NODLOCAL,LEN_IA)
-C
+
       IF(NUMSPH>0.AND.NSPCOND>0)THEN
         CALL W_ISKEWSP(ISKEW,NODGLOB,NUMNOD_L,NUMSPH_L,CEPSP,P-1,LEN_IA)
       ELSE
@@ -1846,13 +1887,8 @@ C--------------------------------------------
       OFF = OFF + NUMELP
       CALL W_IELOC(IPARTR,CEP(MIN(OFF+1,LEN_CEP)),P-1,NUMELR,NUMELR_L,LEN_IA)
       OFF = OFF + NUMELR
-      OFF1 = OFF
-      OFF  = OFF + NUMELTG
-      CALL W_IELOC(IPARTUR,CEP(MIN(OFF+1,LEN_CEP)),P-1,NUMELUR,NUMELUR_L,LEN_IA)
-C      OFF = OFF + NUMELUR
-      OFF = OFF1
       CALL W_IELOC(IPARTTG,CEP(MIN(OFF+1,LEN_CEP)),P-1,NUMELTG,NUMELTG_L,LEN_IA)
-      OFF = OFF + NUMELTG + NUMELUR
+      OFF = OFF + NUMELTG
       CALL W_IELOC(IPARTX,CEP(MIN(OFF+1,LEN_CEP)),P-1,NUMELX,NUMELX_L,LEN_IA)
       OFF = OFF + NUMELX
       CALL W_IELOC(IPARTSP,CEPSP,P-1,NUMSPH,NUMSPH_L,LEN_IA)
@@ -1864,14 +1900,13 @@ C
         LEN_IA = LEN_IA + LNOM_OPT
       ENDIF
 C
+
+      CALL PYTHON_SERIALIZE(PYTHON,BUFFER, BUFFER_SIZE)
+      CALL WRITE_I_C(BUFFER, BUFFER_SIZE)
+
       CALL WRITE_I_C(NPC,3*NFUNCT+1)
         LEN_IA = LEN_IA + 3*NFUNCT+1
-C--------------------------------------------
-C contectivity for RNUR
-C--------------------------------------------
-      OFF = NUMELS+NUMELQ+NUMELC+NUMELT+NUMELP+NUMELR+NUMELTG
-      CALL W_IXLOC(IXUR,NIXUR,4,CEP(MIN(OFF+1,LEN_CEP)),P-1,
-     +             NUMELUR,NUMELUR_L,NODLOCAL,LEN_IA)
+
 C--------------------------------------------
 C Connectivity for Triangles
 C--------------------------------------------
@@ -2043,7 +2078,7 @@ C     ----------------------    C
 
           IF(ALE_CONNECTIVITY%has_nn_connect .OR. ALE_CONNECTIVITY%has_ne_connect)THEN
             CALL W_ING2LOC(ALE_CONNECTIVITY,
-     .            ELEMID_L,NUMNOD,NODGLOB,NODLOCAL,NUMNOD_L,LEN_IA,NWALE)
+     .            ELEMID_L,NUMNOD,NODGLOB,NODLOCAL,NUMNOD_L,LEN_IA,ALE%GRID%NWALE)
           ENDIF
 
         DEALLOCATE(ELEMID_L)
@@ -2075,8 +2110,11 @@ C--------------------------------------
      .                 IGRSH3N ,IGRTRUSS ,IGRBEAM ,IGRSPRING ,IGRPART   ,
      .                 CEP     ,CEL      ,NODLOCAL,P-1       ,FRONTB_R2R,
      .                 NUMNOD_L )
-      CALL W_ISURF_STR(IGRSURF ,LEN_IA ,CEP  ,CEL  ,P-1,
-     .                 NODLOCAL,LENISURF_L)
+      CALL W_ISURF_STR(LEN_IA,P-1,NUMNOD,NSURF,NUMELS,
+     .                 NUMELQ,NUMELC,NUMELT,NUMELP,NUMELR,
+     .                 NODLOCAL,SCEL,CEL,LTITR,LENISURF_L,
+     .                 NSPMD,IGRSURF,IGRSURF_PROC)
+
       CALL W_ISLIN_STR(IGRSLIN ,LEN_IA , P-1, NODLOCAL)
 C--------------------------------------
 C Elem multi-brins
@@ -2159,9 +2197,9 @@ C--------------------------------------
         ! NRF ebcs
         IF(.NOT.EBCS_TAB%tab(ii)%poly%is_multifluid.AND.EBCS_TAB%tab(ii)%poly%type==10) THEN
             NEBCS_NRF = NEBCS_NRF + 1
-            DO JJ = 1, EBCS_TAB_LOC_2%tab(ii)%poly%nb_node
-                IF( NODLOCAL(EBCS_TAB_LOC_2%tab(ii)%poly%node_list(jj))>0.AND.
-     .              NODLOCAL(EBCS_TAB_LOC_2%tab(ii)%poly%node_list(jj))<=NUMNOD ) THEN
+            DO JJ = 1, EBCS_TAB_LOC_2%tab(NEBCS_NRF)%poly%nb_node
+                IF( NODLOCAL(EBCS_TAB_LOC_2%tab(NEBCS_NRF)%poly%node_list(jj)) > 0 .AND.
+     .              NODLOCAL(EBCS_TAB_LOC_2%tab(NEBCS_NRF)%poly%node_list(jj)) <= NUMNOD ) THEN
                     EBCS_TAB_LOC_2%tab(NEBCS_NRF)%poly%node_list(JJ) =
      .               NODLOCAL(EBCS_TAB_LOC_2%tab(NEBCS_NRF)%poly%node_list(JJ))                
                 ENDIF
@@ -2199,15 +2237,11 @@ C LLINK
 C--------------------------------------
       IF (NLINK>0)
      .  CALL W_LLINK(NNLINK,LLLINK,NODLOCAL,P-1,NLLINK_L,LEN_IA)
-C--------------------------------------
-C USERWINDOW Partie Entiere
-C--------------------------------------
-      IF(P==1.AND.IUSERWI/=0)THEN
-        ALLOCATE(IUSERW_L(SIUSERW_L))
-        CALL SPMD_USERWI_REST(IUSERW,IUSERW_L,NODLOCAL)
-        CALL  WRITE_I_C(IUSERW_L,SIUSERW_L)
-        DEALLOCATE(IUSERW_L)
-      ENDIF
+C--------------
+C--------------
+C USER WINDOWS 
+C--------------
+        CALL SPMD_USERWI_REST(USER_WINDOWS,NODLOCAL,NUMNOD,NUMNOD_L,P,NSPMD)
 C--------------------------------------
 C IPARG
 C--------------------------------------
@@ -2333,7 +2367,7 @@ c       start CPU timer for SPLIT_INTERFACES
         CALL SPLIT_INTERFACES(INTBUF_TAB, IPARI   , P-1     , INTBUF_TAB_L,
      .                        IPARI_L   , INTERCEP, NODLOCAL,
      .                        ITAB      , ITABI2M , NBDDI2M , NUMNOD_L    ,
-     .                        CEP       , CEL     , IGRBRIC , T8, MULTI_FVM,
+     .                        LEN_CEP,CEP       , CEL     , IGRBRIC , T8, MULTI_FVM,
      .                        TAG_NM    ,NINDX_NM ,INDX_NM  ,TAG_SCRATCH,NINDX_SCRT,
      .                        INDX_SCRT ,FLAG_24_25,I24MAXNSNE,INTBUF_FRIC_TAB)
 
@@ -2425,63 +2459,25 @@ C--------------------------------------
 C--------------------------------------------
 C TH Groups
 C--------------------------------------------
-      CALL W_TH(ITHGRP ,ITHBUF ,LENTHG,NODLOCAL,CEL   ,
-     2          NTHGRP0,NTHGRP ,P       ,LEN_IA,
-     3          CELSPH ,NUMLOCCLUSTER,NBR_TH_MONVOL)
+       CALL WRITE_TH_BUFFER(OUTPUT%TH,NODLOCAL ,CEL      ,P,
+     2                      NTHGRP0  ,NTHGRP   ,NTHGRP01 ,NTHGRP1  , 
+     3                      SCEL     ,NUMSPH   ,NUMNOD   ,NCLUSTER ,
+     4                      CELSPH   ,NUMLOCCLUSTER ,NBR_TH_MONVOL)
 
-      IF (NTHGRP01(1) > 0) THEN
-        CALL W_TH(ITHGRPA    ,ITHBUFA    ,SITHBUFA,NODLOCAL,CEL   ,
-     2            NTHGRP01(1),NTHGRP1(1) ,P       ,LEN_IA,
-     3            CELSPH, NUMLOCCLUSTER ,NBR_TH_MONVOL)
-      END IF
+       CALL THSURF_WRITE_RESTART(OUTPUT%TH%TH_SURF,1)
+       IF (OUTPUT%TH%TH_SURF%PLOAD_FLAG > 0) THEN 
+          OFF = NUMELC+NUMELTG+NUMELS+NUMELQ+NUMELT+NUMELP+NUMELR+NUMELX
+          CALL W_TH_SURF_PLOAD(IBCL ,NODLOCAL ,P-1   ,LEN_IA  ,CEP    ,
+     .             OUTPUT%TH%TH_SURF,NUMNOD   ,NIBCLD,NCONLD  ,LEN_CEP,
+     .                         OFF  )
+       ENDIF
+       IF (OUTPUT%TH%TH_SURF%LOADP_FLAG > 0) THEN 
+          OFF = NUMELC+NUMELTG+NUMELS+NUMELQ+NUMELT+NUMELP+NUMELR+NUMELX+NCONLD+NUMCONV+NUMRADIA+NFXFLUX
+          CALL W_TH_SURF_LOADP(ILOADP  ,NODLOCAL  ,P-1   ,LEN_IA  ,CEP    ,
+     .                OUTPUT%TH%TH_SURF,NUMNOD    ,SIZLOADP,NLOADP,LEN_CEP,
+     .                OFF              )
+       ENDIF
 
-      IF (NTHGRP01(2) > 0) THEN
-        CALL W_TH(ITHGRPB ,ITHBUFB ,SITHBUFB,NODLOCAL,CEL   ,
-     2            NTHGRP01(2),NTHGRP1(2) ,P ,LEN_IA  ,
-     3            CELSPH, NUMLOCCLUSTER ,NBR_TH_MONVOL)
-      END IF
-
-      IF (NTHGRP01(3) > 0) THEN
-        CALL W_TH(ITHGRPC ,ITHBUFC ,SITHBUFC,NODLOCAL,CEL   ,
-     2            NTHGRP01(3),NTHGRP1(3) ,P ,LEN_IA  ,
-     3            CELSPH, NUMLOCCLUSTER ,NBR_TH_MONVOL)
-      END IF
-
-      IF (NTHGRP01(4) > 0) THEN
-        CALL W_TH(ITHGRPD ,ITHBUFD ,SITHBUFD,NODLOCAL,CEL   ,
-     2            NTHGRP01(4),NTHGRP1(4) ,P ,LEN_IA  ,
-     3             CELSPH, NUMLOCCLUSTER ,NBR_TH_MONVOL)
-      END IF
-
-      IF (NTHGRP01(5) > 0) THEN
-        CALL W_TH(ITHGRPE ,ITHBUFE ,SITHBUFE,NODLOCAL,CEL   ,
-     2          NTHGRP01(5),NTHGRP1(5) ,P ,LEN_IA    ,
-     3          CELSPH, NUMLOCCLUSTER  ,NBR_TH_MONVOL)
-      END IF
-
-      IF (NTHGRP01(6) > 0) THEN
-        CALL W_TH(ITHGRPF ,ITHBUFF ,SITHBUFF,NODLOCAL,CEL   ,
-     2            NTHGRP01(6),NTHGRP1(6) ,P ,LEN_IA  ,
-     3            CELSPH, NUMLOCCLUSTER ,NBR_TH_MONVOL)
-      END IF
-
-      IF (NTHGRP01(7) > 0) THEN
-        CALL W_TH(ITHGRPG ,ITHBUFG ,SITHBUFG,NODLOCAL,CEL   ,
-     2            NTHGRP01(7),NTHGRP1(7) ,P ,LEN_IA  ,
-     3            CELSPH, NUMLOCCLUSTER  ,NBR_TH_MONVOL)
-      END IF
-
-      IF (NTHGRP01(8) > 0) THEN
-        CALL W_TH(ITHGRPH ,ITHBUFH ,SITHBUFH,NODLOCAL,CEL   ,
-     2            NTHGRP01(8),NTHGRP1(8) ,P ,LEN_IA  ,
-     3            CELSPH, NUMLOCCLUSTER  ,NBR_TH_MONVOL)
-      END IF
-
-      IF (NTHGRP01(9) > 0) THEN
-        CALL W_TH(ITHGRPI ,ITHBUFI ,SITHBUFI,NODLOCAL,CEL   ,
-     2            NTHGRP01(9),NTHGRP1(9) ,P ,LEN_IA  ,
-     3            CELSPH, NUMLOCCLUSTER  ,NBR_TH_MONVOL)
-      END IF
 C--------------------------------------
 C Frontieres SPMD
 C--------------------------------------
@@ -2493,6 +2489,7 @@ C--------------------------------------
       ENDIF
       NBCFD = MAX(NRCVVOIS,NSNDVOIS,NERVOIS,NESVOIS,NSEGFL_L)
       IF(NUMSKW>0) CALL SPLIT_SKEW(P,ISKWP_L,ISKWP,TAG_SKN,MULTIPLE_SKEW)
+
       CALL W_FRONT(
      1   P       ,NBDDACC ,NBDDKIN ,NODLOCAL,
      2   NBDDPROC,NBDDBOUN,NODGLOB ,NUMNOD_L,NBDDNRB ,
@@ -2511,12 +2508,12 @@ C--------------------------------------
      F   IACCP   ,NACCP   ,IRBE3   ,LRBE3   ,ITABRBE3M,
      G   NBDDRBE3M,IRBYM   ,LCRBYM  ,FRONT_RM ,DD_RBYM2,
      H   NBDDNRBYM,IRBE2   ,LRBE2   ,NBDDRBE2,ITABRBE2M,
-     I   USERNODS,IEDGE_TMP,NODEDGE,EDGELOCAL,NBDDEDGE_L,
+     I   IEDGE_TMP,NODEDGE,EDGELOCAL,NBDDEDGE_L,
      J   IGAUP   ,NGAUP    ,FRONTB_R2R,SDD_R2R_ELEM,ADDCSRECT,
      K   CSRECT  ,NBDDNORT_L,NBDDNOR_MAX_L,NBCCFR25_L,NBCCNOR_L,
      L   NUMNOR_L ,NBDDEDGT_L,NBDDEDG_MAX_L,INTERCEP ,NBDDCNDM,
      M   ITABCNDM,MULTI_FVM,IGRSURF,ISKWP_L,ALE_ELM,
-     N   SIZE_ALE_ELM  )
+     N   SIZE_ALE_ELM,SENSORS%NSENSOR,NLOC_DMG)
       DEALLOCATE(ITABI2M)
       DEALLOCATE(ITABRBE3M)
       DEALLOCATE(ITABRBE2M)
@@ -2530,11 +2527,11 @@ C--------------------------------------
      1      ADDCNE   ,CNE      ,LCNE      ,NUMNOD_L  ,NODGLOB   ,
      2      LCNE_L   ,CEP      ,CEL       ,IXS       ,IXS10     ,
      3      IXS20    ,IXS16    ,IXQ       ,IXC       ,IXT       ,
-     4      IXP      ,IXR      ,IXTG      ,IXUR      ,MONVOL    ,
+     4      IXP      ,IXR      ,IXTG      ,MONVOL    ,
      5      IBCL     ,GEO      ,IGEO      ,P         ,
      6      NUMELS_L ,NUMELS8_L,NUMELS10_L,NUMELS16_L,NUMELS20_L,
      7      NUMELQ_L ,NUMELC_L ,NUMELT_L  ,NUMELP_L  ,NUMELR_L  ,
-     8      NUMELTG_L,NUMELUR_L,NSKYRW_L  ,NPRW      ,LPRW      ,
+     8      NUMELTG_L,NSKYRW_L  ,NPRW      ,LPRW      ,
      9      NSKYRBK_L,NPBY      ,LPBY     ,DD_RBY2   ,
      A      I2NSNT   ,I2NSN_L  ,IPARI     ,NIR       ,
      B      LCNI2_L  ,NISKYI2_L,CEPI2     ,CELI2     ,CNI2      ,
@@ -2552,7 +2549,8 @@ C--------------------------------------
      N      CRKNODIAD ,INTBUF_TAB,NUMELIG3D_L,KXIG3D,IXIG3D,
      O      IBFFLUX   ,NFXFLUX_L ,CEPCND  ,CELCND   ,ADDCNCND    ,
      P      CNCND     ,NS10E_L   ,ICNDS10 ,LCNCND_L ,ITAGND ,IGRSURF,
-     Q      IGRSURF_PROC ,NEBCS_NRF, EBCS_TAB_LOC_2)
+     Q      IGRSURF_PROC ,NEBCS_NRF, EBCS_TAB_LOC_2,
+     R      NUMBER_LOAD_CYL,LOADS,LOADS_PER_PROC)
 
       ! -------------------
       CALL EBCS_TAB_LOC_2%destroy()
@@ -2595,7 +2593,7 @@ C--------------------------------------
 
         CALL W_FI(IPARI,P-1,LEN_IA,
      1            INTERCEP  ,INTBUF_TAB,ITAB,MULTI_FVM,TAG_SCRATCH,
-     2            NINDX_SCRT,INDX_SCRT ,NODLOCAL,NUMNOD_L)
+     2            NINDX_SCRT,INDX_SCRT ,NODLOCAL,NUMNOD_L,LEN_CEP,CEP)
 
 c       stop CPU timer for W_FI
         CALL STOPTIME(8,1)
@@ -2640,6 +2638,14 @@ C--------------------------------------------
         CALL PBLAST_WRITE_STARTER(PBLAST_TAB,P-1,CEP)
       ENDIF
 C
+C--------------------------------------------
+C LOAD/PCYL
+C--------------------------------------------
+      IF (LOADS_PER_PROC%NLOAD_CYL > 0) THEN
+        CALL WRITE_PCYL(LOADS_PER_PROC%LOAD_CYL,LOADS_PER_PROC%NLOAD_CYL,NODLOCAL)
+      ENDIF
+C
+C--------------------------------------
       IF(ICRACK3D > 0)THEN
 C--------------------------------------
 C Boundary nodes for xfem
@@ -2702,16 +2708,13 @@ C--------------------------------------------
      .  CALL W_BID(3*NRCVVOIS,LEN_AM)
       IF(IRODDL>0) THEN
         CALL W_R3NLOC(VR,NODGLOB,NUMNOD_L,LEN_AM)
-        IF(ISECUT>0.OR.ISUB>0.OR.MSHSUB>0.OR.IISROT>0.OR.
-     .     IMPOSE_DR/=0.OR.IDROT==1)
-     .    CALL W_R3NLOC(DR,NODGLOB,NUMNOD_L,LEN_AM)
+        IF(ISECUT > 0 .OR. IISROT > 0 .OR. IMPOSE_DR /= 0 .OR. IDROT == 1)CALL W_R3NLOC(DR,NODGLOB,NUMNOD_L,LEN_AM)
       ENDIF
 C--------------------------------------------
 C THKE SHELL 4-N + SHELL 3-N
 C--------------------------------------------
       OFF = NUMELS + NUMELQ
       CALL W_RELOC(THKE,CEP(MIN(OFF+1,LEN_CEP)),P-1,NUMELC,NUMELC_L,LEN_AM)
-C      OFF = OFF + NUMELC + NUMELT + NUMELP + NUMELR + NUMELUR
       OFF = OFF + NUMELC + NUMELT + NUMELP + NUMELR
       CALL W_RELOC(
      .   THKE(NUMELC+1),CEP(MIN(OFF+1,LEN_CEP)),P-1,NUMELTG,NUMELTG_L,LEN_AM)
@@ -2721,7 +2724,6 @@ C--------------------------------------------
       IF (NDAMP>0) THEN
         CALL WRITE_DB(DAMPR,NRDAMP*NDAMP)
         LEN_AM = LEN_AM + NRDAMP*NDAMP
-
         IF(IRODDL>0)THEN
           CALL W_RNNLOC(DAMP,NODGLOB,NUMNOD_L,6,LEN_AM)
         ELSE
@@ -2753,8 +2755,9 @@ C--------------------------------------------
       CALL WRITE_DB(PM,NPROPM*NUMMAT)
       LEN_AM = LEN_AM + NPROPM*NUMMAT
 c
-      CALL WRITE_MATPARAM(MATPARAM_TAB,NUMMAT,LEN)
-      LEN_AM = LEN_AM + LEN
+      CALL WRITE_MATPARAM(MAT_ELEM,LEN)
+C     LEN_AM = LEN_AM + LEN !LEN is corrupted by uninitialized variable
+C     in write_matparam
 C--------------------------------------
 C ELGROUP_PARAM
 C--------------------------------------
@@ -2796,7 +2799,6 @@ C--------------------------------------------
       OFF = OFF + NUMELQ
       CALL W_RELOC(EANI(OFF+1),CEP(MIN(OFF+1,LEN_CEP)),P-1,NUMELC,NUMELC_L,LEN_AM)
       SHF = OFF + NUMELC
-C      OFF = OFF + NUMELC + NUMELT + NUMELP + NUMELR + NUMELUR
       OFF = OFF + NUMELC + NUMELT + NUMELP + NUMELR
       CALL W_RELOC(EANI(SHF+1),CEP(MIN(OFF+1,LEN_CEP)),P-1,NUMELTG,NUMELTG_L,LEN_AM)
 C--------------------------------------------
@@ -2870,23 +2872,13 @@ C
         CALL WRITE_DB(ALPH,SALPH)
         LEN_AM = LEN_AM + SALPH
       END IF
-      IF(NWALE==2) THEN
+      IF(ALE%GRID%NWALE==2) THEN
         CALL W_R3NLOC(WB,NODGLOB,NUMNOD_L,LEN_AM)
-      ELSEIF(NWALE==4) THEN
+      ELSEIF(ALE%GRID%NWALE==4) THEN
         CALL W_R3NLOC(WB,NODGLOB,NUMNOD_L,LEN_AM)
         CALL W_RNLOC(WMA,NODGLOB,NUMNOD_L,LEN_AM)
       ENDIF
-      IF(MSHSUB==1)THEN
-        CALL W_R3NLOC(DSAV ,NODGLOB,NUMNOD_L,LEN_AM)
-        CALL W_R3NLOC(DRSAV,NODGLOB,NUMNOD_L,LEN_AM)
-        CALL W_R3NLOC(ASAV ,NODGLOB,NUMNOD_L,LEN_AM)
-        CALL W_R3NLOC(ARSAV,NODGLOB,NUMNOD_L,LEN_AM)
-        CALL W_RNLOC(STSAV ,NODGLOB,NUMNOD_L,LEN_AM)
-        CALL W_RNLOC(STRSAV,NODGLOB,NUMNOD_L,LEN_AM)
-C       FSAVSAV
-        CALL WRITE_DB(FSAVSAV,NTHVKI*NSECT)
-        LEN_AM = LEN_AM + NTHVKI*NSECT
-      ELSEIF(ILAG==1.AND.(IALE+IEULER)/=0)THEN
+      IF(ILAG==1.AND.(IALE+IEULER)/=0)THEN
         CALL W_R3NLOC(DSAV,NODGLOB,NUMNOD_L,LEN_AM)
         CALL W_R3NLOC(ASAV,NODGLOB,NUMNOD_L,LEN_AM)
       ENDIF
@@ -2894,13 +2886,12 @@ C--------------------------------------
 C SPH Cells partie reelle
 C--------------------------------------
       IF (NUMSPH>0)THEN
-          CALL W_RSPH(SPBUF ,NUMSPH_L,CEPSP,P-1,
-     *                VSPHIO,LEN_AM, SSPHVELN_L  )
+        CALL W_RSPH(SPBUF ,NUMSPH_L,CEPSP,P-1,VSPHIO,LEN_AM, SSPHVELN_L  )
       ENDIF
 C--------------------------------------
 C Masses nodales fluides
 C--------------------------------------
-      IF(IALE==1.OR.IEULER==1.OR.IALELAG==1) THEN
+      IF(IALE == 1 .OR. IEULER == 1 .OR. IALELAG == 1) THEN
         CALL W_RNLOC(MSNF,NODGLOB,NUMNOD_L,LEN_AM)
       ENDIF
 C--------------------------------------------
@@ -2908,27 +2899,16 @@ C Pressure & concentrated loads
 C--------------------------------------------
 c      CALL WRITE_DB(FAC,NCONLD)
 c      LEN_AM = LEN_AM + NCONLD
-      IF(NCONLD>0)
-     .  CALL W_FAC(FAC,CEP,P-1,NCONLD_L,LEN_AM)
+      IF(NCONLD>0)CALL W_FAC(FAC,CEP,P-1,NCONLD_L,LEN_AM)
 C--------------------------------------------
 C Fixvel real
 C--------------------------------------------
-      IF(NFXVEL_L>0)
-     .  CALL W_FIXVEL(VEL,NFXVEL,IBFV,NFXVEL_L,LEN_AM,P-1)
+      IF(NFXVEL_L>0)CALL W_FIXVEL(VEL,NFXVEL,IBFV,NFXVEL_L,LEN_AM,P-1)
 C--------------------------------------------
 C FSAV
 C--------------------------------------------
-      CALL WRITE_DB(FSAV,NTHVKI*
-     .     (NINTER+NRWALL+NRBODY+NSECT+NJOINT+NRBAG+NVOLU+
-     .      NFXBODY+NINTSUB))
-      LEN_AM = LEN_AM + NTHVKI*
-     .        (NINTER+NRWALL+NRBODY+NSECT+NJOINT+NRBAG+NVOLU+
-     .         NFXBODY+NINTSUB)
-
-      CALL WRITE_DB(FBSAV6,12*6*SFSAV6)
-
-      CALL WRITE_I_C(TABSENSOR,STABSEN)
-
+      CALL WRITE_DB(FSAV,NTHVKI*(NINTER+NRWALL+NRBODY+NSECT+NJOINT+NRBAG+NVOLU+NFXBODY+NINTSUB))
+      LEN_AM = LEN_AM + NTHVKI*(NINTER+NRWALL+NRBODY+NSECT+NJOINT+NRBAG+NVOLU+ NFXBODY+NINTSUB)
 C--------------------------------------------
 C TIMER MAT/PROP and WEIGHT
 C--------------------------------------------
@@ -2948,7 +2928,6 @@ C--------------------------------------------
       IF(IABS(ISIGI)==5)THEN
         OFF = NUMELS+NUMELQ
         CALL W_RELOC2(FZERO,3*4,CEP(MIN(OFF+1,LEN_CEP)),P-1,NUMELC,NUMELC_L,LEN_AM)
-C        OFF = OFF + NUMELC + NUMELT + NUMELP + NUMELR + NUMELUR
         OFF = OFF + NUMELC + NUMELT + NUMELP + NUMELR
         SHF = NUMELC*3*4
         CALL W_RELOC2(FZERO(SHF+1),3*4,CEP(MIN(OFF+1,LEN_CEP)),P-1,NUMELTG,
@@ -2978,9 +2957,7 @@ C--------------------------------------------
 C--------------------------------------------
 C Sensors
 C--------------------------------------------
-      IF (NSENSOR > 0) THEN
-        CALL WRITE_SENSOR_TAB(SENSOR_TAB,NSENSOR,NODLOCAL)
-      END IF
+      CALL WRITE_SENSORS(SENSORS,NUMNOD,NODLOCAL)
 C--------------------------------------------
 C RBM
 C--------------------------------------------
@@ -3029,12 +3006,6 @@ C PARTS0
 C--------------------------------------------
       CALL WRITE_DB(PARTS0,NPART)
       LEN_AM = LEN_AM + NPART
-C--------------------------------------
-C USERWINDOW (float)
-C--------------------------------------
-      IF(P==1.AND.IUSERWI/=0)THEN
-        CALL  WRITE_DB(USERW,SUSERW_L)
-      ENDIF
 C--------------------------------------------
 C Element Buffer
 C--------------------------------------------
@@ -3294,6 +3265,24 @@ C--------------------------------------------
       IF (LMAX_DIS>0)CALL W_R3NLOC(D,NODGLOB,NUMNOD_L,LEN_AM)
       IF (LMAX_VEL>0)CALL W_R3NLOC(V,NODGLOB,NUMNOD_L,LEN_AM)
       CALL W_OUTMAXN(NUMNOD_L,LEN_AM)
+C--------------------------------------------
+C Pressure & concentrated loads --> DISP & VEL saved
+C--------------------------------------------
+      IF (LOADS%NLOAD_CLOAD > 0) THEN
+        OFF = NUMELC+NUMELTG+NUMELS+NUMELQ+NUMELT+NUMELP+NUMELR
+     .      + NUMELX
+        CALL W_DISP0_VEL0_CLOAD(DPL0CLD,CEP    ,P-1   ,NCLOAD_L,LEN_AM,
+     .                          OFF    ,LEN_CEP,LOADS%NLOAD_CLOAD)
+        CALL W_DISP0_VEL0_CLOAD(VEL0CLD,CEP    ,P-1   ,NCLOAD_L,LEN_AM,
+     .                          OFF    ,LEN_CEP,LOADS%NLOAD_CLOAD)
+      ENDIF
+C--------------------------------------------
+C /DAMP/VREL
+C--------------------------------------------
+      IF (NDAMP_VREL_L>0) THEN       
+        CALL W_DAMPVREL(DAMPR,IGRNOD,IDAMP_VREL_L,NDAMP_VREL_L,LEN_IA,
+     .                  NGRNOD,NDAMP,NRDAMP,NSPMD)
+      ENDIF      
 C-----------------------------------------------
 C FLOW
 C-----------------------------------------------
@@ -3477,7 +3466,7 @@ C
 C--------------------------------------
 C     ALEFVM WORKING ARRAY : MUST BE INIT. FOR CYCLE 0
 C--------------------------------------
-       IF(IALEFVM > 0)CALL WRITE_DB(FCELL ,6*NUMELS)
+       IF(ALEFVM_Param%IEnabled > 0)CALL WRITE_DB(ALEFVM_Buffer%FCELL ,6*NUMELS)
 C--------------------------------------------
 C  for foam+air
        IF(IALELAG > 0) THEN
@@ -3506,7 +3495,7 @@ C--------------------------------------------
 C STACK proprerties
 C--------------------------------------------
        IF(IPART_STACK > 0 .OR. IPART_PCOMPP > 0 ) THEN
-          LEN_IG  = (3*NPT_STACK + 2)*NS_STACK
+          LEN_IG  = (4*NPT_STACK + 2)*NS_STACK
           LEN_G   = (6*NPT_STACK + 1)*NS_STACK
           LEN_PM  =  20*NS_STACK
          CALL W_STACK(STACK%IGEO,STACK%GEO,LEN_IG,LEN_G,LEN_IA,LEN_AM,
@@ -3518,10 +3507,13 @@ C--------------------------------------------
        IF (NDRAPE > 0) THEN
 C    write drape structure
          OFF  = NUMELS + NUMELQ
-         CALL W_DRAPE(DRAPE,CEP(MIN(OFF+1,LEN_CEP)),P-1,NUMELC,NUMELC_L,LEN_IA,LEN_AM)
+         IF(NUMELC_DRAPE > 0) 
+     .      CALL W_DRAPE(DRAPE,DRAPEG%INDX,CEP(MIN(OFF+1,LEN_CEP)),P-1,
+     .                  NUMELC,NUMELC_L,NUMSH4N_L,LEN_IA,LEN_AM)
          OFF = OFF + NUMELC + NUMELT + NUMELP + NUMELR
-         CALL W_DRAPE(DRAPE(1+NUMELC),CEP(MIN(OFF+1,LEN_CEP)),P-1,
-     .                 NUMELTG,NUMELTG_L,LEN_IA,LEN_AM)
+         IF(NUMELTG_DRAPE > 0) 
+     .      CALL W_DRAPE(DRAPE,DRAPEG%INDX(NUMELC +1),CEP(MIN(OFF+1,LEN_CEP)),P-1,
+     .                 NUMELTG,NUMELTG_L,NUMSH3N_L,LEN_IA,LEN_AM)
        ENDIF
 C--------------------------------------------
 C PLY_INFO ( need for animation file )
@@ -3529,6 +3521,17 @@ C--------------------------------------------
       IF (NUMPLY>0)
      .  CALL W_PLY_INFO(PLY_INFO,NUMPLY)
 C
+C--------------------------------------------
+C Pressure & concentrated loads --> DISP & VEL saved
+C--------------------------------------------
+!      IF (LOADS%NLOAD_CLOAD > 0) THEN
+!        OFF = NUMELC+NUMELTG+NUMELS+NUMELQ+NUMELT+NUMELP+NUMELR
+!     .      + NUMELX
+!        CALL W_DISP0_VEL0_CLOAD(DPL0CLD,CEP    ,P-1   ,NCLOAD_L,LEN_AM,
+!     .                          OFF    ,LEN_CEP,LOADS%NLOAD_CLOAD)
+!        CALL W_DISP0_VEL0_CLOAD(VEL0CLD,CEP    ,P-1   ,NCLOAD_L,LEN_AM,
+!     .                          OFF    ,LEN_CEP,LOADS%NLOAD_CLOAD)
+!      ENDIF
 ! -------------------------------------
 ! write the current elapsed time
 ! -------------------------------------
@@ -3571,7 +3574,7 @@ C 5 : NUMELC_L
 C 6 : NUMELP_L
 C 7 : NUMELT_L
 C 8 : NUMELR_L
-C 9 : NUMELUR_L
+C 9 : -
 C 10: NUMELTG_L
 C 11: NUMELX_L
 C 12: NBDDPROC :  nb of boundary proc 
@@ -3596,7 +3599,7 @@ C 24: NSLARB_L : number of nodes secnd rigid body
       DDSTAT(6) = NUMELP_L
       DDSTAT(7) = NUMELT_L
       DDSTAT(8) = NUMELR_L
-      DDSTAT(9) = NUMELUR_L
+      DDSTAT(9) = 0
       DDSTAT(10)= NUMELTG_L
       DDSTAT(11)= NUMELX_L
       DDSTAT(12)= NBDDPROC

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -52,5 +52,8 @@ C-----------------------------------------------
       DO I=1,SMESSAGESFILE
         MESSAGESFILE(I)=MESSAGESDATA(I)
       END DO
+
+      ! Allocation is done in starter_message_description.inc
+      DEALLOCATE(MESSAGESDATA)
       RETURN
       END SUBROUTINE

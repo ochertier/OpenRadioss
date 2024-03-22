@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,10 +26,12 @@ Chd|-- called by -----------
 Chd|        TFORC3                        source/elements/truss/tforc3.F
 Chd|-- calls ---------------
 Chd|====================================================================
-      SUBROUTINE TDLEN3(JFT  ,JLT   ,PM     ,OFFG,OFF   ,
-     .                  DT2T ,NELTST,ITYPTST,MSTR,DMELTR,
-     .                  DTEL ,NEL   ,G_DT   ,MAT ,NGL   ,
-     .                  AL   )
+      SUBROUTINE TDLEN3(
+     1   JFT,     JLT,     PM,      OFFG,
+     2   OFF,     DT2T,    NELTST,  ITYPTST,
+     3   MSTR,    DMELTR,  DTEL,    NEL,
+     4   G_DT,    MAT,     NGL,     AL,
+     5   JSMS)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -42,7 +44,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "couple_c.inc"
 #include      "com08_c.inc"
 #include      "param_c.inc"
 #include      "scr02_c.inc"
@@ -51,10 +52,10 @@ C-----------------------------------------------
 #include      "scr18_c.inc"
 #include      "sms_c.inc"
 #include      "units_c.inc"
-#include      "vect01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: JSMS
       INTEGER MAT(MVSIZ),NGL(MVSIZ)
       INTEGER, INTENT(IN)    :: NEL
       my_real, INTENT(INOUT) :: DTEL(NEL)
@@ -130,7 +131,7 @@ C----
       END IF!(IDTMINS/=2.OR.JSMS==0)
 C-----------------------------------------------           
       IF(G_DT/=ZERO)THEN
-        DO I=LFT,LLT
+        DO I=1,NEL
           DTEL(I) = DT(I)
         ENDDO
       ENDIF

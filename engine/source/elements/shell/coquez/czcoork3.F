@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -28,7 +28,7 @@ Chd|        CZKEL3                        source/elements/shell/coquez/czkel3.F
 Chd|-- calls ---------------
 Chd|        CLSKEW3                       source/elements/sh3n/coquedk/cdkcoor3.F
 Chd|        CORTDIR3                      source/elements/shell/coque/cortdir3.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
         SUBROUTINE CZCOORK3(JFT  ,JLT  ,X     ,IXC  ,PM    ,
      1                      OFFG ,AREA ,AREA_I,VQN  ,VQ    ,
@@ -50,7 +50,6 @@ c   g l o b a l   p a r a m e t e r s
 c-----------------------------------------------
 #include      "mvsiz_p.inc"
 #include      "param_c.inc"
-#include      "parit_c.inc"
 #include      "impl1_c.inc"
 #include      "comlock.inc"
 #include      "units_c.inc"
@@ -238,7 +237,7 @@ C
         L13(I)=X13_2(I)+Y13_2(I)
         L24(I)=X24_2(I)+Y24_2(I)
         LL(I)=HALF*(L13(I)+L24(I))
-	       S1=EM01*THK(I)*THK(I)
+                 S1=EM01*THK(I)*THK(I)
         LL(I)=MAX(LL(I),S1)
       ENDDO
       IF (IMP_CHK > 0) THEN
@@ -268,53 +267,49 @@ C--------------------------
        Z2(I)=Z1(I)*Z1(I)
        IF (Z2(I)<LL(I)*TOL.OR.NPT==1) THEN
          Z1(I)=ZERO
-c         PLAT(I)=.TRUE.
        ELSE
-c         PLAT(I)=.FALSE.
 C--------------------------------------------------
-C TRAITEMENT SPECIAL POUR ELEMENT GAUCHE
+C WARPING SPECIAL TREATMENT
 C full projection eliminer drilling rotations and rigid rotations
 C--------------------------------------------------------------------------  
-        A_4=AREA(I)*FOURTH
-C
+         A_4=AREA(I)*FOURTH
 C----------  node N ----------
-        SZ1=MX13(I)*Y24(I)-MY13(I)*X24(I)
-        SZ2=A_4+SZ1
-        SZ=Z2(I)*L24(I)
-        SL=ONE/SQRT(SZ+SZ2*SZ2)
-        VQN(I,1,1)=-Z1(I)*Y24(I)
-        VQN(I,2,1)= Z1(I)*X24(I)
-        VQN(I,3,1)= SZ2*SL
-        VQN(I,1,3)=-VQN(I,1,1)
-        VQN(I,2,3)=-VQN(I,2,1)
-        VQN(I,1,1)= VQN(I,1,1)*SL
-        VQN(I,2,1)= VQN(I,2,1)*SL
+         SZ1=MX13(I)*Y24(I)-MY13(I)*X24(I)
+         SZ2=A_4+SZ1
+         SZ=Z2(I)*L24(I)
+         SL=ONE/SQRT(SZ+SZ2*SZ2)
+         VQN(I,1,1)=-Z1(I)*Y24(I)
+         VQN(I,2,1)= Z1(I)*X24(I)
+         VQN(I,3,1)= SZ2*SL
+         VQN(I,1,3)=-VQN(I,1,1)
+         VQN(I,2,3)=-VQN(I,2,1)
+         VQN(I,1,1)= VQN(I,1,1)*SL
+         VQN(I,2,1)= VQN(I,2,1)*SL
 C
-        SZ2=A_4-SZ1
-        SL=ONE/SQRT(SZ+SZ2*SZ2)
-        VQN(I,1,3)= VQN(I,1,3)*SL
-        VQN(I,2,3)= VQN(I,2,3)*SL
-        VQN(I,3,3)= SZ2*SL
+         SZ2=A_4-SZ1
+         SL=ONE/SQRT(SZ+SZ2*SZ2)
+         VQN(I,1,3)= VQN(I,1,3)*SL
+         VQN(I,2,3)= VQN(I,2,3)*SL
+         VQN(I,3,3)= SZ2*SL
 C
-        SZ1=MX13(I)*Y13(I)-MY13(I)*X13(I)
-        SZ2=A_4+SZ1
-        SZ=Z2(I)*L13(I)
-        SL=ONE/SQRT(SZ+SZ2*SZ2)
-        VQN(I,1,2)=-Z1(I)*Y13(I)
-        VQN(I,2,2)= Z1(I)*X13(I)
-        VQN(I,3,2)= SZ2*SL
-        VQN(I,1,4)=-VQN(I,1,2)
-        VQN(I,2,4)=-VQN(I,2,2)
-        VQN(I,1,2)= VQN(I,1,2)*SL
-        VQN(I,2,2)= VQN(I,2,2)*SL
+         SZ1=MX13(I)*Y13(I)-MY13(I)*X13(I)
+         SZ2=A_4+SZ1
+         SZ=Z2(I)*L13(I)
+         SL=ONE/SQRT(SZ+SZ2*SZ2)
+         VQN(I,1,2)=-Z1(I)*Y13(I)
+         VQN(I,2,2)= Z1(I)*X13(I)
+         VQN(I,3,2)= SZ2*SL
+         VQN(I,1,4)=-VQN(I,1,2)
+         VQN(I,2,4)=-VQN(I,2,2)
+         VQN(I,1,2)= VQN(I,1,2)*SL
+         VQN(I,2,2)= VQN(I,2,2)*SL
 C
-        SZ2=A_4-SZ1
-        SL=ONE/SQRT(SZ+SZ2*SZ2)
-        VQN(I,1,4)= VQN(I,1,4)*SL
-        VQN(I,2,4)= VQN(I,2,4)*SL
-        VQN(I,3,4)= SZ2*SL
+         SZ2=A_4-SZ1
+         SL=ONE/SQRT(SZ+SZ2*SZ2)
+         VQN(I,1,4)= VQN(I,1,4)*SL
+         VQN(I,2,4)= VQN(I,2,4)*SL
+         VQN(I,3,4)= SZ2*SL
        ENDIF
-C
       ENDDO
 C
       NPLAT=JFT-1
@@ -337,6 +332,5 @@ C
       ENDDO
 C
       RETURN
- 2001 FORMAT(/' ZERO OR NEGATIVE SHELL SUB-AREA : ELEMENT NB:',
-     .          I8/)
+ 2001 FORMAT(/' ZERO OR NEGATIVE SHELL SUB-AREA : ELEMENT NB:',I8/)
       END

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -101,9 +101,6 @@ C---------+---------+---+---+--------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "parit_c.inc"
-#include      "com04_c.inc"
-#include      "scr05_c.inc"
 #include      "com01_c.inc"
 C-----------------------------------------------
 C   I N P U T   A r g u m e n t s
@@ -264,9 +261,9 @@ C la partie visqueuse
 C  
          SOUNDSP(I) = SQRT(A1(I)/RHO0(I))
          C11 = C2(I) + 2*VISCV(I)
-C a verefier cette formule	  
+C a verefier cette formule    
           VISCMAX(I) = MAX(C2(I), C11)
-	  VISCMAX(I) = VISCMAX(I)/
+            VISCMAX(I) = VISCMAX(I)/
      .          (ONEP414*RHO0(I)*SOUNDSP(I)*SQRT(AREA(I)))                   
          ETSE(I) = ONE
 C-------------------
@@ -349,7 +346,7 @@ C
          CALL VINTER(TF,IAD1,IPOS1,ILEN1,NEL0,EPST,DYDX1,Y1)     
 C
 
-Cel remplacer par les sous cas :
+C   remplacer par les sous cas :
 
         DO I=1,NEL0
          J1 = JJ(I) +1

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -69,10 +69,8 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "units_c.inc"
-#include      "warn_c.inc"
 #include      "param_c.inc"
 #include      "r2r_c.inc"
-#include      "submod_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -127,7 +125,7 @@ C-----------------------------------------------
       ITHGRP(7)=IAD                                              
       IAD=IAD+NVAR                                               
       IFI=IFI+NVAR
-      RFI=0	                                              	                                              
+      RFI=0                                                                                                
 
       CONT=1
       NNE=0                                                      
@@ -151,7 +149,7 @@ C         Multidomains-> skipping entities which are not on current domain
         ELSE                                                                              
           NNE = NNE+1                                                                     
         ENDIF                                                                             
-      ENDDO	      
+      ENDDO        
 C------------------------
       ITHGRP(4)=NNE                                        
       ITHGRP(5)=IAD                                        
@@ -169,10 +167,10 @@ C------------------------
         SIZ=LEN_TRIM(TITR)
         TITR(SIZ+1:SIZ+1)=' '     
         IF (ITYP == 0) THEN                               
-C         Multidomains-> skipping nodes which are not on current domain 	    	 		  		  
-	  IF(NSUBDOM /= 0) THEN
+C         Multidomains-> skipping nodes which are not on current domain                      
+            IF(NSUBDOM /= 0) THEN
               IF (R2R_SYS(N,ITABM1,MESS) == 0) CYCLE
-	  ENDIF  
+            ENDIF  
           ITHBUF(IAD)=USR2SYS(N,ITABM1,MESS,ID)                          
           ITHBUF(IAD+NNE)=ISK                                         
           DO JC = 1,NMERGED                                           
@@ -180,10 +178,10 @@ C         Multidomains-> skipping nodes which are not on current domain
      .          ITHBUF(IAD)  = IMERGE(NUMCNOD+JC)                     
           ENDDO                                                         
         ELSE                                                                           
-C         Multidomains-> skipping elems which are not on current domain 		    	 		  		  
-	  IF(NSUBDOM /= 0) THEN                                   
-	      IF (R2R_NIN(N,IX,NIX,NUMEL) == 0) CYCLE             
-	  ENDIF  
+C         Multidomains-> skipping elems which are not on current domain                        
+            IF(NSUBDOM /= 0) THEN                                   
+                IF (R2R_NIN(N,IX,NIX,NUMEL) == 0) CYCLE             
+            ENDIF  
           ID_LOCAL = SET_USRTOS(N,MAP,MAPSIZE)
           IF(ID_LOCAL == 0) THEN
             CALL ANCMSG(MSGID=69, MSGTYPE=MSGERROR,ANMODE=ANINFO,I1=ITHGRP(1),C1=TITR1,I2=N)
@@ -217,9 +215,7 @@ C
      .        ITHBUF(I) == 625)) IREAC = 1                       
          IF((ITHBUF(I) == 626 .OR. ITHBUF(I) == 627 .OR.        
      .       ITHBUF(I) == 628) .AND.                            
-     .      ((ISUB == 0.AND.ISECUT == 0.AND.IISROT == 0.AND.   
-     .       MSHSUB == 0.AND.IMPOSE_DR == 0 .AND. IDROT == 0) .OR.   
-     .       IRODDL == 0)) THEN                           
+     .      ((ISECUT == 0 .AND. IISROT == 0 .AND. IMPOSE_DR == 0 .AND. IDROT == 0) .OR. IRODDL == 0)) THEN
                IF (ITHBUF(I) == 626)DIRMSG='DRX'           
                IF (ITHBUF(I) == 627)DIRMSG='DRY'               
                IF (ITHBUF(I) == 628)DIRMSG='DRZ'            

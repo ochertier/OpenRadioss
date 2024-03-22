@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -29,32 +29,37 @@ Chd|        ANCMSG                        source/output/message/message.F
 Chd|        FRETITL2                      source/starter/freform.F      
 Chd|        MY_ORDERS                     ../common_source/tools/sort/my_orders.c
 Chd|        ZEROIN                        source/system/zeroin.F        
+Chd|        BPRELOAD_MOD                  share/modules1/bpreload_mod.F 
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
+Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        R2R_MOD                       share/modules1/r2r_mod.F      
 Chd|        REORDER_MOD                   share/modules1/reorder_mod.F  
 Chd|====================================================================
-      SUBROUTINE PGRTAILS(
+      SUBROUTINE PGRTAILS(MAT_PARAM,
      1    IXP    ,IPARG  ,PM       ,GEO      ,
-     2    EADD   ,ND     ,DD_IAD   ,IDX      ,LB_MAX     ,
-     3    INUM   ,INDEX  ,CEP      ,IPARTP   ,NELP       ,
+     2    EADD   ,ND     ,DD_IAD   ,IDX      ,
+     3    INUM   ,INDEX  ,CEP      ,IPARTP   ,
      4    ITR1   ,IGRSURF,IGRBEAM  ,IGEO     ,
      5    IPM    ,IPOUOFF,TAGPRT_SMS ,
-     6    NOD2EL1D)
+     6    NOD2EL1D,PRINT_FLAG,ITAGPRLD_BEAM,
+     7    PRELOAD_A,NPRELOAD_A)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE GROUPDEF_MOD
       USE R2R_MOD
-      USE MESSAGE_MOD   
+      USE MESSAGE_MOD
       USE REORDER_MOD
+      USE MATPARAM_DEF_MOD
+      USE BPRELOAD_MOD
 C-----------------------------------------------
 C            A R G U M E N T S
 C-----------------------------------------------
 C     IXP(6,NUMELP)      TABLEAU CONECS+PID+MID+NOS POUTRES         E
 C     IPARG(NPARG,NGROUP)TABLEAU DES CARACTERISTIQUES DES GROUPES   E/S
 C     GEO(NPROPG,NUMGEO) TABLEAU DES CARACS DES PID                 E
-C     EADD(NUMELP)       TABLEAU DES ADRESEES DANS IDAM CHGT DAMIER E 
+C     EADD(NUMELP)       TABLEAU DES ADRESEES DANS IDAM CHGT DAMIER E
 C     DD_IAD             TABLEAU DE LA DD EN SUPER GROUPES          S
 C     INUM(9,NUMELP)     TABLEAU DE TRAVAIL                         E/S
 C     INDEX(NUMELP)      TABLEAU DE TRAVAIL                         E/S
@@ -66,15 +71,10 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com10_c.inc"
 #include      "param_c.inc"
 #include      "sms_c.inc"
 #include      "units_c.inc"
@@ -85,26 +85,31 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IDX,LB_MAX,ND
-      INTEGER NELP(*),ITR1(*),IXP(6,*),IPARG(NPARG,*),EADD(*),IPARTP(*),
+      INTEGER ITR1(*),IXP(6,*),IPARG(NPARG,*),EADD(*),IPARTP(*),
      .        DD_IAD(NSPMD+1,*),CEP(*),INUM(8,*),INDEX(*),
      .        IPM(NPROPMI,*),IPOUOFF(*),
      .        TAGPRT_SMS(*),NOD2EL1D(*),IGEO(NPROPGI,*)
+      INTEGER, INTENT(IN) :: PRINT_FLAG !< flag to print the element group data
+      INTEGER, INTENT(IN) :: NPRELOAD_A
+      INTEGER ,INTENT(INOUT), DIMENSION(NUMELP) :: ITAGPRLD_BEAM
       my_real
      .   PM(NPROPM,*), GEO(NPROPG,*)
+      TYPE(MATPARAM_STRUCT_) ,DIMENSION(NUMMAT), INTENT(IN) :: MAT_PARAM
 C-----------------------------------------------
       TYPE (GROUP_)  , DIMENSION(NGRBEAM)  :: IGRBEAM
       TYPE (SURF_)   , DIMENSION(NSURF)    :: IGRSURF
+      TYPE(PREL1D_) ,DIMENSION(NPRELOAD_A) :: PRELOAD_A
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER NGR1, NG, ISSN, MLN, I, NE1, N, NFIX,
-     .        MID, PID, NEL_PREC, LB_L, II, P, NEL,NB,NIP,IGTYP,
-     .        MODE,NN,IAD1,NGROU, J, K,
+     .        MID, PID, NEL_PREC, II, P, NEL,NB,NIP,IGTYP,
+     .        MODE,NN, J,
      .        ITAG(2*NUMELT+2*NUMELP+3*NUMELR),
-     .        NGP(NSPMD+1),IPARTR2R,NUVAR,IE,ID1
+     .        NGP(NSPMD+1),IPARTR2R,NUVAR,IE,ID1,IPRLD
       INTEGER ID
       CHARACTER*nchartitle,
-     .   TITR,TITR1,TITR2
+     .   TITR,TITR1
       INTEGER WORK(70000)
       DATA NFIX/13/
 C=======================================================================
@@ -118,9 +123,9 @@ C     NSPGROUP = NSPGROUP + ND
       NFT = 0
 C initialisation dd_iad
       DO N=1,ND
-       DO P=1,NSPMD+1
-         DD_IAD(P,NSPGROUP+N) = 0
-       END DO
+        DO P=1,NSPMD+1
+          DD_IAD(P,NSPGROUP+N) = 0
+        END DO
       ENDDO
 
       DO N=1,ND
@@ -137,7 +142,7 @@ C initialisation dd_iad
           INUM(7,I)=IXP(6,NFT+I)
           INUM(8,I)=IPOUOFF(NFT+I)
         ENDDO
-      
+
         MODE=0
         CALL MY_ORDERS( MODE, WORK, CEP(NFT+1), INDEX, NEL , 1)
         DO I = 1, NEL
@@ -172,17 +177,17 @@ C dd-iad
           DD_IAD(P,NSPGROUP+N) = DD_IAD(P-1,NSPGROUP+N)+1
         ENDDO
         DD_IAD(1,NSPGROUP+N) = 1
-C          
+C
 C maj CEP
 C
         DO I = 1, NEL
-          INDEX(I) = CEP(NFT+INDEX(I))          
+          INDEX(I) = CEP(NFT+INDEX(I))
         ENDDO
         DO I = 1, NEL
-          CEP(NFT+I) = INDEX(I)          
+          CEP(NFT+I) = INDEX(I)
         ENDDO
         NFT = NFT + NEL
-      ENDDO          
+      ENDDO
 C
 C RENUMEROTATION POUR SURFACES
 C
@@ -207,131 +212,145 @@ C renumerotation CONNECTIVITE INVERSE
 C
       ITAG = 0
       DO I=1,2*NUMELT+2*NUMELP+3*NUMELR
-        IF(NOD2EL1D(I) /= 0 .AND. NUMELT      <  NOD2EL1D(I) 
+        IF(NOD2EL1D(I) /= 0 .AND. NUMELT      <  NOD2EL1D(I)
      .                      .AND. NOD2EL1D(I) <= NUMELT+NUMELP)THEN
           IF(ITAG(NOD2EL1D(I)) == 0) THEN
-             NOD2EL1D(I)=ITR1(NOD2EL1D(I)-NUMELT)
-             NOD2EL1D(I)=NOD2EL1D(I)+NUMELT
-             ITAG(NOD2EL1D(I)) = 1
+            NOD2EL1D(I)=ITR1(NOD2EL1D(I)-NUMELT)
+            NOD2EL1D(I)=NOD2EL1D(I)+NUMELT
+            ITAG(NOD2EL1D(I)) = 1
           END IF
-	END IF
-      END DO      
-C              
+        END IF
+      END DO
+C REORDERING FOR ITAGPRLD_BEAM
+      DO I=1,NUMELP
+        IF (ITAGPRLD_BEAM(I) ==0) CYCLE
+        ITAGPRLD_BEAM(I) = ITR1(ITAGPRLD_BEAM(I))
+      ENDDO
+C
 C-------------------------------------------------------------------------
 C phase 2 : bornage en groupe de mvsiz
 C ngroup est global, iparg est global mais organise en fonction de dd
 C
       DO 300 N=1,ND
-       NFT = 0
+        NFT = 0
 cc       LB_L = LBUFEL
-       DO P = 1, NSPMD
-        NGP(P)=0
-        NEL = DD_IAD(P+1,NSPGROUP+N)-DD_IAD(P,NSPGROUP+N)
-        IF (NEL>0) THEN
-         NEL_PREC = DD_IAD(P,NSPGROUP+N)-DD_IAD(1,NSPGROUP+N)
-         NGP(P)=NGROUP
-         NG  = (NEL-1)/NVSIZ + 1
-         DO I=1,NG
-          !---ngroup global
-          NGROUP=NGROUP+1
-          II = EADD(N)+NFT
-          MID= IXP(1,II)
-          MLN= PM(19,MID)
-          PID= IXP(5,II)
-          IF (NSUBDOM>0) IPARTR2R = TAG_MAT(MID)
-          ISSN=0
-          IF(GEO(5,PID)/=ZERO)ISSN=1
-          NIP  = 1
-          IGTYP = IGEO(11,PID)
-          IF (IGTYP == 18) NIP = IGEO(3,PID)
-          CALL ZEROIN(1,NPARG,IPARG(1,NGROUP))
+        DO P = 1, NSPMD
+          NGP(P)=0
+          NEL = DD_IAD(P+1,NSPGROUP+N)-DD_IAD(P,NSPGROUP+N)
+          IF (NEL>0) THEN
+            NEL_PREC = DD_IAD(P,NSPGROUP+N)-DD_IAD(1,NSPGROUP+N)
+            NGP(P)=NGROUP
+            NG  = (NEL-1)/NVSIZ + 1
+            DO I=1,NG
+              !---ngroup global
+              NGROUP=NGROUP+1
+              II = EADD(N)+NFT
+              MID= IXP(1,II)
+              MLN= INT(PM(19,MID))
+              PID= IXP(5,II)
+              IPARTR2R = 0
+              IF (NSUBDOM>0) IPARTR2R = TAG_MAT(MID)
+              ISSN=0
+              IF(GEO(5,PID)/=ZERO)ISSN=1
+              NIP  = 1
+              IGTYP = IGEO(11,PID)
+              IF (IGTYP == 18) NIP = IGEO(3,PID)
+              CALL ZEROIN(1,NPARG,IPARG(1,NGROUP))
+              IPRLD = ITAGPRLD_BEAM(II)
 
-          NE1 = MIN( NVSIZ, NEL + NEL_PREC - NFT)
+              NE1 = MIN( NVSIZ, NEL + NEL_PREC - NFT)
 C---
-          JTHE = NINT(PM(71,MID))
+              JTHE = NINT(PM(71,MID))
 
-          !!
-          IF(IGTYP == 3 .AND. MLN == 34 ) THEN
-           ID=IPM(1,MID)
-           ID1= IGEO(1,PID)
-           CALL FRETITL2(TITR1,IGEO(NPROPGI-LTITR+1,PID),LTITR)
-           CALL FRETITL2(TITR,IPM(NPROPMI-LTITR+1,MID),LTITR)
-           
-           CALL ANCMSG(MSGID=2050, 
-     .                 MSGTYPE=MSGERROR,
-     .                 ANMODE=ANINFO,
-     .                 I1=ID1,
-     .                 C1=TITR1,
-     .                 I2=ID,
-     .                 C2=TITR)
-          ENDIF
-          
-          !!         
-          NUVAR  = 0
-          DO J = 1,NE1
-            IE=J+EADD(N)+NFT-1
-            NUVAR  = MAX(NUVAR,IPM(8,IXP(1,IE)))
-          END DO
-          IPARG(46,NGROUP) = NUVAR
+              !!
+              IF(IGTYP == 3 .AND. MLN == 34 ) THEN
+                ID=IPM(1,MID)
+                ID1= IGEO(1,PID)
+                CALL FRETITL2(TITR1,IGEO(NPROPGI-LTITR+1,PID),LTITR)
+                CALL FRETITL2(TITR,IPM(NPROPMI-LTITR+1,MID),LTITR)
+
+                CALL ANCMSG(MSGID=2050,
+     .                      MSGTYPE=MSGERROR,
+     .                      ANMODE=ANINFO,
+     .                      I1=ID1,
+     .                      C1=TITR1,
+     .                      I2=ID,
+     .                      C2=TITR)
+              ENDIF
+              !!
+              NUVAR  = 0
+              DO J = 1,NE1
+                IE=J+EADD(N)+NFT-1
+                NUVAR  = MAX(NUVAR,IPM(8,IXP(1,IE)))
+              END DO
+              IPARG(46,NGROUP) = NUVAR
 C---
-          IPARG(1,NGROUP) = MLN      
-          IPARG(2,NGROUP) = NE1
-          IPARG(3,NGROUP) = EADD(N)-1 + NFT
-          IPARG(4,NGROUP) = LBUFEL+1  !  kept in place for compatibility with
+              IPARG(1,NGROUP) = MLN
+              IPARG(2,NGROUP) = NE1
+              IPARG(3,NGROUP) = EADD(N)-1 + NFT
+              IPARG(4,NGROUP) = LBUFEL+1  !  kept in place for compatibility with
 c                                        other groups using old buffer
-          IPARG(5,NGROUP) = 5
-          IPARG(6,NGROUP) = NIP
-          IPARG(9,NGROUP) = ISSN
-          IPARG(13,NGROUP) = JTHE  !beam : 0 or 1 only
-          IPARG(38,NGROUP) = IGTYP      
-          !---reperage groupe/processeur
-          IPARG(32,NGROUP)= P-1
-C         flag for group of duplicated elements in multidomains
-          IF (NSUBDOM>0) IPARG(77,NGROUP)= IPARTR2R
-C         thermal material expansion 
-          IPARG(49,NGROUP) = 0
-          IF(IPM(218,MID) > 0 .AND. MLN /= 0 .AND. MLN /=13) THEN
-           IPARG(49,NGROUP) = 1
-          ENDIF     
+              IPARG(5,NGROUP) = 5
+              IPARG(6,NGROUP) = NIP
+              IPARG(9,NGROUP) = NINT(GEO(3,PID))
+              IPARG(13,NGROUP) = JTHE  !beam : 0 or 1 only
+              IPARG(38,NGROUP) = IGTYP
+              !---reperage groupe/processeur
+              IPARG(32,NGROUP)= P-1
+C             flag for group of duplicated elements in multidomains
+              IF (NSUBDOM>0) IPARG(77,NGROUP)= IPARTR2R
+C             thermal material expansion
+              IPARG(49,NGROUP) = 0
+              IF(IPM(218,MID) > 0 .AND. MLN /= 0 .AND. MLN /=13) THEN
+                IPARG(49,NGROUP) = 1
+              ENDIF
+              ! check failure models
+              IF (MAT_PARAM(MID)%NFAIL >  0) THEN                                
+                IPARG(43,NGROUP) = 1   ! IFAIL flag                      
+              ENDIF
+              ! Property internal ID
+              IPARG(62,NGROUP) = PID
+C          /PRELOAD/AXIAL              
+              IPARG(72,NGROUP)= IPRLD
+              
+              IF ( IPRLD>0 ) THEN
+                IPARG(73,NGROUP)= PRELOAD_A(IPRLD)%fun_id
+                IPARG(74,NGROUP)= PRELOAD_A(IPRLD)%sens_id
+              END IF
 
-          JSMS=0
-          IF(ISMS/=0)THEN
-            IF(IDTGRS/=0)THEN
-              IF(TAGPRT_SMS(IPARTP(II))/=0)JSMS=1
-            ELSE
-              JSMS=1
-            END IF
-          END IF
-          IPARG(52,NGROUP)=JSMS
+              JSMS=0
+              IF(ISMS/=0)THEN
+                IF(IDTGRS/=0)THEN
+                  IF(TAGPRT_SMS(IPARTP(II))/=0)JSMS=1
+                ELSE
+                  JSMS=1
+                END IF
+              END IF
+              IPARG(52,NGROUP)=JSMS
 c
-cc          LBUFEL = LBUFEL + NFIX*NE1   ! Cmi --> a virer
-cc     .                    + NMTVP(MLN)*NE1*NIP 
-cc     .                    + NMTVC(MLN)*NE1*NIP
-c
-          NFT = NFT + NE1
-         END DO !I=1,NG
-         NGP(P)=NGROUP-NGP(P)
-        ENDIF
-       ENDDO
-cc       LB_L = LBUFEL - LB_L
-cc       LB_MAX = MAX(LB_MAX,LB_L)
-       !--- DD_IAD => nb groupes par sous domaine
-       NGP(NSPMD+1)=0
-       DO P = 1, NSPMD
-         NGP(NSPMD+1)=NGP(NSPMD+1)+NGP(P)
-         DD_IAD(P,NSPGROUP+N)=NGP(P)
-       END DO
-       DD_IAD(NSPMD+1,NSPGROUP+N)=NGP(NSPMD+1)
+              NFT = NFT + NE1
+            END DO !I=1,NG
+            NGP(P)=NGROUP-NGP(P)
+          ENDIF
+        ENDDO
+        !--- DD_IAD => nb groupes par sous domaine
+        NGP(NSPMD+1)=0
+        DO P = 1, NSPMD
+          NGP(NSPMD+1)=NGP(NSPMD+1)+NGP(P)
+          DD_IAD(P,NSPGROUP+N)=NGP(P)
+        END DO
+        DD_IAD(NSPMD+1,NSPGROUP+N)=NGP(NSPMD+1)
 
   300 CONTINUE
 
       NSPGROUP = NSPGROUP + ND
 
-      WRITE(IOUT,1000)
-      WRITE(IOUT,1001)(N,IPARG(1,N),IPARG(2,N),IPARG(3,N)+1,
+      IF(PRINT_FLAG>6) THEN
+          WRITE(IOUT,1000)
+          WRITE(IOUT,1001)(N,IPARG(1,N),IPARG(2,N),IPARG(3,N)+1,
      +                 IPARG(5,N),
      +                 N=NGR1,NGROUP)
-
+      ENDIF
  1000 FORMAT(/
      +       /6X,'3D - BEAM ELEMENT GROUPS'/
      +        6X,'-------------------------'/
@@ -339,6 +358,6 @@ cc       LB_MAX = MAX(LB_MAX,LB_L)
      +'                   LAW     NUMBER    ELEMENT       TYPE'/)
  1001 FORMAT(5(1X,I10))
 
-     
+
       RETURN
       END

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -34,21 +34,12 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "vect01_c.inc"
-#include      "com08_c.inc"
-#include      "scr18_c.inc"
-#include      "impl1_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NEL
-C     REAL
       my_real
      .   SIG(NEL,6),
      .   S1(*), S2(*), S3(*), S4(*), S5(*), S6(*),
@@ -57,13 +48,12 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I
-C     REAL
       my_real
      .   X , Y, Z ,DV
 C-----------------------------------------------
 C     STRESSES EXTRACTION.
 C-----------------------------------------------
-      DO 10 I=LFT,LLT
+      DO 10 I=1,NEL
       S1(I)=SIG(I,1)
       S2(I)=SIG(I,2)
       S3(I)=SIG(I,3)
@@ -72,7 +62,6 @@ C-----------------------------------------------
    10 S6(I)=SIG(I,6)
 C-----------------------------------------------
 C     SMALL STRAIN. moved to SRHO3.F
-C-----------------------------------------------
 C-----------------------------------------------
       RETURN
       END

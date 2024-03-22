@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -37,7 +37,7 @@ Chd|====================================================================
      2                  IRECT,LMSR,CRST  ,MSR ,NSV  ,
      3                  ILOC ,IRTL,LCODE ,V   ,ISKEW,
      4                  NOR  ,MS  ,FRIGAP,MSMN,MSMT ,
-     5                  EFRIC,ITAB,FSAV  )
+     5                  EFRIC,ITAB,FSAV,NMN,NSN  )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -50,7 +50,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER IRECT(4,*), LMSR(4,*), MSR(*), NSV(*), ILOC(*), IRTL(*),
+      INTEGER, INTENT(IN) :: NMN,NSN
+      INTEGER IRECT(4,*), LMSR(4,*), MSR(*), NSV(NSN), ILOC(*), IRTL(*),
      .   LCODE(*), ISKEW(*), ITAB(*)
 C     REAL
       my_real
@@ -62,10 +63,7 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com08_c.inc"
-#include      "scr04_c.inc"
-#include      "scr08_s_c.inc"
 #include      "scr08_a_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

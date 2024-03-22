@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -49,8 +49,6 @@ C-----------------------------------------------
 #include      "parit_c.inc"
 #include      "units_c.inc"
 #include      "param_c.inc"
-#include      "scr07_c.inc"
-#include      "couple_c.inc"
 #include      "task_c.inc"
       integer maxbloc
       parameter (maxbloc=1000)

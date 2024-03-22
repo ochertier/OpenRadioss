@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -73,7 +73,7 @@ C-----------------------------------------------
           IF(SPBUF(9,N)>ZERO)THEN
            KXSP(1,N) =0
            KXSP(2,N) =NG
-           SPBUF(9,N)=ZERO	   
+           SPBUF(9,N)=ZERO     
           ENDIF
          ENDDO
         ENDIF

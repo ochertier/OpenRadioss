@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -80,21 +80,22 @@ Chd|-- called by -----------
 Chd|        HM_READ_EOS_SESAME            source/materials/eos/hm_read_eos_sesame.F
 Chd|-- calls ---------------
 Chd|====================================================================
-      SUBROUTINE TBUSR1(R,P,E,NR,NT)
+      SUBROUTINE TBUSR1(R,P,E,NR,NT,UNITAB)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
+      USE UNITAB_MOD
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NR,NT
+      TYPE(UNIT_TYPE_), INTENT(IN) :: UNITAB
       my_real
      .   R(*),P(NR,*),E(NR,*)
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "sysunit.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -103,9 +104,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------
-      AMSCAL= FAC_M_WORK
-      ALSCAL= FAC_L_WORK
-      ATSCAL= FAC_T_WORK
+      AMSCAL=UNITAB%FAC_M_WORK
+      ALSCAL=UNITAB%FAC_L_WORK
+      ATSCAL=UNITAB%FAC_T_WORK
 C----------------------------------------------------------------
 C Passage des unites table Sesame type 301-306 aux unites
 C utilisateur passer obligatoirement avant l'appel de cette

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -55,7 +55,7 @@ Chd|        CRKLAYER3N_INI                source/elements/xfem/crklayer3n_ini.F
 Chd|        CRKLEN3N_ADV                  source/elements/xfem/crklen3n_adv.F
 Chd|        CRKOFFTG                      source/elements/xfem/precrklay.F
 Chd|        CSENS3                        source/elements/shell/coque/csens3.F
-Chd|        DTTHERM                       source/elements/sh3n/coquedk/cndt3.F
+Chd|        DTTHERM                       source/elements/sh3n/coquedk/dttherm.F
 Chd|        PRECRKLAYTG                   source/elements/xfem/precrklay.F
 Chd|        SET_FAILWAVE_NOD3             source/materials/fail/failwave/set_failwave_nod3.F
 Chd|        SET_FAILWAVE_SH3N             source/materials/fail/failwave/upd_failwave_sh3n.F
@@ -67,46 +67,48 @@ Chd|        TEMP3CG                       source/elements/sh3n/coque3n/temp3cg.F
 Chd|        THERM3C                       source/elements/sh3n/coque3n/therm3c.F
 Chd|        CRACKXFEM_MOD                 share/modules/crackxfem_mod.F 
 Chd|        DRAPE_MOD                     share/modules/drape_mod.F     
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
 Chd|        FAILWAVE_MOD                  ../common_source/modules/failwave_mod.F
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/matparam_def_mod.F
+Chd|        MAT_ELEM_MOD                  ../common_source/modules/mat_elem/mat_elem_mod.F
 Chd|        NLOCAL_REG_MOD                ../common_source/modules/nlocal_reg_mod.F
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
 Chd|        STACK_MOD                     share/modules/stack_mod.F     
 Chd|        TABLE_MOD                     share/modules/table_mod.F     
 Chd|====================================================================
-      SUBROUTINE C3FORC3 (ELBUF_STR,
-     1           JFT      ,JLT      ,PM      ,IXTG     ,X        ,
-     2           F        ,M        ,V       ,R        ,FAILWAVE ,
-     3           NVC      ,MTN      ,GEO     ,TF       ,NPF      ,
-     4           BUFMAT   ,PMSAV    ,DT2T    ,NELTST   ,ITYPTST  ,
-     5           STIFN    ,STIFR    ,FSKY    ,IADTG    ,ITAB     ,
-     6           EPSDOT   ,OFFSET   ,IPARTTG ,THKE     ,F11      ,
-     7           F12      ,F13      ,F21     ,F22      ,F23      ,
-     8           F31      ,F32      ,F33     ,M11      ,M12      ,
-     9           M13      ,M21      ,M22     ,M23      ,M31      ,
-     A           M32      ,M33      ,GROUP_PARAM,MATPARAM_TAB,
-     B           NEL      ,ISTRAIN  ,ISH3N   ,XEDGE3N  ,
-     C           ITHK     ,IOFC     ,IPLA    ,NFT      ,ISMSTR   ,
-     D           NPT      ,KFTS     ,
-     E           FZERO    ,IGEO     ,IPM     ,IFAILURE ,ITASK    ,  
-     F           JTHE     ,TEMP     ,FTHE    ,FTHESKY  ,IEXPAN   ,
-     G           GRESAV   ,GRTH     ,IGRTH   ,
-     H           MSTG     ,DMELTG   ,JSMS    ,TABLE    ,IPARG    ,
-     I           IXFEM    ,SENSOR_TAB,PTG      ,IBORDNODE,
-     J           ELCUTC   ,INOD_CRK ,IEL_CRK ,NODENR   ,IADTG_CRK,
-     K           NODEDGE  ,CRKNODIAD,KNOD2ELC,CONDN    ,
-     L           CONDNSKY ,STACK    ,ISUBSTACK,XFEM_STR,CRKEDGE  ,
-     N           DRAPE_T3    ,IPRI    ,NLOC_DMG , xdp)
+      SUBROUTINE C3FORC3(
+     1   ELBUF_STR,   JFT,         JLT,         PM,
+     2   IXTG,        X,           F,           M,
+     3   V,           R,           FAILWAVE,    NVC,
+     4   MTN,         GEO,         TF,          NPF,
+     5   BUFMAT,      PMSAV,       DT2T,        NELTST,
+     6   ITYPTST,     STIFN,       STIFR,       FSKY,
+     7   IADTG,       ITAB,        EPSDOT,      OFFSET,
+     8   IPARTTG,     THKE,        F11,         F12,
+     9   F13,         F21,         F22,         F23,
+     A   F31,         F32,         F33,         M11,
+     B   M12,         M13,         M21,         M22,
+     C   M23,         M31,         M32,         M33,
+     D   GROUP_PARAM, MAT_ELEM,    NEL,         ISTRAIN,
+     E   ISH3N,       XEDGE3N,     ITHK,        IOFC,
+     F   IPLA,        NFT,         ISMSTR,      NPT,
+     G   KFTS,        FZERO,       IGEO,        IPM,
+     H   IFAILURE,    ITASK,       JTHE,        TEMP,
+     I   FTHE,        FTHESKY,     IEXPAN,      GRESAV,
+     J   GRTH,        IGRTH,       MSTG,        DMELTG,
+     K   JSMS,        TABLE,       IPARG,       IXFEM,
+     L   SENSORS,     PTG,         IBORDNODE,   ELCUTC,
+     M   INOD_CRK,    IEL_CRK,     NODENR,      IADTG_CRK,
+     N   NODEDGE,     CRKNODIAD,   KNOD2ELC,    CONDN,
+     O   CONDNSKY,    STACK,       ISUBSTACK,   XFEM_STR,
+     P   CRKEDGE,     DRAPE_SH3N,  IPRI,        NLOC_DMG,
+     Q   xdp,         INDX_DRAPE,  IGRE,        JTUR)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE TABLE_MOD
-      USE ELBUFDEF_MOD
+      USE MAT_ELEM_MOD
       USE CRACKXFEM_MOD
       USE STACK_MOD
       USE FAILWAVE_MOD
-      USE MATPARAM_DEF_MOD       
       USE NLOCAL_REG_MOD          
       USE DRAPE_MOD      
       USE SENSOR_MOD
@@ -124,20 +126,15 @@ C-----------------------------------------------
 #include      "param_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com06_c.inc"
-#include      "com08_c.inc"
-#include      "scr01_c.inc"
-#include      "scr03_c.inc"
-#include      "scr07_c.inc"
 #include      "scr18_c.inc"
 #include      "com_xfem1.inc"
 #include      "parit_c.inc"
 #include      "timeri_c.inc"
-#include      "warn_c.inc"
-#include      "scr05_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: JTUR
+      INTEGER, INTENT(IN) :: IGRE
       INTEGER JFT, JLT, NVC, MTN,NELTST,ITYPTST, OFFSET,
      .        NEL    ,ISTRAIN,ISH3N , ICSEN,
      .        ITHK  ,IOFC   ,IPLA  ,NFT   ,ISMSTR ,NPT,KFTS,IFAILURE,
@@ -146,7 +143,7 @@ C-----------------------------------------------
      .   IPARTTG(*),ITASK,JTHE,IEXPAN,GRTH(*),IGRTH(*),IPARG(*),ITAB(*),
      .   IXFEM,IBORDNODE(*),
      .   ELCUTC(2,*),INOD_CRK(*),NODENR(*),IEL_CRK(*),IADTG_CRK(3,*),
-     .   NODEDGE(2,*),CRKNODIAD(*),KNOD2ELC(*),XEDGE3N(3,*)
+     .   NODEDGE(2,*),CRKNODIAD(*),KNOD2ELC(*),XEDGE3N(3,*),INDX_DRAPE(STDRAPE)
       my_real 
      .   PM(*), F(*), M(*), V(*), R(*),X(*),
      .   GEO(NPROPG,*), TF(*), BUFMAT(*), PMSAV(*),STIFN(*),
@@ -170,10 +167,10 @@ C-----------------------------------------------
       TYPE (STACK_PLY) :: STACK
       TYPE (NLOCAL_STR_)   ,TARGET :: NLOC_DMG 
       TYPE (FAILWAVE_STR_) ,TARGET :: FAILWAVE 
-      TYPE (GRP_PARAM_STRUCT_) :: GROUP_PARAM
-      TYPE (DRAPE_) :: DRAPE_T3
-      TYPE (MATPARAM_STRUCT_) , DIMENSION(NUMMAT) :: MATPARAM_TAB
-      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE (DRAPE_), DIMENSION(NUMELTG_DRAPE)   :: DRAPE_SH3N
+      TYPE (SENSORS_) ,INTENT(IN) :: SENSORS
+      TYPE (MAT_ELEM_),INTENT(INOUT) :: MAT_ELEM
+      TYPE (GROUP_PARAM_) :: GROUP_PARAM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -181,7 +178,8 @@ C-----------------------------------------------
       INTEGER MAT(MVSIZ),PID(MVSIZ),NGL(MVSIZ),FWAVE_EL(NEL)
       INTEGER I,J,IFLAG,NPG,IBID,IDRIL,NG,IR,IS,N1,N2,N3,
      .   IXEL,IXLAY,ILAY,NXLAY,NLAY,L_DIRA,L_DIRB,J1,J2,IGMAT,IGTYP,
-     .   IMAT,NPTTOT,IREP,ipr,IFRAM_OLD,IPRI,IFAILWAVE
+     .   IMAT,NPTTOT,IREP,ipr,IFRAM_OLD,IPRI,IFAILWAVE, IDRAPE,NPTT,IT,
+     .   ACTIFXFEM ,SEDRAPE,NUMEL_DRAPE
       my_real 
      .   STI(MVSIZ),STIR(MVSIZ),RHO(MVSIZ),BID,
      .   VISCMX(MVSIZ),AREA(MVSIZ),
@@ -233,16 +231,22 @@ C-----
       TYPE(BUF_LAY_) ,POINTER :: BUFLY
       TYPE(G_BUFEL_) ,POINTER :: GBUF
       TYPE(L_BUFEL_) ,POINTER :: LBUF
+      TYPE(L_BUFEL_DIR_) ,POINTER :: LBUF_DIR
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------
 
       GBUF   => ELBUF_STR%GBUF
+      IDRAPE = ELBUF_STR%IDRAPE
       IBID   = 0
       BID    = ZERO
       IDRIL  = IPARG(41)
+      ACTIFXFEM = IPARG(70)
       INLOC  = IPARG(78)
       NLAY  = ELBUF_STR%NLAY
+      SEDRAPE = STDRAPE
+      NUMEL_DRAPE = NUMELTG_DRAPE
+      TEMPEL(1:MVSIZ) = ZERO
 cc      NPT  = MAX(NLAY,NPTT) --> set to = IPARG(6) , keeping it original
 C                                 to allow for NPT = 0 (global LAW_3
       NPG  = 1
@@ -298,21 +302,44 @@ c
 c-------------------------------------
       L_DIRA = ELBUF_STR%BUFLY(1)%LY_DIRA
       L_DIRB = ELBUF_STR%BUFLY(1)%LY_DIRB
-      ALLOCATE(DIRA(NLAY*NEL*L_DIRA))
-      ALLOCATE(DIRB(NLAY*NEL*L_DIRB))
-      DIRA=ZERO
-      DIRB=ZERO
-      IF (L_DIRA == 0) THEN
-        CONTINUE
-      ELSEIF (IREP == 0) THEN
-        DO J=1,NLAY
-          J1 = 1+(J-1)*L_DIRA*NEL
-          J2 = J*L_DIRA*NEL
-          DIRA(J1:J2) = ELBUF_STR%BUFLY(J)%DIRA(1:NEL*L_DIRA)
-        ENDDO
-      ENDIF
-      DIR_A => DIRA(1:NLAY*NEL*L_DIRA)
-      DIR_B => DIRB(1:NLAY*NEL*L_DIRB)
+      IF(IDRAPE > 0 .AND. (IGTYP == 51 .OR. IGTYP == 52)) THEN
+        ALLOCATE(DIRA(NPTTOT*NEL*L_DIRA))
+        ALLOCATE(DIRB(NPTTOT*NEL*L_DIRB))
+        IF (L_DIRA == 0) THEN
+            CONTINUE
+        ELSEIF (IREP == 0) THEN
+           NPTTOT = 0
+           DO ILAY=1,NLAY
+              NPTT = ELBUF_STR%BUFLY(ILAY)%NPTT
+              DO IT=1,NPTT
+                 J = NPTTOT + IT
+                 LBUF_DIR =>  ELBUF_STR%BUFLY(ILAY)%LBUF_DIR(IT)
+                 J1 = 1+(J-1)*L_DIRA*NEL
+                 J2 = J*L_DIRA*NEL
+                 DIRA(J1:J2) = LBUF_DIR%DIRA(1:NEL*L_DIRA)
+              ENDDO
+              NPTTOT = NPTTOT + NPTT
+            ENDDO 
+        ENDIF
+        DIR_A => DIRA(1:NPTTOT*NEL*L_DIRA)
+        DIR_B => DIRB(1:NPTTOT*NEL*L_DIRB)
+      ELSE ! idrape
+        ALLOCATE(DIRA(NLAY*NEL*L_DIRA))
+        ALLOCATE(DIRB(NLAY*NEL*L_DIRB))
+        DIRA=ZERO
+        DIRB=ZERO
+        IF (L_DIRA == 0) THEN
+          CONTINUE
+        ELSEIF (IREP == 0) THEN
+           DO J=1,NLAY
+              J1 = 1+(J-1)*L_DIRA*NEL
+              J2 = J*L_DIRA*NEL
+              DIRA(J1:J2) = ELBUF_STR%BUFLY(J)%DIRA(1:NEL*L_DIRA)
+           ENDDO
+         ENDIF
+         DIR_A => DIRA(1:NLAY*NEL*L_DIRA)
+         DIR_B => DIRB(1:NLAY*NEL*L_DIRB)
+      ENDIF ! IDRAPE
 c-------------------------------------
       NXLAY = NLAY
 c
@@ -403,7 +430,7 @@ c
      .             PX1 ,PY1 ,PY2 ,EYZ  ,EZX  ,
      .             E1X      ,E1Y      ,E1Z     ,E2X      ,                 
      .             E2Y      ,E2Z      ,E3X     ,E3Y      ,E3Z      )       
-	  
+            
       IF (ISMSTR == 10) THEN
         CALL C3COORT3(JFT    ,JLT    ,X          ,IXTG   ,GBUF%OFF,
      1                R      ,X2L    ,X3L        ,Y2L    ,Y3L     ,
@@ -474,7 +501,7 @@ C--------------------------
      4   SSP       ,RHO       ,VISCMX    ,DT1C      ,SIGY      ,
      5   AREA      ,EXX       ,EYY       ,EXY       ,EZX       ,
      6   EYZ       ,KXX       ,KYY       ,KXY       ,NU        ,
-     7   OFF       ,THK0      ,MAT       ,PID       ,MATPARAM_TAB,
+     7   OFF       ,THK0      ,MAT       ,PID       ,MAT_ELEM  ,
      8   GBUF%FOR  ,GBUF%MOM  ,GBUF%STRA ,FAILWAVE  ,FWAVE_EL  ,
      9   GBUF%THK  ,GBUF%EINT ,IOFC      ,
      A   G         ,A11       ,A12       ,VOL0      ,INDX      ,
@@ -488,11 +515,12 @@ C--------------------------
      I   BID       ,BID       ,BID       ,E1X0      ,E1Y0       ,
      J   E1Z0      ,E2X0      ,E2Y0      ,E2Z0      ,E3X0       ,
      K   E3Y0      ,E3Z0      ,NG        ,TABLE     ,IXFEM     ,
-     L   BID       ,SENSOR_TAB,BID       ,ELCRKINI  ,
+     L   BID       ,SENSORS   ,BID       ,ELCRKINI  ,
      M   DIR1_CRK  ,DIR2_CRK  ,ALDT      ,
      N   ISMSTR    ,IR        ,IS        ,NLAY      ,NPT       ,
      O   IXLAY     ,IXEL      ,ISUBSTACK ,STACK     ,
-     P   F_DEF     ,ITASK     ,DRAPE_T3  ,VAR_REG   ,NLOC_DMG  )
+     P   F_DEF     ,ITASK     ,DRAPE_SH3N  ,VAR_REG   ,NLOC_DMG ,
+     R   INDX_DRAPE,THKE        ,SEDRAPE     ,NUMEL_DRAPE )
 C--------------------------
       IF ((IMON_MAT==1).AND.ITASK == 0)CALL STOPTIME(35,1)
 C--------------------------
@@ -515,12 +543,15 @@ C     BALANCE FOR EACH MATERIAL
 C--------------------------
 c      IFLAG=MOD(NCYCLE,NCPRI)
       IF(IPRI>0)
-     +   CALL C3BILAN(JFT  ,JLT    ,PM    ,V    ,GBUF%THK,GBUF%EINT,
-     2                PMSAV,IPARTTG,RHO   ,VOL00,IXTG   ,X        ,
-     3                R    ,THK02  ,AREA  ,GRESAV ,GRTH     ,
-     4                IGRTH,OFF    ,IBID  ,IBID ,IBID   ,IBID     ,
-     5                IBID ,IEXPAN ,GBUF%EINTTH ,ITASK  ,MAT      ,
-     6                GBUF%VOL)
+     +   CALL C3BILAN(
+     1   JFT,        JLT,        PM,         V,
+     2   GBUF%THK,   GBUF%EINT,  PMSAV,      IPARTTG,
+     3   RHO,        VOL00,      IXTG,       X,
+     4   R,          THK02,      AREA,       GRESAV,
+     5   GRTH,       IGRTH,      OFF,        IBID,
+     6   IBID,       IBID,       IBID,       IBID,
+     7   IEXPAN,     GBUF%EINTTH,ITASK,      MAT,
+     8   GBUF%VOL,   ACTIFXFEM,  IGRE)
 C----------------------------
 C     INTERNAL FORCES
 C----------------------------
@@ -541,12 +572,13 @@ c-------------------------
 c     Virtual internal forces of regularized non local ddl 
 c--------------------------
       IF (INLOC > 0) THEN
-        CALL C3FINT_REG(NLOC_DMG,VAR_REG ,GBUF%THK,NEL     ,
-     .                  OFF     ,AREA    ,NC1     ,NC2     , 
-     .                  NC3     ,PX1     ,PY1     ,PY2     ,
-     .                  ELBUF_STR%NLOC(1,1),IMAT  ,NDDL    ,
-     .                  ITASK   ,DT2T    ,ALDT    ,GBUF%THK_I,
-     .                  GBUF%AREA)
+        CALL C3FINT_REG(
+     1   NLOC_DMG,        VAR_REG,         GBUF%THK,        NEL,
+     2   OFF,             AREA,            NC1,             NC2,
+     3   NC3,             PX1,             PY1,             PY2,
+     4   ELBUF_STR%NLOC(1,1),               IMAT,            NDDL,
+     5   ITASK,           DT2T,            ALDT,            GBUF%THK_I,
+     6   GBUF%AREA,       NFT)
       ENDIF 
 c-------------------------------
 C-------------------------
@@ -561,9 +593,11 @@ C--------------------------
 C     THERMAL TIME STEP
 C--------------------------
         IF(JTHE > 0.AND.IDT_THERM == 1)THEN
-           CALL DTTHERM(JFT     ,JLT     ,PM   ,TEMPEL,GBUF%RE,
-     2                  RHO     ,GBUF%RK ,VOL0 ,ALDT  ,MAT    ,
-     3                  DT_THERM,OFF     ,CONDE) 
+           CALL DTTHERM(
+     1   JFT,     JLT,     PM,      TEMPEL,
+     2   GBUF%RE, RHO,     GBUF%RK, VOL0,
+     3   ALDT,    MAT,     DT_THERM,OFF,
+     4   CONDE,   JTUR)
          ENDIF 
 C-------------------------
 C     ASSEMBLY

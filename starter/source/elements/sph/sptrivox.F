@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -24,10 +24,10 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 Chd|====================================================================
 Chd|  SPTRIVOX                      source/elements/sph/sptrivox.F
 Chd|-- called by -----------
-Chd|        SPBUC31                       source/elements/sph/spbuc31.F
+Chd|        SPBUC31                       source/elements/sph/spbuc31.F 
 Chd|-- calls ---------------
-Chd|        SPPRO31                       source/elements/sph/spbuc31.F
-Chd|        TRI7BOX                       share/modules1/tri7box.F
+Chd|        SPPRO31                       source/elements/sph/spbuc31.F 
+Chd|        TRI7BOX                       share/modules1/tri7box.F      
 Chd|====================================================================
       SUBROUTINE SPTRIVOX(
      1      NSN    ,X       ,BMINMA  ,NOD2SP  ,
@@ -50,12 +50,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "param_c.inc"
-#include      "scr05_c.inc"
 #include      "sphcom.inc"
 C-----------------------------------------------
 C   ROLE DE LA ROUTINE:

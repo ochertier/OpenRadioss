@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -53,21 +53,17 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "tabsiz_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       TYPE (UNIT_TYPE_),INTENT(IN) ::UNITAB 
       INTEGER IIN,IOUT,IUNIT
       my_real PM(NPROPM)
-      LOGICAL :: IS_ENCRYPTED, IS_AVAILABLE
       TYPE(SUBMODEL_DATA), DIMENSION(NSUBMOD), INTENT(IN) :: LSUBMODEL
       INTEGER,INTENT(IN) :: IMIDEOS
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr17_c.inc"
-#include      "submod_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -76,11 +72,13 @@ C-----------------------------------------------
      .   C1, C2, C3, G0, T1, T2, ES, HH, E0, RHO0,
      .   FAC_L,FAC_T,FAC_M,FAC_C,RHOR,RHOI,MU2,
      .   XX,AA,BB,GX,PRES,EXPA,ETA,EE,CC, MU0, DF, PP ,SSP0, DPDMU, PC
+      LOGICAL :: IS_ENCRYPTED, IS_AVAILABLE, IS_AVAILABLE_RHO0     
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------
       IS_ENCRYPTED = .FALSE.
       IS_AVAILABLE = .FALSE.
+      IS_AVAILABLE_RHO0 = .FALSE.
 
       CALL HM_OPTION_IS_ENCRYPTED(IS_ENCRYPTED)
 
@@ -95,7 +93,7 @@ C-----------------------------------------------
 
       CALL HM_GET_FLOATV('MAT_EOH',HH, IS_AVAILABLE,LSUBMODEL,UNITAB)
       CALL HM_GET_FLOATV('MAT_EA', E0, IS_AVAILABLE,LSUBMODEL,UNITAB)
-      CALL HM_GET_FLOATV('Refer_Rho', RHO0, IS_AVAILABLE,LSUBMODEL,UNITAB)
+      CALL HM_GET_FLOATV('Refer_Rho', RHO0, IS_AVAILABLE_RHO0,LSUBMODEL,UNITAB)
 
       IF(T1 == ZERO) T1=C1
 
@@ -186,7 +184,8 @@ C-----------------------------------------------
       IF(IS_ENCRYPTED)THEN
         WRITE(IOUT,'(5X,A,//)')'CONFIDENTIAL DATA'
       ELSE
-        WRITE(IOUT,1500)C1,C2,C3,G0,T1,T2,ES,HH,E0,PM(31),PM(1)
+        WRITE(IOUT,1500)C1,C2,C3,G0,T1,T2,ES,HH,E0,PM(31)
+        IF(IS_AVAILABLE_RHO0)WRITE(IOUT,1501)PM(1)
       ENDIF
 
       RETURN
@@ -204,8 +203,9 @@ C-----------------------------------------------
      & 5X,'SUBLIMATION ENERGY (PER UNIT VOLUME). . . .=',1PG20.13/,
      & 5X,'H . . . . . . . . . . . . . . . . . . . . .=',1PG20.13/,
      & 5X,'INITIAL INTERNAL ENERGY (PER UNIT VOLUME) .=',1PG20.13/,
-     & 5X,'INITIAL PRESSURE. . . . . . . . . . . . . .=',1PG20.13/,
-     & 5X,'REFERENCE DENSITY . . . . . . . . . . . . .=',1PG20.13//)
+     & 5X,'INITIAL PRESSURE. . . . . . . . . . . . . .=',1PG20.13)
+ 1501 FORMAT(     
+     & 5X,'EOS REFERENCE DENSITY . . . . . . . . . .=',1PG20.13)      
 
       RETURN
       END

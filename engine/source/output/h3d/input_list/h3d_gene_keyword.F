@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,7 +27,7 @@ Chd|        LECH3D                        source/output/h3d/h3d_build_fortran/le
 Chd|-- calls ---------------
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|====================================================================
       SUBROUTINE H3D_GENE_KEYWORD(KEY2_READ,KEY2,KEY3_READ,KEY3_GLOB,NB_KEY,CPT_KEY,MULTI_FVM,
      .                            IS_MODEL_NPT,IS_MODEL_LAYER,IS_MODEL_PLY,IS_MDSVAR,IS_MDSVAR_DEF,
@@ -38,27 +38,18 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE H3D_MOD
       USE MULTI_FVM_MOD
+      USE NAMES_AND_TITLES_MOD, ONLY: NCHARLINE100,NCHARKEY
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "chara_c.inc"
-#include      "nchara_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
        INTEGER NB_KEY,CPT_KEY
-       CHARACTER(LEN=ncharkey) ::  KEY2,KEY2_READ
-       CHARACTER(LEN=ncharline) ::  KEY3_READ,KEY3_GLOB
+       CHARACTER(LEN=NCHARKEY) ::  KEY2,KEY2_READ
+       CHARACTER(LEN=NCHARLINE100) ::  KEY3_READ,KEY3_GLOB
        TYPE(MULTI_FVM_STRUCT), INTENT(IN) :: MULTI_FVM
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com04_c.inc"
-#include      "param_c.inc"
-C-----------------------------------------------
-C   E x t e r n a l   F u n c t i o n s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -66,7 +57,6 @@ C-----------------------------------------------
      .        IS_MDSVAR,IS_MDSVAR_DEF,IS_PLY_ALL,IS_LAYER_ALL,IS_IPT,
      .        IS_LAYER,IS_PLY,IS_ID
       CHARACTER(LEN=2) :: CH_OPTION
-C=========================================================================
 c-----------------------------------------------
       IF (KEY2_READ == 'MASS') THEN
 c-----------------------------------------------
@@ -121,6 +111,23 @@ c-----------------------------------------------
             IS_MDSVAR = 1
             IS_MDSVAR_DEF = 1
             IF(IS_MODEL_PLY == 1 .OR. IS_MODEL_LAYER == 1 )IS_LAYER_ALL = 1
+          ENDIF
+        ELSEIF (KEY3_READ == 'VFRAC') THEN
+c     create specific keywords for LAW151, number of present materials is not
+c     known a priori
+          IF (MULTI_FVM%IS_USED) THEN
+            NB_KEY = MULTI_FVM%NBMAT
+            DO II = 1, NB_KEY
+              IF (CPT_KEY == II) THEN
+                WRITE(KEY3_GLOB, '(A,I0)') 'M151VFRAC', II 
+              ENDIF
+            ENDDO
+          ELSE
+            NB_KEY = 4
+            IF (CPT_KEY == 1) KEY3_GLOB = 'VFRAC1'
+            IF (CPT_KEY == 2) KEY3_GLOB = 'VFRAC2'
+            IF (CPT_KEY == 3) KEY3_GLOB = 'VFRAC3'
+            IF (CPT_KEY == 4) KEY3_GLOB = 'VFRAC4'
           ENDIF
         ELSE
           NB_KEY = 1

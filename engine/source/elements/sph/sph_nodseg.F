@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -28,19 +28,11 @@ Chd|        SPONOF2                       source/elements/sph/sponof2.F
 Chd|-- calls ---------------
 Chd|====================================================================
       SUBROUTINE SPH_NODSEG(XI,YI,ZI,XX,TFLAG,NP,LONFSPH,IXP,DPS,WNORMAL,FLAG)
-C----6---------------------------------------------------------------7---------8
+C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "sphcom.inc"
-#include      "param_c.inc"
-C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER TFLAG,LONFSPH(*),IXP(*),NP,FLAG
@@ -81,7 +73,7 @@ C----------
              XC=X3
              YC=Y3
              ZC=Z3
-           ENDIF	   
+           ENDIF     
 C----------
 C          triangle 1,2,C
            K  =0
@@ -469,7 +461,7 @@ C             normale sortante au segment.
               Z12=HALF*(Z2+Z3-Z1-Z4)
               X23=HALF*(X3+X4-X1-X2)
               Y23=HALF*(Y3+Y4-Y1-Y2)
-              Z23=HALF*(Z3+Z4-Z1-Z2)	      
+              Z23=HALF*(Z3+Z4-Z1-Z2)        
               NX = Y12*Z23-Z12*Y23
               NY =-X12*Z23+Z12*X23
               NZ = X12*Y23-Y12*X23
@@ -484,7 +476,7 @@ C             cumule normale sortante au segment.
               Z12=HALF*(Z2+Z3-Z1-Z4)
               X23=HALF*(X3+X4-X1-X2)
               Y23=HALF*(Y3+Y4-Y1-Y2)
-              Z23=HALF*(Z3+Z4-Z1-Z2)	      
+              Z23=HALF*(Z3+Z4-Z1-Z2)        
               NX = Y12*Z23-Z12*Y23
               NY =-X12*Z23+Z12*X23
               NZ = X12*Y23-Y12*X23

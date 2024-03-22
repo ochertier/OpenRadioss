@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -33,11 +33,10 @@ Chd|        RADIOSS2                      source/engine/radioss2.F
 Chd|-- calls ---------------
 Chd|====================================================================
       MODULE SCRATCHFILE_MOD
-
-      CHARACTER(LEN=256) :: IINFNA,IUSC4_FNAM,IUSC2_FNAM,
-     *                      IFXS_FN,IFXM_FN,IEIGM_FN
-      INTEGER USE_IFXM, USE_IFXS,USE_IEIGM
-      INTEGER LEN_IINFNA,LEN_IUSC4_FNAM,LEN_IFXS_FN,LEN_IFXM_FN,
-     *        LEN_IEIGM_FN
+        CHARACTER(LEN=10192) :: IINFNA,IUSC4_FNAM,IUSC2_FNAM,
+     *                        IFXS_FN,IFXM_FN,IEIGM_FN
+        INTEGER USE_IFXM, USE_IFXS,USE_IEIGM
+        INTEGER LEN_IINFNA,LEN_IUSC4_FNAM,LEN_IFXS_FN,LEN_IFXM_FN,
+     *                        LEN_IEIGM_FN
 
       END MODULE SCRATCHFILE_MOD 

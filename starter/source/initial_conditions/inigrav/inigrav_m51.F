@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,8 +26,8 @@ Chd|-- called by -----------
 Chd|        INIGRAV_LOAD                  source/initial_conditions/inigrav/inigrav_load.F
 Chd|-- calls ---------------
 Chd|        POLYSOLVE                     source/initial_conditions/inigrav/inigrav_m51.F
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE INIGRAV_M51(NELG, NEL , NG   , MATID, IPM, GRAV0, DEPTH, PM,     BUFMAT, ELBUF_TAB,
      .                       PSURF,LIST, ALE_CONNECTIVITY, NV46 , IX , NIX  , NFT  , BUFMATG, IPARG)
@@ -40,10 +40,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -96,7 +92,7 @@ C NELG IS SIZE OF ORIGINAL GROUP : needed to shift indexes in GBUF%SIG & MBUF%VA
       K4 = N0PHAS + (4 - 1) * NVPHAS
       NUVAR = IPM(8, MATID)
       PEXT  = BUFMAT(8)
-      IF(IFORM/=6)THEN
+      IF(IFORM /= 6)THEN
       !all value are in UPARAM=>BUFMAT()
         !Initial densities
         RHO10 = BUFMAT(9)
@@ -139,10 +135,6 @@ C NELG IS SIZE OF ORIGINAL GROUP : needed to shift indexes in GBUF%SIG & MBUF%VA
       ENDIF
       DO K = 1, NEL
          I = LIST(K)
-         EINT1 = EINT10
-         EINT2 = EINT20
-         EINT3 = EINT30
-         EINT4 = EINT40
          IF(IFORM==6)THEN
          !value are not in buffer UPARAM=>BUFMAT but are cell dependent
            ML     = 0
@@ -205,6 +197,10 @@ C NELG IS SIZE OF ORIGINAL GROUP : needed to shift indexes in GBUF%SIG & MBUF%VA
            ALPHA3 = MBUFv%VAR(IS + (K3 + 23 - 1) * NELGv)
            ALPHA4 = MBUFv%VAR(IS + (K4 + 23 - 1) * NELGv)
          ELSE
+           EINT1 = EINT10
+           EINT2 = EINT20
+           EINT3 = EINT30
+           EINT4 = EINT40
            !Volumic fractions
            ALPHA1 = MBUF%VAR(I + (K1 + 23 - 1) * NELG)
            ALPHA2 = MBUF%VAR(I + (K2 + 23 - 1) * NELG)

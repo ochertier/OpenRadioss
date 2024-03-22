@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -29,32 +29,32 @@ Chd|        ARRET                         source/system/arret.F
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|====================================================================
       SUBROUTINE CREATE_H3D_QUAD_SCALAR(H3D_DATA,ID_QUAD_SCALAR,ID_INPUT,TEXT1,STEXT1,
-     .                                  COMMENT,SCOMMENT,IPART,KEY3_GLOB,LAYER,IR,IS,IT,IUVAR)
+     .                                  COMMENT,SCOMMENT,IPART,KEY3_GLOB,LAYER,IR,IS,IT,IUVAR,
+     .                                  ID     )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE H3D_MOD
+      USE NAMES_AND_TITLES_MOD, ONLY: NCHARLINE100
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "nchara_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       TYPE (H3D_DATABASE) :: H3D_DATA
       INTEGER ID_QUAD_SCALAR,ID_INPUT,STEXT1,SCOMMENT,LAYER,IR,IS,IT,IUVAR
       INTEGER IPART(LIPART1,*)
+      INTEGER, INTENT(IN) :: ID
       CHARACTER(LEN=STEXT1) ::  TEXT1
-      CHARACTER(LEN=ncharline) :: KEY3_GLOB
+      CHARACTER(LEN=NCHARLINE100) :: KEY3_GLOB
       CHARACTER(LEN=SCOMMENT) :: COMMENT
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
-#include      "param_c.inc"
 #include      "scr17_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
@@ -62,7 +62,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      CHARACTER(LEN=ncharline) :: CARTE,CARTE1
+      CHARACTER(LEN=NCHARLINE100) :: CARTE,CARTE1
       INTEGER I,J,L,N_H3D_PART
 C=========================================================================
       H3D_DATA%N_OUTP_H3D = H3D_DATA%N_OUTP_H3D + 1
@@ -81,6 +81,8 @@ C=========================================================================
       H3D_DATA%OUTPUT_LIST(H3D_DATA%N_OUTP_H3D)%STRING1(1:STEXT1) = TEXT1(1:STEXT1)
       H3D_DATA%OUTPUT_LIST(H3D_DATA%N_OUTP_H3D)%S_COMMENT = SCOMMENT
       H3D_DATA%OUTPUT_LIST(H3D_DATA%N_OUTP_H3D)%COMMENT(1:SCOMMENT) = COMMENT(1:SCOMMENT)
+      H3D_DATA%OUTPUT_LIST(H3D_DATA%N_OUTP_H3D)%OBJECT_ID = ID
+
 
       N_H3D_PART = H3D_DATA%INPUT_LIST(ID_INPUT)%NB_PART
       H3D_DATA%OUTPUT_LIST(H3D_DATA%N_OUTP_H3D)%N_H3D_PART_LIST = N_H3D_PART

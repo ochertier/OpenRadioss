@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -35,8 +35,9 @@ Chd|        PUTDPDAANC                    source/mpi/interfaces/spmd_i7tool.F
 Chd|        PUTDPZERO                     source/mpi/interfaces/spmd_i7tool.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
+Chd|        INTERFACES_MOD                ../common_source/modules/interfaces/interfaces_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
 Chd|        TRI25EBOX                     share/modules/tri25ebox.F     
 Chd|        TRI7BOX                       share/modules/tri7box.F       
@@ -45,11 +46,11 @@ Chd|====================================================================
      1   IPARI   ,X       ,V       ,MS      ,
      2   IMSCH   ,I2MSCH ,DT2PREV ,INTLIST ,NBINTC  ,
      3   ISLEN7  ,IRLEN7 ,ISLEN11 ,IRLEN11 ,ISLEN17 ,
-     4   IRLEN17 ,IXS    ,IXS16   ,
+     4   IRLEN17 ,IXS    ,IXS16   ,NSENSOR ,
      5   IGRBRIC ,TEMP   ,IFLAG   ,IRLEN7T ,ISLEN7T ,
      6   IRLEN20 ,ISLEN20,IRLEN20T,ISLEN20T,IRLEN20E,
      7   ISLEN20E,IKINE  ,DIAG_SMS,SENSOR_TAB,INTBUF_TAB,INT24E2EUSE,
-     8   FORNEQS ,MULTI_FVM)
+     8   FORNEQS ,MULTI_FVM,INTERFACES)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -60,11 +61,11 @@ C-----------------------------------------------
       USE GROUPDEF_MOD
       USE MULTI_FVM_MOD
       USE SENSOR_MOD
+      USE INTERFACES_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -76,7 +77,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "assert.inc"
 #include      "scr05_c.inc"
-#include      "scr17_c.inc"
 #include      "scr18_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
@@ -85,14 +85,12 @@ C-----------------------------------------------
 #include      "task_c.inc"
 #include      "impl1_c.inc"
 #include      "spmd_c.inc"
-#include      "units_c.inc"
 #include      "sms_c.inc"
 #include      "rad2r_c.inc"
-#include      "i25edge_c.inc"
-#include      "macro.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER ,INTENT(IN) :: NSENSOR
       INTEGER IMSCH, I2MSCH, IFLAG, NBINTC,
      .        ISLEN7, IRLEN7, ISLEN11, IRLEN11, ISLEN17, IRLEN17,
      .        IRLEN7T, ISLEN7T,IRLEN20,ISLEN20,IRLEN20T,ISLEN20T,
@@ -107,6 +105,7 @@ C-----------------------------------------------
       TYPE (GROUP_)  , DIMENSION(NGRBRIC) :: IGRBRIC
       TYPE(MULTI_FVM_STRUCT), INTENT(INOUT) :: MULTI_FVM
       TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE (INTERFACES_)    ,INTENT(IN)     :: INTERFACES
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -116,7 +115,7 @@ C-----------------------------------------------
      .        N1, N2, LENI, LEN11, NTY, IALLOCS, IALLOCR, INACTI,
      .        LEN17, IGN, IGE, NMES, NME, NAD, NN, IES, LEN7T,
      .        LEN20, LEN20T, NLN, LEN20E, INC,LEN11T,
-     .        IL, IL1, IL2, MSGOFF,INTNITSCHE,LENNIT,
+     .        IL, IL1, IL2, MSGOFF,INTNITSCHE,LENNIT,NISUB,
      .        STATUS(MPI_STATUS_SIZE),
 C parasiz car variable en save
      .        DEBUT(NINTER),  DEBUTE(NINTER),
@@ -140,6 +139,7 @@ C type 25
       DATA ISTOCOM/0/
       SAVE ADDS,ADDR,REQ_SI,REQ_RI,ISTOCOM,
      .     IALLOCS,IALLOCR,BBUFS,BBUFR
+      LOGICAL IFSUB_CAREA
 C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
@@ -177,6 +177,16 @@ C type 25
       LEN25E = 14 ! 2 x [  X(3) +  V(3) +  MS(1) ] +
 
 C
+      IFSUB_CAREA = .FALSE.
+      DO II = 1, NBINTC
+         NIN = INTLIST(II)
+         NTY = IPARI(7,NIN)
+         NISUB = IPARI(36,NIN)
+         IF((NTY == 25.OR.NTY==24).AND.INTERFACES%PARAMETERS%INTCAREA > 0.AND.NISUB > 0) THEN
+              IFSUB_CAREA = .TRUE.
+         ENDIF
+      ENDDO
+C
       IF(IFLAG==1)THEN
 C
 C Partie 1 envoi et preparation buffer reception
@@ -195,6 +205,8 @@ C
      .                       + LEN11T*ISLEN11 + LEN17*ISLEN17
      .          + LEN20*ISLEN20 + LEN20T*ISLEN20T + LEN20E*ISLEN20E
      .          + LEN25E*ISLEN25E
+        IF(IFSUB_CAREA ) IALLOCS = IALLOCS +ISLEN25+ISLEN7
+
         IERROR=0
         IF(IALLOCS>0)
      +    ALLOCATE(BBUFS(IALLOCS),STAT=IERROR)
@@ -207,6 +219,8 @@ C
      .                       + LEN11T*IRLEN11 + LEN17*IRLEN17
      .          + LEN20*IRLEN20 + LEN20T*IRLEN20T + LEN20E*IRLEN20E
      .          + LEN25E*IRLEN25E
+
+        IF(IFSUB_CAREA ) IALLOCR = IALLOCR +IRLEN25+IRLEN7
 
         IERROR=0
         IF(IALLOCR>0)
@@ -233,26 +247,29 @@ C
               INACTI = IPARI(22,NIN)
               INTNITSCHE = IPARI(86,NIN)
               IEDGE = IPARI(58,NIN)
+              NISUB = IPARI(36,NIN)
 C
-              IF(NTY/=25.AND.(NTY==23.OR.
-     .           INACTI==5.OR.INACTI==6.OR.INACTI==7))THEN
-C Attention aux interfaces inactives
-               ISENS = 0
-               INTERACT = 1
-               IF(NTY == 7.OR.NTY == 11.OR.NTY == 24.OR.
+              ISENS = 0
+              INTERACT = 1
+              IF(NTY == 7.OR.NTY == 11.OR.NTY == 24.OR.
      .            NTY == 21.OR.NTY == 5.OR.NTY == 19 .OR.
      .            NTY == 25) ISENS = IPARI(64,NIN)  
-               IF (ISENS > 0) THEN    ! IF INTERFACE IS ACTIVATED BY SENSOR 
+               
+              IF (ISENS > 0) THEN    ! IF INTERFACE IS ACTIVATED BY SENSOR 
                   TS = SENSOR_TAB(ISENS)%TSTART
                   IF (TS>TT-DT2)  INTERACT = 0
-               ELSE
-                  STARTT = INTBUF_TAB(NIN)%VARIABLES(3)
-                  STOPT  = INTBUF_TAB(NIN)%VARIABLES(11)              
-                  IF (STARTT>TT-DT2) INTERACT = 0
-               ENDIF   
-C on force le nombre d entite a envoyer a 0 tant que l'interface est inactive (jusqu au retri suivant)
-                IF (INTERACT==0) NB=0
+              ELSE                    
+                  IF(NTY/=25.AND.(NTY==23.OR.INACTI==5.OR.INACTI==6.OR.INACTI==7))THEN  ! IF INACTI : check TSTART
+                    STARTT = INTBUF_TAB(NIN)%VARIABLES(3)
+                    STOPT  = INTBUF_TAB(NIN)%VARIABLES(11)              
+                    IF (STARTT>TT-DT2) INTERACT = 0
+                  ENDIF   
               END IF
+
+               ! Number of entities to send set to 0 when interface is deactivated
+              IF (INTERACT==0) NB=0
+
+
               LENI = LEN
               IF(NTY==11)LENI=LEN11
               IF(NTY==17)LENI=LEN17
@@ -268,6 +285,13 @@ c              IF(NTY == 24 .AND. INTNITSCHE > 0 ) LENI = LENI + 3
               IF(NB>0) THEN
                 L = L + NB*LENI
               ENDIF
+              IF((NTY == 25.OR.NTY==24).AND.INTERFACES%PARAMETERS%INTCAREA > 0.AND.NISUB > 0) THEN
+                  IFSUB_CAREA = .TRUE.
+                  IF(NB>0) THEN
+                     L = L + NB
+                  ENDIF
+              ENDIF
+
 C ajout partie edge pour type 20
               IF(NTY==20)THEN
                 NB = NSNFIE(NIN)%P(P)
@@ -280,7 +304,7 @@ C ajout partie edge pour type 25
               END IF
 
             ENDDO
-            SIZ = L+1-ADD
+            SIZ = L+1-ADD 
             IF(SIZ>0)THEN
               MSGTYP = MSGOFF
 C BUFS : envoi partie force et reception partie vitesse
@@ -308,11 +332,36 @@ C
               NIN = INTLIST(II)
               IDEB = DEBUT(NIN)
               NB = NSNSI(NIN)%P(P)
+
+              ISENS = 0
+              INTERACT = 1
+              IF(NTY == 7.OR.NTY == 11.OR.NTY == 24.OR.
+     .           NTY == 21.OR.NTY == 5.OR.NTY == 19 .OR.
+     .           NTY == 25) ISENS = IPARI(64,NIN)  
+
+              IF (ISENS > 0) THEN    ! IF INTERFACE IS ACTIVATED BY SENSOR 
+                 TS = SENSOR_TAB(ISENS)%TSTART
+                 IF (TS>TT-DT2)  INTERACT = 0
+              ELSE
+                 IF(NTY/=25.AND.(NTY==23.OR.INACTI==5.OR.INACTI==6.OR.INACTI==7))THEN  ! TSTART
+                    STARTT = INTBUF_TAB(NIN)%VARIABLES(3)
+                    STOPT  = INTBUF_TAB(NIN)%VARIABLES(11)              
+                    IF (STARTT>TT-DT2) INTERACT = 0
+                 ENDIF   
+              ENDIF   
+              ! Number of entities to send set to 0 when interface is deactivated
+              IF (INTERACT==0) NB=0
+
               IF(NB>0) THEN
                 NTY   =IPARI(7,NIN)
                 INTTH = IPARI(47,NIN)
                 INACTI = IPARI(22,NIN)           
                 INTNITSCHE = IPARI(86,NIN)
+                IFSUB_CAREA = .FALSE.
+                IF((NTY == 25.OR.NTY==24).AND.INTERFACES%PARAMETERS%INTCAREA > 0.AND.NISUB > 0) THEN ! if Carea output for TH and subinterfaces
+                    IFSUB_CAREA = .TRUE.
+                ENDIF
+
                 LSAV=L
                 IF((NTY==7 .AND. INTTH ==0 ).OR.NTY==10.OR.
      .             (NTY==22 .AND. INTTH ==0) .OR.
@@ -737,7 +786,17 @@ C
                   ENDIF
                  ENDIF
 
+                 IF(IFSUB_CAREA) THEN
+                    DO I = 1, NB
+                      N=NSVSI(NIN)%P(IDEB+I)
+                      NOD = INTBUF_TAB(NIN)%NSV(N)
+                      IF(NOD > NUMNOD)THEN
+                         BBUFS(L+1) = INTERFACES%PARAMETERS%INTAREAN(NOD)     
+                         L = L +1 
+                      ENDIF                      
+                    ENDDO
 
+                  ENDIF
 C
                 ELSEIF(NTY==11.AND.INTTH==0)THEN
 C type 11
@@ -2012,6 +2071,10 @@ C            DO NIN = 1, NINTER
                 NTY =IPARI(7,NIN)
                 INTTH = IPARI(47,NIN)
                 INTNITSCHE = IPARI(86,NIN)
+                IFSUB_CAREA = .FALSE.
+                IF((NTY == 25.OR.NTY==24).AND.INTERFACES%PARAMETERS%INTCAREA > 0.AND.NISUB > 0) THEN ! if Carea output for TH and subinterfaces
+                    IFSUB_CAREA = .TRUE.
+                ENDIF
                 IF((NTY==7.AND.INTTH == 0).OR.NTY==10.OR.
      .             (NTY==22.AND.INTTH == 0).OR.
      .             (NTY==23.AND.INTTH == 0).OR.
@@ -2291,6 +2354,13 @@ C
                     ENDIF
                    ENDIF
 
+C
+                  IF(IFSUB_CAREA) THEN
+                      DO I = 1, NB
+                        INTAREANFI(NIN)%P(I+IDEB) = BBUFR(L+1)
+                        L = L + 1
+                      ENDDO
+                  ENDIF
 
 
 C----

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,7 +25,7 @@ Chd|  THERMEXPPI                    source/elements/beam/thermexpp.F
 Chd|-- called by -----------
 Chd|        PFORC3                        source/elements/beam/pforc3.F 
 Chd|-- calls ---------------
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE THERMEXPPI(ELBUF_STR,
      1                  NEL    ,NPT    ,MAT    , PID    ,
@@ -46,14 +46,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
-#include      "scr05_c.inc"
-#include      "scr06_c.inc"
-#include      "scr17_c.inc"
 #include      "param_c.inc"
-#include      "com08_c.inc"
-#include      "com20_c.inc"
-#include      "impl1_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -111,7 +104,7 @@ C
 C       FORCES ET MOMENTS
           APT = GEO(IPA+IPT,PID(I)) 
           DFXX = APT*SIGNXX
-          FOR(I,1) = FOR(I,1) + DFXX		 
+          FOR(I,1) = FOR(I,1) + DFXX     
 C                                                    
           LBUF%SIG(II(1)+I) = LBUF%SIG(II(1)+I) + SIGNXX
         ENDDO                                                       
@@ -143,11 +136,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "scr06_c.inc"
-#include      "com04_c.inc"
-#include      "com08_c.inc"
-#include      "vect01_c.inc"
-#include      "impl1_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

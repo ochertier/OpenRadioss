@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,17 +26,14 @@ Chd|-- called by -----------
 Chd|        INIEBCSP0                     source/boundary_conditions/ebcs/iniebcsp0.F
 Chd|-- calls ---------------
 Chd|        EBCS_SET_TCARP                source/boundary_conditions/ebcs/iniebcs_nrf_tcar.F
-Chd|        EBCS_MOD                      ../common_source/modules/ebcs_mod.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        EBCS_MOD                      ../common_source/modules/boundary_conditions/ebcs_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        INIGRAV                       share/modules1/inigrav_mod.F  
 Chd|====================================================================
       SUBROUTINE INIEBCS_NRF_TCAR(EBCS_TAB, 
      .                    IPARG,X, IXS,IXQ,IXTG,
      .                    IPARTS,IPARTQ,IPARTTG,
      .                    PM, IPM)
-C-----------------------------------------------
-C   D e s c r i p t i o n
-C-----------------------------------------------
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -203,7 +200,7 @@ Chd|  EBCS_SET_TCARP                source/boundary_conditions/ebcs/iniebcs_nrf_
 Chd|-- called by -----------
 Chd|        INIEBCS_NRF_TCAR              source/boundary_conditions/ebcs/iniebcs_nrf_tcar.F
 Chd|-- calls ---------------
-Chd|        EBCS_MOD                      ../common_source/modules/ebcs_mod.F
+Chd|        EBCS_MOD                      ../common_source/modules/boundary_conditions/ebcs_mod.F
 Chd|====================================================================
       SUBROUTINE EBCS_SET_TCARP(EBCS,TCAR_P)
       USE EBCS_MOD

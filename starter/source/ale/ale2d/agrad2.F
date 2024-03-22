@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,7 +25,7 @@ Chd|  AGRAD2                        source/ale/ale2d/agrad2.F
 Chd|-- called by -----------
 Chd|        MATINI                        source/materials/mat_share/matini.F
 Chd|-- calls ---------------
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
 Chd|====================================================================
       SUBROUTINE AGRAD2(IXQ,X,ALE_CONNECTIVITY,GRAD,NEL)
 C-----------------------------------------------
@@ -47,7 +47,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "vect01_c.inc"
@@ -78,7 +77,7 @@ C ---- COORDINATES -----------------------------
       DO I=LFT,LLT
         II=I+NFT
         
-	Y1(I)=X(2,IXQ(2,II))
+          Y1(I)=X(2,IXQ(2,II))
         Z1(I)=X(3,IXQ(2,II))
 
         Y2(I)=X(2,IXQ(3,II))
@@ -104,7 +103,7 @@ C ---- NORMAL VECTORS ON FACES------------------
 
         N4Y(I)= (Z1(I)-Z4(I))
         N4Z(I)=-(Y1(I)-Y4(I))
-	
+
         YC(I) = (Y1(I)+Y2(I)+Y3(I)+Y4(I))
         ZC(I) = (Z1(I)+Z2(I)+Z3(I)+Z4(I))
       END DO
@@ -135,7 +134,7 @@ C ---- DISTANCES BETWEEN ELEMS (*4.)------------
         IF(IV2 <= 0) IV2=IE
         IF(IV3 <= 0) IV3=IE
         IF(IV4 <= 0) IV4=IE
-	
+
         D1Y(I) = - YC(I)+X(2,IXQ(2,IV1))+X(2,IXQ(3,IV1))+X(2,IXQ(4,IV1))+X(2,IXQ(5,IV1))
         D1Z(I) = - ZC(I)+X(3,IXQ(2,IV1))+X(3,IXQ(3,IV1))+X(3,IXQ(4,IV1))+X(3,IXQ(5,IV1))
 

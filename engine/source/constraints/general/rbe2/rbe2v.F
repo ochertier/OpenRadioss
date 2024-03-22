@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -36,13 +36,8 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
@@ -66,7 +61,7 @@ C======================================================================|
         NSN = IRBE2(5,N)
         ISK = IRBE2(7,N)
         IRAD = IRBE2(11,N)
-	IF (ISK>1) THEN
+          IF (ISK>1) THEN
            CALL RBE2VL1(NSN   ,LRBE2(IAD+1),X     ,A     ,AR    ,
      1                  V     ,VR    ,JT(1,N),JR(1,N),M     ,
      2                  SKEW(1,ISK),IRAD  )
@@ -90,16 +85,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "param_c.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NSL,ISL(*),JT(3),JR(3),M
@@ -115,24 +100,24 @@ C     REAL
      .     XS, YS, ZS,VRM(3)
 C======================================================================|
         DO J = 1,3
-	 IF (JT(J)/=0) THEN
+           IF (JT(J)/=0) THEN
           DO I=1,NSL
            NS = ISL(I)
-C	   V(J,NS)= V(J,M)
-	   A(J,NS)= A(J,M)
-	  ENDDO
+C     V(J,NS)= V(J,M)
+             A(J,NS)= A(J,M)
+            ENDDO
          ENDIF
         ENDDO
        IF ((JR(1)+JR(2)+JR(3))>0) THEN
         DO J = 1,3
-	 IF (JR(J)/=0) THEN
+           IF (JR(J)/=0) THEN
           DO I=1,NSL
            NS = ISL(I)
-C	   VR(J,NS)= VR(J,M)
-	   AR(J,NS)= AR(J,M)
-	  ENDDO
+C     VR(J,NS)= VR(J,M)
+             AR(J,NS)= AR(J,M)
+            ENDDO
          ENDIF
-	 VRM(J)= AR(J,M)*JR(J)
+           VRM(J)= AR(J,M)*JR(J)
         ENDDO
         DO I=1,NSL
          NS = ISL(I)
@@ -159,16 +144,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -251,13 +226,8 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
 #include      "impl1_c.inc"
@@ -282,8 +252,8 @@ C======================================================================|
         NSL = IRBE2(5,N)
         ISK = IRBE2(7,N)
         IRAD= IRBE2(11,N)
-	  IF (ISK>1) THEN
-	    IF( IMP_LR == 0 ) THEN
+            IF (ISK>1) THEN
+              IF( IMP_LR == 0 ) THEN
             CALL RBE2DL2(NSL   ,LRBE2(IAD+1),X     ,D     ,DR    ,
      1                 JT(1,N),JR(1,N),M     ,SKEW(1,ISK),IRAD  )
           ELSE
@@ -314,14 +284,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
-#include      "mvsiz_p.inc"
 #include      "impl1_c.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -338,27 +301,27 @@ C     REAL
      .     XS, YS, ZS,VRM(3),LSM(3),VS(3)
 C======================================================================|
         DO J = 1,3
-	 IF (JT(J)/=0) THEN
+           IF (JT(J)/=0) THEN
           DO I=1,NSL
            NS = ISL(I)
-	   V(J,NS)= V(J,M)
-	  ENDDO
+             V(J,NS)= V(J,M)
+            ENDDO
          ENDIF
         ENDDO
        IF ((JR(1)+JR(2)+JR(3))>0) THEN
         DO J = 1,3
-	 IF (JR(J)/=0) THEN
+           IF (JR(J)/=0) THEN
           DO I=1,NSL
            NS = ISL(I)
-	   VR(J,NS)= VR(J,M)
-	  ENDDO
+             VR(J,NS)= VR(J,M)
+            ENDDO
          ENDIF
         ENDDO
        END IF
 C
        IF (IRAD==0) THEN
         DO J = 1,3
-	 VRM(J)= VR(J,M)
+           VRM(J)= VR(J,M)
         ENDDO
         DO I=1,NSL
          NS = ISL(I)
@@ -381,7 +344,7 @@ C
         ENDDO
        ELSEIF ((JR(1)+JR(2)+JR(3))>0) THEN
         DO J = 1,3
-	 VRM(J)= VR(J,M)*JR(J)
+           VRM(J)= VR(J,M)*JR(J)
         ENDDO
         DO I=1,NSL
          NS = ISL(I)
@@ -417,16 +380,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -507,16 +460,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -631,7 +574,7 @@ C-------------------100---------------------
           EJ(2)=SKEW(2)
           EJ(3)=SKEW(3)
           CALL L_DIR(EJ,J)
-	  J1=0
+            J1=0
           CALL DIR_RBE2(J    ,J1    ,K     )
 C-------------------010---------------------
        ELSEIF (ICT == 2) THEN
@@ -639,7 +582,7 @@ C-------------------010---------------------
           EJ(2)=SKEW(5)
           EJ(3)=SKEW(6)
           CALL L_DIR(EJ,J)
-	  J1=0
+            J1=0
           CALL DIR_RBE2(J    ,J1    ,K     )
 C-------------------001---------------------
        ELSEIF (ICT == 1) THEN
@@ -647,7 +590,7 @@ C-------------------001---------------------
           EJ(2)=SKEW(8)
           EJ(3)=SKEW(9)
           CALL L_DIR(EJ,J)
-	  J1=0
+            J1=0
           CALL DIR_RBE2(J    ,J1    ,K     )
 C-------------------011---------------------
        ELSEIF (ICT == 3) THEN
@@ -666,11 +609,11 @@ C-------------------011---------------------
           VLS(3)=VLM(3)
           VLS(2)=VLM(2)
           CALL DIR_RBE2(J    ,J1    ,K     )
-	  IF (ABS(VQ(1,K))<EM20) THEN
-	   S= ZERO
-	  ELSE
-	   S= ONE/VQ(1,K)
-	  ENDIF
+            IF (ABS(VQ(1,K))<EM20) THEN
+             S= ZERO
+            ELSE
+             S= ONE/VQ(1,K)
+            ENDIF
 C-------------------101---------------------
        ELSEIF (ICT == 5) THEN
           EJ(1)=SKEW(7)
@@ -688,11 +631,11 @@ C-------------------101---------------------
           VLS(3)=VLM(3)
           VLS(1)=VLM(1)
           CALL DIR_RBE2(J    ,J1    ,K     )
-	  IF (ABS(VQ(2,K))<EM20) THEN
-	   S= ZERO
-	  ELSE
-	   S= ONE/VQ(2,K)
-	  ENDIF
+            IF (ABS(VQ(2,K))<EM20) THEN
+             S= ZERO
+            ELSE
+             S= ONE/VQ(2,K)
+            ENDIF
 C-------------------110---------------------
        ELSEIF (ICT == 6) THEN
           EJ(1)=SKEW(4)
@@ -710,11 +653,11 @@ C-------------------110---------------------
           VLS(2)=VLM(2)
           VLS(1)=VLM(1)
           CALL DIR_RBE2(J    ,J1    ,K     )
-	  IF (ABS(VQ(3,K))<EM20) THEN
-	   S= ZERO
-	  ELSE
-	   S= ONE/VQ(3,K)
-	  ENDIF
+            IF (ABS(VQ(3,K))<EM20) THEN
+             S= ZERO
+            ELSE
+             S= ONE/VQ(3,K)
+            ENDIF
        ENDIF
        DO I=1,NSN
         NS = ISL(I)
@@ -779,9 +722,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER K,J,J1
@@ -814,15 +754,8 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "param_c.inc"
 #include      "com08_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -843,22 +776,22 @@ C======================================================================|
 C-------change As=Am to Vs=Vm------
         USDT = ONE/DT12
         DO J = 1,3
-	 IF (JT(J)/=0) THEN
+           IF (JT(J)/=0) THEN
           DO I=1,NSL
            NS = ISL(I)
-	   A(J,NS)= A(J,M)+(V(J,M)-V(J,NS))*USDT
-	  ENDDO
+             A(J,NS)= A(J,M)+(V(J,M)-V(J,NS))*USDT
+            ENDDO
          ENDIF
         ENDDO
 C
        IF ((JR(1)+JR(2)+JR(3))>0.OR.IRAD==0) THEN
         DO J = 1,3
          VG(J)=VR(J,M)+AR(J,M)*DT12
-	 IF (JR(J)/=0) THEN
+           IF (JR(J)/=0) THEN
           DO I=1,NSL
            NS = ISL(I)
            AR(J,NS)= (VG(J)-VR(J,NS)) * USDT
-	  ENDDO
+            ENDDO
          ENDIF
         ENDDO
        END IF
@@ -877,11 +810,11 @@ C
          VX1=V2X3-V3X2
          VX2=V3X1-V1X3
          VX3=V1X2-V2X1
-	 IF (JT(1)/=0)
+           IF (JT(1)/=0)
      .   A(1,NS)= A(1,NS)+(VX1+DT05*(VG(2)*VX3-VG(3)*VX2))*USDT
-	 IF (JT(2)/=0)
+           IF (JT(2)/=0)
      .   A(2,NS)= A(2,NS)+(VX2+DT05*(VG(3)*VX1-VG(1)*VX3))*USDT
-	 IF (JT(3)/=0)
+           IF (JT(3)/=0)
      .   A(3,NS)= A(3,NS)+(VX3+DT05*(VG(1)*VX2-VG(2)*VX1))*USDT
         ENDDO
        ELSEIF ((JR(1)+JR(2)+JR(3))>0) THEN
@@ -926,15 +859,8 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "param_c.inc"
 #include      "com08_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -1067,14 +993,8 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -1096,17 +1016,17 @@ C======================================================================|
         NR=JR(1)+JR(2)+JR(3)
         ICT=JT(1)*4 +JT(2)*2 +JT(3)
         ICR=JR(1)*4 +JR(2)*2 +JR(3)
-	IF (ISK>1) THEN
-	 DO K=1,LSKEW
-	  SKEW(K)=SKEW0(K)
-	 ENDDO
-	ELSE
-	 DO K=1,LSKEW
-	  SKEW(K)=ZERO
-	 ENDDO
-	  SKEW(1)=ONE
-	  SKEW(5)=ONE
-	  SKEW(9)=ONE
+          IF (ISK>1) THEN
+           DO K=1,LSKEW
+            SKEW(K)=SKEW0(K)
+           ENDDO
+          ELSE
+           DO K=1,LSKEW
+            SKEW(K)=ZERO
+           ENDDO
+            SKEW(1)=ONE
+            SKEW(5)=ONE
+            SKEW(9)=ONE
         ENDIF
       IF (NT>0.AND.NT<3) THEN
        NSN=1
@@ -1341,16 +1261,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "param_c.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NSN,ISL(*),JT(3),JR(3),M,IRAD
@@ -1470,7 +1380,7 @@ C-------------------100---------------------
           EJ(2)=SKEW(2)
           EJ(3)=SKEW(3)
           CALL L_DIR(EJ,J)
-	    J1=0
+              J1=0
           CALL DIR_RBE2(J    ,J1    ,K     )
 C-------------------010---------------------
        ELSEIF (ICT == 2) THEN
@@ -1486,7 +1396,7 @@ C-------------------001---------------------
           EJ(2)=SKEW(8)
           EJ(3)=SKEW(9)
           CALL L_DIR(EJ,J)
-	    J1=0
+              J1=0
           CALL DIR_RBE2(J    ,J1    ,K     )
 C-------------------011---------------------
        ELSEIF (ICT == 3) THEN

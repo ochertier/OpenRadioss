@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -33,13 +33,13 @@ Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        TABLE_MOD                     share/modules/table_mod.F     
 Chd|====================================================================
       SUBROUTINE FAIL_INIEVO_C (
-     1     NEL      ,NUPARAM  ,NUVAR    ,NFUNC    ,IFUNC    ,
-     2     NPF      ,TABLE    ,TF       ,TIME     ,UPARAM   , 
+     1     NEL      ,NUPARAM  ,NUVAR    ,
+     2     TABLE    ,NTABLF   ,ITABLF   ,TIME     ,UPARAM   , 
      3     NGL      ,ALDT     ,DPLA     ,EPSP     ,UVAR     ,     
      4     SIGNXX   ,SIGNYY   ,SIGNXY   ,SIGNYZ   ,SIGNZX   ,            
      5     PLA      ,TEMP     ,SIGY     ,FOFF     ,DFMAX    ,
      6     TDELE    ,IPT      ,IPG      ,DMG_FLAG ,DMG_SCALE,
-     7     PTHKF    ,DAMINI   ,AREA     ,INLOC    ,NPG      )   
+     7     DAMINI   ,AREA     ,INLOC    ,NPG      )   
 C---------+---------+---+---+--------------------------------------------
       USE TABLE_MOD
       USE INTERFACE_TABLE_MOD
@@ -51,23 +51,17 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "mvsiz_p.inc"
-#include      "scr17_c.inc"
 #include      "units_c.inc"
 #include      "comlock.inc"
-#include      "param_c.inc"
-#include      "impl1_c.inc"
 #include      "com04_c.inc"
-#include      "com01_c.inc"
-#include      "scr18_c.inc"
 #include      "tabsiz_c.inc"
-#include      "my_allocate.inc"
 C-----------------------------------------------
 C   I N P U T   A r g u m e n t s
 C-----------------------------------------------
       INTEGER, INTENT(IN) :: 
-     .        NEL,NUPARAM,NUVAR,NGL(NEL),IPT,IPG,
+     .        NEL,NUPARAM,NUVAR,NGL(NEL),IPT,IPG,NTABLF,
      .        INLOC,NPG
+      INTEGER, DIMENSION(NTABLF) ,INTENT(IN) :: ITABLF
       INTEGER, INTENT(INOUT) :: 
      .        DMG_FLAG,FOFF(NEL)
       my_real, INTENT(IN) :: 
@@ -78,20 +72,12 @@ C-----------------------------------------------
      .        SIGY(NEL),AREA(NEL)
       my_real, INTENT(INOUT) :: 
      .        UVAR(NEL,NUVAR),DFMAX(NEL),TDELE(NEL),
-     .        DMG_SCALE(NEL),PTHKF,DAMINI(NEL)
+     .        DMG_SCALE(NEL),DAMINI(NEL)
       TYPE (TTABLE), INTENT(IN), DIMENSION(NTABLE) :: TABLE 
-C!-----------------------------------------------
-C!   VARIABLES FOR FUNCTION INTERPOLATION 
-C!-----------------------------------------------
-      INTEGER, INTENT(IN) :: NPF(SNPC),NFUNC,IFUNC(NFUNC)
-      my_real, INTENT(IN) :: TF(STF)
-      my_real
-     .         FINTER
-      EXTERNAL FINTER
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,INDX(NEL),NINDX,FAILIP,IPOS(NEL,2),
+      INTEGER I,J,INDX(NEL),NINDX,IPOS(NEL,2),
      .        NINIEVO,ISHEAR,ILEN
       INTEGER, DIMENSION(:), ALLOCATABLE :: 
      .        INITYPE,EVOTYPE,EVOSHAP,COMPTYP,TAB_ID,
@@ -118,31 +104,33 @@ C!--------------------------------------------------------------
       ISHEAR  = INT(UPARAM(2))
       ILEN    = INT(UPARAM(3))
       IF (INLOC > 0) ILEN = 1
-      PTHKF   = UPARAM(5)
-      MY_ALLOCATE(INITYPE,NINIEVO)
-      MY_ALLOCATE(EVOTYPE,NINIEVO)
-      MY_ALLOCATE(EVOSHAP,NINIEVO)
-      MY_ALLOCATE(COMPTYP,NINIEVO)
-      MY_ALLOCATE(TAB_ID ,NINIEVO)
-      MY_ALLOCATE(SR_REF ,NINIEVO)
-      MY_ALLOCATE(FSCALE ,NINIEVO)
-      MY_ALLOCATE(INI_P1 ,NINIEVO)
-      MY_ALLOCATE(TAB_EL ,NINIEVO)
-      MY_ALLOCATE(EL_REF ,NINIEVO)
-      MY_ALLOCATE(ELSCAL ,NINIEVO)
-      MY_ALLOCATE(DISP   ,NINIEVO)
-      MY_ALLOCATE(ENER   ,NINIEVO)
-      MY_ALLOCATE(ALPHA2 ,NINIEVO)   
+      ALLOCATE(INITYPE(NINIEVO))
+      ALLOCATE(EVOTYPE(NINIEVO))
+      ALLOCATE(EVOSHAP(NINIEVO))
+      ALLOCATE(COMPTYP(NINIEVO))
+      ALLOCATE(TAB_ID (NINIEVO))
+      ALLOCATE(SR_REF (NINIEVO))
+      ALLOCATE(FSCALE (NINIEVO))
+      ALLOCATE(INI_P1 (NINIEVO))
+      ALLOCATE(TAB_EL (NINIEVO))
+      ALLOCATE(EL_REF (NINIEVO))
+      ALLOCATE(ELSCAL (NINIEVO))
+      ALLOCATE(DISP   (NINIEVO))
+      ALLOCATE(ENER   (NINIEVO))
+      ALLOCATE(ALPHA2 (NINIEVO))   
+      TAB_ID(1:NINIEVO) = ITABLF(1:NINIEVO)
+      TAB_EL(1:NINIEVO) = ITABLF(NINIEVO+1:NINIEVO*2)
+c
       DO J = 1,NINIEVO
         INITYPE(J) = UPARAM(6  + 14*(J-1))
         EVOTYPE(J) = UPARAM(7  + 14*(J-1))
         EVOSHAP(J) = UPARAM(8  + 14*(J-1))
         COMPTYP(J) = UPARAM(9  + 14*(J-1))
-        TAB_ID(J)  = NINT(UPARAM(10 + 14*(J-1)))
+c        TAB_ID(J)  = NINT(UPARAM(10 + 14*(J-1)))
         SR_REF(J)  = UPARAM(11 + 14*(J-1))
         FSCALE(J)  = UPARAM(12 + 14*(J-1))
         INI_P1(J)  = UPARAM(13 + 14*(J-1))
-        TAB_EL(J)  = NINT(UPARAM(14 + 14*(J-1)))
+c        TAB_EL(J)  = NINT(UPARAM(14 + 14*(J-1)))
         EL_REF(J)  = UPARAM(15 + 14*(J-1))
         ELSCAL(J)  = UPARAM(16 + 14*(J-1)) 
         DISP(J)    = UPARAM(17 + 14*(J-1))
@@ -176,9 +164,9 @@ c
       ! Positive stress triaxiality bounded plastic strain
       EPSMOD(1:NEL) = UVAR(1:NEL,2)
       ! Damage initiation and evolution variable
-      MY_ALLOCATE2D(DMGINI,NEL,NINIEVO)
-      MY_ALLOCATE2D(DMGEVO,NEL,NINIEVO)
-      MY_ALLOCATE(FCRIT,NEL)
+      ALLOCATE(DMGINI(NEL,NINIEVO))
+      ALLOCATE(DMGEVO(NEL,NINIEVO))
+      ALLOCATE(FCRIT(NEL))
       DO J = 1,NINIEVO
         DO I=1,NEL
           ! Initiation damage
@@ -253,7 +241,7 @@ c
         END SELECT
         XVEC(1:NEL,2)   = EPSP(1:NEL)/SR_REF(J)
         IPOS(1:NEL,1:2) = 1
-        CALL TABLE_VINTERP(TABLE(TAB_ID(J)),NEL,IPOS,XVEC,EPSF,DEPSF)
+        CALL TABLE_VINTERP(TABLE(TAB_ID(J)),NEL,NEL,IPOS,XVEC,EPSF,DEPSF)
         EPSF(1:NEL) = EPSF(1:NEL)*FSCALE(J)
 c
         ! Compute the element size regularization factor 
@@ -274,7 +262,7 @@ c
               ENDDO            
           END SELECT
           IPOS(1:NEL,1:2) = 1
-          CALL TABLE_VINTERP(TABLE(TAB_EL(J)),NEL,IPOS,XVEC,SIZEFAC,DSIZE)
+          CALL TABLE_VINTERP(TABLE(TAB_EL(J)),NEL,NEL,IPOS,XVEC,SIZEFAC,DSIZE)
           SIZEFAC(1:NEL) = SIZEFAC(1:NEL)*ELSCAL(J)
           EPSF(1:NEL) = EPSF(1:NEL)*SIZEFAC(1:NEL)
         ENDIF

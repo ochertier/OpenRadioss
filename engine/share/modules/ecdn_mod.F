@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -41,7 +41,7 @@ C=======================================================================
 c DEFINE ARRAYS (integers arrays)
 C=======================================================================
         integer, DIMENSION(:) , POINTER ::  ICNDS10   !  3*NS10E 
-C-- :ND, 2:N1, 3:N2	; ND <0 : degenerated  
+C-- :ND, 2:N1, 3:N2  ; ND <0 : degenerated  
 C=======================================================================
 c DEFINE ARRAYS (float arrays) : internal arrays :restarter
 C=======================================================================

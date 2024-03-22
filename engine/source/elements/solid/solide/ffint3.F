@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,17 +27,28 @@ Chd|  FFINT3                        source/elements/solid/solide/ffint3.F
 Chd|-- called by -----------
 Chd|        SFORC3                        source/elements/solid/solide/sforc3.F
 Chd|-- calls ---------------
+Chd|        ALE_MOD                       ../common_source/modules/ale/ale_mod.F
 Chd|====================================================================
-      SUBROUTINE FFINT3(SIG,DFE,
-     .   PX1, PX2, PX3, PX4,
-     .   PY1, PY2, PY3, PY4,
-     .   PZ1, PZ2, PZ3, PZ4,
-     .   F11,F21,F31,F12,F22,F32,F13,F23,F33,F14,F24,F34,
-     .   F15,F25,F35,F16,F26,F36,F17,F27,F37,F18,F28,F38,
-     .   VOL,QVIS,
-     .   N1X, N2X, N3X, N4X, N5X, N6X,
-     .   N1Y, N2Y, N3Y, N4Y, N5Y, N6Y,
-     .   N1Z, N2Z, N3Z, N4Z, N5Z, N6Z)
+      SUBROUTINE FFINT3(
+     1   SIG,     DFE,     PX1,     PX2,
+     2   PX3,     PX4,     PY1,     PY2,
+     3   PY3,     PY4,     PZ1,     PZ2,
+     4   PZ3,     PZ4,     F11,     F21,
+     5   F31,     F12,     F22,     F32,
+     6   F13,     F23,     F33,     F14,
+     7   F24,     F34,     F15,     F25,
+     8   F35,     F16,     F26,     F36,
+     9   F17,     F27,     F37,     F18,
+     A   F28,     F38,     VOL,     QVIS,
+     B   N1X,     N2X,     N3X,     N4X,
+     C   N5X,     N6X,     N1Y,     N2Y,
+     D   N3Y,     N4Y,     N5Y,     N6Y,
+     E   N1Z,     N2Z,     N3Z,     N4Z,
+     F   N5Z,     N6Z,     NEL)
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
+      USE ALE_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -49,14 +60,10 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "vect01_c.inc"
-c#include      "vect04_c.2.inc"
-#include      "com01_c.inc"
-#include      "fluid_scr_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-C     REAL
+      INTEGER, INTENT(IN) :: NEL
       my_real
      .   SIG(MVSIZ,6),
      .   PX1(*), PX2(*), PX3(*), PX4(*),  
@@ -75,20 +82,13 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, J
-C     REAL
       my_real
      .   S1(MVSIZ), S2(MVSIZ), S3(MVSIZ),
      .   S4(MVSIZ), S5(MVSIZ), S6(MVSIZ),    
      .   FINT,FINTD,P(MVSIZ)
 C-----------------------------------------------
-      IF(ICAA == 0)THEN
-        DO I=LFT,LLT
-c          S1(I)=(SIG(1,I)+SVIS(I,1)-QVIS(I))*VOL(I)
-c         S2(I)=(SIG(2,I)+SVIS(I,2)-QVIS(I))*VOL(I)
-c         S3(I)=(SIG(3,I)+SVIS(I,3)-QVIS(I))*VOL(I)
-c         S4(I)=(SIG(4,I)+SVIS(I,4))*VOL(I)
-c         S5(I)=(SIG(5,I)+SVIS(I,5))*VOL(I)
-c         S6(I)=(SIG(6,I)+SVIS(I,6))*VOL(I)
+      IF(ALE%GLOBAL%ICAA == 0)THEN
+        DO I=1,NEL
          S1(I)=(SIG(I,1)-QVIS(I))*VOL(I)
          S2(I)=(SIG(I,2)-QVIS(I))*VOL(I)
          S3(I)=(SIG(I,3)-QVIS(I))*VOL(I)
@@ -97,10 +97,7 @@ c         S6(I)=(SIG(6,I)+SVIS(I,6))*VOL(I)
          S6(I)=(SIG(I,6))*VOL(I)
         ENDDO
       ELSE
-        DO I=LFT,LLT
-c         S1(I)=SIG(1,I)+SVIS(I,1)-QVIS(I)
-c         S2(I)=SIG(2,I)+SVIS(I,2)-QVIS(I)
-c         S3(I)=SIG(3,I)+SVIS(I,3)-QVIS(I)
+        DO I=1,NEL
          S1(I)=SIG(I,1)-QVIS(I)
          S2(I)=SIG(I,2)-QVIS(I)
          S3(I)=SIG(I,3)-QVIS(I)
@@ -108,16 +105,13 @@ c         S3(I)=SIG(3,I)+SVIS(I,3)-QVIS(I)
          S1(I)=(S1(I)-P(I))*VOL(I)
          S2(I)=(S2(I)-P(I))*VOL(I)
          S3(I)=(S3(I)-P(I))*VOL(I)
-c         S4(I)=(SIG(4,I)+SVIS(I,4))*VOL(I)
-c         S5(I)=(SIG(5,I)+SVIS(I,5))*VOL(I)
-c         S6(I)=(SIG(6,I)+SVIS(I,6))*VOL(I)
          S4(I)=SIG(I,4)*VOL(I)
          S5(I)=SIG(I,5)*VOL(I)
          S6(I)=SIG(I,6)*VOL(I)
          P(I)=P(I)*0.125
          
         ENDDO
-        DO I=LFT,LLT
+        DO I=1,NEL
           F11(I)=F11(I)-P(I)*(N1X(I)              +N4X(I)       +N6X(I))
           F21(I)=F21(I)-P(I)*(N1Y(I)              +N4Y(I)       +N6Y(I))
           F31(I)=F31(I)-P(I)*(N1Z(I)              +N4Z(I)       +N6Z(I))
@@ -145,7 +139,7 @@ c         S6(I)=(SIG(6,I)+SVIS(I,6))*VOL(I)
         ENDDO
       ENDIF
 C      
-       DO I=LFT,LLT
+       DO I=1,NEL
         FINT=S1(I)*PX1(I)+S4(I)*PY1(I)+S6(I)*PZ1(I)
         F11(I)=F11(I) - FINT  - DFE(I,1)     
         F17(I)=F17(I) + FINT - DFE(I,1)  
@@ -156,12 +150,11 @@ C
 C       
         FINT=S3(I)*PZ1(I)+S6(I)*PX1(I)+S5(I)*PY1(I)
         F31(I)=F31(I) - FINT  - DFE(I,3) 
-        F37(I)=F37(I) + FINT  - DFE(I,3)       
-      
+        F37(I)=F37(I) + FINT  - DFE(I,3)             
 C
-         FINT=S1(I)*PX2(I)+S4(I)*PY2(I)+S6(I)*PZ2(I) 
-         F12(I)=F12(I) - FINT - DFE(I,1)
-         F18(I)=F18(I) + FINT - DFE(I,1)                  
+        FINT=S1(I)*PX2(I)+S4(I)*PY2(I)+S6(I)*PZ2(I) 
+        F12(I)=F12(I) - FINT - DFE(I,1)
+        F18(I)=F18(I) + FINT - DFE(I,1)                  
 C
         FINT=S2(I)*PY2(I)+S4(I)*PX2(I)+S5(I)*PZ2(I)
         F22(I)=F22(I)-FINT - DFE(I,2)
@@ -172,8 +165,8 @@ C
         F38(I)=F38(I) + FINT - DFE(I,3)    
 C
         FINT=S1(I)*PX3(I)+S4(I)*PY3(I)+S6(I)*PZ3(I)
-         F13(I)=F13(I)-FINT - DFE(I,1)
-         F15(I)=F15(I)+FINT - DFE(I,1)
+        F13(I)=F13(I)-FINT - DFE(I,1)
+        F15(I)=F15(I)+FINT - DFE(I,1)
 C 
         FINT=S2(I)*PY3(I)+S4(I)*PX3(I)+S5(I)*PZ3(I)
         F23(I)=F23(I)-FINT - DFE(I,2) 
@@ -191,9 +184,9 @@ cc
         F24(I)=F24(I)-FINT  - DFE(I,2)
         F26(I)=F26(I)+FINT  - DFE(I,2)
 c
-         FINT=S3(I)*PZ4(I)+S6(I)*PX4(I)+S5(I)*PY4(I)
-         F34(I)=F34(I)-FINT  - DFE(I,3)
-         F36(I)=F36(I)+FINT  - DFE(I,3)
+        FINT=S3(I)*PZ4(I)+S6(I)*PX4(I)+S5(I)*PY4(I)
+        F34(I)=F34(I)-FINT  - DFE(I,3)
+        F36(I)=F36(I)+FINT  - DFE(I,3)
        ENDDO     
 C
       RETURN

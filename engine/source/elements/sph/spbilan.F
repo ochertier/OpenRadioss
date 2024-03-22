@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,9 +27,12 @@ Chd|        SPSTRES                       source/elements/sph/spstres.F
 Chd|-- calls ---------------
 Chd|        GRELEM_SAV                    source/output/th/grelem_sav.F 
 Chd|====================================================================
-      SUBROUTINE SPBILAN(V, PARTSAV, NC1, EINT, RHO, RK,
-     .   VOL,VNEW,IPARTSP,OFFG,
-     .   GRESAV,GRTH,IGRTH,EINTTH,IEXPAN,X)
+      SUBROUTINE SPBILAN(
+     1   V,       PARTSAV, NC1,     EINT,
+     2   RHO,     RK,      VOL,     VNEW,
+     3   IPARTSP, OFFG,    GRESAV,  GRTH,
+     4   IGRTH,   EINTTH,  IEXPAN,  X,
+     5   LFT,     LLT,     JTUR,    IGRE)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -41,12 +44,14 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "param_c.inc"
-#include      "vect01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(INOUT) :: LFT
+      INTEGER, INTENT(INOUT) :: LLT
+      INTEGER, INTENT(INOUT) :: JTUR
+      INTEGER, INTENT(INOUT) :: IGRE
 C     REAL
       my_real
      .  V(3,*),X(3,*),

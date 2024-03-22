@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -24,12 +24,10 @@ Chd|====================================================================
 Chd|  SIGROTA                       source/output/anim/generate/sigrota.F
 Chd|-- called by -----------
 Chd|        DFUNCC_PLY                    source/output/anim/generate/dfuncc_ply.F
-Chd|        H3D_SHELL_TENSOR              source/output/h3d/h3d_results/h3d_shell_tensor.F
-Chd|        TENSORC                       source/output/anim/generate/tensorc.F
 Chd|        TENSORC_PLY                   source/output/anim/generate/tensorc_ply.F
 Chd|-- calls ---------------
 Chd|        UROTOV                        source/airbag/uroto.F         
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE SIGROTA(JFT     ,JLT     ,NFT     ,IPT      ,NEL      ,
      2                   NS1     ,X       ,IXC     ,ELBUF_STR,
@@ -47,8 +45,6 @@ C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
-#include      "param_c.inc"
-#include      "scr01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -59,7 +55,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,II,J,K,N,I1,NLAY,NPTR,NPTS,NPG,IR,IS,JJ(5),DIM
+      INTEGER I,II,J,K,N,I1,NLAY,NPTR,NPTS,NPG,IR,IS,JJ(5),DIM,IDRAPE,IGTYP
       my_real
      .   X1(NEL),  X2(NEL),  X3(NEL), X4(NEL),
      .   Y1(NEL),  Y2(NEL),  Y3(NEL), Y4(NEL),
@@ -79,16 +75,27 @@ C-----------------------------------------------
      .   DIMENSION(:) , POINTER :: DIR1
       TYPE(G_BUFEL_)  , POINTER :: GBUF   
       TYPE(L_BUFEL_)  , POINTER :: LBUF   
+      TYPE(L_BUFEL_DIR_)  , POINTER :: LBUF_DIR   
 C=======================================================================
       NPTR = ELBUF_STR%NPTR
       NPTS = ELBUF_STR%NPTS
       NLAY = ELBUF_STR%NLAY
       NPG  = NPTR*NPTS
-      IF (NLAY > 1) THEN
-        DIR1 => ELBUF_STR%BUFLY(IPT)%DIRA
+      IDRAPE =  ELBUF_STR%IDRAPE
+      IGTYP =  ELBUF_STR%IGTYP
+      IF(IDRAPE > 0 .AND. (IGTYP == 51 .OR. IGTYP == 52))THEN
+       IF (NLAY > 1) THEN
+        DIR1 => ELBUF_STR%BUFLY(IPT)%LBUF_DIR(1)%DIRA
+       ELSE
+        DIR1 => ELBUF_STR%BUFLY(1)%LBUF_DIR(1)%DIRA
+       ENDIF      
       ELSE
+       IF (NLAY > 1) THEN
+        DIR1 => ELBUF_STR%BUFLY(IPT)%DIRA
+       ELSE
         DIR1 => ELBUF_STR%BUFLY(1)%DIRA
-      ENDIF
+       ENDIF
+      ENDIF 
 c
 !
       DO I=1,5

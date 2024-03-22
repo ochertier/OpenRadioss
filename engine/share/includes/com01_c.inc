@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>    
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,15 +21,15 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
 C.../COM01/
-      COMMON /COM01/ N2D,    NCPRI,  IUSERWI, IALE,   NGROUP, 
+      COMMON /COM01/ N2D,    NCPRI,  IALE,    NGROUP, 
      .               NCYCLE, IRUN,   IGER,    LBUFEL, IRODDL, 
      .               IEULER, ITHERM, IHSH,    ITESTV, ITURB,
      .               ILAG,   ISECUT, IDAMP,   IRXDP,  NMULT,
-     .               INTEG8, ISIGI,  NSPMD, LENWA,  ISGIFL,
-     .               ISUB,   NNODS,  NCNOIS,  LCNE0,  IPARI0,
+     .               INTEG8, ISIGI,  NSPMD,   LENWA,  ISGIFL,
+     .               NNODS,  NCNOIS, LCNE0,   IPARI0,
      .               IMAXIMP,NNOISER,NSPGROUP,IRESMD, IFRWV,
      .               INTBAG ,ICLOSE ,LICBAG  ,LRCBAG,LIBAGJET,
-     .               LRBAGJET,LIBAGHOL,LRBAGHOL,ISHFRAM,MSHSUB,
+     .               LRBAGJET,LIBAGHOL,LRBAGHOL,ISHFRAM,
      .               NSHFRONT,TRIMAT,NSPROC,  NDSOLV, NSBMAX,
      .               NSVMAXT, NFLOW, ICONDP,  DSNROW, DSNCOL,
      .               DSNBLOC, NBUCK, NFASOLFR,KCONTACT,
@@ -40,15 +40,15 @@ C.../COM01/
      .               LCNECRKXFEM,ICRASH,FTEMPVAR21,INTPLYXFEM,NFILSOL,
      .               IPART_STACK,ISH3NFRAM,IS17_OLD,NSEGQUADFR,NLPRI,
      .               INTERADHESION,NITSCHE,INISPRI,IMASSI,TH_STRAIN
-      INTEGER        N2D,    NCPRI,  IUSERWI, IALE,   NGROUP, 
+      INTEGER        N2D,    NCPRI,  IALE,    NGROUP, 
      .               NCYCLE, IRUN,   IGER,    LBUFEL, IRODDL, 
      .               IEULER, ITHERM, IHSH,    ITESTV, ITURB,
      .               ILAG,   ISECUT, IDAMP,   IRXDP,  NMULT,
-     .               INTEG8, ISIGI,  NSPMD, LENWA,  ISGIFL,
-     .               ISUB,   NNODS,  NCNOIS,  LCNE0,  IPARI0,
+     .               INTEG8, ISIGI,  NSPMD,   LENWA,  ISGIFL,
+     .               NNODS,  NCNOIS, LCNE0,   IPARI0,
      .               IMAXIMP,NNOISER,NSPGROUP,IRESMD, IFRWV,
      .               INTBAG ,ICLOSE ,LICBAG  ,LRCBAG,LIBAGJET,
-     .               LRBAGJET,LIBAGHOL,LRBAGHOL,ISHFRAM,MSHSUB,
+     .               LRBAGJET,LIBAGHOL,LRBAGHOL,ISHFRAM,
      .               NSHFRONT,TRIMAT,NSPROC,  NDSOLV, NSBMAX,
      .               NSVMAXT, NFLOW, ICONDP,  DSNROW, DSNCOL,
      .               DSNBLOC, NBUCK, NFASOLFR,KCONTACT,

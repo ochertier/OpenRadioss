@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -31,16 +31,19 @@ Chd|        MAT87C_TABULATED_PLAS_SR      source/materials/mat/mat087/mat87c_tab
 Chd|        MAT87C_TABULATED_TOTALSR      source/materials/mat/mat087/mat87c_tabulated_totalsr.F
 Chd|====================================================================
       SUBROUTINE SIGEPS87C(
-     1     NEL    ,NUPARAM ,NUVAR   ,NFUNC   ,IFUNC    ,
-     2     NPF    ,TF      ,TIME    ,TIMESTEP,UPARAM   ,
-     3     UVAR   ,RHO0    ,THKLY   ,THK     ,OFF      ,
-     4     EPSPXX ,EPSPYY  ,EPSPXY  ,EPSPYZ  ,EPSPZX   ,
-     5     DEPSXX ,DEPSYY  ,DEPSXY  ,DEPSYZ  ,DEPSZX   ,
-     6     SIGOXX ,SIGOYY  ,SIGOXY  ,SIGOYZ  ,SIGOZX   ,
-     8     SIGNXX ,SIGNYY  ,SIGNXY  ,SIGNYZ  ,SIGNZX   ,
-     9     SOUNDSP,PLA     ,DPLA    ,EPSP    ,YLD      ,
-     B     ETSE   ,GS      ,ISRATE  ,ASRATE  ,FACYLDI  ,
-     C     TEMPEL ,SIGB    ,INLOC   ,DPLANL  ,SEQ      )
+     1   NEL,     NUPARAM, NUVAR,   NFUNC,
+     2   IFUNC,   NPF,     TF,      TIME,
+     3   TIMESTEP,UPARAM,  UVAR,    RHO0,
+     4   THKLY,   THK,     OFF,     EPSPXX,
+     5   EPSPYY,  EPSPXY,  EPSPYZ,  EPSPZX,
+     6   DEPSXX,  DEPSYY,  DEPSXY,  DEPSYZ,
+     7   DEPSZX,  SIGOXX,  SIGOYY,  SIGOXY,
+     8   SIGOYZ,  SIGOZX,  SIGNXX,  SIGNYY,
+     9   SIGNXY,  SIGNYZ,  SIGNZX,  SOUNDSP,
+     A   PLA,     DPLA,    EPSP,    YLD,
+     B   ETSE,    GS,      ISRATE,  ASRATE,
+     C   FACYLDI, TEMPEL,  SIGB,    INLOC,
+     D   DPLANL,  SEQ,     JTHE)
 C=======================================================================
 C   BARLAT YLD2000 material model
 C=======================================================================
@@ -50,8 +53,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
-#include      "param_c.inc"
-#include      "com01_c.inc"
 C---------+---------+---+---+--------------------------------------------
 C VAR     | SIZE    |TYP| RW| DEFINITION
 C---------+---------+---+---+--------------------------------------------
@@ -90,12 +91,10 @@ C PLA     | NEL    | F |R/W| PLASTIC STRAIN
 C UVAR    |NEL*NUVAR| F |R/W| USER ELEMENT VARIABLE ARRAY
 C OFF     | NEL    | F |R/W| DELETED ELEMENT FLAG (=1. ON, =0. OFF)
 C---------+---------+---+---+--------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "vect01_c.inc"
 C-----------------------------------------------
 C   I N P U T   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: JTHE
       INTEGER NEL, NUPARAM, NUVAR,ISRATE,INLOC
       my_real 
      .   TIME,TIMESTEP,ASRATE,UPARAM(NUPARAM),
@@ -210,15 +209,18 @@ c
      .         SIGB   ,INLOC   ,DPLANL  ,SEQ     )    
          CASE(2) !hansel
             CALL MAT87C_HANSEL(
-     .         NEL    ,NUPARAM ,NUVAR   ,TIME    ,TIMESTEP ,
-     .         UVAR   ,RHO0    ,THKLY   ,THK     ,OFF      ,
-     .         EPSPXX ,EPSPYY  ,EPSPXY  ,EPSPYZ  ,EPSPZX   ,
-     .         DEPSXX ,DEPSYY  ,DEPSXY  ,DEPSYZ  ,DEPSZX   ,
-     .         SIGOXX ,SIGOYY  ,SIGOXY  ,SIGOYZ  ,SIGOZX   ,
-     .         SIGNXX ,SIGNYY  ,SIGNXY  ,SIGNYZ  ,SIGNZX   ,
-     .         SOUNDSP,PLA     ,DPLA    ,EPSP    ,YLD      ,
-     .         ETSE   ,GS      ,ISRATE  ,ASRATE  ,UPARAM   ,
-     .         TEMPEL ,SIGB    ,INLOC   ,DPLANL  ,SEQ      )
+     1   NEL,     NUPARAM, NUVAR,   TIME,
+     2   TIMESTEP,UVAR,    RHO0,    THKLY,
+     3   THK,     OFF,     EPSPXX,  EPSPYY,
+     4   EPSPXY,  EPSPYZ,  EPSPZX,  DEPSXX,
+     5   DEPSYY,  DEPSXY,  DEPSYZ,  DEPSZX,
+     6   SIGOXX,  SIGOYY,  SIGOXY,  SIGOYZ,
+     7   SIGOZX,  SIGNXX,  SIGNYY,  SIGNXY,
+     8   SIGNYZ,  SIGNZX,  SOUNDSP, PLA,
+     9   DPLA,    EPSP,    YLD,     ETSE,
+     A   GS,      ISRATE,  ASRATE,  UPARAM,
+     B   TEMPEL,  SIGB,    INLOC,   DPLANL,
+     C   SEQ,     JTHE)
           CASE(3)
             CALL  MAT87C_TABULATED_PLAS_SR(
      .         NEL    ,NUPARAM ,NUVAR   ,NFUNC   ,IFUNC    ,

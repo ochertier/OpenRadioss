@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -24,8 +24,12 @@ Chd|====================================================================
 Chd|  WRITE_DB                      source/output/tools/write_db.F
 Chd|-- called by -----------
 Chd|        COMPRESS_R_NNZ                ../common_source/comm/compress_nnz.F
-Chd|        PBLAST_WRITE_ENGINE           ../common_source/modules/pblast_mod.F
-Chd|        PBLAST_WRITE_STARTER          ../common_source/modules/pblast_mod.F
+Chd|        PBLAST_WRITE_ENGINE           ../common_source/modules/loads/pblast_mod.F
+Chd|        PBLAST_WRITE_STARTER          ../common_source/modules/loads/pblast_mod.F
+Chd|        WRITE_REAL                    ../common_source/comm/write_mod.F
+Chd|        WRITE_REAL_1D                 ../common_source/comm/write_mod.F
+Chd|        WRITE_REAL_2D                 ../common_source/comm/write_mod.F
+Chd|        WRITE_REAL_3D                 ../common_source/comm/write_mod.F
 Chd|        WRITE_UNITS                   ../common_source/comm/write_units.F
 Chd|        ALELAG_WREST                  source/output/restart/wrrest.F
 Chd|        CONVWREST                     source/output/restart/wrrest.F
@@ -54,19 +58,23 @@ Chd|        STACK_WREST                   source/output/restart/wrrest.F
 Chd|        STAT_INIMAP1D_FILE_SPMD       source/output/sta/stat_inimap1d_file_spmd.F
 Chd|        STAT_INIMAP2D_FILE_SPMD       source/output/sta/stat_inimap2d_file_spmd.F
 Chd|        TABLE_WRESTR                  source/tools/curve/table_tools.F
-Chd|        TABLE_WRESTR_MAT              source/tools/curve/table_tools.F
 Chd|        THCWREST                      source/output/restart/wrrest.F
+Chd|        USERWI_WRITE                  source/user_interface/userwindow_interface_routines.F
 Chd|        WRITE_ELGROUP_PARAM           source/output/restart/write_elgroup_param.F
+Chd|        WRITE_FAILPARAM               source/output/restart/write_failparam.F
 Chd|        WRITE_INTBUF                  source/output/restart/write_intbuf.F
 Chd|        WRITE_MATPARAM                source/output/restart/write_matparam.F
+Chd|        WRITE_MAT_TABLE               source/materials/tools/write_mat_table.F
 Chd|        WRITE_NLOC_STRUCT             source/output/restart/write_nloc_struct.F
-Chd|        WRITE_SENSOR_TAB              source/output/restart/write_sensor_tab.F
+Chd|        WRITE_PCYL                    source/output/restart/write_pcyl.F
+Chd|        WRITE_SENSORS                 source/output/restart/write_sensors.F
+Chd|        WRITE_VISCPARAM               source/output/restart/write_viscparam.F
 Chd|        WRRESTP                       source/output/restart/wrrestp.F
 Chd|        W_BUFBRIC_22                  source/interfaces/int22/w_bufbric_22.F
 Chd|        W_CLUSTER                     source/output/cluster/w_cluster.F
 Chd|        W_ELBUF_STR                   source/elements/elbuf/w_elbuf_str.F
 Chd|-- calls ---------------
-Chd|        WRITE_DB_C                    source/output/tools/sortie_c.c
+Chd|        WRITE_DB_C                    ../common_source/tools/input_output/write_routtines.c
 Chd|====================================================================
       SUBROUTINE WRITE_DB(A,N)
 C ecriture nombre reel : routine tampon
@@ -138,14 +146,19 @@ C
 Chd|====================================================================
 Chd|  WRITE_DPDB                    source/output/tools/write_db.F
 Chd|-- called by -----------
+Chd|        WRITE_DOUBLE                  ../common_source/comm/write_mod.F
+Chd|        WRITE_DOUBLE_1D               ../common_source/comm/write_mod.F
+Chd|        WRITE_DOUBLE_2D               ../common_source/comm/write_mod.F
+Chd|        WRITE_DOUBLE_3D               ../common_source/comm/write_mod.F
 Chd|        ADD_ELAPSED_TIME_MON_OFF      source/system/timer.F         
 Chd|        INTSTAMP_WRESTR               share/modules/intstamp_mod.F  
 Chd|        PRINTIME                      source/system/timer.F         
 Chd|        RESOL                         source/engine/resol.F         
+Chd|        WRITE_SENSORS                 source/output/restart/write_sensors.F
 Chd|        WRRESTP                       source/output/restart/wrrestp.F
 Chd|        W_ELBUF_STR                   source/elements/elbuf/w_elbuf_str.F
 Chd|-- calls ---------------
-Chd|        WRITE_DB_C                    source/output/tools/sortie_c.c
+Chd|        WRITE_DB_C                    ../common_source/tools/input_output/write_routtines.c
 Chd|====================================================================
       SUBROUTINE WRITE_DPDB(A,N)
 C ecriture nombre reel : routine tampon
@@ -157,13 +170,8 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER N
-C     REAL
       DOUBLE PRECISION
      .   A(*)
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "scr05_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -28,11 +28,12 @@ Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|-- calls ---------------
 Chd|====================================================================
       MODULE MESSAGE_MOD2
-#include      "nchara_c.inc"
+C
+      USE NAMES_AND_TITLES_MOD, ONLY: NCHARLINE100,NCHARLINE
       TYPE TMESSAGE
 C message size
         INTEGER SMESSAGE
-        CHARACTER*ncharline,DIMENSION(:), ALLOCATABLE :: MESSAGE
+        CHARACTER(LEN=NCHARLINE100),DIMENSION(:), ALLOCATABLE :: MESSAGE
 C dimension : size
       END TYPE TMESSAGE
 c
@@ -51,7 +52,6 @@ C better than a durty one
       INTEGER ANINFO,ANINFO_BLIND,ANINFO_MSG,ANINFO_BLIND_1,ANINFO_BLIND_2
       INTEGER MSGINFO,MSGWARNING,MSGERROR,ANSTOP,MSG_CUMU,MSG_PRINT
 
-      INTEGER MY_IERR ! for my_allocate macro
       PARAMETER (MSGINFO   =0)
       PARAMETER (MSGWARNING=1)
       PARAMETER (MSGERROR  =2)
@@ -62,7 +62,7 @@ C better than a durty one
       PARAMETER (ANINFO_BLIND_2=4)
       PARAMETER (ANINFO_MSG    =4)
 
-      CHARACTER*ncharline, DIMENSION(:), ALLOCATABLE :: MESSAGESFILE
+      CHARACTER(LEN=NCHARLINE), DIMENSION(:), ALLOCATABLE :: MESSAGESFILE
       INTEGER SMESSAGESFILE   
 
       INTEGER NCHAROUT

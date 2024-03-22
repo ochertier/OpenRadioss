@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -48,21 +48,13 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "units_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "warn_c.inc"
-#include      "scr03_c.inc"
 #include      "scr17_c.inc"
-#include      "scr21_c.inc"
 #include      "drape_c.inc"
-C     NSUBMOD
-#include      "submod_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -101,10 +93,9 @@ C-------------------------------------------------
       CALL HM_GET_FLOATV('orientangle2', GEO(212), IS_AVAILABLE, LSUBMODEL, UNITAB)  
 !     Line 2
       CALL HM_GET_INTV('table', DRAPE_ID, IS_AVAILABLE, LSUBMODEL)
-      CALL HM_GET_INTV('def_orth', IGEO(49), IS_AVAILABLE, LSUBMODEL)
-
-    
+      
       IF (IGEO(4) <= 0) IGEO(4) = 1   ! default value
+      IGEO(44) = IGEO(4) ! Used with drape for OUPT
       IF (GEO(212) == ZERO) THEN
          CALL HM_GET_FLOATV_DIM('orientangle2',FAC_GEN, IS_AVAILABLE, LSUBMODEL, UNITAB)
          GEO(212) = NINTY * FAC_GEN ! default value   
@@ -114,7 +105,7 @@ C-------------------------------------------------
          WRITE(IOUT, 1000) IG
       ELSE
          WRITE(IOUT, 2000) IG, IMID, GEO(1), GEO(2), IGEO(40), IGEO(41), IGEO(4),
-     .        GEO(212), DRAPE_ID, IGEO(49)
+     .        GEO(212), DRAPE_ID
       ENDIF
      
       GEO(2) = GEO(2) * PI / HUNDRED80
@@ -125,7 +116,7 @@ C-------------------------------------------------
 !     Check for layer materials compatibility moved to "lecgeo"
 !     *********************************************************    !
       LFOUND = .FALSE.
-      DO J=1,NUMMAT
+      DO J=1,NUMMAT-1
          IF (IPM(1,J) == IMID) THEN
             IGEO(101) = J
             LFOUND = .TRUE.
@@ -177,14 +168,13 @@ C-------------------------------------------------
      &    5X,'CONFIDENTIAL DATA'//)
  2000 FORMAT(
      & 5X,'LAYER PROPERTY SET ',/,
-     & 5X,'PROPERTY SET NUMBER . . . . . . . . . . . .  . .=',I10/,
-     & 5X,'MATERIAL NUMBER . . . . . . . . . . . . . .  . .=',I10/,
-     & 5X,'LAYER THICKNESS . . . . . . . . . . . . . . .  .=',1PG20.13/,
-     & 5X,'INCRMENTAL ANGLE (DIR 1,PROJ(DIR 1 / SHELL). . .=',1PG20.13/,      
-     & 5X,'SHELL 4-nodes GROUP IDENTIFIER. . . . . . .  . .=',I10/,
-     & 5X,'SHELL 3-nodes GROUP IDENTIFIER. . . . . . .  . .=',I10/,
-     & 5X,'NUMBER OF INTEGRATION POINTS THROUGH LAYER.  . .=',I10/,
+     & 5X,'PROPERTY SET NUMBER . . . . . . . . . . . . . . =',I10/,
+     & 5X,'MATERIAL NUMBER . . . . . . . . . . . . . . . . =',I10/,
+     & 5X,'LAYER THICKNESS . . . . . . . . . . . . . . . . =',1PG20.13/,
+     & 5X,'INCREMENTAL ANGLE (DIR 1,PROJ(DIR 1 / SHELL). . =',1PG20.13/,      
+     & 5X,'SHELL 4-nodes GROUP IDENTIFIER. . . . . . . . . =',I10/,
+     & 5X,'SHELL 3-nodes GROUP IDENTIFIER. . . . . . . . . =',I10/,
+     & 5X,'NUMBER OF INTEGRATION POINTS THROUGH LAYER. . . =',I10/,
      & 5X,'ORTHOTROPY ANGLE BETWEEN (DIR 1,DIR 2). . . . . =',1PG20.13/,
-     & 5X,'DRAPE IDENTIFIER  . . . . . . . . . . . . .  . .=',I10/,
-     & 5X,'DEF_ORTH FLAG . . . . . . . . . . . . . . . . . =',I10/)
+     & 5X,'DRAPE IDENTIFIER  . . . . . . . . . . . . . . . =',I10/)
       END SUBROUTINE HM_READ_PROP19

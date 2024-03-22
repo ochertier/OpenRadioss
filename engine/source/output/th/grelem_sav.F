@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -30,7 +30,7 @@ Chd|        PBILAN                        source/elements/beam/pbilan.F
 Chd|        QBILAN                        source/elements/solid_2d/quad/qbilan.F
 Chd|        R23BILAN                      source/elements/spring/r23bilan.F
 Chd|        R3BILAN                       source/elements/spring/r3bilan.F
-Chd|        R5BILAN                       source/elements/spring/rforc3.F
+Chd|        R5BILAN                       source/elements/spring/r5bilan.F
 Chd|        RBILAN                        source/elements/spring/rbilan.F
 Chd|        RBILAN33                      source/elements/joint/rbilan33.F
 Chd|        S10BILAN                      source/elements/solid/solide10/s10bilan.F
@@ -57,13 +57,9 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "com01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

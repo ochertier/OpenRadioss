@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,15 +27,15 @@ Chd|        OUTP_C_TF                     source/output/sty/outp_c_t.F
 Chd|-- calls ---------------
 Chd|        LAYINI                        source/elements/shell/coque/layini.F
 Chd|        DRAPE_MOD                     share/modules/drape_mod.F     
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        STACK_MOD                     share/modules/stack_mod.F     
 Chd|====================================================================
       SUBROUTINE C_TF_NE(ELBUF_STR,IHBE     ,NEL  ,NPT   ,MLW   ,
      .                   ITY      ,ISTRAIN  ,JJ   ,WA    ,IW    ,
      .                   NLAY     ,NPTR     ,NPTS ,ITHK  ,NFT   ,
      .                   THKE     ,NPG      ,IGTYP,GEO   ,IGEO  ,
-     .                   IXFEM    ,ISUBSTACK,STACK,DRAPE_Q4, DRAPE_T3,
-     .                   IXC      ,IXTG     ,MPT  )
+     .                   IXFEM    ,ISUBSTACK,STACK,DRAPE_SH4N, DRAPE_SH3N,
+     .                   IXC      ,IXTG     ,MPT ,DRAPEG )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -50,14 +50,11 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
 #include      "units_c.inc"
-#include      "scr01_c.inc"
 #include      "scr16_c.inc"
 C
-#include "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -70,14 +67,15 @@ C-----------------------------------------------
      .   THK_LY(NEL,MPT)
       TYPE (ELBUF_STRUCT_), TARGET :: ELBUF_STR
       TYPE (STACK_PLY) :: STACK
-      TYPE(DRAPE_) :: DRAPE_Q4, DRAPE_T3
+      TYPE(DRAPE_) :: DRAPE_SH4N(NUMELC_DRAPE), DRAPE_SH3N(NUMELTG_DRAPE)
+      TYPE(DRAPEG_) :: DRAPEG
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,J,K,IPT,I1,I2,I3,I4,I5,II(12),
      .        PTF,PTM,PTEP,PTS,NG,IR,IS,LENF,LENM,
      .        LENS,MAT_1,PID_1,LAYNPT_MAX,LAY_MAX,IXLAY,IPT_ALL,
-     .        JPOS,IT,NPTT,ILAY,SHIFT
+     .        JPOS,IT,NPTT,ILAY,SHIFT,SEDRAPE,NUMEL_DRAPE
       INTEGER MAT(MVSIZ),PID(MVSIZ),MATLY(MVSIZ*NPT)
       my_real
      .   THKLY(MVSIZ*MPT),POSLY(MVSIZ,MPT)
@@ -142,19 +140,23 @@ C
       IXLAY = 0
 C
       IF(ITY == 7) THEN
+         NUMEL_DRAPE = NUMELTG_DRAPE
+         SEDRAPE = STDRAPE
         CALL LAYINI(
      .      ELBUF_STR,1    ,NEL             ,GEO              ,IGEO    ,
      .      MAT      ,PID  ,THKLY           ,MATLY            ,POSLY   ,
      .      IGTYP    ,IXFEM,IXLAY           ,NLAY             ,NPT     ,
-     .      ISUBSTACK,STACK,DRAPE_T3        ,NFT              ,GBUF%THK,
-     .      NEL      ,THK_LY   )
+     .      ISUBSTACK,STACK,DRAPE_SH3N        ,NFT            ,THKE    ,
+     .      NEL      ,THK_LY  ,DRAPEG%INDX_SH3N ,SEDRAPE,NUMEL_DRAPE   )
       ELSE
+        NUMEL_DRAPE = NUMELC_DRAPE  
+        SEDRAPE = SCDRAPE
        CALL LAYINI(
      .      ELBUF_STR,1    ,NEL             ,GEO              ,IGEO    ,
      .      MAT      ,PID  ,THKLY           ,MATLY            ,POSLY   ,
      .      IGTYP    ,IXFEM,IXLAY           ,NLAY             ,NPT     ,
-     .      ISUBSTACK,STACK,DRAPE_Q4        ,NFT              ,GBUF%THK,
-     .      NEL      ,THK_LY   )      
+     .      ISUBSTACK,STACK,DRAPE_SH4N        ,NFT            ,THKE    ,
+     .      NEL      ,THK_LY  ,DRAPEG%INDX_SH4N,SEDRAPE,NUMEL_DRAPE     )      
       ENDIF  
 C------------------------
 C        STRESS

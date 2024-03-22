@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -33,8 +33,8 @@ Chd|        I7ASS3                        source/interfaces/int07/i7ass3.F
 Chd|        I7ASS35                       source/interfaces/int07/i7ass3.F
 Chd|        I7ASSIGEO0                    source/interfaces/int07/i7ass3.F
 Chd|        I7SMS2                        source/interfaces/int07/i7sms2.F
-Chd|        H3D_MOD                       share/modules/h3d_mod.F
-Chd|        TRI7BOX                       share/modules/tri7box.F
+Chd|        H3D_MOD                       share/modules/h3d_mod.F       
+Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
       SUBROUTINE I7ASS33(JLT       ,A        ,NOINT     ,ITAB      ,STIFN    ,
      2                  STIF      ,FSKYI    ,ISKY      ,FCONT     ,IX1       ,
@@ -72,24 +72,13 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com06_c.inc"
-#include      "com08_c.inc"
-#include      "scr02_c.inc"
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
-#include      "scr07_c.inc"
-#include      "scr11_c.inc"
 #include      "scr14_c.inc"
 #include      "scr16_c.inc"
 #include      "scr18_c.inc"
 #include      "sms_c.inc"
-#include      "units_c.inc"
 #include      "parit_c.inc"
-#include      "warn_c.inc"
-#include      "couple_c.inc"
 #include      "param_c.inc"
 #include      "impl1_c.inc"
-#include      "tabsiz_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -330,7 +319,7 @@ Chd|        I22FOR3                       source/interfaces/int22/i22for3.F
 Chd|        I23FOR3                       source/interfaces/int23/i23for3.F
 Chd|        I7ASS33                       source/interfaces/int07/i7ass3.F
 Chd|-- calls ---------------
-Chd|        DOUBLE_FLOT_IEEE              source/system/parit.F
+Chd|        DOUBLE_FLOT_IEEE              source/system/parit.F         
 Chd|====================================================================
       SUBROUTINE I7ASS3(JLT   ,IX1  ,IX2  ,IX3  ,IX4    ,
      2                  NSVG  ,H1   ,H2   ,H3   ,H4     ,STIF ,
@@ -345,10 +334,6 @@ C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -507,7 +492,7 @@ Chd|        I20FOR3                       source/interfaces/int20/i20for3.F
 Chd|        I23FOR3                       source/interfaces/int23/i23for3.F
 Chd|        I7ASS33                       source/interfaces/int07/i7ass3.F
 Chd|-- calls ---------------
-Chd|        DOUBLE_FLOT_IEEE              source/system/parit.F
+Chd|        DOUBLE_FLOT_IEEE              source/system/parit.F         
 Chd|====================================================================
       SUBROUTINE I7ASS35(JLT  ,IX1  ,IX2  ,IX3  ,IX4  ,
      2                  NSVG ,H1   ,H2   ,H3   ,H4   ,STIF ,
@@ -524,10 +509,6 @@ C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -713,7 +694,6 @@ C
       RETURN
       END
 C
-Cel nouvelle routine
 Chd|====================================================================
 Chd|  I7ASS0                        source/interfaces/int07/i7ass3.F
 Chd|-- called by -----------
@@ -723,7 +703,7 @@ Chd|        I20FOR3                       source/interfaces/int20/i20for3.F
 Chd|        I23FOR3                       source/interfaces/int23/i23for3.F
 Chd|        I7ASS33                       source/interfaces/int07/i7ass3.F
 Chd|-- calls ---------------
-Chd|        TRI7BOX                       share/modules/tri7box.F
+Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
       SUBROUTINE I7ASS0(JLT   ,IX1  ,IX2  ,IX3  ,IX4    ,
      2                  NSVG  ,H1   ,H2   ,H3   ,H4     ,STIF ,
@@ -747,9 +727,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
-#include      "scr05_c.inc"
-#include      "task_c.inc"
 #include      "scr18_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -941,7 +918,7 @@ Chd|        I20FOR3                       source/interfaces/int20/i20for3.F
 Chd|        I23FOR3                       source/interfaces/int23/i23for3.F
 Chd|        I7ASS33                       source/interfaces/int07/i7ass3.F
 Chd|-- calls ---------------
-Chd|        TRI7BOX                       share/modules/tri7box.F
+Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
       SUBROUTINE I7ASS05(JLT   ,IX1  ,IX2  ,IX3  ,IX4    ,
      2                   NSVG  ,H1   ,H2   ,H3   ,H4     ,
@@ -967,8 +944,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
-#include      "scr05_c.inc"
 #include      "scr18_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -1144,7 +1119,6 @@ C
       RETURN
       END
 C
-Cel nouvelle routine
 Chd|====================================================================
 Chd|  I7ASS2                        source/interfaces/int07/i7ass3.F
 Chd|-- called by -----------
@@ -1155,9 +1129,9 @@ Chd|        I23FOR3                       source/interfaces/int23/i23for3.F
 Chd|        I7ASS33                       source/interfaces/int07/i7ass3.F
 Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
-Chd|        ARRET                         source/system/arret.F
+Chd|        ARRET                         source/system/arret.F         
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        TRI7BOX                       share/modules/tri7box.F
+Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
       SUBROUTINE I7ASS2(JLT   ,IX1   ,IX2  ,IX3  ,IX4   ,
      2                  NSVG  ,H1    ,H2   ,H3   ,H4    ,STIF   ,
@@ -1184,13 +1158,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
-#include      "scr05_c.inc"
 #include      "parit_c.inc"
-#include      "task_c.inc"
-#include      "units_c.inc"
-#include      "com01_c.inc"
-#include      "warn_c.inc"
 #include      "scr18_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -1477,7 +1445,6 @@ C
       RETURN
       END
 C
-Cel nouvelle routine
 Chd|====================================================================
 Chd|  I7ASS25                       source/interfaces/int07/i7ass3.F
 Chd|-- called by -----------
@@ -1487,9 +1454,9 @@ Chd|        I23FOR3                       source/interfaces/int23/i23for3.F
 Chd|        I7ASS33                       source/interfaces/int07/i7ass3.F
 Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
-Chd|        ARRET                         source/system/arret.F
+Chd|        ARRET                         source/system/arret.F         
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        TRI7BOX                       share/modules/tri7box.F
+Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
       SUBROUTINE I7ASS25(JLT   ,IX1  ,IX2  ,IX3  ,IX4    ,
      2                   NSVG  ,H1   ,H2   ,H3   ,H4     ,
@@ -1517,10 +1484,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
-#include      "scr05_c.inc"
 #include      "parit_c.inc"
-#include      "units_c.inc"
 #include      "scr18_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -1822,9 +1786,9 @@ Chd|-- called by -----------
 Chd|        I7ASS33                       source/interfaces/int07/i7ass3.F
 Chd|-- calls ---------------
 Chd|        IG3DONEBASIS                  source/elements/ige3d/ig3donebasis.F
-Chd|        H3D_MOD                       share/modules/h3d_mod.F
+Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        TRI7BOX                       share/modules/tri7box.F
+Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
       SUBROUTINE I7ASSIGEO0(JLT   ,IX1  ,IX2  ,IX3  ,IX4    ,
      2                  NSVG  ,H1   ,H2   ,H3   ,H4     ,STIF ,
@@ -1851,10 +1815,7 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "scr05_c.inc"
-#include      "task_c.inc"
 #include      "scr14_c.inc"
-#include      "scr18_c.inc"
 #include      "com04_c.inc"
 #include      "ige3d_c.inc"
 C-----------------------------------------------

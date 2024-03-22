@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -51,13 +51,9 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr17_c.inc"
-#include      "sphcom.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -74,9 +70,7 @@ C-----------------------------------------------
 C----------------------s-------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr06_c.inc"
 #include      "units_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -145,10 +139,10 @@ C
        ISU2=NGR2USR(ISU2,INGR2USR,NSURF)
        IF (IGRNOD(ISU1)%NENTITY == 0) THEN
            CALL ANCMSG(MSGID=1131,
-     .   		ANMODE=ANINFO_BLIND_1,
-     .  		MSGTYPE=MSGERROR,
-     .    		I1=NOINT,
-     .    		C1=TITR)
+     .       ANMODE=ANINFO_BLIND_1,
+     .      MSGTYPE=MSGERROR,
+     .        I1=NOINT,
+     .        C1=TITR)
        END IF
 
 C-------*STORAGE IN IPARI AND FRIGAP *-------------------

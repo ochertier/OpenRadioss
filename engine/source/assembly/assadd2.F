@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -48,12 +48,9 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "com08_c.inc"
 #include      "com_xfem1.inc"
-#include      "scr07_c.inc"
-#include      "param_c.inc"
 #include      "parit_c.inc"
 #include      "units_c.inc"
 #include      "task_c.inc"
-#include      "couple_c.inc"
 #include      "spmd_c.inc"
 #include      "scr18_c.inc"
       INTEGER MAXBLOC,NBLOC,NBVAL,NBCOL
@@ -237,13 +234,13 @@ C
 c---
               NOD1 = INOD_CRKXFEM(NOD)                                        
               IF (NOD1 > 0 ) THEN                                             
-	               XFEM_REM_COUNT = 0                                            
+                         XFEM_REM_COUNT = 0                                            
                 DO CC = ADDCNE_CRKXFEM(NOD1),ADDCNE_CRKXFEM(NOD1+1)-1         
                   IF (PROCNE_CRKXFEM(CC) == I) XFEM_REM_COUNT =                 
      .                                         XFEM_REM_COUNT+1                 
-		              ENDDO                                                         
+                        ENDDO                                                         
 c
-		              IF (XFEM_REM_COUNT /= 0) THEN                                 
+                        IF (XFEM_REM_COUNT /= 0) THEN                                 
                   DO CC = ADDCNE_CRKXFEM(NOD1),ADDCNE_CRKXFEM(NOD1+1)-1       
                     IF (PROCNE_CRKXFEM(CC)==LOC_PROC) THEN                  
                       FR_NBCC1(1,I) = FR_NBCC1(1,I)+1                         
@@ -255,7 +252,7 @@ c
                       LRC1 = LRC1 + 1                                         
                     ENDIF                                                     
                   ENDDO                                                       
-		              ENDIF                                                         
+                        ENDIF                                                         
 c                                                                              
               ENDIF                                                           
 c---
@@ -291,8 +288,8 @@ C-----------------------------------------------
 C Optimisation vectorielle de asspar4
 C-----------------------------------------------
       IF (IVECTOR==1) THEN
-Cel index : 2*numnod
-Cel indsky : numnod
+C   index : 2*numnod
+C   indsky : numnod
         DO N = 1, NUMNOD
           INDSKY(N) = ADDCNE(N+1) - ADDCNE(N)
           INDEX(N) = N
@@ -550,7 +547,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com_xfem1.inc"
 #include      "scr05_c.inc"
 #include      "parit_c.inc"
 #include      "task_c.inc"

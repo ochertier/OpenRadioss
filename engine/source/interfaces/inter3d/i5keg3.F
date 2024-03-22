@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -40,9 +40,6 @@ C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER LFT    ,LLT 
@@ -65,10 +62,6 @@ C-----------------------------------------------
      .   PREC,Q11,Q12,Q13,Q22,Q23,Q33,H00,VTX,VTY,VTZ,VT,
      .   KT1,KT2,KT3,KT4,Q1,Q2
 C-----------------------------------------------
-!      EQUIVALENCE (N1,BV(1,19)) ,(N2,BV(1,20)) ,(N3,BV(1,21))
-!      EQUIVALENCE (H1,BV(1,25)) ,(H2,BV(1,26)) ,(H3,BV(1,27))
-!      EQUIVALENCE (H4,BV(1,28)) ,(STIF,BV(1,30))
-C---------------------------------
 C    ----sans frottement d'abord--- 
       DO I=LFT,LLT
         FAC=STIF(I)*SCALK
@@ -197,15 +190,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr03_c.inc"
-#include      "scr07_c.inc"
-#include      "scr14_c.inc"
-#include      "scr16_c.inc"
-#include      "com06_c.inc"
 #include      "com08_c.inc"
-#include      "task_c.inc"
-#include      "parit_c.inc"
-#include      "scr18_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -235,19 +220,6 @@ C     REAL
      .   VV1,VV2,V21,DMU,AA
       my_real, DIMENSION(MVSIZ) :: FXI,FYI,FZI,FNI
 C-----------------------------------------------
-!      EQUIVALENCE (IX1,IV(1,1)) ,(IX2,IV(1,2)) ,(IX3,IV(1,3))
-!      EQUIVALENCE (IX4,IV(1,4))
-C
-!      EQUIVALENCE (XI,BV(1,13)),(YI,BV(1,14)),(ZI,BV(1,15))
-!      EQUIVALENCE (XP,BV(1,16)),(YP,BV(1,17)),(ZP,BV(1,18))
-!      EQUIVALENCE (N1,BV(1,19)) ,(N2,BV(1,20)) ,(N3,BV(1,21))
-!      EQUIVALENCE (ANS,BV(1,22)),(SSC,BV(1,23)),(TTC,BV(1,24))
-!      EQUIVALENCE (H1,BV(1,25)) ,(H2,BV(1,26)) ,(H3,BV(1,27))
-!      EQUIVALENCE (H4,BV(1,28)) ,(XFACE,BV(1,29)),(STIF,BV(1,30))
-!      EQUIVALENCE (FNI,BV(1,40))                                       --> local
-!      EQUIVALENCE (FXI,BV(1,41)),(FYI,BV(1,42)),(FZI,BV(1,43))         --> local
-!      EQUIVALENCE (AREA,BV(1,71))
-C
       DO I=LFT,LLT
        L=I_E(I)
        STIF(I)=HALF*STFM(L)
@@ -320,11 +292,11 @@ C
         FZI(I)=FZI(I) + ANSZ*STF
           IFQ = IPARI(31)
           IF (IFQ>0) THEN
-	    IF (IFQ==3) FREQ = MAX(ONE,FREQ*DT12)
+              IF (IFQ==3) FREQ = MAX(ONE,FREQ*DT12)
             ALPHA = FREQ
             ALPHI = ONE - ALPHA
             K = 3*(IL-1)
-	    IF (FNI(I)/=ZERO) THEN
+              IF (FNI(I)/=ZERO) THEN
               FXI(I)= ALPHA*FXI(I) + ALPHI*FTSAV(K+1)
               FYI(I)= ALPHA*FYI(I) + ALPHI*FTSAV(K+2)
               FZI(I)= ALPHA*FZI(I) + ALPHI*FTSAV(K+3)
@@ -354,9 +326,9 @@ C
         ENDIF
 C
        ENDIF
-        TNJ(1,I)=TN1	
-        TNJ(2,I)=TN2	
-        TNJ(3,I)=TN3	
+        TNJ(1,I)=TN1
+        TNJ(2,I)=TN2
+        TNJ(3,I)=TN3
 C
  300  CONTINUE
       RETURN

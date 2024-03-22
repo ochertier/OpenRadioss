@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -23,6 +23,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 Chd|====================================================================
 Chd|  MSTRAIN_RATE                  source/materials/mat_share/mstrain_rate.F
 Chd|-- called by -----------
+Chd|        M2LAW                         source/materials/mat/mat002/m2law.F
 Chd|        MULAW                         source/materials/mat_share/mulaw.F
 Chd|        SIGEPS44                      source/materials/mat/mat044/sigeps44.F
 Chd|        SIGEPS93                      source/materials/mat/mat093/sigeps93.F

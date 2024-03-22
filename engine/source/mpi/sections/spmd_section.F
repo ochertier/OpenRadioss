@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,7 +20,6 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-#include "hardware.inc"
 Chd|====================================================================
 Chd|  SPMD_X_SECTION                source/mpi/sections/spmd_section.F
 Chd|-- called by -----------
@@ -32,7 +31,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -43,9 +41,7 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com03_c.inc"
 #include      "com04_c.inc"
-#include      "param_c.inc"
 #include      "task_c.inc"
 #include      "scr03_c.inc"
 C-----------------------------------------------
@@ -405,7 +401,6 @@ C
 #endif
       RETURN
       END
-C nouvelle routine maj section en SPMD
 Chd|====================================================================
 Chd|  SPMD_EXCH_SEC                 source/mpi/sections/spmd_section.F
 Chd|-- called by -----------
@@ -420,7 +415,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -431,11 +425,8 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com03_c.inc"
 #include      "com04_c.inc"
-#include      "param_c.inc"
 #include      "task_c.inc"
-#include      "scr03_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -836,13 +827,12 @@ C
       RETURN
       END
 C
-C nouvelle routine cut section en SPMD (ecriture deplacement)
 Chd|====================================================================
 Chd|  SPMD_WRT_CUTD                 source/mpi/sections/spmd_section.F
 Chd|-- called by -----------
-Chd|        SECT_IO                       source/tools/sect/sectio.F    
+Chd|        SECTION_IO                    source/tools/sect/section_io.F
 Chd|-- calls ---------------
-Chd|        WRITE_R_C                     source/output/tools/sortie_c.c
+Chd|        WRITE_R_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|====================================================================
       SUBROUTINE SPMD_WRT_CUTD(NNOD   ,NSTRF ,D    ,DR    ,RG_CUT,
      2                         IAD_CUT,NSIZE ,NNODG,WEIGHT,IFLG  )
@@ -850,7 +840,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -861,11 +850,7 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com03_c.inc"
-#include      "com04_c.inc"
-#include      "param_c.inc"
 #include      "task_c.inc"
-#include      "scr03_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1029,13 +1014,12 @@ C
       RETURN
       END
 C
-C nouvelle routine cut section en SPMD (ecriture force)
 Chd|====================================================================
 Chd|  SPMD_WRT_CUTF                 source/mpi/sections/spmd_section.F
 Chd|-- called by -----------
-Chd|        SECT_IO                       source/tools/sect/sectio.F    
+Chd|        SECTION_IO                    source/tools/sect/section_io.F
 Chd|-- calls ---------------
-Chd|        WRITE_R_C                     source/output/tools/sortie_c.c
+Chd|        WRITE_R_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|====================================================================
       SUBROUTINE SPMD_WRT_CUTF(NNOD  ,NSTRF,SECFCUM,RG_CUT,IAD_CUT,
      2                         NSIZE ,NNODG,WEIGHT ,IFLG )
@@ -1043,7 +1027,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -1054,11 +1037,7 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com03_c.inc"
-#include      "com04_c.inc"
-#include      "param_c.inc"
 #include      "task_c.inc"
-#include      "scr03_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1236,7 +1215,7 @@ C
 Chd|====================================================================
 Chd|  SPMD_EXCH_CUT                 source/mpi/sections/spmd_section.F
 Chd|-- called by -----------
-Chd|        SECT_IO                       source/tools/sect/sectio.F    
+Chd|        SECTION_IO                    source/tools/sect/section_io.F
 Chd|-- calls ---------------
 Chd|====================================================================
       SUBROUTINE SPMD_EXCH_CUT(NSTRF,SECFCUM,IAD_ELEM,FR_ELEM,SIZE,
@@ -1246,7 +1225,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -1256,11 +1234,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr06_c.inc"
 #include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "task_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1406,7 +1381,7 @@ C
 Chd|====================================================================
 Chd|  SPMD_SD_CUT                   source/mpi/sections/spmd_section.F
 Chd|-- called by -----------
-Chd|        SECT_READP                    source/tools/sect/sectio.F    
+Chd|        SECTION_READP                 source/tools/sect/section_readp.F
 Chd|-- calls ---------------
 Chd|====================================================================
       SUBROUTINE SPMD_SD_CUT(SECBUFG,NNODG  ,SECBUF1,SECBUF2,NNOD,
@@ -1415,7 +1390,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -1426,11 +1400,7 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com03_c.inc"
-#include      "com04_c.inc"
-#include      "param_c.inc"
 #include      "task_c.inc"
-#include      "scr03_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

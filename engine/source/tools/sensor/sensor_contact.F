@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -43,8 +43,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "scr17_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
 #include      "units_c.inc"
@@ -84,14 +82,14 @@ c
 c
       IF (IDIR == 1) THEN
         FF = SQRT((FBSAV6(1,1,ISECT) + FBSAV6(1,2,ISECT)
-     .   	 +  FBSAV6(1,3,ISECT) + FBSAV6(1,4,ISECT)
-     .   	 +  FBSAV6(1,5,ISECT) + FBSAV6(1,6,ISECT))**2  
+     .      +  FBSAV6(1,3,ISECT) + FBSAV6(1,4,ISECT)
+     .      +  FBSAV6(1,5,ISECT) + FBSAV6(1,6,ISECT))**2  
      .     + (FBSAV6(2,1,ISECT) + FBSAV6(2,2,ISECT)
-     .   	 +  FBSAV6(2,3,ISECT) + FBSAV6(2,4,ISECT)
-     .   	 +  FBSAV6(2,5,ISECT) + FBSAV6(2,6,ISECT))**2 
+     .      +  FBSAV6(2,3,ISECT) + FBSAV6(2,4,ISECT)
+     .      +  FBSAV6(2,5,ISECT) + FBSAV6(2,6,ISECT))**2 
      .     + (FBSAV6(3,1,ISECT) + FBSAV6(3,2,ISECT)
-     .   	 +  FBSAV6(3,3,ISECT) + FBSAV6(3,4,ISECT)
-     .   	 +  FBSAV6(3,5,ISECT) + FBSAV6(3,6,ISECT))**2) 
+     .      +  FBSAV6(3,3,ISECT) + FBSAV6(3,4,ISECT)
+     .      +  FBSAV6(3,5,ISECT) + FBSAV6(3,6,ISECT))**2) 
       ELSEIF (IDIR == 2) THEN
         FF = SQRT((FBSAV6(4,1,ISECT)+FBSAV6(4,2,ISECT)
      .     +  FBSAV6(4,3,ISECT)+FBSAV6(4,4,ISECT)
@@ -105,27 +103,27 @@ c
       END IF
 c
       IF (FREQ > ZERO) THEN   ! Filter contact forces (Butterworth) 
-    	   IF (TT == ZERO) THEN                           
-    	     VV1 = FF                                     
-    	     VV2 = FF                                     
-    	     FV1 = FF                                     
-    	     FV2 = FF                                     
-    	     SENSOR%VAR(1) = VV1                             
-    	     SENSOR%VAR(2) = VV2                            
-    	     SENSOR%VAR(3) = FV1                            
-    	     SENSOR%VAR(4) = FV2                            
-    	   ENDIF                                          
+             IF (TT == ZERO) THEN                           
+               VV1 = FF                                     
+               VV2 = FF                                     
+               FV1 = FF                                     
+               FV2 = FF                                     
+               SENSOR%VAR(1) = VV1                             
+               SENSOR%VAR(2) = VV2                            
+               SENSOR%VAR(3) = FV1                            
+               SENSOR%VAR(4) = FV2                            
+             ENDIF                                          
 c
-    	   VV1 = SENSOR%VAR(1)                                 
-    	   VV2 = SENSOR%VAR(2)                                
-    	   FV1 = SENSOR%VAR(3)                                
-    	   FV2 = SENSOR%VAR(4)                                
-    	   CALL BUTTERWORTH(DT2,FREQ,VV2,VV1,FF,FV2,FV1,FV) 
-    	   SENSOR%VAR(1) = FF                                  
-    	   SENSOR%VAR(2) = VV1                                
-    	   SENSOR%VAR(3) = FV                                 
-    	   SENSOR%VAR(4) = FV1                                
-    	   FF = FV
+             VV1 = SENSOR%VAR(1)                                 
+             VV2 = SENSOR%VAR(2)                                
+             FV1 = SENSOR%VAR(3)                                
+             FV2 = SENSOR%VAR(4)                                
+             CALL BUTTERWORTH(DT2,FREQ,VV2,VV1,FF,FV2,FV1,FV) 
+             SENSOR%VAR(1) = FF                                  
+             SENSOR%VAR(2) = VV1                                
+             SENSOR%VAR(3) = FV                                 
+             SENSOR%VAR(4) = FV1                                
+             FF = FV
       END IF
 c      
       IF (FF < FMIN) THEN
@@ -187,8 +185,8 @@ c
         END IF
       ENDIF
 c-----------------------------------------------------------------------      
-1100  FORMAT(' SENSOR (CONTACT) NUMBER ',I10,' ACTIVATED AT TIME '  ,1PE12.5)
-1200  FORMAT(' SENSOR (CONTACT) NUMBER ',I10,' DEACTIVATED AT TIME ',1PE12.5)
+1100  FORMAT(' SENSOR (INTER) NUMBER ',I10,' ACTIVATED AT TIME '  ,1PE12.5)
+1200  FORMAT(' SENSOR (INTER) NUMBER ',I10,' DEACTIVATED AT TIME ',1PE12.5)
 1300  FORMAT('    TARGET MIN FORCE = ',1PE12.5,/
      .       '    CURRENT FORCE AFTER TMIN and TDELAY = ',1PE12.5/)
 1400  FORMAT('    TARGET MAX FORCE = ',1PE12.5,/

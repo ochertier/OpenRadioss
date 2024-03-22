@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -28,8 +28,8 @@ Chd|-- calls ---------------
 Chd|        INITBUF                       share/resol/initbuf.F         
 Chd|        SIGROTA                       source/output/anim/generate/sigrota.F
 Chd|        SPMD_R4GET_PARTN              source/mpi/anim/spmd_r4get_partn.F
-Chd|        WRITE_R_C                     source/output/tools/sortie_c.c
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        WRITE_R_C                     ../common_source/tools/input_output/write_routtines.c
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        INITBUF_MOD                   share/resol/initbuf.F         
 Chd|        PLYXFEM_MOD                   share/modules/plyxfem_mod.F   
 Chd|        STACK_MOD                     share/modules/stack_mod.F     
@@ -58,14 +58,9 @@ C-----------------------------------------------
 #include      "mvsiz_p.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr01_c.inc"
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
 #include      "scr14_c.inc"
 #include      "param_c.inc"
-#include      "rnur_c.inc"
 #include      "task_c.inc"
-#include      "spmd_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -95,7 +90,7 @@ C     REAL
      .        ISTRAIN,NN, K1, K2,JTURB,MT,IMID, IALEL,IPID,
      .        NN1,NN2,NN3,NN4,NN5,NN6,NN7,NN8,NN9,NN10,NF,
      .        LLL,NINTLAY,NFAIL,
-     .        OFFSET,K,II,II_L,INC,KK,IHBE, N13, N14, N15, N16,
+     .        OFFSET,K,II,II_L,INC,KK,IHBE, 
      .        NPTM,NPG, NBVU, I1, MPT, NEL5, NEL8,
      .        IPT,BUF,NPTR,NPTS,NPTT,NLAY,IR,IS,PTF,LENF,IL,
      .        IADR,IPMAT,PID(MVSIZ),MAT(MVSIZ),MATLY(MVSIZ*100),
@@ -138,7 +133,7 @@ C
       IFLAG = 0
 C
       DO 900 NG=1,NGROUP
-          CALL INITBUF (IPARG    ,NG      ,                    
+          CALL INITBUF(IPARG    ,NG      ,                    
      2          MLW     ,NEL     ,NFT     ,IAD     ,ITY     ,  
      3          NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTURB   ,  
      4          JTHE    ,JLAG    ,JMULT   ,JHBE    ,JIVF    ,  
@@ -241,18 +236,26 @@ c---------
             ENDDO
 c---------
           ELSEIF(IFUNC == 7)THEN   ! Von Mises
-c---------
+c---------available only for Batoz shell and TYPE17 PID
             DO I=LFT,LLT
                N = I + NFT 
                II = (I-1)*5
-              ILAYER = PLYELEMS(N)
-               BUFLY => ELBUF_TAB(NG)%BUFLY(ILAYER)
+               ILAYER = PLYELEMS(N)
+                S1  = ZERO
+                S2  = ZERO
+                S12 = ZERO
                IF(ILAYER > 0) THEN
-                 S1 = BUFLY%SIGPT(II + 1)
-                 S2 = BUFLY%SIGPT(II + 2)
-                 S12= BUFLY%SIGPT(II + 3)
-                 VONM2= S1*S1 + S2*S2 - S1*S2 + THREE*S12*S12
-                 EVAR(I) = SQRT(VONM2)
+                 BUFLY => ELBUF_TAB(NG)%BUFLY(ILAYER)
+                 DO IR=1,NPTR                                                       
+                   DO IS=1,NPTS 
+                       LBUF => BUFLY%LBUF(IR,IS,1)
+                       S1 = S1  + LBUF%SIG(I        )/NPG
+                       S2 = S2  + LBUF%SIG(NEL   + I)/NPG
+                       S12= S12 + LBUF%SIG(2*NEL + I)/NPG
+                    ENDDO 
+                 ENDDO    
+                   VONM2= S1*S1 + S2*S2 - S1*S2 + THREE*S12*S12
+                   EVAR(I) =  SQRT(VONM2) 
                ENDIF  
             ENDDO
 c---------
@@ -316,14 +319,14 @@ Cit's available just for law25 and batoz shell
 C +
              IF(ITY == 3)THEN
               DO I=1,NEL
-            	MAT(I)=IXC(1,NFT+I)
-            	PID(I)=IXC(6,NFT+I)
-              END DO				    
+          MAT(I)=IXC(1,NFT+I)
+          PID(I)=IXC(6,NFT+I)
+              END DO            
             ELSE
               DO I=1,NEL
-            	MAT(I)=IXTG(1,NFT+I)
-            	PID(I)=IXTG(5,NFT+I)
-              END DO				    
+          MAT(I)=IXTG(1,NFT+I)
+          PID(I)=IXTG(5,NFT+I)
+              END DO            
             END IF   
              IVISC = 0
              IF(MLW == 25) THEN
@@ -400,14 +403,14 @@ c
             IF (MLW == 25.AND. IREP == 1) THEN
              IF(ITY == 3)THEN
               DO I=1,NEL
-            	MAT(I)=IXC(1,NFT+I)
-            	PID(I)=IXC(6,NFT+I)
-              END DO				    
+          MAT(I)=IXC(1,NFT+I)
+          PID(I)=IXC(6,NFT+I)
+              END DO            
             ELSE
               DO I=1,NEL
-            	MAT(I)=IXTG(1,NFT+I)
-            	PID(I)=IXTG(5,NFT+I)
-              END DO				    
+          MAT(I)=IXTG(1,NFT+I)
+          PID(I)=IXTG(5,NFT+I)
+              END DO            
             END IF   
               IVISC = 0
               NUVARV = 0
@@ -439,29 +442,16 @@ C -
               ENDDO
             ELSEIF (MLW == 25 .AND. IREP == 0) THEN
               IF (IHBE == 11) THEN  
-               NB13= NB12 + 8*NPG*NEL
-               NB14= NB13 + 8*NPG*NEL*ISTRAIN
-               NB15= NB14 + MAX(1,NPT)*NPG*NEL
                DO I=LFT,LLT 
                  EVAR(I) = ZERO
                  N = I + NFT 
                  ILAYER = PLYELEMS(N)
-                 IF(ILAYER > 0) THEN
-                    DO K=1,NPG
-                     I1 = NB15+NPT*5*NEL*(K-1)+5*LLT*(ILAYER-1)+(I-1)*5
-c                     EVAR(I) = EVAR(I) + BUFEL(I1+ IFUNC - 14)/NPG
-                    ENDDO  
-                 ENDIF
                 ENDDO 
               ELSE
 c                IADD  = NB10 + 5 * NEL * (ILAYER - 1)
                 DO I=LFT,LLT
                   N = I + NFT 
                   ILAYER = PLYELEMS(N)
-                  IF(ILAYER > 0) THEN
-c                   IADD  = NB10 + 5 * NEL * (ILAYER - 1)
-c                   EVAR(I) = BUFEL(IADD + (I-1)*5 + IFUNC - 14)
-                  ENDIF 
                 ENDDO
               ENDIF
             ELSE 
@@ -513,10 +503,6 @@ C------------------------
               NEL5 = NEL*5
               NEL8 = NEL*8    
 C-------QBAT,DKT18,
-              N13=NB12 + NPG*NEL8
-              N14=N13  + NPG*NEL8*ISTRAIN
-              N15=N14  + NPTM*NPG*NEL
-              N16=N15  + NPG*MPT*NEL5
 C
               IF (ITY == 7) THEN
                IGTYP = NINT(GEO(12,IXTG(6,NFT+1)))

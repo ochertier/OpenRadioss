@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -30,7 +30,7 @@ Chd|        SPHREQS                       source/elements/sph/sphreq.F
 Chd|        SPH_NODSEG                    source/elements/sph/sph_nodseg.F
 Chd|        SPMD_SPHGETIMP                source/mpi/elements/spmd_sph.F
 Chd|        SPMD_SPHGETVOIS_OFF           source/mpi/elements/spmd_sph.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        INITBUF_MOD                   share/resol/initbuf.F         
 Chd|        SPHBOX                        share/modules/sphbox.F        
@@ -54,9 +54,6 @@ C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "comlock.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "vect01_c.inc"
@@ -66,12 +63,8 @@ C-----------------------------------------------
 #include      "com08_c.inc"
 #include      "param_c.inc"
 #include      "sphcom.inc"
-#include      "scr01_c.inc"
 #include      "scr05_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
 #include      "tabsiz_c.inc"
-#include      "task_c.inc"
 #include      "scr17_c.inc"
 #include      "rad2r_c.inc"
 C-----------------------------------------------------------------
@@ -487,7 +480,7 @@ C           conditions multiples => la derniere condition rencontree impose ..
      .                  +WA(KK+1)*V(2,INOD)
      .                  +WA(KK+2)*V(3,INOD)
             NG=MOD(KXSP(2,N),NGROUP+1)
-            CALL INITBUF (IPARG    ,NG      ,                 
+            CALL INITBUF(IPARG    ,NG      ,                 
      2         MTN     ,NEL     ,NFT     ,KAD     ,ITY     ,  
      3         NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,  
      4         JTHE    ,JLAG    ,JMULT   ,JHBE    ,JIVF    ,  
@@ -517,7 +510,7 @@ C           conditions multiples => la derniere condition rencontree impose ..
      .                  +WA(KK+1)*V(2,INOD)
      .                  +WA(KK+2)*V(3,INOD)
             NG=MOD(KXSP(2,N),NGROUP+1)
-            CALL INITBUF (IPARG    ,NG      ,                 
+            CALL INITBUF(IPARG    ,NG      ,                 
      2         MTN     ,NEL     ,NFT     ,KAD     ,ITY     ,  
      3         NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,  
      4         JTHE    ,JLAG    ,JMULT   ,JHBE    ,JIVF    ,  
@@ -539,7 +532,6 @@ C           conditions multiples => la derniere condition rencontree impose ..
        ENDIF
       ENDIF
       ENDDO    !fin DO I=1,NSPHIO
-C-----------------------------------------------
 C-----------------------------------------------
           IF(NSPMD>1)THEN
 C send IMPOSE value
@@ -564,8 +556,8 @@ C      general outlets & silent boundary.
           IPPV=0
           DMIN=EP20
 
-	  DO J=1,KXSP(4,N)         
-	   JNOD=IXSP(J,N)
+            DO J=1,KXSP(4,N)         
+             JNOD=IXSP(J,N)
 
            IF(JNOD>0)THEN      ! particule locale
              M=NOD2SP(JNOD)
@@ -607,7 +599,7 @@ C      general outlets & silent boundary.
                ENDIF
              ENDIF
             ENDIF
-	  ENDDO
+            ENDDO
 C-------
           IF(IPPV==0)THEN
 C           no interaction between the outgoing particle 
@@ -675,6 +667,15 @@ c            IN2B=IBUFSSG(IAD+1)
             XG =HALF*(X1+X2)
             YG =HALF*(Y1+Y2)
             ZG =HALF*(Z1+Z2)
+            IF(ITAB(INOD) >= 1000000000)THEN
+              D(1,INOD)=ZERO
+              D(2,INOD)=ZERO
+              D(3,INOD)=ZERO
+            ELSE
+              D(1,INOD)=XG-X(1,INOD)+D(1,INOD)
+              D(2,INOD)=YG-X(2,INOD)+D(2,INOD)
+              D(3,INOD)=ZG-X(3,INOD)+D(3,INOD)
+            ENDIF
             X(1,INOD)=XG
             X(2,INOD)=YG
             X(3,INOD)=ZG
@@ -683,11 +684,8 @@ c            IN2B=IBUFSSG(IAD+1)
               XDP(2,INOD)=YG
               XDP(3,INOD)=ZG
             END IF
-            D(1,INOD)=ZERO
-            D(2,INOD)=ZERO
-            D(3,INOD)=ZERO
             NG=MOD(ABS(KXSP(2,N)),NGROUP+1)
-            CALL INITBUF (IPARG    ,NG      ,                 
+            CALL INITBUF(IPARG    ,NG      ,                 
      2         MTN     ,NEL     ,NFT     ,KAD     ,ITY     ,  
      3         NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,  
      4         JTHE    ,JLAG    ,JMULT   ,JHBE    ,JIVF    ,  

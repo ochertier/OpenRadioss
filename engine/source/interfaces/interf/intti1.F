@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -70,14 +70,9 @@ C-----------------------------------------------
 #include      "param_c.inc"
 #include      "task_c.inc"
 #include      "parit_c.inc"
-#include      "scr03_c.inc"
 #include      "scr18_c.inc"
 #include      "spmd_c.inc"
 #include      "sms_c.inc"
-#include      "com06_c.inc"
-#include      "com08_c.inc"
-#include      "scr07_c.inc"
-#include      "scr14_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -103,17 +98,17 @@ C-----------------------------------------------
       INTEGER N, NTY, JI, JB, NMN, NINT, LWA, I2OK,K,ITIED,
      .        LCOMI2M, I0, NIR, SIZE, LENS, LENR, I, J, ILEV,
      .        TAGNOD(NUMNOD), K10, K11, K12, NSN, KSN,I25PENA,
-     .        I2SIZETH,INTTH2, SIZE_MINER_POFF,II
+     .        I2SIZETH,INTTH2, SIZE_INER_POFF,II
 C     REAL
       my_real
      .   FSKYI2(I2SIZE,LCNI2),FTHESKYI2(LCNI2),CONDNSKYI2(LCNI2)
       my_real,
      . DIMENSION(:,:),ALLOCATABLE ::SAV_FOR_PENA
       my_real,
-     . DIMENSION(:),ALLOCATABLE ::MS_PENA,SAV_MINER_POFF
+     . DIMENSION(:),ALLOCATABLE ::MS_PENA,SAV_INER_POFF
 C=======================================================================
       I25PENA=0
-      SIZE_MINER_POFF = 0
+      SIZE_INER_POFF = 0
 C
       IF (IPARIT == 0)THEN
         DO N=1,NINTER                                    
@@ -127,7 +122,7 @@ C
             ELSEIF (ILEV == 27 .or. ILEV == 28) THEN
               I25PENA=2
             ENDIF
-            IF (IRODDL > 0) SIZE_MINER_POFF = NUMNOD
+            IF (IRODDL > 0) SIZE_INER_POFF = NUMNOD
           ENDIF
         ENDDO
 C
@@ -146,9 +141,9 @@ C
           ALLOCATE(MS_PENA(0))
         ENDIF
 C
-C-- For parithoff inertia of main node must be saved
-        ALLOCATE(SAV_MINER_POFF(SIZE_MINER_POFF))
-        IF (SIZE_MINER_POFF>0) SAV_MINER_POFF(1:NUMNOD) = IN(1:NUMNOD)
+C-- For parithoff inertia of main and secondary node must be saved
+        ALLOCATE(SAV_INER_POFF(SIZE_INER_POFF))
+        IF (SIZE_INER_POFF>0) SAV_INER_POFF(1:NUMNOD) = IN(1:NUMNOD)
 C
       ENDIF
 C
@@ -168,7 +163,7 @@ C      Calcul flag de rupture pour interface type 2 user
          ENDIF                                           
        ENDDO                                            
 C
-Cel correction pb poff si main dans plusieurs interfaces type2
+C   correction pb poff si main dans plusieurs interfaces type2
       IF (IMACH == 3 .AND. IPARIT == 0) THEN                     
         IF (NHIN2 == 0) THEN                                  
           DO N=1,NINTER                                       
@@ -181,8 +176,8 @@ Cel correction pb poff si main dans plusieurs interfaces type2
               ILAGM = IPARI(33,N)                             
               IF (NTY == 2 .AND. ILAGM == 0)THEN  
                 CALL INT2POFF(                                
-     .   	         IPARI(1,N) ,X        ,V      ,  
-     .   	         A          ,VR       ,AR     ,MS    ,IN    ,          
+     .              IPARI(1,N) ,X        ,V      ,  
+     .              A          ,VR       ,AR     ,MS    ,IN    ,          
      .               WEIGHT     ,STIFN    ,STIFR  ,MCP   ,CONDN , 
      .               FTHE       ,INTBUF_TAB(N)    )               
               ENDIF                                           
@@ -200,9 +195,9 @@ Cel correction pb poff si main dans plusieurs interfaces type2
               ILAGM = IPARI(33,N)                             
               IF (NTY == 2 .AND. ILAGM == 0) THEN 
                 CALL INT2POFFH(                               
-     .   	      IPARI(1,N),X    ,V    ,  
-     .   	      A	  ,VR	,AR   ,MS   ,IN    ,          
-     .   	      WEIGHT    ,STIFN     ,STIFR   ,TAGNOD,INTBUF_TAB(N))        
+     .           IPARI(1,N),X    ,V    ,  
+     .           A    ,VR  ,AR   ,MS   ,IN    ,          
+     .           WEIGHT    ,STIFN     ,STIFR   ,TAGNOD,INTBUF_TAB(N))        
               ENDIF                                           
             ENDIF                                             
           ENDDO                                               
@@ -264,7 +259,7 @@ C---
      5       FSAV(1,N) ,FNCONT   ,NODNX_SMS,DMINT2(KSN)  ,SAV_FOR_PENA,
      6       MS_PENA   ,DT2T     ,NELTST   ,ITYPTST ,INTBUF_TAB(N),TEMP,
      7       FTHE      ,FTHESKYI2,CONDN    ,CONDNSKYI2,ITAB,
-     8       SAV_MINER_POFF     ,H3D_DATA,T2FAC_SMS,FNCONTP ,
+     8       SAV_INER_POFF     ,H3D_DATA,T2FAC_SMS,FNCONTP ,
      A       FTCONTP)
             ELSE
         !       WARNING : if NSN==0 and ILEV==2 or 4, ones needs to save the mass 

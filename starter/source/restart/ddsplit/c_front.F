@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -30,25 +30,28 @@ Chd|        C_IFRONT                      source/spmd/node/ddtools.F
 Chd|        NLOCAL                        source/spmd/node/ddtools.F    
 Chd|        FRONT_MOD                     share/modules1/front_mod.F    
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
+Chd|        NLOCAL_REG_MOD                ../common_source/modules/nlocal_reg_mod.F
+Chd|        USER_WINDOWS_MOD              ../common_source/modules/user_windows_mod.F
 Chd|====================================================================
       SUBROUTINE C_FRONT(PROC     ,NBDDACC,NBDDKIN,NBDDNRB,
      2                   NPBY     ,NRBYKIN_L,LJOINT ,NBDDNCJ,IBVEL  ,
      3                   NBDDNRBM ,IADLL    ,LLL    ,NLAGF_L,FRONT_RM,
-     4                   NRBYMK_L ,NBDDNRBYM, USERNODS,SFR_USERWI_L,
+     4                   NRBYMK_L ,NBDDNRBYM, 
      5                   SDD_R2R_ELEM,ADDCSRECT,CSRECT,NBDDNORT,NBDDNOR_MAX,
      6                   NBCCNOR,NBCCFR25,NBDDEDGT  ,NBDDEDG_MAX,NRTMX25   ,
      7                   IPARI  ,INTBUF_TAB,INTERCEP,NODGLOB    ,NODLOCAL  ,
-     8                   NUMNOD_L)
+     8                   NUMNOD_L,NLOC_DMG)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE FRONT_MOD
-      USE INTBUFDEF_MOD  
+      USE INTBUFDEF_MOD
+      USE USER_WINDOWS_MOD  
+      USE NLOCAL_REG_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -57,7 +60,6 @@ C-----------------------------------------------
 #include      "param_c.inc"
 #include      "lagmult.inc"
 #include      "r2r_c.inc"
-#include      "tabsiz_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -66,13 +68,14 @@ C-----------------------------------------------
      .          NBDDNOR_MAX, NBCCNOR, NBCCFR25, NBDDEDGT,NBDDEDG_MAX,NRTMX25,
      .          NPBY(NNPBY,*), LJOINT(*),
      .          IBVEL(NBVELP,*) , IADLL(*), LLL(*),FRONT_RM(NRBYM,*),
-     .          USERNODS(*),SFR_USERWI_L,SDD_R2R_ELEM,
+     .          SDD_R2R_ELEM,
      .          ADDCSRECT(*), CSRECT(*), IPARI(NPARI,*)
        INTEGER, INTENT(IN) :: NUMNOD_L
        INTEGER, DIMENSION(NUMNOD_L), INTENT(IN) :: NODGLOB
        INTEGER, DIMENSION(NUMNOD), INTENT(IN) :: NODLOCAL
        TYPE(INTBUF_STRUCT_) INTBUF_TAB(*)
        TYPE(INTERSURFP) :: INTERCEP(3,NINTER)
+       TYPE (NLOCAL_STR_), TARGET, INTENT(IN)  :: NLOC_DMG
 !       -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 !       NODGLOB   : integer, dimension=NUMNOD_L
 !                   gives the global ID of a local element
@@ -138,7 +141,11 @@ C Frontiere Multidomaines
 C      
       SDD_R2R_ELEM = 0       
       IF ((NSUBDOM>0).AND.(IDDOM==0)) THEN
-        SDD_R2R_ELEM = 2*(NBDDKIN + NBDDACC)       
+        IF (NLOC_DMG%IMOD > 0) THEN
+          SDD_R2R_ELEM = 4*(NBDDKIN + NBDDACC)
+        ELSE
+          SDD_R2R_ELEM = 2*(NBDDKIN + NBDDACC)
+        ENDIF       
       ENDIF     
 C
 C Frontiere RBY (main nodes)
@@ -401,31 +408,5 @@ C ---------------------
 
       END IF ! NINTER25/=0
 C
-C ---------------------
-C Fontiere UserWindow comptage de la taille du tableau FR_USERW
-C ---------------------
-      SFR_USERWI_L = 0
-      IF (IUSERWI /= 0)THEN
-        IF(PROC/=1)THEN
-C pour les procs autre que le premier on note les noeuds
-C dont on va recevoir les accels.
-          DO II=1,NUMNOD_L
-            I=NODGLOB(II)
-            IF(USERNODS(I)==1)THEN
-               SFR_USERWI_L=SFR_USERWI_L+1
-            ENDIF
-          ENDDO
-        ELSE
-          DO I=1,NUMNOD
-             IF(USERNODS(I)==1)THEN
-               DO P=2,NSPMD
-                 IF(NLOCAL(I,P)==1)THEN          
-                    SFR_USERWI_L=SFR_USERWI_L+1
-                 ENDIF
-               ENDDO
-             ENDIF
-          ENDDO
-        ENDIF
-      ENDIF
       RETURN
       END

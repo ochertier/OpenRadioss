@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,6 +27,7 @@ Chd|        I25MAINF                      source/interfaces/int25/i25mainf.F
 Chd|-- calls ---------------
 Chd|        INT_CHECKSUM                  share/modules/debug_mod.F     
 Chd|        DEBUG_MOD                     share/modules/debug_mod.F     
+Chd|        PARAMETERS_MOD                ../common_source/modules/interfaces/parameters_mod.F
 Chd|        TRI25EBOX                     share/modules/tri25ebox.F     
 Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
@@ -47,7 +48,8 @@ Chd|====================================================================
      F      JBS    ,IAM    ,STFE   , EDGE_ID, ITAB ,
      G      INTFRIC,IPARTFRIC_E,IPARTFRIC_ES,IPARTFRIC_EM,
      H      IGSTI  ,KMIN   ,KMAX  ,E2S_NOD_NORMAL,NADMSR,
-     I      NORMALN1,NORMALN2,NORMALM1,NORMALM2)
+     I      NORMALN1,NORMALN2,NORMALM1,NORMALM2,ISTIF_MSDT,
+     J      DTSTIF,STIFMSDT_EDG,STIFMSDT_M,NRTM,PARAMETERS)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -56,6 +58,7 @@ C-----------------------------------------------
 #ifdef WITH_ASSERT
       USE DEBUG_MOD
 #endif
+      USE PARAMETERS_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -69,12 +72,9 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "i25edge_c.inc"
-#include      "scr02_c.inc"
-#include      "scr05_c.inc"
-#include      "com06_c.inc"
-#include      "com08_c.inc"
 #include      "param_c.inc"
 #include      "sms_c.inc"
+#include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -88,6 +88,8 @@ C-----------------------------------------------
      .        NODNX_SMS(*), NSMS(4,MVSIZ), 
      .        TYPEDGS(MVSIZ),IAS(MVSIZ),JAS(MVSIZ),IBS(MVSIZ),JBS(MVSIZ),IAM(MVSIZ)
       INTEGER  , INTENT(IN) :: IGSTI, NADMSR
+      INTEGER , INTENT(IN) :: ISTIF_MSDT
+      INTEGER , INTENT(IN) :: NRTM
 C     REAL
       my_real
      .        X(3,*), STFM(*), STFE(*), MS(*), V(3,*),
@@ -106,6 +108,9 @@ C     REAL
       REAL*4 , INTENT(IN) :: E2S_NOD_NORMAL(3,NADMSR)
       my_real  , INTENT(INOUT) :: NORMALN1(3,MVSIZ),NORMALN2(3,MVSIZ),
      .       NORMALM1(3,4,MVSIZ),NORMALM2(3,4,MVSIZ)
+      my_real  , INTENT(IN) :: DTSTIF
+      my_real  , INTENT(IN) ::  STIFMSDT_EDG(NEDGE) , STIFMSDT_M(NRTM) 
+      TYPE (PARAMETERS_) ,INTENT(IN):: PARAMETERS
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -115,7 +120,9 @@ C     INTEGER ::  NOD1S(MVSIZ),NOD2S(MVSIZ)
 C     INTEGER ::  NOD1M(MVSIZ),NOD2M(MVSIZ)
 
       my_real
-     .   AAA, DX, DY, DZ, DD, NNI, NI2, INVCOS, GAPE_M(MVSIZ), GAPE_S(MVSIZ)
+     .   AAA, DX, DY, DZ, DD, NNI, NI2, INVCOS, DTS
+      my_real
+     .   GAPE_M(MVSIZ), GAPE_S(MVSIZ), STIF_MSDT(MVSIZ)
       INTEGER :: IDS(4)
 C-----------------------------------------------
 
@@ -185,7 +192,7 @@ C           END IF
 
             STS=STFE(ES)
             STIF(EJ,I)=STS*STM / MAX(EM20,STS+STM)
-            STIF(EJ,I)=MAX(KMIN,MIN(STIF(EJ,I),KMAX))
+c            STIF(EJ,I)=MAX(KMIN,MIN(STIF(EJ,I),KMAX))
 
             XXS1(EJ,I) = X(1,N1(EJ,I))
             XYS1(EJ,I) = X(2,N1(EJ,I))
@@ -223,7 +230,7 @@ c
             STS=STIFIE(NIN)%P(NN)
             STIF(EJ,I)=STS*STM / MAX(EM20,STS+STM)
 
-            STIF(EJ,I)=MAX(KMIN,MIN(STIF(EJ,I),KMAX))
+c            STIF(EJ,I)=MAX(KMIN,MIN(STIF(EJ,I),KMAX))
 
             TYPEDGS(I)=LEDGE_FIE(NIN)%P(E_TYPE,NN)
 
@@ -251,6 +258,39 @@ C
           END IF
         END DO
       END DO
+C------------------------------------------
+C   Stiffness based on mass and time step
+C------------------------------------------
+
+      IF(ISTIF_MSDT > 0) THEN
+         IF(DTSTIF > ZERO) THEN
+            DTS = DTSTIF
+         ELSE
+            DTS = PARAMETERS%DT_STIFINT
+         ENDIF
+         DO I=1,JLT
+
+           IF(CAND_S(I)<=NEDGE) THEN
+              ES    =CAND_S(I)
+              STIF_MSDT(I) = STIFMSDT_EDG(ES)
+            ELSE
+              NN = CAND_S(I) - NEDGE  
+              STIF_MSDT(I) = ABS(STIFE_MSDT_FI(NIN)%P(NN))
+            ENDIF
+            STIF_MSDT(I) = STIFMSDT_M(IAM(I))*STIF_MSDT(I)/(STIFMSDT_M(IAM(I))+STIF_MSDT(I))
+
+            STIF_MSDT(I) = STIF_MSDT(I)/(DTS*DTS)
+            DO EJ=1,4
+               STIF(EJ,I)=MAX(STIF(EJ,I),STIF_MSDT(I))
+            ENDDO
+         ENDDO
+      ENDIF
+C
+      DO I=1,JLT
+         DO EJ=1,4
+            STIF(EJ,I)=MAX(KMIN,MIN(STIF(EJ,I),KMAX))
+         ENDDO
+      ENDDO
 
 C
 C     THIS is provisional (solids => Zero gap even if secnd shell edge)

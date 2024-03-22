@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,7 +25,7 @@ Chd|  ZEROVARS_AUTO                 source/elements/elbuf_init/zerovars_auto.F
 Chd|-- called by -----------
 Chd|        ELBUF_INI                     source/elements/elbuf_init/elbuf_ini.F
 Chd|-- calls ---------------
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        ELBUFTAG_MOD                  share/modules1/elbuftag_mod.F 
 Chd|====================================================================
       SUBROUTINE ZEROVARS_AUTO(ELBUF_STR)
@@ -34,10 +34,6 @@ C   M o d u l e s
 C-----------------------------------------------
       USE ELBUFDEF_MOD            
       USE ELBUFTAG_MOD            
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com_xfem1.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -161,6 +157,8 @@ C
       GBUF%G_PLANL = 0  
       IAD = IAD + 1
       GBUF%G_EPSDNL = 0  
+      IAD = IAD + 1
+      GBUF%G_DMGSCL = 0  
       IAD = IAD + 1
       GBUF%G_TSAIWU = 0  
       IAD = IAD + 1

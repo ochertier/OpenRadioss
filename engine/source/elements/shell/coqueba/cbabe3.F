@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -633,7 +633,6 @@ C--------pour rigidite en rzz-------
        END IF !(ISROT==0) THEN
        RETURN
        END
-C   ----nouvelle routine ---
 Chd|====================================================================
 Chd|  CBABEC3                       source/elements/shell/coqueba/cbabe3.F
 Chd|-- called by -----------

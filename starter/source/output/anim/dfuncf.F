@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,8 +25,8 @@ Chd|  DFUNCF                        source/output/anim/dfuncf.F
 Chd|-- called by -----------
 Chd|        GENANI1                       source/output/anim/genani1.F  
 Chd|-- calls ---------------
-Chd|        WRITE_R_C                     source/output/tools/write_routines.c
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        WRITE_R_C                     ../common_source/tools/input_output/write_routtines.c
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE DFUNCF(ELBUF_TAB,FUNC  ,IFUNC ,IPARG  ,GEO   ,                  
      .                  IXT      ,IXP   ,IXR   ,MASS   ,PM    ,                  
@@ -45,11 +45,8 @@ C-----------------------------------------------
 #include      "mvsiz_p.inc"                                             
 #include      "com01_c.inc"                                             
 #include      "com04_c.inc"                                             
-#include      "scr05_c.inc"                                             
 #include      "scr14_c.inc"                                             
-#include      "scr23_c.inc"                                             
-#include      "param_c.inc"                                             
-#include      "rnur_c.inc"                                              
+#include      "param_c.inc"                                                                                       
 C-----------------------------------------------                        
 C   D u m m y   A r g u m e n t s                                       
 C-----------------------------------------------                        

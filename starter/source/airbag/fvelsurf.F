@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -38,7 +38,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -124,8 +123,8 @@ C
                   ENDDO
                   IF (ITAG(I1)==1.AND.ITAG(I2)==1.AND.ITAG(I3)==1) THEN
                      IF (.NOT. FLAG) IFOUND=NUMELQ+JJ
-                     IF (FLAG .AND. (JJ == ELEM_ID(I))) THEN
-                        IFOUND=NUMELQ+JJ
+                     IF (FLAG) THEN 
+                        IF(JJ == ELEM_ID(I)) IFOUND=NUMELQ+JJ
                      ENDIF
                   ENDIF
                   DO K=1,4
@@ -139,8 +138,8 @@ C
                   ENDDO
                   IF (ITAG(I1)==1.AND.ITAG(I2)==1.AND.ITAG(I3)==1) THEN
                      IF (.NOT. FLAG) IFOUND=NUMELC+JJ
-                     IF (FLAG .AND. (JJ == ELEM_ID(I))) THEN
-                        IFOUND=NUMELQ+NUMELC+JJ
+                     IF (FLAG) THEN 
+                        IF (JJ == ELEM_ID(I)) IFOUND=NUMELQ+NUMELC+JJ
                      ENDIF
                   ENDIF
                   DO K=1,3
@@ -160,8 +159,8 @@ C
                   ENDDO
                   IF (ITAG(I1)==1.AND.ITAG(I2)==1.AND.ITAG(I3)==1) THEN
                      IF (.NOT. FLAG) IFOUND=NUMELQ+JJ
-                     IF (FLAG .AND. (JJ == ELEM_ID(I))) THEN
-                        IFOUND=NUMELQ+JJ
+                     IF (FLAG) THEN 
+                        IF (JJ == ELEM_ID(I)) IFOUND=NUMELQ+JJ
                      ENDIF
                   ENDIF
                   DO K=1,4
@@ -175,8 +174,8 @@ C
                   ENDDO
                   IF (ITAG(I1)==1.AND.ITAG(I2)==1.AND.ITAG(I3)==1) THEN
                      IF (.NOT. FLAG) IFOUND=NUMELC+JJ
-                     IF (FLAG .AND. JJ == ELEM_ID(I)) THEN
-                        IFOUND=NUMELQ+NUMELC+JJ
+                     IF (FLAG) THEN
+                        IF( JJ == ELEM_ID(I)) IFOUND=NUMELQ+NUMELC+JJ
                      ENDIF
                   ENDIF
                   DO K=1,3
@@ -196,8 +195,8 @@ C
                   ENDDO
                   IF (ITAG(I1)==1.AND.ITAG(I2)==1.AND.ITAG(I3)==1) THEN
                      IF (.NOT. FLAG) IFOUND=NUMELQ+JJ
-                     IF (FLAG .AND. (JJ == ELEM_ID(I))) THEN
-                        IFOUND=NUMELQ+JJ
+                     IF (FLAG) THEN 
+                        IF (JJ == ELEM_ID(I)) IFOUND=NUMELQ+JJ
                      ENDIF
                   ENDIF
                   DO K=1,4
@@ -211,8 +210,8 @@ C
                   ENDDO
                   IF (ITAG(I1)==1.AND.ITAG(I2)==1.AND.ITAG(I3)==1) THEN
                      IF (.NOT. FLAG) IFOUND=NUMELC+JJ
-                     IF (FLAG .AND. (JJ == ELEM_ID(I))) THEN
-                        IFOUND=NUMELQ+NUMELC+JJ
+                     IF (FLAG) THEN
+                        IF (JJ == ELEM_ID(I)) IFOUND=NUMELQ+NUMELC+JJ
                      ENDIF
                   ENDIF
                   DO K=1,3

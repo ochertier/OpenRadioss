@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -35,7 +35,7 @@ Chd|====================================================================
      3     TIME     ,TIMESTEP ,IPG      ,ILAY     ,IPT      ,   
      4     EPSXX    ,EPSYY    ,EPSXY    ,DMG_FLAG ,DMG_SCALE,
      5     EPSPXX   ,EPSPYY   ,EPSPXY   ,ALDT     ,ISMSTR   ,
-     6     SIGNXX   ,SIGNYY   ,SIGNXY   ,PTHKF    ,
+     6     SIGNXX   ,SIGNYY   ,SIGNXY   ,
      7     OFF      ,OFFLY    ,FOFF     ,DFMAX    ,TDEL     )
 C-----------------------------------------------
 C    Orthotropic strain failure model
@@ -74,7 +74,6 @@ C ...     |         |   |   |
 C---------+---------+---+---+--------------------------------------------
 C OFF     | NEL     | F | R | DELETED ELEMENT FLAG (=1. ON, =0. OFF)
 C FOFF    | NEL     | I |R/W| DELETED INTEGRATION POINT FLAG (=1 ON, =0 OFF)
-C PTHKF   |  1      | F | W | PERCENTAGE OF LAYER THICKNESS TO FAIL
 C DFMAX   | NEL     | F |R/W| MAX DAMAGE FACTOR 
 C TDEL    | NEL     | F | W | FAILURE TIME
 C---------+---------+---+---+--------------------------------------------
@@ -97,7 +96,6 @@ C   I N P U T   O U T P U T   A r g u m e n t s
 C-----------------------------------------------
       INTEGER ,INTENT(OUT) :: DMG_FLAG
       INTEGER ,DIMENSION(NEL) ,INTENT(INOUT) :: OFFLY,FOFF
-      my_real ,INTENT(OUT) :: PTHKF
       my_real ,DIMENSION(NEL) ,INTENT(INOUT) :: DFMAX,SIGNXX,SIGNYY,SIGNXY
       my_real ,DIMENSION(NEL) ,INTENT(OUT)   :: TDEL,DMG_SCALE
       my_real ,DIMENSION(NEL,NUVAR) ,INTENT(INOUT) :: UVAR
@@ -128,13 +126,13 @@ C-----------------------------------------------
      .  ET31M,DI,ALPHA,DAMXX,DAMYY,DAMXY,ODAMXX,ODAMYY,ODAMXY,THETA,C,S,
      .  EPSPREF,EPDOT,DEPS,DEPSM,FACT,FSCALE_SIZ,REF_SIZ,EPSD1,EPSD2,
      .  EPST1,EPST2,EPST_A,EPST_B
-      my_real ,DIMENSION(NEL) :: EPS11,EPS22,EPS12,EPSP11,EPSP22,EPSP12 
+      my_real ,DIMENSION(NEL) :: EPS11,EPS22,EPS12,EPSP11,EPSP22,EPSP12,
+     .                           EPSM1,EPSM2,EPSM3,EPSM4,EPSM5,EPSM6
       my_real ,DIMENSION(:), POINTER :: FSIZE
 C=======================================================================
 C     USER VARIABLES INITIALIZATION
 C-----------------------------------------------
       DMG_FLAG   = INT(UPARAM(1))
-      PTHKF      = UPARAM(2)
       ALPHA      = MIN(TWO*PI*UPARAM(16)*TIMESTEP,ONE)
       EPSPREF    = UPARAM(17)
       FSCALE_SIZ = UPARAM(26)
@@ -236,16 +234,16 @@ c----------------------------------------------
 c     Element size scale factor
       FSIZE => UVAR(1:NEL,32)
 c
-      IF (TIME == ZERO) THEN
+      IF (FSIZE(1)==ZERO) THEN
         IF (IFUNC_SIZ > 0) THEN
-	        ESCAL(1:NEL) = ALDT(1:NEL) / REF_SIZ
+                  ESCAL(1:NEL) = ALDT(1:NEL) / REF_SIZ
           IPOSP(1:NEL) = 0
           IADP (1:NEL) = NPF(IFUNC_SIZ) / 2 + 1
           ILENP(1:NEL) = NPF(IFUNC_SIZ  + 1) / 2 - IADP(1:NEL)
           CALL VINTER2(TF,IADP,IPOSP,ILENP,NEL,ESCAL,DYDXE,FSIZE)
           FSIZE(1:NEL) = FSCALE_SIZ * FSIZE(1:NEL)
         ELSE
-	        FSIZE(1:NEL) = ONE
+                  FSIZE(1:NEL) = ONE
         ENDIF
       ENDIF
 c
@@ -313,10 +311,10 @@ c
           ELSE
             FRATE = ONE
           ENDIF
-		      FRATE = FRATE*FSIZE(I)
+                FRATE = FRATE*FSIZE(I)
           ET1M = FRATE * ET1M
           ET1  = FRATE * ET1
-          DEPS = EPS11(I) - ET1
+          DEPS = EPS11(I) - ET1 
           IF (DEPS > ZERO .and. DAM(I,MODE) < ONE) THEN
             DEPSM = ET1M - ET1
             FACT  = ET1M / EPS11(I)
@@ -326,6 +324,7 @@ c
               FAILI = 1
               FMODE(I,MODE) = 1
               DAM(I,MODE) = ONE
+              EPSM1(I) = ET1M
             ENDIF
           ENDIF
 c
@@ -336,7 +335,7 @@ c
           ELSE
             FRATE = ONE
           ENDIF
-		        FRATE = FRATE*FSIZE(I)
+                  FRATE = FRATE*FSIZE(I)
           ET2M = FRATE * ET2M
           ET2  = FRATE * ET2
           DEPS = MAX(EPS22(I) - ET2, ZERO)
@@ -349,6 +348,7 @@ c
               FAILI = 1
               FMODE(I,MODE) = 1
               DAM(I,MODE) = ONE
+              EPSM2(I) = ET2M
             ENDIF
           ENDIF
 c
@@ -359,7 +359,7 @@ c
           ELSE
             FRATE = ONE
           ENDIF
-		        FRATE = FRATE*FSIZE(I)
+                  FRATE = FRATE*FSIZE(I)
           ET12M = FRATE * ET12M
           ET12  = FRATE * ET12
           DEPS  = MAX(EPS12(I) - ET12, ZERO)
@@ -372,6 +372,7 @@ c
               FAILI = 1
               FMODE(I,MODE) = 1
               DAM(I,MODE) = ONE
+              EPSM3(I) = ET12M
             ENDIF
           ENDIF
 c
@@ -382,7 +383,7 @@ c
           ELSE
             FRATE = ONE
           ENDIF
-		        FRATE = FRATE*FSIZE(I)
+                  FRATE = FRATE*FSIZE(I)
           EC1M = FRATE * EC1M
           EC1  = FRATE * EC1
           DEPS = -EPS11(I) - EC1
@@ -395,6 +396,7 @@ c
               FAILI = 1
               FMODE(I,MODE) = 1
               DAM(I,MODE) = ONE
+              EPSM4(I) = -EC1M
             ENDIF
           ENDIF
 c
@@ -405,7 +407,7 @@ c
           ELSE
             FRATE = ONE
           ENDIF
-		        FRATE = FRATE*FSIZE(I)
+                  FRATE = FRATE*FSIZE(I)
           EC2M = FRATE * EC2M
           EC2  = FRATE * EC2
           DEPS = MAX(-EPS22(I) - EC2, ZERO)
@@ -418,6 +420,7 @@ c
               FAILI = 1
               FMODE(I,MODE) = 1
               DAM(I,MODE) = ONE
+              EPSM5(I) = -EC2M
             ENDIF
           ENDIF
 c
@@ -428,7 +431,7 @@ c
           ELSE
             FRATE = ONE
           ENDIF
-		        FRATE = FRATE*FSIZE(I)
+                  FRATE = FRATE*FSIZE(I)
           EC12M = FRATE * EC12M
           EC12  = FRATE * EC12
           DEPS  = MAX(-EPS12(I) - EC12, ZERO)
@@ -441,6 +444,7 @@ c
               FAILI = 1
               FMODE(I,MODE) = 1
               DAM(I,MODE) = ONE
+              EPSM6(I) = -EC12M
             ENDIF
           ENDIF
 c-----
@@ -460,12 +464,12 @@ c------------------------
           
           WRITE(IOUT, 1000) NGL(I),IPG,ILAY,IPT
           WRITE(ISTDO,1000) NGL(I),IPG,ILAY,IPT
-          IF (FMODE(I,1)==1) WRITE(IOUT, 2000) 1,EPSP(I,XX)
-          IF (FMODE(I,2)==1) WRITE(IOUT, 2000) 2,EPSP(I,YY)
-          IF (FMODE(I,3)==1) WRITE(IOUT, 2000) 3,EPSP(I,XY)
-          IF (FMODE(I,4)==1) WRITE(IOUT, 2000) 4,EPSP(I,XX)
-          IF (FMODE(I,5)==1) WRITE(IOUT, 2000) 5,EPSP(I,YY)
-          IF (FMODE(I,6)==1) WRITE(IOUT, 2000) 6,EPSP(I,XY)
+          IF (FMODE(I,1)==1) WRITE(IOUT, 2000) '1 - TRACTION XX',EPS11(I),EPSM1(I),EPSP(I,XX)
+          IF (FMODE(I,2)==1) WRITE(IOUT, 2000) '2 - TRACTION YY',EPS22(I),EPSM2(I),EPSP(I,YY)
+          IF (FMODE(I,3)==1) WRITE(IOUT, 2000) '3 - POSITIVE SHEAR XY',EPS12(I),EPSM3(I),EPSP(I,XY)
+          IF (FMODE(I,4)==1) WRITE(IOUT, 2000) '4 - COMPRESSION XX',EPS11(I),EPSM4(I),EPSP(I,XX)
+          IF (FMODE(I,5)==1) WRITE(IOUT, 2000) '5 - COMPRESSION YY',EPS22(I),EPSM5(I),EPSP(I,YY)
+          IF (FMODE(I,6)==1) WRITE(IOUT, 2000) '6 - NEGATIVE SHEAR XY',EPS12(I),EPSM6(I),EPSP(I,XY)
 #include  "lockoff.inc"
         END DO
       END IF              
@@ -519,7 +523,8 @@ c     Update state variables
 c-----------------------------------------------------------------------
  1000 FORMAT(1X,'FAILURE (ORTHSTR) OF SHELL ELEMENT ',I10,1X,',GAUSS PT',
      .       I2,1X,',LAYER',I3,1X,',INTEGRATION PT',I3)
- 2000 FORMAT(1X,'MODE',1X,I2,' STRAIN RATE',1PE12.4)
+ 2000 FORMAT(1X,'MODE',1X,A,', STRAIN',1PE12.4,', CRITICAL VALUE',1PE12.4,
+     .       ', STRAIN RATE',1PE12.4)
 c-----------------------------------------------------------------------
       RETURN          
       END

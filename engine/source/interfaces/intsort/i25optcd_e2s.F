@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -74,14 +74,8 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "task_c.inc"
-#include      "scr05_c.inc"
-#include      "scr07_c.inc"
-#include      "scr18_c.inc"
-#include      "units_c.inc"
 #include      "com01_c.inc"
-#include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "couple_c.inc"
 #include      "parit_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -113,6 +107,9 @@ C-----------------------------------------------
      .         DIMENSION(:,:),ALLOCATABLE :: BOXM
       SAVE TAGM,BOXM
       INTEGER :: IDS(4)
+      INTEGER :: J
+      INTEGER :: MY_SIZE
+      INTEGER, DIMENSION(:), ALLOCATABLE :: LIST_REAL_CANDIDATE
 
 C-----------------------------------------------
       SOL_EDGE=IEDGE/10 ! solids
@@ -123,6 +120,8 @@ C-----------------------------------------------
       MSEG = NVSIZ
       FIRST = 1 + I_STOK*ITASK / NTHREAD
       LAST = I_STOK*(ITASK+1) / NTHREAD
+      MY_SIZE = LAST - FIRST + 1
+      ALLOCATE( LIST_REAL_CANDIDATE(MY_SIZE) )
 C-----------------------------------------------
       IF(SOL_EDGE/=0)THEN
 
@@ -433,6 +432,7 @@ C ======== LOCAL TIRM 3
           IF (XMAXS>=XMINM.AND.XMAXM>=XMINS) THEN
             CAND_S(I) = -CAND_S(I)
             COUNT_CAND = COUNT_CAND+1
+            LIST_REAL_CANDIDATE(COUNT_CAND) = I
           ENDIF
        ENDDO
 C
@@ -456,7 +456,7 @@ C
 C =========  REMOTE TRIM 1
 #include      "vectorize.inc"
          DO LS = NLF, NLT
-Cel conserver LISTI et LIST pour optimiser le code genere (IA64)
+C   conserver LISTI et LIST pour optimiser le code genere (IA64)
           IS = LISTI(LS)
           I=JS+IS
           II = CAND_S(I)-NEDGE
@@ -573,6 +573,7 @@ C ================ REMOTE TRIM 3
             CAND_S(I) = -CAND_S(I)
             COUNT_CAND = COUNT_CAND+1
             CT = CT+1
+            LIST_REAL_CANDIDATE(COUNT_CAND) = I
 
           ENDIF
         ENDDO
@@ -581,12 +582,16 @@ C ================ REMOTE TRIM 3
        JS = JS + NSEG
       ENDDO
       IF (IFQ > 0) THEN
-        DO I=FIRST,LAST
-          IF (IFPEN(I) == 0 ) THEN
+#include "vectorize.inc"
+        DO J=1,COUNT_CAND
+          I = LIST_REAL_CANDIDATE(J)
+          IF(IFPEN(I) == 0 ) THEN
             CAND_FX(1:4,I) = ZERO
             CAND_FY(1:4,I) = ZERO
             CAND_FZ(1:4,I) = ZERO
           ENDIF
+        ENDDO
+        DO I=FIRST,LAST
           IFPEN(I) = 0
         ENDDO
       ENDIF
@@ -605,6 +610,8 @@ C
         IF(ITASK==0)DEALLOCATE(TAGM,BOXM)
 
       END IF
+
+      DEALLOCATE( LIST_REAL_CANDIDATE )
 C
       RETURN
       END

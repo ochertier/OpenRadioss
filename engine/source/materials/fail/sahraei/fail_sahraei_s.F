@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -32,9 +32,9 @@ Chd|        FINTER                        source/tools/curve/finter.F
 Chd|====================================================================
       SUBROUTINE FAIL_SAHRAEI_S(
      1     NEL   ,NFUNC ,IFUNC ,NPF   ,TF     ,
-     2     TIME  ,NGL   ,IPM   ,MAT   ,UPARAM ,
+     2     TIME  ,NGL   ,UPARAM ,
      3     EPSXX ,EPSYY ,EPSZZ ,EPSXY ,EPSYZ  ,
-     4     EPSZX ,OFF   ,IP    ,DFMAX ,TDELE  , 
+     4     EPSZX ,OFF   ,DFMAX ,TDELE  , 
      5     DELTAX,NUVAR ,UVAR  )
 C-----------------------------------------------
 C   MIT Wierzbicki Sahraei electric battery failure
@@ -70,15 +70,13 @@ C---------+---------+---+---+--------------------------------------------
 #include "units_c.inc"
 #include "param_c.inc"
 #include "scr17_c.inc"
-#include "scr19_c.inc"
-#include "impl1_c.inc"
 #include "comlock.inc"
 C-----------------------------------------------
 C   I N P U T   A r g u m e n t s
 C-----------------------------------------------
 C
-      INTEGER NEL, NUPARAM,IP,NUVAR
-      INTEGER NGL(NEL),IPM(NPROPMI,*),MAT(NEL)
+      INTEGER NEL, NUPARAM,NUVAR
+      INTEGER NGL(NEL)
       INTEGER, INTENT(IN) :: NFUNC 
       INTEGER, DIMENSION(NFUNC), INTENT(IN) ::  IFUNC    
       my_real TIME,UPARAM(*),

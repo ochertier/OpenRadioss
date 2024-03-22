@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -28,7 +28,7 @@ Chd|-- calls ---------------
 Chd|        MAT121C_NEWTON                source/materials/mat/mat121/mat121c_newton.F
 Chd|        MAT121C_NICE                  source/materials/mat/mat121/mat121c_nice.F
 Chd|        VINTER2                       source/tools/curve/vinter.F   
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE SIGEPS121C(
      1     NEL     ,NGL     ,NUPARAM ,NUVAR   ,NFUNC   ,IFUNC   ,NPF     ,
@@ -50,16 +50,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C O M M O N
 C-----------------------------------------------
-#include      "param_c.inc" 
-#include      "com01_c.inc"
-#include      "scr17_c.inc"
-#include      "mvsiz_p.inc"
-#include      "parit_c.inc"
-#include      "scr05_c.inc"
-#include      "com04_c.inc"
 #include      "com08_c.inc"
 #include      "units_c.inc"
-#include      "impl1_c.inc"
 #include      "comlock.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s

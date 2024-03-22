@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -30,10 +30,10 @@ Chd|        CZKEL3                        source/elements/shell/coquez/czkel3.F
 Chd|-- calls ---------------
 Chd|        CCTOGLOB                      source/elements/shell/coqueba/cmatc3.F
 Chd|        GEPM_LC                       source/elements/shell/coqueba/cmatc3.F
-Chd|        GET_ETFAC_S                   source/elements/solid/solide8z/mmats.F
+Chd|        GET_ETFAC_S                   source/elements/solid/solide8z/get_etfac_s.F
 Chd|        LAYINI                        source/elements/shell/coque/layini.F
 Chd|        DRAPE_MOD                     share/modules/drape_mod.F     
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        STACK_MOD                     share/modules/stack_mod.F     
 Chd|====================================================================
       SUBROUTINE CMATC3(JFT    ,JLT     ,PM     ,MAT     ,GEO      ,
@@ -43,7 +43,7 @@ Chd|====================================================================
      4                  IORTH  ,HMOR    ,HFOR   ,DIR     ,IGEO     ,
      5                  IDRIL  ,IHBE    ,HMFOR  ,GS      ,ISUBSTACK,
      6                  STACK  ,ELBUF_STR,NLAY  ,DRAPE  ,NFT       ,
-     .                  NEL   )
+     .                  NEL   , INDX_DRAPE, SEDRAPE , NUMEL_DRAPE)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -62,15 +62,15 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "com04_c.inc"
 #include      "impl1_c.inc"
 #include      "impl2_c.inc"
-CC#include      "com08_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER JFT, JLT  ,MTN  , NPT,ITHK,IGTYP,IORTH,ISUBSTACK,NLAY,NFT
       INTEGER MAT(*), PID(*),IGEO(NPROPGI,*),IDRIL,IHBE
+      INTEGER ,    INTENT(IN)     ::        SEDRAPE,NUMEL_DRAPE
+      INTEGER, DIMENSION(SEDRAPE) :: INDX_DRAPE
       my_real
      .   GEO(NPROPG,*), PM(NPROPM,*), AREA(*),
      .   THK0(*),THK02(*),THK(*),THKE(*), DIR(*),
@@ -78,7 +78,7 @@ C-----------------------------------------------
      .   HMFOR(MVSIZ,6),GS(*)
       TYPE (STACK_PLY) :: STACK
       TYPE(ELBUF_STRUCT_) :: ELBUF_STR
-      TYPE (DRAPE_) :: DRAPE
+      TYPE (DRAPE_) :: DRAPE(NUMEL_DRAPE)
 C-----------------------------------------------
 c FUNCTION:   stiffness modulus matrix build
 c
@@ -234,8 +234,8 @@ C         INTEGRATION PAR COUCHES
           CALL LAYINI(ELBUF_STR,JFT      ,JLT      ,GEO      ,IGEO    ,  
      .                MAT      ,PID      ,THKLY    ,MATLY    ,POSLY   ,  
      .                IGTYP    ,0        ,0        ,NLAY     ,NPT     ,  
-     .                ISUBSTACK,STACK    ,DRAPE   ,NFT       ,THK     ,
-     .                NEL      ,THK_LY   )                               
+     .                ISUBSTACK,STACK    ,DRAPE   ,NFT       ,THKE     ,
+     .                NEL      ,THK_LY   ,INDX_DRAPE,SEDRAPE, NUMEL_DRAPE)                               
          DO I=JFT,JLT
            HM(I,1)=ZERO
            HM(I,2)=ZERO
@@ -321,8 +321,8 @@ C-----by layer
           CALL LAYINI(ELBUF_STR,JFT      ,JLT      ,GEO      ,IGEO    ,  
      .                MAT      ,PID      ,THKLY    ,MATLY    ,POSLY   ,  
      .                IGTYP    ,0        ,0        ,NLAY     ,NPT     ,  
-     .                ISUBSTACK,STACK    ,DRAPE   ,NFT       ,THK     ,                               
-     .                JLT      ,THK_LY   )                               
+     .                ISUBSTACK,STACK    ,DRAPE   ,NFT       ,THKE     , 
+     .                JLT      ,THK_LY   ,INDX_DRAPE,SEDRAPE ,NUMEL_DRAPE)                               
          DO I=JFT,JLT
           HM(I,1)=A11(I)
           HM(I,2)=A11(I)
@@ -395,20 +395,15 @@ C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER JFT, JLT,NEL
-C     REAL
       my_real
      .   DIR(NEL,2),HM(MVSIZ,4),HC(MVSIZ,2),HMOR(MVSIZ,2)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,J
-C     REAL
       my_real
      .  M2(MVSIZ),N2(MVSIZ),MN(MVSIZ),M4(MVSIZ),N4(MVSIZ),
      .  MN2(MVSIZ),CM(6),CC(2),T1,T2,T3
@@ -473,14 +468,12 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER JFT, JLT,MAT(*)
-C     REAL
       my_real
      .   HM(MVSIZ,4),HC(MVSIZ,2), PM(NPROPM,*), SHF(*)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,J,MX
-C     REAL
       my_real
      .   G,A11,A12,E11,E22,NU12,G31,G23,A22
 C-----------------------------------------------
@@ -531,21 +524,17 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
 #include      "impl1_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER JFT, JLT ,IR,IS,IT
-C     REAL
       my_real
      .   G_IMP(*),SIGNOR(MVSIZ,5)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,MX,J,K
-C     REAL
-
       TYPE(L_KTBUFEP_)    , POINTER :: SKBUF
 C-----------------------------------------------
        IF (IKT==0) RETURN
@@ -569,7 +558,7 @@ Chd|        C3KE3                         source/elements/sh3n/coque3n/c3ke3.F
 Chd|        CBAKE3                        source/elements/shell/coqueba/cbake3.F
 Chd|        CZKE3                         source/elements/shell/coquez/czke3.F
 Chd|-- calls ---------------
-Chd|        GET_ETFAC_S                   source/elements/solid/solide8z/mmats.F
+Chd|        GET_ETFAC_S                   source/elements/solid/solide8z/get_etfac_s.F
 Chd|        IMP_KTAN                      share/modules/impbufdef_mod.F 
 Chd|        IMP_KTAN_DEF                  share/modules/impbufdef_mod.F 
 Chd|====================================================================
@@ -593,7 +582,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "com04_c.inc"
 #include      "impl1_c.inc"
 #include      "com20_c.inc"
 C-----------------------------------------------
@@ -601,7 +589,6 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER JFT, JLT  ,MTN  , NPT,IORTH,IPG
       INTEGER MAT(*), PID(*)
-C     REAL
       my_real
      .   PM(NPROPM,*),HM(MVSIZ,4),HF(MVSIZ,4),HMOR(MVSIZ,2),HFOR(MVSIZ,2),HMFOR(MVSIZ,6)
 C-----------------------------------------------
@@ -834,8 +821,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "com04_c.inc"
-#include      "impl1_c.inc"
 #include      "impl2_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -868,7 +853,6 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,MX,IPID,J,J2,J3,JJ,NEL,L,IGMAT,IPGMAT,IGTYP
-C     REAL
       my_real
      .   NU(MVSIZ),G(MVSIZ),YM(MVSIZ),A11(MVSIZ),A12(MVSIZ),
      .   E11,E22,NU12,G31,G23,A22,WMC,FACG,COEF,WM
@@ -946,21 +930,9 @@ Chd|====================================================================
      3                   GM   ,GF   ,DHZ  ,DMOR ,DFOR ,
      4                   DMF  ,IDRIL,IORTH)
 C-----------------------------------------------
-C   M o d u l e s
-C-----------------------------------------------
-C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "param_c.inc"
-#include      "com04_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1010,7 +982,7 @@ C
        IF (IORTH >0 ) THEN
         DO M=JFT,JLT 
          EP=IPLAT(M)
- 	     C2=VOL(EP)
+               C2=VOL(EP)
          C1=THK2(EP)*C2
          DMOR(1,M)=HMOR(1,EP)*C2
          DMOR(2,M)=HMOR(2,EP)*C2
@@ -1019,7 +991,7 @@ C
         ENDDO
         DO M=JFT,JLT 
          EP=IPLAT(M)
- 	     C2=VOL(EP)*THK0(EP)
+               C2=VOL(EP)*THK0(EP)
          DMF(1,1,M)=HMFOR(1,EP)*C2
          DMF(2,2,M)=HMFOR(2,EP)*C2
          DMF(1,2,M)=HMFOR(3,EP)*C2

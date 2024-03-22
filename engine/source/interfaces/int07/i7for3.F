@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -29,9 +29,9 @@ Chd|        I7CURV                        source/interfaces/int07/i7curv.F
 Chd|        IBCOFF                        source/interfaces/interf/ibcoff.F
 Chd|        BITGET                        source/interfaces/intsort/i20sto.F
 Chd|        ANIM_MOD                      ../common_source/modules/anim_mod.F
-Chd|        H3D_MOD                       share/modules/h3d_mod.F
+Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|        OUTPUTS_MOD                   ../common_source/modules/outputs_mod.F
-Chd|        TRI7BOX                       share/modules/tri7box.F
+Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
       SUBROUTINE I7FOR3(JLT       ,A         ,V          ,IBCC       ,ICODT  ,
      2                  FSAV      ,GAP       ,FRIC       ,MS         ,VISC   ,
@@ -74,7 +74,7 @@ Chd|====================================================================
      8                  INDEXORTH  ,INDEXISOT ,DIR1      ,DIR2      ,TAGNCONT ,
      9                  KLOADPINTER,LOADPINTER,LOADP_HYD_INTER,TYPSUB,INFLG_SUBS,
      A                  INFLG_SUBM,NINLOADP   ,DGAPLOADINT,S_LOADPINTER,DGAPLOADP,
-     B                  INTEREFRIC ,EFRICINT )
+     B                  INTEREFRIC )
 
 C-----------------------------------------------
 C   M o d u l e s
@@ -99,8 +99,6 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "com06_c.inc"
 #include      "com08_c.inc"
-#include      "scr02_c.inc"
-#include      "scr03_c.inc"
 #include      "scr05_c.inc"
 #include      "scr07_c.inc"
 #include      "scr11_c.inc"
@@ -110,8 +108,6 @@ C-----------------------------------------------
 #include      "sms_c.inc"
 #include      "units_c.inc"
 #include      "parit_c.inc"
-#include      "warn_c.inc"
-#include      "couple_c.inc"
 #include      "param_c.inc"
 #include      "impl1_c.inc"
 #include      "kincod_c.inc"
@@ -177,7 +173,6 @@ C-----------------------------------------------
      .   FZ1(MVSIZ), FZ2(MVSIZ), FZ3(MVSIZ), FZ4(MVSIZ)
       TYPE(H3D_DATABASE) :: H3D_DATA
       my_real  , INTENT(IN) :: DGAPLOADP, DGAPLOADINT(S_LOADPINTER)
-      my_real  , INTENT(INOUT) :: EFRICINT(S_EFRICINT)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -235,7 +230,6 @@ C      1 .. JLT : all impacts
 C          1 .. JLT-JLT_TIED     : Standard TYPE7 formulation
 C          JLT-JLT_TIED+1 .. JLT : Modified formulation (tied nodes with possible rebound)
 C-----------------------------------------------
-#include "sync_dir.inc"
       IF (IRESP==1) THEN
         PREC = FIVEEM4
       ELSE
@@ -934,11 +928,11 @@ C   2:const,1:linear,0:nonlinear
             ENDIF
             IF(STIGLO<=ZERO)THEN
               IF(INCONV==1) ECONTT = ECONTT + HALF*STIF(I)*GAPV(I)**2 *
-     .            ( FACM1 -ONE -LOG(FACM1) )
+     .            ( FACM1 -ONE -LOG(MAX(TINY(FACM1),FACM1) ))
               STIF(I) = HALF*STIF(I) * FAC
             ELSEIF(STIF(I)/=ZERO)THEN
               IF(INCONV==1)ECONTT = ECONTT + STIGLO*GAPV(I)**2 *
-     .            ( FACM1 - ONE -LOG(FACM1) )
+     .            ( FACM1 - ONE -LOG(MAX(TINY(FACM1),FACM1) ))
               STIF(I) = STIGLO * FAC
             ENDIF
             FNI(I)= -STIF(I) * PENE(I)
@@ -990,11 +984,11 @@ C   2:const,1:linear,0:nonlinear
           ENDIF
           IF(STIGLO<=ZERO)THEN
             ECONTT = ECONTT + HALF*STIF(I)*GAPV(I)**2 *( FACM1 - ONE -
-     .            LOG(FACM1) )
+     .            LOG(MAX(TINY(FACM1),FACM1)) )
             STIF(I) = HALF*STIF(I) * FAC
           ELSEIF(STIF(I)/=ZERO)THEN
             ECONTT = ECONTT + STIGLO*GAPV(I)**2 *( FACM1 - ONE -
-     .            LOG(FACM1) )
+     .            LOG(MAX(TINY(FACM1),FACM1)) )
             STIF(I) = STIGLO * FAC
           ENDIF
           FNI(I)= -STIF(I) * PENE(I)
@@ -1907,7 +1901,7 @@ C---      Viscous friction
             XMU(I) = MAX(XMU(I),EM30)
           ENDDO
         ELSEIF(MFROT==2)THEN
-C---        Loi Darmstad
+C---        Darmstad Law
           DO I=1,JLT-JLT_TIED
             IE=CE_LOC(I)
             AA = N1(I)*VX(I) + N2(I)*VY(I) + N3(I)*VZ(I)
@@ -1933,7 +1927,7 @@ C---        Loi Darmstad
             XMU(I) = MAX(XMU(I),EM30)
           ENDDO
         ELSEIF (MFROT==3) THEN
-C---        Loi Renard
+C---        Renard Law
           DO I=1,JLT-JLT_TIED
             AA = N1(I)*VX(I) + N2(I)*VY(I) + N3(I)*VZ(I)
             V2 = (VX(I) - N1(I)*AA)**2
@@ -1955,8 +1949,20 @@ C---        Loi Renard
             ENDIF
             XMU(I) = MAX(XMU(I),EM30)
           ENDDO
-        ENDIF
 
+        ELSEIF(MFROT==4)THEN
+C---        Exponential decay model
+          DO I=1,JLT-JLT_TIED
+            AA = N1(I)*VX(I) + N2(I)*VY(I) + N3(I)*VZ(I)
+            V2 = (VX(I) - N1(I)*AA)**2
+     .         + (VY(I) - N2(I)*AA)**2
+     .         + (VZ(I) - N3(I)*AA)**2
+            VV = SQRT(MAX(EM30,V2))
+            XMU(I) = FRICC(I)
+     .             + (FRIC_COEFS(I,1)-FRICC(I))*EXP(-FRIC_COEFS(I,2)*VV)
+            XMU(I) = MAX(XMU(I),EM30)
+          ENDDO
+        ENDIF
       ELSE
 C++ Orthotropic Friction
 
@@ -2072,7 +2078,7 @@ c
           ENDDO
 
         ELSEIF(MFROT==2)THEN
-C---        Loi Darmstad
+C---        Darmstad LAW
 #include   "vectorize.inc"
           DO K=1,NFISOT  ! isotropic friction couples
             I = INDEXISOT(K)
@@ -2156,7 +2162,7 @@ c
           ENDDO
 
         ELSEIF (MFROT==3) THEN
-C---        Loi Renard
+C---        Renard Law
 #include   "vectorize.inc"
           DO K=1,NFISOT  ! isotropic friction couples
             I = INDEXISOT(K)
@@ -2216,6 +2222,59 @@ c
               VV2 = (VV - FRIC_COEFS2(I,6))**2
               XMU2(I) = FRIC_COEFS2(I,2) - DMU / (ONE + DMU*VV2)
             ENDIF
+            XMU(I) = MAX(XMU(I),EM30)
+            XMU2(I) = MAX(XMU2(I),EM30)
+          ENDDO
+
+#include   "vectorize.inc"
+          DO K=1,NFORTH ! Orthotropic friction couples : treat differently cases where mu1=0 AND/OR mu2=0
+            I = INDEXORTH(K)
+            IF(XMU(I)<=EM30) THEN
+              XMU(I) = EM30
+              DIR1(I,1:3) = ZERO
+              AN(K) = ZERO
+            ELSE
+              AN(K)=XMU(I)**2
+              AN(K)=ONE/AN(K)
+            ENDIF
+            IF(XMU2(I)<=EM30) THEN
+              XMU2(I) = EM30
+              DIR2(I,1:3) = ZERO
+              BN(K) = ZERO
+            ELSE
+              BN(K)=XMU2(I)**2
+              BN(K)=ONE/BN(K)
+            ENDIF
+          ENDDO
+
+        ELSEIF(MFROT==4)THEN
+C---        Exponential decay model
+#include   "vectorize.inc"
+          DO K=1,NFISOT  ! isotropic friction couples
+            I = INDEXISOT(K)
+            AA = N1(I)*VX(I) + N2(I)*VY(I) + N3(I)*VZ(I)
+            V2 = (VX(I) - N1(I)*AA)**2
+     .         + (VY(I) - N2(I)*AA)**2
+     .         + (VZ(I) - N3(I)*AA)**2
+            VV = SQRT(MAX(EM30,V2))
+            XMU(I) = FRICC(I)
+     .             + (FRIC_COEFS(I,1)-FRICC(I))*EXP(-FRIC_COEFS(I,2)*VV)
+            XMU(I) = MAX(XMU(I),EM30)
+          ENDDO
+c
+#include   "vectorize.inc"
+          DO K=1,NFORTH ! Orthotropic friction couples
+            I = INDEXORTH(K)
+c
+            V2 = VX(I)*DIR1(I,1) +VY(I)*DIR1(I,2)+VZ(I)*DIR1(I,3)
+            VV  = MAX(EM30,V2)
+            XMU(I) = FRICC(I)
+     .             + (FRIC_COEFS(I,1)-FRICC(I))*EXP(-FRIC_COEFS(I,2)*VV)
+c
+            V2 = VX(I)*DIR2(I,1) +VY(I)*DIR2(I,2)+VZ(I)*DIR2(I,3)
+            VV  = MAX(EM30,V2)
+            XMU2(I) = FRICC2(I)
+     .             + (FRIC_COEFS2(I,1)-FRICC2(I))*EXP(-FRIC_COEFS2(I,2)*VV)
             XMU(I) = MAX(XMU(I),EM30)
             XMU2(I) = MAX(XMU2(I),EM30)
           ENDDO
@@ -3448,14 +3507,14 @@ C---------------------------------
 #include "lockon.inc"
           DO I=1,JLT
             EFRIC_LM = HALF*EFRIC_L(I)
-            EFRICINT(IX1(I)) = EFRICINT(IX1(I)) + H1(I)*(EFRIC_LM-FHEATM*EFRICT(I))
-            EFRICINT(IX2(I)) = EFRICINT(IX2(I)) + H2(I)*(EFRIC_LM-FHEATM*EFRICT(I))
-            EFRICINT(IX3(I)) = EFRICINT(IX3(I)) + H3(I)*(EFRIC_LM-FHEATM*EFRICT(I))
-            EFRICINT(IX4(I)) = EFRICINT(IX4(I)) + H4(I)*(EFRIC_LM-FHEATM*EFRICT(I))
+            EFRIC(INTEREFRIC,IX1(I)) = EFRIC(INTEREFRIC,IX1(I)) + H1(I)*(EFRIC_LM-FHEATM*EFRICT(I))
+            EFRIC(INTEREFRIC,IX2(I)) = EFRIC(INTEREFRIC,IX2(I)) + H2(I)*(EFRIC_LM-FHEATM*EFRICT(I))
+            EFRIC(INTEREFRIC,IX3(I)) = EFRIC(INTEREFRIC,IX3(I)) + H3(I)*(EFRIC_LM-FHEATM*EFRICT(I))
+            EFRIC(INTEREFRIC,IX4(I)) = EFRIC(INTEREFRIC,IX4(I)) + H4(I)*(EFRIC_LM-FHEATM*EFRICT(I))
             JG = NSVG(I)
             EFRIC_LS = HALF*EFRIC_L(I)
             IF(JG>0) THEN
-              EFRICINT(JG) = EFRICINT(JG) + (EFRIC_LS-FHEATS*EFRICT(I))
+              EFRIC(INTEREFRIC,JG) = EFRIC(INTEREFRIC,JG) + (EFRIC_LS-FHEATS*EFRICT(I))
             ELSE ! node remote
               JG = -JG
               EFRICFI(NIN)%P(JG)=EFRICFI(NIN)%P(JG)+ (EFRIC_LS-FHEATS*EFRICT(I))

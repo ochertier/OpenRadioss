@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -49,23 +49,13 @@ C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "comlock.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "units_c.inc"
-#include      "scr03_c.inc"
-#include      "scr04_c.inc"
-#include      "scr05_c.inc"
 #include      "warn_c.inc"
 #include      "task_c.inc"
-#include      "parit_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -81,6 +71,7 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER NSNR, IGAP, I_STOK_GLO, SIZOPT, IEDGE, NEDGE, IGAP0, I_STOK, L_STOK
       INTEGER N, NSNF, NSNL, NSNRF, NSNRL ,IFQ
+      INTEGER :: NRTM, NSN
 C     REAL
       my_real
      .   STARTT, STOPT, DRAD, DGAPLOAD
@@ -116,7 +107,9 @@ C-----------------------------------------------------------
        SIZOPT = INTBUF_TAB%S_CAND_OPT_N
 C
 C      I_OPT_STOK modifie ds i25optcd, apres barriere !
+!$OMP SINGLE
        I_OPT_STOK = INTBUF_TAB%I_STOK(2)
+!$OMP END SINGLE NOWAIT
        CALL I25OPTCD(
      1 INTBUF_TAB%NSV,INTBUF_TAB%CAND_E,INTBUF_TAB%CAND_N,X,I_STOK_GLO    ,
      2 INTBUF_TAB%IRECTM,INTBUF_TAB%GAP_S,INTBUF_TAB%GAP_M,V,IPARI(39,NIN),
@@ -155,7 +148,10 @@ C        I_OPT_STOK modifie ds i25optcd, apres barriere !
        END IF
 C
 C      I_OPT_STOK modifie ds i25optcd, avant barriere
+!$OMP SINGLE
        INTBUF_TAB%I_STOK(2)=I_OPT_STOK
+       ! nowait is ok, because there is a barrier in INTTRI
+!$OMP END SINGLE NOWAIT
 C
 Cf barrier at the end of i25optcd
       NSNF = 1 + ITASK*NSN / NTHREAD
@@ -199,7 +195,6 @@ C
      7    INTBUF_TAB%FTSAVX_E2S,INTBUF_TAB%FTSAVY_E2S, INTBUF_TAB%FTSAVZ_E2S,DGAPLOAD)
       END IF
 
-C     call my_barrier ! pour timer only
 
 C-----------------------------------------------------------------------
       RETURN

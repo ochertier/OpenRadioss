@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -31,12 +31,15 @@ Chd|        GET_KEYS_ID                   source/input/freoutp.F
 Chd|        WRIUSC2                       source/input/wriusc2.F        
 Chd|        NVAR                          source/input/nvar.F           
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
+Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
 Chd|====================================================================
-      SUBROUTINE FREOUTP(IKAD,KEY0,KOUTP)
+      SUBROUTINE FREOUTP(IKAD,KEY0,KOUTP,SENSORS)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
+      USE SENSOR_MOD
+      USE NAMES_AND_TITLES_MOD, ONLY: NCHARLINE100
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -53,18 +56,18 @@ C-----------------------------------------------
 #include      "units_c.inc"
 #include      "scr14_c.inc"
 #include      "scr16_c.inc"
-#include      "chara_c.inc"
-#include      "nchara_c.inc"
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
       INTEGER NVAR
+      TYPE (SENSORS_), INTENT(INOUT) :: SENSORS
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, NBC, K, IKEY, N1, N
       CHARACTER KEY2*5, KEY3*5, KEY4*5
-      CHARACTER  CART*ncharline,LINE*ncharline
+      CHARACTER(LEN=NCHARLINE100)::CART
+      CHARACTER(LEN=NCHARLINE100)::LINE
 C
       IKEY=KOUTP
       TOUTP0 = ZERO
@@ -83,8 +86,9 @@ C
         OUTP_SPS(I)=0
         OUTP_SPT(I)=0
       ENDDO
+c
       IF(IKAD(IKEY)/=IKAD(IKEY+1))THEN
-       K=0
+         K=0
  1175    READ(IUSC1,REC=IKAD(IKEY)+K,FMT='(A)') CART
          READ(IUSC1,REC=IKAD(IKEY)+K,FMT='(A)') LINE
 
@@ -434,7 +438,7 @@ C-----------------------------------------------
          ELSEIF(KEY3(1:4)=='VONM')THEN
            OUTP_SPS(7) = 1
          ELSEIF(KEY3(1:5)=='STRES')THEN
-              IF(KEY4(1:4)=='FULL')THEN 	
+              IF(KEY4(1:4)=='FULL')THEN 
                OUTP_SPT(2) = 1
               ELSE
                OUTP_SPT(1) = 1
@@ -516,14 +520,14 @@ C-----------------------------------------------
          ELSE
            GOTO 9990
          ENDIF
-       ELSEIF(KEY2=='LSENS')THEN
-          DO I=1,NBC
-            READ(IUSC1,REC=IKAD(IKEY)+K+I-1,FMT='(A)',ERR=9990)CART
-            CALL WRIUSC2(IKAD(IKEY)+K+I-1,1,KEY0(IKEY))
-            READ(IUSC2,*,ERR=9990,END=9990)
-     .          (LOUTPSENS(N),N=1,NVAR(CART))
-              NOUTPSENS=NOUTPSENS+NVAR(CART)
-           ENDDO 
+       ELSEIF (KEY2=='LSENS')THEN
+         DO I=1,NBC
+           READ(IUSC1,REC=IKAD(IKEY)+K+I-1,FMT='(A)',ERR=9990)CART
+           CALL WRIUSC2(IKAD(IKEY)+K+I-1,1,KEY0(IKEY))
+           READ(IUSC2,*,ERR=9990,END=9990)
+     .         (SENSORS%OUTP_TMP(N),N=1,NVAR(CART))
+             SENSORS%NOUTP = SENSORS%NOUTP + NVAR(CART)
+         ENDDO 
        ELSE
          GOTO 9990
        ENDIF
@@ -579,10 +583,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "scr17_c.inc"
 C-----------------------------------------------
 C   G l o b a l   V a r i a b l e s
 C-----------------------------------------------

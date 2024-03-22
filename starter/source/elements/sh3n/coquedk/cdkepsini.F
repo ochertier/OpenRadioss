@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -30,7 +30,7 @@ Chd|        CDKEVEC3                      source/elements/sh3n/coquedk/cdkevec3.
 Chd|        CDKPXPYI                      source/elements/sh3n/coquedk/cdkinit3.F
 Chd|        CMLAWI                        source/elements/shell/coque/cepsini.F
 Chd|        CORTH3                        source/elements/shell/coque/corth3.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE CDKEPSINI(ELBUF_STR,
      1           JFT  ,JLT   ,ISMSTR,ILAW  ,ITHK   ,
@@ -73,7 +73,7 @@ C-----------------------------------------------
 C------------------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, NT, I1, I2, I3
+      INTEGER I, NT, I1, I2, I3,IDRAPE,IGTYP
       my_real FAC
       my_real
      .   E1X(MVSIZ), E1Y(MVSIZ), E1Z(MVSIZ),
@@ -88,6 +88,9 @@ C-----------------------------------------------
       my_real, 
      .   DIMENSION(:) , POINTER :: DIR1, DIR2
 C=======================================================================
+      
+      IDRAPE = ELBUF_STR%IDRAPE
+      IGTYP = ELBUF_STR%IGTYP
       DO I=JFT,JLT
         I1 = IXTG(2,I)
         I2 = IXTG(3,I)
@@ -176,7 +179,8 @@ c
      .                NLAY     ,IREP    ,NEL     ,
      .                X1  ,X2  ,X3  ,X4  ,Y1  ,Y2  ,
      .                Y3  ,Y4  ,Z1  ,Z2  ,Z3  ,Z4  ,
-     .                E1X ,E2X ,E3X ,E1Y ,E2Y ,E3Y ,E1Z ,E2Z ,E3Z )
+     .                E1X ,E2X ,E3X ,E1Y ,E2Y ,E3Y ,E1Z ,E2Z ,E3Z ,
+     .                IDRAPE , IGTYP )
 c
           CALL CDKPXPYI(JFT  ,JLT  ,ISMSTR,
      .                  PX2G ,PY2G ,PX3G ,PY3G ,

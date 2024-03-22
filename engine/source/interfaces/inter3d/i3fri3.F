@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -57,13 +57,11 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr03_c.inc"
 #include      "scr07_c.inc"
 #include      "scr14_c.inc"
 #include      "scr16_c.inc"
 #include      "com06_c.inc"
 #include      "com08_c.inc"
-#include      "task_c.inc"
 #include      "parit_c.inc"
 #include      "scr18_c.inc"
 C-----------------------------------------------
@@ -222,6 +220,8 @@ C
 C
 #include "atomic.inc"
         ECONTV = ECONTV + ECONVT ! Frictional contact energy
+#include "atomend.inc"
+#include "atomic.inc"
         FSAV(27) = FSAV(27) + ECONVT
 #include "atomend.inc"
 C---------------------------------
@@ -450,7 +450,6 @@ C-----------------------------------------------
 #include      "scr16_c.inc"
 #include      "com06_c.inc"
 #include      "com08_c.inc"
-#include      "task_c.inc"
 #include      "parit_c.inc"
 #include      "scr18_c.inc"
 #include      "impl1_c.inc"
@@ -569,19 +568,19 @@ C----        Filtrage du frottement
         IF (CODVERS>=44) THEN
           IFQ = IPARI(31)
           IF (IFQ>0) THEN
-	      IF (IFQ==3) FREQ = MAX(ONE,FREQ*DT12)
+                IF (IFQ==3) FREQ = MAX(ONE,FREQ*DT12)
             ALPHA = FREQ
             ALPHI = ONE - ALPHA
             K = 3*(IL-1)
-	      IF (FNI(I)==0) THEN
+                IF (FNI(I)==0) THEN
               FTSAV(K+1) = ZERO
               FTSAV(K+2) = ZERO
               FTSAV(K+3) = ZERO
-	    ELSE
+              ELSE
               FXI(I)= ALPHA*FXI(I) + ALPHI*FTSAV(K+1)
               FYI(I)= ALPHA*FYI(I) + ALPHI*FTSAV(K+2)
               FZI(I)= ALPHA*FZI(I) + ALPHI*FTSAV(K+3)
-	     IF (INCONV==1) THEN
+               IF (INCONV==1) THEN
               FTSAV(K+1) = FXI(I) 
               FTSAV(K+2) = FYI(I) 
               FTSAV(K+3) = FZI(I) 
@@ -647,19 +646,19 @@ C---        Darmstad's law
           ELSEIF(MFROT==3)THEN
 C---        Renard's law
             IF(VV>=0.AND.VV<=FROT_P(5)) THEN
-	          DMU = FROT_P(3)-FROT_P(1)
+                    DMU = FROT_P(3)-FROT_P(1)
               VV1 = VV / FROT_P(5)
               XMU = FROT_P(1)+ DMU*VV1*(TWO-VV1)
             ELSEIF(VV>FROT_P(5).AND.VV<FROT_P(6)) THEN
-	          DMU  = FROT_P(4)-FROT_P(3) 
+                    DMU  = FROT_P(4)-FROT_P(3) 
               VV1  = (VV - FROT_P(5))/(FROT_P(6)-FROT_P(5))
               XMU = FROT_P(3)+ DMU * (THREE-TWO*VV1)*VV1**2
-	        ELSE
+                  ELSE
               DMU  = FROT_P(2)-FROT_P(4)
               VV2  = (VV - FROT_P(6))**2
               XMU = FROT_P(2) - DMU / (ONE + DMU*VV2)
-	        ENDIF
-	      ENDIF
+                  ENDIF
+                ENDIF
           FMAX = -MIN(XMU*FNI(I),ZERO)
           IF(FTI>FMAX)THEN
 C---        sliding
@@ -724,6 +723,8 @@ C
       IF (INCONV==1) THEN
 #include "atomic.inc"
         ECONTV = ECONTV + ECONVT ! Frictional contact energy
+#include "atomend.inc"
+#include "atomic.inc"
         FSAV(27) = FSAV(27) + ECONVT
 #include "atomend.inc"
 C---------------------------------

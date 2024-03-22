@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,16 +27,19 @@ Chd|        HM_READ_MAT                   source/materials/mat/hm_read_mat.F
 Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
 Chd|        HM_GET_FLOATV                 source/devtools/hm_reader/hm_get_floatv.F
+Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
 Chd|        HM_OPTION_IS_ENCRYPTED        source/devtools/hm_reader/hm_option_is_encrypted.F
+Chd|        INIT_MAT_KEYWORD              source/materials/mat/init_mat_keyword.F
 Chd|        ELBUFTAG_MOD                  share/modules1/elbuftag_mod.F 
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/matparam_def_mod.F
+Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
       SUBROUTINE HM_READ_MAT79(
      .     UPARAM   ,MAXUPARAM,NUPARAM  ,NUVAR    ,NFUNC    ,
      .     MAXFUNC  ,IFUNC    ,PARMAT   ,MAT_ID   ,PM       ,
-     .     ISRATE   ,MTAG     ,TITR     ,UNITAB   ,LSUBMODEL)
+     .     ISRATE   ,MTAG     ,TITR     ,UNITAB   ,LSUBMODEL,
+     .     MATPARAM )
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C-----------------------------------------------
@@ -57,8 +60,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr17_c.inc"
-#include      "submod_c.inc"
-#include      "sysunit.inc"
 #include      "units_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
@@ -72,13 +73,15 @@ C-----------------------------------------------
       CHARACTER*nchartitle,INTENT(IN)       :: TITR
       TYPE(SUBMODEL_DATA),INTENT(IN)        :: LSUBMODEL(*)
       TYPE(MLAW_TAG_), INTENT(INOUT)   :: MTAG
+      TYPE(MATPARAM_STRUCT_) ,INTENT(INOUT) :: MATPARAM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER MATS,IFLAG1,IFLAG2,ITEMAX
+      INTEGER MATS,IFLAG1,IFLAG2,ITEMAX,IDEL
       my_real
      .        SHEAR, AA, BB, MM, NN, CC, EPS0, SIGFMAX, TMAX, HEL, PHEL,
-     .        D1, D2, K1, K2, K3, BETA, YOUNG, NU, RHO0, RHOR
+     .        D1, D2, K1, K2, K3, BETA, YOUNG, NU, RHO0, RHOR, ASRATE,
+     .        EPSMAX
       LOGICAL :: IS_ENCRYPTED, IS_AVAILABLE
 C-----------------------------------------------
 C     S o u r c e 
@@ -106,15 +109,18 @@ C     #c epsp_0 sigma_f_max
       CALL HM_GET_FLOATV('MAT_C', CC, IS_AVAILABLE, LSUBMODEL, UNITAB)
       CALL HM_GET_FLOATV('MAT_Epsilon_F', EPS0, IS_AVAILABLE, LSUBMODEL, UNITAB)
       CALL HM_GET_FLOATV('MAT_SIG1max_t', SIGFMAX, IS_AVAILABLE, LSUBMODEL, UNITAB)
+      CALL HM_GET_FLOATV('MAT_FCUT', ASRATE, IS_AVAILABLE, LSUBMODEL, UNITAB)
 C----------------------------------------------------------------
 C     #T HEL PHEL
       CALL HM_GET_FLOATV('MAT_T0', TMAX, IS_AVAILABLE, LSUBMODEL, UNITAB)
       CALL HM_GET_FLOATV('MAT_E', HEL, IS_AVAILABLE, LSUBMODEL, UNITAB)
       CALL HM_GET_FLOATV('MAT_EPS', PHEL, IS_AVAILABLE, LSUBMODEL, UNITAB)
 C----------------------------------------------------------------
-C     #D1 D2
-      CALL HM_GET_FLOATV('D1', D1, IS_AVAILABLE, LSUBMODEL, UNITAB)
-      CALL HM_GET_FLOATV('D2', D2, IS_AVAILABLE, LSUBMODEL, UNITAB)
+C     #D1 D2 IDEL EPSMAX
+      CALL HM_GET_FLOATV('D1' , D1, IS_AVAILABLE, LSUBMODEL, UNITAB)
+      CALL HM_GET_FLOATV('D2' , D2, IS_AVAILABLE, LSUBMODEL, UNITAB)
+      CALL HM_GET_INTV  ('IDEL',IDEL, IS_AVAILABLE, LSUBMODEL)
+      CALL HM_GET_FLOATV('EPSMAX',EPSMAX, IS_AVAILABLE, LSUBMODEL, UNITAB)
 C----------------------------------------------------------------
 C     #K1 K2 K3 BETA
       CALL HM_GET_FLOATV('K1', K1, IS_AVAILABLE, LSUBMODEL, UNITAB)
@@ -122,7 +128,7 @@ C     #K1 K2 K3 BETA
       CALL HM_GET_FLOATV('K3', K3, IS_AVAILABLE, LSUBMODEL, UNITAB)
       CALL HM_GET_FLOATV('MAT_Beta', BETA, IS_AVAILABLE, LSUBMODEL, UNITAB)
      
-      NUVAR = 5
+      NUVAR = 2
       PM(1) = RHOR
       PM(89) = RHO0
 
@@ -131,10 +137,22 @@ C     Memory allocation flags
       MTAG%L_EPSD = 1
       MTAG%G_PLA  = 1
       MTAG%L_PLA  = 1
-
-C     ISRATE
-      ISRATE = 1
-
+      MTAG%G_DMG  = 1
+      MTAG%L_DMG  = 1
+C
+      !----------------------------------------------------------
+      ! Activation of strain-rate filtering
+      IF (ASRATE /= ZERO) THEN
+        ISRATE = 1
+      ELSE
+        ISRATE = 0
+      ENDIF
+      ! Check flag for element deletion
+      IDEL = MIN(IDEL,3)
+      IDEL = MAX(0,IDEL)
+      ! Critical plastic strain
+      IF (EPSMAX == ZERO) EPSMAX = INFINITY
+      !----------------------------------------------------------
 C----------
 C DEFAULT
 C----------
@@ -199,13 +217,21 @@ C
       UPARAM(16)= K2
       UPARAM(17)= K3
       UPARAM(18)= BETA
-      NUPARAM= 18
+      UPARAM(19)= IDEL
+      UPARAM(20)= EPSMAX
+      NUPARAM= 20
 C
       NU=(THREE*K1-TWO*SHEAR)/(SIX*K1+TWO*SHEAR)
       YOUNG=NINE*K1*SHEAR/(THREE*K1+SHEAR)
       PARMAT(1) = K1
       PARMAT(2) = YOUNG
       PARMAT(3) = NU
+      PARMAT(4) = ISRATE
+      PARMAT(5) = ASRATE
+C
+      ! Properties compatibility  
+      CALL INIT_MAT_KEYWORD(MATPARAM,"SOLID_ISOTROPIC") 
+      CALL INIT_MAT_KEYWORD(MATPARAM,"SPH")       
 C
       WRITE(IOUT, 900) TRIM(TITR),MAT_ID,79
       WRITE(IOUT,1000)
@@ -214,9 +240,10 @@ C
       ELSE
        WRITE(IOUT,1050) RHO0
        WRITE(IOUT,1100) SHEAR, AA, BB, MM, NN, CC, EPS0, SIGFMAX
-       WRITE(IOUT,1200) TMAX, HEL, PHEL, D1, D2
+       WRITE(IOUT,1200) TMAX, HEL, PHEL, D1, D2, IDEL, EPSMAX
        WRITE(IOUT,1300) K1, K2, K3, BETA
        WRITE(IOUT,1400) YOUNG, NU 
+       IF (ISRATE > 0) WRITE(IOUT,1500) ASRATE
       ENDIF
 C 
       RETURN
@@ -229,29 +256,37 @@ C
      &  5X,'  JOHNSON HOLMQUIST MATERIAL',/,
      &  5X,'  --------------------------',//)
  1050 FORMAT(
-     & 5X,'INITIAL DENSITY    . . . . . . . . . . . . .=',1PG20.13/)  
+     & 5X,'INITIAL DENSITY . . . . . . . . . . . . . .=',1PG20.13/)  
  1100 FORMAT(
-     &  5X,'SHEAR MODULUS . . . . . . . . . . . . . . =',1PG20.13/,
-     &  5X,'INTACT STRENGTH CONSTANT (A). . . . . . . =',1PG20.13/,
-     &  5X,'FRACTURED STRENGTH CONSTANT (B) . . . . . =',1PG20.13/,
-     &  5X,'FRACTURED STRENGTH EXPONENT (M) . . . . . =',1PG20.13/,
-     &  5X,'INTACT STRENGTH EXPONENT (N). . . . . . . =',1PG20.13/,
-     &  5X,'STRAIN RATE COEFFICIENT (C) . . . . . . . =',1PG20.13/,
-     &  5X,'REFERENCE STRAIN RATE . . . . . . . . . . =',1PG20.13/,
-     &  5X,'MAXIMUM NORMALIZED FRACTURED STRENGTH . . =',1PG20.13//)
+     &  5X,'SHEAR MODULUS . . . . . . . . . . . . . . .=',1PG20.13/,
+     &  5X,'INTACT STRENGTH CONSTANT (A). . . . . . . .=',1PG20.13/,
+     &  5X,'FRACTURED STRENGTH CONSTANT (B) . . . . . .=',1PG20.13/,
+     &  5X,'FRACTURED STRENGTH EXPONENT (M) . . . . . .=',1PG20.13/,
+     &  5X,'INTACT STRENGTH EXPONENT (N). . . . . . . .=',1PG20.13/,
+     &  5X,'STRAIN RATE COEFFICIENT (C) . . . . . . . .=',1PG20.13/,
+     &  5X,'REFERENCE STRAIN RATE . . . . . . . . . . .=',1PG20.13/,
+     &  5X,'MAXIMUM NORMALIZED FRACTURED STRENGTH . . .=',1PG20.13//)
  1200 FORMAT(
-     &  5X,'MAXIMUM PRESSURE TENSILE STRENGTH . . . . =',1PG20.13/,
-     &  5X,'HUGONIOT ELASTIC LIMIT (HEL). . . . . . . =',1PG20.13/,
-     &  5X,'PRESSURE AT HUGONIOT ELASTIC LIMIT. . . . =',1PG20.13/,
-     &  5X,'DAMAGE CONSTANT (D1). . . . . . . . . . . =',1PG20.13/,
-     &  5X,'DAMAGE EXPONENT (D2). . . . . . . . . . . =',1PG20.13//)
+     &  5X,'MAXIMUM PRESSURE TENSILE STRENGTH . . . . .=',1PG20.13/,
+     &  5X,'HUGONIOT ELASTIC LIMIT (HEL). . . . . . . .=',1PG20.13/,
+     &  5X,'PRESSURE AT HUGONIOT ELASTIC LIMIT. . . . .=',1PG20.13/,
+     &  5X,'DAMAGE CONSTANT (D1). . . . . . . . . . . .=',1PG20.13/,
+     &  5X,'DAMAGE EXPONENT (D2). . . . . . . . . . . .=',1PG20.13/,
+     &  5X,'ELEMENT DELETION FLAG (IDEL). . . . . . . .=',I10/,
+     &  5X,'  IDEL = 0: NO ELEMENT DELETION                        ',/,
+     &  5X,'  IDEL = 1: ELEMENT DELETION IN TENSION ONLY           ',/,
+     &  5X,'  IDEL = 2: ELEMENT DELETION IF PLASTIC STRAIN > EPSMAX',/,
+     &  5X,'  IDEL = 3: ELEMENT DELETION IF DAMAGE = 1.0           ',/,
+     &  5X,'CRITICAL PLASTIC STRAIN (EPSMAX). . . . . .=',1PG20.13/)
  1300 FORMAT(
-     &  5X,'BULK MODULUS (K1) . . . . . . . . . . . . =',1PG20.13/
-     &  5X,'PRESSURE COEFFICIENT (K2) . . . . . . . . =',1PG20.13/
-     &  5X,'PRESSURE COEFFICIENT (K3) . . . . . . . . =',1PG20.13/
-     &  5X,'BULKING PRESSURE COEFFICIENT (BETA) . . . =',1PG20.13)
+     &  5X,'BULK MODULUS (K1) . . . . . . . . . . . . .=',1PG20.13/
+     &  5X,'PRESSURE COEFFICIENT (K2) . . . . . . . . .=',1PG20.13/
+     &  5X,'PRESSURE COEFFICIENT (K3) . . . . . . . . .=',1PG20.13/
+     &  5X,'BULKING PRESSURE COEFFICIENT (BETA) . . . .=',1PG20.13)
  1400 FORMAT(
-     &  5X,'YOUNG',1H','S MODULUS . . . . . . . . . . . . =',1PG20.13/,
-     &  5X,'POISSON',1H','S RATIO . . . . . . . . . . . . =',1PG20.13/)
+     &  5X,'YOUNG',1H','S MODULUS . . . . . . . . . . . . . .=',1PG20.13/,
+     &  5X,'POISSON',1H','S RATIO . . . . . . . . . . . . . .=',1PG20.13/)
+ 1500 FORMAT(
+     &  5X,'STRAIN RATE FILTERING FREQUENCY . . . . . .=',1PG20.13/)
 C
       END

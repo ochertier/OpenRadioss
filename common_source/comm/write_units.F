@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -28,8 +28,7 @@ Chd|        RESOL                         engine/source/engine/resol.F
 Chd|-- calls ---------------
 Chd|        WRITE_DB                      starter/source/restart/ddsplit/wrrest.F
 Chd|        WRITE_DB                      engine/source/output/tools/write_db.F
-Chd|        WRITE_I_C                     starter/source/output/tools/write_routines.c
-Chd|        WRITE_I_C                     engine/source/output/tools/sortie_c.c
+Chd|        WRITE_I_C                     tools/input_output/write_routtines.c
 Chd|====================================================================
       SUBROUTINE WRITE_UNITS(UNITAB)
 C============================================================================
@@ -43,7 +42,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "sysunit.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C----------------------------------------------- 
@@ -55,7 +53,16 @@ C-----------------------------------------------
       INTEGER I,UID
       my_real FAC_M,FAC_L,FAC_T
 C----------------------------------------------- 
-      DO I=1,NUNITS
+      CALL WRITE_I_C(UNITAB%NUNITS,1)
+      CALL WRITE_I_C(UNITAB%NUNIT0,1)
+      CALL WRITE_DB(UNITAB%FAC_M_WORK,1)
+      CALL WRITE_DB(UNITAB%FAC_L_WORK,1)
+      CALL WRITE_DB(UNITAB%FAC_T_WORK,1)
+      CALL WRITE_DB(UNITAB%FAC_MASS,1)
+      CALL WRITE_DB(UNITAB%FAC_LENGTH,1)
+      CALL WRITE_DB(UNITAB%FAC_TIME,1)
+
+      DO I=1,UNITAB%NUNITS
         UID = UNITAB%UNIT_ID(I)
         FAC_M = UNITAB%FAC_M(I)
         FAC_L = UNITAB%FAC_L(I)
@@ -76,8 +83,7 @@ Chd|        RADIOSS2                      engine/source/engine/radioss2.F
 Chd|-- calls ---------------
 Chd|        READ_DB                       starter/source/restart/ddsplit/wrrest.F
 Chd|        READ_DB                       engine/source/output/tools/read_db.F
-Chd|        READ_I_C                      starter/source/output/tools/write_routines.c
-Chd|        READ_I_C                      engine/source/output/tools/sortie_c.c
+Chd|        READ_I_C                      tools/input_output/write_routtines.c
 Chd|        MESSAGE_MOD                   starter/share/message_module/message_mod.F
 Chd|        MESSAGE_MOD                   engine/share/message_module/message_mod.F
 Chd|====================================================================
@@ -94,8 +100,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "sysunit.inc"
-#include      "my_allocate.inc"
 #include      "warn_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -107,11 +111,21 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,UID
       my_real FAC_M,FAC_L,FAC_T
+      INTEGER :: NUNITS 
 C----------------------------------------------- 
-      MY_ALLOCATE(UNITAB%UNIT_ID,NUNITS)
-      MY_ALLOCATE(UNITAB%FAC_M,NUNITS)
-      MY_ALLOCATE(UNITAB%FAC_L,NUNITS)
-      MY_ALLOCATE(UNITAB%FAC_T,NUNITS)
+      CALL READ_I_C(NUNITS,1)
+      UNITAB%NUNITS = NUNITS 
+      CALL READ_I_C(UNITAB%NUNIT0,1)
+      ALLOCATE(UNITAB%UNIT_ID(NUNITS))
+      ALLOCATE(UNITAB%FAC_M(NUNITS))
+      ALLOCATE(UNITAB%FAC_L(NUNITS))
+      ALLOCATE(UNITAB%FAC_T(NUNITS))
+      CALL READ_DB(UNITAB%FAC_M_WORK,1)
+      CALL READ_DB(UNITAB%FAC_L_WORK,1)
+      CALL READ_DB(UNITAB%FAC_T_WORK,1)
+      CALL READ_DB(UNITAB%FAC_MASS,1)
+      CALL READ_DB(UNITAB%FAC_LENGTH,1)
+      CALL READ_DB(UNITAB%FAC_TIME,1)
 
       DO I=1,NUNITS
 
@@ -124,7 +138,6 @@ C-----------------------------------------------
         UNITAB%FAC_M(I) = FAC_M
         UNITAB%FAC_L(I) = FAC_L
         UNITAB%FAC_T(I) = FAC_T
-
       ENDDO
 C----------------------------------------------- 
       END

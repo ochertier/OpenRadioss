@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -36,7 +36,7 @@ Chd|====================================================================
      3  IXS20   ,IPARG    ,NODNX_SMS ,
      4  ICODT   ,ICODR    ,KINET     ,
      5                     IPARTS    ,IPARTQ   ,IPARTC  ,
-     6  IPARTT  ,IPARTP   ,IPARTR    ,IPARTUR  ,IPARTTG ,
+     6  IPARTT  ,IPARTP   ,IPARTR    ,IPARTTG ,
      7  IPARTX  ,TAGPRT_SMS,ITAB    ,IRBE2   ,
      8  IRBE3   ,LRBE2     ,LRBE3     ,NPRW    ,LPRW    ,
      9  IPART   ,IGEO      ,IPM       ,NATIV_SMS,NPBY   ,
@@ -50,16 +50,11 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "kincod_c.inc"
 #include      "param_c.inc"
-#include      "sms_c.inc"
 #include      "units_c.inc"
 #include      "scr17_c.inc"
 C-----------------------------------------------
@@ -72,7 +67,7 @@ C-----------------------------------------------
      .        IPARG(NPARG,*), 
      .   NODNX_SMS(*), ICODT(*), ICODR(*), KINET(*),
      .   IPARTS(*),IPARTQ(*),IPARTC(*),IPARTT(*),
-     .   IPARTP(*),IPARTR(*),IPARTUR(*),IPARTTG(*),IPARTX(*),
+     .   IPARTP(*),IPARTR(*),IPARTTG(*),IPARTX(*),
      .   TAGPRT_SMS(*),
      .   ITAB(*),
      .   IRBE2(NRBE2L,*), IRBE3(NRBE3L,*), LRBE2(*), LRBE3(*),
@@ -352,7 +347,7 @@ C-----
       DO NHI=0,NHRBE2
        DO N=1,NRBE2
         IF (IRBE2(9,N)/=NHI) CYCLE
-	IAD = IRBE2(1,N)
+          IAD = IRBE2(1,N)
         NSN = IRBE2(5,N)
         M   = IRBE2(3,N)
 
@@ -390,7 +385,7 @@ Chd|====================================================================
      3  IXS20   ,IPARG    ,MS      ,MS0     ,NODNX_SMS ,
      4  ICODT   ,ICODR    ,KINET   ,
      5  KAD_SMS                    ,IPARTS   ,IPARTQ   ,
-     6  IPARTC  ,IPARTT  ,IPARTP   ,IPARTR    ,IPARTUR  ,
+     6  IPARTC  ,IPARTT  ,IPARTP   ,IPARTR    ,
      7  IPARTTG ,IPARTX  ,TAGPRT_SMS,TAGREL_SMS,ITAB    ,
      8  IRBE2   ,IRBE3     ,LRBE2    ,LRBE3    ,
      9  NPRW    ,LPRW      ,IPART    ,IGEO     ,NATIV_SMS)
@@ -403,10 +398,8 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "kincod_c.inc"
 #include      "param_c.inc"
 #include      "sms_c.inc"
-#include      "units_c.inc"
 #include      "scr17_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -419,7 +412,7 @@ C-----------------------------------------------
      .   NODNX_SMS(*), ICODT(*), ICODR(*), KINET(*), 
      .   KAD_SMS(*),
      .   IPARTS(*),IPARTQ(*),IPARTC(*),IPARTT(*),
-     .   IPARTP(*),IPARTR(*),IPARTUR(*),IPARTTG(*),IPARTX(*),
+     .   IPARTP(*),IPARTR(*),IPARTTG(*),IPARTX(*),
      .   TAGPRT_SMS(*), TAGREL_SMS(*),
      .   ITAB(*), 
      .   IRBE2(NRBE2L,*), IRBE3(NRBE3L,*), LRBE2(*), LRBE3(*),
@@ -635,12 +628,12 @@ C
              DO K=1,2
                I=IXR(1+K,J)
                DO KK=1,2
-         	 JJ = IXR(1+KK,J)
+           JJ = IXR(1+KK,J)
                  IF(JJ/=I.AND..NOT.(NATIV_SMS(I)==0.AND.NATIV_SMS(JJ)==0))THEN
                    TAGREL_SMS(NG)=1
-         	   NAD_SMS(I)=NAD_SMS(I)+1
-         	   KNZ_SMS   =KNZ_SMS+1
-         	 END IF
+             NAD_SMS(I)=NAD_SMS(I)+1
+             KNZ_SMS   =KNZ_SMS+1
+           END IF
                END DO
              END DO
            END DO
@@ -651,44 +644,44 @@ C
                I=IXR(1+K,J)
 
                KK=2
-         	 JJ = IXR(1+KK,J)
+           JJ = IXR(1+KK,J)
                  IF(JJ/=I.AND..NOT.(NATIV_SMS(I)==0.AND.NATIV_SMS(JJ)==0))THEN
                    TAGREL_SMS(NG)=1
-         	   NAD_SMS(I)=NAD_SMS(I)+1
-         	   KNZ_SMS   =KNZ_SMS+1
-         	 END IF
+             NAD_SMS(I)=NAD_SMS(I)+1
+             KNZ_SMS   =KNZ_SMS+1
+           END IF
 
              K=2
 
                I=IXR(1+K,J)
 
                KK=1
-         	 JJ = IXR(1+KK,J)
+           JJ = IXR(1+KK,J)
                  IF(JJ/=I.AND..NOT.(NATIV_SMS(I)==0.AND.NATIV_SMS(JJ)==0))THEN
                    TAGREL_SMS(NG)=1
-         	   NAD_SMS(I)=NAD_SMS(I)+1
-         	   KNZ_SMS   =KNZ_SMS+1
-         	 END IF
+             NAD_SMS(I)=NAD_SMS(I)+1
+             KNZ_SMS   =KNZ_SMS+1
+           END IF
 
                KK=3
-         	 JJ = IXR(1+KK,J)
+           JJ = IXR(1+KK,J)
                  IF(JJ/=I.AND..NOT.(NATIV_SMS(I)==0.AND.NATIV_SMS(JJ)==0))THEN
                    TAGREL_SMS(NG)=1
-         	   NAD_SMS(I)=NAD_SMS(I)+1
-         	   KNZ_SMS   =KNZ_SMS+1
-         	 END IF
+             NAD_SMS(I)=NAD_SMS(I)+1
+             KNZ_SMS   =KNZ_SMS+1
+           END IF
 
              K=3
 
                I=IXR(1+K,J)
 
                KK=2
-         	 JJ = IXR(1+KK,J)
+           JJ = IXR(1+KK,J)
                  IF(JJ/=I.AND..NOT.(NATIV_SMS(I)==0.AND.NATIV_SMS(JJ)==0))THEN
                    TAGREL_SMS(NG)=1
-         	   NAD_SMS(I)=NAD_SMS(I)+1
-         	   KNZ_SMS   =KNZ_SMS+1
-         	 END IF
+             NAD_SMS(I)=NAD_SMS(I)+1
+             KNZ_SMS   =KNZ_SMS+1
+           END IF
 
            END DO
           END IF
@@ -728,16 +721,9 @@ Chd|====================================================================
      1 NUMNOD  ,NUMEL ,NIX ,MIX ,LIX ,
      2 IX      ,IPARTX,TAGPRT_SMS,NODNX_SMS)
 C-----------------------------------------------
-C   M o d u l e s
-C-----------------------------------------------
-C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -764,7 +750,7 @@ C
             IF(TAG(I)==0)THEN
               NODNX_SMS(I)=NODNX_SMS(I)+1
               TAG(I)=1
-            END IF		    
+            END IF        
           END IF                  
         ENDDO                                    
       ENDDO                                      
@@ -785,7 +771,7 @@ Chd|====================================================================
      5             JADT_SMS ,JADP_SMS,
      6             JADR_SMS,JADTG_SMS,TAGPRT_SMS,IAD_SMS ,
      7             TAGREL_SMS,IPARTS ,IPARTQ   ,IPARTC   ,IPARTT   ,
-     8             IPARTP    ,IPARTR ,IPARTUR  ,IPARTTG  ,IPARTX   ,
+     8             IPARTP    ,IPARTR ,IPARTTG  ,IPARTX   ,
      9             NPBY      ,LPBY   ,KINET    ,TAGSLV_RBY_SMS,IPARI,
      A             INTBUF_TAB,LAD_SMS,IPART    ,IGEO     ,NATIV_SMS )
 C-----------------------------------------------
@@ -797,16 +783,12 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-#include "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "kincod_c.inc"
 #include      "param_c.inc"
 #include      "sms_c.inc"
-#include      "units_c.inc"
 #include      "scr17_c.inc"
 C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -823,7 +805,7 @@ C-----------------------------------------------
      .        JADTG_SMS(3,*), NATIV_SMS(*),
      .        TAGPRT_SMS(*), TAGREL_SMS(*), 
      .        IPARTS(*), IPARTQ(*), IPARTC(*), IPARTT(*),
-     .        IPARTP(*), IPARTR(*), IPARTUR(*), IPARTTG(*), IPARTX(*),
+     .        IPARTP(*), IPARTR(*), IPARTTG(*), IPARTX(*),
      .        NPBY(NNPBY,*), LPBY(*), KINET(*), TAGSLV_RBY_SMS(*),
      .        IPARI(NPARI,*), 
      .        LAD_SMS(*), KDI_SMS(*), 
@@ -1193,7 +1175,7 @@ Chd|====================================================================
      4             JADS_SMS ,JADS10_SMS,JADT_SMS,JADP_SMS,JADR_SMS ,
      5             JADTG_SMS,TAGPRT_SMS,KAD_SMS,KDI_SMS  ,PK_SMS   ,
      6             TAGREL_SMS,IPARTS ,IPARTQ   ,IPARTC   ,IPARTT   ,
-     7             IPARTP    ,IPARTR ,IPARTUR  ,IPARTTG  ,IPARTX   ,
+     7             IPARTP    ,IPARTR ,IPARTTG  ,IPARTX   ,
      8             NPBY      ,LPBY   ,KINET    ,TAGSLV_RBY_SMS,IPARI,
      9             INTBUF_TAB,LAD_SMS,IPART    ,IGEO     ,NATIV_SMS ,
      A             IAD_SMS   ,IDI_SMS,JAD_SMS  ,JDI_SMS  ,T2MAIN_SMS)
@@ -1206,16 +1188,11 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-#include "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "kincod_c.inc"
 #include      "param_c.inc"
 #include      "sms_c.inc"
-#include      "units_c.inc"
 #include      "scr17_c.inc"
 C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -1233,7 +1210,7 @@ C-----------------------------------------------
      .        JADTG_SMS(3,*),NATIV_SMS(*),
      .        TAGPRT_SMS(*), TAGREL_SMS(*), 
      .        IPARTS(*), IPARTQ(*), IPARTC(*), IPARTT(*),
-     .        IPARTP(*), IPARTR(*), IPARTUR(*), IPARTTG(*), IPARTX(*),
+     .        IPARTP(*), IPARTR(*), IPARTTG(*), IPARTX(*),
      .        NPBY(NNPBY,*), LPBY(*), KINET(*), TAGSLV_RBY_SMS(*),
      .        IPARI(NPARI,*), 
      .        LAD_SMS(*), 
@@ -1586,7 +1563,7 @@ Chd|====================================================================
      4             JADS_SMS ,JADS10_SMS,JADT_SMS ,JADP_SMS,JADR_SMS ,
      5             JADTG_SMS,TAGPRT_SMS,KAD_SMS,KDI_SMS  ,
      6             TAGREL_SMS,IPARTS ,IPARTQ   ,IPARTC   ,IPARTT   ,
-     7             IPARTP    ,IPARTR ,IPARTUR  ,IPARTTG  ,IPARTX   ,
+     7             IPARTP    ,IPARTR ,IPARTTG  ,IPARTX   ,
      8             NPBY      ,LPBY   ,KINET    ,TAGSLV_RBY_SMS,IPARI,
      9             INTBUF_TAB,LAD_SMS ,NPRW    ,LPRW ,TAGMSR_RBY_SMS,
      A             INTSTAMP ,IPART    ,IGEO    ,NATIV_SMS,IRBE2   ,
@@ -1603,17 +1580,11 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-#include "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "intstamp_c.inc"
-#include      "kincod_c.inc"
 #include      "param_c.inc"
 #include      "sms_c.inc"
-#include      "units_c.inc"
 #include      "scr17_c.inc"
 C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -1631,7 +1602,7 @@ C-----------------------------------------------
      .        JADTG_SMS(3,*),
      .        TAGPRT_SMS(*), TAGREL_SMS(*), 
      .        IPARTS(*), IPARTQ(*), IPARTC(*), IPARTT(*),
-     .        IPARTP(*), IPARTR(*), IPARTUR(*), IPARTTG(*), IPARTX(*),
+     .        IPARTP(*), IPARTR(*), IPARTTG(*), IPARTX(*),
      .        NPBY(NNPBY,*), LPBY(*), KINET(*), TAGSLV_RBY_SMS(*),
      .        IPARI(NPARI,*), 
      .        LAD_SMS(*), 
@@ -1896,7 +1867,7 @@ Chd|====================================================================
      4             JADS_SMS ,JADS10_SMS,JADT_SMS ,JADP_SMS,JADR_SMS ,
      5             JADTG_SMS,TAGPRT_SMS,KAD_SMS  ,KDI_SMS ,
      6             TAGREL_SMS,IPARTS ,IPARTQ   ,IPARTC   ,IPARTT   ,
-     7             IPARTP    ,IPARTR ,IPARTUR  ,IPARTTG  ,IPARTX   ,
+     7             IPARTP    ,IPARTR ,IPARTTG  ,IPARTX   ,
      8             NPBY     ,LPBY     ,KINET    ,
      9             TAGSLV_RBY_SMS,IPARI,INTBUF_TAB,
      A             LAD_SMS   ,JSM_SMS  ,INTSTAMP  ,IPART     , 
@@ -1913,19 +1884,12 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-#include "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "intstamp_c.inc"
-#include      "kincod_c.inc"
 #include      "param_c.inc"
-#include      "sms_c.inc"
-#include      "units_c.inc"
 #include      "scr17_c.inc"
-C-----------------------------------------------------------------
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER 
@@ -1941,7 +1905,7 @@ C-----------------------------------------------
      .        JADTG_SMS(3,*),NATIV_SMS(*),
      .        TAGPRT_SMS(*), TAGREL_SMS(*), 
      .        IPARTS(*), IPARTQ(*), IPARTC(*), IPARTT(*),
-     .        IPARTP(*), IPARTR(*), IPARTUR(*), IPARTTG(*), IPARTX(*),
+     .        IPARTP(*), IPARTR(*), IPARTTG(*), IPARTX(*),
      .        NPBY(NNPBY,*), LPBY(*), KINET(*), TAGSLV_RBY_SMS(*),
      .        IPARI(NPARI,*), 
      .        LAD_SMS(*), JSM_SMS(*), 

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -51,19 +51,12 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
 #include      "units_c.inc"
-#include      "scr03_c.inc"
 #include      "scr17_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "submod_c.inc"
-#include      "sysunit.inc"
 #include      "thermal_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -134,7 +127,7 @@ C--------------------------------------------------
         CALL HM_GET_FLOATV_DIM('rad_tstop',TSTOP_DIM,IS_AVAILABLE,LSUBMODEL,UNITAB)   
 C--------------------------------------------------  
         IFLAGUNIT = 0                                        
-        DO J=1,NUNITS                           
+        DO J=1,UNITAB%NUNITS                           
           IF (UNITAB%UNIT_ID(J) == UID) THEN                     
             IFLAGUNIT = 1                       
             EXIT                                
@@ -194,9 +187,9 @@ C
          ELSE
           CALL ANCMSG(MSGID=1230,ANMODE=ANINFO,MSGTYPE=MSGERROR,C1=TITR,I1=ISU)                              
          ENDIF
-C		 
+C     
         ELSEIF(IGBR > 0) THEN
-         IS=0		
+         IS=0
          DO J=1,NGRBRIC
            IF (IGBR == IGRBRIC(J)%ID) IS=J
          ENDDO

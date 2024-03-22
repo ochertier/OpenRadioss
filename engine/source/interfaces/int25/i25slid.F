@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,7 +25,7 @@ Chd|  I25PREP_ADD                   source/interfaces/int25/i25slid.F
 Chd|-- called by -----------
 Chd|        I25MAIN_SLID                  source/interfaces/int25/i25main_slid.F
 Chd|-- calls ---------------
-Chd|        TRI7BOX                       share/modules/tri7box.F
+Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
       SUBROUTINE I25PREP_ADD(
      1                  NIN    ,NI25   ,NSN      ,NSNR   ,ITAB   ,
@@ -43,17 +43,8 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "assert.inc"
-#include      "mvsiz_p.inc"
 #include      "com01_c.inc"
-#include      "sms_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "task_c.inc"
-#include      "impl1_c.inc"
 #include      "comlock.inc"
-#include      "scr05_c.inc"
-#include      "com08_c.inc"
-#include      "parit_c.inc"
 #include      "com04_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -153,7 +144,7 @@ Chd|  I25PREP_SLID_1                source/interfaces/int25/i25slid.F
 Chd|-- called by -----------
 Chd|        I25COMP_1                     source/interfaces/int25/i25comp_1.F
 Chd|-- calls ---------------
-Chd|        TRI7BOX                       share/modules/tri7box.F
+Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
       SUBROUTINE I25PREP_SLID_1(
      1                  JLT    ,CAND_N ,CAND_E ,NIN    ,
@@ -172,14 +163,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
-#include      "assert.inc"
-#include      "mvsiz_p.inc"
-#include      "com01_c.inc"
-#include      "sms_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "task_c.inc"
-#include      "impl1_c.inc"
 #include      "comlock.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -190,13 +173,6 @@ C-----------------------------------------------
       my_real
      .     TIME_S(2,*),
      .     PENM(4,*), LBM(4,*), LCM(4,*)
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "scr05_c.inc"
-#include      "com08_c.inc"
-#include      "parit_c.inc"
-#include      "com04_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -404,7 +380,7 @@ Chd|  I25PREP_SLID_2                source/interfaces/int25/i25slid.F
 Chd|-- called by -----------
 Chd|        I25MAIN_SLID                  source/interfaces/int25/i25main_slid.F
 Chd|-- calls ---------------
-Chd|        TRI7BOX                       share/modules/tri7box.F
+Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
       SUBROUTINE I25PREP_SLID_2(
      1                  CAND_N ,CAND_E ,NIN    ,NI25   ,NSN    ,
@@ -423,13 +399,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
-#include      "mvsiz_p.inc"
-#include      "com01_c.inc"
-#include      "sms_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "task_c.inc"
-#include      "impl1_c.inc"
 #include      "comlock.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -442,13 +411,6 @@ C-----------------------------------------------
      .        KREMNOR(*), REMNOR(*)
       my_real
      .        STFM(*)
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "scr05_c.inc"
-#include      "com08_c.inc"
-#include      "parit_c.inc"
-#include      "com04_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -656,7 +618,7 @@ Chd|  I25KEEPF                      source/interfaces/int25/i25slid.F
 Chd|-- called by -----------
 Chd|        I25MAINF                      source/interfaces/int25/i25mainf.F
 Chd|-- calls ---------------
-Chd|        TRI7BOX                       share/modules/tri7box.F
+Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
       SUBROUTINE I25KEEPF(
      1                  I_STOK ,INDEX  ,CAND_N ,CAND_E ,NIN    ,
@@ -674,13 +636,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
-#include      "mvsiz_p.inc"
-#include      "com01_c.inc"
-#include      "sms_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
 #include      "task_c.inc"
-#include      "impl1_c.inc"
 #include      "comlock.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -690,13 +646,6 @@ C-----------------------------------------------
       INTEGER MSEGLO(*), IRTLM(4,NSN)
       my_real
      .     PENM(4,*), PENE_OLD(5,*), SECND_FR(6,*), TIME_S(2,*), STIF_OLD(2,*)
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "scr05_c.inc"
-#include      "com08_c.inc"
-#include      "parit_c.inc"
-#include      "com04_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -762,7 +711,7 @@ Chd|        I25MAIN_SLID                  source/interfaces/int25/i25main_slid.F
 Chd|-- calls ---------------
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        TRI7BOX                       share/modules/tri7box.F
+Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
       SUBROUTINE I25PREP_NINDEX(
      1                  NIN    ,NI25   ,NSN    ,NSNR   ,
@@ -781,11 +730,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
-#include      "mvsiz_p.inc"
 #include      "com01_c.inc"
-#include      "sms_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
 #include      "task_c.inc"
 #include      "comlock.inc"
 C-----------------------------------------------
@@ -799,9 +744,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr05_c.inc"
-#include      "com08_c.inc"
-#include      "parit_c.inc"
 #include      "com04_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -850,14 +792,14 @@ Chd|        I25MAIN_SLID                  source/interfaces/int25/i25main_slid.F
 Chd|-- calls ---------------
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        TRI7BOX                       share/modules/tri7box.F
+Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
       SUBROUTINE I25PREP_SIZBUFS(
      1                  NIN    ,NI25   ,NSN    ,NSNR   ,ITYP   ,
      2                  IFQ    ,INACTI ,IGAP   ,INTTH  ,ILEV   ,
      3                  ITAB   ,NSV    ,IAD_FRNOR,FR_NOR ,NADD ,
      4                  KADD   ,RSIZ   ,ISIZ   ,SIZBUFS,FR_SLIDE ,
-     5                  INDEX  ,INTFRIC, IVIS2)
+     5                  INDEX  ,INTFRIC, IVIS2 ,ISTIF_MSDT,IFSUB_CAREA)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -871,11 +813,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
-#include      "mvsiz_p.inc"
 #include      "com01_c.inc"
 #include      "sms_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
 #include      "task_c.inc"
 #include      "comlock.inc"
 C-----------------------------------------------
@@ -886,12 +825,10 @@ C-----------------------------------------------
       INTEGER ITAB(*), INDEX(*), FR_SLIDE(4,*)
       INTEGER IAD_FRNOR(NINTER25,NSPMD+1),FR_NOR(*),
      .        NADD(*), KADD(*), IRTLM(4,NSN), NSV(*)
+      INTEGER , INTENT(INOUT) :: ISTIF_MSDT, IFSUB_CAREA
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr05_c.inc"
-#include      "com08_c.inc"
-#include      "parit_c.inc"
 #include      "com04_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -931,6 +868,10 @@ C Friction
       IF(INTFRIC > 0 ) THEN
         ISIZ = ISIZ + 1
       ENDIF
+C---Stiffness based on mass and time step
+      IF(ISTIF_MSDT > 0) RSIZ = RSIZ + 1
+C---CAREA output 
+      IF(IFSUB_CAREA > 0) RSIZ = RSIZ + 1
 C
 C -- IDTMINS==2
       IF(IDTMINS == 2)THEN
@@ -1004,7 +945,7 @@ Chd|        I25MAIN_SLID                  source/interfaces/int25/i25main_slid.F
 Chd|-- calls ---------------
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        TRI7BOX                       share/modules/tri7box.F
+Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
       SUBROUTINE I25PREP_SEND(
      1                  NIN    ,NI25   ,NSN    ,NSNR   ,ITYP    ,
@@ -1014,7 +955,8 @@ Chd|====================================================================
      .                  NODNX_SMS,X      ,V      ,MS     ,TEMP   ,
      .                  INTBUF_TAB,RBUF  ,IBUF   ,
      4                  RSIZ   ,ISIZ   ,SIZBUFS,FR_SLIDE ,INDEX  ,
-     5                  MAIN_PROC ,INTFRIC,IVIS2, ICODT, ISKEW)
+     5                  MAIN_PROC ,INTFRIC,IVIS2, ICODT, ISKEW   ,
+     7                  ISTIF_MSDT,IFSUB_CAREA,INTAREAN) 
 
 C-----------------------------------------------
 C   M o d u l e s
@@ -1029,11 +971,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
-#include      "mvsiz_p.inc"
 #include      "com01_c.inc"
 #include      "sms_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
 #include      "task_c.inc"
 #include      "comlock.inc"
 C-----------------------------------------------
@@ -1051,12 +990,11 @@ C-----------------------------------------------
       TYPE(INTBUF_STRUCT_) :: INTBUF_TAB
       TYPE(real_pointer), DIMENSION(NSPMD,NINTER25) :: RBUF
       TYPE(int_pointer) , DIMENSION(NSPMD,NINTER25) :: IBUF
+      INTEGER , INTENT(IN) :: ISTIF_MSDT, IFSUB_CAREA
+      my_real , INTENT(IN) :: INTAREAN(NUMNOD)
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr05_c.inc"
-#include      "com08_c.inc"
-#include      "parit_c.inc"
 #include      "com04_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -1247,6 +1185,39 @@ C Friction
               END DO
               ISHIFT = ISHIFT + 1
             ENDIF
+
+            IF(ISTIF_MSDT > 0) THEN
+              LR = 0
+#include      "vectorize.inc"
+              DO J = 1, NSEND
+                I = INDEX(IDEB+J)
+                IF(I <= NSN)THEN
+                  RBUF(P,NI25)%p(LR+RSHIFT)= INTBUF_TAB%STIFMSDT_S(I)
+                ELSE
+                  II = I-NSN
+                  RBUF(P,NI25)%p(LR+RSHIFT)= STIF_MSDT_FI(NIN)%P(II)
+                END IF
+                LR = LR + RSIZ
+              END DO 
+                RSHIFT = RSHIFT + 1
+            ENDIF 
+
+            IF(IFSUB_CAREA > 0) THEN
+              LR = 0
+#include      "vectorize.inc"
+              DO J = 1, NSEND
+                I = INDEX(IDEB+J)
+                IF(I <= NSN)THEN
+                  NOD = INTBUF_TAB%NSV(I)
+                  RBUF(P,NI25)%p(LR+RSHIFT)= INTAREAN(NOD)
+                ELSE
+                  II = I-NSN
+                  RBUF(P,NI25)%p(LR+RSHIFT)= INTAREANFI(NIN)%P(II)
+                END IF
+                LR = LR + RSIZ
+              END DO 
+                RSHIFT = RSHIFT + 1
+            ENDIF 
 
 C
 C -- IDTMINS==2

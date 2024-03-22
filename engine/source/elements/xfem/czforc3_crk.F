@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -49,9 +49,8 @@ Chd|        TEMPCG                        source/materials/mat_share/tempcg.F
 Chd|        THERMC                        source/materials/mat_share/thermc.F
 Chd|        CRACKXFEM_MOD                 share/modules/crackxfem_mod.F 
 Chd|        DRAPE_MOD                     share/modules/drape_mod.F     
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
 Chd|        FAILWAVE_MOD                  ../common_source/modules/failwave_mod.F
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/matparam_def_mod.F
+Chd|        MAT_ELEM_MOD                  ../common_source/modules/mat_elem/mat_elem_mod.F
 Chd|        NLOCAL_REG_MOD                ../common_source/modules/nlocal_reg_mod.F
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
 Chd|        STACK_MOD                     share/modules/stack_mod.F     
@@ -72,23 +71,23 @@ Chd|====================================================================
      C            F33    ,F34    ,M11    ,M12    ,M13    ,
      D            M14    ,M21    ,M22    ,M23    ,M24    ,
      E            M31    ,M32    ,M33    ,M34    ,
-     F            KFTS   ,FZERO  ,ISMSTR ,MATPARAM_TAB,
+     F            KFTS   ,FZERO  ,ISMSTR ,MAT_ELEM ,
      I            IGEO   ,IPM    ,IFAILURE,ITASK , JTHE  ,
      J            TEMP   ,FTHE   ,FTHESKY ,IEXPAN,GRESAV ,
      K            GRTH   ,IGRTH  ,MSC    ,DMELC  ,JSMS   ,
      L            TABLE  ,IPARG  ,IXFEM ,INOD_CRK,IEL_CRK,
-     M            IADC_CRK,ELCUTC,CRKSKY,SENSOR_TAB,IXEL    ,
+     M            IADC_CRK,ELCUTC,CRKSKY,SENSORS,IXEL    ,
      N            ISUBSTACK,UXINT_MEAN,UYINT_MEAN,UZINT_MEAN,NLEVXF,
-     K            NODEDGE,CRKEDGE, STACK ,DRAPE_Q4,NLOC_DMG)
+     O            NODEDGE,CRKEDGE, STACK ,DRAPE_SH4N,NLOC_DMG,
+     P            INDX_DRAPE, IGRE  )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE TABLE_MOD
       USE CRACKXFEM_MOD
-      USE ELBUFDEF_MOD
       USE STACK_MOD
       USE FAILWAVE_MOD
-      USE MATPARAM_DEF_MOD  
+      USE MAT_ELEM_MOD  
       USE DRAPE_MOD 
       USE NLOCAL_REG_MOD         
       USE SENSOR_MOD
@@ -105,12 +104,9 @@ C-----------------------------------------------
 C   C O M M O N   B L O C K S
 C-----------------------------------------------
 #include      "com_xfem1.inc"
-#include      "scr01_c.inc"
 #include      "scr14_c.inc"
 #include      "parit_c.inc"
-#include      "scr17_c.inc"
 #include      "timeri_c.inc"
-#include      "warn_c.inc"
 #include      "comlock.inc"
 #include      "com04_c.inc"
 C-----------------------------------------------
@@ -122,7 +118,8 @@ C-----------------------------------------------
       INTEGER IXC(NIXC,*),IADC(4,*),IPARTC(*),NPF(*),IGEO(NPROPGI,*),
      .        IPM(NPROPMI,*),INDXOF(MVSIZ),ITASK,IEXPAN,GRTH(*),IGRTH(*),
      .        IPARG(*),IXFEM,INOD_CRK(*),IEL_CRK(*),IADC_CRK(4,*),
-     .        ELCUTC(2,*),NODEDGE(2,*)
+     .        ELCUTC(2,*),NODEDGE(2,*),INDX_DRAPE(SCDRAPE)
+      INTEGER, INTENT(IN) :: IGRE
 C     REAL OU REAL*8
       my_real
      .   F11(MVSIZ),F12(MVSIZ),F13(MVSIZ),F14(MVSIZ),
@@ -147,11 +144,11 @@ C     REAL OU REAL*8
       TYPE (XFEM_SKY_)    , DIMENSION(*) :: CRKSKY
       TYPE (STACK_PLY) :: STACK
       TYPE (FAILWAVE_STR_) :: FAILWAVE 
-      TYPE (GRP_PARAM_STRUCT_) :: GROUP_PARAM
-      TYPE (DRAPE_) :: DRAPE_Q4
-      TYPE (MATPARAM_STRUCT_) , DIMENSION(NUMMAT) :: MATPARAM_TAB
+      TYPE (GROUP_PARAM_)  :: GROUP_PARAM
+      TYPE (DRAPE_) , DIMENSION(NUMELC_DRAPE) :: DRAPE_SH4N
+      TYPE (MAT_ELEM_)   ,INTENT(INOUT) :: MAT_ELEM
       TYPE (NLOCAL_STR_) :: NLOC_DMG 
-      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE (SENSORS_) ,INTENT(IN) :: SENSORS
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7--
 C   L O C A L   V A R I A B L E S
 C--------------------------------
@@ -159,7 +156,8 @@ C--------------------------------
       INTEGER 
      .   I,J,NEL,MX,NNOD,NPG,IBID,ISROT,IXLAY,NXLAY,NLAYER,NPTT,
      .   IR,IS,IT,IPT,NG,L_DIRA,L_DIRB,J1,J2,IXFEM2,IPTHK,
-     .   IORTH,ILEV,IGMAT,IGTYP,IREP,NUPARAM,IADBUF,IMAT
+     .   IORTH,ILEV,IGMAT,IGTYP,IREP,NUPARAM,IADBUF,IMAT,
+     .   ACTIFXFEM, SEDRAPE,NUMEL_DRAPE
       INTEGER  MAT(MVSIZ),PID(MVSIZ),NGL(MVSIZ),FWAVE(MVSIZ)
       PARAMETER (NNOD = 4)
       my_real 
@@ -233,6 +231,8 @@ C=======================================================================
       IR   = 1
       IS   = 1
       IT   = 1
+      SEDRAPE = SCDRAPE
+      NUMEL_DRAPE = NUMELC_DRAPE
       ALLOCATE(VARNL(NEL,1))
       VARNL = ZERO
 C -----will put it in starter     
@@ -252,6 +252,7 @@ C
       IGTYP = IGEO(11,PID(1))
       IGMAT = IGEO(98,PID(1))
       IREP  = IPARG(35)
+      ACTIFXFEM = IPARG(70)
       IMAT  = IXC(1,JFT)
       IADBUF = MAX(1,IPM(7,IMAT))
       NUPARAM= IPM(9,IMAT)       
@@ -366,7 +367,7 @@ C       ! calcul coords + vit des elements fantoms au lieu de std
      A                   VRZ1 ,VRZ2 ,VRZ3 ,VRZ4   ,ILEV    ,
      B                   OFFG )
 C
-        CALL CZCORC1(XFEM_STR,
+        CALL CZCORC1(NUMNOD ,NUMELC ,XFEM_STR,
      1               JFT    ,JLT    ,X       ,V       ,VR     ,
      2               IXC    ,PM     ,PLAT    ,AREA    ,
      3               A_I    ,VL13   ,VL24    ,VLHI    ,RLXYZ  ,
@@ -406,7 +407,8 @@ C
      1                 PID    ,MTN    ,NPTT     ,HM      ,HF     ,  
      2                 HC     ,HMFOR  ,IORTH    ,DIR_A   ,IGEO   ,  
      3                 ISUBSTACK,STACK,XFEM_STR ,NXLAY   ,THKG   ,
-     4                 DRAPE_Q4 ,NFT  ,NEL      )           
+     4                 DRAPE_SH4N ,NFT  ,NEL    ,INDX_DRAPE , THKE,
+     5                 SEDRAPE,NUMEL_DRAPE )           
 C----------------------------------
 C     CALCUL VITESSE DE DEFORMATION 
 C----------------------------------
@@ -452,7 +454,7 @@ C-----------------------------
      4       SSP       ,RHO       ,VISCMX    ,DT1C      ,SIGY    ,
      5       AREA      ,EXX       ,EYY       ,EXY       ,EXZ     ,
      6       EYZ       ,KXX       ,KYY       ,KXY       ,NU      ,
-     7       OFF       ,THK0      ,MAT       ,PID       ,MATPARAM_TAB,
+     7       OFF       ,THK0      ,MAT       ,PID       ,MAT_ELEM,
      8       FORG      ,MOMG      ,STRAG     ,FAILWAVE  ,FWAVE   ,
      9       THKG      ,EINTG     ,IOFC      ,
      A       G         ,A11       ,A12       ,VOL0      ,INDXOF  ,
@@ -466,27 +468,32 @@ C-----------------------------
      I       BID       ,BID       ,BID       ,R11       ,R12     ,
      J       R13       ,R21       ,R22       ,R23       ,R31     ,
      K       R32       ,R33       ,IBID      ,TABLE     ,IXFEM   ,
-     L       BID       ,SENSOR_TAB,BID       ,ELCRKINI,
+     L       BID       ,SENSORS   ,BID       ,ELCRKINI,
      M       DIR1_CRK  ,DIR2_CRK  ,LL        ,
      N       ISMSTR    ,IR        ,IS        ,NLAYER    ,NPTT    ,
      O       IXLAY     ,IXEL      ,ISUBSTACK ,STACK     ,
-     R       BID       ,ITASK     ,DRAPE_Q4  ,VARNL     ,NLOC_DMG)
+     P       BID       ,ITASK     ,DRAPE_SH4N  ,VARNL     ,NLOC_DMG,
+     R       INDX_DRAPE, THKE    ,SEDRAPE     ,NUMEL_DRAPE)
 C-----------------------------
         IF ((ITASK==0).AND.(IMON_MAT==1)) CALL STOPTIME(35,1)
 C--------------------------
 C     BILANS PAR MATERIAU
 C--------------------------
         IF (IPRI == 1)
-     1    CALL CBILAN(JFT     ,JLT      ,PM     ,V    ,IXC ,
-     2                THKG    ,EINTG    ,PARTSAV,AREA ,MAT ,
-     3                IPARTC  ,BID      ,BID    ,BID  ,BID ,
-     4                BID     ,BID      ,IBID   ,OFF  ,
-     5                NFT     ,GRESAV   ,GRTH   ,IGRTH,
-     6                VL1     ,VL2      ,VL3    ,VL4  ,VRL1,
-     7                VRL2    ,VRL3     ,VRL4   ,X1G  ,X2G ,
-     8                X3G     ,X4G      ,Y1G    ,Y2G  ,Y3G ,
-     9                Y4G     ,Z1G      ,Z2G    ,Z3G  ,Z4G ,
-     A                IXFEM2  ,IEXPAN   ,EINTTH ,ITASK,GBUF%VOL)
+     1    CALL CBILAN(
+     1   JFT,      JLT,      PM,       V,
+     2   IXC,      THKG,     EINTG,    PARTSAV,
+     3   AREA,     MAT,      IPARTC,   BID,
+     4   BID,      BID,      BID,      BID,
+     5   BID,      IBID,     OFF,      NFT,
+     6   GRESAV,   GRTH,     IGRTH,    VL1,
+     7   VL2,      VL3,      VL4,      VRL1,
+     8   VRL2,     VRL3,     VRL4,     X1G,
+     9   X2G,      X3G,      X4G,      Y1G,
+     A   Y2G,      Y3G,      Y4G,      Z1G,
+     B   Z2G,      Z3G,      Z4G,      IXFEM2,
+     C   IEXPAN,   EINTTH,   ITASK,    GBUF%VOL,
+     D   ACTIFXFEM,IGRE)
 C
         CALL CNDT3(
      1             JFT    ,JLT    ,OFF    , DT2T   ,AMU   ,

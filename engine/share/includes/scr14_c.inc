@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>    
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -31,9 +31,9 @@ c----------------------------------------------------------
      .              NST_ANI,ANIM_ST(MX_ANI),NSE_ANI,ANIM_SE(MX_ANI),
      .              NFT_ANI,ANIM_FT(MX_ANI),NFE_ANI,ANIM_FE(MX_ANI),
      .              ANIM_M,ANIM_K,ANIM_U,ANIM_MAT,IEPSDOT,FMT_ANI,
-     .              ANIM_VERS,IZIP,IANISENS,IFVANI,IFAILA,IAD_GPS,
-     .              IZIPSTRS,ANIM_PLY,NLSENS,LANISENS(MX_ANI),ANIM_CRK,
-     .              TITLETAB,NTITLETAB,NLTITLE,IANISENS_OLD,LANISENS_OLD(MX_ANI),
+     .              ANIM_VERS,IZIP,IFVANI,IFAILA,IAD_GPS,
+     .              IZIPSTRS,ANIM_PLY,ANIM_CRK,
+     .              TITLETAB,NTITLETAB,NLTITLE,
      .              ISTRESALL,ISTRAIALL,IEPSDOALL,IEPSPALL,IEPSPNLALL,IORTHDALL,
      .              IEPSPFULL,ISTRESFULL,IPLYALL,ISTRESALL_PLY,ISTRESALL_PLY_IPT,
      .              IPHIALL_PLY,IEPSPALL_PLY,ISTRAINALL_PLY,IDAMAFULL,ISTRAINFULL,
@@ -44,9 +44,9 @@ c----------------------------------------------------------
      .        NCT_ANI,ANIM_CT,NCE_ANI,ANIM_CE,
      .        NFT_ANI,ANIM_FT,NFE_ANI,ANIM_FE,
      .        NN_ANI,ANIM_N,ANIM_M,ANIM_K,ANIM_U,ANIM_MAT,
-     .        IEPSDOT,FMT_ANI,ANIM_VERS,IZIP,IANISENS,IFVANI,IFAILA,
-     .        IAD_GPS,IZIPSTRS,ANIM_PLY,NLSENS,LANISENS,ANIM_CRK,
-     .        NTITLETAB(MX_ANI),NLTITLE,IANISENS_OLD,LANISENS_OLD,
+     .        IEPSDOT,FMT_ANI,ANIM_VERS,IZIP,IFVANI,IFAILA,
+     .        IAD_GPS,IZIPSTRS,ANIM_PLY,ANIM_CRK,
+     .        NTITLETAB(MX_ANI),NLTITLE,
      .        ISTRESALL,ISTRAIALL,IEPSDOALL,IEPSPALL,IEPSPNLALL,IORTHDALL,
      .        IEPSPFULL,ISTRESFULL,IPLYALL,ISTRESALL_PLY,ISTRESALL_PLY_IPT,
      .        IPHIALL_PLY,IEPSPALL_PLY,ISTRAINALL_PLY,IDAMAFULL,ISTRAINFULL,

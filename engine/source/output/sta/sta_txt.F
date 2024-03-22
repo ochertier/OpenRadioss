@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -24,7 +24,7 @@ Chd|====================================================================
 Chd|  STRS_TXT                      source/output/sta/sta_txt.F   
 Chd|-- called by -----------
 Chd|-- calls ---------------
-Chd|        WRITE_C_C                     source/output/tools/sortie_c.c
+Chd|        WRITE_C_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|====================================================================
       SUBROUTINE STRS_TXT(TEXT,LEN)
 C-----------------------------------------------
@@ -53,6 +53,12 @@ C
 Chd|====================================================================
 Chd|  STRS_TXT50                    source/output/sta/sta_txt.F   
 Chd|-- called by -----------
+Chd|        DYNAIN_C_STRAG                source/output/dynain/dynain_c_strag.F
+Chd|        DYNAIN_C_STRSG                source/output/dynain/dynain_c_strsg.F
+Chd|        DYNAIN_NODE                   source/output/dynain/dynain_node.F
+Chd|        DYNAIN_SHEL_MP                source/output/dynain/dynain_shel_mp.F
+Chd|        DYNAIN_SHEL_SPMD              source/output/dynain/dynain_shel_spmd.F
+Chd|        GENDYNAIN                     source/output/dynain/gendynain.F
 Chd|        GENSTAT                       source/output/sta/genstat.F   
 Chd|        STAT_C_AUXF                   source/output/sta/stat_c_auxf.F
 Chd|        STAT_C_EPSPF                  source/output/sta/stat_c_epspf.F
@@ -76,7 +82,7 @@ Chd|        STAT_S_STRAF                  source/output/sta/stat_s_straf.F
 Chd|        STAT_S_STRSF                  source/output/sta/stat_s_strsf.F
 Chd|        TAB_STRS_TXT50                source/output/sta/sta_txt.F   
 Chd|-- calls ---------------
-Chd|        WRITE_C_C_TXT                 source/output/tools/sortie_c.c
+Chd|        WRITE_C_C_TXT                 ../common_source/tools/input_output/write_routtines.c
 Chd|====================================================================
       SUBROUTINE STRS_TXT50(TEXT,LENGTH)
 C-----------------------------------------------
@@ -91,13 +97,10 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER CTEXT(LENGTH+1),I
-C
-      DO I=1,LENGTH
-        CTEXT(I)=ICHAR(TEXT(I:I))
-        CALL WRITE_C_C_TXT(CTEXT(I),I,LENGTH)
-      ENDDO
-        CTEXT(LENGTH+1)=0
+      INTEGER TEXT_LEN
+      TEXT_LEN=LEN_TRIM(TEXT)
+
+      CALL WRITE_C_C_TXT(TEXT,TEXT_LEN)
 C
       RETURN
       END

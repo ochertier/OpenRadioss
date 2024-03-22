@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -28,7 +28,8 @@ Chd|-- calls ---------------
 Chd|        ALEWDX_GRID_BCS               source/ale/grid/alewdx_grid_bcs.F
 Chd|        MY_BARRIER                    source/system/machine.F       
 Chd|        SPMD_XVOIS                    source/mpi/fluid/spmd_cfd.F   
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
+Chd|        ALE_MOD                       ../common_source/modules/ale/ale_mod.F
 Chd|====================================================================
       SUBROUTINE ALEW5( 
      1     X         ,D       ,V       ,W       ,WA      ,
@@ -39,6 +40,7 @@ C-----------------------------------------------
 C     M o d u l e s
 C-----------------------------------------------
       USE ALE_CONNECTIVITY_MOD
+      USE ALE_MOD
 C-----------------------------------------------
 C     D e s c r i p t i o n
 C-----------------------------------------------
@@ -63,13 +65,10 @@ C-----------------------------------------------
 C-----------------------------------------------
 C     C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr05_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com07_c.inc"
 #include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "timeri_c.inc"    
 #include      "tabsiz_c.inc"  
 C-----------------------------------------------
 C     D u m m y   A r g u m e n t s
@@ -94,9 +93,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------
-      LAMBDA=ALPHA
-      NITER=NINT(VGX)
-      IFORM=NINT(GAMMA)
+      LAMBDA=ALE%GRID%ALPHA
+      NITER=NINT(ALE%GRID%VGX)
+      IFORM=NINT(ALE%GRID%GAMMA)
       
       WA(1:3,NODFT:NODLT)=X(1:3,NODFT:NODLT)      
       CALL MY_BARRIER

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -34,8 +34,8 @@ Chd|        SENSOR_MOD                    share/modules/sensor_mod.F
 Chd|====================================================================
       SUBROUTINE GRAVIT_IMP(IGRV  ,AGRV  ,NPC   ,TF    ,A ,
      2                  V     ,X     ,SKEW  ,MS,TFEXTT,
-     3                      SENSOR_TAB,WEIGHT,IB,ITASK,
-     4                      NRBYAC,IRBYAC,NPBY  ,RBY   )
+     3                  NSENSOR,SENSOR_TAB,WEIGHT,IB,ITASK,
+     4                  NRBYAC,IRBYAC,NPBY  ,RBY   )
 C-----------------------------------------------  
 C   M o d u l e s
 C-----------------------------------------------  
@@ -54,10 +54,10 @@ C-----------------------------------------------
 #include      "scr05_c.inc"
 #include      "task_c.inc"
 #include      "param_c.inc"
-#include      "impl1_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER ,INTENT(IN) :: NSENSOR
       INTEGER NPC(*)
       INTEGER IGRV(NIGRV,*),IB(*)
       INTEGER WEIGHT(*),ITASK,NRBYAC,IRBYAC(*),NPBY(NNPBY,*)
@@ -65,7 +65,7 @@ C     REAL
       my_real
      .   AGRV(LFACGRV,*), TF(*), A(3,*), V(3,*), MS(*),
      .   X(3,*), SKEW(LSKEW,*), TFEXTT, RBY(NRBY,*)
-      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) ,INTENT(IN) :: SENSOR_TAB
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

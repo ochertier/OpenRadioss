@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -41,12 +41,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "task_c.inc"
-#include      "parit_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -77,7 +73,7 @@ C
       DO NHI=NHRBE2,0,-1
        DO N=1,NRBE2
         IF (IRBE2(9,N)/=NHI) CYCLE
-	IAD = IRBE2(1,N)
+          IAD = IRBE2(1,N)
         NSN = IRBE2(5,N)
         M   = IRBE2(3,N)
         DO I=1,NSN
@@ -124,12 +120,12 @@ C
        END DO
        DO N=1,NRBE2
         IF (IRBE2(9,N)/=NHI) CYCLE
-	IAD = IRBE2(1,N)
+          IAD = IRBE2(1,N)
         NSN = IRBE2(5,N)
         M   = IRBE2(3,N)
         ISK = IRBE2(7,N)
-	MID = IABS(IRBE2(6,N))
-	IRAD = IRBE2(11,N)
+          MID = IABS(IRBE2(6,N))
+          IRAD = IRBE2(11,N)
         CALL SMS_RBE_5(NSN   ,LRBE2(IAD+1),DIAG_RBE2,MS    ,WEIGHT,
      1                 JT    ,FRBE2M6(1,1,MID),M      ,IRAD  ,ISK   ,
      2                 SKEW  )
@@ -219,12 +215,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "task_c.inc"
-#include      "parit_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -242,12 +233,12 @@ C
       DO NHI=0,NHRBE2
        DO N=1,NRBE2
         IF (IRBE2(9,N)/=NHI) CYCLE
-	IAD = IRBE2(1,N)
+          IAD = IRBE2(1,N)
         NSN = IRBE2(5,N)
         M   = IRBE2(3,N)
         ISK = IRBE2(7,N)
-	MID = IABS(IRBE2(6,N))
-	IRAD = IRBE2(11,N)
+          MID = IABS(IRBE2(6,N))
+          IRAD = IRBE2(11,N)
         IF(JT(1,N)+JT(2,N)+JT(3,N)/=0.AND.NODXI_SMS(M)==0)THEN
           DO I=1,NSN
            NS = LRBE2(IAD+I)
@@ -289,12 +280,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "task_c.inc"
-#include      "parit_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -327,12 +314,12 @@ C
        END DO
        DO N=1,NRBE2
         IF (IRBE2(9,N)/=NHI) CYCLE
-	IAD = IRBE2(1,N)
+          IAD = IRBE2(1,N)
         NSN = IRBE2(5,N)
         M   = IRBE2(3,N)
         ISK = IRBE2(7,N)
-	MID = IABS(IRBE2(6,N))
-	IRAD = IRBE2(11,N)
+          MID = IABS(IRBE2(6,N))
+          IRAD = IRBE2(11,N)
         CALL SMS_RBE_1(NSN   ,LRBE2(IAD+1),X       ,A     ,AR       ,
      1                 MS    ,IN    ,WEIGHT,JT(1,N),FRBE2M6(1,1,MID),
      2                 M     ,IRAD  ,ISK   ,SKEW   )
@@ -386,12 +373,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "task_c.inc"
-#include      "parit_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -442,12 +424,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "task_c.inc"
-#include      "parit_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -499,12 +476,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "task_c.inc"
-#include      "parit_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -538,12 +511,12 @@ C
        END DO
        DO N=1,NRBE2
         IF (IRBE2(9,N)/=NHI) CYCLE
-	IAD = IRBE2(1,N)
+          IAD = IRBE2(1,N)
         NSN = IRBE2(5,N)
         M   = IRBE2(3,N)
         ISK = IRBE2(7,N)
-	MID = IABS(IRBE2(6,N))
-	IRAD = IRBE2(11,N)
+          MID = IABS(IRBE2(6,N))
+          IRAD = IRBE2(11,N)
         CALL SMS_RBE_5(NSN   ,LRBE2(IAD+1),DIAG_SMS3,MS    ,WEIGHT,
      1                 JT    ,FRBE2M6(1,1,MID),M      ,IRAD  ,ISK   ,
      2                 SKEW  )
@@ -596,11 +569,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr05_c.inc"
-#include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -684,11 +653,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr05_c.inc"
-#include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -754,11 +719,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr05_c.inc"
-#include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -832,11 +793,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr05_c.inc"
-#include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -909,11 +866,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr05_c.inc"
-#include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -996,29 +949,20 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IRBE2(NRBE2L,*),ISIZE, WEIGHT(*),NMRBE2,IH
-C     REAL
-      my_real
-     .   A(ISIZE,*)
-      DOUBLE PRECISION
-     .   F6(ISIZE,6,*)
+      my_real A(ISIZE,*)
+      DOUBLE PRECISION F6(ISIZE,6,*)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, J, K, N, NS ,NML, IAD,JJ,M,MID,IROT,IRAD
-C     REAL
 C======================================================================|
 #include    "vectorize.inc"
       DO N=1,NRBE2
@@ -1029,7 +973,7 @@ C======================================================================|
         IF (MID<0) CYCLE
         DO K=1,6
          DO J=1,ISIZE
-	  A(J,M) = A(J,M)+ F6(J,K,MID)
+            A(J,M) = A(J,M)+ F6(J,K,MID)
          ENDDO
         ENDDO
       ENDDO

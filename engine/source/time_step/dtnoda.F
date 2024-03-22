@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,6 +27,7 @@ Chd|        RESOL                         source/engine/resol.F
 Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
 Chd|        ARRET                         source/system/arret.F         
+Chd|        ALE_MOD                       ../common_source/modules/ale/ale_mod.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
@@ -43,6 +44,7 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE H3D_MOD
       USE GROUPDEF_MOD
+      USE ALE_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -51,24 +53,18 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "rad2r_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "task_c.inc"
 #include      "scr02_c.inc"
-#include      "scr05_c.inc"
 #include      "scr07_c.inc"
 #include      "scr14_c.inc"
 #include      "scr16_c.inc"
-#include      "scr17_c.inc"
 #include      "scr18_c.inc"
 #include      "units_c.inc"
 #include      "com08_c.inc"
-#include      "couple_c.inc"
 #include      "parit_c.inc"
 #include      "impl1_c.inc"
-#include      "vect01_c.inc"
-#include      "alesolver.inc"
 C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -125,22 +121,13 @@ C----------------------------------------------------------
       ENDIF
       
       !ALE or EULER grid points are not concerned about /DT/NODA & /DT/NODA/CST options
-      IF(IALE+IEULER/=0 .AND. I_DT_NODA_ALE_ON==0 .AND. NODADT/=0)THEN
+      IF(IALE+IEULER/=0 .AND. ALE%GLOBAL%I_DT_NODA_ALE_ON==0 .AND. NODADT/=0)THEN
         !NOD_LAG_COUNT = 0
         DO N=NODFT,NODLT
           IF(IABS(NALE(N))==1 .OR. IABS(NALE(N))==2)THEN
             TAG(N) = 0     
-         ! ELSE
-         !   NOD_LAG_COUNT = NOD_LAG_COUNT + 1
           ENDIF                                                        
         ENDDO        
-        !IF(NOD_LAG_COUNT == 0)THEN
-        !  NODADT = 0
-        !  IDTMIN(1) = 0
-        !  IDTMIN(2) = 0
-        !  IDTMIN(3) = 0
-        !  IDTMIN(7) = 0
-        !ENDIF 
       ENDIF      
                                                       
 C----------------------------------------------------------
@@ -179,7 +166,6 @@ C true dependency
          ENDDO
          KMAX = K
 C vectorize sqrt
-#include      "simd.inc"
          DO K=1,KMAX
            N = INDTN(K)
            DTN(K) = DTFAC1(11)*TWO * MCP(N) / CONDN(N)
@@ -238,7 +224,7 @@ C----------------------------------------------------------
          K = 0
          DTNOD = EP20
 C true dependency
-         IF(IALE+IEULER == 0 .OR. I_DT_NODA_ALE_ON==1)THEN
+         IF(IALE+IEULER == 0 .OR.  ALE%GLOBAL%I_DT_NODA_ALE_ON==1)THEN
            DO N=I,MIN(NODLT,I+1023)
              IF(STIFN(N)<=ZERO)THEN                             
                 ISTOP = -ITAB(N)                                  
@@ -263,7 +249,6 @@ C true dependency
          KMAX = K
 
 C vectorize sqrt
-#include      "simd.inc"
          DO K=1,KMAX
            N      = INDTN(K)
            DTN(K) = DTFAC1(11)*SQRT(TWO * MS(N) / STIFN(N))
@@ -384,7 +369,6 @@ C              DTNOD = MIN(DTNOD,DTN(K))
           ENDDO
          KMAX = K
 C vectorize sqrt
-#include      "simd.inc"
          DO K=1,KMAX
             N = INDTN(K)
             DTN(K) = DTFAC1(11)*SQRT(TWO * MASS / STI)
@@ -479,7 +463,6 @@ C true dependency
            ENDDO
            KMAX = K
 C vectorize sqrt
-#include      "simd.inc"
            DO K=1,KMAX
               N = INDTN(K)
               DTN(K) = DTFAC1(11)*SQRT(TWO * IN(N) / STIFR(N))
@@ -593,7 +576,6 @@ C true dependency
            ENDDO
            KMAX = K
 C vectorize sqrt
-#include      "simd.inc"
            DO K=1,KMAX
               N = INDTN(K)
               DTN(K) = DTFAC1(11)*SQRT(TWO * IN(N) / STIFR(N))
@@ -693,7 +675,6 @@ C true dependency
          ENDDO
          KMAX = K
 C vectorize sqrt
-#include      "simd.inc"
          DO K=1,KMAX
            N = INDTN(K)
            DTN(K) = DTFAC1(11)*SQRT(TWO * MS(N) / STIFN(N))
@@ -813,19 +794,19 @@ C--------------------------------
           WRITE(ISTDO,*)
      .     ' **ERROR : NEGATIVE STIFFNESS NODE',-ISTOP
              IF ( ISTAMPING == 1) THEN
-	       WRITE(ISTDO,'(A)')'The run encountered a problem in an in
+                 WRITE(ISTDO,'(A)')'The run encountered a problem in an in
      .terface Type 7.'
                WRITE(ISTDO,'(A)')'You may need to check if there is enou 
      .gh clearance between the tools,'
                WRITE(ISTDO,'(A)')'and that they do not penetrate each ot
      .her during their travel'
-	       WRITE(IOUT, '(A)')'The run encountered a problem in an in
+                 WRITE(IOUT, '(A)')'The run encountered a problem in an in
      .terface Type 7.'
                WRITE(IOUT, '(A)')'You may need to check if there is enou
      .gh clearance between the tools,'
                WRITE(IOUT, '(A)')'and that they do not penetrate each ot
      .her during their travel'
-	     ENDIF
+               ENDIF
 #include "lockoff.inc"
         ENDIF
        ELSEIF (INCONV==1)THEN
@@ -845,19 +826,19 @@ C--------------------------------
           WRITE(ISTDO,*)
      .     ' **ERROR : NEGATIVE STIFFNESS NODE',-ISTOP
              IF ( ISTAMPING == 1) THEN
-	       WRITE(ISTDO,'(A)')'The run encountered a problem in an in
+                 WRITE(ISTDO,'(A)')'The run encountered a problem in an in
      .terface Type 7.'
                WRITE(ISTDO,'(A)')'You may need to check if there is enou 
      .gh clearance between the tools,'
                WRITE(ISTDO,'(A)')'and that they do not penetrate each ot
      .her during their travel'
-	       WRITE(IOUT, '(A)')'The run encountered a problem in an in
+                 WRITE(IOUT, '(A)')'The run encountered a problem in an in
      .terface Type 7.'
                WRITE(IOUT, '(A)')'You may need to check if there is enou
      .gh clearance between the tools,'
                WRITE(IOUT, '(A)')'and that they do not penetrate each ot
      .her during their travel'
-	     ENDIF
+               ENDIF
 #include "lockoff.inc"
         ENDIF
        ENDIF

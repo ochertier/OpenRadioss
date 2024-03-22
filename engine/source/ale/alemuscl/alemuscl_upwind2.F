@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -23,13 +23,13 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 Chd|====================================================================
 Chd|  ALEMUSCL_UPWIND2              source/ale/alemuscl/alemuscl_upwind2.F
 Chd|-- called by -----------
-Chd|        AFLUXT                        source/ale/ale51/afluxt.F
+Chd|        AFLUXT                        source/ale/ale51/afluxt.F     
 Chd|-- calls ---------------
-Chd|        ALEMUSCL_MOD                  ../common_source/modules/alemuscl_mod.F
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
-Chd|        I22BUFBRIC_MOD                ../common_source/modules/cut-cell-search_mod.F
-Chd|        I22TRI_MOD                    ../common_source/modules/cut-cell-search_mod.F
-Chd|        SEGVAR_MOD                    share/modules/segvar_mod.F
+Chd|        ALEMUSCL_MOD                  ../common_source/modules/ale/alemuscl_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
+Chd|        I22BUFBRIC_MOD                ../common_source/modules/interfaces/cut-cell-search_mod.F
+Chd|        I22TRI_MOD                    ../common_source/modules/interfaces/cut-cell-search_mod.F
+Chd|        SEGVAR_MOD                    share/modules/segvar_mod.F    
 Chd|====================================================================
       SUBROUTINE ALEMUSCL_UPWIND2(FLUX, ALE_CONNECT, ALPH, X, IXQ, FLUX_VOIS,
      .     N4_VOIS, ITAB, NV46, ITRIMAT, SEGVAR)
@@ -44,7 +44,7 @@ C     3 - upwind this value on the edge and store it in the flux
 C-----------------------------------------------
       USE I22BUFBRIC_MOD
       USE I22TRI_MOD
-      USE ALEMUSCL_MOD
+      USE ALEMUSCL_MOD , only:ALEMUSCL_Buffer
       USE SEGVAR_MOD
       USE ALE_CONNECTIVITY_MOD
 C-----------------------------------------------
@@ -52,20 +52,11 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l  P a r a m e t e r s
-C-----------------------------------------------
-#include "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include "spmd_c.inc"
 #include "vect01_c.inc"
-#include "com01_c.inc"
 #include "com04_c.inc"
-#include "com07_c.inc"
-#include "com08_c.inc"
-#include "param_c.inc"
-#include "alemuscl.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -106,7 +97,8 @@ C-----------------------------------------------
         II = I + NFT
         IAD2 = ALE_CONNECT%ee_connect%iad_connect(II)
         !!! Element centroid
-        YK = ELCENTER(II,2) ; ZK = ELCENTER(II,3)
+        YK = ALEMUSCL_Buffer%ELCENTER(II,2) ; 
+        ZK = ALEMUSCL_Buffer%ELCENTER(II,3)
         !!! Neighbors
         DO KK = 1, NV46
           !!! Only for outgoing fluxes
@@ -134,9 +126,9 @@ C-----------------------------------------------
             ZF = HALF * (X(3, NODEID1) + X(3, NODEID2))
 
             !!! Reconstruct second order value for ALPHA(II) on the face
-            ALPHAK = VOLUME_FRACTION(II,ITRIMAT)
-     .           + GRAD(II,2,ITRIMAT) * (YF - YK)
-     .           + GRAD(II,3,ITRIMAT) * (ZF - ZK)
+            ALPHAK = ALEMUSCL_Buffer%VOLUME_FRACTION(II,ITRIMAT)
+     .           + ALEMUSCL_Buffer%GRAD(II,2,ITRIMAT) * (YF - YK)
+     .           + ALEMUSCL_Buffer%GRAD(II,3,ITRIMAT) * (ZF - ZK)
 
             !!! Partial volume flux is then computed as:
             FLUX(KK, II) = ALPHAK * FLUX(KK, II)

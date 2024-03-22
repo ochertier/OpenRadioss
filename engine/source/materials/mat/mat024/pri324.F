@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -203,7 +203,7 @@ C
            V(3,1) = ZERO
            V(1,2) = ZERO
            V(2,2) = ONE
-           V(3,2) = ZERO	   
+           V(3,2) = ZERO     
          ENDIF
       ENDIF
 C

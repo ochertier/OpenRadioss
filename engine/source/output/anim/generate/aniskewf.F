@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -28,7 +28,7 @@ Chd|-- calls ---------------
 Chd|        RAD_SPMD_RECV                 source/mpi/generic/rad_spmd_recv.F
 Chd|        RAD_SPMD_SEND                 source/mpi/generic/rad_spmd_send.F
 Chd|        SPMD_IGATH                    source/mpi/anim/spmd_igath.F  
-Chd|        WRITE_I_C                     source/output/tools/sortie_c.c
+Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|====================================================================
       SUBROUTINE ANISKEWF(GEO,SKEW,IPARG,IXR,DD_IAD,LRBUF)
 C-----------------------------------------------
@@ -40,11 +40,8 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr05_c.inc"
 #include      "param_c.inc"
-#include      "units_c.inc"
 #include      "task_c.inc"
-#include      "spmd_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -60,15 +57,16 @@ C-----------------------------------------------
      .   NB10,NB11,NB12,NB13,NB14,NEL,LFT,LLT,NG,
      .   ITY,IAD,MLW,NFT,N,II,ISKK,MSGTAG,LEN,IGTYP
       INTEGER SRBUF(LRBUF)
+      INTEGER, PARAMETER :: INTSIZE = 4
 C
 C-----------------------------------------------
 C      SKEW
 C-----------------------------------------------
       ISK=NUMSKW-1
-Cel spmd
+C   spmd
 c      IF (IMACH==3) THEN
         II = 0
-Cel pb sur ISK : incremente par pour ts les elem !
+C   pb sur ISK : incremente par pour ts les elem !
         MSGTAG = 1000
         IF (NSPMD > 1 .AND. ISPMD/=0) THEN
 
@@ -209,12 +207,7 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "scr05_c.inc"
 #include      "param_c.inc"
-#include      "units_c.inc"
-#include      "task_c.inc"
-#include      "spmd_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

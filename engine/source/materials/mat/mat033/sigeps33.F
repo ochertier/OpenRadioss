@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -788,7 +788,6 @@ Chd|  VALPVEC                       source/materials/mat/mat033/sigeps33.F
 Chd|-- called by -----------
 Chd|        EPSF2U                        source/materials/mat/mat033/sigeps33.F
 Chd|        SIGEPS88                      source/materials/mat/mat088/sigeps88.F
-Chd|        SIGEPS90                      source/materials/mat/mat090/sigeps90.F
 Chd|-- calls ---------------
 Chd|        FLOATMIN                      ../common_source/tools/math/precision.c
 Chd|====================================================================
@@ -1066,7 +1065,7 @@ C
           V(3,1,NN) = ZERO
           V(1,2,NN) = ZERO
           V(2,2,NN) = ONE
-          V(3,2,NN) = ZERO	  
+          V(3,2,NN) = ZERO    
         ENDIF
       ENDDO
 C
@@ -1107,7 +1106,6 @@ Chd|  VALPVECDP                     source/materials/mat/mat033/sigeps33.F
 Chd|-- called by -----------
 Chd|        EPSF2U                        source/materials/mat/mat033/sigeps33.F
 Chd|        SIGEPS88                      source/materials/mat/mat088/sigeps88.F
-Chd|        SIGEPS90                      source/materials/mat/mat090/sigeps90.F
 Chd|-- calls ---------------
 Chd|        FLOATMIN                      ../common_source/tools/math/precision.c
 Chd|====================================================================
@@ -1260,7 +1258,7 @@ C
           V(3,1,NN) = ZERO
           V(1,2,NN) = ZERO
           V(2,2,NN) = ONE
-          V(3,2,NN) = ZERO	  
+          V(3,2,NN) = ZERO    
         ELSEIF(XMAXV(NN)>TOL1(NN)) THEN
           NINDEX1 = NINDEX1 + 1
           INDEX1(NINDEX1) = NN
@@ -1385,7 +1383,7 @@ C
           V(3,1,NN) = ZERO
           V(1,2,NN) = ZERO
           V(2,2,NN) = ONE
-          V(3,2,NN) = ZERO	  
+          V(3,2,NN) = ZERO    
         ENDIF
       ENDDO
 C
@@ -1459,7 +1457,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C O M M O N 
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "scr05_c.inc"
 C----------------------------------------------------------------
 C  I N P U T   A R G U M E N T S
@@ -1598,9 +1595,9 @@ C precision minimum dependant du type REAL ou DOUBLE
         CS(1) = CS(1) + PR
         CS(2) = CS(2) + PR
         CS(3) = CS(3) + PR
-	S4_2 = CS(4)*CS(4)
-	S5_2 = CS(5)*CS(5)
-	S6_2 = CS(6)*CS(6)
+          S4_2 = CS(4)*CS(4)
+          S5_2 = CS(5)*CS(5)
+          S6_2 = CS(6)*CS(6)
         AAA(NN)=S4_2 + S5_2 + S6_2 - CS(1)*CS(2)
      &         - CS(2)*CS(3) - CS(1)*CS(3)
         NORMINF(NN) = MAX(ABS(CS(1)),ABS(CS(2)),ABS(CS(3)),
@@ -1673,9 +1670,9 @@ C
         XMAG(1,NN)=B(1,1,NN)*B(1,1,NN)+B(2,1,NN)*B(2,1,NN)+
      .             B(3,1,NN)*B(3,1,NN)
         XMAG(2,NN)=B(1,2,NN)*B(1,2,NN)+B(2,2,NN)*B(2,2,NN)+
-     .             	B(3,2,NN)*B(3,2,NN)
+     .               B(3,2,NN)*B(3,2,NN)
         XMAG(3,NN)=B(1,3,NN)*B(1,3,NN)+B(2,3,NN)*B(2,3,NN)+
-     .             	B(3,3,NN)*B(3,3,NN)
+     .               B(3,3,NN)*B(3,3,NN)
 
       ENDDO
 C 
@@ -1699,7 +1696,7 @@ C
           V(3,1,NN) = ZERO
           V(1,2,NN) = ZERO
           V(2,2,NN) = ONE
-          V(3,2,NN) = ZERO	  
+          V(3,2,NN) = ZERO    
         ELSEIF(XMAXV(NN)>TOL1(NN)*TOL1(NN)) THEN
           NINDEX1 = NINDEX1 + 1
           INDEX1(NINDEX1) = NN
@@ -1733,9 +1730,9 @@ C
         XMAG(1,NN)=B(1,1,NN)*B(1,1,NN)+B(2,1,NN)*B(2,1,NN)+
      .             B(3,1,NN)*B(3,1,NN)
         XMAG(2,NN)=B(1,2,NN)*B(1,2,NN)+B(2,2,NN)*B(2,2,NN)+
-     .             	B(3,2,NN)*B(3,2,NN)
+     .               B(3,2,NN)*B(3,2,NN)
         XMAG(3,NN)=B(1,3,NN)*B(1,3,NN)+B(2,3,NN)*B(2,3,NN)+
-     .             	B(3,3,NN)*B(3,3,NN)
+     .               B(3,3,NN)*B(3,3,NN)
 C
         XMAXV(NN)=MAX(XMAG(1,NN),XMAG(2,NN),XMAG(3,NN))
       ENDDO
@@ -1762,7 +1759,7 @@ C
           V(1,2,NN)=V(2,3,NN)*V(3,1,NN)-V(2,1,NN)*V(3,3,NN)
           V(2,2,NN)=V(3,3,NN)*V(1,1,NN)-V(3,1,NN)*V(1,3,NN)
           V(3,2,NN)=V(1,3,NN)*V(2,1,NN)-V(1,1,NN)*V(2,3,NN)
-	  C1 = V(1,2,NN)*V(1,2,NN)+V(2,2,NN)*V(2,2,NN)+
+            C1 = V(1,2,NN)*V(1,2,NN)+V(2,2,NN)*V(2,2,NN)+
      &         V(3,2,NN)*V(3,2,NN)
           VMAG=ONE/SQRT(C1)
           V(1,2,NN)=V(1,2,NN)*VMAG
@@ -1821,7 +1818,7 @@ C
           V(1,2,NN)=-A(3,LMAX,NN)*V(2,1,NN)
           V(2,2,NN)= A(3,LMAX,NN)*V(1,1,NN)
           V(3,2,NN)= A(1,LMAX,NN)*V(2,1,NN)-A(2,LMAX,NN)*V(1,1,NN)
-	  C1 = V(1,2,NN)*V(1,2,NN)+V(2,2,NN)*V(2,2,NN)+
+            C1 = V(1,2,NN)*V(1,2,NN)+V(2,2,NN)*V(2,2,NN)+
      &         V(3,2,NN)*V(3,2,NN)
           VMAG=ONE/SQRT(C1)
           V(1,2,NN)=V(1,2,NN)*VMAG
@@ -1833,7 +1830,7 @@ C
           V(3,1,NN) = ZERO
           V(1,2,NN) = ZERO
           V(2,2,NN) = ONE
-          V(3,2,NN) = ZERO	  
+          V(3,2,NN) = ZERO    
         ENDIF
       ENDDO
 C
@@ -1887,6 +1884,8 @@ C str utilise com tableau temporaire au lieu de scalaires temporaires
 Chd|====================================================================
 Chd|  VALPVEC_V                     source/materials/mat/mat033/sigeps33.F
 Chd|-- called by -----------
+Chd|        SIGEPS124                     source/materials/mat/mat124/sigeps124.F
+Chd|        SIGEPS190                     source/materials/mat/mat190/sigeps190.F
 Chd|        SIGEPS33                      source/materials/mat/mat033/sigeps33.F
 Chd|        SIGEPS38                      source/materials/mat/mat038/sigeps38.F
 Chd|        SIGEPS42                      source/materials/mat/mat042/sigeps42.F
@@ -1894,6 +1893,7 @@ Chd|        SIGEPS62                      source/materials/mat/mat062/sigeps62.F
 Chd|        SIGEPS69                      source/materials/mat/mat069/sigeps69.F
 Chd|        SIGEPS71                      source/materials/mat/mat071/sigeps71.F
 Chd|        SIGEPS82                      source/materials/mat/mat082/sigeps82.F
+Chd|        SIGEPS90                      source/materials/mat/mat090/sigeps90.F
 Chd|        SIGEPS92                      source/materials/mat/mat092/sigeps92.F
 Chd|        SIGEPS94                      source/materials/mat/mat094/sigeps94.F
 Chd|-- calls ---------------
@@ -2173,7 +2173,7 @@ C
           V(NN,3,1) = ZERO
           V(NN,1,2) = ZERO
           V(NN,2,2) = ONE
-          V(NN,3,2) = ZERO	  
+          V(NN,3,2) = ZERO    
         ENDIF
       ENDDO
 C
@@ -2211,6 +2211,7 @@ C
 Chd|====================================================================
 Chd|  VALPVECDP_V                   source/materials/mat/mat033/sigeps33.F
 Chd|-- called by -----------
+Chd|        SIGEPS124                     source/materials/mat/mat124/sigeps124.F
 Chd|        SIGEPS33                      source/materials/mat/mat033/sigeps33.F
 Chd|        SIGEPS38                      source/materials/mat/mat038/sigeps38.F
 Chd|        SIGEPS42                      source/materials/mat/mat042/sigeps42.F
@@ -2218,6 +2219,7 @@ Chd|        SIGEPS62                      source/materials/mat/mat062/sigeps62.F
 Chd|        SIGEPS69                      source/materials/mat/mat069/sigeps69.F
 Chd|        SIGEPS71                      source/materials/mat/mat071/sigeps71.F
 Chd|        SIGEPS82                      source/materials/mat/mat082/sigeps82.F
+Chd|        SIGEPS90                      source/materials/mat/mat090/sigeps90.F
 Chd|        SIGEPS92                      source/materials/mat/mat092/sigeps92.F
 Chd|        SIGEPS94                      source/materials/mat/mat094/sigeps94.F
 Chd|-- calls ---------------
@@ -2372,7 +2374,7 @@ C
           V(NN,3,1) = ZERO
           V(NN,1,2) = ZERO
           V(NN,2,2) = ONE
-          V(NN,3,2) = ZERO	  
+          V(NN,3,2) = ZERO    
         ELSEIF(XMAXV(NN)>TOL1(NN)) THEN
           NINDEX1 = NINDEX1 + 1
           INDEX1(NINDEX1) = NN
@@ -2448,6 +2450,7 @@ C
 C . . . . . . . . . . . . .
 C    SOLUTION DOUBLE
 C . . . . . . . . . . . . .
+#include      "vectorize.inc"
       DO N = 1, NINDEX2
         NN = INDEX2(N)
         XMAG(NN,1)=SQRT(A(NN,1,1)**2+A(NN,2,1)**2)
@@ -2497,7 +2500,7 @@ C
           V(NN,3,1) = ZERO
           V(NN,1,2) = ZERO
           V(NN,2,2) = ONE
-          V(NN,3,2) = ZERO	  
+          V(NN,3,2) = ZERO    
         ENDIF
       ENDDO
 C
@@ -2528,6 +2531,7 @@ C
         VEC(NN,9)=VECDP(NN,9)
       ENDDO
 C reecriture pour contourner probleme sur itanium2 comp 9. + latency=16
+#include      "vectorize.inc"
       DO N = 1, NINDEX3
         NN = INDEX3(N)
 C str utilise com tableau temporaire au lieu de scalaires temporaires
@@ -2535,6 +2539,7 @@ C str utilise com tableau temporaire au lieu de scalaires temporaires
         STR(NN,2)=VEC(NN,8)
         STR(NN,3)=VEC(NN,9)
       ENDDO
+#include      "vectorize.inc"
       DO N = 1, NINDEX3
         NN = INDEX3(N)
         VEC(NN,7)=VEC(NN,1)
@@ -2546,15 +2551,11 @@ C str utilise com tableau temporaire au lieu de scalaires temporaires
       ENDDO
       RETURN
       END
-
-
-
-
 Chd|====================================================================
 Chd|  VALPVECOP_V                   source/materials/mat/mat033/sigeps33.F
 Chd|-- called by -----------
-Chd|        PRINC_U                       source/materials/mat/mat001/m1law.F
-Chd|        PRINC_U1                      source/materials/mat/mat001/m1law.F
+Chd|        PRINC_U                       source/materials/mat/mat001/princ_u.F
+Chd|        PRINC_U1                      source/materials/mat/mat001/princ_u1.F
 Chd|-- calls ---------------
 Chd|        FLOATMIN                      ../common_source/tools/math/precision.c
 Chd|====================================================================
@@ -2614,6 +2615,7 @@ C precision minimum dependant du type REAL ou DOUBLE
       CALL FLOATMIN(CS1,CS2,FLMIN)
       FLM = TWO*SQRT(FLMIN)
       NINDEX3=0 
+      INDEX3(1:NEL) =0
       C1 = HALF*SQRT(TWENTY7)      
       C2 = TWO*SQRT(THIRD)      
       DO NN = 1, NEL
@@ -2652,13 +2654,12 @@ c        CC=-SQRT(TWENTY7/MAX(EM20,AA))*BB*HALF/MAX(EM20,AA)
 
         COS_ANGP = COS(ANGP)
         SIN_ANGP = SIN(ANGP)
-        STR1(NN)=DD*COS_ANGP
-        STR2(NN)=DD*((-HALF*COS_ANGP) - (SIN_ANGP*SQRT3DMI))
-        STR3(NN)=DD*((-HALF*COS_ANGP) + (SIN_ANGP*SQRT3DMI))
-
-c       STR1(NN)=DD*COS(ANGP)
-c       STR2(NN)=DD*COS(ANGP+FTPI)
-c       STR3(NN)=DD*COS(ANGP+TTPI)
+c        STR1(NN)=DD*COS_ANGP
+c        STR2(NN)=DD*((-HALF*COS_ANGP) - (SIN_ANGP*SQRT3DMI))
+c        STR3(NN)=DD*((-HALF*COS_ANGP) + (SIN_ANGP*SQRT3DMI))
+        STR3(NN)=DD*COS_ANGP
+        STR1(NN)=DD*((-HALF*COS_ANGP) - (SIN_ANGP*SQRT3DMI))
+        STR2(NN)=-(STR1(NN)+STR3(NN))
 C
         VALDP1(NN) = STR1(NN)-PR
         VALDP2(NN) = STR2(NN)-PR
@@ -2670,9 +2671,9 @@ C renforcement de precision en compression simple----
          STR1(NN)=STR3(NN)
          STR3(NN)=AA
          INDEX3(NN) = 1
-        ELSE
-         INDEX3(NN) = 0
+         NINDEX3 = 1
         ENDIF
+      
 C . . . . . . . . . . .
 C      VECTEURS PROPRES
 C . . . . . . . . . . .
@@ -2906,20 +2907,22 @@ C
         VEC(NN,9)=VECDP9(NN)
       ENDDO
 C reecriture pour contourner probleme sur itanium2 comp 9. + latency=16
-      DO NN = 1, NEL
-        IF(INDEX3(NN) == 1) THEN
-C str utilise com tableau temporaire au lieu de scalaires temporaires
-          S1=VEC(NN,7)
-          S2=VEC(NN,8)
-          S3=VEC(NN,9)
-          VEC(NN,7)=VEC(NN,1)
-          VEC(NN,8)=VEC(NN,2)
-          VEC(NN,9)=VEC(NN,3)
-          VEC(NN,1)=-S1
-          VEC(NN,2)=-S2
-          VEC(NN,3)=-S3
-        ENDIF
-      ENDDO
+      IF (NINDEX3 > 0) THEN
+        DO NN = 1, NEL
+          IF(INDEX3(NN) == 1) THEN
+C strutilise com tableau temporaire au lieu de scalaires temporaires
+            S1=VEC(NN,7)
+            S2=VEC(NN,8)
+            S3=VEC(NN,9)
+            VEC(NN,7)=VEC(NN,1)
+            VEC(NN,8)=VEC(NN,2)
+            VEC(NN,9)=VEC(NN,3)
+            VEC(NN,1)=-S1
+            VEC(NN,2)=-S2
+            VEC(NN,3)=-S3
+          ENDIF
+        ENDDO
+      END IF !(NINDEX3 > 0) THEN
       RETURN
       END
  

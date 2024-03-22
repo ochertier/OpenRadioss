@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -51,15 +51,6 @@ C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "com04_c.inc"
-#include      "param_c.inc"
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER I_MEM, NRTS, NIN, ITAB(*)
@@ -83,7 +74,6 @@ C     REAL
 C-----------------------------------------------
         K_STOK=0
 
-#include "sync_dir.inc"
 c       CALL I11PEN3(J_STOK ,PROV_S,PROV_M,TZINF ,X     ,
 c    .               IRECTS ,IRECTM,PENE  ,NRTS    )
         CALL I11PEN3_VOX(J_STOK ,PROV_S ,PROV_M ,GAPMIN ,DRAD    , 
@@ -152,7 +142,7 @@ c             IFPEN(I_STOK) = 0
         IF (IFORM==2 .AND. I_STOK > I_STOK_FIRST) IFPEN(I_STOK_FIRST+1:I_STOK)=0
 
 C-----------------------------------------------
-#include "lockoff.inc"	
+#include "lockoff.inc"
       RETURN
       END
 
@@ -188,15 +178,6 @@ C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "com04_c.inc"
-#include      "param_c.inc"
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER I_MEM, NRTS, NIN, ITAB(*)
@@ -218,7 +199,6 @@ C     REAL
 C-----------------------------------------------
         K_STOK=0
 
-#include "sync_dir.inc"
         CALL I11PEN3(J_STOK ,PROV_S,PROV_M,TZINF ,X     ,
      .               IRECTS ,IRECTM,PENE  ,NRTS    )
 C-----------------------------------------------
@@ -264,7 +244,7 @@ C-----------------------------------------------
             ENDIF
           ENDIF
         ENDDO
-	
+
         IF(K_STOK==0) THEN
 #include "lockoff.inc"         
           RETURN
@@ -283,7 +263,7 @@ c             IFPEN(I_STOK) = 0
         IF (IFORM==2 .AND. I_STOK > I_STOK_FIRST) IFPEN(I_STOK_FIRST+1:I_STOK)=0
 
 C-----------------------------------------------
-#include "lockoff.inc"	
+#include "lockoff.inc"
       RETURN
       END
 

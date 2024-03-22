@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,7 +27,7 @@ Chd|        FORINT                        source/elements/forint.F
 Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
 Chd|        ARRET                         source/system/arret.F         
-Chd|        IG3DAVERAGE                   source/elements/ige3d/ig3dfint.F
+Chd|        IG3DAVERAGE                   source/elements/ige3d/ig3daverage.F
 Chd|        IG3DCUMU3                     source/elements/ige3d/ig3dcumu3.F
 Chd|        IG3DDERISHAP                  source/elements/ige3d/ig3dderishap.F
 Chd|        IG3DFINT                      source/elements/ige3d/ig3dfint.F
@@ -37,45 +37,49 @@ Chd|        IGE3DBILAN                    source/elements/ige3d/ige3dbilan.F
 Chd|        IGE3DDEFO                     source/elements/ige3d/ige3ddefo.F
 Chd|        IGE3DZERO                     source/elements/ige3d/ige3dzero.F
 Chd|        MMAIN                         source/materials/mat_share/mmain.F
-Chd|        SMALLB3                       source/elements/solid/solide/small3.F
+Chd|        SMALLB3                       source/elements/solid/solide/smallb3.F
 Chd|        SRHO3                         source/elements/solid/solide/srho3.F
 Chd|        SROTA3                        source/elements/solid/solide/srota3.F
 Chd|        SSTRA3                        source/elements/solid/solide/sstra3.F
 Chd|        STARTIME                      source/system/timer.F         
 Chd|        STOPTIME                      source/system/timer.F         
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/matparam_def_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
+Chd|        MAT_ELEM_MOD                  ../common_source/modules/mat_elem/mat_elem_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        MMAIN_MOD                     source/materials/mat_share/mmain.F
 Chd|        NLOCAL_REG_MOD                ../common_source/modules/nlocal_reg_mod.F
 Chd|        TABLE_MOD                     share/modules/table_mod.F     
 Chd|====================================================================
-      SUBROUTINE IG3DUFORC3(ELBUF_TAB,NG     ,
-     1           LFT      ,LLT      ,NFT     ,NEL     ,IXS     ,       
-     2           PM       ,GEO      ,IPM     ,IGEO    ,X       ,       
-     3           A        ,AR       ,V       ,VR      ,W       ,       
-     4           D        ,MS       ,IN      ,TF      ,NPF     ,       
-     5           BUFMAT   ,IPARG    ,IPARTS  ,PARTSAV ,NLOC_DMG,         
-     6           FSKY     ,FR_WAVE  ,IADS    ,EANI    ,STIFN   ,
-     7           STIFR    ,FX       ,FY      ,FZ      ,IFAILURE,
-     8           MTN      ,IGTYP    ,NPT     ,JSMS    ,MSSA    ,
-     9           DMELS    ,KXIG3D   ,IXIG3D  ,KNOT    ,NCTRL   ,
-     A           WIGE     ,FLUX     ,FLU1    ,DT2T    ,NELTST  ,
-     B           ITYPTST  ,OFFSET   ,TABLE   ,IEXPAN  ,ALE_CONNECT   ,
-     C           FV       ,ITASK    ,IOUTPRT ,
-     D           PX       ,PY       ,PZ      ,KNOTLOCPC,KNOTLOCEL,
-     E           GRESAV   ,GRTH     ,IGRTH   ,MATPARAM_TAB,H3D_STRAIN)
+      SUBROUTINE IG3DUFORC3(
+     1   ELBUF_TAB,   NG,          LFT,         LLT,
+     2   NFT,         NEL,         IXS,         PM,
+     3   GEO,         IPM,         IGEO,        X,
+     4   A,           AR,          V,           VR,
+     5   W,           D,           MS,          IN,
+     6   TF,          NPF,         BUFMAT,      IPARG,
+     7   IPARTS,      PARTSAV,     NLOC_DMG,    FSKY,
+     8   FR_WAVE,     IADS,        EANI,        STIFN,
+     9   STIFR,       FX,          FY,          FZ,
+     A   IFAILURE,    MTN,         IGTYP,       NPT,
+     B   JSMS,        MSSA,        DMELS,       KXIG3D,
+     C   IXIG3D,      KNOT,        NCTRL,       WIGE,
+     D   FLUX,        FLU1,        DT2T,        NELTST,
+     E   ITYPTST,     OFFSET,      TABLE,       IEXPAN,
+     F   ALE_CONNECT, FV,          ITASK,       IOUTPRT,
+     G   PX,          PY,          PZ,          KNOTLOCPC,
+     H   KNOTLOCEL,   GRESAV,      GRTH,        IGRTH,
+     I   MAT_ELEM,    H3D_STRAIN,  ISMSTR,      JALE,
+     J   JEUL,        JLAG,        JCVT,        JPLASOL,
+     K   JSPH)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE MMAIN_MOD
       USE TABLE_MOD
-      USE ELBUFDEF_MOD            
+      USE MAT_ELEM_MOD            
       USE MESSAGE_MOD
       USE NLOCAL_REG_MOD
       USE ALE_CONNECTIVITY_MOD
-      USE MATPARAM_DEF_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -90,24 +94,22 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com06_c.inc"
 #include      "com08_c.inc"
-#include      "scr07_c.inc"
-#include      "scr01_c.inc"
-#include      "scr03_c.inc"
-#include      "scr06_c.inc"
 #include      "scr19_c.inc"
-#include      "parit_c.inc"
-#include      "units_c.inc"
 #include      "param_c.inc"
 #include      "timeri_c.inc"
-#include      "userlib.inc"
-#include      "chara_c.inc"
 #include      "scr18_c.inc"
 #include      "ige3d_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(INOUT) :: JPLASOL
+      INTEGER, INTENT(INOUT) :: JSPH
+      INTEGER, INTENT(IN) :: JCVT
+      INTEGER, INTENT(IN) :: ISMSTR
+      INTEGER, INTENT(IN) :: JALE
+      INTEGER, INTENT(IN) :: JEUL
+      INTEGER, INTENT(IN) :: JLAG
       INTEGER LFT,LLT,NEL,NFT,MTN,IGTYP,IFAILURE,NPT,JSMS,
      .        NCTRL,NG,NELTST,ITYPTST,OFFSET,IEXPAN,ITASK,H3D_STRAIN
       INTEGER IXS(NIXS,*), IPARG(NPARG,*), NPF(*),IADS(8,*),
@@ -125,7 +127,7 @@ C-----------------------------------------------
       TYPE(TTABLE) TABLE(*)
       TYPE (NLOCAL_STR_)  , TARGET :: NLOC_DMG 
       TYPE(t_ale_connectivity), INTENT(IN) :: ALE_CONNECT
-      TYPE(MATPARAM_STRUCT_)  , DIMENSION(NUMMAT) :: MATPARAM_TAB
+      TYPE (MAT_ELEM_) ,INTENT(INOUT) :: MAT_ELEM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -245,7 +247,7 @@ C----------------------------------------------------------
      1 0.D0               ,0.D0               ,0.D0               ,
      2 -.577350269189625D0,0.577350269189625D0,0.D0               ,
      2 0.D0               ,0.D0               ,0.D0               ,
-     2 0.D0               ,0.D0               ,0.D0               , 	
+     2 0.D0               ,0.D0               ,0.D0               , 
      3 -.774596669241483D0,0.D0               ,0.774596669241483D0,
      3 0.D0               ,0.D0               ,0.D0               ,
      3 0.D0               ,0.D0               ,0.D0               ,
@@ -292,7 +294,6 @@ c a modifier
         IMAT = KXIG3D(1,I+NFT)
         NGEO(I)=KXIG3D(2,I+NFT)
         MXT(I)=IMAT
-c Mise    0 des anciennes equivalences non utilis  es
         VIS(I)=ZERO
         QVIS(I)=ZERO
         VDX(I)=ZERO
@@ -384,11 +385,11 @@ C------------------------------------------------------
       VGAUSS(:,:)=ZERO
 
       CALL IGE3DZERO(
-     .    NCTRL    ,VOLG   ,GBUF%SIG,GBUF%EINT,GBUF%RHO,
-     .    GBUF%QVIS,FX     ,FY      ,FZ       ,BtDBAloc,
-     .    STIG     ,MASS   ,MMUNK   ,AFACE    ,VMIN    ,
-     .    GBUF%PLA ,GBUF%EPSD,GBUF%G_PLA,GBUF%G_EPSD   ,
-     .    NEL      )
+     1   NCTRL,      VOLG,       GBUF%SIG,   GBUF%EINT,
+     2   GBUF%RHO,   GBUF%QVIS,  FX,         FY,
+     3   FZ,         BtDBAloc,   STIG,       MASS,
+     4   MMUNK,      AFACE,      VMIN,       GBUF%PLA,
+     5   GBUF%EPSD,  GBUF%G_PLA, GBUF%G_EPSD,NEL)
 
       N=0
       DO I=1,PX  
@@ -451,20 +452,22 @@ C     STRAIN RATE
 C------------------------------------------------------
 
          CALL IGE3DDEFO(
-     .     VX    ,VY    ,VZ    ,MATB  ,NCTRL ,
-     .     WXX   ,WYY   ,WZZ   ,DXX   ,DYY   ,
-     .     DZZ   ,DXY   ,DYX   ,DYZ   ,DZY   ,
-     .     DXZ   ,DZX   ,D4    ,D5    ,D6    ,
-     .     BA    ,Aloc  )
+     1   VX,      VY,      VZ,      MATB,
+     2   NCTRL,   WXX,     WYY,     WZZ,
+     3   DXX,     DYY,     DZZ,     DXY,
+     4   DYX,     DYZ,     DZY,     DXZ,
+     5   DZX,     D4,      D5,      D6,
+     6   BA,      Aloc,    NEL)
  
 C------------------------------------------------------
 C     ROTATION DE CORPS RIGIDE DES CONTRAINTES PASSEES 
 C------------------------------------------------------
 
          CALL SROTA3(
-     .      LBUF%SIG,S1   ,S2   ,S3   ,S4   ,
-     .      S5      ,S6   ,WXX  ,WYY  ,WZZ  ,
-     .      NEL     )
+     1   LBUF%SIG,S1,      S2,      S3,
+     2   S4,      S5,      S6,      WXX,
+     3   WYY,     WZZ,     NEL,     MTN,
+     4   IPARG(9,NG))
 
 C------------------------------------------------------
 C     CALCUL DE LA MASSE VOLUMIQUE COURANTE
@@ -472,9 +475,13 @@ C------------------------------------------------------
          VOLDP(LFT:LLT) = VOLN(LFT:LLT)
          DIVDE(1:NEL) = DT1*(DXX(1:NEL)+ DYY(1:NEL)+ DZZ(1:NEL))   
 
-         CALL SRHO3(PM         , LBUF%VOL   , LBUF%RHO , LBUF%EINT, DIVDE ,
-     2              FLUX(1,NF1), FLU1(NF1)  , VOLN     , DVOL     , NGL  , MXT  , OFF , 
-     3              IPARG(64,NG)  , GBUF%TAG22, VOLDP,LBUF%VOL0DP ,AMU   ,GBUF%OFF)
+         CALL SRHO3(
+     1   PM,          LBUF%VOL,    LBUF%RHO,    LBUF%EINT,
+     2   DIVDE,       FLUX(1,NF1), FLU1(NF1),   VOLN,
+     3   DVOL,        NGL,         MXT,         OFF,
+     4   IPARG(64,NG),GBUF%TAG22,  VOLDP,       LBUF%VOL0DP,
+     5   AMU,         GBUF%OFF,    NEL,         MTN,
+     6   JALE,        ISMSTR,      JEUL,        JLAG)
 
 c      CALL SMALL3(GBUF%SMSTR,GBUF%OFF,OFF,WXX,WYY,
 c     .            WZZ,DXX,DYY,DZZ,GBUF%RHO,RHO0,
@@ -485,28 +492,40 @@ C     CALCUL DES CONTRAINTES
 C------------------------------------------------------
 
       IF ((ITASK==0).AND.(IMON_MAT==1)) CALL STARTIME(35,1)
-       CALL MMAIN(                                            
-     1       ELBUF_TAB,NG      ,PM      ,GEO           ,FV	      ,ALE_CONNECT	,
-     2       IXS      ,IPARG   ,V       ,TF            ,NPF	      ,BUFMAT	,
-     3       STI      ,X       ,DT2T    ,NELTST        ,ITYPTST       ,OFFSET	,
-     4       NEL      ,W       ,OFF     ,NGEO          ,
-     6       MXT      ,NGL     ,VOLN    ,VD2           ,DVOL	      ,DELTAX	,
-     7       VIS      ,QVIS    ,CXX     ,S1            ,S2	      ,S3	,
-     8       S4       ,S5      ,S6      ,DXX           ,DYY	      ,DZZ	,
-     9       D4       ,D5      ,D6      ,WXX           ,WYY	      ,WZZ	,
-     A       AJ1      ,AJ2     ,AJ3     ,AJ4           ,AJ5	      ,AJ6	,
-     B       VDX      ,VDY     ,VDZ     ,MUVOID        ,SSP_EQ        ,AIRE	,
-     C       SIGY     ,ET      ,R1_FREE ,DEFP          ,R3_FREE       ,AMU      ,
-     D       MFXX     ,MFXY    ,MFXZ    ,MFYX          ,MFYY	      ,MFYZ	,
-     E       MFZX     ,MFZY    ,MFZZ    ,IPM           ,GAMA	      ,BID	,
-     F       DXY      ,DYX     ,DYZ     ,DZY           ,DZX	      ,DXZ	,
-     G       ISTRAIN  ,TEMPEL  ,DIE     ,IEXPAN        ,ILAY	      ,MSSA	,
-     H       DMELS    ,I       ,J       ,K             ,TABLE	      ,BID	,
-     I       BID      ,BID     ,BID     ,IPARG(1,NG)   ,IGEO     ,BID      ,
-     J       ITASK    ,NLOC_DMG,VARNL   ,MATPARAM_TAB  ,H3D_STRAIN)
+       CALL MMAIN(
+     1   ELBUF_TAB,   NG,          PM,          GEO,
+     2   FV,          ALE_CONNECT, IXS,         IPARG,
+     3   V,           TF,          NPF,         BUFMAT,
+     4   STI,         X,           DT2T,        NELTST,
+     5   ITYPTST,     OFFSET,      NEL,         W,
+     6   OFF,         NGEO,        MXT,         NGL,
+     7   VOLN,        VD2,         DVOL,        DELTAX,
+     8   VIS,         QVIS,        CXX,         S1,
+     9   S2,          S3,          S4,          S5,
+     A   S6,          DXX,         DYY,         DZZ,
+     B   D4,          D5,          D6,          WXX,
+     C   WYY,         WZZ,         AJ1,         AJ2,
+     D   AJ3,         AJ4,         AJ5,         AJ6,
+     E   VDX,         VDY,         VDZ,         MUVOID,
+     F   SSP_EQ,      AIRE,        SIGY,        ET,
+     G   R1_FREE,     DEFP,        R3_FREE,     AMU,
+     H   MFXX,        MFXY,        MFXZ,        MFYX,
+     I   MFYY,        MFYZ,        MFZX,        MFZY,
+     J   MFZZ,        IPM,         GAMA,        BID,
+     K   DXY,         DYX,         DYZ,         DZY,
+     L   DZX,         DXZ,         ISTRAIN,     TEMPEL,
+     M   DIE,         IEXPAN,      ILAY,        MSSA,
+     N   DMELS,       I,           J,           K,
+     O   TABLE,       BID,         BID,         BID,
+     P   BID,         IPARG(1,NG), IGEO,        BID,
+     Q   ITASK,       NLOC_DMG,    VARNL,       MAT_ELEM,
+     R   H3D_STRAIN,  JPLASOL,     JSPH)
 
-       CALL SSTRA3(DXX      ,DYY   ,DZZ   ,D4   ,D5   ,D6   , 
-     .             LBUF%STRA,WXX   ,WYY   ,WZZ  ,OFF  ,NEL  )
+       CALL SSTRA3(
+     1   DXX,      DYY,      DZZ,      D4,
+     2   D5,       D6,       LBUF%STRA,WXX,
+     3   WYY,      WZZ,      OFF,      NEL,
+     4   JCVT)
 
       IF ((ITASK==0).AND.(IMON_MAT==1)) CALL STOPTIME(35,1)
 
@@ -515,9 +534,10 @@ C     FORCES INTERNES
 C------------------------------------------------------
 
       CALL IG3DFINT(
-     1     PM, MXT,KXIG3D  ,LBUF%SIG ,NCTRL   ,MATB    , 
-     2     FX     ,FY      ,FZ       ,VOLN    ,BtDBAloc,
-     3     DBA    ,SSP_EQ  ,STIG     ,NEL     )
+     1   PM,      MXT,     KXIG3D,  LBUF%SIG,
+     2   NCTRL,   MATB,    FX,      FY,
+     3   FZ,      VOLN,    BtDBAloc,DBA,
+     4   SSP_EQ,  STIG,    NEL,     NFT)
 
            ENDDO
          ENDDO
@@ -527,7 +547,8 @@ C-----------------------------
 C     SMALL STRAIN 
 C-----------------------------
 
-      CALL SMALLB3(GBUF%OFF,OFF)
+      CALL SMALLB3(
+     1   GBUF%OFF,OFF,     NEL,     ISMSTR)
 
 C------------------------------------------------------
 c
@@ -540,10 +561,11 @@ c
          LBUF => ELBUF_TAB(NG)%BUFLY(1)%LBUF(I,J,K)
 
          CALL IG3DAVERAGE(
-     2        LBUF%SIG ,GBUF%SIG ,LBUF%VOL  ,GBUF%VOL   ,LBUF%RHO ,
-     3        LBUF%EINT,GBUF%EINT,GBUF%RHO  ,VGAUSS(N,:),VOLG     ,
-     4        LBUF%PLA ,GBUF%PLA ,GBUF%G_PLA,LBUF%EPSD  ,GBUF%EPSD,
-     5        NEL      )
+     1   LBUF%SIG,   GBUF%SIG,   LBUF%VOL,   GBUF%VOL,
+     2   LBUF%RHO,   LBUF%EINT,  GBUF%EINT,  GBUF%RHO,
+     3   VGAUSS(N,:),VOLG,       LBUF%PLA,   GBUF%PLA,
+     4   GBUF%G_PLA, LBUF%EPSD,  GBUF%EPSD,  NEL,
+     5   IPARG(40,NG))
 
         ENDDO
        ENDDO
@@ -564,9 +586,11 @@ C--------------------------------------------
 C     CUMUL
 C--------------------------------------------
 
-      CALL IG3DCUMU3(IXIG3D,KXIG3D,NCTRL,GBUF%OFF,A     ,
-     .               FX    ,FY    ,FZ   ,BtDBAloc,
-     .               STIG  ,STIFN )
+      CALL IG3DCUMU3(
+     1   IXIG3D,  KXIG3D,  NCTRL,   GBUF%OFF,
+     2   A,       FX,      FY,      FZ,
+     3   BtDBAloc,STIG,    STIFN,   NEL,
+     4   NFT)
 
 
 

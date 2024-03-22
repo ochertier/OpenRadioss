@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -29,8 +29,8 @@ Chd|        VINTER                        source/tools/curve/vinter.F
 Chd|        VINTER_SMOOTH                 source/tools/curve/vinter_smooth.F
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
 Chd|====================================================================
-      SUBROUTINE FIXTEMP(IBFT  ,VAL    , TEMP  ,NPC    ,TF   ,
-     .                   SENSOR_TAB)
+      SUBROUTINE FIXTEMP(IBFT   ,VAL    , TEMP  ,NPC    ,TF   ,
+     .                   NSENSOR,SENSOR_TAB)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------  
@@ -55,12 +55,13 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER ,INTENT(IN) :: NSENSOR
       INTEGER NPC(*)
       INTEGER IBFT(NIFT,*)
 C     REAL
       my_real
      .   TEMP(*),TF(*), VAL(LFACTHER,*)
-      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) ,INTENT(IN) :: SENSOR_TAB
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -147,7 +148,7 @@ C
         ELSE
           CALL VINTER_SMOOTH(TF,IADC,IPOSC,ILENC,IC,TSC,DYDXC,YC)
         ENDIF ! IF (ISMOOTH == 0)
-C		
+C
         IF(IVECTOR == 0) THEN
          DO II=1,IC
           N = INDEX(II) 

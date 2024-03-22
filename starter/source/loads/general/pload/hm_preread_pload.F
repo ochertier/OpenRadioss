@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -48,9 +48,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
-#include      "param_c.inc"
-#include      "scr03_c.inc"
 #include      "scr17_c.inc"
 #include      "com04_c.inc"
 #include      "r2r_c.inc"
@@ -87,7 +84,7 @@ C--------------------------------------------------
 C BROWSING MODEL Surface  1->NLD
 C--------------------------------------------------
       DO I=1,NLD
-	NN = 0
+          NN = 0
 C--------------------------------------------------
 C EXTRACT DATAS OF SURF
 C--------------------------------------------------
@@ -103,18 +100,18 @@ C--------------------------------------------------
           DO J=1,NSURF
             IF (ISU == IGRSURF(J)%ID) THEN
               ISS = J
-	      NN = IGRSURF(ISS)%NSEG
+                NN = IGRSURF(ISS)%NSEG
               EXIT
             ENDIF                             
           ENDDO 
         ENDIF
 C-----------Multidomaines -> on decompte les seg communs, on ne les compte qu'une foi---
         IF (NSUBDOM>0) THEN
-	  IF (IDDOM>0) NN = NN-ISURF_R2R(1,ISS) 
-	  NNCL(NCONLD+I)=NN 
-	ENDIF
+            IF (IDDOM>0) NN = NN-ISURF_R2R(1,ISS) 
+            NNCL(NCONLD+I)=NN 
+          ENDIF
 C-----------
-        NUMPRES = NUMPRES + NN	 
+        NUMPRES = NUMPRES + NN   
       ENDDO                                            
 C---
       RETURN

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,13 +25,13 @@ Chd|  ALEMUSCL_DEALLOCATE           source/ale/alemuscl/alemuscl_deallocate.F
 Chd|-- called by -----------
 Chd|        RESOL                         source/engine/resol.F         
 Chd|-- calls ---------------
-Chd|        ALEMUSCL_MOD                  ../common_source/modules/alemuscl_mod.F
+Chd|        ALEMUSCL_MOD                  ../common_source/modules/ale/alemuscl_mod.F
 Chd|====================================================================
       SUBROUTINE ALEMUSCL_DEALLOCATE()
 C-----------------------------------------------
 C   M o d u l e s 
 C-----------------------------------------------
-      USE ALEMUSCL_MOD
+      USE ALEMUSCL_MOD , only:ALEMUSCL_Buffer
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -39,10 +39,10 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   S o u r c e   L i n e s 
 C-----------------------------------------------
-      IF (ALLOCATED(VOLUME_FRACTION)) DEALLOCATE(VOLUME_FRACTION)
-      IF (ALLOCATED(NODE_MAX_VALUE)) DEALLOCATE(NODE_MAX_VALUE)
-      IF (ALLOCATED(NODE_MIN_VALUE)) DEALLOCATE(NODE_MIN_VALUE)
-      IF (ALLOCATED(GRAD)) DEALLOCATE(GRAD)
-      IF (ALLOCATED(ELCENTER)) DEALLOCATE(ELCENTER)
+      IF (ALLOCATED(ALEMUSCL_Buffer%VOLUME_FRACTION)) DEALLOCATE(ALEMUSCL_Buffer%VOLUME_FRACTION)
+      IF (ALLOCATED(ALEMUSCL_Buffer%NODE_MAX_VALUE)) DEALLOCATE(ALEMUSCL_Buffer%NODE_MAX_VALUE)
+      IF (ALLOCATED(ALEMUSCL_Buffer%NODE_MIN_VALUE)) DEALLOCATE(ALEMUSCL_Buffer%NODE_MIN_VALUE)
+      IF (ALLOCATED(ALEMUSCL_Buffer%GRAD)) DEALLOCATE(ALEMUSCL_Buffer%GRAD)
+      IF (ALLOCATED(ALEMUSCL_Buffer%ELCENTER)) DEALLOCATE(ALEMUSCL_Buffer%ELCENTER)
 C-----------------------------------------------
       END SUBROUTINE ALEMUSCL_DEALLOCATE

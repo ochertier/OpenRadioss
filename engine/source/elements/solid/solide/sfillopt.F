@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -33,26 +33,25 @@ Chd|        SUFORC3                       source/user_interface/suforc3.F
 Chd|        SZFORC3                       source/elements/solid/solidez/szforc3.F
 Chd|-- calls ---------------
 Chd|====================================================================
-      SUBROUTINE SFILLOPT(FILL,STI,
-     .   F11,F21,F31,F12,F22,F32,F13,F23,F33,F14,F24,F34,
-     .   F15,F25,F35,F16,F26,F36,F17,F27,F37,F18,F28,F38)
+      SUBROUTINE SFILLOPT(
+     1   FILL,    STI,     F11,     F21,
+     2   F31,     F12,     F22,     F32,
+     3   F13,     F23,     F33,     F14,
+     4   F24,     F34,     F15,     F25,
+     5   F35,     F16,     F26,     F36,
+     6   F17,     F27,     F37,     F18,
+     7   F28,     F38,     NEL)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "vect01_c.inc"
-#include      "com01_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: NEL
       my_real
      .   FILL(*),STI(*),
      .   F11(*),F21(*),F31(*),F12(*),F22(*),F32(*),
@@ -64,7 +63,7 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I
 C-----------------------------------------------
-      DO I=LFT,LLT
+      DO I=1,NEL
         STI(I)=FILL(I)*STI(I)
         F11(I)=FILL(I)*F11(I)
         F21(I)=FILL(I)*F21(I)

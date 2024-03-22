@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -32,14 +32,14 @@ Chd|        STOPTIME                      source/system/timer.F
 Chd|        UPD_FR_K                      source/mpi/implicit/imp_fri.F 
 Chd|        UPD_GLOB_K                    source/implicit/upd_glob_k.F  
 Chd|        DRAPE_MOD                     share/modules/drape_mod.F     
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
 Chd|        STACK_MOD                     share/modules/stack_mod.F     
 Chd|====================================================================
       SUBROUTINE IMP_K_EIG(NDDL0  , NNZK0   , DIAG_K , LT_K   , LSIZE ,
      .                     PM     , GEO     , IPM    , IGEO   , ELBUF ,
      .                     IXS    , IXQ     , IXC    , IXT    , IXP   ,
-     .                     IXR    , IXTG    , IXTG1  , IXUR   , IPARG ,
+     .                     IXR    , IXTG    , IXTG1  , IPARG ,
      .                     TF     , NPC     , FR_WAVE, W16    , BUFMAT,
      .                     THKE   , BUFGEO  , RBY   ,
      .                     SKEW   , X       , WA     , IDDL   , NDOF  ,
@@ -51,7 +51,7 @@ Chd|====================================================================
      .                     IKC    , ITASK   , EIGIPM , EIGIBUF, NDDL  ,
      .                     INLOC  , IAD_ELEM, FR_ELEM,IRBE3   ,LRBE3  ,
      .                     FRBE3  ,IRBE2    , LRBE2  , ELBUF_TAB, STACK,
-     .                     DRAPE_Q4, DRAPE_T3      )
+     .                     DRAPE_SH4N, DRAPE_SH3N   , DRAPEG  )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -80,7 +80,7 @@ C-----------------------------------------------
       INTEGER NDDL0, NNZK0, LSIZE(*), IPM(NPROPMI,*),IGEO(NPROPGI,*),
      .        IXS(*), IXQ(NIXQ,*), IXC(NIXC,*), IXT(NIXT,*),
      .        IXP(NIXP,*), IXR(NIXR,*), IXTG(NIXTG,*),
-     .        IXTG1(4,*), IXUR(*), IPARG(NPARG,*),
+     .        IXTG1(4,*), IPARG(NPARG,*),
      .        NPC(*), IDDL(*), NDOF(*), IADK(*),JDIK(*),
      .        ICODT(*), ICODR(*), ISKEW(*), IBFV(NIFV,*),
      .        LPBY(*), NPBY(NNPBY,*), ITAB(*),
@@ -98,7 +98,8 @@ C-----------------------------------------------
       TYPE (ELBUF_STRUCT_), DIMENSION(NGROUP) :: ELBUF_TAB
       TYPE(INTBUF_STRUCT_) INTBUF_TAB(*)
       TYPE (STACK_PLY) :: STACK
-      TYPE (DRAPE_) :: DRAPE_Q4, DRAPE_T3
+      TYPE (DRAPE_) :: DRAPE_SH4N(NUMELC_DRAPE), DRAPE_SH3N(NUMELTG_DRAPE)
+      TYPE (DRAPEG_) :: DRAPEG
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -156,13 +157,13 @@ C
       CALL IMP_GLOB_K(
      1   PM        ,GEO       ,IPM       ,IGEO      ,ELBUF     ,
      2   IXS       ,IXQ       ,IXC       ,IXT       ,IXP       ,
-     3   IXR       ,IXTG      ,IXTG1     ,IXUR      ,IXS(L1)   ,
+     3   IXR       ,IXTG      ,IXTG1     ,IXS(L1)   ,
      4   IXS(L2)   ,IXS(L3)   ,IPARG     ,TF        ,NPC       ,
      5   FR_WAVE   ,W16       ,BUFMAT    ,THKE      ,BUFGEO    ,
      6   RBY       ,SKEW      ,X         ,
      7   WA        ,IDDL      ,NDOF      ,DIAG_K    ,LT_K      ,
      8   IADK      ,JDIK      ,IKG       ,ETAG      ,ELBUF_TAB ,
-     9   STACK     ,DRAPE_Q4, DRAPE_T3        )
+     9   STACK     ,DRAPE_SH4N, DRAPE_SH3N   ,DRAPEG     )
 C      IF (IMON>0) CALL STOPTIME(25,ITASK+1)
 C    /---------------/
       CALL MY_BARRIER

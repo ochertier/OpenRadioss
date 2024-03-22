@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,13 +25,13 @@ Chd|  SIGEPS37_SINGLE_CELL          source/interfaces/int22/sigeps37_single_cell
 Chd|-- called by -----------
 Chd|        SINIT22_FVM                   source/interfaces/int22/sinit22_fvm.F
 Chd|-- calls ---------------
-Chd|        ALEFVM_MOD                    ../common_source/modules/alefvm_mod.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ALEFVM_MOD                    ../common_source/modules/ale/alefvm_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        INITBUF_MOD                   share/resol/initbuf.F         
 Chd|====================================================================
       SUBROUTINE SIGEPS37_SINGLE_CELL (
-     1   ELBUF_TAB, IXS,  BUFMAT , IPARG, IPM,
-     2   IDLOC    , NG ,  brickID, VOL  
+     1                                 ELBUF_TAB, IXS,  BUFMAT , IPARG, IPM,
+     2                                 IDLOC    , NG ,  brickID, VOL  
      .                                )
 C-----------------------------------------------
 C   D e s c r i p t i o n
@@ -250,10 +250,8 @@ C-----------------------------------------------
          
            LBUF%SSP(IDLOC)            = SSP    ;                                    
 
-
-
-           FCELL(5, brickID ) = SSP                                         
-           FCELL(6, brickID ) = P  
+           ALEFVM_Buffer%FCELL(5, brickID ) = SSP                                         
+           ALEFVM_Buffer%FCELL(6, brickID ) = P  
 
 C-----------------------------------------------
       RETURN

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,9 +27,14 @@ Chd|        BINIT2                        source/ale/bimat/binit2.F
 Chd|        Q4INIT2                       source/elements/solid_2d/quad4/q4init2.F
 Chd|        QINIT2                        source/elements/solid_2d/quad/qinit2.F
 Chd|-- calls ---------------
+Chd|        ALE_MOD                       ../common_source/modules/ale/ale_mod.F
 Chd|====================================================================
       SUBROUTINE QMASI2(PM,MAT,MS,VOL,MSQ,WMA,IPART,PARTSAV, 
      .     IX1, IX2, IX3, IX4 ,X ,V)
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
+      USE ALE_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -49,10 +54,7 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "vect01_c.inc"
-#include      "scr05_c.inc"
-#include      "com07_c.inc"
 #include      "param_c.inc"
-#include      "ale_param.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -69,8 +71,8 @@ C calcul mass initiale en arithmetique // pour le spmd
         DO I=LFT,LLT
           MSQ(I)=MASS(I)
         ENDDO
-	
-      IF(JALE > 0 .AND. NWALE == 4)THEN
+
+      IF(JALE > 0 .AND. ALE%GRID%NWALE == 4)THEN
         DO I=LFT,LLT
           WMA(IX1(I))=WMA(IX1(I))+ONE
           WMA(IX2(I))=WMA(IX2(I))+ONE

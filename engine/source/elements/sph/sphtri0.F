@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -40,41 +40,28 @@ C============================================================================
 C   M o d u l e s
 C-----------------------------------------------
       USE TRI7BOX
-C----6---------------------------------------------------------------7---------8
+C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "comlock.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "com08_c.inc"
-#include      "scr05_c.inc"
 #include      "sphcom.inc"
-#include      "param_c.inc"
-#include      "parit_c.inc"
-#include      "units_c.inc"
 #include      "task_c.inc"
 #include      "timeri_c.inc"
-C-----------------------------------------------------------------
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER KXSP(NISP,*), WSP2SORT(*),NSP2SORTF,NSP2SORTL,ITASK,NMN
-C     REAL
-      my_real
-     .        X(3,*),SPBUF(NSPBUF,*), BMINMA(12),  DMAX, DBUC
+      my_real X(3,*),SPBUF(NSPBUF,*), BMINMA(12),  DMAX, DBUC
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER N, J, NS,LOC_PROC
-      my_real
-     .        XMAX  ,YMAX  ,ZMAX,XMIN,YMIN,ZMIN, DBUCL,
-     .   MX,MY,MZ,DX,DY,DZ,SX,SY,SZ,SX2,SY2,SZ2
+      my_real XMAX,YMAX,ZMAX,XMIN,YMIN,ZMIN,DBUCL,MX,MY,MZ,DX,DY,DZ,SX,SY,SZ,SX2,SY2,SZ2
      
 C-----------------------------------------------
       XMIN=EP30
@@ -112,8 +99,6 @@ C
         SY2=SY2+X(2,J)**2
         SZ2=SZ2+X(3,J)**2
       END DO
-cc      DBUC=TWO*DBUC
-cc      DBUC=DBUC*SQRT(ONE +SPATRUE)
 
       IF(ITASK == 0)THEN
          BMINMA(7:12)=0
@@ -149,12 +134,12 @@ C
 
       IF(ITASK==0) THEN
         DBUC=DBUC*SQRT(ONE +SPATRUE)*ONEP0001
-	BMINMA(1) = BMINMA(1)+DBUC
+          BMINMA(1) = BMINMA(1)+DBUC
         BMINMA(2) = BMINMA(2)+DBUC
         BMINMA(3) = BMINMA(3)+DBUC
-	BMINMA(4) = BMINMA(4)-DBUC
-	BMINMA(5) = BMINMA(5)-DBUC
-	BMINMA(6) = BMINMA(6)-DBUC
+          BMINMA(4) = BMINMA(4)-DBUC
+          BMINMA(5) = BMINMA(5)-DBUC
+          BMINMA(6) = BMINMA(6)-DBUC
 C   Computation of standard deviation of X main
 C   use the formula dev = sum(xi  )-n.m  
 C   mean value m by direction

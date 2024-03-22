@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -80,7 +80,7 @@ C---------
      .           V(3), FC(3),STF, 
      .           VR(3), MC(3), STR
           DOUBLE PRECISION D(3), DR(3)
-	  DOUBLE PRECISION FC6(6,3),ST6(6),MC6(6,3),STR6(6)
+            DOUBLE PRECISION FC6(6,3),ST6(6),MC6(6,3),STR6(6)
 
       END TYPE INTSTAMP_DATA
 C-----------------------------------------------
@@ -164,7 +164,7 @@ Chd|  INTSTAMP_WRESTI               share/modules1/intstamp_mod.F
 Chd|-- called by -----------
 Chd|        DDSPLIT                       source/restart/ddsplit/ddsplit.F
 Chd|-- calls ---------------
-Chd|        WRITE_I_C                     source/output/tools/write_routines.c
+Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|====================================================================
       SUBROUTINE INTSTAMP_WRESTI(INTSTAMP, LENI, NODLOCAL)
 C-----------------------------------------------
@@ -278,7 +278,7 @@ Chd|====================================================================
 Chd|  INTSTAMP_RRESTI               share/modules1/intstamp_mod.F 
 Chd|-- called by -----------
 Chd|-- calls ---------------
-Chd|        READ_I_C                      source/output/tools/write_routines.c
+Chd|        READ_I_C                      ../common_source/tools/input_output/write_routtines.c
 Chd|====================================================================
       SUBROUTINE INTSTAMP_RRESTI(INTSTAMP)
 C-----------------------------------------------

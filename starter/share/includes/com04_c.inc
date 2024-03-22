@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>    
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -29,7 +29,7 @@ C
      .   NRWALL, NRBODY, NODMAS,  
      .   NFXVEL, NRIVET, NUMELR, NUMELP, NSECT , 
      .   NRBAG , NJOINT, NUMELTG,NSLAG , NFACX ,
-     .   NUMPOR, NACCELM,NSENSOR,NPRETEN,NVOLU,NMONVOL,
+     .   NUMPOR, NACCELM,NPRETEN,NVOLU,NMONVOL,
      .   NPART,  NSURF,  NSUBS,  NGRAV,  NRBY2 ,
      .   NGRNOD, NGRBRIC,NGRQUAD,NGRSHEL,NGRSH3N,
      .   NGRBEAM,NGRTRUS,NGRSPRI,NLINK,  INVSTR,
@@ -65,7 +65,7 @@ C
      .   NRWALL, NRBODY, NODMAS, 
      .   NFXVEL, NRIVET, NUMELR, NUMELP, NSECT , 
      .   NRBAG , NJOINT, NUMELTG,NSLAG , NFACX ,
-     .   NUMPOR, NACCELM,NSENSOR,NPRETEN,NVOLU,NMONVOL,
+     .   NUMPOR, NACCELM,NPRETEN,NVOLU,NMONVOL,
      .   NPART,  NSURF,  NSUBS,  NGRAV,  NRBY2 ,
      .   NGRNOD, NGRBRIC,NGRQUAD,NGRSHEL,NGRSH3N,
      .   NGRBEAM,NGRTRUS,NGRSPRI,NLINK,  INVSTR,

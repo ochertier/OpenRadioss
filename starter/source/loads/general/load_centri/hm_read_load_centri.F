@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -41,7 +41,7 @@ Chd|        SENSOR_MOD                    share/modules1/sensor_mod.F
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
       SUBROUTINE HM_READ_LOAD_CENTRI(ICFIELD,LCFIELD  ,CFIELD  ,ITAB     ,ITABM1 ,
-     .                               IGRNOD ,NPC      ,SENSOR_TAB ,UNITAB   ,IFRAME ,
+     .                               IGRNOD ,NPC      ,SENSORS ,UNITAB   ,IFRAME ,
      .                               LSUBMODEL)
 C
 C-----------------------------------------------
@@ -65,13 +65,9 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "scr03_c.inc"
 #include      "scr17_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "sysunit.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -81,8 +77,8 @@ C-----------------------------------------------
       my_real CFIELD(LFACLOAD,*)
 C-----------------------------------------------
       TYPE (GROUP_)  , DIMENSION(NGRNOD)  :: IGRNOD
-      TYPE(SUBMODEL_DATA),INTENT(IN)::LSUBMODEL(*)
-      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE (SUBMODEL_DATA),INTENT(IN)::LSUBMODEL(*)
+      TYPE (SENSORS_) ,INTENT(IN) :: SENSORS
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -191,7 +187,7 @@ C--------------------------------------------------
         CALL HM_GET_FLOATV_DIM('magnitude',FAC_FCY,IS_AVAILABLE,LSUBMODEL,UNITAB)
 C--------------------------------------------------
         IFLAGUNIT = 0
-        DO J=1,NUNITS
+        DO J=1,UNITAB%NUNITS
           IF (UNITAB%UNIT_ID(J) == UID) THEN
             IFLAGUNIT = 1
             EXIT
@@ -261,24 +257,24 @@ C-----------
         ENDIF
 C-----------        
         TSENS = 0
-	       IF (ISENS/=0) THEN
-          DO J=1,NSENSOR
-	           IF (ISENS == SENSOR_TAB(J)%SENS_ID) TSENS=J
-	         ENDDO
-	         IF (TSENS==0) THEN
+                 IF (ISENS/=0) THEN
+          DO J=1,SENSORS%NSENSOR
+                     IF (ISENS == SENSORS%SENSOR_TAB(J)%SENS_ID) TSENS=J
+                   ENDDO
+                   IF (TSENS==0) THEN
              CALL ANCMSG(MSGID=884, MSGTYPE=MSGERROR, ANMODE=ANINFO_BLIND_1,
      .            I1=ID,
      .            C1=TITR,
      .            I2=ISENS)
-	         ENDIF
-	       ENDIF
+                   ENDIF
+                 ENDIF
 C-----------        
         NN = NODGRNR5(IGU,IGS,LCFIELD(IAD),IGRNOD,ITABM1,MESS)
 C-----------        
         IF (IVAR == 0) IVAR = 1
 C-----------        
-	       ICFIELD(1,K)  = NN
-	       ICFIELD(2,K)  = IDIR
+                 ICFIELD(1,K)  = NN
+                 ICFIELD(2,K)  = IDIR
         ICFIELD(3,K)  = NCURS
         ICFIELD(4,K)  = IAD
         ICFIELD(5,K)  = 1 ! Type /LOAD/CENTRI

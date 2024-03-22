@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -74,18 +74,10 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "scr17_c.inc"
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
 #include      "param_c.inc"
-#include      "warn_c.inc"
-#include      "sysunit.inc"
 #include      "sphcom.inc"
-#include      "r2r_c.inc"
-#include      "submod_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -215,7 +207,7 @@ C
         ENDIF                                                    
                 
         IFLAGUNIT = 0                                            
-        DO J=1,NUNITS  
+        DO J=1,UNITAB%NUNITS  
             IF (UNITAB%UNIT_ID(J) == UID) THEN    
               FAC_T = UNITAB%FAC_T(J)
               IFLAGUNIT = 1                                        
@@ -323,13 +315,13 @@ C
              J=K+1                                                       
              JJ=(NUMSKW+1)+NSUBMOD+MIN(IUN,NSPCOND)*NUMSPH+K+1           
              IF(NFRAM==ISKN(4,JJ)) THEN                                
-	       A = XFRAME(7,J)                                           
-	       B = XFRAME(8,J)                                           
-	       C = XFRAME(9,J)                                           
+                 A = XFRAME(7,J)                                           
+                 B = XFRAME(8,J)                                           
+                 C = XFRAME(9,J)                                           
                D = XFRAME(10,J)                                          
                E = XFRAME(11,J)                                          
                F = XFRAME(12,J)                                          
-	       N1 = ISKN(1,JJ)                                           
+                 N1 = ISKN(1,JJ)                                           
                IF (NSTRF(K0+3) == 0 ) THEN                               
                  IF (ISKN(1,JJ) /= 0) THEN                             
                    NSTRF(K0+3) = ITAB(ISKN(1,JJ))                        
@@ -373,9 +365,9 @@ C
            ENDDO                                                         
           ENDIF                                                          
           KK=1+NGRNOD                                                    
-	  NNOD = 0                                                       
-	  CPT = 1                                                        
-	  CALL SEC_NODES_SOL(IGUS,ISTYP,NGRBRIC,IGRBRIC,X0,A,            
+            NNOD = 0                                                       
+            CPT = 1                                                        
+            CALL SEC_NODES_SOL(IGUS,ISTYP,NGRBRIC,IGRBRIC,X0,A,            
      2                  B,C,D,E,F,ITAB,IXS,IXS10,IXS16,IXS20,            
      3                  NIXS,KK,NNOD,NSTRF,NBINTER,N1 ,K1,               
      4                  CPT,NODTAG,ISOLNOD,TAGELEMS,                     

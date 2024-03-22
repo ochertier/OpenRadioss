@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -31,9 +31,9 @@ Chd|        MATINI                        source/materials/mat_share/matini.F
 Chd|        QCOOR2                        source/elements/solid_2d/quad/qcoor2.F
 Chd|        QDLEN2                        source/elements/solid_2d/quad/qdlen2.F
 Chd|        QVOLI2                        source/elements/solid_2d/quad/qvoli2.F
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
 Chd|        DETONATORS_MOD                share/modules1/detonators_mod.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
       SUBROUTINE MULTIFLUID_INIT2(NEL, NSIGS, 
@@ -81,7 +81,7 @@ C-----------------------------------------------
       my_real, INTENT(INOUT) :: GEO(*), SIGI(NSIGS, *), 
      .     SKEW(LSKEW, *), TF(*), BUFMAT(*)
       LOGICAL :: ERROR_THROWN
-      TYPE(DETONATOR_STRUCT_) :: DETONATORS
+      TYPE(DETONATORS_STRUCT_) :: DETONATORS
       TYPE(t_ale_connectivity), INTENT(INOUT) :: ALE_CONNECTIVITY
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -39,12 +39,7 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "param_c.inc"
-#include      "scr07_c.2.inc"
 #include      "scr17_c.inc"
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -52,7 +47,6 @@ C-----------------------------------------------
       INTEGER NSV(*),IXC(NIXC,*),IXTG(NIXTG,*),IXS(NIXS,*),ITAB(*),
      .   KNOD2ELC(*),KNOD2ELTG(*),KNOD2ELS(*),NOD2ELC(*),
      .   NOD2ELTG(*),NOD2ELS(*)
-C     REAL
       my_real
      .   X(3,*),AREA(*)
       INTEGER ID
@@ -70,6 +64,7 @@ C     REAL
      .   X12,Y12,Z12,X13,Y13,Z13,X24,Y24,Z24,I1,I2,I3,AREA0
       my_real
      .   FACE(6)
+      my_real ::  XX1(4), XX2(4),XX3(4),XS1,YS1,ZS1,XC,YC,ZC
 C=======================================================================
       ICOQ = 1
       ISOL = 1 
@@ -190,7 +185,7 @@ c           face 1234
             XX1(4)=X4                    
             XX2(4)=Y4                    
             XX3(4)=Z4                    
-            CALL NORMA1(I1,I2,I3,FACE(1))  
+            CALL NORMA1(I1,I2,I3,FACE(1),XX1,XX2,XX3)  
 c           face 5678
             XX1(1)=X5
             XX2(1)=Y5
@@ -204,7 +199,7 @@ c           face 5678
             XX1(4)=X8
             XX2(4)=Y8
             XX3(4)=Z8
-            CALL NORMA1(I1,I2,I3,FACE(2))
+            CALL NORMA1(I1,I2,I3,FACE(2),XX1,XX2,XX3)
 c           face 2376
             XX1(1)=X2
             XX2(1)=Y2
@@ -218,7 +213,7 @@ c           face 2376
             XX1(4)=X6
             XX2(4)=Y6
             XX3(4)=Z6
-            CALL NORMA1(I1,I2,I3,FACE(3))
+            CALL NORMA1(I1,I2,I3,FACE(3),XX1,XX2,XX3)
 c           face 1485
             XX1(1)=X1
             XX2(1)=Y1
@@ -232,7 +227,7 @@ c           face 1485
             XX1(4)=X5
             XX2(4)=Y5
             XX3(4)=Z5
-            CALL NORMA1(I1,I2,I3,FACE(4))
+            CALL NORMA1(I1,I2,I3,FACE(4),XX1,XX2,XX3)
 c           face 1265
             XX1(1)=X1
             XX2(1)=Y1
@@ -246,7 +241,7 @@ c           face 1265
             XX1(4)=X5
             XX2(4)=Y5
             XX3(4)=Z5
-            CALL NORMA1(I1,I2,I3,FACE(5))
+            CALL NORMA1(I1,I2,I3,FACE(5),XX1,XX2,XX3)
 c           face 4378
             XX1(1)=X4
             XX2(1)=Y4
@@ -260,7 +255,7 @@ c           face 4378
             XX1(4)=X8
             XX2(4)=Y8
             XX3(4)=Z8
-            CALL NORMA1(I1,I2,I3,FACE(6))
+            CALL NORMA1(I1,I2,I3,FACE(6),XX1,XX2,XX3)
 C----
             DO K=1,8
               N = IXS(K+1,IEL)

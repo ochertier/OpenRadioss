@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -32,7 +32,7 @@ Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
 Chd|        R2R_MOD                       share/modules1/r2r_mod.F      
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
-      SUBROUTINE HM_PRE_READ_PRELOAD(NSTRF,LSUBMODEL)
+      SUBROUTINE HM_PRE_READ_PRELOAD(NSTRF,LSUBMODEL) 
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -46,13 +46,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
-#include      "param_c.inc"
-#include      "scr03_c.inc"
 #include      "scr17_c.inc"
 #include      "com04_c.inc"
 #include      "boltpr_c.inc"
-#include      "submod_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -64,7 +60,7 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,J,NLD,ISEC,NN,ID,UID,NDEB,NFIN,IS,K0  !,ISU,ISS
       INTEGER FLAG_FMT,FLAG_FMT_TMP,IFIX_TMP
-      CHARACTER TITR*nchartitle
+      CHARACTER TITR*nchartitle,KEY*ncharline
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
@@ -86,12 +82,14 @@ C-----------------------------------------------
         CALL HM_OPTION_READ_KEY(LSUBMODEL, 
      .                          OPTION_ID      = ID, 
      .                          UNIT_ID        = UID,
-     .                          OPTION_TITR    = TITR)           
+     .                          OPTION_TITR    = TITR,           
+     .                          KEYWORD2       = KEY)
 C
+         IF (KEY(1:LEN_TRIM(KEY))=='AXIAL') CYCLE
 
         CALL HM_GET_INTV('sect_ID'  ,ISEC  ,IS_AVAILABLE,LSUBMODEL)                                             
 
-	   NN = 0
+             NN = 0
         IF (ISEC > 0) THEN
           K0=31
           DO IS=1,NSECT
@@ -102,7 +100,7 @@ C
               K0=NSTRF(K0+24)
            ENDDO 
         ENDIF
-        NUMPRELOAD = NUMPRELOAD + NN	 
+        NUMPRELOAD = NUMPRELOAD + NN   
 
       ENDDO                                            
 C---

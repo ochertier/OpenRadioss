@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,11 +27,14 @@ Chd|        LECTUR                        source/input/lectur.F
 Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
 Chd|        ARRET                         source/system/arret.F         
+Chd|        FXBVINI                       ../common_source/fxbody/fxbvini.F
 Chd|        NGR2USR                       source/input/freform.F        
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
-      SUBROUTINE LECINV(NINIV ,X, V ,VR  ,ITAB  ,IFRAME ,XFRAME, IGRNOD )
+      SUBROUTINE LECINV(NINIV ,X, V ,VR  ,ITAB  ,
+     .                  IFRAME,XFRAME, IGRNOD, FXBIPM, FXBVIT,
+     .                  FXBRPM)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -50,17 +53,19 @@ C-----------------------------------------------
 #include      "scr05_c.inc"
 #include      "task_c.inc"
 #include      "param_c.inc"
-#include      "sphcom.inc"
-#include      "scr17_c.inc"
+#include      "fxbcom.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C----------------------------------------------- 
       INTEGER NINIV,ITAB(*),IFRAME(LISKN,*)
+      INTEGER, INTENT(IN) :: FXBIPM(NBIPM,NFXBODY)
 C-----------------------------------------------
       TYPE (GROUP_)  , DIMENSION(NGRNOD) :: IGRNOD
 C     REAL
       my_real
      .   X(3,*),V(3,*), VR(3,*), XFRAME(NXFRAME,*)
+      my_real, INTENT(IN) :: FXBRPM(LENRPM)
+      my_real, INTENT(INOUT) :: FXBVIT(LENVAR)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -265,6 +270,12 @@ C
         END IF !(N1 < 0) THEN
        ENDIF
       ENDDO
+C----------------
+C     Initialization of Fxbvit for flexible bodies
+C----------------
+      IF (NFXBODY>0) THEN
+        CALL FXBVINI(FXBIPM, FXBVIT, FXBRPM, V, VR)
+      ENDIF
 C----------------
 C     FORMATS
 C----------------

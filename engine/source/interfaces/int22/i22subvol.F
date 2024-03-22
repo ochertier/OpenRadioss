@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,10 +26,10 @@ Chd|-- called by -----------
 Chd|        INTTRI                        source/interfaces/intsort/inttri.F
 Chd|-- calls ---------------
 Chd|        MY_BARRIER                    source/system/machine.F       
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        I22BUFBRIC_MOD                ../common_source/modules/cut-cell-search_mod.F
-Chd|        I22TRI_MOD                    ../common_source/modules/cut-cell-search_mod.F
+Chd|        I22BUFBRIC_MOD                ../common_source/modules/interfaces/cut-cell-search_mod.F
+Chd|        I22TRI_MOD                    ../common_source/modules/interfaces/cut-cell-search_mod.F
 Chd|====================================================================
       SUBROUTINE I22SUBVOL(X    ,NIN     ,ITASK  ,IPARI  ,ITAB     , 
      .                     IXS  ,IXTG    ,V      ,IPARG  ,ELBUF_TAB,
@@ -56,22 +56,13 @@ C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "comlock.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "parit_c.inc"
-#include      "scr05_c.inc"
-#include      "scr17_c.inc"
 #include      "task_c.inc"
 #include      "subvolumes.inc"
-#include      "i22edges.inc"
 #include      "inter22.inc"
 C-----------------------------------------------
       INTERFACE
@@ -1223,24 +1214,24 @@ C             if (IBUG22_subvol==1)WRITE (*,FMT='(A1)') " "
             !interpolate w_a1
             beta    = EDGE_LIST(NIN,IAD(1))%CUTCOOR(iPOSe(1));
             J       = IAD(1)-(IB-1)*12;
-            EdgNod1 = IXS(1+iEDGE(1,J),ID);
-            EdgNod2 = IXS(1+iEDGE(2,J),ID)
+            EdgNod1 = IXS(1+INT22_BUF%iEDGE(1,J),ID);
+            EdgNod2 = IXS(1+INT22_BUF%iEDGE(2,J),ID)
             wa1(1)  = beta * W(1,EdgNod1) + (ONE-beta)*W(1,EdgNod2)
             wa1(2)  = beta * W(2,EdgNod1) + (ONE-beta)*W(2,EdgNod2)
             wa1(3)  = beta * W(3,EdgNod1) + (ONE-beta)*W(3,EdgNod2)
             !interpolate w_a2
             beta    = EDGE_LIST(NIN,IAD(2))%CUTCOOR(iPOSe(2));
             J       = IAD(2)-(IB-1)*12;
-            EdgNod1 = IXS(1+iEDGE(1,J),ID);
-            EdgNod2 = IXS(1+iEDGE(2,J),ID)
+            EdgNod1 = IXS(1+INT22_BUF%iEDGE(1,J),ID);
+            EdgNod2 = IXS(1+INT22_BUF%iEDGE(2,J),ID)
             wa2(1)  = beta * W(1,EdgNod1) + (ONE-beta)*W(1,EdgNod2)
             wa2(2)  = beta * W(2,EdgNod1) + (ONE-beta)*W(2,EdgNod2)
             wa2(3)  = beta * W(3,EdgNod1) + (ONE-beta)*W(3,EdgNod2)
             !interpolate w_a3
             beta    = EDGE_LIST(NIN,IAD(3))%CUTCOOR(iPOSe(3));
             J       = IAD(3)-(IB-1)*12;
-            EdgNod1 = IXS(1+iEDGE(1,J),ID);
-            EdgNod2 = IXS(1+iEDGE(2,J),ID)
+            EdgNod1 = IXS(1+INT22_BUF%iEDGE(1,J),ID);
+            EdgNod2 = IXS(1+INT22_BUF%iEDGE(2,J),ID)
             wa3(1)  = beta * W(1,EdgNod1) + (ONE-beta)*W(1,EdgNod2)
             wa3(2)  = beta * W(2,EdgNod1) + (ONE-beta)*W(2,EdgNod2)
             wa3(3)  = beta * W(3,EdgNod1) + (ONE-beta)*W(3,EdgNod2)
@@ -1284,32 +1275,32 @@ C             if (IBUG22_subvol==1)WRITE (*,FMT='(A1)') " "
             !interpolate w_a1
             beta    = EDGE_LIST(NIN,IAD(1))%CUTCOOR(iPOSe(1));
             J       = IAD(1)-(IB-1)*12;
-            EdgNod1 = IXS(1+iEDGE(1,J),ID);
-            EdgNod2 = IXS(1+iEDGE(2,J),ID)
+            EdgNod1 = IXS(1+INT22_BUF%iEDGE(1,J),ID);
+            EdgNod2 = IXS(1+INT22_BUF%iEDGE(2,J),ID)
             wa1(1)  = beta * W(1,EdgNod1) + (ONE-beta)*W(1,EdgNod2)
             wa1(2)  = beta * W(2,EdgNod1) + (ONE-beta)*W(2,EdgNod2)
             wa1(3)  = beta * W(3,EdgNod1) + (ONE-beta)*W(3,EdgNod2)
             !interpolate w_a2
             beta    = EDGE_LIST(NIN,IAD(2))%CUTCOOR(iPOSe(2));
             J       = IAD(2)-(IB-1)*12;
-            EdgNod1 = IXS(1+iEDGE(1,J),ID);
-            EdgNod2 = IXS(1+iEDGE(2,J),ID)
+            EdgNod1 = IXS(1+INT22_BUF%iEDGE(1,J),ID);
+            EdgNod2 = IXS(1+INT22_BUF%iEDGE(2,J),ID)
             wa2(1)  = beta * W(1,EdgNod1) + (ONE-beta)*W(1,EdgNod2)
             wa2(2)  = beta * W(2,EdgNod1) + (ONE-beta)*W(2,EdgNod2)
             wa2(3)  = beta * W(3,EdgNod1) + (ONE-beta)*W(3,EdgNod2)
             !interpolate w_a3
             beta    = EDGE_LIST(NIN,IAD(3))%CUTCOOR(iPOSe(3));
             J       = IAD(3)-(IB-1)*12;
-            EdgNod1 = IXS(1+iEDGE(1,J),ID);
-            EdgNod2 = IXS(1+iEDGE(2,J),ID)
+            EdgNod1 = IXS(1+INT22_BUF%iEDGE(1,J),ID);
+            EdgNod2 = IXS(1+INT22_BUF%iEDGE(2,J),ID)
             wa3(1)  = beta * W(1,EdgNod1) + (ONE-beta)*W(1,EdgNod2)
             wa3(2)  = beta * W(2,EdgNod1) + (ONE-beta)*W(2,EdgNod2)
             wa3(3)  = beta * W(3,EdgNod1) + (ONE-beta)*W(3,EdgNod2)
             !interpolate w_a4
             beta    = EDGE_LIST(NIN,IAD(4))%CUTCOOR(iPOSe(4));
             J       = IAD(4)-(IB-1)*12;
-            EdgNod1 = IXS(1+iEDGE(1,J),ID);
-            EdgNod2 = IXS(1+iEDGE(2,J),ID)
+            EdgNod1 = IXS(1+INT22_BUF%iEDGE(1,J),ID);
+            EdgNod2 = IXS(1+INT22_BUF%iEDGE(2,J),ID)
             wa4(1)  = beta * W(1,EdgNod1) + (ONE-beta)*W(1,EdgNod2)
             wa4(2)  = beta * W(2,EdgNod1) + (ONE-beta)*W(2,EdgNod2)
             wa4(3)  = beta * W(3,EdgNod1) + (ONE-beta)*W(3,EdgNod2)
@@ -1362,40 +1353,40 @@ C             if (IBUG22_subvol==1)WRITE (*,FMT='(A1)') " "
             !interpolate w_a1
             beta    = EDGE_LIST(NIN,IAD(1))%CUTCOOR(iPOSe(1));
             J       = IAD(1)-(IB-1)*12;
-            EdgNod1 = IXS(1+iEDGE(1,J),ID);
-            EdgNod2 = IXS(1+iEDGE(2,J),ID)
+            EdgNod1 = IXS(1+INT22_BUF%iEDGE(1,J),ID);
+            EdgNod2 = IXS(1+INT22_BUF%iEDGE(2,J),ID)
             wa1(1)  = beta * W(1,EdgNod1) + (ONE-beta)*W(1,EdgNod2)
             wa1(2)  = beta * W(2,EdgNod1) + (ONE-beta)*W(2,EdgNod2)
             wa1(3)  = beta * W(3,EdgNod1) + (ONE-beta)*W(3,EdgNod2)
             !interpolate w_a2
             beta    = EDGE_LIST(NIN,IAD(2))%CUTCOOR(iPOSe(2));
             J       = IAD(2)-(IB-1)*12;
-            EdgNod1 = IXS(1+iEDGE(1,J),ID);
-            EdgNod2 = IXS(1+iEDGE(2,J),ID)
+            EdgNod1 = IXS(1+INT22_BUF%iEDGE(1,J),ID);
+            EdgNod2 = IXS(1+INT22_BUF%iEDGE(2,J),ID)
             wa2(1)  = beta * W(1,EdgNod1) + (ONE-beta)*W(1,EdgNod2)
             wa2(2)  = beta * W(2,EdgNod1) + (ONE-beta)*W(2,EdgNod2)
             wa2(3)  = beta * W(3,EdgNod1) + (ONE-beta)*W(3,EdgNod2)
             !interpolate w_a3
             beta    = EDGE_LIST(NIN,IAD(3))%CUTCOOR(iPOSe(3));
             J       = IAD(3)-(IB-1)*12;
-            EdgNod1 = IXS(1+iEDGE(1,J),ID);
-            EdgNod2 = IXS(1+iEDGE(2,J),ID)
+            EdgNod1 = IXS(1+INT22_BUF%iEDGE(1,J),ID);
+            EdgNod2 = IXS(1+INT22_BUF%iEDGE(2,J),ID)
             wa3(1)  = beta * W(1,EdgNod1) + (ONE-beta)*W(1,EdgNod2)
             wa3(2)  = beta * W(2,EdgNod1) + (ONE-beta)*W(2,EdgNod2)
             wa3(3)  = beta * W(3,EdgNod1) + (ONE-beta)*W(3,EdgNod2)
             !interpolate w_a4
             beta    = EDGE_LIST(NIN,IAD(4))%CUTCOOR(iPOSe(4));
             J       = IAD(4)-(IB-1)*12;
-            EdgNod1 = IXS(1+iEDGE(1,J),ID);
-            EdgNod2 = IXS(1+iEDGE(2,J),ID)
+            EdgNod1 = IXS(1+INT22_BUF%iEDGE(1,J),ID);
+            EdgNod2 = IXS(1+INT22_BUF%iEDGE(2,J),ID)
             wa4(1)  = beta * W(1,EdgNod1) + (ONE-beta)*W(1,EdgNod2)
             wa4(2)  = beta * W(2,EdgNod1) + (ONE-beta)*W(2,EdgNod2)
             wa4(3)  = beta * W(3,EdgNod1) + (ONE-beta)*W(3,EdgNod2)
             !interpolate w_a5
             beta    = EDGE_LIST(NIN,IAD(4))%CUTCOOR(iPOSe(5));
             J       = IAD(5)-(IB-1)*12;
-            EdgNod1 = IXS(1+iEDGE(1,J),ID);
-            EdgNod2 = IXS(1+iEDGE(2,J),ID)
+            EdgNod1 = IXS(1+INT22_BUF%iEDGE(1,J),ID);
+            EdgNod2 = IXS(1+INT22_BUF%iEDGE(2,J),ID)
             wa5(1)  = beta * W(1,EdgNod1) + (ONE-beta)*W(1,EdgNod2)
             wa5(2)  = beta * W(2,EdgNod1) + (ONE-beta)*W(2,EdgNod2)
             wa5(3)  = beta * W(3,EdgNod1) + (ONE-beta)*W(3,EdgNod2)
@@ -1457,32 +1448,32 @@ C             if (IBUG22_subvol==1)WRITE (*,FMT='(A1)') " "
             !interpolate w_a1
             beta    = EDGE_LIST(NIN,IAD(1))%CUTCOOR(iPOSe(1));
             J       = IAD(1)-(IB-1)*12;
-            EdgNod1 = IXS(1+iEDGE(1,J),ID);
-            EdgNod2 = IXS(1+iEDGE(2,J),ID)
+            EdgNod1 = IXS(1+INT22_BUF%iEDGE(1,J),ID);
+            EdgNod2 = IXS(1+INT22_BUF%iEDGE(2,J),ID)
             wa1(1)  = beta * W(1,EdgNod1) + (ONE-beta)*W(1,EdgNod2)
             wa1(2)  = beta * W(2,EdgNod1) + (ONE-beta)*W(2,EdgNod2)
             wa1(3)  = beta * W(3,EdgNod1) + (ONE-beta)*W(3,EdgNod2)
             !interpolate w_a2
             beta    = EDGE_LIST(NIN,IAD(2))%CUTCOOR(iPOSe(2));
             J       = IAD(2)-(IB-1)*12;
-            EdgNod1 = IXS(1+iEDGE(1,J),ID);
-            EdgNod2 = IXS(1+iEDGE(2,J),ID)
+            EdgNod1 = IXS(1+INT22_BUF%iEDGE(1,J),ID);
+            EdgNod2 = IXS(1+INT22_BUF%iEDGE(2,J),ID)
             wa2(1)  = beta * W(1,EdgNod1) + (ONE-beta)*W(1,EdgNod2)
             wa2(2)  = beta * W(2,EdgNod1) + (ONE-beta)*W(2,EdgNod2)
             wa2(3)  = beta * W(3,EdgNod1) + (ONE-beta)*W(3,EdgNod2)
             !interpolate w_a3
             beta    = EDGE_LIST(NIN,IAD(3))%CUTCOOR(iPOSe(3));
             J       = IAD(3)-(IB-1)*12;
-            EdgNod1 = IXS(1+iEDGE(1,J),ID);
-            EdgNod2 = IXS(1+iEDGE(2,J),ID)
+            EdgNod1 = IXS(1+INT22_BUF%iEDGE(1,J),ID);
+            EdgNod2 = IXS(1+INT22_BUF%iEDGE(2,J),ID)
             wa3(1)  = beta * W(1,EdgNod1) + (ONE-beta)*W(1,EdgNod2)
             wa3(2)  = beta * W(2,EdgNod1) + (ONE-beta)*W(2,EdgNod2)
             wa3(3)  = beta * W(3,EdgNod1) + (ONE-beta)*W(3,EdgNod2)
             !interpolate w_a4
             beta    = EDGE_LIST(NIN,IAD(4))%CUTCOOR(iPOSe(4));
             J       = IAD(4)-(IB-1)*12;
-            EdgNod1 = IXS(1+iEDGE(1,J),ID);
-            EdgNod2 = IXS(1+iEDGE(2,J),ID)
+            EdgNod1 = IXS(1+INT22_BUF%iEDGE(1,J),ID);
+            EdgNod2 = IXS(1+INT22_BUF%iEDGE(2,J),ID)
             wa4(1)  = beta * W(1,EdgNod1) + (ONE-beta)*W(1,EdgNod2)
             wa4(2)  = beta * W(2,EdgNod1) + (ONE-beta)*W(2,EdgNod2)
             wa4(3)  = beta * W(3,EdgNod1) + (ONE-beta)*W(3,EdgNod2)
@@ -1551,48 +1542,48 @@ C             if (IBUG22_subvol==1)WRITE (*,FMT='(A1)') " "
             !interpolate w_a1
             beta    = EDGE_LIST(NIN,IAD(1))%CUTCOOR(iPOSe(1));
             J       = IAD(1)-(IB-1)*12;
-            EdgNod1 = IXS(1+iEDGE(1,J),ID);
-            EdgNod2 = IXS(1+iEDGE(2,J),ID)
+            EdgNod1 = IXS(1+INT22_BUF%iEDGE(1,J),ID);
+            EdgNod2 = IXS(1+INT22_BUF%iEDGE(2,J),ID)
             wa1(1)  = beta * W(1,EdgNod1) + (ONE-beta)*W(1,EdgNod2)
             wa1(2)  = beta * W(2,EdgNod1) + (ONE-beta)*W(2,EdgNod2)
             wa1(3)  = beta * W(3,EdgNod1) + (ONE-beta)*W(3,EdgNod2)
             !interpolate w_a2
             beta    = EDGE_LIST(NIN,IAD(2))%CUTCOOR(iPOSe(2));
             J       = IAD(2)-(IB-1)*12;
-            EdgNod1 = IXS(1+iEDGE(1,J),ID);
-            EdgNod2 = IXS(1+iEDGE(2,J),ID)
+            EdgNod1 = IXS(1+INT22_BUF%iEDGE(1,J),ID);
+            EdgNod2 = IXS(1+INT22_BUF%iEDGE(2,J),ID)
             wa2(1)  = beta * W(1,EdgNod1) + (ONE-beta)*W(1,EdgNod2)
             wa2(2)  = beta * W(2,EdgNod1) + (ONE-beta)*W(2,EdgNod2)
             wa2(3)  = beta * W(3,EdgNod1) + (ONE-beta)*W(3,EdgNod2)
             !interpolate w_a3
             beta    = EDGE_LIST(NIN,IAD(3))%CUTCOOR(iPOSe(3));
             J       = IAD(3)-(IB-1)*12;
-            EdgNod1 = IXS(1+iEDGE(1,J),ID);
-            EdgNod2 = IXS(1+iEDGE(2,J),ID)
+            EdgNod1 = IXS(1+INT22_BUF%iEDGE(1,J),ID);
+            EdgNod2 = IXS(1+INT22_BUF%iEDGE(2,J),ID)
             wa3(1)  = beta * W(1,EdgNod1) + (ONE-beta)*W(1,EdgNod2)
             wa3(2)  = beta * W(2,EdgNod1) + (ONE-beta)*W(2,EdgNod2)
             wa3(3)  = beta * W(3,EdgNod1) + (ONE-beta)*W(3,EdgNod2)
             !interpolate w_a4
             beta    = EDGE_LIST(NIN,IAD(4))%CUTCOOR(iPOSe(4));
             J       = IAD(4)-(IB-1)*12;
-            EdgNod1 = IXS(1+iEDGE(1,J),ID);
-            EdgNod2 = IXS(1+iEDGE(2,J),ID)
+            EdgNod1 = IXS(1+INT22_BUF%iEDGE(1,J),ID);
+            EdgNod2 = IXS(1+INT22_BUF%iEDGE(2,J),ID)
             wa4(1)  = beta * W(1,EdgNod1) + (ONE-beta)*W(1,EdgNod2)
             wa4(2)  = beta * W(2,EdgNod1) + (ONE-beta)*W(2,EdgNod2)
             wa4(3)  = beta * W(3,EdgNod1) + (ONE-beta)*W(3,EdgNod2)
             !interpolate w_a5
             beta    = EDGE_LIST(NIN,IAD(5))%CUTCOOR(iPOSe(5));
             J       = IAD(5)-(IB-1)*12;
-            EdgNod1 = IXS(1+iEDGE(1,J),ID);
-            EdgNod2 = IXS(1+iEDGE(2,J),ID)
+            EdgNod1 = IXS(1+INT22_BUF%iEDGE(1,J),ID);
+            EdgNod2 = IXS(1+INT22_BUF%iEDGE(2,J),ID)
             wa5(1)  = beta * W(1,EdgNod1) + (ONE-beta)*W(1,EdgNod2)
             wa5(2)  = beta * W(2,EdgNod1) + (ONE-beta)*W(2,EdgNod2)
             wa5(3)  = beta * W(3,EdgNod1) + (ONE-beta)*W(3,EdgNod2)
             !interpolate w_a6
             beta    = EDGE_LIST(NIN,IAD(6))%CUTCOOR(iPOSe(6));
             J       = IAD(6)-(IB-1)*12;
-            EdgNod1 = IXS(1+iEDGE(1,J),ID);
-            EdgNod2 = IXS(1+iEDGE(2,J),ID)
+            EdgNod1 = IXS(1+INT22_BUF%iEDGE(1,J),ID);
+            EdgNod2 = IXS(1+INT22_BUF%iEDGE(2,J),ID)
             wa6(1)  = beta * W(1,EdgNod1) + (ONE-beta)*W(1,EdgNod2)
             wa6(2)  = beta * W(2,EdgNod1) + (ONE-beta)*W(2,EdgNod2)
             wa6(3)  = beta * W(3,EdgNod1) + (ONE-beta)*W(3,EdgNod2)
@@ -1666,48 +1657,48 @@ C             if (IBUG22_subvol==1)WRITE (*,FMT='(A1)') " "
             !interpolate w_a1
             beta    = EDGE_LIST(NIN,IAD(1))%CUTCOOR(iPOSe(1));
             J       = IAD(1)-(IB-1)*12;
-            EdgNod1 = IXS(1+iEDGE(1,J),ID);
-            EdgNod2 = IXS(1+iEDGE(2,J),ID)
+            EdgNod1 = IXS(1+INT22_BUF%iEDGE(1,J),ID);
+            EdgNod2 = IXS(1+INT22_BUF%iEDGE(2,J),ID)
             wa1(1)  = beta * W(1,EdgNod1) + (ONE-beta)*W(1,EdgNod2)
             wa1(2)  = beta * W(2,EdgNod1) + (ONE-beta)*W(2,EdgNod2)
             wa1(3)  = beta * W(3,EdgNod1) + (ONE-beta)*W(3,EdgNod2)
             !interpolate w_a2
             beta    = EDGE_LIST(NIN,IAD(2))%CUTCOOR(iPOSe(2));
             J       = IAD(2)-(IB-1)*12;
-            EdgNod1 = IXS(1+iEDGE(1,J),ID);
-            EdgNod2 = IXS(1+iEDGE(2,J),ID)
+            EdgNod1 = IXS(1+INT22_BUF%iEDGE(1,J),ID);
+            EdgNod2 = IXS(1+INT22_BUF%iEDGE(2,J),ID)
             wa2(1)  = beta * W(1,EdgNod1) + (ONE-beta)*W(1,EdgNod2)
             wa2(2)  = beta * W(2,EdgNod1) + (ONE-beta)*W(2,EdgNod2)
             wa2(3)  = beta * W(3,EdgNod1) + (ONE-beta)*W(3,EdgNod2)
             !interpolate w_a3
             beta    = EDGE_LIST(NIN,IAD(3))%CUTCOOR(iPOSe(3));
             J       = IAD(3)-(IB-1)*12;
-            EdgNod1 = IXS(1+iEDGE(1,J),ID);
-            EdgNod2 = IXS(1+iEDGE(2,J),ID)
+            EdgNod1 = IXS(1+INT22_BUF%iEDGE(1,J),ID);
+            EdgNod2 = IXS(1+INT22_BUF%iEDGE(2,J),ID)
             wa3(1)  = beta * W(1,EdgNod1) + (ONE-beta)*W(1,EdgNod2)
             wa3(2)  = beta * W(2,EdgNod1) + (ONE-beta)*W(2,EdgNod2)
             wa3(3)  = beta * W(3,EdgNod1) + (ONE-beta)*W(3,EdgNod2)
             !interpolate w_a4
             beta    = EDGE_LIST(NIN,IAD(4))%CUTCOOR(iPOSe(4));
             J       = IAD(4)-(IB-1)*12;
-            EdgNod1 = IXS(1+iEDGE(1,J),ID);
-            EdgNod2 = IXS(1+iEDGE(2,J),ID)
+            EdgNod1 = IXS(1+INT22_BUF%iEDGE(1,J),ID);
+            EdgNod2 = IXS(1+INT22_BUF%iEDGE(2,J),ID)
             wa4(1)  = beta * W(1,EdgNod1) + (ONE-beta)*W(1,EdgNod2)
             wa4(2)  = beta * W(2,EdgNod1) + (ONE-beta)*W(2,EdgNod2)
             wa4(3)  = beta * W(3,EdgNod1) + (ONE-beta)*W(3,EdgNod2)
             !interpolate w_a5
             beta    = EDGE_LIST(NIN,IAD(5))%CUTCOOR(iPOSe(5));
             J       = IAD(5)-(IB-1)*12;
-            EdgNod1 = IXS(1+iEDGE(1,J),ID);
-            EdgNod2 = IXS(1+iEDGE(2,J),ID)
+            EdgNod1 = IXS(1+INT22_BUF%iEDGE(1,J),ID);
+            EdgNod2 = IXS(1+INT22_BUF%iEDGE(2,J),ID)
             wa5(1)  = beta * W(1,EdgNod1) + (ONE-beta)*W(1,EdgNod2)
             wa5(2)  = beta * W(2,EdgNod1) + (ONE-beta)*W(2,EdgNod2)
             wa5(3)  = beta * W(3,EdgNod1) + (ONE-beta)*W(3,EdgNod2)
             !interpolate w_a6
             beta    = EDGE_LIST(NIN,IAD(6))%CUTCOOR(iPOSe(6));
             J       = IAD(6)-(IB-1)*12;
-            EdgNod1 = IXS(1+iEDGE(1,J),ID);
-            EdgNod2 = IXS(1+iEDGE(2,J),ID)
+            EdgNod1 = IXS(1+INT22_BUF%iEDGE(1,J),ID);
+            EdgNod2 = IXS(1+INT22_BUF%iEDGE(2,J),ID)
             wa6(1)  = beta * W(1,EdgNod1) + (ONE-beta)*W(1,EdgNod2)
             wa6(2)  = beta * W(2,EdgNod1) + (ONE-beta)*W(2,EdgNod2)
             wa6(3)  = beta * W(3,EdgNod1) + (ONE-beta)*W(3,EdgNod2)
@@ -1780,48 +1771,48 @@ C             if (IBUG22_subvol==1)WRITE (*,FMT='(A1)') " "
             !interpolate w_a1
             beta    = EDGE_LIST(NIN,IAD(1))%CUTCOOR(iPOSe(1));
             J       = IAD(1)-(IB-1)*12;
-            EdgNod1 = IXS(1+iEDGE(1,J),ID);
-            EdgNod2 = IXS(1+iEDGE(2,J),ID)
+            EdgNod1 = IXS(1+INT22_BUF%iEDGE(1,J),ID);
+            EdgNod2 = IXS(1+INT22_BUF%iEDGE(2,J),ID)
             wa1(1)  = beta * W(1,EdgNod1) + (ONE-beta)*W(1,EdgNod2)
             wa1(2)  = beta * W(2,EdgNod1) + (ONE-beta)*W(2,EdgNod2)
             wa1(3)  = beta * W(3,EdgNod1) + (ONE-beta)*W(3,EdgNod2)
             !interpolate w_a2
             beta    = EDGE_LIST(NIN,IAD(2))%CUTCOOR(iPOSe(2));
             J       = IAD(2)-(IB-1)*12;
-            EdgNod1 = IXS(1+iEDGE(1,J),ID);
-            EdgNod2 = IXS(1+iEDGE(2,J),ID)
+            EdgNod1 = IXS(1+INT22_BUF%iEDGE(1,J),ID);
+            EdgNod2 = IXS(1+INT22_BUF%iEDGE(2,J),ID)
             wa2(1)  = beta * W(1,EdgNod1) + (ONE-beta)*W(1,EdgNod2)
             wa2(2)  = beta * W(2,EdgNod1) + (ONE-beta)*W(2,EdgNod2)
             wa2(3)  = beta * W(3,EdgNod1) + (ONE-beta)*W(3,EdgNod2)
             !interpolate w_a3
             beta    = EDGE_LIST(NIN,IAD(3))%CUTCOOR(iPOSe(3));
             J       = IAD(3)-(IB-1)*12;
-            EdgNod1 = IXS(1+iEDGE(1,J),ID);
-            EdgNod2 = IXS(1+iEDGE(2,J),ID)
+            EdgNod1 = IXS(1+INT22_BUF%iEDGE(1,J),ID);
+            EdgNod2 = IXS(1+INT22_BUF%iEDGE(2,J),ID)
             wa3(1)  = beta * W(1,EdgNod1) + (ONE-beta)*W(1,EdgNod2)
             wa3(2)  = beta * W(2,EdgNod1) + (ONE-beta)*W(2,EdgNod2)
             wa3(3)  = beta * W(3,EdgNod1) + (ONE-beta)*W(3,EdgNod2)
             !interpolate w_a4
             beta    = EDGE_LIST(NIN,IAD(4))%CUTCOOR(iPOSe(4));
             J       = IAD(4)-(IB-1)*12;
-            EdgNod1 = IXS(1+iEDGE(1,J),ID);
-            EdgNod2 = IXS(1+iEDGE(2,J),ID)
+            EdgNod1 = IXS(1+INT22_BUF%iEDGE(1,J),ID);
+            EdgNod2 = IXS(1+INT22_BUF%iEDGE(2,J),ID)
             wa4(1)  = beta * W(1,EdgNod1) + (ONE-beta)*W(1,EdgNod2)
             wa4(2)  = beta * W(2,EdgNod1) + (ONE-beta)*W(2,EdgNod2)
             wa4(3)  = beta * W(3,EdgNod1) + (ONE-beta)*W(3,EdgNod2)
             !interpolate w_a5
             beta    = EDGE_LIST(NIN,IAD(5))%CUTCOOR(iPOSe(5));
             J       = IAD(5)-(IB-1)*12;
-            EdgNod1 = IXS(1+iEDGE(1,J),ID);
-            EdgNod2 = IXS(1+iEDGE(2,J),ID)
+            EdgNod1 = IXS(1+INT22_BUF%iEDGE(1,J),ID);
+            EdgNod2 = IXS(1+INT22_BUF%iEDGE(2,J),ID)
             wa5(1)  = beta * W(1,EdgNod1) + (ONE-beta)*W(1,EdgNod2)
             wa5(2)  = beta * W(2,EdgNod1) + (ONE-beta)*W(2,EdgNod2)
             wa5(3)  = beta * W(3,EdgNod1) + (ONE-beta)*W(3,EdgNod2)
             !interpolate w_a6
             beta    = EDGE_LIST(NIN,IAD(6))%CUTCOOR(iPOSe(6));
             J       = IAD(6)-(IB-1)*12;
-            EdgNod1 = IXS(1+iEDGE(1,J),ID);
-            EdgNod2 = IXS(1+iEDGE(2,J),ID)
+            EdgNod1 = IXS(1+INT22_BUF%iEDGE(1,J),ID);
+            EdgNod2 = IXS(1+INT22_BUF%iEDGE(2,J),ID)
             wa6(1)  = beta * W(1,EdgNod1) + (ONE-beta)*W(1,EdgNod2)
             wa6(2)  = beta * W(2,EdgNod1) + (ONE-beta)*W(2,EdgNod2)
             wa6(3)  = beta * W(3,EdgNod1) + (ONE-beta)*W(3,EdgNod2)
@@ -1894,48 +1885,48 @@ C             if (IBUG22_subvol==1)WRITE (*,FMT='(A1)') " "
             !interpolate w_a1
             beta    = EDGE_LIST(NIN,IAD(1))%CUTCOOR(iPOSe(1));
             J       = IAD(1)-(IB-1)*12;
-            EdgNod1 = IXS(1+iEDGE(1,J),ID);
-            EdgNod2 = IXS(1+iEDGE(2,J),ID)
+            EdgNod1 = IXS(1+INT22_BUF%iEDGE(1,J),ID);
+            EdgNod2 = IXS(1+INT22_BUF%iEDGE(2,J),ID)
             wa1(1)  = beta * W(1,EdgNod1) + (ONE-beta)*W(1,EdgNod2)
             wa1(2)  = beta * W(2,EdgNod1) + (ONE-beta)*W(2,EdgNod2)
             wa1(3)  = beta * W(3,EdgNod1) + (ONE-beta)*W(3,EdgNod2)
             !interpolate w_a2
             beta    = EDGE_LIST(NIN,IAD(2))%CUTCOOR(iPOSe(2));
             J       = IAD(2)-(IB-1)*12;
-            EdgNod1 = IXS(1+iEDGE(1,J),ID);
-            EdgNod2 = IXS(1+iEDGE(2,J),ID)
+            EdgNod1 = IXS(1+INT22_BUF%iEDGE(1,J),ID);
+            EdgNod2 = IXS(1+INT22_BUF%iEDGE(2,J),ID)
             wa2(1)  = beta * W(1,EdgNod1) + (ONE-beta)*W(1,EdgNod2)
             wa2(2)  = beta * W(2,EdgNod1) + (ONE-beta)*W(2,EdgNod2)
             wa2(3)  = beta * W(3,EdgNod1) + (ONE-beta)*W(3,EdgNod2)
             !interpolate w_a3
             beta    = EDGE_LIST(NIN,IAD(3))%CUTCOOR(iPOSe(3));
             J       = IAD(3)-(IB-1)*12;
-            EdgNod1 = IXS(1+iEDGE(1,J),ID);
-            EdgNod2 = IXS(1+iEDGE(2,J),ID)
+            EdgNod1 = IXS(1+INT22_BUF%iEDGE(1,J),ID);
+            EdgNod2 = IXS(1+INT22_BUF%iEDGE(2,J),ID)
             wa3(1)  = beta * W(1,EdgNod1) + (ONE-beta)*W(1,EdgNod2)
             wa3(2)  = beta * W(2,EdgNod1) + (ONE-beta)*W(2,EdgNod2)
             wa3(3)  = beta * W(3,EdgNod1) + (ONE-beta)*W(3,EdgNod2)
             !interpolate w_a4
             beta    = EDGE_LIST(NIN,IAD(4))%CUTCOOR(iPOSe(4));
             J       = IAD(4)-(IB-1)*12;
-            EdgNod1 = IXS(1+iEDGE(1,J),ID);
-            EdgNod2 = IXS(1+iEDGE(2,J),ID)
+            EdgNod1 = IXS(1+INT22_BUF%iEDGE(1,J),ID);
+            EdgNod2 = IXS(1+INT22_BUF%iEDGE(2,J),ID)
             wa4(1)  = beta * W(1,EdgNod1) + (ONE-beta)*W(1,EdgNod2)
             wa4(2)  = beta * W(2,EdgNod1) + (ONE-beta)*W(2,EdgNod2)
             wa4(3)  = beta * W(3,EdgNod1) + (ONE-beta)*W(3,EdgNod2)
             !interpolate w_a5
             beta    = EDGE_LIST(NIN,IAD(5))%CUTCOOR(iPOSe(5));
             J       = IAD(5)-(IB-1)*12;
-            EdgNod1 = IXS(1+iEDGE(1,J),ID);
-            EdgNod2 = IXS(1+iEDGE(2,J),ID)
+            EdgNod1 = IXS(1+INT22_BUF%iEDGE(1,J),ID);
+            EdgNod2 = IXS(1+INT22_BUF%iEDGE(2,J),ID)
             wa5(1)  = beta * W(1,EdgNod1) + (ONE-beta)*W(1,EdgNod2)
             wa5(2)  = beta * W(2,EdgNod1) + (ONE-beta)*W(2,EdgNod2)
             wa5(3)  = beta * W(3,EdgNod1) + (ONE-beta)*W(3,EdgNod2)
             !interpolate w_a6
             beta    = EDGE_LIST(NIN,IAD(6))%CUTCOOR(iPOSe(6));
             J       = IAD(6)-(IB-1)*12;
-            EdgNod1 = IXS(1+iEDGE(1,J),ID);
-            EdgNod2 = IXS(1+iEDGE(2,J),ID)
+            EdgNod1 = IXS(1+INT22_BUF%iEDGE(1,J),ID);
+            EdgNod2 = IXS(1+INT22_BUF%iEDGE(2,J),ID)
             wa6(1)  = beta * W(1,EdgNod1) + (ONE-beta)*W(1,EdgNod2)
             wa6(2)  = beta * W(2,EdgNod1) + (ONE-beta)*W(2,EdgNod2)
             wa6(3)  = beta * W(3,EdgNod1) + (ONE-beta)*W(3,EdgNod2)

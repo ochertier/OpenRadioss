@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -42,10 +42,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "comlock.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -94,10 +90,10 @@ C-----------------------------------------------------------
      1 INTBUF_TAB%CAND_E,INTBUF_TAB%CAND_N,INTBUF_TAB%XSAV(ADXLOC),
      .                                    I_STOK     ,INTBUF_TAB%IRECTM,
      2GAP      ,INTBUF_TAB%GAP_S,IPARI(21,NIN),IPARI(5,NIN) ,INTBUF_TAB%STFNS,
-     3ITASK	   ,INTBUF_TAB%STF,INACTI   ,INTBUF_TAB%IFPEN,INTBUF_TAB%FTSAVX,
+     3ITASK     ,INTBUF_TAB%STF,INACTI   ,INTBUF_TAB%IFPEN,INTBUF_TAB%FTSAVX,
      4INTBUF_TAB%FTSAVY,INTBUF_TAB%FTSAVZ,INTBUF_TAB%PENIS,NIN   ,INTBUF_TAB%VARIABLES(16),
      5IPARI(39,NIN),INTBUF_TAB%IRTLM,INTBUF_TAB%CSTS,INTBUF_TAB%VARIABLES(23),
-     .  					  INTBUF_TAB%NOD_NORMAL,
+     .              INTBUF_TAB%NOD_NORMAL,
      6INTBUF_TAB%XM0,INTBUF_TAB%VARIABLES(32),NB_STOK_N,NB_JLT,INTBUF_TAB%VARIABLES(46))
 C-----------------------------------------------------------
 C

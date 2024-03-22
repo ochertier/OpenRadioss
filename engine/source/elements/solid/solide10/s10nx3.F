@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,10 +26,8 @@ Chd|-- called by -----------
 Chd|        S10FORC3                      source/elements/solid/solide10/s10forc3.F
 Chd|-- calls ---------------
 Chd|====================================================================
-      SUBROUTINE S10NX3(NX)
-C-----------------------------------------------
-C   M o d u l e s
-C-----------------------------------------------
+      SUBROUTINE S10NX3(
+     1   NX,      NEL,     NPT)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -41,13 +39,13 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-C     REAL
+      INTEGER, INTENT(IN) :: NEL
+      INTEGER, INTENT(IN) :: NPT
       my_real
      .   NX(MVSIZ,10,5)
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "vect01_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -80,7 +78,7 @@ C
         K8 = IPERM(8,IP)
         K9 = IPERM(9,IP)
         K10= IPERM(10,IP)
-       DO I=LFT,LLT
+       DO I=1,NEL
         NX(I,K1,IP) = BB
         NX(I,K2,IP) = BB
         NX(I,K3,IP) = BB
@@ -95,7 +93,7 @@ C
       ENDDO
 C
       IF (NPT==5) THEN      
-        NX(LFT:LLT,1:10,5) = ZERO
+        NX(1:NEL,1:10,5) = ZERO
       ENDIF
 C-----------
       RETURN

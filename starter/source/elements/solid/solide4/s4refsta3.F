@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -39,25 +39,22 @@ Chd|        S4ROTA3                       source/elements/solid/solide4/s4rota3.
 Chd|        S4ROTAT3                      source/elements/solid/solide4/s4rota3.F
 Chd|        SORTHO3                       source/elements/solid/solide/sortho3.F
 Chd|        SRHO3                         source/elements/solid/solide/srho3.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        MAT_ELEM_MOD                  ../common_source/modules/mat_elem/mat_elem_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
       SUBROUTINE S4REFSTA3(ELBUF_STR,IXS     ,PM     ,GEO     ,IPARG   ,
-     .                     IPM    ,IGEO    ,SKEW   ,X      ,XREFS   ,
-     .                     NEL      ,IPARTS  ,IPART  ,BUFMAT  ,
-     .                     NPF      ,TF      )
+     .                     IPM      ,IGEO    ,SKEW   ,X      ,XREFS   ,
+     .                     NEL      ,IPARTS  ,IPART  ,BUFMAT  ,MAT_PARAM,
+     .                     NPF      ,TF      ,NUMMAT )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
-      USE ELBUFDEF_MOD            
+      USE MAT_ELEM_MOD
       USE MESSAGE_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
 C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
@@ -65,18 +62,14 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "scr01_c.inc"
 #include      "scr03_c.inc"
 #include      "scr17_c.inc"
-#include      "units_c.inc"
 #include      "vect01_c.inc"
-#include      "warn_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER ,INTENT(IN) :: NUMMAT
       INTEGER IXS(NIXS,*), IPARG(*),IPARTS(*),IGEO(NPROPGI,*),
      .    IPM(NPROPMI,*),IPART(LIPART1,*), NPF(*)
       INTEGER NEL
@@ -84,10 +77,11 @@ C-----------------------------------------------
      .   PM(NPROPM,*), X(3,*), XREFS(8,3,*), GEO(NPROPG,*),
      .   SKEW(LSKEW,*), BUFMAT(*), TF(*)
       TYPE (ELBUF_STRUCT_), TARGET :: ELBUF_STR
+      TYPE (MATPARAM_STRUCT_) ,DIMENSION(NUMMAT) ,INTENT(INOUT) :: MAT_PARAM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,II, N, JHBE, IGTYP, ITRS, ISTRA, IPID, IBID,
+      INTEGER I,II, N, JHBE, IMAT,IGTYP, ITRS, ISTRA, IPID, IBID,
      .        NITSAV,JJ(6)
       INTEGER ID
       CHARACTER*nchartitle,
@@ -175,6 +169,7 @@ C----------------------------
           IX3(I)=IXS(7,N)
           IX4(I)=IXS(6,N)
         END DO
+        IMAT = MAT(1)
 C----------------------------
 C        Coordinates
 C----------------------------
@@ -309,7 +304,7 @@ C----------------------------
         DO ITRS=1,NITRS
 C
           FAC = FLOAT(ITRS)
-C--------in  global sys	
+C--------in  global sys
         IF (ISMSTR >= 10) THEN
            CALL S4DERI3(VOLN   ,VBID   ,GEO    ,IGEO   ,RX    ,
      .          RY     ,RZ     ,SX     ,SY     ,
@@ -447,7 +442,7 @@ C-----------
      .         VYL(1,1)   ,VYL(1,2)   ,VYL(1,3)   ,VYL(1,4)   ,
      .         VZL(1,1)   ,VZL(1,2)   ,VZL(1,3)   ,VZL(1,4)   )
 C-----calculate Dij anyway to get EINT 
-C-----(small strain is not taken account here, if do it, should also modify SRHO3)	
+C-----(small strain is not taken account here, if do it, should also modify SRHO3)
           CALL S4DEFO3(
      .      PX1, PX2, PX3, PX4,
      .      PY1, PY2, PY3, PY4,
@@ -471,8 +466,8 @@ C-----------
 C-----------
           CALL MMAIN(PM     ,ELBUF_STR,IXS     ,NIXS   ,X      ,
      2               GEO    ,IPARG  ,NEL     ,SKEW   ,BUFMAT ,
-     3               IPART  ,IPARTS ,
-     4               MAT    ,IPM    ,NGL     ,PID    ,NPF    ,
+     3               IPART  ,IPARTS ,NUMMAT  ,MAT_PARAM,
+     4               IMAT   ,IPM    ,NGL     ,PID    ,NPF    ,
      5               TF     ,MFXX   ,MFXY   ,MFXZ    ,MFYX   ,
      6               MFYY   ,MFYZ   ,MFZX   ,MFZY    ,MFZZ   ,
      7               RX     ,RY     ,RZ     ,SX      ,SY     ,
@@ -567,10 +562,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -36,7 +36,7 @@ Chd|        TABLE_MOD                     share/modules1/table_mod.F
 Chd|====================================================================
       SUBROUTINE LAW58_UPD(IOUT   ,TITR   ,UPARAM ,NPC    ,PLD    ,  
      .                     NFUNC  ,NFUNL  ,IFUNC  ,MAT_ID ,FUNC_ID,
-     .                     PM     ,NUPARAM,SENSOR_TAB)
+     .                     PM     ,NUPARAM,SENSORS)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -59,13 +59,13 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       CHARACTER*nchartitle  :: TITR
       INTEGER MAT_ID,IOUT,NFUNC,NFUNL,NUPARAM,NPTS
-      INTEGER NPC(SNPC), FUNC_ID(*),IFUNC(NFUNC+NFUNL)
+      INTEGER NPC(SNPC), FUNC_ID(NFUNCT),IFUNC(NFUNC+NFUNL)
       my_real UPARAM(NUPARAM),PLD(STF),PM(NPROPM)
-      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE (SENSORS_) ,INTENT(IN) :: SENSORS
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,K,FUNC,FUND,UNLOAD,PN,IOK,ISENS,SENS_ID,TEST
+      INTEGER I,K,FUNC,FUND,UNLOAD,PN,IOK,ISENS,SENS_ID
       my_real KC,KT,KCMAX,KTMAX,KFC,KFT,GMAX,DERI,STIFF,STIFFMIN,STIFFINI,
      .  STIFFMAX,STIFFAVG,XINT1,YINT1,XINT2,YINT2,FAC,FAC1,FAC2,GFROT,GSH
 C=======================================================================
@@ -82,16 +82,17 @@ C----------------------------
       SENS_ID = UPARAM(25)
       ISENS   = 0
       IF (SENS_ID > 0 ) THEN
-        DO I=1,NSENSOR
-          IF (SENS_ID == SENSOR_TAB(I)%SENS_ID) THEN
+        DO I=1,SENSORS%NSENSOR
+          IF (SENS_ID == SENSORS%SENSOR_TAB(I)%SENS_ID) THEN
             ISENS = I
-            UPARAM(25) = ISENS
             EXIT
           END IF
         ENDDO
-        IF (ISENS == 0)  
-     .    CALL ANCMSG(MSGID=1240,ANMODE=ANINFO,MSGTYPE=MSGWARNING,
-     .  	      I1=MAT_ID,C1=TITR,I2=ISENS) 
+        IF (ISENS == 0) THEN 
+          CALL ANCMSG(MSGID=1240,ANMODE=ANINFO,MSGTYPE=MSGWARNING,
+     .          I1=MAT_ID,C1=TITR,I2=ISENS) 
+        END IF
+        UPARAM(25) = ISENS
       ENDIF
 c---------------------------------------------------------------
       KC   = ZERO

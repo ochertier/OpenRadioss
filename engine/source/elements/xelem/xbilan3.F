@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,28 +26,26 @@ Chd|-- called by -----------
 Chd|        XFORC3                        source/elements/xelem/xforc3.F
 Chd|-- calls ---------------
 Chd|====================================================================
-      SUBROUTINE XBILAN3(NX    ,KXX   ,IXX   ,X       ,V    ,
-     2                   VR    ,UMASS ,UINER ,FORC    ,TORQ  ,
-     3                   KEUSR , EUSR ,EINT  ,PARTSAV ,IPART ,
-     4                   GRESAV,GRTH  ,IGRTH)
+      SUBROUTINE XBILAN3(
+     1   NX,      KXX,     IXX,     X,
+     2   V,       VR,      UMASS,   UINER,
+     3   FORC,    TORQ,    KEUSR,   EUSR,
+     4   EINT,    PARTSAV, IPART,   GRESAV,
+     5   GRTH,    IGRTH,   IGRE)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com08_c.inc"
-#include      "com01_c.inc"
 #include      "param_c.inc"
 #include      "scr23_c.inc"
-#include      "vect01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: IGRE
       INTEGER KXX(NIXX),IXX(*),NX,KEUSR,IPART,GRTH(*),IGRTH(*)
 C     REAL
       my_real

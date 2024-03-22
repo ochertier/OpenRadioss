@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,8 +26,8 @@ Chd|  C_IXFLOC                      source/restart/ddsplit/c_ixfloc.F
 Chd|-- called by -----------
 Chd|        DDSPLIT                       source/restart/ddsplit/ddsplit.F
 Chd|-- calls ---------------
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|====================================================================
       SUBROUTINE C_IXFLOC(NUMEL,IXSF,IXQF,IXTGF,NSVOIS,
      +                    NQVOIS,NTGVOIS,PROC,IPARG,CEP,CEL,
@@ -39,7 +39,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -66,9 +65,6 @@ C-----------------------------------------------
       INTEGER, DIMENSION(3*NUMELTG,*), INTENT(in) :: FACE_ELM_TG
       TYPE(t_ale_connectivity), INTENT(INOUT) :: ALE_CONNECTIVITY
       TYPE(t_connectivity_ext1), INTENT(INOUT) :: ee_connect_l
-C-----------------------------------------------
-C   F u n c t i o n
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -136,9 +132,9 @@ C
          NEL = IPARG(2,NG)
          NFT = IPARG(3,NG)
          ITY = IPARG(5,NG)
-Cel voir autres types solides
+C   voir autres types solides
          ISOLNOD = IPARG(28,NG)
-Cel 3D
+C   3D
          IF(ITY==1) THEN
            DO I = 1, NEL
              IE = I+NFT
@@ -146,7 +142,7 @@ Cel 3D
              IAD1 = ALE_CONNECTIVITY%ee_connect%iad_connect(IE)
              LGTH = ALE_CONNECTIVITY%ee_connect%iad_connect(IE+1)-ALE_CONNECTIVITY%ee_connect%iad_connect(IE)
              TAGE(IE) = CEL(IE)
-Cel IVOIS
+C   IVOIS
              DO J = 1, LGTH
                IV = ALE_CONNECTIVITY%ee_connect%connected(IAD1 + J - 1)
                IAD2 = ee_connect_l%iad_connect(IE_LOC) + J - 1
@@ -154,11 +150,11 @@ Cel IVOIS
                  PROC2 = CEP(IV)
                  IV_LOC = CEL(IV)
                  IF(PROC2/=PROC) THEN
-Cel element frontiere
+C   element frontiere
                    IF(TAGE(IV)==0) THEN
                      IFS = IFS + 1
                      TAGE(IV) = NUMELS_L+IFS
-Cel recopie IXS + chgt no local des noeuds
+C   recopie IXS + chgt no local des noeuds
                      DO K = 1,1
                        IXSF(K,IFS) = IXS(K,IV)
                      ENDDO
@@ -169,7 +165,7 @@ Cel recopie IXS + chgt no local des noeuds
                        IXSF(K,IFS) = IXS(K,IV)
                      ENDDO
                    ENDIF
-Cel ivois     
+C   ivois     
                    ee_connect_l%connected(IAD2) = TAGE(IV)
                    
                    ID_GLOBAL_VOIS( (IE_LOC-1)*6+J ) = IXS(NIXS,IV) ! pas sur le proc courant
@@ -179,7 +175,7 @@ Cel ivois
                         ENDIF                     
                    ENDDO
                  ELSE
-Cel element interne
+C   element interne
                    ee_connect_l%connected(IAD2) = IV_LOC
                    ID_GLOBAL_VOIS( (IE_LOC-1)*6+J ) = IXS(NIXS,IV) ! sur le proc courant
                  ENDIF
@@ -193,14 +189,14 @@ Cel element interne
            ENDDO
            NFT_LOC = NFT_LOC + NEL
          ELSEIF(ITY==2) THEN
-Cel 2D
+C   2D
            DO I = 1, NEL
              IE = I+NFT
              IE_lOC = I+NFT_LOC
              IAD1 = ALE_CONNECTIVITY%ee_connect%iad_connect(IE)
              LGTH = ALE_CONNECTIVITY%ee_connect%iad_connect(IE+1)-ALE_CONNECTIVITY%ee_connect%iad_connect(IE)
              TAGE(IE) = CEL(IE)
-Cel IVOIS
+C   IVOIS
              DO J = 1, LGTH
                IV = ALE_CONNECTIVITY%ee_connect%connected(IAD1 + J - 1)
                IAD2 = ee_connect_l%iad_connect(IE_LOC) + J - 1
@@ -208,11 +204,11 @@ Cel IVOIS
                  PROC2  = CEP(IV)
                  IV_LOC = CEL(IV)
                  IF(PROC2/=PROC) THEN
-Cel element frontiere
+C   element frontiere
                    IF(TAGE(IV)==0) THEN
                      IFQ = IFQ + 1
                      TAGE(IV) = NUMELQ_L+IFQ
-Cel recopie IXQ + chgt no local des noeuds
+C   recopie IXQ + chgt no local des noeuds
                      DO K = 1,1
                        IXQF(K,IFQ) = IXQ(K,IV)
                      ENDDO
@@ -223,7 +219,7 @@ Cel recopie IXQ + chgt no local des noeuds
                        IXQF(K,IFQ) = IXQ(K,IV)
                      ENDDO
                    ENDIF
-Cel ivois
+C   ivois
                    ee_connect_l%connected(IAD2) = TAGE(IV)
                    ID_GLOBAL_VOIS( (IE_LOC-1)*4+J ) = IXQ(NIXQ,IV)
                    DO K=1,INDX_Q(IE)
@@ -232,7 +228,7 @@ Cel ivois
                         ENDIF                       
                    ENDDO
                  ELSE
-Cel element interne
+C   element interne
                    ee_connect_l%connected(IAD2) = IV_LOC 
                    ID_GLOBAL_VOIS( (IE_LOC-1)*4+J ) = IXQ(NIXQ,IV)
                  ENDIF
@@ -246,14 +242,14 @@ Cel element interne
            ENDDO
            NFT_LOC = NFT_LOC + NEL
          ELSEIF(ITY==7 .AND. (N2D /= 0 .AND. MULTI_FVM%IS_USED)) THEN
-Cel 2D
+C   2D
            DO I = 1, NEL
              IE = I+NFT
              IE_lOC = I+NFT_LOC
              IAD1 = ALE_CONNECTIVITY%ee_connect%iad_connect(IE)
              LGTH = ALE_CONNECTIVITY%ee_connect%iad_connect(IE+1)-ALE_CONNECTIVITY%ee_connect%iad_connect(IE)
              TAGE(IE) = CEL(IE)
-Cel IVOIS
+C   IVOIS
              DO J = 1, 3
                IV = ALE_CONNECTIVITY%ee_connect%connected(IAD1 + J - 1)
                IAD2 = ee_connect_l%iad_connect(IE_LOC) + J - 1
@@ -261,11 +257,11 @@ Cel IVOIS
                  PROC2  = CEP(IV)
                  IV_LOC = CEL(IV)
                  IF(PROC2/=PROC) THEN
-Cel element frontiere
+C   element frontiere
                    IF(TAGE(IV)==0) THEN
                      IFTG = IFTG + 1
                      TAGE(IV) = NUMELTG_L+IFTG
-Cel recopie IXQ + chgt no local des noeuds
+C   recopie IXQ + chgt no local des noeuds
                      DO K = 1,1
                        IXTGF(K,IFTG) = IXTG(K,IV)
                      ENDDO
@@ -276,7 +272,7 @@ Cel recopie IXQ + chgt no local des noeuds
                        IXTGF(K,IFTG) = IXTG(K,IV)
                      ENDDO
                    ENDIF
-Cel ivois
+C   ivois
                    ee_connect_l%connected(IAD2) = TAGE(IV)
                    ID_GLOBAL_VOIS( (IE_LOC-1)*3+J ) = IXTG(NIXTG,IV)
 
@@ -287,7 +283,7 @@ Cel ivois
                    ENDDO
 
                  ELSE
-Cel element interne
+C   element interne
                    ee_connect_l%connected(IAD2) = IV_LOC
                    ID_GLOBAL_VOIS( (IE_LOC-1)*3+J ) = IXTG(NIXTG,IV)
                  ENDIF

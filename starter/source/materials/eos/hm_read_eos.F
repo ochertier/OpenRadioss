@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,7 +26,6 @@ Chd|-- called by -----------
 Chd|        READ_MATERIAL_MODELS          source/materials/read_material_models.F
 Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
-Chd|        FRETITL2                      source/starter/freform.F      
 Chd|        HM_GET_STRING                 source/devtools/hm_reader/hm_get_string.F
 Chd|        HM_OPTION_COUNT               source/devtools/hm_reader/hm_option_count.F
 Chd|        HM_OPTION_READ_KEY            source/devtools/hm_reader/hm_option_read_key.F
@@ -49,15 +48,17 @@ Chd|        HM_READ_EOS_TABULATED         source/materials/eos/hm_read_eos_tabul
 Chd|        HM_READ_EOS_TILLOTSON         source/materials/eos/hm_read_eos_tillotson.F
 Chd|        ELBUFTAG_MOD                  share/modules1/elbuftag_mod.F 
 Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
+Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
       SUBROUTINE HM_READ_EOS(
-     .           IPM      ,PM       ,BUFMAT   ,BUFLEN   ,IADBUF   ,
-     .           EOS_TAG  ,MAXEOS   ,UNITAB   ,LSUBMODEL)
+     .           MAT_PARAM   ,IPM      ,PM       ,BUFMAT   ,
+     .           BUFLEN      ,IADBUF   ,EOS_TAG  ,UNITAB   ,LSUBMODEL)
 C-----------------------------------------------
 C   A n a l y s e   M o d u l e
 C-----------------------------------------------
+      USE MATPARAM_DEF_MOD
       USE UNITAB_MOD
       USE MESSAGE_MOD
       USE ELBUFTAG_MOD            
@@ -74,15 +75,15 @@ C-----------------------------------------------
 #include      "units_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "sysunit.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       TYPE (UNIT_TYPE_),INTENT(IN) ::UNITAB 
-      INTEGER  :: BUFLEN,MAXEOS,IADBUF
+      INTEGER  :: BUFLEN,IADBUF
       INTEGER ,DIMENSION(NPROPMI,NUMMAT) ,INTENT(INOUT) :: IPM
       my_real ,DIMENSION(NPROPM ,NUMMAT) ,INTENT(INOUT) :: PM
       my_real ,DIMENSION(*)              ,INTENT(INOUT) :: BUFMAT
+      TYPE(MATPARAM_STRUCT_) ,DIMENSION(NUMMAT) ,INTENT(INOUT) :: MAT_PARAM
       TYPE(EOS_TAG_),DIMENSION(0:MAXEOS) ,INTENT(INOUT) :: EOS_TAG
       TYPE(SUBMODEL_DATA) ,DIMENSION(*)  ,INTENT(IN)    :: LSUBMODEL
 C-----------------------------------------------
@@ -160,7 +161,7 @@ c--------------------------------------------------
 c       Check Unit_ID
 c--------------------------------------------------
         FLAGUNIT = 0
-        DO IUNIT=1,NUNITS
+        DO IUNIT=1,UNITAB%NUNITS
           IF (UNITAB%UNIT_ID(IUNIT) == UID) THEN
             FLAGUNIT = 1
             EXIT
@@ -177,16 +178,6 @@ c--------------------------------------------------
      .                C2='EOS MODEL',
      .                C3= TITR)                             
         ENDIF
-
-        MTN = IPM(2,IMAT)  
-        IF(MTN/=3.AND.MTN/=4.AND.MTN/=6.AND.MTN/=10.AND.MTN/=12.AND.MTN/=49.AND.MTN/=102.AND.MTN/=103) THEN       
-          CALL FRETITL2(TITR,IPM(NPROPMI-LTITR+1,I),LTITR)                                                                        
-          CALL ANCMSG(MSGID=824,                                                                                                  
-     .                MSGTYPE=MSGERROR,                                                                                           
-     .                ANMODE=ANINFO,                                                                                              
-     .                I1=IPM(1,IMAT),                                                                                                
-     .                C1=TITR,I2=MTN)                                                                                             
-        ENDIF                                                                      
 c--------------------------------------------------
 c       Read EOS model
 c--------------------------------------------------
@@ -195,10 +186,6 @@ c
 c-----------------------------
         EOS_key = KEY2(1:LEN_TRIM(KEY2))
         SELECT CASE (EOS_key)
-c---
-          CASE ('LINEAR')
-            IEOS = 0                          
-            CALL HM_READ_EOS_LINEAR(IOUT,PM(1,IMAT),UNITAB,IUNIT,LSUBMODEL,IMIDEOS)
 c---
           CASE ('POLYNOMIAL')
             IEOS = 1     
@@ -210,7 +197,7 @@ c---
 c---
           CASE ('TILLOTSON')
             IEOS = 3  
-            CALL HM_READ_EOS_TILLOTSON(IOUT,PM(1,IMAT),UNITAB,IUNIT,LSUBMODEL,IMIDEOS,EOS_TAG,IEOS,MAXEOS)                                    
+            CALL HM_READ_EOS_TILLOTSON(IOUT,PM(1,IMAT),UNITAB,IUNIT,LSUBMODEL,IMIDEOS,EOS_TAG,IEOS)
 c---
           CASE ('PUFF')
             IEOS = 4  
@@ -250,7 +237,7 @@ c---
 c---
           CASE ('COMPACTION')
             IEOS = 13                          
-            CALL HM_READ_EOS_COMPACTION(IOUT,PM(1,IMAT),UNITAB,IUNIT,LSUBMODEL,IMIDEOS,EOS_TAG,IEOS,MAXEOS)                                    
+            CALL HM_READ_EOS_COMPACTION(IOUT,PM(1,IMAT),UNITAB,IUNIT,LSUBMODEL,IMIDEOS,EOS_TAG,IEOS)
 c---
           CASE ('NASG')
             IEOS = 14                          
@@ -262,8 +249,11 @@ c---
 c---
           CASE ('TABULATED')
             IEOS = 17     
-            CALL HM_READ_EOS_TABULATED(IOUT,PM(1,IMAT),UNITAB,IUNIT,LSUBMODEL,IMIDEOS)                                
-                                               
+            CALL HM_READ_EOS_TABULATED(IOUT,PM(1,IMAT),UNITAB,IUNIT,LSUBMODEL,IMIDEOS)                                                                              
+c---
+          CASE ('LINEAR')
+            IEOS = 18                          
+            CALL HM_READ_EOS_LINEAR(IOUT,PM(1,IMAT),UNITAB,IUNIT,LSUBMODEL,IMIDEOS)
 c---
           CASE DEFAULT
             IEOS = -1 
@@ -277,11 +267,11 @@ c---
         END SELECT
 c
         IPM(4,IMAT) = IEOS
+        MAT_PARAM(IMAT)%IEOS = IEOS
 c--------------------------------------------------
 c
       ENDDO      !  HM_NEOS
 c--------------------------------------------------
-c
       DO I=1,NUMMAT-1
         MTN = IPM(2,I)
         IF (MTN /= 42) PM(100,I) = PM(32,I)

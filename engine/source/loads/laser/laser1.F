@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,7 +27,7 @@ Chd|        ALEWDX                        source/ale/grid/alewdx.F
 Chd|-- calls ---------------
 Chd|        LASER2                        source/loads/laser/laser2.F   
 Chd|        LASER3                        source/loads/laser/laser2.F   
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE LASER1(LAS ,XLAS ,MS    ,X    ,V     ,
      .                  W   ,WA   ,IPARG ,IXQ  ,PM    , 
@@ -45,11 +45,7 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com06_c.inc"
-#include      "com08_c.inc"
-#include      "units_c.inc"
 #include      "param_c.inc"
-#include      "scr11_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -89,9 +85,9 @@ C
        IAFUNC  = LAS(K1+4)
        ITYP    = LAS(K1+5)
        IF(ITYP==1)THEN
-         CALL LASER3(NL        ,N1      ,N2   ,IFUNC    ,IAFUNC    ,
+         CALL LASER3(NL        ,IFUNC    ,
      .               LAS(K1+6) ,XLAS(K2),X    ,ELBUF_TAB,PM        ,
-     .               WA        ,IPARG   ,IXQ  ,TF       ,NPF       )
+     .               IPARG   ,IXQ  ,TF       ,NPF       )
        ELSE
          CALL LASER2(NL       ,N1      ,N2   ,IFUNC    ,IAFUNC    ,
      .              LAS(K1+6) ,XLAS(K2),X    ,ELBUF_TAB,PM        ,

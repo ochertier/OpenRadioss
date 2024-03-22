@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -45,15 +45,15 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE LAW_USERSH
+      USE NAMES_AND_TITLES_MOD, ONLY: NCHARLINE100
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------      
 #include      "implicit_f.inc"
-#include      "nchara_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      CHARACTER,INTENT(INOUT) :: IUSER_KEY*ncharline
+      CHARACTER(LEN=NCHARLINE100),INTENT(INOUT) :: IUSER_KEY
       INTEGER,INTENT(IN) :: ILAW_USER
 C-----------------------------------------------
 C   S o u r c e   L i n e s

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,7 +26,7 @@ Chd|-- called by -----------
 Chd|        GENANI                        source/output/anim/generate/genani.F
 Chd|-- calls ---------------
 Chd|        SPMD_GLOB_ISUM9               source/mpi/interfaces/spmd_th.F
-Chd|        WRITE_I_C                     source/output/tools/sortie_c.c
+Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|====================================================================
       SUBROUTINE SPMD_DPARRBE3(LRBE3, IRBE3,NODGLOB,WEIGHT,NERBE3Y,
      *                         NERBE3T )
@@ -34,7 +34,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -155,7 +154,7 @@ C Envoi des noeuds secnds
         SECNDNODS=0
          DO I=1,NRBE3
            MN =  IRBE3(3,I)
-	   IF(MN/=0)THEN
+             IF(MN/=0)THEN
              IF (WEIGHT(MN)==1) THEN
                NGRBE = IRBE3(10,I)
                SECNDNODS(NGRBE)=NODGLOB(MN)
@@ -186,9 +185,9 @@ C preparation IADRBE3
 C preparation P0RECRBE3 pour le proc0
          PGLOBRBE3=0
          DO I=1,NRBE3G
-	    PGLOBRBE3(I)=IADRBE3(I)
+              PGLOBRBE3(I)=IADRBE3(I)
          ENDDO
-	 	 
+           
          DO I=1,NRBE3
            NSN = IRBE3(5,I)
            IAD = IRBE3(1,I)
@@ -234,7 +233,7 @@ C Reception des Noeuds SECONDARYs
          SECNDNODS=0
          DO I=1,NRBE3
            MN =  IRBE3(3,I)
-	   IF(MN/=0)THEN
+             IF(MN/=0)THEN
              IF (WEIGHT(MN)==1) THEN
                NGRBE = IRBE3(10,I)
                SECNDNODS(NGRBE)=NODGLOB(MN)

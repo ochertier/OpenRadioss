@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,8 +25,8 @@ Chd|  ALEFVM_FRESET                 source/ale/alefvm/alefvm_freset.F
 Chd|-- called by -----------
 Chd|        SFORC3                        source/elements/solid/solide/sforc3.F
 Chd|-- calls ---------------
-Chd|        ALEFVM_MOD                    ../common_source/modules/alefvm_mod.F
-Chd|        I22BUFBRIC_MOD                ../common_source/modules/cut-cell-search_mod.F
+Chd|        ALEFVM_MOD                    ../common_source/modules/ale/alefvm_mod.F
+Chd|        I22BUFBRIC_MOD                ../common_source/modules/interfaces/cut-cell-search_mod.F
 Chd|====================================================================
       SUBROUTINE ALEFVM_FRESET (
      1                          ITASK, IAD22
@@ -57,16 +57,7 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "vect01_c.inc"
-#include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "com06_c.inc"
-#include      "com08_c.inc"
-#include      "nsvis_c.inc"
-#include      "fluid_scr_c.inc"
 #include      "inter22.inc"
-#include      "param_c.inc"
-#include      "alefvm.inc"
-#include      "task_c.inc"
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C----------------------------------------------- 
@@ -83,7 +74,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   P r e - C o n d i t i o n s
 C-----------------------------------------------      
-      IF(IALEFVM==0)RETURN
+      IF(ALEFVM_Param%IEnabled==0)RETURN
 C-----------------------------------------------
 C   S o u r c e   L i n e s 
 C-----------------------------------------------
@@ -95,18 +86,18 @@ C-----------------------------------------------
       !-------------------------------------------------------------!  
       IF(INT22==0)THEN    
         DO I=LFT,LLT
-          II                              = I + NFT
-          FCELL(1,II)                     = ZERO
-          FCELL(2,II)                     = ZERO
-          FCELL(3,II)                     = ZERO      
+          II                         = I + NFT
+          ALEFVM_Buffer%FCELL(1,II)  = ZERO
+          ALEFVM_Buffer%FCELL(2,II)  = ZERO
+          ALEFVM_Buffer%FCELL(3,II)  = ZERO      
         ENDDO!next I
       ELSE
         DO I=LFT,LLT
-          II                              = I + NFT
-          FCELL(1,II)                     = ZERO
-          FCELL(2,II)                     = ZERO
-          FCELL(3,II)                     = ZERO 
-          IB                              = NINT(IAD22(I))
+          II                        = I + NFT
+          ALEFVM_Buffer%FCELL(1,II) = ZERO
+          ALEFVM_Buffer%FCELL(2,II) = ZERO
+          ALEFVM_Buffer%FCELL(3,II) = ZERO 
+          IB                        = NINT(IAD22(I))
           IF(IB/=ZERO)THEN
             BRICK_LIST(NIN,IB)%FCELL(1:3) = ZERO
           ENDIF               

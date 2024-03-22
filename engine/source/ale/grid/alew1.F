@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,7 +26,8 @@ Chd|-- called by -----------
 Chd|        ALEWDX                        source/ale/grid/alewdx.F      
 Chd|-- calls ---------------
 Chd|        SPMD_XVOIS                    source/mpi/fluid/spmd_cfd.F   
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
+Chd|        ALE_MOD                       ../common_source/modules/ale/ale_mod.F
 Chd|====================================================================
       SUBROUTINE ALEW1( 
      1   X              ,D       ,V       ,W       ,
@@ -36,6 +37,7 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------      
       USE ALE_CONNECTIVITY_MOD
+      USE ALE_MOD
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C-----------------------------------------------
@@ -52,12 +54,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr05_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com07_c.inc"
 #include      "com08_c.inc"
-#include      "param_c.inc"
 #include      "tabsiz_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -72,7 +71,6 @@ C-----------------------------------------------
      .        LNRCVOIS(*),LNSDVOIS(*),ITAB(NUMNOD)
       my_real X(3,SX/3), D(3,SD/3), V(3,SV/3), W(3,SW/3)     
       TYPE(t_connectivity), INTENT(IN) :: ALE_NN_CONNECT
-
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -88,17 +86,9 @@ C-----------------------------------------------
 
 C  SPMD : COMM D
       IF(NSPMD > 1)THEN
-C
-C Part not parallel smt
-C
 !$OMP SINGLE
-
          LENCOM = NBRCVOIS(NSPMD+1)+NBSDVOIS(NSPMD+1)
-         CALL SPMD_XVOIS(
-     1        D     ,NBRCVOIS,NBSDVOIS,LNRCVOIS,LNSDVOIS,
-     2        LENCOM)
-
-C End part not parallel smt
+         CALL SPMD_XVOIS(D,NBRCVOIS,NBSDVOIS,LNRCVOIS,LNSDVOIS,LENCOM)
 !$OMP END SINGLE
 
       END IF
@@ -126,12 +116,12 @@ C End part not parallel smt
             DY = FAC * (DY_MAX + DY_MIN - TWO * D(2, I))
             DZ = FAC * (DZ_MAX + DZ_MIN - TWO * D(3, I))
 
-            DX=VGX*DX
-            DY=VGY*DY
-            DZ=VGZ*DZ
-            W(1,I)=SIGN(ONE,DX)*MIN(ABS(DX),ALPHA)
-            W(2,I)=SIGN(ONE,DY)*MIN(ABS(DY),ALPHA)
-            W(3,I)=SIGN(ONE,DZ)*MIN(ABS(DZ),ALPHA)
+            DX=ALE%GRID%VGX*DX
+            DY=ALE%GRID%VGY*DY
+            DZ=ALE%GRID%VGZ*DZ
+            W(1,I)=SIGN(ONE,DX)*MIN(ABS(DX),ALE%GRID%ALPHA)
+            W(2,I)=SIGN(ONE,DY)*MIN(ABS(DY),ALE%GRID%ALPHA)
+            W(3,I)=SIGN(ONE,DZ)*MIN(ABS(DZ),ALE%GRID%ALPHA)
          ELSEIF(NALE(I) == 0)THEN
             W(1,I)=V(1,I)
             W(2,I)=V(2,I)

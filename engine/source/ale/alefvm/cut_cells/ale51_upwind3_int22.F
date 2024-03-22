@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -28,9 +28,9 @@ Chd|        ALE51_FINISH                  source/ale/ale51/ale51_finish.F
 Chd|        ALE51_INIT                    source/ale/ale51/ale51_init.F 
 Chd|-- calls ---------------
 Chd|        MY_BARRIER                    source/system/machine.F       
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
-Chd|        I22BUFBRIC_MOD                ../common_source/modules/cut-cell-search_mod.F
-Chd|        I22TRI_MOD                    ../common_source/modules/cut-cell-search_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
+Chd|        I22BUFBRIC_MOD                ../common_source/modules/interfaces/cut-cell-search_mod.F
+Chd|        I22TRI_MOD                    ../common_source/modules/interfaces/cut-cell-search_mod.F
 Chd|====================================================================
       SUBROUTINE ALE51_UPWIND3_INT22(
      .                         PM     , IXS  , ITRIMAT,        IFLG ,
@@ -65,13 +65,10 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr05_c.inc"
 #include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "vect01_c.inc"
 #include      "param_c.inc"
 #include      "inter22.inc"
-#include      "i22edges.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -226,37 +223,37 @@ C                DDVOL = DDVOL + cellFLUX(J,ICELL,IB)-UPWL(J)*ABS(cellFLUX(J,ICE
       ! SECND CELLS STACK                                       !
       !---------------------------------------------------------!
       !STACK Secnd cells values from ones connected to current main cell                                                        
-      NIN = 1													       
-      DO IB=NBF,NBL												             
-     	NG    = BRICK_LIST(NIN,IB)%NG										       
-     	IE    = BRICK_LIST(NIN,IB)%ID										       
-     	IDLOC = BRICK_LIST(NIN,IB)%IDLOC									       
-     	MLW   =  BRICK_LIST(NIN,IB)%MLW 									       
-     	NUM   = BRICK_LIST(NIN,IB)%SecndList%Num								       
-     	MCELL = BRICK_LIST(NIN,IB)%mainID									       
-     	IF(MLW/=51)CYCLE											       
-     	DDVOL = ZERO												       
-     	DO K=1,NUM												       
-     	  IBV	 = BRICK_LIST(NIN,IB)%SecndList%IBV(K)  							       
-     	  ICELLv = BRICK_LIST(NIN,IB)%SecndList%ICELLv(K)							       
-     	  DDVOL  = DDVOL + BRICK_LIST(NIN,IBv)%POLY(ICELLv)%DDVOL_upw						       
-     	ENDDO													       
-     	DDVOL = DDVOL + BRICK_LIST(NIN,IB)%POLY(MCELL)%DDVOL_upw						       
-     	!updating law51 material buffer with computed stacked value						       
-     	IF(ITRIMAT>0)THEN											       
-     	  LFT	 =  1												       
-     	  LLT	 =  IPARG(2,NG) 										       
-     	  UVAR   => ELBUF_TAB(NG)%BUFLY(1)%MAT(1,1,1)%VAR							       
-     	  ADD	 = (N0PHAS + (ITRIMAT-1)*NVPHAS+12)*LLT 							       
-     	  pDDVOL => UVAR(ADD+1:ADD+LLT) 									       
-     	  pDDVOL(IDLOC) =  DDVOL   !*HALF  : deja applique facteur 1/2					       
-     	  if(ixs(11,IE)==26354)then										       
-     	    print *, "itrimat, ddvoli", itrimat, DDVOL  							       
-     	  endif 												       
-     	ELSE													       
-     	  BRICK_LIST(NIN,IB)%POLY(MCELL)%DDVOL_upw = DDVOL							       
-     	ENDIF													       
-      ENDDO!next IB												       
+      NIN = 1                                 
+      DO IB=NBF,NBL                                     
+          NG    = BRICK_LIST(NIN,IB)%NG                           
+          IE    = BRICK_LIST(NIN,IB)%ID                           
+          IDLOC = BRICK_LIST(NIN,IB)%IDLOC                         
+          MLW   =  BRICK_LIST(NIN,IB)%MLW                          
+          NUM   = BRICK_LIST(NIN,IB)%SecndList%Num                       
+          MCELL = BRICK_LIST(NIN,IB)%mainID                         
+          IF(MLW/=51)CYCLE                             
+          DDVOL = ZERO                               
+          DO K=1,NUM                               
+            IBV   = BRICK_LIST(NIN,IB)%SecndList%IBV(K)                       
+            ICELLv = BRICK_LIST(NIN,IB)%SecndList%ICELLv(K)                     
+            DDVOL  = DDVOL + BRICK_LIST(NIN,IBv)%POLY(ICELLv)%DDVOL_upw                   
+          ENDDO                                 
+          DDVOL = DDVOL + BRICK_LIST(NIN,IB)%POLY(MCELL)%DDVOL_upw                   
+          !updating law51 material buffer with computed stacked value                   
+          IF(ITRIMAT>0)THEN                             
+            LFT   =  1                               
+            LLT   =  IPARG(2,NG)                            
+            UVAR   => ELBUF_TAB(NG)%BUFLY(1)%MAT(1,1,1)%VAR                     
+            ADD   = (N0PHAS + (ITRIMAT-1)*NVPHAS+12)*LLT                      
+            pDDVOL => UVAR(ADD+1:ADD+LLT)                          
+            pDDVOL(IDLOC) =  DDVOL   !*HALF  : deja applique facteur 1/2                 
+            if(ixs(11,IE)==26354)then                           
+              print *, "itrimat, ddvoli", itrimat, DDVOL                       
+            endif                                
+          ELSE                                 
+            BRICK_LIST(NIN,IB)%POLY(MCELL)%DDVOL_upw = DDVOL                     
+          ENDIF                                 
+      ENDDO!next IB                               
       
 
       RETURN

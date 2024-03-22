@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -49,9 +49,6 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "param_c.inc"
 #include      "task_c.inc"
-#include      "scr05_c.inc"
-#include      "parit_c.inc"
-#include      "scr03_c.inc"
 #include      "impl1_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -155,7 +152,7 @@ C
               N6=N5+NRWALL
               IF(NPRW(N3) /= 0) THEN
                 IF(NSPMD > 1) THEN
-Cel si proc concerne par le rgwall
+C   si proc concerne par le rgwall
                   IF(FR_WALL(ISPMD+1,N) /= 0) THEN
                     CALL SPMD_EXCH_FR6(FR_WALL(1,N),FRWL6(1,1,N),7*6)
                   ENDIF
@@ -223,8 +220,6 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "param_c.inc"
 #include      "task_c.inc"
-#include      "scr05_c.inc"
-#include      "parit_c.inc"
 #include      "scr03_c.inc"
 #include      "com08_c.inc"
 #include      "impl1_c.inc"
@@ -267,11 +262,11 @@ c!$OMP END DO
 
           NDS=0
           IMP=1
-	      IF (IDYNA > 0) THEN
-	        CALL GETDYNA_A(1  ,NUMNOD   ,A )
-	      ELSE
+                IF (IDYNA > 0) THEN
+                  CALL GETDYNA_A(1  ,NUMNOD   ,A )
+                ELSE
             CALL ZEROR(A,NUMNOD)
-	      END IF
+                END IF
           IF (ICOMV == 1) THEN
            DTI = ONE/DT2
            DO N=1,NUMNOD
@@ -339,7 +334,7 @@ C
               N6=N5+NRWALL
               IF(NPRW(N3) /= 0) THEN
                 IF(NSPMD > 1) THEN
-Cel si proc concerne par le rgwall
+C   si proc concerne par le rgwall
                   IF(FR_WALL(ISPMD+1,N) /= 0) THEN
                     CALL SPMD_EXCH_FR6(FR_WALL(1,N),FRWL6(1,1,N),7*6)
                   ENDIF
@@ -390,13 +385,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "task_c.inc"
-#include      "scr05_c.inc"
-#include      "parit_c.inc"
-#include      "scr03_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -458,10 +448,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com06_c.inc"
 #include      "com08_c.inc"
-#include      "scr05_c.inc"
 #include      "sms_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
@@ -509,7 +496,7 @@ C
       ENDIF
 C
       IF(IDTMINS==0.AND.IDTMINS_INT==0)THEN
-Cel changement formulation F et XMT stockoques dans RWL et appliques debut cycle suivant
+C   changement formulation F et XMT stockoques dans RWL et appliques debut cycle suivant
          RWL(17)=(FXN+FXT)*DIVDT12
          RWL(18)=(FYN+FYT)*DIVDT12
          RWL(19)=(FZN+FZT)*DIVDT12

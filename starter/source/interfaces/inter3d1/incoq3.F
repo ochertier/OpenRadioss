@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -52,9 +52,7 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "units_c.inc"
 #include      "param_c.inc"
-#include      "warn_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -89,11 +87,11 @@ C-----------------------------------------------
   210     CONTINUE
           GOTO 230
   220   CONTINUE
-	IGTYP = IGEO(11,IXTG(5,N)) 
-	IF ( THK(NUMELC+N) /= ZERO .AND. IINTTHICK == 0 .AND.
+          IGTYP = IGEO(11,IXTG(5,N)) 
+          IF ( THK(NUMELC+N) /= ZERO .AND. IINTTHICK == 0 .AND.
      .       (NTY == 7 .OR. NTY == 20.OR. NTY == 22)) THEN
-	  DX=THK(NUMELC+N)
-	ELSEIF(IGTYP == 17 .OR. IGTYP == 51 .OR.IGTYP ==52) THEN
+            DX=THK(NUMELC+N)
+          ELSEIF(IGTYP == 17 .OR. IGTYP == 51 .OR.IGTYP ==52) THEN
            DX=THK(NUMELC+N) 
         ELSE
           DX = GEO(1,IXTG(5,N))
@@ -121,7 +119,7 @@ C-----------------------------------------------
             NELTG = N
             STM = ST
           ENDIF
-        ENDIF	     
+        ENDIF       
   230  CONTINUE
       ENDIF
 C
@@ -136,14 +134,14 @@ C
           GOTO 430
   420   CONTINUE
         IGTYP = IGEO(11,IXC(6,N))
-	IF ( THK(N) /= ZERO .AND. IINTTHICK == 0 .AND.
+          IF ( THK(N) /= ZERO .AND. IINTTHICK == 0 .AND.
      .       (NTY == 7 .OR. NTY == 20.OR. NTY == 22)) THEN
-	  DX=THK(N)
-	ELSEIF(IGTYP == 17 .OR. IGTYP ==51 .OR. IGTYP ==52) THEN
-	  DX=THK(N)
+            DX=THK(N)
+          ELSEIF(IGTYP == 17 .OR. IGTYP ==51 .OR. IGTYP ==52) THEN
+            DX=THK(N)
         ELSE 
           DX = GEO(1,IXC(6,N))
-	ENDIF
+          ENDIF
         IF (IXC(1,N)>0) THEN
           ST = PM(20,IXC(1,N))
         ELSE
@@ -158,7 +156,7 @@ C
             NEL = N
             STM = ST
           ENDIF
-        ENDIF	     
+        ENDIF       
   430  CONTINUE
       ENDIF
       RETURN

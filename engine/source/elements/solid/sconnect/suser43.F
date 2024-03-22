@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -44,8 +44,8 @@ Chd|        SMOM43                        source/elements/solid/sconnect/smom43.
 Chd|        SRROTA3                       source/elements/solid/solide/srrota3.F
 Chd|        STARTIME                      source/system/timer.F         
 Chd|        STOPTIME                      source/system/timer.F         
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
 Chd|        LAW_USERSO                    source/user_interface/law_userso.F
+Chd|        MAT_ELEM_MOD                  ../common_source/modules/mat_elem/mat_elem_mod.F
 Chd|        TABLE_MOD                     share/modules/table_mod.F     
 Chd|====================================================================
       SUBROUTINE SUSER43(
@@ -64,12 +64,12 @@ Chd|====================================================================
      G FZ1      ,FZ2   ,FZ3    ,FZ4    ,FZ5    ,FZ6    ,FZ7    ,FZ8    ,
      H STIFM    ,STIFR ,VISCM  ,VISCR  ,PARTSAV,IPARTS ,BUFMAT ,IOUTPRT,
      L IFAILURE ,NPF   ,TF     ,IPM    ,IGEO   ,NPG    ,NEL    ,JSMS   ,
-     M DMELS    ,PM    ,GEO    ,ITASK  ,JTHE   ,TABLE )
+     M DMELS    ,PM    ,GEO    ,ITASK  ,JTHE   ,TABLE  ,MAT_PARAM)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE TABLE_MOD
-      USE ELBUFDEF_MOD            
+      USE MAT_ELEM_MOD            
       USE LAW_USERSO
 C-------------------------------------------------------------------------
 C     This subroutine compute user 8 nodes solids forces and moments.
@@ -143,7 +143,6 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "scr19_c.inc"
 #include      "task_c.inc"
-#include      "usrplas_c.inc"
 #include      "userlib.inc"
 #include      "timeri_c.inc"
 C----------------------------------------------------------
@@ -171,12 +170,13 @@ C----------------------------------------------------------
      .  GEO(NPROPG,*)
       TYPE (ELBUF_STRUCT_)  ,TARGET :: ELBUF_STR
       my_real ,DIMENSION(*) ,TARGET :: BUFMAT
+      TYPE (MATPARAM_STRUCT_) ,DIMENSION(NUMMAT) ,INTENT(IN) :: MAT_PARAM
 C-----------------------------------------------
 C   L O C A L   V A R I A B L E S
 C-----------------------------------------------
-      INTEGER I,I1,I2,II,JJ(6),J,J1,J2,IC,IR,IP,IPG,JPT,IUV,IEL,ISRATE,
+      INTEGER I,I1,I2,II,JJ(6),J,J1,J2,IC,IR,IPG,JPT,IUV,IEL,ISRATE,
      .  NPAR,NPARF,NVARF,NFUNC,NFUNCR,NFAILS,ISMSTR,ILAW_USER,IPTR,IPTS,IPTT,
-     .  IADBUF,IADBUFR,IFAIL,NUVAR,MTN,NDAMF,ISOLID,ISOLIDF,NUMTABL,NVARTMP
+     .  IADBUF,IFAIL,NUVAR,MTN,NDAMF,ISOLID,ISOLIDF,NUMTABL,NVARTMP
       INTEGER IFUNC(MAXFUNC),IFUNCR(MAXFUNC)
       my_real :: A,B,C,ALPHA,EPSP,ASRATE,TTHICK,OFF_EL
       my_real 
@@ -443,7 +443,8 @@ c
      3         AREA     ,DEPSZZ   ,DEPSYZ   ,DEPSZX   ,EPSZZ    ,NPAR     ,
      4         SIG0ZZ   ,SIG0YZ   ,SIG0ZX   ,SIGNZZ   ,SIGNYZ   ,SIGNZX  ,  
      5         LBUF%PLA ,JSMS     ,DMELS    ,UVAR     ,NUVAR    ,
-     6         NUMTABL  ,ITABLE   ,TABLE    ,NVARTMP  ,VARTMP   ,LBUF%TEMP    )                                           
+     6         NUMTABL  ,ITABLE   ,TABLE    ,NVARTMP  ,VARTMP   ,LBUF%TEMP,
+     7         LBUF%DMG)                                           
 c           mean Gauss point values for element output                                                     
             DO IEL=1,NEL
               GBUF%PLA(IEL)  = GBUF%PLA(IEL)  + FOURTH*LBUF%PLA(IEL)
@@ -479,7 +480,7 @@ C           Fill Structure in dynamical library
      *           BID,    BID, BID, BID, BID, BID,  BID,  
      *           BID,    DEPSZZ, BID, DEPSYZ, DEPSZX, RHO0, BID,   
      *           BID,    SIGNZZ,  BID,  SIGNYZ,  SIGNZX,  BID,  BID,  
-     *  	        BID,    BID, BID, BID )                 
+     *            BID,    BID, BID, BID )                 
 c
 c           Call user law in dynamical user library
             CALL  ENG_USERLIB_SIGEPS99(
@@ -524,17 +525,15 @@ c--------------------------------------------------
         SOFT(1:NEL) = ONE
 c
         IF (IFAILURE == 1) THEN                                                
-          NFAILS = IPM(220, IMAT)       
+          NFAILS = MAT_PARAM(IMAT)%NFAIL     
                            
           DO IR = 1,NFAILS                                                     
-            IP = (IR -1)*15                                                    
-            IFAI L = IPM(111 +IP ,IMAT)                                        
-            NPARF  = IPM(112 +IP ,IMAT)                                        
-            NVARF  = IPM(113 +IP ,IMAT)    
-            IADBUFR= IPM(114 +IP ,IMAT)                                        
-            NFUNCR = IPM(115 +IP ,IMAT)                                        
+            IFAIL  = MAT_PARAM(IMAT)%FAIL(IR)%IRUPT                                   
+            NPARF  = MAT_PARAM(IMAT)%FAIL(IR)%NUPARAM                                       
+            NVARF  = MAT_PARAM(IMAT)%FAIL(IR)%NUVAR    
+            NFUNCR = MAT_PARAM(IMAT)%FAIL(IR)%NFUNC
             DO I=1,NFUNCR                                                      
-              IFUNCR(I) = IPM(115 + IP + I,IMAT)
+              IFUNCR(I) = MAT_PARAM(IMAT)%FAIL(IR)%IFUNC(I) 
             ENDDO                                                              
 C
             FLOC  => ELBUF_STR%BUFLY(1)%FAIL(IPG,1,1)%FLOC(IR)                      
@@ -543,7 +542,7 @@ c
 C
               CALL FAIL_CONNECT(                                                          
      1        NEL       ,NPARF    ,NVARF   ,NFUNCR   ,IFUNCR    ,                    
-     2        NPF       ,TF       ,TIME    ,TIMESTEP ,BUFMAT(IADBUFR),                
+     2        NPF       ,TF       ,TIME    ,TIMESTEP ,MAT_PARAM(IMAT)%FAIL(IR)%UPARAM,                
      3        FLOC%VAR  ,NGL      ,EPSZZ   ,EPSZX    ,EPSYZ     ,                           
      4        GBUF%EPSD ,GBUF%OFF ,LBUF%OFF,IPG      ,ISOLIDF   ,                       
      5        SIGNZZ    ,SIGNYZ   ,SIGNZX  ,DEIN     ,DEIT      ,              
@@ -554,7 +553,7 @@ C
               NDAMF =  FLOC%LF_DAM                                                  
               CALL FAIL_SNCONNECT(                                                          
      1        NEL       ,NPARF     ,NVARF     ,NFUNCR    ,IFUNCR    ,             
-     2        NPF       ,TF        ,TIME      ,TIMESTEP  ,BUFMAT(IADBUFR),         
+     2        NPF       ,TF        ,TIME      ,TIMESTEP  ,MAT_PARAM(IMAT)%FAIL(IR)%UPARAM,     
      3        FLOC%VAR  ,NGL       ,IPG       ,NPG       ,NDAMF     ,              
      4        LBUF%EPSD ,LBUF%PLA  ,GBUF%OFF  ,LBUF%OFF  ,ISOLIDF   ,         
      5        SIGNZZ    ,SIGNYZ    ,SIGNZX    ,SYM       ,AREAN     ,               
@@ -602,9 +601,9 @@ c       save current strain and stress
         ENDDO                               
         IF (ELBUF_STR%BUFLY(1)%L_EPE > 0) THEN
           DO IEL=1,NEL
-            LBUF%EPE(JJ(1)+IEL) = EPSZZ(IEL)	 
-            LBUF%EPE(JJ(2)+IEL) = EPSYZ(IEL)	 
-            LBUF%EPE(JJ(3)+IEL) = EPSZX(IEL)	 
+            LBUF%EPE(JJ(1)+IEL) = EPSZZ(IEL)   
+            LBUF%EPE(JJ(2)+IEL) = EPSYZ(IEL)   
+            LBUF%EPE(JJ(3)+IEL) = EPSZX(IEL)   
           ENDDO
         END IF
 c
@@ -638,10 +637,15 @@ C     Add forces for moment equilibrium
      .     RXX   ,RYY   ,RZZ   ,TTHICK ) 
 C     Nodal forces : corotationnal --> global
       CALL SRROTA3(
-     .     E1X   ,E1Y   ,E1Z   ,E2X   ,E2Y   ,E2Z   ,E3X   ,E3Y   ,E3Z ,
-     .     FX1   ,FX2   ,FX3   ,FX4   ,FX5   ,FX6   ,FX7   ,FX8   ,
-     .     FY1   ,FY2   ,FY3   ,FY4   ,FY5   ,FY6   ,FY7   ,FY8   ,
-     .     FZ1   ,FZ2   ,FZ3   ,FZ4   ,FZ5   ,FZ6   ,FZ7   ,FZ8   )
+     1   E1X,     E1Y,     E1Z,     E2X,
+     2   E2Y,     E2Z,     E3X,     E3Y,
+     3   E3Z,     FX1,     FX2,     FX3,
+     4   FX4,     FX5,     FX6,     FX7,
+     5   FX8,     FY1,     FY2,     FY3,
+     6   FY4,     FY5,     FY6,     FY7,
+     7   FY8,     FZ1,     FZ2,     FZ3,
+     8   FZ4,     FZ5,     FZ6,     FZ7,
+     9   FZ8,     NEL)
 c-----------
       RETURN
       END

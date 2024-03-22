@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -91,7 +91,7 @@ C=======================================================================
      .                             NSEG     ,IAD_SURF  ,OPT_O    ,BUFTMPSURF,CLAUSE)
       ELSE
         IF ( CLAUSE%NB_SH4N > 0 ) CALL SHELL_SURFACE_BUFFER_REMESH(
-     .                             IXC     ,NIXC      ,2	 ,5	    ,3     ,
+     .                             IXC     ,NIXC      ,2   ,5      ,3     ,
      .                             NSEG    ,IAD_SURF  ,BUFTMPSURF,CLAUSE    ,IPARTC ,
      .                             IPART   ,KSH4TREE  ,SH4TREE   )
         IF ( CLAUSE%NB_SH3N > 0 .AND. NUMELTRIA == 0) 

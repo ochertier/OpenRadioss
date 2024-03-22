@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -103,12 +103,9 @@ C=======================================================================
       SIGR_INI = UPARAM(3)                        
       ISHELL   = INT(UPARAM(4))                     
       IBRIT    = INT(UPARAM(6))                   
-      LAYXFEM  = INT(UPARAM(7))                  
       BRIT_B   = UPARAM(8)                        
       BRIT_C   = UPARAM(9)                        
       DADV     = UPARAM(10)
-c-----------------------------
-      IF (LAYXFEM == 0) RETURN
 c-----------------------------
       LAYXFEM = IXFEM
       IF (LAYXFEM == 1 .and. ISHELL == 1) ISHELL = 2

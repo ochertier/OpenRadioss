@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -70,13 +70,6 @@ C-----------------------------------------------
      .    INC,     
      .   DF1(MVSIZ), DF2(MVSIZ), DF3(MVSIZ), DF4(MVSIZ)
 C-----------------------------------------------
-      !EQUIVALENCE (GAMMA,BV(1,61)),(XMS,BV(1,62))
-C-------------------------------
-!      DO I=LFT,LLT
-!        XMS(I)  = HALF/(PY1(I)*PZ2(I)-PY2(I)*PZ1(I))
-!        GAMMA(I)= ONE
-!      ENDDO
-C-------------------------------
       DO I=LFT,LLT
         FI1(I)=FILL(NC1(I),1)
         FI2(I)=FILL(NC2(I),1)

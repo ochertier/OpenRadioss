@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -33,6 +33,7 @@ Chd|====================================================================
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE MY_ALLOC_MOD
       USE QA_OUT_MOD
       USE MESSAGE_MOD
 C-----------------------------------------------
@@ -42,15 +43,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "param_c.inc"
 #include      "scr03_c.inc"
-#include      "scr17_c.inc"
-#include      "tabsiz_c.inc"
-#include      "thermal_c.inc"
-#include      "units_c.inc"
-#include      "my_allocate.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -167,8 +161,8 @@ C
 C        
         IF (NEREF > 0) THEN
 C
-          MY_ALLOCATE(INDEX,2*NUMELC)
-          MY_ALLOCATE(ITR1,NUMELC)
+          CALL MY_ALLOC(INDEX,2*NUMELC)
+          CALL MY_ALLOC(ITR1,NUMELC)
 C
           DO IE=1,NUMELC
             ITR1(IE)=IXC(NIXC,IE)
@@ -210,8 +204,8 @@ C
           ENDDO
           DEALLOCATE(INDEX,ITR1)
 C
-          MY_ALLOCATE(INDEX,2*NUMELTG)
-          MY_ALLOCATE(ITR1,NUMELTG)
+          CALL MY_ALLOC(INDEX,2*NUMELTG)
+          CALL MY_ALLOC(ITR1,NUMELTG)
 C
           DO IE=1,NUMELTG
             ITR1(IE)=IXTG(NIXTG,IE)
@@ -253,8 +247,8 @@ C
           ENDDO
           DEALLOCATE(INDEX,ITR1)
 C
-          MY_ALLOCATE(INDEX,2*NUMELS8)
-          MY_ALLOCATE(ITR1,NUMELS8)
+          CALL MY_ALLOC(INDEX,2*NUMELS8)
+          CALL MY_ALLOC(ITR1,NUMELS8)
 C
           DO IE=1,NUMELS8
             ITR1(IE)=IXS(NIXS,IE)

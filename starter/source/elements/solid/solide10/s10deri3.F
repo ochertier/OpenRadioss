@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -29,7 +29,7 @@ Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
 Chd|        S10JACOB                      source/elements/solid/solide10/s10deri3.F
 Chd|        S10PIJSAV                     source/elements/solid/solide10/s10deri3.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
       SUBROUTINE S10DERI3(VOL,NGL,
@@ -50,8 +50,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "vect01_c.inc"
-#include      "param_c.inc"
-#include      "scr17_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -255,6 +253,7 @@ Chd|====================================================================
 Chd|  S10JACOB                      source/elements/solid/solide10/s10deri3.F
 Chd|-- called by -----------
 Chd|        S10DERI3                      source/elements/solid/solide10/s10deri3.F
+Chd|        S10JACI3                      source/elements/solid/solide10/s10jaci3.F
 Chd|-- calls ---------------
 Chd|====================================================================
       SUBROUTINE S10JACOB(ALPH,BETA,W,
@@ -302,7 +301,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "vect01_c.inc"
-#include      "com01_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -473,12 +471,10 @@ Chd|====================================================================
 Chd|  S10PIJSAV                     source/elements/solid/solide10/s10deri3.F
 Chd|-- called by -----------
 Chd|        S10DERI3                      source/elements/solid/solide10/s10deri3.F
+Chd|        S10JACI3                      source/elements/solid/solide10/s10jaci3.F
 Chd|-- calls ---------------
 Chd|====================================================================
       SUBROUTINE S10PIJSAV(PX,PY,PZ, PIJ,NEL)
-C-----------------------------------------------
-C   M o d u l e s
-C-----------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -495,9 +491,6 @@ C     REAL
       my_real
      .   PX(MVSIZ,10),PY(MVSIZ,10),PZ(MVSIZ,10),
      .   PIJ(NEL,3,10)
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

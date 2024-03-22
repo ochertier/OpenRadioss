@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,56 +26,49 @@ Chd|-- called by -----------
 Chd|        ALEMAIN                       source/ale/alemain.F          
 Chd|-- calls ---------------
 Chd|        BCS3V                         source/ale/inter/bcs3v.F      
+Chd|        ALE_MOD                       ../common_source/modules/ale/ale_mod.F
 Chd|====================================================================
       SUBROUTINE ALESUB1(
      1  NALE ,V    ,W    ,DSAVE ,ICODT,
      2  ISKEW,SKEW ,D    ,ITASK ,NODFT,
      3  NODLT,FSKY ,FSKYV)
 C-----------------------------------------------
-C   I m p l i c i t   T y p e s
+C   D e s c r i p t i o n
 C-----------------------------------------------
 C /ALESUB is an obsolete option
 C Multidomain computation (/SUBDOMAIN) is now used instead.
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
+      USE ALE_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com02_c.inc"
 #include      "com04_c.inc"
-#include      "com06_c.inc"
 #include      "com08_c.inc"
-#include      "scr06_c.inc"
-#include      "units_c.inc"
 #include      "task_c.inc"
-#include      "vale_c.inc"
 #include      "parit_c.inc"
 #include      "param_c.inc"
-C-----------------------------------------------------------------
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NALE(*),ICODT(*),ISKEW(*),ITASK,NODFT,NODLT
-      my_real V(3,NUMNOD),W(3,NUMNOD),DSAVE(3,*),SKEW(LSKEW,*),D(3,NUMNOD),FSKY(8,LSKY),
-     .        FSKYV(LSKY,8)
+      my_real V(3,NUMNOD),W(3,NUMNOD),DSAVE(3,*),SKEW(LSKEW,*),D(3,NUMNOD),FSKY(8,LSKY),FSKYV(LSKY,8)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER N,LCOD, INDX2(1024), I,NINDX2,
-     .        KFT1,NISKFT,NISKLT,K
+      INTEGER N,LCOD, INDX2(1024),I,NINDX2,KFT1,NISKFT,NISKLT,K
       my_real FAC
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------
         FAC=ZERO
         IF(DT1 > ZERO)FAC=ONE/DT1
-        IF(IFSUB == 0)THEN
+        IF(ALE%SUB%IFSUB == 0)THEN
            DO N=NODFT,NODLT
               W(1,N)=FAC*(D(1,N)-DSAVE(1,N))
               W(2,N)=FAC*(D(2,N)-DSAVE(2,N))

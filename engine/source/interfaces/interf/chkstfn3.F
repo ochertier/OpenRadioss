@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -37,7 +37,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "task_c.inc"
-#include      "scr05_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -57,7 +56,7 @@ C
       DO I = NSNF, NSNL
 C si tag nul sur noeuds secnds alors stifn = 0.
         IF (ITAG(NSV(I)) == 0.AND.STFN(I) > ZERO) THEN
-Cel       STFN(I) = ZERO => Prise en compte cycle suivant apres comm SPMD (cf i7for3)
+C         STFN(I) = ZERO => Prise en compte cycle suivant apres comm SPMD (cf i7for3)
           STFN(I) = -STFN(I)
           NEWFRONT = -1
         ENDIF
@@ -83,7 +82,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "task_c.inc"
-#include      "scr05_c.inc"
 #include      "com04_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -117,12 +115,6 @@ C si tag nul sur noeuds secnds alors stifn = 0.
             STFN(I) = -STFN(I)
             NEWFRONT = -1
           ENDIF
-        ELSE
-          IF (ITAG(NSV(I)) == 0.AND.STFN(I) > ZERO) THEN
-Cel       STFN(I) = ZERO => Prise en compte cycle suivant apres comm SPMD (cf i7for3)
-            STFN(I) = -STFN(I)
-            NEWFRONT = -1
-          ENDIF
         ENDIF
       ENDDO
 C
@@ -143,7 +135,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "task_c.inc"
-#include      "scr05_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -187,7 +178,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "task_c.inc"
-#include      "scr05_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -207,7 +197,7 @@ C
       DO I = NSNF, NSNL
 C si tag nul sur noeuds secnds alors stifn = 0.
         IF (ITAG(NLG(NSV(I))) == 0.AND.STFA(NSV(I)) > ZERO) THEN
-Cel       STFA(NSV(I)) = ZERO => Prise en compte cycle suivant apres comm SPMD (cf i7for3)
+C         STFA(NSV(I)) = ZERO => Prise en compte cycle suivant apres comm SPMD (cf i7for3)
           STFA(NSV(I)) = -STFA(NSV(I))
           NEWFRONT = -1
         ENDIF
@@ -227,10 +217,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -277,7 +263,7 @@ Chd|-- calls ---------------
 Chd|====================================================================
       SUBROUTINE CHKINIT(
      2   IXS        ,IXQ        ,IXC        ,IXT      ,IXP      ,
-     3   IXR        ,IXTG       ,IXUR       ,IXS10    ,IXS20    ,
+     3   IXR        ,IXTG       ,IXS10    ,IXS20    ,
      4   IXS16      ,IXTG1      ,GEO        ,ADDCNEL  ,CNEL     ,
      5   ADSKY      ,IPARG      )
 C-----------------------------------------------
@@ -285,23 +271,16 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "scr17_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "rnur_c.inc"
-#include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IXS(NIXS,*),IXQ(NIXQ,*),IXC(NIXC,*),IXTG(NIXTG,*),
-     .        IXT(NIXT,*),IXP(NIXP,*),IXR(NIXR,*), IXUR(NIXUR,*),
+     .        IXT(NIXT,*),IXP(NIXP,*),IXR(NIXR,*), 
      .        IXS10(6,*),IXS20(12,*),IXS16(8,*),IXTG1(4,*),
      .        ADDCNEL(0:*), CNEL(0:*), ADSKY(0:*), IPARG(NPARG,*)
       my_real 
@@ -400,12 +379,6 @@ C
           IF (N > 1) ADDCNEL(N) = ADDCNEL(N) + 1
         END DO
       END DO
-      DO K=2,5
-        DO I=1,NUMELUR
-          N = IXUR(K,I) + 1
-          ADDCNEL(N) = ADDCNEL(N) + 1
-        END DO
-      END DO
 C
       ADDCNEL(1) = 1
       DO I=2,NUMNOD+1
@@ -415,7 +388,7 @@ C
 C Construction de la matrice CNEL
 C
 C CNEL est contruite de maniere analogue a ce qui est fait dans chkstfn3n (traitement idel)
-C la numerotation dans CNEL est globale de 1 a NUMELS+NUMELQ+...+NUMELUR
+C la numerotation dans CNEL est globale de 1 a NUMELS+NUMELQ+...+NUMELR
 C
       ADSKY(0) = 0
       DO I = 1, NUMNOD
@@ -563,16 +536,6 @@ C#include "vectorize.inc"
               ENDDO
             END IF
 C
-          ELSEIF(ITY == 50)THEN
-C#include "vectorize.inc"
-            DO I = LFT,LLT
-              IE = NFT+I+OFUR
-              DO K=2,5
-                N = IXUR(K,NFT+I)
-                CNEL(ADSKY(N)) = IE
-                ADSKY(N) = ADSKY(N)+1
-              ENDDO
-            ENDDO
           ENDIF
       ENDDO
 C
@@ -597,7 +560,7 @@ Chd|        SPMD_EXCH_R2R_ITAG            source/mpi/r2r/spmd_r2r.F
 Chd|        SPMD_IBCAST                   source/mpi/generic/spmd_ibcast.F
 Chd|        SPMD_R2R_TAGEL                source/mpi/r2r/spmd_r2r.F     
 Chd|        SYSFUS2                       source/system/sysfus.F        
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        RAD2R_MOD                     share/modules/rad2r.F         
 Chd|        REMESH_MOD                    share/modules/remesh_mod.F    
@@ -605,7 +568,7 @@ Chd|        SHOOTING_NODE_MOD             share/modules/shooting_node_mod.F
 Chd|====================================================================
       SUBROUTINE TAGOFF3N(
      1    GEO     ,IXS   ,IXS10   ,IXS20   ,IXS16  ,IXQ    ,
-     2    IXC     ,IXT    ,IXP    ,IXR     ,IXTG   ,IXUR   ,
+     2    IXC     ,IXT    ,IXP    ,IXR     ,IXTG   ,
      3    ITAG    ,NODFT  ,NODLT  ,IPARG   ,EV     ,ITASK  ,
      4    ITAGL   ,IXTG1  ,IAD_ELEM,FR_ELEM,ITAB   ,ITABM1 ,
      5    ADDCNEL ,CNEL   ,KXSP   ,ELBUF_TAB,TAGEL ,IEXLNK ,
@@ -626,20 +589,12 @@ C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "comlock.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com09_c.inc"
-#include      "scr01_c.inc"
-#include      "scr05_c.inc"
 #include      "scr17_c.inc"
-#include      "rnur_c.inc"
 #include      "task_c.inc"
 #include      "sphcom.inc"
 #include      "rad2r_c.inc"
@@ -651,7 +606,7 @@ C-----------------------------------------------
      .   LINDIDEL, LBUFIDEL,
      .   IXS(NIXS,*),IXS10(6,*),IXS20(12,*),IXS16(8,*),
      .   IXQ(NIXQ,*),IXC(NIXC,*), IXT(NIXT,*), IXP(NIXP,*),
-     .   IXR(NIXR,*), IXTG(NIXTG,*),IXTG1(4,*),IXUR(NIXUR,*),ITAG(*),
+     .   IXR(NIXR,*), IXTG(NIXTG,*),IXTG1(4,*),ITAG(*),
      .   IPARG(NPARG,*), NODFT,NODLT,ITASK, ITAGL (*),
      .   IAD_ELEM(2,*),FR_ELEM(*),ITAB(*),ITABM1(*),
      .   ADDCNEL(0:*),CNEL(0:*),KXSP(NISP,*),
@@ -750,10 +705,12 @@ C
               IF (ABS(GBUF%OFF(I)) == ONE .OR.
      .            ABS(GBUF%OFF(I)) == TWO) THEN
                 TAGEL(IE)=1
+#include "lockon.inc"
                 DO K=2,9
                   N = IXS(K,NFT+I)
                   ITAG(N) = 1
                 ENDDO
+#include "lockoff.inc"
               ELSE
                 IF ((R2R_SIU == 1).AND.(TAGEL(IE) > -1)) THEN
                   CALL R2R_TAGEL(NTAGEL_R2R_SEND,IXS(11,NFT+I),ITAB(IXS(2,NFT+I)),ITY,
@@ -765,10 +722,12 @@ C
                     LOCAL_ELEM_INDEX(GLOBAL_NB_ELEM_OFF(ITASK+1)) = IE
                 ENDIF
                 ELEM_STATE(IE) = .FALSE.
+#include "lockon.inc"
                 DO K=2,9
                   N = IXS(K,NFT+I)
                   ITAG(NUMNOD+N) = 1
                 ENDDO
+#include "lockoff.inc"
               ENDIF
             ENDDO
            ELSEIF ((R2R_SIU == 0).OR.(IPARTR2R > 0)) THEN         
@@ -952,7 +911,6 @@ C Void elements never break and doesn't have ELBUF
 C
           ELSEIF(ITY == 4)THEN
             IF ((R2R_SIU == 0).OR.(IPARTR2R > 0)) THEN
-            NB1 = KAD
 #include "vectorize.inc"
             DO I = LFT,LLT
               IE = NFT+I+OFT
@@ -983,7 +941,6 @@ C
 C
           ELSEIF(ITY == 5)THEN
             IF ((R2R_SIU == 0).OR.(IPARTR2R > 0)) THEN
-            NB1 = KAD
 #include "vectorize.inc"
             DO I = LFT,LLT
               IE = NFT+I+OFP
@@ -1014,7 +971,6 @@ C
 C
           ELSEIF(ITY == 6)THEN
             IF ((R2R_SIU == 0).OR.(IPARTR2R > 0)) THEN
-            NB1 = KAD
 #include "vectorize.inc"
             DO I = LFT,LLT
               IE = NFT+I+OFR
@@ -1131,47 +1087,17 @@ C Void elements never break and doesn't have ELBUF
              ENDIF
             END IF
 C
-          ELSEIF(ITY == 50)THEN
-            NB1 = KAD
+              ELSEIF(ITY == 51) THEN
 #include "vectorize.inc"
-            DO I = LFT,LLT
-              IE = NFT+I+OFUR
-              IF(ABS(EV(NB1+I-1))>=ONE) THEN 
-                TAGEL(IE)=1
-                DO K=2,5
-                  N = IXUR(K,NFT+I)
-                  ITAG(N) = 1
-                ENDDO
-              ELSE
-                IF ((R2R_SIU == 1).AND.(TAGEL(IE) > -1)) THEN
-                  CALL R2R_TAGEL(NTAGEL_R2R_SEND,IXUR(NIXUR,NFT+I),ITAB(IXUR(2,NFT+I)),ITY,
-     .                           OFUR,TAGEL_SIZE)
-                ENDIF
-                TAGEL(IE)=-1
-                IF(ELEM_STATE(IE)) THEN
-                    GLOBAL_NB_ELEM_OFF(ITASK+1) = GLOBAL_NB_ELEM_OFF(ITASK+1) + 1
-                    LOCAL_ELEM_INDEX(GLOBAL_NB_ELEM_OFF(ITASK+1)) = IE
-                ENDIF
-                ELEM_STATE(IE) = .FALSE.
-                DO K=2,5
-                  N = IXUR(K,NFT+I)
-                  ITAG(NUMNOD+N) = 1
-                ENDDO
-              ENDIF
-            ENDDO
-C
- 	    ELSEIF(ITY == 51) THEN
- 	      NB1 = KAD
-#include "vectorize.inc"
- 	      DO I = LFT,LLT
- 	        IF(ABS(GBUF%OFF(I))>=ONE) THEN
- 		         N = KXSP(3,NFT+I)
- 		         ITAG(N) = 1
- 	        ELSE
- 		         N = KXSP(3,NFT+I)
- 		         ITAG(NUMNOD+N) = 1
- 	        ENDIF
- 	      END DO
+                DO I = LFT,LLT
+                  IF(ABS(GBUF%OFF(I))>=ONE) THEN
+                   N = KXSP(3,NFT+I)
+                   ITAG(N) = 1
+                  ELSE
+                   N = KXSP(3,NFT+I)
+                   ITAG(NUMNOD+N) = 1
+                  ENDIF
+                END DO
             ENDIF
         ENDDO
 
@@ -1295,8 +1221,6 @@ C
                   R2R_NUMEL = IXR(NIXR,IE-OFR)              
                 ELSEIF ((ITY == 7).AND.((IE > OFTG).AND.(IE<=OFUR))) THEN
                   R2R_NUMEL = IXTG(6,IE-OFTG)
-                ELSEIF ((ITY == 8).AND.((IE > OFUR).AND.(IE<=OFUR+NUMELUR))) THEN
-                  R2R_NUMEL = IXUR(NIXUR,IE-OFUR)
                 ENDIF
 C
                 IF (R2R_NUMEL == TAGEL_R2R_RECV((I-1)*3+1)) THEN
@@ -1349,9 +1273,8 @@ Chd|        CHKSLV3_T24                   source/interfaces/interf/chkstfn3.F
 Chd|        SETMSR2                       source/interfaces/interf/chkstfn3.F
 Chd|        SETMSR3                       source/interfaces/interf/chkstfn3.F
 Chd|        SPMD_EXCHMSR_IDEL             source/mpi/interfaces/spmd_exchmsr_idel.F
-Chd|        SPMD_EXCH_IDEL_SEGLO          source/mpi/interfaces/spmd_exch_idel_seglo.F
 Chd|        SPMD_INIT_IDEL                source/mpi/interfaces/spmd_init_idel.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE CHKSTFN3N(
@@ -1372,24 +1295,12 @@ C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "comlock.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com09_c.inc"
-#include      "scr01_c.inc"
-#include      "scr05_c.inc"
-#include      "scr17_c.inc"
-#include      "rnur_c.inc"
 #include      "task_c.inc"
-#include      "sphcom.inc"
-#include      "rad2r_c.inc"
-#include      "remesh_c.inc"
 C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1458,16 +1369,15 @@ C E2E have fictive nodes with NSV  > NUMNOD
              CALL CHKSLV3_T24(
      .           NSN         ,INTBUF_TAB(NG)%NSV,INTBUF_TAB(NG)%STFNS,ITAG,ITASK,
      .           INTBUF_TAB(NG)%IS2SE,INTBUF_TAB(NG)%IRTSE,NEWFRONT(NG))
-           ELSEIF(NTY==25) THEN
-             CALL CHKSLV3(
-     .           NSN         ,INTBUF_TAB(NG)%NSV,INTBUF_TAB(NG)%STFNS,ITAG,ITASK,
-     .           NEWFRONT(NG))
            ENDIF
          ENDIF
          NMN   =IPARI(6,NG)
          NRTM  =IPARI(4,NG)
          INC=4
          IF(IDEL == 1) THEN
+!$OMP SINGLE
+           NINDEX1(NG) = 0
+!$OMP END SINGLE
            CALL CHKMSR3NB(
      1   NMN          ,INTBUF_TAB(NG)%MSR ,ITAG          ,ITASK,INTBUF_TAB(NG)%IRECTM,
      2   NRTM         ,INTBUF_TAB(NG)%STFM,ITAG(NUMNOD+1),IXS  ,IXC          ,
@@ -1477,7 +1387,9 @@ C E2E have fictive nodes with NSV  > NUMNOD
      6   IBUFS(IDBS+4),IND(IDB)     ,TAGEL         ,NG   ,INTBUF_TAB(NG)%MSEGLO,
      7   INTBUF_TAB(NG)%MVOISIN,INDSEGLO     ,IBUFSEGLO)
          ELSEIF(IDEL == 2)THEN
+!$OMP SINGLE
             NINDEX1(NG) = 0
+!$OMP END SINGLE
            CALL CHKMSR3N( 
      1   NMN          ,INTBUF_TAB(NG)%MSR ,ITAG           ,ITASK,INTBUF_TAB(NG)%IRECTM,
      2   NRTM         ,INTBUF_TAB(NG)%STFM,ITAG(NUMNOD+1),IXS  ,IXC          ,
@@ -1487,7 +1399,10 @@ C E2E have fictive nodes with NSV  > NUMNOD
      6   IBUFS(IDBS+4),IND(IDB)     ,TAGEL         ,NG,
      7   INTBUF_TAB(NG)%MSEGLO,INTBUF_TAB(NG)%MVOISIN,INDSEGLO     ,IBUFSEGLO)
          END IF
+!$OMP SINGLE
          NINDEX2(NG)=0
+!$OMP END SINGLE
+
          IF(NINDEX1(NG)+NINDEX2(NG) > 0)THEN
 C Partie non parallele
 !$OMP SINGLE
@@ -1502,7 +1417,7 @@ C Fin Partie non parallele
          END IF
        ELSEIF(NTY == 23.AND.IDEL>=1) THEN
          NSN = IPARI(5,NG)
-	 IF(IDELKEEP /= 1) CALL CHKSLV3(
+           IF(IDELKEEP /= 1) CALL CHKSLV3(
      .     NSN         ,INTBUF_TAB(NG)%NSV,INTBUF_TAB(NG)%STFNS,ITAG,ITASK,
      .     NEWFRONT(NG))
          NMN   =IPARI(6,NG)
@@ -1517,13 +1432,13 @@ C Fin Partie non parallele
      5   OFC          ,OFT          ,OFTG          ,OFUR ,NINDEX1(NG)  ,
      6   IBUFS(IDBS+4),IND(IDB)     ,TAGEL         )
          ELSEIF(IDEL == 2)THEN
-	   CALL CHK23MSR3N(
-     1   NMN	      ,INTBUF_TAB(NG)%MSR,ITAG	   ,ITASK,INTBUF_TAB(NG)%IRECTM,
-     2   NRTM	      ,INTBUF_TAB(NG)%STFM,ITAG(NUMNOD+1),IXS  ,IXC	       ,
-     3   IXTG	      ,IXQ	    ,IPARG	   ,ITAGL	 ,
-     4   NTY	      ,ITAB	    ,ITABM1	   ,CNEL ,ADDCNEL      ,
-     5   OFC	      ,OFT	    ,OFTG	   ,OFUR ,NINDEX1(NG)  ,
-     6   IBUFS(IDBS+4),IND(IDB)     ,TAGEL	   )
+             CALL CHK23MSR3N(
+     1   NMN        ,INTBUF_TAB(NG)%MSR,ITAG     ,ITASK,INTBUF_TAB(NG)%IRECTM,
+     2   NRTM        ,INTBUF_TAB(NG)%STFM,ITAG(NUMNOD+1),IXS  ,IXC         ,
+     3   IXTG        ,IXQ      ,IPARG     ,ITAGL   ,
+     4   NTY        ,ITAB      ,ITABM1     ,CNEL ,ADDCNEL      ,
+     5   OFC        ,OFT      ,OFTG     ,OFUR ,NINDEX1(NG)  ,
+     6   IBUFS(IDBS+4),IND(IDB)     ,TAGEL     )
          END IF
          NINDEX2(NG)=0
          IF(NINDEX1(NG)+NINDEX2(NG) > 0)THEN
@@ -1609,27 +1524,27 @@ C------
 C------
        ELSEIF(NTY == 20.AND.IDEL>=1) THEN
          NSN = IPARI(5,NG)
-	 IF(IDELKEEP /= 1) CALL CHKSLV3C(
+           IF(IDELKEEP /= 1) CALL CHKSLV3C(
      .     NSN         ,INTBUF_TAB(NG)%NSV,INTBUF_TAB(NG)%STFA,ITAG,ITASK,
      .     NEWFRONT(NG),INTBUF_TAB(NG)%NLG)
          NMN   =IPARI(6,NG)
          NRTM  =IPARI(4,NG)
          INC=4
-	 IF(IDEL == 1) THEN
-	   CALL CHK20MSR3NB(
-     1   NMN	      ,INTBUF_TAB(NG)%MSR,ITAG	   ,ITASK,INTBUF_TAB(NG)%IRECTM,
-     2   NRTM	      ,INTBUF_TAB(NG)%STFM,ITAG(NUMNOD+1),IXS  ,IXC	       ,
-     3   IXTG	      ,IXQ	    ,IPARG	   ,ITAGL	 ,
-     3   NTY	      ,ITAB	    ,ITABM1	   ,CNEL ,ADDCNEL      ,
-     5   OFC	      ,OFT	    ,OFTG	   ,OFUR ,NINDEX1(NG)  ,
+           IF(IDEL == 1) THEN
+             CALL CHK20MSR3NB(
+     1   NMN        ,INTBUF_TAB(NG)%MSR,ITAG     ,ITASK,INTBUF_TAB(NG)%IRECTM,
+     2   NRTM        ,INTBUF_TAB(NG)%STFM,ITAG(NUMNOD+1),IXS  ,IXC         ,
+     3   IXTG        ,IXQ      ,IPARG     ,ITAGL   ,
+     3   NTY        ,ITAB      ,ITABM1     ,CNEL ,ADDCNEL      ,
+     5   OFC        ,OFT      ,OFTG     ,OFUR ,NINDEX1(NG)  ,
      6   IBUFS(IDBS+4),IND(IDB)     ,INTBUF_TAB(NG)%NLG ,TAGEL)
-	 ELSEIF(IDEL == 2)THEN
-	   CALL CHK20MSR3N(
-     1   NMN	      ,INTBUF_TAB(NG)%MSR,ITAG	   ,ITASK,INTBUF_TAB(NG)%IRECTM,
-     2   NRTM	      ,INTBUF_TAB(NG)%STFM,ITAG(NUMNOD+1),IXS  ,IXC	       ,
-     3   IXTG	      ,IXQ	    ,IPARG	   ,ITAGL	 ,
-     4   NTY	      ,ITAB	    ,ITABM1	   ,CNEL ,ADDCNEL      ,
-     5   OFC	      ,OFT	    ,OFTG	   ,OFUR ,NINDEX1(NG)  ,
+           ELSEIF(IDEL == 2)THEN
+             CALL CHK20MSR3N(
+     1   NMN        ,INTBUF_TAB(NG)%MSR,ITAG     ,ITASK,INTBUF_TAB(NG)%IRECTM,
+     2   NRTM        ,INTBUF_TAB(NG)%STFM,ITAG(NUMNOD+1),IXS  ,IXC         ,
+     3   IXTG        ,IXQ      ,IPARG     ,ITAGL   ,
+     4   NTY        ,ITAB      ,ITABM1     ,CNEL ,ADDCNEL      ,
+     5   OFC        ,OFT      ,OFTG     ,OFUR ,NINDEX1(NG)  ,
      6   IBUFS(IDBS+4),IND(IDB)     ,INTBUF_TAB(NG)%NLG ,TAGEL)
          END IF
          NINDEX2(NG)=0
@@ -1655,48 +1570,48 @@ C
          INC=2
          IF(IDEL == 1) THEN
 Cote main
-	   CALL CHK20EMSR3NB(
-     1     NMNE   ,INTBUF_TAB(NG)%MSRL,ITAG	       ,ITASK  ,INTBUF_TAB(NG)%IXLINM ,
-     2     NLINMA ,INTBUF_TAB(NG)%STF,ITAG(NUMNOD+1),IXS    ,IXC	      ,
-     3     IXTG   ,IXQ  	,IPARG         ,ITAGL	      ,
-     4     NTY    ,ITAB 	,ITABM1        ,NEWFRONT(NG),IXT      ,
-     5     IXP    ,IXR  	,GEO	       ,1      ,CNEL	      ,
-     6     ADDCNEL,OFC  	,OFT	       ,OFTG   ,OFUR	      ,
-     7     OFR    ,OFP  	,NINDEX3(NG)   ,IBUFS(IDBS+4),IND(IDB),
-     8     INTBUF_TAB(NG)%NLG	,TAGEL)
+             CALL CHK20EMSR3NB(
+     1     NMNE   ,INTBUF_TAB(NG)%MSRL,ITAG         ,ITASK  ,INTBUF_TAB(NG)%IXLINM ,
+     2     NLINMA ,INTBUF_TAB(NG)%STF,ITAG(NUMNOD+1),IXS    ,IXC        ,
+     3     IXTG   ,IXQ    ,IPARG         ,ITAGL        ,
+     4     NTY    ,ITAB   ,ITABM1        ,NEWFRONT(NG),IXT      ,
+     5     IXP    ,IXR    ,GEO         ,1      ,CNEL        ,
+     6     ADDCNEL,OFC    ,OFT         ,OFTG   ,OFUR        ,
+     7     OFR    ,OFP    ,NINDEX3(NG)   ,IBUFS(IDBS+4),IND(IDB),
+     8     INTBUF_TAB(NG)%NLG  ,TAGEL)
 Cote secnd
-	   CALL CHK20EMSR3NB(
-     1     NSNE   ,INTBUF_TAB(NG)%NSVL,ITAG	       ,ITASK  ,INTBUF_TAB(NG)%IXLINS,
-     2     NLINSA ,INTBUF_TAB(NG)%STFS,ITAG(NUMNOD+1),IXS    ,IXC	     ,
-     3     IXTG   ,IXQ  	,IPARG         ,ITAGL	     ,
-     4     NTY    ,ITAB 	,ITABM1        ,NEWFRONT(NG),IXT     ,
-     5     IXP    ,IXR  	,GEO	       ,2      ,CNEL	     ,
-     6     ADDCNEL,OFC  	,OFT	       ,OFTG   ,OFUR	     ,
-     7     OFR    ,OFP  	,NINDEX4(NG)   ,
+             CALL CHK20EMSR3NB(
+     1     NSNE   ,INTBUF_TAB(NG)%NSVL,ITAG         ,ITASK  ,INTBUF_TAB(NG)%IXLINS,
+     2     NLINSA ,INTBUF_TAB(NG)%STFS,ITAG(NUMNOD+1),IXS    ,IXC       ,
+     3     IXTG   ,IXQ    ,IPARG         ,ITAGL       ,
+     4     NTY    ,ITAB   ,ITABM1        ,NEWFRONT(NG),IXT     ,
+     5     IXP    ,IXR    ,GEO         ,2      ,CNEL       ,
+     6     ADDCNEL,OFC    ,OFT         ,OFTG   ,OFUR       ,
+     7     OFR    ,OFP    ,NINDEX4(NG)   ,
      +     IBUFS(IDBS+4+NINDEX3(NG)*INC), IND(IDB+NINDEX3(NG))       ,
-     8     INTBUF_TAB(NG)%NLG	,TAGEL)
+     8     INTBUF_TAB(NG)%NLG  ,TAGEL)
          ELSEIF(IDEL == 2)THEN
 Cote main
-	   CALL CHK20EMSR3N(
-     1     NMNE   ,INTBUF_TAB(NG)%MSRL,ITAG	       ,ITASK  ,INTBUF_TAB(NG)%IXLINM ,
-     2     NLINMA ,INTBUF_TAB(NG)%STF,ITAG(NUMNOD+1),IXS    ,IXC	      ,
-     3     IXTG   ,IXQ  	,IPARG         ,ITAGL	      ,
-     4     NTY    ,NEWFRONT(NG) ,IXT	       ,IXP    ,IXR	      ,
-     5     GEO    ,1		,ITAB	       ,ITABM1 ,CNEL	      ,
-     6     ADDCNEL,OFC  	,OFT	       ,OFTG   ,OFUR	      ,
-     7     OFR    ,OFP  	,NINDEX3(NG)   ,IBUFS(IDBS+4),IND(IDB),
-     8     INTBUF_TAB(NG)%NLG	,TAGEL)
+             CALL CHK20EMSR3N(
+     1     NMNE   ,INTBUF_TAB(NG)%MSRL,ITAG         ,ITASK  ,INTBUF_TAB(NG)%IXLINM ,
+     2     NLINMA ,INTBUF_TAB(NG)%STF,ITAG(NUMNOD+1),IXS    ,IXC        ,
+     3     IXTG   ,IXQ    ,IPARG         ,ITAGL        ,
+     4     NTY    ,NEWFRONT(NG) ,IXT         ,IXP    ,IXR        ,
+     5     GEO    ,1    ,ITAB         ,ITABM1 ,CNEL        ,
+     6     ADDCNEL,OFC    ,OFT         ,OFTG   ,OFUR        ,
+     7     OFR    ,OFP    ,NINDEX3(NG)   ,IBUFS(IDBS+4),IND(IDB),
+     8     INTBUF_TAB(NG)%NLG  ,TAGEL)
 Cote secnd
-	   CALL CHK20EMSR3N(
-     1     NSNE   ,INTBUF_TAB(NG)%NSVL,ITAG	       ,ITASK  ,INTBUF_TAB(NG)%IXLINS,
-     2     NLINSA ,INTBUF_TAB(NG)%STFS,ITAG(NUMNOD+1),IXS    ,IXC	     ,
-     3     IXTG   ,IXQ  	,IPARG         ,ITAGL	     ,
-     4     NTY    ,NEWFRONT(NG) ,IXT	       ,IXP    ,IXR	     ,
-     5     GEO    ,2		,ITAB	       ,ITABM1 ,CNEL	     ,
-     6     ADDCNEL,OFC  	,OFT	       ,OFTG   ,OFUR	     ,
-     7     OFR    ,OFP  	,NINDEX4(NG)   ,
+             CALL CHK20EMSR3N(
+     1     NSNE   ,INTBUF_TAB(NG)%NSVL,ITAG         ,ITASK  ,INTBUF_TAB(NG)%IXLINS,
+     2     NLINSA ,INTBUF_TAB(NG)%STFS,ITAG(NUMNOD+1),IXS    ,IXC       ,
+     3     IXTG   ,IXQ    ,IPARG         ,ITAGL       ,
+     4     NTY    ,NEWFRONT(NG) ,IXT         ,IXP    ,IXR       ,
+     5     GEO    ,2    ,ITAB         ,ITABM1 ,CNEL       ,
+     6     ADDCNEL,OFC    ,OFT         ,OFTG   ,OFUR       ,
+     7     OFR    ,OFP    ,NINDEX4(NG)   ,
      +     IBUFS(IDBS+4+NINDEX3(NG)*INC), IND(IDB+NINDEX3(NG))       ,
-     8     INTBUF_TAB(NG)%NLG	,TAGEL)
+     8     INTBUF_TAB(NG)%NLG  ,TAGEL)
          END IF
 C
          IF(NINDEX3(NG)+NINDEX4(NG) > 0)THEN
@@ -1793,13 +1708,13 @@ C Fin Partie non parallele
          END IF
          INC=4
          IF(IDEL == 1) THEN
-	   CALL CHKMSR3NB(
-     1       NMN      ,INTBUF_TAB(NG)%MSR,ITAG	   ,ITASK,INTBUF_TAB(NG)%IRECTM,
-     2       NRTM     ,INTBUF_TAB(NG)%STFM,ITAG(NUMNOD+1),IXS  ,IXC	       ,
-     3       IXTG     ,IXQ	    ,IPARG	   ,ITAGL	 ,
-     3       NTY      ,ITAB	    ,ITABM1	   ,CNEL ,ADDCNEL      ,
-     5       OFC      ,OFT	    ,OFTG	   ,OFUR ,NINDEX1(NG)  ,
-     6       IBUFS(IDBS+4),IND(IDB) ,TAGEL	   ,NG   ,INTBUF_TAB(NG)%IRTLOS,
+             CALL CHKMSR3NB(
+     1       NMN      ,INTBUF_TAB(NG)%MSR,ITAG     ,ITASK,INTBUF_TAB(NG)%IRECTM,
+     2       NRTM     ,INTBUF_TAB(NG)%STFM,ITAG(NUMNOD+1),IXS  ,IXC         ,
+     3       IXTG     ,IXQ      ,IPARG     ,ITAGL   ,
+     3       NTY      ,ITAB      ,ITABM1     ,CNEL ,ADDCNEL      ,
+     5       OFC      ,OFT      ,OFTG     ,OFUR ,NINDEX1(NG)  ,
+     6       IBUFS(IDBS+4),IND(IDB) ,TAGEL     ,NG   ,INTBUF_TAB(NG)%IRTLOS,
      7       INTBUF_TAB(NG)%ILOCM,INDSEGLO     ,IBUFSEGLO )
          ELSEIF(IDEL == 2)THEN
            CALL CHKMSR3N(
@@ -1831,19 +1746,19 @@ C
          INC=4
          IF (IDEL == 2) THEN 
            CALL CHK2MSR3N(
-     1	    NSN  	,INTBUF_TAB(NG)%NSV ,ITAG,ITASK,INTBUF_TAB(NG)%IRECTM,
-     2	    INTBUF_TAB(NG)%IRTLM,ITAG(NUMNOD+1),IXS	,IXC  ,IXTG	    ,
-     3	    IXQ  	,IPARG       ,ITAGL,MS	    ,
-     4	    IN		,INTBUF_TAB(NG)%SMAS ,INTBUF_TAB(NG)%SINER,ADM,CNEL      ,
-     5	    ADDCNEL	,OFC	       ,OFT	,OFTG ,OFUR	    ,
+     1      NSN    ,INTBUF_TAB(NG)%NSV ,ITAG,ITASK,INTBUF_TAB(NG)%IRECTM,
+     2      INTBUF_TAB(NG)%IRTLM,ITAG(NUMNOD+1),IXS  ,IXC  ,IXTG      ,
+     3      IXQ    ,IPARG       ,ITAGL,MS      ,
+     4      IN    ,INTBUF_TAB(NG)%SMAS ,INTBUF_TAB(NG)%SINER,ADM,CNEL      ,
+     5      ADDCNEL  ,OFC         ,OFT  ,OFTG ,OFUR      ,
      6     TAGEL   ,ILEV     )
          ELSEIF (IDEL == 1) THEN 
            CALL CHK2MSR3NB(
-     1	    NSN  	,INTBUF_TAB(NG)%NSV ,ITAG	,ITASK,INTBUF_TAB(NG)%IRECTM,
-     2	    INTBUF_TAB(NG)%IRTLM,ITAG(NUMNOD+1),IXS	,IXC  ,IXTG	    ,
-     3	    IXQ  	,IPARG       ,ITAGL,MS	    ,
-     4	    IN		,INTBUF_TAB(NG)%SMAS ,INTBUF_TAB(NG)%SINER,ADM,CNEL      ,
-     5	    ADDCNEL	,OFC	       ,OFT	,OFTG ,OFUR	    ,
+     1      NSN    ,INTBUF_TAB(NG)%NSV ,ITAG  ,ITASK,INTBUF_TAB(NG)%IRECTM,
+     2      INTBUF_TAB(NG)%IRTLM,ITAG(NUMNOD+1),IXS  ,IXC  ,IXTG      ,
+     3      IXQ    ,IPARG       ,ITAGL,MS      ,
+     4      IN    ,INTBUF_TAB(NG)%SMAS ,INTBUF_TAB(NG)%SINER,ADM,CNEL      ,
+     5      ADDCNEL  ,OFC         ,OFT  ,OFTG ,OFUR      ,
      6     NINDEX1(NG)  ,IBUFS(IDBS+4) ,IND(IDB),TAGEL,ITAB         ,
      7     ILEV      )
 
@@ -1852,12 +1767,12 @@ C
          IF (NSPMD > 1 .AND. IDEL == 2) THEN
            N1 = NUMNOD+1
            CALL CHK2MSR3NP(
-     1	   NSN  	,INTBUF_TAB(NG)%NSV,ITAG   ,ITASK ,INTBUF_TAB(NG)%IRECTM,
-     2	   INTBUF_TAB(NG)%IRTLM,ITAG(N1)     ,IXS    ,IXC   ,IXTG	   ,
-     3	   IXQ  	,IPARG        ,ITAGL ,MS	   ,
-     4	   IN,INTBUF_TAB(NG)%SMAS,INTBUF_TAB(NG)%SINER     ,ADM   ,ITAB	   ,
-     5	   ITABM1	,CNEL	      ,ADDCNEL,OFC   ,OFT	   ,
-     6	   OFTG 	,OFUR,NINDEX1(NG),IBUFS(IDBS+4),IND(IDB)   ,
+     1     NSN    ,INTBUF_TAB(NG)%NSV,ITAG   ,ITASK ,INTBUF_TAB(NG)%IRECTM,
+     2     INTBUF_TAB(NG)%IRTLM,ITAG(N1)     ,IXS    ,IXC   ,IXTG     ,
+     3     IXQ    ,IPARG        ,ITAGL ,MS     ,
+     4     IN,INTBUF_TAB(NG)%SMAS,INTBUF_TAB(NG)%SINER     ,ADM   ,ITAB     ,
+     5     ITABM1  ,CNEL        ,ADDCNEL,OFC   ,OFT     ,
+     6     OFTG   ,OFUR,NINDEX1(NG),IBUFS(IDBS+4),IND(IDB)   ,
      7     IDEL)
          ELSEIF (IDEL == 2) THEN
            NINDEX1(NG)=0
@@ -1991,7 +1906,6 @@ Cote secnd
 
 
       IF(INT24USE > 0.OR.NINTER25/=0)THEN
-        CALL SPMD_EXCH_IDEL_SEGLO(IPARI,INTBUF_TAB,INDSEGLO,IBUFSEGLO)
         DEALLOCATE(INDSEGLO_SAV)
         DEALLOCATE(IBUFSEGLO_SAV)
       ENDIF
@@ -2030,18 +1944,11 @@ C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "comlock.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "task_c.inc"
-#include      "scr01_c.inc"
-#include      "scr05_c.inc"
 #include      "com01_c.inc"
 #include      "param_c.inc"
-#include      "parit_c.inc"
       COMMON /IDELG/ICOMP
       INTEGER ICOMP
 C-----------------------------------------------
@@ -2065,7 +1972,6 @@ C     REAL
 C-----------------------------------------------
       NMNF = 1 + ITASK*NMN / NTHREAD
       NMNL = (ITASK+1)*NMN / NTHREAD
-      ICOMP = 0
 C
       IF(NTY/=3.AND.NTY/=5) THEN
 C mise a - uniquement pour optimiser les interfaces type 7, 10
@@ -2076,9 +1982,13 @@ C si tag nul sur noeuds main alors msr(i) = -msr(i)
           ENDIF
         ENDDO
       END IF
+
+!$OMP SINGLE
+      ICOMP = 0
+!$OMP END SINGLE
 C
       CALL MY_BARRIER()
-      IF(NTY==7.OR.NTY==10.OR.NTY==22) RETURN
+      IF(NTY==7.OR.NTY==10.OR.NTY==22.OR.NTY==24.OR.NTY==25) RETURN
 C
       NRTF = 1 + ITASK*NRTM / NTHREAD
       NRTL = (ITASK+1)*NRTM / NTHREAD
@@ -2155,17 +2065,17 @@ C
          END IF
        END DO
 C
-Cel on a rien trouve, il faut voir sur les autres procs en SPMD (cas elt double ou facette avec nds frontiere sur 2 cpus)
+C   on a rien trouve, il faut voir sur les autres procs en SPMD (cas elt double ou facette avec nds frontiere sur 2 cpus)
        IF(NSPMD > 1) THEN
 #include "lockon.inc"
          ICOMP = ICOMP + 1
          NIND2 = ICOMP
 #include "lockoff.inc"
-     	 NINDEX(NIND2) = I
-     	 BUFS(4*(NIND2-1)+1) = ITAB(N1)
-     	 BUFS(4*(NIND2-1)+2) = ITAB(N2)
-     	 BUFS(4*(NIND2-1)+3) = ITAB(N3)
-     	 BUFS(4*(NIND2-1)+4) = ITAB(N4)
+           NINDEX(NIND2) = I
+           BUFS(4*(NIND2-1)+1) = ITAB(N1)
+           BUFS(4*(NIND2-1)+2) = ITAB(N2)
+           BUFS(4*(NIND2-1)+3) = ITAB(N3)
+           BUFS(4*(NIND2-1)+4) = ITAB(N4)
        END IF
  400   CONTINUE
       END DO
@@ -2223,18 +2133,11 @@ C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "comlock.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "task_c.inc"
-#include      "scr01_c.inc"
-#include      "scr05_c.inc"
 #include      "com01_c.inc"
 #include      "param_c.inc"
-#include      "parit_c.inc"
       COMMON /IDELG/ICOMP
       INTEGER ICOMP
 C-----------------------------------------------
@@ -2270,7 +2173,8 @@ C si tag nul sur noeuds main alors msr(i) = -msr(i)
         ENDDO
       END IF
 C
-      CALL MY_BARRIER()
+      CALL MY_BARRIER()     
+      IF(NTY==7.OR.NTY==10.OR.NTY==22.OR.NTY==24.OR.NTY==25) RETURN
 C
       NRTF = 1 + ITASK*NRTM / NTHREAD
       NRTL = (ITASK+1)*NRTM / NTHREAD
@@ -2408,18 +2312,11 @@ C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "comlock.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "task_c.inc"
-#include      "scr01_c.inc"
-#include      "scr05_c.inc"
 #include      "com01_c.inc"
 #include      "param_c.inc"
-#include      "parit_c.inc"
       COMMON /IDELG/ICOMP
       INTEGER ICOMP
 C-----------------------------------------------
@@ -2528,17 +2425,17 @@ C
          END IF
        END DO
 C
-Cel on a rien trouver, il faut voir sur les autres procs en SPMD (cas elt double ou facette avec nds frontiere sur 2 cpus)
+C   on a rien trouver, il faut voir sur les autres procs en SPMD (cas elt double ou facette avec nds frontiere sur 2 cpus)
        IF(NSPMD > 1) THEN
 #include "lockon.inc"
          ICOMP = ICOMP + 1
          NIND2 = ICOMP
 #include "lockoff.inc"
-     	 NINDEX(NIND2) = I
-     	 BUFS(4*(NIND2-1)+1) = ITAB(N1)
-     	 BUFS(4*(NIND2-1)+2) = ITAB(N2)
-     	 BUFS(4*(NIND2-1)+3) = ITAB(N3)
-     	 BUFS(4*(NIND2-1)+4) = ITAB(N4)
+           NINDEX(NIND2) = I
+           BUFS(4*(NIND2-1)+1) = ITAB(N1)
+           BUFS(4*(NIND2-1)+2) = ITAB(N2)
+           BUFS(4*(NIND2-1)+3) = ITAB(N3)
+           BUFS(4*(NIND2-1)+4) = ITAB(N4)
        END IF
  400   CONTINUE
       END DO
@@ -2572,18 +2469,11 @@ C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "comlock.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "task_c.inc"
-#include      "scr01_c.inc"
-#include      "scr05_c.inc"
 #include      "com01_c.inc"
 #include      "param_c.inc"
-#include      "parit_c.inc"
       COMMON /IDELG/ICOMP
       INTEGER ICOMP
 C-----------------------------------------------
@@ -2726,7 +2616,7 @@ Chd|        MY_BARRIER                    source/system/machine.F
 Chd|====================================================================
       SUBROUTINE CHK11MSR3N(
      1    NMN    ,MSR     ,ITAG  ,ITASK  ,IRECT  ,
-     2    NRTM   ,STF     ,ITAG2 ,IXS    ,IXC	 ,
+     2    NRTM   ,STF     ,ITAG2 ,IXS    ,IXC   ,
      3    IXTG   ,IXQ     ,IPARG ,ITAGL  ,
      4    NTY    ,NEWFRONT,IXT   ,IXP    ,IXR    ,
      5    GEO    ,IFL     ,ITAB  ,ITABM1 ,CNEL   ,
@@ -2739,18 +2629,10 @@ C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "comlock.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "task_c.inc"
-#include      "scr01_c.inc"
-#include      "scr05_c.inc"
-#include      "com01_c.inc"
 #include      "param_c.inc"
-#include      "parit_c.inc"
       COMMON /IDELG/ICOMP
       INTEGER ICOMP
 C-----------------------------------------------
@@ -2818,19 +2700,10 @@ C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "comlock.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "task_c.inc"
-#include      "scr01_c.inc"
-#include      "scr05_c.inc"
-#include      "com01_c.inc"
 #include      "param_c.inc"
-#include      "parit_c.inc"
-#include      "com04_c.inc"
       COMMON /IDELG/ICOMP
       INTEGER ICOMP
 C-----------------------------------------------
@@ -2888,7 +2761,7 @@ Chd|        MY_BARRIER                    source/system/machine.F
 Chd|====================================================================
       SUBROUTINE CHK20EMSR3N(
      1    NMN    ,MSR     ,ITAG  ,ITASK  ,IRECT  ,
-     2    NRTM   ,STF     ,ITAG2 ,IXS    ,IXC	 ,
+     2    NRTM   ,STF     ,ITAG2 ,IXS    ,IXC   ,
      3    IXTG   ,IXQ     ,IPARG ,ITAGL  ,
      4    NTY    ,NEWFRONT,IXT   ,IXP    ,IXR    ,
      5    GEO    ,IFL     ,ITAB  ,ITABM1 ,CNEL   ,
@@ -2901,18 +2774,11 @@ C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "comlock.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "task_c.inc"
-#include      "scr01_c.inc"
-#include      "scr05_c.inc"
 #include      "com01_c.inc"
 #include      "param_c.inc"
-#include      "parit_c.inc"
       COMMON /IDELG/ICOMP
       INTEGER ICOMP
 C-----------------------------------------------
@@ -3040,7 +2906,7 @@ C suivant facette main ou second
          END IF
         END DO
 C
-Cel on a rien trouver, il faut voir sur les autres procs en SPMD
+C   on a rien trouver, il faut voir sur les autres procs en SPMD
         IF(NSPMD > 1) THEN
 #include "lockon.inc"
           ICOMP = ICOMP + 1
@@ -3086,19 +2952,11 @@ C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "comlock.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "task_c.inc"
-#include      "scr01_c.inc"
-#include      "scr05_c.inc"
 #include      "com01_c.inc"
 #include      "param_c.inc"
-#include      "parit_c.inc"
-#include      "com04_c.inc"
       COMMON /IDELG/ICOMP
       INTEGER ICOMP
 C-----------------------------------------------
@@ -3273,8 +3131,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "task_c.inc"
-#include      "scr01_c.inc"
-#include      "com01_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -3400,7 +3256,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "task_c.inc"
-#include      "scr01_c.inc"
 #include      "com01_c.inc"
 #include      "param_c.inc"
       COMMON /IDELG/ICOMP
@@ -3550,8 +3405,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "task_c.inc"
-#include      "scr01_c.inc"
-#include      "com01_c.inc"
 #include      "param_c.inc"
       COMMON /IDELG/ICOMP
       INTEGER ICOMP
@@ -3649,18 +3502,11 @@ C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "comlock.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "task_c.inc"
-#include      "scr01_c.inc"
-#include      "scr05_c.inc"
 #include      "com01_c.inc"
 #include      "param_c.inc"
-#include      "parit_c.inc"
       COMMON /IDELG/ICOMP
       INTEGER ICOMP
 C-----------------------------------------------
@@ -3759,17 +3605,17 @@ C
          END IF
        END DO
 C
-Cel on a rien trouver, il faut voir sur les autres procs en SPMD (cas elt double ou facette avec nds frontiere sur 2 cpus)
+C   on a rien trouver, il faut voir sur les autres procs en SPMD (cas elt double ou facette avec nds frontiere sur 2 cpus)
        IF(NSPMD > 1) THEN
 #include "lockon.inc"
          ICOMP = ICOMP + 1
          NIND2 = ICOMP
 #include "lockoff.inc"
-     	 NINDEX(NIND2) = I
-     	 BUFS(4*(NIND2-1)+1) = ITAB(N1)
-     	 BUFS(4*(NIND2-1)+2) = ITAB(N2)
-     	 BUFS(4*(NIND2-1)+3) = ITAB(N3)
-     	 BUFS(4*(NIND2-1)+4) = ITAB(N4)
+           NINDEX(NIND2) = I
+           BUFS(4*(NIND2-1)+1) = ITAB(N1)
+           BUFS(4*(NIND2-1)+2) = ITAB(N2)
+           BUFS(4*(NIND2-1)+3) = ITAB(N3)
+           BUFS(4*(NIND2-1)+4) = ITAB(N4)
        END IF
  400   CONTINUE
       END DO
@@ -3803,18 +3649,11 @@ C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "comlock.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "task_c.inc"
-#include      "scr01_c.inc"
-#include      "scr05_c.inc"
 #include      "com01_c.inc"
 #include      "param_c.inc"
-#include      "parit_c.inc"
       COMMON /IDELG/ICOMP
       INTEGER ICOMP
 C-----------------------------------------------
@@ -3957,11 +3796,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
-#include      "mvsiz_p.inc"
 #include      "com01_c.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -4080,17 +3915,9 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NINDG, NINDEX(*), BUFS(*), NSV(*), IDEL
-C     REAL
       my_real
      .        MS(*), SMAS(*), IN(*), SINER(*)
 C-----------------------------------------------
@@ -4146,7 +3973,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -4189,7 +4015,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

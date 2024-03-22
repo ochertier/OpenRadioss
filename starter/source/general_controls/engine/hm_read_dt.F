@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -53,9 +53,6 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       TYPE(GROUP_)  ,DIMENSION(NGRPART) :: IGRPART
-C-----------------------------------------------
-C   E x t e r n a l   F u n c t i o n s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -122,11 +119,11 @@ C     Printing
 C-----------------------------------------------
       WRITE(IOUT,1000)
       IF(IDT1SH /=0)   WRITE(IOUT,4720)
-      IF(IDTHEPH /= 0) WRITE(IOUT,4710)
+      IF(IDT1SOL /= 0) WRITE(IOUT,4710)
       IF(IDT1SOL/=0)   WRITE(IOUT,4730)
       IF(IDT1TET10/=0) WRITE(IOUT,4740)
       IF(NODADT == 0)THEN
-	IF (MIN_ASPECT+MIN_DEFV > ZERO) THEN
+          IF (MIN_ASPECT+MIN_DEFV > ZERO) THEN
            WRITE(IOUT,1115) DTFAC1(1),DTMIN1(1),IDTMIN(1),
      +                 MIN_ASPECT,MIN_DEFV,
      +                 DTFAC1(2),DTMIN1(2),IDTMIN(2),
@@ -147,7 +144,7 @@ C-----------------------------------------------
      +                 DTFAC1(9),DTMIN1(9),IDTMIN(9),
      +                 DTFAC1(10),DTMIN1(10),IDTMIN(10)
           ! WRITE(IOUT,4710) DTFAC1(102),DTMIN1(102)
-	END IF
+          END IF
         IF(IDTMIN(11) == 3 .OR. IDTMIN(11) == 8) THEN
           WRITE(IOUT,1107)DTFAC1(11),DTMIN1(11),IDTMIN(11)
         ENDIF
@@ -168,7 +165,7 @@ C-----------------------------------------------
         IF(IDTMIN(11)==3.OR.IDTMIN(11) == 8)THEN
           WRITE(IOUT,1106) DTFAC1(11),DTMIN1(11),IDTMIN(11)
         END IF
-	IF (MIN_ASPECT+MIN_DEFV > ZERO) THEN
+          IF (MIN_ASPECT+MIN_DEFV > ZERO) THEN
           WRITE(IOUT,1115) DTFAC1(1),DTMIN1(1),IDTMIN(1),
      +                MIN_ASPECT,MIN_DEFV,
      +                DTFAC1(2),DTMIN1(2),IDTMIN(2),
@@ -189,7 +186,7 @@ C-----------------------------------------------
      +                 DTFAC1(9),DTMIN1(9),IDTMIN(9),
      +                 DTFAC1(10),DTMIN1(10),IDTMIN(10)
           ! WRITE(IOUT,4710) DTFAC1(102),DTMIN1(102)
-	END IF ! (MIN_ASPECT+MIN_DEFV > ZERO) THEN
+          END IF ! (MIN_ASPECT+MIN_DEFV > ZERO) THEN
         IF(IDTMINS_INT/=0)THEN
           WRITE(IOUT,1208) DTFACS_INT,DTMINS_INT
         END IF

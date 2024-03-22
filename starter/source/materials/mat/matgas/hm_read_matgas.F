@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -50,11 +50,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "sysunit.inc"
 #include      "scr17_c.inc"
-#include      "scr03_c.inc"
 #include      "units_c.inc"
-#include      "submod_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -285,9 +282,9 @@ C-----------------------------------------------
 
 !     ***********************************
 !     Units for hard-coded default values
-      FAC_M = FAC_M_WORK
-      FAC_L = FAC_L_WORK
-      FAC_T = FAC_T_WORK
+      FAC_M = UNITAB%FAC_M_WORK
+      FAC_L = UNITAB%FAC_L_WORK
+      FAC_T = UNITAB%FAC_T_WORK
       FAC_CP = FAC_L * FAC_L / (FAC_T * FAC_T)
 
       R_IGC1 = R_IGC / FAC_M / FAC_L / FAC_L * (FAC_T * FAC_T)
@@ -324,7 +321,7 @@ C-----------------------------------------------
       PM(25) = CPE
       PM(26) = CPF
       PM(27) = R_IGC1 
-
+c
 !     *********
 !     Print out
       WRITE (IOUT, 1001) TRIM(TITR), ID

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -34,27 +34,29 @@ Chd|        INITWG_SHELL                  source/spmd/domain_decomposition/initw
 Chd|        INITWG_SOLID                  source/spmd/domain_decomposition/initwg_solid.F
 Chd|        INITWG_TRI                    source/spmd/domain_decomposition/initwg_tri.F
 Chd|        INITWG_TRUSS                  source/spmd/domain_decomposition/initwg_truss.F
-Chd|        INITWG_UR                     source/spmd/domain_decomposition/initwg_ur.F
 Chd|        INITWG_X                      source/spmd/domain_decomposition/initwg_x.F
 Chd|        INIT_MID_PID_ARRAY            source/spmd/tools/init_mid_pid_array.F
 Chd|        DDWEIGHTS_MOD                 share/modules1/ddweights_mod.F
+Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
 Chd|        MID_PID_MOD                   share/modules1/mid_pid_mod.F  
 Chd|====================================================================
       SUBROUTINE INITWG(WD,PM,GEO,IXS,IXQ,
      .            IXC,IXT,IXP,IXR,IXTG,
-     .            IXUR,KXX,IGEO,ISOLNOD,IDARCH,
+     .            KXX,IGEO,ISOLNOD,IDARCH,
      .            NUMELS,NUMELQ,NUMELC,NUMELT,NUMELP,
-     .            NUMELR,NUMELTG,NUMELUR,NUMELX,IPM ,
+     .            NUMELR,NUMELTG,NUMELX,IPM ,
      .            BUFMAT,NUMMAT,NUMGEO,TAILLE,POIN_UMP,
      .            TAB_UMP,POIN_UMP_OLD,TAB_UMP_OLD,CPUTIME_MP_OLD,
      .            TABMP_L,IPART,IPARTC,IPARTG,
      .            IPARTS,NPART,POIN_PART_SHELL,POIN_PART_TRI,POIN_PART_SOL,
-     .            MID_PID_SHELL,MID_PID_TRI,MID_PID_SOL,IDDLEVEL)
+     .            MID_PID_SHELL,MID_PID_TRI,MID_PID_SOL,IDDLEVEL,
+     .            MAT_PARAM)
 C-----------------------------------------------
 C            M o d u l e s
 C-----------------------------------------------
       USE DDWEIGHTS_MOD
       USE MID_PID_MOD
+      USE MATPARAM_DEF_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -64,13 +66,9 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
 #include      "com01_c.inc"
-#include      "com_xfem1.inc"
 #include      "scr17_c.inc"
-#include      "scr21_c.inc"
-#include      "scr05_c.inc"
 #include      "tablen_c.inc"
 #include      "scr23_c.inc"
-#include      "spmd_c.inc" 
 #include      "ddspmd_c.inc"
 #include      "units_c.inc"
 C-----------------------------------------------
@@ -78,11 +76,11 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER  IDARCH,
      .  NUMELS,NUMELQ,NUMELC,NUMELT,NUMELP,
-     .  NUMELR,NUMELTG,NUMELUR,NUMELX,
+     .  NUMELR,NUMELTG,NUMELX,
      .  NUMMAT,NUMGEO,TAILLE,
      .  IXS(NIXS,*),IXQ(NIXQ,*),IXC(NIXC,*),
      .  IXT(NIXT,*), IXP(NIXP,*), IXR(NIXR,*), IXTG(NIXTG,*),
-     .  IXUR(NIXUR,*),  KXX(NIXX,*),IGEO(NPROPGI,*),ISOLNOD(*),
+     .  KXX(NIXX,*),IGEO(NPROPGI,*),ISOLNOD(*),
      .  IPM(NPROPMI,*),TABMP_L,NPART,IDDLEVEL
       INTEGER, DIMENSION(NUMMAT_OLD) :: POIN_UMP_OLD
       INTEGER, DIMENSION(7,TAILLE_OLD) :: TAB_UMP_OLD
@@ -101,6 +99,7 @@ C     REAL OU REAL*8
      .    PM(NPROPM,*), GEO(NPROPG,*),BUFMAT(*)
       my_real, DIMENSION(TAILLE_OLD) :: CPUTIME_MP_OLD
       REAL WD(*)
+      TYPE(MATPARAM_STRUCT_) ,DIMENSION(NUMMAT), INTENT(IN) :: MAT_PARAM
 C-----------------------------------------------
       INTEGER OFF, NPN, MID, PID, JHBE, IGT, MLN,
      .    ISTRAIN, ITHK, IHBE, IPLA, ISSN, MTN, I, J, K,L,
@@ -136,7 +135,7 @@ C-----------------------------------------------
 
       SIZE_IRUP = 0
       DO I = 1, NUMMAT
-        SIZE_IRUP = MAX(SIZE_IRUP, IPM(220,I))
+        SIZE_IRUP = MAX(SIZE_IRUP, MAT_PARAM(I)%NFAIL)
       ENDDO
 
       IF(IDDLEVEL==0) THEN
@@ -256,7 +255,7 @@ C-----------------------------------------------
      .            NUMEL_RE,IPM,NUMMAT,NUMGEO,POIN_PART_SHELL,
      .            MID_PID_SHELL,IPARTC,OFF,BUFMAT,
      .            MID,PID,MLN,RECHERCHE,TELT_PRO,
-     .            TABMP_L)
+     .            TABMP_L,MAT_PARAM)
 ! --------------------------
 !       TRI             
            ELSEIF(ELM_TYP_OLD==7) THEN
@@ -264,7 +263,7 @@ C-----------------------------------------------
             CALL INITWG_TRI(WD,PM,GEO,IXTG,IGEO,NUMEL_RE,IPM ,SIZE_IRUP,
      .            NUMMAT,NUMGEO,POIN_PART_TRI,MID_PID_TRI,IPARTG,
      .            OFF,BUFMAT,MID,PID,MLN,RECHERCHE,TELT_PRO,
-     .            TABMP_L)
+     .            TABMP_L,MAT_PARAM)
 
 ! --------------------------
 !       OTHER        
@@ -283,7 +282,7 @@ C-----------------------------------------------
      .            NUMMAT,NUMGEO,
      .            POIN_PART_SOL,MID_PID_SOL,IPARTS,BUFMAT,
      .            MID,PID,MLN,RECHERCHE,ISOL,
-     .            TELT_PRO,TABMP_L,NPART)
+     .            TELT_PRO,TABMP_L,NPART,MAT_PARAM)
            ENDIF
            ! --------------------------
            ! Convert the old weight : new_weight = old_weight*reference_weight/reference_old_weight
@@ -321,7 +320,7 @@ C -------------------------------
      .            NUMMAT,NUMGEO,
      .            POIN_PART_SOL,MID_PID_SOL,IPARTS,BUFMAT,
      .            MID,PID,MLN,RECHERCHE,ISOL,
-     .            TELT_PRO,TABMP_L,NPART)
+     .            TELT_PRO,TABMP_L,NPART,MAT_PARAM)
 C      
       OFF = NUMELS
 ! -------------------- 
@@ -334,7 +333,7 @@ C
      .            NUMELC,IPM,NUMMAT,NUMGEO,POIN_PART_SHELL,
      .            MID_PID_SHELL,IPARTC,OFF,BUFMAT,
      .            MID,PID,MLN,RECHERCHE,TELT_PRO,
-     .            TABMP_L)
+     .            TABMP_L,MAT_PARAM)
 C
       OFF = OFF + NUMELC
 ! -------------------- 
@@ -356,14 +355,9 @@ C
       CALL INITWG_TRI(WD,PM,GEO,IXTG,IGEO,NUMELTG,IPM , SIZE_IRUP,
      .            NUMMAT,NUMGEO,POIN_PART_TRI,MID_PID_TRI,IPARTG,
      .            OFF,BUFMAT,MID,PID,MLN,RECHERCHE,TELT_PRO,
-     .            TABMP_L)
+     .            TABMP_L,MAT_PARAM)
 C
       OFF = OFF + NUMELTG
-! -------------------- 
-      CALL INITWG_UR(WD,PM,GEO,IXUR,IGEO,
-     .            NUMELUR,IPM,NUMMAT,NUMGEO,OFF)
-C
-      OFF = OFF + NUMELUR
 ! -------------------- 
       CALL INITWG_X(WD,PM,GEO,KXX,IGEO,
      .            NUMELX,IPM,NUMMAT,NUMGEO,OFF)

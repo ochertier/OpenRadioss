@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -62,11 +62,13 @@ Chd|====================================================================
      7       NPBYL  ,LPBYL   ,IBFV    ,VEL      ,NPF      ,
      8       TF     ,NEWFRONT,ICONTACT,RWBUF    ,LPRW     ,
      9       NPRW   ,RBYL    ,D       ,DR       ,KINET    ,
-     A       SENSOR_TAB,INTBUF_TAB ,H3D_DATA ,IGRBRIC)
+     A       NSENSOR,SENSOR_TAB,INTBUF_TAB ,H3D_DATA ,IGRBRIC,
+     B       PYTHON)
 C======================================================================|
 C-----------------------------------------------
 C   M o d u l e s
 C----------------------------------------------- 
+      USE PYTHON_FUNCT_MOD
       USE INTBUFDEF_MOD
       USE H3D_MOD
       USE GROUPDEF_MOD
@@ -79,18 +81,14 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "units_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
-#include      "task_c.inc"
 #include      "lagmult.inc"
-#include      "com01_c.inc"
-#include      "scr17_c.inc"
       COMMON /LAGGLOB/N_MULT
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER ITASK
+      INTEGER ,INTENT(IN) :: NSENSOR,ITASK
       INTEGER IPARI(NPARI,*),IXS(NIXS,*),IXS16(8,*),
      .        IXS10(6,*),IXS20(12,*),ITAB(*),
      .        LAGBUF(*),IBCSLAG(*),GJBUFI(LKJNI,*),
@@ -105,7 +103,8 @@ C     REAL
 
       TYPE(INTBUF_STRUCT_) INTBUF_TAB(*)
       TYPE(H3D_DATABASE) :: H3D_DATA
-      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) ,INTENT(IN) :: SENSOR_TAB
+      TYPE(PYTHON_), INTENT(INOUT) :: PYTHON
 C-----------------------------------------------
       TYPE (GROUP_)  , DIMENSION(NGRNOD)  :: IGRNOD
       TYPE (GROUP_)  , DIMENSION(NGRBRIC) :: IGRBRIC
@@ -323,7 +322,7 @@ C ---------------------
      2   WAG(IP0)  ,WAG(IP1)  ,WAG(IP2)  ,WAG(IP3)  ,WAG(IP4)  ,
      3   WAG(IP5)  ,WAG(IP6)  ,LAGBUF(J3),LAGBUF(J4),MS        ,
      4   IN        ,V         ,VR        ,A         ,AR        ,
-     5   ISKIP     ,NCF_S     ,N_MULT    )
+     5   ISKIP     ,NCF_S     ,N_MULT    ,PYTHON)
 C ---------------------
       NCF_E = N_MULT
 C ---------------------
@@ -411,7 +410,6 @@ Chd|        LAG_ANITHP                    source/tools/lagmul/lag_anith.F
 Chd|        LAG_FXVP                      source/tools/lagmul/lag_fxv.F 
 Chd|        LAG_I2MAIN                    source/tools/lagmul/lag_i2main.F
 Chd|        LAG_MPCP                      source/tools/lagmul/lag_mpc.F 
-Chd|        LAG_MULT_SDP                  source/tools/lagmul/lag_mult_solv.F
 Chd|        LAG_MULT_SOLVP                source/tools/lagmul/lag_mult_solv.F
 Chd|        RBY_DECOND                    source/tools/lagmul/lag_rby_cond.F
 Chd|        SPMD_EXCH_MULT                source/mpi/lag_multipliers/spmd_lag.F
@@ -434,10 +432,11 @@ Chd|====================================================================
      9       NPRW   ,RBYL    ,D       ,DR       ,KINET    ,
      A       NODGLOB,WEIGHT  ,NBNCL   ,NBIKL    ,NBNODL   ,
      B       NBNODLR,FR_LAGF ,LLAGF   ,IAD_ELEM ,FR_ELEM  ,
-     C       INTBUF_TAB ,H3D_DATA)
+     C       INTBUF_TAB ,H3D_DATA, PYTHON)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE PYTHON_FUNCT_MOD
       USE MESSAGE_MOD
       USE INTBUFDEF_MOD
       USE H3D_MOD
@@ -449,7 +448,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "units_c.inc"
 #include      "com04_c.inc"
 #include      "task_c.inc"
 #include      "lagmult.inc"
@@ -477,6 +475,7 @@ C     REAL
 
       TYPE(INTBUF_STRUCT_) INTBUF_TAB(*)
       TYPE(H3D_DATABASE) :: H3D_DATA
+      TYPE(PYTHON_), INTENT(INOUT) :: PYTHON
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -494,7 +493,6 @@ C-----------------------------------------------
      .        AG(3,NBNODL),VG(3,NBNODL),MSG(NBNODL),
      .        ARG(3,NBNODLR),VRG(3,NBNODLR),ING(NBNODLR)   ! NBNODLR = NBNODL ou 0 suivant iroddl
 C======================================================================|
-C     IMLAGSOL = 1 => solveur directe ; sinon solveur iteratif
 C
       NLAGF = FR_LAGF(3,ISPMD+1)
       IK0 = 2*NBNCL + 1
@@ -677,7 +675,7 @@ C ---------------------
       IF(NFVLAG>0) CALL LAG_FXVP(
      1   IBFV      ,VEL        ,SKEW     ,NPF       ,TF        ,
      2   LAGCOM    ,LAGCOM(IK0),N_MULT   ,NODGLOB   ,WEIGHT    ,
-     3   N_IK      )
+     3   N_IK      ,PYTHON)
 C ---------------------
       NCF_E = N_MULT
 C ---------------------
@@ -753,18 +751,8 @@ C
      2  IN      ,AG      ,ARG    ,VG     ,VRG   ,
      3  MSG     ,ING     ,FR_LAGF,ISIZ   ,NBNODL,
      4  INDEXLAG,NODGLOB ,LLAGF  ,NLAGF  )
-C routine sequentielle a changer si solveur direct branche a la place
-      IF(IMLAGSOL==1) THEN
-        CALL LAG_MULT_SDP(
-     1    NH        ,N_MULT    ,NCR       ,AG        ,VG        ,
-     2    MSG       ,WAG(IP1)  ,WAG(IP2)  ,WAG(IP3)  ,WAG(IP5)  ,
-     3    WAG(IP6)  ,WAG(IP7)  ,WAG(IP8)  ,WAG(IP9)  ,WAG(IP10) ,
-     4    WAG(IP11) ,WAG(IP12) ,WAG(IP13) ,WAG(IP14) ,WAG(IP15) ,
-     5    WAG(IP16) ,WAG(IP17) ,WAG(IP18) ,WAG(IP19) ,LAMBDA    ,
-     6    RBYL      ,NPBYL     ,ARG       ,VRG       ,ING       ,
-     7    LAGBUF(J1),LAGBUF(J2),LAGBUF(J3),LAGBUF(J4),NCF_S     ,
-     8    NCF_E     ,INDEXLAG  )
-      ELSEIF(ISPMD==0) THEN
+      IF(ISPMD==0) THEN
+        !iterative solver
         CALL LAG_MULT_SOLVP(
      1    NH        ,N_MULT    ,NCR       ,AG        ,VG        ,
      2    MSG       ,WAG(IP1)  ,WAG(IP2)  ,WAG(IP3)  ,WAG(IP5)  ,

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,7 +25,7 @@ Chd|  READ_DB                       source/output/tools/read_db.F
 Chd|-- called by -----------
 Chd|        DECOMPRESS_R_NNZ              ../common_source/comm/decompress_nnz.F
 Chd|        INTBUF_INI                    ../common_source/interf/intbuf_ini.F
-Chd|        PBLAST_LOAD                   ../common_source/modules/pblast_mod.F
+Chd|        PBLAST_LOAD                   ../common_source/modules/loads/pblast_mod.F
 Chd|        READ_UNITS                    ../common_source/comm/write_units.F
 Chd|        ALELAG_RREST                  source/output/restart/rdresb.F
 Chd|        ALLOCBUF_AUTO                 source/elements/elbuf/allocbuf_auto.F
@@ -55,9 +55,13 @@ Chd|        RADIOSS2                      source/engine/radioss2.F
 Chd|        RDRESB                        source/output/restart/rdresb.F
 Chd|        READ_CLUSTER                  source/output/cluster/read_cluster.F
 Chd|        READ_ELGROUP_PARAM            source/output/restart/read_elgroup_param.F
+Chd|        READ_FAILPARAM                source/output/restart/read_failparam.F
 Chd|        READ_MATPARAM                 source/output/restart/read_matparam.F
+Chd|        READ_MAT_TABLE                source/materials/tools/read_mat_table.F
 Chd|        READ_NLOC_STRUCT              source/output/restart/read_nloc_struct.F
-Chd|        READ_SENSOR_TAB               source/output/restart/read_sensor_tab.F
+Chd|        READ_PCYL                     source/output/restart/read_pcyl.F
+Chd|        READ_SENSORS                  source/output/restart/read_sensors.F
+Chd|        READ_VISCPARAM                source/output/restart/read_viscparam.F
 Chd|        RMATRREST                     source/output/restart/rdresb.F
 Chd|        RTHBUFREST                    source/output/restart/rdresb.F
 Chd|        R_BUFBRIC_22                  source/interfaces/int22/r_bufbric_22.F
@@ -65,11 +69,11 @@ Chd|        SPMD_INISPH                   source/mpi/sph/spmd_sptool.F
 Chd|        SPMD_INITFI                   source/mpi/interfaces/spmd_i7tool.F
 Chd|        STACK_RREST                   source/output/restart/rdresb.F
 Chd|        TABLE_RRESTR                  source/tools/curve/table_tools.F
-Chd|        TABLE_RRESTR_MAT              source/tools/curve/table_tools.F
 Chd|        THCRREST                      source/output/restart/rdresb.F
+Chd|        USERWI_READ                   source/user_interface/userwindow_interface_routines.F
 Chd|        WIGEREST                      source/output/restart/rdresb.F
 Chd|-- calls ---------------
-Chd|        READ_DB_C                     source/output/tools/sortie_c.c
+Chd|        READ_DB_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|====================================================================
       SUBROUTINE READ_DB(A,N)
 C lecture nombre reel : routine tampon
@@ -146,8 +150,9 @@ Chd|        ALLOCBUF_AUTO                 source/elements/elbuf/allocbuf_auto.F
 Chd|        INTSTAMP_RRESTR               share/modules/intstamp_mod.F  
 Chd|        RADIOSS2                      source/engine/radioss2.F      
 Chd|        RDRESB                        source/output/restart/rdresb.F
+Chd|        READ_SENSORS                  source/output/restart/read_sensors.F
 Chd|-- calls ---------------
-Chd|        READ_DB_C                     source/output/tools/sortie_c.c
+Chd|        READ_DB_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|====================================================================
       SUBROUTINE READ_DPDB(A,N)
 C lecture nombre reel : routine tampon
@@ -159,13 +164,7 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER N
-C     REAL
-      DOUBLE PRECISION 
-     .   A(*)
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "scr05_c.inc"
+      DOUBLE PRECISION A(*)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,24 +26,30 @@ Chd|-- called by -----------
 Chd|        GENANI                        source/output/anim/generate/genani.F
 Chd|        H3D_NODAL_SCALAR              source/output/h3d/h3d_results/h3d_nodal_scalar.F
 Chd|-- calls ---------------
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
-Chd|        I22BUFBRIC_MOD                ../common_source/modules/cut-cell-search_mod.F
-Chd|        I22TRI_MOD                    ../common_source/modules/cut-cell-search_mod.F
+Chd|        ANIM_NODAL_CONTOUR_FVMBAGS    source/output/anim/generate/anim_nodal_contour_fvmbags.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
+Chd|        FVBAG_MOD                     share/modules/fvbag_mod.F     
+Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
+Chd|        I22BUFBRIC_MOD                ../common_source/modules/interfaces/cut-cell-search_mod.F
+Chd|        I22TRI_MOD                    ../common_source/modules/interfaces/cut-cell-search_mod.F
 Chd|        INITBUF_MOD                   share/resol/initbuf.F         
 Chd|====================================================================
-      SUBROUTINE NODALD(IFUNC     ,WA4, IFLOW, RFLOW, IPARG, 
-     .                  ELBUF_TAB ,IX , NIX  , ITAB , NV46 )
+      SUBROUTINE NODALD(IFUNC    , WA4      , WA4_FVM, IFLOW  , RFLOW,  
+     .                  IPARG    , ELBUF_TAB, IX     , NIX    , NUMEL, 
+     .                  ITAB     , NV46     , MONVOL , VOLMON , AIRBAGS_TOTAL_FVM_IN_H3D,
+     .                  IS_WRITTEN_NODE     , IS_WRITTEN_NODE_FVM, ISPMD, FVDATA_P,
+     .                  SWA4                , AIRBAGS_NODE_ID_SHIFT)
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C-----------------------------------------------
-C     This suroutine computes nodal densities for
-C     ALE elements. In case of CEL coupling (inter22)
-C     result is also calculated from cut cells.
+C   This subroutine defines & writes nodal Density requested by Engine keywords /ANIM/NODA/DENS or /H3D/NODA/DENS
+C   /INTER/TYPE22   (nodal Density from polyhedra, specific buffer).
+C   /MONVOL/FVMBAG* (nodal Density from polyhedra, specific buffer).
+C   DEFAULT         (nodal PresDensitysure from adjacent elems)
 C-----------------------------------------------
 C   P r e - C o n d i t i o n s
 C-----------------------------------------------
-C     Tested below during NG LOOP : IALEL > 0 
-C        where IALEL =IPARG(7,NG)+IPARG(11,NG)
+C     none
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -51,7 +57,9 @@ C-----------------------------------------------
       USE ELBUFDEF_MOD  
       USE I22BUFBRIC_MOD   
       USE I22EDGE_MOD    
-      USE I22TRI_MOD           
+      USE I22TRI_MOD       
+      USE FVBAG_MOD , only:FVBAG_DATA,NFVBAG  
+      USE GROUPDEF_MOD , only:GROUP_           
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -62,19 +70,22 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "vect01_c.inc"
-#include      "scr05_c.inc"
-#include      "flowcom.inc"
-#include      "task_c.inc"
 #include      "param_c.inc"
 #include      "inter22.inc"
+#include      "tabsiz_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER IFUNC, IFLOW(*),IPARG(NPARG,*),IX(NIX,*),ITAB(*),NIX,NV46
-      my_real
-     .        RFLOW(*)
-      REAL WA4(*)
-      TYPE (ELBUF_STRUCT_), DIMENSION(NGROUP), TARGET :: ELBUF_TAB      
+      INTEGER,INTENT(IN) :: NUMEL, IFUNC, NIX, NV46,ITAB(NUMNOD),ISPMD, SWA4, AIRBAGS_NODE_ID_SHIFT
+      INTEGER,INTENT(IN) :: IFLOW(*),IPARG(NPARG,NGROUP),IX(NIX,NUMEL)
+      my_real,INTENT(IN) :: RFLOW(*)
+      INTEGER,INTENT(IN) :: AIRBAGS_TOTAL_FVM_IN_H3D 
+      REAL,INTENT(INOUT) :: WA4(SWA4),WA4_FVM(AIRBAGS_TOTAL_FVM_IN_H3D)
+      TYPE (ELBUF_STRUCT_), INTENT(IN), DIMENSION(NGROUP), TARGET :: ELBUF_TAB    
+      INTEGER,INTENT(IN) :: MONVOL(SMONVOL)
+      my_real,INTENT(IN) :: VOLMON(SVOLMON)
+      INTEGER,INTENT(INOUT) :: IS_WRITTEN_NODE_FVM(AIRBAGS_TOTAL_FVM_IN_H3D),IS_WRITTEN_NODE(NUMNOD)
+      TYPE(FVBAG_DATA),INTENT(IN) :: FVDATA_P
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -98,20 +109,18 @@ C-----------------------------------------------
 
          NNOD = NIX-3   !8-node brick or 4-node quad
 
+C------------------------------------------------------------------
+C        DEFAULT - ALL ELEMS (HEXA,PENTA, SHELL, QUAD, ..)
+C           expand elem pressure to elem nodes
+C------------------------------------------------------------------      
          IF(INT22==0)THEN
-         !---------------------------------------------------------!         
-         !         ALE STANDARD FORMULATION                        !
-         !---------------------------------------------------------!       
-         !1. COMPUTE NODAL PRESSURE                                !
-         !---------------------------------------------------------!         
-           !---1. COMPUTE NODAL PRESSURE---!      
            ALLOCATE(COUNT_VOL(NUMNOD))                 
            COUNT_VOL(:) = 0                           
            DO NG = 1, NGROUP
              NEL   =IPARG(2,NG)
              NFT   =IPARG(3,NG)
              ITYP  =IPARG(5,NG)
-             IALEL =IPARG(7,NG)+IPARG(11,NG)             
+             !IALEL =IPARG(7,NG)+IPARG(11,NG)             
              IF(ITYP/=1 .AND. ITYP/=2)CYCLE 
              !IF(IALEL==0)CYCLE
              GBUF => ELBUF_TAB(NG)%GBUF                       
@@ -121,7 +130,8 @@ C-----------------------------------------------
                 DO J=2,NNOD+1
                   JJ=IX(J,NFT+I)
                   WA4(JJ)=WA4(JJ)+V*D               !cumulated mass
-                  COUNT_VOL(JJ) = COUNT_VOL(JJ) + V !cumulated volume                 
+                  COUNT_VOL(JJ) = COUNT_VOL(JJ) + V !cumulated volume  
+                  IS_WRITTEN_NODE(JJ)=1               
                 ENDDO            
               ENDDO
            ENDDO
@@ -132,17 +142,11 @@ C-----------------------------------------------
              ENDIF
            ENDDO                 
            DEALLOCATE(COUNT_VOL)             
-           GOTO 100
          
+C------------------------------------------------------------------
+C        CUT CELLS (INTER TYPE 22)
+C------------------------------------------------------------------      
          ELSEIF(INT22>0)THEN 
-         !---------------------------------------------------------!         
-         !         /INTER/TYPE22                                   !
-         !---------------------------------------------------------!       
-         !1. TAG FOR CUT CELL                                      !
-         !2. COMPUTE NODAL PRESSURE                                !
-         !     NOT INTERSECTED : NODAL P COMPUTED FROM GLOBAL BUF  !
-         !         INTERSECTED : NODAL P COMPUTED FROM CUT CELL    !
-         !---------------------------------------------------------!                 
            ALLOCATE(COUNT_VOL(NUMNOD))      
            COUNT_VOL = 0
            !---1. TAG FOR INTERSECTED BRICKS---!
@@ -176,6 +180,7 @@ C                print *, "treating brick id=", IX(11,I+NFT)
                     JJ=IX(J,NFT+I)
                     WA4(JJ)=WA4(JJ)+ D*V              !cumulated mass
                     COUNT_VOL(JJ) = COUNT_VOL(JJ) + V !cumulated volume 
+                    IS_WRITTEN_NODE(JJ)=1
 c                   if(ibug22_nodalp==1)then                    
 c                       print *, "adding on node", itab(JJ)
 c                       print *, "    D=", D
@@ -193,6 +198,7 @@ c                   endif
                   MCELL = BRICK_LIST(NIN,IB)%MainID
                   DO J=2,NNOD+1
                     JJ=IX(J,NFT+I)
+                    IS_WRITTEN_NODE(JJ)=1
                     ICELL=BRICK_LIST(NIN,IB)%NODE(J-1)%WhichCell
                     IF(ICELL == MCELL)THEN
                       D = GBUF%RHO(I)   
@@ -217,13 +223,6 @@ c                   endif
                     ENDIF
                     WA4(JJ)=WA4(JJ)+D*V
                     COUNT_VOL(JJ) = COUNT_VOL(JJ) + V
-c                   if(ibug22_nodalp==1)then                    
-c                       print *, "adding on node", itab(JJ)
-c                       print *, "    D=", D
-c                       print *, "    V=", V 
-c                       print *, "   WA=", WA4(JJ)
-c                       print *, " sumV=", COUNT_VOL(JJ)
-c                   endif
                   ENDDO            
                 ENDIF
               ENDDO
@@ -232,18 +231,21 @@ c                   endif
            DO I=1,NUMNOD
              IF(COUNT_VOL(I)/=ZERO)THEN
                WA4(I)=WA4(I)/COUNT_VOL(I)
-c                if(ibug22_nodalp==1)then               
-c                    print *, "normilze node", itab(I)
-c                    print *, "  sum V=",COUNT_VOL(I) 
-c                    print *, "     WA=", WA4(I)
-c               endif
-                    
              ENDIF
            ENDDO
            DEALLOCATE(COUNT_VOL)                  
-           GOTO 100
          ENDIF
                   
-  100 CONTINUE        
+
+C------------------------------------------------------------------
+C        /MONVOL/FVMBAG*
+C           set density from polyhedra centroids
+C------------------------------------------------------------------
+        IF(NFVBAG > 0 .AND. ISPMD == 0 .AND. AIRBAGS_TOTAL_FVM_IN_H3D > 0)THEN
+          CALL ANIM_NODAL_CONTOUR_FVMBAGS('DENS', WA4_FVM, MONVOL , VOLMON                  , FVDATA_P             , 
+     .                                    NFVBAG, SMONVOL, SVOLMON, AIRBAGS_TOTAL_FVM_IN_H3D, IS_WRITTEN_NODE_FVM  ,
+     .                                    AIRBAGS_NODE_ID_SHIFT)
+        ENDIF
+
       RETURN
       END

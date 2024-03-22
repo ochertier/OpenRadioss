@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -31,7 +31,7 @@ Chd|        CG2LEPS                       source/elements/shell/coqueba/scigini4
 Chd|        CG2LSIG                       source/elements/shell/coqueba/scigini4.F
 Chd|        FRETITL2                      source/starter/freform.F      
 Chd|        LOC2ORTH                      source/elements/shell/coqueba/scigini4.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
       SUBROUTINE CSIGINI4(ELBUF_STR,
@@ -41,7 +41,7 @@ Chd|====================================================================
      4           IX     ,NIX    ,NUMSH ,PTSH   ,IGEO   ,
      5           IR     ,IS     ,IPG   ,NPG    ,G_PLA  ,
      6           EPSP   ,THKE   ,IGTYP ,NEL    ,ISIGSH ,
-     7           E1X    ,E2X   ,E3X   ,E1Y   ,E2Y  ,E3Y,
+     7           E1X    ,E2X    ,E3X   ,E1Y    ,E2Y  ,E3Y,
      8           E1Z    ,E2Z   ,E3Z   ,DIR_A   ,DIR_B  ,
      9           POSLY  )
 !     points Gauss a corriger !!!!!!
@@ -55,10 +55,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-#include      "analyse_name.inc"
-C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
@@ -66,8 +62,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
 #include      "com01_c.inc"
 #include      "scr17_c.inc"
 C-----------------------------------------------
@@ -99,7 +93,8 @@ C-----------------------------------------------
      . S4(LAYNPT_MAX*LAY_MAX),SM(LAYNPT_MAX*LAY_MAX),PG2I,PG,FM,S6(6),
      . POSI(MVSIZ,NPT)
       my_real 
-     .    E1(6),E2(6),Z1,Z2,Z0,AA,E1G(6,4),E2G(6,4),Z1G(4),Z2G(4),UNG
+     .    E1(6),E2(6),Z1,Z2,Z0,AA,E1G(6,4),E2G(6,4),Z1G(4),Z2G(4),UNG,
+     .    FORJ(5,4),MOMJ(3,4),TJ,UNPT,F2MJ(4),F2M
 C--------------------------------------------------------------
       TYPE(G_BUFEL_) ,POINTER :: GBUF     
       TYPE(L_BUFEL_) ,POINTER :: LBUF     
@@ -112,16 +107,17 @@ C=======================================================================
       DO I=1,8
         KK(I) = NEL*(I-1)
       ENDDO
-!
+!       
       IF (IHBE == 23) NPG=4
       DO I=JFT,JLT
         IF (ABS(ISIGI) /= 3.AND.ABS(ISIGI) /= 4.AND.ABS(ISIGI) /= 5)THEN
-          II = I+NFT
+          II = PTSH(I + NFT)
+          IF(II == 0) GOTO 100
           N = NINT(SIGSH(1,II))
-          IF (N /= IX(NIX,II)) THEN
-            JJ = II
+          IF (N /= IX(NIX,I + NFT)) THEN
+            JJ = I + NFT
             DO J = 1,NUMEL
-              II= J
+              II = J
               N = NINT(SIGSH(1,II))
               IF (N == 0) GOTO 100
               IF (N == IX(NIX,JJ)) GOTO 60
@@ -135,6 +131,7 @@ C=======================================================================
           IF (II == 0) GOTO 100
         ENDIF
         LI(I) = II
+        IF(SIGSH(NVSHELL - 1 ,II) == ZERO ) CYCLE
         NPTI=NINT(SIGSH(2,II))
         NPGI=NINT(SIGSH(NVSHELL,II))
         IF (SIGSH(3,II) /= ZERO) THEN
@@ -144,31 +141,33 @@ C=======================================================================
         EINT(I,1)=SIGSH(4,II)
         EINT(I,2)=SIGSH(5,II)
 C for IGTYP == 51, NPT now =NPTI
-        IF (NPT /= NPTI .OR. NPG /= NPGI) THEN
-          IPID1=IX(NIX-1,NFT+I) 
-          PID1=IGEO(1,IPID1)
-          CALL FRETITL2(TITR,IGEO(NPROPGI-LTITR+1,IPID1),LTITR)
-          IF (NPT >0 .AND. NPTI==0) THEN
+        IF ((NPT /= NPTI.AND.NPT/=0) .OR. NPG /= NPGI) THEN
+             IPID1=IX(NIX-1,NFT+I) 
+             PID1=IGEO(1,IPID1)
+             CALL FRETITL2(TITR,IGEO(NPROPGI-LTITR+1,IPID1),LTITR)
+             IF (NPT > 0 .AND. (NPTI == 0 .AND. ITHKSHEL /= 2)) THEN
 C----limite number of error out
-            IF (IPG<=1) CALL ANCMSG(MSGID=2020,
-     .                ANMODE=ANINFO,
-     .                MSGTYPE=MSGERROR,
-c     .                C1=TITR,
-     .                I1=PID1,
-     .                I2=N,
-     .                PRMOD=MSG_CUMU)
-          ELSE
-            CALL ANCMSG(MSGID=26,
-     .                ANMODE=ANINFO,
-     .                MSGTYPE=MSGERROR,
-     .                C1=TITR,
-     .                I1=PID1,
-     .                I2=N)
-          ENDIF
+               IF (IPG<=1) then 
+                   CALL ANCMSG(MSGID=2020,
+     .                   ANMODE=ANINFO,
+     .                   MSGTYPE=MSGERROR,
+c     .                   C1=TITR,
+     .                   I1=PID1,
+     .                   I2=N,
+     .                   PRMOD=MSG_CUMU)
+              ENDIF
+             ELSEIF(ISIGSH /= 0) THEN
+               CALL ANCMSG(MSGID=26,
+     .                   ANMODE=ANINFO,
+     .                   MSGTYPE=MSGERROR,
+     .                   C1=TITR,
+     .                   I1=PID1,
+     .                   I2=N)
+             ENDIF
         ENDIF
         IF (ISTRAIN /= 0.AND.ITHKSHEL==2) THEN
-C--- in global sys NPGI=1 for QEPH not like stress
-          IF(SIGSH(17,II) == ONE)THEN
+C--- reading in another routine for QEPH 
+          IF(SIGSH(17,II) == ONE .AND. IHBE /= 23)THEN
             PT = INISHVAR1          
             IF(NPGI <= 1.OR.IHBE == 23)THEN
              IF (NPTI==1) THEN
@@ -287,6 +286,79 @@ c                error out
 C--- in global sys modifying directly SIGSH
         IF(SIGSH(17,II) == ONE)THEN
           IF (NPT == 0)THEN
+           IF (NPTI>1) THEN
+            UNPT = ONE/NPTI
+            IF (NPG>1) THEN
+              IF (IHBE == 23) THEN      !  QEPH-----
+                PT = 22 
+                FORJ(1:5,1:4) = ZERO
+                F2MJ(1:4) = ZERO
+                DO IT=1,NPTI
+                  DO IP=1,NPG
+                    S6(1:6)=SIGSH(PT:PT+5,II)
+                    CALL CG2LSIG(
+     7              E1X(I) ,E2X(I),E3X(I),E1Y(I),E2Y(I),E3Y(I),
+     8              E1Z(I) ,E2Z(I),E3Z(I),S6   )
+                    TJ=SIX*SIGSH(PT+7,II)
+                    PT = PT + 8
+                    FORJ(1:5,IP) = FORJ(1:5,IP) + UNPT*S6(1:5)
+                    IF (TJ>ZERO) THEN
+                      F2MJ(IP) = ONE/TJ
+                      MOMJ(1:3,IP) = S6(1:3)
+                    END IF 
+                  END DO 
+                ENDDO
+               DO IP =1,NPG
+                MOMJ(1:3,IP) = F2MJ(IP)*(MOMJ(1:3,IP)-FORJ(1:3,IP))
+                PTN= 22 + 9*(IP-1)
+                SIGSH(PTN:PTN+4,II)=FORJ(1:5,IP)
+                SIGSH(PTN+5,II)=ZERO
+                SIGSH(PTN+6:PTN+8,II)=MOMJ(1:3,IP)
+               END DO !IP =1,NPG
+              ELSE
+                PT = 22 + 8*(IPG -1)
+                FORJ(1:5,1) = ZERO
+                F2M = ZERO
+                DO IT=1,NPTI
+                  S6(1:6)=SIGSH(PT:PT+5,II)
+                  CALL CG2LSIG(
+     7            E1X(I) ,E2X(I),E3X(I),E1Y(I),E2Y(I),E3Y(I),
+     8            E1Z(I) ,E2Z(I),E3Z(I),S6   )
+                  TJ=SIX*SIGSH(PT+7,II)
+                  PT = PT + 8
+                  FORJ(1:5,1) = FORJ(1:5,1) + UNPT*S6(1:5)
+                  IF (TJ>ZERO) THEN
+                    F2M = ONE/TJ
+                    MOMJ(1:3,1) = S6(1:3)
+                  END IF 
+                ENDDO
+                FOR(I,1:5)=FORJ(1:5,1)
+                MOM(I,1:3)=F2M*(MOMJ(1:3,1)-FORJ(1:3,1))
+              END IF ! IHBE
+            ELSE
+C------ Q4,T3 
+              FORJ(1:5,1) = ZERO
+              F2M = ZERO
+               DO IT=1,NPTI
+                 PT = 22 + 6*(IT-1)
+                 S6(1:2)=SIGSH(PT:PT+1,II)
+                 S6(3)=SIGSH(INISHVAR+IT,II)
+                 S6(4:6)=SIGSH(PT+2:PT+4,II)
+                 TJ=SIX*SIGSH(INISHVAR+NPTI+IT,II)
+                CALL CG2LSIG(
+     7          E1X(I) ,E2X(I),E3X(I),E1Y(I),E2Y(I),E3Y(I),
+     8          E1Z(I) ,E2Z(I),E3Z(I),S6   )
+                FORJ(1:5,1) = FORJ(1:5,1) + UNPT*S6(1:5)
+                IF (TJ>ZERO) THEN
+                  F2M = ONE/TJ
+                  MOMJ(1:3,1) = S6(1:3)
+                END IF 
+               ENDDO
+               SIGSH(22:26,II)=FORJ(1:5,1)
+               SIGSH(28:30,II)=F2M*(MOMJ(1:3,1)-FORJ(1:3,1))
+            END IF !(NPG>1) THEN
+           ELSE ! NPTI=0
+C            
             IF (NPG>1) THEN
               IF (IHBE == 23) THEN
                DO IP =1,NPG
@@ -295,14 +367,14 @@ C--- in global sys modifying directly SIGSH
 !              
                 S6(1:6)=SIGSH(PT:PT+5,II)
                 CALL CG2LSIG(
-     7           E1X    ,E2X   ,E3X   ,E1Y   ,E2Y  ,E3Y,
-     8           E1Z    ,E2Z   ,E3Z   ,S6    )
+     7            E1X(I) ,E2X(I),E3X(I),E1Y(I),E2Y(I),E3Y(I),
+     8            E1Z(I) ,E2Z(I),E3Z(I),S6   )
                 SIGSH(PTN:PTN+4,II)=S6(1:5)
                 SIGSH(PTN+5,II)=SIGSH(PT+12,II)
                 S6(1:6)=SIGSH(PT+6:PT+11,II)
                 CALL CG2LSIG(
-     7           E1X    ,E2X   ,E3X   ,E1Y   ,E2Y  ,E3Y,
-     8           E1Z    ,E2Z   ,E3Z   ,S6    )
+     7              E1X(I) ,E2X(I),E3X(I),E1Y(I),E2Y(I),E3Y(I),
+     8              E1Z(I) ,E2Z(I),E3Z(I),S6   )
                 SIGSH(PTN+6:PTN+8,II)=S6(1:3)
                END DO !IP =1,NPG
               ELSE
@@ -311,26 +383,26 @@ C--- in global sys modifying directly SIGSH
                 LBUF => ELBUF_STR%BUFLY(1)%LBUF(IR,IS,1)
                 S6(1:6)=SIGSH(PT:PT+5,II)
                 CALL CG2LSIG(
-     7           E1X    ,E2X   ,E3X   ,E1Y   ,E2Y  ,E3Y,
-     8           E1Z    ,E2Z   ,E3Z   ,S6    )
+     7              E1X(I) ,E2X(I),E3X(I),E1Y(I),E2Y(I),E3Y(I),
+     8              E1Z(I) ,E2Z(I),E3Z(I),S6   )
 C     
                 IF (NPG<4) S6(4:5)=ZERO 
                 FOR(I,1:5)=S6(1:5)
                 IF (L_PLA > 0) LBUF%PLA(I)=SIGSH(PT+12,II)
                 S6(1:6)=SIGSH(PT+6:PT+11,II)
                 CALL CG2LSIG(
-     7           E1X    ,E2X   ,E3X   ,E1Y   ,E2Y  ,E3Y,
-     8           E1Z    ,E2Z   ,E3Z   ,S6    )
+     7              E1X(I) ,E2X(I),E3X(I),E1Y(I),E2Y(I),E3Y(I),
+     8              E1Z(I) ,E2Z(I),E3Z(I),S6   )
                  MOM(I,1:3)=S6(1:3)
-              END IF
+              END IF ! IHBE
 C------------NPG=1               
             ELSE
               S6(1:2)=SIGSH(22:23,II)
               S6(3)=SIGSH(18,II)
               S6(4:6)=SIGSH(24:26,II)
               CALL CG2LSIG(
-     7           E1X    ,E2X   ,E3X   ,E1Y   ,E2Y  ,E3Y,
-     8           E1Z    ,E2Z   ,E3Z   ,S6    )
+     7           E1X(I) ,E2X(I),E3X(I),E1Y(I),E2Y(I),E3Y(I),
+     8           E1Z(I) ,E2Z(I),E3Z(I),S6   )
               SIGSH(22:26,II)=S6(1:5)
 C---MOM              
               S6(1:2)=SIGSH(28:29,II)
@@ -338,12 +410,13 @@ C---MOM
               S6(4)=SIGSH(30,II)
               S6(5:6)=SIGSH(20:21,II)
               CALL CG2LSIG(
-     7           E1X    ,E2X   ,E3X   ,E1Y   ,E2Y  ,E3Y,
-     8           E1Z    ,E2Z   ,E3Z   ,S6    )
-              SIGSH(27:29,II)=S6(1:3)
-            END IF
+     7           E1X(I) ,E2X(I),E3X(I),E1Y(I),E2Y(I),E3Y(I),
+     8           E1Z(I) ,E2Z(I),E3Z(I),S6   )
+              SIGSH(28:30,II)=S6(1:3)
+            END IF ! NPG
+           END IF !(NPTI>1) THEN
           ELSE
-C-------npt>1          
+C-------npt>1       
             IF (NPG>1) THEN
               IF (IHBE == 23) THEN      !  QEPH-----
                 PT = 22 
@@ -359,12 +432,12 @@ C-------npt>1
                      DO IP=1,NPG
                        S6(1:6)=SIGSH(PT:PT+5,II)
                        CALL CG2LSIG(
-     7                 E1X    ,E2X   ,E3X   ,E1Y   ,E2Y  ,E3Y,
-     8                 E1Z    ,E2Z   ,E3Z   ,S6    )
+     7                 E1X(I) ,E2X(I),E3X(I),E1Y(I),E2Y(I),E3Y(I),
+     8                 E1Z(I) ,E2Z(I),E3Z(I),S6   )
                        CALL LOC2ORTH(S6,DIR_A,DIR_B,JJ,ILAW,IGTYP,NEL)
                        SIGSH(PTN:PTN+4,II) = S6(1:5)
                        SIGSH(PTN+5,II) = SIGSH(PT+6,II)
-                       POSI(I,IPT)=SIGSH(PT+8,II)
+                       POSI(I,IPT)=SIGSH(PT+7,II)
                        PT = PT + 8
                        PTN = PTN + 6
                      END DO !IT=1,NPG
@@ -386,8 +459,8 @@ C----------unlike QEPH, SIGSH can't be updated w/ reduced dim
                      IPT =IPT_ALL+IT
                        S6(1:6)=SIGSH(PT:PT+5,II)
                        CALL CG2LSIG(
-     7                 E1X    ,E2X   ,E3X   ,E1Y   ,E2Y  ,E3Y,
-     8                 E1Z    ,E2Z   ,E3Z   ,S6    )
+     7                 E1X(I) ,E2X(I),E3X(I),E1Y(I),E2Y(I),E3Y(I),
+     8                 E1Z(I) ,E2Z(I),E3Z(I),S6   )
 C---------no transvers shear for DKT
                       IF (NPG<4) S6(4:5)=ZERO 
                        CALL LOC2ORTH(S6,DIR_A,DIR_B,JJ,ILAW,IGTYP,NEL)
@@ -415,8 +488,8 @@ C------ Q4,T3
                    S6(4:6)=SIGSH(PT+2:PT+4,II)
                    POSI(I,IPT)=SIGSH(INISHVAR+NPT+IPT,II)
                   CALL CG2LSIG(
-     7            E1X    ,E2X   ,E3X   ,E1Y   ,E2Y  ,E3Y,
-     8            E1Z    ,E2Z   ,E3Z   ,S6    )
+     7              E1X(I) ,E2X(I),E3X(I),E1Y(I),E2Y(I),E3Y(I),
+     8              E1Z(I) ,E2Z(I),E3Z(I),S6   )
                   CALL LOC2ORTH(S6,DIR_A,DIR_B,JJ,ILAW,IGTYP,NEL)
                   SIGSH(PT:PT+4,II) = S6(1:5)
                  ENDDO
@@ -437,7 +510,7 @@ c---
             S4(1)=SIGSH(PT+27,II)
             FOR(I,1)=FOURTH*(S1(1)+S2(1)+S3(1)+S4(1))
             HH(I,1)=(S3(1)+S4(1)-TWO*FOR(I,1))*PG2I
-            HH(I,7)=-(S2(1)+S3(1)-TWO*FOR(I,1))*PG2I
+            HH(I,7)=-(S2(1)+S3(1)-TWO*FOR(I,1))*PG2I         
 
             PT = 23
             S1(1)=SIGSH(PT,II)
@@ -649,11 +722,11 @@ c---
             MOM(I,1)=SIGSH(PT+6,II)
             MOM(I,2)=SIGSH(PT+7,II)
             MOM(I,3)=SIGSH(PT+8,II)
-          ELSE  !  NPT /= 0
+          ELSE  !  NPT /= 0       
             PT = 22 + 6*(IPG -1)
             DO ILAY=1,NLAY
               NPTT = ELBUF_STR%BUFLY(ILAY)%NPTT
-              L_PLA = ELBUF_STR%BUFLY(ILAY)%L_PLA
+              L_PLA = ELBUF_STR%BUFLY(ILAY)%L_PLA 
               DO IT=1,NPTT
                 LBUF => ELBUF_STR%BUFLY(ILAY)%LBUF(IR,IS,IT)
                 LBUF%SIG(KK(1)+I) = SIGSH(PT,II)
@@ -713,6 +786,7 @@ Chd|  CG2LEPS                       source/elements/shell/coqueba/scigini4.F
 Chd|-- called by -----------
 Chd|        CSIGINI                       source/elements/shell/coque/csigini.F
 Chd|        CSIGINI4                      source/elements/shell/coqueba/scigini4.F
+Chd|        CSTRAINI4                     source/elements/shell/coqueba/cstraini4.F
 Chd|-- calls ---------------
 Chd|====================================================================
       SUBROUTINE CG2LEPS(
@@ -826,18 +900,12 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER II,ILAW,IGTYP,NEL
 C     REAL
       my_real
      .   TENS(6), DIR_A(*),DIR_B(*)
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -873,22 +941,14 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-C     REAL
       my_real
      .   SIG(6), DIR1,DIR2
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I
-C     REAL
       my_real
      .   S1, S2, S3, S4, S5
 C-----------------------------------------------

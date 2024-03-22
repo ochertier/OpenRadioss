@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,21 +25,26 @@ Chd|  SZDERI3                       source/elements/solid/solidez/szderi3.F
 Chd|-- called by -----------
 Chd|        SZFORC3                       source/elements/solid/solidez/szforc3.F
 Chd|-- calls ---------------
-Chd|        SCHKJABT3                     source/elements/solid/solide4/s4deri3.F
+Chd|        SCHKJABT3                     source/elements/solid/solide4/schkjabt3.F
 Chd|====================================================================
-      SUBROUTINE SZDERI3(OFF,DET,NGL,ISMSTR,
-     .   X1, X2, X3, X4, X5, X6, X7, X8,
-     .   Y1, Y2, Y3, Y4, Y5, Y6, Y7, Y8,
-     .   Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8,
-     .   PX1, PX2, PX3, PX4,
-     .   PY1, PY2, PY3, PY4,
-     .   PZ1, PZ2, PZ3, PZ4,
-     .   PX1H1, PX1H2, PX1H3, PX1H4,
-     .   PX2H1, PX2H2, PX2H3, PX2H4,
-     .   PX3H1, PX3H2, PX3H3, PX3H4,
-     .   PX4H1, PX4H2, PX4H3, PX4H4,
-     .   JAC1,JAC2,JAC3,JAC4,JAC5,JAC6,JAC9,
-     .   SAV ,OFFG ,NEL,VOLDP)
+      SUBROUTINE SZDERI3(
+     1   OFF,     DET,     NGL,     ISMSTR,
+     2   X1,      X2,      X3,      X4,
+     3   X5,      X6,      X7,      X8,
+     4   Y1,      Y2,      Y3,      Y4,
+     5   Y5,      Y6,      Y7,      Y8,
+     6   Z1,      Z2,      Z3,      Z4,
+     7   Z5,      Z6,      Z7,      Z8,
+     8   PX1,     PX2,     PX3,     PX4,
+     9   PY1,     PY2,     PY3,     PY4,
+     A   PZ1,     PZ2,     PZ3,     PZ4,
+     B   PX1H1,   PX1H2,   PX1H3,   PX1H4,
+     C   PX2H1,   PX2H2,   PX2H3,   PX2H4,
+     D   PX3H1,   PX3H2,   PX3H3,   PX3H4,
+     E   PX4H1,   PX4H2,   PX4H3,   PX4H4,
+     F   JAC1,    JAC2,    JAC3,    JAC4,
+     G   JAC5,    JAC6,    JAC9,    SAV,
+     H   OFFG,    NEL,     VOLDP,   JLAG)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -50,11 +55,9 @@ C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: JLAG
       INTEGER :: ISMSTR,NEL,NGL(*)
       DOUBLE PRECISION
      .   X1(*), X2(*), X3(*), X4(*), X5(*), X6(*), X7(*), X8(*),
@@ -136,7 +139,10 @@ C
       DET(I)=VOLDP(I)
       END DO
 C
-      CALL SCHKJABT3(OFF,DET,NGL,OFFG,NNEGA,INDEX)
+      CALL SCHKJABT3(
+     1   OFF,     DET,     NGL,     OFFG,
+     2   NNEGA,   INDEX,   NEL,     ISMSTR,
+     3   JLAG)
       IF (NNEGA>0) THEN
         IF (ISMSTR==10.OR.ISMSTR==12) THEN
 #include "vectorize.inc"
@@ -222,7 +228,7 @@ C
             JAC1(I)=X17+X46-X28-X35
             JAC2(I)=Y17+Y46-Y28-Y35
             JAC3(I)=Z17+Z46-Z28-Z35
-C	    
+C      
             JAC_59_68(I)=JAC5(I)*JAC9(I)-JAC6(I)*JAC8(I)
             JAC_67_49(I)=JAC6(I)*JAC7(I)-JAC4(I)*JAC9(I)
             JAC_48_57(I)=JAC4(I)*JAC8(I)-JAC5(I)*JAC7(I)
@@ -271,7 +277,7 @@ C
 C 1 -1 1 -1 1 -1 1 -1
          HX=ONE_OVER_8*(X1(I)-X2(I)+X3(I)-X4(I)+X5(I)-X6(I)+X7(I)-X8(I))
          HY=ONE_OVER_8*(Y1(I)-Y2(I)+Y3(I)-Y4(I)+Y5(I)-Y6(I)+Y7(I)-Y8(I))
-         HZ=ONE_OVER_8*(Z1(I)-Z2(I)+Z3(I)-Z4(I)+Z5(I)-Z6(I)+Z7(I)-Z8(I))	 
+         HZ=ONE_OVER_8*(Z1(I)-Z2(I)+Z3(I)-Z4(I)+Z5(I)-Z6(I)+Z7(I)-Z8(I))   
          PX1H3(I)=PX1(I)*HX+ PY1(I)*HY+PZ1(I)*HZ
          PX2H3(I)=PX2(I)*HX+ PY2(I)*HY+PZ2(I)*HZ
          PX3H3(I)=PX3(I)*HX+ PY3(I)*HY+PZ3(I)*HZ
@@ -281,7 +287,7 @@ C 1 1 -1 -1 -1 -1 1 1
        DO I=1,NEL
          HX=ONE_OVER_8*(X1(I)+X2(I)-X3(I)-X4(I)-X5(I)-X6(I)+X7(I)+X8(I))
          HY=ONE_OVER_8*(Y1(I)+Y2(I)-Y3(I)-Y4(I)-Y5(I)-Y6(I)+Y7(I)+Y8(I))
-         HZ=ONE_OVER_8*(Z1(I)+Z2(I)-Z3(I)-Z4(I)-Z5(I)-Z6(I)+Z7(I)+Z8(I))	 
+         HZ=ONE_OVER_8*(Z1(I)+Z2(I)-Z3(I)-Z4(I)-Z5(I)-Z6(I)+Z7(I)+Z8(I))   
          PX1H1(I)=PX1(I)*HX+ PY1(I)*HY+PZ1(I)*HZ
          PX2H1(I)=PX2(I)*HX+ PY2(I)*HY+PZ2(I)*HZ
          PX3H1(I)=PX3(I)*HX+ PY3(I)*HY+PZ3(I)*HZ
@@ -291,7 +297,7 @@ C 1 -1 -1 1 -1 1 1 -1
        DO I=1,NEL
          HX=ONE_OVER_8*(X1(I)-X2(I)-X3(I)+X4(I)-X5(I)+X6(I)+X7(I)-X8(I))
          HY=ONE_OVER_8*(Y1(I)-Y2(I)-Y3(I)+Y4(I)-Y5(I)+Y6(I)+Y7(I)-Y8(I))
-         HZ=ONE_OVER_8*(Z1(I)-Z2(I)-Z3(I)+Z4(I)-Z5(I)+Z6(I)+Z7(I)-Z8(I))	 
+         HZ=ONE_OVER_8*(Z1(I)-Z2(I)-Z3(I)+Z4(I)-Z5(I)+Z6(I)+Z7(I)-Z8(I))   
          PX1H2(I)=PX1(I)*HX+ PY1(I)*HY+PZ1(I)*HZ
          PX2H2(I)=PX2(I)*HX+ PY2(I)*HY+PZ2(I)*HZ
          PX3H2(I)=PX3(I)*HX+ PY3(I)*HY+PZ3(I)*HZ
@@ -301,7 +307,7 @@ C -1 1 -1 1 1 -1 1 -1
        DO I=1,NEL
          HX=ONE_OVER_8*(-X1(I)+X2(I)-X3(I)+X4(I)+X5(I)-X6(I)+X7(I)-X8(I))
          HY=ONE_OVER_8*(-Y1(I)+Y2(I)-Y3(I)+Y4(I)+Y5(I)-Y6(I)+Y7(I)-Y8(I))
-         HZ=ONE_OVER_8*(-Z1(I)+Z2(I)-Z3(I)+Z4(I)+Z5(I)-Z6(I)+Z7(I)-Z8(I))	 
+         HZ=ONE_OVER_8*(-Z1(I)+Z2(I)-Z3(I)+Z4(I)+Z5(I)-Z6(I)+Z7(I)-Z8(I))   
          PX1H4(I)=PX1(I)*HX+ PY1(I)*HY+PZ1(I)*HZ
          PX2H4(I)=PX2(I)*HX+ PY2(I)*HY+PZ2(I)*HZ
          PX3H4(I)=PX3(I)*HX+ PY3(I)*HY+PZ3(I)*HZ
@@ -315,21 +321,25 @@ Chd|  SZDERIT3                      source/elements/solid/solidez/szderi3.F
 Chd|-- called by -----------
 Chd|        SZFORC3                       source/elements/solid/solidez/szforc3.F
 Chd|-- calls ---------------
-Chd|        SCHKJAB3                      source/elements/solid/solide/sderi3.F
+Chd|        SCHKJAB3                      source/elements/solid/solide/schkjab3.F
 Chd|====================================================================
-      SUBROUTINE SZDERIT3(OFF,DET,NGL,NEL,
-     .   X1, X2, X3, X4, X5, X6, X7, X8,
-     .   Y1, Y2, Y3, Y4, Y5, Y6, Y7, Y8,
-     .   Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8,
-     .   PX1, PX2, PX3, PX4,
-     .   PY1, PY2, PY3, PY4,
-     .   PZ1, PZ2, PZ3, PZ4,
-     .   PX1H1, PX1H2, PX1H3, PX1H4,
-     .   PX2H1, PX2H2, PX2H3, PX2H4,
-     .   PX3H1, PX3H2, PX3H3, PX3H4,
-     .   PX4H1, PX4H2, PX4H3, PX4H4,
-     .   JAC1,JAC2,JAC3,
-     .   JAC4,JAC5,JAC6,JAC9)
+      SUBROUTINE SZDERIT3(
+     1   OFF,     DET,     NGL,     NEL,
+     2   X1,      X2,      X3,      X4,
+     3   X5,      X6,      X7,      X8,
+     4   Y1,      Y2,      Y3,      Y4,
+     5   Y5,      Y6,      Y7,      Y8,
+     6   Z1,      Z2,      Z3,      Z4,
+     7   Z5,      Z6,      Z7,      Z8,
+     8   PX1,     PX2,     PX3,     PX4,
+     9   PY1,     PY2,     PY3,     PY4,
+     A   PZ1,     PZ2,     PZ3,     PZ4,
+     B   PX1H1,   PX1H2,   PX1H3,   PX1H4,
+     C   PX2H1,   PX2H2,   PX2H3,   PX2H4,
+     D   PX3H1,   PX3H2,   PX3H3,   PX3H4,
+     E   PX4H1,   PX4H2,   PX4H3,   PX4H4,
+     F   JAC1,    JAC2,    JAC3,    JAC4,
+     G   JAC5,    JAC6,    JAC9,    JLAG)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -340,11 +350,9 @@ C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: JLAG
       INTEGER :: NEL,NGL(*)
       DOUBLE PRECISION
      .   X1(*), X2(*), X3(*), X4(*), X5(*), X6(*), X7(*), X8(*),
@@ -426,7 +434,8 @@ C
       DET(I)=ONE_OVER_64*(JAC1(I)*JAC_59_68(I)+JAC2(I)*JAC_67_49(I)+JAC3(I)*JAC_48_57(I))
       END DO
 C
-      CALL SCHKJAB3(OFF,DET,NGL)
+      CALL SCHKJAB3(
+     1   OFF,     DET,     NGL,     NEL)
 C
 C Jacobian matrix inverse and shape functions derivatives Pij
       DO I=1,NEL
@@ -468,7 +477,7 @@ C
 C 1 -1 1 -1 1 -1 1 -1
          HX=ONE_OVER_8*(X1(I)-X2(I)+X3(I)-X4(I)+X5(I)-X6(I)+X7(I)-X8(I))
          HY=ONE_OVER_8*(Y1(I)-Y2(I)+Y3(I)-Y4(I)+Y5(I)-Y6(I)+Y7(I)-Y8(I))
-         HZ=ONE_OVER_8*(Z1(I)-Z2(I)+Z3(I)-Z4(I)+Z5(I)-Z6(I)+Z7(I)-Z8(I))	 
+         HZ=ONE_OVER_8*(Z1(I)-Z2(I)+Z3(I)-Z4(I)+Z5(I)-Z6(I)+Z7(I)-Z8(I))   
          PX1H3(I)=PX1(I)*HX+ PY1(I)*HY+PZ1(I)*HZ
          PX2H3(I)=PX2(I)*HX+ PY2(I)*HY+PZ2(I)*HZ
          PX3H3(I)=PX3(I)*HX+ PY3(I)*HY+PZ3(I)*HZ
@@ -478,7 +487,7 @@ C 1 1 -1 -1 -1 -1 1 1
       DO I=1,NEL
          HX=ONE_OVER_8*(X1(I)+X2(I)-X3(I)-X4(I)-X5(I)-X6(I)+X7(I)+X8(I))
          HY=ONE_OVER_8*(Y1(I)+Y2(I)-Y3(I)-Y4(I)-Y5(I)-Y6(I)+Y7(I)+Y8(I))
-         HZ=ONE_OVER_8*(Z1(I)+Z2(I)-Z3(I)-Z4(I)-Z5(I)-Z6(I)+Z7(I)+Z8(I))	 
+         HZ=ONE_OVER_8*(Z1(I)+Z2(I)-Z3(I)-Z4(I)-Z5(I)-Z6(I)+Z7(I)+Z8(I))   
          PX1H1(I)=PX1(I)*HX+ PY1(I)*HY+PZ1(I)*HZ
          PX2H1(I)=PX2(I)*HX+ PY2(I)*HY+PZ2(I)*HZ
          PX3H1(I)=PX3(I)*HX+ PY3(I)*HY+PZ3(I)*HZ
@@ -488,7 +497,7 @@ C 1 -1 -1 1 -1 1 1 -1
       DO I=1,NEL
          HX=ONE_OVER_8*(X1(I)-X2(I)-X3(I)+X4(I)-X5(I)+X6(I)+X7(I)-X8(I))
          HY=ONE_OVER_8*(Y1(I)-Y2(I)-Y3(I)+Y4(I)-Y5(I)+Y6(I)+Y7(I)-Y8(I))
-         HZ=ONE_OVER_8*(Z1(I)-Z2(I)-Z3(I)+Z4(I)-Z5(I)+Z6(I)+Z7(I)-Z8(I))	 
+         HZ=ONE_OVER_8*(Z1(I)-Z2(I)-Z3(I)+Z4(I)-Z5(I)+Z6(I)+Z7(I)-Z8(I))   
          PX1H2(I)=PX1(I)*HX+ PY1(I)*HY+PZ1(I)*HZ
          PX2H2(I)=PX2(I)*HX+ PY2(I)*HY+PZ2(I)*HZ
          PX3H2(I)=PX3(I)*HX+ PY3(I)*HY+PZ3(I)*HZ
@@ -498,7 +507,7 @@ C -1 1 -1 1 1 -1 1 -1
       DO I=1,NEL
          HX=ONE_OVER_8*(-X1(I)+X2(I)-X3(I)+X4(I)+X5(I)-X6(I)+X7(I)-X8(I))
          HY=ONE_OVER_8*(-Y1(I)+Y2(I)-Y3(I)+Y4(I)+Y5(I)-Y6(I)+Y7(I)-Y8(I))
-         HZ=ONE_OVER_8*(-Z1(I)+Z2(I)-Z3(I)+Z4(I)+Z5(I)-Z6(I)+Z7(I)-Z8(I))	 
+         HZ=ONE_OVER_8*(-Z1(I)+Z2(I)-Z3(I)+Z4(I)+Z5(I)-Z6(I)+Z7(I)-Z8(I))   
          PX1H4(I)=PX1(I)*HX+ PY1(I)*HY+PZ1(I)*HZ
          PX2H4(I)=PX2(I)*HX+ PY2(I)*HY+PZ2(I)*HZ
          PX3H4(I)=PX3(I)*HX+ PY3(I)*HY+PZ3(I)*HZ
@@ -513,11 +522,12 @@ Chd|-- called by -----------
 Chd|        SZFORC3                       source/elements/solid/solidez/szforc3.F
 Chd|-- calls ---------------
 Chd|====================================================================
-      SUBROUTINE SZDERITO3(OFF,DET,
-     .   PX1, PX2, PX3, PX4,
-     .   PY1, PY2, PY3, PY4,
-     .   PZ1, PZ2, PZ3, PZ4,
-     .   JAC_I,NEL)
+      SUBROUTINE SZDERITO3(
+     1   OFF,     DET,     PX1,     PX2,
+     2   PX3,     PX4,     PY1,     PY2,
+     3   PY3,     PY4,     PZ1,     PZ2,
+     4   PZ3,     PZ4,     JAC_I,   NEL,
+     5   JLAG)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -527,11 +537,9 @@ C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: JLAG
       INTEGER :: NEL
       my_real
      .   OFF(*),DET(*),  

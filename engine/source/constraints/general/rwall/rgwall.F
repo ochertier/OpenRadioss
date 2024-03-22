@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -41,11 +41,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com06_c.inc"
 #include      "com08_c.inc"
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
 #include      "scr11_c.inc"
 #include      "impl1_c.inc"
 #include      "sms_c.inc"
@@ -94,7 +91,7 @@ C
          M3=3*MSR
          M2=M3-1
          M1=M2-1
-Cel changement formulation : plus d'impasse sur contribution force
+C   changement formulation : plus d'impasse sur contribution force
          VXW=V(M1)+A(M1)*DT12
          VYW=V(M2)+A(M2)*DT12
          VZW=V(M3)+A(M3)*DT12
@@ -193,7 +190,7 @@ C
          M3=3*MSR
          M2=M3-1
          M1=M2-1
-Cel changement formulation : plus d'impasse sur contribution force
+C   changement formulation : plus d'impasse sur contribution force
          VXW=V(M1)+A(M1)*DT12
          VYW=V(M2)+A(M2)*DT12
          VZW=V(M3)+A(M3)*DT12

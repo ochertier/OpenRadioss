@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -32,7 +32,7 @@ Chd|        HM_OPTION_START               source/devtools/hm_reader/hm_option_st
 Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
-      SUBROUTINE HM_READ_ANALY(NANALY,IPARITH,ISUB,IPARI0,MSHSUB,LSUBMODEL)
+      SUBROUTINE HM_READ_ANALY(NANALY,IPARITH,IPARI0,LSUBMODEL)
 C-----------------------------------------------
 C   ROUTINE DESCRIPTION :
 C   ===================
@@ -43,7 +43,6 @@ C   ===================
 C     NAME            DESCRIPTION    
 C     NANALY          N2D3D INTEGER
 C     IPARITH         FLAG FOR PARAL. ARITH.
-C     ISUB            FLAG FOR SUBCYCLING
 C     LSUBMODEL       SUBMODEL STRUCTURE     
 C-----------------------------------------------
 C   M o d u l e s
@@ -55,17 +54,10 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "param_c.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
 C INPUT ARGUMENTS
-      INTEGER, INTENT(OUT)          ::NANALY,IPARITH,ISUB,IPARI0,MSHSUB
+      INTEGER, INTENT(OUT)          ::NANALY,IPARITH,IPARI0
       TYPE(SUBMODEL_DATA),INTENT(IN)::LSUBMODEL(*)
 C OUTPUT ARGUMENTS
 C-----------------------------------------------
@@ -81,8 +73,7 @@ C----------------------------------------------
         CALL HM_OPTION_START('/ANALY')
         CALL HM_OPTION_READ_KEY(LSUBMODEL)
         CALL HM_GET_INTV('N2D3D',NANALY,IS_AVAILABLE,LSUBMODEL)      
-        CALL HM_GET_INTV('IPARITH',IPARITH,IS_AVAILABLE,LSUBMODEL) 
-        CALL HM_GET_INTV('ISUBCYC',ISUB,IS_AVAILABLE,LSUBMODEL)
+        CALL HM_GET_INTV('IPARITH',IPARITH,IS_AVAILABLE,LSUBMODEL)
         IF(IPARITH==0)THEN
           IPARI0  = 1
           IPARITH = 1
@@ -95,14 +86,9 @@ C----------------------------------------------
         ENDIF
       ELSE
         NANALY  = 0
-        ISUB    = 0
         IPARITH = 1
       ENDIF
-C
-      IF(ISUB==2)THEN
-        MSHSUB = 1
-        ISUB   = 0
-      END IF      
+
 C--------------------------------------------------------------
       RETURN
       END 

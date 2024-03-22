@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -39,9 +39,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
@@ -58,20 +55,18 @@ C     REAL
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
 #include      "vect01_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I
       my_real
      .   XP1, XP2, XP3, XNOR1, XP4, XP5, XP6, 
-     .   XNOR2, XNORM, DET1, DET2, DET3, DET, XX,YY,ZZ
+     .   XNOR2, XNORM, DET1, DET2, DET3, DET, XX,YY,ZZ,TOL
 C=======================================================================
 C     CONNECTIVITES ET MATERIEL                   |
 C--------------------------------------------------
+      TOL=TWO*EM06
       DO 10 I=LFT,LLT
       MXT(I)=NCP(1,I)
       NC1(I)=NCP(2,I)
@@ -131,14 +126,20 @@ C      CALCUL DE COLINEARITE DES VECTEURS N1N2 ET N1N3
          DET2=XP2*XP6-XP3*XP5
          DET3=XP3*XP4-XP1*XP6
          DET= SQRT(DET1**2+DET2**2+DET3**2)
-         IF(DET<EM20) THEN
-          CALL ANCMSG(MSGID=224,
-     .                MSGTYPE=MSGERROR,
+         IF (DET<TOL) THEN
+           CALL ANCMSG(MSGID=3051,
+     .                MSGTYPE=MSGWARNING,
      .                ANMODE=ANINFO_BLIND_1,
-     .                I1=NCP(6,I))
-         ENDIF
+     .                I1=NCP(6,I),
+     .                PRMOD=MSG_CUMU)
+           NC3(I)=NC2(I)
+         END IF
        ENDIF
  30   CONTINUE
+      CALL ANCMSG(MSGID=3051,
+     .                  MSGTYPE=MSGWARNING,
+     .                  ANMODE=ANINFO_BLIND_1,
+     .                  PRMOD=MSG_PRINT)
 c-----------
       RETURN
       END

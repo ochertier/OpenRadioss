@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -32,28 +32,18 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
 C----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "macro.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "couple_c.inc"
 #include      "impl1_c.inc"
 #include      "remesh_c.inc"
-#include      "scr05_c.inc"
-#include      "scr07_c.inc"
-#include      "scr18_c.inc"
-#include      "alefvm.inc"
 #include      "sms_c.inc"
 #include      "sphcom.inc"
 #include      "task_c.inc"
-#include      "warn_c.inc"
-#include      "filescount_c.inc"
 #include        "timeri_c.inc"
-C#include        "timerr_c.inc"
 
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -417,15 +407,11 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
 C----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "macro.inc"
 #include      "com01_c.inc"
 #include      "task_c.inc"
-C#include      "timerr_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -615,12 +601,9 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
 C----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "macro.inc"
 #include      "task_c.inc"
 #include      "timerr_c.inc"
       COMMON /ICLOCK/CLOCK0
@@ -631,9 +614,6 @@ C-----------------------------------------------
       REAL(kind=8) OMP_get_wtime
       external OMP_get_wtime
 #endif
-C-----------------------------------------------
-C   D u m m y   A r g u m e n t s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -779,8 +759,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -930,8 +908,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "task_c.inc"
@@ -982,13 +958,13 @@ Chd|  PRINTIME                      source/system/timer.F
 Chd|-- called by -----------
 Chd|        RESOL                         source/engine/resol.F         
 Chd|-- calls ---------------
-Chd|        CLOSE_C                       source/output/tools/sortie_c.c
-Chd|        CUR_FIL_C                     source/output/tools/sortie_c.c
+Chd|        CLOSE_C                       ../common_source/tools/input_output/write_routtines.c
+Chd|        CUR_FIL_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|        ELAPSTIME                     source/system/timer.F         
-Chd|        FSEEK_END_C                   source/output/tools/sortie_c.c
+Chd|        FSEEK_END_C                   ../common_source/tools/input_output/write_routtines.c
 Chd|        GET_MEM_MAP_VAR               source/system/timer.F         
 Chd|        MAP_MEMORY                    ../common_source/comm/memory_use_c.c
-Chd|        OPEN_C                        source/output/tools/sortie_c.c
+Chd|        OPEN_C                        ../common_source/tools/input_output/write_routtines.c
 Chd|        PRINT_SUMMARY                 source/system/timer.F         
 Chd|        RAD_SPMD_RECV                 source/mpi/generic/rad_spmd_recv.F
 Chd|        RAD_SPMD_SEND                 source/mpi/generic/rad_spmd_send.F
@@ -1009,27 +985,17 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include        "com01_c.inc"
 #include        "com04_c.inc"
-#include        "couple_c.inc"
-#include        "impl1_c.inc"
-#include        "remesh_c.inc"
 #include        "scr05_c.inc"
-#include        "scr07_c.inc"
-#include        "scr18_c.inc"
-#include        "alefvm.inc"
 #include        "sms_c.inc"
-#include        "sphcom.inc"
 #include        "task_c.inc"
 #include        "timerc_c.inc"
 #include        "timeri_c.inc"
 #include        "timerr_c.inc"
 #include        "units_c.inc"
-#include        "warn_c.inc"
 #include        "filescount_c.inc"
       COMMON /ICLOCK/CLOCK0
       INTEGER CLOCK0
@@ -1063,6 +1029,7 @@ C-----------------------------------------------
       INTEGER :: LEN_TMP_NAME
       CHARACTER(len=4096) :: TMP_NAME
       INTEGER :: INDICE
+      INTEGER, PARAMETER :: INTSIZE = 4
 
       TITLES(MACRO_TIMER_RESOL      ) = "RESOL"
       TITLES(MACRO_TIMER_CONTSORT   ) = "CONTSORT"
@@ -1747,20 +1714,9 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include	"com01_c.inc"
-#include        "scr05_c.inc"
-#include        "scr07_c.inc"
-#include	"task_c.inc"
 #include        "units_c.inc"
-#include        "warn_c.inc"
-#include        "impl1_c.inc"
-C-----------------------------------------------
-C   D u m m y   A r g u m e n t s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------        
@@ -1822,16 +1778,11 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include	"com01_c.inc"
-#include        "scr05_c.inc"
-#include        "scr07_c.inc"
-#include	"task_c.inc"
+#include  "com01_c.inc"
+#include  "task_c.inc"
 #include        "units_c.inc"
-#include        "warn_c.inc"
 #include        "impl1_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -1908,8 +1859,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
 C----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -1966,8 +1915,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
       COMMON /TIMERG/TIMERG(2,500000),CPUTIMEG(500000)
@@ -2016,8 +1963,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
       COMMON /TIMERG/TIMERG(2,500000),CPUTIMEG(500000)
@@ -2051,22 +1996,15 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr07_c.inc"
       COMMON /TIMERG/TIMERG(2,500000),CPUTIMEG(500000)
       REAL TIMERG,CPUTIMEG
 C-----------------------------------------------
-#include	"com01_c.inc"
-#include	"com04_c.inc"
-#include        "scr05_c.inc"
-#include	"task_c.inc"
+#include  "com01_c.inc"
+#include  "task_c.inc"
 #include        "units_c.inc"
 #include        "param_c.inc"
-#include        "spmd_c.inc"
-#include        "rnur_c.inc"
 #include        "chara_c.inc"
 #include        "scr19_c.inc"
 #include        "ddspmd_c.inc"
@@ -2170,15 +2108,15 @@ C   SOLIDES
            TELT = TET4TNL(MTN,1) + TET4TELT(1)
 C   TETRA10
           ELSEIF (ISOLNOD==10) THEN
-	   MMA = IXS(1,NFT)
-	   NFUNC = MAX(IPM(10,MMA) - 3,1)
-	   IF (NFUNC<=2) THEN
+             MMA = IXS(1,NFT)
+             NFUNC = MAX(IPM(10,MMA) - 3,1)
+             IF (NFUNC<=2) THEN
               TELT = TET10TNL(MTN,1) + TET10TELT(1)
-	   ELSEIF (NFUNC>2.AND.NFUNC<=7) THEN
-	      TELT = TET10TNL(MTN,2) + TET10TELT(1)
-	   ELSE
-	      TELT = TET10TNL(MTN,3) + TET10TELT(1)
-	   ENDIF
+             ELSEIF (NFUNC>2.AND.NFUNC<=7) THEN
+                TELT = TET10TNL(MTN,2) + TET10TELT(1)
+             ELSE
+                TELT = TET10TNL(MTN,3) + TET10TELT(1)
+             ENDIF
           ELSE
            IF (IHBE<=1.OR.IHBE==101) THEN
 C   Solides ISOLD1
@@ -2204,11 +2142,11 @@ C   Solides HA8
             NPTOT = NPTS*NPTT*NPTR
 C
             TELT = NPTOT*SOL8TNL(MTN,1)+SOLTELT(5)+NPTOT*SOLTELT(6)
-	   
-	   ELSEIF(IHBE==17)THEN
-	     TELT = SOL1TNL(MTN,1)*8+SOLTELT(7)
-	   ELSE
-	     TELT = SOL1TNL(MTN,1) + SOLTELT(1)
+             
+             ELSEIF(IHBE==17)THEN
+               TELT = SOL1TNL(MTN,1)*8+SOLTELT(7)
+             ELSE
+               TELT = SOL1TNL(MTN,1) + SOLTELT(1)
            ENDIF
           ENDIF
 C
@@ -2456,17 +2394,8 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include    "com01_c.inc"
-#include    "com04_c.inc"
-#include    "scr05_c.inc"
-#include    "task_c.inc"
-#include    "units_c.inc"
 #include    "param_c.inc"
-#include    "spmd_c.inc"
-#include    "rnur_c.inc"
-#include    "chara_c.inc"
-#include    "scr07_c.inc"
 #include    "scr19_c.inc"
-#include    "ddspmd_c.inc"
 C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
@@ -2586,17 +2515,8 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include    "com01_c.inc"
-#include    "com04_c.inc"
-#include    "scr05_c.inc"
-#include    "task_c.inc"
-#include    "units_c.inc"
 #include    "param_c.inc"
-#include    "spmd_c.inc"
-#include    "rnur_c.inc"
-#include    "chara_c.inc"
-#include    "scr07_c.inc"
 #include    "scr19_c.inc"
-#include    "ddspmd_c.inc"
 C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
@@ -2658,12 +2578,12 @@ C-----------------------------------------------
         ITY = IPARG(5,NG)
         MTN = IPARG(1,NG)
         NELEM = IPARG(2,NG)
-	NFT   = IPARG(3,NG)+1
+          NFT   = IPARG(3,NG)+1
         NSG = IPARG(10,NG)
         NPT = IPARG(6,NG)
-	
+
         MID = IXS(1,NFT)
-        MUID = IPM(1,MID)	
+        MUID = IPM(1,MID)
 
         DIFFTT = CPUTIMEG(NG) - THEOGP(NG) 
 
@@ -2703,17 +2623,8 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include    "com01_c.inc"
-#include    "com04_c.inc"
-#include    "scr05_c.inc"
-#include    "task_c.inc"
-#include    "units_c.inc"
 #include    "param_c.inc"
-#include    "spmd_c.inc"
-#include    "rnur_c.inc"
-#include    "chara_c.inc"
-#include    "scr07_c.inc"
 #include    "scr19_c.inc"
-#include    "ddspmd_c.inc"
 C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
@@ -2770,7 +2681,7 @@ C-----------------------------------------------
       DO I=1,NUMSOLG
         NGL = INDEXSH(I)
         NG = NUMGROUP(NGL)
-	NFT   = IPARG(3,NG)+1
+          NFT   = IPARG(3,NG)+1
 
         ITY = IPARG(5,NG)
         MTN = IPARG(1,NG)
@@ -2819,17 +2730,8 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include    "com01_c.inc"
-#include    "com04_c.inc"
-#include    "scr05_c.inc"
-#include    "task_c.inc"
-#include    "units_c.inc"
 #include    "param_c.inc"
-#include    "spmd_c.inc"
-#include    "rnur_c.inc"
-#include    "chara_c.inc"
-#include    "scr07_c.inc"
 #include    "scr19_c.inc"
-#include    "ddspmd_c.inc"
 C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
@@ -2931,17 +2833,8 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include    "com01_c.inc"
-#include    "com04_c.inc"
-#include    "scr05_c.inc"
-#include    "task_c.inc"
-#include    "units_c.inc"
 #include    "param_c.inc"
-#include    "spmd_c.inc"
-#include    "rnur_c.inc"
-#include    "chara_c.inc"
-#include      "scr07_c.inc"
 #include     "scr19_c.inc"
-#include     "ddspmd_c.inc"
 C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
@@ -3110,8 +3003,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
 C----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -3173,13 +3064,9 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "task_c.inc"
-#include      "timerr_c.inc"
-#include      "com01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -3207,13 +3094,9 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "task_c.inc"
-#include      "timerr_c.inc"
-#include      "com01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -3244,7 +3127,7 @@ Chd|====================================================================
       SUBROUTINE CUMULTIME_MP(
      1          TAILLE,IPARG,
      2          IXC,IXQ,IXT,IXP,IXTG,
-     3          IXR,IXUR,IXS,KXIG3D,IPM,
+     3          IXR,IXS,KXIG3D,IPM,
      4          IGEO,GEO,POIN_UMP,CPUTIME_MP,
      5          NBR_GPMP,CPUTIME_MP_GLOB,TAB_UMP,PM,
      6          BUFMAT,TABMP_L,TAB_MAT )
@@ -3254,32 +3137,22 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include    "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
-#include      "scr07_c.inc"
       COMMON /TIMERG/TIMERG(2,500000),CPUTIMEG(500000)
       REAL TIMERG,CPUTIMEG
 C-----------------------------------------------
 #include    "com01_c.inc"
 #include    "com04_c.inc"
-#include    "scr05_c.inc"
 #include    "task_c.inc"
-#include    "units_c.inc"
 #include    "param_c.inc"
-#include    "spmd_c.inc"
-#include    "rnur_c.inc"
-#include    "chara_c.inc"
 #include    "scr19_c.inc"
-#include    "ddspmd_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IPARG(NPARG,*),IXC(NIXC,*),IXS(NIXS,*),
      .        IXQ(NIXQ,*),IXT(NIXT,*), IXP(NIXP,*),
-     .        IXR(NIXR,*), IXUR(*),KXIG3D(*),IXTG(NIXTG,*),
+     .        IXR(NIXR,*),KXIG3D(*),IXTG(NIXTG,*),
      .        IPM(NPROPMI,*),IGEO(NPROPGI,*),
      .        TAILLE,NBR_GPMP,TABMP_L
 
@@ -3332,7 +3205,6 @@ C
       REAL WD
 C-----------------------------------------------
 
-!#include "weights_p4linux964_spmd.inc" 
       T1 = 0
       ELEM_MP = ZERO
       POIDS_REF = ZERO
@@ -3546,26 +3418,17 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include    "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
-#include      "scr07_c.inc"
       COMMON /TIMERG/TIMERG(2,500000),CPUTIMEG(500000)
       REAL TIMERG,CPUTIMEG
 C-----------------------------------------------
 #include    "com01_c.inc"
 #include    "com04_c.inc"
-#include    "scr05_c.inc"
 #include    "task_c.inc"
 #include    "units_c.inc"
-#include    "param_c.inc"
-#include    "spmd_c.inc"
-#include    "rnur_c.inc"
 #include    "chara_c.inc"
 #include    "scr19_c.inc"
-#include    "ddspmd_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -3748,11 +3611,11 @@ Chd|  ADD_ELAPSED_TIME_MON_OFF      source/system/timer.F
 Chd|-- called by -----------
 Chd|        RESOL                         source/engine/resol.F         
 Chd|-- calls ---------------
-Chd|        CLOSE_C                       source/output/tools/sortie_c.c
-Chd|        CUR_FIL_C                     source/output/tools/sortie_c.c
+Chd|        CLOSE_C                       ../common_source/tools/input_output/write_routtines.c
+Chd|        CUR_FIL_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|        ELAPSTIME                     source/system/timer.F         
-Chd|        FSEEK_END_C                   source/output/tools/sortie_c.c
-Chd|        OPEN_C                        source/output/tools/sortie_c.c
+Chd|        FSEEK_END_C                   ../common_source/tools/input_output/write_routtines.c
+Chd|        OPEN_C                        ../common_source/tools/input_output/write_routtines.c
 Chd|        WRITE_DPDB                    source/output/tools/write_db.F
 Chd|        INOUTFILE_MOD                 ../common_source/modules/inoutfile_mod.F
 Chd|        TIME_MOD                      share/modules/time_mod.F      
@@ -3770,35 +3633,13 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C       G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C       C o m m o n   B l o c k s
 C-----------------------------------------------
-#include        "com01_c.inc"
-#include        "com04_c.inc"
-#include        "couple_c.inc"
-#include        "impl1_c.inc"
-#include        "remesh_c.inc"
-#include        "scr05_c.inc"
-#include        "scr07_c.inc"
-#include        "scr18_c.inc"
-#include        "alefvm.inc"
-#include        "sms_c.inc"
-#include        "sphcom.inc"
 #include        "task_c.inc"
-#include        "timerc_c.inc"
-#include        "timeri_c.inc"
-#include        "timerr_c.inc"
-#include        "units_c.inc"
-#include        "warn_c.inc"
-#include        "filescount_c.inc"
         COMMON /ICLOCK/CLOCK0
         INTEGER CLOCK0
         COMMON /RCLOCK/ELAPSED
         DOUBLE PRECISION ELAPSED
-C-----------------------------------------------
-C   D u m m y   A r g u m e n t s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

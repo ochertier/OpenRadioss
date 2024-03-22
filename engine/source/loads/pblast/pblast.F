@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -31,17 +31,19 @@ Chd|        PBLAST_2                      source/loads/pblast/pblast_2.F
 Chd|        PBLAST_3                      source/loads/pblast/pblast_3.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
-Chd|        PBLAST_MOD                    ../common_source/modules/pblast_mod.F
+Chd|        PBLAST_MOD                    ../common_source/modules/loads/pblast_mod.F
+Chd|        TH_SURF_MOD                   ../common_source/modules/interfaces/th_surf_mod.F
 Chd|====================================================================
       SUBROUTINE PBLAST (ILOADP  ,FAC     ,A       , V       ,X       ,
      1                   IADC    ,FSKY    ,FSKYV   ,LLOADP   ,FEXT    ,
-     2                   ITAB    ,H3D_DATA)
+     2                   ITAB    ,H3D_DATA,TH_SURF,FSAVSURF  ,NSEG_LOADP)
 C-----------------------------------------------
 C   M o d u l e s
 C----------------------------------------------- 
       USE H3D_MOD 
       USE PBLAST_MOD
-      USE GROUPDEF_MOD      
+      USE GROUPDEF_MOD  
+      USE TH_SURF_MOD , ONLY : TH_SURF_
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -51,19 +53,10 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com06_c.inc"
 #include      "com08_c.inc"
-#include      "scr05_c.inc"
-#include      "task_c.inc"
-#include      "parit_c.inc"
-#include      "scr14_c.inc"
-#include      "scr16_c.inc"
-#include      "scr17_c.inc"
 #include      "mvsiz_p.inc"
-#include      "units_c.inc"
-#include      "sysunit.inc"
 #include      "tabsiz_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -75,83 +68,88 @@ C-----------------------------------------------
       my_real,INTENT(IN) :: FAC(LFACLOAD,NLOADP),V(3,NUMNOD),X(3,NUMNOD)
       my_real,INTENT(INOUT) :: A(3,NUMNOD),FSKY(8,SFSKY/8), FSKYV(SFSKY/8,8),FEXT(3,NUMNOD)
       TYPE(H3D_DATABASE),INTENT(IN) :: H3D_DATA
+      TYPE (TH_SURF_) , INTENT(IN) :: TH_SURF
+      my_real, INTENT(INOUT) :: FSAVSURF(5,NSURF)
+      INTEGER, INTENT(INOUT) :: NSEG_LOADP(NSURF)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-       INTEGER :: NL, ABAC_ID, NDT, NDT0, ID, II, IJK, NN(4), NNOD, IAD , IL
-       my_real :: T0INF_LOC, TFEXT_LOC, T_STOP, TDET
+       INTEGER :: NL, ABAC_ID, ID, II, IJK, NN(4), NNOD, IAD , IL, NSEGPL
+       my_real :: DTMIN_LOC, TFEXT_LOC, T_STOP, TA_FIRST
        LOGICAL :: IS_RESET
+
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C-----------------------------------------------
 C this subroutines is applying pressure load to
-C a segment submitted to a blast wave which
-C characteristics are built from TM5-1300 abacuses which are in unit system {cm g mus, bar},  pressure must also be converted into Mbar before switching from unit system.
+C a segment submitted to a blast wave.
+C Preussre time histories are built from "UFC 3-340-02, Dec. 5th 2008" tables which are hardcoded in unit system {g, cm, mus}
+C 3 different models are avaialable to build the pressure time history :
+C    FREE AIR      (ABAC_ID = 1)
+C    SURFACE BURST (ABAC_ID = 2)
+C    AIR BURST     (ABAC_ID = 3)
 C-----------------------------------------------
 C   P r e - C o n d i t i o n
 C-----------------------------------------------
-       DT_PBLAST = EP20
-       T0INF_PBLAST = EP20       
-       IDT_PBLAST = 0      
+       PBLAST_DT%DT = EP20
+       PBLAST_DT%IDT = 0
 
        IF(NLOADP_B==0)THEN
-         RETURN 
+         RETURN
        ENDIF     
-       
+       NSEGPL = TH_SURF%NSEGLOADPF
 C-----------------------------------------------,
 C   S o u r c e   C o d e
 C-----------------------------------------------
 !$OMP PARALLEL
 !$OMP+ SHARED(FAC,A,V,X,TFEXT,IADC,FSKY,FSKYV,LLOADP,FEXT,ITAB,H3D_DATA,TT,ILOADP)
-!$OMP+ SHARED(T0INF_PBLAST,PBLAST_TAB,PBLAST_DATA)
-!$OMP+ PRIVATE(ABAC_ID,ID,NDT,NDT0,T0INF_LOC,NL,TFEXT_LOC)
-       
+!$OMP+ SHARED(PBLAST_DT,PBLAST_TAB,PBLAST_DATA)
+!$OMP+ PRIVATE(ABAC_ID,ID,DTMIN_LOC,NL,TFEXT_LOC,TA_FIRST,IJK)
+
        !-----------------------------------------------
        !   LOOP OVER all /LOAD/PBLAST options
-       !----------------------------------------------- 
+       !-----------------------------------------------
+
        DO NL=NLOADP_F+1, NLOADP_F+NLOADP_B
 
          ABAC_ID  = ILOADP(07,NL)
          ID       = ILOADP(08,NL) !user_id
-         NDT      = PBLAST_NDT
-         NDT0     = ILOADP(10,NL)
-         TDET     = FAC(01,NL)
+         TA_FIRST = FAC(07,NL)
          T_STOP   = FAC(13,NL)
-         
          IL       = NL-NLOADP_F
          IS_RESET = PBLAST_TAB(IL)%IS_RESET
-
-         IF(NDT0/=0) NDT = NDT0
-                  
          TFEXT_LOC = ZERO
-         T0INF_LOC = EP20
+         DTMIN_LOC = EP20
 
-         IF(TT >= TDET .AND. TT <= T_STOP)THEN
+         IF(TT <= T_STOP)THEN
            SELECT CASE(ABAC_ID)
              CASE(1)
                !--- LOADING MODEL : FREE AIR, SPHERICAL CHARGE
                CALL PBLAST_1(
      1                       ILOADP  ,FAC      ,A        ,V         ,X        ,
-     2                       IADC    ,FSKY     ,FSKYV    ,LLOADP    ,FEXT     ,
-     3                       ITAB    ,H3D_DATA ,NL       ,T0INF_LOC ,TFEXT_LOC)
+     2                       IADC    ,FSKY     ,LLOADP   ,FEXT      ,
+     3                       ITAB    ,H3D_DATA ,NL       ,DTMIN_LOC ,TFEXT_LOC,
+     4                       TH_SURF ,FSAVSURF ,NSEG_LOADP,NSEGPL   )
      
              CASE(2)
                !--- LOADING MODEL : GROUND REFLECTION, HEMISPHERICAL CHARGE
                CALL PBLAST_2(
      1                       ILOADP  ,FAC      ,A        ,V         ,X        ,
-     2                       IADC    ,FSKY     ,FSKYV    ,LLOADP    ,FEXT     ,
-     3                       ITAB    ,H3D_DATA ,NL       ,T0INF_LOC ,TFEXT_LOC)        
+     2                       IADC    ,FSKY     ,LLOADP   ,FEXT      ,
+     3                       ITAB    ,H3D_DATA ,NL       ,DTMIN_LOC ,TFEXT_LOC,
+     4                       TH_SURF ,FSAVSURF ,NSEG_LOADP,NSEGPL   )        
              CASE(3)
                !--- LOADING MODEL : SURFACE BURST, SPHERICAL CHARGE
                CALL PBLAST_3(
      1                       ILOADP  ,FAC      ,A        ,V         ,X        ,
-     2                       IADC    ,FSKY     ,FSKYV    ,LLOADP    ,FEXT     ,
-     3                       ITAB    ,H3D_DATA ,NL       ,T0INF_LOC ,TFEXT_LOC)
+     2                       IADC    ,FSKY     ,LLOADP   ,FEXT      ,
+     3                       ITAB    ,H3D_DATA ,NL       ,DTMIN_LOC ,TFEXT_LOC,
+     4                       TH_SURF ,FSAVSURF ,NSEG_LOADP,NSEGPL   )
      
              END SELECT 
              
          ELSEIF(TT > T_STOP)THEN         
-         
+           DTMIN_LOC = EP20
            IF(.NOT. IS_RESET)THEN
             ! FLUSH fsky array to 0.
 !$OMP DO SCHEDULE(GUIDED,MVSIZ)           
@@ -161,10 +159,8 @@ C-----------------------------------------------
                NN(2)=LLOADP(ILOADP(4,NL)+4*(II-1)+1)
                NN(3)=LLOADP(ILOADP(4,NL)+4*(II-1)+2)
                NN(4)=LLOADP(ILOADP(4,NL)+4*(II-1)+3)
-               IF(NN(4) /= 0 .AND.
-     .            NN(1) /= NN(2) .AND. NN(1) /= NN(3) .AND. NN(1) /= NN(4) .AND.
-     .            NN(2) /= NN(3) .AND. NN(2) /= NN(4) .AND.
-     .            NN(3) /= NN(4) )THEN
+               IF(NN(4) /= 0 .AND.NN(1) /= NN(2) .AND. NN(1) /= NN(3) .AND. NN(1) /= NN(4) .AND.
+     .            NN(2) /= NN(3) .AND. NN(2) /= NN(4) .AND. NN(3) /= NN(4) )THEN
                  NNOD=4
                ELSE
                  NNOD=3
@@ -183,10 +179,14 @@ C-----------------------------------------------
 #include "lockon.inc"
          TFEXT = TFEXT + TFEXT_LOC
          ! Time Step (DT_PBLAST) and corresponding option id (IDT_PBLAST)
-         IF(T0INF_LOC/NDT<DT_PBLAST) THEN
-           IDT_PBLAST  = ID 
-           DT_PBLAST = T0INF_LOC/NDT
-         ENDIF      
+         ! if nothing was loaded : set time step to go on arrival time (no CPU time wasted in nothing happen elsewhere)
+         ! if load has started, use positive impulse to determine a time step for this current option
+
+           IF(DTMIN_LOC < PBLAST_DT%DT)THEN
+             PBLAST_DT%IDT  = ID
+             PBLAST_DT%DT = DTMIN_LOC
+           ENDIF
+
 #include  "lockoff.inc"
 
            CALL MY_BARRIER()

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,35 +27,40 @@ Chd|        ACONVE                        source/ale/aconve.F
 Chd|        INTTI12A                      source/interfaces/interf/intti12.F
 Chd|        SEGGETV                       source/interfaces/interf/seggetv.F
 Chd|-- calls ---------------
+Chd|        ALE_MOD                       ../common_source/modules/ale/ale_mod.F
 Chd|====================================================================
       SUBROUTINE VARCONDEC(ICODV,VARCONV,CODTOT)
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
+      USE ALE_MOD      
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "conv_c.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER ICODV(LCONV),VARCONV,CODTOT
+      INTEGER ICODV(ALE%GLOBAL%LCONV),VARCONV,CODTOT
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,PDIX,CODVR 
-C
+C-----------------------------------------------
+C   S o u r c e   L i n e s
+C-----------------------------------------------
       CODTOT=0
-      PDIX=10**(LCONV-1)
+      PDIX=10**(ALE%GLOBAL%LCONV-1)
       CODVR=VARCONV
-      DO I=LCONV,1,-1
+      DO I=ALE%GLOBAL%LCONV,1,-1
          ICODV(I)=CODVR/PDIX
          CODVR=CODVR-ICODV(I)*PDIX
          PDIX=PDIX/10
          IF(ICODV(I)/=0)CODTOT=CODTOT+1
       ENDDO
+C-----------------------------------------------      
       RETURN
+C-----------------------------------------------      
       END
       
               

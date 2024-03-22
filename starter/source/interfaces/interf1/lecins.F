@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -44,7 +44,7 @@ Chd|        NSEGMT                        source/interfaces/interf1/nsegmt.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|====================================================================
       SUBROUTINE LECINS(IPARI   ,ITAB       ,PM       ,IPM       ,BUFMAT  ,
      .                  IGRNOD  ,IGRSURF    ,IGRSLIN  ,XFILTR    ,STFAC   ,
@@ -67,24 +67,13 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com02_c.inc"
-#include      "com03_c.inc"
 #include      "com04_c.inc"
 #include      "units_c.inc"
-#include      "warn_c.inc"
 #include      "param_c.inc"
 #include      "scr03_c.inc"
-#include      "scr05_c.inc"
-#include      "scr12_c.inc"
 #include      "scr17_c.inc"
-#include      "conv_c.inc"
-#include      "ige3d_c.inc"
 #include      "tabsiz_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -214,7 +203,7 @@ C
             IF(ISU1>0)THEN
               IF(IPRI>=1) WRITE(IOUT,'(//,A)')' SECONDARY SURFACE'
               NBRIC=IGRBRIC(ISU1)%NENTITY
-              CALL INGRBRIC(NSN,   NOINT,   IGRBRIC(ISU1)%ENTITY,   ITAB,  INTBUF_TAB(NI)%NSV,
+              CALL INGRBRIC(NSN,   IGRBRIC(ISU1)%ENTITY, INTBUF_TAB(NI)%NSV,
      +                      IXS,   NBRIC,   PM, INTBUF_TAB(NI)%S_NSV,IGEO)
            ENDIF
 C--------------------------------------------
@@ -271,11 +260,13 @@ c            END IF
               !INTER18 + GRBRIC_ID
               NBRIC = IGRBRIC(GRBRIC_ID)%NENTITY              
               IF (MULTI_FVM%IS_USED)THEN
-               CALL INGRBRIC_CENTROIDS(NOINT, IGRBRIC(GRBRIC_ID)%ENTITY, ITAB, INTBUF_TAB(NI)%NSV,
+               IPARI(14,NI) = 151
+               CALL INGRBRIC_CENTROIDS(IGRBRIC(GRBRIC_ID)%ENTITY, INTBUF_TAB(NI)%NSV,
      .                       IXS, NBRIC)                            
               ELSE
-               CALL INGRBRIC_NODES(    NSN_FE, NOINT, IGRBRIC(GRBRIC_ID)%ENTITY, ITAB, INTBUF_TAB(NI)%NSV,
-     .                       IXS, NBRIC, 2, NALE, IPM, BUFMAT, INTBUF_TAB(NI)%S_NSV)              
+               IPARI(14,NI) = 0
+               CALL INGRBRIC_NODES(NSN_FE, IGRBRIC(GRBRIC_ID)%ENTITY, ITAB, INTBUF_TAB(NI)%NSV,
+     .                       IXS, NBRIC, NALE, IPM, BUFMAT, INTBUF_TAB(NI)%S_NSV)
               ENDIF
             ENDIF
             IF (NTYP==3) THEN
@@ -403,7 +394,7 @@ C-------
      .         INTBUF_TAB(NI)%NSEGM,NMT,NRTM,NMN)
 C-------
         ELSEIF (NTYP == 2) THEN
-          LIXINT = LIXINT+6*NSN
+          LIXINT = LIXINT+NSN
           IF (ILEV == 20 .OR. ILEV == 21 .OR. ILEV == 22.OR.INTTH >0) THEN
            DO J = 1,NSN
             INTBUF_TAB(NI)%AREAS2(J) = AREASL(NI) 
@@ -478,7 +469,7 @@ C-------
           IF(IPARI(31,NI)/=0) THEN
              INTBUF_TAB(NI)%XFILTR(1) = XFILTR(NI)
           ENDIF
-          LIXINT = LIXINT+6*MULTIMP*(NSN_IGE+NSN_FE)
+          LIXINT = LIXINT+MULTIMP*(NSN_IGE+NSN_FE)
 C-------
         ELSEIF (NTYP == 8) THEN
 C-------
@@ -509,7 +500,7 @@ C-------
           IF(IPARI(31,NI)/=0) THEN
             INTBUF_TAB(NI)%XFILTR(1) = XFILTR(NI)
           ENDIF
-          LIXINT = LIXINT+6*MULTIMP*NSN
+          LIXINT = LIXINT+MULTIMP*NSN
           IALLO = 2  ! initialisation des tableaux
           CALL I20SURFI(
      1      IALLO        ,IPARI(1,NI)  ,IGRNOD     ,IGRSURF  ,
@@ -532,7 +523,7 @@ C-------
           IF(IPARI(31,NI)/=0) THEN
             INTBUF_TAB(NI)%ALPHA0(1) = XFILTR(NI)
           ENDIF
-          LIXINT = MAX(LIXINT,6*MULTIMP*NSN)
+          LIXINT = MAX(LIXINT,MULTIMP*NSN)
 C-------
         ELSEIF (NTYP == 22) THEN
           IF (IPARI(30,NI)/=0) THEN
@@ -546,7 +537,7 @@ C-------
           IF(IPARI(31,NI)/=0) THEN
             INTBUF_TAB(NI)%XFILTR(1) = XFILTR(NI)
           ENDIF
-          LIXINT = LIXINT+6*MULTIMP*NSN
+          LIXINT = LIXINT+MULTIMP*NSN
 C-------
         ELSEIF (NTYP == 23) THEN
           IF (IPARI(30,NI)/=0) THEN
@@ -560,7 +551,7 @@ C-------
           IF(IPARI(31,NI)/=0) THEN
             INTBUF_TAB(NI)%XFILTR(1) = XFILTR(NI)
           ENDIF
-          LIXINT = MAX(LIXINT,6*MULTIMP*NSN)
+          LIXINT = MAX(LIXINT,MULTIMP*NSN)
 C-------
         ELSEIF (NTYP == 24) THEN
           IF (IPARI(30,NI)/=0) THEN
@@ -574,7 +565,7 @@ C-------
           IF(IPARI(31,NI)/=0) THEN
             INTBUF_TAB(NI)%XFILTR(1) = XFILTR(NI)
           ENDIF
-          LIXINT = LIXINT+6*MULTIMP*NSN
+          LIXINT = LIXINT+MULTIMP*NSN
 C-----------inside I24SURFI NRTM=NRTM0          
           IALLO = 2  ! initialisation des tableaux
           CALL I24SURFI(
@@ -601,7 +592,7 @@ C-------
           IF(IPARI(31,NI)/=0) THEN
             INTBUF_TAB(NI)%XFILTR(1) = XFILTR(NI)
           ENDIF
-          LIXINT = LIXINT+6*MULTIMP*NSN
+          LIXINT = LIXINT+MULTIMP*NSN
 C-----------inside I24SURFI NRTM=NRTM0          
           IALLO = 2  ! initialisation des tableaux
           IF(ILEV==2)THEN
@@ -641,19 +632,9 @@ Chd|-- calls ---------------
 Chd|====================================================================
       SUBROUTINE ELTY_SURF(NRTM0,NRTM,NSEG,SURF_ELTYP,MSEGTYP,ISU2)
 C-----------------------------------------------
-C   M o d u l e s
-C-----------------------------------------------
-C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "scr17_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

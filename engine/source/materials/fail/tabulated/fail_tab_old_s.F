@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -28,10 +28,10 @@ Chd|        FINTER                        source/tools/curve/finter.F
 Chd|====================================================================
       SUBROUTINE FAIl_TAB_OLD_S (
      1     NEL     ,NUVAR   ,NPF     ,TF      ,TIME    ,
-     2     UPARAM  ,NGL     ,IPM     ,MAT     ,ALDT    ,
+     2     UPARAM  ,NGL     ,ALDT    ,
      4     SIGNXX  ,SIGNYY  ,SIGNZZ  ,SIGNXY  ,SIGNYZ  ,SIGNZX   ,
      5     PLAS    ,DPLA    ,EPSP    ,TSTAR   ,UVAR    ,
-     6     OFF     ,IP      ,DFMAX   ,TDELE   ,
+     6     OFF     ,DFMAX   ,TDELE   ,
      7     NFUNC   ,IFUNC )
 C---------+---------+---+---+--------------------------------------------
 C   /FAIL/TAB - tabulated rupture criteria for solids (old, obsolete version)
@@ -45,14 +45,13 @@ C-----------------------------------------------
 #include "units_c.inc"
 #include "param_c.inc"
 #include "scr17_c.inc"
-#include "scr19_c.inc"
 #include "impl1_c.inc"
 #include "comlock.inc"
 C-----------------------------------------------
 C   I N P U T   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER NEL,NUVAR,IP
-      INTEGER NGL(NEL),IPM(NPROPMI,*),MAT(NEL)
+      INTEGER NEL,NUVAR
+      INTEGER NGL(NEL)
       INTEGER, INTENT(IN) :: NFUNC
       INTEGER, DIMENSION(NFUNC), INTENT(IN) ::  IFUNC
 c

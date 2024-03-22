@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,20 +27,21 @@ Chd|        GENANI                        source/output/anim/generate/genani.F
 Chd|-- calls ---------------
 Chd|        CLSCONV3                      source/output/anim/generate/dfuncc.F
 Chd|        INITBUF                       share/resol/initbuf.F         
-Chd|        SCHLIEREN                     source/output/anim/generate/schlieren.F
+Chd|        OUTPUT_SCHLIEREN              source/output/anim/generate/output_schlieren.F
 Chd|        SCHLIEREN_BUFFER_GATHERING    source/output/anim/generate/schlieren_buffer_gathering.F
 Chd|        SPMD_R4GET_PARTN              source/mpi/anim/spmd_r4get_partn.F
-Chd|        WRITE_R_C                     source/output/tools/sortie_c.c
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        WRITE_R_C                     ../common_source/tools/input_output/write_routtines.c
+Chd|        ALEFVM_MOD                    ../common_source/modules/ale/alefvm_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        INITBUF_MOD                   share/resol/initbuf.F         
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|        SCHLIEREN_MOD                 share/modules/schlieren_mod.F 
 Chd|        STACK_MOD                     share/modules/stack_mod.F     
 Chd|====================================================================
       SUBROUTINE DFUNCC(ELBUF_TAB ,FUNC      ,IFUNC     ,IPARG       ,GEO        ,
      .                  IXQ       ,IXC       ,IXTG      ,MASS        ,PM         ,
-     .                  EL2FA     ,NBF       ,IXUR      ,IADP        ,
+     .                  EL2FA     ,NBF       ,IADP        ,
      .                  NBF_L     ,EHOUR     ,ANIM      ,NBPART      ,IADG       ,
      .                  IPM       ,IGEO      ,THKE      ,ERR_THK_SH4 ,ERR_THK_SH3,
      .                  INVERT    ,X         ,V         ,W           ,ALE_CONNECTIVITY,
@@ -55,6 +56,7 @@ C-----------------------------------------------
       USE STACK_MOD    
       USE MULTI_FVM_MOD            
       USE ALE_CONNECTIVITY_MOD
+      USE ALEFVM_MOD , only:ALEFVM_Param
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -66,17 +68,11 @@ C-----------------------------------------------
 #include      "mvsiz_p.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr01_c.inc"
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
-#include      "scr14_c.inc"
 #include      "scr25_c.inc"
 #include      "param_c.inc"
-#include      "rnur_c.inc"
 #include      "task_c.inc"
 #include      "spmd_c.inc"
 #include      "mmale51_c.inc"
-#include      "alefvm.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -84,7 +80,7 @@ C-----------------------------------------------
      .   FUNC(*),MASS(*),X(3,NUMNOD),V(3,NUMNOD),W(3,NUMNOD),THKE(*),EHOUR(*),GEO(NPROPG,NUMGEO),
      .   ANIM(*),PM(NPROPM,NUMMAT),ERR_THK_SH4(*), ERR_THK_SH3(*),BUFMAT(*)
       INTEGER IPARG(NPARG,NGROUP),IXC(NIXC,NUMELC),IXTG(NIXTG,NUMELTG),EL2FA(*),
-     .   IXQ(NIXQ,NUMELQ),IXUR(NIXUR,NUMELUR),IFUNC,NBF,
+     .   IXQ(NIXQ,NUMELQ),IFUNC,NBF,
      .   IADP(*),NBF_L, NBPART,IADG(NSPMD,*),IPM(NPROPMI,NUMMAT),
      .   IGEO(NPROPGI,NUMGEO),INVERT(*), NV46
       REAL WAL(NBF_L)
@@ -121,13 +117,14 @@ C-----------------------------------------------
       INTEGER PID(MVSIZ),MAT(MVSIZ),MATLY(MVSIZ*100),FAILG(MVSIZ),
      .        PTE(4),PTP(4),PTMAT(4),PTVAR(4),LENCOM,NPT_ALL,IPLY,ITRIMAT,IPOS,
      .        ISUBMAT, ISH_EINT, IS_ALE, IS_EULER,IPG,IPINCH,
-     .        IMAT_TILLOTSON, NTILLOTSON,NVAREOS,IEOS
+     .        IMAT_TILLOTSON, NTILLOTSON,NVAREOS,IEOS,IDRAPE,IVAR
       REAL R4
       TYPE(G_BUFEL_)  ,POINTER :: GBUF     
       TYPE(L_BUFEL_)  ,POINTER :: LBUF     
       TYPE(BUF_LAY_)  ,POINTER :: BUFLY     
       TYPE(BUF_FAIL_) ,POINTER :: FBUF 
-      TYPE(BUF_EOS_)  ,POINTER :: EBUF     
+      TYPE(BUF_EOS_)  ,POINTER :: EBUF  
+      TYPE(L_BUFEL_DIR_) ,POINTER :: LBUF_DIR
       
       my_real,
      .  DIMENSION(:), POINTER  :: UVAR,OFFL
@@ -155,9 +152,8 @@ C-----------------------------------------------
       ENDIF!(IFUNC==10672)
 
 C-----------------------------------------------
-
       DO NG=1,NGROUP
-       CALL INITBUF (IPARG    ,NG      ,                    
+       CALL INITBUF(IPARG    ,NG      ,                    
      2          MLW     ,NEL     ,NFT     ,IAD     ,ITY     ,  
      3          NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTURB   ,  
      4          JTHE    ,JLAG    ,JMULT   ,JHBE    ,JIVF    ,  
@@ -174,6 +170,7 @@ C-----------------------------------------------
           IVISC = IPARG(61,NG)
           IS_ALE=IPARG(7,NG)
           IS_EULER=IPARG(11,NG)
+          IDRAPE = ELBUF_TAB(NG)%IDRAPE
 !
           DO I=1,6
             JJ(I) = NEL*(I-1)
@@ -431,15 +428,15 @@ c----           USER VARIABLES from 6 to 60
                   ENDDO 
                ELSE
                  IF(ITY==2)THEN                                                                         
-                   CALL SCHLIEREN(
-     1                   EVAR    , IXQ    , X           , V       , W       ,
+                   CALL OUTPUT_SCHLIEREN(
+     1                   EVAR    , IXQ    , X           ,
      2                   IPARG   , WA_L   , ELBUF_TAB   , ALE_CONNECTIVITY   , GBUF%VOL,
-     3                   PM      , NG     , NIXQ        , ITY)
+     3                   NG      , NIXQ   , ITY)
                  ELSEIF(ITY==7.AND.N2D/=0)THEN
-                   CALL SCHLIEREN(
-     1                   EVAR    , IXTG   , X           , V                  , W       ,
+                   CALL OUTPUT_SCHLIEREN(
+     1                   EVAR    , IXTG   , X           ,
      2                   IPARG   , WA_L   , ELBUF_TAB   , ALE_CONNECTIVITY   , GBUF%VOL,
-     3                   PM      , NG     , NIXTG       , ITY)          
+     3                   NG      , NIXTG  , ITY)
                  ENDIF 
                  DO  I=LFT,LLT 
                    FUNC(EL2FA(NN3+NFT+I)) = EVAR(I) 
@@ -786,7 +783,7 @@ c------------------------------------ Mach Number
                     VEL(0) = SQRT(VEL(1)*VEL(1)+VEL(2)*VEL(2)+VEL(3)*VEL(3))                              
                     FUNC(EL2FA(NN3+NFT+I)) = VEL(0)/MULTI_FVM%SOUND_SPEED(I + NFT)                                      
                  ENDDO                                                                                    
-              ELSEIF(I_ALE_SOLVER>1)THEN                                                                    
+              ELSEIF(ALEFVM_Param%ISOLVER>1)THEN                                                                    
                    L = ELBUF_TAB(NG)%BUFLY(1)%L_SSP                                                       
                    IF(ELBUF_TAB(NG)%BUFLY(1)%L_SSP /= 0)THEN                                            
                       LBUF => ELBUF_TAB(NG)%BUFLY(1)%LBUF(1,1,1)                                          
@@ -1028,52 +1025,82 @@ c---
             ELSEIF (IFUNC == 1 .AND. (MLW /= 15 .AND. MLW /= 25)) THEN   ! plastic strain (mid layer : npt/2 + 1) 
 ! law15 and law25 it's the plastic work instead plastic strain. it can be outp using /ANIM/ELEM/WPLA ( ifunc=4*MX_PLY_ANIM +13245)           
               IF (GBUF%G_PLA > 0) THEN
-                IF (NLAY > 1) THEN
-                  IPT = IABS(NLAY)/2 + 1
-                  BUFLY => ELBUF_TAB(NG)%BUFLY(IPT)
-                  IF (BUFLY%L_PLA > 0)THEN
+                ILAY = 1
+                IF (NLAY > 1) ILAY = IABS(NLAY)/2 + 1
+                 BUFLY => ELBUF_TAB(NG)%BUFLY(ILAY)
+                 IF (BUFLY%L_PLA > 0) THEN
                   IF (NPG > 1) THEN
-                    DO  I=LFT,LLT  
-                      EVAR(I) = ABS(BUFLY%PLAPT(I))
-                    ENDDO
-                  ELSE
-                    NPTT = BUFLY%NPTT  ! needed for PID51 (new shell prop)
-                    DO  I=LFT,LLT
-                      DO IT=1,NPTT
-                        EVAR(I) = EVAR(I) + ABS(BUFLY%LBUF(1,1,IT)%PLA(I))/NPTT
+                    IF(ITY == 3) THEN
+                      IF(IGTYP == 51 .OR. IGTYP == 52) THEN
+                         NPTT = BUFLY%NPTT
+                         DO IS = 1,NPTS
+                           DO IR = 1,NPTR
+                             DO IT = 1, NPTT
+                               DO  I=1,NEL  
+                                 EVAR(I) = EVAR(I) + FOURTH*BUFLY%LBUF(IR,IS,IT)%PLA(I)/NPTT
+                               ENDDO
+                             ENDDO
+                           ENDDO
+                         ENDDO     
+                      ELSE
+                         DO  I=1,NEL  
+                           EVAR(I) = FOURTH*(BUFLY%LBUF(1,1,1)%PLA(I) + BUFLY%LBUF(2,1,1)%PLA(I) + 
+     .                                        BUFLY%LBUF(1,2,1)%PLA(I) + BUFLY%LBUF(2,2,1)%PLA(I))
+                         ENDDO
+                      ENDIF ! igtyp
+                    ELSE ! ITY == 7
+                      IF(IGTYP == 51 .OR. IGTYP == 52) THEN
+                        NPTT = BUFLY%NPTT
+                        DO IT = 1,NPTT
+                          DO IR =1,NPG
+                            DO  I=1,NEL  
+                              EVAR(I) =  EVAR(I) + THIRD*BUFLY%LBUF(IR,1,IT)%PLA(I)/NPTT
+                            ENDDO
+                           ENDDO
+                         ENDDO   
+                       ELSE
+                         DO I=1,NEL  
+                           EVAR(I) = THIRD*(BUFLY%LBUF(1,1,1)%PLA(I) + BUFLY%LBUF(1,1,1)%PLA(I) +
+     .                                       BUFLY%LBUF(1,1,1)%PLA(I)) 
+                         ENDDO
+                       ENDIF ! igtyp 
+                     ENDIF  ! ity
+                  ELSE ! NPG == 1
+                    IF(IGTYP == 51 .OR. IGTYP == 52) THEN   
+                      NPTT = BUFLY%NPTT  ! needed for PID51 (new shell prop)
+                      DO IT = 1,NPTT
+                       DO  I=1,NEL 
+                          EVAR(I) = EVAR(I) + ABS(BUFLY%LBUF(1,1,IT)%PLA(I))/NPTT
+                       ENDDO
                       ENDDO
-                    ENDDO
-                  ENDIF
-                 ENDIF
-                ELSEIF (NPG > 1) THEN   ! NLAY = 1
-                  BUFLY => ELBUF_TAB(NG)%BUFLY(1)
-                 IF (BUFLY%L_PLA > 0) THEN
-                  NPTT = BUFLY%NPTT  ! needed for PID51 (new shell prop)
-                  IPT = IABS(NPTT)/2 + 1
-cc                  IPT = IABS(NPT)/2 + 1
-                  II = (IPT-1)*NEL  
-                  DO  I=LFT,LLT
-                    EVAR(I) = ABS(BUFLY%PLAPT(II+I))
-                  ENDDO
-                 ENDIF
-                ELSE   !  NLAY=1, NPG=1
-                  BUFLY => ELBUF_TAB(NG)%BUFLY(1)
-                 IF (BUFLY%L_PLA > 0) THEN
-                  NPTT = BUFLY%NPTT  ! needed for PID51 (new shell prop)
-cc                  IPT = IABS(NPT)/2 + 1
-                  IPT = IABS(NPTT)/2 + 1
-                  DO  I=LFT,LLT
-                    EVAR(I) = ABS(BUFLY%LBUF(1,1,IPT)%PLA(I)) 
-                  ENDDO
-                 ENDIF
-                ENDIF
-              ENDIF  
+                    ELSE                 
+                      NPTT = BUFLY%NPTT  !
+                      IPT = IABS(NPTT)/2 + 1
+                      DO  I=1,NEL 
+                        EVAR(I) = ABS(BUFLY%LBUF(1,1,IPT)%PLA(I))
+                      ENDDO
+                    ENDIF ! igtyp
+                  ENDIF ! npg
+                 ENDIF ! BUFLY%L_PLA 
+              ENDIF  ! GBUF
                           
 c---
-            ELSEIF (IFUNC == 2 .AND. MLW == 151) THEN
-              DO I=LFT,LLT
-                EVAR(I) = GBUF%RHO(I) 
-              ENDDO               
+            ELSEIF (IFUNC == 2) THEN
+              IF (MLW == 151) THEN 
+                DO I=LFT,LLT
+                  EVAR(I) = GBUF%RHO(I) 
+                ENDDO 
+              ELSE 
+                IF (ITY == 3) THEN 
+                  DO I=LFT,LLT
+                    EVAR(I) = PM(1,IXC(1,NFT+I))
+                  ENDDO
+                ELSEIF (ITY == 7) THEN 
+                  DO I=LFT,LLT
+                    EVAR(I) = PM(1,IXTG(1,NFT+I))
+                  ENDDO
+                ENDIF 
+              ENDIF          
 c---
             ELSEIF (IFUNC == 3 .AND. MLW == 151) THEN
               DO I=LFT,LLT
@@ -1246,17 +1273,17 @@ c
                 ENDIF                                                                      
                 NUVAR = ELBUF_TAB(NG)%BUFLY(IL)%NVAR_MAT                                   
 c
-                IF (MLW == 58) THEN                                                        
+                IF (MLW == 58 .or. MLW == 158) THEN                                                        
                   DO I=LFT,LLT                                                             
                     DO IR = 1, NPTR                                                        
-                     DO IS = 1, NPTS                                                       
-                      UVAR=>ELBUF_TAB(NG)%BUFLY(IL)%MAT(IR,IS,IPT)%VAR                     
-                      IF(IUS==3.OR.IUS==4)THEN                                             
-                       EVAR(I) = EVAR(I) + LOG(UVAR(I1 + I)+ONE)/NPG                       
-                      ELSE                                                                 
-                       EVAR(I) = EVAR(I) + UVAR(I1 + I)/NPG                               
-                      ENDIF                                                                
-                     ENDDO                                                                 
+                      DO IS = 1, NPTS                                                      
+                        UVAR=>ELBUF_TAB(NG)%BUFLY(IL)%MAT(IR,IS,IPT)%VAR                   
+                        IF (IUS==3 .OR. IUS==4) THEN  ! convert true to eng strain                                           
+                          EVAR(I) = EVAR(I) + EXP(UVAR(I1+I) - ONE) / NPG                     
+                        ELSE                                                               
+                          EVAR(I) = EVAR(I) + UVAR(I1 + I) / NPG                             
+                        ENDIF                                                              
+                      ENDDO                                                                
                     ENDDO                                                                  
                   ENDDO                                                                    
                 ELSE                                                                       
@@ -1352,7 +1379,121 @@ c
                   IF (IGTYP == 9  .OR. IGTYP == 10 .OR.IGTYP == 11 .OR.
      .                IGTYP == 16 .OR. IGTYP == 17 .OR. IGTYP == 51 .OR.
      .                IGTYP == 52 ) THEN
-                    IF (MLW /= 0 .AND. MLW /= 13) THEN                        
+                    IF (MLW /= 0 .AND. MLW /= 13) THEN 
+                        
+                     IF(IDRAPE > 0 .AND. (IGTYP == 51 .OR. IGTYP == 52)) THEN
+                      LBUF_DIR => ELBUF_TAB(NG)%BUFLY(IL)%LBUF_DIR(1) 
+                      DO I=LFT,LLT                                                                     
+                        N = I + NFT                                                                    
+                        X21 = X(1,IXC(3,N))-X(1,IXC(2,N))                         
+                        X32 = X(1,IXC(4,N))-X(1,IXC(3,N))                         
+                        X34 = X(1,IXC(4,N))-X(1,IXC(5,N))                         
+                        X41 = X(1,IXC(5,N))-X(1,IXC(2,N))                         
+
+                        Y21 = X(2,IXC(3,N))-X(2,IXC(2,N))                         
+                        Y32 = X(2,IXC(4,N))-X(2,IXC(3,N))                         
+                        Y34 = X(2,IXC(4,N))-X(2,IXC(5,N))                         
+                        Y41 = X(2,IXC(5,N))-X(2,IXC(2,N))                         
+
+                        Z21 = X(3,IXC(3,N))-X(3,IXC(2,N))                         
+                        Z32 = X(3,IXC(4,N))-X(3,IXC(3,N))                         
+                        Z34 = X(3,IXC(4,N))-X(3,IXC(5,N))                         
+                        Z41 = X(3,IXC(5,N))-X(3,IXC(2,N))                         
+                                                                                  
+                        E1X = (X21+X34)                                           
+                        E1Y = (Y21+Y34)                                           
+                        E1Z = (Z21+Z34)                                           
+
+                        E2X = (X32+X41)                                           
+                        E2Y = (Y32+Y41)                                           
+                        E2Z = (Z32+Z41)                                           
+                 
+                        E3X = E1Y*E2Z-E1Z*E2Y                                     
+                        E3Y = E1Z*E2X-E1X*E2Z                                     
+                        E3Z = E1X*E2Y-E1Y*E2X                                     
+                        IF (IREP > 0) THEN                                        
+                          RX = E1X                                                
+                          RY = E1Y                                                
+                          RZ = E1Z                                                
+                          SX = E2X                                                
+                          SY = E2Y                                                
+                          SZ = E2Z                                                
+                        ENDIF                                    
+                        IF (ISHFRAM == 0 ) THEN                  
+C------                   Repere convecte symetrique - version 5 (default)        
+                          SUMA   = E3X*E3X+E3Y*E3Y+E3Z*E3Z                        
+                          SUMA   = ONE / MAX(SQRT(SUMA),EM20)                      
+                          E3X = E3X * SUMA                                        
+                          E3Y = E3Y * SUMA                                        
+                          E3Z = E3Z * SUMA                                        
+C
+                          S1     = E1X*E1X+E1Y*E1Y+E1Z*E1Z                        
+                          S2     = E2X*E2X+E2Y*E2Y+E2Z*E2Z                        
+                          SUMA   = SQRT(S1/S2)                                    
+                          E1X = E1X + (E2Y*E3Z-E2Z*E3Y)*SUMA                      
+                          E1Y = E1Y + (E2Z*E3X-E2X*E3Z)*SUMA                      
+                          E1Z = E1Z + (E2X*E3Y-E2Y*E3X)*SUMA                      
+C
+                          SUMA   = E1X*E1X+E1Y*E1Y+E1Z*E1Z                        
+                          SUMA   = ONE / MAX(SQRT(SUMA),EM20)                      
+                          E1X = E1X * SUMA                                        
+                          E1Y = E1Y * SUMA                                        
+                          E1Z = E1Z * SUMA                                        
+C
+                          E2X = E3Y * E1Z - E3Z * E1Y                             
+                          E2Y = E3Z * E1X - E3X * E1Z                             
+                          E2Z = E3X * E1Y - E3Y * E1X                             
+                        ELSEIF (ISHFRAM == 2) THEN                                
+C------                   Repere convecte nonsymetrique - version 4               
+                          SUMA   = E2X*E2X+E2Y*E2Y+E2Z*E2Z                        
+                          E1X = E1X*SUMA + E2Y*E3Z-E2Z*E3Y                        
+                          E1Y = E1Y*SUMA + E2Z*E3X-E2X*E3Z                        
+                          E1Z = E1Z*SUMA + E2X*E3Y-E2Y*E3X                        
+                          SUMA   = E1X*E1X+E1Y*E1Y+E1Z*E1Z                        
+                          SUMA   = ONE/MAX(SQRT(SUMA),EM20)                        
+                          E1X = E1X*SUMA                                          
+                          E1Y = E1Y*SUMA                                          
+                          E1Z = E1Z*SUMA                                          
+C
+                          SUMA   = E3X*E3X+E3Y*E3Y+E3Z*E3Z                        
+                          SUMA   = ONE / MAX(SQRT(SUMA),EM20)                      
+                          E3X = E3X * SUMA                                        
+                          E3Y = E3Y * SUMA                                        
+                          E3Z = E3Z * SUMA                                        
+C
+                          E2X = E3Y*E1Z-E3Z*E1Y                                   
+                          E2Y = E3Z*E1X-E3X*E1Z                                   
+                          E2Z = E3X*E1Y-E3Y*E1X                                   
+                          SUMA   = E2X*E2X+E2Y*E2Y+E2Z*E2Z                        
+                          SUMA   = ONE/MAX(SQRT(SUMA),EM20)                        
+                          E2X = E2X*SUMA                                          
+                          E2Y = E2Y*SUMA                                          
+                          E2Z = E2Z*SUMA                                          
+                        ENDIF                                                     
+                        IF (IREP >= 1) THEN                                       
+                          AA = LBUF_DIR%DIRA(I)                              
+                          BB = LBUF_DIR%DIRA(I+NEL)                       
+                          V1 = AA*RX + BB*SX                                      
+                          V2 = AA*RY + BB*SY                                      
+                          V3 = AA*RZ + BB*SZ                                      
+                          VR = V1*E1X+ V2*E1Y + V3*E1Z                            
+                          VS = V1*E2X+ V2*E2Y + V3*E2Z                            
+                          SUMA=SQRT(VR*VR + VS*VS)                                
+                          DIR1_1 = VR/SUMA                                        
+                          DIR1_2 = VS/SUMA                                        
+                        ELSE                                                      
+                          DIR1_1 = LBUF_DIR%DIRA(I)                
+                          DIR1_2 = LBUF_DIR%DIRA(I+NEL)            
+                        ENDIF                                       
+C
+                        PHI =(HUNDRED80/PI)*ATAN2(DIR1_2,DIR1_1)  
+                        ERR = (ABS(PHI) - NINTY)/NINTY
+                        EVAR(I) = PHI
+                        IF(ABS(ERR) < EM02) EVAR(I) = SIGN(NINTY,PHI)
+                        IF(ABS(EVAR(I)) < ONE) EVAR(I) = ZERO
+                        !!EVAR(I) = (HUNDRED80/PI)*ATAN2(DIR1_2,DIR1_1)  
+                      ENDDO                                
+                     ELSE                  
                       DO I=LFT,LLT                                                
                         N = I + NFT                                               
                         X21 = X(1,IXC(3,N))-X(1,IXC(2,N))                         
@@ -1452,8 +1593,8 @@ C
                           DIR1_1 = VR/SUMA                                        
                           DIR1_2 = VS/SUMA                                        
                         ELSE                                                      
-                          DIR1_1 = BUFLY%DIRA(I)    			      
-                          DIR1_2 = BUFLY%DIRA(I+NEL)			      
+                          DIR1_1 = BUFLY%DIRA(I)                
+                          DIR1_2 = BUFLY%DIRA(I+NEL)            
                         ENDIF                                       
 C
                         PHI =(HUNDRED80/PI)*ATAN2(DIR1_2,DIR1_1)  
@@ -1462,7 +1603,8 @@ C
                         IF(ABS(ERR) < EM02) EVAR(I) = SIGN(NINTY,PHI)
                         IF(ABS(EVAR(I)) < ONE) EVAR(I) = ZERO
                         !!EVAR(I) = (HUNDRED80/PI)*ATAN2(DIR1_2,DIR1_1)  
-                      ENDDO                                                       
+                      ENDDO    
+                     ENDIF ! IDRAPE                                                    
                     ENDIF  ! MLW                                                  
                   ENDIF  ! IGTYP
 
@@ -1471,8 +1613,10 @@ C
                   IF (IGTYP == 9  .OR. IGTYP == 10 .OR. IGTYP == 11 .OR. 
      .                IGTYP == 16 .OR. IGTYP == 17 .OR. IGTYP == 51 .OR.
      .                IGTYP == 52 ) THEN
-                    IF (MLW /= 0 .AND. MLW /= 13) THEN                      
-                      DO I=LFT,LLT                                              
+                    IF (MLW /= 0 .AND. MLW /= 13) THEN
+                     IF(IDRAPE > 0 .AND. (IGTYP == 51 .OR. IGTYP == 52)) THEN
+                     LBUF_DIR => ELBUF_TAB(NG)%BUFLY(IL)%LBUF_DIR(1)
+                      DO I=LFT,LLT                                                             
                         N = I + NFT                                             
                         X21 = X(1,IXTG(3,N))-X(1,IXTG(2,N))                     
                         X31 = X(1,IXTG(4,N))-X(1,IXTG(2,N))                     
@@ -1493,10 +1637,10 @@ C
                           E22 = Y31                                             
                           E23 = Z31                                             
                         ENDIF                                                   
-                  IF(IFRAM_OLD ==0 ) THEN
-	            CALL CLSCONV3(X21,Y21,Z21,X31,Y31,Z31,
-     +	                          E1X,E1Y,E1Z,E2X,E2Y,E2Z,E3X,E3Y,E3Z)
-                  ELSE		
+                        IF(IFRAM_OLD ==0 ) THEN
+                              CALL CLSCONV3(X21,Y21,Z21,X31,Y31,Z31,
+     +                            E1X,E1Y,E1Z,E2X,E2Y,E2Z,E3X,E3Y,E3Z)
+                       ELSE
                         E1X= X21                                                
                         E1Y= Y21                                                
                         E1Z= Z21                                                
@@ -1520,10 +1664,10 @@ C
                         E2X=E2X/SUM_                                             
                         E2Y=E2Y/SUM_                                             
                         E2Z=E2Z/SUM_                                             
-                  END IF!(ISH3NFRAM ==0 ) THEN
+                      END IF!(ISH3NFRAM ==0 ) THEN
                         IF (IREP >= 1) THEN                                     
-                          AA = BUFLY%DIRA(I)				    
-                          BB = BUFLY%DIRA(I+NEL)			    
+                          AA = LBUF_DIR%DIRA(I)            
+                          BB = LBUF_DIR%DIRA(I+NEL)          
                           V1 = AA*E11 + BB*E21                                  
                           V2 = AA*E12 + BB*E22                                  
                           V3 = AA*E13 + BB*E23                                  
@@ -1533,15 +1677,87 @@ C
                           DIR1_1 = VR/SUMA                                      
                           DIR1_2 = VS/SUMA                                      
                         ELSE                                                    
-                          DIR1_1 = BUFLY%DIRA(I)    			    
-                          DIR1_2 = BUFLY%DIRA(I+NEL)			    
+                          DIR1_1 = LBUF_DIR%DIRA(I)              
+                          DIR1_2 = LBUF_DIR%DIRA(I+NEL)          
                         ENDIF                                         
                         PHI =(HUNDRED80/PI)*ATAN2(DIR1_2,DIR1_1)  
                         ERR = (ABS(PHI) - NINTY)/NINTY
                         EVAR(I) = PHI
                         IF(ABS(ERR) < EM02) EVAR(I) = SIGN(NINTY,PHI)
                         IF(ABS(EVAR(I)) < ONE) EVAR(I) = ZERO          
-                      ENDDO                                                     
+                      ENDDO                                                  
+                     ELSE  ! IDRAPE                    
+                      DO I=LFT,LLT                                              
+                        N = I + NFT                                             
+                        X21 = X(1,IXTG(3,N))-X(1,IXTG(2,N))                     
+                        X31 = X(1,IXTG(4,N))-X(1,IXTG(2,N))                     
+                        X32 = X(1,IXTG(4,N))-X(1,IXTG(3,N))                     
+
+                        Y21 = X(2,IXTG(3,N))-X(2,IXTG(2,N))                     
+                        Y31 = X(2,IXTG(4,N))-X(2,IXTG(2,N))                     
+                        Y32 = X(2,IXTG(4,N))-X(2,IXTG(3,N))                     
+
+                        Z21 = X(3,IXTG(3,N))-X(3,IXTG(2,N))                     
+                        Z31 = X(3,IXTG(4,N))-X(3,IXTG(2,N))                     
+                        Z32 = X(3,IXTG(4,N))-X(3,IXTG(3,N))                     
+                        IF (IREP > 0) THEN                                      
+                          E11 = X21                                             
+                          E12 = Y21                                             
+                          E13 = Z21                                             
+                          E21 = X31                                             
+                          E22 = Y31                                             
+                          E23 = Z31                                             
+                        ENDIF                                                   
+                        IF(IFRAM_OLD ==0 ) THEN
+                              CALL CLSCONV3(X21,Y21,Z21,X31,Y31,Z31,
+     +                            E1X,E1Y,E1Z,E2X,E2Y,E2Z,E3X,E3Y,E3Z)
+                       ELSE
+                        E1X= X21                                                
+                        E1Y= Y21                                                
+                        E1Z= Z21                                                
+                        X2L = SQRT(E1X*E1X+E1Y*E1Y+E1Z*E1Z)                     
+                        E1X=E1X/X2L                                             
+                        E1Y=E1Y/X2L                                             
+                        E1Z=E1Z/X2L                                             
+C
+                        E3X=Y31*Z32-Z31*Y32                                     
+                        E3Y=Z31*X32-X31*Z32                                     
+                        E3Z=X31*Y32-Y31*X32                                     
+                        SUM_ = SQRT(E3X*E3X+E3Y*E3Y+E3Z*E3Z)                     
+                        E3X=E3X/SUM_                                             
+                        E3Y=E3Y/SUM_                                             
+                        E3Z=E3Z/SUM _                                            
+                        AREA = HALF * SUM_                                    
+                        E2X=E3Y*E1Z-E3Z*E1Y                                     
+                        E2Y=E3Z*E1X-E3X*E1Z                                     
+                        E2Z=E3X*E1Y-E3Y*E1X                                     
+                        SUM_ = SQRT(E2X*E2X+E2Y*E2Y+E2Z*E2Z)                     
+                        E2X=E2X/SUM_                                             
+                        E2Y=E2Y/SUM_                                             
+                        E2Z=E2Z/SUM_                                             
+                      END IF!(ISH3NFRAM ==0 ) THEN
+                        IF (IREP >= 1) THEN                                     
+                          AA = BUFLY%DIRA(I)            
+                          BB = BUFLY%DIRA(I+NEL)          
+                          V1 = AA*E11 + BB*E21                                  
+                          V2 = AA*E12 + BB*E22                                  
+                          V3 = AA*E13 + BB*E23                                  
+                          VR = V1*E1X + V2*E1Y + V3*E1Z                         
+                          VS = V1*E2X + V2*E2Y + V3*E2Z                         
+                          SUMA=SQRT(VR*VR + VS*VS)                              
+                          DIR1_1 = VR/SUMA                                      
+                          DIR1_2 = VS/SUMA                                      
+                        ELSE                                                    
+                          DIR1_1 = BUFLY%DIRA(I)              
+                          DIR1_2 = BUFLY%DIRA(I+NEL)          
+                        ENDIF                                         
+                        PHI =(HUNDRED80/PI)*ATAN2(DIR1_2,DIR1_1)  
+                        ERR = (ABS(PHI) - NINTY)/NINTY
+                        EVAR(I) = PHI
+                        IF(ABS(ERR) < EM02) EVAR(I) = SIGN(NINTY,PHI)
+                        IF(ABS(EVAR(I)) < ONE) EVAR(I) = ZERO          
+                      ENDDO  
+                     ENDIF ! IDRAPE                                                    
                     ENDIF                                                       
                   ENDIF              
                 ENDIF
@@ -2619,79 +2835,86 @@ C--------------------------------------------------
             ELSE IF (IFUNC>11925 .AND. IFUNC < 11925+MX_PLY_ANIM+1)THEN 
             !/ANIM/SHELL/IDPLY
 c------------------------------------
-	      IPLY = IFUNC - 11925
-	      IF (IGTYP == 17 .OR. IGTYP == 51) THEN
-		IF (PLY_ANIM( 3 * (IPLY - 1) + 2) == 1 )THEN
-		  DO J=1,NLAY
+                IPLY = IFUNC - 11925
+                IF (IGTYP == 17 .OR. IGTYP == 51) THEN
+          IF (PLY_ANIM( 3 * (IPLY - 1) + 2) == 1 )THEN
+            DO J=1,NLAY
                     BUFLY => ELBUF_TAB(NG)%BUFLY(J)
                     NPTT = BUFLY%NPTT
-		    ID_PLY = IGEO(1,STACK%IGEO(2+J,ISUBSTACK))
-		    IF (ID_PLY  == PLY_ANIM( 3 * (IPLY - 1) + 1) ) THEN
-		      DO I=LFT,LLT
+              ID_PLY = IGEO(1,STACK%IGEO(2+J,ISUBSTACK))
+              IF (ID_PLY  == PLY_ANIM( 3 * (IPLY - 1) + 1) ) THEN
+                DO I=LFT,LLT
                         NB_PLYOFF = 0
                         DO IR=1,NPTR                                          
                           DO IS=1,NPTS                                         
                             DO IT=1,NPTT     
                               LBUF => ELBUF_TAB(NG)%BUFLY(J)%LBUF(IR,IS,IT)  
                               IF (LBUF%OFF(I) == ZERO) NB_PLYOFF = NB_PLYOFF + 1
-		            ENDDO 
-		          ENDDO 
-		        ENDDO
-		        IF ( NB_PLYOFF == NPTR * NPTS * NPTT ) THEN
+                      ENDDO 
+                    ENDDO 
+                  ENDDO
+                  IF ( NB_PLYOFF == NPTR * NPTS * NPTT ) THEN
                           EVAR(I) = -ONE
-		        ELSE
+                  ELSE
                           EVAR(I) = ONE 
                         ENDIF
-		      ENDDO 
-		    ENDIF
-		  ENDDO
-		ENDIF
-	      ELSEIF (IGTYP == 52) THEN
-		IF (PLY_ANIM( 3 * (IPLY - 1) + 2) == 1 )THEN
-		  DO J=1,NLAY
+                ENDDO 
+              ENDIF
+            ENDDO
+          ENDIF
+                ELSEIF (IGTYP == 52) THEN
+          IF (PLY_ANIM( 3 * (IPLY - 1) + 2) == 1 )THEN
+            DO J=1,NLAY
                     BUFLY => ELBUF_TAB(NG)%BUFLY(J)
                     NPTT = BUFLY%NPTT
-		    ID_PLY = PLY_INFO(1,STACK%IGEO(2+J,ISUBSTACK)-NUMSTACK)
-		    IF (ID_PLY  == PLY_ANIM( 3 * (IPLY - 1) + 1) ) THEN
-		      DO I=LFT,LLT
+              ID_PLY = PLY_INFO(1,STACK%IGEO(2+J,ISUBSTACK)-NUMSTACK)
+              IF (ID_PLY  == PLY_ANIM( 3 * (IPLY - 1) + 1) ) THEN
+                DO I=LFT,LLT
                         NB_PLYOFF = 0
                         DO IR=1,NPTR                                          
                           DO IS=1,NPTS                                         
                             DO IT=1,NPTT     
                               LBUF => ELBUF_TAB(NG)%BUFLY(J)%LBUF(IR,IS,IT)  
                               IF (LBUF%OFF(I) == ZERO) NB_PLYOFF = NB_PLYOFF + 1
-		            ENDDO 
-		          ENDDO 
-		        ENDDO 
-		        IF ( NB_PLYOFF == NPTR * NPTS * NPTT ) THEN
+                      ENDDO 
+                    ENDDO 
+                  ENDDO 
+                  IF ( NB_PLYOFF == NPTR * NPTS * NPTT ) THEN
                           EVAR(I) = -ONE
-		        ELSE
+                  ELSE
                           EVAR(I) = ONE 
                         ENDIF
-		      ENDDO 
-		    ENDIF
-		  ENDDO
-		ENDIF
-	      ENDIF
+                ENDDO 
+              ENDIF
+            ENDDO
+          ENDIF
+                ENDIF
 C--------------------------------------------------
             ELSE IF (IFUNC> 11925+MX_PLY_ANIM .AND. IFUNC < 11925+(2*MX_PLY_ANIM)+1)THEN 
             !/ANIM/SHELL/IDPLY/PHI
 c------------------------------------
-	      IPLY = IFUNC - (11925+MX_PLY_ANIM)
+              IVAR = IFUNC - (11925+MX_PLY_ANIM)
+              IPLY = PLY_ANIM_PHI( 3 * (IVAR - 1) + 1)
+              IPT  = PLY_ANIM_PHI( 3 * (IVAR - 1) + 3)      
 c
-	      DO J=1,NLAY
+                DO J=1,NLAY
                ID_PLY = 0
                IF (IGTYP == 17 .OR. IGTYP == 51) THEN
-		 ID_PLY = IGEO(1,STACK%IGEO(2+J,ISUBSTACK))
+           ID_PLY = IGEO(1,STACK%IGEO(2+J,ISUBSTACK))
                ELSEIF (IGTYP == 52) THEN
                  ID_PLY = PLY_INFO(1,STACK%IGEO(2+J,ISUBSTACK)-NUMSTACK) 
                ENDIF
 c
-               IF (ID_PLY  == PLY_ANIM_PHI( 3 * (IPLY - 1) + 1) ) THEN
-                      BUFLY => ELBUF_TAB(NG)%BUFLY(J)
-                  IF (ITY == 3) THEN
-                   IF (IGTYP == 17 .OR. IGTYP == 51 .OR. IGTYP == 52 ) THEN
-                    IF (MLW /= 0 .AND. MLW /= 13) THEN                        
+               IF (ID_PLY  == IPLY ) THEN
+                BUFLY => ELBUF_TAB(NG)%BUFLY(J)
+                IF (ITY == 3) THEN
+                  IF(IDRAPE > 0 .AND. (IGTYP == 51 .OR. IGTYP == 52)) THEN
+                    IF(IPT <= BUFLY%NPTT ) THEN 
+                        LBUF_DIR => ELBUF_TAB(NG)%BUFLY(J)%LBUF_DIR(IPT) 
+                     ELSE
+                        LBUF_DIR => ELBUF_TAB(NG)%BUFLY(J)%LBUF_DIR(1)   
+                    ENDIF   
+                    IF (MLW /= 0 .AND. MLW /= 13) THEN   
                       DO I=LFT,LLT                                                
                         N = I + NFT                                               
                         X21 = X(1,IXC(3,N))-X(1,IXC(2,N))                         
@@ -2780,8 +3003,8 @@ C
                           E2Z = E2Z*SUMA                                          
                         ENDIF                                                     
                         IF (IREP >= 1) THEN                                       
-                          AA = BUFLY%DIRA(I)				      
-                          BB = BUFLY%DIRA(I+NEL)			      
+                          AA = LBUF_DIR%DIRA(I)              
+                          BB = LBUF_DIR%DIRA(I+NEL)            
                           V1 = AA*RX + BB*SX                                      
                           V2 = AA*RY + BB*SY                                      
                           V3 = AA*RZ + BB*SZ                                      
@@ -2791,8 +3014,121 @@ C
                           DIR1_1 = VR/SUMA                                        
                           DIR1_2 = VS/SUMA                                        
                         ELSE                                                      
-                          DIR1_1 = BUFLY%DIRA(I)    			      
-                          DIR1_2 = BUFLY%DIRA(I+NEL)			      
+                          DIR1_1 = LBUF_DIR%DIRA(I)                
+                          DIR1_2 = LBUF_DIR%DIRA(I+NEL)            
+                        ENDIF                                       
+c
+                        PHI =(HUNDRED80/PI)*ATAN2(DIR1_2,DIR1_1)  
+                        ERR = (ABS(PHI) - NINTY)/NINTY
+                        EVAR(I) = PHI
+                        IF(ABS(ERR) < EM02) EVAR(I) = SIGN(NINTY,PHI)
+                        IF(ABS(EVAR(I)) < ONE) EVAR(I) = ZERO
+                      ENDDO                                                       
+                    ENDIF  ! MLW                            
+                 ELSEIF (IGTYP == 17 .OR. IGTYP == 51 .OR. IGTYP == 52 ) THEN
+                     BUFLY => ELBUF_TAB(NG)%BUFLY(J)
+                    IF (MLW /= 0 .AND. MLW /= 13) THEN   
+                      DO I=LFT,LLT                                                
+                        N = I + NFT                                               
+                        X21 = X(1,IXC(3,N))-X(1,IXC(2,N))                         
+                        X32 = X(1,IXC(4,N))-X(1,IXC(3,N))                         
+                        X34 = X(1,IXC(4,N))-X(1,IXC(5,N))                         
+                        X41 = X(1,IXC(5,N))-X(1,IXC(2,N))                         
+
+                        Y21 = X(2,IXC(3,N))-X(2,IXC(2,N))                         
+                        Y32 = X(2,IXC(4,N))-X(2,IXC(3,N))                         
+                        Y34 = X(2,IXC(4,N))-X(2,IXC(5,N))                         
+                        Y41 = X(2,IXC(5,N))-X(2,IXC(2,N))                         
+
+                        Z21 = X(3,IXC(3,N))-X(3,IXC(2,N))                         
+                        Z32 = X(3,IXC(4,N))-X(3,IXC(3,N))                         
+                        Z34 = X(3,IXC(4,N))-X(3,IXC(5,N))                         
+                        Z41 = X(3,IXC(5,N))-X(3,IXC(2,N))                         
+                                                                                  
+                        E1X = (X21+X34)                                           
+                        E1Y = (Y21+Y34)                                           
+                        E1Z = (Z21+Z34)                                           
+
+                        E2X = (X32+X41)                                           
+                        E2Y = (Y32+Y41)                                           
+                        E2Z = (Z32+Z41)                                           
+                 
+                        E3X = E1Y*E2Z-E1Z*E2Y                                     
+                        E3Y = E1Z*E2X-E1X*E2Z                                     
+                        E3Z = E1X*E2Y-E1Y*E2X                                     
+                        IF (IREP > 0) THEN                                        
+                          RX = E1X                                                
+                          RY = E1Y                                                
+                          RZ = E1Z                                                
+                          SX = E2X                                                
+                          SY = E2Y                                                
+                          SZ = E2Z                                                
+                        ENDIF                                                     
+                        IF (ISHFRAM == 0 .OR. IGTYP == 16 ) THEN                  
+C------                   Repere convecte symetrique - version 5 (default)        
+                          SUMA   = E3X*E3X+E3Y*E3Y+E3Z*E3Z                        
+                          SUMA   = ONE / MAX(SQRT(SUMA),EM20)                      
+                          E3X = E3X * SUMA                                        
+                          E3Y = E3Y * SUMA                                        
+                          E3Z = E3Z * SUMA                                        
+C
+                          S1     = E1X*E1X+E1Y*E1Y+E1Z*E1Z                        
+                          S2     = E2X*E2X+E2Y*E2Y+E2Z*E2Z                        
+                          SUMA   = SQRT(S1/S2)                                    
+                          E1X = E1X + (E2Y*E3Z-E2Z*E3Y)*SUMA                      
+                          E1Y = E1Y + (E2Z*E3X-E2X*E3Z)*SUMA                      
+                          E1Z = E1Z + (E2X*E3Y-E2Y*E3X)*SUMA                      
+C
+                          SUMA   = E1X*E1X+E1Y*E1Y+E1Z*E1Z                        
+                          SUMA   = ONE / MAX(SQRT(SUMA),EM20)                      
+                          E1X = E1X * SUMA                                        
+                          E1Y = E1Y * SUMA                                        
+                          E1Z = E1Z * SUMA                                        
+C
+                          E2X = E3Y * E1Z - E3Z * E1Y                             
+                          E2Y = E3Z * E1X - E3X * E1Z                             
+                          E2Z = E3X * E1Y - E3Y * E1X                             
+                        ELSEIF (ISHFRAM == 2) THEN                                
+C------                   Repere convecte nonsymetrique - version 4               
+                          SUMA   = E2X*E2X+E2Y*E2Y+E2Z*E2Z                        
+                          E1X = E1X*SUMA + E2Y*E3Z-E2Z*E3Y                        
+                          E1Y = E1Y*SUMA + E2Z*E3X-E2X*E3Z                        
+                          E1Z = E1Z*SUMA + E2X*E3Y-E2Y*E3X                        
+                          SUMA   = E1X*E1X+E1Y*E1Y+E1Z*E1Z                        
+                          SUMA   = ONE/MAX(SQRT(SUMA),EM20)                        
+                          E1X = E1X*SUMA                                          
+                          E1Y = E1Y*SUMA                                          
+                          E1Z = E1Z*SUMA                                          
+C
+                          SUMA   = E3X*E3X+E3Y*E3Y+E3Z*E3Z                        
+                          SUMA   = ONE / MAX(SQRT(SUMA),EM20)                      
+                          E3X = E3X * SUMA                                        
+                          E3Y = E3Y * SUMA                                        
+                          E3Z = E3Z * SUMA                                        
+C
+                          E2X = E3Y*E1Z-E3Z*E1Y                                   
+                          E2Y = E3Z*E1X-E3X*E1Z                                   
+                          E2Z = E3X*E1Y-E3Y*E1X                                   
+                          SUMA   = E2X*E2X+E2Y*E2Y+E2Z*E2Z                        
+                          SUMA   = ONE/MAX(SQRT(SUMA),EM20)                        
+                          E2X = E2X*SUMA                                          
+                          E2Y = E2Y*SUMA                                          
+                          E2Z = E2Z*SUMA                                          
+                        ENDIF                                                     
+                        IF (IREP >= 1) THEN                                       
+                          AA = BUFLY%DIRA(I)              
+                          BB = BUFLY%DIRA(I+NEL)            
+                          V1 = AA*RX + BB*SX                                      
+                          V2 = AA*RY + BB*SY                                      
+                          V3 = AA*RZ + BB*SZ                                      
+                          VR = V1*E1X+ V2*E1Y + V3*E1Z                            
+                          VS = V1*E2X+ V2*E2Y + V3*E2Z                            
+                          SUMA=SQRT(VR*VR + VS*VS)                                
+                          DIR1_1 = VR/SUMA                                        
+                          DIR1_2 = VS/SUMA                                        
+                        ELSE                                                      
+                          DIR1_1 = BUFLY%DIRA(I)                
+                          DIR1_2 = BUFLY%DIRA(I+NEL)            
                         ENDIF                                       
 c
                         PHI =(HUNDRED80/PI)*ATAN2(DIR1_2,DIR1_1)  
@@ -2802,11 +3138,16 @@ c
                         IF(ABS(EVAR(I)) < ONE) EVAR(I) = ZERO
                       ENDDO                                                       
                     ENDIF  ! MLW                                                  
-                   ENDIF  ! IGTYP
-
+                   ENDIF  ! IGTYP + IDRAPE
+                
                   ELSEIF (ITY == 7) THEN
-                   IF (IGTYP == 17 .OR. IGTYP == 51 .OR. IGTYP == 52 ) THEN
-                    IF (MLW /= 0 .AND. MLW /= 13) THEN                      
+                    IF(IDRAPE > 0 .AND. (IGTYP == 51 .OR. IGTYP == 52)) THEN  
+                      IF(IPT <= BUFLY%NPTT ) THEN 
+                         LBUF_DIR => ELBUF_TAB(NG)%BUFLY(J)%LBUF_DIR(IPT) 
+                      ELSE
+                        LBUF_DIR => ELBUF_TAB(NG)%BUFLY(J)%LBUF_DIR(1)   
+                      ENDIF   
+                     IF (MLW /= 0 .AND. MLW /= 13) THEN                      
                       DO I=LFT,LLT                                              
                         N = I + NFT                                             
                         X21 = X(1,IXTG(3,N))-X(1,IXTG(2,N))                     
@@ -2829,9 +3170,9 @@ c
                           E23 = Z31                                             
                         ENDIF                                                   
              IF(IFRAM_OLD ==0 ) THEN
-	       CALL CLSCONV3(X21,Y21,Z21,X31,Y31,Z31,
-     +	                     E1X,E1Y,E1Z,E2X,E2Y,E2Z,E3X,E3Y,E3Z)
-             ELSE		
+                 CALL CLSCONV3(X21,Y21,Z21,X31,Y31,Z31,
+     +                       E1X,E1Y,E1Z,E2X,E2Y,E2Z,E3X,E3Y,E3Z)
+             ELSE
                         E1X= X21                                                
                         E1Y= Y21                                                
                         E1Z= Z21                                                
@@ -2855,10 +3196,84 @@ C
                         E2X=E2X/SUM_                                             
                         E2Y=E2Y/SUM_                                             
                         E2Z=E2Z/SUM_ 
-             END IF			
+             END IF
                         IF (IREP >= 1) THEN                                     
-                          AA = BUFLY%DIRA(I)				    
-                          BB = BUFLY%DIRA(I+NEL)			    
+                          AA = LBUF_DIR%DIRA(I)            
+                          BB = LBUF_DIR%DIRA(I+NEL)          
+                          V1 = AA*E11 + BB*E21                                  
+                          V2 = AA*E12 + BB*E22                                  
+                          V3 = AA*E13 + BB*E23                                  
+                          VR = V1*E1X + V2*E1Y + V3*E1Z                         
+                          VS = V1*E2X + V2*E2Y + V3*E2Z                         
+                          SUMA=SQRT(VR*VR + VS*VS)                              
+                          DIR1_1 = VR/SUMA                                      
+                          DIR1_2 = VS/SUMA                                      
+                        ELSE                                                    
+                          DIR1_1 = LBUF_DIR%DIRA(I)                        
+                          DIR1_2 = LBUF_DIR%DIRA(I+NEL)                        
+                        ENDIF                                         
+                        PHI =(HUNDRED80/PI)*ATAN2(DIR1_2,DIR1_1)  
+                        ERR = (ABS(PHI) - NINTY)/NINTY
+                        EVAR(I) = PHI
+                        IF(ABS(ERR) < EM02) EVAR(I) = SIGN(NINTY,PHI)
+                        IF(ABS(EVAR(I)) < ONE) EVAR(I) = ZERO     
+                      ENDDO                                                     
+                    ENDIF                                                        
+                   ELSEIF (IGTYP == 17 .OR. IGTYP == 51 .OR. IGTYP == 52 ) THEN
+                     BUFLY => ELBUF_TAB(NG)%BUFLY(J)
+                    IF (MLW /= 0 .AND. MLW /= 13) THEN                      
+                      DO I=LFT,LLT                                              
+                        N = I + NFT                                             
+                        X21 = X(1,IXTG(3,N))-X(1,IXTG(2,N))                     
+                        X31 = X(1,IXTG(4,N))-X(1,IXTG(2,N))                     
+                        X32 = X(1,IXTG(4,N))-X(1,IXTG(3,N))                     
+
+                        Y21 = X(2,IXTG(3,N))-X(2,IXTG(2,N))                     
+                        Y31 = X(2,IXTG(4,N))-X(2,IXTG(2,N))                     
+                        Y32 = X(2,IXTG(4,N))-X(2,IXTG(3,N))                     
+
+                        Z21 = X(3,IXTG(3,N))-X(3,IXTG(2,N))                     
+                        Z31 = X(3,IXTG(4,N))-X(3,IXTG(2,N))                     
+                        Z32 = X(3,IXTG(4,N))-X(3,IXTG(3,N))                     
+                        IF (IREP > 0) THEN                                      
+                          E11 = X21                                             
+                          E12 = Y21                                             
+                          E13 = Z21                                             
+                          E21 = X31                                             
+                          E22 = Y31                                             
+                          E23 = Z31                                             
+                        ENDIF                                                   
+             IF(IFRAM_OLD ==0 ) THEN
+                 CALL CLSCONV3(X21,Y21,Z21,X31,Y31,Z31,
+     +                       E1X,E1Y,E1Z,E2X,E2Y,E2Z,E3X,E3Y,E3Z)
+             ELSE
+                        E1X= X21                                                
+                        E1Y= Y21                                                
+                        E1Z= Z21                                                
+                        X2L = SQRT(E1X*E1X+E1Y*E1Y+E1Z*E1Z)                     
+                        E1X=E1X/X2L                                             
+                        E1Y=E1Y/X2L                                             
+                        E1Z=E1Z/X2L                                             
+C
+                        E3X=Y31*Z32-Z31*Y32                                     
+                        E3Y=Z31*X32-X31*Z32                                     
+                        E3Z=X31*Y32-Y31*X32                                     
+                        SUM_ = SQRT(E3X*E3X+E3Y*E3Y+E3Z*E3Z)                     
+                        E3X=E3X/SUM_                                             
+                        E3Y=E3Y/SUM_                                             
+                        E3Z=E3Z/SUM_                                             
+                        AREA = HALF * SUM_                                     
+                        E2X=E3Y*E1Z-E3Z*E1Y                                     
+                        E2Y=E3Z*E1X-E3X*E1Z                                     
+                        E2Z=E3X*E1Y-E3Y*E1X                                     
+                        SUM_ = SQRT(E2X*E2X+E2Y*E2Y+E2Z*E2Z)                     
+                        E2X=E2X/SUM_                                             
+                        E2Y=E2Y/SUM_                                             
+                        E2Z=E2Z/SUM_ 
+             END IF
+                        IF (IREP >= 1) THEN                                     
+                          AA = BUFLY%DIRA(I)            
+                          BB = BUFLY%DIRA(I+NEL)          
                           V1 = AA*E11 + BB*E21                                  
                           V2 = AA*E12 + BB*E22                                  
                           V3 = AA*E13 + BB*E23                                  
@@ -2887,13 +3302,13 @@ c------------------------------------
             ELSE IF (IFUNC> 11925+(2*MX_PLY_ANIM) .AND. IFUNC < 11925+(3*MX_PLY_ANIM)+1)THEN 
             !/ANIM/SHELL/IDPLY/EPSP
 c------------------------------------
-	      IPLY = IFUNC - (11925+ 2*MX_PLY_ANIM)
-	      IPT = PLY_ANIM_EPSP( 3 * (IPLY - 1) + 3)
+                IPLY = IFUNC - (11925+ 2*MX_PLY_ANIM)
+                IPT = PLY_ANIM_EPSP( 3 * (IPLY - 1) + 3)
 c
-	      DO J=1,NLAY
+                DO J=1,NLAY
                ID_PLY = 0
                IF (IGTYP == 17 .OR. IGTYP == 51) THEN
-		 ID_PLY = IGEO(1,STACK%IGEO(2+J,ISUBSTACK))
+           ID_PLY = IGEO(1,STACK%IGEO(2+J,ISUBSTACK))
                ELSEIF (IGTYP == 52) THEN
                  ID_PLY = PLY_INFO(1,STACK%IGEO(2+J,ISUBSTACK)-NUMSTACK) 
                ENDIF
@@ -2906,24 +3321,24 @@ c
                     IF( NPG > 1 ) THEN
                      DO  I=LFT,LLT
                        DO IR=1,NPTR
-                         DO IS=1,NPTS				  
+                         DO IS=1,NPTS          
                            EVAR(I) = EVAR(I) + ABS(BUFLY%LBUF(IR,IS,IPT)%PLA(I))/NPG  
                          ENDDO    
                        ENDDO
                      ENDDO
                     ELSE
-                      DO  I=LFT,LLT				  
+                      DO  I=LFT,LLT          
                         EVAR(I) = ABS(BUFLY%LBUF(1,1,IPT)%PLA(I))  
                       ENDDO
                     ENDIF
 c
                    ELSE
-                     DO  I=LFT,LLT				  
+                     DO  I=LFT,LLT          
                        EVAR(I) = ZERO
                      ENDDO
                    ENDIF
                  ELSE
-                   DO  I=LFT,LLT				
+                   DO  I=LFT,LLT
                      EVAR(I) = ZERO
                    ENDDO
                  ENDIF
@@ -2933,30 +3348,30 @@ c------------------------------------
             ELSE IF (IFUNC> 11925+(3*MX_PLY_ANIM) .AND. IFUNC < 11925+(4*MX_PLY_ANIM)+1)THEN 
             !/ANIM/SHELL/IDPLY/DAMA
 c------------------------------------
-	      IPLY = IFUNC - (11925+ 3*MX_PLY_ANIM)
-	      IPT = PLY_ANIM_DAMA( 3 * (IPLY - 1) + 3)
+                IPLY = IFUNC - (11925+ 3*MX_PLY_ANIM)
+                IPT = PLY_ANIM_DAMA( 3 * (IPLY - 1) + 3)
 c
               IF(IFAILURE > 0) THEN 
-	        DO J=1,NLAY
+                  DO J=1,NLAY
                   NPTT = ELBUF_TAB(NG)%BUFLY(J)%NPTT
                   ID_PLY = 0
                   IF (IGTYP == 17 .OR. IGTYP == 51) THEN
-		    ID_PLY = IGEO(1,STACK%IGEO(2+J,ISUBSTACK))
+              ID_PLY = IGEO(1,STACK%IGEO(2+J,ISUBSTACK))
                   ELSEIF (IGTYP == 52) THEN
                     ID_PLY=PLY_INFO(1,STACK%IGEO(2+J,ISUBSTACK)-NUMSTACK) 
                   ENDIF 
                   IF (ID_PLY  == PLY_ANIM_DAMA( 3 *(IPLY - 1) + 1) )THEN
                     IF (IPT <= NPTT) THEN                                             
-                      DO I=LFT,LLT								  
-                        DO IR = 1, NPTR							  
-                          DO IS = 1, NPTS							  
-                            FBUF => ELBUF_TAB(NG)%BUFLY(J)%FAIL(IR,IS,IPT)			    
-                            DO IFAIL = 1, ELBUF_TAB(NG)%BUFLY(J)%NFAIL						 
-                	      EVAR(I) = MAX(EVAR(I), FBUF%FLOC(IFAIL)%DAMMX(I))
-                            ENDDO								  
-                          ENDDO								  
-                        ENDDO 								  
-                      ENDDO	  !  I=LFT,LLT  
+                      DO I=LFT,LLT                  
+                        DO IR = 1, NPTR                
+                          DO IS = 1, NPTS                
+                            FBUF => ELBUF_TAB(NG)%BUFLY(J)%FAIL(IR,IS,IPT)          
+                            DO IFAIL = 1, ELBUF_TAB(NG)%BUFLY(J)%NFAIL             
+                EVAR(I) = MAX(EVAR(I), FBUF%FLOC(IFAIL)%DAMMX(I))
+                            ENDDO                  
+                          ENDDO                  
+                        ENDDO                   
+                      ENDDO    !  I=LFT,LLT  
                     ENDIF
                   ENDIF
                 ENDDO
@@ -2967,34 +3382,34 @@ c
                   DO I=LFT,LLT
                     MAT(I)=IXC(1,NFT+I)
                     PID(I)=IXC(6,NFT+I)
-                  END DO				
+                  END DO
                 ELSE
                   DO I=LFT,LLT
                     MAT(I)=IXTG(1,NFT+I)
                     PID(I)=IXTG(5,NFT+I)
-                  END DO				
+                  END DO
                 END IF
 c
-                IPMAT = 2 + NLAY			 
+                IPMAT = 2 + NLAY       
                 DO N=1,NLAY
-                  IADR = (N-1)*NEL			 
+                  IADR = (N-1)*NEL       
                   DO I=LFT,LLT
-                    J = IADR+I  			  
+                    J = IADR+I          
                     MATLY(J) = STACK%IGEO(IPMAT+N,ISUBSTACK)
-                  END DO				
+                  END DO
                 END DO
 c
-	        DO J=1,NLAY
+                  DO J=1,NLAY
                   ID_PLY = 0
                   IF (IGTYP == 17 .OR. IGTYP == 51) THEN
-		    ID_PLY = IGEO(1,STACK%IGEO(2+J,ISUBSTACK))
+              ID_PLY = IGEO(1,STACK%IGEO(2+J,ISUBSTACK))
                   ELSEIF (IGTYP == 52) THEN
                    ID_PLY=PLY_INFO(1,STACK%IGEO(2+J,ISUBSTACK)-NUMSTACK) 
                   ENDIF
 c
                   IF (ID_PLY  == PLY_ANIM_DAMA( 3 *(IPLY - 1) + 1) )THEN
                     BUFLY => ELBUF_TAB(NG)%BUFLY(J)
-                    DO I=LFT,LLT					    
+                    DO I=LFT,LLT              
                       NPTT = ELBUF_TAB(NG)%BUFLY(J)%NPTT
                       IF (IPT <= NPTT) THEN                                      
                         IADR = (J - 1)*NEL
@@ -3003,11 +3418,11 @@ c
                         DO IR=1,NPTR
                           DO IS=1,NPTS
                             LBUF=> ELBUF_TAB(NG)%BUFLY(J)%LBUF(IR,IS,IPT)  
-                            DMAX(I) = ONE/PM(64,MATLY(IADR + I))  			     
-                            WPMAX(I)= ONE/PM(41,MATLY(IADR + I))  			     
-                            EPST1(I)= PM(60,MATLY(IADR + I))				  
-                            EPST2(I)= PM(61,MATLY(IADR + I))				  
-                            EPSF1(I)= ONE/PM(98,MATLY(IADR + I))  			     
+                            DMAX(I) = ONE/PM(64,MATLY(IADR + I))             
+                            WPMAX(I)= ONE/PM(41,MATLY(IADR + I))             
+                            EPST1(I)= PM(60,MATLY(IADR + I))          
+                            EPST2(I)= PM(61,MATLY(IADR + I))          
+                            EPSF1(I)= ONE/PM(98,MATLY(IADR + I))             
                             EPSF2(I)= ONE/PM(99,MATLY(IADR + I))
 C   
                             VG(1) = MAX(VG(1),LBUF%DAM(JJ(1)+I)*DMAX(I)) 
@@ -3556,46 +3971,64 @@ C
 ! it's the plastic work  /ANIM/ELEM/WPLA ( ifunc=4*MX_PLY_ANIM +13245)           
               IF (GBUF%G_PLA > 0) THEN
                 ! for law25, plastic work < 0 if the layer has reached failure-p !
-                IF (NLAY > 1) THEN
-                  IPT = IABS(NLAY)/2 + 1
-                  BUFLY => ELBUF_TAB(NG)%BUFLY(IPT)
-                  IF (BUFLY%L_PLA > 0)THEN
+                ILAY = 1
+                IF (NLAY > 1) ILAY = IABS(NLAY)/2 + 1
+                 BUFLY => ELBUF_TAB(NG)%BUFLY(ILAY)
+                 IF (BUFLY%L_PLA > 0) THEN
                   IF (NPG > 1) THEN
-                    DO  I=LFT,LLT  
-                      EVAR(I) = ABS(BUFLY%PLAPT(I))
-                    ENDDO
-                  ELSE
-                    NPTT = BUFLY%NPTT  ! needed for PID51 (new shell prop)
-                    DO  I=LFT,LLT
+                    IF(ITY == 3) THEN
+                      IF(IGTYP == 51 .OR. IGTYP == 52) THEN
+                         NPTT = BUFLY%NPTT
+                         DO IS = 1,NPTS
+                           DO IR = 1,NPTR
+                             DO IT = 1, NPTT
+                               DO  I=1,NEL  
+                                 EVAR(I) = EVAR(I) + FOURTH*BUFLY%LBUF(IR,IS,IT)%PLA(I)/NPTT
+                               ENDDO
+                             ENDDO
+                           ENDDO
+                         ENDDO     
+                      ELSE
+                         DO  I=1,NEL  
+                           EVAR(I) = FOURTH*(BUFLY%LBUF(1,1,1)%PLA(I) + BUFLY%LBUF(2,1,1)%PLA(I) + 
+     .                                        BUFLY%LBUF(1,2,1)%PLA(I) + BUFLY%LBUF(2,2,1)%PLA(I))
+                         ENDDO
+                      ENDIF ! igtyp
+                    ELSE ! ITY == 7
+                      IF(IGTYP == 51 .OR. IGTYP == 52) THEN
+                        NPTT = BUFLY%NPTT
+                        DO IT = 1,NPTT
+                          DO IR =1,NPG
+                            DO  I=1,NEL  
+                              EVAR(I) = EVAR(I)  + THIRD*BUFLY%LBUF(IR,1,IT)%PLA(I)/NPTT
+                            ENDDO
+                           ENDDO
+                         ENDDO   
+                       ELSE
+                         DO I=1,NEL 
+                           EVAR(I) = THIRD*(BUFLY%LBUF(1,1,1)%PLA(I) + BUFLY%LBUF(1,1,1)%PLA(I) +
+     .                                     BUFLY%LBUF(1,1,1)%PLA(I)) 
+                         ENDDO
+                       ENDIF ! igtyp 
+                     ENDIF  ! ity
+                  ELSE ! NPG == 1
+                    IF(IGTYP == 51 .OR. IGTYP == 52) THEN
+                      NPTT = BUFLY%NPTT  ! needed for PID51 (new shell prop)
                       DO IT=1,NPTT
-                        EVAR(I) = EVAR(I) + ABS(BUFLY%LBUF(1,1,IT)%PLA(I))/NPTT
-                      ENDDO
-                    ENDDO
-                  ENDIF
-                 ENDIF
-                ELSEIF (NPG > 1) THEN   ! NLAY = 1
-                  BUFLY => ELBUF_TAB(NG)%BUFLY(1)
-                 IF (BUFLY%L_PLA > 0) THEN
-                  NPTT = BUFLY%NPTT  ! needed for PID51 (new shell prop)
-                  IPT = IABS(NPTT)/2 + 1
-cc                  IPT = IABS(NPT)/2 + 1
-                  II = (IPT-1)*NEL  
-                  DO  I=LFT,LLT
-                    EVAR(I) = ABS(BUFLY%PLAPT(II+I))
-                  ENDDO
-                 ENDIF
-                ELSE   !  NLAY=1, NPG=1
-                  BUFLY => ELBUF_TAB(NG)%BUFLY(1)
-                 IF (BUFLY%L_PLA > 0) THEN
-                  NPTT = BUFLY%NPTT  ! needed for PID51 (new shell prop)
-cc                  IPT = IABS(NPT)/2 + 1
-                  IPT = IABS(NPTT)/2 + 1
-                  DO  I=LFT,LLT
-                    EVAR(I) = ABS(BUFLY%LBUF(1,1,IPT)%PLA(I)) 
-                  ENDDO
-                 ENDIF
-                ENDIF
-              ENDIF  
+                        DO  I=1,NEL 
+                          EVAR(I) = EVAR(I) + ABS(BUFLY%LBUF(1,1,IT)%PLA(I))/NPTT
+                        ENDDO
+                     ENDDO
+                    ELSE
+                     NPTT = BUFLY%NPTT  !
+                     IPT = IABS(NPTT)/2 + 1
+                     DO I=1,NEL 
+                          EVAR(I) =  ABS(BUFLY%LBUF(1,1,IPT)%PLA(I))/NPTT
+                     ENDDO
+                   ENDIF
+                  ENDIF ! npg
+                 ENDIF ! BUFLY%L_PLA 
+              ENDIF  ! gbuf
 c------------------------------------
             ELSEIF (IFUNC == 13246 + 4*MX_PLY_ANIM .AND. (MLW == 15 .OR. MLW == 25)) THEN  ! WPLA/UPPER
 c------------------------------------
@@ -3831,7 +4264,7 @@ c------------------------------------ Mach Number
                     VEL(0) = SQRT(VEL(1)*VEL(1)+VEL(2)*VEL(2)+VEL(3)*VEL(3))                              
                     EVAR(I) = VEL(0)/MULTI_FVM%SOUND_SPEED(I + NFT)                                              
                  ENDDO                                                                                    
-              ELSEIF(I_ALE_SOLVER>1)THEN                                                                    
+              ELSEIF(ALEFVM_Param%ISOLVER>1)THEN                                                                    
                    L = ELBUF_TAB(NG)%BUFLY(1)%L_SSP                                                       
                    IF(ELBUF_TAB(NG)%BUFLY(1)%L_SSP /= 0)THEN                                            
                       LBUF => ELBUF_TAB(NG)%BUFLY(1)%LBUF(1,1,1)                                          
@@ -3845,30 +4278,54 @@ c------------------------------------ Mach Number
                    ENDIF                                                                                  
               ELSE                                                                                 
                 L = ELBUF_TAB(NG)%BUFLY(1)%L_SSP                                                     
-                IF(ELBUF_TAB(NG)%BUFLY(1)%L_SSP /= 0)THEN                                               
+                IF(N2D/=0.AND.ELBUF_TAB(NG)%BUFLY(1)%L_SSP /= 0)THEN
                   LBUF => ELBUF_TAB(NG)%BUFLY(1)%LBUF(1,1,1) 
                   IF(JALE/=0)THEN                                             
-                    DO  I=1,NEL                                                                             
-                      TMP(1,1:3)=V(1,IXTG(2:4,I+NFT))-W(1,IXTG(2:4,I+NFT))                                                     
-                      TMP(2,1:3)=V(2,IXTG(2:4,I+NFT))-W(2,IXTG(2:4,I+NFT))                                                     
-                      TMP(3,1:3)=V(3,IXTG(2:4,I+NFT))-W(3,IXTG(2:4,I+NFT))                                                     
-                      VEL(1) = SUM(TMP(1,1:3))*THIRD                                                       
-                      VEL(2) = SUM(TMP(2,1:3))*THIRD                                                       
-                      VEL(3) = SUM(TMP(3,1:3))*THIRD                                                       
-                      EVAR(I) = SQRT(VEL(1)*VEL(1)+VEL(2)*VEL(2)+VEL(3)*VEL(3))/LBUF%SSP(I)                                       
-                    ENDDO                                                                                   
+                    IF(ITY==7) THEN
+                      DO  I=1,NEL 
+                        TMP(1,1:3)=V(1,IXTG(2:4,I+NFT))-W(1,IXTG(2:4,I+NFT))
+                        TMP(2,1:3)=V(2,IXTG(2:4,I+NFT))-W(2,IXTG(2:4,I+NFT))
+                        TMP(3,1:3)=V(3,IXTG(2:4,I+NFT))-W(3,IXTG(2:4,I+NFT))
+                        VEL(1) = SUM(TMP(1,1:3))*THIRD
+                        VEL(2) = SUM(TMP(2,1:3))*THIRD
+                        VEL(3) = SUM(TMP(3,1:3))*THIRD
+                        EVAR(I) = SQRT(VEL(1)*VEL(1)+VEL(2)*VEL(2)+VEL(3)*VEL(3))/LBUF%SSP(I)
+                      ENDDO  
+                    ELSEIF(ITY==2) THEN
+                      DO  I=1,NEL
+                        TMP(1,1:4)=V(1,IXQ(2:5,I+NFT))-W(1,IXQ(2:5,I+NFT))
+                        TMP(2,1:4)=V(2,IXQ(2:5,I+NFT))-W(2,IXQ(2:5,I+NFT))
+                        TMP(3,1:4)=V(3,IXQ(2:5,I+NFT))-W(3,IXQ(2:5,I+NFT))
+                        VEL(1) = SUM(TMP(1,1:4))*FOURTH
+                        VEL(2) = SUM(TMP(2,1:4))*FOURTH
+                        VEL(3) = SUM(TMP(3,1:4))*FOURTH
+                        EVAR(I) = SQRT(VEL(1)*VEL(1)+VEL(2)*VEL(2)+VEL(3)*VEL(3))/LBUF%SSP(I)
+                      ENDDO 
+                    ENDIF
                   ELSE
-                    DO  I=1,NEL                                                                             
-                      TMP(1,1:3)=V(1,IXTG(2:4,I+NFT))                                                    
-                      TMP(2,1:3)=V(2,IXTG(2:4,I+NFT))                                                    
-                      TMP(3,1:3)=V(3,IXTG(2:4,I+NFT))                                                    
-                      VEL(1) = SUM(TMP(1,1:3))*THIRD                                                       
-                      VEL(2) = SUM(TMP(2,1:3))*THIRD                                                       
-                      VEL(3) = SUM(TMP(3,1:3))*THIRD                                                       
-                      EVAR(I) = SQRT(VEL(1)*VEL(1)+VEL(2)*VEL(2)+VEL(3)*VEL(3))/LBUF%SSP(I)                                       
-                    ENDDO                                                                                   
+                    IF(ITY==7) THEN
+                        DO  I=1,NEL 
+                          TMP(1,1:3)=V(1,IXTG(2:4,I+NFT))
+                          TMP(2,1:3)=V(2,IXTG(2:4,I+NFT))
+                          TMP(3,1:3)=V(3,IXTG(2:4,I+NFT))          
+                          VEL(1) = SUM(TMP(1,1:3))*THIRD
+                          VEL(2) = SUM(TMP(2,1:3))*THIRD
+                          VEL(3) = SUM(TMP(3,1:3))*THIRD     
+                          EVAR(I) = SQRT(VEL(1)*VEL(1)+VEL(2)*VEL(2)+VEL(3)*VEL(3))/LBUF%SSP(I)
+                        ENDDO   
+                    ELSEIF(ITY==2) THEN
+                        DO  I=1,NEL
+                          TMP(1,1:4)=V(1,IXQ(2:5,I+NFT))
+                          TMP(2,1:4)=V(2,IXQ(2:5,I+NFT))
+                          TMP(3,1:4)=V(3,IXQ(2:5,I+NFT))          
+                          VEL(1) = SUM(TMP(1,1:4))*FOURTH
+                          VEL(2) = SUM(TMP(2,1:4))*FOURTH
+                          VEL(3) = SUM(TMP(3,1:4))*FOURTH     
+                          EVAR(I) = SQRT(VEL(1)*VEL(1)+VEL(2)*VEL(2)+VEL(3)*VEL(3))/LBUF%SSP(I)
+                        ENDDO   
+                    ENDIF
                   ENDIF
-                ENDIF                                                                                     
+                ENDIF
               ENDIF 
 c------------------------------------ DAMG
            ELSEIF((IFUNC >= 13547 + 4*MX_PLY_ANIM + 1000 + 4).AND.
@@ -4440,7 +4897,7 @@ C-----------------------------------------------
         ENDDO
 C
         IF (ISPMD == 0) THEN
-          BUF = (NUMELQG+NUMELCG+NUMELTGG+NUMELURG)*4
+          BUF = (NUMELQG+NUMELCG+NUMELTGG)*4
         ELSE
           BUF=1
         ENDIF
@@ -4466,26 +4923,16 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER JFT,JLT,IREP
-C     REAL
       my_real
      .   RX , RY , RZ, SX , SY , SZ,
      .   E1X, E1Y, E1Z,E2X, E2Y, E2Z,E3X, E3Y, E3Z
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I
-C     REAL
-C                                                                     12
       MY_REAL
      .   C1,C2,CC,DET
 C~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -4514,6 +4961,6 @@ C~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         E2X = E3Y * E1Z - E3Z * E1Y
         E2Y = E3Z * E1X - E3X * E1Z
         E2Z = E3X * E1Y - E3Y * E1X
-C	
+C
       RETURN
       END

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -23,6 +23,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 Chd|====================================================================
 Chd|  HM_READ_ALE_CLOSE             source/ale/hm_read_ale_close.F
 Chd|-- called by -----------
+Chd|        HM_READ_PROP14                source/properties/solid/hm_read_prop14.F
 Chd|        HM_READ_PROP14F               source/properties/solid/hm_read_prop14.F
 Chd|        HM_READ_PROP15                source/properties/solid/hm_read_prop15.F
 Chd|-- calls ---------------
@@ -50,7 +51,6 @@ C-----------------------------------------------
 #include      "param_c.inc"
 #include      "com01_c.inc"
 #include      "units_c.inc"
-#include      "submod_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -80,9 +80,9 @@ C-----------------------------------------------
       RETURN
 C-----------------------------------------------
  2010 FORMAT(
-     & 5X,'    ELEMENT CLOSURE  ',/,
-     & 5X,'    ---------------  ',/,
+     & 5X,'    ALE ELEMENT CLOSURE  ',/,
+     & 5X,'    -------------------  ',/,
      & 5X,'MAXIMUM LENGTH FOR ACTIVATION . . . . .=',1PG20.13/,
-     & 5X,'MAXIMUM LENGTH FOR RESISTANCE . . . . .=',1PG20.13//)
+     & 5X,'MAXIMUM LENGTH FOR RESISTANCE . . . . .=',1PG20.13/)
 C-----------------------------------------------
       END SUBROUTINE HM_READ_ALE_CLOSE

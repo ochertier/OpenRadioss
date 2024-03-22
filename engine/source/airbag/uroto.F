@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -32,24 +32,16 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER JFT, JLT,NEL
-C     REAL
       my_real
      .   SIG(5,*), DIR(NEL,2)
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I
-C     REAL
-      my_real
-     .   S1, S2, S3, S4, S5
+      my_real S1, S2, S3, S4, S5
 C-----------------------------------------------
       DO I=JFT,JLT
        S1 = DIR(I,1)*DIR(I,1)*SIG(1,I)
@@ -75,13 +67,11 @@ C
 Chd|====================================================================
 Chd|  UROTOV                        source/airbag/uroto.F         
 Chd|-- called by -----------
-Chd|        H3D_SHELL_TENSOR              source/output/h3d/h3d_results/h3d_shell_tensor.F
 Chd|        M25CPLRC                      source/materials/mat/mat025/m25cplrc.F
 Chd|        M32PLAS                       source/materials/mat/mat032/m32plas.F
 Chd|        MULAWC                        source/materials/mat_share/mulawc.F
 Chd|        SIGROTA                       source/output/anim/generate/sigrota.F
 Chd|        SIGROTA_XFE                   source/output/anim/generate/sigrota_xfe.F
-Chd|        TENSORC                       source/output/anim/generate/tensorc.F
 Chd|        TENSORC_CRK                   source/output/anim/generate/tensorc_crk.F
 Chd|        USERMAT_SHELL                 source/materials/mat_share/usermat_shell.F
 Chd|-- calls ---------------
@@ -99,19 +89,12 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER JFT, JLT,NEL
-C     REAL
-      my_real
-     .   SIG(MVSIZ,5), DIR(NEL,2)
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
+      my_real SIG(MVSIZ,5), DIR(NEL,2)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I
-C     REAL
-      my_real
-     .   S1, S2, S3, S4, S5
+      my_real S1, S2, S3, S4, S5
 C-----------------------------------------------
       DO I=JFT,JLT
        S1 = DIR(I,1)*DIR(I,1)*SIG(I,1)
@@ -146,25 +129,15 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER JFT,JLT,NEL
-C     REAL
-      my_real
-     .   SIG(NEL,5),DIR(NEL,2)
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
+      my_real SIG(NEL,5),DIR(NEL,2)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I
-C     REAL
-      my_real
-     .   S1, S2, S3, S4, S5
+      my_real S1, S2, S3, S4, S5
 C-----------------------------------------------
       DO I=JFT,JLT
         S1 = DIR(I,1)*DIR(I,1)*SIG(I,1)

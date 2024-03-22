@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -46,7 +46,8 @@ C-----------------------------------------------
 C
       INTEGER I,J,L,II
 C
-Cel gather deja effectue, seul p0 ecrit 
+C Gathering already done , only p0 writes 
+
       IF (IMACH/=3.OR.ISPMD==0) THEN
         II = 0
         DO J=J1,J2

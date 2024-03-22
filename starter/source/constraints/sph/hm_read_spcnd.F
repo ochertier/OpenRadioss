@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -57,13 +57,9 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr17_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "sphcom.inc"
 #include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "scr03_c.inc"
-#include      "titr_c.inc"
 #include      "param_c.inc"
 #include      "r2r_c.inc"
 C-----------------------------------------------
@@ -100,7 +96,7 @@ C-----------------------------------------------
           NY=NY+1
 C----------Multidomaines --> on ignore les BCS SPH non tagees-----------
           IF(NSUBDOM>0)THEN
-	    IF(TAGSPHBCS(NY)==0)CALL HM_SZ_R2R(TAGSPHBCS,NY,LSUBMODEL)
+              IF(TAGSPHBCS(NY)==0)CALL HM_SZ_R2R(TAGSPHBCS,NY,LSUBMODEL)
           END IF
 C--------------------------------------------------
 C EXTRACT DATAS OF /SPHBCS/... LINE

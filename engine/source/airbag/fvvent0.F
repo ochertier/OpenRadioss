@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -32,7 +32,7 @@ Chd|        PORFORM4                      source/airbag/porfor4.F
 Chd|        PORFORM5                      source/airbag/porfor5.F       
 Chd|        PORFORM6                      source/airbag/porfor6.F       
 Chd|        GET_U_FUNC                    source/user_interface/ufunc.F 
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
       SUBROUTINE FVVENT0(
@@ -55,9 +55,7 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
 #include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "com08_c.inc"
-#include      "scr17_c.inc"
 #include      "spmd_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -193,7 +191,7 @@ C------------------
             TT1=TT-TTF
             IF (ITTF==13) THEN
               TVENT=RBAGHOL(3,IVENT)
-			  TT1=TT-TTF-TVENT
+            TT1=TT-TTF-TVENT
             ENDIF
             SVTFAC=ZERO
 C

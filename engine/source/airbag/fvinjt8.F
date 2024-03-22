@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -30,8 +30,8 @@ Chd|        FINTER                        source/tools/curve/finter.F
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
 Chd|====================================================================
       SUBROUTINE FVINJT8(NJET   , IBAGJET , RBAGJET , NPC    , TF,
-     2                   SENSOR_TAB, SCALT,    IGEO,     GEO,     PM, 
-     3                   IVOLU,   DATAINJ )
+     2                   NSENSOR,SENSOR_TAB, SCALT,    IGEO,     GEO,     
+     3                   PM     , IVOLU,   DATAINJ )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------  
@@ -46,16 +46,16 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER ,INTENT(IN) :: NSENSOR
       INTEGER NJET, IBAGJET(NIBJET,*), NPC(*), IGEO(NPROPGI,*), IVOLU(*)
 C     REAL
       my_real
      .   RBAGJET(NRBJET,*), TF(*),SCALT, 
      .   GEO(NPROPG,*), PM(NPROPM,*), DATAINJ(6,NJET)
-      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) ,INTENT(IN) :: SENSOR_TAB
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

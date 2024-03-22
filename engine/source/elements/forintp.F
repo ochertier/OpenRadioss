@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -71,11 +71,11 @@ Chd|        STARTIME                      source/system/timer.F
 Chd|        STARTIMEG                     source/system/timer.F         
 Chd|        STOPTIME                      source/system/timer.F         
 Chd|        STOPTIMEG                     source/system/timer.F         
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
 Chd|        INITBUF_MOD                   share/resol/initbuf.F         
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/matparam_def_mod.F
+Chd|        MAT_ELEM_MOD                  ../common_source/modules/mat_elem/mat_elem_mod.F
 Chd|        MOD_FORINTP                   source/elements/forintp.F     
 Chd|        NLOCAL_REG_MOD                ../common_source/modules/nlocal_reg_mod.F
+Chd|        OUTPUT_MOD                    ../common_source/modules/output/output_mod.F
 Chd|        SPHBOX                        share/modules/sphbox.F        
 Chd|        TABLE_MOD                     share/modules/table_mod.F     
 Chd|====================================================================
@@ -94,7 +94,7 @@ Chd|====================================================================
      C    NGROUNC   ,IGROUNC   ,IXS       ,IRST      ,SOL2SPH   ,
      D    SPH2SOL   ,FSKYV     ,FSKY      ,IGEO      ,TEMP      ,
      E    FTHE      ,FTHESKYI  ,SPHG_F6   ,WSMCOMP   ,SOL2SPH_TYP,
-     F    MATPARAM_TAB)
+     F    MAT_ELEM  ,OUTPUT    ,SPH_IORD1)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -102,9 +102,9 @@ C-----------------------------------------------
       USE SPHBOX
       USE MOD_FORINTP
       USE TABLE_MOD
-      USE ELBUFDEF_MOD            
+      USE MAT_ELEM_MOD            
       USE NLOCAL_REG_MOD
-      USE MATPARAM_DEF_MOD
+      USE OUTPUT_MOD
 C----6---------------------------------------------------------------7---------8
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -119,19 +119,15 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com06_c.inc"
 #include      "com08_c.inc"
-#include      "com10_c.inc"
 #include      "sphcom.inc"
 #include      "param_c.inc"
 #include      "parit_c.inc"
 #include      "vect01_c.inc"
-#include      "scr05_c.inc"
 #include      "scr07_c.inc"
 #include      "scr17_c.inc"
 #include      "task_c.inc"
 #include      "units_c.inc"
-#include      "scr01_c.inc"
 #include      "scr02_c.inc"
 #include      "scr18_c.inc"
 #include      "scr_thermal_c.inc"
@@ -146,6 +142,7 @@ C-----------------------------------------------
      .   LPRTSPH(2,0:NPART),LONFSPH(*),WASPACT(*),ISPHIO(NISPHIO,*),
      .   ITASK,GRTH(*),IGRTH(*), LGAUGE(3,*), NGROUNC, IGROUNC(*), 
      .   IXS(NIXS,*), IRST(3,*), SOL2SPH(2,*), SPH2SOL(*), SOL2SPH_TYP(*)
+      INTEGER, INTENT(IN) :: SPH_IORD1
       my_real
      .   X(3,*), V(3,*), MS(*), W(*), PM(NPROPM,*), GEO(NPROPG,*),
      .   BUFMAT(*), BUFGEO(*), PLD(*)  ,
@@ -160,6 +157,8 @@ C-----------------------------------------------
       TYPE (NLOCAL_STR_)  , TARGET :: NLOC_DMG 
       DOUBLE PRECISION SPHG_F6(4,6,NBGAUGE)
       TYPE(MATPARAM_STRUCT_)  , DIMENSION(NUMMAT) :: MATPARAM_TAB
+      TYPE(OUTPUT_), INTENT(INOUT) :: OUTPUT !< output structure
+      TYPE (MAT_ELEM_) ,INTENT(INOUT) :: MAT_ELEM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -174,7 +173,7 @@ C-----------------------------------------------
      .   OFF,DTX,DT05,RHOI,VI,
      .   PHI1,PHI2,PHI3,PHI4,PHI5,PHI6,PHI7,PHI8,
      .   KSI, ETA, ZETA,
-     .   VOLN(MVSIZ)  !local array to get rid of equivalence statements
+     .   VOLN(MVSIZ)
 C
       TYPE(G_BUFEL_)  ,POINTER :: GBUF     
 C-----------------------------------------------
@@ -294,7 +293,7 @@ C--------
             OFFSET = NELEM - 1
             NSG   =IPARG(10,NG)
             NVC   =IPARG(19,NG)
-            CALL INITBUF (IPARG    ,NG      ,                      
+            CALL INITBUF(IPARG    ,NG      ,                      
      2         MTN     ,NEL     ,NFT     ,IAD     ,ITY     ,       
      3         NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,       
      4         JTHE    ,JLAG    ,JMULT   ,JHBE    ,JIVF    ,       
@@ -331,7 +330,7 @@ C-----------------------------------------------
                   ELSE
                     LAMBDA(N)=PM(77,MX)+PM(78,MX)*WT(N)
                   END IF
-				  LAMBDA(N)=LAMBDA(N)*THEACCFACT
+            LAMBDA(N)=LAMBDA(N)*THEACCFACT
                 END IF
                END DO
               ELSE
@@ -386,7 +385,7 @@ C--------
             OFFSET = NELEM - 1
             NSG   =IPARG(10,NG)
             NVC   =IPARG(19,NG)
-            CALL INITBUF (IPARG    ,NG      ,                      
+            CALL INITBUF(IPARG    ,NG      ,                      
      2         MTN     ,NEL     ,NFT     ,IAD     ,ITY     ,       
      3         NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,       
      4         JTHE    ,JLAG    ,JMULT   ,JHBE    ,JIVF    ,       
@@ -400,7 +399,7 @@ C-----------------------------------------------
               CALL SPGRADT(
      1    X         ,MS        ,SPBUF     ,KXSP      ,IXSP      ,
      2    NOD2SP    ,ISPSYM    ,XSPSYM    ,WA        ,WASPH     ,
-     3    WT        ,WTR       ,WGRADT    )
+     3    WT        ,WTR       ,WGRADT    , LFT, LLT, NFT)
 C-----------------------------------------------
             ENDIF
             IF (IDDW>0) CALL STOPTIMEG(NG)
@@ -416,7 +415,7 @@ C
          IF(NSPMD>1) THEN
            IF(ITASK==0) THEN
              CALL STARTIME(93,1)
-             CALL SPMD_SPHGETG(WGRADT,WASPH,WGR)
+             CALL SPMD_SPHGETG(WGRADT,WASPH,WGR,SPH_IORD1)
              CALL STOPTIME(93,1)
            END IF
 C         /---------------/
@@ -436,8 +435,10 @@ C       /---------------/
          CALL MY_BARRIER
 C       /---------------/
          IF(ITASK==0)
-     1    CALL SPGTSYM(ISPCOND ,XFRAME  ,ISPSYM ,XSPSYM  ,WGRADT  ,
-     2                 WGRADTSM,WASPACT ,WGR    )
+     1    CALL SPGTSYM(
+     1   ISPCOND, XFRAME,  ISPSYM,  XSPSYM,
+     2   WGRADT,  WGRADTSM,WASPACT, WGR,
+     3   LFT,     LLT,     NFT)
 C       /---------------/
          CALL MY_BARRIER
 C       /---------------/
@@ -458,7 +459,7 @@ C--------
             OFFSET = NELEM - 1
             NSG   =IPARG(10,NG)
             NVC   =IPARG(19,NG)
-            CALL INITBUF (IPARG    ,NG      ,                      
+            CALL INITBUF(IPARG    ,NG      ,                      
      2         MTN     ,NEL     ,NFT     ,IAD     ,ITY     ,       
      3         NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,       
      4         JTHE    ,JLAG    ,JMULT   ,JHBE    ,JIVF    ,       
@@ -473,7 +474,7 @@ C-----------------------------------------------
      1    X         ,MS        ,SPBUF     ,KXSP      ,IXSP      ,
      2    NOD2SP    ,ISPSYM    ,XSPSYM    ,WA        ,WASPH     ,
      3    WGRADT    ,WGR       ,WGRADTSM  ,WLAPLT ,WSMCOMP,
-     4    LAMBDA    ,LAMBDR    )
+     4    LAMBDA    ,LAMBDR,   LFT, LLT, NFT   )
 C-----------------------------------------------
               GBUF => ELBUF_TAB(NG)%GBUF
               DO I=LFT,LLT
@@ -492,7 +493,7 @@ C-----------------------------------------------
      1    X         ,MS        ,SPBUF     ,KXSP      ,IXSP      ,
      2    NOD2SP    ,ISPSYM    ,XSPSYM    ,WA        ,WASPH     ,
      3    WGRADT    ,WGR       ,WGRADTSM  ,WLAPLT ,WSMCOMP,
-     4    LAMBDA    ,LAMBDR    )
+     4    LAMBDA    ,LAMBDR    ,LFT,LLT,NFT    )
 C-----------------------------------------------
               GBUF => ELBUF_TAB(NG)%GBUF
               DO I=LFT,LLT
@@ -612,7 +613,7 @@ C--------
             OFFSET = NELEM - 1
             NSG   =IPARG(10,NG)
             NVC   =IPARG(19,NG)
-            CALL INITBUF (IPARG    ,NG      ,                      
+            CALL INITBUF(IPARG    ,NG      ,                      
      2         MTN     ,NEL     ,NFT     ,IAD     ,ITY     ,       
      3         NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,       
      4         JTHE    ,JLAG    ,JMULT   ,JHBE    ,JIVF    ,       
@@ -636,15 +637,15 @@ C            a ne pas ecraser avt SPFORC.
 C-----------------------------------------------
              NDSVOID=0
              CALL SPSTRES(ELBUF_TAB,NG    ,
-     1    PM        ,GEO       ,X         ,V         ,MS        ,
-     2    W         ,SPBUF     ,WA        ,NLOC_DMG  ,
-     3    ITAB      ,PLD       ,BUFMAT    ,BUFGEO    ,PARTSAV   ,
-     4    FSAV      ,DT2T      ,IPARG     ,NPC       ,KXSP      ,
-     5    IXSP      ,NOD2SP    ,NELTST    ,ITYPTST   ,IPART     ,
-     6    IPARTSP   ,FV        ,NEL       ,IPM       ,GRESAV    ,
-     7    GRTH      ,IGRTH     ,TABLE     ,ISTRA     ,VOLN      ,
-     8    IGEO      ,IEXPAN    ,TEMP      ,ITASK     ,SPH2SOL   ,
-     9    MATPARAM_TAB,IBID)
+     1            PM        ,GEO       ,X         ,V         ,MS        ,
+     2            W         ,SPBUF     ,WA        ,NLOC_DMG  ,
+     3            ITAB      ,PLD       ,BUFMAT    ,BUFGEO    ,PARTSAV   ,
+     4            FSAV      ,DT2T      ,IPARG     ,NPC       ,KXSP      ,
+     5            IXSP      ,NOD2SP    ,NELTST    ,ITYPTST   ,IPART     ,
+     6            IPARTSP   ,FV        ,NEL       ,IPM       ,GRESAV    ,
+     7            GRTH      ,IGRTH     ,TABLE     ,ISTRA     ,VOLN      ,
+     8            IGEO      ,IEXPAN    ,TEMP      ,ITASK     ,SPH2SOL   ,
+     9            MAT_ELEM  ,IBID      ,OUTPUT    )
             ENDIF
             IF (IDDW>0) CALL STOPTIMEG(NG)
           END DO
@@ -697,7 +698,7 @@ C       /---------------/
 C       /---------------/
          IF(ITASK==0)THEN
            CALL STARTIME(93,1)
-           CALL SPMD_SPHGETW(SPBUF,WASPH,WA,WAR)
+           CALL SPMD_SPHGETW(SPBUF,WASPH,WA,WAR,SPH_IORD1)
 C a optimiser (1 seule comm)
            CALL SPMD_SPHGETSTB(STAB,STAB(1,NUMSPH+1))
            CALL STOPTIME(93,1)
@@ -717,7 +718,7 @@ C-----------------------------------------------
 c on doit mettre a jour wa(1),wa(2),wa(3) suite a sponfprs
             IF(NSPMD>1) THEN
               CALL STARTIME(93,1)
-              CALL SPMD_SPHGETW(SPBUF,WASPH,WA,WAR)
+              CALL SPMD_SPHGETW(SPBUF,WASPH,WA,WAR,SPH_IORD1)
               CALL STOPTIME(93,1)
             ENDIF
           ENDIF 
@@ -757,7 +758,7 @@ C      /---------------/
 C      /---------------/
 C       initialisation sur task i
         DO NS=ITASK+1,NSPHACT,NTHREAD
-          N	  =WASPACT(NS)
+          N    =WASPACT(NS)
 C         (re)used for storage of FX, FY, FZ, STIF :
           MYADRN  =KWASPH*(N-1)
           WA(MYADRN+10)=ZERO
@@ -1196,7 +1197,7 @@ C--------
           IF (IDDW>0) CALL STARTIMEG(NG)
           DO NELEM = 1,IPARG(2,NG),NVSIZ
             OFFSET = NELEM - 1
-            CALL INITBUF (IPARG    ,NG      ,                    
+            CALL INITBUF(IPARG    ,NG      ,                    
      2         MTN     ,NEL     ,NFT     ,KAD     ,ITY     ,     
      3         NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,     
      4         JTHE    ,JLAG    ,JMULT   ,JHBE    ,JIVF    ,     

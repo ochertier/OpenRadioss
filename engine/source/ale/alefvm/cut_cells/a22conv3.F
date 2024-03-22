@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,9 +26,10 @@ Chd|-- called by -----------
 Chd|        ACONVE                        source/ale/aconve.F           
 Chd|-- calls ---------------
 Chd|        MY_BARRIER                    source/system/machine.F       
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
-Chd|        I22BUFBRIC_MOD                ../common_source/modules/cut-cell-search_mod.F
-Chd|        I22TRI_MOD                    ../common_source/modules/cut-cell-search_mod.F
+Chd|        ALEFVM_MOD                    ../common_source/modules/ale/alefvm_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
+Chd|        I22BUFBRIC_MOD                ../common_source/modules/interfaces/cut-cell-search_mod.F
+Chd|        I22TRI_MOD                    ../common_source/modules/interfaces/cut-cell-search_mod.F
 Chd|====================================================================
       SUBROUTINE A22CONV3(            PHI  ,  FLUX ,   FLU1,
      .                    IOFF ,  QMV  ,   IFLG,
@@ -58,7 +59,8 @@ C   M o d u l e s
 C-----------------------------------------------
       USE I22TRI_MOD
       USE ELBUFDEF_MOD
-      USE I22BUFBRIC_MOD             
+      USE I22BUFBRIC_MOD
+      USE ALEFVM_MOD , only:ALEFVM_Param
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -75,15 +77,11 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "com08_c.inc"
-#include      "vect01_c.inc"
 #include      "task_c.inc"
 #include      "inter22.inc"
 #include      "param_c.inc"
 #include      "comlock.inc"
-#include      "alefvm.inc"
-!#include      "mmale51_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -275,21 +273,21 @@ C-----------------------------------------------
         !        N V A R = 6         !
         !----------------------------!
         ELSEIF (NVAR == 6) THEN
-          IF(IALEFVM>0)THEN
+          IF(ALEFVM_Param%IEnabled>0)THEN
               VAR => ELBUF_TAB(NG)%GBUF%MOM( 1 : LLT_ )       
           ENDIF
         !----------------------------!
         !        N V A R = 7         !
         !----------------------------!
         ELSEIF (NVAR == 7) THEN
-          IF(IALEFVM>0)THEN
+          IF(ALEFVM_Param%IEnabled>0)THEN
               VAR => ELBUF_TAB(NG)%GBUF%MOM( LLT_*1+1 : LLT_*1+LLT_ )       
           ENDIF
         !----------------------------!
         !        N V A R = 8         !
         !----------------------------!
         ELSEIF (NVAR == 8) THEN
-          IF(IALEFVM>0)THEN
+          IF(ALEFVM_Param%IEnabled>0)THEN
               VAR => ELBUF_TAB(NG)%GBUF%MOM( LLT_*2+1 : LLT_*2+LLT_ )         
           ENDIF
         !----------------------------!

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>    
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,15 +21,12 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
 C.../SCR18/
-C...recopie par defaut en spmd
-      COMMON /SCR18R/ DTFAC1(102),DTMIN1(102),DT_THERM,MIN_ASPECT,MIN_DEFV,
-     .        DTFSUB, DTMSUB, DTIN, DTMX, 
-     .        DMTMXS, DMNMXS, DEMXS, DMTMXK, DMNMXK, DEMXK, MASS0_START
+      COMMON /SCR18R/ DTFAC1(102),DTMIN1(102),MIN_ASPECT,MIN_DEFV,
+     .        DTIN, DTMX, 
+     .        MASS0_START
       my_real
-     .    DTFAC1,DTMIN1,DT_THERM,MIN_ASPECT,MIN_DEFV,
-     .    DTFSUB, DTMSUB, DTIN, DTMX, 
-     .    DMTMXS, DMNMXS, DEMXS, DMTMXK, DMNMXK, DEMXK, MASS0_START
-      COMMON /SCR18/ IDTMIN(102),IDTGR(102),KDTINT,KDTSMSTR,IDT_THERM,
-     .               NODADT_THERM
-      INTEGER IDTMIN,IDTGR,KDTINT,KDTSMSTR,IDT_THERM,
-     .               NODADT_THERM
+     .    DTFAC1,DTMIN1,MIN_ASPECT,MIN_DEFV,
+     .    DTIN, DTMX, 
+     .    MASS0_START
+      COMMON /SCR18/ IDTMIN(102),IDTGR(102),KDTINT
+      INTEGER IDTMIN,IDTGR,KDTINT

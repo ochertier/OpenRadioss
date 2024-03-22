@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,19 +27,30 @@ Chd|        MMAIN                         source/materials/mat_share/mmain.F
 Chd|-- calls ---------------
 Chd|        MQVISCB                       source/materials/mat_share/mqviscb.F
 Chd|        SIGEPS46                      source/materials/mat/mat046/sigeps46.F
+Chd|        ALE_MOD                       ../common_source/modules/ale/ale_mod.F
 Chd|====================================================================
-      SUBROUTINE M46LAW (LFT   ,LLT    ,NFT   ,MTN     ,
-     2                  PM     ,OFF    ,SIG   ,EINT    ,RHO   ,
-     3                  QOLD   ,VOL    ,UVAR  ,BUFMAT  ,STIFN ,
-     4                  MAT    ,NGL    ,NUVAR ,DT2T    ,NELTST,RHO0   ,
-     5                  ITYPTST,OFFG   ,JLAG  ,GEO     ,PID   ,SSP    ,
-     6                  AIRE   ,VOLN   ,VD2   ,DELTAX  ,VIS   ,D1     , 
-     7                  D2     ,D3     ,PNEW  ,PSH     ,Q     ,SSP_EQ ,
-     8                  WXX  ,
-     9                  WYY    ,WZZ    ,IPM   ,MSSA    ,DMELS ,DVOL   ,
-     A                  SOLD1  ,SOLD2  ,SOLD3 ,SOLD4   ,SOLD5 ,SOLD6  ,
-     B                  CONDE  ,VOL_AVG,DTEL  ,G_DT    ,NEL   ,D4     ,
-     C                  D5     ,D6     ,RHOREF  ,RHOSP   )
+      SUBROUTINE M46LAW(
+     1   LFT,     LLT,     NFT,     MTN,
+     2   PM,      OFF,     SIG,     EINT,
+     3   RHO,     QOLD,    VOL,     UVAR,
+     4   BUFMAT,  STIFN,   MAT,     NGL,
+     5   NUVAR,   DT2T,    NELTST,  RHO0,
+     6   ITYPTST, OFFG,    JLAG,    GEO,
+     7   PID,     SSP,     AIRE,    VOLN,
+     8   VD2,     DELTAX,  VIS,     D1,
+     9   D2,      D3,      PNEW,    PSH,
+     A   Q,       SSP_EQ,  WXX,     WYY,
+     B   WZZ,     IPM,     MSSA,    DMELS,
+     C   DVOL,    SOLD1,   SOLD2,   SOLD3,
+     D   SOLD4,   SOLD5,   SOLD6,   CONDE,
+     E   VOL_AVG, DTEL,    G_DT,    NEL,
+     F   D4,      D5,      D6,      RHOREF,
+     G   RHOSP,   ISMSTR,  ITY,     JSMS,
+     H   JTUR,    JTHE  ,  NPG )
+C-----------------------------------------------
+C   I m p l i c i t   T y p e s
+C-----------------------------------------------
+      USE ALE_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -51,21 +62,23 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
 #include      "nsvis_c.inc"
 #include      "param_c.inc"
+#include      "com04_c.inc"
 #include      "com08_c.inc"
 #include      "scr06_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER LFT     ,LLT    ,NFT     ,MTN, NUVAR,
-     .   MAT(MVSIZ),NGL(MVSIZ),PID(MVSIZ),IPM(NPROPMI,*),G_DT,NEL
-C
+      INTEGER, INTENT(IN) :: ISMSTR
+      INTEGER, INTENT(IN) :: ITY
+      INTEGER, INTENT(IN) :: JSMS
+      INTEGER, INTENT(IN) :: JTUR
+      INTEGER, INTENT(IN) :: JTHE,NPG
+      INTEGER LFT,LLT,NFT,MTN, NUVAR,MAT(MVSIZ),NGL(MVSIZ),PID(MVSIZ),IPM(NPROPMI,NUMMAT),G_DT,NEL
       INTEGER NELTST, ITYPTST,JLAG
       my_real DT2T
-C 
-      my_real  PM(NPROPM,*),OFF(*), SIG(NEL,6), EINT(*), 
+      my_real  PM(NPROPM,NUMMAT),OFF(*), SIG(NEL,6), EINT(*), 
      .         RHO(*),QOLD(*), VOL(*), UVAR(*), BUFMAT(*),
      .         OFFG(*),STIFN(*),GEO(*) ,SSP(*) ,
      .         AIRE(*) ,VOLN(*) ,VD2(*) ,DELTAX(*) ,VIS(*) , D1(*) , 
@@ -79,16 +92,17 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       my_real 
-     .E1,E2,E3,E4,E5,E6,P2,BID1,BID2,BID3,C1(MVSIZ),
-     .EP1(MVSIZ),EP2(MVSIZ),EP3(MVSIZ),EP4(MVSIZ),EP5(MVSIZ),EP6(MVSIZ),
-     .S1(MVSIZ) ,S2(MVSIZ) ,S3(MVSIZ) ,S4(MVSIZ) ,S5(MVSIZ) ,S6(MVSIZ),
-     .DE1(MVSIZ),DE2(MVSIZ),DE3(MVSIZ),DE4(MVSIZ),DE5(MVSIZ),DE6(MVSIZ),
-     .SV1(MVSIZ),SV2(MVSIZ),SV3(MVSIZ),SV4(MVSIZ),SV5(MVSIZ),SV6(MVSIZ),
-     .SO1(MVSIZ),SO2(MVSIZ),SO3(MVSIZ),SO4(MVSIZ),SO5(MVSIZ),SO6(MVSIZ)
-C
+     .  E1,E2,E3,E4,E5,E6,P2,BID1,BID2,BID3,C1(MVSIZ),
+     .  EP1(MVSIZ),EP2(MVSIZ),EP3(MVSIZ),EP4(MVSIZ),EP5(MVSIZ),EP6(MVSIZ),
+     .  S1(MVSIZ) ,S2(MVSIZ) ,S3(MVSIZ) ,S4(MVSIZ) ,S5(MVSIZ) ,S6(MVSIZ),
+     .  DE1(MVSIZ),DE2(MVSIZ),DE3(MVSIZ),DE4(MVSIZ),DE5(MVSIZ),DE6(MVSIZ),
+     .  SV1(MVSIZ),SV2(MVSIZ),SV3(MVSIZ),SV4(MVSIZ),SV5(MVSIZ),SV6(MVSIZ),
+     .  SO1(MVSIZ),SO2(MVSIZ),SO3(MVSIZ),SO4(MVSIZ),SO5(MVSIZ),SO6(MVSIZ)
       INTEGER NPAR,IADBUF,I,IBID,MX
       my_real  FACQ0
-C=======================================================================
+C-----------------------------------------------
+C   S o u r c e   L i n e s
+C-----------------------------------------------
       MX = MAT(1)
       NPAR   = IPM(9,MX)
       IADBUF = IPM(7,MX)
@@ -148,21 +162,26 @@ C-------------------------------------------
 C   BULK VISCOSITY AND TIME STEP COMPUTATION
 C   THIS SUBROUTINE RETURN THE NEW BULK VISCOSITY Q
 C-----------------------
-      CALL MQVISCB(PM     ,OFF     ,RHO     ,BID1  ,BID2    ,SSP   ,
-     2            BID3    ,STIFN   ,DT2T   ,NELTST ,ITYPTST ,AIRE  ,
-     3            OFFG    ,GEO     ,PID    ,VOLN   ,VD2     ,DELTAX,
-     4            VIS     ,D1      ,D2     ,D3     ,PNEW    ,PSH   ,
-     5            MAT     ,NGL     ,Q      ,SSP_EQ ,VOL     ,MSSA  ,
-     6            DMELS   ,IBID    ,FACQ0   ,CONDE  ,DTEL  ,G_DT   ,
-     7            IPM     ,RHOREF  ,RHOSP   )
+      CALL MQVISCB(
+     1   PM,      OFF,     RHO,     BID1,
+     2   BID2,    SSP,     BID3,    STIFN,
+     3   DT2T,    NELTST,  ITYPTST, AIRE,
+     4   OFFG,    GEO,     PID,     VOLN,
+     5   VD2,     DELTAX,  VIS,     D1,
+     6   D2,      D3,      PNEW,    PSH,
+     7   MAT,     NGL,     Q,       SSP_EQ,
+     8   VOL,     MSSA,    DMELS,   IBID,
+     9   FACQ0,   CONDE,   DTEL,    G_DT,
+     A   IPM,     RHOREF,  RHOSP,   NEL,
+     B   ITY,     ISMSTR,  JTUR,    JTHE,
+     C   JSMS,    NPG )
 C
       DO I=LFT,LLT
-        P2 = -(SOLD1(I)+SIG(I,1)+SOLD2(I)+
-     .         SIG(I,2)+SOLD3(I)+SIG(I,3))/THREE
+        P2 = -(SOLD1(I)+SIG(I,1)+SOLD2(I)+SIG(I,2)+SOLD3(I)+SIG(I,3))/THREE
         EINT(I)=EINT(I)-(Q(I)+QOLD(I)+P2)*DVOL(I)*HALF
         QOLD(I)=Q(I)
       ENDDO
-      IF(INCOMP==0 .OR. JLAG==1)THEN
+      IF(ALE%GLOBAL%INCOMP==0 .OR. JLAG==1)THEN
         DO I=LFT,LLT
          E1=D1(I)*SVIS(I,1)
          E2=D2(I)*SVIS(I,2)
@@ -176,38 +195,35 @@ C
       DO I=LFT,LLT
         EINT(I)=EINT(I)/VOL(I)
       ENDDO
-C DANS LE CAS QUASI COMPRESSIBLE ALE ET EULERIEN, L'ENERGIE
-C N'EST PAS TRANSPORTEE. ON N'ACCUMULE DONC PAS LES TERMES VISQUEUX
-C
+      
+C In case of quasi incompressible flow ALE & EULER, Enrgie is not convected.
+C no cumulation of viscous terms
 c      IF(INCOMP==1.AND. JLAG==0)THEN
 c       DO I=LFT,LLT
+c         E1=D1(I)*(SOLD1(I)+SIG(1,I))
+c         E2=D2(I)*(SOLD2(I)+SIG(2,I))
+c         E3=D3(I)*(SOLD3(I)+SIG(3,I))
+c         E4=D4(I)*(SOLD4(I)+SIG(4,I))
+c         E5=D5(I)*(SOLD5(I)+SIG(5,I))
+c         E6=D6(I)*(SOLD6(I)+SIG(6,I))
+c         EINT(I)=EINT(I)+(E1+E2+E3+E4+E5+E6)*(VOLN(I)-0.5*DVOL(I))*DT1*0.5
+c         EINT(I)=EINT(I)/VOL(I)
+c         QOLD(I)=Q(I)
+c       ENDDO
+c       RETURN
+c      ENDIF
+cC
+c      DO I=LFT,LLT
 c        E1=D1(I)*(SOLD1(I)+SIG(1,I))
 c        E2=D2(I)*(SOLD2(I)+SIG(2,I))
 c        E3=D3(I)*(SOLD3(I)+SIG(3,I))
 c        E4=D4(I)*(SOLD4(I)+SIG(4,I))
 c        E5=D5(I)*(SOLD5(I)+SIG(5,I))
 c        E6=D6(I)*(SOLD6(I)+SIG(6,I))
-c        EINT(I)=EINT(I)
-c     .       +(E1+E2+E3+E4+E5+E6)*(VOLN(I)-0.5*DVOL(I))*DT1*0.5
+c        EINT(I)=EINT(I)-(Q(I)+QOLD(I))*DVOL(I)*0.5+(E1+E2+E3+E4+E5+E6)*(VOLN(I)-0.5*DVOL(I))*DT1*0.5
 c        EINT(I)=EINT(I)/VOL(I)
 c        QOLD(I)=Q(I)
-c       ENDDO
-c       RETURN
-c      ENDIF
-cC
-c      DO 140 I=LFT,LLT
-c      E1=D1(I)*(SOLD1(I)+SIG(1,I))
-c      E2=D2(I)*(SOLD2(I)+SIG(2,I))
-c      E3=D3(I)*(SOLD3(I)+SIG(3,I))
-c      E4=D4(I)*(SOLD4(I)+SIG(4,I))
-c      E5=D5(I)*(SOLD5(I)+SIG(5,I))
-c      E6=D6(I)*(SOLD6(I)+SIG(6,I))
-c      EINT(I)=EINT(I)
-c     .       -(Q(I)+QOLD(I))*DVOL(I)*0.5
-c     .       +(E1+E2+E3+E4+E5+E6)*(VOLN(I)-0.5*DVOL(I))*DT1*0.5
-c      EINT(I)=EINT(I)/VOL(I)
-c      QOLD(I)=Q(I)
-c  140 CONTINUE
+c      ENDDO
 
 C------------------------------------------
       RETURN

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -40,7 +40,7 @@ Chd|        SENSOR_MOD                    share/modules1/sensor_mod.F
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
       SUBROUTINE HM_READ_PFLUID(NUMLOADP ,ILOADP  ,LLOADP ,FACLOADP ,NPC      ,
-     .                          SENSOR_TAB,IGRSURF ,UNITAB ,IFRAME   ,LSUBMODEL)
+     .                          SENSORS  ,IGRSURF ,UNITAB ,IFRAME   ,LSUBMODEL)
 C
 C-----------------------------------------------
 C   M o d u l e s
@@ -60,28 +60,21 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "scr03_c.inc"
 #include      "scr17_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "units_c.inc"
-#include      "warn_c.inc"
 #include      "r2r_c.inc"
-#include      "sysunit.inc"
-#include      "mvsiz_p.inc"
-#include      "submod_c.inc"
 #include      "tabsiz_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       TYPE (UNIT_TYPE_),INTENT(IN) ::UNITAB 
-      INTEGER NPC(SNPC),IFRAME(LISKN,NUMFRAM+1),
-     .        NUMLOADP, ILOADP(SIZLOADP,NLOADP), LLOADP(SLLOADP)
+      INTEGER NPC(SNPC),IFRAME(LISKN,NUMFRAM+1),NUMLOADP, ILOADP(SIZLOADP,NLOADP), LLOADP(SLLOADP)
       my_real FACLOADP(LFACLOAD,NLOADP)
 C-----------------------------------------------
       TYPE (SURF_)   ,TARGET, DIMENSION(NSURF)   :: IGRSURF
       TYPE(SUBMODEL_DATA),INTENT(IN)::LSUBMODEL(NSUBMOD)
-      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE (SENSORS_) ,INTENT(IN) :: SENSORS
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -106,39 +99,66 @@ C-----------------------------------------------
       DATA MESS/'FLUID PRESSURE LOAD DEFINITION          '/
 C----------------------------------------------------------------------------------        
 C   C o m m e n t s
-C----------------------------------------------------------------------------------        
+C----------------------------------------------------------------------------------   
+C                         /LOAD/PFLUID     /LOAD/PBLAST    
 C
-C                     /LOAD/PFLUID                                     /LOAD/PBLAST    
+C     LLOADP(1,K)   :    K=1,NLOADP_F     K=1+NLOADP_F,NLOADP_F+NLOADP_B  :    . . .  SEGMENT STORAGE (surface)
+C     ILOADP(1,K)   :    K=1,NLOADP_F     K=1+NLOADP_F,NLOADP_F+NLOADP_B  :    . . .  INTEGER STORAGE (option parameters)
+C     FACLOADP(1,K) :    K=1,NLOADP_F     K=1+NLOADP_F,NLOADP_F+NLOADP_B  :    . . .  REAL STORAGE    (option parameters)     
 C
+C----------------------------------------------------------------------------------   
+C                     /LOAD/PFLUID                                     /LOAD/PBLAST  
+C                       K=1,NLOADP_F                                     K=1+NLOADP_F,NLOADP_F+NLOADP_B  
 C----------------------------------------------------------------------------------        
-C     ILOADP(SIZLOADP,*)
+C     ILOADP(1:SIZLOADP,K) : INTEGER STORAGE (option parameters)
+C----------------------------------------------------------------------------------      
+C                     K=1,NLOADP_F                                    K=1+NLOADP_F,NLOADP_F+NLOADP_B 
+C
 C     ILOADP(1,K) :   4*NN (4 * Nb of segments)                       4*NN 
 C     ILOADP(2,K) :   ID                                              IS
 C     ILOADP(3,K) :   -                                               -
 C     ILOADP(4,K) :   IAD  Address of segments in LLOADP              IAD         
 C     ILOADP(5,K) :   2                                               3         
-C     ILOADP(6,K) :   Sensor No                                       IZ_UPDATE 
+C     ILOADP(6,K) :   Sensor id                                       IZ_UPDATE 
 C     ILOADP(7,K) :   FCT_HSP function No                             IABAC
 C     ILOADP(8,K) :   Dir_hsp (1, 2, 3)                               ID                              
-C     ILOADP(9,K) :   frahsp No                                       ITA_SHIFT               
-C     ILOADP(10,K):   FCT_PC function No                              NDT                             
-C     IILOADP(11,K):  FCT_VEL function No                           
-C     ILOADP(12,K):   Dir_vel (1, 2, 3)                        
-C     ILOADP(13,K):   fravel No            
-C----------------------------------------------------------------------------------        
+C     ILOADP(9,K) :   frahsp id                                       ITA_SHIFT               
+C     ILOADP(10,K):   FCT_CX function No                              NDT                             
+C     ILOADP(11,K):   FCT_VEL function No                             IMODEL
+C     ILOADP(12,K):   Dir_vel (1, 2, 3)                               -
+C     ILOADP(13,K):   fravel id                                       -
+C----------------------------------------------------------------------------------   
+C                     /LOAD/PFLUID                                     /LOAD/PBLAST  
+C                       K=1,NLOADP_F                                     K=1+NLOADP_F,NLOADP_F+NLOADP_B   
+C----------------------------------------------------------------------------------   
+C     LLOADP(1:SLLOADP,K) : SEGMENT STORAGE (surface)
+C----------------------------------------------------------------------------------      
+C                     K=1,NLOADP_F                                    K=1+NLOADP_F,NLOADP_F+NLOADP_B 
+C    
 C     LLOADP(1,K) :   NODE1                                           NODE1            
 C     LLOADP(2,K) :   NODE2                                           NODE2            
 C     LLOADP(3,K) :   NODE3                                           NODE3            
 C     LLOADP(4,K) :   NODE4                                           NODE4             
+C----------------------------------------------------------------------------------   
+C                     /LOAD/PFLUID                                     /LOAD/PBLAST  
+C                       K=1,NLOADP_F                                     K=1+NLOADP_F,NLOADP_F+NLOADP_B   
 C----------------------------------------------------------------------------------        
-C     FACLOADP(LFACLOAD,*)
+C     FACLOADP(LFACLOAD,K) : REAL STORAGE    (option parameters) 
+C----------------------------------------------------------------------------------      
+C    
 C     FACLOADP( 1,K) = Fscaley_hsp                                    TDET                                      
 C     FACLOADP( 2,K) = ONE/Ascalex_hsp                                XDET     
 C     FACLOADP( 3,K) = Fscaley_pc                                     YDET                                        
 C     FACLOADP( 4,K) = ONE/Ascalex_pc                                 ZDET     
 C     FACLOADP( 5,K) = Fscaley_vel                                    WTNT                                        
 C     FACLOADP( 6,K) = ONE/Ascalex_vel                                P0_REF   
-C     FACLOADP( 7,K) = UNUSED		                              ZERO ! TA_SHIFT 
+C     FACLOADP( 7,K) = -                                  ZERO ! TA_SHIFT 
+C     FACLOADP( 8,K) = -                                              Nx_SURF
+C     FACLOADP( 9,K) = -                                              Ny_SURF
+C     FACLOADP(10,K) = -                                              Nz_SURF
+C     FACLOADP(11,K) = -                                              HC
+C     FACLOADP(12,K) = -                                              alpha_zc
+C     FACLOADP(13,K) = -                                              TSTOP 
 C----------------------------------------------------------------------------------        
 C   S o u r c e   L i n e s
 C----------------------------------------------------------------------------------        
@@ -162,21 +182,15 @@ C--------------------------------------------------
      .                          OPTION_TITR = TITR)
 
         IFLAGUNIT = 0
-        DO J=1,NUNITS
+        DO J=1,UNITAB%NUNITS
           IF (UNITAB%UNIT_ID(J) == UID) THEN
             IFLAGUNIT = 1
             EXIT
           ENDIF
         ENDDO
         IF (UID /= 0.AND.IFLAGUNIT  == 0) THEN
-          CALL ANCMSG(MSGID   = 659,
-     .                ANMODE  = ANINFO,
-     .                MSGTYPE = MSGERROR,
-     .                I2      = UID,
-     .                I1      = ID,
-     .                C1      = 'FLUID PRESSURE LOAD',
-     .                C2      = 'FLUID PRESSURE LOAD',
-     .                C3      = TITR)  
+          CALL ANCMSG(MSGID=659, ANMODE= ANINFO, MSGTYPE=MSGERROR,
+     .                I2=UID,I1=ID,C1='FLUID PRESSURE LOAD',C2='FLUID PRESSURE LOAD',C3= TITR)  
         ENDIF
 C-----------        
         ILOADP(2,K) = ID  !load identifier
@@ -209,23 +223,18 @@ C-----------
             ENDIF                                                                    
           ENDDO                                                                      
         ENDIF                                                                        
-	       ILOADP(1,K)=4*NN                                                             
+                 ILOADP(1,K)=4*NN                                                             
         !-----------  
         !possible Sensor                                                               
-	TSENS=0                                                                      
-        DO J=1,NSENSOR                                                               
-        	  IF(ISENS /= 0) THEN                                                
-	            IF (ISENS == SENSOR_TAB(J)%SENS_ID) TSENS=J
-        	  ENDIF                                                              
-        	ENDDO                                                                
-        	IF((TSENS == 0).AND.(ISENS /= 0))THEN                               
-                  CALL ANCMSG(MSGID=930,                                             
-     .                      MSGTYPE=MSGERROR,                                        
-     .                      ANMODE=ANINFO_BLIND_1,                                   
-     .                      I1=ID,                                                   
-     .                      C1=TITR,                                                 
-     .                      I2=ISENS)                                                
-        	ENDIF                                                                
+                 TSENS=0                                                                      
+        DO J=1,SENSORS%NSENSOR                                                               
+            IF(ISENS /= 0) THEN                                                
+                      IF (ISENS == SENSORS%SENSOR_TAB(J)%SENS_ID) TSENS=J
+            ENDIF                                                              
+          ENDDO                                                                
+          IF((TSENS == 0).AND.(ISENS /= 0))THEN                               
+                  CALL ANCMSG(MSGID=930, MSGTYPE=MSGERROR, ANMODE=ANINFO_BLIND_1, I1=ID, C1=TITR, I2=ISENS)                                                
+          ENDIF                                                                
         !-----------  
         !Input file - Reader                                                               
         CALL HM_GET_INTV('fct_hsp',NCUR_HSP,IS_AVAILABLE,LSUBMODEL)                  
@@ -242,12 +251,7 @@ C-----------
             IF(NPC(NFUNCT+J+1)  == NCUR_HSP)FUN_HSP=J                                
           ENDDO                                                                      
           IF(FUN_HSP  == 0)THEN                                                      
-            CALL ANCMSG(MSGID=929,                                                   
-     .                  MSGTYPE=MSGERROR,                                            
-     .                  ANMODE=ANINFO_BLIND_1,                                       
-     .                  I1=ID,                                                       
-     .                  C1=TITR,                                                     
-     .                  I2=NCUR_HSP)                                                 
+            CALL ANCMSG(MSGID=929, MSGTYPE=MSGERROR, ANMODE=ANINFO_BLIND_1, I1=ID, C1=TITR, I2=NCUR_HSP)                                                 
           ENDIF                                                                      
         ENDIF                                                                        
         !-----------   
@@ -261,15 +265,8 @@ C-----------
         IF(XYZ(1:1)  == char_Z)ICFIELD8=3    
         ! XYZ mandatory if hydrostatic pressure (HSP) expected                                        
         IF (NCUR_HSP /= 0)THEN                                                       
-          IF(XYZ(1:1) /= char_X  .AND.                                             
-     .       XYZ(1:1) /= char_Y  .AND.                                             
-     .       XYZ(1:1) /= char_Z  ) THEN                                            
-             CALL ANCMSG(MSGID=927,                                                  
-     .                   MSGTYPE=MSGERROR,                                           
-     .                   ANMODE=ANINFO_BLIND_1,                                      
-     .                   I1=ID,                                                      
-     .                   C1=TITR,                                                    
-     .                   C2=XYZ)                                                     
+          IF(XYZ(1:1) /= char_X  .AND. XYZ(1:1) /= char_Y  .AND. XYZ(1:1) /= char_Z) THEN                                            
+             CALL ANCMSG(MSGID=927, MSGTYPE=MSGERROR, ANMODE=ANINFO_BLIND_1, I1=ID, C1=TITR, C2=XYZ)                                                     
           ENDIF                                                                      
         ENDIF                                                                        
                                                                                                                                                                          
@@ -278,13 +275,8 @@ C-----------
         CALL HM_GET_INTV('frahsp_ID',IFRA1,IS_AVAILABLE,LSUBMODEL)                   
         !-----------                                                       
         IF(IFRA1 == 0 .AND. SUB_INDEX /= 0)THEN                                      
-          CALL ANCMSG(MSGID   = 1712,                                                
-     .                ANMODE  = ANINFO,                                              
-     .                MSGTYPE = MSGWARNING,                                          
-     .                I1      = ID,                                                  
-     .                I2      = SUB_ID,                                              
-     .                C1      = '/LOAD/PFLUID - frahsp_ID=0',                                      
-     .                C2      = TITR)                                                
+          CALL ANCMSG(MSGID=1712, ANMODE=ANINFO, MSGTYPE=MSGWARNING,                                          
+     .                I1=ID, I2=SUB_ID, C1='/LOAD/PFLUID - frahsp_ID=0', C2=TITR)                                            
         ENDIF                                                                        
                                                                                      
         DO J=0,NUMFRAM                                                               
@@ -294,12 +286,7 @@ C-----------
         ENDDO                                                                        
         IF(IFRA1 == 0) ICFIELD9 = 1                                                  
         IF (IFRA1  /= 0 .AND. ICFIELD9 == 0) THEN                                    
-          CALL ANCMSG(MSGID=928,                                                     
-     .                MSGTYPE=MSGERROR,                                              
-     .                ANMODE=ANINFO_BLIND_1,                                         
-     .                I1=ID,                                                         
-     .                C1=TITR,                                                       
-     .                I2=IFRA1)                                                      
+          CALL ANCMSG(MSGID=928, MSGTYPE=MSGERROR, ANMODE=ANINFO_BLIND_1, I1=ID, C1=TITR, I2=IFRA1)                                                      
         ENDIF                                                                        
         !-----------    
         !Reader                                                             
@@ -317,12 +304,7 @@ C-----------
             IF(NPC(NFUNCT+J+1)  == NCUR_CX)FUN_CX=J                                  
           ENDDO                                                                      
           IF(FUN_CX  == 0)THEN                                                       
-            CALL ANCMSG(MSGID=929,                                                   
-     .                  MSGTYPE=MSGERROR,                                            
-     .                  ANMODE=ANINFO_BLIND_1,                                       
-     .                  I1=ID,                                                       
-     .                  C1=TITR,                                                     
-     .                  I2=NCUR_CX)                                                  
+            CALL ANCMSG(MSGID=929, MSGTYPE=MSGERROR, ANMODE=ANINFO_BLIND_1, I1=ID, C1=TITR, I2=NCUR_CX)                                                  
           ENDIF                                                                      
         ENDIF                                                                        
         !-----------   
@@ -341,12 +323,7 @@ C-----------
             IF(NPC(NFUNCT+J+1)  == NCUR_VEL)FUN_VEL=J                                
           ENDDO                                                                      
           IF(FUN_VEL  == 0)THEN                                                      
-            CALL ANCMSG(MSGID=929,                                                   
-     .                  MSGTYPE=MSGERROR,                                            
-     .                  ANMODE=ANINFO_BLIND_1,                                       
-     .                  I1=ID,                                                       
-     .                  C1=TITR,                                                     
-     .                  I2=NCUR_VEL)                                                 
+            CALL ANCMSG(MSGID=929, MSGTYPE=MSGERROR, ANMODE=ANINFO_BLIND_1, I1=ID, C1=TITR, I2=NCUR_VEL)                                                 
           ENDIF                                                                      
         ENDIF                                                                        
         !-----------                                                                 
@@ -357,15 +334,8 @@ C-----------
         IF(XYZ1(1:1)  == char_Y)ICFIELD12=2                                          
         IF(XYZ1(1:1)  == char_Z)ICFIELD12=3                                          
         IF (NCUR_VEL /= 0)THEN                                                       
-          IF(XYZ1(1:1)   /= char_X  .AND.                                            
-     .       XYZ1(1:1)   /= char_Y  .AND.                                            
-     .       XYZ1(1:1)   /= char_Z  ) THEN                                           
-             CALL ANCMSG(MSGID=927,                                                  
-     .                   MSGTYPE=MSGERROR,                                           
-     .                   ANMODE=ANINFO_BLIND_1,                                      
-     .                   I1=ID,                                                      
-     .                   C1=TITR,                                                    
-     .                   C2=XYZ1)                                                    
+          IF(XYZ1(1:1) /= char_X  .AND. XYZ1(1:1) /= char_Y .AND. XYZ1(1:1)  /= char_Z) THEN                                           
+             CALL ANCMSG(MSGID=927, MSGTYPE=MSGERROR, ANMODE=ANINFO_BLIND_1, I1=ID, C1=TITR, C2=XYZ1)                                                    
           ENDIF                                                                      
         ENDIF                                                                        
 
@@ -373,13 +343,8 @@ C-----------
         CALL HM_GET_INTV('fravel_ID',IFRA2,IS_AVAILABLE,LSUBMODEL)                   
         !-----------                                                                 
         IF(IFRA2 == 0 .AND. SUB_INDEX /= 0)THEN                                      
-          CALL ANCMSG(MSGID   = 1712,                                                
-     .                ANMODE  = ANINFO,                                              
-     .                MSGTYPE = MSGWARNING,                                          
-     .                I1      = ID,                                                  
-     .                I2      = SUB_ID,                                              
-     .                C1      = '/LOAD/PFLUID - fravel_ID=0',                                      
-     .                C2      = TITR)                                                
+          CALL ANCMSG(MSGID=1712, ANMODE=ANINFO, MSGTYPE=MSGWARNING,                                          
+     .                I1 = ID, I2 = SUB_ID, C1 = '/LOAD/PFLUID - fravel_ID=0', C2 = TITR)                                        
         ENDIF                                                                        
         DO J=0,NUMFRAM                                                               
           IF(IFRA2  == IFRAME(4,J+1)) THEN                                           
@@ -388,12 +353,7 @@ C-----------
         ENDDO                                                                        
         IF(IFRA2 == 0) ICFIELD13 = 1                                                 
         IF (IFRA2 /= 0  .AND. ICFIELD13 == 0) THEN                                   
-          CALL ANCMSG(MSGID=928,                                                     
-     .                MSGTYPE=MSGERROR,                                              
-     .                ANMODE=ANINFO_BLIND_1,                                         
-     .                I1=ID,                                                         
-     .                C1=TITR,                                                       
-     .                I2=IFRA2)                                                      
+          CALL ANCMSG(MSGID=928, MSGTYPE=MSGERROR, ANMODE=ANINFO_BLIND_1, I1=ID, C1=TITR, I2=IFRA2)                                                      
         ENDIF                                                                        
 
         ILOADP(5,K)=2 !type of load 2:PFLUID
@@ -417,7 +377,7 @@ C-----------
           FACLOADP( 5,K) = FCY2                                                       
           FACLOADP( 6,K) = ONE/FCX2                                                   
           !Multidomains -> numbering common segments (one single time)                
-	  IF (IDDOM > 0) NN = NN-ISURF_R2R(1,IS)                                      
+            IF (IDDOM > 0) NN = NN-ISURF_R2R(1,IS)                                      
         ENDIF    
 
         !OUTPUT STARTER LISTING FILE

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>    
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -141,12 +141,12 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
        SOL8TNL(28,1) = .0000016610 !.0000021385 
        TET4TNL(28,1) = .0000002680 !.0000003168 
        TET10TNL(28,1)= .0000011490 !.0000013620 
-!     LAW 33	0 fct
+!     LAW 33  0 fct
        SOL1TNL(33,1) = .0000002991 !.0000004453 
        SOL8TNL(33,1) = .0000019190 !.0000021870 
        TET4TNL(33,1) = .0000002858 !.0000004027 
        TET10TNL(33,1)= .0000011570 !.0000015750 
-!     LAW 33	1 fct
+!     LAW 33  1 fct
        SOL1TNL(33,2) = .0000004217  !.0000006103 
        SOL8TNL(33,2) = .0000027120  !.0000025320 
        TET4TNL(33,2) = .0000004088 !.0000005659
@@ -345,20 +345,20 @@ C M = 2
        TET10TNL(81,1)= .0000014370 !.0000012470    
 !     LAW 82
        ! M = 1
-       SOL1TNL(82,1) = .0000004210 !.0000005645  
-       SOL8TNL(82,1) = .0000032190 !.0000043090  
-       TET4TNL(82,1) = .0000004198 !.0000005553  
-       TET10TNL(82,1)= .0000016170 !.0000020840  
+       SOL1TNL(82,1) = .0000005600
+       SOL8TNL(82,1) = .0000045000
+       TET4TNL(82,1) = .0000005500
+       TET10TNL(82,1)= .0000022000
        ! M = 2
-       SOL1TNL(82,2) = .0000005122 !.0000006735  
-       SOL8TNL(82,2) = .0000034600 !.0000045120  
-       TET4TNL(82,2) = .0000005127 !.0000006743  
-       TET10TNL(82,2)= .0000020060 !.0000025890  
+       SOL1TNL(82,2) = .0000006800
+       SOL8TNL(82,2) = .0000054400
+       TET4TNL(82,2) = .0000006700
+       TET10TNL(82,2)= .0000026900
        ! M = 3
-       SOL1TNL(82,3) = .0000006320 !.0000007826  
-       SOL8TNL(82,3) = .0000040000 !.0000052410  
-       TET4TNL(82,3) = .0000006246 !.0000008028  
-       TET10TNL(82,3)= .0000022680 !.0000030570  
+       SOL1TNL(82,3) = .0000008800
+       SOL8TNL(82,3) = .0000071000
+       TET4TNL(82,3) = .0000008800
+       TET10TNL(82,3)= .0000036000
 !     LAW 83 (user solid property) IGT=43
        SOL1TNL(83,1) = .0000010200 !.0000013690  
        SOL8TNL(83,1) = .0000010200 !.0000013690  
@@ -465,6 +465,8 @@ C M = 2
 !        8 --> IGTYP  = 43
 !        9 --> ISOLID = 18 H8C
 !        10--> IGTYP  = Thickshell 20 or 21 or 22
+!        11--> JHBE=15 : fixed part of element cost
+!        12--> JHBE=15 : overcost for N>1
 !        NLOCAL_OPTION
 !        1 --> sol
 !        2 --> shell
@@ -485,6 +487,9 @@ C M = 2
          SOLTELT(8)  =.0000008152 !.0000012750
          SOLTELT(9)  =.0000023960
          SOLTELT(10) =.0000003461
+         SOLTELT(11) =.0000009980
+         SOLTELT(12) =.0000000854
+
          TET4TELT(1) =.0000002920 !.0000004744 
          TET4TELT(2) =.0000013046 !.0000016460 
          TET10TELT(1)=.0000014747 !.0000018340 
@@ -500,6 +505,8 @@ C M = 2
          SOLTELT(8)  =.0000006793
          SOLTELT(9)  =.0000019970
          SOLTELT(10) =.0000002914
+         SOLTELT(11) =.0000008400
+         SOLTELT(12) =.0000000702
          TET4TELT(1) =.0000002433
          TET4TELT(2) =.0000010870
          TET10TELT(1)=.0000012200 
@@ -1239,7 +1246,7 @@ C Temps de traitement de la partie elementaire sans la loi materielle fonction d
          RUPTURE_SOL12(1,1)  = .00000017710     
          RUPTURE_TET4(1,1)   = .00000008021     
          RUPTURE_TET10(1,1)  = .00000033420     
-	 ! MLN >=28 or /=49
+   ! MLN >=28 or /=49
          RUPTURE_SOL(1,2)    = .00000002696     
          RUPTURE_SOL12(1,2)  = .00000015790     
          RUPTURE_TET4(1,2)   = .00000002663     

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,7 +25,7 @@ Chd|  HM_GET_FLOAT_ARRAY_INDEX      source/devtools/hm_reader/hm_get_float_array
 Chd|-- called by -----------
 Chd|        HM_READ_ADMAS                 source/tools/admas/hm_read_admas.F
 Chd|        HM_READ_BEM                   source/loads/bem/hm_read_bem.F
-Chd|        HM_READ_DRAPE                 source/properties/composite_options/drape/hm_read_drape.F
+Chd|        HM_READ_EBCS_INLET            source/boundary_conditions/ebcs/hm_read_ebcs_inlet.F
 Chd|        HM_READ_FAIL_INIEVO           source/materials/fail/inievo/hm_read_fail_inievo.F
 Chd|        HM_READ_FAIL_ORTHBIQUAD       source/materials/fail/orthbiquad/hm_read_fail_orthbiquad.F
 Chd|        HM_READ_FAIL_TAB_OLD          source/materials/fail/tabulated/hm_read_fail_tab_old.F
@@ -89,6 +89,7 @@ Chd|        HM_READ_TABLE1_0              source/tools/curve/hm_read_table1_0.F
 Chd|        HM_READ_TABLE1_1              source/tools/curve/hm_read_table1_1.F
 Chd|        HM_READ_TABLE2_0              source/tools/curve/hm_read_table2_0.F
 Chd|        HM_READ_TABLE2_1              source/tools/curve/hm_read_table2_1.F
+Chd|        HM_READ_VISC_LPRONY           source/materials/visc/hm_read_visc_lprony.F
 Chd|        HM_READ_VISC_PRONY            source/materials/visc/hm_read_visc_prony.F
 Chd|        HM_READ_XREF                  source/loads/reference_state/xref/hm_read_xref.F
 Chd|        LECFILL                       source/elements/initia/lecfill.F
@@ -133,9 +134,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "nchar_c.inc"
-#include      "submod_c.inc"
-#include      "sysunit.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C----------------------------------------------- 
@@ -149,9 +147,6 @@ C OUTPUT ARGUMENTS
      .  INTENT(OUT)::RVAL
       LOGICAL,INTENT(OUT)::IS_AVAILABLE
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,J,VALUE_TYPE,SUB_ID,IFLAGUNIT,UID
@@ -160,10 +155,6 @@ C-----------------------------------------------
       REAL*8 DVAL,LENGTH_DIM,MASS_DIM,TIME_DIM
       LOGICAL(KIND=C_BOOL) C_IS_AVAILABLE
 C-----------------------------------------------
-C   E x t e r n a l   F u n c t i o n s
-C-----------------------------------------------
-C=======================================================================
-C--------------------------------------------------
         C_IS_AVAILABLE = .FALSE.
         LENGTH_DIM = ZERO
         MASS_DIM = ZERO
@@ -188,7 +179,7 @@ C--------------------------------------------------
         FAC_M = ZERO
         FAC_L = ZERO
         FAC_T = ZERO  
-        DO J=1,NUNITS                         
+        DO J=1,UNITAB%NUNITS                         
           IF (UNITAB%UNIT_ID(J) == UID) THEN    
             FAC_M = UNITAB%FAC_M(J)
             FAC_L = UNITAB%FAC_L(J)

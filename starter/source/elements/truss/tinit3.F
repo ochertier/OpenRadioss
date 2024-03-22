@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -32,19 +32,22 @@ Chd|        TCOORI                        source/elements/truss/tcoori.F
 Chd|        TIBUF3                        source/elements/truss/tibuf3.F
 Chd|        TMASS                         source/elements/truss/tmass.F 
 Chd|        TSIGINI                       source/elements/truss/tsigini.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        BPRELOAD_MOD                  share/modules1/bpreload_mod.F 
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
       SUBROUTINE TINIT3(ELBUF_STR,
      1                  IC     ,PM         ,X        ,GEO    ,XMAS   ,
      2                  DTELEM ,NFT        ,NEL      ,STIFN  ,PARTSAV,
      3                  V      ,IPART      ,MST      ,STIFINT,STT    ,
-     4                  IGEO   ,NSIGTRUSS  ,SIGTRUSS ,PTTRUSS)
+     4                  IGEO   ,NSIGTRUSS  ,SIGTRUSS ,PTTRUSS,
+     5                  PRELOAD_A,IPRELD )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE ELBUFDEF_MOD
       USE MESSAGE_MOD
+      USE BPRELOAD_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -61,18 +64,19 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "scr03_c.inc"
 #include      "scr17_c.inc"
-#include      "warn_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IC(NIXT,*),IPART(*),IGEO(NPROPGI,*),PTTRUSS(*)
       INTEGER NFT,NEL,NSIGTRUSS
+      INTEGER , INTENT (IN   )  :: IPRELD
       my_real
      .   PM(*),X(*), GEO(NPROPG,*),XMAS(*),DTELEM(*),
      .   STIFN(*),PARTSAV(20,*),V(*),MST(*),STIFINT(*),STT(*),
      .   SIGTRUSS(NSIGTRUSS,*)
 C
       TYPE(ELBUF_STRUCT_), TARGET :: ELBUF_STR
+      TYPE(PREL1D_) ,      TARGET :: PRELOAD_A
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -90,7 +94,7 @@ C-----------------------------------------------
      .   TITR
       DATA IDMIN /-1/, IDMAX /-1/
       my_real
-     .     LGTHMIN, LGTHMAX,XNOR
+     .     LGTHMIN, LGTHMAX,XNOR,UNDAMP,CC1
       DATA LGTHMIN /-1/, LGTHMAX /-1/
 C
       TYPE(G_BUFEL_),POINTER :: GBUF
@@ -162,6 +166,15 @@ C
       DO I=1,NEL
         DTELEM(NDEPAR + I) = DTX(I)
       ENDDO
+!---  /PRELOAD/AXIAL     
+      IF (IPRELD>0) THEN
+          CC1 =TWO*SQRT(TWO)
+          DO I=1,NEL
+            UNDAMP = CC1*MST(NFT+I)*GBUF%LENGTH(I)/DTX(I)
+            GBUF%BPRELD(I)     = PRELOAD_A%preload
+            GBUF%BPRELD(I+NEL) = UNDAMP*PRELOAD_A%damp
+          ENDDO
+      END IF
 C---
       RETURN
       END

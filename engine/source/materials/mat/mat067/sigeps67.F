@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -49,7 +49,6 @@ C-----------------------------------------------
 C   C O M M O N 
 C-----------------------------------------------
 #include "param_c.inc"
-#include "scr17_c.inc"
 C----------------------------------------------------------------
 C  I N P U T   A R G U M E N T S
 C----------------------------------------------------------------
@@ -106,11 +105,11 @@ C----------------------------------------------------------------
 C SET INITIAL MATERIAL CONSTANTS
       PEXT = UPARAM(1)
       IF(TIME==ZERO)THEN
-        T0	= UPARAM(2)
-        CPA	= PM(186)
-        CPB	= PM(187)
-        CPC	= PM(188)
-        RMW	= PM(189)
+        T0  = UPARAM(2)
+        CPA  = PM(186)
+        CPB  = PM(187)
+        CPC  = PM(188)
+        RMW  = PM(189)
         T2=T0*T0
         T3=T0*T2
         H0=CPA*T0+HALF*CPB*T2+THIRD*CPC*T3

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,6 +25,7 @@ Chd|  EBCS_VOL2SEG                  source/boundary_conditions/ebcs/ebcs_vol2seg
 Chd|-- called by -----------
 Chd|        EBCS_MAIN                     source/boundary_conditions/ebcs/ebcs_main.F
 Chd|-- calls ---------------
+Chd|        ALE_MOD                       ../common_source/modules/ale/ale_mod.F
 Chd|        SEGVAR_MOD                    share/modules/segvar_mod.F    
 Chd|====================================================================
       SUBROUTINE EBCS_VOL2SEG(NSEG,SURF_NODES,ISEG,SEGVAR,
@@ -33,17 +34,11 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE SEGVAR_MOD
+      USE ALE_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "param_c.inc"
-#include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "conv_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -213,7 +208,7 @@ C VALEURS FLUIDE RENTRANT
 C        ROIN =RO
 C        ENIN =EN
 C VALEURS FLUIDE SORTANT
-        SEGAD=NVCONV*(KSEG-1)
+        SEGAD=ALE%GLOBAL%NVCONV*(KSEG-1)
         ROOU = SEGVAR%RHO(KSEG)
         ENOU = SEGVAR%EINT(KSEG)
 c        write(7,*)iseg(is),enin,roin,pn,vel,vn,s

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -55,10 +55,12 @@ Chd|====================================================================
      E              DRAD       ,IGEO   ,FILLSOL       ,PM_STACK ,IWORKSH  ,
      F              IT19       ,KXIG3D ,IXIG3D        ,INTFRIC  ,IPARTS   ,
      G              TAGPRT_FRIC,IPARTFRICS,IPARTFRICM ,INTBUF_FRIC_TAB,NRT_IGE,
-     I              IREM_GAP   ,GAPM_MX,GAPS_MX       ,GAPM_L_MX,GAPS_L_MX)
+     I              IREM_GAP   ,GAPM_MX,GAPS_MX       ,GAPM_L_MX,GAPS_L_MX,
+     J              IPARTT     ,IPARTP ,IPARTR        )
 C-----------------------------------------------
 C   M o d u l e s
-C----------------------------------------------- 
+C-----------------------------------------------
+      USE MY_ALLOC_MOD 
       USE MESSAGE_MOD
       USE INTBUF_FRIC_MOD
       USE GROUPDEF_MOD
@@ -67,22 +69,16 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
 #include      "remesh_c.inc"
-#include      "scr03_c.inc"
 #include      "scr05_c.inc"
 #include      "scr08_c.inc"
 #include      "scr17_c.inc"
 #include      "units_c.inc"
-#include      "warn_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -105,6 +101,9 @@ C-----------------------------------------------
      .   MS(*),WA(*),GAP_S(*),GAP_M(*),
      .   AREAS(*),THK(*),THK_PART(*),
      .   GAP_S_L(*),GAP_M_L(*), FILLSOL(*),PM_STACK(20,*)
+      INTEGER, DIMENSION(NUMELT), INTENT(IN) :: IPARTT
+      INTEGER, DIMENSION(NUMELP), INTENT(IN) :: IPARTP
+      INTEGER, DIMENSION(NUMELR), INTENT(IN) :: IPARTR
       INTEGER ID
       CHARACTER*nchartitle, TITR
       TYPE(INTBUF_FRIC_STRUCT_) INTBUF_FRIC_TAB(*)
@@ -116,7 +115,7 @@ C-----------------------------------------------
      .   MG, NUM, NPT, LL, L, NN, NELTG,N1,N2,N3,N4,IE,
      .   IP, NLEV, MYLEV, K, P, R, T,IGTYP,IPGMAT,IGMAT,
      .   ISUBSTACK,NELIG3D, COIN_IGE(8), IPID, PX, PY, PZ, IAD ,IPFMAX,IPL,
-     .   IPFLMAX,IPG
+     .   IPFLMAX,IPG,NINV
       INTEGER JPERM(4)
       LOGICAL TYPE18
       my_real
@@ -124,6 +123,7 @@ C-----------------------------------------------
      .   GAPTMP, GAPSCALE,SX1,SY1,SZ1,SX2,SY2,SZ2,SX3,SY3,SZ3,
      .   SLSFAC,XL
       my_real, dimension(:), allocatable :: GAP_S_L_TMP
+      INTEGER, DIMENSION(:),ALLOCATABLE  :: TAGELEMS,INDEXE
       DATA JPERM/2,3,4,1/
 C-----------------------------------------------
 C   S o u r c e   L i n e s
@@ -220,16 +220,16 @@ C------------------------------------
        DO I=1,NUMELC
         MG=IXC(6,I)
         IGTYP = IGEO(11,MG)
-	IP = IPARTC(I)
-	IF ( THK_PART(IP) /= ZERO .AND. IINTTHICK == 0) THEN
-	  DX=HALF*THK_PART(IP)
-	ELSEIF ( THK(I)  /= ZERO .AND. IINTTHICK == 0) THEN
-	  DX=HALF*THK(I)
-	ELSEIF(IGTYP == 17 .OR. IGTYP ==51 .OR. IGTYP == 52) THEN
-	  DX=HALF*THK(I)
+          IP = IPARTC(I)
+          IF ( THK_PART(IP) /= ZERO .AND. IINTTHICK == 0) THEN
+            DX=HALF*THK_PART(IP)
+          ELSEIF ( THK(I)  /= ZERO .AND. IINTTHICK == 0) THEN
+            DX=HALF*THK(I)
+          ELSEIF(IGTYP == 17 .OR. IGTYP ==51 .OR. IGTYP == 52) THEN
+            DX=HALF*THK(I)
         ELSE
           DX=HALF*GEO(1,MG)
-	ENDIF
+          ENDIF
         WA(IXC(2,I))=MAX(WA(IXC(2,I)),DX)
         WA(IXC(3,I))=MAX(WA(IXC(3,I)),DX)
         WA(IXC(4,I))=MAX(WA(IXC(4,I)),DX)
@@ -238,31 +238,52 @@ C------------------------------------
        DO I=1,NUMELTG
         MG=IXTG(5,I)
         IGTYP = IGEO(11,MG)
-	IP = IPARTTG(I)
-	IF ( THK_PART(IP) /= ZERO .AND. IINTTHICK == 0) THEN
-	  DX=HALF*THK_PART(IP)
-	ELSEIF ( THK(NUMELC+I) /= ZERO .AND. IINTTHICK == 0) THEN
-	  DX=HALF*THK(NUMELC+I)
-	ELSEIF(IGTYP == 17 .OR. IGTYP ==51 .OR. IGTYP == 52) THEN
-	  DX=HALF*THK(NUMELC+I)
+          IP = IPARTTG(I)
+          IF ( THK_PART(IP) /= ZERO .AND. IINTTHICK == 0) THEN
+            DX=HALF*THK_PART(IP)
+          ELSEIF ( THK(NUMELC+I) /= ZERO .AND. IINTTHICK == 0) THEN
+            DX=HALF*THK(NUMELC+I)
+          ELSEIF(IGTYP == 17 .OR. IGTYP ==51 .OR. IGTYP == 52) THEN
+            DX=HALF*THK(NUMELC+I)
         ELSE
           DX=HALF*GEO(1,MG)
-	ENDIF
+          ENDIF
         WA(IXTG(2,I))=MAX(WA(IXTG(2,I)),DX)
         WA(IXTG(3,I))=MAX(WA(IXTG(3,I)),DX)
         WA(IXTG(4,I))=MAX(WA(IXTG(4,I)),DX)
        ENDDO
        DO I=1,NUMELT
         MG=IXT(4,I)
-        DX=HALF*SQRT(GEO(1,MG))
+        IP = IPARTT(I)
+        IF ( THK_PART(IP) > ZERO ) THEN
+          DX=HALF*THK_PART(IP)
+        ELSE
+          DX=HALF*SQRT(GEO(1,MG))
+        END IF
         WA(IXT(2,I))=MAX(WA(IXT(2,I)),DX)
         WA(IXT(3,I))=MAX(WA(IXT(3,I)),DX)
        ENDDO
        DO I=1,NUMELP
         MG=IXP(5,I)
-        DX=0.5*SQRT(GEO(1,MG))
+        IP = IPARTP(I)
+        IF ( THK_PART(IP) > ZERO ) THEN
+          DX=HALF*THK_PART(IP)
+        ELSE
+          DX=HALF*SQRT(GEO(1,MG))
+        END IF
         WA(IXP(2,I))=MAX(WA(IXP(2,I)),DX)
         WA(IXP(3,I))=MAX(WA(IXP(3,I)),DX)
+       ENDDO
+       DO I=1,NUMELR
+         IP = IPARTR(I)
+         IF ( THK_PART(IP) > ZERO ) THEN
+           MG=IXR(1,I)
+           IGTYP = IGEO(11,MG)
+           DX=HALF*THK_PART(IP)
+           WA(IXR(2,I))=MAX(WA(IXR(2,I)),DX)
+           WA(IXR(3,I))=MAX(WA(IXR(3,I)),DX)
+           IF (IGTYP==12) WA(IXR(4,I))=MAX(WA(IXR(4,I)),DX)
+        END IF
        ENDDO
        DO I=1,NSN
          GAP_S(I)=GAPSCALE * WA(NSV(I))
@@ -370,6 +391,13 @@ C
 C------------------------------------
 C     GAP STIFF FACES MAIN
 C------------------------------------
+      IF(NUMELS > 0) THEN
+        CALL MY_ALLOC(TAGELEMS,NUMELS)
+        TAGELEMS = 0
+        CALL MY_ALLOC(INDEXE,NUMELS)
+        INDEXE = 0
+      ENDIF
+      NINV = 0
       DO I=1,NRT
         STF(I)=ZERO
         IF(INTTH > 0 ) IELES(I) = 0
@@ -614,7 +642,7 @@ C       SOLID ELEMENTS
 C----------------------
         CALL INSOL3D(X     ,IRECT ,IXS      ,NINT    ,NELS,INRT,
      .               AREA  ,NOINT ,KNOD2ELS ,NOD2ELS ,0   ,
-     .               IXS10 ,IXS16 ,IXS20)
+     .               IXS10 ,IXS16 ,IXS20    ,TAGELEMS,INDEXE,NINV)
         !----------------!
         !  NELS > 0      !
         !----------------!
@@ -887,6 +915,35 @@ C        SPMD EXCHANGE : if no element associated to the edge => error
 C----------------------------------        
       ENDDO!next I=1,NRT
   
+      IF(NUMELS > 0) DEALLOCATE(TAGELEMS,INDEXE)
+C
+      CALL ANCMSG(MSGID=3022,
+     .             MSGTYPE=MSGWARNING,
+     .             ANMODE=ANINFO_BLIND_1,
+     .             I1=ID,
+     .             C1=TITR,
+     .             PRMOD=MSG_PRINT)
+      CALL ANCMSG(MSGID=3024,
+     .             MSGTYPE=MSGWARNING,
+     .             ANMODE=ANINFO_BLIND_1,
+     .             I1=ID,
+     .             C1=TITR,
+     .             PRMOD=MSG_PRINT)
+      IF(NINV > 0 .AND.NINT>0)
+     .    CALL ANCMSG(MSGID=3023,
+     .             MSGTYPE=MSGWARNING,
+     .             ANMODE=ANINFO_BLIND_1,
+     .             I1=ID,
+     .             C1=TITR,
+     .             I2=NINV)
+C
+      IF(NINV > 0 .AND.NINT< 0)
+     .    CALL ANCMSG(MSGID=3025,
+     .             MSGTYPE=MSGWARNING,
+     .             ANMODE=ANINFO_BLIND_1,
+     .             I1=ID,
+     .             C1=TITR,
+     .             I2=NINV)
 C------------------------------------
 C     GAP STIF FACES MAIN IGE
 C------------------------------------
@@ -1208,21 +1265,13 @@ Chd|====================================================================
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE MY_ALLOC_MOD
 
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "comlock.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "param_c.inc"
-#include      "com04_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

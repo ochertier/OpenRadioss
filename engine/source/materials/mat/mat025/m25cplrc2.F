@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -207,7 +207,7 @@ C
        CNN=CN(I)-ONE
        IF(WPLA(I)>ZERO) WVEC(I)=EPSP(I)*WPLA(I)**CNN
        YLD(I) = FYLD
-       TSAIWU(I) = MIN(WVEC(I)/FYLD,ONE)
+       TSAIWU(I) = MAX(MIN(WVEC(I)/FYLD,ONE),TSAIWU(I))
       ENDDO
 C
       DO I=JFT,JLT

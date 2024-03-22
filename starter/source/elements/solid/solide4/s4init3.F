@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -35,6 +35,7 @@ Chd|        M115_PERTURB                  source/materials/mat/mat115/m115_pertu
 Chd|        MATINI                        source/materials/mat_share/matini.F
 Chd|        S4COOR3                       source/elements/solid/solide4/s4coor3.F
 Chd|        S4DERI3                       source/elements/solid/solide4/s4deri3.F
+Chd|        S4JACI3                       source/elements/solid/solide4/s4jaci3.F
 Chd|        S4MASS3                       source/elements/solid/solide4/s4mass3.F
 Chd|        SBOLTINI                      source/loads/bolt/sboltini.F  
 Chd|        SBULK3                        source/elements/solid/solide/sbulk3.F
@@ -43,10 +44,11 @@ Chd|        SOLTOSPHV4                    source/elements/sph/soltosph.F
 Chd|        SREPLOC3                      source/elements/solid/solide/sreploc3.F
 Chd|        USERIN3                       source/elements/solid/solide/userin3.F
 Chd|        USTRSIN3                      source/elements/solid/solide/userin3.F
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
 Chd|        BPRELOAD_MOD                  share/modules1/bpreload_mod.F 
 Chd|        DETONATORS_MOD                share/modules1/detonators_mod.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
+Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
       SUBROUTINE S4INIT3(
@@ -60,7 +62,7 @@ Chd|====================================================================
      8   MCP      ,MCPS    ,TEMP    ,NPF     ,TF      ,
      9   IUSER    ,SIGSP   ,NSIGI   ,MSSA    ,XREFS   ,
      A   STRSGLOB ,STRAGLOB,FAIL_INI,SPBUF   ,SOL2SPH ,
-     B   ILOADP   ,FACLOAD ,RNOISE  ,PERTURB )
+     B   ILOADP   ,FACLOAD ,RNOISE  ,PERTURB ,MAT_PARAM)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -69,6 +71,7 @@ C-----------------------------------------------
       USE BPRELOAD_MOD
       USE DETONATORS_MOD      
       USE ALE_CONNECTIVITY_MOD
+      USE MATPARAM_DEF_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -83,14 +86,10 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "scr01_c.inc"
-#include      "scr03_c.inc"
 #include      "scr12_c.inc"
 #include      "scr17_c.inc"
 #include      "scry_c.inc"
-#include      "units_c.inc"
 #include      "vect01_c.inc"
-#include      "warn_c.inc"
 #include      "sphcom.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -111,13 +110,14 @@ C-----------------------------------------------
       TYPE(ELBUF_STRUCT_), TARGET :: ELBUF_STR
       INTEGER,INTENT(IN) :: ILOADP(SIZLOADP,*)
       my_real,INTENT(IN) :: FACLOAD(LFACLOAD,*)
-      TYPE(DETONATOR_STRUCT_)::DETONATORS
+      TYPE(DETONATORS_STRUCT_)::DETONATORS
       TYPE(t_ale_connectivity), INTENT(INOUT) :: ALE_CONNECTIVITY
+      TYPE (MATPARAM_STRUCT_) ,DIMENSION(NUMMAT) ,INTENT(INOUT) :: MAT_PARAM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER NF1,IBID,I,IGTYP,IREP,NCC, IP, NUVAR, IDEF,
-     .   NUVARR ,JHBE,IPID1,NPTR,NPTS,NPTT,NLAY,L_SIGB
+     .   NUVARR ,JHBE,IPID1,NPTR,NPTS,NPTT,NLAY,L_SIGB,L_PLA
       INTEGER MAT(MVSIZ), PID(MVSIZ), NGL(MVSIZ), IXT4(MVSIZ,4)
       INTEGER IX1(MVSIZ), IX2(MVSIZ), IX3(MVSIZ), IX4(MVSIZ)
       INTEGER NSPHDIR,NCELF,NCELL,IBOLTP
@@ -158,6 +158,7 @@ c
       NPTT  = ELBUF_STR%NPTT
       NLAY  = ELBUF_STR%NLAY
       L_SIGB= ELBUF_STR%BUFLY(1)%L_SIGB
+      L_PLA = ELBUF_STR%BUFLY(1)%L_PLA
       NF1=NFT+1
       IF(MTN>=28)THEN
         NUVAR = IPM(8,IXS(1,NF1))
@@ -258,7 +259,8 @@ C
      .         IXS     ,NIXS    ,NSIGI    ,NUVAR    ,NEL     ,
      .         NSIGS   ,IUSER   ,IDEF     ,STRAGLOB ,JHBE    ,
      .         IGTYP   ,X       ,GBUF%GAMA,PTSOL    ,LBUF%SIGB,
-     .         L_SIGB  ,MAT(1)  ,IPM      ,BUFMAT   )
+     .         L_SIGB  ,MAT(1)  ,IPM      ,BUFMAT   ,LBUF%PLA,  
+     .         L_PLA   )
 c
           CALL S4MASS3(
      1      GBUF%RHO   ,MAS       ,PARTSAV,X   ,V,
@@ -293,14 +295,20 @@ c Failure model initialisation
 C----------------------------------------
       CALL FAILINI(ELBUF_STR,NPTR,NPTS,NPTT,NLAY,
      .             IPM,SIGSP,NSIGI,FAIL_INI ,
-     .             SIGI,NSIGS,IXS,NIXS,PTSOL,RNOISE,PERTURB,BUFMAT)
+     .             SIGI,NSIGS,IXS,NIXS,PTSOL,RNOISE,PERTURB,MAT_PARAM)
+C----------------------------------------
+c initialisation inibri/eref
+C----------------------------------------
+      IF (NSIGI > 0.AND.(ISMSTR==10.OR.ISMSTR==12)) THEN
+         CALL S4JACI3(GBUF%SMSTR,GBUF%JAC_I, GBUF%VOL,NEL  ) 
+      END IF
 C------------------------------------------
 C     CALCUL DES DT ELEMENTAIRES
 c
       AIRE(:) = ZERO
       CALL DTMAIN(GEO       ,PM        ,IPM         ,PID     ,MAT     ,FV    ,
      .     GBUF%EINT ,GBUF%TEMP ,GBUF%DELTAX ,GBUF%RK ,GBUF%RE ,BUFMAT, DELTAX, AIRE, 
-     .     VOLU, DTX ,IGEO)
+     .     VOLU, DTX ,IGEO,IGTYP)
 C------------------------------------------
 c
       DO 10 I=LFT,LLT

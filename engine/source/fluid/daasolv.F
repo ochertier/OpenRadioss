@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -35,11 +35,12 @@ Chd|====================================================================
      .                   RFLOW,  NORMAL, TA,    AREAF, COSG,  DIST,  
      .                   MFLE,   ACCF,   PM,    PTI,   X, V, A, NPC, TF, 
      .                   NBGAUGE,LGAUGE, GAUGE, NSENSOR, SENSOR_TAB, IGRV, AGRV,
-     .                   CBEM   ,IPIV  , NFUNCT)
+     .                   CBEM   ,IPIV  , NFUNCT, PYTHON)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------  
       USE SENSOR_MOD
+      USE PYTHON_FUNCT_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -47,11 +48,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
+#include      "param_c.inc"
 #include      "com06_c.inc"
 #include      "com08_c.inc"
-#include      "param_c.inc"
-#include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -63,6 +62,7 @@ C-----------------------------------------------
       my_real MFLE(NEL,*), GAUGE(LLGAUGE,*),AGRV(LFACGRV,*)
       my_real CBEM(NEL,*)
       TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE (PYTHON_), INTENT(INOUT) :: PYTHON
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -71,7 +71,7 @@ C-----------------------------------------------
       INTEGER  IFPRES, JFORM, KFORM, IPRES, IWAVE, INTEGR, FREESURF, AFTERFLOW
       INTEGER  GRAV_ID, IFUNC, ISENS, LENBUF, NNO_L, NEL_L, NELMAX, INFO,ISMOOTH
       my_real  X1,  Y1,  Z1,  X2,  Y2,  Z2,  X3,  Y3,  Z3,  X4,  Y4,  Z4,
-     .         X0,  Y0,  Z0,  X12, Y12, Z12, X13, Y13, Z13, X24, Y24, Z24,	  
+     .         X0,  Y0,  Z0,  X12, Y12, Z12, X13, Y13, Z13, X24, Y24, Z24,    
      .         NRX, NRY, NRZ, AREA2, WF(2), WI(4,2),
      .         PM1, DSC, VX0, VY0, VZ0
       my_real  RHO, SSP, RHOC, TTA, DYDX, FF, SFPRES, DPPDT, PMAX, THETA, NORM, FAC1, TS, GRAVITY
@@ -166,7 +166,7 @@ C Spherical wave
                DIRWRX=DIRWRX/NORM
                DIRWRY=DIRWRY/NORM
                DIRWRZ=DIRWRZ/NORM
-	           COSG(I+NEL)=NORMAL(1,I)*DIRWRX+NORMAL(2,I)*DIRWRY+NORMAL(3,I)*DIRWRZ
+                     COSG(I+NEL)=NORMAL(1,I)*DIRWRX+NORMAL(2,I)*DIRWRY+NORMAL(3,I)*DIRWRZ
              ENDIF
 C hydrostatic pressure
              HH(I)=ZERO
@@ -181,7 +181,7 @@ C Onde plane
 C hydrostatic pressure
              HH(I)=ZERO
            ENDIF
-	       COSG(I)=NORMAL(1,I)*DIRWIX+NORMAL(2,I)*DIRWIY+NORMAL(3,I)*DIRWIZ
+                 COSG(I)=NORMAL(1,I)*DIRWIX+NORMAL(2,I)*DIRWIY+NORMAL(3,I)*DIRWIZ
 C vitesse N-1/2
            VX0 = THIRD*VL(1,I1)+THIRD*VL(1,I2)+THIRD*VL(1,I3)
            VY0 = THIRD*VL(2,I1)+THIRD*VL(2,I2)+THIRD*VL(2,I3)
@@ -249,7 +249,7 @@ C Spherical wave
                DIRWRX=DIRWRX/NORM
                DIRWRY=DIRWRY/NORM
                DIRWRZ=DIRWRZ/NORM
-	           COSG(I+NEL)=NORMAL(1,I)*DIRWRX+NORMAL(2,I)*DIRWRY+NORMAL(3,I)*DIRWRZ
+                     COSG(I+NEL)=NORMAL(1,I)*DIRWRX+NORMAL(2,I)*DIRWRY+NORMAL(3,I)*DIRWRZ
              ENDIF
 C hydrostatic pressure
              HH(I)=ZERO
@@ -271,7 +271,7 @@ C vitesse N-1/2
            VZ0 = WI(1,I5)*VL(3,I1)+WI(2,I5)*VL(3,I2)+WI(3,I5)*VL(3,I3)+WI(4,I5)*VL(3,I4)
            VEL(I) = VX0*NORMAL(1,I)+VY0*NORMAL(2,I)+VZ0*NORMAL(3,I)
         ENDDO
-		
+
       ENDIF
 C-----------------------------------------------
 C    1. Pression incidente
@@ -312,8 +312,13 @@ C-----------------------------------------------
 !!                PP(I) = SFPRES*FINTER(IFPRES,TTA,NPC,TF,DPPDT)*RATIO*OFF(I)
                 IF (ISMOOTH == 0) THEN
                   PP(I) = SFPRES*FINTER(IFPRES,TTA,NPC,TF,DPPDT)*RATIO*OFF(I)
-                ELSE
+                ELSE IF(ISMOOTH > 0) THEN
                   PP(I) = SFPRES*FINTER_SMOOTH(IFPRES,TTA,NPC,TF,DPPDT)*RATIO*OFF(I)
+                ELSE 
+                  ISMOOTH = -ISMOOTH ! function id
+                  CALL PYTHON_CALL_FUNCT1D(PYTHON, ISMOOTH,TTA,PP(I))
+                  PP(I) = PP(I)*SFPRES*RATIO*OFF(I)
+                  CALL PYTHON_DERIV_FUNCT1D(PYTHON, ISMOOTH,TTA,DPPDT)
                 ENDIF ! IF (ISMOOTH == 0)
                 DPIDT(I) = DPPDT*COSG(I)*RATIO*OFF(I)
              ELSE
@@ -329,8 +334,13 @@ C-----------------------------------------------
 !!                PP(I) = SFPRES*FINTER(IFPRES,TTA,NPC,TF,DPPDT)*OFF(I)
                 IF (ISMOOTH == 0) THEN
                   PP(I) = SFPRES*FINTER(IFPRES,TTA,NPC,TF,DPPDT)*OFF(I)
-                ELSE
+                ELSE IF (ISMOOTH > 0) THEN
                   PP(I) = SFPRES*FINTER_SMOOTH(IFPRES,TTA,NPC,TF,DPPDT)*OFF(I)
+                ELSE
+                  ISMOOTH = -ISMOOTH ! function id
+                  CALL PYTHON_CALL_FUNCT1D(PYTHON, ISMOOTH,TTA,PP(I))
+                  PP(I) = PP(I)*SFPRES*OFF(I)
+                  CALL PYTHON_DERIV_FUNCT1D(PYTHON, ISMOOTH,TTA,DPPDT)
                 ENDIF ! IF (ISMOOTH == 0)
                 DPIDT(I) = DPPDT*COSG(I)*OFF(I)
              ELSE
@@ -339,7 +349,7 @@ C-----------------------------------------------
              ENDIF
           ENDDO
         ENDIF
-      ENDIF	  
+      ENDIF    
 C-----------------------------------------------
 C     Vitesse onde incidente
 C-----------------------------------------------
@@ -359,7 +369,7 @@ C add afterflow velocity, no afterflow velocity for plane wave
            ELSEIF(IPRES == 2) THEN
               DO I=1,NEL
                  PTI(I) = PTI(I) + PP(I)*DT1
-		         VI(I) = VI(I) + PTI(I)*COSG(I)/(RHO*DIST(I))
+                   VI(I) = VI(I) + PTI(I)*COSG(I)/(RHO*DIST(I))
               ENDDO
            ENDIF
          ENDIF
@@ -393,8 +403,13 @@ C-----------------------------------------------
 !!                PR(I) = -SFPRES*FINTER(IFPRES,TTA,NPC,TF,DPPDT)*RATIO*OFF(I)
                 IF (ISMOOTH == 0) THEN
                   PR(I) = -SFPRES*FINTER(IFPRES,TTA,NPC,TF,DPPDT)*RATIO*OFF(I)
-                ELSE
+                ELSE IF (ISMOOTH > 0) THEN
                   PR(I) = -SFPRES*FINTER_SMOOTH(IFPRES,TTA,NPC,TF,DPPDT)*RATIO*OFF(I)
+                ELSE
+                  ISMOOTH = -ISMOOTH ! function id
+                  CALL PYTHON_CALL_FUNCT1D(PYTHON, ISMOOTH,TTA,PR(I))
+                  PR(I) = -PR(I)*SFPRES*RATIO*OFF(I)
+                  CALL PYTHON_DERIV_FUNCT1D(PYTHON, ISMOOTH,TTA,DPPDT)
                 ENDIF ! IF (ISMOOTH == 0)
                 DPRDT(I) = DPPDT*COSG(J)*OFF(I)
              ELSE
@@ -402,7 +417,7 @@ C-----------------------------------------------
                 DPRDT(I) = ZERO
              ENDIF
           ENDDO
-        ENDIF	  
+        ENDIF    
 C-----------------------------------------------
 C    Vitesse onde reflechie
 C-----------------------------------------------
@@ -547,8 +562,12 @@ C-----------------------------------------------
 !!        GRAVITY = FCY*FINTER(IFUNC,TS*FCX,NPC,TF,DYDX)
           IF (ISMOOTH == 0) THEN
             GRAVITY = FCY*FINTER(IFUNC,TS*FCX,NPC,TF,DYDX)
-          ELSE
+          ELSE IF(ISMOOTH > 0) THEN
             GRAVITY = FCY*FINTER_SMOOTH(IFUNC,TS*FCX,NPC,TF,DYDX)
+          ELSE
+            ISMOOTH = -ISMOOTH ! function id
+            CALL PYTHON_CALL_FUNCT1D(PYTHON, ISMOOTH,TS*FCX,GRAVITY)
+            GRAVITY = GRAVITY*FCY
           ENDIF ! IF (ISMOOTH = 0)
         ELSE
           GRAVITY = FCY
@@ -561,7 +580,7 @@ C-----------------------------------------------
          PTOT = PP(I)+PS(I)+PR(I)+RHO*HH(I)*ABS(GRAVITY)
          FEL(I) = AREAF(I)*MAX(PTOT,PMIN)
       ENDDO
-C	  
+C    
       IF(JFORM == 1) THEN
          DO I=1,NEL
              I1 = ELEM(1,I)

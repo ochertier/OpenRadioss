@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -66,7 +66,7 @@ C
          NBLOC=IFLOW(IADI+12)
          NPROW=IFLOW(IADI+18)
          NPCOL=IFLOW(IADI+19)
-		 
+           
          IF (ITYP==1) THEN
             NINOUT=IFLOW(IADI+4)
             NNN=IFLOW(IADI+7)
@@ -202,7 +202,7 @@ C
                  WRITE(IOUT,'(4X,A)') 'PROC  NB OF ROWS  NB OF COLUMNS'
               ENDIF
               WRITE(IOUT,'(3I10)') P,NNR_P,NNC_P
-			  
+            
               IFLOW_L(IADI+8) = NNR_P+NBLOC
               IFLOW_L(IADI+9) = NNR_P*NNC_P
               IFLOW_L(IADI+10)= IADMATI

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Csm|============================================================
-Csm|  CBAPROJ_PLY                          /coqueba/cbaproj_ply.F
-Csm|------------------------------------------------------------
-Csm|-- appelee par -----------
-Csm|         CBAFORC3                         /coqueba/cbaforc3.F
-Csm|-- appelle ---------------
-Csm|============================================================
+C  |============================================================
+C  |  CBAPROJ_PLY                          /coqueba/cbaproj_ply.F
+C  |------------------------------------------------------------
+C  |-- appelee par -----------
+C  |         CBAFORC3                         /coqueba/cbaforc3.F
+C  |-- appelle ---------------
+C  |============================================================
 Chd|====================================================================
 Chd|  CBAPROJ_PLY                   source/properties/composite_options/stack/cbaproj_ply.F
 Chd|-- called by -----------
@@ -46,7 +46,6 @@ C        SORTIES : FIJ
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8
 #include      "implicit_f.inc"
 #include      "mvsiz_p.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D U M M Y   A R G U M E N T S
 C-----------------------------------------------

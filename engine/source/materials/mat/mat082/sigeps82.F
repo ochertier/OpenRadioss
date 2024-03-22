@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,7 +20,6 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-C  nouvelle routine (modified ogden form) --
 Chd|====================================================================
 Chd|  SIGEPS82                      source/materials/mat/mat082/sigeps82.F
 Chd|-- called by -----------
@@ -51,15 +50,11 @@ C-----------------------------------------------
 C   G L O B A L   P A R A M E T E R S
 C-----------------------------------------------
 #include "mvsiz_p.inc"
-#include      "scr17_c.inc"
 C-----------------------------------------------
 C   C O M M O N 
 C-----------------------------------------------
 #include "scr05_c.inc"
 #include "impl1_c.inc"
-#include      "units_c.inc"
-#include "com01_c.inc"
-#include "scr18_c.inc"
 C----------------------------------------------------------------
 C  I N P U T   A R G U M E N T S
 C----------------------------------------------------------------
@@ -288,22 +283,22 @@ C------max of Cii :
            ENDIF
          ENDDO
          DO II = 2,NORDRE
-		   IF (D(II)==ZERO) CYCLE
-		   PP = 2*II*(2*II-1)/D(II)
-		   JJ = 2*II - 2
+             IF (D(II)==ZERO) CYCLE
+             PP = 2*II*(2*II-1)/D(II)
+             JJ = 2*II - 2
            DO I=1,NEL
-		    IF (ABS(RV(I)- ONE)<EM20) CYCLE
+              IF (ABS(RV(I)- ONE)<EM20) CYCLE
             RKMAX(I) = RKMAX(I) + PP * (RV(I)- ONE)**JJ
            ENDDO
          ENDDO
-C------GT=3/4 Cii (factor 1/2*1/3 already inside CII)		  
+C------GT=3/4 Cii (factor 1/2*1/3 already inside CII)      
          DO I=1,NEL
            AMAX= HALF*MAX(CII(I,1),CII(I,2),CII(I,3))/GMAX
-C---------reduce old result change		   
+C---------reduce old result change       
            ETI = MAX(ONE,AMAX*0.81) 
            GTMAX(I) = GMAX*ETI 
            RKMAX(I) = MAX(RBULK,RKMAX(I))
-C---- 		   
+C----        
            ET(I)= MAX(ONE,AMAX)
          ENDDO
 C cauchy to glabale

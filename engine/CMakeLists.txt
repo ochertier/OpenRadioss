@@ -9,9 +9,6 @@ project (Radioss_Engine)
 # -------
 # set (CMAKE_VERBOSE_MAKEFILE on)
 
-
-
-
 # Language settings & Compiler Settings
 # -------------------------------------
 enable_language (Fortran)
@@ -27,8 +24,6 @@ else()
 set (cdir "_c" )
 endif()
 
-include (CMake_Compilers${cdir}/cmake_${arch}_compilers.txt)
-
 # source files & include directories
 # -------------------------------------
 
@@ -41,7 +36,7 @@ set (include_directory "${CMAKE_CURRENT_SOURCE_DIR}/share" )
 if ( NOT DEFINED COM) 
 
 #Fortran source files
-file(GLOB_RECURSE source_files  ${source_directory}/source/*.F ${source_directory}/stub/*.F ${source_directory}/share/*.F  ${source_directory}/../common_source/*.F   )
+file(GLOB_RECURSE source_files  ${source_directory}/source/*.F ${source_directory}/stub/*.F ${source_directory}/share/*.F  ${source_directory}/../common_source/*.F ${source_directory}/source/*.F90 ${source_directory}/stub/*.F90 ${source_directory}/share/*.F90  ${source_directory}/../common_source/*.F90 ${source_directory}/source/*.f90 ${source_directory}/stub/*.f90 ${source_directory}/share/*.f90  ${source_directory}/../common_source/*.f90 )
 
 
 #C source files
@@ -58,12 +53,12 @@ set (ex_version "engine")
 else()
 
 #Fortran source files
-file(GLOB_RECURSE source_files  ${source_directory}/source/*.F ${source_directory}/com/*.F ${source_directory}/share/*.F  ${source_directory}/../common_source/*.F   )
+file(GLOB_RECURSE source_files  ${source_directory}/source/*.F ${source_directory}/com/*.F ${source_directory}/share/*.F  ${source_directory}/../common_source/*.F ${source_directory}/source/*.F90 ${source_directory}/com/*.F90 ${source_directory}/share/*.F90  ${source_directory}/../common_source/*.F90 ${source_directory}/source/*.f90 ${source_directory}/com/*.f90 ${source_directory}/share/*.f90  ${source_directory}/../common_source/*.f90)
 
-if ( NOT DEFINED WITH_LINEAR_ALGEBRA) 
+if ( NOT DEFINED WITH_LINEAR_ALGEBRA OR precision STREQUAL "sp") 
 # remove files related to linear algebra
 file(GLOB_RECURSE remove_files ${source_directory}/com/eig/*.F  )
-list(REMOVE_ITEM source_files ${remove_source})
+list(REMOVE_ITEM source_files ${remove_files})
 endif()
 
 
@@ -161,11 +156,6 @@ else ()
 endif ()
 
 #
-# executable name
-# ---------------------------------
-set ( EXEC_NAME "${ex_version}_${RELNAME}${exec_prec}${exec_deb}"  )
-
-#
 # Print some configuration messages
 # ---------------------------------
 message (" " )
@@ -216,7 +206,7 @@ add_custom_command(
          OUTPUT 
             ${Build_includes_directory}/engine_message_description.inc
          COMMAND 
-            perl ../../Compiling_tools/script/build_message.pl ${source_directory}/source/output/message/engine_message_description.txt > ${Build_includes_directory}/engine_message_description.inc
+         python ${source_directory}/../Compiling_tools/script/build_message.py -inputfile=${source_directory}/source/output/message/engine_message_description.txt -outfile=${Build_includes_directory}/engine_message_description.inc
          DEPENDS 
               ${source_directory}/source/output/message/engine_message_description.txt
          )
@@ -227,7 +217,7 @@ add_custom_command(
             ${Build_includes_directory}/__foo.inc 
             ${Build_includes_directory}/build_info.inc
          COMMAND 
-            sh ../../Compiling_tools/script/or_compile_info_cm.sh linux64 0 e 0 linux64  > ${Build_includes_directory}/build_info.inc
+            python ${source_directory}/../Compiling_tools/script/or_build_info.py -arch=${arch} -outfile=${Build_includes_directory}/build_info.inc
          )
 else()
 #include generated with a text files
@@ -235,7 +225,7 @@ add_custom_command(
          OUTPUT 
             ${Build_includes_directory}/engine_message_description.inc
          COMMAND 
-            perl ../../Compiling_tools/script/build_message.pl ${source_directory}/source/output/message/engine_message_description.txt > ${Build_includes_directory}/engine_message_description.inc
+            python ${source_directory}/../Compiling_tools/script/build_message.py -inputfile=${source_directory}/source/output/message/engine_message_description.txt -outfile=${Build_includes_directory}/engine_message_description.inc
          DEPENDS 
               ${source_directory}/source/output/message/engine_message_description.txt
          )
@@ -245,14 +235,10 @@ add_custom_command(
          OUTPUT 
             ${Build_includes_directory}/__foo.inc 
             ${Build_includes_directory}/build_info.inc
-            ${Build_includes_directory}/btag.inc
          COMMAND 
-            bash ../../Compiling_tools/script/compile_info_cm.sh linux64 0 e 0 linux64  > ${Build_includes_directory}/build_info.inc
+            python ${source_directory}/../Compiling_tools/script/build_info.py -version=${version} -titlevers=${titlevers} -arch=${arch} -solver=E -outfile=${Build_includes_directory}/build_info.inc
          )
 endif()
-
-
-add_custom_target( always_execute ALL DEPENDS ${Build_includes_directory}/__foo.inc )
 
 
 
@@ -264,7 +250,13 @@ if (NOT CMAKE_BUILD_TYPE)
 endif (NOT CMAKE_BUILD_TYPE)
 
 
-add_executable (${EXEC_NAME} ${source_files} ${source_files_common} ${c_source_files} ${cpp_source_files} ${Build_includes_directory}/engine_message_description.inc ${Build_includes_directory}/build_info.inc)
+add_executable (${EXEC_NAME} ${source_files} ${source_files_common} ${c_source_files} ${cpp_source_files} ${Build_includes_directory}/engine_message_description.inc ${Build_includes_directory}/__foo.inc )
+
+add_custom_command(TARGET ${EXEC_NAME}
+                   POST_BUILD
+                   COMMAND ${CMAKE_COMMAND} -E make_directory ${source_directory}/../exec
+                   COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${EXEC_NAME}> ${source_directory}/../exec
+                  )
 
 target_include_directories(${EXEC_NAME} PRIVATE ${include_dir_list}  )
 target_link_libraries(${EXEC_NAME} ${LINK} )

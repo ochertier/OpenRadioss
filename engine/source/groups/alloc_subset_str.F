@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,7 +26,7 @@ Chd|-- called by -----------
 Chd|        SUBSET_INI                    source/groups/subset_ini.F    
 Chd|-- calls ---------------
 Chd|        FRETITL2                      source/input/freform.F        
-Chd|        READ_I_C                      source/output/tools/sortie_c.c
+Chd|        READ_I_C                      ../common_source/tools/input_output/write_routtines.c
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
@@ -46,7 +46,6 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "scr17_c.inc"
 #include      "tabsiz_c.inc"
-#include      "my_allocate.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -105,10 +104,10 @@ C-----------------------------------------------
        SUBSET(ISU)%THIAD  = THIAD
 !!       SUBSET(ISU)%TH_FLAG = TH_FLAG
        SUBSET(ISU)%TITLE = NEW_TITLE(ISU)
-       MY_ALLOCATE(SUBSET(ISU)%CHILD,NCHILD)
-       MY_ALLOCATE(SUBSET(ISU)%PART,NBPART)
-       MY_ALLOCATE(SUBSET(ISU)%TPART,NBTPART)
-       MY_ALLOCATE(SUBSET(ISU)%NVARTH,10)  !  /iTH (9) + /TH (1) -> SUBSET(I)%NVARTH(ITHFLAG)
+       ALLOCATE(SUBSET(ISU)%CHILD(NCHILD))
+       ALLOCATE(SUBSET(ISU)%PART(NBPART))
+       ALLOCATE(SUBSET(ISU)%TPART(NBTPART))
+       ALLOCATE(SUBSET(ISU)%NVARTH(10))  !  /iTH (9) + /TH (1) -> SUBSET(I)%NVARTH(ITHFLAG)
 !---
 ! NOMBRE DE SUBSETS FILS
         DO J=1,NCHILD

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -42,7 +42,7 @@ Chd|====================================================================
      6     SIGNXX  ,SIGNYY  ,SIGNXY  ,SIGNYZ  ,SIGNZX  ,THKLY   ,
      7     THK     ,SIGY    ,ET      ,TEMPEL  ,TEMP    ,SEQ     ,
      8     TF      ,NUMTABL ,ITABLE  ,TABLE   ,NVARTMP ,VARTMP  ,
-     9     SIGA    ,INLOC   ,DPLANL  )
+     9     SIGA    ,INLOC   ,DPLANL  ,EPSPL   )
       !=======================================================================
       !      Modules
       !=======================================================================
@@ -55,10 +55,7 @@ Chd|====================================================================
       !=======================================================================
       !      Common
       !=======================================================================
-#include      "param_c.inc" 
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr17_c.inc"
       !=======================================================================
       !      Dummy arguments
       !=======================================================================
@@ -81,7 +78,7 @@ c
      .   SIGNXX,SIGNYY,SIGNXY,SIGNYZ,SIGNZX
 c
       my_real ,DIMENSION(NEL), INTENT(INOUT)       :: 
-     .   PLA,DPLA,OFF,THK,TEMP,SEQ
+     .   PLA,DPLA,OFF,THK,TEMP,SEQ,EPSPL
       my_real ,DIMENSION(NEL,NUVAR), INTENT(INOUT) :: 
      .   UVAR
       my_real ,DIMENSION(NEL,3)     ,INTENT(INOUT) :: 
@@ -168,6 +165,9 @@ c--------------------------
      A           SIGA    ,INLOC   ,DPLANL  )
           END SELECT    
         END SELECT
+
+        ! Copy the strain rate for failure criteria
+        EPSPL(1:NEL) = EPSP(1:NEL)
 c--------------------------
 c-----------
       END

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -49,10 +49,8 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "com06_c.inc"
 #include      "com08_c.inc"
-#include      "scr05_c.inc"
 #include      "scr07_c.inc"
 #include      "scr14_c.inc"
 #include      "scr16_c.inc"
@@ -143,15 +141,15 @@ C
       ENDIF
 
       SURFACE = I18F6(1,1)+I18F6(1,2)+I18F6(1,3)+
-     +  	I18F6(1,4)+I18F6(1,5)+I18F6(1,6)
+     +    I18F6(1,4)+I18F6(1,5)+I18F6(1,6)
       PRESMOY = I18F6(2,1)+I18F6(2,2)+I18F6(2,3)+
-     +  	I18F6(2,4)+I18F6(2,5)+I18F6(2,6)
+     +    I18F6(2,4)+I18F6(2,5)+I18F6(2,6)
       CDGX    = I18F6(3,1)+I18F6(3,2)+I18F6(3,3)+
-     +  	I18F6(3,4)+I18F6(3,5)+I18F6(3,6)
+     +    I18F6(3,4)+I18F6(3,5)+I18F6(3,6)
       CDGY    = I18F6(4,1)+I18F6(4,2)+I18F6(4,3)+
-     +  	I18F6(4,4)+I18F6(4,5)+I18F6(4,6)
+     +    I18F6(4,4)+I18F6(4,5)+I18F6(4,6)
       CDGZ    = I18F6(5,1)+I18F6(5,2)+I18F6(5,3)+
-     +  	I18F6(5,4)+I18F6(5,5)+I18F6(5,6)
+     +    I18F6(5,4)+I18F6(5,5)+I18F6(5,6)
 
 C
       PRESMOY = PRESMOY / SURFACE
@@ -274,7 +272,7 @@ c      IF(IBAG/=5)THEN
              N = IRECT(J,I)
              NISKY = NISKY + 1
              ISKY(NISKY) = N
-             FSKYI(NISKY,1)= -PRESM*SURF(1,I)	    ! addition en P/ON idem interface
+             FSKYI(NISKY,1)= -PRESM*SURF(1,I)      ! addition en P/ON idem interface
              FSKYI(NISKY,2)= -PRESM*SURF(2,I)
              FSKYI(NISKY,3)= -PRESM*SURF(3,I)
              FSKYI(NISKY,4)= ZERO
@@ -288,7 +286,7 @@ c      IF(IBAG/=5)THEN
              N = IRECT(J,I)
              NISKY = NISKY + 1
              ISKY(NISKY) = N
-             FSKYI(NISKY,1)= -PRESM*SURF(1,I)	    ! addition en P/ON idem interface
+             FSKYI(NISKY,1)= -PRESM*SURF(1,I)      ! addition en P/ON idem interface
              FSKYI(NISKY,2)= -PRESM*SURF(2,I)
              FSKYI(NISKY,3)= -PRESM*SURF(3,I)
              FSKYI(NISKY,4)= ZERO

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -44,6 +44,7 @@ Chd|        THPRIN_SUB                    source/output/th/thprin.F
 Chd|        UDOUBLE                       source/system/sysfus.F        
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
+Chd|        INTERFACES_MOD                ../common_source/modules/interfaces/interfaces_mod.F
 Chd|        MAPPING_OPTION_MOD            share/modules1/dichotomy_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        MONVOL_STRUCT_MOD             share/modules1/monvol_struct_mod.F
@@ -51,21 +52,23 @@ Chd|        SENSOR_MOD                    share/modules1/sensor_mod.F
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
       SUBROUTINE HM_READ_THGROU(
-     1      ITHGRP,ITHBUF,ITAB   ,ITABM1,IXUR  ,IXTG  ,
-     2      IXS   ,IXQ   ,IXC    ,IXT   ,IXP   ,IXR   ,
-     3      KXX   ,IXX   ,IPART  ,IFI   ,
-     4      NTHWA ,KXSP  ,IXRI  ,ISKWN ,IFRAME ,
-     5      NTHGRP2 ,PATHID ,SUTHID ,FXBIPM ,IPARTH ,NPARTH ,
-     6      NVPARTH ,NVSUBTH,IMERGE ,ITHVAR ,
-     7      FLAGABF,NVARABF ,NOM_OPT,PTR_NOPT_FXBY,PTR_NOPT_INTER,
-     8      PTR_NOPT_RWALL,PTR_NOPT_SECT,PTR_NOPT_JOINT,
-     9      PTR_NOPT_MONV,PTR_NOPT_ACC,PTR_NOPT_SKW,PTR_NOPT_GAU,
-     A      PTR_NOPT_CLUS,PTR_NOPT_SPHIO,ISPHIO,RFI,T_MONVOL,
-     B      IGRSURF ,SUBSET ,ITHFLAG,NPBY,LSUBMODEL,IPARG,
-     C      IPARTS  ,IPARTQ ,IPARTC ,IPARTT  ,IPARTP  ,IPARTR ,
-     D      IPARTG  ,IPARTX ,IPARTSP ,IPARTIG3D, LITHBUFMX,
-     E      MAP_TABLES, IFLAG,PTR_NOPT_SLIPRING,PTR_NOPT_RETRACTOR,SENSOR_TAB)
+     1      ITHGRP        ,ITHBUF        ,ITAB             ,ITABM1            ,IXTG          ,
+     2      IXS           ,IXQ           ,IXC              ,IXT               ,IXP           ,
+     3      IXR           ,KXX           ,IXX              ,IPART             ,IFI           ,
+     4      NTHWA         ,KXSP          ,IXRI             ,ISKWN             ,IFRAME        ,
+     5      NTHGRP2       ,PATHID        ,SUTHID           ,FXBIPM            ,IPARTH        ,
+     6      NPARTH        ,NVPARTH       ,NVSUBTH          ,IMERGE            ,ITHVAR        ,
+     7      FLAGABF       ,NVARABF       ,NOM_OPT          ,PTR_NOPT_FXBY     ,PTR_NOPT_INTER,
+     8      PTR_NOPT_RWALL,PTR_NOPT_SECT ,PTR_NOPT_JOINT   ,
+     9      PTR_NOPT_MONV ,PTR_NOPT_ACC  ,PTR_NOPT_SKW     ,PTR_NOPT_GAU,
+     A      PTR_NOPT_CLUS ,PTR_NOPT_SPHIO,ISPHIO           ,RFI               ,T_MONVOL      ,
+     B      IGRSURF       ,SUBSET        ,ITHFLAG          ,NPBY              ,LSUBMODEL     ,IPARG,
+     C      IPARTS        ,IPARTQ        ,IPARTC           ,IPARTT            ,IPARTP        ,IPARTR ,
+     D      IPARTG        ,IPARTX        ,IPARTSP          ,IPARTIG3D         ,LITHBUFMX     ,
+     E      MAP_TABLES    ,IFLAG         ,PTR_NOPT_SLIPRING,PTR_NOPT_RETRACTOR,SENSORS       ,
+     F      INTERFACES    ,IPARI)
 C-----------------------------------------------
+      USE MY_ALLOC_MOD
       USE MESSAGE_MOD
       USE GROUPDEF_MOD
       USE MONVOL_STRUCT_MOD
@@ -73,6 +76,7 @@ C-----------------------------------------------
       USE HM_OPTION_READ_MOD
       USE MAPPING_OPTION_MOD
       USE SENSOR_MOD
+      USE INTERFACES_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -82,29 +86,23 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr23_c.inc"
 #include      "scr17_c.inc"
-#include      "scr03_c.inc"
 #include      "com10_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
 #include      "param_c.inc"
-#include      "rnur_c.inc"
 #include      "sphcom.inc"
 #include      "fxbcom.inc"
-#include      "submod_c.inc"
-#include      "r2r_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER,INTENT(IN) :: LITHBUFMX
-      INTEGER ITAB(*),ITABM1(*), IFLAG,
-     .        IXS(NIXS,*),IXQ(NIXQ,*),IXC(NIXC,*),IXT(NIXT,*),
-     .        IXP(NIXP,*),IXR(NIXR,*),IXTG(NIXTG,*),KXX(NIXX,*),
+      INTEGER ITAB(NUMNOD),ITABM1(*), IFLAG,
+     .        IXS(NIXS,NUMELS),IXQ(NIXQ,NUMELQ),IXC(NIXC,NUMELC),IXT(NIXT,NUMELT),
+     .        IXP(NIXP,NUMELP),IXR(NIXR,NUMELR),IXTG(NIXTG,NUMELTG),KXX(NIXX,*),
      .        IXX(*),IPART(LIPART1,*),ITHGRP(NITHGR,*),ITHBUF(LITHBUFMX),
-     .        IXUR(NIXUR,*),IMERGE(*),
+     .        IMERGE(*),
      .        IFI,NTHWA,KXSP(NISP,*),IXRI(4,*),
-     .        IFRAME(LISKN,*), NTHGRP2,PATHID(*),SUTHID(*),
+     .        IFRAME(LISKN,NUMFRAM+1), NTHGRP2,PATHID(*),SUTHID(*),
      .        FXBIPM(NBIPM,*),ISKWN(LISKN,*),
      .        NPARTH,IPARTH(NPARTH,*),NVPARTH,ITYP,
      .        NVSUBTH,ITHVAR(*),FLAGABF,NVARABF,
@@ -118,10 +116,12 @@ C-----------------------------------------------
       INTEGER, TARGET :: IPARTS(NUMELS),IPARTQ(NUMELQ),IPARTC(NUMELC),
      .        IPARTT(NUMELT),IPARTP(NUMELP),IPARTR(NUMELR),IPARTG(NUMELTG),
      .        IPARTX(NUMELX),IPARTSP(NUMSPH),IPARTIG3D(NUMELIG3D)
+      INTEGER,INTENT(INOUT) :: IPARI(NPARI,NINTER)
       TYPE(MONVOL_STRUCT_), DIMENSION(NVOLU), INTENT(IN) :: T_MONVOL
       TYPE (SUBMODEL_DATA) ,DIMENSION(NSUBMOD) ,INTENT(IN) :: LSUBMODEL
       TYPE(MAPPING_STRUCT_),INTENT(IN) :: MAP_TABLES
-      TYPE (SENSOR_STR_)   ,DIMENSION(NSENSOR) ,INTENT(IN) :: SENSOR_TAB
+      TYPE (INTERFACES_)   ,INTENT(INOUT):: INTERFACES
+      TYPE (SENSORS_) ,INTENT(IN) :: SENSORS
 C-----------------------------------------------
       TYPE (SUBSET_) , DIMENSION(NSUBS) :: SUBSET
       TYPE (SURF_)   , DIMENSION(NSURF) :: IGRSURF
@@ -131,10 +131,9 @@ C-----------------------------------------------
       INTEGER J,JJ,II, I,ISU,ID,NOSYS,J10(10),NTOT,KK,IER,
      .        OK,IGS,IGRS,NSU,K,L,CONT,IAD0,IADV,NTRI,NL,
      .        IFITMP,IADFIN,NUMEL,NV,NVAR,M,N,IAD2,IAD,NSNE,NNE,ISK,
-     .        NVALL,TAGP,TAGS,IFIX_TMP,IBID
+     .        NVALL,TAGP,TAGS,IFIX_TMP,IBID,NIN
       CHARACTER TITR*nchartitle,MESS*40,KEY*ncharline,COPT*ncharline,
      .        TITR1*nchartitle
-C
       INTEGER NVARN,NVARS,NVARC,NVART,NVARP,NVARR,NVARUR
       INTEGER NVARNS,NVARSPH
       INTEGER NVARIN,NVARRW,NVARRB,NVARAC,NVARSE,NVARJO,NVARFX,NVARFXM
@@ -152,23 +151,29 @@ C
       CHARACTER*10 VARRIV(NVARRIV),VARRIVG(NVARRIVG)
 C-----------------------------------------------
       PARAMETER (NVARN = 637,NVARS =239554 ,NVARC = 37856,NVART = 6)
-      PARAMETER (NVARP = 336,NVARR = 65,NVARUR = 12)
+      PARAMETER (NVARP = 337,NVARR = 66,NVARUR = 12)
       PARAMETER (NVARNS = 4,NVARSPH = 41)
-      PARAMETER (NVARIN = 28,NVARRW = 6,NVARRB =15,NVARFX =4)
+      PARAMETER (NVARIN = 29,NVARRW = 6,NVARRB =15,NVARFX =4)
       PARAMETER (NVARFXM = 3)
       PARAMETER (NVARAC = 6,NVARSE =39,NVARJO = 6)
       PARAMETER (NVARAB = 7,NVARMV4= 9,NVARMV = 19,NVARMVENT = 150)
-      PARAMETER (NVARPA =28)
+      PARAMETER (NVARPA = 31)
       PARAMETER (NVARF1 = 18,NVARFR = 24,NVARGAU = 8,NVARCLUS=11,NVARFLOW=1,
-     .           NVARSURF = 3,NVARSLIP=6,NVARRET=3)
-      CHARACTER*10 VARN(NVARN),VARS(NVARS),VARC(NVARC),VART(NVART)
+     .           NVARSURF = 5,NVARSLIP=6,NVARRET=3)
+      CHARACTER*10 VARN(NVARN),VART(NVART)
       CHARACTER*10 VARP(NVARP),VARR(NVARR),VARUR(NVARUR)
+      CHARACTER(LEN=10),DIMENSION(:),ALLOCATABLE::VARS
+      CHARACTER(LEN=10),DIMENSION(:),ALLOCATABLE::VARC
       CHARACTER*10 VARS1(196),VARS2(567), VARS3(369), VARS4(492),
-     .             VARS5(22),VARS6(118692),VARS7(118692),VARN1(19),
+     .             VARS5(22),VARN1(19),
      .             VARN2(9),
      .             VARNPINCH(9),
-     .             VARSG1(202),VARSG2(19782),VARSG3(19782),VARSG4(1),
+     .             VARSG1(202),VARSG4(1),
      .             VARS8(516),VARS9(6),VARSNLOC(2)
+      CHARACTER(LEN=10),DIMENSION(:),ALLOCATABLE::VARS6
+      CHARACTER(LEN=10),DIMENSION(:),ALLOCATABLE::VARS7
+      CHARACTER(LEN=10),DIMENSION(:),ALLOCATABLE::VARSG2
+      CHARACTER(LEN=10),DIMENSION(:),ALLOCATABLE::VARSG3
       CHARACTER*10 VARNS(NVARNS),VARSPH(NVARSPH)
       CHARACTER*10 VARIN(NVARIN),VARRW(NVARRW),VARRB(NVARRB)
       CHARACTER*10 VARAC(NVARAC),VARSE(NVARSE),VARJO(NVARJO)
@@ -195,7 +200,7 @@ C-----------------------------------------------
       PARAMETER (NVARF1G = 3,NVARFRG = 4,NVARGAUG = 1,NVARCLUSG=2,NVARFLOWG=1,
      .           NVARSURFG = 1,NVARSLIPG=1,NVARRETG = 1)
       PARAMETER (NVARSENS = 1,NVARSENSG = 1)
-      CHARACTER*10 VARNG(NVARNG),VARSG(NVARSG)
+      CHARACTER*10 VARNG(NVARNG)
       CHARACTER*10 VARCG(NVARCG),VARTG(NVARTG)
       CHARACTER*10 VARPG(NVARPG),VARRG(NVARRG),VARURG(NVARURG)
       CHARACTER*10 VARNSG(NVARNSG),VARSPG(NVARSPG)
@@ -207,8 +212,10 @@ C-----------------------------------------------
       CHARACTER*10 VARF1G(NVARF1G),VARFRG(NVARFRG),VARGAUG(NVARGAUG)
       CHARACTER*10 VARCLUSG(NVARCLUSG),VARFLOWG(NVARFLOWG)
       CHARACTER*10 VARSURFG(NVARSURFG),VARSLIPG(NVARSLIPG),VARRETG(NVARRETG)
+      INTEGER,DIMENSION(:,:),ALLOCATABLE :: IVARSG
+      CHARACTER(LEN=10),DIMENSION(:),ALLOCATABLE:: VARSG
 C-----------------------------------------------
-      INTEGER IVARNG(18,NVARNG),IVARSG(18,NVARSG)
+      INTEGER IVARNG(18,NVARNG)
       INTEGER IVARCG(18,NVARCG),IVARTG(18,NVARTG)
       INTEGER IVARPG(18,NVARPG),IVARRG(18,NVARRG),IVARURG(18,NVARURG)
       INTEGER IVARNSG(18,NVARNSG),IVARSPG(18,NVARSPG),IVNS2R(18,NVARNSG)
@@ -253,6 +260,18 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   TH VARIABLES
 C-----------------------------------------------
+      ! Allocate temporary Arrays
+      ! Character Arrays - ue ALLOCATEkm
+      ALLOCATE(VARS6(118692))
+      ALLOCATE(VARS7(118692))
+      ALLOCATE(VARSG2(19782))
+      ALLOCATE(VARSG3(19782))
+      ALLOCATE(VARS(NVARS))
+      ALLOCATE(VARC(NVARC))
+      ALLOCATE(VARSG(NVARSG))
+
+      ! INTEGER Arrays - use MY_ALLOC
+      CALL MY_ALLOC(IVARSG,18,NVARSG)
 C   nodes
       DATA VARN1/'DX      ','DY      ','DZ      ',
      .           'VX      ','VY      ','VZ      ',
@@ -968,7 +987,7 @@ C   beams
      . 'EPSP_66 ','EPSP_67 ','EPSP_68 ','EPSP_69 ','EPSP_70 ',
      . 'EPSP_71 ','EPSP_72 ','EPSP_73 ','EPSP_74 ','EPSP_75 ',
      . 'EPSP_76 ','EPSP_77 ','EPSP_78 ','EPSP_79 ','EPSP_80 ',
-     . 'EPSP_81 '/
+     . 'EPSP_81 ','EPSD    '/
 C   springs
       DATA VARR/
      . 'OFF     ','FX      ','FY      ','FZ      ','MX      ',
@@ -983,7 +1002,8 @@ C   springs
      . 'D2G_Z   ','D1L_X   ','D1L_Y   ','D1L_Z   ','D2L_X   ',
      . 'D2L_Y   ','D2L_Z   ','R1G_X   ','R1G_Y   ','R1G_Z   ',
      . 'R2G_X   ','R2G_Y   ','R2G_Z   ','R1L_X   ','R1L_Y   ',
-     . 'G1L_Z   ','G2L_X   ','G2L_Y   ','G2L_Z   ','LENGTH  '/
+     . 'R1L_Z   ','R2L_X   ','R2L_Y   ','R2L_Z   ','LENGTH  ',
+     . 'FAIL    '/
 
       DATA VARNS/
      . 'OFF     ','FX      ','LX      ','IE      '/
@@ -1009,7 +1029,7 @@ C   interfaces
      . '||FN||  ','|FX|    ','|FY|    ','|FZ|    ','||F||   ',
      . 'PVOL    ','PSURF   ','PMED    ','DELTAP  ','VOL     ',
      . 'SURF    ','MX      ','MY      ','MZ      ','QFRIC   ',
-     . 'CE_ELAST','CE_FRIC ','CE_DAMP '/
+     . 'CE_ELAST','CE_FRIC ','CE_DAMP ','CAREA   '/
 C   rigid wall
       DATA VARRW/
      . 'FNX     ','FNY     ','FNZ     ','FTX     ','FTY     ',
@@ -1094,8 +1114,9 @@ C   part
      . 'MASS    ','HE      ','TURBKE  ','XCG     ','YCG     ',
      . 'ZCG     ','XXMOM   ','YYMOM   ','ZZMOM   ','IXX     ',
      . 'IYY     ','IZZ     ','IXY     ','IYZ     ','IZX     ',
-     . 'RIE     ','KERB    ','RKERB   ','RKE     ','UNUSED  ',
-     . 'UNUSED  ','UNUSED  ','HEAT    '/
+     . 'RIE     ','KERB    ','RKERB   ','RKE     ','ERODED  ',
+     . 'UNUSED  ','UNUSED  ','HEAT    ','VX      ','VY      ',
+     . 'VZ      '/
 C   rivets
       DATA VARRIV/
      . 'OFF     ','F1X     ','F1Y     ','F1Z     ','F2X     ',
@@ -1123,7 +1144,7 @@ C     element cluster
       DATA VARFLOW/
      . 'FLOW    '/
       DATA VARSURF/
-     . 'AREA    ','MASSFLOW','VELOCITY'/
+     . 'AREA    ','MASSFLOW','VELOCITY','P       ','A       '/
 C
       DATA VARSLIP/
      . 'RINGSLIP','FN      ','F1      ','F2      ','THETA   ','GAMMA   '/
@@ -1608,7 +1629,7 @@ C
      .     150, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0/
       DATA VARPAG/'DEF     '/
       DATA IVARPAG
-     .         / 1, 2, 3, 4, 5, 6, 7,28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0/
+     .         / 1, 2, 3, 4, 5, 6, 7,28, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0/
       DATA VARRIVG/'DEF     '/
       DATA IVARRIV
      .         / 1, 2, 3, 4, 5, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0/
@@ -1636,7 +1657,7 @@ C   frames
      .         / 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0/
       DATA VARSURFG/'DEF     '/
       DATA IVARSURFG
-     .         / 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0/
+     .         / 1, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0/
       DATA VARSLIPG/'DEF     '/
       DATA IVARSLIPG
      .         / 1, 2, 3, 4, 5, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0/
@@ -1652,6 +1673,7 @@ C=======================================================================
       TAGS=0
       IBID = 0
       BID = 0
+      NSNE = 0
 C-----------------------------------------------
 C  Brick
 C ------------------------------------------
@@ -2031,15 +2053,15 @@ C keyword  564
 c keyword  565 -----> 573
         DO J = 565,573
          DO I = 1,10
-	  IVARCG(I,J)= IVCG + 1
-	  IVCG = IVCG + 1
-	 ENDDO
-	ENDDO
+            IVARCG(I,J)= IVCG + 1
+            IVCG = IVCG + 1
+           ENDDO
+          ENDDO
 c keyword  574
         DO I = 1,9
-	 IVARCG(I,574)= IVCG + 1
-	 IVCG = IVCG + 1
-	ENDDO
+           IVARCG(I,574)= IVCG + 1
+           IVCG = IVCG + 1
+          ENDDO
 C keyword de 575 -----> 674
         DO J = 575, 674
          DO I = 1,5
@@ -2054,7 +2076,7 @@ C pinching
 C  
 C to ctrole the value of ivcg                    
 C icvg = 30882  
-Csm end . ivcg = ivcg  + 4*99*60 + 5 + 99  + 100
+C   end . ivcg = ivcg  + 4*99*60 + 5 + 99  + 100
 C--------------fin --------------------
 C--------------fin --------------------
 C  ---- node + displacement by ply for shell
@@ -2196,6 +2218,17 @@ C
      4      IVARING  ,NSNE     ,NVALL  ,ITHVAR,FLAGABF ,NVARABF   ,
      5      NOM_OPT  ,IGS      ,LSUBMODEL, LITHBUFMX)
           IF(IGS/=0) NTHWA=MAX(NTHWA,ITHGRP(4,IGS)*ITHGRP(6,IGS))
+          DO JJ = ITHGRP(7,IGS),ITHGRP(5,IGS)
+             IF(ITHBUF(JJ) ==29) INTERFACES%PARAMETERS%INTCAREA =1
+          ENDDO
+          IF(INTERFACES%PARAMETERS%INTCAREA > 0 ) THEN
+            DO JJ = ITHGRP(5,IGS),ITHGRP(5,IGS)+ITHGRP(4,IGS)-1
+               NIN = ITHBUF(JJ)
+               IF(NIN <= NINTER) THEN 
+                  IF(IPARI(7,NIN)==24.OR. IPARI(7,NIN)==25) IPARI(99,NIN) = 1
+               ENDIF
+            ENDDO
+          ENDIF
         ENDDO
       ENDIF
       !-------------------------------------------
@@ -2592,9 +2625,9 @@ C          frame numbers user -> internal
           NVALL = 9                                               
           IGS=IGS+1                                               
           TITR1(1:5)='VENT '                                      
-   	      DO J=1,nchartitle-5                                 
-   	        TITR1(J+5:J+5) = TITR(J:J)                        
-   	      ENDDO                                               
+                DO J=1,nchartitle-5                                 
+                  TITR1(J+5:J+5) = TITR(J:J)                        
+                ENDDO                                               
           CALL FRETITL(TITR1,ITHGRP(NITHGR-LTITR+1,IGS),LTITR)    
           ITHGRP(1,IGS)=ID_TH_AUTO                                
           ID_TH_AUTO = ID_TH_AUTO + 1                             
@@ -2961,7 +2994,7 @@ C             error message if type of inout is not correct
           NVALL = 1
           ITYP  = 120
           KEY   = 'SENSOR    ' 
-          CALL HM_READ_THGRSENS(SENSOR_TAB,
+          CALL HM_READ_THGRSENS(SENSORS,
      .      ITYP     ,KEY      ,IGS      ,LITHBUFMX ,ITHBUF    ,
      .      IAD      ,IFI      ,ITHGRP(1,IGS),ITHVAR,NVALL     ,
      .      NVARSENS ,NVARSENSG,VARSENS  ,VARSENSG  ,IVARSENSG ,
@@ -3109,5 +3142,17 @@ C Recherche des ID doubles
 C-------------------------------------
       CALL UDOUBLE(ITHGRP,NITHGR,NTHGRP2,MESS,0,BID)
 C
+
+      ! Deallocate Variables
+      DEALLOCATE(VARS6)
+      DEALLOCATE(VARS7)
+      DEALLOCATE(VARSG2)
+      DEALLOCATE(VARSG3)
+      DEALLOCATE(VARS)
+      DEALLOCATE(VARC)
+      DEALLOCATE(VARSG)
+      DEALLOCATE(IVARSG)
+      
+
       RETURN
       END

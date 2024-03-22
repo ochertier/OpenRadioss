@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -28,6 +28,7 @@ Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
 Chd|        ARRET                         source/system/arret.F         
 Chd|        FRICTIONPARTS_MODEL_ISOT      source/interfaces/int07/frictionparts_model.F
+Chd|        I11ASS3                       source/interfaces/int11/i11ass3.F
 Chd|        I11CDCOR3                     source/interfaces/int11/i11cdcor3.F
 Chd|        I11COR3                       source/interfaces/int11/i11cor3.F
 Chd|        I11DST3                       source/interfaces/int11/i11dst3.F
@@ -72,19 +73,14 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "units_c.inc"
-#include      "scr04_c.inc"
-#include      "scr07_c.inc"
 #include      "warn_c.inc"
 #include      "task_c.inc"
 #include      "parit_c.inc"
 #include      "impl1_c.inc"
 #include      "timeri_c.inc"
-#include      "sms_c.inc"
 #include      "macro.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -169,16 +165,18 @@ C     REAL
       INTEGER,TARGET, DIMENSION(1):: TABPARTS_FRIC_BID
       INTEGER,TARGET, DIMENSION(1):: ADPARTS_FRIC_BID
       my_real,TARGET, DIMENSION(1):: TABCOEF_FRIC_BID
+      INTEGER :: NRTS, NTY
 C-----------------------------------------------
-C	Calcul des adresses des buffers d'interfaces. 
-C	Les adresses des buffers J10-JFI et K10-KFI 
-C	sont remplaces systematiquement par des tableaux
-C	JD(i) et KD(i), en gardant les memes numeros d'indexes.
-C	Les anciens adresses directs Jn, Kn sont modifies
-C	dans la routine sans commentaires additionnels habituels
+C  Calcul des adresses des buffers d'interfaces. 
+C  Les adresses des buffers J10-JFI et K10-KFI 
+C  sont remplaces systematiquement par des tableaux
+C  JD(i) et KD(i), en gardant les memes numeros d'indexes.
+C  Les anciens adresses directs Jn, Kn sont modifies
+C  dans la routine sans commentaires additionnels habituels
 C----------------------------------------------------
 C
       NRTS  =IPARI(3)
+      NTY   =IPARI(7)
       IBC   =IPARI(11)
       IVIS2 =IPARI(14)
       NOINT =IPARI(15)
@@ -394,7 +392,7 @@ C
      7          PHIM2     ,CONDINTM1,CONDINTM2  ,IFORMTH  ) 
         ENDIF
 C
-	CALL I11ASS3 (
+          CALL I11ASS3 (
      1  JLT          ,A            ,NIN         ,NOINT       ,CS_LOC   ,
      2  STIFN        ,STIF         ,FSKYI       ,ISKY        ,FCONT    ,
      3  HS1          ,HS2          ,HM1         ,HM2         ,N1       ,
@@ -421,7 +419,7 @@ C
       ENDDO
       IF (SFSAVPARIT /= 0)THEN
           CALL SUM_6_FLOAT_SENS(FSAVPARIT, NISUB+1, 11, I_STOK,1,I_STOK,
-     .  			FBSAV6, 12, 6, DIMFB, ISENSINT )
+     .        FBSAV6, 12, 6, DIMFB, ISENSINT )
       ENDIF
       IF(ALLOCATED(FSAVPARIT)) DEALLOCATE (FSAVPARIT)
 

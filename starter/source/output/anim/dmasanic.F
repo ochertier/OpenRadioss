@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,11 +25,11 @@ Chd|  DMASANIC                      source/output/anim/dmasanic.F
 Chd|-- called by -----------
 Chd|        GENANI1                       source/output/anim/genani1.F  
 Chd|-- calls ---------------
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE DMASANIC(ELBUF_TAB,X   ,D    ,GEO  ,IPARG,                 
-     .                   IXQ  ,IXC  ,IXTG ,MAS  ,PM   ,                 
-     .                   EL2FA,NBF  ,IXUR )                             
+     .                   IXQ  ,IXC  ,IXTG ,MAS  ,PM   ,    
+     .                   EL2FA,NBF)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -43,8 +43,7 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------                        
 #include      "com01_c.inc"                                             
 #include      "com04_c.inc"                                             
-#include      "param_c.inc"                                             
-#include      "rnur_c.inc"                                              
+#include      "param_c.inc"
 C-----------------------------------------------                        
 C   D u m m y   A r g u m e n t s                                       
 C-----------------------------------------------                        
@@ -52,7 +51,7 @@ C     REAL
       my_real                                                           
      .   MAS(*) ,PM(NPROPM,*),GEO(NPROPG,*),X(3,*),            
      .   D(3,*)                                                         
-      INTEGER IPARG(NPARG,*),IXC(NIXC,*),IXTG(NIXTG,*),IXUR(NIXUR,*),   
+      INTEGER IPARG(NPARG,*),IXC(NIXC,*),IXTG(NIXTG,*),   
      .        IXQ(NIXQ,*),EL2FA(*),NBF                                  
       TYPE (ELBUF_STRUCT_), TARGET, DIMENSION(NGROUP) :: ELBUF_TAB
 C-----------------------------------------------                        
@@ -72,10 +71,9 @@ C---+----1----+----2----+----3----+----4----+----5----+----6----+----7--
       NN4 = NN3 + NUMELQ                                                
       NN5 = NN4 + NUMELC                                                
       NN6 = NN5 + NUMELTG                                               
-      NN7 = NN6                                                         
-      NN8 = NN7                                                         
-      NN9 = NN8                                                         
-      NN10= NN9 + NUMELUR                                               
+      NN7 = NN6
+      NN8 = NN7
+      NN9 = NN8
 C-----------------------------------------------                        
       DO 490 NG=1,NGROUP                                                
         GBUF => ELBUF_TAB(NG)%GBUF
@@ -154,16 +152,6 @@ C
             A0  = HALF*SQRT(XX3*XX3 + YY3*YY3 + ZZ3*ZZ3)              
             MAS(EL2FA(NN5+N_FA)) = RHO0*THK0*A0                         
           ENDDO                                                         
-C                                                                       
-C-----------------------------------------------                        
-C       RNUR                                                            
-C-----------------------------------------------                        
-        ELSEIF(ITY==50)THEN                                           
-         DO I=LFT,LLT                                                   
-            N = I + NFT                                                 
-            N_FA = I + NFT_FA                                           
-            MAS(EL2FA(NN9+N_FA)) = GEO(21,IXUR(1,N))                    
-         ENDDO                                                          
 C                                                                       
         ELSE                                                            
         ENDIF                                                           

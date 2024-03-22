@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -24,7 +24,6 @@ Chd|====================================================================
 Chd|  FMT_DEF                       source/starter/fmt_def.F      
 Chd|-- called by -----------
 Chd|        CONTRL                        source/starter/contrl.F       
-Chd|        INIVEL                        source/initial_conditions/general/inivel/inivel.F
 Chd|-- calls ---------------
 Chd|====================================================================
       SUBROUTINE FMT_DEF(INVERS,IFIX)

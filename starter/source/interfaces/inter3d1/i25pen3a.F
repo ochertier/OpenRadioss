@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -31,7 +31,7 @@ Chd|====================================================================
      .                  Z1    ,Z2    ,Z3    ,Z4     ,XI   ,
      .                  YI    ,ZI    ,PENE  ,IX1    ,IX2  ,
      .                  IX3   ,IX4   ,GAPV  ,NRTM   ,ETYP ,
-     .                  IBC  )
+     .                  IBC   ,NRTMT )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -52,9 +52,7 @@ C-----------------------------------------------
      .     Y1(MVSIZ), Y2(MVSIZ), Y3(MVSIZ), Y4(MVSIZ),
      .     Z1(MVSIZ), Z2(MVSIZ), Z3(MVSIZ), Z4(MVSIZ),
      .     XI(MVSIZ), YI(MVSIZ), ZI(MVSIZ), PENE(MVSIZ)
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
+      INTEGER , INTENT(IN) :: NRTMT
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -352,9 +350,9 @@ C
        ENDDO
 C
        DO I=1,JLT
-	X23 = X3(I) - X2(I)
-	Y23 = Y3(I) - Y2(I)
-	Z23 = Z3(I) - Z2(I)
+          X23 = X3(I) - X2(I)
+          Y23 = Y3(I) - Y2(I)
+          Z23 = Z3(I) - Z2(I)
         LA = ONE - LB2(I) - LC2(I)
         AAA = ONE / MAX(EM20,X23*X23+Y23*Y23+Z23*Z23)
         HLA= LA*ABS(LA) * AAA
@@ -375,9 +373,9 @@ C
        ENDDO
 C
        DO I=1,JLT
-	X34 = X4(I) - X3(I)
-	Y34 = Y4(I) - Y3(I)
-	Z34 = Z4(I) - Z3(I)
+          X34 = X4(I) - X3(I)
+          Y34 = Y4(I) - Y3(I)
+          Z34 = Z4(I) - Z3(I)
         LA = ONE - LB3(I) - LC3(I)
         AAA = ONE / MAX(EM20,X34*X34+Y34*Y34+Z34*Z34)
         HLA= LA*ABS(LA) * AAA
@@ -398,9 +396,9 @@ C
        ENDDO
 C
        DO I=1,JLT
-	X41 = X1(I) - X4(I)
-	Y41 = Y1(I) - Y4(I)
-	Z41 = Z1(I) - Z4(I)
+          X41 = X1(I) - X4(I)
+          Y41 = Y1(I) - Y4(I)
+          Z41 = Z1(I) - Z4(I)
         LA = ONE - LB4(I) - LC4(I)
         AAA = ONE / MAX(EM20,X41*X41+Y41*Y41+Z41*Z41)
         HLA= LA*ABS(LA) * AAA
@@ -458,7 +456,7 @@ C     Case of solids, cf symmetry conditions
 C--------------------------------------------------------
       DO I=1,JLT
 
-        IF(.NOT.(ETYP(I)==0 .OR. ETYP(I) > NRTM))CYCLE ! only solids including coating shell.
+        IF(.NOT.(ETYP(I)==0 .OR. ETYP(I) > NRTMT))CYCLE ! only solids including coating shell.
 
         DX =MAX(X1(I),X2(I),X3(I),X4(I))-MIN(X1(I),X2(I),X3(I),X4(I))
         DY =MAX(Y1(I),Y2(I),Y3(I),Y4(I))-MIN(Y1(I),Y2(I),Y3(I),Y4(I))

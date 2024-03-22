@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -32,7 +32,7 @@ Chd|        MY_ORDERS                     ../common_source/tools/sort/my_orders.
 Chd|        ZEROIN                        source/system/zeroin.F        
 Chd|        DRAPE_MOD                     share/modules1/drape_mod.F    
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/matparam_def_mod.F
+Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        R2R_MOD                       share/modules1/r2r_mod.F      
 Chd|        REORDER_MOD                   share/modules1/reorder_mod.F  
@@ -40,17 +40,18 @@ Chd|        STACK_MOD                     share/modules1/stack_mod.F
 Chd|====================================================================
       SUBROUTINE CGRTAILS(
      1       IXC    ,PM      ,IPARG     ,GEO     ,
-     2       EADD   ,ND      ,NELC      ,IPARTC  ,DD_IAD,
-     3       IDX    ,LB_MAX  ,INUM      ,ITR1    ,ITR2,
-     4       INDEX  ,ITRI2   ,CEP       ,THK     ,XNUM,
+     2       EADD   ,ND      ,IPARTC  ,DD_IAD,
+     3       IDX    ,INUM      ,ITR1    ,
+     4       INDEX  ,CEP       ,THK     ,XNUM,
      5       IGRSURF,IGRSH4N ,IGEO      ,IPM     ,
      6       IPART  ,SH4TREE ,NOD2ELC   ,ISHEOFF ,
      7       SH4TRIM ,TAGPRT_SMS,LGAUGE  ,IWORKSH ,
-     8       STACK   ,DRAPE    ,RNOISE  ,MATPARAM_TAB,
-     9       SH4ANG, IDDLEVEL)
+     8       STACK   ,DRAPE    ,RNOISE  ,MAT_PARAM,
+     9       SH4ANG, IDDLEVEL , DRAPEG,PRINT_FLAG,PTSHEL)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE MY_ALLOC_MOD
       USE MESSAGE_MOD
       USE R2R_MOD 
       USE STACK_MOD     
@@ -72,9 +73,7 @@ C     DD_IAD             TABLEAU DE LA DD EN SUPER GROUPES          S
 C     IPARTC                                                        E/S
 C     INUM(9,NUMELC)     TABLEAU DE TRAVAIL                         E/S
 C     ITR1(NSELC)        TABLEAU DE TRAVAIL                         E/S
-C     ITR2(NSELC)        TABLEAU DE TRAVAIL                         E/S
 C     INDEX(NUMELC)      TABLEAU DE TRAVAIL                         E/S
-C     ITRI2(NUMELC)      TABLEAU DE TRAVAIL                         E/S
 C     THK(NUMELC)        TABLEAU EPAISSEUR                          E/S
 C     XNUM(NUMELC)       TABLEAU DE TRAVAIL                         E/S
 C     CEP(NUMELC)        TABLEAU DE TRAVAIL                         E/S
@@ -84,81 +83,72 @@ C   I M P L I C I T   T Y P E S
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
-C   G L O B A L   P A R A M E T E R S
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C O M M O N   B L O C K S
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com10_c.inc"
 #include      "com_xfem1.inc"
 #include      "units_c.inc"
 #include      "param_c.inc"
 #include      "vect01_c.inc"
-#include      "warn_c.inc"
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
-#include      "scr12_c.inc"
 #include      "scr17_c.inc"
 #include      "remesh_c.inc"
 #include      "sms_c.inc"
 #include      "r2r_c.inc"
 #include      "drape_c.inc"
-#include      "my_allocate.inc"
 C-----------------------------------------------
 C   D U M M Y   A R G U M E N T S
 C-----------------------------------------------
-      INTEGER ND, IDX, LB_MAX
+      INTEGER ND, IDX
       INTEGER IXC(NIXC,*),IPARG(NPARG,*),EADD(*),IGEO(NPROPGI,*),
-     .    DD_IAD(NSPMD+1,*),IPARTC(*), NELC(*), SH4TRIM(*),
-     .    INUM(9,*),ITR1(*),ITR2(*),INDEX(*),ITRI2(*),CEP(*),
+     .    DD_IAD(NSPMD+1,*),IPARTC(*),SH4TRIM(*),
+     .    INUM(9,*),ITR1(*),INDEX(*),CEP(*),
      .    IPM(NPROPMI,*), IPART(LIPART1,*), SH4TREE(KSH4TREE,*), 
-     .    ISHEOFF(*),MINDEXC(NUMELC), TAGPRT_SMS(*),LGAUGE(3,*),
+     .    ISHEOFF(*),TAGPRT_SMS(*),LGAUGE(3,*),
      .    NOD2ELC(*),IWORKSH(3,*)
       INTEGER, INTENT(IN) :: IDDLEVEL
+      INTEGER, INTENT(IN) :: PRINT_FLAG !< flag to print the element group data
+      INTEGER , DIMENSION(NUMELC) , INTENT(INOUT):: PTSHEL
       MY_REAL
      .    PM(NPROPM,*), GEO(NPROPG,*), XNUM(*),THK(*),RNOISE(NPERTURB,*),
      .    SH4ANG(*)
-      TYPE(MATPARAM_STRUCT_) , TARGET, DIMENSION(NUMMAT),INTENT(IN) :: MATPARAM_TAB
+      TYPE(MATPARAM_STRUCT_) ,DIMENSION(NUMMAT),INTENT(IN) :: MAT_PARAM
 C-----------------------------------------------     
       TYPE (STACK_PLY) :: STACK
-      TYPE (DRAPE_)  :: DRAPE (*)
-      TYPE (DRAPE_) , DIMENSION(:), ALLOCATABLE :: XNUM_DRAPE
+      TYPE (DRAPE_)  , TARGET  :: DRAPE (NUMELC_DRAPE + NUMELTG_DRAPE)
+      TYPE (DRAPEG_)                             :: DRAPEG
+      TYPE (DRAPE_)  , DIMENSION(:), ALLOCATABLE :: XNUM_DRAPE
+      TYPE (DRAPEG_)                             :: XNUM_DRAPEG
 C-----------------------------------------------
       TYPE (GROUP_)  , DIMENSION(NGRSHEL)  :: IGRSH4N
       TYPE (SURF_)   , DIMENSION(NSURF)    :: IGRSURF
 C-----------------------------------------------
 C   L O C A L   V A R I A B L E S
 C-----------------------------------------------
-      INTEGER I, K, NGR1, MLN, NG, ISMST, ICSEN, JLEV, MY_NVSIZ, IADM,NLEVXF,
-     .   NPN, N, MID, PID, IHBE,NPT1,NPT2,NPG,IXFEM_ERR,
-     .   II, J, MIDN, PIDN, NSG, NEL, NE1, ITHK, ITHK0,
-     .   IPLA, IGTYP, KFTS, P, NEL_PREC,
-     .   NELGR,IDEBGR,IFINGR,IDEB,IFIN,NPASS,NELTRI,L,NEL1,NB,
-     .   NN,IAD1,NGROU,PRT,PRTN,
-     .   IMATLY, IPT,MLNLY, ILEV,MPT, IE, NUVARR,IPIDL,
-     .   NGP(NSPMD+1),N1,IRUP,NVARV,IVISC,IFWV,IXFEM,IPTUN,IMID,IREP,
-     .   INUM_R2R(1+R2R_SIU*NUMELC),ISUBSTACK,IIGEO,IADI,IPMAT, IPPID,
-     .   IPARTR2R,NB_LAW58,IPERT,STAT,IGMAT,IPINCH,ISM0,ISEATBELT
+      INTEGER I,K,NGR1,MLN,ISMST, ICSEN, JLEV, MY_NVSIZ, IADM,NLEVXF,
+     .   NPN, N, MID, PID, IHBE,NPG,IXFEM_ERR,
+     .   II, J, MIDN, PIDN, NSG, NEL, NE1, ITHK,
+     .   IPLA, IGTYP, KFTS, P, NEL_PREC,NB,
+     .   NN,PRT,
+     .   IMATLY, IPT,ILEV,MPT, IE, NUVARR,
+     .   NGP(NSPMD+1),N1,NVARV,IVISC,IFWV,IXFEM,IPTUN,IREP,
+     .   INUM_R2R(1+R2R_SIU*NUMELC),ISUBSTACK,IPMAT, IPPID,
+     .   IPARTR2R,NB_LAW58,IPERT,STAT,IGMAT,IPINCH,ISM0,ISEATBELT,
+     .   NSLICE,KK,NPT_DRP, IDRAPE, JJ,IEL,IEL0,ISHEL
       my_real
      .  ANGLE(NUMELC)
-      INTEGER, DIMENSION(:), ALLOCATABLE :: INDEXS2
+      INTEGER, DIMENSION(:), ALLOCATABLE :: INDEXS2,INUM_PTSHEL
 
-      INTEGER MODE,WORK(70000),NPTEL(NUMELC)
-      INTEGER, DIMENSION(:,:), ALLOCATABLE :: ISTOR
+      INTEGER MODE,WORK(70000)
+      INTEGER, DIMENSION(:,:), ALLOCATABLE :: ISTOR,INUM_WORKSH
 C     REAL OU REAL*8
       INTEGER ID
       CHARACTER*nchartitle,
      .   TITR,TITR1,TITR2
       my_real, DIMENSION(:,:), ALLOCATABLE :: XNUM_RNOISE
-      TYPE(MATPARAM_STRUCT_) , POINTER :: MATPARAM
       INTEGER :: NB_NODES, LDIM, OFFSET
-
+      
+      TYPE (DRAPE_PLY_)  , POINTER         :: DRAPE_PLY
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7--
 
       IF(NADMESH /= 0)THEN
@@ -167,7 +157,7 @@ C---+----1----+----2----+----3----+----4----+----5----+----6----+----7--
         ALLOCATE( ISTOR(0,0) )
       ENDIF
 
-      MY_ALLOCATE(INDEXS2,NUMELC)
+      CALL MY_ALLOC(INDEXS2,NUMELC)
       INDEXS2(1:NUMELC)=PERMUTATION%SHELL(1:NUMELC)
 C
       IF (NPERTURB > 0) THEN
@@ -197,50 +187,114 @@ C initialisation dd_iad
        END DO
       ENDDO
 C
+      IEL  = 0
       DO N=1,ND
-        NEL = EADD(N+1)-EADD(N)
+       NEL = EADD(N+1)-EADD(N)
 C      
-          IF(NDRAPE > 0) THEN
-             ALLOCATE( XNUM_DRAPE(NEL))
-             DO I =1, NEL
-               NPT = DRAPE(I+NFT)%NPT
-               ALLOCATE(XNUM_DRAPE(I)%RDRAPE(NPT,2),XNUM_DRAPE(I)%IDRAPE(NPT))
-               XNUM_DRAPE(I)%RDRAPE = 0
-               XNUM_DRAPE(I)%IDRAPE = 0
-             ENDDO 
-          ENDIF 
+       IF (NDRAPE > 0 .AND. NUMELC_DRAPE > 0) THEN
+         ALLOCATE(XNUM_DRAPE(NEL))                                                  
+         ALLOCATE(XNUM_DRAPEG%INDX(NEL))
+         XNUM_DRAPEG%INDX = 0                                             
+         DO I =1, NEL
+           IEL0 = DRAPEG%INDX(I + NFT)
+           IF(IEL0 == 0) CYCLE 
+           NPT = DRAPE(IEL0)%NPLY
+           NPT_DRP = DRAPE(IEL0)%NPLY_DRAPE
+           ALLOCATE(XNUM_DRAPE(I)%INDX_PLY(NPT))
+           ALLOCATE(XNUM_DRAPE(I)%DRAPE_PLY(NPT_DRP))        
+           XNUM_DRAPE(I)%INDX_PLY= 0                                       
+           DO J = 1,NPT_DRP                            
+                NSLICE = DRAPE(IEL0)%DRAPE_PLY(J)%NSLICE   
+                ALLOCATE(XNUM_DRAPE(I)%DRAPE_PLY(J)%RDRAPE(NSLICE,2))    
+                ALLOCATE(XNUM_DRAPE(I)%DRAPE_PLY(J)%IDRAPE(NSLICE,3)) 
+                XNUM_DRAPE(I)%DRAPE_PLY(J)%RDRAPE = 0             
+                XNUM_DRAPE(I)%DRAPE_PLY(J)%IDRAPE = 0
+           ENDDO                                                                           
+         ENDDO      
+        ELSE
+            ALLOCATE( XNUM_DRAPE(0) )
+        ENDIF     
+        ALLOCATE(INUM_WORKSH(3,NEL))                                                               
 C          
-        DO I = 1, NEL
-          INDEX(I) = I
-          INUM(1,I)=IPARTC(NFT+I)
-          INUM(2,I)=ISHEOFF(NFT+I)
-          INUM(3,I)=IXC(1,NFT+I)
-          INUM(4,I)=IXC(2,NFT+I)
-          INUM(5,I)=IXC(3,NFT+I)
-          INUM(6,I)=IXC(4,NFT+I)
-          INUM(7,I)=IXC(5,NFT+I)
-          INUM(8,I)=IXC(6,NFT+I)
-          INUM(9,I)=IXC(7,NFT+I)
-          XNUM(I)=THK(NFT+I)
-          IF (NSUBDOM>0) INUM_R2R(I) = TAG_ELCF(NFT+I)
-!!          NPTEL(I) = IWORKC(1,NFT+I)
-          IF (NDRAPE > 0) THEN
-            NPT = DRAPE(NFT + I)%NPT
-            XNUM_DRAPE(I)%NPT = NPT
-            DO IPT = 1, NPT
-              XNUM_DRAPE(I)%IDRAPE(IPT)   =DRAPE(NFT+I)%IDRAPE(IPT)
-              XNUM_DRAPE(I)%RDRAPE(IPT,1) =DRAPE(NFT+I)%RDRAPE(IPT,1)
-              XNUM_DRAPE(I)%RDRAPE(IPT,2) =DRAPE(NFT+I)%RDRAPE(IPT,2)
+        IF(NDRAPE > 0 .AND. NUMELC_DRAPE > 0) THEN
+          DO I = 1, NEL
+            INDEX(I) = I
+            INUM(1,I)=IPARTC(NFT+I)
+            INUM(2,I)=ISHEOFF(NFT+I)
+            INUM(3,I)=IXC(1,NFT+I)
+            INUM(4,I)=IXC(2,NFT+I)
+            INUM(5,I)=IXC(3,NFT+I)
+            INUM(6,I)=IXC(4,NFT+I)
+            INUM(7,I)=IXC(5,NFT+I)
+            INUM(8,I)=IXC(6,NFT+I)
+            INUM(9,I)=IXC(7,NFT+I)
+            XNUM(I)=THK(NFT+I)
+            INUM_WORKSH(1,I) = IWORKSH(1, NFT + I)
+            INUM_WORKSH(2,I) = IWORKSH(2, NFT + I)
+            INUM_WORKSH(3,I) = IWORKSH(3, NFT + I)
+            IF (NSUBDOM>0) INUM_R2R(I) = TAG_ELCF(NFT+I)
+            IF (NPERTURB > 0) THEN
+               DO IPERT = 1, NPERTURB
+                 XNUM_RNOISE(IPERT,I) = RNOISE(IPERT,NFT+I) 
+               ENDDO
+            ENDIF
+            ANGLE(I) = SH4ANG(NFT + I)
+            !drape structure
+            IEL0 = DRAPEG%INDX(NFT + I)  
+            XNUM_DRAPEG%INDX(I) = IEL0
+            IF(IEL0 == 0) CYCLE  
+            NPT = DRAPE(IEL0)%NPLY 
+            XNUM_DRAPE(I)%NPLY = NPT                          
+            XNUM_DRAPE(I)%INDX_PLY(1:NPT) = DRAPE(IEL0)%INDX_PLY(1:NPT)
+            NPT = DRAPE(IEL0)%NPLY_DRAPE                                      
+            XNUM_DRAPE(I)%NPLY_DRAPE = NPT 
+            DO JJ = 1, NPT                                                  
+              DRAPE_PLY => DRAPE(IEL0)%DRAPE_PLY(JJ)
+              NSLICE =  DRAPE_PLY%NSLICE                                        
+              XNUM_DRAPE(I)%DRAPE_PLY(JJ)%NSLICE =  NSLICE 
+              XNUM_DRAPE(I)%DRAPE_PLY(JJ)%IPID = DRAPE_PLY%IPID                
+              DO KK = 1,NSLICE                                                  
+                XNUM_DRAPE(I)%DRAPE_PLY(JJ)%IDRAPE(KK,1)=DRAPE_PLY%IDRAPE(KK,1) 
+                XNUM_DRAPE(I)%DRAPE_PLY(JJ)%IDRAPE(KK,2)=DRAPE_PLY%IDRAPE(KK,2) 
+                XNUM_DRAPE(I)%DRAPE_PLY(JJ)%RDRAPE(KK,1)=DRAPE_PLY%RDRAPE(KK,1) 
+                XNUM_DRAPE(I)%DRAPE_PLY(JJ)%RDRAPE(KK,2)=DRAPE_PLY%RDRAPE(KK,2) 
+              ENDDO 
+              DEALLOCATE(DRAPE_PLY%IDRAPE, DRAPE_PLY%RDRAPE)                                                            
             ENDDO
-          ENDIF
-          IF (NPERTURB > 0) THEN
-            DO IPERT = 1, NPERTURB
-              XNUM_RNOISE(IPERT,I) = RNOISE(IPERT,NFT+I) 
-            ENDDO
-          ENDIF
-          !!
-          ANGLE(I) = SH4ANG(NFT+I)          
-        ENDDO
+             DEALLOCATE(DRAPE(IEL0)%DRAPE_PLY)  
+             DEALLOCATE(DRAPE(IEL0)%INDX_PLY)
+           ENDDO
+        ELSE
+          DO I = 1, NEL
+            INDEX(I) = I
+            INUM(1,I)=IPARTC(NFT+I)
+            INUM(2,I)=ISHEOFF(NFT+I)
+            INUM(3,I)=IXC(1,NFT+I)
+            INUM(4,I)=IXC(2,NFT+I)
+            INUM(5,I)=IXC(3,NFT+I)
+            INUM(6,I)=IXC(4,NFT+I)
+            INUM(7,I)=IXC(5,NFT+I)
+            INUM(8,I)=IXC(6,NFT+I)
+            INUM(9,I)=IXC(7,NFT+I)
+            XNUM(I)=THK(NFT+I)
+            INUM_WORKSH(1,I) = IWORKSH(1,NFT + I)
+            INUM_WORKSH(2,I) = IWORKSH(2,NFT + I)
+            INUM_WORKSH(3,I) = IWORKSH(3,NFT + I)
+            IF (NSUBDOM>0) INUM_R2R(I) = TAG_ELCF(NFT+I)
+            IF (NPERTURB > 0) THEN
+               DO IPERT = 1, NPERTURB
+                 XNUM_RNOISE(IPERT,I) = RNOISE(IPERT,NFT+I) 
+               ENDDO
+             ENDIF
+             ANGLE(I) = SH4ANG(NFT+I)          
+           ENDDO          
+        ENDIF   
+        IF(ABS(ISIGI) == 3  .OR. ABS(ISIGI) == 4 .OR. ABS(ISIGI) == 5) THEN
+          ALLOCATE(INUM_PTSHEL(NEL))
+          DO I = 1, NEL
+            INUM_PTSHEL(I)=PTSHEL(NFT+I)
+          ENDDO
+         ENDIF    
 C
         IF(NADMESH/=0)THEN
           DO  K=1,KSH4TREE
@@ -254,10 +308,7 @@ C
             ENDDO
           END IF
         END IF
-C
-      
-
-
+C 
         IF(DOQA .NE. 0 .OR. NADMESH /=0 .OR. IDDLEVEL == 0) THEN
           MODE=0
           CALL MY_ORDERS( MODE, WORK, CEP(NFT+1), INDEX, NEL , 1)
@@ -267,54 +318,109 @@ C
           OFFSET = 3 ! nodes starts at INUM(4,I)
           CALL CPP_REORDER_ELEMENTS(NEL, NSPMD, NB_NODES, OFFSET, LDIM , CEP(NFT+1), INUM, INDEX)
         ENDIF
-
-
-        DO I = 1, NEL
-          PERMUTATION%SHELL(I+NFT)=INDEXS2(INDEX(I)+NFT)
-          IPARTC(I+NFT) =INUM(1,INDEX(I))
-          ISHEOFF(I+NFT)=INUM(2,INDEX(I))
-          THK(I+NFT)   =XNUM(INDEX(I))
-          IXC(1,I+NFT)=INUM(3,INDEX(I))
-          IXC(2,I+NFT)=INUM(4,INDEX(I))
-          IXC(3,I+NFT)=INUM(5,INDEX(I))
-          IXC(4,I+NFT)=INUM(6,INDEX(I))
-          IXC(5,I+NFT)=INUM(7,INDEX(I))
-          IXC(6,I+NFT)=INUM(8,INDEX(I))
-          IXC(7,I+NFT)=INUM(9,INDEX(I))
-          IF (NSUBDOM>0) TAG_ELCF(NFT+I) = INUM_R2R(INDEX(I))
-          ITR1(NFT+INDEX(I)) = NFT+I
-C         
-!!          IWORKSH(1,NFT+I) = NPTEL(INDEX(I))
-          IF (NDRAPE > 0) THEN
-             NPT = XNUM_DRAPE(INDEX(I))%NPT 
-             DRAPE(NFT + I)%NPT = NPT
-            DO IPT = 1, NPT
-              DRAPE(NFT + I)%IDRAPE(IPT)   = XNUM_DRAPE(INDEX(I))%IDRAPE(IPT)
-              DRAPE(NFT + I)%RDRAPE(IPT,1) = XNUM_DRAPE(INDEX(I))%RDRAPE(IPT,1)
-              DRAPE(NFT + I)%RDRAPE(IPT,2) = XNUM_DRAPE(INDEX(I))%RDRAPE(IPT,2)
+        IF(NDRAPE > 0  .AND. NUMELC_DRAPE > 0) THEN
+            DO I = 1, NEL
+              PERMUTATION%SHELL(I+NFT)=INDEXS2(INDEX(I)+NFT)
+              IPARTC(I+NFT) =INUM(1,INDEX(I))
+              ISHEOFF(I+NFT)=INUM(2,INDEX(I))
+              THK(I+NFT)   =XNUM(INDEX(I))
+              IXC(1,I+NFT)=INUM(3,INDEX(I))
+              IXC(2,I+NFT)=INUM(4,INDEX(I))
+              IXC(3,I+NFT)=INUM(5,INDEX(I))
+              IXC(4,I+NFT)=INUM(6,INDEX(I))
+              IXC(5,I+NFT)=INUM(7,INDEX(I))
+              IXC(6,I+NFT)=INUM(8,INDEX(I))
+              IXC(7,I+NFT)=INUM(9,INDEX(I))
+              IF (NSUBDOM>0) TAG_ELCF(NFT+I) = INUM_R2R(INDEX(I))
+              ITR1(NFT+INDEX(I)) = NFT+I
+              IWORKSH(1, NFT + I)=INUM_WORKSH(1,INDEX(I))
+              IWORKSH(2, NFT + I)=INUM_WORKSH(2,INDEX(I))
+              IWORKSH(3, NFT + I)=INUM_WORKSH(3,INDEX(I))
+C             
+              IF (NPERTURB > 0) THEN
+                DO IPERT = 1, NPERTURB
+                  RNOISE(IPERT,I+NFT) = XNUM_RNOISE(IPERT,INDEX(I)) 
+                ENDDO
+              ENDIF
+               SH4ANG(NFT+I) = ANGLE(INDEX(I))
+               !!
+               IEL0 = XNUM_DRAPEG%INDX(INDEX(I))
+               DRAPEG%INDX(NFT + I)= 0
+               IF(IEL0 == 0) CYCLE
+               IEL = IEL + 1
+               NPT = XNUM_DRAPE(INDEX(I))%NPLY ! number of layer shell
+               ALLOCATE(DRAPE(IEL)%INDX_PLY(NPT)) 
+               DRAPE(IEL)%INDX_PLY = 0
+               DRAPEG%INDX(NFT + I)= IEL
+               DRAPE(IEL)%INDX_PLY(1:NPT) =  XNUM_DRAPE(INDEX(I))%INDX_PLY(1:NPT)
+               DRAPE(IEL)%NPLY = NPT
+               NPT = XNUM_DRAPE(INDEX(I))%NPLY_DRAPE       ! NPT_DRP                                
+               DRAPE(IEL)%NPLY_DRAPE= NPT
+               ALLOCATE(DRAPE(IEL)%DRAPE_PLY(NPT))
+               DO JJ = 1, NPT         
+                 DRAPE_PLY => DRAPE(IEL)%DRAPE_PLY(JJ)                                  
+                 NSLICE = XNUM_DRAPE(INDEX(I))%DRAPE_PLY(JJ)%NSLICE                           
+                 DRAPE_PLY%NSLICE = NSLICE   
+                 DRAPE_PLY%IPID =  XNUM_DRAPE(INDEX(I))%DRAPE_PLY(JJ)%IPID
+                 ALLOCATE(DRAPE_PLY%IDRAPE(NSLICE,2), DRAPE_PLY%RDRAPE(NSLICE,2))
+                  DRAPE_PLY%IDRAPE = 0
+                  DRAPE_PLY%RDRAPE = ZERO
+                 DO KK = 1,NSLICE                                                              
+                   DRAPE_PLY%IDRAPE(KK,1) = XNUM_DRAPE(INDEX(I))%DRAPE_PLY(JJ)%IDRAPE(KK,1)    
+                   DRAPE_PLY%IDRAPE(KK,2) = XNUM_DRAPE(INDEX(I))%DRAPE_PLY(JJ)%IDRAPE(KK,2)    
+                   DRAPE_PLY%RDRAPE(KK,1) = XNUM_DRAPE(INDEX(I))%DRAPE_PLY(JJ)%RDRAPE(KK,1)    
+                   DRAPE_PLY%RDRAPE(KK,2) = XNUM_DRAPE(INDEX(I))%DRAPE_PLY(JJ)%RDRAPE(KK,2) 
+                 ENDDO                                                                         
+               ENDDO             
             ENDDO
-          ENDIF
-          IF (NPERTURB > 0) THEN
-            DO IPERT = 1, NPERTURB
-              RNOISE(IPERT,I+NFT) = XNUM_RNOISE(IPERT,INDEX(I)) 
+        ELSE
+            DO I = 1, NEL
+              PERMUTATION%SHELL(I+NFT)=INDEXS2(INDEX(I)+NFT)
+              IPARTC(I+NFT) =INUM(1,INDEX(I))
+              ISHEOFF(I+NFT)=INUM(2,INDEX(I))
+              THK(I+NFT)   =XNUM(INDEX(I))
+              IXC(1,I+NFT)=INUM(3,INDEX(I))
+              IXC(2,I+NFT)=INUM(4,INDEX(I))
+              IXC(3,I+NFT)=INUM(5,INDEX(I))
+              IXC(4,I+NFT)=INUM(6,INDEX(I))
+              IXC(5,I+NFT)=INUM(7,INDEX(I))
+              IXC(6,I+NFT)=INUM(8,INDEX(I))
+              IXC(7,I+NFT)=INUM(9,INDEX(I))
+              IF (NSUBDOM>0) TAG_ELCF(NFT+I) = INUM_R2R(INDEX(I))
+              ITR1(NFT+INDEX(I)) = NFT+I
+              IWORKSH(1, NFT + I)=INUM_WORKSH(1,INDEX(I))
+              IWORKSH(2, NFT + I)=INUM_WORKSH(2,INDEX(I))
+              IWORKSH(3, NFT + I)=INUM_WORKSH(3,INDEX(I))
+C             
+!!              IWORKSH(1,NFT+I) = NPTEL(INDEX(I))
+              IF (NPERTURB > 0) THEN
+                DO IPERT = 1, NPERTURB
+                  RNOISE(IPERT,I+NFT) = XNUM_RNOISE(IPERT,INDEX(I)) 
+                ENDDO
+              ENDIF
+              !!
+               SH4ANG(NFT+I) = ANGLE(INDEX(I))
             ENDDO
-          ENDIF
-          !!
-           SH4ANG(NFT+I) = ANGLE(INDEX(I))
-        ENDDO
-
- 	IF(NADMESH/=0)THEN
- 	  DO  K=1,KSH4TREE
- 	    DO  I=1,NEL
- 	      SH4TREE(K,I+NFT)=ISTOR(K,INDEX(I))
- 	    ENDDO
- 	  ENDDO
- 	  IF(LSH4TRIM/=0)THEN
- 	    DO  I=1,NEL
- 	      SH4TRIM(I+NFT)=ISTOR(KSH4TREE+1,INDEX(I))
- 	    ENDDO
- 	  END IF
- 	END IF
+        ENDIF   ! NDRAPE  
+        
+        IF(ABS(ISIGI)==3.OR.ABS(ISIGI)== 4.OR.ABS(ISIGI)==5)THEN
+         DO I=1,NEL
+           PTSHEL(NFT+I) = INUM_PTSHEL(INDEX(I))
+         ENDDO  
+          DEALLOCATE(INUM_PTSHEL)
+        ENDIF
+        IF(NADMESH/=0)THEN
+            DO  K=1,KSH4TREE
+                DO  I=1,NEL
+                    SH4TREE(K,I+NFT)=ISTOR(K,INDEX(I))
+                ENDDO
+            ENDDO
+            IF(LSH4TRIM/=0)THEN
+                DO  I=1,NEL
+                    SH4TRIM(I+NFT)=ISTOR(KSH4TREE+1,INDEX(I))
+                ENDDO
+            END IF
+        END IF
 
 C dd-iad
         P = CEP(NFT+INDEX(1))
@@ -348,12 +454,23 @@ C
         ENDDO
         NFT = NFT + NEL
 C
-         IF(NDRAPE > 0) THEN
-             DO I =1, NEL
-               DEALLOCATE(XNUM_DRAPE(I)%RDRAPE,XNUM_DRAPE(I)%IDRAPE)
-            ENDDO 
-            DEALLOCATE( XNUM_DRAPE ) 
-         ENDIF     
+        IF(NDRAPE > 0 .AND. NUMELC_DRAPE > 0) THEN
+         DO I =1, NEL
+            IEL0 = XNUM_DRAPEG%INDX(I) 
+            IF(IEL0 == 0 ) CYCLE                                                        
+            NPT_DRP = XNUM_DRAPE(I)%NPLY_DRAPE                
+            DO J = 1,NPT_DRP                                             
+               DEALLOCATE(XNUM_DRAPE(I)%DRAPE_PLY(J)%RDRAPE)         
+               DEALLOCATE(XNUM_DRAPE(I)%DRAPE_PLY(J)%IDRAPE) 
+            ENDDO   
+            DEALLOCATE(XNUM_DRAPE(I)%DRAPE_PLY,XNUM_DRAPE(I)%INDX_PLY)                                                                    
+         ENDDO
+         DEALLOCATE(XNUM_DRAPE,XNUM_DRAPEG%INDX )
+        ELSE
+          DEALLOCATE(XNUM_DRAPE )      
+        ENDIF 
+        !!
+        DEALLOCATE(INUM_WORKSH)
       ENDDO   ! ND       
 C
 C RENUMEROTATION DE L ARBRE
@@ -421,6 +538,7 @@ C ngroup global
           MID = IXC(1,II)
           MLN = NINT(PM(19,MID))
           PID = IXC(6,II)
+          IPARTR2R = 0
           IF (NSUBDOM>0) IPARTR2R = TAG_MAT(MID)
 c          NPN = NINT(GEO(6,PID))
           NPN   = IGEO(4,PID)
@@ -440,6 +558,7 @@ C          IGTYP=NINT(GEO(12,PID))
           NLEVXF = 0
           IXFEM = 0
           ISUBSTACK = 0
+          IDRAPE = 0
           IF (IGTYP == 17 .OR. IGTYP == 51 .OR. IGTYP == 52) THEN
             NPN = IWORKSH(1,II)
             ISUBSTACK =IWORKSH(3,II)
@@ -454,14 +573,28 @@ C          IGTYP=NINT(GEO(12,PID))
      .                    I2=IXC(NIXC,II))
                CALL ARRET(2)
             ENDIF
-          ENDIF  
+          ENDIF
+          IF(NDRAPE > 0 .AND. (IGTYP == 17 .OR. IGTYP == 51 .OR. IGTYP ==52) ) THEN
+              IF(DRAPEG%INDX(II) /= 0 ) IDRAPE = 1
+          ENDIF
+          ISHEL=IHBE+1
+          IF ((ISHEL /=12 .AND. ISHEL /=24).AND.ISHEL > 5 ) THEN  ! not expected 
+            CALL FRETITL2(TITR,IGEO(NPROPGI-LTITR+1,PID),LTITR)
+            CALL ANCMSG(MSGID=3007,
+     .                  ANMODE=ANINFO,
+     .                  MSGTYPE=MSGERROR,
+     .                  I1=IGEO(1,PID),
+     .                  C1=TITR,
+     .                  I2=ISHEL,
+     .                  PRMOD=MSG_CUMU)
+          ENDIF
 c-------- check xfem compatibility
 c          IF (ICRACK3D > 0) THEN
             IF (IGTYP == 11 .or. IGTYP == 16) THEN
               DO IPT = 1, NPN                                    
                 IMATLY  = IGEO(100+IPT,PID)
-                IF (IPM(220,IMATLY) > 0) THEN
-                  IXFEM = IPM(236,IMATLY)
+                IF (MAT_PARAM(IMATLY)%NFAIL > 0) THEN
+                  IXFEM = MAT_PARAM(IMATLY)%IXFEM
                 ENDIF
               ENDDO                                              
               IF (IXFEM  > 0) IXFEM = 1
@@ -471,12 +604,12 @@ c          IF (ICRACK3D > 0) THEN
                IPMAT   = IPPID + NPN
                DO IPT = 1, NPN
                  IMATLY  = STACK%IGEO(IPMAT + IPT ,ISUBSTACK)
-                 IF (IPM(220,IMATLY) > 0) IXFEM = IPM(236,IMATLY)
+                 IF (MAT_PARAM(IMATLY)%NFAIL > 0) IXFEM = MAT_PARAM(IMATLY)%IXFEM
                  IF (IXFEM  > 0) IXFEM = 1
                  IF (IXFEM == 1) NLEVXF = NXEL*NPN
                ENDDO
             ELSEIF (IGTYP == 1 .or. IGTYP == 9 .or. IGTYP == 10 .or. IGTYP == 17) THEN
-              IXFEM = IPM(236,MID)
+              IXFEM = MAT_PARAM(MID)%IXFEM
               IF (IXFEM == 1) THEN
                 IXFEM  = 2
                 NLEVXF = NXEL 
@@ -507,11 +640,10 @@ C--------------------
 C-   ISMSTR IPLAST,ITHICK Automatic           
 C-----------all shell prop
           IF (IGTYP > 0)  THEN
-           MATPARAM => MATPARAM_TAB(MID)
 C----- fixed to 1 excepting small strain case          
            IF (ITHK<0) THEN
             ITHK = 1 
-            IF (MATPARAM%SMSTR==1 .OR. MLN == 1) ITHK = 0
+            IF (MAT_PARAM(MID)%SMSTR==1 .OR. MLN == 1) ITHK = 0
 C--------message out       
             ISM0 = ITHK
             IF (ITHK == 0) ISM0=2
@@ -539,12 +671,12 @@ C------ --
            IF (ISMST<0) THEN
 C---  MATPARAM%SMSTR : 2 large, 1: small  ;   MATPARAM%STRAIN_FORMULATION : 1 inc, 2 total     
 c       there is no recommended total strain for shell for the moment
-              IF (MATPARAM%SMSTR==1) THEN
+              IF (MAT_PARAM(MID)%SMSTR==1) THEN
                 ISMST = 1
               ELSE
                 ISMST = 2
 C----certain laws to use 4 to see one by one
-                IF (MATPARAM%STRAIN_FORMULATION==2) ISMST =4             
+                IF (MAT_PARAM(MID)%STRAIN_FORMULATION==2) ISMST =4             
                 IF (MLN == 58 ) ISMST =4
                 IF (MLN == 19 .AND. NPN==1) ISMST =11
               END IF
@@ -614,6 +746,27 @@ c          ENDIF
      .                      I2=MLN,
      .                      I3=ISMST,
      .                      PRMOD=MSG_CUMU)
+          ELSEIF (ISMST == 10 ) THEN
+            IF (ISHEL /=12 .AND. ISHEL /=24 ) THEN  ! not expected 
+              CALL ANCMSG(MSGID=3019,
+     .                    ANMODE=ANINFO,
+     .                    MSGTYPE=MSGWARNING,
+     .                    I1=ID,
+     .                    C1=TITR,
+     .                    I2=ISHEL,
+     .                    PRMOD=MSG_CUMU)
+              ISMST = 2
+            ENDIF
+            IF (MLN /=42 .AND. MLN /=69 .AND. MLN /=88) THEN  ! 
+              CALL ANCMSG(MSGID=3020,
+     .                    ANMODE=ANINFO,
+     .                    MSGTYPE=MSGWARNING,
+     .                    I1=ID,
+     .                    C1=TITR,
+     .                    I2=MLN,
+     .                    PRMOD=MSG_CUMU)
+              ISMST = 2
+            ENDIF
           ENDIF
 
           IF(IGTYP == 0)MLN=0
@@ -692,7 +845,7 @@ C
             ITHK = 1
           ENDIF
 C---------Drilling dof---ISHELL=12(QBAT uses NB4)--------         
-         IF (ISROT>0.AND.IHBE<11) THEN    	
+         IF (ISROT>0.AND.IHBE<11) THEN
           CALL ANCMSG(MSGID=854,
      .                MSGTYPE=MSGWARNING,
      .                ANMODE=ANINFO_BLIND_2,
@@ -718,11 +871,11 @@ C-------------
          IF (IGTYP == 11) THEN
            DO IPT = 1, NPN                                         
               IMATLY  = IGEO(100+IPT,PID)                          
-              IF(IPM(220,IMATLY) >  0)THEN                         
+              IF(MAT_PARAM(IMATLY)%NFAIL >  0)THEN                         
                  IPARG(43,NGROUP) = 1                              
               ENDIF                                                
-              IF (IPM(222,IMATLY) > 0 ) IVISC =  1                 
-              IF (IPM(254,IMATLY) > 0)  IFWV = 1                         
+              IF (MAT_PARAM(IMATLY)%IVISC > 0 ) IVISC =  1                 
+              IF (MAT_PARAM(IMATLY)%IFAILWAVE > 0)  IFWV = 1                         
            ENDDO                                                   
 C-------------
          ELSEIF(IGTYP == 17) THEN
@@ -735,10 +888,10 @@ C-------------
                IPMAT   = IPPID + NPN
                DO IPT = 1, NPN
                 IMATLY  = STACK%IGEO(IPMAT + IPT ,ISUBSTACK)
-                IF(IPM(220,IMATLY) >  0)THEN
+                IF(MAT_PARAM(IMATLY)%NFAIL >  0)THEN
                  IPARG(43,NGROUP) = 1
                 ENDIF
-                IF( IPM(222,IMATLY) > 0 ) IVISC =  1  
+                IF( MAT_PARAM(IMATLY)%IVISC > 0 ) IVISC =  1  
                ENDDO 
 C---
 C new shell property (variable NPT through each layer)
@@ -749,11 +902,11 @@ C---
                IPMAT   = IPPID + NPN
                DO IPT = 1, NPN
                  IMATLY  = STACK%IGEO(IPMAT + IPT ,ISUBSTACK)
-                 IF (IPM(220,IMATLY) >  0) THEN
+                 IF (MAT_PARAM(IMATLY)%NFAIL >  0) THEN
                    IPARG(43,NGROUP) = 1
                  ENDIF
-                 IF (IPM(222,IMATLY) > 0) IVISC =  1  
-                 IF (IPM(254,IMATLY) > 0) IFWV = 1                         
+                 IF (MAT_PARAM(IMATLY)%IVISC > 0) IVISC =  1  
+                 IF (MAT_PARAM(IMATLY)%IFAILWAVE > 0) IFWV = 1                         
 C --- PID 51 combined with LAW58 ---
                  IF (NINT(PM(19,IMATLY)) == 58) NB_LAW58 = NB_LAW58 + 1
                ENDDO
@@ -765,11 +918,11 @@ C --- set new IREP for groups:
                ENDIF
 C-------------
          ELSE  ! IGTYP = 1
-            IF(IPM(220 ,MID) > 0.AND.MLN /= 0 .AND. MLN /=13)THEN
+            IF(MAT_PARAM(MID)%NFAIL > 0.AND.MLN /= 0 .AND. MLN /=13)THEN
               IPARG(43,NGROUP) = 1
             ENDIF
-            IF (IPM(222,MID) > 0 ) IVISC =  1  
-            IF (IPM(254,MID) > 0)  IFWV = 1                         
+            IF (MAT_PARAM(MID)%IVISC > 0 ) IVISC =  1  
+            IF (MAT_PARAM(MID)%IFAILWAVE > 0)  IFWV = 1                         
          ENDIF ! IGTYP 
 C-------------
 C         
@@ -877,9 +1030,10 @@ C for stack
           IPARG(71,NGROUP) = ISUBSTACK 
           IPARG(75,NGROUP) = IGMAT
 c         non-local variable regularization flag for failure models
-          IPARG(78,NGROUP) = IPM(253,MID)   ! NLOC_FAIL 
+          IPARG(78,NGROUP) = MAT_PARAM(MID)%NLOC   ! NLOC_FAIL 
           IPARG(79,NGROUP) = IFWV
 C
+          IPARG(92,NGROUP) = IDRAPE  !
           NFT = NFT + NE1  
 C         
          END DO
@@ -936,16 +1090,30 @@ c
      .                  MSGTYPE=MSGWARNING,
      .                  ANMODE=ANINFO_BLIND_2,
      .                  PRMOD=MSG_PRINT)
+      CALL ANCMSG(MSGID=3007,                 
+     .            ANMODE=ANINFO,
+     .            MSGTYPE=MSGERROR,
+     .            PRMOD=MSG_PRINT)       
+      CALL ANCMSG(MSGID=3019,                 
+     .            ANMODE=ANINFO,
+     .            MSGTYPE=MSGWARNING,
+     .            PRMOD=MSG_PRINT)       
+      CALL ANCMSG(MSGID=3020,                 
+     .            ANMODE=ANINFO,
+     .            MSGTYPE=MSGWARNING,
+     .            PRMOD=MSG_PRINT)       
 C-----------
-      WRITE(IOUT,1000) 
-      DO  N=NGR1,NGROUP
-        MLN = IPARG(1,N)       
+      IF(PRINT_FLAG>6) THEN
+        WRITE(IOUT,1000) 
+        DO  N=NGR1,NGROUP
+            MLN = IPARG(1,N)       
 c
-        WRITE(IOUT,1001)N,MLN,IPARG(2,N),IPARG(3,N)+1,
+            WRITE(IOUT,1001)N,MLN,IPARG(2,N),IPARG(3,N)+1,
      +                IPARG(5,N),IABS(IPARG(6,N)),
      +                IPARG(9,N),IPARG(10,N),IPARG(44,N),
      +                IPARG(23,N),IPARG(43,N),IPARG(90,N)   
-      ENDDO
+        ENDDO
+      ENDIF
 C-----------
  1000 FORMAT(/
      +       /6X,'3D - SHELL ELEMENT GROUPS'/

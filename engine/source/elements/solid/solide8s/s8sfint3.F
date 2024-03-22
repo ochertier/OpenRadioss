@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,11 +26,17 @@ Chd|-- called by -----------
 Chd|        S8SFORC3                      source/elements/solid/solide8s/s8sforc3.F
 Chd|-- calls ---------------
 Chd|====================================================================
-      SUBROUTINE S8SFINT3(SIG,
-     .   F11,F21,F31,F12,F22,F32,F13,F23,F33,F14,F24,F34,
-     .   F15,F25,F35,F16,F26,F36,F17,F27,F37,F18,F28,F38,
-     .   DN_X, DN_Y, DN_Z, BB,
-     .   VOL,QVIS,ICP,JFAC,NEL ,I_SH,IDEGE)
+      SUBROUTINE S8SFINT3(
+     1   SIG,     F11,     F21,     F31,
+     2   F12,     F22,     F32,     F13,
+     3   F23,     F33,     F14,     F24,
+     4   F34,     F15,     F25,     F35,
+     5   F16,     F26,     F36,     F17,
+     6   F27,     F37,     F18,     F28,
+     7   F38,     DN_X,    DN_Y,    DN_Z,
+     8   BB,      VOL,     QVIS,    ICP,
+     9   JFAC,    NEL,     I_SH,    IDEGE,
+     A   ISMSTR)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -42,12 +48,11 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "vect01_c.inc"
-#include      "com01_c.inc"
 #include      "nsvis_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: ISMSTR
       INTEGER ICP,NEL,I_SH,IDEGE(*)
 C     REAL
       my_real
@@ -58,9 +63,6 @@ C     REAL
      .   F15(*),F25(*),F35(*),F16(*),F26(*),F36(*),
      .   F17(*),F27(*),F37(*),F18(*),F28(*),F38(*),
      .   VOL(*),QVIS(*),JFAC(*),BB(6,24,MVSIZ)
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -73,7 +75,7 @@ C     REAL
 C-----------------------------------------------
       
       IF (ICP==1.AND.(ISMSTR==10.OR.ISMSTR==12)) THEN
-       DO I=LFT,LLT
+       DO I=1,NEL
         FVOL=JFAC(I)*VOL(I)
         S1(I)=(SIG(I,1)+SVIS(I,1)-QVIS(I))*FVOL
         S2(I)=(SIG(I,2)+SVIS(I,2)-QVIS(I))*FVOL
@@ -84,7 +86,7 @@ C-----------------------------------------------
        ENDDO
       ELSEIF (ICP==1) THEN
        COEF=ZEP3 
-       DO I=LFT,LLT
+       DO I=1,NEL
         P(I) =COEF*(SIG(I,1)+SIG(I,2)+SIG(I,3)
      .            +SVIS(I,1)+SVIS(I,2)+SVIS(I,3))
         IF (IDEGE(I)>10) P(I) =QVIS(I)
@@ -96,7 +98,7 @@ C-----------------------------------------------
         S6(I)=(SIG(I,6)+SVIS(I,6))*VOL(I)
        ENDDO
       ELSE
-      DO I=LFT,LLT
+      DO I=1,NEL
         S1(I)=(SIG(I,1)+SVIS(I,1)-QVIS(I))*VOL(I)
         S2(I)=(SIG(I,2)+SVIS(I,2)-QVIS(I))*VOL(I)
         S3(I)=(SIG(I,3)+SVIS(I,3)-QVIS(I))*VOL(I)
@@ -106,7 +108,7 @@ C-----------------------------------------------
        ENDDO
       ENDIF
       ! Cas ANS
-        DO I=LFT,LLT
+        DO I=1,NEL
         F11(I)=F11(I)-(S1(I)*BB(1,1,I)+S2(I)*BB(2,1,I)+S3(I)*BB(3,1,I)
      .                +S4(I)*BB(4,1,I)+S6(I)*BB(5,1,I)+S5(I)*BB(6,1,I))
         F21(I)=F21(I)-(S1(I)*BB(1,2,I)+S2(I)*BB(2,2,I)+S3(I)*BB(3,2,I)
@@ -165,7 +167,7 @@ C-----------------------------------------------
 
         ENDDO
         ! Cas de l'integration complete standard
-!        DO I=LFT,LLT
+!        DO I=1,NEL
 !        F11(I)=F11(I)-(S1(I)*DN_X(I,1)+S4(I)*DN_Y(I,1)+S6(I)*DN_Z(I,1))
 !        F21(I)=F21(I)-(S2(I)*DN_Y(I,1)+S4(I)*DN_X(I,1)+S5(I)*DN_Z(I,1))
 !        F31(I)=F31(I)-(S3(I)*DN_Z(I,1)+S5(I)*DN_Y(I,1)+S6(I)*DN_X(I,1))

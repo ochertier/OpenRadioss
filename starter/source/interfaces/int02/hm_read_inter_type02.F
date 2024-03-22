@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -32,6 +32,7 @@ Chd|        HM_GET_FLOATV_DIM             source/devtools/hm_reader/hm_get_float
 Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
 Chd|        HM_OPTION_IS_ENCRYPTED        source/devtools/hm_reader/hm_option_is_encrypted.F
 Chd|        NGR2USR                       source/system/nintrr.F        
+Chd|        ALE_MOD                       ../common_source/modules/ale/ale_mod.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
@@ -48,13 +49,11 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE GROUPDEF_MOD
       USE SUBMODEL_MOD
+      USE ALE_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -76,18 +75,11 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
-#include      "scr06_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com09_c.inc"
 #include      "units_c.inc"
-#include      "warn_c.inc"
 #include      "scr12_c.inc"
-#include      "sysunit.inc"
-#include      "fluid_scr_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -217,10 +209,10 @@ C-------*CHECKS*-------------------
 C
       IF ((ISU1 > 0).AND.(IGRNOD(ISU1)%NENTITY == 0)) THEN
         CALL ANCMSG(MSGID=1131,
-     .   		ANMODE=ANINFO_BLIND_1,
-     .  		MSGTYPE=MSGERROR,
-     .    		I1=NOINT,
-     .    		C1=TITR)
+     .       ANMODE=ANINFO_BLIND_1,
+     .      MSGTYPE=MSGERROR,
+     .        I1=NOINT,
+     .        C1=TITR)
       END IF
 C
       IPARI(45) = ISU1
@@ -244,15 +236,23 @@ C
      .                  C3='TYPE2',
      .                  I2=ILEV)
       ENDIF
-      IF (ICAA == 1 .AND. ILEV == 0) ILEV=4
+      IF (ALE%GLOBAL%ICAA == 1 .AND. ILEV == 0) ILEV=4
       IF (ILEV == 5) ILEV=0
 
 ! IDEL2
-      IF ((ILEV/=0 .AND. ILEV/=1 .AND. ILEV/=5 .AND. ILEV/=25 .AND. ILEV/=26 .AND. ILEV/=27 .AND. ILEV/=28)) 
-     .      IDEL2 = 0
+      IF ((ILEV/=0 .AND. ILEV/=1 .AND. ILEV/=5 .AND. ILEV/=25 .AND. ILEV/=26 .AND. ILEV/=27 .AND. ILEV/=28)) IDEL2 = 0
       IF (N2D == 1)  IDEL2 = 0
       IPARI(17) = IDEL2
-
+C
+      IF ((N2D > 0).AND.(ILEV/=0)) THEN
+        CALL ANCMSG(MSGID=3015,
+     .              ANMODE=ANINFO_BLIND_1,
+     .              MSGTYPE=MSGERROR,
+     .              I1=NOINT,
+     .              C1=TITR,
+     .              I2=ILEV)
+      ENDIF
+C
       IF(IBUC==0)IBUC=2
       IPARI(12) = IBUC
 
@@ -348,8 +348,8 @@ C.....* CHECK AND Storage IPARI FRIGAP *.........
         IF (SCAL_SR  == ZERO) SCAL_SR  = ONE*SR_UNIT
         IF (SCAL_D == ZERO) SCAL_D = ONE*D_UNIT
 C
-C	DNMAX = DNMAX*L_UNIT
-C	DTMAX = DTMAX*L_UNIT
+C  DNMAX = DNMAX*L_UNIT
+C  DTMAX = DTMAX*L_UNIT
 C        AREA = AREA*FAC_L*FAC_L
 C        SCAL_F = SCAL_F*FAC_M/(FAC_L*FAC_T**2)
 C        SCAL_SR = SCAL_SR*FAC_M/(FAC_L*FAC_T**3)

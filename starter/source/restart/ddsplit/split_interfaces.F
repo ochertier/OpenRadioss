@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -85,21 +85,21 @@ Chd|        SPLIT_SEG_NODLOC              source/restart/ddsplit/inter_tools.F
 Chd|        SPLIT_SEG_NODLOC_I24          source/restart/ddsplit/inter_tools.F
 Chd|        SPLIT_SEG_RVAL_I20            source/restart/ddsplit/inter_tools.F
 Chd|        SPLIT_SEG_SEGLOC              source/restart/ddsplit/inter_tools.F
-Chd|        WRITE_I_C                     source/output/tools/write_routines.c
+Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|        W_INTBUF_SIZE                 source/restart/ddsplit/inter_tools.F
 Chd|        W_TYPE8                       source/restart/ddsplit/split_interfaces.F
 Chd|        FRONT_MOD                     share/modules1/front_mod.F    
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        INT8_MOD                      ../common_source/modules/int8_mod.F
+Chd|        INT8_MOD                      ../common_source/modules/interfaces/int8_mod.F
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
 Chd|        INTBUF_FRIC_MOD               share/modules1/intbuf_fric_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|====================================================================
       SUBROUTINE SPLIT_INTERFACES(INTBUF_TAB, IPARI   , PROC    , INTBUF_TAB_L,
      .                            IPARI_L   , INTERCEP, NODLOCAL,
      .                            ITAB      , ITABI2M , NBDDI2M , NUMNOD_L    ,
-     .                            CEP       , CEL     , IGRBRIC , T8, MULTI_FVM,
+     .                            LEN_CEP,CEP       , CEL     , IGRBRIC , T8, MULTI_FVM,
      .                            TAG_NM    ,NINDX_NM ,INDX_NM  ,TAG_SCRATCH,NINDX_SCRT,
      .                            INDX_SCRT ,FLAG_24_25,I24MAXNSNE,INTBUF_FRIC_TAB)  
 C-----------------------------------------------
@@ -116,11 +116,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-#include      "analyse_name.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -128,8 +123,6 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "scr17_c.inc"
-#include      "ige3d_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -146,10 +139,11 @@ C-----------------------------------------------
 !                allocated array in lectur and threadprivate array
 !       FLAG_24_25 : logical, flag for interface 24 or 25
 !       -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+      INTEGER, INTENT(in) :: LEN_CEP !< size of cep
       INTEGER 
      .         PROC,IPARI(NPARI,*),IPARI_L(NPARI,NINTER),
      .         NODLOCAL(*),ITAB(*),ITABI2M(*),
-     .         NBDDI2M,NUMNOD_L,CEP(*), CEL(*),I24MAXNSNE
+     .         NBDDI2M,NUMNOD_L,CEP(LEN_CEP), CEL(*),I24MAXNSNE
       LOGICAL, INTENT(IN) :: FLAG_24_25
       INTEGER, INTENT(INOUT) :: NINDX_NM,NINDX_SCRT
       INTEGER, DIMENSION(*), INTENT(INOUT) :: INDX_NM,INDX_SCRT
@@ -200,7 +194,8 @@ C-----------------------------------------------
      .         NRTM_FE, NRTM_FE_L, NRTS_FE, NRTS_FE_L,NMN_FE_L,
      .         NMN_IGE_L,NSN_FE_L,NSN_IGE_L,NMN_FE,
      .         NMN_IGE,NSN_FE,NSN_IGE,L,INTFRIC,NREMNOR,IVIS2,
-     .         NEDGE,NEDGE_L,INTNITSCHE,II,NISUBE_L,ITHK,FLAGLOADP
+     .         NEDGE,NEDGE_L,INTNITSCHE,II,NISUBE_L,ITHK,FLAGLOADP,
+     .         ISTIF_MSDT
        INTEGER :: NINDX_NDLOCAL24
        INTEGER :: MULTIMPE
 c      my_real
@@ -214,7 +209,7 @@ c     .        RCONT
        INTEGER, DIMENSION(:), ALLOCATABLE :: TAG_II_E2E
        INTEGER, DIMENSION(:), ALLOCATABLE :: TAG_II_E2S
        INTEGER, DIMENSION(:), ALLOCATABLE :: TAG_JJ_E2E,TAG_JJ_E2S 
-
+       LOGICAL :: TYPE18_LAW151
 C ----------------------------------------
 !      NODLOCAL24 is used for interface /TYPE24 or /TYPE25
 !      value of NODLOCAL24 : 1-->NUMNOD NODLOCAL24 = NODLOCAL
@@ -259,6 +254,7 @@ C
         NINDX_NM = 0
         NINDX_SCRT = 0
         NINDX_NDLOCAL24 = 0
+        TYPE18_LAW151 = .FALSE.
 
 !        print*,'=============SPLIT INTERFACE PROC NI======',PROC,NI
 
@@ -319,6 +315,7 @@ C       WRITE(6,*) __FILE__,"INTERFACE=",NI
         INTNITSCHE = IPARI(86,NI)
         ITHK = IPARI(91,NI)
         FLAGLOADP = IPARI(95,NI)
+        ISTIF_MSDT = IPARI(97,NI)
 
         IF (ITYP == 24) NRTSE  = IPARI(52,NI)
         IF (ITYP == 24) IEDGE4 = IPARI(59,NI)
@@ -772,6 +769,7 @@ C=======================================================================
            TAG_NODE_MSR(1:NMN_FE_L) = 0
            TAG_II(1:II_STOK) = 0
            IF (MULTI_FVM%IS_USED .AND. INACTI==7) THEN
+            TYPE18_LAW151 = .TRUE.
 C     Interface type 18 for law151
 !prepare addition arrays used for split
               CALL PREPARE_SPLIT_I7(PROC          ,INTBUF_TAB(NI),IPARI(1,NI) ,
@@ -820,7 +818,7 @@ c     split candidates
      .             TAG_SEGM2, II_STOK       , MULTIMP  , NCONT       ,
      .             NOINT    , INACTI        , TAG_SCRATCH , 
      .             II_STOK_L, ITYP          ,NINDX_SCRT,INDX_SCRT,NODLOCAL,
-     .             NUMNOD_L )
+     .             NUMNOD_L,NUMNOD,NUMELS,LEN_CEP,CEP,TYPE18_LAW151)
               
               CALL COPY_IVAL(II_STOK_L,1,1)
               
@@ -949,7 +947,7 @@ c     split candidates
      .             TAG_SEGM2, II_STOK       , MULTIMP  , NCONT       ,
      .             NOINT    , INACTI        , TAG_SCRATCH , 
      .             II_STOK_L, ITYP          ,NINDX_SCRT,INDX_SCRT,NODLOCAL,
-     .             NUMNOD_L )
+     .             NUMNOD_L,NUMNOD,NUMELS,LEN_CEP,CEP,TYPE18_LAW151)
               
               CALL COPY_IVAL(II_STOK_L,1,1)
               
@@ -1267,7 +1265,7 @@ c split candidates
      .                       TAG_SEGM2, II_STOK       , MULTIMP  , NCONT       ,
      .                       NOINT    , INACTI        , TAG_SCRATCH , 
      .                       II_STOK_L, ITYP          ,NINDX_SCRT,INDX_SCRT,NODLOCAL,
-     .                       NUMNOD_L )
+     .                       NUMNOD_L,NUMNOD,NUMELS,LEN_CEP,CEP,TYPE18_LAW151)
 
           CALL COPY_IVAL(II_STOK_L,1,1)
 
@@ -2017,7 +2015,7 @@ c split candidates :
      .                       TAG_SEGM2, II_STOK       , MULTIMP  , NCONT       ,
      .                       NOINT    , INACTI        , TAG_SCRATCH , 
      .                       II_STOK_L, ITYP          ,NINDX_SCRT,INDX_SCRT,NODLOCAL,
-     .                       NUMNOD_L )
+     .                       NUMNOD_L,NUMNOD,NUMELS,LEN_CEP,CEP,TYPE18_LAW151)
 
           CALL COPY_IVAL(II_STOK_L,1,1)
 
@@ -2129,7 +2127,7 @@ c split candidates
      .                       TAG_SEGM2, II_STOK       , MULTIMP  , NCONT       ,
      .                       NOINT    , INACTI        , TAG_SCRATCH , 
      .                       II_STOK_L, ITYP          ,NINDX_SCRT,INDX_SCRT   ,NODLOCAL,
-     .                       NUMNOD_L )
+     .                       NUMNOD_L,NUMNOD,NUMELS,LEN_CEP,CEP,TYPE18_LAW151)
 
           CALL COPY_IVAL(II_STOK_L,1,1)
 
@@ -2355,6 +2353,11 @@ c split and write on disk floating arrays
           CALL COPY_RVAL(INTBUF_TAB(NI)%VARIABLES,NPARIR,1)   
           CALL SPLIT_NODE_RVAL(INTBUF_TAB(NI)%STFNS,NSN_L,1,TAG_NODE_2RY)
           CALL SPLIT_NODE_RVAL(INTBUF_TAB(NI)%STFM,NRTM_L,1,TAG_SEGM)
+
+          IF(ISTIF_MSDT > 0) THEN
+            CALL SPLIT_NODE_RVAL(INTBUF_TAB(NI)%STIFMSDT_S,NSN_L,1,TAG_NODE_2RY)
+            CALL SPLIT_NODE_RVAL(INTBUF_TAB(NI)%STIFMSDT_M,NRTM_L,1,TAG_SEGM)
+          ENDIF
 
           IF(IGAP/=0)THEN
             CALL SPLIT_NODE_RVAL(INTBUF_TAB(NI)%GAP_M,NRTM_L,1,TAG_SEGM)!JD(15)
@@ -2717,6 +2720,11 @@ c split and write on disk floating arrays
           CALL SPLIT_NODE_RVAL(INTBUF_TAB(NI)%STFNS,NSN_L,1,TAG_NODE_2RY)
           CALL SPLIT_NODE_RVAL(INTBUF_TAB(NI)%STFM,NRTM_L,1,TAG_SEGM)
 
+          IF(ISTIF_MSDT > 0) THEN
+            CALL SPLIT_NODE_RVAL(INTBUF_TAB(NI)%STIFMSDT_S,NSN_L,1,TAG_NODE_2RY)
+            CALL SPLIT_NODE_RVAL(INTBUF_TAB(NI)%STIFMSDT_M,NRTM_L,1,TAG_SEGM)
+          ENDIF
+
           IF(IGAP/=0)THEN
             CALL SPLIT_NODE_RVAL(INTBUF_TAB(NI)%GAP_M,NRTM_L,1,TAG_SEGM)!JD(15)
             CALL SPLIT_NODE_RVAL(INTBUF_TAB(NI)%GAP_S,NSN_L,1,TAG_NODE_2RY)!JD(16)
@@ -2769,6 +2777,7 @@ C           WRITE(6,*) NI,"S_CAND_PS=",II_STOK_S_L*4,INTBUF_TAB_L(NI)%S_CAND_PS
               CALL SPLIT_NODE_RVAL(INTBUF_TAB(NI)%GAP_E_L,NEDGE_L,1,TAG_EDGE)
             ENDIF
             CALL SPLIT_NODE_RVAL(INTBUF_TAB(NI)%STFE,NEDGE_L,1,TAG_EDGE)
+            IF(ISTIF_MSDT > 0) CALL SPLIT_NODE_RVAL(INTBUF_TAB(NI)%STIFMSDT_EDG,NEDGE_L,1,TAG_EDGE)
           END IF
 
           CALL SPLIT_NODE_RVAL(INTBUF_TAB(NI)%GAPN_M,NMN_L,1,
@@ -2860,9 +2869,9 @@ Chd|  W_TYPE8                       source/restart/ddsplit/split_interfaces.F
 Chd|-- called by -----------
 Chd|        SPLIT_INTERFACES              source/restart/ddsplit/split_interfaces.F
 Chd|-- calls ---------------
-Chd|        WRITE_I_C                     source/output/tools/write_routines.c
+Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|        FRONT_MOD                     share/modules1/front_mod.F    
-Chd|        INT8_MOD                      ../common_source/modules/int8_mod.F
+Chd|        INT8_MOD                      ../common_source/modules/interfaces/int8_mod.F
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
@@ -2878,18 +2887,10 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-#include      "analyse_name.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "param_c.inc"
-#include      "scr17_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

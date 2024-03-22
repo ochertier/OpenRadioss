@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,7 +26,7 @@ Chd|-- called by -----------
 Chd|        LINE_INI                      source/groups/line_ini.F      
 Chd|-- calls ---------------
 Chd|        FRETITL2                      source/input/freform.F        
-Chd|        READ_I_C                      source/output/tools/sortie_c.c
+Chd|        READ_I_C                      ../common_source/tools/input_output/write_routtines.c
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
@@ -45,7 +45,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "scr17_c.inc"
-#include      "my_allocate.inc"
 #include      "tabsiz_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -101,10 +100,10 @@ C-----------------------------------------------
 !
 ! LINE ENTITIES (NODES, PROC, ELTYP, ELEM)
 !
-       MY_ALLOCATE2D(IGRSLIN(ISU)%NODES,NSEG,2)
-       MY_ALLOCATE(IGRSLIN(ISU)%ELTYP,NSEG)
-       MY_ALLOCATE(IGRSLIN(ISU)%ELEM,NSEG)
-       MY_ALLOCATE(IGRSLIN(ISU)%PROC,NSEG)
+       ALLOCATE(IGRSLIN(ISU)%NODES(NSEG,2))
+       ALLOCATE(IGRSLIN(ISU)%ELTYP(NSEG))
+       ALLOCATE(IGRSLIN(ISU)%ELEM(NSEG))
+       ALLOCATE(IGRSLIN(ISU)%PROC(NSEG))
 !
         DO J=1,NSEG
           DO K=1,2

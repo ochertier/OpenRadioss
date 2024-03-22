@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -72,14 +72,11 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr06_c.inc"
 #include      "scr17_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
 #include      "units_c.inc"
-#include      "sysunit.inc"
-#include      "submod_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -141,7 +138,7 @@ c--------------------------------------------------
 c       Check Unit_ID
 c--------------------------------------------------
         FLAGUNIT = 0
-        DO IUNIT=1,NUNITS
+        DO IUNIT=1,UNITAB%NUNITS
           IF (UNITAB%UNIT_ID(IUNIT) == UID) THEN
             FLAGUNIT = 1
             EXIT
@@ -256,11 +253,11 @@ c       Default Values
 c--------------------------------------------------
         IF (T0 == ZERO)    T0 = PM(23,IMAT) / RHO_CP             
         IF (T1 == ZERO)    T1 = EP20                              
-        IF (EFRAC < ZERO)  EFRAC = ZERO			  
+        IF (EFRAC < ZERO)  EFRAC = ZERO        
         IF (EFRAC > ONE )   EFRAC = ONE
         IF (EFRAC == ZERO) EFRAC = ONE
         PM (80,IMAT) = T1
-        PM (90,IMAT) = EFRAC			  
+        PM (90,IMAT) = EFRAC        
 c--------------------------------------------------
 c       Output
 c--------------------------------------------------

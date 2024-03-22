@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -40,8 +40,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
-#include      "scr17_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
@@ -53,7 +51,7 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       my_real, DIMENSION(3,NUMNOD) :: X
       my_real, DIMENSION(12)       :: XSENS
-      TYPE (SENSOR_STR_) ,TARGET   :: SENSOR
+      TYPE (SENSOR_STR_) ,INTENT(INOUT) ,TARGET :: SENSOR
 C----------------------------------------------------------
 C Local Variables
 C----------------------------------------------------------

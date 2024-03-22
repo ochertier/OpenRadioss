@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>    
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -53,7 +53,7 @@ C KINVEL EST LIBRE
      .        KPERTURB,KSTACK,KPLY,KDRAPE,KINT2,KINISPRI,KSH3NFRA,KS17_OLD,
      .        KPRELOAD,KNBCS,KINIGRAV,IDT1SOL,KINIMAP1D,KFUNC2D,KINIMAP2D,
      .        KFRICTION,KTRIA,KGRTRIA,IDT1TET10,KKEY_ENCRYPT,KMERGE,KFRIC_ORIENT,
-     .        KSET,IDT1SH,IDTHEPH,IDTS6,ID_UNIT_AUTO,IDTTSH
+     .        KSET,IDT1SH,IDTS6,ID_UNIT_AUTO,IDTTSH
 C
       COMMON /SCR17/ LKEY0(MAXNOPT),KOPTAD(MAXNOPT+2),NLINE(MAXNOPT),
      .        NSLASH(MAXNOPT),KCUR,IREC,KREC,ID_LIMIT,ID_LIMIT_ADMESH,
@@ -83,7 +83,7 @@ C
      .        KPERTURB,KSTACK,KPLY,KDRAPE,KINT2,KINISPRI,KSH3NFRA,KS17_OLD,
      .        KPRELOAD,KNBCS,KINIGRAV,IDT1SOL,KINIMAP1D,KFUNC2D,KINIMAP2D,
      .        KFRICTION,KTRIA,KGRTRIA,IDT1TET10,KKEY_ENCRYPT,KMERGE,KFRIC_ORIENT,
-     .        KSET,IDT1SH,IDTHEPH,IDTS6,ID_UNIT_AUTO,IDTTSH
+     .        KSET,IDT1SH,IDTS6,ID_UNIT_AUTO,IDTTSH
 C
       CHARACTER KEY0(MAXNOPT)*ncharkey,KLINE*ncharline,LINE*ncharline
 C

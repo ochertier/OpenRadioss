@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,7 +20,6 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-C  |--nouvelle routine commune des elements coques---------
 Chd|====================================================================
 Chd|  CNDT_PLY                      source/properties/composite_options/stack/cndt_ply.F
 Chd|-- called by -----------
@@ -39,24 +38,9 @@ C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com06_c.inc"
-#include      "com08_c.inc"
-#include      "couple_c.inc"
-#include      "param_c.inc"
-#include      "scr02_c.inc"
-#include      "scr06_c.inc"
-#include      "scr07_c.inc"
-#include      "scr17_c.inc"
-#include      "scr18_c.inc"
-#include      "units_c.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER JFT, JLT,NPT
-C     REAL
       my_real
      .   OFF(*),STI(MVSIZ,*),
      .   ALDT(*), A1(MVSIZ,*), THK(MVSIZ,*),

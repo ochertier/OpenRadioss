@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -44,7 +44,6 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "scr17_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -52,7 +51,7 @@ C-----------------------------------------------
       INTEGER MONVOL(*), FR_MV(NSPMD+2,NVOLU)
 C     REAL
       my_real
-     .   FSAVSURF(3,NSURF), VOLMON(*)
+     .   FSAVSURF(5,NSURF), VOLMON(*)
       TYPE (SURF_)   , DIMENSION(NSURF)   :: IGRSURF
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -103,7 +102,7 @@ C-----------------------------------------------------------------------
                   CALL SURF_MASS_COM(MONVOL(K2), VOLMON(KK2), NCA, IDSURF,
      .                               FSAVSURF(2,I),FSAVSURF(3,I))
                ENDDO
-             ENDIF			 
+             ENDIF       
            ENDIF
            K1 = K1+NIMV
            K2 = K2+NICBAG*NCA
@@ -124,13 +123,9 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NTGI, ITAG(*)
-C     REAL
       my_real
      .   ELFMASS(*), MASS, ELFVEL(*), VEL, ELSINI(*)
 C-----------------------------------------------
@@ -167,7 +162,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s

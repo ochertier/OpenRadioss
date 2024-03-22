@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -40,14 +40,9 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "lagmult.inc"
-#include      "com04_c.inc"
 #include      "scr17_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -76,8 +71,8 @@ C
         CALL FRETITL2(TITR,
      .       NOM_OPT(LNOPT1-LTITR+1,I),LTITR)
         DO J=3,6
-	  IF(GJBUFI(J,I)/=0)THEN
-	    IF(MASS(GJBUFI(J,I))==0)THEN
+            IF(GJBUFI(J,I)/=0)THEN
+              IF(MASS(GJBUFI(J,I))==0)THEN
               CALL ANCMSG(MSGID=535,
      .                    MSGTYPE=MSGERROR,
      .                    ANMODE=ANINFO_BLIND_1,
@@ -86,11 +81,11 @@ C
      .                    C2='GEAR TYPE JOINT',
      .                    C3=TITR,C4=' ',
      .                    I2=ITAB(GJBUFI(J,I)))
-	    ENDIF
-	  END IF
-	  
-	  IF(GJBUFI(J,I)/=0)THEN
-	    IF(INER(GJBUFI(J,I))==0)THEN
+              ENDIF
+            END IF
+            
+            IF(GJBUFI(J,I)/=0)THEN
+              IF(INER(GJBUFI(J,I))==0)THEN
               CALL ANCMSG(MSGID=536,
      .                    MSGTYPE=MSGERROR,
      .                    ANMODE=ANINFO_BLIND_1,
@@ -99,10 +94,10 @@ C
      .                    C2='GEAR TYPE JOINT',
      .                    C3=TITR,
      .                    I2=ITAB(GJBUFI(J,I)))
-	    ENDIF 
-	  END IF
-	ENDDO  	
-	
+              ENDIF 
+            END IF
+          ENDDO  
+
         IF (JTYP==1) THEN
           CALL INI_GEAR(IADLL,JLL  ,LLL  ,N0   ,N1   ,N2,NC,ID,TITR)
         ELSEIF (JTYP==2) THEN

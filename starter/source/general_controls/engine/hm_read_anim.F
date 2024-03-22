@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -40,18 +40,11 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   D u m m y   A r g u m e n t s
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
 #include      "scr14_c.inc"
 #include      "scr25_c.inc"
 #include      "scrcut_c.inc"
-C-----------------------------------------------
-C   E x t e r n a l   F u n c t i o n s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -66,8 +59,6 @@ C-----------------------------------------------
       DTANIM0           = ZERO
       TANIM_STOP0       = EP20
       TANIMSENS         = ZERO
-      DTANISENS         = ZERO
-      IANISENS          = 0
       ANIM_M            = 0
       ANIM_K            = 0
       ANIM_U            = 0
@@ -115,11 +106,9 @@ C-----------------------------------------------
         ANIM_CT(I)      = 0
         ANIM_ST(I)      = 0
         ANIM_FT(I)      = 0
-        LANISENS(I)     = 0
         NTITLETAB(I)    = 0
       ENDDO
       ANIM_WPLA         = 0
-      NLSENS            = 0
       IFVANI            = 0
       NLTITLE           = 0
       NBPLY_ANIM        = 0
@@ -131,7 +120,6 @@ C-----------------------------------------------
       NBPLY_ANIM_DAMA   = 0
 C-----------------------------------------------
 C     Read options ../..
-C-----------------------------------------------
 C-----------------------------------------------
 C     Counters
 C-----------------------------------------------

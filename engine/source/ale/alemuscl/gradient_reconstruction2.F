@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,8 +25,8 @@ Chd|  GRADIENT_RECONSTRUCTION2      source/ale/alemuscl/gradient_reconstruction2
 Chd|-- called by -----------
 Chd|        ALE51_GRADIENT_RECONSTRUCTION2source/ale/alemuscl/ale51_gradient_reconstruction2.F
 Chd|-- calls ---------------
-Chd|        ALEMUSCL_MOD                  ../common_source/modules/alemuscl_mod.F
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
+Chd|        ALEMUSCL_MOD                  ../common_source/modules/ale/alemuscl_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
 Chd|        SEGVAR_MOD                    share/modules/segvar_mod.F    
 Chd|====================================================================
       SUBROUTINE GRADIENT_RECONSTRUCTION2(ITASK, IXQ, X, ALE_CONNECT, NV46, ITRIMAT, SEGVAR)
@@ -36,7 +36,6 @@ C  This subroutine computes a gradient of the scalar field value in each
 C  element:
 C        mean square approximation of the gradient in the face related 
 C        neighborhood of the element
-C-----------------------------------------------
 C-----------------------------------------------
 C   M o d u l e s 
 C-----------------------------------------------
@@ -48,16 +47,10 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l  P a r a m e t e r s
-C-----------------------------------------------
-#include "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include "param_c.inc"
 #include "vect01_c.inc"
 #include "com04_c.inc"
-#include "alemuscl.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -96,8 +89,9 @@ C-----------------------------------------------
          !!! Reset mat, rhs
          mat(1:2, 1:2) = ZERO ; rhs(1:2) = ZERO
          !!! Value of the target function in the element
-         VALK = VOLUME_FRACTION(II,ITRIMAT)
-         YK = ELCENTER(II,2) ; ZK = ELCENTER(II,3)
+         VALK = ALEMUSCL_Buffer%VOLUME_FRACTION(II,ITRIMAT)
+         YK = ALEMUSCL_Buffer%ELCENTER(II,2) ;
+         ZK = ALEMUSCL_Buffer%ELCENTER(II,3)
          !!! IXS(2:9, II) : Node global ID
          IAD2 = ALE_CONNECT%ee_connect%iad_connect(II)
          LGTH = ALE_CONNECT%ee_connect%iad_connect(II+1)-IAD2
@@ -105,8 +99,9 @@ C-----------------------------------------------
             VOIS_ID = ALE_CONNECT%ee_connect%connected(IAD2 + KK - 1)
             IF (VOIS_ID > 0) THEN
                !!! Value of the target function in the current neighbor
-               VALL = VOLUME_FRACTION(VOIS_ID,ITRIMAT)
-               YL = ELCENTER(VOIS_ID,2) ; ZL = ELCENTER(VOIS_ID,3)
+               VALL = ALEMUSCL_Buffer%VOLUME_FRACTION(VOIS_ID,ITRIMAT)
+               YL = ALEMUSCL_Buffer%ELCENTER(VOIS_ID,2) ;
+               ZL = ALEMUSCL_Buffer%ELCENTER(VOIS_ID,3) ;
             ELSE
                IF(VOIS_ID == 0) THEN
                  VALL = VALK
@@ -121,8 +116,8 @@ C-----------------------------------------------
                YF = HALF * (X(2, NODEID1) + X(2, NODEID2))
                ZF = HALF * (X(3, NODEID1) + X(3, NODEID2))
 
-               YL = TWO * YF - ELCENTER(II,2)
-               ZL = TWO * ZF - ELCENTER(II,3)
+               YL = TWO * YF - ALEMUSCL_Buffer%ELCENTER(II,2)
+               ZL = TWO * ZF - ALEMUSCL_Buffer%ELCENTER(II,3)
             ENDIF
 
             !!! Incrementing mat and rhs
@@ -142,8 +137,8 @@ C-----------------------------------------------
          sol(1) = undet * (rhs(1) * mat(2,2) - rhs(2) * mat(1,2))
          sol(2) = undet * (- mat(2,1) * rhs(1) + mat(1, 1) * rhs(2))
          !!! Solution goes to the gradient
-         GRAD(II,2,ITRIMAT) = -sol(1)
-         GRAD(II,3,ITRIMAT) = -sol(2)
+         ALEMUSCL_Buffer%GRAD(II,2,ITRIMAT) = -sol(1)
+         ALEMUSCL_Buffer%GRAD(II,3,ITRIMAT) = -sol(2)
       ENDDO  ! I = LFT, LLT
 C-----------------------------------------------      
       END SUBROUTINE GRADIENT_RECONSTRUCTION2

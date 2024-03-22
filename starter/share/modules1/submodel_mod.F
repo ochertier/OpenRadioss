@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -24,9 +24,12 @@ Chd|====================================================================
 Chd|  SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|-- called by -----------
 Chd|        CHECK_ELTYP                   source/model/sets/check_eltyp.F
+Chd|        CHECK_SKEW                    source/spmd/domain_decomposition/check_skew.F
 Chd|        CONTRBE2                      source/constraints/general/rbe2/hm_read_rbe2.F
+Chd|        CONTRBE3                      source/constraints/general/rbe3/contrbe3.F
 Chd|        CONTRL                        source/starter/contrl.F       
 Chd|        CREATE_BOX_CLAUSE             source/model/sets/create_box_clause.F
+Chd|        CREATE_ELLIPSE_CLAUSE         source/model/sets/create_ellipse_clause.F
 Chd|        CREATE_ELT_BOX                source/model/sets/create_elt_box.F
 Chd|        CREATE_ELT_CLAUSE             source/model/sets/create_element_clause.F
 Chd|        CREATE_ELT_LIST               source/model/sets/create_element_clause.F
@@ -57,6 +60,8 @@ Chd|        CREATE_SUBM_LIST_G            source/model/sets/create_subm_clause.F
 Chd|        CREATE_SUBS_CLAUSE            source/model/sets/create_subs_clause.F
 Chd|        CREATE_SUBS_LIST              source/model/sets/create_subs_clause.F
 Chd|        CREATE_SUBS_LIST_G            source/model/sets/create_subs_clause.F
+Chd|        DDSPLIT                       source/restart/ddsplit/ddsplit.F
+Chd|        DOMDEC2                       source/spmd/domdec2.F         
 Chd|        FREFORM                       source/starter/freform.F      
 Chd|        GLOBMAT                       source/materials/globmat.F    
 Chd|        GROUPS_GET_ELEM_LIST          source/groups/groups_get_elem_list.F
@@ -210,9 +215,10 @@ Chd|        HM_READ_FAIL_HOFFMAN          source/materials/fail/hoffman/hm_read_
 Chd|        HM_READ_FAIL_INIEVO           source/materials/fail/inievo/hm_read_fail_inievo.F
 Chd|        HM_READ_FAIL_JOHNSON          source/materials/fail/johnson_cook/hm_read_fail_johnson.F
 Chd|        HM_READ_FAIL_LADEVEZE         source/materials/fail/ladeveze/hm_read_fail_ladeveze.F
-Chd|        HM_READ_FAIL_MAXSTRN          source/materials/fail/max_strain/hm_read_fail_maxstrn.F
+Chd|        HM_READ_FAIL_MAXSTRAIN        source/materials/fail/max_strain/hm_read_fail_maxstrain.F
 Chd|        HM_READ_FAIL_NXT              source/materials/fail/nxt/hm_read_fail_nxt.F
 Chd|        HM_READ_FAIL_ORTHBIQUAD       source/materials/fail/orthbiquad/hm_read_fail_orthbiquad.F
+Chd|        HM_READ_FAIL_ORTHENERG        source/materials/fail/orthenerg/hm_read_fail_orthenerg.F
 Chd|        HM_READ_FAIL_ORTHSTRAIN       source/materials/fail/orthstrain/hm_read_fail_orthstrain.F
 Chd|        HM_READ_FAIL_PUCK             source/materials/fail/puck/hm_read_fail_puck.F
 Chd|        HM_READ_FAIL_RTCL             source/materials/fail/rtcl/hm_read_fail_rtcl.F
@@ -330,13 +336,17 @@ Chd|        HM_READ_MAT11_K_EPS           source/materials/mat/mat011/hm_read_ma
 Chd|        HM_READ_MAT12                 source/materials/mat/mat012/hm_read_mat12.F
 Chd|        HM_READ_MAT120                source/materials/mat/mat120/hm_read_mat120.F
 Chd|        HM_READ_MAT121                source/materials/mat/mat121/hm_read_mat121.F
+Chd|        HM_READ_MAT122                source/materials/mat/mat122/hm_read_mat122.F
+Chd|        HM_READ_MAT124                source/materials/mat/mat124/hm_read_mat124.F
 Chd|        HM_READ_MAT13                 source/materials/mat/mat013/hm_read_mat13.F
 Chd|        HM_READ_MAT14                 source/materials/mat/mat014/hm_read_mat14.F
 Chd|        HM_READ_MAT15                 source/materials/mat/mat015/hm_read_mat15.F
 Chd|        HM_READ_MAT151                source/materials/mat/mat151/hm_read_mat151.F
+Chd|        HM_READ_MAT158                source/materials/mat/mat158/hm_read_mat158.F
 Chd|        HM_READ_MAT16                 source/materials/mat/mat016/hm_read_mat16.F
 Chd|        HM_READ_MAT18                 source/materials/mat/mat018/hm_read_mat18.F
 Chd|        HM_READ_MAT19                 source/materials/mat/mat019/hm_read_mat19.F
+Chd|        HM_READ_MAT190                source/materials/mat/mat190/hm_read_mat190.F
 Chd|        HM_READ_MAT20                 source/materials/mat/mat020/hm_read_mat20.F
 Chd|        HM_READ_MAT21                 source/materials/mat/mat021/hm_read_mat21.F
 Chd|        HM_READ_MAT22                 source/materials/mat/mat022/hm_read_mat22.F
@@ -355,7 +365,7 @@ Chd|        HM_READ_MAT36                 source/materials/mat/mat036/hm_read_ma
 Chd|        HM_READ_MAT37                 source/materials/mat/mat037/hm_read_mat37.F
 Chd|        HM_READ_MAT38                 source/materials/mat/mat038/hm_read_mat38.F
 Chd|        HM_READ_MAT40                 source/materials/mat/mat040/hm_read_mat40.F
-Chd|        HM_READ_MAT41                 source/materials/mat/mat041/hm_read_mat41.F.F
+Chd|        HM_READ_MAT41                 source/materials/mat/mat041/hm_read_mat41.F
 Chd|        HM_READ_MAT42                 source/materials/mat/mat042/hm_read_mat42.F
 Chd|        HM_READ_MAT43                 source/materials/mat/mat043/hm_read_mat43.F
 Chd|        HM_READ_MAT44                 source/materials/mat/mat044/hm_read_mat44.F
@@ -392,7 +402,7 @@ Chd|        HM_READ_MAT79                 source/materials/mat/mat079/hm_read_ma
 Chd|        HM_READ_MAT80                 source/materials/mat/mat080/hm_read_mat80.F
 Chd|        HM_READ_MAT81                 source/materials/mat/mat081/hm_read_mat81.F
 Chd|        HM_READ_MAT82                 source/materials/mat/mat082/hm_read_mat82.F
-Chd|        HM_READ_MAT83                 source/materials/mat/mat083/hm_read_law83.F
+Chd|        HM_READ_MAT83                 source/materials/mat/mat083/hm_read_mat83.F
 Chd|        HM_READ_MAT84                 source/materials/mat/mat084/hm_read_mat84.F
 Chd|        HM_READ_MAT87                 source/materials/mat/mat087/hm_read_mat87.F
 Chd|        HM_READ_MAT88                 source/materials/mat/mat088/hm_read_mat88.F
@@ -426,6 +436,7 @@ Chd|        HM_READ_NODE                  source/elements/reader/hm_read_node.F
 Chd|        HM_READ_NONLOCAL              source/materials/nonlocal/hm_read_nonlocal.F
 Chd|        HM_READ_PART                  source/model/assembling/hm_read_part.F
 Chd|        HM_READ_PBLAST                source/loads/pblast/hm_read_pblast.F
+Chd|        HM_READ_PCYL                  source/loads/general/load_pcyl/hm_read_pcyl.F
 Chd|        HM_READ_PERTURB               source/general_controls/computation/hm_read_perturb.F
 Chd|        HM_READ_PERTURB_FAIL          source/general_controls/computation/hm_read_perturb_fail.F
 Chd|        HM_READ_PERTURB_PART_SHELL    source/general_controls/computation/hm_read_perturb_part_shell.F
@@ -542,6 +553,7 @@ Chd|        HM_READ_TRUSS                 source/elements/reader/hm_read_truss.F
 Chd|        HM_READ_UNIT                  source/general_controls/computation/hm_read_unit.F
 Chd|        HM_READ_UPWIND                source/general_controls/computation/hm_read_upwind.F
 Chd|        HM_READ_VISC                  source/materials/visc/hm_read_visc.F
+Chd|        HM_READ_VISC_LPRONY           source/materials/visc/hm_read_visc_lprony.F
 Chd|        HM_READ_VISC_PRONY            source/materials/visc/hm_read_visc_prony.F
 Chd|        HM_READ_WINDOW_USER           source/tools/userwi/hm_read_window_user.F
 Chd|        HM_READ_XELEM                 source/elements/reader/hm_read_xelem.F
@@ -587,16 +599,18 @@ Chd|        NBADIGEMESH                   source/elements/ige3d/nbadigemesh.F
 Chd|        NBADMESH                      source/model/remesh/nbadmesh.F
 Chd|        NBFUNCT                       source/tools/curve/nbfunc.F   
 Chd|        NBSPH                         source/elements/sph/nbsph.F   
+Chd|        NEW_SEATBELT                  source/tools/seatbelts/new_seatbelt.F
 Chd|        PRELECDET                     source/initial_conditions/detonation/prelecdet.F
 Chd|        PRELECLAS                     source/loads/laser/lpreleclas.F
 Chd|        PRELECSEC                     source/tools/sect/prelecsec.F 
 Chd|        PRELECSEC4BOLT                source/tools/sect/prelecsec4bolt.F
-Chd|        PREREAD_INIVEL                source/initial_conditions/general/inivel/inivel.F
 Chd|        PREREAD_RBODY_LAGMUL          source/constraints/general/rbody/preread_rbody_lagmul.F
 Chd|        PREREAD_RBODY_SET             source/model/sets/preread_rbody_set.F
+Chd|        PRE_STACKGROUP                source/stack/pres_stackgroup.F
 Chd|        R2R_FORK                      source/coupling/rad2rad/r2r_fork.F
 Chd|        R2R_GROUP                     source/coupling/rad2rad/r2r_group.F
 Chd|        R2R_MONVOL                    source/coupling/rad2rad/r2r_prelec.F
+Chd|        R2R_NOM_OPT                   source/coupling/rad2rad/routines_r2r.F
 Chd|        R2R_PRELEC                    source/coupling/rad2rad/r2r_prelec.F
 Chd|        R2R_PRELEC_NAME               source/coupling/rad2rad/r2r_prelec_name.F
 Chd|        R2R_SPLIT                     source/coupling/rad2rad/r2r_split.F
@@ -651,14 +665,19 @@ Chd|        SHELLTHK_UPD                  source/properties/composite_options/dr
 Chd|        SORT_SET                      source/model/sets/sort_sets.F 
 Chd|        SPLIT_EBCS                    source/boundary_conditions/ebcs/split_ebcs.F
 Chd|        STACKGROUP                    source/stack/stackgroup.F     
+Chd|        STACKGROUP_DRAPE              source/stack/stackgroup_drape.F
 Chd|        STARTER0                      source/starter/starter0.F     
 Chd|        STATE_ADMESH                  source/model/remesh/state_admesh.F
 Chd|        ST_QAPRINT_DRIVER             source/output/qaprint/st_qaprint_driver.F
+Chd|        ST_QAPRINT_MODEL_TOOLS        source/output/qaprint/st_qaprint_model_tools.F
 Chd|        ST_QAPRINT_SET                source/output/qaprint/st_qaprint_set.F
 Chd|        ST_QAPRINT_TRANSFORMATIONS    source/output/qaprint/st_qaprint_transformations.F
 Chd|        SUBROTPOINT                   source/model/submodel/subrot.F
 Chd|        SUBROTTENS                    source/model/submodel/subrot.F
 Chd|        SUBROTVECT                    source/model/submodel/subrot.F
+Chd|        WRCOMIP                       source/restart/ddsplit/wrcommp.F
+Chd|        W_ISKN                        source/restart/ddsplit/w_iskn.F
+Chd|        W_SKWSUB                      source/restart/ddsplit/w_skwsub.F
 Chd|        HM_THVARC                     source/output/th/hm_read_thvarc.F
 Chd|-- calls ---------------
 Chd|====================================================================
@@ -668,42 +687,24 @@ C   m y _ r e a l
 C-----------------------------------------------
 #include      "my_real.inc"
 C-----------------------------------------------
-      TYPE SUBMODEL_DATA
-C---------
-C         Id of the Submodel
-C---------
-          INTEGER NOSUBMOD
-C---------
-C         UnitId of the Submodel
-C---------
-          INTEGER UID
-C---------
-C         Internal Id of father
-C---------
-          INTEGER IFATHER
-C---------
-C         Level the Submodel in the Hierarchy : 0=main_model
-C---------
-          INTEGER LEVEL
-C---------
-C         Number of Transformations applied to the Submodel
-C---------
-          INTEGER NBTRANS
-C---------
-C         array of Transformations applied to the Submodel
-C---------
-          INTEGER, DIMENSION(:), POINTER :: IDTRANS
-C---------
-C         Offsets
-C---------
-          INTEGER OFF_DEF0,OFF_NOD0,OFF_EL0,OFF_PART0,OFF_MAT0,OFF_PROP0,
-     .            OFF_SUBMOD0
-          INTEGER OFF_DEF,OFF_NOD,OFF_EL,OFF_PART,OFF_MAT,OFF_PROP,
-     .            OFF_SUBMOD
-C---------
-C         Local Skews
-C---------
-          INTEGER SKEW
-C---------
-      END TYPE SUBMODEL_DATA
+
+        ! SIZE
+        INTEGER NSUBMOD
+
+        ! DATA STRUCTURE
+        TYPE SUBMODEL_DATA
+            INTEGER NOSUBMOD                           !Id of the Submodel
+            INTEGER UID                                !UnitId of the Submodel
+            INTEGER IFATHER                            !Internal Id of father
+            INTEGER LEVEL                              !Level the Submodel in the Hierarchy : 0=main_model
+            INTEGER NBTRANS                            !Number of Transformations applied to the Submodel
+            INTEGER SKEW !                             !Local Skews
+            INTEGER, DIMENSION(:), POINTER :: IDTRANS  !array of Transformations applied to the Submodel
+            !---Offsets
+            INTEGER OFF_DEF0,OFF_NOD0,OFF_EL0,OFF_PART0,OFF_MAT0,OFF_PROP0,OFF_SUBMOD0 
+            INTEGER OFF_DEF,OFF_NOD,OFF_EL,OFF_PART,OFF_MAT,OFF_PROP,OFF_SUBMOD
+        END TYPE SUBMODEL_DATA
+
+
       END MODULE SUBMODEL_MOD
+C-----------------------------------------------

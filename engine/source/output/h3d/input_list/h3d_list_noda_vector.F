@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -39,21 +39,16 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
+C   C o m m o n   B l o c k s
+C-----------------------------------------------
+#include      "param_c.inc"
+#include      "com04_c.inc"
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       TYPE (H3D_KEYWORD) H3D_KEYWORD_NODAL_VECTOR(*)
-      my_real
-     .      GEO(NPROPG,*)
+      my_real GEO(NPROPG,NUMGEO)
       INTEGER, INTENT(INOUT) :: NKEY
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "chara_c.inc"
-#include      "com04_c.inc"
-#include      "param_c.inc"
-C-----------------------------------------------
-C   E x t e r n a l   F u n c t i o n s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -64,8 +59,7 @@ c-----------------------------------------------
       I = I + 1
       H3D_KEYWORD_NODAL_VECTOR(I)%KEY3  = 'VEL'
       H3D_KEYWORD_NODAL_VECTOR(I)%TEXT1  = 'Velocity'
-      H3D_KEYWORD_NODAL_VECTOR(I)%COMMENT  = 
-     .'Node translational velocity'
+      H3D_KEYWORD_NODAL_VECTOR(I)%COMMENT  = 'Node translational velocity'
 c-----------------------------------------------
       I = I + 1
       H3D_KEYWORD_NODAL_VECTOR(I)%KEY3  = 'DIS'
@@ -123,6 +117,10 @@ c-----------------------------------------------
       I = I + 1
       H3D_KEYWORD_NODAL_VECTOR(I)%KEY3  = 'CONT2'
       H3D_KEYWORD_NODAL_VECTOR(I)%TEXT1  = 'Tied Contact Forces'
+c-----------------------------------------------
+      I = I + 1
+      H3D_KEYWORD_NODAL_VECTOR(I)%KEY3  = 'CONT2/MOMENT'
+      H3D_KEYWORD_NODAL_VECTOR(I)%TEXT1  = 'Tied Contact Moments'
 c-----------------------------------------------
       I = I + 1
       H3D_KEYWORD_NODAL_VECTOR(I)%KEY3  = 'DROT'
@@ -227,21 +225,23 @@ c-----------------------------------------------
       I = I + 1
       H3D_KEYWORD_NODAL_VECTOR(I)%KEY3  = 'VEL/TMAX'
       H3D_KEYWORD_NODAL_VECTOR(I)%TEXT1  = 'Max_Velocity'
-      H3D_KEYWORD_NODAL_VECTOR(I)%COMMENT  = 
-     .'Maximum node translational velocity over time'
+      H3D_KEYWORD_NODAL_VECTOR(I)%COMMENT  = 'Maximum node translational velocity over time'
 c-----------------------------------------------
       I = I + 1
       H3D_KEYWORD_NODAL_VECTOR(I)%KEY3  = 'DIS/TMAX'
       H3D_KEYWORD_NODAL_VECTOR(I)%TEXT1  = 'Max_Displacement'
-      H3D_KEYWORD_NODAL_VECTOR(I)%COMMENT  = 
-     .'Maximum node displacement over time'
+      H3D_KEYWORD_NODAL_VECTOR(I)%COMMENT  = 'Maximum node displacement over time'
 c-----------------------------------------------
       I = I + 1
       H3D_KEYWORD_NODAL_VECTOR(I)%KEY3  = 'AROT'
       H3D_KEYWORD_NODAL_VECTOR(I)%TEXT1  = 'Rotational Acceleration'
       H3D_KEYWORD_NODAL_VECTOR(I)%COMMENT  = 'drot=1 must also be set in /IOFLAG otherwise, rotational dof are not computed'
 c-----------------------------------------------
-
+      I = I + 1
+      H3D_KEYWORD_NODAL_VECTOR(I)%KEY3  = 'VEL/GRID'
+      H3D_KEYWORD_NODAL_VECTOR(I)%TEXT1  = 'Grid Velocity'
+      H3D_KEYWORD_NODAL_VECTOR(I)%COMMENT  = 'ALE only'
+c-----------------------------------------------
 
       NKEY=I
       END

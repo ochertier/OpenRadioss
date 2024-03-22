@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -30,7 +30,7 @@ Chd|        SPMD_RGATHER9_DP              source/mpi/interfaces/spmd_outp.F
 Chd|        SPMD_STAT_PGATHER             source/mpi/output/spmd_stat.F 
 Chd|        STRS_TXT50                    source/output/sta/sta_txt.F   
 Chd|        TAB_STRS_TXT50                source/output/sta/sta_txt.F   
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        INITBUF_MOD                   share/resol/initbuf.F         
 Chd|====================================================================
       SUBROUTINE STAT_S_AUXF(ELBUF_TAB ,IPARG ,IPM ,IGEO ,IXS ,
@@ -49,13 +49,9 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "param_c.inc"
 #include      "units_c.inc"
-#include      "scr01_c.inc"
-#include      "scr05_c.inc"
 #include      "task_c.inc"
-#include      "scr03_c.inc"
 #include      "scr14_c.inc"
 #include      "scr16_c.inc"
 #include      "vect01_c.inc"
@@ -104,7 +100,7 @@ C======================================================================|
         PID = IPART(2,IPRT)
 c
         IF (ITY == 1) THEN
-          CALL INITBUF (IPARG    ,NG      ,                    
+          CALL INITBUF(IPARG    ,NG      ,                    
      2          MLW     ,NEL     ,NFT     ,IAD     ,ITY     ,  
      3          NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,  
      4          JTHE    ,JLAG    ,JMULT   ,JHBE    ,JIVF    ,  
@@ -125,43 +121,95 @@ C          JHBE   = IGEO(10,PID)
           IF (JHBE==17.AND.IINT==2) JHBE = 18
           IF (MLW < 28) THEN 
             NUVAR = 0
-          ELSE
+          ELSEIF (MLW == 112) THEN 
+            NUVAR = 3
+          ELSE 
             NUVAR = IPM(8,IXS(1,NFT+1))   
           ENDIF
+c-------------------------------
+          IF (ISOLNOD == 16) THEN
 c
-          DO I=LFT,LLT                                       
-            N = I + NFT                                      
-            IPRT=IPARTS(N)                                   
-            IF (IPART_STATE(IPRT)==0) CYCLE                    
-            WA(JJ+1) = GBUF%VOL(I)             
-            WA(JJ+2) = IPRT                                  
-            WA(JJ+3) = IXS(NIXS,N)                           
-            WA(JJ+4) = NLAY                                          
-            WA(JJ+5) = NPTR                                
-            WA(JJ+6) = NPTS                                
-            WA(JJ+7) = NPTT                                
-            WA(JJ+8) = ISOLNOD                                
-            WA(JJ+9) = NUVAR                                  
-            WA(JJ+10)= JHBE   
-            WA(JJ+11) = GBUF%OFF(I)                                                                                                                 
-            JJ = JJ + 11  
-            DO IL=1,NLAY                                               
-             DO IR=1,NPTR                                             
-              DO IS=1,NPTS                                           
-               DO IT=1,NPTT                                         
-                 MBUF => ELBUF_TAB(NG)%BUFLY(IL)%MAT(IR,IS,IT)
-                 DO IUS = 1,NUVAR   
-                   WA(JJ + 1) = MBUF%VAR(I + (IUS-1)*NEL)
-                   JJ = JJ +1                                     
-                 ENDDO                                             
-               ENDDO                                                 
-              ENDDO                                                   
-             ENDDO                                                    
-            ENDDO                 
-            IE=IE+1                          
-C           pointeur de fin de zone dans WA  
-            PTWA(IE)=JJ                      
-          ENDDO  !  I=LFT,LLT                                     
+            DO I=LFT,LLT                                       
+              N = I + NFT                                      
+              IPRT=IPARTS(N)                                   
+              IF (IPART_STATE(IPRT)==0) CYCLE                    
+              WA(JJ+1) = GBUF%VOL(I)             
+              WA(JJ+2) = IPRT                                  
+              WA(JJ+3) = IXS(NIXS,N)                           
+              WA(JJ+4) = NLAY                                          
+              WA(JJ+5) = NPTR                                
+              WA(JJ+6) = NPTS                                
+              WA(JJ+7) = NPTT                                
+              WA(JJ+8) = ISOLNOD                                
+              WA(JJ+9) = NUVAR                                  
+              WA(JJ+10)= JHBE   
+              WA(JJ+11) = GBUF%OFF(I)                                                                                                                 
+              JJ = JJ + 11  
+              IS = 1 
+              DO IT=1,NPTT                                         
+               DO IL=1,NLAY                                               
+                DO IR=1,NPTR      
+                  IF (MLW == 112) THEN
+                    DO IUS = 1,3
+                      WA(JJ + 1) = ELBUF_TAB(NG)%BUFLY(IL)%LBUF(IR,IS,IT)%PLA(I + IUS*NEL)
+                      JJ = JJ +1                          
+                    ENDDO
+                  ELSE                                        
+                    MBUF => ELBUF_TAB(NG)%BUFLY(IL)%MAT(IR,IS,IT)
+                    DO IUS = 1,NUVAR   
+                      WA(JJ + 1) = MBUF%VAR(I + (IUS-1)*NEL)
+                      JJ = JJ +1                                     
+                    ENDDO     
+                  ENDIF                                        
+                ENDDO                                                 
+               ENDDO                                                    
+              ENDDO                 
+              IE=IE+1                          
+C             pointeur de fin de zone dans WA  
+              PTWA(IE)=JJ                      
+            ENDDO  !  I=LFT,LLT                                     
+          ELSE
+            DO I=LFT,LLT                                       
+              N = I + NFT                                      
+              IPRT=IPARTS(N)                                   
+              IF (IPART_STATE(IPRT)==0) CYCLE                    
+              WA(JJ+1) = GBUF%VOL(I)             
+              WA(JJ+2) = IPRT                                  
+              WA(JJ+3) = IXS(NIXS,N)                           
+              WA(JJ+4) = NLAY                                          
+              WA(JJ+5) = NPTR                                
+              WA(JJ+6) = NPTS                                
+              WA(JJ+7) = NPTT                                
+              WA(JJ+8) = ISOLNOD                                
+              WA(JJ+9) = NUVAR                                  
+              WA(JJ+10)= JHBE   
+              WA(JJ+11) = GBUF%OFF(I)                                                                                                                 
+              JJ = JJ + 11  
+              DO IL=1,NLAY                                               
+               DO IT=1,NPTT
+                DO IS=1,NPTS
+                 DO IR=1,NPTR
+                    IF (MLW == 112) THEN
+                      DO IUS = 1,3
+                        WA(JJ + 1) = ELBUF_TAB(NG)%BUFLY(IL)%LBUF(IR,IS,IT)%PLA(I + IUS*NEL)
+                        JJ = JJ +1                          
+                      ENDDO
+                    ELSE 
+                      MBUF => ELBUF_TAB(NG)%BUFLY(IL)%MAT(IR,IS,IT)
+                      DO IUS = 1,NUVAR   
+                        WA(JJ + 1) = MBUF%VAR(I + (IUS-1)*NEL)
+                        JJ = JJ +1                                     
+                      ENDDO            
+                    ENDIF                                 
+                 ENDDO                                                   
+                ENDDO                                                    
+               ENDDO                 
+              ENDDO                 
+              IE=IE+1                          
+C             pointeur de fin de zone dans WA  
+              PTWA(IE)=JJ                      
+            ENDDO  !  I=LFT,LLT                                     
+          ENDIF !  ISOLNOD == 16
         ENDIF    !  ITY = 1
       ENDDO
  200  CONTINUE
@@ -289,7 +337,7 @@ c
               ENDIF
             ENDIF
          ENDIF  !  IF (IOFF == 1)              
-        ENDDO		    
+        ENDDO        
       ENDIF
 c-----------
       RETURN

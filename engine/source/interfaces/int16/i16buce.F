@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -46,9 +46,7 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
-#include      "scr05_c.inc"
 #include      "task_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -61,10 +59,6 @@ C     REAL
      .   TZINF,MINBOX
       my_real
      .   X(3,*),EMINX(6,*),XSAV(3,*),V(3,*) ,A(3,*)  
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -116,11 +110,11 @@ C-----------------------------------------------
         ELSEIF(N20>0)THEN
           DO K=1,12
             J=IXS20(K,N20)
-            IF(J/=0)THEN	
+            IF(J/=0)THEN
               XSAV(1,J) = X(1,J)+DT2*(V(1,J)+DT12*A(1,J))
               XSAV(2,J) = X(2,J)+DT2*(V(2,J)+DT12*A(2,J))
               XSAV(3,J) = X(3,J)+DT2*(V(3,J)+DT12*A(3,J))
-	    ENDIF	      
+              ENDIF        
           ENDDO
         ELSEIF(N10>0)THEN
           DO K=1,6

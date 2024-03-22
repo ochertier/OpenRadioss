@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -43,7 +43,7 @@ Chd|====================================================================
       SUBROUTINE HM_READ_INTER_TYPE07(
      1        IPARI      ,STFAC      ,FRIGAP     ,NOINT     ,NI         ,    
      2        IGRNOD     ,IGRSURF    ,XFILTR     ,FRIC_P    ,NOM_OPT    ,
-     3        DEF_INTER  ,NPC1       ,SENSOR_TAB ,UNITAB    ,LSUBMODEL  ,
+     3        DEF_INTER  ,NPC1       ,SENSORS    ,UNITAB    ,LSUBMODEL  ,
      4        TITR       ,NOM_OPTFRIC,INTBUF_FRIC_TAB,NPC   ,TF         ,
      4        ID_TYPE19)
 C============================================================================
@@ -82,23 +82,16 @@ C-----------------------------------------------
 C-----------------------------------------------
       TYPE (GROUP_)  ,TARGET, DIMENSION(NGRNOD)  :: IGRNOD
       TYPE (SURF_)   ,TARGET , DIMENSION(NSURF)   :: IGRSURF
-      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE (SENSORS_) ,INTENT(IN) :: SENSORS
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
 #include      "scr06_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com09_c.inc"
 #include      "units_c.inc"
-#include      "warn_c.inc"
 #include      "scr12_c.inc"
 #include      "remesh_c.inc"
-#include      "sysunit.inc"
-#include      "thknod_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -747,7 +740,7 @@ C------------------------------------------------------------
 C
         NTYP0 = 7
         CALL INTER_DCOD_FUNCTION(NTYP0,NI,IPARI,NPC1,NOM_OPT,NPC,TF)
-        CALL INTER_DCOD_SENSOR (NTYP0,NI,IPARI,NOM_OPT,SENSOR_TAB)
+        CALL INTER_DCOD_SENSOR (NTYP0,NI,IPARI,NOM_OPT,SENSORS)
         CALL INTER_DCOD_FRICTION(NTYP0,NI,IPARI,NOM_OPT,NOM_OPTFRIC,
      .                           INTBUF_FRIC_TAB)
 C
@@ -925,7 +918,8 @@ C
            ELSEIF(MFROT==3)THEN
                 WRITE(IOUT,1523)FRIC_P(1),FRIC_P(2),FRIC_P(3),
      .           FRIC_P(4),FRIC_P(5),FRIC_P(6)
-
+           ELSEIF(MFROT==4)THEN
+               WRITE(IOUT,1526)  FRIC,FRIC_P(1),FRIC_P(2)
            ENDIF
         ELSE
 
@@ -1042,6 +1036,12 @@ C------------
      .  '   Function for FRICTION COEFFICIENT wrt TEMPERATURE',I10/,
      .      '    Abscissa scale factor on IFUNTCF. . . .  . ',1PG20.13/,
      .      '    Ordinate scale factor on IFUNTCF .  . .  . ',1PG20.13/)
+ 1526 FORMAT(/
+     .    '     EXPONENTIAL DECAY FRICTION LAW   '/
+     .    '      MU = c1+(MUo-c1)*exp(-c2*v)'/
+     .    '      STATIC COEFFICIENT MUo . . . . . . . . . ',1PG20.13/,
+     .    '      DYNAMIC COEFFICIENT C1 . . . . . . . . . ',1PG20.13/,
+     .    '      EXPONENTIAL DECAY COEFFICIENT C2 . . . . ',1PG20.13/)
 C----------     
  1537 FORMAT(
      .       '    BOUND. COND. DELETED AFTER IMPACT . . . . . IN X DIR       ',I1/,

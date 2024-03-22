@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -30,10 +30,10 @@ Chd|        ALEFVM_SFINT3                 source/ale/alefvm/alefvm_sfint3.F
 Chd|        ALEFVM_SFINT3_INT22           source/ale/alefvm/alefvm_sfint3_int22.F
 Chd|        INITBUF                       share/resol/initbuf.F         
 Chd|        MY_BARRIER                    source/system/machine.F       
-Chd|        ALEFVM_MOD                    ../common_source/modules/alefvm_mod.F
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
-Chd|        I22TRI_MOD                    ../common_source/modules/cut-cell-search_mod.F
+Chd|        ALEFVM_MOD                    ../common_source/modules/ale/alefvm_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
+Chd|        I22TRI_MOD                    ../common_source/modules/interfaces/cut-cell-search_mod.F
 Chd|        INITBUF_MOD                   share/resol/initbuf.F         
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
 Chd|        SEGVAR_MOD                    share/modules/segvar_mod.F    
@@ -79,29 +79,15 @@ C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "comlock.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com02_c.inc"
 #include      "com04_c.inc"
-#include      "com06_c.inc"
-#include      "com08_c.inc"
 #include      "param_c.inc"
 #include      "vect01_c.inc"
-#include      "scr05_c.inc"
-#include      "scr06_c.inc"
 #include      "scr17_c.inc"
-#include      "units_c.inc"
-#include      "parit_c.inc"
 #include      "task_c.inc"
-#include      "spmd_c.inc"
-#include      "vale_c.inc"
 #include      "inter22.inc"
-#include      "alefvm.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -147,11 +133,10 @@ C-----------------------------------------------
       TYPE(L_BUFEL_)  ,POINTER  :: LBUF
             
       INTEGER :: NIN,NBF,NBL,tNB
-C
 C-----------------------------------------------
 C   P r e - C o n d i t i o n
 C-----------------------------------------------       
-      IF(IALEFVM==0)RETURN
+      IF(ALEFVM_Param%IEnabled==0)RETURN
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------  
@@ -188,13 +173,13 @@ C-----------------------------------------------
       ! ALEFVM : FINITE VOLUME FOR MOMENTUM                                                 
       !--------------------------------------------- 
 
-       VERTEX(1:4,1:NUMNOD) = ZERO ! for alefvm_expand_momentum.F => vel on nodes           
+       ALEFVM_Buffer%VERTEX(1:4,1:NUMNOD) = ZERO ! for alefvm_expand_momentum.F => vel on nodes           
 
-       IF(IALEFVM > 0) THEN                                                                 
+       IF(ALEFVM_Param%Ienabled > 0) THEN                                                                 
          CALL MY_BARRIER 
                                                                                     
          DO NG=ITASK+1,NGROUP,NTHREAD                                                       
-           CALL INITBUF (                                                                   
+           CALL INITBUF(                                                                   
      1                   IPARG    ,NG      ,                                                
      2                   MTN     ,NEL     ,NFT     ,IAD     ,ITY     ,                      
      3                   NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,                      
@@ -247,10 +232,10 @@ C-----------------------------------------------
 
  
        DO N=NODFT,NODLT
-         IF(VERTEX(4,N) == ZERO .OR. NALE(N)==0)CYCLE
-         V(1,N)      = VERTEX(1,N) 
-         V(2,N)      = VERTEX(2,N) 
-         V(3,N)      = VERTEX(3,N)            
+         IF(ALEFVM_Buffer%VERTEX(4,N) == ZERO .OR. NALE(N)==0)CYCLE
+         V(1,N)      = ALEFVM_Buffer%VERTEX(1,N) 
+         V(2,N)      = ALEFVM_Buffer%VERTEX(2,N) 
+         V(3,N)      = ALEFVM_Buffer%VERTEX(3,N)            
        ENDDO
             
 #include "vectorize.inc"
@@ -274,7 +259,7 @@ C-----------------------------------------------
        ENDIF
 
        CALL MY_BARRIER
-       VERTEX(4,1:NUMNOD) = ZERO ! was needed for alefvm_expand_momentum.F reset here for gravity on next cycle
+       ALEFVM_Buffer%VERTEX(4,1:NUMNOD) = ZERO ! was needed for alefvm_expand_momentum.F reset here for gravity on next cycle
 
       RETURN
       END

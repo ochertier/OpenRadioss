@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,7 +20,6 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Cf51e6 Nouvelle routine
 Chd|====================================================================
 Chd|  UINTBUF_MOD                   source/user_interface/uintbuf_mod.F
 Chd|-- called by -----------
@@ -35,8 +34,7 @@ C-----------------------------------------------
 C   D e r i v e d   T y p e   D e f i n i t i o n s
 C-----------------------------------------------
       TYPE UINTBUF
-#include "sequence.inc"
-	INTEGER ISECND
+          INTEGER ISECND
         my_real AREA
         my_real DT
         my_real DXN

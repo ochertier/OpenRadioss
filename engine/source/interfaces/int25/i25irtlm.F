@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -42,24 +42,11 @@ C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "comlock.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "units_c.inc"
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
-#include      "scr07_c.inc"
-#include      "warn_c.inc"
 #include      "task_c.inc"
-#include      "parit_c.inc"
-#include      "timeri_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -108,9 +95,9 @@ C                 at the previous cycle => the node can not impact during THIS c
                   INTBUF_TAB%TIME_S(2*(N-1)+1) =  EP20
                   INTBUF_TAB%TIME_S(2*(N-1)+2) =  EP20
 C
-          	  INTBUF_TAB%SECND_FR(6*(N-1)+1:6*N) = ZERO
-          	  INTBUF_TAB%STIF_OLD(2*(N-1)+1:2*N)= ZERO
-          	  INTBUF_TAB%PENE_OLD(5*(N-1)+1:5*N)= ZERO
+            INTBUF_TAB%SECND_FR(6*(N-1)+1:6*N) = ZERO
+            INTBUF_TAB%STIF_OLD(2*(N-1)+1:2*N)= ZERO
+            INTBUF_TAB%PENE_OLD(5*(N-1)+1:5*N)= ZERO
 C
                 ELSE
 C
@@ -184,9 +171,9 @@ C                 at the previous cycle => the node can not impact during THIS c
                   TIME_SFI(NIN)%P(2*(N-1)+1) =  EP20
                   TIME_SFI(NIN)%P(2*(N-1)+2) =  EP20
 C
-          	  SECND_FRFI(NIN)%P (1:6,N)=ZERO
-          	  PENE_OLDFI(NIN)%P(1:5,N)=ZERO
-          	  STIF_OLDFI(NIN)%P(1:2,N)=ZERO
+            SECND_FRFI(NIN)%P (1:6,N)=ZERO
+            PENE_OLDFI(NIN)%P(1:5,N)=ZERO
+            STIF_OLDFI(NIN)%P(1:2,N)=ZERO
 C
                 ELSE
                   I_STOK_RTLM=I_STOK_RTLM+1
@@ -260,9 +247,9 @@ C                 at the previous cycle => the node can not impact during THIS c
                   INTBUF_TAB%TIME_S(2*(N-1)+1) =  EP20
                   INTBUF_TAB%TIME_S(2*(N-1)+2) =  EP20
 C
-          	  INTBUF_TAB%SECND_FR(6*(N-1)+1:6*N) = ZERO
-          	  INTBUF_TAB%STIF_OLD(2*(N-1)+1:2*N)= ZERO
-          	  INTBUF_TAB%PENE_OLD(5*(N-1)+1:5*N)= ZERO
+            INTBUF_TAB%SECND_FR(6*(N-1)+1:6*N) = ZERO
+            INTBUF_TAB%STIF_OLD(2*(N-1)+1:2*N)= ZERO
+            INTBUF_TAB%PENE_OLD(5*(N-1)+1:5*N)= ZERO
                   INTBUF_TAB%IF_ADH(N) = 0    
 C
                 ELSE
@@ -336,9 +323,9 @@ C                 at the previous cycle => the node can not impact during THIS c
                   TIME_SFI(NIN)%P(2*(N-1)+1) =  EP20
                   TIME_SFI(NIN)%P(2*(N-1)+2) =  EP20
 C
-          	  SECND_FRFI(NIN)%P (1:6,N)=ZERO
-          	  PENE_OLDFI(NIN)%P(1:5,N)=ZERO
-          	  STIF_OLDFI(NIN)%P(1:2,N)=ZERO
+            SECND_FRFI(NIN)%P (1:6,N)=ZERO
+            PENE_OLDFI(NIN)%P(1:5,N)=ZERO
+            STIF_OLDFI(NIN)%P(1:2,N)=ZERO
                   IF_ADHFI(NIN)%P(N) = 0
 C
                 ELSE

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,7 +26,7 @@ Chd|-- called by -----------
 Chd|        PINIT3                        source/elements/beam/pinit3.F 
 Chd|-- calls ---------------
 Chd|====================================================================
-      SUBROUTINE DT1LAWP(PM,GEO,MAT,MXG,DELTAX,DTX)
+      SUBROUTINE DT1LAWP(PM,GEO,MAT,MXG,DELTAX,DTX,IGTYP)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -38,13 +38,12 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com08_c.inc"
 #include      "param_c.inc"
 #include      "vect01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER MAT(MVSIZ), MXG(MVSIZ)
+      INTEGER MAT(MVSIZ), MXG(MVSIZ),IGTYP
 C     REAL
       my_real
      .   PM(NPROPM,*), GEO(NPROPG,*), DELTAX(MVSIZ), DTX(MVSIZ)
@@ -77,7 +76,8 @@ C
          DMP =DMP*SQRT(TWO)
          FAC =SQRT(ONE+DMP*DMP)-DMP
 C
-         DTX(I) = FAC * DELTAX(I) / MAX(EM20,SSP)/SQRT(FSH)
+         DTX(I) = FAC * DELTAX(I) / MAX(EM20,SSP)
+         IF (IGTYP /= 18) DTX(I) = DTX(I)/SQRT(FSH)
         ENDDO
 C-----------
       RETURN

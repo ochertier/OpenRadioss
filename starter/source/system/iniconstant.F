@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -63,7 +63,7 @@ C--------------------------------------
        FOURTY      = 40.
        FOURTY5     = 45.
        FOURTY8     = 48.
-       FIVEUANTE     = 50.
+       FIFTY     = 50.
        SIXTY4     = 64.
        EIGHTY   = 80.
        NINTY= 90.

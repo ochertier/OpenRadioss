@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -37,7 +37,7 @@ Chd|        TRI7BOX                       share/modules/tri7box.F
 Chd|====================================================================
       SUBROUTINE SPMD_IFRONT(
      1   IPARI   ,NEWFRONT,ISENDTO   ,IRCVFROM,
-     2   NBINTC  ,INTLIST ,ISLEN7    ,IRLEN7  ,
+     2   NSENSOR ,NBINTC  ,INTLIST ,ISLEN7    ,IRLEN7  ,
      3   ISLEN11 ,IRLEN11 ,ISLEN17   ,IRLEN17 ,IRLEN7T ,
      4   ISLEN7T ,IRLEN20 ,ISLEN20   ,IRLEN20T,ISLEN20T,
      5   IRLEN20E,ISLEN20E,SENSOR_TAB,INTBUF_TAB, MODE)
@@ -67,30 +67,21 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "units_c.inc"
-#include      "scr03_c.inc"
-#include      "scr04_c.inc"
-#include      "scr05_c.inc"
-#include      "scr18_c.inc"
-#include      "warn_c.inc"
 #include      "task_c.inc"
-#include      "parit_c.inc"
-#include      "spmd_c.inc"
-#include      "impl1_c.inc"
 #include      "assert.inc"
-#include      "my_allocate.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER ,INTENT(IN) :: NSENSOR
       INTEGER NBINTC,ISLEN7,IRLEN7,ISLEN11,IRLEN11,ISLEN17,IRLEN17,
      .        IRLEN7T,ISLEN7T,IRLEN20,ISLEN20 ,IRLEN20T,ISLEN20T,
-     .        IRLEN20E,ISLEN20E,  
+     .        IRLEN20E,ISLEN20E, 
      .        IPARI(NPARI,NINTER),
      .        NEWFRONT(*), INTLIST(*),
      .        ISENDTO(NINTER+1,*) ,IRCVFROM(NINTER+1,*)
       INTEGER MODE
       TYPE(INTBUF_STRUCT_) INTBUF_TAB(*)
-      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) ,INTENT(IN) :: SENSOR_TAB
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

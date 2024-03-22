@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -37,7 +37,7 @@ Chd|        SENSOR_MOD                    share/modules/sensor_mod.F
 Chd|====================================================================
       SUBROUTINE SENSOR_SPMD(SENSOR_TAB,IPARI  ,NPRW   ,ISENSP  ,NSENSP    ,
      .                   XSENS     ,X      ,ACCELM ,IACCP   ,NACCP     ,
-     .                   GAUGE     ,IGAUP  ,NGAUP  ,PARTSAV2)
+     .                   GAUGE     ,IGAUP  ,NGAUP  ,PARTSAV2,NSENSOR   )
 C-----------------------------------------------
 C   SPMD sensor update routine
 C-----------------------------------------------
@@ -60,6 +60,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER ,INTENT(IN) :: NSENSOR
       INTEGER IPARI(NPARI,NINTER),
      .        NPRW(*), ISENSP(2,*), NSENSP(*), IACCP(*), NACCP(*),
      .        IGAUP(*), NGAUP(*)
@@ -228,11 +229,11 @@ C
          IF (TT == ZERO) THEN
            DO K=1,NSENSOR
              TYP = SENSOR_TAB(K)%TYPE
-             N2  = SENSOR_TAB(K)%IPARAM(2)
              IF (TYP == 13) THEN
                XSENS(7,K)  = XSENS(1,K)
                XSENS(8,K)  = XSENS(2,K)
                XSENS(9,K)  = XSENS(3,K)
+               N2  = SENSOR_TAB(K)%IPARAM(2)
                IF (N2 > 0) THEN
                  XSENS(10,K) = XSENS(4,K)
                  XSENS(11,K) = XSENS(5,K)
@@ -275,7 +276,7 @@ C
         CALL SPMD_GLOB_ISUM9(IBUF,LEN)
         CALL SPMD_IBCAST(IBUF,IBUF,LEN,1,0,2)
 C
-Cel il faut corrige la reduction et l'affecter au ipari/nprw
+C   il faut corrige la reduction et l'affecter au ipari/nprw
         LEN = 0
         DO K=1,NSENSOR
          TYP = SENSOR_TAB(K)%TYPE

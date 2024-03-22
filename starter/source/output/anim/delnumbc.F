@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,9 +25,9 @@ Chd|  DELNUMBC                      source/output/anim/delnumbc.F
 Chd|-- called by -----------
 Chd|        GENANI1                       source/output/anim/genani1.F  
 Chd|-- calls ---------------
-Chd|        WRITE_I_C                     source/output/tools/write_routines.c
+Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|====================================================================
-      SUBROUTINE DELNUMBC(IPARG,IXQ  ,IXC  ,IXTG  ,IXUR ,                                   
+      SUBROUTINE DELNUMBC(IPARG,IXQ  ,IXC  ,IXTG  ,                          
      2                    EL2FA,NBF  ,INUM ,NELCUT,                       
      3                    NBPART,IDCMAX)                                         
 C-----------------------------------------------                        
@@ -40,14 +40,11 @@ C-----------------------------------------------
 #include      "com01_c.inc"                                             
 #include      "com04_c.inc"                                             
 #include      "param_c.inc"                                             
-#include      "scr05_c.inc"                                             
-#include      "scr14_c.inc"                                             
-#include      "rnur_c.inc"                                              
 C-----------------------------------------------                        
 C   D u m m y   A r g u m e n t s                                       
 C-----------------------------------------------                        
       INTEGER IXC(NIXC,*),IXTG(NIXTG,*),IPARG(NPARG,*),                 
-     .        IXQ(NIXQ,*),EL2FA(*),INUM(*),IXUR(NIXUR,*),               
+     .        IXQ(NIXQ,*),EL2FA(*),INUM(*),
      .        NBF,NELCUT,NBPART,IDCMAX                              
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -57,9 +54,9 @@ C     REAL
      .   OFF                                                            
       INTEGER IE, NG, ITY, LFT, LLT, N, I, J,                      
      .        NEL, IAD, NFT,                          
-     .        NN1,NN2,NN3,NN4,NN5,NN6,NN7,NN8,NN9,NN10
+     .        NN1,NN2,NN3,NN4,NN5,NN6,NN7,NN8,NN9
+
 C-----------------------------------------------                        
-C                                                                       
       NN1 = 1                                                           
       NN2 = 1                                                           
       NN3 = 1                                                           
@@ -69,7 +66,6 @@ C
       NN7 = NN6                                                         
       NN8 = NN7                                                         
       NN9 = NN8                                                         
-      NN10= NN9 + NUMELUR                                               
 C                                                                       
       DO NG=1,NGROUP                                                
         NEL   =IPARG(2,NG)                                              
@@ -101,18 +97,11 @@ C-----------------------------------------------
          DO I=LFT,LLT                                                   
           N = I + NFT                                                   
           INUM(EL2FA(NN5+N)) = IXTG(NIXTG,N)                            
-         ENDDO                                                          
-C-----------------------------------------------                        
-C       RNUR                                                            
-C-----------------------------------------------                        
-        ELSEIF(ITY==50)THEN                                           
-         DO I=LFT,LLT                                                   
-          N = I + NFT                                                   
-          INUM(EL2FA(NN9+N)) = IXUR(NIXUR,N)                            
-         ENDDO                                                          
+         ENDDO     
         ELSE                                                            
         ENDIF                                                           
       ENDDO                                                          
+                                                     
 C-----------------------------------------------                        
       IDCMAX=0
       DO I=1,NBF

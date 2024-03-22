@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -33,10 +33,10 @@ Chd|        NGR2USR                       source/system/nintrr.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        PBLAST_MOD                    ../common_source/modules/pblast_mod.F
+Chd|        PBLAST_MOD                    ../common_source/modules/loads/pblast_mod.F
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
-      SUBROUTINE HM_PREREAD_PBLAST(NUMLOADP , IGRNOD ,IGRSURF, LSUBMODEL)
+      SUBROUTINE HM_PREREAD_PBLAST(NUMLOADP , IGRSURF, LSUBMODEL)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -52,39 +52,31 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
 #include      "units_c.inc"
-#include      "scr03_c.inc"
 #include      "scr17_c.inc"
 #include      "com04_c.inc"
-C     NSUBMOD
-#include      "submod_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER,INTENT(INOUT) :: NUMLOADP
 C-----------------------------------------------
-      TYPE (GROUP_)  , DIMENSION(NGRNOD)  :: IGRNOD
       TYPE (SURF_)   ,TARGET, DIMENSION(NSURF)   :: IGRSURF
       TYPE(SUBMODEL_DATA), DIMENSION(NSUBMOD), INTENT(IN) :: LSUBMODEL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER               :: I, ID, IGU, IGS, NN, UID
-      INTEGER               :: FLAG_FMT_TMP, IFIX_TMP, ISU, IS, J, IERR1
-      CHARACTER             :: TITR*nchartitle, KEY2*ncharkey
-!
+      INTEGER :: I, ID, ISU, IS, IERR1
+      CHARACTER :: TITR*nchartitle
       INTEGER, DIMENSION(:), POINTER :: INGR2USR
       LOGICAL :: IS_AVAILABLE
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
-      INTEGER  NGR2USR
-      EXTERNAL NGR2USR
+      INTEGER,EXTERNAL ::  NGR2USR
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------
-      IERR1      = 0
+      IERR1 = 0
 
       CALL HM_OPTION_START('/LOAD/PBLAST')
 
@@ -95,8 +87,6 @@ C-----------------------------------------------
          IS = NGR2USR(ISU,INGR2USR,NSURF)
          IF(IS > 0)THEN
            NUMLOADP = NUMLOADP + IGRSURF(IS)%NSEG*4
-          ELSE
-           NUMLOADP = 0 
          ENDIF
       ENDDO
 

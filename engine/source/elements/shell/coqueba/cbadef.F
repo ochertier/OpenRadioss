@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -35,7 +35,6 @@ C        CALCUL DES DEFORMATIONS GENERALISEES AUX POINTS DE GAUSS ET [B]
 C        ENTREES :  NEL,NG,VCORE,VQN,VXYZ,RXYZ,VNRM,VASM,VASTN
 C        SORTIES : VDEF,BM (MEMBRANE),BMF(COUPLAGE MEM-FLEXION),BF (FLEXION),BC(C.T)
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8
-C-----------------------------------------------
 C-----------------------------------------------
 C   I M P L I C I T   T Y P E S
 C-----------------------------------------------
@@ -1141,10 +1140,10 @@ C--------------------------
       DATA VPG/PG1,PG1,PG,PG1,PG,PG,PG1,PG/
 C-------------Correction of BM0RZ to pass Patch test- IAC: analytical compute
       IAC = 1
-	  IF (IAC>0) THEN
+            IF (IAC>0) THEN
       DO I=JFT,JLT
-	   JK_A=FOUR_OVER_3*(MX23(I)*MY13(I)-MX13(I)*MY23(I))/AREA(I)
-	   JE_A=FOUR_OVER_3*(MX13(I)*MY34(I)-MX34(I)*MY13(I))/AREA(I)
+             JK_A=FOUR_OVER_3*(MX23(I)*MY13(I)-MX13(I)*MY23(I))/AREA(I)
+             JE_A=FOUR_OVER_3*(MX13(I)*MY34(I)-MX34(I)*MY13(I))/AREA(I)
 C--------NxI,x ------
        BM0RZ(I,1,1) = -BMKRZ(I,1,1)*JK_A-BMERZ(I,1,1)*JE_A
        BM0RZ(I,1,2) = -BMKRZ(I,1,2)*JK_A-BMERZ(I,1,2)*JE_A
@@ -1167,8 +1166,8 @@ C -------NyI,y -------------
        BM0RZ(I,4,4) = -BMKRZ(I,4,4)*JK_A-BMERZ(I,4,4)*JE_A
       ENDDO
       RETURN
-	  END IF !(ICN>0) THEN
-C	  
+            END IF !(ICN>0) THEN
+C    
       DO I=JFT,JLT
         J1=(MX23(I)*MY13(I)-MX13(I)*MY23(I))*PG
         J2=-(MX13(I)*MY34(I)-MX34(I)*MY13(I))*PG
@@ -1190,7 +1189,7 @@ C
 C
       DO NG= 1,4
       DO I=JFT,JLT
-	   DET=JAC(I,NG)/AREA(I)
+             DET=JAC(I,NG)/AREA(I)
        DO J=1,4
         BM0RZM(I,1,J) = BM0RZM(I,1,J)+ (BMKRZ(I,1,J)*VPG(1,NG)+
      .                  BMERZ(I,1,J)*VPG(2,NG))*DET
@@ -1204,7 +1203,7 @@ C
        ENDDO
       ENDDO
       ENDDO
-C	  
+C    
       DO I=JFT,JLT
        DO J=1,4
         BM0RZ(I,1,J) = -BM0RZM(I,1,J)
@@ -1230,7 +1229,6 @@ C        CALCUL DES DEFORMATIONS GENERALISEES AUX POINTS DE GAUSS ET [B] (MEMBRA
 C        ENTREES :  NEL,NG,VCORE,VXYZ
 C        SORTIES : VDEF,BM (MEMBRANE)
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8
-C-----------------------------------------------
 C-----------------------------------------------
 C   I M P L I C I T   T Y P E S
 C-----------------------------------------------
@@ -1317,7 +1315,6 @@ C-----------------------------------------------
 C     .   BM(9,4,*),BMF(9,4,*),BF(6,4,*),VDEF(8,*)
       MY_REAL 
      .   BMRZ(MVSIZ,4,4)
-#include      "com01_c.inc"
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8
 C---VDEF: 1:8 exx eyy,exy,eyx,byx,bxx,byy,bxy
 C-----------------------------------------------
@@ -1463,7 +1460,6 @@ Chd|====================================================================
      1                    HX,HY,BM,NPLAT,IPLAT,ISROT,
      2                    BMRZ,RXYZ,WXY )
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8
-C-----------------------------------------------
 C-----------------------------------------------
 C   I M P L I C I T   T Y P E S
 C-----------------------------------------------
@@ -1814,7 +1810,6 @@ C-----------------------------------------------
       MY_REAL 
      .   RXYZ(MVSIZ,2,4),VXYZ(MVSIZ,3,4),
      .   BM(MVSIZ,9,4),BMF(MVSIZ,9,4),BF(MVSIZ,6,4),WXY(*)
-#include      "com01_c.inc"
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8
 C---VDEF: 1:8 exx eyy,exy,eyx,byx,bxx,byy,bxy
 C-----------------------------------------------

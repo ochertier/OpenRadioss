@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,25 +26,21 @@ Chd|-- called by -----------
 Chd|        TENSORS                       source/output/anim/generate/tensor6.F
 Chd|-- calls ---------------
 Chd|====================================================================
-      SUBROUTINE SROTA6_S8S(KCVT  ,TENS  ,GAMA  ,KHBE  ,ITYP  ,FRAME)
+      SUBROUTINE SROTA6_S8S(
+     1   KCVT,    TENS,    GAMA,    KHBE,
+     2   ITYP,    FRAME,   IINT,    ISORTH)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com08_c.inc"
-#include      "vect01_c.inc"
-#include      "scr18_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: IINT
+      INTEGER, INTENT(IN) :: ISORTH
 C     REAL
       my_real
      .   TENS(6),GAMA(6),FRAME(3,3)
@@ -65,14 +61,14 @@ C---- should not rotate w/ global iso system
 C----------------------------
       IF (KHBE /= 17 .OR. IINT /= 3) RETURN
          R11 = FRAME(1,1)
-	   R21 = FRAME(2,1)
-	   R31 = FRAME(3,1)
-	   R12 = FRAME(1,2)
-	   R22 = FRAME(2,2)
-	   R32 = FRAME(3,2)
-	   R13 = FRAME(1,3)
-	   R23 = FRAME(2,3)
-	   R33 = FRAME(3,3)
+             R21 = FRAME(2,1)
+             R31 = FRAME(3,1)
+             R12 = FRAME(1,2)
+             R22 = FRAME(2,2)
+             R32 = FRAME(3,2)
+             R13 = FRAME(1,3)
+             R23 = FRAME(2,3)
+             R33 = FRAME(3,3)
 !       ENDIF
 C-----------
 C     ORTHOTROPIC ELEMENTS : Rotation from ORHTOROPIC FRAME TO LOCAL FRAME

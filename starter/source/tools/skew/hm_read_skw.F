@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -62,17 +62,13 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr17_c.inc"
-#include      "scr03_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com10_c.inc"
 #include      "sphcom.inc"
 #include      "units_c.inc"
 #include      "titr_c.inc"
-#include      "warn_c.inc"
 #include      "param_c.inc"
-#include      "submod_c.inc"
-#include      "sysunit.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -148,7 +144,7 @@ C--------------------------------------------------
       IMOV  = 0
 C
       IFLAGUNIT = 0
-      DO J=1,NUNITS
+      DO J=1,UNITAB%NUNITS
         IF (UNITAB%UNIT_ID(J) == UID) THEN                 
           IFLAGUNIT = 1
           EXIT
@@ -550,7 +546,7 @@ C          not a user's defined skew.
         ENDDO
       ENDIF
 C-------------------------------------------------------------
-Csv begin   building SKEWS for SUBMODEL (Rotation Transformation)
+C   begin   building SKEWS for SUBMODEL (Rotation Transformation)
 C-------------------------------------------------------------
       IF(NSUBMOD/=0)THEN
         WRITE (IOUT,'(A)')TITRE(118)
@@ -599,7 +595,7 @@ C-------------------------------------------------------------
           IF(LSUBMODEL(IDSUB)%NBTRANS /=0)
      .      CALL SUBROTPOINT(SKEW(10,J),SKEW(11,J),SKEW(12,J),
      .        RTRANS,LSUBMODEL(IDSUB)%NOSUBMOD,LSUBMODEL)
-Csv          not a user's defined skew.
+C            not a user's defined skew.
              ISKN(4,J)=1000000001 + (J-NUMSKW-NUMSPH_TMP-2)
           WRITE(IOUT,'(1X,I10,1X,3F16.7,3F16.7)')ISKN(4,J),
      .                (SKEW(K,J),K=1,3),(SKEW(K,J),K=10,12)

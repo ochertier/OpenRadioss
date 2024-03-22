@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -28,7 +28,7 @@ Chd|        SENSOR_BASE                   source/tools/sensor/sensor_base.F
 Chd|-- calls ---------------
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
 Chd|====================================================================
-      SUBROUTINE SENSOR_SECTION(SENSOR  ,IPARSENS,DIMFB   ,STABS   ,TABS    ,
+      SUBROUTINE SENSOR_SECTION(SENSOR  ,DIMFB   ,STABS   ,TABS    ,
      .                          FSAV    ,FBSAV6  )
 C-----------------------------------------------
 C   M o d u l e s
@@ -42,7 +42,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "scr17_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
 #include      "units_c.inc"
@@ -51,7 +50,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER :: IPARSENS,DIMFB,STABS
+      INTEGER :: DIMFB,STABS
       INTEGER :: TABS(STABS)
       DOUBLE PRECISION ,DIMENSION(12,6,DIMFB) :: FBSAV6
       my_real ,DIMENSION(NTHVKI,*) :: FSAV
@@ -81,7 +80,7 @@ c
       ISECT = TABS(SECT_ID+1) - TABS(SECT_ID)
 c
       IF (IDIR == 1) THEN      ! normal force                    
-        IF (IPARSENS==0) THEN  ! Parith/Off
+        IF (STABS == 0) THEN   ! Parith/Off
           FX = FSAV(1,IAD)              
           FY = FSAV(2,IAD)                          
           FZ = FSAV(3,IAD)                          
@@ -97,7 +96,7 @@ c
      .       + FBSAV6(3,5,ISECT)+FBSAV6(3,6,ISECT)
         ENDIF
       ELSEIF (IDIR == 2) THEN  ! tangent force
-        IF (IPARSENS==0) THEN  ! Parith/Of
+        IF (STABS == 0)  THEN  ! Parith/Of
          FX = FSAV(4,IAD)                          
          FY = FSAV(5,IAD)                          
          FZ = FSAV(6,IAD)                          
@@ -113,7 +112,7 @@ c
      .       + FBSAV6(6,5,ISECT)+FBSAV6(6,6,ISECT)
         ENDIF
       ELSEIF (IDIR == 3) THEN  ! Total force
-        IF (IPARSENS==0) THEN  ! Parith/Off  
+        IF (STABS == 0) THEN  ! Parith/Off  
          FX = FSAV(34,IAD)                         
          FY = FSAV(35,IAD)                         
          FZ = FSAV(36,IAD)
@@ -129,7 +128,7 @@ c
      .       + FBSAV6(12,5,ISECT)+FBSAV6(12,6,ISECT)
         ENDIF  
       ELSEIF (IDIR == 4) THEN  !  Total moment
-        IF (IPARSENS==0) THEN  !  Parith/Off  
+        IF (STABS == 0) THEN  !  Parith/Off  
          FX = FSAV(31,IAD)                         
          FY = FSAV(32,IAD)                         
          FZ = FSAV(33,IAD)
@@ -145,7 +144,7 @@ c
      .      + FBSAV6(9,5,ISECT)+FBSAV6(9,6,ISECT)
         ENDIF  
       ELSEIF (IDIR == 5) THEN  !  FX
-        IF (IPARSENS==0) THEN !         Parith/Off
+        IF (STABS == 0) THEN !         Parith/Off
           FF = FSAV(1,IAD) + FSAV(4,IAD)
         ELSE                  !         Parith/on
           FF = FBSAV6(1,1,ISECT)+FBSAV6(1,2,ISECT)
@@ -156,7 +155,7 @@ c
      .       + FBSAV6(4,5,ISECT)+FBSAV6(4,6,ISECT)
         ENDIF
       ELSEIF (IDIR == 6) THEN  !  FY
-        IF (IPARSENS==0) THEN!         Parith/Off
+        IF (STABS == 0) THEN!         Parith/Off
           FF = FSAV(2,IAD) + FSAV(5,IAD)
         ELSE                  !         Parith/on
           FF = FBSAV6(2,1,ISECT)+FBSAV6(2,2,ISECT)
@@ -167,7 +166,7 @@ c
      .       + FBSAV6(5,5,ISECT)+FBSAV6(5,6,ISECT)
         ENDIF                         
       ELSEIF (IDIR == 7) THEN  !  FZ
-        IF (IPARSENS==0) THEN  !         Parith/Off
+        IF (STABS == 0) THEN  !         Parith/Off
           FF = FSAV(3,IAD) + FSAV(6,IAD)
         ELSE                  !         Parith/on
           FF = FBSAV6(3,1,ISECT)+FBSAV6(3,2,ISECT)
@@ -178,7 +177,7 @@ c
      .       + FBSAV6(6,5,ISECT)+FBSAV6(6,6,ISECT)
         ENDIF                          
       ELSEIF (IDIR == 8) THEN  !  MX
-        IF (IPARSENS==0) THEN!         Parith/Off
+        IF (STABS == 0) THEN!         Parith/Off
           FF = FSAV(31,IAD)
         ELSE                  !         Parith/on
           FF = FBSAV6(7,1,ISECT)+FBSAV6(7,2,ISECT)
@@ -186,7 +185,7 @@ c
      .       + FBSAV6(7,5,ISECT)+FBSAV6(7,6,ISECT)
         ENDIF                          
       ELSEIF (IDIR == 9) THEN  !  MY
-        IF (IPARSENS==0) THEN!         Parith/Off
+        IF (STABS == 0) THEN!         Parith/Off
           FF = FSAV(32,IAD)
         ELSE                  !         Parith/on
           FF = FBSAV6(8,1,ISECT)+FBSAV6(8,2,ISECT)
@@ -194,7 +193,7 @@ c
      .       + FBSAV6(8,5,ISECT)+FBSAV6(8,6,ISECT)
         ENDIF                           
       ELSEIF (IDIR == 10) THEN  !  MZ
-        IF (IPARSENS==0) THEN        ! Parith/Off
+        IF (STABS == 0) THEN        ! Parith/Off
           FF = FSAV(33,IAD)
         ELSE                        ! Parith/on
           FF = FBSAV6(9,1,ISECT)+FBSAV6(9,2,ISECT)

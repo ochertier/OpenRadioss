@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -32,25 +32,19 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER N, NFSKYI, ISKY(*)
-      my_real
-     .        FSKYI(2*NFSKYI,*)
+      my_real FSKYI(2*NFSKYI,*)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, J, L, IR, IIA
-      my_real
-     .        RRA1, RRA2, RRA3, RRA4, RRA5,
-     .        RRA6, RRA7, RRA8, RRA9, RRA10
+      my_real RRA1, RRA2, RRA3, RRA4, RRA5, RRA6, RRA7, RRA8, RRA9, RRA10
 C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
-Cel test sur n=0
+C   test sur n=0
       IF (N==0) RETURN
       L=N/2+1
       IR=N

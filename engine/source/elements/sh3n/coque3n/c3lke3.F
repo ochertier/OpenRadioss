@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -260,7 +260,7 @@ C
          M33(1,2,EP)=M33(1,2,EP)-PY3PY3(EP)*DF6(EP)
         ENDDO
         DO EP=JFT,JLT 
- 	     C2=VOL(EP)*THK0(EP)
+               C2=VOL(EP)*THK0(EP)
          DMF(1,1,EP)=HMFOR(EP,1)*C2
          DMF(2,2,EP)=HMFOR(EP,2)*C2
          DMF(1,2,EP)=HMFOR(EP,3)*C2
@@ -577,7 +577,6 @@ C   I M P L I C I T   T Y P E S
 C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "mvsiz_p.inc"
-#include      "com04_c.inc"
 C-----------------------------------------------
 C   D U M M Y   A R G U M E N T S
 C-----------------------------------------------
@@ -889,7 +888,7 @@ C------ Mzz  ----------
 C ----add mem-bending coupling terms of orthotrope--coplanar first---
 #include "vectorize.inc"
         DO EP=JFT,JLT 
- 	 C2=VOL(EP)*THK0(EP)
+           C2=VOL(EP)*THK0(EP)
          DMF(1,1,EP)=HMFOR(EP,1)*C2
          DMF(2,2,EP)=HMFOR(EP,2)*C2
          DMF(1,2,EP)=HMFOR(EP,3)*C2

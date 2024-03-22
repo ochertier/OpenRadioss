@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,7 +25,7 @@ Chd|  SINI43                        source/elements/solid/sconnect/sini43.F
 Chd|-- called by -----------
 Chd|        SUINIT3                       source/elements/elbuf_init/suinit3.F
 Chd|-- calls ---------------
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE SINI43(ELBUF_STR,
      1           MLW   ,NEL   ,AREA  ,VOLG  ,RHOG  ,
@@ -48,7 +48,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
 #include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "vect01_c.inc"
 C----------------------------------------------------------
 C   D u m m y   A r g u m e n t s  

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,15 +27,19 @@ Chd|        Q4FORC2                       source/elements/solid_2d/quad4/q4forc2
 Chd|-- calls ---------------
 Chd|        Q4RROTA2                      source/elements/solid_2d/quad4/q4rrota2.F
 Chd|====================================================================
-      SUBROUTINE Q4RCOOR2(X ,NCP     ,Y1      ,Y2      ,Y3      ,
-     2             Y4      ,Z1      ,Z2      ,Z3      ,Z4      ,
-     3             NC1     ,NC2     ,NC3     ,NC4     ,NGL     ,
-     4             MAT     ,NGEO    ,VD2     ,R11     ,R12     ,
-     5             R13     ,R21     ,R22     ,R23     ,R31     ,
-     6             R32     ,R33     ,GAMA    ,Y234    ,Y124    ,
-     7             VIS     ,V       ,VY1     ,VY2     ,VY3     ,
-     8             VY4     ,VZ1     ,VZ2     ,VZ3     ,VZ4     ,
-     9             YAVG    ,AY      ,EXX     )                   
+      SUBROUTINE Q4RCOOR2(
+     1   X,       NCP,     Y1,      Y2,
+     2   Y3,      Y4,      Z1,      Z2,
+     3   Z3,      Z4,      NC1,     NC2,
+     4   NC3,     NC4,     NGL,     MAT,
+     5   NGEO,    VD2,     R11,     R12,
+     6   R13,     R21,     R22,     R23,
+     7   R31,     R32,     R33,     GAMA,
+     8   Y234,    Y124,    VIS,     V,
+     9   VY1,     VY2,     VY3,     VY4,
+     A   VZ1,     VZ2,     VZ3,     VZ4,
+     B   YAVG,    AY,      EXX,     NEL,
+     C   ISORTH)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -47,6 +51,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: ISORTH
+      INTEGER, INTENT(IN) :: NEL
       INTEGER NC1(*), NC2(*), NC3(*), NC4(*), MAT(*), NGL(*), NGEO(*),
      .        NCP(7,*)
 C     REAL
@@ -61,9 +67,7 @@ C     REAL
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "vect01_c.inc"
 #include      "com01_c.inc"
-#include      "com04_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -75,7 +79,7 @@ C-----------------------------------------------
      .   G22,G23,G32,G33,
      .   T22,T23,T32,T33,VYG
 C-----------------------------------------------
-      DO I=LFT,LLT
+      DO I=1,NEL
         NGEO(I)=NCP(6,I)
         NGL(I)=NCP(7,I)
         MAT(I)=NCP(1,I)
@@ -88,7 +92,7 @@ C
 C----------------------------
 C     COORDONNEES NODALES
 C----------------------------
-      DO I=LFT,LLT
+      DO I=1,NEL
         Y1(I)=X(2,NC1(I))
         Z1(I)=X(3,NC1(I))
         Y2(I)=X(2,NC2(I))
@@ -98,7 +102,7 @@ C----------------------------
         Y4(I)=X(2,NC4(I))
         Z4(I)=X(3,NC4(I))
       END DO
-      DO I=LFT,LLT
+      DO I=1,NEL
         VY1(I)=V(2,NC1(I))
         VZ1(I)=V(3,NC1(I))
         VY2(I)=V(2,NC2(I))
@@ -110,7 +114,7 @@ C----------------------------
       END DO
 C-----Exx ia calculated anyway in global system
       IF(N2D==1) THEN
-        DO I=LFT,LLT
+        DO I=1,NEL
           YAVG(I) = Y1(I)+Y2(I)+Y3(I)+Y4(I)
           VYG = VY1(I)+VY2(I)+VY3(I)+VY4(I)
           Y234(I)=Y2(I)+Y3(I)+Y4(I)
@@ -123,7 +127,7 @@ C-----constant Exx,
 C---------------------------------------
 C     REPERE LOCAL
 C---------------------------------------
-      DO I=LFT,LLT
+      DO I=1,NEL
         SY(I)=HALF*(Y2(I)+Y3(I)-Y1(I)-Y4(I))
         SZ(I)=HALF*(Z2(I)+Z3(I)-Z1(I)-Z4(I))
         TY(I)=HALF*(Y3(I)+Y4(I)-Y1(I)-Y2(I))
@@ -132,7 +136,7 @@ C---------------------------------------
 C-----------
 C     REPERE CONVECTE : Same than the shell
 C-----------
-      DO I=LFT,LLT
+      DO I=1,NEL
         CT = TY(I)*TY(I)+TZ(I)*TZ(I)
         CS = SY(I)*SY(I)+SZ(I)*SZ(I)
         IF(CS /= ZERO) THEN
@@ -145,12 +149,12 @@ C-----------
           SZ(I) = SZ(I) - TY(I)*SUMA
         END IF 
       ENDDO
-      DO I=LFT,LLT
+      DO I=1,NEL
         SUMA=ONE/MAX(SQRT(SY(I)*SY(I)+SZ(I)*SZ(I)),EM20)
         SY(I)=SY(I)*SUMA
         SZ(I)=SZ(I)*SUMA
       ENDDO
-      DO I=LFT,LLT
+      DO I=1,NEL
         R11(I)= ONE
         R21(I)= ZERO
         R31(I)= ZERO
@@ -162,7 +166,7 @@ C-----------
         R33(I)= SY(I)
       END DO
 C-----------
-      DO I=LFT,LLT
+      DO I=1,NEL
         YL=R22(I)*Y1(I)+R32(I)*Z1(I)
         ZL=R23(I)*Y1(I)+R33(I)*Z1(I)
         Y1(I)=YL
@@ -184,7 +188,7 @@ C-----------
 C     PASSAGE AU REPERE ORTHOTROPE.
 C-----------
       IF (ISORTH /= 0)THEN
-        DO I=LFT,LLT
+        DO I=1,NEL
 C         Extration de G tq Xortho=Transpose(G) Xcvt
 C                                 =Transpose(G) Transpose(R) Xglobal.
           G22=GAMA(I,2)
@@ -219,11 +223,13 @@ C         MATRICE DE PASSAGE GLOBAL -> ORTHOTROPE.
           R33(I)=T33
         ENDDO
       ENDIF
-        CALL Q4RROTA2(R22,R23,R32,R33,
-     2                VY1,VY2,VY3,VY4,
-     3                VZ1,VZ2,VZ3,VZ4)
+        CALL Q4RROTA2(
+     1   R22,     R23,     R32,     R33,
+     2   VY1,     VY2,     VY3,     VY4,
+     3   VZ1,     VZ2,     VZ3,     VZ4,
+     4   NEL)
 C-----------
-      DO I=LFT,LLT
+      DO I=1,NEL
         VD2(I)=ZERO
         VIS(I)=ZERO
       END DO

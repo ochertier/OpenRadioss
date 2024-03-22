@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -50,7 +50,7 @@ Chd|        SENSOR_MOD                    share/modules1/sensor_mod.F
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
       SUBROUTINE READ_MONVOL(T_MONVOL, T_MONVOL_METADATA, ITAB, ITABM1, IPM, IGEO, 
-     .     X, PM, GEO, IXC, IXTG, SENSOR_TAB,
+     .     X, PM, GEO, IXC, IXTG, SENSORS,
      .     UNITAB, NPC, NPT, PLD, IGRSURF, IGRBRIC, NOM_OPT,IFRAME, XFRAME, 
      .     LSUBMODEL)
 C-----------------------------------------------
@@ -59,7 +59,7 @@ C-----------------------------------------------
       USE UNITAB_MOD
       USE R2R_MOD
       USE MESSAGE_MOD
-      USE GROUPDEF_MOD
+      USE GROUPDEF_MOD , only:GROUP_,SURF_
       USE MONVOL_STRUCT_MOD
       USE SUBMODEL_MOD
       USE HM_OPTION_READ_MOD
@@ -80,27 +80,24 @@ C     NSUBDOM
 C     NIMV, NRVOLU
 #include      "param_c.inc"
 C     LUNIT, NUNITS
-#include      "sysunit.inc"
 C     IOUT
 #include      "units_c.inc"
-C     NSUBMOD
-#include      "submod_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       TYPE(MONVOL_STRUCT_), DIMENSION(NVOLU + NMONVOL), INTENT(INOUT) :: T_MONVOL
       TYPE(MONVOL_METADATA_), INTENT(INOUT) :: T_MONVOL_METADATA
       TYPE(UNIT_TYPE_), INTENT(IN) :: UNITAB
-      my_real, INTENT(IN) :: X(3, *), GEO(NPROPG, *), PM(NPROPM, *), PLD(2, *), 
+      my_real, INTENT(IN) :: X(3, NUMNOD), GEO(NPROPG, NUMGEO), PM(NPROPM, NUMMAT), PLD(2, *), 
      .     XFRAME(NXFRAME,*)
       INTEGER, INTENT(IN) :: NPC(*), NPT(*), ITAB(*), ITABM1(*), 
-     .     IXC(NIXC, *), IXTG(NIXTG, *),IPM(NPROPMI, *), 
-     .     IGEO(NPROPGI, *),IFRAME(LISKN,*)
+     .     IXC(NIXC, NUMELC), IXTG(NIXTG, NUMELTG),IPM(NPROPMI, NUMMAT), 
+     .     IGEO(NPROPGI, NUMGEO),IFRAME(LISKN,*)
       INTEGER, INTENT(INOUT) :: NOM_OPT(LNOPT1, *)
       TYPE (SURF_), INTENT(INOUT), DIMENSION(NSURF) :: IGRSURF
       TYPE (GROUP_), DIMENSION(NGRBRIC), INTENT(IN) :: IGRBRIC
-      TYPE(SUBMODEL_DATA), DIMENSION(NSUBMOD), INTENT(IN) :: LSUBMODEL
-      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE (SUBMODEL_DATA), DIMENSION(NSUBMOD), INTENT(IN) :: LSUBMODEL
+      TYPE (SENSORS_) ,INTENT(IN) :: SENSORS
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -134,7 +131,7 @@ C     Multidomain -> skip untagged monvols
          CALL FRETITL(TITR,NOM_OPT(LNOPT1-LTITR+1,II),LTITR)
 C     Check units
          FOUND = .FALSE.
-         DO JJ = 1, NUNITS
+         DO JJ = 1,UNITAB%NUNITS
             IF (UNITAB%UNIT_ID(JJ) == UID) THEN
                FOUND = .TRUE.
                LOCAL_UID = JJ
@@ -168,6 +165,7 @@ C     Check units
          ELSEIF (KEY(1:6) == 'LFLUID') THEN
             ITYPE = 10
          ELSE
+            ITYPE = 0
             CALL ANCMSG(MSGID=7,ANMODE=ANINFO,MSGTYPE=MSGERROR,
      .           I1=ID,C1=TITR)
          ENDIF
@@ -208,14 +206,14 @@ C     Check units
 !     /MONVOL/AIRBAG     !
 !     **************     !
             CALL HM_READ_MONVOL_TYPE4(T_MONVOL(II), IPM, IGEO, ITABM1, 
-     .           SENSOR_TAB, NPT, PLD, UNITAB, LOCAL_UID, NPC, IGRSURF,
+     .           SENSORS, NPT, PLD, UNITAB, LOCAL_UID, NPC, IGRSURF,
      .           ITAB, X, PM, GEO, IXC, IXTG, LSUBMODEL)
          CASE(5)
 !     *************     !
 !     /MONVOL/COMMU     !
 !     *************     !
             CALL HM_READ_MONVOL_TYPE5(T_MONVOL(II), T_MONVOL_METADATA, IPM, IGEO, ITABM1, 
-     .           SENSOR_TAB, NPT, PLD, 
+     .           SENSORS, NPT, PLD, 
      .           UNITAB, LOCAL_UID, NPC, IGRSURF, ITAB, X, PM, GEO, IXC, IXTG,
      .           LSUBMODEL)
          CASE(6)
@@ -223,7 +221,7 @@ C     Check units
 !     /MONVOL/FVMBAG     !
 !     **************     !
             CALL HM_READ_MONVOL_TYPE6(T_MONVOL(II), IPM, IGEO, ITABM1, 
-     .           SENSOR_TAB, NPT, PLD, IGRBRIC,
+     .           SENSORS, NPT, PLD, IGRBRIC,
      .           UNITAB, LOCAL_UID, NPC, IGRSURF, ITAB, X, PM, GEO, IXC, IXTG,
      .           LSUBMODEL)
          CASE(7)
@@ -231,7 +229,7 @@ C     Check units
 !     /MONVOL/AIRBAG1     !
 !     ***************     !
             CALL HM_READ_MONVOL_TYPE7(T_MONVOL(II), IPM, IGEO, ITABM1,   
-     .           SENSOR_TAB, NPT, PLD, 
+     .           SENSORS, NPT, PLD, 
      .           UNITAB, LOCAL_UID, NPC, IGRSURF, ITAB, X, PM, GEO, IXC, IXTG,
      .           LSUBMODEL)
          CASE(8)
@@ -239,7 +237,7 @@ C     Check units
 !     /MONVOL/FVMBAG1     !
 !     ***************     !
            CALL HM_READ_MONVOL_TYPE8(T_MONVOL(II), IPM, IGEO, ITABM1,   
-     .           SENSOR_TAB, NPT, PLD, IFRAME, XFRAME, IGRBRIC,
+     .           SENSORS, NPT, PLD, IFRAME, XFRAME, IGRBRIC,
      .           UNITAB, LOCAL_UID, NPC, IGRSURF, ITAB, X, PM, GEO, IXC, IXTG, 
      .           LSUBMODEL)           
 
@@ -248,7 +246,7 @@ C     Check units
 !     /MONVOL/COMMU1     !
 !     **************     !
             CALL HM_READ_MONVOL_TYPE9(T_MONVOL(II), T_MONVOL_METADATA, IPM, IGEO, ITABM1,   
-     .           SENSOR_TAB, NPT, PLD, 
+     .           SENSORS, NPT, PLD, 
      .           UNITAB, LOCAL_UID, NPC, IGRSURF, ITAB, X, PM, GEO, IXC, IXTG,
      .           LSUBMODEL)
          CASE(10)
@@ -264,7 +262,7 @@ C     Check units
 !     /MONVOL/FVMBAG2     !
 !     ***************     !
             CALL HM_READ_MONVOL_TYPE11(T_MONVOL(II), IPM, IGEO, ITABM1,   
-     .           SENSOR_TAB, NPT, PLD, IFRAME, XFRAME, IGRBRIC,
+     .           SENSORS, NPT, PLD, IFRAME, XFRAME, IGRBRIC,
      .           UNITAB, LOCAL_UID, NPC, IGRSURF, ITAB, X, PM, GEO, IXC, IXTG, 
      .           LSUBMODEL)
          END SELECT

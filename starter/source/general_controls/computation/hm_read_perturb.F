@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -32,10 +32,11 @@ Chd|        HM_READ_PERTURB_PART_SOLID    source/general_controls/computation/hm
 Chd|        UDOUBLE                       source/system/sysfus.F        
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
+Chd|        MAT_ELEM_MOD                  ../common_source/modules/mat_elem/mat_elem_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
-      SUBROUTINE HM_READ_PERTURB(
+      SUBROUTINE HM_READ_PERTURB(MAT_PARAM,
      1      IPART   ,RNOISE  ,IPARTC   ,IPARTG    ,IPARTSP  ,
      2      IGRPART ,IPM     ,IPARTS   ,PERTURB   ,QP_IPERTURB,
      3      QP_RPERTURB      ,LSUBMODEL,UNITAB  )
@@ -47,6 +48,7 @@ C-----------------------------------------------
       USE UNITAB_MOD
       USE SUBMODEL_MOD
       USE HM_OPTION_READ_MOD
+      USE MAT_ELEM_MOD    
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -54,17 +56,10 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "scr17_c.inc"
-#include      "scr03_c.inc"
-#include      "scry_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
 #include      "param_c.inc"
-#include      "remesh_c.inc"
 #include      "sphcom.inc"
-#include      "submod_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -76,6 +71,7 @@ c     . RNOISE(*)
       INTEGER IPART(LIPART1,*),IPARTC(*),IPARTSP(*),IPARTG(*),IPARTS(*),
      .   IPM(NPROPMI,*),PERTURB(NPERTURB),QP_IPERTURB(NPERTURB,6)
       TYPE(SUBMODEL_DATA) LSUBMODEL(*)
+      TYPE (MATPARAM_STRUCT_) ,DIMENSION(NUMMAT) ,INTENT(INOUT) :: MAT_PARAM
 C-----------------------------------------------
       TYPE (GROUP_)  , DIMENSION(NGRPART)  :: IGRPART
 C-----------------------------------------------
@@ -141,9 +137,9 @@ c
 c
 c     /PERTURB/FAIL/BIQUAD
 c
-      CALL HM_READ_PERTURB_FAIL(
+      CALL HM_READ_PERTURB_FAIL(MAT_PARAM,
      .     IPART    ,RNOISE   ,IPARTC ,IPARTG    ,IPARTSP  ,
-     .     IGRPART  ,IPARTS   ,IPM    ,PERTURB   ,IDPERTURB,
+     .     IGRPART  ,IPARTS   ,PERTURB   ,IDPERTURB,
      .     INDEX   ,INDEX_ITYP,NPART_SHELL,OFFS ,QP_IPERTURB,
      .     QP_RPERTURB,LSUBMODEL,UNITAB)
 c

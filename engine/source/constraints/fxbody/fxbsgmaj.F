@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,7 +26,7 @@ Chd|-- called by -----------
 Chd|        FXBODFP1                      source/constraints/fxbody/fxbodfp.F
 Chd|-- calls ---------------
 Chd|        SCHREP                        source/constraints/fxbody/fxbsgmaj.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE FXBSGMAJ(ELBUF, FXBELM , FXBSIG, FXBDEP, FXBIPM ,
      .                    EIEL , PARTSAV, RT    , ITN   , IPARG  ,
@@ -64,7 +64,7 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER NELS, NELC, NELTG, NML, NME, IM, IG, OFFSET, NFT, NFS,
      .        LAST, IAD1, IAD2, IAD3, I, MX, NFT1, II, OFF, NG,
-     .        IGOF, IFILE, NFS2, J, IAD, NELT, NELP,IEL,JJ(6),NEL
+     .        IGOF, IFILE, NFS2, J, IAD, NELT, NELP,IEL,JJ(6),NEL,AELM
       my_real
      .   FAC,FAC2,SIGL(MVSIZ,6),SIG(MVSIZ,6),
      .   EIELC(NPART),EIELP(NPART), VSIG(LVSIG)
@@ -78,7 +78,9 @@ C=======================================================================
       NELP=FXBIPM(35)
       NELTG=FXBIPM(23)
 C
-      NFT=0
+      AELM=FXBIPM(19)
+C
+      NFT=AELM-1
       NFS=0
       DO I=1,NPART
          EIELC(I)=ZERO
@@ -247,7 +249,7 @@ C
          ENDIF
          FAC=FXBDEP(NME+IM)
          FAC2=FAC*FAC
-         NFT=0
+         NFT=AELM-1
          NFS2=0
          DO IG=1,NELS,NVSIZ
             OFFSET=IG-1
@@ -388,7 +390,7 @@ C
          ENDDO
       ENDDO
 C
-      NFT=0
+      NFT=AELM-1
       DO IG=1,NELS,NVSIZ
          OFFSET=IG-1
          LAST=MIN(NVSIZ,NELS-OFFSET)
@@ -455,9 +457,6 @@ C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

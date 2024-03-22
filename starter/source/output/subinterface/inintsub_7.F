@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -48,16 +48,10 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr03_c.inc"
 #include      "scr17_c.inc"
 #include      "com04_c.inc"
-#include      "units_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -244,9 +238,9 @@ C  --------Skyline tabs ADDSUBS-----------
 C
          CUR=1
          DO IS=1,NSN
-            NEXT	                = CUR+INTBUF_TAB(NI)%ADDSUBS(IS)
+            NEXT                  = CUR+INTBUF_TAB(NI)%ADDSUBS(IS)
             INTBUF_TAB(NI)%ADDSUBS(IS)= CUR
-            CUR	                = NEXT
+            CUR                  = NEXT
          END DO
          INTBUF_TAB(NI)%ADDSUBS(1+NSN)=CUR
 C
@@ -581,9 +575,9 @@ C
 C
           CUR=1
           DO IM=1,NRTM0
-             NEXT	                =CUR+INTBUF_TAB(NI)%ADDSUBM(IM)
+             NEXT                  =CUR+INTBUF_TAB(NI)%ADDSUBM(IM)
              INTBUF_TAB(NI)%ADDSUBM(IM)=CUR
-             CUR	                =NEXT
+             CUR                  =NEXT
           END DO
           INTBUF_TAB(NI)%ADDSUBM(NRTM0+1:NRTM+1)=CUR
 C

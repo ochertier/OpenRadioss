@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -39,6 +39,7 @@ Chd|====================================================================
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE MY_ALLOC_MOD
       USE MESSAGE_MOD
       USE GROUPDEF_MOD
       USE SUBMODEL_MOD
@@ -48,19 +49,10 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr17_c.inc"
-#include      "scr03_c.inc"
 #include      "com04_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "param_c.inc"
-#include      "my_allocate.inc"
-#include      "submod_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -148,13 +140,13 @@ C                       reference a une ligne initialise
               IF (SKIPFLAG == 0) THEN               
                 INSEG=INSEG+6*NSEG                                
                 IGRSLIN(IGS)%NSEG= NSEG
-                MY_ALLOCATE2D(IGRSLIN(IGS)%NODES,NSEG,2)
+                CALL MY_ALLOC(IGRSLIN(IGS)%NODES,NSEG,2)
                 IGRSLIN(IGS)%NODES(1:NSEG,1:2) = 0
-                MY_ALLOCATE(IGRSLIN(IGS)%ELTYP,NSEG)
+                CALL MY_ALLOC(IGRSLIN(IGS)%ELTYP,NSEG)
                 IGRSLIN(IGS)%ELTYP(1:NSEG) = 0
-                MY_ALLOCATE(IGRSLIN(IGS)%ELEM,NSEG)
+                CALL MY_ALLOC(IGRSLIN(IGS)%ELEM,NSEG)
                 IGRSLIN(IGS)%ELEM(1:NSEG) = 0
-                MY_ALLOCATE(IGRSLIN(IGS)%PROC,NSEG)
+                CALL MY_ALLOC(IGRSLIN(IGS)%PROC,NSEG)
                 IGRSLIN(IGS)%PROC(1:NSEG) = 0
               ENDIF                                 
 C-----------                                             

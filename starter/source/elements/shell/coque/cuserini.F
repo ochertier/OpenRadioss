@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,7 +27,7 @@ Chd|        C3INIT3                       source/elements/sh3n/coque3n/c3init3.F
 Chd|        CBAINIT3                      source/elements/shell/coqueba/cbainit3.F
 Chd|        CINIT3                        source/elements/shell/coque/cinit3.F
 Chd|-- calls ---------------
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE CUSERINI(ELBUF_STR,
      1           JFT     ,JLT     ,NFT     ,NEL     ,NPT     ,
@@ -47,9 +47,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
-#include      "units_c.inc"
-#include      "warn_c.inc"
 #include      "com01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -152,7 +149,6 @@ c
             IPT_ALL = IPT_ALL + NPTT
           ENDDO  !  DO ILAY=1,NPT
 c
-c
         ELSE IF (ELBUF_STR%BUFLY(1)%ILAW == 87) THEN  ! backstress is no more stored in uvar
           L_SIGB = ELBUF_STR%BUFLY(1)%L_SIGB
           NUVAR  = ELBUF_STR%BUFLY(1)%NVAR_MAT
@@ -174,6 +170,21 @@ c
               DO J = 1,L_SIGB
                 JJ = (J-1)*NEL + I
                 SIGB(JJ) = SIGSH(KK + J ,II)
+              ENDDO
+            ENDDO
+            IPT_ALL = IPT_ALL + NPTT
+          ENDDO  !  DO ILAY=1,NPT
+c
+        ELSE IF (ELBUF_STR%BUFLY(1)%ILAW == 112) THEN  ! backstress is no more stored in uvar
+          IPT_ALL = 0
+          DO ILAY=1,NLAY
+            NPTT  = ELBUF_STR%BUFLY(ILAY)%NPTT
+            DO IT=1,NPTT
+              IPT  = IPT_ALL + IT
+              KK = NVSHELL + 4 + (IPT-1)*NVARS
+              DO J = 1,3
+                JJ = I + J*NEL
+                ELBUF_STR%BUFLY(ILAY)%LBUF(IR,IS,IT)%PLA(JJ) = SIGSH(KK + J,II)
               ENDDO
             ENDDO
             IPT_ALL = IPT_ALL + NPTT

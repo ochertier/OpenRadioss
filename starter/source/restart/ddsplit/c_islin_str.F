@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -40,8 +40,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
-#include      "scr17_c.inc"
-#include      "tabsiz_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -91,8 +89,8 @@ C-----------------------------------------------
             DO K=1,2
 !              NOD = IGRSLIN(ISU)%NODES(J,K)
 !              IF(NOD > 0)THEN;IGRSLIN_L(L_SLIN+1) = NODLOCAL(NOD)
-!	      ELSE;           IGRSLIN_L(L_SLIN+1) = 0
-!	      ENDIF
+!        ELSE;           IGRSLIN_L(L_SLIN+1) = 0
+!        ENDIF
               L_SLIN = L_SLIN+1
             ENDDO
 !            IGRSLIN_L(L_SLIN+1) = PROC

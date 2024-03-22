@@ -1,5 +1,5 @@
 //Copyright>    OpenRadioss
-//Copyright>    Copyright (C) 1986-2023 Altair Engineering Inc.
+//Copyright>    Copyright (C) 1986-2024 Altair Engineering Inc.
 //Copyright>
 //Copyright>    This program is free software: you can redistribute it and/or modify
 //Copyright>    it under the terms of the GNU Affero General Public License as published by
@@ -366,6 +366,7 @@ void syserr();
          com->tagelr = shmv ;
          com->tagels = shmv + shmvr_size;
 
+         bid = 0;
          writer(fidw, (void *) &bid, sizeof(int)); 
 }
 
@@ -443,6 +444,7 @@ void r2r_sem_c()
 {
 int bid;
 
+      bid = 0;
       writer(fidw, (void *) &bid,sizeof(int));    
 }
 
@@ -674,8 +676,8 @@ int *igd, *nng, *nodbuf, *itab,*addcnel,*cnel,*ixc,*ofc,*info,*typ,*cdt,*cdr,*pr
 my_real_c *x,*dx;
 {init_link_c(igd, nng, itab, nodbuf, x,addcnel,cnel,ixc,ofc,info,typ,cdt,cdr,print,rddl,nlink,dx);}
 
-void init_link_nl_c(igd, nng, itab, nodbuf, x,print,dx,ndof_nl,nb_tot_dof)
-int *igd, *nng, *nodbuf, *itab,*print,*ndof_nl,*nb_tot_dof;
+void init_link_nl_c(igd, nng, itab, nodbuf, x,print,dx,ndof_nl,nb_tot_dof,nlnk)
+int *igd, *nng, *nodbuf, *itab,*print,*ndof_nl,*nb_tot_dof,*nlnk;
 my_real_c *x,*dx;
 {
 int i,j,tt,nn,lbuf,lbuf1,init_buf[6],id;
@@ -684,6 +686,7 @@ my_real_c *crd;
 
     /************************coupling for non local dof***************************/
     /*****************************************************************************/
+    flagrot  = (int *) malloc(*nlnk*2*sizeof(int));
     lbuf = *nb_tot_dof*sizeof(my_real_c);
     crd  = (my_real_c *) malloc(3*lbuf);
     lbuf1  = *nb_tot_dof*sizeof(int);   
@@ -724,24 +727,24 @@ my_real_c *crd;
     free(bcs);                   
 }
 
-void _FCALL  INIT_LINK_NL_C (igd, nng, itab, nodbuf, x,print,dx,ndof_nl,nb_tot_dof)
-int *igd, *nng, *nodbuf, *itab,*print,*ndof_nl,*nb_tot_dof;
+void _FCALL  INIT_LINK_NL_C (igd, nng, itab, nodbuf, x,print,dx,ndof_nl,nb_tot_dof,nlnk)
+int *igd, *nng, *nodbuf, *itab,*print,*ndof_nl,*nb_tot_dof,*nlnk;
 my_real_c *x,*dx;
 {
-    init_link_nl_c(igd, nng, itab, nodbuf, x,print,dx,ndof_nl,nb_tot_dof);
+    init_link_nl_c(igd, nng, itab, nodbuf, x,print,dx,ndof_nl,nb_tot_dof,nlnk);
 }
 
-void _FCALL init_link_nl_c_(igd, nng, itab, nodbuf, x,print,dx,ndof_nl,nb_tot_dof)
-int *igd, *nng, *nodbuf, *itab,*print,*ndof_nl,*nb_tot_dof;
+void _FCALL init_link_nl_c_(igd, nng, itab, nodbuf, x,print,dx,ndof_nl,nb_tot_dof,nlnk)
+int *igd, *nng, *nodbuf, *itab,*print,*ndof_nl,*nb_tot_dof,*nlnk;
 my_real_c *x,*dx;
 {
-    init_link_nl_c(igd, nng, itab, nodbuf, x,print,dx,ndof_nl,nb_tot_dof);
+    init_link_nl_c(igd, nng, itab, nodbuf, x,print,dx,ndof_nl,nb_tot_dof,nlnk);
 }
 
-void _FCALL init_link_nl_c__(igd, nng, itab, nodbuf, x,print,dx,ndof_nl,nb_tot_dof)
-int *igd, *nng, *nodbuf, *itab,*print,*ndof_nl,*nb_tot_dof;
+void _FCALL init_link_nl_c__(igd, nng, itab, nodbuf, x,print,dx,ndof_nl,nb_tot_dof,nlnk)
+int *igd, *nng, *nodbuf, *itab,*print,*ndof_nl,*nb_tot_dof,*nlnk;
 my_real_c *x,*dx;
-{init_link_nl_c(igd, nng, itab, nodbuf, x,print,dx,ndof_nl,nb_tot_dof);}
+{init_link_nl_c(igd, nng, itab, nodbuf, x,print,dx,ndof_nl,nb_tot_dof,nlnk);}
 
 
 void init_buf_spmd_c(igd, nng, itab, nodbuf, x,addcnel,cnel,ixc,ofc,tlel,lel,lelnb,tleln,leln,nbelem,tcnel,cnelem2,wgt,tcneldb,cnelemdb,info,typ,nglob)
@@ -1616,13 +1619,17 @@ int i, j, k, nn, nm, offset;
             {
                 com->fx_buf[k+j] =  fx[nn+j];
                 com->fr_buf[k+j] =  fr[nn+j];
-                                if((*typ < 4)||(*npas == 0)) com->vx_buf[k+j] =  vx[nn+j];
-                                if((*typ == 5)&&(*kin == 1))
-                                  {dr[3*next+j] += *dt2*vr[nn+j];
-                                   com->dx_buf[2*k+j] =  dx[nn+j];
-                                   com->dx_buf[2*k+j+3] =  dr[3*next+j];}                                   
-                                else
-                                  {com->dx_buf[k+j] =  dx[nn+j];}                                  
+                if ((*typ <= 4)||(*npas == 0)) 
+                  {com->vx_buf[k+j] =  vx[nn+j];}
+                if(*typ == 5)
+                  {
+                   if (*kin == 1)
+                     {dr[3*next+j] += *dt2*vr[nn+j];
+                      com->dx_buf[2*k+j] =  dx[nn+j];
+                      com->dx_buf[2*k+j+3] =  dr[3*next+j];}                                   
+                   else
+                     {com->dx_buf[k+j] =  dx[nn+j];}
+                  }                                  
             }
             com->mass_buf[i] = ms[nm];
             if(*typ == 5) com->sx_buf[i] = stx[nm];
@@ -1631,10 +1638,10 @@ int i, j, k, nn, nm, offset;
                 if(*typ == 5) com->sr_buf[i] = str[nm];
                 com->iner_buf[i] = in[nm];
                 if (*rbylnk==1)
-                           for (j = 0; j < 9; j++) 
-                      com->iner_rby_buf[9*i+j] = rby[*nrby*tag_rby[*add_rby+next]+j+16];                
-                if((*typ < 4)||(*npas == 0)) 
-                           for (j = 0; j < 3; j++) com->vr_buf[k+j] =  vr[nn+j];
+                  for (j = 0; j < 9; j++) 
+                     com->iner_rby_buf[9*i+j] = rby[*nrby*tag_rby[*add_rby+next]+j+16];                
+                if ((*typ <= 4)||(*npas == 0)) 
+                  for (j = 0; j < 3; j++) com->vr_buf[k+j] =  vr[nn+j];
             }
             /************ change of state - activation or deactivation of SPH - coordinates are transmitted instead of forces**************/
             if (flg_sphinout == 1)
@@ -1747,8 +1754,8 @@ int buflen, lbuf, rest, next, nn, nm, i, j, k, chunk;
             {
                 com->fx_buf[k+j] =  bufr1[nn+j];
                 com->fr_buf[k+j] =  bufr2[nn+j];
-                                if((*typ < 4)||(*npas == 0)) com->vx_buf[k+j] =  bufr5[nn+j];
-                                com->dx_buf[k+j] =  bufr7[nn+j];                                  
+                if((*typ <= 4)||(*npas == 0)) com->vx_buf[k+j] =  bufr5[nn+j];
+                com->dx_buf[k+j] =  bufr7[nn+j];                                  
             }
             com->mass_buf[i] = bufr8[nm];
             if(*typ == 5) com->sx_buf[i] = bufr3[nm];
@@ -1757,10 +1764,10 @@ int buflen, lbuf, rest, next, nn, nm, i, j, k, chunk;
                 if(*typ == 5) com->sr_buf[i] = bufr4[nm];
                 com->iner_buf[i] = bufr9[nm];
                 if (*flg_rby == 1)
-                           for (j = 0; j < 9; j++) 
-                      com->iner_rby_buf[9*i+j] = buf_rby[9*next+j];                
-                if((*typ < 4)||(*npas == 0)) 
-                           for (j = 0; j < 3; j++) com->vr_buf[k+j] =  bufr6[nn+j];
+                  for (j = 0; j < 9; j++) 
+                    com->iner_rby_buf[9*i+j] = buf_rby[9*next+j];                
+                if((*typ <= 4)||(*npas == 0)) 
+                  for (j = 0; j < 3; j++) com->vr_buf[k+j] =  bufr6[nn+j];
             }
         }              
         off_link += rest;
@@ -1899,6 +1906,10 @@ int i, j, k, nn, nm, chunk;
 my_real_c df, dm, wfl,wf2l,wml,wm2l;
 
     rest = *nng;
+    wfl = 0;
+    wf2l = 0;
+    wml = 0;
+    wm2l = 0;
 
     if (*iex == 1) off_link = 0;
     
@@ -2242,7 +2253,7 @@ int *sd;
   
 #ifdef _WIN64 
 
-
+    gethostname(PUF,512);
     hp = gethostbyname(PUF);
     
     memcpy ( &(server.sin_addr.s_addr), hp->h_addr,  hp->h_length);

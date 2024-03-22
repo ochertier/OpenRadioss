@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -29,11 +29,11 @@ Chd|        ANCMSG                        source/output/message/message.F
 Chd|        C3VEOK3                       source/elements/sh3n/coque3n/c3veok3.F
 Chd|        M5IN2T                        source/initial_conditions/detonation/m5in2t.F
 Chd|        MATINI                        source/materials/mat_share/matini.F
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
 Chd|        DETONATORS_MOD                share/modules1/detonators_mod.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|====================================================================
       SUBROUTINE MULTIFLUID_INIT2T(ELBUF_STR, NEL, NSIGS, NVC, IPARG, IXTG, ALE_CONNECTIVITY,
      .     IGEO, IPART, IPARTTG, IPM, PTSH3N, NPF, ILOADP, 
@@ -85,7 +85,7 @@ C-----------------------------------------------
      .     TF(*), BUFMAT(*)
       TYPE(MULTI_FVM_STRUCT) :: MULTI_FVM
       LOGICAL :: ERROR_THROWN
-      TYPE(DETONATOR_STRUCT_) DETONATORS
+      TYPE(DETONATORS_STRUCT_) DETONATORS
       TYPE(t_ale_connectivity), INTENT(INOUT) :: ALE_CONNECTIVITY
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s

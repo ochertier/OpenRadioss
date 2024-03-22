@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -24,7 +24,7 @@ Chd|====================================================================
 Chd|  AGLO24                        source/materials/mat/mat024/aglo24.F
 Chd|-- called by -----------
 Chd|        CONC24                        source/materials/mat/mat024/conc24.F
-Chd|        M24ANIM                       source/materials/mat/mat024/m24law.F
+Chd|        M24ANIM                       source/materials/mat/mat024/m24anim.F
 Chd|-- calls ---------------
 Chd|====================================================================
       SUBROUTINE AGLO24(NEL,SIG,R11,R12,R13,

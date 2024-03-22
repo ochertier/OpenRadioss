@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -60,7 +60,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "nchar_c.inc"
-#include      "submod_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -68,17 +67,11 @@ C INPUT ARGUMENTS
       INTEGER,INTENT(IN)::TABLE_MAXID,FAIL_MAXID
       TYPE(SUBMODEL_DATA),INTENT(IN)::LSUBMODEL(*)
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,NBFAILTAB,OFFSET,ISFIRST,IS_CONVERT
+      INTEGER I,NBFAILTAB,OFFSET,ISFIRST,IS_CONVERT,CPT
       CHARACTER KEY*ncharline
 C-----------------------------------------------
-C   E x t e r n a l   F u n c t i o n s
-C-----------------------------------------------
-C=======================================================================
       IS_CONVERT = 0
       CALL HM_OPTION_COUNT('/FAIL/TAB', NBFAILTAB)
       CALL HM_OPTION_START('/FAIL/TAB')
@@ -96,16 +89,19 @@ C=======================================================================
 C--------------------------------------------------
 C DELETE /FAIL/TAB ENTITIES
 C--------------------------------------------------
+      CPT = 0
       IF (IS_CONVERT == 1) THEN
         DO I=1,NBFAILTAB
           CALL HM_OPTION_START('/FAIL/TAB')
           KEY  = '' 
           CALL HM_OPTION_READ_KEY(LSUBMODEL,
      .                          KEYWORD2    = KEY )
-          DO WHILE ((KEY == 'TAB1').OR.(KEY == 'TAB2'))
+          CPT = 1
+          DO WHILE (((KEY == 'TAB1').OR.(KEY == 'TAB2')) .AND. CPT < NBFAILTAB)
             KEY  = '' 
             CALL HM_OPTION_READ_KEY(LSUBMODEL,
      .                          KEYWORD2    = KEY )
+            CPT = CPT + 1
           ENDDO
           IF ((KEY /= 'TAB1').AND.(KEY /= 'TAB2')) CALL CPP_DELETE_ENTITY()
         ENDDO

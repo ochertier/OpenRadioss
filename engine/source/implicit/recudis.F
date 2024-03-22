@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,7 +20,6 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-C   ----  nouvelle routine---------
 Chd|====================================================================
 Chd|  RECUDIS                       source/implicit/recudis.F     
 Chd|-- called by -----------
@@ -74,7 +73,6 @@ C----No ddl actuelle -> IDDL(NUMNOD)+J(1-6)-NKC-----
 C
       RETURN
       END
-C   ----  nouvelle routine---------
 Chd|====================================================================
 Chd|  RECUKIN                       source/implicit/recudis.F     
 Chd|-- called by -----------
@@ -114,10 +112,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com08_c.inc"
-#include      "com09_c.inc"
 #include      "param_c.inc"
 #include      "remesh_c.inc"
 C-----------------------------------------------
@@ -227,7 +222,6 @@ C----No ddl actuelle -> IDDL(NUMNOD)+J(1-6)-NKC-----
 C
       RETURN
       END
-C   ----  nouvelle routine---------
 Chd|====================================================================
 Chd|  WEIGHTDDL                     source/implicit/recudis.F     
 Chd|-- called by -----------

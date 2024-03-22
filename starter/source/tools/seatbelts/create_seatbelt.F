@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -32,12 +32,13 @@ Chd|        SEATBELT_MOD                  ../common_source/modules/seatbelt_mod.
 Chd|        SENSOR_MOD                    share/modules1/sensor_mod.F   
 Chd|====================================================================
       SUBROUTINE CREATE_SEATBELT(IXR,ITAB,KNOD2EL1D,NOD2EL1D,IPM,
-     .                           X,SENSOR_TAB,BUFMAT,PM,GEO,
+     .                           X,SENSORS,BUFMAT,PM,GEO,
      .                           IDDLEVEL,KNOD2ELC,NOD2ELC,IXC,IGEO,
      .                           ISKN    )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE MY_ALLOC_MOD
       USE MESSAGE_MOD
       USE SEATBELT_MOD
       USE SENSOR_MOD
@@ -50,11 +51,8 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
 #include      "units_c.inc"
-#include      "scr03_c.inc"
-#include      "scr17_c.inc"
 #include      "com04_c.inc"
 #include      "com01_c.inc"
-#include      "my_allocate.inc"
 #include      "tabsiz_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -63,7 +61,7 @@ C-----------------------------------------------
      .        KNOD2ELC(*),NOD2ELC(*),IXC(NIXC,*)
       INTEGER, INTENT(INOUT) :: IGEO(NPROPGI,NUMGEO),ISKN(SISKWN)
       my_real X(3,*),BUFMAT(*),PM(NPROPM,*),GEO(NPROPG,*)
-      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE (SENSORS_) ,INTENT(IN) :: SENSORS
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -71,13 +69,15 @@ C-----------------------------------------------
      .        FLAG,NNOD,MTYP,MID,NDIR,
      .        I1,I2,IADBUF,TAG_PRINT,ISENS_LOC(2),IPID,OFFC,OFFR,NB_ELEM,NODE,
      .        NB_2D_SEATBELT,COMPT_BELT_END,COMPT_FRAM,NEXT_NODE,NODE_CUR,COMPT_2D,MID_2D,NODE_LONGI,
-     .        IADBUF_2D,FUNC1,FUNC2,ISK,N1,N2,SEATBELT_ELEM_FOUND,IMOV,IECROU
+     .        IADBUF_2D,FUNC1,FUNC2,ISK,N1,N2,SEATBELT_ELEM_FOUND,IMOV,IECROU,NB_ELEM_1D,NB_BRANCH,
+     .        BRANCH_CPT
       my_real DIST2,LMIN,RHO,XK,XC,AREA,LONGI_DIRECTION(3),EDGE_DIRECTION(3),SCAL,E11,E22,G12,DET,
      .        N12,N21,NU,FSCALE1,FSCALE2,A11,A22,A12,C1,SSP,RHO0,YOUNG,FSCALET,KMAX,A1C,A2C
 C
       INTEGER , DIMENSION(:), ALLOCATABLE:: TAG_RES,TAG_SHELL,TAG_NOD,CC_ELEM,CPT_MAT,TAG_MAT_2D,
      .                                      TAG_NOD_SHELL,TAG_NOD_SPRING,FRAM_TAB,TAG_FRAM_SEATBELT,
-     .                                      NNOD_FRAM_SEATBELT,BELT_END_NFRAM,BELT_END_ADDR,TAG_PROP_2D
+     .                                      NNOD_FRAM_SEATBELT,BELT_END_NFRAM,BELT_END_ADDR,TAG_PROP_2D,
+     .                                      BRANCH_TAB
       my_real , DIMENSION(:), ALLOCATABLE:: AV_LEN_MAT,AV_AREA_MAT,ELEMSIZE_MAT,BELT_END_SECTION,
      .                                      SECTION_MAT
 C-----------------------------------------------
@@ -92,8 +92,8 @@ C
         DO I=1,NSLIPRING
           ISENS_LOC(1) = 0
           IF(SLIPRING(I)%SENSID > 0)THEN
-            DO K=1,NSENSOR
-              IF(SLIPRING(I)%SENSID == SENSOR_TAB(K)%SENS_ID) ISENS_LOC(1) = K
+            DO K=1,SENSORS%NSENSOR
+              IF(SLIPRING(I)%SENSID == SENSORS%SENSOR_TAB(K)%SENS_ID) ISENS_LOC(1) = K
             ENDDO
             IF(ISENS_LOC(1) == 0) THEN
               CALL ANCMSG(MSGID=2002,
@@ -111,8 +111,8 @@ C
           ISENS_LOC(1:2) = 0
           DO J=1,2
             IF(RETRACTOR(I)%ISENS(J) > 0)THEN
-              DO K=1,NSENSOR
-                IF(RETRACTOR(I)%ISENS(J) == SENSOR_TAB(K)%SENS_ID) ISENS_LOC(J) = K
+              DO K=1,SENSORS%NSENSOR
+                IF(RETRACTOR(I)%ISENS(J) == SENSORS%SENSOR_TAB(K)%SENS_ID) ISENS_LOC(J) = K
               ENDDO
               IF(ISENS_LOC(J) == 0) THEN
                 CALL ANCMSG(MSGID=2028,
@@ -136,8 +136,8 @@ C--   Need to check bifurcation in seatbelt and to tag elements on same cpu for 
 C
 C-----------------------------------------------
 C
-      MY_ALLOCATE(TAG_NOD_SHELL,NUMNOD)
-      MY_ALLOCATE(TAG_PROP_2D,NUMGEO)
+      CALL MY_ALLOC(TAG_NOD_SHELL,NUMNOD)
+      CALL MY_ALLOC(TAG_PROP_2D,NUMGEO)
       TAG_NOD_SHELL(1:NUMNOD) = 0
       TAG_PROP_2D(1:NUMGEO) = 0
       DO I=1,NUMELC
@@ -158,13 +158,15 @@ C-        tag of prop type 9 to -2 for error message if conflict with non seatbe
         ENDIF
       ENDDO
 C
-      MY_ALLOCATE(TAG_NOD_SPRING,NUMNOD)
+      NB_ELEM_1D = 0
+      CALL MY_ALLOC(TAG_NOD_SPRING,NUMNOD)
       TAG_NOD_SPRING(1:NUMNOD) = 0
       DO I=1,NUMELR
         MID = IXR(5,I)
         IF (MID > 0) THEN
           MTYP = IPM(2,MID)
           IF (MTYP == 114) THEN
+            NB_ELEM_1D = NB_ELEM_1D + 1
             DO J=2,3
               TAG_NOD_SPRING(IXR(J,I)) = TAG_NOD_SPRING(IXR(J,I)) + 1
             ENDDO
@@ -243,7 +245,7 @@ C--   if nshell = 1 and nspring = 1 -> node in corner of 2D belt
 C--   if nshell = 2 and nspring = 1 -> node on edge of 2D belt
 C--   if nshell = 0 and nspring = 1 -> node at end of 1D belt
 C
-      MY_ALLOCATE(TAG_NOD,NUMNOD)
+      CALL MY_ALLOC(TAG_NOD,NUMNOD)
       TAG_NOD(1:NUMNOD) = 0
       COMPT_BELT_END = 0
       COMPT_FRAM = 0
@@ -278,10 +280,10 @@ C--                   next node on transverse edge of seatbelt
       ENDDO
 C
       TAG_NOD(1:NUMNOD) = 0
-      MY_ALLOCATE(BELT_END_NFRAM,COMPT_BELT_END)
-      MY_ALLOCATE(BELT_END_ADDR,COMPT_BELT_END)
-      MY_ALLOCATE(FRAM_TAB,COMPT_FRAM)
-      MY_ALLOCATE(BELT_END_SECTION,COMPT_BELT_END)
+      CALL MY_ALLOC(BELT_END_NFRAM,COMPT_BELT_END)
+      CALL MY_ALLOC(BELT_END_ADDR,COMPT_BELT_END)
+      CALL MY_ALLOC(FRAM_TAB,COMPT_FRAM)
+      CALL MY_ALLOC(BELT_END_SECTION,COMPT_BELT_END)
       BELT_END_NFRAM(1:COMPT_BELT_END) = 0
       BELT_END_ADDR(1:COMPT_BELT_END) = 0
       BELT_END_SECTION(1:COMPT_BELT_END) = ZERO
@@ -366,9 +368,9 @@ C      ENDDO
 C
       DEALLOCATE(TAG_NOD_SPRING,TAG_NOD_SHELL)
 C
-      MY_ALLOCATE(TAG_RES,NUMELR)
-      MY_ALLOCATE(TAG_FRAM_SEATBELT,COMPT_BELT_END)
-      MY_ALLOCATE(NNOD_FRAM_SEATBELT,COMPT_BELT_END)
+      CALL MY_ALLOC(TAG_RES,NUMELR)
+      CALL MY_ALLOC(TAG_FRAM_SEATBELT,COMPT_BELT_END)
+      CALL MY_ALLOC(NNOD_FRAM_SEATBELT,COMPT_BELT_END)
       TAG_NOD(1:NUMNOD) = 0
       TAG_RES(1:NUMELR) = 0
       SEATBELT_ID = 0
@@ -380,6 +382,14 @@ C
 C----------------------------------------------------------------------------
 C---  Loop on seatblet elements in longitudinal direction
 C----------------------------------------------------------------------------
+C
+      IF (COMPT_BELT_END == 0) THEN
+        CALL ANCMSG(MSGID=2099,
+     .                  MSGTYPE=MSGERROR,
+     .                  ANMODE=ANINFO_BLIND_1)
+      ENDIF
+C
+      CALL MY_ALLOC(BRANCH_TAB,2*NB_ELEM_1D)
 C
       DO I=1,COMPT_BELT_END
 C
@@ -405,15 +415,24 @@ C
                   MTYP = IPM(2,MID)
                   IF (MTYP == 114) THEN
 C--                 Loop on belt elements
+                    NB_BRANCH = 0
+                    BRANCH_CPT = 0
                     CALL NEW_SEATBELT(IXR,ITAB,KNOD2EL1D,NOD2EL1D,NOD_START,
-     .                                ELEM_CUR,TAG_RES,TAG_NOD,SEATBELT_ID,FLAG,
-     .                                NNOD,IPM)
-C 
-                    NDIR = NDIR + 1
-                    IF(NDIR > 2) CALL ANCMSG(MSGID=2005,
-     .                                       MSGTYPE=MSGERROR,
-     .                                       ANMODE=ANINFO,
-     .                                       I1=ITAB(NOD_START))
+     .                                  ELEM_CUR,TAG_RES,TAG_NOD,SEATBELT_ID,FLAG,
+     .                                  NNOD,IPM,NB_ELEM_1D,NB_BRANCH,BRANCH_TAB,
+     .                                  BRANCH_CPT)
+
+C--                 Loop on subranch (only if no sliprings and no retractors)
+                    DO WHILE(NB_BRANCH > 0)
+                      NOD_START = BRANCH_TAB(2*(BRANCH_CPT-NB_BRANCH)+1) 
+                      ELEM_CUR = BRANCH_TAB(2*(BRANCH_CPT-NB_BRANCH)+2) 
+                      NB_BRANCH = NB_BRANCH -1
+                      CALL NEW_SEATBELT(IXR,ITAB,KNOD2EL1D,NOD2EL1D,NOD_START,
+     .                                  ELEM_CUR,TAG_RES,TAG_NOD,SEATBELT_ID,FLAG,
+     .                                  NNOD,IPM,NB_ELEM_1D,NB_BRANCH,BRANCH_TAB,
+     .                                  BRANCH_CPT)
+                    ENDDO
+C
                   ENDIF
                 ENDIF
               ENDIF
@@ -441,17 +460,19 @@ C
 C
       ENDDO
 C
+      DEALLOCATE(BRANCH_TAB)
+C
 C----------------------------------------------------------------------------
 C---  Filling of seatbelt structure
 C----------------------------------------------------------------------------
 C
       N_SEATBELT = SEATBELT_ID
-      IF (IDDLEVEL == 0) MY_ALLOCATE(SEATBELT_TAB,N_SEATBELT)
-      MY_ALLOCATE(TAG_MAT_2D,NUMMAT)
+      IF (IDDLEVEL == 0) ALLOCATE(SEATBELT_TAB(N_SEATBELT))
+      CALL MY_ALLOC(TAG_MAT_2D,NUMMAT)
       TAG_MAT_2D(1:NUMMAT) = 0
       IF (NB_2D_SEATBELT > 0) THEN
-        MY_ALLOCATE(TAG_SHELL,NUMELC)
-        MY_ALLOCATE(SECTION_MAT,NUMMAT)
+        CALL MY_ALLOC(TAG_SHELL,NUMELC)
+        CALL MY_ALLOC(SECTION_MAT,NUMMAT)
         TAG_SHELL(1:NUMELC) = 0
         SECTION_MAT(1:NUMMAT) = ZERO
       ENDIF
@@ -503,7 +524,7 @@ C--         count and tag of 2d elements of the seatbelt
         ENDDO 
         SEATBELT_TAB(I)%NSPRING = COMPT
         SEATBELT_TAB(I)%NSHELL = COMPT_2D
-        IF (IDDLEVEL == 0) MY_ALLOCATE(SEATBELT_TAB(I)%SPRING,COMPT)
+        IF (IDDLEVEL == 0) CALL MY_ALLOC(SEATBELT_TAB(I)%SPRING,COMPT)
         COMPT = 0
         DO J=1,NUMELR
           IF (TAG_RES(J) == I) THEN
@@ -522,7 +543,7 @@ C
       DO I=1,NRETRACTOR
         SEATBELT_ID = TAG_NOD(RETRACTOR(I)%NODE(1))
         RETRACTOR(I)%INACTI_NNOD_MAX = SEATBELT_TAB(SEATBELT_ID)%NNOD
-        IF (IDDLEVEL == 0) MY_ALLOCATE(RETRACTOR(I)%INACTI_NODE,SEATBELT_TAB(SEATBELT_ID)%NNOD)
+        IF (IDDLEVEL == 0) CALL MY_ALLOC(RETRACTOR(I)%INACTI_NODE,SEATBELT_TAB(SEATBELT_ID)%NNOD)
         SEATBELT_TAB(SEATBELT_ID)%ELEM_SIZE =  MAX(SEATBELT_TAB(SEATBELT_ID)%ELEM_SIZE,RETRACTOR(I)%ELEMENT_SIZE)        
       ENDDO
 C
@@ -530,10 +551,10 @@ C----------------------------------------------------------------------------
 C---  Computation of default lmin and default critical damping
 C----------------------------------------------------------------------------
 C
-      MY_ALLOCATE(CPT_MAT,NUMMAT)
-      MY_ALLOCATE(AV_LEN_MAT,NUMMAT)
-      MY_ALLOCATE(AV_AREA_MAT,NUMMAT)
-      MY_ALLOCATE(ELEMSIZE_MAT,NUMMAT)
+      CALL MY_ALLOC(CPT_MAT,NUMMAT)
+      CALL MY_ALLOC(AV_LEN_MAT,NUMMAT)
+      CALL MY_ALLOC(AV_AREA_MAT,NUMMAT)
+      CALL MY_ALLOC(ELEMSIZE_MAT,NUMMAT)
       COMPT = 0
       CPT_MAT(1:NUMMAT) = 0
       AV_LEN_MAT(1:NUMMAT) = ZERO
@@ -713,7 +734,7 @@ C
 C
           IF (SEATBELT_TAB(I)%NFRAM == 1) THEN
 C--         1D SEATBELT
-            MY_ALLOCATE(CC_ELEM,SEATBELT_TAB(I)%NSPRING)
+            CALL MY_ALLOC(CC_ELEM,SEATBELT_TAB(I)%NSPRING)
             CC_ELEM(1:SEATBELT_TAB(I)%NSPRING) = 0
             COMPT = 0
             DO J=1,SEATBELT_TAB(I)%NSPRING
@@ -725,7 +746,7 @@ C
           ELSEIF (SEATBELT_TAB(I)%NFRAM > 1) THEN
 C--         2D SEATBELT
             NB_ELEM = SEATBELT_TAB(I)%NSPRING + SEATBELT_TAB(I)%NSHELL
-            MY_ALLOCATE(CC_ELEM,NB_ELEM)
+            CALL MY_ALLOC(CC_ELEM,NB_ELEM)
             CC_ELEM(1:NB_ELEM) = 0
             COMPT = 0
             DO J=1,SEATBELT_TAB(I)%NSPRING

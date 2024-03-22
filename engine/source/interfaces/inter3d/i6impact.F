@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,11 +26,13 @@ Chd|-- called by -----------
 Chd|        I6MAIN                        source/interfaces/inter3d/i6main.F
 Chd|-- calls ---------------
 Chd|====================================================================
-      SUBROUTINE I6IPMACT(LOLD   ,IRTL   ,IRTLO   ,CST   ,
-     1                    IRECT  ,MSR    ,NSV     ,V     ,
-     2                    VNI    ,VNT    ,N1      ,N2    ,
-     3                    N3     ,SSC    ,TTC     ,H1    ,
-     4                    H2     ,H3     ,H4      ,XFACE)
+      SUBROUTINE I6IPMACT(
+     1   LOLD,    IRTL,    IRTLO,   CST,
+     2   IRECT,   MSR,     NSV,     V,
+     3   VNI,     VNT,     N1,      N2,
+     4   N3,      SSC,     TTC,     H1,
+     5   H2,      H3,      H4,      XFACE,
+     6   LFT,     LLT,     NFT)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -42,6 +44,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(INOUT) :: LFT
+      INTEGER, INTENT(INOUT) :: LLT
+      INTEGER, INTENT(INOUT) :: NFT
       INTEGER IRECT(4,*),MSR(*),NSV(*), IRTL(*), IRTLO(*), LOLD(*)
 C     REAL
       my_real
@@ -51,8 +56,6 @@ C     REAL
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com08_c.inc"
-#include      "vect07_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -65,11 +68,6 @@ C     REAL
       my_real
      .   DVX,DVY,DVZ,VTX,VTY,VTZ
 C-----------------------------------------------
-!      EQUIVALENCE (SSC,BV(1,23)),(TTC,BV(1,24)),(XFACE,BV(1,29))
-!      EQUIVALENCE (N1,BV(1,19)) ,(N2,BV(1,20)) ,(N3,BV(1,21))
-!      EQUIVALENCE (H1,BV(1,25)) ,(H2,BV(1,26)) ,(H3,BV(1,27))
-!      EQUIVALENCE (H4,BV(1,28)) 
-C=======================================================================
       DO I=LFT,LLT
         IL = I+NFT
 c

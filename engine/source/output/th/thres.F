@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,7 +25,7 @@ Chd|  THRES                         source/output/th/thres.F
 Chd|-- called by -----------
 Chd|        HIST2                         source/output/th/hist2.F      
 Chd|-- calls ---------------
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE THRES(IPARG,ITHBUF,ELBUF_TAB,WA,IGEO,
      .                      IXR,NTHGRP2,ITHGRP,X)
@@ -43,7 +43,6 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "scr05_c.inc"
-#include      "scr03_c.inc"
 #include      "task_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
@@ -97,7 +96,7 @@ C-----------------------------------------------
         
           IF(ITYP==6) THEN
             IH=IAD
-Cel specifique spmd
+C   specifique spmd
             IF (IMACH == 3) THEN
 C decalage IH
                 DO WHILE (ITHBUF(IH+NN) /= ISPMD .AND. IH < IAD+NN)
@@ -131,7 +130,7 @@ C
 C
                             IF (K == N) THEN
                                 IH=IH+1
-Cel traitement specifique spmd
+C   traitement specifique spmd
                                 IF (IMACH == 3) THEN
 C recherche du ii correct
                                     II = ((IH-1) - IAD)*NVAR
@@ -217,6 +216,12 @@ C
                                 WWA(65)= SQRT((X(1,NODE2)-X(1,NODE1))**2 +
      .                                        (X(2,NODE2)-X(2,NODE1))**2 + 
      .                                        (X(3,NODE2)-X(3,NODE1))**2)   
+                                ! Failure criterion
+                                IF (GBUF%G_RUPTCRIT > 0) THEN 
+                                  WWA(66) = GBUF%RUPTCRIT(I)
+                                ELSE
+                                  WWA(66) = ZERO
+                                ENDIF
                                 DO L=IADV,IADV+NVAR-1
                                     K=ITHBUF(L)
                                     IJK=IJK+1
@@ -269,6 +274,12 @@ C
                                 WWA(65)= SQRT((X(1,NODE2)-X(1,NODE1))**2 +
      .                                        (X(2,NODE2)-X(2,NODE1))**2 + 
      .                                        (X(3,NODE2)-X(3,NODE1))**2)   
+                                ! Failure criterion
+                                IF (GBUF%G_RUPTCRIT > 0) THEN 
+                                  WWA(66) = GBUF%RUPTCRIT(I)
+                                ELSE
+                                  WWA(66) = ZERO
+                                ENDIF
                                 DO L=IADV,IADV+NVAR-1
                                     K=ITHBUF(L)
                                     IJK=IJK+1
@@ -344,7 +355,7 @@ C
 C
                             IF (K == N) THEN
                                 IH=IH+1
-Cel traitement specifique spmd
+C   traitement specifique spmd
                                 IF (IMACH == 3) THEN
 C recherche du ii correct
                                     II = ((IH-1) - IAD)*NVAR
@@ -377,7 +388,13 @@ C
                                 ! Absolute spring length
                                 WWA(65)= SQRT((X(1,NODE2)-X(1,NODE1))**2 +
      .                                        (X(2,NODE2)-X(2,NODE1))**2 + 
-     .                                        (X(3,NODE2)-X(3,NODE1))**2)   
+     .                                        (X(3,NODE2)-X(3,NODE1))**2)  
+                                ! Failure criterion
+                                IF (GBUF%G_RUPTCRIT > 0) THEN 
+                                  WWA(66) = GBUF%RUPTCRIT(I)
+                                ELSE
+                                  WWA(66) = ZERO
+                                ENDIF
                                 DO L=IADV,IADV+NVAR-1
                                     K=ITHBUF(L)
                                     IJK=IJK+1
@@ -399,7 +416,7 @@ C
 C
                                     IF (K == N) THEN
                                         IH=IH+1
-Cel traitement specifique spmd
+C   traitement specifique spmd
                                         IF (IMACH == 3) THEN
 C recherche du ii correct
                                             II = ((IH-1) - IAD)*NVAR
@@ -531,7 +548,7 @@ c
 C
                                     IF (K == N) THEN
                                         IH=IH+1
-Cel traitement specifique spmd
+C   traitement specifique spmd
                                         IF (IMACH == 3) THEN
 C recherche du ii correct
                                             II = ((IH-1) - IAD)*NVAR
@@ -584,7 +601,7 @@ C
 C
                                     IF (K == N) THEN
                                         IH=IH+1
-Cel traitement specifique spmd
+C   traitement specifique spmd
                                         IF (IMACH == 3) THEN
 C recherche du ii correct
                                             II = ((IH-1) - IAD)*NVAR

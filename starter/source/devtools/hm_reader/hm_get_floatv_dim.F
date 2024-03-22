@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -69,7 +69,10 @@ Chd|        HM_READ_MAT117                source/materials/mat/mat117/hm_read_ma
 Chd|        HM_READ_MAT11_K_EPS           source/materials/mat/mat011/hm_read_mat11_k_eps.F
 Chd|        HM_READ_MAT120                source/materials/mat/mat120/hm_read_mat120.F
 Chd|        HM_READ_MAT121                source/materials/mat/mat121/hm_read_mat121.F
+Chd|        HM_READ_MAT122                source/materials/mat/mat122/hm_read_mat122.F
+Chd|        HM_READ_MAT158                source/materials/mat/mat158/hm_read_mat158.F
 Chd|        HM_READ_MAT16                 source/materials/mat/mat016/hm_read_mat16.F
+Chd|        HM_READ_MAT190                source/materials/mat/mat190/hm_read_mat190.F
 Chd|        HM_READ_MAT21                 source/materials/mat/mat021/hm_read_mat21.F
 Chd|        HM_READ_MAT25                 source/materials/mat/mat025/hm_read_mat25.F
 Chd|        HM_READ_MAT26                 source/materials/mat/mat026/hm_read_mat26.F
@@ -99,7 +102,7 @@ Chd|        HM_READ_MAT76                 source/materials/mat/mat076/hm_read_ma
 Chd|        HM_READ_MAT77                 source/materials/mat/mat077/hm_read_mat77.F
 Chd|        HM_READ_MAT80                 source/materials/mat/mat080/hm_read_mat80.F
 Chd|        HM_READ_MAT81                 source/materials/mat/mat081/hm_read_mat81.F
-Chd|        HM_READ_MAT83                 source/materials/mat/mat083/hm_read_law83.F
+Chd|        HM_READ_MAT83                 source/materials/mat/mat083/hm_read_mat83.F
 Chd|        HM_READ_MAT88                 source/materials/mat/mat088/hm_read_mat88.F
 Chd|        HM_READ_MAT92                 source/materials/mat/mat092/hm_read_mat92.F
 Chd|        HM_READ_MAT93                 source/materials/mat/mat093/hm_read_mat93.F
@@ -113,6 +116,7 @@ Chd|        HM_READ_MONVOL_TYPE6          source/airbag/hm_read_monvol_type6.F
 Chd|        HM_READ_MONVOL_TYPE7          source/airbag/hm_read_monvol_type7.F
 Chd|        HM_READ_MONVOL_TYPE8          source/airbag/hm_read_monvol_type8.F
 Chd|        HM_READ_MONVOL_TYPE9          source/airbag/hm_read_monvol_type9.F
+Chd|        HM_READ_PCYL                  source/loads/general/load_pcyl/hm_read_pcyl.F
 Chd|        HM_READ_PFLUID                source/loads/general/pfluid/hm_read_pfluid.F
 Chd|        HM_READ_PLOAD                 source/loads/general/pload/hm_read_pload.F
 Chd|        HM_READ_PROP04                source/properties/spring/hm_read_prop04.F
@@ -133,9 +137,6 @@ Chd|        HM_READ_RWALL_THERM           source/constraints/general/rwall/hm_re
 Chd|        HM_READ_SLIPRING              source/tools/seatbelts/hm_read_slipring.F
 Chd|        HM_READ_SPHIO                 source/loads/sph/hm_read_sphio.F
 Chd|        HM_READ_VISC_PRONY            source/materials/visc/hm_read_visc_prony.F
-Chd|        READ_BOX_CYL                  source/model/box/read_box_cyl.F
-Chd|        READ_BOX_RECT                 source/model/box/read_box_rect.F
-Chd|        READ_BOX_SPHER                source/model/box/read_box_spher.F
 Chd|        READ_IMPDISP                  source/constraints/general/impvel/read_impdisp.F
 Chd|        READ_IMPDISP_FGEO             source/constraints/general/impvel/read_impdisp_fgeo.F
 Chd|        READ_IMPVEL                   source/constraints/general/impvel/read_impvel.F
@@ -179,9 +180,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "nchar_c.inc"
-#include      "submod_c.inc"
-#include      "sysunit.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C----------------------------------------------- 
@@ -194,9 +192,6 @@ C OUTPUT ARGUMENTS
      .  INTENT(OUT)::DIM_FAC
       LOGICAL,INTENT(OUT)::IS_AVAILABLE
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,J,VALUE_TYPE,SUB_ID,IFLAGUNIT,UID
@@ -206,10 +201,6 @@ C-----------------------------------------------
       LOGICAL(KIND=C_BOOL) :: C_IS_AVAILABLE
 
 C-----------------------------------------------
-C   E x t e r n a l   F u n c t i o n s
-C-----------------------------------------------
-C=======================================================================
-C--------------------------------------------------
         C_IS_AVAILABLE = .FALSE.
         LENGTH_DIM = ZERO
         MASS_DIM = ZERO
@@ -234,7 +225,7 @@ C--------------------------------------------------
         FAC_M = ZERO        
         FAC_L = ZERO        
         FAC_T = ZERO                                        
-        DO J=1,NUNITS                         
+        DO J=1,UNITAB%NUNITS                         
           IF (UNITAB%UNIT_ID(J) == UID) THEN    
             FAC_M = UNITAB%FAC_M(J)
             FAC_L = UNITAB%FAC_L(J)

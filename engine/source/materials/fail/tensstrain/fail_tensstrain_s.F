@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -33,12 +33,12 @@ Chd|====================================================================
       SUBROUTINE FAIL_TENSSTRAIN_S(
      1           NEL    ,NUPARAM,NUVAR  ,NFUNC   ,IFUNC   , 
      2           NPF    ,TF     ,TIME   ,TIMESTEP,UPARAM  ,
-     3           NGL    ,IPM    ,MAT    ,ALDT    ,TSTAR  ,ISMSTR ,
+     3           NGL    ,ALDT   ,TSTAR  ,ISMSTR ,
      4           EPSXX  ,EPSYY  ,EPSZZ  ,EPSXY   ,EPSYZ  ,EPSZX  ,
      5           SIGNXX ,SIGNYY ,SIGNZZ ,SIGNXY  ,SIGNYZ ,SIGNZX ,
-     6           EPSP   ,UVAR   ,OFF    ,IP      ,DFMAX  ,TDELE  ,
+     6           EPSP   ,UVAR   ,OFF    ,DFMAX  ,TDELE  ,
      7           MFXX   ,MFXY   ,MFXZ   ,MFYX    ,MFYY   ,MFYZ   ,                 
-     8           MFZX   ,MFZY   ,MFZZ   )
+     8           MFZX   ,MFZY   ,MFZZ   ,DMG_SCALE)
 C-----------------------------------------------
 C   Tensile Strain failure criterion
 C-----------------------------------------------
@@ -77,14 +77,14 @@ C---------+---------+---+---+--------------------------------------------
 C-----------------------------------------------
 C   I N P U T   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER :: NEL,NUPARAM,NUVAR,ISMSTR,IP
-      INTEGER ,DIMENSION(NEL)       :: NGL,MAT
-      INTEGER ,DIMENSION(NPROPMI,*) :: IPM
+      INTEGER :: NEL,NUPARAM,NUVAR,ISMSTR
+      INTEGER ,DIMENSION(NEL)       :: NGL
       my_real  :: TIME,TIMESTEP
       my_real ,DIMENSION(NUPARAM)  :: UPARAM
       my_real ,DIMENSION(NEL) :: SIGNXX,SIGNYY,SIGNZZ,SIGNXY,SIGNYZ,SIGNZX,
      .   EPSXX,EPSYY,EPSZZ,EPSXY,EPSYZ,EPSZX,EPSP,ALDT,TSTAR,
      .   MFXX,MFXY,MFXZ,MFYX,MFYY,MFYZ,MFZX,MFZY,MFZZ
+      my_real, DIMENSION(NEL), INTENT(INOUT) :: DMG_SCALE
 C-----------------------------------------------
 C   I N P U T   O U T P U T   A r g u m e n t s 
 C-----------------------------------------------
@@ -133,9 +133,8 @@ c
 C-----------------------------------------------
 c     Initialization
 C-----------------------------------------------
-      IF (TIME == ZERO) THEN
+      IF (UVAR(1,1) == ZERO) THEN 
         DO I=1,NEL
-
           SELECT CASE (S_FLAG)
             CASE (1)  ! default - old formulation
               UVAR(I,1) = EPSP1
@@ -155,13 +154,13 @@ C-----------------------------------------------
               ELSE
                 UVAR(I,1) = ONE
               ENDIF              
-          END SELECT          
+          END SELECT
         ENDDO
       ENDIF
 c-----------------------------------------------
       DO I=1,NEL
         IF (OFF(I) < EM01) OFF(I)=ZERO
-        IF (OFF(I) < ONE)   OFF(I)=OFF(I)*FOUR_OVER_5
+        IF (OFF(I) < ONE)  OFF(I)=OFF(I)*FOUR_OVER_5
       END DO
 c----------------------------------------------
 c     Max strain transformation following input definition
@@ -663,13 +662,8 @@ C ---
       DO I=1,NEL
         R1 = EPSF1
         R2 = EPSF2
-        IF (R1 < R2) THEN         
-          SIGNXX(I) = (ONE - DAMAGE(I))*SIGNXX(I)
-          SIGNYY(I) = (ONE - DAMAGE(I))*SIGNYY(I)
-          SIGNZZ(I) = (ONE - DAMAGE(I))*SIGNZZ(I)
-          SIGNXY(I) = (ONE - DAMAGE(I))*SIGNXY(I)
-          SIGNYZ(I) = (ONE - DAMAGE(I))*SIGNYZ(I)
-          SIGNZX(I) = (ONE - DAMAGE(I))*SIGNZX(I)
+        IF (R1 < R2) THEN    
+          DMG_SCALE(I) = ONE - DAMAGE(I)
         END IF
         DFMAX(I) = MAX(DFMAX(I),DAMAGE(I))  ! Maximum Damage storing for output : 0 < DFMAX < 1
        ENDDO            

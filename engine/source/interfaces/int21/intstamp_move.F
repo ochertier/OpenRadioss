@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -40,23 +40,10 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "com06_c.inc"
 #include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "parit_c.inc"
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
-#include      "scr07_c.inc"
-#include      "scr11_c.inc"
-#include      "sms_c.inc"
 #include      "task_c.inc"
 #include      "intstamp_c.inc"
 C-----------------------------------------------
@@ -121,8 +108,8 @@ C---------------------
              FVY=VIS*(INTSTAMP(NN)%VR(2)-INTSTAMP(INTDAMP)%VR(2))
              FVZ=VIS*(INTSTAMP(NN)%VR(3)-INTSTAMP(INTDAMP)%VR(3))
              DW=-TWO*( FVX*(VR(1,MSR)-VR(1,MSRR))
-     .     	       +FVY*(VR(2,MSR)-VR(2,MSRR))
-     .     	       +FVZ*(VR(3,MSR)-VR(3,MSRR)))
+     .              +FVY*(VR(2,MSR)-VR(2,MSRR))
+     .              +FVZ*(VR(3,MSR)-VR(3,MSRR)))
            END IF
            INTSTAMP(NN)%DW = INTSTAMP(NN)%DW + HALF * DT2 * DW
          END IF

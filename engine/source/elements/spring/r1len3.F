@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,10 +26,12 @@ Chd|-- called by -----------
 Chd|        RFORC3                        source/elements/spring/rforc3.F
 Chd|-- calls ---------------
 Chd|====================================================================
-      SUBROUTINE R1LEN3(JFT    ,JLT  ,OFF  ,DT2T ,NELTST ,
-     2                  ITYPTST,STI  ,MS   ,MSRT ,DMELRT ,
-     3                  G_DT   ,DTEL ,NGL  ,XK   ,XM     ,
-     4                  XC     ,AK   ,NC1  ,NC2  )
+      SUBROUTINE R1LEN3(
+     1   JFT,     JLT,     OFF,     DT2T,
+     2   NELTST,  ITYPTST, STI,     MS,
+     3   MSRT,    DMELRT,  G_DT,    DTEL,
+     4   NGL,     XK,      XM,      XC,
+     5   AK,      NC1,     NC2,     JSMS)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -43,18 +45,16 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com08_c.inc"
-#include      "couple_c.inc"
 #include      "scr02_c.inc"
 #include      "scr07_c.inc"
 #include      "scr17_c.inc"
 #include      "scr18_c.inc"
 #include      "sms_c.inc"
 #include      "units_c.inc"
-#include      "vect01_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: JSMS
       INTEGER NGL(*),NC1(*),NC2(*)
       my_real,INTENT(INOUT) :: DTEL(JFT:JLT)
       INTEGER,INTENT(IN)    :: G_DT

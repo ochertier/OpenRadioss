@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -55,10 +55,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com06_c.inc"
-#include      "com08_c.inc"
 #include      "param_c.inc"
 #include      "scr02_c.inc"
 #include      "scr06_c.inc"
@@ -115,7 +113,7 @@ C-----------------------------------------------
          GAMA1(I)= OFF(I)*( ONE- PX1V-PY1V)
          GAMA3(I)= OFF(I)*( ONE+ PX1V+PY1V)
          GAMA2(I)= OFF(I)*(-ONE- PX2V-PY2V)
-         GAMA4(I)= OFF(I)*(-ONE+ PX2V+PY2V)	 
+         GAMA4(I)= OFF(I)*(-ONE+ PX2V+PY2V)   
        ENDDO
       ELSE
        DO I=JFT,JLT
@@ -176,7 +174,7 @@ C-----------------------------------
        H2(I)=ZERO     
  360  CONTINUE
 C-----------------------------------
-C     RIGIDITE-DT
+C     STIFFNESS - DT
 C-----------------------------------
       DO I=JFT,JLT
          SCALE(I)= ZERO
@@ -235,7 +233,7 @@ C
        ENDIF
       ENDIF
 C-----------------------------------
-C     FORCES ANTISABLIER DE MEMBRANE
+C     ANTI-HOURGLASS MEMBRANE FORCES
 C-----------------------------------
       IF(ISMSTR==3.OR.IHBE<1)THEN
        DO 400 I=JFT,JLT
@@ -287,7 +285,7 @@ C-----------------------------------
      .       + VY3(I)*H23(I) + VY4(I)*H24(I) 
       ENDDO
 C----------------------------------------------------------------
-C     FORCES ANTISABLIER DE FLEXION W OU PARABOLOIDE HYPERBOLIQUE
+C     HYPERBOLIC SHAPE ANTI-HOURGLASS BENDING FORCES
 C----------------------------------------------------------------
       IF(ISMSTR==3.OR.IHBE<1)THEN
        DO 600 I=JFT,JLT
@@ -317,7 +315,7 @@ C
  760   CONTINUE
       ENDIF
 C------------------------------------------------------
-C     FORCES ANTISABLIER DE FLEXION  V OU DENTS DE SCIE
+C     V-SHAPE ANTI-HOURGLASS BENDING FORCES
 C------------------------------------------------------
        DO 780 I=JFT,JLT
        HG1(I)=+VZ1(I)+VZ2(I)-VZ3(I)-VZ4(I)
@@ -373,12 +371,9 @@ C
         EHOUR = EHOUR + EHOURT
 #include "atomend.inc"
 C
-      IF((ANIM_E(25)==1).OR.(ANIM_CE(25)==1).OR.
-     &                 (OUTP_CS(25)==1))THEN
-        DO I=JFT,JLT
-          EANI(NFT+NUMELS+I) = EANI(NFT+NUMELS+I)+EHOU(I)
-        ENDDO
-      ENDIF
+      DO I=JFT,JLT
+        EANI(NFT+NUMELS+I) = EANI(NFT+NUMELS+I)+EHOU(I)
+      ENDDO
 C
       RETURN
       END

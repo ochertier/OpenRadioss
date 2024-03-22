@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -23,7 +23,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       module QA_OUT_MOD
 
 !#if CPP_mach == CPP_p4win64 
-!      use IFPORT
+!      USE IFPORT
 !#endif
 
       integer doqa, lunitqa, qaid, next_index
@@ -86,6 +86,7 @@ C     At least one card is one char, so we do 1039 / 2 (one char one comma...)
       allocate(qa_storage(lqa_storage))
       do i=1,lqa_storage
         qa_storage(i)%itype=0
+        qa_storage(i)%title=''
         qa_storage(i)%valuer=0.0_8
         qa_storage(i)%valuei=0
       end do

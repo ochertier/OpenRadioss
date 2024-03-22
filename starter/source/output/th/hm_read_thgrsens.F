@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -39,7 +39,7 @@ Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        SENSOR_MOD                    share/modules1/sensor_mod.F   
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
-      SUBROUTINE HM_READ_THGRSENS(SENSOR_TAB,
+      SUBROUTINE HM_READ_THGRSENS(SENSORS,
      .      ITYP     ,KEY      ,IGS      ,LITHBUFMX,ITHBUF   ,
      .      IAD      ,IFI      ,ITHGRP   ,ITHVAR   ,NVALL    ,
      .      NVARE    ,NVARG    ,VARE     ,VARG     ,IVARG    ,
@@ -58,14 +58,11 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr03_c.inc"
 #include      "scr17_c.inc"
 #include      "com04_c.inc"
 #include      "units_c.inc"
-#include      "warn_c.inc"
 #include      "param_c.inc"
 #include      "r2r_c.inc"
-#include      "submod_c.inc"
 #include      "tabsiz_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -79,7 +76,7 @@ C-----------------------------------------------
       INTEGER ,DIMENSION(LITHBUFMX) ,INTENT(OUT)   :: ITHBUF
       CHARACTER*10 ,INTENT(IN) :: VARE(NVARE),KEY,VARG(NVARG)
       TYPE (SUBMODEL_DATA) ,DIMENSION(NSUBMOD) ,INTENT(IN) :: LSUBMODEL
-      TYPE (SENSOR_STR_)   ,DIMENSION(NSENSOR) ,INTENT(IN) :: SENSOR_TAB
+      TYPE (SENSORS_) ,INTENT(IN) :: SENSORS
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -131,8 +128,8 @@ c
         IAD2      = IAD + 3*NNE
         ITHGRP(8) = IAD2
         CALL ZEROIN(IAD,IAD + 43*NNE-1,ITHBUF)      
-        ALLOCATE (FOUND(NSENSOR))
-        FOUND(1:NSENSOR) = .FALSE.
+        ALLOCATE (FOUND(SENSORS%NSENSOR))
+        FOUND(1:SENSORS%NSENSOR) = .FALSE.
         NNE = 0
 C
         DO K = 1,IDSMAX
@@ -141,12 +138,12 @@ C
           ! Loop over Objects IDs
           IF (IDS > 0) THEN
             IF (NSUBDOM > 0) THEN
-	             IF (R2R_EXIST(ITYP,IDS) == 0) CYCLE
-	           ENDIF
+                       IF (R2R_EXIST(ITYP,IDS) == 0) CYCLE
+                     ENDIF
 c
             N = 0
-            DO J=1,NSENSOR
-              IF (IDS == SENSOR_TAB(J)%SENS_ID) THEN
+            DO J=1,SENSORS%NSENSOR
+              IF (IDS == SENSORS%SENSOR_TAB(J)%SENS_ID) THEN
                 N = J
                 EXIT
               ENDIF
@@ -189,8 +186,8 @@ c
 C
         DO I=1,NNE
           N = ITHBUF(IAD)
-          ITHBUF(IAD+2*NNE) = SENSOR_TAB(N)%SENS_ID
-          TITR = SENSOR_TAB(N)%TITLE
+          ITHBUF(IAD+2*NNE) = SENSORS%SENSOR_TAB(N)%SENS_ID
+          TITR = SENSORS%SENSOR_TAB(N)%TITLE
 
           CALL FRETITL(TITR,ITHBUF(IAD2),40)
 
@@ -229,7 +226,7 @@ C=======================================================================
         DO K=IAD1,IAD1+N-1
            CALL FRETITL2(TITR,ITHBUF(IAD2),40)
            IAD2=IAD2+40
-           WRITE(IOUT,FMT=FMW_I_A) SENSOR_TAB(ITHBUF(K))%SENS_ID,TITR(1:40)
+           WRITE(IOUT,FMT=FMW_I_A) SENSORS%SENSOR_TAB(ITHBUF(K))%SENS_ID,TITR(1:40)
         ENDDO
 C
       ENDIF  ! NVAR > 0

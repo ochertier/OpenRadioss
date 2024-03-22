@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,16 +25,17 @@ Chd|====================================================================
 Chd|  EIGP                          stub/eigp.F                   
 Chd|-- called by -----------
 Chd|-- calls ---------------
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
 Chd|        CLUSTER_MOD                   share/modules/cluster_mod.F   
 Chd|        CRACKXFEM_MOD                 share/modules/crackxfem_mod.F 
 Chd|        DRAPE_MOD                     share/modules/drape_mod.F     
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        GENANI_MOD                    source/output/anim/generate/genani.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|        STACK_MOD                     share/modules/stack_mod.F     
 Chd|====================================================================
       SUBROUTINE EIGP(
@@ -46,7 +47,7 @@ Chd|====================================================================
      6                   PM          , GEO         , CONT     , ICUT      , SKEW    ,
      7                   XCUT        , FINT        , ITAB     , FEXT      , FOPT    ,
      8                   ANIN        , LPBY        , NPBY     , NSTRF     , RWBUF   ,
-     9                   NPRW        , IXUR        , TANI     , ELBUF_TAB , DD_IAD  ,
+     9                   NPRW        , TANI        , ELBUF_TAB, MATPARAM_TAB,DD_IAD    ,
      A                   FR_IAD      , DD_FRONT    , WEIGHT   , EANI      , IPART   ,
      B                   RBY         , NOM_OPT     , IGRSURF  ,
      C                   BUFSF       , IDATA       , RDATA    , BUFMAT    , BUFGEO  ,
@@ -79,6 +80,7 @@ C-----------------------------------------------
       USE MULTI_FVM_MOD
       USE DRAPE_MOD
       USE ALE_CONNECTIVITY_MOD
+      USE MATPARAM_DEF_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -98,7 +100,6 @@ C-----------------------------------------------
 #include      "scr23_c.inc"
 #include      "param_c.inc"
 #include      "sphcom.inc"
-#include      "rnur_c.inc"
 #include      "units_c.inc"
 #include      "spmd_c.inc"
 #include      "task_c.inc"
@@ -109,7 +110,7 @@ C-----------------------------------------------
       INTEGER EIGIPM(*), IKC0(*), NDDL0, IADK(*), JDIK(*), NDOF(*),
      .    NDDL, EIGIBUF(*), IXS(*), IXQ(*), IXC(*), IXT(*), IXP(*),     
      .    IXR(*), IXTG(*), ICUT(*), ITAB(*), LPBY(*), NPBY(NNPBY,*),    
-     .    NSTRF(*), NPRW(*), IXUR(*),INDX_CRK(*),XEDGE4N(4,*),XEDGE3N(3,*),                                   
+     .    NSTRF(*), NPRW(*),INDX_CRK(*),XEDGE4N(4,*),XEDGE3N(3,*),                                   
      .    DD_IAD(NSPMD+1,*), FR_IAD(*), DD_FRONT(4,*), WEIGHT(*),       
      .    IPART(*), NOM_OPT(LNOPT1,*),     
      .    IDATA(*), KXX(NIXX,*), IXX(*),              
@@ -144,6 +145,7 @@ C-----------------------------------------------
       TYPE (SURF_)   , DIMENSION(NSURF)  :: IGRSURF
       TYPE (DRAPE_)   :: DRAPE_Q4, DRAPE_T3
       TYPE(t_ale_connectivity), INTENT(IN) :: ALE_CONNECTIVITY
+      TYPE (MATPARAM_STRUCT_) ,DIMENSION(NUMMAT) ,INTENT(IN) :: MATPARAM_TAB
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

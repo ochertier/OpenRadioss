@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,7 +27,7 @@ Chd|        GENOUTP                       source/output/sty/genoutp.F
 Chd|-- calls ---------------
 Chd|        INITBUF                       share/resol/initbuf.F         
 Chd|        SPMD_RGATHER9_1COMM           source/mpi/interfaces/spmd_outp.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        INITBUF_MOD                   share/resol/initbuf.F         
 Chd|====================================================================
       SUBROUTINE OUTP_S_T(NBX   ,KEY,TEXT,ELBUF_TAB,IPARG,
@@ -45,12 +45,9 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "vect01_c.inc"
-#include      "scr01_c.inc"
 #include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "param_c.inc"
 #include      "units_c.inc"
-#include      "scr05_c.inc"
 #include      "task_c.inc"
 #include      "scr16_c.inc"
 C-----------------------------------------------
@@ -97,7 +94,7 @@ C
          DO  NG = NGF, NGL
           ITY = IPARG(5,NG)
           IF (ITY == 1 .OR. ITY == 2) THEN
-          CALL INITBUF (IPARG    ,NG      ,                    
+          CALL INITBUF(IPARG    ,NG      ,                    
      2          MTN     ,NEL     ,NFT     ,IAD     ,ITY     ,  
      3          NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,  
      4          JTHE    ,JLAG    ,JMULT   ,JHBE    ,JIVF    ,  
@@ -189,7 +186,7 @@ Chd|        GENOUTP                       source/output/sty/genoutp.F
 Chd|-- calls ---------------
 Chd|        INITBUF                       share/resol/initbuf.F         
 Chd|        SPMD_RGATHER9_1COMM           source/mpi/interfaces/spmd_outp.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        INITBUF_MOD                   share/resol/initbuf.F         
 Chd|====================================================================
       SUBROUTINE OUTP_S_TT(NBX   ,KEY ,TEXT,ELBUF_TAB,IPARG,
@@ -207,13 +204,9 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "vect01_c.inc"
-#include      "scr01_c.inc"
-#include      "scr03_c.inc"
 #include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "param_c.inc"
 #include      "units_c.inc"
-#include      "scr05_c.inc"
 #include      "task_c.inc"
 #include      "scr16_c.inc"
 C-----------------------------------------------
@@ -257,7 +250,7 @@ C
         DO  NG = NGF, NGL
          ITY   =IPARG(5,NG)
          IF (ITY == 1.OR.ITY == 2) THEN
-          CALL INITBUF (IPARG    ,NG      ,                    
+          CALL INITBUF(IPARG    ,NG      ,                    
      2          MLW     ,NEL     ,NFT     ,IAD     ,ITY     ,  
      3          NPT     ,JALE    ,ISMSTR  ,JEUL    ,JTUR    ,  
      4          JTHE    ,JLAG    ,JMULT   ,KHBE    ,JIVF    ,  
@@ -299,12 +292,12 @@ C------------------------------------
                    DO IT=1,NPTT                                                  
                     DO IL=1,NLAY
                      LBUF => ELBUF_TAB(NG)%BUFLY(IL)%LBUF(IR,IS,IT)             
-                     WA(JJ +  1) = LBUF%SIG(KK(1)+I)				 
-                     WA(JJ +  2) = LBUF%SIG(KK(2)+I)				 
-                     WA(JJ +  3) = LBUF%SIG(KK(3)+I)				 
-                     WA(JJ +  4) = LBUF%SIG(KK(4)+I)				 
-                     WA(JJ +  5) = LBUF%SIG(KK(5)+I)				 
-                     WA(JJ +  6) = LBUF%SIG(KK(6)+I)				 
+                     WA(JJ +  1) = LBUF%SIG(KK(1)+I)         
+                     WA(JJ +  2) = LBUF%SIG(KK(2)+I)         
+                     WA(JJ +  3) = LBUF%SIG(KK(3)+I)         
+                     WA(JJ +  4) = LBUF%SIG(KK(4)+I)         
+                     WA(JJ +  5) = LBUF%SIG(KK(5)+I)         
+                     WA(JJ +  6) = LBUF%SIG(KK(6)+I)         
                      IF (ELBUF_TAB(NG)%BUFLY(IL)%L_PLA == 0) THEN                                      
                        WA(JJ +  7) = ZERO                                       
                      ELSE                                                       
@@ -332,12 +325,12 @@ C------------------------------------
                    DO IS=1,NPTS                                                
                     DO IT=1,NPTT                                                 
                      LBUF => ELBUF_TAB(NG)%BUFLY(IL)%LBUF(IR,IS,IT)            
-                     WA(JJ +  1) = LBUF%SIG(KK(1)+I)				
-                     WA(JJ +  2) = LBUF%SIG(KK(2)+I)				
-                     WA(JJ +  3) = LBUF%SIG(KK(3)+I)				
-                     WA(JJ +  4) = LBUF%SIG(KK(4)+I)				
-                     WA(JJ +  5) = LBUF%SIG(KK(5)+I)				
-                     WA(JJ +  6) = LBUF%SIG(KK(6)+I)				
+                     WA(JJ +  1) = LBUF%SIG(KK(1)+I)
+                     WA(JJ +  2) = LBUF%SIG(KK(2)+I)
+                     WA(JJ +  3) = LBUF%SIG(KK(3)+I)
+                     WA(JJ +  4) = LBUF%SIG(KK(4)+I)
+                     WA(JJ +  5) = LBUF%SIG(KK(5)+I)
+                     WA(JJ +  6) = LBUF%SIG(KK(6)+I)
                      IF (ELBUF_TAB(NG)%BUFLY(IL)%L_PLA == 0) THEN                                      
                        WA(JJ +  7) = ZERO                                      
                      ELSE                                                      
@@ -367,12 +360,12 @@ C------------------------------------
                 DO IS=1,NPTS                                                  
                  DO IR=1,NPTR            
                    LBUF => ELBUF_TAB(NG)%BUFLY(IL)%LBUF(IR,IS,IT)             
-                   WA(JJ +  1) = LBUF%SIG(KK(1)+I)			       
-                   WA(JJ +  2) = LBUF%SIG(KK(2)+I)			       
-                   WA(JJ +  3) = LBUF%SIG(KK(3)+I)			       
-                   WA(JJ +  4) = LBUF%SIG(KK(4)+I)			       
-                   WA(JJ +  5) = LBUF%SIG(KK(5)+I)			       
-                   WA(JJ +  6) = LBUF%SIG(KK(6)+I)			       
+                   WA(JJ +  1) = LBUF%SIG(KK(1)+I)             
+                   WA(JJ +  2) = LBUF%SIG(KK(2)+I)             
+                   WA(JJ +  3) = LBUF%SIG(KK(3)+I)             
+                   WA(JJ +  4) = LBUF%SIG(KK(4)+I)             
+                   WA(JJ +  5) = LBUF%SIG(KK(5)+I)             
+                   WA(JJ +  6) = LBUF%SIG(KK(6)+I)             
                    IF (ELBUF_TAB(NG)%BUFLY(IL)%L_PLA == 0) THEN                                        
                      WA(JJ +  7) = ZERO                                       
                    ELSE                                                       
@@ -404,12 +397,12 @@ c
                 DO IS=1,NPTS                                                  
                  DO IT=1,NPTT
                    LBUF => ELBUF_TAB(NG)%BUFLY(IL)%LBUF(IR,IS,IT)             
-                   WA(JJ +  1) = LBUF%SIG(KK(1)+I)			       
-                   WA(JJ +  2) = LBUF%SIG(KK(2)+I)			       
-                   WA(JJ +  3) = LBUF%SIG(KK(3)+I)			       
-                   WA(JJ +  4) = LBUF%SIG(KK(4)+I)			       
-                   WA(JJ +  5) = LBUF%SIG(KK(5)+I)			       
-                   WA(JJ +  6) = LBUF%SIG(KK(6)+I)			       
+                   WA(JJ +  1) = LBUF%SIG(KK(1)+I)             
+                   WA(JJ +  2) = LBUF%SIG(KK(2)+I)             
+                   WA(JJ +  3) = LBUF%SIG(KK(3)+I)             
+                   WA(JJ +  4) = LBUF%SIG(KK(4)+I)             
+                   WA(JJ +  5) = LBUF%SIG(KK(5)+I)             
+                   WA(JJ +  6) = LBUF%SIG(KK(6)+I)             
                    IF (ELBUF_TAB(NG)%BUFLY(IL)%L_PLA == 0) THEN                                        
                      WA(JJ +  7) = ZERO                                       
                    ELSE                                                       
@@ -436,12 +429,12 @@ c
                 DO IS=1,NPTS                                                  
                  DO IT=1,NPTT                                                 
                    LBUF => ELBUF_TAB(NG)%BUFLY(IL)%LBUF(IR,IS,IT)             
-                   WA(JJ +  1) = LBUF%SIG(KK(1)+I)			       
-                   WA(JJ +  2) = LBUF%SIG(KK(2)+I)			       
-                   WA(JJ +  3) = LBUF%SIG(KK(3)+I)			       
-                   WA(JJ +  4) = LBUF%SIG(KK(4)+I)			       
-                   WA(JJ +  5) = LBUF%SIG(KK(5)+I)			       
-                   WA(JJ +  6) = LBUF%SIG(KK(6)+I)			       
+                   WA(JJ +  1) = LBUF%SIG(KK(1)+I)             
+                   WA(JJ +  2) = LBUF%SIG(KK(2)+I)             
+                   WA(JJ +  3) = LBUF%SIG(KK(3)+I)             
+                   WA(JJ +  4) = LBUF%SIG(KK(4)+I)             
+                   WA(JJ +  5) = LBUF%SIG(KK(5)+I)             
+                   WA(JJ +  6) = LBUF%SIG(KK(6)+I)             
                    IF (ELBUF_TAB(NG)%BUFLY(IL)%L_PLA == 0) THEN                                        
                      WA(JJ +  7) = ZERO                                       
                    ELSE                                                       
@@ -471,12 +464,12 @@ c
                 DO IS=1,NPTS                                                  
                  DO IT=1,NPTT                                                 
                    LBUF => ELBUF_TAB(NG)%BUFLY(IL)%LBUF(IR,IS,IT)             
-                   WA(JJ +  1) = LBUF%SIG(KK(1)+I)			       
-                   WA(JJ +  2) = LBUF%SIG(KK(2)+I)			       
-                   WA(JJ +  3) = LBUF%SIG(KK(3)+I)			       
-                   WA(JJ +  4) = LBUF%SIG(KK(4)+I)			       
-                   WA(JJ +  5) = LBUF%SIG(KK(5)+I)			       
-                   WA(JJ +  6) = LBUF%SIG(KK(6)+I)			       
+                   WA(JJ +  1) = LBUF%SIG(KK(1)+I)             
+                   WA(JJ +  2) = LBUF%SIG(KK(2)+I)             
+                   WA(JJ +  3) = LBUF%SIG(KK(3)+I)             
+                   WA(JJ +  4) = LBUF%SIG(KK(4)+I)             
+                   WA(JJ +  5) = LBUF%SIG(KK(5)+I)             
+                   WA(JJ +  6) = LBUF%SIG(KK(6)+I)             
                    IF (ELBUF_TAB(NG)%BUFLY(IL)%L_PLA == 0) THEN                                        
                      WA(JJ +  7) = ZERO                                       
                    ELSE                                                       
@@ -503,11 +496,11 @@ c-------------
               WA(JJ+7) = GBUF%EINT(I) 
               WA(JJ+8) = GBUF%RHO(I)  
               JJ = JJ + 8                
-              WA(JJ + 1) = GBUF%SIG(KK(1)+I)				 
-              WA(JJ + 2) = GBUF%SIG(KK(2)+I)				 
-              WA(JJ + 3) = GBUF%SIG(KK(3)+I)				 
-              WA(JJ + 4) = GBUF%SIG(KK(4)+I)				 
-              WA(JJ + 5) = GBUF%SIG(KK(5)+I)				 
+              WA(JJ + 1) = GBUF%SIG(KK(1)+I)         
+              WA(JJ + 2) = GBUF%SIG(KK(2)+I)         
+              WA(JJ + 3) = GBUF%SIG(KK(3)+I)         
+              WA(JJ + 4) = GBUF%SIG(KK(4)+I)         
+              WA(JJ + 5) = GBUF%SIG(KK(5)+I)         
               WA(JJ + 6) = GBUF%SIG(KK(6)+I)  
               IF (GBUF%G_PLA == 0) THEN                                        
                 WA(JJ +  7) = ZERO                                       
@@ -542,9 +535,9 @@ C--------------------------------------
                 DO IS=1,NPTS                                                   
                  DO IT=1,NPTT                                                  
                    LBUF => ELBUF_TAB(NG)%BUFLY(IL)%LBUF(IR,IS,IT)           
-                   WA(JJ + 1) = LBUF%EPE(KK(1)+I)			       
-                   WA(JJ + 2) = LBUF%EPE(KK(2)+I)			       
-                   WA(JJ + 3) = LBUF%EPE(KK(3)+I)			       
+                   WA(JJ + 1) = LBUF%EPE(KK(1)+I)             
+                   WA(JJ + 2) = LBUF%EPE(KK(2)+I)             
+                   WA(JJ + 3) = LBUF%EPE(KK(3)+I)             
                    WA(JJ + 4) = ZERO                                        
                    WA(JJ + 5) = ZERO                                        
                    WA(JJ + 6) = ZERO                                        
@@ -561,12 +554,12 @@ C--------------------------------------
                 DO IT=1,NPTT                                                   
                  DO IL=1,NLAY                                                     
                    LBUF => ELBUF_TAB(NG)%BUFLY(IL)%LBUF(IR,IS,IT)           
-                   WA(JJ + 1) = LBUF%STRA(KK(1)+I)				
-                   WA(JJ + 2) = LBUF%STRA(KK(2)+I)				
-                   WA(JJ + 3) = LBUF%STRA(KK(3)+I)				
-                   WA(JJ + 4) = LBUF%STRA(KK(4)+I)				
-                   WA(JJ + 5) = LBUF%STRA(KK(5)+I)				
-                   WA(JJ + 6) = LBUF%STRA(KK(6)+I)				
+                   WA(JJ + 1) = LBUF%STRA(KK(1)+I)
+                   WA(JJ + 2) = LBUF%STRA(KK(2)+I)
+                   WA(JJ + 3) = LBUF%STRA(KK(3)+I)
+                   WA(JJ + 4) = LBUF%STRA(KK(4)+I)
+                   WA(JJ + 5) = LBUF%STRA(KK(5)+I)
+                   WA(JJ + 6) = LBUF%STRA(KK(6)+I)
                    JJ=JJ + 6                                                   
                  ENDDO                                                         
                 ENDDO                                                          
@@ -580,12 +573,12 @@ C--------------------------------------
                 DO IS=1,NPTS                                              
                  DO IR=1,NPTR                                                
                    LBUF => ELBUF_TAB(NG)%BUFLY(IL)%LBUF(IR,IS,IT)           
-                   WA(JJ + 1) = LBUF%STRA(KK(1)+I)				
-                   WA(JJ + 2) = LBUF%STRA(KK(2)+I)				
-                   WA(JJ + 3) = LBUF%STRA(KK(3)+I)				
-                   WA(JJ + 4) = LBUF%STRA(KK(4)+I)				
-                   WA(JJ + 5) = LBUF%STRA(KK(5)+I)				
-                   WA(JJ + 6) = LBUF%STRA(KK(6)+I)				
+                   WA(JJ + 1) = LBUF%STRA(KK(1)+I)
+                   WA(JJ + 2) = LBUF%STRA(KK(2)+I)
+                   WA(JJ + 3) = LBUF%STRA(KK(3)+I)
+                   WA(JJ + 4) = LBUF%STRA(KK(4)+I)
+                   WA(JJ + 5) = LBUF%STRA(KK(5)+I)
+                   WA(JJ + 6) = LBUF%STRA(KK(6)+I)
                    JJ=JJ + 6                                                   
                  ENDDO                                                         
                 ENDDO                                                          
@@ -1015,7 +1008,7 @@ Chd|-- called by -----------
 Chd|        GENOUTP                       source/output/sty/genoutp.F   
 Chd|        OUTP_ARSZ_ST                  source/mpi/interfaces/spmd_outp.F
 Chd|-- calls ---------------
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE COUNT_ARSZ_ST(IPARG,DD_IAD,WASZ,SZP0)
 C-----------------------------------------------
@@ -1026,12 +1019,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   M P I   I n c l u d e s
-C-----------------------------------------------
-#ifdef MPI
-#include "mpif.h"
-#endif
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -29,7 +29,7 @@ Chd|        I7CMP3                        source/interfaces/inter3d1/i7cmp3.F
 Chd|        I7COR3                        source/interfaces/inter3d1/i7cor3.F
 Chd|        I7DST3                        source/interfaces/inter3d1/i7dst3.F
 Chd|        I7PEN3                        source/interfaces/inter3d1/i7pen3.F
-Chd|        TRI7BOX                       share/modules1/tri7box.F
+Chd|        TRI7BOX                       share/modules1/tri7box.F      
 Chd|====================================================================
       SUBROUTINE I7TRIVOX1(
      1      NSN    ,I_MEM   ,IRECT    ,X       ,STF     ,
@@ -70,13 +70,8 @@ c     parameter setting the size for the vector (orig version is 128)
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "scr05_c.inc"
-#include      "sms_c.inc"
 #include      "vect07_c.inc"
 #include      "scr17_c.inc"
 C-----------------------------------------------

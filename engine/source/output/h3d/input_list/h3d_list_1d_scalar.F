@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -48,17 +48,12 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "chara_c.inc"
-#include      "com04_c.inc"
 #include      "param_c.inc"
-C-----------------------------------------------
-C   E x t e r n a l   F u n c t i o n s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,J,NIPMAX
-C=========================================================================
+C===============================================
       I = 0
 c-----------------------------------------------
       I = I + 1
@@ -164,6 +159,19 @@ c-----------------------------------------------
       I = I + 1
       H3D_KEYWORD_ONED_SCALAR(I)%KEY3  = 'LOCAL.ID'
       H3D_KEYWORD_ONED_SCALAR(I)%TEXT1  = 'Local identifier within the group'
+c-----------------------------------------------
+      I = I + 1
+      H3D_KEYWORD_ONED_SCALAR(I)%KEY3  = 'EPSD'
+      H3D_KEYWORD_ONED_SCALAR(I)%TEXT1  = 'Strain rate'
+c-----------------------------------------------
+      I = I + 1
+      H3D_KEYWORD_ONED_SCALAR(I)%KEY3    = 'DAMA'
+      H3D_KEYWORD_ONED_SCALAR(I)%TEXT1   = 'MAX DAMAGE'
+      H3D_KEYWORD_ONED_SCALAR(I)%COMMENT = 'maximum damage over time'
+c-----------------------------------------------
+      I = I + 1
+      H3D_KEYWORD_ONED_SCALAR(I)%KEY3  = 'EINTV'
+      H3D_KEYWORD_ONED_SCALAR(I)%TEXT1  = 'Internal Energy per unit volume'
 c-----------------------------------------------
       NKEY=I
       END

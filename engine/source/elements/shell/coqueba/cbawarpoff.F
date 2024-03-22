@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,7 +26,7 @@ Chd|-- called by -----------
 Chd|        CBAFORC3                      source/elements/shell/coqueba/cbaforc3.F
 Chd|-- calls ---------------
 Chd|        SETUVARW                      source/elements/shell/coqueba/cbawarpoff.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
        SUBROUTINE CBAL58WARP(ELBUF_STR,NEL,
      1                       X,IXC,E3X   ,E3Y   ,E3Z  ,OFFG ,ZLLC2 )
@@ -42,9 +42,6 @@ c-----------------------------------------------
 c   g l o b a l   p a r a m e t e r s
 c-----------------------------------------------
 #include      "mvsiz_p.inc"
-#include      "param_c.inc"
-#include      "com01_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D U M M Y   A R G U M E N T S
 C-----------------------------------------------
@@ -53,7 +50,6 @@ C-----------------------------------------------
       my_real 
      .   X(3,*),E3X(*),E3Y(*),E3Z(*),OFFG(*),ZLLC2(*)
       TYPE(ELBUF_STRUCT_), TARGET :: ELBUF_STR
-C-----------------------------------------------
 C-----------------------------------------------
 C   L O C A L   V A R I A B L E S
 C-----------------------------------------------
@@ -157,18 +153,12 @@ C-----------------------------------------------
 C   I M P L I C I T   T Y P E S
 C-----------------------------------------------
 #include      "implicit_f.inc"
-c-----------------------------------------------
-c   g l o b a l   p a r a m e t e r s
-c-----------------------------------------------
-#include      "param_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D U M M Y   A R G U M E N T S
 C-----------------------------------------------
       INTEGER NEL
       my_real 
      .   PCOS(*),UVAR(NEL,*)
-C-----------------------------------------------
 C-----------------------------------------------
 C   L O C A L   V A R I A B L E S
 C-----------------------------------------------

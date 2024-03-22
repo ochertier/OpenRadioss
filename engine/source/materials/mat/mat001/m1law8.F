@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -28,14 +28,19 @@ Chd|-- called by -----------
 Chd|        MMAIN8                        source/materials/mat_share/mmain8.F
 Chd|-- calls ---------------
 Chd|        MQVISC8                       source/materials/mat_share/mqvisc8.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
-      SUBROUTINE M1LAW8 (PM,OFF,SIG,EINT,RHO,QOLD,VOL,STIFN,NEL,
-     .                   D1,D2,D3,D4,D5,D6,
-     .                   VNEW,VOLGP,DELTAX,RHO0,DVOL,VD2,VIS,
-     .                   MAT,NC,NGL,GEO,PID,
-     .                   DT2T ,NELTST,ITYPTST, OFFG,MSSA   ,
-     .                   DMELS ,BUFLY, SSP)
+      SUBROUTINE M1LAW8(
+     1   PM,      OFF,     SIG,     EINT,
+     2   RHO,     QOLD,    VOL,     STIFN,
+     3   NEL,     D1,      D2,      D3,
+     4   D4,      D5,      D6,      VNEW,
+     5   VOLGP,   DELTAX,  RHO0,    DVOL,
+     6   VD2,     VIS,     MAT,     NC,
+     7   NGL,     GEO,     PID,     DT2T,
+     8   NELTST,  ITYPTST, OFFG,    MSSA,
+     9   DMELS,   BUFLY,   SSP,     ITY,
+     A   NPT,     JTUR,    JTHE,    JSMS)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -53,10 +58,14 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "vect01_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: ITY
+      INTEGER, INTENT(IN) :: NPT
+      INTEGER, INTENT(IN) :: JTUR
+      INTEGER, INTENT(IN) :: JTHE
+      INTEGER, INTENT(IN) :: JSMS
       INTEGER MAT(MVSIZ),NC(8,MVSIZ),NGL(MVSIZ),PID(MVSIZ)
       INTEGER NEL,NELTST,ITYPTST
 C     REAL
@@ -89,13 +98,13 @@ C     REAL
       TYPE(L_BUFEL_) ,POINTER :: LBUF
 C=======================================================================
       DTA = HALF*DT1
-      MX=MAT(LFT)
+      MX=MAT(1)
       C1 = PM(32,MX)
-      DO I=LFT,LLT
+      DO I=1,NEL
         G(I) = PM(22,MX)*OFF(I)
       ENDDO
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         DF(I)=RHO0(I)/RHO(I)
       ENDDO
 C
@@ -105,7 +114,7 @@ C
 C-----------------------
 C     PRESSION ANCIENNE
 C-----------------------
-      DO I=LFT,LLT
+      DO I=1,NEL
         P(I) = -THIRD*(SIG(I,1)+SIG(I,2)+SIG(I,3))
         G1(I)=DT1*G(I)
         G2(I)=TWO*G1(I)
@@ -121,23 +130,27 @@ C-----------------------
 C------------------------------
 C     DP/DRHO ET VITESSE DU SON
 C------------------------------
-      DO I=LFT,LLT
+      DO I=1,NEL
         DPDM(I)=ONEP333*G(I)+C1
         SSP(I)=SQRT(ABS(DPDM(I))/RHO0(I))
       ENDDO
 C--------------------------------------------------
 C     VISCOSITE VOLUMETRIQUE ET PAS DE TEMPS
 C--------------------------------------------------
-      CALL MQVISC8(PM,OFF,RHO,VIS,VIS,VIS,STIFN,EINT,
-     .                   D1,D2,D3,VNEW,DVOL,
-     .                   VD2,DELTAX,VIS,QOLD,SSP,
-     .                   MAT,NC,NGL,GEO,PID,
-     .                   DT2T ,NELTST,ITYPTST,OFFG,MSSA,
-     .                   DMELS,NEL)
+      CALL MQVISC8(
+     1   PM,      OFF,     RHO,     VIS,
+     2   VIS,     VIS,     STIFN,   EINT,
+     3   D1,      D2,      D3,      VNEW,
+     4   DVOL,    VD2,     DELTAX,  VIS,
+     5   QOLD,    SSP,     MAT,     NC,
+     6   NGL,     GEO,     PID,     DT2T,
+     7   NELTST,  ITYPTST, OFFG,    MSSA,
+     8   DMELS,   NEL,     ITY,     JTUR,
+     9   JTHE,    JSMS)
 C--------------------------------------------------
 C     NOUVELLE PRESSION
 C--------------------------------------------------
-      DO I=LFT,LLT
+      DO I=1,NEL
         PNEW(I)=C1*AMU(I)
       ENDDO
 C--------------------------------------------------
@@ -147,7 +160,7 @@ C--------------------------------------------------
         LBUF => BUFLY%LBUF(1,1,IPT)
         SIGP => BUFLY%LBUF(1,1,IPT)%SIG(1:NEL*6)
 C
-        DO I=LFT,LLT
+        DO I=1,NEL
           DAV=ONE - DVOL(I)/VNEW(I)
           SOLD1(I)=SIGP(JJ(1)+I)*DAV
           SOLD2(I)=SIGP(JJ(2)+I)*DAV
@@ -159,19 +172,19 @@ C
 C--------------------------------------------------
 C     CONTRAINTES DEVIATORIQUES AUX POINTS DE GAUSS
 C--------------------------------------------------
-        DO I=LFT,LLT
+        DO I=1,NEL
           DAV=-THIRD*(D1(I,IPT)+D2(I,IPT)+D3(I,IPT))
           SIGP(JJ(1)+I)=SIGP(JJ(1)+I)+P(I)+G2(I)*(D1(I,IPT)+DAV)
           SIGP(JJ(2)+I)=SIGP(JJ(2)+I)+P(I)+G2(I)*(D2(I,IPT)+DAV)
           SIGP(JJ(3)+I)=SIGP(JJ(3)+I)+P(I)+G2(I)*(D3(I,IPT)+DAV)
-          SIGP(JJ(4)+I)=SIGP(JJ(4)+I)	  +G1(I)* D4(I,IPT)
-          SIGP(JJ(5)+I)=SIGP(JJ(5)+I)	  +G1(I)* D5(I,IPT)
-          SIGP(JJ(6)+I)=SIGP(JJ(6)+I)	  +G1(I)* D6(I,IPT)
+          SIGP(JJ(4)+I)=SIGP(JJ(4)+I)    +G1(I)* D4(I,IPT)
+          SIGP(JJ(5)+I)=SIGP(JJ(5)+I)    +G1(I)* D5(I,IPT)
+          SIGP(JJ(6)+I)=SIGP(JJ(6)+I)    +G1(I)* D6(I,IPT)
         ENDDO
 C--------------------------------------------------
 C     CONTRAINTE AUX POINTS DE GAUSS
 C--------------------------------------------------
-        DO I=LFT,LLT
+        DO I=1,NEL
           SIGP(JJ(1)+I)=(SIGP(JJ(1)+I)-PNEW(I))*OFF(I)
           SIGP(JJ(2)+I)=(SIGP(JJ(2)+I)-PNEW(I))*OFF(I)
           SIGP(JJ(3)+I)=(SIGP(JJ(3)+I)-PNEW(I))*OFF(I)
@@ -182,7 +195,7 @@ C--------------------------------------------------
 C--------------------------------------------------
 C     ENERGIE INTERNE
 C--------------------------------------------------
-        DO I=LFT,LLT
+        DO I=1,NEL
           DAV=VOLGP(I,IPT)*OFF(I)*DTA
           EINT(I)=EINT(I)+DAV*(D1(I,IPT)*(SOLD1(I)+SIGP(JJ(1)+I))+
      +                         D2(I,IPT)*(SOLD2(I)+SIGP(JJ(2)+I))+
@@ -194,7 +207,7 @@ C--------------------------------------------------
 C--------------------------------------------------
 C     CONTRAINTE MOYENNE (OUTPUT)
 C--------------------------------------------------
-        DO I=LFT,LLT
+        DO I=1,NEL
           SIG(I,1)=SIG(I,1)+ONE_OVER_8*SIGP(JJ(1)+I)
           SIG(I,2)=SIG(I,2)+ONE_OVER_8*SIGP(JJ(2)+I)
           SIG(I,3)=SIG(I,3)+ONE_OVER_8*SIGP(JJ(3)+I)
@@ -205,7 +218,7 @@ C--------------------------------------------------
 C
       ENDDO
 C
-      DO I=LFT,LLT
+      DO I=1,NEL
         EINT(I)=EINT(I)/MAX(EM15,VOL(I))
       ENDDO
 C-----------

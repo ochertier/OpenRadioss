@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,7 +27,7 @@ Chd|        ST_QAPRINT_DRIVER             source/output/qaprint/st_qaprint_drive
 Chd|-- calls ---------------
 Chd|        DRAPE_MOD                     share/modules1/drape_mod.F    
 Chd|====================================================================
-      SUBROUTINE ST_QAPRINT_COMPOSITE_OPTIONS(DRAPE)
+      SUBROUTINE ST_QAPRINT_COMPOSITE_OPTIONS(DRAPE, DRAPEG)
 C============================================================================
 C   M o d u l e s
 C-----------------------------------------------
@@ -40,48 +40,57 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "param_c.inc"
-#include      "scr17_c.inc"
-#include      "tabsiz_c.inc"
-#include      "units_c.inc"
-#include      "drape_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      TYPE (DRAPE_)    :: DRAPE(*)
+      TYPE (DRAPE_), DIMENSION(NUMELC_DRAPE + NUMELTG_DRAPE), TARGET      :: DRAPE
+      TYPE (DRAPEG_)                         :: DRAPEG
+      TYPE (DRAPE_PLY_)          ,POINTER    :: DRAPE_PLY
 C--------------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,II,MY_ID,NPT,J,TEMP_INT
+      INTEGER I,II,MY_ID,NPT,J,TEMP_INT,IE_DRAPE,KK,NSLICE,IP
       CHARACTER (LEN=255) :: VARNAME
       DOUBLE PRECISION TEMP_DOUBLE
 C-----------------------------------------------
       IF (MYQAKEY('/DRAPE')) THEN
-        DO I = 1,NUMELC + NUMELTG
-          NPT = DRAPE(I)%NPT
-          IF (NPT > 0) THEN
-            IF (I <= NUMELC) THEN
-              WRITE(VARNAME,'(A)') 'SHELL INTERNAL NUMBER'
-              TEMP_INT = I
-              CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),TEMP_INT,0.0_8)
-            ELSE
-              WRITE(VARNAME,'(A)') 'SH3N INTERNAL NUMBER'
-              TEMP_INT = I
-              CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),TEMP_INT,0.0_8)
-            ENDIF
-            DO II = 1, DRAPE(I)%NPT
-              WRITE(VARNAME,'(A,I10)') 'IDRAPE',II
-              TEMP_INT = DRAPE(I)%IDRAPE(II)
-              CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),TEMP_INT,0.0_8) 
-              DO J = 1,2
-                WRITE(VARNAME,'(A,I10,I10)') 'RDRAPE',II,J
-                TEMP_DOUBLE = DRAPE(I)%RDRAPE(II,J)
-                CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),0,TEMP_DOUBLE)
+        DO I = 1,NUMELC+ NUMELTG
+           IE_DRAPE = DRAPEG%INDX(I)
+           IF(IE_DRAPE == 0) CYCLE
+            NPT =  DRAPE(IE_DRAPE)%NPLY 
+            IF (NPT > 0) THEN
+              IF (I <= NUMELC) THEN
+                WRITE(VARNAME,'(A)') 'SHELL INTERNAL NUMBER'
+                TEMP_INT = I
+                CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),TEMP_INT,0.0_8)
+              ELSE
+                WRITE(VARNAME,'(A)') 'SH3N INTERNAL NUMBER'
+                TEMP_INT = I
+                CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),TEMP_INT,0.0_8)
+              ENDIF
+              DO II = 1, NPT
+                IP = DRAPE(IE_DRAPE)%INDX_PLY(II)
+                IF(IP == 0) CYCLE
+                DRAPE_PLY =>  DRAPE(IE_DRAPE)%DRAPE_PLY(IP)
+                NSLICE = DRAPE_PLY%NSLICE
+                WRITE(VARNAME,'(A,I10)') 'IDDRAPE',IP
+                TEMP_INT = DRAPE_PLY%IPID
+                CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),TEMP_INT,0.0_8) 
+                DO KK =1,NSLICE
+                      DO J = 1,2
+                       WRITE(VARNAME,'(A,I10,I10,I10)') 'IDRAPE',II,KK,J
+                       TEMP_INT = DRAPE_PLY%IDRAPE(KK,J)
+                       CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),TEMP_INT,0.0_8)
+                     ENDDO
+                     DO J = 1,2
+                       WRITE(VARNAME,'(A,I10,I10,I10)') 'RDRAPE',II,KK,J
+                       TEMP_DOUBLE = DRAPE_PLY%RDRAPE(KK,J)
+                       CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),0,TEMP_DOUBLE)
+                     ENDDO
+                ENDDO     
               ENDDO
-            ENDDO
-          ENDIF
+            ENDIF
         ENDDO
       END IF
 C-----------------------------------------------------------------------

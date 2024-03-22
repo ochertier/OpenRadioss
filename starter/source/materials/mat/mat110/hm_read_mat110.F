@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -33,7 +33,7 @@ Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.
 Chd|        HM_OPTION_IS_ENCRYPTED        source/devtools/hm_reader/hm_option_is_encrypted.F
 Chd|        INIT_MAT_KEYWORD              source/materials/mat/init_mat_keyword.F
 Chd|        ELBUFTAG_MOD                  share/modules1/elbuftag_mod.F 
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/matparam_def_mod.F
+Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
@@ -59,8 +59,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr17_c.inc"
 #include      "units_c.inc"
-#include      "submod_c.inc"
-#include      "sysunit.inc"
 #include      "param_c.inc"
 C
 C-----------------------------------------------
@@ -193,6 +191,7 @@ card7 - Yield criterion parameters
         IF (.NOT.ALLOCATED(fUN))   ALLOCATE(fUN(NANGLE,2))
         IF (.NOT.ALLOCATED(fSH))   ALLOCATE(fSH(NANGLE,2))
         IF (.NOT.ALLOCATED(fPS))   ALLOCATE(fPS(NANGLE,2))
+        fPS(1:NANGLE,1:2) = ZERO
         IF (.NOT.ALLOCATED(rLank)) ALLOCATE(rLank(NANGLE))
         ! Loop over angles (must be equally distributed between 0 and pi/2)
         DO J = 1, NANGLE
@@ -292,9 +291,9 @@ c
         ENDIF
 c        
         ! Computation of plane strain reference point first coordinate
-        fPS_MIN   = 0.97D0
-        fPS_MAX   = 1.14D0
-        fPS_TRANS = 1.22D0
+        fPS_MIN   = 0.827D0
+        fPS_MAX   = 1.315D0
+        fPS_TRANS = 0.5D0
         ADIRAC    = 1.2D0
         DO J = 1,NANGLE
           FDIRAC    = EXP(ADIRAC*(rLank(J)-fPS_TRANS))
@@ -421,11 +420,11 @@ c---------------------
         ! Set strain-rate filtering
         ISRATE  = 1
         ! Default cutting frequency
-        IF ((ASRATE == ZERO).OR.(Ivflag == 1)) ASRATE = 10000.0D0*FAC_T_WORK
+        IF ((ASRATE == ZERO).OR.(Ivflag == 1)) ASRATE = 10000.0D0*UNITAB%FAC_T_WORK
       ENDIF
       ! Boltzmann constant
       KBOLTZ = 8.6173303*EM5 ! eV/K (~J/K)
-      KBOLTZ = KBOLTZ/(FAC_M_WORK*FAC_L_WORK*FAC_L_WORK/(FAC_T_WORK*FAC_T_WORK))
+      KBOLTZ = KBOLTZ/(UNITAB%FAC_M_WORK*UNITAB%FAC_L_WORK*UNITAB%FAC_L_WORK/(UNITAB%FAC_T_WORK*UNITAB%FAC_T_WORK))
       ! Kinematic hardening factor
       IF (FISOKIN > ONE)   FISOKIN = ONE
       IF (FISOKIN < ZERO) FISOKIN = ZERO
@@ -1929,9 +1928,13 @@ c
         MTAG%L_SIGA  = 3
       ENDIF
 c
-      CALL INIT_MAT_KEYWORD(MATPARAM ,"ELASTO_PLASTIC")
-      CALL INIT_MAT_KEYWORD(MATPARAM ,"INCREMENTAL"   )
-      CALL INIT_MAT_KEYWORD(MATPARAM ,"LARGE_STRAIN"  )
+      CALL INIT_MAT_KEYWORD(MATPARAM,"ELASTO_PLASTIC")
+      CALL INIT_MAT_KEYWORD(MATPARAM,"INCREMENTAL"   )
+      CALL INIT_MAT_KEYWORD(MATPARAM,"LARGE_STRAIN"  )
+      CALL INIT_MAT_KEYWORD(MATPARAM,"ORTHOTROPIC"   )
+c 
+      ! Properties compatibility
+      CALL INIT_MAT_KEYWORD(MATPARAM,"SHELL_ORTHOTROPIC")
 c
 c--------------------------
 c     Parameters printout

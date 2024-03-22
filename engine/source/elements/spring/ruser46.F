@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -116,7 +116,7 @@ C   D u m m y   A r g u m e n t s   a n d   F u n c t i o n
 C----------------------------------------------------------
       INTEGER IOUT,NEL,NUVAR,IPROP,
      .        GET_U_PNU,GET_U_PID,GET_U_MID,GET_U_MNU,
-     .        KFUNC,KMAT,KPROP,GET_SPRING_ELNUM
+     .        KFUNC,KMAT,KPROP
       my_real
      .   UVAR(NUVAR,*),DT ,
      .   FX(*), FY(*), FZ(*), E(*), VX(*),MASS(*) ,XINER(*),
@@ -125,8 +125,7 @@ C----------------------------------------------------------
      .   STIFM(*) ,STIFR(*) , VISCM(*) ,VISCR(*) ,FR_WAVE(*) ,
      .   GET_U_MAT, GET_U_GEO, GET_U_FUNC, GET_U_TIME
       EXTERNAL GET_U_MNU,GET_U_PNU,GET_U_MID,GET_U_PID,
-     .         GET_U_MAT,GET_U_GEO, GET_U_FUNC, GET_U_TIME,
-     .         GET_SPRING_ELNUM
+     .         GET_U_MAT,GET_U_GEO, GET_U_FUNC, GET_U_TIME
       PARAMETER (KFUNC=29)
 !      PARAMETER (KMAT=31)
 !      PARAMETER (KPROP=33)

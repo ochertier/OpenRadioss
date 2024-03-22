@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>    
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
-C ... X-FEM (CRACK)
-      INTEGER LXFEM3I
-      PARAMETER (LXFEM3I = 22)
+
 C
-      COMMON /XFEM3I/ NUMELCRK ,NODXVARI  ,ELEXVARIC  ,ELEXVARR ,
-     .                ICRACK3D ,ELEXVARITG,NXEL       ,NINICRACK,
+      COMMON /XFEM3I/ NUMELCRK ,
+     .                ICRACK3D ,NXEL       ,NINICRACK,
      .                NCRKXFE  ,ECRKXFE   ,ECRKXFEC   ,ECRKXFETG  ,NLEVMAX ,
      .                NUMEDGES ,NXLAYMAX  ,IENRNOD    ,LCNECRKXFEM
 c
-      INTEGER         NUMELCRK ,NODXVARI  ,ELEXVARIC  ,ELEXVARR ,
-     .                ICRACK3D ,ELEXVARITG,NXEL       ,NINICRACK,
+      INTEGER         NUMELCRK ,
+     .                ICRACK3D ,NXEL       ,NINICRACK,
      .                NCRKXFE  ,ECRKXFE   ,ECRKXFEC   ,ECRKXFETG  ,NLEVMAX ,
      .                NUMEDGES ,NXLAYMAX  ,IENRNOD    ,LCNECRKXFEM

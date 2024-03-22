@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,6 +25,7 @@ Chd|  ST_QAPRINT_GENERAL_CONTROLS   source/output/qaprint/st_qaprint_general_con
 Chd|-- called by -----------
 Chd|        ST_QAPRINT_DRIVER             source/output/qaprint/st_qaprint_driver.F
 Chd|-- calls ---------------
+Chd|        ALE_MOD                       ../common_source/modules/ale/ale_mod.F
 Chd|====================================================================
       SUBROUTINE ST_QAPRINT_GENERAL_CONTROLS(NOM_OPT ,INOM_OPT  ,DAMPR  , IRAND, ALEA,
      1                                       XSEED   ,UNITAB    ,QP_IPERTURB,QP_RPERTURB,
@@ -34,20 +35,16 @@ C   M o d u l e s
 C-----------------------------------------------
       USE QA_OUT_MOD
       USE UNITAB_MOD
+      USE ALE_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com06_c.inc"
-#include      "com07_c.inc"
 #include      "param_c.inc"
 #include      "scr03_c.inc"
 #include      "scr05_c.inc"
@@ -58,13 +55,9 @@ C-----------------------------------------------
 #include      "scr17_c.inc"
 #include      "scr21_c.inc"
 #include      "tabsiz_c.inc"
-#include      "thermal_c.inc"
-#include      "units_c.inc"
 #include      "random_c.inc"
 #include      "sphcom.inc"
-#include      "fluid_scr_c.inc"
 #include      "sms_c.inc"
-#include      "sysunit.inc"
 #include      "eigcom.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -155,10 +148,6 @@ C
 C
         WRITE(VARNAME,'(A)') 'IPARI0'
         TEMP_INT = IPARI0
-        CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),TEMP_INT,0.0_8)
-C
-        WRITE(VARNAME,'(A)') 'MSHSUB'
-        TEMP_INT = MSHSUB
         CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),TEMP_INT,0.0_8)
 C
       END IF
@@ -361,7 +350,7 @@ C
         CALL QAPRINT('CAA',0,0.0_8)
 
         WRITE(VARNAME,'(A,I0)') 'ICAA'
-        TEMP_INT = ICAA
+        TEMP_INT = ALE%GLOBAL%ICAA
         CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),TEMP_INT,0.0_8)
 C
       END IF
@@ -374,10 +363,6 @@ C
 C
         WRITE(VARNAME,'(A,I0)') 'IPRI'
         TEMP_INT = IPRI
-        CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),TEMP_INT,0.0_8)
-C
-        WRITE(VARNAME,'(A,I0)') 'IGFOR0'
-        TEMP_INT = IGFOR0
         CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),TEMP_INT,0.0_8)
 C
         WRITE(VARNAME,'(A,I0)') 'IOUTPUT'
@@ -437,7 +422,7 @@ C     /UNIT
 C-----------------------------------------------
       IF (MYQAKEY('/UNIT')) THEN
 C
-        DO MY_UNIT=1,NUNITS
+        DO MY_UNIT=1,UNITAB%NUNITS
 C
           TITR(1:nchartitle)=''
           MY_ID = UNITAB%UNIT_ID(MY_UNIT)
@@ -468,7 +453,7 @@ C           VARNAME: variable name in ref.extract (without blanks)
             CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),0,TEMP_DOUBLE)
           END IF
 C
-        END DO ! MY_UNIT=1,NUNITS
+        END DO ! MY_UNIT=1,UNITAB%NUNITS
 C
       END IF
 C-----------------------------------------------
@@ -507,19 +492,19 @@ C     /ALE/GRID/ *
 C----------------------------------------------
       OK_QA = MYQAKEY('/ALE/GRID')
       IF (OK_QA) THEN
-         TEMP_DOUBLE = ALPHA
+         TEMP_DOUBLE = ALE%GRID%ALPHA
          WRITE(VARNAME,'(A)') 'ALPHA_'
          CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),0,TEMP_DOUBLE)
-         TEMP_DOUBLE = GAMMA
+         TEMP_DOUBLE = ALE%GRID%GAMMA
          WRITE(VARNAME,'(A)') 'GAMMA_'
          CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),0,TEMP_DOUBLE)
-         TEMP_DOUBLE = VGX
+         TEMP_DOUBLE = ALE%GRID%VGX
          WRITE(VARNAME,'(A)') 'VGX_'
          CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),0,TEMP_DOUBLE)
-         TEMP_DOUBLE = VGY
+         TEMP_DOUBLE = ALE%GRID%VGY
          WRITE(VARNAME,'(A)') 'VGY_'
          CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),0,TEMP_DOUBLE)
-         TEMP_DOUBLE = VGZ
+         TEMP_DOUBLE = ALE%GRID%VGZ
          WRITE(VARNAME,'(A)') 'VGZ_'
          CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),0,TEMP_DOUBLE)
       ENDIF
@@ -541,13 +526,13 @@ C     /UPWIND
 C----------------------------------------------
       OK_QA = MYQAKEY('/UPWIND')
       IF (OK_QA) THEN
-         TEMP_DOUBLE = UPWMG
+         TEMP_DOUBLE = ALE%UPWIND%UPWMG
          WRITE(VARNAME,'(A)') 'UPCOEF1_'
          CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),0,TEMP_DOUBLE)
-         TEMP_DOUBLE = UPWOG
+         TEMP_DOUBLE = ALE%UPWIND%UPWOG
          WRITE(VARNAME,'(A)') 'UPCOEF2_'
          CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),0,TEMP_DOUBLE)
-         TEMP_DOUBLE = UPWSM
+         TEMP_DOUBLE = ALE%UPWIND%UPWSM
          WRITE(VARNAME,'(A)') 'UPCOEF3_'
          CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),0,TEMP_DOUBLE)
       ENDIF

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -30,9 +30,9 @@ Chd|        ALESO2T                       source/ale/ale2d/aleso2t.F
 Chd|        ALESO3                        source/ale/ale3d/aleso3.F     
 Chd|        ALESOP                        source/ale/alesop.F           
 Chd|        ALE_CHECK_LAG                 source/ale/ale_check_lag.F    
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|====================================================================
       SUBROUTINE ALELEC(
      1      ICODE    ,IXS     , IXQ      , IXC             ,IXT    ,
@@ -57,6 +57,12 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
+C   C o m m o n   B l o c k s
+C-----------------------------------------------
+#include      "com01_c.inc"
+#include      "com04_c.inc"
+#include      "param_c.inc"
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER,INTENT(IN) :: ICODE(*),IXS(3,NUMNOD),IXQ(NIXQ,NUMELQ),IXC(NIXC,NUMELC),IXT(NIXT,NUMELT),IXTG(NIXTG,NUMELTG)
@@ -65,13 +71,6 @@ C-----------------------------------------------
       TYPE(MULTI_FVM_STRUCT), INTENT(IN) :: MULTI_FVM
       TYPE(t_ale_connectivity), INTENT(INOUT) :: ALE_CONNECTIVITY
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "ale_param.inc"
-#include      "param_c.inc"
-C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER :: I
@@ -79,10 +78,11 @@ C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------
       CALL ALE_CONNECTIVITY%ALE_COMPUTE_EE_CONNECTIVITY(
-     .     PM  , NPROPM, NUMMAT, NUMNOD , NUMELQ, NUMELTG, NUMELS, N2D, 
-     .     IALE, IEULER, ITHERM, IALELAG, 
-     .     NIXQ, NIXTG , NIXS  , ITAB   , 
-     .     IXQ , IXTG  , IXS)
+     .     PM     , IGEO,
+     .     NPROPGI, NUMGEO, NPROPM, NUMMAT , NUMNOD , NUMELQ, NUMELTG, NUMELS, N2D, 
+     .     IALE   , IEULER, ITHERM, IALELAG, 
+     .     NIXQ   , NIXTG , NIXS  , ITAB   , 
+     .     IXQ    , IXTG  , IXS   )
       
       IF (ALE_CONNECTIVITY%has_ne_connect .OR. ALE_CONNECTIVITY%has_nn_connect) THEN
          CALL ALE_CONNECTIVITY%ALE_COMPUTE_CONNECTIVITY(

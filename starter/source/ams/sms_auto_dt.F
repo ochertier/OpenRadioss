@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,13 +27,13 @@ Chd|        INITIA                        source/elements/initia/initia.F
 Chd|-- calls ---------------
 Chd|        NOD_SMS_DT                    source/ams/sms_auto_dt.F      
 Chd|        NOD_SMS_DT_SOL                source/ams/sms_auto_dt.F      
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE SMS_AUTO_DT(DTELEM,NATIV_SMS,
      1  IXS     ,IXQ      ,IXC     ,IXT     ,IXP       ,
      2  IXR     ,IXTG     ,IXS10   ,IXS16   ,IXS20     ,
      3  IPARTS  ,IPARTQ   ,IPARTC  ,IPARTT  ,IPARTP    ,
-     4  IPARTR  ,IPARTUR  ,IPARTG  ,IPARTX  ,IPART     ,
+     4  IPARTR  ,IPARTG  ,IPARTX  ,IPART     ,
      5  IPARG   ,ELBUF_TAB,IGEO    ,IDDLEVEL,TAGPRT_SMS)
 C-----------------------------------------------
 C   M o d u l e s
@@ -48,12 +48,9 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com06_c.inc"
 #include      "param_c.inc"
-#include      "scr15_c.inc"
 #include      "scr17_c.inc"
 #include      "sphcom.inc"
-#include      "rnur_c.inc"
 #include      "units_c.inc"
 #include      "sms_c.inc"
 C-----------------------------------------------
@@ -63,7 +60,7 @@ C-----------------------------------------------
      .   IXS(NIXS,*),IXS10(6,*) ,IXS16(8,*) ,IXS20(12,*),
      .   IXQ(NIXQ,*),IXC(NIXC,*), IXT(NIXT,*), IXP(NIXP,*),
      .   IXR(NIXR,*),IXTG(NIXTG,*),IPARTS(*),IPARTQ(*),IPARTC(*),
-     .   IPARTT(*),IPARTP(*),IPARTR(*),IPARTUR(*),IPARTG(*),IPARTX(*),
+     .   IPARTT(*),IPARTP(*),IPARTR(*),IPARTG(*),IPARTX(*),
      .   IPARG(NPARG,NGROUP),IGEO(NPROPGI,*),IDDLEVEL, TAGPRT_SMS(*)
       my_real
      .   DTELEM(*)
@@ -141,7 +138,7 @@ C-----------------------------------------------
 C     Calcul des index dans dtelem pour chaque type d'element
 C-----------------------------------------------
 C
-      NUMEL= NUMELC+NUMELS+NUMELT+NUMELQ+NUMELP+NUMELR+NUMELUR+NUMELTG
+      NUMEL= NUMELC+NUMELS+NUMELT+NUMELQ+NUMELP+NUMELR+NUMELTG
      .      +NUMELX+NUMSPH+NUMELIG3D
 C
       NUME(1) = NUMELS
@@ -150,7 +147,7 @@ C
       NUME(4) = NUMELT
       NUME(5) = NUMELP
       NUME(6) = NUMELR
-      NUME(7) = NUMELTG 	 
+      NUME(7) = NUMELTG    
       DT_INDEX(1)  = 0
       DO I=2,7
         DT_INDEX(I)  = DT_INDEX(I-1)  + NUME(I-1)
@@ -168,7 +165,7 @@ C
       TYPE_ELEM(7)='SHELL-3NODES'
 C
 C--------------------------------------------------
-C     Identification des elements a switcher en AMS	
+C     Identification des elements a switcher en AMS
 C--------------------------------------------------
 C
       DO NG=1,NGROUP
@@ -235,7 +232,7 @@ C
       ENDDO
 C
 C------------------------------------------------------------------
-C     Printout of selected elements - only at first call of initia	
+C     Printout of selected elements - only at first call of initia
 C------------------------------------------------------------------
 C
       IF (IDDLEVEL == 0) THEN
@@ -297,13 +294,9 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 #include      "sms_c.inc"
 #include      "scr17_c.inc"
 #include      "param_c.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -344,8 +337,8 @@ C
             IF(TAG(I)==0)THEN
               TAGN_SMS(I)=1
               TAG(I)=1
-            END IF		    
-          END IF		    
+            END IF        
+          END IF        
         ENDDO
         IF (TAGPRT_SMS(ID_PART)==0) THEN
           COMPT = COMPT + 1
@@ -378,13 +371,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
-#include      "sms_c.inc"
-#include      "scr17_c.inc"
-#include      "param_c.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -416,8 +402,8 @@ C
               IF(TAG(I)==0)THEN
                 TAGN_SMS(I)=1
                 TAG(I)=1
-              END IF		    
-            END IF		    
+              END IF        
+            END IF        
           ENDDO
 C
         ENDIF

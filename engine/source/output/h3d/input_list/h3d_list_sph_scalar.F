@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -48,7 +48,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "chara_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
@@ -155,8 +154,9 @@ c-----------------------------------------------
       H3D_KEYWORD_SPH_SCALAR(I)%TEXT1  = 'Burn Fraction'
 c-----------------------------------------------
       I = I + 1
-      H3D_KEYWORD_SPH_SCALAR(I)%KEY3  = 'DAMA'
-      H3D_KEYWORD_SPH_SCALAR(I)%TEXT1  = 'MAX DAMAGE ELEMENT'
+      H3D_KEYWORD_SPH_SCALAR(I)%KEY3    = 'DAMA'
+      H3D_KEYWORD_SPH_SCALAR(I)%TEXT1   = 'MAX DAMAGE'
+      H3D_KEYWORD_SPH_SCALAR(I)%COMMENT = 'maximum of damage over time and of all failure criteria acting in one material'
 c-----------------------------------------------
       I = I + 1
       H3D_KEYWORD_SPH_SCALAR(I)%KEY3  = 'DOMAIN'
@@ -220,6 +220,12 @@ c-----------------------------------------------
       H3D_KEYWORD_SPH_SCALAR(I)%KEY3  = 'TILLOTSON'
       H3D_KEYWORD_SPH_SCALAR(I)%TEXT1  = 'Region identifier in p,v diagram'
       H3D_KEYWORD_SPH_SCALAR(I)%COMMENT  = '1:compressed, 2:expanded cold, 3:transition, 4:hot expansion'
+c-----------------------------------------------
+      I = I + 1
+      H3D_KEYWORD_SPH_SCALAR(I)%KEY3    = 'FAILURE'
+      H3D_KEYWORD_SPH_SCALAR(I)%IS_ID   = 1
+      H3D_KEYWORD_SPH_SCALAR(I)%TEXT1   = 'Failure'
+      H3D_KEYWORD_SPH_SCALAR(I)%COMMENT = 'Damage of current failure criterion'
 c-----------------------------------------------
 
 

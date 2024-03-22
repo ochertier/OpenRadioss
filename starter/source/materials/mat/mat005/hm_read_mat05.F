@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -28,15 +28,16 @@ Chd|-- calls ---------------
 Chd|        HM_GET_FLOATV                 source/devtools/hm_reader/hm_get_floatv.F
 Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
 Chd|        HM_OPTION_IS_ENCRYPTED        source/devtools/hm_reader/hm_option_is_encrypted.F
+Chd|        INIT_MAT_KEYWORD              source/materials/mat/init_mat_keyword.F
 Chd|        ELBUFTAG_MOD                  share/modules1/elbuftag_mod.F 
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/matparam_def_mod.F
+Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
       SUBROUTINE HM_READ_MAT05(UPARAM ,MAXUPARAM,NUPARAM  ,ISRATE   , IMATVIS  ,
      .                         NUVAR  ,IFUNC    ,MAXFUNC  ,NFUNC    , PARMAT   , 
      .                         UNITAB ,MAT_ID   ,TITR     ,MTAG     , LSUBMODEL,
-     .                         PM     ,IPM      ,UID)
+     .                         PM     ,IPM      ,UID      ,MATPARAM )
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C-----------------------------------------------
@@ -60,6 +61,7 @@ C-----------------------------------------------
       USE MESSAGE_MOD      
       USE SUBMODEL_MOD
       USE MATPARAM_DEF_MOD          
+      USE UNITAB_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -68,13 +70,7 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr17_c.inc"
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
 #include      "units_c.inc"
-#include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "submod_c.inc"
-#include      "sysunit.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -85,8 +81,9 @@ C-----------------------------------------------
       TYPE(MLAW_TAG_),INTENT(INOUT)         :: MTAG
       INTEGER,INTENT(IN)                    :: MAT_ID
       CHARACTER*nchartitle,INTENT(IN)       :: TITR
-      my_real,INTENT(IN)                    :: UNITAB(LUNIT,NUNITS)
+      TYPE(UNIT_TYPE_), INTENT(IN)          :: UNITAB
       TYPE(SUBMODEL_DATA),INTENT(IN)        :: LSUBMODEL(NSUBMOD)
+      TYPE(MATPARAM_STRUCT_),INTENT(INOUT)  :: MATPARAM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -101,7 +98,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C     S o u r c e   L i n e s
 C-----------------------------------------------
-      IPM(4) = 15
+      IPM(4) = 15       ! internal EOS TYPE
+!      MATPARAM%IEOS = 15
       TBEGIN = ZERO
       TEND = INFINITY
       IBFRAC = 0
@@ -126,8 +124,8 @@ C-----------------------------------------------
       
       !unit needed for millers extension
       IFLAGUNIT = 0                            
-      DO J=1,NUNITS                            
-        IF (NINT(UNITAB(1,J)) == UID) THEN     
+      DO J=1,UNITAB%NUNITS                            
+        IF (UNITAB%UNIT_ID(J) == UID) THEN     
           IFLAGUNIT = 1                        
           EXIT                                 
         ENDIF                                  
@@ -258,14 +256,21 @@ C-----------------------------------------------
       MTAG%L_TEMP   = 1
       MTAG%L_BFRAC  = 1 
       MTAG%L_ABURN  = 1       
-      
+
+      !======== MATPARAM KEYWORDS
+      ! EOS/Thermo keyword
+      CALL INIT_MAT_KEYWORD(MATPARAM,"HYDRO_EOS")
+      ! Properties compatibility
+      CALL INIT_MAT_KEYWORD(MATPARAM,"SOLID_ISOTROPIC")
+      CALL INIT_MAT_KEYWORD(MATPARAM,"SPH")      
+
       !======== LISTING OUTPUT
       WRITE(IOUT,1001) TRIM(TITR),MAT_ID,5
       WRITE(IOUT,1000)     
       IF(IS_ENCRYPTED)THEN
          WRITE(IOUT,'(5X,A,//)')'CONFIDENTIAL DATA'
       ELSE
-         WRITE(IOUT,1002) RHO0,RHOR
+         WRITE(IOUT,1002)RHO0,RHOR
          WRITE(IOUT,1300)A,B,R1,R2,W
          WRITE(IOUT,1400)D,PCJ,VCJ,E0,C0,PSH,BULK,IBFRAC
          !AFTERBURNING OPTIONAL MODEL

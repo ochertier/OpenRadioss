@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -35,7 +35,7 @@ Chd|        INELTS_NP                     source/interfaces/inter3d1/i24sti3.F
 Chd|        INSOL3                        source/interfaces/inter3d1/insol3.F
 Chd|-- calls ---------------
 Chd|====================================================================
-      SUBROUTINE NORMA1(N1,N2,N3,AREA)
+      SUBROUTINE NORMA1(N1,N2,N3,AREA,XX1,XX2,XX3)
 C
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -46,10 +46,7 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       my_real
      .   N1, N2, N3, AREA
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "scr07_c.2.inc"
+      my_real, INTENT(IN) :: XX1(4),XX2(4),XX3(4)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -82,25 +79,18 @@ Chd|-- called by -----------
 Chd|        INSOL3D                       source/interfaces/inter3d1/insol3.F
 Chd|-- calls ---------------
 Chd|====================================================================
-      SUBROUTINE NORMA1D(N1,N2,N3,AREA)
+      SUBROUTINE NORMA1D(N1,N2,N3,AREA,XX1,XX2,XX3)
 C
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       my_real
      .   N1, N2, N3, AREA
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "scr07_c.2.inc"
+      my_real, INTENT(IN) :: XX1(4),XX2(4),XX3(4)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -146,19 +136,11 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IRECT(4)
-C     REAL
       my_real
      .   N1, N2, N3, AREA, X(3,*)
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -206,19 +188,11 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IRECT(4),I1,I2
-C     REAL
       my_real
      .   N1, N2, N3, AREA, X(3,*),SHF(3)
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 c FUNCTION: calculate normale with perturbation
 C-----------------------------------------------

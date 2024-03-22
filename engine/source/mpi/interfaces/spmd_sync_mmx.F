@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -35,7 +35,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -47,7 +46,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com08_c.inc"
 #include      "param_c.inc"
 #include      "task_c.inc"
 C commun local a spmd_init et spmd_ring_mmx
@@ -278,10 +276,10 @@ C TZINF
               L = L + 1
 C DELTA_PMAX_GAP
               DELTA_PMAX_GAP(NIN)= MAX(DELTA_PMAX_GAP(NIN),SBUF(L) )
-	      L = L + 1
+                L = L + 1
 C T25 main gap changes with thickness change
               MAXDGAP(NIN)= MAX(MAXDGAP(NIN),SBUF(L) )
-	      L = L + 1
+                L = L + 1
             END IF
           END DO
         END DO
@@ -319,11 +317,11 @@ C
               L = L + 1
               SBUF(L+1) = TZINF(KK)
               L = L + 1
-	      SBUF(L+1) = DELTA_PMAX_GAP(NIN)
-	      L = L + 1
+                SBUF(L+1) = DELTA_PMAX_GAP(NIN)
+                L = L + 1
 C T25 main gap changes with thickness change
-	      SBUF(L+1) = MAXDGAP(NIN)
-	      L = L + 1
+                SBUF(L+1) = MAXDGAP(NIN)
+                L = L + 1
             END IF
           END DO
 C

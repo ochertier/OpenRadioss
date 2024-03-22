@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -28,7 +28,7 @@ Chd|-- calls ---------------
 Chd|        SPMD_EXCH_FR6                 source/mpi/kinematic_conditions/spmd_exch_fr6.F
 Chd|        SUM_6_FLOAT                   source/system/parit.F         
 Chd|        WEIGHT0                       source/elements/sph/weight.F  
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        INITBUF_MOD                   share/resol/initbuf.F         
 Chd|        SPHBOX                        share/modules/sphbox.F        
 Chd|====================================================================
@@ -47,20 +47,12 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com08_c.inc"
 #include      "param_c.inc"
-#include      "scr01_c.inc"
 #include      "sphcom.inc"
-#include      "task_c.inc"
-#include      "units_c.inc"
-#include      "vect01_c.inc"
 #include      "parit_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -75,48 +67,48 @@ C     REAL
       DOUBLE PRECISION SPHG_F6(4,6,NBGAUGE)
 C-----------------------------------------------
 c     GAUGE(3,*)
-c 1:  -Isolid				   -(NUMELS_G+1) if SPH gauge
+c 1:  -Isolid           -(NUMELS_G+1) if SPH gauge
 c 2:  GaugeId
 c 3:  +Node or -Shell
 c
 c     => GAUGE(LLGAUGE,*), LLGAUGE = 37
-c 1:  Dist (distance from Shell)	   Dist (distance from Shell)
-c 2:  XG				   XG
-c 3:  YG				   YG
-c 4:  ZG				   ZG
-c 5:  Alpha (Solid penetration ratio)	   not yet used
-c 6:    				   XSAV (SPH sorting)
-c 7:    				   YSAV (SPH sorting)
-c 8:    				   ZSAV (SPH sorting)
-c 9:    				   FF (sph only)
-c 10:   				   intantaneous Pressure
-c 11:   				   not yet available
-c 12:   				   intantaneous Rho
-c 13:   				   intantaneous E
-c 14:   				   ! Butterworth !
-c 15:   				   ! Butterworth !
-c 16:   				   ! Butterworth !
-c 17:   				   ! Butterworth !
-c 18:   				   ! Butterworth !
-c 19:   				   ! Butterworth !
-c 20:   			           ! Butterworth !
-c 21: 				           ! Butterworth !
-c 22: 				           ! Butterworth !
-c 23: 				           ! Butterworth !  
-c 24:   				   ! Butterworth !
-c 25:   				   ! Butterworth !
-c 26:   				   ! Butterworth !
-c 27:   				   ! Butterworth !
-c 28:   				   ! Butterworth !
-c 29:   				   ! Butterworth !
-c 30:  Pressure      		  	   filtered Pressure
-c 31:  PA            			   not yet available
-c 32:  Rho           			   filtered Rho
-c 33:  E             			   filtered E	     
-c 34:   				   ! Butterworth !
-c 35:   				   ! Butterworth !
-c 36:   				   ! Butterworth !
-c 37:   				   ! Butterworth !
+c 1:  Dist (distance from Shell)     Dist (distance from Shell)
+c 2:  XG           XG
+c 3:  YG           YG
+c 4:  ZG           ZG
+c 5:  Alpha (Solid penetration ratio)     not yet used
+c 6:               XSAV (SPH sorting)
+c 7:               YSAV (SPH sorting)
+c 8:               ZSAV (SPH sorting)
+c 9:               FF (sph only)
+c 10:              intantaneous Pressure
+c 11:              not yet available
+c 12:              intantaneous Rho
+c 13:              intantaneous E
+c 14:              ! Butterworth !
+c 15:              ! Butterworth !
+c 16:              ! Butterworth !
+c 17:              ! Butterworth !
+c 18:              ! Butterworth !
+c 19:              ! Butterworth !
+c 20:                    ! Butterworth !
+c 21:                    ! Butterworth !
+c 22:                    ! Butterworth !
+c 23:                    ! Butterworth !  
+c 24:              ! Butterworth !
+c 25:              ! Butterworth !
+c 26:              ! Butterworth !
+c 27:              ! Butterworth !
+c 28:              ! Butterworth !
+c 29:              ! Butterworth !
+c 30:  Pressure                 filtered Pressure
+c 31:  PA                     not yet available
+c 32:  Rho                    filtered Rho
+c 33:  E                      filtered E       
+c 34:              ! Butterworth !
+c 35:              ! Butterworth !
+c 36:              ! Butterworth !
+c 37:              ! Butterworth !
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -145,31 +137,31 @@ C------
         ENER   =ZERO
         RHO    =ZERO
 C------
-     	NVOIS=KXSP(4,N)
+          NVOIS=KXSP(4,N)
 C------
         SFGAUGE = KXSP(4,N) + KXSP(6,N)
         ALLOCATE(FGAUGE1(SFGAUGE),FGAUGE2(SFGAUGE),FGAUGE3(SFGAUGE),FGAUGE4(SFGAUGE))
 C------
-     	DO J=1,NVOIS
-     	  JNOD=IXSP(J,N)
-     	  IF(JNOD>0)THEN
-     	    M=NOD2SP(JNOD)
+          DO J=1,NVOIS
+            JNOD=IXSP(J,N)
+            IF(JNOD>0)THEN
+              M=NOD2SP(JNOD)
             IF(KXSP(2,M)<=0) CYCLE
-     	    XJ=X(1,JNOD)
-     	    YJ=X(2,JNOD)
-     	    ZJ=X(3,JNOD)
-     	    DJ  =SPBUF(1,M)
-     	    RHOJ=SPBUF(2,M)
-     	    VJ=SPBUF(12,M)/MAX(EM20,RHOJ)
-     	    CALL WEIGHT0(XI,YI,ZI,XJ,YJ,ZJ,DJ,WGHT)
+              XJ=X(1,JNOD)
+              YJ=X(2,JNOD)
+              ZJ=X(3,JNOD)
+              DJ  =SPBUF(1,M)
+              RHOJ=SPBUF(2,M)
+              VJ=SPBUF(12,M)/MAX(EM20,RHOJ)
+              CALL WEIGHT0(XI,YI,ZI,XJ,YJ,ZJ,DJ,WGHT)
             WCOMPI=VJ*WGHT
             PP=-THIRD*(WA(1,M)+WA(2,M)+WA(3,M))
             FGAUGE1(J) = WCOMPI
             FGAUGE2(J) = VJ*WGHT*PP
             FGAUGE3(J) = VJ*WGHT*RHOJ
             FGAUGE4(J) = ENER
-     	  END IF
-     	ENDDO
+            END IF
+          ENDDO
 C------
 C       partie symetrique.
         NVOISS=KXSP(6,N)
@@ -271,9 +263,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "r4r8_p.inc"
 #include      "com08_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

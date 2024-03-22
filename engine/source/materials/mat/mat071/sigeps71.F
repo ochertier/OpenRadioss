@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -97,12 +97,7 @@ C UVAR    |NEL*NUVAR| F |R/W| USER ELEMENT VARIABLE ARRAY
 C OFF     | NEL     | F |R/W| DELETED ELEMENT FLAG (=1. ON, =0. OFF)
 C---------+---------+---+---+--------------------------------------------
 #include      "param_c.inc"
-#include      "parit_c.inc"
-#include      "scr17_c.inc"
 #include      "scr05_c.inc"
-#include      "com01_c.inc"
-#include      "com08_c.inc"
-#include      "units_c.inc"
 C
       INTEGER NEL, NUPARAM, NUVAR,IPT,JTHE,
      .   NGL(NEL),MAT(NEL),IPLA,IPM(NPROPMI,*)
@@ -291,7 +286,7 @@ C
         SYY= TWO*GT(I)*(EE2(I) -EPSL*FM*NYY(I))
         SZZ= TWO*GT(I)*(EE3(I) -EPSL*FM*NZZ(I))
 
-	   SV =  SQRT( SXX*SXX + SYY*SYY + SZZ*SZZ  )
+             SV =  SQRT( SXX*SXX + SYY*SYY + SZZ*SZZ  )
 c       sound velocity    
         SOUNDSP(I) = SQRT(AA1/RHO0(I))
         
@@ -326,7 +321,7 @@ C   Check Austenite -----> martensite
          DFMAS = MIN(ONE,DFMAS  ) ! (should be positive)
         ENDIF
 C----------------------
-C   Check marteniste -----> austenite  (dependance au tempurature a voir ...)
+C   Check marteniste -----> austenite   
 c      Unloading function
         FS = SV + THREE*ALPHA*P  - CSA*TEMP(I)
         FSAS = FS -RSSA  
@@ -440,7 +435,7 @@ C
         SYY= G2*(EE2(I) -EPSL*FM*NYY(I))
         SZZ= G2*(EE3(I) -EPSL*FM*NZZ(I))
 
-	   SV =  SQRT( SXX*SXX + SYY*SYY + SZZ*SZZ  )
+             SV =  SQRT( SXX*SXX + SYY*SYY + SZZ*SZZ  )
 c       sound velocity    
         SOUNDSP(I) = SQRT(AA1/RHO0(I))
         VISCMAX(I) = ZERO
@@ -454,7 +449,7 @@ c loading function
        FS = SV + THREE*ALPHA*P - CAS*TEMP(I) ! loading function A--> M
        !FSS = FS - YLD_ASS 
 C----------------------
-C   Check Austenite -----> martensite  (dependance tempurature a voir ...)
+C   Check Austenite -----> martensite  
        FASS = FS -RSAS 
        FASF = FS -RFAS 
        FS0 = UVAR(I,2)
@@ -462,12 +457,12 @@ C   Check Austenite -----> martensite  (dependance tempurature a voir ...)
                 DFMAS = MIN(ONE, -(FS-FS0)*(ONE-FM)/(FASF-BETA*(ONE-FM) )  ) ! (should be positive)
        ENDIF
 C----------------------
-C   Check marteniste -----> austenite  (dependance au tempurature a voir ...)
+C   Check marteniste -----> austenite  
        FS = SV + THREE*ALPHA*P - CSA*TEMP(I) ! Unloading function M--> A
        FSAS = FS - RSSA
        FSAF = FS - RFSA
        FS0 = UVAR(I,3)
-       IF((FS - FS0) < ZERO .AND. FSAS < ZERO .AND. FSAF > ZERO ) THEN
+       IF((FS - FS0) < ZERO .AND. FSAS < ZERO .AND. FSAF > ZERO .AND. FM > ZERO ) THEN
                DFMSA =  MAX(-ONE , FM * (FS - FS0)/ (FSAF+BETA*FM) )  !compute marteniste fraction
        ENDIF
 C----------------------
@@ -476,15 +471,15 @@ C      new martensite fraction
        IF(DFM < ZERO .AND. FM == ZERO) DFM = ZERO
 C----------------------
        !UPDATE
-	  SXX =  SXX -G2* EPSL*DFM*NXX(I) 
-	  SYY =  SYY -G2* EPSL*DFM*NYY(I)
-	  SZZ =  SZZ -G2* EPSL*DFM*NZZ(I)
+            SXX =  SXX -G2* EPSL*DFM*NXX(I) 
+            SYY =  SYY -G2* EPSL*DFM*NYY(I)
+            SZZ =  SZZ -G2* EPSL*DFM*NZZ(I)
        P = P - K*EPSL*THREE*ALPHA*DFM
        !KIRCHHOFF STRESS
        SIGXX(I)= SXX + P
        SIGYY(I)= SYY + P
        SIGZZ(I)= SZZ + P
-	  SV =  SQRT( SXX*SXX + SYY*SYY + SZZ*SZZ ) 
+            SV =  SQRT( SXX*SXX + SYY*SYY + SZZ*SZZ ) 
        FS = SV + THREE*ALPHA*P      
        !CAUCHY STRESS
        IF(DET(I)/=zero)THEN 

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -46,6 +46,7 @@ Chd|        HM_READ_MONVOL_TYPE6          source/airbag/hm_read_monvol_type6.F
 Chd|        HM_READ_MONVOL_TYPE7          source/airbag/hm_read_monvol_type7.F
 Chd|        HM_READ_MONVOL_TYPE8          source/airbag/hm_read_monvol_type8.F
 Chd|        HM_READ_MONVOL_TYPE9          source/airbag/hm_read_monvol_type9.F
+Chd|        HM_READ_PCYL                  source/loads/general/load_pcyl/hm_read_pcyl.F
 Chd|        HM_READ_PFLUID                source/loads/general/pfluid/hm_read_pfluid.F
 Chd|        HM_READ_PRELOAD               source/loads/general/preload/hm_read_preload.F
 Chd|        HM_READ_RBODY                 source/constraints/general/rbody/hm_read_rbody.F
@@ -57,6 +58,7 @@ Chd|        INIPARSEN                     source/tools/sensor/iniparsen.F
 Chd|        INISEN                        source/tools/sensor/inisen.F  
 Chd|        INIT_MONVOL                   source/airbag/init_monvol.F   
 Chd|        INTER_DCOD_SENSOR             source/interfaces/reader/inter_dcod_sensor.F
+Chd|        LAW158_UPD                    source/materials/mat/mat158/law158_upd.F
 Chd|        LAW58_UPD                     source/materials/mat/mat058/law58_upd.F
 Chd|        LECTUR                        source/starter/lectur.F       
 Chd|        READ_MONVOL                   source/airbag/read_monvol.F   
@@ -87,11 +89,13 @@ Chd|        SORT_LOGICAL_SENSORS          source/tools/sensor/sort_logical_senso
 Chd|        ST_QAPRINT_DRIVER             source/output/qaprint/st_qaprint_driver.F
 Chd|        ST_QAPRINT_MODEL_TOOLS        source/output/qaprint/st_qaprint_model_tools.F
 Chd|        UPDMAT                        source/materials/updmat.F     
-Chd|        WRITE_SENSOR_TAB              source/tools/sensor/write_sensor_tab.F
+Chd|        WRCOMIP                       source/restart/ddsplit/wrcommp.F
+Chd|        WRITE_SENSORS                 source/tools/sensor/write_sensors.F
 Chd|        SET_U_SENS_FPAR               source/user_interface/uaccess.F
 Chd|        SET_U_SENS_IPAR               source/user_interface/uaccess.F
 Chd|        SET_U_SENS_SPMD_NODE_LIST     source/tools/sensor/set_u_sens_spmd_node_list.F
-Chd|        SENSOR_VARIABLE_MOD           share/modules1/sensor_mod.F   
+Chd|        USER_INTERFACE_MOD            share/modules1/user_interface_mod.F
+Chd|        USER_SENSOR_MOD               share/modules1/user_interface_mod.F
 Chd|-- calls ---------------
 Chd|====================================================================
       MODULE SENSOR_MOD
@@ -121,9 +125,10 @@ C-----------------------------------------------
       PARAMETER (ISENPARI=3)
       PARAMETER (ISENPARR=203)
 
+
       TYPE SENSOR_STR_
         INTEGER :: TYPE        !   sensor type 
-        INTEGER :: SENS_ID     !   sensor ID
+        INTEGER :: SENS_ID     !   sensor User ID
         INTEGER :: STATUS      !   sensor status
                                !          = 0   : deactivated
                                !          = 1   : activated at TSTART
@@ -132,13 +137,14 @@ C-----------------------------------------------
         my_real :: TMIN        !   time duration of crit value before activation
         my_real :: TDELAY      !   time delay before activation (after Tmin)
         my_real :: TSTART      !   time when sensor is finally activated (for output)
-        my_real :: VALUE       !   actual value of sensor criterion
+        my_real :: VALUE       !   actual sensor value
         INTEGER :: NPARI       !   number of constant integer parameters
         INTEGER :: NPARR       !   number of constant real value parameters
         INTEGER :: NVAR        !   number of internal variables
         INTEGER ,DIMENSION(:) ,ALLOCATABLE :: IPARAM  !  integer parameter array
         my_real ,DIMENSION(:) ,ALLOCATABLE :: RPARAM  !  real parameter array
         my_real ,DIMENSION(:) ,ALLOCATABLE :: VAR     !  internal variables array
+        ! User Sensor buffers
         INTEGER ,DIMENSION(:) ,ALLOCATABLE :: INTEGER_USERBUF    !  Buffer to store integer variables
         my_real ,DIMENSION(:) ,ALLOCATABLE :: FLOAT_USERBUF      !  Buffer to store user variables.
         INTEGER ,DIMENSION(:) ,ALLOCATABLE :: INTEGER_USERPARAM  !  Buffer to store integer variables
@@ -160,30 +166,36 @@ C-----------------------------------------------
 c
       INTEGER LOGICAL_SENSOR_COUNT
       INTEGER, DIMENSION(:),ALLOCATABLE :: LOGICAL_SENSORS_LIST
+      
+      
+      ! -----------------------------------
+      !  Main sensor data structure    
+      ! -----------------------------------
+      TYPE SENSORS_
+      
+        INTEGER :: NSENSOR
+        INTEGER :: STABSEN
+        INTEGER :: SFSAV
+        INTEGER :: NSTOP
+        INTEGER :: NSTAT
+        INTEGER :: NOUTP
+        INTEGER :: NANIM
+
+
+        TYPE (SENSOR_STR_) ,DIMENSION(:)     ,ALLOCATABLE :: SENSOR_TAB
+            
+        DOUBLE PRECISION   ,DIMENSION(:,:,:) ,ALLOCATABLE :: FSAV  ! smpd communication array for "force" sensors
+        INTEGER            ,DIMENSION(:)     ,ALLOCATABLE :: TABSENSOR  
+
+      END TYPE SENSORS_
+
+      
+      
+      
 c--------------------------
       END MODULE SENSOR_MOD
 
 
-Chd|====================================================================
-Chd|  SENSOR_VARIABLE_MOD           share/modules1/sensor_mod.F   
-Chd|-- called by -----------
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|        SORT_LOGICAL_SENSORS          source/tools/sensor/sort_logical_sensors.F
-Chd|        SET_U_SENS_FPAR               source/user_interface/uaccess.F
-Chd|        SET_U_SENS_IPAR               source/user_interface/uaccess.F
-Chd|-- calls ---------------
-Chd|        SENSOR_MOD                    share/modules1/sensor_mod.F   
-Chd|====================================================================
-      MODULE SENSOR_VARIABLE_MOD
-C-----------------------------------------------
-         USE SENSOR_MOD
-C-----------------------------------------------
-C   m y _ r e a l
-C-----------------------------------------------
-#include      "my_real.inc"
-         TYPE (SENSOR_STR_)       ,DIMENSION(:) , ALLOCATABLE :: SENSOR_TAB       ! NSENSOR
 
-         ! Logical sensors : and, or,not,sens sorted list
-      END MODULE SENSOR_VARIABLE_MOD
       
 

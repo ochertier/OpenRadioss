@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -42,13 +42,10 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include "com01_c.inc"
 #include "com04_c.inc"
-#include "units_c.inc"
 #include "impl1_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -154,8 +151,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include "com01_c.inc"
@@ -196,8 +191,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -257,7 +250,7 @@ C------- actualise V',D',(t) --V->v(t+dt)-------
          ADT1 = DY_G*DT2
 c         CALL IMP_DT2(DT3)
          DT1_IMP = DT_IMP
-	 DT3 = DT2
+         DT3 = DT2
          ADT = (ONE-DY_G)*DT3
          BDT = (HALF-DY_B)*DT3*DT3
          DO I=NODFT,NODLT
@@ -315,13 +308,10 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com08_c.inc"
-#include      "scr05_c.inc"
 #include      "impl1_c.inc"
 #include      "impl2_c.inc"
 C-----------------------------------------------
@@ -409,15 +399,11 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com08_c.inc"
 #include      "impl1_c.inc"
-#include      "impl2_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -479,14 +465,8 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "com08_c.inc"
-#include      "impl1_c.inc"
 #include      "impl2_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -532,8 +512,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "impl2_c.inc"
@@ -552,142 +530,7 @@ C------------------------------------------
 C--------------------------------------------
       RETURN
       END
-C      SUBROUTINE CINER_DY(JFT    ,JLT     ,PM     ,MAT     ,GEO   ,
-C     1                   PID     ,AREA    ,VOLG   ,THK02   ,NPT   ,
-C     2                   IGTYP   ,IGEO    ,VQ     ,IXC     ,IXTG  ,
-C     3                   NNOD    )
-C-----------------------------------------------
-C   M o d u l e s
-C-----------------------------------------------
-C      USE IMP_DYNA
-C-----------------------------------------------
-C   I m p l i c i t   T y p e s
-C-----------------------------------------------
-C#include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C#include      "mvsiz_p.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C#include      "param_c.inc"
-C#include      "com01_c.inc"
-C#include      "com04_c.inc"
-C#include      "impl1_c.inc"
-C-----------------------------------------------
-C   D u m m y   A r g u m e n t s
-C-----------------------------------------------
-C      INTEGER JFT, JLT  ,NPT,IGTYP,NNOD
-C      INTEGER MAT(*), PID(*),IGEO(NPROPGI,*),IXC(NIXC,*),IXTG(NIXTG,*)
-C     REAL
-C      my_real
-C     .   GEO(NPROPG,*), PM(NPROPM,*), AREA(*),
-C     .   VOLG(*),THK02(*),VQ(3,3,*)
-C-----------------------------------------------
-C   L o c a l   V a r i a b l e s
-C-----------------------------------------------
-C      INTEGER I,MX,J,J2,JJ,N1,N2,N3,N4,MATLY(MVSIZ*100)
-C     REAL
-C      my_real
-C     .   RHO(MVSIZ),INE(MVSIZ),FAC,EMS,INZ(MVSIZ),
-C     .   IN_X,IN_Y,IN_Z
-C      my_real
-C     .   THKLY(MVSIZ*100),POSLY(MVSIZ,100)
-C-----------------------------------------------
-Ctmp      IF (IDYNA==0.OR.IRODDL==0) RETURN
-C
-C      DO I=JFT,JLT
-C        MX  =MAT(I)
-C        RHO(I)=PM(1,MX)
-C        INE(I)=ZERO
-C      ENDDO
-C      IF (NNOD==4) THEN
-C       FAC = FOURTH
-C      ELSEIF (NNOD==3) THEN
-C       FAC = THIRD
-C      ENDIF
-C----------------------------------------------
-C     MASSES,INERTIES ELEMENTAIRES /NNOD
-C----------------------------------------------
-C      IF (IGTYP==11 ) THEN
-C         CALL LAYINI (JFT    ,JLT    ,NPT    ,GEO    ,IGEO   ,
-C     .                MAT    ,PID    ,THKLY  ,MATLY  ,POSLY  ,
-C     .                IGTYP  )
-C         DO J=1,NPT
-C          J2=1+(J-1)*JLT
-C          MX  =MATLY(J2)
-C          DO I=JFT,JLT
-C           JJ = J2 - 1 + I
-C           EMS = PM(1,MX)*THKLY(JJ)*AREA(I)*FAC
-C           INE(I)=INE(I)+EMS*((AREA(I)+THKLY(JJ)*THKLY(JJ))*ONE_OVER_12+
-C     .                        POSLY(I,J)*POSLY(I,J))
-C          ENDDO
-C         ENDDO
-C      ELSE
-C        DO I=JFT,JLT
-C          EMS = RHO(I)*VOLG(I)*FAC
-C          INE(I)=EMS*(AREA(I)+THK02(I))*ONE_OVER_12
-C          INZ(I)=TWO*INE(I)
-C        ENDDO
-C      ENDIF
-C
-C      IF (NNOD==4) THEN
-C       DO I=JFT,JLT
-C        IN_X = INE(I)*VQ(1,1,I)*VQ(1,1,I)+INE(I)*VQ(2,1,I)*VQ(2,1,I)+
-C     .         INZ(I)*VQ(3,1,I)*VQ(3,1,I)
-C        IN_Y = INE(I)*VQ(1,2,I)*VQ(1,2,I)+INE(I)*VQ(2,2,I)*VQ(2,2,I)+
-C     .         INZ(I)*VQ(3,2,I)*VQ(3,2,I)
-C        IN_Z = INE(I)*VQ(1,3,I)*VQ(1,3,I)+INE(I)*VQ(2,3,I)*VQ(2,3,I)+
-C     .         INZ(I)*VQ(3,3,I)*VQ(3,3,I)
-C        N1 = IXC(2,I)
-C        N2 = IXC(3,I)
-C        N3 = IXC(4,I)
-C        N4 = IXC(5,I)
-C        DY_IN(1,N1) = DY_IN(1,N1) + IN_X
-C        DY_IN(2,N1) = DY_IN(2,N1) + IN_Y
-C        DY_IN(3,N1) = DY_IN(3,N1) + IN_Z
-C
-C        DY_IN(1,N2) = DY_IN(1,N2) + IN_X
-C        DY_IN(2,N2) = DY_IN(2,N2) + IN_Y
-C        DY_IN(3,N2) = DY_IN(3,N2) + IN_Z
-C
-C        DY_IN(1,N3) = DY_IN(1,N3) + IN_X
-C        DY_IN(2,N3) = DY_IN(2,N3) + IN_Y
-C        DY_IN(3,N3) = DY_IN(3,N3) + IN_Z
-C
-C        DY_IN(1,N4) = DY_IN(1,N4) + IN_X
-C        DY_IN(2,N4) = DY_IN(2,N4) + IN_Y
-C        DY_IN(3,N4) = DY_IN(3,N4) + IN_Z
-C       ENDDO
-C      ELSEIF (NNOD==3) THEN
-C       DO I=JFT,JLT
-C        IN_X = INE(I)*VQ(1,1,I)*VQ(1,1,I)+INE(I)*VQ(2,1,I)*VQ(2,1,I)+
-C     .         INZ(I)*VQ(3,1,I)*VQ(3,1,I)
-C        IN_Y = INE(I)*VQ(1,2,I)*VQ(1,2,I)+INE(I)*VQ(2,2,I)*VQ(2,2,I)+
-C     .         INZ(I)*VQ(3,2,I)*VQ(3,2,I)
-C        IN_Z = INE(I)*VQ(1,3,I)*VQ(1,3,I)+INE(I)*VQ(2,3,I)*VQ(2,3,I)+
-C     .         INZ(I)*VQ(3,3,I)*VQ(3,3,I)
-C        N1 = IXTG(2,I)
-C        N2 = IXTG(3,I)
-C        N3 = IXTG(4,I)
-C        DY_IN(1,N1) = DY_IN(1,N1) + IN_X
-C        DY_IN(2,N1) = DY_IN(2,N1) + IN_Y
-C        DY_IN(3,N1) = DY_IN(3,N1) + IN_Z
-C
-C        DY_IN(1,N2) = DY_IN(1,N2) + IN_X
-C        DY_IN(2,N2) = DY_IN(2,N2) + IN_Y
-C        DY_IN(3,N2) = DY_IN(3,N2) + IN_Z
-C
-C        DY_IN(1,N3) = DY_IN(1,N3) + IN_X
-C        DY_IN(2,N3) = DY_IN(2,N3) + IN_Y
-C        DY_IN(3,N3) = DY_IN(3,N3) + IN_Z
-C       ENDDO
-C      ENDIF
-C
-C      RETURN
-C      END
-Cq52d5-------------nouvelle routine-------
+
 Chd|====================================================================
 Chd|  QSTAT_INI                     source/implicit/imp_dyna.F    
 Chd|-- called by -----------
@@ -710,14 +553,11 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
-#include      "units_c.inc"
 #include      "impl1_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -798,7 +638,6 @@ C
 C--------------------------------------------
       RETURN
       END
-Cq52d5-------------nouvelle routine-------
 Chd|====================================================================
 Chd|  QSTAT_IT                      source/implicit/imp_dyna.F    
 Chd|-- called by -----------
@@ -815,11 +654,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -839,7 +673,6 @@ C-----------------
 C--------------------------------------------
       RETURN
       END
-Cq52d5-------------nouvelle routine-------
 Chd|====================================================================
 Chd|  QSTAT_END                     source/implicit/imp_dyna.F    
 Chd|-- called by -----------
@@ -856,11 +689,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -887,7 +715,7 @@ Chd|        IMP_SOLV                      source/implicit/imp_solv.F
 Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
 Chd|        ARRET                         source/system/arret.F         
-Chd|        FORCE                         source/loads/general/force.F  
+Chd|        FORCE_IMP                     source/loads/general/force_imp.F
 Chd|        GRAVIT_IMP                    source/loads/general/grav/gravit_imp.F
 Chd|        SPMD_MAX_I                    source/mpi/implicit/imp_spmd.F
 Chd|        SPMD_SUMF_A                   source/mpi/implicit/imp_spmd.F
@@ -897,6 +725,7 @@ Chd|        H3D_MOD                       share/modules/h3d_mod.F
 Chd|        IMP_DYNA                      share/modules/impbufdef_mod.F 
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
+Chd|        TH_SURF_MOD                   ../common_source/modules/interfaces/th_surf_mod.F
 Chd|====================================================================
       SUBROUTINE DYNA_INA(IBCL  ,FORC   ,NPC   ,TF    ,A     ,
      2                    V     ,X      ,SKEW  ,AR    ,VR    ,
@@ -904,7 +733,10 @@ Chd|====================================================================
      4                    FSKY  ,IGRV   ,AGRV  ,MS    ,IN    ,
      5                    LGRAV ,ITASK ,NRBYAC,IRBYAC ,NPBY  ,
      6                    RBY   ,FR_ELEM,IAD_ELEM  ,NDDL  ,NNZK,
-     7                    IDIV  ,H3D_DATA,CPTREAC,FTHREAC,NODREAC)
+     7                    IDIV  ,H3D_DATA,CPTREAC,FTHREAC,NODREAC,
+     8                    NSENSOR,TH_SURF ,FSAVSURF, NSEG_LOADP,DPL0CLD,
+     9                    VEL0CLD,   D,  DR,  NUMNOD,NSURF,
+     A                    NFUNCT,NCONLD,NGRAV,NINVEL)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -912,27 +744,24 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE H3D_MOD
       USE SENSOR_MOD
+      USE TH_SURF_MOD , ONLY : TH_SURF_
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include "com01_c.inc"
-#include "com04_c.inc"
 #include "com08_c.inc"
 #include "impl1_c.inc"
 #include "param_c.inc"
 #include "timeri_c.inc"
-#include "scr05_c.inc"
-#include "units_c.inc"
 #include "impl2_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER ,INTENT(IN) :: NSENSOR,NUMNOD,NSURF,NFUNCT,NCONLD,NGRAV,NINVEL
       INTEGER ITASK,NPC(*), IBCL(*), NPBY(NNPBY,*), IADS_F(*),
      .        IGRV(*),WEIGHT(*),LGRAV(*),IDIV,
      .        CPTREAC,NODREAC(*)
@@ -944,13 +773,20 @@ C     REAL
      .   A(3,*) ,AR(3,*),TFEXC,FSKY(*),FTHREAC(6,*)
       TYPE(H3D_DATABASE) :: H3D_DATA
       TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE (TH_SURF_) , INTENT(IN) :: TH_SURF
+      my_real, INTENT(INOUT) :: FSAVSURF(5,NSURF)
+      INTEGER, INTENT(INOUT) :: NSEG_LOADP(NSURF)
+      my_real, INTENT(IN) :: 
+     .   DPL0CLD(6,NCONLD),VEL0CLD(6,NCONLD),
+     .   D(3,NUMNOD),DR(3,NUMNOD)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,J,N, NCL_MAX,LBAND,NTMP,NODFT,NODLT,IER1,IER2
       my_real
-     .   TMP,ADT,BDT,BDTI,RBID
+     .   TMP,ADT,BDT,BDTI,DUMMY_FEXT(3,1)
 C--------------------------------
+       DUMMY_FEXT = ZERO
        NODFT = 1
        NODLT = NUMNOD
 C-----allocation supp----
@@ -979,7 +815,7 @@ C-----------divergence at first step--------
       ELSE
          ADT = (ONE-DY_G)
          BDT = (HALF-DY_B)*DT0_IMP
-	 BDTI =ONE/(BDT-ADT*DT0_IMP)
+         BDTI =ONE/(BDT-ADT*DT0_IMP)
          DO N=NODFT,NODLT
            DY_A(1,N) = ZERO
            DY_A(2,N) = ZERO
@@ -1008,11 +844,13 @@ C---estimation a(t=0)----
         IF (TT==DT2) TT = ZERO
         IF(NCONLD/=0) THEN
           IF (IMON>0) CALL STARTIME(4,ITASK+1)
-          CALL FORCE(IBCL  ,FORC  ,NPC   ,TF  ,DY_A  ,
+          CALL FORCE_IMP(IBCL  ,FORC  ,NPC   ,TF  ,DY_A  ,
      2               V     ,X     ,SKEW  ,DY_AR,VR    ,
-     3               SENSOR_TAB,WEIGHT,TFEXC,
-     4               IADS_F,FSKY  ,FSKY,RBID,H3D_DATA,
-     5               CPTREAC,FTHREAC,NODREAC)
+     3               NSENSOR,SENSOR_TAB,TFEXC,
+     4               IADS_F,FSKY  ,FSKY,DUMMY_FEXT,H3D_DATA,
+     5               CPTREAC,FTHREAC,NODREAC,TH_SURF ,FSAVSURF,
+     6               NSEG_LOADP,DPL0CLD ,VEL0CLD ,D       ,DR      ,
+     7               NCONLD ,NUMNOD    ,NSURF,NFUNCT)
          IF (NSPMD>1) THEN
           DO I=IAD_ELEM(1,1),IAD_ELEM(1,NSPMD+1)-1
             J = FR_ELEM(I)
@@ -1039,7 +877,7 @@ C---estimation a(t=0)----
           IF (IMON>0) CALL STARTIME(4,ITASK+1)
           CALL GRAVIT_IMP(IGRV  ,AGRV  ,NPC   ,TF    ,DY_A,
      2                    V     ,X     ,SKEW  ,MS,TFEXC,
-     3                    SENSOR_TAB,WEIGHT,LGRAV,ITASK,
+     3                    NSENSOR,SENSOR_TAB,WEIGHT,LGRAV,ITASK,
      4                    NRBYAC,IRBYAC,NPBY  ,RBY    )
           IF (IMON>0) CALL STOPTIME(4,ITASK+1)
         ENDIF
@@ -1129,7 +967,7 @@ Chd|  DYNA_WEX                      source/implicit/imp_dyna.F
 Chd|-- called by -----------
 Chd|        IMP_SOLV                      source/implicit/imp_solv.F    
 Chd|-- calls ---------------
-Chd|        FORCE                         source/loads/general/force.F  
+Chd|        FORCE_IMP                     source/loads/general/force_imp.F
 Chd|        GRAVIT_IMP                    source/loads/general/grav/gravit_imp.F
 Chd|        STARTIME                      source/system/timer.F         
 Chd|        STOPTIME                      source/system/timer.F         
@@ -1137,6 +975,7 @@ Chd|        WFV_IMP                       source/constraints/general/impvel/fv_i
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|        IMP_DYNA                      share/modules/impbufdef_mod.F 
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
+Chd|        TH_SURF_MOD                   ../common_source/modules/interfaces/th_surf_mod.F
 Chd|====================================================================
       SUBROUTINE DYNA_WEX(IBCL  ,FORC   ,NPC   ,TF    ,A     ,
      2                    V     ,X      ,SKEW  ,AR    ,VR    ,
@@ -1145,24 +984,25 @@ Chd|====================================================================
      5                    LGRAV ,ITASK ,NRBYAC,IRBYAC ,NPBY  ,
      6                    RBY   ,IBFV  ,VEL   ,D      ,DR    ,
      7                    IKC   ,IDDL  ,IFRAME,XFRAME ,NDOF  ,
-     8                    H3D_DATA,CPTREAC,FTHREAC,NODREAC)
+     8                    H3D_DATA,CPTREAC,FTHREAC,NODREAC,NSENSOR,
+     9                    TH_SURF ,FSAVSURF,NSEG_LOADP,DPL0CLD,
+     A                    VEL0CLD, NUMNOD,NSURF,NFUNCT,NCONLD,
+     B                    NGRAV,NFXVEL)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE IMP_DYNA
       USE H3D_MOD
       USE SENSOR_MOD
+      USE TH_SURF_MOD , ONLY : TH_SURF_
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include "com01_c.inc"
-#include "com04_c.inc"
 #include "com08_c.inc"
 #include "param_c.inc"
 #include "timeri_c.inc"
@@ -1170,6 +1010,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER ,INTENT(IN) :: NSENSOR,NUMNOD,NSURF,NFUNCT,NCONLD,NGRAV,NFXVEL
       INTEGER ITASK,NPC(*), IBCL(*), NPBY(NNPBY,*), IADS_F(*),
      .        IGRV(*),WEIGHT(*),LGRAV(*),
      .        IFRAME(LISKN,*),IBFV(*),IKC(*) ,IDDL(*),NDOF(*),
@@ -1184,46 +1025,55 @@ C     REAL
      .   FTHREAC(6,*)
       TYPE(H3D_DATABASE) :: H3D_DATA
       TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE (TH_SURF_) , INTENT(IN) :: TH_SURF
+      my_real, INTENT(INOUT) :: FSAVSURF(5,NSURF)
+      INTEGER, INTENT(INOUT) :: NSEG_LOADP(NSURF)
+      my_real, INTENT(IN) :: 
+     .   DPL0CLD(6,NCONLD),VEL0CLD(6,NCONLD)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER N,IBID,IW ,I,J,ND,J1
       my_real
-     .   TFEXC,RBID
+     .   TFEXC,DUMMY_FEXT(3,1)
+C--------------------------------
+       DUMMY_FEXT=ZERO
 C--------------------------------
        IF (IMON>0) CALL STARTIME(4,ITASK+1)
         IF(NCONLD/=0) THEN
-          CALL FORCE(IBCL  ,FORC  ,NPC   ,TF  ,A     ,
+          CALL FORCE_IMP(IBCL  ,FORC  ,NPC   ,TF  ,A     ,
      2               V     ,X     ,SKEW  ,AR  ,VR    ,
-     3               SENSOR_TAB,WEIGHT,TFEXC,
-     4               IADS_F,FSKY  ,FSKY, RBID,H3D_DATA,
-     5               CPTREAC,FTHREAC,NODREAC)
+     3               NSENSOR,SENSOR_TAB,TFEXC,
+     4               IADS_F,FSKY  ,FSKY, DUMMY_FEXT,H3D_DATA,
+     5               CPTREAC,FTHREAC,NODREAC,TH_SURF ,FSAVSURF,
+     6               NSEG_LOADP,DPL0CLD ,VEL0CLD ,D       ,DR      ,
+     7               NCONLD ,NUMNOD    ,NSURF,NFUNCT)
           TFEXT = TFEXT + TFEXC*DT2
         ENDIF
         IF(NGRAV/=0) THEN
           CALL GRAVIT_IMP(IGRV  ,AGRV  ,NPC   ,TF    ,A    ,
      2                    V     ,X     ,SKEW  ,MS,TFEXC,
-     3                    SENSOR_TAB,WEIGHT,LGRAV,ITASK,
+     3                    NSENSOR,SENSOR_TAB,WEIGHT,LGRAV,ITASK,
      5                    NRBYAC,IRBYAC,NPBY  ,RBY    )
           TFEXT = TFEXT + TFEXC*DT2
         ENDIF
         IF(NFXVEL/=0) THEN
           CALL WFV_IMP(IBFV  ,NPC    ,TF     ,VEL   ,SENSOR_TAB,
-     1                D      ,DR     ,IKC   ,IDDL  ,
+     1                D      ,DR     ,IKC   ,IDDL  ,NSENSOR   ,
      2                SKEW  ,IFRAME ,XFRAME  ,DY_A  ,DY_AR ,
      3                X     ,NDOF    ,MS     ,IN    ,WEIGHT,
      4                RBY   ,TFEXC   )
           TFEXT = TFEXT + TFEXC
         ENDIF
         IF(IDY_DAMP>0) THEN
-	 TFEXC = ZERO
+         TFEXC = ZERO
 C----------DY_DAM has been already condensed---
          DO I = 1 ,NUMNOD
-	  DO J=1,3
+          DO J=1,3
            ND = IDDL(I)+J
-	   IF (IKC(ND) == 0 )
+           IF (IKC(ND) == 0 )
      .      TFEXC = TFEXC +D(J,I)*(DY_DAM(J,I)+DY_DAM0(J,I))*HALF
-	  END DO
+          END DO
          ENDDO
          DO I = 1 ,NUMNOD
            DY_DAM0(1,I) = DY_DAM(1,I)
@@ -1232,10 +1082,10 @@ C----------DY_DAM has been already condensed---
          ENDDO
          IF (IRODDL/=0) THEN
           DO I = 1 ,NUMNOD
-	   DO J=4,NDOF(I)
+           DO J=4,NDOF(I)
             ND = IDDL(I)+J
-	    J1=J-3
-	    IF (IKC(ND) == 0 )
+            J1=J-3
+            IF (IKC(ND) == 0 )
      .      TFEXC = TFEXC +DR(J,I)*(DY_DAMR(J,I)+DY_DAMR0(J,I))*HALF
            ENDDO
           ENDDO
@@ -1266,14 +1116,10 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com08_c.inc"
-#include      "scr05_c.inc"
-#include      "impl1_c.inc"
 #include      "impl2_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -1307,7 +1153,7 @@ C
          ND = IDDL(I)+J
          ID = ND-NKC
           IF (J<=3) THEN
-	   MM = MKF
+           MM = MKF
           ELSE
            MM = MKM
           ENDIF
@@ -1327,7 +1173,7 @@ C
          ND = IDDL(I)+J
          ID = ND-NKC
           IF (J<=3) THEN
-	   MM = MKF
+           MM = MKF
           ELSE
            MM = MKM
           ENDIF
@@ -1361,12 +1207,9 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "com08_c.inc"
 #include      "scr05_c.inc"
 #include      "param_c.inc"
@@ -1678,12 +1521,9 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include "com01_c.inc"
-#include "com04_c.inc"
 #include "com08_c.inc"
 #include "impl1_c.inc"
 C-----------------------------------------------
@@ -1782,12 +1622,9 @@ C-----------------------------------------------
 #include "implicit_f.inc"
 #include "comlock.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com08_c.inc"
 #include      "impl2_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -1808,7 +1645,7 @@ C----------------------
       CALL MY_BARRIER
 C---------------------
          DT05=ZERO
-	 EN_K=ZERO
+         EN_K=ZERO
          DO I = NODFT ,NODLT
           MAS=MS(I)*WEIGHT(I)
           VX = DY_V(1,I) - DT05*DY_A(1,I)
@@ -1836,8 +1673,8 @@ C---------------------
 C----------------------
       CALL MY_BARRIER
 C---------------------
-	EFAC = R_N2/MAX(EM20,EN_I)
-	EFAC = MIN(ONE,EFAC)
+        EFAC = R_N2/MAX(EM20,EN_I)
+        EFAC = MIN(ONE,EFAC)
 C--------------------------------------------
       RETURN
       END
@@ -1860,8 +1697,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -1923,15 +1758,11 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr05_c.inc"
 #include      "param_c.inc"
-#include      "com08_c.inc"
 #include      "impl2_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -2077,13 +1908,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include  "impl1_c.inc"
-#include  "com01_c.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
 C     REAL
@@ -2138,16 +1962,11 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr05_c.inc"
 #include      "param_c.inc"
-#include      "com08_c.inc"
-#include      "impl2_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -2173,7 +1992,7 @@ C------- estimation of A(t+dt) w/ initial velocity------
         DO I=1,NDDL
          W(I)=ZERO
         ENDDO
-	NNZ=IADK(NDDL+1)-IADK(1)
+        NNZ=IADK(NDDL+1)-IADK(1)
        CALL MAV_LT(
      1             NDDL   ,NNZ   ,IADK,JDIK ,DIAG_K,
      2             LT_K   ,U     ,W     )
@@ -2282,14 +2101,8 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "com08_c.inc"
-#include      "impl1_c.inc"
 #include      "impl2_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s

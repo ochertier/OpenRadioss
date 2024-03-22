@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Cts
-Cts Centroids definition for secnd side of Interface Type18 and colocated scheme.
-Cts Input for secnd side is a GRBRIC. 
+C  
+C   Centroids definition for secnd side of Interface Type18 and colocated scheme.
+C   Input for secnd side is a GRBRIC. 
 Chd|====================================================================
 Chd|  INGRBRIC_CENTROIDS            source/interfaces/interf1/ingrbric_centroids.F
 Chd|-- called by -----------
 Chd|        LECINS                        source/interfaces/interf1/lecins.F
 Chd|-- calls ---------------
 Chd|====================================================================
-      SUBROUTINE INGRBRIC_CENTROIDS(NOINT,IBUFSSG,ITAB,MSV, IXS, NBRIC)
+      SUBROUTINE INGRBRIC_CENTROIDS(IBUFSSG,MSV, IXS, NBRIC)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -38,17 +38,14 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "units_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "param_c.inc"
 #include      "scr03_c.inc"
-#include      "warn_c.inc"
 #include      "scr17_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER,INTENT(IN)    :: NOINT,NBRIC
-      INTEGER,INTENT(IN)    :: IBUFSSG(NBRIC), ITAB(NUMNOD), IXS(NIXS,NUMELS)
+      INTEGER,INTENT(IN)    :: NBRIC
+      INTEGER,INTENT(IN)    :: IBUFSSG(NBRIC), IXS(NIXS,NUMELS)
       INTEGER,INTENT(INOUT), TARGET :: MSV(1:NUMNOD)
 C-----------------------------------------------
 C   L o c a l   V a r a i b l e s
@@ -63,7 +60,7 @@ C-----------------------------------------------
       ENDDO   
 
       !PRINTOUT
-      IF(IPRI>=1) THEN
+      IF(IPRI >= 1) THEN
         WRITE(IOUT,'(/,A,/)')' CENTROID EXTRACTED FROM SOLID ELEMENTS : '
         WRITE(IOUT,FMT=FMW_10I)(IXS(11,MSV(I)),I=1,NBRIC)
       ENDIF

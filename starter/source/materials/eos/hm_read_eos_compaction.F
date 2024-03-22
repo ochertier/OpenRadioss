@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -33,7 +33,7 @@ Chd|        ELBUFTAG_MOD                  share/modules1/elbuftag_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
-      SUBROUTINE HM_READ_EOS_COMPACTION(IOUT,PM,UNITAB,IUNIT,LSUBMODEL,IMIDEOS,EOS_TAG,IEOS,MAXEOS)
+      SUBROUTINE HM_READ_EOS_COMPACTION(IOUT,PM,UNITAB,IUNIT,LSUBMODEL,IMIDEOS,EOS_TAG,IEOS)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -57,7 +57,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "tabsiz_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -67,12 +66,10 @@ C-----------------------------------------------
       TYPE(SUBMODEL_DATA), DIMENSION(NSUBMOD), INTENT(IN) :: LSUBMODEL
       INTEGER,INTENT(IN) :: IMIDEOS
       TYPE(EOS_TAG_),DIMENSION(0:MAXEOS) ,INTENT(INOUT) :: EOS_TAG  
-      INTEGER,INTENT(IN) :: IEOS, MAXEOS
+      INTEGER,INTENT(IN) :: IEOS
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr17_c.inc"
-#include      "submod_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -81,12 +78,13 @@ C-----------------------------------------------
       my_real  C0,C1,C2,C3,MUMAX,BID,BUNL,MU,MUMIN
       my_real  MU0,SSP0,DF, G0, BULK,BULK2,P_, BB, POLD, MU2, MUOLD, ALPHA,DPDMU
       INTEGER IFORM, IOUTP
-      LOGICAL :: IS_ENCRYPTED, IS_AVAILABLE
+      LOGICAL :: IS_ENCRYPTED, IS_AVAILABLE, IS_AVAILABLE_RHO0
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------
       IS_ENCRYPTED = .FALSE.
       IS_AVAILABLE = .FALSE.
+      IS_AVAILABLE_RHO0 = .FALSE.
       IFORM=0
       IOUTP=1
       
@@ -106,7 +104,7 @@ C-----------------------------------------------
       CALL HM_GET_FLOATV('EOS_COM_B', BUNL, IS_AVAILABLE,LSUBMODEL,UNITAB)
 
       CALL HM_GET_FLOATV('LAW5_PSH', PSH, IS_AVAILABLE,LSUBMODEL,UNITAB)
-      CALL HM_GET_FLOATV('Refer_Rho', RHO0, IS_AVAILABLE,LSUBMODEL,UNITAB)
+      CALL HM_GET_FLOATV('Refer_Rho', RHO0, IS_AVAILABLE_RHO0,LSUBMODEL,UNITAB)
 
       RHOR = PM(1)
       RHOI = PM(89)
@@ -119,12 +117,7 @@ C-----------------------------------------------
       ENDIF
             
       IF(C1 <= ZERO)THEN
-         CALL ANCMSG(MSGID=67,
-     .               MSGTYPE=MSGERROR,
-     .               ANMODE=ANINFO,
-     .               I1=IMIDEOS,
-     .               C1='/EOS/COMPACTION',
-     .               C2='C1 MUST BE POSITIVE')
+         CALL ANCMSG(MSGID=67,MSGTYPE=MSGERROR,ANMODE=ANINFO,I1=IMIDEOS,C1='/EOS/COMPACTION',C2='C1 MUST BE POSITIVE')
       ENDIF
 
       !IFORM=1 : CONSTANT unload modulus BUNL (DEFAULT)
@@ -204,6 +197,7 @@ C-----------------------------------------------
         WRITE(IOUT,'(5X,A,//)')'CONFIDENTIAL DATA'
       ELSE
         WRITE(IOUT,1500)C0,C1,C2,C3,PSH,BUNL,MUMIN,MUMAX
+        IF(IS_AVAILABLE_RHO0)WRITE(IOUT,1503)PM(1)
         IF(IOUTP == 1)THEN
           IF(IFORM==10)THEN
              WRITE(IOUT,1510)
@@ -227,13 +221,15 @@ C-----------------------------------------------
      & 5X,'PRESSURE SHIFT. . . . . . . . . . . . . . .=',1PG20.13/,
      & 5X,'BUNL : UNLOADING MODULUS. . . . . . . . . .=',1PG20.13/,
      & 5X,'MU_MIN : ELASTIC LIMIT. . . . . . . . . . .=',1PG20.13/,
-     & 5X,'MU_MAX : MAXIMUM COMPACTION . . . . . . . .=',1PG20.13/)
+     & 5X,'MU_MAX : MAXIMUM COMPACTION . . . . . . . .=',1PG20.13)    
  1510 FORMAT(
      & 5X,'LEGACY FORMULATION'/)
  1501 FORMAT(
      & 5X,'CONSTANT UNLOAD MODULUS'/)
  1502 FORMAT(
      & 5X,'CONTINUOUS UNLOAD MODULUS FROM C1 TO BUNL IN RANGE [MUMIN,MUMAX]'/)
+ 1503 FORMAT(     
+     & 5X,'EOS REFERENCE DENSITY . . . . . . . . . .=',1PG20.13)      
 
       RETURN
   

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -51,23 +51,13 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com02_c.inc"
-#include      "com03_c.inc"
 #include      "com04_c.inc"
 #include      "units_c.inc"
-#include      "warn_c.inc"
 #include      "param_c.inc"
 #include      "scr03_c.inc"
-#include      "scr05_c.inc"
-#include      "scr12_c.inc"
 #include      "scr17_c.inc"
-#include      "conv_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -325,14 +315,14 @@ C=======================================================================
 C-----new subsuf/suf on edge-----
       IF(IEDGE == 4)THEN
         ISHIF=0
-         CALL I24EDGE2(IALLO   ,IGRSURF(ISU1)%NSEG,NLN     ,IEDGE-1  ,
+         CALL I24EDGE2(IALLO   ,IGRSURF(ISU1)%NSEG,NLN     ,
      1                 IGRSURF(ISU1)%NODES ,ITAB  ,ISU1    ,
      2                 X       ,EDG_COS ,MBINFLG  ,ISHIF   ,NLS1    ,
      3                 IRECT   ,NRTSE   ,IRTSE    ,NSNE    ,IS2SE   ,
      4                 IS2PT   ,NSN     ,NSV      ,IS2ID)
         ISHIF=NSU1
         IF(ISU2 /= 0 .AND. ILEV /= 1) THEN
-         CALL I24EDGE2(IALLO   ,IGRSURF(ISU2)%NSEG,NLN     ,IEDGE-1 ,
+         CALL I24EDGE2(IALLO   ,IGRSURF(ISU2)%NSEG,NLN     ,
      1                 IGRSURF(ISU2)%NODES ,ITAB  ,ISU2    ,
      2                 X       ,EDG_COS ,MBINFLG  ,ISHIF   ,NLS2    ,
      3                 IRECT   ,NRTSE   ,IRTSE    ,NSNE    ,IS2SE   ,
@@ -444,23 +434,12 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com02_c.inc"
-#include      "com03_c.inc"
 #include      "com04_c.inc"
 #include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "param_c.inc"
 #include      "scr03_c.inc"
-#include      "scr05_c.inc"
-#include      "scr12_c.inc"
 #include      "scr17_c.inc"
-#include      "conv_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -901,13 +880,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "param_c.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NRTM0,IEDG,NRTM
@@ -981,9 +953,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1139,7 +1109,6 @@ C-----------------------------------------------
       my_real
      .   X(3,*)
 C-----------------------------------------------
-C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,J,II,K,M,LING,NN
@@ -1200,7 +1169,7 @@ Chd|        ANCMSG                        source/output/message/message.F
 Chd|        MY_ORDERS                     ../common_source/tools/sort/my_orders.c
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
-      SUBROUTINE I24EDGE2(IALLO      ,NSEG    ,NACTIF  ,IEDGE   ,
+      SUBROUTINE I24EDGE2(IALLO      ,NSEG    ,NACTIF  ,
      1                    SURF_NODES ,ITAB    ,ISU     ,
      2                    X          ,EDG_COS ,MBINFLG ,IADM    ,NLS     ,
      3                    IRECT      ,NRTSE   ,IRTSE   ,NSNE    ,IS2SE   ,
@@ -1216,27 +1185,16 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com02_c.inc"
-#include      "com03_c.inc"
 #include      "com04_c.inc"
 #include      "units_c.inc"
-#include      "warn_c.inc"
-#include      "param_c.inc"
 #include      "scr03_c.inc"
-#include      "scr05_c.inc"
-#include      "scr12_c.inc"
 #include      "scr17_c.inc"
-#include      "conv_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER IALLO,NACTIF,IEDGE,IADM,NLS,L24ADD,NSN,IFIRST,ISU
+      INTEGER IALLO,NACTIF,IADM,NLS,L24ADD,NSN,IFIRST,ISU
       INTEGER ITAB(*),MBINFLG(*),IRECT(4,*),NSEG,SURF_NODES(NSEG,4),
      .        IRTSE(5,*) ,NSV(*),NRTSE,NSNE,IS2SE(2,*),IS2PT(*),IS2ID(*)
       my_real
@@ -1279,7 +1237,6 @@ c---------------------------------------
       ALLOCATE (LINEIX2(2,NLMAX)   ,STAT=stat)
       ALLOCATE (XLINEIX(3,NLMAX)   ,STAT=stat)
       ALLOCATE (INDEX(2*NLMAX)     ,STAT=stat)
-c      ALLOCATE (TAG(NUMNOD)        ,STAT=stat)
       ALLOCATE (IXWORK(8,NLMAX)    ,STAT=stat)
 
 #ifndef HYPERMESH_LIB
@@ -1420,41 +1377,6 @@ c       dimension first
 c---------------------------------------
         LL = NL
         NL = 0
-        IF(IEDGE == 1)THEN
-c         keep only border edges (IXWORK(5,L) == 1)
-          DO L=1,LL
-            IF(IXWORK(5,L) == 1)THEN
-              NL = NL + 1
-              I1=IXWORK(1,NL)
-              I2=IXWORK(2,NL)
-              I3=IXWORK(3,NL)
-              I4=IXWORK(4,NL)
-              I5=IXWORK(5,NL)
-              I6=IXWORK(6,NL)
-              I7=IXWORK(7,NL)
-              IXWORK(1,NL)=IXWORK(1,L)
-              IXWORK(2,NL)=IXWORK(2,L)
-              IXWORK(3,NL)=IXWORK(3,L)
-              IXWORK(4,NL)=IXWORK(4,L)
-              IXWORK(5,NL)=1 ! border
-              IXWORK(6,NL)=IXWORK(6,L)
-              IXWORK(7,NL)=IXWORK(7,L)
-              IXWORK(1,L)=I1  
-              IXWORK(2,L)=I2  
-              IXWORK(3,L)=I3  
-              IXWORK(4,L)=I4  
-              IXWORK(5,L)=I5 
-              IXWORK(6,L)=I6  
-              IXWORK(7,L)=I7 
-            ENDIF
-          ENDDO
-        ELSEIF(IEDGE == 2)THEN
-c         toutes les lignes sont conserves ET actives
-          DO L=1,LL
-            NL = NL + 1
-            IF(IXWORK(5,L) == 0)IXWORK(5,L)=-1 ! all on +-1
-          ENDDO
-        ELSEIF(IEDGE == 3)THEN
 c         les bords sont conservs
 c         les artes vives sont conservs (EDG_COS)
           DO L=1,LL
@@ -1484,7 +1406,6 @@ C             IXWORK(5,NL)=+-1 ! bord on
               IXWORK(7,L)=I7 
            ENDIF
           ENDDO
-        ENDIF
 C
       ELSE
 C       pas de surfaces
@@ -1502,7 +1423,7 @@ C-------no double fictive SECONDARY nodes----
 C------NSN<-NSN0+NSNE;  3*4*NRTSE for IEDGE = 2  -> more interesting to coding seg/seg
 C------
       IF(IALLO == 1 )THEN
-        DO L=1,LL
+        DO L=1,NL
             IF(IABS(IXWORK(5,L)) == 1)THEN
                 I3 = IXWORK(3,L)
                 I6 = IXWORK(6,L)
@@ -1522,20 +1443,16 @@ c
             ENDIF
         ENDDO
       ELSEIF(IALLO == 2 )THEN
-        DO L=1,LL
+        DO L=1,NL
             IF(IABS(IXWORK(5,L)) == 1)THEN
                 I3 = IXWORK(3,L)
                 I6 = IXWORK(6,L)
-c             print *,'edge I,J=',itab(IXWORK(1,L)),itab(IXWORK(2,L)),L
-c             print *,'I3,I6,IADM=',I3,I6,IADM
              IF(I3/=0)THEN
               I4 = IXWORK(4,L)
               J=I3
               NRTSE = NRTSE + 1
               IRTSE(1:4,NRTSE)=SURF_NODES(J,1:4)
               IRTSE(5,NRTSE)=I4
-c             print *,'IRTSE(j,NRTSE)=',(itab(IRTSE(k,NRTSE)),k=1,4),
-c     +                  IRTSE(5,NRTSE)
               DO I = 1,NP_EDGE
                NSNE = NSNE + 1
                NSV(NSN+NSNE) = NUMNOD+NSNE
@@ -1556,8 +1473,6 @@ C -----IF IS2SE(1,NSNE) >0 and IS2SE(2,NSNE) >0, order is inversed on IS2SE(2
               NRTSE = NRTSE + 1
               IRTSE(1:4,NRTSE)=SURF_NODES(J,1:4)
               IRTSE(5,NRTSE)=I7
-c             print *,'IRTSE(j,NRTSE)=',(itab(IRTSE(k,NRTSE)),k=1,4),
-c     +                  IRTSE(5,NRTSE)
               IF(I3==0) THEN
                DO I = 1,NP_EDGE
                 NSNE = NSNE + 1
@@ -1578,10 +1493,8 @@ C------------------only  NP_EDGE_th node is added
             ENDIF
         ENDDO
       ENDIF
-C        NSN = NSN + NSNE
-c       print *,'IALLO,NSNE,NRTSE,NSN0=',IALLO,NSNE,NRTSE,NSN
 c---------------------------------------
-c       nombre de lignes: may keep only NACTIF
+c       edge number: may keep only NACTIF
 c---------------------------------------
       NACTIF = NACTIF + NL
 c---------------------------------------
@@ -1629,7 +1542,6 @@ C Useful in SPMD to easily find the SECONDARY
       ENDIF
 c---------------------------------------
       DEALLOCATE (INDEX)
-c      DEALLOCATE (TAG)
       DEALLOCATE (IXWORK)
       DEALLOCATE (LINEIX)
       DEALLOCATE (LINEIX2)
@@ -1651,9 +1563,6 @@ C============================================================================
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -1753,9 +1662,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
@@ -1827,9 +1733,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
@@ -1900,9 +1803,6 @@ C============================================================================
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -1994,7 +1894,7 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
          INTEGER I,NI,NSI
 C-----------------------------------------------
-	 ISPT2(1:NSN) = 0
+           ISPT2(1:NSN) = 0
          DO I=1,I_STOK
              NI=CAND_N(I)
              IF(NI <= NSN)THEN
@@ -2022,6 +1922,8 @@ Chd|        I24ISEGPT_INI                 source/interfaces/inter3d1/i24surfi.F
 Chd|        I24PEN3                       source/interfaces/inter3d1/i24pen3.F
 Chd|        I24TRI                        source/interfaces/inter3d1/i24tri.F
 Chd|        I24XFIC_INI                   source/interfaces/inter3d1/i24surfi.F
+Chd|        IWCONTDD_TYPE24               source/spmd/domain_decomposition/iwcontdd_type24.F
+Chd|        UPDATE_WEIGHT_INTER_TYPE_24_25source/spmd/domain_decomposition/update_weight_inter_type_24_25.F
 Chd|-- calls ---------------
 Chd|====================================================================
       SUBROUTINE I24FIC_GETN(NS      ,IRTSE   ,IS2SE   ,IE    ,NS1     ,
@@ -2030,13 +1932,6 @@ C============================================================================
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com04_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -2084,9 +1979,6 @@ C============================================================================
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -2148,12 +2040,18 @@ C=======================================================================
 C------mean value of IE        
         IF (IP==NPT) THEN
 C------mean value of NS1,NS2 
-         DO J=1,4
+         DO J=1,3
           N = ITAG(IRTSE(J,IE))
           NX = NX + FIC_V(1,N)
           NY = NY + FIC_V(2,N)
           NZ = NZ + FIC_V(3,N)
          END DO
+         IF (IRTSE(3,IE)/=IRTSE(4,IE)) THEN
+          N = ITAG(IRTSE(4,IE))
+          NX = NX + FIC_V(1,N)
+          NY = NY + FIC_V(2,N)
+          NZ = NZ + FIC_V(3,N)
+         END IF
         ELSE
           N = ITAG(NS1)
           NX = NX + FIC_V(1,N)

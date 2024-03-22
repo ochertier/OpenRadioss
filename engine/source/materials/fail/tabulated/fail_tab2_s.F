@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -38,7 +38,7 @@ Chd|====================================================================
      3     NGL      ,ALDT     ,DPLA     ,EPSP     ,UVAR     ,     
      4     SIGNXX   ,SIGNYY   ,SIGNZZ   ,SIGNXY   ,SIGNYZ   ,SIGNZX   ,            
      5     TEMP     ,OFF      ,DFMAX    ,TDELE    ,DMG_SCALE,
-     6     UELR     ,IPG      ,NPG      ,LOFF     )   
+     6     UELR     ,IPG      ,NPG      ,LOFF     ,NTABLF   ,ITABLF)   
 C---------+---------+---+---+--------------------------------------------
       USE TABLE_MOD
       USE INTERFACE_TABLE_MOD
@@ -49,21 +49,16 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "mvsiz_p.inc"
 #include      "scr17_c.inc"
 #include      "units_c.inc"
 #include      "comlock.inc"
-#include      "param_c.inc"
-#include      "impl1_c.inc"
 #include      "com04_c.inc"
-#include      "com01_c.inc"
-#include      "scr18_c.inc"
 #include      "tabsiz_c.inc"
 C-----------------------------------------------
 C   I N P U T   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER, INTENT(IN) :: 
-     .        NEL,NUPARAM,NUVAR,NGL(NEL),NPG,IPG
+      INTEGER, INTENT(IN) :: NEL,NUPARAM,NUVAR,NGL(NEL),NPG,IPG,NTABLF
+      INTEGER, DIMENSION(NTABLF) ,INTENT(IN) :: ITABLF
       my_real, INTENT(IN) ::
      .        TIME,UPARAM(NUPARAM),ALDT(NEL),
      .        DPLA(NEL),EPSP(NEL),TEMP(NEL),
@@ -85,8 +80,8 @@ C!-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,INDX(NEL),NINDX,INT_ITAB_EPSF,FAILIP,
-     .        INT_ITAB_INST,INT_ITAB_SIZE,IREG,IPOS(NEL,3),
+      INTEGER I,J,INDX(NEL),NINDX,ITAB_EPSF,FAILIP,
+     .        ITAB_INST,ITAB_SIZE,IREG,IPOS(NEL,3),
      .        NDIM
       my_real 
      .        FCRIT  ,DN,DCRIT,ECRIT,EXP_REF,EXPO,EL_REF,
@@ -103,16 +98,13 @@ C!--------------------------------------------------------------
       ! - INITIALISATION OF COMPUTATION ON TIME STEP
       !=======================================================================
       ! Recovering failure criterion parameters
-      INT_ITAB_EPSF = NINT(UPARAM(1))
       FCRIT         = UPARAM(2)
       FAILIP        = MIN(NINT(UPARAM(3)),NPG)
       DN            = UPARAM(5)
       DCRIT         = UPARAM(6) 
-      INT_ITAB_INST = NINT(UPARAM(7))
       ECRIT         = UPARAM(8)
       EXP_REF       = UPARAM(9)
       EXPO          = UPARAM(10)
-      INT_ITAB_SIZE = NINT(UPARAM(11))
       IREG          = NINT(UPARAM(12))
       EL_REF        = UPARAM(13)
       SR_REF1       = UPARAM(14)
@@ -124,10 +116,14 @@ C!--------------------------------------------------------------
       CJC           = UPARAM(20)
       FSCALE_DLIM   = UPARAM(21)
 c
+      ITAB_EPSF = ITABLF(1)
+      ITAB_INST = ITABLF(2)
+      ITAB_SIZE = ITABLF(3)
+c
       ! Checking element failure and recovering user variable
       DO I=1,NEL
         ! If necking control is activated
-        IF ((INT_ITAB_INST > 0).OR.(ECRIT > ZERO)) THEN 
+        IF ((ITAB_INST > 0).OR.(ECRIT > ZERO)) THEN 
           ! Instability damage
           INST(I) = UVAR(I,1)
           ! Necking critical damage 
@@ -182,9 +178,9 @@ c
       ENDIF
 c
       ! Compute the element size regularization factor 
-      IF (INT_ITAB_SIZE > 0) THEN 
+      IF (ITAB_SIZE > 0) THEN 
         ! Element size scaling dependency
-        NDIM = TABLE(INT_ITAB_SIZE)%NDIM
+        NDIM = TABLE(ITAB_SIZE)%NDIM
         IF (IREG == 1) THEN 
           SELECT CASE (NDIM)
             ! Scale factor vs element size
@@ -212,9 +208,15 @@ c
               XVEC(1:NEL,2)   = TRIAX(1:NEL)
               XVEC(1:NEL,3)   = ZERO
               IPOS(1:NEL,1:3) = 1
+              ! Scale factor vs element size vs triaxiality vs Lode parameter
+            CASE(3)
+              XVEC(1:NEL,1)   = L0(1:NEL)/EL_REF
+              XVEC(1:NEL,2)   = TRIAX(1:NEL)
+              XVEC(1:NEL,3)   = XI(1:NEL)
+              IPOS(1:NEL,1:3) = 1
           END SELECT            
         ENDIF
-        CALL TABLE_VINTERP(TABLE(INT_ITAB_SIZE),NEL,IPOS,XVEC,SIZEFAC,DSIZE)
+        CALL TABLE_VINTERP(TABLE(ITAB_SIZE),NEL,NEL,IPOS,XVEC,SIZEFAC,DSIZE)
         SIZEFAC(1:NEL) = SIZEFAC(1:NEL)*FSCALE_EL
         IF (IREG == 1) THEN 
           DO I = 1,NEL
@@ -264,9 +266,9 @@ c
       !====================================================================
       ! - COMPUTATION OF PLASTIC STRAIN AT FAILURE
       !====================================================================   
-      IF (INT_ITAB_EPSF > 0) THEN 
+      IF (ITAB_EPSF > 0) THEN 
         ! Failure plastic strain map dependency
-        NDIM = TABLE(INT_ITAB_EPSF)%NDIM
+        NDIM = TABLE(ITAB_EPSF)%NDIM
         SELECT CASE (NDIM)
           ! Failure plastic strain vs triaxiality
           CASE (1)
@@ -286,7 +288,7 @@ c
             XVEC(1:NEL,3)   = TEMP(1:NEL)
             IPOS(1:NEL,1:3) = 1
         END SELECT
-        CALL TABLE_VINTERP(TABLE(INT_ITAB_EPSF),NEL,IPOS,XVEC,EPSF,DEPSF)
+        CALL TABLE_VINTERP(TABLE(ITAB_EPSF),NEL,NEL,IPOS,XVEC,EPSF,DEPSF)
         EPSF(1:NEL) = EPSF(1:NEL)*FCRIT
       ELSE 
         EPSF(1:NEL) = FCRIT
@@ -295,9 +297,9 @@ c
       !====================================================================
       ! - COMPUTATION OF PLASTIC STRAIN AT NECKING
       !====================================================================   
-      IF (INT_ITAB_INST > 0) THEN 
+      IF (ITAB_INST > 0) THEN 
         ! Instability plastic strain map dependency
-        NDIM = TABLE(INT_ITAB_INST)%NDIM
+        NDIM = TABLE(ITAB_INST)%NDIM
         SELECT CASE (NDIM)
           ! Instability plastic strain vs triaxiality
           CASE(1)
@@ -317,7 +319,7 @@ c
             XVEC(1:NEL,3)   = TEMP(1:NEL)
             IPOS(1:NEL,1:3) = 1            
         END SELECT
-        CALL TABLE_VINTERP(TABLE(INT_ITAB_INST),NEL,IPOS,XVEC,EPSL,DEPSL)
+        CALL TABLE_VINTERP(TABLE(ITAB_INST),NEL,NEL,IPOS,XVEC,EPSL,DEPSL)
         EPSL(1:NEL) = EPSL(1:NEL)*ECRIT
       ELSEIF (ECRIT > ZERO) THEN 
         EPSL(1:NEL) = ECRIT
@@ -357,7 +359,7 @@ c
           ENDIF
 c
           ! Compute the controle necking instability damage
-          IF ((INT_ITAB_INST > 0).OR.(ECRIT > ZERO)) THEN 
+          IF ((ITAB_INST > 0).OR.(ECRIT > ZERO)) THEN 
             DPL_DEF = DPLA(I)/MAX(EPSL(I)*RATEFAC(I)*SIZEFAC(I),EM20)
             INST(I) = INST(I) + DPL_DEF*DN*(INST(I)**(ONE-(ONE/DN)))
             INST(I) = MIN(INST(I),ONE)
@@ -373,7 +375,7 @@ c
       ! - UPDATE UVAR AND THE STRESS TENSOR
       !====================================================================
       DO I = 1,NEL 
-        IF ((INT_ITAB_INST > 0).OR.(ECRIT > ZERO)) THEN 
+        IF ((ITAB_INST > 0).OR.(ECRIT > ZERO)) THEN 
           UVAR(I,1) = INST(I)
           UVAR(I,2) = DC(I)
           IF (DFMAX(I) >= DC(I)) THEN 

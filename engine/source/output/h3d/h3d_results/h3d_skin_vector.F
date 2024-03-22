@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,19 +25,22 @@ Chd|  H3D_SKIN_VECTOR               source/output/h3d/h3d_results/h3d_skin_vecto
 Chd|-- called by -----------
 Chd|        GENH3D                        source/output/h3d/h3d_results/genh3d.F
 Chd|-- calls ---------------
+Chd|        PRESS_SEG3                    source/loads/general/load_pcyl/press_seg3.F
 Chd|        FINTER                        source/tools/curve/finter.F   
 Chd|        FINTER_SMOOTH                 source/tools/curve/finter_smooth.F
 Chd|        H3D_INC_MOD                   share/modules/h3d_inc_mod.F   
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
-Chd|        PBLAST_MOD                    ../common_source/modules/pblast_mod.F
+Chd|        LOADS_MOD                     ../common_source/modules/loads/loads_mod.F
+Chd|        PBLAST_MOD                    ../common_source/modules/loads/pblast_mod.F
 Chd|        PINCHTYPE_MOD                 ../common_source/modules/pinchtype_mod.F
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
+Chd|        TABLE_MOD                     share/modules/table_mod.F     
 Chd|====================================================================
-      SUBROUTINE H3D_SKIN_VECTOR(SKIN_VECTOR,NODAL_IPART,
+      SUBROUTINE H3D_SKIN_VECTOR(SKIN_VECTOR,NODAL_IPART,NSENSOR,
      .                   IS_WRITTEN_SKIN  ,H3D_PART,INFO1   ,KEYWORD ,
      .                   IB ,ILOADP,LLOADP,FAC ,NPC,TF ,SENSOR_TAB,
      .                   TAGNCONT,LOADP_HYD_INTER,FORC,XFRAME,X ,V ,
-     .                   IMAPSKP)
+     .                   IMAPSKP,LOADS ,TABLE,IFRAME)
 C-----------------------------------------------
 C   M o d u l e s 
 C-----------------------------------------------
@@ -46,18 +49,18 @@ C-----------------------------------------------
       USE PBLAST_MOD
       USE SENSOR_MOD
       USE H3D_INC_MOD
+      USE LOADS_MOD
+      USE TABLE_MOD
+      USE NAMES_AND_TITLES_MOD, ONLY: NCHARLINE100
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "nchara_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com06_c.inc"
 #include      "com08_c.inc"
 #include      "tabsiz_c.inc"
 C-----------------------------------------------
@@ -70,7 +73,8 @@ C-----------------------------------------------
 C-----------------------------------------------,
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      CHARACTER*ncharline KEYWORD
+      INTEGER  ,INTENT(IN) :: NSENSOR
+      CHARACTER(LEN=NCHARLINE100):: KEYWORD
       my_real
      .   SKIN_VECTOR(3,*),TF(*),X(3,*),V(3,*)
       TYPE (H3D_DATABASE) :: H3D_DATA
@@ -82,12 +86,15 @@ C-----------------------------------------------
       INTEGER TAGNCONT(NLOADP_HYD_INTER,NUMNOD),
      .        LOADP_HYD_INTER(NLOADP_HYD),NODAL_IPART(*)
       my_real
-     .   FAC(LFACCLD,*),XFRAME(NXFRAME,*),FORC(LFACCLD,*)
-      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+     .   FAC(LFACLOAD,NLOADP),XFRAME(NXFRAME,*),FORC(LFACCLD,*)
+      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) ,INTENT(IN) :: SENSOR_TAB
+      TYPE (LOADS_)   , INTENT(IN) :: LOADS
+      INTEGER ,       DIMENSION(LISKN,NUMFRAM+1)  ,INTENT(IN) :: IFRAME
+      TYPE (TTABLE)  ,DIMENSION(NTABLE)   ,INTENT(IN) :: TABLE
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NL, N1, ISK, N2, N3, N4, N5,NSKIN, 
+      INTEGER NL, N1, ISK, N2, N3, N4, N5,NSKIN,  
      .        IAD ,NP ,IFUNC ,NPRES,NSKIN0,NSKIN1,N1FRAM,DIR_HSP,I,N
       INTEGER K1, K2, K3, ISENS,K,LL,IERR,
      .        N_OLD, ISMOOTH,IDEL,NINTERP ,NPL,TAGN1,TAGN2,TAGN3,TAGN4,
@@ -105,13 +112,17 @@ C-----------------------------------------------
       my_real COORMEAN,YMEAN,ZMEAN,PVEL,NSIGN,DNORM,
      .        Xdet,Ydet,Zdet,Tdet,Wtnt,PMIN,Dx,Dy,Dz,NORMD, P,
      .        T0INF_LOC, TA_SHIFT, TT_STAR
+      INTEGER :: IFUN,IFRA,M1,M2,NDIM,NPOINT, IIOUT,SHIFT
+       my_real :: A11,A12,A21,A22,B1,B2,DET,LEN,DIRX,DIRY,DIRZ,
+     .     BETA,GAMMA,R,S,RMAX,XFACR,XFACT,YFAC,SEGP,PRESS
+      my_real, DIMENSION(3) :: P0,DIR,A,B,C,D,M
       
       EXTERNAL FINTER,FINTER_SMOOTH
 C=======================================================================
       IF (KEYWORD /= 'VECT/PEXT') RETURN
       NSKIN = NUMSKIN - NUMSKINP
       IS_WRITTEN_SKIN(NSKIN+1:NUMSKIN) = 0
-	  SKIN_VECTOR(1:3,NSKIN+1:NUMSKIN)=ZERO
+            SKIN_VECTOR(1:3,NSKIN+1:NUMSKIN)=ZERO
         NP0= 0
         NSKIN0 = NSKIN
 C---- fill SKIN_SCALAR(*) w/ IS_WRITTEN_SKIN(*)=1
@@ -127,12 +138,12 @@ C-----Force (pressure) first
          IDEL    = IB(8,NL)
          FCY     = FORC(1,NL)
          FCX     = FORC(2,NL)
-		 IF (N1==0.OR.N2==0.OR.N3==0.OR.N4==-1) CYCLE
+         IF (N1==0.OR.N2==0.OR.N3==0.OR.N4==-1) CYCLE
 C--------default zero        
-		 NP0 = NP0 + 1
+         NP0 = NP0 + 1
          NSKIN = NSKIN0+ IMAPSKP(NP0)
          IF (NODAL_IPART(N1)>0) THEN
-		   IF (H3D_PART(NODAL_IPART(N1))==1) IS_WRITTEN_SKIN(NSKIN)=1
+             IF (H3D_PART(NODAL_IPART(N1))==1) IS_WRITTEN_SKIN(NSKIN)=1
          END IF
          ISENS   = 0
          XSENS   = ONE
@@ -152,17 +163,20 @@ C--------default zero
 !!           F1 = FINTER(N5,TS*FCX,NPC,TF,DYDX)
            IF (ISMOOTH == 0) THEN
              F1 = FINTER(N5,TS*FCX,NPC,TF,DYDX)
-           ELSE
+           ELSE IF(ISMOOTH > 0) THEN
              F1 = FINTER_SMOOTH(N5,TS*FCX,NPC,TF,DYDX)
+           ELSE 
+
            ENDIF ! IF (ISMOOTH == 0)
            N_OLD = N5
            X_OLD = TS
          ENDIF
          AA = FCY*F1*XSENS
-		 SKIN_VECTOR(3,NSKIN)=SKIN_VECTOR(3,NSKIN) + AA
+         SKIN_VECTOR(3,NSKIN)=SKIN_VECTOR(3,NSKIN) + AA
        END DO 
-C----------load_pressure	   
-       DO NP=1,NLOADP_HYD
+C----------load_pressure     
+       SHIFT =   NLOADP_F+NLOADP_B
+       DO NP=1+SHIFT,NLOADP_HYD+SHIFT
          ISIZ_SEG = ILOADP(1,NP)/4 
          IFUNC = ILOADP(3,NP)
          IAD = ILOADP(4,NP)
@@ -176,10 +190,10 @@ C--------default zero
            N2 = LLOADP(IAD+4*(N-1)+1)
            N3 = LLOADP(IAD+4*(N-1)+2)
            N4 = LLOADP(IAD+4*(N-1)+3)
-		   IF (N1==0.OR.N2==0.OR.N3==0) CYCLE
+           IF (N1==0.OR.N2==0.OR.N3==0) CYCLE
            NSKIN = NSKIN0+ IMAPSKP(NP0+N)
            IF (NODAL_IPART(N1)>0) THEN
-		     IF (H3D_PART(NODAL_IPART(N1))==1) IS_WRITTEN_SKIN(NSKIN)=1
+               IF (H3D_PART(NODAL_IPART(N1))==1) IS_WRITTEN_SKIN(NSKIN)=1
            END IF
          ENDDO
 C
@@ -187,16 +201,16 @@ C
               TS=TT
            ELSE
               TS = TT-SENSOR_TAB(ISENS)%TSTART
-              IF(TS<ZERO) CYCLE
            ENDIF    
          DO N=1, ISIZ_SEG
            N1 = LLOADP(IAD+4*(N-1))
            N2 = LLOADP(IAD+4*(N-1)+1)
            N3 = LLOADP(IAD+4*(N-1)+2)
            N4 = LLOADP(IAD+4*(N-1)+3)
-		   IF (N1==0.OR.N2==0.OR.N3==0) CYCLE
+           IF (N1==0.OR.N2==0.OR.N3==0) CYCLE
 
-		   NP0 = NP0 + 1
+           NP0 = NP0 + 1
+           IF(TS<ZERO) CYCLE
            NSKIN = NSKIN0+ IMAPSKP(NP0)
            F1 = FINTER(IFUNC,TS*FCX,NPC,TF,DYDX)
            AA = FCY*F1  
@@ -221,7 +235,7 @@ C----------------
                       TAGN2 = TAGNCONT(NPL,N2)
                       TAGN3 = TAGNCONT(NPL,N3)
                       TAGN4 = TAGNCONT(NPL,N4)
-					  FP = (TAGN1+TAGN2+TAGN3+TAGN4)/4
+            FP = (TAGN1+TAGN2+TAGN3+TAGN4)/4
                    ENDIF
                 ELSE
                    IF(TAGNCONT(NPL,N1)==1.AND.TAGNCONT(NPL,N2)==1.AND.
@@ -231,30 +245,30 @@ C----------------
                       TAGN1 = TAGNCONT(NPL,N1)
                       TAGN2 = TAGNCONT(NPL,N2)
                       TAGN3 = TAGNCONT(NPL,N3)
-					  FP = (TAGN1+TAGN2+TAGN3)/3
+            FP = (TAGN1+TAGN2+TAGN3)/3
                    ENDIF
                 ENDIF    
                 IF (FP==ZERO) FP = ONE
              ENDIF
-			 IF (SEGCONT==1) AA = ZERO
-		    AA=AA*FP
-		    SKIN_VECTOR(3,NSKIN)=SKIN_VECTOR(3,NSKIN) + AA
+           IF (SEGCONT==1) AA = ZERO
+              AA=AA*FP
+              SKIN_VECTOR(3,NSKIN)=SKIN_VECTOR(3,NSKIN) + AA
          END DO !N=1, NPRES/4
        END DO !NP=1,NLOADP_HYD
-C---------pfluid	   
+C---------pfluid     
        DO NL=1,NLOADP_F
 C--------default zero        
-         ISIZ_SEG = ILOADP(1,NP)/4 
-         IAD = ILOADP(4,NP)
+         ISIZ_SEG = ILOADP(1,NL)/4 
+         IAD = ILOADP(4,NL)
          DO N=1, ISIZ_SEG
            N1 = LLOADP(IAD+4*(N-1))
            N2 = LLOADP(IAD+4*(N-1)+1)
            N3 = LLOADP(IAD+4*(N-1)+2)
            N4 = LLOADP(IAD+4*(N-1)+3)
-		   IF (N1==0.OR.N2==0.OR.N3==0) CYCLE
+           IF (N1==0.OR.N2==0.OR.N3==0) CYCLE
            NSKIN = NSKIN0+ IMAPSKP(NP0+N)
            IF (NODAL_IPART(N1)>0) THEN
-		     IF (H3D_PART(NODAL_IPART(N1))==1) IS_WRITTEN_SKIN(NSKIN)=1
+               IF (H3D_PART(NODAL_IPART(N1))==1) IS_WRITTEN_SKIN(NSKIN)=1
            END IF
          ENDDO
          FUN_HSP=ILOADP(7,NL)
@@ -281,15 +295,15 @@ C--------default zero
             TS=TT
          ELSE                        
             TS = TT-SENSOR_TAB(ISENS)%TSTART
-            IF(TS < ZERO) CYCLE     
          ENDIF
          DO I = 1,ISIZ_SEG
            N1=LLOADP(ILOADP(4,NL)+4*(I-1))
            N2=LLOADP(ILOADP(4,NL)+4*(I-1)+1)
            N3=LLOADP(ILOADP(4,NL)+4*(I-1)+2)
            N4=LLOADP(ILOADP(4,NL)+4*(I-1)+3)
-		   IF (N1==0.OR.N2==0.OR.N3==0) CYCLE
-		   NP0 = NP0 + 1
+           IF (N1==0.OR.N2==0.OR.N3==0) CYCLE
+           NP0 = NP0 + 1
+           IF(TS < ZERO) CYCLE     
            NSKIN = NSKIN0+ IMAPSKP(NP0)
 C        
            AA = ZERO
@@ -363,7 +377,8 @@ C
             ELSEIF(N3 == N4)THEN
               N4 = 0
             ENDIF
-Csv         true triangles.
+            IF (N4==0) N4=N3
+C           true triangles.
             IF(FUN_HSP /=0)THEN
                K1=3*DIR_HSP-2
                K2=3*DIR_HSP-1
@@ -407,11 +422,11 @@ C
      .                 (NZ/NORM)*VEL*XFRAME(K3,IFRA2))**2  )* FCY1*
      .              FINTER(FUN_CX,TT*FCX1,NPC,TF,DYDX)/TWO
            ENDIF
-		    AA=-AA+PVEL*NSIGN
-		    SKIN_VECTOR(3,NSKIN)=SKIN_VECTOR(3,NSKIN) + AA
+              AA=-AA+PVEL*NSIGN
+              SKIN_VECTOR(3,NSKIN)=SKIN_VECTOR(3,NSKIN) + AA
          END DO 
        END DO 
-C---------pblast	   
+C---------pblast     
        DO NL=1+NLOADP_F,NLOADP_F+NLOADP_B
 C--------default zero        
          ISIZ_SEG  = ILOADP(1,NL)/4 
@@ -421,16 +436,15 @@ C--------default zero
            N2 = LLOADP(IAD+4*(N-1)+1)
            N3 = LLOADP(IAD+4*(N-1)+2)
            N4 = LLOADP(IAD+4*(N-1)+3)
-		   IF (N1==0.OR.N2==0.OR.N3==0) CYCLE
+           IF (N1==0.OR.N2==0.OR.N3==0) CYCLE
            NSKIN = NSKIN0+ IMAPSKP(NP0+N)
            IF (NODAL_IPART(N1)>0) THEN
-		     IF (H3D_PART(NODAL_IPART(N1))==1) IS_WRITTEN_SKIN(NSKIN)=1
+               IF (H3D_PART(NODAL_IPART(N1))==1) IS_WRITTEN_SKIN(NSKIN)=1
            END IF
          ENDDO
          IL             = NL-NLOADP_F
          TDET           = FAC(01,NL)
          ID             = ILOADP(08,NL) !user_id
-         IF(TT<TDET)CYCLE
          !---------------------------------------------
          !   LOOP ON SEGMENTS (4N or 3N)
          !---------------------------------------------      
@@ -439,15 +453,111 @@ C--------default zero
            N2=LLOADP(ILOADP(4,NL)+4*(I-1)+1)
            N3=LLOADP(ILOADP(4,NL)+4*(I-1)+2)
            N4=LLOADP(ILOADP(4,NL)+4*(I-1)+3) 
-		   IF (N1==0.OR.N2==0.OR.N3==0) CYCLE           
-		   NP0 = NP0 + 1
+           IF (N1==0.OR.N2==0.OR.N3==0) CYCLE           
+           NP0 = NP0 + 1
+           IF(TT<TDET)CYCLE
            NSKIN = NSKIN0+ IMAPSKP(NP0)
-           !Dist                                                                                                          
-           
            P = PBLAST_TAB(IL)%PRES(I)                                                           
-		   AA= -P
-		   SKIN_VECTOR(3,NSKIN)=SKIN_VECTOR(3,NSKIN) + AA
+           AA= -P
+           SKIN_VECTOR(3,NSKIN)=SKIN_VECTOR(3,NSKIN) + AA
          ENDDO
+       END DO 
+C---------/LOAD/PCYL     
+       DO NL=1,LOADS%NLOAD_CYL
+C--------default zero        
+         ISIZ_SEG  = LOADS%LOAD_CYL(NL)%NSEG 
+         DO N=1, ISIZ_SEG
+           N1 = LOADS%LOAD_CYL(NL)%SEGNOD(N,1)
+           N2 = LOADS%LOAD_CYL(NL)%SEGNOD(N,2)
+           N3 = LOADS%LOAD_CYL(NL)%SEGNOD(N,3)
+           N4 = LOADS%LOAD_CYL(NL)%SEGNOD(N,4)
+           IF (N1==0.OR.N2==0.OR.N3==0) CYCLE
+           NSKIN = NSKIN0+ IMAPSKP(NP0+N)
+           IF (NODAL_IPART(N1)>0) THEN
+              IF (H3D_PART(NODAL_IPART(N1))==1) IS_WRITTEN_SKIN(NSKIN)=1
+           END IF
+         ENDDO
+         ISENS = LOADS%LOAD_CYL(NL)%ISENS
+         IIOUT = 0
+         IF (ISENS > 0) THEN
+           IF (SENSOR_TAB(ISENS)%STATUS == 0) THEN
+              NP0 = NP0 + ISIZ_SEG
+              CYCLE
+           END IF
+         END IF
+         IFRA = LOADS%LOAD_CYL(NL)%IFRAME + 1
+         XFACR= LOADS%LOAD_CYL(NL)%XSCALE_R
+         XFACT= LOADS%LOAD_CYL(NL)%XSCALE_T
+         YFAC = LOADS%LOAD_CYL(NL)%YSCALE
+         IFUN = LOADS%LOAD_CYL(NL)%ITABLE
+         NDIM = TABLE(IFUN)%NDIM
+         NPOINT = SIZE(TABLE(IFUN)%X(1)%VALUES)
+         RMAX = TABLE(IFUN)%X(1)%VALUES(NPOINT)
+         M1   = IFRAME(1,IFRA)
+         M2   = IFRAME(2,IFRA)
+         DIRX = X(1,M1) - X(1,M2)
+         DIRY = X(2,M1) - X(2,M2)
+         DIRZ = X(3,M1) - X(3,M2)
+         LEN  = SQRT(DIRX**2 + DIRY**2 + DIRZ**2)
+         ! SEGP beam axis
+         DIR(1) = DIRX / LEN
+         DIR(2) = DIRY / LEN
+         DIR(3) = DIRZ / LEN
+         P0(1)  = X(1,M2)
+         P0(2)  = X(2,M2)
+         P0(3)  = X(3,M2)
+         !---------------------------------------------
+         !   LOOP ON SEGMENTS (4N or 3N)
+         !---------------------------------------------      
+         DO N = 1,ISIZ_SEG
+           N1 = LOADS%LOAD_CYL(NL)%SEGNOD(N,1)
+           N2 = LOADS%LOAD_CYL(NL)%SEGNOD(N,2)
+           N3 = LOADS%LOAD_CYL(NL)%SEGNOD(N,3)
+           N4 = LOADS%LOAD_CYL(NL)%SEGNOD(N,4)
+           PRESS = ZERO
+           A(1) = X(1,N1)
+           A(2) = X(2,N1)
+           A(3) = X(3,N1)
+           B(1) = X(1,N2)
+           B(2) = X(2,N2)
+           B(3) = X(3,N2)
+           C(1) = X(1,N3)
+           C(2) = X(2,N3)
+           C(3) = X(3,N3)
+           NP0 = NP0 + 1
+           IF (N4 == 0) THEN    ! 3 node segment
+             CALL PRESS_SEG3(A       ,B      ,C      ,P0      ,DIR    , 
+     .                       IFUN    ,TABLE  ,XFACR  ,SEGP   )
+             PRESS = ABS(SEGP) * YFAC
+c          
+           ELSE                ! 4 node segment
+             D(1) = X(1,N4)
+             D(2) = X(2,N4)
+             D(3) = X(3,N4)
+             M(1) = (X(1,N1) + X(1,N2) + X(1,N3) + X(1,N4)) * FOURTH
+             M(2) = (X(2,N1) + X(2,N2) + X(2,N3) + X(2,N4)) * FOURTH
+             M(3) = (X(3,N1) + X(3,N2) + X(3,N3) + X(3,N4)) * FOURTH
+c            1st internal triangle 
+             CALL PRESS_SEG3(A       ,B      ,M      ,P0      ,DIR    , 
+     .                       IFUN    ,TABLE  ,XFACR  ,SEGP   )
+             PRESS = PRESS + SEGP * FOURTH
+c            2nd internal triangle 
+             CALL PRESS_SEG3(B       ,C      ,M      ,P0      ,DIR    , 
+     .                       IFUN    ,TABLE  ,XFACR  ,SEGP   )
+             PRESS = PRESS + SEGP * FOURTH
+c            3rd internal triangle 
+             CALL PRESS_SEG3(C       ,D      ,M      ,P0      ,DIR    , 
+     .                       IFUN    ,TABLE  ,XFACR  ,SEGP   )
+             PRESS = PRESS + SEGP * FOURTH
+c            4th internal triangle 
+             CALL PRESS_SEG3(D       ,A      ,M      ,P0      ,DIR    , 
+     .                       IFUN    ,TABLE  ,XFACR  ,SEGP   )
+             PRESS = PRESS + SEGP * FOURTH
+             PRESS = ABS(PRESS) * YFAC
+           END IF  !  seg 4 node
+           NSKIN = NSKIN0+ IMAPSKP(NP0)
+           SKIN_VECTOR(3,NSKIN)=SKIN_VECTOR(3,NSKIN) +PRESS
+         ENDDO!next N
        END DO 
 C
       RETURN

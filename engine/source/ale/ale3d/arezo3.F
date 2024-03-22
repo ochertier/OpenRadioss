@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,7 +25,7 @@ Chd|  AREZO3                        source/ale/ale3d/arezo3.F
 Chd|-- called by -----------
 Chd|        AREZON                        source/ale/arezon.F           
 Chd|-- calls ---------------
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
 Chd|====================================================================
       SUBROUTINE AREZO3(ALE_CONNECT,VAR,NV,PHI,NDIM,FLUX,VOL,IAD22,IXS,ITRIMAT)
 C-----------------------------------------------
@@ -51,10 +51,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com08_c.inc"
 #include      "vect01_c.inc"
-#include      "param_c.inc"
 #include      "inter22.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -120,7 +118,7 @@ Chd|  AREZO3_SIG                    source/ale/ale3d/arezo3.F
 Chd|-- called by -----------
 Chd|        AREZON                        source/ale/arezon.F           
 Chd|-- calls ---------------
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
 Chd|====================================================================
       SUBROUTINE AREZO3_SIG(ALE_CONNECT,SIG,NV,PHI,NDIM,FLUX,
      .                      VOL,IAD22,IXS,ITRIMAT,NEL)
@@ -146,11 +144,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
 #include      "vect01_c.inc"
-#include      "param_c.inc"
 #include      "inter22.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s

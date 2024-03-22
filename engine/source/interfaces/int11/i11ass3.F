@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -23,6 +23,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 Chd|====================================================================
 Chd|  I11ASS3                       source/interfaces/int11/i11ass3.F
 Chd|-- called by -----------
+Chd|        I11MAINF                      source/interfaces/int11/i11mainf.F
 Chd|-- calls ---------------
 Chd|        I11ASS0                       source/interfaces/int11/i11ass3.F
 Chd|        I11ASS05                      source/interfaces/int11/i11ass3.F
@@ -65,22 +66,12 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com06_c.inc"
-#include      "com08_c.inc"
-#include      "scr02_c.inc"
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
-#include      "scr07_c.inc"
-#include      "scr11_c.inc"
 #include      "scr14_c.inc"
 #include      "scr16_c.inc"
 #include      "scr18_c.inc"
-#include      "units_c.inc"
 #include      "parit_c.inc"
-#include      "couple_c.inc"
 #include      "impl1_c.inc"
 #include      "sms_c.inc"
-#include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -247,19 +238,19 @@ C-----------------------------------------------------
         DO I=1,JLT
           IF(CS_LOC(I)<=NRTS) THEN
           IF(FX1(I)/=ZERO.OR.FY1(I)/=ZERO.OR.FZ1(I)/=ZERO)THEN
-            ICONTACT(N1(I))=1	  
+            ICONTACT(N1(I))=1    
           ENDIF
           IF(FX2(I)/=ZERO.OR.FY2(I)/=ZERO.OR.FZ2(I)/=ZERO)THEN
-            ICONTACT(N2(I))=1	    	  
-          ENDIF		  
-	  ENDIF	
+            ICONTACT(N2(I))=1          
+          ENDIF      
+            ENDIF
 C test modifie pour coherence avec communication SPMD (spmd_i7tools)
           IF(FX3(I)/=ZERO.OR.FY3(I)/=ZERO.OR.FZ3(I)/=ZERO)THEN
-            ICONTACT(M1(I))=1	    	  
+            ICONTACT(M1(I))=1          
           ENDIF
           IF(FX4(I)/=ZERO.OR.FY4(I)/=ZERO.OR.FZ4(I)/=ZERO)THEN
-            ICONTACT(M2(I))=1	    	  
-          ENDIF	  
+            ICONTACT(M2(I))=1          
+          ENDIF    
         ENDDO
       ENDIF
 C      
@@ -297,8 +288,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
-#include      "scr05_c.inc"
 #include      "scr18_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -515,8 +504,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
-#include      "scr05_c.inc"
 #include      "scr18_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -756,10 +743,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
-#include      "scr05_c.inc"
 #include      "parit_c.inc"
-#include      "units_c.inc"
 #include      "scr18_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -1033,10 +1017,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
-#include      "scr05_c.inc"
 #include      "parit_c.inc"
-#include      "units_c.inc"
 #include      "scr18_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s

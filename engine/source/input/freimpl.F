@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -45,6 +45,7 @@ C-----------------------------------------------
       USE IMP_PCG_PROJ
       USE IMP_SPBRM
       USE MESSAGE_MOD
+      USE NAMES_AND_TITLES_MOD, ONLY: NCHARLINE100
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -58,19 +59,14 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "units_c.inc"
-#include      "warn_c.inc"
 #include      "scr05_c.inc"
 #include      "impl1_c.inc"
 #include      "impl2_c.inc"
 #include      "parit_c.inc"
-#include      "task_c.inc"
 #include      "com01_c.inc"
 #include      "com06_c.inc"
 #include      "buckcom.inc"
 #include      "scr06_c.inc"
-#include      "chara_c.inc"
-#include      "fsi_ar_c.inc"
-#include      "nchara_c.inc"
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
@@ -79,7 +75,8 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, NBC, K, IKEY,IM,J,NJ,KK, IOERR,E_ID
-      CHARACTER  CARTE*ncharline,TITLE*72, KEY2*5, KEY3*5, KEY4*5
+      CHARACTER  TITLE*72, KEY2*5, KEY3*5, KEY4*5
+      CHARACTER(LEN=NCHARLINE100)::CARTE
       my_real
      .   TMP
 C----------------------------------------
@@ -129,7 +126,6 @@ C      IRREF = 0
       IMP_LR=0
       IKPROJ=0
       ISMDISP = 0
-      IACUSLV = 0
       IF(IKAD(IKEY)/=IKAD(IKEY+1))THEN
        K=0
        IMPL_S=1
@@ -168,9 +164,7 @@ C      IRREF = 0
        M_ORDER =0
        M_OCORE =0
        IRIG_M = 0
- 1160  READ(IUSC1,REC=IKAD(IKEY)+K,
-     .      FMT='(7X,A,1X,A,1X,A,25X,I10)',
-     .      ERR=9990)KEY2,KEY3,KEY4,NBC
+ 1160  READ(IUSC1,REC=IKAD(IKEY)+K,FMT='(7X,A,1X,A,1X,A,25X,I10)',ERR=9990)KEY2,KEY3,KEY4,NBC
        K=K+1
 C----------------------------
 C      Dynamic implicit

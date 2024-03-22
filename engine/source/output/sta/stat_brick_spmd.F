@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,7 +27,7 @@ Chd|        GENSTAT                       source/output/sta/genstat.F
 Chd|-- calls ---------------
 Chd|        MY_ORDERS                     ../common_source/tools/sort/my_orders.c
 Chd|        SPMD_IGET_PARTN_STA           source/mpi/output/spmd_stat.F 
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE STAT_BRICK_SPMD(ITAB,IPART,IGEO,IXS,IPARTS,
      .                     IPART_STATE,NODTAG,STAT_INDXS,
@@ -47,7 +47,6 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "scr05_c.inc"
 #include      "scr16_c.inc"
 #include      "scr17_c.inc"
 #include      "spmd_c.inc"
@@ -358,7 +357,7 @@ C en spmd il faut envoyer l'info meme qd on a 0 elem local
 C-----
       STAT_NUMELS_G=0
       CALL SPMD_IGET_PARTN_STA(24,STAT_NUMELS,STAT_NUMELS_G,LENGS,NP,
-     .  		       IADG,NPGLOB,STAT_INDXS)
+     .             IADG,NPGLOB,STAT_INDXS)
 C-----
       IF (ISPMD==0) THEN
         DO N=1,STAT_NUMELS_G

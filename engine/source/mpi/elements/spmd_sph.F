@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,7 +20,6 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-#include "hardware.inc"
 Chd|====================================================================
 Chd|  SPMD_EXCH_A_SOL2SPH           source/mpi/elements/spmd_sph.F
 Chd|-- called by -----------
@@ -35,7 +34,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -45,11 +43,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr06_c.inc"
 #include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "task_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -126,7 +121,7 @@ C
       DO I=1,NSPMD
 C--------------------------------------------------------------------
 C envoi a N+I mod P
-Cel test si msg necessaire a envoyer a completer par test interface
+C   test si msg necessaire a envoyer a completer par test interface
        IF(IAD_ELEM(1,I+1)-IAD_ELEM(1,I)>0)THEN
           MSGTYP = MSGOFF 
           SIZ = IAD_SEND(I+1)-IAD_SEND(I)
@@ -141,7 +136,7 @@ C
 C decompactage
 C
       DO I = 1, NSPMD
-Cel test si msg necessaire a envoyer a completer par test interface
+C   test si msg necessaire a envoyer a completer par test interface
         NB_NOD = IAD_ELEM(1,I+1)-IAD_ELEM(1,I)
         IF(NB_NOD>0)THEN
           CALL MPI_WAIT(REQ_R(I),STATUS,IERROR)
@@ -179,7 +174,7 @@ C         DO J=IAD_ELEM(1,I),IAD_ELEM(1,I+1)-1
         END IF
       END DO
 C
-Cel wait terminaison isend
+C   wait terminaison isend
 C
       DO I = 1, NSPMD
         IF(IAD_ELEM(1,I+1)-IAD_ELEM(1,I)>0)THEN
@@ -209,7 +204,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -222,8 +216,6 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "task_c.inc"
 #include      "sphcom.inc"
-#include      "param_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -413,7 +405,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -424,11 +415,7 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "task_c.inc"
-#include      "sphcom.inc"
-#include      "param_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -508,7 +495,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -520,12 +506,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "task_c.inc"
-#include      "sphcom.inc"
-#include      "param_c.inc"
-#include      "units_c.inc"
-C-----------------------------------------------
-C   D u m m y   A r g u m e n t s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -591,7 +571,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -604,7 +583,6 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "task_c.inc"
 #include      "sphcom.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -638,9 +616,9 @@ ctmp+1
           BUFS(1,N+IDEB) = SPBUF(1,ICELL)
           BUFS(2,N+IDEB) = X(1,INOD)
           BUFS(3,N+IDEB) = X(2,INOD)
-          BUFS(4,N+IDEB) = X(3,INOD)	  
-          BUFS(5,N+IDEB) = KXSP(2,ICELL)	  
-          BUFS(6,N+IDEB) = IPARTSP(ICELL)	  
+          BUFS(4,N+IDEB) = X(3,INOD)    
+          BUFS(5,N+IDEB) = KXSP(2,ICELL)    
+          BUFS(6,N+IDEB) = IPARTSP(ICELL)    
         END DO
         MSGTYP = MSGOFF
         CALL MPI_ISEND(
@@ -664,8 +642,8 @@ C
             XSPHR(3,IDEB+N) = BUFR(2,N)
             XSPHR(4,IDEB+N) = BUFR(3,N)
             XSPHR(5,IDEB+N) = BUFR(4,N)
-	    XSPHR(13,IDEB+N)= BUFR(5,N)
-	    XSPHR(14,IDEB+N)= BUFR(6,N)
+              XSPHR(13,IDEB+N)= BUFR(5,N)
+              XSPHR(14,IDEB+N)= BUFR(6,N)
           END DO
           IDEB = IDEB + PSPHR(P)
         END IF
@@ -691,7 +669,7 @@ Chd|        FORINTP                       source/elements/forintp.F
 Chd|-- calls ---------------
 Chd|        SPHBOX                        share/modules/sphbox.F        
 Chd|====================================================================
-      SUBROUTINE SPMD_SPHGETW(SPBUF,WACOMP,WA,WAR)
+      SUBROUTINE SPMD_SPHGETW(SPBUF,WACOMP,WA,WAR,SPH_IORD1)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -700,7 +678,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -713,10 +690,10 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "task_c.inc"
 #include      "sphcom.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+       INTEGER, INTENT(IN) :: SPH_IORD1
        my_real
      .        SPBUF(NSPBUF,*), WACOMP(16,*), WA(KWASPH,*),
      .        WAR(10,*)
@@ -728,7 +705,7 @@ C-----------------------------------------------
      .        IERROR, ICELL,
      .        REQ_SD(NSPMD), STATUS(MPI_STATUS_SIZE),MSGOFF
        my_real
-     .        BUFS(15,NSPHS), BUFR(15,NSPHR)
+     .        BUFS(15+6*SPH_IORD1,NSPHS),BUFR(15+6*SPH_IORD1,NSPHR)
        DATA MSGOFF/2010/
 C-----------------------------------------------
 C   S o u r c e  L i n e s
@@ -737,85 +714,171 @@ C-----------------------------------------------
 C
 C Envoi WACOMP, WA, RHO sur cellules actives
 C
-      IDEB = 0
-      DO P = 1, NSPMD
-        IF(PSPHS(P)>0)THEN
-          NN = 0
-          DO N = 1, PSPHS(P)
-            IF(ISPHS(IDEB+N)==1) THEN
-              NN = NN + 1
-              ICELL = LSPHS(IDEB+N)
-C             INOD = KXSP(3,ICELL)
-              BUFS(1,NN+IDEB)  = SPBUF(2,ICELL)
-              BUFS(2,NN+IDEB)  = WACOMP(1,ICELL)
-              BUFS(3,NN+IDEB)  = WACOMP(5,ICELL)
-              BUFS(4,NN+IDEB)  = WACOMP(6,ICELL)
-              BUFS(5,NN+IDEB)  = WACOMP(7,ICELL)
-              BUFS(6,NN+IDEB)  = WA(1,ICELL)
-              BUFS(7,NN+IDEB)  = WA(2,ICELL)
-              BUFS(8,NN+IDEB)  = WA(3,ICELL)
-              BUFS(9,NN+IDEB)  = WA(4,ICELL)
-              BUFS(10,NN+IDEB) = WA(5,ICELL)
-              BUFS(11,NN+IDEB) = WA(6,ICELL)
-              BUFS(12,NN+IDEB) = WA(8,ICELL)
-              BUFS(13,NN+IDEB) = WA(9,ICELL)
-              BUFS(14,NN+IDEB) = WA(13,ICELL)
-              BUFS(15,NN+IDEB) = WA(14,ICELL)
-            END IF
-          END DO
-          MSGTYP = MSGOFF
-          CALL MPI_ISEND(
-     S      BUFS(1,IDEB+1),NN*15,REAL,IT_SPMD(P),MSGTYP,
-     G      MPI_COMM_WORLD,REQ_SD(P),IERROR)
-          IDEB = IDEB + PSPHS(P)
-        END IF
-      END DO
+      IF (SPH_IORD1 == 0) THEN
+        IDEB = 0
+        DO P = 1, NSPMD
+          IF(PSPHS(P)>0)THEN
+            NN = 0
+            DO N = 1, PSPHS(P)
+              IF(ISPHS(IDEB+N)==1) THEN
+                NN = NN + 1
+                ICELL = LSPHS(IDEB+N)
+C               INOD = KXSP(3,ICELL)
+                BUFS(1,NN+IDEB)  = SPBUF(2,ICELL)
+                BUFS(2,NN+IDEB)  = WA(1,ICELL)
+                BUFS(3,NN+IDEB)  = WA(2,ICELL)
+                BUFS(4,NN+IDEB)  = WA(3,ICELL)
+                BUFS(5,NN+IDEB)  = WA(4,ICELL)
+                BUFS(6,NN+IDEB)  = WA(5,ICELL)
+                BUFS(7,NN+IDEB)  = WA(6,ICELL)
+                BUFS(8,NN+IDEB)  = WA(8,ICELL)
+                BUFS(9,NN+IDEB)  = WA(9,ICELL)
+                BUFS(10,NN+IDEB) = WA(13,ICELL)
+                BUFS(11,NN+IDEB) = WA(14,ICELL)
+                BUFS(12,NN+IDEB) = WACOMP(1,ICELL)
+                BUFS(13,NN+IDEB) = WACOMP(5,ICELL)
+                BUFS(14,NN+IDEB) = WACOMP(6,ICELL)
+                BUFS(15,NN+IDEB) = WACOMP(7,ICELL)
+              END IF
+            END DO
+            MSGTYP = MSGOFF
+            CALL MPI_ISEND(
+     S        BUFS(1,IDEB+1),NN*15,REAL,IT_SPMD(P),MSGTYP,
+     G        MPI_COMM_WORLD,REQ_SD(P),IERROR)
+            IDEB = IDEB + PSPHS(P)
+          END IF
+        END DO
+      ELSE
+        IDEB = 0
+        DO P = 1, NSPMD
+          IF(PSPHS(P)>0)THEN
+            NN = 0
+            DO N = 1, PSPHS(P)
+              IF(ISPHS(IDEB+N)==1) THEN
+                NN = NN + 1
+                ICELL = LSPHS(IDEB+N)
+C               INOD = KXSP(3,ICELL)
+                BUFS(1,NN+IDEB)  = SPBUF(2,ICELL)
+                BUFS(2,NN+IDEB)  = WA(1,ICELL)
+                BUFS(3,NN+IDEB)  = WA(2,ICELL)
+                BUFS(4,NN+IDEB)  = WA(3,ICELL)
+                BUFS(5,NN+IDEB)  = WA(4,ICELL)
+                BUFS(6,NN+IDEB)  = WA(5,ICELL)
+                BUFS(7,NN+IDEB)  = WA(6,ICELL)
+                BUFS(8,NN+IDEB)  = WA(8,ICELL)
+                BUFS(9,NN+IDEB)  = WA(9,ICELL)
+                BUFS(10,NN+IDEB) = WA(13,ICELL)
+                BUFS(11,NN+IDEB) = WA(14,ICELL)
+                BUFS(12,NN+IDEB) = WACOMP(1,ICELL)
+                BUFS(13,NN+IDEB) = WACOMP(8,ICELL)
+                BUFS(14,NN+IDEB) = WACOMP(9,ICELL)
+                BUFS(15,NN+IDEB) = WACOMP(10,ICELL)
+                BUFS(16,NN+IDEB) = WACOMP(11,ICELL)
+                BUFS(17,NN+IDEB) = WACOMP(12,ICELL)
+                BUFS(18,NN+IDEB) = WACOMP(13,ICELL)
+                BUFS(19,NN+IDEB) = WACOMP(14,ICELL)
+                BUFS(20,NN+IDEB) = WACOMP(15,ICELL)
+                BUFS(21,NN+IDEB) = WACOMP(16,ICELL)                                
+              END IF
+            END DO
+            MSGTYP = MSGOFF
+            CALL MPI_ISEND(
+     S        BUFS(1,IDEB+1),NN*21,REAL,IT_SPMD(P),MSGTYP,
+     G        MPI_COMM_WORLD,REQ_SD(P),IERROR)
+            IDEB = IDEB + PSPHS(P)
+          END IF
+        END DO        
+      ENDIF  
 C
 C Reception WACOMP, WA, RHO
 C
-      IDEB = 0
-      DO P = 1, NSPMD
-        IF(PSPHR(P)/=0)THEN
-          MSGTYP = MSGOFF
-          CALL MPI_RECV(BUFR,15*PSPHR(P),REAL,IT_SPMD(P),
-     .                  MSGTYP,MPI_COMM_WORLD,STATUS,IERROR)
-          NN = 0
-          DO N = 1, PSPHR(P)
-            IF(ISPHR(IDEB+N)==1) THEN
-              NN = NN + 1
-              XSPHR(7,IDEB+N)  = BUFR(1,NN)
-              WACOMPR(1,IDEB+N)= BUFR(2,NN)
-              WACOMPR(2,IDEB+N)= ZERO
-              WACOMPR(3,IDEB+N)= ZERO
-              WACOMPR(4,IDEB+N)= ZERO
-              WACOMPR(5,IDEB+N)= BUFR(3,NN)
-              WACOMPR(6,IDEB+N)= BUFR(4,NN)
-              WACOMPR(7,IDEB+N)= BUFR(5,NN)
-              WACOMPR(8,IDEB+N)= ZERO
-              WACOMPR(9,IDEB+N)= ZERO
-              WACOMPR(10,IDEB+N)=ZERO
-              WACOMPR(11,IDEB+N)=ZERO
-              WACOMPR(12,IDEB+N)=ZERO
-              WACOMPR(13,IDEB+N)=ZERO
-              WACOMPR(14,IDEB+N)=ZERO
-              WACOMPR(15,IDEB+N)=ZERO
-              WACOMPR(16,IDEB+N)=ZERO
-              WAR(1,IDEB+N)= BUFR(6,NN)
-              WAR(2,IDEB+N)= BUFR(7,NN)
-              WAR(3,IDEB+N)= BUFR(8,NN)
-              WAR(4,IDEB+N)= BUFR(9,NN)
-              WAR(5,IDEB+N)= BUFR(10,NN)
-              WAR(6,IDEB+N)= BUFR(11,NN)
-              WAR(7,IDEB+N)= BUFR(12,NN)
-              WAR(8,IDEB+N)= BUFR(13,NN)
-              WAR(9,IDEB+N)= BUFR(14,NN)
-              WAR(10,IDEB+N)=BUFR(15,NN)
-            END IF
-          END DO	  
-          IDEB = IDEB + PSPHR(P)
-        END IF
-	
-      END DO
+      IF (SPH_IORD1 == 0) THEN
+        IDEB = 0
+        DO P = 1, NSPMD
+          IF(PSPHR(P)/=0)THEN
+            MSGTYP = MSGOFF
+            CALL MPI_RECV(BUFR,15*PSPHR(P),REAL,IT_SPMD(P),
+     .                    MSGTYP,MPI_COMM_WORLD,STATUS,IERROR)
+            NN = 0
+            DO N = 1, PSPHR(P)
+              IF(ISPHR(IDEB+N)==1) THEN
+                NN = NN + 1
+                XSPHR(7,IDEB+N)  = BUFR(1,NN)
+                WAR(1,IDEB+N)= BUFR(2,NN)
+                WAR(2,IDEB+N)= BUFR(3,NN)
+                WAR(3,IDEB+N)= BUFR(4,NN)
+                WAR(4,IDEB+N)= BUFR(5,NN)
+                WAR(5,IDEB+N)= BUFR(6,NN)
+                WAR(6,IDEB+N)= BUFR(7,NN)
+                WAR(7,IDEB+N)= BUFR(8,NN)
+                WAR(8,IDEB+N)= BUFR(9,NN)
+                WAR(9,IDEB+N)= BUFR(10,NN)
+                WAR(10,IDEB+N)=BUFR(11,NN)
+                WACOMPR(1,IDEB+N)= BUFR(12,NN)
+                WACOMPR(2,IDEB+N)= ZERO
+                WACOMPR(3,IDEB+N)= ZERO
+                WACOMPR(4,IDEB+N)= ZERO
+                WACOMPR(5,IDEB+N)= BUFR(13,NN)
+                WACOMPR(6,IDEB+N)= BUFR(14,NN)
+                WACOMPR(7,IDEB+N)= BUFR(15,NN)
+                WACOMPR(8,IDEB+N)= ZERO
+                WACOMPR(9,IDEB+N)= ZERO
+                WACOMPR(10,IDEB+N)=ZERO
+                WACOMPR(11,IDEB+N)=ZERO
+                WACOMPR(12,IDEB+N)=ZERO
+                WACOMPR(13,IDEB+N)=ZERO
+                WACOMPR(14,IDEB+N)=ZERO
+                WACOMPR(15,IDEB+N)=ZERO
+                WACOMPR(16,IDEB+N)=ZERO
+              END IF
+            END DO	  
+            IDEB = IDEB + PSPHR(P)
+          END IF
+        END DO
+      ELSE
+        IDEB = 0
+        DO P = 1, NSPMD
+          IF(PSPHR(P)/=0)THEN
+            MSGTYP = MSGOFF
+            CALL MPI_RECV(BUFR,21*PSPHR(P),REAL,IT_SPMD(P),
+     .                    MSGTYP,MPI_COMM_WORLD,STATUS,IERROR)
+            NN = 0
+            DO N = 1, PSPHR(P)
+              IF(ISPHR(IDEB+N)==1) THEN
+                NN = NN + 1
+                XSPHR(7,IDEB+N)  = BUFR(1,NN)
+                WAR(1,IDEB+N)= BUFR(2,NN)
+                WAR(2,IDEB+N)= BUFR(3,NN)
+                WAR(3,IDEB+N)= BUFR(4,NN)
+                WAR(4,IDEB+N)= BUFR(5,NN)
+                WAR(5,IDEB+N)= BUFR(6,NN)
+                WAR(6,IDEB+N)= BUFR(7,NN)
+                WAR(7,IDEB+N)= BUFR(8,NN)
+                WAR(8,IDEB+N)= BUFR(9,NN)
+                WAR(9,IDEB+N)= BUFR(10,NN)
+                WAR(10,IDEB+N)=BUFR(11,NN)
+                WACOMPR(1,IDEB+N)= BUFR(12,NN)
+                WACOMPR(2,IDEB+N)= ZERO
+                WACOMPR(3,IDEB+N)= ZERO
+                WACOMPR(4,IDEB+N)= ZERO
+                WACOMPR(5,IDEB+N)= ZERO
+                WACOMPR(6,IDEB+N)= ZERO
+                WACOMPR(7,IDEB+N)= ZERO
+                WACOMPR(8,IDEB+N)= BUFR(13,NN)
+                WACOMPR(9,IDEB+N)= BUFR(14,NN)
+                WACOMPR(10,IDEB+N)=BUFR(15,NN)
+                WACOMPR(11,IDEB+N)=BUFR(16,NN)
+                WACOMPR(12,IDEB+N)=BUFR(17,NN)
+                WACOMPR(13,IDEB+N)=BUFR(18,NN)
+                WACOMPR(14,IDEB+N)=BUFR(19,NN)
+                WACOMPR(15,IDEB+N)=BUFR(20,NN)
+                WACOMPR(16,IDEB+N)=BUFR(21,NN)
+              END IF
+            END DO	  
+            IDEB = IDEB + PSPHR(P)
+          END IF
+        END DO        
+      ENDIF
 C
 C Wait terminaison
 C
@@ -845,7 +908,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -857,8 +919,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "task_c.inc"
-#include      "sphcom.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -915,10 +975,10 @@ C
               NN = NN + 1
               STABR(7,IDEB+N)  = BUFR(NN)
             END IF
-          END DO	  
+          END DO    
           IDEB = IDEB + PSPHR(P)
         END IF
-	
+
       END DO
 C
 C Wait terminaison
@@ -949,7 +1009,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -962,7 +1021,6 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "task_c.inc"
 #include      "sphcom.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1062,7 +1120,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -1075,7 +1132,6 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "task_c.inc"
 #include      "sphcom.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1177,7 +1233,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -1190,7 +1245,6 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "task_c.inc"
 #include      "sphcom.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1270,7 +1324,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -1280,7 +1333,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -1326,7 +1378,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -1338,8 +1389,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "task_c.inc"
-#include      "sphcom.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1421,7 +1470,7 @@ Chd|        FORINTP                       source/elements/forintp.F
 Chd|-- calls ---------------
 Chd|        SPHBOX                        share/modules/sphbox.F        
 Chd|====================================================================
-      SUBROUTINE SPMD_SPHGETG(WGRADT,WACOMP,WGR)
+      SUBROUTINE SPMD_SPHGETG(WGRADT,WACOMP,WGR,SPH_IORD1)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -1430,7 +1479,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -1442,11 +1490,10 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "task_c.inc"
-#include      "sphcom.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+       INTEGER, INTENT(IN) :: SPH_IORD1
        my_real
      .        WGRADT(3,*), WACOMP(16,*), WGR(3,*)
 C-----------------------------------------------
@@ -1457,7 +1504,7 @@ C-----------------------------------------------
      .        IERROR, ICELL,
      .        REQ_SD(NSPMD), STATUS(MPI_STATUS_SIZE),MSGOFF
        my_real
-     .        BUFS(7,NSPHS), BUFR(7,NSPHR)
+     .        BUFS(7+6*SPH_IORD1,NSPHS), BUFR(7+6*SPH_IORD1,NSPHR)
        DATA MSGOFF/2016/
 C-----------------------------------------------
 C   S o u r c e  L i n e s
@@ -1466,68 +1513,139 @@ C-----------------------------------------------
 C
 C Envoi WACOMP, WA, RHO sur cellules actives
 C
-      IDEB = 0
-      DO P = 1, NSPMD
-        IF(PSPHS(P)>0)THEN
-          NN = 0
-          DO N = 1, PSPHS(P)
-            IF(ISPHS(IDEB+N)==1) THEN
-              NN = NN + 1
-              ICELL = LSPHS(IDEB+N)
-C             INOD = KXSP(3,ICELL)
-              BUFS(1,NN+IDEB)  = WGRADT(1,ICELL)
-              BUFS(2,NN+IDEB)  = WGRADT(2,ICELL)
-              BUFS(3,NN+IDEB)  = WGRADT(3,ICELL)
-              BUFS(4,NN+IDEB)  = WACOMP(1,ICELL)
-              BUFS(5,NN+IDEB)  = WACOMP(5,ICELL)
-              BUFS(6,NN+IDEB)  = WACOMP(6,ICELL)
-              BUFS(7,NN+IDEB)  = WACOMP(7,ICELL)
-            END IF
-          END DO
-          MSGTYP = MSGOFF
-          CALL MPI_ISEND(
-     S      BUFS(1,IDEB+1),NN*7,REAL,IT_SPMD(P),MSGTYP,
-     G      MPI_COMM_WORLD,REQ_SD(P),IERROR)
-          IDEB = IDEB + PSPHS(P)
-        END IF
-      END DO
+      IF (SPH_IORD1==0) THEN
+        IDEB = 0
+        DO P = 1, NSPMD
+          IF(PSPHS(P)>0)THEN
+            NN = 0
+            DO N = 1, PSPHS(P)
+              IF(ISPHS(IDEB+N)==1) THEN
+                NN = NN + 1
+                ICELL = LSPHS(IDEB+N)
+C               INOD = KXSP(3,ICELL)
+                BUFS(1,NN+IDEB)  = WGRADT(1,ICELL)
+                BUFS(2,NN+IDEB)  = WGRADT(2,ICELL)
+                BUFS(3,NN+IDEB)  = WGRADT(3,ICELL)
+                BUFS(4,NN+IDEB)  = WACOMP(1,ICELL)
+                BUFS(5,NN+IDEB)  = WACOMP(5,ICELL)
+                BUFS(6,NN+IDEB)  = WACOMP(6,ICELL)
+                BUFS(7,NN+IDEB)  = WACOMP(7,ICELL)
+              END IF
+            END DO
+            MSGTYP = MSGOFF
+            CALL MPI_ISEND(
+     S        BUFS(1,IDEB+1),NN*7,REAL,IT_SPMD(P),MSGTYP,
+     G        MPI_COMM_WORLD,REQ_SD(P),IERROR)
+            IDEB = IDEB + PSPHS(P)
+          END IF
+        END DO
+      ELSE
+        IDEB = 0
+        DO P = 1, NSPMD
+          IF(PSPHS(P)>0)THEN
+            NN = 0
+            DO N = 1, PSPHS(P)
+              IF(ISPHS(IDEB+N)==1) THEN
+                NN = NN + 1
+                ICELL = LSPHS(IDEB+N)
+C               INOD = KXSP(3,ICELL)
+                BUFS(1,NN+IDEB)  = WGRADT(1,ICELL)
+                BUFS(2,NN+IDEB)  = WGRADT(2,ICELL)
+                BUFS(3,NN+IDEB)  = WGRADT(3,ICELL)
+                BUFS(4,NN+IDEB)  = WACOMP(1,ICELL)
+                BUFS(5,NN+IDEB)  = WACOMP(8,ICELL)
+                BUFS(6,NN+IDEB)  = WACOMP(9,ICELL)
+                BUFS(7,NN+IDEB)  = WACOMP(10,ICELL)
+                BUFS(8,NN+IDEB)  = WACOMP(11,ICELL)
+                BUFS(9,NN+IDEB)  = WACOMP(12,ICELL)
+                BUFS(10,NN+IDEB) = WACOMP(13,ICELL)
+                BUFS(11,NN+IDEB) = WACOMP(14,ICELL)
+                BUFS(12,NN+IDEB) = WACOMP(15,ICELL)
+                BUFS(13,NN+IDEB) = WACOMP(16,ICELL)
+              END IF
+            END DO
+            MSGTYP = MSGOFF
+            CALL MPI_ISEND(
+     S        BUFS(1,IDEB+1),NN*13,REAL,IT_SPMD(P),MSGTYP,
+     G        MPI_COMM_WORLD,REQ_SD(P),IERROR)
+            IDEB = IDEB + PSPHS(P)
+          END IF
+        END DO        
+      ENDIF  
 C
 C Reception WACOMP, WA, RHO
 C
-      IDEB = 0
-      DO P = 1, NSPMD
-        IF(PSPHR(P)/=0)THEN
-          MSGTYP = MSGOFF
-          CALL MPI_RECV(BUFR,7*PSPHR(P),REAL,IT_SPMD(P),
+      IF (SPH_IORD1==0) THEN
+        IDEB = 0
+        DO P = 1, NSPMD
+          IF(PSPHR(P)/=0)THEN
+            MSGTYP = MSGOFF
+            CALL MPI_RECV(BUFR,7*PSPHR(P),REAL,IT_SPMD(P),
      .                  MSGTYP,MPI_COMM_WORLD,STATUS,IERROR)
-          NN = 0
-          DO N = 1, PSPHR(P)
-            IF(ISPHR(IDEB+N)==1) THEN
-              NN = NN + 1
-              WGR(1,IDEB+N)= BUFR(1,NN)
-              WGR(2,IDEB+N)= BUFR(2,NN)
-              WGR(3,IDEB+N)= BUFR(3,NN)
-              WACOMPR(1,IDEB+N)= BUFR(4,NN)
-              WACOMPR(2,IDEB+N)= ZERO
-              WACOMPR(3,IDEB+N)= ZERO
-              WACOMPR(4,IDEB+N)= ZERO
-              WACOMPR(5,IDEB+N)= BUFR(5,NN)
-              WACOMPR(6,IDEB+N)= BUFR(6,NN)
-              WACOMPR(7,IDEB+N)= BUFR(7,NN)
-              WACOMPR(8,IDEB+N)= ZERO
-              WACOMPR(9,IDEB+N)= ZERO
-              WACOMPR(10,IDEB+N)=ZERO
-              WACOMPR(11,IDEB+N)=ZERO
-              WACOMPR(12,IDEB+N)=ZERO
-              WACOMPR(13,IDEB+N)=ZERO
-              WACOMPR(14,IDEB+N)=ZERO
-              WACOMPR(15,IDEB+N)=ZERO
-              WACOMPR(16,IDEB+N)=ZERO
-            END IF
-          END DO
-          IDEB = IDEB + PSPHR(P)
-        END IF
-      END DO
+            NN = 0
+            DO N = 1, PSPHR(P)
+              IF(ISPHR(IDEB+N)==1) THEN
+                NN = NN + 1
+                WGR(1,IDEB+N)= BUFR(1,NN)
+                WGR(2,IDEB+N)= BUFR(2,NN)
+                WGR(3,IDEB+N)= BUFR(3,NN)
+                WACOMPR(1,IDEB+N)= BUFR(4,NN)
+                WACOMPR(2,IDEB+N)= ZERO
+                WACOMPR(3,IDEB+N)= ZERO
+                WACOMPR(4,IDEB+N)= ZERO
+                WACOMPR(5,IDEB+N)= BUFR(5,NN)
+                WACOMPR(6,IDEB+N)= BUFR(6,NN)
+                WACOMPR(7,IDEB+N)= BUFR(7,NN)
+                WACOMPR(8,IDEB+N)= ZERO
+                WACOMPR(9,IDEB+N)= ZERO
+                WACOMPR(10,IDEB+N)=ZERO
+                WACOMPR(11,IDEB+N)=ZERO
+                WACOMPR(12,IDEB+N)=ZERO
+                WACOMPR(13,IDEB+N)=ZERO
+                WACOMPR(14,IDEB+N)=ZERO
+                WACOMPR(15,IDEB+N)=ZERO
+                WACOMPR(16,IDEB+N)=ZERO
+              END IF
+            END DO
+            IDEB = IDEB + PSPHR(P)
+          END IF
+        END DO
+      ELSE
+        IDEB = 0
+        DO P = 1, NSPMD
+          IF(PSPHR(P)/=0)THEN
+            MSGTYP = MSGOFF
+            CALL MPI_RECV(BUFR,13*PSPHR(P),REAL,IT_SPMD(P),
+     .                  MSGTYP,MPI_COMM_WORLD,STATUS,IERROR)
+            NN = 0
+            DO N = 1, PSPHR(P)
+              IF(ISPHR(IDEB+N)==1) THEN
+                NN = NN + 1
+                WGR(1,IDEB+N)= BUFR(1,NN)
+                WGR(2,IDEB+N)= BUFR(2,NN)
+                WGR(3,IDEB+N)= BUFR(3,NN)
+                WACOMPR(1,IDEB+N)= BUFR(4,NN)
+                WACOMPR(2,IDEB+N)= ZERO
+                WACOMPR(3,IDEB+N)= ZERO
+                WACOMPR(4,IDEB+N)= ZERO
+                WACOMPR(5,IDEB+N)= ZERO
+                WACOMPR(6,IDEB+N)= ZERO
+                WACOMPR(7,IDEB+N)= ZERO
+                WACOMPR(8,IDEB+N)= BUFR(5,NN)
+                WACOMPR(9,IDEB+N)= BUFR(6,NN)
+                WACOMPR(10,IDEB+N)=BUFR(7,NN)
+                WACOMPR(11,IDEB+N)=BUFR(8,NN)
+                WACOMPR(12,IDEB+N)=BUFR(9,NN)
+                WACOMPR(13,IDEB+N)=BUFR(10,NN)
+                WACOMPR(14,IDEB+N)=BUFR(11,NN)
+                WACOMPR(15,IDEB+N)=BUFR(12,NN)
+                WACOMPR(16,IDEB+N)=BUFR(13,NN)
+              END IF
+            END DO
+            IDEB = IDEB + PSPHR(P)
+          END IF
+        END DO
+      ENDIF
 C
 C Wait terminaison
 C
@@ -1557,7 +1675,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -1570,7 +1687,6 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "task_c.inc"
 #include      "sphcom.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1685,7 +1801,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -1696,10 +1811,8 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "task_c.inc"
 #include      "sphcom.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -1851,10 +1964,10 @@ C
                   IXSP(NVOIS2+NVOISS2,ICELL)=JK
                 ENDIF
               ENDDO 
-    	      KXSP(4,ICELL)= NVOIS1
- 	      KXSP(5,ICELL)= NVOIS2
-	      KXSP(6,ICELL)=NVOISS1
-	      KXSP(7,ICELL)=NVOISS2
+                KXSP(4,ICELL)= NVOIS1
+                KXSP(5,ICELL)= NVOIS2
+                KXSP(6,ICELL)=NVOISS1
+                KXSP(7,ICELL)=NVOISS2
             ENDIF
           END DO
           IDEB = IDEB + PSPHS(P)
@@ -1891,7 +2004,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -1904,7 +2016,6 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "task_c.inc"
 #include      "sphcom.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -2001,7 +2112,6 @@ C-----------------------------------------------
 #include      "com08_c.inc"
 #include      "task_c.inc"
 #include      "sphcom.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -2145,15 +2255,15 @@ C         plus proche voisin en amont de l'outlet => IPPV.
                 TMP_IPPV(2,IPPVR)=P !proc sur lequel il se situe
                 TMP_IPPV(3,IPPVR)=(-IPPV)-N1 !Indice IPPV (local)
                 MYPSPHS(P)=MYPSPHS(P)+1
-		GOTO 160
+          GOTO 160
                 ELSEIF(P==NSPMD)THEN
                    TMP_IPPV(2,IPPVR)=P !proc sur lequel il se situe
                    TMP_IPPV(3,IPPVR)=(-IPPV)-N1 !Indice IPPV (local)
-                   MYPSPHS(P)=MYPSPHS(P)+1	
-		ENDIF	
+                   MYPSPHS(P)=MYPSPHS(P)+1
+          ENDIF
                ENDIF
              ENDDO ! ENDDO P=1,NSPMD
- 160      CONTINUE	     
+ 160      CONTINUE       
           ENDIF
         ENDIF
        ENDIF
@@ -2417,8 +2527,8 @@ c envoi
      S      BUFS(1,IDEB2+1),SIZ,REAL,IT_SPMD(P),MSGTYP,
      G      MPI_COMM_WORLD,REQ_SD3(P),IERROR)
         IDEB2= IDEB2+MYPSPHR(P)
-	ENDIF
-	IDEB = IDEB + PSPHS(P)
+          ENDIF
+          IDEB = IDEB + PSPHS(P)
       END DO !ENDDO P = 1, NSPMD
 C
 C Reception 
@@ -2485,14 +2595,10 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "comlock.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "task_c.inc"
-#include      "timeri_c.inc"
 #include      "sphcom.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -2580,7 +2686,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
 C-----------------------------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------

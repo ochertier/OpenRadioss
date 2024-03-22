@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -76,7 +76,7 @@ C
       Z12=Z1*Z1 
       Z22=Z2*Z2
       Z32=Z3*Z3 
-      Z42=Z4*Z4 		
+      Z42=Z4*Z4 
       XX=X12 + X22 + X32 + X42 
       YY=Y12 + Y22 + Y32 + Y42 
       ZZ=Z12 + Z22 + Z32 + Z42 
@@ -90,7 +90,7 @@ C
       YZ2=YZ*YZ
       ZX2=ZX*ZX
       DET= XXX*YYY*ZZZ - XXX*YZ2 - YYY*ZX2 - ZZZ*XY2 
-     .  				   - TWO*XY*YZ*ZX
+     .             - TWO*XY*YZ*ZX
 C
 C --- VECT_SURF = 0.5*(X1^X2 + X2^X3 + X3^X4 +X4^X1)
 C

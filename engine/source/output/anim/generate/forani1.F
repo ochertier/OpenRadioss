@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -29,41 +29,62 @@ Chd|        H3D_MOD                       share/modules/h3d_mod.F
 Chd|====================================================================
       SUBROUTINE FORANI1(FANI,A,NFIA,NFEA,NFOA,NODFT,NODLT,FEXT,H3D_DATA)
 C-----------------------------------------------
+C   D e s c r i p t i o n
+C-----------------------------------------------
+C This subroutine is related to output of FINT and FEXT vectors.
+C   When FORANI1 is called, A is containing: FEXT
+C   When FORANI2 is called, A is containing: FEXT+FINT
+C   When FORANI3 is called, A is containing:(FEXT+FINT+FGRAV)/m
+C
+C                        forani1       forani2                   forani3
+C       FANI(:,N+NFIA) =   -FEXT  +(FEXT+FINT)                               = FINT
+C       FANI(:,N+NFEA) =   +FEXT  -(FEXT+FINT)  + [(FEXT+FINT+FRAV)/m]*m     = FEXT+FGRAV
+C
+C-----------------------------------------------
+C
+C  ANIM_V(5)            : /ANIM/VECT/FINT
+C  OUTP_V(5)            : /OUTP/VECT/FINT
+C  H3D_DATA%N_VECT_FINT : /H3D/NODA/FINT
+C
+C  ANIM_V(6)            : /ANIM/VECT/FEXT
+C  OUTP_V(6)            : /OUTP/VECT/FEXT
+C  H3D_DATA%N_VECT_FEXT : /H3D/NODA/FEXT
+C
+C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE H3D_MOD
-C----6------------------------------------------ 
+C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com04_c.inc"
-#include      "scr05_c.inc"
+!ANIM_V
 #include      "scr14_c.inc"
+!OUTP_V
 #include      "scr16_c.inc"
-#include      "rnur_c.inc"
+!IPARIT
 #include      "parit_c.inc"
-C-----------------------------------------------------------------
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NFIA,NFEA,NFOA,NODFT,NODLT
-C     REAL
-      my_real
-     .   A(3,*)    ,FANI(3,*) ,FEXT(3,*)
+      my_real A(3,*),FANI(3,*),FEXT(3,*)
       TYPE (H3D_DATABASE) :: H3D_DATA
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER N,I
-C
+C-----------------------------------------------
+C   S o u r c e   L i n e s
+C-----------------------------------------------
+
+C --- PARITH OFF CASE
       IF(IPARIT == 0)THEN
         IF(ANIM_V(5)+OUTP_V(5)+H3D_DATA%N_VECT_FINT > 0) THEN
+        !if FINT is requested (ANIM or OUTP or H3D)
 #include      "vectorize.inc"
           DO N=NODFT,NODLT
             FANI(1,N+NFIA) = - A(1,N)
@@ -72,6 +93,7 @@ C
           ENDDO
         ENDIF
         IF(ANIM_V(6)+OUTP_V(6)+H3D_DATA%N_VECT_FEXT > 0) THEN
+        !if FEXT is requested (ANIM or OUTP or H3D)
 #include      "vectorize.inc"
           DO N=NODFT,NODLT
             FANI(1,N+NFEA) =  A(1,N)
@@ -79,6 +101,9 @@ C
             FANI(3,N+NFEA) =  A(3,N)
           ENDDO
         ENDIF
+
+
+C --- PARITH ON CASE
       ELSE
         IF(ANIM_V(5)+OUTP_V(5)+H3D_DATA%N_VECT_FINT >0) THEN
 #include      "vectorize.inc"
@@ -96,8 +121,7 @@ C
             FANI(3,N+NFEA) =  FEXT(3,N)
           ENDDO
         ENDIF
-        IF(ANIM_V(5)+OUTP_V(5)+H3D_DATA%N_VECT_FINT > 0 .OR. 
-     .            ANIM_V(6)+OUTP_V(6)+H3D_DATA%N_VECT_FEXT > 0) THEN
+        IF(ANIM_V(5)+OUTP_V(5)+H3D_DATA%N_VECT_FINT > 0 .OR. ANIM_V(6)+OUTP_V(6)+H3D_DATA%N_VECT_FEXT > 0) THEN
 #include      "vectorize.inc"
           DO N=NODFT,NODLT
             FEXT(1,N)=ZERO
@@ -106,6 +130,6 @@ C
           ENDDO
         ENDIF
       ENDIF
-
+C-----------------------------------------------
       RETURN
-      END
+      END SUBROUTINE FORANI1

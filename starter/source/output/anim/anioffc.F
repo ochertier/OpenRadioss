@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,8 +25,8 @@ Chd|  ANIOFFC                       source/output/anim/anioffc.F
 Chd|-- called by -----------
 Chd|        GENANI1                       source/output/anim/genani1.F  
 Chd|-- calls ---------------
-Chd|        WRITE_C_C                     source/output/tools/write_routines.c
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        WRITE_C_C                     ../common_source/tools/input_output/write_routtines.c
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE ANIOFFC(ELBUF_TAB,IPARG,IOFF,EL2FA,NBF   )                      
 C-----------------------------------------------
@@ -42,8 +42,7 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------                        
 #include      "com01_c.inc"                                             
 #include      "com04_c.inc"                                             
-#include      "param_c.inc"                                             
-#include      "rnur_c.inc"                                              
+#include      "param_c.inc"                                                                                         
 C-----------------------------------------------                        
 C   D u m m y   A r g u m e n t s                                       
 C-----------------------------------------------                        
@@ -54,7 +53,7 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------                        
 C     REAL                                                    
       INTEGER I, NG, NEL, NFT, ITY, LFT,LLT, MLW,                      
-     .   N1,N2,N3,N4,NN1,NN2,NN3,NN4,NN5,NN6,NN7,NN8,NN9,NN10,N_FA                          
+     .   N1,N2,N3,N4,NN1,NN2,NN3,NN4,NN5,NN6,NN7,NN8,NN9,N_FA                          
       REAL R4                                                           
       my_real
      .   OFF
@@ -68,8 +67,7 @@ C---+----1----+----2----+----3----+----4----+----5----+----6----+----7--
       NN6 = NN5 + NUMELTG                                               
       NN7 = NN6                                                         
       NN8 = NN7                                                         
-      NN9 = NN8                                                         
-      NN10= NN9 + NUMELUR                                               
+      NN9 = NN8                                                                                                    
 C-----------------------------------------------                        
 C                                                                       
       DO NG=1,NGROUP                                                    

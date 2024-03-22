@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,8 +27,11 @@ Chd|        RADIOSS2                      source/engine/radioss2.F
 Chd|-- calls ---------------
 Chd|====================================================================
       SUBROUTINE UTABLE_DUM(IERR)
-C---------+---------+---+---+--------------------------------------------
+C-----------------------------------------------
+C   I m p l i c i t   T y p e s
+C-----------------------------------------------
 #include      "implicit_f.inc"
+C-----------------------------------------------
        INTEGER IERR
        IERR=0
       END
@@ -40,12 +43,21 @@ Chd|        TABLE_GLOB_MOD                share/modules/table_glob_mod.F
 Chd|        TABLE_MOD                     share/modules/table_mod.F     
 Chd|====================================================================
       INTEGER FUNCTION GET_U_NUMTABLE(TID) 
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
       USE TABLE_GLOB_MOD
       USE TABLE_MOD
+C-----------------------------------------------
+C   I m p l i c i t   T y p e s
+C-----------------------------------------------      
+#include      "implicit_f.inc"
+C-----------------------------------------------
+#include      "com04_c.inc"     
+C----------------------------------------------- 
       TYPE(TTABLE) CUR_TABLE
       INTEGER I,TID
 C need NTABLE
-#include      "com04_c.inc"
 C
       GET_U_NUMTABLE = 0
       DO I=1,NTABLE
@@ -65,6 +77,9 @@ Chd|        INTERFACE_TABLE_MOD           share/modules/table_mod.F
 Chd|        TABLE_GLOB_MOD                share/modules/table_glob_mod.F
 Chd|====================================================================
       SUBROUTINE GET_U_TABLE(ITABLE,XX,YY) 
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
       USE TABLE_GLOB_MOD
       USE INTERFACE_TABLE_MOD
 C-----------------------------------------------
@@ -166,9 +181,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER ITABLE,NEL0
@@ -181,7 +193,7 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
 C
-      CALL TABLE_VINTERP(TABLE(ITABLE),NEL0,IPOS,XX,YY,DYDX1)
+      CALL TABLE_VINTERP(TABLE(ITABLE),NEL0,NEL0,IPOS,XX,YY,DYDX1)
       RETURN
       END
 
@@ -201,16 +213,12 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER ITABLE,NEL0,XXDIM
       INTEGER IPOS(NEL0,XXDIM)
       my_real  XX(NEL0,XXDIM)
-      my_real
-     .       YY(*), DYDX1(*)
+      my_real  YY(*), DYDX1(*)
      
       my_real, DIMENSION(:,:), ALLOCATABLE :: XX2 
       INTEGER, DIMENSION(:,:), ALLOCATABLE :: IPOS2
@@ -225,7 +233,7 @@ C
       IPOS2(1:NEL0,1:XXDIM) = IPOS(1:NEL0,1:XXDIM)
       XX2(1:NEL0,1:XXDIM) = XX(1:NEL0,1:XXDIM)
 
-      CALL TABLE_VINTERP(TABLE(ITABLE),NEL0,IPOS2,XX2,YY,DYDX1)
+      CALL TABLE_VINTERP(TABLE(ITABLE),NEL0,NEL0,IPOS2,XX2,YY,DYDX1)
 
       DEALLOCATE(XX2)
       DEALLOCATE(IPOS2)

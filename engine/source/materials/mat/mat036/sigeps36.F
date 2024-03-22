@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -32,18 +32,17 @@ Chd|        VINTER2                       source/tools/curve/vinter.F
 Chd|        FINTER                        source/tools/curve/finter.F   
 Chd|====================================================================
       SUBROUTINE SIGEPS36(
-     1     NEL    ,NUPARAM,NUVAR   ,MFUNC   ,KFUNC   ,NPF    ,
-     2     TF     ,TIME   ,TIMESTEP,UPARAM  ,RHO0    ,RHO    ,
-     3     VOLUME ,EINT   ,
+     1     NEL    ,NUVAR   ,MFUNC   ,KFUNC   ,NPF    ,
+     2     TF     ,TIME   ,TIMESTEP,UPARAM  ,RHO0    ,
      4     DEPSXX ,DEPSYY ,DEPSZZ  ,DEPSXY  ,DEPSYZ  ,DEPSZX ,
      5     EPSXX  ,EPSYY  ,EPSZZ   ,EPSXY   ,EPSYZ   ,EPSZX  ,
      6     SIGOXX ,SIGOYY ,SIGOZZ  ,SIGOXY  ,SIGOYZ  ,SIGOZX ,
      7     SIGNXX ,SIGNYY ,SIGNZZ  ,SIGNXY  ,SIGNYZ  ,SIGNZX ,
-     8     SOUNDSP,VISCMAX,UVAR    ,OFF     ,NGL     ,IPT    ,
+     8     SOUNDSP,VISCMAX,UVAR    ,OFF     ,NGL     ,
      9     IPM    ,MAT    ,EPSP    ,IPLA    ,YLD     ,PLA    ,
      A     DPLA1  ,ETSE   ,AL_IMP  ,SIGNOR  ,AMU     ,
-     B     FACYLDI,NVARTMP,VARTMP  ,SIGB    ,DMG     ,INLOC  ,
-     C     PLANL  )
+     B     FACYLDI,NVARTMP,VARTMP  ,DMG     ,INLOC  ,PLANL,
+     C     SIGBXX,SIGBYY,SIGBZZ,SIGBXY,SIGBYZ,SIGBZX)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -70,8 +69,6 @@ C TIMESTEP|  1      | F | R | CURRENT TIME STEP
 C UPARAM  | NUPARAM | F | R | USER MATERIAL PARAMETER ARRAY
 C RHO0    | NEL     | F | R | INITIAL DENSITY
 C RHO     | NEL     | F | R | DENSITY
-C VOLUME  | NEL     | F | R | VOLUME
-C EINT    | NEL     | F | R | TOTAL INTERNAL ENERGY
 C ...     |         |   |   |
 C DEPSXX  | NEL     | F | R | STRAIN INCREMENT XX
 C DEPSYY  | NEL     | F | R | STRAIN INCREMENT YY
@@ -93,21 +90,19 @@ C UVAR    |NEL*NUVAR| F |R/W| USER ELEMENT VARIABLE ARRAY
 C OFF     | NEL     | F |R/W| DELETED ELEMENT FLAG (=1. ON, =0. OFF)
 C---------+---------+---+---+--------------------------------------------
 #include      "param_c.inc"
-#include      "parit_c.inc"
 #include      "scr17_c.inc"
-#include      "scr05_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
 #include      "units_c.inc"
 #include      "impl1_c.inc"
 C=======================================================================
-      INTEGER NEL, NUPARAM, NUVAR,IPT,IPLA,NVARTMP,INLOC
-      INTEGER ,DIMENSION(NEL) :: NGL,MAT
-      INTEGER ,DIMENSION(NPROPMI,NUMMAT) :: IPM
+      INTEGER, INTENT(IN) :: NEL, NUVAR,IPLA,NVARTMP,INLOC
+      INTEGER ,DIMENSION(NEL), INTENT(IN) :: NGL,MAT
+      INTEGER ,DIMENSION(NPROPMI,NUMMAT), INTENT(IN) :: IPM
       my_real
-     .   TIME,TIMESTEP,UPARAM(*),SIGB(*),
-     .   RHO(NEL),RHO0(NEL),VOLUME(NEL),EINT(NEL),
+     .   TIME,TIMESTEP,UPARAM(*),
+     .   RHO0(NEL),
      .   EPSXX(NEL),EPSYY(NEL),EPSZZ(NEL),
      .   EPSXY(NEL),EPSYZ(NEL),EPSZX(NEL),
      .   DEPSXX(NEL),DEPSYY(NEL),DEPSZZ(NEL),
@@ -131,6 +126,7 @@ C-----------------------------------------------
      .        UVAR(NEL,NUVAR), OFF(NEL),  YLD(NEL),
      .        PLA(NEL)
       INTEGER, INTENT(INOUT) :: VARTMP(NEL,NVARTMP)
+      my_real, DIMENSION(NEL), INTENT(INOUT)  :: SIGBXX,SIGBYY,SIGBZZ,SIGBXY,SIGBYZ,SIGBZX
 C-----------------------------------------------
 C   VARIABLES FOR FUNCTION INTERPOLATION 
 C-----------------------------------------------
@@ -161,7 +157,7 @@ C-----------------------------------------------
      .        DSXX,DSYY,DSZZ,DSXY,DSYZ,
      .        DSZX,SIGPXX,SIGPYY,SIGPXY,SIGPYZ,SIGPZX,SIGPZZ,ALPHA,
      .        EPSR1DAV,EPSR1F,VM_1,G3H,NORM_1,EPSMAX,SSP,
-     .        EINF,CE1,EPSR2,SVM,DF,F,DFSR,COEF
+     .        EINF,CE1,EPSR2,SVM,DF,F
       my_real :: FACT(NEL),
      .        C1(MVSIZ),G(MVSIZ),G2(MVSIZ),G3(MVSIZ),
      .        Y1(MVSIZ),Y2(MVSIZ),H(MVSIZ),DYDX1(MVSIZ),
@@ -172,16 +168,16 @@ C-----------------------------------------------
      .        SIGEXX(MVSIZ),SIGEYY(MVSIZ),SIGEZZ(MVSIZ),
      .        SIGEXY(MVSIZ),SIGEYZ(MVSIZ),SIGEZX(MVSIZ),
      .        DYDXE(MVSIZ),PLAOLD(MVSIZ),
-     .        YFAC(MVSIZ,2)
+     .        YFAC(MVSIZ,2),
+     .        COEF(MVSIZ),
+     .        DFSR(MVSIZ)
       my_real
      .       PLAP(MVSIZ),SVM2(MVSIZ),DPLA_J(MVSIZ),DPLA_I(MVSIZ),
      .       HI(MVSIZ),ESCALE12(MVSIZ),
      .       SVM_TAB(MVSIZ)
       INTEGER :: NINDEX_PLA,NINDEX_VINTER
       INTEGER, DIMENSION(MVSIZ) :: INDEX_PLA,INDEX_VINTER
-      my_real, DIMENSION(MVSIZ) :: TAB_LOC,Y1_LOC,DYDX1_LOC, Y2_LOC,DYDX2_LOC ,VECNUL 
-      my_real, DIMENSION(:) ,POINTER  :: SIGBXX,SIGBYY,SIGBZZ,SIGBXY,SIGBYZ,SIGBZX
-      TARGET  SIGB, VECNUL      
+      my_real, DIMENSION(MVSIZ) :: TAB_LOC,Y1_LOC,DYDX1_LOC, Y2_LOC,DYDX2_LOC 
 C=======================================================================
 C     USER VARIABLES INITIALIZATION
 C-----------------------------------------------
@@ -227,22 +223,7 @@ C
         SOUNDSP(I) = SSP
       ENDDO            
 c-----------------------------
-      IF (FISOKIN > 0) THEN
-          SIGBXX => SIGB(1      :  NEL) 
-          SIGBYY => SIGB(NEL+1  :2*NEL)
-          SIGBZZ => SIGB(2*NEL+1:3*NEL)
-          SIGBXY => SIGB(3*NEL+1:4*NEL)
-          SIGBYZ => SIGB(4*NEL+1:5*NEL)
-          SIGBZX => SIGB(5*NEL+1:6*NEL)
-      ELSE IF (IMPL_S > 0) THEN
-          VECNUL(1:NEL) = ZERO
-          SIGBXX => VECNUL(1:NEL)
-          SIGBYY => VECNUL(1:NEL)
-          SIGBZZ => VECNUL(1:NEL)
-          SIGBXY => VECNUL(1:NEL)
-          SIGBYZ => VECNUL(1:NEL)
-          SIGBZX => VECNUL(1:NEL)     
-      ENDIF
+
 C------------------------------------------
 C     ECROUISSAGE CINE
 C------------------------------------------
@@ -446,19 +427,12 @@ c-----------
             ENDDO
           ENDDO
 C
-          IF (ISMOOTH == 3) THEN       ! log_n  based interpolation of strain rate
+          IF (ISMOOTH == 2) THEN      ! log_n  based interpolation of strain rate
 #include    "vectorize.inc"
             DO I=1,NEL
               EPSP1 = MAX(UPARAM(6+JJ(I)), EM20)
               EPSP2 = UPARAM(7+JJ(I))
-              RFAC(I) = LOG(MAX(PLAP(I),EM20)/EPSP1) / LOG(EPSP2/EPSP1)
-            ENDDO
-          ELSE IF (ISMOOTH == 2) THEN  ! log_10 based interpolation of strain rate
-#include    "vectorize.inc"
-            DO I=1,NEL
-              EPSP1 = MAX(UPARAM(6+JJ(I)), EM20)
-              EPSP2 = UPARAM(7+JJ(I))
-              RFAC(I) = LOG10(MAX(PLAP(I),EM20)/EPSP1) / LOG10(EPSP2/EPSP1)
+              RFAC(I) = LOG(MAX(EPSP(I),EM20)/EPSP1) / LOG(EPSP2/EPSP1)
             ENDDO
           ELSE                        ! linear interpolation of strain rate
 #include "vectorize.inc"
@@ -498,9 +472,9 @@ C
             DO I=1,NEL
               J1 = JJ(I)
               J2 = J1+1
-              Y1(I)=Y1(I)*YFAC(I,1)
-              Y2(I)=Y2(I)*YFAC(I,2)
-              FAC   = RFAC(I)
+              Y1(I)= Y1(I)*YFAC(I,1)
+              Y2(I)= Y2(I)*YFAC(I,2)
+              FAC  = RFAC(I)
               CC = FAIL(I)* PFAC(I)
               YLD(I)  = (Y1(I)    + FAC*(Y2(I)-Y1(I))) * CC
               DYDX1(I)= DYDX1(I)*YFAC(I,1)
@@ -635,8 +609,8 @@ c ---       nonlinear hardening requires iterations in radial return --
               DO I=1,NEL
 C               inside M36ITER_IMP, IPOS1=0        
                 J1 = JJ(I)
-                IAD1(I)  = HALF*NPF(IFUNC(J1)) + 1
-                ILEN1(I) = HALF*NPF(IFUNC(J1)+1) - IAD1(I) 
+                IAD1(I)  = NPF(IFUNC(J1)) / 2 + 1
+                ILEN1(I) = NPF(IFUNC(J1)+1) / 2 - IAD1(I) 
               ENDDO
               CALL M36ITER_IMP( SIGNXX,  SIGNYY,  SIGNZZ,
      .                          SIGNXY,  SIGNYZ,  SIGNZX,
@@ -719,21 +693,13 @@ c
                 IF (PLAP(I) >= UPARAM(6+J)) JJ(I) = J               
               ENDDO
             ENDDO  
-            IF (ISMOOTH == 3) THEN       ! log_n  based interpolation of strain rate
+            IF (ISMOOTH == 2) THEN       ! log_n  based interpolation of strain rate
 #include     "vectorize.inc" 
               DO II=1,NINDX                                             
                 I = INDEX(II) 
                 EPSP1 = MAX(UPARAM(6+JJ(I)), EM20)
                 EPSP2 = UPARAM(7+JJ(I))
                 RFAC(I) = LOG(MAX(PLAP(I),EM20)/EPSP1) / LOG(EPSP2/EPSP1)
-              ENDDO
-            ELSE IF (ISMOOTH == 2) THEN  ! log_10 based interpolation of strain rate
-#include     "vectorize.inc" 
-              DO II=1,NINDX                                             
-                I = INDEX(II) 
-                EPSP1 = MAX(UPARAM(6+JJ(I)), EM20)
-                EPSP2 = UPARAM(7+JJ(I))
-                RFAC(I) = LOG10(MAX(PLAP(I),EM20)/EPSP1) / LOG10(EPSP2/EPSP1)
               ENDDO
             ELSE                         ! linear interpolation of strain rate
 #include     "vectorize.inc" 
@@ -796,7 +762,7 @@ c
                 H(I)    = FAIL(I)*(DYDX1(I) + FAC*(DYDX2(I)-DYDX1(I)))
                 YLD(I) = YLD(I)*MAX(ZERO,PFAC(I))
                 H(I)   = H(I)  *MAX(ZERO,PFAC(I))          
-                DFSR   = H(I)  + MAX(ZERO,PFAC(I))*FAIL(I)*(Y2(I)-Y1(I))/
+                DFSR(I)   = H(I)  + MAX(ZERO,PFAC(I))*FAIL(I)*(Y2(I)-Y1(I))/
      .         (UPARAM(7+JJ(I))-UPARAM(6+JJ(I))) /TIMESTEP
             ENDDO
 c------------------------
@@ -812,7 +778,7 @@ c------------------------
                 SVM       = R(I)* SVM_TAB(I)                         
 
                 F = SVM -  YLD(I) - G3(I) *DPLA_I(I)                 
-                DF = - G3(I) -DFSR                                   
+                DF = - G3(I) -DFSR(I)                                   
                 DF = SIGN(MAX(ABS(DF),EM20),DF)                      
                 IF(DPLA_I(I) > ZERO) THEN                            
                   DPLA_J(I)=MAX( EM10 ,DPLA_I(I)-F/DF)               
@@ -832,19 +798,12 @@ c------------------------
                   IF(PLAP(I) >= UPARAM(6+J)) JJ(I) = J       
                 ENDDO       
               ENDDO
-              IF (ISMOOTH == 3) THEN       ! log_n  based interpolation of strain rate
+              IF (ISMOOTH == 2) THEN       ! log_n  based interpolation of strain rate
 #include        "vectorize.inc"
                 DO I=1,NEL
                   EPSP1 = MAX(UPARAM(6+JJ(I)), EM20)
                   EPSP2 = UPARAM(7+JJ(I))
                   RFAC(I) = LOG(MAX(PLAP(I),EM20)/EPSP1) / LOG(EPSP2/EPSP1)
-                ENDDO
-              ELSE IF (ISMOOTH == 2) THEN  ! log_10 based interpolation of strain rate
-#include        "vectorize.inc"
-                DO I=1,NEL
-                  EPSP1 = MAX(UPARAM(6+JJ(I)), EM20)
-                  EPSP2 = UPARAM(7+JJ(I))
-                  RFAC(I) = LOG10(MAX(PLAP(I),EM20)/EPSP1) / LOG10(EPSP2/EPSP1)
                 ENDDO
               ELSE                        ! linear interpolation of strain rate
 #include        "vectorize.inc"
@@ -898,6 +857,7 @@ c------------------------
               DO II=1,NINDX                                             
                 I = INDEX(II)  
                 !Y1 and Y2 for Pl SR dependency
+                ! PFAC => scale factor pression 
                 Y1(I) = YFAC(I,1) * Y1(I)
                 Y2(I) = YFAC(I,2) * Y2(I)
                 FAC   = RFAC(I)         
@@ -908,7 +868,7 @@ c------------------------
                 DYDX2(I)=DYDX2(I)*YFAC(I,2)
                 H(I)   = FAIL(I)*(DYDX1(I) + FAC*(DYDX2(I)-DYDX1(I)))
                 H(I)   = H(I)  *MAX(ZERO,PFAC(I))          
-                DFSR   = H(I)+ MAX(ZERO,PFAC(I))*FAIL(I)*(Y2(I)-Y1(I))
+                DFSR(I)= H(I)+ MAX(ZERO,PFAC(I))*FAIL(I)*(Y2(I)-Y1(I))
      .                 /(UPARAM(7+JJ(I))-UPARAM(6+JJ(I))) /TIMESTEP
               ENDDO
             ENDDO  !iter
@@ -952,21 +912,13 @@ c------------------------------------------------
               ENDDO
             ENDDO    
 c
-            IF (ISMOOTH == 3) THEN       ! log_n  based interpolation of strain rate
+            IF (ISMOOTH == 2) THEN       ! log_n  based interpolation of strain rate
 #include      "vectorize.inc"
               DO II=1,NINDX                                           
                 I = INDEX(II) 
                 EPSP1 = MAX(UPARAM(6+JJ(I)), EM20)
                 EPSP2 = UPARAM(7+JJ(I))
                 RFAC(I) = LOG(MAX(PLAP(I),EM20)/EPSP1) / LOG(EPSP2/EPSP1)
-              ENDDO
-            ELSE IF (ISMOOTH == 2) THEN  ! log_10 based interpolation of strain rate
-#include      "vectorize.inc"
-              DO II=1,NINDX                                           
-                I = INDEX(II) 
-                EPSP1 = MAX(UPARAM(6+JJ(I)), EM20)
-                EPSP2 = UPARAM(7+JJ(I))
-                RFAC(I) = LOG10(MAX(PLAP(I),EM20)/EPSP1) / LOG10(EPSP2/EPSP1)
               ENDDO
             ELSE                        ! linear interpolation of strain rate
 #include      "vectorize.inc"
@@ -1033,15 +985,15 @@ c
               H(I)   = H(I)  *MAX(ZERO,PFAC(I))          
               HI(I)   = H(I)*(ONE-FISOKIN)
 
-              COEF    = (Y2(I)-Y1(I))/(UPARAM(6+J2)-UPARAM(6+J1)) /TIMESTEP   
-              DFSR   = H(I)+ COEF
-              DFSR   = DFSR * (ONE-FISOKIN)*MAX(ZERO,PFAC(I))  
+              COEF(I)    = (Y2(I)-Y1(I))/(UPARAM(6+J2)-UPARAM(6+J1)) /TIMESTEP   
+              DFSR(I)   = H(I)+ COEF(I)
+              DFSR(I)   = DFSR(I) * (ONE-FISOKIN)*MAX(ZERO,PFAC(I))  
               !Hardening
               Y1(I)=TF(NPF(IFUNC(J1))+1)
               Y2(I)=TF(NPF(IFUNC(J2))+1)
               Y1(I)= Y1(I)*YFAC(I,1)
               Y2(I)= Y2(I)*YFAC(I,2)
-              COEF = MAX(ZERO,PFAC(I))*FISOKIN * FAIL(I)*(Y2(I)-Y1(I))
+              COEF(I) = MAX(ZERO,PFAC(I))*FISOKIN * FAIL(I)*(Y2(I)-Y1(I))
      .               /(UPARAM(6+J2)-UPARAM(6+J1)) /TIMESTEP   
               YLD(I) = (ONE-FISOKIN) * YLD(I) + 
      .              FISOKIN * (FAIL(I)*(Y1(I)    + FAC*(Y2(I)-Y1(I))))
@@ -1062,7 +1014,7 @@ c
                 R(I)      = YLD(I)/(YLD(I) +(G3(I)+FISOKIN*H(I))*DPLA_I(I))
                 SVM       = R(I)* SVM_TAB(I)
                 F         = SVM -  YLD(I) - (G3(I)+FISOKIN*H(I)) *DPLA_I(I)
-                DF        =-(G3(I)+FISOKIN*H(I)) - (DFSR + COEF )
+                DF        =-(G3(I)+FISOKIN*H(I)) - (DFSR(I) + COEF(I) )
                 DF = SIGN(MAX(ABS(DF),EM20),DF)
                 IF(DPLA_I(I) > ZERO) THEN
                   DPLA_J(I)=MAX( EM10 ,DPLA_I(I)-F/DF)
@@ -1084,21 +1036,13 @@ c
                 ENDDO              
               ENDDO
 c
-              IF (ISMOOTH == 3) THEN       ! log_n  based interpolation of strain rate
+              IF (ISMOOTH == 2) THEN       ! log_n  based interpolation of strain rate
 #include        "vectorize.inc"
                 DO II=1,NINDX                                           
                   I = INDEX(II) 
                   EPSP1 = MAX(UPARAM(6+JJ(I)), EM20)
                   EPSP2 = UPARAM(7+JJ(I))
                   RFAC(I) = LOG(MAX(PLAP(I),EM20)/EPSP1) / LOG(EPSP2/EPSP1)
-                ENDDO
-              ELSE IF (ISMOOTH == 2) THEN  ! log_10 based interpolation of strain rate
-#include        "vectorize.inc"
-                DO II=1,NINDX                                           
-                  I = INDEX(II) 
-                  EPSP1 = MAX(UPARAM(6+JJ(I)), EM20)
-                  EPSP2 = UPARAM(7+JJ(I))
-                  RFAC(I) = LOG10(MAX(PLAP(I),EM20)/EPSP1) / LOG10(EPSP2/EPSP1)
                 ENDDO
               ELSE                        ! linear interpolation of strain rate
 #include        "vectorize.inc"
@@ -1163,13 +1107,13 @@ c
                 H(I)  = FAIL(I)*(DYDX1(I) + FAC*(DYDX2(I)-DYDX1(I)))
                 H(I)  = H(I)  *MAX(ZERO,PFAC(I))          
                 HI(I) = H(I)*(ONE-FISOKIN)
-                DFSR  = HI(I)+ MAX(ZERO,PFAC(I))* (ONE-FISOKIN)*(Y2(I)-Y1(I))
+                DFSR(I)  = HI(I)+ MAX(ZERO,PFAC(I))* (ONE-FISOKIN)*(Y2(I)-Y1(I))
      .                / (UPARAM(7+JJ(I))-UPARAM(6+JJ(I))) /TIMESTEP
                 Y1(I)=TF(NPF(IFUNC(J1))+1)
                 Y2(I)=TF(NPF(IFUNC(J2))+1)
                 Y1(I)=Y1(I)*YFAC(I,1)
                 Y2(I)=Y2(I)*YFAC(I,2)
-                COEF = MAX(ZERO,PFAC(I))*FISOKIN * FAIL(I)*(Y2(I)-Y1(I))
+                COEF(I) = MAX(ZERO,PFAC(I))*FISOKIN * FAIL(I)*(Y2(I)-Y1(I))
      .               / (UPARAM(6+J2)-UPARAM(6+J1)) /TIMESTEP   
                 YLD(I) = (ONE-FISOKIN) * YLD(I)
      .                 + FISOKIN * (FAIL(I)*(Y1(I) + FAC*(Y2(I)-Y1(I))))
@@ -1216,21 +1160,13 @@ c------------------------------------------------
               ENDDO 
             ENDDO
 c
-            IF (ISMOOTH == 3) THEN       ! log_n  based interpolation of strain rate
+            IF (ISMOOTH == 2) THEN       ! log_n  based interpolation of strain rate
 #include      "vectorize.inc"
               DO II=1,NINDX                                           
                 I = INDEX(II) 
                 EPSP1 = MAX(UPARAM(6+JJ(I)), EM20)
                 EPSP2 = UPARAM(7+JJ(I))
                 RFAC(I) = LOG(MAX(PLAP(I),EM20)/EPSP1) / LOG(EPSP2/EPSP1)
-              ENDDO
-            ELSE IF (ISMOOTH == 2) THEN  ! log_10 based interpolation of strain rate
-#include      "vectorize.inc"
-              DO II=1,NINDX                                           
-                I = INDEX(II) 
-                EPSP1 = MAX(UPARAM(6+JJ(I)), EM20)
-                EPSP2 = UPARAM(7+JJ(I))
-                RFAC(I) = LOG10(MAX(PLAP(I),EM20)/EPSP1) / LOG10(EPSP2/EPSP1)
               ENDDO
             ELSE                        ! linear interpolation of strain rate
 #include      "vectorize.inc"
@@ -1297,15 +1233,15 @@ c
               H(I)  = H(I)  *MAX(ZERO,PFAC(I))          
               HI(I) = H(I)*(ONE-FISOKIN)
         
-              COEF = (Y2(I)-Y1(I))/(UPARAM(6+J2)-UPARAM(6+J1)) /TIMESTEP   
-              DFSR = H(I)+ COEF
-              DFSR = DFSR * (ONE-FISOKIN)*MAX(ZERO,PFAC(I))  
+              COEF(I) = (Y2(I)-Y1(I))/(UPARAM(6+J2)-UPARAM(6+J1)) /TIMESTEP   
+              DFSR(I) = H(I)+ COEF(I)
+              DFSR(I) = DFSR(I) * (ONE-FISOKIN)*MAX(ZERO,PFAC(I))  
               !Hardening
               Y1(I)=TF(NPF(IFUNC(J1))+1)
               Y2(I)=TF(NPF(IFUNC(J2))+1)
               Y1(I)= Y1(I)*YFAC(I,1)
               Y2(I)= Y2(I)*YFAC(I,2)
-              COEF = MAX(ZERO,PFAC(I))*FISOKIN * FAIL(I)*(Y2(I)-Y1(I))
+              COEF(I) = MAX(ZERO,PFAC(I))*FISOKIN * FAIL(I)*(Y2(I)-Y1(I))
      .               /(UPARAM(6+J2)-UPARAM(6+J1)) /TIMESTEP   
               YLD(I) = (ONE-FISOKIN) * YLD(I) + 
      .              FISOKIN * (FAIL(I)*(Y1(I)    + FAC*(Y2(I)-Y1(I))))
@@ -1326,7 +1262,7 @@ c
                 R(I)      = YLD(I)/(YLD(I) +(G3(I)+FISOKIN*H(I))*DPLA_I(I))
                 SVM       = R(I)* SVM_TAB(I)
                 F         = SVM -  YLD(I) - (G3(I)+FISOKIN*H(I)) *DPLA_I(I)
-                DF        =-(G3(I)+FISOKIN*H(I)) - (DFSR + COEF )
+                DF        =-(G3(I)+FISOKIN*H(I)) - (DFSR(I) + COEF(I))
                 DF = SIGN(MAX(ABS(DF),EM20),DF)
                 IF(DPLA_I(I) > ZERO) THEN
                   DPLA_J(I)=MAX( EM10 ,DPLA_I(I)-F/DF)
@@ -1348,21 +1284,13 @@ c
                 ENDDO
               ENDDO
 c
-              IF (ISMOOTH == 3) THEN       ! log_n  based interpolation of strain rate
+              IF (ISMOOTH == 2) THEN       ! log_n  based interpolation of strain rate
 #include        "vectorize.inc"
                 DO II=1,NINDX                                           
                   I = INDEX(II) 
                   EPSP1 = MAX(UPARAM(6+JJ(I)), EM20)
                   EPSP2 = UPARAM(7+JJ(I))
                   RFAC(I) = LOG(MAX(PLAP(I),EM20)/EPSP1) / LOG(EPSP2/EPSP1)
-                ENDDO
-              ELSE IF (ISMOOTH == 2) THEN  ! log_10 based interpolation of strain rate
-#include        "vectorize.inc"
-                DO II=1,NINDX                                           
-                  I = INDEX(II) 
-                  EPSP1 = MAX(UPARAM(6+JJ(I)), EM20)
-                  EPSP2 = UPARAM(7+JJ(I))
-                  RFAC(I) = LOG10(MAX(PLAP(I),EM20)/EPSP1) / LOG10(EPSP2/EPSP1)
                 ENDDO
               ELSE                        ! linear interpolation of strain rate
 #include        "vectorize.inc"
@@ -1427,13 +1355,13 @@ c
                 H(I) = FAIL(I)*(DYDX1(I) + FAC*(DYDX2(I)-DYDX1(I)))
                 H(I) = H(I)  *MAX(ZERO,PFAC(I))          
                 HI(I)= H(I)*(ONE-FISOKIN)
-                DFSR = HI(I)+ MAX(ZERO,PFAC(I))* (ONE-FISOKIN)*(Y2(I)-Y1(I))
+                DFSR(I) = HI(I)+ MAX(ZERO,PFAC(I))* (ONE-FISOKIN)*(Y2(I)-Y1(I))
      .                   /(UPARAM(7+JJ(I))-UPARAM(6+JJ(I))) /TIMESTEP
                 Y1(I)=TF(NPF(IFUNC(J1))+1)
                 Y2(I)=TF(NPF(IFUNC(J2))+1)
                 Y1(I)=Y1(I)*YFAC(I,1)
                 Y2(I)=Y2(I)*YFAC(I,2)
-                COEF = MAX(ZERO,PFAC(I))*FISOKIN * FAIL(I)*(Y2(I)-Y1(I))
+                COEF(I) = MAX(ZERO,PFAC(I))*FISOKIN * FAIL(I)*(Y2(I)-Y1(I))
      .                /(UPARAM(6+J2)-UPARAM(6+J1)) /TIMESTEP   
                 YLD(I) = (ONE-FISOKIN) * YLD(I) + 
      .               FISOKIN * (FAIL(I)*(Y1(I)    + FAC*(Y2(I)-Y1(I))))

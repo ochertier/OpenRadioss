@@ -1,5 +1,6 @@
+
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -33,15 +34,16 @@ Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.
 Chd|        HM_GET_INT_ARRAY_INDEX        source/devtools/hm_reader/hm_get_int_array_index.F
 Chd|        HM_OPTION_IS_ENCRYPTED        source/devtools/hm_reader/hm_option_is_encrypted.F
 Chd|        INIT_MAT_KEYWORD              source/materials/mat/init_mat_keyword.F
+Chd|        MYQSORT                       ../common_source/tools/sort/myqsort.F
 Chd|        ELBUFTAG_MOD                  share/modules1/elbuftag_mod.F 
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/matparam_def_mod.F
+Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
       SUBROUTINE HM_READ_MAT70(UPARAM ,MAXUPARAM,NUPARAM  ,ISRATE   , IMATVIS  ,
      .                         NUVAR  ,IFUNC    ,MAXFUNC  ,NFUNC    , PARMAT   , 
-     .                         UNITAB ,ID       ,TITR     ,MTAG     , LSUBMODEL,
-     .                         PM     ,IPM      ,MATPARAM )
+     .                         UNITAB ,MAT_ID   ,TITR     ,MTAG     , LSUBMODEL,
+     .                         PM     ,MATPARAM ,NVARTMP  )
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C-----------------------------------------------
@@ -54,7 +56,7 @@ C     NAME            DESCRIPTION
 C
 C     PM              MATERIAL ARRAY(REAL)
 C     UNITAB          UNITS ARRAY
-C     ID              MATERIAL ID(INTEGER)
+C     MAT_ID          MATERIAL ID(INTEGER)
 C     TITR            MATERIAL TITLE
 C     LSUBMODEL       SUBMODEL STRUCTURE   
 C
@@ -74,40 +76,35 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr17_c.inc"
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
 #include      "units_c.inc"
-#include      "com01_c.inc"
-#include      "com04_c.inc"
-#include      "submod_c.inc"
-#include      "sysunit.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       TYPE (UNIT_TYPE_),INTENT(IN) ::UNITAB 
       my_real, INTENT(INOUT)                :: PM(NPROPM),PARMAT(100),UPARAM(MAXUPARAM)
-      INTEGER, INTENT(INOUT)                :: IPM(NPROPMI),ISRATE,IFUNC(MAXFUNC),NFUNC,MAXFUNC,MAXUPARAM,NUPARAM, NUVAR,IMATVIS
+      INTEGER, INTENT(INOUT)                :: ISRATE,NFUNC,MAXFUNC,MAXUPARAM,
+     .                                         NUPARAM,NUVAR,NVARTMP,IMATVIS
+      INTEGER, INTENT(INOUT)                :: IFUNC(MAXFUNC)
       TYPE(MLAW_TAG_),INTENT(INOUT)         :: MTAG
-      INTEGER,INTENT(IN)                    :: ID
+      INTEGER,INTENT(IN)                    :: MAT_ID
       CHARACTER*nchartitle,INTENT(IN)       :: TITR
       TYPE(SUBMODEL_DATA),INTENT(IN)        :: LSUBMODEL(*)
       TYPE(MATPARAM_STRUCT_) ,INTENT(INOUT) :: MATPARAM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      my_real E,NU,G,C1,RATE(MAXFUNC),VISC, VISCV,YFAC(MAXFUNC),EXPO,HYS,YFAC_UNIT(MAXFUNC),
+      INTEGER NRATEN,J,I,NRATEP,IUNLOAD,ITENS,IETANG,NL,ISORT
+      my_real E,NU,G,C1,VISC, VISCV,EXPO,HYS,
      .        RHO0,RHOR,E0,EMAX,EPSMAX,FCUT,A1,A2,AA
-      INTEGER NRATEN,J,I,NRATEP, IUNLOAD,IFLAG,IETANG,ISTIF,I2017_2,NL
+      INTEGER ,DIMENSION(MAXFUNC) :: PERM
+      my_real ,DIMENSION(MAXFUNC) :: RATE,YFAC,YFAC_UNIT,RTMP,YTMP
       LOGICAL IS_AVAILABLE,IS_ENCRYPTED         
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------
       IS_ENCRYPTED = .FALSE.
       IS_AVAILABLE = .FALSE.
-      ISTIF = 0
-      I2017_2 = 0
-      IPM(3) = 1
       IMATVIS = 2
 
       RATE(1:MAXFUNC) = ZERO
@@ -121,7 +118,7 @@ C-----------------------------------------------
       CALL HM_GET_FLOATV('MAT_NU'    ,NU       ,IS_AVAILABLE, LSUBMODEL, UNITAB)
       CALL HM_GET_FLOATV('E_Max'     ,EMAX     ,IS_AVAILABLE, LSUBMODEL, UNITAB)
       CALL HM_GET_FLOATV('MAT_EPS'   ,EPSMAX   ,IS_AVAILABLE, LSUBMODEL, UNITAB)
-      CALL HM_GET_INTV('Itens'       ,IFLAG    ,IS_AVAILABLE, LSUBMODEL)
+      CALL HM_GET_INTV('Itens'       ,ITENS    ,IS_AVAILABLE, LSUBMODEL)
       !line-3
       CALL HM_GET_FLOATV('MAT_asrate',FCUT     ,IS_AVAILABLE, LSUBMODEL, UNITAB)
       CALL HM_GET_INTV('ISRATE'      ,ISRATE   ,IS_AVAILABLE, LSUBMODEL)
@@ -136,10 +133,8 @@ C-----------------------------------------------
       PM(89)=RHO0
 
       IF(NRATEP == 0) THEN
-          CALL ANCMSG(MSGID=866,
-     .                MSGTYPE=MSGERROR,
-     .                ANMODE=ANINFO_BLIND,
-     .                I1=ID,
+          CALL ANCMSG(MSGID=866,MSGTYPE=MSGERROR,ANMODE=ANINFO_BLIND,
+     .                I1=MAT_ID,
      .                C1=TITR)
       ENDIF 
       !--loading function     
@@ -147,14 +142,13 @@ C-----------------------------------------------
         CALL HM_GET_INT_ARRAY_INDEX('FUN_LOAD'           ,IFUNC(I)    ,I,IS_AVAILABLE, LSUBMODEL)
         CALL HM_GET_FLOAT_ARRAY_INDEX('STRAINRATE_LOAD'  ,RATE(I)     ,I,IS_AVAILABLE, LSUBMODEL, UNITAB)
         CALL HM_GET_FLOAT_ARRAY_INDEX('SCALE_LOAD'       ,YFAC(I)     ,I,IS_AVAILABLE, LSUBMODEL, UNITAB)
-        !IF(I==1)CALL HM_GET_INT_ARRAY_INDEX('I2017_2'        ,I2017_2     ,IS_AVAILABLE, LSUBMODEL)
         !units
         CALL HM_GET_FLOAT_ARRAY_INDEX_DIM('SCALE_LOAD'  ,YFAC_UNIT(I) ,I,IS_AVAILABLE, LSUBMODEL, UNITAB)         
         IF(YFAC(I) == ZERO) YFAC(I) = ONE * YFAC_UNIT(I)         
       ENDDO  
                          
       !--unloading function
-      IF(NRATEN > 0 ) THEN
+      IF (NRATEN > 0 ) THEN
         DO I=NRATEP+1,NRATEP+NRATEN
           CALL HM_GET_INT_ARRAY_INDEX('FUN_UNLOAD'            ,IFUNC(I)    ,I-NRATEP,IS_AVAILABLE, LSUBMODEL)
           CALL HM_GET_FLOAT_ARRAY_INDEX('STRAINRATE_UNLOAD'   ,RATE(I)     ,I-NRATEP,IS_AVAILABLE, LSUBMODEL, UNITAB)
@@ -164,82 +158,132 @@ C-----------------------------------------------
           IF(YFAC(I) == ZERO) YFAC(I) = ONE * YFAC_UNIT(I)         
         ENDDO 
       ELSE 
-        IF(NRATEN == 0 .AND. IUNLOAD <= 2 ) THEN
+        IF (NRATEN == 0 .AND. IUNLOAD <= 2) THEN
              NRATEN = 1
              IFUNC(NRATEP+1) = IFUNC(1)
              YFAC (NRATEP+1) = YFAC(1)
              RATE (NRATEP+1) = RATE(1)
              IUNLOAD = 0
 C             
-             CALL ANCMSG(MSGID=1226,
-     .                   MSGTYPE=MSGWARNING,
-     .                   ANMODE=ANINFO_BLIND_1,
-     .                   I1=ID,
+             CALL ANCMSG(MSGID=1226, MSGTYPE=MSGWARNING, ANMODE=ANINFO_BLIND_1,
+     .                   I1=MAT_ID,
      .                   C1=TITR)
          ENDIF
       ENDIF                     
-C
-      IF(RATE(1) /=  ZERO)THEN
-          CALL ANCMSG(MSGID=1721,
-     .                MSGTYPE=MSGWARNING,
-     .                ANMODE=ANINFO_BLIND,
-     .                I1=ID,
+c---------------------------------------------------------------------------
+c     check if loading functions are defined in increasing strain rate order
+c---------------------------------------------------------------------------
+      IF (NRATEP > 1) THEN
+        IERR  = 0
+        ISORT = 0
+        DO I=1,NRATEP-1
+          IF (RATE(I) == RATE(I+1) .and. IFUNC(I) /= IFUNC(I+1)) THEN
+            IERR  = 1
+          ELSE IF (RATE(I) > RATE(I+1)) THEN
+            ISORT = 1
+          END IF
+        ENDDO
+        IF (IERR == 1) THEN
+          CALL ANCMSG(MSGID=478,MSGTYPE=MSGERROR,ANMODE=ANINFO_BLIND,
+     .                I1=MAT_ID,
+     .                C1=TITR)
+        END IF
+c
+        IF (ISORT == 1) THEN  ! sort functions in correct order
+          DO I=1,NRATEP
+            RTMP(I) = RATE(I)
+            YTMP(I)   = YFAC(I)
+          ENDDO  
+      
+          CALL MYQSORT(NRATEP, RTMP, PERM, IERR)
+
+          DO I=1,NRATEP
+            J = PERM(I)
+            RATE(I) = RTMP(J)
+            YFAC(I) = YTMP(J)
+          ENDDO  
+        END IF
+c
+        IF (RATE(1) /=  ZERO) THEN   ! static strain rate must be equal to 0
+          RATE(1) = ZERO     
+          CALL ANCMSG(MSGID=1721, MSGTYPE=MSGWARNING, ANMODE=ANINFO_BLIND,
+     .                I1=MAT_ID,
      .                C1=TITR)       
-       
-        RATE(1) = ZERO
-      ENDIF 
-      IF(RATE(NRATEP + 1) /= ZERO) THEN
-        RATE(NRATEP + 1) = ZERO 
-          CALL ANCMSG(MSGID=1722,
-     .                MSGTYPE=MSGWARNING,
-     .                ANMODE=ANINFO_BLIND,
-     .                I1=ID,
-     .                C1=TITR)      
-      ENDIF  
-CC
-      DO I=1,NRATEP-1
-        IF(RATE(I) >= RATE(I+1))THEN
-          CALL ANCMSG(MSGID=478,
-     .                MSGTYPE=MSGERROR,
-     .                ANMODE=ANINFO_BLIND,
-     .                I1=ID,
+        ENDIF 
+      END IF
+c---------------------------------------------------------------------------
+c     check if unloading functions are defined in increasing strain rate order
+c---------------------------------------------------------------------------
+      IF (NRATEN > 1) THEN
+        IERR  = 0
+        ISORT = 0
+        DO I=1,NRATEN-1
+          J = I + NRATEP
+          IF (RATE(J) == RATE(J+1) .and. IFUNC(J) /= IFUNC(J+1)) THEN
+            IERR  = 1
+          ELSE IF (RATE(J) > RATE(J+1)) THEN
+            ISORT = 1
+          END IF
+        ENDDO
+        IF (IERR == 1) THEN
+          CALL ANCMSG(MSGID=478,MSGTYPE=MSGERROR,ANMODE=ANINFO_BLIND,
+     .                I1=MAT_ID,
      .                C1=TITR)
-          EXIT
-         ENDIF
-      ENDDO  
-C 
-      IF(NRATEP > 1 .OR. (IUNLOAD == 0 .AND. NRATEN > 1)) THEN      
-        IF(ISRATE == 0 .OR. FCUT == ZERO ) THEN
-           CALL ANCMSG(MSGID=1220,
-     .                MSGTYPE=MSGWARNING,
-     .                ANMODE=ANINFO_BLIND_1,
-     .                I1=ID,
-     .                C1=TITR)
-       
-        ENDIF
-      ENDIF 
-      IF (FCUT == 0) FCUT = INFINITY
+        END IF
+c
+        IF (ISORT == 1) THEN  ! sort functions in correct order
+          DO I=1,NRATEN
+            J = I + NRATEP
+            RTMP(I) = RATE(J)
+            YTMP(I) = YFAC(J)
+          ENDDO  
+      
+          CALL MYQSORT(NRATEN, RTMP, PERM, IERR)
+
+          DO I=1,NRATEN
+            J = PERM(I)
+            RATE(I + NRATEP) = RTMP(J)
+            YFAC(I + NRATEP) = YTMP(J)
+          ENDDO  
+        END IF
+c
+        IF (RTMP(1) /=  ZERO) THEN   ! static strain rate must be equal to 0
+          RATE(1 + NRATEP) = ZERO     
+          CALL ANCMSG(MSGID=1721, MSGTYPE=MSGWARNING, ANMODE=ANINFO_BLIND,
+     .                I1=MAT_ID,
+     .                C1=TITR)       
+        ENDIF 
+      END IF
+c---------------------------------------------------------------------------
+c
+      IF (FCUT > ZERO) ISRATE = 1
+      IF (FCUT == ZERO) FCUT = INFINITY
       NL = NRATEP + NRATEN
-      IF(IFLAG > 0) THEN
-         NL = NRATEP + NRATEN  +1
+      IF (ITENS > 0) THEN
+         NL = NRATEP + NRATEN + 1
          RATE(NL) = ZERO
-         CALL HM_GET_INT_ARRAY_INDEX('FUN_A1'        ,IFUNC(NL)    ,NL,IS_AVAILABLE, LSUBMODEL)
-         CALL HM_GET_FLOAT_ARRAY_INDEX('FScale11'    ,YFAC(NL)     ,NL,IS_AVAILABLE, LSUBMODEL, UNITAB)   
-         !units
+         CALL HM_GET_INT_ARRAY_INDEX('FUN_A1'     ,IFUNC(NL) ,NL,IS_AVAILABLE, LSUBMODEL)
+         CALL HM_GET_FLOAT_ARRAY_INDEX('FScale11' ,YFAC(NL)  ,NL,IS_AVAILABLE, LSUBMODEL,UNITAB)   
          IF (YFAC(NL) == ZERO) YFAC(NL) = ONE
       ENDIF 
       
       DO I=1,NL
         IF(IFUNC(I) == 0)THEN
-          CALL ANCMSG(MSGID=126,
-     .                MSGTYPE=MSGERROR,
-     .                ANMODE=ANINFO_BLIND,
-     .                I1=ID,
+          CALL ANCMSG(MSGID=126, MSGTYPE=MSGERROR, ANMODE=ANINFO_BLIND,
+     .                I1=MAT_ID,
      .                C1=TITR,
      .                I2=IFUNC(I))
         ENDIF
       ENDDO
-C      
+C
+      IF (EMAX< E0) THEN
+          CALL ANCMSG(MSGID=3028,
+     .                MSGTYPE=MSGWARNING,
+     .                ANMODE=ANINFO_BLIND,
+     .                I1=MAT_ID,
+     .                C1=TITR)
+          EMAX = ZERO
+      END IF      
       IF(EPSMAX == ZERO) EPSMAX = ONE
       UPARAM(1)=NL
       UPARAM(2)=E0
@@ -262,32 +306,25 @@ C
       UPARAM(2*NL + 10)= EXPO
       UPARAM(2*NL + 11) = HYS
       UPARAM(2*NL + 12) = EMAX
-      UPARAM(2*NL + 13) = IFLAG
-      UPARAM(2*NL + 14) = I2017_2
+      UPARAM(2*NL + 13) = ITENS
+      UPARAM(2*NL + 14) = 0  ! not used
 C
-      C1=E0/THREE/(ONE - TWO*NU)
+      C1 = E0/THREE/(ONE - TWO*NU)
       NFUNC = NL 
-      NUPARAM =15 + 2*NL  
-      UPARAM(NUPARAM) = NFUNC
+      NUPARAM =16 + 2*NL  
+      IF (IS_ENCRYPTED) UPARAM(16 + 2*NL) = 1
 C
       PARMAT(1) = C1
       PARMAT(2) = E0
       PARMAT(3) = NU
-C      
-      IF(ISTIF > 0) THEN
-        C1=EMAX/THREE/(ONE - TWO*NU)
-        PARMAT(1) = C1
-        PARMAT(2) = EMAX 
-      ENDIF
-C
       PARMAT(4) = ISRATE
       PARMAT(5) = FCUT
 C     Formulation for solid elements time step computation.
       PARMAT(16) = 2
       PARMAT(17) = (ONE-TWO*NU)/(ONE-NU)
 C
-      NUVAR = 10 + 6
-      ISRATE = 1
+      NUVAR   = 10
+      NVARTMP = 6
 c-----------------
       CALL INIT_MAT_KEYWORD(MATPARAM,"TOTAL")
       CALL INIT_MAT_KEYWORD(MATPARAM,"SMALL_STRAIN")
@@ -296,19 +333,23 @@ c-----------------
       ELSE
         CALL INIT_MAT_KEYWORD(MATPARAM,"COMPRESSIBLE")
       END IF
+      CALL INIT_MAT_KEYWORD(MATPARAM,"HOOK")
+      ! Properties compatibility  
+      CALL INIT_MAT_KEYWORD(MATPARAM,"SOLID_ISOTROPIC")
+      CALL INIT_MAT_KEYWORD(MATPARAM,"SPH")
 c------------------------------------
-      WRITE(IOUT,1001) TRIM(TITR),ID,70    
+      WRITE(IOUT,1001) TRIM(TITR),MAT_ID,70    
       WRITE(IOUT,1000)
       IF(IS_ENCRYPTED)THEN
         WRITE(IOUT,'(5X,A,//)')'CONFIDENTIAL DATA'
       ELSE
         WRITE(IOUT,1050)RHO0      
         WRITE(IOUT,1100)E0,NU,EMAX,EPSMAX
-        WRITE(IOUT,1200)FCUT,ISRATE,NRATEP,NRATEN,IUNLOAD,EXPO,HYS,IFLAG
+        WRITE(IOUT,1200)FCUT,ISRATE,NRATEP,NRATEN,IUNLOAD,EXPO,HYS,ITENS
         WRITE(IOUT,1300)(IFUNC(J),RATE(J),YFAC(J),J=1,NRATEP)
         WRITE(IOUT,1400)(IFUNC(J+NRATEP),RATE(J+NRATEP),YFAC(J+NRATEP),
      .                 J=1,NRATEN)
-        IF(IFLAG > 0) THEN
+        IF(ITENS > 0) THEN
            WRITE(IOUT,1500)IFUNC(NL),YFAC(NL)        
         ENDIF
       ENDIF

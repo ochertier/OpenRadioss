@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>    
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,12 +20,7 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss 
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the 
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
-C.../SCR06R/
-      COMMON /SCR06R/ HVISC, HELAS, REEL, BMUL0, UPWMG, UPWOG
-C     REAL ou REAL*8
-      my_real
-     .   HVISC, HELAS, REEL, BMUL0,UPWMG, UPWOG
-C.../SCR06/ 
-      COMMON /SCR06/ IALESUB, NSOROT, INCOMP
-      INTEGER IALESUB, NSOROT, INCOMP
+
+      COMMON /SCR06R/ HVISC, HELAS, REEL, BMUL0 
+      my_real         HVISC, HELAS, REEL, BMUL0
 

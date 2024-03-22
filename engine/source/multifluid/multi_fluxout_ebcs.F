@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -24,13 +24,10 @@ Chd|====================================================================
 Chd|  MULTI_FLUXOUT_EBCS            source/multifluid/multi_fluxout_ebcs.F
 Chd|-- called by -----------
 Chd|-- calls ---------------
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/multi_fvm_mod.F
+Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|====================================================================
       SUBROUTINE MULTI_FLUXOUT_EBCS(MULTI_FVM, NELEM, ELEM_LIST, FACE_LIST, 
      .     IXS, IXQ, IXTG, XGRID, WGRID)
-C-----------------------------------------------
-C     D e s c r i p t i o n
-C-----------------------------------------------
 C-----------------------------------------------
 C     M o d u l e s
 C-----------------------------------------------
@@ -43,13 +40,9 @@ C-----------------------------------------------
 C     C o m m o n   B l o c k s
 C-----------------------------------------------  
 ! NIXS
-#include      "param_c.inc"
 ! ISPMD
-#include      "task_c.inc"
 ! ALE
-#include      "com01_c.inc"
 ! NUMELS, NUMELQ, NUMELTG
-#include      "com04_c.inc"
 C-----------------------------------------------
 C     D u m m y   A r g u m e n t s
 C-----------------------------------------------

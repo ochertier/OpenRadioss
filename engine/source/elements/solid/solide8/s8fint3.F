@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,12 +25,18 @@ Chd|  S8FINT3                       source/elements/solid/solide8/s8fint3.F
 Chd|-- called by -----------
 Chd|        S8FORC3                       source/elements/solid/solide8/s8forc3.F
 Chd|-- calls ---------------
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE S8FINT3(BUFLY,VOLGP,QVIS,
      .                   PX1,PX2,PX3,PX4,PX5,PX6,PX7,PX8,
      .                   PY1,PY2,PY3,PY4,PY5,PY6,PY7,PY8,
-     .                   PZ1,PZ2,PZ3,PZ4,PZ5,PZ6,PZ7,PZ8,NEL)
+     .                   PZ1,PZ2,PZ3,PZ4,PZ5,PZ6,PZ7,PZ8,NEL,
+     .                   F11, F12, F13, F14,
+     .                   F15, F16, F17, F18, F21,
+     .                   F22, F23, F24, F25, F26,
+     .                   F27, F28, F31, F32, F33,
+     .                   F34, F35, F36, F37, F38)
+
 
 C-----------------------------------------------
 C   M o d u l e s
@@ -47,9 +53,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "vect01_c.inc"
 #include      "nsvis_c.inc"
-#include      "vecfx_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -62,6 +66,12 @@ C     REAL
      .   PY5(MVSIZ,8),PY6(MVSIZ,8),PY7(MVSIZ,8),PY8(MVSIZ,8),      
      .   PZ1(MVSIZ,8),PZ2(MVSIZ,8),PZ3(MVSIZ,8),PZ4(MVSIZ,8),      
      .   PZ5(MVSIZ,8),PZ6(MVSIZ,8),PZ7(MVSIZ,8),PZ8(MVSIZ,8)
+      my_real :: F11(MVSIZ),F12(MVSIZ),F13(MVSIZ),F14(MVSIZ),
+     .   F15(MVSIZ), F16(MVSIZ), F17(MVSIZ), F18(MVSIZ), F21(MVSIZ),
+     .   F22(MVSIZ), F23(MVSIZ), F24(MVSIZ), F25(MVSIZ), F26(MVSIZ),
+     .   F27(MVSIZ), F28(MVSIZ), F31(MVSIZ), F32(MVSIZ), F33(MVSIZ),
+     .   F34(MVSIZ), F35(MVSIZ), F36(MVSIZ), F37(MVSIZ), F38(MVSIZ)
+
       TYPE (BUF_LAY_)  ,TARGET :: BUFLY
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -78,7 +88,7 @@ C-----------------------------------------------
         II(I) = NEL*(I-1)
       ENDDO
 !
-      DO I=LFT,LLT
+      DO I=1,NEL
         F11(I)=ZERO
         F21(I)=ZERO
         F31(I)=ZERO
@@ -107,7 +117,7 @@ C-----------------------------------------------
 C
       DO IPT=1,8
         LBUF => BUFLY%LBUF(1,1,IPT)
-        DO I=LFT,LLT
+        DO I=1,NEL
           J = 6*(I-1)
           S1=(LBUF%SIG(II(1)+I)+SVIS(I,1)-QVIS(I))*VOLGP(I,IPT)
           S2=(LBUF%SIG(II(2)+I)+SVIS(I,2)-QVIS(I))*VOLGP(I,IPT)

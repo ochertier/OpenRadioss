@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -38,7 +38,6 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include "implicit_f.inc"
 C----------------------------------------------------------
-#include "scr17_c.inc"
 #include "units_c.inc"
 #include "comlock.inc"
 #include "sms_c.inc"
@@ -118,7 +117,7 @@ c-------------------------
       DO I=1,NEL             
         EPSN(I) = MAX(EPSZZ(I) , ZERO)      
         EPST(I) = SQRT(EPSYZ(I)**2  + EPSZX(I)**2)
-        EPSM(I) = SQRT( EPSN(I)**2  + EPST(I)**2)	           
+        EPSM(I) = SQRT( EPSN(I)**2  + EPST(I)**2)             
         EPSMMAX(I) = MAX(EPSM(I),EPSMMAX(I))
       ENDDO !I=1,NEL
       !---------------------------------------------------------

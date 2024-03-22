@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -38,20 +38,15 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "units_c.inc"
 #include      "scr03_c.inc"
 #include      "scr17_c.inc"
-C  _clean#include      "scr07_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NSN,IWPENE,NINT
-C     REAL
       my_real
      .   FRIC, GAP
       INTEGER IRECT(4,*), MSR(*), NSV(*), ILOC(*), IRTL(*), IRTLO(*),
@@ -127,8 +122,8 @@ C       WRITE(IOUT,1000)PEN
      .             R1=PEN)
       ENDIF
       IF(IPRI>=1)THEN
-Cst013   format I5 remplace par I8
-Cst013   WRITE(IOUT,'(I5,2I9,2I5,F10.6)')
+C  013   format I5 remplace par I8
+C  013   WRITE(IOUT,'(I5,2I9,2I5,F10.6)')
 C     . ITAB(I),ITAB(K),L,
 C     . ITAB(MSR(IRECT(1,L))),ITAB(MSR(IRECT(2,L))),SS
        WRITE(IOUT,FMT=FMW_5I_F)
@@ -142,7 +137,7 @@ C
       GO TO 150
  110  CONTINUE
       IF(IPRI>=1)THEN
-Cst013       WRITE(IOUT,'(I5,2I9,2I5)')ITAB(I),ITAB(K),L,
+C  013       WRITE(IOUT,'(I5,2I9,2I5)')ITAB(I),ITAB(K),L,
 C     .       ITAB(MSR(IRECT(1,L))),ITAB(MSR(IRECT(2,L)))
 C  121       WRITE(IOUT,'(I8,2I9,2I8)')ITAB(I),ITAB(K),L,
        WRITE(IOUT,FMT=FMW_5I)ITAB(I),ITAB(K),L,

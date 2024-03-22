@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -42,22 +42,13 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
-#include      "spmd_c.inc"
 #include      "assert.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
 #include      "com04_c.inc"
-#include      "task_c.inc"
-#include      "units_c.inc"
 #include      "com01_c.inc"
-#include      "com06_c.inc"
-#include      "com08_c.inc"
-#include      "scr07_c.inc"
-#include      "scr14_c.inc"
-#include      "scr16_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -88,7 +79,7 @@ C-----------------------------------------------
               ITAG(NOD)=1
             ENDDO
             DO NI=1,NBINTC
-	      NIN = INTLIST(NI)
+                NIN = INTLIST(NI)
               NTY   = IPARI(7,NIN)
               NSN   = IPARI(5,NIN)
 
@@ -100,7 +91,7 @@ C-----------------------------------------------
                   ENDIF
                 ENDDO
               ENDIF
-            ENDDO	   	   
+            ENDDO          
 C Flush ITAG to zero again for next CPU
             DO J=IAD_ELEM(1,P),IAD_ELEM(1,P+1)-1
               NOD = FR_ELEM(J)
@@ -124,8 +115,8 @@ C-----------------------------------------------
             ENDDO
 
             DO NI=1,NBINTC
-	      IAD_I25(NI+1,P)=IAD_I25(NI,P)
-	      NIN = INTLIST(NI)
+                IAD_I25(NI+1,P)=IAD_I25(NI,P)
+                NIN = INTLIST(NI)
               NTY   = IPARI(7,NIN)
               NSN   = IPARI(5,NIN)
 
@@ -134,9 +125,9 @@ C-----------------------------------------------
                   SN = INTBUF_TAB(NIN)%NSV(I)
                   ASSERT(SN > 0)
                   ASSERT(SN <= NUMNOD)
-                  IF(ITAG(SN)==1)THEN		 
+                  IF(ITAG(SN)==1)THEN     
                     IAD_I25(NI+1,P)=IAD_I25(NI+1,P)+1
-		    IAFR25 = IAFR25 + 1
+              IAFR25 = IAFR25 + 1
                     FR_I25(IAFR25)=I
                   ENDIF
                 ENDDO
@@ -147,12 +138,12 @@ C Flush ITAG to zero again for next CPU
               NOD = FR_ELEM(J)
               ITAG(NOD)=0
             ENDDO
-	  ELSE
+            ELSE
             DO I=2,NBINTC+1
-	      IAD_I25(I,P)=IAD_I25(1,P)
-	    ENDDO	  
+                IAD_I25(I,P)=IAD_I25(1,P)
+              ENDDO    
           ENDIF    ! IF(IAD_ELEM(1,P+1)-IAD_ELEM(1,P)>0)
-	  IF(P<NSPMD)IAD_I25(1,P+1)=IAD_I25(NBINTC+1,P)
+            IF(P<NSPMD)IAD_I25(1,P+1)=IAD_I25(NBINTC+1,P)
         ENDDO
       ENDIF
       

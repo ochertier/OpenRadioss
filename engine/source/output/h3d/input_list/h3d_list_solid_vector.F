@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -39,22 +39,17 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
+C   C o m m o n   B l o c k s
+C-----------------------------------------------
+#include      "param_c.inc"
+#include      "com04_c.inc"
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       TYPE (H3D_KEYWORD) H3D_KEYWORD_SOLID_VECTOR(*)
-      my_real
-     .      GEO(NPROPG,*)
-      INTEGER IGEO(NPROPGI,*)
+      my_real GEO(NPROPG,NUMGEO)
+      INTEGER IGEO(NPROPGI,NUMGEO)
       INTEGER, INTENT(INOUT) :: NKEY
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "chara_c.inc"
-#include      "com04_c.inc"
-#include      "param_c.inc"
-C-----------------------------------------------
-C   E x t e r n a l   F u n c t i o n s
-C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -76,14 +71,13 @@ c-----------------------------------------------
       H3D_KEYWORD_SOLID_VECTOR(I)%KEY3  = 'VECT/PEXT'
       H3D_KEYWORD_SOLID_VECTOR(I)%IS_SKIN  = 1
       H3D_KEYWORD_SOLID_VECTOR(I)%TEXT1  = 'Pressure vector'
-      H3D_KEYWORD_SOLID_VECTOR(I)%COMMENT  = 
-     .'External pressure vector on the Skin of solid'
+      H3D_KEYWORD_SOLID_VECTOR(I)%COMMENT  = 'External pressure vector on the Skin of solid'
 c-----------------------------------------------
-
-
-c-----------------------------------------------
-
-
+      I = I + 1
+      H3D_KEYWORD_SOLID_VECTOR(I)%KEY3  = 'VECT/ACC'
+      H3D_KEYWORD_SOLID_VECTOR(I)%TEXT1  = 'Element Acceleration'
+      H3D_KEYWORD_SOLID_VECTOR(I)%COMMENT  ='Element acceleration for FVM solver'
 c-----------------------------------------------
       NKEY=I
+c-----------------------------------------------
       END

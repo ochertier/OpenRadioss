@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -28,27 +28,49 @@ Chd|        SZFORC3                       source/elements/solid/solidez/szforc3.
 Chd|-- calls ---------------
 Chd|        AJAC3_V                       source/elements/solid/solide/ajac3.F
 Chd|        AMOMTN3                       source/elements/solid/solide/amomtn3.F
+Chd|        ALE_MOD                       ../common_source/modules/ale/ale_mod.F
 Chd|====================================================================
-      SUBROUTINE AMOMT3(PM,RHO,VOL,
-     .   X1,X2,X3,X4,X5,X6,X7,X8,
-     .   Y1,Y2,Y3,Y4,Y5,Y6,Y7,Y8,
-     .   Z1,Z2,Z3,Z4,Z5,Z6,Z7,Z8,
-     .   VX1,VX2,VX3,VX4,VX5,VX6,VX7,VX8,
-     .   VY1,VY2,VY3,VY4,VY5,VY6,VY7,VY8,
-     .   VZ1,VZ2,VZ3,VZ4,VZ5,VZ6,VZ7,VZ8,
-     .   F11,F21,F31,F12,F22,F32,F13,F23,F33,F14,F24,F34,
-     .   F15,F25,F35,F16,F26,F36,F17,F27,F37,F18,F28,F38,
-     .   PX1,PX2,PX3,PX4,
-     .   PY1,PY2,PY3,PY4,
-     .   PZ1,PZ2,PZ3,PZ4,
-     .   DXX,DXY,DXZ,DYX,DYY,DYZ,DZX,DZY,DZZ,
-     .   VDX1,VDX2,VDX3,VDX4,VDX5,VDX6,VDX7,VDX8,
-     .   VDY1,VDY2,VDY3,VDY4,VDY5,VDY6,VDY7,VDY8,
-     .   VDZ1,VDZ2,VDZ3,VDZ4,VDZ5,VDZ6,VDZ7,VDZ8,
-     .   VDX,VDY,VDZ,
-     .   DELTAX,VIS,
-     .   MAT,  QMV,BUFMAT,IPARG1,IXS, IAD22, 
-     .   NC1, NC2, NC3, NC4, NC5, NC6, NC7, NC8, NALE)
+      SUBROUTINE AMOMT3(
+     1   PM,      RHO,     VOL,     X1,
+     2   X2,      X3,      X4,      X5,
+     3   X6,      X7,      X8,      Y1,
+     4   Y2,      Y3,      Y4,      Y5,
+     5   Y6,      Y7,      Y8,      Z1,
+     6   Z2,      Z3,      Z4,      Z5,
+     7   Z6,      Z7,      Z8,      VX1,
+     8   VX2,     VX3,     VX4,     VX5,
+     9   VX6,     VX7,     VX8,     VY1,
+     A   VY2,     VY3,     VY4,     VY5,
+     B   VY6,     VY7,     VY8,     VZ1,
+     C   VZ2,     VZ3,     VZ4,     VZ5,
+     D   VZ6,     VZ7,     VZ8,     F11,
+     E   F21,     F31,     F12,     F22,
+     F   F32,     F13,     F23,     F33,
+     G   F14,     F24,     F34,     F15,
+     H   F25,     F35,     F16,     F26,
+     I   F36,     F17,     F27,     F37,
+     J   F18,     F28,     F38,     PX1,
+     K   PX2,     PX3,     PX4,     PY1,
+     L   PY2,     PY3,     PY4,     PZ1,
+     M   PZ2,     PZ3,     PZ4,     DXX,
+     N   DXY,     DXZ,     DYX,     DYY,
+     O   DYZ,     DZX,     DZY,     DZZ,
+     P   VDX1,    VDX2,    VDX3,    VDX4,
+     Q   VDX5,    VDX6,    VDX7,    VDX8,
+     R   VDY1,    VDY2,    VDY3,    VDY4,
+     S   VDY5,    VDY6,    VDY7,    VDY8,
+     T   VDZ1,    VDZ2,    VDZ3,    VDZ4,
+     U   VDZ5,    VDZ6,    VDZ7,    VDZ8,
+     V   VDX,     VDY,     VDZ,     DELTAX,
+     W   VIS,     MAT,     QMV,     BUFMAT,
+     X   IPARG1,  IXS,     IAD22,   NC1,
+     Y   NC2,     NC3,     NC4,     NC5,
+     Z   NC6,     NC7,     NC8,     NALE,
+     1   NEL,     NFT,     MTN)
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
+      USE ALE_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -60,17 +82,17 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com08_c.inc"
-#include      "vect01_c.inc"
 #include      "param_c.inc"
-#include      "scrupw_c.inc"
 #include      "inter22.inc"
+#include      "com04_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: NFT
+      INTEGER, INTENT(IN) :: MTN
+      INTEGER, INTENT(IN) :: NEL
       my_real
-     .   PM(NPROPM,*), RHO(*),VOL(*),
+     .   PM(NPROPM,NUMMAT), RHO(*),VOL(*),
      .   X1(*),X2(*),X3(*),X4(*),X5(*),X6(*),X7(*),X8(*),
      .   Y1(*),Y2(*),Y3(*),Y4(*),Y5(*),Y6(*),Y7(*),Y8(*),
      .   Z1(*),Z2(*),Z3(*),Z4(*),Z5(*),Z6(*),Z7(*),Z8(*),
@@ -113,14 +135,14 @@ C-----------------------------------------------
      .   V87a(MVSIZ,3), V87b(MVSIZ,3)
       INTEGER I,J,IADBUF,IFLG, MX
 C-----------------------------------------------
-      IF(UPWM==0.AND.IPARG1(64)==1)RETURN   !silent boundary
+      IF(ALE%UPWIND%UPWM==0.AND.IPARG1(64)==1)RETURN   !silent boundary
 C-----------------------------------------------
 C  MULTIMATERIAL LAW 51
 C-----------------------------------------------
-      IF(MTN==51 .AND. UPWM/=3 .AND. IPARG1(64)==0)THEN
+      IF(MTN==51 .AND. ALE%UPWIND%UPWM/=3 .AND. IPARG1(64)==0)THEN
       !-------------------------------------------------------!
-      !     Forces de transports calculees par volume fini    !
-      !   DMi = 0.5*DT1*QMV(i,I)  masse entrant par la face i !
+      !     Reynolds theorem ('transportation force')         !
+      !   DMi = 0.5*DT1*QMV(i,I)  incoming mass from face i   !
       !-------------------------------------------------------!
       IADBUF = NINT(PM(27,MAT(1)))
       IFLG = NINT(BUFMAT(31+IADBUF-1))
@@ -128,12 +150,12 @@ C-----------------------------------------------
        IF(IFLG>1)RETURN
 
        !momentum advection with UPWIND method only. Even if SUPG or TG are activated. (UPSM=2 or 3)   
-       MX = MAT(LFT)       
-       DO I=LFT,LLT
+       MX = MAT(1)       
+       DO I=1,NEL
         GAM(I)= PM(15,MX)
        ENDDO
 
-        DO I=LFT,LLT
+        DO I=1,NEL
           IF(INT22>0)THEN
             IF(NINT(IAD22(I))/=0)CYCLE
           ENDIF
@@ -194,10 +216,10 @@ C-----------------------------------------------
           A2(I) = PX2(I)*VDX(I)+PY2(I)*VDY(I)+PZ2(I)*VDZ(I)
           A3(I) = PX3(I)*VDX(I)+PY3(I)*VDY(I)+PZ3(I)*VDZ(I)
           A4(I) = PX4(I)*VDX(I)+PY4(I)*VDY(I)+PZ4(I)*VDZ(I)
-          A1(I) = SIGN(GAM(LFT),A1(I))
-          A2(I) = SIGN(GAM(LFT),A2(I))
-          A3(I) = SIGN(GAM(LFT),A3(I))
-          A4(I) = SIGN(GAM(LFT),A4(I))
+          A1(I) = SIGN(GAM(1),A1(I))
+          A2(I) = SIGN(GAM(1),A2(I))
+          A3(I) = SIGN(GAM(1),A3(I))
+          A4(I) = SIGN(GAM(1),A4(I))
 
           F11(I) = F11(I) - (ONE+A1(I))*DMX
           F12(I) = F12(I) - (ONE+A2(I))*DMX
@@ -240,8 +262,8 @@ C-----------------------------------------------
       !     SUPG & TG      !
       !    R,S,T frame     !
       !--------------------!
-      IF(UPWM>1)THEN
-       DO I=LFT,LLT
+      IF(ALE%UPWIND%UPWM>1)THEN
+       DO I=1,NEL
         V12(I,1)=X2(I)-X1(I)
         V12(I,2)=Y2(I)-Y1(I)
         V12(I,3)=Z2(I)-Z1(I)
@@ -280,21 +302,21 @@ C-----------------------------------------------
         V58(I,3)=Z8(I)-Z5(I)
        ENDDO
        
-       ! NOEUD 1 : V12,V14,V15
-       ! NOEUD 2 : V12,V23,V26
-       ! NOEUD 3 : V43,V23,V37
-       ! NOEUD 4 : V43,V14,V48
-       ! NOEUD 5 : V56,V58,V15
-       ! NOEUD 6 : V56,V67,V26
-       ! NOEUD 7 : V87,V67,V37
-       ! NOEUD 8 : V87,V58,V48
+       ! NODE 1 : V12,V14,V15
+       ! NODE 2 : V12,V23,V26
+       ! NODE 3 : V43,V23,V37
+       ! NODE 4 : V43,V14,V48
+       ! NODE 5 : V56,V58,V15
+       ! NODE 6 : V56,V67,V26
+       ! NODE 7 : V87,V67,V37
+       ! NODE 8 : V87,V58,V48
               
        !PENTA6DG CASE
        !V43 is change to V43a for frame on node 3
        !V43 is change to V43b for frame on node 4 
        !V87 is change to V87a for frame on node 3
        !V87 is change to V87b for frame on node 4            
-       DO I=LFT,LLT
+       DO I=1,NEL
          
          IF(IXS(5,I+NFT)==IXS(4,I+NFT))THEN
            V43a(I,1)=X3(I)-X1(I)
@@ -330,23 +352,23 @@ C-----------------------------------------------
        ENDDO
        
        DO J=1,3
-        DO I=LFT,LLT
+        DO I=1,NEL
          R(I,J)=FOURTH*(V12(I,J)+V56(I,J)+V43(I,J)+V87(I,J))
          S(I,J)=FOURTH*(V23(I,J)+V14(I,J)+V58(I,J)+V67(I,J))
-         T(I,J)=FOURTH*(V15(I,J)+V26(I,J)+V37(I,J)+V48(I,J))	 
+         T(I,J)=FOURTH*(V15(I,J)+V26(I,J)+V37(I,J)+V48(I,J))   
         ENDDO
        ENDDO
       ENDIF
 
       !----------------------------------------------------!
       ! UPWIND STANDARD (upwm<2)                           !
-      ! CALCUL DE LA FORCE DE TRANSPORT AU CENTRE          !
+      ! TRANSPORTATION FORCE AT CENTROID                   !
       !----------------------------------------------------!
-      IF(UPWM<=1 .OR.IPARG1(64)==1)THEN
+      IF(ALE%UPWIND%UPWM<=1 .OR.IPARG1(64)==1)THEN
       
        IF((IPARG1(64)==1))THEN
-       ! VDX,VDY,VDZ EST CALCULE DANS M11VS3 OU M51VS3
-        DO I=LFT,LLT
+       ! VDX,VDY,VDZ IS CALCULATED IN M11VS3 OU M51VS3
+        DO I=1,NEL
          A1(I) =(PX1(I)*VDX(I)+PY1(I)*VDY(I)+PZ1(I)*VDZ(I))
          A2(I) =(PX2(I)*VDX(I)+PY2(I)*VDY(I)+PZ2(I)*VDZ(I))
          A3(I) =(PX3(I)*VDX(I)+PY3(I)*VDY(I)+PZ3(I)*VDZ(I))
@@ -357,29 +379,29 @@ C-----------------------------------------------
          A4(I) = SIGN(ONE,A4(I))        
         ENDDO
        ELSE
-        IF(UPWM==ZERO)THEN
-         MX = MAT(LFT)
-         DO I=LFT,LLT
+        IF(ALE%UPWIND%UPWM==ZERO)THEN
+         MX = MAT(1)
+         DO I=1,NEL
           GAM(I)= PM(15,MX)
          ENDDO
         ELSE
-         DO I=LFT,LLT
-          GAM(I)= CUPWM
+         DO I=1,NEL
+          GAM(I)= ALE%UPWIND%CUPWM
          ENDDO
         ENDIF
-        DO I=LFT,LLT
+        DO I=1,NEL
          A1(I) = PX1(I)*VDX(I)+PY1(I)*VDY(I)+PZ1(I)*VDZ(I)
          A2(I) = PX2(I)*VDX(I)+PY2(I)*VDY(I)+PZ2(I)*VDZ(I)
          A3(I) = PX3(I)*VDX(I)+PY3(I)*VDY(I)+PZ3(I)*VDZ(I)
          A4(I) = PX4(I)*VDX(I)+PY4(I)*VDY(I)+PZ4(I)*VDZ(I)
-         A1(I) = SIGN(GAM(LFT),A1(I))
-         A2(I) = SIGN(GAM(LFT),A2(I))
-         A3(I) = SIGN(GAM(LFT),A3(I))
-         A4(I) = SIGN(GAM(LFT),A4(I))
+         A1(I) = SIGN(GAM(1),A1(I))
+         A2(I) = SIGN(GAM(1),A2(I))
+         A3(I) = SIGN(GAM(1),A3(I))
+         A4(I) = SIGN(GAM(1),A4(I))
         ENDDO
        ENDIF
        
-       DO I=LFT,LLT
+       DO I=1,NEL
         FAC = ONE_OVER_8*RHO(I)*VOL(I)
         F1(I) = (VDX(I)*DXX(I)+VDY(I)*DXY(I)+VDZ(I)*DXZ(I))*FAC
         F2(I) = (VDX(I)*DYX(I)+VDY(I)*DYY(I)+VDZ(I)*DYZ(I))*FAC
@@ -388,7 +410,7 @@ C-----------------------------------------------
 
        !inter22
        IF(INT22>0)THEN       
-         DO I=LFT,LLT
+         DO I=1,NEL
           !currently no momentum transport force for polyedra
            IF(NINT(IAD22(I))==0)CYCLE
           !no force for brick in cut cell buffer
@@ -398,8 +420,8 @@ C-----------------------------------------------
           ENDDO
        ENDIF
         
-       !repartition nodale
-       DO I=LFT,LLT
+       !expand to nodes
+       DO I=1,NEL
         F11(I) = F11(I) - (ONE+A1(I))*F1(I)
         F12(I) = F12(I) - (ONE+A2(I))*F1(I)
         F13(I) = F13(I) - (ONE+A3(I))*F1(I)
@@ -425,33 +447,47 @@ C
         F35(I) = F35(I) - (ONE-A3(I))*F3(I)
         F36(I) = F36(I) - (ONE-A4(I))*F3(I)
         F37(I) = F37(I) - (ONE-A1(I))*F3(I)
-        F38(I) = F38(I) - (ONE-A2(I))*F3(I)	
+        F38(I) = F38(I) - (ONE-A2(I))*F3(I)
        ENDDO
 
       ELSE
 
       !-----------------------------------------------------------------------!
       ! SUPG OU TG                                                            !
-      ! FORMULATION DE LA FORCE DE TRANSPORT MINIMISANT LES PBS D'HOURGLASS   !
-      ! ON EVALUE <PHI,UJ*DUI/DXJ> DIRECTEMENT AUX NOEUDS                     !
+      ! TRANSPORTATION FORCE WHICH MINIMIZE HOURGLASS                         !
+      !  <PHI,UJ*DUI/DXJ> ESTIMATED AT NODES                                  !
       !-----------------------------------------------------------------------!
-      ! NOEUD 1 (1,2,4,5)     
-       CALL AJAC3_V(V12,V14,V15,AJ1,AJ2,AJ3,AJV)
-       DO I=LFT,LLT
+      ! NODE 1 (1,2,4,5)     
+       CALL AJAC3_V(
+     1   V12,     V14,     V15,     AJ1,
+     2   AJ2,     AJ3,     AJV,     NEL)
+       DO I=1,NEL
         AJ0(I,1)=-(AJ1(I,1)+AJ2(I,1)+AJ3(I,1))
         AJ0(I,2)=-(AJ1(I,2)+AJ2(I,2)+AJ3(I,2))
         AJ0(I,3)=-(AJ1(I,3)+AJ2(I,3)+AJ3(I,3))
        ENDDO
-       CALL AMOMTN3(RHO,DELTAX,VIS,VOL,
-     .   AJ0,AJ1,AJ2,AJ3,AJV,R,S,T,
-     .   VDX1,VDY1,VDZ1,
-     .   VX1,VY1,VZ1,VX2,VY2,VZ2,VX4,VY4,VZ4,VX5,VY5,VZ5,
-     .   F11,F21,F31,F12,F22,F32,F14,F24,F34,F15,F25,F35,
-     .   F13,F23,F33,F16,F26,F36,F17,F27,F37,F18,F28,F38,
-     .   IAD22, NC1, NC2, NC3, NC4, NC5, NC6, NC7, NC8, NALE)
-       ! NOEUD 2 (2,1,3,6)     
-       CALL AJAC3_V(V12,V23,V26,AJ1,AJ2,AJ3,AJV)
-       DO I=LFT,LLT
+       CALL AMOMTN3(
+     1   RHO,     DELTAX,  VIS,     VOL,
+     2   AJ0,     AJ1,     AJ2,     AJ3,
+     3   AJV,     R,       S,       T,
+     4   VDX1,    VDY1,    VDZ1,    VX1,
+     5   VY1,     VZ1,     VX2,     VY2,
+     6   VZ2,     VX4,     VY4,     VZ4,
+     7   VX5,     VY5,     VZ5,     F11,
+     8   F21,     F31,     F12,     F22,
+     9   F32,     F14,     F24,     F34,
+     A   F15,     F25,     F35,     F13,
+     B   F23,     F33,     F16,     F26,
+     C   F36,     F17,     F27,     F37,
+     D   F18,     F28,     F38,     IAD22,
+     E   NC1,     NC2,     NC3,     NC4,
+     F   NC5,     NC6,     NC7,     NC8,
+     G   NALE,    NEL)
+       ! NODE 2 (2,1,3,6)     
+       CALL AJAC3_V(
+     1   V12,     V23,     V26,     AJ1,
+     2   AJ2,     AJ3,     AJV,     NEL)
+       DO I=1,NEL
         AJ1(I,1)=-AJ1(I,1)
         AJ1(I,2)=-AJ1(I,2)
         AJ1(I,3)=-AJ1(I,3)
@@ -459,16 +495,28 @@ C
         AJ0(I,2)=-(AJ1(I,2)+AJ2(I,2)+AJ3(I,2))
         AJ0(I,3)=-(AJ1(I,3)+AJ2(I,3)+AJ3(I,3))
        ENDDO
-       CALL AMOMTN3(RHO,DELTAX,VIS,VOL,
-     .   AJ0,AJ1,AJ2,AJ3,AJV,R,S,T,
-     .   VDX2,VDY2,VDZ2,
-     .   VX2,VY2,VZ2,VX1,VY1,VZ1,VX3,VY3,VZ3,VX6,VY6,VZ6,
-     .   F12,F22,F32,F11,F21,F31,F13,F23,F33,F16,F26,F36,
-     .   F14,F24,F34,F15,F25,F35,F17,F27,F37,F18,F28,F38,
-     .   IAD22, NC1, NC2, NC3, NC4, NC5, NC6, NC7, NC8, NALE)
-       ! NOEUD 3  (3,4,2,8)    
-       CALL AJAC3_V(V43a,V23,V37,AJ1,AJ2,AJ3,AJV)
-       DO I=LFT,LLT
+       CALL AMOMTN3(
+     1   RHO,     DELTAX,  VIS,     VOL,
+     2   AJ0,     AJ1,     AJ2,     AJ3,
+     3   AJV,     R,       S,       T,
+     4   VDX2,    VDY2,    VDZ2,    VX2,
+     5   VY2,     VZ2,     VX1,     VY1,
+     6   VZ1,     VX3,     VY3,     VZ3,
+     7   VX6,     VY6,     VZ6,     F12,
+     8   F22,     F32,     F11,     F21,
+     9   F31,     F13,     F23,     F33,
+     A   F16,     F26,     F36,     F14,
+     B   F24,     F34,     F15,     F25,
+     C   F35,     F17,     F27,     F37,
+     D   F18,     F28,     F38,     IAD22,
+     E   NC1,     NC2,     NC3,     NC4,
+     F   NC5,     NC6,     NC7,     NC8,
+     G   NALE,    NEL)
+       ! NODE 3  (3,4,2,8)    
+       CALL AJAC3_V(
+     1   V43a,    V23,     V37,     AJ1,
+     2   AJ2,     AJ3,     AJV,     NEL)
+       DO I=1,NEL
         AJ1(I,1)=-AJ1(I,1)
         AJ1(I,2)=-AJ1(I,2)
         AJ1(I,3)=-AJ1(I,3)
@@ -479,16 +527,28 @@ C
         AJ0(I,2)=-(AJ1(I,2)+AJ2(I,2)+AJ3(I,2))
         AJ0(I,3)=-(AJ1(I,3)+AJ2(I,3)+AJ3(I,3))
        ENDDO
-       CALL AMOMTN3(RHO,DELTAX,VIS,VOL,
-     .   AJ0,AJ1,AJ2,AJ3,AJV,R,S,T,
-     .   VDX3,VDY3,VDZ3,
-     .   VX3,VY3,VZ3,VX4,VY4,VZ4,VX2,VY2,VZ2,VX7,VY7,VZ7,
-     .   F13,F23,F33,F14,F24,F34,F12,F22,F32,F17,F27,F37,
-     .   F11,F21,F31,F15,F25,F35,F16,F26,F36,F18,F28,F38,
-     .   IAD22, NC1, NC2, NC3, NC4, NC5, NC6, NC7, NC8, NALE)
-       ! NOEUD 4 (4,3,1,8)     
-       CALL AJAC3_V(V43b,V14,V48,AJ1,AJ2,AJ3,AJV)
-       DO I=LFT,LLT
+       CALL AMOMTN3(
+     1   RHO,     DELTAX,  VIS,     VOL,
+     2   AJ0,     AJ1,     AJ2,     AJ3,
+     3   AJV,     R,       S,       T,
+     4   VDX3,    VDY3,    VDZ3,    VX3,
+     5   VY3,     VZ3,     VX4,     VY4,
+     6   VZ4,     VX2,     VY2,     VZ2,
+     7   VX7,     VY7,     VZ7,     F13,
+     8   F23,     F33,     F14,     F24,
+     9   F34,     F12,     F22,     F32,
+     A   F17,     F27,     F37,     F11,
+     B   F21,     F31,     F15,     F25,
+     C   F35,     F16,     F26,     F36,
+     D   F18,     F28,     F38,     IAD22,
+     E   NC1,     NC2,     NC3,     NC4,
+     F   NC5,     NC6,     NC7,     NC8,
+     G   NALE,    NEL)
+       ! NODE 4 (4,3,1,8)     
+       CALL AJAC3_V(
+     1   V43b,    V14,     V48,     AJ1,
+     2   AJ2,     AJ3,     AJV,     NEL)
+       DO I=1,NEL
         AJ2(I,1)=-AJ2(I,1)
         AJ2(I,2)=-AJ2(I,2)
         AJ2(I,3)=-AJ2(I,3)
@@ -496,16 +556,28 @@ C
         AJ0(I,2)=-(AJ1(I,2)+AJ2(I,2)+AJ3(I,2))
         AJ0(I,3)=-(AJ1(I,3)+AJ2(I,3)+AJ3(I,3))
        ENDDO
-       CALL AMOMTN3(RHO,DELTAX,VIS,VOL,
-     .   AJ0,AJ1,AJ2,AJ3,AJV,R,S,T,
-     .   VDX4,VDY4,VDZ4,
-     .   VX4,VY4,VZ4,VX3,VY3,VZ3,VX1,VY1,VZ1,VX8,VY8,VZ8,
-     .   F14,F24,F34,F13,F23,F33,F11,F21,F31,F18,F28,F38,
-     .   F12,F22,F32,F15,F25,F35,F16,F26,F36,F17,F27,F37,
-     .   IAD22, NC1, NC2, NC3, NC4, NC5, NC6, NC7, NC8, NALE)
-       ! NOEUD 5  (5,6,8,1)    
-       CALL AJAC3_V(V56,V58,V15,AJ1,AJ2,AJ3,AJV)
-       DO I=LFT,LLT
+       CALL AMOMTN3(
+     1   RHO,     DELTAX,  VIS,     VOL,
+     2   AJ0,     AJ1,     AJ2,     AJ3,
+     3   AJV,     R,       S,       T,
+     4   VDX4,    VDY4,    VDZ4,    VX4,
+     5   VY4,     VZ4,     VX3,     VY3,
+     6   VZ3,     VX1,     VY1,     VZ1,
+     7   VX8,     VY8,     VZ8,     F14,
+     8   F24,     F34,     F13,     F23,
+     9   F33,     F11,     F21,     F31,
+     A   F18,     F28,     F38,     F12,
+     B   F22,     F32,     F15,     F25,
+     C   F35,     F16,     F26,     F36,
+     D   F17,     F27,     F37,     IAD22,
+     E   NC1,     NC2,     NC3,     NC4,
+     F   NC5,     NC6,     NC7,     NC8,
+     G   NALE,    NEL)
+       ! NODE 5  (5,6,8,1)    
+       CALL AJAC3_V(
+     1   V56,     V58,     V15,     AJ1,
+     2   AJ2,     AJ3,     AJV,     NEL)
+       DO I=1,NEL
         AJ3(I,1)=-AJ3(I,1)
         AJ3(I,2)=-AJ3(I,2)
         AJ3(I,3)=-AJ3(I,3)
@@ -513,16 +585,28 @@ C
         AJ0(I,2)=-(AJ1(I,2)+AJ2(I,2)+AJ3(I,2))
         AJ0(I,3)=-(AJ1(I,3)+AJ2(I,3)+AJ3(I,3))
        ENDDO
-       CALL AMOMTN3(RHO,DELTAX,VIS,VOL,
-     .   AJ0,AJ1,AJ2,AJ3,AJV,R,S,T,
-     .   VDX5,VDY5,VDZ5,
-     .   VX5,VY5,VZ5,VX6,VY6,VZ6,VX8,VY8,VZ8,VX1,VY1,VZ1,
-     .   F15,F25,F35,F16,F26,F36,F18,F28,F38,F11,F21,F31,
-     .   F12,F22,F32,F13,F23,F33,F14,F24,F34,F17,F27,F37,
-     .   IAD22, NC1, NC2, NC3, NC4, NC5, NC6, NC7, NC8, NALE)
-       ! NOEUD 6  (6,5,7,2)    
-       CALL AJAC3_V(V56,V67,V26,AJ1,AJ2,AJ3,AJV)
-       DO I=LFT,LLT
+       CALL AMOMTN3(
+     1   RHO,     DELTAX,  VIS,     VOL,
+     2   AJ0,     AJ1,     AJ2,     AJ3,
+     3   AJV,     R,       S,       T,
+     4   VDX5,    VDY5,    VDZ5,    VX5,
+     5   VY5,     VZ5,     VX6,     VY6,
+     6   VZ6,     VX8,     VY8,     VZ8,
+     7   VX1,     VY1,     VZ1,     F15,
+     8   F25,     F35,     F16,     F26,
+     9   F36,     F18,     F28,     F38,
+     A   F11,     F21,     F31,     F12,
+     B   F22,     F32,     F13,     F23,
+     C   F33,     F14,     F24,     F34,
+     D   F17,     F27,     F37,     IAD22,
+     E   NC1,     NC2,     NC3,     NC4,
+     F   NC5,     NC6,     NC7,     NC8,
+     G   NALE,    NEL)
+       ! NODE 6  (6,5,7,2)    
+       CALL AJAC3_V(
+     1   V56,     V67,     V26,     AJ1,
+     2   AJ2,     AJ3,     AJV,     NEL)
+       DO I=1,NEL
         AJ3(I,1)=-AJ3(I,1)
         AJ3(I,2)=-AJ3(I,2)
         AJ3(I,3)=-AJ3(I,3)
@@ -533,16 +617,28 @@ C
         AJ0(I,2)=-(AJ1(I,2)+AJ2(I,2)+AJ3(I,2))
         AJ0(I,3)=-(AJ1(I,3)+AJ2(I,3)+AJ3(I,3))
       ENDDO
-       CALL AMOMTN3(RHO,DELTAX,VIS,VOL,
-     .   AJ0,AJ1,AJ2,AJ3,AJV,R,S,T,
-     .   VDX6,VDY6,VDZ6,
-     .   VX6,VY6,VZ6,VX5,VY5,VZ5,VX7,VY7,VZ7,VX2,VY2,VZ2,
-     .   F16,F26,F36,F15,F25,F35,F17,F27,F37,F12,F22,F32,
-     .   F11,F21,F31,F13,F23,F33,F14,F24,F34,F18,F28,F38,
-     .   IAD22, NC1, NC2, NC3, NC4, NC5, NC6, NC7, NC8, NALE)
-       ! NOEUD 7 (7,8,6,3)     
-       CALL AJAC3_V(V87a,V67,V37,AJ1,AJ2,AJ3,AJV)
-       DO I=LFT,LLT
+       CALL AMOMTN3(
+     1   RHO,     DELTAX,  VIS,     VOL,
+     2   AJ0,     AJ1,     AJ2,     AJ3,
+     3   AJV,     R,       S,       T,
+     4   VDX6,    VDY6,    VDZ6,    VX6,
+     5   VY6,     VZ6,     VX5,     VY5,
+     6   VZ5,     VX7,     VY7,     VZ7,
+     7   VX2,     VY2,     VZ2,     F16,
+     8   F26,     F36,     F15,     F25,
+     9   F35,     F17,     F27,     F37,
+     A   F12,     F22,     F32,     F11,
+     B   F21,     F31,     F13,     F23,
+     C   F33,     F14,     F24,     F34,
+     D   F18,     F28,     F38,     IAD22,
+     E   NC1,     NC2,     NC3,     NC4,
+     F   NC5,     NC6,     NC7,     NC8,
+     G   NALE,    NEL)
+       ! NODE 7 (7,8,6,3)     
+       CALL AJAC3_V(
+     1   V87a,    V67,     V37,     AJ1,
+     2   AJ2,     AJ3,     AJV,     NEL)
+       DO I=1,NEL
         AJ1(I,1)=-AJ1(I,1)
         AJ1(I,2)=-AJ1(I,2)
         AJ1(I,3)=-AJ1(I,3)
@@ -556,16 +652,28 @@ C
         AJ0(I,2)=-(AJ1(I,2)+AJ2(I,2)+AJ3(I,2))
         AJ0(I,3)=-(AJ1(I,3)+AJ2(I,3)+AJ3(I,3))
        ENDDO
-       CALL AMOMTN3(RHO,DELTAX,VIS,VOL,
-     .   AJ0,AJ1,AJ2,AJ3,AJV,R,S,T,
-     .   VDX7,VDY7,VDZ7,
-     .   VX7,VY7,VZ7,VX8,VY8,VZ8,VX6,VY6,VZ6,VX3,VY3,VZ3,
-     .   F17,F27,F37,F18,F28,F38,F16,F26,F36,F13,F23,F33,
-     .   F11,F21,F31,F12,F22,F32,F14,F24,F34,F15,F25,F35,
-     .   IAD22, NC1, NC2, NC3, NC4, NC5, NC6, NC7, NC8, NALE)
-       ! NOEUD 8      
-       CALL AJAC3_V(V87b,V58,V48,AJ1,AJ2,AJ3,AJV)
-       DO I=LFT,LLT
+       CALL AMOMTN3(
+     1   RHO,     DELTAX,  VIS,     VOL,
+     2   AJ0,     AJ1,     AJ2,     AJ3,
+     3   AJV,     R,       S,       T,
+     4   VDX7,    VDY7,    VDZ7,    VX7,
+     5   VY7,     VZ7,     VX8,     VY8,
+     6   VZ8,     VX6,     VY6,     VZ6,
+     7   VX3,     VY3,     VZ3,     F17,
+     8   F27,     F37,     F18,     F28,
+     9   F38,     F16,     F26,     F36,
+     A   F13,     F23,     F33,     F11,
+     B   F21,     F31,     F12,     F22,
+     C   F32,     F14,     F24,     F34,
+     D   F15,     F25,     F35,     IAD22,
+     E   NC1,     NC2,     NC3,     NC4,
+     F   NC5,     NC6,     NC7,     NC8,
+     G   NALE,    NEL)
+       ! NODE 8      
+       CALL AJAC3_V(
+     1   V87b,    V58,     V48,     AJ1,
+     2   AJ2,     AJ3,     AJV,     NEL)
+       DO I=1,NEL
         AJ2(I,1)=-AJ2(I,1)
         AJ2(I,2)=-AJ2(I,2)
         AJ2(I,3)=-AJ2(I,3)
@@ -576,13 +684,23 @@ C
         AJ0(I,2)=-(AJ1(I,2)+AJ2(I,2)+AJ3(I,2))
         AJ0(I,3)=-(AJ1(I,3)+AJ2(I,3)+AJ3(I,3))
        ENDDO
-       CALL AMOMTN3(RHO,DELTAX,VIS,VOL,
-     .   AJ0,AJ1,AJ2,AJ3,AJV,R,S,T,
-     .   VDX8,VDY8,VDZ8,
-     .   VX8,VY8,VZ8,VX7,VY7,VZ7,VX5,VY5,VZ5,VX4,VY4,VZ4,
-     .   F18,F28,F38,F17,F27,F37,F15,F25,F35,F14,F24,F34,
-     .   F11,F21,F31,F12,F22,F32,F13,F23,F33,F16,F26,F36,
-     .   IAD22, NC1, NC2, NC3, NC4, NC5, NC6, NC7, NC8, NALE)
+       CALL AMOMTN3(
+     1   RHO,     DELTAX,  VIS,     VOL,
+     2   AJ0,     AJ1,     AJ2,     AJ3,
+     3   AJV,     R,       S,       T,
+     4   VDX8,    VDY8,    VDZ8,    VX8,
+     5   VY8,     VZ8,     VX7,     VY7,
+     6   VZ7,     VX5,     VY5,     VZ5,
+     7   VX4,     VY4,     VZ4,     F18,
+     8   F28,     F38,     F17,     F27,
+     9   F37,     F15,     F25,     F35,
+     A   F14,     F24,     F34,     F11,
+     B   F21,     F31,     F12,     F22,
+     C   F32,     F13,     F23,     F33,
+     D   F16,     F26,     F36,     IAD22,
+     E   NC1,     NC2,     NC3,     NC4,
+     F   NC5,     NC6,     NC7,     NC8,
+     G   NALE,    NEL)
       ENDIF
       RETURN
       END

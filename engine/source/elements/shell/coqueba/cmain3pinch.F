@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,9 +27,9 @@ Chd|        CBAFORC3                      source/elements/shell/coqueba/cbaforc3
 Chd|-- calls ---------------
 Chd|        MULAWGLCPINCH                 source/elements/shell/coqueba/mulawglcpinch.F
 Chd|        DRAPE_MOD                     share/modules/drape_mod.F     
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        FAILWAVE_MOD                  ../common_source/modules/failwave_mod.F
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/matparam_def_mod.F
+Chd|        GROUP_PARAM_MOD               ../common_source/modules/mat_elem/group_param_mod.F
 Chd|        PINCHTYPE_MOD                 ../common_source/modules/pinchtype_mod.F
 Chd|        PINCH_LOCAL_MOD               share/modules/pinch_local_mod.F
 Chd|        STACK_MOD                     share/modules/stack_mod.F     
@@ -70,7 +70,7 @@ C-----------------------------------------------
       USE ELBUFDEF_MOD
       USE STACK_MOD
       USE FAILWAVE_MOD
-      USE MATPARAM_DEF_MOD 
+      USE GROUP_PARAM_MOD 
       USE PINCHTYPE_MOD
       USE PINCH_LOCAL_MOD
       USE DRAPE_MOD
@@ -86,15 +86,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "com01_c.inc"
-#include      "com08_c.inc"
-#include      "scr03_c.inc"
-#include      "scr17_c.inc"
-#include      "scr18_c.inc"
-#include      "impl1_c.inc"
-#include      "sms_c.inc"
-#include      "com_xfem1.inc"
-#include      "timeri_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -126,7 +117,7 @@ C-----------------------------------------------
       TYPE(ELBUF_STRUCT_), TARGET :: ELBUF_STR
       TYPE (STACK_PLY) :: STACK
       TYPE (FAILWAVE_STR_) ,TARGET :: FAILWAVE 
-      TYPE (GRP_PARAM_STRUCT_) :: GROUP_PARAM
+      TYPE (GROUP_PARAM_) :: GROUP_PARAM
       TYPE (PINCH_LOCAL_STRUCT_) :: PINCH_LOCAL
       TYPE (DRAPE_) :: DRAPE
 C-----------------------------------------------

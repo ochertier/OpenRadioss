@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -56,7 +56,6 @@ C-----------------------------------------------
       INTEGER I
 C     REAL
 C-----------------------------------------------
-!      EQUIVALENCE (PENE,BV(1,22))
 C     CAS DECHARGEMENT
       DO I=LFT,LLT
         IF(PENE(I)/=0.0)THEN
@@ -117,9 +116,6 @@ C-----------------------------------------------
       INTEGER I
 C     REAL
 C-----------------------------------------------
-!      EQUIVALENCE (PROV_N,IV(1,6)) ,(PROV_E,IV(1,7)) 
-C
-!      EQUIVALENCE (PENE,BV(1,22))
 C
 C
       IF(IFLAG==0) THEN

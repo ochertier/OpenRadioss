@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -43,12 +43,7 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "scr03_c.inc"
 #include      "scr17_c.inc"
-#include      "scr10_c.inc"
-#include      "tabsiz_c.inc"
-#include      "units_c.inc"
-#include      "nchar_c.inc"
 #include      "com04_c.inc"
 #include      "r2r_c.inc"
 C-----------------------------------------------
@@ -76,7 +71,7 @@ C
             CALL QAPRINT('NB_SUBDOMAIN',NSUBDOM,0.0_8)
             CALL QAPRINT('NB_PART_SUB',NB_PART_SUB,0.0_8)
 C
-	    RLEN = ISUBDOM(7,I)
+              RLEN = ISUBDOM(7,I)
             WRITE(VARNAME,'(A)') DOM_NAME(ISUBDOM(8,I):ISUBDOM(8,I)+RLEN-1)
             CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),ISUBDOM(2,I), 0.0_8)
 C

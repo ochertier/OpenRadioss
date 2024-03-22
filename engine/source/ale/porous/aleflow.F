@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,8 +27,8 @@ Chd|        SFORC3                        source/elements/solid/solide/sforc3.F
 Chd|-- calls ---------------
 Chd|        ALECONVE                      source/ale/porous/aleconv.F   
 Chd|        ALEFLUX                       source/ale/porous/aleflux.F   
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale_connectivity_mod.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE ALEFLOW(
      .         PM    ,IPM      ,MAT         ,X      ,IPARG   ,
@@ -73,19 +73,10 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
-#include      "com02_c.inc"
 #include      "com04_c.inc"
-#include      "com06_c.inc"
 #include      "com08_c.inc"
 #include      "param_c.inc"
 #include      "vect01_c.inc"
-#include      "scr05_c.inc"
-#include      "scr06_c.inc"
-#include      "units_c.inc"
-#include      "parit_c.inc"
-#include      "task_c.inc"
-#include      "spmd_c.inc"
-#include      "vale_c.inc"
 #include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -152,7 +143,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------   
-       DO I = LFT, LLT
+       DO I = 1, NEL
         RHOEXT(I)  = ZERO
         EIEXT(I) = ZERO
           
@@ -248,7 +239,7 @@ C coordinates
        ENDDO
 
 C different Alpha values
-       DO  I=LFT,LLT 
+       DO  I=1,NEL 
            IE =NFT+I
            IAD2 = ALE_CONNECT%ee_connect%iad_connect(IE)
            ALPHA(I) = POR(IE)
@@ -262,10 +253,10 @@ C different Alpha values
           ENDDO
         ENDDO
 C External gas
-       MX = MAT(LFT)
+       MX = MAT(1)
        ICONGAS = NINT(PM(201, MX))
        IF(ICONGAS > 0) THEN
-         DO I= LFT,LLT 
+         DO I= 1,NEL 
            RHOEXT(I) = PM(199, MX)
            EIEXT(I)  = PM(200, MX)
          ENDDO
@@ -275,7 +266,7 @@ C with interface
 C 
        ICLOS = NINT(PM(198, MAT(1)))
        IF(ICLOS == 2 .AND. INTBAG > 0  ) THEN
-          DO  I=LFT,LLT 
+          DO  I=1,NEL 
              IAD2 = ALE_CONNECT%ee_connect%iad_connect(I+NFT)
             II=ALE_CONNECT%ee_connect%connected(IAD2 + 1 - 1)
             IF(II == 0) THEN
@@ -335,7 +326,7 @@ C
 
       IF(ICLOS == 1 ) THEN      
 #include "lockon.inc"
-       DO  I=LFT,LLT 
+       DO  I=1,NEL 
           IAD2 = ALE_CONNECT%ee_connect%iad_connect(I + NFT)
            II=ALE_CONNECT%ee_connect%connected(IAD2 + 1 - 1)
            IF(II == 0)THEN
@@ -574,7 +565,7 @@ C
 #include "lockoff.inc"       
       ELSEIF(ICLOS == 2 .AND. INTBAG > 0  ) THEN
 #include "lockon.inc"
-          DO  I=LFT,LLT 
+          DO  I=1,NEL 
              IAD2 = ALE_CONNECT%ee_connect%iad_connect(I + NFT)
            II=ALE_CONNECT%ee_connect%connected(IAD2 + 1 - 1)
            IF(II == 0 .AND. REXCH(I,1) < EM15 )THEN
@@ -826,7 +817,7 @@ C
      
         IF(ICONGAS == 0) THEN
 #include "lockon.inc"
-          DO  I=LFT,LLT 
+          DO  I=1,NEL 
              IAD2 = ALE_CONNECT%ee_connect%iad_connect(I + NFT)
            II=ALE_CONNECT%ee_connect%connected(IAD2 + 1 - 1)
            IF(II == 0 .AND. FLUX(I,1) < ZERO )THEN
@@ -1082,8 +1073,8 @@ C------------
            
       DTINV = DT1/MAX(DT1*DT1, EM20)  
     
-      MX = MAT(LFT) 
-      DO I=LFT,LLT
+      MX = MAT(1) 
+      DO I=1,NEL
         FRHO0(I) =PM(192,MX) 
          KK(I) = MBUF%VAR(21*NEL + I)
          FAC = ONE_OVER_8*(ONE - ALPHA(I))/MAX(EM20,KK(I))       

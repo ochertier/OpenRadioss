@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -597,7 +597,6 @@ C-----------------------------------------------
       INTEGER I,J,EP,ISYM
       my_real
      .    K(3,3,MVSIZ)
-C----nouvelle routine---- QI^tKQJ avec K13=K23=0--K33 traite diff-----
        IF (ISYM==1) THEN
         DO I=1,3 
         DO J=I,3 
@@ -821,7 +820,7 @@ C -----------PROJECTION---------
 C
         CALL SET_RSJ2(RZ1     ,RZ2     ,RZ3     ,RZ4    ,Z1    ,
      .                JFT     ,JLT     ,CORELV  ,IPLAT  )
-C	
+C
         CALL SETPROJKZ(DR    ,R1     ,R2     ,R3     ,R4    ,
      3                K11,K12,K13,K14,K22,K23,K24,K33,K34,K44,
      4                M11,M12,M13,M14,M22,M23,M24,M33,M34,M44,
@@ -1540,7 +1539,6 @@ Chd|====================================================================
       SUBROUTINE TRANQIKQJ67(JFT   ,JLT    ,VQI  ,KK , VQJ,KD ,ISYM) 
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8
 #include      "implicit_f.inc"
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   D U M M Y   A R G U M E N T S
 C-----------------------------------------------
@@ -1601,7 +1599,7 @@ Chd|  TRANQIKQJ                     source/elements/shell/coquez/czsumg3.F
 Chd|-- called by -----------
 Chd|        SETPROJK                      source/elements/shell/coquez/czsumg3.F
 Chd|        SETPROJKBA                    source/elements/shell/coqueba/cbasumg3.F
-Chd|        SETPROJKS6                    source/elements/thickshell/solide6c/s6ccumg3.F
+Chd|        SETPROJKS6                    source/elements/thickshell/solide6c/setprojks6.F
 Chd|        SETPROJKZ                     source/elements/shell/coquez/czsumg3.F
 Chd|        SETPROJKZ1                    source/elements/shell/coquez/czsumg3.F
 Chd|-- calls ---------------
@@ -1684,7 +1682,6 @@ Chd|====================================================================
       SUBROUTINE TRANKL1(JFT   ,JLT    ,KL  ,IS ) 
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8
 #include      "implicit_f.inc"
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   D U M M Y   A R G U M E N T S
 C-----------------------------------------------
@@ -1724,7 +1721,6 @@ Chd|====================================================================
       SUBROUTINE TRANKLQ(JFT   ,JLT    ,VQ   ,KL  ,KD  ,IT) 
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8
 #include      "implicit_f.inc"
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   D U M M Y   A R G U M E N T S
 C-----------------------------------------------
@@ -1795,7 +1791,6 @@ C-----------------------------------------------
       INTEGER I,J,EP,ISYM
       my_real
      .    K(3,3,MVSIZ)
-C----nouvelle routine---- QI^tKQJ K33 =0-----
 C-----------------------------------------------
        IF (ISYM==1) THEN
         DO I=1,3 
@@ -2321,7 +2316,6 @@ Chd|====================================================================
       SUBROUTINE TRANKL2(JFT   ,JLT    ,KL  ,QNI  ,KR  ,IT) 
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8
 #include      "implicit_f.inc"
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   D U M M Y   A R G U M E N T S
 C-----------------------------------------------
@@ -2343,7 +2337,7 @@ C--------------update KL(6,j),j=4,6--by QNI------------------------
 C
        IF (IT == 1 )THEN
         DO J=4,6
-	 K=J-3 
+           K=J-3 
          DO EP=JFT,JLT 
           KR(6,K,EP)= ZERO
           KR(6,J,EP)= QNI(K,EP)
@@ -2351,7 +2345,7 @@ C
         ENDDO
        ELSE
         DO J=4,6 
-	 K=J-3 
+           K=J-3 
          DO EP=JFT,JLT 
           KR(K,6,EP)= ZERO
           KR(J,6,EP)= QNI(K,EP)
@@ -2968,7 +2962,6 @@ Chd|====================================================================
       SUBROUTINE TRANKLQN(JFT   ,JLT    ,VQ   ,VQN  ,KL   ,KD   ,IT  ) 
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8
 #include      "implicit_f.inc"
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   D U M M Y   A R G U M E N T S
 C-----------------------------------------------
@@ -3027,7 +3020,6 @@ Chd|====================================================================
       SUBROUTINE TRANKL0(JFT   ,JLT    ,KL  ,KR  ,IT) 
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8
 #include      "implicit_f.inc"
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   D U M M Y   A R G U M E N T S
 C-----------------------------------------------
@@ -3072,7 +3064,6 @@ Chd|====================================================================
      .                       KL    ,KR     ,IT  ,IS  )
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8
 #include      "implicit_f.inc"
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   D U M M Y   A R G U M E N T S
 C-----------------------------------------------

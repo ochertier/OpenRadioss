@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -45,12 +45,6 @@ C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com04_c.inc"
-#include      "param_c.inc"
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER I_MEM, NSN,NSNROLD,IGAP
@@ -79,12 +73,10 @@ C     REAL
      .   NNZ1(MVSIZ), NNZ2(MVSIZ), NNZ3(MVSIZ), NNZ4(MVSIZ),
      .   PENE(MVSIZ), GAPV(MVSIZ)
 C-----------------------------------------------
-#include "sync_dir.inc"
-C-----------------------------------------------
         CALL I23COR3T(J_STOK ,X    ,IRECT ,PROV_E ,
      1               PROV_N  ,IGAP ,GAP   ,X1    ,X2     ,
-     2               X3      ,X4   ,Y1    ,Y2	 ,Y3	 ,
-     3               Y4      ,Z1   ,Z2    ,Z3	 ,Z4	 ,
+     2               X3      ,X4   ,Y1    ,Y2   ,Y3   ,
+     3               Y4      ,Z1   ,Z2    ,Z3   ,Z4   ,
      4               XI      ,YI   ,ZI    ,IX1   ,IX2    ,  
      5               IX3     ,IX4  ,NSN   ,GAP_S ,GAPV   ,
      6               GAPMAX  ,GAPMIN,CURV_MAX,NSV,MSR    ,
@@ -110,10 +102,10 @@ C numerotation tris precedent pour les noeuds non locaux (SPMD)
             J = CAND_A(N)
             DO WHILE(J<=CAND_A(N+1)-1)
               IF(CAND_E(J)==NE)THEN
-        	PENE(I)=ZERO
-        	J=CAND_A(N+1)
+          PENE(I)=ZERO
+          J=CAND_A(N+1)
               ELSE
-        	J=J+1
+          J=J+1
               ENDIF
             ENDDO
           ENDIF
@@ -159,10 +151,10 @@ c            N1 = IRECTG(1,NE)
 c            N2 = IRECTG(2,NE)
 c            N3 = IRECTG(3,NE)
 c            N4 = IRECTG(4,NE)
-c	    ITAGP(N1)=1
-c	    ITAGP(N2)=1
-c	    ITAGP(N3)=1
-c	    ITAGP(N4)=1
+c      ITAGP(N1)=1
+c      ITAGP(N2)=1
+c      ITAGP(N3)=1
+c      ITAGP(N4)=1
 c            IF(N>NSN) THEN
 cC numerotation tris precedent pour les noeuds non locaux (SPMD)
 c              N = OLDNUM(N-NSN)+NSN
@@ -193,7 +185,7 @@ c                    IFPEN(I_STOK)  = IFPEN(J)
 c                    CAND_P(I_STOK) = CAND_P(J)
 c                 END IF
 c                ENDIF
-c        	J=J+1
+c          J=J+1
 c              END IF
 c            ENDDO
 c            ITAGP(N1)=0

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -31,7 +31,7 @@ Chd|        SPMD_GLOB_DSUM9               source/mpi/interfaces/spmd_th.F
 Chd|        SPMD_GLOB_ISUM9               source/mpi/interfaces/spmd_th.F
 Chd|        SPMD_IBCAST                   source/mpi/generic/spmd_ibcast.F
 Chd|        SPMD_RBCAST                   source/mpi/generic/spmd_rbcast.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE I9WAL2(X,V   ,W         ,A         ,CRST      ,
      2   NSV       ,ILOC      ,IRTL      ,ICODE     ,ISKEW     ,
@@ -39,7 +39,7 @@ Chd|====================================================================
      4   IRECT     ,UPW       ,IXQ       ,ELBUF_TAB ,
      5   IPARG     ,PM        ,NALE      ,EE        ,IELES     ,
      6   IELEM     ,TSTIF     ,INTTH     ,IEULT     ,STENS     ,
-     7   ISIZES    ,ISIZEM    )
+     7   ISIZES    ,ISIZEM, NRTS, NRTM,NSN,NMN) 
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -53,16 +53,14 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com08_c.inc"
-#include      "scr04_c.inc"
-#include      "scr08_s_c.inc"
 #include      "scr08_a_c.inc"
 #include      "param_c.inc"
-#include      "scr05_c.inc"
 #include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER IRECT(4,*), NSV(*), ILOC(*), IRTL(*), ICODE(*), ISKEW(*),
+      INTEGER, INTENT(IN) :: NRTS, NRTM,NSN,NMN
+      INTEGER IRECT(4,*), NSV(NSN), ILOC(*), IRTL(NSN), ICODE(*), ISKEW(*),
      .   MSR(*), IRECTS(4,*), LMSR(*), NSEG(*),IXQ(NIXQ,*),
      .   IPARG(NPARG,*), IELES(*), IELEM(*),NALE(*) ,
      .   INTTH, IEULT, ISIZES, ISIZEM
@@ -196,17 +194,17 @@ C
 C
 C gather des valeurs
 C
- 	       CALL SPMD_GLOB_DSUM9(COMAREA,ILEN)
- 	       CALL SPMD_GLOB_DSUM9(COMSTF,ILEN)
- 	       CALL SPMD_GLOB_DSUM9(COMT,ILEN)
- 	       CALL SPMD_GLOB_DSUM9(COMVOL,ILEN)
- 	       CALL SPMD_GLOB_ISUM9(ICOMERR,ILEN)
- 	       CALL SPMD_GLOB_ISUM9(ICOMNGR,ILEN)
- 	       CALL SPMD_GLOB_ISUM9(ICOMNEL,ILEN)
-Cel partie noeud sur P0 uniquement
- 	    IF(ISPMD/=0) GOTO 900
+                 CALL SPMD_GLOB_DSUM9(COMAREA,ILEN)
+                 CALL SPMD_GLOB_DSUM9(COMSTF,ILEN)
+                 CALL SPMD_GLOB_DSUM9(COMT,ILEN)
+                 CALL SPMD_GLOB_DSUM9(COMVOL,ILEN)
+                 CALL SPMD_GLOB_ISUM9(ICOMERR,ILEN)
+                 CALL SPMD_GLOB_ISUM9(ICOMNGR,ILEN)
+                 CALL SPMD_GLOB_ISUM9(ICOMNEL,ILEN)
+C   partie noeud sur P0 uniquement
+              IF(ISPMD/=0) GOTO 900
        END IF
-Cel interface traitee par p0
+C   interface traitee par p0
       ELSE
        IF(ISPMD/=0) RETURN
       ENDIF
@@ -269,11 +267,11 @@ c          ENDIF
 c         ELSEIF(ISPMD==0)THEN
            KK = TAGM(L)
            EFRIC = HALF * EE(II) / (LL2-LL1+1)
-	   IERR = ICOMERR(KK)
-	   AREAM = COMAREA(KK)
-	   TSTIFM = COMSTF(KK)
-	   TM = COMT(KK)
-	   VOLM = COMVOL(KK)
+             IERR = ICOMERR(KK)
+             AREAM = COMAREA(KK)
+             TSTIFM = COMSTF(KK)
+             TM = COMT(KK)
+             VOLM = COMVOL(KK)
            IF(IERR==0) THEN
              DO LL = LL1,LL2
                LG = LMSR(LL)

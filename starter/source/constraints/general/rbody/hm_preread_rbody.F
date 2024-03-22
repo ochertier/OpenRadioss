@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -39,6 +39,7 @@ Chd|====================================================================
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE MY_ALLOC_MOD
       USE R2R_MOD
       USE GROUPDEF_MOD
       USE SUBMODEL_MOD
@@ -48,14 +49,8 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
-#include      "units_c.inc"
-#include      "scr03_c.inc"
 #include      "scr17_c.inc"
 #include      "com04_c.inc"
 #include      "r2r_c.inc"
@@ -96,7 +91,7 @@ C--------------------------------------------------
      .                       KEYWORD2 = KEY )
 C--------------------------------------------------
        IF(KEY=='')THEN ! not a /RBODY/LAGMUL
-C----------Multidomaines --> on ignore les rby tages---------------	
+C----------Multidomaines --> on ignore les rby tages---------------
          NRB = NRB + 1
          IF (NSUBDOM > 0) THEN ! TAGRBY is allocated only if NSUBDOM>0
            IF(TAGRBY(NRB) == 0) CALL HM_SZ_R2R(TAGRBY,NRB,LSUBMODEL)

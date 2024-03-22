@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,25 +27,30 @@ Chd|        SORTIE_MAIN                   source/output/sortie_main.F
 Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
 Chd|        ARRET                         source/system/arret.F         
+Chd|        CLOSE_C                       ../common_source/tools/input_output/write_routtines.c
+Chd|        CUR_FIL_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|        DYNAIN_C_STRAG                source/output/dynain/dynain_c_strag.F
 Chd|        DYNAIN_C_STRSG                source/output/dynain/dynain_c_strsg.F
 Chd|        DYNAIN_NODE                   source/output/dynain/dynain_node.F
 Chd|        DYNAIN_SHEL_MP                source/output/dynain/dynain_shel_mp.F
 Chd|        DYNAIN_SHEL_SPMD              source/output/dynain/dynain_shel_spmd.F
 Chd|        DYNAIN_SIZE_C                 source/output/dynain/dynain_size.F
+Chd|        OPEN_C                        ../common_source/tools/input_output/write_routtines.c
 Chd|        SPMD_OUTPITAB                 source/mpi/interfaces/spmd_outp.F
+Chd|        STRS_TXT50                    source/output/sta/sta_txt.F   
 Chd|        DRAPE_MOD                     share/modules/drape_mod.F     
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        INOUTFILE_MOD                 ../common_source/modules/inoutfile_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        STACK_MOD                     share/modules/stack_mod.F     
+Chd|        STATE_MOD                     ../common_source/modules/state_mod.F
 Chd|====================================================================
        SUBROUTINE GENDYNAIN(X  ,ELBUF_TAB, BUFEL  ,IXC      ,IXTG     ,
      2                IPARG    ,IPM      , IGEO   ,ITAB     ,IPART    ,
      3                PM       ,GEO      , IPARTC ,IPARTTG  ,LENG     ,
      4                LENGC    ,LENGTG   , WEIGHT ,NODGLOB  ,THKE     ,               
-     5                NPBY     ,LPBY     , STACK  ,DRAPE_Q4 ,DRAPE_T3 , 
-     6                IPART_DYNAIN) 
+     5                NPBY     ,LPBY     , STACK  ,DRAPE_SH4N ,DRAPE_SH3N , 
+     6                DYNAIN_DATA,DRAPEG) 
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -54,6 +59,7 @@ C-----------------------------------------------
       USE INOUTFILE_MOD 
       USE STACK_MOD
       USE DRAPE_MOD  
+      USE STATE_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -63,41 +69,27 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com05_c.inc"
-#include      "com06_c.inc"
-#include      "com08_c.inc"
-#include      "com09_c.inc"
 #include      "param_c.inc"
 #include      "units_c.inc"
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
-#include      "scr11_c.inc"
-#include      "scr13_c.inc"
-#include      "scr14_c.inc"
-#include      "scr16_c.inc"
 #include      "scr17_c.inc"
 #include      "chara_c.inc"
 #include      "task_c.inc"
-#include      "sphcom.inc"
-#include      "spmd_c.inc"
-#include      "vect01_c.inc"
-#include      "state_c.inc"
-#include      "sysunit.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IPARG(*),
      .   IXC(NIXC,*),IXTG(NIXTG,*),IPM(*),IGEO(*),
      .   ITAB(*) ,IPART(LIPART1,*) ,IPARTC(*) ,IPARTTG(*),
-     .   WEIGHT(*), NODGLOB(*), IPART_DYNAIN(*),
-     .   NPBY(NNPBY,*), LPBY(*)
+     .   WEIGHT(*), NODGLOB(*), NPBY(NNPBY,*), LPBY(*) 
       INTEGER LENG,LENGC,LENGTG
       my_real
      .   X(*), BUFEL(*),
      .   PM(NPROPM,*), GEO(NPROPG,*) ,THKE(*)
       TYPE (ELBUF_STRUCT_), DIMENSION(NGROUP), TARGET :: ELBUF_TAB
       TYPE (STACK_PLY) :: STACK
-      TYPE (DRAPE_)  :: DRAPE_Q4,DRAPE_T3
+      TYPE (DRAPE_)  :: DRAPE_SH4N(NUMELC_DRAPE),DRAPE_SH3N(NUMELTG_DRAPE)
+      TYPE (DRAPEG_) :: DRAPEG
+      TYPE (DYNAIN_DATABASE), INTENT(INOUT) :: DYNAIN_DATA
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -120,17 +112,34 @@ C-----------------------------------------------
 C===============================================|
 C   OPEN FILE
 C-----------------------------------------------
-      IF(IDYNAINF>=10000)IDYNAINF=1
-      WRITE(CHSTAT,'(I4.4)')IDYNAINF
-      FILNAM=ROOTNAM(1:ROOTLEN)//'_'//CHSTAT//'.dynain'
-      FILEN = ROOTLEN + 12
-      LEN_TMP_NAME = OUTFILE_NAME_LEN + FILEN
-      TMP_NAME=OUTFILE_NAME(1:OUTFILE_NAME_LEN)//FILNAM(1:FILEN)
+      IF(DYNAIN_DATA%IDYNAINF>=10000)DYNAIN_DATA%IDYNAINF=1
+      WRITE(CHSTAT,'(I4.4)')DYNAIN_DATA%IDYNAINF
+      IF(DYNAIN_DATA%ZIPDYNAIN==0) THEN ! Not zipped file
+        FILNAM=ROOTNAM(1:ROOTLEN)//'_'//CHSTAT//'.dynain'
+        FILEN = ROOTLEN + 12
+        LEN_TMP_NAME = OUTFILE_NAME_LEN + FILEN
+        TMP_NAME=OUTFILE_NAME(1:OUTFILE_NAME_LEN)//FILNAM(1:FILEN)
+        IF(ISPMD == 0) THEN
+           OPEN(UNIT=IUDYNAIN,FILE=TMP_NAME(1:LEN_TMP_NAME),ACCESS='SEQUENTIAL',FORM='FORMATTED',STATUS='UNKNOWN')
+           WRITE(IUDYNAIN,'(2A)')'$RADIOSS DYNAIN FILE ',FILNAM(1:FILEN)
+        END IF
+      ELSE ! zipped file
+        FILNAM=ROOTNAM(1:ROOTLEN)//'_'//CHSTAT//'.dynain'
+        FILEN = ROOTLEN + 12
+        LEN_TMP_NAME = OUTFILE_NAME_LEN + FILEN
+        TMP_NAME=OUTFILE_NAME(1:OUTFILE_NAME_LEN)//FILNAM(1:FILEN)
+        DO I=1,LEN_TMP_NAME
+           CTEXT(I)=ICHAR(TMP_NAME(I:I))
+           CALL CUR_FIL_C(0)
+        ENDDO
+        IF(ISPMD == 0) THEN 
+           CALL OPEN_C(CTEXT,LEN_TMP_NAME,6)
+           WRITE(LINE,'(2A)') '$RADIOSS DYNAIN FILE ',FILNAM(1:FILEN)
+           CALL STRS_TXT50(LINE,100)
+        ENDIF
+      ENDIF
+
 c       
-      IF(ISPMD == 0) THEN
-        OPEN(UNIT=IUDYNAIN,FILE=TMP_NAME(1:LEN_TMP_NAME),ACCESS='SEQUENTIAL',FORM='FORMATTED',STATUS='UNKNOWN')
-        WRITE(IUDYNAIN,'(2A)')'$RADIOSS DYNAIN FILE ',FILNAM(1:FILEN)
-      END IF
 
 C-----------------------
 C    Allocation Tabs
@@ -147,21 +156,21 @@ c
 
       NODTAG=0
 
-      DYNAIN_NUMELC =0
-      DYNAIN_NUMELTG =0
+      DYNAIN_DATA%DYNAIN_NUMELC =0
+      DYNAIN_DATA%DYNAIN_NUMELTG =0
 
       IF(NSPMD == 1)THEN
         !  - shells -   
         CALL DYNAIN_SHEL_MP(ITAB   ,ITABG   ,LENG    ,IGEO     ,IXC    ,
-     .                      IXTG   ,IPARTC  ,IPARTTG ,IPART_DYNAIN     ,
+     .                      IXTG   ,IPARTC  ,IPARTTG ,DYNAIN_DATA      ,
      .                      NODTAG ,DYNAIN_INDXC,DYNAIN_INDXTG,IPARG   ,
      .                      ELBUF_TAB,THKE  ,IPART   )                                 
-        DYNAIN_NUMELC_G =DYNAIN_NUMELC 
-        DYNAIN_NUMELTG_G =DYNAIN_NUMELTG 
+        DYNAIN_DATA%DYNAIN_NUMELC_G =DYNAIN_DATA%DYNAIN_NUMELC 
+        DYNAIN_DATA%DYNAIN_NUMELTG_G =DYNAIN_DATA%DYNAIN_NUMELTG 
       ELSE
         !  - shells -
         CALL DYNAIN_SHEL_SPMD(ITAB   ,ITABG   ,LENG    ,IGEO   ,IXC    ,
-     .                          IXTG   ,IPARTC  ,IPARTTG ,IPART_DYNAIN     ,
+     .                          IXTG   ,IPARTC  ,IPARTTG ,DYNAIN_DATA      ,
      .                          NODTAG ,DYNAIN_INDXC,DYNAIN_INDXTG,IPARG   ,
      .                          ELBUF_TAB,THKE  ,LENGC   ,LENGTG  ,IPART   )
       END IF
@@ -180,10 +189,10 @@ C-----------------------------------------------
           ENDDO
        ENDDO
 C-----------------------------------------------
-      CALL DYNAIN_NODE(X,NUMNOD,ITAB,ITABG,LENG,NODGLOB,WEIGHT,NODTAG)
+      CALL DYNAIN_NODE(X,NUMNOD,ITAB,ITABG,LENG,NODGLOB,WEIGHT,NODTAG,DYNAIN_DATA)
 
 C-----------------------------------------------
-      CALL DYNAIN_SIZE_C(IPARG ,ELBUF_TAB, SIZP0 ,SIZLOC        )
+      CALL DYNAIN_SIZE_C(IPARG ,ELBUF_TAB, SIZP0 ,SIZLOC   ,DYNAIN_DATA  )
 
 C-----------------------------------------------
 C   ALLOCATION OF TABLES
@@ -213,23 +222,23 @@ C   SHELL SCALAR
 C-----------------------------------------------
 
 
-      IF(DYNAIN_C(4)==1) THEN
+      IF(DYNAIN_DATA%DYNAIN_C(4)==1) THEN
          CALL DYNAIN_C_STRSG(
      1        ELBUF_TAB  ,IPARG     ,IPM        ,IGEO  ,IXC    ,
      2        IXTG       ,WA        ,WAP0       ,IPARTC,IPARTTG,
-     3        IPART_DYNAIN,DYNAIN_INDXC,DYNAIN_INDXTG,SIZP0    ,
-     4        GEO        ,STACK     ,DRAPE_Q4 ,DRAPE_T3,X      ,
-     5        THKE      )
+     3        DYNAIN_DATA,DYNAIN_INDXC,DYNAIN_INDXTG,SIZP0    ,
+     4        GEO        ,STACK     ,DRAPE_SH4N ,DRAPE_SH3N,X      ,
+     5        THKE      , DRAPEG)
       ENDIF
 C------------------------------------------
 
-      IF(DYNAIN_C(5)==1) THEN
+      IF(DYNAIN_DATA%DYNAIN_C(5)==1) THEN
           CALL DYNAIN_C_STRAG(
      1         ELBUF_TAB  ,IPARG     ,IPM        ,IGEO  ,IXC    ,
      2         IXTG       ,WA        ,WAP0       ,IPARTC,IPARTTG,
-     3         IPART_DYNAIN,DYNAIN_INDXC,DYNAIN_INDXTG,SIZP0    ,
-     4         GEO        ,STACK     ,DRAPE_Q4   ,DRAPE_T3,X    ,
-     5         THKE       )
+     3         DYNAIN_DATA,DYNAIN_INDXC,DYNAIN_INDXTG,SIZP0    ,
+     4         GEO        ,STACK     ,DRAPE_SH4N   ,DRAPE_SH3N,X    ,
+     5         THKE       ,DRAPEG)
         ENDIF
 
 C-----------------------------------------------
@@ -244,8 +253,13 @@ C-----------------------------------------------
 C   END
 C-----------------------------------------------
       IF(ISPMD==0) THEN
-        WRITE(IUDYNAIN,'(A)')'*END   '
-        CLOSE(UNIT=IUDYNAIN)
+        IF(DYNAIN_DATA%ZIPDYNAIN==0) THEN
+          WRITE(IUDYNAIN,'(A)')'*END   '
+          CLOSE(UNIT=IUDYNAIN)
+        ELSE
+          CALL STRS_TXT50('*END   ',7)
+          CALL CLOSE_C()
+        ENDIF
 
         WRITE (IOUT,1000)  FILNAM(1:FILEN)
         WRITE (ISTDO,1000) FILNAM(1:FILEN)

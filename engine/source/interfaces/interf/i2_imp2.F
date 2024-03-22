@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -50,12 +50,6 @@ C     REAL
      .   X(*),MS(*),IN(*),D(3,*),DR(3,*)
 
       TYPE(INTBUF_STRUCT_) INTBUF_TAB
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "scr05_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -122,10 +116,6 @@ C-----------------------------------------------
 C     REAL
       my_real
      .    CRST(2,*), D(3,*),MS(*),DR(3,*),X(3,*)
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com01_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -249,10 +239,6 @@ C     REAL
       my_real
      .    DPARA(7,*), D(3,*),MS(*),DR(3,*),X(3,*)
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com01_c.inc"
-C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, J,  K,  II, L, NIR(NSN),NJ
@@ -317,10 +303,6 @@ C     REAL
       my_real
      .    DPARA(7,*), D(3,*),MS(*),DR(3,*),X(3,*)
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com01_c.inc"
-C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, J,  K,  II, L, NIR(NSN),NJ,NIRI
@@ -355,7 +337,7 @@ C       VITESSE DE ROTATION MOYENNE DU SEGMENT MAIN
 C----------------------------------------------------
         X0=FACM*(XM(1)+XM(2)+XM(3)+XM(4))
         Y0=FACM*(YM(1)+YM(2)+YM(3)+YM(4))
-        Z0=FACM*(ZM(1)+ZM(2)+ZM(3)+ZM(4))	   
+        Z0=FACM*(ZM(1)+ZM(2)+ZM(3)+ZM(4))     
         LSM(1)=X(1,I)-X0
         LSM(2)=X(2,I)-Y0
         LSM(3)=X(3,I)-Z0             
@@ -415,10 +397,6 @@ C-----------------------------------------------
 C     REAL
       my_real
      .   D(3,*),X(3,*),DPARA(7,*)
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com01_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -514,10 +492,6 @@ C-----------------------------------------------
 C     REAL
       my_real
      .   X(3,*),D(3,*),DR(3,*), CRST(2,*)
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com01_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

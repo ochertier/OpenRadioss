@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -51,8 +51,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "r4r8_p.inc"
-#include      "assert.inc"
 C-----------------------------------------------
 C   M e s s a g e   P a s s i n g
 C-----------------------------------------------
@@ -62,16 +60,10 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr18_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
 #include      "task_c.inc"
-#include      "parit_c.inc"
-#include      "timeri_c.inc"
-#include      "warn_c.inc"
-#include      "spmd_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -187,22 +179,20 @@ C
                    LL = L+1
                    L = L + 1
                    DO N = 1, NB
-                     IF(NSVFI(NIN)%P(IDEB+N)<0)THEN
-                       BBUFS(L+1) = -NSVFI(NIN)%P(IDEB+N)
-                       IF(INTERFRIC>0)  THEN
-                           BBUFS(L+2) = EFRICFI(NIN)%P(IDEB+N)
-                           EFRICFI(NIN)%P(IDEB+N) = ZERO
-                       ELSE
-                           BBUFS(L+2) = ZERO
-                       ENDIF
-                       IF(H3D_DATA%N_SCAL_CSE_FRIC>0) THEN
-                           BBUFS(L+3) = EFRICGFI(NIN)%P(IDEB+N)
-                           EFRICGFI(NIN)%P(IDEB+N) = ZERO
-                       ELSE
-                           BBUFS(L+3) = ZERO
-                       ENDIF
-                       L = L + LEN
-                     ENDIF
+                      BBUFS(L+1) = ABS(NSVFI(NIN)%P(IDEB+N))
+                      IF(INTERFRIC>0)  THEN
+                          BBUFS(L+2) = EFRICFI(NIN)%P(IDEB+N)
+                          EFRICFI(NIN)%P(IDEB+N) = ZERO
+                      ELSE
+                          BBUFS(L+2) = ZERO
+                      ENDIF
+                      IF(H3D_DATA%N_SCAL_CSE_FRIC>0) THEN
+                          BBUFS(L+3) = EFRICGFI(NIN)%P(IDEB+N)
+                          EFRICGFI(NIN)%P(IDEB+N) = ZERO
+                      ELSE
+                          BBUFS(L+3) = ZERO
+                      ENDIF
+                      L = L + LEN
                    ENDDO
                    BBUFS(LL) = (L-LL)/LEN
                    DEBUT(NIN) = DEBUT(NIN) + NB

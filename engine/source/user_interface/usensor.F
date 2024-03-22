@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -39,14 +39,14 @@ Chd|-- called by -----------
 Chd|        CSENS3                        source/elements/shell/coque/csens3.F
 Chd|-- calls ---------------
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
-Chd|        SENSOR_VARIABLE_MOD           share/modules/sensor_mod.F    
+Chd|        USER_INTERFACE_MOD            share/modules/user_interface_mod.F
 Chd|====================================================================
       INTEGER FUNCTION GET_U_NUMSENS(IDSENS)
 C-----------------------------------------------
 C   M o d u l e s 
 C-----------------------------------------------
       USE SENSOR_MOD
-      USE SENSOR_VARIABLE_MOD
+      USE USER_INTERFACE_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -54,7 +54,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
 #include      "com04_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -68,10 +67,10 @@ C
         RETURN
       ENDIF
 C---
-      DO J=1,NSENSOR
+      DO J=1,SENSORS%NSENSOR
 
-        ID = SENSOR_TAB(J)%SENS_ID
-        ITYP = SENSOR_TAB(J)%TYPE
+        ID   = SENSORS%SENSOR_TAB(J)%SENS_ID
+        ITYP = SENSORS%SENSOR_TAB(J)%TYPE
 
         IF(IDSENS==ID)THEN
           IF (ITYP>=29 .AND. ITYP<=31)THEN
@@ -90,23 +89,18 @@ Chd|  GET_U_SENS_ID                 source/user_interface/usensor.F
 Chd|-- called by -----------
 Chd|-- calls ---------------
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
-Chd|        SENSOR_VARIABLE_MOD           share/modules/sensor_mod.F    
+Chd|        USER_INTERFACE_MOD            share/modules/user_interface_mod.F
 Chd|====================================================================
       INTEGER FUNCTION GET_U_SENS_ID(ISENS)
 C-----------------------------------------------
 C   M o d u l e s 
 C-----------------------------------------------
       USE SENSOR_MOD
-      USE SENSOR_VARIABLE_MOD
+      USE USER_INTERFACE_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "param_c.inc"
-#include      "com04_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -118,7 +112,7 @@ C=======================================================================
         RETURN
       ENDIF
 
-      GET_U_SENS_ID = SENSOR_TAB(ISENS)%SENS_ID
+      GET_U_SENS_ID = SENSORS%SENSOR_TAB(ISENS)%SENS_ID
 C---
       RETURN
       END
@@ -127,24 +121,18 @@ Chd|  SET_U_SENS_VALUE              source/user_interface/usensor.F
 Chd|-- called by -----------
 Chd|-- calls ---------------
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
-Chd|        SENSOR_VARIABLE_MOD           share/modules/sensor_mod.F    
+Chd|        USER_INTERFACE_MOD            share/modules/user_interface_mod.F
 Chd|====================================================================
       INTEGER FUNCTION SET_U_SENS_VALUE(NSENS,IVAR,VAR)
 C-----------------------------------------------
 C   M o d u l e s 
 C-----------------------------------------------
       USE SENSOR_MOD
-      USE SENSOR_VARIABLE_MOD
+      USE USER_INTERFACE_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "param_c.inc"
-#include      "r4r8_p.inc"
-#include      "scr05_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -165,11 +153,11 @@ C
         RETURN
       ENDIF
 
-      ITYP = SENSOR_TAB(NSENS)%TYPE
+      ITYP = SENSORS%SENSOR_TAB(NSENS)%TYPE
 C
       IF (ITYP>=29 .AND. ITYP<=31)THEN
 
-        SENSOR_TAB(NSENS)%FLOAT_USERBUF(IVAR) = VAR
+        SENSORS%SENSOR_TAB(NSENS)%FLOAT_USERBUF(IVAR) = VAR
         SET_U_SENS_VALUE = 0
 
       ENDIF
@@ -181,29 +169,23 @@ Chd|  GET_U_SENS_VALUE              source/user_interface/usensor.F
 Chd|-- called by -----------
 Chd|-- calls ---------------
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
-Chd|        SENSOR_VARIABLE_MOD           share/modules/sensor_mod.F    
+Chd|        USER_INTERFACE_MOD            share/modules/user_interface_mod.F
 Chd|====================================================================
       INTEGER FUNCTION GET_U_SENS_VALUE(NSENS, IVAR, VAR)
 C-----------------------------------------------
 C   M o d u l e s 
 C-----------------------------------------------
       USE SENSOR_MOD
-      USE SENSOR_VARIABLE_MOD
+      USE USER_INTERFACE_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "param_c.inc"
-#include      "scr05_c.inc"
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s  
 C-----------------------------------------------
       INTEGER K,L, SHIFT,NSENS, ITYP, IVAR
-      my_real 
-     .      VAR
+      my_real VAR
 C=======================================================================
 C
       GET_U_SENS_VALUE = -1
@@ -218,11 +200,11 @@ C
         RETURN
       ENDIF
 
-      ITYP =  SENSOR_TAB(NSENS)%TYPE
+      ITYP =  SENSORS%SENSOR_TAB(NSENS)%TYPE
 
       IF (ITYP>=29 .AND. ITYP<=31)THEN
 
-        VAR = SENSOR_TAB(NSENS)%FLOAT_USERBUF(IVAR)
+        VAR = SENSORS%SENSOR_TAB(NSENS)%FLOAT_USERBUF(IVAR)
         GET_U_SENS_VALUE = 0
 
       ENDIF
@@ -235,14 +217,14 @@ Chd|-- called by -----------
 Chd|        CSENS3                        source/elements/shell/coque/csens3.F
 Chd|-- calls ---------------
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
-Chd|        SENSOR_VARIABLE_MOD           share/modules/sensor_mod.F    
+Chd|        USER_INTERFACE_MOD            share/modules/user_interface_mod.F
 Chd|====================================================================
       INTEGER FUNCTION SET_U_SENS_MAXVALUE(NSENS,IVAR,VAR)
 C-----------------------------------------------
 C   M o d u l e s 
 C-----------------------------------------------
       USE SENSOR_MOD
-      USE SENSOR_VARIABLE_MOD
+      USE USER_INTERFACE_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -250,10 +232,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
 
-#include      "r4r8_p.inc"
-#include      "scr05_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s  
 C-----------------------------------------------
@@ -272,9 +251,9 @@ C=======================================================================
         RETURN
       ENDIF
 
-      MAXV = SENSOR_TAB(NSENS)%FLOAT_USERBUF(IVAR)
+      MAXV = SENSORS%SENSOR_TAB(NSENS)%FLOAT_USERBUF(IVAR)
       MAXV = MAX(MAXV,VAR)
-      SENSOR_TAB(NSENS)%FLOAT_USERBUF(IVAR) = MAXV
+      SENSORS%SENSOR_TAB(NSENS)%FLOAT_USERBUF(IVAR) = MAXV
       SET_U_SENS_MAXVALUE = 0    
 C---
       RETURN
@@ -284,14 +263,14 @@ Chd|  GET_U_SENS_FPAR               source/user_interface/usensor.F
 Chd|-- called by -----------
 Chd|-- calls ---------------
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
-Chd|        SENSOR_VARIABLE_MOD           share/modules/sensor_mod.F    
+Chd|        USER_INTERFACE_MOD            share/modules/user_interface_mod.F
 Chd|====================================================================
       INTEGER FUNCTION GET_U_SENS_FPAR(NSENS,IVAR,VAR)
 C-----------------------------------------------
 C   M o d u l e s 
 C-----------------------------------------------
       USE SENSOR_MOD
-      USE SENSOR_VARIABLE_MOD
+      USE USER_INTERFACE_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -299,9 +278,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
 #include      "units_c.inc"
-#include      "scr05_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s  
 C-----------------------------------------------
@@ -321,11 +298,11 @@ C
         RETURN
       ENDIF
 C
-      ITYP = SENSOR_TAB(NSENS)%TYPE
+      ITYP = SENSORS%SENSOR_TAB(NSENS)%TYPE
 
       IF ( ITYP>=29 .AND. ITYP<=31 )THEN
 
-        VAR = SENSOR_TAB(NSENS)%FLOAT_USERPARAM(IVAR)
+        VAR = SENSORS%SENSOR_TAB(NSENS)%FLOAT_USERPARAM(IVAR)
         GET_U_SENS_FPAR = 0
 
       ENDIF
@@ -337,14 +314,14 @@ Chd|  GET_U_SENS_IPAR               source/user_interface/usensor.F
 Chd|-- called by -----------
 Chd|-- calls ---------------
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
-Chd|        SENSOR_VARIABLE_MOD           share/modules/sensor_mod.F    
+Chd|        USER_INTERFACE_MOD            share/modules/user_interface_mod.F
 Chd|====================================================================
       INTEGER FUNCTION GET_U_SENS_IPAR(NSENS,IVAR,VAR)
 C-----------------------------------------------
 C   M o d u l e s 
 C-----------------------------------------------
       USE SENSOR_MOD
-      USE SENSOR_VARIABLE_MOD
+      USE USER_INTERFACE_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -352,9 +329,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
 #include      "units_c.inc"
-#include      "scr05_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s  
 C-----------------------------------------------
@@ -373,11 +348,11 @@ C=======================================================================
 
       ENDIF
 
-      ITYP = SENSOR_TAB(NSENS)%TYPE
+      ITYP = SENSORS%SENSOR_TAB(NSENS)%TYPE
 
       IF (ITYP>=29 .AND. ITYP<=31)THEN
 
-        VAR = SENSOR_TAB(NSENS)%INTEGER_USERPARAM(IVAR)
+        VAR = SENSORS%SENSOR_TAB(NSENS)%INTEGER_USERPARAM(IVAR)
         GET_U_SENS_IPAR = 0
    
       ENDIF
@@ -389,14 +364,14 @@ Chd|  SET_U_SENS_ACTI               source/user_interface/usensor.F
 Chd|-- called by -----------
 Chd|-- calls ---------------
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
-Chd|        SENSOR_VARIABLE_MOD           share/modules/sensor_mod.F    
+Chd|        USER_INTERFACE_MOD            share/modules/user_interface_mod.F
 Chd|====================================================================
       INTEGER FUNCTION SET_U_SENS_ACTI(NSENS)
 C-----------------------------------------------
 C   M o d u l e s 
 C-----------------------------------------------
       USE SENSOR_MOD
-      USE SENSOR_VARIABLE_MOD
+      USE USER_INTERFACE_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -404,10 +379,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
 #include      "com08_c.inc"
 #include      "com04_c.inc"
-#include      "scr05_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s  
 C-----------------------------------------------
@@ -417,16 +390,16 @@ c========================================================================
       SET_U_SENS_ACTI = -1
 
 
-      IF (NSENS > 0 .OR. NSENS <= NSENSOR ) THEN
-      ITYP = SENSOR_TAB(NSENS)%TYPE
+      IF (NSENS > 0 .OR. NSENS <= SENSORS%NSENSOR ) THEN
+      ITYP = SENSORS%SENSOR_TAB(NSENS)%TYPE
 
         IF (ITYP >= 29 .AND. ITYP <= 31)THEN
   
-          TSTART = SENSOR_TAB(NSENS)%TSTART
+          TSTART = SENSORS%SENSOR_TAB(NSENS)%TSTART
           SETVAR = MIN(TT,TSTART)
 
-          SENSOR_TAB(NSENS)%TSTART = SETVAR
-          SENSOR_TAB(NSENS)%STATUS = 1
+          SENSORS%SENSOR_TAB(NSENS)%TSTART = SETVAR
+          SENSORS%SENSOR_TAB(NSENS)%STATUS = 1
           SET_U_SENS_ACTI = 0
 
         ENDIF
@@ -441,14 +414,14 @@ Chd|  SET_U_SENS_DEACTI             source/user_interface/usensor.F
 Chd|-- called by -----------
 Chd|-- calls ---------------
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
-Chd|        SENSOR_VARIABLE_MOD           share/modules/sensor_mod.F    
+Chd|        USER_INTERFACE_MOD            share/modules/user_interface_mod.F
 Chd|====================================================================
       INTEGER FUNCTION SET_U_SENS_DEACTI(NSENS)
 C-----------------------------------------------
 C   M o d u l e s 
 C-----------------------------------------------
       USE SENSOR_MOD
-      USE SENSOR_VARIABLE_MOD
+      USE USER_INTERFACE_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -456,10 +429,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
 #include      "com04_c.inc"
-#include      "com08_c.inc"
-#include      "scr05_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s  
 C-----------------------------------------------
@@ -468,12 +438,12 @@ C-----------------------------------------------
 c========================================================================
       SET_U_SENS_DEACTI = -1
 
-      IF (NSENS >= 1 .OR. NSENS <= NSENSOR) THEN
+      IF (NSENS >= 1 .OR. NSENS <= SENSORS%NSENSOR) THEN
 
-        ITYP = SENSOR_TAB(NSENS)%TYPE
+        ITYP = SENSORS%SENSOR_TAB(NSENS)%TYPE
 
         IF (ITYP >= 29 .AND. ITYP <= 31)THEN
-          SENSOR_TAB(NSENS)%TSTART = EP30
+          SENSORS%SENSOR_TAB(NSENS)%TSTART = EP30
           SET_U_SENS_DEACTI = 0
         ENDIF
       ENDIF
@@ -486,14 +456,14 @@ Chd|  GET_U_SENS_ACTI               source/user_interface/usensor.F
 Chd|-- called by -----------
 Chd|-- calls ---------------
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
-Chd|        SENSOR_VARIABLE_MOD           share/modules/sensor_mod.F    
+Chd|        USER_INTERFACE_MOD            share/modules/user_interface_mod.F
 Chd|====================================================================
       my_real FUNCTION GET_U_SENS_ACTI(NSENS)
 C-----------------------------------------------
 C   M o d u l e s 
 C-----------------------------------------------
       USE SENSOR_MOD
-      USE SENSOR_VARIABLE_MOD
+      USE USER_INTERFACE_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -501,10 +471,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
-#include      "scr05_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s  
 C-----------------------------------------------
@@ -515,7 +483,7 @@ C-----------------------------------------------
 
 
       
-      IF (NSENS < 1 .OR. NSENS > NSENSOR) THEN
+      IF (NSENS < 1 .OR. NSENS > SENSORS%NSENSOR) THEN
 
         ! Sensor not existing
         ! --------------------
@@ -523,7 +491,7 @@ C-----------------------------------------------
 
       ELSE
 
-        TSTART=SENSOR_TAB(NSENS)%TSTART
+        TSTART=SENSORS%SENSOR_TAB(NSENS)%TSTART
 
         IF (TT > TSTART) THEN
           GET_U_SENS_ACTI = TT-TSTART
@@ -540,14 +508,14 @@ Chd|-- called by -----------
 Chd|        RUSER32                       source/elements/spring/ruser32.F
 Chd|-- calls ---------------
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
-Chd|        SENSOR_VARIABLE_MOD           share/modules/sensor_mod.F    
+Chd|        USER_INTERFACE_MOD            share/modules/user_interface_mod.F
 Chd|====================================================================
       my_real FUNCTION GET_U_SENS(USENS)
 C-----------------------------------------------
 C   M o d u l e s 
 C-----------------------------------------------
       USE SENSOR_MOD
-      USE SENSOR_VARIABLE_MOD
+      USE USER_INTERFACE_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -555,10 +523,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
-#include      "scr05_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s  
 C-----------------------------------------------
@@ -580,13 +546,13 @@ C
       ! CASE : Find Sensor, 
       !        Do Treatment
       ! --------------------
-      DO J=1,NSENSOR
+      DO J=1,SENSORS%NSENSOR
         
-          LI = SENSOR_TAB(J)%SENS_ID
+          LI = SENSORS%SENSOR_TAB(J)%SENS_ID
 
           IF (USENS == LI) THEN 
 
-            LT = SENSOR_TAB(J)%TSTART
+            LT = SENSORS%SENSOR_TAB(J)%TSTART
             ! If sensor is activated - return the time Sensor is active
             IF (TT > LT) THEN
             GET_U_SENS = TT - LT
@@ -604,14 +570,14 @@ Chd|  GET_U_SENS_DELAY              source/user_interface/usensor.F
 Chd|-- called by -----------
 Chd|-- calls ---------------
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
-Chd|        SENSOR_VARIABLE_MOD           share/modules/sensor_mod.F    
+Chd|        USER_INTERFACE_MOD            share/modules/user_interface_mod.F
 Chd|====================================================================
       my_real FUNCTION GET_U_SENS_DELAY(NSENS)
 C-----------------------------------------------
 C   M o d u l e s 
 C-----------------------------------------------
       USE SENSOR_MOD
-      USE SENSOR_VARIABLE_MOD
+      USE USER_INTERFACE_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -619,10 +585,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
-#include      "scr05_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s  
 C-----------------------------------------------
@@ -641,7 +605,7 @@ C
 
       ! Sensor is not existing
       ! -----------------------
-      IF ( NSENS < 1 .OR. NSENS > NSENSOR) THEN
+      IF ( NSENS < 1 .OR. NSENS > SENSORS%NSENSOR) THEN
          GET_U_SENS_DELAY = TT
         RETURN
       ENDIF
@@ -649,7 +613,7 @@ C
       ! TDELAY Value
       ! -------------
      
-      TDELAY = SENSOR_TAB(NSENS)%TDELAY
+      TDELAY = SENSORS%SENSOR_TAB(NSENS)%TDELAY
       GET_U_SENS_DELAY = TDELAY
 C---
       RETURN

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -34,13 +34,14 @@ Chd|        HM_OPTION_READ_KEY            source/devtools/hm_reader/hm_option_re
 Chd|        HM_OPTION_START               source/devtools/hm_reader/hm_option_start.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
+Chd|        LOADS_MOD                     ../common_source/modules/loads/loads_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        PINCHTYPE_MOD                 ../common_source/modules/pinchtype_mod.F
 Chd|        R2R_MOD                       share/modules1/r2r_mod.F      
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
-      SUBROUTINE HM_READ_PLOAD(IPRES     ,PRES     ,NPREL  ,ITAB    ,ITABM1  ,
-     2                  IGRSURF,UNITAB,LSUBMODEL )
+      SUBROUTINE HM_READ_PLOAD(IPRES     ,PRES     ,NPREL    ,ITAB    ,ITABM1  ,
+     .                         IGRSURF   ,UNITAB   ,LSUBMODEL,LOADS   )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -51,13 +52,11 @@ C-----------------------------------------------
       USE SUBMODEL_MOD
       USE HM_OPTION_READ_MOD
       USE PINCHTYPE_MOD
+      USE LOADS_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -65,11 +64,8 @@ C-----------------------------------------------
 #include      "units_c.inc"
 #include      "scr03_c.inc"
 #include      "scr17_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "sysunit.inc"
 #include      "r2r_c.inc"
-#include      "alefvm.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -80,12 +76,13 @@ C-----------------------------------------------
      .   PRES(LFACCLD,*)
       TYPE (SURF_)   , DIMENSION(NSURF)   :: IGRSURF
       TYPE(SUBMODEL_DATA),INTENT(IN)::LSUBMODEL(*)
+      TYPE (LOADS_),INTENT(INOUT) :: LOADS
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER K, M, I1, I2, I3, I4, IFU, I, ISENS,NPR0,NN,ISU,IS,
      .        IAD,ID,J,UID,IFLAGUNIT,IFIX_TMP,
-     .        CAPT,H,SUB_INDEX,FLAG_PINCH,KPINCH,IDEL
+     .        CAPT,H,SUB_INDEX,FLAG_PINCH,KPINCH,IDEL,IFUNCTYPE
       INTEGER N1,N2,N3,N4
       my_real
      .   FCX,FCY,FAC_FCX,FAC_FCY
@@ -107,6 +104,7 @@ C     4: 4th node number of the segment
 C     5: Function internal number
 C     6: ISENS Sensor User ID
 C     7: User ID
+C     9: Itypfun                           Function type
 C-----------------------------------------------
 C     FORC(LFACCLD,NUMCLD+NUMPRES)
 C     PRES = FORC(LFACCLD,NUMCLD+1:NUMCLD+NUMPRES)
@@ -122,6 +120,7 @@ C=======================================================================
       NPLOADPINCH=0
       KPINCH=0
       PDEL = 0
+      IFUNCTYPE = 0
 C--------------------------------------------------
 C START BROWSING MODEL /PLOAD
 C--------------------------------------------------
@@ -146,7 +145,7 @@ C--------------------------------------------------
         CALL HM_GET_INTV('rad_sensor_id',ISENS,IS_AVAILABLE,LSUBMODEL)
         CALL HM_GET_INTV('ipinch',FLAG_PINCH,IS_AVAILABLE,LSUBMODEL)
         CALL HM_GET_INTV('Idel',IDEL,IS_AVAILABLE,LSUBMODEL)
-
+        CALL HM_GET_INTV('Itypfun',IFUNCTYPE,IS_AVAILABLE,LSUBMODEL)
 C--------------------------------------------------
 C EXTRACT DATAS (REAL VALUES)
 C--------------------------------------------------
@@ -155,8 +154,8 @@ C--------------------------------------------------
         CALL HM_GET_FLOATV('magnitude',FCY,IS_AVAILABLE,LSUBMODEL,UNITAB)
         CALL HM_GET_FLOATV_DIM('magnitude',FAC_FCY,IS_AVAILABLE,LSUBMODEL,UNITAB)
 C--------------------------------------------------
-        IFLAGUNIT = 0 					       
-        DO J=1,NUNITS                           
+        IFLAGUNIT = 0                  
+        DO J=1,UNITAB%NUNITS                           
           IF (UNITAB%UNIT_ID(J) == UID) THEN                     
             IFLAGUNIT = 1                       
             EXIT                                
@@ -182,23 +181,28 @@ C--------------------------------------------------
             PDEL = 0    
             IDEL = 0
         ENDIF
+C
+        IF(IFUNCTYPE == 0) IFUNCTYPE = 1 ! Abscissa function is time (by default)
+                        !  IFUNCTYPE = 2 ! Abscissa function is nodal displacement
+                        !  IFUNCTYPE = 3 ! Abscissa function is nodal velocity
+C
         IF(IS/=0)THEN                                          
           NN=IGRSURF(IS)%NSEG
           KPINCH=NN+1
           DO J=1,NN
-	    IF (IDDOM/=0) THEN	  
+              IF (IDDOM/=0) THEN    
 C-----------Multidomaines -> on elimine les seg communs, on ne les traite qu'une foi---
-	       CAPT=0 
+                 CAPT=0 
                DO H=1,4
-	         IF (TAGNO(NPART+IGRSURF(IS)%NODES(J,H))==1) CAPT = 1
-               END DO	  
-	       IF (CAPT==0) GOTO 150
-	    ENDIF   
+                   IF (TAGNO(NPART+IGRSURF(IS)%NODES(J,H))==1) CAPT = 1
+               END DO    
+                 IF (CAPT==0) GOTO 150
+              ENDIF   
 C
             IF(FLAG_PINCH /= 1) THEN
               K=K+1                                                
               IPRES(1,K)  = IGRSURF(IS)%NODES(J,1)
-              IPRES(2,K)  = IGRSURF(IS)%NODES(J,2)				    
+              IPRES(2,K)  = IGRSURF(IS)%NODES(J,2)            
               IPRES(3,K)  = IGRSURF(IS)%NODES(J,3)
               IF (IGRSURF(IS)%NODES(J,3)==IGRSURF(IS)%NODES(J,4)) THEN
 C               true triangles (not segments built from 3 nodes).   
@@ -210,13 +214,14 @@ C               true triangles (not segments built from 3 nodes).
               IPRES(6,K)     = ISENS     
               IPRES(7,K) = IDEL          
               IPRES(8,K) = 0                                       
+              IPRES(9,K) = IFUNCTYPE
               PRES(1,K) = FCY                                          
               PRES(2,K) = ONE/FCX
             ELSE
               NPLOADPINCH = NPLOADPINCH + 1
               KPINCH=KPINCH-1
               IPRES(1,KPINCH)  = IGRSURF(IS)%NODES(J,1)
-              IPRES(2,KPINCH)  = IGRSURF(IS)%NODES(J,2)				    
+              IPRES(2,KPINCH)  = IGRSURF(IS)%NODES(J,2)            
               IPRES(3,KPINCH)  = IGRSURF(IS)%NODES(J,3)
               IF (IGRSURF(IS)%ELTYP(J)==7) THEN
 C               true triangles (not segments built from 3 nodes).   
@@ -228,22 +233,26 @@ C               true triangles (not segments built from 3 nodes).
               IPRES(6,KPINCH)     = ISENS    
               IPRES(7,KPINCH) = IDEL  
               IPRES(8,KPINCH) = 0                                      
+              IPRES(9,KPINCH) = IFUNCTYPE
               PRES(1,KPINCH) = FCY                                          
               PRES(2,KPINCH) = ONE/FCX              
             ENDIF  
 C                                  
   150        CONTINUE
           ENDDO
-C-----------Multidomaines -> on decompte les seg communs, on ne les compte qu'une foi---	  
-	  IF (IDDOM>0) NN = NN-ISURF_R2R(1,IS)                                                  
+C-----------Multidomaines -> on decompte les seg communs, on ne les compte qu'une foi---    
+            IF (IDDOM>0) NN = NN-ISURF_R2R(1,IS)                                                  
           NPRELD=NPRELD+NN                                       
         ELSE                                                     
           GOTO 999                                               
-        ENDIF						 
+        ENDIF             
       ENDDO
 C
       I1=1
       I2=MIN0(50,NPRELD)
+C----
+      LOADS%NLOAD_PLOAD = NPRELD
+C----
 C
    90  WRITE (IOUT,2000)
 

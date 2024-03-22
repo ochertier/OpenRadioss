@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -76,53 +76,56 @@ Chd|        CUPDTN3P                      source/elements/shell/coque/cupdtn3.F
 Chd|        CUPDTN3PINCH                  source/elements/shell/coqueba/cupdtn3pinch.F
 Chd|        CUPDT_PLY                     source/properties/composite_options/stack/cupdt_ply.F
 Chd|        DTCBA_REG                     source/elements/shell/coqueba/dtcba_reg.F
-Chd|        DTTHERM                       source/elements/sh3n/coquedk/cndt3.F
+Chd|        DTTHERM                       source/elements/sh3n/coquedk/dttherm.F
 Chd|        SET_FAILWAVE_SH4N             source/materials/fail/failwave/upd_failwave_sh4n.F
 Chd|        STARTIME                      source/system/timer.F         
 Chd|        STOPTIME                      source/system/timer.F         
 Chd|        DRAPE_MOD                     share/modules/drape_mod.F     
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
 Chd|        FAILWAVE_MOD                  ../common_source/modules/failwave_mod.F
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/matparam_def_mod.F
+Chd|        MAT_ELEM_MOD                  ../common_source/modules/mat_elem/mat_elem_mod.F
 Chd|        NLOCAL_REG_MOD                ../common_source/modules/nlocal_reg_mod.F
 Chd|        PINCH_LOCAL_MOD               share/modules/pinch_local_mod.F
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
 Chd|        STACK_MOD                     share/modules/stack_mod.F     
 Chd|        TABLE_MOD                     share/modules/table_mod.F     
 Chd|====================================================================
-       SUBROUTINE CBAFORC3(ELBUF_STR,
-     1            JFT    ,JLT     ,NFT     ,NPT     ,
-     2            IPARI  ,MTN     ,IPRI    ,ITHK    ,NELTST  ,
-     3            ITYPTST,ITAB    ,MATPARAM_TAB,
-     4            ISTRAIN,IPLA    ,TT      ,DT1     ,DT2T    ,
-     5            PM     ,GEO     ,PARTSAV ,IXC     ,FAILWAVE,
-     6            BUFMAT  ,TF      ,NPF     ,IADC   ,
-     7            X      ,D       ,DR      ,V       ,VR      ,
-     8            F      ,M       ,STIFN   ,STIFR   ,FSKY    ,
-     9            TANI    ,OFFSET  ,EANI    ,INDXOF ,
-     A            IPARTC ,THKE    ,NVC     ,IOFC    ,IHBE    ,
-     B            F11    ,F12     ,F13     ,F14     ,F21     ,
-     C            F22    ,F23     ,F24     ,F31     ,F32     ,
-     D            F33    ,F34     ,M11     ,M12     ,M13     ,
-     E            M14    ,M21     ,M22     ,M23     ,M24     ,
-     F            M31    ,M32     ,M33     ,M34     ,
-     I            KFTS   ,ISMSTR  ,IGEO    ,GROUP_PARAM,
-     K            IPM    ,IFAILURE,ITASK   ,JTHE    ,TEMP    ,
-     L            FTHE   ,FTHESKY ,IEXPAN  ,ISHPLYXFEM,MS    ,
-     I            IN      ,MS_PLY  ,ZI_PLY ,INOD_PXFEM,IEL_PXFEM ,
-     J            IADC_PXFEM,GRESAV,GRTH   ,IGRTH   ,MSC     ,
-     K            DMELC   ,JSMS    ,TABLE  ,IPARG   ,SENSOR_TAB,
-     L            MSZ2    ,CONDN  ,CONDNSKY,ISUBSTACK,STACK ,
-     M            DRAPE_Q4   ,NEL    ,NLOC_DMG,VPINCH, 
-     O            FPINCH  ,STIFPINCH)
+      SUBROUTINE CBAFORC3(
+     1   ELBUF_STR,   JFT,         JLT,         NFT,
+     2   NPT,         IPARI,       MTN,         IPRI,
+     3   ITHK,        NELTST,      ITYPTST,     ITAB,
+     4   MAT_ELEM,    ISTRAIN,     IPLA,        TT,
+     5   DT1,         DT2T,        PM,          GEO,
+     6   PARTSAV,     IXC,         FAILWAVE,    BUFMAT,
+     7   TF,          NPF,         IADC,        X,
+     8   D,           DR,          V,           VR,
+     9   F,           M,           STIFN,       STIFR,
+     A   FSKY,        TANI,        OFFSET,      EANI,
+     B   INDXOF,      IPARTC,      THKE,        NVC,
+     C   IOFC,        IHBE,        F11,         F12,
+     D   F13,         F14,         F21,         F22,
+     E   F23,         F24,         F31,         F32,
+     F   F33,         F34,         M11,         M12,
+     G   M13,         M14,         M21,         M22,
+     H   M23,         M24,         M31,         M32,
+     I   M33,         M34,         KFTS,        ISMSTR,
+     J   IGEO,        GROUP_PARAM, IPM,         IFAILURE,
+     K   ITASK,       JTHE,        TEMP,        FTHE,
+     L   FTHESKY,     IEXPAN,      ISHPLYXFEM,  MS,
+     M   IN,          MS_PLY,      ZI_PLY,      INOD_PXFEM,
+     N   IEL_PXFEM,   IADC_PXFEM,  GRESAV,      GRTH,
+     O   IGRTH,       MSC,         DMELC,       JSMS,
+     P   TABLE,       IPARG,       SENSORS,     MSZ2,
+     Q   CONDN,       CONDNSKY,    ISUBSTACK,   STACK,
+     R   DRAPE_SH4N,  NEL,         NLOC_DMG,    VPINCH,
+     S   FPINCH,      STIFPINCH,   INDX_DRAPE,  IGRE,
+     T   JTUR)
 C-----------------------------------------------
 C   M o d u l e s
 C----------------------------------------------- 
       USE TABLE_MOD
-      USE ELBUFDEF_MOD
       USE STACK_MOD
       USE FAILWAVE_MOD
-      USE MATPARAM_DEF_MOD        
+      USE MAT_ELEM_MOD        
       USE NLOCAL_REG_MOD    
       USE PINCH_LOCAL_MOD
       USE DRAPE_MOD
@@ -138,27 +141,24 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C O M M O N   B L O C K S
 C-----------------------------------------------
-#include      "scr01_c.inc"
-#include      "scr03_c.inc"
 #include      "scr14_c.inc"
 #include      "scr18_c.inc"
 #include      "parit_c.inc"
 #include      "param_c.inc"
-#include      "scr17_c.inc"
 #include      "timeri_c.inc"
-#include      "warn_c.inc"
-#include      "com01_c.inc"
 #include      "com04_c.inc"
 C-----------------------------------------------
 C   D U M M Y   A R G U M E N T S
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: IGRE,JTUR
       INTEGER JFT,JLT,NFT,NPT,MTN,IPRI,ITHK,NELTST,
      .        ITYPTST ,ISTRAIN,IPLA ,OFFSET,NVC,
      .        IOFC ,IHBE ,KFTS,ISMSTR,IFAILURE,
      .        IEXPAN, ISHPLYXFEM,ITASK,JTHE,IBID,JSMS,ISUBSTACK,NEL
       INTEGER IXC(NIXC,*), IADC(4,*), IPARTC(*), NPF(*),IGEO(NPROPGI,*),
      .        IPM(*),INDXOF(MVSIZ),INOD_PXFEM(*),IEL_PXFEM(*),ITAB(*),
-     .        IADC_PXFEM(4,*),GRTH(*),IGRTH(*),IPARG(*),IPARI(NPARI,*)
+     .        IADC_PXFEM(4,*),GRTH(*),IGRTH(*),IPARG(*),IPARI(NPARI,*),
+     .        INDX_DRAPE(SCDRAPE)
 C     REAL OU REAL*8
       my_real
      .   F11(MVSIZ), F12(MVSIZ), F13(MVSIZ), F14(MVSIZ),
@@ -181,11 +181,11 @@ C     REAL OU REAL*8
       TYPE(ELBUF_STRUCT_), TARGET :: ELBUF_STR
       TYPE (STACK_PLY) :: STACK
       TYPE (FAILWAVE_STR_) :: FAILWAVE 
-      TYPE (GRP_PARAM_STRUCT_) :: GROUP_PARAM
+      TYPE (GROUP_PARAM_)  :: GROUP_PARAM
       TYPE (NLOCAL_STR_), TARGET :: NLOC_DMG 
-      TYPE (DRAPE_) :: DRAPE_Q4
-      TYPE (MATPARAM_STRUCT_) , DIMENSION(NUMMAT) :: MATPARAM_TAB
-      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE (DRAPE_)  :: DRAPE_SH4N(NUMELC_DRAPE)
+      TYPE (MAT_ELEM_),INTENT(INOUT) :: MAT_ELEM
+      TYPE (SENSORS_) ,INTENT(IN) :: SENSORS
 C-----------------------------------------------
 C   L O C A L   V A R I A B L E S
 C-----------------------------------------------
@@ -196,7 +196,8 @@ C-----------------------------------------------
      .   IPPID,JPID,IPTHK,IPPOS,IPMAT,IPMAT_IPLY,MATLY,IFAILWAVE,
      .   J1,J2,IIGEO,IADI ,IADR,IPANG,IGTYP,IGMAT,ILAY,NPTTOT,IREP,KK(5),K,
      .   LENFPINCH,LENMPINCH,LENEPINCHXZ,LENEPINCHYZ,LENEPINCHZZ,
-     .   PTFP,PTMP,PTEPXZ,PTEPYZ,PTEPZZ,MT,NPINCH
+     .   PTFP,PTMP,PTEPXZ,PTEPYZ,PTEPZZ,MT,NPINCH,IDRAPE,ACTIFXFEM,
+     .   SEDRAPE,NUMEL_DRAPE
       INTEGER  MAT(MVSIZ), PID(MVSIZ), NGL(MVSIZ),MAT_IPLY(MVSIZ,NPT),
      .   IPLAT(MVSIZ),ISTACK(MVSIZ,NPT),FWAVE_EL(NEL)
       PARAMETER (NPG = 4)
@@ -269,7 +270,6 @@ C-----------------------------------------------
       my_real, ALLOCATABLE, DIMENSION(:) :: DIR1_CRK,DIR2_CRK,DIRA,DIRB
       my_real
      .   EZZPG(MVSIZ,4)
-      my_real, ALLOCATABLE, DIMENSION(:,:,:) :: PLAPT_LAY,SIGPT_LAY
       TARGET :: DIRA,DIRB
       INTEGER :: NDDL, NC1(MVSIZ), NC2(MVSIZ), NC3(MVSIZ), NC4(MVSIZ),
      .           INLOC
@@ -279,18 +279,24 @@ C-------------------------------------
       TYPE(BUF_LAY_) ,POINTER :: BUFLY
       TYPE(L_BUFEL_) ,POINTER :: LBUF1,LBUF2,LBUF3,LBUF4     
       TYPE(G_BUFEL_) ,POINTER :: GBUF 
+      TYPE(L_BUFEL_) ,POINTER :: LBUF
+      TYPE(L_BUFEL_DIR_) ,POINTER :: LBUF_DIR
       TYPE(PINCH_LOCAL_STRUCT_) :: PINCH_LOCAL    
 C=======================================================================
 C     INITIALISATION
 C--------------------------
       ISTACK = 0
       GBUF => ELBUF_STR%GBUF
+      IDRAPE = ELBUF_STR%IDRAPE
       IBID = 0
       BID = ZERO
       IDRIL = IPARG(41)
       IREP  = IPARG(35)
       INLOC = IPARG(78)
+      ACTIFXFEM = IPARG(70)
       NPINCH= IPARG(90)
+      SEDRAPE = SCDRAPE
+      NUMEL_DRAPE = NUMELC_DRAPE
 C
       NLAY = ELBUF_STR%NLAY
       NPTR = ELBUF_STR%NPTR
@@ -339,21 +345,47 @@ c--------------------------------------------
 c-------------------------------------
       L_DIRA = ELBUF_STR%BUFLY(1)%LY_DIRA
       L_DIRB = ELBUF_STR%BUFLY(1)%LY_DIRB
-      ALLOCATE(DIRA(NLAY*NEL*L_DIRA))
-      ALLOCATE(DIRB(NLAY*NEL*L_DIRB))
-      DIRA=ZERO
-      DIRB=ZERO
-      IF (L_DIRA == 0) THEN
-        CONTINUE
-      ELSEIF (IREP == 0) THEN
-        DO J=1,NLAY
-          J1 = 1+(J-1)*L_DIRA*NEL
-          J2 = J*L_DIRA*NEL
-          DIRA(J1:J2) = ELBUF_STR%BUFLY(J)%DIRA(1:NEL*L_DIRA)
-        ENDDO
-      ENDIF
-      DIR_A => DIRA(1:NLAY*NEL*L_DIRA)
-      DIR_B => DIRB(1:NLAY*NEL*L_DIRB)
+      IGTYP = IGEO(11,PID(1))
+      IF(IDRAPE > 0 .AND. (IGTYP == 51 .OR. IGTYP == 52)) THEN
+        ALLOCATE(DIRA(NPTTOT*NEL*L_DIRA))
+        ALLOCATE(DIRB(NPTTOT*NEL*L_DIRB))
+        DIRA = ZERO
+        DIRB = ZERO
+        IF (L_DIRA == 0) THEN
+            CONTINUE
+        ELSEIF (IREP == 0) THEN
+           NPTTOT = 0
+           DO ILAY=1,NLAY
+              NPTT = ELBUF_STR%BUFLY(ILAY)%NPTT
+              DO IT=1,NPTT
+                 J = NPTTOT + IT
+                 LBUF_DIR =>  ELBUF_STR%BUFLY(ILAY)%LBUF_DIR(IT)
+                 J1 = 1+(J-1)*L_DIRA*NEL
+                 J2 = J*L_DIRA*NEL
+                 DIRA(J1:J2) = LBUF_DIR%DIRA(1:NEL*L_DIRA)
+              ENDDO
+              NPTTOT = NPTTOT + NPTT
+            ENDDO 
+        ENDIF
+        DIR_A => DIRA(1:NPTTOT*NEL*L_DIRA)
+        DIR_B => DIRB(1:NPTTOT*NEL*L_DIRB)
+      ELSE ! idrape
+        ALLOCATE(DIRA(NLAY*NEL*L_DIRA))
+        ALLOCATE(DIRB(NLAY*NEL*L_DIRB))
+        DIRA=ZERO
+        DIRB=ZERO
+        IF (L_DIRA == 0) THEN
+          CONTINUE
+        ELSEIF (IREP == 0) THEN
+           DO J=1,NLAY
+              J1 = 1+(J-1)*L_DIRA*NEL
+              J2 = J*L_DIRA*NEL
+              DIRA(J1:J2) = ELBUF_STR%BUFLY(J)%DIRA(1:NEL*L_DIRA)
+           ENDDO
+         ENDIF
+         DIR_A => DIRA(1:NLAY*NEL*L_DIRA)
+         DIR_B => DIRB(1:NLAY*NEL*L_DIRB)
+      ENDIF ! IDRAPE    
 c-------------------------------------
       ALLOCATE(DIR1_CRK(0))
       ALLOCATE(DIR2_CRK(0))
@@ -381,25 +413,13 @@ c     .              IGEO, PID,ISUBSTACK)
       IGMAT  = IGEO(98 ,IXC(6,1))
 C      
 C initiallisation pour la thermique ---
-       IF(JTHE > 0 ) THEN
-         DO I=JFT,JLT
-          THEM(I,1) = ZERO
-          THEM(I,2) = ZERO
-          THEM(I,3) = ZERO
-          THEM(I,4) = ZERO
-          TEMPEL(I) = ZERO
-         ENDDO 
-       ENDIF  
-C
-       IF (IGTYP == 51 .OR. IGTYP == 52) THEN
-         ALLOCATE(PLAPT_LAY(MVSIZ,NLAY,NPG))
-         ALLOCATE(SIGPT_LAY(5*MVSIZ,NLAY,NPG))
-         PLAPT_LAY = ZERO
-         SIGPT_LAY = ZERO
-       ELSE
-         ALLOCATE(PLAPT_LAY(0,0,0))
-         ALLOCATE(SIGPT_LAY(0,0,0))
-       ENDIF
+       DO I=JFT,JLT
+         THEM(I,1) = ZERO
+         THEM(I,2) = ZERO
+         THEM(I,3) = ZERO
+         THEM(I,4) = ZERO
+         TEMPEL(I) = ZERO
+       ENDDO
 C
        IF(NPINCH > 0) THEN
          ALLOCATE(PINCH_LOCAL%EPINCHXZ(MVSIZ))
@@ -718,9 +738,9 @@ C-----------------
      M    DIR1_CRK  ,DIR2_CRK  ,LC        ,
      N    ISMSTR    ,IR        ,IS        ,NLAY      ,NPT       ,
      O    IBID      ,IBID      ,ISUBSTACK ,STACK     ,
-     P    F_DEF(1,1,NG),ITASK  ,DRAPE_Q4     ,VAR_REG(1,1),
+     P    F_DEF(1,1,NG),ITASK  ,DRAPE_SH4N     ,VAR_REG(1,1),
      Q    PINCH_LOCAL , GBUF%FORPGPINCH(PTFP), GBUF%MOMPGPINCH(PTMP),EZZAVG  ,
-     R    AREAPINCH)
+     R    AREAPINCH   )
         ELSE
           CALL CMAIN3(
      1    ELBUF_STR ,JFT       ,JLT       ,NFT       ,IPARG      ,
@@ -729,7 +749,7 @@ C-----------------
      4    SSP       ,RHO       ,VISCMX    ,DT1C      ,SIGY       ,
      5    CDET      ,EXX       ,EYY       ,EXY       ,EXZ        ,
      6    EYZ       ,KXX       ,KYY       ,KXY       ,NU         ,
-     7    OFF       ,THK0      ,MAT       ,PID       ,MATPARAM_TAB,
+     7    OFF       ,THK0      ,MAT       ,PID       ,MAT_ELEM   ,
      8    GBUF%FORPG(PTF),GBUF%MOMPG(PTM) ,GBUF%STRPG(PTS),FAILWAVE,FWAVE_EL,
      9    GBUF%THK  ,GBUF%EINT ,IOFC      ,
      A    G         ,A11       ,A12       ,VOL0      ,INDXOF    ,
@@ -743,13 +763,13 @@ C-----------------
      I    DELG_PLY  ,TH_IPLY   ,SIG_IPLY  ,R11       ,R12       ,
      J    R13       ,R21       ,R22       ,R23       ,R31       ,
      K    R32       ,R33       ,NG        ,TABLE     ,IBID      ,
-     L    OFFI      ,SENSOR_TAB,A11_IPLY  ,IBID      ,
+     L    OFFI      ,SENSORS   ,A11_IPLY  ,IBID      ,
      M    DIR1_CRK  ,DIR2_CRK  ,LC        ,
      N    ISMSTR    ,IR        ,IS        ,NLAY      ,NPT       ,
      O    IBID      ,IBID      ,ISUBSTACK ,STACK     ,
-     P    F_DEF(1,1,NG),ITASK  ,DRAPE_Q4     ,VAR_REG(1,1),NLOC_DMG)        
+     P    F_DEF(1,1,NG),ITASK  ,DRAPE_SH4N     ,VAR_REG(1,1),NLOC_DMG ,
+     R    INDX_DRAPE ,THKE        ,SEDRAPE     ,NUMEL_DRAPE)        
         ENDIF
-
 C-----------------
         IF ((ITASK==0).AND.(IMON_MAT == 1)) CALL STOPTIME(35,1)
 C      
@@ -822,54 +842,21 @@ c-------------------------
 c     Virtual internal forces of regularized non local ddl 
 c--------------------------
          IF (INLOC > 0) THEN
-           CALL CBAFINT_REG(NLOC_DMG,VAR_REG(1,1)     ,THK0    ,
-     .                      NEL     ,GBUF%OFF,AREA    ,NC1     ,
-     .                      NC2     ,NC3     ,NC4     ,
-     .                      ELBUF_STR%NLOC(IR,IS), 
-     .                      IXC(1,JFT),NDDL  ,ITASK   ,
-     .                      NG      ,JFT     ,JLT     ,X13     ,
-     .                      Y13     ,X24     ,Y24     ,DT2T    ,
-     .                      GBUF%THK_I,GBUF%AREA)
+           CALL CBAFINT_REG(
+     1   NLOC_DMG,         VAR_REG(1,1),     THK0,             NEL,
+     2   GBUF%OFF,         AREA,             NC1,              NC2,
+     3   NC3,              NC4,              ELBUF_STR%NLOC(IR,IS), IXC(1,JFT),
+     4   NDDL,             ITASK,            NG,               JFT,
+     5   JLT,              X13,              Y13,              X24,
+     6   Y24,              DT2T,             GBUF%THK_I, GBUF%AREA,
+     7   NFT)
          ENDIF 
        ENDDO  ! NPTR
       ENDDO  ! NPTS
     
-c      IF( ISHPLYXFEM > 0 )  
-c     .    CALL CBAFREL_PLY(JFT,JLT,NPT,THKLY,PLY_FN,IXC,
-c     .                       INOD_PXFEM,ISTACK,ZI_PLY,MS_PLY,VFI)
 C---------------------------------------
 C-----FIN DE BOUCLE DE 4 POINTS DE GAUSS
 C---------------------------------------
-C----
-C temporary storage for mean PLAPT, SIGPT
-C----
-      IF ((IGTYP == 51 .OR. IGTYP == 52)  .AND. NLAY > 1) THEN
-        DO ILAY=1,NLAY
-          BUFLY => ELBUF_STR%BUFLY(ILAY)
-          NPTT = BUFLY%NPTT
-          DO IT = 1,NPTT
-            DO IS = 1,NPTS
-              DO IR = 1,NPTR
-                NG = NPTR*(IS-1) + IR
-                DO I=JFT,JLT
-                  IF (BUFLY%L_PLA > 0) THEN
-                    PLAPT_LAY(I,ILAY,NG) = PLAPT_LAY(I,ILAY,NG) + 
-     .                                     BUFLY%LBUF(IR,IS,IT)%PLA(I)/NPTT
-                  ELSE
-                    PLAPT_LAY(I,ILAY,NG) = ZERO
-                  ENDIF
-                  II = (I-1)*5
-                  DO J=1,5
-                    JJ = II+J
-                    SIGPT_LAY(JJ,ILAY,NG) = SIGPT_LAY(JJ,ILAY,NG) + 
-     .                                      BUFLY%LBUF(IR,IS,IT)%SIG(KK(J)+I)/NPTT
-                  ENDDO
-                ENDDO
-              ENDDO
-            ENDDO
-          ENDDO
-        ENDDO ! DO ILAY=1,NLAY
-      ENDIF  ! IF (IGTYP == 51) THEN
 C
       IF (NPINCH > 0) THEN
         CALL CBAPINCHTHK(
@@ -908,98 +895,6 @@ C---
      .                             + GBUF%MOMPG(PT4+KK(J)+I))
         ENDDO
       ENDDO
-C---
-C    = PLAPT =
-C---
-      IF (NLAY > 1) THEN
-        IF (IGTYP == 51 .OR. IGTYP == 52) THEN
-          DO IPT = 1,NLAY
-            BUFLY => ELBUF_STR%BUFLY(IPT)
-            IF (BUFLY%L_PLA > 0) THEN
-              DO I=JFT,JLT  
-                BUFLY%PLAPT(I) = FOURTH*(PLAPT_LAY(I,IPT,1) + PLAPT_LAY(I,IPT,2) +
-     .                                  PLAPT_LAY(I,IPT,3) + PLAPT_LAY(I,IPT,4))
-              ENDDO
-            ENDIF
-          ENDDO
-        ELSE  ! (IGTYP /= 51)
-          DO IPT = 1,NLAY
-            BUFLY => ELBUF_STR%BUFLY(IPT)
-            IF (BUFLY%L_PLA > 0) THEN
-              LBUF1 => ELBUF_STR%BUFLY(IPT)%LBUF(1,1,1)
-              LBUF2 => ELBUF_STR%BUFLY(IPT)%LBUF(2,1,1)
-              LBUF3 => ELBUF_STR%BUFLY(IPT)%LBUF(1,2,1)
-              LBUF4 => ELBUF_STR%BUFLY(IPT)%LBUF(2,2,1)
-              DO I=JFT,JLT  
-                BUFLY%PLAPT(I) = FOURTH*(LBUF1%PLA(I) + LBUF2%PLA(I) +
-     .                                  LBUF3%PLA(I) + LBUF4%PLA(I))
-              ENDDO
-            ENDIF
-          ENDDO
-        ENDIF  !  IF (IGTYP == 51) THEN
-      ELSE  !  (NLAY == 1)
-        BUFLY => ELBUF_STR%BUFLY(1)
-        DO IPT = 1,BUFLY%NPTT
-          IF (BUFLY%L_PLA > 0) THEN
-            LBUF1 => ELBUF_STR%BUFLY(1)%LBUF(1,1,IPT)
-            LBUF2 => ELBUF_STR%BUFLY(1)%LBUF(2,1,IPT)
-            LBUF3 => ELBUF_STR%BUFLY(1)%LBUF(1,2,IPT)
-            LBUF4 => ELBUF_STR%BUFLY(1)%LBUF(2,2,IPT)
-            II = (IPT-1)*NEL
-            DO I=JFT,JLT                                                 
-              BUFLY%PLAPT(II+I) = FOURTH*(LBUF1%PLA(I) + LBUF2%PLA(I) +
-     .                                   LBUF3%PLA(I) + LBUF4%PLA(I))
-            ENDDO
-          ENDIF
-        ENDDO
-      ENDIF !  IF (NLAY > 1) THEN
-C---
-C    = SIGPT =
-C---
-      IF (NLAY > 1) THEN
-        IF (IGTYP == 51 .OR. IGTYP == 52) THEN
-          DO IPT = 1,NLAY
-            BUFLY => ELBUF_STR%BUFLY(IPT)
-            DO I=JFT,JLT*5
-              BUFLY%SIGPT(I) = FOURTH*(SIGPT_LAY(I,IPT,1) + SIGPT_LAY(I,IPT,2) +
-     .                                SIGPT_LAY(I,IPT,3) + SIGPT_LAY(I,IPT,4))
-            ENDDO
-          ENDDO
-        ELSE  ! (IGTYP /= 51)
-          DO IPT = 1,NLAY
-            BUFLY => ELBUF_STR%BUFLY(IPT)
-            LBUF1 => ELBUF_STR%BUFLY(IPT)%LBUF(1,1,1)
-            LBUF2 => ELBUF_STR%BUFLY(IPT)%LBUF(2,1,1)
-            LBUF3 => ELBUF_STR%BUFLY(IPT)%LBUF(1,2,1)
-            LBUF4 => ELBUF_STR%BUFLY(IPT)%LBUF(2,2,1)
-            DO I=JFT,JLT
-              II = (I-1)*5
-              DO J=1,5
-               JJ = II+J
-               BUFLY%SIGPT(JJ) = FOURTH*(LBUF1%SIG(KK(J)+I) + LBUF2%SIG(KK(J)+I) +
-     .                                  LBUF3%SIG(KK(J)+I) + LBUF4%SIG(KK(J)+I))
-              ENDDO
-            ENDDO
-          ENDDO
-        ENDIF  !  IF (IGTYP == 51) THEN
-      ELSE  !  (NLAY == 1)
-        BUFLY => ELBUF_STR%BUFLY(1)
-        DO IPT = 1,BUFLY%NPTT
-          LBUF1 => ELBUF_STR%BUFLY(1)%LBUF(1,1,IPT)
-          LBUF2 => ELBUF_STR%BUFLY(1)%LBUF(2,1,IPT)
-          LBUF3 => ELBUF_STR%BUFLY(1)%LBUF(1,2,IPT)
-          LBUF4 => ELBUF_STR%BUFLY(1)%LBUF(2,2,IPT)
-          K = (IPT-1)*NEL*5
-          DO I=JFT,JLT
-            II = (I-1)*5
-            DO J=1,5
-              JJ = K+II+J
-              BUFLY%SIGPT(JJ) =FOURTH*(LBUF1%SIG(KK(J)+I) + LBUF2%SIG(KK(J)+I)
-     .                              + LBUF3%SIG(KK(J)+I) + LBUF4%SIG(KK(J)+I))
-            ENDDO
-          ENDDO
-        ENDDO
-      ENDIF !  IF (NLAY > 1) THEN
 c------------------------------      
 C     membrane shear traitement
       IF (IDRIL == 0) THEN
@@ -1046,17 +941,20 @@ C     BILANS PAR MATERIAU
 C--------------------------
        IPOUT=2
       IF(IPRI == 1)
-     1   CALL CBILAN(JFT     ,JLT      ,PM     ,V       ,IXC      ,
-     2               GBUF%THK,GBUF%EINT,PARTSAV,AREA    ,MAT      ,
-     3               IPARTC  ,X        ,VR     ,BID     ,BID      ,
-     4               BID     ,THK2     ,IPOUT  ,OFF     ,
-     5               NFT     ,GRESAV   ,GRTH   ,IGRTH   ,
-     6               VL1     ,VL2      ,VL3    ,VL4     ,VRL1     ,
-     7               VRL2    ,VRL3     ,VRL4   ,X1G     ,X2G      ,
-     8               X3G     ,X4G      ,Y1G    ,Y2G     ,Y3G      ,
-     9               Y4G     ,Z1G      ,Z2G    ,Z3G     ,Z4G      ,
-     A               IBID    ,IEXPAN   ,GBUF%EINTTH     ,ITASK    ,
-     B               GBUF%VOL)
+     1   CALL CBILAN(
+     1   JFT,        JLT,        PM,         V,
+     2   IXC,        GBUF%THK,   GBUF%EINT,  PARTSAV,
+     3   AREA,       MAT,        IPARTC,     X,
+     4   VR,         BID,        BID,        BID,
+     5   THK2,       IPOUT,      OFF,        NFT,
+     6   GRESAV,     GRTH,       IGRTH,      VL1,
+     7   VL2,        VL3,        VL4,        VRL1,
+     8   VRL2,       VRL3,       VRL4,       X1G,
+     9   X2G,        X3G,        X4G,        Y1G,
+     A   Y2G,        Y3G,        Y4G,        Z1G,
+     B   Z2G,        Z3G,        Z4G,        IBID,
+     C   IEXPAN,     GBUF%EINTTH,ITASK,      GBUF%VOL,
+     D   ACTIFXFEM,  IGRE)
 C----------------------------
 C     CALCUL  DT
 C----------------------------
@@ -1100,9 +998,11 @@ C--------------------------
 C     THERMAL TIME STEP
 C--------------------------
         IF(JTHE > 0.AND.IDT_THERM == 1)THEN
-           CALL DTTHERM(JFT     ,JLT    ,PM    ,TEMPEL,GBUF%RE,
-     2                  RHO     ,GBUF%RK,VOL0  ,LC    ,MAT    ,
-     3                  DT_THERM,OFF,CONDE) 
+           CALL DTTHERM(
+     1   JFT,     JLT,     PM,      TEMPEL,
+     2   GBUF%RE, RHO,     GBUF%RK, VOL0,
+     3   LC,      MAT,     DT_THERM,OFF,
+     4   CONDE,   JTUR)
          ENDIF 
 C 
       IF(ISHPLYXFEM > 0) THEN                                     
@@ -1162,18 +1062,19 @@ C
       ENDIF
 C     
       IF(ISHPLYXFEM > 0) THEN
-        CALL CUPDT_PLY(JFT ,JLT  ,NVC ,GBUF%OFF,OFF ,IADC_PXFEM,
-     2            IEL_PXFEM,INOD_PXFEM ,IXC   ,MS    ,IN   ,MS_PLY,
-     3            ZI_PLY,ISTACK,POSLY,
-     4            FLY11 ,FLY12 ,FLY13  ,FLY14 , FLY21 , FLY22 ,
-     5            FLY23 ,FLY24 ,FLY31 ,FLY32 , FLY33  ,FLY34 ,
-     6            FACN  ,STI_PLY,MSZ2)
+        CALL CUPDT_PLY(
+     1   JFT,       JLT,       NVC,       GBUF%OFF,
+     2   OFF,       IADC_PXFEM,IEL_PXFEM, INOD_PXFEM,
+     3   IXC,       MS,        IN,        MS_PLY,
+     4   ZI_PLY,    ISTACK,    POSLY,     FLY11,
+     5   FLY12,     FLY13,     FLY14,     FLY21,
+     6   FLY22,     FLY23,     FLY24,     FLY31,
+     7   FLY32,     FLY33,     FLY34,     FACN,
+     8   STI_PLY,   MSZ2,      NFT,       NPT)
       ENDIF  
 C------------
-      IF (ALLOCATED(DIRB)) DEALLOCATE(DIRB)                                                          
-      IF (ALLOCATED(DIRA)) DEALLOCATE(DIRA)                                                          
-      IF (ALLOCATED(PLAPT_LAY)) DEALLOCATE(PLAPT_LAY)
-      IF (ALLOCATED(SIGPT_LAY)) DEALLOCATE(SIGPT_LAY)
+      IF (ALLOCATED(DIRB)) DEALLOCATE(DIRB) 
+      IF (ALLOCATED(DIRA)) DEALLOCATE(DIRA)
       IF (ALLOCATED(VAR_REG))   DEALLOCATE(VAR_REG)
 C
        IF(NPINCH > 0) THEN

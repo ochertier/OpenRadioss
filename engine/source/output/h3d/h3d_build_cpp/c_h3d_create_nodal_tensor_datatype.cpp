@@ -1,5 +1,5 @@
 //Copyright>    OpenRadioss
-//Copyright>    Copyright (C) 1986-2023 Altair Engineering Inc.
+//Copyright>    Copyright (C) 1986-2024 Altair Engineering Inc.
 //Copyright>
 //Copyright>    This program is free software: you can redistribute it and/or modify
 //Copyright>    it under the terms of the GNU Affero General Public License as published by
@@ -82,6 +82,9 @@ void c_h3d_create_nodal_tensor_datatype_(int *cpt_data, char *name, int *size, i
     cname=(char*) malloc(sizeof(char)*cname_len);
     for(i=0;i<*size;i++)  cname[i] = name[i];
     cname[*size]='\0'; 
+    
+    if (strncmp(cname,"Grid Point Stress",17)==0) tensor_type = H3D_DS_STRESS;
+    if (strncmp(cname,"Grid Point Strain",17)==0) tensor_type = H3D_DS_STRAIN;
 
     cname_len1 = *size1 + 1;
     cname1=(char*) malloc(sizeof(char)*cname_len1);

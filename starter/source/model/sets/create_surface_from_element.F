@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -43,6 +43,7 @@ Chd|====================================================================
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE MY_ALLOC_MOD
       USE SETDEF_MOD
       USE MESSAGE_MOD
       USE SET_SCRATCH_MOD
@@ -51,9 +52,7 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "com04_c.inc"
-#include      "param_c.inc"
 #include      "scr17_c.inc"
-#include      "my_allocate.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -149,9 +148,9 @@ C=======================================================================
         IF (ALLOCATED(CLAUSE%SURF_ELEM))  DEALLOCATE(CLAUSE%SURF_ELEM)
 !
         CLAUSE%NB_SURF_SEG = NSEG
-        MY_ALLOCATE2D(CLAUSE%SURF_NODES,NSEG,4)
-        MY_ALLOCATE(CLAUSE%SURF_ELTYP,NSEG)
-        MY_ALLOCATE(CLAUSE%SURF_ELEM,NSEG)
+        CALL MY_ALLOC(CLAUSE%SURF_NODES,NSEG,4)
+        CALL MY_ALLOC(CLAUSE%SURF_ELTYP,NSEG)
+        CALL MY_ALLOC(CLAUSE%SURF_ELEM,NSEG)
 !
         DO L=1,NSEG
           CLAUSE%SURF_NODES(L,1) = BUFTMPSURF((INDEX(L)-1)*NIX+1)

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -46,28 +46,18 @@ C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include "units_c.inc"
-#include "param_c.inc"
-#include "scr17_c.inc"
-#include "scr19_c.inc"
 #include "comlock.inc"
-#include "mvsiz_p.inc"
 C---------+--------+---+---+-------------------------------------------
 C VAR     | SIZE   |TYP| RW| DEFINITION
 C---------+--------+---+---+-------------------------------------------
 C NEL     | 1      | I | R | SIZE OF THE ELEMENT GROUP NEL
 C NUPARAM | 1      | I | R | SIZE OF THE USER PARAMETER ARRAY
 C NUVAR   | 1      | I | R | NUMBER OF USER ELEMENT VARIABLES
-C---------+--------+---+---+-------------------------------------------
-C NFUNC   | 1      | I | R | NUMBER FUNCTION USED FOR THIS USER LAW
-C IFUNC   | NFUNC  | I | R | FUNCTION INDEX
-C NPF     | *      | I | R | FUNCTION ARRAY
 C NPT0    | 1      | I | R | NUMBER OF LAYERS OR INTEGRATION POINTS
 C IPT     | 1      | I | R | LAYER OR INTEGRATION POINT NUMBER
-C TF      | *      | F | R | FUNCTION ARRAY
 C NGL     | NEL    | I | R | ELEMENT NUMBER
 C---------+--------+---+---+-------------------------------------------
 C TIME    | 1      | F | R | CURRENT TIME
-C TIMESTEP| 1      | F | R | CURRENT TIME STEP
 C UPARAM  | NUPARAM| F | R | USER MATERIAL PARAMETER ARRAY
 C EPSPXX  | NEL    | F | R | STRAIN RATE XX
 C EPSPYY  | NEL    | F | R | STRAIN RATE YY
@@ -91,7 +81,7 @@ C-----------------------------------------------
        INTEGER, INTENT(IN) :: ILAY,IPTT,IPG
        INTEGER NEL,  NUVAR, NGL(NEL),
      .   IPT,NPT0,NOFF(NEL)
-       my_real TIME,TIMESTEP(NEL),UPARAM(*),DPLA(NEL),
+       my_real TIME,UPARAM(*),DPLA(NEL),
      .   EPSXX(NEL) ,EPSYY(NEL) ,EPSXY(NEL),
      .   EPSYZ(NEL) ,EPSZX(NEL),
      .   DFMAX(NEL) ,TDEL(NEL)
@@ -126,9 +116,6 @@ c!      UVAR(I,3) contains the previous first principal stress
        C0                  = UPARAM(1)
        EMA                 = UPARAM(2)
        NINDX               = 0       
-                              
-                              
-c!       PTHKF               = P_THICK
 C-----------------------------------------------
        DO I =1,NEL
          IF(OFF(I) >= ONE .AND. FOFF(I) == 1 ) THEN

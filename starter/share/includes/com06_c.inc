@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2022 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>    
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,9 +25,9 @@ C.../COM06/
       PARAMETER (LCOM06 = 58)
 C
       COMMON /COM06/ DTDES, DTHIS, DTFAC, DTMIN, VOLMIN,
-     .               TFEXT, REINT, DTPAT, TPAT,
+     .               TFEXT, REINT, 
      .                      UREINT,ECONTV,EHOUR, DTOUTP,
-     .               TOUTP, T1S,   DT2S,  DT12S, USREINT,
+     .               TOUTP, T1S,   DT2S,  DT12S, 
      .               R2RFX1,R2RFX2,DAMPA, DAMPB, DAMPW,
      .               DTHIS1(9),DWMAD,T1SH,DTSTAT,TSTAT,
      .               DTABF(10),DTABFWR(10),ECONTD,ECONT_CUMU,
@@ -35,9 +35,9 @@ C
 
       my_real
      .               DTDES, DTHIS, DTFAC, DTMIN, VOLMIN,
-     .               TFEXT, REINT, DTPAT, TPAT,
+     .               TFEXT, REINT, 
      .                     UREINT,ECONTV,EHOUR, DTOUTP,
-     .               TOUTP, T1S,   DT2S,  DT12S, USREINT,
+     .               TOUTP, T1S,   DT2S,  DT12S, 
      .               R2RFX1,R2RFX2,DAMPA, DAMPB, DAMPW,
      .               DTHIS1,DWMAD ,T1SH, DTSTAT, TSTAT,
      .               DTABF,DTABFWR,ECONTD,ECONT_CUMU,

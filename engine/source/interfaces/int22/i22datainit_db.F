@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -24,8 +24,8 @@ Chd|====================================================================
 Chd|  I22DATAINIT_DB                source/interfaces/int22/i22datainit_db.F
 Chd|-- called by -----------
 Chd|-- calls ---------------
-Chd|        I22BUFBRIC_MOD                ../common_source/modules/cut-cell-search_mod.F
-Chd|        I22TRI_MOD                    ../common_source/modules/cut-cell-search_mod.F
+Chd|        I22BUFBRIC_MOD                ../common_source/modules/interfaces/cut-cell-search_mod.F
+Chd|        I22TRI_MOD                    ../common_source/modules/interfaces/cut-cell-search_mod.F
 Chd|====================================================================
       SUBROUTINE I22DATAINIT_DB()
       USE I22TRI_MOD
@@ -41,12 +41,7 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "comlock.inc"
-#include      "subvolumes.inc"
-#include      "i22edges.inc"
 #include      "inter22.inc"
-#include      "task_c.inc"
-#include      "com01_c.inc"
-#include      "com04_c.inc"
 C-----------------------------------------------
 
 

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,7 +25,7 @@ Chd|  I20FOR3                       source/interfaces/int20/i20for3.F
 Chd|-- called by -----------
 Chd|        I20MAINF                      source/interfaces/int20/i20mainf.F
 Chd|-- calls ---------------
-Chd|        FOAT_TO_6_FLOAT               source/system/parit.F
+Chd|        FOAT_TO_6_FLOAT               source/system/parit.F         
 Chd|        I7ASS0                        source/interfaces/int07/i7ass3.F
 Chd|        I7ASS05                       source/interfaces/int07/i7ass3.F
 Chd|        I7ASS2                        source/interfaces/int07/i7ass3.F
@@ -36,8 +36,8 @@ Chd|        I7CURV                        source/interfaces/int07/i7curv.F
 Chd|        I7SMS2                        source/interfaces/int07/i7sms2.F
 Chd|        IBCOFF                        source/interfaces/interf/ibcoff.F
 Chd|        ANIM_MOD                      ../common_source/modules/anim_mod.F
-Chd|        H3D_MOD                       share/modules/h3d_mod.F
-Chd|        TRI7BOX                       share/modules/tri7box.F
+Chd|        H3D_MOD                       share/modules/h3d_mod.F       
+Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
       SUBROUTINE I20FOR3(JLT   ,A      ,VA     ,IBCC  ,ICODT  ,
      2                  FSAV   ,GAP    ,FRIC   ,MS    ,VISC   ,
@@ -91,8 +91,6 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "com06_c.inc"
 #include      "com08_c.inc"
-#include      "scr02_c.inc"
-#include      "scr03_c.inc"
 #include      "scr05_c.inc"
 #include      "scr07_c.inc"
 #include      "scr11_c.inc"
@@ -101,11 +99,8 @@ C-----------------------------------------------
 #include      "scr18_c.inc"
 #include      "units_c.inc"
 #include      "parit_c.inc"
-#include      "warn_c.inc"
-#include      "couple_c.inc"
 #include      "param_c.inc"
 #include      "impl1_c.inc"
-#include      "task_c.inc"
 #include      "sms_c.inc"
 #include      "kincod_c.inc"
 C-----------------------------------------------
@@ -197,7 +192,6 @@ C
       DOUBLE PRECISION FX6(6,MVSIZ), FY6(6,MVSIZ), FZ6(6,MVSIZ)
 C
 C-----------------------------------------------
-#include "sync_dir.inc"
       IF (IRESP==1) THEN
         PREC = FIVEEM4
       ELSE
@@ -480,9 +474,9 @@ C --
      1              N3     ,GAPV   ,XA     ,NOD_NORMAL,
      2              IX1L   ,IX2L   ,IX3L   ,IX4L      ,
      3              H1     ,H2     ,H3     ,H4        ,
-     4              X1     ,X2     ,X3     ,X4    ,Y1	 ,
-     5              Y2     ,Y3     ,Y4     ,Z1    ,Z2	 ,
-     6              Z3     ,Z4     ,XI     ,YI    ,ZI	 )
+     4              X1     ,X2     ,X3     ,X4    ,Y1   ,
+     5              Y2     ,Y3     ,Y4     ,Z1    ,Z2   ,
+     6              Z3     ,Z4     ,XI     ,YI    ,ZI   )
 
         DO I=1,JLT
           IF(PENE(I)<ZERO)THEN
@@ -1196,7 +1190,7 @@ C---        Loi Darmstad
      .           + FROT_P(5)*EXP(FROT_P(6)*VV)
         ENDDO
       ELSEIF (MFROT==3) THEN
-C---        Loi Renard
+C---    Renard
         DO I=1,JLT
           AA = N1(I)*VX(I) + N2(I)*VY(I) + N3(I)*VZ(I)
           V2 = (VX(I) - N1(I)*AA)**2
@@ -1217,6 +1211,18 @@ C---        Loi Renard
             XMU(I) = FROT_P(2) - DMU / (ONE + DMU*VV2)
           ENDIF
         ENDDO
+      ELSEIF(MFROT==4)THEN
+C---    Exponential decay model
+        DO I=1,JLT
+          AA = N1(I)*VX(I) + N2(I)*VY(I) + N3(I)*VZ(I)
+          V2 = (VX(I) - N1(I)*AA)**2
+     .       + (VY(I) - N2(I)*AA)**2
+     .       + (VZ(I) - N3(I)*AA)**2
+           VV = SQRT(MAX(EM30,V2))
+           XMU(I) = FRIC
+     .        + (FROT_P(1)-FRIC)*EXP(-FROT_P(2)*VV)
+           XMU(I) = MAX(XMU(I),EM30)
+         ENDDO
       ENDIF
 C------------------
 C    TANGENT FORCE CALCULATION
@@ -2252,8 +2258,8 @@ Chd|  I20FOR3C                      source/interfaces/int20/i20for3.F
 Chd|-- called by -----------
 Chd|        I20MAINF                      source/interfaces/int20/i20mainf.F
 Chd|-- calls ---------------
-Chd|        ICONTACT_MOD                  share/modules/icontact_mod.F
-Chd|        TRI7BOX                       share/modules/tri7box.F
+Chd|        ICONTACT_MOD                  share/modules/icontact_mod.F  
+Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
       SUBROUTINE I20FOR3C(NLN   ,NLG  ,MS     ,DXANC ,
      2                    DVANC ,STFA ,WEIGHT ,INACTI,
@@ -2270,24 +2276,11 @@ C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "comlock.inc"
 C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
-#include      "com04_c.inc"
 #include      "com06_c.inc"
 #include      "com08_c.inc"
 #include      "scr11_c.inc"
-#include      "units_c.inc"
-#include      "parit_c.inc"
-#include      "warn_c.inc"
-#include      "couple_c.inc"
-#include      "param_c.inc"
-#include      "impl1_c.inc"
-#include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -2388,14 +2381,14 @@ Chd|  I20FOR3E                      source/interfaces/int20/i20for3.F
 Chd|-- called by -----------
 Chd|        I20MAINF                      source/interfaces/int20/i20mainf.F
 Chd|-- calls ---------------
-Chd|        FOAT_TO_6_FLOAT               source/system/parit.F
+Chd|        FOAT_TO_6_FLOAT               source/system/parit.F         
 Chd|        I20ASS0                       source/interfaces/int20/i20for3.F
 Chd|        I20ASS05                      source/interfaces/int20/i20for3.F
 Chd|        I20ASS2                       source/interfaces/int20/i20for3.F
 Chd|        I20ASS25                      source/interfaces/int20/i20for3.F
 Chd|        I20SMS2E                      source/interfaces/int20/i20sms2.F
-Chd|        H3D_MOD                       share/modules/h3d_mod.F
-Chd|        TRI7BOX                       share/modules/tri7box.F
+Chd|        H3D_MOD                       share/modules/h3d_mod.F       
+Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
       SUBROUTINE I20FOR3E(
      1                  JLT    ,A      ,V      ,IBC     ,ICODT  ,
@@ -2436,8 +2429,6 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "com06_c.inc"
 #include      "com08_c.inc"
-#include      "scr02_c.inc"
-#include      "scr03_c.inc"
 #include      "scr05_c.inc"
 #include      "scr07_c.inc"
 #include      "scr11_c.inc"
@@ -2446,10 +2437,8 @@ C-----------------------------------------------
 #include      "scr18_c.inc"
 #include      "units_c.inc"
 #include      "parit_c.inc"
-#include      "couple_c.inc"
 #include      "impl1_c.inc"
 #include      "sms_c.inc"
-#include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -2505,7 +2494,6 @@ C-----------------------------------------------
       DOUBLE PRECISION
      .   FX6(6,MVSIZ), FY6(6,MVSIZ), FZ6(6,MVSIZ)
 C-----------------------------------------------
-#include "sync_dir.inc"
       IF (IRESP == 1) THEN
         PREC = FIVEEM4
       ELSE
@@ -3354,7 +3342,7 @@ Chd|  I20ASS0                       source/interfaces/int20/i20for3.F
 Chd|-- called by -----------
 Chd|        I20FOR3E                      source/interfaces/int20/i20for3.F
 Chd|-- calls ---------------
-Chd|        TRI7BOX                       share/modules/tri7box.F
+Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
       SUBROUTINE I20ASS0(JLT  ,CS_LOC,N1   ,N2   ,M1   ,
      2                   M2   ,HS1   ,HS2  ,HM1  ,HM2  ,
@@ -3374,11 +3362,6 @@ C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "param_c.inc"
-#include      "scr05_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -3451,7 +3434,7 @@ Chd|  I20ASS05                      source/interfaces/int20/i20for3.F
 Chd|-- called by -----------
 Chd|        I20FOR3E                      source/interfaces/int20/i20for3.F
 Chd|-- calls ---------------
-Chd|        TRI7BOX                       share/modules/tri7box.F
+Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
       SUBROUTINE I20ASS05(JLT  ,CS_LOC,N1    ,N2   ,M1   ,
      2                    M2   ,HS1   ,HS2   ,HM1  ,HM2  ,
@@ -3472,11 +3455,6 @@ C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "param_c.inc"
-#include      "scr05_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -3558,9 +3536,9 @@ Chd|-- called by -----------
 Chd|        I20FOR3E                      source/interfaces/int20/i20for3.F
 Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
-Chd|        ARRET                         source/system/arret.F
+Chd|        ARRET                         source/system/arret.F         
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        TRI7BOX                       share/modules/tri7box.F
+Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
       SUBROUTINE I20ASS2(JLT   ,CS_LOC ,N1    ,N2    ,M1      ,
      2                   M2    ,HS1    ,HS2   ,HM1   ,HM2     ,
@@ -3585,10 +3563,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
-#include      "scr05_c.inc"
 #include      "parit_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -3700,9 +3675,9 @@ Chd|-- called by -----------
 Chd|        I20FOR3E                      source/interfaces/int20/i20for3.F
 Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
-Chd|        ARRET                         source/system/arret.F
+Chd|        ARRET                         source/system/arret.F         
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        TRI7BOX                       share/modules/tri7box.F
+Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
       SUBROUTINE I20ASS25(JLT   ,CS_LOC ,N1    ,N2      ,M1    ,
      2                    M2    ,HS1    ,HS2   ,HM1     ,HM2   ,
@@ -3728,10 +3703,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc"
-#include      "scr05_c.inc"
 #include      "parit_c.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

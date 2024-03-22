@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -40,7 +40,9 @@ Chd|        HM_READ_DRAPE                 source/properties/composite_options/dr
 Chd|        INITIA                        source/elements/initia/initia.F
 Chd|        LAYINI1                       source/elements/shell/coqueba/layini1.F
 Chd|        LECTUR                        source/starter/lectur.F       
+Chd|        PRE_STACKGROUP                source/stack/pres_stackgroup.F
 Chd|        SHELLTHK_UPD                  source/properties/composite_options/drape/shellthk_upd.F
+Chd|        STACKGROUP_DRAPE              source/stack/stackgroup_drape.F
 Chd|        ST_QAPRINT_COMPOSITE_OPTIONS  source/output/qaprint/st_qaprint_composite_options.F
 Chd|        ST_QAPRINT_DRIVER             source/output/qaprint/st_qaprint_driver.F
 Chd|        T3GRHEAD                      source/elements/solid_2d/tria/t3grhead.F
@@ -55,11 +57,36 @@ C   m y _ r e a l
 C-----------------------------------------------
 #include      "my_real.inc"
 c=======================================================================      
-c
+c      
+      TYPE DRAPE_PLY_
+        INTEGER                           ::  NSLICE   ! number of slice
+        INTEGER                           ::  IPID     ! ID PID
+c-------  layer variables     
+        my_real, DIMENSION(:,:) , ALLOCATABLE ::   RDRAPE
+        INTEGER, DIMENSION(:,:) , ALLOCATABLE ::   IDRAPE 
+c-------       
+      END TYPE DRAPE_PLY_      
+      !!
       TYPE DRAPE_
-        INTEGER                               :: NPT 
-        INTEGER , DIMENSION(:)  , ALLOCATABLE ::     IDRAPE
-        my_real,  DIMENSION(:,:), ALLOCATABLE ::     RDRAPE 
+        INTEGER                                        ::  NPLY_DRAPE
+        INTEGER                                        ::  NPLY
+        INTEGER,            DIMENSION(:)   , ALLOCATABLE   ::  INDX_PLY
+        TYPE (DRAPE_PLY_) , DIMENSION(:)   , ALLOCATABLE   ::  DRAPE_PLY
       END TYPE DRAPE_  
+      !!
+      TYPE DRAPEG_
+        INTEGER                              ::  NUMSH4
+        INTEGER                              ::  NUMSH3
+        INTEGER, DIMENSION(:) , ALLOCATABLE  ::  INDX
+      END TYPE DRAPEG_  
+      
+      TYPE DRAPE_WORK_
+        INTEGER                              ::  IDSTACK  ! idstack
+        INTEGER, DIMENSION(:)  , ALLOCATABLE ::  PLYID    ! Id ply
+        INTEGER, DIMENSION(:)  , ALLOCATABLE ::  NPT_PLY  ! Number of int point
+        INTEGER, DIMENSION(:)  , ALLOCATABLE ::  PLYNUM   ! Number of ply 
+      END TYPE DRAPE_WORK_
+      
+      INTEGER :: NUMELC_DRAPE    ,NUMELTG_DRAPE , SCDRAPE, STDRAPE
 C=======================================================================
       END MODULE DRAPE_MOD

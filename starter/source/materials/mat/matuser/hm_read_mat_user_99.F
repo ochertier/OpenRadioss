@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -29,10 +29,12 @@ Chd|        ANCMSG                        source/output/message/message.F
 Chd|        ARRET                         source/system/arret.F         
 Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
 Chd|        HM_GET_STRING_INDEX           source/devtools/hm_reader/hm_get_string_index.F
+Chd|        INIT_MAT_KEYWORD              source/materials/mat/init_mat_keyword.F
 Chd|        ST_GET_USERBUF_VAR            source/user_interface/dyn_userlib.c
 Chd|        ST_USERLIB_LECM99             source/user_interface/dyn_userlib.c
 Chd|        USER_OUTPUT                   source/user_interface/user_output.F
 Chd|        LAW_USER                      source/user_interface/law_user.F
+Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
@@ -42,7 +44,7 @@ Chd|====================================================================
      .                          NUVAR ,IFUNC,MAXFUNC,NFUNC,
      .                          PARMAT,USERBUF,
      .                          LSUBMODEL,
-     .                          PM )
+     .                          PM,MATPARAM)
 C-----------------------------------------------
 C   ROUTINE DESCRIPTION :
 C   ===================
@@ -65,6 +67,7 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE SUBMODEL_MOD
       USE LAW_USER
+      USE MATPARAM_DEF_MOD          
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -92,6 +95,7 @@ C-----------------------------------------------
       my_real, DIMENSION(NPROPM) ,INTENT(INOUT)   :: PM
       TYPE(ULAWBUF) :: USERBUF
       CHARACTER IUSER_KEY*ncharline
+      TYPE(MATPARAM_STRUCT_),INTENT(INOUT) :: MATPARAM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -157,6 +161,10 @@ C-----------------------------------------------
       ELSE
          ! Error MESSAGE_Mess
       ENDIF
+
+      ! Properties compatibility
+      CALL INIT_MAT_KEYWORD(MATPARAM,"SOLID_ALL")
+      CALL INIT_MAT_KEYWORD(MATPARAM,"SHELL_ALL")
 
       RETURN
  999  CALL ANCMSG(MSGID=55,

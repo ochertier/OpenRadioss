@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -29,7 +29,7 @@ Chd|        S10NXT4                       source/elements/solid/solide10/s10nxt4
 Chd|        S4VOLUME                      source/elements/solid/solide4/s4volume.F
 Chd|        S8ETEMPER                     source/elements/solid/solide8e/s8etemper.F
 Chd|        S8EVOLUME                     source/elements/solid/solide8e/s8evolume.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/elbufdef_mod.F
+Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|====================================================================
        SUBROUTINE ELOFF(IXS     ,IXQ     ,IXC      ,IXP     ,IXT      ,
@@ -56,13 +56,8 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
 #include      "units_c.inc"
-#include      "scr01_c.inc"
-#include      "scr03_c.inc"
-#include      "scr05_c.inc"
-#include      "scr17_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "task_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -163,7 +158,7 @@ C
              NPTS   = ELBUF_TAB(NG)%NPTS
              NPTT   = ELBUF_TAB(NG)%NPTT
              FACVOL=ONE
-             IF(ISOLNOD == 4 .AND. ITETRA4 == 1) FACVOL=FOUR			   
+             IF(ISOLNOD == 4 .AND. ITETRA4 == 1) FACVOL=FOUR         
 
              DO I=1,NELA
                 J=INDEX(I)+NFT
@@ -185,7 +180,7 @@ C
                 MCP_OFF(NC7(I)) = ONE
                 MCP_OFF(NC8(I)) = ONE
              ENDDO
-			 
+           
              IF(IFORM == 2) THEN
                RHOCP=PM(69,IXS(1,1+NFT))
                DO I=1,NELA
@@ -213,13 +208,13 @@ C---      TEMPERATURE AT ACTIVATION TIME
                  NC4(I)=IXS(6,J)
                ENDDO
                CALL S4VOLUME(X, VOLGN, NELA, NC1, NC2, NC3, NC4)
-			   
+             
                IF(ITETRA4 == 1) THEN
                  IF(JTHE < 0) CALL S10NXT4(NXT4,NELA)
                  DO IP=1,NPTR
                    DO I=1,NELA
                     VOLPN(I,IP) = FOURTH*VOLGN(I)
-				    IF(JTHE >= 0 ) CYCLE
+              IF(JTHE >= 0 ) CYCLE
                     TEMPN(I,IP) = NXT4(I,1,IP)*TEMP(NC1(I))+NXT4(I,2,IP)*TEMP(NC2(I))+
      .                            NXT4(I,3,IP)*TEMP(NC3(I))+NXT4(I,4,IP)*TEMP(NC4(I))
                    ENDDO
@@ -227,7 +222,7 @@ C---      TEMPERATURE AT ACTIVATION TIME
                ELSE
                  DO I=1,NELA
                   VOLPN(I,1) = VOLGN(I)
-				  IF(JTHE >= 0 ) CYCLE
+            IF(JTHE >= 0 ) CYCLE
                   TEMPN(I,1) = FOURTH*(TEMP(NC1(I))+TEMP(NC2(I))+TEMP(NC3(I))+TEMP(NC4(I)))
                  ENDDO
                ENDIF
@@ -420,7 +415,7 @@ C-----------------------
           WRITE(IOUT,'(A,I10,A,G13.5)')' BRICK DEACTIVATION:',IXS(11,II),' AT TIME:',TIME
           IF(ITHERM_FE > 0 .AND. IFORM == 2) THEN
             FACVOL=ONE
-            IF(ISOLNOD == 4 .AND. ITETRA4 == 1) FACVOL=FOUR			   
+            IF(ISOLNOD == 4 .AND. ITETRA4 == 1) FACVOL=FOUR         
             RHOCP=PM(69,IXS(1,II))
             MCPS=ONE_OVER_8*RHOCP*VOLG(I)*FACVOL
             DO K=2,9

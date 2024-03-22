@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,7 +25,7 @@ Chd|  SET_ELGROUP_PARAM             source/elements/shell/coque/set_elgroup_para
 Chd|-- called by -----------
 Chd|        LECTUR                        source/starter/lectur.F       
 Chd|-- calls ---------------
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/matparam_def_mod.F
+Chd|        GROUP_PARAM_MOD               ../common_source/modules/mat_elem/group_param_mod.F
 Chd|====================================================================
       SUBROUTINE SET_ELGROUP_PARAM(
      .           GROUP_PARAM_TAB,IPARG    ,NGROUP   ,N2D      ,
@@ -34,7 +34,7 @@ Chd|====================================================================
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
-      USE MATPARAM_DEF_MOD            
+      USE GROUP_PARAM_MOD            
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -55,7 +55,7 @@ C-----------------------------------------------
       my_real ,DIMENSION(NPROPM,NUMMAT)  :: PM
       my_real ,DIMENSION(NPROPG,NUMGEO)  :: GEO
       my_real ,DIMENSION(SBUFMAT)        :: BUFMAT
-      TYPE(GRP_PARAM_STRUCT_) ,DIMENSION(NGROUP) :: GROUP_PARAM_TAB
+      TYPE(GROUP_PARAM_) ,DIMENSION(NGROUP) :: GROUP_PARAM_TAB
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -89,7 +89,7 @@ c
               ELSE
                 DM = FOURTH
               END IF
-            ELSEIF (ILAW == 58) THEN
+            ELSEIF (ILAW == 58 .or. ILAW == 158) THEN
               IF (IHBE == 11) THEN
                 DM = ONE_FIFTH
               ELSE

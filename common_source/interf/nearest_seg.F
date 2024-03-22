@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -80,7 +80,7 @@ C
       B2 =(UW(1)*N(1)+UW(2)*N(2)+UW(3)*N(3))*FAC
       B1 =(WV(1)*N(1)+WV(2)*N(2)+WV(3)*N(3))*FAC
       B0 = ONE - B1 - B2
-      BMIN=MIN(B0,B1,B2)	  
+      BMIN=MIN(B0,B1,B2)    
 C BMIN > 0 Projection est a l'interieur du triangle
 C BMIN = 0 Projection est sur un cote du triangle
 C BMIN < 0 Projection est a l'exterieur du triangle

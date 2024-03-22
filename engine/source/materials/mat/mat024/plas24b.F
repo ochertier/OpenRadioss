@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -40,9 +40,7 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "com08_c.inc"
 #include      "comlock.inc"
-#include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -576,10 +574,10 @@ c           PURE TRIAXIAL TO SOLVE UNDETERMINATION
             RO = MIN( ROB(I),ROB(I) + HPV*DEPSVP )
             DP = RO - ROB(I)
             SIG(I,1) = SIG(I,1) + DP + TWO*G*D1
-	           SIG(I,2) = SIG(I,2) + DP + TWO*G*D2
+                     SIG(I,2) = SIG(I,2) + DP + TWO*G*D2
             SIG(I,3) = SIG(I,3) + DP + TWO*G*D3
- 	          SIG(I,4) = SIG(I,4) + G*DEPS4(I)
-	           SIG(I,5) = SIG(I,5) + G*DEPS5(I)
+                    SIG(I,4) = SIG(I,4) + G*DEPS4(I)
+                     SIG(I,5) = SIG(I,5) + G*DEPS5(I)
             SIG(I,6) = SIG(I,6) + G*DEPS6(I)
             ROB(I) = RO
             VK0(I) = ONE  

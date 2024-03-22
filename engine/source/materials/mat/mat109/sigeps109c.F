@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -38,7 +38,7 @@ Chd|====================================================================
      5     DEPSXX  ,DEPSYY  ,DEPSXY  ,DEPSYZ  ,DEPSZX  ,
      6     SIGOXX  ,SIGOYY  ,SIGOXY  ,SIGOYZ  ,SIGOZX  ,
      7     SIGNXX  ,SIGNYY  ,SIGNXY  ,SIGNYZ  ,SIGNZX  ,
-     8     THK     ,THKLY   ,INLOC   ,DPLANL  )
+     8     THK     ,THKLY   ,INLOC   ,DPLANL  ,EPSPL   )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -51,10 +51,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "param_c.inc" 
-#include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "scr17_c.inc"
 C-----------------------------------------------
 C   D u m m y A r g u m e n t s
 C-----------------------------------------------
@@ -69,7 +66,7 @@ c
      .   SIGOXX,SIGOYY,SIGOXY,SIGOYZ,SIGOZX,DPLANL
       my_real ,DIMENSION(NEL)    ,INTENT(OUT) :: SOUNDSP,SIGY,ET,
      .   SIGNXX,SIGNYY,SIGNXY,SIGNYZ,SIGNZX
-      my_real ,DIMENSION(NEL) ,INTENT(INOUT) :: PLA,DPLA,EPSP,TEMP,THK
+      my_real ,DIMENSION(NEL) ,INTENT(INOUT) :: PLA,DPLA,EPSP,TEMP,THK,EPSPL
       my_real ,DIMENSION(NEL,NUVAR)   ,INTENT(INOUT) :: UVAR
       INTEGER ,DIMENSION(NEL,NVARTMP) ,INTENT(INOUT) :: VARTMP
 c
@@ -182,7 +179,7 @@ c---  self heating factor and temperatiure initialization
               IPOS_ETA(1:NEL,3) = VARTMP(1:NEL,5)
             END IF
 
-            CALL TABLE_VINTERP(TABLE(FUNC_ETA),NEL,IPOS_ETA,XVEC_ETA,FACT_ETA,DXDYV)          
+            CALL TABLE_VINTERP(TABLE(FUNC_ETA),NEL,NEL,IPOS_ETA,XVEC_ETA,FACT_ETA,DXDYV)          
       
             IF (NDIM_ETA > 1) VARTMP(1:NEL,4) = IPOS_ETA(1:NEL,2)
             IF (NDIM_ETA > 2) VARTMP(1:NEL,5) = IPOS_ETA(1:NEL,3)
@@ -221,7 +218,7 @@ c----------------------------------------------------
       IPOS(1:NEL,1) = VARTMP(1:NEL,1)
       IPOS(1:NEL,2) = 1
 c
-      CALL TABLE2D_VINTERP_LOG(TABLE(FUNC_YLD),ISMOOTH,NEL,IPOS,XVEC  ,YLD  ,HARDP,HARDR)               
+      CALL TABLE2D_VINTERP_LOG(TABLE(FUNC_YLD),ISMOOTH,NEL,NEL,IPOS,XVEC  ,YLD  ,HARDP,HARDR)               
 c
       YLD(1:NEL)   = YLD(1:NEL)   * YSCALE
       HARDP(1:NEL) = HARDP(1:NEL) * YSCALE
@@ -234,12 +231,12 @@ c        XVEC(1:NEL,1) = PLA(1:NEL)
         XVEC(1:NEL,2) = TREF
         IPOS(1:NEL,1) = VARTMP(1:NEL,2)
         IPOS(1:NEL,2) = VARTMP(1:NEL,3)
-        CALL TABLE_VINTERP(TABLE(FUNC_TEMP),NEL,IPOS,XVEC,YLD_TREF,DYDX)  
+        CALL TABLE_VINTERP(TABLE(FUNC_TEMP),NEL,NEL,IPOS,XVEC,YLD_TREF,DYDX)  
         VARTMP(1:NEL,2) = IPOS(1:NEL,1)     
         VARTMP(1:NEL,3) = IPOS(1:NEL,2)     
 c     
         XVEC(1:NEL,2) = TEMP(1:NEL)
-        CALL TABLE_VINTERP(TABLE(FUNC_TEMP),NEL,IPOS,XVEC,YLD_TEMP,DYDX)          
+        CALL TABLE_VINTERP(TABLE(FUNC_TEMP),NEL,NEL,IPOS,XVEC,YLD_TEMP,DYDX)          
 c     
         TFAC(1:NEL)  = YLD_TEMP(1:NEL) / YLD_TREF(1:NEL)      
         YLD(1:NEL)   = YLD(1:NEL)   * TFAC(1:NEL)      
@@ -302,7 +299,7 @@ c
             IPOS(II,2) = 1
           ENDDO
 c
-          CALL TABLE2D_VINTERP_LOG(TABLE(FUNC_YLD),ISMOOTH,NINDX,IPOS,XVEC,YLD_I,HARDP_I,HARDR_I)
+          CALL TABLE2D_VINTERP_LOG(TABLE(FUNC_YLD),ISMOOTH,NEL,NINDX,IPOS,XVEC,YLD_I,HARDP_I,HARDR_I)
 c
           DO II = 1, NINDX 
             I = INDEX(II)
@@ -362,6 +359,7 @@ c
       SOUNDSP(1:NEL)= SQRT(A11 / RHO(1:NEL))
       SIGY(1:NEL)   = YLD(1:NEL)
       EPSP(1:NEL)   = ALPHA*DPLA(1:NEL)*DTINV + ALPHI*EPSP(1:NEL)
+      EPSPL(1:NEL)  = EPSP(1:NEL)
       IF (INLOC > 0) THEN 
         DO I = 1,NEL     
           DEPSZZ(I) = MAX(DPLANL(I),ZERO)*HALF*(SIGNXX(I)+SIGNYY(I))/MAX(YLD(I),EM20)

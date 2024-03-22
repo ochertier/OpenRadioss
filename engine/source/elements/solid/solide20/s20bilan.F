@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -43,7 +43,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "com01_c.inc"
 #include      "param_c.inc"
 #include      "vect01_c.inc"
 C-----------------------------------------------
@@ -91,7 +90,7 @@ C-----------------------------------------------
         VXA(I)=V1
         VYA(I)=V2
         VZA(I)=V3
-        VA2(I)=(V1**2+V2**2+V3**2)	  
+        VA2(I)=(V1**2+V2**2+V3**2)    
       ENDDO
 C
       DO N=2,8
@@ -102,7 +101,7 @@ C
           VXA(I)=VXA(I)+V1
           VYA(I)=VYA(I)+V2
           VZA(I)=VZA(I)+V3
-          VA2(I)=VA2(I)+(V1**2+V2**2+V3**2)	  
+          VA2(I)=VA2(I)+(V1**2+V2**2+V3**2)    
         ENDDO
       ENDDO
 C
@@ -290,6 +289,14 @@ C-----------------------------------------------
 C-----------------------------------------------
 C
       OFF_L(LFT:LLT) = ONE
+C
+      DO I = LFT,LLT
+        M=IPARTS(I)
+        IF (OFFG(I) < ONE) THEN 
+          PARTSAV(25,M) = PARTSAV(25,M) + ONE
+        ENDIF
+      ENDDO
+C
       CALL SENSOR_ENERGY_BILAN(LFT,LLT,EI,EK,OFF_L,IPARTS,ITASK) 
 C
       RETURN

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,7 +26,7 @@ Chd|  W_SECTIO                      source/restart/ddsplit/w_sectio.F
 Chd|-- called by -----------
 Chd|        DDSPLIT                       source/restart/ddsplit/ddsplit.F
 Chd|-- calls ---------------
-Chd|        WRITE_I_C                     source/output/tools/write_routines.c
+Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|        NLOCAL                        source/spmd/node/ddtools.F    
 Chd|====================================================================
       SUBROUTINE W_SECTIO(NSTRF  ,CEP   ,CEL,PROC,
@@ -39,12 +39,10 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
-#include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -203,7 +201,7 @@ C poutre
         IP_L = IP_L + 2*NSELP_S_L
         IP = IP + 2*NSELP_S
         OFF = OFF + NUMELP
-Cel ressort
+C   ressort
         DO J = 1, NSELR_S
           K = NSTRF(IP + J*2 - 1)
           IF(CEP(K+OFF)==PROC) THEN
@@ -216,7 +214,7 @@ Cel ressort
         IP_L = IP_L + 2*NSELR_S_L
         IP = IP + 2*NSELR_S
         OFF = OFF + NUMELR
-Cel triangle
+C   triangle
         DO J = 1, NSELTG_S
           K = NSTRF(IP + J*2 - 1)
           IF(CEP(K+OFF)==PROC) THEN

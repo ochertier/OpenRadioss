@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,7 +25,7 @@ Chd|  GRADIENT_LIMITATION2          source/ale/alemuscl/gradient_limitation2.F
 Chd|-- called by -----------
 Chd|        ALE51_GRADIENT_RECONSTRUCTION2source/ale/alemuscl/ale51_gradient_reconstruction2.F
 Chd|-- calls ---------------
-Chd|        ALEMUSCL_MOD                  ../common_source/modules/alemuscl_mod.F
+Chd|        ALEMUSCL_MOD                  ../common_source/modules/ale/alemuscl_mod.F
 Chd|====================================================================
       SUBROUTINE GRADIENT_LIMITATION2(IXQ, X, TRIMAT)
 C-----------------------------------------------
@@ -35,7 +35,6 @@ C        extrapolated values on the nodes of the element lie between
 C        local minimum and maximum values from the neighboring elements
 C        -> maximum principle purpose
 C-----------------------------------------------
-C-----------------------------------------------
 C   M o d u l e s 
 C-----------------------------------------------
       USE ALEMUSCL_MOD
@@ -44,17 +43,10 @@ C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include "implicit_f.inc"
 C-----------------------------------------------
-C   G l o b a l  P a r a m e t e r s
-C-----------------------------------------------
-#include "mvsiz_p.inc"
-#include "mmale51_c.inc"
-C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include "param_c.inc"
 #include "vect01_c.inc"
 #include "com04_c.inc"
-#include "alemuscl.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -77,12 +69,12 @@ C-----------------------------------------------
       DO I = LFT, LLT
          II = I + NFT
          !!! Element centroid
-         YK = ELCENTER(II,2) ; ZK = ELCENTER(II,3)
+         YK = ALEMUSCL_Buffer%ELCENTER(II,2) ; ZK = ALEMUSCL_Buffer%ELCENTER(II,3)
          reduc_factor = EP30
          NNUM = 0
          DO ITRIMAT = 1, TRIMAT
-            IF(ABS(GRAD(II,2,ITRIMAT)) + 
-     .           ABS(GRAD(II,3,ITRIMAT)) > ZERO) THEN
+            IF(ABS(ALEMUSCL_Buffer%GRAD(II,2,ITRIMAT)) + 
+     .         ABS(ALEMUSCL_Buffer%GRAD(II,3,ITRIMAT)) > ZERO) THEN
                NNUM = NNUM + 1
                !!! Check the nodes of the element
                DO JJ = 1, 4
@@ -90,18 +82,18 @@ C-----------------------------------------------
                   !!! Get the node coordinates
                   YN = X(2, NODE_ID) ; ZN = X(3, NODE_ID) 
                   !!! Interpolate the function at the node
-                  VALNODE = VOLUME_FRACTION(II,ITRIMAT) 
-     .                 + GRAD(II,2,ITRIMAT) * (YN - YK)
-     .                 + GRAD(II,3,ITRIMAT) * (ZN - ZK)
+                  VALNODE = ALEMUSCL_Buffer%VOLUME_FRACTION(II,ITRIMAT) 
+     .                 + ALEMUSCL_Buffer%GRAD(II,2,ITRIMAT) * (YN - YK)
+     .                 + ALEMUSCL_Buffer%GRAD(II,3,ITRIMAT) * (ZN - ZK)
                   nodal_reduc_factor = ONE
-                  IF (VALNODE - VOLUME_FRACTION(II,ITRIMAT) > ZERO) THEN
+                  IF (VALNODE - ALEMUSCL_Buffer%VOLUME_FRACTION(II,ITRIMAT) > ZERO) THEN
                      nodal_reduc_factor = 
-     .                    MIN((NODE_MAX_VALUE(NODE_ID,ITRIMAT) - VOLUME_FRACTION(II,ITRIMAT))
-     .                    / (VALNODE - VOLUME_FRACTION(II,ITRIMAT)), I_BETA)
-                  ELSE IF (VALNODE - VOLUME_FRACTION(II,ITRIMAT) < ZERO) THEN
+     .                    MIN((ALEMUSCL_Buffer%NODE_MAX_VALUE(NODE_ID,ITRIMAT) - ALEMUSCL_Buffer%VOLUME_FRACTION(II,ITRIMAT))
+     .                    / (VALNODE - ALEMUSCL_Buffer%VOLUME_FRACTION(II,ITRIMAT)), ALEMUSCL_Param%BETA)
+                  ELSE IF (VALNODE - ALEMUSCL_Buffer%VOLUME_FRACTION(II,ITRIMAT) < ZERO) THEN
                      nodal_reduc_factor = 
-     .                    MIN((NODE_MIN_VALUE(NODE_ID,ITRIMAT) - VOLUME_FRACTION(II,ITRIMAT)) 
-     .                    / (VALNODE - VOLUME_FRACTION(II,ITRIMAT)), I_BETA)
+     .                    MIN((ALEMUSCL_Buffer%NODE_MIN_VALUE(NODE_ID,ITRIMAT) - ALEMUSCL_Buffer%VOLUME_FRACTION(II,ITRIMAT)) 
+     .                    / (VALNODE - ALEMUSCL_Buffer%VOLUME_FRACTION(II,ITRIMAT)), ALEMUSCL_Param%BETA)
                   ENDIF
                   reduc_factor(ITRIMAT) = MIN(reduc_factor(ITRIMAT), nodal_reduc_factor)
                ENDDO  ! JJ = 1, 8
@@ -111,11 +103,10 @@ C-----------------------------------------------
          ENDDO  ! ITRIMAT = 1, TRIMAT
         
          DO ITRIMAT = 1, TRIMAT
-            IF(ABS(GRAD(II,2,ITRIMAT)) + 
-     .           ABS(GRAD(II,3,ITRIMAT)) > ZERO) THEN
+            IF(ABS(ALEMUSCL_Buffer%GRAD(II,2,ITRIMAT)) + ABS(ALEMUSCL_Buffer%GRAD(II,3,ITRIMAT)) > ZERO) THEN
             !!!   Limitation of the gradient
-               GRAD(II,2,ITRIMAT) = reduc_factor(ITRIMAT) * GRAD(II,2,ITRIMAT)
-               GRAD(II,3,ITRIMAT) = reduc_factor(ITRIMAT) * GRAD(II,3,ITRIMAT)
+               ALEMUSCL_Buffer%GRAD(II,2,ITRIMAT) = reduc_factor(ITRIMAT) * ALEMUSCL_Buffer%GRAD(II,2,ITRIMAT)
+               ALEMUSCL_Buffer%GRAD(II,3,ITRIMAT) = reduc_factor(ITRIMAT) * ALEMUSCL_Buffer%GRAD(II,3,ITRIMAT)
             ENDIF
          ENDDO
       ENDDO  ! I = LFT, LLT

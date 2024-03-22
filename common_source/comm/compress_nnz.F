@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2023 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -24,8 +24,7 @@ Chd|====================================================================
 Chd|  COMPRESS_C_NNZ                comm/compress_nnz.F           
 Chd|-- called by -----------
 Chd|-- calls ---------------
-Chd|        WRITE_I_C                     starter/source/output/tools/write_routines.c
-Chd|        WRITE_I_C                     engine/source/output/tools/sortie_c.c
+Chd|        WRITE_I_C                     tools/input_output/write_routtines.c
 Chd|====================================================================
        SUBROUTINE COMPRESS_C_NNZ(ARRAY,LEN)
        IMPLICIT NONE
@@ -85,8 +84,7 @@ Chd|-- called by -----------
 Chd|        DDSPLIT                       starter/source/restart/ddsplit/ddsplit.F
 Chd|        WRRESTP                       engine/source/output/restart/wrrestp.F
 Chd|-- calls ---------------
-Chd|        WRITE_I_C                     starter/source/output/tools/write_routines.c
-Chd|        WRITE_I_C                     engine/source/output/tools/sortie_c.c
+Chd|        WRITE_I_C                     tools/input_output/write_routtines.c
 Chd|====================================================================
        SUBROUTINE COMPRESS_I_NNZ(ARRAY,LEN)
        IMPLICIT NONE
@@ -147,8 +145,7 @@ Chd|        WRRESTP                       engine/source/output/restart/wrrestp.F
 Chd|-- calls ---------------
 Chd|        WRITE_DB                      starter/source/restart/ddsplit/wrrest.F
 Chd|        WRITE_DB                      engine/source/output/tools/write_db.F
-Chd|        WRITE_I_C                     starter/source/output/tools/write_routines.c
-Chd|        WRITE_I_C                     engine/source/output/tools/sortie_c.c
+Chd|        WRITE_I_C                     tools/input_output/write_routtines.c
 Chd|====================================================================
        SUBROUTINE COMPRESS_R_NNZ(ARRAY,LEN)
 #include      "implicit_f.inc"
