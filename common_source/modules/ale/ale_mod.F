@@ -78,6 +78,7 @@ Chd|        AMOMTN3                       engine/source/elements/solid/solide/am
 Chd|        ASSPAR2                       engine/source/assembly/asspar2.F
 Chd|        ASSPAR4                       engine/source/assembly/asspar4.F
 Chd|        DTNODA                        engine/source/time_step/dtnoda.F
+Chd|        EBCS10                        engine/source/boundary_conditions/ebcs/ebcs10.F
 Chd|        EBCS_VOL2SEG                  engine/source/boundary_conditions/ebcs/ebcs_vol2seg.F
 Chd|        EMOMT2                        engine/source/ale/euler2d/emomt2.F
 Chd|        EMOMT3B                       engine/source/elements/solid/solide/emomt3b.F
@@ -121,8 +122,6 @@ Chd|        SFINT3                        engine/source/elements/solid/solide/sf
 Chd|        SFORC3                        engine/source/elements/solid/solide/sforc3.F
 Chd|        SHVIS3                        engine/source/elements/solid/solide/shvis3.F
 Chd|        SIGEPS46                      engine/source/materials/mat/mat046/sigeps46.F
-Chd|        SPMD_EXCH_MASSFLOW_DATA       engine/source/ale/grid/spmd_exch_massflow_data.F
-Chd|        SPMD_EXCH_MASSFLOW_DATA2      engine/source/ale/grid/spmd_exch_massflow_data2.F
 Chd|        SPMD_SD_XV                    engine/source/mpi/nodes/spmd_sd_xv.F
 Chd|        SPMD_SEGCOM                   engine/source/mpi/fluid/spmd_cfd.F
 Chd|        SRHO3                         engine/source/elements/solid/solide/srho3.F
@@ -147,9 +146,19 @@ Chd|====================================================================
           my_real :: EP(9) ! L=GRAD V
           my_real :: LD(6) ! D = 1/2*( L + t(L) ) !strain rate
           my_real :: LW(3) ! W = 1/2*( L - t(L) ) !rotation
+          my_real :: ITM_L(6) ! inertia tensor matrix (Ixx,Iyy,Izz,-Ixy,-Iyz,-Ixz)
+          my_real :: X_min_max(6) ! Xmin,Ymin,Zmin,Xmax,Ymax,Zmax
+          my_real :: X_min_max_GRID(6)
+          my_real :: BETA0(6)
           my_real :: COG_L(3) ! mass * X accumulation
           my_real :: MOM_L(3) ! mass * VEL accumulation
           my_real :: SUM_M    ! mass accumulation
+          my_real :: SUM_VOL   ! volume accumulation
+          my_real :: MS_ELEM_MEAN_0
+          my_real :: EIGENVEC(3,3)
+          my_real :: LD_NORM
+          INTEGER :: NUM_ELEM_ALE
+          INTEGER :: NUM_NODE_ALE_L
         END TYPE
 
         ! GRID FORMULATION PARAMETERS

@@ -28,6 +28,7 @@ Chd|-- calls ---------------
 Chd|        COMPRESS_I_NNZ                ../common_source/comm/compress_nnz.F
 Chd|        COMPRESS_R_NNZ                ../common_source/comm/compress_nnz.F
 Chd|        CUR_FIL_C                     ../common_source/tools/input_output/write_routtines.c
+Chd|        EIGWREST                      source/output/restart/wrrest.F
 Chd|        FXBWREST                      source/output/restart/wrrest.F
 Chd|        INTFRIC_WRESTI                share/modules/intbuf_fric_mod.F
 Chd|        INTFRIC_WRESTR                share/modules/intbuf_fric_mod.F
@@ -104,7 +105,8 @@ Chd|====================================================================
      .           H3D_DATA      ,INTBUF_FRIC_TAB,SUBSET,
      .           PINCH_DATA    ,ALE_CONNECTIVITY, T_MONVOL,
      .           SENSORS       ,EBCS_TAB  ,DYNAIN_DATA,USER_WINDOWS,OUTPUT,
-     .           INTERFACES    ,LOADS     ,PYTHON, NAMES_AND_TITLES)
+     .           INTERFACES    ,LOADS     ,PYTHON, NAMES_AND_TITLES,
+     .           EIGIPM        ,EIGIBUF   ,EIGRPM, NEIPM, LEIBUF, NERPM)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -150,9 +152,11 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(INOUT) :: NEIPM, LEIBUF, NERPM
+      INTEGER, INTENT(INOUT) :: EIGIPM(NEIPM,NEIG),EIGIBUF(LEIBUF)
+      my_real, INTENT(INOUT) :: EIGRPM(NERPM,NEIG)
       INTEGER IAF(*),ICH,ADDCNE(*)
-      my_real
-     .   AF(*)
+      my_real  AF(*)
       DOUBLE PRECISION XDP(*)
       TYPE(ELBUF_STRUCT_), TARGET, DIMENSION(NGROUP)      :: ELBUF_TAB
       TYPE(ELBUF_STRUCT_), TARGET, DIMENSION(NGROUP,NXEL) :: XFEM_TAB
@@ -1319,15 +1323,24 @@ C--------------------------------------
 #endif
 C--------------------------------------
 C ALE LINKS
-!      print *,"wrrestp.F: WRITE_I_C, SLINALE=", SLINALE
+C--------------------------------------
       IF(SLINALE > 0)THEN
         CALL WRITE_I_C(LINALE,SLINALE)
       END IF
-C
+C--------------------------------------
+C ALE GRID
+C--------------------------------------
+      CALL WRITE_ALE_GRID()
 C--------------------------------------
 C FXBODY (moved from resol.F)
 C--------------------------------------
       IF (NFXBODY>0) CALL FXBWREST(ICH)
+C--------------------------------------
+C EIGEN MODES
+C--------------------------------------
+      IF (NEIG>0) THEN
+         CALL EIGWREST(EIGIPM, EIGIBUF, EIGRPM)
+      ENDIF
 C--------------------------------------
 C SEATBELTS - SLIPRING / RETRACTOR
 C--------------------------------------

@@ -311,7 +311,6 @@ Chd|        LGMINI_I7                     source/tools/lagmul/lgmini_i7.F
 Chd|        LGMINI_RWL                    source/tools/lagmul/lgmini_rwl.F
 Chd|        LINE_DECOMP                   source/model/group/line_decomp.F
 Chd|        M20DCOD                       source/system/fsdcod.F        
-Chd|        MATPARAM_R2R_VOID             source/elements/elbuf_init/matparam_r2r_void.F
 Chd|        MERGE                         source/model/submodel/merge.F 
 Chd|        MERGE_NODE                    source/elements/nodes/merge_node.F
 Chd|        MONVOL_ALLOCATE               share/modules1/monvol_struct_mod.F
@@ -352,6 +351,7 @@ Chd|        R2R_CHECK                     source/coupling/rad2rad/r2r_check.F
 Chd|        R2R_CLEAN_INTER               source/coupling/rad2rad/r2r_clean_inter.F
 Chd|        R2R_DOMDEC                    source/coupling/rad2rad/r2r_domdec.F
 Chd|        R2R_GROUP                     source/coupling/rad2rad/r2r_group.F
+Chd|        R2R_MATPARAM_COPY             source/elements/elbuf_init/r2r_matparam_copy.F
 Chd|        R2R_NOM_OPT                   source/coupling/rad2rad/routines_r2r.F
 Chd|        R2R_SPEEDUP                   source/coupling/rad2rad/r2r_speedup.F
 Chd|        R2R_SPLIT                     source/coupling/rad2rad/r2r_split.F
@@ -2373,7 +2373,7 @@ c       complete mlaw_tag for new void materials
          ALLOCATE(MPARAM_R2R(NUMMAT))
          CALL INIT_MLAW_TAG(MTAG_R2R   ,NUMMAT)
          MTAG_R2R(1:NUMMAT0) = MTAG_INI(1:NUMMAT0)
-         CALL MATPARAM_R2R_VOID(MPARAM_R2R, MPARAM_INI   ,NUMMAT0 ,NUMMAT)
+         CALL R2R_MATPARAM_COPY(MPARAM_R2R, MPARAM_INI   ,NUMMAT0 ,NUMMAT)
          MLAW_TAG(1:NUMMAT)     => MTAG_R2R(1:NUMMAT)
          MAT_ELEM%MAT_PARAM(1:NUMMAT) => MPARAM_R2R(1:NUMMAT)
          MAT_ELEM%NUMMAT = NUMMAT
@@ -5809,7 +5809,7 @@ C---------------------------
       NUMSPHK8     =    NUMSPH
 ! working int8 to avoid integer overflow for large models
       EMAX = MAX(23*NUMELCK8,24*NUMELTGK8+1,29*NUMELSK8+1,19*NUMELRK8,
-     .           18*NUMELPK8+1,16*NUMELTK8,19*NUMELQK8,
+     .           18*NUMELPK8+1,17*NUMELTK8,19*NUMELQK8,
      .           15*NUMELXK8+1,24*NUMELIG3DK8+1,NUMSPHK8) + 1
 
       ALLOCATE(IPARGTMP(NPARG,NUMEL)    ,STAT=stat)
@@ -6039,8 +6039,8 @@ C------
        K2 = 8*NUMELT
        K3 = 9*NUMELT+1
        K4 = 11*NUMELT+1
-       K5 = 15*NUMELT+1
-       K6 = 16*NUMELT+1
+       K5 = 16*NUMELT+1
+       K6 = 17*NUMELT+1
        !warning: please also update any index change
        !         for MODIF option (MODIF_SPMD.F)
        IWORK  = 0
