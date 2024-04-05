@@ -77,6 +77,7 @@ Chd|        FAIL_WILKINS_C                source/materials/fail/wilkins/fail_wil
 Chd|        FAIL_WIND_FRWAVE              source/materials/fail/alter/fail_wind_frwave.F
 Chd|        FAIL_WIND_XFEM                source/materials/fail/alter/fail_wind_xfem.F
 Chd|        M25DELAM                      source/materials/mat/mat025/m25delam.F
+Chd|        PRONY_MODELC                  source/materials/mat/mat066/prony_modelc.F
 Chd|        PUTSIGNORC3                   source/elements/shell/coqueba/cmatc3.F
 Chd|        ROTOV                         source/airbag/roto.F          
 Chd|        SIGEPS01C                     source/materials/mat/mat001/sigeps01c.F
@@ -289,11 +290,13 @@ c----
 !
       CHARACTER OPTION*256
       INTEGER SIZE
-      INTEGER :: NRATE
-      my_real :: FISOKIN
+      INTEGER :: NRATE,NPRONY
+      my_real :: FISOKIN,KV
       my_real, DIMENSION(NEL) :: DEPS1,DEPS2,EPS1,EPS2
       my_real, DIMENSION(NEL), TARGET :: VECNUL
       my_real, DIMENSION(:), POINTER  :: SIGBXX,SIGBYY,SIGBXY
+      my_real
+     .       , DIMENSION(:), ALLOCATABLE :: GV,BETA
 c
 C-----------------------------------------------
 C   S o u r c e   L i n e s
@@ -527,7 +530,7 @@ c
         IF(ILAW==1.OR.ILAW== 2.OR.ILAW==25.OR.ILAW==32.OR.ILAW==63.OR.ILAW==64.OR.ILAW==65.OR.
      .       ILAW==66.OR.ILAW==72.OR.ILAW==76.OR.ILAW==78.OR.ILAW==85.OR.ILAW==93) FLAG_EPS=.FALSE.
 
-
+        IF(MATPARAM%IVISC == 1 ) FLAG_EPSP=.TRUE.
         IF (IFAILURE == 1) THEN   
           DO IT=1,NPTT                                                         
             FBUF => BUFLY%FAIL(IR,IS,IT)                   
@@ -1753,6 +1756,27 @@ c
      A        SENSORS%SENSOR_TAB)  
 c
           ENDIF !ILAW
+C
+C  visco elastic model (prony)
+C        
+         IF(MATPARAM%IVISC == 1 .AND. ILAW /= 25) THEN 
+              NPRONY = MATPARAM%VISC%IPARAM(1)
+              KV     = MATPARAM%VISC%UPARAM(1)
+c                 
+             ALLOCATE(GV(NPRONY),BETA(NPRONY)) 
+             DO I=1,NPRONY
+               GV(I)   = MATPARAM%VISC%UPARAM(1 + I)         
+               BETA(I) = MATPARAM%VISC%UPARAM(1 + NPRONY + I)
+             ENDDO
+C
+             CALL PRONY_MODELC( 
+     1          NEL    ,NUVARV  ,TT    ,DT1C , 
+     2          NPRONY , KV   , GV   ,BETA    ,RHO   ,   
+     3          EPSPXX ,EPSPYY ,EPSPXY  ,EPSPYZ  ,EPSPZX ,
+     4          SIGVXX ,SIGVYY ,SIGVXY  ,SIGVYZ  ,SIGVZX ,
+     5          SSP,UVARV   ,OFF)
+             DEALLOCATE(GV,BETA)
+          ENDIF
 c-------------------------------------------
           DO I=JFT,JLT
             VISCMX(I) = MAX(DM,VISCMX(I))

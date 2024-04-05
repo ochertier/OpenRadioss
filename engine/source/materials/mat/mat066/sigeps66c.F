@@ -25,7 +25,6 @@ Chd|  SIGEPS66C                     source/materials/mat/mat066/sigeps66c.F
 Chd|-- called by -----------
 Chd|        MULAWC                        source/materials/mat_share/mulawc.F
 Chd|-- calls ---------------
-Chd|        PRONY_MODELC                  source/materials/mat/mat066/prony_modelc.F
 Chd|        VINTER                        source/tools/curve/vinter.F   
 Chd|        FINTER                        source/tools/curve/finter.F   
 Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
@@ -784,25 +783,8 @@ C
         ENDDO
        ENDIF       
 C
-C  visco elastic model (prony)
+C  visco elastic model (prony) moved to mulawc
 C             
-       IF (MAT_PARAM%IVISC == 1) THEN   
-         NPRONY = MAT_PARAM%VISC%IPARAM(1)
-         KV     = MAT_PARAM%VISC%UPARAM(1)
-c              
-        DO I=1,NPRONY
-          GV(I)   = MAT_PARAM%VISC%UPARAM(1 + I)         
-          BETA(I) = MAT_PARAM%VISC%UPARAM(1 + NPRONY + I)
-        ENDDO 
-C
-        CALL PRONY_MODELC( 
-     1     NEL    ,NUPARAM,NUVARV  ,TIME    ,TIMESTEP , 
-     2     NPRONY , KV   , GV   ,BETA    ,RHO0   ,   
-     3     EPSPXX ,EPSPYY ,EPSPXY  ,EPSPYZ  ,EPSPZX ,
-     4     SIGVXX ,SIGVYY ,SIGVXY  ,SIGVYZ  ,SIGVZX ,
-     5     VISCMAX,SOUNDSP,UVARV   ,OFF)        
-        ENDIF
-C
 C--------------------------------
 C     NON-LOCAL THICKNESS VARIATION
 C--------------------------------

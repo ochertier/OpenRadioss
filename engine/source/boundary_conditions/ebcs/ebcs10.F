@@ -25,6 +25,7 @@ Chd|  EBCS10                        source/boundary_conditions/ebcs/ebcs10.F
 Chd|-- called by -----------
 Chd|        EBCS_MAIN                     source/boundary_conditions/ebcs/ebcs_main.F
 Chd|-- calls ---------------
+Chd|        ALE_MOD                       ../common_source/modules/ale/ale_mod.F
 Chd|        EBCS_MOD                      ../common_source/modules/boundary_conditions/ebcs_mod.F
 Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
@@ -40,6 +41,7 @@ Chd|====================================================================
       USE ELBUFDEF_MOD
       USE MULTI_FVM_MOD
       USE SEGVAR_MOD
+      USE ALE_MOD , only : ALE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -194,7 +196,12 @@ C-----------------------------------------------
           ENDDO
           Vold = EBCS%vold(IS)
           Vnew = FAC1 * (TMP(1)*XN + TMP(2)*YN + TMP(3)*ZN)
-          IF(TIME == ZERO) Vold=Vnew
+          IF(TIME == ZERO) THEN
+            IF(ALE%GRID%NWALE == 7)THEN
+              Vold = ZERO ! 0.0 with /ALE/GRID/MASSFLOW
+            ENDIF
+            Vold = Vnew
+          ENDIF
           !-- storage for next cycle
           EBCS%vold(IS) = Vnew  
           !Static-PRessure (increment)
@@ -216,7 +223,7 @@ C-----------------------------------------------
                bFOUND = .TRUE.                              
                EXIT                                         
              ENDIF                                          
-          ENDDO                                             
+          ENDDO
           IF(.NOT.bFOUND)CYCLE !next I                 
           GBUF    => ELBUF_TAB(NGRP)%GBUF        
           LBUF    => ELBUF_TAB(NGRP)%BUFLY(1)%LBUF(1,1,1)   
@@ -288,9 +295,11 @@ C-----------------------------------------------
             ELSE
               RHOC2 = RHO*SSP*SSP 
               ROC   =SQRT(RHO*RHOC2)
+C              PP    = Pold + (ROC*(Vnew-Vold)) !+ALPHA*(Pvois+DP0)/(ALPHA + ONE)
               PP    = ONE/(ONE+ALPHA)*(Pold+ROC*(Vnew-Vold))+ALPHA*(Pvois+DP0)/(ALPHA + ONE)
+
             ENDIF
-            EBCS%pold(IS) = PP   
+            EBCS%pold(IS) = PP
             
             IF(SEGVAR%nbmat > 0)THEN
               !Volume Fractions update

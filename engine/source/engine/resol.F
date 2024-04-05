@@ -586,7 +586,7 @@ Chd|====================================================================
      M  T_MONVOL,ID_GLOBAL_VOIS,FACE_VOIS,TAGSLV_RBY,DYNAIN_DATA,FCONT_MAX,EBCS_TAB,DIFFUSION,
      N  KLOADPINTER,LOADPINTER,IN0 ,DGAPLOADINT,DRAPEG,USER_WINDOWS,OUTPUT,INTERFACES,
      O  DT        ,LOADS     , PYTHON, DPL0CLD,VEL0CLD,
-     P  NDAMP_VREL,ID_DAMP_VREL,FR_DAMP_VREL,NDAMP_VREL_RBY,NDAMP_VREL_RBYG,NAMES_AND_TITLES,UNITAB )
+     P  NDAMP_VREL,ID_DAMP_VREL,FR_DAMP_VREL,NDAMP_VREL_RBYG,NAMES_AND_TITLES,UNITAB )
 C-----------------------------------------------
 C   M o d u l e s
 C----------------------------------------------- 
@@ -898,7 +898,7 @@ c
       TYPE(PYTHON_)  ,INTENT(INOUT)                      :: PYTHON
       TYPE(NAMES_AND_TITLES_),INTENT(INOUT)              :: NAMES_AND_TITLES !< NAMES_AND_TITLES host the input deck names and titles for outputs
 C
-      INTEGER ,INTENT(IN) :: NDAMP_VREL,NDAMP_VREL_RBY,NDAMP_VREL_RBYG
+      INTEGER ,INTENT(IN) :: NDAMP_VREL,NDAMP_VREL_RBYG
       INTEGER ,INTENT(IN) :: ID_DAMP_VREL(NDAMP_VREL),FR_DAMP_VREL(NSPMD+2,NDAMP_VREL)    
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -5658,8 +5658,8 @@ C===============================================================================
      6      NRBYKIN_L,NATIV_SMS,SENSORS%SFSAV,SENSORS%FSAV,SENSORS%STABSEN     ,
      7      SENSORS%TABSENSOR,NODREAC,FTHREAC,CPTREAC     ,DAMPR,
      8      SDAMP    ,DAMP   ,NDAMP_VREL,ID_DAMP_VREL     ,IGRNOD      ,
-     9      TAGSLV_RBY,IPARIT,TFEXT     ,NDAMP_VREL_RBY   ,NDAMP_VREL_RBYG,
-     A      SIZE_RBY6_C,RBY6_C)
+     9      TAGSLV_RBY,IPARIT,TFEXT     ,NDAMP_VREL_RBYG  ,SIZE_RBY6_C ,
+     A      RBY6_C)
 
 !$OMP END PARALLEL
           IF (IMON>0) CALL STOPTIME(4,1)
@@ -9097,12 +9097,13 @@ C--------------------------------------------------------
 
           ICH = 0
           IF (RESTART_FILE==1) THEN
-          CALL WRRESTP(AF        , IAF        ,XDP        ,ICH        ,ADSKY          ,
-     .                 ELBUF_TAB , XFEM_TAB   ,INTBUF_TAB , MULTI_FVM ,MAT_ELEM       ,
-     .                 H3D_DATA  , INTBUF_FRIC_TAB,SUBSETS,
-     .                 PINCH_DATA, ALE_CONNECTIVITY, T_MONVOL,
-     .                 SENSORS   , EBCS_TAB   ,DYNAIN_DATA ,USER_WINDOWS,OUTPUT        ,
-     .                 INTERFACES, LOADS      ,PYTHON, NAMES_AND_TITLES)
+          CALL WRRESTP(AF        , IAF             ,XDP            ,ICH             ,ADSKY          ,
+     .                 ELBUF_TAB , XFEM_TAB        ,INTBUF_TAB     ,MULTI_FVM       ,MAT_ELEM       ,
+     .                 H3D_DATA  , INTBUF_FRIC_TAB ,SUBSETS        ,
+     .                 PINCH_DATA, ALE_CONNECTIVITY,T_MONVOL       ,
+     .                 SENSORS   , EBCS_TAB        ,DYNAIN_DATA    ,USER_WINDOWS    ,OUTPUT        ,
+     .                 INTERFACES, LOADS           ,PYTHON         ,NAMES_AND_TITLES,
+     .                 EIGIPM    , EIGIBUF         ,EIGRPM         ,NEIPM           ,LEIBUF        , NERPM)
 
           IF (NFLOW>0) CALL NFWREST(IFLOW, RFLOW)
           CALL FVWREST()
@@ -9379,12 +9380,13 @@ C--------------------------------------------------------
              CALL SPMD_I21TEMPCOM(IPARI,TEMP,INTBUF_TAB,NSENSOR,SENSORS%SENSOR_TAB) 
           ENDIF
 
-          CALL WRRESTP(AF         ,IAF             ,XDP       ,ICH         ,ADSKY          ,
-     .                 ELBUF_TAB  ,XFEM_TAB        ,INTBUF_TAB, MULTI_FVM  ,MAT_ELEM       ,
-     .                 H3D_DATA   ,INTBUF_FRIC_TAB ,SUBSETS   ,
-     .                 PINCH_DATA ,ALE_CONNECTIVITY, T_MONVOL ,
-     .                 SENSORS    ,EBCS_TAB        ,DYNAIN_DATA,USER_WINDOWS,OUTPUT        ,
-     .                 INTERFACES ,LOADS           ,PYTHON, NAMES_AND_TITLES)
+          CALL WRRESTP(AF         ,IAF             ,XDP        ,ICH             ,ADSKY          ,
+     .                 ELBUF_TAB  ,XFEM_TAB        ,INTBUF_TAB ,MULTI_FVM       ,MAT_ELEM       ,
+     .                 H3D_DATA   ,INTBUF_FRIC_TAB ,SUBSETS    ,
+     .                 PINCH_DATA ,ALE_CONNECTIVITY,T_MONVOL   ,
+     .                 SENSORS    ,EBCS_TAB        ,DYNAIN_DATA,USER_WINDOWS    ,OUTPUT         ,
+     .                 INTERFACES ,LOADS           ,PYTHON     ,NAMES_AND_TITLES,
+     .                 EIGIPM    , EIGIBUF         ,EIGRPM     ,NEIPM           ,LEIBUF         , NERPM)
 
         IF (NFLOW>0) CALL NFWREST(IFLOW, RFLOW)
         CALL FVWREST()
@@ -9517,12 +9519,13 @@ C--------------------------------------------------------
              ENDIF
 
               ICH = 1
-              CALL WRRESTP(AF        ,IAF            ,XDP          ,ICH        ,ADSKY          ,
-     .                    ELBUF_TAB  ,XFEM_TAB       ,INTBUF_TAB   ,MULTI_FVM  ,MAT_ELEM       ,
-     .                    H3D_DATA   ,INTBUF_FRIC_TAB,SUBSETS     ,
-     .                    PINCH_DATA ,ALE_CONNECTIVITY, T_MONVOL ,
-     .                    SENSORS    ,EBCS_TAB      ,DYNAIN_DATA ,USER_WINDOWS,OUTPUT         ,
-     .                    INTERFACES ,LOADS         ,PYTHON, NAMES_AND_TITLES)
+              CALL WRRESTP(AF        ,IAF             ,XDP         ,ICH              ,ADSKY          ,
+     .                    ELBUF_TAB  ,XFEM_TAB        ,INTBUF_TAB  ,MULTI_FVM        ,MAT_ELEM       ,
+     .                    H3D_DATA   ,INTBUF_FRIC_TAB ,SUBSETS     ,
+     .                    PINCH_DATA ,ALE_CONNECTIVITY,T_MONVOL    ,
+     .                    SENSORS    ,EBCS_TAB        ,DYNAIN_DATA ,USER_WINDOWS     ,OUTPUT         ,
+     .                    INTERFACES ,LOADS           ,PYTHON      , NAMES_AND_TITLES,
+     .                    EIGIPM    , EIGIBUF         ,EIGRPM      , NEIPM           ,LEIBUF         , NERPM)
 
               IF (NFLOW>0) CALL NFWREST(IFLOW, RFLOW)
               CALL FVWREST()
