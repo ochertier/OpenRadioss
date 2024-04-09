@@ -26,14 +26,14 @@ Chd|-- called by -----------
 Chd|        GENH3D                        source/output/h3d/h3d_results/genh3d.F
 Chd|-- calls ---------------
 Chd|        SCHLIEREN_BUFFER_GATHERING    source/output/anim/generate/schlieren_buffer_gathering.F
-Chd|        ALEANIM_MOD                   share/modules/aleanim_mod.F
+Chd|        ALEANIM_MOD                   share/modules/aleanim_mod.F   
 Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
 Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
-Chd|        H3D_MOD                       share/modules/h3d_mod.F
-Chd|        INITBUF_MOD                   share/resol/initbuf.F
+Chd|        H3D_MOD                       share/modules/h3d_mod.F       
+Chd|        INITBUF_MOD                   share/resol/initbuf.F         
 Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
-Chd|        SCHLIEREN_MOD                 share/modules/schlieren_mod.F
-Chd|        STACK_MOD                     share/modules/stack_mod.F
+Chd|        SCHLIEREN_MOD                 share/modules/schlieren_mod.F 
+Chd|        STACK_MOD                     share/modules/stack_mod.F     
 Chd|====================================================================
       SUBROUTINE H3D_SOLID_SCALAR(
      .                  ELBUF_TAB       ,SOLID_SCALAR ,IFUNC     ,IPARG       ,GEO         ,
@@ -47,7 +47,7 @@ Chd|====================================================================
      .                  IR_INPUT        ,IS_INPUT     ,IT_INPUT  ,IUVAR_INPUT ,H3D_PART    ,
      .                  IS_WRITTEN_SOLID,INFO1        ,KEYWORD   ,FANI_CELL   ,
      .                  MULTI_FVM       , H3D_DATA    ,IDMDS     ,IMDSVAR     ,MDS_MATID   ,
-     .                  ID              ,MODE         )
+     .                  ID              ,MAT_PARAM    ,MODE         )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -60,6 +60,7 @@ C-----------------------------------------------
         USE ALE_CONNECTIVITY_MOD
         USE ALEANIM_MOD , ONLY : FANI_CELL_
         USE NAMES_AND_TITLES_MOD, ONLY: NCHARLINE100
+        USE MATPARAM_DEF_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -91,6 +92,7 @@ C-----------------------------------------------
         TYPE (H3D_DATABASE) :: H3D_DATA
         TYPE(MULTI_FVM_STRUCT), INTENT(IN) :: MULTI_FVM
         TYPE(t_ale_connectivity), INTENT(IN) :: ALE_CONNECT
+        TYPE (MATPARAM_STRUCT_) ,DIMENSION(NUMMAT) ,INTENT(IN) :: MAT_PARAM
         INTEGER ,INTENT(IN) :: MODE
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -161,7 +163,7 @@ c
      .                    IR_INPUT        ,IS_INPUT     ,IT_INPUT  ,IUVAR_INPUT ,H3D_PART    ,
      .                    IS_WRITTEN_SOLID,INFO1        ,KEYWORD   ,FANI_CELL   ,
      .                    MULTI_FVM       , H3D_DATA    ,NG        ,IDMDS       ,IMDSVAR     ,
-     .                    MDS_MATID       ,ID           ,MODE     )
+     .                    MDS_MATID       ,ID           ,MAT_PARAM ,MODE     )
 
  900    CONTINUE   ! NG
 C-----------------------------------------------
