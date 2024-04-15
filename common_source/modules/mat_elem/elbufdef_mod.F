@@ -490,6 +490,7 @@ Chd|        SCHLIEREN_BUFFER_GATHERING    engine/source/output/anim/generate/sch
 Chd|        SCONNECT_OFF                  engine/source/elements/solid/sconnect/sconnect_off.F
 Chd|        SEATBELT_REDUCTION_FACTOR     engine/source/tools/seatbelts/seatbelt_reduction_factor.F
 Chd|        SEGGETV                       engine/source/interfaces/interf/seggetv.F
+Chd|        SFINT_REG                     engine/source/elements/solid/solide/sfint_reg.F
 Chd|        SHELL_LOCAL_FRAME             engine/source/output/dynain/shell_rota.F
 Chd|        SHELL_ROTA                    engine/source/output/dynain/shell_rota.F
 Chd|        SIGEPS02G                     engine/source/materials/mat/mat002/sigeps02g.F
@@ -984,6 +985,11 @@ c---
         my_real, DIMENSION(:,:), POINTER :: VNLTH  ! Non-local velocities
         my_real, DIMENSION(:,:), POINTER :: FNLTH  ! Non-local forces
       END TYPE BUF_NLOCTS_
+!     Non-local buffer for brick elements geometry configuration
+      TYPE BUF_NLOCS_
+        INTEGER, DIMENSION(:)  , ALLOCATABLE :: NL_ISOLNOD ! Number of effective nodes (NEL)
+        INTEGER, DIMENSION(:,:), ALLOCATABLE :: NL_SOLNOD  ! Identifiers of effectives nodes (8,NEL)
+      END TYPE BUF_NLOCS_
 !--------------------------------------------------------------------------------
 
       TYPE BUF_EOS_
@@ -1205,8 +1211,9 @@ c--------------------
         TYPE (BUF_LAY_)   , DIMENSION(:)   , POINTER :: BUFLY  ! BUFLY(NLAY) layer variables 
         TYPE (BUF_INTLAY_), DIMENSION(:)   , POINTER :: INTLAY ! inter-layer (NLAY-1)
         TYPE (BUF_XFEM_)  , DIMENSION(:)   , POINTER :: XFEM   ! XFEM (NXEL)
-        TYPE (BUF_NLOC_)  , DIMENSION(:,:) , POINTER :: NLOC   ! NLOC (NPTR,NPTS)
-        TYPE (BUF_NLOCTS_), DIMENSION(:,:) , POINTER :: NLOCTS ! NLOC (NPTR,NPTS)
+        TYPE (BUF_NLOC_)  , DIMENSION(:,:) , POINTER :: NLOC   ! Non-local thickness specific structure for shells
+        TYPE (BUF_NLOCTS_), DIMENSION(:,:) , POINTER :: NLOCTS ! Non-local thickness specific structure for thickshells
+        TYPE (BUF_NLOCS_)                            :: NLOCS  ! Non-local structure of brick element geometry configuration
       END TYPE ELBUF_STRUCT_
 c
 c---------------

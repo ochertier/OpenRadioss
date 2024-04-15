@@ -127,7 +127,6 @@ Chd|        SIGEPS43C                     source/materials/mat/mat043/sigeps43c.
 Chd|        SIGEPS43G                     source/materials/mat/mat043/sigeps43g.F
 Chd|        SIGEPS44P                     source/materials/mat/mat044/sigeps44p.F
 Chd|        SIGEPS44T                     source/materials/mat/mat044/sigeps44t.F
-Chd|        SIGEPS50                      source/materials/mat/mat050/sigeps50.F
 Chd|        SIGEPS51                      source/materials/mat/mat051/sigeps51.F
 Chd|        SIGEPS57C                     source/materials/mat/mat057/sigeps57c.F
 Chd|        SIGEPS58C                     source/materials/mat/mat058/sigeps58c.F
@@ -148,7 +147,6 @@ Chd|        SIGEPS81                      source/materials/mat/mat081/sigeps81.F
 Chd|        SIGEPS83                      source/materials/mat/mat083/sigeps83.F
 Chd|        SIGEPS88                      source/materials/mat/mat088/sigeps88.F
 Chd|        SIGEPS88C                     source/materials/mat/mat088/sigeps88c.F
-Chd|        SIGEPS90                      source/materials/mat/mat090/sigeps90.F
 Chd|        SMS_GRAVIT                    source/ams/sms_gravit.F       
 Chd|        THERMEXPC                     source/materials/mat_share/thermexpc.F
 Chd|        VOLPFV                        source/airbag/volpfv.F        
