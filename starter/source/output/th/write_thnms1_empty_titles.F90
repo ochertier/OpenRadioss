@@ -20,95 +20,43 @@
 !Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 !Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 !Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
+      module write_thnms1_empty_titles_mod
+      contains
 ! ======================================================================================================================
 !                                                   PROCEDURES
 ! ======================================================================================================================
-!! \brief  SPMD exchange necessary for option /ALE/GRID/MASSFLOW
-!! \details  gathering  SUM(mi.ITMi,i) : DOMAIN_DATA%ITM(1:6)    where ITM is Inertia Tensor Matrix
-!
-      subroutine spmd_exch_massflow_data3( domain_data, nspmd )
+!! \write in th.nms1 empty vars
+        subroutine write_thnms1_empty_titles(io,       init_id          ,end_id)
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Modules
 ! ----------------------------------------------------------------------------------------------------------------------
-         use ale_mod , only : massflow_data_
-         use spmd_mod
-         use constant_mod , only: zero
 ! ----------------------------------------------------------------------------------------------------------------------
-!                                                   Included file
+!                                                   Implicit none
 ! ----------------------------------------------------------------------------------------------------------------------
-         implicit none
+          implicit none
+! ----------------------------------------------------------------------------------------------------------------------
+!                                                   Included files
+! ----------------------------------------------------------------------------------------------------------------------
 #include "my_real.inc"
-#include "task_c.inc"
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Arguments
 ! ----------------------------------------------------------------------------------------------------------------------
-         type(massflow_data_),intent(inout)::domain_data !< intent(in) ale massflow buffer for given domain
-         integer,intent(in)::nspmd                       !< number of SPMD domains
+          integer,                                   intent(in) :: io
+          integer,                                   intent(in) :: init_id
+          integer,                                   intent(in) :: end_id
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Local variables
 ! ----------------------------------------------------------------------------------------------------------------------
-      integer :: msgtyp, msgoff, p, nbirecv
-      integer :: req_sb(nspmd),irindexi(nspmd)
-      integer :: loc_proc, isize
-      my_real :: rbuf(6,nspmd)
-      data msgoff/2205/
+          integer :: i
 ! ----------------------------------------------------------------------------------------------------------------------
-!                                                   Preconditions
+!                                                   External functions
 ! ----------------------------------------------------------------------------------------------------------------------
-         if(nspmd == 1)return
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Body
 ! ----------------------------------------------------------------------------------------------------------------------
-!$OMP SINGLE
-         loc_proc=ispmd+1
-         rbuf(1:6,1:nspmd)=zero
-         rbuf(1:6,loc_proc) = domain_data%itm_l(1:6)
-         isize=6
-         !-------------------------------------------!
-         ! SENDING %ITM(1:6)                         !
-         !-------------------------------------------!
-         do p = 1, nspmd
-            if(p /= loc_proc) then
-               msgtyp = msgoff
-               call spmd_isend(rbuf(1,loc_proc),isize,it_spmd(p),msgtyp,req_sb(p))
-            endif
-         enddo
-         !-------------------------------------------!
-         ! RECIEVING %ITM(1:6)                       !
-         !-------------------------------------------!
-         nbirecv=0
-         do p = 1, nspmd
-            if(loc_proc /= p) then
-               nbirecv=nbirecv+1
-               irindexi(nbirecv)=p
-               msgtyp = msgoff
-               call spmd_recv(rbuf(1,p), isize, it_spmd(p), msgtyp)
-            endif
-         enddo
-         !-------------------------------------------!
-         !     MPI_WAITING                           !
-         !-------------------------------------------!
-         do p = 1, nspmd
-            if(p /= loc_proc) then
-               call spmd_wait(req_sb(p))
-            endif
-         enddo
-
-         !-------------------------------------------!
-         ! COMPUTE AVERAGE ON CURRENT DOMAIN         !
-         !-------------------------------------------!
-         domain_data%itm_l(1:6)=zero
-
-         do p=1,nspmd
-            domain_data%itm_l(1) = domain_data%itm_l(1) + rbuf(1,p)
-            domain_data%itm_l(2) = domain_data%itm_l(2) + rbuf(2,p)
-            domain_data%itm_l(3) = domain_data%itm_l(3) + rbuf(3,p)
-            domain_data%itm_l(4) = domain_data%itm_l(4) + rbuf(4,p)
-            domain_data%itm_l(5) = domain_data%itm_l(5) + rbuf(5,p)
-            domain_data%itm_l(6) = domain_data%itm_l(6) + rbuf(6,p)
-         enddo
-
-!$OMP END SINGLE
-!-----------------------------------------------
-         return
-      end subroutine spmd_exch_massflow_data3
+          do i=init_id,end_id
+            write(io, '(2x,I10)') i
+          enddo
+! ----------------------------------------------------------------------------------------------------------------------
+        end subroutine write_thnms1_empty_titles
+      end module write_thnms1_empty_titles_mod

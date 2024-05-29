@@ -434,7 +434,6 @@ Chd|        TRACE_IN1                     source/system/trace_back.F
 Chd|        TRACE_OUT1                    source/system/trace_back.F    
 Chd|        TRIINTFRIC                    source/interfaces/interf1/trintfric.F
 Chd|        UPDATE_WEIGHT_RBE3            source/spmd/domain_decomposition/update_weight_rbe3.F
-Chd|        UPDFAIL                       source/materials/updfail.F    
 Chd|        UPDMAT                        source/materials/updmat.F     
 Chd|        UPGRADE_IXINT                 source/interfaces/interf1/upgrade_ixint.F
 Chd|        XFEM_CRACK_INIT               source/elements/xfem/xfem_crack_init.F
@@ -504,7 +503,6 @@ Chd|        SEATBELT_MOD                  ../common_source/modules/seatbelt_mod.
 Chd|        SENSOR_MOD                    share/modules1/sensor_mod.F   
 Chd|        SETDEF_MOD                    ../common_source/modules/setdef_mod.F
 Chd|        SET_MOD                       share/modules1/set_mod.F      
-Chd|        SKEW_MOD                      share/modules1/skew_mod.F     
 Chd|        SMS_MOD                       share/modules1/sms_mod.F      
 Chd|        SPH_MOD                       share/modules1/sph_mod.F      
 Chd|        SPLIT_CFD_MOD                 share/modules1/split_cfd_mod.F
@@ -519,7 +517,7 @@ Chd|        XFEM2DEF_MOD                  ../common_source/modules/xfem2def_mod.
 Chd|====================================================================
       SUBROUTINE LECTUR(MULTI_FVM                   ,LSUBMODEL          ,IS_DYNA         ,DETONATORS   ,EBCS_TAB,
      .                  SEATBELT_CONVERTED_ELEMENTS ,NB_SEATBELT_SHELLS ,NB_DYNA_INCLUDE ,USER_WINDOWS ,OUTPUT  ,
-     .                  MAT_ELEM,NAMES_AND_TITLES)
+     .                  MAT_ELEM,NAMES_AND_TITLES,DEFAULTS)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -604,6 +602,14 @@ C-----------------------------------------------
       USE damping_rby_spmdset_mod
       USE HM_READ_PRELOAD_AXIAL_MOD
       USE BCS_MOD, ONLY : BCS, BCS_STRUCT_
+      USE DEFAULTS_MOD
+      USE DIM_SHELL_OFFSETP_MOD,ONLY:DIM_SHELL_OFFSETP
+      USE SHELL_OFFSET_INI_MOD,ONLY: SHELL_OFFSET_INI
+      USE INTER_OFFSET_ITAG_MOD, ONLY:INTER_OFFSET_ITAG
+      USE CHK_SHELL_OFFSET_MOD, ONLY:CHK_SHELL_OFFSET
+      USE SHELL_OFFSETP_MOD, ONLY:SHELL_OFFSETP
+      USE UPDFAIL_MOD
+      USE RANDOM_WALK_DEF_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -622,6 +628,7 @@ C-----------------------------------------------
       TYPE(USER_WINDOWS_), INTENT(INOUT)  :: USER_WINDOWS
       TYPE(OUTPUT_),  INTENT(INOUT)       :: OUTPUT
       TYPE(NAMES_AND_TITLES_),INTENT(INOUT) :: NAMES_AND_TITLES !< NAMES_AND_TITLES host the input deck names and titles for outputs
+      TYPE(DEFAULTS_),INTENT(INOUT)       :: DEFAULTS
 C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
@@ -696,7 +703,7 @@ C-----------------------------------------------
 
       INTEGER II,I,J,KK,N, NPTS, NMNT, NRTMT_25,MLW,
      .   NUMEL, IFIP, IS_EULER,NB_EULER_GROUPS,
-     .   K5B,NAIRWA,NTHWA, LWASPIO, LEN_G,LEN_M,LEN,
+     .   NAIRWA,NTHWA, LWASPIO, LEN_G,LEN_M,LEN,
      .   IADBUF, IADGEO, NUVAR, NUVARI,
      .   NS_I7,NEL,ND,AUX,NS_I21,
      .   NPT,NS_I11,
@@ -725,7 +732,7 @@ C-----------------------------------------------
      .   PROC_BID,FLG_R2R_ERR,NSPCOND0,LENTHGR,FLAG_XFEM,
      .   IADTABIGE,NDOUBLONIGE,DECALIGEO,HM_NSENSOR,
      .   IPARSENS,NBT8,
-     .   TAB_SOL(6),ISTR_24,
+     .   TAB_SOL(6),ISTR_24,IDEL_SOLID,
      .   LCNCND,I24MAXNSNE,NSIGBEAM,NSIGTRUSS,S_LOADPINTER,
      .   FLAGF,ITHFLAG,MAXRTM_T2,NS_I2,SITAGE,NCTRLMAX,INLIN,SVR_1
       INTEGER (KIND=8) EMAX
@@ -863,13 +870,18 @@ C
       TYPE (DRAPE_)   ,DIMENSION(:), ALLOCATABLE   :: DRAPE,DRAPE_WRK
       TYPE (DRAPEG_)                               :: DRAPEG
       TYPE(DRAPE_WORK_) ,DIMENSION(:), ALLOCATABLE   :: IWORK_T
-      INTEGER :: EBCS_TAG_CELL_SPMD(NUMELQ+NUMELTG+NUMELS)
+C    ! DEF_SHELL / ioffset=1 treatment for contact  
+      INTEGER, DIMENSION(:),     ALLOCATABLE         :: ITAGOSET !Offset  
+      my_real, DIMENSION(:),     ALLOCATABLE, TARGET :: XYZ    
+      my_real, DIMENSION(:),     POINTER             :: X_C ! points to X or XYZ 
+C
+      INTEGER, DIMENSION(:), ALLOCATABLE :: EBCS_TAG_CELL_SPMD 
 C
       TYPE (DYNAIN_DATABASE)   :: DYNAIN_DATA
       TYPE (INTERFACES_)       :: INTERFACES
       TYPE (MAT_ELEM_) ,INTENT(INOUT) :: MAT_ELEM
-
-
+      INTEGER LWAMP_L     !< Size of work array in Engine (WA)
+      INTEGER LWANMP_L    !< Size of work array in Engine (WA)
 C-----------------------------------------------
       CHARACTER(LEN=4096) :: SCR_FILE_NAME
       CHARACTER(LEN=ncharline) :: RLINE
@@ -1063,7 +1075,7 @@ C
 !       FLAG_24_25 : logical, flag for interface 24 or 25
 !       -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-**-*-*-*-*-*-*-*-*-*-*-*-*
       INTEGER, DIMENSION(:), ALLOCATABLE :: TAG_SKN
-      TYPE(SKEW_TYPE), DIMENSION(:), ALLOCATABLE :: MULTIPLE_SKEW
+      TYPE(SKEW_) :: SKEWS
       TYPE (SENSOR_STR_) ,DIMENSION(:) ,ALLOCATABLE :: SENSOR_TMP
 !       -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-**-*-*-*-*-*-*-*-*-*-*-*-*
 !       TAG_SKN : integer ; dimension=NUMSKW+1
@@ -1072,9 +1084,10 @@ C
 !                 tag array=1 --> the SKEW is used by one SPRING
 !                 tag array>1 --> the SKEW is used by several SPRING
 !                 tag array <0 --> the SKEW is used by several options (has to be duplicated to all domains that have the nodes)
-!       MULTIPLE_SKEW : SKEW_TYPE ; dimension=NUMSKW+1
-!                       MULTIPLE_SKEW(I)%PLIST(:) is a list of processor
-!                       where the SKEW is stuck
+!       SKEWS : SKEW_ ; SKEW Type 
+      !                 SKEWS%MULTIPLE_SKEW : dimension=NUMSKW+1
+!                       %MULTIPLE_SKEW(I)%PLIST(:) is a list of processor
+!                       where the SKEW is stick
 !       -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-**-*-*-*-*-*-*-*-*-*-*-*-*
         TYPE(SURF_), DIMENSION(:,:), ALLOCATABLE :: IGRSURF_PROC
 !       -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-**-*-*-*-*-*-*-*-*-*-*-*-*
@@ -1149,8 +1162,9 @@ C SEATBELTS
       INTEGER :: NDAMP_VREL_RBY
 
       TYPE(INTER_CAND_) :: INTER_CAND
+      TYPE (FAIL_FRACTAL_) :: FAIL_FRACTAL
 c=======================================================================
-!    
+      IREAC = 0 
       PYTHON%NB_FUNCTS = 0
 !     domain decomposition statistic
       DDSTAT(1:50,1:PARASIZ)=0
@@ -1220,6 +1234,7 @@ C     Idem with  (KD(12) = KD(11) + 4*NRTM )
       INTER18_AUTOPARAM = 0
       INTER18_IS_VARIABLE_GAP_DEFINED = .FALSE.
       NBPRELD = 10
+      ALLOCATE(EBCS_TAG_CELL_SPMD(NUMELQ+NUMELTG+NUMELS))
 C
       ALLOCATE(EOS_TAG(0:MAXEOS))
 C Interface give CPU to Main surface - INITIALIZE ARRAY
@@ -2066,7 +2081,7 @@ c------------------------------------
 c---------------------------------------------------------------
       CALL READ_MATERIAL_MODELS(
      .     MAT_ELEM    ,MLAW_TAG ,FAIL_TAG ,EOS_TAG   ,
-     .     RWORK       ,SBUFMAT  ,IPM      ,PM       ,UNITAB    ,
+     .     RWORK       ,SBUFMAT  ,IPM      ,PM        ,UNITAB    ,
      .     MULTI_FVM   ,FAILWAVE ,NLOC_DMG ,LSUBMODEL ,
      .     TABLE       ,NPC      )
 c---------------------------------------------------------------
@@ -2203,7 +2218,7 @@ C
      .                          DBRWORK    , SBUFGEO     , ISKWN    , IGEO     ,IPM       ,
      .                          NPC        , TF          , UNITAB   , RTRANS   ,LSUBMODEL ,
      .                          PROP_TAG   , IPART       , KNOT     , IDRAPEID ,STACK_INFO,
-     .                          NUMGEOSTACK, NPROP_STACK , MULTI_FVM, IADGEO)
+     .                          NUMGEOSTACK, NPROP_STACK , MULTI_FVM, IADGEO   ,DEFAULTS)
 C
         ALLOCATE(BUFGEO(SBUFGEO)    ,STAT=stat)
         IF(STAT /= 0) CALL ANCMSG(MSGID=268,ANMODE=ANINFO,
@@ -2971,10 +2986,10 @@ c limit INTEGER 32 bits ((2^31)-1), we add a security marge of 5%
      .                               ANMODE=ANSTOP,
      .                               MSGTYPE=MSGERROR,
      .                         C1='RESERVEP')
-          RESERVEP(1:NBPARTINLET) = ZERO
+          RESERVEP(1:NBPARTINLET) = 0 
         ELSE
           ALLOCATE(RESERVEP(1))
-          RESERVEP(1)=ZERO
+          RESERVEP(1) = 0
         ENDIF
         KXSP   = 0
         IXSP   = 0
@@ -3643,6 +3658,8 @@ C--------------------------------------------
      *              IBOX     ,SKEW      ,IPARTQ    ,IPARTT   ,IPARTP    ,
      *              IPARTR   ,SUBSETS   ,RBY_MSN   ,ISKWN    ,RTRANS    ,
      *              UNITAB   ,RWORK     ,SBUFSF    ,SISKWN   ,SSKEW     )
+     
+     
 C        IF(ALLOCATED(RBY_MSN)) DEALLOCATE(RBY_MSN)
       ENDIF
       
@@ -3895,15 +3912,9 @@ C--------------------------------------------
          FLAG_GOTO = 1
 
 C-----on realloue le tableau FRONT-------------
-c         GOTO 206 ! plus besoin de reallouer, on flushe simplement sur new numnod
          CALL INI_IFRONT()
          IENTRY2(1:NUMNOD) = -1
          FLAGKIN(1:NUMNOD) = 0
-
-207      CONTINUE !plus utilise
-c         DO I=1,NUMNOD
-c          FRONT(I,1)=FRONT_R2R(I)
-c        ENDDO
 
 cc r2r with new IFRONT
          DO I=1,NUMNOD
@@ -4754,12 +4765,12 @@ C
           FVM_INIVEL(I)%FLAG = .FALSE.
        ENDDO
 C
-        CALL HM_READ_INIVEL(V       ,W       ,ITAB   ,ITABM1  ,VR      ,
-     .              IGRNOD    ,IGRBRIC ,ISKWN    ,SKEW    ,IWORK    ,
-     .              X       ,UNITAB  ,LSUBMODEL,RTRANS,XFRAME  ,
-     .              IFRAME    ,VFLOW   ,WFLOW    ,KXSP    ,MULTI_FVM,
-     .              FVM_INIVEL,IGRQUAD ,IGRSH3N  ,RBY_MSN ,RBY_INIAXIS)
-        CALL INIVEL(V       ,VR      ,SVR_1 ,ITABM1     )
+        CALL HM_READ_INIVEL(V         , W      , ITAB     , ITABM1 , VR         ,
+     .                      IGRNOD    , IGRBRIC, ISKWN    , SKEW   , IWORK      ,
+     .                      X         , UNITAB , LSUBMODEL, RTRANS , XFRAME     ,
+     .                      IFRAME    , VFLOW  , WFLOW    , KXSP   , MULTI_FVM  ,
+     .                      FVM_INIVEL, IGRQUAD, IGRSH3N  , RBY_MSN, RBY_INIAXIS)
+        CALL INIVEL(V, VR, SVR_1, ITABM1)
 C
         IF(ALLOCATED(IWORK)) DEALLOCATE(IWORK)
         NINVEL  = SIWORK
@@ -4894,13 +4905,13 @@ C-------------------------------------------------
       ERR_CATEGORY='ELEMENTARY BOUNDARY CONDITIONS'
       CALL TRACE_IN1(ERR_MSG,LEN_TRIM(ERR_MSG))
       EBCS_TAG_CELL_SPMD(1:NUMELQ+NUMELTG+NUMELS)=0
-      CALL READ_EBCS(IGRSURF,MULTI_FVM,NPC1,(LNOPT1*INOM_OPT(24)+1),LSUBMODEL,EBCS_TAB)
+      CALL READ_EBCS(IGRSURF,MULTI_FVM,NPC1,LSUBMODEL,EBCS_TAB)
       IF(NEBCS > 0)THEN
         !allocate & count
         IF(.NOT. ALLOCATED(SENSOR_TMP)) ALLOCATE( SENSOR_TMP(0) )
         CALL INIEBCS(ALE_CONNECTIVITY, 0, IGRSURF, IXS, IXQ, IXTG,
-     .        PM, IGEO, X, SENSOR_TMP, MONVOl, MULTI_FVM%IS_USED, 
-     .        EBCS_TAB, EBCS_TAG_CELL_SPMD)
+     .               PM, IGEO, X, SENSOR_TMP, MONVOl, MULTI_FVM%IS_USED,
+     .               EBCS_TAB, EBCS_TAG_CELL_SPMD)
         DEALLOCATE(SENSOR_TMP)
       ENDIF
       CALL TRACE_OUT1()
@@ -5116,14 +5127,14 @@ C--------------------------------------------
 
        ALLOCATE(TAB_UMP_OLD(7,TAILLE_OLD),STAT=stat)
        ALLOCATE(CPUTIME_MP_OLD(TAILLE_OLD),STAT=stat)
-       TAB_UMP_OLD = ZERO
+       TAB_UMP_OLD = 0 
        CPUTIME_MP_OLD = ZERO
 
        CALL LEC_DDW(FILNAM,LEN_FILNAM,TAB_UMP_OLD,CPUTIME_MP_OLD)
 
        CALL PRELEC_DDW_POIN(FILNAM,LEN_FILNAM)
        ALLOCATE(POIN_UMP_OLD(NUMMAT_OLD), STAT=stat)
-       POIN_UMP_OLD = ZERO
+       POIN_UMP_OLD = 0
 
         CALL LEC_DDW_POIN(FILNAM,LEN_FILNAM,POIN_UMP_OLD)
       ELSE
@@ -5225,11 +5236,11 @@ C--------------------------------------------
 
 
 C -------------------------------------------------
-C Check des surfaces pour les airbags
+C Check surfaces for airbags
 C -------------------------------------------------
-      CALL CHECK_SURF(IGRSURF,1)
+      CALL CHECK_SURF(IGRSURF)
 C----------------------------------
-C     LECTURE DES VOLUMES MONITORES
+C     READER FOR MONITORED VOLUMES
 C----------------------------------
       ERR_MSG='MONITORED VOLUMES'
       ERR_CATEGORY='MONITORED VOLUMES'
@@ -5431,7 +5442,9 @@ c------------------------------------------------------------------------
      .            NPC      ,TF      ,SENSORS   ,NLOC_DMG ,MLAW_TAG ,
      .            MAT_ELEM%MAT_PARAM)
 c
-      CALL UPDFAIL(MAT_ELEM%MAT_PARAM ,NUMMAT ,NFUNCT ,NTABLE ,NPC1 ,TABLE )
+      CALL UPDFAIL(MAT_ELEM%MAT_PARAM ,NUMMAT ,NFUNCT ,NTABLE ,NPC1 ,TABLE ,
+     .             FAIL_FRACTAL,NGRSHEL   ,NGRSH3N,IGRSH4N ,IGRSH3N ,
+     .             NIXC    ,IXC   ,NIXTG ,IXTG    ,NUMELC  ,NUMELTG )
 C
       CALL TRACE_OUT1()
 C------------------------------------------------------------------------
@@ -5859,7 +5872,7 @@ C---------------------------------
         K3 = K2 + NUMELS+1
         K4 = K3 + NUMELS*2
         K5 = K4 + NUMELS*7
-        K5B= K4 + NUMELS
+        !K5B= K4 + NUMELS
         K6 = K5 + NUMELS
         !warning: please also update any index change
         !         for MODIF option (MODIF_SPMD.F)
@@ -7208,6 +7221,40 @@ C---------------Deactivation of ALE flags if no more ALE elements in domain ----
       ENDIF
 C
 C--------------------------------------------
+C     shell offset projection  thke could be overwritten by /INI
+C--------------------------------------------
+C--------------------------------------------
+C     check if need offset treatment
+C--------------------------------------------
+      CALL CHK_SHELL_OFFSET(                                        
+     .                      NGROUP,    NPARG,      IPARG,        NPROPG,
+     .                      NUMGEO,      GEO,     DEFAULTS%SHELL%IOFFSET)
+      IF (DEFAULTS%SHELL%IOFFSET>0) THEN
+        IF (IDDLEVEL == 0) THEN 
+          NULLIFY(X_C) 
+          IF (DEFAULTS%SHELL%IOFFSET==1) THEN
+            ALLOCATE(ITAGOSET(NUMELC+NUMELTG), STAT=Stat)
+            ITAGOSET = 0
+            ALLOCATE(XYZ(3*NUMNOD), STAT=Stat)
+            XYZ(1:3*NUMNOD) = X(1:3*NUMNOD)
+            X_C=>XYZ
+          ELSE
+            ALLOCATE(ITAGOSET(0), STAT=Stat)
+            X_C=>X
+          END IF
+          CALL SHELL_OFFSETP(
+     .                NGROUP,    NPARG,      IPARG,        NPROPG,
+     .                NUMGEO,      GEO,     NUMELC,          NIXC,
+     .                   IXC,  NUMELTG,      NIXTG,          IXTG,
+     .                NUMNOD,      X_C,       THKE,      ITAGOSET,
+     .                DEFAULTS%SHELL)
+        END IF
+      ELSEIF (IDDLEVEL == 0) THEN
+        NULLIFY(X_C) 
+        X_C=>X
+      END IF
+C
+C--------------------------------------------
 C     LECTURE DES INTERFACES
 C--------------------------------------------
       ERR_MSG='INTERFACES'
@@ -7218,6 +7265,7 @@ C--------------------------------------------
       INTERFACES%PARAMETERS%ISTIF_DT = 0
 C PROBINT egalement initialisee dans ENGINE (rdresa)
       PROBINT=HALF
+      INTERFACES%PARAMETERS%INT25_EROSION_SOLID = 0
 
       IF(NINTER == 0.AND.NINTERFRIC > 0 )THEN
             CALL ANCMSG(MSGID=1593,
@@ -7261,6 +7309,7 @@ C
 C------------------------------------------------------------
 C     INTERFACE READING
 C--------------------------------------------------------------
+       NINTER25 = 0
        CALL HM_READ_INTERFACES(
      1           IPARI    ,FRIGAP   ,NINTER   ,ITAB       ,ITABM1                      ,
      2           IGRNOD   ,IGRSURF  ,IGRSLIN  ,IGRBRIC    ,IGRSH3N                     ,
@@ -7272,6 +7321,17 @@ C--------------------------------------------------------------
 C
 
        IF(.NOT. ALLOCATED(ALE_CONNECTIVITY%NALE)) ALLOCATE(ALE_CONNECTIVITY%NALE(0))
+
+c       IF(NINTER25 /= 0)THEN
+c        DO N=1,NGROUP
+c          IF(IPARG(NPARG*(N-1)+43) >0.AND.IPARG(NPARG*(N-1)+5)==1)THEN
+c             INTERFACES%PARAMETERS%INT25_EROSION_SOLID = 1
+c          ENDIF
+c        END DO
+c       END IF
+c       INTERFACES%PARAMETERS%INT25_EROSION_SOLID = 1
+
+
        CALL LECINT (IPARI       ,NINTER    ,IPM       ,BUFMAT   ,                                                 
      .              NMNT        ,ITAB      ,ITABM1    ,GEO      ,                                                 
      .              PM          ,X         ,IGRNOD    ,IGRSURF  ,IGRSLIN  ,                                       
@@ -7285,7 +7345,13 @@ C
      .              IXS16       ,IXS20     ,DEF_INTER ,MAXNSNE  ,                                                 
      .              NPC1        ,MULTI_FVM ,NOM_OPT(LNOPT1*INOM_OPT(29)+1),INTBUF_FRIC_TAB,            
      .              IGRBRIC     ,IGRSH3N   ,IGRTRUSS  ,MAXRTM_T2,NSN_MULTI_CONNEC,           
-     .              T2_NB_CONNEC,IDDLEVEL ,ALE_CONNECTIVITY%NALE)
+     .              T2_NB_CONNEC,IDDLEVEL ,ALE_CONNECTIVITY%NALE,INTERFACES)
+
+c       IF(INTERFACES%PARAMETERS%INT25_EROSION_SOLID == 2) THEN
+c         INTERFACES%PARAMETERS%INT25_EROSION_SOLID = 1
+c       ELSE
+c         INTERFACES%PARAMETERS%INT25_EROSION_SOLID = 0
+c       ENDIF
 C
        !need to allocate only once at first passage in lectur
        FLAG_ALLOCATE = 1
@@ -7346,7 +7412,8 @@ C
      .             IXC      ,IXTG      ,KNOD2ELC ,KNOD2ELTG                    ,NOD2ELC,
      .             NOD2ELTG ,INTBUF_TAB,KNOD2ELS ,NOD2ELS                      ,IXS10  ,
      .             IXS16    ,IXS20     ,NIGE     ,RIGE                         ,XIGE   ,
-     .             VIGE     ,IGRBRIC   ,MULTI_FVM,ALE_CONNECTIVITY%NALE        ,IGEO)
+     .             VIGE     ,IGRBRIC   ,MULTI_FVM,ALE_CONNECTIVITY%NALE        ,IGEO   ,
+     .             INTERFACES)
 C
 cc     DEALLOCATE(XFILTR)
 cc     DEALLOCATE(STFAC)
@@ -7458,7 +7525,7 @@ c set INTERCEP for INT7 only to avoid bug with INT20 dur to renumerotation
 c in I20NLG (other interface types still done in SET_INTERCEP)
         CALL FILL_INTERCEP(IPARI,INTBUF_TAB,INTERCEP)
 C
-        CALL ININTR(IPARI     ,INSCR    ,X,V     ,IXS      ,IXQ      ,
+        CALL ININTR(IPARI     ,INSCR    ,X_C,V   ,IXS      ,IXQ      ,
      2               IXC      ,PM       ,GEO     ,ITAB     ,MS       ,
      3               IWORK    ,RWORK    ,IXTG    ,D        ,IXT      ,
      4               IXP      ,IXR      ,ALE_CONNECTIVITY  ,NELEMINT ,IDDLEVEL ,
@@ -7477,9 +7544,17 @@ C
       IF(IDDLEVEL == 0) CALL STOPTIME(12,1)
       IF(IDDLEVEL == 1) CALL STOPTIME(13,1)
 
-        DEALLOCATE(T2_NB_CONNEC)
-        DEALLOCATE(RWORK)
-        DEALLOCATE(IWORK)
+      IDEL_SOLID = 0
+      DO I=1,NINTER 
+         IF(IPARI(NPARI*(I-1)+7)==25.AND.IPARI(NPARI*(I-1)+100)>0) THEN
+            IDEL_SOLID = IDEL_SOLID + 1
+         ENDIF
+      ENDDO
+      IF(IDEL_SOLID == 0) INTERFACES%PARAMETERS%INT25_EROSION_SOLID = 0
+         
+        DEALLOCATE (T2_NB_CONNEC)
+        DEALLOCATE (RWORK)
+        DEALLOCATE (IWORK)
 
         IF(IDDLEVEL==1)  THEN
           DEALLOCATE(XFILTR)
@@ -8141,7 +8216,7 @@ C
      .               IPARTSP  ,IXS      ,IXQ      ,IXC      ,IXTG      ,
      .               FLAG_XFEM,IPARTIG3D,STACK    ,IGEO_STACK,
      .               IXT      ,IXP      ,IXR      ,KXX      ,GEO       ,
-     .               EOS_TAG  ,ISTR_24  ,IPRI)
+     .               EOS_TAG  ,ISTR_24  ,IPRI     ,DEFAULTS)
 C---
 C  if xfem
 c---
@@ -8157,7 +8232,7 @@ c
      .         IPARTSP                ,IXS      ,IXQ      ,IXC      ,IXTG      ,
      .         FLAG_XFEM              ,IPARTIG3D,STACK    ,IGEO_STACK,
      .         IXT                    ,IXP      ,IXR      ,KXX      ,GEO       ,
-     .         EOS_TAG                ,ISTR_24  ,IPRI)
+     .         EOS_TAG                ,ISTR_24  ,IPRI     ,DEFAULTS)
         ENDDO
       ELSE
         ALLOCATE(XFEM_TAB(0,0), STAT=Stat)
@@ -8183,7 +8258,17 @@ C--------------------------------------------
       IF(NUMELS>0) THEN
        CALL CHK_DTTSH(ELBUF_TAB,IXS ,IPARG ,D   )
       END IF
-C
+!-------ini of shell offset treatment      
+      IF (DEFAULTS%SHELL%IOFFSET>0) THEN
+        IF (DEFAULTS%SHELL%IOFFSET==1) CALL INTER_OFFSET_ITAG(                                 
+     .                 NINTER,    IPARI,      NPARI,       IGRSURF,
+     .                  NSURF,   NUMELC,    NUMELTG,      ITAGOSET)
+        CALL SHELL_OFFSET_INI(
+     .                NGROUP,    NPARG,      IPARG,        NPROPG,
+     .                NUMGEO,      GEO,     NUMELC,       NUMELTG,       
+     .               NPROPGI,     IGEO,   ITAGOSET,       ELBUF_TAB,
+     .               DEFAULTS%SHELL   )
+      END IF 
 C-----------------------------------------------------------
 C     ALLOCATION OF ARRAYS FOR INITIA - DEALLOCATED AFTER INTIA
 C-----------------------------------------------------------
@@ -8471,7 +8556,7 @@ C
      &            IXP        , IXR            , DETONATORS       , GEO                , PM       ,
      &            RBY        , NPBY           , LPBY             , NPC                , NPTS     ,
      &            TF         , VEUL           , ALE_CONNECTIVITY , SKEW               , FILL     ,
-     &            IPART      , ITAB           , SENSORS          , IWCIN2             ,
+     &            IPART      , ITAB           , SENSORS          ,
      &            IXTG       , THKE           , NLOC_DMG         , GROUP_PARAM_TAB    ,
      &            IGRNOD     , IGRSURF        , BUFSF            , VR                 ,
      &            BUFMAT     , XLAS           , ILAS             , DTELEM             , MSS      ,
@@ -8523,7 +8608,7 @@ C
      &            KNOD2EL1D  , NOD2EL1D       , EBCS_TAB         , RBY_INIAXIS        , ALEA     ,
      &            KNOD2ELC   , NOD2ELC        , DR               , SLRBODY            , DRAPEG   ,
      &            IPARI      , INTBUF_TAB     , INTERFACES       , MAT_ELEM%MAT_PARAM ,
-     &            NPRELOAD_A , PRELOAD_A      )
+     &            NPRELOAD_A , PRELOAD_A      , FAIL_FRACTAL     )
 
 
       IF(NINTER>0.AND.NUMELIG3D>0) THEN
@@ -8611,6 +8696,10 @@ C
       DEALLOCATE(ITRI)
       DEALLOCATE(KSYSUSR)
       DEALLOCATE(IWA)
+      IF (DEFAULTS%SHELL%IOFFSET==1) THEN
+        DEALLOCATE(ITAGOSET)
+        DEALLOCATE(XYZ)
+      END IF
 
 C
 C XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -9485,7 +9574,7 @@ c-----
      C       IPARTS   ,IPARTQ   ,IPARTC   ,IPARTT   ,IPARTP  ,IPARTR   ,
      D       IPARTG   ,IPARTX   ,IPARTSP  ,IPARTIG3D,LITHBUFMX,
      E       MAP_TABLES, 0,INOM_OPT(31),INOM_OPT(32),SENSORS   ,
-     F       INTERFACES,IPARI   )
+     F       INTERFACES,IPARI   ,OUTPUT%TH%DUMP_THNMS1_FILE)
 C
       CALL MY_ALLOC(OUTPUT%TH%ITHBUF,OUTPUT%TH%SITHBUF)
       OUTPUT%TH%ITHBUF(1:OUTPUT%TH%SITHBUF) = ITHBUFTMP(1:OUTPUT%TH%SITHBUF)
@@ -9530,7 +9619,7 @@ c-----
      C       IPARTS   ,IPARTQ   ,IPARTC   ,IPARTT   ,IPARTP  ,IPARTR   ,
      D       IPARTG   ,IPARTX   ,IPARTSP  ,IPARTIG3D,LITHBUFMX,
      E       MAP_TABLES, 1,INOM_OPT(31),INOM_OPT(32),SENSORS,
-     F       INTERFACES,IPARI   )
+     F       INTERFACES,IPARI   ,0)
 C
         CALL MY_ALLOC(OUTPUT%TH%ITHBUFA,OUTPUT%TH%SITHBUFA)
         OUTPUT%TH%ITHBUFA = ITHBUFTMP(1:OUTPUT%TH%SITHBUFA)
@@ -9573,7 +9662,7 @@ c-----
      C       IPARTS   ,IPARTQ   ,IPARTC   ,IPARTT   ,IPARTP  ,IPARTR   ,
      D       IPARTG   ,IPARTX   ,IPARTSP  ,IPARTIG3D,LITHBUFMX,
      E       MAP_TABLES, 2,INOM_OPT(31),INOM_OPT(32),SENSORS,
-     F       INTERFACES,IPARI   )
+     F       INTERFACES,IPARI   ,0)
 C
         CALL MY_ALLOC(OUTPUT%TH%ITHBUFB,OUTPUT%TH%SITHBUFB)
         OUTPUT%TH%ITHBUFB = ITHBUFTMP(1:OUTPUT%TH%SITHBUFB)
@@ -9616,7 +9705,7 @@ c-----
      C       IPARTS   ,IPARTQ   ,IPARTC   ,IPARTT   ,IPARTP  ,IPARTR   ,
      D       IPARTG   ,IPARTX   ,IPARTSP  ,IPARTIG3D,LITHBUFMX,
      E       MAP_TABLES, 3,INOM_OPT(31),INOM_OPT(32),SENSORS,
-     F       INTERFACES,IPARI   )
+     F       INTERFACES,IPARI   ,0)
 C
         CALL MY_ALLOC(OUTPUT%TH%ITHBUFC, OUTPUT%TH%SITHBUFC)
         OUTPUT%TH%ITHBUFC(1:OUTPUT%TH%SITHBUFC) = ITHBUFTMP(1:OUTPUT%TH%SITHBUFC)
@@ -9659,7 +9748,7 @@ c-----
      C       IPARTS   ,IPARTQ   ,IPARTC   ,IPARTT   ,IPARTP  ,IPARTR   ,
      D       IPARTG   ,IPARTX   ,IPARTSP  ,IPARTIG3D,LITHBUFMX,
      E       MAP_TABLES, 4,INOM_OPT(31),INOM_OPT(32),SENSORS,
-     F       INTERFACES,IPARI   )
+     F       INTERFACES,IPARI   ,0)
 C
         CALL MY_ALLOC(OUTPUT%TH%ITHBUFD,OUTPUT%TH%SITHBUFD)
         OUTPUT%TH%ITHBUFD(1:OUTPUT%TH%SITHBUFD) = ITHBUFTMP(1:OUTPUT%TH%SITHBUFD)
@@ -9703,7 +9792,7 @@ c-----
      C       IPARTS   ,IPARTQ   ,IPARTC   ,IPARTT   ,IPARTP  ,IPARTR   ,
      D       IPARTG   ,IPARTX   ,IPARTSP  ,IPARTIG3D,LITHBUFMX,
      E       MAP_TABLES, 5,INOM_OPT(31),INOM_OPT(32),SENSORS,
-     F       INTERFACES,IPARI   )
+     F       INTERFACES,IPARI   ,0)
 C
         CALL MY_ALLOC(OUTPUT%TH%ITHBUFE,OUTPUT%TH%SITHBUFE)
         OUTPUT%TH%ITHBUFE = ITHBUFTMP(1:OUTPUT%TH%SITHBUFE)
@@ -9746,7 +9835,7 @@ c-----
      C       IPARTS   ,IPARTQ   ,IPARTC   ,IPARTT   ,IPARTP  ,IPARTR   ,
      D       IPARTG   ,IPARTX   ,IPARTSP  ,IPARTIG3D,LITHBUFMX,
      E       MAP_TABLES, 6,INOM_OPT(31),INOM_OPT(32),SENSORS,
-     F       INTERFACES,IPARI   )
+     F       INTERFACES,IPARI   ,0)
 C
         CALL MY_ALLOC(OUTPUT%TH%ITHBUFF,OUTPUT%TH%SITHBUFF)
         OUTPUT%TH%ITHBUFF(1:OUTPUT%TH%SITHBUFF) = ITHBUFTMP(1:OUTPUT%TH%SITHBUFF)
@@ -9789,7 +9878,7 @@ c-----
      C       IPARTS   ,IPARTQ   ,IPARTC   ,IPARTT   ,IPARTP  ,IPARTR   ,
      D       IPARTG   ,IPARTX   ,IPARTSP  ,IPARTIG3D,LITHBUFMX,
      E       MAP_TABLES, 7,INOM_OPT(31),INOM_OPT(32),SENSORS,
-     F       INTERFACES,IPARI   )
+     F       INTERFACES,IPARI   ,0)
 C
         CALL MY_ALLOC(OUTPUT%TH%ITHBUFG,OUTPUT%TH%SITHBUFG)
         OUTPUT%TH%ITHBUFG(1:OUTPUT%TH%SITHBUFG) = ITHBUFTMP(1:OUTPUT%TH%SITHBUFG)
@@ -9832,7 +9921,7 @@ c-----
      C       IPARTS   ,IPARTQ   ,IPARTC   ,IPARTT   ,IPARTP  ,IPARTR   ,
      D       IPARTG   ,IPARTX   ,IPARTSP  ,IPARTIG3D,LITHBUFMX,
      E       MAP_TABLES, 8,INOM_OPT(31),INOM_OPT(32),SENSORS,
-     F       INTERFACES,IPARI   )
+     F       INTERFACES,IPARI   ,0)
 C
         CALL MY_ALLOC(OUTPUT%TH%ITHBUFH,OUTPUT%TH%SITHBUFH)
         OUTPUT%TH%ITHBUFH(1:OUTPUT%TH%SITHBUFH) = ITHBUFTMP(1:OUTPUT%TH%SITHBUFH)
@@ -9875,7 +9964,7 @@ c-----
      C       IPARTS   ,IPARTQ   ,IPARTC   ,IPARTT   ,IPARTP  ,IPARTR   ,
      D       IPARTG   ,IPARTX   ,IPARTSP  ,IPARTIG3D,LITHBUFMX,
      E       MAP_TABLES, 9,INOM_OPT(31),INOM_OPT(32),SENSORS,
-     F       INTERFACES,IPARI   )
+     F       INTERFACES,IPARI   ,0)
 C
         CALL MY_ALLOC(OUTPUT%TH%ITHBUFI,OUTPUT%TH%SITHBUFI)
         OUTPUT%TH%ITHBUFI = ITHBUFTMP(1:OUTPUT%TH%SITHBUFI)
@@ -9891,10 +9980,6 @@ C
       IF(ALLOCATED(ITHSUB))    DEALLOCATE(ITHSUB)
       IF(ALLOCATED(ITHBUFTMP)) DEALLOCATE(ITHBUFTMP)
 C
-C -------------------------------------------------
-C Check des surfaces pour les sorties TH
-C -------------------------------------------------
-      CALL CHECK_SURF(IGRSURF,2)
 C -------------------------------------------------
 C /TH/SURF : outputting Pressure and Area : 
 C -------------------------------------------------
@@ -10012,7 +10097,10 @@ C appel a routine generique ici et dans ddsplit
      1      LENWA ,NTHWA  ,NAIRWA    ,NUMELS   ,NUMELQ,
      2      NUMELC,NUMELTG,NUMELT    ,NUMELP   ,NUMELR,
      3      NUMNOD,NMNT   ,L_MUL_LAG1,L_MUL_LAG,MAXNX ,
-     4      LWASPH,NUMSPH    ,LWASPIO, NRCVVOIS0 )
+     4      LWASPH,NUMSPH    ,LWASPIO, NRCVVOIS0,
+     5      LWAMP_L,LWANMP_L )
+      LWAMP  = LWAMP_L   !< Copy values in common
+      LWANMP = LWANMP_L  !< Copy values in common
 C init MULTIMAX
       ALLOCATE(MWA(LENWA)     ,  STAT=stat)
       MWA = ZERO
@@ -10155,11 +10243,11 @@ c build structure surfaces specific Inlet Outlet
          IF(STAT /= 0) CALL ANCMSG(MSGID=268,ANMODE=ANINFO,
      .                              MSGTYPE=MSGERROR,
      .                         C1='IBUFSSG_IO')
-         IBUFSSG_IO(1:SIBUFSSG_IO) = ZERO
+         IBUFSSG_IO(1:SIBUFSSG_IO) = 0
          CALL SET_IBUFSSG_IO(ISPHIO, IGRSURF, IBUFSSG_IO)
       ELSE
          ALLOCATE(IBUFSSG_IO(1))
-         SIBUFSSG_IO = ZERO
+         SIBUFSSG_IO = 0
       ENDIF
 
 !--------------------------------------------
@@ -10189,7 +10277,7 @@ C--------------------------------------------
         ALLOCATE(IGAUP(NBGAUGE))
         ALLOCATE(NGAUP(NSPMD))
         ALLOCATE(TAG_SKN(NUMSKW+NSUBMOD+1))
-        ALLOCATE(MULTIPLE_SKEW(NUMSKW+1))
+        ALLOCATE(SKEWS%MULTIPLE_SKEW(NUMSKW+1))
         ISKWP(1:NUMSKW+1) = 0
         TAG_SKN(1:NUMSKW+NSUBMOD+1) = 0
         NSKWP(1:NSPMD) = 0
@@ -10211,7 +10299,7 @@ C
      B    IRBYM  ,LNRBYM  ,CEP    ,IBCR      ,IRBE2   ,
      C    LRBE2  ,CEPSP   ,CELSPH ,ILOADP    ,LLOADP  ,
      D    LGAUGE ,IGAUP   ,NGAUP  ,INTBUF_TAB,IBFFLUX ,
-     E    ICNDS10,ITAGND  ,IGEO   ,TAG_SKN   ,MULTIPLE_SKEW,
+     E    ICNDS10,ITAGND  ,IGEO   ,TAG_SKN   ,SKEWS%MULTIPLE_SKEW,
      F    IBFV   ,IBCSCYC ,LBCSCYC,R_SKEW    ,IPM,
      G    SENSORS,SCEP    ,EBCS_TAB,LOADS,IFRAME)
 
@@ -10807,7 +10895,7 @@ c
      X         POIN_PART_SHELL,POIN_PART_TRI,POIN_PART_SOL,MID_PID_SHELL,MID_PID_TRI ,
      Y         MID_PID_SOL  , TAG_NM      ,NINDX_NM       ,INDX_NM      ,TAG_SCRATCH ,
      Z         NINDX_SCRT   , INDX_SCRT   ,FLAG_24_25     ,NUMNOD_L(P)  ,TAG_SKN     ,
-     A         MULTIPLE_SKEW, IGRSURF_PROC,KNOTLOCPC     ,KNOTLOCEL     ,ALE_ELM(P),
+     A         SKEWS%MULTIPLE_SKEW, IGRSURF_PROC,KNOTLOCPC     ,KNOTLOCEL     ,ALE_ELM(P),
      B         SIZE_ALE_ELM(P),PINCH_DATA ,TAG_SKINS6    ,IBCSCYC      ,LBCSCYC   ,T_MONVOL,
      C         INDX_S,INDX_Q,INDX_TG,FACE_ELM_S,FACE_ELM_Q,FACE_ELM_TG,NBR_TH_MONVOL, EBCS_TAB,
      D         KLOADPINTER  ,LOADPINTER   ,DGAPLOADINT   ,S_LOADPINTER, SCEP,DYNAIN_DATA,
@@ -10877,7 +10965,7 @@ C
           DEALLOCATE(IPART_STATE)
           DEALLOCATE(EIGIPM, EIGIBUF, EIGRPM)
           DEALLOCATE(TAG_SKN)
-          DEALLOCATE(MULTIPLE_SKEW)
+          DEALLOCATE(SKEWS%MULTIPLE_SKEW)
           IF(IDDLEVEL ==1 .OR. ((NINTER == 0).AND.(ISMS == 0))) THEN
             DEALLOCATE(TAGXREF)
             DEALLOCATE(TAGREFSTA)
@@ -11053,8 +11141,7 @@ C
       IF(ALLOCATED(MULTI_FVM%VEL)) DEALLOCATE(MULTI_FVM%VEL)
       IF(ALLOCATED(MULTI_FVM%ACC)) DEALLOCATE(MULTI_FVM%ACC)
       CALL ALE_CONNECTIVITY%ALE_DEALLOCATE_CONNECTIVITY()
-!!      DEALLOCATE(STACK)
-      IF(IPART_STACK > 0 .OR. IPART_PCOMPP > 0)DEALLOCATE(STACK_INFO)
+      IF(IPART_STACK > 0 .OR. IPART_PCOMPP > 0) DEALLOCATE(STACK_INFO)
       IF(ALLOCATED(IPRELOAD)) DEALLOCATE(IPRELOAD)
       IF(ALLOCATED(PRELOAD))  DEALLOCATE(PRELOAD)
       IF(ALLOCATED(IFLAG_BPRELOAD))  DEALLOCATE(IFLAG_BPRELOAD)
@@ -11096,6 +11183,7 @@ C
 
       IF(ALLOCATED(DPL0CLD)) DEALLOCATE(DPL0CLD)
       IF(ALLOCATED(VEL0CLD)) DEALLOCATE(VEL0CLD)
+      IF(ALLOCATED(EBCS_TAG_CELL_SPMD)) DEALLOCATE(EBCS_TAG_CELL_SPMD)
 C----------------------------------------------
 
       RETURN

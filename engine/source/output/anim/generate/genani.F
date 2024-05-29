@@ -2799,7 +2799,7 @@ C------------gps2 part
             ! --------------------------
             IF(NSPMD > 1)THEN
              LENR = IAD_ELEM(1,NSPMD+1)-IAD_ELEM(1,1)
-             CALL SPMD_EXCH_NODAREAI(VGPS,IAD_ELEM,FR_ELEM,LENR,WEIGHT)
+             CALL SPMD_EXCH_NODAREA(VGPS,IAD_ELEM,FR_ELEM,LENR,WEIGHT) 
              CALL SPMD_EXCH_NODAREA(WGPS,IAD_ELEM,FR_ELEM,LENR,WEIGHT)
             ENDIF
             ! --------------------------
@@ -2829,7 +2829,7 @@ C------------gps2 part
            ! --------------------------
            IF(NSPMD > 1)THEN
             LENR = IAD_ELEM(1,NSPMD+1)-IAD_ELEM(1,1)
-            IF (IFIRST==1) CALL SPMD_EXCH_NODAREAI(VGPS,IAD_ELEM,FR_ELEM,LENR,WEIGHT)
+            IF (IFIRST==1) CALL SPMD_EXCH_NODAREA(VGPS,IAD_ELEM,FR_ELEM,LENR,WEIGHT) 
             IF (J<=3) THEN
              CALL SPMD_EXCH_NODAREA2(VFLU,IAD_ELEM,FR_ELEM,LENR,WEIGHT,J)
             ELSE
@@ -2907,7 +2907,7 @@ C
            ! --------------------------
            IF(NSPMD > 1)THEN
             LENR = IAD_ELEM(1,NSPMD+1)-IAD_ELEM(1,1)
-            IF (IFIRST==1) CALL SPMD_EXCH_NODAREAI(VGPS,IAD_ELEM,FR_ELEM,LENR,WEIGHT)
+            IF (IFIRST==1) CALL SPMD_EXCH_NODAREA(VGPS,IAD_ELEM,FR_ELEM,LENR,WEIGHT)
             IF (J<=3) THEN
              CALL SPMD_EXCH_NODAREA2(VFLU,IAD_ELEM,FR_ELEM,LENR,WEIGHT,J)
             ELSE
@@ -3168,7 +3168,7 @@ C  en spmd localement NBF = 0 mais pas la somme sur pi !
        DO I = 1,MX_ANI
         IFUNC = I
         IF(ANIM_CE(I)==1)THEN
-          IF(I<=2142 .OR. I==2155 .OR. I==2156 .OR. (I>=2239.AND.I<=10251) .OR. 
+          IF(I<=2142 .OR. I==2155 .OR. I==2156 .OR. (I>=2239.AND.I<=10252) .OR.
      .      (I>=10253.AND.I<=10675) .OR. (I >= 10676 .AND. I <= 1000000)) THEN
             CALL DFUNCC(ELBUF_TAB ,WAFT        ,IFUNC         ,IPARG,GEO    ,
      .                  IXQ       ,IXC         ,IXTG          ,MAS          ,PM         ,

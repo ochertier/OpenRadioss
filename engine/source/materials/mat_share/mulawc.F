@@ -233,7 +233,7 @@ C-----------------------------------------------
      .   IRUPT,NFAIL,IADBUF,IADBUFR,MAXNULVAR,IGTYP,NUVAR,NVARF,JDIR,
      .   NFUNC, JPOS, NINDX,NUPAR,NUPARAM,NUPARAM0,NFUNC_FAIL,NTABL_FAIL,
      .   IFAILWV,NLOCAL,NSENSOR,IUN,IBIDON1,IBIDON2,IBIDON3,
-     .   IPTX,ILAYER,IROT,DMG_FLAG,
+     .   IPTX,ILAYER,IROT,DMG_FLAG,LF_DAMMX,NIPAR,
      .   IGMAT,IPGMAT,NPTT,IPT_ALL,NPTTOT,NUVARV,ILAW,
      .   FAILNPT,JOFF,SIZNUL,PLY_ID,ISEQ,PROGRESSIVE_CRACK,
      .   ORTH_DAMAGE,L_DMG,IPRONY,ISRATE,NVARTMP,INLOC,IDRAPE,VP
@@ -278,7 +278,7 @@ c----
       TYPE(BUF_VISC_),POINTER :: VBUF
 c----
       INTEGER, DIMENSION(:) ,POINTER  :: FLD_IDX,FOFF,OFFLY,ITABLE,IFUNC_FAIL,
-     .                                   ITABL_FAIL,VARTMP
+     .                                   ITABL_FAIL,VARTMP,IPARAMF
       my_real, DIMENSION(:) ,POINTER  :: UVAR,UVARF,UELR,UELR1,DAM,
      .   DFMAX,TDEL ,OFFL,UVARV,UPARAM,UPARAM0,UPARAMF,
      .   DIRDMG,DIR_ORTH,DAMINI
@@ -731,15 +731,9 @@ c               total strain in element coord sys
                 DEPSXX(I) = R1*R1*T1 + S1*S1*T2 + TWO*R1*S1*T3  ! eps_x dir1
                 DEPSYY(I) = R2*R2*T1 + S2*S2*T2 + TWO*R2*S2*T3  ! eps_y dir2           
 c
-!                DEPSYZ(I) = EYZ(I)  ! incremental
-!                DEPSZX(I) = EXZ(I)   
-c
                 EPSXX(I) = T1     
                 EPSYY(I) = T2   
-!       not IT dependant
-!                EPSXY(I) = ZERO
-!                EPSYZ(I) = ZERO                       
-!                EPSZX(I) = ZERO  
+                EPSXY(I) = T3 * TWO  ! gamma_xy
               ENDDO
             ELSE  
         !       ------------
@@ -753,13 +747,6 @@ c             strain rate in fiber coord sys
                 R2 = DIR_B(II)
                 S2 = DIR_B(II+NEL)
 C---
-!                EPSXX(I) = GSTR(I,1)      
-!                EPSYY(I) = GSTR(I,2)   
-!       not IT dependant 
-!                EPSXY(I) = ZERO
-!                EPSYZ(I) = ZERO                     
-!                EPSZX(I) = ZERO  
-C---
                 ZT = POSLY(I,IPT) *THK0(I)
                 T1 = EXX(I) + ZT*KXX(I)
                 T2 = EYY(I) + ZT*KYY(I)
@@ -767,26 +754,15 @@ C---
                 DEPSXY(I) = (R1*R2 + S1*S2) / (R1*S2 - R2*S1)   ! Tan(alpha_totale)
                 DEPSXX(I) = R1*R1*T1 + S1*S1*T2 + TWO*R1*S1*T3 ! delta_eps_x dir1
                 DEPSYY(I) = R2*R2*T1 + S2*S2*T2 + TWO*R2*S2*T3 ! delta_eps_y dir2
-c
-!       not IT dependant
-!                DEPSYZ(I) = EYZ(I)
-!                DEPSZX(I) = EXZ(I)   
-c---
-c               total true strain in global coord sys
-!                EPSXX(I)  = GSTR(I,1) + ZT*GSTR(I,6)
-!                EPSYY(I)  = GSTR(I,2) + ZT*GSTR(I,7)
-!       not IT dependant
-!                EPSXY(I)  = ZERO
-!                EPSYZ(I)  = ZERO
-!                EPSZX(I)  = ZERO    
               ENDDO
             ENDIF
             IF (FLAG_EPS) THEN
               DO I=JFT,JLT
 c             total true strain in global coord sys
                 ZT = POSLY(I,IPT) *THK0(I)
-                EPSXX(I)  = GSTR(I,1) + ZT*GSTR(I,6)
-                EPSYY(I)  = GSTR(I,2) + ZT*GSTR(I,7)    
+                EPSXX(I) = GSTR(I,1) + ZT*GSTR(I,6)
+                EPSYY(I) = GSTR(I,2) + ZT*GSTR(I,7)    
+                EPSXY(I) = GSTR(I,3) + ZT*GSTR(I,8)
               ENDDO
             ENDIF
 c------
@@ -818,16 +794,7 @@ c               total strain in element coord sys
                 DEPSXY(I) = (R1*R2 + S1*S2) / (R1*S2 - R2*S1)    ! Tan(alpha_totale)
                 DEPSXX(I) = R1*R1*T1 + S1*S1*T2 + TWO*R1*S1*T3  ! eps_x dir1
                 DEPSYY(I) = R2*R2*T1 + S2*S2*T2 + TWO*R2*S2*T3  ! eps_y dir2           
-c
-!                DEPSYZ(I) = EYZ(I)  ! incremental
-!                DEPSZX(I) = EXZ(I)   
-c
-!                EPSXX(I) = T1     
-!                EPSYY(I) = T2      
-!       not IT dependant
-!                EPSXY(I) = ZERO
-!                EPSYZ(I) = ZERO                       
-!                EPSZX(I) = ZERO  
+                EPSXY(I)  = T3 * TWO  ! gamma_xy
               ENDDO
             ELSE  
         !       ------------
@@ -840,13 +807,6 @@ c             strain rate in fiber coord sys
                 S1 = DIR_A(II+NEL)
                 R2 = DIR_B(II)
                 S2 = DIR_B(II+NEL)
-C
-!                EPSXX(I) = GSTR(I,1)      
-!                EPSYY(I) = GSTR(I,2)
-!       not IT dependant    
-!                EPSXY(I) = ZERO
-!                EPSYZ(I) = ZERO                     
-!                EPSZX(I) = ZERO  
 C---
                 ZT = POSLY(I,IPT) *THK0(I)
                 T1 = EXX(I) + ZT*KXX(I)
@@ -855,17 +815,6 @@ C---
                 DEPSXY(I) = (R1*R2 + S1*S2) / (R1*S2 - R2*S1)   ! Tan(alpha_totale)
                 DEPSXX(I) = R1*R1*T1 + S1*S1*T2 + TWO*R1*S1*T3 ! delta_eps_x dir1
                 DEPSYY(I) = R2*R2*T1 + S2*S2*T2 + TWO*R2*S2*T3 ! delta_eps_y dir2
-c
-!                DEPSYZ(I) = EYZ(I)
-!                DEPSZX(I) = EXZ(I)   
-c---
-c               total true strain in global coord sys
-!                EPSXX(I)  = GSTR(I,1) + ZT*GSTR(I,6)
-!                EPSYY(I)  = GSTR(I,2) + ZT*GSTR(I,7)
-!       not IT dependant
-!                EPSXY(I)  = ZERO
-!                EPSYZ(I)  = ZERO
-!                EPSZX(I)  = ZERO    
               ENDDO
             ENDIF ! IF (ISMSTR == 11) THEN
             IF (FLAG_EPS) THEN
@@ -873,8 +822,10 @@ c               total true strain in global coord sys
                         ZT = POSLY(I,IPT) *THK0(I)
                         T1 = GSTR(I,1) + ZT*GSTR(I,6)
                         T2 = GSTR(I,2) + ZT*GSTR(I,7)
+                        T3 = GSTR(I,3) + ZT*GSTR(I,8)
                         EPSXX(I) = T1     
                         EPSYY(I) = T2       
+                        EPSXY(I) = T3       
                 ENDDO
             ENDIF
            ELSE !        Igtyp 9/10/11/17/51   - NO law58
@@ -910,9 +861,6 @@ C
               DEPSXX(I)=EXX(I)+ZT*KXX(I)
               DEPSYY(I)=EYY(I)+ZT*KYY(I)
               DEPSXY(I)=EXY(I)+ZT*KXY(I)
-!       depsyz and zx are IT independant !
-!              DEPSYZ(I)=EYZ(I)
-!              DEPSZX(I)=EXZ(I)
             ENDDO
            ENDIF
 !
@@ -1093,9 +1041,9 @@ C------------------------------------------
      C        SIGVXX      ,SIGVYY   ,SIGVXY      ,SIGVYZ   ,SIGVZX    ,
      D        ISRATE      ,UVARV    ,ISHPLYXFEM  ,IPT      ,LBUF%SEQ  ,
      E        PLY_EXX     ,PLY_EYY  ,PLY_EXY     ,PLY_EXZ  ,PLY_EYZ   ,
-     F        PLY_F       ,LBUF%PLA ,LBUF%DAM    ,LBUF%CRAK,GBUF%IERR ,
+     F        PLY_F       ,LBUF%PLA ,LBUF%CRAK   ,GBUF%IERR,
      G        IOFF_DUCT   ,IFAILURE ,PLY_ID      ,IPG      ,LBUF%TSAIWU,
-     H        IMCONV      ,IOUT     )
+     H        IMCONV      ,IOUT     ,LBUF%DMG    ,BUFLY%L_DMG)
 
           ELSEIF (IGTYP == 9) THEN
 !           INTEGRATION BY POINTS (through thickness)
@@ -1652,14 +1600,15 @@ c
 c  
           ELSEIF (ILAW == 104 )THEN
             CALL SIGEPS104C(
-     1         JLT     ,NGL     ,IPG     ,ILAYER  ,IT      ,NUPARAM0 ,NUVAR   ,NFUNC   ,
-     2         IFUNC   ,NPF     ,TF      ,DT1C    ,TT      ,UPARAM0  ,UVAR    ,JTHE    ,
-     3         RHO     ,TEMPEL  ,LBUF%PLA,DPLA    ,SSP     ,LBUF%OFF,LBUF%EPSD,GS      ,
-     5         DEPSXX  ,DEPSYY  ,DEPSXY  ,DEPSYZ  ,DEPSZX  ,THKLYL  ,OFF     ,
-     6         LBUF%SIG(IJ1),LBUF%SIG(IJ2),LBUF%SIG(IJ3),LBUF%SIG(IJ4),LBUF%SIG(IJ5),
-     7         THKN    ,SIGNXX  ,SIGNYY  ,SIGNXY  ,SIGNYZ  ,SIGNZX  ,VISCMX  ,SIGY    ,
-     8         ETSE    ,VARNL(1,IT)      ,LBUF%DMG,LBUF%TEMP        ,LBUF%SEQ,ELBUF_STR%NPTR,
-     9         ELBUF_STR%NPTS,ELBUF_STR%NPTT,BUFLY,INLOC   ,EPSPL   )
+     1         JLT     ,NGL     ,IPG     ,ILAYER  ,IT      ,NUPARAM0 ,NUVAR    ,
+     2         DT1C    ,TT      ,UPARAM0 ,UVAR    ,JTHE    ,RHO      ,TEMPEL   ,
+     3         LBUF%PLA,DPLA    ,SSP     ,LBUF%OFF,LBUF%EPSD,EPSPL   ,GS       ,
+     4         DEPSXX  ,DEPSYY  ,DEPSXY  ,DEPSYZ  ,DEPSZX  ,THKLYL   ,OFF      ,
+     5         LBUF%SIG(IJ1),LBUF%SIG(IJ2),LBUF%SIG(IJ3),LBUF%SIG(IJ4),LBUF%SIG(IJ5),
+     6         SIGNXX  ,SIGNYY  ,SIGNXY  ,SIGNYZ  ,SIGNZX  ,THKN     ,SIGY     ,
+     7         ETSE    ,VARNL(1,IT),LBUF%DMG,BUFLY%L_DMG,LBUF%TEMP,LBUF%SEQ,INLOC,
+     8         ELBUF_STR%NPTR,ELBUF_STR%NPTS,ELBUF_STR%NPTT,BUFLY    ,LBUF%PLANL,
+     9         BUFLY%L_PLANL ,LBUF%EPSDNL,BUFLY%L_EPSDNL)
 !
           ELSEIF (ILAW == 107 )THEN
             CALL SIGEPS107C(
@@ -1861,10 +1810,13 @@ c---
               TDEL   => FBUF%FLOC(IFL)%TDEL   
               FLD_IDX=> FBUF%FLOC(IFL)%INDX
               FOFF   => FBUF%FLOC(IFL)%OFF
+              LF_DAMMX   = FBUF%FLOC(IFL)%LF_DAMMX
               NUPAR      =  MAT_ELEM%MAT_PARAM(IMAT)%FAIL(IFL)%NUPARAM
+              NIPAR      =  MAT_ELEM%MAT_PARAM(IMAT)%FAIL(IFL)%NIPARAM
               NFUNC_FAIL =  MAT_ELEM%MAT_PARAM(IMAT)%FAIL(IFL)%NFUNC
               NTABL_FAIL =  MAT_ELEM%MAT_PARAM(IMAT)%FAIL(IFL)%NTABLE
               UPARAMF    => MAT_ELEM%MAT_PARAM(IMAT)%FAIL(IFL)%UPARAM(1:NUPAR)
+              IPARAMF    => MAT_ELEM%MAT_PARAM(IMAT)%FAIL(IFL)%IPARAM(1:NIPAR)
               IFUNC_FAIL => MAT_ELEM%MAT_PARAM(IMAT)%FAIL(IFL)%IFUNC(1:NFUNC_FAIL)
               ITABL_FAIL => MAT_ELEM%MAT_PARAM(IMAT)%FAIL(IFL)%TABLE(1:NTABL_FAIL)
 c              IF (IXFEM == 0) PTHKF(ILAYER,IFL) = ZERO
@@ -2062,7 +2014,7 @@ c
      2               TT        ,DT1C      ,IPG       ,ILAYER    ,IT        ,
      3               NGL       ,DMG_FLAG  ,DMG_LOC_SCALE ,DFMAX ,TDEL      ,
      4               SIGNXX    ,SIGNYY    ,SIGNXY    ,SIGNYZ    ,SIGNZX    ,        
-     5               OFF       ,FOFF      )
+     5               OFF       ,FOFF      ,LF_DAMMX  )
 c
               CASE (14)     !    Hashin failure model  
                 DO I=JFT,JLT        
@@ -2072,10 +2024,10 @@ c
                 CALL FAIL_HASHIN_C(
      1               NEL       ,NUPAR     ,NVARF     ,UPARAMF   ,UVARF      ,
      2               TT        ,DT1C      ,IPG       ,ILAYER    ,IT         ,
-     3               NGL       ,DMG_FLAG  ,DMG_LOC_SCALE ,DFMAX     ,TDEL       ,
+     3               NGL       ,DMG_FLAG  ,DMG_LOC_SCALE,DFMAX  ,TDEL       ,
      4               SIGNXX    ,SIGNYY    ,SIGNXY    ,SIGNYZ    ,SIGNZX     ,        
      5               OFF       ,FOFF      ,PLY_ID    ,
-     6               EPSP      ,FWAVE_EL  ,GBUF%DMG  ) 
+     6               EPSP      ,FWAVE_EL  ,GBUF%DMG  ,LF_DAMMX  ) 
 c
               CASE (16)     !    Modified Puck failure model
                 CALL FAIL_PUCK_C(
@@ -2083,7 +2035,7 @@ c
      2               TT        ,NGL       ,IPG       ,ILAYER    ,IT        ,
      3               SIGNXX    ,SIGNYY    ,SIGNXY    ,SIGNYZ    ,SIGNZX    ,
      4               OFF       ,FOFF      ,DMG_FLAG  ,DMG_LOC_SCALE ,
-     5               DFMAX     ,TDEL      ,DT1C      )
+     5               DFMAX     ,LF_DAMMX  ,TDEL      ,DT1C      )
 c
               CASE (23)     !    Tabulated failure model
                 IF (IXFEM == 0) THEN
@@ -2123,8 +2075,7 @@ c
      2               TT        ,NPF       ,TF        ,NFUNC_FAIL    ,IFUNC_FAIL    ,   
      3               NGL       ,IPG       ,ILAYER    ,IT        ,HARDM     ,   
      4               SIGNXX    ,SIGNYY    ,SIGNXY    ,SIGNYZ    ,SIGNZX    ,
-     5               OFF       ,FOFF      ,DFMAX     ,TDEL      ,   
-     6               DAM       )
+     5               OFF       ,FOFF      ,DFMAX     ,TDEL      ,LF_DAMMX  )
 c
               CASE (28)     !    windshield failure (Christian Alter model)
                 IROT   =  ELBUF_STR%BUFLY(ILAYER)%LY_DIRA
@@ -2252,14 +2203,14 @@ c
               CASE (39)     !    GENE1
 c
                 CALL FAIL_GENE1_C(
-     1            JLT      ,NUPAR    ,NVARF    ,NFUNC_FAIL   ,IFUNC_FAIL   ,
+     1            JLT      ,NUPAR    ,NVARF    ,NFUNC_FAIL,IFUNC_FAIL,
      2            NPF      ,TF       ,TT       ,DT1C     ,UPARAMF  ,IPG      ,
      3            NGL      ,GBUF%DT  ,EPSPL    ,UVARF    ,OFF      ,    
      4            EPSXX    ,EPSYY    ,EPSXY    ,AREA     ,THKN     ,            
      5            SIGNXX   ,SIGNYY   ,SIGNXY   ,SIGNYZ   ,SIGNZX   , 
      6            EL_TEMP  ,DFMAX    ,ALDT     ,TABLE    ,TDEL     ,
-     7            THK0     ,IPT      ,FOFF     ,THKLYL   ,NTABL_FAIL,
-     8            ITABL_FAIL)
+     7            THK0     ,IPT      ,FOFF     ,THKLYL   ,NTABL_FAIL,ITABL_FAIL,
+     8            LF_DAMMX ,NIPAR    ,IPARAMF  )
 c
               CASE (40)     !    RTCL
 c
@@ -2288,7 +2239,7 @@ c
      4            SIGNXX   ,SIGNYY   ,SIGNXY   ,SIGNYZ   ,SIGNZX   ,              
      5            EL_PLA   ,EL_TEMP  ,SIGY     ,FOFF     ,DFMAX    ,
      6            TDEL     ,IPT      ,IPG      ,DMG_FLAG ,DMG_LOC_SCALE,
-     7            DAMINI   ,AREA     ,INLOC    ,NPG      ,ITABL_FAIL  )
+     7            DAMINI   ,AREA     ,INLOC    ,NPG      )
 c
               CASE (43)     !    Syazwan failure model
 c
@@ -2307,7 +2258,7 @@ c
      2            TT        ,NGL       ,IPG       ,ILAYER    ,IT        ,
      3            SIGNXX    ,SIGNYY    ,SIGNXY    ,SIGNYZ    ,SIGNZX    ,
      4            OFF       ,FOFF      ,DMG_FLAG  ,DMG_LOC_SCALE ,
-     5            DFMAX     ,TDEL      ,DT1C      )
+     5            DFMAX     ,LF_DAMMX  ,TDEL      ,DT1C      )
 c
               CASE (45)     !    Tsai-Hill criterion
 c
@@ -2316,7 +2267,7 @@ c
      2            TT        ,NGL       ,IPG       ,ILAYER    ,IT        ,
      3            SIGNXX    ,SIGNYY    ,SIGNXY    ,SIGNYZ    ,SIGNZX    ,
      4            OFF       ,FOFF      ,DMG_FLAG  ,DMG_LOC_SCALE ,
-     5            DFMAX     ,TDEL      ,DT1C      )
+     5            DFMAX     ,LF_DAMMX  ,TDEL      ,DT1C      )
 c
               CASE (46)     !    Hoffman criterion
 c
@@ -2325,7 +2276,7 @@ c
      2            TT        ,NGL       ,IPG       ,ILAYER    ,IT        ,
      3            SIGNXX    ,SIGNYY    ,SIGNXY    ,SIGNYZ    ,SIGNZX    ,
      4            OFF       ,FOFF      ,DMG_FLAG  ,DMG_LOC_SCALE ,
-     5            DFMAX     ,TDEL      ,DT1C      )
+     5            DFMAX     ,LF_DAMMX  ,TDEL      ,DT1C      )
 c
               CASE (47)     !    Maximum strain failure model
 c
@@ -2334,7 +2285,7 @@ c
      2            TT        ,NGL       ,IPG       ,ILAYER    ,IT        ,
      3            EPSXX     ,EPSYY     ,EPSXY     ,EPSYZ     ,EPSZX     ,
      4            OFF       ,FOFF      ,DMG_FLAG  ,DMG_LOC_SCALE ,
-     5            DFMAX     ,TDEL      ,DT1C      )
+     5            DFMAX     ,LF_DAMMX  ,TDEL      ,DT1C      )
 c
               CASE (48)     !    Orthotropic energy failure model
 c               
@@ -2371,11 +2322,12 @@ c         END of FAILURE MODELS
 c-----------------------------------
 #include "vectorize.inc"
           DO I=JFT,JLT                                               
-            LBUF%SIG(IJ(1)+I) = SIGNXX(I) * SIGOFF(I)      
-            LBUF%SIG(IJ(2)+I) = SIGNYY(I) * SIGOFF(I)           
-            LBUF%SIG(IJ(3)+I) = SIGNXY(I) * SIGOFF(I)           
-            LBUF%SIG(IJ(4)+I) = SIGNYZ(I) * SIGOFF(I)           
-            LBUF%SIG(IJ(5)+I) = SIGNZX(I) * SIGOFF(I)           
+            ! IJ(K) = NEL*(K-1)
+            LBUF%SIG(NEL*(1-1)+I) = SIGNXX(I) * SIGOFF(I)      
+            LBUF%SIG(NEL*(2-1)+I) = SIGNYY(I) * SIGOFF(I)           
+            LBUF%SIG(NEL*(3-1)+I) = SIGNXY(I) * SIGOFF(I)           
+            LBUF%SIG(NEL*(4-1)+I) = SIGNYZ(I) * SIGOFF(I)           
+            LBUF%SIG(NEL*(5-1)+I) = SIGNZX(I) * SIGOFF(I)           
           ENDDO                                                      
 C
 c------------------------------------------------

@@ -32,7 +32,6 @@ Chd|        FSEEK_C_RD                    ../common_source/tools/input_output/wr
 Chd|        SPMD_COLLECT_SEATBELT         source/mpi/output/spmd_collect_seatbelt.F
 Chd|        SPMD_GATHERV                  source/mpi/generic/spmd_gatherv.F
 Chd|        SPMD_GLOB_DSUM9               source/mpi/interfaces/spmd_th.F
-Chd|        SPMD_GLOB_ISUM9               source/mpi/interfaces/spmd_th.F
 Chd|        SPMD_GLOB_RSUM_POFF           source/mpi/generic/spmd_glob_rsum_poff.F
 Chd|        SPMD_SD_ACC                   source/mpi/output/spmd_sd_acc.F
 Chd|        SPMD_SD_GAU                   source/mpi/output/spmd_sd_gau.F
@@ -58,6 +57,7 @@ Chd|        WRITE_TH                      source/output/th/write_th.F
 Chd|        WRTDES                        source/output/th/wrtdes.F     
 Chd|        WRTDES0                       source/output/th/wrtdes0.F    
 Chd|        CLUSTER_MOD                   share/modules/cluster_mod.F   
+Chd|        EBCS_MOD                      ../common_source/modules/boundary_conditions/ebcs_mod.F
 Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
@@ -67,28 +67,29 @@ Chd|        SEATBELT_MOD                  ../common_source/modules/seatbelt_mod.
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
 Chd|        STACK_MOD                     share/modules/stack_mod.F     
 Chd|        TH_MOD                        share/modules/th_mod.F        
+Chd|        TH_SURF_MOD                   ../common_source/modules/interfaces/th_surf_mod.F
 Chd|====================================================================
-      SUBROUTINE HIST2(PM      ,D         ,X        ,V        ,A         ,
-     2                 IXS     ,BUFEL     ,WA       ,IPARG    ,SENSOR_TAB,
-     4                 FSAV    ,FLSW      ,SKEW     ,ELBUF_TAB,CLUSTER   ,
+      SUBROUTINE HIST2(PM      ,D         ,X        ,V           ,A         ,
+     2                 IXS     ,BUFEL     ,WA       ,IPARG       ,SENSOR_TAB,
+     4                 FSAV    ,FLSW      ,SKEW     ,ELBUF_TAB   ,CLUSTER   ,
      5                 PARTSAV ,ACCELM    ,NSENSOR  ,MATPARAM_TAB, 
-     6                 WEIGHT    ,IPART    ,IGRSURF  ,
-     7                 ITHGRP  ,ITHBUF    ,SUBSET   ,GEO      ,
+     6                 WEIGHT  ,IPART     ,IGRSURF  ,EBCS_TAB    ,
+     7                 ITHGRP  ,ITHBUF    ,SUBSET   ,GEO         ,
      8                 KXX     ,IXR       ,
      9                 KXSP    ,NOD2SP    ,SPBUF    ,
-     B                 AR        ,VR       ,DR       ,
-     D                 LRIVET    ,RIVET    ,IXP      ,
-     E                 ISKWN   ,IFRAME    ,XFRAME   ,IXC      ,IXQ       ,
-     F                 DTHIS0  ,THIS0     ,IFIL     ,NTHGRP2  ,IXTG      ,
-     G                 IGEO    ,IPM       ,FXBIPM   ,FXBDEP   ,FXBVIT    ,
-     H                 FXBACC  ,IPARTL    ,NPARTL   ,IACCP    ,NACCP     ,
+     B                 AR      ,VR        ,DR       ,
+     D                 LRIVET  ,RIVET     ,IXP      ,
+     E                 ISKWN   ,IFRAME    ,XFRAME   ,IXC         ,IXQ       ,
+     F                 DTHIS0  ,THIS0     ,IFIL     ,NTHGRP2     ,IXTG      ,
+     G                 IGEO    ,IPM       ,FXBIPM   ,FXBDEP      ,FXBVIT    ,
+     H                 FXBACC  ,IPARTL    ,NPARTL   ,IACCP       ,NACCP     ,
      I                 IPARTH  ,NPARTH    ,NVPARTH  ,
-     J                 MONVOL    ,VOLMON   ,FR_MV    ,TEMP,INOD ,
-     K                 FTHREAC ,NODREAC   ,GRESAV   ,GAUGE    ,
-     L                 IGAUP   ,NGAUP     ,ITTYP    ,SIZE_MES  ,
-     M                 RTHBUF  ,THKE      ,STACK    ,ISPHIO   ,VSPHIO    ,
-     N                 ITHFLAG ,PINCH_DATA,MULTI_FVM,W        ,SITHBUF   ,
-     Q                 FSAVSURF,NSEG_LOADP,NEED_TO_REINIT_FSAV)
+     J                 MONVOL  ,VOLMON    ,FR_MV    ,TEMP,INOD   ,
+     K                 FTHREAC ,NODREAC   ,GRESAV   ,GAUGE       ,
+     L                 IGAUP   ,NGAUP     ,ITTYP    ,SIZE_MES    ,
+     M                 RTHBUF  ,THKE      ,STACK    ,ISPHIO      ,VSPHIO    ,
+     N                 ITHFLAG ,PINCH_DATA,MULTI_FVM,W           ,SITHBUF   ,
+     Q                 FSAVSURF,NEED_TO_REINIT_FSAV)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -102,6 +103,8 @@ C-----------------------------------------------
       USE SEATBELT_MOD  
       USE SENSOR_MOD
       USE MATPARAM_DEF_MOD
+      USE EBCS_MOD , only : t_ebcs_tab
+      USE TH_SURF_MOD , only : TH_SURF_NUM_CHANNEL
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -132,6 +135,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(t_ebcs_tab), TARGET, INTENT(IN) :: EBCS_TAB
       INTEGER,INTENT(IN) :: SITHBUF,NSENSOR
       INTEGER NPARTL
       INTEGER IXS(NIXS,NUMELS),IPARG(NPARG,NGROUP),
@@ -165,17 +169,16 @@ C-----------------------------------------------
       TYPE (MULTI_FVM_STRUCT), INTENT(IN) :: MULTI_FVM   
       TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) ,INTENT(IN) :: SENSOR_TAB
       TYPE (MATPARAM_STRUCT_) ,DIMENSION(NUMMAT) ,INTENT(IN) :: MATPARAM_TAB
-      my_real, INTENT(INOUT) :: FSAVSURF(5,NSURF)
-      INTEGER, INTENT(INOUT) :: NSEG_LOADP(NSURF)
+      my_real, INTENT(INOUT) :: FSAVSURF(TH_SURF_NUM_CHANNEL,NSURF)
       LOGICAL, INTENT(INOUT) :: NEED_TO_REINIT_FSAV !< boolean to re-initialize PARTSAV array 
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      LOGICAL ICOND,RIVET_BOOL
+      LOGICAL ICOND,RIVET_BOOL,HAS_TH
       
       INTEGER I,J,K,L,M,N,II,JJ,NP,NN,N1,NRWA,
      .        JALE,FSAVMAX,NVAR,IAD,ITYP,IADV,KRBHOL,ID_HIST, SEEK_ID,
-     .        IMID,IPID,JALE_FROM_MAT,JALE_FROM_PROP
+     .        IMID,IPID,JALE_FROM_MAT,JALE_FROM_PROP,SURF_ID
 
       my_real XX,YY,ZZ,DET,XXMOM,YYMOM,ZZMOM, 
      .        XCG, YCG, ZCG, IXX, IYY, IZZ,IXY, IYZ, IZX,                   
@@ -183,7 +186,7 @@ C-----------------------------------------------
      .        FSAVINT(NTHVKI,NINTER+NINTSUB),FSAVVENT(5,NVENTTOT),          
      .        FAC,ARRAY(5)                            
       my_real, DIMENSION(100) :: SUBSAV  
-      my_real, DIMENSION(1) :: WA_LOCAL      
+      my_real, DIMENSION(1) :: WA_LOCAL
       REAL(KIND=8) :: THIS0_DOUBLE,TT_DOUBLE
       REAL(KIND=8) :: DTHIS0_DOUBLE,DT1_DOUBLE,THISC_DOUBLE
 C-----------------------------------------------
@@ -523,11 +526,9 @@ C                                    [Izx Iyz Izz]   {ZZMOM}
                  JXY=IYZ*IZX-IXY*IZZ
                  JYZ=IZX*IXY-IYZ*IXX
                  JZX=IXY*IYZ-IZX*IYY
-                 DET =  ONE/ MAX(EM20,
-     .                       IXX * JXX + IXY * JXY + IZX * JZX)
-                 WA(II)=DET *
-     .        (HALF*(IXX*XXMOM*XXMOM+IYY*YYMOM*YYMOM+IZZ*ZZMOM*ZZMOM)
-     .            + IXY*XXMOM*YYMOM+IYZ*YYMOM*ZZMOM+IZX*XXMOM*ZZMOM )
+                 DET =  ONE/ MAX(EM20,IXX * JXX + IXY * JXY + IZX * JZX)
+                 WA(II)=DET * (HALF*(IXX*XXMOM*XXMOM+IYY*YYMOM*YYMOM+IZZ*ZZMOM*ZZMOM)
+     .                             + IXY*XXMOM*YYMOM+IYZ*YYMOM*ZZMOM+IZX*XXMOM*ZZMOM )
               ELSEIF(K==24)THEN
                  WA(II)=SUBSAV(22)
               ELSEIF(K==25) THEN 
@@ -555,16 +556,9 @@ C-------------------------------------------------------
        FSAVMAX = NVOLU+NRBAG+NJOINT+NSECT+NRBODY+NRWALL+NINTER+NINTSUB
 
        IF (NSPMD > 1) THEN
-         CALL SPMD_GLOB_DSUM9(
-     .        FSAV,NTHVKI*(NINTER+NRWALL+NRBODY+NSECT+NJOINT))
-         IF((NVOLU+NRBAG)>0)
-     .        CALL SPMD_GLOB_DSUM9(
-     .        FSAV(1,1+NINTER+NRWALL+NRBODY+NSECT+NJOINT),
-     .        NTHVKI*(NVOLU+NRBAG))
-         IF(NINTSUB>0)
-     .        CALL SPMD_GLOB_DSUM9(
-     .  FSAV(1,1+NINTER+NRWALL+NRBODY+NSECT+NJOINT+NVOLU+NRBAG),
-     .  NTHVKI*NINTSUB)
+         CALL SPMD_GLOB_DSUM9(FSAV,NTHVKI*(NINTER+NRWALL+NRBODY+NSECT+NJOINT))
+         IF((NVOLU+NRBAG)>0)CALL SPMD_GLOB_DSUM9(FSAV(1,1+NINTER+NRWALL+NRBODY+NSECT+NJOINT),NTHVKI*(NVOLU+NRBAG))
+         IF(NINTSUB>0)CALL SPMD_GLOB_DSUM9(FSAV(1,1+NINTER+NRWALL+NRBODY+NSECT+NJOINT+NVOLU+NRBAG),NTHVKI*NINTSUB)
        ENDIF
        IF(FSAVMAX>0) THEN
          IF (ISPMD/=0) THEN
@@ -582,14 +576,12 @@ C
              FSAVINT(J,N)=FSAV(J,N)
            END DO
            DO N=1,NINTSUB
-             FSAVINT(J,NINTER+N)=
-     .  FSAV(J,(NINTER+NRWALL+NRBODY+NSECT+NJOINT+NVOLU+NRBAG)+N)
+             FSAVINT(J,NINTER+N)=FSAV(J,(NINTER+NRWALL+NRBODY+NSECT+NJOINT+NVOLU+NRBAG)+N)
            END DO
          END DO
        END IF
        IF(NVENTTOT>0)THEN
-C
-C        Volmon dumped into Fsavvent.
+         ! Volmon dumped into Fsavvent.
          DO I=1,NVENTTOT
            DO J=1,5
              FSAVVENT(J,I) = ZERO
@@ -597,49 +589,80 @@ C        Volmon dumped into Fsavvent.
          END DO
          KRBHOL =1 + NRVOLU * NVOLU + LRCBAG + LRBAGJET
          CALL BUFMONV(FSAVVENT,MONVOL,VOLMON(KRBHOL),FR_MV)
-C
          IF(NSPMD > 1)CALL SPMD_GLOB_DSUM9(FSAVVENT,5*NVENTTOT)
        END IF
-C
-       IF(NSURF > 0) THEN
-         DO I=1,NSURF
-           DO J=1,3
-             FSAVSURF(J,I)=ZERO
-           ENDDO
-         ENDDO
-C-----------------------------------
-C      Area of surfaces computation
-C-----------------------------------
-         DO I=1,NSURF
-            IF(IGRSURF(I)%TH_SURF == 1) THEN
-               NN = IGRSURF(I)%NSEG
-               CALL SURF_AREA(X, NN, IGRSURF(I)%NODES, FSAVSURF(1,I))
-            ENDIF
-         ENDDO
+
 C---------------------------------------------------------
-C      MASS FLOW (FVMBAG)
+C      /TH/SURF : 6 output channels
 C---------------------------------------------------------
+      !FSAVSURF(1, 1:NSURF) : area           (ebcs + monvol + ploads)
+      !FSAVSURF(2, 1:NSURF) : massflow       (ebcs + monvol         )
+      !FSAVSURF(3, 1:NSURF) : velocity       (ebcs + monvol + ploads)
+      !FSAVSURF(4, 1:NSURF) : pressure       (ebcs + monvol + ploads)
+      !FSAVSURF(5, 1:NSURF) : A              (                ploads)
+      !FSAVSURF(6, 1:NSURF) : cumulated mass (ebcs + monvol         )
+C-----------------------------------
+C      /TH/SURF (AREA) if not already computed
+C-----------------------------------
+       DO I=1,NSURF
+         IF(IGRSURF(I)%TH_SURF == 1 .AND. FSAVSURF(1,I) == ZERO) THEN
+           NN = IGRSURF(I)%NSEG
+           CALL SURF_AREA(X, NN, IGRSURF(I)%NODES, FSAVSURF(1,I), NUMNOD)
+         ENDIF
+       ENDDO
+
+C---------------------------------------------------------
+C      /TH/SURF (cumulated mass from AIRBAGS)
+C---------------------------------------------------------
+       IF(NSURF > 0)THEN
          CALL SURF_MASS_MONV(FSAVSURF,IGRSURF,MONVOL,VOLMON,FR_MV)
-C
-         IF(NSPMD > 1)CALL SPMD_GLOB_DSUM9(FSAVSURF,5*NSURF)
-         IF(NSPMD > 1)CALL SPMD_GLOB_ISUM9(NSEG_LOADP,NSURF)
-C
-         IF(ISPMD ==0 ) THEN
-           DO I=1,NSURF
-            IF(IGRSURF(I)%TH_SURF == 1) THEN
-               IF(NSEG_LOADP(I) > 0) THEN
-                  FSAVSURF(4,I)=FSAVSURF(4,I) / NSEG_LOADP(I) ! The pressure in an average pressure
-               ELSE
-                  FSAVSURF(4,I)= ZERO
-               ENDIF
-            ENDIF    
-          ENDDO
-        ENDIF
+       ENDIF !NSURF > 0
+
+C---------------------------------------------------------
+C      /TH/SURF : SPMD EXCHANGE
+C---------------------------------------------------------
+       IF(NSPMD > 1)CALL SPMD_GLOB_DSUM9(FSAVSURF,5*NSURF)
+
+C---------------------------------------------------------
+C      /TH/SURF (PRESSURE mean velues)
+C---------------------------------------------------------
+       IF(ISPMD ==0 ) THEN
+         DO I=1,NSURF
+           IF(IGRSURF(I)%TH_SURF == 1) THEN
+             !IF(N_S_E_G_LOADP(I) > 0) THEN
+               FSAVSURF(4,I)=FSAVSURF(4,I) ! The pressure in an average pressure
+             !ELSE
+             !  FSAVSURF(4,I)= ZERO
+             !ENDIF
+           ENDIF
+         ENDDO
        ENDIF
+
+C---------------------------------------------------------
+C      /TH/SURF (EBCS mean values)
+C        total surface FSAVSURF(1,:) are here gathered and
+C        they can be used here to divide
+C---------------------------------------------------------
+       IF (EBCS_TAB%nebcs > 0)THEN
+         DO K=1,EBCS_TAB%nebcs
+           IF(.NOT.EBCS_TAB%need_to_compute(K)) CYCLE
+           HAS_TH = EBCS_TAB%TAB(K)%poly%has_th
+           IF(has_th) THEN
+             SURF_ID = EBCS_TAB%TAB(K)%poly%surf_id
+             NN = IGRSURF(SURF_ID)%NSEG
+             IF(FSAVSURF(1,SURF_ID) > ZERO)THEN
+               FSAVSURF(3,SURF_ID) =  FSAVSURF(3,SURF_ID) / FSAVSURF(1,SURF_ID)  !mean velocity
+               FSAVSURF(4,SURF_ID) =  FSAVSURF(4,SURF_ID) / FSAVSURF(1,SURF_ID)  !mean pressure
+               FSAVSURF(5,SURF_ID) =  FSAVSURF(5,SURF_ID) / FSAVSURF(1,SURF_ID)  !mean acceleration
+             ENDIF
+           ENDIF
+         ENDDO!next K
+       ENDIF
+
 C--------------------------------------------
 C      PRE-TREATMENT RIVETS (SPMD ONLY)
 C--------------------------------------------
-       IF(NRIVF>1.AND.NSPMD > 1.AND.NRIVET>0) THEN
+       IF(NRIVF>1 .AND. NSPMD > 1 .AND. NRIVET>0) THEN
         DO K = 1, NRIVET
           I = ABS(LRIVET(2,K))
 C beckup : flag off
@@ -1254,10 +1277,9 @@ C-----------------------------
             IF((ISPMD==0).AND.(II>0)) CALL WRTDES(WA,WA,II,ITTYP,1)
           ELSEIF (ITYP==116) THEN
 C-----------------------------
-C           SURF
+C           /TH/SURF
 C-----------------------------
-            CALL THSURF(IAD,IAD+NN-1,IADV,IADV+NVAR-1,ITHBUF,
-     .                  WA ,FSAVSURF,ITTYP)
+            CALL THSURF(IAD,IAD+NN-1,IADV,IADV+NVAR-1,ITHBUF,WA ,FSAVSURF,ITTYP,NSURF)
 C
           ELSEIF (ITYP==118) THEN
 C-----------------------------
@@ -1290,7 +1312,7 @@ C-----------------------------
 C
           ELSEIF (ITYP==119) THEN
 C-----------------------------
-C           RETRACTOR
+C           RETRACTORS
 C-----------------------------
             IF (ISPMD==0) THEN
               II = 0
@@ -1313,7 +1335,7 @@ C-----------------------------
 c
           ELSEIF (ITYP == 120) THEN
 C-----------------------------
-C           SENSOR
+C           SENSORS
 C-----------------------------
             CALL THSENS (SENSOR_TAB,NSENSOR,
      .           IAD    ,IAD+NN-1 ,IADV   ,IADV+NVAR-1,ITHBUF   ,
@@ -1323,7 +1345,7 @@ c----
           ENDIF  ! ITYP
        ENDDO
 C-------------------------------------------------------
-C     SECTIONS FLUIDES
+C     SECTIONS OF FLUIDS
 C-------------------------------------------------------
        IF (NSFLSW> 0 .AND. NABFILE==0)THEN
          IF (NSPMD > 1)CALL SPMD_GLOB_DSUM9(FLSW,9*NSFLSW)
@@ -1361,7 +1383,7 @@ C---------------------------------------
          IF(ISPMD==0)THEN
            IF(IUNIT==3)THEN
             DO M=1,NPART+NTHPART
-C remise a zero apres gather sur toute les parts ou on ne cumule pas
+C Reset after gather on all partitions where no accumulation occurs
               DO I=1,NPSAV
                 IF((I<23.OR.I>26.OR.I==25).AND.I/=8 .AND. NABFILE==0
      .               .AND. (MSTOP /= 1 .OR. ICTLSTOP == 1) ) then
@@ -1379,7 +1401,6 @@ C-------------------------
         DO II=1,NPARTL
           ! zeroing on current PART on local domain
           M = IPARTL(II) !local parts (present on current domain)
-
           IMID = IPART(1,M)
           IPID = IPART(2,M)
           JALE_FROM_MAT = NINT(PM(72,IMID))
@@ -1393,20 +1414,9 @@ C-------------------------
             END DO
           END IF
         END DO
-c      ELSEIF(IMACH/=3.AND.IUNIT==3)THEN
-c        ICOND = TT+2.*DT2>=T1S+DT2S
-c        DO M=1,NPART
-C remise a zero sur part active du processeur en spmd
-c          JALE= NINT(PM(72,IPART(1,M)))
-c          IF(JALE==0.OR.(JALE>0.AND.ICOND))THEN
-c            DO I=1,NPSAV
-c              IF((I<23.OR.I>26).AND.I/=8)
-c     .          PARTSAV(I,M)=0
-c            END DO
-c          END IF
-c        END DO
       END IF
-C remise a zero du tableau GRESAV
+
+C reset GRESAV array
       IF (NTHPART > 0) THEN
         DO I=1,NPSAV
           DO J = 1,NTHPART

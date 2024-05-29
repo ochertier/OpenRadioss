@@ -150,7 +150,7 @@ Chd|====================================================================
      4                  LLOADP   ,FAC      ,SENSORS     ,TAGNCONT    ,LOADP_HYD_INTER,
      5                  XFRAME   ,FORC     ,AR          ,CSEFRIC     ,CSEFRICG  ,
      6                  CSEFRIC_STAMP,CSEFRICG_STAMP    ,TABLE       ,IFRAME    ,LOADS,
-     7                  DRAPE_SH4N, DRAPE_SH3N, DRAPEG  )
+     7                  DRAPE_SH4N, DRAPE_SH3N, DRAPEG  ,X_C         )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -284,6 +284,7 @@ C-----------------------------------------------
         my_real , INTENT(IN) :: AR(SAR)
         my_real , INTENT(IN) :: CSEFRIC(NINEFRIC,S_EFRICINT) ,CSEFRICG(S_EFRIC),
      .                          CSEFRIC_STAMP(NINEFRIC_STAMP,S_EFRICINTG) ,CSEFRICG_STAMP(S_EFRICG)
+        my_real ,DIMENSION(3,NUMNOD), INTENT(IN) :: X_C
         TYPE (DRAPE_) , INTENT(IN)  :: DRAPE_SH4N(NUMELC_DRAPE), DRAPE_SH3N(NUMELTG_DRAPE)
         TYPE (DRAPEG_), INTENT(IN)  :: DRAPEG
 C-----------------------------------------------
@@ -447,7 +448,7 @@ C
      .                                        QUAD_VECTOR,QUAD_VECTOR_P,
      .                                        QUAD_TENSOR,QUAD_TENSOR_P,NODAL_SCALAR_FVM,
      .                                        NODAL_VECTOR_FVM
-        INTEGER, DIMENSION(:), ALLOCATABLE :: TAGNOD,TAGNOD_P,TAGNOD_P_PART,
+        INTEGER, DIMENSION(:), ALLOCATABLE :: TAGNOD,TAGNOD_P,
      .                                        ITAB_P_PART,ITABM1_P
         my_real
      .     XWL(NRWALL) ,YWL(NRWALL) , ZWL(NRWALL), V1(NRWALL), V2(NRWALL), V3(NRWALL),
@@ -844,7 +845,6 @@ c
             ENDIF
           ENDIF
 C
-          ALLOCATE(TAGNOD_P_PART(NUMNOD_H3DPART))
           ALLOCATE(ITAB_P_PART(NUMNOD_H3DPART))
           ALLOCATE(ITABM1_P(2*NUMNODG))
 C
@@ -868,7 +868,6 @@ C
               TAGNOD_P(I) = TAGNOD(I)
             ENDDO
           ENDIF
-          DEALLOCATE(TAGNOD_P_PART)
           DEALLOCATE(ITAB_P_PART)
           DEALLOCATE(ITABM1_P)
         ELSE IF(ISPMD == 0) THEN
@@ -2221,7 +2220,7 @@ c          IF(ISPMD == 0) print *,'H3D_DATA%OUTPUT_LIST(I)%PART',H3D_DATA%OUTPUT
      .                     IXR               ,IXP                      , IXT           ,N_H3D_PART_LIST ,
      .                     NODAL_VECTOR_FVM,
      .                     IS_WRITEN_NODE_FVM,AIRBAGS_TOTAL_FVM_IN_H3D_G,SMONVOL       ,SVOLMON  ,ISPMD         ,
-     .                     FVDATA_P          ,USER_NOD_ID%FVMBAG_SHIFT ,W              ,SW)
+     .                     FVDATA_P          ,USER_NOD_ID%FVMBAG_SHIFT ,W              ,SW       ,X_C  )
 
 c
             IF (NSPMD > 1 ) THEN
@@ -2556,7 +2555,7 @@ c         IF(ISPMD == 0)  print *,'H3D_DATA%OUTPUT_LIST(I)%PART',H3D_DATA%OUTPUT
      .                       IS_WRITEN_SHELL,IPARTC ,IPARTTG     ,LAYER        ,IPT        ,
      .                       ID_PLY     ,GAUSS     ,IUVAR ,H3D_DATA%OUTPUT_LIST(I)%PART,KEYWORD,
      .                       D          ,MULTI_FVM ,IDMDS        ,IMDSVAR      ,MDS_MATID  ,
-     .                       OBJECT_ID  ,MODE)
+     .                       OBJECT_ID  ,MODE      ,MAT_PARAM    )
 c
             IF (NSPMD > 1 ) THEN
               CALL STARTIME(MACRO_TIMER_SPMDH3D,1)

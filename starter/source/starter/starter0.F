@@ -105,6 +105,7 @@ C-----------------------------------------------
       USE OUTPUT_MOD
       USE MAT_ELEM_MOD
       USE NAMES_AND_TITLES_MOD, only: NAMES_AND_TITLES_
+      USE DEFAULTS_MOD, only: DEFAULTS_
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -194,6 +195,7 @@ c      TYPE(SENSORS_) :: SENSORS    ! declared as global in USER_SENSOR_MOD
       INTEGER :: LEN_CWD
       INTEGER*4 GETCWD, STATUS_CWD
       TYPE(NAMES_AND_TITLES_)   :: NAMES_AND_TITLES    !< NAMES_AND_TITLES host the input deck names and titles for outputs
+      TYPE(DEFAULTS_)           :: DEFAULTS            !< Hosts the variables from /DEF/ option
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
@@ -210,7 +212,7 @@ C=======================================================================
 #include      "archloops.inc"
 C -------------------------------------------------
 C First task check the exec arguments (fill common)
-      CALL EXECARGCHECK()
+      CALL EXECARGCHECK(OUTPUT)
 C -------------------------------------------------
 C     Constants
       CALL INICONSTANT
@@ -351,7 +353,6 @@ C------------------------------------------------
           DLIBFILE_SIZE=LEN_TRIM(DLIBFILE)
         ENDIF
         USERL_AVAIL=0
-#ifndef SANITIZE 
         CALL DYN_USERLIB_INIT(DLIBFILE,DLIBFILE_SIZE,USERL_AVAIL,DLIBTKVERS,IRESP,GOT_USERL_ALTNAME)
 C------------------------------------------------
 C Mds lib initialization
@@ -360,7 +361,6 @@ C------------------------------------------------
        CALL MDS_USERLIB_INIT (IRESP, MDS_AVAIL, MDS_VER, MDS_PATH, MDS_PATH_LEN)
 #else
       MDS_AVAIL=0
-#endif
 #endif
 C-----------------------------------------------------
 C Avoid linking issue with dynamical libraries
@@ -795,7 +795,7 @@ c 2d seatbelt translation
 C-------------------------------------------------------------------
 C     Control variables (count options)
 C-------------------------------------------------------------------
-      CALL CONTRL(MULTI_FVM,LSUBMODEL,IS_DYNA,DETONATORS,USER_WINDOWS,MAT_ELEM,NAMES_AND_TITLES,LIPART1)
+      CALL CONTRL(MULTI_FVM,LSUBMODEL,IS_DYNA,DETONATORS,USER_WINDOWS,MAT_ELEM,NAMES_AND_TITLES,LIPART1,DEFAULTS)
 C-------------------------------------------------------------------
 C     Parameters modification and parameters write (-HSTP_READ -HSTP_WRITE ARGUMENTS)
 C-------------------------------------------------------------------
@@ -891,7 +891,7 @@ C--------------------------------------------------
         CALL LECTUR(
      .       MULTI_FVM                   ,LSUBMODEL         ,IS_DYNA          ,DETONATORS   ,EBCS_TAB,
      .       SEATBELT_CONVERTED_ELEMENTS ,NB_SEATBELT_SHELLS,NB_DYNA_INCLUDE  ,USER_WINDOWS ,OUTPUT  ,
-     .       MAT_ELEM,NAMES_AND_TITLES  )
+     .       MAT_ELEM,NAMES_AND_TITLES,DEFAULTS  )
 
 c       stop CPU timer for lectur
         CALL STOPTIME(2,1)

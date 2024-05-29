@@ -359,9 +359,9 @@ C       global buffer allocation
 c-------------------------------------------------
       GBUF => ELBUF_TAB(NG)%GBUF
       CALL MY_ALLOC(GBUF%NOFF,NEL*GBUF%G_NOFF)                                      
-         ELBUF_TAB(NG)%GBUF%NOFF = ZERO
+         ELBUF_TAB(NG)%GBUF%NOFF = 0
       CALL MY_ALLOC(GBUF%IERR,NEL*GBUF%G_IERR)                                      
-        ELBUF_TAB(NG)%GBUF%IERR = ZERO                                                    
+        ELBUF_TAB(NG)%GBUF%IERR = 0                                                   
       CALL MY_ALLOC(GBUF%GAMA,NEL*GBUF%G_GAMA)                                      
         ELBUF_TAB(NG)%GBUF%GAMA = ZERO
       CALL MY_ALLOC(GBUF%SMSTR,NEL*GBUF%G_SMSTR)                                    
@@ -397,7 +397,7 @@ c-------------------------------------------------
       CALL MY_ALLOC(GBUF%DT,NEL*GBUF%G_DT)                         
         ELBUF_TAB(NG)%GBUF%DT = ZERO
       CALL MY_ALLOC(GBUF%ISMS,NEL*GBUF%G_ISMS)                         
-        ELBUF_TAB(NG)%GBUF%ISMS = ZERO  
+        ELBUF_TAB(NG)%GBUF%ISMS = 0
       CALL MY_ALLOC(GBUF%STRHG,NEL*GBUF%G_STRHG)                         
         ELBUF_TAB(NG)%GBUF%STRHG = ZERO  
       CALL MY_ALLOC(GBUF%BPRELD,NEL*GBUF%G_BPRELD)                         
@@ -419,6 +419,8 @@ c           Allocate Orthotropic Beta angle (dyna input format)
         ELBUF_TAB(NG)%GBUF%BETAORTH= ZERO
       CALL MY_ALLOC(GBUF%AMU,NEL*GBUF%G_AMU)                                    
         ELBUF_TAB(NG)%GBUF%AMU = ZERO
+      CALL MY_ALLOC(GBUF%SH_IOFFSET,NEL*GBUF%G_SH_IOFFSET)                                    
+        ELBUF_TAB(NG)%GBUF%SH_IOFFSET = 0
 
 c
       IF (NPG == 1) THEN
@@ -616,7 +618,7 @@ C --- needed for batoz shell and /heat/mat
       ENDIF
 C
       ALLOCATE (GBUF%SKEW_ID(NEL*GBUF%G_SKEW_ID)                 ,STAT=Stat)
-        GBUF%SKEW_ID = ZERO
+        GBUF%SKEW_ID = 0
 c---
 c seatbelt elements
 c---

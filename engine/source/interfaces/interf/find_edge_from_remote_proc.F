@@ -32,7 +32,7 @@ Chd|        SHOOTING_NODE_MOD             share/modules/shooting_node_mod.F
 Chd|====================================================================
         SUBROUTINE FIND_EDGE_FROM_REMOTE_PROC(SHOOT_STRUCT,NB_EDGE,LIST_NODE,INTBUF_TAB,ITABM1,
      .                                        NEWFRONT,IPARI,GEO,
-     .                                        IXS,IXC,IXT,IXP,IXR,IXTG,
+     .                                        IXS,IXC,IXT,IXP,IXR,IXTG,IXS10,
      .                                        ADDCNEL,CNEL,TAG_NODE,TAG_ELEM )
 !$COMMENT
 !       FIND_EDGE_FROM_REMOTE_PROC description
@@ -64,13 +64,14 @@ C-----------------------------------------------
         INTEGER, DIMENSION(NUMNOD), INTENT(in) :: ITABM1    ! array of global id
         TYPE(shooting_node_type), INTENT(inout) :: SHOOT_STRUCT ! structure for shooting node algo  
         TYPE(INTBUF_STRUCT_), DIMENSION(NINTER), INTENT(inout) :: INTBUF_TAB    ! interface data         
-         INTEGER, DIMENSION(NINTER), INTENT(inout) :: NEWFRONT   ! array for sorting : 1 --> need to sort the interface NIN
+         INTEGER, DIMENSION(NINTER), INTENT(inout) :: NEWFRONT   !< flag to force some exchanges related to S nodes between processor (if a S node becomes a shooting node - all interface) / force the collision detection algo if a new segment is activated for the (interface 25 + solid erosion)
         INTEGER, DIMENSION(NIXS,NUMELS), INTENT(in) :: IXS   ! solid array
         INTEGER, DIMENSION(NIXC,NUMELC), INTENT(in) :: IXC   ! shell array
         INTEGER, DIMENSION(NIXT,NUMELT), INTENT(in) :: IXT! truss array
         INTEGER, DIMENSION(NIXP,NUMELP), INTENT(in) :: IXP! beam array
         INTEGER, DIMENSION(NIXR,NUMELR), INTENT(in) :: IXR! spring array
         INTEGER, DIMENSION(NIXTG,NUMELTG), INTENT(in) :: IXTG! triangle array
+        INTEGER, DIMENSION(6,NUMELS10), INTENT(in) :: IXS10!< tetra10 data
         INTEGER, DIMENSION(0:NUMNOD+1), INTENT(in) :: ADDCNEL ! address for the CNEL array
         INTEGER, DIMENSION(NPARI,NINTER), INTENT(in) :: IPARI
         my_real, DIMENSION(NPROPG,NUMGEO), INTENT(in) :: GEO
@@ -200,7 +201,7 @@ C-----------------------------------------------
         CALL CHECK_EDGE_STATE( -1,NB_EDGE_R_PROC_M,NB_EDGE_R_PROC_S,
      .                         LIST_EDGE_R_PROC(1),LIST_EDGE_R_PROC(1+NB_EDGE_R_PROC_M),
      .                         SHOOT_STRUCT%SHIFT_INTERFACE,INTBUF_TAB,NEWFRONT,IPARI,GEO,
-     .                         IXS,IXC,IXT,IXP,IXR,IXTG,
+     .                         IXS,IXC,IXT,IXP,IXR,IXTG,IXS10,
      .                         ADDCNEL,CNEL,TAG_NODE,TAG_ELEM,SHOOT_STRUCT )
 
         DEALLOCATE( LIST_EDGE_R_PROC )

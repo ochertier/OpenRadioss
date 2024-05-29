@@ -192,17 +192,19 @@ Chd|        SUINIT3                       starter/source/elements/elbuf_init/sui
 Chd|        T3GRHEAD                      starter/source/elements/solid_2d/tria/t3grhead.F
 Chd|        T3GRTAILS                     starter/source/elements/solid_2d/tria/t3grtails.F
 Chd|        TAGNOD_R2R_NL                 starter/source/coupling/rad2rad/tagnod_r2r_nl.F
-Chd|        UPDFAIL                       starter/source/materials/updfail.F
 Chd|        UPDMAT                        starter/source/materials/updmat.F
 Chd|        EIG                           engine/stub/eig.F             
 Chd|        EIG1                          engine/stub/eig1.F            
 Chd|        EIGP                          engine/stub/eigp.F            
 Chd|        GENANI                        engine/source/output/anim/generate/genani.F
 Chd|        GENH3D                        engine/source/output/h3d/h3d_results/genh3d.F
+Chd|        H3D_SHELL_SCALAR              engine/source/output/h3d/h3d_results/h3d_shell_scalar.F
+Chd|        H3D_SHELL_SCALAR_1            engine/source/output/h3d/h3d_results/h3d_shell_scalar_1.F
 Chd|        H3D_SHELL_TENSOR              engine/source/output/h3d/h3d_results/h3d_shell_tensor.F
 Chd|        H3D_SOLID_SCALAR              engine/source/output/h3d/h3d_results/h3d_solid_scalar.F
 Chd|        HIST2                         engine/source/output/th/hist2.F
 Chd|        IMP_BUCK                      engine/source/implicit/imp_buck.F
+Chd|        LECH3D                        engine/source/output/h3d/h3d_build_fortran/lech3d.F
 Chd|        S4VOLN_M                      engine/source/elements/solid/solide4_sfem/s4voln_m.F
 Chd|        SIGEPS190                     engine/source/materials/mat/mat190/sigeps190.F
 Chd|        SIGEPS25C                     engine/source/materials/mat/mat025/sigeps25c.F
@@ -301,10 +303,13 @@ c
         INTEGER     :: NLOC                 ! non-local variable regularization flag
         INTEGER     :: IFAILWAVE            ! failwave propagation flag
         INTEGER     :: IXFEM                ! XFEM flag
+        ! --------------------------------- !
+        INTEGER     :: NMOD                 !number of rupture/damage modes
 c                        
         my_real           ,DIMENSION(:) ,ALLOCATABLE :: UPARAM   ! NUPARAM
         INTEGER           ,DIMENSION(:) ,ALLOCATABLE :: IPARAM   ! NIPARAM
         TYPE (TABLE_4D_)  ,DIMENSION(:) ,ALLOCATABLE :: TABLE    ! local function tables
+        CHARACTER(LEN=nchartitle) ,DIMENSION(:) ,ALLOCATABLE :: MODE   ! size NMOD
 c                
         TYPE (FAIL_PARAM_),DIMENSION(:) ,ALLOCATABLE :: FAIL     ! failure models (NFAIL)
         TYPE (VISC_PARAM_)                           :: VISC     ! viscosity model          

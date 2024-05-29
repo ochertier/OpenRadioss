@@ -289,7 +289,7 @@ Chd|====================================================================
         THIS%HAS_NE_CONNECT = RESULT
         RESULT = .FALSE.
         IF(IALE > 0 .AND. ALE%GRID%NWALE < 2)RESULT=.TRUE. !/ALE/GRID/DONEA, DISP, SPRING
-        IF(IALE > 0 .AND. ALE%GRID%NWALE == 7)RESULT=.TRUE. !/ALE/GRID/MASSFLOW
+        IF(IALE > 0 .AND. ALE%GRID%NWALE == 7)RESULT=.TRUE. !/ALE/GRID/FLOW-TRACKING
         IF(IALE > 0 .AND. ALE%GRID%NWALE == 5)RESULT=.TRUE. !/ALE/GRID/LAPLACIAN
         THIS%HAS_NN_CONNECT = RESULT
       END SUBROUTINE ALE_CONNECTIVITY_INIT
@@ -322,7 +322,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C     L o c a l   V a r i a b l e s
 C-----------------------------------------------
-        INTEGER :: II, JJ, NODE_ID, NODE1, NODE2
+        INTEGER :: II, JJ,KK, NODE_ID, NODE1, NODE2
+        LOGICAL :: DUPLICATE
         INTEGER, DIMENSION(:), ALLOCATABLE :: ADSKY
         INTEGER :: IAD1, IAD2, ITMP
         INTEGER :: MAX_EDGE, NB_EDGE, NB_EDGE_NEW, IEDGE, CUR_POS
@@ -464,7 +465,11 @@ C-----------------------------------------------
 !             BRICKS
              DO JJ = 1, 8
                 NODE_ID = IXS(1 + JJ, II)
-                NE_NB_CONNECT(NODE_ID) = NE_NB_CONNECT(NODE_ID) + 1
+                DUPLICATE = .FALSE.
+                DO KK = 1, JJ-1
+                  IF(NODE_ID == IXS(1 + KK, II)) DUPLICATE = .TRUE.
+                ENDDO
+                IF(.NOT. DUPLICATE) NE_NB_CONNECT(NODE_ID) = NE_NB_CONNECT(NODE_ID) + 1
              ENDDO
 !             edges
              DO IEDGE = 1, 12
@@ -550,9 +555,15 @@ C-----------------------------------------------
 !          BRICKS                                            
            DO JJ = 1, 8                                      
               NODE_ID = IXS(1 + JJ, II)                      
-              THIS%NE_CONNECT%CONNECTED(ADSKY(NODE_ID)) = II 
-              THIS%NE_CONNECT%TYPE(ADSKY(NODE_ID)) = 1       
-              ADSKY(NODE_ID) = ADSKY(NODE_ID) + 1            
+              DUPLICATE = .FALSE. !degenerated solids: duplicated node IDS
+              DO KK = 1, JJ-1                              
+               IF(NODE_ID == IXS(1 + KK, II)) DUPLICATE = .TRUE.
+              ENDDO
+              IF(.NOT. DUPLICATE) THEN
+                THIS%NE_CONNECT%CONNECTED(ADSKY(NODE_ID)) = II 
+                THIS%NE_CONNECT%TYPE(ADSKY(NODE_ID)) = 1       
+                ADSKY(NODE_ID) = ADSKY(NODE_ID) + 1            
+              ENDIF
            ENDDO                                             
          ENDIF
         ENDDO
@@ -683,7 +694,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C     L o c a l   V a r i a b l e s
 C-----------------------------------------------
-        INTEGER :: II, JJ, NODE_ID, NODE1, NODE2, INODE
+        INTEGER :: II, JJ,KK, NODE_ID, NODE1, NODE2, INODE
+        LOGICAL :: DUPLICATE
         INTEGER, DIMENSION(:), ALLOCATABLE :: ADSKY
         INTEGER :: IAD1, IAD2, ITMP, IAD
         INTEGER, DIMENSION(:), ALLOCATABLE :: IDX
@@ -787,31 +799,34 @@ C-----------------------------------------------
 
 !       2D elements
 !       /TRIA
-        DO II = 1, NUMELTG
-!       ale : jal = 1, euler : jal = 2
-         JAL_FROM_MAT = NINT(PM(72, IABS(IXTG(1, II)))) 
-         JAL_FROM_PROP = IGEO(62, IABS(IXTG(5, II)))
-         JAL = MAX(JAL_FROM_MAT, JAL_FROM_PROP)
-         JALT = JAL + NINT(PM(71, IABS(IXTG(1, II))) + PM(96, IABS(IXTG(1, II))))
-         IMID = IABS(IXTG(1, II))
-         IF (JALT == 0) CYCLE
-         MLW  = NINT(PM(19,IMID))
-         DO JJ = 1, 3
-            NODE_ID = IXTG(1 + JJ, II)
-            NE_NB_CONNECT(NODE_ID) = NE_NB_CONNECT(NODE_ID) + 1
-            IF (.NOT. THIS%NALE_ALREADY_COMPUTED) THEN
-               THIS%NALE(NODE_ID) = MAX(THIS%NALE(NODE_ID), JAL)
-               IF (MLW == 151) THEN
-                  IF (THIS%NALE(NODE_ID) == 1 .OR. THIS%NALE(NODE_ID) == 2) THIS%NALE(NODE_ID) = 150 + THIS%NALE(NODE_ID)
-               ENDIF
-            ENDIF
-         ENDDO
-        ENDDO
+        IF(N2D > 0)THEN
+          DO II = 1, NUMELTG
+!         ale : jal = 1, euler : jal = 2
+           JAL_FROM_MAT = NINT(PM(72, IABS(IXTG(1, II))))
+           JAL_FROM_PROP = IGEO(62, IABS(IXTG(5, II)))
+           JAL = MAX(JAL_FROM_MAT, JAL_FROM_PROP)
+           JALT = JAL + NINT(PM(71, IABS(IXTG(1, II))) + PM(96, IABS(IXTG(1, II))))
+           IMID = IABS(IXTG(1, II))
+           IF (JALT == 0) CYCLE
+           MLW  = NINT(PM(19,IMID))
+           DO JJ = 1, 3
+              NODE_ID = IXTG(1 + JJ, II)
+              NE_NB_CONNECT(NODE_ID) = NE_NB_CONNECT(NODE_ID) + 1
+              IF (.NOT. THIS%NALE_ALREADY_COMPUTED) THEN
+                 THIS%NALE(NODE_ID) = MAX(THIS%NALE(NODE_ID), JAL)
+                 IF (MLW == 151) THEN
+                    IF (THIS%NALE(NODE_ID) == 1 .OR. THIS%NALE(NODE_ID) == 2) THIS%NALE(NODE_ID) = 150 + THIS%NALE(NODE_ID)
+                 ENDIF
+              ENDIF
+           ENDDO
+          ENDDO
+        ENDIF
+
 !       /QUAD
         DO II = 1, NUMELQ
 !       ale : jal = 1, euler : jal = 2
          JAL_FROM_MAT = NINT(PM(72, IABS(IXQ(1, II))))
-         JAL_FROM_PROP = IGEO(62,IABS(IXQ(6, II))) 
+         JAL_FROM_PROP = IGEO(62,IABS(IXQ(6, II)))
          JAL = MAX(JAL_FROM_MAT, JAL_FROM_PROP)
          JALT = JAL + NINT(PM(71, IABS(IXQ(1, II))) + PM(96, IABS(IXQ(1, II))))
          IMID = IABS(IXQ(1, II))
@@ -828,7 +843,7 @@ C-----------------------------------------------
             ENDIF
          ENDDO
         ENDDO
-        
+
 !       3D elements
         DO II = 1, NUMELS
          JAL_FROM_MAT = NINT(PM(72, IABS(IXS(1, II))))
@@ -855,11 +870,17 @@ C-----------------------------------------------
 !          bricks
            DO JJ = 1, 8
              NODE_ID = IXS(1 + JJ, II)
-             NE_NB_CONNECT(NODE_ID) = NE_NB_CONNECT(NODE_ID) + 1
-             IF (.NOT. THIS%NALE_ALREADY_COMPUTED) THEN
-               THIS%NALE(NODE_ID) = MAX(THIS%NALE(NODE_ID), JAL)
-               IF (MLW == 151) THEN
-                 IF (THIS%NALE(NODE_ID) == 1 .OR. THIS%NALE(NODE_ID) == 2) THIS%NALE(NODE_ID) = 150 + THIS%NALE(NODE_ID)
+             DUPLICATE = .FALSE.
+             DO KK = 1,JJ - 1
+              IF(NODE_ID == IXS(1 + KK, II)) DUPLICATE = .TRUE.
+             ENDDO
+             IF( .NOT. DUPLICATE) THEN
+               NE_NB_CONNECT(NODE_ID) = NE_NB_CONNECT(NODE_ID) + 1
+               IF (.NOT. THIS%NALE_ALREADY_COMPUTED) THEN
+                 THIS%NALE(NODE_ID) = MAX(THIS%NALE(NODE_ID), JAL)
+                 IF (MLW == 151) THEN
+                   IF (THIS%NALE(NODE_ID) == 1 .OR. THIS%NALE(NODE_ID) == 2) THIS%NALE(NODE_ID) = 150 + THIS%NALE(NODE_ID)
+                 ENDIF
                ENDIF
              ENDIF
            ENDDO
@@ -886,24 +907,27 @@ C-----------------------------------------------
         
 !       2D elements
 !       /TRIA
-        DO II = 1, NUMELTG
-         JAL_FROM_MAT = NINT(PM(72, IABS(IXTG(1, II)))) 
-         JAL_FROM_PROP = IGEO(62,IABS(IXTG(5, II)))
-         JAL = MAX(JAL_FROM_MAT, JAL_FROM_PROP)
-         JALT = JAL + NINT(PM(71, IABS(IXTG(1, II))) + PM(96, IABS(IXTG(1, II))))
-         IMID = IABS(IXTG(1, II))
-         IF (JALT == 0) CYCLE
-         DO JJ = 1, 3
-            NODE_ID = IXTG(1 + JJ, II)
-            CONNECTED(ADSKY(NODE_ID)) = II
-            TYPE(ADSKY(NODE_ID)) = 3
-            ADSKY(NODE_ID) = ADSKY(NODE_ID) + 1
-         ENDDO
-        ENDDO
+        IF(N2D > 0)THEN
+          DO II = 1, NUMELTG
+           JAL_FROM_MAT = NINT(PM(72, IABS(IXTG(1, II))))
+           JAL_FROM_PROP = IGEO(62,IABS(IXTG(5, II)))
+           JAL = MAX(JAL_FROM_MAT, JAL_FROM_PROP)
+           JALT = JAL + NINT(PM(71, IABS(IXTG(1, II))) + PM(96, IABS(IXTG(1, II))))
+           IMID = IABS(IXTG(1, II))
+           IF (JALT == 0) CYCLE
+           DO JJ = 1, 3
+              NODE_ID = IXTG(1 + JJ, II)
+              CONNECTED(ADSKY(NODE_ID)) = II
+              TYPE(ADSKY(NODE_ID)) = 3
+              ADSKY(NODE_ID) = ADSKY(NODE_ID) + 1
+           ENDDO
+          ENDDO
+        ENDIF
+
 !       /QUAD
         DO II = 1, NUMELQ
          JAL_FROM_MAT = NINT(PM(72, IABS(IXQ(1, II))))
-         JAL_FROM_PROP = IGEO(62, IABS(IXQ(6, II)) ) 
+         JAL_FROM_PROP = IGEO(62, IABS(IXQ(6, II)) )
          JAL = MAX(JAL_FROM_MAT, JAL_FROM_PROP)
          JALT = JAL + NINT(PM(71, IABS(IXQ(1, II))) + PM(96, IABS(IXQ(1, II))))
          IMID = IABS(IXQ(1, II))
@@ -914,7 +938,8 @@ C-----------------------------------------------
             TYPE(ADSKY(NODE_ID)) = 2
             ADSKY(NODE_ID) = ADSKY(NODE_ID) + 1
          ENDDO
-       ENDDO
+        ENDDO
+
 !      3D elements
         DO II = 1, NUMELS
          JAL_FROM_MAT = NINT(PM(72, IABS(IXS(1, II))))
@@ -946,9 +971,15 @@ C-----------------------------------------------
 !           bricks
             DO JJ = 1, 8
                NODE_ID = IXS(1 + JJ, II)
-               CONNECTED(ADSKY(NODE_ID)) = II
-               TYPE(ADSKY(NODE_ID)) = 1
-               ADSKY(NODE_ID) = ADSKY(NODE_ID) + 1
+               DUPLICATE = .FALSE.
+               DO KK = 1,JJ - 1
+                IF(NODE_ID == IXS(1 + KK, II)) DUPLICATE = .TRUE.
+               ENDDO
+               IF(.NOT. DUPLICATE) THEN
+                 CONNECTED(ADSKY(NODE_ID)) = II
+                 TYPE(ADSKY(NODE_ID)) = 1
+                 ADSKY(NODE_ID) = ADSKY(NODE_ID) + 1
+               ENDIF
             ENDDO
          ENDIF
         ENDDO

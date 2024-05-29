@@ -36,7 +36,7 @@ Chd|        TH_SURF_MOD                   ../common_source/modules/interfaces/th
 Chd|====================================================================
       SUBROUTINE PBLAST (ILOADP  ,FAC     ,A       , V       ,X       ,
      1                   IADC    ,FSKY    ,FSKYV   ,LLOADP   ,FEXT    ,
-     2                   ITAB    ,H3D_DATA,TH_SURF,FSAVSURF  ,NSEG_LOADP)
+     2                   ITAB    ,H3D_DATA,TH_SURF  )
 C-----------------------------------------------
 C   M o d u l e s
 C----------------------------------------------- 
@@ -62,15 +62,14 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER,INTENT(IN) :: LLOADP(SLLOADP)
-      INTEGER,INTENT(IN) :: ILOADP(SIZLOADP,NLOADP)
+      INTEGER,INTENT(INOUT) :: ILOADP(SIZLOADP,NLOADP)
       INTEGER,INTENT(IN) :: IADC(*)
       INTEGER, INTENT(IN) :: ITAB(NUMNOD)
-      my_real,INTENT(IN) :: FAC(LFACLOAD,NLOADP),V(3,NUMNOD),X(3,NUMNOD)
+      my_real,INTENT(INOUT) :: FAC(LFACLOAD,NLOADP)
+      my_real,INTENT(IN) :: V(3,NUMNOD),X(3,NUMNOD)
       my_real,INTENT(INOUT) :: A(3,NUMNOD),FSKY(8,SFSKY/8), FSKYV(SFSKY/8,8),FEXT(3,NUMNOD)
       TYPE(H3D_DATABASE),INTENT(IN) :: H3D_DATA
-      TYPE (TH_SURF_) , INTENT(IN) :: TH_SURF
-      my_real, INTENT(INOUT) :: FSAVSURF(5,NSURF)
-      INTEGER, INTENT(INOUT) :: NSEG_LOADP(NSURF)
+      TYPE (TH_SURF_) , INTENT(INOUT) :: TH_SURF
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -129,7 +128,7 @@ C-----------------------------------------------
      1                       ILOADP  ,FAC      ,A        ,V         ,X        ,
      2                       IADC    ,FSKY     ,LLOADP   ,FEXT      ,
      3                       ITAB    ,H3D_DATA ,NL       ,DTMIN_LOC ,TFEXT_LOC,
-     4                       TH_SURF ,FSAVSURF ,NSEG_LOADP,NSEGPL   )
+     4                       TH_SURF ,NSEGPL   )
      
              CASE(2)
                !--- LOADING MODEL : GROUND REFLECTION, HEMISPHERICAL CHARGE
@@ -137,14 +136,14 @@ C-----------------------------------------------
      1                       ILOADP  ,FAC      ,A        ,V         ,X        ,
      2                       IADC    ,FSKY     ,LLOADP   ,FEXT      ,
      3                       ITAB    ,H3D_DATA ,NL       ,DTMIN_LOC ,TFEXT_LOC,
-     4                       TH_SURF ,FSAVSURF ,NSEG_LOADP,NSEGPL   )        
+     4                       TH_SURF ,NSEGPL   )
              CASE(3)
                !--- LOADING MODEL : SURFACE BURST, SPHERICAL CHARGE
                CALL PBLAST_3(
      1                       ILOADP  ,FAC      ,A        ,V         ,X        ,
      2                       IADC    ,FSKY     ,LLOADP   ,FEXT      ,
      3                       ITAB    ,H3D_DATA ,NL       ,DTMIN_LOC ,TFEXT_LOC,
-     4                       TH_SURF ,FSAVSURF ,NSEG_LOADP,NSEGPL   )
+     4                       TH_SURF ,NSEGPL   )
      
              END SELECT 
              

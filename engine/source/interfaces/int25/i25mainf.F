@@ -634,13 +634,13 @@ C
      7 INACTI      ,KINI        ,ITAB        ,LB          ,LC          ,
      8 PENMIN      ,EPS         ,PENE        ,INTBUF_TAB%PENE_OLD,SUBTRIA,
      9 GAPV        ,IVIS2       ,INTBUF_TAB%IF_ADH,IFADHI ,BASE_ADH      ,
-     A MVOISN      ,IBOUND      ,INTBUF_TAB%VTX_BISECTOR  ,DIST)
+     A MVOISN      ,IBOUND      ,INTBUF_TAB%VTX_BISECTOR  ,DIST,    TT)
 C
           DO I = 1 ,JLT
 C
 C       Needs to compute STIF_OLD even if PENE ==0 (cf INACTI=5)
 C          IF(PENE(I)/=ZERO.AND.STIF(I)/=ZERO)THEN
-           IF(STIF(I)/=ZERO)THEN
+           IF(STIF(I)>ZERO)THEN
              IF(PENE(I)==ZERO)THEN
                N = CAND_N_N(I)
                IF(N <= NSN)THEN

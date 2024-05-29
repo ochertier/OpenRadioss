@@ -205,6 +205,7 @@ C-----------------------------------------------
       USE PYTHON_FUNCT_MOD
       USE NAMES_AND_TITLES_MOD, only: NAMES_AND_TITLES_
       USE UNITAB_MOD
+      USE SKEW_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -336,6 +337,7 @@ c      TYPE (SENSORS_)  :: SENSORS    ! defined as global in user_interface_mod
       TYPE (DT_)       :: DT
       TYPE (LOADS_)    :: LOADS
       TYPE (MAT_ELEM_) :: MAT_ELEM
+      TYPE (SKEW_)      :: SKEWS
 C----------------------------------------------------------------------------------
 C MDS Table
       INTEGER, DIMENSION(:), ALLOCATABLE :: MDS_OUTPUT_TABLE
@@ -520,10 +522,8 @@ C--------------------------------------------------
         ENDIF
         USERL_AVAIL=0
         DLIB_ARRAY(1:NBR_DLIB) = 0
-#ifndef SANITIZE 
         CALL DYN_USERLIB_INIT(DLIBFILE,DLIBFILE_SIZE,USERL_AVAIL,DLIBTKVERS,IRESP,GOT_USERL_ALTNAME,
      1                        DLIB_ARRAY)
-#endif
         DYN_LIB_MODE = 1
         CALL INIT_DYN_LIB_STRUC(DYN_LIB_MODE)
 
@@ -538,12 +538,10 @@ C Linux Issue call dummy routines to avoid loader removing object files
 C--------------------------------------------------
 C Radioss MDS initialization
 C--------------------------------------------------
-#ifndef SANITIZE
 #ifdef DNC
         CALL MDS_USERLIB_INIT(IRESP,MDS_AVAIL,MDS_VER,MDS_PATH,MDS_PATH_LEN)
 #else
         MDS_AVAIL=0
-#endif
 #endif
 C--------------------------------------------------
 C Error messages initialization
@@ -854,7 +852,7 @@ C------------------------------------------------
       CALL RDRESA(ITSTV1 ,LHEADER ,LVARINT ,LVARREA ,PRADIOS ,
      .            PRESFIL, MULTI_FVM, H3D_DATA,
      .            PINCH_DATA,DYNAIN_DATA,INTERFACES,SENSORS,LOADS,
-     .            MAT_ELEM,NAMES_AND_TITLES )
+     .            MAT_ELEM,NAMES_AND_TITLES,SKEWS )
 
 C------------------------------------------------
 C     Test of .rst file compatibility
@@ -986,7 +984,7 @@ C------------------------------------------------
 C     .rst file reading 2
 C------------------------------------------------
       CALL TRACE_IN(17,2,ZERO)
-      CALL RESTALLOC(MULTI_FVM,H3D_DATA,PINCH_DATA,ALE_CONNECTIVITY,SEGVAR,LOADS)
+      CALL RESTALLOC(MULTI_FVM,H3D_DATA,PINCH_DATA,ALE_CONNECTIVITY,SEGVAR,LOADS,INTERFACES,SKEWS)
       ALLOCATE(T_MONVOL(NVOLU))
       IGEO = 0
       IPM = 0
@@ -1026,7 +1024,7 @@ c
       CALL RDRESB(AF                ,IAF      ,LVARREA      ,XDP             ,IRUNN     , 
      .            MULTI_FVM        ,H3D_DATA  ,PINCH_DATA,
      .            ALE_CONNECTIVITY ,T_MONVOL  ,SENSORS      ,EBCS_TAB        ,DYNAIN_DATA,
-     .            USER_WINDOWS     ,OUTPUT    ,INTERFACES   ,LOADS           ,MAT_ELEM, PYTHON)
+     .            USER_WINDOWS     ,OUTPUT    ,INTERFACES   ,LOADS           ,MAT_ELEM, PYTHON,SKEWS)
 
       IF (NSPMD > 1)  CALL SPMD_RST_CHECK()
 c----------
@@ -1545,7 +1543,7 @@ C------------------------------------------------
      5              NPBY ,   LPBY    ,ILINK,   LLINK  ,LINALE ,
      6              NEFLSW , NNFLSW , ICUT ,   IAF(IF01),
      7              X  ,     V  ,     VR  ,    MS   ,IN  ,
-     8              SKEW  ,TF       ,RBY  ,
+     8              SKEWS%SKEW  ,TF       ,RBY  ,
      9              WA  ,CRFLSW  ,XCUT  ,ANIN  ,DAMPR  ,
      A              IGRNOD ,KXSP,WEIGHT ,FR_RBY2 ,FR_RL,
      B              PARTSAV,IPART,PM,
@@ -1593,7 +1591,7 @@ C------------------------------------------------
       IF (NUMELTG6>0) THEN
         CALL CDK6BC3(ICODT ,ISKEW,ISKWN,IXTG  ,
      1                  IXTG1   ,NPBY,
-     2                  X ,SKEW)
+     2                  X ,SKEWS%SKEW)
       ENDIF
 C
 C bcs rigid material
@@ -1903,7 +1901,8 @@ C   Multiple th files
      2                    WA            ,PM               ,GEO              ,IPART,
      3                    SUBSETS       ,OUTPUT%TH%ITHGRP ,OUTPUT%TH%ITHBUF ,IGEO,
      4                    IPM           ,IPART            ,LIPART1          ,8,
-     5                    12            ,ITHVAR           ,ITHFLAG,NAMES_AND_TITLES )
+     5                    12            ,ITHVAR           ,ITHFLAG,NAMES_AND_TITLES,
+     6                    OUTPUT%TH%SITHBUF )
             FILNAMABF=ROOTNAM(1:ROOTLEN)//'_'//CHRUN//'.abf'
             LONG = 9
             LEN_TMP_NAME = OUTFILE_NAME_LEN + ROOTLEN + LONG        
@@ -1936,7 +1935,8 @@ c
      2                      WA            ,PM                ,GEO               ,IPART,
      3                      SUBSETS       ,OUTPUT%TH%ITHGRPA ,OUTPUT%TH%ITHBUFA ,IGEO,
      4                      IPM           ,IPART(1+LIPART1*(NPART+NTHPART))     ,2,1,
-     5                      1             ,ITHVAR            ,ITHFLAG,NAMES_AND_TITLES)
+     5                      1             ,ITHVAR            ,ITHFLAG,NAMES_AND_TITLES,
+     6                      OUTPUT%TH%SITHBUFA)
               FILNAMABF=ROOTNAM(1:ROOTLEN)//'_'//CHRUN//'_a.abf'
               LONG = 11
               LEN_TMP_NAME = OUTFILE_NAME_LEN + ROOTLEN + LONG        
@@ -1966,7 +1966,8 @@ c
      2                      WA            ,PM               ,GEO               ,IPART,
      3                      SUBSETS       ,OUTPUT%TH%ITHGRPB,OUTPUT%TH%ITHBUFB ,IGEO,
      4                      IPM           ,IPART(1+LIPART1*(NPART+NTHPART)+2*(NPART+NTHPART)),2,1,
-     5                      1             ,ITHVAR           ,ITHFLAG,NAMES_AND_TITLES)
+     5                      1             ,ITHVAR           ,ITHFLAG,NAMES_AND_TITLES,
+     6                      OUTPUT%TH%SITHBUFB)
               FILNAMABF=ROOTNAM(1:ROOTLEN)//'_'//CHRUN//'_b.abf'
               LONG = 11
               LEN_TMP_NAME = OUTFILE_NAME_LEN + ROOTLEN + LONG        
@@ -1997,7 +1998,8 @@ c
      2                      WA            ,PM      ,GEO        ,IPART ,
      3                      SUBSETS       ,OUTPUT%TH%ITHGRPC   ,OUTPUT%TH%ITHBUFC ,IGEO,
      4                      IPM           ,IPART               ,2 ,1,
-     5                      1             ,ITHVAR              ,ITHFLAG,NAMES_AND_TITLES)
+     5                      1             ,ITHVAR              ,ITHFLAG,NAMES_AND_TITLES,
+     6                      OUTPUT%TH%SITHBUFC)
               FILNAMABF=ROOTNAM(1:ROOTLEN)//'_'//CHRUN//'_c.abf'
               LONG = 11
               LEN_TMP_NAME = OUTFILE_NAME_LEN + ROOTLEN + LONG        
@@ -2027,7 +2029,8 @@ c
      2                       WA            ,PM      ,GEO        ,IPART,
      3                       SUBSETS       ,OUTPUT%TH%ITHGRPD   ,OUTPUT%TH%ITHBUFD ,IGEO,
      4                       IPM           ,IPART   ,2     ,1   ,
-     5                       1             ,ITHVAR  ,ITHFLAG,NAMES_AND_TITLES)
+     5                       1             ,ITHVAR  ,ITHFLAG,NAMES_AND_TITLES,
+     6                       OUTPUT%TH%SITHBUFD)
               FILNAMABF=ROOTNAM(1:ROOTLEN)//'_'//CHRUN//'_d.abf'
               LONG = 11
             LEN_TMP_NAME = OUTFILE_NAME_LEN + ROOTLEN + LONG        
@@ -2055,7 +2058,8 @@ c
      2                       WA            ,PM     ,GEO       ,IPART,
      3                       SUBSETS       ,OUTPUT%TH%ITHGRPE ,OUTPUT%TH%ITHBUFE ,IGEO,
      4                       IPM           ,IPART             ,2     ,1     ,
-     5                       1             ,ITHVAR            ,ITHFLAG,NAMES_AND_TITLES)
+     5                       1             ,ITHVAR            ,ITHFLAG,NAMES_AND_TITLES,
+     6                       OUTPUT%TH%SITHBUFE)
               FILNAMABF=ROOTNAM(1:ROOTLEN)//'_'//CHRUN//'_e.abf'
               LONG = 11
             LEN_TMP_NAME = OUTFILE_NAME_LEN + ROOTLEN + LONG        
@@ -2084,7 +2088,8 @@ c
      2                      WA  ,PM  ,GEO ,IPART ,
      3                      SUBSETS ,OUTPUT%TH%ITHGRPF,OUTPUT%TH%ITHBUFF,IGEO    ,
      4                      IPM   ,IPART   ,2     ,1     ,
-     5                      1   ,ITHVAR,ITHFLAG,NAMES_AND_TITLES)
+     5                      1   ,ITHVAR,ITHFLAG,NAMES_AND_TITLES,
+     6                      OUTPUT%TH%SITHBUFF)
               FILNAMABF=ROOTNAM(1:ROOTLEN)//'_'//CHRUN//'_f.abf'
               LONG = 11
             LEN_TMP_NAME = OUTFILE_NAME_LEN + ROOTLEN + LONG        
@@ -2113,7 +2118,8 @@ c
      2                      WA  ,PM  ,GEO ,IPART ,
      3                      SUBSETS ,OUTPUT%TH%ITHGRPG,OUTPUT%TH%ITHBUFG,IGEO    ,
      4                      IPM     ,IPART   ,2     ,1     ,
-     5                      1       ,ITHVAR,ITHFLAG,NAMES_AND_TITLES)
+     5                      1       ,ITHVAR,ITHFLAG,NAMES_AND_TITLES,
+     6                      OUTPUT%TH%SITHBUFG)
      
               FILNAMABF=ROOTNAM(1:ROOTLEN)//'_'//CHRUN//'_g.abf'
               LONG = 11
@@ -2147,7 +2153,8 @@ c
      2                      WA            ,PM                  ,GEO              ,IPART,
      3                      SUBSETS       ,OUTPUT%TH%ITHGRPH  ,OUTPUT%TH%ITHBUFH ,IGEO,
      4                      IPM   ,IPART  ,2                  ,1     ,
-     5                      1     ,ITHVAR ,ITHFLAG ,NAMES_AND_TITLES)
+     5                      1     ,ITHVAR ,ITHFLAG ,NAMES_AND_TITLES,
+     6                      OUTPUT%TH%SITHBUFH)
      
               FILNAMABF=ROOTNAM(1:ROOTLEN)//'_'//CHRUN//'_h.abf'
               LONG = 11
@@ -2180,7 +2187,8 @@ c
      2                      WA            ,PM                 ,GEO               ,IPART,
      3                      SUBSETS       ,OUTPUT%TH%ITHGRPI  ,OUTPUT%TH%ITHBUFI ,IGEO    ,
      4                      IPM           ,IPART(1+LIPART1*(NPART+NTHPART)+16*(NPART+NTHPART)),2,1,
-     5                      1             ,ITHVAR ,ITHFLAG,NAMES_AND_TITLES)
+     5                      1             ,ITHVAR ,ITHFLAG,NAMES_AND_TITLES,
+     6                      OUTPUT%TH%SITHBUFI)
      
               FILNAMABF=ROOTNAM(1:ROOTLEN)//'_'//CHRUN//'_i.abf'
               LONG = 11
@@ -2251,7 +2259,7 @@ C---------------------------------------------------------------------
      .                   DRAPE_SH4N   ,DRAPE_SH3N      ,T_MONVOL        ,SENSORS    ,EBCS_TAB        ,
      .                   DIFFUSION    ,SEGVAR          ,DYNAIN_DATA     ,DRAPEG     ,USER_WINDOWS    ,
      .                   OUTPUT       ,INTERFACES      ,DT              ,LOADS      ,MAT_ELEM  , PYTHON,
-     .                   NAMES_AND_TITLES, UNITAB)
+     .                   NAMES_AND_TITLES, UNITAB      ,SKEWS)
 C---------------------------------------------------------------------
       CURRENT_RUN = GLOBAL_COMP_TIME%RUN_NBR
       CALL SPMD_REDUCE_DB(GLOBAL_COMP_TIME%ENGINE_TIME(CURRENT_RUN),RESULT,1,0,"MAX ")

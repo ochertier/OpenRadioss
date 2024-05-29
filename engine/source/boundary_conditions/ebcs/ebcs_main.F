@@ -37,10 +37,11 @@ Chd|        EBCS_MOD                      ../common_source/modules/boundary_cond
 Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
+Chd|        TH_SURF_MOD                   ../common_source/modules/interfaces/th_surf_mod.F
 Chd|====================================================================
       SUBROUTINE EBCS_MAIN(IGRSURF,SEGVAR,VOLMON,A,V,W,X,
      .                     FSAV,FV,WA,MS,STIFN,IPARG,ELBUF_TAB,EBCS_TAB,MULTI_FVM,IXQ,IXS,IXTG,
-     .                     ITAB,NALE,FSKY)
+     .                     ITAB,NALE,FSKY,FSAVSURF)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -48,6 +49,7 @@ C-----------------------------------------------
       USE GROUPDEF_MOD
       USE EBCS_MOD
       USE MULTI_FVM_MOD
+      USE TH_SURF_MOD , only : TH_SURF_NUM_CHANNEL
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -62,11 +64,11 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      my_real,INTENT(INOUT) :: FSAVSURF(TH_SURF_NUM_CHANNEL,NSURF)
       INTEGER IPARG(NPARG,NGROUP)
       INTEGER,INTENT(IN) :: IXQ(NIXQ,NUMELQ),IXS(NIXS,NUMELS),IXTG(NIXTG,NUMELTG),ITAB(NUMNOD),NALE(NUMNOD)
-      my_real
-     .       VOLMON(*),SEGVAR(*),V(3,NUMNOD),W(3,NUMNOD),A(3,NUMNOD),X(3,NUMNOD),FSAV(NTHVKI,*),
-     .       FV(*),WA(*),MS(NUMNOD),STIFN(NUMNOD)
+      my_real VOLMON(*),SEGVAR(*),V(3,NUMNOD),W(3,NUMNOD),A(3,NUMNOD),X(3,NUMNOD),FSAV(NTHVKI,*),
+     .        FV(*),WA(*),MS(NUMNOD),STIFN(NUMNOD)
       TYPE(ELBUF_STRUCT_), DIMENSION(NGROUP) :: ELBUF_TAB
       TYPE (SURF_)   , DIMENSION(NSURF)   :: IGRSURF
       TYPE(t_ebcs_tab), TARGET, INTENT(INOUT) :: EBCS_TAB
@@ -77,10 +79,23 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,TYP,ISU,NSEG,VOLU,NOD,J
       CLASS(t_ebcs), POINTER :: EBCS
+      LOGICAL HAS_TH
 C-----------------------------------------------
 C   S o u r  c e   L i n e s
 C-----------------------------------------------
- 
+
+      !/TH/SURF (RESET)
+      DO I = 1, NEBCS
+         IF(.NOT.EBCS_TAB%need_to_compute(I)) CYCLE
+         EBCS => EBCS_TAB%tab(i)%poly
+         HAS_TH = EBCS%has_th
+         IF(HAS_TH)THEN
+           ISU = EBCS%surf_id
+           FSAVSURF(1:5,ISU) = ZERO
+           ! FSAVSURF(6,ISU) is cumulative value : not reset
+         ENDIF
+      ENDDO
+
       DO I = 1, NEBCS
          IF(.NOT.EBCS_TAB%need_to_compute(I)) CYCLE
          EBCS => EBCS_TAB%tab(i)%poly
@@ -147,7 +162,7 @@ C-----------------------------------------------
      .             twf%node_list,NOD,twf%elem_list,twf%ielem,twf%iface,
      .             twf%ro0,twf%en0,
      .             twf%la,MS,STIFN,twf,IPARG,ELBUF_TAB,MULTI_FVM,IXQ,IXS,IXTG,
-     .             ITAB, NALE, EBCS_PARITHON(I)%ELEM_ADRESS,FSKY)  
+     .             ITAB, NALE, EBCS_PARITHON(I)%ELEM_ADRESS,FSKY,FSAVSURF)
             end select  
          ELSE IF (TYP == 100) THEN
             SELECT TYPE(EBCS)

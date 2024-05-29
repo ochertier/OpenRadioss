@@ -30,18 +30,20 @@ Chd|        EBCS_MOD                      ../common_source/modules/boundary_cond
 Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|        SEGVAR_MOD                    share/modules/segvar_mod.F    
+Chd|        TH_SURF_MOD                   ../common_source/modules/interfaces/th_surf_mod.F
 Chd|====================================================================
       SUBROUTINE EBCS10(NSEG,ISEG,SEGVAR,
      .                 A,V,W,X,
      .                 LISTE,NOD,IRECT,IELEM,IFACE,
      .                 RO0,EN0,
      .                 LA,MS,STIFN,EBCS,IPARG,ELBUF_TAB,MULTI_FVM,IXQ,IXS,IXTG,
-     .                 ITAB,NALE,ELEM_ADRESS,FSKY)
+     .                 ITAB,NALE,ELEM_ADRESS,FSKY,FSAVSURF)
       USE EBCS_MOD
       USE ELBUFDEF_MOD
       USE MULTI_FVM_MOD
       USE SEGVAR_MOD
       USE ALE_MOD , only : ALE
+      USE TH_SURF_MOD , only : TH_SURF_NUM_CHANNEL
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -58,6 +60,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      my_real, INTENT(INOUT) :: FSAVSURF(TH_SURF_NUM_CHANNEL,NSURF)
       INTEGER,INTENT(IN) :: NSEG,NOD,ISEG(NSEG),LISTE(NOD),IRECT(4,NSEG),IELEM(NSEG),IFACE(NSEG)
       INTEGER,INTENT(IN) :: IXQ(NIXQ,NUMELQ),IXS(NIXS,NUMELS),IXTG(NIXTG,NUMELTG)
       INTEGER,INTENT(IN) :: ITAB(NUMNOD),NALE(NUMNOD)
@@ -89,6 +92,7 @@ C-----------------------------------------------
       LOGICAL bFOUND
       TYPE(BUF_MAT_)  ,POINTER :: MBUF  
       INTEGER :: ADRESS ! adress for parit/on array
+      INTEGER :: SURF_ID ! EBCS surface identifier
 C-----------------------------------------------
       DATA ICF_2d  /1,2,2,3,3,4,4,1/
       DATA ICF_3d  /1,4,3,2,3,4,8,7,5,6,7,8,1,2,6,5,2,3,7,6,1,5,8,4/
@@ -98,6 +102,7 @@ C-----------------------------------------------
       TCAR_P = EBCS%TCAR_P
       TCAR_VF = EBCS%TCAR_VF
       TIME = TT
+      SURF_ID = EBCS%SURF_ID
       
       ALPHA = DT1/TCAR_P
       BETA = DT1/MAX(DT1,TCAR_VF)
@@ -198,7 +203,7 @@ C-----------------------------------------------
           Vnew = FAC1 * (TMP(1)*XN + TMP(2)*YN + TMP(3)*ZN)
           IF(TIME == ZERO) THEN
             IF(ALE%GRID%NWALE == 7)THEN
-              Vold = ZERO ! 0.0 with /ALE/GRID/MASSFLOW
+              Vold = ZERO ! 0.0 with /ALE/GRID/FLOW-TRACKING
             ENDIF
             Vold = Vnew
           ENDIF
@@ -277,7 +282,7 @@ C-----------------------------------------------
             ENDDO
           ENDIF
           NBMAT=EBCS%NBMAT
-          
+
           !segment data for flux of volumes ( upwind/ACONVE() )
           SEGVAR%RHO(KSEG)=RHO
           SEGVAR%EINT(KSEG)=EINT          
@@ -300,7 +305,7 @@ C              PP    = Pold + (ROC*(Vnew-Vold)) !+ALPHA*(Pvois+DP0)/(ALPHA + ONE
 
             ENDIF
             EBCS%pold(IS) = PP
-            
+
             IF(SEGVAR%nbmat > 0)THEN
               !Volume Fractions update
               IF(Vnew < ZERO)THEN     !flux rentrant, relaxation du pourcentage volumique   
@@ -323,6 +328,12 @@ C              PP    = Pold + (ROC*(Vnew-Vold)) !+ALPHA*(Pvois+DP0)/(ALPHA + ONE
              LA(2,NN(KK)) = LA(2,NN(KK)) -  PP*SURF*YN*FAC1
              LA(3,NN(KK)) = LA(3,NN(KK)) -  PP*SURF*ZN*FAC1
            ENDDO
+
+           !/TH/SURF (massflow, velocity, pressure)
+           FSAVSURF(2,SURF_ID) = FSAVSURF(2,SURF_ID) + RHO*SURF*Vnew     !rho.S.u = dm/dt
+           FSAVSURF(3,SURF_ID) = FSAVSURF(3,SURF_ID) + SURF*Vnew         !S.u
+           FSAVSURF(4,SURF_ID) = FSAVSURF(4,SURF_ID) + SURF*PP           !S.P
+           FSAVSURF(6,SURF_ID) = FSAVSURF(6,SURF_ID) + RHO*SURF*Vnew*DT1 ! m<-m+dm (cumulative)
 
            ! -------------
            ! for parith/on option : need to update with FSKY array 
@@ -348,7 +359,7 @@ C              PP    = Pold + (ROC*(Vnew-Vold)) !+ALPHA*(Pvois+DP0)/(ALPHA + ONE
                 A(3,NUM)=A(3,NUM)+LA(3,II)
             ENDDO
         ENDIF
-        ! -------------         
+        ! -------------
 
       RETURN
       END

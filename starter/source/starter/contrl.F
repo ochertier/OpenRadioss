@@ -40,7 +40,6 @@ Chd|        HM_OPTION_NEXT                source/devtools/hm_reader/hm_option_ne
 Chd|        HM_OPTION_READ_KEY            source/devtools/hm_reader/hm_option_read_key.F
 Chd|        HM_OPTION_START               source/devtools/hm_reader/hm_option_start.F
 Chd|        HM_PRELCE16S                  source/elements/reader/hm_read_solid.F
-Chd|        HM_PREREAD_INIVEL             source/initial_conditions/general/inivel/hm_read_inivel.F
 Chd|        HM_PREREAD_NODE               source/elements/reader/hm_preread_node.F
 Chd|        HM_PREREAD_PART               source/model/assembling/hm_read_part.F
 Chd|        HM_PREREAD_PROPERTIES         source/properties/hm_preread_properties.F
@@ -88,7 +87,7 @@ Chd|        SETDEF_MOD                    ../common_source/modules/setdef_mod.F
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|        USER_WINDOWS_MOD              ../common_source/modules/user_windows_mod.F
 Chd|====================================================================
-      SUBROUTINE CONTRL(MULTI_FVM,LSUBMODEL,IS_DYNA,DETONATORS,USER_WINDOWS,MAT_ELEM,NAMES_AND_TITLES,LIPART1)
+      SUBROUTINE CONTRL(MULTI_FVM,LSUBMODEL,IS_DYNA,DETONATORS,USER_WINDOWS,MAT_ELEM,NAMES_AND_TITLES,LIPART1,DEFAULTS)
 C----------------------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -115,6 +114,7 @@ C-----------------------------------------------
       USE MAT_ELEM_MOD
       USE NAMES_AND_TITLES_MOD, only:NAMES_AND_TITLES_,LTITLE,NCHARLINE,NCHARTITLE
       USE BCS_MOD , only : BCS
+      USE DEFAULTS_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -176,7 +176,8 @@ C-----------------------------------------------
       TYPE(USER_WINDOWS_), INTENT(INOUT) :: USER_WINDOWS
       TYPE(MAT_ELEM_), INTENT(INOUT)     :: MAT_ELEM
       TYPE(NAMES_AND_TITLES_),INTENT(INOUT) :: NAMES_AND_TITLES   !< NAMES_AND_TITLES host the input deck names and titles for outputs
-      INTEGER,INTENT(IN) ::  LIPART1  !< Number of variables of IPART
+      INTEGER,INTENT(IN) ::  LIPART1                              !< Number of variables of IPART
+      TYPE(DEFAULTS_), INTENT(INOUT)      :: DEFAULTS             !< Defaults mod
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -202,6 +203,7 @@ C-----------------------------------------------
       CHARACTER (LEN=NCHARTITLE) :: TITR
       CHARACTER (LEN=255) :: STR_NBTHREADS
       CHARACTER MESS*40, ERRMSG*40
+      CHARACTER*3 :: LABEL_DEF,LABEL_ROT
 C-----------------------------------------------
 C OpenMP specific
 #if defined(_OPENMP)
@@ -451,7 +453,7 @@ C
 C-------------------------------------------------------------------
 C     READING OF SHELL PROPERTIES DEFAULT VALUES
 C-------------------------------------------------------------------
-      CALL HM_READ_DEFSHELL(LSUBMODEL)
+      CALL HM_READ_DEFSHELL(LSUBMODEL,DEFAULTS%SHELL)
 C-------------------------------------------------------------------
 C     READING OF SOLID PROPERTIES DEFAULT VALUES
 C-------------------------------------------------------------------
@@ -1059,7 +1061,8 @@ C----------------------------------------------------------
 C     solids with rotation
 C----------------------------------------------------------
       KROT = 0
-      CALL HM_PREREAD_INIVEL(KROT,LSUBMODEL)
+      CALL HM_OPTION_COUNT('/INIVEL/NODE',I)
+      IF(I > 0)KROT=1
       IRODDL=MIN(1,NUMELC+NUMELP+NRBODY+NUMELR+NUMELTG+NGJOINT+NUMMPC+NFXBODY+NUMELX+KROT)
       IRODDL0 = 0
       IISROT = 0
@@ -1113,7 +1116,7 @@ C----------------------------------------------------------
       CALL HM_OPTION_COUNT('/USERWI',USER_WINDOWS%HAS_USER_WINDOW)
       NCPRI=1
       IF(DTINI==ZERO)DTINI=EP06
-      IF(VOLMIN==ZERO)VOLMIN=-EP30
+      IF(VOLMIN==ZERO)VOLMIN=-EP20
       DT2OLD=DTINI/ONEP1
       TT=ZERO
       DT1=ZERO
@@ -1370,13 +1373,18 @@ C
         WRITE (IOUT,5100)ALE%GRID%NWALE
         SELECT CASE (ALE%GRID%NWALE)
           CASE(0);WRITE (IOUT,5199) ALE%GRID%ALPHA,ALE%GRID%GAMMA,ALE%GRID%VGX,ALE%GRID%VGY,ALE%GRID%VGZ,VOLMIN
-          CASE(1);WRITE (IOUT,5200) ALE%GRID%ALPHA,ALE%GRID%VGX,ALE%GRID%VGY,ALE%GRID%VGZ,VOLMIN
+          CASE(1);WRITE (IOUT,5200) ALE%GRID%ALPHA,VOLMIN
           CASE(2);WRITE (IOUT,5300) DT_INPUT, ALE%GRID%ALPHA,ALE%GRID%GAMMA,ALE%GRID%VGX,ALE%GRID%VGY,VOLMIN
           CASE(3);WRITE (IOUT,5350) 
           CASE(4);WRITE (IOUT,5351) ALE%GRID%ALPHA,ALE%GRID%GAMMA,ALE%GRID%VGX,ALE%GRID%VGY 
           CASE(5);WRITE (IOUT,5353) ALE%GRID%ALPHA,NINT(ALE%GRID%VGX)               
           CASE(6);WRITE (IOUT,5354)
-          CASE(7);WRITE (IOUT,5355) ALE%GRID%ALPHA,ALE%GRID%GAMMA
+          CASE(7);
+            LABEL_DEF = ' NO'
+            IF(INT(ALE%GRID%VGX) == 1)LABEL_DEF = 'YES'
+            LABEL_ROT = ' NO'
+            IF(INT(ALE%GRID%VGY) == 1)LABEL_ROT = 'YES'
+            WRITE (IOUT,5355) LABEL_DEF,LABEL_ROT,ALE%GRID%ALPHA,ALE%GRID%GAMMA
         END SELECT
       ENDIF
 
@@ -1541,11 +1549,11 @@ c     & 4X,'MEMORY AVAILABLE FOR REALS. . . . . . . . . . . . . .',I10)
  5055 FORMAT(
      & '    NSUBDOM: NUMBER OF SUBDOMAINS . . . . . .. . . . . . ',I10)
  5100 FORMAT(/
-     & 4X,'NWALE : CHOICE OF ALE GRID VELOCITY FORMULATION . . .',I10)
+     & 4X,'NWALE : ALE GRID VELOCITY FORMULATION  . . . . . . . .',I10)
  5199 FORMAT(//
-     & 4X,'ALE GRID FORMULATION                           '/
-     & 4X,'--------------------                           '/
-     & 5X,'DONEA GRID VELOCITY COMPUTATION METHOD         '/
+     & 4X,'ALE GRID SMOOTHING FORMULATION'/
+     & 4X,'------------------------------'/
+     & 5X,'DONEA GRID VELOCITY COMPUTATION METHOD         '//
      & 5X,'ALPHA   : DONEA COEFFICIENT. . . . . . . . . . ',1PG20.13/
      & 5X,'GAMMA   : GRID VELOCITY LIMITATION FACTOR. . . ',1PG20.13/
      & 5X,'FscaleX : X-GRID VELOCITY SCALE FACTOR . . . . ',1PG20.13/
@@ -1553,18 +1561,15 @@ c     & 4X,'MEMORY AVAILABLE FOR REALS. . . . . . . . . . . . . .',I10)
      & 5X,'FscaleZ : Z-GRID VELOCITY SCALE FACTOR . . . . ',1PG20.13/
      & 5X,'VOLMIN  : MINIMUM VOLUME FOR ELEMENT DELETION. ',1PG20.13)
  5200 FORMAT(//
-     & 4X,'ALE GRID FORMULATION                           '/
-     & 4X,'--------------------                           '/
-     & 5X,'ALTAIR AVERAGE DISPLACEMENT GRID FORMULATION   '/
+     & 4X,'ALE GRID SMOOTHING FORMULATION'/
+     & 4X,'------------------------------'/
+     & 5X,'ALTAIR AVERAGE DISPLACEMENT GRID FORMULATION   '//
      & 5X,'UMAX  : MAXIMUM ABSOLUTE GRID VELOCITY . . . . ',1PG20.13/
-     & 5X,'CWX   : X GRID VELOCITY SCALE FACTOR . . . . . ',1PG20.13/
-     & 5X,'CWY   : Y GRID VELOCITY SCALE FACTOR . . . . . ',1PG20.13/
-     & 5X,'CWZ   : Z GRID VELOCITY SCALE FACTOR . . . . . ',1PG20.13/
      & 5X,'VMIN  : MINIMUM VOLUME FOR ELEMENT DELETION. . ',1PG20.13)
  5300 FORMAT(//
-     & 4X,'ALE GRID FORMULATION                           '/
-     & 4X,'--------------------                           '/
-     &5X,'ALTAIR SPRING METHOD FOR GRID VELOCITY COMPUTATION    '/
+     & 4X,'ALE GRID SMOOTHING FORMULATION'/
+     & 4X,'------------------------------'/
+     &5X,'ALTAIR SPRING METHOD FOR GRID VELOCITY COMPUTATION    '//
      &5X,'DT0   : TYPICAL TIME STEP  . . . . . . . . . . . . ',1PG20.13/
      &5X,'DT0*  : EFFECTIVE TIME STEP. . . . . . . . . . . . ',1PG20.13/
      &5X,'GAMMA : NON LINEARITY FACTOR . . . . . . . . . . . ',1PG20.13/
@@ -1572,45 +1577,47 @@ c     & 4X,'MEMORY AVAILABLE FOR REALS. . . . . . . . . . . . . .',I10)
      &5X,'NU    : SHEAR FACTOR . . . . . . . . . . . . . . . ',1PG20.13/
      &5X,'VOLMIN: MINIMUM VOLUME FOR ELEMENT DELETION. . . . ',1PG20.13)
  5350 FORMAT(//
-     & 4X,'ALE GRID FORMULATION                           '/
-     & 4X,'--------------------                           '/
+     & 4X,'ALE GRID SMOOTHING FORMULATION'/
+     & 4X,'------------------------------'/
      & 5X,'GRID VELOCITY IS NOT COMPUTED (QUASI EULER) ')
  5351 FORMAT(//
-     & 4X,'ALE GRID FORMULATION                           '/
-     & 4X,'--------------------                           '/
-     & 5X,'ALTAIR STANDARD METHOD FOR GRID VELOCITY COMPUTATION '/
+     & 4X,'ALE GRID SMOOTHING FORMULATION'/
+     & 4X,'------------------------------'/
+     & 5X,'ALTAIR STANDARD METHOD FOR GRID VELOCITY COMPUTATION '//
      & 5X,'ALPHA : STABILITY FACTOR . . . . . . . . . . . . ',1PG20.13/
      & 5X,'GAMMA : NON LINEARITY FACTOR . . . . . . . . . . ',1PG20.13/
      & 5X,'BETA  : DAMPING COEFFICIENT. . . . . . . . . . . ',1PG20.13/
      & 5X,'LC    : CHARACTERISTIC LENGTH. . . . . . . . . . ',1PG20.13)
  5353 FORMAT(//
-     & 4X,'ALE GRID FORMULATION                           '/
-     & 4X,'--------------------                           '/
-     & 5X,'LAPLACIAN SMOOTHING '/
+     & 4X,'ALE GRID SMOOTHING FORMULATION'/
+     & 4X,'------------------------------'/
+     & 5X,'LAPLACIAN SMOOTHING '//
      & 5X,'LAMBDA:. . . . . . . . . . . . . . . . . . . . . ',1PG20.13/
      & 5X,'NITER :. . . . . . . . . . . . . . . . . . . . . ',I10)
  5354 FORMAT(//
-     & 4X,'ALE GRID FORMULATION                           '/
-     & 4X,'--------------------                           '/
+     & 4X,'ALE GRID SMOOTHING FORMULATION'/
+     & 4X,'------------------------------'/
      & 5X,'VOLUME SMOOTHING ')
  5355 FORMAT(//
-     & 4X,'ALE GRID FORMULATION                           '/
-     & 4X,'--------------------                           '/
-     & 5X,'AVERAGED MASSFLOW '/
-     & 5X,'SCALE_DEF: . . . . . . . . . . . . . . . . . . . ',1PG20.13/
-     & 5X,'SCALE_ROT: . . . . . . . . . . . . . . . . . . . ',1PG20.13/)
+     & 4X,'ALE GRID SMOOTHING FORMULATION'/
+     & 4X,'------------------------------'/
+     & 5X,'FLOW-TRACKING (MASS WEIGHTED AVERAGED VELOCITY)'//
+     & 5X,'DEFORMATION ENABLED :  . . . . . . . . . . . . . ',A3/
+     & 5X,'ROTATION ENABLED : . . . . . . . . . . . . . . . ',A3/
+     & 5X,'DEFORMATION SCALE FACTOR : . . . . . . . . . . . ',1PG20.13/
+     & 5X,'ROTATION SCALE FACTOR: . . . . . . . . . . . . . ',1PG20.13/)
 
 
  5360 FORMAT(//
-     & 4X,'ALE UPWIND PARAMETERS                   '/
-     & 4X,'---------------------                   '/
+     & 4X,'ALE UPWIND PARAMETERS'/
+     & 4X,'---------------------'/
      & 5X,'UPWIND FOR MOMENTUM TRANSPORT . . . . .=',1PG20.13/,
      & 5X,'UPWIND FOR OTHER TRANSPORT. . . . . . .=',1PG20.13/)
  5380 FORMAT(/
-     & 4X,'CAA FLUID FORMULATION ACTIVATED         ')
+     & 4X,'CAA FLUID FORMULATION ACTIVATED')
  5400 FORMAT(
-     & 4X,'alpha M + beta K DAMPING                    '/,
-     & 4X,'------------------------                    '/,
+     & 4X,'alpha M + beta K DAMPING'/,
+     & 4X,'------------------------'/,
      . 4X,'NODE GROUP ID (=0 ALL NODES). . . . . . ',I5/,
      & 5X,'ALPHA . . . . . . . . . . . . . . . . .=',1PG20.13/,
      & 5X,'BETA. . . . . . . . . . . . . . . . . .=',1PG20.13)
@@ -1642,8 +1649,8 @@ c     & 4X,'MEMORY AVAILABLE FOR REALS. . . . . . . . . . . . . .',I10)
  5503 FORMAT(
      & 4X,'ISFINT : INTERNAL FORCES FORMULATION . . . . . . . . .',I10)  
  5504 FORMAT(//
-     & 4X,'ALEMUSCL                   '/
-     & 4X,'---------------------                   '/
+     & 4X,'MUSCL (MONOTONIC UPSTREAM-CENTERED SCHEME FOR CONSERVATION LAWS)'/
+     & 4X,'----------------------------------------------------------------'/
      & 5X,'COMPRESSION COEFFICIENT (BETA). . . . . . . . . . . : ',1PG20.13/  
      & 5X,'FORMULATION FLAG (IFLAG). . . . . . . . . . . . . . : ',I10)
  5700 FORMAT(//

@@ -20,3 +20,32 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
+Chd|====================================================================
+Chd|  SPMD_ARRAYS_MOD               modules/interfaces/spmd_arrays_mod.F
+Chd|-- called by -----------
+Chd|        INTERFACES_MOD                common_source/modules/interfaces/interfaces_mod.F
+Chd|-- calls ---------------
+Chd|====================================================================
+        MODULE SPMD_ARRAYS_MOD
+C-----------------------------------------------
+C   m y _ r e a l
+C-----------------------------------------------
+#include      "my_real.inc"
+       implicit none
+!   -----------------------------------------------
+!   D e r i v e d   T y p e   D e f i n i t i o n s
+!   -----------------------------------------------
+
+!   -------------------------
+
+C----------------------------------------------
+C   Global SPMD_ARRAYS activated by Contact
+C---------------------------------------------
+
+          TYPE SPMD_ARRAYS_
+             INTEGER , DIMENSION(:), ALLOCATABLE :: FR_EDG      ! List of frontier edges of main segments of int25 contacts
+             INTEGER , DIMENSION(:), ALLOCATABLE :: IAD_FREDG   ! Adress of frontier edges of main segments of int25 contacts per proc spmd
+          END TYPE SPMD_ARRAYS_
+
+C
+        END MODULE SPMD_ARRAYS_MOD

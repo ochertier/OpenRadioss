@@ -258,7 +258,6 @@ Chd|        PBLAST_MOD                    ../common_source/modules/loads/pblast_
 Chd|        PINCHTYPE_MOD                 ../common_source/modules/pinchtype_mod.F
 Chd|        SEATBELT_MOD                  ../common_source/modules/seatbelt_mod.F
 Chd|        SENSOR_MOD                    share/modules1/sensor_mod.F   
-Chd|        SKEW_MOD                      share/modules1/skew_mod.F     
 Chd|        SPLIT_CFD_MOD                 share/modules1/split_cfd_mod.F
 Chd|        STACK_MOD                     share/modules1/stack_mod.F    
 Chd|        STACK_VAR_MOD                 share/modules1/stack_var_mod.F
@@ -611,7 +610,7 @@ C-----------------------------------------------
 !       NUMNOD_L : integer, number of local element
 !       -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-**-*-*-*-*-*-*-*-*-*-*-*-*
         INTEGER, DIMENSION(NUMSKW+1), INTENT(INOUT) :: TAG_SKN
-        TYPE(SKEW_TYPE), DIMENSION(NUMSKW+1), INTENT(INOUT) :: MULTIPLE_SKEW
+        TYPE(PLIST_SKEW_), DIMENSION(NUMSKW+1), INTENT(INOUT) :: MULTIPLE_SKEW
 !       -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-**-*-*-*-*-*-*-*-*-*-*-*-*
 !       TAG_SKN : integer ; dimension=NUMSKW+1
 !                 tag array --> tag the i SKEW if a SPRING uses it
@@ -709,7 +708,9 @@ C-----------------------------------------------
      .        LENIGRSH3N_L,LENISURF_L,LENISLIN_L,NBCSCYC_L,LLBCSCYC_L,NS_DIFF,
      .        N_SLIPRING_L,N_RETRACTOR_L,N_ANCHOR_REMOTE_L,N_ANCHOR_REMOTE_SEND_L,
      .        N_SEATBELT_L,N_SEATBELT_2D_L,NUMSH4N_L,NUMSH3N_L,NCLOAD_L,NPLOAD_L,
-     .        NDAMP_VREL_L,IDAMP_VREL_L(NDAMP)   
+     .        NDAMP_VREL_L,IDAMP_VREL_L(NDAMP)
+      INTEGER LWAMP_L  !< Size of Working area in Engine. Need for SPH
+      INTEGER LWANMP_L !< Size of Working area in Engine. Need for SPH
       INTEGER IPARI_L(NPARI,MAX(1,NINTER))
       INTEGER NCONV_L,NFXTEMP_L,NRADIA_L,NFXFLUX_L
       INTEGER , DIMENSION(:), ALLOCATABLE:: NUMLOCGROUP,NUMLOCCLUSTER
@@ -998,7 +999,7 @@ C--------------------------------------
          ! mode 0 : count the number of entity/element
          CALL C_IEBCS(IXS, IXQ, IXTG,
      .        NUMELS, NUMELQ, NUMELTG,
-     .        IPM, NEBCS, CEP, NUMELS + NUMELQ + NUMELTG, NUMELS_L + NUMELQ_L + NUMELTG_L,
+     .        NEBCS, CEP, NUMELS + NUMELQ + NUMELTG,
      .        P-1, IEBCS_NELEM_L, IEBCS_TYPE, IEBCS_LISTELEM_L, IEBCS_LISTFAC_L,IEBCS_LISTDP0_L,IEBCSLGTH, N2D,
      .        MULTI_FVM%IS_USED,0,EBCS_TAB)
          ! --------------------
@@ -1017,7 +1018,7 @@ C        ALLOCATE
          IEBCSLGTH = 0
          CALL C_IEBCS(IXS, IXQ, IXTG,
      .        NUMELS, NUMELQ, NUMELTG,
-     .        IPM, NEBCS, CEP, NUMELS + NUMELQ + NUMELTG, NUMELS_L + NUMELQ_L + NUMELTG_L,
+     .        NEBCS, CEP, NUMELS + NUMELQ + NUMELTG,
      .        P-1, IEBCS_NELEM_L, IEBCS_TYPE, IEBCS_LISTELEM_L, IEBCS_LISTFAC_L,IEBCS_LISTDP0_L,IEBCSLGTH, N2D,
      .        MULTI_FVM%IS_USED,1,EBCS_TAB)
          ! --------------------
@@ -1106,7 +1107,7 @@ C        ALLOCATE
         ! --------------------
         ! additional computation for /NRF ebcs
          CALL SPLIT_EBCS(P,NEBCS_NRF,LIST_EBCS_NRF,SCEL,CEP,IGRSURF,
-     .                   CEL,NODLOCAL,EBCS_TAB,EBCS_TAB_LOC_2)
+     .                   CEL,EBCS_TAB,EBCS_TAB_LOC_2)
         ! --------------------
 !$OMP END CRITICAL
       ENDIF
@@ -1625,7 +1626,8 @@ C
      1      LENWA_L ,NTHWA    ,NAIRWA    ,NUMELS_L ,NUMELQ_L,
      2      NUMELC_L,NUMELTG_L,NUMELT_L  ,NUMELP_L ,NUMELR_L,
      3      NUMNOD_L,NMNT     ,L_MUL_LAG1,L_MUL_LAG,MAXNX   ,
-     4      LWASPH_L,NUMSPH_L  ,LWASPIO, NRCVVOIS )
+     4      LWASPH_L,NUMSPH_L  ,LWASPIO, NRCVVOIS, 
+     5      LWAMP_L, LWANMP_L)
 C--------------------------------------
 C counts LLCFIELD
 C--------------------------------------
@@ -1784,7 +1786,8 @@ C--------------------------------------------
      3   ALE_CONNECTIVITY,N_SLIPRING_L,N_RETRACTOR_L,N_ANCHOR_REMOTE_L,
      4   N_ANCHOR_REMOTE_SEND_L,N_SEATBELT_L,N_SEATBELT_2D_L,DYNAIN_DATA,
      5   NUMSH4N_L,NUMSH3N_L,INTERFACES%PARAMETERS,SENSORS,LOADS_PER_PROC%NLOAD_CYL,
-     6   NCLOAD_L,NPLOAD_L,NDAMP_VREL_L, UNITAB)
+     6   NCLOAD_L,NPLOAD_L,NDAMP_VREL_L, UNITAB,
+     7   LWAMP_L,LWANMP_L)
      
 
       CALL WRCOMR(LMXVREA,LVARREA,TABVREA,MSNDP(P),P,INTERFACES%PARAMETERS,UNITAB)

@@ -46,6 +46,7 @@ Chd|        H3D_MOD                       share/modules/h3d_mod.F
 Chd|        INTBUFFRIC_MOD                share/modules/restart_mod.F   
 Chd|        INTBUFMOD                     share/modules/restart_mod.F   
 Chd|        INTBUF_MOD                    share/modules/restart_mod.F   
+Chd|        INTERFACES_MOD                ../common_source/modules/interfaces/interfaces_mod.F
 Chd|        INTSTAMP_GLOB_MOD             share/modules/intstamp_glob_mod.F
 Chd|        LOADS_MOD                     ../common_source/modules/loads/loads_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
@@ -61,7 +62,7 @@ Chd|        SPH_MOD                       share/modules/sph_mod.F
 Chd|        STACK_MOD                     share/modules/stack_mod.F     
 Chd|        TRIMAT_MOD                    share/modules/trimat.F        
 Chd|====================================================================
-      SUBROUTINE RESTALLOC(MULTI_FVM,H3D_DATA,PINCH_DATA,ALE_CONNECTIVITY,SEGVAR,LOADS)
+      SUBROUTINE RESTALLOC(MULTI_FVM,H3D_DATA,PINCH_DATA,ALE_CONNECTIVITY,SEGVAR,LOADS,INTERFACES,SKEWS)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -95,6 +96,9 @@ C-----------------------------------------------
       USE ALE_MOD
       USE LOADS_MOD
       USE DAMP_MOD
+      USE INTERFACES_MOD
+      USE SKEW_MOD
+      USE MY_ALLOC_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -132,6 +136,8 @@ C-----------------------------------------------
       TYPE(t_ale_connectivity), INTENT(INOUT) :: ALE_CONNECTIVITY
       TYPE(t_SEGVAR) :: SEGVAR
       TYPE (LOADS_),INTENT(IN) :: LOADS
+      TYPE(INTERFACES_) :: INTERFACES
+      TYPE(SKEW_)       :: SKEWS
 C----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -555,13 +561,13 @@ C
         IF (IERR/=0) GOTO 1000
         IAD_FRNOR = 0
 C          
-        ALLOCATE (FR_EDG(2*NBDDEDGT),STAT=IERR)
+        ALLOCATE (INTERFACES%SPMD_ARRAYS%FR_EDG(2*NBDDEDGT),STAT=IERR)
         IF (IERR/=0) GOTO 1000
-        FR_EDG = 0
+        INTERFACES%SPMD_ARRAYS%FR_EDG = 0
 C          
-        ALLOCATE (IAD_FREDG((NSPMD+1)*NINTER25),STAT=IERR)
+        ALLOCATE (INTERFACES%SPMD_ARRAYS%IAD_FREDG((NSPMD+1)*NINTER25),STAT=IERR)
         IF (IERR/=0) GOTO 1000
-        IAD_FREDG = 0
+        INTERFACES%SPMD_ARRAYS%IAD_FREDG = 0
 C          
         ALLOCATE (FR_NOR(NBDDNORT),STAT=IERR)
         IF (IERR/=0) GOTO 1000
@@ -1039,10 +1045,6 @@ C   -----------------------------------------------
         ALLOCATE (PM(SPM),STAT=IERR)
         IF (IERR/=0) GOTO 1000
         PM = 0
-
-        ALLOCATE (SKEW(SSKEW),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        SKEW = 0  
 
         ALLOCATE (XFRAME(SXFRAME),STAT=IERR)
         IF (IERR/=0) GOTO 1000
@@ -2060,7 +2062,7 @@ C
 
         
         IF (MULTI_FVM%IS_USED) THEN
-           CALL MULTI_ALLOCATE(MULTI_FVM,H3D_DATA)
+           CALL MULTI_ALLOCATE(MULTI_FVM, H3D_DATA)
            ALLOCATE (ALEFVM_Buffer%VERTEX(4,NUMNOD)      ,STAT=IERR)
            IF (IERR /= 0) GOTO 1000
            ALEFVM_Buffer%VERTEX(:,:) = ZERO
@@ -2289,7 +2291,10 @@ C-------/DAMP/VREL----------------------
         IF (IERR/=0) GOTO 1000    
         ALLOCATE (FR_DAMP_VREL(NDAMP_VREL*(NSPMD+2)),STAT=IERR)
         IF (IERR/=0) GOTO 1000          
-C
+
+        ! Skew
+        CALL MY_ALLOC(SKEWS%SKEW,SKEWS%N_SKEW_VAR,SKEWS%TOTAL_SKEW_NUMBER)
+        
 C  DEBUG MEMORY ALLOCATIONS
 C
         IF(DEBUG(6)==1)THEN

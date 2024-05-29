@@ -144,7 +144,7 @@ Chd|====================================================================
      5  NSTRF  ,LJOINT ,ICODT  ,ICODR  ,ISKY   ,ADSKY  ,IADS_F ,
      6  ILINK  ,LLINK  ,WEIGHT         ,ITASK  ,IBVEL  ,LBVEL  ,FBVEL  ,
      7  X      ,D      ,V      ,VR     ,DR     ,THKE   ,DAMP   ,MS     ,
-     8  IN     ,PM     ,SKEW   ,GEO    ,EANI   ,BUFMAT ,BUFGEO ,BUFSF  ,
+     8  IN     ,PM     ,SKEWS  ,GEO    ,EANI   ,BUFMAT ,BUFGEO ,BUFSF  ,
      9  TF     ,FORC   ,VEL    ,FSAV   ,AGRV   ,FR_WAVE,PARTS0 ,
      A  ELBUF  ,RBY    ,RIVET  ,FR_ELEM,IAD_ELEM,
      B  WA             ,A      ,AR     ,STIFN  ,STIFR  ,PARTSAV,FSKY   ,
@@ -164,7 +164,7 @@ Chd|====================================================================
      Y  DIMFB  ,FBSAV6 ,STABSEN,TABSENSOR,DRAPE_SH4N, DRAPE_SH3N,
      Z  H3D_DATA,MULTI_FVM,IGRBRIC,IGRSH4N,IGRSH3N,IGRBEAM,FORNEQS,MAXDGAP,
      A  NDDL0   ,NNZK0 ,IT_T    ,IMPBUF_TAB,CPTREAC,FTHREAC,NODREAC, DRAPEG,
-     B  INTERFACES,TH_SURF ,FSAVSURF,NSEG_LOADP,DPL0CLD,VEL0CLD)
+     B  INTERFACES,TH_SURF,DPL0CLD,VEL0CLD,SNPC,STF)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -184,6 +184,7 @@ C-----------------------------------------------
         USE SENSOR_MOD
         USE INTERFACES_MOD
         USE TH_SURF_MOD , ONLY : TH_SURF_
+        USE SKEW_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -212,6 +213,8 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
         INTEGER ,INTENT(IN) :: NSENSOR
+        INTEGER ,INTENT(IN) :: SNPC
+        INTEGER ,INTENT(IN) :: STF
         INTEGER ITASK,ICODE(*), ISKEW(*), ISKWN(LISKN,*),ITABM1(*),
      .     IPART(*),IXS(*),IXQ(NIXQ,*),IXC(NIXC,*), IXT(NIXT,*),
      .     IXP(NIXP,*),IXR(NIXR,*), IXTG(NIXTG,*), IXTG1(4,*),
@@ -232,7 +235,7 @@ C-----------------------------------------------
      .          ICFIELD(*),LCFIELD(*),COUNT_REMSLV(*),COUNT_REMSLVE(*)
         my_real
      .     X(3,*)    ,D(3,*)      ,V(3,*)   ,VR(3,*),DAMP(*),
-     .     MS(*)   ,IN(*)   ,PM(NPROPM,*),SKEW(LSKEW,*),GEO(NPROPG,*),
+     .     MS(*)   ,IN(*)   ,PM(NPROPM,*),GEO(NPROPG,*),
      .     BUFMAT(*) ,TF(*) ,FORC(*)  ,VEL(*),FSAV(NTHVKI,*) ,ELBUF(*) ,
      .     RWBUF(NRWLP,*),RWSAV(*),RBY(NRBY,*),
      .     RIVET(*),WA(*), A(3,*) ,AR(3,*),PARTSAV(*) ,TFEXT,
@@ -283,8 +286,7 @@ C
         TYPE (DRAPEG_)   :: DRAPEG
         TYPE (INTERFACES_)    ,INTENT(IN)     :: INTERFACES
         TYPE (TH_SURF_) , INTENT(IN) :: TH_SURF
-        my_real, INTENT(INOUT) :: FSAVSURF(5,NSURF)
-        INTEGER, INTENT(INOUT) :: NSEG_LOADP(NSURF)
+        TYPE(SKEW_),INTENT(INOUT) :: SKEWS
 C
 C---D_IMP: dUn+1,i,DD : ddU,i+1
 C---R_IMP[1:R02,2:RRR(R_OLD),3:RU0,4:E02,5:DE_OLD,6:EIMP,7,8,9:pour line-search]
@@ -520,16 +522,16 @@ C
           ENDIF
 C
           IF (NCYCLE==1.AND.IDYNA>0)
-     .       CALL DYNA_INA(IBCL  ,FORC   ,NPC   ,TF    ,A     ,
-     2                     V     ,X      ,SKEW  ,AR    ,VR    ,
+     .       CALL DYNA_INA(IBCL  ,FORC   ,SNPC,NPC   ,TF    ,A     ,
+     2                     V     ,X      ,SKEWS  ,AR    ,VR    ,
      3                     SENSOR_TAB,WEIGHT,TFEXC ,IADS_F ,
      4                     FSKY  ,IGRV   ,AGRV  ,MS    ,IN    ,
      5                     LGRAV ,ITASK ,NRBYAC,IRBYAC ,NPBY  ,
      6                     RBY   ,FR_ELEM,IAD_ELEM,NDDL0,NNZK0,
      7                     I_IMP(5),H3D_DATA,CPTREAC,FTHREAC,NODREAC,
-     8                     NSENSOR,TH_SURF ,FSAVSURF, NSEG_LOADP,DPL0CLD,
+     8                     NSENSOR,TH_SURF ,TH_SURF%CHANNELS, DPL0CLD,
      9                     VEL0CLD,   D,  DR,  NUMNOD,NSURF,
-     A                     NFUNCT,NCONLD,NGRAV,NINVEL)
+     A                     NFUNCT,NCONLD,NGRAV,NINVEL,STF,NUMSKW)
 C
 C----------------------------------
 C       FORCES EXTERNES A=Fext-Fint
@@ -539,13 +541,13 @@ C
           IF(NCONLD/=0) THEN
             IF (IMON>0) CALL STARTIME(4,1)
 C         --en spmd force est traite comme elements---
-            CALL FORCE_IMP(IBCL   ,FORC    ,NPC    ,TF    ,AC     ,
-     2                 V      ,X       ,SKEW   ,ACR   ,VR     ,
-     3                 NSENSOR,SENSOR_TAB,TFEXC,
-     4                 IADS_F ,FSKY    ,FSKY   ,DUMMY_FEXT,H3D_DATA,
-     5                 CPTREAC ,FTHREAC,NODREAC ,TH_SURF ,FSAVSURF,
-     6                 NSEG_LOADP,DPL0CLD ,VEL0CLD ,D       ,DR      ,
-     7                 NCONLD  ,NUMNOD    ,NSURF,NFUNCT)
+            CALL FORCE_IMP( IBCL    ,FORC       ,SNPC       ,NPC        ,TF         ,
+     2                      AC      ,V          ,X          ,SKEWS      ,
+     3                      ACR     ,VR         ,NSENSOR    ,SENSOR_TAB ,TFEXC      ,
+     4                      IADS_F  ,FSKY       ,DUMMY_FEXT ,H3D_DATA   ,CPTREAC    ,
+     5                      FTHREAC ,NODREAC    ,TH_SURF    ,TH_SURF%CHANNELS   ,
+     6                      DPL0CLD ,VEL0CLD    ,D          ,DR         ,NCONLD     ,
+     7                      NUMNOD  ,NSURF      ,NFUNCT     ,STF )
 C
             IF (IMACH==3.AND.NSPMD>1) THEN
               DO I=IAD_ELEM(1,1),IAD_ELEM(1,NSPMD+1)-1
@@ -579,7 +581,7 @@ C---------no //SMP for the moment, add it after----
           IF(NGRAV/=0) THEN
             IF (IMON>0) CALL STARTIME(4,1)
             CALL GRAVIT_IMP(IGRV  ,AGRV  ,NPC   ,TF    ,AC,
-     2                      V     ,X     ,SKEW  ,MS,TFEXC,
+     2                      V     ,X     ,SKEWS%SKEW  ,MS,TFEXC,
      3                      NSENSOR,SENSOR_TAB,WEIGHT,
      4                      LGRAV ,ITASK,
      5                      NRBYAC,IRBYAC,NPBY  ,RBY    )
@@ -605,7 +607,7 @@ C-------------dU_d---------------------------------
           IF (IMON>0) CALL STARTIME(4,1)
           CALL FV_IMP(IBFV  ,NPC    ,TF     ,VEL   ,SENSOR_TAB,
      1                D_IMP  ,DR_IMP ,IKC   ,IDDL  ,NSENSOR   ,
-     2                SKEW  ,IFRAME ,XFRAME ,V     ,VR    ,
+     2                SKEWS%SKEW  ,IFRAME ,XFRAME ,V     ,VR    ,
      3                X     ,DIRUL  ,NDOF   ,A     ,AR    )
           IF (IMON>0) CALL STOPTIME(4,1)
         ENDIF
@@ -769,7 +771,7 @@ c          NGDONE = 1
      3     IXR       ,IXTG      ,IXTG1     ,IXS(L1)   ,
      4     IXS(L2)   ,IXS(L3)   ,IPARG     ,TF        ,NPC       ,
      5     FR_WAVE   ,W16       ,BUFMAT    ,THKE      ,BUFGEO    ,
-     6     RBY       ,SKEW      ,X         ,
+     6     RBY       ,SKEWS%SKEW      ,X         ,
      7     WA        ,IDDL      ,NDOF      ,DIAG_K    ,LT_K      ,
      8     IADK      ,JDIK      ,IKG       ,IBID      ,ITASK     ,
      9     ELBUF_TAB ,STACK     ,DRAPE_SH4N, DRAPE_SH3N   ,DRAPEG )
@@ -790,7 +792,7 @@ C-------estimation of A(t+dt) w/ initial velocity----
      .        .AND.IDYNA>0.AND.NINVEL>0) THEN
             CALL IMP_DYKV0(NODFT  ,NODLT   ,IDDL   ,NDOF   ,IKC    ,
      .                     DIAG_K ,IADK    ,JDIK   ,LT_K   ,WEIGHT ,
-     1                     RBY    ,X       ,SKEW   ,LPBY   ,NPBY   ,
+     1                     RBY    ,X       ,SKEWS%SKEW   ,LPBY   ,NPBY   ,
      2                     NRBYAC ,IRBYAC  ,NINT2  ,IINT2  ,IPARI  ,
      3                     INTBUF_TAB      ,IRBE3  ,LRBE3  ,FRBE3  ,
      4                     IRBE2  ,LRBE2   ,V      ,VR     ,NDDL0  ,
@@ -803,7 +805,7 @@ C-------estimation of A(t+dt) w/ initial velocity----
 C
           IF (IKPRES>0.AND.NBUCK==0)
      1      CALL IMP_KPRES(IBCL  ,FORC   ,NPC   ,TF    ,X     ,
-     2                     SKEW  ,NSENSOR,SENSOR_TAB,WEIGHT,IADS_F,
+     2                     SKEWS%SKEW  ,NSENSOR,SENSOR_TAB,WEIGHT,IADS_F,
      3                     IDDL  ,NDOF   ,IADK  ,JDIK  ,DIAG_K,
      4                     LT_K  )
           IF(IAUTSPC>0) THEN
@@ -816,7 +818,7 @@ C
           CALL UPD_GLOB_K(
      1    ICODT     ,ICODR     ,ISKEW     ,IBFV      ,NPC       ,
      2    TF        ,VEL       ,XFRAME    ,
-     3    RBY       ,X         ,SKEW      ,LPBY      ,NPBY      ,
+     3    RBY       ,X         ,SKEWS%SKEW      ,LPBY      ,NPBY      ,
      4    ITAB      ,WEIGHT    ,MS        ,IN        ,NRBYAC    ,
      5    IRBYAC    ,NSC       ,IKINW(LI1),NMC       ,IKINW(LI2),
      6    IKINW(LI3),IKINW(LI4),NINT2     ,IINT2     ,IKINW(LI8),
@@ -997,7 +999,7 @@ Ctmp-------A n'est pas modifie ici -------------------
             CALL IMP_INT_K(A     ,V         ,
      1      ICODT     ,ICODR     ,ISKEW     ,IBFV      ,NPC       ,
      2      TF        ,VEL       ,NSENSOR   ,SENSOR_TAB,XFRAME    ,
-     3      RBY       ,XI_C      ,SKEW      ,LPBY      ,NPBY      ,
+     3      RBY       ,XI_C      ,SKEWS%SKEW      ,LPBY      ,NPBY      ,
      4      ITAB      ,WEIGHT    ,MS        ,IN        ,NRBYAC    ,
      5      IRBYAC    ,NSS       ,ISS       ,IPARI     ,INTBUF_TAB,
      6      NINT2     ,IINT2     ,IAINT2    ,NSS2      ,
@@ -1013,7 +1015,7 @@ Ctmp-------A n'est pas modifie ici -------------------
             CALL IMP_INT_K(A     ,V         ,
      1      ICODT     ,ICODR     ,ISKEW     ,IBFV      ,NPC       ,
      2      TF        ,VEL       ,NSENSOR   ,SENSOR_TAB,XFRAME    ,
-     3      RBY       ,X_A       ,SKEW      ,LPBY      ,NPBY      ,
+     3      RBY       ,X_A       ,SKEWS%SKEW      ,LPBY      ,NPBY      ,
      4      ITAB      ,WEIGHT    ,MS        ,IN        ,NRBYAC    ,
      5      IRBYAC    ,NSS       ,ISS       ,IPARI     ,INTBUF_TAB,
      6      NINT2     ,IINT2     ,IAINT2    ,NSS2      ,
@@ -1029,7 +1031,7 @@ Ctmp-------A n'est pas modifie ici -------------------
             CALL IMP_INT_K(A     ,V         ,
      1      ICODT     ,ICODR     ,ISKEW     ,IBFV      ,NPC       ,
      2      TF        ,VEL       ,NSENSOR   ,SENSOR_TAB,XFRAME    ,
-     3      RBY       ,X         ,SKEW      ,LPBY      ,NPBY      ,
+     3      RBY       ,X         ,SKEWS%SKEW      ,LPBY      ,NPBY      ,
      4      ITAB      ,WEIGHT    ,MS        ,IN        ,NRBYAC    ,
      5      IRBYAC    ,NSS       ,ISS       ,IPARI     ,INTBUF_TAB,
      6      NINT2     ,IINT2     ,IAINT2    ,NSS2      ,
@@ -1118,7 +1120,7 @@ c            WRITE(ISTDO,*)
 C----------------------------------
         IF (NFXVEL/=0.AND.IMCONV==1) THEN
           CALL FV_IMP1(NKUD   ,IKUD    ,BKUD    ,LB    )
-          CALL FVBC_IMPL1(IBFV   ,SKEW  ,XFRAME ,DIRUL ,IDDL   ,
+          CALL FVBC_IMPL1(IBFV   ,SKEWS%SKEW  ,XFRAME ,DIRUL ,IDDL   ,
      1                    IKC    ,NDOF  ,D_IMP  ,DR_IMP,ICODT  ,
      3                    ICODR  ,ISKEW )
         ENDIF
@@ -1134,7 +1136,7 @@ C             R_IMP(13) = SQRT(R2)
         IF (IDYNA>0.AND.IDY_DAMP>0) THEN
           CALL IMP_DYKV(NODFT  ,NODLT   ,IDDL   ,NDOF   ,IKC    ,
      .                  DIAG_K ,IADK    ,JDIK   ,LT_K   ,WEIGHT ,
-     1                  RBY    ,X       ,SKEW   ,LPBY   ,NPBY   ,
+     1                  RBY    ,X       ,SKEWS%SKEW   ,LPBY   ,NPBY   ,
      2                  NRBYAC ,IRBYAC  ,NINT2  ,IINT2  ,IPARI  ,
      3                  INTBUF_TAB      ,IRBE3  ,LRBE3  ,FRBE3  ,
      4                  IRBE2  ,LRBE2   ,V      ,VR     ,NDDL0  ,
@@ -1143,7 +1145,7 @@ C             R_IMP(13) = SQRT(R2)
 C-------------LB,A,AR devient Fext-Fint---------------------
 
         CALL UPD_RHS(ICODT ,ICODR ,ISKEW ,IBFV    ,XFRAME ,
-     1              RBY   ,X     ,SKEW   ,LPBY   ,NPBY   ,
+     1              RBY   ,X     ,SKEWS%SKEW   ,LPBY   ,NPBY   ,
      2              NRBYAC,IRBYAC,NINT2  ,IINT2  ,IPARI  ,
      3              INTBUF_TAB   ,NDOF   ,IDDL   ,IKC    ,
      4              NDDL0 ,LB    ,ISETK  ,INLOC  ,DIRUL  ,
@@ -1166,7 +1168,7 @@ C
      2          NPBY      ,LPBY      ,ITAB      ,NRBYAC    ,
      3          IRBYAC    ,NINT2     ,IINT2     ,IDDL      ,IKC       ,
      4          NDOF      ,INLOC     ,NSREM     ,NSL       ,NBINTC    ,
-     5          INTLIST   ,XI_C      ,IBFV      ,DIRUL     ,SKEW      ,
+     5          INTLIST   ,XI_C      ,IBFV      ,DIRUL     ,SKEWS%SKEW      ,
      6          XFRAME    ,ISKEW     ,ICODT     ,R_IMP(16) ,D_IMP     ,
      7          LB        ,IFDIS     ,NDDL      ,DR_IMP    ,IDDLI     ,
      8          IRBE3     ,LRBE3     ,FRBE3     ,IRBE2     ,LRBE2     ,
@@ -1180,7 +1182,7 @@ C
      2          NPBY      ,LPBY      ,ITAB      ,NRBYAC    ,
      3          IRBYAC    ,NINT2     ,IINT2     ,IDDL      ,IKC       ,
      4          NDOF      ,INLOC     ,NSREM     ,NSL       ,NBINTC    ,
-     5          INTLIST   ,X_A       ,IBFV      ,DIRUL     ,SKEW      ,
+     5          INTLIST   ,X_A       ,IBFV      ,DIRUL     ,SKEWS%SKEW      ,
      6          XFRAME    ,ISKEW     ,ICODT     ,R_IMP(16) ,D_IMP     ,
      7          LB        ,IFDIS     ,NDDL      ,DR_IMP    ,IDDLI     ,
      8          IRBE3     ,LRBE3     ,FRBE3     ,IRBE2     ,LRBE2     ,
@@ -1194,7 +1196,7 @@ C
      2          NPBY      ,LPBY      ,ITAB      ,NRBYAC    ,
      3          IRBYAC    ,NINT2     ,IINT2     ,IDDL      ,IKC       ,
      4          NDOF      ,INLOC     ,NSREM     ,NSL       ,NBINTC    ,
-     5          INTLIST   ,X         ,IBFV      ,DIRUL     ,SKEW      ,
+     5          INTLIST   ,X         ,IBFV      ,DIRUL     ,SKEWS%SKEW,
      6          XFRAME    ,ISKEW     ,ICODT     ,R_IMP(16) ,D_IMP     ,
      7          LB        ,IFDIS     ,NDDL      ,DR_IMP    ,IDDLI     ,
      8          IRBE3     ,LRBE3     ,FRBE3     ,IRBE2     ,LRBE2     ,
@@ -1232,14 +1234,14 @@ C
      3    NINT2     ,IINT2     ,IBFV      ,DIRUL     ,ISKEW     ,
      6    ICODT     ,NDOFI     ,IDDL      ,IKC       ,NDOF      ,
      5    INLOC     ,IRBE3     ,LRBE3     ,FRBE3     ,X         ,
-     6    SKEW      ,IRBE2     ,LRBE2)
+     6    SKEWS%SKEW,IRBE2     ,LRBE2)
         ENDIF
 C
         IF (NMONV>0.AND.ISETK==1) CALL MONV_IMP(
      .   MONVOL ,VOLMON  ,X      ,IGRSURF  ,
      1   NMONV  ,IMONV   ,IPARI  ,INTBUF_TAB      ,
      2   A      ,AR      ,NDOF   ,IDDL   ,IKC     ,
-     3   INLOC  ,ILINE   ,IBFV   ,SKEW   ,XFRAME  ,
+     3   INLOC  ,ILINE   ,IBFV   ,SKEWS%SKEW,XFRAME  ,
      4   DIRUL  ,ISKEW   ,ICODT  ,IRBE3   ,LRBE3  ,
      5   FRBE3  ,IRBE2   ,LRBE2  ,NSURF)
 C
@@ -1378,7 +1380,7 @@ C
      8                 NUM_IMP,NS_IMP,NE_IMP,NSREM ,NSL  ,
      9                 NTMP  ,GRAPHE, ITAB  ,RBID  ,IBID ,
      A                 IBID  ,NMONV ,IMONV  ,MONVOL,IGRSURF,
-     B                 FR_MV ,VOLMON,IBFV  ,SKEW  ,
+     B                 FR_MV ,VOLMON,IBFV  ,SKEWS%SKEW  ,
      C                 XFRAME,MUMPS_PAR,CDDLP,IND_IMP,XI_C,
      D                 IRBE3 ,LRBE3 ,IRBE2  ,LRBE2 )
 
@@ -1401,10 +1403,10 @@ C
           IF(NFXV_G/=0.AND.(NSREM+NSL-INTP_C)>0) THEN
             CALL FV_IMP(IBFV  ,NPC    ,TF     ,VEL   ,SENSOR_TAB,
      1                  D_IMP  ,DR_IMP ,IKC   ,IDDL  ,NSENSOR   ,
-     2                  SKEW  ,IFRAME ,XFRAME ,V     ,VR    ,
+     2                  SKEWS%SKEW  ,IFRAME ,XFRAME ,V     ,VR    ,
      3                  X     ,DIRUL  ,NDOF   ,A     ,AR    )
           ENDIF
-          CALL RECUKIN(RBY   ,LPBY  ,NPBY  ,SKEW  ,ISKEW ,
+          CALL RECUKIN(RBY   ,LPBY  ,NPBY  ,SKEWS%SKEW  ,ISKEW ,
      1                 ITAB  ,WEIGHT,MS    ,IN    ,
      2                 IBFV  ,VEL   ,ICODT,ICODR ,
      3                 NRBYAC,IRBYAC,NINT2 ,IINT2 ,IPARI ,
@@ -1602,7 +1604,7 @@ C-----------------------------
           IF (IT==1.AND.ICONTA>I_IMP(6)) THEN
 C       re-evoluer Rref-------
             IF (IREFI==5.AND.NFXV_G>0.AND.IMCONV>=0) THEN
-              CALL RER02(RBY   ,LPBY  ,NPBY  ,SKEW  ,ISKEW ,
+              CALL RER02(RBY   ,LPBY  ,NPBY  ,SKEWS%SKEW  ,ISKEW ,
      1                   ITAB  ,WEIGHT,MS    ,IN    ,
      2                   IBFV  ,VEL   ,ICODT,ICODR ,
      3                   NRBYAC,IRBYAC,NINT2 ,IINT2 ,IPARI ,
@@ -1658,7 +1660,7 @@ C---------------------
      B                   NS_IMP   ,NE_IMP,NSREM ,NSL   ,ICONTA ,
      C                   GRAPHE   ,FAC_K ,IPIV_K, NKCOND,NMONV  ,
      D                   IMONV ,MONVOL ,IGRSURF,FR_MV  ,
-     E                   VOLMON,IBFV   ,SKEW  ,XFRAME,MUMPS_PAR,
+     E                   VOLMON,IBFV   ,SKEWS%SKEW  ,XFRAME,MUMPS_PAR,
      F                   CDDLP ,IND_IMP,NBINTC,INTLIST,NEWFRONT,
      G                   ISENDTO,IRECVFROM,IRBE3,LRBE3,I_IMP(8),
      H                   I_IMP(9),I_IMP(10),FEXT  ,DG    ,DGR  ,
@@ -1679,7 +1681,7 @@ C-----for FV_local
             IF (NTMP>0)
      .      CALL FV_IMP(IBFV  ,NPC    ,TF     ,VEL   ,SENSOR_TAB,
      1                  D_IMP  ,DR_IMP ,IKC   ,IDDL  ,NSENSOR   ,
-     2                  SKEW  ,IFRAME ,XFRAME ,V     ,VR    ,
+     2                  SKEWS%SKEW  ,IFRAME ,XFRAME ,V     ,VR    ,
      3                  X     ,DIRUL  ,NDOF   ,A     ,AR    )
           END IF
 C--------Rigid motions elimination----
@@ -1687,10 +1689,10 @@ C--------Rigid motions elimination----
             CALL SPB_RM_RIG(
      1      X         ,IXC       ,IXTG      ,NDOF      ,IDDL      ,
      2      IKC       ,D_IMP     ,DR_IMP    ,ICODT     ,ICODR ,
-     3      SKEW      ,ISKEW     ,itab     )
+     3      SKEWS%SKEW,ISKEW     ,itab     )
           END IF
           IF(IMP_LR > 0)THEN
-            CALL RECUKIN(RBY   ,LPBY  ,NPBY  ,SKEW  ,ISKEW ,
+            CALL RECUKIN(RBY   ,LPBY  ,NPBY  ,SKEWS%SKEW  ,ISKEW ,
      1                   ITAB  ,WEIGHT,MS    ,IN    ,
      2                   IBFV  ,VEL   ,ICODT,ICODR ,
      3                   NRBYAC,IRBYAC,NINT2 ,IINT2 ,IPARI ,
@@ -1699,7 +1701,7 @@ C--------Rigid motions elimination----
      6                   IXTG  ,SH4TREE,SH3TREE,IRBE3 ,LRBE3,
      7                   FRBE3 ,IRBE2 ,LRBE2 )
           ELSE
-            CALL RECUKIN(RBY   ,LPBY  ,NPBY  ,SKEW  ,ISKEW ,
+            CALL RECUKIN(RBY   ,LPBY  ,NPBY  ,SKEWS%SKEW  ,ISKEW ,
      1                   ITAB  ,WEIGHT,MS    ,IN    ,
      2                   IBFV  ,VEL   ,ICODT,ICODR ,
      3                   NRBYAC,IRBYAC,NINT2 ,IINT2 ,IPARI ,
@@ -1753,7 +1755,7 @@ c
               IF(NFXV_G/=0.AND.TMP<ONE)
      .        CALL FV_IMP(IBFV  ,NPC    ,TF     ,VEL   ,SENSOR_TAB,
      1                    D_IMP  ,DR_IMP ,IKC   ,IDDL  ,NSENSOR   ,
-     2                    SKEW  ,IFRAME ,XFRAME ,V     ,VR    ,
+     2                    SKEWS%SKEW  ,IFRAME ,XFRAME ,V     ,VR    ,
      3                    X     ,DIRUL  ,NDOF   ,A     ,AR    )
             END IF !(ISMDISP>0) THEN
           END IF
@@ -1890,7 +1892,7 @@ C---------------------------------
             IF(IDYNA>0.AND.NFXVEL/=0) THEN
               CALL FV_FINT0(IBFV  ,NPC    ,TF   ,VEL   ,SENSOR_TAB,
      1                     D_IMP ,DR_IMP,IKC   ,IDDL  ,NSENSOR   ,
-     2                     SKEW   ,IFRAME ,XFRAME,A    ,AR    ,
+     2                     SKEWS%SKEW   ,IFRAME ,XFRAME,A    ,AR    ,
      3                     X      ,NDOF  ,MS   ,IN    ,WEIGHT ,
      4                     RBY    )
             END IF
@@ -1915,17 +1917,17 @@ C
           ENDIF
 C
           IF(IDYNA>0.AND.IMCONV==1)  THEN
-            CALL DYNA_WEX(IBCL  ,FORC   ,NPC   ,TF    ,AC    ,
-     2                    V     ,X      ,SKEW  ,ACR   ,VR    ,
+            CALL DYNA_WEX(IBCL  ,FORC   ,SNPC,NPC   ,TF    ,AC    ,
+     2                    V     ,X      ,SKEWS  ,ACR   ,VR    ,
      3                    SENSOR_TAB,WEIGHT,TFEXT ,IADS_F,
      4                    FSKY  ,IGRV   ,AGRV  ,MS    ,IN    ,
      5                    LGRAV ,ITASK ,NRBYAC,IRBYAC ,
      6                    NPBY  ,RBY   ,IBFV    ,VEL   ,D_IMP  ,
      7                    DR_IMP,IKC   ,IDDL  ,IFRAME,XFRAME  ,
      8                    NDOF  ,H3D_DATA,CPTREAC,FTHREAC,NODREAC,NSENSOR,
-     9                    TH_SURF ,FSAVSURF,NSEG_LOADP,DPL0CLD,
+     9                    TH_SURF ,TH_SURF%CHANNELS,DPL0CLD,
      A                    VEL0CLD, NUMNOD,NSURF,NFUNCT,NCONLD,
-     B                    NGRAV,NFXVEL)
+     B                    NGRAV,NFXVEL,STF,NUMSKW)
             CALL DYNA_CPR0(NDDL0  )
           END IF
 C----------D_imp taking D_n-1 :exception for case with Gravity-----
@@ -3140,7 +3142,7 @@ Chd|====================================================================
      N  FRWL6  ,IRBE2  ,LRBE2  ,ICFIELD,LCFIELD,CFIELD,ELBUF_TAB,WEIGHT_MD,
      O  STACK  ,DIMFB  ,FBSAV6 ,STABSEN,TABSENSOR,DRAPE_SH4N,DRAPE_SH3N,H3D_DATA,
      P  NDDL0  ,NNZK0  ,IMPBUF_TAB,CPTREAC,FTHREAC,NODREAC,DRAPEG,TH_SURF ,
-     Q  FSAVSURF,NSEG_LOADP,DPL0CLD,VEL0CLD)
+     Q  DPL0CLD,VEL0CLD,SNPC,STF)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -3176,6 +3178,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+        INTEGER ,INTENT(IN) :: SNPC    !< size of NPC
+        INTEGER ,INTENT(IN) :: STF     !< size of TF / Tabulated function array
         INTEGER ,INTENT(IN) :: NSENSOR
         INTEGER ITASK,ICODE(*), ISKEW(*), ISKWN(LISKN,*),ITABM1(*),
      .     IPART(*),IXS(*),IXQ(NIXQ,*),IXC(NIXC,*), IXT(NIXT,*),
@@ -3226,8 +3230,6 @@ c     .  BKUD(*),R_IMP(*),AC(3,*),ACR(3,*),FRBE3(*)
         TYPE (IMPBUF_STRUCT_) ,TARGET :: IMPBUF_TAB
         TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
         TYPE (TH_SURF_) , INTENT(IN) :: TH_SURF
-        my_real, INTENT(INOUT) :: FSAVSURF(5,NSURF)
-        INTEGER, INTENT(INOUT) :: NSEG_LOADP(NSURF)
 #if defined(MUMPS5)
 C----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -3346,13 +3348,13 @@ C----------------------------------
         NCL_MAX=0
         R_IMP(16)=ZERO
         IF(NCONLD/=0) THEN
-          CALL FORCE_IMP(IBCL  ,FORC  ,NPC   ,TF  ,AC    ,
-     2               V     ,X     ,SKEW  ,ACR ,VR    ,
-     3               NSENSOR,SENSOR_TAB,TFEXC,
-     4               IADS_F,FSKY  ,FSKY, DUMMY_FEXT,H3D_DATA,
-     5               CPTREAC,FTHREAC,NODREAC,TH_SURF ,FSAVSURF,
-     6               NSEG_LOADP,DPL0CLD ,VEL0CLD ,D       ,DR      ,
-     7               NCONLD  ,NUMNOD    ,NSURF,NFUNCT)
+          CALL FORCE_IMP(IBCL    ,FORC    ,SNPC       ,NPC        ,TF         ,
+     2                   AC      ,V       ,X          ,SKEW       ,NUMSKW     ,
+     3                   ACR     ,VR      ,NSENSOR    ,SENSOR_TAB ,TFEXC      ,
+     4                   IADS_F  ,FSKY    ,DUMMY_FEXT ,H3D_DATA   ,CPTREAC    ,
+     5                   FTHREAC ,NODREAC ,TH_SURF    ,TH_SURF%CHANNELS,
+     6                   DPL0CLD ,VEL0CLD ,D          ,DR         ,NCONLD     ,
+     7                   NUMNOD  ,NSURF   ,NFUNCT     ,STF)
           IF (IMACH==3.AND.NSPMD>1) THEN
             DO I=IAD_ELEM(1,1),IAD_ELEM(1,NSPMD+1)-1
               J = FR_ELEM(I)

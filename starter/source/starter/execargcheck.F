@@ -37,13 +37,15 @@ Chd|        UPCASE                        source/starter/execargcheck.F
 Chd|        CHECK_MOD                     ../common_source/modules/check_mod.F
 Chd|        GRP_SIZE_MOD                  share/modules1/grp_size_mod.F 
 Chd|        INOUTFILE_MOD                 ../common_source/modules/inoutfile_mod.F
+Chd|        OUTPUT_MOD                    ../common_source/modules/output/output_mod.F
 Chd|        RANDOM_MOD                    share/modules1/random_mod.F   
 Chd|====================================================================
-      SUBROUTINE EXECARGCHECK()
+      SUBROUTINE EXECARGCHECK(OUTPUT)
       USE CHECK_MOD
       USE INOUTFILE_MOD
       USE RANDOM_MOD
       USE GRP_SIZE_MOD
+      USE OUTPUT_MOD
       USE PYTHON_FUNCT_MOD 
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -59,6 +61,10 @@ C-----------------------------------------------
 #include      "tablen_c.inc"
 #include      "ddspmd_c.inc"
 #include      "debug_rst.inc"
+C-----------------------------------------------
+C   D u m m y   A r g u m e n t s
+C-----------------------------------------------
+      TYPE(OUTPUT_),  INTENT(INOUT)       :: OUTPUT
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -80,7 +86,7 @@ C-----------------------------------------------
        INTEGER :: RANDM_SEED,RANDM_ALEA
        REAL(kind=8) :: RANDM_SEED_NBR,RANDM_ALEA_NBR
        INTEGER :: GOT_GRP_SIZE
-       PARAMETER (LENLIST=31)
+       PARAMETER (LENLIST=32)
        CHARACTER (LEN=12) ::  ARGLIST(LENLIST)
        EXTERNAL IARGC
        DATA ARGLIST/
@@ -97,7 +103,7 @@ C-----------------------------------------------
      .    '-INSPIRE_ALM' , '-FLUSH_RST', '-CHECK',
      .    '-HSTP_READ' , '-HSTP_WRITE', '-RXALEA', '-RSEED',
      .    '-PREVIEW',
-     .    '-GRP_SIZE' , '-PYTHON' /
+     .    '-GRP_SIZE' , '-PYTHON' , '-THNMS1'/
 
 C-----------------------------------------------
        IDUM=-1
@@ -173,6 +179,8 @@ c
         GOT_GRP_SIZE = 0
         GRP_SIZE=128     
 !       ------------------------
+        
+        OUTPUT%TH%DUMP_THNMS1_FILE = 0
 
        ARGS2(1:2096) = ''
 
@@ -295,6 +303,9 @@ C------------------------------------------------
 C------------------------------------------------
             CASE ( '-GRP_SIZE')
                 GOT_GRP_SIZE = I
+C------------------------------------------------
+            CASE ( '-THNMS1')
+                OUTPUT%TH%DUMP_THNMS1_FILE = 1
 C------------------------------------------------
 C Lignes de commande qui ne sont pas definies
             CASE DEFAULT
@@ -988,7 +999,6 @@ C Error was found during Character to Integer translation
  2123      CONTINUE
          ENDIF
        ENDIF
-
 
 
 !       ------------------------------------------------

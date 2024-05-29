@@ -44,6 +44,7 @@ Chd|        NINTRI                        source/system/nintrr.F
 Chd|        ALE_MOD                       ../common_source/modules/ale/ale_mod.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        INTBUF_FRIC_MOD               share/modules1/intbuf_fric_mod.F
+Chd|        INTERFACES_MOD                ../common_source/modules/interfaces/interfaces_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|        R2R_MOD                       share/modules1/r2r_mod.F      
@@ -61,7 +62,7 @@ Chd|====================================================================
      .                  IXS16   ,IXS20   ,DEF_INTER,MAXNSNE,
      .                  NPC1    ,MULTI_FVM,NOM_OPTFRIC,INTBUF_FRIC_TAB,
      .                  IGRBRIC,IGRSH3N ,IGRTRUSS ,MAXRTM_T2,NSN_MULTI_CONNEC,T2_NB_CONNEC,
-     .                  IDDLEVEL,NALE)
+     .                  IDDLEVEL,NALE   ,INTERFACES)
 C============================================================================
 C   M o d u l e s
 C-----------------------------------------------
@@ -72,6 +73,7 @@ C-----------------------------------------------
       USE INTBUF_FRIC_MOD
       USE GROUPDEF_MOD
       USE ALE_MOD
+      USE INTERFACES_MOD
 C-----------------------------------------------      
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -120,6 +122,7 @@ C-----------------------------------------------
       TYPE (GROUP_)  , DIMENSION(NGRTRUS) :: IGRTRUSS
       TYPE (SURF_)   , DIMENSION(NSURF) ,TARGET   :: IGRSURF
       TYPE (SURF_)   , DIMENSION(NSLIN) ,TARGET   :: IGRSLIN
+      TYPE (INTERFACES_) ,INTENT(INOUT):: INTERFACES
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -436,7 +439,7 @@ C
      6      IXTG         ,KNOD2ELC     ,KNOD2ELTG   ,NOD2ELC      ,
      7      NOD2ELTG     ,KNOD2ELS     ,NOD2ELS     ,IXS          ,
      8      IXS10        ,IXS16        ,IXS20       ,IBID         ,
-     9      IBID         ,IBID         ,IBID        )
+     9      IBID         ,IBID         ,IBID        ,INTERFACES%PARAMETERS)
             IPARI(66,NI) = INTPLY
             IF(INTPLY > 0) INTPLYXFEM = 1          
 C----------NRTS,NRTM is calculated in I25SURFI     
@@ -724,7 +727,7 @@ C--------------------------------------------
                 IAD_IGE = IGRSURF(ISU1)%IAD_IGE               
                 CALL INSURFIGEO(NRTS_IGE,NRTS_FE,NSN_IGE,0,IAD_IGE,IRM,IRECTS,NOINT,
      .                     SURF_NODES_IGE,ITAB,NSV,ID,TITR,
-     .                     RBID,RBID,RBID,RBID,RBID,RBID,RBID,RBID)
+     .                     RBID,IBID,RBID,RBID,RBID,RBID,RBID,RBID)
               ENDIF
             ELSEIF(IS1 == 2)THEN
               CALL INPOINT(NSN_FE,NOINT,IGRNOD(ISU1)%ENTITY,ITAB,NSV)

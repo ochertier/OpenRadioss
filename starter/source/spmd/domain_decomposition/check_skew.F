@@ -27,7 +27,6 @@ Chd|        DOMDEC2                       source/spmd/domdec2.F
 Chd|-- calls ---------------
 Chd|        HM_ENTITY_REFERENCE_NUMBER    source/devtools/hm_reader/hm_entity_reference_number.F
 Chd|        IFRONTPLUS                    source/spmd/node/frontplus.F  
-Chd|        SKEW_MOD                      share/modules1/skew_mod.F     
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
         SUBROUTINE CHECK_SKEW(IXR,IGEO,ISKN,CEP,ISKWP,NSKWP,TAG_SKN,MULTIPLE_SKEW,
@@ -59,7 +58,7 @@ C-----------------------------------------------
         INTEGER, DIMENSION(NPROPGI,NUMGEO), INTENT(IN) :: IGEO
         INTEGER, DIMENSION(LISKN,SISKWN/LISKN), INTENT(IN) :: ISKN
         INTEGER, DIMENSION(NPROPMI,NUMMAT), INTENT(IN) :: IPM
-        TYPE(SKEW_TYPE), DIMENSION(NUMSKW+1), INTENT(INOUT) :: MULTIPLE_SKEW
+        TYPE(PLIST_SKEW_), DIMENSION(NUMSKW+1), INTENT(INOUT) :: MULTIPLE_SKEW
         INTEGER, INTENT(IN) :: OFFSET
 !       -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-**-*-*-*-*-*-*-*-*-*-*-*-*
 !       NSKWP : integer ; dimension = NSPMD

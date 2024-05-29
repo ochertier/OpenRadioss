@@ -63,7 +63,6 @@ Chd|        CHECK_DYNAIN                  source/starter/check_dynain.F
 Chd|        CHECK_ELTYP                   source/model/sets/check_eltyp.F
 Chd|        CHECK_MAT_ELEM_PROP_COMPATIBILITYsource/materials/mat/check_mat_elem_prop_compatibility.F
 Chd|        CHECK_PTHICKFAIL              source/materials/fail/check_pthickfail.F
-Chd|        CHECK_SURF                    source/groups/check_surf.F    
 Chd|        CHEKMP2                       source/elements/initia/initia.F
 Chd|        CHKFUNCT                      source/tools/curve/lecfun.F   
 Chd|        CHKTYP2                       source/interfaces/interf1/chktyp2.F
@@ -813,7 +812,6 @@ Chd|        UDOUBL2_SET                   source/system/sysfus.F
 Chd|        UDOUBL2_WO_TITLE              source/system/sysfus.F        
 Chd|        UDOUBL3                       source/system/sysfus.F        
 Chd|        UNIT_CODE                     source/general_controls/computation/unit_code.F
-Chd|        UPDFAIL                       source/materials/updfail.F    
 Chd|        UPDMAT                        source/materials/updmat.F     
 Chd|        VDOUBL2                       source/system/sysfus.F        
 Chd|        W_ISPH                        source/restart/ddsplit/w_isph.F

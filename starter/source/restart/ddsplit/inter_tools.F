@@ -300,6 +300,10 @@ C=======================================================================
       INTBUF_SIZE(N) = INTBUF_TAB_L%S_KREMNODE_E2S
       N = N+1
       INTBUF_SIZE(N) = INTBUF_TAB_L%S_REMNODE_E2S
+      N = N+1
+      INTBUF_SIZE(N) = INTBUF_TAB_L%S_IELEM_M
+      N = N+1
+      INTBUF_SIZE(N) = INTBUF_TAB_L%S_PROC_MVOISIN
 
 C=======================================================================
 C real arrays sizes
@@ -926,6 +930,7 @@ C ----------------------------------------
 
       RETURN
       END
+
 Chd|====================================================================
 Chd|  COPY_IVAL                     source/restart/ddsplit/inter_tools.F
 Chd|-- called by -----------
@@ -3985,10 +3990,9 @@ C ----------------------------------------
         TAG_SCRATCH(N) = 0
       ENDDO
       NINDX_SCRT = 0
-
 C
 C Partie ligne
-C
+CTAG_SCRATCH(K)
       CNLINS_L = 0
       CNLINSA_L= 0
       CNLINM_L = 0
@@ -4037,15 +4041,17 @@ C comptage ligne active
           ENDIF
         ENDIF
       ENDDO
-
       !reflush to zero only part of TAG_SCRATCH that has been used
 #include "vectorize.inc"
-        DO K=1,NINDX_SCRT  
-          N = INDX_SCRT(K)
-          TAG_SCRATCH(N) = 0
+        DO K=1,NLINS
+          N1L = INTBUF_TAB%IXLINS(2*(K-1)+1)
+          N2L = INTBUF_TAB%IXLINS(2*(K-1)+2)
+          N1  = INTBUF_TAB%NLG(N1L)
+          N2  = INTBUF_TAB%NLG(N2L)
+          TAG_SCRATCH(N1) = 0
+          TAG_SCRATCH(N2) = 0
         ENDDO
         NINDX_SCRT = 0
-
       DO K=1,NLINM
         N1L = INTBUF_TAB%IXLINM(2*(K-1)+1)
         N2L = INTBUF_TAB%IXLINM(2*(K-1)+2)
@@ -4090,11 +4096,14 @@ C comptage ligne active
 
       !reflush to zero only part of TAG_SCRATCH that has been used
 #include "vectorize.inc"
-        DO K=1,NINDX_SCRT  
-          N = INDX_SCRT(K)
-          TAG_SCRATCH(N) = 0
-        ENDDO
-        NINDX_SCRT = 0
+      DO K=1,NLINM
+        N1L = INTBUF_TAB%IXLINM(2*(K-1)+1)
+        N2L = INTBUF_TAB%IXLINM(2*(K-1)+2)
+        N1  = INTBUF_TAB%NLG(N1L)
+        N2  = INTBUF_TAB%NLG(N2L)
+        TAG_SCRATCH(N1) = 0
+        TAG_SCRATCH(N2) = 0
+      ENDDO
 C
 C Calcul de NCONT en prenant le max des edge et non edge
 C
@@ -4142,7 +4151,6 @@ C TAGG(I) = K => noeud I vers numero local de noeud d interface sur le proc
 Chd|====================================================================
 Chd|  SPLIT_SEG_RVAL_I20            source/restart/ddsplit/inter_tools.F
 Chd|-- called by -----------
-Chd|        SPLIT_INTERFACES              source/restart/ddsplit/split_interfaces.F
 Chd|-- calls ---------------
 Chd|        WRITE_DB                      source/restart/ddsplit/wrrest.F
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
@@ -4380,6 +4388,7 @@ C ----------------------------------------
 
         ALLOCATE(PLIST(NSPMD)) 
         PLIST(1:NSPMD) = -1
+        NINDX_SCRT=0
         DO K=1,NSN
           N = INTBUF_TAB%NSV(K)
           NSNLOCAL(K) = 0
@@ -5803,11 +5812,13 @@ Chd|        NLOCAL                        source/spmd/node/ddtools.F
 Chd|        FRONT_MOD                     share/modules1/front_mod.F    
 Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
 Chd|====================================================================
-      SUBROUTINE PREPARE_SPLIT_I25(PROC     , INTBUF_TAB  , IPARI       ,
-     .                            INTERCEP , TAG_NODE_2RY, TAG_SEGM    ,
-     .                            TAG_SEGM2, TAG_NM      , TAG_NODE_MSR,
-     .                            TAG_SCRATCH, TAG_SM ,KNOR2MSR,NOR2MSR,
-     .                            TAG_NODE_2RY2,NINDX_NM,INDX_NM,NINDX_SCRT,INDX_SCRT)
+      SUBROUTINE PREPARE_SPLIT_I25(PROC     , INTBUF_TAB   , IPARI          ,
+     .                            INTERCEP  , TAG_NODE_2RY , TAG_SEGM       ,
+     .                            TAG_SEGM2 , TAG_NM       , TAG_NODE_MSR   ,
+     .                            TAG_SCRATCH, TAG_SM       ,KNOR2MSR       ,
+     .                            NOR2MSR    ,TAG_NODE_2RY2,NINDX_NM        ,
+     .                            INDX_NM    ,NINDX_SCRT   ,INDX_SCRT       ,
+     .                            NRTM_L)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -5840,7 +5851,7 @@ C-----------------------------------------------
       INTEGER 
      .        NSN,NRTM,NMN,
      .        I,J,K,L,N,N1,N2,N3,N4,E,
-     .        CNSN_L,CNRTM_L,CNMN_L,NADMSR_L
+     .        CNSN_L,CNRTM_L,CNMN_L,NADMSR_L,NRTM_L
 C ----------------------------------------
       NRTM = IPARI(4)
       NSN  = IPARI(5)
@@ -5925,7 +5936,7 @@ C ----------------------------------------
             NADMSR_L=NADMSR_L+1
             TAG_SM(N4)=NADMSR_L
           END IF
-        ENDIF
+        ENDIF       
       ENDDO 
 
       CNMN_L = 0 
@@ -5950,7 +5961,7 @@ C
             N = TAG_SM(INTBUF_TAB%ADMSR(4*(I-1)+4))
             KNOR2MSR(N) = KNOR2MSR(N) + 1
           END IF
-        END IF
+        END IF  
       END DO
 C
       DO I=1,NADMSR_L

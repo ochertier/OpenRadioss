@@ -172,6 +172,8 @@ C-----------------------------------------------
       INTEGER(KIND=8) :: NREMNODE_KIND8
       INTEGER :: IEDGE !< check if edge to edge is used by the interface
       INTEGER :: SKIP_TYPE25_EDGE_2_EDGE !< flag to activate only the computation of interface type 25 with edge to edge
+      INTEGER, DIMENSION(:), ALLOCATABLE :: ELEM_LINKED_TO_SEGMENT
+       
 C
       I_MEM = 0
       RESORT = 0
@@ -221,6 +223,7 @@ C--
        ENDIF
 
 C-----------------------------------------------     
+        ALLOCATE( ELEM_LINKED_TO_SEGMENT(NUMELS) )
         ! ----------------
         ! loop over the interfaces
         ! interface type 24 & 25 must be treated at the end
@@ -356,7 +359,7 @@ C---     Initial dimension of REMNODE arrays
      F                IPARTX       ,IPARTR         ,NSN_MULTI_CONNEC,T2_ADD_CONNEC,T2_NB_CONNEC,
      G                T2_CONNEC    ,NOM_OPT        ,ICODE           ,ISKEW        ,IREMNODE_EDG,
      H                MULTI_FVM%S_APPEND_ARRAY,MULTI_FVM%X_APPEND,MULTI_FVM%MASS_APPEND,N2D,FLAG_REMOVED_NODE,
-     I                NSPMD,INTER_TYPE2_NUMBER)
+     I                NSPMD,INTER_TYPE2_NUMBER,ELEM_LINKED_TO_SEGMENT)
 
               IF (I_MEM /= 0) GOTO 200
             ELSE
@@ -375,7 +378,9 @@ C---     Initial dimension of REMNODE arrays
           IF (N2D==0.AND.KIND_INTERFACE==2.AND.NSPMD>1) THEN
             IF(IDDLEVEL==0) THEN   
               FLAG_OUTPUT = 0
-              IF (INTER_TYPE2_NUMBER >0) CALL REMN_I2OP(IPARI,INTBUF_TAB,ITAB,NOM_OPT,NREMN,FLAG_OUTPUT,SKIP_TYPE25_EDGE_2_EDGE)
+              IF (INTER_TYPE2_NUMBER >0) THEN
+                CALL REMN_I2OP(1,NINTER,IPARI,INTBUF_TAB,ITAB,NOM_OPT,NREMN,FLAG_OUTPUT,SKIP_TYPE25_EDGE_2_EDGE)
+              ENDIF
               CALL REMN_SELF24(X   ,IXS   ,IXS10 ,IXS16,IXS20   ,
      .                       KNOD2ELS,NOD2ELS,IPARI ,INTBUF_TAB ,
      .                       ITAB , NOM_OPT,NREMN, S_NOD2ELS,FLAG_OUTPUT)
@@ -389,6 +394,7 @@ C---     Initial dimension of REMNODE arrays
 
         ENDDO
         ! ----------------
+        DEALLOCATE(ELEM_LINKED_TO_SEGMENT)
 C      
 C--- IREM_I2 treatment has been removed at end of ININTR2 to take into account 
 C---- the compaction of type2 w/ Itetra10=2  

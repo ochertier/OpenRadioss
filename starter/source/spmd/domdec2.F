@@ -42,7 +42,6 @@ Chd|        LOADS_MOD                     ../common_source/modules/loads/loads_m
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        MONVOL_STRUCT_MOD             share/modules1/monvol_struct_mod.F
 Chd|        SENSOR_MOD                    share/modules1/sensor_mod.F   
-Chd|        SKEW_MOD                      share/modules1/skew_mod.F     
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
       SUBROUTINE DOMDEC2(
@@ -111,7 +110,7 @@ C-----------------------------------------------
      .        R_SKEW(*),IPM(NPROPMI,*),LEN_CEP
         INTEGER, DIMENSION(NPROPGI,*), INTENT(IN) :: IGEO
         INTEGER, DIMENSION(NUMSKW+NSUBMOD+1), INTENT(INOUT) :: TAG_SKN
-        TYPE(SKEW_TYPE), DIMENSION(NUMSKW+1), INTENT(INOUT) :: MULTIPLE_SKEW
+        TYPE(PLIST_SKEW_), DIMENSION(NUMSKW+1), INTENT(INOUT) :: MULTIPLE_SKEW
 !       -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-**-*-*-*-*-*-*-*-*-*-*-*-*
 !       TAG_SKN : integer ; dimension=NUMSKW+NSUBMOD+1
 !                 tag array --> tag the i SKEW if a SPRING uses it
@@ -2078,9 +2077,9 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, J, K, N, IDEB, OFF, OFFC, OFFTG, K1, K3, NL, NUMLOADP,
      .        N1, N2, N3, N4, NN, P, NL_L, IS, NN_S, IAD, ITY,
-     .        ADSKY(0:NUMNOD+1), ITRI(ILEN), INDEX(2*ILEN),
      .        WORK(70000)
-c     .        ADSKY(0:1000000), ITRI(1000000), INDEX(2000000),
+
+      INTEGER, DIMENSION(:), ALLOCATABLE :: ADSKY, ITRI, INDEX
       INTEGER :: IJK,NUMBER_NODE
       INTEGER :: NELEM,ELEM_ID,NODE_ID
       INTEGER :: SURF_ID ! surface id
@@ -2091,6 +2090,9 @@ C   S o u r c e  L i n e s
 C-----------------------------------------------
 C   CALCUL DE CNE ADDCNE
 C-----------------------------------------------
+      ALLOCATE(ADSKY(0:NUMNOD+1))
+      ALLOCATE(ITRI(ILEN))
+      ALLOCATE(INDEX(2*ILEN))
       DO I = 0, NUMNOD+1
         ADSKY(I) = ADDCNE(I)
       ENDDO
@@ -2793,7 +2795,10 @@ C-----------------------------------------------
             ! ------------
         ENDDO
 !   -------------------------------------
-C
+      DEALLOCATE(ADSKY)
+      DEALLOCATE(ITRI)
+      DEALLOCATE(INDEX)
+
       RETURN
       END
 C
@@ -2831,13 +2836,14 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, J, L, K, N, OFF, NTY, NRTS, NRTM, NSN, NMN,
-     .        KK, NIR,
-     .        ADSKYI2(0:NUMNOD+1)
+     .        KK, NIR
+      INTEGER, DIMENSION(:), ALLOCATABLE :: ADSKYI2 !(0:NUMNOD+1)
 C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
 C   CALCUL DE CNE ADDCNE
 C-----------------------------------------------
+      ALLOCATE(ADSKYI2(0:NUMNOD+1))
       DO I = 0, NUMNOD+1
         ADSKYI2(I) = ADDCNI2(I)
       ENDDO
@@ -2870,6 +2876,7 @@ C
           OFF = OFF + NSN
         END IF
       END DO
+      DEALLOCATE(ADSKYI2)
 C
       RETURN
       END

@@ -54,6 +54,7 @@ Chd|        CLUSTER_MOD                   share/modules/cluster_mod.F
 Chd|        CRACKXFEM_MOD                 share/modules/crackxfem_mod.F 
 Chd|        DRAPE_MOD                     share/modules/drape_mod.F     
 Chd|        DT_MOD                        share/modules/dt_mod.F        
+Chd|        EBCS_MOD                      ../common_source/modules/boundary_conditions/ebcs_mod.F
 Chd|        ECND_MOD                      share/modules/ecdn_mod.F      
 Chd|        FVBAG_MOD                     share/modules/fvbag_mod.F     
 Chd|        FVMBAG_MESHCONTROL_MOD        ../common_source/modules/airbag/fvmbag_meshcontrol_mod.F
@@ -74,16 +75,17 @@ Chd|        SENSOR_MOD                    share/modules/sensor_mod.F
 Chd|        STACK_MOD                     share/modules/stack_mod.F     
 Chd|        STATE_MOD                     ../common_source/modules/state_mod.F
 Chd|        TABLE_MOD                     share/modules/table_mod.F     
+Chd|        TH_SURF_MOD                   ../common_source/modules/interfaces/th_surf_mod.F
 Chd|        USER_WINDOWS_MOD              ../common_source/modules/user_windows_mod.F
 Chd|====================================================================
       SUBROUTINE SORTIE_MAIN(
-     1            PM        ,D           ,V          ,ALE_CONNECT     ,W        ,         
+     1            PM        ,D           ,V          ,ALE_CONNECT,W        ,
      2            ELBUF     ,IPARG       ,IXS        ,IXQ       ,IXC      ,         
      3            IXT       ,IXP         ,IXR        ,IXTG      ,WA       ,         
      4            ITAB      ,X           ,GEO        ,MS        ,A        ,         
      5            CONT      ,PARTSAV                 ,ICUT      ,XCUT     ,         
      6            FINT      ,FEXT        ,FOPT       ,ANIN      ,LPBY     ,         
-     7            NPBY      ,NSTRF       ,RWBUF      ,NPRW      ,
+     7            NPBY      ,NSTRF       ,RWBUF      ,NPRW      ,EBCS_TAB ,
      8            TANI      ,INOISE      ,BUFNOIS    ,RBY       ,NEFLSW   ,         
      9            NNFLSW    ,CRFLSW      ,FLSW       ,LOUT      ,                
      B            FSAV      ,SKEW        ,ELBUF_TAB  ,CLUSTER   ,                   
@@ -123,8 +125,8 @@ Chd|====================================================================
      q            TF        ,NPC         ,DYNAIN_DATA,FCONT_MAX,MDS_MATID,
      r            FNCONTP2  ,FTCONTP2    ,IBCL        ,ILOADP   ,LLOADP   ,
      s            LOADP     ,TAGNCONT    ,LOADP_HYD_INTER,FORC  ,DRAPEG,USER_WINDOWS,
-     t            OUTPUT    ,DT          ,FSAVSURF    ,NSEG_LOADP,TABLE   ,
-     u            LOADS     ,SFANI       ,IPARIT      )
+     t            OUTPUT    ,DT          ,FSAVSURF    ,TABLE   ,
+     u            LOADS     ,SFANI       ,IPARIT      ,X_C    )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -157,6 +159,8 @@ C-----------------------------------------------
       USE DT_MOD
       USE TABLE_MOD
       USE LOADS_MOD
+      USE EBCS_MOD , only : t_ebcs_tab
+      USE TH_SURF_MOD , only : TH_SURF_, TH_SURF_NUM_CHANNEL
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -193,6 +197,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(t_ebcs_tab), TARGET, INTENT(IN) :: EBCS_TAB
       LOGICAL LOUT
       INTEGER, INTENT(IN) :: SFANI
       INTEGER IPARG(*), IXS(*), IXQ(*), IXC(*), IXT(*), IXP(*),
@@ -251,8 +256,8 @@ C-----------------------------------------------
      .       LOADP(LFACCLD,*),FORC(*)
 
       INTEGER, DIMENSION(*), INTENT(IN) :: ISKWP
-      my_real, INTENT(INOUT) :: FSAVSURF(5,NSURF)
-      INTEGER, INTENT(INOUT) :: NSEG_LOADP(NSURF)
+      my_real, INTENT(INOUT) :: FSAVSURF(TH_SURF_NUM_CHANNEL,NSURF)
+      my_real, DIMENSION(3,NUMNOD), INTENT(IN) :: X_C
 C-----------------------------------------------      
       TYPE(OUTPUT_),INTENT(INOUT) :: OUTPUT
 C-----------------------------------------------      
@@ -780,7 +785,7 @@ c
      4             LLOADP     ,LOADP     ,SENSORS     ,TAGNCONT    ,LOADP_HYD_INTER,
      5             XFRAME     ,FORC      ,AR          ,CSEFRIC     ,CSEFRICG  ,
      6             CSEFRIC_STAMP,CSEFRICG_STAMP,TABLE ,IFRAME      ,LOADS   ,
-     7             DRAPE_SH4N, DRAPE_SH3N, DRAPEG)
+     7             DRAPE_SH4N, DRAPE_SH3N, DRAPEG     ,X_C         )
       ENDIF
       IF(ALLOCATED(CSEFRIC)) DEALLOCATE(CSEFRIC)
       IF(ALLOCATED(CSEFRICG)) DEALLOCATE(CSEFRICG)
@@ -1011,7 +1016,7 @@ C         to avoid double points
      2                 IXS  ,ELBUF,WA(N2),IPARG,SENSORS%SENSOR_TAB,
      4                 FSAV ,FLSW ,SKEW,ELBUF_TAB,CLUSTER,                                 
      5                 PARTSAV,ACCELM,NSENSOR  ,MAT_PARAM, 
-     6                 WEIGHT,IPART,IGRSURF,
+     6                 WEIGHT,IPART,IGRSURF,EBCS_TAB,
      7                 OUTPUT%TH%ITHGRPA, OUTPUT%TH%ITHBUFA, SUBSET,GEO  ,
      8                 KXX   ,IXR,
      9                 KXSP  ,NOD2SP ,SPBUF ,
@@ -1027,7 +1032,7 @@ C         to avoid double points
      L                 IGAUP  ,NGAUP ,AFORM(1),SIZE_MES,
      M                 RTHBUF ,THKE ,STACK ,ISPHIO  ,VSPHIO,
      N                 ITHFLAG,PINCH_DATA,MULTI_FVM,W,OUTPUT%TH%SITHBUFA,
-     Q                 FSAVSURF,NSEG_LOADP,NEED_TO_REINIT_FSAV)
+     Q                 FSAVSURF,NEED_TO_REINIT_FSAV)
 
             IF (SIZE_MES==1 .AND.AFORM(1)==3 .AND.ISPMD==0 ) 
      *          CALL file_size(MULTITHFILESIZE(1))
@@ -1106,7 +1111,7 @@ C
      2                 IXS  ,ELBUF,WA(N2),IPARG,SENSORS%SENSOR_TAB,
      4                 FSAV ,FLSW ,SKEW,ELBUF_TAB,CLUSTER,
      5                 PARTSAV,ACCELM,NSENSOR  ,MAT_PARAM,
-     6                 WEIGHT,IPART,IGRSURF,
+     6                 WEIGHT,IPART,IGRSURF,EBCS_TAB,
      7                 OUTPUT%TH%ITHGRPB,OUTPUT%TH%ITHBUFB,SUBSET,GEO  ,
      8                 KXX   ,IXR,
      9                 KXSP  ,NOD2SP ,SPBUF ,
@@ -1122,7 +1127,7 @@ C
      L                 IGAUP  ,NGAUP, AFORM(2),SIZE_MES,
      M                 RTHBUF ,THKE ,STACK,ISPHIO  ,VSPHIO,
      N                 ITHFLAG,PINCH_DATA,MULTI_FVM,W,OUTPUT%TH%SITHBUFB,
-     Q                 FSAVSURF,NSEG_LOADP,NEED_TO_REINIT_FSAV)
+     Q                 FSAVSURF,NEED_TO_REINIT_FSAV)
 
             IF (SIZE_MES==1 .AND.AFORM(2)==3 .AND.ISPMD==0 )
      *        CALL file_size(MULTITHFILESIZE(2))
@@ -1201,7 +1206,7 @@ C
      2                 IXS  ,ELBUF,WA(N2),IPARG,SENSORS%SENSOR_TAB,
      4                 FSAV ,FLSW ,SKEW,ELBUF_TAB,CLUSTER,
      5                 PARTSAV,ACCELM,NSENSOR  ,MAT_PARAM,
-     6                 WEIGHT,IPART,IGRSURF,
+     6                 WEIGHT,IPART,IGRSURF,EBCS_TAB,
      7                 OUTPUT%TH%ITHGRPC,OUTPUT%TH%ITHBUFC,SUBSET,GEO  ,
      8                 KXX   ,IXR,
      9                 KXSP  ,NOD2SP ,SPBUF ,
@@ -1217,7 +1222,7 @@ C
      L                 IGAUP  ,NGAUP ,AFORM(3),SIZE_MES,
      M                 RTHBUF ,THKE ,STACK ,ISPHIO  ,VSPHIO,
      n                 ITHFLAG,PINCH_DATA,MULTI_FVM,W,OUTPUT%TH%SITHBUFC,
-     Q                 FSAVSURF,NSEG_LOADP,NEED_TO_REINIT_FSAV)
+     Q                 FSAVSURF,NEED_TO_REINIT_FSAV)
 
         IF(SIZE_MES==1 .AND.
      *     AFORM(3)==3   .AND.
@@ -1292,7 +1297,7 @@ C
      2                 IXS  ,ELBUF,WA(N2),IPARG,SENSORS%SENSOR_TAB,
      4                 FSAV ,FLSW ,SKEW,ELBUF_TAB,CLUSTER,
      5                 PARTSAV,ACCELM,NSENSOR  ,MAT_PARAM,
-     6                 WEIGHT,IPART,IGRSURF,
+     6                 WEIGHT,IPART,IGRSURF,EBCS_TAB,
      7                 OUTPUT%TH%ITHGRPD,OUTPUT%TH%ITHBUFD,SUBSET,GEO  ,
      8                 KXX   ,IXR,
      9                 KXSP  ,NOD2SP ,SPBUF ,
@@ -1308,7 +1313,7 @@ C
      L                 IGAUP  ,NGAUP ,AFORM(4),SIZE_MES,
      M                 RTHBUF ,THKE ,STACK ,ISPHIO  ,VSPHIO,
      N                 ITHFLAG,PINCH_DATA,MULTI_FVM,W,OUTPUT%TH%SITHBUFD,
-     Q                 FSAVSURF,NSEG_LOADP,NEED_TO_REINIT_FSAV)
+     Q                 FSAVSURF,NEED_TO_REINIT_FSAV)
 
          IF(SIZE_MES==1 .AND.
      *     AFORM(4)==3   .AND.
@@ -1384,7 +1389,7 @@ C
      2                IXS  ,ELBUF,WA(N2),IPARG,SENSORS%SENSOR_TAB,
      4                FSAV ,FLSW ,SKEW,ELBUF_TAB,CLUSTER,
      5                PARTSAV,ACCELM,NSENSOR  ,MAT_PARAM,
-     6                WEIGHT,IPART,IGRSURF,
+     6                WEIGHT,IPART,IGRSURF,EBCS_TAB,
      7                OUTPUT%TH%ITHGRPE,OUTPUT%TH%ITHBUFE,SUBSET,GEO  ,
      8                KXX   ,IXR,
      9                KXSP  ,NOD2SP ,SPBUF ,
@@ -1400,7 +1405,7 @@ C
      L                IGAUP  ,NGAUP ,AFORM(5),SIZE_MES,
      M                RTHBUF  ,THKE ,STACK  ,ISPHIO  ,VSPHIO,
      N                ITHFLAG,PINCH_DATA,MULTI_FVM,W,OUTPUT%TH%SITHBUFE,
-     Q                FSAVSURF,NSEG_LOADP,NEED_TO_REINIT_FSAV)
+     Q                FSAVSURF,NEED_TO_REINIT_FSAV)
 
         IF(SIZE_MES==1 .AND.
      *     AFORM(5)==3   .AND.
@@ -1475,7 +1480,7 @@ C
      2                IXS  ,ELBUF,WA(N2),IPARG,SENSORS%SENSOR_TAB,
      4                FSAV ,FLSW ,SKEW,ELBUF_TAB,CLUSTER,
      5                PARTSAV,ACCELM,NSENSOR  ,MAT_PARAM,
-     6                WEIGHT,IPART,IGRSURF,
+     6                WEIGHT,IPART,IGRSURF,EBCS_TAB,
      7                OUTPUT%TH%ITHGRPF,OUTPUT%TH%ITHBUFF,SUBSET,GEO  ,
      8                KXX   ,IXR,
      9                KXSP  ,NOD2SP ,SPBUF ,
@@ -1491,7 +1496,7 @@ C
      L                IGAUP,NGAUP ,AFORM(6),SIZE_MES,
      M                RTHBUF,THKE ,STACK  ,ISPHIO  ,VSPHIO,
      N                ITHFLAG,PINCH_DATA,MULTI_FVM,W,OUTPUT%TH%SITHBUFF,
-     Q                FSAVSURF,NSEG_LOADP,NEED_TO_REINIT_FSAV)
+     Q                FSAVSURF,NEED_TO_REINIT_FSAV)
 
         IF(SIZE_MES==1 .AND.
      *     AFORM(6)==3   .AND.
@@ -1567,7 +1572,7 @@ C
      2                IXS  ,ELBUF,WA(N2),IPARG,SENSORS%SENSOR_TAB,
      4                FSAV ,FLSW ,SKEW,ELBUF_TAB,CLUSTER,
      5                PARTSAV,ACCELM,NSENSOR  ,MAT_PARAM,
-     6                WEIGHT,IPART,IGRSURF,
+     6                WEIGHT,IPART,IGRSURF,EBCS_TAB,
      7                OUTPUT%TH%ITHGRPG,OUTPUT%TH%ITHBUFG,SUBSET,GEO  ,
      8                KXX   ,IXR,
      9                KXSP  ,NOD2SP ,SPBUF ,
@@ -1583,7 +1588,7 @@ C
      L                IGAUP,NGAUP ,AFORM(7),SIZE_MES,
      M                RTHBUF,THKE ,STACK  ,ISPHIO  ,VSPHIO,
      N                ITHFLAG,PINCH_DATA,MULTI_FVM,W,OUTPUT%TH%SITHBUFG,
-     Q                FSAVSURF,NSEG_LOADP,NEED_TO_REINIT_FSAV)
+     Q                FSAVSURF,NEED_TO_REINIT_FSAV)
 
         IF(SIZE_MES==1 .AND.
      *     AFORM(7)==3   .AND.
@@ -1659,7 +1664,7 @@ C
      2                IXS  ,ELBUF,WA(N2),IPARG,SENSORS%SENSOR_TAB,
      4                FSAV ,FLSW ,SKEW,ELBUF_TAB,CLUSTER,
      5                PARTSAV,ACCELM,NSENSOR  ,MAT_PARAM,
-     6                WEIGHT,IPART,IGRSURF,
+     6                WEIGHT,IPART,IGRSURF,EBCS_TAB,
      7                OUTPUT%TH%ITHGRPH,OUTPUT%TH%ITHBUFH,SUBSET,GEO  ,
      8                KXX   ,IXR,
      9                KXSP  ,NOD2SP ,SPBUF ,
@@ -1675,7 +1680,7 @@ C
      L                IGAUP  ,NGAUP ,AFORM(8),SIZE_MES,
      M                RTHBUF ,THKE ,STACK ,ISPHIO  ,VSPHIO,
      N                ITHFLAG,PINCH_DATA,MULTI_FVM,W,OUTPUT%TH%ITHBUFH,
-     Q                FSAVSURF,NSEG_LOADP,NEED_TO_REINIT_FSAV)
+     Q                FSAVSURF,NEED_TO_REINIT_FSAV)
 
         IF(SIZE_MES==1 .AND.
      *     AFORM(8)==3   .AND.
@@ -1750,7 +1755,7 @@ C
      2                IXS  ,ELBUF,WA(N2),IPARG,SENSORS%SENSOR_TAB,
      4                FSAV ,FLSW ,SKEW,ELBUF_TAB,CLUSTER,
      5                PARTSAV,ACCELM,NSENSOR  ,MAT_PARAM,
-     6                WEIGHT,IPART,IGRSURF,
+     6                WEIGHT,IPART,IGRSURF,EBCS_TAB,
      7                OUTPUT%TH%ITHGRPI,OUTPUT%TH%ITHBUFI,SUBSET,GEO  ,
      8                KXX   ,IXR,
      9                KXSP  ,NOD2SP ,SPBUF ,
@@ -1766,7 +1771,7 @@ C
      L                IGAUP,NGAUP ,AFORM(9),SIZE_MES,
      M                RTHBUF ,THKE ,STACK ,ISPHIO  ,VSPHIO,
      N                ITHFLAG,PINCH_DATA,MULTI_FVM,W,OUTPUT%TH%ITHBUFI,
-     Q                FSAVSURF,NSEG_LOADP,NEED_TO_REINIT_FSAV)
+     Q                FSAVSURF,NEED_TO_REINIT_FSAV)
 
         IF(SIZE_MES==1 .AND.
      *     AFORM(9)==3   .AND.
@@ -1839,7 +1844,7 @@ C
      2                IXS  ,ELBUF,WA(N2),IPARG,SENSORS%SENSOR_TAB,
      4                FSAV ,FLSW ,SKEW,ELBUF_TAB,CLUSTER,
      5                PARTSAV,ACCELM,NSENSOR  ,MAT_PARAM,
-     6                WEIGHT,IPART,IGRSURF,
+     6                WEIGHT,IPART,IGRSURF,EBCS_TAB,
      7                OUTPUT%TH%ITHGRP,OUTPUT%TH%ITHBUF,SUBSET,GEO  ,
      8                KXX   ,IXR,
      9                KXSP  ,NOD2SP ,SPBUF ,
@@ -1855,7 +1860,7 @@ C
      L                IGAUP,NGAUP,ITFORM,SIZE_MES,
      M                RTHBUF ,THKE ,STACK,ISPHIO  ,VSPHIO,
      N                ITHFLAG,PINCH_DATA,MULTI_FVM,W,OUTPUT%TH%SITHBUF,
-     Q                FSAVSURF,NSEG_LOADP,NEED_TO_REINIT_FSAV)
+     Q                FSAVSURF,NEED_TO_REINIT_FSAV)
 
         IF(SIZE_MES==1 .AND.
      *     ITFORM==3   .AND.
@@ -1952,12 +1957,14 @@ C  FSAV(26) : contact elastic energy is not cumulated : only for int10 and int18
          END DO
       ENDIF
 
-C Pressure/Area for /TH/SURF is reset to zero (not cumulated)
-      IF(NSURF >0 ) THEN
-        DO N = 1,NSURF                                                                        
-          FSAVSURF(4:5,N) = ZERO
-          NSEG_LOADP(N) = 0
-        ENDDO
+C /TH/SURF quantities reset to 0 expect for massflow (airbags)
+      IF(NSURF > 0) THEN
+        FSAVSURF(1,1:NSURF) = ZERO  !area
+        FSAVSURF(2,1:NSURF) = ZERO  !massflow
+        FSAVSURF(3,1:NSURF) = ZERO  !velocity
+        FSAVSURF(4,1:NSURF) = ZERO  !pressure
+        FSAVSURF(5,1:NSURF) = ZERO  !A (load,pload)
+        !FSAVSURF(6,1:NSURF)        !cumulated mass
       ENDIF 
       
       ! -----------------------

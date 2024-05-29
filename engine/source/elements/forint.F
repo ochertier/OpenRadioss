@@ -21,14 +21,6 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 Chd|====================================================================
-Chd|  FORINT_MOD                    source/elements/forint.F      
-Chd|-- called by -----------
-Chd|        RESOL                         source/engine/resol.F         
-Chd|-- calls ---------------
-Chd|====================================================================
-      MODULE FORINT_MOD
-      CONTAINS
-Chd|====================================================================
 Chd|  FORINT                        source/elements/forint.F      
 Chd|-- called by -----------
 Chd|        RESOL                         source/engine/resol.F         
@@ -116,7 +108,7 @@ Chd|====================================================================
      W    KNOTLOCPC ,KNOTLOCEL ,SUBSET     ,FLAG_SLIPRING_UPDATE,FLAG_RETRACTOR_UPDATE,
      Y    H3D_DATA  ,IFTHE     ,ICONDN     ,DT        ,OUTPUT,
      Z    SBUFMAT   ,SNPC      ,STF        ,NODADT    ,DTFAC1,
-     .    DTMIN1    ,IDTMIN    ,IOUT       ,ISTDO     )
+     .    DTMIN1    ,IDTMIN    ,IOUT       ,ISTDO     ,IDTMINS,DTFACS)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -183,6 +175,8 @@ C-----------------------------------------------
       INTEGER ,INTENT(IN) :: STF
       INTEGER ,INTENT(IN) :: IOUT
       INTEGER ,INTENT(IN) :: ISTDO
+      INTEGER  :: IDTMINS
+      my_real  :: DTFACS
       my_real
      .   X(3,*),V(3,*),VR(3,*),D(3,*),MS(*),IN(*),A(3,*),AR(3,*),
      .   DR(3,*),W(3,*),PM(NPROPM,NUMMAT),SKEW(LSKEW,*),GEO(NPROPG,NUMGEO),
@@ -953,7 +947,8 @@ C-------------------------
      6           FSKY    ,FR_WAVE ,IADS    ,EANI    ,STIFN    ,
      7           STIFR   ,FX      ,FY      ,FZ      ,IFAILURE ,
      8           MTN     ,IGTYP   ,NPT     ,JSMS    ,MSSA(NF1),
-     9           DMELS(NF1),ITASK ,IPRI    ,JTHE    ,TABLE )
+     9           DMELS(NF1),ITASK ,IPRI    ,JTHE    ,TABLE    ,
+     A           IDTMINS,DTFACS)
 C--------------------------
           ELSEIF (NPT == 1)THEN
 C--------------------------
@@ -1426,5 +1421,4 @@ C-----------
       RETURN
       END
 C-----------
-      END MODULE FORINT_MOD
 

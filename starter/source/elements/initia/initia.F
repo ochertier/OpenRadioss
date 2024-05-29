@@ -136,6 +136,7 @@ Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|        NLOCAL_REG_MOD                ../common_source/modules/nlocal_reg_mod.F
 Chd|        OPTIONDEF_MOD                 ../common_source/modules/optiondef_mod.F
+Chd|        SENSOR_MOD                    share/modules1/sensor_mod.F   
 Chd|        STACK_MOD                     share/modules1/stack_mod.F    
 Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
 Chd|====================================================================
@@ -144,7 +145,7 @@ Chd|====================================================================
      2                  IXP        ,IXR           ,DETONATORS       ,GEO            ,PM        ,
      3                  RBY        ,NPBY          ,LPBY             ,NPC            ,NPTS      ,
      4                  PLD        ,VEUL          ,ALE_CONNECTIVITY ,SKEW           ,FILL      ,
-     5                  IPART      ,ITAB          ,SENSORS          ,IWORKING_ARRAY ,
+     5                  IPART      ,ITAB          ,SENSORS          ,
      6                  IXTG       ,THK           ,NLOC_DMG         ,GROUP_PARAM_TAB,
      7                  IGRNOD     ,IGRSURF       ,BUFSF            ,VR             ,
      8                  BUFMAT     ,XLAS          ,LAS              ,DTELEM         ,MSS       ,
@@ -196,7 +197,7 @@ Chd|====================================================================
      K                  KNOD2EL1D  ,NOD2EL1D      ,EBCS_TAB         ,RBY_INIAXIS    ,ALEA      ,
      L                  KNOD2ELC   ,NOD2ELC       ,DR               ,SLRBODY        ,DRAPEG    ,
      M                  IPARI      ,INTBUF_TAB    ,INTERFACES       ,MAT_PARAM      ,NPRELOAD_A,
-     N                  PRELOAD_A  )
+     N                  PRELOAD_A  ,FAIL_FRACTAL  )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------                     
@@ -225,6 +226,7 @@ C-----------------------------------------------
       USE init_seatbelt_rbodies_mod
       USE BCS_MOD
       USE SENSOR_MOD
+      USE RANDOM_WALK_DEF_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -290,7 +292,6 @@ C-----------------------------------------------
      .        NCTRLMAX,NSIGBEAM,NSIGTRUSS
       INTEGER,INTENT(IN) :: ILOADP(SIZLOADP,*),SLRBODY
       INTEGER,INTENT(IN) :: IPARI(NPARI,NINTER)
-      INTEGER,INTENT(IN) :: IWORKING_ARRAY(2*NUMNOD)  !lectur::IWCIN2 used here as working array
       my_real,INTENT(IN) :: FACLOAD(LFACLOAD,*)
       my_real
      .   ELBUF(*), MS(*), IN(*), V(*), X(*), GEO(*),PM(NPROPM,*),
@@ -353,11 +354,12 @@ C-----------------------------------------------
       TYPE (DETONATORS_STRUCT_) :: DETONATORS
       TYPE (DRAPE_)  , DIMENSION(NUMELC_DRAPE + NUMELTG_DRAPE):: DRAPE 
       TYPE (DRAPEG_)                            :: DRAPEG 
-      TYPE(t_ale_connectivity), INTENT(INOUT) :: ALE_CONNECTIVITY
-      TYPE(INTBUF_STRUCT_) , INTENT(IN   ) ::  INTBUF_TAB(NINTER)
-      TYPE(INTERFACES_) , INTENT(INOUT   ) ::  INTERFACES
-      TYPE(PREL1D_) , INTENT(IN   ), DIMENSION(NPRELOAD_A) ::  PRELOAD_A
-      TYPE(SENSORS_) ,INTENT(IN)  :: SENSORS
+      TYPE (t_ale_connectivity), INTENT(INOUT) :: ALE_CONNECTIVITY
+      TYPE (INTBUF_STRUCT_) , INTENT(IN   ) ::  INTBUF_TAB(NINTER)
+      TYPE (INTERFACES_) , INTENT(INOUT   ) ::  INTERFACES
+      TYPE (PREL1D_) , INTENT(IN   ), DIMENSION(NPRELOAD_A) ::  PRELOAD_A
+      TYPE (SENSORS_) ,INTENT(IN)  :: SENSORS
+      TYPE (FAIL_FRACTAL_) ,INTENT(IN) :: FAIL_FRACTAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -818,7 +820,7 @@ C--------------------------------------------
       IF(BCS%NUM_WALL > 0)THEN
         CALL INIT_BCS_WALL(IGRNOD,NGRNOD,NUMNOD,ALE_CONNECTIVITY,MULTI_FVM,
      .                     IXS,NIXS,NUMELS, IXQ,NIXQ,NUMELQ, IXTG,NIXTG,NUMELTG, N2D,
-     .                     NGROUP,NPARG,IPARG,IWORKING_ARRAY)
+     .                     NGROUP,NPARG,IPARG,IPRI)
       ENDIF
 C---------------------------------------------------------
 C     Tri du vecteur de bolt Preloading
@@ -1179,6 +1181,14 @@ C Case total strain
                  CALL SGSAVINIEREF(ISOLNOD,STRAGLOB(NF1),SIGSP,NSIGI,PTSOL(NF1),
      .                             GBUF%SMSTR,GBUF%OFF,NEL)
               END IF
+              IF (NXREF > 0 .AND. JHBE == 17 ) THEN
+                CALL SREFSTA3(
+     1          ELBUF_TAB(NG),IXS        ,PM         ,GEO      ,IPARG(1,NG),  
+     2          IPM          ,IGEO       ,SKEW       ,X        ,XREFS     ,
+     3          NEL          ,IPART(I15A),IPART      ,BUFMAT   ,MAT_PARAM,              
+     6          NPC          ,PLD        ,NUMMAT     )
+                CALL SGSAVREF(ISOLNOD,XREFS(1,1,NFT+1),GBUF%SMSTR,NEL)
+              END IF
             END IF
             CALL S8ZINIT3(
      .           ELBUF_TAB(NG),MS        ,IXS     ,PM   ,X          ,
@@ -1356,7 +1366,7 @@ C 2D multifluid law
      D             RNOISE     ,DRAPE  ,SH4ANG    ,GEO_STACK,
      E             IGEO_STACK ,STRC   ,PERTURB            ,IYLDINI ,ELE_AREA,
      F             NLOC_DMG   ,NG        ,GROUP_PARAM_TAB(NG),IDRAPE,DRAPEG,
-     G             MAT_PARAM  )
+     G             MAT_PARAM  ,FAIL_FRACTAL)
           ELSE
             NULLIFY(ptr_ITAGE)
             IF (SITAGE>0) ptr_ITAGE => ITAGE(1)       
@@ -1374,7 +1384,7 @@ C 2D multifluid law
      D      STACK     ,RNOISE     ,DRAPE      ,SH4ANG     ,
      E      GEO_STACK,IGEO_STACK  ,STRC       ,PERTURB    ,IYLDINI    ,
      F      ELE_AREA  ,NG         ,GROUP_PARAM_TAB(NG)    ,NLOC_DMG   ,
-     G      IDRAPE    ,DRAPEG     ,MAT_PARAM  )
+     G      IDRAPE    ,DRAPEG     ,MAT_PARAM  ,FAIL_FRACTAL)
           ENDIF
           NC1 = NVC / 8
           NC2 = (NVC-NC1*8) / 4
@@ -1468,7 +1478,8 @@ C 2D multifluid law
      D          ISUBSTACK , STACK,RNOISE  ,
      E          DRAPE ,SH3ANG,GEO_STACK,IGEO_STACK,STRTG,
      F          PERTURB ,ISH3N,IYLDINI ,ELE_AREA,
-     G          NLOC_DMG,NG,GROUP_PARAM_TAB(NG),IDRAPE, DRAPEG,MAT_PARAM)
+     G          NLOC_DMG,NG,GROUP_PARAM_TAB(NG),IDRAPE, 
+     H          DRAPEG,MAT_PARAM,FAIL_FRACTAL)
           ENDIF
           NC1 = NVC / 8
           NC2 = (NVC-NC1*8) / 4

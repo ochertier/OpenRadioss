@@ -26,7 +26,6 @@ Chd|-- called by -----------
 Chd|        HM_READ_PROPERTIES            source/properties/hm_read_properties.F
 Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
-Chd|        FREERR                        source/starter/freform.F      
 Chd|        HM_GET_FLOATV                 source/devtools/hm_reader/hm_get_floatv.F
 Chd|        HM_GET_FLOATV_DIM             source/devtools/hm_reader/hm_get_floatv_dim.F
 Chd|        HM_GET_FLOAT_ARRAY_INDEX      source/devtools/hm_reader/hm_get_float_array_index.F
@@ -493,13 +492,13 @@ C----------------------
      &    5X,'--------------------------------------',/,
      &    5X,'PROPERTY SET NUMBER . . . . . . . . . .=',I10,/,
      &    5X,'CONFIDENTIAL DATA'//)
- 1100 FORMAT(
-     & 5X,'INJECTOR PROPERTY SET  (/PROP/INJECT2)'/,
-     & 5X,'PROPERTY SET NUMBER . . . . . . . . . .=',I10,/,
-     & 5X,'INCOMING MASS FLAG FOR FUNCTIONS. . . .=',I10,/,
-     & 5X,'(0:MASS/TIME, 1:MASS FLOW/TIME)',/,
-     & 5X,'ABSCISSA SCALE FACTOR',/,
-     & 5X,'     FOR TIME BASED FUNCTIONS . . . . .=',1PG20.13,/)
+c1100 FORMAT(
+c    & 5X,'INJECTOR PROPERTY SET  (/PROP/INJECT2)'/,
+c    & 5X,'PROPERTY SET NUMBER . . . . . . . . . .=',I10,/,
+c    & 5X,'INCOMING MASS FLAG FOR FUNCTIONS. . . .=',I10,/,
+c    & 5X,'(0:MASS/TIME, 1:MASS FLOW/TIME)',/,
+c    & 5X,'ABSCISSA SCALE FACTOR',/,
+c    & 5X,'     FOR TIME BASED FUNCTIONS . . . . .=',1PG20.13,/)
  1110 FORMAT(
      & 5X,'MIXTURE DEFINTION'/,
      & 5X,'NUMBER OF GASES . . . . . . . . . . . .=',I10,/)
@@ -529,6 +528,5 @@ C----------------------
      & 10X,'GAS NUMBER. . . . . . . . . . . . . . .=',I10,/,
      & 10X,'MOLAR FRACTION. . . . . . . . . . . . .=',1PG20.13,/,
      & 10X,'TIME FUNCTION FOR MOLAR FRACTION. . . .=',I10,/)
- 999  CALL FREERR(3)
       RETURN
       END

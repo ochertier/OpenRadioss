@@ -78,13 +78,14 @@ Chd|        SPLIT_REMNODE_I25_EDGE        source/restart/ddsplit/inter_tools.F
 Chd|        SPLIT_REMNODE_I7              source/restart/ddsplit/inter_tools.F
 Chd|        SPLIT_SEGEDGE_NODLOC_I24      source/restart/ddsplit/inter_tools.F
 Chd|        SPLIT_SEG_EDGE                source/restart/ddsplit/inter_tools.F
+Chd|        SPLIT_SEG_IELEM               source/restart/ddsplit/split_seg_ielem.F
 Chd|        SPLIT_SEG_IVAL2               source/restart/ddsplit/inter_tools.F
 Chd|        SPLIT_SEG_IVAL_I20            source/restart/ddsplit/inter_tools.F
 Chd|        SPLIT_SEG_IVAL_I20_2          source/restart/ddsplit/inter_tools.F
 Chd|        SPLIT_SEG_NODLOC              source/restart/ddsplit/inter_tools.F
 Chd|        SPLIT_SEG_NODLOC_I24          source/restart/ddsplit/inter_tools.F
-Chd|        SPLIT_SEG_RVAL_I20            source/restart/ddsplit/inter_tools.F
 Chd|        SPLIT_SEG_SEGLOC              source/restart/ddsplit/inter_tools.F
+Chd|        WRITE_DB                      source/restart/ddsplit/wrrest.F
 Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|        W_INTBUF_SIZE                 source/restart/ddsplit/inter_tools.F
 Chd|        W_TYPE8                       source/restart/ddsplit/split_interfaces.F
@@ -195,7 +196,7 @@ C-----------------------------------------------
      .         NMN_IGE_L,NSN_FE_L,NSN_IGE_L,NMN_FE,
      .         NMN_IGE,NSN_FE,NSN_IGE,L,INTFRIC,NREMNOR,IVIS2,
      .         NEDGE,NEDGE_L,INTNITSCHE,II,NISUBE_L,ITHK,FLAGLOADP,
-     .         ISTIF_MSDT
+     .         ISTIF_MSDT, IDEL25_SOLID
        INTEGER :: NINDX_NDLOCAL24
        INTEGER :: MULTIMPE
 c      my_real
@@ -316,6 +317,7 @@ C       WRITE(6,*) __FILE__,"INTERFACE=",NI
         ITHK = IPARI(91,NI)
         FLAGLOADP = IPARI(95,NI)
         ISTIF_MSDT = IPARI(97,NI)
+        IDEL25_SOLID = IPARI(100,NI)
 
         IF (ITYP == 24) NRTSE  = IPARI(52,NI)
         IF (ITYP == 24) IEDGE4 = IPARI(59,NI)
@@ -620,8 +622,8 @@ C=======================================================================
               CALL COPY_RVAL(INTBUF_TAB(NI)%FRIC_P,10,1) !JD(25)
             ENDIF
             IF (IFQ/=0) THEN 
-              CALL COPY_RVAL(INTBUF_TAB(NI)%S_XFILTR,1,1) !JD(26)
-              CALL COPY_RVAL(INTBUF_TAB(NI)%S_FTSAV,NSN,3) !JD(27)
+              CALL COPY_RVAL(INTBUF_TAB(NI)%S_XFILTR,1,1) !JD(26) COPY_IVAL?
+              CALL COPY_RVAL(INTBUF_TAB(NI)%S_FTSAV,NSN,3) !JD(27) COPY_IVAL?
             ENDIF
             CALL COPY_RVAL(INTBUF_TAB(NI)%STFM,NRTM,1) !JD(17)
             CALL COPY_RVAL(INTBUF_TAB(NI)%STFS,NRTS,1) !JD(16)
@@ -1209,8 +1211,8 @@ cc     .                          TAG_IELES) !KD(24)
             CALL COPY_RVAL(INTBUF_TAB(NI)%FRIC_P,10,1) !JD(25)
           ENDIF
           IF (IFQ/=0) THEN 
-            CALL COPY_RVAL(INTBUF_TAB(NI)%S_XFILTR,1,1) !JD(26)
-            CALL COPY_RVAL(INTBUF_TAB(NI)%S_FTSAV,NSN,3) !JD(27)
+            CALL COPY_RVAL(INTBUF_TAB(NI)%S_XFILTR,1,1) !JD(26) COPY_IVAL
+            CALL COPY_RVAL(INTBUF_TAB(NI)%S_FTSAV,NSN,3) !JD(27) COPY_IVAL
           ENDIF
 
           DEALLOCATE(TAG_NODE_2RY, TAG_NODE_MSR, TAG_IELES, TAG_IELEM)
@@ -1767,11 +1769,9 @@ c split and write on disk floating arrays
 
 
           IF(INTBUF_TAB(NI)%S_CRITX > 0) THEN
-            CALL SPLIT_SEG_RVAL_I20(INTBUF_TAB(NI)%CRITX,
-     .                              NSNE_L,3,TAG_NSVE) !JD(39)
-
-            CALL SPLIT_SEG_RVAL_I20(INTBUF_TAB(NI)%CRITX(NSNE_L*3+1),
-     .                              NMNE_L,3,TAG_MSRE) !JD(39)
+            ! INTBUF_TAB(NI)%CRITX is initialized to 0 in Starter / No need to split
+            SIZ = 3*(NSNE_L+NMNE_L)            
+            CALL WRITE_DB(INTBUF_TAB(NI)%CRITX,SIZ)
           ENDIF
 
           CALL SPLIT_NODE_RVAL(INTBUF_TAB(NI)%GAP_ME,NLINM_L,1,TAG_NLINM) !JD(35)
@@ -2487,7 +2487,7 @@ C=======================================================================
      .                          TAG_SEGM2     ,TAG_NM      ,TAG_NODE_MSR,
      .                          TAG_SCRATCH   ,TAG_SM      ,KNOR2MSR    ,
      .                          NOR2MSR       ,TAG_NODE_2RY2,NINDX_NM,INDX_NM,
-     .                          NINDX_SCRT    ,INDX_SCRT)
+     .                          NINDX_SCRT    ,INDX_SCRT    ,NRTM_L)
 
           IF(II_STOK>0)THEN
             CALL PREPARE_SPLIT_CAND(INTBUF_TAB(NI), TAG_SEGM2, II_STOK,
@@ -2712,6 +2712,10 @@ c     .                            TAG_II_E2E)
             CALL SPLIT_NODE_IVAL(INTBUF_TAB(NI)%IFPEN_E2S,II_STOK_S_L,1,
      .                            TAG_II_E2S) 
           ENDIF
+
+          CALL SPLIT_SEG_IELEM(INTBUF_TAB(NI)%IELEM_M,INTBUF_TAB(NI)%PROC_MVOISIN, INTBUF_TAB(NI)%MVOISIN,NRTM,
+     .                           NRTM_L               ,TAG_SEGM                   ,CEP                    ,CEL  ,
+     .                           IDEL25_SOLID         ,INTERCEP(1,NI)             ,PROC                  ,NUMELS)
 
 c split and write on disk floating arrays 
 

@@ -77,13 +77,14 @@ Chd|        H3D_INC_MOD                   share/modules/h3d_inc_mod.F
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|        INITBUF_MOD                   share/resol/initbuf.F         
 Chd|        LOADS_MOD                     ../common_source/modules/loads/loads_mod.F
+Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|        STACK_MOD                     share/modules/stack_mod.F     
 Chd|====================================================================
       SUBROUTINE LECH3D(GEO,IGEO,IPM,IPART,H3D_DATA,MULTI_FVM,IPARI,IPARG,TAG_SKINS6,
      .                  MDS_LABEL,MDS_OUTPUT_TABLE,MDS_NMAT,MAX_DEPVAR,MDS_NDEPSVAR,
-     .                  ELBUF_STR,STACK,IBCL,ILOADP,LLOADP,LOADS)
+     .                  ELBUF_STR,STACK,IBCL,ILOADP,LLOADP,LOADS,MAT_PARAM)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -97,6 +98,7 @@ C-----------------------------------------------
         USE H3D_INC_MOD
         USE LOADS_MOD
         USE NAMES_AND_TITLES_MOD, ONLY: NCHARLINE100,NCHARKEY
+        USE MATPARAM_DEF_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -125,6 +127,7 @@ C-----------------------------------------------
         TYPE(ELBUF_STRUCT_), TARGET, DIMENSION(NGROUP) :: ELBUF_STR
         TYPE (STACK_PLY) :: STACK
         TYPE (LOADS_), INTENT(IN)    :: LOADS
+        TYPE (MATPARAM_STRUCT_) ,DIMENSION(NUMMAT) ,INTENT(INOUT) :: MAT_PARAM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -133,7 +136,7 @@ C-----------------------------------------------
      .          NB_INTEGER,N,IR_MAX,IS_MAX,IT_MAX,
      .          NB_ALL,IS_CHAR_KEY2,IS_CHAR_KEY3,IS_CHAR_KEY4,IS_CHAR_KEY5,IS_CHAR_KEY6,IS_CHAR_KEY7,IS_CHAR_KEY8,
      .          IS_EMPTY_KEY2,IS_EMPTY_KEY3,IS_EMPTY_KEY4,IS_EMPTY_KEY5,IS_EMPTY_KEY6,IS_EMPTY_KEY7,IS_EMPTY_KEY8,
-     .          IS_PLY_KEY4,IS_PLY_KEY5,IS_PLY_KEY6,IS_PLY_KEY7,IS_PLY_KEY8,IBID,IS_ALL,IS_UPPER,IS_LOWER,IS_DEF,
+     .          IS_PLY_KEY4,IS_PLY_KEY5,IS_PLY_KEY6,IS_PLY_KEY7,IS_PLY_KEY8,IS_ALL,IS_UPPER,IS_LOWER,IS_DEF,
      .          IS_LAYER_KEY4,IS_LAYER_KEY5,IS_LAYER_KEY6,IS_LAYER_KEY7,IS_LAYER_KEY8,IS_IPT_KEY4,IS_IPT_KEY5,
      .          IS_IPT_KEY6,IS_IPT_KEY7,IS_IPT_KEY8,
      .          IS_GAUSS_KEY4,IS_GAUSS_KEY5,IS_GAUSS_KEY6,IS_GAUSS_KEY7,IS_GAUSS_KEY8,IS_PLY,IS_LAYER,IS_IPT,IS_GAUSS,
@@ -151,8 +154,10 @@ C-----------------------------------------------
      .          IS_MDSVAR_DEF,NMDSVAR_MAX,IS_MDSVAR,IS_MDSVAR_ALL,IMDSVAR,
      .          IS_MODEL_NPT,IS_MODEL_PLY,IS_MODEL_LAYER,ISKIND,IOUTER,IPEXT,
      .          IS_ID,ID,ID_MAX,IS_ID_ALL,NINEFRIC,N19,IFAIL,CPT_IRUP,CPT_IRUP2,
-     .          IS_MODE,MODE,MODE_MAX,IS_MODE_ALL
+     .          IS_MODE,MODE,MODE_MAX,IS_MODE_ALL,NFAIL
         INTEGER MLW,NEL,NG,JTURB,NLAY,NUVAR,IPLY,IMAT,ISUBSTACK,ID_PLY_TMP
+        INTEGER CPT_MOD,NMOD,CPT_LAWID
+        INTEGER IBID1,IBID2,IBID3
 
         CHARACTER(LEN=NCHARKEY)::KEY2
         CHARACTER(LEN=NCHARKEY)::KEY3
@@ -172,7 +177,7 @@ C-----------------------------------------------
      .        IR_INPUT,IS_INPUT,IT_INPUT,IS_AVAILABLE_KEY,INTER_INPUT,
      .        MDSVAR_INPUT,MDSVAR_INPUT1,MDSVAR_INPUT_TMP,MDSVAR_INPUT1_TMP,
      .        MDSVAR_INPUT2,MDSVAR_INPUT2_TMP,ID_MAT_MDS,INDEX_MAT_MDS,IDS_INPUT,
-     .        IRUP_ALL,IRUP_ID_ALL,IRUP_H3D,MODES_INPUT
+     .        IRUP_ID_ALL,MODES_INPUT,IRUP_H3D
 c
         TYPE (H3D_KEYWORD) H3D_KEYWORD_NODE,H3D_KEYWORD_SHELL,H3D_KEYWORD_SOLID,H3D_KEYWORD_QUAD,H3D_KEYWORD_ONED
 c
@@ -202,18 +207,8 @@ c
         INTEGER, DIMENSION(:,:), ALLOCATABLE :: IS_LAYER_MAT
         LOGICAL :: FOUND
         CHARACTER*64 TEST_CHAIN
-        CHARACTER*10 FAIL_NAME(50)
-        DATA  FAIL_NAME/
-     1   'JOHNSON   ','TBUTCHER  ','WILKINS   ','USER1     ','USER2     ',
-     2   'USER3     ','FLD       ','SPALLING  ','WIERZBICKI','TENSSTRAIN',
-     3   'ENERGY    ','          ','CHANG     ','HASHIN    ','          ',
-     4   'PUCK      ','          ','LADEVEZE  ','          ','CONNECT   ',
-     5   '          ','          ','TAB1      ','ORTHSTRAIN','NXT       ',
-     6   'SNCONNECT ','EMC       ','ALTER     ','SAHRAEI   ','BIQUAD    ',
-     7   'FABRIC    ','HC_DSSE   ','MULLINS   ','COCKCROFT ','GURSON    ',
-     8   'VISUAL    ','TAB_OLD   ','ORTHBIQUAD','GENE1     ','RTCL      ',
-     9   'TAB2      ','INIEVO    ','SYAZWAN   ','TSAIWU    ','TSAIHILL  ',
-     A   'HOFFMAN   ','MAXSTRAIN ','ORTHENERG ','          ','          '/
+        CHARACTER(LEN=NCHARTITLE), DIMENSION(:),   ALLOCATABLE :: FAIL_NAME
+        CHARACTER(LEN=NCHARTITLE), DIMENSION(:,:), ALLOCATABLE :: MODNAME
 C=========================================================================
         IF(H3D_DATA%TH3D0 /= ZERO)  H3D_DATA%TH3D = H3D_DATA%TH3D0
         IF(H3D_DATA%TH3D_STOP0 /= EP20)  H3D_DATA%TH3D_STOP = H3D_DATA%TH3D_STOP0
@@ -226,7 +221,10 @@ C=========================================================================
      .                         + INT((TT-DT2-H3D_DATA%TH3D)/H3D_DATA%DTH3D)*H3D_DATA%DTH3D
         IF (H3D_DATA%TH3D < TT-DT2)H3D_DATA%TH3D = H3D_DATA%TH3D+H3D_DATA%DTH3D
 C=========================================================================
-        IBID = 0
+        IBID1 = 0
+        IBID2 = 0
+        IBID3 = 0
+        
 c
         H3D_DATA%IPART_SELECT = 0
         IS_SCALAR = 0
@@ -236,8 +234,6 @@ c
         NB_ALL = 0
         IS_SKING = 0
         NLAY_MAX = 0
-        ALLOCATE(IRUP_ALL(1))
-        IRUP_ALL(1) = 0
         CPT_IRUP = 0
 
         ALLOCATE(H3D_DATA%N_SKID_INTER(NINTER))
@@ -521,8 +517,8 @@ C--------------------------------------------------
           CALL CREATE_H3D_ARG_KEYWORD(KEY2       ,KEY3        ,KEY4      ,KEY5     ,KEY6      ,
      .                                KEY7       ,KEY8        ,IS_ALL    ,IS_LOWER ,IS_UPPER  ,
      .                                'PLY'  ,3       ,IS_PLY  ,PLY    ,
-     .                                IS_PLY_ALL ,IBID        ,IBID      ,IS_DEF   ,
-     .                                IBID       )
+     .                                IS_PLY_ALL ,IBID1        ,IBID2      ,IS_DEF   ,
+     .                                IBID3       )
 C--------------------------------------------------
 C Read LAYER= I/ALL/LOWER/UPPER
 C--------------------------------------------------
@@ -534,7 +530,7 @@ C--------------------------------------------------
      .                                KEY7       ,KEY8        ,IS_ALL     ,IS_LOWER    ,IS_UPPER  ,
      .                                'LAYER'    ,5           ,IS_LAYER    ,LAYER    ,
      .                                IS_LAYER_ALL,IS_LAYER_LOWER,IS_LAYER_UPPER   ,IS_DEF ,
-     .                                IBID       )
+     .                                IBID1       )
 C--------------------------------------------------
 C Read NPT= I/ALL/LOWER/UPPER
 C--------------------------------------------------
@@ -548,7 +544,7 @@ C--------------------------------------------------
      .                                KEY7       ,KEY8        ,IS_ALL     ,IS_LOWER    ,IS_UPPER  ,
      .                                'NPT'      ,3           ,IS_IPT    ,IPT    ,
      .                                IS_IPT_ALL,IS_IPT_LOWER,IS_IPT_UPPER,IS_DEF  ,
-     .                                IBID       )
+     .                                IBID1       )
 C--------------------------------------------------
 C Read UVAR= I/ALL/DEF
 C--------------------------------------------------
@@ -559,8 +555,8 @@ C--------------------------------------------------
           CALL CREATE_H3D_ARG_KEYWORD(KEY2       ,KEY3        ,KEY4      ,KEY5     ,KEY6      ,
      .                                KEY7       ,KEY8        ,IS_ALL     ,IS_LOWER    ,IS_UPPER  ,
      .                                'UVAR'     ,4           ,IS_UVAR    ,IUVAR    ,
-     .                                IS_UVAR_ALL,IBID        ,IBID       ,IS_DEF  ,
-     .                                IBID       )
+     .                                IS_UVAR_ALL,IBID1        ,IBID2       ,IS_DEF  ,
+     .                                IBID3       )
 C--------------------------------------------------
 C Read MDS_VAR= I/ALL/DEF
 C--------------------------------------------------
@@ -571,7 +567,7 @@ C--------------------------------------------------
           CALL CREATE_H3D_ARG_KEYWORD(KEY2       ,KEY3        ,KEY4      ,KEY5     ,KEY6      ,
      .                                KEY7       ,KEY8        ,IS_ALL     ,IS_LOWER    ,IS_UPPER  ,
      .                                'MDS_VAR'  ,7           ,IS_MDSVAR  ,IMDSVAR    ,
-     .                                IS_MDSVAR_ALL,IBID      ,IBID       ,IS_DEF  ,
+     .                                IS_MDSVAR_ALL,IBID1      ,IBID2       ,IS_DEF  ,
      .                                IS_MDSVAR_DEF)
 C--------------------------------------------------
 C Read IR= I/ALL/LOWER/UPPER
@@ -584,7 +580,7 @@ C--------------------------------------------------
      .                                KEY7       ,KEY8        ,IS_ALL     ,IS_LOWER    ,IS_UPPER  ,
      .                                'IR'  ,2       ,IS_IR  ,IR    ,
      .                                IS_IR_ALL  ,IS_IR_LOWER ,IS_IR_UPPER ,IS_DEF ,
-     .                                IBID       )
+     .                                IBID1       )
 C--------------------------------------------------
 C Read IS= I/ALL/LOWER/UPPER
 C--------------------------------------------------
@@ -596,7 +592,7 @@ C--------------------------------------------------
      .                                KEY7       ,KEY8        ,IS_ALL     ,IS_LOWER    ,IS_UPPER  ,
      .                                'IS'  ,2       ,IS_IS  ,IS    ,
      .                                IS_IS_ALL  ,IS_IS_LOWER ,IS_IS_UPPER ,IS_DEF ,
-     .                                IBID       )
+     .                                IBID1       )
 C--------------------------------------------------
 C Read IT= I/ALL/LOWER/UPPER
 C--------------------------------------------------
@@ -608,7 +604,7 @@ C--------------------------------------------------
      .                                KEY7       ,KEY8        ,IS_ALL     ,IS_LOWER    ,IS_UPPER  ,
      .                                'IT'  ,2       ,IS_IT  ,IT    ,
      .                                IS_IT_ALL  ,IS_IT_LOWER ,IS_IT_UPPER ,IS_DEF ,
-     .                                IBID       )
+     .                                IBID1       )
 C--------------------------------------------------
 C Read INTER= I/ALL
 C--------------------------------------------------
@@ -619,8 +615,8 @@ C--------------------------------------------------
           CALL CREATE_H3D_ARG_KEYWORD(KEY2       ,KEY3        ,KEY4      ,KEY5     ,KEY6      ,
      .                                KEY7       ,KEY8        ,IS_ALL     ,IS_LOWER    ,IS_UPPER  ,
      .                                'INTER'    ,5           ,IS_INTER    ,INTER    ,
-     .                                IS_INTER_ALL,IBID       ,IBID       ,IS_DEF    ,
-     .                                IBID       )
+     .                                IS_INTER_ALL,IBID1      ,IBID2       ,IS_DEF    ,
+     .                                IBID3       )
 C--------------------------------------------------
 C Read ID= I/ALL
 C--------------------------------------------------
@@ -631,8 +627,8 @@ C--------------------------------------------------
           CALL CREATE_H3D_ARG_KEYWORD(KEY2       ,KEY3        ,KEY4      ,KEY5     ,KEY6      ,
      .                                KEY7       ,KEY8        ,IS_ALL     ,IS_LOWER    ,IS_UPPER  ,
      .                                'ID'       ,2           ,IS_ID     ,ID         ,
-     .                                IS_ID_ALL  ,IBID       ,IBID       ,IS_DEF    ,
-     .                                IBID       )
+     .                                IS_ID_ALL  ,IBID1       ,IBID2       ,IS_DEF    ,
+     .                                IBID3       )
 C--------------------------------------------------
 C Read MODE= I/ALL
 C--------------------------------------------------
@@ -643,8 +639,8 @@ C--------------------------------------------------
           CALL CREATE_H3D_ARG_KEYWORD(KEY2       ,KEY3        ,KEY4      ,KEY5     ,KEY6      ,
      .                                KEY7       ,KEY8        ,IS_ALL     ,IS_LOWER    ,IS_UPPER  ,
      .                                'MODE'     ,4           ,IS_MODE   ,MODE       ,
-     .                                IS_MODE_ALL,IBID       ,IBID       ,IS_DEF    ,
-     .                                IBID       )
+     .                                IS_MODE_ALL,IBID1       ,IBID2       ,IS_DEF    ,
+     .                                IBID3       )
 C--------------------------------------------------
           CPT = 0
           IF ( IS_CHAR_KEY3 == 1 .AND. IS_EMPTY_KEY3 == 0) THEN
@@ -897,7 +893,7 @@ C
                   IF(IGEO(11,K) == 10 .OR. IGEO(11,K) == 11 .OR. IGEO(11,K) == 16 ) THEN
                     NLAY_MAX = MAX(NLAY_MAX,IGEO(4,K))
                   ELSEIF(IGEO(11,K) == 20 .OR. IGEO(11,K) == 21 .OR. IGEO(11,K) == 22) THEN
-                    NLAY_MAX = MAX(NLAY_MAX,MIN(1,IGEO(30,K)))
+                    NLAY_MAX = MAX(NLAY_MAX,MAX(1,IGEO(30,K)))
                   ENDIF
                 ENDDO
                 DO K=1,NS_STACK ! type17,51 & 52
@@ -1079,118 +1075,214 @@ c
                 ENDDO
               ENDIF
 c
+              CPT_MOD = 0
+              CPT_LAWID = 0
+              CPT_IRUP = 0
+c
+              !=====================================================================================
               ! /H3D/ELEM/FAILURE definition
-              IF (KEY3_GLOB == 'FAILURE') THEN
+              !=====================================================================================
+              IF (KEY3_GLOB(1:7) == 'FAILURE') THEN
 c
-                ! All failure IDs are asked by user
-                IF (IS_ID_ALL > 0) THEN
+                ! Initialization of Mode flag for title
+                CPT_MOD = 0
 c
-                  ! First count of the failure model
-                  CPT_IRUP = 0
-                  DO NG=1,NGROUP
-                    NLAY = ELBUF_STR(NG)%NLAY
-                    DO J = 1,NLAY
-                      DO K = 1, ELBUF_STR(NG)%BUFLY(J)%NPTT
-                        DO L = 1,ELBUF_STR(NG)%NPTR
-                          DO M = 1,ELBUF_STR(NG)%NPTS
-                            FBUF => ELBUF_STR(NG)%BUFLY(J)%FAIL(L,M,K)
-                            CPT_IRUP = CPT_IRUP + ELBUF_STR(NG)%BUFLY(J)%NFAIL
-                          ENDDO
-                        ENDDO
-                      ENDDO
+                ! If MODE output is specified by user
+                IF ((IS_MODE > 0).OR.(IS_MODE_ALL > 0)) THEN 
+c
+                  ! All failure IDs are asked by user
+                  IF (IS_ID_ALL > 0) THEN
+c  
+                    ! First count of the failure models with IDs and number of modes
+                    IF (ALLOCATED(MODNAME))   DEALLOCATE(MODNAME)
+                    IF (ALLOCATED(FAIL_NAME)) DEALLOCATE(FAIL_NAME)
+                    CPT_IRUP = 0
+                    DO IMAT = 1,NUMMAT
+                      NFAIL = MAT_PARAM(IMAT)%NFAIL
+                      IF (NFAIL > 0) THEN 
+                        DO J = 1,NFAIL
+                          NMOD = MAT_PARAM(IMAT)%FAIL(J)%NMOD
+                          IF (MAT_PARAM(IMAT)%FAIL(J)%FAIL_ID > 0 .AND. NMOD > 0) THEN 
+                            CPT_IRUP = CPT_IRUP + 1
+                            CPT_MOD  = MAX(CPT_MOD,NMOD)
+                          ENDIF
+                        ENDDO   
+                      ENDIF
                     ENDDO
-                  ENDDO
 c
-                  ! Save all IDs (might be doubled)
-                  IF (ALLOCATED(IRUP_ALL)) DEALLOCATE(IRUP_ALL)
-                  ALLOCATE(IRUP_ALL(CPT_IRUP))
-                  IRUP_ALL(1:CPT_IRUP) = 0
-                  CPT_IRUP = 0
-                  DO NG=1,NGROUP
-                    NLAY = ELBUF_STR(NG)%NLAY
-                    DO J = 1,NLAY
-                      DO K = 1, ELBUF_STR(NG)%BUFLY(J)%NPTT
-                        DO L = 1,ELBUF_STR(NG)%NPTR
-                          DO M = 1,ELBUF_STR(NG)%NPTS
-                            FBUF => ELBUF_STR(NG)%BUFLY(J)%FAIL(L,M,K)
-                            DO IFAIL = 1,ELBUF_STR(NG)%BUFLY(J)%NFAIL
-                              CPT_IRUP = CPT_IRUP + 1
-                              IRUP_ALL(CPT_IRUP) = FBUF%FLOC(IFAIL)%IDFAIL
-                            ENDDO
-                          ENDDO
-                        ENDDO
-                      ENDDO
+                    ! Second count to save IDs and failure model names
+                    ALLOCATE(FAIL_NAME(CPT_IRUP))
+                    ALLOCATE(IRUP_ID_ALL(CPT_IRUP))
+                    ALLOCATE(MODNAME(CPT_IRUP,CPT_MOD))
+                    IRUP_ID_ALL(1:CPT_IRUP) = 0
+                    CPT_IRUP = 0
+                    CPT_MOD  = 0
+                    DO IMAT = 1,NUMMAT
+                      NFAIL = MAT_PARAM(IMAT)%NFAIL
+                      IF (NFAIL > 0) THEN 
+                        DO J = 1,NFAIL
+                          NMOD = MAT_PARAM(IMAT)%FAIL(J)%NMOD
+                          IF (MAT_PARAM(IMAT)%FAIL(J)%FAIL_ID > 0 .AND. NMOD > 0) THEN 
+                            CPT_IRUP = CPT_IRUP + 1
+                            FAIL_NAME(CPT_IRUP) = MAT_PARAM(IMAT)%FAIL(J)%KEYWORD
+                            IRUP_ID_ALL(CPT_IRUP) = MAT_PARAM(IMAT)%FAIL(J)%FAIL_ID
+                            MODNAME(CPT_IRUP,1:NMOD) = MAT_PARAM(IMAT)%FAIL(J)%MODE(1:NMOD)
+                            IF (IS_MODE_ALL > 0) THEN
+                              CPT_MOD = MAX(CPT_MOD,NMOD)
+                            ELSEIF (IS_MODE > 0) THEN 
+                              CPT_MOD = 1
+                            ENDIF
+                          ENDIF
+                        ENDDO   
+                      ENDIF
                     ENDDO
-                  ENDDO
+c  
+                    ! Maximal number of IDs
+                    ID_MAX = CPT_IRUP
 c
-                  ! Remove doubled failure IDs
-                  ALLOCATE(IRUP_ID_ALL(CPT_IRUP))
-                  IRUP_ID_ALL(1:CPT_IRUP) = 0
-                  CPT_IRUP2 = 0
-                  DO J = 1,CPT_IRUP
-                    FOUND = .FALSE.
-                    DO K = 1,CPT_IRUP2
-                      IF (IRUP_ID_ALL(K) == IRUP_ALL(J) .AND. IRUP_ALL(J) /= 0) FOUND = .TRUE.
-                    ENDDO
-                    IF (.NOT.FOUND) THEN
-                      CPT_IRUP2 = CPT_IRUP2 + 1
-                      IRUP_ID_ALL(CPT_IRUP2) = IRUP_ALL(J)
-                    ENDIF
-                  ENDDO
-c
-                  ! Save corresponding failure models
-                  IF (ALLOCATED(IRUP_ALL)) DEALLOCATE(IRUP_ALL)
-                  ALLOCATE(IRUP_ALL(CPT_IRUP2))
-                  IRUP_ALL(1:CPT_IRUP2) = 0
-                  DO O = 1,CPT_IRUP2
-                    DO NG=1,NGROUP
-                      NLAY = ELBUF_STR(NG)%NLAY
-                      DO J = 1,NLAY
-                        DO K = 1, ELBUF_STR(NG)%BUFLY(J)%NPTT
-                          DO L = 1,ELBUF_STR(NG)%NPTR
-                            DO M = 1,ELBUF_STR(NG)%NPTS
-                              FBUF => ELBUF_STR(NG)%BUFLY(J)%FAIL(L,M,K)
-                              DO IFAIL = 1,ELBUF_STR(NG)%BUFLY(J)%NFAIL
-                                IF (FBUF%FLOC(IFAIL)%IDFAIL == IRUP_ID_ALL(O)) THEN
-                                  IRUP_ALL(O) = FBUF%FLOC(IFAIL)%ILAWF
-                                ENDIF
-                              ENDDO
-                            ENDDO
-                          ENDDO
-                        ENDDO
-                      ENDDO
-                    ENDDO
-                  ENDDO
-c
-                  ! Maximal number of IDs
-                  ID_MAX = CPT_IRUP2
+                    ! Maximal number of Modes
+                    MODE_MAX = CPT_MOD
 c
                   ! Only a specific failure ID is asked by the user
-                ELSEIF (IS_ID > 0) THEN
-c
-                  ! Look if ID is found for the element group
-                  CPT_IRUP = 0
-                  DO NG=1,NGROUP
-                    NLAY = ELBUF_STR(NG)%NLAY
-                    DO J = 1,NLAY
-                      DO K = 1, ELBUF_STR(NG)%BUFLY(J)%NPTT
-                        DO L = 1,ELBUF_STR(NG)%NPTR
-                          DO M = 1,ELBUF_STR(NG)%NPTS
-                            FBUF => ELBUF_STR(NG)%BUFLY(J)%FAIL(L,M,K)
-                            DO IFAIL = 1,ELBUF_STR(NG)%BUFLY(J)%NFAIL
-                              IF (FBUF%FLOC(IFAIL)%IDFAIL == ID) THEN
-                                IRUP_ALL(1) = FBUF%FLOC(IFAIL)%ILAWF
-                                CPT_IRUP = 1
+                  ELSEIF (IS_ID > 0) THEN
+                    ! Recover the number of modes and their names
+                    IF (ALLOCATED(MODNAME))   DEALLOCATE(MODNAME)
+                    IF (ALLOCATED(FAIL_NAME)) DEALLOCATE(FAIL_NAME)
+                    DO IMAT = 1,NUMMAT
+                      NFAIL = MAT_PARAM(IMAT)%NFAIL
+                      IF (NFAIL > 0) THEN 
+                        DO J = 1,NFAIL
+                          IF (MAT_PARAM(IMAT)%FAIL(J)%FAIL_ID == ID) THEN 
+                            NMOD = MAT_PARAM(IMAT)%FAIL(J)%NMOD
+                            IF (NMOD > 0) THEN 
+                              ALLOCATE(MODNAME(1,NMOD))
+                              MODNAME(1,1:NMOD) = MAT_PARAM(IMAT)%FAIL(J)%MODE(1:NMOD)
+                              IF (IS_MODE_ALL > 0) THEN
+                                MODE_MAX = NMOD
+                              ELSEIF (IS_MODE > 0) THEN 
+                                MODE_MAX = 1 
                               ENDIF
-                            ENDDO
-                          ENDDO
-                        ENDDO
-                      ENDDO
+                              CPT_IRUP = 1 
+                              CPT_MOD  = 1
+                            ENDIF
+                            ALLOCATE(FAIL_NAME(1))
+                            FAIL_NAME(1) = MAT_PARAM(IMAT)%FAIL(J)%KEYWORD
+                          ENDIF
+                        ENDDO   
+                      ENDIF
                     ENDDO
-                  ENDDO
+                  ENDIF
 c
+                ! Otherwise, classic global damage variable only
+                ELSE 
+                  ! All failure IDs are asked by user
+                  IF (IS_ID_ALL > 0) THEN
+c  
+                    ! First count of the failure models with IDs
+                    IF (ALLOCATED(FAIL_NAME)) DEALLOCATE(FAIL_NAME)
+                    CPT_IRUP = 0
+                    DO IMAT = 1,NUMMAT
+                      NFAIL = MAT_PARAM(IMAT)%NFAIL
+                      IF (NFAIL > 0) THEN 
+                        DO J = 1,NFAIL
+                          IF (MAT_PARAM(IMAT)%FAIL(J)%FAIL_ID > 0) THEN 
+                            CPT_IRUP = CPT_IRUP + 1
+                          ENDIF
+                        ENDDO   
+                      ENDIF
+                    ENDDO
+c
+                    ! Second count to save IDs and failure model names
+                    ALLOCATE(FAIL_NAME(CPT_IRUP))
+                    ALLOCATE(IRUP_ID_ALL(CPT_IRUP))
+                    IRUP_ID_ALL(1:CPT_IRUP) = 0
+                    CPT_IRUP = 0
+                    DO IMAT = 1,NUMMAT
+                      NFAIL = MAT_PARAM(IMAT)%NFAIL
+                      IF (NFAIL > 0) THEN 
+                        DO J = 1,NFAIL
+                          IF (MAT_PARAM(IMAT)%FAIL(J)%FAIL_ID > 0) THEN 
+                            CPT_IRUP = CPT_IRUP + 1
+                            FAIL_NAME(CPT_IRUP) = MAT_PARAM(IMAT)%FAIL(J)%KEYWORD
+                            IRUP_ID_ALL(CPT_IRUP) = MAT_PARAM(IMAT)%FAIL(J)%FAIL_ID
+                          ENDIF
+                        ENDDO   
+                      ENDIF
+                    ENDDO
+c  
+                    ! Maximal number of IDs
+                    ID_MAX = CPT_IRUP
+c  
+                    ! Only a specific failure ID is asked by the user
+                  ELSEIF (IS_ID > 0) THEN
+c  
+                    ! Look for failure criterion ID among materials
+                    CPT_IRUP = 0
+                    IF (ALLOCATED(FAIL_NAME)) DEALLOCATE(FAIL_NAME)
+                    DO IMAT = 1,NUMMAT
+                      NFAIL = MAT_PARAM(IMAT)%NFAIL
+                      IF (NFAIL > 0) THEN 
+                        DO J = 1,NFAIL
+                          IF (MAT_PARAM(IMAT)%FAIL(J)%FAIL_ID == ID) THEN 
+                            ALLOCATE(FAIL_NAME(1))
+                            CPT_IRUP = 1 
+                            FAIL_NAME(1) = MAT_PARAM(IMAT)%FAIL(J)%KEYWORD
+                          ENDIF
+                        ENDDO   
+                      ENDIF
+                    ENDDO
+c  
+                  ENDIF
                 ENDIF
               ENDIF
+              !=====================================================================================
+c
+              !=====================================================================================
+              ! /H3D/ELEM/DAMG output definition
+              !=====================================================================================
+              ! -> Modes output definition
+              IF ((KEY3_GLOB(1:4) == 'DAMG').AND.((IS_MODE > 0).OR.(IS_MODE_ALL > 0))) THEN 
+                ! Only available if the ID of the material law is given by user
+                CPT_MOD = 0
+                ! -> Specific ID given by user
+                IF (IS_ID > 0) THEN 
+                  ! Recover the number of modes and their names
+                  IF (ALLOCATED(MODNAME)) DEALLOCATE(MODNAME)
+                  DO IMAT = 1,NUMMAT
+                    IF (MAT_PARAM(IMAT)%MAT_ID == ID) THEN 
+                      NMOD = MAT_PARAM(IMAT)%NMOD
+                      ALLOCATE(MODNAME(1,NMOD))
+                      MODNAME(1,1:NMOD) = MAT_PARAM(IMAT)%MODE(1:NMOD)
+                      MLW = MAT_PARAM(IMAT)%ILAW
+                      IF (IS_MODE_ALL > 0) THEN
+                        MODE_MAX = NMOD
+                      ELSEIF (IS_MODE > 0) THEN 
+                        MODE_MAX = 1 
+                      ENDIF
+                      IF ((NMOD > 0).AND.(MODE <= NMOD)) CPT_MOD = 1
+                    ENDIF
+                  ENDDO
+                ! Otherwise, printing error message
+                ELSE
+                  IF (ISPMD == 0) THEN 
+                    CALL ANCMSG(
+     .                     MSGID=306,
+     .                     C1='/H3D/'//KEY2//'/'//KEY3//'/'//KEY4//'/'//KEY5//'/'//KEY6,
+     .                     ANMODE=ANINFO)
+                    CALL ARRET(2)
+                  ENDIF                 
+                ENDIF
+              ! -> ID only output definition
+              ELSEIF ((KEY3_GLOB(1:4) == 'DAMG').AND.(IS_ID > 0)) THEN 
+                CPT_LAWID = 0
+                DO IMAT = 1,NUMMAT
+                  IF (MAT_PARAM(IMAT)%MAT_ID == ID) THEN 
+                    MLW = MAT_PARAM(IMAT)%ILAW
+                    CPT_LAWID = 1
+                  ENDIF
+                ENDDO
+              ENDIF
+              !=====================================================================================
 c
               ALLOCATE (LAYER_INPUT(MAX(1,NLAY_MAX)*MAX(1,NIP_MAX)*MAX(1,NPLY_MAX)*MAX(1,NUVAR_MAX)*
      .                   MAX(1,IR_MAX)*MAX(1,IS_MAX)*MAX(1,IT_MAX)*MAX(1,NMDSVAR_MAX)*MAX(1,ID_MAX)*
@@ -1388,7 +1480,7 @@ C
                       IF(H3D_KEYWORD_SHELL%IS_ID == 1) THEN
                         IF(ID /= 0) IDS_INPUT(CPT_H3D) = ID
                         IF ((KEY3_GLOB(1:7) == 'FAILURE').AND.(CPT_IRUP > 0)) THEN
-                          IRUP_H3D(CPT_H3D) = IRUP_ALL(1)
+                          IRUP_H3D(CPT_H3D) = 1
                         ENDIF
                       ENDIF
 
@@ -1405,7 +1497,7 @@ C
                       ENDIF
 
                     ELSE
-                      IF(NLAY_MAX + MAX(1,NIP_MAX) + NPLY_MAX + NUVAR_MAX + NMDSVAR_MAX + ID_MAX /= 0)THEN
+                      IF(NLAY_MAX + MAX(1,NIP_MAX) + NPLY_MAX + NUVAR_MAX + NMDSVAR_MAX + ID_MAX + MODE_MAX /= 0)THEN
                         DO K=1,MAX(1,IS_LAYER_ALL*MAX(NLAY_MAX,1))
                           DO L=1,MAX(1,IS_IPT_ALL*MAX(NIP_MAX,1))
                             DO M=1,MAX(1,IS_PLY_ALL*MAX(NPLY_MAX,1))
@@ -1463,15 +1555,15 @@ c
                                       IF ((KEY3_GLOB(1:7) == 'FAILURE').AND.(CPT_IRUP > 0)) THEN
                                         IF (IS_ID_ALL == 1) THEN
                                           IDS_INPUT(CPT_H3D) = IRUP_ID_ALL(P)
-                                          IRUP_H3D(CPT_H3D)  = IRUP_ALL(P)
+                                          IRUP_H3D(CPT_H3D)  = P
                                         ELSE
-                                          IRUP_H3D(CPT_H3D)  = IRUP_ALL(1)
+                                          IRUP_H3D(CPT_H3D)  = 1
                                         ENDIF
                                       ENDIF
 
                                       MODES_INPUT(CPT_H3D) = -1
                                       IF (IS_MODE_ALL == 1) MODES_INPUT(CPT_H3D) = Q
-                                      IF (IS_MODE_ALL == 0 .AND. ID >= 1) MODES_INPUT(CPT_H3D) = MODE
+                                      IF (IS_MODE_ALL == 0 .AND. MODE >= 1) MODES_INPUT(CPT_H3D) = MODE
 c
                                       GAUSS_INPUT(CPT_H3D) = -1
 c
@@ -1561,14 +1653,36 @@ c
      .                            UVAR_INPUT(K))
                       IS_SKING = 1
                     ELSE
-
+c
+                      ! ---------------------------------------------------------------------------------------------
+                      ! /H3D/ELEM/FAILURE Specific output name
+                      ! ---------------------------------------------------------------------------------------------
                       IF ((KEY3_GLOB(1:7) == 'FAILURE').AND.(CPT_IRUP > 0)) THEN
                         TEST_CHAIN = ''
-                        WRITE(TEST_CHAIN,'(A,1X,A,1X,A)')
-     *                        TRIM(H3D_KEYWORD_SHELL_SCALAR(J)%TEXT1(1:7)),TRIM(FAIL_NAME(IRUP_H3D(K))),'Damage'
+                        IF (CPT_MOD > 0) THEN 
+                          WRITE(TEST_CHAIN,'(A,A,A,A)') "Failure:",TRIM(MODNAME(IRUP_H3D(K),MODES_INPUT(K))),
+     .                                                  "; FAIL ",TRIM(FAIL_NAME(IRUP_H3D(K)))
+                        ELSE
+                          WRITE(TEST_CHAIN,'(A,A)') "Failure:Failure index; FAIL ",TRIM(FAIL_NAME(IRUP_H3D(K)))
+                        ENDIF
                         H3D_KEYWORD_SHELL_SCALAR(J)%TEXT1 = TEST_CHAIN
                       ENDIF
-
+c
+                      ! ---------------------------------------------------------------------------------------------
+                      ! /H3D/ELEM/DAMG Specific output name
+                      ! ---------------------------------------------------------------------------------------------
+                      IF ((KEY3_GLOB(1:4) == 'DAMG').AND.(CPT_MOD > 0)) THEN
+                        TEST_CHAIN = ''
+                        WRITE(TEST_CHAIN,'(A,A,A,I3)') "Damage:",TRIM(MODNAME(1,MODES_INPUT(K))),"; LAW",MLW
+                        H3D_KEYWORD_SHELL_SCALAR(J)%TEXT1 = TEST_CHAIN
+                      ELSEIF ((KEY3_GLOB(1:4) == 'DAMG').AND.(CPT_LAWID > 0)) THEN
+                        TEST_CHAIN = ''
+                        WRITE(TEST_CHAIN,'(A,I3)') "Damage:Damage index; LAW",MLW
+                        H3D_KEYWORD_SHELL_SCALAR(J)%TEXT1 = TEST_CHAIN
+                      ELSEIF ((KEY3_GLOB(1:4) == 'DAMG').AND.(CPT_MOD == 0).AND.(CPT_LAWID == 0)) THEN 
+                        H3D_KEYWORD_SHELL_SCALAR(J)%TEXT1 = "Damage:Damage index"
+                      ENDIF 
+c
                       CALL CREATE_H3D_SHELL_SCALAR(H3D_DATA,H3D_KEYWORD_SHELL_SCALAR(J)%ID,N1,N2,ID_INPUT,
      .                           TRIM(H3D_KEYWORD_SHELL_SCALAR(J)%TEXT1),LEN_TRIM(H3D_KEYWORD_SHELL_SCALAR(J)%TEXT1),
      .                                                      H3D_KEYWORD_SHELL_SCALAR(J)%COMMENT,80,IPART,KEY3_GLOB,
@@ -1693,17 +1807,17 @@ C--------------------------------------------------
                       IF(H3D_KEYWORD_SOLID%IS_ID == 1) THEN
                         IF(ID /= 0) IDS_INPUT(CPT_H3D) = ID
                         IF ((KEY3_GLOB(1:7) == 'FAILURE').AND.(CPT_IRUP > 0)) THEN
-                          IRUP_H3D(CPT_H3D) = IRUP_ALL(1)
+                          IRUP_H3D(CPT_H3D) = 1
                         ENDIF
                       ENDIF
 
                       IF(H3D_KEYWORD_SOLID%IS_MODE == 1) THEN
-                        IF(MODE /= 0) MODES_INPUT(CPT_H3D) = MODE_MAX
+                        IF(MODE /= 0) MODES_INPUT(CPT_H3D) = MODE
                       ENDIF
 
                     ELSE
 C------ LAYER is not available for /SOLID/TENS/ in manuel, might be removed in the loop
-                      IF(NLAY_MAX + IR_MAX + IS_MAX + IT_MAX + NUVAR_MAX + NMDSVAR_MAX + ID_MAX /= 0)THEN
+                      IF(NLAY_MAX + IR_MAX + IS_MAX + IT_MAX + NUVAR_MAX + NMDSVAR_MAX + ID_MAX + MODE_MAX /= 0)THEN
                         DO K=1,MAX(1,IS_LAYER_ALL*MAX(NLAY_MAX,1))
                           DO L=1,MAX(1,IS_UVAR_ALL*MAX(NUVAR_MAX,1))
                             DO M=1,MAX(1,IS_IR_ALL*MAX(IR_MAX,1))
@@ -1711,7 +1825,7 @@ C------ LAYER is not available for /SOLID/TENS/ in manuel, might be removed in t
                                 DO O=1,MAX(1,IS_IT_ALL*MAX(IT_MAX,1))
                                   DO P=1,MAX(1,MAX(IS_MDSVAR_ALL,IS_MDSVAR_DEF)*MAX(NMDSVAR_MAX,1))
                                     DO Q=1,MAX(1,IS_ID_ALL*MAX(ID_MAX,1))
-                                      DO R=1,MAX(1,IS_ID_ALL*MAX(MODE_MAX,1))
+                                      DO R=1,MAX(1,IS_MODE_ALL*MAX(MODE_MAX,1))
                                         CPT_H3D = CPT_H3D + 1
 c
                                         LAYER_INPUT(CPT_H3D) = -1
@@ -1758,15 +1872,15 @@ c
                                         IF (IS_ID_ALL == 0 .AND. ID >= 1) IDS_INPUT(CPT_H3D) = ID
 
                                         MODES_INPUT(CPT_H3D) = -1
-                                        IF (IS_MODE_ALL == 1) MODES_INPUT(CPT_H3D) = Q
+                                        IF (IS_MODE_ALL == 1) MODES_INPUT(CPT_H3D) = R
                                         IF (IS_MODE_ALL == 0 .AND. MODE >= 1) MODES_INPUT(CPT_H3D) = MODE
 
                                         IF ((KEY3_GLOB(1:7) == 'FAILURE').AND.(CPT_IRUP > 0)) THEN
                                           IF (IS_ID_ALL == 1) THEN
                                             IDS_INPUT(CPT_H3D) = IRUP_ID_ALL(Q)
-                                            IRUP_H3D(CPT_H3D)  = IRUP_ALL(Q)
+                                            IRUP_H3D(CPT_H3D)  = Q
                                           ELSE
-                                            IRUP_H3D(CPT_H3D)  = IRUP_ALL(1)
+                                            IRUP_H3D(CPT_H3D)  = 1
                                           ENDIF
                                         ENDIF
                                         GAUSS_INPUT(CPT_H3D) = -1
@@ -1819,14 +1933,36 @@ c
                       IS_SKING = 1
                     ELSE
                       IF (IS_MDSVAR ==1) MDS_LABEL_TMP = MDS_LABEL(MDSVAR_INPUT1(K), MDSVAR_INPUT(K))
-
+c
+                      ! ---------------------------------------------------------------------------------------------
+                      ! /H3D/ELEM/FAILURE Specific output name
+                      ! ---------------------------------------------------------------------------------------------
                       IF ((KEY3_GLOB(1:7) == 'FAILURE').AND.(CPT_IRUP > 0)) THEN
                         TEST_CHAIN = ''
-                        WRITE(TEST_CHAIN,'(A,1X,A,1X,A)')
-     *                        TRIM(H3D_KEYWORD_SOLID_SCALAR(J)%TEXT1(1:7)),TRIM(FAIL_NAME(IRUP_H3D(K))),'Damage'
+                        IF (CPT_MOD > 0) THEN 
+                          WRITE(TEST_CHAIN,'(A,A,A,A)') "Failure:",TRIM(MODNAME(IRUP_H3D(K),MODES_INPUT(K))),
+     .                                                  "; FAIL ",TRIM(FAIL_NAME(IRUP_H3D(K)))
+                        ELSE
+                          WRITE(TEST_CHAIN,'(A,A)') "Failure:Failure index; FAIL ",TRIM(FAIL_NAME(IRUP_H3D(K)))
+                        ENDIF
                         H3D_KEYWORD_SOLID_SCALAR(J)%TEXT1 = TEST_CHAIN
                       ENDIF
-
+c
+                      ! ---------------------------------------------------------------------------------------------
+                      ! /H3D/ELEM/DAMG Specific output name
+                      ! ---------------------------------------------------------------------------------------------
+                      IF ((KEY3_GLOB(1:4) == 'DAMG').AND.(CPT_MOD > 0)) THEN
+                        TEST_CHAIN = ''
+                        WRITE(TEST_CHAIN,'(A,A,A,I3)') "Damage:",TRIM(MODNAME(1,MODES_INPUT(K))),"; LAW",MLW
+                        H3D_KEYWORD_SOLID_SCALAR(J)%TEXT1 = TEST_CHAIN
+                      ELSEIF ((KEY3_GLOB(1:4) == 'DAMG').AND.(CPT_LAWID > 0)) THEN
+                        TEST_CHAIN = ''
+                        WRITE(TEST_CHAIN,'(A,I3)') "Damage:Damage index; LAW",MLW
+                        H3D_KEYWORD_SOLID_SCALAR(J)%TEXT1 = TEST_CHAIN
+                      ELSEIF ((KEY3_GLOB(1:4) == 'DAMG').AND.(CPT_MOD == 0).AND.(CPT_LAWID == 0)) THEN 
+                        H3D_KEYWORD_SOLID_SCALAR(J)%TEXT1 = "Damage:Damage index"
+                      ENDIF     
+c
                       CALL CREATE_H3D_SOLID_SCALAR(H3D_DATA,H3D_KEYWORD_SOLID_SCALAR(J)%ID,ID_INPUT,
      .                            TRIM(H3D_KEYWORD_SOLID_SCALAR(J)%TEXT1),LEN_TRIM(H3D_KEYWORD_SOLID_SCALAR(J)%TEXT1),
      .                                                 H3D_KEYWORD_SOLID_SCALAR(J)%COMMENT,80,IPART,KEY3_GLOB,
@@ -1880,59 +2016,83 @@ C--------------------------------------------------
               JMAX=MAX(H3D_NUM_KEY%SPH_SCALAR, H3D_NUM_KEY%SPH_TENSOR)
               DO J=1,JMAX
                 CPT_H3D = 0
-                IF (H3D_KEYWORD_SPH_SCALAR(J)%IS_ID /= 0 ) THEN
-                  IF (IS_ID_ALL == 0) THEN
+                IF (H3D_KEYWORD_SPH_SCALAR(J)%IS_ID   /= 0 .OR.
+     .              H3D_KEYWORD_SPH_SCALAR(J)%IS_MODE /= 0) THEN
+                  IF (IS_ID_ALL == 0 .AND. IS_MODE_ALL ==0) THEN
                     CPT_H3D = CPT_H3D + 1
+                    
                     IDS_INPUT(CPT_H3D) = -1
                     IF (H3D_KEYWORD_SPH_SCALAR(J)%IS_ID == 1) THEN
                       IF (ID /= 0) IDS_INPUT(CPT_H3D) = ID
                       IF ((KEY3_GLOB(1:7) == 'FAILURE').AND.(CPT_IRUP > 0)) THEN
-                        IRUP_H3D(CPT_H3D) = IRUP_ALL(1)
+                        IRUP_H3D(CPT_H3D) = 1
                       ENDIF
                     ENDIF
+
+                    MODES_INPUT(CPT_H3D) = -1
+                    IF(H3D_KEYWORD_SPH_SCALAR(J)%IS_MODE == 1) THEN
+                      IF(MODE /= 0) MODES_INPUT(CPT_H3D) = MODE
+                    ENDIF
+
                   ELSE
-                    IF (ID_MAX /= 0) THEN
+
+                    IF ((ID_MAX + MODE_MAX /=0)) THEN
                       DO Q=1,MAX(1,IS_ID_ALL*MAX(ID_MAX,1))
-                        CPT_H3D = CPT_H3D + 1
-                        IDS_INPUT(CPT_H3D) = -1
-                        IF (IS_ID_ALL == 1) IDS_INPUT(CPT_H3D) = Q
-                        IF (IS_ID_ALL == 0 .AND. ID >= 1) IDS_INPUT(CPT_H3D) = ID
-                        IF ((KEY3_GLOB(1:7) == 'FAILURE').AND.(CPT_IRUP > 0)) THEN
-                          IF (IS_ID_ALL == 1) THEN
-                            IDS_INPUT(CPT_H3D) = IRUP_ID_ALL(Q)
-                            IRUP_H3D(CPT_H3D)  = IRUP_ALL(Q)
-                          ELSE
-                            IRUP_H3D(CPT_H3D)  = IRUP_ALL(1)
+                        DO R=1,MAX(1,IS_MODE_ALL*MAX(MODE_MAX,1))
+                          CPT_H3D = CPT_H3D + 1
+                          IDS_INPUT(CPT_H3D) = -1
+
+                          IF (IS_ID_ALL == 1) IDS_INPUT(CPT_H3D) = Q
+                          IF (IS_ID_ALL == 0 .AND. ID >= 1) IDS_INPUT(CPT_H3D) = ID
+                          IF ((KEY3_GLOB(1:7) == 'FAILURE').AND.(CPT_IRUP > 0)) THEN
+                            IF (IS_ID_ALL == 1) THEN
+                              IDS_INPUT(CPT_H3D) = IRUP_ID_ALL(Q)
+                              IRUP_H3D(CPT_H3D)  = Q
+                            ELSE
+                              IRUP_H3D(CPT_H3D)  = 1
+                            ENDIF
                           ENDIF
-                        ENDIF
+
+                          MODES_INPUT(CPT_H3D)= -1
+                          IF (IS_MODE_ALL == 1) MODES_INPUT(CPT_H3D) = R
+                          IF (IS_MODE_ALL == 0 .AND. MODE >= 1) MODES_INPUT(CPT_H3D) = MODE
+
+                        ENDDO
                       ENDDO
                     ENDIF
                   ENDIF
-                ELSEIF(H3D_KEYWORD_SHELL%IS_ID == 0 .AND. IS_ID == 0) THEN
+                ELSEIF(H3D_KEYWORD_SPH_SCALAR(J)%IS_ID == 0 .AND. IS_ID == 0 .AND. 
+     .                 H3D_KEYWORD_SPH_SCALAR(J)%IS_MODE == 0) THEN
                   CPT_H3D = CPT_H3D + 1
                   IDS_INPUT(CPT_H3D) = -1
+                  MODES_INPUT(CPT_H3D)= -1
                 ENDIF
 
                 IF ( KEY3_GLOB == H3D_KEYWORD_SPH_SCALAR(J)%KEY3 )THEN
 
+                  ! ---------------------------------------------------------------------------------------------
+                  ! /H3D/ELEM/FAILURE Specific output name
+                  ! ---------------------------------------------------------------------------------------------
                   IF((KEY3_GLOB(1:7) == 'FAILURE').AND.(CPT_IRUP > 0)) THEN
                     DO K=1,CPT_H3D
-                      IF (CPT_IRUP > 0) THEN
-                        TEST_CHAIN = ''
-                        WRITE(TEST_CHAIN,'(A,1X,A,1X,A)')
-     .                        TRIM(H3D_KEYWORD_SPH_SCALAR(J)%TEXT1(1:7)),TRIM(FAIL_NAME(IRUP_H3D(K))),'Damage'
-                        H3D_KEYWORD_SPH_SCALAR(J)%TEXT1 = TEST_CHAIN
+                      TEST_CHAIN = ''
+                      IF (CPT_MOD > 0) THEN 
+                        WRITE(TEST_CHAIN,'(A,A,A,A)') "Failure:",TRIM(MODNAME(IRUP_H3D(K),MODES_INPUT(K))),
+     .                                                "; FAIL ",TRIM(FAIL_NAME(IRUP_H3D(K)))
+                      ELSE
+                        WRITE(TEST_CHAIN,'(A,A)') "Failure:Failure index; FAIL ",TRIM(FAIL_NAME(IRUP_H3D(K)))
                       ENDIF
+                      H3D_KEYWORD_SPH_SCALAR(J)%TEXT1 = TEST_CHAIN
                       CALL CREATE_H3D_SPH_SCALAR(H3D_DATA,H3D_KEYWORD_SPH_SCALAR(J)%ID,ID_INPUT,
      .                        TRIM(H3D_KEYWORD_SPH_SCALAR(J)%TEXT1),LEN_TRIM(H3D_KEYWORD_SPH_SCALAR(J)%TEXT1),
      .                                             H3D_KEYWORD_SPH_SCALAR(J)%COMMENT,80,IPART,KEY3_GLOB,
-     .                                             IUVAR,IDS_INPUT(K))
+     .                                             IUVAR,IDS_INPUT(K),MODES_INPUT(K))
                     ENDDO
                   ELSE
                     CALL CREATE_H3D_SPH_SCALAR(H3D_DATA,H3D_KEYWORD_SPH_SCALAR(J)%ID,ID_INPUT,
      .                          TRIM(H3D_KEYWORD_SPH_SCALAR(J)%TEXT1),LEN_TRIM(H3D_KEYWORD_SPH_SCALAR(J)%TEXT1),
      .                                               H3D_KEYWORD_SPH_SCALAR(J)%COMMENT,80,IPART,KEY3_GLOB,
-     .                                               IUVAR,IDS_INPUT(1))
+     .                                               IUVAR,IDS_INPUT(1),MODES_INPUT(1))
                   ENDIF
                   IOK_H3DKEY = 1
                 ENDIF
@@ -2047,9 +2207,11 @@ C--------------------------------------------------
      .                  H3D_KEYWORD_QUAD%IS_IS /= 0 .OR.
      .                  H3D_KEYWORD_QUAD%IS_IT /= 0 .OR.
      .                  H3D_KEYWORD_QUAD%IS_UVAR /= 0 .OR.
-     .                 H3D_KEYWORD_QUAD%IS_ID /= 0  ) THEN
+     .                  H3D_KEYWORD_QUAD%IS_ID /= 0 .OR.
+     .                  H3D_KEYWORD_QUAD%IS_MODE /= 0 ) THEN
                     IF(IS_LAYER_ALL == 0 .AND. IS_IR_ALL == 0 .AND. IS_IS_ALL == 0 .AND.
-     .                    IS_IT_ALL == 0 .AND. IS_UVAR_ALL == 0 .AND. IS_ID_ALL ==0)THEN
+     .                    IS_IT_ALL == 0 .AND. IS_UVAR_ALL == 0 .AND. IS_ID_ALL ==0 .AND. 
+     .                  IS_MODE_ALL == 0)THEN
 
                       CPT_H3D = CPT_H3D + 1
                       LAYER_INPUT(CPT_H3D) = -1
@@ -2094,49 +2256,60 @@ C--------------------------------------------------
                       IF(H3D_KEYWORD_QUAD%IS_ID == 1) THEN
                         IF(ID /= 0) IDS_INPUT(CPT_H3D) = ID
                         IF ((KEY3_GLOB(1:7) == 'FAILURE').AND.(CPT_IRUP > 0)) THEN
-                          IRUP_H3D(CPT_H3D) = IRUP_ALL(1)
+                          IRUP_H3D(CPT_H3D) = 1
                         ENDIF
                       ENDIF
+
+                      IF(H3D_KEYWORD_QUAD%IS_MODE == 1) THEN
+                        IF (MODE /= 0) MODES_INPUT(CPT_H3D) = MODE
+                      ENDIF
+
                     ELSE
-                      IF(NLAY_MAX + IR_MAX + IS_MAX + IT_MAX + NUVAR_MAX + ID_MAX /= 0)THEN
+                      IF(NLAY_MAX + IR_MAX + IS_MAX + IT_MAX + NUVAR_MAX + ID_MAX + MODE_MAX /= 0)THEN
                         DO K=1,MAX(1,IS_LAYER_ALL*MAX(NLAY_MAX,1))
                           DO L=1,MAX(1,IS_UVAR_ALL*MAX(NUVAR_MAX,1))
                             DO M=1,MAX(1,IS_IR_ALL*MAX(IR_MAX,1))
                               DO N=1,MAX(1,IS_IS_ALL*MAX(IS_MAX,1))
                                 DO O=1,MAX(1,IS_IT_ALL*MAX(IT_MAX,1))
                                   DO P=1,MAX(1,IS_ID_ALL*MAX(ID_MAX,1))
-                                    CPT_H3D = CPT_H3D + 1
+                                    DO Q=1,MAX(1,IS_MODE_ALL*MAX(MODE_MAX,1))
+                                      CPT_H3D = CPT_H3D + 1
 c
-                                    LAYER_INPUT(CPT_H3D) = -1
-                                    IF (NLAY_MAX /= 0 .AND. IS_LAYER_ALL == 1) LAYER_INPUT(CPT_H3D) = K
+                                      LAYER_INPUT(CPT_H3D) = -1
+                                      IF (NLAY_MAX /= 0 .AND. IS_LAYER_ALL == 1) LAYER_INPUT(CPT_H3D) = K
 c
-                                    UVAR_INPUT(CPT_H3D) = -1
-                                    IF (NUVAR_MAX /= 0  .AND. IS_UVAR_ALL == 1) UVAR_INPUT(CPT_H3D) = L
+                                      UVAR_INPUT(CPT_H3D) = -1
+                                      IF (NUVAR_MAX /= 0  .AND. IS_UVAR_ALL == 1) UVAR_INPUT(CPT_H3D) = L
 
-                                    IR_INPUT(CPT_H3D) = -1
-                                    IF (IR_MAX /= 0  .AND. IS_IR_ALL == 1) IR_INPUT(CPT_H3D) = M
+                                      IR_INPUT(CPT_H3D) = -1
+                                      IF (IR_MAX /= 0  .AND. IS_IR_ALL == 1) IR_INPUT(CPT_H3D) = M
 
-                                    IS_INPUT(CPT_H3D) = -1
-                                    IF (IS_MAX /= 0  .AND. IS_IS_ALL == 1) IS_INPUT(CPT_H3D) = N
+                                      IS_INPUT(CPT_H3D) = -1
+                                      IF (IS_MAX /= 0  .AND. IS_IS_ALL == 1) IS_INPUT(CPT_H3D) = N
 
-                                    IT_INPUT(CPT_H3D) = -1
-                                    IF (IT_MAX /= 0  .AND. IS_IT_ALL == 1) IT_INPUT(CPT_H3D) = O
+                                      IT_INPUT(CPT_H3D) = -1
+                                      IF (IT_MAX /= 0  .AND. IS_IT_ALL == 1) IT_INPUT(CPT_H3D) = O
 
-                                    IDS_INPUT(CPT_H3D) = -1
-                                    IF(ID /= 0) IDS_INPUT(CPT_H3D) = ID
-                                    IF ((KEY3_GLOB(1:7) == 'FAILURE').AND.(CPT_IRUP > 0)) THEN
-                                      IF (IS_ID_ALL == 1) THEN
-                                        IDS_INPUT(CPT_H3D) = IRUP_ID_ALL(P)
-                                        IRUP_H3D(CPT_H3D)  = IRUP_ALL(P)
-                                      ELSE
-                                        IRUP_H3D(CPT_H3D)  = IRUP_ALL(1)
+                                      IDS_INPUT(CPT_H3D) = -1
+                                      IF(ID /= 0) IDS_INPUT(CPT_H3D) = ID
+                                      IF ((KEY3_GLOB(1:7) == 'FAILURE').AND.(CPT_IRUP > 0)) THEN
+                                        IF (IS_ID_ALL == 1) THEN
+                                          IDS_INPUT(CPT_H3D) = IRUP_ID_ALL(P)
+                                          IRUP_H3D(CPT_H3D)  = P
+                                        ELSE
+                                          IRUP_H3D(CPT_H3D)  = 1
+                                        ENDIF
                                       ENDIF
-                                    ENDIF
+
+                                      MODES_INPUT(CPT_H3D) = -1
+                                      IF (IS_MODE_ALL == 1) MODES_INPUT(CPT_H3D) = Q
+                                      IF (IS_MODE_ALL == 0 .AND. MODE >= 1) MODES_INPUT(CPT_H3D) = MODE
 c
-                                    GAUSS_INPUT(CPT_H3D) = -1
+                                      GAUSS_INPUT(CPT_H3D) = -1
 c
-                                    IS_AVAILABLE_KEY(CPT_H3D) = 1
+                                      IS_AVAILABLE_KEY(CPT_H3D) = 1
 c
+                                    ENDDO
                                   ENDDO
                                 ENDDO
                               ENDDO
@@ -2151,7 +2324,8 @@ c
      .                      H3D_KEYWORD_QUAD%IS_IS == 0 .AND. IS_IS == 0 .AND.
      .                      H3D_KEYWORD_QUAD%IS_IT == 0 .AND. IS_IT == 0 .AND.
      .                      H3D_KEYWORD_QUAD%IS_UVAR == 0 .AND. IS_UVAR == 0 .AND.
-     .                     H3D_KEYWORD_QUAD%IS_ID == 0 .AND. IS_ID == 0 ) THEN
+     .                      H3D_KEYWORD_QUAD%IS_ID == 0 .AND. IS_ID == 0 .AND. 
+     .                      H3D_KEYWORD_QUAD%IS_MODE == 0) THEN
                     CPT_H3D = CPT_H3D + 1
                     LAYER_INPUT(CPT_H3D) = -1
                     UVAR_INPUT (CPT_H3D)= -1
@@ -2163,27 +2337,34 @@ c
                     IS_INPUT(CPT_H3D) = -1
                     IT_INPUT(CPT_H3D) = -1
                     IDS_INPUT(CPT_H3D) = -1
+                    MODES_INPUT(CPT_H3D) = -1
                     IS_AVAILABLE_KEY(CPT_H3D) = 1
                   ENDIF
                 ENDIF
 
                 DO K=1,CPT_H3D
                   IF (IS_AVAILABLE_KEY(K) == 1 .AND. IS_SCALAR == 1)THEN
-
+c
+                    ! ---------------------------------------------------------------------------------------------
+                    ! /H3D/ELEM/FAILURE Specific output name
+                    ! ---------------------------------------------------------------------------------------------
                     IF ((KEY3_GLOB(1:7) == 'FAILURE').AND.(CPT_IRUP > 0)) THEN
                       TEST_CHAIN = ''
-                      WRITE(TEST_CHAIN,'(A,1X,A,1X,A)')
-     *                      TRIM(H3D_KEYWORD_QUAD_SCALAR(J)%TEXT1(1:7)),TRIM(FAIL_NAME(IRUP_H3D(K))),'Damage'
+                      IF (CPT_MOD > 0) THEN 
+                        WRITE(TEST_CHAIN,'(A,A,A,A)') "Failure:",TRIM(MODNAME(IRUP_H3D(K),MODES_INPUT(K))),
+     .                                                "; FAIL ",TRIM(FAIL_NAME(IRUP_H3D(K)))
+                      ELSE
+                        WRITE(TEST_CHAIN,'(A,A)') "Failure:Failure index; FAIL ",TRIM(FAIL_NAME(IRUP_H3D(K)))
+                      ENDIF
                       H3D_KEYWORD_QUAD_SCALAR(J)%TEXT1 = TEST_CHAIN
                     ENDIF
-
-
+c
                     CALL CREATE_H3D_QUAD_SCALAR(H3D_DATA,H3D_KEYWORD_QUAD,ID_INPUT,
      .                                        TRIM(H3D_KEYWORD_QUAD_SCALAR(J)%TEXT1),
      .                                        LEN_TRIM(H3D_KEYWORD_QUAD_SCALAR(J)%TEXT1),
      .                                        H3D_KEYWORD_QUAD_SCALAR(J)%COMMENT,80,IPART,KEY3_GLOB,
      .                                        LAYER_INPUT(K),IR_INPUT(K),IS_INPUT(K),IT_INPUT(K),
-     .                                         UVAR_INPUT(K),IDS_INPUT(K))
+     .                                         UVAR_INPUT(K),IDS_INPUT(K),MODES_INPUT(K))
                     IOK_H3DKEY = 1
                   ENDIF
 
@@ -2291,7 +2472,6 @@ C
         DEALLOCATE(H3D_KEYWORD_QUAD_VECTOR)
         DEALLOCATE(H3D_KEYWORD_QUAD_TENSOR)
         DEALLOCATE(ID_MAT_MDS)
-        IF (ALLOCATED(IRUP_ALL))    DEALLOCATE (IRUP_ALL)
         IF (ALLOCATED(IRUP_ID_ALL)) DEALLOCATE (IRUP_ID_ALL)
 C
         RETURN

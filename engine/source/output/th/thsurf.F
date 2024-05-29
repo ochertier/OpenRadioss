@@ -26,9 +26,13 @@ Chd|-- called by -----------
 Chd|        HIST2                         source/output/th/hist2.F      
 Chd|-- calls ---------------
 Chd|        WRTDES                        source/output/th/wrtdes.F     
+Chd|        TH_SURF_MOD                   ../common_source/modules/interfaces/th_surf_mod.F
 Chd|====================================================================
-      SUBROUTINE THSURF(J1  ,J2        ,L1    ,L2   ,ITHBUF,
-     .                  WA  ,FSAVSURF  ,IFORM )
+      SUBROUTINE THSURF(J1, J2, L1, L2, ITHBUF, WA, FSAVSURF, IFORM, NSURF)
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
+      USE TH_SURF_MOD , only : TH_SURF_NUM_CHANNEL
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -40,10 +44,10 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER,INTENT(IN) :: J1,J2,L1,L2
+      INTEGER,INTENT(IN) :: J1,J2,L1,L2,NSURF
       INTEGER,INTENT(IN) :: ITHBUF(*),IFORM
       my_real, INTENT(INOUT) :: WA(*)
-      my_real, INTENT(IN) :: FSAVSURF(5,*)
+      my_real, INTENT(IN) :: FSAVSURF(TH_SURF_NUM_CHANNEL,NSURF)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

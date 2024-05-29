@@ -32,7 +32,7 @@ Chd|        SHOOTING_NODE_MOD             share/modules/shooting_node_mod.F
 Chd|====================================================================
         SUBROUTINE CHECK_EDGE_STATE( ITASK,M_EDGE_NB,S_EDGE_NB,M_EDGE_ID,S_EDGE_ID,
      .                               SHIFT_INTERFACE,INTBUF_TAB,NEWFRONT,IPARI,GEO,
-     .                               IXS,IXC,IXT,IXP,IXR,IXTG,
+     .                               IXS,IXC,IXT,IXP,IXR,IXTG,IXS10,
      .                               ADDCNEL,CNEL,TAG_NODE,TAG_ELEM,SHOOT_STRUCT )
 !$COMMENT
 !       CHECK_EDGE_STATE description
@@ -62,7 +62,7 @@ C-----------------------------------------------
         INTEGER, INTENT(in) :: M_EDGE_NB,S_EDGE_NB  ! number of local edge surface
         INTEGER, DIMENSION(M_EDGE_NB), INTENT(in) :: M_EDGE_ID  ! id of main edge that need to be deactivated
         INTEGER, DIMENSION(S_EDGE_NB), INTENT(in) :: S_EDGE_ID  ! id of secon. edge that need to be deactivated
-        INTEGER, DIMENSION(NINTER), INTENT(inout) :: NEWFRONT   ! array for sorting : 1 --> need to sort the interface NIN
+        INTEGER, DIMENSION(NINTER), INTENT(inout) :: NEWFRONT   !< flag to force some exchanges related to S nodes between processor (if a S node becomes a shooting node - all interface) / force the collision detection algo if a new segment is activated for the (interface 25 + solid erosion)
         INTEGER, DIMENSION(NINTER+1,2), INTENT(in) :: SHIFT_INTERFACE ! interface shift
         TYPE(INTBUF_STRUCT_), DIMENSION(NINTER), INTENT(inout) :: INTBUF_TAB    ! interface data 
         INTEGER, DIMENSION(NPARI,NINTER), INTENT(in) :: IPARI
@@ -73,6 +73,7 @@ C-----------------------------------------------
         INTEGER, DIMENSION(NIXP,NUMELP), INTENT(in) :: IXP! beam array
         INTEGER, DIMENSION(NIXR,NUMELR), INTENT(in) :: IXR! spring array
         INTEGER, DIMENSION(NIXTG,NUMELTG), INTENT(in) :: IXTG! triangle array
+        INTEGER, DIMENSION(6,NUMELS10), INTENT(in) :: IXS10!< tetra10 data
         INTEGER, DIMENSION(0:NUMNOD+1), INTENT(in) :: ADDCNEL ! address for the CNEL array
         my_real, DIMENSION(NPROPG,NUMGEO), INTENT(in) :: GEO
         INTEGER, DIMENSION(0:LCNEL), INTENT(in) :: CNEL ! connectivity node-->element
@@ -128,7 +129,7 @@ C-----------------------------------------------
                     IF(SHOOT_STRUCT%INTER(NIN)%REMOTE_ELM_M(K)<1) THEN
                         CALL CHECK_ACTIVE_ELEM_EDGE( NUMBER_NODE, N1,N2,N3,N4,
      .                                               DEACTIVATION,GEO,IXS,IXC,
-     .                                               IXT,IXP,IXR,IXTG,ADDCNEL,CNEL,
+     .                                               IXT,IXP,IXR,IXTG,IXS10,ADDCNEL,CNEL,
      .                                               TAG_NODE,TAG_ELEM )
                     ELSE
                         DEACTIVATION = .FALSE.
@@ -177,7 +178,7 @@ C-----------------------------------------------
                     IF(SHOOT_STRUCT%INTER(NIN)%REMOTE_ELM_S(K)<1) THEN
                         CALL CHECK_ACTIVE_ELEM_EDGE( NUMBER_NODE, N1,N2,N3,N4,
      .                                               DEACTIVATION,GEO,IXS,IXC,
-     .                                               IXT,IXP,IXR,IXTG,ADDCNEL,CNEL,
+     .                                               IXT,IXP,IXR,IXTG,IXS10,ADDCNEL,CNEL,
      .                                               TAG_NODE,TAG_ELEM )
                     ELSE
                         DEACTIVATION = .FALSE.

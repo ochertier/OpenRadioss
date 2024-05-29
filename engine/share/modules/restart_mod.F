@@ -110,14 +110,14 @@ Chd|====================================================================
      .      IAD_EDGE  ,FR_EDGE,  FR_NBEDGE,IGAUP      ,NGAUP,     NODLEVXF,WEIGHT_MD,
      .      NODGLOBXFE,ELCUTC,   NODENR,   KXFENOD2ELC,ENRTAG,
      .      TABSENSOR ,ADDCSRECT,FR_NOR,   IAD_FRNOR  , PROCNOR,    
-     .      FR_EDG,    IAD_FREDG,IDRAPE,   NATIV0_SMS , SEGQUADFR,ISKWP_L, NE_NERCVOIS,  
+     .      IDRAPE,   NATIV0_SMS , SEGQUADFR,ISKWP_L, NE_NERCVOIS,  
      .      NE_LERCVOIS,  NE_NESDVOIS, NE_LESDVOIS
 
         my_real , 
      .    DIMENSION(:), ALLOCATABLE :: 
      .      X,       D,       V,       VR,      DR,      THKE,
      .      DAMPR,   DAMP,    MS,      IN,      TF,      PM, 
-     .      SKEW,    XFRAME,  GEO,     EANI,    BUFMAT,  BUFGEO,
+     .      XFRAME,  GEO,     EANI,    BUFMAT,  BUFGEO,
      .      BUFSF,   RBMPC,   GJBUFR,  W,       VEUL,    FILL, 
      .      DFILL,   ALPH,    WB,      DSAVE,   ASAVE, 
      .      SPBUF,

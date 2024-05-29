@@ -20,13 +20,6 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-C|============================================================
-C|  M75INIT                                 /mate751/m75init.F
-C|------------------------------------------------------------
-C|-- appelee par -----------
-C|         MATINI                           /mater1/matini.F
-C|-- appelle ---------------
-C|============================================================
 Chd|====================================================================
 Chd|  M75INIT                       source/materials/mat/mat075/m75init.F
 Chd|-- called by -----------
@@ -38,7 +31,7 @@ Chd|====================================================================
       SUBROUTINE M75INIT(
      1      NEL    , NUPARAM, NUVAR   , NFUNC  , IFUNC  , NPF   ,
      2      TF     , UPARAM , RHO0    , VOLUME , EINT   ,UVAR   ,
-     3      PM     , IPM    ,ID       ,TITR) 
+     3      PM     ,ID       ,TITR) 
       USE MESSAGE_MOD
 C-----------------------------------------------
 C   I M P L I C I T   T Y P E S
@@ -77,7 +70,7 @@ C----------------------------------------------------------------
       INTEGER       NEL, NUPARAM, NUVAR
       my_real
      .      UPARAM(NUPARAM), RHO0(NEL), VOLUME(NEL), EINT(NEL),
-     .      PM(NPROPM,*), IPM(NPROPMI,*)
+     .      PM(NPROPM,*)                
       INTEGER ID
       CHARACTER*nchartitle,
      .   TITR
