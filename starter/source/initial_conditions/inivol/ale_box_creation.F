@@ -23,7 +23,6 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 Chd|====================================================================
 Chd|  ALE_BOX_CREATION              source/initial_conditions/inivol/ale_box_creation.F
 Chd|-- called by -----------
-Chd|        INITIA                        source/elements/initia/initia.F
 Chd|-- calls ---------------
 Chd|====================================================================
         SUBROUTINE ALE_BOX_CREATION(NB_BOX_LIMIT,NB_CELL_X,NB_CELL_Y,NB_CELL_Z,
@@ -42,10 +41,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include "mvsiz_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------

@@ -156,7 +156,7 @@ C--------------------------------
       INTEGER 
      .   I,J,NEL,MX,NNOD,NPG,IBID,ISROT,IXLAY,NXLAY,NLAYER,NPTT,
      .   IR,IS,IT,IPT,NG,L_DIRA,L_DIRB,J1,J2,IXFEM2,IPTHK,
-     .   IORTH,ILEV,IGMAT,IGTYP,IREP,NUPARAM,IADBUF,IMAT,
+     .   IORTH,ILEV,IGMAT,IGTYP,IREP,IMAT,
      .   ACTIFXFEM, SEDRAPE,NUMEL_DRAPE
       INTEGER  MAT(MVSIZ),PID(MVSIZ),NGL(MVSIZ),FWAVE(MVSIZ)
       PARAMETER (NNOD = 4)
@@ -202,12 +202,14 @@ C--------------------------------
      .   THKE0(MVSIZ),XL2(MVSIZ),XL3(MVSIZ),XL4(MVSIZ),
      .   YL2(MVSIZ),YL3(MVSIZ),YL4(MVSIZ),FAC58(MVSIZ,2)
       my_real  BID,THKR
+      !
+      my_real, DIMENSION(MVSIZ) :: ZOFFSET
 C---
       INTEGER, ALLOCATABLE, DIMENSION(:) :: ELCRKINI
       my_real, 
      .    ALLOCATABLE, DIMENSION(:) :: DIRA,DIRB,DIR1_CRK,DIR2_CRK
       my_real,
-     .  DIMENSION(:) ,POINTER  ::  DIR_A,DIR_B,UPARAM,UVAR
+     .  DIMENSION(:) ,POINTER  ::  DIR_A,DIR_B,UVAR
       TARGET :: DIRA,DIRB
 C---
       TYPE(BUF_LAY_) ,POINTER :: BUFLY
@@ -254,9 +256,6 @@ C
       IREP  = IPARG(35)
       ACTIFXFEM = IPARG(70)
       IMAT  = IXC(1,JFT)
-      IADBUF = MAX(1,IPM(7,IMAT))
-      NUPARAM= IPM(9,IMAT)       
-      UPARAM => BUFMAT(IADBUF:IADBUF+NUPARAM)
 C-----------------------------------------
       GBUF => XFEM_STR%GBUF
 C
@@ -401,7 +400,8 @@ C
      6                NPTT   ,DT1C    ,DT1     ,IHBE   ,AMU    ,
      7                GSR    ,A11SR   ,A12SR   ,NUSR   ,SHFSR  ,
      8                KRZ    ,IGEO    ,A11R  ,ISUBSTACK, STACK%PM, 
-     9                UPARAM ,DIRA    ,DIRB    ,UVAR   ,FAC58  )
+     9                MAT_ELEM%MAT_PARAM(IMAT)%UPARAM ,DIRA    ,DIRB    ,
+     A                UVAR   ,FAC58  ,NEL     ,ZOFFSET)
 C
         CALL CNCOEFORT(JFT    ,JLT    ,PM       ,MAT     ,GEO    ,  
      1                 PID    ,MTN    ,NPTT     ,HM      ,HF     ,  
@@ -503,7 +503,7 @@ C
      5             IOFC   ,NNOD   ,AREA   , G      ,SHF   ,
      6             MSC    ,DMELC  ,JSMS   , BID    ,IGTYP ,
      7             IGMAT  ,A11R   ,GBUF%G_DT, GBUF%DT,MTN   ,
-     8             PM     ,MAT(JFT))
+     8             PM     ,MAT(JFT),NEL     ,ZOFFSET)
         CALL CZFINTCE(JFT  ,JLT  ,THK0 ,THK02,A_I    ,X13    ,
      2                X24  ,Y13  ,Y24  ,Z1   ,MX23   ,MX13   ,
      3                MX34 ,MY13 ,MY23 ,MY34 ,FORG   ,MOMG   ,

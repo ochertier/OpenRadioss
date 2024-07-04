@@ -57,6 +57,7 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE TRI7BOX
       USE INTBUFDEF_MOD
+      use check_sorting_criteria_mod , only : check_sorting_criteria
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -78,7 +79,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER NIN ,ITASK, RETRI, NRTM_T, ESHIFT
+      INTEGER, INTENT(IN) :: ITASK
+      INTEGER NIN , RETRI, NRTM_T, ESHIFT
       INTEGER IPARI(NPARI,NINTER),  ITAB(*),
      .        WEIGHT(*), IAD_ELEM(2,*) ,FR_ELEM(*),
      .        ISENDTO(NINTER+1,*),IRCVFROM(NINTER+1,*),NODNX_SMS(*), 
@@ -99,10 +101,19 @@ C-----------------------------------------------
       INTEGER, DIMENSION(:), ALLOCATABLE :: OLDINBUF1, OLDINBUF2
 C     REAL
       my_real
-     .   STARTT, GAP, MAXBOX, MINBOX, STOPT,DIST,TZINF,
+     .   GAP, MAXBOX, MINBOX, TZINF,
      .   XMAXL, YMAXL, ZMAXL, XMINL, YMINL, ZMINL, INACTI,DRAD,DGAPLOAD
       INTEGER :: NMN, NSN,NTY,NRTS,NRTM
+      logical :: need_computation
 C-----------------------------------------------
+
+      ! --------------
+      ! check if the current interface needs to be sorted
+      call check_sorting_criteria( need_computation,nin,npari,nspmd,  
+     .                             itask,ipari(1,nin),tt,intbuf_tab )
+      if( .not.need_computation ) return
+      ! --------------
+
       I_MEM = 0
       I_MEMG = 0
 C
@@ -124,16 +135,9 @@ C
         NSNROLD = 0
       ENDIF
 C
-      STARTT=INTBUF_TAB%VARIABLES(3)
-      STOPT =INTBUF_TAB%VARIABLES(11)
-      IF(STARTT>TT) RETURN
-      IF(TT>STOPT)  RETURN
-C
       GAP  = INTBUF_TAB%VARIABLES(2)
       DRAD =INTBUF_TAB%VARIABLES(24)
-      DIST = INTBUF_TAB%VARIABLES(5)
       DGAPLOAD =INTBUF_TAB%VARIABLES(46)
-      IF (DIST>ZERO) RETURN
       RETRI=1
 C -------------------------------------------------------------
 C

@@ -45,9 +45,8 @@ Chd|        CUSERINI4                     source/elements/shell/coqueba/cuserini
 Chd|        LAYINI1                       source/elements/shell/coqueba/layini1.F
 Chd|        THICKINI                      source/elements/shell/coqueba/thickini.F
 Chd|        DRAPE_MOD                     share/modules1/drape_mod.F    
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        GROUP_PARAM_MOD               ../common_source/modules/mat_elem/group_param_mod.F
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
+Chd|        MAT_ELEM_MOD                  ../common_source/modules/mat_elem/mat_elem_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        NLOCAL_REG_MOD                ../common_source/modules/nlocal_reg_mod.F
 Chd|        STACK_MOD                     share/modules1/stack_mod.F    
@@ -69,13 +68,12 @@ Chd|====================================================================
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
-      USE ELBUFDEF_MOD            
+      USE MAT_ELEM_MOD            
       USE MESSAGE_MOD            
       USE STACK_MOD
       USE GROUP_PARAM_MOD
       USE NLOCAL_REG_MOD   
       USE DRAPE_MOD           
-      USE MATPARAM_DEF_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -285,10 +283,10 @@ c
         CALL CMAINI3(ELBUF_STR,PM       ,GEO      ,NEL       ,NLAY     ,
      .               SKEW     ,IGEO ,IXTG(1,NFT+1),NIXTG     ,NUMELTG  ,
      .               NSIGSH   ,SIGSH    ,PTSH3N   ,IGTYP     ,IORTHLOC ,
-     .               IPM      ,ID       ,ALDT     ,BUFMAT    ,
+     .               IPM      ,ID       ,ALDT     ,MAT_PARAM,
      .               IR       ,IS       ,ISUBSTACK,STACK     ,IREP     ,
      .               DRAPE    ,SH3ANG(NFT+1),GEO_STACK,IGEO_STACK,
-     .               IGMAT    ,IMAT     ,IPROP   ,
+     .               IGMAT    ,IMAT     ,IPROP    ,NUMMAT,
      .               X1  ,X2  ,X3  ,X4  ,Y1  ,Y2  ,
      .               Y3  ,Y4  ,Z1  ,Z2  ,Z3  ,Z4  ,
      .               E1X ,E2X ,E3X ,E1Y ,E2Y ,E3Y ,E1Z ,E2Z ,E3Z ,X ,
@@ -347,13 +345,13 @@ C     CALCUL DES DEFORMATIONS INITIALES (MEMBRANE)
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7--
       IF (ISTRAIN == 1 .AND. NXREF > 0) THEN
         UVAR => ELBUF_STR%BUFLY(1)%MAT(1,1,1)%VAR  ! 
-        CALL CDKEPSINI(ELBUF_STR,
+        CALL CDKEPSINI(ELBUF_STR,MAT_PARAM(IMAT),
      .       LFT     ,LLT     ,ISMSTR    ,MTN      ,ITHK     ,
      .       PM      ,GEO     ,IXTG(1,NFT+1),X ,XREFTG(1,1,NFT+1),
      .       GBUF%FOR,GBUF%THK,GBUF%EINT,GBUF%STRA,
      .       PX2     ,PY2     ,PX3      ,PY3       ,X2S      ,
      .       Y2S     ,X3S     ,Y3S      ,GBUF%OFF  ,IMAT     ,
-     .       UVAR    ,BUFMAT  ,IPM      ,IGEO      ,NEL      ,
+     .       UVAR    ,IPM      ,NEL      ,
      .       NLAY    ,DIR_A   ,DIR_B    ,GBUF%SIGI ,NPF      ,
      .       TF      ,IREP    )
 c

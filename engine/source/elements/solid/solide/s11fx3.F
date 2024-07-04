@@ -31,20 +31,21 @@ Chd|====================================================================
       SUBROUTINE S11FX3(
      1   PM,         FLUX,       ALE_CONNECT,IXS,
      2   IPM,        BUFMAT,     NEL,        NFT,
-     3   JALE,       JEUL)
+     3   JALE,       JEUL  ,     NUMMAT,     S_IXS)
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
       USE ALE_CONNECTIVITY_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 #include      "comlock.inc"
+#include      "task_c.inc"
 C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "param_c.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -52,17 +53,17 @@ C-----------------------------------------------
       INTEGER, INTENT(IN) :: NFT
       INTEGER, INTENT(IN) :: JALE
       INTEGER, INTENT(IN) :: JEUL
-      my_real
-     .  PM(NPROPM,*),FLUX(6,*),BUFMAT(*)
-      INTEGER
-     .  IXS(NIXS,*),IPM(NPROPMI,*)
+      INTEGER, INTENT(IN) :: NUMMAT
+      INTEGER, INTENT(IN) :: S_IXS
+      my_real PM(NPROPM,NUMMAT),FLUX(6,*),BUFMAT(*)
+      INTEGER, INTENT(IN) :: IXS(NIXS,S_IXS),IPM(NPROPMI,NUMMAT)
       TYPE(t_ale_connectivity), INTENT(IN) :: ALE_CONNECT
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, J,JJ,II,K,IFLG,IADBUF,IAD2
 C-----------------------------------------------
-C     Enthalpie entrante par loi 11
+C     Incomping Enthalpy material law 11
 C-----------------------------------------------
       IF(JEUL+JALE==1)THEN
           DO I=1,NEL
@@ -77,7 +78,7 @@ C-----------------------------------------------
                     FLUX(K,I) = MAX(FLUX(K,I),ZERO)
                 !TEST LAW51 IFORM=3
                 ELSEIF(NINT(PM(19,J))==51)THEN
-                  IADBUF = NINT(PM(27,J))
+                  IADBUF = IPM(27,J)
                   IFLG   = NINT(BUFMAT(31+IADBUF-1))
                   IF (IFLG == 6)THEN
                     FLUX(K,I) = MAX(FLUX(K,I),ZERO)

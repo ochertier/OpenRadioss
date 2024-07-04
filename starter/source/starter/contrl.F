@@ -69,12 +69,11 @@ Chd|        ALEFVM_MOD                    ../common_source/modules/ale/alefvm_mo
 Chd|        ALEMUSCL_MOD                  ../common_source/modules/ale/alemuscl_mod.F
 Chd|        ALE_EBCS_MOD                  ../common_source/modules/ale/ale_ebcs_mod.F
 Chd|        ALE_MOD                       ../common_source/modules/ale/ale_mod.F
-Chd|        ANIM_MOD                      ../common_source/modules/anim_mod.F
+Chd|        ANIM_MOD                      ../common_source/modules/output/anim_mod.F
 Chd|        CHECK_MOD                     ../common_source/modules/check_mod.F
 Chd|        DETONATORS_MOD                share/modules1/detonators_mod.F
 Chd|        GRP_SIZE_MOD                  share/modules1/grp_size_mod.F 
 Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        INIVOL_ARRAY_MOD              share/modules1/inivol_mod.F   
 Chd|        INIVOL_DEF_MOD                share/modules1/inivol_mod.F   
 Chd|        INOUTFILE_MOD                 ../common_source/modules/inoutfile_mod.F
 Chd|        MAT_ELEM_MOD                  ../common_source/modules/mat_elem/mat_elem_mod.F
@@ -100,8 +99,7 @@ C-----------------------------------------------
       USE INOUTFILE_MOD
       USE SETDEF_MOD
       USE DETONATORS_MOD
-      USE INIVOL_DEF_MOD
-      USE INIVOL_ARRAY_MOD
+      USE INIVOL_DEF_MOD , ONLY : NUM_INIVOL
       USE REFSTA_MOD
       USE ALE_EBCS_MOD
       USE RESTMOD
@@ -907,7 +905,7 @@ C-----
       CALL HM_OPTION_COUNT('/INIMAP1D', NINIMAP1D)
       CALL HM_OPTION_COUNT('/INIMAP2D', NINIMAP2D)
 C-----
-      CALL HM_OPTION_COUNT('/INIVOL' ,NINIVOL)
+      CALL HM_OPTION_COUNT('/INIVOL' ,NUM_INIVOL)
 C---------------------------------------------------
 C     Thermal FE options 
 C---------------------------------------------------
@@ -2032,6 +2030,7 @@ C-----------------------------------------------
 C-----------------------------------------------
       IFUND=0
       IO_ERR1 = 0
+      NPRT = 0
 C-----------------------------------------------
 C     Lecture des donnees dans le fichier engine
 C-----------------------------------------------   

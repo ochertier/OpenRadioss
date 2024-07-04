@@ -159,9 +159,7 @@ C     REAL OU REAL*8
      .   STIFN(*), STIFR(*),FSKY(*),TANI(6,*),THKE(*),
      .   FZERO(3,4,*),TEMP(*),FTHE(*),FTHESKY(*),GRESAV(*),
      .   MSC(*), DMELC(*),CONDN(*),CONDNSKY(*)
-      my_real    
-     .   DT1, DT2T
-      TARGET :: BUFMAT
+      my_real DT1, DT2T
       TYPE(TTABLE) TABLE(*)
       TYPE (ELBUF_STRUCT_), TARGET :: ELBUF_STR
       TYPE (NLOCAL_STR_)  , TARGET :: NLOC_DMG 
@@ -230,17 +228,18 @@ C--------------------------------
      .  MX13T(MVSIZ), MX23T(MVSIZ), MX34T(MVSIZ),
      .  MY13T(MVSIZ), MY23T(MVSIZ), MY34T(MVSIZ), Z1T(MVSIZ),
      .  A_IT(MVSIZ),F_DEF(MVSIZ,8), U13(MVSIZ,2),U24(MVSIZ,2),
-     .  AXYZ(MVSIZ,4),WXY(MVSIZ),FAC58(MVSIZ,2)  
+     .  AXYZ(MVSIZ,4),WXY(MVSIZ),FAC58(MVSIZ,2) 
+       my_real , DIMENSION (NEL) :: ZOFFSET
 C--- Variables pour le non-local
       INTEGER :: NDDL, K, INOD(4),NC1(MVSIZ), NC2(MVSIZ), NC3(MVSIZ), NC4(MVSIZ),
-     .           IPOS(4), L_NLOC, IMAT, INLOC,NUPARAM,IADBUF,IINT
+     .           IPOS(4), L_NLOC, IMAT, INLOC,IINT
       my_real, DIMENSION(:,:), ALLOCATABLE :: VAR_REG
       my_real, DIMENSION(:), POINTER :: BPRELD,DNL,UVAR
 C---
       INTEGER, DIMENSION(NEL) :: OFFLY
       INTEGER, ALLOCATABLE, DIMENSION(:) :: ELCRKINI
       my_real, ALLOCATABLE, DIMENSION(:) :: DIRA,DIRB,DIR1_CRK,DIR2_CRK
-      my_real, DIMENSION(:) ,POINTER     :: DIR_A,DIR_B,CRKDIR,CRKLEN,DADV,UPARAM
+      my_real, DIMENSION(:) ,POINTER     :: DIR_A,DIR_B,CRKDIR,CRKLEN,DADV
       TARGET :: DIRA,DIRB
 C-----
       TYPE(BUF_LAY_) ,POINTER :: BUFLY
@@ -351,9 +350,6 @@ C
       IMAT  = IXC(1,JFT)
       IGTYP = IGEO(11,PID(1))
       IGMAT = IGEO(98,PID(1))
-      IADBUF = MAX(1,IPM(7,IMAT))
-      NUPARAM= IPM(9,IMAT)       
-      UPARAM => BUFMAT(IADBUF:IADBUF+NUPARAM)
 c--------------------------------------------
 c     Front wave
 c--------------------------------------------
@@ -428,7 +424,8 @@ C
      6              NPTTOT ,DT1C    ,DT1     ,IHBE    ,AMU     ,
      7              GSR    ,A11SR   ,A12SR   ,NUSR    ,SHFSR   ,
      8              KRZ    ,IGEO    ,A11R , ISUBSTACK , STACK%PM,
-     9              UPARAM ,DIRA    ,DIRB    ,UVAR    ,FAC58   )
+     9              MAT_ELEM%MAT_PARAM(IMAT)%UPARAM ,DIRA    ,DIRB    ,
+     A              UVAR   ,FAC58   ,NEL     ,ZOFFSET )
 C       
       CALL CNCOEFORT(JFT    ,JLT    ,PM        ,MAT     ,GEO     ,
      1               PID    ,MTN    ,NPTTOT    ,HM      ,HF      ,
@@ -595,7 +592,7 @@ C
      5        IOFC  ,NNOD ,AREA,G  ,SHF   ,
      6        MSC   ,DMELC,JSMS,BID , IGTYP ,
      7        IGMAT  ,A11R   ,GBUF%G_DT, GBUF%DT,MTN   ,
-     8        PM     ,MAT(JFT))
+     8        PM     ,MAT(JFT),NEL, ZOFFSET)
 c-------------------------------
          CALL CZFINTCE(JFT  ,JLT  ,THK0 ,THK02,A_I     ,X13     ,
      2                 X24  ,Y13  ,Y24  ,Z1   ,MX23    ,MX13    ,

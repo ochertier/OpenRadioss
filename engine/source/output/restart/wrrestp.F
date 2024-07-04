@@ -25,23 +25,45 @@ Chd|  WRRESTP                       source/output/restart/wrrestp.F
 Chd|-- called by -----------
 Chd|        RESOL                         source/engine/resol.F         
 Chd|-- calls ---------------
+Chd|        ALELAG_WREST                  source/output/restart/wrrest.F
+Chd|        CLOSE_C                       ../common_source/tools/input_output/write_routtines.c
 Chd|        COMPRESS_I_NNZ                ../common_source/comm/compress_nnz.F
 Chd|        COMPRESS_R_NNZ                ../common_source/comm/compress_nnz.F
+Chd|        CONVWREST                     source/output/restart/wrrest.F
+Chd|        CRKXFEM_WREST                 source/output/restart/wrrest.F
+Chd|        CRKXFEM_WRESTANIM             source/output/restart/wrrest.F
 Chd|        CUR_FIL_C                     ../common_source/tools/input_output/write_routtines.c
+Chd|        DRAPE_WREST                   source/output/restart/wrrest.F
 Chd|        EIGWREST                      source/output/restart/wrrest.F
+Chd|        FVWREST                       source/output/restart/wrrest.F
 Chd|        FXBWREST                      source/output/restart/wrrest.F
+Chd|        FXFLUXWREST                   source/constraints/thermic/fxfluxwrest.F
+Chd|        FXTEMPWREST                   source/output/restart/wrrest.F
+Chd|        IMPWREST                      source/output/restart/wrrest.F
+Chd|        IMP_TRANS                     source/output/restart/wrrest.F
 Chd|        INTFRIC_WRESTI                share/modules/intbuf_fric_mod.F
 Chd|        INTFRIC_WRESTR                share/modules/intbuf_fric_mod.F
 Chd|        INTSTAMP_WRESTI               share/modules/intstamp_mod.F  
 Chd|        INTSTAMP_WRESTR               share/modules/intstamp_mod.F  
+Chd|        NFWREST                       source/output/restart/wrrest.F
+Chd|        NITSCHEWREST                  source/output/restart/wrrest.F
 Chd|        OPEN_C                        ../common_source/tools/input_output/write_routtines.c
 Chd|        PBLAST_WRITE_ENGINE           ../common_source/modules/loads/pblast_mod.F
+Chd|        PLYXFEM_WRAVUPLY              source/output/restart/wrrest.F
+Chd|        PLYXFEM_WREST                 source/output/restart/wrrest.F
+Chd|        PLYXFEM_WRESTANIM             source/output/restart/wrrest.F
+Chd|        PLY_INFO_WREST                source/output/restart/wrrest.F
+Chd|        RADIAWREST                    source/output/restart/wrrest.F
+Chd|        RIGMATWREST                   source/output/restart/wrrest.F
+Chd|        RTHBUFWREST                   source/output/restart/wrrest.F
 Chd|        SPMD_GLOB_DMIN9               source/mpi/fluid/spmd_cfd.F   
 Chd|        SPMD_GLOB_DSUM9               source/mpi/interfaces/spmd_th.F
 Chd|        SPMD_SAVEFI                   source/mpi/interfaces/spmd_i7tool.F
 Chd|        SPMD_SAVESPH                  source/mpi/sph/spmd_sptool.F  
+Chd|        STACK_WREST                   source/output/restart/wrrest.F
 Chd|        TABLE_WRESTI                  source/tools/curve/table_tools.F
 Chd|        TABLE_WRESTR                  source/tools/curve/table_tools.F
+Chd|        THCWREST                      source/output/restart/wrrest.F
 Chd|        THSURF_WRITE_RESTART          ../common_source/modules/interfaces/th_surf_mod.F
 Chd|        USERWI_WRITE                  source/user_interface/userwindow_interface_routines.F
 Chd|        WRCOMI                        source/output/restart/wrcomm.F
@@ -58,6 +80,7 @@ Chd|        WRITE_NLOC_STRUCT             source/output/restart/write_nloc_struc
 Chd|        WRITE_PCYL                    source/output/restart/write_pcyl.F
 Chd|        WRITE_SENSORS                 source/output/restart/write_sensors.F
 Chd|        WRITE_TH_RESTART              source/output/th/write_th_restart.F
+Chd|        WRITE_UNITS                   ../common_source/comm/write_units.F
 Chd|        W_BUFBRIC_22                  source/interfaces/int22/w_bufbric_22.F
 Chd|        W_CLUSTER                     source/output/cluster/w_cluster.F
 Chd|        W_ELBUF_STR                   source/elements/elbuf/w_elbuf_str.F
@@ -66,10 +89,12 @@ Chd|        W_GROUP_STR                   source/output/restart/w_group_str.F
 Chd|        W_LINE_STR                    source/output/restart/w_line_str.F
 Chd|        W_SUBSET_STR                  source/output/restart/w_subset_str.F
 Chd|        W_SURF_STR                    source/output/restart/w_surf_str.F
+Chd|        ALEFVM_MOD                    ../common_source/modules/ale/alefvm_mod.F
 Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
 Chd|        ALE_MOD                       ../common_source/modules/ale/ale_mod.F
 Chd|        CLUSTER_MOD                   share/modules/cluster_mod.F   
 Chd|        DAMP_MOD                      share/modules/damp_mod.F      
+Chd|        DRAPE_MOD                     share/modules/drape_mod.F     
 Chd|        EBCS_MOD                      ../common_source/modules/boundary_conditions/ebcs_mod.F
 Chd|        ECND_MOD                      share/modules/ecdn_mod.F      
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
@@ -96,18 +121,23 @@ Chd|        SEATBELT_MOD                  ../common_source/modules/seatbelt_mod.
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
 Chd|        SMS_MOD                       share/modules/sms_mod.F       
 Chd|        SPH_MOD                       share/modules/sph_mod.F       
+Chd|        STACK_MOD                     share/modules/stack_mod.F     
 Chd|        STATE_MOD                     ../common_source/modules/state_mod.F
 Chd|        TABLE_GLOB_MOD                share/modules/table_glob_mod.F
+Chd|        TIME_MOD                      share/modules/time_mod.F      
 Chd|        USER_WINDOWS_MOD              ../common_source/modules/user_windows_mod.F
+Chd|        XFEM2VARS_MOD                 share/modules/xfem2vars_mod.F 
 Chd|====================================================================
-      SUBROUTINE WRRESTP(AF    ,IAF       ,XDP       ,ICH       ,ADDCNE,
-     .           ELBUF_TAB     ,XFEM_TAB  ,INTBUF_TAB, MULTI_FVM,MAT_ELEM,
-     .           H3D_DATA      ,INTBUF_FRIC_TAB,SUBSET,
-     .           PINCH_DATA    ,ALE_CONNECTIVITY, T_MONVOL,
-     .           SENSORS       ,EBCS_TAB  ,DYNAIN_DATA,USER_WINDOWS,OUTPUT,
-     .           INTERFACES    ,LOADS     ,PYTHON, NAMES_AND_TITLES,
-     .           EIGIPM        ,EIGIBUF   ,EIGRPM, NEIPM, LEIBUF, NERPM,
-     .           SKEWS)
+      SUBROUTINE WRRESTP(AF         ,IAF      ,XDP        ,ICH       ,ADDCNE,
+     .                   ELBUF_TAB  ,XFEM_TAB        ,INTBUF_TAB ,MULTI_FVM   ,MAT_ELEM         ,
+     .                   H3D_DATA   ,INTBUF_FRIC_TAB ,SUBSET     ,PINCH_DATA  ,ALE_CONNECTIVITY ,
+     .                   T_MONVOL   ,SENSORS         ,EBCS_TAB   ,DYNAIN_DATA ,USER_WINDOWS     ,
+     .                   OUTPUT     ,INTERFACES      ,LOADS      ,PYTHON      ,NAMES_AND_TITLES ,
+     .                   EIGIPM     ,EIGIBUF         ,EIGRPM     ,NEIPM       ,LEIBUF           ,
+     .                   NERPM      ,IFLOW           ,RFLOW      ,LIFLOW      ,LRFLOW           ,
+     .                   IMPBUF_TAB ,IMPL_S          ,IMPL_S0    ,MCP         ,TEMP             ,
+     .                   FORNEQS    ,UNITAB          ,STACK      ,NDRAPE      ,DRAPE_SH3N       ,
+     .                   DRAPE_SH4N ,DRAPEG          ,RESTSIZE   ,SKEWS)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -145,9 +175,16 @@ C-----------------------------------------------
       USE INTERFACES_MOD
       USE PYTHON_FUNCT_MOD
       USE DAMP_MOD
+      USE XFEM2VARS_MOD
+      USE ALEFVM_MOD
       USE NAMES_AND_TITLES_MOD, only:NAMES_AND_TITLES_,LTITLE
       USE BCS_MOD , only : BCS
       USE SKEW_MOD
+      USE IMPBUFDEF_MOD, only: IMPBUF_STRUCT_
+      USE UNITAB_MOD, ONLY : UNIT_TYPE_
+      USE STACK_MOD
+      USE DRAPE_MOD
+      USE TIME_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -155,9 +192,15 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: NDRAPE
+      INTEGER, INTENT(IN) :: IMPL_S
+      INTEGER, INTENT(IN) :: IMPL_S0
+      my_real, INTENT(INOUT) :: MCP(NUMNOD)
+      my_real, INTENT(INOUT) :: TEMP(NUMNOD)      
       INTEGER, INTENT(INOUT) :: NEIPM, LEIBUF, NERPM
       INTEGER, INTENT(INOUT) :: EIGIPM(NEIPM,NEIG),EIGIBUF(LEIBUF)
       my_real, INTENT(INOUT) :: EIGRPM(NERPM,NEIG)
+      INTEGER, INTENT(IN) :: FORNEQS(3,NUMNOD)
       INTEGER IAF(*),ICH,ADDCNE(*)
       my_real  AF(*)
       DOUBLE PRECISION XDP(*)
@@ -183,6 +226,11 @@ c     TYPE (CLUSTER_) ,DIMENSION(NCLUSTER) :: CLUSTER
       TYPE(PYTHON_)         ,INTENT(INOUT)                :: PYTHON
       TYPE(NAMES_AND_TITLES_),INTENT(IN)                  :: NAMES_AND_TITLES !< NAMES_AND_TITLES host the input deck names and titles for outputs
       TYPE(SKEW_),INTENT(IN)                              :: SKEWS
+      TYPE(IMPBUF_STRUCT_), TARGET :: IMPBUF_TAB
+      TYPE(UNIT_TYPE_) :: UNITAB !< structure containing units conversion ratios
+      TYPE (STACK_PLY) :: STACK
+      TYPE(DRAPE_)     :: DRAPE_SH3N(NUMELTG_DRAPE),DRAPE_SH4N(NUMELC_DRAPE)
+      TYPE(DRAPEG_)    :: DRAPEG
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -238,12 +286,18 @@ C-----------------------------------------------
       INTEGER :: MY_SIZE
       INTEGER,DIMENSION(LTITLE) :: ITITLE
       INTEGER :: SKEW_LEN
+      INTEGER, INTENT(IN) :: LIFLOW  !< Size of IFLOW
+      INTEGER, INTENT(IN) :: LRFLOW  !< Size of RFLOW
+      INTEGER, INTENT(IN), DIMENSION(LIFLOW) :: IFLOW
+      INTEGER, INTENT(IN), DIMENSION(LRFLOW) :: RFLOW
 C-----------------------------------------------
 C     Python interface
 C-----------------------------------------------
       INTEGER, DIMENSION(:), ALLOCATABLE :: BUFFER
       INTEGER :: BUFFER_SIZE
-
+C-----------------------------------------------
+C     Restart size
+      INTEGER,INTENT(INOUT) :: RESTSIZE
 C-----------------------------------------------
       DATA IJK/'I','J','K','L','M','N','O','P','Q','R',
      .         'S','T','U','V','W','X','Y','Z','A','B',
@@ -1418,6 +1472,7 @@ C
         CALL WRITE_I_C(RETRACTOR(I)%ISENS, 2)
         CALL WRITE_I_C(RETRACTOR(I)%TENS_TYP, 1)
         CALL WRITE_I_C(RETRACTOR(I)%LOCKED, 1)
+        CALL WRITE_I_C(RETRACTOR(I)%LOCKED_FREEZE, 1)
         CALL WRITE_I_C(RETRACTOR(I)%PRETENS_ACTIV, 1)
         CALL WRITE_I_C(RETRACTOR(I)%INACTI_NNOD, 1)
         CALL WRITE_I_C(RETRACTOR(I)%INACTI_NNOD_MAX, 1)
@@ -1432,6 +1487,7 @@ C
         CALL WRITE_DB(RETRACTOR(I)%PULLOUT, 1)
         CALL WRITE_DB(RETRACTOR(I)%UNLOCK_FORCE, 1)
         CALL WRITE_DB(RETRACTOR(I)%LOCK_PULL, 1)
+        CALL WRITE_DB(RETRACTOR(I)%LOCK_PULL_SAV, 1)
         CALL WRITE_DB(RETRACTOR(I)%LOCK_OFFSET, 1)
         CALL WRITE_DB(RETRACTOR(I)%LOCK_YIELD_FORCE, 1)
         CALL WRITE_DB(RETRACTOR(I)%RINGSLIP, 1)
@@ -1442,12 +1498,12 @@ C
       ENDDO
 C
       IF (N_ANCHOR_REMOTE > 0) THEN
-        CALL WRITE_I_C(ANCHOR_REMOTE%ADD_PROC, NSPMD)
+        CALL WRITE_I_C(ANCHOR_REMOTE%ADD_PROC, NSPMD+1)
         CALL WRITE_I_C(ANCHOR_REMOTE%NODE, N_ANCHOR_REMOTE)
       ENDIF
 C
       IF (N_ANCHOR_REMOTE_SEND > 0) THEN
-        CALL WRITE_I_C(ANCHOR_REMOTE_SEND%ADD_PROC, NSPMD)
+        CALL WRITE_I_C(ANCHOR_REMOTE_SEND%ADD_PROC, NSPMD+1)
         CALL WRITE_I_C(ANCHOR_REMOTE_SEND%NODE, N_ANCHOR_REMOTE_SEND)
       ENDIF
 C
@@ -1483,12 +1539,81 @@ C--------------------------------------
       IF (NDAMP_VREL > 0) THEN
         CALL WRITE_I_C(ID_DAMP_VREL,NDAMP_VREL)
         CALL WRITE_I_C(FR_DAMP_VREL,NDAMP_VREL*(NSPMD+2)) 
-      ENDIF         
+      ENDIF
 C--------------------------------------
+      IF (NFLOW>0) CALL NFWREST(IFLOW, RFLOW)
+c     
+      CALL FVWREST()  
+c
+      IF (IMPL_S>0) THEN
+        CALL IMP_TRANS(IMPBUF_TAB%R_IMP)
+        CALL IMPWREST(IMPL_S0)
+      ENDIF
+c
+      IF(ITHERM_FE > 0 )CALL THCWREST(MCP, TEMP)
+C
+      IF(NITSCHE > 0 )CALL NITSCHEWREST(FORNEQS)
+c
+      CALL WRITE_UNITS(UNITAB)
+c
+      IF(IRIGID_MAT > 0 )CALL RIGMATWREST(RBYM ,IRBYM ,LNRBYM,WEIGHT_RM)
+
+C thermal boundary
+      IF(NUMCONV > 0 )  CALL CONVWREST(IBCV, FCONV)
+      IF(NUMRADIA > 0 ) CALL RADIAWREST(IBCR, FRADIA)
+      IF(NFXFLUX > 0 )  CALL FXFLUXWREST(IBFFLUX, FBFFLUX)
+      IF(NFXTEMP > 0 )  CALL FXTEMPWREST(IBFTEMP, FBFTEMP)
+c Ply XFEM
+      IF (IPLYXFEM > 0)THEN
+        CALL PLYXFEM_WREST(MS_PLY,ZI_PLY,INOD_PXFEM,IEL_PXFEM,
+     .                     ICODE_PLY,ISKEW_PLY,MSZ2)
+        CALL PLYXFEM_WRESTANIM()
+        CALL PLYXFEM_WRAVUPLY()
+      ENDIF  
+c
+      IF (NLOADC > 0) CALL WRITE_DB(CFIELD,LFACLOAD*NLOADC)
+      IF (NLOADP > 0) CALL WRITE_DB(LOADP,LFACLOAD*NLOADP)
+      IF (NINTLOADP > 0) CALL WRITE_DB(DGAPLOADINT,NINTER*NLOADP_HYD)
+C
+C xfem for layerd shell (cracks)
+      IF (ICRACK3D > 0) THEN
+        CALL CRKXFEM_WREST(INOD_CRKXFEM,IEL_CRKXFEM,NODLEVXF)
+        CALL CRKXFEM_WRESTANIM(CRKEDGE,CRKSKY,INDX_CRK,XEDGE4N,XEDGE3N)
+      ENDIF
+C
+      IF(ALEFVM_Param%IEnabled > 0) CALL WRITE_DB(ALEFVM_Buffer%FCELL ,6*NUMELS)
+C foam + air
+      IF(IALELAG > 0 )CALL ALELAG_WREST()
+C THoutput
+      IF(SRTHBUF > 0) CALL RTHBUFWREST()
+C Knot
+      IF (SKNOT > 0) CALL WRITE_DB(KNOT,SKNOT)
+      IF (SKNOTLOCPC > 0) CALL WRITE_DB(KNOTLOCPC,SKNOTLOCPC)
+      IF (SKNOTLOCEL > 0) CALL WRITE_DB(KNOTLOCEL,SKNOTLOCEL)
+      IF (NUMELIG3D > 0) CALL WRITE_DB(WIGE,NUMNOD)
+C
+      IF(IPART_STACK >0) CALL STACK_WREST(STACK%IGEO,STACK%GEO,STACK%PM )
+C
+      IF (NDRAPE > 0) CALL DRAPE_WREST(DRAPE_SH4N  , DRAPE_SH3N,DRAPEG)
+C
+      IF (NUMPLY > 0) CALL PLY_INFO_WREST(PLY_INFO)
+
+      ! ---------------------------
+      ! write the starter + engine elapsed time
+      CALL WRITE_DPDB(GLOBAL_COMP_TIME%STARTER_TIME,1)
+      CALL WRITE_DPDB(GLOBAL_COMP_TIME%ENGINE_TIME,GLOBAL_COMP_TIME%RUN_NBR)
+      ! ---------------------------
+
+      ! restart file size - mist be before closing the file
+      CALL  file_size(RESTSIZE)
+
+      ! Closing the file
+      CALL CLOSE_C
+C
       IF(ISPMD==0)THEN
         WRITE (IOUT,1000)  FILNAMG(1:LENG)
         WRITE (ISTDO,1050) FILNAMG(1:LENG)
-      ENDIF
+      ENDIF      
 C--------------------------------------
  1000 FORMAT (/4X,' RESTART FILES:',1X,A,' WRITTEN'/
      .         4X,' -------------'/)

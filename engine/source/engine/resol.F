@@ -40,7 +40,6 @@ Chd|        ADMVIT                        source/model/remesh/admvit.F
 Chd|        AGAUGE0                       source/ale/agauge.F           
 Chd|        ALEFVM_ACCELE                 source/ale/alefvm/alefvm_accele.F
 Chd|        ALEFVM_MAIN                   source/ale/alefvm/alefvm_main.F
-Chd|        ALELAG_WREST                  source/output/restart/wrrest.F
 Chd|        ALEMAIN                       source/ale/alemain.F          
 Chd|        ALEMUSCL_DEALLOCATE           source/ale/alemuscl/alemuscl_deallocate.F
 Chd|        ALESUB2                       source/ale/subcycling/alesub2.F
@@ -78,7 +77,6 @@ Chd|        CHKMSIN                       source/output/outfile/chkmsin.F
 Chd|        CHKSTFN3N                     source/interfaces/interf/chkstfn3.F
 Chd|        CHKSTIFN                      source/interfaces/inter2d/chkstifn.F
 Chd|        CJOINT                        source/constraints/general/cyl_joint/cjoint.F
-Chd|        CLOSE_C                       ../common_source/tools/input_output/write_routtines.c
 Chd|        CLOSE_SOCK_C                  source/coupling/rad2rad/rad2rad_c.c
 Chd|        CLUSTERF                      source/output/cluster/clusterf.F
 Chd|        CNDINT                        source/model/remesh/cndint.F  
@@ -88,10 +86,7 @@ Chd|        COLLECT                       source/output/outfile/collect.F
 Chd|        COLLECTM                      source/output/outfile/collect.F
 Chd|        COLLECTT                      source/output/outfile/collect.F
 Chd|        CONVEC                        source/constraints/thermic/convec.F
-Chd|        CONVWREST                     source/output/restart/wrrest.F
 Chd|        CP_DM                         source/implicit/produt_v.F    
-Chd|        CRKXFEM_WREST                 source/output/restart/wrrest.F
-Chd|        CRKXFEM_WRESTANIM             source/output/restart/wrrest.F
 Chd|        CRK_ACCELE                    source/elements/xfem/accele_crk.F
 Chd|        CRK_COORD_INI                 source/elements/xfem/crk_coord_ini.F
 Chd|        CRK_VITESSE                   source/elements/xfem/crk_vitesse.F
@@ -111,7 +106,6 @@ Chd|        DEPLAFAKEIGE                  source/assembly/deplafakeige.F
 Chd|        DEPLAPINCH                    source/assembly/deplapinch.F  
 Chd|        DESACTI                       source/elements/desacti.F     
 Chd|        DISP_VEL_SAVED_CLOAD          source/assembly/disp_vel_saved_cload.F
-Chd|        DRAPE_WREST                   source/output/restart/wrrest.F
 Chd|        DTNODA                        source/time_step/dtnoda.F     
 Chd|        DTNODAMP                      source/time_step/dtnodamp.F   
 Chd|        DTNODAMS                      source/time_step/dtnodams.F   
@@ -155,14 +149,11 @@ Chd|        FVMESH0                       source/airbag/fvmesh0.F
 Chd|        FVREZONE0                     source/airbag/fvrezone.F      
 Chd|        FVSTATS                       source/airbag/fvstats.F       
 Chd|        FVUPD0                        source/airbag/fvupd.F         
-Chd|        FVWREST                       source/output/restart/wrrest.F
 Chd|        FV_SWITCH_CRIT                source/airbag/fvdim.F         
 Chd|        FXBYFOR                       source/constraints/fxbody/fxbyfor.F
 Chd|        FXBYPID                       source/constraints/fxbody/fxbypid.F
 Chd|        FXBYVIT                       source/constraints/fxbody/fxbyvit.F
-Chd|        FXFLUXWREST                   source/constraints/thermic/fxfluxwrest.F
 Chd|        FXGRVCOR                      source/constraints/fxbody/fxgrvcor.F
-Chd|        FXTEMPWREST                   source/output/restart/wrrest.F
 Chd|        GET_FBUFDP_C                  source/coupling/rad2rad/rad2rad_c.c
 Chd|        GET_FBUF_C                    source/coupling/rad2rad/rad2rad_c.c
 Chd|        GET_IBUF_C                    source/coupling/rad2rad/rad2rad_c.c
@@ -176,7 +167,6 @@ Chd|        I18MAIN_KINE_2                source/interfaces/int18/i18main_kine.F
 Chd|        I24E2E_FICTIVE_NODES_UPDATE   source/interfaces/int24/i24for3e.F
 Chd|        I24NITSCHFOR3                 source/interfaces/int24/i24nitschfor3.F
 Chd|        I24PXFEM                      source/interfaces/int24/i24pxfem.F
-Chd|        IMPWREST                      source/output/restart/wrrest.F
 Chd|        IMP_BUCK                      source/implicit/imp_buck.F    
 Chd|        IMP_CHKM                      source/implicit/imp_solv.F    
 Chd|        IMP_DT2                       source/implicit/imp_dt.F      
@@ -186,7 +176,6 @@ Chd|        IMP_FOUT                      source/implicit/imp_solv.F
 Chd|        IMP_RESTARCP                  source/implicit/imp_sol_init.F
 Chd|        IMP_SOLV                      source/implicit/imp_solv.F    
 Chd|        IMP_SOL_INIT                  source/implicit/imp_sol_init.F
-Chd|        IMP_TRANS                     source/output/restart/wrrest.F
 Chd|        INIT_I25_EDGE                 source/interfaces/int25/init_i25_edge.F
 Chd|        INIT_INTERF_SORTING_STRATEGY  source/interfaces/init_interf_sorting_strategy.F
 Chd|        INIT_NODAL_STATE              source/interfaces/interf/init_nodal_state.F
@@ -230,8 +219,6 @@ Chd|        MVOLUDT                       source/airbag/mvoludt.F
 Chd|        MY_BARRIER                    source/system/machine.F       
 Chd|        NEWSKW                        source/tools/skew/newskw.F    
 Chd|        NEWSKW_INIT                   source/tools/skew/newskw.F    
-Chd|        NFWREST                       source/output/restart/wrrest.F
-Chd|        NITSCHEWREST                  source/output/restart/wrrest.F
 Chd|        NLOCAL_ACC                    source/assembly/nlocal_acc.F  
 Chd|        NLOCAL_DTNODA                 source/time_step/nlocal_dtnoda.F
 Chd|        NLOCAL_INCR                   source/assembly/nlocal_incr.F 
@@ -239,12 +226,8 @@ Chd|        NLOCAL_VEL                    source/assembly/nlocal_vel.F
 Chd|        PBLAST                        source/loads/pblast/pblast.F  
 Chd|        PBLAST_DEALLOCATE             ../common_source/modules/loads/pblast_mod.F
 Chd|        PFLUID                        source/loads/general/pfluid/pfluid.F
-Chd|        PLYXFEM_WRAVUPLY              source/output/restart/wrrest.F
-Chd|        PLYXFEM_WREST                 source/output/restart/wrrest.F
-Chd|        PLYXFEM_WRESTANIM             source/output/restart/wrrest.F
 Chd|        PLY_ACCELE                    source/assembly/ply_accele.F  
 Chd|        PLY_BCS                       source/constraints/general/bcs/ply_bcs.F
-Chd|        PLY_INFO_WREST                source/output/restart/wrrest.F
 Chd|        PLY_VITESSE                   source/assembly/ply_vitesse.F 
 Chd|        PORO                          source/ale/porous/poro.F      
 Chd|        PREPARE_DEBUG                 share/modules/debug_mod.F     
@@ -260,7 +243,6 @@ Chd|        R2R_SEM_C                     source/coupling/rad2rad/rad2rad_c.c
 Chd|        R2R_SENDKINE                  source/coupling/rad2rad/r2r_getdata.F
 Chd|        R2R_UNLOCK_THREADS_C          source/coupling/rad2rad/rad2rad_c.c
 Chd|        RADIATION                     source/constraints/thermic/radiation.F
-Chd|        RADIAWREST                    source/output/restart/wrrest.F
 Chd|        RBAGDT                        source/airbag/rbagdt.F        
 Chd|        RBE2COR                       source/constraints/general/rbody/rgbcor.F
 Chd|        RBE2T1                        source/constraints/general/rbe2/rbe2f.F
@@ -282,13 +264,11 @@ Chd|        RENUM_SIZ                     source/interfaces/interf/renum_siz.F
 Chd|        RESOL_INIT                    source/engine/resol_init.F    
 Chd|        RGWAL0                        source/constraints/general/rwall/rgwal0.F
 Chd|        RGWALF                        source/constraints/general/rwall/rgwal0.F
-Chd|        RIGMATWREST                   source/output/restart/wrrest.F
 Chd|        RIVET1                        source/elements/rivet/rivet1.F
 Chd|        RLINK10                       source/constraints/general/rlink/rlink10.F
 Chd|        RLINK11                       source/constraints/general/rlink/rlink10.F
 Chd|        RMATACCE                      source/materials/mat/mat013/rmatacce.F
 Chd|        RMATFORP                      source/materials/mat/mat013/rmatforp.F
-Chd|        RTHBUFWREST                   source/output/restart/wrrest.F
 Chd|        S10CNDF1                      source/elements/solid/solide10/s10cndf.F
 Chd|        S10CNDF2                      source/elements/solid/solide10/s10cndf.F
 Chd|        S10CNDFND                     source/elements/solid/solide10/s10cndf.F
@@ -392,7 +372,6 @@ Chd|        SPMD_WIOUT                    source/mpi/generic/spmd_wiout.F
 Chd|        SPONFV                        source/elements/sph/sponfv.F  
 Chd|        SPWFVIS                       source/elements/sph/spwfvis.F 
 Chd|        SRFVIT                        source/constraints/general/rbody/srfvit.F
-Chd|        STACK_WREST                   source/output/restart/wrrest.F
 Chd|        STARTIME                      source/system/timer.F         
 Chd|        STATIC                        source/general_controls/damping/static.F
 Chd|        STOPTIME                      source/system/timer.F         
@@ -401,7 +380,6 @@ Chd|        TAGOFF3N                      source/interfaces/interf/chkstfn3.F
 Chd|        TEMPUR                        source/constraints/thermic/tempur.F
 Chd|        THBCS                         source/output/th/thbcs.F      
 Chd|        THBCS_IMP                     source/output/th/thbcs_imp.F  
-Chd|        THCWREST                      source/output/restart/wrrest.F
 Chd|        THERMBILAN                    source/constraints/thermic/thermbilan.F
 Chd|        THICKVAR                      source/elements/shell/coque/thickvar.F
 Chd|        TH_TIME_OUTPUT                source/output/th/th_time_output.F
@@ -419,9 +397,6 @@ Chd|        UPXFEM_TAGXP                  source/elements/xfem/upxfem_tagxp.F
 Chd|        USER_WINDOWS_ROUTINE          source/user_interface/user_windows.F
 Chd|        VITESSE                       source/assembly/vitesse.F     
 Chd|        VITESSEPINCH                  source/assembly/vitessepinch.F
-Chd|        WRITE_DB                      source/output/tools/write_db.F
-Chd|        WRITE_DPDB                    source/output/tools/write_db.F
-Chd|        WRITE_UNITS                   ../common_source/comm/write_units.F
 Chd|        WRRESTP                       source/output/restart/wrrestp.F
 Chd|        XFEOFF                        source/elements/xfem/xfeoff.F 
 Chd|        ZERO1                         source/system/zero.F          
@@ -432,7 +407,7 @@ Chd|        ALEFVM_MOD                    ../common_source/modules/ale/alefvm_mo
 Chd|        ALEMUSCL_MOD                  ../common_source/modules/ale/alemuscl_mod.F
 Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
 Chd|        ALE_MOD                       ../common_source/modules/ale/ale_mod.F
-Chd|        ANIM_MOD                      ../common_source/modules/anim_mod.F
+Chd|        ANIM_MOD                      ../common_source/modules/output/anim_mod.F
 Chd|        ARRAY_MOD                     ../common_source/modules/array_mod.F
 Chd|        CHECK_MOD                     ../common_source/modules/check_mod.F
 Chd|        CLUSTER_MOD                   share/modules/cluster_mod.F   
@@ -583,7 +558,7 @@ Chd|====================================================================
      M  T_MONVOL,ID_GLOBAL_VOIS,FACE_VOIS,TAGSLV_RBY,DYNAIN_DATA,FCONT_MAX,EBCS_TAB,DIFFUSION,
      N  KLOADPINTER,LOADPINTER,IN0 ,DGAPLOADINT,DRAPEG,USER_WINDOWS,OUTPUT,INTERFACES,
      O  DT        ,LOADS     , PYTHON, DPL0CLD,VEL0CLD,
-     P  NDAMP_VREL,ID_DAMP_VREL,FR_DAMP_VREL,NDAMP_VREL_RBYG,NAMES_AND_TITLES,UNITAB )
+     P  NDAMP_VREL,ID_DAMP_VREL,FR_DAMP_VREL,NDAMP_VREL_RBYG,NAMES_AND_TITLES,UNITAB,LIFLOW,LRFLOW )
 C-----------------------------------------------
 C   M o d u l e s
 C----------------------------------------------- 
@@ -667,7 +642,7 @@ C-----------------------------------------------
       USE UNITAB_MOD, ONLY : UNIT_TYPE_
       USE BCS_MOD , ONLY : BCS
       USE INTER_SH_OFFSET_MOD , only:SH_OFFSET_
-      USE OFFSET_NPROJ_MOD
+      USE OFFSET_NPROJ_MOD, only : OFFSET_NPROJ
       USE get_neighbour_surface_mod , only : get_neighbour_surface
       USE spmd_mod , only : SPMD_MAX,spmd_allreduce
       USE SKEW_MOD
@@ -903,6 +878,8 @@ C
       INTEGER ,INTENT(IN) :: NDAMP_VREL,NDAMP_VREL_RBYG
       INTEGER ,INTENT(IN) :: ID_DAMP_VREL(NDAMP_VREL),FR_DAMP_VREL(NSPMD+2,NDAMP_VREL)
       TYPE(SKEW_),INTENT(INOUT) :: SKEWS
+      INTEGER, INTENT(IN) :: LIFLOW  !< Size of IFLOW
+      INTEGER, INTENT(IN) :: LRFLOW  !< Size of RFLOW
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -1228,6 +1205,9 @@ C-------------------------------------------------------------------------------
         INTEGER :: COMM_INT25_SOLID_EROSION !< integer, sub-communicator related to interface type 25 with solid erosion
 
         INTEGER :: CHECK_NEIGH_FLAG,CHECK_NEIGH_FLAG_RES
+
+        ! Restart File Writing
+        INTEGER STOP_OR_ADD_CYCLE  !< Check if additional cycle must be done after restart at termination
       DATA IUN/1/
 C-----------------------------------------------------------------------------------       
 C Uncomment for Debug - ITAB is copied in Debug Module.
@@ -2101,14 +2081,15 @@ C===============================================================================
 C                                  NON PARALLEL SECTION (SMP)
 C========================================================================================
        CALL SPLIT_ASSPAR4(ADSKY,NUMNOD,NTHREAD,NODFT_ASSPAR,NODLT_ASSPAR,SADSKY)
-       ! Allocation & initialization of /INT18 + LAW151 
+       ! Allocation and initialization of /INT18 + LAW151 
        ALLOCATE( XCELL_REMOTE(NINTER) )
-       CALL INT18_ALLOC(NUMBER_INTER18,INTER18_LIST,MULTI_FVM,IPARI,XCELL_REMOTE)
+       CALL INT18_ALLOC(NUMBER_INTER18,INTER18_LIST,MULTI_FVM,IPARI,XCELL_REMOTE,NSPMD)
        CALL INT18_LAW151_INIT(MULTI_FVM,IGRBRIC,IPARI    ,IXS,
-     1                        IGROUPS  ,IPARG  ,ELBUF_TAB,MULTI_FVM%FORCE_INT         ,
-     2            X       ,          V       ,          MS         ,          KINET       ,
+     1                        IGROUPS  ,IPARG  ,ELBUF_TAB,MULTI_FVM%FORCE_INT    ,
+     2            X       ,          V       ,          MS         ,    KINET   ,
      3  MULTI_FVM%X_APPEND,MULTI_FVM%V_APPEND,MULTI_FVM%MASS_APPEND,MULTI_FVM%KINET_APPEND,
      4  MULTI_FVM%FORCE_INT_PON)
+
        ! allocation & initialization for /FAIL/ALTER
        CALL FAIL_WIND_FRWAVE_INIT(NGROUP)
        ! Check if ALE elements are deactivated to avoid some mpi comm. in the ALE solver
@@ -2375,11 +2356,13 @@ C Init var parallel SMP
            CALL MY_BARRIER()
             IF(NINTER25/=0.AND.INTERFACES%PARAMETERS%INT25_EROSION_SOLID > 0) THEN
               IF(ITSK==0) THEN
+                CHECK_NEIGH_FLAG = SHOOT_STRUCT%NUMBER_NEW_SURF
                 IF(NEED_COMM_INT25_SOLID_EROSION) THEN
-                  CHECK_NEIGH_FLAG = SHOOT_STRUCT%NUMBER_NEW_SURF
                   CALL SPMD_ALLREDUCE(CHECK_NEIGH_FLAG,CHECK_NEIGH_FLAG_RES,1,SPMD_MAX,COMM_INT25_SOLID_EROSION)
-               ENDIF
-               IF(CHECK_NEIGH_FLAG_RES > 0 ) THEN
+                ELSEIF(NSPMD==1) THEN
+                CHECK_NEIGH_FLAG_RES = CHECK_NEIGH_FLAG
+                ENDIF
+                IF(CHECK_NEIGH_FLAG_RES > 0 ) THEN
                   call get_neighbour_surface( ispmd,nspmd,ninter25,npari,ninter,  
      .                                        nbintc,nixs,numnod,numels,s_elem_state,nbddedgt,nbddedg_max,  
      .                                        elem_state,ipari,intlist,itab,itabm1,newfront,ixs,iad_elem,x,         
@@ -3324,10 +3307,10 @@ C-------------------------------------------------------------------
         IF (IMON>0) CALL STARTIME(4,1)
         IF (IMONM > 0) CALL STARTIME(41,1)
 !$OMP PARALLEL
-          CALL PFLUID(ILOADP  ,LOADP   ,NPC        ,TF        ,A         ,
-     2                V       ,X       ,XFRAME     ,MS        ,
-     3                NSENSOR,SENSORS%SENSOR_TAB,TFEXC,IADS(I87M) ,
-     4                FSKY    ,FSKY    ,LLOADP     ,FEXT     ,H3D_DATA   ,
+          CALL PFLUID(ILOADP  ,LOADP             ,NPC        ,TF         ,A         ,
+     2                V       ,X                 ,XFRAME     ,MS         ,
+     3                NSENSOR ,SENSORS%SENSOR_TAB,TFEXC      ,IADS(I87M) ,
+     4                FSKY    ,FSKY              ,LLOADP     ,FEXT       ,H3D_DATA  ,
      5                OUTPUT%TH%TH_SURF)
 !$OMP END PARALLEL
         IF (IMONM > 0) CALL STOPTIME(41,1)
@@ -3370,7 +3353,7 @@ C----------------------------------
 !----------------------------------
         IF (SH_OFFSET_TAB%NSH_OSET > 0) THEN
            XYZ(1:3*NUMNOD) = X(1:3*NUMNOD)
-           CALL offset_nPROJ(NSPMD,NUMNOD,XYZ,SH_OFFSET_TAB)
+           CALL offset_nPROJ(NSPMD,NUMNOD,XYZ,SH_OFFSET_TAB,IPARIT)
         ENDIF  
 !
         IF( NUMCONV + NUMRADIA > 0 .AND. ITHERM_FE > 0 )THEN
@@ -4462,10 +4445,10 @@ C Init var parallel SMP
       IF(NDTSK>ICONDN)IDX_CONDN = 1
 C
       CALL FORINT(
-     1 PM             ,GEO           ,X           ,A(1,NDTSK) ,AR(1,NDTSK)     ,     
-     2 V              ,VR            ,MS          ,IN         ,W               ,      
-     3 ELBUF          ,WA(NWAFTSK)   ,VAL2        ,VEUL       ,FV              ,     
-     4 STIFN(NDTSK)   ,STIFR(NDTSK)  ,FSKY        ,TF         ,BUFMAT          ,     
+     1 PM             ,GEO           ,X           ,A(1,NDTSK) ,AR(1,NDTSK)     ,
+     2 V              ,VR            ,MS          ,IN         ,W               ,
+     3 ELBUF          ,WA(NWAFTSK)   ,VAL2        ,VEUL       ,FV              ,
+     4 STIFN(NDTSK)   ,STIFR(NDTSK)  ,FSKY        ,TF         ,BUFMAT          ,
      5 PARTSAV(IPMTSK),D             ,DR          ,EANI       ,ELBUF_TAB       ,
      6 TANI           ,FANI(1,NFOA+1),FSAV        ,SENSORS    ,NLOC_DMG        ,
      7 SKEWS%SKEW     ,ANIN(NDMA2+1) ,DT2TT       ,BUFGEO     ,ITAB            ,
@@ -4495,7 +4478,7 @@ C
      W KNOTLOCPC      ,KNOTLOCEL     ,SUBSETS     ,FLAG_SLIPRING_UPDATE, FLAG_RETRACTOR_UPDATE  ,
      Y H3D_DATA       ,IFTHE         ,ICONDN      ,DT      ,OUTPUT,
      Z SBUFMAT        ,SNPC          ,STF         ,NODADT  ,DTFAC1,
-     . DTMIN1         ,IDTMIN        ,IOUT        ,ISTDO   ,IDTMINS,DTFACS) 
+     . DTMIN1         ,IDTMIN        ,IOUT        ,ISTDO   ,IDTMINS,DTFACS,NSVOIS)
 C     
 #include "lockon.inc"
       IF(DT2TT<DT2T)THEN
@@ -5406,9 +5389,12 @@ C WA local  : utilise de 1 a NUMNOD
             CALL MY_BARRIER()
             IF(NINTER25/=0.AND.INTERFACES%PARAMETERS%INT25_EROSION_SOLID > 0) THEN
               IF(ITSK==0) THEN
+                CHECK_NEIGH_FLAG = SHOOT_STRUCT%NUMBER_NEW_SURF
                 IF(NEED_COMM_INT25_SOLID_EROSION) THEN
                   CHECK_NEIGH_FLAG = SHOOT_STRUCT%NUMBER_NEW_SURF
                   CALL SPMD_ALLREDUCE(CHECK_NEIGH_FLAG,CHECK_NEIGH_FLAG_RES,1,SPMD_MAX,COMM_INT25_SOLID_EROSION)
+                ELSEIF(NSPMD==1) THEN
+                  CHECK_NEIGH_FLAG_RES = CHECK_NEIGH_FLAG
                 ENDIF
                IF(CHECK_NEIGH_FLAG_RES > 0 ) THEN
                   call get_neighbour_surface( ispmd,nspmd,ninter25,npari,ninter,  
@@ -9104,220 +9090,206 @@ C--- //0 ----------------
 #if defined(MYREAL8) && !defined(WITHOUT_LINALG)
  300  CONTINUE
 #endif
- 
-C---------------
-C     END OF RUN
-C---------------
+
+      ! ---------------------------------------------
+      !     END OF RUN
+      ! ---------------------------------------------
+
+      ! --------------
+      ! Restart Files
+      ! --------------
+
+      ! Restart File criteria
+      STOP_OR_ADD_CYCLE = 0
+      BOOL_RESTART=.FALSE.
+
+      ! End of computation
       IF (((TT>TSTOP).OR.(MSTOP_DT_THERM==1)).AND.IMCONV==1) THEN
+        STOP_OR_ADD_CYCLE = 1   ! check if additional cycle is need with animation
+        IF (IRAD2R==0) THEN     ! No Restart writing at end of Run when Rad2rad is active
+           BOOL_RESTART = ((ILASTANIM==0.OR.ILASTANIM==1.OR.ILASTANIM==3).AND. RESTART_FILE==1) ! Restart writing criteria
+        ENDIF
+      ENDIF
 
-          BOOL_RESTART = (ILASTANIM==0.OR.ILASTANIM==1.OR.ILASTANIM==3)
-          IF (BOOL_RESTART.AND.(IRAD2R==0)) THEN
-C
-         IF(IDT_THERM == 1) THEN
-            CALL BCSDTTH_COPY(ICODT, ICODR, ICODT0, ICODR0, 2)
+      ! Restart within Run
+      IF (ALE%SUB%IFSUB==0.AND.IMCONV==1 .AND. RESTART_FILE==1.AND.
+     .    (NCYCLE/NCRST)*NCRST==NCYCLE.AND. IRAD2R==0 .OR.MREST==1.OR.(WMCHECK==1.AND.NCYCLE/=1) ) THEN
+        STOP_OR_ADD_CYCLE = 0
+        BOOL_RESTART = .TRUE. 
+      ENDIF
+
+      IF(WMCHECK==1)THEN        ! Checkpoint Restart : write CHECK_DATA File
+         IF(ISPMD==0)THEN
+           FILNAM = 'CHECK_DATA'
+           OPEN(UNIT=ICHECKD,FILE=FILNAM,ACCESS='SEQUENTIAL',FORM='FORMATTED',STATUS='UNKNOWN')
+           WRITE(ICHECKD, FMT='(3A, I1)') '/RERUN/',ROOTNAM(1:ROOTLEN),'/',IRUN
+           CLOSE(ICHECKD)
          ENDIF
-C
-         CALL BCSN(ICODE,ICODT,ICODR,PARTS0,PARTSAV)
+      ENDIF
+
+      IF (BOOL_RESTART) THEN
+        IF(IMON>0) CALL STARTIME(7,1)
+
+        IF(IDT_THERM == 1)CALL BCSDTTH_COPY(ICODT, ICODR, ICODT0, ICODR0, 2)
+
+        CALL BCSN(ICODE,ICODT,ICODR,PARTS0,PARTSAV)
           
-         IF (INT24USE == 1)THEN
-C E2E Fictive Node Position, Velocity, Mass
-C Useful to do it before send back to Remote nodes, E2E Fictive node position,
-C mass & velocity
-           CALL  I24E2E_FICTIVE_NODES_UPDATE(INTLIST,NBINTC,IPARI,INTBUF_TAB,
-     *                                       X,V,MS,ITAB)
-         ENDIF
+        IF (INT24USE == 1)THEN
+           ! E2E Update Fictive Node Position, Velocity, Mass
+           ! To do before SPMD_I7XVCOM2
+            CALL  I24E2E_FICTIVE_NODES_UPDATE(INTLIST,NBINTC,IPARI,INTBUF_TAB,X,V,MS,ITAB)
+        ENDIF
 
-          IF(NSPMD>1)THEN
-            L1 = 1+NIXS*NUMELS + NSVOIS*NIXS
-            L2 = L1+6*NUMELS10
-            L3 = L2+12*NUMELS20
-            CALL SPMD_I7XVCOM2(
-     1         IPARI   ,X       ,V       ,MS      ,
-     2         IMSCH   ,I2MSCH ,DT2PREV ,INTLIST ,NBINTC  ,
-     3         ISLEN7  ,IRLEN7 ,ISLEN11 ,IRLEN11 ,ISLEN17 ,
-     4         IRLEN17 ,IXS    ,IXS(L3) ,NSENSOR ,
-     5         IGRBRIC ,TEMP   ,2       ,IRLEN7T ,ISLEN7T ,
-     6         IRLEN20 ,ISLEN20,IRLEN20T,ISLEN20T,IRLEN20E,
-     7         ISLEN20E,IKINE  ,DIAG_SMS,SENSORS%SENSOR_TAB,INTBUF_TAB ,INT24E2EUSE,
-     8         FORNEQS ,MULTI_FVM,INTERFACES)
-          END IF
+        ! Interface communication : Send updates to remote nodes - finalizatoin
+        ! Need here for coherent Restart writing
+        IF(NSPMD>1)THEN
+           L1 = 1+NIXS*NUMELS + NSVOIS*NIXS
+           L2 = L1+6*NUMELS10
+           L3 = L2+12*NUMELS20
+           CALL SPMD_I7XVCOM2(
+     1             IPARI   ,X       ,V       ,MS      ,
+     2             IMSCH   ,I2MSCH ,DT2PREV ,INTLIST ,NBINTC  ,
+     3             ISLEN7  ,IRLEN7 ,ISLEN11 ,IRLEN11 ,ISLEN17 ,
+     4             IRLEN17 ,IXS    ,IXS(L3) ,NSENSOR ,
+     5             IGRBRIC ,TEMP   ,2       ,IRLEN7T ,ISLEN7T ,
+     6             IRLEN20 ,ISLEN20,IRLEN20T,ISLEN20T,IRLEN20E,
+     7             ISLEN20E,IKINE  ,DIAG_SMS,SENSORS%SENSOR_TAB,INTBUF_TAB ,INT24E2EUSE,
+     8             FORNEQS ,MULTI_FVM,INTERFACES)
+        END IF
 
-          IF (INT24USE == 1)THEN
-            IF (IMON>0) CALL STARTIME(8,1)        
-              CALL SPMD_EXCH_I24(IPARI,    INTBUF_TAB ,ITAB  ,
-     *                     IAD_ELEM, FR_ELEM ,INTLIST ,NBINTC,
-     *                     IAD_I24  ,FR_I24  ,SFR_I24,I24MAXNSNE,3,
-     *                     INT24E2EUSE)
-     
-            IF (IMON>0) CALL STARTIME(8,1)        
-              CALL SPMD_EXCH_I24(IPARI,    INTBUF_TAB ,ITAB  ,
-     *                     IAD_ELEM, FR_ELEM ,INTLIST ,NBINTC,
-     *                     IAD_I24  ,FR_I24  ,SFR_I24,I24MAXNSNE,4,
-     *                     INT24E2EUSE)
-            IF (IMON>0) CALL STOPTIME(8,1)
-          ENDIF
-          
-C--------------------------------------------------------
-C INTERFACE 21 - Communication of nodal temperature
-C--------------------------------------------------------
+        ! Finalize T24 Communication to fill Buffers before restarts
+        IF (INT24USE == 1)THEN
+           IF (IMON>0) CALL STARTIME(8,1)        
+           CALL SPMD_EXCH_I24(IPARI,    INTBUF_TAB ,ITAB  ,
+     *                        IAD_ELEM, FR_ELEM ,INTLIST ,NBINTC,
+     *                        IAD_I24  ,FR_I24  ,SFR_I24,I24MAXNSNE,3,
+     *                        INT24E2EUSE)
 
-          IF(NINTSTAMP /= 0.AND.FTEMPVAR21==1.AND.NSPMD>1) THEN
-             CALL SPMD_I21TEMPCOM(IPARI,TEMP,INTBUF_TAB,NSENSOR,SENSORS%SENSOR_TAB) 
-          ENDIF
+           CALL SPMD_EXCH_I24(IPARI,    INTBUF_TAB ,ITAB  ,
+     *                        IAD_ELEM, FR_ELEM ,INTLIST ,NBINTC,
+     *                        IAD_I24  ,FR_I24  ,SFR_I24,I24MAXNSNE,4,
+     *                        INT24E2EUSE)
 
-          ICH = 0
-          IF (RESTART_FILE==1) THEN
-          CALL WRRESTP(AF        , IAF             ,XDP            ,ICH             ,ADSKY          ,
-     .                 ELBUF_TAB , XFEM_TAB        ,INTBUF_TAB     ,MULTI_FVM       ,MAT_ELEM       ,
-     .                 H3D_DATA  , INTBUF_FRIC_TAB ,SUBSETS        ,
-     .                 PINCH_DATA, ALE_CONNECTIVITY,T_MONVOL       ,
-     .                 SENSORS   , EBCS_TAB        ,DYNAIN_DATA    ,USER_WINDOWS    ,OUTPUT        ,
-     .                 INTERFACES, LOADS           ,PYTHON         ,NAMES_AND_TITLES,
-     .                 EIGIPM    , EIGIBUF         ,EIGRPM         ,NEIPM           ,LEIBUF        , NERPM,
-     .                 SKEWS)
+           IF (IMON>0) CALL STOPTIME(8,1)
+        ENDIF
 
-          IF (NFLOW>0) CALL NFWREST(IFLOW, RFLOW)
-          CALL FVWREST()
-          IF (IMPL_S>0) THEN
-            CALL IMP_TRANS(R_IMP)
-            CALL IMPWREST(IRFORM,IMPL_S0)
-          ENDIF
-C
-            IF(ITHERM_FE > 0 )CALL THCWREST(MCP, TEMP)
-C
-            IF(NITSCHE > 0 )CALL NITSCHEWREST(FORNEQS)
-C
-            CALL WRITE_UNITS(UNITAB)
-            IF(IRIGID_MAT > 0 )
-     *          CALL RIGMATWREST(RBYM  ,IRBYM ,LNRBYM,WEIGHT_RM)
-C thermal boundary
-            IF(NUMCONV > 0 )  CALL CONVWREST(IBCV, FCONV)
-            IF(NUMRADIA > 0 ) CALL RADIAWREST(IBCR, FRADIA)
-            IF(NFXFLUX > 0 )  CALL FXFLUXWREST(IBFFLUX, FBFFLUX)
-            IF(NFXTEMP > 0 )  CALL FXTEMPWREST(IBFTEMP, FBFTEMP)
-            IF (IPLYXFEM > 0)  THEN
-              CALL PLYXFEM_WREST(MS_PLY,ZI_PLY,INOD_PXFEM,IEL_PXFEM,
-     .                       ICODE_PLY,ISKEW_PLY,MSZ2)
-              CALL PLYXFEM_WRESTANIM()
-              CALL PLYXFEM_WRAVUPLY()
-            ENDIF
-            IF (NLOADC > 0) CALL WRITE_DB(CFIELD,LFACLOAD*NLOADC)
-            IF (NLOADP > 0) CALL WRITE_DB(LOADP,LFACLOAD*NLOADP)
-            IF (NINTLOADP > 0) CALL WRITE_DB(DGAPLOADINT,NINTER*NLOADP_HYD)
+        ! INTERFACE 21 - Communication of nodal temperature
+        IF(NINTSTAMP /= 0.AND.FTEMPVAR21==1.AND.NSPMD>1) THEN
+           CALL SPMD_I21TEMPCOM(IPARI,TEMP,INTBUF_TAB,NSENSOR,SENSORS%SENSOR_TAB) 
+        ENDIF
+        ICH = 0
+        ! Engine time for restart
+        CALL ELAPSTIME(SECS)
+        GLOBAL_COMP_TIME%ENGINE_TIME(GLOBAL_COMP_TIME%RUN_NBR) = SECS
 
-c-------------------------------
-C xfem for layerd shell (cracks)
-            IF (ICRACK3D > 0) THEN
-              CALL CRKXFEM_WREST(INOD_CRK,IEL_CRK,NODLEVXF)
-              CALL CRKXFEM_WRESTANIM(CRKEDGE,CRKSKY,INDX_CRK,XEDGE4N,XEDGE3N)
-            ENDIF
-c-------------------------------
-            IF(ALEFVM_Param%IEnabled > 0) CALL WRITE_DB(ALEFVM_Buffer%FCELL ,6*NUMELS)
-c-------------------------------
-C foam + air
-            IF(IALELAG > 0 )CALL ALELAG_WREST() 
-C THoutput
-            IF(SRTHBUF > 0) CALL RTHBUFWREST() 
-C
-            IF (SKNOT > 0) CALL WRITE_DB(KNOT,SKNOT)
-            IF (SKNOTLOCPC > 0) CALL WRITE_DB(KNOTLOCPC,SKNOTLOCPC)
-            IF (SKNOTLOCEL > 0) CALL WRITE_DB(KNOTLOCEL,SKNOTLOCEL)
-            IF (NUMELIG3D > 0) CALL WRITE_DB(WIGE,NUMNOD)
-
-C
-            IF(IPART_STACK >0) 
-     .          CALL STACK_WREST(STACK%IGEO,STACK%GEO,STACK%PM )
-C
-            IF (NDRAPE > 0) CALL DRAPE_WREST(DRAPE_SH4N  , DRAPE_SH3N,DRAPEG) 
-            IF (NUMPLY > 0) CALL PLY_INFO_WREST(PLY_INFO) 
-!
-            CALL ELAPSTIME(SECS)
-            GLOBAL_COMP_TIME%ENGINE_TIME(GLOBAL_COMP_TIME%RUN_NBR) = SECS
-!       ---------------------------
-!         write the starter + engine elapsed time
-            CALL WRITE_DPDB(GLOBAL_COMP_TIME%STARTER_TIME,1)
-            CALL WRITE_DPDB(GLOBAL_COMP_TIME%ENGINE_TIME,GLOBAL_COMP_TIME%RUN_NBR)
-!       ---------------------------
+        CALL WRRESTP(AF         ,IAF             ,XDP            ,ICH             ,ADSKY            ,
+     .               ELBUF_TAB  ,XFEM_TAB        ,INTBUF_TAB     ,MULTI_FVM       ,MAT_ELEM         ,
+     .               H3D_DATA   ,INTBUF_FRIC_TAB ,SUBSETS        ,PINCH_DATA      ,ALE_CONNECTIVITY ,
+     .               T_MONVOL   ,SENSORS         , EBCS_TAB      ,DYNAIN_DATA     ,USER_WINDOWS     ,
+     .               OUTPUT     ,INTERFACES      ,LOADS          ,PYTHON          ,NAMES_AND_TITLES ,
+     .               EIGIPM     ,EIGIBUF         ,EIGRPM         ,NEIPM           ,LEIBUF           ,
+     .               NERPM      ,IFLOW           ,RFLOW          ,LIFLOW          ,LRFLOW           ,
+     .               IMPBUF_TAB ,IMPL_S          ,IMPL_S0        ,MCP             ,TEMP             ,
+     .               FORNEQS    ,UNITAB          ,STACK          ,NDRAPE          ,DRAPE_SH3N       ,
+     .               DRAPE_SH4N ,DRAPEG          ,RESTSIZE       ,SKEWS)
         
-C Restart file size
-            IF (MULTIREST >0)THEN
-             CALL  file_size(RESTSIZE)
-             IF (RESTSIZE > MULTIRESTS(IRPREV))MULTIRESTS(IRPREV)=RESTSIZE
-            ELSE
-             CALL file_size(RESTSIZE)
-             IF (RESTSIZE > RESTARTFILESIZE) RESTARTFILESIZE=RESTSIZE
-            ENDIF
-C
-            CALL CLOSE_C
-          ENDIF 
-          STATE_ANIM = 0
-          IF(MSTOP_DT_THERM==0) THEN
+        ! Restart file size
+        IF (MULTIREST >0)THEN
+           IF (RESTSIZE > MULTIRESTS(IRPREV))MULTIRESTS(IRPREV)=RESTSIZE
+        ELSE
+           IF (RESTSIZE > RESTARTFILESIZE) RESTARTFILESIZE=RESTSIZE
+        ENDIF
+
+        IF((IDDW/=0).AND.(MSTOP/=0.OR.TT+DT2>=TSTOP)) THEN
+          CALL CUMULTIME_MP(
+     1          TAILLE,IPARG,
+     2          IXC,IXQ,IXT,IXP,IXTG,
+     3          IXR,IXS,KXIG3D,IPM,
+     4          IGEO,GEO,POIN_UMP,CPUTIME_MP,
+     5          NBR_GPMP,CPUTIME_MP_GLOB,TAB_UMP,PM,
+     6          BUFMAT,TABMP_L ,TAB_MAT )
+          IF(IDDWSTAT/=0) THEN
+             CALL PRINTIMEG(IPARG,PM,IPM,IXC,IXTG,IXS)
+          ENDIF
+        ENDIF  
+
+        IF(IMON>0) CALL STOPTIME(7,1)
+      END IF
+
+      IF (STOP_OR_ADD_CYCLE==1)   THEN
+
+      ! End of Run / criteria if additional cycle is need to write Anim or H3D state
+      !
+      ! ILASTANIM=0 No additional animation
+      ! ILASTANIM=1 One more cycle needed
+      ! ILASTANIM=2 Additional cycle done
+      ! ILASTANIM=3 regular animation
+
+         IF (ILASTANIM==2.OR.IRAD2R==1)THEN ! We are done / No magic - No additional Restart with Rad2rad run
+           MSTOP=2
+           GOTO 500
+         ENDIF
+
+         STATE_ANIM = 0
+         IF(MSTOP_DT_THERM==0) THEN
             IF (ILASTANIM==1) THEN
                STATE_ANIM = 1
             ELSEIF (ILASTANIM==0.OR.ILASTANIM==3) THEN
-               STATE_ANIM = 2
+              STATE_ANIM = 2
             END IF
-          ELSE
-               STATE_ANIM = 2
-          ENDIF
+         ELSE
+           STATE_ANIM = 2
+         ENDIF
 
-          STATE_H3D = 0
-          IF(MSTOP_DT_THERM==0) THEN
+         STATE_H3D = 0
+         IF(MSTOP_DT_THERM==0) THEN
             IF (ILASTH3D==1) THEN
                STATE_H3D = 1
             ELSEIF (ILASTH3D==0.OR.ILASTH3D==3) THEN
-              STATE_H3D = 2
+               STATE_H3D = 2
             END IF
-          ELSE
-            STATE_H3D = 2
-          ENDIF
+         ELSE
+             STATE_H3D = 2
+         ENDIF
+         IF( STATE_ANIM == 1 .OR. STATE_H3D == 1 ) THEN
+             CALL TRACE_OUT(3)
+             GOTO 100
+         ELSEIF( STATE_ANIM == 2 .OR. STATE_H3D == 2 ) THEN
+             MSTOP=2
+             GOTO 500
+         ENDIF
+      ENDIF
 
-          IF( STATE_ANIM == 1 .OR. STATE_H3D == 1 ) THEN
-            CALL TRACE_OUT(3)
-            GOTO 100
-          ELSEIF( STATE_ANIM == 2 .OR. STATE_H3D == 2 ) THEN
-            MSTOP=2
-            GOTO 500
-          ENDIF
-
-          ELSE
-            MSTOP=2
-            GOTO 500
-          END IF
-      END IF
-C-----------------------
+      ! ------------------
+      ! Negative Timestep
+      ! ------------------      
       IF(DT2<=ZERO) THEN
          WRITE(IOUT,*)' **ERROR : TIME STEP LESS OR EQUAL ZERO'
          WRITE(ISTDO,*)' **ERROR : TIME STEP LESS OR EQUAL ZERO'
+
          IF ( ISTAMPING == 1) THEN
-           WRITE(ISTDO,'(A)')' The run has gone to divergence.'
-           WRITE(ISTDO,'(A)')' It could be due to a wrong definition of
-     . the interfaces between the tools and the blank.'
-           WRITE(ISTDO,'(A)')' You may need to check if there is enough
-     . clearance between the tools,'
-           WRITE(ISTDO,'(A)')' and that they do not penetrate each othe
-     .r during their travel.'
-           WRITE(IOUT, '(A)')' The run has gone to divergence.'
-           WRITE(IOUT, '(A)')' It could be due to a wrong definition of
-     . the interfaces between the tools and the blank.'
-           WRITE(IOUT, '(A)')' You may need to check if there is enough
-     . clearance between the tools,'
-           WRITE(IOUT, '(A)')' and that they do not penetrate each othe
-     .r during their travel.'
+            WRITE(ISTDO,'(A)')' The run has gone to divergence.'
+            WRITE(ISTDO,'(A)')' It could be due to a wrong definition of the interfaces between the tools and the blank.'
+            WRITE(ISTDO,'(A)')' You may need to check if there is enough clearance between the tools,'
+            WRITE(ISTDO,'(A)')' and that they do not penetrate each other during their travel.'
+            WRITE(IOUT, '(A)')' The run has gone to divergence.'
+            WRITE(IOUT, '(A)')' It could be due to a wrong definition of the interfaces between the tools and the blank.'
+            WRITE(IOUT, '(A)')' You may need to check if there is enough clearance between the tools,'
+            WRITE(IOUT, '(A)')' and that they do not penetrate each other during their travel.'
          ENDIF
-C termination wait if  dt < 0
-       IF (INT24USE == 1)THEN
-C E2E Fictive Node Position, Velocity, Mass
-C Useful to do it before send back to Remote nodes, E2E Fictive node position,
-C mass & velocity
-         CALL  I24E2E_FICTIVE_NODES_UPDATE(INTLIST,NBINTC,IPARI,INTBUF_TAB,
-     *                                     X,V,MS,ITAB)
-       ENDIF
+
+         ! Finalize MPI communication for clean exit when dt < 0
+         IF (INT24USE == 1) THEN
+            ! E2E Update Fictive Node Position, Velocity, Mass
+            ! To do before SPMD_I7XVCOM2
+            CALL  I24E2E_FICTIVE_NODES_UPDATE(INTLIST,NBINTC,IPARI,INTBUF_TAB, X,V,MS,ITAB)
+         ENDIF
+         ! Finalize Interface communication from Node to remote node for coherent restart
          IF(NSPMD>1)THEN                                       
-           L1 = 1+NIXS*NUMELS + NSVOIS*NIXS                                     
-           L2 = L1+6*NUMELS10                                     
-           L3 = L2+12*NUMELS20                                    
-           CALL SPMD_I7XVCOM2(                                    
+            L1 = 1+NIXS*NUMELS + NSVOIS*NIXS                                     
+            L2 = L1+6*NUMELS10                                     
+            L3 = L2+12*NUMELS20                                    
+            CALL SPMD_I7XVCOM2(                                    
      1          IPARI   ,X       ,V       ,MS      ,              
      2          IMSCH   ,I2MSCH  ,DT2PREV ,INTLIST ,NBINTC  ,     
      3          ISLEN7  ,IRLEN7  ,ISLEN11 ,IRLEN11 ,ISLEN17 ,     
@@ -9327,6 +9299,7 @@ C mass & velocity
      7          ISLEN20E,IKINE   ,DIAG_SMS,SENSORS%SENSOR_TAB,INTBUF_TAB ,INT24E2EUSE ,
      8          FORNEQS ,MULTI_FVM,INTERFACES) 
          END IF
+
          IF(ALLOCATED(ISENDTO))DEALLOCATE(ISENDTO)
          IF(ALLOCATED(IRCVFROM))DEALLOCATE(IRCVFROM)
          IF(ALLOCATED(INTLIST))DEALLOCATE(INTLIST)
@@ -9392,311 +9365,9 @@ C mass & velocity
          CALL TRACE_OUT(3)      
          RETURN                 
       ENDIF
-      IF (ALE%SUB%IFSUB==0.AND.IMCONV==1) THEN
-      IF(IMON>0) CALL STARTIME(7,1)
-      IF(  (RESTART_FILE==1).AND.( 
-     1     (((NCYCLE/NCRST)*NCRST==NCYCLE.AND.(IRAD2R==0))
-     2       .OR.MREST==1.OR.WMCHECK==1) ) ) THEN
-C
-         IF(IDT_THERM == 1) THEN
-            CALL BCSDTTH_COPY(ICODT, ICODR, ICODT0, ICODR0, 2)
-         ENDIF
-C
-      CALL BCSN(ICODE,ICODT,ICODR,PARTS0,PARTSAV)
-      IF((MREST==1.OR.(NCYCLE/NCRST)*NCRST==NCYCLE)
-     .       .AND.WMCHECK==0)THEN
-       IF (INT24USE == 1)THEN
-C E2E Fictive Node Position, Velocity, Mass
-C Useful to do it before send back to Remote nodes, E2E Fictive node position,
-C mass & velocity
-         CALL  I24E2E_FICTIVE_NODES_UPDATE(INTLIST,NBINTC,IPARI,INTBUF_TAB,
-     *                                     X,V,MS,ITAB)
-       ENDIF
-
-      IF(NSPMD>1)THEN
-        L1 = 1+NIXS*NUMELS + NSVOIS*NIXS
-        L2 = L1+6*NUMELS10
-        L3 = L2+12*NUMELS20
-        CALL SPMD_I7XVCOM2(
-     1       IPARI   ,X       ,V       ,MS      ,
-     2       IMSCH   ,I2MSCH ,DT2PREV ,INTLIST ,NBINTC  ,
-     3       ISLEN7  ,IRLEN7 ,ISLEN11 ,IRLEN11 ,ISLEN17 ,
-     4       IRLEN17 ,IXS    ,IXS(L3) ,NSENSOR ,
-     5       IGRBRIC ,TEMP   ,3       ,IRLEN7T ,ISLEN7T ,
-     6       IRLEN20 ,ISLEN20,IRLEN20T,ISLEN20T,IRLEN20E,
-     7       ISLEN20E,IKINE  ,DIAG_SMS,SENSORS%SENSOR_TAB,INTBUF_TAB,INT24E2EUSE,
-     8       FORNEQS ,MULTI_FVM,INTERFACES)
-      END IF
-
-        IF (INT24USE == 1)THEN
-          IF (IMON>0) CALL STARTIME(8,1)        
-            CALL SPMD_EXCH_I24(IPARI,    INTBUF_TAB,ITAB,
-     *                     IAD_ELEM, FR_ELEM ,INTLIST ,NBINTC,
-     *                     IAD_I24  ,FR_I24  ,SFR_I24,I24MAXNSNE,3,
-     *                     INT24E2EUSE)
-     
-            CALL SPMD_EXCH_I24(IPARI,    INTBUF_TAB,ITAB,
-     *                     IAD_ELEM, FR_ELEM ,INTLIST ,NBINTC,
-     *                     IAD_I24  ,FR_I24  ,SFR_I24,I24MAXNSNE,4,
-     *                     INT24E2EUSE)
-          IF (IMON>0) CALL STOPTIME(8,1)
-        ENDIF
-
-C
-        ICH = 0
-C--------------------------------------------------------
-C INTERFACE 21 - Communication of nodal temperature
-C--------------------------------------------------------
-          IF(NINTSTAMP /= 0.AND.FTEMPVAR21==1.AND.NSPMD>1) THEN
-             CALL SPMD_I21TEMPCOM(IPARI,TEMP,INTBUF_TAB,NSENSOR,SENSORS%SENSOR_TAB) 
-          ENDIF
-
-          CALL WRRESTP(AF         ,IAF             ,XDP        ,ICH             ,ADSKY          ,
-     .                 ELBUF_TAB  ,XFEM_TAB        ,INTBUF_TAB ,MULTI_FVM       ,MAT_ELEM       ,
-     .                 H3D_DATA   ,INTBUF_FRIC_TAB ,SUBSETS    ,
-     .                 PINCH_DATA ,ALE_CONNECTIVITY,T_MONVOL   ,
-     .                 SENSORS    ,EBCS_TAB        ,DYNAIN_DATA,USER_WINDOWS    ,OUTPUT         ,
-     .                 INTERFACES ,LOADS           ,PYTHON     ,NAMES_AND_TITLES,
-     .                 EIGIPM    , EIGIBUF         ,EIGRPM     ,NEIPM           ,LEIBUF         , NERPM,
-     .                 SKEWS)
-
-        IF (NFLOW>0) CALL NFWREST(IFLOW, RFLOW)
-        CALL FVWREST()
-        IF (IMPL_S>0) THEN
-          CALL IMP_TRANS(R_IMP)
-          CALL IMPWREST(IRFORM,IMPL_S0)
-        ENDIF
-C
-        IF(ITHERM_FE > 0  ) CALL THCWREST(MCP, TEMP)
-C
-        IF(NITSCHE > 0 )CALL NITSCHEWREST(FORNEQS)
-C
-        CALL WRITE_UNITS(UNITAB)
-C
-        IF(IRIGID_MAT > 0 )
-     *    CALL RIGMATWREST(RBYM ,IRBYM ,LNRBYM,WEIGHT_RM)
-C thermal boundary
-          IF(NUMCONV > 0 )  CALL CONVWREST(IBCV, FCONV)
-          IF(NUMRADIA > 0 ) CALL RADIAWREST(IBCR, FRADIA)
-          IF(NFXFLUX > 0 )  CALL FXFLUXWREST(IBFFLUX, FBFFLUX)
-          IF(NFXTEMP > 0 )  CALL FXTEMPWREST(IBFTEMP, FBFTEMP)
-C
-          IF (IPLYXFEM > 0)THEN
-            CALL PLYXFEM_WREST(MS_PLY,ZI_PLY,INOD_PXFEM,IEL_PXFEM,
-     .                       ICODE_PLY,ISKEW_PLY,MSZ2)
-            CALL PLYXFEM_WRESTANIM()
-            CALL PLYXFEM_WRAVUPLY()
-          ENDIF  
-          IF (NLOADC > 0) CALL WRITE_DB(CFIELD,LFACLOAD*NLOADC)
-          IF (NLOADP > 0) CALL WRITE_DB(LOADP,LFACLOAD*NLOADP)
-          IF (NINTLOADP > 0) CALL WRITE_DB(DGAPLOADINT,NINTER*NLOADP_HYD)
-c-------------------------------
-C xfem for layerd shell (cracks)
-c-------------------------------
-          IF (ICRACK3D > 0) THEN
-            CALL CRKXFEM_WREST(INOD_CRK,IEL_CRK,NODLEVXF)
-            CALL CRKXFEM_WRESTANIM(CRKEDGE,CRKSKY,INDX_CRK,XEDGE4N,XEDGE3N)
-          ENDIF
-c-------------------------------
-          IF(ALEFVM_Param%IEnabled > 0) CALL WRITE_DB(ALEFVM_Buffer%FCELL ,6*NUMELS)
-c-------------------------------
-C foam + air
-          IF(IALELAG > 0 )CALL ALELAG_WREST() 
-C THoutput
-         IF(SRTHBUF > 0) CALL RTHBUFWREST() 
-C
-          IF (SKNOT > 0) CALL WRITE_DB(KNOT,SKNOT)
-          IF (SKNOTLOCPC > 0) CALL WRITE_DB(KNOTLOCPC,SKNOTLOCPC)
-          IF (SKNOTLOCEL > 0) CALL WRITE_DB(KNOTLOCEL,SKNOTLOCEL)
-          IF (NUMELIG3D > 0) CALL WRITE_DB(WIGE,NUMNOD)
-C           
-          IF(IPART_STACK >0) 
-     .        CALL STACK_WREST(STACK%IGEO,STACK%GEO,STACK%PM)
-C
-          IF (NDRAPE > 0) CALL DRAPE_WREST(DRAPE_SH4N  , DRAPE_SH3N ,DRAPEG)
-          IF (NUMPLY > 0) CALL PLY_INFO_WREST(PLY_INFO)
-!
-          CALL ELAPSTIME(SECS)
-          GLOBAL_COMP_TIME%ENGINE_TIME(GLOBAL_COMP_TIME%RUN_NBR) = SECS
-!       ---------------------------
-!         write the starter + engine elapsed time
-          CALL WRITE_DPDB(GLOBAL_COMP_TIME%STARTER_TIME,1)
-          CALL WRITE_DPDB(GLOBAL_COMP_TIME%ENGINE_TIME,GLOBAL_COMP_TIME%RUN_NBR)
-!       ---------------------------
-
-C Restart file size
-          IF (MULTIREST >0)THEN
-           CALL  file_size(RESTSIZE)
-           IF (RESTSIZE > MULTIRESTS(IRPREV))MULTIRESTS(IRPREV)=RESTSIZE
-          ELSE
-           CALL file_size(RESTSIZE)
-           IF (RESTSIZE > RESTARTFILESIZE) RESTARTFILESIZE=RESTSIZE
-          ENDIF
-C
-          CALL CLOSE_C
-        END IF
-C
-        IF(WMCHECK==1)THEN
-          IF(ISPMD==0)THEN
-            FILNAM = 'CHECK_DATA'
-            OPEN(UNIT=ICHECKD,FILE=FILNAM,
-     .           ACCESS='SEQUENTIAL',
-     .           FORM='FORMATTED',STATUS='UNKNOWN')
-            WRITE(ICHECKD, FMT='(3A, I1)')
-     .           '/RERUN/',ROOTNAM(1:ROOTLEN),'/',IRUN
-            CLOSE(ICHECKD)
-          ENDIF
-          IF(WMCHECK==1.AND.NCYCLE/=1)THEN
-       IF (INT24USE == 1)THEN
-C E2E Fictive Node Position, Velocity, Mass
-C Useful to do it before send back to Remote nodes, E2E Fictive node position,
-C mass & velocity
-         CALL  I24E2E_FICTIVE_NODES_UPDATE(INTLIST,NBINTC,IPARI,INTBUF_TAB,
-     *                                     X,V,MS,ITAB)
-       ENDIF
-
-            IF(NSPMD>1)THEN
-              L1 = 1+NIXS*NUMELS + NSVOIS*NIXS
-              L2 = L1+6*NUMELS10
-              L3 = L2+12*NUMELS20  
-              CALL SPMD_I7XVCOM2(
-     1             IPARI   ,X       ,V       ,MS      ,
-     2             IMSCH   ,I2MSCH ,DT2PREV ,INTLIST ,NBINTC  ,
-     3             ISLEN7  ,IRLEN7 ,ISLEN11 ,IRLEN11 ,ISLEN17 ,
-     4             IRLEN17 ,IXS    ,IXS(L3) ,NSENSOR ,
-     5             IGRBRIC ,TEMP   ,3       ,IRLEN7T ,ISLEN7T ,
-     6             IRLEN20 ,ISLEN20,IRLEN20T,ISLEN20T,IRLEN20E,
-     7             ISLEN20E,IKINE  ,DIAG_SMS,SENSORS%SENSOR_TAB,INTBUF_TAB ,INT24E2EUSE  ,
-     8             FORNEQS ,MULTI_FVM,INTERFACES)
-              END IF
-C
-              IF (INT24USE == 1)THEN
-                IF (IMON>0) CALL STARTIME(8,1)        
-                  CALL SPMD_EXCH_I24(IPARI,    INTBUF_TAB,ITAB,
-     *                     IAD_ELEM, FR_ELEM,INTLIST ,NBINTC,
-     *                     IAD_I24  ,FR_I24  ,SFR_I24,I24MAXNSNE ,3,
-     *                     INT24E2EUSE)
-
-                  CALL SPMD_EXCH_I24(IPARI,    INTBUF_TAB,ITAB,
-     *                     IAD_ELEM, FR_ELEM,INTLIST ,NBINTC,
-     *                     IAD_I24  ,FR_I24  ,SFR_I24,I24MAXNSNE ,4,
-     *                     INT24E2EUSE)
-                IF (IMON>0) CALL STOPTIME(8,1)
-              ENDIF
-C--------------------------------------------------------
-C INTERFACE 21 - Communication of nodal temperature
-C--------------------------------------------------------
-             IF(NINTSTAMP /= 0.AND.FTEMPVAR21==1.AND.NSPMD>1) THEN
-                 CALL SPMD_I21TEMPCOM(IPARI,TEMP,INTBUF_TAB,NSENSOR,SENSORS%SENSOR_TAB) 
-             ENDIF
-
-              ICH = 1
-              CALL WRRESTP(AF        ,IAF             ,XDP         ,ICH              ,ADSKY          ,
-     .                    ELBUF_TAB  ,XFEM_TAB        ,INTBUF_TAB  ,MULTI_FVM        ,MAT_ELEM       ,
-     .                    H3D_DATA   ,INTBUF_FRIC_TAB ,SUBSETS     ,
-     .                    PINCH_DATA ,ALE_CONNECTIVITY,T_MONVOL    ,
-     .                    SENSORS    ,EBCS_TAB        ,DYNAIN_DATA ,USER_WINDOWS     ,OUTPUT         ,
-     .                    INTERFACES ,LOADS           ,PYTHON      , NAMES_AND_TITLES,
-     .                    EIGIPM    , EIGIBUF         ,EIGRPM      , NEIPM           ,LEIBUF         , NERPM,
-     .                    SKEWS)
-
-              IF (NFLOW>0) CALL NFWREST(IFLOW, RFLOW)
-              CALL FVWREST()
-              IF (IMPL_S>0) THEN
-                CALL IMP_TRANS(R_IMP)
-                CALL IMPWREST(IRFORM,IMPL_S0)
-              ENDIF
-C
-              IF(ITHERM_FE > 0  )CALL THCWREST(MCP, TEMP)
-C
-              IF(NITSCHE > 0 )CALL NITSCHEWREST(FORNEQS)
-C
-              CALL WRITE_UNITS(UNITAB)
-              IF(IRIGID_MAT > 0 )
-     *             CALL RIGMATWREST(RBYM ,IRBYM ,LNRBYM,WEIGHT_RM)
-C thermal boundary
-              IF(NUMCONV > 0 )  CALL CONVWREST(IBCV, FCONV)
-              IF(NUMRADIA > 0 ) CALL RADIAWREST(IBCR, FRADIA)
-              IF(NFXFLUX > 0 )  CALL FXFLUXWREST(IBFFLUX, FBFFLUX)
-              IF(NFXTEMP > 0 )  CALL FXTEMPWREST(IBFTEMP, FBFTEMP)
-C ply xfem (composites)
-             IF (IPLYXFEM > 0)THEN     
-              CALL PLYXFEM_WREST(MS_PLY,ZI_PLY,INOD_PXFEM,IEL_PXFEM,
-     .                         ICODE_PLY,ISKEW_PLY,MSZ2)
-              CALL PLYXFEM_WRESTANIM()
-              CALL PLYXFEM_WRAVUPLY()
-             ENDIF 
-          IF (NLOADC > 0) CALL WRITE_DB(CFIELD,LFACLOAD*NLOADC)
-          IF (NLOADP > 0) CALL WRITE_DB(LOADP,LFACLOAD*NLOADP)
-          IF (NINTLOADP > 0) CALL WRITE_DB(DGAPLOADINT,NINTER*NLOADP_HYD)
-c-------------------------------
-C xfem for layerd shell (cracks)
-          IF (ICRACK3D > 0) THEN
-            CALL CRKXFEM_WREST(INOD_CRK,IEL_CRK,NODLEVXF)
-            CALL CRKXFEM_WRESTANIM(CRKEDGE,CRKSKY,INDX_CRK,XEDGE4N,XEDGE3N)
-          ENDIF
-c-------------------------------
-          IF(ALEFVM_Param%IEnabled > 0) CALL WRITE_DB(ALEFVM_Buffer%FCELL ,6*NUMELS)
-c-------------------------------
-C foam + air
-          IF(IALELAG > 0 )CALL ALELAG_WREST()
-C THoutput
-         IF(SRTHBUF > 0) CALL RTHBUFWREST()  
-C
-          IF (SKNOT > 0) CALL WRITE_DB(KNOT,SKNOT)
-          IF (SKNOTLOCPC > 0) CALL WRITE_DB(KNOTLOCPC,SKNOTLOCPC)
-          IF (SKNOTLOCEL > 0) CALL WRITE_DB(KNOTLOCEL,SKNOTLOCEL)
-          IF (NUMELIG3D > 0) CALL WRITE_DB(WIGE,NUMNOD)
-C
-C
-          IF(IPART_STACK >0) 
-     .        CALL STACK_WREST(STACK%IGEO,STACK%GEO,STACK%PM )
-C
-          IF (NDRAPE > 0) CALL DRAPE_WREST(DRAPE_SH4N  , DRAPE_SH3N ,DRAPEG)
-          IF (NUMPLY > 0) CALL PLY_INFO_WREST(PLY_INFO)
-!
-          CALL ELAPSTIME(SECS)
-          GLOBAL_COMP_TIME%ENGINE_TIME(GLOBAL_COMP_TIME%RUN_NBR) = SECS
-!       ---------------------------
-!         write the starter + engine elapsed time
-          CALL WRITE_DPDB(GLOBAL_COMP_TIME%STARTER_TIME,1)
-          CALL WRITE_DPDB(GLOBAL_COMP_TIME%ENGINE_TIME,GLOBAL_COMP_TIME%RUN_NBR)
-!       ---------------------------
-
-C Restart file size
-              IF (MULTIREST >0)THEN
-           CALL  file_size(RESTSIZE)
-           IF (RESTSIZE > MULTIRESTS(IRPREV))MULTIRESTS(IRPREV)=RESTSIZE
-              ELSE
-                CALL file_size(RESTSIZE)
-                IF (RESTSIZE > RESTARTFILESIZE) RESTARTFILESIZE=RESTSIZE
-              ENDIF
-C
-              CALL CLOSE_C
-            ENDIF
-          ENDIF
-        ENDIF
-C
-      IF((IDDW/=0).AND.(MSTOP/=0.OR.TT+DT2>=TSTOP)) THEN
-        CALL CUMULTIME_MP(
-     1          TAILLE,IPARG,
-     2          IXC,IXQ,IXT,IXP,IXTG,
-     3          IXR,IXS,KXIG3D,IPM,
-     4          IGEO,GEO,POIN_UMP,CPUTIME_MP,
-     5          NBR_GPMP,CPUTIME_MP_GLOB,TAB_UMP,PM,
-     6          BUFMAT,TABMP_L ,TAB_MAT )
-        IF(IDDWSTAT/=0) THEN
-         CALL PRINTIMEG(IPARG,PM,IPM,IXC,IXTG,IXS)
-        ENDIF
-      ENDIF  
-C
-C-------------------------------
-        IF(IMON>0) CALL STOPTIME(7,1)
-      ENDIF
 C-------------------------------
  500  CONTINUE
 C-------------------------------     
-      
       IF(MSTOP/=0) THEN
         PARALLEL_SECTION = 0
 C Multidomain -> close sockets

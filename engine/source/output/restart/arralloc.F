@@ -28,6 +28,7 @@ Chd|-- calls ---------------
 Chd|        ALEFVM_INIT                   source/ale/alefvm/alefvm_init.F
 Chd|        ANCMSG                        source/output/message/message.F
 Chd|        ARRET                         source/system/arret.F         
+Chd|        INTSTAMP_ZERO                 share/modules/intstamp_mod.F  
 Chd|        MULTI_ALLOCATE                source/multifluid/multi_allocate.F
 Chd|        SZ_PRINT                      source/output/restart/arralloc.F
 Chd|        ALEANIM_MOD                   share/modules/aleanim_mod.F   
@@ -137,7 +138,7 @@ C-----------------------------------------------
       TYPE(t_SEGVAR) :: SEGVAR
       TYPE (LOADS_),INTENT(IN) :: LOADS
       TYPE(INTERFACES_) :: INTERFACES
-      TYPE(SKEW_)       :: SKEWS
+      TYPE(SKEW_) , INTENT(INOUT)       :: SKEWS
 C----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -1813,6 +1814,19 @@ c
               ALLOCATE(PSKIDS(NINTSKIDOLD,NUMNOD),STAT=IERR)
               IF (IERR/=0) GOTO 1000
            ENDIF
+         END IF
+
+         ! Stamping
+         ! INTSTAMP structures allocation
+         IF(NINTSTAMP/=0)THEN
+            ALLOCATE(INTSTAMP(NINTSTAMP),STAT=IERR)
+            IF (IERR/=0)THEN
+              CALL ANCMSG(MSGID=20,ANMODE=ANINFO)
+              CALL ARRET(2)
+            ENDIF
+            CALL INTSTAMP_ZERO(INTSTAMP)
+         ELSE
+            ALLOCATE(INTSTAMP(0))
          END IF
 C
         ALLOCATE (CFIELD(LFACLOAD*NLOADC),STAT=IERR)

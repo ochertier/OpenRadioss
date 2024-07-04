@@ -38,6 +38,7 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
+#include      "com01_c.inc"
 C---------+---------+---+---+--------------------------------------------
 C VAR     | SIZE    |TYP| RW| DEFINITION
 C---------+---------+---+---+--------------------------------------------
@@ -87,7 +88,7 @@ C----------------------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER :: II,IEL,ITER,IRATE,NRATE,IDYIELD,IPLAS,IFUNN,IFUNT,
+      INTEGER :: II,IEL,ITER,NITER,IRATE,NRATE,IDYIELD,IPLAS,IFUNN,IFUNT,
      .           ICOMP,NTRAC,NCOMP,VP
       INTEGER ,DIMENSION(NEL) :: ELTRAC,ELCOMP
       my_real :: YOUNGT,YOUNGC,SHEAR,DYDX,
@@ -122,6 +123,7 @@ C-----------------------------------------------
       YOUNGC  = UPARAM(13)
       VP      = NINT(UPARAM(14))
       DTINV   = ONE / MAX(EM20,TIMESTEP)
+      NITER   = 3
 c
       IF (VP == 0) THEN              ! total displacement rate
         EPSP(1:NEL)   = SQRT(DEPSZZ(1:NEL)**2 + DEPSYZ(1:NEL)**2 + DEPSZX(1:NEL)**2) *DTINV                                                      
@@ -226,7 +228,7 @@ c-----------------------------------------------------------------------------
               NZX  = SIGTRZX(IEL) / NORMEF
               FACN = TWO*AN*YOUNG(IEL)
               FACT = TWO*AS*SHEAR
-              DO ITER= 1,3
+              DO ITER= 1,NITER
                 FPRIM = -FACN*SIGNZZ(IEL)*NZZ - FACT*(SIGNYZ(IEL)*NYZ + SIGNZX(IEL)*NZX)
                 FPRIM = FPRIM -TWO*FYIELD(IEL)
                               
@@ -268,7 +270,7 @@ c--------------
               NZX  = SIGTRZX(IEL) / NORMEF
               FACN = TWO*AN*YOUNG(IEL)
               FACT = TWO*AS*SHEAR
-              DO ITER= 1,3
+              DO ITER= 1,NITER
                 DSZZ = -FACN*SIGNZZ(IEL)*NZZ
                 DSYZ = -FACT*SIGNYZ(IEL)*NYZ
                 DSZX = -FACT*SIGNZX(IEL)*NZX
@@ -301,7 +303,7 @@ c
               NYZ  = SIGTRYZ(IEL) / NORMEF
               NZX  = SIGTRZX(IEL) / NORMEF
               FACT = TWO*AS*SHEAR
-              DO ITER= 1,3
+              DO ITER= 1,NITER
                 DSYZ = -FACT*SIGNYZ(IEL)*NYZ
                 DSZX = -FACT*SIGNZX(IEL)*NZX
                 DYLD = -TWO*FYIELD(IEL)*HYIELD(IEL)
@@ -339,17 +341,17 @@ c------------------------
               NZZ  = SIGTRZZ(IEL) / NORMEF
               NYZ  = SIGTRYZ(IEL) / NORMEF
               NZX  = SIGTRZX(IEL) / NORMEF
-
               FACN = BETA*AN*YOUNG(IEL)
               FACT = BETA*AS*SHEAR
 
-              DO ITER=1,3
-                SZZ = ABS(SIGNZZ(IEL))
-                SYZ = ABS(SIGNYZ(IEL))
-                SZX = ABS(SIGNZX(IEL))
-                DSZZ = -FACN*NZZ*SZZ**(BETA-ONE)
-                DSYZ = -FACT*NYZ*SYZ*SVMT**(BETA-TWO)
-                DSZX = -FACT*NZX*SZX*SVMT**(BETA-TWO)
+              DO ITER=1,NITER
+                SVMT = MAX(SVMT,EM20)
+                SZZ  = SIGNZZ(IEL)
+                SYZ  = SIGNYZ(IEL)
+                SZX  = SIGNZX(IEL)
+                DSZZ = -FACN*NZZ*ABS(SZZ)**(BETA-ONE) * SIGN(ONE,SZZ)              
+                DSYZ = -FACT*NYZ*SYZ*SVMT**(BETA-TWO) 
+                DSZX = -FACT*NZX*SZX*SVMT**(BETA-TWO) 
                 DYLD = -BETA*HYIELD(IEL)*FYIELD(IEL)**(BETA-ONE)
                 FPRIM = DSZZ + DSYZ + DSZX + DYLD
 
@@ -358,12 +360,12 @@ c------------------------
                 SIGNZZ(IEL) = SIGTRZZ(IEL) - YOUNG(IEL)*DEP(IEL) * NZZ
                 SIGNYZ(IEL) = SIGTRYZ(IEL) - SHEAR*DEP(IEL) * NYZ
                 SIGNZX(IEL) = SIGTRZX(IEL) - SHEAR*DEP(IEL) * NZX
-                FYIELD(IEL) = YLD0 + HYIELD(IEL)*DEP(IEL)
+                FYIELD(IEL) = MAX(ZERO, YLD0 + HYIELD(IEL)*DEP(IEL))
 
                 SVMT = SQRT(SIGNYZ(IEL)**2 + SIGNZX(IEL)**2)
-                SIG_EFF = AN * SZZ**BETA + AS * SVMT**BETA 
+                SIG_EFF = AN * ABS(SIGNZZ(IEL))**BETA + AS * SVMT**BETA 
                 PHI     = SIG_EFF - FYIELD(IEL)**BETA
-              ENDDO  
+              ENDDO
               DEP(IEL) = MAX(ZERO, DEP(IEL))*OFF(IEL)
               PLA(IEL) = PLA(IEL) + DEP(IEL)
             ENDIF 
@@ -386,17 +388,17 @@ c
               NZZ  = SIGTRZZ(IEL) / NORMEF
               NYZ  = SIGTRYZ(IEL) / NORMEF
               NZX  = SIGTRZX(IEL) / NORMEF
-
               FACN = BETA*AN*YOUNG(IEL)
               FACT = BETA*AS*SHEAR
 
-              DO ITER=1,3
-                SZZ = ABS(SIGNZZ(IEL))
-                SYZ = ABS(SIGNYZ(IEL))
-                SZX = ABS(SIGNZX(IEL))
-                DSZZ = -FACN*NZZ*SZZ**(BETA-ONE)
-                DSYZ = -FACT*NYZ*SYZ*SVMT**(BETA-TWO)
-                DSZX = -FACT*NZX*SZX*SVMT**(BETA-TWO)
+              DO ITER=1,NITER
+                SVMT = MAX(SVMT,EM20)
+                SZZ  = SIGNZZ(IEL)
+                SYZ  = SIGNYZ(IEL)
+                SZX  = SIGNZX(IEL)
+                DSZZ = -FACN*NZZ*ABS(SZZ)**(BETA-ONE) * SIGN(ONE,SZZ)              
+                DSYZ = -FACT*NYZ*SYZ*SVMT**(BETA-TWO)    
+                DSZX = -FACT*NZX*SZX*SVMT**(BETA-TWO)    
                 DYLD = -BETA*HYIELD(IEL)*FYIELD(IEL)**(BETA-ONE)
                 FPRIM = DSZZ + DSYZ + DSZX + DYLD
 
@@ -405,10 +407,10 @@ c
                 SIGNZZ(IEL) = SIGTRZZ(IEL) - YOUNG(IEL)*DEP(IEL) * NZZ
                 SIGNYZ(IEL) = SIGTRYZ(IEL) - SHEAR*DEP(IEL) * NYZ
                 SIGNZX(IEL) = SIGTRZX(IEL) - SHEAR*DEP(IEL) * NZX
-                FYIELD(IEL) = YLD0 + HYIELD(IEL)*DEP(IEL)
+                FYIELD(IEL) = MAX(ZERO, YLD0 + HYIELD(IEL)*DEP(IEL))
 
                 SVMT = SQRT(SIGNYZ(IEL)**2 + SIGNZX(IEL)**2)
-                SIG_EFF = AN * SZZ**BETA + AS * SVMT**BETA 
+                SIG_EFF = AN * ABS(SIGNZZ(IEL))**BETA + AS * SVMT**BETA 
                 PHI     = SIG_EFF - FYIELD(IEL)**BETA
               ENDDO  
               DEP(IEL) = MAX(ZERO, DEP(IEL))*OFF(IEL)
@@ -429,11 +431,12 @@ c
               NZX  = SIGTRZX(IEL) / NORMEF
               FACT = BETA*AS*SHEAR
 
-              DO ITER=1,3
-                SYZ = ABS(SIGNYZ(IEL))
-                SZX = ABS(SIGNZX(IEL))
-                DSYZ = -FACT*NYZ*SYZ*SVMT**(BETA-TWO)
-                DSZX = -FACT*NZX*SZX*SVMT**(BETA-TWO)
+              DO ITER=1,NITER
+                SVMT = MAX(SVMT,EM20)
+                SYZ  = SIGNYZ(IEL)
+                SZX  = SIGNZX(IEL)
+                DSYZ = -FACT*NYZ*SYZ*SVMT**(BETA-TWO)   
+                DSZX = -FACT*NZX*SZX*SVMT**(BETA-TWO)   
                 DYLD = -BETA*HYIELD(IEL)*FYIELD(IEL)**(BETA-ONE)
                 FPRIM = DSYZ + DSZX + DYLD
 

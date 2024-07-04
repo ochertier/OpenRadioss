@@ -311,12 +311,10 @@ C
 Chd|====================================================================
 Chd|  NFWREST                       source/output/restart/wrrest.F
 Chd|-- called by -----------
-Chd|        RESOL                         source/engine/resol.F         
+Chd|        WRRESTP                       source/output/restart/wrrestp.F
 Chd|-- calls ---------------
 Chd|        WRITE_DB                      source/output/tools/write_db.F
 Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
-Chd|        WRTSQI                        source/output/tools/wrtsqi.F  
-Chd|        WRTSQR                        source/output/tools/wrtsqr.F  
 Chd|====================================================================
       SUBROUTINE NFWREST(IFLOW, RFLOW)
 C-----------------------------------------------
@@ -337,22 +335,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-C--------------------------------------
-C     ECRITURE DES ENTIERS
-C--------------------------------------
-      IF (IRFORM/5<=1) THEN
-        CALL WRTSQI (IFLOW,LIFLOW,IRFORM)
-      ELSE
         CALL WRITE_I_C(IFLOW,LIFLOW)
-      ENDIF
-C--------------------------------------
-C     ECRITURE DES REELS
-C--------------------------------------
-      IF (IRFORM/5<=1) THEN
-        CALL WRTSQR (RFLOW,LRFLOW,IRFORM)
-      ELSE
         CALL WRITE_DB(RFLOW,LRFLOW)
-      ENDIF
 C
       RETURN
       END
@@ -360,14 +344,13 @@ C
 Chd|====================================================================
 Chd|  IMPWREST                      source/output/restart/wrrest.F
 Chd|-- called by -----------
-Chd|        RESOL                         source/engine/resol.F         
+Chd|        WRRESTP                       source/output/restart/wrrestp.F
 Chd|-- calls ---------------
 Chd|        WRITE_DB                      source/output/tools/write_db.F
-Chd|        WRTSQR                        source/output/tools/wrtsqr.F  
 Chd|        IMP_DYNA                      share/modules/impbufdef_mod.F 
 Chd|        IMP_REST                      share/modules/impbufdef_mod.F 
 Chd|====================================================================
-      SUBROUTINE IMPWREST(IRFORM,NIMPR)
+      SUBROUTINE IMPWREST(NIMPR)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -386,7 +369,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER IRFORM,NIMPR
+      INTEGER NIMPR
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -396,19 +379,13 @@ C--------------------------------------
 C     ECRITURE DES REELS
 C--------------------------------------
       ND = NUMNOD*3
-      IF (IRFORM/5<=1) THEN
-       CALL WRTSQR(IMP_RR,NIMPR,IRFORM)
-       IF (IDYNA>0) THEN
-        CALL WRTSQR(DY_A,ND,IRFORM)
-        IF (IRODDL/=0) CALL WRTSQR(DY_AR,ND,IRFORM)
-       ENDIF
-      ELSE
-       CALL WRITE_DB(IMP_RR,NIMPR)
-       IF (IDYNA>0) THEN
+      CALL WRITE_DB(IMP_RR,NIMPR)
+
+      IF (IDYNA>0) THEN
         CALL WRITE_DB(DY_A,ND)
         IF (IRODDL/=0) CALL WRITE_DB(DY_AR,ND)
-       ENDIF
       ENDIF
+
 C
       RETURN
       END
@@ -457,7 +434,7 @@ C
 Chd|====================================================================
 Chd|  IMP_TRANS                     source/output/restart/wrrest.F
 Chd|-- called by -----------
-Chd|        RESOL                         source/engine/resol.F         
+Chd|        WRRESTP                       source/output/restart/wrrestp.F
 Chd|-- calls ---------------
 Chd|        IMP_REST                      share/modules/impbufdef_mod.F 
 Chd|====================================================================
@@ -488,7 +465,7 @@ C
 Chd|====================================================================
 Chd|  FVWREST                       source/output/restart/wrrest.F
 Chd|-- called by -----------
-Chd|        RESOL                         source/engine/resol.F         
+Chd|        WRRESTP                       source/output/restart/wrrestp.F
 Chd|-- calls ---------------
 Chd|        WRITE_DB                      source/output/tools/write_db.F
 Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
@@ -660,7 +637,7 @@ C --- for shell heat transfer
 Chd|====================================================================
 Chd|  THCWREST                      source/output/restart/wrrest.F
 Chd|-- called by -----------
-Chd|        RESOL                         source/engine/resol.F         
+Chd|        WRRESTP                       source/output/restart/wrrestp.F
 Chd|-- calls ---------------
 Chd|        WRITE_DB                      source/output/tools/write_db.F
 Chd|        WRTSQR                        source/output/tools/wrtsqr.F  
@@ -699,7 +676,7 @@ C --- for Nitsche Method
 Chd|====================================================================
 Chd|  NITSCHEWREST                  source/output/restart/wrrest.F
 Chd|-- called by -----------
-Chd|        RESOL                         source/engine/resol.F         
+Chd|        WRRESTP                       source/output/restart/wrrestp.F
 Chd|-- calls ---------------
 Chd|        WRITE_DB                      source/output/tools/write_db.F
 Chd|        WRTSQR                        source/output/tools/wrtsqr.F  
@@ -736,7 +713,7 @@ C convection flux
 Chd|====================================================================
 Chd|  CONVWREST                     source/output/restart/wrrest.F
 Chd|-- called by -----------
-Chd|        RESOL                         source/engine/resol.F         
+Chd|        WRRESTP                       source/output/restart/wrrestp.F
 Chd|-- calls ---------------
 Chd|        WRITE_DB                      source/output/tools/write_db.F
 Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
@@ -778,7 +755,7 @@ C radiative flux
 Chd|====================================================================
 Chd|  RADIAWREST                    source/output/restart/wrrest.F
 Chd|-- called by -----------
-Chd|        RESOL                         source/engine/resol.F         
+Chd|        WRRESTP                       source/output/restart/wrrestp.F
 Chd|-- calls ---------------
 Chd|        WRITE_DB                      source/output/tools/write_db.F
 Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
@@ -820,7 +797,7 @@ C convection flux
 Chd|====================================================================
 Chd|  FXTEMPWREST                   source/output/restart/wrrest.F
 Chd|-- called by -----------
-Chd|        RESOL                         source/engine/resol.F         
+Chd|        WRRESTP                       source/output/restart/wrrestp.F
 Chd|-- calls ---------------
 Chd|        WRITE_DB                      source/output/tools/write_db.F
 Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
@@ -862,12 +839,10 @@ C for rigid_ material
 Chd|====================================================================
 Chd|  RIGMATWREST                   source/output/restart/wrrest.F
 Chd|-- called by -----------
-Chd|        RESOL                         source/engine/resol.F         
+Chd|        WRRESTP                       source/output/restart/wrrestp.F
 Chd|-- calls ---------------
 Chd|        WRITE_DB                      source/output/tools/write_db.F
 Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
-Chd|        WRTSQI                        source/output/tools/wrtsqi.F  
-Chd|        WRTSQR                        source/output/tools/wrtsqr.F  
 Chd|====================================================================
       SUBROUTINE RIGMATWREST(RBYM  ,IRBYM    ,LCRBYM,WEIGHT_RM)      
 C-----------------------------------------------
@@ -890,23 +865,18 @@ C-----------------------------------------------
 C--------------------------------------
 C     ECRITURE DES REELS
 C--------------------------------------
-      IF (IRFORM/5 <= 1) THEN
-        CALL WRTSQR (RBYM,NFRBYM*NRBYM,IRFORM)
-        CALL WRTSQI (IRBYM,NIRBYM*NRBYM,IRFORM)
-        CALL WRTSQI (LCRBYM,NGSLNRBYM,IRFORM)        
-      ELSE
-        CALL WRITE_DB(RBYM,NFRBYM*NRBYM)
-        CALL WRITE_I_C(IRBYM,NIRBYM*NRBYM)
-        CALL WRITE_I_C( LCRBYM,NGSLNRBYM)      
-      ENDIF
+      CALL WRITE_DB(RBYM,NFRBYM*NRBYM)
+      CALL WRITE_I_C(IRBYM,NIRBYM*NRBYM)
+      CALL WRITE_I_C( LCRBYM,NGSLNRBYM)      
       CALL WRITE_I_C( WEIGHT_RM,NRBYM)
+      
       RETURN
       END
 C for shell composite xfem 
 Chd|====================================================================
 Chd|  PLYXFEM_WREST                 source/output/restart/wrrest.F
 Chd|-- called by -----------
-Chd|        RESOL                         source/engine/resol.F         
+Chd|        WRRESTP                       source/output/restart/wrrestp.F
 Chd|-- calls ---------------
 Chd|        WRITE_DB                      source/output/tools/write_db.F
 Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
@@ -949,7 +919,7 @@ C for shell composite xfem
 Chd|====================================================================
 Chd|  PLYXFEM_WRESTANIM             source/output/restart/wrrest.F
 Chd|-- called by -----------
-Chd|        RESOL                         source/engine/resol.F         
+Chd|        WRRESTP                       source/output/restart/wrrestp.F
 Chd|-- calls ---------------
 Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|        PLYXFEM_MOD                   share/modules/plyxfem_mod.F   
@@ -995,7 +965,7 @@ C Writing nodes infos for PLY XFEM
 Chd|====================================================================
 Chd|  CRKXFEM_WREST                 source/output/restart/wrrest.F
 Chd|-- called by -----------
-Chd|        RESOL                         source/engine/resol.F         
+Chd|        WRRESTP                       source/output/restart/wrrestp.F
 Chd|-- calls ---------------
 Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|====================================================================
@@ -1028,7 +998,7 @@ C
 Chd|====================================================================
 Chd|  CRKXFEM_WRESTANIM             source/output/restart/wrrest.F
 Chd|-- called by -----------
-Chd|        RESOL                         source/engine/resol.F         
+Chd|        WRRESTP                       source/output/restart/wrrestp.F
 Chd|-- calls ---------------
 Chd|        WRITE_DB                      source/output/tools/write_db.F
 Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
@@ -1148,7 +1118,7 @@ C for shell composite xfem
 Chd|====================================================================
 Chd|  PLYXFEM_WRAVUPLY              source/output/restart/wrrest.F
 Chd|-- called by -----------
-Chd|        RESOL                         source/engine/resol.F         
+Chd|        WRRESTP                       source/output/restart/wrrestp.F
 Chd|-- calls ---------------
 Chd|        WRITE_DB                      source/output/tools/write_db.F
 Chd|        PLYXFEM_MOD                   share/modules/plyxfem_mod.F   
@@ -1184,7 +1154,7 @@ C air + faom
 Chd|====================================================================
 Chd|  ALELAG_WREST                  source/output/restart/wrrest.F
 Chd|-- called by -----------
-Chd|        RESOL                         source/engine/resol.F         
+Chd|        WRRESTP                       source/output/restart/wrrestp.F
 Chd|-- calls ---------------
 Chd|        WRITE_DB                      source/output/tools/write_db.F
 Chd|        ALEFLOW_MOD                   share/modules/aleflow_mod.F   
@@ -1217,7 +1187,7 @@ C TH output
 Chd|====================================================================
 Chd|  RTHBUFWREST                   source/output/restart/wrrest.F
 Chd|-- called by -----------
-Chd|        RESOL                         source/engine/resol.F         
+Chd|        WRRESTP                       source/output/restart/wrrestp.F
 Chd|-- calls ---------------
 Chd|        WRITE_DB                      source/output/tools/write_db.F
 Chd|        RESTMOD                       share/modules/restart_mod.F   
@@ -1246,7 +1216,7 @@ C STACk PART
 Chd|====================================================================
 Chd|  STACK_WREST                   source/output/restart/wrrest.F
 Chd|-- called by -----------
-Chd|        RESOL                         source/engine/resol.F         
+Chd|        WRRESTP                       source/output/restart/wrrestp.F
 Chd|-- calls ---------------
 Chd|        WRITE_DB                      source/output/tools/write_db.F
 Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
@@ -1282,7 +1252,7 @@ C-----------------------------------------------*
 Chd|====================================================================
 Chd|  DRAPE_WREST                   source/output/restart/wrrest.F
 Chd|-- called by -----------
-Chd|        RESOL                         source/engine/resol.F         
+Chd|        WRRESTP                       source/output/restart/wrrestp.F
 Chd|-- calls ---------------
 Chd|        WRITE_DB                      source/output/tools/write_db.F
 Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
@@ -1415,7 +1385,7 @@ C--------------------------------------
 Chd|====================================================================
 Chd|  PLY_INFO_WREST                source/output/restart/wrrest.F
 Chd|-- called by -----------
-Chd|        RESOL                         source/engine/resol.F         
+Chd|        WRRESTP                       source/output/restart/wrrestp.F
 Chd|-- calls ---------------
 Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|====================================================================

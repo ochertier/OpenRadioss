@@ -30,7 +30,6 @@ Chd|        FRETITL2                      source/starter/freform.F
 Chd|        MY_ORDERS                     ../common_source/tools/sort/my_orders.c
 Chd|        ZEROIN                        source/system/zeroin.F        
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        INIVOL_ARRAY_MOD              share/modules1/inivol_mod.F   
 Chd|        INIVOL_DEF_MOD                share/modules1/inivol_mod.F   
 Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
@@ -48,8 +47,7 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE R2R_MOD
       USE GROUPDEF_MOD
-      USE INIVOL_DEF_MOD
-      USE INIVOL_ARRAY_MOD
+      USE INIVOL_DEF_MOD , ONLY : INIVOL_STRUCT_, NUM_INIVOL
       USE MATPARAM_DEF_MOD
 C-----------------------------------------------M
 C            A R G U M E N T S
@@ -89,7 +87,7 @@ C-----------------------------------------------
      .        CEP(*),IPARTQ(*),ITR1(*),
      .        IQUAOFF(*)
       INTEGER, INTENT(IN) :: PRINT_FLAG !< flag to print the element group data
-      TYPE (INIVOL_) , DIMENSION(NINIVOL) :: INIVOL
+      TYPE (INIVOL_STRUCT_) , DIMENSION(NUM_INIVOL) :: INIVOL
       MY_REAL PM(NPROPM,NUMMAT), GEO(NPROPG,NUMGEO)
 C-----------------------------------------------
       TYPE (GROUP_)  , DIMENSION(NGRQUAD)  :: IGRQUAD
@@ -359,13 +357,13 @@ C   - initial volume franction -
 C
           lFOUND=.FALSE.
           TAG_INVOL=0
-          IF(NINIVOL > 0)THEN
+          IF(NUM_INIVOL > 0)THEN
           ! Warning : In same group you can have different PArts, A loop over elem in groups has to be introduced to check if INIVOL PART is there.
             MFT = EADD(N)-1 + NFT
             NE1=MIN( NVSIZ, NEL + NEL_PREC - NFT)
             DO ILOC = 1 ,NE1
-              DO JJ=1,NINIVOL
-                IF(INIVOL(JJ)%IPARTFILL == IPARTQ(ILOC+MFT)) THEN
+              DO JJ=1,NUM_INIVOL
+                IF(INIVOL(JJ)%PART_ID == IPARTQ(ILOC+MFT)) THEN
                   TAG_INVOL = 1
                   lFOUND=.TRUE.
                   EXIT

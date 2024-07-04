@@ -27,7 +27,7 @@ Chd|        I21MAINF                      source/interfaces/int21/i21mainf.F
 Chd|-- calls ---------------
 Chd|        FOAT_TO_6_FLOAT               source/system/parit.F         
 Chd|        STRI                          source/tools/univ/stri.F      
-Chd|        ANIM_MOD                      ../common_source/modules/anim_mod.F
+Chd|        ANIM_MOD                      ../common_source/modules/output/anim_mod.F
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|        INTSTAMP_MOD                  share/modules/intstamp_mod.F  
 Chd|        OUTPUTS_MOD                   ../common_source/modules/outputs_mod.F
@@ -127,6 +127,7 @@ C-----------------------------------------------
      .   MX6(6,MVSIZ), MY6(6,MVSIZ), MZ6(6,MVSIZ), STR6(6,MVSIZ),
      .   XX, YY, ZZ, MX, MY, MZ, STR
 C---------------------------------
+      NISKYFIL = 0
       DO I=1,JLT
        FXI(I)=FXN(I)+FXT(I)
        FYI(I)=FYN(I)+FYT(I)

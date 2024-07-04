@@ -111,7 +111,7 @@ Chd|====================================================================
      G                   CONDN    ,CONDNSKY  ,
      H                   D        ,TAGPRT_SMS,SENSORS,IOUTPRT  ,
      I                   NALE     ,NLOC_DMG  ,MAT_ELEM,H3D_STRAIN,
-     J                   DT       ,OUTPUT)
+     J                   DT       ,OUTPUT,NSVOIS)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -151,6 +151,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: NSVOIS
       INTEGER IXS(NIXS,*),IPARG(NPARG,NGROUP), NPF(*),IADS(8,*),
      .        IPARTS(*),IPM(NPROPMI,NUMMAT),ITASK,IMATVIS,GRTH(*),IGRTH(*),
      .        IGEO(NPROPGI,*), TAGPRT_SMS(*)        
@@ -561,7 +562,8 @@ c
      3   DXZ,        DYX,        DYY,        DYZ,
      4   DZX,        DZY,        DZZ,        D4,
      5   D5,         D6,         WXX,        WYY,
-     6   WZZ,        BUFMAT,     NEL,        NFT)
+     6   WZZ,        BUFMAT,     NEL,        NFT,
+     7   IPM,        NUMMAT,     NUMELS+NSVOIS)
       ELSE
         CALL SDEFO3(
      1   PX1,     PX2,     PX3,     PX4,
@@ -950,7 +952,7 @@ C ALE or EULER : update momentum transport forces
      X   IPARG(1,NG),IXS,        GBUF%TAG22, NC1,
      Y   NC2,        NC3,        NC4,        NC5,
      Z   NC6,        NC7,        NC8,        NALE,
-     1   NEL,        NFT,        MTN)
+     1   NEL,        NFT,        MTN,        IPM)
       ELSEIF(JEUL == 1 .AND. INTEG8 == 1)THEN
 C
 C Does not include upwind SUPG or TG
@@ -978,7 +980,7 @@ C Does not include upwind SUPG or TG
      L   VY7,               VY8,               VZ1,               VZ2,
      M   VZ3,               VZ4,               VZ5,               VZ6,
      N   VZ7,               VZ8,               IPARG(1,NG),       NEL,
-     O   MTN)
+     O   MTN,               IPM)
       ENDIF
 
         IF(JEUL+JALE/=0) CALL CHECK_OFF_ALE(F11,F21,F31,F12,F22,

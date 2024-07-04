@@ -143,7 +143,7 @@ Chd|====================================================================
      P   VOLN,       CONDN,      CONDNSKY,   AGRAV,
      Q   IGRV,       LGRAV,      SENSORS,    SKEW,
      R   NALE,       D,          IOUTPRT,    NLOC_DMG,
-     S   MAT_ELEM,   H3D_STRAIN, DT,         IDEL7NOK)
+     S   MAT_ELEM,   H3D_STRAIN, DT,         IDEL7NOK,NSVOIS)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -181,10 +181,11 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, INTENT(IN) :: NSVOIS
       INTEGER, INTENT(INOUT) :: IDEL7NOK
       INTEGER, DIMENSION(*), INTENT(IN) :: IPARG,IPARTS,NPF,NALE
       INTEGER,INTENT(IN) :: NG,NEL
-      INTEGER IXS(NIXS,*), IADS(8,*),IPM(NPROPMI,*),
+      INTEGER IXS(NIXS,NUMELS), IADS(8,*),IPM(NPROPMI,NUMMAT),
      .        IGEO(NPROPGI,*),GRTH(*),IGRTH(*),IPARG1(*),IFOAM(*),
      .        ICONTACT(*),ISKY(*),ITAB(*)
       INTEGER NELTST,ITYPTST,OFFSET,NVC,ITASK,
@@ -194,7 +195,7 @@ C
 C          
       my_real :: DT2T
       my_real
-     .   PM(NPROPM,*), GEO(NPROPG,*), X(*), A(*), V(*), MS(*), W(*), 
+     .   PM(NPROPM,NUMMAT), GEO(NPROPG,NUMGEO), X(*), A(*), V(*), MS(*), W(*),
      .   FLUX(6,*), FSKYM(*),
      .   FLU1(*), VEUL(*), FV(*), TF(*), BUFMAT(*),
      .   PARTSAV(*),STIFN(*), FSKY(*),EANI(*),
@@ -706,7 +707,8 @@ C Compute strain rates Dij (silent boundary element)
      3   DXZ,        DYX,        DYY,        DYZ,
      4   DZX,        DZY,        DZZ,        D4,
      5   D5,         D6,         WXX,        WYY,
-     6   WZZ,        BUFMAT,     NEL,        NFT)
+     6   WZZ,        BUFMAT,     NEL,        NFT,
+     7   IPM,        NUMMAT,     NUMELS+NSVOIS      )
       ELSE
 C Compute strain rates Dij
         CALL SDEFO3(
@@ -740,7 +742,7 @@ C
       CALL S11FX3(
      1   PM,         FLUX(1,NF1),ALE_CONNECT,IXS,
      2   IPM,        BUFMAT,     NEL,        NFT,
-     3   JALE,       JEUL)
+     3   JALE,       JEUL  ,     NUMMAT,     NUMELS+NSVOIS)
 C
       DIVDE(1:NEL) = DT1*(DXX(1:NEL)+ DYY(1:NEL)+ DZZ(1:NEL))  
 C Compute new density
@@ -1278,7 +1280,7 @@ C ALE & Euler momentum transport forces
      X   IPARG1,    IXS,       GBUF%TAG22,NC1,
      Y   NC2,       NC3,       NC4,       NC5,
      Z   NC6,       NC7,       NC8,       NALE,
-     1   NEL,       NFT,       MTN)
+     1   NEL,       NFT,       MTN,       IPM)
 C
        ELSEIF (JEUL == 1 .AND. INTEG8 == 1) THEN
 C SUPG and TG UPWIND not included 
@@ -1306,7 +1308,7 @@ C SUPG and TG UPWIND not included
      L   VY7,               VY8,               VZ1,               VZ2,
      M   VZ3,               VZ4,               VZ5,               VZ6,
      N   VZ7,               VZ8,               IPARG1,            NEL,
-     O   MTN)
+     O   MTN,               IPM)
        ENDIF
 C
         IF(JEUL+JALE/=0) CALL CHECK_OFF_ALE(F11,F21,F31,F12,F22,
@@ -1353,7 +1355,7 @@ C
      X   IPARG1,    IXS,       GBUF%TAG22,NC1,
      Y   NC2,       NC3,       NC4,       NC5,
      Z   NC6,       NC7,       NC8,       NALE,
-     1   NEL,       NFT,       MTN)
+     1   NEL,       NFT,       MTN,       IPM)
        ENDIF     
       ENDIF !  IALEFVM_MAT <= 1
 C
