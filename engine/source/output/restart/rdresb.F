@@ -46,8 +46,6 @@ Chd|        FXTEMPRREST                   source/output/restart/rdresb.F
 Chd|        GROUP_INI                     source/groups/group_ini.F     
 Chd|        IMPRREST                      source/output/restart/rdresb.F
 Chd|        INTBUF_INI                    ../common_source/interf/intbuf_ini.F
-Chd|        INTFRIC_RRESTI                share/modules/intbuf_fric_mod.F
-Chd|        INTFRIC_RRESTR                share/modules/intbuf_fric_mod.F
 Chd|        INTSTAMP_RRESTI               share/modules/intstamp_mod.F  
 Chd|        INTSTAMP_RRESTR               share/modules/intstamp_mod.F  
 Chd|        KNOTLOCELREST                 source/output/restart/rdresb.F
@@ -66,8 +64,8 @@ Chd|        PLY_INFO_REST                 source/output/restart/rdresb.F
 Chd|        RADIARREST                    source/output/restart/rdresb.F
 Chd|        RDCOMR                        source/output/restart/rdcomm.F
 Chd|        READ_CLUSTER                  source/output/cluster/read_cluster.F
-Chd|        READ_DB                       source/output/tools/read_db.F 
-Chd|        READ_DPDB                     source/output/tools/read_db.F 
+Chd|        READ_DB                       ../common_source/tools/input_output/read_db.F
+Chd|        READ_DPDB                     ../common_source/tools/input_output/read_db.F
 Chd|        READ_ELGROUP_PARAM            source/output/restart/read_elgroup_param.F
 Chd|        READ_FAILWAVE                 source/output/restart/read_failwave.F
 Chd|        READ_I_C                      ../common_source/tools/input_output/write_routtines.c
@@ -100,10 +98,6 @@ Chd|        DRAPE_MOD                     share/modules/drape_mod.F
 Chd|        EBCS_MOD                      ../common_source/modules/boundary_conditions/ebcs_mod.F
 Chd|        ECND_MOD                      share/modules/ecdn_mod.F      
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
-Chd|        INTBUFFRIC_MOD                share/modules/restart_mod.F   
-Chd|        INTBUFMOD                     share/modules/restart_mod.F   
-Chd|        INTBUF_MOD                    share/modules/restart_mod.F   
-Chd|        INTERFACES_MOD                ../common_source/modules/interfaces/interfaces_mod.F
 Chd|        INTSTAMP_GLOB_MOD             share/modules/intstamp_glob_mod.F
 Chd|        LOADS_MOD                     ../common_source/modules/loads/loads_mod.F
 Chd|        MAT_ELEM_MOD                  ../common_source/modules/mat_elem/mat_elem_mod.F
@@ -138,8 +132,6 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE PYTHON_FUNCT_MOD
-      USE INTBUFMOD
-      USE INTBUF_MOD
       USE RESTMOD
       USE INTSTAMP_GLOB_MOD
       USE TABLE_GLOB_MOD
@@ -149,7 +141,6 @@ C-----------------------------------------------
       USE ECND_MOD
       USE MULTI_FVM_MOD
       USE H3D_MOD
-      USE INTBUFFRIC_MOD
       USE NLOCAL_REG_MOD
       USE MAT_ELEM_MOD
       USE PINCHTYPE_MOD
@@ -562,7 +553,7 @@ c        CALL READ_I_C(INBUF,SINBUF)
         CALL R_BUFBRIC_22  ! I22LEN |-> BRICK_LIST(...);  CALL READ_I_C(); CALL READ_DB(); END SUBROUTINE
 
         !read new structure INTBUF_TAB
-        CALL INTBUF_INI(INTBUF_TAB)
+        CALL INTBUF_INI(INTERFACES%INTBUF_TAB)
 
         CALL READ_I_C(NPRW,SNPRW)
 
@@ -890,7 +881,7 @@ C--------------------------------------
 C  Interface friction buffer (reak )
 C--------------------------------------
       IF(NINTERFRIC /= 0)THEN
-        CALL INTFRIC_RRESTI(INTBUF_FRIC_TAB)
+        CALL INTFRIC_RRESTI(INTERFACES%INTBUF_FRIC_TAB,NINTERFRIC)
       END IF
 C--------------------------------------
 C  Structure table partie entiere
@@ -1275,7 +1266,7 @@ C--------------------------------------
 C  Interface friction buffer (Reals )
 C--------------------------------------
       IF(NINTERFRIC /= 0)THEN
-        CALL INTFRIC_RRESTR(INTBUF_FRIC_TAB)
+        CALL INTFRIC_RRESTR(INTERFACES%INTBUF_FRIC_TAB,NINTERFRIC)
       END IF
 C-------------
 C     always
@@ -1461,9 +1452,9 @@ C--------------------------------------
       CALL READ_DB(TM_NSTRA1,LMAX_NSTRA*NUMNOD)
       CALL READ_DB(TM_NSTRA3,LMAX_NSTRA*NUMNOD)
 C--------------------------------------
-      IF (LOADS%NLOAD_CLOAD > 0) THEN
-        CALL READ_DB(DPL0CLD,6*LOADS%NLOAD_CLOAD)
-        CALL READ_DB(VEL0CLD,6*LOADS%NLOAD_CLOAD)
+      IF (NCONLD > 0) THEN
+        CALL READ_DB(DPL0CLD,6*NCONLD)
+        CALL READ_DB(VEL0CLD,6*NCONLD)
       ENDIF
 C--------------------------------------
 C   /DAMP/VREL
@@ -1571,7 +1562,7 @@ Chd|-- called by -----------
 Chd|        RDRESB                        source/output/restart/rdresb.F
 Chd|-- calls ---------------
 Chd|        MY_GETPID                     source/system/pid.c           
-Chd|        READ_DB                       source/output/tools/read_db.F 
+Chd|        READ_DB                       ../common_source/tools/input_output/read_db.F
 Chd|        READ_I_C                      ../common_source/tools/input_output/write_routtines.c
 Chd|        REDSQI                        source/output/tools/redsqi.F  
 Chd|        REDSQR                        source/output/tools/redsqr.F  
@@ -1708,7 +1699,7 @@ Chd|-- called by -----------
 Chd|        RDRESB                        source/output/restart/rdresb.F
 Chd|-- calls ---------------
 Chd|        MY_GETPID                     source/system/pid.c           
-Chd|        READ_DB                       source/output/tools/read_db.F 
+Chd|        READ_DB                       ../common_source/tools/input_output/read_db.F
 Chd|        READ_I_C                      ../common_source/tools/input_output/write_routtines.c
 Chd|        REDSQI                        source/output/tools/redsqi.F  
 Chd|        REDSQR                        source/output/tools/redsqr.F  
@@ -1798,7 +1789,7 @@ Chd|====================================================================
 Chd|  DSRREST                       source/output/restart/rdresb.F
 Chd|-- called by -----------
 Chd|-- calls ---------------
-Chd|        READ_DB                       source/output/tools/read_db.F 
+Chd|        READ_DB                       ../common_source/tools/input_output/read_db.F
 Chd|        READ_I_C                      ../common_source/tools/input_output/write_routtines.c
 Chd|        REDSQI                        source/output/tools/redsqi.F  
 Chd|        REDSQR                        source/output/tools/redsqr.F  
@@ -1954,7 +1945,7 @@ Chd|  NFRREST                       source/output/restart/rdresb.F
 Chd|-- called by -----------
 Chd|        RDRESB                        source/output/restart/rdresb.F
 Chd|-- calls ---------------
-Chd|        READ_DB                       source/output/tools/read_db.F 
+Chd|        READ_DB                       ../common_source/tools/input_output/read_db.F
 Chd|        READ_I_C                      ../common_source/tools/input_output/write_routtines.c
 Chd|        REDSQI                        source/output/tools/redsqi.F  
 Chd|        REDSQR                        source/output/tools/redsqr.F  
@@ -2005,7 +1996,7 @@ Chd|-- called by -----------
 Chd|        RDRESB                        source/output/restart/rdresb.F
 Chd|-- calls ---------------
 Chd|        CP_REAL                       source/implicit/produt_v.F    
-Chd|        READ_DB                       source/output/tools/read_db.F 
+Chd|        READ_DB                       ../common_source/tools/input_output/read_db.F
 Chd|        IMP_DYNA                      share/modules/impbufdef_mod.F 
 Chd|        IMP_REST                      share/modules/impbufdef_mod.F 
 Chd|====================================================================
@@ -2069,7 +2060,7 @@ Chd|        RDRESB                        source/output/restart/rdresb.F
 Chd|-- calls ---------------
 Chd|        ANCMSG                        source/output/message/message.F
 Chd|        ARRET                         source/system/arret.F         
-Chd|        READ_DB                       source/output/tools/read_db.F 
+Chd|        READ_DB                       ../common_source/tools/input_output/read_db.F
 Chd|        READ_I_C                      ../common_source/tools/input_output/write_routtines.c
 Chd|        SPMD_COMM_SPLIT               source/mpi/generic/spmd_comm_split.F
 Chd|        SPMD_FVB_COMM_PATTERN         source/mpi/airbags/spmd_fvb_comm_pattern.F
@@ -2530,7 +2521,7 @@ Chd|  THCRREST                      source/output/restart/rdresb.F
 Chd|-- called by -----------
 Chd|        RDRESB                        source/output/restart/rdresb.F
 Chd|-- calls ---------------
-Chd|        READ_DB                       source/output/tools/read_db.F 
+Chd|        READ_DB                       ../common_source/tools/input_output/read_db.F
 Chd|        REDSQR                        source/output/tools/redsqr.F  
 Chd|====================================================================
       SUBROUTINE THCRREST(MCP, TEMP)
@@ -2575,7 +2566,7 @@ Chd|  NITSCHERREST                  source/output/restart/rdresb.F
 Chd|-- called by -----------
 Chd|        RDRESB                        source/output/restart/rdresb.F
 Chd|-- calls ---------------
-Chd|        READ_DB                       source/output/tools/read_db.F 
+Chd|        READ_DB                       ../common_source/tools/input_output/read_db.F
 Chd|        REDSQR                        source/output/tools/redsqr.F  
 Chd|====================================================================
       SUBROUTINE NITSCHERREST(FORNEQS)
@@ -2619,7 +2610,7 @@ Chd|  CONVRREST                     source/output/restart/rdresb.F
 Chd|-- called by -----------
 Chd|        RDRESB                        source/output/restart/rdresb.F
 Chd|-- calls ---------------
-Chd|        READ_DB                       source/output/tools/read_db.F 
+Chd|        READ_DB                       ../common_source/tools/input_output/read_db.F
 Chd|        READ_I_C                      ../common_source/tools/input_output/write_routtines.c
 Chd|        REDSQI                        source/output/tools/redsqi.F  
 Chd|        REDSQR                        source/output/tools/redsqr.F  
@@ -2668,7 +2659,7 @@ Chd|  RADIARREST                    source/output/restart/rdresb.F
 Chd|-- called by -----------
 Chd|        RDRESB                        source/output/restart/rdresb.F
 Chd|-- calls ---------------
-Chd|        READ_DB                       source/output/tools/read_db.F 
+Chd|        READ_DB                       ../common_source/tools/input_output/read_db.F
 Chd|        READ_I_C                      ../common_source/tools/input_output/write_routtines.c
 Chd|        REDSQI                        source/output/tools/redsqi.F  
 Chd|        REDSQR                        source/output/tools/redsqr.F  
@@ -2717,7 +2708,7 @@ Chd|  FXTEMPRREST                   source/output/restart/rdresb.F
 Chd|-- called by -----------
 Chd|        RDRESB                        source/output/restart/rdresb.F
 Chd|-- calls ---------------
-Chd|        READ_DB                       source/output/tools/read_db.F 
+Chd|        READ_DB                       ../common_source/tools/input_output/read_db.F
 Chd|        READ_I_C                      ../common_source/tools/input_output/write_routtines.c
 Chd|        REDSQI                        source/output/tools/redsqi.F  
 Chd|        REDSQR                        source/output/tools/redsqr.F  
@@ -2766,7 +2757,7 @@ Chd|  RMATRREST                     source/output/restart/rdresb.F
 Chd|-- called by -----------
 Chd|        RDRESB                        source/output/restart/rdresb.F
 Chd|-- calls ---------------
-Chd|        READ_DB                       source/output/tools/read_db.F 
+Chd|        READ_DB                       ../common_source/tools/input_output/read_db.F
 Chd|        READ_I_C                      ../common_source/tools/input_output/write_routtines.c
 Chd|        REDSQI                        source/output/tools/redsqi.F  
 Chd|        REDSQR                        source/output/tools/redsqr.F  
@@ -2818,7 +2809,7 @@ Chd|  PLYXFEM_RREST                 source/output/restart/rdresb.F
 Chd|-- called by -----------
 Chd|        RDRESB                        source/output/restart/rdresb.F
 Chd|-- calls ---------------
-Chd|        READ_DB                       source/output/tools/read_db.F 
+Chd|        READ_DB                       ../common_source/tools/input_output/read_db.F
 Chd|        READ_I_C                      ../common_source/tools/input_output/write_routtines.c
 Chd|====================================================================
       SUBROUTINE PLYXFEM_RREST(MS_LAYER,ZI_LAYER,INOD,IEL,ICODE,ISKEW,
@@ -2939,7 +2930,7 @@ Chd|  CFIELDREST                    source/output/restart/rdresb.F
 Chd|-- called by -----------
 Chd|        RDRESB                        source/output/restart/rdresb.F
 Chd|-- calls ---------------
-Chd|        READ_DB                       source/output/tools/read_db.F 
+Chd|        READ_DB                       ../common_source/tools/input_output/read_db.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
       SUBROUTINE CFIELDREST(CFIELD)
@@ -2981,7 +2972,7 @@ Chd|  LOADPREST                     source/output/restart/rdresb.F
 Chd|-- called by -----------
 Chd|        RDRESB                        source/output/restart/rdresb.F
 Chd|-- calls ---------------
-Chd|        READ_DB                       source/output/tools/read_db.F 
+Chd|        READ_DB                       ../common_source/tools/input_output/read_db.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
       SUBROUTINE LOADPREST(LOADP)
@@ -3054,7 +3045,7 @@ Chd|  CRKXFEM_RRESTANIM             source/output/restart/rdresb.F
 Chd|-- called by -----------
 Chd|        RDRESB                        source/output/restart/rdresb.F
 Chd|-- calls ---------------
-Chd|        READ_DB                       source/output/tools/read_db.F 
+Chd|        READ_DB                       ../common_source/tools/input_output/read_db.F
 Chd|        READ_I_C                      ../common_source/tools/input_output/write_routtines.c
 Chd|        RESTMOD                       share/modules/restart_mod.F   
 Chd|        XFEM2VARS_MOD                 share/modules/xfem2vars_mod.F 
@@ -3232,7 +3223,7 @@ Chd|  PLYXFEM_RAVUPLY               source/output/restart/rdresb.F
 Chd|-- called by -----------
 Chd|        RDRESB                        source/output/restart/rdresb.F
 Chd|-- calls ---------------
-Chd|        READ_DB                       source/output/tools/read_db.F 
+Chd|        READ_DB                       ../common_source/tools/input_output/read_db.F
 Chd|        PLYXFEM_MOD                   share/modules/plyxfem_mod.F   
 Chd|====================================================================
       SUBROUTINE PLYXFEM_RAVUPLY()
@@ -3268,7 +3259,7 @@ Chd|  ALELAG_RREST                  source/output/restart/rdresb.F
 Chd|-- called by -----------
 Chd|        RDRESB                        source/output/restart/rdresb.F
 Chd|-- calls ---------------
-Chd|        READ_DB                       source/output/tools/read_db.F 
+Chd|        READ_DB                       ../common_source/tools/input_output/read_db.F
 Chd|        ALEFLOW_MOD                   share/modules/aleflow_mod.F   
 Chd|====================================================================
       SUBROUTINE ALELAG_RREST()
@@ -3300,7 +3291,7 @@ Chd|  RTHBUFREST                    source/output/restart/rdresb.F
 Chd|-- called by -----------
 Chd|        RDRESB                        source/output/restart/rdresb.F
 Chd|-- calls ---------------
-Chd|        READ_DB                       source/output/tools/read_db.F 
+Chd|        READ_DB                       ../common_source/tools/input_output/read_db.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
       SUBROUTINE RTHBUFREST(RTHBUF,SRTHBUF)
@@ -3340,7 +3331,7 @@ Chd|  KNOTREST                      source/output/restart/rdresb.F
 Chd|-- called by -----------
 Chd|        RDRESB                        source/output/restart/rdresb.F
 Chd|-- calls ---------------
-Chd|        READ_DB                       source/output/tools/read_db.F 
+Chd|        READ_DB                       ../common_source/tools/input_output/read_db.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
       SUBROUTINE KNOTREST(KNOT)
@@ -3380,7 +3371,7 @@ Chd|  KNOTLOCPCREST                 source/output/restart/rdresb.F
 Chd|-- called by -----------
 Chd|        RDRESB                        source/output/restart/rdresb.F
 Chd|-- calls ---------------
-Chd|        READ_DB                       source/output/tools/read_db.F 
+Chd|        READ_DB                       ../common_source/tools/input_output/read_db.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
       SUBROUTINE KNOTLOCPCREST(KNOTLOCPC)
@@ -3420,7 +3411,7 @@ Chd|  KNOTLOCELREST                 source/output/restart/rdresb.F
 Chd|-- called by -----------
 Chd|        RDRESB                        source/output/restart/rdresb.F
 Chd|-- calls ---------------
-Chd|        READ_DB                       source/output/tools/read_db.F 
+Chd|        READ_DB                       ../common_source/tools/input_output/read_db.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
       SUBROUTINE KNOTLOCELREST(KNOTLOCEL)
@@ -3459,7 +3450,7 @@ Chd|  WIGEREST                      source/output/restart/rdresb.F
 Chd|-- called by -----------
 Chd|        RDRESB                        source/output/restart/rdresb.F
 Chd|-- calls ---------------
-Chd|        READ_DB                       source/output/tools/read_db.F 
+Chd|        READ_DB                       ../common_source/tools/input_output/read_db.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
       SUBROUTINE WIGEREST(WIGE)
@@ -3498,7 +3489,7 @@ Chd|  STACK_RREST                   source/output/restart/rdresb.F
 Chd|-- called by -----------
 Chd|        RDRESB                        source/output/restart/rdresb.F
 Chd|-- calls ---------------
-Chd|        READ_DB                       source/output/tools/read_db.F 
+Chd|        READ_DB                       ../common_source/tools/input_output/read_db.F
 Chd|        READ_I_C                      ../common_source/tools/input_output/write_routtines.c
 Chd|====================================================================
       SUBROUTINE STACK_RREST(IGEO,GEO,PM)
@@ -3534,7 +3525,7 @@ Chd|  DRAPE_RREST                   source/output/restart/rdresb.F
 Chd|-- called by -----------
 Chd|        RDRESB                        source/output/restart/rdresb.F
 Chd|-- calls ---------------
-Chd|        READ_DB                       source/output/tools/read_db.F 
+Chd|        READ_DB                       ../common_source/tools/input_output/read_db.F
 Chd|        READ_I_C                      ../common_source/tools/input_output/write_routtines.c
 Chd|        DRAPE_MOD                     share/modules/drape_mod.F     
 Chd|====================================================================

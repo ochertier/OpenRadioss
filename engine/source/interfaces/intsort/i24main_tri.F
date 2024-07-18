@@ -39,9 +39,6 @@ Chd|        STARTIME                      source/system/timer.F
 Chd|        STOPTIME                      source/system/timer.F         
 Chd|        UPGRADE_MULTIMP               ../common_source/interf/upgrade_multimp.F
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
-Chd|        IMP_INTBUF                    share/modules/imp_mod_def.F   
-Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
-Chd|        INTBUFMOD                     share/modules/restart_mod.F   
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        PARAMETERS_MOD                ../common_source/modules/interfaces/parameters_mod.F
 Chd|        TRI7BOX                       share/modules/tri7box.F       
@@ -57,7 +54,6 @@ C============================================================================
 C   M o d u l e s
 C-----------------------------------------------
       USE TRI7BOX
-      USE INTBUFMOD
       USE MESSAGE_MOD
       USE IMP_INTBUF
       USE INTBUFDEF_MOD
@@ -256,19 +252,19 @@ C
 
         NSNR = 0
        IF (IMPL_S >0 .AND. NCYCLE>0 .AND. INCONV==1) THEN
-        BMINMA_OLD(1)=BMINMA_IMP(1,NIN)
-        BMINMA_OLD(2)=BMINMA_IMP(2,NIN)
-        BMINMA_OLD(3)=BMINMA_IMP(3,NIN)
-        BMINMA_OLD(4)=BMINMA_IMP(4,NIN)
-        BMINMA_OLD(5)=BMINMA_IMP(5,NIN)
-        BMINMA_OLD(6)=BMINMA_IMP(6,NIN)
+        BMINMA_OLD(1)=INTBUF_TAB%BMINMA_IMP(1)
+        BMINMA_OLD(2)=INTBUF_TAB%BMINMA_IMP(2)
+        BMINMA_OLD(3)=INTBUF_TAB%BMINMA_IMP(3)
+        BMINMA_OLD(4)=INTBUF_TAB%BMINMA_IMP(4)
+        BMINMA_OLD(5)=INTBUF_TAB%BMINMA_IMP(5)
+        BMINMA_OLD(6)=INTBUF_TAB%BMINMA_IMP(6)
 C        
-        BMINMA_IMP(1,NIN)=BMINMA(1)
-        BMINMA_IMP(2,NIN)=BMINMA(2)
-        BMINMA_IMP(3,NIN)=BMINMA(3)
-        BMINMA_IMP(4,NIN)=BMINMA(4)
-        BMINMA_IMP(5,NIN)=BMINMA(5)
-        BMINMA_IMP(6,NIN)=BMINMA(6)
+        INTBUF_TAB%BMINMA_IMP(1)=BMINMA(1)
+        INTBUF_TAB%BMINMA_IMP(2)=BMINMA(2)
+        INTBUF_TAB%BMINMA_IMP(3)=BMINMA(3)
+        INTBUF_TAB%BMINMA_IMP(4)=BMINMA(4)
+        INTBUF_TAB%BMINMA_IMP(5)=BMINMA(5)
+        INTBUF_TAB%BMINMA_IMP(6)=BMINMA(6)
 C        
         BMINMA(1)=MAX(BMINMA(1),BMINMA_OLD(1))
         BMINMA(2)=MAX(BMINMA(2),BMINMA_OLD(2))

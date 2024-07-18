@@ -116,8 +116,6 @@ Chd|        GROUP_PARAM_MOD               ../common_source/modules/mat_elem/grou
 Chd|        INIMAP1D_MOD                  share/modules1/inimap1d_mod.F 
 Chd|        INIMAP2D_MOD                  share/modules1/inimap2d_mod.F 
 Chd|        INIVOL_DEF_MOD                share/modules1/inivol_mod.F   
-Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
-Chd|        INTERFACES_MOD                ../common_source/modules/interfaces/interfaces_mod.F
 Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
@@ -132,7 +130,7 @@ Chd|====================================================================
      2                  IXP        ,IXR           ,DETONATORS       ,GEO            ,PM        ,
      3                  RBY        ,NPBY          ,LPBY             ,NPC            ,NPTS      ,
      4                  PLD        ,VEUL          ,ALE_CONNECTIVITY ,SKEW           ,FILL      ,
-     5                  IPART      ,ITAB          ,SENSORS          ,
+     5                  IPART      ,ITAB          ,SENSORS          ,SKVOL          ,
      6                  IXTG       ,THK           ,NLOC_DMG         ,GROUP_PARAM_TAB,
      7                  IGRNOD     ,IGRSURF       ,BUFSF            ,VR             ,
      8                  BUFMAT     ,XLAS          ,LAS              ,DTELEM         ,MSS       ,
@@ -249,6 +247,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER,INTENT(IN) :: SKVOL
       INTEGER IPARG(NPARG,NGROUP), IXS(NIXS,*), IXQ(NIXQ,*),IXC(NIXC,*),
      .   IGEO(NPROPGI,*), IXT(NIXT,*),IXP(NIXP,*), IXR(NIXR,*),
      .   NPBY(NNPBY,*),LPBY(*),NPBYL(NNPBY,*),LPBYL(*),NPC(*),
@@ -656,6 +655,7 @@ C     shells
       COQMAT(119) = 1
       COQMAT(121) = 1
       COQMAT(122) = 1
+      COQMAT(125) = 1
       COQMAT(151) = 1
       COQMAT(158) = 1
       COQMAT(200) = 1
@@ -1645,7 +1645,7 @@ C-----------------------------------------------------
      .                   n2d      ,multi_fvm,  sipart, ipart,
      .                   i15a     ,i15b     ,    i15h, sbufmat,  bufmat,
      .                   npropmi  ,nummat   ,     ipm , sbufsf,   bufsf,
-     .                   npropg   ,numgeo   ,     geo , mvsiz)
+     .                   npropg   ,numgeo   ,     geo , mvsiz ,   skvol, itab)
 C---------------------------------
 C  Gravity (after INIVOL)
 C---------------------------------

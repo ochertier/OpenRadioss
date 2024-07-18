@@ -31,11 +31,11 @@ Chd|        CUR_FIL_C                     ../common_source/tools/input_output/wr
 Chd|        RDCOMI                        source/output/restart/rdcomm.F
 Chd|        READ_I_C                      ../common_source/tools/input_output/write_routtines.c
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
-Chd|        INTERFACES_MOD                ../common_source/modules/interfaces/interfaces_mod.F
 Chd|        LOADS_MOD                     ../common_source/modules/loads/loads_mod.F
 Chd|        MAT_ELEM_MOD                  ../common_source/modules/mat_elem/mat_elem_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
+Chd|        NAMES_AND_TITLES_MOD          ../common_source/modules/names_and_titles_mod.F
 Chd|        PINCHTYPE_MOD                 ../common_source/modules/pinchtype_mod.F
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
 Chd|        STATE_MOD                     ../common_source/modules/state_mod.F
@@ -57,7 +57,7 @@ C-----------------------------------------------
       USE SENSOR_MOD
       USE LOADS_MOD
       USE MAT_ELEM_MOD
-      USE NAMES_AND_TITLES_MOD, only:NAMES_AND_TITLES_,LTITLE   !< NAMES_AND_TITLES host the input deck names and titles for outputs
+      USE NAMES_AND_TITLES_MOD                                  !< NAMES_AND_TITLES host the input deck names and titles for outputs
       USE SKEW_MOD                                              !< Skew type
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s

@@ -31,8 +31,6 @@ Chd|        FFIZERO                       source/interfaces/int07/i7ke3.F
 Chd|        I24CORKM                      source/interfaces/int24/i24cork3.F
 Chd|        I24KEG3                       source/interfaces/int24/i24ke3.F
 Chd|        I24KGEO3                      source/interfaces/int24/i24ke3.F
-Chd|        IMP_INTBUFDEF                 share/modules/imp_mod_def.F   
-Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE I24KE3( A     ,V      ,MS   ,
      1                   IPARI ,INTBUF_TAB,X    ,NIN   ,
@@ -41,8 +39,6 @@ Chd|====================================================================
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
-      USE MOD_NODNORM
-      USE MOD_RCURV
       USE INTBUFDEF_MOD
       USE IMP_INTBUFDEF
 C-----------------------------------------------

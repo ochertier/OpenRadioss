@@ -65,7 +65,7 @@ Chd|====================================================================
      H STIFM    ,STIFR ,VISCM  ,VISCR  ,PARTSAV,IPARTS ,BUFMAT ,IOUTPRT,
      L IFAILURE ,NPF   ,TF     ,IPM    ,IGEO   ,NPG    ,NEL    ,JSMS   ,
      M DMELS    ,PM    ,GEO    ,ITASK  ,JTHE   ,TABLE  ,MAT_PARAM,
-     N IDTMINS,DTFACS)
+     N IDTMINS  ,DTFACS,DTMINS)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -154,8 +154,9 @@ C----------------------------------------------------------
       INTEGER NGL(NEL),IPARTS(*),NPF(*),IPM(NPROPMI,*),
      .  IGEO(NPROPGI,*),ITASK
       TARGET  :: IPM
-      INTEGER  :: IDTMINS
-      my_real  :: DTFACS
+      INTEGER,INTENT(IN)  :: IDTMINS
+      my_real,INTENT(IN)  :: DTFACS
+      my_real,INTENT(IN)  :: DTMINS
       my_real
      .  TIME,TIMESTEP,PARTSAV(NPSAV,*),DMELS(*),PM(NPROPM,*),
      .  STIFM(*) ,STIFR(*) , VISCM(*) ,VISCR(*) ,FR_WAVE(*),TF(*),             
@@ -457,12 +458,14 @@ C-----------------------------------------------
           CASE (169) ! MAT_ARUP_ADHESIVE
 
            CALL SIGEPS169_CONNECT(
-     1        NEL      ,TIME     ,MAT_PARAM(IMAT)%UPARAM, MAT_PARAM(IMAT)%IPARAM ,
+     1        NEL      ,TIME     ,MAT_PARAM(IMAT)%UPARAM,  MAT_PARAM(IMAT)%IPARAM ,
      2        MAT_PARAM(IMAT)%NIPARAM     ,MAT_PARAM(IMAT)%NUPARAM    ,STIFM    ,
      3        AREA     ,GBUF%OFF ,NUVAR   ,UVAR     ,IPG     ,
      4        DEPSZZ   ,DEPSYZ   ,DEPSZX  ,EPSZZ    ,EPSYZ    ,EPSZX   ,
      5        SIG0ZZ   ,SIG0YZ   ,SIG0ZX  ,SIGNZZ   ,SIGNYZ   ,SIGNZX  ,
-     6        LBUF%PLA ,IOUT     ,JSMS       ,LBUF%DMG,NGL    ,DMELS   ,IDTMINS,DTFACS)
+     6        LBUF%PLA ,IOUT     ,JSMS       ,LBUF%DMG,NGL    ,DMELS   ,IDTMINS,DTFACS,
+     7        DTMINS,GBUF%THK)
+
 C-----------------------------------------------
          CASE (99)
 c
@@ -661,3 +664,4 @@ C     Nodal forces : corotationnal --> global
 c-----------
       RETURN
       END
+

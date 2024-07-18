@@ -37,7 +37,6 @@ Chd|        STOPTIME                      source/system/timer.F
 Chd|        UPGRADE_MULTIMP               ../common_source/interf/upgrade_multimp.F
 Chd|        COMMAND_LINE_ARGS_MOD         share/modules/command_line_args.F
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
-Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
 Chd|        INTER7_COLLISION_DETECTION_MODsource/interfaces/inter7_collision_detection.F
 Chd|        INTER_SORTING_MOD             share/modules/inter_sorting_mod.F
 Chd|        INTER_STRUCT_MOD              share/modules/inter_struct_mod.F
@@ -97,9 +96,9 @@ C-----------------------------------------------
         INTEGER, INTENT(in) :: RENUM_SIZ    ! size of RENUM
         INTEGER, INTENT(in) :: NIN ,ITASK,NRTM_T,ESHIFT
         INTEGER, INTENT(inout) :: RETRI
-        INTEGER, DIMENSION(NUMNOD), INTENT(inout) :: ITAB
+        INTEGER, DIMENSION(NUMNOD), INTENT(in) :: ITAB
         INTEGER, DIMENSION(NPARI,NINTER),INTENT(inout) :: IPARI
-        INTEGER, DIMENSION(NINTER+1,NSPMD+1),INTENT(inout) :: ISENDTO,IRCVFROM
+        INTEGER, DIMENSION(NINTER+1,NSPMD+1),INTENT(in) :: ISENDTO,IRCVFROM
         INTEGER, DIMENSION(RENUM_SIZ), INTENT(inout) :: RENUM
         INTEGER, DIMENSION(NSPMD), INTENT(inout) :: NSNFIOLD
         my_real, DIMENSION(3*NUMNOD), INTENT(in) :: X   ! position

@@ -25,7 +25,6 @@ Chd|  ININTMASS                     source/interfaces/inter3d1/inintmass.F
 Chd|-- called by -----------
 Chd|        INITIA                        source/elements/initia/initia.F
 Chd|-- calls ---------------
-Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
       SUBROUTINE ININTMASS( IPARI, INTBUF_TAB, MS  ,ISTIF_DT)
@@ -49,7 +48,7 @@ C-----------------------------------------------
       INTEGER , INTENT(INOUT) :: ISTIF_DT
       INTEGER , INTENT(IN   ) :: IPARI(NPARI,NINTER) 
       my_real , INTENT(IN   ) :: MS(NUMNOD) 
-      TYPE(INTBUF_STRUCT_) , INTENT(IN   ) ::  INTBUF_TAB(NINTER)
+      TYPE(INTBUF_STRUCT_) , INTENT(INOUT) ::  INTBUF_TAB(NINTER)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

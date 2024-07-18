@@ -25,7 +25,6 @@ Chd|  S16FORC3                      source/elements/thickshell/solide16/s16forc3
 Chd|-- called by -----------
 Chd|        FORINT                        source/elements/forint.F      
 Chd|-- calls ---------------
-Chd|        MMAIN                         source/materials/mat_share/mmain.F
 Chd|        S16BILAN                      source/elements/thickshell/solide16/s16bilan.F
 Chd|        S16DERI3                      source/elements/thickshell/solide16/s16deri3.F
 Chd|        S16RST                        source/elements/thickshell/solide16/s16rst.F
@@ -49,7 +48,6 @@ Chd|        TSHGEODEL3                    source/elements/thickshell/solidec/tsh
 Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
 Chd|        DT_MOD                        share/modules/dt_mod.F        
 Chd|        MAT_ELEM_MOD                  ../common_source/modules/mat_elem/mat_elem_mod.F
-Chd|        MMAIN_MOD                     source/materials/mat_share/mmain.F
 Chd|        NLOCAL_REG_MOD                ../common_source/modules/nlocal_reg_mod.F
 Chd|        TABLE_MOD                     share/modules/table_mod.F     
 Chd|====================================================================
@@ -71,7 +69,11 @@ Chd|====================================================================
      F                    IPM      ,ISTRAIN ,TEMP   ,FTHE    ,FTHESKY ,
      G                    IEXPAN   ,GRESAV  ,GRTH   ,IGRTH   ,TABLE   ,
      H                    IGEO     ,VOLN    ,CONDN  ,CONDNSKY,ITASK  ,
-     I                    IOUTPRT  ,MAT_ELEM,H3D_STRAIN  ,DT    )
+     I                    IOUTPRT  ,MAT_ELEM,H3D_STRAIN  ,DT  ,SNPC  ,
+     J                    STF      ,SBUFMAT,SVIS,NSVOIS,IDTMINS,IRESP,      
+     .                    IDEL7NG,     IDEL7NOK,    IDTMIN,     MAXFUNC, 
+     .                    IMON_MAT ,USERL_AVAIL, heat_meca,     impl_s,
+     V                    idyna)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -107,6 +109,21 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER,INTENT(IN) :: SNPC
+      INTEGER,INTENT(IN) :: STF
+      INTEGER, INTENT(IN) :: SBUFMAT
+      INTEGER, INTENT(IN) :: IDTMINS
+      INTEGER, INTENt(IN) :: NSVOIS
+      INTEGER ,INTENT(IN) :: IRESP 
+      INTEGER ,INTENT(IN) :: IDEL7NG
+      INTEGER ,INTENT(INOUT) :: IDEL7NOK
+      integer,dimension(102) :: IDTMIN
+      INTEGER ,INTENT(IN) :: MAXFUNC
+      INTEGER, INTENT(IN) :: IMPL_S
+      INTEGER, INTENT(IN) :: IDYNA
+      INTEGER, INTENT(IN) :: USERL_AVAIL
+      INTEGER, INTENT(IN) :: IMON_MAT
+      my_real, INTENT(INOUT) :: HEAT_MECA
       INTEGER IXS(NIXS,*), IPARG(NPARG,NGROUP),NPF(*),
      .        IPARTS(*),IXS16(8,*),IADS16(8,*),IPM(*),GRTH(*),IGRTH(*),
      .        IGEO(*),IADS(8,*),ITASK,IOUTPRT
@@ -131,6 +148,7 @@ C-----------------------------------------------
      .  PX(MVSIZ,NPE,NIPMAX),PY(MVSIZ,NPE,NIPMAX),PZ(MVSIZ,NPE,NIPMAX),
      .  TEMP(*), FTHE(*), FTHESKY(*), GRESAV(*),VOLN(MVSIZ),CONDN(*),
      .  CONDNSKY(*)
+      my_real, DIMENSION(MVSIZ,6), INTENT(INOUT) :: SVIS
       TYPE (TTABLE) TABLE(*)
       TYPE (ELBUF_STRUCT_), TARGET, DIMENSION(NGROUP) :: ELBUF_TAB
       TYPE (NLOCAL_STR_)  , TARGET :: NLOC_DMG 
@@ -141,7 +159,7 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,J,N,LCO, NF1, IFLAG, IL, IR, IS, IT, NF2,L_PLA,
-     .        IP,NLAY,NPTT,NPTS,NPTR,ICO,IBID,IBIDON(1),MX,II(6),PID
+     .        IP,NLAY,NPTT,NPTS,NPTR,ICO,IBID,IBIDON(1),MX,II(6),PID,CURRENT_LAYER
 
       INTEGER MXT(MVSIZ),NGL(MVSIZ),NGEO(MVSIZ),IPERM1(NPE),IPERM2(NPE)
       my_real
@@ -168,7 +186,7 @@ C-----------------------------------------------
      . TEMPEL(MVSIZ),DIE(MVSIZ),THEM(MVSIZ,NPE),AREA(MVSIZ),LLSH(MVSIZ)
      
       ! Variables utilisees dans les routines solides uniquement (en arguments).
-      INTEGER NC(MVSIZ,NPE),NN_DEL,IPRES
+      INTEGER NC(MVSIZ,NPE),NN_DEL,IPRES,SZ_IX
       my_real
      .  OFF(MVSIZ) , RHOO(MVSIZ),NI(NPE,NIPMAX),
      .  SIGSM(MVSIZ),VOLSM(MVSIZ),
@@ -376,6 +394,7 @@ C=======================================================================
       IF (NPTR*NPTS*NPTT*NLAY > NIPMAX) STOP 933
       IBID     = 0
       IBIDON(1)= 0
+      SZ_IX=NUMELQ+NUMELS+NSVOIS
 !
       DO I=1,6
         II(I) = NEL*(I-1)
@@ -569,12 +588,14 @@ C
           IF(JTHE < 0 ) THEN
              CALL S20TEMPCG(1,NEL,NPE, NC,NI(1,IP), TEMP,TEMPEL)
           ENDIF
+
+      CURRENT_LAYER=IL
       !------------------------------------------------------
       !     CALCUL DES CONTRAINTES SUIVANT LOIS CONSTITUTIVES
       !------------------------------------------------------
          CALL MMAIN(
      1   ELBUF_TAB,   NG,          PM,          GEO,
-     2   FV,          ALE_CONNECT, IXS,         IPARG,
+     2                ALE_CONNECT, IXS,         IPARG,
      3   V,           TF,          NPF,         BUFMAT,
      4   STI,         X,           DT2T,        NELTST,
      5   ITYPTST,     OFFSET,      NEL,         W,
@@ -594,13 +615,21 @@ C
      J   DZZ,         IPM,         GAMA,        BID,
      K   BID,         BID,         BID,         BID,
      L   BID,         BID,         ISTRAIN,     TEMPEL,
-     M   DIE,         IEXPAN,      IL,          MBID,
+     M   DIE,         IEXPAN,      CURRENT_LAYER,MBID,
      N   MBID,        IR,          IS,          IT,
      O   TABLE,       BID,         BID,         BID,
      P   BID,         IPARG(1,NG), IGEO,        CONDE,
      Q   ITASK,       NLOC_DMG,    VARNL,       MAT_ELEM,
-     R   H3D_STRAIN,  JPLASOL,     JSPH,        OPT_MTN=MTN,
-     S   OPT_JCVT=JCVT,OPT_ISORTH=ISORTH,       OPT_ISORTHG=ISORTHG)
+     R   H3D_STRAIN,  JPLASOL,     JSPH,        MVSIZ, 
+     *                SNPC,        STF,         SBUFMAT,
+     *   SVIS,        SZ_IX,       IDTMINS,     IRESP,
+     *   N2D,         TH_STRAIN,   NGROUP,      TT, 
+     .   DT1,         NTABLE,      NUMELQ,      nummat,
+     .   numgeo,      numnod,      numels,
+     .   IDEL7NG,     IDEL7NOK,    IDTMIN,      MAXFUNC,
+     .   IMON_MAT,    USERL_AVAIL, heat_meca,   impl_s,
+     .   idyna,       OPT_MTN=MTN, OPT_JCVT=JCVT,OPT_ISORTH=ISORTH,
+     .   OPT_ISORTHG=ISORTHG)
 
 c
       IF (ISTRAIN == 1)THEN 
@@ -637,7 +666,7 @@ C
      6   GBUF%EINT, GBUF%RHO,  GBUF%QVIS, GBUF%PLA,
      7   WI,        VOLG,      LBUF%VOL,  GBUF%VOL,
      8   L_PLA,     NEL,       CONDE,     DELTAX,
-     9   CONDEG,    ISRAT)
+     9   CONDEG,    ISRAT,     SVIS)
       !-------------------------
       !    finite element heat transfert  
       !--------------------------

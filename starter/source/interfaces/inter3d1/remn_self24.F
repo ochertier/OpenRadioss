@@ -30,7 +30,6 @@ Chd|        ANCMSG                        source/output/message/message.F
 Chd|        FRETITL2                      source/starter/freform.F      
 Chd|        INSOL3ET                      source/interfaces/inter3d1/i24sti3.F
 Chd|        UPGRADE_REMNODE2              source/interfaces/interf1/upgrade_remnode.F
-Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
       SUBROUTINE REMN_SELF24(
@@ -69,7 +68,7 @@ C-----------------------------------------------
       INTEGER, DIMENSION(LNOPT1,SNOM_OPT) ,INTENT(IN) :: NOM_OPT
       INTEGER, DIMENSION(NINTER)      ,INTENT(INOUT) :: NREMOV
       my_real, DIMENSION(NUMNOD*3)       ,INTENT(IN) :: X
-      TYPE(INTBUF_STRUCT_), DIMENSION(NINTER),INTENT(IN):: INTBUF_TAB
+      TYPE(INTBUF_STRUCT_), DIMENSION(NINTER),INTENT(INOUT):: INTBUF_TAB
       INTEGER, INTENT(in) :: IDDLEVEL !< flag : 0 for the 1rst step, 1 for the 2nd step
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s

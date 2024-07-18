@@ -26,8 +26,6 @@ Chd|-- called by -----------
 Chd|        INTTRI                        source/interfaces/intsort/inttri.F
 Chd|-- calls ---------------
 Chd|        I25COMP_2                     source/interfaces/int25/i25comp_2.F
-Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
-Chd|        INTBUFMOD                     share/modules/restart_mod.F   
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        MPI_COMMOD                    share/modules/mpi_comm_mod.F  
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
@@ -40,7 +38,6 @@ Chd|====================================================================
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
-      USE INTBUFMOD
       USE MESSAGE_MOD
       USE TRI7BOX
       USE INTBUFDEF_MOD  

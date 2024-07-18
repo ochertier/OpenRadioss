@@ -36,7 +36,6 @@ Chd|        IGE3DAIRE                     source/elements/ige3d/ig3daire.F
 Chd|        IGE3DBILAN                    source/elements/ige3d/ige3dbilan.F
 Chd|        IGE3DDEFO                     source/elements/ige3d/ige3ddefo.F
 Chd|        IGE3DZERO                     source/elements/ige3d/ige3dzero.F
-Chd|        MMAIN                         source/materials/mat_share/mmain.F
 Chd|        SMALLB3                       source/elements/solid/solide/smallb3.F
 Chd|        SRHO3                         source/elements/solid/solide/srho3.F
 Chd|        SROTA3                        source/elements/solid/solide/srota3.F
@@ -46,7 +45,6 @@ Chd|        STOPTIME                      source/system/timer.F
 Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
 Chd|        MAT_ELEM_MOD                  ../common_source/modules/mat_elem/mat_elem_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        MMAIN_MOD                     source/materials/mat_share/mmain.F
 Chd|        NLOCAL_REG_MOD                ../common_source/modules/nlocal_reg_mod.F
 Chd|        TABLE_MOD                     share/modules/table_mod.F     
 Chd|====================================================================
@@ -70,7 +68,10 @@ Chd|====================================================================
      H   KNOTLOCEL,   GRESAV,      GRTH,        IGRTH,
      I   MAT_ELEM,    H3D_STRAIN,  ISMSTR,      JALE,
      J   JEUL,        JLAG,        JCVT,        JPLASOL,
-     K   JSPH)
+     K   JSPH,        SNPC,        STF,         SBUFMAT,
+     L   SVIS,        NSVOIS,      IDTMINS,     IRESP,      
+     .   IDEL7NG,     IDEL7NOK,    USERL_AVAIL, heat_meca,
+     .   impl_s,      idyna)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -110,6 +111,19 @@ C-----------------------------------------------
       INTEGER, INTENT(IN) :: JALE
       INTEGER, INTENT(IN) :: JEUL
       INTEGER, INTENT(IN) :: JLAG
+      INTEGER, INTENT(IN) :: SNPC
+      INTEGER, INTENT(IN) :: STF
+      INTEGER, INTENT(IN) :: SBUFMAT
+      INTEGER, INTENT(IN) :: IDTMINS
+      INTEGER, INTENT(IN) :: NSVOIS
+      INTEGER, INTENT(IN) :: IRESP     
+      INTEGER ,INTENT(IN) :: IDEL7NG
+      INTEGER ,INTENT(INOUT) :: IDEL7NOK
+      INTEGER, INTENT(IN) :: IMPL_S
+      INTEGER, INTENT(IN) :: IDYNA
+      INTEGER, INTENT(IN) :: USERL_AVAIL
+      my_real, INTENT(INOUT) :: HEAT_MECA
+
       INTEGER LFT,LLT,NEL,NFT,MTN,IGTYP,IFAILURE,NPT,JSMS,
      .        NCTRL,NG,NELTST,ITYPTST,OFFSET,IEXPAN,ITASK,H3D_STRAIN
       INTEGER IXS(NIXS,*), IPARG(NPARG,*), NPF(*),IADS(8,*),
@@ -117,12 +131,13 @@ C-----------------------------------------------
      .        KXIG3D(NIXIG3D,*),IXIG3D(*),FLUX(6,*),FLU1(*),
      .        IOUTPRT,PX,PY,PZ,GRTH(*),IGRTH(*)
       my_real
-     .   PM(NPROPM,*), GEO(NPROPG,*),X(3,*),A(3,*),V(3,*),MS(*),W(*),
-     .   AR(3,*), VR(3,*), IN(3,*),D(3,*),TF(*), BUFMAT(*),FR_WAVE(*),
-     .   PARTSAV(*),STIFN(*), STIFR(*), FSKY(*),EANI(*),
-     .   FX(MVSIZ,*),FY(MVSIZ,*),FZ(MVSIZ,*),
-     .   MSSA(*), DMELS(*),KNOT(*),WIGE(*),DT2T, FV(*),KNOTLOCPC(DEG_MAX,3,*),
-     .   KNOTLOCEL(2,3,*),GRESAV(*)
+     .  PM(NPROPM,*), GEO(NPROPG,*),X(3,*),A(3,*),V(3,*),MS(*),W(*),
+     .  AR(3,*), VR(3,*), IN(3,*),D(3,*),TF(*), BUFMAT(*),FR_WAVE(*),
+     .  PARTSAV(*),STIFN(*), STIFR(*), FSKY(*),EANI(*),
+     .  FX(MVSIZ,*),FY(MVSIZ,*),FZ(MVSIZ,*),
+     .  MSSA(*), DMELS(*),KNOT(*),WIGE(*),DT2T, FV(*),KNOTLOCPC(DEG_MAX,3,*),
+     .  KNOTLOCEL(2,3,*),GRESAV(*)
+      my_real, DIMENSION(MVSIZ,6), INTENT(INOUT) :: SVIS
       TYPE (ELBUF_STRUCT_), TARGET, DIMENSION(NGROUP) :: ELBUF_TAB
       TYPE(TTABLE) TABLE(*)
       TYPE (NLOCAL_STR_)  , TARGET :: NLOC_DMG 
@@ -173,9 +188,9 @@ C-----
      . MUVOID(MVSIZ),SSP_EQ(MVSIZ),AIRE(MVSIZ),
      . SIGY(MVSIZ),ET(MVSIZ),R1_FREE(MVSIZ),
      . R3_FREE(MVSIZ),R4_FREE(MVSIZ),DEFP(MVSIZ),
-     . MFXX(1,1),MFXY(1,1),MFYX(1,1),
-     . MFYY(1,1),MFYZ(1,1),MFZY(1,1),
-     . MFZZ(1,1),MFZX(1,1),MFXZ(1,1),
+     . MFXX(MVSIZ),MFXY(MVSIZ),MFYX(MVSIZ),
+     . MFYY(MVSIZ),MFYZ(MVSIZ),MFZY(MVSIZ),
+     . MFZZ(MVSIZ),MFZX(MVSIZ),MFXZ(MVSIZ),
      . GAMA(MVSIZ,6),BID(MVSIZ),TEMPEL(MVSIZ),DIE(MVSIZ),
      . STIG(MVSIZ,NCTRL)
 C 
@@ -210,6 +225,7 @@ C
       my_real VARNL(NEL)
       my_real,
      .   ALLOCATABLE, DIMENSION(:,:) :: VGAUSS
+      INTEGER SZ_IX
 C----------------------------------------------------------
       DOUBLE PRECISION
      .  W_GAUSS(9,9),A_GAUSS(9,9),VOLDP(MVSIZ)
@@ -272,6 +288,7 @@ C----------------------------------------------------------
 C-----------------------------------------------
 C   S o u r c e  L i n e s
 C=======================================================================
+      SZ_IX=NUMELQ+NUMELS+NSVOIS     ! Size of IX array (either IXS+NSVOIS or IXQ)
       IBID = 0
       IBIDV = 0
       ISTRAIN = 1
@@ -494,7 +511,7 @@ C------------------------------------------------------
       IF ((ITASK==0).AND.(IMON_MAT==1)) CALL STARTIME(35,1)
        CALL MMAIN(
      1   ELBUF_TAB,   NG,          PM,          GEO,
-     2   FV,          ALE_CONNECT, IXS,         IPARG,
+     2                ALE_CONNECT, IXS,         IPARG,
      3   V,           TF,          NPF,         BUFMAT,
      4   STI,         X,           DT2T,        NELTST,
      5   ITYPTST,     OFFSET,      NEL,         W,
@@ -519,7 +536,15 @@ C------------------------------------------------------
      O   TABLE,       BID,         BID,         BID,
      P   BID,         IPARG(1,NG), IGEO,        BID,
      Q   ITASK,       NLOC_DMG,    VARNL,       MAT_ELEM,
-     R   H3D_STRAIN,  JPLASOL,     JSPH)
+     R   H3D_STRAIN,  JPLASOL,     JSPH,        MVSIZ,
+     S                SNPC,        STF,         SBUFMAT,
+     *   SVIS,        SZ_IX,       IDTMINS,     IRESP,
+     T   N2D,         TH_STRAIN,   NGROUP,      TT, 
+     .   DT1,         NTABLE,      NUMELQ,      nummat,
+     .   numgeo,      numnod,      numels,
+     .   IDEL7NG,     IDEL7NOK,    IDTMIN,      MAXFUNC,
+     .   IMON_MAT,    USERL_AVAIL, heat_meca,   impl_s,
+     .   idyna)
 
        CALL SSTRA3(
      1   DXX,      DYY,      DZZ,      D4,

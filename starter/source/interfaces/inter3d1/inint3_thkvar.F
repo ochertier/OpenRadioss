@@ -34,7 +34,6 @@ Chd|        I21PWR3                       source/interfaces/inter3d1/i21pwr3.F
 Chd|        I21RCURV                      source/interfaces/inter3d1/i21norm3.F
 Chd|        I21RESET                      source/interfaces/inter3d1/i21reset.F
 Chd|        I21ROT                        source/interfaces/inter3d1/i21rot.F
-Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
 Chd|        INTSTAMP_MOD                  share/modules1/intstamp_mod.F 
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|====================================================================
@@ -91,7 +90,7 @@ C-----------------------------------------------
       INTEGER ID
       CHARACTER*nchartitle,
      .   TITR
-      TYPE(INTBUF_STRUCT_) INTBUF_TAB
+      TYPE(INTBUF_STRUCT_) :: INTBUF_TAB
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

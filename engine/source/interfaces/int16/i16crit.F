@@ -29,13 +29,14 @@ Chd|        I10BOX                        source/interfaces/int16/i16crit.F
 Chd|        I16BOX                        source/interfaces/int16/i16crit.F
 Chd|        I20BOX                        source/interfaces/int16/i16crit.F
 Chd|        I8BOX                         source/interfaces/int16/i16crit.F
-Chd|        I16MAIN_MOD                   source/interfaces/int16/i16main.F
 Chd|====================================================================
        SUBROUTINE I16CRIT(
      1       X      ,NSV    ,NELEM ,NSN   ,EMINX  ,
      2       NME    ,ITASK  ,XSAV  ,IXS   ,IXS16  ,
-     3       IXS20  ,IXS10  ,V      ,A     )
-       USE I16MAIN_MOD
+     3       IXS20  ,IXS10  ,V      ,A    ,XMSRG,
+     4       XSLVG )
+C-----------------------------------------------
+      USE INTBUFDEF_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -57,6 +58,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      my_real, DIMENSION(7) :: XMSRG
+      my_real, DIMENSION(7) :: XSLVG
       INTEGER NSN,NMN,ITASK,NME,
      .        NSV(*),NELEM(*),IXS(NIXS,*),IXS16(8,*),IXS20(12,*),
      .        IXS10(6,*)

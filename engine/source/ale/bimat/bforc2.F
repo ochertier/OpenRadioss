@@ -39,7 +39,6 @@ Chd|        BLERO2                        source/ale/bimat/blero2.F
 Chd|        BREST2                        source/ale/bimat/brest2.F     
 Chd|        CHECK_OFF_ALE                 source/elements/solid/solide/check_off_ale.F
 Chd|        EDEFO2                        source/ale/euler2d/edefo2.F   
-Chd|        MMAIN                         source/materials/mat_share/mmain.F
 Chd|        QBILAN                        source/elements/solid_2d/quad/qbilan.F
 Chd|        QCOOR2                        source/elements/solid_2d/quad/qcoor2.F
 Chd|        QDEFO2                        source/elements/solid_2d/quad/qdefo2.F
@@ -58,7 +57,6 @@ Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_conne
 Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
 Chd|        MAT_ELEM_MOD                  ../common_source/modules/mat_elem/mat_elem_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        MMAIN_MOD                     source/materials/mat_share/mmain.F
 Chd|        NLOCAL_REG_MOD                ../common_source/modules/nlocal_reg_mod.F
 Chd|        OUTPUT_MOD                    ../common_source/modules/output/output_mod.F
 Chd|        TABLE_MOD                     share/modules/table_mod.F     
@@ -66,7 +64,7 @@ Chd|====================================================================
       SUBROUTINE BFORC2(ELBUF_TAB,NG   ,
      1                   PM     ,GEO    ,IC     ,X       ,
      2                   A      ,V      ,MS     ,W      ,FLUX    ,
-     3                   FLU1   ,VEUL   ,FV     ,ALE_CONNECT  ,IPARG   ,
+     3                   FLU1   ,VEUL   ,ALE_CONNECT  ,IPARG   ,
      4                   JPARG  ,FILL   ,DFILL  ,IMS    ,NLOC_DMG,
      5                   TF     ,NPF    ,BUFMAT ,PARTSAV ,
      6                   DT2T   ,NELTST ,ITYPTST,STIFN  ,OFFSET  ,
@@ -74,7 +72,10 @@ Chd|====================================================================
      8                   IPM    ,BUFVOIS,
      9                   GRESAV ,GRTH   ,IGRTH  ,TABLE  ,IGEO    ,
      O                   VOLN   ,ITASK  ,MS_2D  ,FSKYM  ,MAT_ELEM,
-     B                   H3D_STRAIN,OUTPUT)
+     B                   H3D_STRAIN,OUTPUT,SZ_BUFVOIS,SNPC,STF,SBUFMAT,SVIS,
+     C                   NSVOIS, IDTMINS,IRESP, IDEL7NG,     IDEL7NOK, 
+     D                   IDTMIN, MAXFUNC, IMON_MAT,   
+     E                   USERL_AVAIL, heat_meca,   impl_s,      idyna)
 C-----------------------------------------------
 C   M o d u l e s 
 C-----------------------------------------------
@@ -108,14 +109,29 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER OFFSET,NEL,NG
+      INTEGER OFFSET,NEL,NG,NSVOIS,IDTMINS
+      INTEGER,INTENT(IN) :: SZ_BUFVOIS
+      INTEGER,INTENT(IN) :: SNPC
+      INTEGER,INTENT(IN) :: STF
+      INTEGER, INTENT(IN) :: SBUFMAT
+      INTEGER, INTENT(IN) :: IRESP
+      INTEGER ,INTENT(IN) :: IDEL7NG
+      INTEGER ,INTENT(INOUT) :: IDEL7NOK
+      integer,dimension(102) :: IDTMIN
+      INTEGER ,INTENT(IN) :: MAXFUNC
+      INTEGER, INTENT(IN) :: IMPL_S
+      INTEGER, INTENT(IN) :: IDYNA
+      INTEGER, INTENT(IN) :: USERL_AVAIL
+      INTEGER, INTENT(IN) :: IMON_MAT
+      my_real, INTENT(INOUT) :: HEAT_MECA
       INTEGER IC(*), IPARG(NPARG,NGROUP), JPARG(*), IMS(*), NPF(*),IPARTQ(NUMELQ),IPM(*),IGEO(*),ITASK,H3D_STRAIN
       INTEGER NELTST,ITYPTST, IADQ(4,*),GRTH(*),IGRTH(*)
       my_real DT2T
       my_real PM(*), GEO(*), X(*), A(*), V(*), MS(*), W(*), FLUX(4,*),
-     .        FLU1(*), VEUL(*), FV(*), FILL(NUMNOD,*),EANI(*),FSKY(*),
+     .        FLU1(*), VEUL(*),FILL(NUMNOD,*),EANI(*),FSKY(*),
      .        DFILL(NUMNOD,*), TF(*), BUFMAT(*), PARTSAV(*), STIFN(*),
      .        BUFVOIS(6,*),GRESAV(*),VOLN(MVSIZ),MS_2D(*),FSKYM(*)
+      my_real, DIMENSION(MVSIZ,6), INTENT(INOUT) :: SVIS
       TYPE (TTABLE) TABLE(*)
       TYPE(ELBUF_STRUCT_), TARGET, DIMENSION(NGROUP) :: ELBUF_TAB
       TYPE (NLOCAL_STR_)  , TARGET :: NLOC_DMG 
@@ -127,7 +143,7 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,NF1,NF2, MTN1, MTN2, LCO, IMULT, IFLAG,IBID
       INTEGER MAT(MVSIZ),NC1(MVSIZ),NC2(MVSIZ),NC3(MVSIZ),NC4(MVSIZ),
-     .        NGL(MVSIZ),NGEO(MVSIZ), IBIDV(1) ,L_TEMP, L_PLA, L_BFRAC,L_BULK
+     .        NGL(MVSIZ),NGEO(MVSIZ), IBIDV(1) ,L_TEMP, L_PLA, L_BFRAC,L_BULK,SZ_IX
       INTEGER :: ILAY
       my_real  SOFF
       my_real Y1(MVSIZ), Y2(MVSIZ), Y3(MVSIZ), Y4(MVSIZ),
@@ -149,17 +165,19 @@ C-----------------------------------------------
 
       my_real B11(MVSIZ), B12(MVSIZ), B13(MVSIZ), B14(MVSIZ),B21(MVSIZ), B22(MVSIZ), B23(MVSIZ), B24(MVSIZ) ! Advection term ('force')
       my_real WYY(MVSIZ),WZZ(MVSIZ),VDX(MVSIZ)
-      my_real MUVOID(MVSIZ), STI(MVSIZ),BID(1), MBID(1)
+      my_real MUVOID(MVSIZ), STI(MVSIZ),BID(MVSIZ), MBID(1)
       my_real SIGY(MVSIZ),ET(MVSIZ),GAMA(MVSIZ,6), R3_FREE(MVSIZ),R4_FREE(MVSIZ)
       my_real DALPH1(MVSIZ), DALPH2(MVSIZ)
       my_real EYYS(MVSIZ), EZZS(MVSIZ), ETTS(MVSIZ), EYZS(MVSIZ), EYTS(MVSIZ), EZTS(MVSIZ),BIDM(MVSIZ)
       my_real VARNL(NEL)
+      INTEGER NPARG_BID(NPARG)
 C-------------------
       TYPE(L_BUFEL_)  ,POINTER :: LBUF, LBUF1,LBUF2     
       TYPE(G_BUFEL_)  ,POINTER :: GBUF     
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------
+      SZ_IX=NUMELQ+NUMELS+NSVOIS                   ! Size of IX array (either IXS+NSVOIS or IXQ)
       GBUF  => ELBUF_TAB(NG)%GBUF
       LBUF1 => ELBUF_TAB(NG)%BUFLY(1)%LBUF(1,1,1)  ! buffer mat 1
       LBUF2 => ELBUF_TAB(NG)%BUFLY(2)%LBUF(1,1,1)  ! buffer mat 2
@@ -314,7 +332,7 @@ C     STRESS TENSOR
 C-----------------------------------------------------
       CALL MMAIN(
      1   ELBUF_TAB,   NG,          PM,          GEO,
-     2   FV,          ALE_CONNECT, IC,          IPARG,
+     2                ALE_CONNECT, IC,          IPARG,
      3   V,           TF,          NPF,         BUFMAT,
      4   STI,         X,           DT2T,        NELTST,
      5   ITYPTST,     OFFSET,      NEL,         W,
@@ -334,12 +352,19 @@ C-----------------------------------------------------
      J   WYZ,         IPM,         GAMA,        BID,
      K   BID,         BID,         BID,         BID,
      L   BID,         BID,         IBID,        BID,
-     M   BID,         IBID,        ILAY,       MBID,
+     M   BID,         IBID,        ILAY,        MBID,
      N   MBID,        1,           1,           1,
      O   TABLE,       BID,         BID,         BID,
      P   BID,         IPARG(1,NG), IGEO,        BID,
      Q   ITASK,       NLOC_DMG,    VARNL,       MAT_ELEM,
-     R   H3D_STRAIN,  JPLASOL,     JSPH)
+     R   H3D_STRAIN,  JPLASOL,     JSPH,        SZ_BUFVOIS,
+     T           SNPC,STF,SBUFMAT,SVIS,          SZ_IX,
+     U   IDTMINS,IRESP, N2D,         TH_STRAIN,   NGROUP,TT, 
+     .   DT1,         NTABLE,      NUMELQ,      nummat,
+     .   numgeo,      numnod,      numels,            
+     .   IDEL7NG,     IDEL7NOK,    IDTMIN,      MAXFUNC,
+     .   IMON_MAT,    USERL_AVAIL, heat_meca,   impl_s,
+     .   idyna)
 C----------------------------------
 C     PETROV-GALERKIN PSEUDO MASSES & ALE MASSES
 C----------------------------------
@@ -409,7 +434,8 @@ C--------------------
      2   PZ2,     AIRE,    VOLN,    QVIS,
      3   F11,     F12,     F21,     F22,
      4   AX1,     AX2,     BID,     BID,
-     5   BID,     BID,     NEL,     JCVT)
+     5   BID,     BID,     NEL,     JCVT,
+     6   SVIS)
 C------------------------
 C     ADVECTION TERM (TRANSPORTATION 'FORCE')
 C------------------------
@@ -524,7 +550,7 @@ C     STREE TENSOR
 C-----------------------------------------------------
       CALL MMAIN(
      1   ELBUF_TAB,   NG,          PM,          GEO,
-     2   FV,          ALE_CONNECT, IC,          IPARG,
+     2                ALE_CONNECT, IC,          IPARG,
      3   V,           TF,          NPF,         BUFMAT,
      4   STI,         X,           DT2T,        NELTST,
      5   ITYPTST,     OFFSET,      NEL,         W,
@@ -547,9 +573,17 @@ C-----------------------------------------------------
      M   BID,         IBID,        ILAY,        MBID,
      N   MBID,        1,           1,           1,
      O   TABLE,       BID,         BID,         BID,
-     P   BID,         IBIDV,       IGEO,        BID,
+     P   BID,         NPARG_BID,       IGEO,        BID,
      Q   ITASK,       NLOC_DMG,    VARNL,       MAT_ELEM,
-     R   TH_STRAIN,   JPLASOL,     JSPH)
+     R   TH_STRAIN,   JPLASOL,     JSPH,        SZ_BUFVOIS,
+     S                SNPC,        STF,         SBUFMAT, 
+     *   SVIS,        SZ_IX,       IDTMINS,     IRESP,
+     T   N2D,         TH_STRAIN,   NGROUP,      TT, 
+     .   DT1,         NTABLE,      NUMELQ,      nummat,
+     .   numgeo,      numnod,      numels,
+     .   IDEL7NG,     IDEL7NOK,    IDTMIN,      MAXFUNC,
+     .   IMON_MAT,    USERL_AVAIL, heat_meca,   impl_s,
+     .   idyna )
 C----------------------------------
 C     PETROV-GALERKIN PSEUDO MASSES & MASSES ALE
 C----------------------------------
@@ -619,7 +653,8 @@ C--------------------
      2   PZ2,     AIRE,    VOLN,    QVIS,
      3   F11,     F12,     F21,     F22,
      4   AX1,     AX2,     BID,     BID,
-     5   BID,     BID,     NEL,     JCVT)
+     5   BID,     BID,     NEL,     JCVT,
+     6   SVIS)
 C------------------------
 C       ADVECTION TERM (TRANSPORTATION 'FORCE')
 C------------------------

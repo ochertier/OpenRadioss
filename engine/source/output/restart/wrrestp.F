@@ -41,8 +41,6 @@ Chd|        FXFLUXWREST                   source/constraints/thermic/fxfluxwrest
 Chd|        FXTEMPWREST                   source/output/restart/wrrest.F
 Chd|        IMPWREST                      source/output/restart/wrrest.F
 Chd|        IMP_TRANS                     source/output/restart/wrrest.F
-Chd|        INTFRIC_WRESTI                share/modules/intbuf_fric_mod.F
-Chd|        INTFRIC_WRESTR                share/modules/intbuf_fric_mod.F
 Chd|        INTSTAMP_WRESTI               share/modules/intstamp_mod.F  
 Chd|        INTSTAMP_WRESTR               share/modules/intstamp_mod.F  
 Chd|        NFWREST                       source/output/restart/wrrest.F
@@ -69,8 +67,8 @@ Chd|        USERWI_WRITE                  source/user_interface/userwindow_inter
 Chd|        WRCOMI                        source/output/restart/wrcomm.F
 Chd|        WRCOMR                        source/output/restart/wrcomm.F
 Chd|        WRITE_C_C                     ../common_source/tools/input_output/write_routtines.c
-Chd|        WRITE_DB                      source/output/tools/write_db.F
-Chd|        WRITE_DPDB                    source/output/tools/write_db.F
+Chd|        WRITE_DB                      ../common_source/tools/input_output/write_db.F
+Chd|        WRITE_DPDB                    ../common_source/tools/input_output/write_db.F
 Chd|        WRITE_ELGROUP_PARAM           source/output/restart/write_elgroup_param.F
 Chd|        WRITE_INTBUF                  source/output/restart/write_intbuf.F
 Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
@@ -101,16 +99,12 @@ Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.
 Chd|        GROUP_MOD                     share/modules/group_mod.F     
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|        INOUTFILE_MOD                 ../common_source/modules/inoutfile_mod.F
-Chd|        INT8_MOD                      ../common_source/modules/interfaces/int8_mod.F
-Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
-Chd|        INTBUFMOD                     share/modules/restart_mod.F   
-Chd|        INTBUF_FRIC_MOD               share/modules/intbuf_fric_mod.F
-Chd|        INTERFACES_MOD                ../common_source/modules/interfaces/interfaces_mod.F
 Chd|        INTSTAMP_GLOB_MOD             share/modules/intstamp_glob_mod.F
 Chd|        LOADS_MOD                     ../common_source/modules/loads/loads_mod.F
 Chd|        MAT_ELEM_MOD                  ../common_source/modules/mat_elem/mat_elem_mod.F
 Chd|        MONVOL_STRUCT_MOD             share/modules/monvol_struct_mod.F
 Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
+Chd|        NAMES_AND_TITLES_MOD          ../common_source/modules/names_and_titles_mod.F
 Chd|        OUTMAX_MOD                    ../common_source/modules/outmax_mod.F
 Chd|        OUTPUTS_MOD                   ../common_source/modules/outputs_mod.F
 Chd|        OUTPUT_MOD                    ../common_source/modules/output/output_mod.F
@@ -142,7 +136,6 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE RESTMOD
-      USE INTBUFMOD
       USE INTSTAMP_GLOB_MOD
       USE SMS_MOD
       USE TABLE_GLOB_MOD
@@ -177,7 +170,7 @@ C-----------------------------------------------
       USE DAMP_MOD
       USE XFEM2VARS_MOD
       USE ALEFVM_MOD
-      USE NAMES_AND_TITLES_MOD, only:NAMES_AND_TITLES_,LTITLE
+      USE NAMES_AND_TITLES_MOD
       USE BCS_MOD , only : BCS
       USE SKEW_MOD
       USE IMPBUFDEF_MOD, only: IMPBUF_STRUCT_
@@ -973,7 +966,7 @@ C--------------------------------------
 C  Interface friction buffer (integer )
 C--------------------------------------
       IF(NINTERFRIC /= 0)THEN
-        CALL INTFRIC_WRESTI(INTBUF_FRIC_TAB)
+        CALL INTFRIC_WRESTI(INTBUF_FRIC_TAB,NINTERFRIC)
       END IF
 C--------------------------------------
 C structure tables (partie entiere)
@@ -1351,7 +1344,7 @@ C--------------------------------------
 C  Interface friction buffer (integer )
 C--------------------------------------
       IF(NINTERFRIC /= 0)THEN
-        CALL INTFRIC_WRESTR(INTBUF_FRIC_TAB)
+        CALL INTFRIC_WRESTR(INTBUF_FRIC_TAB,NINTERFRIC)
       END IF
 C--------------------------------------
         CALL WRITE_DB(MS0,NUMNOD)
@@ -1529,9 +1522,9 @@ C--------------------------------------------
       CALL WRITE_DB(TM_NSTRA1,LMAX_NSTRA*NUMNOD)
       CALL WRITE_DB(TM_NSTRA3,LMAX_NSTRA*NUMNOD)
 C--------------------------------------
-      IF (LOADS%NLOAD_CLOAD > 0) THEN
-        CALL WRITE_DB(DPL0CLD,6*LOADS%NLOAD_CLOAD)
-        CALL WRITE_DB(VEL0CLD,6*LOADS%NLOAD_CLOAD)
+      IF (NCONLD > 0) THEN
+        CALL WRITE_DB(DPL0CLD,6*NCONLD)
+        CALL WRITE_DB(VEL0CLD,6*NCONLD)
       ENDIF
 C--------------------------------------
 C   /DAMP/VREL

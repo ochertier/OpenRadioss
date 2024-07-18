@@ -44,10 +44,6 @@ Chd|        EIG_MOD                       share/modules/eig_mod.F
 Chd|        FSKYI_MOD                     share/modules/restart_mod.F   
 Chd|        FXB_MOD                       share/modules/fxb_mod.F       
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
-Chd|        INTBUFFRIC_MOD                share/modules/restart_mod.F   
-Chd|        INTBUFMOD                     share/modules/restart_mod.F   
-Chd|        INTBUF_MOD                    share/modules/restart_mod.F   
-Chd|        INTERFACES_MOD                ../common_source/modules/interfaces/interfaces_mod.F
 Chd|        INTSTAMP_GLOB_MOD             share/modules/intstamp_glob_mod.F
 Chd|        LOADS_MOD                     ../common_source/modules/loads/loads_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
@@ -67,8 +63,6 @@ Chd|====================================================================
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
-      USE INTBUFMOD
-      USE INTBUF_MOD
       USE RESTMOD
       USE INTSTAMP_GLOB_MOD
       USE FSKYI_MOD
@@ -82,8 +76,7 @@ C-----------------------------------------------
       USE ECND_MOD
       USE MULTI_FVM_MOD
       USE ALEANIM_MOD
-      USE H3D_MOD
-      USE INTBUFFRIC_MOD                     
+      USE H3D_MOD                    
       USE PINCHTYPE_MOD 
       USE DRAPE_MOD
       USE FXB_MOD
@@ -397,11 +390,11 @@ c        ALLOCATE (INBUF(0),STAT=IERR)
 c        IF (IERR/=0) GOTO 1000
 c        INBUF = 0  
 
-        ALLOCATE (INTBUF_TAB(NINTER),STAT=IERR)
+        ALLOCATE (INTERFACES%INTBUF_TAB(NINTER),STAT=IERR)
 
 C
 C     allocations structures Interface friction
-        ALLOCATE(INTBUF_FRIC_TAB(NINTERFRIC),STAT=IERR)
+        ALLOCATE(INTERFACES%INTBUF_FRIC_TAB(NINTERFRIC),STAT=IERR)
         IF (IERR/=0) GOTO 1000
 
 c        ALLOCATE (T8(NINTER),STAT=IERR)
@@ -2290,11 +2283,11 @@ C-------TMAX(H3D) -----
            ALLOCATE(GPSTMP(6*NUMNOD),P2TMP(2*NUMNOD),STAT=IERR)
            IF (IERR/=0) GOTO 1000 
          END IF
-         IF (LOADS%NLOAD_CLOAD > 0) THEN
-           ALLOCATE (DPL0CLD(6*LOADS%NLOAD_CLOAD),STAT=IERR)
+         IF (NCONLD > 0) THEN
+           ALLOCATE (DPL0CLD(6*NCONLD),STAT=IERR)
            IF (IERR/=0) GOTO 1000
            DPL0CLD = ZERO
-           ALLOCATE (VEL0CLD(6*LOADS%NLOAD_CLOAD),STAT=IERR)
+           ALLOCATE (VEL0CLD(6*NCONLD),STAT=IERR)
            IF (IERR/=0) GOTO 1000
            VEL0CLD = ZERO
          ELSE

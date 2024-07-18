@@ -128,8 +128,6 @@ Chd|        IMPBUFDEF_MOD                 share/modules/impbufdef_mod.F
 Chd|        IMP_LINTF                     share/modules/impbufdef_mod.F 
 Chd|        IMP_PCG_PROJ                  share/modules/impbufdef_mod.F 
 Chd|        IMP_WORKI                     share/modules/impbufdef_mod.F 
-Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
-Chd|        INTERFACES_MOD                ../common_source/modules/interfaces/interfaces_mod.F
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
@@ -281,7 +279,7 @@ C
         TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
         TYPE (DRAPEG_)   :: DRAPEG
         TYPE (INTERFACES_)    ,INTENT(IN)     :: INTERFACES
-        TYPE (TH_SURF_) , INTENT(IN) :: TH_SURF
+        TYPE (TH_SURF_) , INTENT(INOUT) :: TH_SURF
         TYPE(SKEW_),INTENT(INOUT) :: SKEWS
 C
 C---D_IMP: dUn+1,i,DD : ddU,i+1
@@ -440,7 +438,7 @@ C
         IF(NCYCLE==1.AND.IMCONV==1.AND.I_IMP(5)==0) THEN
           R_IMP(19)=TT-DT2
 C---------for interface sorting
-          IF(NINTER>0) CALL INI_BMINMA_IMP
+          IF(NINTER>0) CALL INI_BMINMA_IMP(INTBUF_TAB)
         END IF
 c
 C-----------------------------
@@ -519,7 +517,7 @@ C
      5                     LGRAV      ,ITASK    ,NRBYAC          ,IRBYAC  ,NPBY   ,
      6                     RBY        ,FR_ELEM  ,IAD_ELEM        ,NDDL0   ,NNZK0  ,
      7                     I_IMP(5)   ,H3D_DATA ,CPTREAC         ,FTHREAC ,NODREAC,
-     8                     NSENSOR    ,TH_SURF  ,TH_SURF%CHANNELS,DPL0CLD ,
+     8                     NSENSOR    ,TH_SURF  ,DPL0CLD ,
      9                     VEL0CLD    ,D        ,DR              ,NUMNOD  ,NSURF  ,
      A                     NFUNCT     ,NCONLD   ,NGRAV           ,NINVEL  ,STF    ,NUMSKW)
 C
@@ -1914,7 +1912,7 @@ C
      6                    NPBY  ,RBY   ,IBFV    ,VEL   ,D_IMP  ,
      7                    DR_IMP,IKC   ,IDDL  ,IFRAME,XFRAME  ,
      8                    NDOF  ,H3D_DATA,CPTREAC,FTHREAC,NODREAC,NSENSOR,
-     9                    TH_SURF ,TH_SURF%CHANNELS,DPL0CLD,
+     9                    TH_SURF ,DPL0CLD,
      A                    VEL0CLD, NUMNOD,NSURF,NFUNCT,NCONLD,
      B                    NGRAV,NFXVEL,STF,NUMSKW)
             CALL DYNA_CPR0(NDDL0  )
@@ -3107,7 +3105,6 @@ Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbu
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|        IMPBUFDEF_MOD                 share/modules/impbufdef_mod.F 
 Chd|        IMP_WORKI                     share/modules/impbufdef_mod.F 
-Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
 Chd|        STACK_MOD                     share/modules/stack_mod.F     
 Chd|        TH_SURF_MOD                   ../common_source/modules/interfaces/th_surf_mod.F
@@ -3207,7 +3204,7 @@ C-----------------------------------------------
         TYPE(H3D_DATABASE) :: H3D_DATA
         TYPE (IMPBUF_STRUCT_) ,TARGET :: IMPBUF_TAB
         TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
-        TYPE (TH_SURF_) , INTENT(IN) :: TH_SURF
+        TYPE (TH_SURF_) , INTENT(INOUT) :: TH_SURF
         TYPE(SKEW_),INTENT(INOUT) :: SKEWS
 #if defined(MUMPS5)
 C----------------------------------------------
@@ -3730,7 +3727,6 @@ Chd|  IMP_COMPAB                    source/implicit/imp_solv.F
 Chd|-- called by -----------
 Chd|        IMP_CHKM                      source/implicit/imp_solv.F    
 Chd|-- calls ---------------
-Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
 Chd|====================================================================
       SUBROUTINE IMP_COMPAB(
@@ -4126,7 +4122,6 @@ Chd|-- calls ---------------
 Chd|        SPMD_MAX_I                    source/mpi/implicit/imp_spmd.F
 Chd|        SPMD_SEND_VI                  source/mpi/implicit/imp_spmd.F
 Chd|        SPMD_SUM_S                    source/mpi/implicit/imp_spmd.F
-Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
 Chd|====================================================================
       SUBROUTINE IMP_COMPABP(
@@ -4891,7 +4886,6 @@ Chd|        FVBC_DEALLO                   source/constraints/general/impvel/fv_i
 Chd|        SPMD_MUMPS_DEAL               source/mpi/implicit/imp_spmd.F
 Chd|        IMP_BFGS                      share/modules/impbufdef_mod.F 
 Chd|        IMP_DYNA                      share/modules/impbufdef_mod.F 
-Chd|        IMP_INTBUF                    share/modules/imp_mod_def.F   
 Chd|        IMP_KBCS                      share/modules/impbufdef_mod.F 
 Chd|        IMP_PCG_PROJ                  share/modules/impbufdef_mod.F 
 Chd|        IMP_QSTAT                     share/modules/impbufdef_mod.F 
@@ -7020,7 +7014,6 @@ Chd|====================================================================
 Chd|  PRINT_STIF                    source/implicit/imp_solv.F    
 Chd|-- called by -----------
 Chd|-- calls ---------------
-Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
 Chd|        TRI7BOX                       share/modules/tri7box.F       
 Chd|====================================================================
       SUBROUTINE PRINT_STIF(IPARI,INTBUF_TAB,IFLAG,NN     ,JG    )
@@ -7189,7 +7182,6 @@ Chd|        RBE3_IMPR1                    source/constraints/general/rbe3/rbe3_i
 Chd|        RBE3_IMPR2                    source/constraints/general/rbe3/rbe3_imp0.F
 Chd|        RBY_IMPR1                     source/constraints/general/rbody/rby_imp0.F
 Chd|        RBY_IMPR2                     source/constraints/general/rbody/rby_imp0.F
-Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE UPD_RHS_FR(ICODT ,ICODR ,ISKEW ,IBFV    ,XFRAME ,
      1                   RBY   ,X     ,SKEW   ,LPBY   ,NPBY   ,
@@ -7293,7 +7285,6 @@ Chd|        IMP_FRFV                      source/mpi/implicit/imp_fri.F
 Chd|        IMP_FRI                       source/mpi/implicit/imp_fri.F 
 Chd|        IMP_SETBA                     source/implicit/imp_setb.F    
 Chd|        UPD_RHS_FR                    source/implicit/imp_solv.F    
-Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
 Chd|====================================================================
       SUBROUTINE IMP_INTFR(
      1    NUM_IMP   ,NS_IMP    ,NE_IMP    ,IPARI     ,INTBUF_TAB,
@@ -7412,13 +7403,12 @@ Chd|  INI_BMINMA_IMP                source/implicit/imp_solv.F
 Chd|-- called by -----------
 Chd|        IMP_SOLV                      source/implicit/imp_solv.F    
 Chd|-- calls ---------------
-Chd|        IMP_INTBUF                    share/modules/imp_mod_def.F   
 Chd|====================================================================
-      SUBROUTINE INI_BMINMA_IMP
+      SUBROUTINE INI_BMINMA_IMP(INTBUF_TAB)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
-        USE IMP_INTBUF
+        USE INTBUFDEF_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -7428,18 +7418,19 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
 C-----------------------------------------------
+        TYPE(INTBUF_STRUCT_):: INTBUF_TAB(NINTER)
+C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
         INTEGER  N
 C-----------------------------------------------
-        ALLOCATE(BMINMA_IMP(6,NINTER))
         DO N = 1,NINTER
-          BMINMA_IMP(1,N)=-EP30
-          BMINMA_IMP(2,N)=-EP30
-          BMINMA_IMP(3,N)=-EP30
-          BMINMA_IMP(4,N)=EP30
-          BMINMA_IMP(5,N)=EP30
-          BMINMA_IMP(6,N)=EP30
+          INTBUF_TAB(N)%BMINMA_IMP(1)=-EP30
+          INTBUF_TAB(N)%BMINMA_IMP(2)=-EP30
+          INTBUF_TAB(N)%BMINMA_IMP(3)=-EP30
+          INTBUF_TAB(N)%BMINMA_IMP(4)=EP30
+          INTBUF_TAB(N)%BMINMA_IMP(5)=EP30
+          INTBUF_TAB(N)%BMINMA_IMP(6)=EP30
         END DO
 C------------------------------------------
         RETURN
@@ -8538,7 +8529,6 @@ Chd|  IMP_INTBUF_INI                source/implicit/imp_solv.F
 Chd|-- called by -----------
 Chd|        DIM_INT7                      source/implicit/ind_glob_k.F  
 Chd|-- calls ---------------
-Chd|        IMP_INTBUFDEF                 share/modules/imp_mod_def.F   
 Chd|====================================================================
       SUBROUTINE IMP_INTBUF_INI(IMP_INTBUF_TAB,NIMP)
 C-----------------------------------------------

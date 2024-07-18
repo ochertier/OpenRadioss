@@ -23,7 +23,6 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 Chd|====================================================================
 Chd|  M46LAW                        source/materials/mat/mat046/m46law.F
 Chd|-- called by -----------
-Chd|        MMAIN                         source/materials/mat_share/mmain.F
 Chd|-- calls ---------------
 Chd|        MQVISCB                       source/materials/mat_share/mqviscb.F
 Chd|        SIGEPS46                      source/materials/mat/mat046/sigeps46.F
@@ -46,7 +45,7 @@ Chd|====================================================================
      E   VOL_AVG, DTEL,    G_DT,    NEL,
      F   D4,      D5,      D6,      RHOREF,
      G   RHOSP,   ISMSTR,  ITY,     JSMS,
-     H   JTUR,    JTHE  ,  NPG )
+     H   JTUR,    JTHE  ,  NPG ,    SVIS)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -62,7 +61,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "nsvis_c.inc"
 #include      "param_c.inc"
 #include      "com04_c.inc"
 #include      "com08_c.inc"
@@ -88,6 +86,7 @@ C-----------------------------------------------
      .         SOLD4(*) ,SOLD5(*) ,SOLD6(*), DVOL(MVSIZ),CONDE(*),
      .         VOL_AVG(*),DTEL(*),D4(MVSIZ),D5(MVSIZ),D6(MVSIZ),
      .         RHOREF(*)  ,RHOSP(*)  
+      my_real, DIMENSION(MVSIZ,6), INTENT(INOUT) :: SVIS
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

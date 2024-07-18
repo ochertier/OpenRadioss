@@ -470,12 +470,8 @@ Chd|        INIMAP2D_MOD                  share/modules1/inimap2d_mod.F
 Chd|        INIVOL_DEF_MOD                share/modules1/inivol_mod.F   
 Chd|        INIVOL_INTERF_MOD             share/modules1/inivol_mod.F   
 Chd|        INOUTFILE_MOD                 ../common_source/modules/inoutfile_mod.F
-Chd|        INT8_MOD                      ../common_source/modules/interfaces/int8_mod.F
-Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
 Chd|        INTBUFMOD                     share/modules1/restart_mod.F  
 Chd|        INTBUFSCRATCH_MOD             source/interfaces/interf1/intbufscratch_mod.F
-Chd|        INTBUF_FRIC_MOD               share/modules1/intbuf_fric_mod.F
-Chd|        INTERFACES_MOD                ../common_source/modules/interfaces/interfaces_mod.F
 Chd|        INTER_CAND_MOD                share/modules1/inter_cand_mod.F
 Chd|        INTSTAMP_GLOB_MOD             share/modules1/intstamp_glob_mod.F
 Chd|        INVERTED_GROUP_MOD            share/modules1/inverted_group_mod.F
@@ -4568,11 +4564,11 @@ C--------------------------------------------
         IF(STAT /= 0) CALL ANCMSG(MSGID=268,ANMODE=ANINFO,
      .                             MSGTYPE=MSGERROR,
      .                         C1='FORC')
-      ALLOCATE(DPL0CLD(6*NUMCLD)    ,STAT=stat)
+      ALLOCATE(DPL0CLD(6*(NUMCLD+NUMPRES))    ,STAT=stat)
         IF(STAT /= 0) CALL ANCMSG(MSGID=268,ANMODE=ANINFO,
      .                             MSGTYPE=MSGERROR,
      .                         C1='DPL0CLD')
-      ALLOCATE(VEL0CLD(6*NUMCLD)    ,STAT=stat)
+      ALLOCATE(VEL0CLD(6*(NUMCLD+NUMPRES))    ,STAT=stat)
       IF(STAT /= 0) CALL ANCMSG(MSGID=268,ANMODE=ANINFO,
      .                            MSGTYPE=MSGERROR,
      .                         C1='VEL0CLD')
@@ -8541,7 +8537,7 @@ C
      &            IXP        , IXR            , DETONATORS       , GEO                , PM       ,
      &            RBY        , NPBY           , LPBY             , NPC                , NPTS     ,
      &            TF         , VEUL           , ALE_CONNECTIVITY , SKEW               , FILL     ,
-     &            IPART      , ITAB           , SENSORS          ,
+     &            IPART      , ITAB           , SENSORS          , SKVOL              ,
      &            IXTG       , THKE           , NLOC_DMG         , GROUP_PARAM_TAB    ,
      &            IGRNOD     , IGRSURF        , BUFSF            , VR                 ,
      &            BUFMAT     , XLAS           , ILAS             , DTELEM             , MSS      ,

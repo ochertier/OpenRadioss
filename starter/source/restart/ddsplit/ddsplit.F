@@ -95,8 +95,6 @@ Chd|        FVWRESTP                      source/restart/ddsplit/fvwrestp.F
 Chd|        FXBWRESTP                     source/restart/ddsplit/wrrest.F
 Chd|        F_NODLOC2                     source/restart/ddsplit/f_nodloc2.F
 Chd|        INTBUF_INI_STARTER            source/interfaces/intbuf/intbuf_ini_starter.F
-Chd|        INTFRIC_WRESTI                source/interfaces/intbuf/intbufFric_ini_starter.F
-Chd|        INTFRIC_WRESTR                source/interfaces/intbuf/intbufFric_ini_starter.F
 Chd|        INTSTAMP_WRESTI               share/modules1/intstamp_mod.F 
 Chd|        INTSTAMP_WRESTR               share/modules1/intstamp_mod.F 
 Chd|        IPARI_L_INI                   source/restart/ddsplit/ipari_l_ini.F
@@ -118,8 +116,8 @@ Chd|        THSURF_WRITE_RESTART          ../common_source/modules/interfaces/th
 Chd|        WRCOMIP                       source/restart/ddsplit/wrcommp.F
 Chd|        WRCOMR                        source/restart/ddsplit/wrcomm.F
 Chd|        WRITE_C_C                     ../common_source/tools/input_output/write_routtines.c
-Chd|        WRITE_DB                      source/restart/ddsplit/wrrest.F
-Chd|        WRITE_DPDB                    source/restart/ddsplit/wrrest.F
+Chd|        WRITE_DB                      ../common_source/tools/input_output/write_db.F
+Chd|        WRITE_DPDB                    ../common_source/tools/input_output/write_db.F
 Chd|        WRITE_ELGROUP_PARAM           source/restart/ddsplit/write_elgroup_param.F
 Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
 Chd|        WRITE_JOINT                   source/constraints/general/cyl_joint/write_joint.F
@@ -239,10 +237,6 @@ Chd|        FVBAG_MOD                     share/modules1/fvbag_mod.F
 Chd|        FVMBAG_MESHCONTROL_MOD        ../common_source/modules/airbag/fvmbag_meshcontrol_mod.F
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
 Chd|        INOUTFILE_MOD                 ../common_source/modules/inoutfile_mod.F
-Chd|        INT8_MOD                      ../common_source/modules/interfaces/int8_mod.F
-Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
-Chd|        INTBUF_FRIC_MOD               share/modules1/intbuf_fric_mod.F
-Chd|        INTERFACES_MOD                ../common_source/modules/interfaces/interfaces_mod.F
 Chd|        INTSTAMP_MOD                  share/modules1/intstamp_mod.F 
 Chd|        JOINT_MOD                     share/modules1/joint_mod.F    
 Chd|        LOADS_MOD                     ../common_source/modules/loads/loads_mod.F
@@ -2618,8 +2612,7 @@ C--------------------------------------
 C interface friction (integers)
 C--------------------------------------
        IF(NINTERFRIC > 0) THEN
-          CALL INTFRIC_WRESTI(INTBUF_FRIC_TAB, LINTFRIC)
-          LEN_IA=LEN_IA+LINTFRIC
+          CALL INTFRIC_WRESTI(INTBUF_FRIC_TAB,NINTERFRIC)
        ENDIF
 C--------------------------------------
 C structure tables (partie entiere)
@@ -3191,8 +3184,7 @@ C--------------------------------------
 C FRICTION INTERFACE (REALS)
 C--------------------------------------
        IF(NINTERFRIC > 0) THEN
-          CALL INTFRIC_WRESTR(INTBUF_FRIC_TAB, LINTFRIC)
-          LEN_AM=LEN_AM+LINTFRIC
+          CALL INTFRIC_WRESTR(INTBUF_FRIC_TAB,NINTERFRIC)
        ENDIF
 C-----------------------------------------------
       CALL W_RNLOC(MS0,NODGLOB,NUMNOD_L,LEN_AM)
@@ -3279,13 +3271,13 @@ C--------------------------------------------
 C--------------------------------------------
 C Pressure & concentrated loads --> DISP & VEL saved
 C--------------------------------------------
-      IF (LOADS%NLOAD_CLOAD > 0) THEN
+      IF (NCONLD_L > 0) THEN
         OFF = NUMELC+NUMELTG+NUMELS+NUMELQ+NUMELT+NUMELP+NUMELR
      .      + NUMELX
-        CALL W_DISP0_VEL0_CLOAD(DPL0CLD,CEP    ,P-1   ,NCLOAD_L,LEN_AM,
-     .                          OFF    ,LEN_CEP,LOADS%NLOAD_CLOAD)
-        CALL W_DISP0_VEL0_CLOAD(VEL0CLD,CEP    ,P-1   ,NCLOAD_L,LEN_AM,
-     .                          OFF    ,LEN_CEP,LOADS%NLOAD_CLOAD)
+        CALL W_DISP0_VEL0_CLOAD(DPL0CLD,CEP    ,P-1   ,NCONLD_L,LEN_AM,
+     .                          OFF    ,LEN_CEP,NCONLD)
+        CALL W_DISP0_VEL0_CLOAD(VEL0CLD,CEP    ,P-1   ,NCONLD_L,LEN_AM,
+     .                          OFF    ,LEN_CEP,NCONLD)
       ENDIF
 C--------------------------------------------
 C /DAMP/VREL

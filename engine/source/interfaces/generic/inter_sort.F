@@ -30,10 +30,9 @@ Chd|        INT_STARTIME                  source/system/timer_interf.F
 Chd|        INT_STOPTIME                  source/system/timer_interf.F  
 Chd|        COMMAND_LINE_ARGS_MOD         share/modules/command_line_args.F
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
-Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
 Chd|        INTER_SORTING_MOD             share/modules/inter_sorting_mod.F
 Chd|        INTER_STRUCT_MOD              share/modules/inter_struct_mod.F
-Chd|        METRIC_MOD                    ../common_source/modules/metric_mod.F
+Chd|        METRIC_MOD                    ../common_source/modules/interfaces/metric_mod.F
 Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
 Chd|====================================================================
@@ -79,7 +78,7 @@ C-----------------------------------------------
       INTEGER, INTENT(in) :: NSENSOR
       INTEGER, DIMENSION(NB_INTER_SORTED), INTENT(in) :: LIST_INTER_SORTED   !   list of interfaces that need to be sorted
       INTEGER, INTENT(inout) :: RETRI
-      INTEGER, DIMENSION(NPARI,NINTER), INTENT(in) :: IPARI    !   interface data
+      INTEGER, DIMENSION(NPARI,NINTER), INTENT(inout) :: IPARI    !   interface data
       INTEGER, DIMENSION(NINTER+1,NSPMD+1), INTENT(in) :: ISENDTO,IRECVFROM 
       TYPE(INTBUF_STRUCT_),DIMENSION(NINTER), INTENT(inout) :: INTBUF_TAB    ! interface data
       my_real, DIMENSION(3,NUMNOD), INTENT(in), TARGET :: X            !   position

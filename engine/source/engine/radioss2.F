@@ -100,10 +100,6 @@ Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.
 Chd|        GROUP_MOD                     share/modules/group_mod.F     
 Chd|        H3D_MOD                       share/modules/h3d_mod.F       
 Chd|        INOUTFILE_MOD                 ../common_source/modules/inoutfile_mod.F
-Chd|        INTBUFFRIC_MOD                share/modules/restart_mod.F   
-Chd|        INTBUFMOD                     share/modules/restart_mod.F   
-Chd|        INTBUF_MOD                    share/modules/restart_mod.F   
-Chd|        INTERFACES_MOD                ../common_source/modules/interfaces/interfaces_mod.F
 Chd|        INTSTAMP_GLOB_MOD             share/modules/intstamp_glob_mod.F
 Chd|        LINEAR_SOLVER_MOD             share/modules/linear_solver_mod.F
 Chd|        LOADS_MOD                     ../common_source/modules/loads/loads_mod.F
@@ -112,6 +108,7 @@ Chd|        MDS_RESTART_MOD               ../common_source/modules/mds_rest.mod.
 Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
 Chd|        MONVOL_STRUCT_MOD             share/modules/monvol_struct_mod.F
 Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
+Chd|        NAMES_AND_TITLES_MOD          ../common_source/modules/names_and_titles_mod.F
 Chd|        OUTPUT_MOD                    ../common_source/modules/output/output_mod.F
 Chd|        PINCHTYPE_MOD                 ../common_source/modules/pinchtype_mod.F
 Chd|        RAD2R_MOD                     share/modules/rad2r.F         
@@ -131,8 +128,6 @@ Chd|====================================================================
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
-      USE INTBUFMOD
-      USE INTBUF_MOD
       USE DSGRAPH_MOD
       USE RESTMOD
       USE INTSTAMP_GLOB_MOD
@@ -144,7 +139,6 @@ C-----------------------------------------------
       USE ALEFVM_MOD
       USE MULTI_FVM_MOD
       USE H3D_MOD
-      USE INTBUFFRIC_MOD
       USE GROUP_MOD
       USE GROUPDEF_MOD
       USE MAT_ELEM_MOD
@@ -174,7 +168,7 @@ C-----------------------------------------------
       USE DT_MOD
       USE LOADS_MOD
       USE PYTHON_FUNCT_MOD
-      USE NAMES_AND_TITLES_MOD, only: NAMES_AND_TITLES_
+      USE NAMES_AND_TITLES_MOD
       USE UNITAB_MOD
       USE SKEW_MOD
 C-----------------------------------------------
@@ -1456,7 +1450,7 @@ C------------------------------------------------
      A              IGRNOD ,KXSP,WEIGHT ,FR_RBY2 ,FR_RL,
      B              PARTSAV,IPART,PM,
      C              MONVOL ,VOLMON, IPART_STATE,GEO,TABLE,
-     D              IFRAME,XFRAME,MAT_ELEM%ELBUF,IGEO,INTBUF_TAB,
+     D              IFRAME,XFRAME,MAT_ELEM%ELBUF,IGEO,INTERFACES%INTBUF_TAB,
      E              IPM   ,H3D_DATA, MULTI_FVM,
      F              IGRPART,TAG_SKINS6,ICFIELD,LCFIELD,TAGSLV_RBY,
      G              MDS_LABEL,MDS_OUTPUT_TABLE,MDS_NMAT,MAX_DEPVAR,
@@ -2159,8 +2153,8 @@ C---------------------------------------------------------------------
 
          CALL RESOL_HEAD(ITASK        ,AF              ,IAF             ,IDATA      ,RDATA,XDP ,
      .                   GRAPHE       ,IFLOW           ,RFLOW           ,MCP        ,TEMP      ,
-     .                   INTBUF_TAB   ,STACK           ,IRUNN_BIS       ,
-     .                   MULTI_FVM    ,H3D_DATA        ,INTBUF_FRIC_TAB ,SUBSETS    ,IGRNOD    ,
+     .                   STACK        ,IRUNN_BIS       ,
+     .                   MULTI_FVM    ,H3D_DATA        ,SUBSETS    ,IGRNOD    ,
      .                   IGRBRIC      ,IGRQUAD         ,IGRSH4N         ,IGRSH3N    ,IGRTRUSS  ,
      .                   IGRBEAM      ,IGRSPRING       ,IGRPART         ,IGRSURF    ,IGRSLIN   ,
      .                   FORNEQS      ,PINCH_DATA      ,ALE_CONNECTIVITY,

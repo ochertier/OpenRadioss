@@ -27,7 +27,6 @@ Chd|        INTFOP2                       source/interfaces/interf/intfop2.F
 Chd|        INTTRI                        source/interfaces/intsort/inttri.F
 Chd|-- calls ---------------
 Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        INTBUFDEF_MOD                 ../common_source/modules/intbufdef_mod.F
 Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
 Chd|====================================================================
         SUBROUTINE INT18_LAW151_NSV_SHIFT(MODE,ITASK,MULTI_FVM,IPARI,INTBUF_TAB)
@@ -59,7 +58,7 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
         CHARACTER(len=*), INTENT(in) :: MODE
         INTEGER, INTENT(in) :: ITASK
-        TYPE(INTBUF_STRUCT_),DIMENSION(NINTER), INTENT(in) :: INTBUF_TAB      
+        TYPE(INTBUF_STRUCT_),DIMENSION(NINTER), INTENT(inout) :: INTBUF_TAB      
         INTEGER, DIMENSION(NPARI,*), INTENT(in) :: IPARI
         TYPE(MULTI_FVM_STRUCT) :: MULTI_FVM
 C-----------------------------------------------
