@@ -20,20 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  PRELECDET                     source/initial_conditions/detonation/prelecdet.F
-Chd|-- called by -----------
-Chd|        READ_DETONATORS               source/initial_conditions/detonation/read_detonators.F
-Chd|-- calls ---------------
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        HM_OPTION_READ_KEY            source/devtools/hm_reader/hm_option_read_key.F
-Chd|        HM_OPTION_START               source/devtools/hm_reader/hm_option_start.F
-Chd|        NGR2USRN                      source/system/nintrr.F        
-Chd|        DETONATORS_MOD                share/modules1/detonators_mod.F
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    prelecdet              ../starter/source/initial_conditions/detonation/prelecdet.F
+      !||--- called by ------------------------------------------------------
+      !||    read_detonators        ../starter/source/initial_conditions/detonation/read_detonators.F
+      !||--- calls      -----------------------------------------------------
+      !||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
+      !||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
+      !||    ngr2usrn               ../starter/source/system/nintrr.F
+      !||--- uses       -----------------------------------------------------
+      !||    detonators_mod         ../starter/share/modules1/detonators_mod.F
+      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE PRELECDET(IGRNOD, LSUBMODEL, DETONATORS)
 C-----------------------------------------------
 C   M o d u l e s
@@ -43,6 +43,7 @@ C-----------------------------------------------
       USE SUBMODEL_MOD         
       USE HM_OPTION_READ_MOD
       USE DETONATORS_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARKEY
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -63,11 +64,11 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER SIZ_ECRAN, SIZ_DETCORD
-      INTEGER              :: I,J,K,ID,USER_ID,INTERNAL_ID,NN,STAT
-      INTEGER              :: NNOD_DETCORD, NNOD_WAV_SHA,NUM
-      CHARACTER*ncharkey   :: KEY,KEY2,KEY3
-      CHARACTER*nchartitle :: TITR
-      LOGICAL              :: IS_AVAILABLE
+      INTEGER I,J,K,ID,USER_ID,INTERNAL_ID,NN,STAT
+      INTEGER NNOD_DETCORD, NNOD_WAV_SHA,NUM
+      CHARACTER(LEN=NCHARKEY) :: KEY,KEY2,KEY3
+      CHARACTER(LEN=NCHARTITLE) :: TITR
+      LOGICAL :: IS_AVAILABLE
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------

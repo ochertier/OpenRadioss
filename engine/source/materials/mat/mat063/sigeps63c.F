@@ -20,12 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  SIGEPS63C                     source/materials/mat/mat063/sigeps63c.F
-Chd|-- called by -----------
-Chd|        MULAWC                        source/materials/mat_share/mulawc.F
-Chd|-- calls ---------------
-Chd|====================================================================
+      !||====================================================================
+      !||    sigeps63c   ../engine/source/materials/mat/mat063/sigeps63c.F
+      !||--- called by ------------------------------------------------------
+      !||    mulawc      ../engine/source/materials/mat_share/mulawc.F
+      !||--- calls      -----------------------------------------------------
+      !||    finter      ../engine/source/tools/curve/finter.F
+      !||====================================================================
       SUBROUTINE SIGEPS63C(
      1   NEL0,    NUPARAM, NUVAR,   MFUNC,
      2   KFUNC,   NPF,     NPT0,    IPT,
@@ -42,7 +43,8 @@ Chd|====================================================================
      D   VISCMAX, THK,     PLA,     UVAR,
      E   OFF,     NGL,     ETSE,    GS,
      F   VOL,     YLD,     TEMPEL,  DIE,
-     G   COEF,    INLOC,   DPLANL,  JTHE)
+     G   COEF,    INLOC,   DPLANL,  JTHE,
+     H   LOFF     )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -123,6 +125,7 @@ C-----------------------------------------------
      .   DIE(NEL0),COEF(NEL0),DPLANL(NEL0)
       my_real ,DIMENSION(NUPARAM) :: UPARAM
       INTEGER, INTENT(IN) :: JTHE
+      my_real, DIMENSION(NEL0), INTENT(IN) :: LOFF
 C-----------------------------------------------
 C   O U T P U T   A r g u m e n t s
 C-----------------------------------------------
@@ -453,11 +456,13 @@ C     NON-LOCAL THICKNESS VARIATION
 C--------------------------------
        IF (INLOC > 0) THEN
          DO I = 1,NEL0 
-           SVM(I) = SQRT(SIGNXX(I)*SIGNXX(I) + SIGNYY(I)*SIGNYY(I)
-     .            - SIGNXX(I)*SIGNYY(I) + THREE*SIGNXY(I)*SIGNXY(I))
-           DEZZ   = MAX(DPLANL(I),ZERO)*HALF*(SIGNXX(I)+SIGNYY(I))/MAX(SVM(I),EM20)
-           DEZZ   = -NU*((SIGNXX(I)-SIGOXX(I)+SIGNYY(I)-SIGOYY(I))/E) - DEZZ
-           THK(I) = THK(I) + DEZZ*THKLY(I)*OFF(I)     
+           IF (LOFF(I) == ONE) THEN 
+             SVM(I) = SQRT(SIGNXX(I)*SIGNXX(I) + SIGNYY(I)*SIGNYY(I)
+     .              - SIGNXX(I)*SIGNYY(I) + THREE*SIGNXY(I)*SIGNXY(I))
+             DEZZ   = MAX(DPLANL(I),ZERO)*HALF*(SIGNXX(I)+SIGNYY(I))/MAX(SVM(I),EM20)
+             DEZZ   = -NU*((SIGNXX(I)-SIGOXX(I)+SIGNYY(I)-SIGOYY(I))/E) - DEZZ
+             THK(I) = THK(I) + DEZZ*THKLY(I)*OFF(I)    
+           ENDIF 
          ENDDO  
        ENDIF
 C

@@ -20,22 +20,24 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  READ_SENSOR_USER              source/tools/sensor/read_sensor_user.F
-Chd|-- called by -----------
-Chd|        HM_READ_SENSORS               source/tools/sensor/hm_read_sensors.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        ARRET                         source/system/arret.F         
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        HM_GET_STRING_INDEX           source/devtools/hm_reader/hm_get_string_index.F
-Chd|        SENSOR_USER_ALLOC             source/tools/sensor/sensor_user_alloc.F
-Chd|        ST_USERLIB_LECSEN             source/user_interface/dyn_userlib.c
-Chd|        USER_OUTPUT                   source/user_interface/user_output.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        SENSOR_MOD                    share/modules1/sensor_mod.F   
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    read_sensor_user       ../starter/source/tools/sensor/read_sensor_user.F
+      !||--- called by ------------------------------------------------------
+      !||    hm_read_sensors        ../starter/source/tools/sensor/hm_read_sensors.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    arret                  ../starter/source/system/arret.F
+      !||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    hm_get_string_index    ../starter/source/devtools/hm_reader/hm_get_string_index.F
+      !||    sensor_user_alloc      ../starter/source/tools/sensor/sensor_user_alloc.F
+      !||    user_output            ../starter/source/user_interface/user_output.F
+      !||    usr2sys                ../starter/source/system/sysfus.F
+      !||--- uses       -----------------------------------------------------
+      !||    format_mod             ../starter/share/modules1/format_mod.F90
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    sensor_mod             ../starter/share/modules1/sensor_mod.F
+      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE READ_SENSOR_USER(HM_NSENSOR,ISEN    ,TITLE  ,
      .                            UNITAB   ,LSUBMODEL ,KEY       ,UNIT_ID ,SENS_ID,
      .                            SENSOR_PTR)
@@ -46,6 +48,8 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE SUBMODEL_MOD
       USE SENSOR_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARLINE, NCHARKEY
+      USE FORMAT_MOD ,ONLY :  FMT_F
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -83,7 +87,7 @@ C-----------------------------------------------
       CHARACTER(LEN=4096) :: SCR_FILE_NAME
       INTEGER SCR_FILE_NAME_LEN
 !
-      CHARACTER IUSER_KEY*ncharline
+      CHARACTER(LEN=NCHARLINE) :: IUSER_KEY
       CHARACTER OPTION*256
       INTEGER SIZE
 C=======================================================================

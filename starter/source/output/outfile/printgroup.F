@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  PRINTGROUP                    source/output/outfile/printgroup.F
-Chd|-- called by -----------
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        OPTIONDEF_MOD                 ../common_source/modules/optiondef_mod.F
-Chd|        R2R_MOD                       share/modules1/r2r_mod.F      
-Chd|====================================================================
+      !||====================================================================
+      !||    printgroup             ../starter/source/output/outfile/printgroup.F
+      !||--- called by ------------------------------------------------------
+      !||    lectur                 ../starter/source/starter/lectur.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||--- uses       -----------------------------------------------------
+      !||    format_mod             ../starter/share/modules1/format_mod.F90
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    r2r_mod                ../starter/share/modules1/r2r_mod.F
+      !||====================================================================
       SUBROUTINE PRINTGROUP(
      1           ITAB     ,ITABM1   ,IGRNOD   ,NINICRACK,BUFSF   ,
      2           IGRSURF  ,IGRSLIN  ,INICRACK ,IXS      ,IXQ     ,
@@ -46,6 +46,8 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE R2R_MOD
       USE OPTIONDEF_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      USE FORMAT_MOD , ONLY : FMW_10I, FMW_6I, FMW_2I_X_F, FMW_4I
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -58,8 +60,7 @@ C-----------------------------------------------
      .        IXTG(NIXTG,*),IXS10(6,*),IXS20(12,*),IXS16(8,*),
      .        IPART(LIPART1,*),IXQ(NIXQ,*),
      .        KXX(NIXX,*),KXIG3D(NIXIG3D,*),IXIG3D(*)
-      my_real
-     .        BUFSF(*)
+      my_real BUFSF(*)
 C-----------------------------------------------
       TYPE (GROUP_)  , DIMENSION(NGRNOD)  :: IGRNOD
       TYPE (GROUP_)  , DIMENSION(NGRBRIC) :: IGRBRIC
@@ -89,7 +90,8 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,J,K,L,II,KK,NEL,NNOD,NSEG,IAD0,DGR,ITYP,SRFTYP,NE,
      .        KR,IADR,NSEGIGE,ID
-      CHARACTER TITR*nchartitle,MESS*40,FMTT*15
+      CHARACTER(LEN=NCHARTITLE) :: TITR
+      CHARACTER MESS*40,FMTT*15
 C-----------------------------------------------
       IF (IPRI >= 0) THEN
 C-----------------------------------------------

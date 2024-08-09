@@ -20,19 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  HM_READ_MOVE_FUNCT            source/tools/curve/hm_read_move_funct.F
-Chd|-- called by -----------
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|-- calls ---------------
-Chd|        HM_GET_FLOATV                 source/devtools/hm_reader/hm_get_floatv.F
-Chd|        HM_OPTION_COUNT               source/devtools/hm_reader/hm_option_count.F
-Chd|        HM_OPTION_READ_KEY            source/devtools/hm_reader/hm_option_read_key.F
-Chd|        HM_OPTION_START               source/devtools/hm_reader/hm_option_start.F
-Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|        TABLE_MOD                     share/modules1/table_mod.F    
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_read_move_funct     ../starter/source/tools/curve/hm_read_move_funct.F
+      !||--- called by ------------------------------------------------------
+      !||    lectur                 ../starter/source/starter/lectur.F
+      !||--- calls      -----------------------------------------------------
+      !||    hm_get_floatv          ../starter/source/devtools/hm_reader/hm_get_floatv.F
+      !||    hm_option_count        ../starter/source/devtools/hm_reader/hm_option_count.F
+      !||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
+      !||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
+      !||--- uses       -----------------------------------------------------
+      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+      !||    table_mod              ../starter/share/modules1/table_mod.F
+      !||====================================================================
       SUBROUTINE HM_READ_MOVE_FUNCT(NPC,PLD,NFUNCT,TABLE,NTABLE,FUNCRYPT,UNITAB, LSUBMODEL)
 C-----------------------------------------------
 C   M o d u l e s
@@ -41,6 +42,7 @@ C-----------------------------------------------
       USE TABLE_MOD
       USE SUBMODEL_MOD
       USE HM_OPTION_READ_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -50,8 +52,7 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NFUNCT, NTABLE
       INTEGER NPC(*),FUNCRYPT(*)
-      my_real
-     .   PLD(*)
+      my_real PLD(*)
       TYPE(TTABLE) TABLE(*)
       TYPE(UNIT_TYPE_), INTENT(IN) :: UNITAB
       TYPE(SUBMODEL_DATA), DIMENSION(NSUBMOD), INTENT(IN) :: LSUBMODEL
@@ -64,12 +65,11 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,J,N,ID,IFIX_TMP,CPT
-      my_real
-     .   SCX,SCY,SHX,SHY
+      my_real SCX,SCY,SHX,SHY
       my_real, DIMENSION(:),ALLOCATABLE :: PLD_TMP
       INTEGER :: NMOVE_FUNCT
       LOGICAL :: IS_AVAILABLE
-      CHARACTER TITR*nchartitle
+      CHARACTER(LEN=NCHARTITLE) :: TITR
 !     ***************************    !
 !     * Count /MOVE_FUNCT cards *    !
 !     ***************************    !

@@ -20,14 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  I24PWR3                       source/interfaces/inter3d1/i24pwr3.F
-Chd|-- called by -----------
-Chd|        ININT3                        source/interfaces/inter3d1/inint3.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    i24pwr3                ../starter/source/interfaces/inter3d1/i24pwr3.F
+      !||--- called by ------------------------------------------------------
+      !||    inint3                 ../starter/source/interfaces/inter3d1/inint3.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE I24PWR3(ITAB  ,INACTI,CAND_E,CAND_N ,PMIN     ,
      1                   PENMIN,I_STOK,NSV   ,IWPENE ,PENE_OLD,
      2                   NOINT ,NTY   ,MSR   ,IRTLM  ,IRECT    ,
@@ -38,6 +39,7 @@ C-----------------------------------------------
 #ifndef HYPERMESH_LIB
       USE MESSAGE_MOD
 #endif
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -59,8 +61,7 @@ C     REAL
       my_real
      .   PMIN(*),PENMIN,PENE_OLD(5,*)
       INTEGER ID
-      CHARACTER*nchartitle,
-     .   TITR
+      CHARACTER(LEN=NCHARTITLE) :: TITR
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

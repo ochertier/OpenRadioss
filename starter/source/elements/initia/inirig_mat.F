@@ -20,37 +20,37 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  INIRIG_MAT                    source/elements/initia/inirig_mat.F
-Chd|-- called by -----------
-Chd|        INITIA                        source/elements/initia/initia.F
-Chd|-- calls ---------------
-Chd|        C3COORI                       source/elements/sh3n/coque3n/c3coori.F
-Chd|        C3DERII                       source/elements/sh3n/coque3n/c3derii.F
-Chd|        C3EVEC3                       source/elements/sh3n/coque3n/c3evec3.F
-Chd|        C3INMAS                       source/elements/sh3n/coque3n/c3inmas.F
-Chd|        C3VEOK3                       source/elements/sh3n/coque3n/c3veok3.F
-Chd|        CCOORI                        source/elements/shell/coque/ccoori.F
-Chd|        CDERII                        source/elements/shell/coque/cderii.F
-Chd|        CEVECI                        source/elements/shell/coque/ceveci.F
-Chd|        CINMAS                        source/elements/shell/coque/cinmas.F
-Chd|        CVEOK3                        source/elements/shell/coque/cveok3.F
-Chd|        DTMAIN                        source/materials/time_step/dtmain.F
-Chd|        S10COOR3_OLD                  source/elements/solid/solide10/s10coor3.F
-Chd|        S10DERI3                      source/elements/solid/solide10/s10deri3.F
-Chd|        S10LEN3                       source/elements/solid/solide10/s10len3.F
-Chd|        S10MASS3                      source/elements/solid/solide10/s10mass3.F
-Chd|        S4COOR3                       source/elements/solid/solide4/s4coor3.F
-Chd|        S4DERI3                       source/elements/solid/solide4/s4deri3.F
-Chd|        S4MASS3                       source/elements/solid/solide4/s4mass3.F
-Chd|        SCOOR3                        source/elements/solid/solide/scoor3.F
-Chd|        SDERI3                        source/elements/solid/solide/sderi3.F
-Chd|        SDLEN3                        source/elements/solid/solide/sdlen3.F
-Chd|        SMASS3                        source/elements/solid/solide/smass3.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
-Chd|        GROUP_PARAM_MOD               ../common_source/modules/mat_elem/group_param_mod.F
-Chd|        STACK_MOD                     share/modules1/stack_mod.F    
-Chd|====================================================================
+      !||====================================================================
+      !||    inirig_mat        ../starter/source/elements/initia/inirig_mat.F
+      !||--- called by ------------------------------------------------------
+      !||    initia            ../starter/source/elements/initia/initia.F
+      !||--- calls      -----------------------------------------------------
+      !||    c3coori           ../starter/source/elements/sh3n/coque3n/c3coori.F
+      !||    c3derii           ../starter/source/elements/sh3n/coque3n/c3derii.F
+      !||    c3evec3           ../starter/source/elements/sh3n/coque3n/c3evec3.F
+      !||    c3inmas           ../starter/source/elements/sh3n/coque3n/c3inmas.F
+      !||    c3veok3           ../starter/source/elements/sh3n/coque3n/c3veok3.F
+      !||    ccoori            ../starter/source/elements/shell/coque/ccoori.F
+      !||    cderii            ../starter/source/elements/shell/coque/cderii.F
+      !||    ceveci            ../starter/source/elements/shell/coque/ceveci.F
+      !||    cinmas            ../starter/source/elements/shell/coque/cinmas.F
+      !||    cveok3            ../starter/source/elements/shell/coque/cveok3.F
+      !||    dtmain            ../starter/source/materials/time_step/dtmain.F
+      !||    s10coor3_old      ../starter/source/elements/solid/solide10/s10coor3.F
+      !||    s10deri3          ../starter/source/elements/solid/solide10/s10deri3.F
+      !||    s10len3           ../starter/source/elements/solid/solide10/s10len3.F
+      !||    s10mass3          ../starter/source/elements/solid/solide10/s10mass3.F
+      !||    s4coor3           ../starter/source/elements/solid/solide4/s4coor3.F
+      !||    s4deri3           ../starter/source/elements/solid/solide4/s4deri3.F
+      !||    s4mass3           ../starter/source/elements/solid/solide4/s4mass3.F
+      !||    scoor3            ../starter/source/elements/solid/solide/scoor3.F
+      !||    sderi3            ../starter/source/elements/solid/solide/sderi3.F
+      !||    sdlen3            ../starter/source/elements/solid/solide/sdlen3.F
+      !||    smass3            ../starter/source/elements/solid/solide/smass3.F
+      !||--- uses       -----------------------------------------------------
+      !||    defaults_mod      ../starter/source/modules/defaults_mod.F90
+      !||    stack_mod         ../starter/share/modules1/stack_mod.F
+      !||====================================================================
       SUBROUTINE INIRIG_MAT(IXC ,IXS    ,IXTG   ,IXS10  ,X      ,
      2                      V   ,PM     ,GEO    ,MS     ,IN     ,
      3                      PTG ,MSC    ,MSS    ,MSTG   ,INC    ,
@@ -64,13 +64,14 @@ Chd|====================================================================
      B                   NINDX  ,XREFC  ,XREFTG ,XREFS   ,MSSA  ,
      C                   SH3TRIM,ISUBSTACK,BUFMAT,IPM    ,STACK ,
      D                   RNOISE ,STRC  ,STRTG   ,PERTURB ,NEL   ,
-     E                   GROUP_PARAM   ,IGTYP)
+     E                   GROUP_PARAM   ,IGTYP   ,DEFAULTS)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE ELBUFDEF_MOD
       USE STACK_MOD
       USE GROUP_PARAM_MOD            
+      USE DEFAULTS_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -109,11 +110,12 @@ C-----------------------------------------------
      .   XREFC(4,3,*),XREFTG(3,3,*),XREFS(8,3,*), MSSA(*),BUFMAT(*),
      .   RNOISE(*),STRC(*),STRTG(*)
       TYPE(GROUP_PARAM_)  :: GROUP_PARAM
+      TYPE(DEFAULTS_), INTENT(IN)      :: DEFAULTS             
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,  NDEPAR, NDSA,NC(20),N,JJ,KK,J,K,IP,NF1,NF2,
-     .   ILAW,IMAT,IPROP,IE,IBID(MVSIZ),NREFSTA
+     .   ILAW,IMAT,IPROP,IE,IBID(MVSIZ),NREFSTA,IMAS_DS
       INTEGER NC10(MVSIZ,10)
       INTEGER, DIMENSION(MVSIZ) :: IX1,IX2,IX3,IX4,IX5,IX6,IX7,IX8,MXT,PID,NGL
       my_real
@@ -159,6 +161,7 @@ C
       BID(1:MVSIZ) = ZERO
       NREFSTA = NXREF
       NXREF = 0
+      IMAS_DS = DEFAULTS%SOLID%IMAS
       IF (ITY == 1.AND. ISMSTR == 10) ISMSTR = 4
 C-----------------------------------------------
       IF (ITY == 1.AND. ISOLNOD == 4)THEN
@@ -208,7 +211,7 @@ C
      2      IPARTS(NFT+1),MSS(1,NFT+1),MSNF   ,MSSF(1,NFT+1),WMA ,
      3      RHOCP        ,MCP         ,MCPS(1,NFT+1)          ,TEMP0,
      4      TEMP         ,MSSA        ,IX1    ,IX2    ,IX3    ,IX4  ,
-     5      FILL, VOLU)
+     5      FILL, VOLU   ,IMAS_DS )
         ENDIF                   
 C
         CALL DTMAIN(GEO  ,PM   ,VOID  ,PID   ,MXT   ,VOID  ,
@@ -264,7 +267,7 @@ C
      .              XX  ,YY ,ZZ     ,VX         ,VY         ,VZ  ,  
      .              NC10  ,STI,STIFN  ,DELTAX2    ,MSSX(1,NF1),MASSCP,
      .              MCP ,MCPS(1,NF1),MCPSX(1,NF1),IN        ,STIFR,
-     .              INS(1,NF1),MSSA ,X    ,FILL)
+     .              INS(1,NF1),MSSA ,X    ,FILL  ,IMAS_DS)
 C
 C Create dependency to rigid material              
         DO I=1,NEL

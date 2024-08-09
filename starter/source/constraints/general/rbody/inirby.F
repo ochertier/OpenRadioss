@@ -20,17 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  INIRBY                        source/constraints/general/rbody/inirby.F
-Chd|-- called by -----------
-Chd|        INITIA                        source/elements/initia/initia.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        CHBAS                         source/constraints/general/rbody/chbas.F
-Chd|        INEPRI                        source/materials/mat/mat019/inepri.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        R2R_MOD                       share/modules1/r2r_mod.F      
-Chd|====================================================================
+      !||====================================================================
+      !||    inirby                 ../starter/source/constraints/general/rbody/inirby.F
+      !||--- called by ------------------------------------------------------
+      !||    initia                 ../starter/source/elements/initia/initia.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    chbas                  ../starter/source/constraints/general/rbody/chbas.F
+      !||    inepri                 ../starter/source/materials/mat/mat019/inepri.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    r2r_mod                ../starter/share/modules1/r2r_mod.F
+      !||====================================================================
       SUBROUTINE INIRBY(NRB   ,RBY   ,M     ,LPBY  ,
      .                  MS    ,IN    ,X     ,ITAB  ,SKEW  ,
      .                  B1    ,B2    ,B3    ,B5    ,B6    ,
@@ -51,6 +52,7 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE R2R_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -73,7 +75,6 @@ C-----------------------------------------------
       INTEGER NPBY(NNPBY,*), M, ISPH, NRB
       INTEGER ITAB(*), RBYID,ITAGND(*)
       INTEGER, TARGET :: LPBY(*)
-C     REAL
       my_real
      .   RBY(NRBY,*), MS(*), IN(*), X(3,*), SKEW(LSKEW,*),
      .   B1, B2, B3, B5, B6, B9,TOTMAS ,XGT ,YGT ,
@@ -81,8 +82,7 @@ C     REAL
      .   II1,II2,II3,II4,II5,II6,II7,II8,II9,
      .   RBY_R2R(9),RBY_INIAXIS(7,*)
       INTEGER ID
-      CHARACTER*nchartitle,
-     .   TITR
+      CHARACTER(LEN=NCHARTITLE) :: TITR
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -1104,15 +1104,16 @@ C
       END
 
 
-Chd|====================================================================
-Chd|  INIRBYS                       source/constraints/general/rbody/inirby.F
-Chd|-- called by -----------
-Chd|        INITIA                        source/elements/initia/initia.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        INEPRI                        source/materials/mat/mat019/inepri.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    inirbys                ../starter/source/constraints/general/rbody/inirby.F
+      !||--- called by ------------------------------------------------------
+      !||    initia                 ../starter/source/elements/initia/initia.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    inepri                 ../starter/source/materials/mat/mat019/inepri.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE INIRBYS(NRB ,RBY  ,M     ,LPBY ,
      .                   MS  ,IN   ,X     ,ITAB,SKEW,
      .                   B1  ,B2   ,B3    ,B5  ,B6,
@@ -1120,6 +1121,7 @@ Chd|====================================================================
      .                   ZGT ,NPBY ,IWA   ,V   ,VR, 
      .                   RBYID,ID  ,TITR  ,ITAGND ,RBY_INIAXIS)
       USE MESSAGE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C=======================================================================
 C    RBY    EN SORTIE DE INIRBY
 C     1 -> 9 :  MATRICE ROTATION
@@ -1153,8 +1155,7 @@ C     REAL
      .   B1, B2, B3, B5, B6, B9,TOTMAS ,XGT ,YGT ,
      .   ZGT,RBY_INIAXIS(7,*)
       INTEGER ID
-      CHARACTER*nchartitle,
-     .   TITR
+      CHARACTER(LEN=NCHARTITLE) :: TITR
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

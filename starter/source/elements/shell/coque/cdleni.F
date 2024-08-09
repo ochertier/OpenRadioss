@@ -20,13 +20,12 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  CDLENI                        source/elements/shell/coque/cdleni.F
-Chd|-- called by -----------
-Chd|        CINIT3                        source/elements/shell/coque/cinit3.F
-Chd|-- calls ---------------
-Chd|        GROUP_PARAM_MOD               ../common_source/modules/mat_elem/group_param_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    cdleni            ../starter/source/elements/shell/coque/cdleni.F
+      !||--- called by ------------------------------------------------------
+      !||    cinit3            ../starter/source/elements/shell/coque/cinit3.F
+      !||--- uses       -----------------------------------------------------
+      !||====================================================================
       SUBROUTINE CDLENI(PM  ,GEO ,STIFN ,STIFR,IXC,
      .                  PX1 ,PX2 ,PY1   ,PY2  ,THK,
      .                  IGEO,DT  ,SH4TREE,ALDT,UPARAM ,
@@ -67,14 +66,14 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, N, IMT, IPMAT, IGTYP,IPPID,IADB,
+      INTEGER I,N, IMT, IPMAT, IGTYP,IPPID,IADB,
      .        I1,I3,IPTHK,IPPOS,I2,MATLY,IGMAT,IPGMAT,IPOS,NIP,MLAWLY
       my_real
      .   SSP(MVSIZ), AL1(MVSIZ),AL(MVSIZ), ALMIN(MVSIZ),
      .   AL2(MVSIZ), AL3(MVSIZ), AL4(MVSIZ), AL5(MVSIZ), AL6(MVSIZ)
       my_real
      .   VISCMX,A11,A11R,A12,B1,B2,C1,VV,STI,STIR,VISCDEF,DTDYN,RHO, 
-     .   YOUNG,NU,BULK,GMAX,THKLY,POSLY,FAC,Z0
+     .   YOUNG,NU,GMAX,THKLY,POSLY,FAC,Z0
        my_real, DIMENSION(MVSIZ) :: ZOFFSET
 C======================================================================|
       IGTYP = NINT(GEO(12,IPROP))
@@ -109,18 +108,26 @@ c
          IF (MTN <= 28) THEN
           DO I=LFT,LLT
             DO N=1,NPT
-              J=I+(N-1)*LLT
               IMT = IGEO(IPMAT+N,IPROP)
               SSP(I)=MAX(SSP(I),PM(27,IMT))
             ENDDO
           ENDDO
-        ELSEIF (MTN == 42 .OR. MTN  == 69) THEN
+        ELSEIF (MTN == 42) THEN
           DO I=LFT,LLT
             DO N=1,NPT
-              J=I+(N-1)*LLT
+              IMT = IGEO(IPMAT+N,IPROP)
+              RHO   = PM(1,IMT)
+              NU    = PM(21,IMT)
+              GMAX  = PM(22,IMT) 
+              A11   = GMAX*(ONE + NU)/(ONE - NU**2)
+              SSP(I)= MAX(SSP(I), SQRT(A11/RHO)) 
+            ENDDO
+          ENDDO
+        ELSEIF (MTN  == 69) THEN
+          DO I=LFT,LLT
+            DO N=1,NPT
               IMT = IGEO(IPMAT+N,IPROP)
               IADB = IPM(7,IMT)-1
-              BULK = UPARAM(IADB+11)
               NU =  UPARAM(IADB+14)
               GMAX = UPARAM(IADB+1)*UPARAM(IADB+6)
      .             + UPARAM(IADB+2)*UPARAM(IADB+7)
@@ -135,7 +142,6 @@ c
         ELSEIF (MTN == 65) THEN
           DO I=LFT,LLT
             DO N=1,NPT
-              J=I+(N-1)*LLT
               IMT = IGEO(IPMAT+N,IPROP)
               RHO  =PM(1,IMT)
               YOUNG=PM(20,IMT)
@@ -145,7 +151,6 @@ c
         ELSE
           DO I=LFT,LLT
             DO N=1,NPT
-              J=I+(N-1)*LLT
               IMT = IGEO(IPMAT+N,IPROP)
               RHO  =PM(1,IMT)
               YOUNG=PM(20,IMT)
@@ -170,18 +175,42 @@ c
         IF(MTN<=28)THEN
           DO I=LFT,LLT
             DO N=1,NIP
-              J=I+(N-1)*LLT
               IMT  = IGEO_STACK(IPMAT + N,ISUBSTACK)
               SSP(I)=MAX(SSP(I),PM(27,IMT))
             ENDDO
           ENDDO
-        ELSEIF (MTN == 42 .OR. MTN  == 69) THEN
+        ELSEIF (MTN == 42) THEN
           DO I=LFT,LLT
             DO N=1,NIP
-              J=I+(N-1)*LLT
+              IMT = IGEO_STACK(IPMAT + N,ISUBSTACK)
+              RHO   = PM(1,IMT)
+              NU    = PM(21,IMT)
+              GMAX  = PM(22,IMT) 
+              A11   = GMAX*(ONE + NU)/(ONE - NU**2)
+              SSP(I)= MAX(SSP(I), SQRT(A11/RHO)) 
+            ENDDO
+          ENDDO
+        ELSEIF (MTN  == 69) THEN
+          DO I=LFT,LLT
+            DO N=1,NIP
               IMT = IGEO_STACK(IPMAT + N,ISUBSTACK)
               IADB = IPM(7,IMT)-1                                           
-              BULK = UPARAM(IADB+11)
+              NU   =  UPARAM(IADB+14)
+              GMAX = UPARAM(IADB+1)*UPARAM(IADB+6)
+     .             + UPARAM(IADB+2)*UPARAM(IADB+7)               
+     .             + UPARAM(IADB+3)*UPARAM(IADB+8)          
+     .             + UPARAM(IADB+4)*UPARAM(IADB+9)             
+     .             + UPARAM(IADB+5)*UPARAM(IADB+10) 
+              RHO  = PM(1,IMT) 
+              A11 = GMAX*(ONE + NU)/(ONE - NU**2)
+              SSP(I)=MAX(SSP(I), SQRT(A11/RHO)) 
+            ENDDO
+          ENDDO
+        ELSEIF (MTN  == 69) THEN
+          DO I=LFT,LLT
+            DO N=1,NIP
+              IMT = IGEO_STACK(IPMAT + N,ISUBSTACK)
+              IADB = IPM(7,IMT)-1                                           
               NU   =  UPARAM(IADB+14)
               GMAX = UPARAM(IADB+1)*UPARAM(IADB+6)
      .             + UPARAM(IADB+2)*UPARAM(IADB+7)               
@@ -196,7 +225,6 @@ c
         ELSEIF (MTN == 65) THEN
           DO I=LFT,LLT
             DO N=1,NIP
-              J=I+(N-1)*LLT
               IMT = IGEO_STACK(IPMAT + N,ISUBSTACK)
               RHO  =PM(1,IMT)
               YOUNG=PM(20,IMT)
@@ -206,7 +234,6 @@ c
         ELSE
           DO I=LFT,LLT
             DO N=1,NIP
-              J=I+(N-1)*LLT
               IMT = IGEO_STACK(IPMAT + N,ISUBSTACK)
               RHO  =PM(1,IMT)
               YOUNG=PM(20,IMT)
@@ -224,9 +251,14 @@ c
             MLAWLY = NINT(PM(19,IMT))
             IF (MLAWLY <= 28) THEN
               SSP(I)=MAX(SSP(I),PM(27,IMT))
-            ELSEIF (MLAWLY == 42 .OR. MLAWLY  == 69) THEN
+            ELSEIF (MLAWLY == 42) THEN
+              RHO   = PM(1,IMT)
+              NU    = PM(21,IMT)
+              GMAX  = PM(22,IMT) 
+              A11   = GMAX*(ONE + NU)/(ONE - NU**2)
+              SSP(I)= MAX(SSP(I), SQRT(A11/RHO)) 
+            ELSEIF (MLAWLY  == 69) THEN
               IADB = IPM(7,IMT)-1                                           
-              BULK = UPARAM(IADB+11)                                          
               NU = UPARAM(IADB+14)
               GMAX = UPARAM(IADB+1)*UPARAM(IADB+6)
      .             + UPARAM(IADB+2)*UPARAM(IADB+7)
@@ -253,10 +285,17 @@ c
         DO I=LFT,LLT
           SSP(I)=PM(27,IMAT)
         ENDDO
-      ELSEIF (MTN == 42 .OR. MTN  == 69) THEN
+      ELSEIF (MTN == 42) THEN
+        DO I=LFT,LLT
+          RHO   = PM(1,IMAT)
+          NU    = PM(21,IMAT)
+          GMAX  = PM(22,IMAT) 
+          A11   = GMAX*(ONE + NU)/(ONE - NU**2)
+          SSP(I)= MAX(SSP(I), SQRT(A11/RHO)) 
+        ENDDO
+      ELSEIF (MTN  == 69) THEN
         DO I=LFT,LLT
           IADB = IPM(7,IMAT)-1 
-          BULK = UPARAM(IADB+11) 
           NU = UPARAM(IADB+14)          
           GMAX = UPARAM(IADB+1)*UPARAM(IADB+6)                 
      .         + UPARAM(IADB+2)*UPARAM(IADB+7)  

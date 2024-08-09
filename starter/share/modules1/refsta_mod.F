@@ -20,19 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  REFSTA_MOD                    share/modules1/refsta_mod.F   
-Chd|-- called by -----------
-Chd|        CONTRL                        source/starter/contrl.F       
-Chd|        HM_READ_REFSTA                source/loads/reference_state/refsta/hm_read_refsta.F
-Chd|        ST_QAPRINT_REFSTA             source/output/qaprint/st_qaprint_refsta.F
-Chd|-- calls ---------------
-Chd|====================================================================
+      !||====================================================================
+      !||    refsta_mod             ../starter/share/modules1/refsta_mod.F
+      !||--- called by ------------------------------------------------------
+      !||    contrl                 ../starter/source/starter/contrl.F
+      !||    hm_read_refsta         ../starter/source/loads/reference_state/refsta/hm_read_refsta.F
+      !||    st_qaprint_refsta      ../starter/source/output/qaprint/st_qaprint_refsta.F
+      !||--- uses       -----------------------------------------------------
+      !||====================================================================
       MODULE REFSTA_MOD
+        USE NAMES_AND_TITLES_MOD , ONLY : ncharline
 #include "my_real.inc"
-#include "nchar_c.inc"
 
-         CHARACTER*ncharline REFSTA_FILENAME
+         CHARACTER(len=ncharline) :: REFSTA_FILENAME
          LOGICAL IS_REFSTA
 
       END MODULE REFSTA_MOD

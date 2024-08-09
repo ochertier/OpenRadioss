@@ -20,14 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  DESOUT                        source/output/outp/desout.F   
-Chd|-- called by -----------
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|-- calls ---------------
-Chd|        FRETITL2                      source/starter/freform.F      
-Chd|        INOUTFILE_MOD                 ../common_source/modules/inoutfile_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    desout                 ../starter/source/output/outp/desout.F
+      !||--- called by ------------------------------------------------------
+      !||    lectur                 ../starter/source/starter/lectur.F
+      !||--- calls      -----------------------------------------------------
+      !||    fretitl2               ../starter/source/starter/freform.F
+      !||--- uses       -----------------------------------------------------
+      !||    format_mod             ../starter/share/modules1/format_mod.F90
+      !||====================================================================
       SUBROUTINE DESOUT(X   ,IXS  ,IXQ  ,IXC  ,IXT  ,
      .                  IXP ,IXR  ,IXTG ,ITAB ,PM   ,
      .                  GEO ,MS   ,IXS10,IGEO ,IPM  ,
@@ -37,6 +38,7 @@ C   M o d u l e s
 C-----------------------------------------------
       USE INOUTFILE_MOD
       USE NAMES_AND_TITLES_MOD, only:NAMES_AND_TITLES_,NCHARTITLE !< NAMES_AND_TITLES host the input deck names and titles for outputs
+      USE FORMAT_MOD , ONLY : FMT_3I, FMT_8I
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -58,9 +60,7 @@ C-----------------------------------------------
      .   IXP(NIXP,*), IXR(NIXR,*), IXTG(NIXTG,*),IXS10(6,*),ITAB(*),
      .   IGEO(NPROPGI,*),IPM(NPROPMI,*),
      .   KXSP(NISP,*),IPART(LIPART1,*),IPARTSP(*)
-C     REAL
-      my_real
-     .   X(3,*),MS(*), PM(NPROPM,*), GEO(NPROPG,*)
+      my_real X(3,*),MS(*), PM(NPROPM,*), GEO(NPROPG,*)
       TYPE(NAMES_AND_TITLES_),INTENT(IN):: NAMES_AND_TITLES
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s

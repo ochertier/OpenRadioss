@@ -20,21 +20,23 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  I2SURFS                       source/interfaces/inter3d1/i2surfs.F
-Chd|-- called by -----------
-Chd|        ININT3                        source/interfaces/inter3d1/inint3.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        NORMA1                        source/interfaces/inter3d1/norma1.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    i2surfs                ../starter/source/interfaces/inter3d1/i2surfs.F
+      !||--- called by ------------------------------------------------------
+      !||    inint3                 ../starter/source/interfaces/inter3d1/inint3.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    norma1                 ../starter/source/interfaces/inter3d1/norma1.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE I2SURFS(
      .      X        ,NSV      ,AREA     ,NSN      ,ITAB     ,
      .      IXC      ,IXTG     ,IXS      ,KNOD2ELS ,NOD2ELS  ,
      .      KNOD2ELC ,NOD2ELC  ,KNOD2ELTG,NOD2ELTG ,ILEV     ,
      .      ID,TITR  ,INTTH    )
       USE MESSAGE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -50,8 +52,7 @@ C-----------------------------------------------
       my_real
      .   X(3,*),AREA(*)
       INTEGER ID
-      CHARACTER*nchartitle,
-     .   TITR
+      CHARACTER(LEN=NCHARTITLE) :: TITR
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

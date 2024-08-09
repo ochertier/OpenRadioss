@@ -20,21 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  NBOXLST                       source/model/box/nboxlist.F   
-Chd|-- called by -----------
-Chd|        HM_READ_BOX                   source/model/box/hm_read_box.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        MY_ORDERS                     ../common_source/tools/sort/my_orders.c
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    nboxlst                ../starter/source/model/box/nboxlist.F
+      !||--- called by ------------------------------------------------------
+      !||    hm_read_box            ../starter/source/model/box/hm_read_box.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       INTEGER FUNCTION NBOXLST(LIST  ,NLIST  ,IBOXTMP,NBBOX  ,
      .                         IX1   ,IX2    ,INDEX  ,KK     ,ID   ,TITR)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C      FONCTION DONNE N0 SYSTEME D'UNE LISTE DE BOXES USER
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -49,7 +50,7 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NLIST,KK,NBBOX,ID
       INTEGER LIST(NLIST),INDEX(NBBOX*3),IBOXTMP(NBBOX),IX1(NBBOX),IX2(NBBOX)
-      CHARACTER(nchartitle) ,INTENT(IN) :: TITR
+      CHARACTER(LEN=NCHARTITLE) ,INTENT(IN) :: TITR
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

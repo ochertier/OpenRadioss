@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  HM_READ_INTER_TYPE01          source/interfaces/int01/hm_read_inter_type01.F
-Chd|-- called by -----------
-Chd|        HM_READ_INTER_FSI             source/interfaces/reader/hm_read_inter_fsi.F
-Chd|-- calls ---------------
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        NGR2USR                       source/system/nintrr.F        
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_read_inter_type01   ../starter/source/interfaces/int01/hm_read_inter_type01.F
+      !||--- called by ------------------------------------------------------
+      !||    hm_read_inter_fsi      ../starter/source/interfaces/reader/hm_read_inter_fsi.F
+      !||--- calls      -----------------------------------------------------
+      !||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    ngr2usr                ../starter/source/system/nintrr.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE HM_READ_INTER_TYPE01(
      1        IPARI      ,STFAC      ,FRIGAP     ,NOINT   ,NI        ,
      2        IGRSURF    ,TITR       ,LSUBMODEL)
@@ -42,6 +42,7 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE GROUPDEF_MOD
       USE SUBMODEL_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARKEY, NCHARFIELD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -60,7 +61,7 @@ C-----------------------------------------------
      .   STFAC
       my_real
      .   FRIGAP(*)
-      CHARACTER TITR*nchartitle,TITR1*nchartitle
+      CHARACTER(LEN=NCHARTITLE) :: TITR,TITR1
       TYPE(SUBMODEL_DATA), DIMENSION(NSUBMOD), INTENT(IN) :: LSUBMODEL
 C-----------------------------------------------
       TYPE (SURF_)   ,TARGET , DIMENSION(NSURF)   :: IGRSURF
@@ -75,9 +76,10 @@ C-----------------------------------------------
       INTEGER I,J,L, NTYP,IS1, IS2,IGSTI,ILEV,IVOID
       my_real
      .   FRIC,GAP,STARTT,STOPT
-      CHARACTER MESS*40, MSGTITL*nchartitle
-      CHARACTER OPT*ncharkey,KEY*ncharkey,KEY1*ncharkey,
-     .          BCFLAG*ncharfield, BCFLAGM*ncharfield
+      CHARACTER(LEN=40)::MESS
+      CHARACTER(LEN=NCHARTITLE)::MSGTITL
+      CHARACTER(LEN=NCHARKEY)::OPT,KEY,KEY1
+      CHARACTER(LEN=NCHARFIELD)::BCFLAG,BCFLAGM
 !
       INTEGER, DIMENSION(:), POINTER :: INGR2USR
       LOGICAL :: IS_AVAILABLE

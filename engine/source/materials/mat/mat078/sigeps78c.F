@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  SIGEPS78C                     source/materials/mat/mat078/sigeps78c.F
-Chd|-- called by -----------
-Chd|        MULAWC                        source/materials/mat_share/mulawc.F
-Chd|-- calls ---------------
-Chd|        VINTER                        source/tools/curve/vinter.F   
-Chd|====================================================================
+      !||====================================================================
+      !||    sigeps78c   ../engine/source/materials/mat/mat078/sigeps78c.F
+      !||--- called by ------------------------------------------------------
+      !||    mulawc      ../engine/source/materials/mat_share/mulawc.F
+      !||--- calls      -----------------------------------------------------
+      !||    vinter      ../engine/source/tools/curve/vinter.F
+      !||====================================================================
       SUBROUTINE SIGEPS78C(
      1     NEL     ,NUPARAM ,NUVAR   ,NVARTMP ,TIME    ,
      2     NFUNC   ,IFUNC   ,NPF     ,TF      ,UPARAM  ,
@@ -36,7 +36,7 @@ Chd|====================================================================
      6     SIGNXX  ,SIGNYY  ,SIGNXY  ,SIGNYZ  ,SIGNZX  ,
      7     SOUNDSP ,UVAR    ,SIGA    ,SIGB    ,SIGC    ,
      8     RHO     ,OFF     ,PLA     ,DEP     ,VARTMP  ,
-     9     INLOC   ,DPLANL  ,ETIMP   ,SEQ     )
+     9     INLOC   ,DPLANL  ,ETIMP   ,SEQ     ,LOFF    )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -59,6 +59,7 @@ C-----------------------------------------------
      .         DEPSXX,DEPSYY,DEPSXY,DEPSYZ,DEPSZX,
      .         SIGOXX,SIGOYY,SIGOXY,SIGOYZ,SIGOZX
       INTEGER ,INTENT(INOUT) :: VARTMP(NEL,NVARTMP)
+      my_real, DIMENSION(NEL), INTENT(IN) :: LOFF
 C-----------------------------------------------
 C   I N P U T   O U T P U T   A r g u m e n t s
 C-----------------------------------------------
@@ -573,7 +574,7 @@ C
 
 
         !NON LOCAL
-        IF (INLOC > 0) THEN 
+        IF ((INLOC > 0).AND.(LOFF(I) == ONE)) THEN 
           !   -> Hill 1948
           IF (IPLAS == 1) THEN 
             SEFF(I) = SQRT(AXX(I)**2 - TWO*P2*AXX(I)*AYY(I) + P1*AYY(I)**2 + P3*AXY(I)**2)

@@ -21,17 +21,18 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
-Chd|====================================================================
-Chd|  HM_PREREAD_NODE               source/elements/reader/hm_preread_node.F
-Chd|-- called by -----------
-Chd|        CONTRL                        source/starter/contrl.F       
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        AUTO_NODE_MERGE               source/elements/nodes/auto_node_merge.F
-Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_preread_node        ../starter/source/elements/reader/hm_preread_node.F
+      !||--- called by ------------------------------------------------------
+      !||    contrl                 ../starter/source/starter/contrl.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    auto_node_merge        ../starter/source/elements/nodes/auto_node_merge.F
+      !||--- uses       -----------------------------------------------------
+      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE HM_PREREAD_NODE(UNITAB,LSUBMODEL,NUMNUSR,IS_DYNA)
 C-----------------------------------------------
 C   M o d u l e s
@@ -40,6 +41,7 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE SUBMODEL_MOD
       USE HM_OPTION_READ_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARFIELD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -61,16 +63,13 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER N,I,J,IERROR, STAT
       INTEGER FLAG_FMT,FLAG_FMT_TMP,IFIX_TMP,IFLAGUNIT, UID, ID
-C     REAL
-      my_real
-     .    FAC_L
+      my_real FAC_L
       INTEGER, DIMENSION(:), ALLOCATABLE :: SUB_NOD,UID_NOD
       INTEGER, DIMENSION(:), ALLOCATABLE :: ITAB
-      my_real, DIMENSION(:,:), ALLOCATABLE ::
-     .                                       X
+      my_real, DIMENSION(:,:), ALLOCATABLE :: X
       REAL*8, DIMENSION(:,:), ALLOCATABLE :: HM_X
       REAL*8, DIMENSION(:), ALLOCATABLE :: DMERGE
-      CHARACTER KEY*ncharfield
+      CHARACTER(LEN=NCHARFIELD) :: KEY
       LOGICAL IS_AVAILABLE
 C-----------------------------------------------      
       FAC_L = ONE

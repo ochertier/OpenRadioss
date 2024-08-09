@@ -20,15 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  SIGEPS76                      source/materials/mat/mat076/sigeps76.F
-Chd|-- called by -----------
-Chd|-- calls ---------------
-Chd|        ASSO_PLAS76                   source/materials/mat/mat076/asso_plas76.F
-Chd|        NO_ASSO_PLAS76                source/materials/mat/mat076/no_asso_plas76.F
-Chd|        VINTER                        source/tools/curve/vinter.F   
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    sigeps76           ../engine/source/materials/mat/mat076/sigeps76.F
+      !||--- called by ------------------------------------------------------
+      !||    mulaw              ../engine/source/materials/mat_share/mulaw.F90
+      !||--- calls      -----------------------------------------------------
+      !||    asso_plas76        ../engine/source/materials/mat/mat076/asso_plas76.F
+      !||    no_asso_plas76     ../engine/source/materials/mat/mat076/no_asso_plas76.F
+      !||    vinter             ../engine/source/tools/curve/vinter.F
+      !||--- uses       -----------------------------------------------------
+      !||    matparam_def_mod   ../common_source/modules/mat_elem/matparam_def_mod.F90
+      !||====================================================================
       SUBROUTINE SIGEPS76(
      1           NEL     ,NUPARAM ,NUVAR    ,NFUNC    ,IFUNC    ,NGL      ,
      2           NPF     ,TF      ,TIME     ,TIMESTEP ,UPARAM   ,MATPARAM ,
@@ -37,7 +39,7 @@ Chd|====================================================================
      4           SIGOXX  ,SIGOYY  ,SIGOZZ   ,SIGOXY   ,SIGOYZ   ,SIGOZX   ,
      5           SIGNXX  ,SIGNYY  ,SIGNZZ   ,SIGNXY   ,SIGNYZ   ,SIGNZX   ,
      6           OFF     ,EPSD    ,PLA      ,INLOC    ,L_PLANL  ,PLANL    ,
-     7           DMG     ,IDEL7NOK,NVARTMP ,VARTMP  )
+     7           DMG     ,NVARTMP ,VARTMP  )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -54,7 +56,6 @@ C-----------------------------------------------
 #include      "units_c.inc"
 C=======================================================================
       INTEGER, INTENT(IN) :: NEL,NFUNC,NUPARAM,NUVAR,INLOC,L_PLANL
-      INTEGER, INTENT(INOUT) :: IDEL7NOK
       INTEGER ,INTENT(IN)    :: NVARTMP
       INTEGER, DIMENSION(NFUNC), INTENT(IN) :: IFUNC
       INTEGER, DIMENSION(NEL), INTENT(IN) :: NGL
@@ -163,7 +164,6 @@ c
             DMG(I) = ONE
             IF (OFF(I) == ONE) THEN 
               OFF(I)      = FOUR_OVER_5
-              IDEL7NOK    = 1
               NINDX       = NINDX+1
               INDX(NINDX) = I
             ENDIF
@@ -180,7 +180,6 @@ c
           IF (DMG(I) >= ONE) THEN 
             IF (OFF(I) == ONE) THEN 
               OFF(I)      = FOUR_OVER_5
-              IDEL7NOK    = 1
               NINDX       = NINDX+1
               INDX(NINDX) = I
             ENDIF

@@ -20,19 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  HM_GROGRO                     source/groups/hm_grogro.F     
-Chd|-- called by -----------
-Chd|        LECGGROUP                     source/groups/lecggroup.F     
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        GROUPS_GET_ELEM_LIST          source/groups/groups_get_elem_list.F
-Chd|        HM_OPTION_READ_KEY            source/devtools/hm_reader/hm_option_read_key.F
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_grogro              ../starter/source/groups/hm_grogro.F
+      !||--- called by ------------------------------------------------------
+      !||    lecggroup              ../starter/source/groups/lecggroup.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    groups_get_elem_list   ../starter/source/groups/groups_get_elem_list.F
+      !||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
+      !||--- uses       -----------------------------------------------------
+      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE HM_GROGRO(NUMEN   ,NGRELN  ,IGRELEM ,ICOUNT,
      .                  FLAG    ,ITER    ,ELKEY  ,LSUBMODEL )
 !---
@@ -46,6 +46,7 @@ C-----------------------------------------------
       USE GROUPDEF_MOD
       USE SUBMODEL_MOD
       USE HM_OPTION_READ_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARKEY
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -67,7 +68,9 @@ C-----------------------------------------------
       INTEGER I,J,K,L,ID,NEL,IGS,IGRS,JREC,ISU,NONTRI,JJ,KK,
      .        FLAG_FMT,GROUP_ID,IFIX_TMP,SKIPFLAG,UID,NN
       INTEGER BUFTMP(NUMEN*2)
-      CHARACTER TITR*nchartitle,KEY*ncharkey,ELKEY*4,KEY2*ncharkey
+      CHARACTER(LEN=NCHARTITLE) :: TITR
+      CHARACTER(LEN=NCHARKEY)::KEY,KEY2
+      CHARACTER :: ELKEY*4
       LOGICAL IS_ENCRYPTED, IS_AVAILABLE
       INTEGER,DIMENSION(:),ALLOCATABLE :: LIST_ELEM
       INTEGER :: NENTITY

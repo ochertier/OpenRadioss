@@ -20,18 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  HM_READ_MAT101                source/materials/mat/mat101/hm_read_mat101.F
-Chd|-- called by -----------
-Chd|        HM_READ_MAT                   source/materials/mat/hm_read_mat.F
-Chd|-- calls ---------------
-Chd|        HM_GET_FLOATV                 source/devtools/hm_reader/hm_get_floatv.F
-Chd|        HM_OPTION_IS_ENCRYPTED        source/devtools/hm_reader/hm_option_is_encrypted.F
-Chd|        INIT_MAT_KEYWORD              source/materials/mat/init_mat_keyword.F
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_read_mat101           ../starter/source/materials/mat/mat101/hm_read_mat101.F
+      !||--- called by ------------------------------------------------------
+      !||    hm_read_mat              ../starter/source/materials/mat/hm_read_mat.F
+      !||--- calls      -----------------------------------------------------
+      !||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
+      !||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+      !||    init_mat_keyword         ../starter/source/materials/mat/init_mat_keyword.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod              ../starter/share/message_module/message_mod.F
+      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE HM_READ_MAT101 (
      .           UPARAM   ,MAXUPARAM,NUPARAM  ,NUVAR    ,IFUNC    ,
      .           MAXFUNC  ,NFUNC    ,PARMAT   ,UNITAB   ,IMATVIS  ,
@@ -43,6 +43,7 @@ C----------------------------------------------------------------
       USE UNITAB_MOD
       USE MESSAGE_MOD
       USE MATPARAM_DEF_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARFIELD
 C----------------------------------------------------------------
 C  I M P L I C I T   T Y P E S 
 C----------------------------------------------------------------
@@ -64,7 +65,7 @@ C----------------------------------------------------------------
       TYPE (UNIT_TYPE_),INTENT(IN)                 :: UNITAB      
       my_real, DIMENSION(NPROPM) ,INTENT(INOUT)    :: PM       
       TYPE(SUBMODEL_DATA), DIMENSION(*),INTENT(IN) :: LSUBMODEL
-      CHARACTER*nchartitle ,INTENT(IN)             :: TITR
+      CHARACTER(LEN=NCHARTITLE) ,INTENT(IN)             :: TITR
       TYPE(MATPARAM_STRUCT_) ,INTENT(INOUT) :: MATPARAM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -76,8 +77,8 @@ C-----------------------------------------------
      . DC13, DC14, DC1, DC2, DLAMBDA, RHOA, CV, THETA0, BETA0, BTHETA0,
      . FACTOR, TEMP_OPT, THETAI, THETAG,STIFINT,
      . C1,C2,C3,C4,C5,MU,LM,D,BETA,FACPL, SCALE1, SCALE2
-      CHARACTER  STRING*ncharfield
-      CHARACTER KEY*nchartitle,KEYNET*ncharfield      
+      CHARACTER(LEN=NCHARFIELD) ::STRING,KEYNET
+      CHARACTER(LEN=NCHARTITLE) ::  KEY
       INTEGER ILAW
 C     
       LOGICAL :: IS_AVAILABLE,IS_ENCRYPTED

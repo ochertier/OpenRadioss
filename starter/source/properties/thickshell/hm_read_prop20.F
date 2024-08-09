@@ -20,21 +20,23 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  HM_READ_PROP20                source/properties/thickshell/hm_read_prop20.F
-Chd|-- called by -----------
-Chd|        HM_READ_PROPERTIES            source/properties/hm_read_properties.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        HM_GET_FLOATV                 source/devtools/hm_reader/hm_get_floatv.F
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        HM_OPTION_IS_ENCRYPTED        source/devtools/hm_reader/hm_option_is_encrypted.F
-Chd|        ELBUFTAG_MOD                  share/modules1/elbuftag_mod.F 
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
-      SUBROUTINE HM_READ_PROP20(GEO,IGEO,PROP_TAG ,MULTI_FVM,IGTYP,IG,TITR,UNITAB,LSUBMODEL)
+      !||====================================================================
+      !||    hm_read_prop20           ../starter/source/properties/thickshell/hm_read_prop20.F
+      !||--- called by ------------------------------------------------------
+      !||    hm_read_properties       ../starter/source/properties/hm_read_properties.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                   ../starter/source/output/message/message.F
+      !||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
+      !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+      !||--- uses       -----------------------------------------------------
+      !||    defaults_mod             ../starter/source/modules/defaults_mod.F90
+      !||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
+      !||    message_mod              ../starter/share/message_module/message_mod.F
+      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
+      SUBROUTINE HM_READ_PROP20(GEO,IGEO,PROP_TAG ,MULTI_FVM,IGTYP,IG,TITR,UNITAB,LSUBMODEL,
+     .                          DEFAULTS_SOLID)
 C-----------------------------------------------
 C   ROUTINE DESCRIPTION :
 C   ===================
@@ -60,7 +62,8 @@ C-----------------------------------------------
       USE SUBMODEL_MOD
       USE ELBUFTAG_MOD            
       USE MULTI_FVM_MOD
-C---s----1---------2---------3---------4---------5---------6---------7->
+      USE DEFAULTS_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -70,7 +73,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr17_c.inc"
 #include      "units_c.inc"
-#include      "scr21_c.inc"
 #include      "tablen_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -78,7 +80,7 @@ C-----------------------------------------------
 C INPUT ARGUMENTS
       TYPE (UNIT_TYPE_),INTENT(IN) ::UNITAB 
       INTEGER,INTENT(IN)::IG,IGTYP
-      CHARACTER*nchartitle,INTENT(IN)::TITR
+      CHARACTER(LEN=NCHARTITLE) ,INTENT(IN)::TITR
       TYPE(SUBMODEL_DATA),INTENT(IN)::LSUBMODEL(*)
 C MODIFIED ARGUMENT
       INTEGER,INTENT(INOUT)::IGEO(*)
@@ -86,6 +88,7 @@ C MODIFIED ARGUMENT
      .  INTENT(INOUT)::GEO(*)
       TYPE(PROP_TAG_) , DIMENSION(0:MAXPROP) :: PROP_TAG
       TYPE(MULTI_FVM_STRUCT) :: MULTI_FVM
+      TYPE(SOLID_DEFAULTS_), INTENT(IN) :: DEFAULTS_SOLID
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -93,6 +96,7 @@ C     REAL
       INTEGER IHBE,ISMSTR,IPLAST,ICPRE,ICSTR,IINT,JCVT,
      .   NPG,NPT,NPTR,NPTS,NPTT, ISTRAIN,IET,IHBE_OLD,ID,
      .   NLY
+      INTEGER     IHBE_DS,ISST_DS
       my_real
      .    CVIS,QA,QB,QH,VNS1,VNS2,DTMIN,VDEFMIN,VDEFMAX,ASPMAX,ASPTET 
       LOGICAL IS_AVAILABLE, IS_ENCRYPTED
@@ -106,6 +110,9 @@ C---- will branche later
       ICPRE = 0  
       ISTRAIN =1 
       JCVT = 0
+!--- defaults values      
+      IHBE_DS=  DEFAULTS_SOLID%ISOLID
+      ISST_DS=  DEFAULTS_SOLID%ISMSTR
 C--------------------------------------------------
 C EXTRACT DATA (IS OPTION CRYPTED)
 C--------------------------------------------------

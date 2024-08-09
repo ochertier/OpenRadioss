@@ -21,19 +21,21 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
-Chd|====================================================================
-Chd|  HM_READ_SHELL                 source/elements/reader/hm_read_shell.F
-Chd|-- called by -----------
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        ANODSET                       source/output/analyse/analyse_node.c
-Chd|        APARTSET                      source/output/analyse/analyse_part.c
-Chd|        VDOUBLE                       source/system/sysfus.F        
-Chd|        USR2SYS                       source/system/sysfus.F        
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_read_shell          ../starter/source/elements/reader/hm_read_shell.F
+      !||--- called by ------------------------------------------------------
+      !||    lectur                 ../starter/source/starter/lectur.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    anodset                ../starter/source/output/analyse/analyse_node.c
+      !||    apartset               ../starter/source/output/analyse/analyse_part.c
+      !||    nintrn                 ../starter/source/system/nintrn.F
+      !||    usr2sys                ../starter/source/system/sysfus.F
+      !||    vdouble                ../starter/source/system/sysfus.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE HM_READ_SHELL(IXC   ,ITAB  ,ITABM1,IPART,IPARTC,
      .                  THK   ,IPM   ,IGEO  ,UNITAB,ITAG ,ANGLE ,LSUBMODEL)
 C-----------------------------------------------
@@ -64,6 +66,7 @@ C-----------------------------------------------
       USE UNITAB_MOD
       USE MESSAGE_MOD
       USE SUBMODEL_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C--------------------------------------------------------
 C     LECTURE DES ELEMENTS COQUES 4 NOEUDS
 C     VERSIION NUMEROTATION DES NOEUDS LIBRE/MARS 90/DIM
@@ -111,7 +114,8 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, J, I1, I2, ID,IDS,IPID,MT,N,MID,PID,UID,NDEGEN,JC,STAT,
      .   IFLAGUNIT,FLAG_FMT,FLAG_FMT_TMP,IFIX_TMP,ISHXFEM,IOUTN,IERROR,INDEX_PART
-      CHARACTER MESS*40, MESS2*40,TITR*nchartitle
+      CHARACTER MESS*40, MESS2*40
+      CHARACTER(LEN=NCHARTITLE) :: TITR
       my_real
      .   BID,FAC_L
       INTEGER, DIMENSION(:), ALLOCATABLE :: SUB_SHELL,UID_SHELL

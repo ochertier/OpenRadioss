@@ -20,25 +20,29 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  READ_DFS_WAVE_SHAPER          source/initial_conditions/detonation/read_dfs_wave_shaper.F
-Chd|-- called by -----------
-Chd|        READ_DETONATORS               source/initial_conditions/detonation/read_detonators.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        HM_GET_FLOATV                 source/devtools/hm_reader/hm_get_floatv.F
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        HM_OPTION_IS_ENCRYPTED        source/devtools/hm_reader/hm_option_is_encrypted.F
-Chd|        HM_OPTION_READ_KEY            source/devtools/hm_reader/hm_option_read_key.F
-Chd|        HM_OPTION_START               source/devtools/hm_reader/hm_option_start.F
-Chd|        IFRONTPLUS                    source/spmd/node/frontplus.F  
-Chd|        NODGRNR5                      source/starter/freform.F      
-Chd|        DETONATORS_MOD                share/modules1/detonators_mod.F
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    read_dfs_wave_shaper     ../starter/source/initial_conditions/detonation/read_dfs_wave_shaper.F
+      !||--- called by ------------------------------------------------------
+      !||    read_detonators          ../starter/source/initial_conditions/detonation/read_detonators.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                   ../starter/source/output/message/message.F
+      !||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
+      !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+      !||    hm_option_read_key       ../starter/source/devtools/hm_reader/hm_option_read_key.F
+      !||    hm_option_start          ../starter/source/devtools/hm_reader/hm_option_start.F
+      !||    ifrontplus               ../starter/source/spmd/node/frontplus.F
+      !||    nintri                   ../starter/source/system/nintrr.F
+      !||    nodgrnr5                 ../starter/source/starter/freform.F
+      !||    unused_mat_detonator     ../starter/source/initial_conditions/detonation/unused_mat_detonator.F
+      !||    usr2sys                  ../starter/source/system/sysfus.F
+      !||--- uses       -----------------------------------------------------
+      !||    detonators_mod           ../starter/share/modules1/detonators_mod.F
+      !||    format_mod               ../starter/share/modules1/format_mod.F90
+      !||    hm_option_read_mod       ../starter/share/modules1/hm_option_read_mod.F
+      !||    message_mod              ../starter/share/message_module/message_mod.F
+      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE READ_DFS_WAVE_SHAPER(DETONATORS,IGRNOD,IPM,ITABM1,UNITAB,LSUBMODEL,ITAB)
 C-----------------------------------------------
 C   M o d u l e s
@@ -50,6 +54,8 @@ C-----------------------------------------------
       USE HM_OPTION_READ_MOD
       USE SUBMODEL_MOD
       USE DETONATORS_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARKEY
+      USE FORMAT_MOD , ONLY : FMW_10I
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -81,8 +87,8 @@ C-----------------------------------------------
       my_real              :: XC, YC, ZC, ALT, XC1, YC1, ZC1, XC2, YC2, ZC2, NX, NY, NZ, BID, VCJ, VDET
       CHARACTER*40         :: MESS
       CHARACTER*64         :: chain1,chain2
-      CHARACTER*ncharkey   :: KEY, KEY2
-      CHARACTER*nchartitle :: TITR
+      CHARACTER(LEN=NCHARKEY) :: KEY, KEY2
+      CHARACTER(LEN=NCHARTITLE) :: TITR
       LOGICAL              :: IS_ENCRYPTED, IS_AVAILABLE
       INTEGER,POINTER,DIMENSION(:) :: IECRAN
       my_real,POINTER,DIMENSION(:) :: DECRAN
@@ -90,8 +96,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
-      INTEGER,EXTERNAL     :: NODGRNR5, USR2SYS, NINTRI
-      INTEGER              :: UNUSED_MAT_DETONATOR
+      INTEGER,EXTERNAL  :: NODGRNR5, USR2SYS, NINTRI
+      INTEGER           :: UNUSED_MAT_DETONATOR
       DATA MESS/'DETONATORS DEFINITION                   '/      
 C-----------------------------------------------
 C   S o u r c e   L i n e s

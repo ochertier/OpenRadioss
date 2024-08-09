@@ -20,34 +20,34 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  LECSEC4BOLT                   source/tools/sect/lecsec4bolt.F
-Chd|-- called by -----------
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        ANODSET                       source/output/analyse/analyse_node.c
-Chd|        HM_GET_FLOATV                 source/devtools/hm_reader/hm_get_floatv.F
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        HM_GET_INT_ARRAY_INDEX        source/devtools/hm_reader/hm_get_int_array_index.F
-Chd|        HM_GET_STRING                 source/devtools/hm_reader/hm_get_string.F
-Chd|        HM_OPTION_READ_KEY            source/devtools/hm_reader/hm_option_read_key.F
-Chd|        HM_OPTION_START               source/devtools/hm_reader/hm_option_start.F
-Chd|        SECSTRI                       source/tools/sect/hm_read_sect.F
-Chd|        SEC_NODES_SOL                 source/tools/sect/hm_read_sect.F
-Chd|        SUBROTPOINT                   source/model/submodel/subrot.F
-Chd|        SUBROTVECT                    source/model/submodel/subrot.F
-Chd|        UDOUBLE                       source/system/sysfus.F        
-Chd|        ZERORE                        source/system/zerore.F        
-Chd|        ELEGROR                       source/groups/elegror.F       
-Chd|        NODGRNR5                      source/starter/freform.F      
-Chd|        USR2SYS                       source/system/sysfus.F        
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        R2R_MOD                       share/modules1/r2r_mod.F      
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    lecsec4bolt              ../starter/source/tools/sect/lecsec4bolt.F
+      !||--- called by ------------------------------------------------------
+      !||    lectur                   ../starter/source/starter/lectur.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                   ../starter/source/output/message/message.F
+      !||    anodset                  ../starter/source/output/analyse/analyse_node.c
+      !||    elegror                  ../starter/source/groups/elegror.F
+      !||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
+      !||    hm_get_int_array_index   ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+      !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    hm_get_string            ../starter/source/devtools/hm_reader/hm_get_string.F
+      !||    hm_option_read_key       ../starter/source/devtools/hm_reader/hm_option_read_key.F
+      !||    hm_option_start          ../starter/source/devtools/hm_reader/hm_option_start.F
+      !||    nodgrnr5                 ../starter/source/starter/freform.F
+      !||    sec_nodes_sol            ../starter/source/tools/sect/hm_read_sect.F
+      !||    secstri                  ../starter/source/tools/sect/hm_read_sect.F
+      !||    subrotpoint              ../starter/source/model/submodel/subrot.F
+      !||    subrotvect               ../starter/source/model/submodel/subrot.F
+      !||    udouble                  ../starter/source/system/sysfus.F
+      !||    usr2sys                  ../starter/source/system/sysfus.F
+      !||    zerore                   ../starter/source/system/zerore.F
+      !||--- uses       -----------------------------------------------------
+      !||    hm_option_read_mod       ../starter/share/modules1/hm_option_read_mod.F
+      !||    message_mod              ../starter/share/message_module/message_mod.F
+      !||    r2r_mod                  ../starter/share/modules1/r2r_mod.F
+      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE LECSEC4BOLT(IXS   ,IXQ   ,IXC    ,IXT    ,IXP    ,IXR    ,
      2                       IXTG  ,X0    ,NSTRF  ,ITAB   ,ITABM1 ,
      3                       IGRNOD,SECBUF ,
@@ -63,6 +63,7 @@ C-----------------------------------------------
       USE SUBMODEL_MOD
       USE GROUPDEF_MOD
       USE HM_OPTION_READ_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARLINE, NCHARFIELD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -112,8 +113,10 @@ C-----------------------------------------------
       INTEGER, DIMENSION(:), ALLOCATABLE :: NODTAG,TAGELEMS
       my_real
      .   DELTAT,ALPHA,FAC_T,A,B,C,D,E,F,POS,R
-      CHARACTER MESS*40,TITR*nchartitle,CHAR8*ncharline
-      CHARACTER KEY2*ncharfield
+      CHARACTER MESS*40
+      CHARACTER(LEN=NCHARTITLE) :: TITR
+      CHARACTER(LEN=NCHARLINE) ::CHAR8
+      CHARACTER(LEN=NCHARFIELD) :: KEY2
       my_real
      .   BID, XM, YM, ZM, X1, Y1, Z1, X2, Y2, Z2, NORM,
      .   X3, Y3, Z3, N3, PNOR1, PNOR2, PNORM1, DET, DET1, DET2, DET3
@@ -518,9 +521,6 @@ C--------------------------------------------------------------
        KR0 = NSTRF(K0+25)
        K0  = NSTRF(K0+24)
 C-------------------------------------------------------------
-        !IF (FLAG_FMT /= 0) THEN
-        !  CALL FMT_DEF(INVERS_INIT,IFIX_INIT)
-        !ENDIF
         NODTAG = 0
         TAGELEMS  = 0
       ENDDO

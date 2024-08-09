@@ -20,20 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  INI_FXBODY                    source/constraints/fxbody/ini_fxbody.F
-Chd|-- called by -----------
-Chd|        INITIA                        source/elements/initia/initia.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        FRETITL2                      source/starter/freform.F      
-Chd|        ORTHRG                        source/constraints/fxbody/ortho_normalization.F
-Chd|        ORTHSR                        source/constraints/fxbody/ortho_normalization.F
-Chd|        ORTHST                        source/constraints/fxbody/ortho_normalization.F
-Chd|        PRSCAL                        source/constraints/fxbody/ortho_normalization.F
-Chd|        INOUTFILE_MOD                 ../common_source/modules/inoutfile_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    ini_fxbody             ../starter/source/constraints/fxbody/ini_fxbody.F
+      !||--- called by ------------------------------------------------------
+      !||    initia                 ../starter/source/elements/initia/initia.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    fretitl2               ../starter/source/starter/freform.F
+      !||    orthrg                 ../starter/source/constraints/fxbody/ortho_normalization.F
+      !||    orthsr                 ../starter/source/constraints/fxbody/ortho_normalization.F
+      !||    orthst                 ../starter/source/constraints/fxbody/ortho_normalization.F
+      !||    prscal                 ../starter/source/constraints/fxbody/ortho_normalization.F
+      !||    usr2sys                ../starter/source/system/sysfus.F
+      !||--- uses       -----------------------------------------------------
+      !||    format_mod             ../starter/share/modules1/format_mod.F90
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE INI_FXBODY(FXBIPM,  FXBRPM, FXBNOD, FXBGLM,FXBCPM,   
      .                      FXBCPS,  FXBLM,  FXBFLS, FXBDLS,FXBMOD, 
      .                      ITAB, X ,MS, IN, FXB_MATRIX,
@@ -43,6 +45,8 @@ C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
       USE INOUTFILE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      USE FORMAT_MOD , ONLY : FMW_10I
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -60,10 +64,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER ITAB(*),FXBIPM(NBIPM,*),FXBNOD(*),FXB_MATRIX_ADD(4,*),FXB_LAST_ADRESS(*),ICODE(*),
-     .        NOM_OPT(LNOPT1,*)
-      my_real 
-     .        X(3,*),MS(*),IN(*),
+      INTEGER ITAB(*),FXBIPM(NBIPM,*),FXBNOD(*),FXB_MATRIX_ADD(4,*),FXB_LAST_ADRESS(*),ICODE(*),NOM_OPT(LNOPT1,*)
+      my_real X(3,*),MS(*),IN(*),
      .        FXBRPM(*), FXBGLM(*), FXBCPM(*), FXBCPS(*), 
      .        FXBLM(*),  FXBFLS(*), FXBDLS(*), FXBMOD(*),
      .        FXB_MATRIX(*)
@@ -81,8 +83,8 @@ C-----------------------------------------------
      .        FREQ,BETA,OMEGA,DTC1,DTC2,BID,XM(3),ZZ,RHO_INVMK,UNSN,NORM,FAC,FAC2,MSTOT,TOLE,
      .        KT,KR,RR,SKEW(9),RDUM1,MIN_DIAG_STIF,FAC2X,FAC2Y,FAC2Z,DT_MINI,DT_CST,OMEGA_MIN,
      .        INMIN,INMAX,OMEGA_MAX,MAX_FREQ,ALPHA,FREQ_RANGE,MIN_CUT_OFF_FREQ
-      CHARACTER TITR*nchartitle,MESS*40,MESS1*40,NWLINE*100,
-     .          FXBFILE*100
+      CHARACTER(LEN=NCHARTITLE) ::  TITR
+      CHARACTER :: MESS*40,MESS1*40,NWLINE*100,FXBFILE*100
       INTEGER, DIMENSION(:,:), ALLOCATABLE :: TABSL,ITAG_DOF
       INTEGER, DIMENSION(:), ALLOCATABLE :: INDEX,LISTN
       INTEGER IFLAGI1,IFLAGDBL,IRB,CPT,REST,NLIGNE,M,INFO2,LWORK,NBDYN,NDDL,IM,NMOD0,NMST0

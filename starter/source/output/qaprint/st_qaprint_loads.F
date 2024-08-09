@@ -20,13 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  ST_QAPRINT_LOADS              source/output/qaprint/st_qaprint_loads.F
-Chd|-- called by -----------
-Chd|        ST_QAPRINT_DRIVER             source/output/qaprint/st_qaprint_driver.F
-Chd|-- calls ---------------
-Chd|        FRETITL2                      source/starter/freform.F      
-Chd|====================================================================
+      !||====================================================================
+      !||    st_qaprint_loads       ../starter/source/output/qaprint/st_qaprint_loads.F
+      !||--- called by ------------------------------------------------------
+      !||    st_qaprint_driver      ../starter/source/output/qaprint/st_qaprint_driver.F
+      !||--- calls      -----------------------------------------------------
+      !||    fretitl2               ../starter/source/starter/freform.F
+      !||--- uses       -----------------------------------------------------
+      !||====================================================================
       SUBROUTINE ST_QAPRINT_LOADS(NOM_OPT   ,INOM_OPT  ,NUMLOADP  ,ILOADP    ,LLOADP    ,
      2                            LOADP     ,IBCL      ,FORC      ,IPRES     ,PRES      ,
      3                            IBCR      ,FRADIA    ,IBCV      ,FCONV     , IGRV     ,
@@ -37,6 +38,7 @@ C============================================================================
 C   M o d u l e s
 C-----------------------------------------------
       USE QA_OUT_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -132,7 +134,7 @@ C-----------------------------------------------
       INTEGER I,IS,IPRE, MY_ID, MY_LOAD,J,K0,NSMAX,NS,LPRELOADTAB,
      .        IDS(NSPHIO),IDX(NSPHIO),II,MY_SPHIO,LVAD(NSPHIO),
      .        IADSPHIO_1,IADSPHIO_2,FIRST,LAST
-      CHARACTER *nchartitle TITR
+      CHARACTER(LEN=NCHARTITLE) :: TITR
       CHARACTER (LEN=255) :: VARNAME
       DOUBLE PRECISION TEMP_DOUBLE
       LOGICAL :: OK_QA 

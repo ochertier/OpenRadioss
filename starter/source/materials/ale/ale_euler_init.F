@@ -20,19 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  ALE_EULER_INIT                source/materials/ale/ale_euler_init.F
-Chd|-- called by -----------
-Chd|        HM_READ_PART                  source/model/assembling/hm_read_part.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        FRETITL2                      source/starter/freform.F      
-Chd|        NINTRI                        source/system/nintrr.F        
-Chd|        ALEFVM_MOD                    ../common_source/modules/ale/alefvm_mod.F
-Chd|        ALE_MOD                       ../common_source/modules/ale/ale_mod.F
-Chd|        ELBUFTAG_MOD                  share/modules1/elbuftag_mod.F 
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    ale_euler_init         ../starter/source/materials/ale/ale_euler_init.F
+      !||--- called by ------------------------------------------------------
+      !||    hm_read_part           ../starter/source/model/assembling/hm_read_part.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    fretitl2               ../starter/source/starter/freform.F
+      !||    loi_fluid              ../starter/source/fluid/loi_fluid.F
+      !||    nintri                 ../starter/source/system/nintrr.F
+      !||--- uses       -----------------------------------------------------
+      !||    elbuftag_mod           ../starter/share/modules1/elbuftag_mod.F
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE ALE_EULER_INIT(MLAW_TAG,IPM,PM, IGEO,TITR,TITR1,TITR2,IGTYP,ID,ILAW,MID,IMID,PID,IPID,JALE_FROM_PROP,JALE_FROM_MAT)
 C-----------------------------------------------
 C   D e s c r i p t i o n
@@ -49,6 +49,7 @@ C-----------------------------------------------
       USE ELBUFTAG_MOD
       USE ALEFVM_MOD , only:ALEFVM_Param
       USE ALE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -65,7 +66,7 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       TYPE(MLAW_TAG_), DIMENSION(NUMMAT), INTENT(INOUT)  :: MLAW_TAG
-      CHARACTER*nchartitle, INTENT(INOUT) :: TITR,TITR1,TITR2
+      CHARACTER(LEN=NCHARTITLE), INTENT(INOUT) :: TITR,TITR1,TITR2
       INTEGER,INTENT(INOUT)::IGEO(NPROPGI,NUMGEO)      
       INTEGER,INTENT(IN) :: ID,IMID,PID,IPID,IGTYP,ILAW
       INTEGER,INTENT(INOUT) :: MID,JALE_FROM_PROP,JALE_FROM_MAT

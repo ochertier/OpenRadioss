@@ -20,14 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  FAIL_SPALLING_S               source/materials/fail/spalling/fail_spalling_s.F
-Chd|-- called by -----------
-Chd|        MMAIN8                        source/materials/mat_share/mmain8.F
-Chd|        MULAW8                        source/materials/mat_share/mulaw8.F
-Chd|        USERMAT_SOLID                 source/materials/mat_share/usermat_solid.F
-Chd|-- calls ---------------
-Chd|====================================================================
+      !||====================================================================
+      !||    fail_spalling_s   ../engine/source/materials/fail/spalling/fail_spalling_s.F
+      !||--- called by ------------------------------------------------------
+      !||    mmain             ../engine/source/materials/mat_share/mmain.F90
+      !||    mmain8            ../engine/source/materials/mat_share/mmain8.F
+      !||    mulaw             ../engine/source/materials/mat_share/mulaw.F90
+      !||    mulaw8            ../engine/source/materials/mat_share/mulaw8.F
+      !||    usermat_solid     ../engine/source/materials/mat_share/usermat_solid.F
+      !||====================================================================
       SUBROUTINE FAIL_SPALLING_S (
      1     NEL    ,NUPARAM ,NUVAR   ,
      2     TIME   ,TIMESTEP,UPARAM  ,NGL    ,
@@ -144,7 +145,6 @@ C
           OFF(I)=FOUR_OVER_5
           NINDX=NINDX+1
           INDX(NINDX)=I
-          IDEL7NOK = 1  
           TDELE(I) = TIME                  
          ENDIF
         ENDIF 
@@ -239,7 +239,6 @@ C...Spalling
           OFF(I)= FOUR_OVER_5
           NINDEX=NINDEX+1
           INDEX(NINDEX)=I
-          IDEL7NOK = 1  
           TDELE(I) = TIME  
         ENDIF 
         ENDDO

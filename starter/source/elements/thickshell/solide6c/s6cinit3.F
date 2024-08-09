@@ -20,32 +20,31 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  S6CINIT3                      source/elements/thickshell/solide6c/s6cinit3.F
-Chd|-- called by -----------
-Chd|        INITIA                        source/elements/initia/initia.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        ATHERI                        source/ale/atheri.F           
-Chd|        DTMAIN                        source/materials/time_step/dtmain.F
-Chd|        FAILINI                       source/elements/solid/solide/failini.F
-Chd|        FRETITL2                      source/starter/freform.F      
-Chd|        MATINI                        source/materials/mat_share/matini.F
-Chd|        S6CCOOR3                      source/elements/thickshell/solide6c/s6ccoor3.F
-Chd|        S6CDERI3                      source/elements/thickshell/solide6c/s6cderi3.F
-Chd|        S6MASS3                       source/elements/thickshell/solide6c/s6mass3.F
-Chd|        SBULK3                        source/elements/solid/solide/sbulk3.F
-Chd|        SCMORTH3                      source/elements/thickshell/solidec/scmorth3.F
-Chd|        SCZERO3                       source/elements/thickshell/solidec/scinit3.F
-Chd|        SDLENSH3N                     source/elements/thickshell/solide6c/s6cinit3.F
-Chd|        SIGIN20B                      source/elements/solid/solide20/s20mass3.F
-Chd|        SVALUE0                       source/elements/thickshell/solidec/scinit3.F
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
-Chd|        DETONATORS_MOD                share/modules1/detonators_mod.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    s6cinit3               ../starter/source/elements/thickshell/solide6c/s6cinit3.F
+      !||--- called by ------------------------------------------------------
+      !||    initia                 ../starter/source/elements/initia/initia.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    atheri                 ../starter/source/ale/atheri.F
+      !||    dtmain                 ../starter/source/materials/time_step/dtmain.F
+      !||    failini                ../starter/source/elements/solid/solide/failini.F
+      !||    fretitl2               ../starter/source/starter/freform.F
+      !||    matini                 ../starter/source/materials/mat_share/matini.F
+      !||    s6ccoor3               ../starter/source/elements/thickshell/solide6c/s6ccoor3.F
+      !||    s6cderi3               ../starter/source/elements/thickshell/solide6c/s6cderi3.F
+      !||    s6mass3                ../starter/source/elements/thickshell/solide6c/s6mass3.F
+      !||    sbulk3                 ../starter/source/elements/solid/solide/sbulk3.F
+      !||    scmorth3               ../starter/source/elements/thickshell/solidec/scmorth3.F
+      !||    sczero3                ../starter/source/elements/thickshell/solidec/scinit3.F
+      !||    sdlensh3n              ../starter/source/elements/thickshell/solide6c/s6cinit3.F
+      !||    sigin20b               ../starter/source/elements/solid/solide20/s20mass3.F
+      !||    svalue0                ../starter/source/elements/thickshell/solidec/scinit3.F
+      !||--- uses       -----------------------------------------------------
+      !||    defaults_mod           ../starter/source/modules/defaults_mod.F90
+      !||    detonators_mod         ../starter/share/modules1/detonators_mod.F
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE S6CINIT3(
      .                    ELBUF_STR,MAS     ,IXS     ,PM       ,X     ,
      .                    DETONATORS,GEO     ,VEUL    ,ALE_CONNECTIVITY,IPARG ,
@@ -57,7 +56,7 @@ Chd|====================================================================
      .                    BUFMAT   ,MCP     ,MCPS    ,MCPSX    ,TEMP  ,
      .                    NPF      ,TF      ,STRSGLOB,STRAGLOB ,MSSA  ,
      .                    ORTHOGLOB,FAIL_INI,ILOADP  ,FACLOAD  ,RNOISE,
-     .                    PERTURB  ,MAT_PARAM)
+     .                    PERTURB  ,MAT_PARAM,DEFAULTS_SOLID)
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C   Initialization of thick shell PA6 element
@@ -69,6 +68,8 @@ C-----------------------------------------------
       USE DETONATORS_MOD      
       USE ALE_CONNECTIVITY_MOD
       USE MATPARAM_DEF_MOD
+      USE DEFAULTS_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -106,12 +107,13 @@ C-----------------------------------------------
       TYPE(DETONATORS_STRUCT_) :: DETONATORS
       TYPE(t_ale_connectivity), INTENT(INOUT) :: ALE_CONNECTIVITY
       TYPE (MATPARAM_STRUCT_) ,DIMENSION(NUMMAT) ,INTENT(INOUT) :: MAT_PARAM
+      TYPE(SOLID_DEFAULTS_), INTENT(IN) :: DEFAULTS_SOLID
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,NF1,IBID,IGTYP,IREP,IP,ILAY,NLAY,NUVAR,NCC,JHBE,
      .   NUVARR,IDEF,IPANG,IPTHK,IPPOS,IPMAT,IG,IM,MTN0,NLYMAX,
-     .   IPID1,NPTR,NPTS,NPTT,L_PLA,L_SIGB
+     .   IPID1,NPTR,NPTS,NPTT,L_PLA,L_SIGB,IMAS_DS
       INTEGER MAT(MVSIZ), PID(MVSIZ), NGL(MVSIZ), MAT0(MVSIZ)
       INTEGER IX1(MVSIZ), IX2(MVSIZ), IX3(MVSIZ), IX4(MVSIZ),
      .        IX5(MVSIZ), IX6(MVSIZ)
@@ -119,8 +121,7 @@ C-----------------------------------------------
      .     X1(MVSIZ), X2(MVSIZ), X3(MVSIZ), X4(MVSIZ), X5(MVSIZ), X6(MVSIZ), 
      .     Y1(MVSIZ), Y2(MVSIZ), Y3(MVSIZ), Y4(MVSIZ), Y5(MVSIZ), Y6(MVSIZ), 
      .     Z1(MVSIZ), Z2(MVSIZ), Z3(MVSIZ), Z4(MVSIZ), Z5(MVSIZ), Z6(MVSIZ)
-      CHARACTER*nchartitle,
-     .   TITR1
+      CHARACTER(LEN=NCHARTITLE)::TITR1
       my_real
      .   BID, FV, STI, ZI,WI
       my_real
@@ -218,6 +219,7 @@ C
       IF (IGTYP /= 22) THEN
        ISORTH = 0
       END IF
+      IMAS_DS = DEFAULTS_SOLID%IMAS
 C
       DO I=1,NEL
         RHOCP(I) =  PM(69,IXS(1,NFT+I))
@@ -379,7 +381,7 @@ C----------------------------------------
 C Mass initialization
       CALL S6MASS3(GBUF%RHO,MAS,PARTSAV,X,V,IPARTS(NF1),MSS(1,NF1),
      .     RHOCP,MCP ,MCPS(1,NF1),MSSA(NF1),GBUF%FILL, VOLU, 
-     .     IX1, IX2, IX3, IX4, IX5, IX6)
+     .     IX1, IX2, IX3, IX4, IX5, IX6,IMAS_DS)
 C----------------------------------------
 C Failure model initialization
       CALL FAILINI(ELBUF_STR,NPTR,NPTS,NPTT,NLAY,
@@ -436,12 +438,11 @@ c
 C-----------
       RETURN
       END SUBROUTINE S6CINIT3
-Chd|====================================================================
-Chd|  SDLENSH3N                     source/elements/thickshell/solide6c/s6cinit3.F
-Chd|-- called by -----------
-Chd|        S6CINIT3                      source/elements/thickshell/solide6c/s6cinit3.F
-Chd|-- calls ---------------
-Chd|====================================================================
+      !||====================================================================
+      !||    sdlensh3n   ../starter/source/elements/thickshell/solide6c/s6cinit3.F
+      !||--- called by ------------------------------------------------------
+      !||    s6cinit3    ../starter/source/elements/thickshell/solide6c/s6cinit3.F
+      !||====================================================================
       SUBROUTINE SDLENSH3N(NEL,LLSH3N,
      .                     X1, X2, X3, X4, X5, X6,
      .                     Y1, Y2, Y3, Y4, Y5, Y6,

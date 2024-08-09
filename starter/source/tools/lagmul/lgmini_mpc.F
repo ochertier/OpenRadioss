@@ -20,19 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  LGMINI_MPC                    source/tools/lagmul/lgmini_mpc.F
-Chd|-- called by -----------
-Chd|        LAGM_INI                      source/tools/lagmul/lagm_ini.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        FRETITL2                      source/starter/freform.F      
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    lgmini_mpc             ../starter/source/tools/lagmul/lgmini_mpc.F
+      !||--- called by ------------------------------------------------------
+      !||    lagm_ini               ../starter/source/tools/lagmul/lagm_ini.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    fretitl2               ../starter/source/starter/freform.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE LGMINI_MPC(IADLL  ,JLL    ,LLL    ,IBUFNC ,IBUFNN ,
      .                      IBUFDL ,IBUFSK ,NC, MASS, INER, ITAB   ,
      .                      NOM_OPT)
       USE MESSAGE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C----------------------------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -58,8 +60,7 @@ C-----------------------------------------------
       INTEGER I, J, IK, KF, NK, ISK, NN, NDL, NUMC
       my_real COEF
       INTEGER ID
-      CHARACTER*nchartitle,
-     .   TITR
+      CHARACTER(LEN=NCHARTITLE) :: TITR
 C======================================================================|
       KF = 0
       DO I=1,NUMMPC
@@ -68,8 +69,7 @@ C======================================================================|
         NUMC = IBUFNC(I)
         NK = 0
         ID=NOM_OPT(1,I)
-        CALL FRETITL2(TITR,
-     .       NOM_OPT(LNOPT1-LTITR+1,I),LTITR)
+        CALL FRETITL2(TITR,NOM_OPT(LNOPT1-LTITR+1,I),LTITR)
         IF(NC>LAG_NCF)THEN
           CALL ANCMSG(MSGID=468,
      .                MSGTYPE=MSGERROR,

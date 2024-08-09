@@ -20,21 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  I24BUC1                       source/interfaces/inter3d1/i24buc1.F
-Chd|-- called by -----------
-Chd|        ININT3                        source/interfaces/inter3d1/inint3.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        I24S1S2                       source/interfaces/inter3d1/i24buc1.F
-Chd|        I24TRI                        source/interfaces/inter3d1/i24tri.F
-Chd|        I24XFIC_INI                   source/interfaces/inter3d1/i24surfi.F
-Chd|        I7CMP3                        source/interfaces/inter3d1/i7cmp3.F
-Chd|        I7COR3                        source/interfaces/inter3d1/i7cor3.F
-Chd|        I7DST3                        source/interfaces/inter3d1/i7dst3.F
-Chd|        I7PEN3                        source/interfaces/inter3d1/i7pen3.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    i24buc1                ../starter/source/interfaces/inter3d1/i24buc1.F
+      !||--- called by ------------------------------------------------------
+      !||    inint3                 ../starter/source/interfaces/inter3d1/inint3.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    i24s1s2                ../starter/source/interfaces/inter3d1/i24buc1.F
+      !||    i24tri                 ../starter/source/interfaces/inter3d1/i24tri.F
+      !||    i24xfic_ini            ../starter/source/interfaces/inter3d1/i24surfi.F
+      !||    i7cmp3                 ../starter/source/interfaces/inter3d1/i7cmp3.F
+      !||    i7cor3                 ../starter/source/interfaces/inter3d1/i7cor3.F
+      !||    i7dst3                 ../starter/source/interfaces/inter3d1/i7dst3.F
+      !||    i7pen3                 ../starter/source/interfaces/inter3d1/i7pen3.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE I24BUC1(
      1   X     ,IRECT,NSV    ,BUMULT,NSEG    ,
      2   NMN   ,NRTM ,MWA    ,NSN   ,CAND_E  ,
@@ -60,9 +61,13 @@ Chd|====================================================================
      1   LC2,LC3,LC4,N11,N21,
      2   N31,DGAPLOAD,S_KREMNODE,S_REMNODE,
      3   KREMNODE,REMNODE,FLAG_REMOVED_NODE)
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
 #ifndef HYPERMESH_LIB
       USE MESSAGE_MOD
 #endif
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -102,8 +107,7 @@ C     REAL
       INTEGER, INTENT(in) :: S_REMNODE !< size of REMNODE   
       INTEGER, DIMENSION(S_KREMNODE), INTENT(in) :: KREMNODE 
       INTEGER, DIMENSION(S_REMNODE), INTENT(in) :: REMNODE
-      CHARACTER*nchartitle,
-     .   TITR
+      CHARACTER(LEN=NCHARTITLE) :: TITR
       INTEGER, DIMENSION(MVSIZ), INTENT(INOUT) ::PROV_N,PROV_E
       INTEGER, DIMENSION(MVSIZ), INTENT(INOUT) :: IX1,IX2,IX3,IX4,NSVG
       my_real, DIMENSION(MVSIZ), INTENT(INOUT) :: X1,X2,X3,X4
@@ -584,14 +588,14 @@ C
       DEALLOCATE( TAG_REMOVED_NODE )
       RETURN
       END
-Chd|====================================================================
-Chd|  I24S1S2                       source/interfaces/inter3d1/i24buc1.F
-Chd|-- called by -----------
-Chd|        I24BUC1                       source/interfaces/inter3d1/i24buc1.F
-Chd|        I24TRI                        source/interfaces/inter3d1/i24tri.F
-Chd|-- calls ---------------
-Chd|        BITGET                        source/interfaces/inter3d1/bitget.F
-Chd|====================================================================
+      !||====================================================================
+      !||    i24s1s2   ../starter/source/interfaces/inter3d1/i24buc1.F
+      !||--- called by ------------------------------------------------------
+      !||    i24buc1   ../starter/source/interfaces/inter3d1/i24buc1.F
+      !||    i24tri    ../starter/source/interfaces/inter3d1/i24tri.F
+      !||--- calls      -----------------------------------------------------
+      !||    bitget    ../starter/source/interfaces/inter3d1/bitget.F
+      !||====================================================================
       SUBROUTINE I24S1S2(PROV_N,PROV_E,NBINFLG,MBINFLG,PENE)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s

@@ -20,14 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  SIGEPS44                      source/materials/mat/mat044/sigeps44.F
-Chd|-- called by -----------
-Chd|        MULAW8                        source/materials/mat_share/mulaw8.F
-Chd|-- calls ---------------
-Chd|        MSTRAIN_RATE                  source/materials/mat_share/mstrain_rate.F
-Chd|        VINTER                        source/tools/curve/vinter.F   
-Chd|====================================================================
+      !||====================================================================
+      !||    sigeps44       ../engine/source/materials/mat/mat044/sigeps44.F
+      !||--- called by ------------------------------------------------------
+      !||    mulaw          ../engine/source/materials/mat_share/mulaw.F90
+      !||    mulaw8         ../engine/source/materials/mat_share/mulaw8.F
+      !||--- calls      -----------------------------------------------------
+      !||    mstrain_rate   ../engine/source/materials/mat_share/mstrain_rate.F
+      !||    vinter         ../engine/source/tools/curve/vinter.F
+      !||====================================================================
       SUBROUTINE SIGEPS44(
      1     NEL    ,NUPARAM,NUVAR   ,MFUNC   ,KFUNC   ,NPF    ,
      2     TF     ,TIME   ,TIMESTEP,UPARAM  ,RHO0    ,RHO    ,
@@ -40,7 +41,8 @@ Chd|====================================================================
      9     SIGVXX ,SIGVYY ,SIGVZZ  ,SIGVXY  ,SIGVYZ  ,SIGVZX ,
      A     SOUNDSP,VISCMAX,UVAR    ,OFF     ,NGL     ,IPT    ,
      B     IPM    ,MAT    ,EPSP    ,IPLA    ,SIGY    ,PLA    ,
-     C     DPLA1  ,AMU    ,ISRATE  ,ASRATE  ,NVARTMP ,VARTMP )
+     C     DPLA1  ,AMU    ,ISRATE  ,ASRATE  ,NVARTMP ,VARTMP ,
+     D     ET     )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -128,6 +130,8 @@ C   I N P U T   O U T P U T   A r g u m e n t s
 C-----------------------------------------------
       my_real 
      .    UVAR(NEL,NUVAR), OFF(NEL) 
+      my_real, DIMENSION(NEL), INTENT(INOUT) :: 
+     .    ET
 C-------------------------
 C    variables non utilisees (fonctions utilisateur)
 C-------------------------
@@ -417,7 +421,11 @@ C----------------------------------
 C
       DO I=1,NEL
         SIGY(I) = MAX(SIGY(I),YLD(I))
-        IF(OFF(I)<ONE) IDEL7NOK = 1
+        IF (DPLA1(I) > ZERO) THEN
+          ET(I) = H(I) / (H(I) + E)
+        ELSE
+          ET(I) = ONE
+        ENDIF
       ENDDO
 C-----------
       RETURN

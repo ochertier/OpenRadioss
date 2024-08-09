@@ -20,19 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  HM_SUBMODPART                 source/groups/hm_submodpart.F 
-Chd|-- called by -----------
-Chd|        HM_READ_GRPART                source/groups/hm_read_grpart.F
-Chd|        HM_READ_LINES                 source/groups/hm_read_lines.F 
-Chd|        HM_READ_SURF                  source/groups/hm_read_surf.F  
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        GROUPS_GET_ELEM_LIST          source/groups/groups_get_elem_list.F
-Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_submodpart          ../starter/source/groups/hm_submodpart.F
+      !||--- called by ------------------------------------------------------
+      !||    hm_read_grpart         ../starter/source/groups/hm_read_grpart.F
+      !||    hm_read_lines          ../starter/source/groups/hm_read_lines.F
+      !||    hm_read_surf           ../starter/source/groups/hm_read_surf.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    groups_get_elem_list   ../starter/source/groups/groups_get_elem_list.F
+      !||--- uses       -----------------------------------------------------
+      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE HM_SUBMODPART(
      .           ISUBMOD  ,TAGBUF  ,IPART   ,ID      ,FLAG     ,
      .           MESS     ,TITR    ,TITR1   ,INDX    ,NINDX    ,
@@ -43,6 +44,7 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE SUBMODEL_MOD
       USE HM_OPTION_READ_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARKEY, NCHARLINE, NCHARFIELD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -58,8 +60,7 @@ C-----------------------------------------------
       INTEGER   TAGBUF(*),ISUBMOD(*),IPART(LIPART1,*), INDX(*)
       INTEGER   ID,FLAG,NINDX
       CHARACTER MESS(*)
-      CHARACTER*nchartitle,
-     .   TITR,TITR1
+      CHARACTER(LEN=NCHARTITLE) :: TITR,TITR1
       TYPE(SUBMODEL_DATA) LSUBMODEL(*)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -67,8 +68,9 @@ C-----------------------------------------------
       INTEGER I,J,K,ISU,JREC,PARTID,CUR_SUBMOD,ISELECT,IOK,
      .        ID_SUB,IDU,ID1,UID1,SUB_INDEX,KK,JJ
       INTEGER  TAGS(NSUBMOD)
-      CHARACTER KEY*ncharkey,CART*ncharline,VERS_IN*ncharfield
-      CHARACTER TITR2*ncharline
+      CHARACTER(LEN=NCHARKEY) :: KEY
+      CHARACTER(LEN=NCHARFIELD) :: VERS_IN
+      CHARACTER(LEN=NCHARLINE) :: TITR2,CART
       LOGICAL IS_AVAILABLE,IS_ENCRYPTED
       INTEGER,DIMENSION(:),ALLOCATABLE :: LIST_ELEM
       INTEGER :: NENTITY      

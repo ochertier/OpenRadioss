@@ -20,26 +20,28 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  INSLIN                        source/interfaces/interf1/inslin.F
-Chd|-- called by -----------
-Chd|        LECINS                        source/interfaces/interf1/lecins.F
-Chd|        LECINT                        source/interfaces/interf1/lecint.F
-Chd|-- calls ---------------
-Chd|        COUNT3                        source/interfaces/interf1/count3.F
-Chd|====================================================================
-      SUBROUTINE INSLIN(NRT,MSN,IRECT,NOINT,
-     .                  SLIN_NODES,ITAB,MSV,NTAG)
+      !||====================================================================
+      !||    inslin       ../starter/source/interfaces/interf1/inslin.F
+      !||--- called by ------------------------------------------------------
+      !||    lecins       ../starter/source/interfaces/interf1/lecins.F
+      !||    lecint       ../starter/source/interfaces/interf1/lecint.F
+      !||--- calls      -----------------------------------------------------
+      !||    count3       ../starter/source/interfaces/interf1/count3.F
+      !||    usr2sys      ../starter/source/system/sysfus.F
+      !||--- uses       -----------------------------------------------------
+      !||    format_mod   ../starter/share/modules1/format_mod.F90
+      !||====================================================================
+      SUBROUTINE INSLIN(NRT,MSN,IRECT,NOINT,SLIN_NODES,ITAB,MSV,NTAG)
+C-----------------------------------------------
+C   D e s c r i p t i o n
+C-----------------------------------------------
+C     READING SURFACE AND NUMBERING SEGMENTS
+C           IN : NRT
+C           OUT :IRECT
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
-C-----------------------------------------------------------------------
-C     LECTURE DES SURFACES ET DECOMPTE DES SEGMENTS
-C           ENTREE : 
-C                    NRT NOMBRE DE RENSEIGNEMENTS A LIRE
-C           SORTIE : 
-C                    IRECT 
-C-----------------------------------------------------------------------
+        USE FORMAT_MOD , ONLY : FMW_4I
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------

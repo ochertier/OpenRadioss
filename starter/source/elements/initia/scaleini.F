@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  SCALEINI                      source/elements/initia/scaleini.F
-Chd|-- called by -----------
-Chd|        INITIA                        source/elements/initia/initia.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        FRETITL2                      source/starter/freform.F      
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    scaleini               ../starter/source/elements/initia/scaleini.F
+      !||--- called by ------------------------------------------------------
+      !||    initia                 ../starter/source/elements/initia/initia.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    fretitl2               ../starter/source/starter/freform.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE SCALEINI(
      .   ELBUF_STR, IXS      , SIGSP   ,SIGI    ,NSIGI   ,
      .   NEL ,LFT , LLT      ,NFT    ,NSIGS ,
@@ -39,6 +39,7 @@ C   M o d u l e s
 C-----------------------------------------------
       USE ELBUFDEF_MOD      
       USE MESSAGE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -60,8 +61,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      CHARACTER*nchartitle,
-     .   TITR
+      CHARACTER(LEN=NCHARTITLE) :: TITR
       INTEGER I,J,IIP,JPT, II, JJ, IPT, IPP,IUS,IPSU,N,IPID1,
      .        IFLAGINI,NVAR_TMP,IR,IS,IT,NPTT,NPTS,NPTR,PID1,IGTYP,
      .        IIS,IPT_ALL,ILAY,NLAY,KK,NPT,NPS,NPR,NLAYI,JHBET

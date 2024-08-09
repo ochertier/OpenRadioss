@@ -20,22 +20,25 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  ST_QAPRINT_GENERAL_CONTROLS   source/output/qaprint/st_qaprint_general_controls.F
-Chd|-- called by -----------
-Chd|        ST_QAPRINT_DRIVER             source/output/qaprint/st_qaprint_driver.F
-Chd|-- calls ---------------
-Chd|        ALE_MOD                       ../common_source/modules/ale/ale_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    st_qaprint_general_controls   ../starter/source/output/qaprint/st_qaprint_general_controls.F
+      !||--- called by ------------------------------------------------------
+      !||    st_qaprint_driver             ../starter/source/output/qaprint/st_qaprint_driver.F
+      !||--- calls      -----------------------------------------------------
+      !||--- uses       -----------------------------------------------------
+      !||    defaults_mod                  ../starter/source/modules/defaults_mod.F90
+      !||====================================================================
       SUBROUTINE ST_QAPRINT_GENERAL_CONTROLS(NOM_OPT ,INOM_OPT  ,DAMPR  , IRAND, ALEA,
      1                                       XSEED   ,UNITAB    ,QP_IPERTURB,QP_RPERTURB,
-     2                                       EIGIPM  , EIGRPM)
+     2                                       EIGIPM  , EIGRPM   ,DEFAULTS)
 C============================================================================
 C   M o d u l e s
 C-----------------------------------------------
       USE QA_OUT_MOD
       USE UNITAB_MOD
       USE ALE_MOD
+      USE DEFAULTS_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -53,7 +56,6 @@ C-----------------------------------------------
 #include      "scr14_c.inc"
 #include      "scr16_c.inc"
 #include      "scr17_c.inc"
-#include      "scr21_c.inc"
 #include      "tabsiz_c.inc"
 #include      "random_c.inc"
 #include      "sphcom.inc"
@@ -67,16 +69,40 @@ C-----------------------------------------------
       my_real, INTENT(IN) :: DAMPR(NRDAMP,*),ALEA(*),XSEED(*),EIGRPM(NERPM,*)
       my_real, INTENT(IN) :: QP_RPERTURB(NPERTURB,4)
       TYPE (UNIT_TYPE_) ::UNITAB
+      TYPE(DEFAULTS_)    , INTENT(IN)     :: DEFAULTS             
 C--------------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,II,J,IPERT,MY_ID, MY_DAMP, MY_CONSTRAINT,TEMP_INT,
      .        MY_RAND, MY_UNIT, MY_DEFAULTINTER,LENRNOISE,
      .        IDS(NPERTURB),IDX(NPERTURB),IDSEIG(NEIG),IDXEIG(NEIG),MY_EIG
-      CHARACTER *nchartitle TITR
+      CHARACTER(LEN=NCHARTITLE) :: TITR
+      INTEGER     IHBE_DS,ISST_DS,IPLA_DS,IFRAME_DS,ITET4_D,ITET10_D,ICPRE_D,IMAS_DS,
+     .            IHBE_D,IPLA_D,ISTR_D,ITHK_D,ISHEA_D,ISST_D,
+     .            ISH3N_D, ISTRA_D,NPTS_D,IDRIL_D,IOFFSET,DEF_INTER(100)
       CHARACTER (LEN=255) :: VARNAME
       DOUBLE PRECISION TEMP_DOUBLE
       LOGICAL :: OK_QA
+C-----------------------------------------------
+!--- defaults values      
+C-----------------------------------------------
+      IHBE_DS=  DEFAULTS%SOLID%ISOLID
+      ISST_DS=  DEFAULTS%SOLID%ISMSTR
+      ICPRE_D=  DEFAULTS%SOLID%ICPRE
+      ITET4_D=  DEFAULTS%SOLID%ITETRA4
+      ITET10_D= DEFAULTS%SOLID%ITETRA10
+      IMAS_DS=  DEFAULTS%SOLID%IMAS
+      IFRAME_DS= DEFAULTS%SOLID%IFRAME
+      ISTRA_D = 1
+      IHBE_D =  DEFAULTS%SHELL%ishell
+      ISH3N_D=  DEFAULTS%SHELL%ish3n
+      ISST_D =  DEFAULTS%SHELL%ismstr
+      IPLA_D =  DEFAULTS%SHELL%iplas
+      ITHK_D =  DEFAULTS%SHELL%ithick
+      IDRIL_D=  DEFAULTS%SHELL%idrill
+      ISHEA_D = 0
+      NPTS_D = 0
+!
 C-----------------------------------------------
 C     /DAMP
 C-----------------------------------------------
@@ -195,7 +221,7 @@ C     /DEF_SHELL
 C-----------------------------------------------
       IF (MYQAKEY('/DEF_SHELL')) THEN
 C
-        CALL QAPRINT('DEF_SHELL', 0,0.0_8)
+         CALL QAPRINT('DEF_SHELL', 0,0.0_8)
 C
         WRITE(VARNAME,'(A)') 'Ishell'
         TEMP_INT = IHBE_D
@@ -214,7 +240,7 @@ C
         CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),TEMP_INT,0.0_8)
 C
         WRITE(VARNAME,'(A)') 'Istrain'
-        TEMP_INT = ISTR_D
+        TEMP_INT = ISTRA_D
         CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),TEMP_INT,0.0_8)
 C
         WRITE(VARNAME,'(A)') 'Ish3n'
@@ -461,6 +487,7 @@ C     /DEFAULT/INTER
 C----------------------------------------------
       IF (MYQAKEY('/DEFAULT/INTER')) THEN
 C
+        DEF_INTER(1:100) = DEFAULTS%interface%DEF_INTER(1:100)
         CALL QAPRINT('/DEFAULT/INTER', 0,0.0_8)
 
         DO MY_DEFAULTINTER=1,100

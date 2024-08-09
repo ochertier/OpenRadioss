@@ -20,24 +20,32 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  LOAD_PRESSURE                 source/loads/general/load_pressure/load_pressure.F
-Chd|-- called by -----------
-Chd|        RESOL                         source/engine/resol.F         
-Chd|-- calls ---------------
-Chd|        FINTER                        source/tools/curve/finter.F   
-Chd|        H3D_MOD                       share/modules/h3d_mod.F       
-Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
-Chd|        TH_SURF_MOD                   ../common_source/modules/interfaces/th_surf_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    load_pressure         ../engine/source/loads/general/load_pressure/load_pressure.F
+      !||--- called by ------------------------------------------------------
+      !||    resol                 ../engine/source/engine/resol.F
+      !||--- calls      -----------------------------------------------------
+      !||    finter                ../engine/source/tools/curve/finter.F
+      !||    get_u_numsens         ../engine/source/user_interface/usensor.F
+      !||    get_u_sens_fpar       ../engine/source/user_interface/usensor.F
+      !||    get_u_sens_ipar       ../engine/source/user_interface/usensor.F
+      !||    get_u_sens_value      ../engine/source/user_interface/usensor.F
+      !||    set_u_sens_value      ../engine/source/user_interface/usensor.F
+      !||--- uses       -----------------------------------------------------
+      !||    h3d_mod               ../engine/share/modules/h3d_mod.F
+      !||    python_funct_mod      ../common_source/modules/python_mod.F90
+      !||    sensor_mod            ../engine/share/modules/sensor_mod.F
+      !||    th_surf_mod           ../common_source/modules/interfaces/th_surf_mod.F
+      !||====================================================================
       SUBROUTINE LOAD_PRESSURE (ILOADP          ,LOADP       ,LLOADP   ,NPC     ,TF        ,
      2                          A               ,V           ,X       ,SKEW     ,SENSOR_TAB,
      3                          IADC            ,FSKY        ,FEXT    ,TAGNCONT ,NSENSOR   ,
-     4                          LOADP_HYD_INTER , H3D_DATA   ,
+     4                          LOADP_HYD_INTER , H3D_DATA   , PYTHON, 
      5                          NPRESLOAD       ,LOADP_TAGDEL,TH_SURF)
 C-----------------------------------------------
 C   M o d u l e s
 C----------------------------------------------- 
+      USE PYTHON_FUNCT_MOD
       USE H3D_MOD
       USE SENSOR_MOD
       USE TH_SURF_MOD , ONLY : TH_SURF_
@@ -65,6 +73,7 @@ C-----------------------------------------------
 C-----------------------------------------------,
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(PYTHON_), INTENT(inout) :: PYTHON
       INTEGER, INTENT(IN) :: NPRESLOAD,NSENSOR
       INTEGER NPC(*),LLOADP(SLLOADP)
       INTEGER ILOADP(SIZLOADP,*),TAGNCONT(NLOADP_HYD_INTER,NUMNOD),LOADP_HYD_INTER(NLOADP_HYD),IADC(*)
@@ -80,6 +89,7 @@ C-----------------------------------------------
      .        IAD ,NP ,IFUNC ,NPRES ,NINTERP ,IDIR ,INORM ,NPL ,IANIM,IFLOAD,
      .        SEGCONT ,N ,IADN , IJK ,UP_BOUND,TAGN1,TAGN2,TAGN3,TAGN4,NUMPRESLOAD,
      .        IDEL, NSEGPL, NS, KSURF,NIDXLOAD
+      INTEGER :: IS_TABULATED
       my_real
      .   NX, NY, NZ,  AA, FX, FY, FZ, DYDX, TS,
      .   TFEXTT,F1, FCX,FCY,NORM,AREA 
@@ -124,7 +134,14 @@ C
            ENDIF    
 
 
-           F1 = FINTER(IFUNC,TS*FCX,NPC,TF,DYDX)
+           IS_TABULATED = NPC(2*NFUNCT+IFUNC+1)
+           IF(IS_TABULATED >= 0) THEN
+             F1 = FINTER(IFUNC,TS*FCX,NPC,TF,DYDX)
+           ELSE 
+             IS_TABULATED = -IS_TABULATED
+             CALL PYTHON_CALL_FUNCT1D(PYTHON, IS_TABULATED,TS*FCX, F1)
+           ENDIF
+
            AA = FCY*F1  
 
            DO N=1, NPRES/4
@@ -486,8 +503,14 @@ C
           ENDDO
           ! -------------
 
+           IS_TABULATED = NPC(2*NFUNCT+IFUNC+1)
+           IF(IS_TABULATED >= 0) THEN
+             F1 = FINTER(IFUNC,TS*FCX,NPC,TF,DYDX)
+           ELSE 
+             IS_TABULATED = -IS_TABULATED
+             CALL PYTHON_CALL_FUNCT1D(PYTHON, IS_TABULATED,TS*FCX, F1)
+           ENDIF
 
-           F1 = FINTER(IFUNC,TS*FCX,NPC,TF,DYDX)
            AA = FCY*F1  
 
            DO N=1, NPRES/4

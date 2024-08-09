@@ -20,29 +20,30 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  HM_CURRENT_OPTION_MOD         share/modules1/hm_current_option_mod.F
-Chd|-- called by -----------
-Chd|        NGR2USR                       source/system/nintrr.F        
-Chd|-- calls ---------------
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_current_option_mod   ../starter/share/modules1/hm_current_option_mod.F
+      !||--- called by ------------------------------------------------------
+      !||    ngr2usr                 ../starter/source/system/nintrr.F
+      !||--- uses       -----------------------------------------------------
+      !||====================================================================
       MODULE HM_CURRENT_OPTION_MOD
       INTERFACE
-      SUBROUTINE HM_GET_CURRENT_OPTION(OPTION_ID,UNIT_ID,OPTION_TITR,
-     .                              KEYWORD1,KEYWORD2,KEYWORD3,KEYWORD4)  
+      SUBROUTINE HM_GET_CURRENT_OPTION(OPTION_ID,UNIT_ID,OPTION_TITR,KEYWORD1,KEYWORD2,KEYWORD3,KEYWORD4)
+C-----------------------------------------------
+C   M o d u l es
+C-----------------------------------------------
+      USE NAMES_AND_TITLES_MOD , ONLY : ncharkey, nchartitle
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "nchar_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER OPTION_ID,UNIT_ID
       CHARACTER*(ncharkey) KEYWORD1,KEYWORD2,KEYWORD3,KEYWORD4
       CHARACTER*(nchartitle) OPTION_TITR
-      OPTIONAL ::
-     .   OPTION_ID,UNIT_ID,KEYWORD1,KEYWORD2,KEYWORD3,KEYWORD4,OPTION_TITR
+      OPTIONAL :: OPTION_ID,UNIT_ID,KEYWORD1,KEYWORD2,KEYWORD3,KEYWORD4,OPTION_TITR
 
       END SUBROUTINE
       END INTERFACE

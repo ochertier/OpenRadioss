@@ -20,20 +20,24 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  I21PWR3                       source/interfaces/inter3d1/i21pwr3.F
-Chd|-- called by -----------
-Chd|        ININT3_THKVAR                 source/interfaces/inter3d1/inint3_thkvar.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    i21pwr3                ../starter/source/interfaces/inter3d1/i21pwr3.F
+      !||--- called by ------------------------------------------------------
+      !||    inint3_thkvar          ../starter/source/interfaces/inter3d1/inint3_thkvar.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||--- uses       -----------------------------------------------------
+      !||    format_mod             ../starter/share/modules1/format_mod.F90
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE I21PWR3(ITAB,INACTI,CAND_E,CAND_N,STFN,
      1                  X     ,I_STOK,NSV   ,IWPENE,PENI,
      2                  NOINT,NTY   ,GAP_S ,MSR ,IRTLM  ,
      3                  IRECT,XM0   ,GAPMIN,GAPMAX,DEPTH,
      4                  NSN  ,ITAG  ,DRAD  ,ID,TITR)
       USE MESSAGE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      USE FORMAT_MOD , ONLY : FMW_5I
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -47,22 +51,16 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER ITAB(*),CAND_E(*),CAND_N(*), IRECT(4,*), IRTLM(2,*),
-     .        ITAG(*)
+      INTEGER ITAB(*),CAND_E(*),CAND_N(*), IRECT(4,*), IRTLM(2,*),ITAG(*)
       INTEGER I_STOK,NSV(*),MSR(*),IWPENE,INACTI,NOINT,NTY,NSN
-C     REAL
-      my_real
-     .   STFN(*),X(3,*),PENI(*),GAP_S(*),XM0(3,*),
-     .   GAPMIN,GAPMAX,DEPTH,DRAD
+      my_real STFN(*),X(3,*),PENI(*),GAP_S(*),XM0(3,*),GAPMIN,GAPMAX,DEPTH,DRAD
       INTEGER ID
-      CHARACTER*nchartitle,
-     .   TITR
+      CHARACTER(LEN=NCHARTITLE) :: TITR
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, J, L,JWARN
       INTEGER IX1, IX2, IX3, IX4, NSVG
-C     REAL
 C-----------------------------------------------
        JWARN = 0
         DO 100 I=1,I_STOK
@@ -77,10 +75,7 @@ C-----------------------------------------------
             NSVG=NSV(J)
             IF(PENI(J)>ZERO)THEN
               IF(IPRI>=1)THEN
-                WRITE(IOUT,FMT=FMW_5I)
-     1           ITAB(NSVG),
-     2           ITAB(IX1),ITAB(IX2),
-     3           ITAB(IX3),ITAB(IX4)
+                WRITE(IOUT,FMT=FMW_5I) ITAB(NSVG), ITAB(IX1),ITAB(IX2), ITAB(IX3),ITAB(IX4)
               END IF
 c              IF(PENI(J)>ZERO)THEN
                 WRITE(IOUT,1000)PENI(J)

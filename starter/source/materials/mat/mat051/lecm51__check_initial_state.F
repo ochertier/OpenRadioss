@@ -20,14 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  LECM51__CHECK_INITIAL_STATE   source/materials/mat/mat051/lecm51__check_initial_state.F
-Chd|-- called by -----------
-Chd|        HM_READ_MAT51                 source/materials/mat/mat051/hm_read_mat51.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    lecm51__check_initial_state   ../starter/source/materials/mat/mat051/lecm51__check_initial_state.F
+      !||--- called by ------------------------------------------------------
+      !||    hm_read_mat51                 ../starter/source/materials/mat/mat051/hm_read_mat51.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                        ../starter/source/output/message/message.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod                   ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE LECM51__CHECK_INITIAL_STATE(   
      .   AV,  R0,     C0,   C1,   C2, C3, C4,   C5,
      .   E0,  PM,   RHO0, RHOR, IEXP, PEXT,IFLG,
@@ -37,6 +38,7 @@ Chd|====================================================================
      .   LC1 ,LC2 ,  LC3,  LC4,
      .   P0a          )
       USE MESSAGE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C-----------------------------------------------
@@ -66,7 +68,7 @@ C-----------------------------------------------
      . P0a(4)
       INTEGER IEXP, IFLG,PLA(4)
       INTEGER ID
-      CHARACTER*nchartitle,TITR
+      CHARACTER(LEN=NCHARTITLE)::TITR
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

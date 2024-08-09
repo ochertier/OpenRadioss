@@ -20,19 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  HM_READ_IOFLAG                source/general_controls/inputoutput/hm_read_ioflag.F
-Chd|-- called by -----------
-Chd|        CONTRL                        source/starter/contrl.F       
-Chd|-- calls ---------------
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        HM_OPTION_COUNT               source/devtools/hm_reader/hm_option_count.F
-Chd|        HM_OPTION_READ_KEY            source/devtools/hm_reader/hm_option_read_key.F
-Chd|        HM_OPTION_START               source/devtools/hm_reader/hm_option_start.F
-Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_read_ioflag       ../starter/source/general_controls/inputoutput/hm_read_ioflag.F
+      !||--- called by ------------------------------------------------------
+      !||    contrl               ../starter/source/starter/contrl.F
+      !||--- calls      -----------------------------------------------------
+      !||    hm_get_intv          ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    hm_option_count      ../starter/source/devtools/hm_reader/hm_option_count.F
+      !||    hm_option_read_key   ../starter/source/devtools/hm_reader/hm_option_read_key.F
+      !||    hm_option_start      ../starter/source/devtools/hm_reader/hm_option_start.F
+      !||--- uses       -----------------------------------------------------
+      !||    hm_option_read_mod   ../starter/share/modules1/hm_option_read_mod.F
+      !||    message_mod          ../starter/share/message_module/message_mod.F
+      !||    submodel_mod         ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE HM_READ_IOFLAG(LSUBMODEL)
 C-----------------------------------------------
 C   ROUTINE DESCRIPTION :
@@ -77,7 +78,7 @@ C----------------------------------------------
       IPRI=0
       IOUTP0=0
       OUTYY_FMT=0
-      IROOTYY = 0             
+      IROOTYY = 0
       IDROT = 0
 C
       CALL HM_OPTION_COUNT('/IOFLAG', NB_IOFLAG)
@@ -93,7 +94,7 @@ C
           CALL HM_GET_INTV('Irot',IDROT,IS_AVAILABLE,LSUBMODEL)
           IF (INVERS < 90 .AND. IROOTYY == 0) IROOTYY = 2
           EXIT
-        END IF        
+        END IF
       ENDDO
 C
       IF(IOUTP0>=1)THEN
@@ -103,4 +104,4 @@ C
       ENDIF
 C--------------------------------------------------------------
       RETURN
-      END 
+      END

@@ -20,20 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  HM_READ_PROP34                source/properties/sph/hm_read_prop34.F
-Chd|-- called by -----------
-Chd|        HM_READ_PROP_GENERIC          source/properties/hm_read_prop_generic.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        HM_GET_FLOATV                 source/devtools/hm_reader/hm_get_floatv.F
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        HM_OPTION_IS_ENCRYPTED        source/devtools/hm_reader/hm_option_is_encrypted.F
-Chd|        SET_U_GEO                     source/user_interface/uaccess.F
-Chd|        ELBUFTAG_MOD                  share/modules1/elbuftag_mod.F 
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_read_prop34           ../starter/source/properties/sph/hm_read_prop34.F
+      !||--- called by ------------------------------------------------------
+      !||    hm_read_prop_generic     ../starter/source/properties/hm_read_prop_generic.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                   ../starter/source/output/message/message.F
+      !||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
+      !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+      !||    set_u_geo                ../starter/source/user_interface/uaccess.F
+      !||    set_u_pnu                ../starter/source/user_interface/uaccess.F
+      !||--- uses       -----------------------------------------------------
+      !||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
+      !||    message_mod              ../starter/share/message_module/message_mod.F
+      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE HM_READ_PROP34(GEO, IGEO ,IOUT  ,NUVAR ,PARGEO,
      .                          QA, QB    ,ISKN  ,IG    ,TITR  ,UNITAB,
      .                          PROP_TAG,IGTYP,LSUBMODEL)
@@ -44,6 +46,7 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE ELBUFTAG_MOD  
       USE SUBMODEL_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -96,7 +99,7 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       TYPE (UNIT_TYPE_),INTENT(IN) ::UNITAB 
       INTEGER IOUT,NUVAR,ISKN(LISKN,*),IG,IGTYP,IGEO(*)
-      CHARACTER TITR*nchartitle
+      CHARACTER(LEN=NCHARTITLE)::TITR
       my_real
      .        PARGEO(*), GEO(*)
       TYPE(PROP_TAG_) , DIMENSION(0:MAXPROP) :: PROP_TAG

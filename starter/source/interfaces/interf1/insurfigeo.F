@@ -20,15 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  INSURFIGEO                    source/interfaces/interf1/insurfigeo.F
-Chd|-- called by -----------
-Chd|        LECINS                        source/interfaces/interf1/lecins.F
-Chd|        LECINT                        source/interfaces/interf1/lecint.F
-Chd|-- calls ---------------
-Chd|        COUNTIGEO                     source/interfaces/interf1/countigeo.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    insurfigeo             ../starter/source/interfaces/interf1/insurfigeo.F
+      !||--- called by ------------------------------------------------------
+      !||    lecins                 ../starter/source/interfaces/interf1/lecins.F
+      !||    lecint                 ../starter/source/interfaces/interf1/lecint.F
+      !||--- calls      -----------------------------------------------------
+      !||    countigeo              ../starter/source/interfaces/interf1/countigeo.F
+      !||    usr2sys                ../starter/source/system/sysfus.F
+      !||--- uses       -----------------------------------------------------
+      !||    format_mod             ../starter/share/modules1/format_mod.F90
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE INSURFIGEO(NRT_IGE ,OFFSET_SEG   ,MSN_IGE,OFFSET_NODE,IADTABIGE,IR    ,IRECT  ,NOINT  ,
      .                 SURF_NODES_IGE,ITAB  ,MSV   ,ID,TITR,
      .                 NIGE,RIGE,XIGE,VIGE,NIGE_TMP,RIGE_TMP,XIGE_TMP,VIGE_TMP)
@@ -36,6 +39,8 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      USE FORMAT_MOD , ONLY : FMW_4I
 C-----------------------------------------------------------------------
 C     LECTURE DES SURFACES ET DECOMPTE DES SEGMENTS
 C           ENTREE : 
@@ -59,8 +64,7 @@ C-----------------------------------------------
       INTEGER IRECT(4,*),
      .        ITAB(*), MSV(*),NIGE_TMP(*),NIGE(*),SURF_NODES_IGE(NRT_IGE,4)
       INTEGER ID
-      CHARACTER*nchartitle,
-     .   TITR
+      CHARACTER(LEN=NCHARTITLE) :: TITR
       my_real
      .   RIGE(3,*),XIGE(3,*),VIGE(3,*),
      .   RIGE_TMP(3,*),XIGE_TMP(3,*),VIGE_TMP(3,*)

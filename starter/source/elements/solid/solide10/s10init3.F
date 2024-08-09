@@ -20,34 +20,33 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  S10INIT3                      source/elements/solid/solide10/s10init3.F
-Chd|-- called by -----------
-Chd|        INITIA                        source/elements/initia/initia.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        ATHERI                        source/ale/atheri.F           
-Chd|        DTMAIN                        source/materials/time_step/dtmain.F
-Chd|        FAILINI                       source/elements/solid/solide/failini.F
-Chd|        FRETITL2                      source/starter/freform.F      
-Chd|        MATINI                        source/materials/mat_share/matini.F
-Chd|        S10COOR3                      source/elements/solid/solide10/s10coor3.F
-Chd|        S10DERI3                      source/elements/solid/solide10/s10deri3.F
-Chd|        S10LEN3                       source/elements/solid/solide10/s10len3.F
-Chd|        S10MASS3                      source/elements/solid/solide10/s10mass3.F
-Chd|        S10MSI                        source/elements/solid/solide10/s10mass3.F
-Chd|        SBOLTINI                      source/loads/bolt/sboltini.F  
-Chd|        SBULK3                        source/elements/solid/solide/sbulk3.F
-Chd|        SIGIN20B                      source/elements/solid/solide20/s20mass3.F
-Chd|        SMORTH3                       source/elements/solid/solide/smorth3.F
-Chd|        SREPLOC3                      source/elements/solid/solide/sreploc3.F
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
-Chd|        BPRELOAD_MOD                  share/modules1/bpreload_mod.F 
-Chd|        DETONATORS_MOD                share/modules1/detonators_mod.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    s10init3               ../starter/source/elements/solid/solide10/s10init3.F
+      !||--- called by ------------------------------------------------------
+      !||    initia                 ../starter/source/elements/initia/initia.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    atheri                 ../starter/source/ale/atheri.F
+      !||    dtmain                 ../starter/source/materials/time_step/dtmain.F
+      !||    failini                ../starter/source/elements/solid/solide/failini.F
+      !||    fretitl2               ../starter/source/starter/freform.F
+      !||    matini                 ../starter/source/materials/mat_share/matini.F
+      !||    s10coor3               ../starter/source/elements/solid/solide10/s10coor3.F
+      !||    s10deri3               ../starter/source/elements/solid/solide10/s10deri3.F
+      !||    s10len3                ../starter/source/elements/solid/solide10/s10len3.F
+      !||    s10mass3               ../starter/source/elements/solid/solide10/s10mass3.F
+      !||    s10msi                 ../starter/source/elements/solid/solide10/s10mass3.F
+      !||    sboltini               ../starter/source/loads/bolt/sboltini.F
+      !||    sbulk3                 ../starter/source/elements/solid/solide/sbulk3.F
+      !||    sigin20b               ../starter/source/elements/solid/solide20/s20mass3.F
+      !||    smorth3                ../starter/source/elements/solid/solide/smorth3.F
+      !||    sreploc3               ../starter/source/elements/solid/solide/sreploc3.F
+      !||--- uses       -----------------------------------------------------
+      !||    bpreload_mod           ../starter/share/modules1/bpreload_mod.F
+      !||    defaults_mod           ../starter/source/modules/defaults_mod.F90
+      !||    detonators_mod         ../starter/share/modules1/detonators_mod.F
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE S10INIT3(ELBUF_STR,
      1    MAS     ,IXS     ,PM      ,X      ,
      2    DETONATORS,GEO     ,VEUL    ,ALE_CONNECTIVITY ,IPARG    ,
@@ -60,7 +59,7 @@ Chd|====================================================================
      A    MCP     ,MCPS    ,MCPSX   ,TEMP   ,NPF      ,
      B    TF      ,IN      ,STIFR   ,INS    ,MSSA     ,
      C    STRSGLOB,STRAGLOB,FAIL_INI,ILOADP ,FACLOAD  ,
-     D    RNOISE  ,PERTURB ,MAT_PARAM)
+     D    RNOISE  ,PERTURB ,MAT_PARAM,DEFAULTS_SOLID)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -70,6 +69,8 @@ C-----------------------------------------------
       USE DETONATORS_MOD
       USE ALE_CONNECTIVITY_MOD
       USE MATPARAM_DEF_MOD
+      USE DEFAULTS_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -108,13 +109,13 @@ C-----------------------------------------------
       TYPE(DETONATORS_STRUCT_) :: DETONATORS
       TYPE(t_ale_connectivity), INTENT(INOUT) :: ALE_CONNECTIVITY
       TYPE (MATPARAM_STRUCT_) ,DIMENSION(NUMMAT) ,INTENT(INOUT) :: MAT_PARAM
+      TYPE(SOLID_DEFAULTS_), INTENT(IN) :: DEFAULTS_SOLID
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,IP,NF1,NF2,IBID,IGTYP,NUVAR,IREP,NCC,IDEF,JHBE,IPID
-      INTEGER ID,NPTR,NPTS,NPTT,NLAY,L_PLA,L_SIGB,IBOLTP,IINT
-      CHARACTER*nchartitle,
-     .   TITR
+      INTEGER ID,NPTR,NPTS,NPTT,NLAY,L_PLA,L_SIGB,IBOLTP,IINT,IMAS_DS
+      CHARACTER(LEN=NCHARTITLE)::TITR
       INTEGER NC(MVSIZ,10),MAT(MVSIZ), PID(MVSIZ), NGL(MVSIZ)
       DOUBLE PRECISION
      .   XX(MVSIZ,10), YY(MVSIZ,10), ZZ(MVSIZ,10) 
@@ -173,6 +174,7 @@ c
 C
       IBOLTP = IPARG(72)  !Bolt preloading
       JCVT  = IPARG(37)
+      IMAS_DS = DEFAULTS_SOLID%IMAS
 C
       DO I=LFT,LLT
         RHOCP(I) =  PM(69,IXS(1,NFT+I))
@@ -313,7 +315,7 @@ C----------------------------------------
      .              XX  ,YY ,ZZ     ,VX         ,VY         ,VZ  ,
      .              NC  ,STI,STIFN  ,DELTAX2    ,MSSX(1,NF1),MASSCP,
      .              MCP ,MCPS(1,NF1),MCPSX(1,NF1),IN        ,STIFR,
-     .              INS(1,NF1),MSSA(NF1),X       ,GBUF%FILL )
+     .              INS(1,NF1),MSSA(NF1),X       ,GBUF%FILL ,IMAS_DS)
 C----------------------------------------
 c Failure model initialisation
 C----------------------------------------

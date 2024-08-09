@@ -20,13 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  I23PWR3                       source/interfaces/inter3d1/i23pwr3.F
-Chd|-- called by -----------
-Chd|        ININT3                        source/interfaces/inter3d1/inint3.F
-Chd|-- calls ---------------
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    i23pwr3       ../starter/source/interfaces/inter3d1/i23pwr3.F
+      !||--- called by ------------------------------------------------------
+      !||    inint3        ../starter/source/interfaces/inter3d1/inint3.F
+      !||--- uses       -----------------------------------------------------
+      !||    format_mod    ../starter/share/modules1/format_mod.F90
+      !||    message_mod   ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE I23PWR3(ITAB,INACTI,CAND_E,CAND_N,STFN,
      1                  X     ,I_STOK,NSV   ,IWPENE,PENE,
      2                  NOINT,NTY   ,GAP_S ,MSR ,
@@ -34,6 +35,7 @@ Chd|====================================================================
      4                  NSN  ,ITAG  ,CAND_EN,CAND_NN,
      5                  CAND_P,STF  ,IFPEN ,IFPENN,GAPV)
       USE MESSAGE_MOD
+      USE FORMAT_MOD , ONLY : FMW_5I
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -59,9 +61,7 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, J, L
       INTEGER IX1, IX2, IX3, IX4, NSVG
-C     REAL
-      my_real
-     .   PENMAX
+      my_real PENMAX
 C-----------------------------------------------
        JWARN = 0
         DO 100 I=1,I_STOK
@@ -75,10 +75,7 @@ C-----------------------------------------------
           NSVG=NSV(J)
           IF(PENE(I)>ZERO)THEN
             IF(IPRI>=1)THEN
-              WRITE(IOUT,FMT=FMW_5I)
-     1         ITAB(NSVG),
-     2         ITAB(IX1),ITAB(IX2),
-     3         ITAB(IX3),ITAB(IX4)
+              WRITE(IOUT,FMT=FMW_5I) ITAB(NSVG), ITAB(IX1),ITAB(IX2), ITAB(IX3),ITAB(IX4)
             END IF
             WRITE(IOUT,1000)PENE(I)
 C

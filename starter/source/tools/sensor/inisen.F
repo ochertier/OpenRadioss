@@ -20,17 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  INISEN                        source/tools/sensor/inisen.F  
-Chd|-- called by -----------
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        INIPARSEN                     source/tools/sensor/iniparsen.F
-Chd|        SORT_LOGICAL_SENSORS          source/tools/sensor/sort_logical_sensors.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        SENSOR_MOD                    share/modules1/sensor_mod.F   
-Chd|====================================================================
+      !||====================================================================
+      !||    inisen                 ../starter/source/tools/sensor/inisen.F
+      !||--- called by ------------------------------------------------------
+      !||    lectur                 ../starter/source/starter/lectur.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    iniparsen              ../starter/source/tools/sensor/iniparsen.F
+      !||    sort_logical_sensors   ../starter/source/tools/sensor/sort_logical_sensors.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    sensor_mod             ../starter/share/modules1/sensor_mod.F
+      !||====================================================================
       SUBROUTINE INISEN(SENSORS , IPARI ,NOM_OPT ,PTR_NOPT_RWALL,
      .                  PTR_NOPT_SECT ,PTR_NOPT_INTER  ,IXR    ,R_SKEW   ,NUMELR,
      .                  NSECT   ,NINTER ,NINTSUB ,NRWALL   ,NRBODY  )
@@ -39,6 +40,7 @@ C   M o d u l e s
 C-----------------------------------------------  
       USE MESSAGE_MOD
       USE SENSOR_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -53,8 +55,7 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER ,INTENT(IN) :: NUMELR,NSECT,NINTER,NINTSUB,NRWALL,NRBODY
       INTEGER IPARI(NPARI,NINTER)
-      INTEGER NOM_OPT(LNOPT1,*),PTR_NOPT_RWALL,PTR_NOPT_SECT,
-     .        PTR_NOPT_INTER
+      INTEGER NOM_OPT(LNOPT1,*),PTR_NOPT_RWALL,PTR_NOPT_SECT,PTR_NOPT_INTER
       INTEGER ,DIMENSION(NUMELR)      :: R_SKEW
       INTEGER ,DIMENSION(NIXR,NUMELR) :: IXR
       TYPE (SENSORS_) ,INTENT(INOUT) ,TARGET  :: SENSORS
@@ -63,7 +64,7 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,J,K,IN,NSENSOR,IPARSENS,STABSEN,SFSAV,STAT,
      .        IS1,IS2,SENS_TYPE,SENS_ID,SPRING_ID
-      CHARACTER TITR*nchartitle
+      CHARACTER(LEN=NCHARTITLE)::TITR
       TYPE (SENSOR_STR_) ,DIMENSION(:) ,POINTER :: SENSOR_TAB
 c=======================================================================
 C     INIT DES PARAMETRES DE SENSOR

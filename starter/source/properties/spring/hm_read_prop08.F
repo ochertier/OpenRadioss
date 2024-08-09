@@ -20,22 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  HM_READ_PROP08                source/properties/spring/hm_read_prop08.F
-Chd|-- called by -----------
-Chd|        HM_READ_PROPERTIES            source/properties/hm_read_properties.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        HM_GET_FLOATV                 source/devtools/hm_reader/hm_get_floatv.F
-Chd|        HM_GET_FLOATV_DIM             source/devtools/hm_reader/hm_get_floatv_dim.F
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        HM_OPTION_IS_ENCRYPTED        source/devtools/hm_reader/hm_option_is_encrypted.F
-Chd|        NL                            source/output/message/message.F
-Chd|        ELBUFTAG_MOD                  share/modules1/elbuftag_mod.F 
-Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_read_prop08           ../starter/source/properties/spring/hm_read_prop08.F
+      !||--- called by ------------------------------------------------------
+      !||    hm_read_properties       ../starter/source/properties/hm_read_properties.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                   ../starter/source/output/message/message.F
+      !||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
+      !||    hm_get_floatv_dim        ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
+      !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+      !||--- uses       -----------------------------------------------------
+      !||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
+      !||    hm_option_read_mod       ../starter/share/modules1/hm_option_read_mod.F
+      !||    message_mod              ../starter/share/message_module/message_mod.F
+      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE HM_READ_PROP08(GEO,IGEO,PROP_TAG ,IGTYP,IG,
      .                          ISKN,UNITAB,IUNIT,IDTITL,LSUBMODEL,SUB_ID)
 C-----------------------------------------------
@@ -44,6 +44,7 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE SUBMODEL_MOD
       USE HM_OPTION_READ_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -66,7 +67,7 @@ C     REAL
       my_real
      .   GEO(NPROPG)
       TYPE(PROP_TAG_) , DIMENSION(0:MAXPROP) :: PROP_TAG
-      CHARACTER IDTITL*nchartitle
+      CHARACTER(LEN=NCHARTITLE)::IDTITL
       TYPE(SUBMODEL_DATA),INTENT(IN)::LSUBMODEL(*)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s

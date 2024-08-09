@@ -20,22 +20,24 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  YCTRL                         source/initial_conditions/inista/yctrl.F
-Chd|-- called by -----------
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        FREERR                        source/starter/freform.F      
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    yctrl                  ../starter/source/initial_conditions/inista/yctrl.F
+      !||--- called by ------------------------------------------------------
+      !||    lectur                 ../starter/source/starter/lectur.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||--- uses       -----------------------------------------------------
+      !||    format_mod             ../starter/share/modules1/format_mod.F90
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE YCTRL(IGRBRIC)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------                     
       USE GROUPDEF_MOD
       USE MESSAGE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARKEY
+      USE FORMAT_MOD , ONLY : FMT_2I
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -65,7 +67,8 @@ C-----------------------------------------------
      .      UID,SUB_ID,NLAY,NPTR,NPTS,NPTT,IFAIL,IRUPT_TYP,NVAR_RUPT,
      .      ILAY,IMAT,NPT_MAX,NUBEAM0,NVSH_STRA,ISMSTR
       INTEGER IGBR, JGBR, IOK
-      CHARACTER MESS*40,KEY2*ncharkey,KEY3*ncharkey
+      CHARACTER MESS*40
+      CHARACTER(LEN=NCHARKEY) :: KEY2, KEY3
 C=======================================================================
       NFILSOL=0
       NUMSOL =0
@@ -135,9 +138,6 @@ C
        NUSHELL = 0
        NVSHELL1 = 0
        NVSHELL2 = 0
-cc       NGAUSS = 0       
-cc       NLAYER = 0
-cc       NVSHELL = 0
        IUSOLID = 0
        NUSOLID = 0
        NVSOLID1 = 0     
@@ -146,8 +146,6 @@ cc       NVSHELL = 0
        NVSOLID4 = 0
        NVSOLID5 = 0
        NVSOLID6 = 0
-cc       NPSOLID = 0
-cc       NVSOLID = 0
       REWIND(IIN4)
  400  READ(IIN4,FMT='(A)',END=449,ERR=449)LINE
        IF(LINE(1:8)=='/ENDDATA')THEN
@@ -171,9 +169,6 @@ C
          ELSE 
           READ(LINE,FMT='(4I10)')IHBE,NIP,NPG,NUVAR
          ENDIF
-cc          NGAUSS = MAX(NPG,NGAUSS)
-cc          NLAYER = MAX(NIP,NLAYER)
-cc          NVSHELL   = MAX(NUVAR,NVSHELL)
           NUSHELL = MAX(NUSHELL,MAX(1,NPG)*MAX(1,NIP)*NUVAR + NUSHELL0)
           ND = MOD(NUVAR,6)
           NU = (NUVAR - ND)/6
@@ -391,25 +386,24 @@ cc       ENDIF
 !-----------
       RETURN
  399  CONTINUE
-       CALL ANCMSG(MSGID=557,
-     .             MSGTYPE=MSGERROR,
-     .             ANMODE=ANINFO_BLIND_1)
+       CALL ANCMSG(MSGID=557, MSGTYPE=MSGERROR, ANMODE=ANINFO_BLIND_1)
  999  CALL FREERR(3)
       RETURN
       END
 
-Chd|====================================================================
-Chd|  UEL2SYS                       source/initial_conditions/inista/yctrl.F
-Chd|-- called by -----------
-Chd|        HM_READ_INISTATE_D00          source/elements/initia/hm_read_inistate_d00.F
-Chd|        HM_YCTRL                      source/elements/initia/hm_yctrl.F
-Chd|        INIBOLTPREL                   source/loads/bolt/iniboltprel.F
-Chd|        LECFILL                       source/elements/initia/lecfill.F
-Chd|        LEC_INISTATE_TRI              source/elements/initia/lec_inistate_tri.F
-Chd|-- calls ---------------
-Chd|====================================================================
+      !||====================================================================
+      !||    uel2sys                ../starter/source/initial_conditions/inista/yctrl.F
+      !||--- called by ------------------------------------------------------
+      !||    hm_read_inistate_d00   ../starter/source/elements/initia/hm_read_inistate_d00.F
+      !||    hm_yctrl               ../starter/source/elements/initia/hm_yctrl.F
+      !||    iniboltprel            ../starter/source/loads/bolt/iniboltprel.F
+      !||    initag_preload_a       ../starter/source/loads/general/preload/hm_read_preload_axial.F90
+      !||    initia                 ../starter/source/elements/initia/initia.F
+      !||    lec_inistate_tri       ../starter/source/elements/initia/lec_inistate_tri.F
+      !||    lecfill                ../starter/source/elements/initia/lecfill.F
+      !||====================================================================
       INTEGER FUNCTION UEL2SYS(IU,KSYSUSR,NUMEL)
-C     FONCTION DONNE N0 SYSTEME DE L'ELT USER IU (0 si IU nexiste pas)
+C     INTERNAL ID FROM USER ID IU (0 IF IT DOES NOT EXIST)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -434,14 +428,14 @@ C-----------------------------------------------
         RETURN
       ENDIF
       IF((IU-KSYSUSR(J))==0)THEN
-C     >CAS IU=USR FIN DE LA RECHERCHE
+C     >CASE IU=USR  SEARCH IS ENDING
          UEL2SYS=KSYSUSR(J+NUMEL)
          RETURN
       ELSE IF (IU-KSYSUSR(J)<0) THEN
-C     >CAS IU<USR
+C     >CASE IU<USR
          JSUP=J-1
       ELSE
-C     >CAS IU>USR
+C     >CASE IU>USR
          JINF=J+1
       ENDIF
       J=MAX(1,(JSUP+JINF)/2)

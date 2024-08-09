@@ -20,20 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  SPGRTAILS                     source/elements/sph/spgrtails.F
-Chd|-- called by -----------
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        FRETITL2                      source/starter/freform.F      
-Chd|        MY_ORDERS                     ../common_source/tools/sort/my_orders.c
-Chd|        ZEROIN                        source/system/zeroin.F        
-Chd|        GET_U_GEO                     source/user_interface/uaccess.F
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        R2R_MOD                       share/modules1/r2r_mod.F      
-Chd|====================================================================
+      !||====================================================================
+      !||    spgrtails              ../starter/source/elements/sph/spgrtails.F
+      !||--- called by ------------------------------------------------------
+      !||    lectur                 ../starter/source/starter/lectur.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    fretitl2               ../starter/source/starter/freform.F
+      !||    get_u_geo              ../starter/source/user_interface/uaccess.F
+      !||    zeroin                 ../starter/source/system/zeroin.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    mod_spgrhead           ../starter/source/elements/sph/spgrhead.F
+      !||    r2r_mod                ../starter/share/modules1/r2r_mod.F
+      !||====================================================================
       SUBROUTINE SPGRTAILS(KXSP   , IPARG , PM  ,IPART ,
      2                     IPARTSP, EADD,   ND  , CEPSP, DD_IAD,
      3                     IDX,   IXSP, IPM  , IGEO,
@@ -46,6 +46,7 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE R2R_MOD
       USE MATPARAM_DEF_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -82,12 +83,10 @@ C-----------------------------------------------
      .        WORK(70000),INUM(13,NUMSPH),INDEX(2*NUMSPH),
      .        NGP(NSPMD+1),K,J,II, MX, NFAIL, IR, IP, STAT,
      .        IPARTR2R, NOD, JALE_FROM_MAT, JALE_FROM_PROP
-C     REAL
       my_real
      .        RNUM(NSPBUF,NUMSPH)
       INTEGER ID
-      CHARACTER*nchartitle,
-     .   TITR
+      CHARACTER(LEN=NCHARTITLE)::TITR
       DATA IUN/1/
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s

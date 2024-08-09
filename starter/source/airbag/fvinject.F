@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  FVINJECT                      source/airbag/fvinject.F      
-Chd|-- called by -----------
-Chd|        INIT_MONVOL                   source/airbag/init_monvol.F   
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    fvinject               ../starter/source/airbag/fvinject.F
+      !||--- called by ------------------------------------------------------
+      !||    init_monvol            ../starter/source/airbag/init_monvol.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE FVINJECT(IBUF  , ELEM   , IBAGJET, 
      .                    NJET  , IGRSURF, 
      .                    ITAGEL, NN     , NEL    , 
@@ -39,6 +39,7 @@ C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
       USE GROUPDEF_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -56,8 +57,7 @@ C-----------------------------------------------
      .        NJET, 
      .        NN, NEL, ID, TAGVENT(NUMNOD),ITAB(NUMNOD)
       INTEGER, DIMENSION(NEL), INTENT(INOUT) :: ITAGEL
-      CHARACTER*nchartitle,
-     .        TITR
+      CHARACTER(len=nchartitle) :: TITR
       TYPE (SURF_)   , DIMENSION(NSURF)   :: IGRSURF
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s

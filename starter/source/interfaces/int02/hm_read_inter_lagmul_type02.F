@@ -20,20 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  HM_READ_INTER_LAGMUL_TYPE02   source/interfaces/int02/hm_read_inter_lagmul_type02.F
-Chd|-- called by -----------
-Chd|        HM_READ_INTER_LAGMUL          source/interfaces/reader/hm_read_inter_lagmul.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        DEFINTER                      source/interfaces/interf1/definter.F
-Chd|        HM_GET_FLOATV                 source/devtools/hm_reader/hm_get_floatv.F
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        NGR2USR                       source/system/nintrr.F        
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_read_inter_lagmul_type02   ../starter/source/interfaces/int02/hm_read_inter_lagmul_type02.F
+      !||--- called by ------------------------------------------------------
+      !||    hm_read_inter_lagmul          ../starter/source/interfaces/reader/hm_read_inter_lagmul.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                        ../starter/source/output/message/message.F
+      !||    definter                      ../starter/source/interfaces/interf1/definter.F
+      !||    hm_get_floatv                 ../starter/source/devtools/hm_reader/hm_get_floatv.F
+      !||    hm_get_intv                   ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    ngr2usr                       ../starter/source/system/nintrr.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod                   ../starter/share/message_module/message_mod.F
+      !||    submodel_mod                  ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE HM_READ_INTER_LAGMUL_TYPE02(
      1        IPARI      ,STFAC      ,FRIGAP     ,NOINT     ,NI       ,
      2        IGRNOD     ,IGRSURF    ,DEF_INTER  ,TITR      ,UNITAB   ,
@@ -46,6 +46,7 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE GROUPDEF_MOD
       USE SUBMODEL_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARKEY
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -61,7 +62,7 @@ C-----------------------------------------------
       INTEGER IPARI(*),DEF_INTER(*)
       my_real
      .   FRIGAP(*) , STFAC
-      CHARACTER TITR*nchartitle
+      CHARACTER(LEN=NCHARTITLE)::TITR
 C-----------------------------------------------
       TYPE (GROUP_)  ,TARGET, DIMENSION(NGRNOD)  :: IGRNOD
       TYPE (SURF_)   ,TARGET , DIMENSION(NSURF)   :: IGRSURF
@@ -79,7 +80,7 @@ C-----------------------------------------------
      .    IDEL2,IBUC,INTKG,IS1,IS2
       my_real
      .   STARTT,STOPT,DSEARCH
-      CHARACTER KEY1*ncharkey
+      CHARACTER(LEN=NCHARKEY) ::  KEY1
       INTEGER, DIMENSION(:), POINTER :: INGR2USR
       LOGICAL IS_AVAILABLE
 C-----------------------------------------------

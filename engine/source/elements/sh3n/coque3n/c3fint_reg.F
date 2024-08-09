@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  C3FINT_REG                    source/elements/sh3n/coque3n/c3fint_reg.F
-Chd|-- called by -----------
-Chd|        C3FORC3                       source/elements/sh3n/coque3n/c3forc3.F
-Chd|-- calls ---------------
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
-Chd|        NLOCAL_REG_MOD                ../common_source/modules/nlocal_reg_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    c3fint_reg       ../engine/source/elements/sh3n/coque3n/c3fint_reg.F
+      !||--- called by ------------------------------------------------------
+      !||    c3forc3          ../engine/source/elements/sh3n/coque3n/c3forc3.F
+      !||--- uses       -----------------------------------------------------
+      !||    elbufdef_mod     ../common_source/modules/mat_elem/elbufdef_mod.F90
+      !||    nlocal_reg_mod   ../common_source/modules/nlocal_reg_mod.F
+      !||====================================================================
       SUBROUTINE C3FINT_REG(
      1   NLOC_DMG,VAR_REG, THK,     NEL,
      2   OFF,     AREA,    NC1,     NC2,
@@ -337,7 +337,7 @@ c
         DO I = 1, NEL
 c
           ! If the element is not broken, normal computation
-          IF (OFF(I)/=ZERO) THEN 
+          IF (OFF(I) /= ZERO) THEN 
             ! Computation of the product LEN**2 * BtxB
             ! Warning: the derivatives of the shape function does not take into account the volume of the element. 
             ! That is why a factor (1/VOL**2) is added in B1, B2, B3.
@@ -356,9 +356,9 @@ c
             ! Computing the product XDAMP*NtN*VNL
             NTN_VNL = (VNL(POS1(I)+K-1) + VNL(POS2(I)+K-1) + VNL(POS3(I)+K-1))/NTN
             IF (NODADT > 0) THEN 
-              NTN_VNL = (SQRT(MASS(POS1(I)+K-1)/MASS0(POS1(I)+K-1))*VNL(POS1(I)+K-1) + 
-     .                   SQRT(MASS(POS2(I)+K-1)/MASS0(POS2(I)+K-1))*VNL(POS2(I)+K-1) + 
-     .                   SQRT(MASS(POS3(I)+K-1)/MASS0(POS3(I)+K-1))*VNL(POS3(I)+K-1)) / NTN
+              NTN_VNL = MIN(SQRT(MASS(POS1(I)+K-1)/MASS0(POS1(I)+K-1)),
+     .                      SQRT(MASS(POS2(I)+K-1)/MASS0(POS2(I)+K-1)),
+     .                      SQRT(MASS(POS3(I)+K-1)/MASS0(POS3(I)+K-1)))*NTN_VNL
             ENDIF
 c          
             ! Multiplication by the volume of the element

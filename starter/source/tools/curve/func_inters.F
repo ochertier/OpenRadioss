@@ -20,15 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  FUNC_INTERS                   source/tools/curve/func_inters.F
-Chd|-- called by -----------
-Chd|        LAW36_UPD                     source/materials/mat/mat036/law36_upd.F
-Chd|        LAW58_UPD                     source/materials/mat/mat058/law58_upd.F
-Chd|        LAW88_UPD                     source/materials/mat/mat088/law88_upd.F
-Chd|-- calls ---------------
-Chd|====================================================================
+      !||====================================================================
+      !||    func_inters            ../starter/source/tools/curve/func_inters.F
+      !||--- called by ------------------------------------------------------
+      !||    law36_upd              ../starter/source/materials/mat/mat036/law36_upd.F
+      !||    law58_upd              ../starter/source/materials/mat/mat058/law58_upd.F
+      !||    law88_upd              ../starter/source/materials/mat/mat088/law88_upd.F
+      !||--- uses       -----------------------------------------------------
+      !||====================================================================
       SUBROUTINE FUNC_INTERS(TITR,MAT_ID,FUNC1,FUNC2,FAC1,FAC2,NPC,PLD,XINT,YINT)
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
+        USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -41,7 +45,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      CHARACTER*nchartitle :: TITR
+      CHARACTER(LEN=NCHARTITLE) :: TITR
       INTEGER  :: MAT_ID,FUNC1,FUNC2
       my_real  :: XINT,YINT,FAC1,FAC2
       INTEGER  ,DIMENSION(SNPC) :: NPC 
@@ -118,14 +122,14 @@ c     Check intersection of curve segments
 c-----------
       RETURN
       END
-Chd|====================================================================
-Chd|  FUNC_INTERS_SHEAR             source/tools/curve/func_inters.F
-Chd|-- called by -----------
-Chd|        LAW58_UPD                     source/materials/mat/mat058/law58_upd.F
-Chd|-- calls ---------------
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        TABLE_MOD                     share/modules1/table_mod.F    
-Chd|====================================================================
+      !||====================================================================
+      !||    func_inters_shear      ../starter/source/tools/curve/func_inters.F
+      !||--- called by ------------------------------------------------------
+      !||    law58_upd              ../starter/source/materials/mat/mat058/law58_upd.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    table_mod              ../starter/share/modules1/table_mod.F
+      !||====================================================================
       SUBROUTINE FUNC_INTERS_SHEAR(TITR,MAT_ID  ,FUNC   ,FUND,  FAC1  ,FAC2,
      .                            NPC,PLD,XINT1 ,YINT1  ,XINT2 ,YINT2  )
 C-----------------------------------------------
@@ -133,6 +137,7 @@ C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
       USE TABLE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -140,7 +145,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      CHARACTER*nchartitle :: TITR
+      CHARACTER(LEN=NCHARTITLE) :: TITR
       !INTEGER  , DIMENSION(NFUNC)      :: IFUNC,FUNC_ID
       INTEGER     FUNC,FUND,NPC(*) 
       INTEGER  :: MAT_ID
@@ -263,20 +268,21 @@ C=======================================================================
 c-----------
       RETURN
       END
-Chd|====================================================================
-Chd|  FUNC_INTERS_C                 source/tools/curve/func_inters.F
-Chd|-- called by -----------
-Chd|        LAW88_UPD                     source/materials/mat/mat088/law88_upd.F
-Chd|-- calls ---------------
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        TABLE_MOD                     share/modules1/table_mod.F    
-Chd|====================================================================
+      !||====================================================================
+      !||    func_inters_c          ../starter/source/tools/curve/func_inters.F
+      !||--- called by ------------------------------------------------------
+      !||    law88_upd              ../starter/source/materials/mat/mat088/law88_upd.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    table_mod              ../starter/share/modules1/table_mod.F
+      !||====================================================================
       SUBROUTINE FUNC_INTERS_C(TITR,MAT_ID  ,FUNC,FUND,FAC1,FAC2,NPC,PLD,XINC,YINC  )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
       USE TABLE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -284,13 +290,10 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      CHARACTER*nchartitle :: TITR
-      !INTEGER  , DIMENSION(NFUNC)      :: IFUNC,FUNC_ID
-      INTEGER     FUNC,FUND,NPC(*) 
-      INTEGER  :: MAT_ID
-      my_real  
-     .            XINC,YINC,FAC1,FAC2,PLD(*)
-!      TYPE(TTABLE) TABLE(*)
+      CHARACTER(LEN=NCHARTITLE) :: TITR
+      INTEGER FUNC,FUND,NPC(*)
+      INTEGER :: MAT_ID
+      my_real XINC,YINC,FAC1,FAC2,PLD(*)
 C-----------------------------------------------
       INTENT(IN)    :: TITR,FUNC,FUND,MAT_ID,NPC,PLD,FAC1,FAC2
       INTENT(INOUT) :: XINC,YINC 
@@ -360,13 +363,13 @@ C=======================================================================
 c-----------
       RETURN
       END
-Chd|====================================================================
-Chd|  TABLE_INTERS                  source/tools/curve/func_inters.F
-Chd|-- called by -----------
-Chd|        LAW119_UPD                    source/materials/mat/mat119/law119_upd.F
-Chd|-- calls ---------------
-Chd|        TABLE_MOD                     share/modules1/table_mod.F    
-Chd|====================================================================
+      !||====================================================================
+      !||    table_inters   ../starter/source/tools/curve/func_inters.F
+      !||--- called by ------------------------------------------------------
+      !||    law119_upd     ../starter/source/materials/mat/mat119/law119_upd.F
+      !||--- uses       -----------------------------------------------------
+      !||    table_mod      ../starter/share/modules1/table_mod.F
+      !||====================================================================
       SUBROUTINE TABLE_INTERS(TABLE,FUNC1,FUNC2,FAC1,FAC2,XINT,YINT)
 C-----------------------------------------------
 C   M o d u l e s

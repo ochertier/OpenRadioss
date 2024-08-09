@@ -20,18 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  HM_READ_QUAD                  source/elements/reader/hm_read_quad.F
-Chd|-- called by -----------
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        ANODSET                       source/output/analyse/analyse_node.c
-Chd|        VDOUBLE                       source/system/sysfus.F        
-Chd|        USR2SYS                       source/system/sysfus.F        
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_read_quad           ../starter/source/elements/reader/hm_read_quad.F
+      !||--- called by ------------------------------------------------------
+      !||    lectur                 ../starter/source/starter/lectur.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    anodset                ../starter/source/output/analyse/analyse_node.c
+      !||    nintrn                 ../starter/source/system/nintrn.F
+      !||    usr2sys                ../starter/source/system/sysfus.F
+      !||    vdouble                ../starter/source/system/sysfus.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE HM_READ_QUAD(IXQ   ,ITAB  ,ITABM1,IPART,IPARTQ,
      .                  IPM   ,IGEO  ,UNITAB ,LSUBMODEL)
 C-----------------------------------------------
@@ -59,6 +61,7 @@ C-----------------------------------------------
       USE UNITAB_MOD
       USE MESSAGE_MOD
       USE SUBMODEL_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C--------------------------------------------------------
 C     LECTURE DES ELEMENTS QUAD 4 NOEUDS
 C     VERSIION NUMEROTATION DES NOEUDS LIBRE/MARS 90/DIM
@@ -101,9 +104,9 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, J, I1, I2, ID,IDS,IPID,MT,N,MID,PID,UID,NDEGEN,JC,STAT,
      .   IFLAGUNIT,FLAG_FMT,FLAG_FMT_TMP,IFIX_TMP,ISHXFEM,IOUTN,IERROR,INDEX_PART
-      CHARACTER MESS*40, MESS2*40,TITR*nchartitle
-      my_real
-     .   BID,FAC_L
+      CHARACTER MESS*40, MESS2*40
+      CHARACTER(LEN=NCHARTITLE) :: TITR
+      my_real BID,FAC_L
       INTEGER, DIMENSION(:), ALLOCATABLE :: SUB_QUAD,UID_QUAD
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s

@@ -20,23 +20,24 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  HM_READ_TABLE2_0              source/tools/curve/hm_read_table2_0.F
-Chd|-- called by -----------
-Chd|        HM_READ_TABLE2                source/tools/curve/hm_read_table.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        HM_GET_FLOAT_ARRAY_INDEX      source/devtools/hm_reader/hm_get_float_array_index.F
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        HM_OPTION_IS_ENCRYPTED        source/devtools/hm_reader/hm_option_is_encrypted.F
-Chd|        HM_OPTION_READ_KEY            source/devtools/hm_reader/hm_option_read_key.F
-Chd|        HM_OPTION_START               source/devtools/hm_reader/hm_option_start.F
-Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        INTERFACE_TABLE_MOD           share/modules1/table_mod.F    
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|        TABLE_MOD                     share/modules1/table_mod.F    
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_read_table2_0           ../starter/source/tools/curve/hm_read_table2_0.F
+      !||--- called by ------------------------------------------------------
+      !||    hm_read_table2             ../starter/source/tools/curve/hm_read_table.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                     ../starter/source/output/message/message.F
+      !||    hm_get_float_array_index   ../starter/source/devtools/hm_reader/hm_get_float_array_index.F
+      !||    hm_get_intv                ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    hm_option_is_encrypted     ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+      !||    hm_option_read_key         ../starter/source/devtools/hm_reader/hm_option_read_key.F
+      !||    hm_option_start            ../starter/source/devtools/hm_reader/hm_option_start.F
+      !||--- uses       -----------------------------------------------------
+      !||    hm_option_read_mod         ../starter/share/modules1/hm_option_read_mod.F
+      !||    interface_table_mod        ../starter/share/modules1/table_mod.F
+      !||    message_mod                ../starter/share/message_module/message_mod.F
+      !||    submodel_mod               ../starter/share/modules1/submodel_mod.F
+      !||    table_mod                  ../starter/share/modules1/table_mod.F
+      !||====================================================================
       SUBROUTINE HM_READ_TABLE2_0(NTABLE0, TABLE ,L,NFUNCT,UNITAB, LSUBMODEL )
 C-----------------------------------------------
 C   M o d u l e s
@@ -47,6 +48,7 @@ C-----------------------------------------------
       USE SUBMODEL_MOD
       USE HM_OPTION_READ_MOD
       USE UNITAB_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARFIELD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -71,18 +73,14 @@ C-----------------------------------------------
      .        JREC, NPTS, STAT, IDS, LL, LX(2)
       INTEGER,DIMENSION(:),ALLOCATABLE :: JPERM1,JPERM2
       INTEGER,DIMENSION(:,:),ALLOCATABLE :: ITAG
-      INTEGER IERROR, NF  
-C     REAL
-      my_real
-     .   BID, XK, XX, X1, X2, X234(3), YY, Y1, Y2, R, XMIN, XMAX,
-     .    TIME, FUNCT,SCALEY
-      my_real,
-     .        DIMENSION(2) :: XD2
-      my_real,
-     .        DIMENSION(:),ALLOCATABLE :: XV1, XSTOR1, XSTOR2
-      my_real,
-     .        DIMENSION(:,:),ALLOCATABLE :: XV2
-      CHARACTER TITR*nchartitle, MESS*40, KEY*ncharfield
+      INTEGER IERROR, NF
+      my_real  BID, XK, XX, X1, X2, X234(3), YY, Y1, Y2, R, XMIN, XMAX,TIME, FUNCT,SCALEY
+      my_real, DIMENSION(2) :: XD2
+      my_real, DIMENSION(:),ALLOCATABLE :: XV1, XSTOR1, XSTOR2
+      my_real,DIMENSION(:,:),ALLOCATABLE :: XV2
+      CHARACTER(LEN=NCHARTITLE) :: TITR
+      CHARACTER MESS*40
+      CHARACTER(LEN=NCHARFIELD) :: KEY
       DATA MESS/' FUNCTION & TABLE DEFINITION            '/
       LOGICAL :: IS_ENCRYPTED, IS_AVAILABLE
 C======================================================================|

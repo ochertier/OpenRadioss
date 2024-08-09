@@ -20,18 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  LGMINI_RBY                    source/tools/lagmul/lgmini_rby.F
-Chd|-- called by -----------
-Chd|        INITIA                        source/elements/initia/initia.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        FRETITL2                      source/starter/freform.F      
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    lgmini_rby             ../starter/source/tools/lagmul/lgmini_rby.F
+      !||--- called by ------------------------------------------------------
+      !||    initia                 ../starter/source/elements/initia/initia.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    fretitl2               ../starter/source/starter/freform.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE LGMINI_RBY(NPBYL  ,LPBYL  ,RBYL   ,MASS   ,INER   ,
      .                      X      ,V      ,VR     ,ITAB   ,NOM_OPT)
       USE MESSAGE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C----------------------------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -47,18 +49,15 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NPBYL(NNPBY,*), LPBYL(*), ITAB(*)
-      my_real
-     .        RBYL(NRBY,*),MASS(*),INER(*),X(3,*), V(3,*), VR(3,*)
+      my_real RBYL(NRBY,*),MASS(*),INER(*),X(3,*), V(3,*), VR(3,*)
       INTEGER NOM_OPT(LNOPT1,*)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,J,N,NN,M,IK,IC,MSL,NSL,TNSL,ICDG
-      my_real
-     .        RX,RY,RZ,MASRB
+      my_real RX,RY,RZ,MASRB
       INTEGER ID
-      CHARACTER*nchartitle,
-     .   TITR
+      CHARACTER(LEN=NCHARTITLE) :: TITR
 C======================================================================|
       TNSL = 0
       DO N=1,NRBYLAG
@@ -69,8 +68,7 @@ C======================================================================|
         MASS(M) = MASS(M) + RBYL(1,N)
         INER(M) = INER(M) + RBYL(2,N)
         ID=NOM_OPT(1,NRBYKIN+N)
-        CALL FRETITL2(TITR,
-     .                NOM_OPT(LNOPT1-LTITR+1,NRBYKIN+N),LTITR)
+        CALL FRETITL2(TITR, NOM_OPT(LNOPT1-LTITR+1,NRBYKIN+N),LTITR)
         IF(MASS(M)==ZERO.OR.INER(M)==ZERO) THEN
            CALL ANCMSG(MSGID=273,
      .                 MSGTYPE=MSGWARNING,

@@ -20,17 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  CREATE_ELEMENT_FROM_PART      source/model/sets/create_element_from_part.F
-Chd|-- called by -----------
-Chd|        HM_SET                        source/model/sets/hm_set.F    
-Chd|-- calls ---------------
-Chd|        MY_ORDERS                     ../common_source/tools/sort/my_orders.c
-Chd|        INVERTED_GROUP_MOD            share/modules1/inverted_group_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        SETDEF_MOD                    ../common_source/modules/setdef_mod.F
-Chd|====================================================================
-      SUBROUTINE CREATE_ELEMENT_FROM_PART(CLAUSE  ,INV_GROUP)
+      !||====================================================================
+      !||    create_element_from_part   ../starter/source/model/sets/create_element_from_part.F
+      !||--- called by ------------------------------------------------------
+      !||    hm_set                     ../starter/source/model/sets/hm_set.F
+      !||--- calls      -----------------------------------------------------
+      !||--- uses       -----------------------------------------------------
+      !||    inverted_group_mod         ../starter/share/modules1/inverted_group_mod.F
+      !||    message_mod                ../starter/share/message_module/message_mod.F
+      !||====================================================================
+      SUBROUTINE CREATE_ELEMENT_FROM_PART(CLAUSE  ,INV_GROUP,NUMSPH)
 C-----------------------------------------------
 C   ROUTINE DESCRIPTION :
 C   ===================
@@ -63,6 +62,7 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       TYPE(INVERTGROUP_STRUCT_) :: INV_GROUP
       TYPE (SET_) ::  CLAUSE
+      INTEGER, INTENT(IN) :: NUMSPH
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -70,7 +70,7 @@ C-----------------------------------------------
       INTEGER IWORK(70000)
       INTEGER, DIMENSION(:), ALLOCATABLE :: INDX,SORT
 C=======================================================================
-      SZELMAX = MAX(NUMELS,NUMELQ,NUMELC,NUMELTG,NUMELTRIA,NUMELT,NUMELP,NUMELR)
+      SZELMAX = MAX(NUMELS,NUMELQ,NUMELC,NUMELTG,NUMELTRIA,NUMELT,NUMELP,NUMELR,NUMSPH)
       ALLOCATE(INDX(SZELMAX*2))
       ALLOCATE(SORT(SZELMAX))
 !
@@ -107,7 +107,39 @@ C=======================================================================
         ENDDO
 
       ENDIF ! IF (NUMELS > 0)
-      
+!
+!               SPHCEL
+      IF (NUMSPH > 0) THEN
+        SIZE = 0
+        DO ID=1,CLAUSE%NB_PART
+          IP=CLAUSE%PART(ID)
+          EL_FIRST = INV_GROUP%INDPARTSPH(IP)
+          EL_LAST  = INV_GROUP%INDPARTSPH(IP+1)
+          SIZE = SIZE + EL_LAST - EL_FIRST
+        ENDDO
+        CLAUSE%NB_SPHCEL = SIZE
+        ALLOCATE( CLAUSE%SPHCEL(SIZE) )
+!
+        IND = 0
+        DO ID=1,CLAUSE%NB_PART
+          IP=CLAUSE%PART(ID)
+          EL_FIRST = INV_GROUP%INDPARTSPH(IP)
+          EL_LAST  = INV_GROUP%INDPARTSPH(IP+1)-1
+          DO EL=EL_FIRST,EL_LAST 
+            IND = IND+1
+            IE = INV_GROUP%PARTSPH(EL)
+            CLAUSE%SPHCEL(IND) = IE
+          ENDDO 
+        ENDDO
+
+        IWORK(1:70000) = 0
+        SORT(1:CLAUSE%NB_SPHCEL) = CLAUSE%SPHCEL(1:CLAUSE%NB_SPHCEL)
+        CALL MY_ORDERS(0,IWORK,SORT,INDX,CLAUSE%NB_SPHCEL,1)
+        
+        DO I=1,CLAUSE%NB_SPHCEL
+           CLAUSE%SPHCEL(I) = SORT(INDX(I))
+        ENDDO
+      ENDIF ! IF (NUMSPH > 0)
 !
 !               QUAD
       IF (NUMELQ > 0) THEN

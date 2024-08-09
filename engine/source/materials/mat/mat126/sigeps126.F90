@@ -20,19 +20,32 @@
 !Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 !Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 !Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
+      !||====================================================================
+      !||    sigeps126_mod   ../engine/source/materials/mat/mat126/sigeps126.F90
+      !||--- called by ------------------------------------------------------
+      !||    mulaw           ../engine/source/materials/mat_share/mulaw.F90
+      !||====================================================================
       module sigeps126_mod
         contains
   ! ======================================================================================================================
   ! \brief Johnson-Holmquist 1 material law /MAT/LAW126
   ! \details Material law based on Johnson-Holmquist version 1 theory. Dedicated to concrete application. 
   ! ======================================================================================================================
+      !||====================================================================
+      !||    sigeps126          ../engine/source/materials/mat/mat126/sigeps126.F90
+      !||--- called by ------------------------------------------------------
+      !||    mulaw              ../engine/source/materials/mat_share/mulaw.F90
+      !||--- uses       -----------------------------------------------------
+      !||    constant_mod       ../common_source/modules/constant_mod.F
+      !||    matparam_def_mod   ../common_source/modules/mat_elem/matparam_def_mod.F90
+      !||====================================================================
         subroutine sigeps126(                                          &
-          nel      ,nuvar    ,uvar     ,matparam ,tt       ,           &
+          nel      ,nuvar    ,uvar     ,matparam ,tt       ,et       , &
           rho0     ,ngl      ,sigy     ,dpla     ,defp     ,amu      , &
           depsxx   ,depsyy   ,depszz   ,depsxy   ,depsyz   ,depszx   , &
           sigoxx   ,sigoyy   ,sigozz   ,sigoxy   ,sigoyz   ,sigozx   , &
           signxx   ,signyy   ,signzz   ,signxy   ,signyz   ,signzx   , &
-          epsd     ,dmg      ,ssp      ,off      ,idel7nok ,inloc    , &
+          epsd     ,dmg      ,ssp      ,off      ,inloc    , &
           varnl    ,l_planl  ,planl    )
 !-----------------------------------------------
 !   M o d u l e s
@@ -53,6 +66,7 @@
           my_real, dimension(nel,nuvar), intent(inout) :: uvar !< user variables
           type(matparam_struct_), intent(in) :: matparam !< material parameters data
           my_real, intent(in) :: tt !< current time
+          my_real, dimension(nel), intent(inout) :: et ! Coefficient for hourglass
           my_real, dimension(nel), intent(in) :: rho0 !< material density
           integer, dimension(nel), intent(in) :: ngl !< element user IDs index table
           my_real, dimension(nel), intent(inout) :: sigy !< yield stress
@@ -81,7 +95,6 @@
           my_real, dimension(nel), intent(inout) :: dmg !< damage variable 
           my_real, dimension(nel), intent(inout) :: ssp !< sound speed
           my_real, dimension(nel), intent(inout) :: off !< element deletion flag
-          integer, intent(inout) :: idel7nok !< flag for element deletion in interface type 7
           integer, intent(in) :: inloc !< non-local method flag
           my_real, dimension(nel), intent(inout) :: varnl !< non-local variable increment
           integer, intent(in) :: l_planl !< size of the non-local plastic strain table
@@ -181,28 +194,24 @@
                     off(i) = four_over_5
                     nindx  = nindx + 1
                     indx(nindx) = i
-                    idel7nok = 1
                   endif 
                 elseif (idel == 2) then 
                   if (planl(i) > emax) then 
                     off(i) = four_over_5
                     nindx  = nindx + 1
                     indx(nindx) = i
-                    idel7nok = 1
                   endif
                 elseif (idel == 3) then 
                   if (uvar(i,4) <= zero) then 
                     off(i) = four_over_5
                     nindx  = nindx + 1
                     indx(nindx) = i
-                    idel7nok = 1
                   endif   
                 elseif (idel == 4) then 
                   if (dmg(i) >= one) then 
                     off(i) = four_over_5
                     nindx  = nindx + 1
                     indx(nindx) = i
-                    idel7nok = 1
                   endif          
                 endif
               endif
@@ -305,28 +314,24 @@
                     off(i) = four_over_5
                     nindx  = nindx + 1
                     indx(nindx) = i
-                    idel7nok = 1
                   endif 
                 elseif (idel == 2) then 
                   if (defp(i) > emax) then 
                     off(i) = four_over_5
                     nindx  = nindx + 1
                     indx(nindx) = i
-                    idel7nok = 1
                   endif
                 elseif (idel == 3) then 
                   if (fc*sigy(i) <= zero) then 
                     off(i) = four_over_5
                     nindx  = nindx + 1
                     indx(nindx) = i
-                    idel7nok = 1
                   endif   
                 elseif (idel == 4) then 
                   if (dmg(i) >= one) then 
                     off(i) = four_over_5
                     nindx  = nindx + 1
                     indx(nindx) = i
-                    idel7nok = 1
                   endif          
                 endif
               endif
@@ -361,6 +366,8 @@
                 varnl(i) = zero
               endif 
             endif 
+            ! Coefficient for hourglass 
+            et(i) = one
           enddo          
 !     
           !========================================================================

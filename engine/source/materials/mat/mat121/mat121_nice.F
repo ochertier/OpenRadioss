@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  MAT121_NICE                   source/materials/mat/mat121/mat121_nice.F
-Chd|-- called by -----------
-Chd|        SIGEPS121                     source/materials/mat/mat121/sigeps121.F
-Chd|-- calls ---------------
-Chd|        VINTER2                       source/tools/curve/vinter.F   
-Chd|====================================================================
+      !||====================================================================
+      !||    mat121_nice   ../engine/source/materials/mat/mat121/mat121_nice.F
+      !||--- called by ------------------------------------------------------
+      !||    sigeps121     ../engine/source/materials/mat/mat121/sigeps121.F
+      !||--- calls      -----------------------------------------------------
+      !||    vinter2       ../engine/source/tools/curve/vinter.F
+      !||====================================================================
       SUBROUTINE MAT121_NICE(
      1         NEL     ,NGL     ,NUPARAM ,NUVAR   ,NFUNC   ,IFUNC   ,NPF     ,
      2         TF      ,TIMESTEP,TIME    ,UPARAM  ,UVAR    ,RHO     ,PLA     ,
@@ -423,11 +423,13 @@ c
 c
       ! Storing new values
       DO I=1,NEL  
-        ! Storage of yield function value
+        ! Storage of yield function value & coefficient for hourglass
         IF (DPLA(I) > ZERO) THEN 
           UVAR(I,1) = PHI(I)
+          ET(I) = HARDP(I) / (HARDP(I) + YOUNG(I)) 
         ELSE
           UVAR(I,1) = ZERO
+          ET(I) = ONE
         ENDIF
         ! Storage of derivatives in case of viscoplastic formulation
         IF (Ivisc == 1) THEN 
@@ -436,8 +438,6 @@ c
         ENDIF
         ! USR Outputs
         SEQ(I) = SIGVM(I) ! SIGEQ
-        ! Coefficient for hourglass
-        ET(I) = HARDP(I) / (HARDP(I) + YOUNG(I)) 
         ! Computation of the sound speed   
         SOUNDSP(I) = SQRT((BULK(I) + FOUR_OVER_3*G(I))/RHO(I))
         ! Storing the yield stress

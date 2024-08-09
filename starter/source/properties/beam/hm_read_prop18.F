@@ -20,22 +20,25 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  HM_READ_PROP18                source/properties/beam/hm_read_prop18.F
-Chd|-- called by -----------
-Chd|        HM_READ_PROPERTIES            source/properties/hm_read_properties.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        DEFBEAM_SECT                  source/properties/beam/hm_read_prop18.F
-Chd|        HM_GET_FLOATV                 source/devtools/hm_reader/hm_get_floatv.F
-Chd|        HM_GET_FLOAT_ARRAY_INDEX      source/devtools/hm_reader/hm_get_float_array_index.F
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        HM_OPTION_IS_ENCRYPTED        source/devtools/hm_reader/hm_option_is_encrypted.F
-Chd|        ELBUFTAG_MOD                  share/modules1/elbuftag_mod.F 
-Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_read_prop18             ../starter/source/properties/beam/hm_read_prop18.F
+      !||--- called by ------------------------------------------------------
+      !||    hm_read_properties         ../starter/source/properties/hm_read_properties.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                     ../starter/source/output/message/message.F
+      !||    defbeam_sect               ../starter/source/properties/beam/hm_read_prop18.F
+      !||    defbeam_sect_new           ../starter/source/properties/beam/defbeam_sect_new.F90
+      !||    hm_get_float_array_index   ../starter/source/devtools/hm_reader/hm_get_float_array_index.F
+      !||    hm_get_floatv              ../starter/source/devtools/hm_reader/hm_get_floatv.F
+      !||    hm_get_intv                ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    hm_option_is_encrypted     ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+      !||--- uses       -----------------------------------------------------
+      !||    defbeam_sect_new_mod       ../starter/source/properties/beam/defbeam_sect_new.F90
+      !||    elbuftag_mod               ../starter/share/modules1/elbuftag_mod.F
+      !||    hm_option_read_mod         ../starter/share/modules1/hm_option_read_mod.F
+      !||    message_mod                ../starter/share/message_module/message_mod.F
+      !||    submodel_mod               ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE HM_READ_PROP18(GEO       ,IGEO     ,PROP_TAG ,IGTYP    ,IG        ,
      .                          IDTITL    ,UNITAB   ,LSUBMODEL)
 C============================================================================
@@ -47,6 +50,7 @@ C-----------------------------------------------
       USE SUBMODEL_MOD
       USE HM_OPTION_READ_MOD
       USE defbeam_sect_new_mod
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARFIELD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -66,17 +70,17 @@ C-----------------------------------------------
       INTEGER IGTYP,IG,NBADI 
       my_real
      .   GEO(*)
-      CHARACTER IDTITL*nchartitle
+      CHARACTER(LEN=NCHARTITLE)::IDTITL
       TYPE(PROP_TAG_) , DIMENSION(0:MAXPROP) :: PROP_TAG
       TYPE(SUBMODEL_DATA),INTENT(IN)::LSUBMODEL(*)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      CHARACTER STRING*ncharfield,CHROT*7
+      CHARACTER(LEN=NCHARFIELD) :: STRING
+      CHARACTER CHROT*7
       INTEGER I,J,IP,INTR,INTS,NIP,NIPMAX,NC,NS,IPY,IPZ,IPA,IREF,ISECT,
      .        IRX,IR1X,IR1Y,IR1Z,IR2X,IR2Y,IR2Z,ISS
       INTEGER IHBE,ISMSTR,ISHEAR,NB_DIM,ID_FORMAT,INTR_MAX
-C     REAL
       my_real
      .    DM,DR,PY,PZ,AI,YI,ZI,WI,AREA,Y0,Z0,L(6),PUN
       my_real
@@ -395,18 +399,20 @@ C
 C
       END SUBROUTINE
 
-Chd|====================================================================
-Chd|  DEFBEAM_SECT                  source/properties/beam/hm_read_prop18.F
-Chd|-- called by -----------
-Chd|        HM_READ_PROP18                source/properties/beam/hm_read_prop18.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    defbeam_sect           ../starter/source/properties/beam/hm_read_prop18.F
+      !||--- called by ------------------------------------------------------
+      !||    hm_read_prop18         ../starter/source/properties/beam/hm_read_prop18.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE DEFBEAM_SECT(GEO,ISECT,INTR,NIP,
      .                        AREA,L,IG,IDTITL)
 C-----------------------------------------------
       USE MESSAGE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -419,21 +425,15 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER ISECT,INTR,NIP,IG
-C     REAL
-      my_real
-     .   AREA,L(6)
-      my_real
-     .   GEO(NPROPG)
-      CHARACTER IDTITL*nchartitle
+      my_real AREA,L(6)
+      my_real  GEO(NPROPG)
+      CHARACTER(LEN=NCHARTITLE)::IDTITL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,IP,NC,NS,IPY,IPZ,IPA 
-C     REAL
-      my_real
-     .    AI,YI,ZI,WI,PHI,DPHI,R1,R2,R3,R4,D2, D3, D4
-      my_real
-     +  W_GAUSS(9,9),A_GAUSS(9,9),W_LOBATTO(9,9),A_LOBATTO(9,9),LEN(10)
+      INTEGER I,J,IP,NC,NS,IPY,IPZ,IPA
+      my_real AI,YI,ZI,WI,PHI,DPHI,R1,R2,R3,R4,D2, D3, D4
+      my_real W_GAUSS(9,9),A_GAUSS(9,9),W_LOBATTO(9,9),A_LOBATTO(9,9),LEN(10)
 C-----------------------------------------------
       DATA W_GAUSS / 
      1 2.               ,0.               ,0.               ,

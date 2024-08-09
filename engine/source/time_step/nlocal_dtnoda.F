@@ -20,14 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  NLOCAL_DTNODA                 source/time_step/nlocal_dtnoda.F
-Chd|-- called by -----------
-Chd|        RESOL                         source/engine/resol.F         
-Chd|-- calls ---------------
-Chd|        MY_BARRIER                    source/system/machine.F       
-Chd|        NLOCAL_REG_MOD                ../common_source/modules/nlocal_reg_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    nlocal_dtnoda    ../engine/source/time_step/nlocal_dtnoda.F
+      !||--- called by ------------------------------------------------------
+      !||    resol            ../engine/source/engine/resol.F
+      !||--- calls      -----------------------------------------------------
+      !||    my_barrier       ../engine/source/system/machine.F
+      !||--- uses       -----------------------------------------------------
+      !||    nlocal_reg_mod   ../common_source/modules/nlocal_reg_mod.F
+      !||====================================================================
       SUBROUTINE NLOCAL_DTNODA(NODFT    ,NODLT    ,NLOC_DMG ,DTNOD_NLOCAL, DT2T )
 C-----------------------------------------------
 C   M o d u l e s
@@ -66,6 +67,7 @@ C-----------------------------------------------
       ! Coefficient for non-local stability to take into account damping
       my_real, PARAMETER :: CDAMP = 0.7D0
 C  
+      DTNOD = EP20
       IF (NODADT > 0) THEN
 C
         ! Recovering nodal stiffness and masses
@@ -75,7 +77,6 @@ C
         ! Allocating non-local nodal timestep table
         ALLOCATE(DTN(NLOC_DMG%L_NLOC))
         DTN(1:NLOC_DMG%L_NLOC) = ZERO   
-        DTNOD = EP20
 C
         ! Determining the minimum of non-local nodal timestep
         DO N = NODFT,NODLT
@@ -116,10 +117,12 @@ C
           DTNOD = DTMIN1(11)*(SQRT(CSTA))
         ENDIF 
 C
+#include "lockon.inc"
         ! Classical nodal timestep check
         IF (DTNOD < DT2T) THEN
           DT2T = MIN(DT2T,DTNOD)
         ENDIF
+#include "lockoff.inc"
 C       
         ! Resetting non-local nodal stiffness
         DO N = NODFT,NODLT

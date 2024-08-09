@@ -20,18 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  HM_BIGBOX                     source/model/box/hm_bigbox.F  
-Chd|-- called by -----------
-Chd|        HM_LECGRN                     source/groups/hm_lecgrn.F     
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        BOXBOX                        source/model/box/boxbox.F     
-Chd|        BOXTAGN                       source/model/box/bigbox.F     
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        OPTIONDEF_MOD                 ../common_source/modules/optiondef_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_bigbox              ../starter/source/model/box/hm_bigbox.F
+      !||--- called by ------------------------------------------------------
+      !||    hm_lecgrn              ../starter/source/groups/hm_lecgrn.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    boxbox                 ../starter/source/model/box/boxbox.F
+      !||    boxtagn                ../starter/source/model/box/bigbox.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE HM_BIGBOX(X   ,FLAG,NNOD ,
      .                  SKEW,IGS    ,ISKN ,ITABM1,IBOX   ,
      .                  ID  ,IBUFBOX,IADB ,TITR,KEY,NN,
@@ -42,6 +41,7 @@ C-----------------------------------------------
       USE GROUPDEF_MOD
       USE OPTIONDEF_MOD
       USE MESSAGE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARFIELD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -61,10 +61,8 @@ C-----------------------------------------------
       INTEGER,INTENT(IN) :: IDB
       my_real
      .        X(3,*),SKEW(LSKEW,*)
-      CHARACTER*nchartitle,
-     .   TITR
-      CHARACTER*ncharfield,
-     .   KEY
+      CHARACTER(LEN=NCHARTITLE) :: TITR
+      CHARACTER(LEN=NCHARFIELD) :: KEY
       TYPE (GROUP_)  , DIMENSION(NGRNOD) :: IGRNOD
       TYPE (BOX_)    , DIMENSION(NBBOX)  :: IBOX
 C-----------------------------------------------

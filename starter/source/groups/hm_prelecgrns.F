@@ -20,21 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  HM_PRELECGRNS                 source/groups/hm_prelecgrns.F 
-Chd|-- called by -----------
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|-- calls ---------------
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        HM_GET_INT_ARRAY_INDEX        source/devtools/hm_reader/hm_get_int_array_index.F
-Chd|        HM_OPTION_READ_KEY            source/devtools/hm_reader/hm_option_read_key.F
-Chd|        HM_OPTION_START               source/devtools/hm_reader/hm_option_start.F
-Chd|        USR2SYS                       source/system/sysfus.F        
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_prelecgrns            ../starter/source/groups/hm_prelecgrns.F
+      !||--- called by ------------------------------------------------------
+      !||    lectur                   ../starter/source/starter/lectur.F
+      !||--- calls      -----------------------------------------------------
+      !||    hm_get_int_array_index   ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+      !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    hm_option_read_key       ../starter/source/devtools/hm_reader/hm_option_read_key.F
+      !||    hm_option_start          ../starter/source/devtools/hm_reader/hm_option_start.F
+      !||    usr2sys                  ../starter/source/system/sysfus.F
+      !||--- uses       -----------------------------------------------------
+      !||    hm_option_read_mod       ../starter/share/modules1/hm_option_read_mod.F
+      !||    message_mod              ../starter/share/message_module/message_mod.F
+      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE HM_PRELECGRNS(ITABM1 ,IGRNOD ,LSUBMODEL)
 C-----------------------------------------------
 C   M o d u l e s
@@ -44,6 +44,7 @@ C-----------------------------------------------
       USE GROUPDEF_MOD
       USE SUBMODEL_MOD
       USE HM_OPTION_READ_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARKEY
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -65,9 +66,9 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER J10(10)
       INTEGER I,J,K,ID,NNOD,NL,IGS,KK,JJ,NENTITY,UID,NN
-      CHARACTER TITR*nchartitle,KEY*ncharkey,MESS*40,KEY2*ncharkey
-      CHARACTER*nchartitle,
-     .   TITR1
+      CHARACTER(LEN=NCHARTITLE) :: TITR,TITR1
+      CHARACTER(LEN=NCHARKEY) :: KEY,KEY2
+      CHARACTER MESS*40
       LOGICAL IS_AVAILABLE
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s

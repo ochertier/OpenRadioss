@@ -20,36 +20,42 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  HM_READ_THGROU                source/output/th/hm_read_thgrou.F
-Chd|-- called by -----------
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        FRETITL                       source/starter/freform.F      
-Chd|        HM_OPTION_COUNT               source/devtools/hm_reader/hm_option_count.F
-Chd|        HM_OPTION_READ_KEY            source/devtools/hm_reader/hm_option_read_key.F
-Chd|        HM_OPTION_START               source/devtools/hm_reader/hm_option_start.F
-Chd|        HM_READ_THGRKI                source/output/th/hm_read_thgrki.F
-Chd|        HM_READ_THGRKI_RBODY          source/output/th/hm_read_thgrki_rbody.F
-Chd|        HM_READ_THGRNE                source/output/th/hm_read_thgrne.F
-Chd|        HM_READ_THGRNS                source/output/th/hm_read_thgrns.F
-Chd|        HM_READ_THGRPA                source/output/th/hm_read_thgrpa.F
-Chd|        HM_READ_THGRPA_SUB            source/output/th/hm_read_thgrpa.F
-Chd|        HM_READ_THGRSENS              source/output/th/hm_read_thgrsens.F
-Chd|        HM_READ_THGRSURF              source/output/th/hm_read_thgrsurf.F
-Chd|        HM_THGRKI_VENT                source/output/th/hm_thgrki_vent.F
-Chd|        THPRIN                        source/output/th/thprin.F     
-Chd|        THPRIN_SUB                    source/output/th/thprin.F     
-Chd|        UDOUBLE                       source/system/sysfus.F        
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        MAPPING_OPTION_MOD            share/modules1/dichotomy_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        MONVOL_STRUCT_MOD             share/modules1/monvol_struct_mod.F
-Chd|        SENSOR_MOD                    share/modules1/sensor_mod.F   
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_read_thgrou         ../starter/source/output/th/hm_read_thgrou.F
+      !||--- called by ------------------------------------------------------
+      !||    lectur                 ../starter/source/starter/lectur.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    fretitl                ../starter/source/starter/freform.F
+      !||    hm_option_count        ../starter/source/devtools/hm_reader/hm_option_count.F
+      !||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
+      !||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
+      !||    hm_read_thgrki         ../starter/source/output/th/hm_read_thgrki.F
+      !||    hm_read_thgrki_rbody   ../starter/source/output/th/hm_read_thgrki_rbody.F
+      !||    hm_read_thgrne         ../starter/source/output/th/hm_read_thgrne.F
+      !||    hm_read_thgrns         ../starter/source/output/th/hm_read_thgrns.F
+      !||    hm_read_thgrpa         ../starter/source/output/th/hm_read_thgrpa.F
+      !||    hm_read_thgrpa_sub     ../starter/source/output/th/hm_read_thgrpa.F
+      !||    hm_read_thgrsens       ../starter/source/output/th/hm_read_thgrsens.F
+      !||    hm_read_thgrsurf       ../starter/source/output/th/hm_read_thgrsurf.F
+      !||    hm_thgrki_vent         ../starter/source/output/th/hm_thgrki_vent.F
+      !||    th_titles              ../starter/source/output/th/th_titles.F90
+      !||    thprin                 ../starter/source/output/th/thprin.F
+      !||    thprin_sub             ../starter/source/output/th/thprin.F
+      !||    udouble                ../starter/source/system/sysfus.F
+      !||    ulist2s                ../starter/source/system/sysfus.F
+      !||    usr2sys                ../starter/source/system/sysfus.F
+      !||    write_thnms1           ../starter/source/output/th/write_thnms1.F90
+      !||--- uses       -----------------------------------------------------
+      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+      !||    mapping_option_mod     ../starter/share/modules1/dichotomy_mod.F
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    monvol_struct_mod      ../starter/share/modules1/monvol_struct_mod.F
+      !||    sensor_mod             ../starter/share/modules1/sensor_mod.F
+      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+      !||    th_titles_mod          ../starter/source/output/th/th_titles.F90
+      !||    write_thnms1_mod       ../starter/source/output/th/write_thnms1.F90
+      !||====================================================================
       SUBROUTINE HM_READ_THGROU(
      1      ITHGRP        ,ITHBUF        ,ITAB             ,ITABM1            ,IXTG          ,
      2      IXS           ,IXQ           ,IXC              ,IXT               ,IXP           ,
@@ -78,6 +84,7 @@ C-----------------------------------------------
       USE INTERFACES_MOD
       USE th_titles_mod
       USE write_thnms1_mod
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARLINE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -134,8 +141,9 @@ C-----------------------------------------------
      .        OK,IGS,IGRS,NSU,K,L,CONT,IAD0,IADV,NTRI,NL,
      .        IFITMP,IADFIN,NUMEL,NV,NVAR,M,N,IAD2,IAD,NSNE,NNE,ISK,
      .        NVALL,TAGP,TAGS,IFIX_TMP,IBID,NIN
-      CHARACTER TITR*nchartitle,MESS*40,KEY*ncharline,COPT*ncharline,
-     .        TITR1*nchartitle
+      CHARACTER(LEN=NCHARTITLE) :: TITR,TITR1
+      CHARACTER MESS*40
+      CHARACTER(LEN=NCHARLINE) :: KEY,COPT
       INTEGER NVARN,NVARN1,NVARN1A,NVARN2,NVARNPINCH,NVARS,NVARC,NVART,NVARP,NVARR,NVARUR
       INTEGER NVARS1,NVARS2,NVARS3,NVARS4,NVARS5,NVARS6,NVARS7,NVARS8,NVARS9,NVARSNLOC
       INTEGER NVARNS,NVARSPH
@@ -3070,54 +3078,6 @@ c
         ENDDO
       ENDIF
 C
-C=======================================================================
-C NB of UNDEFINED TH SELECTED NODE FOR INVERS>=40
-C ( for INVERS LT 40, REFER TO LECNOD )
-C=======================================================================
-c      CHNOD = 9
-c      CALL ANCHECK(CHNOD)
-C=======================================================================
-C NB of UNDEFINED TH SELECTED SHEL FOR INVERS>=40
-C ( for INVERS LT 40, REFER TO LEC16C )
-C=======================================================================
-c      CHELT = 19
-c      CALL ANCHECK(CHELT)
-C=======================================================================
-C NB of UNDEFINED TH SELECTED TRUSS FOR INVERS>=40
-C ( for INVERS LT 40, REFER TO LEC16T )
-C=======================================================================
-c      CHELT = 25
-c      CALL ANCHECK(CHELT)
-C=======================================================================
-C NB of UNDEFINED TH SELECTED BEAM FOR INVERS>=40
-C ( for INVERS LT 40, REFER TO LEC16P )
-C=======================================================================
-c      CHELT = 32
-c      CALL ANCHECK(CHELT)
-C=======================================================================
-C NB of UNDEFINED TH SELECTED SPRING FOR INVERS>=40
-C ( for INVERS LT 40, REFER TO LECELR )
-C=======================================================================
-c      CHELT = 39
-c      CALL ANCHECK(CHELT)
-C=======================================================================
-C NB of UNDEFINED TH SELECTED SHELL3N FOR INVERS>=40
-C ( for INVERS LT 40, REFER TO C3LECEL )
-C=======================================================================
-c      CHELT = 46
-c      CALL ANCHECK(CHELT)
-C=======================================================================
-C NB of UNDEFINED TH SELECTED INTERFACE FOR INVERS>=40
-C ( for INVERS LT 40, REFER TO  )
-C=======================================================================
-c      CHELT = 62
-c      CALL ANCHECK(CHELT)
-C=======================================================================
-C NB of UNDEFINED TH SELECTED JOINT FOR INVERS>=40
-C ( for INVERS LT 40, REFER TO  )
-C=======================================================================
-c      CHELT = 84
-c      CALL ANCHECK(CHELT)
       DO N=1,NPART
         IF(IPART(8,N)>0) NSMAT=NSMAT+1
       ENDDO

@@ -20,30 +20,30 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  HM_READ_RWALL_SPHER           source/constraints/general/rwall/hm_read_rwall_spher.F
-Chd|-- called by -----------
-Chd|        READ_RWALL                    source/constraints/general/rwall/read_rwall.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        ANODSET                       source/output/analyse/analyse_node.c
-Chd|        FRETITL                       source/starter/freform.F      
-Chd|        HM_GET_FLOATV                 source/devtools/hm_reader/hm_get_floatv.F
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        HM_OPTION_READ_KEY            source/devtools/hm_reader/hm_option_read_key.F
-Chd|        HM_OPTION_START               source/devtools/hm_reader/hm_option_start.F
-Chd|        KINSET                        source/constraints/general/kinset.F
-Chd|        REMOVE_ND                     source/elements/solid/solide10/dim_s10edg.F
-Chd|        SUBROTPOINT                   source/model/submodel/subrot.F
-Chd|        SUBROTVECT                    source/model/submodel/subrot.F
-Chd|        NGR2USR                       source/system/nintrr.F        
-Chd|        USR2SYS                       source/system/sysfus.F        
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        R2R_MOD                       share/modules1/r2r_mod.F      
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_read_rwall_spher    ../starter/source/constraints/general/rwall/hm_read_rwall_spher.F
+      !||--- called by ------------------------------------------------------
+      !||    read_rwall             ../starter/source/constraints/general/rwall/read_rwall.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    anodset                ../starter/source/output/analyse/analyse_node.c
+      !||    fretitl                ../starter/source/starter/freform.F
+      !||    hm_get_floatv          ../starter/source/devtools/hm_reader/hm_get_floatv.F
+      !||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
+      !||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
+      !||    kinset                 ../starter/source/constraints/general/kinset.F
+      !||    ngr2usr                ../starter/source/system/nintrr.F
+      !||    remove_nd              ../starter/source/elements/solid/solide10/dim_s10edg.F
+      !||    subrotpoint            ../starter/source/model/submodel/subrot.F
+      !||    subrotvect             ../starter/source/model/submodel/subrot.F
+      !||    usr2sys                ../starter/source/system/sysfus.F
+      !||--- uses       -----------------------------------------------------
+      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    r2r_mod                ../starter/share/modules1/r2r_mod.F
+      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE HM_READ_RWALL_SPHER(RWL     ,NPRW    ,LPRW    ,IFI     ,MS      ,
      .                               V       ,ITAB    ,ITABM1  ,X       ,IKINE   ,
      .                               IGRNOD  ,MFI     ,IMERGE  ,UNITAB  ,IDDLEVEL,
@@ -60,6 +60,7 @@ C-----------------------------------------------
       USE R2R_MOD
       USE GROUPDEF_MOD
       USE HM_OPTION_READ_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARKEY
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -86,7 +87,6 @@ C-----------------------------------------------
       INTEGER NPRW(*), LPRW(*), ITAB(*), ITABM1(*),
      .        IKINE(*), IMERGE(*),ITAGND(*),IKINE1(3*NUMNOD)
       TYPE(SUBMODEL_DATA) LSUBMODEL(*)
-C     REAL
       my_real
      .   RWL(NRWLP,*), MS(*), V(3,*), X(3,*),
      .   RTRANS(NTRANSF,*)
@@ -102,7 +102,9 @@ C-----------------------------------------------
       my_real
      .   DIST, FRIC, DIAM, XMAS, VX, VY, VZ,
      .   X1, Y1, Z1, DISN, X2, Y2, Z2, X3, FREQ, ALPHA, FAC_M_R2R
-      CHARACTER MESS*40,OPT*ncharkey, TITR*nchartitle
+      CHARACTER MESS*40
+      CHARACTER(LEN=NCHARKEY) :: OPT
+      CHARACTER(LEN=NCHARTITLE) :: TITR
       LOGICAL :: IS_AVAILABLE
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s

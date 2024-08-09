@@ -20,13 +20,12 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  CNCOEF3B                      source/elements/sh3n/coquedk/cncoef3.F
-Chd|-- called by -----------
-Chd|        CZFORC3                       source/elements/shell/coquez/czforc3.F
-Chd|        CZFORC3_CRK                   source/elements/xfem/czforc3_crk.F
-Chd|-- calls ---------------
-Chd|====================================================================
+      !||====================================================================
+      !||    cncoef3b      ../engine/source/elements/sh3n/coquedk/cncoef3.F
+      !||--- called by ------------------------------------------------------
+      !||    czforc3       ../engine/source/elements/shell/coquez/czforc3.F
+      !||    czforc3_crk   ../engine/source/elements/xfem/czforc3_crk.F
+      !||====================================================================
       SUBROUTINE CNCOEF3B(JFT    ,JLT     ,PM     ,MAT    ,GEO    ,
      2                    PID    ,AREA    ,SHF    ,THK0   ,
      3                    THK02  ,NU      ,G      ,YM     ,
@@ -286,14 +285,13 @@ c-----------
       RETURN
       END
 
-Chd|====================================================================
-Chd|  CNCOEF3                       source/elements/sh3n/coquedk/cncoef3.F
-Chd|-- called by -----------
-Chd|        CBAFORC3                      source/elements/shell/coqueba/cbaforc3.F
-Chd|        CDK6FORC3                     source/elements/sh3n/coquedk6/cdk6forc3.F
-Chd|        CDKFORC3                      source/elements/sh3n/coquedk/cdkforc3.F
-Chd|-- calls ---------------
-Chd|====================================================================
+      !||====================================================================
+      !||    cncoef3     ../engine/source/elements/sh3n/coquedk/cncoef3.F
+      !||--- called by ------------------------------------------------------
+      !||    cbaforc3    ../engine/source/elements/shell/coqueba/cbaforc3.F
+      !||    cdk6forc3   ../engine/source/elements/sh3n/coquedk6/cdk6forc3.F
+      !||    cdkforc3    ../engine/source/elements/sh3n/coquedk/cdkforc3.F
+      !||====================================================================
       SUBROUTINE CNCOEF3(JFT     ,JLT     ,PM      ,MAT     ,GEO     ,
      2                   PID     ,OFF     ,AREA    ,SHF     ,THK0    ,
      3                   THK02   ,NU      ,G       ,YM      ,
@@ -460,13 +458,12 @@ c
 c-----------
       RETURN
       END
-Chd|====================================================================
-Chd|  C3COEFRZ3                     source/elements/sh3n/coquedk/cncoef3.F
-Chd|-- called by -----------
-Chd|        C3FORC3                       source/elements/sh3n/coque3n/c3forc3.F
-Chd|        C3FORC3_CRK                   source/elements/xfem/c3forc3_crk.F
-Chd|-- calls ---------------
-Chd|====================================================================
+      !||====================================================================
+      !||    c3coefrz3     ../engine/source/elements/sh3n/coquedk/cncoef3.F
+      !||--- called by ------------------------------------------------------
+      !||    c3forc3       ../engine/source/elements/sh3n/coque3n/c3forc3.F
+      !||    c3forc3_crk   ../engine/source/elements/xfem/c3forc3_crk.F
+      !||====================================================================
       SUBROUTINE C3COEFRZ3(JFT    ,JLT     ,G  ,KRZ   ,AREA   ,THK   )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -501,31 +498,34 @@ C
 
       RETURN
       END
-Chd|====================================================================
-Chd|  CNCOEFORT                     source/elements/sh3n/coquedk/cncoef3.F
-Chd|-- called by -----------
-Chd|        CZFORC3                       source/elements/shell/coquez/czforc3.F
-Chd|        CZFORC3_CRK                   source/elements/xfem/czforc3_crk.F
-Chd|-- calls ---------------
-Chd|        CCTOGLOB                      source/elements/shell/coqueba/cmatc3.F
-Chd|        GEPM_LC                       source/elements/shell/coqueba/cmatc3.F
-Chd|        LAYINI                        source/elements/shell/coque/layini.F
-Chd|        DRAPE_MOD                     share/modules/drape_mod.F     
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
-Chd|        STACK_MOD                     share/modules/stack_mod.F     
-Chd|====================================================================
+      !||====================================================================
+      !||    cncoefort      ../engine/source/elements/sh3n/coquedk/cncoef3.F
+      !||--- called by ------------------------------------------------------
+      !||    czforc3        ../engine/source/elements/shell/coquez/czforc3.F
+      !||    czforc3_crk    ../engine/source/elements/xfem/czforc3_crk.F
+      !||--- calls      -----------------------------------------------------
+      !||    cctoglob       ../engine/source/elements/shell/coqueba/cmatc3.F
+      !||    gepm_lc        ../engine/source/elements/shell/coqueba/cmatc3.F
+      !||    layini         ../engine/source/elements/shell/coque/layini.F
+      !||--- uses       -----------------------------------------------------
+      !||    drape_mod      ../engine/share/modules/drape_mod.F
+      !||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
+      !||    mat_elem_mod   ../common_source/modules/mat_elem/mat_elem_mod.F90
+      !||    stack_mod      ../engine/share/modules/stack_mod.F
+      !||====================================================================
       SUBROUTINE CNCOEFORT(JFT    ,JLT     ,PM        ,MAT     ,GEO    ,
      1                     PID    ,MTN     ,NPT       ,HM      ,HF     ,
      2                     HC     ,HMFOR   ,IORTH     ,DIR     ,IGEO   ,
      3                     ISUBSTACK,STACK ,ELBUF_STR ,NLAY    ,THK    ,
      4                     DRAPE  ,NFT     ,NEL       ,INDX_DRAPE, THKE,
-     5                     SEDRAPE,   NUMEL_DRAPE)
+     5                     SEDRAPE,   NUMEL_DRAPE     ,MAT_ELEM)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE ELBUFDEF_MOD
       USE STACK_MOD
       USE DRAPE_MOD
+      USE MAT_ELEM_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -553,6 +553,7 @@ C     REAL
       TYPE (STACK_PLY) :: STACK
       TYPE(ELBUF_STRUCT_) :: ELBUF_STR
       TYPE (DRAPE_) :: DRAPE(NUMEL_DRAPE)
+      TYPE (MAT_ELEM_) ,INTENT(IN) :: MAT_ELEM
 C-----------------------------------------------
 c FUNCTION:   stiffness modulus matrix build For hourglass stress compute
 c
@@ -581,26 +582,21 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,MX,IPID,J,J1,J2,J3,JJ,L,IGTYP,
      .        ISUBSTACK,IGMAT,IPOS,IPT_ALL,ILAY,IPT,IT,NPTT,
-     .        LAYNPT_MAX, NLAY_MAX
+     .        LAYNPT_MAX, NLAY_MAX,ILAW_PLY
             INTEGER MAT_IPLY(MVSIZ,NPT)
       INTEGER, DIMENSION(:)   , ALLOCATABLE :: MATLY   !! 
       my_real, DIMENSION(:)   , ALLOCATABLE :: THKLY   !! 
       my_real, DIMENSION(:,:) , ALLOCATABLE :: POSLY,THK_LY
       my_real
-     .   WMC,FACG,COEF,WM
+     .   WMC,FACG,COEF,WM,A11,E11,NU,A12,G
       my_real
      .   HMOR(MVSIZ,2),HMLY(MVSIZ,4),HCLY(MVSIZ,2), 
      .   HMORLY(MVSIZ,2),SHF(MVSIZ),IZZ(MVSIZ),IZ(MVSIZ)
 C--------IORTH=2 -> HMFOR couplage non-null----------------
-      IF (MTN == 19.OR.MTN == 15.OR.MTN == 25.OR.MTN == 119) THEN
-        IORTH=1
-      ELSE
-        IORTH=0
-      ENDIF
       IGTYP = IGEO(11,PID(1))
       IGMAT = IGEO(98,PID(1))
       IPOS  = IGEO(99,PID(1))
-C
+      IORTH = 0
       ! Npt_max
       LAYNPT_MAX = 1
       IF(IGTYP == 51 .OR. IGTYP == 52) THEN
@@ -611,7 +607,41 @@ C
       NLAY_MAX   = MAX(NLAY,NPT, ELBUF_STR%NLAY)
       ALLOCATE(MATLY(MVSIZ*NLAY_MAX), THKLY(MVSIZ*NLAY_MAX*LAYNPT_MAX),
      .         POSLY(MVSIZ,NLAY_MAX*LAYNPT_MAX),THK_LY(NEL,NLAY_MAX*LAYNPT_MAX))
-C
+      IF (IGTYP == 11 .OR. IGTYP == 17 ) THEN
+           CALL LAYINI(ELBUF_STR,JFT      ,JLT      ,GEO      ,IGEO    , 
+     .                    MAT      ,PID      ,THKLY    ,MATLY    ,POSLY   , 
+     .                    IGTYP    ,0        ,0        ,NLAY     ,NPT     , 
+     .                    ISUBSTACK,STACK    ,DRAPE    ,NFT      ,THKE    ,
+     .                    JLT      ,THK_LY   ,INDX_DRAPE, SEDRAPE,NUMEL_DRAPE)
+           DO J=1,NPT
+                J2=1+(J-1)*JLT
+                 MX  = MATLY(J2)
+                 ILAW_PLY = MAT_ELEM%MAT_PARAM(MX)%ILAW 
+                 IF(ILAW_PLY == 15. OR. ILAW_PLY == 25) THEN
+                     IORTH = 1
+                     EXIT 
+                 ENDIF
+           ENDDO
+      ELSEIF( IGTYP == 51 .OR. IGTYP == 52) THEN
+          CALL LAYINI(ELBUF_STR,JFT      ,JLT      ,GEO      ,IGEO    , 
+     .                    MAT      ,PID      ,THKLY    ,MATLY    ,POSLY   , 
+     .                    IGTYP    ,0        ,0        ,NLAY     ,NPT     , 
+     .                    ISUBSTACK,STACK    ,DRAPE    ,NFT      ,THKE    ,
+     .                    JLT      ,THK_LY   ,INDX_DRAPE, SEDRAPE,NUMEL_DRAPE)           
+          DO ILAY=1,NLAY
+                    J1 = 1+(ILAY-1)*JLT       ! JMLY
+                    MX  = MATLY(J1)
+                    ILAW_PLY = MAT_ELEM%MAT_PARAM(MX)%ILAW 
+                    IF(ILAW_PLY == 15 .OR. ILAW_PLY == 25 ) THEN
+                      IORTH  = 1
+                      EXIT
+                    ENDIF
+           ENDDO
+      ELSEIF(MTN == 19 .OR. MTN == 15  .OR.  MTN == 25 .OR. MTN == 119) THEN
+        IORTH=1
+      ELSE
+        IORTH=0
+      ENDIF
 C----------unify the factor ONE_OVER_12 after       
       IF (IORTH == 1) THEN
         HMFOR(JFT:JLT,1:6)=ZERO
@@ -641,7 +671,8 @@ C----------unify the factor ONE_OVER_12 after
             HF(I,5)=ONE_OVER_12*HMOR(I,1)
             HF(I,6)=ONE_OVER_12*HMOR(I,2)
           ENDDO
-        ELSEIF (MTN == 15.OR.MTN == 25) THEN
+        ELSEIF ((MTN == 15 .OR. MTN == 25 ) .AND. 
+     .           IGTYP == 9 .OR. IGTYP == 10 ) THEN
           SELECT CASE (IGTYP)
             CASE(9)
               CALL GEPM_LC(JFT,JLT,MAT,PM,SHF,HM,HC)
@@ -656,16 +687,15 @@ C----------unify the factor ONE_OVER_12 after
                 HF(I,5)=ONE_OVER_12*HMOR(I,1)
                 HF(I,6)=ONE_OVER_12*HMOR(I,2)
               ENDDO
-            CASE(10,11,16,17,51,52)
-              CALL LAYINI(ELBUF_STR,JFT      ,JLT      ,GEO      ,IGEO    , 
+            CASE(10)
+                CALL LAYINI(ELBUF_STR,JFT      ,JLT      ,GEO      ,IGEO    , 
      .                    MAT      ,PID      ,THKLY    ,MATLY    ,POSLY   , 
      .                    IGTYP    ,0        ,0        ,NLAY     ,NPT     , 
      .                    ISUBSTACK,STACK    ,DRAPE    ,NFT      ,THKE    ,
      .                    JLT      ,THK_LY   ,INDX_DRAPE, SEDRAPE,NUMEL_DRAPE)                              
-              HM(JFT:JLT,1:6)=ZERO
-              HF(JFT:JLT,1:6)=ZERO
-              HC(JFT:JLT,1:2)=ZERO
-              IF (IGTYP == 10) THEN
+                HM(JFT:JLT,1:6)=ZERO
+                HF(JFT:JLT,1:6)=ZERO
+                HC(JFT:JLT,1:2)=ZERO
                 DO J=1,NPT
                   J2=1+(J-1)*JLT
                   J3=1+(J-1)*JLT*2
@@ -690,10 +720,13 @@ C----------unify the factor ONE_OVER_12 after
                     HF(I,6)=HF(I,6)+WMC*HMORLY(I,2)
                   ENDDO
                 ENDDO 
-              ELSE
-                IORTH=2
-                IF ((IGTYP == 11 .OR. IGTYP == 17).AND. IGMAT > 0) THEN
-C                 
+             END SELECT ! IGTYP = 9, 10, 16  
+            ELSEIF(IGTYP == 11 .OR. IGTYP == 17 .OR. IGTYP == 51 .OR. IGTYP == 52) THEN                            
+              HM(JFT:JLT,1:6)=ZERO
+              HF(JFT:JLT,1:6)=ZERO
+              HC(JFT:JLT,1:2)=ZERO
+              IORTH=2
+              IF ((IGTYP == 11 .OR. IGTYP == 17).AND. IGMAT > 0) THEN         
                   DO I=JFT,JLT
                     IZZ(I) = ZERO
                     IZ(I) = ZERO
@@ -702,7 +735,25 @@ C
                   DO J=1,NPT
                     J2=1+(J-1)*JLT
                     J3=1+(J-1)*JLT*2
-                    CALL GEPM_LC(JFT,JLT,MATLY(J2),PM,SHF,HMLY,HCLY)
+                    MX  = MATLY(J2)
+                    ILAW_PLY = MAT_ELEM%MAT_PARAM(MX)%ILAW 
+                    IF(ILAW_PLY == 15 .OR. ILAW_PLY == 25 ) THEN
+                       CALL GEPM_LC(JFT,JLT,MATLY(J2),PM,SHF,HMLY,HCLY)
+                    ELSE
+                        NU   =PM(21,MX)
+                       !! E    =PM(21,MX)
+                        G    =PM(22,MX)
+                        A11  =PM(24,MX) ! E/(one - nu*nu)
+                        A12  = NU*A11
+                        DO I=JFT,JLT
+                           HMLY(I,1)=A11
+                           HMLY(I,2)=A11
+                           HMLY(I,3)=A12
+                           HMLY(I,4)=G
+                           HCLY(I,1)=G*SHF(I)
+                           HCLY(I,2)=G*SHF(I)
+                        ENDDO
+                    ENDIF   
                     CALL CCTOGLOB(JFT,JLT,HMLY,HCLY,HMORLY,DIR(J3),NEL)
                     DO I=JFT,JLT
                       JJ = J2 - 1 + I
@@ -715,7 +766,7 @@ C
                       HC(I,1)=HC(I,1)+THKLY(JJ)*HCLY(I,1)
                       HC(I,2)=HC(I,2)+THKLY(JJ)*HCLY(I,2)
                       HM(I,5)=HM(I,5)+THKLY(JJ)*HMORLY(I,1)
-                      HM(I,6)=HM(I,6)+THKLY(JJ)*HMORLY(I,2)
+                      HM(I,6)=HM(I,6)+THKLY(JJ)*HMORLY(I,2)                    
                       IZZ(I) = IZZ(I) + WMC 
                       IZ(I) = IZ(I) + WM 
 C                
@@ -740,7 +791,25 @@ C
                   DO J=1,NPT
                     J2=1+(J-1)*JLT
                     J3=1+(J-1)*JLT*2
-                    CALL GEPM_LC(JFT,JLT,MATLY(J2),PM,SHF,HMLY,HCLY)
+                    MX  = MATLY(J2)
+                    ILAW_PLY = MAT_ELEM%MAT_PARAM(MX)%ILAW 
+                    IF(ILAW_PLY == 15 .OR. ILAW_PLY == 25 ) THEN
+                       CALL GEPM_LC(JFT,JLT,MATLY(J2),PM,SHF,HMLY,HCLY)
+                    ELSE
+                        NU   =PM(21,MX)
+                       !! E    =PM(21,MX)
+                        G    =PM(22,MX)
+                        A11  =PM(24,MX) ! E/(one - nu*nu)
+                        A12  = NU*A11
+                        DO I=JFT,JLT
+                           HMLY(I,1)=A11
+                           HMLY(I,2)=A11
+                           HMLY(I,3)=A12
+                           HMLY(I,4)=G
+                           HCLY(I,1)=G*SHF(I)
+                           HCLY(I,2)=G*SHF(I)
+                        ENDDO
+                    ENDIF   
                     CALL CCTOGLOB(JFT,JLT,HMLY,HCLY,HMORLY,DIR(J3),NEL)
                     DO I=JFT,JLT
                       JJ = J2 - 1 + I
@@ -786,7 +855,25 @@ C
                     J2 = 1+(IPT-1)*JLT        ! THKLY
                     J3 = 1+(ILAY-1)*JLT*2     ! JDIR
                     J = IPT                   ! JPOS
-                    CALL GEPM_LC(JFT,JLT,MATLY(J1),PM,SHF,HMLY,HCLY)
+                    MX  = MATLY(J1)
+                    ILAW_PLY = MAT_ELEM%MAT_PARAM(MX)%ILAW 
+                    IF(ILAW_PLY == 15 .OR. ILAW_PLY == 25 ) THEN
+                      CALL GEPM_LC(JFT,JLT,MATLY(J1),PM,SHF,HMLY,HCLY)
+                    ELSE
+                        NU   =PM(21,MX)
+                       !! E    =PM(21,MX)
+                        G    =PM(22,MX)
+                        A11  =PM(24,MX) ! E/(one - nu*nu)
+                        A12  = NU*A11
+                        DO I=JFT,JLT
+                           HMLY(I,1)=A11
+                           HMLY(I,2)=A11
+                           HMLY(I,3)=A12
+                           HMLY(I,4)=G
+                           HCLY(I,1)=G*SHF(I)
+                           HCLY(I,2)=G*SHF(I)
+                        ENDDO
+                    ENDIF   
                     CALL CCTOGLOB(JFT,JLT,HMLY,HCLY,HMORLY,DIR(J3),NEL)
 C
                     DO I=JFT,JLT
@@ -831,7 +918,25 @@ C-----------
                     J2 = 1+(IPT-1)*JLT        ! THKY
                     J3 = 1+(ILAY-1)*JLT*2     ! JDIR
                     J = IPT                   ! POS
-                    CALL GEPM_LC(JFT,JLT,MATLY(J1),PM,SHF,HMLY,HCLY)
+                    MX  = MATLY(J1)
+                    ILAW_PLY = MAT_ELEM%MAT_PARAM(MX)%ILAW 
+                    IF(ILAW_PLY == 15 .OR. ILAW_PLY == 25 ) THEN
+                      CALL GEPM_LC(JFT,JLT,MATLY(J1),PM,SHF,HMLY,HCLY)
+                    ELSE
+                        NU   =PM(21,MX)
+                       !! E    =PM(21,MX)
+                        G    =PM(22,MX)
+                        A11  =PM(24,MX) ! E/(one - nu*nu)
+                        A12  = NU*A11
+                        DO I=JFT,JLT
+                           HMLY(I,1)=A11
+                           HMLY(I,2)=A11
+                           HMLY(I,3)=A12
+                           HMLY(I,4)=G
+                           HCLY(I,1)=G*SHF(I)
+                           HCLY(I,2)=G*SHF(I)
+                        ENDDO
+                    ENDIF   
                     CALL CCTOGLOB(JFT,JLT,HMLY,HCLY,HMORLY,DIR(J3),NEL)
 C
                     DO I=JFT,JLT
@@ -865,8 +970,6 @@ C-----------
                   IPT_ALL = IPT_ALL + NPTT
                 ENDDO  !  DO ILAY=1,NLAY
               ENDIF ! igmat + igtyp == 11
-            END IF !(IGTYP==10)
-          END SELECT
         ENDIF !IF (MTN==19)
       ENDIF    ! IF (IORTH==1) THEN
       DEALLOCATE(MATLY, THKLY, POSLY, THK_LY)

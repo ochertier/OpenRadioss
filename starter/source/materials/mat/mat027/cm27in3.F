@@ -20,18 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  CM27IN3                       source/materials/mat/mat027/cm27in3.F
-Chd|-- called by -----------
-Chd|        C3INIT3                       source/elements/sh3n/coque3n/c3init3.F
-Chd|        CINIT3                        source/elements/shell/coque/cinit3.F
-Chd|        CMAINI3                       source/elements/sh3n/coquedk/cmaini3.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        FRETITL2                      source/starter/freform.F      
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    cm27in3                ../starter/source/materials/mat/mat027/cm27in3.F
+      !||--- called by ------------------------------------------------------
+      !||    c3init3                ../starter/source/elements/sh3n/coque3n/c3init3.F
+      !||    cinit3                 ../starter/source/elements/shell/coque/cinit3.F
+      !||    cmaini3                ../starter/source/elements/sh3n/coquedk/cmaini3.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    fretitl2               ../starter/source/starter/freform.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE CM27IN3(ELBUF_STR,
      .                   GEO ,IGEO,PM ,IPM ,IX ,NIX,
      .                   NLAY,IR  ,IS ,IMAT )
@@ -40,6 +40,7 @@ C   M o d u l e s
 C-----------------------------------------------
       USE ELBUFDEF_MOD            
       USE MESSAGE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C INITIALISE LES DIRECTIONS DE FISSURES
 C INITIALISE LES EPAISSEURS ET LES MATERIAUX DES COUCHES
@@ -58,8 +59,7 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IGEO(NPROPGI,*),IX(NIX,*),NIX,IPM(NPROPMI,*),NLAY,IR,IS,IMAT
-      my_real
-     .   GEO(NPROPG,*),PM(NPROPM,*)
+      my_real GEO(NPROPG,*),PM(NPROPM,*)
       TYPE(ELBUF_STRUCT_), TARGET :: ELBUF_STR
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -67,7 +67,7 @@ C-----------------------------------------------
       INTEGER IPTHK,IPMAT,IPPOS,MID,MLN,IMID,IPID,PID
       INTEGER I,N,I1,I2,I3,J,IGTYP,II,L_DMG,ILAYER,IT,NPTT
       my_real THKL,POS0,DP
-      CHARACTER*nchartitle, TITR,TITR1
+      CHARACTER(LEN=NCHARTITLE) :: TITR,TITR1
       my_real, DIMENSION(:), POINTER :: DIR_DMG
 C
       TYPE(BUF_LAY_) ,POINTER :: BUFLY
@@ -81,14 +81,7 @@ C======================================================================|
         MLN = NINT(PM(19,IMID))
         CALL FRETITL2(TITR,IGEO(NPROPGI-LTITR+1,PID),LTITR)
         CALL FRETITL2(TITR1,IPM(NPROPMI-LTITR+1,IMID),LTITR)
-        CALL ANCMSG(MSGID=23,
-     .              ANMODE=ANINFO,
-     .              MSGTYPE=MSGERROR,
-     .              I1=PID,
-     .              C1=TITR,
-     .              I2=MID,
-     .              C2=TITR1,
-     .              I3=27)
+        CALL ANCMSG(MSGID=23, ANMODE=ANINFO, MSGTYPE=MSGERROR, I1=PID, C1=TITR, I2=MID, C2=TITR1, I3=27)
       ENDIF
 C
       IGTYP=NINT(GEO(12,IMAT))

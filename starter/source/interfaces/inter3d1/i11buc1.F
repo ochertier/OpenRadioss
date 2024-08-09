@@ -20,18 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  I11BUC_VOX1                   source/interfaces/inter3d1/i11buc1.F
-Chd|-- called by -----------
-Chd|        ININT3                        source/interfaces/inter3d1/inint3.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        I11TRIVOX1                    source/interfaces/inter3d1/i11trivox1.F
-Chd|        FRONT_MOD                     share/modules1/front_mod.F    
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        TRI11                         share/modules1/tri11_mod.F    
-Chd|        TRI7BOX                       share/modules1/tri7box.F      
-Chd|====================================================================
+      !||====================================================================
+      !||    i11buc_vox1            ../starter/source/interfaces/inter3d1/i11buc1.F
+      !||--- called by ------------------------------------------------------
+      !||    inint3                 ../starter/source/interfaces/inter3d1/inint3.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    i11trivox1             ../starter/source/interfaces/inter3d1/i11trivox1.F
+      !||--- uses       -----------------------------------------------------
+      !||    front_mod              ../starter/share/modules1/front_mod.F
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    tri11                  ../starter/share/modules1/tri11_mod.F
+      !||    tri7box                ../starter/share/modules1/tri7box.F
+      !||====================================================================
        SUBROUTINE I11BUC_VOX1(
      1   X      ,IRECTS  ,IRECTM ,NRTS    ,NMN     ,
      2   NRTM   ,NSN     ,CAND_M ,CAND_S  ,MAXGAP  ,
@@ -49,7 +50,7 @@ C-----------------------------------------------
       USE TRI7BOX 
       USE TRI11   
       USE FRONT_MOD
-
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C============================================================================
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -78,8 +79,7 @@ C     REAL
      .   X(3,*), 
      .   GAP_S(*), GAP_M(*), GAP_S_L(*), GAP_M_L(*)
       INTEGER ID
-      CHARACTER*nchartitle,
-     .   TITR
+      CHARACTER(LEN=NCHARTITLE) :: TITR
       TYPE(INTERSURFP) :: INTERCEP(3,NINTER)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -369,16 +369,17 @@ C
 
 
 
-Chd|====================================================================
-Chd|  I11BUC1                       source/interfaces/inter3d1/i11buc1.F
-Chd|-- called by -----------
-Chd|        I20INI3                       source/interfaces/inter3d1/i20ini3.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        I11STO                        source/interfaces/inter3d1/i11sto.F
-Chd|        I11TRI                        source/interfaces/inter3d1/i11tri.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    i11buc1                ../starter/source/interfaces/inter3d1/i11buc1.F
+      !||--- called by ------------------------------------------------------
+      !||    i20ini3                ../starter/source/interfaces/inter3d1/i20ini3.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    i11sto                 ../starter/source/interfaces/inter3d1/i11sto.F
+      !||    i11tri                 ../starter/source/interfaces/inter3d1/i11tri.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE I11BUC1(
      1   X     ,IRECTM,IRECTS,BUMULT,NRTS,
      2   NMN   ,NRTM ,MWA   ,NSN   ,CAND_M,
@@ -386,7 +387,11 @@ Chd|====================================================================
      4   DIST  ,TZINF,MAXBOX,MINBOX,MSR   ,   
      5   NSV   ,MULTIMP,ADDCM,CHAINE,I_MEM,
      6   ID,TITR,IDDLEVEL,DRAD,IT19)
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
       USE MESSAGE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C============================================================================
 C  cette routine est appelee par : ININT3(/inter3d1/inint3.F)
 C----------------------------------------------------------------------------
@@ -414,13 +419,11 @@ C-----------------------------------------------
       INTEGER IRECTS(2,*),IRECTM(2,*),MWA(*)
       INTEGER CAND_M(*),CAND_S(*),MSR(*),NSV(*),ADDCM(*),CHAINE(2,*),
      *        II_STOK, IDDLEVEL, IT19
-C     REAL
       my_real
      .   X(3,*),XYZM(6,*),DIST,
      .   BUMULT,GAP,TZINF,MAXBOX,MINBOX,DRAD
       INTEGER ID
-      CHARACTER*nchartitle,
-     .   TITR
+      CHARACTER(LEN=NCHARTITLE) :: TITR
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

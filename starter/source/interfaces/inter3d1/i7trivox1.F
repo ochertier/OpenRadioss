@@ -20,17 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  I7TRIVOX1                     source/interfaces/inter3d1/i7trivox1.F
-Chd|-- called by -----------
-Chd|        I7BUC_VOX1                    source/interfaces/inter3d1/i7buc_vox1.F
-Chd|-- calls ---------------
-Chd|        I7CMP3                        source/interfaces/inter3d1/i7cmp3.F
-Chd|        I7COR3                        source/interfaces/inter3d1/i7cor3.F
-Chd|        I7DST3                        source/interfaces/inter3d1/i7dst3.F
-Chd|        I7PEN3                        source/interfaces/inter3d1/i7pen3.F
-Chd|        TRI7BOX                       share/modules1/tri7box.F      
-Chd|====================================================================
+      !||====================================================================
+      !||    i7trivox1              ../starter/source/interfaces/inter3d1/i7trivox1.F
+      !||--- called by ------------------------------------------------------
+      !||    i7buc_vox1             ../starter/source/interfaces/inter3d1/i7buc_vox1.F
+      !||--- calls      -----------------------------------------------------
+      !||    i7cmp3                 ../starter/source/interfaces/inter3d1/i7cmp3.F
+      !||    i7cor3                 ../starter/source/interfaces/inter3d1/i7cor3.F
+      !||    i7dst3                 ../starter/source/interfaces/inter3d1/i7dst3.F
+      !||    i7pen3                 ../starter/source/interfaces/inter3d1/i7pen3.F
+      !||--- uses       -----------------------------------------------------
+      !||    tri7box                ../starter/share/modules1/tri7box.F
+      !||====================================================================
       SUBROUTINE I7TRIVOX1(
      1      NSN    ,I_MEM   ,IRECT    ,X       ,STF     ,
      2      STFN   ,XYZM    ,NSV      ,CAND_N  ,CAND_E  ,
@@ -56,6 +57,7 @@ C============================================================================
 C   M o d u l e s
 C-----------------------------------------------
       USE TRI7BOX
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -120,14 +122,12 @@ C-----------------------------------------------
      .        IRECT(4,*), VOXEL(NBX+2,NBY+2,NBZ+2),ISTF,
      .        I_STOK ,MULTIMP,PROV_N(*),PROV_E(*),J_STOK,
      .        INDEX(*),KREMNODE(*),REMNODE(*)
-C     REAL
       my_real
      .   X(3,*),XYZM(6,2),STF(*),STFN(*),GAP_S(*),GAP_M(*),
      .   TZINF,MARGE,GAP,GAPMIN,GAPMAX,BGAPSMX,DRAD,
      .   CURV_MAX(*),GAP_S_L(*),GAP_M_L(*)
       INTEGER ID
-      CHARACTER*nchartitle,
-     .   TITR
+      CHARACTER(LEN=NCHARTITLE)::TITR
       INTEGER, DIMENSION(MVSIZ), INTENT(INOUT) :: IX11,IX12,IX13,IX14,NSVG
       my_real, DIMENSION(MVSIZ), INTENT(INOUT) :: X1,X2,X3,X4
       my_real, DIMENSION(MVSIZ), INTENT(INOUT) :: Y1,Y2,Y3,Y4

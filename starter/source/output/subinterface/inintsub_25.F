@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  ININTSUB_25                   source/output/subinterface/inintsub_25.F
-Chd|-- called by -----------
-Chd|        ININTSUB                      source/interfaces/interf1/inintsub.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        FRETITL2                      source/starter/freform.F      
-Chd|        BITSET                        source/interfaces/inter3d1/bitget.F
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    inintsub_25            ../starter/source/output/subinterface/inintsub_25.F
+      !||--- called by ------------------------------------------------------
+      !||    inintsub               ../starter/source/interfaces/interf1/inintsub.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    bitset                 ../starter/source/interfaces/inter3d1/bitget.F
+      !||    fretitl2               ../starter/source/starter/freform.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE ININTSUB_25(ITAB      ,IGRNOD ,IGRSURF ,NOM_OPT ,INTBUF_TAB,
      .                       NRTM      ,NRTM0  ,NSN     ,NISUBS  ,NISUBM    ,
      .                       NOINT     ,NI     ,NOD2NSV ,NOD2RTM ,KAD       ,
@@ -42,6 +42,7 @@ C-----------------------------------------------
       USE MESSAGE_MOD  
       USE INTBUFDEF_MOD
       USE GROUPDEF_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -67,8 +68,7 @@ C-----------------------------------------------
      .   JSUB, KSUB, NNE, IS, ISV, CUR, ID1,
      .   NEXT, IM, KM, JAD, IN, II, N,STAT,K1,K2,NT19,INOD,IFNRT
       CHARACTER MESS*40
-      CHARACTER*nchartitle,
-     .   TITR,TITR1
+      CHARACTER(LEN=NCHARTITLE) :: TITR,TITR1
 C-----------------------------------------------
       TYPE (GROUP_)  , DIMENSION(NGRNOD)  :: IGRNOD
       TYPE (SURF_)   , DIMENSION(NSURF)   :: IGRSURF

@@ -20,42 +20,40 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  RINIT3                        source/elements/spring/rinit3.F
-Chd|-- called by -----------
-Chd|        INITIA                        source/elements/initia/initia.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        FRETITL2                      source/starter/freform.F      
-Chd|        R1BUF3                        source/elements/spring/r1buf3.F
-Chd|        R23MASS                       source/elements/spring/rmass.F
-Chd|        R2BUF3                        source/elements/spring/r2buf3.F
-Chd|        R3BUF3                        source/elements/spring/r3buf3.F
-Chd|        R4BUF3                        source/elements/spring/r4buf3.F
-Chd|        R4INI                         source/elements/spring/rinit3.F
-Chd|        R8INI                         source/elements/spring/rinit3.F
-Chd|        RINI1U                        source/elements/spring/rinit3.F
-Chd|        RINI2U                        source/elements/spring/rinit3.F
-Chd|        RINI32                        source/properties/spring/hm_read_prop32.F
-Chd|        RINI33                        source/elements/joint/rjoint/rini33.F
-Chd|        RINI35                        source/elements/spring/rini35.F
-Chd|        RINI36                        source/properties/spring/hm_read_prop36.F
-Chd|        RINI3U                        source/elements/spring/rinit3.F
-Chd|        RINI44                        source/elements/spring/rini44.F
-Chd|        RINI45                        source/elements/joint/rjoint/rini45.F
-Chd|        RINI46                        source/elements/spring/rini46.F
-Chd|        RKINI3                        source/elements/spring/rkini3.F
-Chd|        RMAS12                        source/elements/spring/rmas12.F
-Chd|        RMASS                         source/elements/spring/rmass.F
-Chd|        RUINI                         source/elements/spring/rinit3.F
-Chd|        ST_USERLIB_RINIUSER           source/user_interface/dyn_userlib.c
-Chd|        USER_OUTPUT                   source/user_interface/user_output.F
-Chd|        STRR                          source/tools/univ/strr.F      
-Chd|        BPRELOAD_MOD                  share/modules1/bpreload_mod.F 
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        SEATBELT_MOD                  ../common_source/modules/seatbelt_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    rinit3                 ../starter/source/elements/spring/rinit3.F
+      !||--- called by ------------------------------------------------------
+      !||    initia                 ../starter/source/elements/initia/initia.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    fretitl2               ../starter/source/starter/freform.F
+      !||    r1buf3                 ../starter/source/elements/spring/r1buf3.F
+      !||    r23mass                ../starter/source/elements/spring/rmass.F
+      !||    r2buf3                 ../starter/source/elements/spring/r2buf3.F
+      !||    r3buf3                 ../starter/source/elements/spring/r3buf3.F
+      !||    r4buf3                 ../starter/source/elements/spring/r4buf3.F
+      !||    r4ini                  ../starter/source/elements/spring/rinit3.F
+      !||    r8ini                  ../starter/source/elements/spring/rinit3.F
+      !||    rini1u                 ../starter/source/elements/spring/rinit3.F
+      !||    rini2u                 ../starter/source/elements/spring/rinit3.F
+      !||    rini32                 ../starter/source/properties/spring/hm_read_prop32.F
+      !||    rini33                 ../starter/source/elements/joint/rjoint/rini33.F
+      !||    rini35                 ../starter/source/elements/spring/rini35.F
+      !||    rini36                 ../starter/source/properties/spring/hm_read_prop36.F
+      !||    rini3u                 ../starter/source/elements/spring/rinit3.F
+      !||    rini44                 ../starter/source/elements/spring/rini44.F
+      !||    rini45                 ../starter/source/elements/joint/rjoint/rini45.F
+      !||    rini46                 ../starter/source/elements/spring/rini46.F
+      !||    rkini3                 ../starter/source/elements/spring/rkini3.F
+      !||    rmas12                 ../starter/source/elements/spring/rmas12.F
+      !||    rmass                  ../starter/source/elements/spring/rmass.F
+      !||    ruini                  ../starter/source/elements/spring/rinit3.F
+      !||    user_output            ../starter/source/user_interface/user_output.F
+      !||--- uses       -----------------------------------------------------
+      !||    bpreload_mod           ../starter/share/modules1/bpreload_mod.F
+      !||    format_mod             ../starter/share/modules1/format_mod.F90
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE RINIT3(ELBUF_STR,
      .                  IXR      ,X        ,GEO      ,XMAS   ,NPC   ,
      .                  PLD      ,XIN      ,SKEW     ,DTELEM ,NEL   ,
@@ -72,6 +70,8 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE SEATBELT_MOD
       USE BPRELOAD_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      USE FORMAT_MOD , ONLY : FMT_10I
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -146,8 +146,7 @@ C     REAL
       my_real 
      .     NOISE,BIDON,MAS2,UNDAMP
       INTEGER ID
-      CHARACTER*nchartitle,
-     .   TITR
+      CHARACTER(LEN=NCHARTITLE)::TITR
       CHARACTER OPTION*50
 C
       TYPE(G_BUFEL_),POINTER :: GBUF
@@ -240,8 +239,7 @@ C-----------------
             DO K=1,IADMERGE2(ITMP+1) - IADMERGE2(ITMP)
               KK = KK + 1
               IF (KK  ==  10) THEN
-                WRITE (IOUT,FMT=FMT_10I)
-     .         (ITAB(IMERGE2(IADMERGE2(ITMP)+KK1)),KK1=0,KK-1)
+                WRITE (IOUT,FMT=FMT_10I)(ITAB(IMERGE2(IADMERGE2(ITMP)+KK1)),KK1=0,KK-1)
                 KK = 0
               ENDIF
             ENDDO
@@ -1604,12 +1602,11 @@ C-----
 C-----
       RETURN
       END
-Chd|====================================================================
-Chd|  RINI3U                        source/elements/spring/rinit3.F
-Chd|-- called by -----------
-Chd|        RINIT3                        source/elements/spring/rinit3.F
-Chd|-- calls ---------------
-Chd|====================================================================
+      !||====================================================================
+      !||    rini3u   ../starter/source/elements/spring/rinit3.F
+      !||--- called by ------------------------------------------------------
+      !||    rinit3   ../starter/source/elements/spring/rinit3.F
+      !||====================================================================
       SUBROUTINE RINI3U(OFF  ,GEO  ,X     ,X0    ,IX   ,
      .                  SKEW ,RLOC ,ITAB  ,UIX   ,IGEO )
 C-----------------------------------------------
@@ -1703,12 +1700,11 @@ C
 C
       RETURN
       END
-Chd|====================================================================
-Chd|  RINI1U                        source/elements/spring/rinit3.F
-Chd|-- called by -----------
-Chd|        RINIT3                        source/elements/spring/rinit3.F
-Chd|-- calls ---------------
-Chd|====================================================================
+      !||====================================================================
+      !||    rini1u   ../starter/source/elements/spring/rinit3.F
+      !||--- called by ------------------------------------------------------
+      !||    rinit3   ../starter/source/elements/spring/rinit3.F
+      !||====================================================================
       SUBROUTINE RINI1U(OFF  ,GEO  ,X     ,X0    ,IX   ,
      .                  SKEW ,RLOC ,ITAB  ,UIX   ,IGEO )
 C-----------------------------------------------
@@ -1792,12 +1788,11 @@ C
 C-----------------------------------------------
       RETURN
       END
-Chd|====================================================================
-Chd|  RINI2U                        source/elements/spring/rinit3.F
-Chd|-- called by -----------
-Chd|        RINIT3                        source/elements/spring/rinit3.F
-Chd|-- calls ---------------
-Chd|====================================================================
+      !||====================================================================
+      !||    rini2u   ../starter/source/elements/spring/rinit3.F
+      !||--- called by ------------------------------------------------------
+      !||    rinit3   ../starter/source/elements/spring/rinit3.F
+      !||====================================================================
       SUBROUTINE RINI2U(IXR     ,UMASS ,UINER ,MS    ,XIN,
      .                  PARTSAV ,X     ,V     ,IPART ,MSR,
      .                  INR     ,MSRT  ,EMS   )
@@ -1925,12 +1920,11 @@ C
 C
       RETURN
       END
-Chd|====================================================================
-Chd|  R4INI                         source/elements/spring/rinit3.F
-Chd|-- called by -----------
-Chd|        RINIT3                        source/elements/spring/rinit3.F
-Chd|-- calls ---------------
-Chd|====================================================================
+      !||====================================================================
+      !||    r4ini    ../starter/source/elements/spring/rinit3.F
+      !||--- called by ------------------------------------------------------
+      !||    rinit3   ../starter/source/elements/spring/rinit3.F
+      !||====================================================================
       SUBROUTINE R4INI(SIGRS ,IXR  ,NSIGI ,EINT  ,F   ,
      .                 DL    ,FEP  ,DPL   ,DPL2  ,XL0 ,
      .                 DFS   ,DV   ,IGTYP ,PTSPRI,DL0 ,
@@ -1993,12 +1987,11 @@ C---
 C---
       RETURN
       END
-Chd|====================================================================
-Chd|  R8INI                         source/elements/spring/rinit3.F
-Chd|-- called by -----------
-Chd|        RINIT3                        source/elements/spring/rinit3.F
-Chd|-- calls ---------------
-Chd|====================================================================
+      !||====================================================================
+      !||    r8ini    ../starter/source/elements/spring/rinit3.F
+      !||--- called by ------------------------------------------------------
+      !||    rinit3   ../starter/source/elements/spring/rinit3.F
+      !||====================================================================
       SUBROUTINE R8INI(IGTYP ,NEL  ,SIGRS ,IXR   ,NSIGI,
      .                 FX    ,FY   ,FZ    ,MX    ,MY   ,
      .                 MZ    ,FXEP ,FYEP  ,FZEP  ,XMEP ,
@@ -2116,12 +2109,11 @@ C---
 C---
       RETURN
       END      
-Chd|====================================================================
-Chd|  RUINI                         source/elements/spring/rinit3.F
-Chd|-- called by -----------
-Chd|        RINIT3                        source/elements/spring/rinit3.F
-Chd|-- calls ---------------
-Chd|====================================================================
+      !||====================================================================
+      !||    ruini    ../starter/source/elements/spring/rinit3.F
+      !||--- called by ------------------------------------------------------
+      !||    rinit3   ../starter/source/elements/spring/rinit3.F
+      !||====================================================================
       SUBROUTINE RUINI(
      .                 SIGRS,IXR   ,NSIGI,NUVAR,FX   ,
      .                 FY   ,FZ    ,XMOM ,YMOM ,ZMOM ,

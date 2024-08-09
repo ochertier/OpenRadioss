@@ -20,26 +20,26 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  HM_READ_PCYL                  source/loads/general/load_pcyl/hm_read_pcyl.F
-Chd|-- called by -----------
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        HM_GET_FLOATV                 source/devtools/hm_reader/hm_get_floatv.F
-Chd|        HM_GET_FLOATV_DIM             source/devtools/hm_reader/hm_get_floatv_dim.F
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        HM_OPTION_COUNT               source/devtools/hm_reader/hm_option_count.F
-Chd|        HM_OPTION_READ_KEY            source/devtools/hm_reader/hm_option_read_key.F
-Chd|        HM_OPTION_START               source/devtools/hm_reader/hm_option_start.F
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        LOADS_MOD                     ../common_source/modules/loads/loads_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        SENSOR_MOD                    share/modules1/sensor_mod.F   
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|        TABLE_MOD                     share/modules1/table_mod.F    
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_read_pcyl           ../starter/source/loads/general/load_pcyl/hm_read_pcyl.F
+      !||--- called by ------------------------------------------------------
+      !||    lectur                 ../starter/source/starter/lectur.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    hm_get_floatv          ../starter/source/devtools/hm_reader/hm_get_floatv.F
+      !||    hm_get_floatv_dim      ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
+      !||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    hm_option_count        ../starter/source/devtools/hm_reader/hm_option_count.F
+      !||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
+      !||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
+      !||    ngr2usr                ../starter/source/system/nintrr.F
+      !||--- uses       -----------------------------------------------------
+      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    sensor_mod             ../starter/share/modules1/sensor_mod.F
+      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+      !||    table_mod              ../starter/share/modules1/table_mod.F
+      !||====================================================================
       SUBROUTINE HM_READ_PCYL(LOADS    ,IGRSURF  ,NSENSOR  ,SENSOR_TAB,TABLE  ,
      .                        IFRAME   ,UNITAB   ,LSUBMODEL, NUMBER_LOAD_CYL)
 C-----------------------------------------------
@@ -54,6 +54,7 @@ C-----------------------------------------------
       USE LOADS_MOD
       USE TABLE_MOD
       USE SENSOR_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -85,7 +86,8 @@ C-----------------------------------------------
         INTEGER I,J,LOAD_ID,TABLE_ID,SURF_ID,SENS_ID,FRAME_ID,UID,ISENS,ISS,
      .          NOFRA,SUB_INDX,NSEG,ITABLE,STAT,NLOAD_CYL,IMOV
         my_real :: X_R,X_T,YFAC,FAC_R,FAC_T,FAC_P
-        CHARACTER MESS*40,TITR*nchartitle
+        CHARACTER MESS*40
+        CHARACTER(LEN=NCHARTITLE) :: TITR
         LOGICAL IS_AVAILABLE
         DATA MESS/'CYLINDRICAL PRESSURE LOADS DEFINITION   '/
 C-----------------------------------------------

@@ -20,12 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  MAT87C_SWIFT_VOCE             source/materials/mat/mat087/mat87c_swift_voce.F
-Chd|-- called by -----------
-Chd|        SIGEPS87C                     source/materials/mat/mat087/sigeps87c.F
-Chd|-- calls ---------------
-Chd|====================================================================
+      !||====================================================================
+      !||    mat87c_swift_voce   ../engine/source/materials/mat/mat087/mat87c_swift_voce.F
+      !||--- called by ------------------------------------------------------
+      !||    sigeps87c           ../engine/source/materials/mat/mat087/sigeps87c.F
+      !||====================================================================
       SUBROUTINE MAT87C_SWIFT_VOCE(
      1     NEL    ,NUPARAM ,NUVAR   ,TIME    ,TIMESTEP ,
      3     UPARAM ,UVAR    ,RHO0    ,THKLY   ,THK      ,
@@ -35,7 +34,7 @@ Chd|====================================================================
      8     SIGNXX ,SIGNYY  ,SIGNXY  ,SIGNYZ  ,SIGNZX   ,
      9     SOUNDSP,PLA     ,DPLA    ,EPSP    ,YLD      ,
      B     ETSE   ,GS      ,ISRATE  ,ASRATE  ,OFF      ,
-     C     SIGB   ,INLOC   ,DPLANL  ,SEQ     )
+     C     SIGB   ,INLOC   ,DPLANL  ,SEQ     ,LOFF     )
 C=======================================================================
 C   BARLAT YLD2000 material model iflag=1 swift voce yield
 C=======================================================================
@@ -91,6 +90,7 @@ C-----------------------------------------------
      .   DEPSXY(NEL),DEPSYZ(NEL),DEPSZX(NEL),
      .   SIGOXX(NEL),SIGOYY(NEL),FACYLDI(NEL),
      .   SIGOXY(NEL),SIGOYZ(NEL),SIGOZX(NEL)
+      my_real, DIMENSION(NEL), INTENT(IN) :: LOFF
 C-----------------------------------------------
 C   O U T P U T   A r g u m e n t s
 C-----------------------------------------------
@@ -678,7 +678,7 @@ c
         UVAR(I,2)  = YLD(I)
         SEQ(I)     = SIG(I)/NORM_SP
         DEELZZ(I ) = -NU*(SIGNXX(I)-SIGOXX(I)+SIGNYY(I)-SIGOYY(I))/E
-        IF (INLOC > 0) THEN
+        IF ((INLOC > 0).AND.(LOFF(I) == ONE)) THEN
           NORMSIG = SIGNXX(I)*SIGNXX(I) + SIGNYY(I)*SIGNYY(I) 
      .            + TWO*SIGNXY(I)*SIGNXY(I)
           IF (NORMSIG > ZERO) THEN

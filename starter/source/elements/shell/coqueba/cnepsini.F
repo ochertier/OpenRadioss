@@ -20,18 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  CNEPSINI                      source/elements/shell/coqueba/cnepsini.F
-Chd|-- called by -----------
-Chd|        CBAINIT3                      source/elements/shell/coqueba/cbainit3.F
-Chd|-- calls ---------------
-Chd|        CDEFOI                        source/elements/shell/coque/cepsini.F
-Chd|        CMLAWI                        source/elements/shell/coque/cepsini.F
-Chd|        CNEVECI                       source/elements/shell/coqueba/cneveci.F
-Chd|        CORTH3                        source/elements/shell/coque/corth3.F
-Chd|        CPXPYI                        source/elements/shell/coque/cepsini.F
-Chd|        MAT_ELEM_MOD                  ../common_source/modules/mat_elem/mat_elem_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    cnepsini       ../starter/source/elements/shell/coqueba/cnepsini.F
+      !||--- called by ------------------------------------------------------
+      !||    cbainit3       ../starter/source/elements/shell/coqueba/cbainit3.F
+      !||--- calls      -----------------------------------------------------
+      !||    cdefoi         ../starter/source/elements/shell/coque/cepsini.F
+      !||    cmlawi         ../starter/source/elements/shell/coque/cepsini.F
+      !||    cneveci        ../starter/source/elements/shell/coqueba/cneveci.F
+      !||    corth3         ../starter/source/elements/shell/coque/corth3.F
+      !||    cpxpyi         ../starter/source/elements/shell/coque/cepsini.F
+      !||--- uses       -----------------------------------------------------
+      !||====================================================================
       SUBROUTINE CNEPSINI(ELBUF_STR,MAT_PARAM,
      1           JFT    ,JLT    ,ISMSTR,MTN   ,ITHK   ,
      2           PM     ,GEO    ,IXC   ,X     ,XREFC  ,
@@ -58,7 +58,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
 #include      "scr03_c.inc"
-#include      "scr21_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -76,7 +75,7 @@ C-----------------------------------------------
 C------------------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, NT, I1, I2, I3, I4,NITRS0,IDRAPE,IGTYP
+      INTEGER I, NT, I1, I2, I3, I4,IDRAPE,IGTYP
       my_real FAC
       my_real
      .   X1(MVSIZ) , X2(MVSIZ) , X3(MVSIZ) , X4(MVSIZ) ,
@@ -163,10 +162,6 @@ c
         VL(3,4,I) = E1Z(I)*XL(1,4,I) + E2Z(I)*XL(2,4,I)
       ENDDO
 c-----------------
-      IF (MTN==58) THEN
-        NITRS0 = NITRS
-        NITRS = MAX(IPLA_D*100,NITRS0)
-      END IF
       FAC = ONE / FLOAT(NITRS)
       DO I=JFT,JLT
         VL(1,2,I) = (VL(1,2,I) - X2(I)) * FAC
@@ -263,7 +258,6 @@ c
      .                AREA,EXX    ,EYY    ,EXY, IMAT )                     
         ENDDO
       ENDIF
-      IF (MTN==58) NITRS = NITRS0
 C ---
       RETURN
       END

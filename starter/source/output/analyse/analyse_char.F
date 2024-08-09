@@ -20,12 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  ANSTCKC                       source/output/analyse/analyse_char.F
-Chd|-- called by -----------
-Chd|-- calls ---------------
-Chd|====================================================================
-      SUBROUTINE ANSTCKC(LEN, STR)
+      !||====================================================================
+      !||    anstckc                ../starter/source/output/analyse/analyse_char.F
+      !||--- uses       -----------------------------------------------------
+      !||====================================================================
+      SUBROUTINE ANSTCKC(LEN_, STR)
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
+        USE NAMES_AND_TITLES_MOD , ONLY : NCHARLINE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -37,15 +40,15 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER LEN
-      CHARACTER STR*ncharline
+      INTEGER LEN_
+      CHARACTER(LEN=NCHARLINE) :: STR
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER  I, B, E, LENGTH
 C
 C-----------------------------------------------
-      LENGTH = LEN
+      LENGTH = LEN_
       B = 1
       E = LENGTH
       I = 1 

@@ -20,23 +20,24 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  HM_READ_BCS                   source/constraints/general/bcs/hm_read_bcs.F
-Chd|-- called by -----------
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        FRETITL                       source/starter/freform.F      
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        HM_OPTION_READ_KEY            source/devtools/hm_reader/hm_option_read_key.F
-Chd|        HM_OPTION_START               source/devtools/hm_reader/hm_option_start.F
-Chd|        KINSET                        source/constraints/general/kinset.F
-Chd|        NGR2USR                       source/system/nintrr.F        
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_read_bcs            ../starter/source/constraints/general/bcs/hm_read_bcs.F
+      !||--- called by ------------------------------------------------------
+      !||    lectur                 ../starter/source/starter/lectur.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    fretitl                ../starter/source/starter/freform.F
+      !||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
+      !||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
+      !||    kinset                 ../starter/source/constraints/general/kinset.F
+      !||    ngr2usr                ../starter/source/system/nintrr.F
+      !||    usr2sys                ../starter/source/system/sysfus.F
+      !||--- uses       -----------------------------------------------------
+      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE HM_READ_BCS(ICODE     ,ISKEW   ,ITAB    ,ITABM1 ,IKINE  ,
      .                  IGRNOD    ,IBCSLAG ,LAG_NCF ,LAG_NKF,LAG_NHF,
      .                  IKINE1LAG ,ISKN    ,NOM_OPT ,UNITAB ,LSUBMODEL,
@@ -49,6 +50,7 @@ C-----------------------------------------------
       USE GROUPDEF_MOD    
       USE SUBMODEL_MOD        
       USE HM_OPTION_READ_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARFIELD, NCHARKEY
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -81,9 +83,12 @@ C-----------------------------------------------
      .        SUB_ID,
      .        CHKCOD,ISERR,NOD,S_STRING,SUB_INDEX
       INTEGER IUN,IGR1,IGRS1,IGR2,IGRS2,IAD_L,NBY_NI,NBCSCYCI,ICYC,IS0
-      CHARACTER MESS*40,KEY*ncharkey,STRING*ncharfield,CODE*7,
-     .        KEY2*ncharkey
-      CHARACTER TITR*nchartitle,OPT*8
+      CHARACTER MESS*40
+      CHARACTER(LEN=NCHARKEY) :: KEY, KEY2
+      CHARACTER(LEN=NCHARFIELD) :: STRING
+      CHARACTER(LEN=NCHARTITLE) :: TITR
+      CHARACTER :: CODE*7
+      CHARACTER :: OPT*8
       LOGICAL IS_AVAILABLE
       INTEGER, DIMENSION(:), ALLOCATABLE :: IKINE1
 C-----------------------------------------------

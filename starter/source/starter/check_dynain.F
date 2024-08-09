@@ -20,22 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  CHECK_DYNAIN                  source/starter/check_dynain.F 
-Chd|-- called by -----------
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        MY_ORDERS                     ../common_source/tools/sort/my_orders.c
-Chd|        INOUTFILE_MOD                 ../common_source/modules/inoutfile_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    check_dynain           ../starter/source/starter/check_dynain.F
+      !||--- called by ------------------------------------------------------
+      !||    lectur                 ../starter/source/starter/lectur.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE CHECK_DYNAIN(IPART,IPARTC,IPARTTG,IXC,IXTG,DYNAIN_CHECK)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
       USE INOUTFILE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARLINE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -65,9 +65,9 @@ C
       INTEGER WORK(70000)
       INTEGER ,  DIMENSION(:),ALLOCATABLE :: NELIDC ,NELIDTG,
      .        CLEFC ,CLEFTG ,INDXC ,INDXTG ,IDWARN ,NELIDCG ,NELIDTGG
-      my_real
-     .   T0,DT0
-      CHARACTER FILNAM*109, KEYA*80, KEYA2*80 ,CARTE*ncharline
+      my_real T0,DT0
+      CHARACTER FILNAM*109, KEYA*80, KEYA2*80
+      CHARACTER(LEN=NCHARLINE) ::CARTE
       INTEGER :: LEN_TMP_NAME
       CHARACTER(len=4096) :: TMP_NAME
 C-------------------------------------------------------------------------------
@@ -102,10 +102,8 @@ C
 C
 10     READ(71,'(A)',END=20) KEYA
 
-
         IF(KEYA(1:1)=='#')GOTO 10
         IF(KEYA(1:1)=='$')GOTO 10
-
 C
 C--     Check dynain file is requested --
         DYNAIN_CHECK = 1

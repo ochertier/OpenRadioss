@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  ST_QAPRINT_ELEMENT            source/output/qaprint/st_qaprint_element.F
-Chd|-- called by -----------
-Chd|        ST_QAPRINT_DRIVER             source/output/qaprint/st_qaprint_driver.F
-Chd|-- calls ---------------
-Chd|        MY_ORDERS                     ../common_source/tools/sort/my_orders.c
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    st_qaprint_element     ../starter/source/output/qaprint/st_qaprint_element.F
+      !||--- called by ------------------------------------------------------
+      !||    st_qaprint_driver      ../starter/source/output/qaprint/st_qaprint_driver.F
+      !||--- calls      -----------------------------------------------------
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE ST_QAPRINT_ELEMENT(IXS , IXS10, IPM   , IGEO, ITAB, 
      1                              ISOLNOD,IXR, R_SKEW,ISKWN, IXP ,
      2                              IXT    ,X  , IXC   ,IXTG ,THKE ,
@@ -40,6 +40,7 @@ C-----------------------------------------------
       USE QA_OUT_MOD
       USE MESSAGE_MOD
       USE MY_ALLOC_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -69,7 +70,7 @@ C-----------------------------------------------
       INTEGER I, J, MY_ID, TEMP_INT, NS, MY_MID, MY_PID, MY_NOD, MY_SKEW,NC
       INTEGER :: WORK(70000),NUMEL_KJ
       INTEGER, ALLOCATABLE, DIMENSION(:) :: INDEX,ITR1
-      CHARACTER *nchartitle TITR
+      CHARACTER(LEN=NCHARTITLE)::TITR
       CHARACTER (LEN=255) :: VARNAME
       DOUBLE PRECISION TEMP_DOUBLE
       INTEGER ITETRA4(4),IPENTA6(6)

@@ -20,26 +20,26 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  HM_READ_XREF                  source/loads/reference_state/xref/hm_read_xref.F
-Chd|-- called by -----------
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        FRETITL2                      source/starter/freform.F      
-Chd|        HM_GET_FLOAT_ARRAY_INDEX      source/devtools/hm_reader/hm_get_float_array_index.F
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        HM_GET_INT_ARRAY_INDEX        source/devtools/hm_reader/hm_get_int_array_index.F
-Chd|        HM_OPTION_READ_KEY            source/devtools/hm_reader/hm_option_read_key.F
-Chd|        HM_OPTION_START               source/devtools/hm_reader/hm_option_start.F
-Chd|        SUBROTPOINT                   source/model/submodel/subrot.F
-Chd|        ID                            source/boundary_conditions/ebcs/hm_read_ebcs_inlet.F
-Chd|        R2R_SYS                       source/coupling/rad2rad/routines_r2r.F
-Chd|        USR2SYS                       source/system/sysfus.F        
-Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_read_xref               ../starter/source/loads/reference_state/xref/hm_read_xref.F
+      !||--- called by ------------------------------------------------------
+      !||    lectur                     ../starter/source/starter/lectur.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                     ../starter/source/output/message/message.F
+      !||    fretitl2                   ../starter/source/starter/freform.F
+      !||    hm_get_float_array_index   ../starter/source/devtools/hm_reader/hm_get_float_array_index.F
+      !||    hm_get_int_array_index     ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+      !||    hm_get_intv                ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    hm_option_read_key         ../starter/source/devtools/hm_reader/hm_option_read_key.F
+      !||    hm_option_start            ../starter/source/devtools/hm_reader/hm_option_start.F
+      !||    r2r_sys                    ../starter/source/coupling/rad2rad/routines_r2r.F
+      !||    subrotpoint                ../starter/source/model/submodel/subrot.F
+      !||    usr2sys                    ../starter/source/system/sysfus.F
+      !||--- uses       -----------------------------------------------------
+      !||    hm_option_read_mod         ../starter/share/modules1/hm_option_read_mod.F
+      !||    message_mod                ../starter/share/message_module/message_mod.F
+      !||    submodel_mod               ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE HM_READ_XREF(ITABM1   ,IPART    ,IPARTC   ,IPARTG   ,IPARTS   ,
      .                        UNITAB   ,IXC      ,IXTG     ,IXS      ,X        ,
      .                        XREFC    ,XREFTG   ,XREFS    ,RTRANS   ,LSUBMODEL,
@@ -50,7 +50,8 @@ C-----------------------------------------------
       USE UNITAB_MOD
       USE SUBMODEL_MOD
       USE MESSAGE_MOD
-      USE HM_OPTION_READ_MOD       
+      USE HM_OPTION_READ_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -90,12 +91,12 @@ C-----------------------------------------------
       INTEGER, DIMENSION(:), ALLOCATABLE :: ID
       INTEGER  I,J,IE,IN,IP,IR,NN,NITER,PARTID,UID,ITYP,ICOMPA
       INTEGER  SUB_ID,NNOD,SUB_INDEX,IMID, MAT_ID,MTN,NSOLID,NPT,ISMSTR
-C     REAL
       my_real
      .  XTMP(3,NUMNOD)
       my_real, DIMENSION(:), ALLOCATABLE ::
      .  XX,YY,ZZ
-      CHARACTER MESS*40,TITR*nchartitle,TITR1*nchartitle
+      CHARACTER MESS*40
+      CHARACTER(LEN=NCHARTITLE) :: TITR,TITR1
       DATA MESS/'XREF'/
       LOGICAL :: IS_AVAILABLE,FOUND      
 C-----------------------------------------------
@@ -218,12 +219,7 @@ C
               IF(MTN /= 35 .AND.MTN /= 38 .AND. MTN /= 42 .AND.
      .             MTN /= 70 .AND. MTN /= 90)THEN
                    CALL FRETITL2(TITR1,IPM(NPROPMI-LTITR+1,IMID),LTITR)
-                   CALL ANCMSG(MSGID=2014,
-     .                       MSGTYPE=MSGERROR,
-     .                       ANMODE=ANSTOP,
-     .                       I1=MAT_ID,
-     .                       C1=TITR1,
-     .                       I2=MTN )
+                   CALL ANCMSG(MSGID=2014, MSGTYPE=MSGERROR, ANMODE=ANSTOP, I1=MAT_ID, C1=TITR1, I2=MTN )
                END IF
                NPT = IGEO(4,IPID)
                ISMSTR = IGEO(5,IPID)

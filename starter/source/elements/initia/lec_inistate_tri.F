@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  LEC_INISTATE_TRI              source/elements/initia/lec_inistate_tri.F
-Chd|-- called by -----------
-Chd|        LEC_INISTATE                  source/elements/initia/lec_inistate.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        MY_ORDERS                     ../common_source/tools/sort/my_orders.c
-Chd|        UEL2SYS                       source/initial_conditions/inista/yctrl.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    lec_inistate_tri   ../starter/source/elements/initia/lec_inistate_tri.F
+      !||--- called by ------------------------------------------------------
+      !||    lec_inistate       ../starter/source/elements/initia/lec_inistate.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg             ../starter/source/output/message/message.F
+      !||    uel2sys            ../starter/source/initial_conditions/inista/yctrl.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod        ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE LEC_INISTATE_TRI(
      1                  IXS        ,IXQ          ,IXC          ,IXT          ,IXP       ,
      2                  IXR        ,KXSP         ,IXTG         ,INDEX        ,ITRI      ,
@@ -39,7 +39,7 @@ Chd|====================================================================
      6                  PTSPRI     ,PTBEAM       ,PTTRUSS      ,SIGI         ,SIGSH     ,
      7                  SIGSP      ,SIGSPH       ,SIGRS        ,SIGBEAM      ,SIGTRUSS  ,
      8                  ID_SIGSH   ,ID_SOLID_SIGI,ID_QUAD_SIGI ,ID_SIGSPRI ,ID_SIGBEAM  ,
-     9                  ID_SIGTRUSS,WORK )
+     9                  ID_SIGTRUSS,WORK         ,ID_SIGSPHCEL ,IS_STATE)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -68,6 +68,9 @@ C-----------------------------------------------
       my_real
      .   SIGI(NSIGS,*),SIGSH(MAX(1,NSIGSH),*),SIGTRUSS(NSIGTRUSS,*),
      .   SIGSP(NSIGI,*),SIGSPH(NSIGSPH,*),SIGRS(NSIGRS,*),SIGBEAM(NSIGBEAM,*)
+      
+      INTEGER,  INTENT(INOUT) :: ID_SIGSPHCEL(NUMSPH)
+      LOGICAL,  INTENT(IN)    :: IS_STATE
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -430,20 +433,83 @@ C
 C
 C SPH
 C
-      IF(NUMSPHY>0)THEN
-C
-C       tri des elts du Y000 par ID croissant
+      IF(NUMSPHY>0 .AND. IS_STATE)THEN
+C      sorting elements Ids
         DO ISYS = 1, NUMSPHY
-          ITRI(ISYS) = NINT(SIGSPH(7,ISYS))
+          ITRI(ISYS) = ID_SIGSPHCEL(ISYS)
+        END DO
+        CALL MY_ORDERS(0,WORK,ITRI,INDEX,NUMSPHY,1)
+C        checking INISPHCEL : search for multiply define
+        ISYS=INDEX(1)
+        IE = ID_SIGSPHCEL(ISYS)
+        
+        DO J = 2, NUMSPHY
+          JSYS=INDEX(J)
+          JE = ID_SIGSPHCEL(JSYS)
+          IF (JE == IE) THEN
+            DO K=1,NSIGSPH
+              IF (SIGSPH(K,JSYS) /= ZERO) THEN
+                IF (SIGSPH(K,ISYS) /= ZERO .AND.
+     .              SIGSPH(K,ISYS) /= SIGSPH(K,JSYS)) THEN
+                  CALL ANCMSG(MSGID=1234,
+     .                        MSGTYPE=MSGERROR,
+     .                        ANMODE=ANINFO_BLIND_1,
+     .                        I1=IE)
+                ELSE
+                  SIGSPH(K,ISYS)=SIGSPH(K,JSYS)
+                ENDIF
+              ENDIF
+            ENDDO
+            SIGSPH(1,JSYS)=ZERO
+            ID_SIGSPHCEL(JSYS)=0
+          ELSE
+            IE  =JE
+            ISYS=JSYS
+          ENDIF
+        ENDDO
+        COMPT=0
+        DO J=1,NUMSPHY
+          IE = ID_SIGSPHCEL(J)
+          IF (IE /= 0) THEN
+            COMPT=COMPT+1
+            IF (COMPT < J) THEN
+              DO K=1,NSIGSPH
+                SIGSPH(K,COMPT)=SIGSPH(K,J)
+              ENDDO
+              ID_SIGSPHCEL(COMPT)=ID_SIGSPHCEL(J)
+              SIGSPH(1,J)=ZERO
+              ID_SIGSPHCEL(J)=0
+            ENDIF
+          ENDIF
+        ENDDO
+        NUMSPHY=COMPT
+
+
+      ENDIF ! IF (NUMSPHY > 0)
+
+
+
+
+      IF (NUMSPHY > 0) THEN
+C      sorting elements Ids
+        DO ISYS = 1, NUMSPHY
+          IF(IS_STATE) THEN 
+            ITRI(ISYS) = ID_SIGSPHCEL(ISYS)
+          ELSE
+            ITRI(ISYS) = NINT(SIGSPH(7,ISYS))
+          ENDIF
         END DO
         CALL MY_ORDERS(0,WORK,ITRI,INDEX,NUMSPHY,1)
         DO J = 1, NUMSPHY
           ISYS=INDEX(J)
-          KSYSUSR(J)=NINT(SIGSPH(7,ISYS))
+          IF(IS_STATE) THEN 
+            KSYSUSR(J) = ID_SIGSPHCEL(ISYS)
+          ELSE
+            KSYSUSR(J) = NINT(SIGSPH(7,ISYS))
+          ENDIF
           KSYSUSR(NUMSPHY+J)=ISYS
         END DO
 C
-C       Nos systeme dans le Y000, des elts du D00
         DO I=1,NUMSPH
           ISYS=UEL2SYS(KXSP(NISP*I),KSYSUSR,NUMSPHY)
           PTSPH(I) =ISYS

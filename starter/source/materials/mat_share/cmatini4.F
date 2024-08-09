@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  CMATINI4                      source/materials/mat_share/cmatini4.F
-Chd|-- called by -----------
-Chd|        CBAINIT3                      source/elements/shell/coqueba/cbainit3.F
-Chd|        CDKINIT3                      source/elements/sh3n/coquedk/cdkinit3.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        FRETITL2                      source/starter/freform.F      
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    cmatini4               ../starter/source/materials/mat_share/cmatini4.F
+      !||--- called by ------------------------------------------------------
+      !||    cbainit3               ../starter/source/elements/shell/coqueba/cbainit3.F
+      !||    cdkinit3               ../starter/source/elements/sh3n/coquedk/cdkinit3.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    fretitl2               ../starter/source/starter/freform.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE CMATINI4(ELBUF_STR,
      1           JFT    ,JLT    ,NFT   ,NEL    ,ISTRAIN ,
      2           SIGSH  ,NSIGSH ,NUMEL ,IX     ,NIX     ,
@@ -41,6 +41,7 @@ C   M o d u l e s
 C-----------------------------------------------
       USE ELBUFDEF_MOD
       USE MESSAGE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -54,17 +55,14 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER JFT,JLT,NFT,NEL,IR,IS,NPT,NUMEL,NIX,ISTRAIN,NSIGSH,NUMSH,
-     . IGTYP,IGEO(NPROPGI,*),NLAY,NPG,IPG
+      INTEGER JFT,JLT,NFT,NEL,IR,IS,NPT,NUMEL,NIX,ISTRAIN,NSIGSH,NUMSH,IGTYP,IGEO(NPROPGI,*),NLAY,NPG,IPG
       INTEGER IX(NIX,*),PTSH(*)
-      my_real
-     . SIGSH(NSIGSH,*)
+      my_real SIGSH(NSIGSH,*)
       TYPE(ELBUF_STRUCT_), TARGET :: ELBUF_STR
 C------------------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      CHARACTER*nchartitle,
-     .   TITR
+      CHARACTER(LEN=NCHARTITLE) :: TITR
       INTEGER I,II,J,JJ,N,NPTI,I1,I2,PT,NPGI,NU,NUVAR,NVARS,IPT,NPI,
      .  IPID1,PID1,C1,IPT_ALL,IT,ILAY,NPTT
       TYPE(L_BUFEL_) ,POINTER :: LBUF     
@@ -101,12 +99,7 @@ C for IGTYP == 51, usually NPT <= NPTI (NPTI = NTPP --> for all layers)
           IPID1=IX(NIX-1,NFT+I)
           PID1=IGEO(1,IPID1)
           CALL FRETITL2(TITR,IGEO(NPROPGI-LTITR+1,IPID1),LTITR)
-          CALL ANCMSG(MSGID=1215,
-     .                ANMODE=ANINFO,
-     .                MSGTYPE=MSGERROR,
-     .                C1=TITR,
-     .                I1=PID1,
-     .                I2=N)
+          CALL ANCMSG(MSGID=1215, ANMODE=ANINFO, MSGTYPE=MSGERROR, C1=TITR, I1=PID1, I2=N)
 C
         ELSE
           IF (NPGI > 0) THEN

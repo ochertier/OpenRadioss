@@ -20,22 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  TINIT3                        source/elements/truss/tinit3.F
-Chd|-- called by -----------
-Chd|        INITIA                        source/elements/initia/initia.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        DT1LAWT                       source/elements/truss/dt1lawt.F
-Chd|        FRETITL2                      source/starter/freform.F      
-Chd|        TCOORI                        source/elements/truss/tcoori.F
-Chd|        TIBUF3                        source/elements/truss/tibuf3.F
-Chd|        TMASS                         source/elements/truss/tmass.F 
-Chd|        TSIGINI                       source/elements/truss/tsigini.F
-Chd|        BPRELOAD_MOD                  share/modules1/bpreload_mod.F 
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    tinit3                 ../starter/source/elements/truss/tinit3.F
+      !||--- called by ------------------------------------------------------
+      !||    initia                 ../starter/source/elements/initia/initia.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    dt1lawt                ../starter/source/elements/truss/dt1lawt.F
+      !||    fretitl2               ../starter/source/starter/freform.F
+      !||    tcoori                 ../starter/source/elements/truss/tcoori.F
+      !||    tibuf3                 ../starter/source/elements/truss/tibuf3.F
+      !||    tmass                  ../starter/source/elements/truss/tmass.F
+      !||    tsigini                ../starter/source/elements/truss/tsigini.F
+      !||--- uses       -----------------------------------------------------
+      !||    bpreload_mod           ../starter/share/modules1/bpreload_mod.F
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE TINIT3(ELBUF_STR,
      1                  IC     ,PM         ,X        ,GEO    ,XMAS   ,
      2                  DTELEM ,NFT        ,NEL      ,STIFN  ,PARTSAV,
@@ -48,6 +48,7 @@ C-----------------------------------------------
       USE ELBUFDEF_MOD
       USE MESSAGE_MOD
       USE BPRELOAD_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -90,8 +91,7 @@ C-----------------------------------------------
      .   DELTAX(MVSIZ),XX,YY,ZZ, DTX(MVSIZ)
       INTEGER IDMIN,IDMAX
       INTEGER ID
-      CHARACTER*nchartitle,
-     .   TITR
+      CHARACTER(LEN=NCHARTITLE)::TITR
       DATA IDMIN /-1/, IDMAX /-1/
       my_real
      .     LGTHMIN, LGTHMAX,XNOR,UNDAMP,CC1
@@ -114,12 +114,7 @@ C-----------------------------
       DO I=1,NEL
         XNOR=(X1(I)-X2(I))**2+(Y1(I)-Y2(I))**2+(Z1(I)-Z2(I))**2
         IF (XNOR <= 1.E-20) THEN
-           CALL ANCMSG(MSGID=269,
-     .                 MSGTYPE=MSGERROR,
-     .                 ANMODE=ANINFO,
-     .                 I1=ID,
-     .                 C1=TITR,
-     .                 I2=IC(5,I+NFT))
+           CALL ANCMSG(MSGID=269, MSGTYPE=MSGERROR, ANMODE=ANINFO, I1=ID, C1=TITR, I2=IC(5,I+NFT))
         ENDIF
         GBUF%LENGTH(I) = SQRT(XNOR)
       END DO
@@ -140,12 +135,7 @@ C------------------------------------------
       DO I=1,NEL
         IGTYP=GEO(12,IC(4,I+NFT))
         IF (IGTYP /= 2 .AND. INVERS > 14) THEN
-          CALL ANCMSG(MSGID=270,
-     .                MSGTYPE=MSGERROR,
-     .                ANMODE=ANINFO_BLIND_1,
-     .                I1=ID,
-     .                C1=TITR,
-     .                I2=IC(NIXT,I),I3=IGTYP)
+          CALL ANCMSG(MSGID=270, MSGTYPE=MSGERROR, ANMODE=ANINFO_BLIND_1, I1=ID, C1=TITR, I2=IC(NIXT,I),I3=IGTYP)
         ENDIF
         XX = (X1(I) - X2(I))*(X1(I) - X2(I))
         YY = (Y1(I) - Y2(I))*(Y1(I) - Y2(I))

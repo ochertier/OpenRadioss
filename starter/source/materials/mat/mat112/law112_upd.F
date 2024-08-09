@@ -20,15 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  LAW112_UPD                    source/materials/mat/mat112/law112_upd.F
-Chd|-- called by -----------
-Chd|        UPDMAT                        source/materials/updmat.F     
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        TABLE_MOD                     share/modules1/table_mod.F    
-Chd|====================================================================
+      !||====================================================================
+      !||    law112_upd             ../starter/source/materials/mat/mat112/law112_upd.F
+      !||--- called by ------------------------------------------------------
+      !||    updmat                 ../starter/source/materials/updmat.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    table_mod              ../starter/share/modules1/table_mod.F
+      !||====================================================================
       SUBROUTINE LAW112_UPD(TITR   ,UPARAM ,NPC    ,PLD    ,  
      .                      NUMTABL,ITABLE ,TABLE  ,MAT_ID )
 C-----------------------------------------------
@@ -36,6 +37,7 @@ C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
       USE TABLE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -48,7 +50,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      CHARACTER*nchartitle  :: TITR
+      CHARACTER(LEN=NCHARTITLE)  :: TITR
       INTEGER MAT_ID,NUMTABL,ITABLE(NUMTABL)
       INTEGER NPC(*)
       my_real UPARAM(*),PLD(*)

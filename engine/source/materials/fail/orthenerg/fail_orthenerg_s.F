@@ -20,18 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  FAIL_ORTHENERG_S              source/materials/fail/orthenerg/fail_orthenerg_s.F
-Chd|-- called by -----------
-Chd|        USERMAT_SOLID                 source/materials/mat_share/usermat_solid.F
-Chd|-- calls ---------------
-Chd|====================================================================
+      !||====================================================================
+      !||    fail_orthenerg_s   ../engine/source/materials/fail/orthenerg/fail_orthenerg_s.F
+      !||--- called by ------------------------------------------------------
+      !||    mmain              ../engine/source/materials/mat_share/mmain.F90
+      !||    mulaw              ../engine/source/materials/mat_share/mulaw.F90
+      !||    usermat_solid      ../engine/source/materials/mat_share/usermat_solid.F
+      !||====================================================================
       SUBROUTINE FAIL_ORTHENERG_S(
      1     NEL      ,NUPARAM  ,NUVAR    ,UPARAM   ,UVAR     ,NGL      , 
      2     NPG      ,IPG      ,ILAY     ,OFF      ,LOFF     ,NOFF     ,
      3     DEPSXX   ,DEPSYY   ,DEPSZZ   ,DEPSXY   ,DEPSYZ   ,DEPSZX   ,
      4     SIGNXX   ,SIGNYY   ,SIGNZZ   ,SIGNXY   ,SIGNYZ   ,SIGNZX   ,
-     5     TIME     ,TDEL     ,DFMAX    ,ALDT     ,DMG_SCALE,IDEL7NOK )
+     5     TIME     ,TDEL     ,DFMAX    ,ALDT     ,DMG_SCALE)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -54,7 +55,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   I N P U T   O U T P U T   A r g u m e n t s 
 C-----------------------------------------------
-      INTEGER, INTENT(INOUT) :: IDEL7NOK
       INTEGER, DIMENSION(NEL), INTENT(INOUT) :: NOFF
       my_real, DIMENSION(NEL), INTENT(INOUT) :: DFMAX,TDEL,OFF,LOFF
       my_real, DIMENSION(NEL,6), INTENT(INOUT) :: DMG_SCALE
@@ -450,7 +450,6 @@ c
               TDEL(I) = TIME 
               NINDX2  = NINDX2 + 1
               INDX2(NINDX2) = I
-              IDEL7NOK = 1
             ENDIF
           ENDIF
         ENDIF

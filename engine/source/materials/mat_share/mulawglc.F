@@ -20,24 +20,25 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  MULAWGLC                      source/materials/mat_share/mulawglc.F
-Chd|-- called by -----------
-Chd|        CMAIN3                        source/materials/mat_share/cmain3.F
-Chd|-- calls ---------------
-Chd|        ROTO                          source/airbag/roto.F          
-Chd|        SIGEPS01G                     source/materials/mat/mat001/sigeps01g.F
-Chd|        SIGEPS02G                     source/materials/mat/mat002/sigeps02g.F
-Chd|        SIGEPS22G                     source/materials/mat/mat022/sigeps22g.F
-Chd|        SIGEPS36G                     source/materials/mat/mat036/sigeps36g.F
-Chd|        SIGEPS43G                     source/materials/mat/mat043/sigeps43g.F
-Chd|        SIGEPS56G                     source/materials/mat/mat056/sigeps56g.F
-Chd|        SIGEPS60G                     source/materials/mat/mat060/sigeps60g.F
-Chd|        SIGEPS86G                     source/materials/mat/mat086/sigeps86g.F
-Chd|        UROTO                         source/airbag/uroto.F         
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
-Chd|        TABLE_MOD                     share/modules/table_mod.F     
-Chd|====================================================================
+      !||====================================================================
+      !||    mulawglc       ../engine/source/materials/mat_share/mulawglc.F
+      !||--- called by ------------------------------------------------------
+      !||    cmain3         ../engine/source/materials/mat_share/cmain3.F
+      !||--- calls      -----------------------------------------------------
+      !||    roto           ../engine/source/airbag/roto.F
+      !||    sigeps01g      ../engine/source/materials/mat/mat001/sigeps01g.F
+      !||    sigeps02g      ../engine/source/materials/mat/mat002/sigeps02g.F
+      !||    sigeps22g      ../engine/source/materials/mat/mat022/sigeps22g.F
+      !||    sigeps36g      ../engine/source/materials/mat/mat036/sigeps36g.F
+      !||    sigeps43g      ../engine/source/materials/mat/mat043/sigeps43g.F
+      !||    sigeps56g      ../engine/source/materials/mat/mat056/sigeps56g.F
+      !||    sigeps60g      ../engine/source/materials/mat/mat060/sigeps60g.F
+      !||    sigeps86g      ../engine/source/materials/mat/mat086/sigeps86g.F
+      !||    uroto          ../engine/source/airbag/uroto.F
+      !||--- uses       -----------------------------------------------------
+      !||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
+      !||    table_mod      ../engine/share/modules/table_mod.F
+      !||====================================================================
       SUBROUTINE MULAWGLC(ELBUF_STR,
      1           JFT    ,JLT    ,PM     ,FOR   ,MOM   ,THK   ,
      2           EINT   ,OFF    ,GSTR   ,DIR   ,SHF   ,
@@ -108,6 +109,7 @@ C-----------------------------------------------
      .   ETSE(MVSIZ)  ,EPSPL(MVSIZ),EPSP_LOC(MVSIZ)
       my_real,DIMENSION(:) ,POINTER :: UVAR
       my_real, DIMENSION(MVSIZ) :: DT_INV
+      my_real, DIMENSION(NEL) :: OFF_OLD
 C-------------------------------------
       INTEGER, DIMENSION(:), POINTER :: VARTMP
       TYPE(L_BUFEL_) ,POINTER :: LBUF
@@ -144,7 +146,8 @@ C
         DT_INV(I) = DT1C(I)/MAX(DT1C(I)**2,EM20)
       ENDDO
 !
-      ETSE(1:MVSIZ) = ZERO      
+      ETSE(1:MVSIZ) = ZERO   
+      OFF_OLD(1:NEL) = OFF(1:NEL)   
 C-----------------------------------------------------------
 C     EPS POINT EQUIVALENT (au sens energetique)
 C-----------------------------------------------------------
@@ -563,8 +566,16 @@ C----------------------------
           INDX(NINDX)=I
         ENDIF
       ENDDO
+c--------------------------------------------------------
+c     SHOOTING NODES ALGORITHM ACTIVATION
+c--------------------------------------------------------
+      DO I = 1,NEL
+        IF ((OFF_OLD(I) > ZERO) .AND. (OFF(I) == ZERO)) THEN 
+          IDEL7NOK = 1
+        ENDIF
+      ENDDO       
+c--------------------------------------------------------
       IF (NINDX > 0) THEN
-        IDEL7NOK = 1
         IF (IMCONV == 1) THEN
           DO I = 1, NINDX
 #include "lockon.inc"

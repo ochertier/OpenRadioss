@@ -20,42 +20,53 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  TIMFUN                        source/tools/curve/timfun.F   
-Chd|-- called by -----------
-Chd|        RESOL                         source/engine/resol.F         
-Chd|-- calls ---------------
-Chd|        INTERP                        source/tools/curve/interp.F   
-Chd|====================================================================
-      SUBROUTINE TIMFUN (FV,NP,TF)
+      !||====================================================================
+      !||    timfun                ../engine/source/tools/curve/timfun.F
+      !||--- called by ------------------------------------------------------
+      !||    resol                 ../engine/source/engine/resol.F
+      !||--- calls      -----------------------------------------------------
+      !||    interp                ../engine/source/tools/curve/interp.F
+      !||--- uses       -----------------------------------------------------
+      !||    python_funct_mod      ../common_source/modules/python_mod.F90
+      !||====================================================================
+      SUBROUTINE TIMFUN (PYTHON, FV,NP,TF)
+            USE PYTHON_FUNCT_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
+C   C o m m o n   B l o c k s
+C-----------------------------------------------
+#include      "com04_c.inc"
+#include "tabsiz_c.inc"
+#include      "com08_c.inc"
+
+C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER NP(*)
+      TYPE(PYTHON_), INTENT(inout) :: PYTHON
+      INTEGER NP(SNPC)
 C     REAL
       my_real
      .   FV(*), TF(*)
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com04_c.inc"
-#include      "com08_c.inc"
-C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER N, NPOINT
+      INTEGER N, NPOINT,ISMOOTH
 C     REAL
       my_real
      .   TG
 C-----------------------------------------------
-      IF(NFUNCT==0) RETURN
-      DO 10 N=1,NFUNCT
-      NPOINT=(NP(N+1)-NP(N))/2
-      CALL INTERP(TF(NP(N)),TT,NPOINT,FV(N),TG)
- 10   CONTINUE
+      DO N=1,NFUNCT
+        ISMOOTH = NP(2*NFUNCT+N+1)
+        IF(ISMOOTH >= 0) THEN
+          NPOINT=(NP(N+1)-NP(N))/2
+          CALL INTERP(TF(NP(N)),TT,NPOINT,FV(N),TG)
+        ELSE 
+          ISMOOTH = -ISMOOTH
+          CALL PYTHON_CALL_FUNCT1D(PYTHON, ISMOOTH,TT, FV(N))
+        ENDIF
+      ENDDO
       RETURN
       END

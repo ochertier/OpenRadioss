@@ -20,21 +20,29 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  I12TID3                       source/interfaces/inter3d1/i12tid3.F
-Chd|-- called by -----------
-Chd|        ININT3                        source/interfaces/inter3d1/inint3.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        INIST3                        source/interfaces/inter3d1/inist3.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    i12tid3                ../starter/source/interfaces/inter3d1/i12tid3.F
+      !||--- called by ------------------------------------------------------
+      !||    inint3                 ../starter/source/interfaces/inter3d1/inint3.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    inist3                 ../starter/source/interfaces/inter3d1/inist3.F
+      !||--- uses       -----------------------------------------------------
+      !||    format_mod             ../starter/share/modules1/format_mod.F90
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE I12TID3(
      1                   X   , IRECT, CRST, MSR , NSV,
      2                   ILOC, IRTL , NSN , ITAB, ALP, 
      3                   ID  , TITR
      .                   )
-      USE MESSAGE_MOD 
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
+      USE MESSAGE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      USE MESSAGE_MOD
+      USE FORMAT_MOD , ONLY : FMW_7I_2F
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C-----------------------------------------------
@@ -54,7 +62,7 @@ C-----------------------------------------------
       INTEGER,INTENT(IN)    :: IRECT(4,*) , MSR(*), NSV(*), ILOC(*), IRTL(*),ITAB(*)
       my_real,INTENT(IN)    :: X(3,NUMNOD), ALP
       my_real,INTENT(INOUT) :: CRST(2,*)
-      CHARACTER*nchartitle,INTENT(INOUT) :: TITR
+      CHARACTER(LEN=NCHARTITLE),INTENT(INOUT) :: TITR
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------

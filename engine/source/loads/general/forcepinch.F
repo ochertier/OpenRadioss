@@ -20,28 +20,36 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  FORCEPINCH                    source/loads/general/forcepinch.F
-Chd|-- called by -----------
-Chd|        RESOL                         source/engine/resol.F         
-Chd|-- calls ---------------
-Chd|        FINTER                        source/tools/curve/finter.F   
-Chd|        FINTER_SMOOTH                 source/tools/curve/finter_smooth.F
-Chd|        H3D_MOD                       share/modules/h3d_mod.F       
-Chd|        PINCHTYPE_MOD                 ../common_source/modules/pinchtype_mod.F
-Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
-Chd|====================================================================
+      !||====================================================================
+      !||    forcepinch            ../engine/source/loads/general/forcepinch.F
+      !||--- called by ------------------------------------------------------
+      !||    resol                 ../engine/source/engine/resol.F
+      !||--- calls      -----------------------------------------------------
+      !||    finter                ../engine/source/tools/curve/finter.F
+      !||    finter_smooth         ../engine/source/tools/curve/finter_smooth.F
+      !||    get_u_numsens         ../engine/source/user_interface/usensor.F
+      !||    get_u_sens_fpar       ../engine/source/user_interface/usensor.F
+      !||    get_u_sens_ipar       ../engine/source/user_interface/usensor.F
+      !||    get_u_sens_value      ../engine/source/user_interface/usensor.F
+      !||    set_u_sens_value      ../engine/source/user_interface/usensor.F
+      !||--- uses       -----------------------------------------------------
+      !||    h3d_mod               ../engine/share/modules/h3d_mod.F
+      !||    pinchtype_mod         ../common_source/modules/pinchtype_mod.F
+      !||    python_funct_mod      ../common_source/modules/python_mod.F90
+      !||    sensor_mod            ../engine/share/modules/sensor_mod.F
+      !||====================================================================
       SUBROUTINE FORCEPINCH (IB     ,FAC     ,NPC    ,TF      ,A     ,
      2                  V      ,X       ,SKEW   ,AR      ,VR    ,
      3                  NSENSOR,SENSOR_TAB ,WEIGHT ,TFEXC   ,IADC  ,
      4                  FSKY   ,FSKYV   ,FEXT   ,H3D_DATA,
-     5                  APINCH ,VPINCH)
+     5                  APINCH ,VPINCH, PYTHON)
 C-----------------------------------------------
 C   M o d u l e s
 C----------------------------------------------- 
       USE H3D_MOD
       USE PINCHTYPE_MOD  
       USE SENSOR_MOD
+      USE PYTHON_FUNCT_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -78,6 +86,7 @@ C-----------------------------------------------
      .   APINCH(3,*),VPINCH(3,*)
       TYPE(H3D_DATABASE) :: H3D_DATA
       TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE(PYTHON_) :: PYTHON
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -132,8 +141,11 @@ C----------------
 !!          F1 = FINTER(N5,TS*FCX,NPC,TF,DYDX)
           IF (ISMOOTH == 0) THEN
             F1 = FINTER(N5,TS*FCX,NPC,TF,DYDX)
-          ELSE
+          ELSE IF(ISMOOTH > 0) THEN
             F1 = FINTER_SMOOTH(N5,TS*FCX,NPC,TF,DYDX)
+          ELSE 
+            ISMOOTH = -ISMOOTH ! the id the python function is saved in the position of ISMOOTH in the NPC array 
+            CALL PYTHON_CALL_FUNCT1D(PYTHON, ISMOOTH,(TS)*FCX, F1)
           ENDIF ! IF (ISMOOTH == 0)
           N_OLD = N5
           X_OLD = TS

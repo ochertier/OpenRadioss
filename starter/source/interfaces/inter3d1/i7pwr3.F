@@ -20,14 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  I7PWR3                        source/interfaces/inter3d1/i7pwr3.F
-Chd|-- called by -----------
-Chd|        ININT3                        source/interfaces/inter3d1/inint3.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    i7pwr3                 ../starter/source/interfaces/inter3d1/i7pwr3.F
+      !||--- called by ------------------------------------------------------
+      !||    inint3                 ../starter/source/interfaces/inter3d1/inint3.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||--- uses       -----------------------------------------------------
+      !||    format_mod             ../starter/share/modules1/format_mod.F90
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE I7PWR3(ITAB,INACTI,CAND_E,CAND_N,STFN,
      1                  STF ,X     ,NSV   ,IWPENE,CAND_P,
      2                  CAND_EN,CAND_NN,TAG,NOINT,GAPV ,
@@ -38,7 +40,12 @@ Chd|====================================================================
      7                  Y2 ,Y3 ,Y4 ,Z1 ,Z2  ,
      8                  Z3 ,Z4 ,XI ,YI ,ZI  ,
      9                  N1 ,N2 ,N3 ,PENE)
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
       USE MESSAGE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      USE FORMAT_MOD , ONLY : FMW_5I
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -58,14 +65,11 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER ITAB(*),CAND_E(*),CAND_N(*),CAND_EN(*),CAND_NN(*),
-     .   KREMNODE(*),REMNODE(*)
+      INTEGER ITAB(*),CAND_E(*),CAND_N(*),CAND_EN(*),CAND_NN(*),KREMNODE(*),REMNODE(*)
       INTEGER NSV(*),TAG(*),IWPENE,INACTI,NOINT,NTY,ITIED, ISTOK
-      my_real
-     .   STF(*),STFN(*),X(3,*),CAND_P(*),GAPV(*), FPENMAX
+      my_real STF(*),STFN(*),X(3,*),CAND_P(*),GAPV(*), FPENMAX
       INTEGER ID,IDDLEVEL,IREMNODE
-      CHARACTER*nchartitle,
-     .   TITR
+      CHARACTER(LEN=NCHARTITLE) :: TITR
       INTEGER, DIMENSION(MVSIZ), INTENT(IN) :: IX1,IX2,IX3,IX4,NSVG
       my_real, DIMENSION(MVSIZ), INTENT(INOUT) :: X1,X2,X3,X4
       my_real, DIMENSION(MVSIZ), INTENT(INOUT) :: Y1,Y2,Y3,Y4
@@ -77,10 +81,8 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,JWARN,J,K,L,TAGNOD
-      my_real
-     .     PENEOLD, PENMAX, PENE0
-      my_real
-     .  DN
+      my_real PENEOLD, PENMAX, PENE0
+      my_real DN
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------

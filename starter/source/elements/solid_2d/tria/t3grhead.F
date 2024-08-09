@@ -20,22 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  T3GRHEAD                      source/elements/solid_2d/tria/t3grhead.F
-Chd|-- called by -----------
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        FRETITL2                      source/starter/freform.F      
-Chd|        MY_ORDERS                     ../common_source/tools/sort/my_orders.c
-Chd|        DRAPE_MOD                     share/modules1/drape_mod.F    
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
-Chd|        REORDER_MOD                   share/modules1/reorder_mod.F  
-Chd|        STACK_MOD                     share/modules1/stack_mod.F    
-Chd|====================================================================
+      !||====================================================================
+      !||    t3grhead               ../starter/source/elements/solid_2d/tria/t3grhead.F
+      !||--- called by ------------------------------------------------------
+      !||    lectur                 ../starter/source/starter/lectur.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    fretitl2               ../starter/source/starter/freform.F
+      !||--- uses       -----------------------------------------------------
+      !||    drape_mod              ../starter/share/modules1/drape_mod.F
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    reorder_mod            ../starter/share/modules1/reorder_mod.F
+      !||    stack_mod              ../starter/share/modules1/stack_mod.F
+      !||====================================================================
       SUBROUTINE T3GRHEAD(
      1       IXTG    ,PM      ,GEO     ,INUM    ,ISEL    ,
      2       ITR1    ,EADD    ,INDEX   ,ITRI    ,XNUM    ,
@@ -56,6 +53,7 @@ C-----------------------------------------------
       USE GROUPDEF_MOD
       USE DRAPE_MOD
       USE MATPARAM_DEF_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C            A R G U M E N T S
 C-----------------------------------------------
@@ -135,9 +133,7 @@ C-----------------------------------------------
      .   IEL, IEL0
        my_real
      . ANGLE(NUMELTG)
-C     REAL OU REAL*8
-      CHARACTER*nchartitle,
-     .   TITR
+      CHARACTER(LEN=NCHARTITLE)::TITR
 C
       INTEGER, DIMENSION(:), ALLOCATABLE :: INDEX2, INUM_PTSH3N
 
@@ -355,9 +351,6 @@ C
         ELSEIF (IGTYP == 17) THEN
           NPN = IWORKSH(1,NUMELC + II)
           ISUBSTACK =IWORKSH(3,NUMELC + II)
-!!          IIGEO   =  40 + 5*(ISUBSTACK - 1) 
-!!          IADI    = IGEO(IIGEO + 3,PID)
-!!          IPPID   = IADI
           IPPID = 2
           DO IPT = 1, NPN
             IPID = STACK%IGEO(IPPID+IPT,ISUBSTACK)

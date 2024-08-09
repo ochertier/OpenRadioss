@@ -20,17 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  ITAGSL2                       source/interfaces/inter3d1/itagsl2.F
-Chd|-- called by -----------
-Chd|        ININTR2                       source/interfaces/inter3d1/inintr2.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        FRETITL2                      source/starter/freform.F      
-Chd|        KINSET                        source/constraints/general/kinset.F
-Chd|        INTAB                         source/interfaces/inter3d1/i24tools.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    itagsl2                ../starter/source/interfaces/inter3d1/itagsl2.F
+      !||--- called by ------------------------------------------------------
+      !||    inintr2                ../starter/source/interfaces/inter3d1/inintr2.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    fretitl2               ../starter/source/starter/freform.F
+      !||    intab                  ../starter/source/interfaces/inter3d1/i24tools.F
+      !||    kinset                 ../starter/source/constraints/general/kinset.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE ITAGSL2(IPARI ,NOM_OPT,ITAB  ,IKINE  ,INTBUF_TAB,
      .                   ITAGND,ICNDS10,NSTRF ,ITAGCYC,IRBE2     ,
      .                   IRBE3 ,LRBE3  )
@@ -38,7 +39,8 @@ C-----------------------------------------------
 C   M o d u l e s
 C----------------------------------------------- 
       USE MESSAGE_MOD
-      USE INTBUFDEF_MOD 
+      USE INTBUFDEF_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -67,7 +69,7 @@ C-----------------------------------------------
       INTEGER I,J,N,NTY,ILEV,NSN,NMN,ISL,NKIN,NOINT,NINT,KCOND,IML,NNOD,NBINTER,TYP,K0
       INTEGER, DIMENSION(:), ALLOCATABLE :: PENTAG,TAGNOS,ITAGMD
       INTEGER, DIMENSION(:), ALLOCATABLE :: IKINE1
-      CHARACTER*nchartitle, TITR
+      CHARACTER(LEN=NCHARTITLE)::TITR
       INTEGER II,N1,N2,IAD,M
       LOGICAL IS1,IS2
 C-----------------------------------------------

@@ -20,22 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  HM_READ_EBCS_NRF              source/boundary_conditions/ebcs/hm_read_ebcs_nrf.F
-Chd|-- called by -----------
-Chd|        READ_EBCS                     source/boundary_conditions/ebcs/read_ebcs.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        HM_GET_FLOATV                 source/devtools/hm_reader/hm_get_floatv.F
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        HM_OPTION_IS_ENCRYPTED        source/devtools/hm_reader/hm_option_is_encrypted.F
-Chd|        NGR2USR                       source/system/nintrr.F        
-Chd|        EBCS_MOD                      ../common_source/modules/boundary_conditions/ebcs_mod.F
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_read_ebcs_nrf         ../starter/source/boundary_conditions/ebcs/hm_read_ebcs_nrf.F
+      !||--- called by ------------------------------------------------------
+      !||    read_ebcs                ../starter/source/boundary_conditions/ebcs/read_ebcs.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                   ../starter/source/output/message/message.F
+      !||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
+      !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+      !||    ngr2usr                  ../starter/source/system/nintrr.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod              ../starter/share/message_module/message_mod.F
+      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE HM_READ_EBCS_NRF(IGRSURF, MULTI_FVM, UNITAB, ID, TITR, UID, LSUBMODEL, EBCS)
 C-----------------------------------------------
 C   M o d u l e s
@@ -46,6 +44,7 @@ C-----------------------------------------------
       USE MULTI_FVM_MOD
       USE GROUPDEF_MOD
       USE SUBMODEL_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARKEY
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -63,7 +62,7 @@ C-----------------------------------------------
       INTEGER ID,UID
       TYPE (MULTI_FVM_STRUCT), INTENT(INOUT) :: MULTI_FVM
       TYPE (SURF_)   ,TARGET,  DIMENSION(NSURF)   :: IGRSURF
-      CHARACTER, INTENT(IN) :: TITR*nchartitle
+      CHARACTER(LEN=NCHARTITLE), INTENT(IN) :: TITR
       TYPE(SUBMODEL_DATA) LSUBMODEL(NSUBMOD)
       LOGICAL IS_AVAILABLE,IS_ENCRYPTED
       TYPE(t_ebcs_nrf), INTENT(INOUT) :: EBCS
@@ -75,7 +74,8 @@ C-----------------------------------------------
       INTEGER LISTE(NUMNOD), IMAT,IVEL_TYP,U_IALPHA,U_IRHO,U_IPRES,IFLAGUNIT,FLAG_FMT,
      .        CHECK_CUMUL_VF(2)
       my_real C,PRES,RHO,LCAR,R1,R2,ENER,VX,VY,VZ, ALPHA, TCAR_VF, TCAR_P
-      CHARACTER MESS*40,KEY*ncharkey,chain*9, chain1*64
+      CHARACTER MESS*40,chain*9, chain1*64
+      CHARACTER(LEN=NCHARKEY) :: KEY
       LOGICAL FOUND
       INTEGER, DIMENSION(:), POINTER :: INGR2USR
       INTEGER, EXTERNAL :: NGR2USR

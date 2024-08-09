@@ -20,30 +20,28 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  S20INIT3                      source/elements/solid/solide20/s20init3.F
-Chd|-- called by -----------
-Chd|        INITIA                        source/elements/initia/initia.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        ATHERI                        source/ale/atheri.F           
-Chd|        DTMAIN                        source/materials/time_step/dtmain.F
-Chd|        FAILINI                       source/elements/solid/solide/failini.F
-Chd|        FRETITL2                      source/starter/freform.F      
-Chd|        MATINI                        source/materials/mat_share/matini.F
-Chd|        S20COOR3                      source/elements/solid/solide20/s20coor3.F
-Chd|        S20DERI3                      source/elements/solid/solide20/s20deri3.F
-Chd|        S20MASS3                      source/elements/solid/solide20/s20mass3.F
-Chd|        S20MSI                        source/elements/solid/solide20/s20mass3.F
-Chd|        S20RST                        source/elements/solid/solide20/s20deri3.F
-Chd|        SBULK3                        source/elements/solid/solide/sbulk3.F
-Chd|        SIGIN20B                      source/elements/solid/solide20/s20mass3.F
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
-Chd|        DETONATORS_MOD                share/modules1/detonators_mod.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    s20init3               ../starter/source/elements/solid/solide20/s20init3.F
+      !||--- called by ------------------------------------------------------
+      !||    initia                 ../starter/source/elements/initia/initia.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    atheri                 ../starter/source/ale/atheri.F
+      !||    dtmain                 ../starter/source/materials/time_step/dtmain.F
+      !||    failini                ../starter/source/elements/solid/solide/failini.F
+      !||    fretitl2               ../starter/source/starter/freform.F
+      !||    matini                 ../starter/source/materials/mat_share/matini.F
+      !||    s20coor3               ../starter/source/elements/solid/solide20/s20coor3.F
+      !||    s20deri3               ../starter/source/elements/solid/solide20/s20deri3.F
+      !||    s20mass3               ../starter/source/elements/solid/solide20/s20mass3.F
+      !||    s20msi                 ../starter/source/elements/solid/solide20/s20mass3.F
+      !||    s20rst                 ../starter/source/elements/solid/solide20/s20deri3.F
+      !||    sbulk3                 ../starter/source/elements/solid/solide/sbulk3.F
+      !||    sigin20b               ../starter/source/elements/solid/solide20/s20mass3.F
+      !||--- uses       -----------------------------------------------------
+      !||    detonators_mod         ../starter/share/modules1/detonators_mod.F
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE S20INIT3(
      1           ELBUF_STR,MAS      ,IXS     ,PM      ,X         ,
      2           DETONATORS,GEO      ,VEUL    ,ALE_CONNECTIVITY ,IPARG     ,
@@ -63,6 +61,7 @@ C-----------------------------------------------
       USE DETONATORS_MOD             
       USE ALE_CONNECTIVITY_MOD
       USE MATPARAM_DEF_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -107,8 +106,7 @@ C-----------------------------------------------
      .        NB01,NB02,NB03,NB04,NB05,NB06, NUVAR,IDEF,
      .        JHBE, IPID1,NLAY,L_PLA,L_SIGB
       INTEGER NC(MVSIZ,20),MAT(MVSIZ), PID(MVSIZ), NGL(MVSIZ), NCC
-      CHARACTER*nchartitle,
-     .   TITR1
+      CHARACTER(LEN=NCHARTITLE)::TITR1
       my_real
      .   BID, FV(1),
      .   V8LOC(51,MVSIZ), MASS(MVSIZ),

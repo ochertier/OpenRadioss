@@ -20,24 +20,25 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  HM_READ_PROP15                source/properties/solid/hm_read_prop15.F
-Chd|-- called by -----------
-Chd|        HM_READ_PROPERTIES            source/properties/hm_read_properties.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        HM_GET_FLOATV                 source/devtools/hm_reader/hm_get_floatv.F
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        HM_OPTION_IS_ENCRYPTED        source/devtools/hm_reader/hm_option_is_encrypted.F
-Chd|        HM_READ_ALE_CLOSE             source/ale/hm_read_ale_close.F
-Chd|        USR2SYS                       source/system/sysfus.F        
-Chd|        ALE_MOD                       ../common_source/modules/ale/ale_mod.F
-Chd|        ELBUFTAG_MOD                  share/modules1/elbuftag_mod.F 
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_read_prop15           ../starter/source/properties/solid/hm_read_prop15.F
+      !||--- called by ------------------------------------------------------
+      !||    hm_read_properties       ../starter/source/properties/hm_read_properties.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                   ../starter/source/output/message/message.F
+      !||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
+      !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+      !||    hm_read_ale_close        ../starter/source/ale/hm_read_ale_close.F
+      !||    usr2sys                  ../starter/source/system/sysfus.F
+      !||--- uses       -----------------------------------------------------
+      !||    defaults_mod             ../starter/source/modules/defaults_mod.F90
+      !||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
+      !||    message_mod              ../starter/share/message_module/message_mod.F
+      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE HM_READ_PROP15 (IG , IGTYP , GEO   ,  IGEO   ,PROP_TAG  ,UNITAB ,
-     .                           LSUBMODEL,IDTITL ,ISKN  ,ITABM1    )
+     .                           LSUBMODEL,IDTITL ,ISKN  ,ITABM1,DEFAULTS_SOLID    )
 C============================================================================
 C   M o d u l e s
 C-----------------------------------------------
@@ -46,6 +47,8 @@ C-----------------------------------------------
       USE SUBMODEL_MOD
       USE MESSAGE_MOD
       USE ALE_MOD
+      USE DEFAULTS_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARKEY
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -58,7 +61,6 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "param_c.inc"
 #include      "scr17_c.inc"
-#include      "scr21_c.inc"
 #include      "tablen_c.inc"
 #include      "sphcom.inc"
 C-----------------------------------------------
@@ -68,18 +70,21 @@ C-----------------------------------------------
       INTEGER IGTYP , IGEO(*) ,ISKN(LISKN,*) ,ITABM1(*)
       TYPE(SUBMODEL_DATA) LSUBMODEL(*)
       my_real GEO(*)
-      CHARACTER IDTITL*nchartitle
+      CHARACTER(LEN=NCHARTITLE)::IDTITL
       TYPE(PROP_TAG_) , DIMENSION(0:MAXPROP) :: PROP_TAG
+      TYPE(SOLID_DEFAULTS_), INTENT(IN) :: DEFAULTS_SOLID
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER IG, ISMSTR, NIP, J,K ,NPTS , 
      .        IHBE,ISH3N,ISROT ,I8PT ,ISK,IHON ,ITU ,IRB,
      .        IGFLU ,IHBE_OLD
+      INTEGER     IHBE_DS,ISST_DS,IPLA_DS,IFRAME_DS
      
       my_real  ANGL,PUN,CVIS,RBID,VX,VY,VZ,FAC_L,FAC_T,FAC_M, PTHK, AN, PHI
-      CHARACTER*nchartitle,TITR
-      CHARACTER MESS*40,KEY*ncharkey
+      CHARACTER(LEN=NCHARTITLE)::TITR
+      CHARACTER MESS*40
+      CHARACTER(LEN=NCHARKEY)::KEY
       LOGICAL IS_AVAILABLE, IS_ENCRYPTED
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
@@ -95,6 +100,10 @@ c------------------------------
         ISROT=0
         IGFLU=1
         CVIS =ZERO
+!--- defaults values      
+      IHBE_DS=  DEFAULTS_SOLID%ISOLID
+      ISST_DS=  DEFAULTS_SOLID%ISMSTR
+      IFRAME_DS= DEFAULTS_SOLID%IFRAME
 
         IS_ENCRYPTED = .FALSE.
         IS_AVAILABLE = .FALSE.

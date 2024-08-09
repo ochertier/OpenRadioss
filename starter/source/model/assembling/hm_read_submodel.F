@@ -20,19 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  HM_READ_SUBMODEL              source/model/assembling/hm_read_submodel.F
-Chd|-- called by -----------
-Chd|        STARTER0                      source/starter/starter0.F     
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        HM_OPTION_COUNT               source/devtools/hm_reader/hm_option_count.F
-Chd|        HM_OPTION_READ_KEY            source/devtools/hm_reader/hm_option_read_key.F
-Chd|        HM_OPTION_START               source/devtools/hm_reader/hm_option_start.F
-Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_read_submodel     ../starter/source/model/assembling/hm_read_submodel.F
+      !||--- called by ------------------------------------------------------
+      !||    starter0             ../starter/source/starter/starter0.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg               ../starter/source/output/message/message.F
+      !||    hm_option_count      ../starter/source/devtools/hm_reader/hm_option_count.F
+      !||    hm_option_read_key   ../starter/source/devtools/hm_reader/hm_option_read_key.F
+      !||    hm_option_start      ../starter/source/devtools/hm_reader/hm_option_start.F
+      !||--- uses       -----------------------------------------------------
+      !||    hm_option_read_mod   ../starter/share/modules1/hm_option_read_mod.F
+      !||    message_mod          ../starter/share/message_module/message_mod.F
+      !||    submodel_mod         ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE HM_READ_SUBMODEL(LSUBMODEL)
 C-----------------------------------------------
 C   ROUTINE DESCRIPTION :
@@ -138,6 +139,13 @@ C
         LSUBMODEL(I)%NOSUBMOD = NOSUBMOD(I) 
         LSUBMODEL(I)%LEVEL = LEVEL(I)  
         LSUBMODEL(I)%UID = UID_SUB(I)
+        LSUBMODEL(I)%OFF_DEF    = OFFSETS(1,I)
+        LSUBMODEL(I)%OFF_NOD    = OFFSETS(2,I)
+        LSUBMODEL(I)%OFF_EL     = OFFSETS(3,I)
+        LSUBMODEL(I)%OFF_PART   = OFFSETS(4,I)
+        LSUBMODEL(I)%OFF_MAT    = OFFSETS(5,I)
+        LSUBMODEL(I)%OFF_PROP   = OFFSETS(6,I)
+        LSUBMODEL(I)%OFF_SUBMOD = OFFSETS(7,I)
       ENDDO
 c
       ISUBSKEW = 1000000000

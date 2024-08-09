@@ -20,19 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  HM_READ_TABLE1                source/tools/curve/hm_read_table.F
-Chd|-- called by -----------
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|-- calls ---------------
-Chd|        HM_OPTION_COUNT               source/devtools/hm_reader/hm_option_count.F
-Chd|        HM_READ_TABLE1_0              source/tools/curve/hm_read_table1_0.F
-Chd|        HM_READ_TABLE1_1              source/tools/curve/hm_read_table1_1.F
-Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|        TABLE_MOD                     share/modules1/table_mod.F    
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_read_table1         ../starter/source/tools/curve/hm_read_table.F
+      !||--- called by ------------------------------------------------------
+      !||    lectur                 ../starter/source/starter/lectur.F
+      !||--- calls      -----------------------------------------------------
+      !||    hm_option_count        ../starter/source/devtools/hm_reader/hm_option_count.F
+      !||    hm_read_table1_0       ../starter/source/tools/curve/hm_read_table1_0.F
+      !||    hm_read_table1_1       ../starter/source/tools/curve/hm_read_table1_1.F
+      !||--- uses       -----------------------------------------------------
+      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+      !||    table_mod              ../starter/share/modules1/table_mod.F
+      !||====================================================================
       SUBROUTINE HM_READ_TABLE1(NTABLE, TABLE ,NFUNCT ,NPC ,PLD,NOM_OPT, UNITAB, LSUBMODEL)
 C-----------------------------------------------
 C   M o d u l e s
@@ -42,6 +43,7 @@ C-----------------------------------------------
       USE SUBMODEL_MOD
       USE HM_OPTION_READ_MOD
       USE UNITAB_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARFIELD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -55,9 +57,7 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NTABLE,NFUNCT,NPC(*)
-C     REAL
-      my_real
-     .    PLD(*)
+      my_real PLD(*)
       TYPE(TTABLE) TABLE(*)
       INTEGER NOM_OPT(LNOPT1,*)
       TYPE(SUBMODEL_DATA), DIMENSION(NSUBMOD), INTENT(IN) :: LSUBMODEL
@@ -72,8 +72,9 @@ C-----------------------------------------------
 C     REAL
       my_real
      .   BID, F5(5), TIME, FUNCT
-      CHARACTER TITR*nchartitle, MESS*40, KEY*ncharfield,
-     .          TITR1*nchartitle
+      CHARACTER(LEN=NCHARTITLE) :: TITR,TITR1
+      CHARACTER :: MESS*40
+      CHARACTER(LEN=NCHARFIELD)::KEY
       DATA MESS/' FUNCTION & TABLE DEFINITION            '/
       LOGICAL :: IS_ENCRYPTED, IS_AVAILABLE
 C======================================================================|
@@ -120,21 +121,22 @@ C-----------------------------------------------------------------
 2300  FORMAT(/'    ORDINATE VALUES . . . . . . . . . . . :'/)
 2350  FORMAT((3X,5(1X,G20.13))/)
       END
-Chd|====================================================================
-Chd|  HM_READ_TABLE2                source/tools/curve/hm_read_table.F
-Chd|-- called by -----------
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|-- calls ---------------
-Chd|        HM_OPTION_COUNT               source/devtools/hm_reader/hm_option_count.F
-Chd|        HM_READ_TABLE2_0              source/tools/curve/hm_read_table2_0.F
-Chd|        HM_READ_TABLE2_1              source/tools/curve/hm_read_table2_1.F
-Chd|        UDOUBLE                       source/system/sysfus.F        
-Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        INTERFACE_TABLE_MOD           share/modules1/table_mod.F    
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|        TABLE_MOD                     share/modules1/table_mod.F    
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_read_table2         ../starter/source/tools/curve/hm_read_table.F
+      !||--- called by ------------------------------------------------------
+      !||    lectur                 ../starter/source/starter/lectur.F
+      !||--- calls      -----------------------------------------------------
+      !||    hm_option_count        ../starter/source/devtools/hm_reader/hm_option_count.F
+      !||    hm_read_table2_0       ../starter/source/tools/curve/hm_read_table2_0.F
+      !||    hm_read_table2_1       ../starter/source/tools/curve/hm_read_table2_1.F
+      !||    udouble                ../starter/source/system/sysfus.F
+      !||--- uses       -----------------------------------------------------
+      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+      !||    interface_table_mod    ../starter/share/modules1/table_mod.F
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+      !||    table_mod              ../starter/share/modules1/table_mod.F
+      !||====================================================================
       SUBROUTINE HM_READ_TABLE2(NTABLE, TABLE ,NFUNCT , UNITAB, LSUBMODEL)
 C-----------------------------------------------
 C   M o d u l e s
@@ -145,6 +147,7 @@ C-----------------------------------------------
       USE SUBMODEL_MOD
       USE HM_OPTION_READ_MOD
       USE UNITAB_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARFIELD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -164,19 +167,14 @@ C-----------------------------------------------
      .        JREC, NPTS, STAT, IDS, LL, LX(2), NOK(4)
       INTEGER,DIMENSION(:),ALLOCATABLE :: JPERM1,JPERM2
       INTEGER,DIMENSION(:,:),ALLOCATABLE :: ITAG
-      INTEGER IERROR, NF, IDFUNC, NP, 
-     .        KK, IDEB, IFIN, IOK, NN, N1, N2, N11, N12, N13, KK1
-C     REAL
-      my_real
-     .   BID, F5(5), XX, X1, X2, X234(3), YY, Y1, Y2, R, XMIN, XMAX,
-     .    TIME, FUNCT,SCALEY
-      my_real,
-     .        DIMENSION(2) :: XD2
-      my_real,
-     .        DIMENSION(:),ALLOCATABLE :: XV1, XSTOR1, XSTOR2
-      my_real,
-     .        DIMENSION(:,:),ALLOCATABLE :: XV2
-      CHARACTER TITR*nchartitle, MESS*40, KEY*ncharfield
+      INTEGER IERROR, NF, IDFUNC, NP, KK, IDEB, IFIN, IOK, NN, N1, N2, N11, N12, N13, KK1
+      my_real BID, F5(5), XX, X1, X2, X234(3), YY, Y1, Y2, R, XMIN, XMAX, TIME, FUNCT,SCALEY
+      my_real,DIMENSION(2) :: XD2
+      my_real,DIMENSION(:),ALLOCATABLE :: XV1, XSTOR1, XSTOR2
+      my_real,DIMENSION(:,:),ALLOCATABLE :: XV2
+      CHARACTER(LEN=NCHARTITLE) :: TITR
+      CHARACTER :: MESS*40
+      CHARACTER(LEN=NCHARFIELD) :: KEY
       DATA MESS/' FUNCTION & TABLE DEFINITION            '/
       LOGICAL :: IS_ENCRYPTED, IS_AVAILABLE
 C======================================================================|

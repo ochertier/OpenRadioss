@@ -20,15 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  SIGEPS66C                     source/materials/mat/mat066/sigeps66c.F
-Chd|-- called by -----------
-Chd|        MULAWC                        source/materials/mat_share/mulawc.F
-Chd|-- calls ---------------
-Chd|        VINTER                        source/tools/curve/vinter.F   
-Chd|        FINTER                        source/tools/curve/finter.F   
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    sigeps66c          ../engine/source/materials/mat/mat066/sigeps66c.F
+      !||--- called by ------------------------------------------------------
+      !||    mulawc             ../engine/source/materials/mat_share/mulawc.F
+      !||--- calls      -----------------------------------------------------
+      !||    finter             ../engine/source/tools/curve/finter.F
+      !||    finter2            ../engine/source/tools/curve/vinter.F
+      !||    vinter             ../engine/source/tools/curve/vinter.F
+      !||--- uses       -----------------------------------------------------
+      !||    matparam_def_mod   ../common_source/modules/mat_elem/matparam_def_mod.F90
+      !||====================================================================
       SUBROUTINE SIGEPS66C(
      1     NEL    ,NUPARAM  ,NUVAR   ,MFUNC   ,KFUNC  ,
      2     NPF    ,NPT0     ,IPT     ,IFLAG   ,
@@ -43,7 +45,7 @@ Chd|====================================================================
      A     SOUNDSP,VISCMAX  ,THK     ,PLA     ,UVAR   ,
      B     OFF    ,NGL      ,IPM     ,MAT     ,ETSE   ,
      C     GS     ,YLD      ,EPSP    ,ISRATE  ,INLOC  ,
-     D     DPLANL ,MAT_PARAM,NUVARV  ,UVARV   )
+     D     DPLANL ,MAT_PARAM,NUVARV  ,UVARV   ,LOFF   )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -125,6 +127,7 @@ C-----------------------------------------------
      .   SIGOXY(NEL),SIGOYZ(NEL),SIGOZX(NEL),
      .   GS(*),EPSP(NEL),DPLANL(NEL)
       TYPE(MATPARAM_STRUCT_) ,INTENT(IN) :: MAT_PARAM
+      my_real, DIMENSION(NEL), INTENT(IN) :: LOFF
 C-----------------------------------------------
 C   O U T P U T   A r g u m e n t s
 C-----------------------------------------------
@@ -790,11 +793,13 @@ C     NON-LOCAL THICKNESS VARIATION
 C--------------------------------
       IF (INLOC > 0) THEN
         DO I = 1,NEL
-          SVM(I) = SQRT(SIGNXX(I)*SIGNXX(I) + SIGNYY(I)*SIGNYY(I)
-     .           - SIGNXX(I)*SIGNYY(I) + THREE*SIGNXY(I)*SIGNXY(I))
-          DEZZ   = MAX(DPLANL(I),ZERO)*HALF*(SIGNXX(I)+SIGNYY(I))/MAX(SVM(I),EM20)
-          DEZZ   = -NU*((SIGNXX(I)-SIGOXX(I)+SIGNYY(I)-SIGOYY(I))/E(I)) - DEZZ
-          THK(I) = THK(I) + DEZZ*THKLY(I)*OFF(I)     
+          IF (LOFF(I) == ONE) THEN 
+            SVM(I) = SQRT(SIGNXX(I)*SIGNXX(I) + SIGNYY(I)*SIGNYY(I)
+     .             - SIGNXX(I)*SIGNYY(I) + THREE*SIGNXY(I)*SIGNXY(I))
+            DEZZ   = MAX(DPLANL(I),ZERO)*HALF*(SIGNXX(I)+SIGNYY(I))/MAX(SVM(I),EM20)
+            DEZZ   = -NU*((SIGNXX(I)-SIGOXX(I)+SIGNYY(I)-SIGOYY(I))/E(I)) - DEZZ
+            THK(I) = THK(I) + DEZZ*THKLY(I)*OFF(I)   
+          ENDIF  
         ENDDO  
       ENDIF
 C -----------------------------------------        

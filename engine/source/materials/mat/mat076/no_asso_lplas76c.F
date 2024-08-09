@@ -20,16 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  NO_ASSO_LPLAS76C              source/materials/mat/mat076/no_asso_lplas76c.F
-Chd|-- called by -----------
-Chd|        SIGEPS76C                     source/materials/mat/mat076/sigeps76c.F
-Chd|-- calls ---------------
-Chd|        TABLE_MAT_VINTERP             source/materials/tools/table_mat_vinterp.F
-Chd|        VINTER                        source/tools/curve/vinter.F   
-Chd|        TABLE4D_MOD                   ../common_source/modules/table4d_mod.F
-Chd|        TABLE_MAT_VINTERP_MOD         source/materials/tools/table_mat_vinterp.F
-Chd|====================================================================
+      !||====================================================================
+      !||    no_asso_lplas76c        ../engine/source/materials/mat/mat076/no_asso_lplas76c.F
+      !||--- called by ------------------------------------------------------
+      !||    sigeps76c               ../engine/source/materials/mat/mat076/sigeps76c.F
+      !||--- calls      -----------------------------------------------------
+      !||    table_mat_vinterp       ../engine/source/materials/tools/table_mat_vinterp.F
+      !||    vinter                  ../engine/source/tools/curve/vinter.F
+      !||--- uses       -----------------------------------------------------
+      !||    table4d_mod             ../common_source/modules/table4d_mod.F
+      !||    table_mat_vinterp_mod   ../engine/source/materials/tools/table_mat_vinterp.F
+      !||====================================================================
       SUBROUTINE NO_ASSO_LPLAS76C(
      .     NEL     ,NUPARAM ,NUVAR   ,NFUNC   ,IFUNC   ,
      .     NPF     ,TF      ,NUMTABL ,TABLE   ,
@@ -39,7 +40,7 @@ Chd|====================================================================
      .     SIGNXX  ,SIGNYY  ,SIGNXY  ,SIGNYZ  ,SIGNZX  ,
      .     PLA     ,DPLA    ,EPSD    ,OFF     ,GS      ,
      .     YLD     ,SOUNDSP ,DEZZ    ,INLOC   ,DPLANL  ,
-     .     NVARTMP, VARTMP  )
+     .     NVARTMP, VARTMP  ,LOFF    )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -65,6 +66,7 @@ C-----------------------------------------------
      .   DEPSXX,DEPSYY,DEPSXY,DEPSYZ,DEPSZX,
      .   SIGOXX,SIGOYY,SIGOXY,SIGOYZ,SIGOZX
       TYPE(TABLE_4D_), DIMENSION(NUMTABL), INTENT(IN) :: TABLE
+      my_real, DIMENSION(NEL), INTENT(IN) :: LOFF
 C-----------------------------------------------
 C   O U T P U T   A r g u m e n t s
 C-----------------------------------------------
@@ -459,18 +461,20 @@ c
       ! - NON-LOCAL THICKNESS VARIATION
       !====================================================================
       IF (INLOC > 0) THEN 
-        DO I = 1,NEL   
-          ALPHA(I)= (NINE/TWO)*((ONE-TWO*NUP(I))/(ONE+NUP(I)))
-          GF(I)   = SQRT(MAX(EM20,(SVM(I)**2)+ALPHA(I)*P(I)**2))
-          NORMGXX = (THREE_HALF*SXX(I) - THIRD*ALPHA(I)*P(I))/GF(I)
-          NORMGYY = (THREE_HALF*SYY(I) - THIRD*ALPHA(I)*P(I))/GF(I)
-          NORMGZZ = (THREE_HALF*SZZ(I) - THIRD*ALPHA(I)*P(I))/GF(I)
-          YLD_NORM = SVM(I)/GF(I)
-          IF (YLD_NORM /= ZERO) THEN 
-            DLAM_NL(I) = (ONE/YLD_NORM)*MAX(DPLANL(I),ZERO)
-            DEZZ(I) = DEZZ(I) + NU1*(DLAM_NL(I)*NORMGXX)
-     .                        + NU1*(DLAM_NL(I)*NORMGYY)
-     .                        + DLAM_NL(I)*NORMGZZ
+        DO I = 1,NEL
+          IF (LOFF(I) == ONE) THEN    
+            ALPHA(I)= (NINE/TWO)*((ONE-TWO*NUP(I))/(ONE+NUP(I)))
+            GF(I)   = SQRT(MAX(EM20,(SVM(I)**2)+ALPHA(I)*P(I)**2))
+            NORMGXX = (THREE_HALF*SXX(I) - THIRD*ALPHA(I)*P(I))/GF(I)
+            NORMGYY = (THREE_HALF*SYY(I) - THIRD*ALPHA(I)*P(I))/GF(I)
+            NORMGZZ = (THREE_HALF*SZZ(I) - THIRD*ALPHA(I)*P(I))/GF(I)
+            YLD_NORM = SVM(I)/GF(I)
+            IF (YLD_NORM /= ZERO) THEN 
+              DLAM_NL(I) = (ONE/YLD_NORM)*MAX(DPLANL(I),ZERO)
+              DEZZ(I) = DEZZ(I) + NU1*(DLAM_NL(I)*NORMGXX)
+     .                          + NU1*(DLAM_NL(I)*NORMGYY)
+     .                          + DLAM_NL(I)*NORMGZZ
+            ENDIF
           ENDIF          
         ENDDO
       ENDIF

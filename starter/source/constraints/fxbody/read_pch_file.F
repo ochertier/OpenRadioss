@@ -20,18 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  READ_PCH_FILE                 source/constraints/fxbody/read_pch_file.F
-Chd|-- called by -----------
-Chd|        HM_READ_FXB1                  source/constraints/fxbody/hm_read_fxb.F
-Chd|        HM_SETFXRBYON                 source/constraints/fxbody/hm_setfxrbyon.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        FXRLINE                       source/constraints/fxbody/hm_read_fxb.F
-Chd|        USR2SYS                       source/system/sysfus.F        
-Chd|        INOUTFILE_MOD                 ../common_source/modules/inoutfile_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    read_pch_file          ../starter/source/constraints/fxbody/read_pch_file.F
+      !||--- called by ------------------------------------------------------
+      !||    hm_read_fxb1           ../starter/source/constraints/fxbody/hm_read_fxb.F
+      !||    hm_setfxrbyon          ../starter/source/constraints/fxbody/hm_setfxrbyon.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    fxrline                ../starter/source/constraints/fxbody/hm_read_fxb.F
+      !||    usr2sys                ../starter/source/system/sysfus.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE READ_PCH_FILE(FLAG,MATRIX,ITAG,MATRIX_ADD,CPT_STIFF,
      .                         CPT_MASS,ITABM1,PCH_FILE,ID,TITR)
 C-----------------------------------------------
@@ -39,6 +39,7 @@ C   M o d u l e s
 C-----------------------------------------------
       USE INOUTFILE_MOD
       USE MESSAGE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -51,16 +52,14 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER ID,ITABM1(*),ITAG(*),MATRIX_ADD(4,*), CPT_STIFF,CPT_MASS,FLAG
-      my_real 
-     .        MATRIX(*)
-      CHARACTER PCH_FILE*100,TITR*nchartitle
+      my_real MATRIX(*)
+      CHARACTER PCH_FILE*100
+      CHARACTER(LEN=NCHARTITLE) :: TITR
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,NFX,REF,IFO,TIN,TOUT,POLAR,NCOL,DUM,DUM2,SIZE,TRIANGLE,
-     .        ID_NOD1,ID_NOD2,J,K,ISTOP
-      my_real 
-     .        RELL
+      INTEGER I,NFX,REF,IFO,TIN,TOUT,POLAR,NCOL,DUM,DUM2,SIZE,TRIANGLE,ID_NOD1,ID_NOD2,J,K,ISTOP
+      my_real RELL
       CHARACTER DEBUT*8,NAME*8,MATRIX_TYPE*16,NWLINE*100,MESS*40
 
       INTEGER :: LEN_TMP_NAME,I_ERR

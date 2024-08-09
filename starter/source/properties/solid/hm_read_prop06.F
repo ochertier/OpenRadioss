@@ -20,25 +20,27 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  HM_READ_PROP06                source/properties/solid/hm_read_prop06.F
-Chd|-- called by -----------
-Chd|        HM_READ_PROPERTIES            source/properties/hm_read_properties.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        ARRET                         source/system/arret.F         
-Chd|        HM_GET_FLOATV                 source/devtools/hm_reader/hm_get_floatv.F
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        HM_OPTION_IS_ENCRYPTED        source/devtools/hm_reader/hm_option_is_encrypted.F
-Chd|        SUBROTVECT                    source/model/submodel/subrot.F
-Chd|        ELBUFTAG_MOD                  share/modules1/elbuftag_mod.F 
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_read_prop06           ../starter/source/properties/solid/hm_read_prop06.F
+      !||--- called by ------------------------------------------------------
+      !||    hm_read_properties       ../starter/source/properties/hm_read_properties.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                   ../starter/source/output/message/message.F
+      !||    arret                    ../starter/source/system/arret.F
+      !||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
+      !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+      !||    istr                     ../starter/source/tools/univ/istr.F
+      !||    subrotvect               ../starter/source/model/submodel/subrot.F
+      !||--- uses       -----------------------------------------------------
+      !||    defaults_mod             ../starter/source/modules/defaults_mod.F90
+      !||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
+      !||    message_mod              ../starter/share/message_module/message_mod.F
+      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE HM_READ_PROP06(GEO      ,IGEO    ,PROP_TAG,MULTI_FVM ,IGTYP   ,
      .                          IG       ,IDTITL  ,UNITAB  ,LSUBMODEL ,RTRANS  ,
-     .                          SUB_ID   ,ISKN    ,IPART   ,SUB_INDEX)
+     .                          SUB_ID   ,ISKN    ,IPART   ,SUB_INDEX,DEFAULTS_SOLID)
 C-----------------------------------------------
 C   ROUTINE DESCRIPTION :
 C   ===================
@@ -73,6 +75,8 @@ C-----------------------------------------------
       USE SUBMODEL_MOD
       USE MESSAGE_MOD
       USE MULTI_FVM_MOD
+      USE DEFAULTS_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -85,7 +89,6 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "param_c.inc"
 #include      "scr17_c.inc"
-#include      "scr21_c.inc"
 #include      "sphcom.inc"
 #include      "tablen_c.inc"
 #include      "tabsiz_c.inc"
@@ -103,23 +106,25 @@ C
       my_real,INTENT(INOUT) :: GEO(NPROPG)
       my_real,INTENT(IN) :: RTRANS(NTRANSF,NRTRANS)
 C
-      CHARACTER,INTENT(IN) :: IDTITL*nchartitle
+      CHARACTER(LEN=NCHARTITLE),INTENT(IN) :: IDTITL
 C
       TYPE(PROP_TAG_) , DIMENSION(0:MAXPROP),INTENT(INOUT) :: PROP_TAG
       TYPE(MULTI_FVM_STRUCT),INTENT(IN) :: MULTI_FVM
       TYPE(SUBMODEL_DATA),INTENT(IN) :: LSUBMODEL(NSUBMOD)
       TYPE (UNIT_TYPE_),INTENT(IN) ::UNITAB 
+      TYPE(SOLID_DEFAULTS_), INTENT(IN) :: DEFAULTS_SOLID
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER IHBE,ISMSTR,IPLAS,ICPRE,ICSTR,IINT,IP,ISK,IREP,JCVT,
      .    NPT,NPTR,NPTS,NPTT,ITET4,IET,ISTR,IHBE_OLD,ITET10,
-     .    ISHEAR,ISORTH
-C     REAL
+     .    ISHEAR,ISORTH,ICONTROL_D,ICONTROL
       my_real
      .    CVIS,QA,QB,QH,VX,VY,VZ,ANGLE,DTMIN,PX,PY,PZ,VN,
      .    VDEFMIN,VDEFMAX,ASPMAX,ASPTET
       INTEGER K,NSPHDIR,ID_PARTSPH,IPARTSPH,J
+      INTEGER     IHBE_DS,ISST_DS,IPLA_DS,IFRAME_DS, IMAS_DS,
+     .            ITET4_D,ITET10_D,ICPRE_D
       LOGICAL IS_AVAILABLE, IS_ENCRYPTED
 C-----------------------------------------------
       IS_ENCRYPTED = .FALSE.
@@ -128,6 +133,14 @@ C-----------------------------------------------
       ISORTH=1
       ISMSTR=0
       IHBE=0
+!--- defaults values      
+      IHBE_DS=  DEFAULTS_SOLID%ISOLID
+      ISST_DS=  DEFAULTS_SOLID%ISMSTR
+      ICPRE_D=  DEFAULTS_SOLID%ICPRE
+      ITET4_D=  DEFAULTS_SOLID%ITETRA4
+      ITET10_D= DEFAULTS_SOLID%ITETRA10
+      IFRAME_DS= DEFAULTS_SOLID%IFRAME
+      ICONTROL_D=DEFAULTS_SOLID%ICONTROL
 C======================================================================|
 C
       GEO(3)=ISMSTR
@@ -166,6 +179,7 @@ c      CALL HM_GET_INTV('Istrain',ISTR,IS_AVAILABLE,LSUBMODEL)
 c      CALL HM_GET_INTV('IHKT',IET,IS_AVAILABLE,LSUBMODEL)
       CALL HM_GET_INTV('Ndir',NSPHDIR,IS_AVAILABLE,LSUBMODEL)
       CALL HM_GET_INTV('SPHPART_ID',ID_PARTSPH,IS_AVAILABLE,LSUBMODEL)
+      CALL HM_GET_INTV('Icontrol',ICONTROL,IS_AVAILABLE,LSUBMODEL)
 C--------------------------------------------------
 C EXTRACT DATAS (REAL VALUES)
 C--------------------------------------------------
@@ -415,6 +429,8 @@ C---- error-out if Vj=0+IP=23,24
       ENDIF
 C   Istrain
 c      IF (ISTR == 0)ISTR =ISTRA_D
+      IF (ICONTROL==0) ICONTROL=ICONTROL_D
+      IF (ICONTROL>1) ICONTROL=0
 C----
       IGEO(2)  = IP
       IGEO(4)  = NPT
@@ -429,6 +445,7 @@ C----
       IGEO(16) = JCVT-1
       IGEO(37) = NSPHDIR
       IGEO(38) = IPARTSPH
+      IGEO(97) = ICONTROL
 C
       GEO(1)  = ANGLE
       GEO(7)  = VX
@@ -448,10 +465,10 @@ C----
       IF(.NOT. IS_ENCRYPTED)THEN
         IF(IGEO(31) == 1)THEN
           WRITE(IOUT,1100)IG,IHBE,ISMSTR,IPLAS,NPT,JCVT,ITET4,ITET10,
-     .                ICPRE,ICSTR,CVIS,QA,QB,QH,DTMIN,IREP,ISTR
+     .                ICPRE,ICSTR,CVIS,QA,QB,QH,DTMIN,IREP,ISTR,ICONTROL
         ELSE
           WRITE(IOUT,1000)IG,IHBE,ISMSTR,IPLAS,NPT,JCVT,ITET4,ITET10,
-     .                ICPRE,ICSTR,CVIS,QA,QB,QH,DTMIN,IREP,ISTR
+     .                ICPRE,ICSTR,CVIS,QA,QB,QH,DTMIN,IREP,ISTR,ICONTROL
         ENDIF
         IF((VDEFMIN+VDEFMAX+ASPMAX+ASPTET)>ZERO) THEN
           IF (VDEFMAX==ZERO) VDEFMAX=EP10
@@ -537,7 +554,8 @@ C---
      & 5X,'HOURGLASS VISCOSITY . . . . . . . . . .=',1PG20.13/,
      & 5X,'BRICK MINIMUM TIME STEP................=',1PG20.13/,
      & 5X,'LOCAL ORTHOTROPY SYSTEM FORMULATION . .=',I10/,
-     & 5X,'POST PROCESSING STRAIN FLAG . . . . . .=',I10/)
+     & 5X,'POST PROCESSING STRAIN FLAG . . . . . .=',I10/,
+     & 5X,'SOLID DISTORTION CONTROL FLAG . . . . .=',I10/)
  1099 FORMAT(
      & 5X,'ORTHOTROPIC SOLID PROPERTY SET'/,
      & 5X,'PROPERTY SET NUMBER . . . . . . . . . .=',I8/,
@@ -564,7 +582,8 @@ C---
      & 5X,'HOURGLASS VISCOSITY . . . . . . . . . .=',1PG20.13/,
      & 5X,'BRICK MINIMUM TIME STEP................=',1PG20.13/,
      & 5X,'LOCAL ORTHOTROPY SYSTEM FORMULATION . .=',I10/,
-     & 5X,'POST PROCESSING STRAIN FLAG . . . . . .=',I10/)
+     & 5X,'POST PROCESSING STRAIN FLAG . . . . . .=',I10/,
+     & 5X,'SOLID DISTORTION CONTROL FLAG . . . . .=',I10/)
  1001 FORMAT(
      & 5X,'ORTHOTROPIC SKEW FRAME. . . . . . . . .=',I10)
  1002 FORMAT(

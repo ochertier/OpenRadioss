@@ -20,23 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  LEC_INIMAP2D_FILE             source/initial_conditions/inimap/lec_inimap2d_file.F
-Chd|-- called by -----------
-Chd|        HM_READ_INIMAP2D              source/initial_conditions/inimap/hm_read_inimap2d.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        CLOSE_C                       ../common_source/tools/input_output/write_routtines.c
-Chd|        CUR_FIL_C                     ../common_source/tools/input_output/write_routtines.c
-Chd|        OPEN_C                        ../common_source/tools/input_output/write_routtines.c
-Chd|        READ_DB                       ../common_source/tools/input_output/read_db.F
-Chd|        READ_I_C                      ../common_source/tools/input_output/write_routtines.c
-Chd|        FUNC2D_MOD                    share/modules1/func2d_mod.F   
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        INIMAP2D_MOD                  share/modules1/inimap2d_mod.F 
-Chd|        INOUTFILE_MOD                 ../common_source/modules/inoutfile_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    lec_inimap2d_file      ../starter/source/initial_conditions/inimap/lec_inimap2d_file.F
+      !||--- called by ------------------------------------------------------
+      !||    hm_read_inimap2d       ../starter/source/initial_conditions/inimap/hm_read_inimap2d.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    usr2sys                ../starter/source/system/sysfus.F
+      !||--- uses       -----------------------------------------------------
+      !||    func2d_mod             ../starter/share/modules1/func2d_mod.F
+      !||    inimap2d_mod           ../starter/share/modules1/inimap2d_mod.F
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE LEC_INIMAP2D_FILE(INIMAP2D, FILENAME, ID, TITLE)
 C-----------------------------------------------
 C   M o d u l e s
@@ -45,7 +40,8 @@ C-----------------------------------------------
       USE FUNC2D_MOD
       USE MESSAGE_MOD
       USE GROUPDEF_MOD
-      USE INOUTFILE_MOD      
+      USE INOUTFILE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARLINE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -59,9 +55,9 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       TYPE(INIMAP2D_STRUCT), INTENT(INOUT) :: INIMAP2D
-      CHARACTER*ncharline, INTENT(INOUT) :: FILENAME
+      CHARACTER(LEN=NCHARLINE), INTENT(INOUT) :: FILENAME
       INTEGER, INTENT(IN) :: ID
-      CHARACTER TITLE*nchartitle
+      CHARACTER(LEN=NCHARTITLE)::TITLE
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
@@ -69,7 +65,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      CHARACTER MESS*40,BUFFER*14,ROOTNAME*ncharline
+      CHARACTER MESS*40,BUFFER*14
+      CHARACTER(LEN=NCHARLINE) :: ROOTNAME
       DATA MESS/'INFILE'/
       INTEGER NUM_CENTROIDS,N_CYCLE,K,ISUBMAT,NBMAT,NUM_NODE_VEL,INPUT_VERSION,NB_COMP
       my_real X_SCALE,Y_SCALE,X_SHIFT,Y_SHIFT,TT

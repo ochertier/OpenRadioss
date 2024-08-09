@@ -20,25 +20,25 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  HM_READ_PROP01                source/properties/shell/hm_read_prop01.F
-Chd|-- called by -----------
-Chd|        HM_READ_PROPERTIES            source/properties/hm_read_properties.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        HM_GET_FLOATV                 source/devtools/hm_reader/hm_get_floatv.F
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        HM_OPTION_IS_ENCRYPTED        source/devtools/hm_reader/hm_option_is_encrypted.F
-Chd|        ELBUFTAG_MOD                  share/modules1/elbuftag_mod.F 
-Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
-Chd|        PINCHTYPE_MOD                 ../common_source/modules/pinchtype_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_read_prop01           ../starter/source/properties/shell/hm_read_prop01.F
+      !||--- called by ------------------------------------------------------
+      !||    hm_read_properties       ../starter/source/properties/hm_read_properties.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                   ../starter/source/output/message/message.F
+      !||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
+      !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+      !||--- uses       -----------------------------------------------------
+      !||    defaults_mod             ../starter/source/modules/defaults_mod.F90
+      !||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
+      !||    hm_option_read_mod       ../starter/share/modules1/hm_option_read_mod.F
+      !||    message_mod              ../starter/share/message_module/message_mod.F
+      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE HM_READ_PROP01(GEO       ,IGEO     ,PROP_TAG ,MULTI_FVM,IGTYP    ,
      .                          IG        ,IDTITL   ,
-     .                          UNITAB    ,LSUBMODEL)
+     .                          UNITAB    ,LSUBMODEL,DEFAULTS_SHELL)
 C============================================================================
 C   M o d u l e s
 C-----------------------------------------------
@@ -49,6 +49,8 @@ C-----------------------------------------------
       USE SUBMODEL_MOD
       USE HM_OPTION_READ_MOD
       USE PINCHTYPE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      USE DEFAULTS_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -60,7 +62,6 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "scr16_c.inc"
 #include      "scr17_c.inc"
-#include      "scr21_c.inc"
 #include      "tablen_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -70,10 +71,11 @@ C-----------------------------------------------
       INTEGER IGTYP,IG,UID,SUB_ID
       my_real
      .   GEO(*)
-      CHARACTER IDTITL*nchartitle
+      CHARACTER(LEN=NCHARTITLE)::IDTITL
       TYPE(PROP_TAG_) , DIMENSION(0:MAXPROP) :: PROP_TAG
       TYPE(MULTI_FVM_STRUCT) :: MULTI_FVM
       TYPE(SUBMODEL_DATA),INTENT(IN)::LSUBMODEL(*)
+      TYPE(SHELL_DEFAULTS_), INTENT(IN)  :: DEFAULTS_SHELL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -83,7 +85,9 @@ C-----------------------------------------------
      .   NSHELL, NSHSUP, NSHINF,
      .   NSST_D, NSST_DS, NPSH,ISEN,ISORTH,
      .   IHBE_OLD,  ISH3N,ISROT,IPINCH,I1,I2,IPOS
-     
+      INTEGER     IHBE_D,IPLA_D,ISTR_D,ITHK_D,ISHEA_D,ISST_D,
+     .           ISH3N_D, ISTRA_D,NPTS_D,IDRIL_D
+
       my_real
      .    PUN,CVIS,DN_P,PTHK,ZSHIFT
       LOGICAL IS_AVAILABLE, IS_ENCRYPTED
@@ -106,6 +110,15 @@ C=======================================================================
         PTHK = ZERO
         IPOS =0
 C
+       IHBE_D =  DEFAULTS_SHELL%ishell
+       ISH3N_D=  DEFAULTS_SHELL%ish3n
+       ISST_D =  DEFAULTS_SHELL%ismstr
+       IPLA_D =  DEFAULTS_SHELL%iplas
+       ITHK_D =  DEFAULTS_SHELL%ithick
+       IDRIL_D=  DEFAULTS_SHELL%idrill
+       ISHEA_D = 0
+       NPTS_D = 0
+       ISTRA_D = 1
 C       Double stockage temporaire - supprimer GEO(12)=IGTYP apres tests
         IGEO( 1)=IG
         IGEO(11)=IGTYP

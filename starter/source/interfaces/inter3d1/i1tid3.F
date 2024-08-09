@@ -20,16 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  I1TID3                        source/interfaces/inter3d1/i1tid3.F
-Chd|-- called by -----------
-Chd|        ININT3                        source/interfaces/inter3d1/inint3.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        INIST3                        source/interfaces/inter3d1/inist3.F
-Chd|        KINSET                        source/constraints/general/kinset.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    i1tid3                 ../starter/source/interfaces/inter3d1/i1tid3.F
+      !||--- called by ------------------------------------------------------
+      !||    inint3                 ../starter/source/interfaces/inter3d1/inint3.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    inist3                 ../starter/source/interfaces/inter3d1/inist3.F
+      !||    kinset                 ../starter/source/constraints/general/kinset.F
+      !||--- uses       -----------------------------------------------------
+      !||    format_mod             ../starter/share/modules1/format_mod.F90
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE I1TID3(X     ,IRECT,CRST ,MSR  ,NSV,
      1                  ILOC  ,IRTL ,NSN  ,ITAB ,IKINE,
      2                  IKINE1,ID   ,TITR ,ILEV ,NTY, CSTS_BIS)
@@ -41,6 +43,8 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
+      USE FORMAT_MOD , ONLY : FMW_7I_2F
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -55,13 +59,10 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NSN
-      INTEGER IRECT(4,*), MSR(*), NSV(*), ILOC(*), IRTL(*),
-     .   ITAB(*),IKINE(*),IKINE1(*),ILEV,NTY
-      my_real
-     .   X(3,*), CRST(2,*), CSTS_BIS(2,*)
+      INTEGER IRECT(4,*), MSR(*), NSV(*), ILOC(*), IRTL(*), ITAB(*),IKINE(*),IKINE1(*),ILEV,NTY
+      my_real X(3,*), CRST(2,*), CSTS_BIS(2,*)
       INTEGER ID
-      CHARACTER*nchartitle,
-     .   TITR
+      CHARACTER(LEN=NCHARTITLE) :: TITR
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

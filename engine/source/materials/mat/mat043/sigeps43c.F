@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  SIGEPS43C                     source/materials/mat/mat043/sigeps43c.F
-Chd|-- called by -----------
-Chd|        MULAWC                        source/materials/mat_share/mulawc.F
-Chd|-- calls ---------------
-Chd|        VINTER                        source/tools/curve/vinter.F   
-Chd|        FINTER                        source/tools/curve/finter.F   
-Chd|====================================================================
+      !||====================================================================
+      !||    sigeps43c   ../engine/source/materials/mat/mat043/sigeps43c.F
+      !||--- called by ------------------------------------------------------
+      !||    mulawc      ../engine/source/materials/mat_share/mulawc.F
+      !||--- calls      -----------------------------------------------------
+      !||    finter      ../engine/source/tools/curve/finter.F
+      !||    vinter      ../engine/source/tools/curve/vinter.F
+      !||====================================================================
       SUBROUTINE SIGEPS43C(
      1     NEL      ,NUPARAM  ,NUVAR    ,NPF      ,TF       ,
      2     NFUNC    ,IFUNC    ,ISRATE   ,TIME     ,TIMESTEP ,
@@ -40,7 +40,7 @@ Chd|====================================================================
      9     SOUNDSP  ,THK      ,PLA      ,UVAR     ,OFF      ,
      A     NGL      ,ETSE     ,HARDM    ,SIGY     ,GS       , 
      B     DPLA1    ,EPSP     ,SHF      ,INLOC    ,DPLANL   ,
-     C     SEQ      )
+     C     SEQ      ,LOFF     )
 C=======================================================================
 C   Tabulated Hill material model
 C=======================================================================
@@ -67,6 +67,7 @@ C-----------------------------------------------
      .   SIGOXX(NEL),SIGOYY(NEL),
      .   SIGOXY(NEL),SIGOYZ(NEL),SIGOZX(NEL),SIGY(NEL),HARDM(NEL),
      .   DPLANL(NEL),SEQ(NEL)
+      my_real, DIMENSION(NEL), INTENT(IN) :: LOFF
 C-----------------------------------------------
 C   O U T P U T   A R G U M E N T S
 C-----------------------------------------------
@@ -416,7 +417,7 @@ C---------------------------------------------------------------
         S3      = A03*SIGNXX(I)*SIGNYY(I)
         AXY(I)  = A12*SIGNXY(I)*SIGNXY(I)
         SEQ(I)  = SQRT(S1+S2-S3+AXY(I)) 
-        IF (INLOC > 0) THEN 
+        IF ((INLOC > 0).AND.(LOFF(I) == ONE)) THEN 
           NORMXX  = (TWO*A01*SIGNXX(I) - A03*SIGNYY(I))/(MAX(TWO*SEQ(I),EM20))
           NORMYY  = (TWO*A02*SIGNYY(I) - A03*SIGNXX(I))/(MAX(TWO*SEQ(I),EM20))
           DEZZ    = MAX(DPLANL(I),ZERO)*(NORMXX + NORMYY)

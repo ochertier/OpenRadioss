@@ -20,40 +20,40 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  LECSEC42                      source/tools/sect/hm_read_sect.F
-Chd|-- called by -----------
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        ANODSET                       source/output/analyse/analyse_node.c
-Chd|        FRETITL                       source/starter/freform.F      
-Chd|        HM_GET_FLOATV                 source/devtools/hm_reader/hm_get_floatv.F
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        HM_GET_INT_ARRAY_INDEX        source/devtools/hm_reader/hm_get_int_array_index.F
-Chd|        HM_GET_STRING                 source/devtools/hm_reader/hm_get_string.F
-Chd|        HM_OPTION_READ_KEY            source/devtools/hm_reader/hm_option_read_key.F
-Chd|        HM_OPTION_START               source/devtools/hm_reader/hm_option_start.F
-Chd|        HM_SZ_R2R                     source/coupling/rad2rad/routines_r2r.F
-Chd|        SECSTRI                       source/tools/sect/hm_read_sect.F
-Chd|        SEC_NODES                     source/tools/sect/hm_read_sect.F
-Chd|        SEC_NODES_SOL                 source/tools/sect/hm_read_sect.F
-Chd|        SEC_TRI                       source/tools/sect/hm_read_sect.F
-Chd|        SUBROTPOINT                   source/model/submodel/subrot.F
-Chd|        SUBROTVECT                    source/model/submodel/subrot.F
-Chd|        UDOUBLE                       source/system/sysfus.F        
-Chd|        ZERORE                        source/system/zerore.F        
-Chd|        ELEGROR                       source/groups/elegror.F       
-Chd|        ELEGROR_SEATBELT              source/groups/elegror_seatbelt.F
-Chd|        GRSIZE_ELE_TRANS              source/system/nintrr.F        
-Chd|        NODGRNR5                      source/starter/freform.F      
-Chd|        USR2SYS                       source/system/sysfus.F        
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        R2R_MOD                       share/modules1/r2r_mod.F      
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    lecsec42                 ../starter/source/tools/sect/hm_read_sect.F
+      !||--- called by ------------------------------------------------------
+      !||    lectur                   ../starter/source/starter/lectur.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                   ../starter/source/output/message/message.F
+      !||    anodset                  ../starter/source/output/analyse/analyse_node.c
+      !||    elegror                  ../starter/source/groups/elegror.F
+      !||    elegror_seatbelt         ../starter/source/groups/elegror_seatbelt.F
+      !||    fretitl                  ../starter/source/starter/freform.F
+      !||    grsize_ele_trans         ../starter/source/system/nintrr.F
+      !||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
+      !||    hm_get_int_array_index   ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+      !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    hm_get_string            ../starter/source/devtools/hm_reader/hm_get_string.F
+      !||    hm_option_read_key       ../starter/source/devtools/hm_reader/hm_option_read_key.F
+      !||    hm_option_start          ../starter/source/devtools/hm_reader/hm_option_start.F
+      !||    hm_sz_r2r                ../starter/source/coupling/rad2rad/routines_r2r.F
+      !||    nodgrnr5                 ../starter/source/starter/freform.F
+      !||    sec_nodes                ../starter/source/tools/sect/hm_read_sect.F
+      !||    sec_nodes_sol            ../starter/source/tools/sect/hm_read_sect.F
+      !||    sec_tri                  ../starter/source/tools/sect/hm_read_sect.F
+      !||    secstri                  ../starter/source/tools/sect/hm_read_sect.F
+      !||    subrotpoint              ../starter/source/model/submodel/subrot.F
+      !||    subrotvect               ../starter/source/model/submodel/subrot.F
+      !||    udouble                  ../starter/source/system/sysfus.F
+      !||    usr2sys                  ../starter/source/system/sysfus.F
+      !||    zerore                   ../starter/source/system/zerore.F
+      !||--- uses       -----------------------------------------------------
+      !||    hm_option_read_mod       ../starter/share/modules1/hm_option_read_mod.F
+      !||    message_mod              ../starter/share/message_module/message_mod.F
+      !||    r2r_mod                  ../starter/share/modules1/r2r_mod.F
+      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE LECSEC42(IXS   ,IXQ   ,IXC    ,IXT    ,IXP    ,IXR    ,
      2                    IXTG  ,X0    ,NSTRF  ,ITAB   ,ITABM1 ,
      3                    IGRNOD,SECBUF ,
@@ -71,6 +71,7 @@ C-----------------------------------------------
       USE GROUPDEF_MOD
       USE HM_OPTION_READ_MOD
       USE UNITAB_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARLINE, NCHARFIELD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -125,15 +126,16 @@ C-----------------------------------------------
      .   N1,CPT,
      .   NG,NOPRINT
       INTEGER L0,ISTYP,SUB_ID,ILEN
-      my_real
-     .   DELTAT,ALPHA,FAC_T,A,B,C,D,E,F,POS,R,MAXDT
+      my_real DELTAT,ALPHA,FAC_T,A,B,C,D,E,F,POS,R,MAXDT
       INTEGER, DIMENSION(:), ALLOCATABLE :: TAGNODES !NUMNOD*2+NPART
       INTEGER, DIMENSION(:), ALLOCATABLE :: TAGNDOUBL !NUMNOD
       INTEGER, DIMENSION(:), ALLOCATABLE :: TAGELEMS ! 1+NUMELC+NUMELS+NUMELT+NUMELQ+NUMELP+NUMELR+NUMELTG
       INTEGER, DIMENSION(:), ALLOCATABLE :: NODTAG ! NUMNOD
 
-      CHARACTER MESS*40,TITR*nchartitle,CHAR8*ncharline
-      CHARACTER KEY2*ncharfield
+      CHARACTER MESS*40
+      CHARACTER(LEN=NCHARTITLE) :: TITR
+      CHARACTER(LEN=NCHARLINE) ::CHAR8
+      CHARACTER(LEN=NCHARFIELD) :: KEY2
       my_real BID, XM, YM, ZM, X1, Y1, Z1, X2, Y2, Z2, NORM
       my_real X3, Y3, Z3, N3, PNOR1, PNOR2, PNORM1, DET, DET1, DET2, DET3
       LOGICAL :: IS_AVAILABLE
@@ -741,13 +743,12 @@ C
       RETURN
       END
 C=========================================================================
-Chd|====================================================================
-Chd|  SECSTRI                       source/tools/sect/hm_read_sect.F
-Chd|-- called by -----------
-Chd|        LECSEC42                      source/tools/sect/hm_read_sect.F
-Chd|        LECSEC4BOLT                   source/tools/sect/lecsec4bolt.F
-Chd|-- calls ---------------
-Chd|====================================================================
+      !||====================================================================
+      !||    secstri       ../starter/source/tools/sect/hm_read_sect.F
+      !||--- called by ------------------------------------------------------
+      !||    lecsec42      ../starter/source/tools/sect/hm_read_sect.F
+      !||    lecsec4bolt   ../starter/source/tools/sect/lecsec4bolt.F
+      !||====================================================================
       SUBROUTINE SECSTRI(NSEG,ISECBUF,IXS,IXS10,IXS16,IXS20,
      .                   NOD ,NNOD ,ITAB ,ISEC, NOPRINT )
 C-----------------------------------------------
@@ -872,12 +873,11 @@ C
        RETURN
        END
 
-Chd|====================================================================
-Chd|  SEC_TRI                       source/tools/sect/hm_read_sect.F
-Chd|-- called by -----------
-Chd|        LECSEC42                      source/tools/sect/hm_read_sect.F
-Chd|-- calls ---------------
-Chd|====================================================================
+      !||====================================================================
+      !||    sec_tri    ../starter/source/tools/sect/hm_read_sect.F
+      !||--- called by ------------------------------------------------------
+      !||    lecsec42   ../starter/source/tools/sect/hm_read_sect.F
+      !||====================================================================
       SUBROUTINE SEC_TRI(NSEG,ISECBUF,IX,NIX,NNE,NOD,
      .                   NNOD,ITAB   ,NUMEL,ISEC,TXT)
 C-----------------------------------------------
@@ -947,23 +947,25 @@ C
        RETURN
        END
 
-Chd|====================================================================
-Chd|  LECSEC0                       source/tools/sect/hm_read_sect.F
-Chd|-- called by -----------
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|-- calls ---------------
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        HM_OPTION_READ_KEY            source/devtools/hm_reader/hm_option_read_key.F
-Chd|        HM_OPTION_START               source/devtools/hm_reader/hm_option_start.F
-Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    lecsec0                ../starter/source/tools/sect/hm_read_sect.F
+      !||--- called by ------------------------------------------------------
+      !||    lectur                 ../starter/source/starter/lectur.F
+      !||--- calls      -----------------------------------------------------
+      !||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
+      !||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
+      !||--- uses       -----------------------------------------------------
+      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE LECSEC0(LSUBMODEL)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE SUBMODEL_MOD
       USE HM_OPTION_READ_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARLINE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -983,7 +985,7 @@ C-----------------------------------------------
       INTEGER I, TYPE, NBINTER
       LOGICAL IS_AVAILABLE
       INTEGER ID
-      CHARACTER*ncharline TITR
+      CHARACTER(LEN=NCHARLINE) :: TITR
 C-----------------------------------------------
 C   S o u r c e   F i l e s
 C-----------------------------------------------
@@ -1002,13 +1004,12 @@ C-----------------------------------------------
       RETURN
       END
 C
-Chd|====================================================================
-Chd|  SEC_NODES                     source/tools/sect/hm_read_sect.F
-Chd|-- called by -----------
-Chd|        LECSEC42                      source/tools/sect/hm_read_sect.F
-Chd|-- calls ---------------
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    sec_nodes      ../starter/source/tools/sect/hm_read_sect.F
+      !||--- called by ------------------------------------------------------
+      !||    lecsec42       ../starter/source/tools/sect/hm_read_sect.F
+      !||--- uses       -----------------------------------------------------
+      !||====================================================================
       SUBROUTINE SEC_NODES(IGU1,ISTYP,NGRELE,IGRELE,X0,A,
      2                  B,C,D,E,F,ITAB,IX,NIX,KK,NNOD,NSTRF,
      3                  NBINTER,N1 ,K1,NBNODES,J,NODTAG,TAGELEMS,
@@ -1158,14 +1159,13 @@ c
       RETURN
       END
 C
-Chd|====================================================================
-Chd|  SEC_NODES_SOL                 source/tools/sect/hm_read_sect.F
-Chd|-- called by -----------
-Chd|        LECSEC42                      source/tools/sect/hm_read_sect.F
-Chd|        LECSEC4BOLT                   source/tools/sect/lecsec4bolt.F
-Chd|-- calls ---------------
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    sec_nodes_sol   ../starter/source/tools/sect/hm_read_sect.F
+      !||--- called by ------------------------------------------------------
+      !||    lecsec42        ../starter/source/tools/sect/hm_read_sect.F
+      !||    lecsec4bolt     ../starter/source/tools/sect/lecsec4bolt.F
+      !||--- uses       -----------------------------------------------------
+      !||====================================================================
       SUBROUTINE SEC_NODES_SOL(IGU1,ISTYP,NGR,IGRBRIC,X0,A,
      2                   B,C,D,E,F,ITAB,IXS,IXS10,IXS16,IXS20,
      3                   NIX,KK,NNOD,NSTRF,NBINTER,N1 ,K1,

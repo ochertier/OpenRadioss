@@ -20,31 +20,34 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  LECSTACK_PLY                  source/properties/composite_options/stack/lecstack_ply.F
-Chd|-- called by -----------
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        ARRET                         source/system/arret.F         
-Chd|        BIDON2                        source/system/machine.F       
-Chd|        FRETITL                       source/starter/freform.F      
-Chd|        FRETITL2                      source/starter/freform.F      
-Chd|        HM_OPTION_READ_KEY            source/devtools/hm_reader/hm_option_read_key.F
-Chd|        HM_OPTION_START               source/devtools/hm_reader/hm_option_start.F
-Chd|        HM_READ_STACK                 source/stack/hm_read_stack.F  
-Chd|        LCGEO19                       source/elements/shell/coque/lcgeo19.F
-Chd|        VDOUBLE                       source/system/sysfus.F        
-Chd|        ELBUFTAG_MOD                  share/modules1/elbuftag_mod.F 
-Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        STACK_MOD                     share/modules1/stack_mod.F    
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    lecstack_ply           ../starter/source/properties/composite_options/stack/lecstack_ply.F
+      !||--- called by ------------------------------------------------------
+      !||    lectur                 ../starter/source/starter/lectur.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    arret                  ../starter/source/system/arret.F
+      !||    bidon2                 ../starter/source/system/machine.F
+      !||    fretitl                ../starter/source/starter/freform.F
+      !||    fretitl2               ../starter/source/starter/freform.F
+      !||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
+      !||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
+      !||    hm_read_stack          ../starter/source/stack/hm_read_stack.F
+      !||    lcgeo19                ../starter/source/elements/shell/coque/lcgeo19.F
+      !||    usr2sys                ../starter/source/system/sysfus.F
+      !||    vdouble                ../starter/source/system/sysfus.F
+      !||--- uses       -----------------------------------------------------
+      !||    defaults_mod           ../starter/source/modules/defaults_mod.F90
+      !||    elbuftag_mod           ../starter/share/modules1/elbuftag_mod.F
+      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    stack_mod              ../starter/share/modules1/stack_mod.F
+      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE LECSTACK_PLY(GEO_STACK ,X           ,IX           ,PM          ,ITABM1  ,
      .                       ISKN       ,IGEO_STACK  ,IPM          ,NPC         ,PLD     ,
      .                       UNITAB     ,RTRANS      ,LSUBMODEL    ,IPART       ,IDRAPEID,
-     .                       PLY_INFO   ,STACK_INFO  ,NUMGEO_STACK ,NPROP_STACK)
+     .                       PLY_INFO   ,STACK_INFO  ,NUMGEO_STACK ,NPROP_STACK,DEFAULTS)
 C============================================================================
 C   M o d u l e s
 C-----------------------------------------------
@@ -55,6 +58,8 @@ C-----------------------------------------------
       USE STACK_MOD
       USE HM_OPTION_READ_MOD
       USE SUBMODEL_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      USE DEFAULTS_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -77,11 +82,13 @@ C-----------------------------------------------
       my_real GEO_STACK(NPROPG,NUMSTACK+NUMPLY), X(*), PM(NPROPM,NUMMAT),PLD(*),RTRANS(NTRANSF,*)
       TYPE(STACK_INFO_ ) , DIMENSION (1:NPROP_STACK) :: STACK_INFO
       TYPE(SUBMODEL_DATA), DIMENSION(NSUBMOD), INTENT(IN) :: LSUBMODEL
+      TYPE(DEFAULTS_)    , INTENT(IN)     :: DEFAULTS
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       LOGICAL lFOUND
-      CHARACTER IDTITL*nchartitle, MESS*40, TITR1*nchartitle
+      CHARACTER(LEN=NCHARTITLE) ::  IDTITL,TITR1
+      CHARACTER MESS*40
       INTEGER I, IG,IGTYP,J,IP,ISTRAIN,I8PT,ISK,ITU,IRB,IHON,IHBE,IPLAST,ITHK,K,N,IDS, IUNIT,UID,ISORTH
       INTEGER NSTACK,ISTACK,NUMS,IFLAGUNIT,JPID,N1,SUB_ID,PID1,JPID1,JPID2,NISUB,II,IPOS
       my_real ANGL,RBID,FAC_L,ZSHIFT
@@ -186,7 +193,7 @@ C----------------------------------------------------------------
           CALL HM_READ_STACK(
      .           GEO_STACK(1,I) ,IGEO_STACK(1,I) ,PM       ,IPM      ,ISKN     ,
      .           IG             ,RTRANS          ,SUB_ID   ,STACK_INFO(NUMS)   ,
-     .           IDTITL         ,UNITAB          ,LSUBMODEL)
+     .           IDTITL         ,UNITAB          ,LSUBMODEL,DEFAULTS%SHELL )
      
 C--------   Variables stored in element buffer        
 c----   Shells

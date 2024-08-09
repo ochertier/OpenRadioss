@@ -20,28 +20,31 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  H3D_SOLID_SCALAR_1            source/output/h3d/h3d_results/h3d_solid_scalar_1.F
-Chd|-- called by -----------
-Chd|        H3D_SOLID_SCALAR              source/output/h3d/h3d_results/h3d_solid_scalar.F
-Chd|-- calls ---------------
-Chd|        H3D_WRITE_SCALAR              source/output/h3d/h3d_results/h3d_write_scalar.F
-Chd|        INITBUF                       share/resol/initbuf.F         
-Chd|        OUTPUT_DIV_U                  source/output/anim/generate/output_div_u.F
-Chd|        OUTPUT_SCHLIEREN              source/output/anim/generate/output_schlieren.F
-Chd|        SROTORTH                      source/elements/solid/srotorth.F
-Chd|        THS_MAREA                     source/output/h3d/h3d_results/h3d_solid_scalar_1.F
-Chd|        THS_VOL                       source/output/h3d/h3d_results/h3d_solid_scalar_1.F
-Chd|        ALEANIM_MOD                   share/modules/aleanim_mod.F   
-Chd|        ALEFVM_MOD                    ../common_source/modules/ale/alefvm_mod.F
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
-Chd|        H3D_MOD                       share/modules/h3d_mod.F       
-Chd|        INITBUF_MOD                   share/resol/initbuf.F         
-Chd|        MAT_ELEM_MOD                  ../common_source/modules/mat_elem/mat_elem_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
-Chd|        SCHLIEREN_MOD                 share/modules/schlieren_mod.F 
-Chd|====================================================================
-      SUBROUTINE H3D_SOLID_SCALAR_1(
+      !||====================================================================
+      !||    h3d_solid_scalar_1             ../engine/source/output/h3d/h3d_results/h3d_solid_scalar_1.F
+      !||--- called by ------------------------------------------------------
+      !||    funct_python_update_elements   ../engine/source/tools/curve/funct_python_update_elements.F90
+      !||    h3d_solid_scalar               ../engine/source/output/h3d/h3d_results/h3d_solid_scalar.F
+      !||--- calls      -----------------------------------------------------
+      !||    h3d_write_scalar               ../engine/source/output/h3d/h3d_results/h3d_write_scalar.F
+      !||    initbuf                        ../engine/share/resol/initbuf.F
+      !||    output_div_u                   ../engine/source/output/anim/generate/output_div_u.F
+      !||    output_schlieren               ../engine/source/output/anim/generate/output_schlieren.F
+      !||    srotorth                       ../engine/source/elements/solid/srotorth.F
+      !||    ths_marea                      ../engine/source/output/h3d/h3d_results/h3d_solid_scalar_1.F
+      !||    ths_vol                        ../engine/source/output/h3d/h3d_results/h3d_solid_scalar_1.F
+      !||--- uses       -----------------------------------------------------
+      !||    ale_connectivity_mod           ../common_source/modules/ale/ale_connectivity_mod.F
+      !||    aleanim_mod                    ../engine/share/modules/aleanim_mod.F
+      !||    alefvm_mod                     ../common_source/modules/ale/alefvm_mod.F
+      !||    h3d_mod                        ../engine/share/modules/h3d_mod.F
+      !||    initbuf_mod                    ../engine/share/resol/initbuf.F
+      !||    mat_elem_mod                   ../common_source/modules/mat_elem/mat_elem_mod.F90
+      !||    multi_fvm_mod                  ../common_source/modules/ale/multi_fvm_mod.F
+      !||    names_and_titles_mod           ../common_source/modules/names_and_titles_mod.F
+      !||    schlieren_mod                  ../engine/share/modules/schlieren_mod.F
+      !||====================================================================
+      SUBROUTINE H3D_SOLID_SCALAR_1(CALLED_FROM_PYTHON,
      .                  ELBUF_TAB       ,SOLID_SCALAR ,IPARG       ,
      .                  IXS          ,PM          ,BUFMAT      ,
      .                  EHOUR        ,
@@ -87,6 +90,7 @@ C argument for initbuf
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+        LOGICAL, INTENT(IN) :: CALLED_FROM_PYTHON
         my_real
      .     SOLID_SCALAR(*),X(3,*),V(3,*),W(3,*),EHOUR(*),
      .     PM(NPROPM,*)
@@ -192,13 +196,15 @@ C-----------------------------------------------
 
             IF (ITY == 1) OFFSET = 0
 c
-            DO  I=1,NEL
-              IF (ITY == 1) THEN
-                ID_ELEM(OFFSET+NFT+I) = IXS(NIXS,NFT+I)
-                ITY_ELEM(OFFSET+NFT+I) = 1
-                IF( H3D_PART(IPARTS(NFT+I)) == 1) IOK_PART(I) = 1
-              ENDIF
-            ENDDO
+            IF(.NOT. CALLED_FROM_PYTHON) THEN
+              DO  I=1,NEL
+                IF (ITY == 1) THEN
+                  ID_ELEM(OFFSET+NFT+I) = IXS(NIXS,NFT+I)
+                  ITY_ELEM(OFFSET+NFT+I) = 1
+                  IF( H3D_PART(IPARTS(NFT+I)) == 1) IOK_PART(I) = 1
+                ENDIF
+              ENDDO
+            ENDIF
 c
             ILAY = LAYER_INPUT
             IUVAR = IUVAR_INPUT
@@ -288,10 +294,13 @@ C--------------------------------------------------
                   ENDDO
                 ELSE
                   DO I=1,NEL
-                    VALUE(I) = ELBUF_TAB(NG)%BUFLY(ILAY)%LBUF(1,1,1)%PLA(I)
-                    IS_WRITTEN_VALUE(I) = 1
+                    IF(ELBUF_TAB(NG)%BUFLY(ILAY)%L_PLA > 0) THEN
+                      VALUE(I) = ELBUF_TAB(NG)%BUFLY(ILAY)%LBUF(1,1,1)%PLA(I)
+                      IS_WRITTEN_VALUE(I) = 1
+                    ENDIF
                   ENDDO
                 ENDIF
+
 C--------------------------------------------------
               ELSEIF(KEYWORD == 'WPLA' .AND. (MLW == 12 .OR. MLW == 14 .OR. MLW == 25))THEN
 C--------------------------------------------------
@@ -2860,8 +2869,12 @@ C--------------------------------------------------
 C--------------------------------------------------
               ENDIF
 C--------------------------------------------------
-              CALL H3D_WRITE_SCALAR(IOK_PART,IS_WRITTEN_SOLID,SOLID_SCALAR,NEL,OFFSET,NFT,
+              IF(CALLED_FROM_PYTHON) THEN
+                 SOLID_SCALAR(1:MVSIZ) = VALUE(1:MVSIZ)
+              ELSE
+                CALL H3D_WRITE_SCALAR(IOK_PART,IS_WRITTEN_SOLID,SOLID_SCALAR,NEL,OFFSET,NFT,
      .           VALUE,IS_WRITTEN_VALUE)
+              ENDIF
             ENDIF
           ENDIF
         ENDIF
@@ -2869,12 +2882,11 @@ C--------------------------------------------------
 C-----------------------------------------------
         RETURN
       END
-Chd|====================================================================
-Chd|  THS_MAREA                     source/output/h3d/h3d_results/h3d_solid_scalar_1.F
-Chd|-- called by -----------
-Chd|        H3D_SOLID_SCALAR_1            source/output/h3d/h3d_results/h3d_solid_scalar_1.F
-Chd|-- calls ---------------
-Chd|====================================================================
+      !||====================================================================
+      !||    ths_marea            ../engine/source/output/h3d/h3d_results/h3d_solid_scalar_1.F
+      !||--- called by ------------------------------------------------------
+      !||    h3d_solid_scalar_1   ../engine/source/output/h3d/h3d_results/h3d_solid_scalar_1.F
+      !||====================================================================
       SUBROUTINE THS_MAREA(RX, RY, RZ, SX, SY, SZ, DET,NEL)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -2908,12 +2920,11 @@ C---------E3------------
 c-----------
         RETURN
       END
-Chd|====================================================================
-Chd|  THS_VOL                       source/output/h3d/h3d_results/h3d_solid_scalar_1.F
-Chd|-- called by -----------
-Chd|        H3D_SOLID_SCALAR_1            source/output/h3d/h3d_results/h3d_solid_scalar_1.F
-Chd|-- calls ---------------
-Chd|====================================================================
+      !||====================================================================
+      !||    ths_vol              ../engine/source/output/h3d/h3d_results/h3d_solid_scalar_1.F
+      !||--- called by ------------------------------------------------------
+      !||    h3d_solid_scalar_1   ../engine/source/output/h3d/h3d_results/h3d_solid_scalar_1.F
+      !||====================================================================
       SUBROUTINE THS_VOL(RX, RY, RZ, SX, SY, SZ, TX, TY, TZ,DET,NEL)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s

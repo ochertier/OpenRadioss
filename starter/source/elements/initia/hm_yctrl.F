@@ -20,25 +20,24 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  HM_YCTRL                      source/elements/initia/hm_yctrl.F
-Chd|-- called by -----------
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        HM_GET_INT_ARRAY_INDEX        source/devtools/hm_reader/hm_get_int_array_index.F
-Chd|        HM_OPTION_COUNT               source/devtools/hm_reader/hm_option_count.F
-Chd|        HM_OPTION_READ_KEY            source/devtools/hm_reader/hm_option_read_key.F
-Chd|        HM_OPTION_START               source/devtools/hm_reader/hm_option_start.F
-Chd|        MY_ORDERS                     ../common_source/tools/sort/my_orders.c
-Chd|        UEL2SYS                       source/initial_conditions/inista/yctrl.F
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
-      SUBROUTINE HM_YCTRL(UNITAB,LSUBMODEL,IGRBRIC,IXC, IXTG,PTSHEL,PTSH3N)
+      !||====================================================================
+      !||    hm_yctrl                 ../starter/source/elements/initia/hm_yctrl.F
+      !||--- called by ------------------------------------------------------
+      !||    lectur                   ../starter/source/starter/lectur.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                   ../starter/source/output/message/message.F
+      !||    hm_get_int_array_index   ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+      !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    hm_option_count          ../starter/source/devtools/hm_reader/hm_option_count.F
+      !||    hm_option_read_key       ../starter/source/devtools/hm_reader/hm_option_read_key.F
+      !||    hm_option_start          ../starter/source/devtools/hm_reader/hm_option_start.F
+      !||    uel2sys                  ../starter/source/initial_conditions/inista/yctrl.F
+      !||--- uses       -----------------------------------------------------
+      !||    hm_option_read_mod       ../starter/share/modules1/hm_option_read_mod.F
+      !||    message_mod              ../starter/share/message_module/message_mod.F
+      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
+      SUBROUTINE HM_YCTRL(UNITAB,LSUBMODEL,IGRBRIC,IXC, IXTG,PTSHEL,PTSH3N,NUSPHCEL)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------                     
@@ -47,6 +46,7 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE SUBMODEL_MOD
       USE HM_OPTION_READ_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARKEY
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -67,6 +67,7 @@ C-----------------------------------------------
       TYPE(SUBMODEL_DATA) LSUBMODEL(*)
       INTEGER   IXTG(NIXTG,NUMELTG) ,IXC(NIXC,NUMELC)
       INTEGER,   INTENT(INOUT) :: PTSHEL(NUMELC),PTSH3N(NUMELTG)
+      INTEGER,   INTENT(INOUT) :: NUSPHCEL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -79,15 +80,14 @@ C-----------------------------------------------
      .      UID,SUB_ID,NLAY,NPTR,NPTS,NPTT,IFAIL,IRUPT_TYP,NVAR_RUPT,
      .      ILAY,IMAT,NPT_MAX,NUBEAM0,NVSH_STRA,PROP,NSROT
       INTEGER IGBR, JGBR, IOK
-      CHARACTER MESS*40,KEY2*ncharkey,KEY3*ncharkey
+      CHARACTER(LEN=NCHARKEY) :: KEY2,KEY3,KEY
 C-----------------------------------------------
       LOGICAL IS_AVAILABLE,GLOB
-      CHARACTER KEY*ncharkey
+      CHARACTER MESS*40
       INTEGER  ID_ELEM,NB_INIBRI,NB_INISHE,NB_INISH3,NB_ELEMENTS,
      .      NB_INITRUSS,NB_INIBEAM,NB_INISPRI,NB_INIQUA,IE,KTRIELC,
-     .      KTRIELTG,NELT
-      my_real
-     .   THK
+     .      KTRIELTG,NELT,NB_INISPHCEL
+      my_real THK
       INTEGER, DIMENSION(:), ALLOCATABLE :: KSYSUSRTG ,KSYSUSR,WORK,ITRI,
      .                                      INDEX
 C-----------------------------------------------
@@ -1154,6 +1154,49 @@ C------------------------------------
           ENDDO ! DO I=1,NB_INIQUA
 !
         ENDIF ! IF ( NB_INIQUA > 0 )
+
+
+        
+C------------------------------------
+C /INISPHCEL card
+C------------------------------------
+        CALL HM_OPTION_COUNT('/INISPHCEL', NB_INISPHCEL)
+!
+        IF ( NB_INISPHCEL > 0 ) THEN
+          ! Start reading /INISPHCEL card 
+          CALL HM_OPTION_START('/INISPHCEL')
+!
+          DO I=1,NB_INISPHCEL
+!
+            CALL HM_OPTION_READ_KEY(LSUBMODEL,
+     .                              KEYWORD2 = KEY)
+!
+            CALL HM_GET_INTV('no_blocks',NB_ELEMENTS,IS_AVAILABLE,LSUBMODEL)
+
+            NUMSPHY = NUMSPHY + NB_ELEMENTS
+
+            SELECT CASE (KEY(1:LEN_TRIM(KEY)))
+            
+!-------------------
+              CASE ( 'FULL' )
+!-------------------
+!!
+                DO J=1,NB_ELEMENTS
+                  ! Reading  ---  ID_ELEM, Prop ...  ---
+                  CALL HM_GET_INT_ARRAY_INDEX('nvarsph'    ,NUVAR,J,IS_AVAILABLE,LSUBMODEL)
+!
+                  NUSPHCEL = MAX(NUSPHCEL,NUVAR)
+                ENDDO ! DO J=1,NB_ELEMENTS
+!
+              CASE DEFAULT
+!
+            END SELECT ! SELECT CASE(KEY)
+!
+          ENDDO ! DO I=1,NB_INISPHCEL
+!
+        ENDIF ! IF ( NB_INISPHCEL > 0 )
+
+
 !---
       ENDIF ! IF (ISIGI==-3.OR.ISIGI==-4.OR.ISIGI==-5)
 !

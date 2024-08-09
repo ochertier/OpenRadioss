@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  LAW76_UPD                     source/materials/mat/mat076/law76_upd.F
-Chd|-- called by -----------
-Chd|        UPDMAT                        source/materials/updmat.F     
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        FUNC_COMP                     source/materials/mat/mat076/law76_upd.F
-Chd|        TABLE2D_INTERSECT             source/tools/curve/table2d_intersect.F
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    law76_upd              ../starter/source/materials/mat/mat076/law76_upd.F
+      !||--- called by ------------------------------------------------------
+      !||    updmat                 ../starter/source/materials/updmat.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    func_comp              ../starter/source/materials/mat/mat076/law76_upd.F
+      !||    table2d_intersect      ../starter/source/tools/curve/table2d_intersect.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE LAW76_UPD(IOUT   ,TITR    ,MAT_ID   ,NUPARAM ,MATPARAM ,
      .                     UPARAM ,NUMTABL ,ITABLE   ,TABLE   ,NFUNC    ,
      .                     IFUNC  ,NPC     ,PLD      )
@@ -39,6 +39,7 @@ C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD      
       USE MATPARAM_DEF_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -54,7 +55,7 @@ C-----------------------------------------------
       INTEGER :: NPC(*)
       my_real UPARAM(NUPARAM)
       my_real PLD(*)
-      CHARACTER*nchartitle  :: TITR
+      CHARACTER(LEN=NCHARTITLE)  :: TITR
       TYPE(MATPARAM_STRUCT_)  ,TARGET :: MATPARAM
       TYPE(TTABLE), DIMENSION(NTABLE) ,INTENT(INOUT) ,TARGET ::  TABLE
 C-----------------------------------------------
@@ -332,14 +333,13 @@ c--------------------------------------------------------
 c--------------------------------------------------------
       RETURN
       END
-Chd|====================================================================
-Chd|  FUNC_COMP                     source/materials/mat/mat076/law76_upd.F
-Chd|-- called by -----------
-Chd|        LAW76_UPD                     source/materials/mat/mat076/law76_upd.F
-Chd|-- calls ---------------
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    func_comp          ../starter/source/materials/mat/mat076/law76_upd.F
+      !||--- called by ------------------------------------------------------
+      !||    law76_upd          ../starter/source/materials/mat/mat076/law76_upd.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod        ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE FUNC_COMP(TABLE   ,NTABLE  ,NPTMAX  ,NPT_TRAC ,NPT_SHEAR ,
      .                     NPT_COMP,X_COMP  ,Y_COMP  ,NUP      )
 C-----------------------------------------------

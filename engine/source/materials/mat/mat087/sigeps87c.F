@@ -20,16 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  SIGEPS87C                     source/materials/mat/mat087/sigeps87c.F
-Chd|-- called by -----------
-Chd|        MULAWC                        source/materials/mat_share/mulawc.F
-Chd|-- calls ---------------
-Chd|        MAT87C_HANSEL                 source/materials/mat/mat087/mat87c_hansel.F
-Chd|        MAT87C_SWIFT_VOCE             source/materials/mat/mat087/mat87c_swift_voce.F
-Chd|        MAT87C_TABULATED_PLAS_SR      source/materials/mat/mat087/mat87c_tabulated_plas_sr.F
-Chd|        MAT87C_TABULATED_TOTALSR      source/materials/mat/mat087/mat87c_tabulated_totalsr.F
-Chd|====================================================================
+      !||====================================================================
+      !||    sigeps87c                  ../engine/source/materials/mat/mat087/sigeps87c.F
+      !||--- called by ------------------------------------------------------
+      !||    mulawc                     ../engine/source/materials/mat_share/mulawc.F
+      !||--- calls      -----------------------------------------------------
+      !||    finter                     ../engine/source/tools/curve/finter.F
+      !||    mat87c_hansel              ../engine/source/materials/mat/mat087/mat87c_hansel.F
+      !||    mat87c_swift_voce          ../engine/source/materials/mat/mat087/mat87c_swift_voce.F
+      !||    mat87c_tabulated_plas_sr   ../engine/source/materials/mat/mat087/mat87c_tabulated_plas_sr.F
+      !||    mat87c_tabulated_totalsr   ../engine/source/materials/mat/mat087/mat87c_tabulated_totalsr.F
+      !||====================================================================
       SUBROUTINE SIGEPS87C(
      1   NEL,     NUPARAM, NUVAR,   NFUNC,
      2   IFUNC,   NPF,     TF,      TIME,
@@ -43,7 +44,7 @@ Chd|====================================================================
      A   PLA,     DPLA,    EPSP,    YLD,
      B   ETSE,    GS,      ISRATE,  ASRATE,
      C   FACYLDI, TEMPEL,  SIGB,    INLOC,
-     D   DPLANL,  SEQ,     JTHE)
+     D   DPLANL,  SEQ,     JTHE,    LOFF)
 C=======================================================================
 C   BARLAT YLD2000 material model
 C=======================================================================
@@ -105,6 +106,7 @@ C-----------------------------------------------
      .   DEPSXY(NEL),DEPSYZ(NEL),DEPSZX(NEL),
      .   SIGOXX(NEL),SIGOYY(NEL),FACYLDI(NEL),
      .   SIGOXY(NEL),SIGOYZ(NEL),SIGOZX(NEL)
+      my_real, DIMENSION(NEL), INTENT(IN) :: LOFF
 C-----------------------------------------------
 C   O U T P U T   A r g u m e n t s
 C-----------------------------------------------
@@ -206,7 +208,7 @@ c
      .         SIGNXX ,SIGNYY  ,SIGNXY  ,SIGNYZ  ,SIGNZX   ,
      .         SOUNDSP,PLA     ,DPLA    ,EPSP    ,YLD      ,
      .         ETSE   ,GS      ,ISRATE  ,ASRATE  ,OFF      ,
-     .         SIGB   ,INLOC   ,DPLANL  ,SEQ     )    
+     .         SIGB   ,INLOC   ,DPLANL  ,SEQ     ,LOFF     )    
          CASE(2) !hansel
             CALL MAT87C_HANSEL(
      1   NEL,     NUPARAM, NUVAR,   TIME,
@@ -220,7 +222,7 @@ c
      9   DPLA,    EPSP,    YLD,     ETSE,
      A   GS,      ISRATE,  ASRATE,  UPARAM,
      B   TEMPEL,  SIGB,    INLOC,   DPLANL,
-     C   SEQ,     JTHE)
+     C   SEQ,     JTHE,    LOFF)
           CASE(3)
             CALL  MAT87C_TABULATED_PLAS_SR(
      .         NEL    ,NUPARAM ,NUVAR   ,NFUNC   ,IFUNC    ,
@@ -232,7 +234,7 @@ c
      .         SIGNXX ,SIGNYY  ,SIGNXY  ,SIGNYZ  ,SIGNZX   ,
      .         SOUNDSP,PLA     ,DPLA    ,EPSP    ,YLD      ,
      .         ETSE   ,GS      ,ISRATE  ,ASRATE  ,FACYLDI  ,
-     .         SIGB   ,INLOC   ,DPLANL  ,SEQ     )
+     .         SIGB   ,INLOC   ,DPLANL  ,SEQ     ,LOFF     )
           CASE(4)
             CALL   MAT87C_TABULATED_TOTALSR(
      .         NEL    ,NUPARAM ,NUVAR   ,NFUNC   ,IFUNC    ,
@@ -244,7 +246,7 @@ c
      .         SIGNXX ,SIGNYY  ,SIGNXY  ,SIGNYZ  ,SIGNZX   ,
      .         SOUNDSP,PLA     ,DPLA    ,EPSP    ,YLD      ,
      .         ETSE   ,GS      ,ISRATE  ,ASRATE  ,FACYLDI  ,
-     .         SIGB   ,INLOC   ,DPLANL  ,SEQ     )
+     .         SIGB   ,INLOC   ,DPLANL  ,SEQ     ,LOFF     )
         END SELECT
 c-----------------------------------------------
 c     COMPUTATION OF STRAIN-RATE

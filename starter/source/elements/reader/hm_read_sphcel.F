@@ -20,25 +20,26 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  HM_READ_SPHCEL                source/elements/reader/hm_read_sphcel.F
-Chd|-- called by -----------
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        FRETITL2                      source/starter/freform.F      
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        HM_OPTION_COUNT               source/devtools/hm_reader/hm_option_count.F
-Chd|        HM_OPTION_READ_KEY            source/devtools/hm_reader/hm_option_read_key.F
-Chd|        HM_OPTION_START               source/devtools/hm_reader/hm_option_start.F
-Chd|        SOLTOSPHX4                    source/elements/sph/soltosph.F
-Chd|        SOLTOSPHX8                    source/elements/sph/soltosph.F
-Chd|        UDOUBLE                       source/system/sysfus.F        
-Chd|        USR2SYS                       source/system/sysfus.F        
-Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_read_sphcel         ../starter/source/elements/reader/hm_read_sphcel.F
+      !||--- called by ------------------------------------------------------
+      !||    lectur                 ../starter/source/starter/lectur.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    fretitl2               ../starter/source/starter/freform.F
+      !||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    hm_option_count        ../starter/source/devtools/hm_reader/hm_option_count.F
+      !||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
+      !||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
+      !||    soltosphx4             ../starter/source/elements/sph/soltosph.F
+      !||    soltosphx8             ../starter/source/elements/sph/soltosph.F
+      !||    udouble                ../starter/source/system/sysfus.F
+      !||    usr2sys                ../starter/source/system/sysfus.F
+      !||--- uses       -----------------------------------------------------
+      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE HM_READ_SPHCEL(ITAB    ,ITABM1  ,IPART ,
      2                  IPARTSP ,IPM     ,IGEO  ,KXSP    ,IXSP    ,
      3                  NOD2SP, RESERVEP ,IXS   ,IPARTS  ,ISOLNOD ,
@@ -82,6 +83,7 @@ C-----------------------------------------------
       USE HM_OPTION_READ_MOD
       USE SUBMODEL_MOD
       USE UNITAB_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARKEY
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -118,9 +120,9 @@ C-----------------------------------------------
      .        NBP,ITAG(NUMNOD),IT,NT,NP,NN,ITOPO,STAT,
      .        INDEX_PART,UID,IFLAGUNIT
 C     REAL
-      my_real
-     .       BID,FAC_M
-      CHARACTER MESS*40,KEY*ncharkey
+      my_real BID,FAC_M
+      CHARACTER MESS*40
+      CHARACTER(LEN=NCHARKEY) :: KEY
       LOGICAL IS_AVAILABLE
 
       LOGICAL :: CHECK_LAW
@@ -128,8 +130,8 @@ C     REAL
       INTEGER :: LAW_SPH,LAW_SOL
       INTEGER :: ERROR_NUM
       INTEGER :: I1,I2,I3,I4,I5
-      CHARACTER(len=nchartitle) :: C1
-      CHARACTER(len=nchartitle) :: TITR
+      CHARACTER(LEN=NCHARTITLE) :: C1
+      CHARACTER(LEN=NCHARTITLE) :: TITR
       INTEGER :: USER_PART_SPH,USER_PART_SOL
       INTEGER :: USER_MID_SPH,USER_MID_SOL
       LOGICAL, DIMENSION(NPART) :: TAG_PART

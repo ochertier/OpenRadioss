@@ -21,27 +21,24 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
-Chd|====================================================================
-Chd|  INVOI3                        source/interfaces/inter3d1/invoi3.F
-Chd|-- called by -----------
-Chd|        INIEND                        source/interfaces/inter3d1/iniend.F
-Chd|        ININT3                        source/interfaces/inter3d1/inint3.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        NEAREST_SEG                   ../common_source/interf/nearest_seg.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    invoi3                 ../starter/source/interfaces/inter3d1/invoi3.F
+      !||--- called by ------------------------------------------------------
+      !||    iniend                 ../starter/source/interfaces/inter3d1/iniend.F
+      !||    inint3                 ../starter/source/interfaces/inter3d1/inint3.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE INVOI3(X,IRECT,LMSR,MSR,NSV,ILOC,IRTL,NSEG,NSN,NMN,ITAB,ID,TITR,NRT)
       USE MESSAGE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------------------------------
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "nchar_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -49,7 +46,7 @@ C-----------------------------------------------
       INTEGER, INTENT(IN)  :: IRECT(4,*), LMSR(*), MSR(*), NSV(*), NSEG(*), ITAB(*)
       INTEGER, INTENT(INOUT) :: ILOC(*), IRTL(*)
       my_real, INTENT(IN)  :: X(3,*)
-      CHARACTER*nchartitle, TITR
+      CHARACTER(LEN=NCHARTITLE)::TITR
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

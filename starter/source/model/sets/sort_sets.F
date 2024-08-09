@@ -20,26 +20,26 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  SORT_SET                      source/model/sets/sort_sets.F 
-Chd|-- called by -----------
-Chd|        HM_SET                        source/model/sets/hm_set.F    
-Chd|-- calls ---------------
-Chd|        ARRET                         source/system/arret.F         
-Chd|        CREATE_SETCOL_ARRAY           source/model/sets/create_setcol_clause.F
-Chd|        CREATE_SET_ARRAY              source/model/sets/create_set_clause.F
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        HM_GET_INT_ARRAY_INDEX        source/devtools/hm_reader/hm_get_int_array_index.F
-Chd|        HM_GET_STRING                 source/devtools/hm_reader/hm_get_string.F
-Chd|        HM_GET_STRING_INDEX           source/devtools/hm_reader/hm_get_string_index.F
-Chd|        HM_OPTION_READ_KEY            source/devtools/hm_reader/hm_option_read_key.F
-Chd|        HM_OPTION_START               source/devtools/hm_reader/hm_option_start.F
-Chd|        SET_MERGE_SIMPLE              source/model/sets/set_merge_simple.F
-Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        MAPPING_OPTION_MOD            share/modules1/dichotomy_mod.F
-Chd|        SETDEF_MOD                    ../common_source/modules/setdef_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    sort_set                 ../starter/source/model/sets/sort_sets.F
+      !||--- called by ------------------------------------------------------
+      !||    hm_set                   ../starter/source/model/sets/hm_set.F
+      !||--- calls      -----------------------------------------------------
+      !||    arret                    ../starter/source/system/arret.F
+      !||    create_set_array         ../starter/source/model/sets/create_set_clause.F
+      !||    create_setcol_array      ../starter/source/model/sets/create_setcol_clause.F
+      !||    hm_get_int_array_index   ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+      !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    hm_get_string            ../starter/source/devtools/hm_reader/hm_get_string.F
+      !||    hm_get_string_index      ../starter/source/devtools/hm_reader/hm_get_string_index.F
+      !||    hm_option_read_key       ../starter/source/devtools/hm_reader/hm_option_read_key.F
+      !||    hm_option_start          ../starter/source/devtools/hm_reader/hm_option_start.F
+      !||    set_merge_simple         ../starter/source/model/sets/set_merge_simple.F
+      !||--- uses       -----------------------------------------------------
+      !||    hm_option_read_mod       ../starter/share/modules1/hm_option_read_mod.F
+      !||    mapping_option_mod       ../starter/share/modules1/dichotomy_mod.F
+      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE SORT_SET (LSUBMODEL ,MAP_TABLES, SET_LIST ,SET,CLAUSE)
 C-----------------------------------------------
 C   ROUTINE DESCRIPTION :
@@ -70,14 +70,11 @@ C-----------------------------------------------
       USE HM_OPTION_READ_MOD
       USE SETDEF_MOD
       USE MAPPING_OPTION_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARFIELD, NCHARKEY, NCHARLINE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "nchar_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -101,8 +98,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C     Characters
       CHARACTER MESS*40
-      CHARACTER KEYSET*ncharfield,SET_TYPE*ncharfield,KEY*ncharkey,KEY_TYPE*ncharfield
-      CHARACTER TITLE*nchartitle,SET_TITLE*nchartitle,KEYPART*ncharkey,TITLE2*nchartitle
+      CHARACTER(LEN=NCHARFIELD) :: KEYSET,SET_TYPE,KEY_TYPE
+      CHARACTER(LEN=NCHARTITLE) :: TITLE,TITLE2,SET_TITLE
+      CHARACTER(LEN=NCHARKEY) :: KEYPART,KEY
 C-----------------------------------------------
       IDEBUG=0
 

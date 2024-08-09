@@ -20,15 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  LAW108_UPD                    source/materials/mat/mat108/law108_upd.F
-Chd|-- called by -----------
-Chd|        UPDMAT                        source/materials/updmat.F     
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        TABLE_MOD                     share/modules1/table_mod.F    
-Chd|====================================================================
+      !||====================================================================
+      !||    law108_upd             ../starter/source/materials/mat/mat108/law108_upd.F
+      !||--- called by ------------------------------------------------------
+      !||    updmat                 ../starter/source/materials/updmat.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    table_mod              ../starter/share/modules1/table_mod.F
+      !||====================================================================
       SUBROUTINE LAW108_UPD(IOUT   ,TITR   ,UPARAM ,NPC    ,PLD    ,  
      .                     NFUNC  ,IFUNC  ,MAT_ID ,FUNC_ID,
      .                     PM     )
@@ -38,6 +39,7 @@ C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
       USE TABLE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -51,7 +53,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      CHARACTER*nchartitle  :: TITR
+      CHARACTER(LEN=NCHARTITLE)  :: TITR
       INTEGER MAT_ID,IOUT,NFUNC
       INTEGER NPC(*), FUNC_ID(*),IFUNC(NFUNC)
       my_real UPARAM(*),PLD(*),PM(NPROPM)
@@ -66,7 +68,7 @@ C-----------------------------------------------
      .   XK,  HARD,X1,X2,Y1,Y2,LSCALE,XK_INI,YFAC,
      .   X0,EMAX,DX,DY,Y0,DERI,H,XSCALE,ALPHA1,ALPHA2,
      .   S1,S2,T1,T2,TY,SX,XX1,YY1,DYDX,DTDS
-      CHARACTER*nchartitle  :: TITR1
+      CHARACTER(LEN=NCHARTITLE)  :: TITR1
 C=======================================================================
 c     Transform FUNC_ID ->  Function number , leakmat only
 cc

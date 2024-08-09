@@ -20,12 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  NOBLE_ABEL                    eos/noble_abel.F              
-Chd|-- called by -----------
-Chd|        EOSMAIN                       common_source/eos/eosmain.F   
-Chd|-- calls ---------------
-Chd|====================================================================
+      !||====================================================================
+      !||    noble_abel   ../common_source/eos/noble_abel.F
+      !||--- called by ------------------------------------------------------
+      !||    eosmain      ../common_source/eos/eosmain.F
+      !||====================================================================
       SUBROUTINE NOBLE_ABEL(IFLAG,NEL, PM   ,OFF  ,EINT ,MU   ,MU2 , 
      2                      ESPE ,DVOL ,DF   ,VNEW ,MAT  ,PSH ,
      3                      PNEW ,DPDM ,DPDE ,THETA,ECOLD)
@@ -58,7 +57,7 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, MX
       my_real GM1(MVSIZ),TFEXTT, DVV, PP,BB_(MVSIZ),RHO0(MVSIZ)
-      my_real C0(MVSIZ),C2(MVSIZ),C3(MVSIZ),C5(MVSIZ),SPH(MVSIZ), BR0,DENOM,BB
+      my_real SPH(MVSIZ), DENOM,BB
 C--------------------------------------------------------------------
       IF(IFLAG == 0) THEN
 C-----------------------------------------

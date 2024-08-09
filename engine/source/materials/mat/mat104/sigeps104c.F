@@ -20,19 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  SIGEPS104C                    source/materials/mat/mat104/sigeps104c.F
-Chd|-- called by -----------
-Chd|        MULAWC                        source/materials/mat_share/mulawc.F
-Chd|-- calls ---------------
-Chd|        MAT104C_LDAM_NEWTON           source/materials/mat/mat104/mat104c_ldam_newton.F
-Chd|        MAT104C_LDAM_NICE             source/materials/mat/mat104/mat104c_ldam_nice.F
-Chd|        MAT104C_NLDAM_NEWTON          source/materials/mat/mat104/mat104c_nldam_newton.F
-Chd|        MAT104C_NLDAM_NICE            source/materials/mat/mat104/mat104c_nldam_nice.F
-Chd|        MAT104C_NODAM_NEWTON          source/materials/mat/mat104/mat104c_nodam_newton.F
-Chd|        MAT104C_NODAM_NICE            source/materials/mat/mat104/mat104c_nodam_nice.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    sigeps104c             ../engine/source/materials/mat/mat104/sigeps104c.F
+      !||--- called by ------------------------------------------------------
+      !||    mulawc                 ../engine/source/materials/mat_share/mulawc.F
+      !||--- calls      -----------------------------------------------------
+      !||    mat104c_ldam_newton    ../engine/source/materials/mat/mat104/mat104c_ldam_newton.F
+      !||    mat104c_ldam_nice      ../engine/source/materials/mat/mat104/mat104c_ldam_nice.F
+      !||    mat104c_nldam_newton   ../engine/source/materials/mat/mat104/mat104c_nldam_newton.F
+      !||    mat104c_nldam_nice     ../engine/source/materials/mat/mat104/mat104c_nldam_nice.F
+      !||    mat104c_nodam_newton   ../engine/source/materials/mat/mat104/mat104c_nodam_newton.F
+      !||    mat104c_nodam_nice     ../engine/source/materials/mat/mat104/mat104c_nodam_nice.F
+      !||--- uses       -----------------------------------------------------
+      !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
+      !||====================================================================
       SUBROUTINE SIGEPS104C(
      1     NEL     ,NGL     ,IPG     ,ILAY    ,IPT     ,NUPARAM ,NUVAR   ,
      2     TIMESTEP,TIME    ,UPARAM  ,UVAR    ,JTHE    ,RHO     ,TEMPEL  ,
@@ -42,7 +43,7 @@ Chd|====================================================================
      6     SIGNXX  ,SIGNYY  ,SIGNXY  ,SIGNYZ  ,SIGNZX  ,THK     ,SIGY    ,
      7     ET      ,VARNL   ,DMG     ,L_DMG   ,TEMP    ,SEQ     ,INLOC   ,
      8     NPTR    ,NPTS    ,NPTT    ,BUFLY   ,PLA_NL  ,L_PLANL ,PLAP_NL ,
-     9     L_EPSDNL)
+     9     L_EPSDNL,IOFF_DUCT)
      
       USE ELBUFDEF_MOD
 C-----------------------------------------------
@@ -61,6 +62,7 @@ C-----------------------------------------------
       INTEGER NEL,NUPARAM,NUVAR,JTHE,IPG,ILAY,IPT,INLOC
       INTEGER NGL(NEL),NPTR,NPTS,NPTT
       INTEGER, INTENT(IN) :: L_PLANL,L_EPSDNL,L_DMG
+      INTEGER, DIMENSION(NEL), INTENT(INOUT) :: IOFF_DUCT
       my_real 
      .   TIMESTEP,TIME,UPARAM(NUPARAM)
       my_real,DIMENSION(NEL), INTENT(IN) :: 
@@ -108,7 +110,7 @@ c
           IF ((NICE == 1).OR.(NICE == 3)) THEN 
             CALL MAT104C_NODAM_NICE(
      1         NEL     ,NGL     ,NUPARAM ,NUVAR   , 
-     2         TIME    ,TIMESTEP,UPARAM  ,UVAR    ,JTHE    ,OFF     ,
+     2         TIME    ,TIMESTEP,UPARAM  ,UVAR    ,JTHE    ,OFFL    ,
      3         GS      ,RHO     ,PLA     ,DPLA    ,EPSD    ,SOUNDSP ,
      4         DEPSXX  ,DEPSYY  ,DEPSXY  ,DEPSYZ  ,DEPSZX  ,
      5         SIGOXX  ,SIGOYY  ,SIGOXY  ,SIGOYZ  ,SIGOZX  ,
@@ -118,7 +120,7 @@ c
           ELSE  ! Newton
             CALL MAT104C_NODAM_NEWTON(
      1         NEL     ,NGL     ,NUPARAM ,NUVAR   , 
-     2         TIME    ,TIMESTEP,UPARAM  ,UVAR    ,JTHE    ,OFF     ,
+     2         TIME    ,TIMESTEP,UPARAM  ,UVAR    ,JTHE    ,OFFL    ,
      3         GS      ,RHO     ,PLA     ,DPLA    ,EPSD    ,SOUNDSP ,
      4         DEPSXX  ,DEPSYY  ,DEPSXY  ,DEPSYZ  ,DEPSZX  ,
      5         SIGOXX  ,SIGOYY  ,SIGOXY  ,SIGOYZ  ,SIGOZX  ,
@@ -178,6 +180,9 @@ c
 c    
       ! Save the strain rate value for failure criterion
       EPSPL(1:NEL) = EPSD(1:NEL)
+c
+      ! Ductile failure activation
+      IOFF_DUCT(1:NEL) = 1
 c--------------------------
       ! Integration point failure
       IF (IGURSON>0) THEN 
@@ -221,6 +226,11 @@ c--------------------------
 #include "lockoff.inc"
           ENDDO
         ENDIF
+      ELSE
+        DO I=1,NEL
+          IF (OFF(I) < EM01) OFF(I) = ZERO
+          IF (OFF(I) < ONE)  OFF(I) = OFF(I)*FOUR_OVER_5 
+        ENDDO 
       ENDIF
 c
  2000 FORMAT(1X,'FAILURE (GURSON) IN SHELL ELEMENT ',I10,1X,',GAUSS PT',I2,1X,',THICKNESS INTG. PT',I3)

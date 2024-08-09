@@ -20,22 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  PGRTAILS                      source/elements/beam/pgrtails.F
-Chd|-- called by -----------
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        FRETITL2                      source/starter/freform.F      
-Chd|        MY_ORDERS                     ../common_source/tools/sort/my_orders.c
-Chd|        ZEROIN                        source/system/zeroin.F        
-Chd|        BPRELOAD_MOD                  share/modules1/bpreload_mod.F 
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        R2R_MOD                       share/modules1/r2r_mod.F      
-Chd|        REORDER_MOD                   share/modules1/reorder_mod.F  
-Chd|====================================================================
+      !||====================================================================
+      !||    pgrtails               ../starter/source/elements/beam/pgrtails.F
+      !||--- called by ------------------------------------------------------
+      !||    lectur                 ../starter/source/starter/lectur.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    fretitl2               ../starter/source/starter/freform.F
+      !||    zeroin                 ../starter/source/system/zeroin.F
+      !||--- uses       -----------------------------------------------------
+      !||    bpreload_mod           ../starter/share/modules1/bpreload_mod.F
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    r2r_mod                ../starter/share/modules1/r2r_mod.F
+      !||    reorder_mod            ../starter/share/modules1/reorder_mod.F
+      !||====================================================================
       SUBROUTINE PGRTAILS(MAT_PARAM,
      1    IXP    ,IPARG  ,PM       ,GEO      ,
      2    EADD   ,ND     ,DD_IAD   ,IDX      ,
@@ -53,6 +51,7 @@ C-----------------------------------------------
       USE REORDER_MOD
       USE MATPARAM_DEF_MOD
       USE BPRELOAD_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C            A R G U M E N T S
 C-----------------------------------------------
@@ -108,8 +107,7 @@ C-----------------------------------------------
      .        ITAG(2*NUMELT+2*NUMELP+3*NUMELR),
      .        NGP(NSPMD+1),IPARTR2R,NUVAR,IE,ID1,IPRLD
       INTEGER ID
-      CHARACTER*nchartitle,
-     .   TITR,TITR1
+      CHARACTER(LEN=NCHARTITLE)::TITR,TITR1
       INTEGER WORK(70000)
       DATA NFIX/13/
 C=======================================================================

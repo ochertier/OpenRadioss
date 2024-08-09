@@ -20,46 +20,48 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  RESTALLOC                     source/output/restart/arralloc.F
-Chd|-- called by -----------
-Chd|        RADIOSS2                      source/engine/radioss2.F      
-Chd|-- calls ---------------
-Chd|        ALEFVM_INIT                   source/ale/alefvm/alefvm_init.F
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        ARRET                         source/system/arret.F         
-Chd|        INTSTAMP_ZERO                 share/modules/intstamp_mod.F  
-Chd|        MULTI_ALLOCATE                source/multifluid/multi_allocate.F
-Chd|        SZ_PRINT                      source/output/restart/arralloc.F
-Chd|        ALEANIM_MOD                   share/modules/aleanim_mod.F   
-Chd|        ALEFVM_MOD                    ../common_source/modules/ale/alefvm_mod.F
-Chd|        ALEMUSCL_MOD                  ../common_source/modules/ale/alemuscl_mod.F
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
-Chd|        ALE_MOD                       ../common_source/modules/ale/ale_mod.F
-Chd|        CLUSTER_MOD                   share/modules/cluster_mod.F   
-Chd|        DAMP_MOD                      share/modules/damp_mod.F      
-Chd|        DRAPE_MOD                     share/modules/drape_mod.F     
-Chd|        ECND_MOD                      share/modules/ecdn_mod.F      
-Chd|        EIG_MOD                       share/modules/eig_mod.F       
-Chd|        FSKYI_MOD                     share/modules/restart_mod.F   
-Chd|        FXB_MOD                       share/modules/fxb_mod.F       
-Chd|        H3D_MOD                       share/modules/h3d_mod.F       
-Chd|        INTSTAMP_GLOB_MOD             share/modules/intstamp_glob_mod.F
-Chd|        LOADS_MOD                     ../common_source/modules/loads/loads_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
-Chd|        OUTMAX_MOD                    ../common_source/modules/outmax_mod.F
-Chd|        OUTPUTS_MOD                   ../common_source/modules/outputs_mod.F
-Chd|        PINCHTYPE_MOD                 ../common_source/modules/pinchtype_mod.F
-Chd|        RBODY_MOD                     share/modules/rbody_mod.F     
-Chd|        RESTMOD                       share/modules/restart_mod.F   
-Chd|        SEATBELT_MOD                  ../common_source/modules/seatbelt_mod.F
-Chd|        SEGVAR_MOD                    share/modules/segvar_mod.F    
-Chd|        SPH_MOD                       share/modules/sph_mod.F       
-Chd|        STACK_MOD                     share/modules/stack_mod.F     
-Chd|        TRIMAT_MOD                    share/modules/trimat.F        
-Chd|====================================================================
-      SUBROUTINE RESTALLOC(MULTI_FVM,H3D_DATA,PINCH_DATA,ALE_CONNECTIVITY,SEGVAR,LOADS,INTERFACES,SKEWS)
+      !||====================================================================
+      !||    restalloc              ../engine/source/output/restart/arralloc.F
+      !||--- called by ------------------------------------------------------
+      !||    radioss2               ../engine/source/engine/radioss2.F
+      !||--- calls      -----------------------------------------------------
+      !||    alefvm_init            ../engine/source/ale/alefvm/alefvm_init.F
+      !||    ancmsg                 ../engine/source/output/message/message.F
+      !||    arret                  ../engine/source/system/arret.F
+      !||    intstamp_zero          ../engine/share/modules/intstamp_mod.F
+      !||    multi_allocate         ../engine/source/multifluid/multi_allocate.F
+      !||    sz_print               ../engine/source/output/restart/arralloc.F
+      !||--- uses       -----------------------------------------------------
+      !||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
+      !||    ale_mod                ../common_source/modules/ale/ale_mod.F
+      !||    aleanim_mod            ../engine/share/modules/aleanim_mod.F
+      !||    alefvm_mod             ../common_source/modules/ale/alefvm_mod.F
+      !||    alemuscl_mod           ../common_source/modules/ale/alemuscl_mod.F
+      !||    cluster_mod            ../engine/share/modules/cluster_mod.F
+      !||    damp_mod               ../engine/share/modules/damp_mod.F
+      !||    drape_mod              ../engine/share/modules/drape_mod.F
+      !||    ecnd_mod               ../engine/share/modules/ecdn_mod.F
+      !||    eig_mod                ../engine/share/modules/eig_mod.F
+      !||    fskyi_mod              ../engine/share/modules/restart_mod.F
+      !||    fxb_mod                ../engine/share/modules/fxb_mod.F
+      !||    h3d_mod                ../engine/share/modules/h3d_mod.F
+      !||    intstamp_glob_mod      ../engine/share/modules/intstamp_glob_mod.F
+      !||    message_mod            ../engine/share/message_module/message_mod.F
+      !||    multi_fvm_mod          ../common_source/modules/ale/multi_fvm_mod.F
+      !||    my_alloc_mod           ../common_source/tools/memory/my_alloc.F
+      !||    outmax_mod             ../common_source/modules/outmax_mod.F
+      !||    outputs_mod            ../common_source/modules/outputs_mod.F
+      !||    pinchtype_mod          ../common_source/modules/pinchtype_mod.F
+      !||    rbody_mod              ../engine/share/modules/rbody_mod.F
+      !||    restmod                ../engine/share/modules/restart_mod.F
+      !||    seatbelt_mod           ../common_source/modules/seatbelt_mod.F
+      !||    segvar_mod             ../engine/share/modules/segvar_mod.F
+      !||    skew_mod               ../common_source/modules/skew_mod.F90
+      !||    sph_mod                ../engine/share/modules/sph_mod.F
+      !||    stack_mod              ../engine/share/modules/stack_mod.F
+      !||    trimat_mod             ../engine/share/modules/trimat.F
+      !||====================================================================
+      SUBROUTINE RESTALLOC(MULTI_FVM,H3D_DATA,PINCH_DATA,ALE_CONNECTIVITY,SEGVAR,INTERFACES,SKEWS)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -88,7 +90,6 @@ C-----------------------------------------------
       USE OUTMAX_MOD
       USE OUTPUTS_MOD
       USE ALE_MOD
-      USE LOADS_MOD
       USE DAMP_MOD
       USE INTERFACES_MOD
       USE SKEW_MOD
@@ -129,7 +130,6 @@ C-----------------------------------------------
       TYPE(PINCH) :: PINCH_DATA
       TYPE(t_ale_connectivity), INTENT(INOUT) :: ALE_CONNECTIVITY
       TYPE(t_SEGVAR) :: SEGVAR
-      TYPE (LOADS_),INTENT(IN) :: LOADS
       TYPE(INTERFACES_) :: INTERFACES
       TYPE(SKEW_) , INTENT(INOUT)       :: SKEWS
 C----------------------------------------------
@@ -757,7 +757,10 @@ C
 
           ALLOCATE (NE_NESDVOIS(NSPMD + 1),STAT=IERR)  
           IF (IERR/=0) GOTO 1000                     
-          NE_NESDVOIS = 0                              
+          NE_NESDVOIS = 0       
+        ELSE
+          ALLOCATE (NE_NERCVOIS(0) )  
+          ALLOCATE (NE_NESDVOIS(0) )                         
         ENDIF                                          
         
         ALLOCATE (NPSEGCOM(SNPSEGCOM),STAT=IERR)
@@ -1545,10 +1548,9 @@ C   thermal bc
             ALLOCATE(IBFTEMP(0),FBFTEMP(0))                              
          ENDIF  
 C
-
+         ALLOCATE (MSF(SMS),STAT=IERR)
+         IF (IERR/=0) GOTO 1000
          IF(IALELAG > 0) THEN
-           ALLOCATE (MSF(SMS),STAT=IERR)
-           IF (IERR/=0) GOTO 1000
            MSF = ZERO
          ENDIF
 C--------------------------------------------
@@ -1649,6 +1651,8 @@ C--------------------------------------------
            ALLOCATE(NATIV0_SMS(NUMNOD),STAT=IERR)
            IF (IERR/=0) GOTO 1000
            NATIV0_SMS = 0
+         ELSE 
+           ALLOCATE(NATIV0_SMS(0) )
          ENDIF
 C--------------------------------------------
 C
@@ -1891,6 +1895,7 @@ C xfem for layered shell (cracks)
          ELSE
            ALLOCATE(IADC_CRKXFEM(0),ADSKY_CRKXFEM(0))
            ALLOCATE(INOD_CRKXFEM(0),IEL_CRKXFEM(0))
+           ALLOCATE (CNE_CRKXFEM(0))
            ALLOCATE(PROCNE_CRKXFEM(0),IADSDP_CRKXFEM(0),
      .              IADRCP_CRKXFEM(0),CRKNODIAD(0))
          ENDIF
@@ -2131,6 +2136,8 @@ C--------2D Mass----------------------------
         IF(N2D/=0) THEN
           ALLOCATE(MS_2D(NUMNOD),STAT=IERR)
           IF (IERR/=0) GOTO 1000
+        ELSE
+          ALLOCATE(MS_2D(0))
         ENDIF
 C-------shell pinching----------------------
 C       IF(NPINCH > 0) THEN
@@ -2150,6 +2157,7 @@ C       ENDIF
 C------end shell pinching-------------------
 C-------TAG_SKINS6----------------------
          ALLOCATE(TAG_SKINS6(NUMELS),STAT=IERR)
+         SXCELL = 0
 C-------ALE BUFFER----------------------
          IF ((IALE > 0 .AND. ALE%GRID%NWALE_RST == 6) ) THEN
             SXCELL = NUMELS + NUMELQ + NE_NSVOIS + NE_NQVOIS
@@ -2164,6 +2172,8 @@ C-------INTER18 BUFFER (IAUTO=1)--------
             IF(.NOT.ALLOCATED(XCELL))ALLOCATE(XCELL(3, SXCELL),STAT=IERR)
             IF (IERR/=0) GOTO 1000
          ENDIF       
+         IF(.NOT.ALLOCATED(XCELL)) ALLOCATE(XCELL(3,SXCELL))
+         IF(.NOT.ALLOCATED(XFACE)) ALLOCATE(XFACE(3,6,0))
          XCELL(1:3,1:SXCELL) = ZERO
 C-------FXBODY (moved from radioss2.F) -----
         ALLOCATE (FXBIPM(NBIPM,NFXBODY),STAT=IERR)
@@ -2320,18 +2330,19 @@ C
       END
 
 
-Chd|====================================================================
-Chd|  SZ_PRINT                      source/output/restart/arralloc.F
-Chd|-- called by -----------
-Chd|        RESTALLOC                     source/output/restart/arralloc.F
-Chd|-- calls ---------------
-Chd|        SPMD_CHKW                     source/mpi/generic/spmd_chkw.F
-Chd|        SPMD_GLOB_ISUM9               source/mpi/interfaces/spmd_th.F
-Chd|        SPMD_IBCAST                   source/mpi/generic/spmd_ibcast.F
-Chd|        SPMD_WIOUT                    source/mpi/generic/spmd_wiout.F
-Chd|        ALE_MOD                       ../common_source/modules/ale/ale_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    sz_print          ../engine/source/output/restart/arralloc.F
+      !||--- called by ------------------------------------------------------
+      !||    restalloc         ../engine/source/output/restart/arralloc.F
+      !||--- calls      -----------------------------------------------------
+      !||    spmd_chkw         ../engine/source/mpi/generic/spmd_chkw.F
+      !||    spmd_glob_isum9   ../engine/source/mpi/interfaces/spmd_th.F
+      !||    spmd_ibcast       ../engine/source/mpi/generic/spmd_ibcast.F
+      !||    spmd_wiout        ../engine/source/mpi/generic/spmd_wiout.F
+      !||--- uses       -----------------------------------------------------
+      !||    ale_mod           ../common_source/modules/ale/ale_mod.F
+      !||    message_mod       ../engine/share/message_module/message_mod.F
+      !||====================================================================
         SUBROUTINE SZ_PRINT()
 C-----------------------------------------------
 C   M o d u l e s

@@ -20,24 +20,25 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  HM_READ_PROP14                source/properties/solid/hm_read_prop14.F
-Chd|-- called by -----------
-Chd|        HM_READ_PROPERTIES            source/properties/hm_read_properties.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        ARRET                         source/system/arret.F         
-Chd|        HM_GET_FLOATV                 source/devtools/hm_reader/hm_get_floatv.F
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        HM_OPTION_IS_ENCRYPTED        source/devtools/hm_reader/hm_option_is_encrypted.F
-Chd|        HM_READ_ALE_CLOSE             source/ale/hm_read_ale_close.F
-Chd|        ALE_MOD                       ../common_source/modules/ale/ale_mod.F
-Chd|        ELBUFTAG_MOD                  share/modules1/elbuftag_mod.F 
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
-      SUBROUTINE HM_READ_PROP14(GEO,IGEO,PROP_TAG,MULTI_FVM,IGTYP,IG,TITR,UNITAB,LSUBMODEL,IPART)
+      !||====================================================================
+      !||    hm_read_prop14           ../starter/source/properties/solid/hm_read_prop14.F
+      !||--- called by ------------------------------------------------------
+      !||    hm_read_properties       ../starter/source/properties/hm_read_properties.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                   ../starter/source/output/message/message.F
+      !||    arret                    ../starter/source/system/arret.F
+      !||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
+      !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+      !||    hm_read_ale_close        ../starter/source/ale/hm_read_ale_close.F
+      !||--- uses       -----------------------------------------------------
+      !||    defaults_mod             ../starter/source/modules/defaults_mod.F90
+      !||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
+      !||    message_mod              ../starter/share/message_module/message_mod.F
+      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
+      SUBROUTINE HM_READ_PROP14(GEO,IGEO,PROP_TAG,MULTI_FVM,IGTYP,IG,TITR,UNITAB,
+     .                          LSUBMODEL,IPART,DEFAULTS_SOLID)
 C-----------------------------------------------
 C   ROUTINE DESCRIPTION :
 C   ===================
@@ -63,6 +64,8 @@ C-----------------------------------------------
       USE ELBUFTAG_MOD            
       USE MULTI_FVM_MOD
       USE ALE_MOD
+      USE DEFAULTS_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -72,7 +75,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr17_c.inc"
 #include      "units_c.inc"
-#include      "scr21_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
@@ -84,21 +86,23 @@ C INPUT ARGUMENTS
       TYPE (UNIT_TYPE_),INTENT(IN) ::UNITAB 
       INTEGER,INTENT(IN)::IG,IGTYP
       INTEGER,INTENT(IN)::IPART(LIPART1,*)
-      CHARACTER*nchartitle,INTENT(IN)::TITR
+      CHARACTER(LEN=NCHARTITLE) ,INTENT(IN)::TITR
       TYPE(SUBMODEL_DATA),INTENT(IN)::LSUBMODEL(NSUBMOD)
       TYPE(MULTI_FVM_STRUCT),INTENT(IN) :: MULTI_FVM      
 C MODIFIED ARGUMENT
       INTEGER,INTENT(INOUT)::IGEO(NPROPGI)
       my_real,INTENT(INOUT)::GEO(NPROPG)
       TYPE(PROP_TAG_) , DIMENSION(0:MAXPROP) :: PROP_TAG
+      TYPE(SOLID_DEFAULTS_), INTENT(IN) :: DEFAULTS_SOLID
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER IHBE,ISMSTR,IPLAS,ICPRE,ICSTR,IINT,JCVT,NPG,NPT,NPTR,NPTS,NPTT, ISTRAIN,IET,IHBE_OLD,ID
       INTEGER I8PT,ITET4,ITET4_PREV,NSPHDIR,ID_SENS,ID_PARTSPH,IPARTSPH,J,ITET10,I_ALE_FLAG,IHBE_PR
       my_real CVIS,QA,QB,QH,VNS1,VNS2,DTMIN,VDEFMIN,VDEFMAX,ASPMAX,ASPTET 
+      INTEGER     IHBE_DS,ISST_DS,IPLA_DS,IFRAME_DS,ITET4_D,ITET10_D,ICPRE_D,ICONTROL_D,ICONTROL
       LOGICAL IS_AVAILABLE, IS_ENCRYPTED, lFOUND
-      CHARACTER*ncharline :: MSGLINE
+      CHARACTER(LEN=NCHARLINE) ::  MSGLINE
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------
@@ -106,6 +110,14 @@ C-----------------------------------------------
       IS_AVAILABLE = .FALSE.
       NSPHDIR = 0
       ID_PARTSPH = 0
+!--- defaults values      
+      IHBE_DS=  DEFAULTS_SOLID%ISOLID
+      ISST_DS=  DEFAULTS_SOLID%ISMSTR
+      ICPRE_D=  DEFAULTS_SOLID%ICPRE
+      ITET4_D=  DEFAULTS_SOLID%ITETRA4
+      ITET10_D= DEFAULTS_SOLID%ITETRA10
+      IFRAME_DS= DEFAULTS_SOLID%IFRAME
+      ICONTROL_D=DEFAULTS_SOLID%ICONTROL
 C--------------------------------------------------
       CALL HM_OPTION_IS_ENCRYPTED(IS_ENCRYPTED)
 C--------------------------------------------------
@@ -123,6 +135,7 @@ C--------------------------------------------------
       CALL HM_GET_INTV('Inpts_R',NPTR,IS_AVAILABLE,LSUBMODEL)
       CALL HM_GET_INTV('Inpts_S',NPTS,IS_AVAILABLE,LSUBMODEL)
       CALL HM_GET_INTV('Inpts_T',NPTT,IS_AVAILABLE,LSUBMODEL)
+      CALL HM_GET_INTV('Icontrol',ICONTROL,IS_AVAILABLE,LSUBMODEL)
 C--------------------------------------------------
 C EXTRACT DATAS (REAL VALUES)
 C--------------------------------------------------
@@ -326,12 +339,8 @@ C--------------------------------------------------
          IHBE=0                                                        
          CALL ANCMSG(MSGID=324, MSGTYPE=MSGWARNING,  ANMODE=ANINFO_BLIND_2, I1=ID,  C1=TITR, I2=IHBE_OLD, I3=IHBE)
       ENDIF                                                            
-C--- temporarly using DTMIN   
-      IGEO(97) = 0
-      IF (DTMIN<ZERO) THEN
-        IGEO(97) = 1
-        DTMIN=ZERO
-      END IF
+      IF (ICONTROL==0) ICONTROL=ICONTROL_D
+      IF (ICONTROL>1) ICONTROL=0
 
       ! --default QA,QB (PSEUDO VISCOSITY)  ---  
       ! igeo(31)  flag for default qa qb for law 70  can be used for other law
@@ -373,6 +382,7 @@ C--------------------------------------------------
       IGEO(38) = IPARTSPH
       IGEO(39) = ID_SENS
       IGEO(62) = I_ALE_FLAG
+      IGEO(97) = ICONTROL
       
       GEO(14)  = QA
       GEO(15)  = QB
@@ -391,9 +401,11 @@ C--------------------------------------------------
       IF (IHBE==1.AND.IINT==3) IHBE_PR=5
       IF(.NOT.IS_ENCRYPTED)THEN
         IF(IGEO(31) == 1) THEN   
-          WRITE(IOUT,1100)IG,IHBE_PR,ISMSTR,I_ALE_FLAG,IPLAS,JCVT,ITET4,ITET10,ICPRE,ICSTR,CVIS,QA,QB,QH,VNS1,VNS2,DTMIN, ISTRAIN
+          WRITE(IOUT,1100)IG,IHBE_PR,ISMSTR,I_ALE_FLAG,IPLAS,JCVT,ITET4,
+     .                    ITET10,ICPRE,ICSTR,CVIS,QA,QB,QH,VNS1,VNS2,DTMIN, ISTRAIN,ICONTROL
         ELSE
-          WRITE(IOUT,1000)IG,IHBE_PR,ISMSTR,I_ALE_FLAG,IPLAS,JCVT,ITET4,ITET10,ICPRE,ICSTR,CVIS,QA,QB,QH,VNS1,VNS2,DTMIN, ISTRAIN
+          WRITE(IOUT,1000)IG,IHBE_PR,ISMSTR,I_ALE_FLAG,IPLAS,JCVT,ITET4,
+     .                    ITET10,ICPRE,ICSTR,CVIS,QA,QB,QH,VNS1,VNS2,DTMIN, ISTRAIN,ICONTROL
         ENDIF
         IF((VDEFMIN+VDEFMAX+ASPMAX+ASPTET)>ZERO) THEN
           IF (VDEFMAX==ZERO) VDEFMAX=EP10
@@ -472,7 +484,8 @@ C---
      & 5X,'NUMERICAL NAVIER STOKES VISCO. LAMBDA .=',1PG20.13/,
      & 5X,'NUMERICAL NAVIER STOKES VISCOSITY MU. .=',1PG20.13/,
      & 5X,'BRICK MINIMUM TIME STEP................=',1PG20.13/,
-     & 5X,'POST PROCESSING STRAIN FLAG . . . . . .=',I10/)
+     & 5X,'POST PROCESSING STRAIN FLAG . . . . . .=',I10/,
+     & 5X,'SOLID DISTORTION CONTROL FLAG . . . . .=',I10/)
  1001 FORMAT(
      & 5X,'NUMBER OF INTEGRATION POINTS. .  . .  .=',I3,
      &    ' (',I3,')'/)
@@ -505,7 +518,8 @@ C---
      & 5X,'NUMERICAL NAVIER STOKES VISCO. LAMBDA .=',1PG20.13/,
      & 5X,'NUMERICAL NAVIER STOKES VISCOSITY MU. .=',1PG20.13/,
      & 5X,'BRICK MINIMUM TIME STEP................=',1PG20.13/,
-     & 5X,'POST PROCESSING STRAIN FLAG . . . . . .=',I10/)
+     & 5X,'POST PROCESSING STRAIN FLAG . . . . . .=',I10/,
+     & 5X,'SOLID DISTORTION CONTROL FLAG . . . . .=',I10/)
  2010 FORMAT(
      & 5X,'HOURGLASS MODULUS FLAG. . . . . . . . .=',I10/)   
  2020 FORMAT(
@@ -521,22 +535,23 @@ C
       END SUBROUTINE HM_READ_PROP14
 
 
-Chd|====================================================================
-Chd|  HM_READ_PROP14F               source/properties/solid/hm_read_prop14.F
-Chd|-- called by -----------
-Chd|        HM_READ_PROPERTIES            source/properties/hm_read_properties.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        HM_GET_FLOATV                 source/devtools/hm_reader/hm_get_floatv.F
-Chd|        HM_OPTION_IS_ENCRYPTED        source/devtools/hm_reader/hm_option_is_encrypted.F
-Chd|        HM_READ_ALE_CLOSE             source/ale/hm_read_ale_close.F
-Chd|        ALE_MOD                       ../common_source/modules/ale/ale_mod.F
-Chd|        ELBUFTAG_MOD                  share/modules1/elbuftag_mod.F 
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
-      SUBROUTINE HM_READ_PROP14F(GEO,IGEO,PROP_TAG,MULTI_FVM,IGTYP,IG,TITR,UNITAB,LSUBMODEL)
+      !||====================================================================
+      !||    hm_read_prop14f          ../starter/source/properties/solid/hm_read_prop14.F
+      !||--- called by ------------------------------------------------------
+      !||    hm_read_properties       ../starter/source/properties/hm_read_properties.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                   ../starter/source/output/message/message.F
+      !||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
+      !||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+      !||    hm_read_ale_close        ../starter/source/ale/hm_read_ale_close.F
+      !||--- uses       -----------------------------------------------------
+      !||    defaults_mod             ../starter/source/modules/defaults_mod.F90
+      !||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
+      !||    message_mod              ../starter/share/message_module/message_mod.F
+      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
+      SUBROUTINE HM_READ_PROP14F(GEO,IGEO,PROP_TAG,MULTI_FVM,IGTYP,IG,TITR,UNITAB,LSUBMODEL,
+     .                          DEFAULTS_SOLID)
 C-----------------------------------------------
 C   ROUTINE DESCRIPTION :
 C   ===================
@@ -562,6 +577,8 @@ C-----------------------------------------------
       USE ELBUFTAG_MOD            
       USE MULTI_FVM_MOD
       USE ALE_MOD
+      USE DEFAULTS_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -570,7 +587,6 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "units_c.inc"
-#include      "scr21_c.inc"
 #include      "com01_c.inc"
 #include      "param_c.inc"
 #include      "tablen_c.inc"
@@ -580,17 +596,19 @@ C-----------------------------------------------
 C INPUT ARGUMENTS
       TYPE (UNIT_TYPE_),INTENT(IN) ::UNITAB 
       INTEGER,INTENT(IN)::IG,IGTYP
-      CHARACTER*nchartitle,INTENT(IN)::TITR
+      CHARACTER(LEN=NCHARTITLE) ,INTENT(IN)::TITR
       TYPE(SUBMODEL_DATA),INTENT(IN)::LSUBMODEL(NSUBMOD)
       TYPE(MULTI_FVM_STRUCT),INTENT(IN) :: MULTI_FVM      
 C MODIFIED ARGUMENT
       INTEGER,INTENT(INOUT)::IGEO(NPROPGI)
       my_real,INTENT(INOUT)::GEO(NPROPG)
       TYPE(PROP_TAG_) , DIMENSION(0:MAXPROP) :: PROP_TAG
+      TYPE(SOLID_DEFAULTS_), INTENT(IN) :: DEFAULTS_SOLID
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER IHBE,ISMSTR,IPLAS,ICPRE,ICSTR,IINT,JCVT,NPG,NPT,NPTR,NPTS,NPTT, ISTRAIN,IET,IHBE_OLD,ID,I8PT,J
+      INTEGER     IHBE_DS,ISST_DS,IPLA_DS,IFRAME_DS
       my_real CVIS,QA,QB,QH,VNS1,VNS2,DTMIN 
       LOGICAL IS_AVAILABLE, IS_ENCRYPTED
 C-----------------------------------------------
@@ -604,6 +622,10 @@ C--------------------------------------------------
       CALL HM_GET_FLOATV('qa',QA,IS_AVAILABLE,LSUBMODEL,UNITAB)
       CALL HM_GET_FLOATV('qb',QB,IS_AVAILABLE,LSUBMODEL,UNITAB)
       CALL HM_GET_FLOATV('h',QH,IS_AVAILABLE,LSUBMODEL,UNITAB)
+!--- defaults values      
+      IHBE_DS=  DEFAULTS_SOLID%ISOLID
+      ISST_DS=  DEFAULTS_SOLID%ISMSTR
+      IFRAME_DS= DEFAULTS_SOLID%IFRAME
 C-----hide and removed flags:
       ICSTR = 0                              
       IHBE=1

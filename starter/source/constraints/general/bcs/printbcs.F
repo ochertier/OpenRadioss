@@ -20,14 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  PRINTBCS                      source/constraints/general/bcs/printbcs.F
-Chd|-- called by -----------
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|-- calls ---------------
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    printbcs               ../starter/source/constraints/general/bcs/printbcs.F
+      !||--- called by ------------------------------------------------------
+      !||    lectur                 ../starter/source/starter/lectur.F
+      !||--- calls      -----------------------------------------------------
+      !||    ngr2usr                ../starter/source/system/nintrr.F
+      !||    usr2sys                ../starter/source/system/sysfus.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE PRINTBCS(ICODE     ,ISKEW   ,ITAB    ,ITABM1 ,IKINE  ,
      .                  IGRNOD    ,IBCSLAG ,LAG_NCF ,LAG_NKF,LAG_NHF,
      .                  IKINE1LAG ,ISKN    ,NOM_OPT , NBCSLAG)
@@ -36,6 +38,7 @@ C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
       USE GROUPDEF_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARFIELD, NCHARKEY
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -68,9 +71,10 @@ C-----------------------------------------------
      .        FLAG_FMT,FLAG_FMT_TMP,IFIX_TMP,SUB_ID,
      .        CHKCOD,ISERR,NOD
       INTEGER IUN
-      CHARACTER MESS*40,KEY*ncharkey,STRING*ncharfield,CODE*7,
-     .        KEY2*ncharkey
-      CHARACTER TITR*nchartitle,OPT*8
+      CHARACTER MESS*40,CODE*7,OPT*8
+      CHARACTER(LEN=NCHARKEY) :: KEY,KEY2
+      CHARACTER(LEN=NCHARFIELD) :: STRING
+      CHARACTER(LEN=NCHARTITLE) :: TITR
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------

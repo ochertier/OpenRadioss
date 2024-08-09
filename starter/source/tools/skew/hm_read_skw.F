@@ -20,27 +20,30 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  HM_READ_SKW                   source/tools/skew/hm_read_skw.F
-Chd|-- called by -----------
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        ANODSET                       source/output/analyse/analyse_node.c
-Chd|        EULER_VROT                    source/model/submodel/euler_vrot.F
-Chd|        FRETITL                       source/starter/freform.F      
-Chd|        HM_GET_FLOATV                 source/devtools/hm_reader/hm_get_floatv.F
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        HM_GET_STRING                 source/devtools/hm_reader/hm_get_string.F
-Chd|        HM_OPTION_READ_KEY            source/devtools/hm_reader/hm_option_read_key.F
-Chd|        HM_OPTION_START               source/devtools/hm_reader/hm_option_start.F
-Chd|        SUBROTPOINT                   source/model/submodel/subrot.F
-Chd|        UDOUBLE                       source/system/sysfus.F        
-Chd|        USR2SYS                       source/system/sysfus.F        
-Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_read_skw            ../starter/source/tools/skew/hm_read_skw.F
+      !||--- called by ------------------------------------------------------
+      !||    lectur                 ../starter/source/starter/lectur.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    anodset                ../starter/source/output/analyse/analyse_node.c
+      !||    euler_vrot             ../starter/source/model/submodel/euler_vrot.F
+      !||    fretitl                ../starter/source/starter/freform.F
+      !||    hm_get_floatv          ../starter/source/devtools/hm_reader/hm_get_floatv.F
+      !||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    hm_get_string          ../starter/source/devtools/hm_reader/hm_get_string.F
+      !||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
+      !||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
+      !||    origin                 ../starter/source/model/remesh/build_admesh.F
+      !||    subrotpoint            ../starter/source/model/submodel/subrot.F
+      !||    udouble                ../starter/source/system/sysfus.F
+      !||    usr2sys                ../starter/source/system/sysfus.F
+      !||--- uses       -----------------------------------------------------
+      !||    format_mod             ../starter/share/modules1/format_mod.F90
+      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE HM_READ_SKW(SKEW    ,ISKN    ,X       ,ITAB     ,ITABM1  ,
      .                       NSN     ,LSUBMODEL,RTRANS ,NOM_OPT ,UNITAB)
 C-----------------------------------------------
@@ -50,6 +53,8 @@ C-----------------------------------------------
       USE SUBMODEL_MOD
       USE MESSAGE_MOD
       USE HM_OPTION_READ_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARKEY, NCHARFIELD
+      USE FORMAT_MOD , ONLY : LFIELD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -72,12 +77,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      TYPE (UNIT_TYPE_),INTENT(IN) ::UNITAB 
+      TYPE (UNIT_TYPE_),INTENT(IN) :: UNITAB
       INTEGER ISKN(LISKN,*), ITAB(*), ITABM1(*), NSN(*)
-C     REAL
-      my_real
-     .   SKEW(LSKEW,*), X(3,*),
-     .   RTRANS(NTRANSF,*)
+      my_real SKEW(LSKEW,*), X(3,*), RTRANS(NTRANSF,*)
       TYPE(SUBMODEL_DATA) LSUBMODEL(*)
       INTEGER NOM_OPT(LNOPT1,*)
 C-----------------------------------------------
@@ -87,13 +89,13 @@ C-----------------------------------------------
      .        IUN, SUB_ID,
      .        IDSUB,ITY,L,READPT,J1,J2,NUMSPH_TMP,SUB_LEVEL,CUR_SUBMOD,
      .        IDIR,IFLAGUNIT,ID,UID,CPT
-C     REAL
-      my_real
-     .   P(12), PNOR1, PNOR2, PNORM1, DET1, DET2, DET3, DET, PP,BID,
-     .   X0(3),ROT(9)
-      CHARACTER NOMSG*nchartitle
-      CHARACTER TITR*nchartitle,MESS*40,KEY*ncharkey
-      CHARACTER DIR*ncharfield
+      my_real  P(12), PNOR1, PNOR2, PNORM1, DET1, DET2, DET3, DET, PP,BID,
+     .         X0(3),ROT(9)
+      CHARACTER(LEN=NCHARTITLE)::NOMSG
+      CHARACTER(LEN=NCHARTITLE) :: TITR
+      CHARACTER MESS*40
+      CHARACTER(LEN=NCHARKEY) :: KEY
+      CHARACTER(LEN=NCHARFIELD) :: DIR
       LOGICAL IS_AVAILABLE
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s

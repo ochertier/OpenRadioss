@@ -20,27 +20,26 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  HM_READ_CLOAD                 source/loads/general/cload/hm_read_cload.F
-Chd|-- called by -----------
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        HM_GET_FLOATV                 source/devtools/hm_reader/hm_get_floatv.F
-Chd|        HM_GET_FLOATV_DIM             source/devtools/hm_reader/hm_get_floatv_dim.F
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        HM_GET_STRING                 source/devtools/hm_reader/hm_get_string.F
-Chd|        HM_OPTION_READ_KEY            source/devtools/hm_reader/hm_option_read_key.F
-Chd|        HM_OPTION_START               source/devtools/hm_reader/hm_option_start.F
-Chd|        NODGRNR5                      source/starter/freform.F      
-Chd|        NODGR_R2R                     source/coupling/rad2rad/routines_r2r.F
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        LOADS_MOD                     ../common_source/modules/loads/loads_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        R2R_MOD                       share/modules1/r2r_mod.F      
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_read_cload          ../starter/source/loads/general/cload/hm_read_cload.F
+      !||--- called by ------------------------------------------------------
+      !||    lectur                 ../starter/source/starter/lectur.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    hm_get_floatv          ../starter/source/devtools/hm_reader/hm_get_floatv.F
+      !||    hm_get_floatv_dim      ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
+      !||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    hm_get_string          ../starter/source/devtools/hm_reader/hm_get_string.F
+      !||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
+      !||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
+      !||    nodgr_r2r              ../starter/source/coupling/rad2rad/routines_r2r.F
+      !||    nodgrnr5               ../starter/source/starter/freform.F
+      !||--- uses       -----------------------------------------------------
+      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    r2r_mod                ../starter/share/modules1/r2r_mod.F
+      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE HM_READ_CLOAD(IBCL   ,FORC    ,NUM    ,ITAB   ,ITABM1   ,
      .                         IGRNOD ,NWORK   ,UNITAB ,ISKN   ,LSUBMODEL,
      .                         LOADS  )
@@ -54,6 +53,7 @@ C-----------------------------------------------
       USE SUBMODEL_MOD
       USE HM_OPTION_READ_MOD
       USE LOADS_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARFIELD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -75,9 +75,7 @@ C-----------------------------------------------
       INTEGER NUM
       INTEGER IBCL(NIBCLD,*), ITAB(*), ITABM1(*),NWORK(*),
      .        ISKN(LISKN,*)
-C     REAL
-      my_real
-     .   FORC(LFACCLD,*)
+      my_real FORC(LFACCLD,*)
       TYPE(SUBMODEL_DATA),INTENT(IN)::LSUBMODEL(*)
       TYPE (LOADS_),INTENT(INOUT) :: LOADS
 C-----------------------------------------------
@@ -90,9 +88,9 @@ C-----------------------------------------------
       INTEGER I,J,K,K1,K2,NOD, NCUR, NOSKEW, ISENS,NLD0,NN,IGU,IGS,
      .        UID,IAD,NS,IWA,ID,NUM0,IFLAGUNIT,COMPT,SUB_INDEX,IDIR,IFUNCTYPE
       INTEGER NNB
-      CHARACTER MESS*40, XYZ*ncharfield,
-     .          X*1, Y*1, Z*1, XX*2, YY*2, ZZ*2
-      CHARACTER TITR*nchartitle
+      CHARACTER MESS*40,X*1, Y*1, Z*1, XX*2, YY*2, ZZ*2
+      CHARACTER(LEN=NCHARFIELD) :: XYZ
+      CHARACTER(LEN=NCHARTITLE) :: TITR
       LOGICAL IS_AVAILABLE
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s

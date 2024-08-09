@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  LAW62_UPD                     source/materials/mat/mat062/law62_upd.F
-Chd|-- called by -----------
-Chd|        UPDMAT                        source/materials/updmat.F     
-Chd|-- calls ---------------
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        TABLE_MOD                     share/modules1/table_mod.F    
-Chd|====================================================================
+      !||====================================================================
+      !||    law62_upd              ../starter/source/materials/mat/mat062/law62_upd.F
+      !||--- called by ------------------------------------------------------
+      !||    updmat                 ../starter/source/materials/updmat.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    table_mod              ../starter/share/modules1/table_mod.F
+      !||====================================================================
       SUBROUTINE LAW62_UPD(IOUT,TITR    ,MAT_ID,NUPARAM,UPARAM, PM ,
      .                    GAMA_INF )
 C-----------------------------------------------
@@ -35,6 +35,7 @@ C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
       USE TABLE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -47,7 +48,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      CHARACTER*nchartitle  :: TITR
+      CHARACTER(LEN=NCHARTITLE)  :: TITR
       INTEGER MAT_ID,IOUT,NUPARAM
       my_real, DIMENSION(NUPARAM), INTENT(INOUT) :: UPARAM
       my_real,  INTENT(IN)                       :: GAMA_INF

@@ -20,11 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  SIGEPS79                      source/materials/mat/mat079/sigeps79.F
-Chd|-- called by -----------
-Chd|-- calls ---------------
-Chd|====================================================================
+      !||====================================================================
+      !||    sigeps79   ../engine/source/materials/mat/mat079/sigeps79.F
+      !||--- called by ------------------------------------------------------
+      !||    mulaw      ../engine/source/materials/mat_share/mulaw.F90
+      !||====================================================================
        SUBROUTINE SIGEPS79(
      1      NEL      ,NUPARAM  ,NUVAR    ,TIME     ,TIMESTEP ,UPARAM   ,                                                                                                          
      2      RHO0     ,RHO      ,NGL      ,SIGY     ,DPLA     ,DEFP     ,
@@ -32,7 +32,7 @@ Chd|====================================================================
      4      SIGOXX   ,SIGOYY   ,SIGOZZ   ,SIGOXY   ,SIGOYZ   ,SIGOZX   ,
      5      SIGNXX   ,SIGNYY   ,SIGNZZ   ,SIGNXY   ,SIGNYZ   ,SIGNZX   ,
      6      EPSD     ,DMG      ,SOUNDSP  ,UVAR     ,OFF      ,AMU      ,
-     7      IDEL7NOK )      
+     7      ET       )      
 C
 C-----------------------------------------------
 C   I M P L I C I T   T Y P E S
@@ -49,8 +49,6 @@ C  I N P U T   A R G U M E N T S
 C----------------------------------------------------------------
       INTEGER,INTENT(IN) :: 
      .      NEL,NUPARAM,NUVAR,NGL(NEL)
-      INTEGER, INTENT(INOUT) :: 
-     .      IDEL7NOK 
       my_real,INTENT(IN) :: 
      .      TIME,TIMESTEP,UPARAM(NUPARAM),RHO0(NEL),RHO(NEL),
      .      DEPSXX(NEL),DEPSYY(NEL),DEPSZZ(NEL),
@@ -70,7 +68,7 @@ C  I N P U T  O U T P U T   A R G U M E N T S
 C----------------------------------------------------------------
       my_real,INTENT(INOUT) :: 
      .      UVAR(NEL,NUVAR),OFF(NEL),DMG(NEL),
-     .      DEFP(NEL)
+     .      DEFP(NEL),ET(NEL)
 C----------------------------------------------------------------
 C  L O C A L  V A R I A B L E S
 C----------------------------------------------------------------
@@ -244,21 +242,18 @@ c
               OFF(I) = FOUR_OVER_5
               NINDX  = NINDX + 1
               INDX(NINDX) = I
-              IDEL7NOK = 1
             ENDIF 
           ELSEIF (IDEL == 2) THEN 
             IF (DEFP(I) > EPSMAX) THEN 
               OFF(I) = FOUR_OVER_5
               NINDX  = NINDX + 1
               INDX(NINDX) = I
-              IDEL7NOK = 1
             ENDIF
           ELSEIF (IDEL == 3) THEN 
             IF (DMG(I) == ONE) THEN 
               OFF(I) = FOUR_OVER_5
               NINDX  = NINDX + 1
               INDX(NINDX) = I
-              IDEL7NOK = 1
             ENDIF            
           ENDIF
         ENDIF
@@ -295,6 +290,7 @@ C
           DPDMU    = K1
         ENDIF
         SOUNDSP(I) = SQRT((DPDMU+FOUR_OVER_3*G)/RHO0(I))
+        ET(I) = ONE
       ENDDO
 C
       !========================================================================

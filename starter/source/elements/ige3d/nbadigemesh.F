@@ -20,25 +20,26 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  NBADIGEMESH                   source/elements/ige3d/nbadigemesh.F
-Chd|-- called by -----------
-Chd|        CONTRL                        source/starter/contrl.F       
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        CONSTIT                       source/elements/nodes/constit.F
-Chd|        FREDEC0                       source/starter/freform.F      
-Chd|        FREDEC_2KEY_4ID_T             source/starter/freform.F      
-Chd|        FREDEC_KEY_3ID_T              source/starter/freform.F      
-Chd|        FREERR                        source/starter/freform.F      
-Chd|        PRERAFIG3D                    source/elements/ige3d/prerafig3d.F
-Chd|        NINTRI                        source/system/nintrr.F        
-Chd|        USR2SYS                       source/system/sysfus.F        
-Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        MESHSURFIG3D_MOD              source/elements/ige3d/meshsurfig3d_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    nbadigemesh            ../starter/source/elements/ige3d/nbadigemesh.F
+      !||--- called by ------------------------------------------------------
+      !||    contrl                 ../starter/source/starter/contrl.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    constit                ../starter/source/elements/nodes/constit.F
+      !||    fredec0                ../starter/source/starter/freform.F
+      !||    fredec_2key_4id_t      ../starter/source/starter/freform.F
+      !||    fredec_key_3id_t       ../starter/source/starter/freform.F
+      !||    nintri                 ../starter/source/system/nintrr.F
+      !||    prerafig3d             ../starter/source/elements/ige3d/prerafig3d.F
+      !||    usr2sys                ../starter/source/system/sysfus.F
+      !||--- uses       -----------------------------------------------------
+      !||    format_mod             ../starter/share/modules1/format_mod.F90
+      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+      !||    meshsurfig3d_mod       ../starter/source/elements/ige3d/meshsurfig3d_mod.F
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE NBADIGEMESH(LSUBMODEL,NUMNUSR)
 C----------------------------------------------------------------------
 C   ROUTINE BASEE SUR NBADMESH MAIS SPECIFIQUE AUX ELEMENTS ISOGEOMETRIQUES
@@ -53,6 +54,8 @@ C-----------------------------------------------
       USE MESHSURFIG3D_MOD  
       USE SUBMODEL_MOD
       USE HM_OPTION_READ_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARKEY
+      USE FORMAT_MOD , ONLY : FMT_10I, FMT_8I, FMT_I, FMT_6I, FMT_5F, FMT_2I
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -71,7 +74,6 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NUMNUSR
-C     REAL
       TYPE(SUBMODEL_DATA) LSUBMODEL(*)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -91,8 +93,9 @@ C-----------------------------------------------
      .        NKNOT1,NKNOT2,NKNOT3,ITGEO,PX,PY,PZ,PID,IPID,MAXNUMGEO,
      .        NBRAFX,NBRAFY,NBRAFZ,NBIG3D_PATCH
       INTEGER OFF_NOD(NSUBMOD), OFF_DEF(NSUBMOD)
-C     REAL
-      CHARACTER MESS*40,TITR*nchartitle,KEY*ncharkey,IDTITL*nchartitle
+      CHARACTER MESS*40
+      CHARACTER(LEN=nchartitle) :: TITR,IDTITL
+      CHARACTER(LEN=ncharkey) :: KEY
       my_real R5(5),RBID
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s

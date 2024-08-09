@@ -20,23 +20,24 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  HM_READ_ALE_LINK              source/constraints/ale/hm_read_ale_link_vel.F
-Chd|-- called by -----------
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        HM_GET_FLOATV                 source/devtools/hm_reader/hm_get_floatv.F
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        HM_OPTION_READ_KEY            source/devtools/hm_reader/hm_option_read_key.F
-Chd|        HM_OPTION_START               source/devtools/hm_reader/hm_option_start.F
-Chd|        NGR2USR                       source/system/nintrr.F        
-Chd|        USR2SYS                       source/system/sysfus.F        
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_read_ale_link       ../starter/source/constraints/ale/hm_read_ale_link_vel.F
+      !||--- called by ------------------------------------------------------
+      !||    lectur                 ../starter/source/starter/lectur.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    hm_get_floatv          ../starter/source/devtools/hm_reader/hm_get_floatv.F
+      !||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
+      !||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
+      !||    ngr2usr                ../starter/source/system/nintrr.F
+      !||    usr2sys                ../starter/source/system/sysfus.F
+      !||--- uses       -----------------------------------------------------
+      !||    format_mod             ../starter/share/modules1/format_mod.F90
+      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE HM_READ_ALE_LINK(ICODE, ISKEW, ITAB, ITABM1, IKINE,
      .     IGRNOD, IBCSLAG, LAG_NCF, LAG_NKF, LAG_NHF,
      .     IKINE1LAG, LINALE, LSUBMODEL, UNITAB)
@@ -52,6 +53,8 @@ C-----------------------------------------------
       USE UNITAB_MOD
       USE HM_OPTION_READ_MOD
       USE SUBMODEL_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARKEY, NCHARFIELD
+      USE FORMAT_MOD , ONLY : LFIELD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -78,8 +81,10 @@ C-----------------------------------------------
      .        NOSYS, J,J10(10),IGR,IGRS,ISU,IBCALE,J3(3),K,
      .        IC0, IC01, IC02, IC03, IC04, ID ,ILAGM, NBCSLAG,
      .        FLAG_FMT,FLAG_FMT_TMP,IFIX_TMP,IKINE1(3*NUMNOD),IGRNS
-      CHARACTER KEY*ncharkey,STRING*ncharfield,KEY2*ncharkey
-      CHARACTER TITR*nchartitle,OPT*8, CHAR_XYZ*ncharfield,MESS*40
+      CHARACTER(LEN=NCHARKEY) :: KEY,KEY2
+      CHARACTER(LEN=NCHARFIELD) :: STRING, CHAR_XYZ
+      CHARACTER(LEN=NCHARTITLE) :: TITR
+      CHARACTER :: OPT*8,MESS*40
       my_real TSTART,TSTOP
       LOGICAL :: IS_AVAILABLE
       INTEGER :: WX, WY, WZ

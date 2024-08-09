@@ -20,20 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  CREATE_RBODY_CLAUSE           source/model/sets/create_rbody_clause.F
-Chd|-- called by -----------
-Chd|        HM_SET                        source/model/sets/hm_set.F    
-Chd|-- calls ---------------
-Chd|        CREATE_RBODY_BOX              source/model/sets/create_rbody_box.F
-Chd|        CREATE_RBODY_LIST             source/model/sets/create_rbody_clause.F
-Chd|        CREATE_RBODY_LIST_G           source/model/sets/create_rbody_clause.F
-Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        OPTIONDEF_MOD                 ../common_source/modules/optiondef_mod.F
-Chd|        SETDEF_MOD                    ../common_source/modules/setdef_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    create_rbody_clause    ../starter/source/model/sets/create_rbody_clause.F
+      !||--- called by ------------------------------------------------------
+      !||    hm_set                 ../starter/source/model/sets/hm_set.F
+      !||--- calls      -----------------------------------------------------
+      !||    create_rbody_box       ../starter/source/model/sets/create_rbody_box.F
+      !||    create_rbody_list      ../starter/source/model/sets/create_rbody_clause.F
+      !||    create_rbody_list_g    ../starter/source/model/sets/create_rbody_clause.F
+      !||--- uses       -----------------------------------------------------
+      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE CREATE_RBODY_CLAUSE(
      .                        CLAUSE   ,IRBODYM  ,JCLAUSE ,OPT_G ,IS_AVAILABLE ,
      .                        LSUBMODEL,OPT_B   ,IBOX    ,X     ,SKEW         ,
@@ -65,6 +64,7 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE HM_OPTION_READ_MOD
       USE OPTIONDEF_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARFIELD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -72,7 +72,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "nchar_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
@@ -82,9 +81,9 @@ C-----------------------------------------------
       LOGICAL :: IS_AVAILABLE
       INTEGER, INTENT(IN), DIMENSION(NRBODY,2) :: IRBODYM
       INTEGER, INTENT(IN), DIMENSION(2,NRBODY) :: RBY_MSN
-      my_real
-     .        X(3,*),SKEW(LSKEW,*)
-      CHARACTER KEYSET*ncharfield,SET_TITLE*nchartitle
+      my_real X(3,*),SKEW(LSKEW,*)
+      CHARACTER(LEN=NCHARFIELD) :: KEYSET
+      CHARACTER(LEN=NCHARTITLE) :: SET_TITLE
 C-----------------------------------------------
       TYPE (SET_) ::  CLAUSE
       TYPE(SUBMODEL_DATA),INTENT(IN):: LSUBMODEL(*)
@@ -109,21 +108,20 @@ C-----------------------------------------------
         ENDIF
 C-----------------------------------------------
       END
-Chd|====================================================================
-Chd|  CREATE_RBODY_LIST             source/model/sets/create_rbody_clause.F
-Chd|-- called by -----------
-Chd|        CREATE_RBODY_CLAUSE           source/model/sets/create_rbody_clause.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        HM_GET_INT_ARRAY_2INDEXES     source/devtools/hm_reader/hm_get_int_array_2indexes.F
-Chd|        HM_GET_INT_ARRAY_INDEX        source/devtools/hm_reader/hm_get_int_array_index.F
-Chd|        MY_ORDERS                     ../common_source/tools/sort/my_orders.c
-Chd|        SET_USRTOS                    source/model/sets/ipartm1.F   
-Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        SETDEF_MOD                    ../common_source/modules/setdef_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    create_rbody_list           ../starter/source/model/sets/create_rbody_clause.F
+      !||--- called by ------------------------------------------------------
+      !||    create_rbody_clause         ../starter/source/model/sets/create_rbody_clause.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                      ../starter/source/output/message/message.F
+      !||    hm_get_int_array_2indexes   ../starter/source/devtools/hm_reader/hm_get_int_array_2indexes.F
+      !||    hm_get_int_array_index      ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+      !||    set_usrtos                  ../starter/source/model/sets/ipartm1.F
+      !||--- uses       -----------------------------------------------------
+      !||    hm_option_read_mod          ../starter/share/modules1/hm_option_read_mod.F
+      !||    message_mod                 ../starter/share/message_module/message_mod.F
+      !||    submodel_mod                ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE CREATE_RBODY_LIST(
      .               CLAUSE,  IRBODYM  ,JCLAUSE ,IS_AVAILABLE ,LSUBMODEL)
 C-----------------------------------------------
@@ -252,19 +250,19 @@ C-------------------------
       RETURN
       END
 
-Chd|====================================================================
-Chd|  CREATE_RBODY_LIST_G           source/model/sets/create_rbody_clause.F
-Chd|-- called by -----------
-Chd|        CREATE_RBODY_CLAUSE           source/model/sets/create_rbody_clause.F
-Chd|-- calls ---------------
-Chd|        HM_GET_INT_ARRAY_2INDEXES     source/devtools/hm_reader/hm_get_int_array_2indexes.F
-Chd|        HM_GET_INT_ARRAY_INDEX        source/devtools/hm_reader/hm_get_int_array_index.F
-Chd|        SET_USRTOS_NEAREST            source/model/sets/ipartm1.F   
-Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        SETDEF_MOD                    ../common_source/modules/setdef_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    create_rbody_list_g         ../starter/source/model/sets/create_rbody_clause.F
+      !||--- called by ------------------------------------------------------
+      !||    create_rbody_clause         ../starter/source/model/sets/create_rbody_clause.F
+      !||--- calls      -----------------------------------------------------
+      !||    hm_get_int_array_2indexes   ../starter/source/devtools/hm_reader/hm_get_int_array_2indexes.F
+      !||    hm_get_int_array_index      ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+      !||    set_usrtos_nearest          ../starter/source/model/sets/ipartm1.F
+      !||--- uses       -----------------------------------------------------
+      !||    hm_option_read_mod          ../starter/share/modules1/hm_option_read_mod.F
+      !||    message_mod                 ../starter/share/message_module/message_mod.F
+      !||    submodel_mod                ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE CREATE_RBODY_LIST_G(
      .               CLAUSE,  IRBODYM  ,JCLAUSE ,IS_AVAILABLE ,LSUBMODEL)
 C-----------------------------------------------

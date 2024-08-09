@@ -20,23 +20,23 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  R2R_FORK                      source/coupling/rad2rad/r2r_fork.F
-Chd|-- called by -----------
-Chd|        STARTER0                      source/starter/starter0.F     
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        CREATE_CHILD                  source/coupling/rad2rad/r2r_fork.F
-Chd|        MY_FORK                       source/system/rad_sys_call.c  
-Chd|        MY_WAITPID                    source/system/rad_sys_call.c  
-Chd|        R2R_PRELEC_NAME               source/coupling/rad2rad/r2r_prelec_name.F
-Chd|        READ_FLAG_ALE                 source/coupling/rad2rad/r2r_fork.F
-Chd|        WIN_WAITPID                   source/coupling/rad2rad/r2r_fork.F
-Chd|        INOUTFILE_MOD                 ../common_source/modules/inoutfile_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        R2R_MOD                       share/modules1/r2r_mod.F      
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    r2r_fork              ../starter/source/coupling/rad2rad/r2r_fork.F
+      !||--- called by ------------------------------------------------------
+      !||    starter0              ../starter/source/starter/starter0.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                ../starter/source/output/message/message.F
+      !||    create_child          ../starter/source/coupling/rad2rad/r2r_fork.F
+      !||    my_fork               ../starter/source/system/rad_sys_call.c
+      !||    my_waitpid            ../starter/source/system/rad_sys_call.c
+      !||    r2r_prelec_name       ../starter/source/coupling/rad2rad/r2r_prelec_name.F
+      !||    read_flag_ale         ../starter/source/coupling/rad2rad/r2r_fork.F
+      !||    win_waitpid           ../starter/source/coupling/rad2rad/r2r_fork.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod           ../starter/share/message_module/message_mod.F
+      !||    r2r_mod               ../starter/share/modules1/r2r_mod.F
+      !||    submodel_mod          ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE R2R_FORK(CHRUN,FILNAM,LSUBMODEL)
 C-----------------------------------------------
 C   M o d u l e s
@@ -65,16 +65,20 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      CHARACTER FILNAM*100,CHRUN*4,ROOT_SUB*80
+      CHARACTER FILNAM*2148,CHRUN*4,ROOT_SUB*80
       TYPE(SUBMODEL_DATA),INTENT(IN)::LSUBMODEL(*)               
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER ISTAT,KDOM,IPID_RET,IERROR,WAIT,IPID_L,STAT,DOM_SWITCH
       LOGICAL(4) WAITA       
-#if defined(COMP_ARMFLANG) || defined(COMP_LLVM) || defined(COMP_AOCC)
-      INTEGER  GETPID
+#if defined(COMP_ARMFLANG) || defined(COMP_LLVM) || defined(COMP_AOCC) 
+      INTEGER ::  GETPID
 #endif
+#if defined(COMP_NVFORTRAN)
+      INTEGER, EXTERNAL :: GETPID
+#endif
+
       INTEGER :: LEN_TMP_NAME
       CHARACTER(len=4096) :: TMP_NAME
 C-----------------------------------------------
@@ -105,7 +109,7 @@ C----------------------------------------------------------------------
 C-------------------INTEL -> LINUX/LINUXIA64/MACOSX--------------------
 C----------------------------------------------------------------------         
 #else
-#if defined(COMP_GFORTRAN) || defined(COMP_ARMFLANG)|| defined(COMP_LLVM) || defined(COMP_AOCC)
+#if defined(COMP_GFORTRAN) || defined(COMP_ARMFLANG)|| defined(COMP_LLVM) || defined(COMP_AOCC) || defined(COMP_NVFORTRAN)
         CALL MY_FORK(IPID)
         IPID_RET = GETPID()
 #else
@@ -137,7 +141,7 @@ C----------------------------------------------------------------------
 C-------------------INTEL -> LINUX/LINUXIA64/MACOSX--------------------
 C----------------------------------------------------------------------                     
 #else
-#if defined(COMP_GFORTRAN) ||  defined(COMP_ARMFLANG) || defined(COMP_LLVM) ||  defined(COMP_AOCC)
+#if defined(COMP_GFORTRAN) ||  defined(COMP_ARMFLANG) || defined(COMP_LLVM) ||  defined(COMP_AOCC) || defined(COMP_NVFORTRAN)
             CALL MY_WAITPID(IPID,ISTAT,0,IPID_RET)
 #else
             CALL PXFWAITPID(IPID,ISTAT,0,IPID_RET,IERROR)
@@ -219,12 +223,12 @@ C--------------------------------------------------------------------C
       END
 
 #if CPP_mach == CPP_p4win64 || CPP_mach == CPP_p4win32
-Chd|====================================================================
-Chd|  WIN_WAITPID                   source/coupling/rad2rad/r2r_fork.F
-Chd|-- called by -----------
-Chd|        R2R_FORK                      source/coupling/rad2rad/r2r_fork.F
-Chd|-- calls ---------------
-Chd|====================================================================
+      !||====================================================================
+      !||    win_waitpid   ../starter/source/coupling/rad2rad/r2r_fork.F
+      !||--- called by ------------------------------------------------------
+      !||    r2r_fork      ../starter/source/coupling/rad2rad/r2r_fork.F
+      !||--- uses       -----------------------------------------------------
+      !||====================================================================
       SUBROUTINE WIN_WAITPID(IPID_RET)
 C----------------------------------------------- 
       USE DFWIN
@@ -243,16 +247,16 @@ C-----------------------------------------------
       
       END
 
-Chd|====================================================================
-Chd|  CREATE_CHILD                  source/coupling/rad2rad/r2r_fork.F
-Chd|-- called by -----------
-Chd|        R2R_FORK                      source/coupling/rad2rad/r2r_fork.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        MY_EXIT                       source/output/analyse/analyse.c
-Chd|        RAD2RAD_CREATEPROCESS         source/system/machine_c.c     
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    create_child            ../starter/source/coupling/rad2rad/r2r_fork.F
+      !||--- called by ------------------------------------------------------
+      !||    r2r_fork                ../starter/source/coupling/rad2rad/r2r_fork.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                  ../starter/source/output/message/message.F
+      !||    my_exit                 ../starter/source/output/analyse/analyse.c
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod             ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE CREATE_CHILD(ID,FLG_SWALE)
       USE MESSAGE_MOD
 C----------------------------------------------- 
@@ -308,14 +312,13 @@ C-------Incompatibility of "<" remplaced by "-i" ----------------
       END
 #endif
 
-Chd|====================================================================
-Chd|  READ_FLAG_ALE                 source/coupling/rad2rad/r2r_fork.F
-Chd|-- called by -----------
-Chd|        R2R_FORK                      source/coupling/rad2rad/r2r_fork.F
-Chd|-- calls ---------------
-Chd|        INOUTFILE_MOD                 ../common_source/modules/inoutfile_mod.F
-Chd|        R2R_MOD                       share/modules1/r2r_mod.F      
-Chd|====================================================================
+      !||====================================================================
+      !||    read_flag_ale   ../starter/source/coupling/rad2rad/r2r_fork.F
+      !||--- called by ------------------------------------------------------
+      !||    r2r_fork        ../starter/source/coupling/rad2rad/r2r_fork.F
+      !||--- uses       -----------------------------------------------------
+      !||    r2r_mod         ../starter/share/modules1/r2r_mod.F
+      !||====================================================================
       SUBROUTINE READ_FLAG_ALE(CHRUN)
 C-----------------------------------------------
 C   M o d u l e s

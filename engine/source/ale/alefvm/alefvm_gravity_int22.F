@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  ALEFVM_GRAVITY_INT22          source/ale/alefvm/alefvm_gravity_int22.F
-Chd|-- called by -----------
-Chd|        SFORC3                        source/elements/solid/solide/sforc3.F
-Chd|-- calls ---------------
-Chd|        ALEFVM_MOD                    ../common_source/modules/ale/alefvm_mod.F
-Chd|        I22BUFBRIC_MOD                ../common_source/modules/interfaces/cut-cell-search_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    alefvm_gravity_int22   ../engine/source/ale/alefvm/alefvm_gravity_int22.F
+      !||--- called by ------------------------------------------------------
+      !||    sforc3                 ../engine/source/elements/solid/solide/sforc3.F
+      !||--- uses       -----------------------------------------------------
+      !||    alefvm_mod             ../common_source/modules/ale/alefvm_mod.F
+      !||    i22bufbric_mod         ../common_source/modules/interfaces/cut-cell-search_mod.F
+      !||====================================================================
       SUBROUTINE ALEFVM_GRAVITY_INT22
      .                         (
      1                          AGRV, IGRV, LGRAV,
@@ -80,7 +80,6 @@ C-----------------------------------------------
       INTEGER          :: IADF,IADL,ISENS,N1,NVERTEX,INOd,II, NIN
       my_real          :: TS,AA,FCX,FCY,VV,A0,DYDX,GAMA,TFEXTT
       my_real          :: M_CELL(MVSIZ),ACCEL(3,MVSIZ),SKEW(LSKEW,*)
-      my_real,EXTERNAL :: FINTER  
       LOGICAL          :: debug_outp
       INTEGER          :: idbf,idbl , MCELL   
 C-----------------------------------------------

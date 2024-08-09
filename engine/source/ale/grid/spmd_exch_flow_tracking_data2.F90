@@ -28,6 +28,17 @@
 !! gathering SUM(mi.xi,i) : DOMAIN_DATA%COG_L(1:3)
 !! gathering SUM(mi)      : DOMAIN_DATA%SUM_M
 !
+      !||====================================================================
+      !||    spmd_exch_flow_tracking_data2   ../engine/source/ale/grid/spmd_exch_flow_tracking_data2.F90
+      !||--- called by ------------------------------------------------------
+      !||    alew7                           ../engine/source/ale/grid/alew7.F
+      !||--- calls      -----------------------------------------------------
+      !||    spmd_wait                       ../engine/source/mpi/spmd_mod.F90
+      !||--- uses       -----------------------------------------------------
+      !||    ale_mod                         ../common_source/modules/ale/ale_mod.F
+      !||    constant_mod                    ../common_source/modules/constant_mod.F
+      !||    spmd_mod                        ../engine/source/mpi/spmd_mod.F90
+      !||====================================================================
       subroutine spmd_exch_flow_tracking_data2( domain_data, nspmd )
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Modules
@@ -61,7 +72,7 @@
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Body
 ! ----------------------------------------------------------------------------------------------------------------------
-!$OMP SINGLE
+
         loc_proc=ispmd+1
         rbuf(1:7,1:nspmd)=zero
         rbuf(1:3,loc_proc) = domain_data%mom_l(1:3)
@@ -115,7 +126,7 @@
           domain_data%sum_m = domain_data%sum_m + rbuf(7,p)
         enddo
 
-!$OMP END SINGLE
+
 ! ----------------------------------------------------------------------------------------------------------------------
         return
       end subroutine spmd_exch_flow_tracking_data2

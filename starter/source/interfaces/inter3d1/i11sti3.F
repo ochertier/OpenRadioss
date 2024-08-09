@@ -20,24 +20,25 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  I11STI3                       source/interfaces/inter3d1/i11sti3.F
-Chd|-- called by -----------
-Chd|        ININT3                        source/interfaces/inter3d1/inint3.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        FRICTION_PARTS_SEARCH         source/interfaces/inter3d1/i7sti3.F
-Chd|        I11COQ                        source/interfaces/inter3d1/i11coq.F
-Chd|        I11FIL                        source/interfaces/inter3d1/i11coq.F
-Chd|        I11GMX3                       source/interfaces/inter3d1/i11gmx3.F
-Chd|        I11SOL                        source/interfaces/inter3d1/i11sol.F
-Chd|        MY_EXIT                       source/output/analyse/analyse.c
-Chd|        NORMA1                        source/interfaces/inter3d1/norma1.F
-Chd|        VOLINT                        source/interfaces/inter3d1/volint.F
-Chd|        GET_U_GEO                     source/user_interface/uaccess.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        R2R_MOD                       share/modules1/r2r_mod.F      
-Chd|====================================================================
+      !||====================================================================
+      !||    i11sti3                 ../starter/source/interfaces/inter3d1/i11sti3.F
+      !||--- called by ------------------------------------------------------
+      !||    inint3                  ../starter/source/interfaces/inter3d1/inint3.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                  ../starter/source/output/message/message.F
+      !||    friction_parts_search   ../starter/source/interfaces/inter3d1/i7sti3.F
+      !||    get_u_geo               ../starter/source/user_interface/uaccess.F
+      !||    i11coq                  ../starter/source/interfaces/inter3d1/i11coq.F
+      !||    i11fil                  ../starter/source/interfaces/inter3d1/i11coq.F
+      !||    i11gmx3                 ../starter/source/interfaces/inter3d1/i11gmx3.F
+      !||    i11sol                  ../starter/source/interfaces/inter3d1/i11sol.F
+      !||    my_exit                 ../starter/source/output/analyse/analyse.c
+      !||    norma1                  ../starter/source/interfaces/inter3d1/norma1.F
+      !||    volint                  ../starter/source/interfaces/inter3d1/volint.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod             ../starter/share/message_module/message_mod.F
+      !||    r2r_mod                 ../starter/share/modules1/r2r_mod.F
+      !||====================================================================
       SUBROUTINE I11STI3(
      1 X        ,IRECT      ,STF      ,IXS            ,PM      ,
      2 GEO      ,NRT        ,IXC      ,NINTR          ,SLSFAC  ,
@@ -68,6 +69,7 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE R2R_MOD
       USE INTBUF_FRIC_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -103,7 +105,7 @@ C-----------------------------------------------
      .                      LELX(*), FILLSOL(*),PM_STACK(20,*)
       my_real,INTENT(IN) :: SLSFAC,GAP0,PERCENT_SIZE
       my_real,INTENT(INOUT) :: GAP_L(*),STF(*),GAP_SM(*),AREA(*),DRAD,GAPINF,GAPMAX,GAPMIN,BGAPSMX
-      CHARACTER*nchartitle,INTENT(IN) :: TITR
+      CHARACTER(LEN=NCHARTITLE) ,INTENT(IN) :: TITR
       TYPE(INTBUF_FRIC_STRUCT_),INTENT(IN) :: INTBUF_FRIC_TAB(*)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -112,12 +114,12 @@ C-----------------------------------------------
      .        MG, NELTG,NELT,NELP,NELR,
      .        IGTYP, IP,N1,N2,K,T,P,R,NELX,IPGMAT,IGMAT,IE,
      .        JJ1,JJ2,IEC,K1,K2,IPL,IPC,
-     .        IE1(50,2),IE2(50,2),ISUBSTACK,IPG,N3,N4,N5,N6,N7,N8
+     .        IE1(50,2),IE2(50,2),ISUBSTACK,IPG,N3,N4,N5,N6,N7,N8,ICONTR
       my_real DXM, GAPMX, GAPMN, AREASS, VOL, DX,GAP1,GAPS1,GAPTMP,XL,
      .        SX1,SY1,SZ1,SX2,SY2,SZ2,SX3,SY3,SZ3,
      .        X1,Y1,Z1,X2,Y2,Z2,X3,Y3,Z3,X4,Y4,Z4,X5,Y5,Z5,X6,Y6,Z6,X7,Y7,Z7,X8,Y8,Z8,
      .        XX1(4),XX2(4), XX3(4) ,FACE(6),
-     .        N_1, N_2, N_3,DX1,XL2
+     .        N_1, N_2, N_3,DX1,XL2,BULK
 C-----------------------------------------------
       my_real,EXTERNAL :: GET_U_GEO
 C-----------------------------------------------
@@ -146,6 +148,8 @@ C----------------------
         CALL I11SOL(X,IRECT,IXS,NINTR,NELS,INRT,AREASS,NOINT,KNOD2ELS,NOD2ELS,IXS10)
         IF(NELS /= 0) THEN
           MT=IXS(1,NELS)
+          MG=IXS(NIXS-1,NELS)
+          ICONTR = IGEO(97,MG)
           IF(MT > 0)THEN
             DO JJ=1,8
               JJJ=IXS(JJ+1,NELS)
@@ -154,8 +158,13 @@ C----------------------
               ZC(JJ)=X(3,JJJ)
             ENDDO
             CALL VOLINT(VOL)
+            IF (ICONTR==1 ) THEN
+              BULK = PM(107,MT)
+            ELSE
+              BULK = PM(32,MT)
+            END IF
             IF(XL2 > 0.0)THEN
-              STF(I)=SLSFAC*FILLSOL(NELS)*VOL*PM(32,MT)/XL2
+              STF(I)=SLSFAC*FILLSOL(NELS)*VOL*BULK/XL2
             ELSE
               STF(I)=ZERO
             ENDIF

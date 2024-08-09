@@ -20,23 +20,26 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  HM_READ_PROP09                source/properties/shell/hm_read_prop09.F
-Chd|-- called by -----------
-Chd|        HM_READ_PROPERTIES            source/properties/hm_read_properties.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        FRETITL2                      source/starter/freform.F      
-Chd|        HM_GET_FLOATV                 source/devtools/hm_reader/hm_get_floatv.F
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        HM_OPTION_IS_ENCRYPTED        source/devtools/hm_reader/hm_option_is_encrypted.F
-Chd|        SUBROTVECT                    source/model/submodel/subrot.F
-Chd|        ELBUFTAG_MOD                  share/modules1/elbuftag_mod.F 
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_read_prop09           ../starter/source/properties/shell/hm_read_prop09.F
+      !||--- called by ------------------------------------------------------
+      !||    hm_read_properties       ../starter/source/properties/hm_read_properties.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                   ../starter/source/output/message/message.F
+      !||    fretitl2                 ../starter/source/starter/freform.F
+      !||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
+      !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+      !||    subrotvect               ../starter/source/model/submodel/subrot.F
+      !||--- uses       -----------------------------------------------------
+      !||    defaults_mod             ../starter/source/modules/defaults_mod.F90
+      !||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
+      !||    message_mod              ../starter/share/message_module/message_mod.F
+      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE HM_READ_PROP09(IGTYP , GEO   ,  IGEO   ,PROP_TAG  ,UNITAB ,
-     .                   RTRANS,LSUBMODEL,IDTITL ,IG     ,SUB_ID   ,ISKN   )
+     .                   RTRANS,LSUBMODEL,IDTITL ,IG     ,SUB_ID   ,ISKN   ,
+     .                   DEFAULTS_SHELL)
 C============================================================================
 C   M o d u l e s
 C-----------------------------------------------
@@ -44,6 +47,8 @@ C-----------------------------------------------
       USE ELBUFTAG_MOD            
       USE SUBMODEL_MOD
       USE MESSAGE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      USE DEFAULTS_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -57,7 +62,6 @@ C-----------------------------------------------
 #include      "param_c.inc"
 #include      "scr16_c.inc"
 #include      "scr17_c.inc"
-#include      "scr21_c.inc"
 #include      "tablen_c.inc"
 #include      "sphcom.inc"
 C-----------------------------------------------
@@ -69,9 +73,10 @@ C-----------------------------------------------
       TYPE(SUBMODEL_DATA) LSUBMODEL(*)
       my_real GEO(*),RTRANS(NTRANSF,*)
 
-      CHARACTER IDTITL*nchartitle
+      CHARACTER(LEN=NCHARTITLE)::IDTITL
 
       TYPE(PROP_TAG_) , DIMENSION(0:MAXPROP) :: PROP_TAG
+      TYPE(SHELL_DEFAULTS_), INTENT(IN)  :: DEFAULTS_SHELL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -82,13 +87,14 @@ C-----------------------------------------------
      .   PID1,IPID1, IHGFLU, IHBE_OLD,NSTACK,IGMAT,NN,NUMS
       INTEGER FLAG_FMT,FLAG_FMT_TMP
       INTEGER ISH3N,ISROT,SUB_ID,IRP,IDSK,ISK,IUN,IPOS
-     
+      INTEGER    IHBE_D,IPLA_D,ISTR_D,ITHK_D,ISHEA_D,ISST_D,
+     .           ISH3N_D, ISTRA_D,NPTS_D,IDRIL_D
+
       my_real
      .    ANGL,PUN,CVIS,RBID,VX,VY,VZ,
      .    PTHK, AN, PHI,ZSHIFT
       LOGICAL IS_AVAILABLE, IS_ENCRYPTED
-      CHARACTER*nchartitle,
-     .   TITR
+      CHARACTER(LEN=NCHARTITLE) :: TITR
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
@@ -111,6 +117,15 @@ C=======================================================================
         IS_ENCRYPTED = .FALSE.
         IS_AVAILABLE = .FALSE.
 
+        IHBE_D =  DEFAULTS_SHELL%ishell
+        ISH3N_D=  DEFAULTS_SHELL%ish3n
+        ISST_D =  DEFAULTS_SHELL%ismstr
+        IPLA_D =  DEFAULTS_SHELL%iplas
+        ITHK_D =  DEFAULTS_SHELL%ithick
+        IDRIL_D=  DEFAULTS_SHELL%idrill
+        ISHEA_D = 0
+        NPTS_D = 0
+        ISTRA_D = 1
 C HIDDEN FLAGS
 C----------------------
 C ISHEAR NEVER USED
@@ -372,10 +387,6 @@ C
      .               I2=NIP)
       ENDIF
 
-C-----------------------------
-c        IF (FLAG_FMT /= 0) THEN
-c          CALL FMT_DEF(INVERS_INIT,IFIX_INIT)
-c        ENDIF
 C-----------------------------
 C       IHBE IPLA ISTRAIN - shells
 C-----------------------------

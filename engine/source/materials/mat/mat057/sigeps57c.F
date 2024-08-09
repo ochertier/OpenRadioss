@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  SIGEPS57C                     source/materials/mat/mat057/sigeps57c.F
-Chd|-- called by -----------
-Chd|        MULAWC                        source/materials/mat_share/mulawc.F
-Chd|-- calls ---------------
-Chd|        DCPPM_UPC                     source/materials/mat/mat057/sigeps57c.F
-Chd|        VINTER                        source/tools/curve/vinter.F   
-Chd|        FINTER                        source/tools/curve/finter.F   
-Chd|====================================================================
+      !||====================================================================
+      !||    sigeps57c   ../engine/source/materials/mat/mat057/sigeps57c.F
+      !||--- called by ------------------------------------------------------
+      !||    mulawc      ../engine/source/materials/mat_share/mulawc.F
+      !||--- calls      -----------------------------------------------------
+      !||    dcppm_upc   ../engine/source/materials/mat/mat057/sigeps57c.F
+      !||    finter      ../engine/source/tools/curve/finter.F
+      !||    vinter      ../engine/source/tools/curve/vinter.F
+      !||====================================================================
       SUBROUTINE SIGEPS57C(
      1     NEL    ,NUPARAM,NUVAR   ,NFUNC   ,IFUNC  ,
      2     NPF    ,NPT    ,IPT     ,IFLAG   ,
@@ -43,7 +43,7 @@ Chd|====================================================================
      A     SOUNDSP,VISCMAX,THK     ,PLA     ,UVAR   ,
      B     OFF    ,NGL    ,SHF     ,ETSE    ,SIGY   ,
      C     HARDM  ,SEQ_OUTPUT,ISRATE,EPSP   ,INLOC  ,
-     D     DPLANL )
+     D     DPLANL ,LOFF   )
 C-----------------------------------------------
 C   I M P L I C I T   T Y P E S
 C-----------------------------------------------
@@ -123,6 +123,7 @@ C-----------------------------------------------
      .   SIGOXX(NEL),SIGOYY(NEL),
      .   SIGOXY(NEL),SIGOYZ(NEL),SIGOZX(NEL),
      .   SEQ_OUTPUT(NEL),EPSP(NEL),DPLANL(NEL)
+      my_real, DIMENSION(NEL), INTENT(IN) :: LOFF
 C-----------------------------------------------
 C   O U T P U T   A r g u m e n t s
 C-----------------------------------------------
@@ -503,33 +504,35 @@ C
 !-------------------------------------------------------------
       IF (INLOC > 0) THEN
         DO I = 1,NEL
-          ! Computation of the normal to the yield surface
-          K1      = (SIGNXX(I) + A03*SIGNYY(I))*NORM/TWO
-          K2      = SQRT(((SIGNXX(I) - A03*SIGNYY(I))/TWO)**TWO + (A12*SIGNXY(I))**TWO)*NORM
-          SEFF    = A01*ABS(K1+K2)**M + A01*ABS(K1-K2)**M + A02*ABS(TWO*K2)**M
-          SEFF    = (HALF*MAX(SEFF,EM20))**(ONE/M)
-          DF_DK1  = (SEFF**(1-M))*(A01/TWO)*(
-     .              +  SIGN(ONE,K1+K2)*(ABS(K1+K2)**(M-1)) 
-     .              +  SIGN(ONE,K1-K2)*(ABS(K1-K2)**(M-1)))
-          DF_DK2  = (SEFF**(1-M))*((A01/TWO)*(
-     .              +  SIGN(ONE,K1+K2)*(ABS(K1+K2)**(M-1)) 
-     .              -  SIGN(ONE,K1-K2)*(ABS(K1-K2)**(M-1))) 
-     .              +  A02*(ABS(TWO*K2)**(M-1)))
-          DK1_DSIGXX = HALF
-          DK1_DSIGYY = A03/TWO
-          DK2_DSIGXX = (SIGNXX(I)-A03*SIGNYY(I))*NORM/(MAX(FOUR*K2,EM20))
-          DK2_DSIGYY = -A03*(SIGNXX(I)-A03*SIGNYY(I))*NORM/(MAX(FOUR*K2,EM20))
-          DK2_DSIGXY = (A12**TWO)*SIGNXY(I)*NORM/MAX(K2,EM20)
-          NORMXX     = DF_DK1*DK1_DSIGXX + DF_DK2*DK2_DSIGXX
-          NORMYY     = DF_DK1*DK1_DSIGYY + DF_DK2*DK2_DSIGYY
-          NORMXY     = DF_DK2*DK2_DSIGXY
-          SIG_DFDSIG = NORMXX*SIGNXX(I) + NORMYY*SIGNYY(I) + NORMXY*SIGNXY(I)
-          ! Updating the thickness
-          DEZZ       = -NU(I)*((SIGNXX(I)-SIGOXX(I)+SIGNYY(I)-SIGOYY(I))/E(I))
-          IF (SIG_DFDSIG /= ZERO) THEN
-            DEZZ     = DEZZ - MAX(DPLANL(I),ZERO)*(SEFF/SIG_DFDSIG)*(NORMXX + NORMYY)
-          ENDIF
-          THK(I)     = THK(I) + DEZZ*THKLY(I)*OFF(I)   
+          IF (LOFF(I) == ONE) THEN
+            ! Computation of the normal to the yield surface
+            K1      = (SIGNXX(I) + A03*SIGNYY(I))*NORM/TWO
+            K2      = SQRT(((SIGNXX(I) - A03*SIGNYY(I))/TWO)**TWO + (A12*SIGNXY(I))**TWO)*NORM
+            SEFF    = A01*ABS(K1+K2)**M + A01*ABS(K1-K2)**M + A02*ABS(TWO*K2)**M
+            SEFF    = (HALF*MAX(SEFF,EM20))**(ONE/M)
+            DF_DK1  = (SEFF**(1-M))*(A01/TWO)*(
+     .                +  SIGN(ONE,K1+K2)*(ABS(K1+K2)**(M-1)) 
+     .                +  SIGN(ONE,K1-K2)*(ABS(K1-K2)**(M-1)))
+            DF_DK2  = (SEFF**(1-M))*((A01/TWO)*(
+     .                +  SIGN(ONE,K1+K2)*(ABS(K1+K2)**(M-1)) 
+     .                -  SIGN(ONE,K1-K2)*(ABS(K1-K2)**(M-1))) 
+     .                +  A02*(ABS(TWO*K2)**(M-1)))
+            DK1_DSIGXX = HALF
+            DK1_DSIGYY = A03/TWO
+            DK2_DSIGXX = (SIGNXX(I)-A03*SIGNYY(I))*NORM/(MAX(FOUR*K2,EM20))
+            DK2_DSIGYY = -A03*(SIGNXX(I)-A03*SIGNYY(I))*NORM/(MAX(FOUR*K2,EM20))
+            DK2_DSIGXY = (A12**TWO)*SIGNXY(I)*NORM/MAX(K2,EM20)
+            NORMXX     = DF_DK1*DK1_DSIGXX + DF_DK2*DK2_DSIGXX
+            NORMYY     = DF_DK1*DK1_DSIGYY + DF_DK2*DK2_DSIGYY
+            NORMXY     = DF_DK2*DK2_DSIGXY
+            SIG_DFDSIG = NORMXX*SIGNXX(I) + NORMYY*SIGNYY(I) + NORMXY*SIGNXY(I)
+            ! Updating the thickness
+            DEZZ       = -NU(I)*((SIGNXX(I)-SIGOXX(I)+SIGNYY(I)-SIGOYY(I))/E(I))
+            IF (SIG_DFDSIG /= ZERO) THEN
+              DEZZ     = DEZZ - MAX(DPLANL(I),ZERO)*(SEFF/SIG_DFDSIG)*(NORMXX + NORMYY)
+            ENDIF
+            THK(I)     = THK(I) + DEZZ*THKLY(I)*OFF(I) 
+          ENDIF  
         ENDDO  
       ENDIF
 !-------------------------
@@ -548,12 +551,11 @@ C
 !---
       RETURN
       END
-Chd|====================================================================
-Chd|  FONC_F                        source/materials/mat/mat057/sigeps57c.F
-Chd|-- called by -----------
-Chd|        DCPPM_UPC                     source/materials/mat/mat057/sigeps57c.F
-Chd|-- calls ---------------
-Chd|====================================================================
+      !||====================================================================
+      !||    fonc_f      ../engine/source/materials/mat/mat057/sigeps57c.F
+      !||--- called by ------------------------------------------------------
+      !||    dcppm_upc   ../engine/source/materials/mat/mat057/sigeps57c.F
+      !||====================================================================
       SUBROUTINE FONC_F(
      1     NEL    ,F      ,NPARAM ,PARAM  ,
      2     B_1     ,B_2     ,B_3  ,SIGYM  ,NEL0)
@@ -590,13 +592,12 @@ C        F(I)=SVM-TWO*SIGY(I)**M
        ENDDO
        RETURN
        END
-Chd|====================================================================
-Chd|  DERIVE_F                      source/materials/mat/mat057/sigeps57c.F
-Chd|-- called by -----------
-Chd|        DCPPM_LOWC                    source/materials/mat/mat057/sigeps57c.F
-Chd|        DCPPM_UPC                     source/materials/mat/mat057/sigeps57c.F
-Chd|-- calls ---------------
-Chd|====================================================================
+      !||====================================================================
+      !||    derive_f     ../engine/source/materials/mat/mat057/sigeps57c.F
+      !||--- called by ------------------------------------------------------
+      !||    dcppm_lowc   ../engine/source/materials/mat/mat057/sigeps57c.F
+      !||    dcppm_upc    ../engine/source/materials/mat/mat057/sigeps57c.F
+      !||====================================================================
       SUBROUTINE DERIVE_F(
      1     NEL    ,NPARAM ,PARAM , SIGXX  ,SIGYY  ,
      2    SIGXY   ,SIGY   ,B_1   ,B_2     ,B_3    ,  
@@ -716,13 +717,12 @@ C-------------------------------------------------------------------------------
         ENDDO
         RETURN
         END
-Chd|====================================================================
-Chd|  INCREAM                       source/materials/mat/mat057/sigeps57c.F
-Chd|-- called by -----------
-Chd|        DCPPM_LOWC                    source/materials/mat/mat057/sigeps57c.F
-Chd|        DCPPM_UPC                     source/materials/mat/mat057/sigeps57c.F
-Chd|-- calls ---------------
-Chd|====================================================================
+      !||====================================================================
+      !||    incream      ../engine/source/materials/mat/mat057/sigeps57c.F
+      !||--- called by ------------------------------------------------------
+      !||    dcppm_lowc   ../engine/source/materials/mat/mat057/sigeps57c.F
+      !||    dcppm_upc    ../engine/source/materials/mat/mat057/sigeps57c.F
+      !||====================================================================
        SUBROUTINE INCREAM(NEL ,G  , G44, GM, GM44, DG, R, D ,NEL0)
 C-----------------------------------------------
 C   I M P L I C I T   T Y P E S
@@ -806,14 +806,14 @@ C
 C
       RETURN
       END
-Chd|====================================================================
-Chd|  DCPPM_LOWC                    source/materials/mat/mat057/sigeps57c.F
-Chd|-- called by -----------
-Chd|        DCPPM_UPC                     source/materials/mat/mat057/sigeps57c.F
-Chd|-- calls ---------------
-Chd|        DERIVE_F                      source/materials/mat/mat057/sigeps57c.F
-Chd|        INCREAM                       source/materials/mat/mat057/sigeps57c.F
-Chd|====================================================================
+      !||====================================================================
+      !||    dcppm_lowc   ../engine/source/materials/mat/mat057/sigeps57c.F
+      !||--- called by ------------------------------------------------------
+      !||    dcppm_upc    ../engine/source/materials/mat/mat057/sigeps57c.F
+      !||--- calls      -----------------------------------------------------
+      !||    derive_f     ../engine/source/materials/mat/mat057/sigeps57c.F
+      !||    incream      ../engine/source/materials/mat/mat057/sigeps57c.F
+      !||====================================================================
        SUBROUTINE DCPPM_LOWC(
      1     NEL    ,NPARAM ,PARAM  ,
      2     XXX    ,XYY    ,XXY    ,ALPHA  ,DG ,
@@ -880,16 +880,16 @@ C------------------------------------------------------------------------------
 C
       RETURN
       END
-Chd|====================================================================
-Chd|  DCPPM_UPC                     source/materials/mat/mat057/sigeps57c.F
-Chd|-- called by -----------
-Chd|        SIGEPS57C                     source/materials/mat/mat057/sigeps57c.F
-Chd|-- calls ---------------
-Chd|        DCPPM_LOWC                    source/materials/mat/mat057/sigeps57c.F
-Chd|        DERIVE_F                      source/materials/mat/mat057/sigeps57c.F
-Chd|        FONC_F                        source/materials/mat/mat057/sigeps57c.F
-Chd|        INCREAM                       source/materials/mat/mat057/sigeps57c.F
-Chd|====================================================================
+      !||====================================================================
+      !||    dcppm_upc    ../engine/source/materials/mat/mat057/sigeps57c.F
+      !||--- called by ------------------------------------------------------
+      !||    sigeps57c    ../engine/source/materials/mat/mat057/sigeps57c.F
+      !||--- calls      -----------------------------------------------------
+      !||    dcppm_lowc   ../engine/source/materials/mat/mat057/sigeps57c.F
+      !||    derive_f     ../engine/source/materials/mat/mat057/sigeps57c.F
+      !||    fonc_f       ../engine/source/materials/mat/mat057/sigeps57c.F
+      !||    incream      ../engine/source/materials/mat/mat057/sigeps57c.F
+      !||====================================================================
       SUBROUTINE DCPPM_UPC(
      1     NEL    ,NEL0   ,NPARAM ,PARAM  ,
      2     XXX    ,XYY    ,XXY    ,ALPHA  ,

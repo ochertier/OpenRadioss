@@ -20,14 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  CLAUSE_INIT                   source/model/sets/clause_init.F
-Chd|-- called by -----------
-Chd|        HM_SET                        source/model/sets/hm_set.F    
-Chd|-- calls ---------------
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        SETDEF_MOD                    ../common_source/modules/setdef_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    clause_init   ../starter/source/model/sets/clause_init.F
+      !||--- called by ------------------------------------------------------
+      !||    hm_set        ../starter/source/model/sets/hm_set.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod   ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE CLAUSE_INIT(CLAUSE)
 C-----------------------------------------------
 C   M o d u l e s
@@ -58,6 +57,7 @@ C-----------------------------------------------
       CLAUSE%NB_SURF_SEG= 0         ! CLAUSE nb of surfacce's segments
       CLAUSE%NB_LINE_SEG= 0         ! CLAUSE nb of line/edge's segments
       CLAUSE%NB_RBODY= 0            ! CLAUSE nb of Rbodys
+      CLAUSE%NB_SPHCEL= 0           ! CLAUSE nb of sphcel
 
       CLAUSE%NB_ELLIPSE= 0          ! CLAUSE nb of Ellipses within a SET (max = 1, one per /SET)
       CLAUSE%ELLIPSE_IAD_BUFR= 0
@@ -100,6 +100,7 @@ C-----------------------------------------------
       IF(ALLOCATED( CLAUSE%RBODY ))         DEALLOCATE( CLAUSE%RBODY )
       IF(ALLOCATED( CLAUSE%ELLIPSE_SKEW ))  DEALLOCATE( CLAUSE%ELLIPSE_SKEW )
       IF(ALLOCATED( CLAUSE%NODENS ))        DEALLOCATE( CLAUSE%NODENS )
+      IF(ALLOCATED( CLAUSE%SPHCEL ))        DEALLOCATE( CLAUSE%SPHCEL )
 C-----
       RETURN
       END

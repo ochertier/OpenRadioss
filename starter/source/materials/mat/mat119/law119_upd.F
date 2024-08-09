@@ -20,23 +20,25 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  LAW119_UPD                    source/materials/mat/mat119/law119_upd.F
-Chd|-- called by -----------
-Chd|        UPDMAT                        source/materials/updmat.F     
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        TABLE_INTERS                  source/tools/curve/func_inters.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        TABLE_MOD                     share/modules1/table_mod.F    
-Chd|====================================================================
+      !||====================================================================
+      !||    law119_upd             ../starter/source/materials/mat/mat119/law119_upd.F
+      !||--- called by ------------------------------------------------------
+      !||    updmat                 ../starter/source/materials/updmat.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    table_inters           ../starter/source/tools/curve/func_inters.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    table_mod              ../starter/share/modules1/table_mod.F
+      !||====================================================================
       SUBROUTINE LAW119_UPD(NUPARAM ,NUMTABL ,ITABLE ,TABLE  ,TABLE_ID ,
      .                      UPARAM  ,PM      ,TITR   ,MAT_ID )          
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE TABLE_MOD
-      USE MESSAGE_MOD   
+      USE MESSAGE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -55,7 +57,7 @@ C-----------------------------------------------
       my_real ,DIMENSION(NPROPM)  :: PM
       my_real ,DIMENSION(NUPARAM), INTENT(INOUT) :: UPARAM
       TYPE(TTABLE) ,DIMENSION(NTABLE) ::  TABLE
-      CHARACTER*nchartitle  :: TITR
+      CHARACTER(LEN=NCHARTITLE)  :: TITR
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

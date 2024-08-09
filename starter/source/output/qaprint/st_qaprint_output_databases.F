@@ -20,18 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  ST_QAPRINT_OUTPUT_DATABASES   source/output/qaprint/st_qaprint_output_databases.F
-Chd|-- called by -----------
-Chd|        ST_QAPRINT_DRIVER             source/output/qaprint/st_qaprint_driver.F
-Chd|-- calls ---------------
-Chd|        FRETITL2                      source/starter/freform.F      
-Chd|====================================================================
+      !||====================================================================
+      !||    st_qaprint_output_databases   ../starter/source/output/qaprint/st_qaprint_output_databases.F
+      !||--- called by ------------------------------------------------------
+      !||    st_qaprint_driver             ../starter/source/output/qaprint/st_qaprint_driver.F
+      !||--- calls      -----------------------------------------------------
+      !||    fretitl2                      ../starter/source/starter/freform.F
+      !||--- uses       -----------------------------------------------------
+      !||====================================================================
       SUBROUTINE ST_QAPRINT_OUTPUT_DATABASES(NOM_OPT, INOM_OPT, LACCELM, ACCELM,LGAUGE,GAUGE)
 C============================================================================
 C   M o d u l e s
 C-----------------------------------------------
       USE QA_OUT_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -48,15 +50,14 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER, INTENT(IN) :: NOM_OPT(LNOPT1,SNOM_OPT1), INOM_OPT(SINOM_OPT)
       INTEGER, INTENT(IN) :: LACCELM(3, NACCELM)
-      my_real, INTENT(IN) ::  
-     .                        ACCELM(LLACCELM, NACCELM)
+      my_real, INTENT(IN) :: ACCELM(LLACCELM, NACCELM)
       INTEGER, INTENT(IN) :: LGAUGE(3,NBGAUGE)
       my_real, INTENT(IN) :: GAUGE(LLGAUGE,NBGAUGE)
 C--------------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, ID, II, TEMP_INT
-      CHARACTER *nchartitle TITR
+      CHARACTER(LEN=NCHARTITLE) :: TITR
       CHARACTER (LEN=255) :: VARNAME
       DOUBLE PRECISION TEMP_DOUBLE
       LOGICAL :: OK_QA

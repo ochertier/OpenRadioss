@@ -20,23 +20,26 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  CFIELD_1                      source/loads/general/load_centri/cfield.F
-Chd|-- called by -----------
-Chd|        RESOL                         source/engine/resol.F         
-Chd|-- calls ---------------
-Chd|        MY_BARRIER                    source/system/machine.F       
-Chd|        RELFRAM_M1                    source/tools/skew/relfram_m1.F
-Chd|        FINTER                        source/tools/curve/finter.F   
-Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
-Chd|====================================================================
-      SUBROUTINE CFIELD_1(ICFIELD  ,FAC   ,NPC   ,TF    ,A ,
+      !||====================================================================
+      !||    cfield_1              ../engine/source/loads/general/load_centri/cfield.F
+      !||--- called by ------------------------------------------------------
+      !||    resol                 ../engine/source/engine/resol.F
+      !||--- calls      -----------------------------------------------------
+      !||    finter                ../engine/source/tools/curve/finter.F
+      !||    my_barrier            ../engine/source/system/machine.F
+      !||    relfram_m1            ../engine/source/tools/skew/relfram_m1.F
+      !||--- uses       -----------------------------------------------------
+      !||    python_funct_mod      ../common_source/modules/python_mod.F90
+      !||    sensor_mod            ../engine/share/modules/sensor_mod.F
+      !||====================================================================
+      SUBROUTINE CFIELD_1(PYTHON, ICFIELD  ,FAC   ,NPC   ,TF    ,A ,
      2                  V     ,X     ,XFRAME  ,MS,SENSOR_TAB,
      3                  WEIGHT,IB,ITASK,IFRAME,NSENSOR)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------  
       USE SENSOR_MOD
+      USE PYTHON_FUNCT_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -53,6 +56,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(PYTHON_), INTENT(INOUT) :: PYTHON
       INTEGER ,INTENT(IN) :: NSENSOR
       INTEGER NPC(*)
       INTEGER ICFIELD(SIZFIELD,*),IB(*),IFRAME(LISKN,*)
@@ -67,6 +71,7 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER NL, N1, IFRA, N2, IFUNC, K1, K2, K3, ISENS,K,NN,
      .    IAD,J, PROC, IADF, IADL,IDIR,IFLAG,N1FRAM,IUN,JJ,IMOVFRAM
+      INTEGER :: IS_TABULATED
       my_real
      .   NX, NY, NZ, AXI, A0, AA, VV, FX, FY, FZ, AX, DYDX, TS,
      .   GAMA, MA, VROT, X0, Y0, Z0, X1, Y1, Z1, X2, Y2, Z2, DWDT,
@@ -117,7 +122,15 @@ C
           IF(TS<ZERO)CYCLE
       ENDIF
 C
-      VROT  = FAC(1,NL)*FINTER(IFUNC,TS*FAC(2,NL),NPC,TF,DYDX)
+      IS_TABULATED = NPC(2*NFUNCT+IFUNC+1)
+      IF(IS_TABULATED >= 0) THEN
+        VROT  = FAC(1,NL)*FINTER(IFUNC,TS*FAC(2,NL),NPC,TF,DYDX)
+      ELSE 
+        IS_TABULATED = -IS_TABULATED
+        CALL PYTHON_CALL_FUNCT1D(PYTHON, IS_TABULATED,TS*FAC(2,NL), VROT)
+        VROT = VROT * FAC(1,NL)
+      ENDIF
+
       VROT2 = VROT*VROT
       X0 = XFRAME(10,IFRA+1)
       Y0 = XFRAME(11,IFRA+1)

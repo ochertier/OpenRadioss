@@ -20,62 +20,64 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  MULAW8_MOD                    source/materials/mat_share/mulaw8.F
-Chd|-- called by -----------
-Chd|        MMAIN8                        source/materials/mat_share/mmain8.F
-Chd|-- calls ---------------
-Chd|====================================================================
+      !||====================================================================
+      !||    mulaw8_mod   ../engine/source/materials/mat_share/mulaw8.F
+      !||--- called by ------------------------------------------------------
+      !||    mmain8       ../engine/source/materials/mat_share/mmain8.F
+      !||====================================================================
       MODULE MULAW8_MOD
       CONTAINS
-Chd|====================================================================
-Chd|  MULAW8                        source/materials/mat_share/mulaw8.F
-Chd|-- called by -----------
-Chd|        MMAIN8                        source/materials/mat_share/mmain8.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        ARRET                         source/system/arret.F         
-Chd|        FAIL_BIQUAD_S                 source/materials/fail/biquad/fail_biquad_s.F
-Chd|        FAIL_EMC                      source/materials/fail/emc/fail_emc.F
-Chd|        FAIL_ENERGY_S                 source/materials/fail/energy/fail_energy_s.F
-Chd|        FAIL_JOHNSON                  source/materials/fail/johnson_cook/fail_johnson.F
-Chd|        FAIL_ORTHBIQUAD_S             source/materials/fail/orthbiquad/fail_orthbiquad_s.F
-Chd|        FAIL_RTCL_S                   source/materials/fail/rtcl/fail_rtcl_s.F
-Chd|        FAIL_SAHRAEI_S                source/materials/fail/sahraei/fail_sahraei_s.F
-Chd|        FAIL_SPALLING_S               source/materials/fail/spalling/fail_spalling_s.F
-Chd|        FAIL_TAB_S                    source/materials/fail/tabulated/fail_tab_s.F
-Chd|        FAIL_TBUTCHER_S               source/materials/fail/tuler_butcher/fail_tbutcher_s.F
-Chd|        FAIL_TENSSTRAIN_S             source/materials/fail/tensstrain/fail_tensstrain_s.F
-Chd|        FAIL_VISUAL_S                 source/materials/fail/visual/fail_visual_s.F
-Chd|        FAIL_WIERZBICKI_S             source/materials/fail/wierzbicki/fail_wierzbicki_s.F
-Chd|        FAIL_WILKINS_S                source/materials/fail/wilkins/fail_wilkins_s.F
-Chd|        MQVISC8                       source/materials/mat_share/mqvisc8.F
-Chd|        MREPLOC                       source/materials/mat_share/mreploc.F
-Chd|        MROTENS                       source/materials/mat_share/mrotens.F
-Chd|        SIGEPS28                      source/materials/mat/mat028/sigeps28.F
-Chd|        SIGEPS33                      source/materials/mat/mat033/sigeps33.F
-Chd|        SIGEPS34                      source/materials/mat/mat034/sigeps34.F
-Chd|        SIGEPS35                      source/materials/mat/mat035/sigeps35.F
-Chd|        SIGEPS36                      source/materials/mat/mat036/sigeps36.F
-Chd|        SIGEPS38                      source/materials/mat/mat038/sigeps38.F
-Chd|        SIGEPS40                      source/materials/mat/mat040/sigeps40.F
-Chd|        SIGEPS41                      source/materials/mat/mat041/sigeps41.F
-Chd|        SIGEPS42                      source/materials/mat/mat042/sigeps42.F
-Chd|        SIGEPS44                      source/materials/mat/mat044/sigeps44.F
-Chd|        SIGEPS45                      source/materials/mat/mat045/sigeps45.F
-Chd|        SIGEPS48                      source/materials/mat/mat048/sigeps48.F
-Chd|        SIGEPS50                      source/materials/mat/mat050/sigeps50.F
-Chd|        SIGEPS52                      source/materials/mat/mat052/sigeps52.F
-Chd|        SIGEPS53                      source/materials/mat/mat053/sigeps53.F
-Chd|        SIGEPS56                      source/materials/mat/mat056/sigeps56.F
-Chd|        SIGEPS60                      source/materials/mat/mat060/sigeps60.F
-Chd|        SIGEPS62                      source/materials/mat/mat062/sigeps62.F
-Chd|        STARTIME                      source/system/timer.F         
-Chd|        STOPTIME                      source/system/timer.F         
-Chd|        MAT_ELEM_MOD                  ../common_source/modules/mat_elem/mat_elem_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        TABLE_MOD                     share/modules/table_mod.F     
-Chd|====================================================================
+      !||====================================================================
+      !||    mulaw8              ../engine/source/materials/mat_share/mulaw8.F
+      !||--- called by ------------------------------------------------------
+      !||    mmain8              ../engine/source/materials/mat_share/mmain8.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg              ../engine/source/output/message/message.F
+      !||    arret               ../engine/source/system/arret.F
+      !||    fail_biquad_s       ../engine/source/materials/fail/biquad/fail_biquad_s.F
+      !||    fail_emc            ../engine/source/materials/fail/emc/fail_emc.F
+      !||    fail_energy_s       ../engine/source/materials/fail/energy/fail_energy_s.F
+      !||    fail_johnson        ../engine/source/materials/fail/johnson_cook/fail_johnson.F
+      !||    fail_orthbiquad_s   ../engine/source/materials/fail/orthbiquad/fail_orthbiquad_s.F
+      !||    fail_rtcl_s         ../engine/source/materials/fail/rtcl/fail_rtcl_s.F
+      !||    fail_sahraei_s      ../engine/source/materials/fail/sahraei/fail_sahraei_s.F
+      !||    fail_spalling_s     ../engine/source/materials/fail/spalling/fail_spalling_s.F
+      !||    fail_tab_old_s      ../engine/source/materials/fail/tabulated/fail_tab_old_s.F
+      !||    fail_tab_s          ../engine/source/materials/fail/tabulated/fail_tab_s.F
+      !||    fail_tbutcher_s     ../engine/source/materials/fail/tuler_butcher/fail_tbutcher_s.F
+      !||    fail_tensstrain_s   ../engine/source/materials/fail/tensstrain/fail_tensstrain_s.F
+      !||    fail_visual_s       ../engine/source/materials/fail/visual/fail_visual_s.F
+      !||    fail_wierzbicki_s   ../engine/source/materials/fail/wierzbicki/fail_wierzbicki_s.F
+      !||    fail_wilkins_s      ../engine/source/materials/fail/wilkins/fail_wilkins_s.F
+      !||    mqvisc8             ../engine/source/materials/mat_share/mqvisc8.F
+      !||    mreploc             ../engine/source/materials/mat_share/mreploc.F
+      !||    mrotens             ../engine/source/materials/mat_share/mrotens.F
+      !||    nvar                ../engine/source/input/nvar.F
+      !||    sigeps28            ../engine/source/materials/mat/mat028/sigeps28.F
+      !||    sigeps33            ../engine/source/materials/mat/mat033/sigeps33.F
+      !||    sigeps34            ../engine/source/materials/mat/mat034/sigeps34.F
+      !||    sigeps35            ../engine/source/materials/mat/mat035/sigeps35.F
+      !||    sigeps36            ../engine/source/materials/mat/mat036/sigeps36.F
+      !||    sigeps38            ../engine/source/materials/mat/mat038/sigeps38.F
+      !||    sigeps40            ../engine/source/materials/mat/mat040/sigeps40.F
+      !||    sigeps41            ../engine/source/materials/mat/mat041/sigeps41.F
+      !||    sigeps42            ../engine/source/materials/mat/mat042/sigeps42.F
+      !||    sigeps44            ../engine/source/materials/mat/mat044/sigeps44.F
+      !||    sigeps45            ../engine/source/materials/mat/mat045/sigeps45.F
+      !||    sigeps48            ../engine/source/materials/mat/mat048/sigeps48.F
+      !||    sigeps50            ../engine/source/materials/mat/mat050/sigeps50.F
+      !||    sigeps52            ../engine/source/materials/mat/mat052/sigeps52.F
+      !||    sigeps53            ../engine/source/materials/mat/mat053/sigeps53.F
+      !||    sigeps56            ../engine/source/materials/mat/mat056/sigeps56.F
+      !||    sigeps60            ../engine/source/materials/mat/mat060/sigeps60.F
+      !||    sigeps62            ../engine/source/materials/mat/mat062/sigeps62.F
+      !||    startime            ../engine/source/system/timer.F
+      !||    stoptime            ../engine/source/system/timer.F
+      !||--- uses       -----------------------------------------------------
+      !||    mat_elem_mod        ../common_source/modules/mat_elem/mat_elem_mod.F90
+      !||    message_mod         ../engine/share/message_module/message_mod.F
+      !||    table_mod           ../engine/share/modules/table_mod.F
+      !||====================================================================
       SUBROUTINE MULAW8(
      1   LFT,     LLT,     NFT,     MTN,
      2   NPT,     D1,      D2,      D3,
@@ -154,9 +156,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NPAR,IADBUF,NFUNC,I,J,II,IPT,JPT,IR,ISRATE,
+      INTEGER NPAR,NUPARAM,NIPARAM,IADBUF,NFUNC,I,J,IPT,JPT,IR,ISRATE,
      .  IFUNC(MAXFUNC),IDUM1,IRUPT,IMAT,NTABL_FAIL,
-     .  NVARF, IEXPAN8,JJ(6),INLOC,DMG_FLAG
+     .  NVARF, IEXPAN8,JJ(6),INLOC,IEOS,DMG_FLAG
       my_real 
      .C1(MVSIZ),PNEW(MVSIZ),PP(MVSIZ),DEFP(MVSIZ),
      .EP1(MVSIZ),EP2(MVSIZ),EP3(MVSIZ),EP4(MVSIZ),EP5(MVSIZ),EP6(MVSIZ),
@@ -169,19 +171,18 @@ C-----------------------------------------------
      .R31(MVSIZ),R32(MVSIZ),R33(MVSIZ),
      .SOLD1(MVSIZ) ,SOLD2(MVSIZ) ,SOLD3(MVSIZ) ,
      .SOLD4(MVSIZ) ,SOLD5(MVSIZ) ,SOLD6(MVSIZ),
-     .Q(MVSIZ),SSPP(MVSIZ),SIGY(MVSIZ),
+     .SSPP(MVSIZ),SIGY(MVSIZ),
      .DPLA(MVSIZ),EPSP1(MVSIZ),TSTAR(MVSIZ),
      .DF(MVSIZ),AMU(MVSIZ),BIDV(MVSIZ)    
       my_real 
-     .   E1,E2,E3,E4,E5,E6,BID1,BID2,BID3,DAV,DTA,SS1,SS2,SS3,SS4,
+     .   E1,E2,E3,E4,E5,E6,DAV,DTA,SS1,SS2,SS3,SS4,
      .   SS5,SS6,Q1,Q2,Q3,ASRATE,EPSP,
-     .   BID,DUM1,DUM2,DUM3,BIDON,BIDON1,BIDON2,BIDON3,BIDON4,BIDON5,BIDON6
+     .   BID,DUM1,BIDON,BIDON1,BIDON2,BIDON3,BIDON4,BIDON5
       my_real TT_LOCAL     
       my_real,
-     .  DIMENSION(:)  ,POINTER :: SIGP,SIGLP,STRAIN,UVAR,UVARF,DFMAX,TDELE,UPARAM,UPARAMF
-      INTEGER, DIMENSION(:), POINTER :: VARTMP,ITABL_FAIL
+     .  DIMENSION(:)  ,POINTER :: SIGP,SIGLP,STRAIN,UVAR,UVARF,DFMAX,TDELE,UPARAM0,UPARAM,UPARAMF
+      INTEGER, DIMENSION(:), POINTER :: VARTMP,ITABL_FAIL,IPARAM
       TYPE(L_BUFEL_)  ,POINTER :: LBUF
-      TYPE (FAIL_LOC_),POINTER :: FLOC
 !
       CHARACTER OPTION*256
       INTEGER SIZE
@@ -191,13 +192,19 @@ C-----------------------------------------------
       my_real, DIMENSION(:), POINTER  :: SIGBXX,SIGBYY,SIGBZZ,SIGBXY,SIGBYZ,SIGBZX
 C=======================================================================
       IMAT = MAT(LFT)
-      INLOC  = MAT_PARAM(IMAT)%NLOC
-      NPAR   = IPM(9,IMAT)
-      IADBUF = IPM(7,IMAT)
-      NFUNC  = IPM(10,IMAT)
-      NUVAR  = BUFLY%NVAR_MAT
-      NVARTMP= BUFLY%NVARTMP
-      UPARAM => BUFMAT(IADBUF:IADBUF+NPAR)
+      INLOC   = MAT_PARAM(IMAT)%NLOC
+      IEOS    = MAT_PARAM(IMAT)%IEOS
+      NUPARAM = MAT_PARAM(IMAT)%NUPARAM
+      NIPARAM = MAT_PARAM(IMAT)%NIPARAM
+      UPARAM => MAT_PARAM(IMAT)%UPARAM
+      IPARAM => MAT_PARAM(IMAT)%IPARAM
+!
+      NPAR    = IPM(9,IMAT)
+      IADBUF  = IPM(7,IMAT)
+      NFUNC   = IPM(10,IMAT)
+      NUVAR   = BUFLY%NVAR_MAT
+      NVARTMP = BUFLY%NVARTMP
+      UPARAM0  => BUFMAT(IADBUF:IADBUF+NPAR)
       DMG_FLAG = BUFLY%L_DMGSCL
 C
       DO J=1,6
@@ -441,19 +448,8 @@ C-------------------------------------------------------------------------------
      A    SV1      ,SV2      ,SV3      ,SV4      ,SV5      ,SV6   ,
      B    SSPP     ,VIS      ,UVAR     ,OFF      ,NGL      ,IPT   ,
      C    IPM      ,MAT      ,AMU      )
+
       ELSEIF(MTN == 29)THEN
-!        CALL SIGEPS29(
-!     2    LLT      ,NPAR     ,NUVAR    ,NFUNC    ,IFUNC    ,
-!     3    NPF      ,TF       ,TT       ,DT1      ,BUFMAT(IADBUF),
-!     4    RHO0     ,RHO      ,VOLN     ,EINT     ,
-!     5    EP1      ,EP2      ,EP3      ,EP4      ,EP5      ,EP6   ,
-!     6    DE1      ,DE2      ,DE3      ,DE4      ,DE5      ,DE6   ,
-!     7    ES1      ,ES2      ,ES3      ,ES4      ,ES5      ,ES6   ,
-!     8    SO1      ,SO2      ,SO3      ,SO4      ,SO5      ,SO6   ,
-!     9    S1       ,S2       ,S3       ,S4       ,S5       ,S6    ,
-!     A    SV1      ,SV2      ,SV3      ,SV4      ,SV5      ,SV6   ,
-!     B    SSPP     ,VIS      ,UVAR     ,OFF      )
-!!!
               ! ----------------
               ! ERROR to be printed & exit
                 OPTION='/MAT/LAW29 - SOLID '
@@ -463,18 +459,6 @@ C-------------------------------------------------------------------------------
               ! ----------------
 !!!
       ELSEIF(MTN == 30)THEN
-!        CALL SIGEPS30(
-!     2    LLT      ,NPAR     ,NUVAR    ,NFUNC    ,IFUNC    ,
-!     3    NPF      ,TF       ,TT       ,DT1      ,BUFMAT(IADBUF),
-!     4    RHO0     ,RHO      ,VOLN     ,EINT     ,
-!     5    EP1      ,EP2      ,EP3      ,EP4      ,EP5      ,EP6   ,
-!     6    DE1      ,DE2      ,DE3      ,DE4      ,DE5      ,DE6   ,
-!     7    ES1      ,ES2      ,ES3      ,ES4      ,ES5      ,ES6   ,
-!     8    SO1      ,SO2      ,SO3      ,SO4      ,SO5      ,SO6   ,
-!     9    S1       ,S2       ,S3       ,S4       ,S5       ,S6    ,
-!     A    SV1      ,SV2      ,SV3      ,SV4      ,SV5      ,SV6   ,
-!     B    SSPP     ,VIS      ,UVAR     ,OFF      )
-!!!
               ! ----------------
               ! ERROR to be printed & exit
                 OPTION='/MAT/LAW30 - SOLID '
@@ -484,18 +468,6 @@ C-------------------------------------------------------------------------------
               ! ----------------
 !!!
       ELSEIF(MTN == 31)THEN
-!        CALL SIGEPS31(
-!     2    LLT      ,NPAR     ,NUVAR    ,NFUNC    ,IFUNC    ,
-!     3    NPF      ,TF       ,TT       ,DT1      ,BUFMAT(IADBUF),
-!     4    RHO0     ,RHO      ,VOLN     ,EINT     ,
-!     5    EP1      ,EP2      ,EP3      ,EP4      ,EP5      ,EP6   ,
-!     6    DE1      ,DE2      ,DE3      ,DE4      ,DE5      ,DE6   ,
-!     7    ES1      ,ES2      ,ES3      ,ES4      ,ES5      ,ES6   ,
-!     8    SO1      ,SO2      ,SO3      ,SO4      ,SO5      ,SO6   ,
-!     9    S1       ,S2       ,S3       ,S4       ,S5       ,S6    ,
-!     A    SV1      ,SV2      ,SV3      ,SV4      ,SV5      ,SV6   ,
-!     B    SSPP     ,VIS      ,UVAR     ,OFF      )
-!!!
               ! ----------------
               ! ERROR to be printed & exit
                 OPTION='/MAT/LAW31 - SOLID '
@@ -561,8 +533,8 @@ C-------------------
           ENDIF
         ENDDO
 
-        NRATE = NINT(UPARAM(1))
-        FISOKIN = UPARAM(6+2*NRATE+8)
+        NRATE = NINT(UPARAM0(1))
+        FISOKIN = UPARAM0(6+2*NRATE+8)
         IF(FISOKIN>0) THEN
           SIGBXX => LBUF%SIGB(1      :  NEL) 
           SIGBYY => LBUF%SIGB(NEL+1  :2*NEL)
@@ -582,15 +554,15 @@ C-------------------
 
         CALL SIGEPS36(
      2    LLT      ,NUVAR    ,NFUNC    ,IFUNC    ,NPF ,
-     3    TF       ,TT       ,DT1      ,UPARAM   ,RHO0,
+     3    TF       ,TT       ,DT1      ,UPARAM0   ,RHO0,
      5    DE1      ,DE2      ,DE3      ,DE4      ,DE5      ,DE6   ,
      6    ES1      ,ES2      ,ES3      ,ES4      ,ES5      ,ES6   ,
      7    SO1      ,SO2      ,SO3      ,SO4      ,SO5      ,SO6   ,
      8    S1       ,S2       ,S3       ,S4       ,S5       ,S6    ,
-     9    SSPP     ,VIS      ,UVAR     ,OFF      ,NGL      ,
+     9    SSPP     ,VIS      ,UVAR     ,OFF      ,NGL      ,IEOS  ,
      A    IPM      ,MAT      ,EPSD     ,IPLA     ,SIGY     ,LBUF%PLA,
-     B    DPLA     ,ET       ,BIDON    ,BIDON    ,AMU      ,CST1  ,
-     C    NVARTMP  ,VARTMP   ,LBUF%DMG ,INLOC    ,LBUF%PLANL,
+     B    DPLA     ,ET       ,BIDON    ,BIDON    ,AMU      ,BIDV      ,
+     C    CST1     ,NVARTMP  ,VARTMP   ,LBUF%DMG ,INLOC    ,LBUF%PLANL,
      D    SIGBXX,SIGBYY,SIGBZZ,SIGBXY,SIGBYZ,SIGBZX )
 c
           DEFP(1:LLT)   =  LBUF%PLA(1:LLT)
@@ -634,15 +606,15 @@ c
      .    LBUF%TEMP)
       ELSEIF(MTN == 42)THEN
         CALL SIGEPS42(
-     1       LLT     ,NPAR    ,NUVAR   ,NFUNC   ,IFUNC   ,NPF     ,
-     2       TF      ,TT      ,DT1     ,BUFMAT(IADBUF),RHO0,RHO   ,
+     1       LLT     ,NUPARAM ,NUVAR   ,NFUNC   ,IFUNC   ,NPF     ,
+     2       TF      ,TT      ,DT1     ,UPARAM  ,RHO0    ,RHO     ,
      3       VOLN    ,EINT    ,UVAR    ,OFF     ,OFFG    ,SSPP    ,
      4       EP1     ,EP2     ,EP3     ,EP4     ,EP5     ,EP6     ,
      5       ES1     ,ES2     ,ES3     ,ES4     ,ES5     ,ES6     ,
      6       S1      ,S2      ,S3      ,S4      ,S5      ,S6      ,
      7       BIDON   ,BIDON   ,BIDON   ,BIDON   ,BIDON   ,BIDON   ,
      8       BIDON   ,BIDON   ,BIDON   ,VIS     ,ISMSTR  ,ET      ,
-     9       IHET    ,BIDON   ,IEXPAN8 )
+     9       IHET    ,BIDON   ,IEXPAN8 ,NIPARAM ,IPARAM  )
 c
       ELSEIF(MTN == 44)THEN
 C
@@ -664,9 +636,9 @@ C
 !           ENDIF
 !         ENDDO
         CALL SIGEPS44(
-     2    LLT      ,NPAR     ,NUVAR    ,NFUNC    ,IFUNC    ,
-     3    NPF      ,TF       ,TT       ,DT1      ,UPARAM   ,
-     4    RHO0     ,RHO      ,VOLN     ,EINT     ,MAT_PARAM%IEOS,BIDV,
+     2    LLT      ,NPAR     ,NUVAR    ,NFUNC    ,IFUNC    ,NPF      ,
+     3    TF       ,TT       ,DT1      ,UPARAM0   ,RHO0     ,RHO      ,
+     4    VOLN     ,EINT     ,IEOS     ,BIDV     ,
      5    EP1      ,EP2      ,EP3      ,EP4      ,EP5      ,EP6   ,
      6    DE1      ,DE2      ,DE3      ,DE4      ,DE5      ,DE6   ,
      7    ES1      ,ES2      ,ES3      ,ES4      ,ES5      ,ES6   ,

@@ -20,17 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  INI_RACK                      source/tools/lagmul/ini_rack.F
-Chd|-- called by -----------
-Chd|        LGMINI_GJ                     source/tools/lagmul/lgmini_gj.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    ini_rack               ../starter/source/tools/lagmul/ini_rack.F
+      !||--- called by ------------------------------------------------------
+      !||    lgmini_gj              ../starter/source/tools/lagmul/lgmini_gj.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE INI_RACK(IADLL  ,JLL   ,LLL   ,N0    ,N1    ,
      .                    N2     ,NC,ID,TITR)
       USE MESSAGE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C----------------------------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -45,8 +47,7 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER N0, N1, N2, NC, IADLL(*), JLL(*), LLL(*)
       INTEGER ID
-      CHARACTER*nchartitle,
-     .   TITR
+      CHARACTER(LEN=NCHARTITLE) :: TITR
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

@@ -20,19 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  I25STI3                       source/interfaces/inter3d1/i25sti3.F
-Chd|-- called by -----------
-Chd|        ININT3                        source/interfaces/inter3d1/inint3.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        FRICTION_PARTS_SEARCH         source/interfaces/inter3d1/i7sti3.F
-Chd|        I24NORMNS                     source/interfaces/inter3d1/i24sti3.F
-Chd|        I25BORD                       source/interfaces/inter3d1/i25sti3.F
-Chd|        I25GAPM                       source/interfaces/inter3d1/i25sti3.F
-Chd|        INSOL3ET                      source/interfaces/inter3d1/i24sti3.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    i25sti3                 ../starter/source/interfaces/inter3d1/i25sti3.F
+      !||--- called by ------------------------------------------------------
+      !||    inint3                  ../starter/source/interfaces/inter3d1/inint3.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                  ../starter/source/output/message/message.F
+      !||    friction_parts_search   ../starter/source/interfaces/inter3d1/i7sti3.F
+      !||    i24normns               ../starter/source/interfaces/inter3d1/i24sti3.F
+      !||    i25bord                 ../starter/source/interfaces/inter3d1/i25sti3.F
+      !||    i25gapm                 ../starter/source/interfaces/inter3d1/i25sti3.F
+      !||    insol3et                ../starter/source/interfaces/inter3d1/i24sti3.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod             ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE I25STI3(
      1 X         ,IRECT      ,STF       ,IXS       ,PM         ,
      2 GEO       ,NRT        ,IXC       ,NINT      ,STFAC      ,
@@ -57,6 +58,7 @@ C-----------------------------------------------
       USE MY_ALLOC_MOD
       USE INTBUF_FRIC_MOD
       USE MESSAGE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -99,8 +101,7 @@ C     REAL
       INTEGER, DIMENSION(NUMELT), INTENT(IN) :: IPARTT
       INTEGER, DIMENSION(NUMELP), INTENT(IN) :: IPARTP
       INTEGER, DIMENSION(NUMELR), INTENT(IN) :: IPARTR
-      CHARACTER*nchartitle,
-     .   TITR
+      CHARACTER(LEN=NCHARTITLE) :: TITR
       TYPE(INTBUF_FRIC_STRUCT_) INTBUF_FRIC_TAB(*)
       INTEGER  , INTENT(INOUT) :: IDEL_SOLID
       INTEGER  , INTENT(INOUT) :: IELEM_M(2,NRT+NRT_SH)
@@ -695,19 +696,20 @@ C
  2001 FORMAT(2X,'Maximum distance for radiation computation = ',
      .                                                    1PG20.13)
       END
-Chd|====================================================================
-Chd|  I25GAPM                       source/interfaces/inter3d1/i25sti3.F
-Chd|-- called by -----------
-Chd|        I25STI3                       source/interfaces/inter3d1/i25sti3.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        FRICTION_PARTS_SEARCH         source/interfaces/inter3d1/i7sti3.F
-Chd|        I4GMX3                        source/interfaces/inter3d1/i4gmx3.F
-Chd|        INCOQ3                        source/interfaces/inter3d1/incoq3.F
-Chd|        INSOL3D                       source/interfaces/inter3d1/insol3.F
-Chd|        VOLINT                        source/interfaces/inter3d1/volint.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    i25gapm                 ../starter/source/interfaces/inter3d1/i25sti3.F
+      !||--- called by ------------------------------------------------------
+      !||    i25sti3                 ../starter/source/interfaces/inter3d1/i25sti3.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                  ../starter/source/output/message/message.F
+      !||    friction_parts_search   ../starter/source/interfaces/inter3d1/i7sti3.F
+      !||    i4gmx3                  ../starter/source/interfaces/inter3d1/i4gmx3.F
+      !||    incoq3                  ../starter/source/interfaces/inter3d1/incoq3.F
+      !||    insol3d                 ../starter/source/interfaces/inter3d1/insol3.F
+      !||    volint                  ../starter/source/interfaces/inter3d1/volint.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod             ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE I25GAPM(
      1 X     ,IRECT ,STF   ,IXS   ,PM    ,
      2 GEO   ,NRT   ,IXC   ,NINT  ,STFAC ,
@@ -730,6 +732,7 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE INTBUF_FRIC_MOD
       USE MY_ALLOC_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -756,18 +759,15 @@ C-----------------------------------------------
      .   IGEO(NPROPGI,*),NRTT,IWORKSH(3,*),TAGPRT_FRIC(*),IPARTFRICS(*),
      .   IPARTFRICM(*) ,IPARTSM(*),INRTIE(*)
       INTEGER  , INTENT(IN) :: IVIS2
-C     REAL
       my_real
      .   STFAC, GAP,BGAPSMX,GAPS1 ,GAPS2,GAPMX ,GAPMN ,GAPSCALE
-C     REAL
       my_real
      .   X(3,*), STF(*), PM(NPROPM,*), GEO(NPROPG,*), STFN(*),
      .   MS(*),GAP_M(*),GAP_N(4,*),
      .   AREAS(*),THK(*),THK_PART(*),SLSFAC,DXM ,GAPMAX_M, FILLSOL(*),
      .   PM_STACK(20,*)
       INTEGER ID
-      CHARACTER*nchartitle,
-     .   TITR
+      CHARACTER(LEN=NCHARTITLE) :: TITR
       TYPE(INTBUF_FRIC_STRUCT_) INTBUF_FRIC_TAB(*)
       INTEGER  , INTENT(INOUT) :: IELEM_M(2,NRTT)
       INTEGER  , INTENT(INOUT) :: IDEL_SOLID
@@ -778,7 +778,7 @@ C-----------------------------------------------
       INTEGER I, J, INRT, NELS, MT, JJ, JJJ, NELC,
      .   MG, NUM, NPT, LL, L, NN, NELTG,N1,N2,N3,N4,IE,
      .   IP, NLEV, MYLEV, K, P, R, T,IAD,NREV,IGTYP,IPGMAT,IGMAT,
-     .   ISUBSTACK,IPL,IPG,ISOL,NINV,NSOL_INT,NELS2,MT2,OFC,OFTG
+     .   ISUBSTACK,IPL,IPG,ISOL,NINV,NSOL_INT,NELS2,MT2,OFC,OFTG,ICONTR
       INTEGER, DIMENSION(:),ALLOCATABLE  :: TAGELEMS,INDEXE
       LOGICAL :: PRINT_ERROR
       INTEGER, DIMENSION(4) :: NODE_ID
@@ -786,7 +786,7 @@ C     REAL
       my_real
      .   AREA, VOL, DX, GAPM, DDX,
      .   GAPTMP, SX1,SY1,SZ1,SX2,SY2,SZ2,SX3,SY3,SZ3,
-     .   XL,STIFC, STV, STC,STF2,STF1,VOL2
+     .   XL,STIFC, STV, STC,STF2,STF1,VOL2,BULK
 C----------------------
       ISOL = 0
       NREV=0
@@ -840,6 +840,8 @@ C----------------------
 
         IF(NELS/=0) THEN
           MT=IXS(1,NELS)
+          MG=IXS(NIXS-1,NELS)
+          ICONTR = IGEO(97,MG)
           IF(INTTH > 0 ) IELEM(I) = MT
           IF(INTTH > 0 ) INRTIE(NELS) = I
           IF(MT>0)THEN
@@ -850,7 +852,12 @@ C----------------------
               ZC(JJ)=X(3,JJJ)
             ENDDO
             CALL VOLINT(VOL)
-            STF(I)=SLSFAC*FILLSOL(NELS)*AREA*AREA*PM(32,MT)/VOL
+            IF (ICONTR==1 ) THEN
+              BULK = PM(107,MT)
+            ELSE
+              BULK = PM(32,MT)
+            END IF
+            STF(I)=SLSFAC*FILLSOL(NELS)*AREA*AREA*BULK/VOL
             IF(IELEM_M(2,I) > 0) THEN ! If internal segment shared between 2 elements
               NELS2 =IELEM_M(2,I) 
               MT2=IXS(1,NELS2)
@@ -1179,13 +1186,12 @@ C-----------------------------------------------
  1400 FORMAT(I10,' MAIN SEGMENTS',' OF INTERFACE',I10,
      +                      ' ARE REVERSED THE NORMAL DIRECTION')
       END
-Chd|====================================================================
-Chd|  I25BORD                       source/interfaces/inter3d1/i25sti3.F
-Chd|-- called by -----------
-Chd|        I25STI3                       source/interfaces/inter3d1/i25sti3.F
-Chd|-- calls ---------------
-Chd|        MY_ORDERS                     ../common_source/tools/sort/my_orders.c
-Chd|====================================================================
+      !||====================================================================
+      !||    i25bord     ../starter/source/interfaces/inter3d1/i25sti3.F
+      !||--- called by ------------------------------------------------------
+      !||    i25sti3     ../starter/source/interfaces/inter3d1/i25sti3.F
+      !||--- calls      -----------------------------------------------------
+      !||====================================================================
       SUBROUTINE I25BORD(NRTM   ,IRECT ,TAGB    )
 C============================================================================
 C-----------------------------------------------

@@ -20,18 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  HM_READ_INTER_TYPE22          source/interfaces/int22/hm_read_inter_type22.F
-Chd|-- called by -----------
-Chd|        HM_READ_INTER_FSI             source/interfaces/reader/hm_read_inter_fsi.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        NGR2USR                       source/system/nintrr.F        
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_read_inter_type22   ../starter/source/interfaces/int22/hm_read_inter_type22.F
+      !||--- called by ------------------------------------------------------
+      !||    hm_read_inter_fsi      ../starter/source/interfaces/reader/hm_read_inter_fsi.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    ngr2usr                ../starter/source/system/nintrr.F
+      !||    usr2sys                ../starter/source/system/sysfus.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
        SUBROUTINE HM_READ_INTER_TYPE22(
      1        IPARI      ,STFAC      ,FRIGAP     ,NOINT     ,NI       ,
      2        IGRNOD     ,IGRSURF    ,IGRBRIC    ,IGRSH3N   ,IGRTRUSS ,
@@ -44,6 +45,7 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE GROUPDEF_MOD
       USE SUBMODEL_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARKEY, NCHARFIELD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e 
 C-----------------------------------------------
@@ -60,7 +62,7 @@ C-----------------------------------------------
       my_real STFAC
       my_real
      .   FRIGAP(*),FRIC_P(*)
-      CHARACTER TITR*nchartitle,TITR1*nchartitle
+      CHARACTER(LEN=NCHARTITLE) :: TITR,TITR1
 C-----------------------------------------------
       TYPE (GROUP_)  ,TARGET, DIMENSION(NGRNOD)  :: IGRNOD
       TYPE (GROUP_)  ,TARGET, DIMENSION(NGRBRIC) :: IGRBRIC
@@ -86,9 +88,10 @@ C-----------------------------------------------
      .    FRIC,GAP,STARTT,BUMULT,STOPT,VISC,VISCF,RATIO22_
       LOGICAL LOGI1, LOGI2, LOGI_I22GRSH3N, LOGI_I22GRTRUS,LOGI_I22GRNOD
       LOGICAL IS_AVAILABLE
-      CHARACTER MESS*40, MSGTITL*nchartitle
-      CHARACTER OPT*ncharkey,KEY*ncharkey,KEY1*ncharkey,
-     .          BCFLAG*ncharfield, BCFLAGM*ncharfield
+      CHARACTER(LEN=40)::MESS
+      CHARACTER(LEN=NCHARTITLE)::MSGTITL
+      CHARACTER(LEN=NCHARKEY)::OPT,KEY,KEY1
+      CHARACTER(LEN=NCHARFIELD)::BCFLAG,BCFLAGM
 !
       INTEGER, DIMENSION(:), POINTER :: INGR2USR
 C-----------------------------------------------

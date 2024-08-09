@@ -20,34 +20,34 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  HM_READ_RBODY                 source/constraints/general/rbody/hm_read_rbody.F
-Chd|-- called by -----------
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        ANODSET                       source/output/analyse/analyse_node.c
-Chd|        FRETITL                       source/starter/freform.F      
-Chd|        FRETITL2                      source/starter/freform.F      
-Chd|        HM_GET_FLOATV                 source/devtools/hm_reader/hm_get_floatv.F
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        HM_OPTION_READ_KEY            source/devtools/hm_reader/hm_option_read_key.F
-Chd|        HM_OPTION_START               source/devtools/hm_reader/hm_option_start.F
-Chd|        HM_SZ_R2R                     source/coupling/rad2rad/routines_r2r.F
-Chd|        NEWDBL                        source/system/sysfus.F        
-Chd|        RIGMODIF_ND                   source/elements/solid/solide10/dim_s10edg.F
-Chd|        SPMDSET                       source/constraints/general/rbody/spmdset.F
-Chd|        UDOUBLE                       source/system/sysfus.F        
-Chd|        NGR2USR                       source/system/nintrr.F        
-Chd|        NODGRNR6                      source/starter/freform.F      
-Chd|        USR2SYS                       source/system/sysfus.F        
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        R2R_MOD                       share/modules1/r2r_mod.F      
-Chd|        SENSOR_MOD                    share/modules1/sensor_mod.F   
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_read_rbody          ../starter/source/constraints/general/rbody/hm_read_rbody.F
+      !||--- called by ------------------------------------------------------
+      !||    lectur                 ../starter/source/starter/lectur.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    anodset                ../starter/source/output/analyse/analyse_node.c
+      !||    fretitl                ../starter/source/starter/freform.F
+      !||    fretitl2               ../starter/source/starter/freform.F
+      !||    hm_get_floatv          ../starter/source/devtools/hm_reader/hm_get_floatv.F
+      !||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
+      !||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
+      !||    hm_sz_r2r              ../starter/source/coupling/rad2rad/routines_r2r.F
+      !||    newdbl                 ../starter/source/system/sysfus.F
+      !||    ngr2usr                ../starter/source/system/nintrr.F
+      !||    nodgrnr6               ../starter/source/starter/freform.F
+      !||    rigmodif_nd            ../starter/source/elements/solid/solide10/dim_s10edg.F
+      !||    spmdset                ../starter/source/constraints/general/rbody/spmdset.F
+      !||    udouble                ../starter/source/system/sysfus.F
+      !||    usr2sys                ../starter/source/system/sysfus.F
+      !||--- uses       -----------------------------------------------------
+      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    r2r_mod                ../starter/share/modules1/r2r_mod.F
+      !||    sensor_mod             ../starter/share/modules1/sensor_mod.F
+      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE HM_READ_RBODY(RBY       ,NPBY    ,LPBY    ,ITAB     ,ITABM1   ,
      2                         IGRNOD    ,IGRSURF ,IBFV    ,IGRV     ,IBGR     ,
      3                         SENSORS   ,IMERGE  ,UNITAB  ,ISKN     ,NOM_OPT  ,
@@ -67,6 +67,7 @@ C-----------------------------------------------
       USE SUBMODEL_MOD
       USE HM_OPTION_READ_MOD
       USE SENSOR_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARKEY
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -96,9 +97,7 @@ C-----------------------------------------------
      .        ISKN(LISKN,*),NUMSL,
      .        KNOD2ELS(*),KNOD2ELC(*),KNOD2ELTG(*),KNOD2EL1D(*),KNOD2ELQ(*),
      .        ITAGND(*),ICDNS10(*), ICFIELD(SIZFIELD,*), LCFIELD(*)
-C     REAL
-      my_real
-     .   RBY(NRBY,*)
+      my_real RBY(NRBY,*)
       INTEGER NOM_OPT(LNOPT1,*)
 C-----------------------------------------------
       TYPE (GROUP_)  , DIMENSION(NGRNOD)  :: IGRNOD
@@ -113,9 +112,10 @@ C-----------------------------------------------
      .   JC,UID,IFLAGUNIT,SUB_INDEX,NRB,
      .   IFAIL,NRB_R2R
       INTEGER IDSURF, ISU, NN, IAD, M, IOPT, IEXPAMS, NEL
-      CHARACTER MESS*40,TITR*nchartitle,TITR1*nchartitle,KEY*ncharkey
-      my_real
-     .     BID, MASS, I1, I2, I3, I12, I23, I13, FN, FT, EXPN, EXPT
+      CHARACTER MESS*40
+      CHARACTER(LEN=NCHARTITLE)::TITR,TITR1
+      CHARACTER(LEN=NCHARKEY)::KEY
+      my_real BID, MASS, I1, I2, I3, I12, I23, I13, FN, FT, EXPN, EXPT
       INTEGER, DIMENSION(:), ALLOCATABLE :: ITAG
       INTEGER, DIMENSION(:,:), ALLOCATABLE :: TABSL
       INTEGER, DIMENSION(:), POINTER :: INGR2USR
@@ -543,21 +543,21 @@ C
 1202  FORMAT( 10X,10I10)
       END SUBROUTINE HM_READ_RBODY
 C
-Chd|====================================================================
-Chd|  SETRBYON                      source/constraints/general/rbody/hm_read_rbody.F
-Chd|-- called by -----------
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|-- calls ---------------
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        HM_OPTION_READ_KEY            source/devtools/hm_reader/hm_option_read_key.F
-Chd|        HM_OPTION_START               source/devtools/hm_reader/hm_option_start.F
-Chd|        HM_SZ_R2R                     source/coupling/rad2rad/routines_r2r.F
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        R2R_MOD                       share/modules1/r2r_mod.F      
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    setrbyon               ../starter/source/constraints/general/rbody/hm_read_rbody.F
+      !||--- called by ------------------------------------------------------
+      !||    lectur                 ../starter/source/starter/lectur.F
+      !||--- calls      -----------------------------------------------------
+      !||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
+      !||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
+      !||    hm_sz_r2r              ../starter/source/coupling/rad2rad/routines_r2r.F
+      !||--- uses       -----------------------------------------------------
+      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    r2r_mod                ../starter/share/modules1/r2r_mod.F
+      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE SETRBYON(IXS     ,IXC      ,IXTG   ,IGRNOD  ,IGRNRBY ,
      2                    ISOLOFF  ,ISHEOFF ,ITRIOFF,KNOD2ELS,KNOD2ELC,
      3                    KNOD2ELTG,NOD2ELS ,NOD2ELC,NOD2ELTG,IXQ     ,
@@ -573,6 +573,7 @@ C-----------------------------------------------
       USE GROUPDEF_MOD
       USE SUBMODEL_MOD
       USE HM_OPTION_READ_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -597,10 +598,10 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, L, ISENS, IG, NSN, II, NALL,
-     .        IGU, N, ID, IRBYON, IOPT, NN, JJ, NRB
+      INTEGER I, L, ISENS, IG, NSN, II, NALL, IGU, N, ID, IRBYON, IOPT, NN, JJ, NRB
       INTEGER, DIMENSION(:), ALLOCATABLE :: ITAG
-      CHARACTER MESS*40,TITR*nchartitle
+      CHARACTER :: MESS*40
+      CHARACTER(LEN=NCHARTITLE) :: TITR
       LOGICAL IS_AVAILABLE
 C-----------------------------------
 C
@@ -736,15 +737,14 @@ C
       RETURN
       END SUBROUTINE SETRBYON
 C
-Chd|====================================================================
-Chd|  SETELOFF                      source/constraints/general/rbody/hm_read_rbody.F
-Chd|-- called by -----------
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|-- calls ---------------
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    seteloff       ../starter/source/constraints/general/rbody/hm_read_rbody.F
+      !||--- called by ------------------------------------------------------
+      !||    lectur         ../starter/source/starter/lectur.F
+      !||--- calls      -----------------------------------------------------
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod    ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE SETELOFF(IXS    ,IXC    ,IXT    ,IXP    ,IXR    ,
      2                    IXTG   ,IPARG  ,        ISOLOFF,ISHEOFF,
      3                    ITRUOFF,IPOUOFF,IRESOFF,ITRIOFF,IGRNRBY,

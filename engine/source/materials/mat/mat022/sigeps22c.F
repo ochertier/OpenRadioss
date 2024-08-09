@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  SIGEPS22C                     source/materials/mat/mat022/sigeps22c.F
-Chd|-- called by -----------
-Chd|        MULAWC                        source/materials/mat_share/mulawc.F
-Chd|-- calls ---------------
-Chd|        M22CPLR                       source/materials/mat/mat022/m22cplr.F
-Chd|====================================================================
+      !||====================================================================
+      !||    sigeps22c   ../engine/source/materials/mat/mat022/sigeps22c.F
+      !||--- called by ------------------------------------------------------
+      !||    mulawc      ../engine/source/materials/mat_share/mulawc.F
+      !||--- calls      -----------------------------------------------------
+      !||    m22cplr     ../engine/source/materials/mat/mat022/m22cplr.F
+      !||====================================================================
       SUBROUTINE SIGEPS22C(
      1                   JFT      ,JLT    ,PM       ,THK      ,OFF     ,
      2                   SIGY     ,DT1C   ,IPLA     ,NEL      ,OFF_OLD ,
@@ -35,7 +35,7 @@ Chd|====================================================================
      5                   DEPSXX   ,DEPSYY ,DEPSXY   ,DEPSYZ   ,DEPSZX  ,
      6                   SIGOXX   ,SIGOYY ,SIGOXY   ,SIGOYZ   ,SIGOZX  ,
      7                   SIGNXX   ,SIGNYY ,SIGNXY   ,SIGNYZ   ,SIGNZX  ,
-     8                   INLOC    ,DPLANL )
+     8                   INLOC    ,DPLANL ,LOFF     )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -63,6 +63,7 @@ C     REAL
      .   SIGNYZ(NEL),SIGNZX(NEL),DEPSXX(MVSIZ),DEPSYY(MVSIZ),
      .   DEPSXY(MVSIZ),DEPSYZ(MVSIZ),DEPSZX(MVSIZ),EPCHK(MVSIZ),
      .   ALPE(MVSIZ),THKLYL(NEL),DPLANL(NEL)
+      my_real, DIMENSION(NEL), INTENT(IN) :: LOFF
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -146,8 +147,10 @@ C----------------------------
 !---------------------------
       DO I=JFT,JLT
         IF (INLOC > 0) THEN
-          EZZ(I) = -NU(I)*(SIGNXX(I)-SIGOXX(I)+SIGNYY(I)-SIGOYY(I))/YOUNG(I)
-          EZZ(I) = EZZ(I) - MAX(DPLANL(I),ZERO)*HALF*(SIGNXX(I)+SIGNYY(I))/YLD(I)
+          IF (LOFF(I) == ONE) THEN 
+            EZZ(I) = -NU(I)*(SIGNXX(I)-SIGOXX(I)+SIGNYY(I)-SIGOYY(I))/YOUNG(I)
+            EZZ(I) = EZZ(I) - MAX(DPLANL(I),ZERO)*HALF*(SIGNXX(I)+SIGNYY(I))/YLD(I)
+          ENDIF
         ELSE
           EZZ(I) = -(DEPSXX(I)+DEPSYY(I))*NU(I)-(ONE - TWO*NU(I))*EZZ(I)
           EZZ(I) = EZZ(I)/(ONE-NU(I))

@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  ST_QAPRINT_INIVOL             source/output/qaprint/st_qaprint_inivol.F
-Chd|-- called by -----------
-Chd|        ST_QAPRINT_DRIVER             source/output/qaprint/st_qaprint_driver.F
-Chd|-- calls ---------------
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        INIVOL_DEF_MOD                share/modules1/inivol_mod.F   
-Chd|====================================================================
+      !||====================================================================
+      !||    st_qaprint_inivol      ../starter/source/output/qaprint/st_qaprint_inivol.F
+      !||--- called by ------------------------------------------------------
+      !||    st_qaprint_driver      ../starter/source/output/qaprint/st_qaprint_driver.F
+      !||--- calls      -----------------------------------------------------
+      !||--- uses       -----------------------------------------------------
+      !||    inivol_def_mod         ../starter/share/modules1/inivol_mod.F
+      !||====================================================================
       SUBROUTINE ST_QAPRINT_INIVOL()
 C-----------------------------------------------
 C   M o d u l e s
@@ -35,14 +35,11 @@ C-----------------------------------------------
         USE QA_OUT_MOD
         USE GROUPDEF_MOD
         USE INIVOL_DEF_MOD
+        USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "nchar_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -56,7 +53,7 @@ C-----------------------------------------------
       INTEGER ID,IPARTFILL,NBCONTY
       INTEGER IPHASE,ICUMU,IREVERSED
       DOUBLE PRECISION VFRAC 
-      CHARACTER*nchartitle TITLE
+      CHARACTER(LEN=NCHARTITLE) :: TITLE
       DOUBLE PRECISION TEMP_DOUBLE      
 C-----------------------------------------------
 C   S o u r c e   L i n e s

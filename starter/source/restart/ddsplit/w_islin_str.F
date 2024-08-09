@@ -20,20 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  W_ISLIN_STR                   source/restart/ddsplit/w_islin_str.F
-Chd|-- called by -----------
-Chd|        DDSPLIT                       source/restart/ddsplit/ddsplit.F
-Chd|-- calls ---------------
-Chd|        FRETITL                       source/starter/freform.F      
-Chd|        WRITE_I_C                     ../common_source/tools/input_output/write_routtines.c
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    w_islin_str            ../starter/source/restart/ddsplit/w_islin_str.F
+      !||--- called by ------------------------------------------------------
+      !||    ddsplit                ../starter/source/restart/ddsplit/ddsplit.F
+      !||--- calls      -----------------------------------------------------
+      !||    fretitl                ../starter/source/starter/freform.F
+      !||--- uses       -----------------------------------------------------
+      !||====================================================================
       SUBROUTINE W_ISLIN_STR(IGRSLIN ,LEN_IA ,PROC, NODLOCAL)
 C-----------------------------------------------
 C   M o d u l e s
 C----------------------------------------------- 
-      USE GROUPDEF_MOD
+      USE GROUPDEF_MOD , ONLY : SURF_
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -56,8 +56,8 @@ C-----------------------------------------------
       INTEGER ISU,I,J,K,ERR,NSEG,ELTYP,ELEM,P,
      .        L_SLIN,ID,TYPE,LEVEL,NSEG_R2R_ALL,
      .        NSEG_R2R_SHARE,NOD,ITITLE(LTITR),NSEG_L(NSLIN)
-      CHARACTER(LEN=nchartitle) :: TITR
-      INTEGER, ALLOCATABLE, DIMENSION (:)  ::  IGRSLIN_L
+      CHARACTER(LEN=NCHARTITLE) :: TITR
+      INTEGER, ALLOCATABLE, DIMENSION (:) :: IGRSLIN_L
 C-----------------------------------------------
 !=======================================================================
       DO ISU=1,NSLIN

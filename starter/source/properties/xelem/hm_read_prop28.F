@@ -21,24 +21,25 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C     This subroutine is organized as a user routine.
-Chd|====================================================================
-Chd|  HM_READ_PROP28                source/properties/xelem/hm_read_prop28.F
-Chd|-- called by -----------
-Chd|        HM_READ_PROP_GENERIC          source/properties/hm_read_prop_generic.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        HM_GET_FLOATV                 source/devtools/hm_reader/hm_get_floatv.F
-Chd|        HM_GET_FLOAT_ARRAY_INDEX      source/devtools/hm_reader/hm_get_float_array_index.F
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        HM_GET_INT_ARRAY_INDEX        source/devtools/hm_reader/hm_get_int_array_index.F
-Chd|        HM_GET_STRING_INDEX           source/devtools/hm_reader/hm_get_string_index.F
-Chd|        HM_OPTION_IS_ENCRYPTED        source/devtools/hm_reader/hm_option_is_encrypted.F
-Chd|        SET_U_GEO                     source/user_interface/uaccess.F
-Chd|        SET_U_PNU                     source/user_interface/uaccess.F
-Chd|        ELBUFTAG_MOD                  share/modules1/elbuftag_mod.F 
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_read_prop28             ../starter/source/properties/xelem/hm_read_prop28.F
+      !||--- called by ------------------------------------------------------
+      !||    hm_read_prop_generic       ../starter/source/properties/hm_read_prop_generic.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                     ../starter/source/output/message/message.F
+      !||    hm_get_float_array_index   ../starter/source/devtools/hm_reader/hm_get_float_array_index.F
+      !||    hm_get_floatv              ../starter/source/devtools/hm_reader/hm_get_floatv.F
+      !||    hm_get_int_array_index     ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+      !||    hm_get_intv                ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    hm_get_string_index        ../starter/source/devtools/hm_reader/hm_get_string_index.F
+      !||    hm_option_is_encrypted     ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+      !||    set_u_geo                  ../starter/source/user_interface/uaccess.F
+      !||    set_u_pnu                  ../starter/source/user_interface/uaccess.F
+      !||--- uses       -----------------------------------------------------
+      !||    elbuftag_mod               ../starter/share/modules1/elbuftag_mod.F
+      !||    message_mod                ../starter/share/message_module/message_mod.F
+      !||    submodel_mod               ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE HM_READ_PROP28(IOUT  ,NUVAR ,PARGEO, UNITAB,ID,
      .                          TITR  ,IGTYP ,PROP_TAG,LSUBMODEL,IUNIT)
 C-----------------------------------------------
@@ -46,6 +47,7 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE ELBUFTAG_MOD
       USE SUBMODEL_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARLINE, NCHARFIELD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -94,15 +96,13 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       TYPE (UNIT_TYPE_),INTENT(IN) ::UNITAB 
       INTEGER IOUT,NUVAR(*),IGTYP,IUNIT
-      my_real   
-     .        PARGEO(*)
+      my_real PARGEO(*)
       INTEGER SET_U_PNU,SET_U_GEO,
      .        KFUNC
       EXTERNAL SET_U_PNU,SET_U_GEO
       PARAMETER (KFUNC=29)
       INTEGER ID
-      CHARACTER*nchartitle,
-     .   TITR
+      CHARACTER(LEN=NCHARTITLE) :: TITR
       TYPE(PROP_TAG_) , DIMENSION(0:MAXPROP) :: PROP_TAG
       TYPE(SUBMODEL_DATA),INTENT(IN)::LSUBMODEL(*)
 C-----------------------------------------------
@@ -114,8 +114,8 @@ C-----------------------------------------------
      .  XK,XVTYP,RHO, XC, DMN, DMX, MU1, MU2, FRIC,Y_SCAL,X_SCAL
       my_real
      .   FAC_M, FAC_L, FAC_T
-      CHARACTER KEYWORD*ncharfield
-      CHARACTER CART*ncharline
+      CHARACTER(LEN=NCHARFIELD) :: KEYWORD
+      CHARACTER(LEN=NCHARLINE) :: CART
       INTEGER IP
       LOGICAL IS_AVAILABLE, IS_ENCRYPTED
 

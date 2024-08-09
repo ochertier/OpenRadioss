@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  CFINT_REG                     source/elements/shell/coque/cfint_reg.F
-Chd|-- called by -----------
-Chd|        CFORC3                        source/elements/shell/coque/cforc3.F
-Chd|        CZFORC3                       source/elements/shell/coquez/czforc3.F
-Chd|-- calls ---------------
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
-Chd|        NLOCAL_REG_MOD                ../common_source/modules/nlocal_reg_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    cfint_reg        ../engine/source/elements/shell/coque/cfint_reg.F
+      !||--- called by ------------------------------------------------------
+      !||    cforc3           ../engine/source/elements/shell/coque/cforc3.F
+      !||    czforc3          ../engine/source/elements/shell/coquez/czforc3.F
+      !||--- uses       -----------------------------------------------------
+      !||    elbufdef_mod     ../common_source/modules/mat_elem/elbufdef_mod.F90
+      !||    nlocal_reg_mod   ../common_source/modules/nlocal_reg_mod.F
+      !||====================================================================
       SUBROUTINE CFINT_REG(
      1   NLOC_DMG,VAR_REG, THK,     NEL,
      2   OFF,     AREA,    NC1,     NC2,
@@ -334,7 +334,7 @@ c
         DO I = 1, NEL
 c
           ! If the element is not broken, normal computation
-          IF (OFF(I)/=ZERO) THEN 
+          IF (OFF(I) /= ZERO) THEN 
             ! Computation of the product LEN**2 * BtxB
             ! Warning: the derivatives of the shape function does not take into account the volume of the element. 
             ! That is why a factor (1/VOL**2) is added in B1, B2, B3 and B4.
@@ -356,10 +356,10 @@ c
             ! Computing the product XDAMP*NtN*VNL    
             NTN_VNL = (VNL(POS1(I)+K-1) + VNL(POS2(I)+K-1) + VNL(POS3(I)+K-1) + VNL(POS4(I)+K-1))/NTN
             IF (NODADT > 0) THEN 
-              NTN_VNL = (SQRT(MASS(POS1(I)+K-1)/MASS0(POS1(I)+K-1))*VNL(POS1(I)+K-1) + 
-     .                   SQRT(MASS(POS2(I)+K-1)/MASS0(POS2(I)+K-1))*VNL(POS2(I)+K-1) + 
-     .                   SQRT(MASS(POS3(I)+K-1)/MASS0(POS3(I)+K-1))*VNL(POS3(I)+K-1) + 
-     .                   SQRT(MASS(POS4(I)+K-1)/MASS0(POS4(I)+K-1))*VNL(POS4(I)+K-1)) / NTN
+              NTN_VNL = MIN(SQRT(MASS(POS1(I)+K-1)/MASS0(POS1(I)+K-1)),
+     .                      SQRT(MASS(POS2(I)+K-1)/MASS0(POS2(I)+K-1)),
+     .                      SQRT(MASS(POS3(I)+K-1)/MASS0(POS3(I)+K-1)),
+     .                      SQRT(MASS(POS4(I)+K-1)/MASS0(POS4(I)+K-1)))*NTN_VNL
             ENDIF
 c
             ! Multiplication by the volume of the element
@@ -497,7 +497,7 @@ c
       IF (NODADT == 0) THEN
         DO I = 1,NEL
           ! If the element is not broken, normal computation
-          IF (OFF(I)/=ZERO) THEN
+          IF (OFF(I) /= ZERO) THEN
             ! Non-local critical time-step in the plane
             DTNL = (TWO*(MIN(LE(I),LE_MAX))*SQRT(THREE*ZETA))/
      .                  SQRT(TWELVE*L2 + (MIN(LE(I),LE_MAX))**2)

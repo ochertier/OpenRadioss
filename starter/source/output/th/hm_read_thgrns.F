@@ -20,25 +20,25 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  HM_READ_THGRNS                source/output/th/hm_read_thgrns.F
-Chd|-- called by -----------
-Chd|        HM_READ_THGROU                source/output/th/hm_read_thgrou.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        FREERR                        source/starter/freform.F      
-Chd|        FRETITL                       source/starter/freform.F      
-Chd|        FRETITL2                      source/starter/freform.F      
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        HM_GET_INT_ARRAY_INDEX        source/devtools/hm_reader/hm_get_int_array_index.F
-Chd|        HM_GET_STRING_INDEX           source/devtools/hm_reader/hm_get_string_index.F
-Chd|        ZEROIN                        source/system/zeroin.F        
-Chd|        HM_THVARC                     source/output/th/hm_read_thvarc.F
-Chd|        NINTRN                        source/system/nintrn.F        
-Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_read_thgrns           ../starter/source/output/th/hm_read_thgrns.F
+      !||--- called by ------------------------------------------------------
+      !||    hm_read_thgrou           ../starter/source/output/th/hm_read_thgrou.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                   ../starter/source/output/message/message.F
+      !||    fretitl                  ../starter/source/starter/freform.F
+      !||    fretitl2                 ../starter/source/starter/freform.F
+      !||    hm_get_int_array_index   ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+      !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    hm_get_string_index      ../starter/source/devtools/hm_reader/hm_get_string_index.F
+      !||    hm_thvarc                ../starter/source/output/th/hm_read_thvarc.F
+      !||    nintrn                   ../starter/source/system/nintrn.F
+      !||    zeroin                   ../starter/source/system/zeroin.F
+      !||--- uses       -----------------------------------------------------
+      !||    hm_option_read_mod       ../starter/share/modules1/hm_option_read_mod.F
+      !||    message_mod              ../starter/share/message_module/message_mod.F
+      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE HM_READ_THGRNS(
      1      ITYP  ,KEY    ,ITAB   ,ITABM1,KXX    ,
      3      IXX   ,IAD    ,IFI    ,ITHGRP,ITHBUF ,
@@ -51,6 +51,7 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE SUBMODEL_MOD
       USE HM_OPTION_READ_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -72,7 +73,7 @@ C-----------------------------------------------
      .        IFI,IAD,NV,NVG,IVARG(18,*),NSNE,
      .        IVNS2R(18,*),NV0,ITHVAR(*),FLAGABF,NVARABF
       CHARACTER*10 VARE(NV),KEY,VARG(NVG)
-      CHARACTER TITR*nchartitle
+      CHARACTER(LEN=NCHARTITLE)::TITR
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -80,7 +81,8 @@ C-----------------------------------------------
      .        OK,IGS,IGRS,NSU,K,L,JREC,CONT,IAD0,IADV,NTRI,NL,
      .        IFITMP,IADFIN,NVAR,M,N,IAD1,IAD2,ISK,IPROC,
      .        IDNS, INS, IUN, IST, NST, IDST
-      CHARACTER TITLE*nchartitle,MESS*40,CSTRAND1*9,CSTRAND2*13
+      CHARACTER(LEN=NCHARTITLE) :: TITLE
+      CHARACTER :: MESS*40,CSTRAND1*9,CSTRAND2*13
       TYPE(SUBMODEL_DATA),INTENT(IN) :: LSUBMODEL(NSUBMOD)      
       LOGICAL IS_AVAILABLE
       INTEGER LENTRIM

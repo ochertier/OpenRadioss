@@ -20,25 +20,24 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  SGRTAILS                      source/elements/solid/solide/sgrtails.F
-Chd|-- called by -----------
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        ARRET                         source/system/arret.F         
-Chd|        FRETITL2                      source/starter/freform.F      
-Chd|        INIT_MAT_KEYWORD              source/materials/mat/init_mat_keyword.F
-Chd|        MY_ORDERS                     ../common_source/tools/sort/my_orders.c
-Chd|        ZEROIN                        source/system/zeroin.F        
-Chd|        CLUSTER_MOD                   share/modules1/cluster_mod.F  
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        INIVOL_DEF_MOD                share/modules1/inivol_mod.F   
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        R2R_MOD                       share/modules1/r2r_mod.F      
-Chd|        REORDER_MOD                   share/modules1/reorder_mod.F  
-Chd|====================================================================
+      !||====================================================================
+      !||    sgrtails               ../starter/source/elements/solid/solide/sgrtails.F
+      !||--- called by ------------------------------------------------------
+      !||    lectur                 ../starter/source/starter/lectur.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    arret                  ../starter/source/system/arret.F
+      !||    cpp_reorder_elements   ../starter/source/spmd/cpp_reorder_elements.cpp
+      !||    fretitl2               ../starter/source/starter/freform.F
+      !||    init_mat_keyword       ../starter/source/materials/mat/init_mat_keyword.F
+      !||    zeroin                 ../starter/source/system/zeroin.F
+      !||--- uses       -----------------------------------------------------
+      !||    cluster_mod            ../starter/share/modules1/cluster_mod.F
+      !||    inivol_def_mod         ../starter/share/modules1/inivol_mod.F
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    r2r_mod                ../starter/share/modules1/r2r_mod.F
+      !||    reorder_mod            ../starter/share/modules1/reorder_mod.F
+      !||====================================================================
       SUBROUTINE SGRTAILS(
      1       IXS           ,PM      ,IPARG       , GEO     ,
      2       EADD          ,ND      ,IPARTS      , DD_IAD  ,
@@ -61,6 +60,7 @@ C-----------------------------------------------
       USE MATPARAM_DEF_MOD
       USE INIVOL_DEF_MOD , ONLY : INIVOL_STRUCT_, NUM_INIVOL
       USE QA_OUT_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C            A R G U M E N T S
 C-----------------------------------------------
@@ -90,7 +90,6 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "units_c.inc"
 #include      "param_c.inc"
-#include      "scr21_c.inc"
 #include      "sms_c.inc"
 #include      "scr17_c.inc"
 #include      "r2r_c.inc"
@@ -131,8 +130,7 @@ C-----------------------------------------------
        DATA IPMAT /100/
        INTEGER, DIMENSION(:), ALLOCATABLE :: INDEXS2
       INTEGER ID
-      CHARACTER*nchartitle,
-     .   TITR
+      CHARACTER(LEN=NCHARTITLE)::TITR
       INTEGER :: CLUSTER_TYP,CLUSTER_NEL
       INTEGER, DIMENSION(:), ALLOCATABLE :: SAVE_CLUSTER
       my_real, DIMENSION(:,:), ALLOCATABLE :: XNUM_RNOISE
@@ -469,10 +467,10 @@ C de plus ISOLNOD remis a 0 real dans lectur
           NPT=1
           JIVF=0
           NUVARP=0
-          JHBE=IHBE_D
+          JHBE= 1
           JPOR=0
           JCLOS=0
-          IPLAST=IPLA_DS-1
+          IPLAST= 1
           ICPRE=0
           ICSTR=0
           IREP = 0
@@ -1223,8 +1221,7 @@ C--------------warning out
                 IF (ISSN == 12) THEN
                  ISSN = 2
                 ELSE                 
-                 ISSN = ISST_DS                           
-                 IF (ISSN == 0 .OR. ISSN == 10) ISSN = 4                            
+                 ISSN = 4                            
                 END IF
             END IF
           ELSE IF (ISSN == 11) THEN

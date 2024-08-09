@@ -20,14 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  ST_QAPRINT_CONSTRAINTS        source/output/qaprint/st_qaprint_constraints.F
-Chd|-- called by -----------
-Chd|        ST_QAPRINT_DRIVER             source/output/qaprint/st_qaprint_driver.F
-Chd|-- calls ---------------
-Chd|        FRETITL2                      source/starter/freform.F      
-Chd|        R2R_MOD                       share/modules1/r2r_mod.F      
-Chd|====================================================================
+      !||====================================================================
+      !||    st_qaprint_constraints   ../starter/source/output/qaprint/st_qaprint_constraints.F
+      !||--- called by ------------------------------------------------------
+      !||    st_qaprint_driver        ../starter/source/output/qaprint/st_qaprint_driver.F
+      !||--- calls      -----------------------------------------------------
+      !||    fretitl2                 ../starter/source/starter/freform.F
+      !||--- uses       -----------------------------------------------------
+      !||    r2r_mod                  ../starter/share/modules1/r2r_mod.F
+      !||====================================================================
       SUBROUTINE ST_QAPRINT_CONSTRAINTS(NOM_OPT   ,INOM_OPT  ,NPBY      ,LPBY      ,RBY       ,
      2                                  IBFTEMP   ,FBFTEMP   ,IBFFLUX   ,FBFFLUX   ,ITAB      ,
      3                                  ICODE     ,ISKEW     ,IBCSLAG   ,IBFVEL    ,FBFVEL    ,
@@ -44,6 +45,7 @@ C-----------------------------------------------
       USE QA_OUT_MOD
       USE R2R_MOD
       USE BCS_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -146,7 +148,7 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, II, MY_ID, MY_RBODY, MY_CONSTRAINT, MY_NODE, MY_RWALL, POSI(NRWALL+1),
      .        MY_MERGE, TNSL, K, NS, MY_FXBODY
-      CHARACTER *nchartitle TITR
+      CHARACTER(LEN=NCHARTITLE) :: TITR
       CHARACTER (LEN=255) :: VARNAME
       DOUBLE PRECISION TEMP_DOUBLE
       INTEGER TEMP_INTEGER

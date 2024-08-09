@@ -20,18 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  SUBSET_INI                    source/model/group/subset_ini.F
-Chd|-- called by -----------
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|-- calls ---------------
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    subset_ini             ../starter/source/model/group/subset_ini.F
+      !||--- called by ------------------------------------------------------
+      !||    lectur                 ../starter/source/starter/lectur.F
+      !||--- uses       -----------------------------------------------------
+      !||====================================================================
       SUBROUTINE SUBSET_INI(SUBSET)
 C-----------------------------------------------
 C   M o d u l e s
 C----------------------------------------------- 
       USE GROUPDEF_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -53,7 +53,7 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,J,ID,ISU,NCHILD,NBPART,NBTPART,ICHILD,IPART,IPARTTOT,
      .        PARENT,LEVEL,TH_PART,L_SUB,THIAD
-      CHARACTER TITR*nchartitle
+      CHARACTER(LEN=NCHARTITLE) :: TITR
 C-----------------------------------------------
 !---
 !  Size of SUBSET_ structure

@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  LGMINI_BC                     source/tools/lagmul/lgmini_bc.F
-Chd|-- called by -----------
-Chd|        LAGM_INI                      source/tools/lagmul/lagm_ini.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        FRETITL2                      source/starter/freform.F      
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    lgmini_bc              ../starter/source/tools/lagmul/lgmini_bc.F
+      !||--- called by ------------------------------------------------------
+      !||    lagm_ini               ../starter/source/tools/lagmul/lagm_ini.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    fretitl2               ../starter/source/starter/freform.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE LGMINI_BC(IADLL  ,JLL   ,LLL   ,IGRNOD ,IBCSLAG,
      .                     MASS   ,INER  ,NC    ,NOM_OPT)
 C-----------------------------------------------
@@ -37,6 +37,7 @@ C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
       USE GROUPDEF_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C----------------------------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -51,8 +52,7 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NC, IADLL(*), JLL(*), LLL(*),IBCSLAG(5,*)
-      my_real
-     .        MASS(*),INER(*)
+      my_real MASS(*),INER(*)
       INTEGER NOM_OPT(LNOPT1,*)
 C-----------------------------------------------
       TYPE (GROUP_)  , DIMENSION(NGRNOD)  :: IGRNOD
@@ -61,8 +61,7 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, IK, IG, IGR, CT, CR, ISK, NN
       INTEGER ID
-      CHARACTER*nchartitle,
-     .   TITR
+      CHARACTER(LEN=NCHARTITLE) :: TITR
 C======================================================================|
       DO I=1,NBCSLAG
         IGR = IBCSLAG(1,I)
@@ -70,8 +69,7 @@ C======================================================================|
         CR  = IBCSLAG(3,I)
         ISK = IBCSLAG(4,I)
         ID=NOM_OPT(1,I)
-        CALL FRETITL2(TITR,
-     .       NOM_OPT(LNOPT1-LTITR+1,I),LTITR)
+        CALL FRETITL2(TITR,NOM_OPT(LNOPT1-LTITR+1,I),LTITR)
         DO IG=1,IGRNOD(IGR)%NENTITY
           NN=IGRNOD(IGR)%ENTITY(IG)
           IF(MASS(NN)/=0.0)THEN

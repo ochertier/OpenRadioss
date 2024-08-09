@@ -20,17 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  SUMMSG                        source/output/message/summsg.F
-Chd|-- called by -----------
-Chd|        ANPRINT                       source/output/analyse/analyse_arret.F
-Chd|        ARRET                         source/system/arret.F         
-Chd|-- calls ---------------
-Chd|        MY_ORDERS                     ../common_source/tools/sort/my_orders.c
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    summsg                 ../starter/source/output/message/summsg.F
+      !||--- called by ------------------------------------------------------
+      !||    anprint                ../starter/source/output/analyse/analyse_arret.F
+      !||    arret                  ../starter/source/system/arret.F
+      !||--- calls      -----------------------------------------------------
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE SUMMSG()
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
       USE MESSAGE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARLINE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -58,8 +62,7 @@ C-----------------------------------------------
      .             E_OPTION_TYPE(IWARN+IERR)
       CHARACTER*200 TMPIN
       CHARACTER*60 OPTIONTYPE(IWARN+IERR)
-      CHARACTER*ncharline MYFMT,TMP_CHAR
-c      CHARACTER*59 SUM_WARN(IWARN*10),SUM_ERR(IERR)
+      CHARACTER(LEN=NCHARLINE) :: MYFMT,TMP_CHAR
       CHARACTER*59 , DIMENSION(:), ALLOCATABLE :: SUM_WARN,SUM_ERR
 C-----------------------------------------------
         REWIND(RES_CHECK)

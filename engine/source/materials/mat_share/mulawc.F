@@ -20,130 +20,132 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  MULAWC_MOD                    source/materials/mat_share/mulawc.F
-Chd|-- called by -----------
-Chd|        CMAIN3                        source/materials/mat_share/cmain3.F
-Chd|-- calls ---------------
-Chd|====================================================================
+      !||====================================================================
+      !||    mulawc_mod   ../engine/source/materials/mat_share/mulawc.F
+      !||--- called by ------------------------------------------------------
+      !||    cmain3       ../engine/source/materials/mat_share/cmain3.F
+      !||====================================================================
       MODULE MULAWC_MOD
       CONTAINS
-Chd|====================================================================
-Chd|  MULAWC                        source/materials/mat_share/mulawc.F
-Chd|-- called by -----------
-Chd|        CMAIN3                        source/materials/mat_share/cmain3.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        ARRET                         source/system/arret.F         
-Chd|        ENG_USERLIB_FLAWC             source/user_interface/dyn_userlib.c
-Chd|        FAIL_BIQUAD_C                 source/materials/fail/biquad/fail_biquad_c.F
-Chd|        FAIL_CHANGCHANG_C             source/materials/fail/changchang/fail_changchang_c.F
-Chd|        FAIL_COCKROFT_C               source/materials/fail/cockroft_latham/fail_cockroft_c.F
-Chd|        FAIL_ENERGY_C                 source/materials/fail/energy/fail_energy_c.F
-Chd|        FAIL_FABRIC_C                 source/materials/fail/fabric/fail_fabric_c.F
-Chd|        FAIL_FLD_C                    source/materials/fail/fld/fail_fld_c.F
-Chd|        FAIL_FLD_XFEM                 source/materials/fail/fld/fail_fld_xfem.F
-Chd|        FAIL_GENE1_C                  source/materials/fail/gene1/fail_gene1_c.F
-Chd|        FAIL_HASHIN_C                 source/materials/fail/hashin/fail_hashin_c.F
-Chd|        FAIL_HC_DSSE_C                source/materials/fail/hc_dsse/fail_hc_dsse_c.F
-Chd|        FAIL_HOFFMAN_C                source/materials/fail/hoffman/fail_hoffman_c.F
-Chd|        FAIL_INIEVO_C                 source/materials/fail/inievo/fail_inievo_c.F
-Chd|        FAIL_JOHNSON_C                source/materials/fail/johnson_cook/fail_johnson_c.F
-Chd|        FAIL_JOHNSON_XFEM             source/materials/fail/johnson_cook/fail_johnson_xfem.F
-Chd|        FAIL_MAXSTRAIN_C              source/materials/fail/max_strain/fail_maxstrain_c.F
-Chd|        FAIL_NXT_C                    source/materials/fail/nxt/fail_nxt_c.F
-Chd|        FAIL_ORTHBIQUAD_C             source/materials/fail/orthbiquad/fail_orthbiquad_c.F
-Chd|        FAIL_ORTHENERG_C              source/materials/fail/orthenerg/fail_orthenerg_c.F
-Chd|        FAIL_ORTHSTRAIN_C             source/materials/fail/orthstrain/fail_orthstrain_c.F
-Chd|        FAIL_PUCK_C                   source/materials/fail/puck/fail_puck_c.F
-Chd|        FAIL_RTCL_C                   source/materials/fail/rtcl/fail_rtcl_c.F
-Chd|        FAIL_SETOFF_C                 source/materials/fail/fail_setoff_c.F
-Chd|        FAIL_SETOFF_NPG_C             source/materials/fail/fail_setoff_npg_c.F
-Chd|        FAIL_SETOFF_WIND_FRWAVE       source/materials/fail/fail_setoff_wind_frwave.F
-Chd|        FAIL_SYAZWAN_C                source/materials/fail/syazwan/fail_syazwan_c.F
-Chd|        FAIL_TAB2_C                   source/materials/fail/tabulated/fail_tab2_c.F
-Chd|        FAIL_TAB_C                    source/materials/fail/tabulated/fail_tab_c.F
-Chd|        FAIL_TAB_OLD_C                source/materials/fail/tabulated/fail_tab_old_c.F
-Chd|        FAIL_TAB_OLD_XFEM             source/materials/fail/tabulated/fail_tab_old_xfem.F
-Chd|        FAIL_TAB_XFEM                 source/materials/fail/tabulated/fail_tab_xfem.F
-Chd|        FAIL_TBUTCHER_C               source/materials/fail/tuler_butcher/fail_tbutcher_c.F
-Chd|        FAIL_TBUTCHER_XFEM            source/materials/fail/tuler_butcher/fail_tbutcher_xfem.F
-Chd|        FAIL_TENSSTRAIN_C             source/materials/fail/tensstrain/fail_tensstrain_c.F
-Chd|        FAIL_TSAIHILL_C               source/materials/fail/tsaihill/fail_tsaihill_c.F
-Chd|        FAIL_TSAIWU_C                 source/materials/fail/tsaiwu/fail_tsaiwu_c.F
-Chd|        FAIL_VISUAL_C                 source/materials/fail/visual/fail_visual_c.F
-Chd|        FAIL_WIERZBICKI_C             source/materials/fail/wierzbicki/fail_wierzbicki_c.F
-Chd|        FAIL_WILKINS_C                source/materials/fail/wilkins/fail_wilkins_c.F
-Chd|        FAIL_WIND_FRWAVE              source/materials/fail/alter/fail_wind_frwave.F
-Chd|        FAIL_WIND_XFEM                source/materials/fail/alter/fail_wind_xfem.F
-Chd|        M25DELAM                      source/materials/mat/mat025/m25delam.F
-Chd|        PRONY_MODELC                  source/materials/mat/mat066/prony_modelc.F
-Chd|        PUTSIGNORC3                   source/elements/shell/coqueba/cmatc3.F
-Chd|        ROTOV                         source/airbag/roto.F          
-Chd|        SIGEPS01C                     source/materials/mat/mat001/sigeps01c.F
-Chd|        SIGEPS02C                     source/materials/mat/mat002/sigeps02c.F
-Chd|        SIGEPS104C                    source/materials/mat/mat104/sigeps104c.F
-Chd|        SIGEPS107C                    source/materials/mat/mat107/sigeps107c.F
-Chd|        SIGEPS109C                    source/materials/mat/mat109/sigeps109c.F
-Chd|        SIGEPS110C                    source/materials/mat/mat110/sigeps110c.F
-Chd|        SIGEPS112C                    source/materials/mat/mat112/sigeps112c.F
-Chd|        SIGEPS119C                    source/materials/mat/mat119/sigeps119c.F
-Chd|        SIGEPS121C                    source/materials/mat/mat121/sigeps121c.F
-Chd|        SIGEPS122C                    source/materials/mat/mat122/sigeps122c.F
-Chd|        SIGEPS158C                    source/materials/mat/mat158/sigeps158c.F
-Chd|        SIGEPS15C                     source/materials/mat/mat015/sigeps15c.F
-Chd|        SIGEPS19C                     source/materials/mat/mat019/sigeps19c.F
-Chd|        SIGEPS22C                     source/materials/mat/mat022/sigeps22c.F
-Chd|        SIGEPS25C                     source/materials/mat/mat025/sigeps25c.F
-Chd|        SIGEPS25CP                    source/materials/mat/mat025/sigeps25cp.F
-Chd|        SIGEPS27C                     source/materials/mat/mat027/sigeps27c.F
-Chd|        SIGEPS32C                     source/materials/mat/mat032/sigeps32c.F
-Chd|        SIGEPS34C                     source/materials/mat/mat034/sigeps34c.F
-Chd|        SIGEPS35C                     source/materials/mat/mat035/sigeps35c.F
-Chd|        SIGEPS36C                     source/materials/mat/mat036/sigeps36c.F
-Chd|        SIGEPS42C                     source/materials/mat/mat042/sigeps42c.F
-Chd|        SIGEPS43C                     source/materials/mat/mat043/sigeps43c.F
-Chd|        SIGEPS44C                     source/materials/mat/mat044/sigeps44c.F
-Chd|        SIGEPS45C                     source/materials/mat/mat045/sigeps45c.F
-Chd|        SIGEPS48C                     source/materials/mat/mat048/sigeps48c.F
-Chd|        SIGEPS52C                     source/materials/mat/mat052/sigeps52c.F
-Chd|        SIGEPS55C                     source/materials/mat/mat055/sigeps55c.F
-Chd|        SIGEPS56C                     source/materials/mat/mat056/sigeps56c.F
-Chd|        SIGEPS57C                     source/materials/mat/mat057/sigeps57c.F
-Chd|        SIGEPS58C                     source/materials/mat/mat058/sigeps58c.F
-Chd|        SIGEPS60C                     source/materials/mat/mat060/sigeps60c.F
-Chd|        SIGEPS62C                     source/materials/mat/mat062/sigeps62c.F
-Chd|        SIGEPS63C                     source/materials/mat/mat063/sigeps63c.F
-Chd|        SIGEPS64C                     source/materials/mat/mat064/sigeps64c.F
-Chd|        SIGEPS65C                     source/materials/mat/mat065/sigeps65c.F
-Chd|        SIGEPS66C                     source/materials/mat/mat066/sigeps66c.F
-Chd|        SIGEPS69C                     source/materials/mat/mat069/sigeps69c.F
-Chd|        SIGEPS71C                     source/materials/mat/mat071/sigeps71c.F
-Chd|        SIGEPS72C                     source/materials/mat/mat072/sigeps72c.F
-Chd|        SIGEPS73C                     source/materials/mat/mat073/sigeps73c.F
-Chd|        SIGEPS76C                     source/materials/mat/mat076/sigeps76c.F
-Chd|        SIGEPS78C                     source/materials/mat/mat078/sigeps78c.F
-Chd|        SIGEPS80C                     source/materials/mat/mat080/sigeps80c.F
-Chd|        SIGEPS82C                     source/materials/mat/mat082/sigeps82c.F
-Chd|        SIGEPS85C_VOID                source/materials/mat/mat085/sigeps85c_void.F
-Chd|        SIGEPS86C                     source/materials/mat/mat086/sigeps86c.F
-Chd|        SIGEPS87C                     source/materials/mat/mat087/sigeps87c.F
-Chd|        SIGEPS88C                     source/materials/mat/mat088/sigeps88c.F
-Chd|        SIGEPS93C                     source/materials/mat/mat093/sigeps93c.F
-Chd|        SIGEPS96C                     source/materials/mat/mat096/sigeps96c.F
-Chd|        STARTIME                      source/system/timer.F         
-Chd|        STOPTIME                      source/system/timer.F         
-Chd|        UROTOV                        source/airbag/uroto.F         
-Chd|        XFEM_CRK_DIR                  source/elements/xfem/xfem_crk_dir.F
-Chd|        FAILWAVE_MOD                  ../common_source/modules/failwave_mod.F
-Chd|        LAW_USERSH                    source/user_interface/law_usersh.F
-Chd|        MAT_ELEM_MOD                  ../common_source/modules/mat_elem/mat_elem_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        NLOCAL_REG_MOD                ../common_source/modules/nlocal_reg_mod.F
-Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
-Chd|        STACK_MOD                     share/modules/stack_mod.F     
-Chd|        TABLE_MOD                     share/modules/table_mod.F     
-Chd|====================================================================
+      !||====================================================================
+      !||    mulawc                    ../engine/source/materials/mat_share/mulawc.F
+      !||--- called by ------------------------------------------------------
+      !||    cmain3                    ../engine/source/materials/mat_share/cmain3.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                    ../engine/source/output/message/message.F
+      !||    arret                     ../engine/source/system/arret.F
+      !||    fail_biquad_c             ../engine/source/materials/fail/biquad/fail_biquad_c.F
+      !||    fail_changchang_c         ../engine/source/materials/fail/changchang/fail_changchang_c.F
+      !||    fail_cockroft_c           ../engine/source/materials/fail/cockroft_latham/fail_cockroft_c.F
+      !||    fail_energy_c             ../engine/source/materials/fail/energy/fail_energy_c.F
+      !||    fail_fabric_c             ../engine/source/materials/fail/fabric/fail_fabric_c.F
+      !||    fail_fld_c                ../engine/source/materials/fail/fld/fail_fld_c.F
+      !||    fail_fld_xfem             ../engine/source/materials/fail/fld/fail_fld_xfem.F
+      !||    fail_gene1_c              ../engine/source/materials/fail/gene1/fail_gene1_c.F
+      !||    fail_hashin_c             ../engine/source/materials/fail/hashin/fail_hashin_c.F
+      !||    fail_hc_dsse_c            ../engine/source/materials/fail/hc_dsse/fail_hc_dsse_c.F
+      !||    fail_hoffman_c            ../engine/source/materials/fail/hoffman/fail_hoffman_c.F
+      !||    fail_inievo_c             ../engine/source/materials/fail/inievo/fail_inievo_c.F
+      !||    fail_johnson_c            ../engine/source/materials/fail/johnson_cook/fail_johnson_c.F
+      !||    fail_johnson_xfem         ../engine/source/materials/fail/johnson_cook/fail_johnson_xfem.F
+      !||    fail_maxstrain_c          ../engine/source/materials/fail/max_strain/fail_maxstrain_c.F
+      !||    fail_nxt_c                ../engine/source/materials/fail/nxt/fail_nxt_c.F
+      !||    fail_orthbiquad_c         ../engine/source/materials/fail/orthbiquad/fail_orthbiquad_c.F
+      !||    fail_orthenerg_c          ../engine/source/materials/fail/orthenerg/fail_orthenerg_c.F
+      !||    fail_orthstrain_c         ../engine/source/materials/fail/orthstrain/fail_orthstrain_c.F
+      !||    fail_puck_c               ../engine/source/materials/fail/puck/fail_puck_c.F
+      !||    fail_rtcl_c               ../engine/source/materials/fail/rtcl/fail_rtcl_c.F
+      !||    fail_setoff_c             ../engine/source/materials/fail/fail_setoff_c.F
+      !||    fail_setoff_npg_c         ../engine/source/materials/fail/fail_setoff_npg_c.F
+      !||    fail_setoff_wind_frwave   ../engine/source/materials/fail/fail_setoff_wind_frwave.F
+      !||    fail_syazwan_c            ../engine/source/materials/fail/syazwan/fail_syazwan_c.F
+      !||    fail_tab2_c               ../engine/source/materials/fail/tabulated/fail_tab2_c.F
+      !||    fail_tab_c                ../engine/source/materials/fail/tabulated/fail_tab_c.F
+      !||    fail_tab_old_c            ../engine/source/materials/fail/tabulated/fail_tab_old_c.F
+      !||    fail_tab_old_xfem         ../engine/source/materials/fail/tabulated/fail_tab_old_xfem.F
+      !||    fail_tab_xfem             ../engine/source/materials/fail/tabulated/fail_tab_xfem.F
+      !||    fail_tbutcher_c           ../engine/source/materials/fail/tuler_butcher/fail_tbutcher_c.F
+      !||    fail_tbutcher_xfem        ../engine/source/materials/fail/tuler_butcher/fail_tbutcher_xfem.F
+      !||    fail_tensstrain_c         ../engine/source/materials/fail/tensstrain/fail_tensstrain_c.F
+      !||    fail_tsaihill_c           ../engine/source/materials/fail/tsaihill/fail_tsaihill_c.F
+      !||    fail_tsaiwu_c             ../engine/source/materials/fail/tsaiwu/fail_tsaiwu_c.F
+      !||    fail_visual_c             ../engine/source/materials/fail/visual/fail_visual_c.F
+      !||    fail_wierzbicki_c         ../engine/source/materials/fail/wierzbicki/fail_wierzbicki_c.F
+      !||    fail_wilkins_c            ../engine/source/materials/fail/wilkins/fail_wilkins_c.F
+      !||    fail_wind_frwave          ../engine/source/materials/fail/alter/fail_wind_frwave.F
+      !||    fail_wind_xfem            ../engine/source/materials/fail/alter/fail_wind_xfem.F
+      !||    m25delam                  ../engine/source/materials/mat/mat025/m25delam.F
+      !||    nvar                      ../engine/source/input/nvar.F
+      !||    prony_modelc              ../engine/source/materials/mat/mat066/prony_modelc.F
+      !||    putsignorc3               ../engine/source/elements/shell/coqueba/cmatc3.F
+      !||    rotov                     ../engine/source/airbag/roto.F
+      !||    sigeps01c                 ../engine/source/materials/mat/mat001/sigeps01c.F
+      !||    sigeps02c                 ../engine/source/materials/mat/mat002/sigeps02c.F
+      !||    sigeps104c                ../engine/source/materials/mat/mat104/sigeps104c.F
+      !||    sigeps107c                ../engine/source/materials/mat/mat107/sigeps107c.F
+      !||    sigeps109c                ../engine/source/materials/mat/mat109/sigeps109c.F
+      !||    sigeps110c                ../engine/source/materials/mat/mat110/sigeps110c.F
+      !||    sigeps112c                ../engine/source/materials/mat/mat112/sigeps112c.F
+      !||    sigeps119c                ../engine/source/materials/mat/mat119/sigeps119c.F
+      !||    sigeps121c                ../engine/source/materials/mat/mat121/sigeps121c.F
+      !||    sigeps122c                ../engine/source/materials/mat/mat122/sigeps122c.F
+      !||    sigeps125c                ../engine/source/materials/mat/mat125/sigeps125c.F90
+      !||    sigeps158c                ../engine/source/materials/mat/mat158/sigeps158c.F
+      !||    sigeps15c                 ../engine/source/materials/mat/mat015/sigeps15c.F
+      !||    sigeps19c                 ../engine/source/materials/mat/mat019/sigeps19c.F
+      !||    sigeps22c                 ../engine/source/materials/mat/mat022/sigeps22c.F
+      !||    sigeps25c                 ../engine/source/materials/mat/mat025/sigeps25c.F
+      !||    sigeps25cp                ../engine/source/materials/mat/mat025/sigeps25cp.F
+      !||    sigeps27c                 ../engine/source/materials/mat/mat027/sigeps27c.F
+      !||    sigeps32c                 ../engine/source/materials/mat/mat032/sigeps32c.F
+      !||    sigeps34c                 ../engine/source/materials/mat/mat034/sigeps34c.F
+      !||    sigeps35c                 ../engine/source/materials/mat/mat035/sigeps35c.F
+      !||    sigeps36c                 ../engine/source/materials/mat/mat036/sigeps36c.F
+      !||    sigeps42c                 ../engine/source/materials/mat/mat042/sigeps42c.F
+      !||    sigeps43c                 ../engine/source/materials/mat/mat043/sigeps43c.F
+      !||    sigeps44c                 ../engine/source/materials/mat/mat044/sigeps44c.F
+      !||    sigeps45c                 ../engine/source/materials/mat/mat045/sigeps45c.F
+      !||    sigeps48c                 ../engine/source/materials/mat/mat048/sigeps48c.F
+      !||    sigeps52c                 ../engine/source/materials/mat/mat052/sigeps52c.F
+      !||    sigeps55c                 ../engine/source/materials/mat/mat055/sigeps55c.F
+      !||    sigeps56c                 ../engine/source/materials/mat/mat056/sigeps56c.F
+      !||    sigeps57c                 ../engine/source/materials/mat/mat057/sigeps57c.F
+      !||    sigeps58c                 ../engine/source/materials/mat/mat058/sigeps58c.F
+      !||    sigeps60c                 ../engine/source/materials/mat/mat060/sigeps60c.F
+      !||    sigeps62c                 ../engine/source/materials/mat/mat062/sigeps62c.F
+      !||    sigeps63c                 ../engine/source/materials/mat/mat063/sigeps63c.F
+      !||    sigeps64c                 ../engine/source/materials/mat/mat064/sigeps64c.F
+      !||    sigeps65c                 ../engine/source/materials/mat/mat065/sigeps65c.F
+      !||    sigeps66c                 ../engine/source/materials/mat/mat066/sigeps66c.F
+      !||    sigeps69c                 ../engine/source/materials/mat/mat069/sigeps69c.F
+      !||    sigeps71c                 ../engine/source/materials/mat/mat071/sigeps71c.F
+      !||    sigeps72c                 ../engine/source/materials/mat/mat072/sigeps72c.F
+      !||    sigeps73c                 ../engine/source/materials/mat/mat073/sigeps73c.F
+      !||    sigeps76c                 ../engine/source/materials/mat/mat076/sigeps76c.F
+      !||    sigeps78c                 ../engine/source/materials/mat/mat078/sigeps78c.F
+      !||    sigeps80c                 ../engine/source/materials/mat/mat080/sigeps80c.F
+      !||    sigeps82c                 ../engine/source/materials/mat/mat082/sigeps82c.F
+      !||    sigeps85c_void            ../engine/source/materials/mat/mat085/sigeps85c_void.F
+      !||    sigeps86c                 ../engine/source/materials/mat/mat086/sigeps86c.F
+      !||    sigeps87c                 ../engine/source/materials/mat/mat087/sigeps87c.F
+      !||    sigeps88c                 ../engine/source/materials/mat/mat088/sigeps88c.F
+      !||    sigeps93c                 ../engine/source/materials/mat/mat093/sigeps93c.F
+      !||    sigeps96c                 ../engine/source/materials/mat/mat096/sigeps96c.F
+      !||    startime                  ../engine/source/system/timer.F
+      !||    stoptime                  ../engine/source/system/timer.F
+      !||    urotov                    ../engine/source/airbag/uroto.F
+      !||    xfem_crk_dir              ../engine/source/elements/xfem/xfem_crk_dir.F
+      !||--- uses       -----------------------------------------------------
+      !||    failwave_mod              ../common_source/modules/failwave_mod.F
+      !||    law_usersh                ../engine/source/user_interface/law_usersh.F
+      !||    mat_elem_mod              ../common_source/modules/mat_elem/mat_elem_mod.F90
+      !||    message_mod               ../engine/share/message_module/message_mod.F
+      !||    nlocal_reg_mod            ../common_source/modules/nlocal_reg_mod.F
+      !||    sensor_mod                ../engine/share/modules/sensor_mod.F
+      !||    sigeps125c_mod            ../engine/source/materials/mat/mat125/sigeps125c.F90
+      !||    stack_mod                 ../engine/share/modules/stack_mod.F
+      !||    table_mod                 ../engine/share/modules/table_mod.F
+      !||====================================================================
       SUBROUTINE MULAWC(ELBUF_STR ,
      1       JFT      ,JLT      ,NEL      ,PM        ,FOR      ,MOM      ,    
      2       GSTR     ,THK      ,EINT     ,OFF       ,DIR_A    ,DIR_B    ,    
@@ -236,16 +238,15 @@ C-----------------------------------------------
      .   IFAILWV,NLOCAL,NSENSOR,IUN,IBIDON1,IBIDON2,IBIDON3,
      .   IPTX,ILAYER,IROT,DMG_FLAG,LF_DAMMX,NIPAR,
      .   IGMAT,IPGMAT,NPTT,IPT_ALL,NPTTOT,NUVARV,ILAW,
-     .   FAILNPT,JOFF,SIZNUL,PLY_ID,ISEQ,PROGRESSIVE_CRACK,
+     .   JOFF,SIZNUL,PLY_ID,ISEQ,PROGRESSIVE_CRACK,
      .   ORTH_DAMAGE,L_DMG,IPRONY,ISRATE,NVARTMP,INLOC,IDRAPE,VP
       INTEGER :: IJ1,IJ2,IJ3,IJ4,IJ5
       INTEGER :: IJ(5),IFLAG(1)
       INTEGER ,DIMENSION(MAXFUNC) :: IFUNC
-      INTEGER ,DIMENSION(MVSIZ)   :: IFAIL,MATF,IOFF_DUCT,NFIS1,NFIS2,NFIS3
+      INTEGER ,DIMENSION(MVSIZ)   :: IOFF_DUCT,NFIS1,NFIS2,NFIS3
 c
       my_real 
-     .   SIGDMG(MVSIZ,5),SIGKSI(MVSIZ,5),TENS(MVSIZ,5),
-     .   EINT_LOC(2,MVSIZ)
+     .   SIGDMG(MVSIZ,5),SIGKSI(MVSIZ,5),TENS(MVSIZ,5)
       my_real ,DIMENSION(MVSIZ) :: 
      .   FPSXX,FPSYY,FPSZZ,FPSXY,FPSYX,EPCHK,EPSPDT,DT_INV,COPY_PLA,PLA0,
      .   DEGMB ,DEGFX ,SIGOFF,THKLYL,THKN  ,ETSE,OFF_OLD, 
@@ -583,9 +584,9 @@ c
           IF (INLOC > 0) THEN 
             DO I = JFT,JLT
               IF (OFF(I) == ONE) THEN 
-                VARNL(I,IT)    = MAX(VARNL(I,IT),ZERO)
+                VARNL(I,IT)  = MAX(VARNL(I,IT),ZERO)
               ELSE 
-                VARNL(I,IT)    = ZERO
+                VARNL(I,IT)  = ZERO
               ENDIF
               LBUF%PLANL(I)  = LBUF%PLANL(I) + VARNL(I,IT)
               LBUF%EPSDNL(I) = VARNL(I,IT)/MAX(DT1,EM20)
@@ -964,7 +965,7 @@ C------------------------------------------
      9                  DEPSXX     ,DEPSYY    ,DEPSXY   ,DEPSYZ   ,DEPSZX   ,
      A                  EPSPXX     ,EPSPYY    ,EPSPXY   ,EPSPYZ   ,EPSPZX ,
      B                  LBUF%SIGB(IJ1),LBUF%SIGB(IJ2),LBUF%SIGB(IJ3),INLOC  ,VARNL(1,IT),
-     C                  VP        ,NUVAR     ,UVAR     ,ASRATE)
+     C                  VP        ,NUVAR     ,UVAR      ,ASRATE   ,LBUF%OFF)
 !
           ELSEIF (ILAW == 15) THEN
             CALL SIGEPS15C(
@@ -994,7 +995,7 @@ C------------------------------------------
      5                   DEPSXX   ,DEPSYY ,DEPSXY   ,DEPSYZ ,DEPSZX  ,
      6         LBUF%SIG(IJ1),LBUF%SIG(IJ2),LBUF%SIG(IJ3),LBUF%SIG(IJ4),LBUF%SIG(IJ5),
      7                   SIGNXX   ,SIGNYY ,SIGNXY   ,SIGNYZ ,SIGNZX  ,
-     8                   INLOC    ,VARNL(1,IT))
+     8                   INLOC    ,VARNL(1,IT),LBUF%OFF)
           ELSEIF (ILAW == 27) THEN
             CALL SIGEPS27C(
      1                   JFT      ,JLT     ,PM       ,THKN    ,OFF   ,
@@ -1005,7 +1006,7 @@ C------------------------------------------
      6                   DEPSXX   ,DEPSYY  ,DEPSXY   ,DEPSYZ  ,DEPSZX,
      7         LBUF%SIG(IJ1),LBUF%SIG(IJ2) ,LBUF%SIG(IJ3),LBUF%SIG(IJ4),LBUF%SIG(IJ5),             
      9                   SIGNXX   ,SIGNYY  ,SIGNXY   ,SIGNYZ  ,SIGNZX,
-     4                   DIRDMG   ,LBUF%PLA,INLOC    ,VARNL(1,IT))
+     4                   DIRDMG   ,LBUF%PLA,INLOC    ,VARNL(1,IT),LBUF%OFF)
 !
             EPSPL(JFT:JLT) = EPSPDT(JFT:JLT)
           ELSEIF (ILAW == 32) THEN
@@ -1017,7 +1018,7 @@ C------------------------------------------
      5        LBUF%SIG(IJ1),LBUF%SIG(IJ2),LBUF%SIG(IJ3),LBUF%SIG(IJ4),LBUF%SIG(IJ5),
      6                     SIGNXX     ,SIGNYY ,SIGNXY  ,SIGNYZ ,SIGNZX ,
      7                     LBUF%PLA   ,NGL    ,HARDM   ,INLOC  ,VARNL(1,IT),
-     8                     LBUF%SEQ   )
+     8                     LBUF%SEQ   ,LBUF%OFF,ETSE   )
                EPSPL(JFT:JLT) = EPSP(JFT:JLT)
           ELSEIF (ILAW == 25) THEN
            IF (IGTYP /= 1 .and. IGTYP /= 9) THEN
@@ -1109,21 +1110,17 @@ C
      B          ETSE   ,GS     ,SIGY   ,EPSPL   ,ISRATE   ,
      C          DPLA   ,G_IMP  ,SIGKSI  ,SHF      ,HARDM  ,
      D          YLDFAC ,INLOC ,VARNL(1,IT),LBUF%DMG,LBUF%PLANL,
-     E          SIGBXX,SIGBYY,SIGBXY) 
+     E          SIGBXX,SIGBYY,SIGBXY,LBUF%OFF) 
           ELSEIF (ILAW == 42) THEN
            CALL SIGEPS42C(
-     1         JLT    , NUPARAM0, NUVAR   , NFUNC , IFUNC , NPF   ,
-     2         NPT    , IPT    , 
-     2         TF     , TT     , DT1C    , UPARAM0, RHO  , 
-     3         AREA   , EINT   , THKLYL  ,
-     4         EPSPXX , EPSPYY , EPSPXY  , EPSPYZ, EPSPZX, 
-     5         DEPSXX , DEPSYY , DEPSXY  , DEPSYZ, DEPSZX,
-     6         EPSXX  , EPSYY  , EPSXY   , EPSYZ , EPSZX ,
-     7         LBUF%SIG(IJ1),LBUF%SIG(IJ2),LBUF%SIG(IJ3),LBUF%SIG(IJ4),LBUF%SIG(IJ5),
-     8         SIGNXX , SIGNYY , SIGNXY  , SIGNYZ, SIGNZX,
-     9         SIGVXX , SIGVYY , SIGVXY  , SIGVYZ, SIGVZX,
-     A         SSP    , VISCMX , THKN    , UVAR   ,
-     B         OFF    , NGL    , ISMSTR  , IPM   , GS)
+     1         NEL    , NUPARAM, NIPARAM , NUVAR   , ISMSTR  ,
+     2         TT     , DT1    , UPARAM  , IPARAM  , RHO     , 
+     3         DEPSXX , DEPSYY , DEPSXY  , DEPSYZ  , DEPSZX  ,
+     4         EPSXX  , EPSYY  , EPSXY   , THKN    , THKLYL  ,
+     5         SIGNXX , SIGNYY , SIGNXY  , SIGNYZ  , SIGNZX  ,
+     6         LBUF%SIG(IJ4),LBUF%SIG(IJ5),SSP     ,GS,  UVAR,
+     7         OFF    )
+
           ELSEIF (ILAW == 43) THEN
            CALL SIGEPS43C(
      1        JLT    ,NUPARAM0,NUVAR   ,NPF      ,TF      ,
@@ -1137,7 +1134,7 @@ C
      9        SSP    ,THKN   ,LBUF%PLA ,UVAR    ,OFF    ,
      A        NGL    ,ETSE   ,HARDM    ,SIGY    ,GS     ,
      B        DPLA   ,EPSP   ,SHF      ,INLOC   ,VARNL(1,IT),
-     C        LBUF%SEQ)
+     C        LBUF%SEQ,LBUF%OFF)
            EPSPL(JFT:JLT) = EPSP(JFT:JLT)
 
           ELSEIF (ILAW == 44) THEN
@@ -1152,7 +1149,8 @@ C
      7        SIGNXX ,SIGNYY ,SIGNXY  ,SIGNYZ   ,SIGNZX ,
      8        SSP    ,VISCMX ,THKN    ,LBUF%PLA ,UVAR   ,
      9        GS     ,SIGY   ,EPSP    ,DPLA     ,ASRATE ,
-     A        NVARTMP,VARTMP ,LBUF%SIGB,INLOC   ,VARNL(1,IT))
+     A        NVARTMP,VARTMP ,LBUF%SIGB,INLOC   ,VARNL(1,IT),
+     B        LBUF%OFF)
 
           ELSEIF (ILAW == 45) THEN
            CALL SIGEPS45C(
@@ -1183,7 +1181,7 @@ C
      A        SSP    ,VISCMX ,THKN    ,LBUF%PLA ,UVAR   ,
      B        OFF    ,NGL    ,IPM     ,MATLY(JMLY),ETSE ,
      C        GS     ,SIGY   ,EPSPL   ,DPLA     ,ISRATE ,
-     D        INLOC  ,VARNL(1,IT))
+     D        INLOC  ,VARNL(1,IT),LBUF%OFF)
           ELSEIF (ILAW == 52) THEN
            CALL SIGEPS52C(
      1        JLT    ,NUPARAM0,NUVAR   ,NFUNC   ,IFUNC   ,
@@ -1244,7 +1242,7 @@ C
      A        SSP    ,VISCMX ,THKN    ,LBUF%PLA ,UVAR   ,
      B        OFF    ,NGL    ,SHF     ,ETSE     ,SIGY   ,
      C        HARDM  ,LBUF%SEQ,ISRATE ,EPSP     ,INLOC  ,
-     D        VARNL(1,IT))
+     D        VARNL(1,IT),LBUF%OFF)
           ELSEIF (ILAW == 58) THEN
 
            CALL SIGEPS58C(
@@ -1280,7 +1278,7 @@ c
      A        SSP    ,VISCMX ,THKN    ,LBUF%PLA ,UVAR   ,
      B        OFF    ,NGL    ,IPM     ,MATLY(JMLY),ETSE ,
      C        GS     ,SIGY   ,EPSPL   ,ISRATE   ,DPLA,SHF,
-     D        INLOC  ,VARNL(1,IT))
+     D        INLOC  ,VARNL(1,IT),LBUF%OFF)
            ELSE
             CALL SIGEPS60C(
      1        JLT    ,NUPARAM0,NUVAR   ,NFUNC   ,IFUNC   ,
@@ -1296,7 +1294,7 @@ c
      A        SSP    ,VISCMX ,THKN    ,LBUF%PLA ,UVAR   ,
      B        OFF    ,NGL    ,IPM     ,MATLY(JMLY),ETSE ,
      C        GS     ,SIGY   ,EPSPL   ,ISRATE   ,DPLA,SHF,
-     D        INLOC  ,VARNL(1,IT))
+     D        INLOC  ,VARNL(1,IT),LBUF%OFF)
            END IF
            ELSEIF (ILAW == 62) THEN  
             CALL SIGEPS62C(
@@ -1329,7 +1327,8 @@ c
      D   VISCMX,       THKN,         LBUF%PLA,     UVAR,
      E   OFF,          NGL,          ETSE,         GS,
      F   VOL0,         SIGY,         TEMPEL,       DIE,
-     G   COEF,         INLOC,        VARNL(1,IT),  JTHE)
+     G   COEF,         INLOC,        VARNL(1,IT),  JTHE,
+     H   LBUF%OFF)
           ELSEIF (ILAW == 64) THEN       
            CALL SIGEPS64C(
      1   JLT,          NUPARAM0,      NUVAR,        NFUNC,
@@ -1348,7 +1347,7 @@ c
      E   OFF,          NGL,          IPM,          MATLY(JMLY),
      F   ETSE,         GS,           VOL0,         SIGY,
      G   TEMPEL,       DIE,          COEF,         INLOC,
-     H   VARNL(1,IT),  JTHE)
+     H   VARNL(1,IT),  JTHE,         LBUF%OFF)
           ELSEIF (ILAW == 65) THEN
            CALL SIGEPS65C(
      1        JLT    ,NUPARAM0,NUVAR   ,NFUNC   ,IFUNC   ,
@@ -1379,7 +1378,8 @@ c
      A        SSP    ,VISCMX ,THKN    ,LBUF%PLA ,UVAR   ,
      B        OFF    ,NGL    ,IPM     ,MATLY(JMLY),ETSE ,
      C        GS     ,SIGY   ,EPSPL   ,ISRATE   ,INLOC  ,
-     D        VARNL(1,IT),MATPARAM    ,NUVARV  ,UVARV   )
+     D        VARNL(1,IT),MATPARAM    ,NUVARV  ,UVARV   ,
+     E        LBUF%OFF)
           ELSEIF (ILAW == 69) THEN
            CALL SIGEPS69C(
      1         JLT    , NUPARAM0, NUVAR   , NFUNC , IFUNC , NPF   ,
@@ -1422,7 +1422,7 @@ c
      5         SIGNXX   ,SIGNYY   ,SIGNXY   ,SIGNYZ   ,SIGNZX   ,
      6         SSP      ,THKN     ,LBUF%PLA ,UVAR     ,OFF      ,
      7         ETSE     ,GS       ,SIGY     ,HARDM    ,LBUF%SEQ ,
-     8         DPLA     ,LBUF%DMG ,INLOC    ,VARNL(1,IT))
+     8         DPLA     ,LBUF%DMG ,INLOC    ,VARNL(1,IT),LBUF%OFF)
           ELSEIF (ILAW == 73) THEN
             CALL SIGEPS73C(
      1   JLT,          NUPARAM0,      NUVAR,        TT,
@@ -1441,7 +1441,8 @@ c
      E   EPSPL,        TABLE,        VOL0,         TEMPEL,
      F   DIE,          COEF,         NPF,          NFUNC,
      G   IFUNC,        TF,           SHF,          HARDM,
-     H   LBUF%SEQ,     INLOC,        VARNL(1,IT),  JTHE)
+     H   LBUF%SEQ,     INLOC,        VARNL(1,IT),  JTHE,
+     I   LBUF%OFF)
 c
           ELSEIF (ILAW == 76) THEN
 
@@ -1454,8 +1455,8 @@ c
      6         SIGNXX   ,SIGNYY   ,SIGNXY   ,SIGNYZ   ,SIGNZX   ,
      7         SSP      ,THKN     ,THKLYL   ,LBUF%PLA ,EPSP     ,
      8         ETSE     ,GS       ,SIGY     ,INLOC    ,BUFLY%L_PLANL,
-     9         LBUF%PLANL,VARNL(1,IT),LBUF%DMG,IDEL7NOK,
-     A         NVARTMP  ,VARTMP   )
+     9         LBUF%PLANL,VARNL(1,IT),LBUF%DMG,
+     A         NVARTMP  ,VARTMP   ,LBUF%OFF)
 c
                EPSPL(1:NEL) = EPSP(1:NEL)
 c
@@ -1469,7 +1470,7 @@ c
      6         SIGNXX   ,SIGNYY   ,SIGNXY   ,SIGNYZ   ,SIGNZX   ,
      7         SSP      ,UVAR     ,LBUF%SIGA,LBUF%SIGB,LBUF%SIGC,
      8         RHO      ,OFF      ,LBUF%PLA ,DPLA     ,VARTMP   ,
-     9         INLOC    ,VARNL(1,IT),ET_IMP ,LBUF%SEQ )   
+     9         INLOC    ,VARNL(1,IT),ET_IMP ,LBUF%SEQ ,LBUF%OFF)   
           ELSEIF (ILAW == 80) THEN  
             IF (ISRATE == 0) THEN
               DO I=JFT,JLT
@@ -1559,7 +1560,7 @@ c
      A   LBUF%PLA,     DPLA,         EPSPL,        SIGY,
      B   ETSE,         GS,           ISRATE,       ASRATE,
      C   YLDFAC,       TEMPEL,       LBUF%SIGB,    INLOC,
-     D   VARNL(1,IT),  LBUF%SEQ,     JTHE)
+     D   VARNL(1,IT),  LBUF%SEQ,     JTHE,         LBUF%OFF)
          ELSEIF (ILAW == 88) THEN
            CALL SIGEPS88C(
      1         JLT    , NUPARAM0, NUVAR   , NFUNC , IFUNC , NPF   ,
@@ -1572,7 +1573,7 @@ c
      7         LBUF%SIG(IJ1),LBUF%SIG(IJ2),LBUF%SIG(IJ3),LBUF%SIG(IJ4),LBUF%SIG(IJ5),
      8         SIGNXX , SIGNYY , SIGNXY  , SIGNYZ, SIGNZX,
      A         SSP    , VISCMX , THKN    , UVAR )          
-          ELSEIF (ILAW == 93) THEN     
+          ELSEIF (ILAW == 93) THEN  
             CALL SIGEPS93C(
      1         JLT      ,NUPARAM0  ,NUVAR    ,NFUNC    ,IFUNC    ,
      2         NPF      ,TF       ,TT       ,DT1C     ,UPARAM0   ,
@@ -1583,7 +1584,7 @@ c
      7         SSP      ,THKN     ,LBUF%PLA ,UVAR     ,RHO      ,
      8         OFF      ,ETSE     ,THKLYL   ,SHF      ,SIGY     ,
      9         HARDM    ,LBUF%SEQ ,EPSP     ,ASRATE   ,NVARTMP  ,
-     A         VARTMP   ,DPLA     ,INLOC    ,VARNL(1,IT))
+     A         VARTMP   ,DPLA     ,INLOC    ,VARNL(1,IT),LBUF%OFF)
 c
           ELSEIF (ILAW == 96)THEN 
             CALL SIGEPS96C(
@@ -1596,6 +1597,7 @@ c
      7         SIGNXX  ,SIGNYY  ,SIGNXY  ,SIGNYZ  ,SIGNZX  )
 c  
           ELSEIF (ILAW == 104 )THEN
+!
             CALL SIGEPS104C(
      1         JLT     ,NGL     ,IPG     ,ILAYER  ,IT      ,NUPARAM0 ,NUVAR    ,
      2         DT1C    ,TT      ,UPARAM0 ,UVAR    ,JTHE    ,RHO      ,TEMPEL   ,
@@ -1605,7 +1607,7 @@ c
      6         SIGNXX  ,SIGNYY  ,SIGNXY  ,SIGNYZ  ,SIGNZX  ,THKN     ,SIGY     ,
      7         ETSE    ,VARNL(1,IT),LBUF%DMG,BUFLY%L_DMG,LBUF%TEMP,LBUF%SEQ,INLOC,
      8         ELBUF_STR%NPTR,ELBUF_STR%NPTS,ELBUF_STR%NPTT,BUFLY    ,LBUF%PLANL,
-     9         BUFLY%L_PLANL ,LBUF%EPSDNL,BUFLY%L_EPSDNL)
+     9         BUFLY%L_PLANL ,LBUF%EPSDNL,BUFLY%L_EPSDNL,IOFF_DUCT   )
 !
           ELSEIF (ILAW == 107 )THEN
             CALL SIGEPS107C(
@@ -1626,7 +1628,7 @@ c
      5         DEPSXX  ,DEPSYY  ,DEPSXY  ,DEPSYZ  ,DEPSZX   ,
      6         LBUF%SIG(IJ1),LBUF%SIG(IJ2),LBUF%SIG(IJ3),LBUF%SIG(IJ4),LBUF%SIG(IJ5),
      7         SIGNXX  ,SIGNYY  ,SIGNXY  ,SIGNYZ  ,SIGNZX   ,
-     8         THKN    ,THKLYL  ,INLOC   ,VARNL(1,IT),EPSPL )     
+     8         THKN    ,THKLYL  ,INLOC   ,VARNL(1,IT),EPSPL ,LBUF%OFF)     
 !
           ELSEIF (ILAW == 110 )THEN
             CALL SIGEPS110C(
@@ -1639,7 +1641,7 @@ c
      7         SIGNXX  ,SIGNYY  ,SIGNXY  ,SIGNYZ  ,SIGNZX   ,THKLYL  ,
      8         THKN    ,SIGY    ,ETSE    ,TEMPEL  ,LBUF%TEMP,LBUF%SEQ,
      9         TF      ,NUMTABL ,ITABLE  ,TABLE   ,NVARTMP  ,VARTMP  ,
-     A         LBUF%SIGA,INLOC  ,VARNL(1,IT),EPSPL)   
+     A         LBUF%SIGA,INLOC  ,VARNL(1,IT),EPSPL,LBUF%OFF ,IOFF_DUCT)   
 !
           ELSEIF (ILAW == 112 )THEN
             CALL SIGEPS112C(
@@ -1674,9 +1676,9 @@ c
      8         SIGNXX  ,SIGNYY  ,SIGNXY  ,SIGNYZ  ,SIGNZX  ,
      9         SIGY    ,ETSE    ,VARNL(1,IT),INLOC,GBUF%DT ,
      A         IPG     ,IT      ,ELBUF_STR%NPTR,ELBUF_STR%NPTS,ELBUF_STR%NPTT,
-     B         BUFLY   ,LBUF%OFF)
+     B         BUFLY   ,LBUF%OFF,IOFF_DUCT)
 c
-          ELSEIF (ILAW == 122) THEN     
+          ELSEIF (ILAW == 122) THEN 
             CALL SIGEPS122C(
      1         JLT      ,NUPARAM0 ,NUVAR    ,UPARAM0  ,UVAR     ,        
      2         EPSXX    ,EPSYY    ,RHO      ,LBUF%PLA ,DPLA     ,
@@ -1686,7 +1688,7 @@ c
      6         THKN     ,THKLYL   ,OFF      ,SIGY     ,ETSE     ,
      7         LBUF%DMG ,LBUF%SEQ ,SHF      ,SSP      ,
      8         EPSP     ,NFUNC    ,IFUNC    ,NPF      ,TF       ,
-     9         NVARTMP  ,VARTMP   )
+     9         NVARTMP  ,VARTMP   ,IOFF_DUCT)
 c
         ELSEIF (ILAW == 125) THEN 
            !---
@@ -2572,12 +2574,16 @@ c-----------------------------------------------
           ENDIF
 C------------------------------------------------------------
 C     Variable to regularize with Non-local
-C-----------------------     
+C------------------------------------------------------------     
           IF (BUFLY%L_PLA > 0) THEN
             ! Non-local material
             IF (INLOC > 0) THEN
               DO I=JFT,JLT
-                VARNL(I,IT) = LBUF%PLA(I)
+                IF (OFF(I) == ONE) THEN 
+                  VARNL(I,IT) = LBUF%PLA(I)
+                ELSE
+                  VARNL(I,IT) = ZERO
+                ENDIF
               ENDDO
             ENDIF
           ENDIF
@@ -2627,11 +2633,21 @@ c---
      .        OFF(I) > ZERO   .and. OFF(I) < ONE .and. DMG_FLAG == 1 .and. 
      .        DMG_GLOB_SCALE(I) < EM02) THEN  
             OFF(I) = ZERO
-            NINDX  = NINDX + 1
-            INDX(NINDX) = I
+            IF (NLAY > 1) THEN 
+              NINDX  = NINDX + 1
+              INDX(NINDX) = I
+            ENDIF
           ENDIF
         ENDDO
       ENDIF
+c--------------------------------------------------------
+c     SHOOTING NODES ALGORITHM ACTIVATION
+c--------------------------------------------------------
+      DO I = 1,NEL
+        IF ((OFF_OLD(I) > ZERO) .AND. (OFF(I) == ZERO)) THEN 
+          IDEL7NOK = 1
+        ENDIF
+      ENDDO 
 c------------------------------------------------------------------
 C     MEMBRANE VISCOSITY
 C---------------------------                                              
@@ -2787,7 +2803,6 @@ c---  Shell failure print out
 c
       IOFC = NINDX  !  INDX used before in IELOF - check if still useful
       IF (NINDX > 0 .and. IXEL == 0) THEN
-        IDEL7NOK = 1
         IF (IMCONV == 1) THEN
           DO II = 1,NINDX
             I = INDX(II)

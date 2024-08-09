@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  SSURFTAGIGEO                  source/groups/ssurftagigeo.F  
-Chd|-- called by -----------
-Chd|        HM_READ_SURF                  source/groups/hm_read_surf.F  
-Chd|-- calls ---------------
-Chd|        SSURFIGEO                     source/groups/ssurftagigeo.F  
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    ssurftagigeo           ../starter/source/groups/ssurftagigeo.F
+      !||--- called by ------------------------------------------------------
+      !||    hm_read_surf           ../starter/source/groups/hm_read_surf.F
+      !||--- calls      -----------------------------------------------------
+      !||    ssurfigeo              ../starter/source/groups/ssurftagigeo.F
+      !||--- uses       -----------------------------------------------------
+      !||====================================================================
       SUBROUTINE SSURFTAGIGEO(IXIG3D,IPARTIG3D,KXIG3D, 
      .                        TAGBUF,NSEG   ,
      .                        IEXT  ,FLAG     ,IFRE  ,KEY    ,
@@ -39,6 +39,7 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE GROUPDEF_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARKEY
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -53,7 +54,7 @@ C-----------------------------------------------
      .        KXIG3D(NIXIG3D,*),IPARTIG3D(*),IXIG3D(*),
      .        KNOD2ELIG3D(*),NOD2ELIG3D(*),NIGE(*)
       INTEGER IEXT,NSEG,FLAG,IFRE,NSEGIGE,IGEO(NPROPGI,*),IADTABIGE,DECALIGEO
-      CHARACTER KEY*ncharkey
+      CHARACTER(LEN=NCHARKEY) :: KEY
       my_real
      .   X(3,*),V(3,*),WIGE(*),KNOT(*),RIGE(3,*),XIGE(3,*),VIGE(3,*),
      .   KNOTLOCPC(*),KNOTLOCEL(2,3,*)
@@ -293,14 +294,14 @@ C-----------
       RETURN
       END
 
-Chd|====================================================================
-Chd|  SSURFIGEO                     source/groups/ssurftagigeo.F  
-Chd|-- called by -----------
-Chd|        SSURFTAGIGEO                  source/groups/ssurftagigeo.F  
-Chd|-- calls ---------------
-Chd|        IG3DONEBASIS                  source/elements/ige3d/ig3donebasis.F
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    ssurfigeo      ../starter/source/groups/ssurftagigeo.F
+      !||--- called by ------------------------------------------------------
+      !||    ssurftagigeo   ../starter/source/groups/ssurftagigeo.F
+      !||--- calls      -----------------------------------------------------
+      !||    ig3donebasis   ../starter/source/elements/ige3d/ig3donebasis.F
+      !||--- uses       -----------------------------------------------------
+      !||====================================================================
       SUBROUTINE SSURFIGEO(JS,IELTYP,
      .               KXIG3D,IXIG3D,NCTRL,X,V,WIGE,
      .               KNOT,IGEO,DECALIGEO,JJ,NIGE,RIGE,XIGE,VIGE,IADTABIGE,
@@ -800,12 +801,12 @@ C-----------
       RETURN
       END
 C
-Chd|====================================================================
-Chd|  FICTIVMASSIGEO                source/groups/ssurftagigeo.F  
-Chd|-- called by -----------
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|-- calls ---------------
-Chd|====================================================================
+      !||====================================================================
+      !||    fictivmassigeo   ../starter/source/groups/ssurftagigeo.F
+      !||--- called by ------------------------------------------------------
+      !||    lectur           ../starter/source/starter/lectur.F
+      !||--- uses       -----------------------------------------------------
+      !||====================================================================
       SUBROUTINE FICTIVMASSIGEO(INTBUF_TAB,NCTRLMAX,MSIG3D,KXIG3D)
 C-----------------------------------------------
 C   M o d u l e s

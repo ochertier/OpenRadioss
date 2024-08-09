@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  PRINC_U1                      source/materials/mat/mat001/princ_u1.F
-Chd|-- called by -----------
-Chd|        M1ISMSTR11                    source/materials/mat/mat001/m1ismstr11.F
-Chd|        U_FROM_F3                     source/output/h3d/h3d_results/h3d_solid_tensor_1.F
-Chd|-- calls ---------------
-Chd|        VALPVECOP_V                   source/materials/mat/mat033/sigeps33.F
-Chd|====================================================================
+      !||====================================================================
+      !||    princ_u1      ../engine/source/materials/mat/mat001/princ_u1.F
+      !||--- called by ------------------------------------------------------
+      !||    m1ismstr11    ../engine/source/materials/mat/mat001/m1ismstr11.F
+      !||    u_from_f3     ../engine/source/output/h3d/h3d_results/h3d_solid_tensor_1.F
+      !||--- calls      -----------------------------------------------------
+      !||    valpvecop_v   ../engine/source/materials/mat/mat033/sigeps33.F
+      !||====================================================================
               SUBROUTINE PRINC_U1(
      1                            NEL   , ES1 , ES2 ,ES3 ,ES4 ,
      2                            ES5   ,ES6  ,EV   , DIRPRV  )
@@ -66,11 +66,9 @@ C--------- [B]=[F][F]^t -1 strain-----
        AV(I,5) = ES5(I)
        AV(I,6) = ES6(I)
       ENDDO
-        CALL VALPVECOP_V(AV,EVV,DIRPRV,NEL)
+      CALL VALPVECOP_V(AV,EVV,DIRPRV,NEL)
 
-      DO I=1,NEL
-        EV(I,1:3)=SQRT(MAX(ZERO,(EVV(I,1:3)+ ONE))) - ONE
-      ENDDO
+      EV(1:NEL,1:3)=SQRT(MAX(ZERO,(EVV(1:NEL,1:3)+ ONE))) - ONE
 C----------------
 C      
       RETURN

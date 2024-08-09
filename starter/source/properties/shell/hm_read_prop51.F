@@ -20,29 +20,31 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  HM_READ_PROP51                source/properties/shell/hm_read_prop51.F
-Chd|-- called by -----------
-Chd|        HM_READ_PROPERTIES            source/properties/hm_read_properties.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        HM_GET_FLOATV                 source/devtools/hm_reader/hm_get_floatv.F
-Chd|        HM_GET_FLOAT_ARRAY_2INDEXES   source/devtools/hm_reader/hm_get_float_array_2indexes.F
-Chd|        HM_GET_FLOAT_ARRAY_INDEX      source/devtools/hm_reader/hm_get_float_array_index.F
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        HM_GET_INT_ARRAY_2INDEXES     source/devtools/hm_reader/hm_get_int_array_2indexes.F
-Chd|        HM_GET_INT_ARRAY_INDEX        source/devtools/hm_reader/hm_get_int_array_index.F
-Chd|        HM_OPTION_IS_ENCRYPTED        source/devtools/hm_reader/hm_option_is_encrypted.F
-Chd|        SUBROTVECT                    source/model/submodel/subrot.F
-Chd|        ELBUFTAG_MOD                  share/modules1/elbuftag_mod.F 
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        STACK_MOD                     share/modules1/stack_mod.F    
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_read_prop51                ../starter/source/properties/shell/hm_read_prop51.F
+      !||--- called by ------------------------------------------------------
+      !||    hm_read_properties            ../starter/source/properties/hm_read_properties.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                        ../starter/source/output/message/message.F
+      !||    hm_get_float_array_2indexes   ../starter/source/devtools/hm_reader/hm_get_float_array_2indexes.F
+      !||    hm_get_float_array_index      ../starter/source/devtools/hm_reader/hm_get_float_array_index.F
+      !||    hm_get_floatv                 ../starter/source/devtools/hm_reader/hm_get_floatv.F
+      !||    hm_get_int_array_2indexes     ../starter/source/devtools/hm_reader/hm_get_int_array_2indexes.F
+      !||    hm_get_int_array_index        ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+      !||    hm_get_intv                   ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    hm_option_is_encrypted        ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+      !||    subrotvect                    ../starter/source/model/submodel/subrot.F
+      !||--- uses       -----------------------------------------------------
+      !||    defaults_mod                  ../starter/source/modules/defaults_mod.F90
+      !||    elbuftag_mod                  ../starter/share/modules1/elbuftag_mod.F
+      !||    message_mod                   ../starter/share/message_module/message_mod.F
+      !||    stack_mod                     ../starter/share/modules1/stack_mod.F
+      !||    submodel_mod                  ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE HM_READ_PROP51(
      .           GEO      ,IGEO     ,PM       ,IPM       ,ISKN     ,  
      .           PROP_ID  ,PROP_TAG ,RTRANS   ,SUB_ID   ,STACK_INFO,
-     .           TITR     ,UNITAB   ,LSUBMODEL)
+     .           TITR     ,UNITAB   ,LSUBMODEL,DEFAULTS_SHELL)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -51,6 +53,8 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE SUBMODEL_MOD
       USE STACK_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      USE DEFAULTS_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -63,7 +67,6 @@ C-----------------------------------------------
 #include      "param_c.inc"
 #include      "scr16_c.inc"
 #include      "scr17_c.inc"
-#include      "scr21_c.inc"
 #include      "tablen_c.inc"
 #include      "sphcom.inc"
 C-----------------------------------------------
@@ -75,11 +78,12 @@ C-----------------------------------------------
       INTEGER :: ISKN(LISKN,*)
       my_real, INTENT(INOUT) :: GEO(NPROPG)
       my_real, INTENT(IN) ::  PM(NPROPM,*),RTRANS(NTRANSF,*)
-      CHARACTER(LEN = nchartitle) :: TITR
+      CHARACTER(LEN = NCHARTITLE) :: TITR
       TYPE (PROP_TAG_) , DIMENSION(0:MAXPROP) :: PROP_TAG
       TYPE (UNIT_TYPE_), INTENT(IN) :: UNITAB
       TYPE (SUBMODEL_DATA), DIMENSION(NSUBMOD), INTENT(IN) :: LSUBMODEL
       TYPE(STACK_INFO_) , TARGET :: STACK_INFO
+      TYPE(SHELL_DEFAULTS_), INTENT(IN)  :: DEFAULTS_SHELL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -87,6 +91,8 @@ C-----------------------------------------------
      .   IORTH,IPOS,IGMAT,ISHEAR,IPLAST,NPLY,NP,NSUB,NISUB,IGTYP,IMID,
      .   ISK,IDSK,PLY_ID,IPID0,IDSUB,INTER,IS,LAMIN,IPID1,IPID2,NPT_SUB,
      .   IRP,IG
+      INTEGER     IHBE_D,IPLA_D,ISTR_D,ITHK_D,ISHEA_D,ISST_D,
+     .           ISH3N_D, ISTRA_D,NPTS_D,IDRIL_D
       my_real :: PTHK,ZSHIFT,HM,HF,HR,DM,DN,ASHEAR,VX,VY,VZ,FAILEXP,CVIS,
      .           NORM,ANG,POS,PTHKLY,WEIGHT
       LOGICAL :: IS_AVAILABLE, IS_ENCRYPTED, LFOUND
@@ -100,6 +106,16 @@ c
       CVIS    = ZERO
       IRP = 0
       IDSK = 0
+!
+      IHBE_D =  DEFAULTS_SHELL%ishell
+      ISH3N_D=  DEFAULTS_SHELL%ish3n
+      ISST_D =  DEFAULTS_SHELL%ismstr
+      IPLA_D =  DEFAULTS_SHELL%iplas
+      ITHK_D =  DEFAULTS_SHELL%ithick
+      IDRIL_D=  DEFAULTS_SHELL%idrill
+      ISHEA_D = 0
+      NPTS_D = 0
+      ISTRA_D = 1
 c--------------------------------------------
 c     check encryption
 c--------------------------------------------

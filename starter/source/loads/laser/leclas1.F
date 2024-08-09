@@ -20,21 +20,24 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  LECLAS1                       source/loads/laser/leclas1.F  
-Chd|-- called by -----------
-Chd|        LECLAS                        source/loads/laser/leclas.F   
-Chd|-- calls ---------------
-Chd|        HM_GET_INT_ARRAY_INDEX        source/devtools/hm_reader/hm_get_int_array_index.F
-Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    leclas1                  ../starter/source/loads/laser/leclas1.F
+      !||--- called by ------------------------------------------------------
+      !||    leclas                   ../starter/source/loads/laser/leclas.F
+      !||--- calls      -----------------------------------------------------
+      !||    hm_get_int_array_index   ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+      !||--- uses       -----------------------------------------------------
+      !||    format_mod               ../starter/share/modules1/format_mod.F90
+      !||    hm_option_read_mod       ../starter/share/modules1/hm_option_read_mod.F
+      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE LECLAS1(NL ,LAS ,NC, LSUBMODEL)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
-      USE SUBMODEL_MOD
+      USE SUBMODEL_MOD , ONLY : NSUBMOD, SUBMODEL_DATA
       USE HM_OPTION_READ_MOD
+      USE FORMAT_MOD , ONLY : FMT_10I
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -44,7 +47,7 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER,INTENT(IN)    :: NC, NL
       INTEGER,INTENT(INOUT) :: LAS(2,*)
-      TYPE(SUBMODEL_DATA),INTENT(IN) ::LSUBMODEL(*)
+      TYPE(SUBMODEL_DATA),INTENT(IN) ::LSUBMODEL(NSUBMOD)
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------

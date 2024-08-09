@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  ST_QAPRINT_TRANSFORMATIONS    source/output/qaprint/st_qaprint_transformations.F
-Chd|-- called by -----------
-Chd|        ST_QAPRINT_DRIVER             source/output/qaprint/st_qaprint_driver.F
-Chd|-- calls ---------------
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    st_qaprint_transformations   ../starter/source/output/qaprint/st_qaprint_transformations.F
+      !||--- called by ------------------------------------------------------
+      !||    st_qaprint_driver            ../starter/source/output/qaprint/st_qaprint_driver.F
+      !||--- calls      -----------------------------------------------------
+      !||--- uses       -----------------------------------------------------
+      !||    submodel_mod                 ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE ST_QAPRINT_TRANSFORMATIONS(RTRANS,LSUBMODEL,IGRNOD)
 C============================================================================
 C   M o d u l e s
@@ -35,6 +35,7 @@ C-----------------------------------------------
       USE QA_OUT_MOD
       USE SUBMODEL_MOD
       USE GROUPDEF_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -45,22 +46,20 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "param_c.inc"
 #include      "scr17_c.inc"
-#include      "scr21_c.inc"
 #include      "tabsiz_c.inc"
 #include      "thermal_c.inc"
 #include      "units_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      my_real, INTENT(IN) ::
-     .                        RTRANS(NTRANSF,NRTRANS)
+      my_real, INTENT(IN) :: RTRANS(NTRANSF,NRTRANS)
       TYPE(SUBMODEL_DATA), INTENT(IN) :: LSUBMODEL(*)
       TYPE (GROUP_)  ,TARGET,  INTENT(IN), DIMENSION(NGRNOD)  :: IGRNOD
 C--------------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, MY_ID, MY_TRANS, TEMP_INT, ITRANSSUB, IGS, IS_INTEGER_RTRANS(NRTRANS)
-      CHARACTER *nchartitle TITR
+      CHARACTER(LEN=NCHARTITLE) :: TITR
       CHARACTER (LEN=255) :: VARNAME
       DOUBLE PRECISION TEMP_DOUBLE
 C-----------------------------------------------

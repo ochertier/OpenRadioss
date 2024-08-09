@@ -20,15 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  LGMINI_I2                     source/tools/lagmul/lgmini_i2.F
-Chd|-- called by -----------
-Chd|        LAGM_INI                      source/tools/lagmul/lagm_ini.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        FRETITL2                      source/starter/freform.F      
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    lgmini_i2              ../starter/source/tools/lagmul/lgmini_i2.F
+      !||--- called by ------------------------------------------------------
+      !||    lagm_ini               ../starter/source/tools/lagmul/lagm_ini.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    fretitl2               ../starter/source/starter/freform.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE LGMINI_I2(IADLL ,JLL  ,LLL  ,INTBUF_TAB ,IPARI, NC,
      .            MASS , ITAB    ,NOM_OPT) 
 C-----------------------------------------------
@@ -36,6 +37,7 @@ C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD 
       USE INTBUFDEF_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C----------------------------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -50,10 +52,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER NC, IADLL(*), JLL(*), LLL(*),
-     .        IPARI(NPARI,NINTER),ITAB(*)
-      my_real
-     .        MASS(*) 
+      INTEGER NC, IADLL(*), JLL(*), LLL(*), IPARI(NPARI,NINTER),ITAB(*)
+      my_real MASS(*)
       INTEGER NOM_OPT(LNOPT1,*)
       TYPE(INTBUF_STRUCT_) INTBUF_TAB(*)
 C-----------------------------------------------
@@ -63,13 +63,11 @@ C-----------------------------------------------
      .        ILAGM, NRTS, NRTM, NSN, NMN,IRECT ,NSV ,IRTL, IADDB,
      .        NIR, NTY, NDL, IAD, I, J, NN0, NM0
       INTEGER ID
-      CHARACTER*nchartitle,
-     .   TITR
+      CHARACTER(LEN=NCHARTITLE) :: TITR
 C======================================================================|
       DO N=1,NINTER
         ID=NOM_OPT(1,N)
-        CALL FRETITL2(TITR,
-     .       NOM_OPT(LNOPT1-LTITR+1,N),LTITR)
+        CALL FRETITL2(TITR,NOM_OPT(LNOPT1-LTITR+1,N),LTITR)
         NTY   = IPARI(7 ,N)
         ILAGM = IPARI(33,N)
         IF (NTY == 2 .AND. ILAGM == 1)THEN

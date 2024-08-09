@@ -20,20 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  RIGID_MAT                     source/materials/mat/mat019/rigid_mat.F
-Chd|-- called by -----------
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        FRETITL2                      source/starter/freform.F      
-Chd|        INEPRI                        source/materials/mat/mat019/inepri.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    rigid_mat              ../starter/source/materials/mat/mat019/rigid_mat.F
+      !||--- called by ------------------------------------------------------
+      !||    lectur                 ../starter/source/starter/lectur.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    fretitl2               ../starter/source/starter/freform.F
+      !||    inepri                 ../starter/source/materials/mat/mat019/inepri.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE RIGID_MAT(NRB, GNSL  ,LSN , NSLNRM  ,STIFN, 
      .                   STIFR, X, V     ,MS    ,IN   ,
      .                    RBYM, IRBYM ,LCRBM,NOM_OPT)
       USE MESSAGE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C=======================================================================
 C    RBY    EN SORTIE DE INIRBY
 C a voir 
@@ -51,17 +53,12 @@ C-----------------------------------------------
 C   A n a l y s e   M o d u l e
 C-----------------------------------------------
 #include      "scr17_c.inc"
-
-
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NRB,GNSL
       INTEGER LSN(*), NSLNRM(*),IRBYM(NIRBYM,NRB) ,LCRBM(GNSL)
-C     REAL
-      my_real
-     .   RBYM(NFRBYM,*), MS(*), IN(*), X(3,*),V(3,*), STIFN(*),
-     .   STIFR(*)
+      my_real RBYM(NFRBYM,*), MS(*), IN(*), X(3,*),V(3,*), STIFN(*),STIFR(*)
       INTEGER NOM_OPT(LNOPT1,*)
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
@@ -72,14 +69,10 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER J, NOSKEW, I, N, NONOD,ICDG,KK,NR,NSL,IR
-C     REAL
-      my_real
-     .   XG(3), XM0(3), XMG, XX, XY, XZ, YY, YZ, ZZ, XIIN, INMIN,
-     .   MASRB,DD,TOL, II1,II2,II3,II4,II5,II6,II7,II8,II9,
-     .   RBY(20)
+      my_real XG(3), XM0(3), XMG, XX, XY, XZ, YY, YZ, ZZ, XIIN, INMIN,
+     .        MASRB,DD,TOL, II1,II2,II3,II4,II5,II6,II7,II8,II9,RBY(20)
       INTEGER ID
-      CHARACTER*nchartitle,
-     .   TITR
+      CHARACTER(LEN=NCHARTITLE) :: TITR
 C
       TOL=ONE+EM04
       KK = 0
@@ -88,8 +81,7 @@ C
         IRBYM(1,NR) = NR
         IRBYM(2,NR) = NSL
         ID=NOM_OPT(1,NRBYKIN+NR)
-        CALL FRETITL2(TITR,
-     .                NOM_OPT(LNOPT1-LTITR+1,NRBYKIN+NR),LTITR)
+        CALL FRETITL2(TITR, NOM_OPT(LNOPT1-LTITR+1,NRBYKIN+NR),LTITR)
 C---------------------------------
 C     CORRECTION DE LA MASSE ET DU
 C     CENTRE DE GRAVITE DU MAIN

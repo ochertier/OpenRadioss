@@ -20,25 +20,27 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  HM_READ_PROP22                source/properties/thickshell/hm_read_prop22.F
-Chd|-- called by -----------
-Chd|        HM_READ_PROPERTIES            source/properties/hm_read_properties.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        HM_GET_FLOATV                 source/devtools/hm_reader/hm_get_floatv.F
-Chd|        HM_GET_FLOAT_ARRAY_INDEX      source/devtools/hm_reader/hm_get_float_array_index.F
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        HM_GET_INT_ARRAY_INDEX        source/devtools/hm_reader/hm_get_int_array_index.F
-Chd|        HM_OPTION_IS_ENCRYPTED        source/devtools/hm_reader/hm_option_is_encrypted.F
-Chd|        SUBROTVECT                    source/model/submodel/subrot.F
-Chd|        ELBUFTAG_MOD                  share/modules1/elbuftag_mod.F 
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_read_prop22             ../starter/source/properties/thickshell/hm_read_prop22.F
+      !||--- called by ------------------------------------------------------
+      !||    hm_read_properties         ../starter/source/properties/hm_read_properties.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                     ../starter/source/output/message/message.F
+      !||    hm_get_float_array_index   ../starter/source/devtools/hm_reader/hm_get_float_array_index.F
+      !||    hm_get_floatv              ../starter/source/devtools/hm_reader/hm_get_floatv.F
+      !||    hm_get_int_array_index     ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+      !||    hm_get_intv                ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    hm_option_is_encrypted     ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+      !||    subrotvect                 ../starter/source/model/submodel/subrot.F
+      !||--- uses       -----------------------------------------------------
+      !||    defaults_mod               ../starter/source/modules/defaults_mod.F90
+      !||    elbuftag_mod               ../starter/share/modules1/elbuftag_mod.F
+      !||    message_mod                ../starter/share/message_module/message_mod.F
+      !||    submodel_mod               ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE HM_READ_PROP22(GEO,IGEO ,IGTYP,IG,TITR,UNITAB,LSUBMODEL,
-     .                          PM ,IPM ,RTRANS   ,SUB_ID ,ISKN,PROP_TAG)
+     .                          PM ,IPM ,RTRANS   ,SUB_ID ,ISKN,PROP_TAG,
+     .                          DEFAULTS_SOLID)
 C-----------------------------------------------
 C   ROUTINE DESCRIPTION :
 C   ===================
@@ -64,7 +66,8 @@ C-----------------------------------------------
       USE SUBMODEL_MOD
       USE ELBUFTAG_MOD            
       USE MULTI_FVM_MOD
-C---s----1---------2---------3---------4---------5---------6---------7->
+      USE DEFAULTS_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -74,7 +77,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "scr17_c.inc"
 #include      "units_c.inc"
-#include      "scr21_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
 #include      "tablen_c.inc"
@@ -85,7 +87,7 @@ C-----------------------------------------------
 C INPUT ARGUMENTS
       TYPE (UNIT_TYPE_),INTENT(IN) ::UNITAB 
       INTEGER,INTENT(IN)::IG,IGTYP,SUB_ID,ISKN(LISKN,*),IPM(NPROPMI,*)
-      CHARACTER*nchartitle,INTENT(IN)::TITR
+      CHARACTER(LEN=NCHARTITLE) ,INTENT(IN)::TITR
       my_real,
      .  INTENT(IN)::RTRANS(NTRANSF,*),PM(NPROPM,*)
       TYPE(SUBMODEL_DATA),INTENT(IN)::LSUBMODEL(*)
@@ -94,13 +96,14 @@ C MODIFIED ARGUMENT
       my_real,
      .  INTENT(INOUT)::GEO(*)
       TYPE(PROP_TAG_) , DIMENSION(0:MAXPROP) :: PROP_TAG
+      TYPE(SOLID_DEFAULTS_), INTENT(IN) :: DEFAULTS_SOLID
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
 C     REAL
       INTEGER IHBE,ISMSTR,IPLAST,ICPRE,ICSTR,IINT,JCVT,
      .   NPG,NPT,NPTR,NPTS,NPTT, ISTRAIN,IET,IHBE_OLD,ID,
-     .   IREP,IPOS
+     .   IREP,IPOS,IHBE_DS,ISST_DS
       my_real
      .    CVIS,QA,QB,QH,VNS1,VNS2,DTMIN,ASHEAR
       INTEGER NUML(200), NLY, NLYMAX, N, J, M1, M2, M3,ICOMPA,
@@ -123,9 +126,12 @@ C=======================================================================
 C-----hide and removed flags:
       IPLAST = 2                              
       ID = IG
-C---- will branche later     
+C----     
       ICPRE = 0  
       ISTRAIN = 1  
+!--- defaults values      
+      IHBE_DS=  DEFAULTS_SOLID%ISOLID
+      ISST_DS=  DEFAULTS_SOLID%ISMSTR
 C--------------------------------------------------
 C EXTRACT DATA (IS OPTION CRYPTED)
 C--------------------------------------------------

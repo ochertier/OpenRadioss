@@ -20,9 +20,30 @@
 !Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 !Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 !Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
+      !||====================================================================
+      !||    read_funct_python_mod   ../starter/source/tools/curve/hm_read_funct_python.F90
+      !||--- called by ------------------------------------------------------
+      !||    lectur                  ../starter/source/starter/lectur.F
+      !||====================================================================
       module read_funct_python_mod
       contains
 !! \details Read the python function defined by /FUNCT_PYTHON/
+      !||====================================================================
+      !||    hm_read_funct_python    ../starter/source/tools/curve/hm_read_funct_python.F90
+      !||--- called by ------------------------------------------------------
+      !||    lectur                  ../starter/source/starter/lectur.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                  ../starter/source/output/message/message.F
+      !||    hm_get_intv             ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    hm_get_string_index     ../starter/source/devtools/hm_reader/hm_get_string_index.F
+      !||    hm_option_count         ../starter/source/devtools/hm_reader/hm_option_count.F
+      !||    hm_option_read_key      ../starter/source/devtools/hm_reader/hm_option_read_key.F
+      !||    hm_option_start         ../starter/source/devtools/hm_reader/hm_option_start.F
+      !||--- uses       -----------------------------------------------------
+      !||    hm_option_read_mod      ../starter/share/modules1/hm_option_read_mod.F
+      !||    message_mod             ../starter/share/message_module/message_mod.F
+      !||    submodel_mod            ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
         subroutine hm_read_funct_python(python,npc,snpc,total_nb_funct,&
         &lsubmodel,nbsubmod)
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -51,7 +72,7 @@
           logical :: is_available
           integer :: nlines
           integer :: nb_funct
-          integer :: i,j,l,k
+          integer :: i,j,l
           integer :: func_id
           integer :: position_in_code
           character(kind=c_char, len=:), allocatable :: code
@@ -89,7 +110,7 @@
               call hm_get_intv('Number_of_datalines' ,nlines ,is_available, lsubmodel)
               python%functs(i)%num_lines = nlines
               python%functs(i)%user_id = func_id
-!          write(6,*) "Python test: funct_id",func_id,"nlines",nlines
+!             write(6,*) "Python test: funct_id",func_id,"nlines",nlines
               position_in_code = 1
               if(nlines > 0) then
                 ! create tempo file
@@ -108,9 +129,9 @@
                 npc(l + 1) = npc(l)
                 npc(total_nb_funct + l + 1) = func_id
                 npc(2 * total_nb_funct + l + 1) = -i
-!            write(6,*) "Python test: code",code(1:position_in_code-1)
+!               write(6,*) "Python test: code",code(1:position_in_code-1)
                 call python_funct_init(python%functs(i), code, position_in_code, nlines)
-!            write(6,*) "Check python function"
+!               write(6,*) "Check python function"
                 call python_check_function(python%functs(i)%name,error)
                 if(error > 0 .and. error_old == 0) then
                   ! converts python%functs(i)%name of type  character(kind=c_char), dimension(:), allocatable :: name
@@ -122,10 +143,11 @@
                   &I1=func_id)
                 endif
 
-                argin(1) = 2.0D0
-                call python_call_function(python%functs(i)%name, 1, argin, 1,argout)
-                !           write(6,*) "results =",argout(1)
-                call python_call_funct1D(python,i,argin(1), argout(1))
+!               argin(1) = 2.0D0
+!               call python_call_function(python%functs(i)%name, 1, argin, 1,argout)
+!               write(6,*) "results =",argout(1)
+!               call python_call_funct1D(python,i,argin(1), argout(1))
+!               write(6,*) "results =",argout(1)
               else
               endif
             enddo

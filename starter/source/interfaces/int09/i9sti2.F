@@ -21,21 +21,26 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
-Chd|====================================================================
-Chd|  I9STI2                        source/interfaces/int09/i9sti2.F
-Chd|-- called by -----------
-Chd|        ININT2                        source/interfaces/inter2d1/inint2.F
-Chd|-- calls ---------------
-Chd|        INARE2                        source/interfaces/inter2d1/inare2.F
-Chd|        INORI2                        source/interfaces/inter2d1/inori2.F
-Chd|        INRCH2                        source/interfaces/inter2d1/inrch2.F
-Chd|        LOCAL_INDEX                   source/interfaces/interf1/local_index.F
-Chd|====================================================================
+      !||====================================================================
+      !||    i9sti2                 ../starter/source/interfaces/int09/i9sti2.F
+      !||--- called by ------------------------------------------------------
+      !||    inint2                 ../starter/source/interfaces/inter2d1/inint2.F
+      !||--- calls      -----------------------------------------------------
+      !||    inare2                 ../starter/source/interfaces/inter2d1/inare2.F
+      !||    inori2                 ../starter/source/interfaces/inter2d1/inori2.F
+      !||    inrch2                 ../starter/source/interfaces/inter2d1/inrch2.F
+      !||    local_index            ../starter/source/interfaces/interf1/local_index.F
+      !||--- uses       -----------------------------------------------------
+      !||====================================================================
       SUBROUTINE I9STI2(
      1 X     ,IRECT  ,STF   ,IXQ   ,PM    ,
      2 NRT   ,STFN   ,NSEG  ,LNSV  ,NINT  ,
      3 NSN    ,NSV   ,SLSFAC,NOINT ,IELE  ,
      4 ID,TITR)
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
+         USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -43,7 +48,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "nchar_c.inc"
 #include      "param_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -55,8 +59,7 @@ C-----------------------------------------------
       my_real
      .   X(3,*), STF(*), PM(NPROPM,*), STFN(*)
       INTEGER ID
-      CHARACTER*nchartitle,
-     .   TITR
+      CHARACTER(LEN=NCHARTITLE)::TITR
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

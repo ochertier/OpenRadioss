@@ -20,21 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  QGRTAILS                      source/elements/solid_2d/quad/qgrtails.F
-Chd|-- called by -----------
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        FRETITL2                      source/starter/freform.F      
-Chd|        MY_ORDERS                     ../common_source/tools/sort/my_orders.c
-Chd|        ZEROIN                        source/system/zeroin.F        
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        INIVOL_DEF_MOD                share/modules1/inivol_mod.F   
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        R2R_MOD                       share/modules1/r2r_mod.F      
-Chd|====================================================================
+      !||====================================================================
+      !||    qgrtails               ../starter/source/elements/solid_2d/quad/qgrtails.F
+      !||--- called by ------------------------------------------------------
+      !||    lectur                 ../starter/source/starter/lectur.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    fretitl2               ../starter/source/starter/freform.F
+      !||    zeroin                 ../starter/source/system/zeroin.F
+      !||--- uses       -----------------------------------------------------
+      !||    inivol_def_mod         ../starter/share/modules1/inivol_mod.F
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    r2r_mod                ../starter/share/modules1/r2r_mod.F
+      !||====================================================================
       SUBROUTINE QGRTAILS(
      1       IXQ    ,PM      ,IPARG  ,GEO    ,
      2       EADD   ,ND      ,DD_IAD ,IDX    ,
@@ -49,6 +47,7 @@ C-----------------------------------------------
       USE GROUPDEF_MOD
       USE INIVOL_DEF_MOD , ONLY : INIVOL_STRUCT_, NUM_INIVOL
       USE MATPARAM_DEF_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------M
 C            A R G U M E N T S
 C-----------------------------------------------
@@ -75,7 +74,6 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "units_c.inc"
 #include      "param_c.inc"
-#include      "scr21_c.inc"
 #include      "scr17_c.inc"
 #include      "r2r_c.inc"
 C-----------------------------------------------
@@ -105,7 +103,7 @@ C-----------------------------------------------
      .   NGP(NSPMD+1),ICPRE,IPARTR2R,ISMST,TAG_INVOL,
      .   JALE_FROM_MAT,JALE_FROM_PROP
       INTEGER ID,MFT,ILOC,JJ
-      CHARACTER*nchartitle, TITR
+      CHARACTER(LEN=NCHARTITLE)::TITR
       LOGICAL lFOUND
 C--------------------------------------------------------------
 C         BORNAGE DES GROUPES DE MVSIZ
@@ -237,7 +235,7 @@ C ngroup global
           JPOR=0
           JCVT = 0
           ISORTH=0
-          IPLAST=IPLA_DS-1
+          IPLAST= 1
           ICPRE=0
           ISMST = 0
           IGT = 0

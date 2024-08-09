@@ -22,32 +22,31 @@ Copyright>        software under a commercial license.  Contact Altair to discus
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C ATTENTION : toute modification dans ces routines doit etre reportee
 C             dans les routines identiques dans l'engine
-Chd|====================================================================
-Chd|  FVMESH0                       source/airbag/fvmesh0.F       
-Chd|-- called by -----------
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|-- calls ---------------
-Chd|        FVBRIC                        source/airbag/fvbric.F        
-Chd|        FVELAREA                      source/airbag/fvelarea.F      
-Chd|        FVELINTE                      source/airbag/fvelinte.F      
-Chd|        FVELPRINT                     source/airbag/fvelprint.F     
-Chd|        FVELSURF                      source/airbag/fvelsurf.F      
-Chd|        FVINJECTINT                   source/airbag/fvinjectint.F   
-Chd|        FVINJNORMAL                   source/airbag/fvinjnormal.F   
-Chd|        FVLENGTH                      source/airbag/fvlength.F      
-Chd|        FVMESH1                       source/airbag/fvmesh.F        
-Chd|        FVNODBR                       source/airbag/fvmbag1.F       
-Chd|        FVTHSURF                      source/airbag/fvthsurf.F      
-Chd|        FVVENTHOLEINT                 source/airbag/fvventholeint.F 
-Chd|        FVVERIF                       source/airbag/fvmbag1.F       
-Chd|        FVVOLU                        source/airbag/fvvolu.F        
-Chd|        FVBAG_MOD                     share/modules1/fvbag_mod.F    
-Chd|        FVMBAG_MESHCONTROL_MOD        ../common_source/modules/airbag/fvmbag_meshcontrol_mod.F
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        MONVOL_STRUCT_MOD             share/modules1/monvol_struct_mod.F
-Chd|        REORDER_MOD                   share/modules1/reorder_mod.F  
-Chd|====================================================================
+      !||====================================================================
+      !||    fvmesh0                  ../starter/source/airbag/fvmesh0.F
+      !||--- called by ------------------------------------------------------
+      !||    lectur                   ../starter/source/starter/lectur.F
+      !||--- calls      -----------------------------------------------------
+      !||    fvbric                   ../starter/source/airbag/fvbric.F
+      !||    fvelarea                 ../starter/source/airbag/fvelarea.F
+      !||    fvelinte                 ../starter/source/airbag/fvelinte.F
+      !||    fvelprint                ../starter/source/airbag/fvelprint.F
+      !||    fvelsurf                 ../starter/source/airbag/fvelsurf.F
+      !||    fvinjectint              ../starter/source/airbag/fvinjectint.F
+      !||    fvinjnormal              ../starter/source/airbag/fvinjnormal.F
+      !||    fvlength                 ../starter/source/airbag/fvlength.F
+      !||    fvmesh1                  ../starter/source/airbag/fvmesh.F
+      !||    fvnodbr                  ../starter/source/airbag/fvmbag1.F
+      !||    fvthsurf                 ../starter/source/airbag/fvthsurf.F
+      !||    fvventholeint            ../starter/source/airbag/fvventholeint.F
+      !||    fvverif                  ../starter/source/airbag/fvmbag1.F
+      !||    fvvolu                   ../starter/source/airbag/fvvolu.F
+      !||--- uses       -----------------------------------------------------
+      !||    fvbag_mod                ../starter/share/modules1/fvbag_mod.F
+      !||    message_mod              ../starter/share/message_module/message_mod.F
+      !||    monvol_struct_mod        ../starter/share/modules1/monvol_struct_mod.F
+      !||    reorder_mod              ../starter/share/modules1/reorder_mod.F
+      !||====================================================================
       SUBROUTINE FVMESH0(T_MONVOL, XYZINI, IXS, IXC, IXTG, PM,
      1                   IPM,  ITAB, IGRSURF, XYZREF,
      2                   NOM_OPT, NB_NODE)
@@ -60,6 +59,7 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE GROUPDEF_MOD
       USE MONVOL_STRUCT_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -79,10 +79,7 @@ C-----------------------------------------------
       INTEGER IXS(NIXS,*), IXC(NIXC,*), IXTG(NIXTG,*)
       INTEGER IPM(NPROPMI,*), ITAB(*)
       INTEGER NOM_OPT(LNOPT1,*), NB_NODE
-     
-      my_real
-     .        XYZINI(3,NB_NODE), PM(NPROPM,*), 
-     .        XYZREF(3,NB_NODE)
+      my_real XYZINI(3,NB_NODE), PM(NPROPM,*), XYZREF(3,NB_NODE)
       TYPE (SURF_)   , DIMENSION(NSURF)   :: IGRSURF
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -96,15 +93,11 @@ C-----------------------------------------------
       INTEGER I
       INTEGER J, IEL, IBID
       INTEGER, DIMENSION(:), ALLOCATABLE :: TAGVENT,TMP
-      CHARACTER*nchartitle,
-     .        TITR
+      CHARACTER(len=nchartitle) :: TITR
       INTEGER, DIMENSION(:), ALLOCATABLE :: MINUS_SIGN_REVERSE
-C
-      my_real
-     .        DIRX,DIRY,DIRZ,DIR2X,DIR2Y,DIR2Z,ORIGX,ORIGY,ORIGZ,
-     .        LX,LY,LZ
-      my_real
-     .        X(3,NB_NODE)
+
+      my_real DIRX,DIRY,DIRZ,DIR2X,DIR2Y,DIR2Z,ORIGX,ORIGY,ORIGZ,LX,LY,LZ
+      my_real X(3,NB_NODE)
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7--
       PFLAG = 0
       IFV=0
@@ -313,16 +306,15 @@ C
 
 
 
-Chd|====================================================================
-Chd|  APPLYSORT2FVM                 source/airbag/fvmesh0.F       
-Chd|-- called by -----------
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|-- calls ---------------
-Chd|        FVBAG_MOD                     share/modules1/fvbag_mod.F    
-Chd|        FVMBAG_MESHCONTROL_MOD        ../common_source/modules/airbag/fvmbag_meshcontrol_mod.F
-Chd|        MONVOL_STRUCT_MOD             share/modules1/monvol_struct_mod.F
-Chd|        REORDER_MOD                   share/modules1/reorder_mod.F  
-Chd|====================================================================
+      !||====================================================================
+      !||    applysort2fvm            ../starter/source/airbag/fvmesh0.F
+      !||--- called by ------------------------------------------------------
+      !||    lectur                   ../starter/source/starter/lectur.F
+      !||--- uses       -----------------------------------------------------
+      !||    fvbag_mod                ../starter/share/modules1/fvbag_mod.F
+      !||    monvol_struct_mod        ../starter/share/modules1/monvol_struct_mod.F
+      !||    reorder_mod              ../starter/share/modules1/reorder_mod.F
+      !||====================================================================
       SUBROUTINE APPLYSORT2FVM(T_MONVOL, IXS    , IXC,   IXTG,
      1                         ITAB  , NOM_OPT, NB_NODE)
 C Description: Apply renumbering to FVMBAGS (ELTG et TBA) 

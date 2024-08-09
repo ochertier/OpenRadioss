@@ -21,13 +21,13 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C
-Chd|====================================================================
-Chd|  I22STI3                       source/interfaces/inter3d1/i22sti3.F
-Chd|-- called by -----------
-Chd|        ININT3                        source/interfaces/inter3d1/inint3.F
-Chd|-- calls ---------------
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    i22sti3                ../starter/source/interfaces/inter3d1/i22sti3.F
+      !||--- called by ------------------------------------------------------
+      !||    inint3                 ../starter/source/interfaces/inter3d1/inint3.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE I22STI3(
      1 X     ,IRECT ,STF   ,IXS   ,PM    ,
      2 GEO   ,NRT   ,IXC   ,NINT  ,STFAC ,
@@ -43,6 +43,7 @@ Chd|====================================================================
      E IXR    ,ITAB,BGAPSMX ,IXS10  ,IXS16   ,IXS20    ,
      F ID,TITR,IGEO , PM_STACK , IWORKSH)
       USE MESSAGE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -76,8 +77,7 @@ C     REAL
      .   AREAS(*),THK(*),THK_PART(*),
      .   GAP_S_L(*),GAP_M_L(*),PM_STACK(20,*)
       INTEGER ID
-      CHARACTER*nchartitle,
-     .   TITR
+      CHARACTER(LEN=NCHARTITLE) :: TITR
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

@@ -20,17 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  I20PWR3AE                     source/interfaces/inter3d1/i20pwr3.F
-Chd|-- called by -----------
-Chd|        I20INI3                       source/interfaces/inter3d1/i20ini3.F
-Chd|-- calls ---------------
-Chd|====================================================================
+      !||====================================================================
+      !||    i20pwr3ae    ../starter/source/interfaces/inter3d1/i20pwr3.F
+      !||--- called by ------------------------------------------------------
+      !||    i20ini3      ../starter/source/interfaces/inter3d1/i20ini3.F
+      !||--- uses       -----------------------------------------------------
+      !||    format_mod   ../starter/share/modules1/format_mod.F90
+      !||====================================================================
       SUBROUTINE I20PWR3AE(ITAB  ,INACTI,CAND_M,CAND_S,
      2                   STFS  ,STFM  ,XANEW ,NSV   ,IWPENE,
      3                   N1    ,N2    ,M1    ,M2    ,NX    ,
      4                   NY    ,NZ    ,GAPV  ,GAP_S ,GAP_M ,
      5                   IGAP  ,X     ,FPENMAX)
+       USE FORMAT_MOD , ONLY : FMW_4I, FMW_I_3F, FMW_5I
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -45,12 +47,9 @@ C-----------------------------------------------
       INTEGER ITAB(*),CAND_M(*),CAND_S(*),INACTI,IGAP  ,
      4        N1(*) ,N2(*) ,M1(*) ,M2(*)        
       INTEGER NSV(*),IWPENE
-C     REAL
-      my_real
-     .   FPENMAX
-      my_real
-     .   STFS(*),STFM(*),XANEW(3,*),X(3,*),GAP_S(*) ,GAP_M(*),
-     .   NX(MVSIZ), NY(MVSIZ), NZ(MVSIZ),GAPV(*)
+      my_real FPENMAX
+      my_real STFS(*),STFM(*),XANEW(3,*),X(3,*),GAP_S(*) ,GAP_M(*),
+     .        NX(MVSIZ), NY(MVSIZ), NZ(MVSIZ),GAPV(*)
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -157,14 +156,16 @@ C
      . ' POSSIBLE NEW COORDINATES OF SECONDARY NODES')
       RETURN
       END
-Chd|====================================================================
-Chd|  I20PWR3A                      source/interfaces/inter3d1/i20pwr3.F
-Chd|-- called by -----------
-Chd|        I20INI3                       source/interfaces/inter3d1/i20ini3.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    i20pwr3a               ../starter/source/interfaces/inter3d1/i20pwr3.F
+      !||--- called by ------------------------------------------------------
+      !||    i20ini3                ../starter/source/interfaces/inter3d1/i20ini3.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||--- uses       -----------------------------------------------------
+      !||    format_mod             ../starter/share/modules1/format_mod.F90
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE I20PWR3A(ITAB,INACTI,CAND_E,CAND_N,STFN,
      1                  STF ,XANEW   ,NSV   ,IWPENE,IWRN ,
      2                  CAND_EN,CAND_NN,TAG,NOINT,GAPV ,NTY,
@@ -175,6 +176,8 @@ Chd|====================================================================
      7                  Z4 ,XI ,YI ,ZI ,N1,
      8                  N2 ,N3 ,PENE,NSVG)
       USE MESSAGE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      USE FORMAT_MOD , ONLY : FMW_5I, FMW_I_3F
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -188,14 +191,10 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER ITAB(*),CAND_E(*),CAND_N(*),CAND_EN(*),CAND_NN(*)
       INTEGER NSV(*),TAG(*),IWPENE,INACTI,NOINT,NTY,ITIED,IWRN
-C     REAL
-      my_real
-     .   FPENMAX
-      my_real
-     .   STF(*),STFN(*),XANEW(3,*),GAPV(*)
+      my_real FPENMAX
+      my_real STF(*),STFN(*),XANEW(3,*),GAPV(*)
       INTEGER ID
-      CHARACTER*nchartitle,
-     .   TITR
+      CHARACTER(LEN=NCHARTITLE) :: TITR
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -394,14 +393,16 @@ C
      . ' IMPOSSIBLE TO CALCULATE NEW COORDINATES OF SECONDARY NODE',I8)
       RETURN
       END
-Chd|====================================================================
-Chd|  I20PWR3                       source/interfaces/inter3d1/i20pwr3.F
-Chd|-- called by -----------
-Chd|        I20INI3                       source/interfaces/inter3d1/i20ini3.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    i20pwr3                ../starter/source/interfaces/inter3d1/i20pwr3.F
+      !||--- called by ------------------------------------------------------
+      !||    i20ini3                ../starter/source/interfaces/inter3d1/i20ini3.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||--- uses       -----------------------------------------------------
+      !||    format_mod             ../starter/share/modules1/format_mod.F90
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE I20PWR3(ITAB,INACTI,CAND_E,CAND_N,STFN ,
      1                   STF ,X     ,NSV   ,IWPENE,IWRN ,
      2                   CAND_EN,CAND_NN,TAG,NOINT,GAPV ,
@@ -409,7 +410,12 @@ Chd|====================================================================
      4                   IGAP,ID ,TITR,IX1,IX2,
      5                   IX3 ,IX4,N1  ,N2 ,N3 ,
      6                   PENE,NSVG)
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
       USE MESSAGE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      USE FORMAT_MOD , ONLY : FMW_5I, FMW_4I, FMW_I_3F
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -429,25 +435,18 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER ITAB(*),CAND_E(*),CAND_N(*),CAND_EN(*),CAND_NN(*)
-      INTEGER NSV(*),TAG(*),IWPENE,INACTI,NOINT,NTY,ITIED,IWRN,
-     .        IGAP
-C     REAL
-      my_real
-     .   STF(*),STFN(*),X(3,*),GAPV(*),PENIS(2,*) ,PENIM(2,*),GAP_S(*)
+      INTEGER NSV(*),TAG(*),IWPENE,INACTI,NOINT,NTY,ITIED,IWRN,IGAP
+      my_real STF(*),STFN(*),X(3,*),GAPV(*),PENIS(2,*) ,PENIM(2,*),GAP_S(*)
       INTEGER ID
-      CHARACTER*nchartitle,
-     .   TITR
+      CHARACTER(LEN=NCHARTITLE) :: TITR
       INTEGER, DIMENSION(MVSIZ), INTENT(IN) :: IX1,IX2,IX3,IX4,NSVG
       my_real, DIMENSION(MVSIZ), INTENT(INOUT) :: N1,N2,N3,PENE
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,IS,IM,JWARN
-C     REAL
-      my_real
-     .   PENEOLD,PPLUS,AAA
-      my_real
-     .  DN
+      my_real PENEOLD,PPLUS,AAA
+      my_real DN
 C-----------------------------------------------
       JWARN = 0
         DO 100 I=LFT,LLT
@@ -541,17 +540,19 @@ C
      . ' IMPOSSIBLE TO CALCULATE NEW COORDINATES OF SECONDARY NODE',I8)
       RETURN
       END
-Chd|====================================================================
-Chd|  I20PWR3E                      source/interfaces/inter3d1/i20pwr3.F
-Chd|-- called by -----------
-Chd|        I20INI3                       source/interfaces/inter3d1/i20ini3.F
-Chd|-- calls ---------------
-Chd|====================================================================
+      !||====================================================================
+      !||    i20pwr3e     ../starter/source/interfaces/inter3d1/i20pwr3.F
+      !||--- called by ------------------------------------------------------
+      !||    i20ini3      ../starter/source/interfaces/inter3d1/i20ini3.F
+      !||--- uses       -----------------------------------------------------
+      !||    format_mod   ../starter/share/modules1/format_mod.F90
+      !||====================================================================
       SUBROUTINE I20PWR3E(ITAB  ,INACTI,CAND_M,CAND_S,
      2                   STFS  ,STFM  ,X     ,NSV   ,IWPENE,
      3                   N1    ,N2    ,M1    ,M2    ,NX    ,
      4                   NY    ,NZ    ,GAPV  ,GAP_S ,GAP_M ,
      5                   PENIS ,PENIM ,IGAP  )
+        USE FORMAT_MOD , ONLY : FMW_4I, FMW_I_3F
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -563,13 +564,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER ITAB(*),CAND_M(*),CAND_S(*),INACTI,IGAP  ,
-     4        N1(*) ,N2(*) ,M1(*) ,M2(*)        
+      INTEGER ITAB(*),CAND_M(*),CAND_S(*),INACTI,IGAP  ,N1(*) ,N2(*) ,M1(*) ,M2(*)
       INTEGER NSV(*),IWPENE
-C     REAL
-      my_real
-     .   STFS(*),STFM(*),X(3,*),GAP_S(*) ,GAP_M(*),PENIS(2,*) , 
-     .   PENIM(2,*),NX(MVSIZ), NY(MVSIZ), NZ(MVSIZ),GAPV(*)
+      my_real STFS(*),STFM(*),X(3,*),GAP_S(*) ,GAP_M(*),PENIS(2,*) , PENIM(2,*),NX(MVSIZ), NY(MVSIZ), NZ(MVSIZ),GAPV(*)
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------

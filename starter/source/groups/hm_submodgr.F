@@ -20,17 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  HM_SUBMODGRN                  source/groups/hm_submodgr.F   
-Chd|-- called by -----------
-Chd|        HM_LECGRN                     source/groups/hm_lecgrn.F     
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        GROUPS_GET_ELEM_LIST          source/groups/groups_get_elem_list.F
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_submodgrn           ../starter/source/groups/hm_submodgr.F
+      !||--- called by ------------------------------------------------------
+      !||    hm_lecgrn              ../starter/source/groups/hm_lecgrn.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    groups_get_elem_list   ../starter/source/groups/groups_get_elem_list.F
+      !||    usr2sys                ../starter/source/system/sysfus.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE HM_SUBMODGRN(
      .           ITAB   ,ITABM1    ,ISUBMOD  ,SID     ,
      .           NNOD   ,MESS      ,FLAG     ,TITR    ,
@@ -41,6 +42,7 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE SUBMODEL_MOD
       USE GROUPDEF_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARLINE, NCHARFIELD, NCHARKEY
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -55,8 +57,7 @@ C-----------------------------------------------
       INTEGER  ITAB(*),ITABM1(*),ISUBMOD(*)
       INTEGER  SID,NNOD,FLAG,NN
       CHARACTER MESS(*)
-      CHARACTER*nchartitle,
-     .   TITR,TITR1
+      CHARACTER(LEN=NCHARTITLE) :: TITR,TITR1
       TYPE(SUBMODEL_DATA) LSUBMODEL(*)
 C-----------------------------------------------
       TYPE (GROUP_),TARGET  :: IGRNOD
@@ -66,7 +67,9 @@ C-----------------------------------------------
       INTEGER I,J,K,ISU,IDNOD,INUM,JREC,NTAG,CTAG,CUR_SUBMOD,ISELECT,IOK,
      .        ID,IDU,NBNODES,NENTITY,KK,JJ,NBCNODES
       INTEGER  TAGS(0:NSUBMOD),J10(10)
-      CHARACTER KEY*ncharkey,CART*ncharline,VERS_IN*ncharfield
+      CHARACTER(LEN=NCHARKEY) ::  KEY
+      CHARACTER(LEN=NCHARLINE) :: CART
+      CHARACTER(LEN=NCHARFIELD) ::VERS_IN
       INTEGER,DIMENSION(:),ALLOCATABLE :: LIST_ENTITY
       INTEGER, DIMENSION(:), ALLOCATABLE :: TAGNODSUB
       LOGICAL IS_AVAILABLE
@@ -158,17 +161,17 @@ C-------------------------------------
 C-------------------------
       RETURN
       END
-Chd|====================================================================
-Chd|  HM_SUBMODGRE                  source/groups/hm_submodgr.F   
-Chd|-- called by -----------
-Chd|        HM_LECGRE                     source/groups/hm_lecgre.F     
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        GROUPS_GET_ELEM_LIST          source/groups/groups_get_elem_list.F
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_submodgre           ../starter/source/groups/hm_submodgr.F
+      !||--- called by ------------------------------------------------------
+      !||    hm_lecgre              ../starter/source/groups/hm_lecgre.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    groups_get_elem_list   ../starter/source/groups/groups_get_elem_list.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE HM_SUBMODGRE(
      .           ISUBMOD  ,IX      ,NIX      ,SID      ,
      .           NEL      ,NUMEL   ,IELT     ,MESS     ,
@@ -180,6 +183,7 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE SUBMODEL_MOD
       USE GROUPDEF_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARFIELD, NCHARLINE, NCHARKEY
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -194,8 +198,7 @@ C-----------------------------------------------
       INTEGER  NIX,SID,NEL,NUMEL,IELT,FLAG,NN,IGS
       INTEGER  ISUBMOD(*),IX(NIX,*)
       CHARACTER MESS(*)
-      CHARACTER*nchartitle,
-     .   TITR,TITR1
+      CHARACTER(LEN=NCHARTITLE) :: TITR,TITR1
       TYPE(SUBMODEL_DATA) LSUBMODEL(NSUBMOD)
 C-----------------------------------------------
       TYPE (GROUP_) IGRELEM(*)
@@ -204,7 +207,9 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,J,K,ISU,IDEL,INUM,TAG,CUR_SUBMOD,ISELECT,IOK, ID,IDU,ELEMTYPE,KK,JJ
       INTEGER  TAGS(0:NSUBMOD)
-      CHARACTER KEY*ncharkey,CART*ncharline,VERS_IN*ncharfield
+      CHARACTER(LEN=NCHARKEY) :: KEY
+      CHARACTER(LEN=NCHARLINE) ::CART
+      CHARACTER(LEN=NCHARFIELD) ::VERS_IN
       INTEGER, DIMENSION(:), ALLOCATABLE :: TAGELEMSUB
       LOGICAL IS_AVAILABLE, IS_ENCRYPTED
       INTEGER,DIMENSION(:),ALLOCATABLE :: LIST_ELEM

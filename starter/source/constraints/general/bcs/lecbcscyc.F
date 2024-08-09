@@ -20,22 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  HM_PREREAD_BCSCYC             source/constraints/general/bcs/lecbcscyc.F
-Chd|-- called by -----------
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        FRETITL                       source/starter/freform.F      
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        HM_OPTION_READ_KEY            source/devtools/hm_reader/hm_option_read_key.F
-Chd|        HM_OPTION_START               source/devtools/hm_reader/hm_option_start.F
-Chd|        NGR2USR                       source/system/nintrr.F        
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_preread_bcscyc      ../starter/source/constraints/general/bcs/lecbcscyc.F
+      !||--- called by ------------------------------------------------------
+      !||    lectur                 ../starter/source/starter/lectur.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    fretitl                ../starter/source/starter/freform.F
+      !||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
+      !||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
+      !||    ngr2usr                ../starter/source/system/nintrr.F
+      !||--- uses       -----------------------------------------------------
+      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE HM_PREREAD_BCSCYC(IGRNOD  ,NOM_OPT ,LSUBMODEL,NBCSCYNN)
 C-----------------------------------------------
 C   M o d u l e s
@@ -44,6 +44,7 @@ C-----------------------------------------------
       USE GROUPDEF_MOD    
       USE SUBMODEL_MOD        
       USE HM_OPTION_READ_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARKEY
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -65,7 +66,8 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,IGR1,IGR2,IGRS1,IGRS2,NBCS_CY_N,ID,SUB_INDEX
-      CHARACTER KEY*ncharkey,TITR*nchartitle
+      CHARACTER(LEN=NCHARKEY) :: KEY
+      CHARACTER(LEN=NCHARTITLE) :: TITR
       LOGICAL IS_AVAILABLE
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
@@ -123,15 +125,16 @@ c
 C
       RETURN
       END
-Chd|====================================================================
-Chd|  INI_BCSCYC                    source/constraints/general/bcs/lecbcscyc.F
-Chd|-- called by -----------
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        INIBCS_CY                     source/constraints/general/bcs/lecbcscyc.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    ini_bcscyc    ../starter/source/constraints/general/bcs/lecbcscyc.F
+      !||--- called by ------------------------------------------------------
+      !||    lectur        ../starter/source/starter/lectur.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg        ../starter/source/output/message/message.F
+      !||    inibcs_cy     ../starter/source/constraints/general/bcs/lecbcscyc.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod   ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE INI_BCSCYC(IBCSCYC,LBCSCYC,SKEW,X,ITAB,ICODE,IBFV,ITAGCYC)
 C-----------------------------------------------
 C   M o d u l e s
@@ -244,16 +247,16 @@ C------ok for NF1=0,NF2=0; NF1=NF2=ISK
 C
       RETURN
       END SUBROUTINE INI_BCSCYC
-Chd|====================================================================
-Chd|  INIBCS_CY                     source/constraints/general/bcs/lecbcscyc.F
-Chd|-- called by -----------
-Chd|        INI_BCSCYC                    source/constraints/general/bcs/lecbcscyc.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        CAR2CYLIN                     source/constraints/general/bcs/lecbcscyc.F
-Chd|        MYQSORT                       ../common_source/tools/sort/myqsort.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    inibcs_cy     ../starter/source/constraints/general/bcs/lecbcscyc.F
+      !||--- called by ------------------------------------------------------
+      !||    ini_bcscyc    ../starter/source/constraints/general/bcs/lecbcscyc.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg        ../starter/source/output/message/message.F
+      !||    car2cylin     ../starter/source/constraints/general/bcs/lecbcscyc.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod   ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE INIBCS_CY(NBCY_N,IXCYCL,ISK,SKEW,X  ,ITAB,ID)
 C-----------------------------------------------
 C   M o d u l e s
@@ -351,12 +354,11 @@ C------sorting by dis
 C
       RETURN
       END SUBROUTINE INIBCS_CY
-Chd|====================================================================
-Chd|  CAR2CYLIN                     source/constraints/general/bcs/lecbcscyc.F
-Chd|-- called by -----------
-Chd|        INIBCS_CY                     source/constraints/general/bcs/lecbcscyc.F
-Chd|-- calls ---------------
-Chd|====================================================================
+      !||====================================================================
+      !||    car2cylin   ../starter/source/constraints/general/bcs/lecbcscyc.F
+      !||--- called by ------------------------------------------------------
+      !||    inibcs_cy   ../starter/source/constraints/general/bcs/lecbcscyc.F
+      !||====================================================================
       SUBROUTINE CAR2CYLIN(NBCY_N,IX,X,CY_X,DIS,SKEW,XYZ0,TOL,IER)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -411,20 +413,23 @@ C--- numeric
 C
       RETURN
       END SUBROUTINE CAR2CYLIN
-Chd|====================================================================
-Chd|  INT2CY_CHK                    source/constraints/general/bcs/lecbcscyc.F
-Chd|-- called by -----------
-Chd|        ININTR2                       source/interfaces/inter3d1/inintr2.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    int2cy_chk             ../starter/source/constraints/general/bcs/lecbcscyc.F
+      !||--- called by ------------------------------------------------------
+      !||    inintr2                ../starter/source/interfaces/inter3d1/inintr2.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    intab                  ../starter/source/interfaces/inter3d1/i24tools.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE INT2CY_CHK(IPARI,INTBUF_TAB,ITAGCYC,ITAB)
 C-----------------------------------------------
 C   M o d u l e s
 C----------------------------------------------- 
       USE MESSAGE_MOD
-      USE INTBUFDEF_MOD 
+      USE INTBUFDEF_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -449,7 +454,7 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,J,N,NTY,NSN,NMN,ISL,NKIN,NOINT,IMODI,II,N1,N2,ND
       INTEGER K,ILEV,NUVAR,IDEL7N,INTTH,IPR,IML,ICOM
-      CHARACTER*nchartitle, TITR
+      CHARACTER(LEN=NCHARTITLE) :: TITR
       LOGICAL IS1,IS2,ISD
 C=======================================================================
        DO N=1,NINTER

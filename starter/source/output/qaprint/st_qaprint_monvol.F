@@ -20,19 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  ST_QAPRINT_MONVOL             source/output/qaprint/st_qaprint_monvol.F
-Chd|-- called by -----------
-Chd|        ST_QAPRINT_DRIVER             source/output/qaprint/st_qaprint_driver.F
-Chd|-- calls ---------------
-Chd|        MONVOL_STRUCT_MOD             share/modules1/monvol_struct_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    st_qaprint_monvol      ../starter/source/output/qaprint/st_qaprint_monvol.F
+      !||--- called by ------------------------------------------------------
+      !||    st_qaprint_driver      ../starter/source/output/qaprint/st_qaprint_driver.F
+      !||--- calls      -----------------------------------------------------
+      !||--- uses       -----------------------------------------------------
+      !||    monvol_struct_mod      ../starter/share/modules1/monvol_struct_mod.F
+      !||====================================================================
       SUBROUTINE ST_QAPRINT_MONVOL(T_MONVOL, T_MONVOL_METADATA)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE QA_OUT_MOD
       USE MONVOL_STRUCT_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -44,8 +46,6 @@ C-----------------------------------------------
 #include "com04_c.inc"
 !     NIMV
 #include "param_c.inc"
-!     nchartitle
-#include "nchar_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

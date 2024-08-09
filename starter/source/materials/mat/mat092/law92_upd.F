@@ -20,16 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  LAW92_UPD                     source/materials/mat/mat092/law92_upd.F
-Chd|-- called by -----------
-Chd|        UPDMAT                        source/materials/updmat.F     
-Chd|-- calls ---------------
-Chd|        HM_OPTION_IS_ENCRYPTED        source/devtools/hm_reader/hm_option_is_encrypted.F
-Chd|        LAW92_NLSQF                   source/materials/mat/mat092/law92_nlsqf.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        TABLE_MOD                     share/modules1/table_mod.F    
-Chd|====================================================================
+      !||====================================================================
+      !||    law92_upd                ../starter/source/materials/mat/mat092/law92_upd.F
+      !||--- called by ------------------------------------------------------
+      !||    updmat                   ../starter/source/materials/updmat.F
+      !||--- calls      -----------------------------------------------------
+      !||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+      !||    law92_nlsqf              ../starter/source/materials/mat/mat092/law92_nlsqf.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod              ../starter/share/message_module/message_mod.F
+      !||    table_mod                ../starter/share/modules1/table_mod.F
+      !||====================================================================
       SUBROUTINE LAW92_UPD(IOUT,TITR    ,MAT_ID,UPARAM,NFUNC,NFUNCT,
      .                      IFUNC, FUNC_ID,NPC   ,PLD   ,PM,IPM)
 C-----------------------------------------------
@@ -37,6 +38,7 @@ C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
       USE TABLE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -49,7 +51,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      CHARACTER*nchartitle  :: TITR
+      CHARACTER(LEN=NCHARTITLE)  :: TITR
       INTEGER MAT_ID,IOUT
       INTEGER ,INTENT(IN) :: NFUNC
       INTEGER ,INTENT(IN) :: NFUNCT

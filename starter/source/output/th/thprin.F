@@ -20,16 +20,28 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  THPRIN                        source/output/th/thprin.F     
-Chd|-- called by -----------
-Chd|        HM_READ_THGROU                source/output/th/hm_read_thgrou.F
-Chd|-- calls ---------------
-Chd|        FRETITL2                      source/starter/freform.F      
-Chd|====================================================================
+      !||====================================================================
+      !||    thprin                 ../starter/source/output/th/thprin.F
+      !||--- called by ------------------------------------------------------
+      !||    hm_read_thgrou         ../starter/source/output/th/hm_read_thgrou.F
+      !||--- calls      -----------------------------------------------------
+      !||    fretitl2               ../starter/source/starter/freform.F
+      !||    nintrn                 ../starter/source/system/nintrn.F
+      !||    ulist2s                ../starter/source/system/sysfus.F
+      !||    usr2sys                ../starter/source/system/sysfus.F
+      !||--- uses       -----------------------------------------------------
+      !||====================================================================
       SUBROUTINE THPRIN(
      1      KEY    ,IPASU  ,NPASU ,NID   ,
      2      NVPS  ,ITHBUF ,VARE   ,NUM   )
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
+        USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
+        USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -52,7 +64,8 @@ C-----------------------------------------------
       INTEGER J,JJ, I,ISU,ID,NNE,NOSYS,J10(10),NTOT,KK,IER,
      .        OK,IGS,IGRS,NSU,K,L,JREC,CONT,IAD0,IADV,NTRI,NL,
      .        IFITMP,IADFIN,NVAR,M,N,IAD2,IAD1,ISK,IPROC
-      CHARACTER TITR*nchartitle,MESS*40
+      CHARACTER(LEN=NCHARTITLE) :: TITR
+      CHARACTER MESS*40
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
@@ -84,18 +97,22 @@ C
 C
       RETURN
       END
-Chd|====================================================================
-Chd|  THPRIN_SUB                    source/output/th/thprin.F     
-Chd|-- called by -----------
-Chd|        HM_READ_THGROU                source/output/th/hm_read_thgrou.F
-Chd|-- calls ---------------
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    thprin_sub             ../starter/source/output/th/thprin.F
+      !||--- called by ------------------------------------------------------
+      !||    hm_read_thgrou         ../starter/source/output/th/hm_read_thgrou.F
+      !||--- calls      -----------------------------------------------------
+      !||    nintrn                 ../starter/source/system/nintrn.F
+      !||    ulist2s                ../starter/source/system/sysfus.F
+      !||    usr2sys                ../starter/source/system/sysfus.F
+      !||--- uses       -----------------------------------------------------
+      !||====================================================================
       SUBROUTINE THPRIN_SUB(
      1      KEY    ,SUBSET ,ITHFLAG ,NID   ,
      2      NVPS   ,ITHBUF ,VARE    ,NUM   )
 C-----------------------------------------------
       USE GROUPDEF_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -120,7 +137,8 @@ C-----------------------------------------------
       INTEGER J,JJ, I,ISU,ID,NNE,NOSYS,J10(10),NTOT,KK,IER,
      .        OK,IGS,IGRS,NSU,K,L,JREC,CONT,IAD0,IADV,NTRI,NL,
      .        IFITMP,IADFIN,NVAR,M,N,IAD2,IAD1,ISK,IPROC
-      CHARACTER TITR*nchartitle,MESS*40
+      CHARACTER(LEN=NCHARTITLE) :: TITR
+      CHARACTER :: MESS*40
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------

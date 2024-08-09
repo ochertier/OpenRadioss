@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  SIGEPS02C                     source/materials/mat/mat002/sigeps02c.F
-Chd|-- called by -----------
-Chd|        MULAWC                        source/materials/mat_share/mulawc.F
-Chd|-- calls ---------------
-Chd|        M2CPLR                        source/materials/mat/mat002/m2cplr.F
-Chd|====================================================================
+      !||====================================================================
+      !||    sigeps02c   ../engine/source/materials/mat/mat002/sigeps02c.F
+      !||--- called by ------------------------------------------------------
+      !||    mulawc      ../engine/source/materials/mat_share/mulawc.F
+      !||--- calls      -----------------------------------------------------
+      !||    m2cplr      ../engine/source/materials/mat/mat002/m2cplr.F
+      !||====================================================================
       SUBROUTINE SIGEPS02C(
      1                  JFT      ,JLT      ,PM       ,EINT     ,THK      ,
      2                  OFF      ,SIGY     ,DT1C     ,IPLA     ,NEL      ,
@@ -39,7 +39,7 @@ Chd|====================================================================
      9                  DEPSXX   ,DEPSYY   ,DEPSXY   ,DEPSYZ   ,DEPSZX   ,
      A                  EPSPXX   ,EPSPYY  ,EPSPXY   ,EPSPYZ    ,EPSPZX   ,
      B                  SIGBAKXX ,SIGBAKYY ,SIGBAKXY ,INLOC    ,DPLANL   ,
-     C                  VP       ,NUVAR    ,UVAR     ,ASRATE)
+     C                  VP       ,NUVAR    ,UVAR     ,ASRATE   ,LOFF     )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -61,6 +61,7 @@ C-----------------------------------------------
       my_real ,DIMENSION(NEL,NUVAR)   ,INTENT(INOUT) :: UVAR
       my_real ,DIMENSION(NEL),INTENT(IN) :: EPSPXX   ,EPSPYY  ,EPSPXY   ,EPSPYZ    ,EPSPZX
       my_real ,INTENT(IN) :: ASRATE
+      my_real, DIMENSION(NEL), INTENT(IN) :: LOFF
 !---
 C     REAL
       my_real
@@ -216,8 +217,10 @@ c------------------------------------
 c------------------------------------            
       DO I=JFT,JLT
         IF (INLOC > 0) THEN
-          EZZ(I) = -NU*(SIGNXX(I)-SIGOXX(I)+SIGNYY(I)-SIGOYY(I))/YOUNG
-          EZZ(I) = EZZ(I) - MAX(DPLANL(I),ZERO)*HALF*(SIGNXX(I)+SIGNYY(I))/YLD(I)
+          IF (LOFF(I) == ONE) THEN 
+            EZZ(I) = -NU*(SIGNXX(I)-SIGOXX(I)+SIGNYY(I)-SIGOYY(I))/YOUNG
+            EZZ(I) = EZZ(I) - MAX(DPLANL(I),ZERO)*HALF*(SIGNXX(I)+SIGNYY(I))/YLD(I)
+          ENDIF
         ELSE
           EZZ(I) = -(DEPSXX(I)+DEPSYY(I))*NU-(ONE - TWO*NU)*EZZ(I)
           EZZ(I) = EZZ(I)/(ONE-NU)

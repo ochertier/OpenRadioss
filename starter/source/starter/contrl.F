@@ -20,72 +20,64 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  CONTRL                        source/starter/contrl.F       
-Chd|-- called by -----------
-Chd|        STARTER0                      source/starter/starter0.F     
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        ARRET                         source/system/arret.F         
-Chd|        CONTRBE2                      source/constraints/general/rbe2/hm_read_rbe2.F
-Chd|        CONTRBE3                      source/constraints/general/rbe3/contrbe3.F
-Chd|        FIND_DT1BRICK_ENGINE          source/starter/contrl.F       
-Chd|        FMT_DEF                       source/starter/fmt_def.F      
-Chd|        FREERR                        source/starter/freform.F      
-Chd|        HM_ELEM_COUNT                 source/devtools/hm_reader/hm_elem_count.F
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        HM_GET_STRING                 source/devtools/hm_reader/hm_get_string.F
-Chd|        HM_OPTION_COUNT               source/devtools/hm_reader/hm_option_count.F
-Chd|        HM_OPTION_NEXT                source/devtools/hm_reader/hm_option_next.F
-Chd|        HM_OPTION_READ_KEY            source/devtools/hm_reader/hm_option_read_key.F
-Chd|        HM_OPTION_START               source/devtools/hm_reader/hm_option_start.F
-Chd|        HM_PRELCE16S                  source/elements/reader/hm_read_solid.F
-Chd|        HM_PREREAD_NODE               source/elements/reader/hm_preread_node.F
-Chd|        HM_PREREAD_PART               source/model/assembling/hm_read_part.F
-Chd|        HM_PREREAD_PROPERTIES         source/properties/hm_preread_properties.F
-Chd|        HM_READ_ALE_GRID              source/general_controls/ale_grid/hm_read_ale_grid.F
-Chd|        HM_READ_ALE_MUSCL             source/general_controls/ale_cfd/hm_read_ale_muscl.F
-Chd|        HM_READ_ALE_SOLVER            source/general_controls/ale_cfd/hm_read_ale_solver.F
-Chd|        HM_READ_ANALY                 source/general_controls/computation/hm_read_analy.F
-Chd|        HM_READ_CAA                   source/general_controls/computation/hm_read_caa.F
-Chd|        HM_READ_DEFINTER              source/general_controls/default_values/hm_read_definter.F
-Chd|        HM_READ_DEFSHELL              source/general_controls/default_values/hm_read_defshell.F
-Chd|        HM_READ_DEFSOLID              source/general_controls/default_values/hm_read_defsolid.F
-Chd|        HM_READ_IMPLICIT              source/general_controls/computation/hm_read_implicit.F
-Chd|        HM_READ_INISTA                source/initial_conditions/inista/hm_read_inista.F
-Chd|        HM_READ_IOFLAG                source/general_controls/inputoutput/hm_read_ioflag.F
-Chd|        HM_READ_LAGMUL                source/tools/lagmul/hm_read_lagmul.F
-Chd|        HM_READ_REFSTA                source/loads/reference_state/refsta/hm_read_refsta.F
-Chd|        HM_READ_SMS                   source/general_controls/computation/hm_read_sms.F
-Chd|        HM_READ_SPHGLO                source/general_controls/computation/hm_read_sphglo.F
-Chd|        HM_READ_SPMD                  source/general_controls/computation/hm_read_spmd.F
-Chd|        HM_READ_UNIT                  source/general_controls/computation/hm_read_unit.F
-Chd|        HM_READ_UPWIND                source/general_controls/computation/hm_read_upwind.F
-Chd|        NBADIGEMESH                   source/elements/ige3d/nbadigemesh.F
-Chd|        NBADMESH                      source/model/remesh/nbadmesh.F
-Chd|        NBSPH                         source/elements/sph/nbsph.F   
-Chd|        ID                            source/boundary_conditions/ebcs/hm_read_ebcs_inlet.F
-Chd|        ALEFVM_MOD                    ../common_source/modules/ale/alefvm_mod.F
-Chd|        ALEMUSCL_MOD                  ../common_source/modules/ale/alemuscl_mod.F
-Chd|        ALE_EBCS_MOD                  ../common_source/modules/ale/ale_ebcs_mod.F
-Chd|        ALE_MOD                       ../common_source/modules/ale/ale_mod.F
-Chd|        ANIM_MOD                      ../common_source/modules/output/anim_mod.F
-Chd|        CHECK_MOD                     ../common_source/modules/check_mod.F
-Chd|        DETONATORS_MOD                share/modules1/detonators_mod.F
-Chd|        GRP_SIZE_MOD                  share/modules1/grp_size_mod.F 
-Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        INIVOL_DEF_MOD                share/modules1/inivol_mod.F   
-Chd|        INOUTFILE_MOD                 ../common_source/modules/inoutfile_mod.F
-Chd|        MAT_ELEM_MOD                  ../common_source/modules/mat_elem/mat_elem_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
-Chd|        PINCHTYPE_MOD                 ../common_source/modules/pinchtype_mod.F
-Chd|        REFSTA_MOD                    share/modules1/refsta_mod.F   
-Chd|        RESTMOD                       share/modules1/restart_mod.F  
-Chd|        SETDEF_MOD                    ../common_source/modules/setdef_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|        USER_WINDOWS_MOD              ../common_source/modules/user_windows_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    contrl                     ../starter/source/starter/contrl.F
+      !||--- called by ------------------------------------------------------
+      !||    starter0                   ../starter/source/starter/starter0.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                     ../starter/source/output/message/message.F
+      !||    arret                      ../starter/source/system/arret.F
+      !||    ascii_encoding_mu_letter   ../starter/source/starter/ascii_encoding_mu_letter.F90
+      !||    contrbe2                   ../starter/source/constraints/general/rbe2/hm_read_rbe2.F
+      !||    contrbe3                   ../starter/source/constraints/general/rbe3/contrbe3.F
+      !||    find_dt1brick_engine       ../starter/source/starter/contrl.F
+      !||    hm_elem_count              ../starter/source/devtools/hm_reader/hm_elem_count.F
+      !||    hm_get_intv                ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    hm_get_string              ../starter/source/devtools/hm_reader/hm_get_string.F
+      !||    hm_option_count            ../starter/source/devtools/hm_reader/hm_option_count.F
+      !||    hm_option_next             ../starter/source/devtools/hm_reader/hm_option_next.F
+      !||    hm_option_read_key         ../starter/source/devtools/hm_reader/hm_option_read_key.F
+      !||    hm_option_start            ../starter/source/devtools/hm_reader/hm_option_start.F
+      !||    hm_prelce16s               ../starter/source/elements/reader/hm_read_solid.F
+      !||    hm_preread_node            ../starter/source/elements/reader/hm_preread_node.F
+      !||    hm_preread_part            ../starter/source/model/assembling/hm_read_part.F
+      !||    hm_preread_properties      ../starter/source/properties/hm_preread_properties.F
+      !||    hm_read_ale_grid           ../starter/source/general_controls/ale_grid/hm_read_ale_grid.F
+      !||    hm_read_ale_muscl          ../starter/source/general_controls/ale_cfd/hm_read_ale_muscl.F
+      !||    hm_read_ale_solver         ../starter/source/general_controls/ale_cfd/hm_read_ale_solver.F
+      !||    hm_read_analy              ../starter/source/general_controls/computation/hm_read_analy.F
+      !||    hm_read_caa                ../starter/source/general_controls/computation/hm_read_caa.F
+      !||    hm_read_definter           ../starter/source/general_controls/default_values/hm_read_definter.F
+      !||    hm_read_defshell           ../starter/source/general_controls/default_values/hm_read_defshell.F
+      !||    hm_read_defsolid           ../starter/source/general_controls/default_values/hm_read_defsolid.F
+      !||    hm_read_implicit           ../starter/source/general_controls/computation/hm_read_implicit.F
+      !||    hm_read_inista             ../starter/source/initial_conditions/inista/hm_read_inista.F
+      !||    hm_read_ioflag             ../starter/source/general_controls/inputoutput/hm_read_ioflag.F
+      !||    hm_read_lagmul             ../starter/source/tools/lagmul/hm_read_lagmul.F
+      !||    hm_read_refsta             ../starter/source/loads/reference_state/refsta/hm_read_refsta.F
+      !||    hm_read_sms                ../starter/source/general_controls/computation/hm_read_sms.F
+      !||    hm_read_sphglo             ../starter/source/general_controls/computation/hm_read_sphglo.F
+      !||    hm_read_spmd               ../starter/source/general_controls/computation/hm_read_spmd.F
+      !||    hm_read_unit               ../starter/source/general_controls/computation/hm_read_unit.F
+      !||    hm_read_upwind             ../starter/source/general_controls/computation/hm_read_upwind.F
+      !||    init_def_elem              ../starter/source/modules/defaults_mod.F90
+      !||    init_def_zero              ../starter/source/modules/defaults_mod.F90
+      !||    istr                       ../starter/source/tools/univ/istr.F
+      !||    nbadigemesh                ../starter/source/elements/ige3d/nbadigemesh.F
+      !||    nbadmesh                   ../starter/source/model/remesh/nbadmesh.F
+      !||    nbsph                      ../starter/source/elements/sph/nbsph.F
+      !||--- uses       -----------------------------------------------------
+      !||    defaults_mod               ../starter/source/modules/defaults_mod.F90
+      !||    detonators_mod             ../starter/share/modules1/detonators_mod.F
+      !||    format_mod                 ../starter/share/modules1/format_mod.F90
+      !||    grp_size_mod               ../starter/share/modules1/grp_size_mod.F
+      !||    hm_option_read_mod         ../starter/share/modules1/hm_option_read_mod.F
+      !||    inivol_def_mod             ../starter/share/modules1/inivol_mod.F
+      !||    message_mod                ../starter/share/message_module/message_mod.F
+      !||    refsta_mod                 ../starter/share/modules1/refsta_mod.F
+      !||    restmod                    ../starter/share/modules1/restart_mod.F
+      !||    submodel_mod               ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE CONTRL(MULTI_FVM,LSUBMODEL,IS_DYNA,DETONATORS,USER_WINDOWS,MAT_ELEM,NAMES_AND_TITLES,LIPART1,DEFAULTS)
 C----------------------------------------------------------
 C   M o d u l e s
@@ -110,9 +102,10 @@ C-----------------------------------------------
       USE USER_WINDOWS_MOD
       USE ALE_MOD
       USE MAT_ELEM_MOD
-      USE NAMES_AND_TITLES_MOD, only:NAMES_AND_TITLES_,LTITLE,NCHARLINE,NCHARTITLE
+      USE NAMES_AND_TITLES_MOD, only:NAMES_AND_TITLES_,LTITLE,NCHARLINE,NCHARTITLE,NCHARFIELD
       USE BCS_MOD , only : BCS
       USE DEFAULTS_MOD
+      USE FORMAT_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -142,7 +135,6 @@ C-----------------------------------------------
 #include      "scr12_c.inc"
 #include      "scr15_c.inc"
 #include      "scr16_c.inc"
-#include      "scr21_c.inc"
 #include      "scr22_c.inc"
 #include      "scr23_c.inc"
 #include      "titr_c.inc"
@@ -191,6 +183,9 @@ C-----------------------------------------------
      .        NPYFUN
       INTEGER IARCHS(8)
       INTEGER IS_BEGIN,SCHAR
+      INTEGER     IHBE_DS,ISST_DS,IPLA_DS,IFRAME_DS,ITET4_D,ITET10_D,ICPRE_D,IMAS_DS,ICONTROL_D,
+     .            IHBE_D,IPLA_D,ISTR_D,ITHK_D,ISHEA_D,ISST_D,
+     .            ISH3N_D, ISTRA_D,NPTS_D,IDRIL_D,IOFFSET_D,DEF_INTER(100)
       my_real DTINI, DTX ,RBID
       CHARACTER (LEN=NCHARLINE) :: CART
       CHARACTER (LEN=NCHARLINE) :: XRFILE      ! NCHARLINE as #define is set to 500 in Starter
@@ -222,7 +217,7 @@ C
       INTEGER :: NUMTITLE, NGRTRIA, IDUMMY, NANIM_VERS
       INTEGER :: NALEMUSCL
       INTEGER :: NB_INISHE,NB_INISH3,NB_INIBRI,NB_INIQUAD,
-     .           NB_INIBEAM,NB_INITRUSS,NB_INISPRIG
+     .           NB_INIBEAM,NB_INITRUSS,NB_INISPRIG,NB_INISPHCEL
       INTEGER :: LEN_LINE
       CHARACTER*20 UNIT_NAME
       INTEGER IS_U_STRING
@@ -280,7 +275,6 @@ c
         CALL HM_GET_INTV('INVERS', INVERS, IS_AVAILABLE, LSUBMODEL)
         INVERS_SRC = INVERS
         INVERS_INIT = INVERS
-        CALL FMT_DEF(INVERS,0)
 
         CALL HM_GET_STRING('length_inputunit_code',KEYLI,SCHAR,IS_AVAILABLE)
         CALL HM_GET_STRING('mass_inputunit_code',KEYMI,SCHAR,IS_AVAILABLE)
@@ -288,10 +282,15 @@ c
         CALL HM_GET_STRING('length_workunit_code',KEYL,SCHAR,IS_AVAILABLE)
         CALL HM_GET_STRING('mass_workunit_code',KEYM,SCHAR,IS_AVAILABLE)
         CALL HM_GET_STRING('time_workunit_code',KEYT,SCHAR,IS_AVAILABLE)
-C
+
+        !convert into ascci format specific encoding of greek letter \mu
+        CALL ASCII_ENCODING_MU_LETTER(KEYLI, KEYMI, KEYTI, KEYL, KEYM, KEYT)
+
         IF(INVERS <= 90)THEN
+          ! /UNIT/LENGTH/[value]
+          ! /UNIT/MASS/[value]
+          ! /UNIT/TIME/[value]
           CALL HM_OPTION_START('/UNIT')
-C     
           DO N=1,NUNIT0
             CALL HM_OPTION_READ_KEY(LSUBMODEL,OPTION_ID = ID)
             UNIT_NAME = ''
@@ -306,9 +305,9 @@ c
             IF(UNIT_NAME == 'TIME') THEN
               CALL HM_GET_STRING('TYPE_UNIT',KEYT,2*ncharfield,IS_AVAILABLE)
             ENDIF
-c
           ENDDO
-        ENDIF
+        ENDIF !(INVERS <= 90)
+
       ENDIF
       CALL HM_READ_UNIT(UNITAB,LSUBMODEL)
 C=======================================================================
@@ -424,30 +423,15 @@ C-------------------------------------------------------------------
 C-------------------------------------------------------------------
 C     READING DEFAULT VALUES FOR SHELLS, SOLIDS, INTERFACES ...
 C-------------------------------------------------------------------
-C
-      IHBE_D=0
-      IHBE_DS=0
-      ISST_D=0
-      ISST_DS=0
-      ITHK_D=0
-      IPLA_D=0
-      IPLA_DDS=2 
-      IPLA_DS =2 
-      ISTRA_D =1
-      ISTR_D=0
+!--- remove first /DEF/SOLID in src21_c.inc
+      CALL init_def_zero(DEFAULTS)
+!---- obsolet flag values fixed here
+      IPLA_DS =2  ! obsolet
+      ISTR_D=1  ! istrain
       ISHEA_D=0 ! Old hidden flag in /DEF_SHELL
       INER_9_12 = ZERO
       INSH = 0 ! Old hidden flag in /DEF_SHELL
-      IHBE_DD=1
-      ISH3N_D =0
-      ISH3N_DD=2
-      IFRAME_DS  = 0
-      IFRAME_DDS = 1
       NPTS_D    = -1 ! Old hidden flag in /DEF_SHELL
-      NPTS_DD   = 0
-      IDRIL_D=0
-      IMAS_DS = 0
-      ICPRE_D =0 
 C-------------------------------------------------------------------
 C     READING OF SHELL PROPERTIES DEFAULT VALUES
 C-------------------------------------------------------------------
@@ -455,24 +439,17 @@ C-------------------------------------------------------------------
 C-------------------------------------------------------------------
 C     READING OF SOLID PROPERTIES DEFAULT VALUES
 C-------------------------------------------------------------------
-      CALL HM_READ_DEFSOLID(IPLA_DDS,LSUBMODEL)
-      IF(IIMPLICIT == 1) THEN
-        IF (IPLA_D == 0) IPLA_D = 1
-        IF (IHBE_DS == 0) IHBE_DS = 14
-        IF (IHBE_D == 0)  IHBE_D  = 24
-        IF (IDRIL_D == 0) IDRIL_D = 1
-      ENDIF
+      CALL HM_READ_DEFSOLID(LSUBMODEL,DEFAULTS%SOLID)
 C----------------------------------------------
-      IF(IFRAME_DS == 0) IFRAME_DS = IFRAME_DDS  
       IS17OLD = 1 ! To be cleaned
 C-----
-      IF(IHBE_D==0)IHBE_D = IHBE_DD
-      IF(ISH3N_D==0)ISH3N_D = ISH3N_DD
       IF(INSH==1)INER_9_12 = TWELVE      
       IF(INSH==2)INER_9_12 = SIXTEEN      
       IF(INSH==3)INER_9_12 = FOURTY8  
       IF(INSH==4)INER_9_12 = THIRTY     
-      IF(INSH==5)INER_9_12 = NINE       
+      IF(INSH==5)INER_9_12 = NINE 
+!   default values in def_solid/def_shell      
+      CALL init_def_elem(N2D,IIMPLICIT,DEFAULTS)
 C-------------------------------------------------------------------
 C     READING OF INTERFACES DEFAULT VALUES
 C-------------------------------------------------------------------
@@ -480,6 +457,7 @@ C-------------------------------------------------------------------
       DEF_INTER(1:100) = 0
       CALL HM_OPTION_COUNT('/DEFAULT/INTER',HM_NINTER_DEF)
       CALL HM_READ_DEFINTER(HM_NINTER_DEF,DEF_INTER,LSUBMODEL)
+      DEFAULTS%interface%DEF_INTER(1:100) = DEF_INTER(1:100)
 C-------------------------------------------------------------------
       CALL HM_OPTION_COUNT('/INTTHICK/V5',IINTTHICK)
       IF (IINTTHICK > 1) THEN
@@ -1085,7 +1063,7 @@ C--------------------------------------------
       ALLOCATE(NISUB(NUMGEO + NUMSTACK) ,STAT=stat)
       ALLOCATE(NPLY (NUMGEO + NUMSTACK) ,STAT=stat)
 c      
-      CALL HM_PREREAD_PROPERTIES(IGEO,NSPHSOL,NPLY,NSUB,NISUB,LSUBMODEL)
+      CALL HM_PREREAD_PROPERTIES(IGEO,NSPHSOL,NPLY,NSUB,NISUB,LSUBMODEL,DEFAULTS)
 
       IF(NSPHSOL/=0.AND.NUMELS8/=0)THEN
         ALLOCATE(IPART(LIPART1*NPART),STAT=stat)
@@ -1220,11 +1198,13 @@ C---------------------------------------------------
       CALL HM_OPTION_COUNT('/INIBEAM',  NB_INIBEAM)
       CALL HM_OPTION_COUNT('/INITRUSS', NB_INITRUSS)
       CALL HM_OPTION_COUNT('/INISPRI',  NB_INISPRIG)
+      CALL HM_OPTION_COUNT('/INISPHCEL',  NB_INISPHCEL)
+
       IF(ISIGI==0.AND.
      .   (NB_INISHE+NB_INISH3
      .   +NB_INIBRI+NB_INIQUAD
      .   +NB_INIBEAM+NB_INITRUSS
-     .   +NB_INISPRIG)/=0) ISIGI=-3
+     .   +NB_INISPRIG+NB_INISPHCEL)/=0) ISIGI=-3
 C=======================================================================
 C     Writing to 0000.out FILE
 C=======================================================================
@@ -1410,8 +1390,24 @@ C
 
       WRITE (IOUT,'(//,A,I10)')  TITRE(130)(1:57),NANALY
 
-      IF(IHBE_DS==0) IHBE_DS = IHBE_DD
-      IF(N2D/=0.AND.IHBE_DS/=17) IHBE_DS = 2
+! for print out 
+      IHBE_DS= DEFAULTS%SOLID%ISOLID
+      ISST_DS= DEFAULTS%SOLID%ISMSTR
+      ICPRE_D= DEFAULTS%SOLID%ICPRE
+      ITET4_D= DEFAULTS%SOLID%ITETRA4
+      ITET10_D= DEFAULTS%SOLID%ITETRA10
+      IFRAME_DS = DEFAULTS%SOLID%IFRAME      
+      IMAS_DS= DEFAULTS%SOLID%IMAS
+!
+      IOFFSET_D= DEFAULTS%SHELL%ioffset    !< offset support contact 
+      IHBE_D =  DEFAULTS%SHELL%ishell     
+      ISH3N_D=  DEFAULTS%SHELL%ish3n      
+      ISST_D =  DEFAULTS%SHELL%ismstr     
+      IPLA_D =  DEFAULTS%SHELL%iplas      
+      ITHK_D =  DEFAULTS%SHELL%ithick     
+      IDRIL_D=  DEFAULTS%SHELL%idrill     
+
+      ICONTROL_D= DEFAULTS%SOLID%ICONTROL
       IF(N2D==0)THEN
         IF(NUMELQ/=0. OR. (NUMELTG/=0.AND.N2D/=0) )THEN
           CALL ANCMSG(MSGID   = 286,MSGTYPE = MSGERROR,ANMODE  = ANINFO)
@@ -1420,7 +1416,9 @@ C
 C                                                                    012
       WRITE(IOUT,5500)INTEG8,IPARITH,USER_WINDOWS%HAS_USER_WINDOW,IHBE_DS,
      .                ITET4_D,ITET10_D,ISST_DS,ICPRE_D,IHBE_D,ISST_D,ITHK_D,
-     .                IPLA_D,ISTR_D,ISHEA_D,INSH,ISH3N_D, NPTS_D, IFRAME_DS
+     .                IPLA_D,ISTR_D,ISHEA_D,INSH,ISH3N_D, NPTS_D, IFRAME_DS,
+     .                IOFFSET_D,
+     .                ICONTROL_D
       WRITE(IOUT,5501)ISHFRAM
       IF(ISH3NFRAM>0)WRITE(IOUT,5901)ISH3NFRAM
       IF(JALE/=0 .AND. ALEFVM_Param%IEnabled/=0)WRITE(IOUT,5502)ALEFVM_Param%ISOLVER
@@ -1639,7 +1637,9 @@ c     & 4X,'MEMORY AVAILABLE FOR REALS. . . . . . . . . . . . . .',I10)
      & 4X,'ISH3N  : DEFAULT 3 NODE SHELL FORMULATION FLAG . . . .',I10/
      & 4X,'NPTS   : SHELL PROPERTIES DEFAULT NUMBER OF           ',/  
      & 4X,'         INTEGRATION POINTS OR LAYERS. . . . . . . . .',I10/
-     & 4X,'IFRAME : DEFAULT SOLID FRAME FORMULATION FLAG . . . . ',I10)
+     & 4X,'IFRAME : DEFAULT SOLID FRAME FORMULATION FLAG . . . . ',I10/
+     & 4X,'IOFFSET: DEFAULT SHELL OFFSET FLAG. . . . . . . . . . ',I10/
+     & 4X,'ICONTROL:DEFAULT SOLID DISTORTION CONTROL FLAG. . . . ',I10)
  5501 FORMAT(
      & 4X,'ISHFRAM: LOCAL SHELL FRAME DEFINITION. . . . . . . . .',I10)
  5502 FORMAT(
@@ -1686,15 +1686,15 @@ c     & 4X,'MEMORY AVAILABLE FOR REALS. . . . . . . . . . . . . .',I10)
  999  CALL FREERR(1)
       RETURN
       END
-Chd|====================================================================
-Chd|  FIND_DT1BRICK_ENGINE          source/starter/contrl.F       
-Chd|-- called by -----------
-Chd|        CONTRL                        source/starter/contrl.F       
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        INOUTFILE_MOD                 ../common_source/modules/inoutfile_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    find_dt1brick_engine   ../starter/source/starter/contrl.F
+      !||--- called by ------------------------------------------------------
+      !||    contrl                 ../starter/source/starter/contrl.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE FIND_DT1BRICK_ENGINE()
 C-----------------------------------------------
 C   M o d u l e s
@@ -1780,16 +1780,15 @@ C
 C------------------------------------------- 
       RETURN
       END
-Chd|====================================================================
-Chd|  INI_H3DTMAX_ENGINE            source/starter/contrl.F       
-Chd|-- called by -----------
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|-- calls ---------------
-Chd|        READ_H3DTMAX_KEY              source/starter/contrl.F       
-Chd|        INOUTFILE_MOD                 ../common_source/modules/inoutfile_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        OUTMAX_MOD                    ../common_source/modules/outmax_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    ini_h3dtmax_engine     ../starter/source/starter/contrl.F
+      !||--- called by ------------------------------------------------------
+      !||    lectur                 ../starter/source/starter/lectur.F
+      !||--- calls      -----------------------------------------------------
+      !||    read_h3dtmax_key       ../starter/source/starter/contrl.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE INI_H3DTMAX_ENGINE(IPARG,IPART,IPARTS,IPARTC,IPARTG,IDDLEVEL)
 C-----------------------------------------------
 C   M o d u l e s
@@ -1797,6 +1796,7 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE INOUTFILE_MOD
       USE OUTMAX_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARLINE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -1825,7 +1825,7 @@ C-----------------------------------------------
       INTEGER IH3D,NG,ITY,NFT,IKEY,K_LEN
 
       INTEGER :: TMAX_IPART(NPART),NKPART(NPART+1,NKEYMAX+1)
-      CHARACTER CARTE*ncharline
+      CHARACTER(LEN=NCHARLINE) :: CARTE
 C-----------------------------------------------
       IF (ALLOCATED(IKEYMAX)) DEALLOCATE(IKEYMAX)
       IF (ALLOCATED(IPART_OK)) DEALLOCATE(IPART_OK)
@@ -1984,20 +1984,20 @@ C
 C------------------------------------------- 
       RETURN
       END
-Chd|====================================================================
-Chd|  READ_H3DTMAX_KEY              source/starter/contrl.F       
-Chd|-- called by -----------
-Chd|        INI_H3DTMAX_ENGINE            source/starter/contrl.F       
-Chd|-- calls ---------------
-Chd|        INOUTFILE_MOD                 ../common_source/modules/inoutfile_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    read_h3dtmax_key       ../starter/source/starter/contrl.F
+      !||--- called by ------------------------------------------------------
+      !||    ini_h3dtmax_engine     ../starter/source/starter/contrl.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE READ_H3DTMAX_KEY(KEY_TM,KEY_LEN,IFUND,NTM_PART,IPART)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
       USE INOUTFILE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARLINE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -2023,7 +2023,8 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, J, K, N ,NELC , NELTG , IP , NPRT , IPRT
       INTEGER IH3D,NG,ITY,NFT,IO_ERR1,LEN_C,IC
-      CHARACTER FILNAM*109, KEYA*80, KEYA2*80,CARTE*ncharline
+      CHARACTER FILNAM*109, KEYA*80, KEYA2*80
+      CHARACTER(LEN=NCHARLINE) :: CARTE
 
       INTEGER :: LEN_TMP_NAME,TMAX_IPART(NPART)
       CHARACTER(len=4096) :: TMP_NAME

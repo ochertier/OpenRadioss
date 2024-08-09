@@ -20,18 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  QGRHEAD                       source/elements/solid_2d/quad/qgrhead.F
-Chd|-- called by -----------
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        FRETITL2                      source/starter/freform.F      
-Chd|        MY_ORDERS                     ../common_source/tools/sort/my_orders.c
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    qgrhead                ../starter/source/elements/solid_2d/quad/qgrhead.F
+      !||--- called by ------------------------------------------------------
+      !||    lectur                 ../starter/source/starter/lectur.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    fretitl2               ../starter/source/starter/freform.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE QGRHEAD(
      1       IXQ     ,PM      ,GEO     ,INUM    ,ISEL    ,
      2       ITR1    ,EADD    ,INDEX   ,ITRI    ,IPARTQ  ,     
@@ -43,6 +41,7 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE GROUPDEF_MOD
       USE MATPARAM_DEF_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C            A R G U M E N T S
 C-----------------------------------------------
@@ -70,7 +69,6 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "param_c.inc"
 #include      "scr05_c.inc"
-#include      "scr21_c.inc"
 #include      "scr17_c.inc"
 C-----------------------------------------------
 C   D U M M Y   A R G U M E N T S
@@ -96,8 +94,7 @@ C-----------------------------------------------
      .        IPLAST, IALEL, MT,IREP,IINT,ISSN,NGTVX,IFAIL,IRB,
      .        JALE_FROM_MAT,JALE_FROM_PROP
       INTEGER ID
-      CHARACTER*nchartitle,
-     .   TITR
+      CHARACTER(LEN=NCHARTITLE)::TITR
       INTEGER WORK(70000)
       EXTERNAL MY_SHIFTL,MY_SHIFTR,MY_AND
       INTEGER MY_SHIFTL,MY_SHIFTR,MY_AND
@@ -143,7 +140,7 @@ C
         JPOR=0
         MID= IXQ(1,II)
         PID= IXQ(6,II)
-        IPLAST=IPLA_DS-1
+        IPLAST= 1
         IREP  = 0
         JCVT  = 0
         IFAIL = 0

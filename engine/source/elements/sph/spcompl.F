@@ -20,22 +20,23 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  SPCOMPL                       source/elements/sph/spcompl.F 
-Chd|-- called by -----------
-Chd|        SPHPREP                       source/elements/sph/sphprep.F 
-Chd|-- calls ---------------
-Chd|        WEIGHT0                       source/elements/sph/weight.F  
-Chd|        WEIGHT1                       source/elements/sph/weight.F  
-Chd|        GET_U_GEO                     source/user_interface/upidmid.F
-Chd|        SPHBOX                        share/modules/sphbox.F        
-Chd|====================================================================
+      !||====================================================================
+      !||    spcompl   ../engine/source/elements/sph/spcompl.F
+      !||--- called by ------------------------------------------------------
+      !||    sphprep   ../engine/source/elements/sph/sphprep.F
+      !||--- calls      -----------------------------------------------------
+      !||    weight0   ../engine/source/elements/sph/weight.F
+      !||    weight1   ../engine/source/elements/sph/weight.F
+      !||--- uses       -----------------------------------------------------
+      !||    sphbox    ../engine/share/modules/sphbox.F
+      !||====================================================================
       SUBROUTINE SPCOMPL(
      1    X       ,V       ,MS      ,SPBUF   ,ITAB    , 
      2    KXSP    ,IXSP    ,NOD2SP  ,ISPSYM  ,XSPSYM  , 
      3    VSPSYM  ,IPARG   ,WACOMP  ,ISPCOND ,          
      4    XFRAME  ,WSMCOMP ,GEO     ,IPART   ,IPARTSP , 
-     5    WASPACT ,ITASK   ,SPH_IORD1)
+     5    WASPACT ,ITASK   ,SPH_IORD1,NUMGEO ,NCYCLE  ,
+     6    MCHECK)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -58,6 +59,7 @@ C-----------------------------------------------
      .        ISPSYM(NSPCOND,*),IPARG(NPARG,*),ISPCOND(NISPCOND,*),
      .        IPART(LIPART1,*),IPARTSP(*),WASPACT(*),
      .        ITASK
+      INTEGER, INTENT(IN)    :: NUMGEO ,NCYCLE,MCHECK 
       INTEGER, INTENT(INOUT) :: SPH_IORD1
 C     REAL
       my_real
@@ -71,7 +73,8 @@ C-----------------------------------------------
       INTEGER N,INOD,JNOD,J,NVOIS,M,NN,
      .        NVOISS,SM,JS,NC,IC,IS,
      .        I,IPRT,IGEO,IORDER,NMUN,NZERO,NUN,
-     .        MWAMUN(NSPHACT),MWAUN(NSPHACT),MWAZERO(NSPHACT)
+     .        MWAMUN(NSPHACT),MWAUN(NSPHACT),MWAZERO(NSPHACT),
+     .        IGTYP
       my_real
      .       XI,YI,ZI,DI,RHOI,XJ,YJ,ZJ,DJ,RHOJ,DIJ,
      .       VJ,VJX,VJY,VJZ,
@@ -127,11 +130,19 @@ C-----------------------------------------------
           MWAUN(NUN)=N
         ENDIF
       ENDDO
-      IF (NUN > 0) THEN
-        SPH_IORD1 = 1
-      ELSE
+C
+C     Flag for size of SPMD communication - needed only one time
+      IF ((NCYCLE == 0).OR.(MCHECK > 0)) THEN
         SPH_IORD1 = 0
+        DO IGEO=1,NUMGEO        
+          IGTYP = NINT(GEO(12,IGEO))
+          IF (IGTYP==34) THEN   
+            IORDER=NINT(GET_U_GEO(5,IGEO))  
+            IF (IORDER==1) SPH_IORD1 = 1
+          ENDIF
+        ENDDO
       ENDIF
+C      
 C-----------------------------------------------
 C     No kernel correction.
 C-----------------------------------------------
@@ -1162,14 +1173,13 @@ C-------------------------------------------
       END
 
 
-Chd|====================================================================
-Chd|  SPSCOMP                       source/elements/sph/spcompl.F 
-Chd|-- called by -----------
-Chd|        FORINTP                       source/elements/forintp.F     
-Chd|-- calls ---------------
-Chd|        GET_U_GEO                     source/user_interface/upidmid.F
-Chd|        SPHBOX                        share/modules/sphbox.F        
-Chd|====================================================================
+      !||====================================================================
+      !||    spscomp   ../engine/source/elements/sph/spcompl.F
+      !||--- called by ------------------------------------------------------
+      !||    forintp   ../engine/source/elements/forintp.F
+      !||--- uses       -----------------------------------------------------
+      !||    sphbox    ../engine/share/modules/sphbox.F
+      !||====================================================================
       SUBROUTINE SPSCOMP(
      1    ISPSYM  ,WACOMP  ,ISPCOND ,XFRAME  ,WSMCOMP ,
      2    GEO     ,IPART   ,IPARTSP ,WASPACT ,ITASK   )

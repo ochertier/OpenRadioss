@@ -20,62 +20,67 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  ALEMAIN                       source/ale/alemain.F          
-Chd|-- called by -----------
-Chd|        RESOL                         source/engine/resol.F         
-Chd|-- calls ---------------
-Chd|        AGAUGE                        source/ale/agauge.F           
-Chd|        ALEFVM_GRAV_INIT              source/ale/alefvm/alefvm_grav_init.F
-Chd|        ALESUB1                       source/ale/subcycling/alesub1.F
-Chd|        ALETHE                        source/ale/alethe.F           
-Chd|        BFORC2                        source/ale/bimat/bforc2.F     
-Chd|        BUILD_CONNECTIVITY            source/multifluid/connectivity.F
-Chd|        EBCS_MAIN                     source/boundary_conditions/ebcs/ebcs_main.F
-Chd|        INITBUF                       share/resol/initbuf.F         
-Chd|        INTTI0                        source/interfaces/interf/intti0.F
-Chd|        MULTI_BUF2VAR                 source/multifluid/multi_buf2var.F
-Chd|        MULTI_COMPUTEVOLUME           source/multifluid/multi_computevolume.F
-Chd|        MULTI_COMPUTE_DT              source/multifluid/multi_compute_dt.F
-Chd|        MULTI_FACE_ELEM_DATA          source/multifluid/multi_face_data_elem.F
-Chd|        MULTI_FVM2FEM                 source/multifluid/multi_fvm2fem.F
-Chd|        MULTI_GLOBALIZE               source/multifluid/multi_globalize.F
-Chd|        MULTI_PRESSURE_EQUILIBRIUM    source/multifluid/multi_pressure_equilibrium.F
-Chd|        MULTI_TIMEEVOLUTION           source/multifluid/multi_timeevolution.F
-Chd|        MULTI_VAR2BUF                 source/multifluid/multi_var2buf.F
-Chd|        MY_BARRIER                    source/system/machine.F       
-Chd|        QFORC2                        source/elements/solid_2d/quad/qforc2.F
-Chd|        S4ALESFEM                     source/elements/solid/solide4_sfem/s4alesfem.F
-Chd|        S4FORC3                       source/elements/solid/solide4/s4forc3.F
-Chd|        SEGGETV                       source/interfaces/interf/seggetv.F
-Chd|        SFORC3                        source/elements/solid/solide/sforc3.F
-Chd|        SINIT22_FVM                   source/interfaces/int22/sinit22_fvm.F
-Chd|        SPMD_ENVOIS                   source/mpi/fluid/spmd_cfd.F   
-Chd|        SPMD_INIT_EBCS                source/mpi/fluid/spmd_cfd.F   
-Chd|        SPMD_L11VOIS                  source/mpi/fluid/spmd_cfd.F   
-Chd|        SPMD_L51VOIS                  source/mpi/fluid/spmd_cfd.F   
-Chd|        SPMD_SEGCOM                   source/mpi/fluid/spmd_cfd.F   
-Chd|        SPMD_XVOIS                    source/mpi/fluid/spmd_cfd.F   
-Chd|        STARTIME                      source/system/timer.F         
-Chd|        STOPTIME                      source/system/timer.F         
-Chd|        ALEFVM_MOD                    ../common_source/modules/ale/alefvm_mod.F
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
-Chd|        ALE_MOD                       ../common_source/modules/ale/ale_mod.F
-Chd|        DIFFUSION_MOD                 share/modules/diffusion_mod.F 
-Chd|        DT_MOD                        share/modules/dt_mod.F        
-Chd|        EBCS_MOD                      ../common_source/modules/boundary_conditions/ebcs_mod.F
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        H3D_MOD                       share/modules/h3d_mod.F       
-Chd|        INITBUF_MOD                   share/resol/initbuf.F         
-Chd|        MAT_ELEM_MOD                  ../common_source/modules/mat_elem/mat_elem_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
-Chd|        NLOCAL_REG_MOD                ../common_source/modules/nlocal_reg_mod.F
-Chd|        OUTPUT_MOD                    ../common_source/modules/output/output_mod.F
-Chd|        SEGVAR_MOD                    share/modules/segvar_mod.F    
-Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
-Chd|        TABLE_MOD                     share/modules/table_mod.F     
-Chd|        TH_SURF_MOD                   ../common_source/modules/interfaces/th_surf_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    alemain                      ../engine/source/ale/alemain.F
+      !||--- called by ------------------------------------------------------
+      !||    resol                        ../engine/source/engine/resol.F
+      !||--- calls      -----------------------------------------------------
+      !||    agauge                       ../engine/source/ale/agauge.F
+      !||    alefvm_grav_init             ../engine/source/ale/alefvm/alefvm_grav_init.F
+      !||    alesub1                      ../engine/source/ale/subcycling/alesub1.F
+      !||    alethe                       ../engine/source/ale/alethe.F
+      !||    bcs_wall_trigger             ../engine/source/boundary_conditions/bcs_wall_trigger.F90
+      !||    bforc2                       ../engine/source/ale/bimat/bforc2.F
+      !||    build_connectivity           ../engine/source/multifluid/connectivity.F
+      !||    ebcs_main                    ../engine/source/boundary_conditions/ebcs/ebcs_main.F
+      !||    initbuf                      ../engine/share/resol/initbuf.F
+      !||    intti0                       ../engine/source/interfaces/interf/intti0.F
+      !||    multi_buf2var                ../engine/source/multifluid/multi_buf2var.F
+      !||    multi_compute_dt             ../engine/source/multifluid/multi_compute_dt.F
+      !||    multi_computevolume          ../engine/source/multifluid/multi_computevolume.F
+      !||    multi_face_elem_data         ../engine/source/multifluid/multi_face_data_elem.F
+      !||    multi_fvm2fem                ../engine/source/multifluid/multi_fvm2fem.F
+      !||    multi_globalize              ../engine/source/multifluid/multi_globalize.F
+      !||    multi_pressure_equilibrium   ../engine/source/multifluid/multi_pressure_equilibrium.F
+      !||    multi_timeevolution          ../engine/source/multifluid/multi_timeevolution.F
+      !||    multi_var2buf                ../engine/source/multifluid/multi_var2buf.F
+      !||    my_barrier                   ../engine/source/system/machine.F
+      !||    ns_fvm_diffusion             ../engine/source/multifluid/ns_fvm_diffusion.F
+      !||    qforc2                       ../engine/source/elements/solid_2d/quad/qforc2.F
+      !||    s4alesfem                    ../engine/source/elements/solid/solide4_sfem/s4alesfem.F
+      !||    s4forc3                      ../engine/source/elements/solid/solide4/s4forc3.F
+      !||    seggetv                      ../engine/source/interfaces/interf/seggetv.F
+      !||    sforc3                       ../engine/source/elements/solid/solide/sforc3.F
+      !||    sinit22_fvm                  ../engine/source/interfaces/int22/sinit22_fvm.F
+      !||    spmd_envois                  ../engine/source/mpi/fluid/spmd_cfd.F
+      !||    spmd_init_ebcs               ../engine/source/mpi/fluid/spmd_cfd.F
+      !||    spmd_l11vois                 ../engine/source/mpi/fluid/spmd_cfd.F
+      !||    spmd_l51vois                 ../engine/source/mpi/fluid/spmd_cfd.F
+      !||    spmd_segcom                  ../engine/source/mpi/fluid/spmd_cfd.F
+      !||    spmd_xvois                   ../engine/source/mpi/fluid/spmd_cfd.F
+      !||    startime                     ../engine/source/system/timer.F
+      !||    stoptime                     ../engine/source/system/timer.F
+      !||--- uses       -----------------------------------------------------
+      !||    ale_connectivity_mod         ../common_source/modules/ale/ale_connectivity_mod.F
+      !||    ale_mod                      ../common_source/modules/ale/ale_mod.F
+      !||    alefvm_mod                   ../common_source/modules/ale/alefvm_mod.F
+      !||    bcs_mod                      ../common_source/modules/boundary_conditions/bcs_mod.F90
+      !||    diffusion_mod                ../engine/share/modules/diffusion_mod.F
+      !||    dt_mod                       ../engine/share/modules/dt_mod.F
+      !||    ebcs_mod                     ../common_source/modules/boundary_conditions/ebcs_mod.F
+      !||    groupdef_mod                 ../common_source/modules/groupdef_mod.F
+      !||    h3d_mod                      ../engine/share/modules/h3d_mod.F
+      !||    initbuf_mod                  ../engine/share/resol/initbuf.F
+      !||    mat_elem_mod                 ../common_source/modules/mat_elem/mat_elem_mod.F90
+      !||    multi_fvm_mod                ../common_source/modules/ale/multi_fvm_mod.F
+      !||    nlocal_reg_mod               ../common_source/modules/nlocal_reg_mod.F
+      !||    output_mod                   ../common_source/modules/output/output_mod.F90
+      !||    python_funct_mod             ../common_source/modules/python_mod.F90
+      !||    segvar_mod                   ../engine/share/modules/segvar_mod.F
+      !||    sensor_mod                   ../engine/share/modules/sensor_mod.F
+      !||    table_mod                    ../engine/share/modules/table_mod.F
+      !||    th_surf_mod                  ../common_source/modules/interfaces/th_surf_mod.F
+      !||====================================================================
       SUBROUTINE ALEMAIN(
      1         PM          ,GEO         ,X             ,A         ,AR        ,V               ,
      2         MS          ,WA          ,ELBUF_TAB     ,BUFMAT    ,PARTSAV   ,TF              ,
@@ -100,10 +105,11 @@ Chd|====================================================================
      M         IGRBRIC     ,NLOC_DMG    ,ID_GLOBAL_VOIS,FACE_VOIS ,EBCS_TAB  ,ALE_CONNECTIVITY, 
      N         DIFFUSION   ,MAT_ELEM    ,H3D_DATA      ,DT   ,OUTPUT,NEED_COMM_INTER18,IDTMINS,
      O         IRESP       ,IDTMIN      ,MAXFUNC       ,IMON_MAT,    
-     P         USERL_AVAIL ,heat_meca   ,impl_s        ,idyna)
+     P         USERL_AVAIL ,heat_meca   ,impl_s        ,idyna, PYTHON)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE PYTHON_FUNCT_MOD
       USE INITBUF_MOD
       USE TABLE_MOD
       USE MAT_ELEM_MOD
@@ -218,6 +224,7 @@ C-----------------------------------------------
       my_real, INTENT(INOUT) :: XCELL(3,SXCELL)
       TYPE (DT_) ,INTENT(INOUT)  :: DT
       TYPE(OUTPUT_), INTENT(INOUT) :: OUTPUT !< output structure
+      TYPE(PYTHON_) :: PYTHON
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -300,34 +307,36 @@ C  IOUTPRT (assembly report)
       !---------------------------------------------
       !     INTERFACE 18 - VARIABLE GAP
       !---------------------------------------------
-       IF(INTER18_IS_VARIABLE_GAP_DEFINED)THEN
-          NEED_COMM_INTER18 = .TRUE.
-          DO NG=ITASK+1,NGROUP,NTHREAD
-             IF (TT > ZERO .AND. IPARG(76, NG) == 1) CYCLE ! --> OFF
-             IF(IPARG(8,NG) == 1) CYCLE
-             ISOLNOD=IPARG(28,NG)
-             CALL INITBUF(
-     1          IPARG   ,NG      ,
-     2          MTN     ,NEL     ,NFT     ,IAD      ,ITY     ,
-     3          NPT     ,JALE    ,ISMSTR  ,JEUL     ,JTUR    ,
-     4          JTHE    ,JLAG    ,JMULT   ,JHBE     ,JIVF    ,
-     5          NVAUX   ,JPOR    ,JCVT    ,JCLOSE   ,IPLA    ,
-     6          IREP    ,IINT    ,IGTYP   ,ISRAT    ,ISROT   ,
-     7          ICSEN   ,ISORTH  ,ISORTHG ,IFAILURE ,JSMS    )
-             IF (ITY == 1 .AND. ISOLNOD /= 4) THEN    
-               DO I=1,NEL                             
-                 XCELL(1,I+NFT)=EXP(LOG(ELBUF_TAB(NG)%GBUF%VOL(I))/THREE)
-                 XCELL(2,I+NFT)=ZERO
-                 XCELL(3,I+NFT)=ZERO      
-               ENDDO      
-             ENDIF                                    
-          ENDDO
-      CALL MY_BARRIER
-        IF(NSPMD>1)THEN
-           LENCOM = NERCVOIS(NSPMD + 1) + NESDVOIS(NSPMD + 1)
-           CALL SPMD_ENVOIS(3, XCELL, NERCVOIS, NESDVOIS, LERCVOIS, LESDVOIS, LENCOM)    
+      IF(INTER18_IS_VARIABLE_GAP_DEFINED)THEN
+        NEED_COMM_INTER18 = .TRUE.
+        DO NG=ITASK+1,NGROUP,NTHREAD
+           IF (TT > ZERO .AND. IPARG(76, NG) == 1) CYCLE ! --> OFF
+           IF(IPARG(8,NG) == 1) CYCLE
+           ISOLNOD=IPARG(28,NG)
+           CALL INITBUF(
+     1        IPARG   ,NG      ,
+     2        MTN     ,NEL     ,NFT     ,IAD      ,ITY     ,
+     3        NPT     ,JALE    ,ISMSTR  ,JEUL     ,JTUR    ,
+     4        JTHE    ,JLAG    ,JMULT   ,JHBE     ,JIVF    ,
+     5        NVAUX   ,JPOR    ,JCVT    ,JCLOSE   ,IPLA    ,
+     6        IREP    ,IINT    ,IGTYP   ,ISRAT    ,ISROT   ,
+     7        ICSEN   ,ISORTH  ,ISORTHG ,IFAILURE ,JSMS    )
+           IF (ITY == 1 .AND. ISOLNOD /= 4) THEN
+             DO I=1,NEL
+               XCELL(1,I+NFT)=EXP(LOG(ELBUF_TAB(NG)%GBUF%VOL(I))/THREE)
+               XCELL(2,I+NFT)=ZERO
+               XCELL(3,I+NFT)=ZERO
+             ENDDO
+           ENDIF
+        ENDDO
+        CALL MY_BARRIER
+        IF(NSPMD > 1)THEN
+!$OMP SINGLE
+          LENCOM = NERCVOIS(NSPMD + 1) + NESDVOIS(NSPMD + 1)
+          CALL SPMD_ENVOIS(3, XCELL, NERCVOIS, NESDVOIS, LERCVOIS, LESDVOIS, LENCOM)
+!$OMP END SINGLE
         ENDIF
-      ENDIF      
+      ENDIF
 
       !--------------------------------------------------------
       ! F L U I D E
@@ -343,8 +352,8 @@ C  IOUTPRT (assembly report)
             ALE%SUB%IFSUB  = 0
             ALE%SUB%IFSUBM = 1
             ALE%SUB%DT1SAVE= DT1
-            DT1    = TT-T1S
-            T1S    = TT
+            DT1 = TT-T1S
+            T1S = TT
           ELSE
             ALE%SUB%IFSUB=1
             ALE%SUB%IFSUBM=0
@@ -357,13 +366,11 @@ C  IOUTPRT (assembly report)
           DT2SAVE = DT2T
           DT2T    = EP30
         ENDIF
-        CALL ALESUB1(
-     1               ALE_CONNECTIVITY%NALE,V,W,DSAVE,ICODT,ISKEW,SKEW,D,
-     2               ITASK,NODFT,NODLT,FSKY,FSKY      )
+        CALL ALESUB1(ALE_CONNECTIVITY%NALE,V,W,DSAVE,ICODT,ISKEW,SKEW,D,ITASK,NODFT,NODLT,FSKY,FSKY)
       ENDIF
       IF(ALE%SUB%IALESUB == 0  .AND. ITASK == 0)THEN
         ALE%SUB%IFSUB = 0
-        T1S   = TT
+        T1S = TT
       ENDIF
       !-----      
       
@@ -380,9 +387,7 @@ C
           MS(N) = MS(N)*WEIGHT(N)
           MSNF(N) = MSNF(N)*WEIGHT(N)
         ENDDO
-C
         CALL MY_BARRIER
-C
       ENDIF
 C---------------------------------------------------------
 C       ALE - EULER  + 2D : update masses 
@@ -391,9 +396,7 @@ C---------------------------------------------------------
         DO N = NODFT, NODLT
           MS_2D(N) = ZERO
         ENDDO
-C
         CALL MY_BARRIER
-C
       ENDIF
 C
       IF(ALE%SUB%IFSUB == 0)THEN
@@ -402,9 +405,8 @@ C
           IF(ALE%GLOBAL%INCOMP == 0) THEN
             IF(NSEGFLU > 0 .AND. N2D == 0) THEN
               CALL SEGGETV(IPARG,ELBUF_TAB,ALE_CONNECTIVITY,ITASK,SEGVAR)
-C             Comm SPMD SEGVAR Pi -> P0
+              ! Comm SPMD SEGVAR Pi -> P0
               IF(NSPMD > 1) THEN
-
 !$OMP SINGLE
                 CALL SPMD_SEGCOM(SEGVAR,NPSEGCOM,LSEGCOM,NPSEGCOM(NSPMD+1),0)
 !$OMP END SINGLE
@@ -414,11 +416,10 @@ C             Comm SPMD SEGVAR Pi -> P0
             ! INTERFACE CONVECTIONS                          !
             !------------------------------------------------!  
             IF(NINTER /= 0)THEN
-C              element from Interface type 12 calculated on proc_0 + sending X proc_i -> proc_0
-C              Envoi X pour interface type 12 ?
+               !element from Interface type 12 calculated on proc_0 + sending X proc_i -> proc_0
+               !Sending X for interface type 12 ?
                IF (ITASK == 0 .AND. ISPMD == 0)
-     .           CALL INTTI0(IPARI ,X      ,V    ,WA    ,
-     .                       ITAB  ,IPARG,IXS,SEGVAR,SKEW,ISKWN,INTBUF_TAB)
+     .           CALL INTTI0(IPARI ,X ,V ,WA ,ITAB ,IPARG ,IXS ,SEGVAR ,SKEW ,ISKWN ,INTBUF_TAB)
                CALL MY_BARRIER
             ENDIF
             !------------------------------------------------!
@@ -586,7 +587,7 @@ C     ------------------------
 C     -------------------------
 C     Gravity terms
 C     -------------------------
-               CALL ALEFVM_GRAV_INIT(
+               CALL ALEFVM_GRAV_INIT(PYTHON, 
      1              AGRAV, IGRV    , LGRAV, SENSORS%NSENSOR,SENSORS%SENSOR_TAB,
      2              IXS  , ITASK   , NPC  , TF    , SKEW   ,
      3              ITAB 
@@ -749,7 +750,7 @@ C
           IF(ALEFVM_Param%IEnabled > 0) THEN
             !GRAVITY INIT
             ! VERTEX(4,1:NUMNOD) = ZERO  !-> not needed, nodes remain the same ones and VERTEX is initialized on allocation
-            CALL ALEFVM_GRAV_INIT(
+            CALL ALEFVM_GRAV_INIT(PYTHON, 
      1                           AGRAV, IGRV    , LGRAV, SENSORS%NSENSOR,SENSORS%SENSOR_TAB,
      2                           IXS  , ITASK   , NPC  , TF    , SKEW   ,
      3                           ITAB 
@@ -772,9 +773,11 @@ C
          ! /ALE/GRID/FLOW-TRACKING - INIT BUFFER
          !---------------------------------------------
           IF(ALE%GRID%NWALE == 7) THEN
+!$OMP SINGLE
              ALE%GRID%flow_tracking_data%EP(1:9)=ZERO
              ALE%GRID%flow_tracking_data%SUM_M = ZERO
              ALE%GRID%flow_tracking_data%NUM_ELEM_ALE = 0
+!$OMP END SINGLE
           ENDIF
 
          !---------------------------------------------
@@ -894,8 +897,8 @@ C
      A                  GRESAV       ,GRTH         ,IGRTH       ,TABLE     ,IGEO     ,
      B                  VOLN         ,ITASK        ,MS_2D       ,FSKYM     ,IOUTPRT  ,MAT_ELEM,
      C              H3D_DATA%STRAIN  ,SZ_BUFVOIS   ,SNPC        ,STF       ,SBUFMAT  ,
-     D                  SVIS,NSVOIS,IDTMINS        ,IRESP       ,TT        ,DT1,      
-     .                  IDEL7NG      ,IDEL7NOK     ,IDTMIN      ,MAXFUNC,  
+     D                  SVIS,NSVOIS,IRESP       ,TT        ,DT1,      
+     .                  IDEL7NOK     ,IDTMIN      ,MAXFUNC,  
      .                  IMON_MAT,USERL_AVAIL, heat_meca, impl_s,     idyna) 
 c
                  ELSEIF (ITY == 2 .AND. JMULT /= 0) THEN
@@ -910,8 +913,8 @@ c
      8                  IPM ,BUFVOIS,
      9                  GRESAV,GRTH , IGRTH         , TABLE     , IGEO            ,
      O                  VOLN  ,ITASK, MS_2D         , FSKYM     , MAT_ELEM        ,
-     B                  IBID,OUTPUT,SZ_BUFVOIS      ,SNPC,STF,SBUFMAT,SVIS,NSVOIS,IDTMINS,IRESP,
-     C                  IDEL7NG     , IDEL7NOK      ,IDTMIN     ,MAXFUNC,
+     B                  IBID,OUTPUT,SZ_BUFVOIS      ,SNPC,STF,SBUFMAT,SVIS,NSVOIS,IRESP,
+     C                  IDEL7NOK    ,IDTMIN         ,MAXFUNC,
      E                  IMON_MAT    , USERL_AVAIL   ,heat_meca  ,impl_s,
      F                  idyna)
                  ENDIF

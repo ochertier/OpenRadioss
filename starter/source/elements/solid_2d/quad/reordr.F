@@ -20,14 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  REORDR                        source/elements/solid_2d/quad/reordr.F
-Chd|-- called by -----------
-Chd|        LCE16Q3                       source/elements/solid_2d/quad/lce16q.F
-Chd|        LCE16S3                       source/elements/reader/hm_read_solid.F
-Chd|-- calls ---------------
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    reordr         ../starter/source/elements/solid_2d/quad/reordr.F
+      !||--- called by ------------------------------------------------------
+      !||    lce16q3        ../starter/source/elements/solid_2d/quad/lce16q.F
+      !||    lce16s3        ../starter/source/elements/reader/hm_read_solid.F
+      !||--- uses       -----------------------------------------------------
+      !||====================================================================
       SUBROUTINE REORDR(IX    ,NX     ,NEL    ,PM     ,IPOINT ,
      .                  IPARTS,NGRELE ,IGRELEM)
 C-----------------------------------------------
@@ -42,16 +41,13 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "scr03_c.inc"
 #include      "tablen_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NX, NEL,NGRELE
       INTEGER IX(NX,*), IPOINT(2,*),IPARTS(*)
-C     REAL
-      my_real
-     .   PM(NPROPM,*)
+      my_real PM(NPROPM,*)
 C-----------------------------------------------
       TYPE (GROUP_)  , DIMENSION(NGRELE) :: IGRELEM
 C-----------------------------------------------
@@ -111,8 +107,6 @@ C------------------------------------------
           IX(J,IPOINT(1,I))=IPOINT(2,I)
         END DO
       ENDDO
-C------------------------------------------
-      IF(INVERS<40)RETURN
 C------------------------------------------
 C     PERMUTATION DES PARTS
 C------------------------------------------

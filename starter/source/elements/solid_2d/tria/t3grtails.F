@@ -20,25 +20,23 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  T3GRTAILS                     source/elements/solid_2d/tria/t3grtails.F
-Chd|-- called by -----------
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        ARRET                         source/system/arret.F         
-Chd|        FRETITL2                      source/starter/freform.F      
-Chd|        MY_ORDERS                     ../common_source/tools/sort/my_orders.c
-Chd|        ZEROIN                        source/system/zeroin.F        
-Chd|        DRAPE_MOD                     share/modules1/drape_mod.F    
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        INIVOL_DEF_MOD                share/modules1/inivol_mod.F   
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        R2R_MOD                       share/modules1/r2r_mod.F      
-Chd|        REORDER_MOD                   share/modules1/reorder_mod.F  
-Chd|        STACK_MOD                     share/modules1/stack_mod.F    
-Chd|====================================================================
+      !||====================================================================
+      !||    t3grtails              ../starter/source/elements/solid_2d/tria/t3grtails.F
+      !||--- called by ------------------------------------------------------
+      !||    lectur                 ../starter/source/starter/lectur.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    arret                  ../starter/source/system/arret.F
+      !||    fretitl2               ../starter/source/starter/freform.F
+      !||    zeroin                 ../starter/source/system/zeroin.F
+      !||--- uses       -----------------------------------------------------
+      !||    drape_mod              ../starter/share/modules1/drape_mod.F
+      !||    inivol_def_mod         ../starter/share/modules1/inivol_mod.F
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    r2r_mod                ../starter/share/modules1/r2r_mod.F
+      !||    reorder_mod            ../starter/share/modules1/reorder_mod.F
+      !||    stack_mod              ../starter/share/modules1/stack_mod.F
+      !||====================================================================
       SUBROUTINE T3GRTAILS(
      1       IXTG    ,PM         ,IPARG      ,GEO       ,
      2       EADD    ,ND         ,IPARTTG    ,DD_IAD    ,
@@ -61,6 +59,7 @@ C-----------------------------------------------
       USE DRAPE_MOD
       USE INIVOL_DEF_MOD , ONLY : INIVOL_STRUCT_, NUM_INIVOL
       USE MATPARAM_DEF_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C            A R G U M E N T S
 C-----------------------------------------------
@@ -89,7 +88,6 @@ C-----------------------------------------------
 #include      "units_c.inc"
 #include      "param_c.inc"
 #include      "vect01_c.inc"
-#include      "scr03_c.inc"
 #include      "scr17_c.inc"
 #include      "remesh_c.inc"
 #include      "sms_c.inc"
@@ -136,7 +134,7 @@ C-----------------------------------------------
       INTEGER WORK(70000),NGP(NSPMD+1)
       INTEGER, DIMENSION(:,:), ALLOCATABLE :: ISTOR
       INTEGER ID,IPARTR2R
-      CHARACTER*nchartitle, TITR,TITR1
+      CHARACTER(LEN=NCHARTITLE)::TITR,TITR1
       my_real, DIMENSION(:,:), ALLOCATABLE :: XNUM_RNOISE
       INTEGER, DIMENSION(:), ALLOCATABLE :: INDEX2, INUM_PTSH3N
       INTEGER, DIMENSION(:,:), ALLOCATABLE :: INUM_WORKSH
@@ -647,20 +645,10 @@ C---------Drilling dof--using NB4 -> no supper place needed---------
           IPLA = NINT(GEO(39,PID))
           ICSEN= IGEO(3,PID)
           IF(NPN == 0.AND.(MLN == 36.OR.MLN == 86))THEN
-           IF(INVERS<44)THEN
-            IPLA=1
-           ELSE
             IF(IPLA == 0) IPLA=1
             IF(IPLA == 2) IPLA=0
-C           IF(IPLA == 3) IPLA=2
-           ENDIF
           ELSEIF(NPN == 0.AND.MLN == 3)THEN
-           IF(INVERS<44)THEN
-            IPLA=0
-           ELSE
             IF(IPLA == 2) IPLA=0
-C           IF(IPLA == 3) IPLA=2
-           ENDIF
           ELSE
            IF(IPLA == 2) IPLA=0
            IF(IPLA == 3) IPLA=2

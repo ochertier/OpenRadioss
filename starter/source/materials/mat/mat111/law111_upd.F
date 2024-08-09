@@ -21,17 +21,18 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C  
-Chd|====================================================================
-Chd|  LAW111_UPD                    source/materials/mat/mat111/law111_upd.F
-Chd|-- called by -----------
-Chd|        UPDMAT                        source/materials/updmat.F     
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        ARRET                         source/system/arret.F         
-Chd|        FUNC_SLOPE                    source/tools/curve/func_slope.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        TABLE_MOD                     share/modules1/table_mod.F    
-Chd|====================================================================
+      !||====================================================================
+      !||    law111_upd             ../starter/source/materials/mat/mat111/law111_upd.F
+      !||--- called by ------------------------------------------------------
+      !||    updmat                 ../starter/source/materials/updmat.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    arret                  ../starter/source/system/arret.F
+      !||    func_slope             ../starter/source/tools/curve/func_slope.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    table_mod              ../starter/share/modules1/table_mod.F
+      !||====================================================================
       SUBROUTINE LAW111_UPD(IOUT,TITR    ,MAT_ID,UPARAM,NFUNC,
      .                      IFUNC, FUNC_ID,NPC   ,PLD   ,PM,IPM)
 C-----------------------------------------------
@@ -39,6 +40,7 @@ C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
       USE TABLE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -51,7 +53,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      CHARACTER*nchartitle  :: TITR
+      CHARACTER(LEN=NCHARTITLE)  :: TITR
       INTEGER MAT_ID,IOUT, NFUNC
       INTEGER NPC(*), FUNC_ID(*), IPM(NPROPMI)
       my_real UPARAM(*),PLD(*),PM(NPROPM)

@@ -20,25 +20,24 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  HM_READ_PERTURB_FAIL          source/general_controls/computation/hm_read_perturb_fail.F
-Chd|-- called by -----------
-Chd|        HM_READ_PERTURB               source/general_controls/computation/hm_read_perturb.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        HM_GET_FLOATV                 source/devtools/hm_reader/hm_get_floatv.F
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        HM_GET_STRING                 source/devtools/hm_reader/hm_get_string.F
-Chd|        HM_OPTION_COUNT               source/devtools/hm_reader/hm_option_count.F
-Chd|        HM_OPTION_READ_KEY            source/devtools/hm_reader/hm_option_read_key.F
-Chd|        HM_OPTION_START               source/devtools/hm_reader/hm_option_start.F
-Chd|        PLOT_DISTRIB                  source/general_controls/computation/plot_distrib.F
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        MAT_ELEM_MOD                  ../common_source/modules/mat_elem/mat_elem_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_read_perturb_fail   ../starter/source/general_controls/computation/hm_read_perturb_fail.F
+      !||--- called by ------------------------------------------------------
+      !||    hm_read_perturb        ../starter/source/general_controls/computation/hm_read_perturb.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    hm_get_floatv          ../starter/source/devtools/hm_reader/hm_get_floatv.F
+      !||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    hm_get_string          ../starter/source/devtools/hm_reader/hm_get_string.F
+      !||    hm_option_count        ../starter/source/devtools/hm_reader/hm_option_count.F
+      !||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
+      !||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
+      !||    plot_distrib           ../starter/source/general_controls/computation/plot_distrib.F
+      !||--- uses       -----------------------------------------------------
+      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE HM_READ_PERTURB_FAIL(MAT_PARAM,
      .      IPART    ,RNOISE   ,IPARTC ,IPARTG    ,IPARTSP  ,
      .      IGRPART  ,IPARTS   ,PERTURB   ,IDPERTURB,
@@ -52,7 +51,8 @@ C-----------------------------------------------
       USE UNITAB_MOD
       USE SUBMODEL_MOD
       USE HM_OPTION_READ_MOD
-      USE MAT_ELEM_MOD    
+      USE MAT_ELEM_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARKEY
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -94,9 +94,9 @@ C-----------------------------------------------
      . MEAN,STDEV,MEAN_INPUT,SD_INPUT,MAX_DISTRIB,TEMP,MIN_VALUE,
      . MAX_VALUE,INTERV,VALUE,MAX_VALUE1,MINVAL,MAXVAL,BID
       my_real, DIMENSION(:), ALLOCATABLE :: ARRAY
-      CHARACTER TITR*nchartitle
+      CHARACTER(LEN=NCHARTITLE)::TITR
       CHARACTER*100 KEY1,KEY2
-      CHARACTER PARAM*ncharkey
+      CHARACTER(LEN=NCHARKEY) :: PARAM
       CHARACTER MESS*40
       LOGICAL IS_AVAILABLE
       DATA MESS/'PERTURBATION DEFINITION            '/

@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  SIGEPS60C                     source/materials/mat/mat060/sigeps60c.F
-Chd|-- called by -----------
-Chd|        MULAWC                        source/materials/mat_share/mulawc.F
-Chd|-- calls ---------------
-Chd|        INTER_RAT_V                   source/materials/mat/mat060/sigeps60c.F
-Chd|        VINTER                        source/tools/curve/vinter.F   
-Chd|        FINTER                        source/tools/curve/finter.F   
-Chd|====================================================================
+      !||====================================================================
+      !||    sigeps60c     ../engine/source/materials/mat/mat060/sigeps60c.F
+      !||--- called by ------------------------------------------------------
+      !||    mulawc        ../engine/source/materials/mat_share/mulawc.F
+      !||--- calls      -----------------------------------------------------
+      !||    finter        ../engine/source/tools/curve/finter.F
+      !||    inter_rat_v   ../engine/source/materials/mat/mat060/sigeps60c.F
+      !||    vinter        ../engine/source/tools/curve/vinter.F
+      !||====================================================================
       SUBROUTINE SIGEPS60C(
      1     NEL0    ,NUPARAM,NUVAR   ,MFUNC   ,KFUNC  ,
      2     NPF    ,NPT0    ,IPT     ,IFLAG   ,
@@ -43,7 +43,7 @@ Chd|====================================================================
      A     SOUNDSP,VISCMAX,THK     ,PLA     ,UVAR   ,
      B     OFF    ,NGL    ,IPM     ,MAT     ,ETSE   ,
      C     GS     ,YLD    ,EPSP    ,ISRATE  ,DPLA_I ,
-     D     SHF    ,INLOC  ,DPLANL  )
+     D     SHF    ,INLOC  ,DPLANL  ,LOFF    )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -124,6 +124,7 @@ C
      .   SIGOXY(NEL0),SIGOYZ(NEL0),SIGOZX(NEL0),
      .   GS(*)       ,EPSP(NEL0),SHF(NEL0),
      .   DPLANL(NEL0)
+      my_real, DIMENSION(NEL0), INTENT(IN) :: LOFF
 C-----------------------------------------------
 C   O U T P U T   A r g u m e n t s
 C-----------------------------------------------
@@ -756,25 +757,26 @@ C     NON-LOCAL THICKNESS VARIATION
 C--------------------------------
       IF (INLOC > 0) THEN
         DO I = 1,NEL0 
-          SVM(I) = SQRT(SIGNXX(I)*SIGNXX(I)
-     .           + SIGNYY(I)*SIGNYY(I)
-     .           - SIGNXX(I)*SIGNYY(I)
-     .           + THREE*SIGNXY(I)*SIGNXY(I))
-          DEZZ   = MAX(DPLANL(I),ZERO)*HALF*(SIGNXX(I)+SIGNYY(I))/MAX(SVM(I),EM20)
-          DEZZ   = -NUX*((SIGNXX(I)-SIGOXX(I)+SIGNYY(I)-SIGOYY(I))/E1) - DEZZ
-          THK(I) = THK(I) + DEZZ*THKLY(I)*OFF(I)     
+          IF (LOFF(I) == ONE) THEN 
+            SVM(I) = SQRT(SIGNXX(I)*SIGNXX(I)
+     .             + SIGNYY(I)*SIGNYY(I)
+     .             - SIGNXX(I)*SIGNYY(I)
+     .             + THREE*SIGNXY(I)*SIGNXY(I))
+            DEZZ   = MAX(DPLANL(I),ZERO)*HALF*(SIGNXX(I)+SIGNYY(I))/MAX(SVM(I),EM20)
+            DEZZ   = -NUX*((SIGNXX(I)-SIGOXX(I)+SIGNYY(I)-SIGOYY(I))/E1) - DEZZ
+            THK(I) = THK(I) + DEZZ*THKLY(I)*OFF(I) 
+          ENDIF    
         ENDDO  
       ENDIF
 C
       RETURN
       END
-Chd|====================================================================
-Chd|  INTER_RAT                     source/materials/mat/mat060/sigeps60c.F
-Chd|-- called by -----------
-Chd|        SIGEPS60                      source/materials/mat/mat060/sigeps60.F
-Chd|        SIGEPS60G                     source/materials/mat/mat060/sigeps60g.F
-Chd|-- calls ---------------
-Chd|====================================================================
+      !||====================================================================
+      !||    inter_rat   ../engine/source/materials/mat/mat060/sigeps60c.F
+      !||--- called by ------------------------------------------------------
+      !||    sigeps60    ../engine/source/materials/mat/mat060/sigeps60.F
+      !||    sigeps60g   ../engine/source/materials/mat/mat060/sigeps60g.F
+      !||====================================================================
       SUBROUTINE INTER_RAT(X0,X1,X2,X3,Y0,Y1,Y2,Y3,X,Y,YP,I,N)
 C
 C     INTERPOLATION (RATIONAL FUNCTION)
@@ -874,12 +876,11 @@ C
       END
 
 
-Chd|====================================================================
-Chd|  INTER_RAT_V                   source/materials/mat/mat060/sigeps60c.F
-Chd|-- called by -----------
-Chd|        SIGEPS60C                     source/materials/mat/mat060/sigeps60c.F
-Chd|-- calls ---------------
-Chd|====================================================================
+      !||====================================================================
+      !||    inter_rat_v   ../engine/source/materials/mat/mat060/sigeps60c.F
+      !||--- called by ------------------------------------------------------
+      !||    sigeps60c     ../engine/source/materials/mat/mat060/sigeps60c.F
+      !||====================================================================
       SUBROUTINE INTER_RAT_V(NEL0,X0,X1,X2,X3,Y0,Y1,Y2,Y3,X,Y,YP,JJ,N)
 !
 !     INTERPOLATION (RATIONAL FUNCTION)

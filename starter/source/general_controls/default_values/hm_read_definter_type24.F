@@ -20,16 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  HM_READ_DEFINTER_TYPE24       source/general_controls/default_values/hm_read_definter_type24.F
-Chd|-- called by -----------
-Chd|        HM_READ_DEFINTER              source/general_controls/default_values/hm_read_definter.F
-Chd|-- calls ---------------
-Chd|        DEFINTER                      source/interfaces/interf1/definter.F
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_read_definter_type24   ../starter/source/general_controls/default_values/hm_read_definter_type24.F
+      !||--- called by ------------------------------------------------------
+      !||    hm_read_definter          ../starter/source/general_controls/default_values/hm_read_definter.F
+      !||--- calls      -----------------------------------------------------
+      !||    definter                  ../starter/source/interfaces/interf1/definter.F
+      !||    hm_get_intv               ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod               ../starter/share/message_module/message_mod.F
+      !||    submodel_mod              ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE HM_READ_DEFINTER_TYPE24( NTYP , DEF_INTER, LSUBMODEL)
 C============================================================================
 C-----------------------------------------------
@@ -37,6 +38,7 @@ C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
       USE SUBMODEL_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARFIELD, NCHARKEY
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -65,8 +67,8 @@ C-----------------------------------------------
       my_real
      .   ETEN_M,EDG_ANGL,GAPMAX_S,GAPMAX_M,STMIN,STMAX,PENMAX,PENMIN,
      .   VISC,VISCF,BUMULT,ALPHA,GAP,STARTT,STOPT,STFAC,FRIC
-      CHARACTER 
-     .   BCFLAG*ncharfield, BCFLAGM*ncharfield,KEY*ncharkey,KEY1*ncharkey
+      CHARACTER(LEN=NCHARFIELD)::BCFLAG, BCFLAGM
+      CHARACTER(LEN=NCHARKEY)::KEY,KEY1
       LOGICAL IS_AVAILABLE
 !
 C============================================================================

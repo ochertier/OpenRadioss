@@ -20,14 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  FREDEC2IM                     source/output/message/fredec2im.F
-Chd|-- called by -----------
-Chd|        BUILD_MSG                     source/output/message/build_msg.F
-Chd|-- calls ---------------
-Chd|        ARRET                         source/system/arret.F         
-Chd|====================================================================
+      !||====================================================================
+      !||    fredec2im              ../starter/source/output/message/fredec2im.F
+      !||--- called by ------------------------------------------------------
+      !||    build_msg              ../starter/source/output/message/build_msg.F
+      !||--- calls      -----------------------------------------------------
+      !||    arret                  ../starter/source/system/arret.F
+      !||--- uses       -----------------------------------------------------
+      !||====================================================================
       SUBROUTINE FREDEC2IM(LINE1,ID)
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
+        USE NAMES_AND_TITLES_MOD , ONLY : NCHARLINE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -40,12 +45,12 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      CHARACTER*ncharline LINE1
+      CHARACTER(LEN=NCHARLINE) :: LINE1
       INTEGER ID
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      CHARACTER*ncharline MOT
+      CHARACTER(LEN=NCHARLINE) :: MOT
       INTEGER I,J1,J2,J
       MOT=' '
       I=2

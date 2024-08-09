@@ -20,38 +20,40 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  INIVOID                       source/elements/initia/inivoid.F
-Chd|-- called by -----------
-Chd|        INITIA                        source/elements/initia/initia.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        C3COORI                       source/elements/sh3n/coque3n/c3coori.F
-Chd|        C3EVEC3                       source/elements/sh3n/coque3n/c3evec3.F
-Chd|        C3INMAS                       source/elements/sh3n/coque3n/c3inmas.F
-Chd|        C3VEOK3                       source/elements/sh3n/coque3n/c3veok3.F
-Chd|        CCOORI                        source/elements/shell/coque/ccoori.F
-Chd|        CEVECI                        source/elements/shell/coque/ceveci.F
-Chd|        CINMAS                        source/elements/shell/coque/cinmas.F
-Chd|        CVEOK3                        source/elements/shell/coque/cveok3.F
-Chd|        FRETITL2                      source/starter/freform.F      
-Chd|        PCOORI                        source/elements/beam/pcoori.F 
-Chd|        PMASS                         source/elements/beam/pmass.F  
-Chd|        R23MASS                       source/elements/spring/rmass.F
-Chd|        S4COOR3                       source/elements/solid/solide4/s4coor3.F
-Chd|        S4DERI3                       source/elements/solid/solide4/s4deri3.F
-Chd|        S4MASS3                       source/elements/solid/solide4/s4mass3.F
-Chd|        SBULK3                        source/elements/solid/solide/sbulk3.F
-Chd|        SCOOR3                        source/elements/solid/solide/scoor3.F
-Chd|        SDERI3                        source/elements/solid/solide/sderi3.F
-Chd|        SDLEN3                        source/elements/solid/solide/sdlen3.F
-Chd|        SMASS3                        source/elements/solid/solide/smass3.F
-Chd|        TCOORI                        source/elements/truss/tcoori.F
-Chd|        TMASS                         source/elements/truss/tmass.F 
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        STACK_MOD                     share/modules1/stack_mod.F    
-Chd|====================================================================
+      !||====================================================================
+      !||    inivoid                ../starter/source/elements/initia/inivoid.F
+      !||--- called by ------------------------------------------------------
+      !||    initia                 ../starter/source/elements/initia/initia.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    c3coori                ../starter/source/elements/sh3n/coque3n/c3coori.F
+      !||    c3evec3                ../starter/source/elements/sh3n/coque3n/c3evec3.F
+      !||    c3inmas                ../starter/source/elements/sh3n/coque3n/c3inmas.F
+      !||    c3veok3                ../starter/source/elements/sh3n/coque3n/c3veok3.F
+      !||    ccoori                 ../starter/source/elements/shell/coque/ccoori.F
+      !||    ceveci                 ../starter/source/elements/shell/coque/ceveci.F
+      !||    cinmas                 ../starter/source/elements/shell/coque/cinmas.F
+      !||    cveok3                 ../starter/source/elements/shell/coque/cveok3.F
+      !||    fretitl2               ../starter/source/starter/freform.F
+      !||    pcoori                 ../starter/source/elements/beam/pcoori.F
+      !||    pmass                  ../starter/source/elements/beam/pmass.F
+      !||    r23mass                ../starter/source/elements/spring/rmass.F
+      !||    s4coor3                ../starter/source/elements/solid/solide4/s4coor3.F
+      !||    s4deri3                ../starter/source/elements/solid/solide4/s4deri3.F
+      !||    s4mass3                ../starter/source/elements/solid/solide4/s4mass3.F
+      !||    sbulk3                 ../starter/source/elements/solid/solide/sbulk3.F
+      !||    scoor3                 ../starter/source/elements/solid/solide/scoor3.F
+      !||    sderi3                 ../starter/source/elements/solid/solide/sderi3.F
+      !||    sdlen3                 ../starter/source/elements/solid/solide/sdlen3.F
+      !||    smass3                 ../starter/source/elements/solid/solide/smass3.F
+      !||    tcoori                 ../starter/source/elements/truss/tcoori.F
+      !||    tmass                  ../starter/source/elements/truss/tmass.F
+      !||--- uses       -----------------------------------------------------
+      !||    defaults_mod           ../starter/source/modules/defaults_mod.F90
+      !||    format_mod             ../starter/share/modules1/format_mod.F90
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    stack_mod              ../starter/share/modules1/stack_mod.F
+      !||====================================================================
       SUBROUTINE INIVOID(ELBUF_STR   ,
      +                   IXC    ,IXS    ,IXTG   ,X      ,V      ,
      1                   PM     ,GEO    ,MS     ,IN     ,PTG    ,
@@ -68,13 +70,16 @@ Chd|====================================================================
      C                   IXP    ,MST    ,MSP    ,STT    ,STP    ,
      D                   STRP   ,INP    ,STIFINT,MCPP   ,INR    ,
      E                   MSR    ,MSRT   ,STR    ,IPARTR ,ITAB   ,
-     F                   IXR    ,IMERGE2 , IADMERGE2,NEL)
+     F                   IXR    ,IMERGE2 , IADMERGE2,NEL,DEFAULTS)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE ELBUFDEF_MOD
       USE STACK_MOD
       USE MESSAGE_MOD
+      USE DEFAULTS_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      USE FORMAT_MOD , ONLY : FMT_10I
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -119,6 +124,7 @@ C-----------------------------------------------
      .   MST(*),MSP(*),STT(*),STP(*),STRP(*),INP(*),STIFINT(*),MCPP(*),
      .   INR(3,*),MSR(3,*),MSRT(*),STR(*)
       TYPE(ELBUF_STRUCT_), TARGET :: ELBUF_STR
+      TYPE(DEFAULTS_), INTENT(IN) :: DEFAULTS             
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -126,7 +132,7 @@ C-----------------------------------------------
       INTEGER MXT(MVSIZ), PID(MVSIZ), NGL(MVSIZ),
      .   IX1(MVSIZ),IX2(MVSIZ),IX3(MVSIZ),IX4(MVSIZ),
      .   IX5(MVSIZ),IX6(MVSIZ),IX7(MVSIZ),IX8(MVSIZ),IBID(MVSIZ),IP,II(6),
-     .   ID, IPID, J, I0,I1,I2,I3,ITMP, KK, K,ILENG,IMASS,KK1
+     .   ID, IPID, J, I0,I1,I2,I3,ITMP, KK, K,ILENG,IMASS,KK1,IMAS_DS
       my_real
      .   AREA(MVSIZ), VOID(MVSIZ),RHO(MVSIZ),VOL(MVSIZ),
      .   X1(MVSIZ),X2(MVSIZ),X3(MVSIZ),X4(MVSIZ),X5(MVSIZ),X6(MVSIZ),
@@ -155,8 +161,7 @@ C-----------------------------------------------
      .   YD5(MVSIZ), YD6(MVSIZ), YD7(MVSIZ), YD8(MVSIZ),
      .   ZD1(MVSIZ), ZD2(MVSIZ), ZD3(MVSIZ), ZD4(MVSIZ),
      .   ZD5(MVSIZ), ZD6(MVSIZ), ZD7(MVSIZ), ZD8(MVSIZ),VOLDP(MVSIZ)
-       CHARACTER*nchartitle,
-     .   TITR
+       CHARACTER(LEN=NCHARTITLE) :: TITR
 C
       TYPE(ELBUF_STRUCT_) ,POINTER :: BIDBUF
       TYPE (STACK_PLY) :: STACK
@@ -173,6 +178,7 @@ C
       NXREF = 0
       NF1=NFT+1
       IF (ITY == 1.AND. ISMSTR == 10) ISMSTR = 4
+      IMAS_DS = DEFAULTS%SOLID%IMAS
 C--------------------------------------
       IF(ITY == 1.AND.ISOLNOD == 4)THEN
 C Solid 4 nodes tetrahedron
@@ -203,7 +209,7 @@ C Solid 4 nodes tetrahedron
      2      IPARTS(NFT+1),MSS(1,NFT+1),MSNF   ,MSSF(1,NFT+1),WMA ,
      3      RHOCP        ,MCP         ,MCPS(1,NFT+1)          ,TEMP0,
      4      TEMP         ,MSSA        ,IX1     ,IX2    ,IX3    ,IX4 ,
-     5      FILL, VOLU)
+     5      FILL, VOLU   ,IMAS_DS )
         ENDIF
         IF(I7STIFS /= 0)THEN
           NCC=4

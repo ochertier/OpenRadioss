@@ -20,25 +20,24 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  HM_READ_INTER_TYPE24          source/interfaces/int24/hm_read_inter_type24.F
-Chd|-- called by -----------
-Chd|        HM_READ_INTER_STRUCT          source/interfaces/reader/hm_read_inter_struct.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        DEFINTER                      source/interfaces/interf1/definter.F
-Chd|        FREERR                        source/starter/freform.F      
-Chd|        HM_GET_FLOATV                 source/devtools/hm_reader/hm_get_floatv.F
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        INTER_DCOD_FRICTION           source/interfaces/reader/inter_dcod_friction.F
-Chd|        INTER_DCOD_SENSOR             source/interfaces/reader/inter_dcod_sensor.F
-Chd|        NGR2USR                       source/system/nintrr.F        
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        PARAMETERS_MOD                ../common_source/modules/interfaces/parameters_mod.F
-Chd|        SENSOR_MOD                    share/modules1/sensor_mod.F   
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_read_inter_type24   ../starter/source/interfaces/int24/hm_read_inter_type24.F
+      !||--- called by ------------------------------------------------------
+      !||    hm_read_inter_struct   ../starter/source/interfaces/reader/hm_read_inter_struct.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    definter               ../starter/source/interfaces/interf1/definter.F
+      !||    hm_get_floatv          ../starter/source/devtools/hm_reader/hm_get_floatv.F
+      !||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    inter_dcod_friction    ../starter/source/interfaces/reader/inter_dcod_friction.F
+      !||    inter_dcod_sensor      ../starter/source/interfaces/reader/inter_dcod_sensor.F
+      !||    ngr2usr                ../starter/source/system/nintrr.F
+      !||--- uses       -----------------------------------------------------
+      !||    format_mod             ../starter/share/modules1/format_mod.F90
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    sensor_mod             ../starter/share/modules1/sensor_mod.F
+      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE HM_READ_INTER_TYPE24(
      1        IPARI      ,STFAC      ,FRIGAP     ,NOINT     ,NI         ,
      2        IGRNOD     ,IGRSURF    ,XFILTR     ,FRIC_P     ,DEF_INTER ,
@@ -56,6 +55,8 @@ C-----------------------------------------------
       USE UNITAB_MOD
       USE SENSOR_MOD
       USE PARAMETERS_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARKEY, NCHARFIELD
+      USE FORMAT_MOD , ONLY : FMT_I_2F
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -70,11 +71,9 @@ C-----------------------------------------------
       INTEGER NOM_OPT(LNOPT1,*), NOM_OPTFRIC(LNOPT1,*)
       INTEGER ISU1,ISU2,NI
       INTEGER IPARI(*),DEF_INTER(*)
-      my_real
-     .   STFAC,XFILTR
-      my_real
-     .   FRIGAP(*),FRIC_P(*)
-      CHARACTER TITR*nchartitle,TITR1*nchartitle
+      my_real STFAC,XFILTR
+      my_real FRIGAP(*),FRIC_P(*)
+      CHARACTER(LEN=NCHARTITLE) :: TITR,TITR1
       TYPE(INTBUF_FRIC_STRUCT_) INTBUF_FRIC_TAB(*)
       TYPE(SUBMODEL_DATA) LSUBMODEL(*)
       TYPE (UNIT_TYPE_),INTENT(IN) :: UNITAB 
@@ -108,9 +107,10 @@ C-----------------------------------------------
      .    PERCENT_SIZE,GAPMAX_S,GAPMAX_M,PENMAX,PENMIN,VISC,VISCF,
      .    ETEN_M,PADM,ANGLADM,RSTH,FHEAT,TINT,CADM,TPFIT,STFACM,
      .    DTSTIF
-      CHARACTER MESS*40, MSGTITL*nchartitle
-      CHARACTER OPT*ncharkey,KEY*ncharkey,KEY1*ncharkey,
-     .          BCFLAG*ncharfield, BCFLAGM*ncharfield
+      CHARACTER(LEN=40)::MESS
+      CHARACTER(LEN=NCHARTITLE)::MSGTITL
+      CHARACTER(LEN=NCHARKEY)::OPT,KEY,KEY1
+      CHARACTER(LEN=NCHARFIELD)::BCFLAG,BCFLAGM
 !
       INTEGER, DIMENSION(:), POINTER :: INGR2USR
 C-----------------------------------------------

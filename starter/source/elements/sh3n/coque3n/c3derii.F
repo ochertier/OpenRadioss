@@ -20,14 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  C3DERII                       source/elements/sh3n/coque3n/c3derii.F
-Chd|-- called by -----------
-Chd|        C3INIT3                       source/elements/sh3n/coque3n/c3init3.F
-Chd|        INIRIG_MAT                    source/elements/initia/inirig_mat.F
-Chd|-- calls ---------------
-Chd|        GROUP_PARAM_MOD               ../common_source/modules/mat_elem/group_param_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    c3derii           ../starter/source/elements/sh3n/coque3n/c3derii.F
+      !||--- called by ------------------------------------------------------
+      !||    c3init3           ../starter/source/elements/sh3n/coque3n/c3init3.F
+      !||    inirig_mat        ../starter/source/elements/initia/inirig_mat.F
+      !||--- uses       -----------------------------------------------------
+      !||====================================================================
       SUBROUTINE C3DERII(JFT,JLT,PM    ,GEO  ,PX1,
      .                   PY1,PY2,STIFN ,STIFR,IXTG,
      .                   THK,SH3TREE   ,ALDT ,UPARAM  ,IPM ,IGEO,
@@ -78,7 +77,7 @@ C-----------------------------------------------
      .        IPMAT,MATLY,IPGMAT,IGMAT,IPOS
       my_real ALDTV(MVSIZ)
       my_real VISCMX, A11, G, STI,STIR,SHF,VISCDEF,
-     .     AL1, AL2, AL3, ALMAX, SSP,YOUNG,NU,RHO,BULK,GMAX,
+     .     AL1, AL2, AL3, ALMAX, SSP,YOUNG,NU,RHO,GMAX,
      .     C1,IZ,THICKT,THKLY,POSLY,A1THK,C1THK,
      .     GTHK,A11R,FAC,A12,E,ETHK,NUTHK,A12THK,RHOG
 C=======================================================================
@@ -113,9 +112,14 @@ C
         ELSE
          IF (MTN<=28) THEN
           SSP=PM(27,IMAT)
-         ELSEIF (MTN == 42 .OR. MTN  == 69 ) THEN
+         ELSEIF (MTN == 42) THEN
+           RHO  = PM(1 ,IMAT)
+           NU   = PM(21,IMAT)
+           GMAX = PM(22,IMAT) 
+           A11  = GMAX*(ONE + NU)/(ONE - NU**2)
+           SSP  = MAX(SSP, SQRT(A11/RHO)) 
+         ELSEIF (MTN == 69) THEN
           IADB = IPM(7,IMAT)-1                                               
-          BULK = UPARAM(IADB+11) 
           NU   = UPARAM(IADB+14)                             
           GMAX = UPARAM(IADB+1)*UPARAM(IADB+6)                 
      .         + UPARAM(IADB+2)*UPARAM(IADB+7)

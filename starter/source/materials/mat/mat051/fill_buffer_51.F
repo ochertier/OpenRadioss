@@ -20,20 +20,23 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  FILL_BUFFER_51                source/materials/mat/mat051/fill_buffer_51.F
-Chd|-- called by -----------
-Chd|        FILL_BUFFER_51_0              source/materials/mat/mat051/fill_buffer_51_0.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        NINTRI                        source/system/nintrr.F        
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    fill_buffer_51         ../starter/source/materials/mat/mat051/fill_buffer_51.F
+      !||--- called by ------------------------------------------------------
+      !||    fill_buffer_51_0       ../starter/source/materials/mat/mat051/fill_buffer_51_0.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    ie_bound               ../starter/source/materials/mat/mat051/ie_bound.F
+      !||    nintri                 ../starter/source/system/nintrr.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE FILL_BUFFER_51( IPM, PM, UPARAM, BUFMAT, USER_ID, TITR, INTERNAL_ID)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C-----------------------------------------------
@@ -57,7 +60,6 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include "param_c.inc"
 #include "com04_c.inc"
-#include "nchar_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -65,7 +67,7 @@ C-----------------------------------------------
       INTEGER,INTENT(IN) :: USER_ID, INTERNAL_ID
       my_real,TARGET :: PM(NPROPM,NUMMAT),BUFMAT(*)
       my_real        :: UPARAM(*)
-      CHARACTER*nchartitle, INTENT(IN) :: TITR
+      CHARACTER(LEN=NCHARTITLE),INTENT(IN) ::  TITR
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -81,7 +83,7 @@ C-----------------------------------------------
       my_real, EXTERNAL              :: IE_BOUND
       my_real, DIMENSION(:), POINTER :: UPARAM_
 
-      CHARACTER*nchartitle :: chain1
+      CHARACTER(LEN=NCHARTITLE) :: chain1
 
       !====================================POLYNOMIAL EOS
       my_real :: RHO,C0,C1,C2,C3,C4,C5,E0,PSH,P0,DPDMU,SSP

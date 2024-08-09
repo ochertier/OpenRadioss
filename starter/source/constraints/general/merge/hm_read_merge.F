@@ -20,14 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  RBMERGE_MOD                   source/constraints/general/merge/hm_read_merge.F
-Chd|-- called by -----------
-Chd|        HM_READ_MERGE                 source/constraints/general/merge/hm_read_merge.F
-Chd|        RETRIRBY                      source/constraints/general/merge/hm_read_merge.F
-Chd|        TRIRBMERGE                    source/constraints/general/merge/hm_read_merge.F
-Chd|-- calls ---------------
-Chd|====================================================================
+      !||====================================================================
+      !||    rbmerge_mod     ../starter/source/constraints/general/merge/hm_read_merge.F
+      !||--- called by ------------------------------------------------------
+      !||    hm_read_merge   ../starter/source/constraints/general/merge/hm_read_merge.F
+      !||    rb_explore      ../starter/source/constraints/general/merge/hm_read_merge.F
+      !||    rbleveldown     ../starter/source/constraints/general/merge/hm_read_merge.F
+      !||    rbtag2down      ../starter/source/constraints/general/merge/hm_read_merge.F
+      !||    retrirby        ../starter/source/constraints/general/merge/hm_read_merge.F
+      !||    trirbmerge      ../starter/source/constraints/general/merge/hm_read_merge.F
+      !||====================================================================
       MODULE RBMERGE_MOD
 c=======================================================================   
 !                           RIGID BODY MERGE
@@ -61,28 +63,30 @@ C-----------------------------------------------------------------------
       END TYPE RBMERGE_
       END MODULE RBMERGE_MOD
 C
-Chd|====================================================================
-Chd|  HM_READ_MERGE                 source/constraints/general/merge/hm_read_merge.F
-Chd|-- called by -----------
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        FRETITL                       source/starter/freform.F      
-Chd|        FRETITL2                      source/starter/freform.F      
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        HM_GET_INT_ARRAY_INDEX        source/devtools/hm_reader/hm_get_int_array_index.F
-Chd|        HM_OPTION_READ_KEY            source/devtools/hm_reader/hm_option_read_key.F
-Chd|        HM_OPTION_START               source/devtools/hm_reader/hm_option_start.F
-Chd|        MY_ORDERS                     ../common_source/tools/sort/my_orders.c
-Chd|        TRIRBMERGE                    source/constraints/general/merge/hm_read_merge.F
-Chd|        NODGRNR5                      source/starter/freform.F      
-Chd|        USR2SYS                       source/system/sysfus.F        
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        RBMERGE_MOD                   source/constraints/general/merge/hm_read_merge.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_read_merge            ../starter/source/constraints/general/merge/hm_read_merge.F
+      !||--- called by ------------------------------------------------------
+      !||    lectur                   ../starter/source/starter/lectur.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                   ../starter/source/output/message/message.F
+      !||    fretitl                  ../starter/source/starter/freform.F
+      !||    fretitl2                 ../starter/source/starter/freform.F
+      !||    hm_get_int_array_index   ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+      !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    hm_option_read_key       ../starter/source/devtools/hm_reader/hm_option_read_key.F
+      !||    hm_option_start          ../starter/source/devtools/hm_reader/hm_option_start.F
+      !||    nodgrnr5                 ../starter/source/starter/freform.F
+      !||    rbleveldown              ../starter/source/constraints/general/merge/hm_read_merge.F
+      !||    rbtag1down               ../starter/source/constraints/general/merge/hm_read_merge.F
+      !||    rbtag2down               ../starter/source/constraints/general/merge/hm_read_merge.F
+      !||    trirbmerge               ../starter/source/constraints/general/merge/hm_read_merge.F
+      !||    usr2sys                  ../starter/source/system/sysfus.F
+      !||--- uses       -----------------------------------------------------
+      !||    hm_option_read_mod       ../starter/share/modules1/hm_option_read_mod.F
+      !||    message_mod              ../starter/share/message_module/message_mod.F
+      !||    rbmerge_mod              ../starter/source/constraints/general/merge/hm_read_merge.F
+      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE HM_READ_MERGE(
      .              MGRBY,SMGRBY,NPBY,LPBY,SLRBODY,
      .              RBY  ,NOM_OPT ,PTR_NOPT_RBMERGE,IGRNOD,
@@ -91,10 +95,11 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
-      USE RBMERGE_MOD
-      USE GROUPDEF_MOD
-      USE SUBMODEL_MOD
+      USE RBMERGE_MOD , ONLY : RBMERGE_
+      USE GROUPDEF_MOD , ONLY : GROUP_
+      USE SUBMODEL_MOD , ONLY : NSUBMOD, SUBMODEL_DATA
       USE HM_OPTION_READ_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : nchartitle, ncharkey
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -109,14 +114,11 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER MGRBY(NMGRBY,*),NPBY(NNPBY,*),LPBY(*),
-     .        SLRBODY,SMGRBY,ITABM1(*),ITAB(*)
-C     REAL
-      my_real
-     .   RBY(NRBY,*)
+      INTEGER MGRBY(NMGRBY,*),NPBY(NNPBY,*),LPBY(*),SLRBODY,SMGRBY,ITABM1(*),ITAB(*)
+      my_real RBY(NRBY,*)
       INTEGER NOM_OPT(LNOPT1,*),PTR_NOPT_RBMERGE
       INTEGER IGRV(NIGRV,*),IBGR(*)
-      TYPE(SUBMODEL_DATA),INTENT(IN)::LSUBMODEL(*)
+      TYPE(SUBMODEL_DATA),INTENT(IN)::LSUBMODEL(NSUBMOD)
 C-----------------------------------------------
       TYPE (GROUP_)  , DIMENSION(NGRNOD)  :: IGRNOD
 C-----------------------------------------------
@@ -126,16 +128,16 @@ C-----------------------------------------------
      .        N,NOPT,UID, II, NOBJ
       INTEGER, DIMENSION(:) , ALLOCATABLE :: INDEX
       INTEGER, DIMENSION(:,:) , ALLOCATABLE :: INUM
-
       INTEGER IMAIN,ISECONDARY,FLAGG_OPT, FLAG_BOUCLE, FLAG_ERROR, 
      .        FLAG_DOUBLON, FLAG_DOUBLEMAIN, M_TYPE, S_TYPE, ID_OPT,
      .        IDNODE, NN, PRT_OPT
       INTEGER TABRB(NRBYKIN,2)
-      INTEGER NB_MAIN(NRBYKIN),NSECONDARY(NRBYKIN),
-     .        TAG1(NRBYKIN),TAG2(NRBYKIN)
+      INTEGER NB_MAIN(NRBYKIN),NSECONDARY(NRBYKIN),TAG1(NRBYKIN),TAG2(NRBYKIN)
       INTEGER TABBOUCLE(NRBYKIN+1), IDBOUCLE, LEVEL
       CHARACTER MYSTRING*100,MYLOOP*200
-      CHARACTER MESS*40,MESS2*40,TITR*nchartitle,KEY2*ncharkey
+      CHARACTER MESS*40,MESS2*40
+      CHARACTER(LEN=nchartitle) :: TITR
+      CHARACTER(LEN=ncharkey) :: KEY2
       TYPE(RBMERGE_), DIMENSION(:), ALLOCATABLE :: RBMERGE
       INTEGER, DIMENSION(:), ALLOCATABLE :: ITAG, WORK
       INTEGER IWORK(70000)
@@ -162,12 +164,7 @@ C--------------------------------------------------
 C--------------------------------------------------
 C EXTRACT DATAS OF /RBODY/... LINE
 C--------------------------------------------------
-        CALL HM_OPTION_READ_KEY(LSUBMODEL,
-     .                       OPTION_ID = ID,
-     .                       UNIT_ID = UID,
-     .                       OPTION_TITR = TITR,
-     .                       KEYWORD2 = KEY2)
-
+        CALL HM_OPTION_READ_KEY(LSUBMODEL, OPTION_ID = ID, UNIT_ID = UID, OPTION_TITR = TITR, KEYWORD2 = KEY2)
 C--------------------------------------------------
 C WRITE TITLE IN OUT FILE
 C--------------------------------------------------
@@ -561,6 +558,12 @@ C
       END SUBROUTINE HM_READ_MERGE
 C
 C-----------------------------------------------
+      !||====================================================================
+      !||    rbtag1down      ../starter/source/constraints/general/merge/hm_read_merge.F
+      !||--- called by ------------------------------------------------------
+      !||    hm_read_merge   ../starter/source/constraints/general/merge/hm_read_merge.F
+      !||--- calls      -----------------------------------------------------
+      !||====================================================================
       RECURSIVE SUBROUTINE RBTAG1DOWN(TABRB,IDRB,TAG1,NBMERGE)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -592,6 +595,14 @@ C
       END
 C 
 C-----------------------------------------------
+      !||====================================================================
+      !||    rbtag2down      ../starter/source/constraints/general/merge/hm_read_merge.F
+      !||--- called by ------------------------------------------------------
+      !||    hm_read_merge   ../starter/source/constraints/general/merge/hm_read_merge.F
+      !||--- calls      -----------------------------------------------------
+      !||--- uses       -----------------------------------------------------
+      !||    rbmerge_mod     ../starter/source/constraints/general/merge/hm_read_merge.F
+      !||====================================================================
       RECURSIVE SUBROUTINE RBTAG2DOWN(IDRB,TAG2,RBMERGE,
      .                                FLAG_BOUCLE,TABBOUCLE,IDBOUCLE)
 C-----------------------------------------------
@@ -644,6 +655,14 @@ C
       END   
 C
 C-----------------------------------------------
+      !||====================================================================
+      !||    rbleveldown     ../starter/source/constraints/general/merge/hm_read_merge.F
+      !||--- called by ------------------------------------------------------
+      !||    hm_read_merge   ../starter/source/constraints/general/merge/hm_read_merge.F
+      !||--- calls      -----------------------------------------------------
+      !||--- uses       -----------------------------------------------------
+      !||    rbmerge_mod     ../starter/source/constraints/general/merge/hm_read_merge.F
+      !||====================================================================
       RECURSIVE SUBROUTINE RBLEVELDOWN(NPBY,RBMERGE,IDRB,LEVEL)
 C-----------------------------------------------
 C   M o d u l e s
@@ -693,16 +712,18 @@ C
       RETURN
       END
 C  
-Chd|====================================================================
-Chd|  TRIRBMERGE                    source/constraints/general/merge/hm_read_merge.F
-Chd|-- called by -----------
-Chd|        HM_READ_MERGE                 source/constraints/general/merge/hm_read_merge.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        SPMDSET                       source/constraints/general/rbody/spmdset.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        RBMERGE_MOD                   source/constraints/general/merge/hm_read_merge.F
-Chd|====================================================================
+      !||====================================================================
+      !||    trirbmerge             ../starter/source/constraints/general/merge/hm_read_merge.F
+      !||--- called by ------------------------------------------------------
+      !||    hm_read_merge          ../starter/source/constraints/general/merge/hm_read_merge.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    rb_explore             ../starter/source/constraints/general/merge/hm_read_merge.F
+      !||    spmdset                ../starter/source/constraints/general/rbody/spmdset.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    rbmerge_mod            ../starter/source/constraints/general/merge/hm_read_merge.F
+      !||====================================================================
       SUBROUTINE TRIRBMERGE(RBMERGE,NPBY   ,LPBY    ,SLRBODY,
      .                      RBY    ,NOM_OPT,ITAB    ,IBGR   ,IGRV   )
 C-----------------------------------------------
@@ -710,6 +731,7 @@ C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
       USE RBMERGE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : nchartitle
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -727,9 +749,7 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NPBY(NNPBY,*),LPBY(*),SLRBODY,ITAB(*)
       TYPE (RBMERGE_)   , DIMENSION(NRBYKIN)   :: RBMERGE
-C     REAL
-      my_real
-     .   RBY(NRBY,*)
+      my_real RBY(NRBY,*)
       INTEGER NOM_OPT(LNOPT1,*)
       INTEGER IGRV(NIGRV,*),IBGR(*)
 C-----------------------------------------------
@@ -740,15 +760,13 @@ C-----------------------------------------------
      .        INDEX(NRBYKIN),LPBY_TMP(SLRBODY),
      .        NOM_OPT_TMP(LNOPT1,NRBYKIN),INODE, IKREM,ISPHER,
      .        ICDG,CNT,NN,IAD
-C     REAL
-      my_real
-     .   RBY_TMP(NRBY,NRBYKIN)
-      my_real
-     .     BID, DX, DY, DZ, DMSTR, DELT, DTMP
+      my_real RBY_TMP(NRBY,NRBYKIN)
+      my_real BID, DX, DY, DZ, DMSTR, DELT, DTMP
       INTEGER NBSECONDARY, IDIR, NSL, NSL_XTRA
       INTEGER, DIMENSION(:), ALLOCATABLE :: ITAG
       INTEGER, DIMENSION(NXTRA_NODE) :: LIST_XTRA 
-      CHARACTER MESS*40,TITR*nchartitle    
+      CHARACTER MESS*40
+      CHARACTER(LEN=nchartitle) :: TITR
 C-----------------------------------------------
 !   RBMERGE(IRBM)%ID   :: Rigid body identifier
 !   RBMERGE(IRBM)%NBSECONDARY   :: Number of SECONDARY rigid body
@@ -975,6 +993,14 @@ C
 1200  FORMAT(5X,'SECONDARY EXTRA NODES ID ',10I10)
       END
 C
+      !||====================================================================
+      !||    rb_explore    ../starter/source/constraints/general/merge/hm_read_merge.F
+      !||--- called by ------------------------------------------------------
+      !||    trirbmerge    ../starter/source/constraints/general/merge/hm_read_merge.F
+      !||--- calls      -----------------------------------------------------
+      !||--- uses       -----------------------------------------------------
+      !||    rbmerge_mod   ../starter/source/constraints/general/merge/hm_read_merge.F
+      !||====================================================================
       RECURSIVE SUBROUTINE RB_EXPLORE(IDRB,RBMERGE,PILE,IDPILE)
 C-----------------------------------------------
 C   M o d u l e s
@@ -1019,14 +1045,14 @@ C
       RETURN
       END     
 C
-Chd|====================================================================
-Chd|  RETRIRBY                      source/constraints/general/merge/hm_read_merge.F
-Chd|-- called by -----------
-Chd|        INITIA                        source/elements/initia/initia.F
-Chd|-- calls ---------------
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        RBMERGE_MOD                   source/constraints/general/merge/hm_read_merge.F
-Chd|====================================================================
+      !||====================================================================
+      !||    retrirby      ../starter/source/constraints/general/merge/hm_read_merge.F
+      !||--- called by ------------------------------------------------------
+      !||    initia        ../starter/source/elements/initia/initia.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod   ../starter/share/message_module/message_mod.F
+      !||    rbmerge_mod   ../starter/source/constraints/general/merge/hm_read_merge.F
+      !||====================================================================
       SUBROUTINE RETRIRBY(NPBY ,LPBY ,RBY ,NOM_OPT)
 C-----------------------------------------------
 C   M o d u l e s
@@ -1048,9 +1074,7 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NPBY(NNPBY,*),LPBY(*)
-C     REAL
-      my_real
-     .   RBY(NRBY,*)
+      my_real RBY(NRBY,*)
       INTEGER NOM_OPT(LNOPT1,*)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -1060,9 +1084,7 @@ C-----------------------------------------------
      .        INDEX(NRBYKIN+NRBYLAG),
      .        NOM_OPT_TMP(LNOPT1,NRBYKIN+NRBYLAG),
      .        NEW_SIZE,CPT_RBY,CPT_RBY_SECONDARY
-C     REAL
-      my_real
-     .   RBY_TMP(NRBY,NRBYKIN+NRBYLAG)
+      my_real RBY_TMP(NRBY,NRBYKIN+NRBYLAG)
 C-----------------------------------------------
 C
       NEW_SIZE = 0       

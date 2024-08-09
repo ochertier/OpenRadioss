@@ -20,19 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  I23BUC1                       source/interfaces/inter3d1/i23buc3.F
-Chd|-- called by -----------
-Chd|        ININT3                        source/interfaces/inter3d1/inint3.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        I23COR3T                      source/interfaces/inter3d1/i23cor3t.F
-Chd|        I23TRI                        source/interfaces/inter3d1/i23tri.F
-Chd|        I7CMP3                        source/interfaces/inter3d1/i7cmp3.F
-Chd|        I7DST3                        source/interfaces/inter3d1/i7dst3.F
-Chd|        I7PEN3                        source/interfaces/inter3d1/i7pen3.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    i23buc1                ../starter/source/interfaces/inter3d1/i23buc3.F
+      !||--- called by ------------------------------------------------------
+      !||    inint3                 ../starter/source/interfaces/inter3d1/inint3.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    i23cor3t               ../starter/source/interfaces/inter3d1/i23cor3t.F
+      !||    i23tri                 ../starter/source/interfaces/inter3d1/i23tri.F
+      !||    i7cmp3                 ../starter/source/interfaces/inter3d1/i7cmp3.F
+      !||    i7dst3                 ../starter/source/interfaces/inter3d1/i7dst3.F
+      !||    i7pen3                 ../starter/source/interfaces/inter3d1/i7pen3.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE I23BUC1(
      1   X     ,IRECT ,NSV   ,BUMULT,NSEG    ,
      2   NMN   ,NRTM ,MWA    ,NSN   ,CAND_E  ,
@@ -53,6 +54,7 @@ Chd|====================================================================
      8   LB4   ,LC1   ,LC2    ,LC3,LC4,
      9   N11   ,N21   ,N31    ,PENE    )
       USE MESSAGE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -84,8 +86,7 @@ C     REAL
      .   DIST,BUMULT,GAP,TZINF,MAXBOX,MINBOX,GAPMIN,GAPMAX,
      .   MARGEREF, GAP_M(*)
       INTEGER ID
-      CHARACTER*nchartitle,
-     .   TITR
+      CHARACTER(LEN=NCHARTITLE) :: TITR
       INTEGER, DIMENSION(MVSIZ), INTENT(INOUT) :: PROV_N,PROV_E
       INTEGER, DIMENSION(MVSIZ), INTENT(INOUT) :: IX1,IX2,IX3,IX4,NSVG
       my_real, DIMENSION(MVSIZ), INTENT(INOUT) :: X1,X2,X3,X4

@@ -20,17 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  SIGEPS76C                     source/materials/mat/mat076/sigeps76c.F
-Chd|-- called by -----------
-Chd|        MULAWC                        source/materials/mat_share/mulawc.F
-Chd|-- calls ---------------
-Chd|        ASSO_QPLAS76C                 source/materials/mat/mat076/asso_qplas76c.F
-Chd|        NO_ASSO_LPLAS76C              source/materials/mat/mat076/no_asso_lplas76c.F
-Chd|        NO_ASSO_QPLAS76C              source/materials/mat/mat076/no_asso_qplas76c.F
-Chd|        VINTER                        source/tools/curve/vinter.F   
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    sigeps76c          ../engine/source/materials/mat/mat076/sigeps76c.F
+      !||--- called by ------------------------------------------------------
+      !||    mulawc             ../engine/source/materials/mat_share/mulawc.F
+      !||--- calls      -----------------------------------------------------
+      !||    asso_qplas76c      ../engine/source/materials/mat/mat076/asso_qplas76c.F
+      !||    no_asso_lplas76c   ../engine/source/materials/mat/mat076/no_asso_lplas76c.F
+      !||    no_asso_qplas76c   ../engine/source/materials/mat/mat076/no_asso_qplas76c.F
+      !||    vinter             ../engine/source/tools/curve/vinter.F
+      !||--- uses       -----------------------------------------------------
+      !||    matparam_def_mod   ../common_source/modules/mat_elem/matparam_def_mod.F90
+      !||====================================================================
       SUBROUTINE SIGEPS76C(
      1     NEL     ,NUPARAM ,NUVAR   ,NFUNC   ,IFUNC   ,
      2     NPF     ,TF      ,MATPARAM,TIME    ,TIMESTEP,
@@ -40,8 +41,8 @@ Chd|====================================================================
      6     SIGNXX  ,SIGNYY  ,SIGNXY  ,SIGNYZ  ,SIGNZX  ,
      7     SOUNDSP ,THK     ,THKLY   ,PLA     ,EPSP    ,
      8     ETSE    ,GS      ,YLD     ,INLOC   ,L_PLANL ,
-     9     PLANL   ,DPLANL  ,DMG     ,IDEL7NOK,
-     A     NVARTMP ,VARTMP  )
+     9     PLANL   ,DPLANL  ,DMG     ,
+     A     NVARTMP ,VARTMP  ,LOFF    )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -60,7 +61,6 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER ,INTENT(IN)    :: NEL,NFUNC,NUPARAM,NUVAR,INLOC,L_PLANL
-      INTEGER ,INTENT(INOUT) :: IDEL7NOK
       INTEGER ,INTENT(IN)    :: NVARTMP
       INTEGER ,DIMENSION(NEL,NVARTMP) ,INTENT(INOUT) :: VARTMP
       INTEGER ,DIMENSION(NFUNC), INTENT(IN) :: IFUNC
@@ -76,6 +76,7 @@ C-----------------------------------------------
      .   ETSE,OFF,YLD,THK,DMG
       my_real, DIMENSION(NEL,NUVAR), INTENT(INOUT) :: UVAR
       TYPE(MATPARAM_STRUCT_), INTENT(IN), TARGET :: MATPARAM
+      my_real, DIMENSION(NEL), INTENT(IN) :: LOFF
 C-----------------------------------------------
 C   VARIABLES FOR FUNCTION INTERPOLATION 
 C-----------------------------------------------
@@ -137,7 +138,7 @@ c
      .       SIGNXX  ,SIGNYY  ,SIGNXY  ,SIGNYZ  ,SIGNZX  ,
      .       PLA     ,DPLA    ,EPSP    ,OFF     ,GS      ,
      .       YLD     ,SOUNDSP ,DEZZ    ,INLOC   ,DPLANL  ,
-     .       NVARTMP ,VARTMP  )
+     .       NVARTMP ,VARTMP  ,LOFF    )
 c
       ELSE   ! Non-associated plastic flow
         IF (IQUAD == 1) THEN ! Quadratic yield criterion
@@ -150,7 +151,7 @@ c
      .       SIGNXX  ,SIGNYY  ,SIGNXY  ,SIGNYZ  ,SIGNZX  ,
      .       PLA     ,DPLA    ,EPSP    ,OFF     ,GS      ,
      .       YLD     ,SOUNDSP ,DEZZ    ,INLOC   ,DPLANL  ,
-     .       NVARTMP ,VARTMP  )
+     .       NVARTMP ,VARTMP  ,LOFF    )
         ELSE                 ! Non-quadratic yield criterion
           CALL NO_ASSO_LPLAS76C(
      .       NEL     ,NUPARAM ,NUVAR   ,NFUNC   ,IFUNC   ,
@@ -161,7 +162,7 @@ c
      .       SIGNXX  ,SIGNYY  ,SIGNXY  ,SIGNYZ  ,SIGNZX  ,
      .       PLA     ,DPLA    ,EPSP    ,OFF     ,GS      ,
      .       YLD     ,SOUNDSP ,DEZZ    ,INLOC   ,DPLANL  ,
-     .       NVARTMP ,VARTMP  )
+     .       NVARTMP ,VARTMP  ,LOFF    )
         ENDIF
       ENDIF
 c
@@ -188,7 +189,6 @@ c
             DMG(I) = ONE
             IF (OFF(I) == ONE) THEN 
               OFF(I) = FOUR_OVER_5
-              IDEL7NOK    = 1
               NINDX       = NINDX+1
               INDX(NINDX) = I
             ENDIF
@@ -204,7 +204,6 @@ c
           IF (DMG(I) >= ONE) THEN 
             IF (OFF(I) == ONE) THEN 
               OFF(I) = FOUR_OVER_5
-              IDEL7NOK    = 1
               NINDX       = NINDX+1
               INDX(NINDX) = I
             ENDIF

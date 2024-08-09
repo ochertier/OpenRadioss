@@ -20,28 +20,31 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  HM_READ_FRM                   source/tools/skew/hm_read_frm.F
-Chd|-- called by -----------
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        ANODSET                       source/output/analyse/analyse_node.c
-Chd|        FRETITL                       source/starter/freform.F      
-Chd|        HM_GET_FLOATV                 source/devtools/hm_reader/hm_get_floatv.F
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        HM_GET_STRING                 source/devtools/hm_reader/hm_get_string.F
-Chd|        HM_OPTION_READ_KEY            source/devtools/hm_reader/hm_option_read_key.F
-Chd|        HM_OPTION_START               source/devtools/hm_reader/hm_option_start.F
-Chd|        IFRONTPLUS                    source/spmd/node/frontplus.F  
-Chd|        SUBROTPOINT                   source/model/submodel/subrot.F
-Chd|        SUBROTVECT                    source/model/submodel/subrot.F
-Chd|        UDOUBLE                       source/system/sysfus.F        
-Chd|        USR2SYS                       source/system/sysfus.F        
-Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_read_frm            ../starter/source/tools/skew/hm_read_frm.F
+      !||--- called by ------------------------------------------------------
+      !||    lectur                 ../starter/source/starter/lectur.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    anodset                ../starter/source/output/analyse/analyse_node.c
+      !||    fretitl                ../starter/source/starter/freform.F
+      !||    hm_get_floatv          ../starter/source/devtools/hm_reader/hm_get_floatv.F
+      !||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    hm_get_string          ../starter/source/devtools/hm_reader/hm_get_string.F
+      !||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
+      !||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
+      !||    ifrontplus             ../starter/source/spmd/node/frontplus.F
+      !||    origin                 ../starter/source/model/remesh/build_admesh.F
+      !||    subrotpoint            ../starter/source/model/submodel/subrot.F
+      !||    subrotvect             ../starter/source/model/submodel/subrot.F
+      !||    udouble                ../starter/source/system/sysfus.F
+      !||    usr2sys                ../starter/source/system/sysfus.F
+      !||--- uses       -----------------------------------------------------
+      !||    format_mod             ../starter/share/modules1/format_mod.F90
+      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE HM_READ_FRM(ISKN    ,X       ,ITAB     ,ITABM1  ,
      .                       XFRAME  ,LSUBMODEL,RTRANS ,NOM_OPT ,UNITAB)
 C-----------------------------------------------
@@ -51,6 +54,8 @@ C-----------------------------------------------
       USE SUBMODEL_MOD
       USE MESSAGE_MOD
       USE HM_OPTION_READ_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARFIELD, NCHARKEY
+      USE FORMAT_MOD , ONLY : LFIELD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -73,10 +78,7 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       TYPE (UNIT_TYPE_),INTENT(IN) ::UNITAB 
       INTEGER ISKN(LISKN,*), ITAB(*), ITABM1(*)
-C     REAL
-      my_real
-     .   X(3,*), XFRAME(NXFRAME,*),
-     .   RTRANS(NTRANSF,*)
+      my_real X(3,*), XFRAME(NXFRAME,*),RTRANS(NTRANSF,*)
       TYPE(SUBMODEL_DATA) LSUBMODEL(*)
       INTEGER NOM_OPT(LNOPT1,*)
 C-----------------------------------------------
@@ -85,12 +87,12 @@ C-----------------------------------------------
       INTEGER I, IMOV, INOD, J, N1, N2, N3, K, NSK,
      .        IUN, JJ, SUB_ID,
      .        IDIR,IFLAGUNIT,ID,UID,CPT
-C     REAL
-      my_real
-     .   P(12), PNOR1, PNOR2, PNORM1, DET1, DET2, DET3, DET, PP,BID
-      CHARACTER NOMFG*nchartitle
-      CHARACTER TITR*nchartitle,MESS*40,MESSF*40,KEY*ncharkey
-      CHARACTER DIR*ncharfield
+      my_real P(12), PNOR1, PNOR2, PNORM1, DET1, DET2, DET3, DET, PP,BID
+      CHARACTER(LEN=NCHARTITLE) ::  NOMFG
+      CHARACTER(LEN=NCHARTITLE) :: TITR
+      CHARACTER :: MESS*40,MESSF*40
+      CHARACTER(LEN=NCHARKEY) :: KEY
+      CHARACTER(LEN=NCHARFIELD) :: DIR
       LOGICAL IS_AVAILABLE
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
@@ -122,8 +124,7 @@ C
 C     Global Frame ID is set to -1
       ISKN(4,JJ)=-1
       NOM_OPT(1,NUMSKW+2)=-1
-      CALL FRETITL(NOMFG,NOM_OPT(LNOPT1-LTITR+1,
-     .                           NUMSKW+2),LTITR)
+      CALL FRETITL(NOMFG,NOM_OPT(LNOPT1-LTITR+1,NUMSKW+2),LTITR)
 C
       IF(NUMFRAM==0)GOTO 900
 C--------------------------------------------------

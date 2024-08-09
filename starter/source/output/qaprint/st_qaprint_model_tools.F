@@ -20,19 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  ST_QAPRINT_MODEL_TOOLS        source/output/qaprint/st_qaprint_model_tools.F
-Chd|-- called by -----------
-Chd|        ST_QAPRINT_DRIVER             source/output/qaprint/st_qaprint_driver.F
-Chd|-- calls ---------------
-Chd|        FRETITL2                      source/starter/freform.F      
-Chd|        MY_ORDERS                     ../common_source/tools/sort/my_orders.c
-Chd|        FUNC2D_MOD                    share/modules1/func2d_mod.F   
-Chd|        OPTIONDEF_MOD                 ../common_source/modules/optiondef_mod.F
-Chd|        SENSOR_MOD                    share/modules1/sensor_mod.F   
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|        TABLE_MOD                     share/modules1/table_mod.F    
-Chd|====================================================================
+      !||====================================================================
+      !||    st_qaprint_model_tools   ../starter/source/output/qaprint/st_qaprint_model_tools.F
+      !||--- called by ------------------------------------------------------
+      !||    st_qaprint_driver        ../starter/source/output/qaprint/st_qaprint_driver.F
+      !||--- calls      -----------------------------------------------------
+      !||    fretitl2                 ../starter/source/starter/freform.F
+      !||--- uses       -----------------------------------------------------
+      !||    func2d_mod               ../starter/share/modules1/func2d_mod.F
+      !||    sensor_mod               ../starter/share/modules1/sensor_mod.F
+      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+      !||    table_mod                ../starter/share/modules1/table_mod.F
+      !||====================================================================
       SUBROUTINE ST_QAPRINT_MODEL_TOOLS(NOM_OPT   ,INOM_OPT  ,
      .           IBOX      ,IPMAS     ,NOM_SECT ,NSTRF ,SECBUF    ,
      .           SKEW      ,ISKWN     ,XFRAME   ,NPC   ,PLD       ,
@@ -47,6 +46,7 @@ C-----------------------------------------------
       USE SENSOR_MOD
       USE FUNC2D_MOD
       USE SUBMODEL_MOD , ONLY : NSUBMOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARLINE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -72,8 +72,7 @@ C-----------------------------------------------
       INTEGER, INTENT(IN) :: ISKWN(LISKN,*)
       my_real, INTENT(IN) :: SKEW(LSKEW,*)
       my_real, INTENT(IN) :: XFRAME(NXFRAME,*)
-      my_real, INTENT(IN) ::
-     .                        PLD(*)
+      my_real, INTENT(IN) :: PLD(*)
       INTEGER, INTENT(IN) :: IACTIV(LACTIV,*)
       my_real, INTENT(IN) :: FACTIV(LRACTIV,*)
       TYPE(TTABLE) TABLE(*)

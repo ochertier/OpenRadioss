@@ -20,19 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  LAW69_UPD                     source/materials/mat/mat069/law69_upd.F
-Chd|-- called by -----------
-Chd|        UPDMAT                        source/materials/updmat.F     
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        ARRET                         source/system/arret.F         
-Chd|        HM_OPTION_IS_ENCRYPTED        source/devtools/hm_reader/hm_option_is_encrypted.F
-Chd|        LAW69_NLSQF                   source/materials/tools/nlsqf.F
-Chd|        LAW69_NLSQF_AUTO              source/materials/tools/law69_nlsqf_auto.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        TABLE_MOD                     share/modules1/table_mod.F    
-Chd|====================================================================
+      !||====================================================================
+      !||    law69_upd                ../starter/source/materials/mat/mat069/law69_upd.F
+      !||--- called by ------------------------------------------------------
+      !||    updmat                   ../starter/source/materials/updmat.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                   ../starter/source/output/message/message.F
+      !||    arret                    ../starter/source/system/arret.F
+      !||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+      !||    law69_nlsqf              ../starter/source/materials/tools/nlsqf.F
+      !||    law69_nlsqf_auto         ../starter/source/materials/tools/law69_nlsqf_auto.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod              ../starter/share/message_module/message_mod.F
+      !||    table_mod                ../starter/share/modules1/table_mod.F
+      !||====================================================================
       SUBROUTINE LAW69_UPD(IOUT,TITR    ,MAT_ID,UPARAM,NFUNC,NFUNCT,
      .                      IFUNC, FUNC_ID,NPC   ,PLD   ,PM,IPM, GAMA_INF)
 C-----------------------------------------------
@@ -40,6 +41,7 @@ C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
       USE TABLE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -52,7 +54,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      CHARACTER*nchartitle  :: TITR
+      CHARACTER(LEN=NCHARTITLE)  :: TITR
       INTEGER MAT_ID,IOUT
       INTEGER ,INTENT(IN) :: NFUNC
       INTEGER ,INTENT(IN) :: NFUNCT

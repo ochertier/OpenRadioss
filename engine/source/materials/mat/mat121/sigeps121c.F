@@ -20,16 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  SIGEPS121C                    source/materials/mat/mat121/sigeps121c.F
-Chd|-- called by -----------
-Chd|        MULAWC                        source/materials/mat_share/mulawc.F
-Chd|-- calls ---------------
-Chd|        MAT121C_NEWTON                source/materials/mat/mat121/mat121c_newton.F
-Chd|        MAT121C_NICE                  source/materials/mat/mat121/mat121c_nice.F
-Chd|        VINTER2                       source/tools/curve/vinter.F   
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    sigeps121c       ../engine/source/materials/mat/mat121/sigeps121c.F
+      !||--- called by ------------------------------------------------------
+      !||    mulawc           ../engine/source/materials/mat_share/mulawc.F
+      !||--- calls      -----------------------------------------------------
+      !||    mat121c_newton   ../engine/source/materials/mat/mat121/mat121c_newton.F
+      !||    mat121c_nice     ../engine/source/materials/mat/mat121/mat121c_nice.F
+      !||    vinter2          ../engine/source/tools/curve/vinter.F
+      !||--- uses       -----------------------------------------------------
+      !||    elbufdef_mod     ../common_source/modules/mat_elem/elbufdef_mod.F90
+      !||====================================================================
       SUBROUTINE SIGEPS121C(
      1     NEL     ,NGL     ,NUPARAM ,NUVAR   ,NFUNC   ,IFUNC   ,NPF     ,
      2     TF      ,TIMESTEP,TIME    ,UPARAM  ,UVAR    ,RHO     ,PLA     ,
@@ -40,7 +41,7 @@ Chd|====================================================================
      7     SIGNXX  ,SIGNYY  ,SIGNXY  ,SIGNYZ  ,SIGNZX  ,
      8     SIGY    ,ET      ,VARNL   ,INLOC   ,DT      ,
      9     IPG     ,IPT     ,NPTR    ,NPTS    ,NPTT    ,
-     A     BUFLY   ,OFFL    )
+     A     BUFLY   ,OFFL    ,IOFF_DUCT)
 C
       USE ELBUFDEF_MOD
 C-----------------------------------------------
@@ -59,6 +60,7 @@ C-----------------------------------------------
       INTEGER NEL,NUPARAM,NUVAR,NFUNC,INLOC,
      .        IPG,IPT,NPF(*),NGL(NEL),
      .        IFUNC(NFUNC),NPTR,NPTS,NPTT
+      INTEGER, DIMENSION(NEL), INTENT(INOUT) :: IOFF_DUCT
       my_real 
      .   TIMESTEP,TIME,TF(*),UPARAM(NUPARAM)
       my_real,DIMENSION(NEL), INTENT(IN) :: 
@@ -110,7 +112,7 @@ c
      5         EPSPXX  ,EPSPYY  ,EPSPXY  ,EPSPYZ  ,EPSPZX  ,
      6         SIGOXX  ,SIGOYY  ,SIGOXY  ,SIGOYZ  ,SIGOZX  ,
      7         SIGNXX  ,SIGNYY  ,SIGNXY  ,SIGNYZ  ,SIGNZX  ,
-     8         SIGY    ,ET      ,VARNL   ,SEQ     ,INLOC   )
+     8         SIGY    ,ET      ,VARNL   ,SEQ     ,INLOC   ,OFFL    )
 c        
         CASE(2)
 c
@@ -122,7 +124,7 @@ c
      5         EPSPXX  ,EPSPYY  ,EPSPXY  ,EPSPYZ  ,EPSPZX  ,
      6         SIGOXX  ,SIGOYY  ,SIGOXY  ,SIGOYZ  ,SIGOZX  ,
      7         SIGNXX  ,SIGNYY  ,SIGNXY  ,SIGNYZ  ,SIGNZX  ,
-     8         SIGY    ,ET      ,VARNL   ,SEQ     ,INLOC   )
+     8         SIGY    ,ET      ,VARNL   ,SEQ     ,INLOC   ,OFFL    )
 c      
       END SELECT    
 c
@@ -130,6 +132,8 @@ c
       EPSP(1:NEL)  = EPSD(1:NEL)    
       ! Store strain-rate for failure criteria
       EPSPL(1:NEL) = EPSD(1:NEL)
+      ! Ductile failure activation
+      IOFF_DUCT(1:NEL) = 1
 c
       !--------------------------------------------------------------------
       ! Failure

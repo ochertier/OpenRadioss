@@ -20,22 +20,26 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  FORCEFINGEO                   source/loads/general/forcefingeo.F
-Chd|-- called by -----------
-Chd|        RESOL                         source/engine/resol.F         
-Chd|-- calls ---------------
-Chd|        FINTER                        source/tools/curve/finter.F   
-Chd|        FINTER_SMOOTH                 source/tools/curve/finter_smooth.F
-Chd|        H3D_MOD                       share/modules/h3d_mod.F       
-Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
-Chd|====================================================================
+      !||====================================================================
+      !||    forcefingeo           ../engine/source/loads/general/forcefingeo.F
+      !||--- called by ------------------------------------------------------
+      !||    resol                 ../engine/source/engine/resol.F
+      !||--- calls      -----------------------------------------------------
+      !||    finter                ../engine/source/tools/curve/finter.F
+      !||    finter_smooth         ../engine/source/tools/curve/finter_smooth.F
+      !||    sysfus2               ../engine/source/system/sysfus.F
+      !||--- uses       -----------------------------------------------------
+      !||    h3d_mod               ../engine/share/modules/h3d_mod.F
+      !||    python_funct_mod      ../common_source/modules/python_mod.F90
+      !||    sensor_mod            ../engine/share/modules/sensor_mod.F
+      !||====================================================================
       SUBROUTINE FORCEFINGEO(IBFV  ,NPC    ,TF     ,A     ,V    ,X     ,
      2                       VEL   ,SENSOR_TAB,FSKY  ,FEXT ,ITABM1,
-     3                       H3D_DATA,NSENSOR)
+     3                       H3D_DATA,NSENSOR, PYTHON)
 C-----------------------------------------------
 C   M o d u l e s
 C----------------------------------------------- 
+      USE PYTHON_FUNCT_MOD
       USE H3D_MOD 
       USE SENSOR_MOD
 C-----------------------------------------------
@@ -63,6 +67,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(PYTHON_), INTENT(inout) :: PYTHON
       INTEGER ,INTENT(IN) :: NSENSOR
       INTEGER IBFV(NIFV,*), NPC(*)
       INTEGER ITABM1(*)
@@ -122,9 +127,12 @@ C
           IF (ISMOOTH == 0) THEN
             F1 = FINTER(NCUR,(TS-DT1)*FACX,NPC,TF,DYDX)
             F2 = FINTER(NCUR,TS*FACX,NPC,TF,DYDX)
-          ELSE
+          ELSE IF(ISMOOTH > 0) THEN
             F1 = FINTER_SMOOTH(NCUR,(TS-DT1)*FACX,NPC,TF,DYDX)
             F2 = FINTER_SMOOTH(NCUR,TS*FACX,NPC,TF,DYDX)
+          ELSE IF(ISMOOTH < 0) THEN
+            CALL PYTHON_CALL_FUNCT1D(PYTHON, -ISMOOTH,TS-DT1, F1)
+            CALL PYTHON_CALL_FUNCT1D(PYTHON, -ISMOOTH,TS, F2)
           ENDIF ! IF (ISMOOTH == 0)
           NCUR_OLD = NCUR
           TS_OLD = TS

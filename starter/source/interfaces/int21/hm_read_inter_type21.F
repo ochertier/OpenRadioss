@@ -20,23 +20,23 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  HM_READ_INTER_TYPE21          source/interfaces/int21/hm_read_inter_type21.F
-Chd|-- called by -----------
-Chd|        HM_READ_INTER_STRUCT          source/interfaces/reader/hm_read_inter_struct.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        HM_GET_FLOATV                 source/devtools/hm_reader/hm_get_floatv.F
-Chd|        HM_GET_FLOATV_DIM             source/devtools/hm_reader/hm_get_floatv_dim.F
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        INTER_DCOD_FUNCTION           source/interfaces/reader/inter_dcod_function.F
-Chd|        INTER_DCOD_SENSOR             source/interfaces/reader/inter_dcod_sensor.F
-Chd|        NGR2USR                       source/system/nintrr.F        
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        SENSOR_MOD                    share/modules1/sensor_mod.F   
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_read_inter_type21   ../starter/source/interfaces/int21/hm_read_inter_type21.F
+      !||--- called by ------------------------------------------------------
+      !||    hm_read_inter_struct   ../starter/source/interfaces/reader/hm_read_inter_struct.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    hm_get_floatv          ../starter/source/devtools/hm_reader/hm_get_floatv.F
+      !||    hm_get_floatv_dim      ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
+      !||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    inter_dcod_function    ../starter/source/interfaces/reader/inter_dcod_function.F
+      !||    inter_dcod_sensor      ../starter/source/interfaces/reader/inter_dcod_sensor.F
+      !||    ngr2usr                ../starter/source/system/nintrr.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    sensor_mod             ../starter/share/modules1/sensor_mod.F
+      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE HM_READ_INTER_TYPE21(
      1        IPARI      ,STFAC      ,FRIGAP     ,NOINT    ,NI        ,
      2        IGRSURF    ,XFILTR     ,FRIC_P     ,NPC1     ,SENSORS   ,
@@ -53,6 +53,7 @@ C-----------------------------------------------
       USE UNITAB_MOD
       USE SENSOR_MOD
       USE INTBUFDEF_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARKEY, NCHARFIELD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -69,7 +70,7 @@ C-----------------------------------------------
       INTEGER IPARI(*),NPC1(*),NPC(*)
       my_real STFAC,XFILTR
       my_real FRIGAP(*),FRIC_P(*),TF(*)
-      CHARACTER TITR*nchartitle,TITR1*nchartitle
+      CHARACTER(LEN=NCHARTITLE) :: TITR,TITR1
 C-----------------------------------------------
       TYPE (SURF_)   ,TARGET , DIMENSION(NSURF)   :: IGRSURF
       TYPE(SUBMODEL_DATA) LSUBMODEL(*)
@@ -100,9 +101,10 @@ C-----------------------------------------------
      .   ANGLADM, CADM, DEPTH,C1,C2,C3,C4,C5,C6, ALPHA,GAPSCALE,GAPMAX, 
      .   STMIN,STMAX,STIFF, PMAX,AREA, KTHE, XTHE, FRAD, DRAD,
      .   VISC,XFRICTH,PTMAX,PSKID,DCOND,XTHE_UNIT,KTHE_UNIT
-      CHARACTER MESS*40, MSGTITL*nchartitle
-      CHARACTER OPT*ncharkey,KEY*ncharkey,KEY1*ncharkey,
-     .          BCFLAG*ncharfield, BCFLAGM*ncharfield
+      CHARACTER(LEN=40)::MESS
+      CHARACTER(LEN=NCHARTITLE)::MSGTITL
+      CHARACTER(LEN=NCHARKEY)::OPT,KEY,KEY1
+      CHARACTER(LEN=NCHARFIELD)::BCFLAG,BCFLAGM
 !,
       INTEGER, DIMENSION(:), POINTER :: INGR2USR
       LOGICAL IS_AVAILABLE

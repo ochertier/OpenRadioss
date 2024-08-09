@@ -20,22 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  HM_READ_MAT29_31              source/materials/mat/matuser/hm_read_mat_user29_31.F
-Chd|-- called by -----------
-Chd|        HM_READ_MAT                   source/materials/mat/hm_read_mat.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        ARRET                         source/system/arret.F         
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        HM_GET_STRING_INDEX           source/devtools/hm_reader/hm_get_string_index.F
-Chd|        INIT_MAT_KEYWORD              source/materials/mat/init_mat_keyword.F
-Chd|        ST_USERLIB_USERMAT            source/user_interface/dyn_userlib.c
-Chd|        USER_OUTPUT                   source/user_interface/user_output.F
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_read_mat29_31       ../starter/source/materials/mat/matuser/hm_read_mat_user29_31.F
+      !||--- called by ------------------------------------------------------
+      !||    hm_read_mat            ../starter/source/materials/mat/hm_read_mat.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    arret                  ../starter/source/system/arret.F
+      !||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    hm_get_string_index    ../starter/source/devtools/hm_reader/hm_get_string_index.F
+      !||    init_mat_keyword       ../starter/source/materials/mat/init_mat_keyword.F
+      !||    user_output            ../starter/source/user_interface/user_output.F
+      !||--- uses       -----------------------------------------------------
+      !||    format_mod             ../starter/share/modules1/format_mod.F90
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE HM_READ_MAT29_31(ILAW,IUSER_KEY,
      .                            USERL_AVAIL,
      .                            UPARAM,MAXUPARAM,NUPARAM,
@@ -64,7 +64,9 @@ C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
       USE SUBMODEL_MOD
-      USE MATPARAM_DEF_MOD          
+      USE MATPARAM_DEF_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARLINE
+      USE FORMAT_MOD , ONLY : FMT_2F
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -90,13 +92,13 @@ C-----------------------------------------------
       my_real, DIMENSION(100)         :: PARMAT
       my_real, DIMENSION(MAXUPARAM)   :: UPARAM
       my_real, DIMENSION(NPROPM) ,INTENT(INOUT)   :: PM
-      CHARACTER IUSER_KEY*ncharline
+      CHARACTER(LEN=NCHARLINE) :: IUSER_KEY
       TYPE (MATPARAM_STRUCT_) ,INTENT(INOUT) :: MATPARAM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       CHARACTER(LEN=4096) :: SCR_FILE_NAME
-      CHARACTER(LEN=ncharline) :: RLINE
+      CHARACTER(LEN=NCHARLINE) :: RLINE
       CHARACTER (LEN=4) :: CLAW
       LOGICAL :: IS_AVAILABLE
       INTEGER NLINES,J

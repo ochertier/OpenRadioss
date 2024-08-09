@@ -20,16 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  SIGEPS109C                    source/materials/mat/mat109/sigeps109c.F
-Chd|-- called by -----------
-Chd|        MULAWC                        source/materials/mat_share/mulawc.F
-Chd|-- calls ---------------
-Chd|        TABLE2D_VINTERP_LOG           source/tools/curve/table2d_vinterp_log.F
-Chd|        TABLE_VINTERP                 source/tools/curve/table_tools.F
-Chd|        INTERFACE_TABLE_MOD           share/modules/table_mod.F     
-Chd|        TABLE_MOD                     share/modules/table_mod.F     
-Chd|====================================================================
+      !||====================================================================
+      !||    sigeps109c            ../engine/source/materials/mat/mat109/sigeps109c.F
+      !||--- called by ------------------------------------------------------
+      !||    mulawc                ../engine/source/materials/mat_share/mulawc.F
+      !||--- calls      -----------------------------------------------------
+      !||    table2d_vinterp_log   ../engine/source/tools/curve/table2d_vinterp_log.F
+      !||    table_vinterp         ../engine/source/tools/curve/table_tools.F
+      !||--- uses       -----------------------------------------------------
+      !||    interface_table_mod   ../engine/share/modules/table_mod.F
+      !||    table_mod             ../engine/share/modules/table_mod.F
+      !||====================================================================
       SUBROUTINE SIGEPS109C(
      1     NEL     ,NGL     ,NUPARAM ,NUVAR   ,NVARTMP ,NUMTABL ,
      2     UPARAM  ,UVAR    ,VARTMP  ,ITABLE  ,TABLE   ,JTHE    ,
@@ -38,7 +39,7 @@ Chd|====================================================================
      5     DEPSXX  ,DEPSYY  ,DEPSXY  ,DEPSYZ  ,DEPSZX  ,
      6     SIGOXX  ,SIGOYY  ,SIGOXY  ,SIGOYZ  ,SIGOZX  ,
      7     SIGNXX  ,SIGNYY  ,SIGNXY  ,SIGNYZ  ,SIGNZX  ,
-     8     THK     ,THKLY   ,INLOC   ,DPLANL  ,EPSPL   )
+     8     THK     ,THKLY   ,INLOC   ,DPLANL  ,EPSPL   ,LOFF    )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -71,6 +72,7 @@ c
       INTEGER ,DIMENSION(NEL,NVARTMP) ,INTENT(INOUT) :: VARTMP
 c
       TYPE(TTABLE), DIMENSION(NTABLE) ::  TABLE
+      my_real, DIMENSION(NEL), INTENT(IN) :: LOFF
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -361,11 +363,13 @@ c
       EPSP(1:NEL)   = ALPHA*DPLA(1:NEL)*DTINV + ALPHI*EPSP(1:NEL)
       EPSPL(1:NEL)  = EPSP(1:NEL)
       IF (INLOC > 0) THEN 
-        DO I = 1,NEL     
-          DEPSZZ(I) = MAX(DPLANL(I),ZERO)*HALF*(SIGNXX(I)+SIGNYY(I))/MAX(YLD(I),EM20)
-          DEPSZZ(I) = - NU*((SIGNXX(I)-SIGOXX(I)+SIGNYY(I)-SIGOYY(I))/YOUNG) - DEPSZZ(I)
-          IF (JTHE == 0 .AND. BETA > ZERO) THEN 
-            TEMP(I) = TEMP(I) + FTHERM(I)*YLD(I)*MAX(DPLANL(I),ZERO)
+        DO I = 1,NEL   
+          IF (LOFF(I) == ONE) THEN   
+            DEPSZZ(I) = MAX(DPLANL(I),ZERO)*HALF*(SIGNXX(I)+SIGNYY(I))/MAX(YLD(I),EM20)
+            DEPSZZ(I) = - NU*((SIGNXX(I)-SIGOXX(I)+SIGNYY(I)-SIGOYY(I))/YOUNG) - DEPSZZ(I)
+            IF (JTHE == 0 .AND. BETA > ZERO) THEN 
+              TEMP(I) = TEMP(I) + FTHERM(I)*YLD(I)*MAX(DPLANL(I),ZERO)
+            ENDIF
           ENDIF
         ENDDO
       ENDIF

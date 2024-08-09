@@ -20,18 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  STACKGROUP_DRAPE              source/stack/stackgroup_drape.F
-Chd|-- called by -----------
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|-- calls ---------------
-Chd|        MY_ORDERS                     ../common_source/tools/sort/my_orders.c
-Chd|        DRAPE_MOD                     share/modules1/drape_mod.F    
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        STACK_MOD                     share/modules1/stack_mod.F    
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    stackgroup_drape       ../starter/source/stack/stackgroup_drape.F
+      !||--- called by ------------------------------------------------------
+      !||    lectur                 ../starter/source/starter/lectur.F
+      !||--- calls      -----------------------------------------------------
+      !||--- uses       -----------------------------------------------------
+      !||    drape_mod              ../starter/share/modules1/drape_mod.F
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    stack_mod              ../starter/share/modules1/stack_mod.F
+      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE STACKGROUP_DRAPE(DRAPE ,DRAPEG , IWORK_T, IWORKSH , 
      .                     IGRSH3N    ,IGRSH4N  ,IXC   ,IXTG ,
      .                     IGEO       ,GEO      ,THK    ,STACK   ,
@@ -45,13 +44,11 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE GROUPDEF_MOD
       USE DRAPE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   A n a l y s e   M o d u l e
-C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -107,8 +104,7 @@ C-----------------------------------------------
       TYPE (STACK_PLY) :: STACK, IWORKS
       TYPE (STACK_INFO_ ) , DIMENSION (1:NPROP_STACK) :: STACK_INFO
       TYPE (DRAPE_PLY_),  POINTER :: DRAPE_PLY
-      CHARACTER*nchartitle,
-     .   TITR,TITR1
+      CHARACTER(LEN=NCHARTITLE) :: TITR,TITR1
 C-----------------------------------------------
       my_real
      .  A_GAUSS(9,9),W_GAUSS(9,9)

@@ -20,14 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  CDKFINT_REG                   source/elements/sh3n/coquedk/cdkfint_reg.F
-Chd|-- called by -----------
-Chd|        CDKFORC3                      source/elements/sh3n/coquedk/cdkforc3.F
-Chd|-- calls ---------------
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
-Chd|        NLOCAL_REG_MOD                ../common_source/modules/nlocal_reg_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    cdkfint_reg      ../engine/source/elements/sh3n/coquedk/cdkfint_reg.F
+      !||--- called by ------------------------------------------------------
+      !||    cdkforc3         ../engine/source/elements/sh3n/coquedk/cdkforc3.F
+      !||--- uses       -----------------------------------------------------
+      !||    elbufdef_mod     ../common_source/modules/mat_elem/elbufdef_mod.F90
+      !||    nlocal_reg_mod   ../common_source/modules/nlocal_reg_mod.F
+      !||====================================================================
       SUBROUTINE CDKFINT_REG(
      1   NLOC_DMG,VAR_REG, THK,     NEL,
      2   OFF,     AREA,    NC1,     NC2,
@@ -340,7 +340,7 @@ c
         DO I = 1, NEL        
 c        
           ! If the element is not broken, normal computation
-          IF (OFF(I)/=ZERO) THEN 
+          IF (OFF(I) /= ZERO) THEN 
             ! Computation of the product LEN**2 * BtxB
             B1 = (L2 * VOL(I)) * WF(K,NDDL)*(BTB11(I)*UNL(POS1(I)+K-1) + BTB12(I)*UNL(POS2(I)+K-1) 
      .                                 + BTB13(I)*UNL(POS3(I)+K-1))
@@ -359,21 +359,21 @@ c
             ! Computing the product XDAMP*NtN*VNL
             NTN_VNL1 = H(1)*H(1)*VNL(POS1(I)+K-1) + H(1)*H(2)*VNL(POS2(I)+K-1) + H(1)*H(3)*VNL(POS3(I)+K-1)
             IF (NODADT > 0) THEN 
-              NTN_VNL1 = H(1)*H(1)*(SQRT(MASS(POS1(I)+K-1)/MASS0(POS1(I)+K-1)))*VNL(POS1(I)+K-1) + 
-     .                   H(1)*H(2)*(SQRT(MASS(POS2(I)+K-1)/MASS0(POS2(I)+K-1)))*VNL(POS2(I)+K-1) + 
-     .                   H(1)*H(3)*(SQRT(MASS(POS3(I)+K-1)/MASS0(POS3(I)+K-1)))*VNL(POS3(I)+K-1)
+              NTN_VNL1 = MIN(SQRT(MASS(POS1(I)+K-1)/MASS0(POS1(I)+K-1)),
+     .                       SQRT(MASS(POS2(I)+K-1)/MASS0(POS2(I)+K-1)),
+     .                       SQRT(MASS(POS3(I)+K-1)/MASS0(POS3(I)+K-1)))*NTN_VNL1
             ENDIF
             NTN_VNL2 = H(2)*H(1)*VNL(POS1(I)+K-1) + H(2)*H(2)*VNL(POS2(I)+K-1) + H(2)*H(3)*VNL(POS3(I)+K-1)
             IF (NODADT > 0) THEN 
-              NTN_VNL2 = H(2)*H(1)*(SQRT(MASS(POS1(I)+K-1)/MASS0(POS1(I)+K-1)))*VNL(POS1(I)+K-1) + 
-     .                   H(2)*H(2)*(SQRT(MASS(POS2(I)+K-1)/MASS0(POS2(I)+K-1)))*VNL(POS2(I)+K-1) + 
-     .                   H(2)*H(3)*(SQRT(MASS(POS3(I)+K-1)/MASS0(POS3(I)+K-1)))*VNL(POS3(I)+K-1)
+              NTN_VNL2 = MIN(SQRT(MASS(POS1(I)+K-1)/MASS0(POS1(I)+K-1)),
+     .                       SQRT(MASS(POS2(I)+K-1)/MASS0(POS2(I)+K-1)),
+     .                       SQRT(MASS(POS3(I)+K-1)/MASS0(POS3(I)+K-1)))*NTN_VNL2
             ENDIF
             NTN_VNL3 = H(3)*H(1)*VNL(POS1(I)+K-1) + H(3)*H(2)*VNL(POS2(I)+K-1) + H(3)*H(3)*VNL(POS3(I)+K-1)
             IF (NODADT > 0) THEN 
-              NTN_VNL3 = H(3)*H(1)*(SQRT(MASS(POS1(I)+K-1)/MASS0(POS1(I)+K-1)))*VNL(POS1(I)+K-1) + 
-     .                   H(3)*H(2)*(SQRT(MASS(POS2(I)+K-1)/MASS0(POS2(I)+K-1)))*VNL(POS2(I)+K-1) + 
-     .                   H(3)*H(3)*(SQRT(MASS(POS3(I)+K-1)/MASS0(POS3(I)+K-1)))*VNL(POS3(I)+K-1)
+              NTN_VNL3 = MIN(SQRT(MASS(POS1(I)+K-1)/MASS0(POS1(I)+K-1)),
+     .                       SQRT(MASS(POS2(I)+K-1)/MASS0(POS2(I)+K-1)),
+     .                       SQRT(MASS(POS3(I)+K-1)/MASS0(POS3(I)+K-1)))*NTN_VNL3
             ENDIF
 c          
             ! Multiplication by the volume of the element

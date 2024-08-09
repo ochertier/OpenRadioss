@@ -20,17 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  COMPUTE_CONNECT_PARTELM       source/model/sets/compute_connect_partelm.F
-Chd|-- called by -----------
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|-- calls ---------------
-Chd|        INVERTED_GROUP_ALLOC          source/model/sets/inverted_group_alloc.F
-Chd|        INVERTED_GROUP_INIT           source/model/sets/inverted_group_init.F
-Chd|        INVERTED_GROUP_MOD            share/modules1/inverted_group_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    compute_connect_partelm   ../starter/source/model/sets/compute_connect_partelm.F
+      !||--- called by ------------------------------------------------------
+      !||    lectur                    ../starter/source/starter/lectur.F
+      !||--- calls      -----------------------------------------------------
+      !||    inverted_group_alloc      ../starter/source/model/sets/inverted_group_alloc.F
+      !||    inverted_group_init       ../starter/source/model/sets/inverted_group_init.F
+      !||--- uses       -----------------------------------------------------
+      !||    inverted_group_mod        ../starter/share/modules1/inverted_group_mod.F
+      !||====================================================================
       SUBROUTINE COMPUTE_CONNECT_PARTELM( IPARTS,IPARTQ,IPARTC,IPARTT,IPARTP,
-     .                                    IPARTTG,IPARTR ,INV_GROUP)
+     .                                    IPARTTG,IPARTR ,IPARTSP, INV_GROUP,NUMSPH,
+     .                                    NISP   ,KXSP   )
 !$COMMENT
 !       COMPUTE_CONNECT_PARTELM description
 !       computation of the inverted connectivity between part and element
@@ -55,6 +57,8 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s 
 C-----------------------------------------------             
 C
+      INTEGER, INTENT(IN) :: NUMSPH,NISP
+      INTEGER, INTENT(IN) :: KXSP(NISP,NUMSPH)
       INTEGER, INTENT(IN),DIMENSION(NUMELS) :: IPARTS
       INTEGER, INTENT(IN),DIMENSION(NUMELQ) :: IPARTQ
       INTEGER, INTENT(IN),DIMENSION(NUMELC) :: IPARTC
@@ -62,6 +66,7 @@ C
       INTEGER, INTENT(IN),DIMENSION(NUMELR) :: IPARTR
       INTEGER, INTENT(IN),DIMENSION(NUMELT) :: IPARTT
       INTEGER, INTENT(IN),DIMENSION(NUMELP) :: IPARTP
+      INTEGER, INTENT(IN),DIMENSION(NUMSPH) :: IPARTSP
 
       TYPE(INVERTGROUP_STRUCT_) :: INV_GROUP
 
@@ -74,7 +79,7 @@ C-----------------------------------------------
       ! allocation of INV_GROUP% array
       IF( .NOT.(INV_GROUP%ALREADY_ALLOC) ) CALL INVERTED_GROUP_ALLOC(INV_GROUP)
       ! check INV_GROUP% array was already computed, if already computed, flush to 0
-      IF( INV_GROUP%ALREADY_DONE ) CALL INVERTED_GROUP_INIT(1,INV_GROUP)
+      IF( INV_GROUP%ALREADY_DONE ) CALL INVERTED_GROUP_INIT(1,INV_GROUP,NUMSPH)
 
       ALLOCATE(PART_COUNT(NPART))
 
@@ -102,6 +107,28 @@ C ------------------------------------------------
         INV_GROUP%PARTS(IND)=I
         PART_COUNT(PART)=PART_COUNT(PART)+1
       ENDDO         
+C ------------------------------------------------
+C  Sph particles (cells)
+C ------------------------------------------------
+      PART_COUNT(1:NPART)=0
+
+      DO I=1,NUMSPH
+        PART=IPARTSP(I)
+        PART_COUNT(PART)=PART_COUNT(PART)+1
+      ENDDO 
+
+      INV_GROUP%INDPARTSPH(1)=1
+      DO I=2,NPART+1
+        INV_GROUP%INDPARTSPH(I)=INV_GROUP%INDPARTSPH(I-1)+PART_COUNT(I-1)
+      ENDDO
+
+      PART_COUNT(1:NPART)=0
+      DO I=1,NUMSPH
+        PART=IPARTSP(I)
+        IND=INV_GROUP%INDPARTSPH(PART) + PART_COUNT(PART)
+        INV_GROUP%PARTSPH(IND)=KXSP(3,I)
+        PART_COUNT(PART)=PART_COUNT(PART)+1
+      ENDDO
 C ------------------------------------------------
 C  Quad elements
 C ------------------------------------------------

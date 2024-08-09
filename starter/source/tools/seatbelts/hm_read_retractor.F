@@ -20,29 +20,28 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  HM_READ_RETRACTOR             source/tools/seatbelts/hm_read_retractor.F
-Chd|-- called by -----------
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        ARRET                         source/system/arret.F         
-Chd|        FRETITL                       source/starter/freform.F      
-Chd|        HM_GET_FLOATV                 source/devtools/hm_reader/hm_get_floatv.F
-Chd|        HM_GET_FLOATV_DIM             source/devtools/hm_reader/hm_get_floatv_dim.F
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        HM_OPTION_READ_KEY            source/devtools/hm_reader/hm_option_read_key.F
-Chd|        HM_OPTION_START               source/devtools/hm_reader/hm_option_start.F
-Chd|        UDOUBLE                       source/system/sysfus.F        
-Chd|        GET_U_FUNC                    source/user_interface/uaccess.F
-Chd|        NINTRI                        source/system/nintrr.F        
-Chd|        USR2SYS                       source/system/sysfus.F        
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        SEATBELT_MOD                  ../common_source/modules/seatbelt_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_read_retractor      ../starter/source/tools/seatbelts/hm_read_retractor.F
+      !||--- called by ------------------------------------------------------
+      !||    lectur                 ../starter/source/starter/lectur.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    arret                  ../starter/source/system/arret.F
+      !||    fretitl                ../starter/source/starter/freform.F
+      !||    get_u_func             ../starter/source/user_interface/uaccess.F
+      !||    hm_get_floatv          ../starter/source/devtools/hm_reader/hm_get_floatv.F
+      !||    hm_get_floatv_dim      ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
+      !||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
+      !||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
+      !||    nintri                 ../starter/source/system/nintrr.F
+      !||    udouble                ../starter/source/system/sysfus.F
+      !||    usr2sys                ../starter/source/system/sysfus.F
+      !||--- uses       -----------------------------------------------------
+      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE HM_READ_RETRACTOR(LSUBMODEL,ITABM1,IXR,ITAB,UNITAB,
      .                             X,FUNC_ID,NOM_OPT,ALEA,IPM)
 C-----------------------------------------------
@@ -55,6 +54,7 @@ C-----------------------------------------------
       USE GROUPDEF_MOD
       USE SUBMODEL_MOD
       USE HM_OPTION_READ_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARKEY
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -85,7 +85,9 @@ C-----------------------------------------------
       INTEGER               :: NODE1,NODE2,EL_LOC,BID,ISENS(2),IFUNC(3),IFUNC_LOC(3),TENS_TYP,MID,MTYP
       my_real               :: FORCE,ELEM_SIZE,DIST1,DIST2,DIST3,PULL,YSCALE1,XSCALE1,XSCALE1_UNIT,YSCALE1_UNIT
       my_real               :: YSCALE2,XSCALE2,XSCALE2_UNIT,YSCALE2_UNIT,XX,DXDY,GET_U_FUNC,ALEA_MAX,TOLE_2
-      CHARACTER             :: TITR*nchartitle, KEY2*ncharkey,MESS*40
+      CHARACTER(LEN=NCHARTITLE) :: TITR
+      CHARACTER(LEN=NCHARKEY) :: KEY2
+      CHARACTER :: MESS*40
       LOGICAL :: IS_AVAILABLE
       EXTERNAL GET_U_FUNC
 C-----------------------------------------------

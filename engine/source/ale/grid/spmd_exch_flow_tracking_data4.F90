@@ -26,6 +26,17 @@
 !! \brief SPMD exchange necessary for option /ALE/GRID/MASS-WEIGHTED-VEL
 !! \details  gathering  domain boundaries X_MIN_MAX (for main flow) and X_MIN_MAX_GRID (for ALE grid points)
 !
+      !||====================================================================
+      !||    spmd_exch_flow_tracking_data4   ../engine/source/ale/grid/spmd_exch_flow_tracking_data4.F90
+      !||--- called by ------------------------------------------------------
+      !||    alew7                           ../engine/source/ale/grid/alew7.F
+      !||--- calls      -----------------------------------------------------
+      !||    spmd_wait                       ../engine/source/mpi/spmd_mod.F90
+      !||--- uses       -----------------------------------------------------
+      !||    ale_mod                         ../common_source/modules/ale/ale_mod.F
+      !||    constant_mod                    ../common_source/modules/constant_mod.F
+      !||    spmd_mod                        ../engine/source/mpi/spmd_mod.F90
+      !||====================================================================
       subroutine spmd_exch_flow_tracking_data4( domain_data, nspmd )
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Modules
@@ -59,7 +70,7 @@
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Body
 ! ----------------------------------------------------------------------------------------------------------------------
-!$OMP SINGLE
+
         loc_proc=ispmd+1
         rbuf(1:3,1:nspmd)=ep20
         rbuf(4:6,1:nspmd)=-ep20
@@ -122,7 +133,7 @@
           domain_data%x_min_max_grid(6) = max(domain_data%x_min_max_grid(6), rbuf(12,p))
         enddo
 
-!$OMP END SINGLE
+
 !-----------------------------------------------
         return
       end subroutine spmd_exch_flow_tracking_data4

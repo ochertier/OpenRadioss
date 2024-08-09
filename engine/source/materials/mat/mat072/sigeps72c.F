@@ -20,12 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  SIGEPS72C                     source/materials/mat/mat072/sigeps72c.F
-Chd|-- called by -----------
-Chd|        MULAWC                        source/materials/mat_share/mulawc.F
-Chd|-- calls ---------------
-Chd|====================================================================
+      !||====================================================================
+      !||    sigeps72c   ../engine/source/materials/mat/mat072/sigeps72c.F
+      !||--- called by ------------------------------------------------------
+      !||    mulawc      ../engine/source/materials/mat_share/mulawc.F
+      !||====================================================================
       SUBROUTINE SIGEPS72C(
      1     NEL      ,NUPARAM  ,NUVAR    ,
      2     TIME     ,TIMESTEP ,UPARAM   ,RHO0     ,THKLY    ,
@@ -34,7 +33,7 @@ Chd|====================================================================
      5     SIGNXX   ,SIGNYY   ,SIGNXY   ,SIGNYZ   ,SIGNZX   ,
      6     SOUNDSP  ,THK      ,PLA      ,UVAR     ,OFF      ,
      7     ETSE     ,GS       ,YLD      ,HARDM    ,SEQ      ,
-     8     DPLA     ,DMG      ,INLOC    ,DPLANL   )
+     8     DPLA     ,DMG      ,INLOC    ,DPLANL   ,LOFF     )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -61,6 +60,7 @@ C
      .   SIGOXY(NEL),SIGOYZ(NEL),SIGOZX(NEL),
      .   GS(*),HARDM(NEL),SEQ(NEL),DMG(NEL),
      .   DPLANL(NEL)
+      my_real, DIMENSION(NEL), INTENT(IN) :: LOFF
 C-----------------------------------------------
 C   O U T P U T   A r g u m e n t s
 C-----------------------------------------------
@@ -346,14 +346,21 @@ C
         ! Sound-speed
         SOUNDSP(I) = SQRT(A11/RHO0(I)) 
         ! Coefficient for hourglass
-        ETSE(I)    = H(I) / (H(I) + E)
-        HARDM(I)   = H(I)
+        IF (DPLA(I) > ZERO) THEN 
+          ETSE(I)  = H(I) / (H(I) + E)
+          HARDM(I) = H(I)
+        ELSE
+          ETSE(I)  = ONE
+          HARDM(I) = ZERO
+        ENDIF
         ! Computation of the thickness variation 
         DEELZZ(I)  = -NU*(SIGNXX(I)-SIGOXX(I)+SIGNYY(I)-SIGOYY(I))/E
         IF (INLOC > 0) THEN 
-          NORMXX   = (GG*SIGNXX(I) + HH*(SIGNXX(I)-SIGNYY(I)))/(MAX(SIGHL(I),EM20))
-          NORMYY   = (FF*SIGNYY(I) + HH*(SIGNYY(I)-SIGNXX(I)))/(MAX(SIGHL(I),EM20))
-          DEZZ(I)  = DEELZZ(I) - MAX(DPLANL(I),ZERO)*(NORMXX+NORMYY)
+          IF (LOFF(I) == ONE) THEN 
+            NORMXX   = (GG*SIGNXX(I) + HH*(SIGNXX(I)-SIGNYY(I)))/(MAX(SIGHL(I),EM20))
+            NORMYY   = (FF*SIGNYY(I) + HH*(SIGNYY(I)-SIGNXX(I)))/(MAX(SIGHL(I),EM20))
+            DEZZ(I)  = DEELZZ(I) - MAX(DPLANL(I),ZERO)*(NORMXX+NORMYY)
+          ENDIF
         ELSE
           DEZZ(I)  = DEELZZ(I) + DPZZ(I)
         ENDIF

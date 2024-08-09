@@ -20,18 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  I2TRI                         source/interfaces/inter3d1/i2tri.F
-Chd|-- called by -----------
-Chd|        I2BUC1                        source/interfaces/inter3d1/i2buc1.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        I2COR3                        source/interfaces/inter3d1/i2cor3.F
-Chd|        I2DST3                        source/interfaces/inter3d1/i2dst3.F
-Chd|        I2DST3_27                     source/interfaces/inter3d1/i2dst3_27.F
-Chd|        I7DSTK                        source/interfaces/inter3d1/i7dstk.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    i2tri                  ../starter/source/interfaces/inter3d1/i2tri.F
+      !||--- called by ------------------------------------------------------
+      !||    i2buc1                 ../starter/source/interfaces/inter3d1/i2buc1.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    i2cor3                 ../starter/source/interfaces/inter3d1/i2cor3.F
+      !||    i2dst3                 ../starter/source/interfaces/inter3d1/i2dst3.F
+      !||    i2dst3_27              ../starter/source/interfaces/inter3d1/i2dst3_27.F
+      !||    i7dstk                 ../starter/source/interfaces/inter3d1/i7dstk.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE I2TRI(
      1      BPE   ,PE    ,BPN   ,PN    ,ADD   ,
      2      IRECT ,X     ,NB_NC ,NB_EC ,XYZM  ,
@@ -58,6 +59,7 @@ Chd|====================================================================
      1      LC2    ,LC3    ,LC4,S   ,T         ,
      2      ILEV)
       USE MESSAGE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C============================================================================
 C  cette routine est appelee par : I2BUC1(/inter3d1/i2buc1.F)
 C----------------------------------------------------------------------------
@@ -97,8 +99,7 @@ C     REAL
      .   MAXBOX,MINBOX, XMAX, YMAX, ZMAX,THK(*),THK_PART(*),GEO(*),
      .   PM(*),DSEARCH,PM_STACK(*)
       INTEGER ID
-      CHARACTER*nchartitle,
-     .   TITR
+      CHARACTER(LEN=NCHARTITLE) :: TITR
       INTEGER, DIMENSION(MVSIZ), INTENT(INOUT) :: PROV_N,PROV_E,NSVG
       INTEGER, DIMENSION(MVSIZ), INTENT(INOUT) :: IX1,IX2,IX3,IX4
       my_real, DIMENSION(MVSIZ), INTENT(INOUT) :: N11,N12,N13

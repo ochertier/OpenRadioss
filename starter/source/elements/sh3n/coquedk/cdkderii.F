@@ -20,13 +20,12 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  CDKDERII                      source/elements/sh3n/coquedk/cdkderii.F
-Chd|-- called by -----------
-Chd|        CDKINIT3                      source/elements/sh3n/coquedk/cdkinit3.F
-Chd|-- calls ---------------
-Chd|        GROUP_PARAM_MOD               ../common_source/modules/mat_elem/group_param_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    cdkderii          ../starter/source/elements/sh3n/coquedk/cdkderii.F
+      !||--- called by ------------------------------------------------------
+      !||    cdkinit3          ../starter/source/elements/sh3n/coquedk/cdkinit3.F
+      !||--- uses       -----------------------------------------------------
+      !||====================================================================
       SUBROUTINE CDKDERII(JFT   ,JLT,PM ,GEO ,PX2,PY2,PX3,PY3,
      .                    STIFN ,STIFR  ,IXTG ,THK ,SH3TREE ,
      .                    ALDT  ,UPARAM ,IPM  ,IGEO,PM_STACK,
@@ -80,7 +79,7 @@ C-----------------------------------------------
      .   X32G(MVSIZ), Y32G(MVSIZ), Z32G(MVSIZ),
      .   X2(MVSIZ), X3(MVSIZ), Y2(MVSIZ),Y3(MVSIZ),
      .   DT(MVSIZ), AREA(MVSIZ),FAC, ALMIN, 
-     .   VISCMX, A11, G, STI,STIR,SHF,VISCDEF,BULK,GMAX,
+     .   VISCMX, A11, G, STI,STIR,SHF,VISCDEF,GMAX,
      .   AL1, AL2, AL3, ALMAX, SSP,YOUNG,NU,RHO,AREAI,
      .   C1,IZ,THICKT,THKLY,POSLY,A1THK,C1THK,
      .   GTHK,A11R,A12,E,ETHK,NUTHK,A12THK,RHOG
@@ -136,18 +135,23 @@ c
         ELSE
           IF(MTN<=28)THEN
           SSP=PM(27,IMAT)
-         ELSEIF (MTN == 42 .OR. MTN  == 69) THEN
-          IADB = IPM(7,IMAT)-1                                               
-          BULK = UPARAM(IADB+11)                                                
-          NU = UPARAM(IADB+14)                              
-          GMAX = UPARAM(IADB+1)*UPARAM(IADB+6)                 
-     .         + UPARAM(IADB+2)*UPARAM(IADB+7)  
-     .         + UPARAM(IADB+3)*UPARAM(IADB+8) 
-     .         + UPARAM(IADB+4)*UPARAM(IADB+9)  
-     .         + UPARAM(IADB+5)*UPARAM(IADB+10) 
-          RHO  = PM(1,IMAT)
-          A11 = GMAX*(ONE + NU)/(ONE - NU**2)                                   
-          SSP  = MAX(SSP, SQRT(A11/RHO))
+         ELSEIF (MTN == 42) THEN
+           RHO  = PM(1 ,IMAT)
+           NU   = PM(21,IMAT)
+           GMAX = PM(22,IMAT) 
+           A11  = GMAX*(ONE + NU)/(ONE - NU**2)
+           SSP  = MAX(SSP, SQRT(A11/RHO)) 
+         ELSEIF (MTN  == 69) THEN
+           IADB = IPM(7,IMAT)-1                                              
+           NU = UPARAM(IADB+14)                             
+           GMAX = UPARAM(IADB+1)*UPARAM(IADB+6)                
+     .          + UPARAM(IADB+2)*UPARAM(IADB+7)  
+     .          + UPARAM(IADB+3)*UPARAM(IADB+8) 
+     .          + UPARAM(IADB+4)*UPARAM(IADB+9)  
+     .          + UPARAM(IADB+5)*UPARAM(IADB+10) 
+           RHO  = PM(1,IMAT)
+           A11 = GMAX*(ONE + NU)/(ONE - NU**2)                                  
+           SSP  = MAX(SSP, SQRT(A11/RHO))
          ELSEIF (MTN == 65) THEN
           RHO  =PM(1,IMAT)
           YOUNG=PM(20,IMAT)

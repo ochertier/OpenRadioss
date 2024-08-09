@@ -20,19 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  MULAW                         source/materials/mat_share/mulaw.F
-Chd|-- called by -----------
-Chd|        MMAIN                         source/materials/mat_share/mmain.F
-Chd|-- calls ---------------
-Chd|        SIGEPS35                      source/materials/mat/mat035/sigeps35.F
-Chd|        SIGEPS37                      source/materials/mat/mat037/sigeps37.F
-Chd|        SIGEPS38                      source/materials/mat/mat038/sigeps38.F
-Chd|        SIGEPS42                      source/materials/mat/mat042/sigeps42.F
-Chd|        SIGEPS70                      source/materials/mat/mat070/sigeps70.F
-Chd|        SIGEPS90                      source/materials/mat/mat090/sigeps90.F
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    mulaw              ../starter/source/materials/mat_share/mulaw.F
+      !||--- called by ------------------------------------------------------
+      !||    mmain              ../starter/source/materials/mat_share/mmain.F
+      !||--- calls      -----------------------------------------------------
+      !||    sigeps35           ../starter/source/materials/mat/mat035/sigeps35.F
+      !||    sigeps37           ../starter/source/materials/mat/mat037/sigeps37.F
+      !||    sigeps38           ../starter/source/materials/mat/mat038/sigeps38.F
+      !||    sigeps42           ../starter/source/materials/mat/mat042/sigeps42.F
+      !||    sigeps70           ../starter/source/materials/mat/mat070/sigeps70.F
+      !||    sigeps90           ../starter/source/materials/mat/mat090/sigeps90.F
+      !||--- uses       -----------------------------------------------------
+      !||====================================================================
       SUBROUTINE MULAW(LFT   ,LLT   ,NFT    ,MTN   ,JCVT   ,
      2                 PM    ,OFF   ,SIG    ,EINT  ,RHO    ,
      3                 VOL   ,STRAIN,GAMA   ,
@@ -251,17 +251,17 @@ C ====================================================================
      .                  RBID,ISMSTR,MFXX,MFXY,MFXZ,MFYX, 
      .                  MFYY ,MFYZ ,MFZX ,MFZY,MFZZ)
       ELSEIF(MTN==42)THEN
-          CALL SIGEPS42(LLT ,NPAR,NUVAR,NFUNC,IFUNC ,
-     2                  NPF ,TF  ,TIME,TIMESTEP,BUFMAT(IADBUF),
-     3                  RHO0,RHO ,VOLN ,EINT ,
-     4                  EP1 ,EP2 ,EP3 ,EP4  ,EP5  ,EP6 ,
-     5                  DE1 ,DE2 ,DE3 ,DE4  ,DE5  ,DE6 ,
-     6                  ES1 ,ES2 ,ES3 ,ES4  ,ES5  ,ES6 ,
-     7                  SO1 ,SO2 ,SO3 ,SO4  ,SO5  ,SO6 ,
-     8                  S1  ,S2  ,S3  ,S4   ,S5   ,S6  ,
-     A                  SSP ,VIS ,UVAR,OFF  ,WXX  ,WYY ,
-     .                  WZZ ,ISMSTR,MFXX,MFXY,MFXZ,MFYX, 
-     .                  MFYY ,MFYZ ,MFZX ,MFZY,MFZZ)
+          CALL SIGEPS42(MATPARAM(IMAT),LLT ,NUVAR,NFUNC,IFUNC ,
+     2                  NPF ,TF  ,TIME,TIMESTEP,RHO0,RHO ,
+     3                  EP1 ,EP2 ,EP3 ,EP4  ,EP5  ,EP6 ,
+     4                  DE1 ,DE2 ,DE3 ,DE4  ,DE5  ,DE6 ,
+     5                  ES1 ,ES2 ,ES3 ,ES4  ,ES5  ,ES6 ,
+     6                  SO1 ,SO2 ,SO3 ,SO4  ,SO5  ,SO6 ,
+     7                  S1  ,S2  ,S3  ,S4   ,S5   ,S6  ,
+     8                  SSP ,VIS ,UVAR,OFF  ,WXX  ,WYY ,
+     A                  WZZ ,ISMSTR,MFXX,MFXY,MFXZ,MFYX,
+     .                  MFYY ,MFYZ ,MFZX ,MFZY,MFZZ)     
+
       ELSEIF(MTN==70)THEN
         CALL SIGEPS70(LLT ,NPAR,NUVAR,NFUNC,IFUNC,
      2                  NPF ,TF  ,TIME,TIMESTEP,BUFMAT,

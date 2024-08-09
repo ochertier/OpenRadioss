@@ -20,16 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  INSURF                        source/interfaces/interf1/insurf.F
-Chd|-- called by -----------
-Chd|        LECINS                        source/interfaces/interf1/lecins.F
-Chd|        LECINT                        source/interfaces/interf1/lecint.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        COUNT3                        source/interfaces/interf1/count3.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    insurf                 ../starter/source/interfaces/interf1/insurf.F
+      !||--- called by ------------------------------------------------------
+      !||    lecins                 ../starter/source/interfaces/interf1/lecins.F
+      !||    lecint                 ../starter/source/interfaces/interf1/lecint.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    count3                 ../starter/source/interfaces/interf1/count3.F
+      !||    usr2sys                ../starter/source/system/sysfus.F
+      !||--- uses       -----------------------------------------------------
+      !||    format_mod             ../starter/share/modules1/format_mod.F90
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE INSURF(NRT       ,MSN   ,IR    ,IRECT ,NOINT  ,
      .                  SURF_NODES,ITAB  ,MSV   ,ID    ,TITR   ,
      .                  NTAG      ,S_MSV  ,SIRECT, X, TYPE18)
@@ -37,6 +40,8 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      USE FORMAT_MOD , ONLY : FMW_4I
 C-----------------------------------------------
 C     LECTURE DES SURFACES ET DECOMPTE DES SEGMENTS
 C           ENTREE : 
@@ -62,8 +67,7 @@ C-----------------------------------------------
       INTEGER,INTENT(IN) :: S_MSV,SIRECT
       INTEGER IRECT(4,SIRECT/4), ITAB(NUMNOD), MSV(S_MSV),SURF_NODES(NRT,4)
       INTEGER ID
-      CHARACTER*nchartitle,
-     .   TITR
+      CHARACTER(LEN=NCHARTITLE) :: TITR
       INTEGER, DIMENSION(2*NUMNOD+1), INTENT(INOUT) ::  NTAG
       LOGICAL, INTENT(INOUT) :: TYPE18
       my_real,INTENT(IN) :: X(3,NUMNOD)

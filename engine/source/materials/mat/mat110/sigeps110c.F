@@ -20,18 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  SIGEPS110C                    source/materials/mat/mat110/sigeps110c.F
-Chd|-- called by -----------
-Chd|        MULAWC                        source/materials/mat_share/mulawc.F
-Chd|-- calls ---------------
-Chd|        SIGEPS110C_LITE_NEWTON        source/materials/mat/mat110/sigeps110c_lite_newton.F
-Chd|        SIGEPS110C_LITE_NICE          source/materials/mat/mat110/sigeps110c_lite_nice.F
-Chd|        SIGEPS110C_NEWTON             source/materials/mat/mat110/sigeps110c_newton.F
-Chd|        SIGEPS110C_NICE               source/materials/mat/mat110/sigeps110c_nice.F
-Chd|        INTERFACE_TABLE_MOD           share/modules/table_mod.F     
-Chd|        TABLE_MOD                     share/modules/table_mod.F     
-Chd|====================================================================
+      !||====================================================================
+      !||    sigeps110c               ../engine/source/materials/mat/mat110/sigeps110c.F
+      !||--- called by ------------------------------------------------------
+      !||    mulawc                   ../engine/source/materials/mat_share/mulawc.F
+      !||--- calls      -----------------------------------------------------
+      !||    sigeps110c_lite_newton   ../engine/source/materials/mat/mat110/sigeps110c_lite_newton.F
+      !||    sigeps110c_lite_nice     ../engine/source/materials/mat/mat110/sigeps110c_lite_nice.F
+      !||    sigeps110c_newton        ../engine/source/materials/mat/mat110/sigeps110c_newton.F
+      !||    sigeps110c_nice          ../engine/source/materials/mat/mat110/sigeps110c_nice.F
+      !||--- uses       -----------------------------------------------------
+      !||    interface_table_mod      ../engine/share/modules/table_mod.F
+      !||    table_mod                ../engine/share/modules/table_mod.F
+      !||====================================================================
       SUBROUTINE SIGEPS110C(
      1     NEL     ,NGL     ,NUPARAM ,NUVAR   ,NPF     , 
      2     TIME    ,TIMESTEP,UPARAM  ,UVAR    ,JTHE    ,OFF     ,
@@ -42,7 +43,7 @@ Chd|====================================================================
      6     SIGNXX  ,SIGNYY  ,SIGNXY  ,SIGNYZ  ,SIGNZX  ,THKLY   ,
      7     THK     ,SIGY    ,ET      ,TEMPEL  ,TEMP    ,SEQ     ,
      8     TF      ,NUMTABL ,ITABLE  ,TABLE   ,NVARTMP ,VARTMP  ,
-     9     SIGA    ,INLOC   ,DPLANL  ,EPSPL   )
+     9     SIGA    ,INLOC   ,DPLANL  ,EPSPL   ,LOFF    ,IOFF_DUCT)
       !=======================================================================
       !      Modules
       !=======================================================================
@@ -60,7 +61,8 @@ Chd|====================================================================
       !      Dummy arguments
       !=======================================================================
       INTEGER NEL,NUPARAM,NUVAR,JTHE,NUMTABL,ITABLE(NUMTABL),NVARTMP,NPF(*),INLOC
-      INTEGER ,DIMENSION(NEL), INTENT(IN)    :: NGL
+      INTEGER,DIMENSION(NEL), INTENT(IN)    :: NGL
+      INTEGER,DIMENSION(NEL), INTENT(INOUT) :: IOFF_DUCT
       my_real 
      .   TIME,TIMESTEP,ASRATE,TF(*)
       INTEGER :: VARTMP(NEL,NVARTMP)
@@ -71,7 +73,7 @@ Chd|====================================================================
      .   DEPSXX,DEPSYY,DEPSXY,DEPSYZ,DEPSZX,
      .   EPSPXX,EPSPYY,EPSPXY,EPSPYZ,EPSPZX ,
      .   SIGOXX,SIGOYY,SIGOXY,SIGOYZ,SIGOZX,
-     .   GS,THKLY,DPLANL
+     .   GS,THKLY,DPLANL,LOFF
 c
       my_real ,DIMENSION(NEL), INTENT(OUT)   :: 
      .   SOUNDSP,SIGY,ET,EPSP,
@@ -121,7 +123,7 @@ c--------------------------
      7           SIGNXX  ,SIGNYY  ,SIGNXY  ,SIGNYZ  ,SIGNZX   ,THKLY   ,
      8           THK     ,SIGY    ,ET      ,TEMPEL  ,TEMP     ,SEQ     ,
      9           TF      ,NUMTABL ,ITABLE  ,TABLE   ,NVARTMP  ,VARTMP  ,
-     A           SIGA    ,INLOC   ,DPLANL  )
+     A           SIGA    ,INLOC   ,DPLANL  ,LOFF    )
             CASE(4)
               CALL SIGEPS110C_LITE_NICE(
      1           NEL     ,NGL     ,NUPARAM ,NUVAR   ,NPF      ,
@@ -133,7 +135,7 @@ c--------------------------
      7           SIGNXX  ,SIGNYY  ,SIGNXY  ,SIGNYZ  ,SIGNZX   ,THKLY  ,
      8           THK     ,SIGY    ,ET      ,TEMPEL  ,TEMP     ,SEQ    ,
      9           TF      ,NUMTABL ,ITABLE  ,TABLE   ,NVARTMP  ,VARTMP ,
-     A           SIGA    ,INLOC   ,DPLANL  )  
+     A           SIGA    ,INLOC   ,DPLANL  ,LOFF    )  
           END SELECT   
         ! Newton cutting plane return mapping
         CASE(2)
@@ -150,7 +152,7 @@ c--------------------------
      7           SIGNXX  ,SIGNYY  ,SIGNXY  ,SIGNYZ  ,SIGNZX   ,THKLY   ,
      8           THK     ,SIGY    ,ET      ,TEMPEL  ,TEMP     ,SEQ     ,
      9           TF      ,NUMTABL ,ITABLE  ,TABLE   ,NVARTMP  ,VARTMP  ,
-     A           SIGA    ,INLOC   ,DPLANL  )
+     A           SIGA    ,INLOC   ,DPLANL  ,LOFF    )
             CASE(4)
               CALL SIGEPS110C_LITE_NEWTON(
      1           NEL     ,NGL     ,NUPARAM ,NUVAR   ,NPF      ,
@@ -162,12 +164,14 @@ c--------------------------
      7           SIGNXX  ,SIGNYY  ,SIGNXY  ,SIGNYZ  ,SIGNZX   ,THKLY  ,
      8           THK     ,SIGY    ,ET      ,TEMPEL  ,TEMP     ,SEQ    ,
      9           TF      ,NUMTABL ,ITABLE  ,TABLE   ,NVARTMP  ,VARTMP ,
-     A           SIGA    ,INLOC   ,DPLANL  )
+     A           SIGA    ,INLOC   ,DPLANL  ,LOFF    )
           END SELECT    
         END SELECT
 
         ! Copy the strain rate for failure criteria
         EPSPL(1:NEL) = EPSP(1:NEL)
+        ! Ductile failure activation
+        IOFF_DUCT(1:NEL) = 1
 c--------------------------
 c-----------
       END

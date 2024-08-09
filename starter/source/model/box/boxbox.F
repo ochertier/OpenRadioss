@@ -20,19 +20,18 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  BOXBOX                        source/model/box/boxbox.F     
-Chd|-- called by -----------
-Chd|        BIGBOX                        source/model/box/bigbox.F     
-Chd|        HM_BIGBOX                     source/model/box/hm_bigbox.F  
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        BOXASSEM1                     source/model/box/bigbox.F     
-Chd|        BOXTAGN                       source/model/box/bigbox.F     
-Chd|        FREERR                        source/starter/freform.F      
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        OPTIONDEF_MOD                 ../common_source/modules/optiondef_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    boxbox                 ../starter/source/model/box/boxbox.F
+      !||--- called by ------------------------------------------------------
+      !||    bigbox                 ../starter/source/model/box/bigbox.F
+      !||    hm_bigbox              ../starter/source/model/box/hm_bigbox.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    boxassem1              ../starter/source/model/box/bigbox.F
+      !||    boxtagn                ../starter/source/model/box/bigbox.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE BOXBOX(IBOX  ,SKEW   ,
      .                  FLAGG  ,ICOUNT,ITER  ,IBUFBOX,
      .                  X      ,IADB  ,ID    ,TITR   ,
@@ -42,6 +41,7 @@ C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
       USE OPTIONDEF_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARFIELD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -60,10 +60,8 @@ C-----------------------------------------------
       my_real
      .      X(3,*),SKEW(LSKEW,*)
       INTEGER ID
-      CHARACTER*nchartitle,
-     .   TITR
-      CHARACTER*ncharfield,
-     .   KEY
+      CHARACTER(LEN=NCHARTITLE) :: TITR
+      CHARACTER(LEN=NCHARFIELD) :: KEY
       TYPE (BOX_)  , DIMENSION(NBBOX)  :: IBOX
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -162,19 +160,18 @@ C-----------
 C-----------
       RETURN
       END
-Chd|====================================================================
-Chd|  BOXBOX2                       source/model/box/boxbox.F     
-Chd|-- called by -----------
-Chd|        BIGBOX2                       source/model/box/bigbox.F     
-Chd|        HM_BIGBOX2                    source/model/box/hm_bigbox2.F 
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        BOXASSEM2                     source/model/box/bigbox.F     
-Chd|        BOXTAGE                       source/model/box/bigbox.F     
-Chd|        FREERR                        source/starter/freform.F      
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        OPTIONDEF_MOD                 ../common_source/modules/optiondef_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    boxbox2         ../starter/source/model/box/boxbox.F
+      !||--- called by ------------------------------------------------------
+      !||    bigbox2         ../starter/source/model/box/bigbox.F
+      !||    hm_bigbox2      ../starter/source/model/box/hm_bigbox2.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg          ../starter/source/output/message/message.F
+      !||    boxassem2       ../starter/source/model/box/bigbox.F
+      !||    boxtage         ../starter/source/model/box/bigbox.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod     ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE BOXBOX2(IBOX    ,SKEW  ,
      .                   FLAGG   ,ICOUNT,ITER    ,BOXTYPE,
      .                   X       ,IX    ,FLAG    ,IBOXMAX,
@@ -208,8 +205,7 @@ C-----------------------------------------------
       my_real
      .      X(3,*),SKEW(LSKEW,*)
       INTEGER ID
-      CHARACTER*nchartitle,
-     .   TITR
+      CHARACTER(LEN=NCHARTITLE) :: TITR
       CHARACTER MES*40
       TYPE (BOX_)  , DIMENSION(NBBOX)  :: IBOX
 C-----------------------------------------------
@@ -311,19 +307,18 @@ C-----------
 C-----------
       RETURN
       END
-Chd|====================================================================
-Chd|  BOXBOXS                       source/model/box/boxbox.F     
-Chd|-- called by -----------
-Chd|        BIGSBOX                       source/model/box/bigbox.F     
-Chd|        HM_BIGSBOX                    source/groups/hm_bigsbox.F    
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        BOXASSEM3                     source/model/box/bigbox.F     
-Chd|        BOX_SURF_SH                   source/model/box/bigbox.F     
-Chd|        FREERR                        source/starter/freform.F      
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        OPTIONDEF_MOD                 ../common_source/modules/optiondef_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    boxboxs         ../starter/source/model/box/boxbox.F
+      !||--- called by ------------------------------------------------------
+      !||    bigsbox         ../starter/source/model/box/bigbox.F
+      !||    hm_bigsbox      ../starter/source/groups/hm_bigsbox.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg          ../starter/source/output/message/message.F
+      !||    box_surf_sh     ../starter/source/model/box/bigbox.F
+      !||    boxassem3       ../starter/source/model/box/bigbox.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod     ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE BOXBOXS(IBOX       ,SKEW    ,FLAGG  ,ICOUNT  ,ITER   ,
      .                   BOXTYPE    ,IBUFBOX ,X      ,IADB    ,IX     ,
      .                   NIX        ,NIX1    ,NIX2   ,NUMEL   ,ISURF0 ,
@@ -353,8 +348,7 @@ C-----------------------------------------------
       my_real
      .        X(3,*),SKEW(LSKEW,*)
       INTEGER ID
-      CHARACTER*nchartitle,
-     .   TITR
+      CHARACTER(LEN=NCHARTITLE) :: TITR
       CHARACTER MESS*40
       TYPE (BOX_)  , DIMENSION(NBBOX)  :: IBOX
 C-----------------------------------------------
@@ -456,19 +450,18 @@ C-----------
 C-----------
       RETURN
       END
-Chd|====================================================================
-Chd|  ELSTAGBOXBOX                  source/model/box/boxbox.F     
-Chd|-- called by -----------
-Chd|        SBOXBOXSURF                   source/model/box/bigbox.F     
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        BOXASSEM4                     source/model/box/bigbox.F     
-Chd|        ELSTAGBOX                     source/model/box/bigbox.F     
-Chd|        FACEBOX                       source/model/box/bigbox.F     
-Chd|        FREERR                        source/starter/freform.F      
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        OPTIONDEF_MOD                 ../common_source/modules/optiondef_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    elstagboxbox           ../starter/source/model/box/boxbox.F
+      !||--- called by ------------------------------------------------------
+      !||    sboxboxsurf            ../starter/source/model/box/bigbox.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    boxassem4              ../starter/source/model/box/bigbox.F
+      !||    elstagbox              ../starter/source/model/box/bigbox.F
+      !||    facebox                ../starter/source/model/box/bigbox.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE ELSTAGBOXBOX(IBOX   ,SKEW   ,
      .                        FLAGG  ,ICOUNT ,ITER    ,BOXTYPE,
      .                        IBUFBOX,X      ,IADB    ,IXS    ,
@@ -482,6 +475,7 @@ C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
       USE OPTIONDEF_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -504,8 +498,7 @@ C-----------------------------------------------
       my_real
      .      X(3,*),SKEW(LSKEW,*)
       INTEGER ID
-      CHARACTER*nchartitle,
-     .   TITR
+      CHARACTER(LEN=NCHARTITLE) :: TITR
       TYPE (BOX_)  , DIMENSION(NBBOX)  :: IBOX
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s

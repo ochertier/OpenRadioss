@@ -20,15 +20,15 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  SFINT_REG                     source/elements/solid/solide/sfint_reg.F
-Chd|-- called by -----------
-Chd|        SFORC3                        source/elements/solid/solide/sforc3.F
-Chd|        SZFORC3                       source/elements/solid/solidez/szforc3.F
-Chd|-- calls ---------------
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
-Chd|        NLOCAL_REG_MOD                ../common_source/modules/nlocal_reg_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    sfint_reg        ../engine/source/elements/solid/solide/sfint_reg.F
+      !||--- called by ------------------------------------------------------
+      !||    sforc3           ../engine/source/elements/solid/solide/sforc3.F
+      !||    szforc3          ../engine/source/elements/solid/solidez/szforc3.F
+      !||--- uses       -----------------------------------------------------
+      !||    elbufdef_mod     ../common_source/modules/mat_elem/elbufdef_mod.F90
+      !||    nlocal_reg_mod   ../common_source/modules/nlocal_reg_mod.F
+      !||====================================================================
       SUBROUTINE SFINT_REG(
      1   NLOC_DMG ,VAR_REG  ,NEL      ,OFF      ,
      2   VOL      ,NLOCS    ,VOL0     ,
@@ -238,14 +238,14 @@ c
           NTN_VNL = (VNL(POS1(I)) + VNL(POS2(I)) + VNL(POS3(I)) + VNL(POS4(I))
      .            +  VNL(POS5(I)) + VNL(POS6(I)) + VNL(POS7(I)) + VNL(POS8(I))) / NTN8
           IF (NODADT > 0) THEN 
-            NTN_VNL = (SQRT(MASS(POS1(I))/MASS0(POS1(I)))*VNL(POS1(I)) + 
-     .                 SQRT(MASS(POS2(I))/MASS0(POS2(I)))*VNL(POS2(I)) + 
-     .                 SQRT(MASS(POS3(I))/MASS0(POS3(I)))*VNL(POS3(I)) + 
-     .                 SQRT(MASS(POS4(I))/MASS0(POS4(I)))*VNL(POS4(I)) +
-     .                 SQRT(MASS(POS5(I))/MASS0(POS5(I)))*VNL(POS5(I)) + 
-     .                 SQRT(MASS(POS6(I))/MASS0(POS6(I)))*VNL(POS6(I)) + 
-     .                 SQRT(MASS(POS7(I))/MASS0(POS7(I)))*VNL(POS7(I)) + 
-     .                 SQRT(MASS(POS8(I))/MASS0(POS8(I)))*VNL(POS8(I))) / NTN8
+            NTN_VNL = MIN(SQRT(MASS(POS1(I))/MASS0(POS1(I))), 
+     .                    SQRT(MASS(POS2(I))/MASS0(POS2(I))), 
+     .                    SQRT(MASS(POS3(I))/MASS0(POS3(I))), 
+     .                    SQRT(MASS(POS4(I))/MASS0(POS4(I))),
+     .                    SQRT(MASS(POS5(I))/MASS0(POS5(I))), 
+     .                    SQRT(MASS(POS6(I))/MASS0(POS6(I))), 
+     .                    SQRT(MASS(POS7(I))/MASS0(POS7(I))), 
+     .                    SQRT(MASS(POS8(I))/MASS0(POS8(I))))*NTN_VNL
           ENDIF
 c        
           ! Computation of the product LEN**2 * BtxB
@@ -393,12 +393,12 @@ c
           NTN_VNL = (VNL(POS1(I)) + VNL(POS2(I)) + VNL(POS3(I)) + 
      .               VNL(POS4(I)) + VNL(POS5(I)) + VNL(POS6(I))) / NTN6
           IF (NODADT > 0) THEN 
-            NTN_VNL = (SQRT(MASS(POS1(I))/MASS0(POS1(I)))*VNL(POS1(I)) + 
-     .                 SQRT(MASS(POS2(I))/MASS0(POS2(I)))*VNL(POS2(I)) + 
-     .                 SQRT(MASS(POS3(I))/MASS0(POS3(I)))*VNL(POS3(I)) + 
-     .                 SQRT(MASS(POS4(I))/MASS0(POS4(I)))*VNL(POS4(I)) +
-     .                 SQRT(MASS(POS5(I))/MASS0(POS5(I)))*VNL(POS5(I)) + 
-     .                 SQRT(MASS(POS6(I))/MASS0(POS6(I)))*VNL(POS6(I))) / NTN6
+            NTN_VNL = MIN(SQRT(MASS(POS1(I))/MASS0(POS1(I))), 
+     .                    SQRT(MASS(POS2(I))/MASS0(POS2(I))), 
+     .                    SQRT(MASS(POS3(I))/MASS0(POS3(I))), 
+     .                    SQRT(MASS(POS4(I))/MASS0(POS4(I))),
+     .                    SQRT(MASS(POS5(I))/MASS0(POS5(I))), 
+     .                    SQRT(MASS(POS6(I))/MASS0(POS6(I))))*NTN_VNL
           ENDIF
 c        
           ! Computation of the product LEN**2 * BtxB

@@ -20,34 +20,30 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  ININTR                        source/interfaces/interf1/inintr.F
-Chd|-- called by -----------
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|-- calls ---------------
-Chd|        FLUSH_REMNODE_ARRAY           source/interfaces/inter3d1/flush_remnode_array.F
-Chd|        FRETITL2                      source/starter/freform.F      
-Chd|        ININT2                        source/interfaces/inter2d1/inint2.F
-Chd|        ININT3                        source/interfaces/inter3d1/inint3.F
-Chd|        IWCONTDD_NEW                  source/spmd/domain_decomposition/grid2mat.F
-Chd|        REMN_I2OP                     source/interfaces/inter3d1/i7remnode.F
-Chd|        REMN_I2_EDGOP                 source/interfaces/inter3d1/i7remnode.F
-Chd|        REMN_SELF24                   source/interfaces/inter3d1/remn_self24.F
-Chd|        RESET_GAP                     source/interfaces/interf1/reset_gap.F
-Chd|        RI2_INT24P_INI                source/interfaces/inter3d1/i7remnode.F
-Chd|        UPGRADE_MULTIMP               ../common_source/interf/upgrade_multimp.F
-Chd|        UPGRADE_REMNODE               source/interfaces/interf1/upgrade_remnode.F
-Chd|        UPGRADE_REMNODE_EDG           source/interfaces/interf1/upgrade_remnode.F
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
-Chd|        FRONT_MOD                     share/modules1/front_mod.F    
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        INOUTFILE_MOD                 ../common_source/modules/inoutfile_mod.F
-Chd|        INTBUFMOD                     share/modules1/restart_mod.F  
-Chd|        INTBUFSCRATCH_MOD             source/interfaces/interf1/intbufscratch_mod.F
-Chd|        INTER_CAND_MOD                share/modules1/inter_cand_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    inintr                 ../starter/source/interfaces/interf1/inintr.F
+      !||--- called by ------------------------------------------------------
+      !||    lectur                 ../starter/source/starter/lectur.F
+      !||--- calls      -----------------------------------------------------
+      !||    flush_remnode_array    ../starter/source/interfaces/inter3d1/flush_remnode_array.F
+      !||    fretitl2               ../starter/source/starter/freform.F
+      !||    inint2                 ../starter/source/interfaces/inter2d1/inint2.F
+      !||    inint3                 ../starter/source/interfaces/inter3d1/inint3.F
+      !||    iwcontdd_new           ../starter/source/spmd/domain_decomposition/grid2mat.F
+      !||    remn_i2_edgop          ../starter/source/interfaces/inter3d1/i7remnode.F
+      !||    remn_i2op              ../starter/source/interfaces/inter3d1/i7remnode.F
+      !||    remn_self24            ../starter/source/interfaces/inter3d1/remn_self24.F
+      !||    reset_gap              ../starter/source/interfaces/interf1/reset_gap.F
+      !||    ri2_int24p_ini         ../starter/source/interfaces/inter3d1/i7remnode.F
+      !||    upgrade_remnode        ../starter/source/interfaces/interf1/upgrade_remnode.F
+      !||    upgrade_remnode_edg    ../starter/source/interfaces/interf1/upgrade_remnode.F
+      !||--- uses       -----------------------------------------------------
+      !||    front_mod              ../starter/share/modules1/front_mod.F
+      !||    intbufmod              ../starter/share/modules1/restart_mod.F
+      !||    intbufscratch_mod      ../starter/source/interfaces/interf1/intbufscratch_mod.F
+      !||    inter_cand_mod         ../starter/share/modules1/inter_cand_mod.F
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE ININTR(IPARI     ,INSCR    ,X,V       ,IXS      ,IXQ      ,
      2                  IXC       ,PM       ,GEO     ,ITAB     ,MS       ,
      3                  MWA       ,RWA      ,IXTG    ,IKINE    ,IXT      ,
@@ -64,15 +60,13 @@ Chd|====================================================================
      F                  SEGQUADFR,TAGPRT_FRIC,INTBUF_FRIC_TAB  ,IPARTT   ,
      G                  IPARTP    ,IPARTX   ,IPARTR  ,NSN_MULTI_CONNEC,T2_NB_CONNEC,
      H                  ICODE     ,ISKEW    ,MULTI_FVM,S_NOD2ELS)
-C============================================================================
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
       USE INTBUFMOD
       USE FRONT_MOD
-      USE INTBUFDEF_MOD 
-!!      USE STACK_MOD 
+      USE INTBUFDEF_MOD
       USE INTBUFSCRATCH_MOD
       USE INTBUF_FRIC_MOD
       USE GROUPDEF_MOD
@@ -80,6 +74,7 @@ C-----------------------------------------------
       USE ALE_CONNECTIVITY_MOD
       USE MULTI_FVM_MOD
       USE INTER_CAND_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -113,14 +108,12 @@ C-----------------------------------------------
      .   KNOD2ELQ(*),NOD2ELQ(*),SEGQUADFR(2,*),TAGPRT_FRIC(*),IPARTT(*),
      .   IPARTP(*),IPARTX(*),IPARTR(*),NSN_MULTI_CONNEC,T2_NB_CONNEC(*),
      .   ICODE(*), ISKEW(*)
-      my_real
-     .   X(3,*),V(3,*), PM(*), GEO(*), MS(*), RWA(6,*),
-     .   THK(*),THK_PART(*),FRIGAP(NPARIR,*),
-     .   LELX(*), FILLSOL(*),PM_STACK(*)
+      my_real X(3,*),V(3,*), PM(*), GEO(*), MS(*), RWA(6,*),
+     .        THK(*),THK_PART(*),FRIGAP(NPARIR,*),
+     .        LELX(*), FILLSOL(*),PM_STACK(*)
       INTEGER NOM_OPT(LNOPT1,*),KXX(*),IXX(*)
       TYPE(INTERSURFP) :: INTERCEP(3,NINTER)
       TYPE(INTBUF_STRUCT_) INTBUF_TAB(*)
-!!      TYPE (STACK_PLY) :: STACK
       TYPE(SCRATCH_STRUCT_) INSCR(*)
       TYPE(INTBUF_FRIC_STRUCT_) INTBUF_FRIC_TAB(*)
 C-----------------------------------------------
@@ -138,8 +131,7 @@ C-----------------------------------------------
      .        NREMN(NINTER),NREMN_OLD(NINTER),IEDG,IEDGN,ST2_CONNEC,
      .        REMNODE_SIZE,LEN_FILNAM,REMNODE_SIZE_EDG,IREMNODE_EDG
       CHARACTER*(2148) FILNAM
-      CHARACTER*nchartitle,
-     .        TITR
+      CHARACTER(LEN=NCHARTITLE) :: TITR
       INTEGER, DIMENSION(:),ALLOCATABLE :: REMNODE,KREMNODE,T2_ADD_CONNEC,T2_CONNEC,IKINE1
       
       INTEGER :: NS

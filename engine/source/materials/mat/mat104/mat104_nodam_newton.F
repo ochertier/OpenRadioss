@@ -20,12 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  MAT104_NODAM_NEWTON           source/materials/mat/mat104/mat104_nodam_newton.F
-Chd|-- called by -----------
-Chd|        SIGEPS104                     source/materials/mat/mat104/sigeps104.F
-Chd|-- calls ---------------
-Chd|====================================================================
+      !||====================================================================
+      !||    mat104_nodam_newton   ../engine/source/materials/mat/mat104/mat104_nodam_newton.F
+      !||--- called by ------------------------------------------------------
+      !||    sigeps104             ../engine/source/materials/mat/mat104/sigeps104.F
+      !||====================================================================
       SUBROUTINE MAT104_NODAM_NEWTON(
      1     NEL     ,NGL     ,NUPARAM ,NUVAR   , 
      2     TIME    ,TIMESTEP,UPARAM  ,UVAR    ,JTHE    ,OFF     ,
@@ -136,7 +135,7 @@ c
         ! Standard inputs
         DPLA(I)  = ZERO    ! Initialization of the plastic strain increment
         ET(I)    = ONE     ! Initialization of hourglass coefficient
-        HARDP(I) = ZERO    ! Initialization of hourglass coefficient
+        HARDP(I) = ZERO    ! Initialization of hardening modulus
       ENDDO
 c      
       ! Initialization of temperature and self-heating weight factor
@@ -227,7 +226,7 @@ c
       ! Checking plastic behavior for all elements
       NINDX = 0
       DO I=1,NEL         
-        IF ((PHI(I)>ZERO).AND.(OFF(I) == ONE)) THEN
+        IF ((PHI(I) >= ZERO).AND.(OFF(I) == ONE)) THEN
           NINDX=NINDX+1
           INDEX(NINDX)=I
         ENDIF
@@ -289,6 +288,7 @@ c
      .            + TWO*SIGNXY(I)*SIGNXY(I)
      .            + TWO*SIGNYZ(I)*SIGNYZ(I)
      .            + TWO*SIGNZX(I)*SIGNZX(I))   
+          NORMSIG = MAX(NORMSIG,ONE)
 c        
           ! Derivative with respect to Fdr 
           FDR(I)     =  (J2(I)/(NORMSIG**2))**3 - CDR*((J3(I)/(NORMSIG**3))**2)       
@@ -444,18 +444,22 @@ c
       ! Storing new values
       DO I=1,NEL  
         ! USR Outputs
-        SEQ(I)     = SIGDR(I) ! SIGEQ
-        DPDT       = DPLA(I) / MAX(EM20,TIMESTEP)
+        SEQ(I)     = SIGDR(I)
         ! Plastic strain-rate (filtered)
+        DPDT       = DPLA(I) / MAX(EM20,TIMESTEP)
         EPSD(I)    = AFILTR * DPDT + (ONE - AFILTR) * EPSD(I)
         ! Coefficient for hourglass
-        ET(I)      = HARDP(I)*FRATE(I) / (HARDP(I)*FRATE(I) + YOUNG)
+        IF (DPLA(I) > ZERO) THEN 
+          ET(I)    = HARDP(I)*FRATE(I) / (HARDP(I)*FRATE(I) + YOUNG)
+        ELSE
+          ET(I)    = ONE
+        ENDIF
         ! Computation of the sound speed
         SOUNDSP(I) = SQRT((BULK + FOUR_OVER_3*G)/RHO0(I))
         ! Storing the yield stress
         SIGY(I)    = YLD(I)
         ! Non-local temperature
-        IF (INLOC > 0) THEN 
+        IF ((INLOC > 0).AND.(OFF(I) == ONE)) THEN 
           IF (CP > ZERO .AND. JTHE == 0) THEN     
             ! Computation of the weight factor
             DPDT_NL = MAX(DPLANL(I),ZERO)/MAX(TIMESTEP,EM20)

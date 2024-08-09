@@ -20,21 +20,23 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  HM_PREREAD_PROPERTIES         source/properties/hm_preread_properties.F
-Chd|-- called by -----------
-Chd|        CONTRL                        source/starter/contrl.F       
-Chd|-- calls ---------------
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        HM_GET_INT_ARRAY_2INDEXES     source/devtools/hm_reader/hm_get_int_array_2indexes.F
-Chd|        HM_GET_INT_ARRAY_INDEX        source/devtools/hm_reader/hm_get_int_array_index.F
-Chd|        HM_OPTION_READ_KEY            source/devtools/hm_reader/hm_option_read_key.F
-Chd|        HM_OPTION_START               source/devtools/hm_reader/hm_option_start.F
-Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        STACK_VAR_MOD                 share/modules1/stack_var_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
-      SUBROUTINE HM_PREREAD_PROPERTIES(IGEO,NSPHSOL,NPLY,NSUB,NISUB,LSUBMODEL)
+      !||====================================================================
+      !||    hm_preread_properties       ../starter/source/properties/hm_preread_properties.F
+      !||--- called by ------------------------------------------------------
+      !||    contrl                      ../starter/source/starter/contrl.F
+      !||--- calls      -----------------------------------------------------
+      !||    hm_get_int_array_2indexes   ../starter/source/devtools/hm_reader/hm_get_int_array_2indexes.F
+      !||    hm_get_int_array_index      ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+      !||    hm_get_intv                 ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    hm_option_read_key          ../starter/source/devtools/hm_reader/hm_option_read_key.F
+      !||    hm_option_start             ../starter/source/devtools/hm_reader/hm_option_start.F
+      !||--- uses       -----------------------------------------------------
+      !||    defaults_mod                ../starter/source/modules/defaults_mod.F90
+      !||    hm_option_read_mod          ../starter/share/modules1/hm_option_read_mod.F
+      !||    stack_var_mod               ../starter/share/modules1/stack_var_mod.F
+      !||    submodel_mod                ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
+      SUBROUTINE HM_PREREAD_PROPERTIES(IGEO,NSPHSOL,NPLY,NSUB,NISUB,LSUBMODEL,DEFAULTS)
 C============================================================================
 C-----------------------------------------------
 C   A n a l y s e   M o d u l e
@@ -42,6 +44,8 @@ C-----------------------------------------------
       USE STACK_VAR_MOD
       USE SUBMODEL_MOD
       USE HM_OPTION_READ_MOD
+      USE DEFAULTS_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARFIELD, NCHARKEY, NCHARLINE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -53,13 +57,13 @@ C-----------------------------------------------
 #include      "scr17_c.inc"
 #include      "param_c.inc"
 #include      "scr03_c.inc"
-#include      "scr21_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IGEO(NPROPGI,*),NSPHSOL
       TYPE(SUBMODEL_DATA) LSUBMODEL(*)
       INTEGER ,DIMENSION (NUMGEO + NUMSTACK) :: NPLY,NSUB,NISUB
+      TYPE(DEFAULTS_), INTENT(IN)            :: DEFAULTS             
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -74,10 +78,11 @@ C-----------------------------------------------
       my_real
      .    FN, FT, DX, ANGL,PUN,HTEST,HCLOS,CVIS,RBID,VX,VY,VZ,
      .    KNOT1,KNOT2,KNOT3,R5(5),DN
-      CHARACTER IDTITL*nchartitle,MESS*40,KEY*ncharline, 
-     .          STRING*ncharfield,CHROT*7,SOLVERKEYWORD*ncharline
-      INTEGER ISH3N,ITET4,IPLAS,NPT,ISROT,NP,LAMIN,NSUB_STACK,NISUB_STACK,
-     .        NPLY_STACK,NPLY_SUB
+      CHARACTER(LEN=NCHARTITLE) :: IDTITL
+      CHARACTER(LEN=NCHARLINE) :: KEY, SOLVERKEYWORD
+      CHARACTER(LEN=NCHARFIELD) :: STRING
+      CHARACTER :: CHROT*7,MESS*40
+      INTEGER ISH3N,ITET4,IPLAS,NPT,ISROT,NP,LAMIN,NSUB_STACK,NISUB_STACK,NPLY_STACK,NPLY_SUB,ITET4_D
       LOGICAL IS_AVAILABLE
      
 !!      TYPE(STACK_INFO_ ) , DIMENSION(:), POINTER :: STACK_INFO
@@ -90,6 +95,7 @@ C
       NSUB (:) = 0
       NISUB(:) = 0
       NPLY (:) = 0
+      ITET4_D= DEFAULTS%SOLID%ITETRA4
 C--------------------------------------------------
       IS_AVAILABLE = .FALSE.
 C--------------------------------------------------

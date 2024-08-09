@@ -20,20 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  HM_READ_MATGAS                source/materials/mat/matgas/hm_read_matgas.F
-Chd|-- called by -----------
-Chd|        HM_READ_MAT                   source/materials/mat/hm_read_mat.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        HM_GET_FLOATV                 source/devtools/hm_reader/hm_get_floatv.F
-Chd|        HM_GET_FLOATV_DIM             source/devtools/hm_reader/hm_get_floatv_dim.F
-Chd|        HM_GET_STRING                 source/devtools/hm_reader/hm_get_string.F
-Chd|        HM_OPTION_IS_ENCRYPTED        source/devtools/hm_reader/hm_option_is_encrypted.F
-Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_read_matgas           ../starter/source/materials/mat/matgas/hm_read_matgas.F
+      !||--- called by ------------------------------------------------------
+      !||    hm_read_mat              ../starter/source/materials/mat/hm_read_mat.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                   ../starter/source/output/message/message.F
+      !||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
+      !||    hm_get_floatv_dim        ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
+      !||    hm_get_string            ../starter/source/devtools/hm_reader/hm_get_string.F
+      !||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+      !||--- uses       -----------------------------------------------------
+      !||    hm_option_read_mod       ../starter/share/modules1/hm_option_read_mod.F
+      !||    message_mod              ../starter/share/message_module/message_mod.F
+      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE HM_READ_MATGAS(PM, IPM, ID, TITR, KEY2, UNITAB, LSUBMODEL)
 C-----------------------------------------------
 C     M o d u l e s
@@ -42,6 +43,7 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE SUBMODEL_MOD
       USE HM_OPTION_READ_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARLINE, NCHARFIELD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -57,18 +59,18 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       TYPE (UNIT_TYPE_),INTENT(IN) ::UNITAB 
       INTEGER, INTENT(IN) :: ID
-      CHARACTER(LEN = nchartitle) :: TITR
+      CHARACTER(LEN = NCHARTITLE) :: TITR
       INTEGER, DIMENSION(NPROPMI), INTENT(INOUT) :: IPM
       my_real, DIMENSION(NPROPM), INTENT(INOUT) :: PM
       TYPE(SUBMODEL_DATA), DIMENSION(NSUBMOD), INTENT(IN) :: LSUBMODEL
-      CHARACTER(LEN = ncharline), INTENT(IN) :: KEY2
+      CHARACTER(LEN = NCHARLINE), INTENT(IN) :: KEY2
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       my_real
      .   MW, CPA, CPB, CPC, CPD, CPE, CPF, CV,
      .   FAC_L, FAC_T, FAC_M, R_IGC1, FAC_CP, FAC
-      CHARACTER(LEN = ncharline) :: KEY, USERGAS_NAME, KEY2_TRIM
+      CHARACTER(LEN = NCHARLINE) :: KEY, USERGAS_NAME, KEY2_TRIM
       CHARACTER(LEN = 20) :: GASTYPE
       INTEGER :: IGAS, IMOLE
       LOGICAL :: IS_AVAILABLE, IS_ENCRYPTED

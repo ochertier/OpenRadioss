@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  FILL_CLAUSE_ELT_BOX           source/model/sets/fill_clause_elt_box.F
-Chd|-- called by -----------
-Chd|        CREATE_ELT_BOX                source/model/sets/create_elt_box.F
-Chd|-- calls ---------------
-Chd|        SET_MERGE_SIMPLE              source/model/sets/set_merge_simple.F
-Chd|        SIMPLE_ELT_BOX                source/model/sets/simpl_elt_box.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        OPTIONDEF_MOD                 ../common_source/modules/optiondef_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    fill_clause_elt_box    ../starter/source/model/sets/fill_clause_elt_box.F
+      !||--- called by ------------------------------------------------------
+      !||    create_elt_box         ../starter/source/model/sets/create_elt_box.F
+      !||--- calls      -----------------------------------------------------
+      !||    elt_box                ../starter/source/model/sets/fill_clause_elt_box.F
+      !||    set_merge_simple       ../starter/source/model/sets/set_merge_simple.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE FILL_CLAUSE_ELT_BOX(
      *                IBOX    ,X           ,SKEW     ,SET_TITLE ,KEYSET ,
      *                BOXLIST ,BOXLIST_SIZE,BOXELTS  ,SZ_BOXELTS,BOXTYPE,
@@ -42,6 +42,7 @@ C   M o d u l e s
 C-----------------------------------------------
       USE OPTIONDEF_MOD
       USE MESSAGE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARFIELD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -65,8 +66,8 @@ C-----------------------------------------------
       my_real
      .        X(3,*),SKEW(LSKEW,*)
 
-      CHARACTER KEYSET*ncharfield
-      CHARACTER SET_TITLE*nchartitle
+      CHARACTER(LEN=NCHARFIELD):: KEYSET
+      CHARACTER(LEN=NCHARTITLE)::SET_TITLE
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -108,6 +109,16 @@ C-------
       END
 
 
+      !||====================================================================
+      !||    elt_box                ../starter/source/model/sets/fill_clause_elt_box.F
+      !||--- called by ------------------------------------------------------
+      !||    fill_clause_elt_box    ../starter/source/model/sets/fill_clause_elt_box.F
+      !||--- calls      -----------------------------------------------------
+      !||    set_merge_simple       ../starter/source/model/sets/set_merge_simple.F
+      !||    simple_elt_box         ../starter/source/model/sets/simpl_elt_box.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       RECURSIVE SUBROUTINE ELT_BOX( IB  ,
      *                     IBOX    ,X         ,SKEW   ,SET_TITLE ,KEYSET,
      *                     BOXELTS ,SZ_BOXELTS,NIX    ,IX        ,NIX1   ,
@@ -137,6 +148,7 @@ C   M o d u l e s
 C-----------------------------------------------
       USE OPTIONDEF_MOD
       USE MESSAGE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARFIELD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -159,8 +171,8 @@ C-----------------------------------------------
       my_real
      .        X(3,*),SKEW(LSKEW,*)
 
-      CHARACTER KEYSET*ncharfield
-      CHARACTER SET_TITLE*nchartitle
+      CHARACTER(LEN=NCHARFIELD) :: KEYSET
+      CHARACTER(LEN=NCHARTITLE)::SET_TITLE
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

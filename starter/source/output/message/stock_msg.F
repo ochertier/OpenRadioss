@@ -20,18 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  STOCK_MSG                     source/output/message/stock_msg.F
-Chd|-- called by -----------
-Chd|        BUILD_MSG                     source/output/message/build_msg.F
-Chd|-- calls ---------------
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    stock_msg              ../starter/source/output/message/stock_msg.F
+      !||--- called by ------------------------------------------------------
+      !||    build_msg              ../starter/source/output/message/build_msg.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE STOCK_MSG(ID,ITYPE,SBUFMSG,BUFMSG)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARLINE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -44,11 +45,12 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER,INTENT(IN) :: ID,ITYPE,SBUFMSG
-      CHARACTER*ncharline, INTENT(IN) :: BUFMSG(SBUFMSG)
+      CHARACTER(LEN=NCHARLINE), INTENT(IN) :: BUFMSG(SBUFMSG)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,J,JDX,IBACKSLASH
+      CHARACTER*1, PARAMETER :: BACKSLASH = CHAR(92)
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------
@@ -67,7 +69,7 @@ C-----------------------------------------------
           MESSAGES(ITYPE,ID)%MESSAGE(I)=' '
           J=1
           DO WHILE(J<=ncharline)
-            IF (BUFMSG(I)(J:J)=='\') THEN
+            IF (BUFMSG(I)(J:J)==BACKSLASH) THEN
 C             => skip \ print next
               IF (J<ncharline) THEN
                 J=J+1

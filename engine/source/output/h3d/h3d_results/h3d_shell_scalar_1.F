@@ -20,25 +20,28 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  H3D_SHELL_SCALAR_1            source/output/h3d/h3d_results/h3d_shell_scalar_1.F
-Chd|-- called by -----------
-Chd|        H3D_SHELL_SCALAR              source/output/h3d/h3d_results/h3d_shell_scalar.F
-Chd|-- calls ---------------
-Chd|        H3D_WRITE_SCALAR              source/output/h3d/h3d_results/h3d_write_scalar.F
-Chd|        INITBUF                       share/resol/initbuf.F         
-Chd|        OUTPUT_DIV_U                  source/output/anim/generate/output_div_u.F
-Chd|        OUTPUT_SCHLIEREN              source/output/anim/generate/output_schlieren.F
-Chd|        ALEFVM_MOD                    ../common_source/modules/ale/alefvm_mod.F
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
-Chd|        INITBUF_MOD                   share/resol/initbuf.F         
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
-Chd|        SCHLIEREN_MOD                 share/modules/schlieren_mod.F 
-Chd|        STACK_MOD                     share/modules/stack_mod.F     
-Chd|====================================================================
-      SUBROUTINE H3D_SHELL_SCALAR_1(
+      !||====================================================================
+      !||    h3d_shell_scalar_1             ../engine/source/output/h3d/h3d_results/h3d_shell_scalar_1.F
+      !||--- called by ------------------------------------------------------
+      !||    funct_python_update_elements   ../engine/source/tools/curve/funct_python_update_elements.F90
+      !||    h3d_shell_scalar               ../engine/source/output/h3d/h3d_results/h3d_shell_scalar.F
+      !||--- calls      -----------------------------------------------------
+      !||    h3d_write_scalar               ../engine/source/output/h3d/h3d_results/h3d_write_scalar.F
+      !||    initbuf                        ../engine/share/resol/initbuf.F
+      !||    output_div_u                   ../engine/source/output/anim/generate/output_div_u.F
+      !||    output_schlieren               ../engine/source/output/anim/generate/output_schlieren.F
+      !||--- uses       -----------------------------------------------------
+      !||    ale_connectivity_mod           ../common_source/modules/ale/ale_connectivity_mod.F
+      !||    alefvm_mod                     ../common_source/modules/ale/alefvm_mod.F
+      !||    elbufdef_mod                   ../common_source/modules/mat_elem/elbufdef_mod.F90
+      !||    initbuf_mod                    ../engine/share/resol/initbuf.F
+      !||    matparam_def_mod               ../common_source/modules/mat_elem/matparam_def_mod.F90
+      !||    multi_fvm_mod                  ../common_source/modules/ale/multi_fvm_mod.F
+      !||    names_and_titles_mod           ../common_source/modules/names_and_titles_mod.F
+      !||    schlieren_mod                  ../engine/share/modules/schlieren_mod.F
+      !||    stack_mod                      ../engine/share/modules/stack_mod.F
+      !||====================================================================
+      SUBROUTINE H3D_SHELL_SCALAR_1( CALLED_FROM_PYTHON,
      .                  ELBUF_TAB   ,SHELL_SCALAR,IPARG       ,GEO        ,
      .                  IXC       ,IXTG      ,PM          ,BUFMAT     ,
      .                  EHOUR     ,
@@ -79,6 +82,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+        logical, intent(in) :: CALLED_FROM_PYTHON
         my_real,INTENT(IN),TARGET :: BUFMAT(*)
         my_real
      .     SHELL_SCALAR(*),X(3,NUMNOD),V(3,NUMNOD),W(3,NUMNOD),D(3,NUMNOD),THKE(*),EHOUR(*),GEO(NPROPG,NUMGEO),
@@ -184,17 +188,19 @@ c
             IF (ITY == 3) OFFSET = 0
             IF (ITY == 7) OFFSET = NUMELC
 c
-            DO  I=1,NEL
-              IF (ITY == 3) THEN
-                ID_ELEM(OFFSET+NFT+I) = IXC(NIXC,NFT+I)
-                ITY_ELEM(OFFSET+NFT+I) = 3
-                IF( H3D_PART(IPARTC(NFT+I)) == 1) IOK_PART(I) = 1
-              ELSEIF (ITY == 7) THEN
-                ID_ELEM(OFFSET+NFT+I) = IXTG(NIXTG,NFT+I)
-                ITY_ELEM(OFFSET+NFT+I) = 7
-                IF( H3D_PART(IPARTTG(NFT+I)) == 1) IOK_PART(I) = 1
-              ENDIF
-            ENDDO
+            IF(.NOT. CALLED_FROM_PYTHON) THEN
+              DO  I=1,NEL
+                IF (ITY == 3) THEN
+                  ID_ELEM(OFFSET+NFT+I) = IXC(NIXC,NFT+I)
+                  ITY_ELEM(OFFSET+NFT+I) = 3
+                  IF( H3D_PART(IPARTC(NFT+I)) == 1) IOK_PART(I) = 1
+                ELSEIF (ITY == 7) THEN
+                  ID_ELEM(OFFSET+NFT+I) = IXTG(NIXTG,NFT+I)
+                  ITY_ELEM(OFFSET+NFT+I) = 7
+                  IF( H3D_PART(IPARTTG(NFT+I)) == 1) IOK_PART(I) = 1
+                ENDIF
+              ENDDO
+            ENDIF
 
             IF( IGTYP == 10 .OR. IGTYP == 11 .OR. IGTYP == 16 .OR. IGTYP == 17) THEN
               NPT = 1
@@ -246,7 +252,11 @@ c
 C---------------------
             DO I=1,NEL
               VALUE(I) = ZERO
-              SHELL_SCALAR(OFFSET+NFT+I) = ZERO   ! Default = zero in all cases !
+              IF(.NOT. CALLED_FROM_PYTHON) THEN 
+                SHELL_SCALAR(OFFSET+NFT+I) = ZERO   ! Default = zero in all cases !
+              ELSE
+                SHELL_SCALAR(1:MVSIZ) = ZERO
+              ENDIF
             ENDDO
 C-----------------------------------------------
 C Mass computation
@@ -473,7 +483,11 @@ C--------------------------------------------------
                 ENDDO
               ELSE
                 DO I=1,NEL
-                  PRES(I) = - (GBUF%SIG(JJ(1) + I)+ GBUF%SIG(JJ(2) + I) + GBUF%SIG(JJ(3) + I))*THIRD
+                  IF(GBUF%G_SIG > 0) THEN
+                    PRES(I) = - (GBUF%SIG(JJ(1) + I)+ GBUF%SIG(JJ(2) + I) + GBUF%SIG(JJ(3) + I))*THIRD
+                  ELSE
+                    PRES(I) = ZERO
+                  ENDIF
                 ENDDO
               ENDIF
               !GBUF%EINT is rho.e
@@ -485,10 +499,12 @@ C--------------------------------------------------
                   ENDDO
                 ELSE
                   IF(N2D == 0)THEN
-                    DO I=1,NEL
-                      VALUE(I) = GBUF%EINT(I)/GBUF%RHO(I) + PRES(I)*GBUF%VOL(I)
-                      IS_WRITTEN_VALUE(I) = 1
-                    ENDDO
+                    IF(GBUF%G_RHO > 0 .AND. GBUF%G_VOL > 0 )THEN
+                      DO I=1,NEL
+                        VALUE(I) = GBUF%EINT(I)/GBUF%RHO(I) + PRES(I)*GBUF%VOL(I)
+                        IS_WRITTEN_VALUE(I) = 1
+                      ENDDO
+                    ENDIF
                   ENDIF
                 ENDIF
               ELSEIF(KEYWORD == 'ENTHV')THEN
@@ -499,11 +515,12 @@ C--------------------------------------------------
                   ENDDO
                 ELSE
                   IF(N2D == 0)THEN
+                    if(GBUF%G_EINT > 0 .AND. GBUF%G_RHO > 0 .AND. GBUF%G_VOL > 0) THEN
                     DO I=1,NEL
-                      N = I + NFT
                       VALUE(I) = GBUF%EINT(I)/GBUF%VOL(I)/GBUF%RHO(I) + PRES(I)
                       IS_WRITTEN_VALUE(I) = 1
                     ENDDO
+                    endif
                   ENDIF
                 ENDIF
               ELSEIF(KEYWORD == 'ENTHM')THEN
@@ -515,11 +532,13 @@ C--------------------------------------------------
                   ENDDO
                 ELSE
                   IF(N2D == 0)THEN
-                    DO I=1,NEL
-                      MASS(I)=GBUF%RHO(I)*GBUF%VOL(I)
-                      VALUE(I) = (GBUF%EINT(I)/GBUF%RHO(I) + PRES(I)*GBUF%VOL(I))/MASS(I)
-                      IS_WRITTEN_VALUE(I) = 1
-                    ENDDO
+                    IF(GBUF%G_RHO > 0 .AND. GBUF%G_VOL > 0 .AND. GBUF%G_EINT > 0) THEN
+                      DO I=1,NEL
+                        MASS(I)=GBUF%RHO(I)*GBUF%VOL(I)
+                        VALUE(I) = (GBUF%EINT(I)/GBUF%RHO(I) + PRES(I)*GBUF%VOL(I))/MASS(I)
+                        IS_WRITTEN_VALUE(I) = 1
+                      ENDDO
+                    ENDIF
                   ENDIF
                 ENDIF
               ENDIF
@@ -2821,23 +2840,26 @@ c
                       DO IR=1,NPTR
                         DO IS=1,NPTS
                           LBUF => ELBUF_TAB(NG)%BUFLY(IL)%LBUF(IR,IS,IT)
-                          IF (BUFLY%L_DAM > 0) THEN
-                            DO I=1,NEL
-                              J = IADR + I
+                          DO I=1,NEL
+                            J = IADR + I
+                            IF (MLW == 25) THEN 
+                              DAM1(I)=LBUF%DMG(JJ(1)+I)
+                              DAM2(I)=LBUF%DMG(JJ(2)+I)
+                            ELSEIF (MLW == 15) THEN
                               DAM1(I)=LBUF%DAM(JJ(1)+I)
                               DAM2(I)=LBUF%DAM(JJ(2)+I)
-                              WPLA(I) = WPLA(I) + ABS(LBUF%PLA(I))/NPG
-                              DMAX(I) = PM(64,IMAT)
-                              WPMAX(I)= PM(41,IMAT)
-                              IF (DAM1(I) >= DMAX(I).OR.DAM2(I) >= DMAX(I)
-     .                            .OR.WPLA(I) < ZERO.OR.WPLA(I) >= WPMAX(I))
-     .                            FAILG(IL,I) = FAILG(IL,I) + 1
-                              IF (FAILG(IL,I) == NPG ) THEN
-                                FAIL(I) = FAIL(I) + ONE
-                                FAILG(IL,I) = NPG + 1
-                              ENDIF
-                            ENDDO
-                          ENDIF
+                            ENDIF
+                            WPLA(I) = WPLA(I) + ABS(LBUF%PLA(I))/NPG
+                            DMAX(I) = PM(64,IMAT)
+                            WPMAX(I)= PM(41,IMAT)
+                            IF (DAM1(I) >= DMAX(I).OR.DAM2(I) >= DMAX(I)
+     .                          .OR.WPLA(I) < ZERO.OR.WPLA(I) >= WPMAX(I))
+     .                          FAILG(IL,I) = FAILG(IL,I) + 1
+                            IF (FAILG(IL,I) == NPG ) THEN
+                              FAIL(I) = FAIL(I) + ONE
+                              FAILG(IL,I) = NPG + 1
+                            ENDIF
+                          ENDDO
                         ENDDO
                       ENDDO
                     ENDDO
@@ -2854,19 +2876,22 @@ c
                     IADR = (IL-1)*NEL
                     DO IT=1,NPTT
                       LBUF => ELBUF_TAB(NG)%BUFLY(IL)%LBUF(1,1,IT)
-                      IF (BUFLY%L_DAM > 0) THEN
-                        DO I=1,NEL
-                          J = IADR + I
+                      DO I=1,NEL
+                        J = IADR + I
+                        IF (MLW == 25) THEN 
+                          DAM1(I)=LBUF%DMG(JJ(1)+I)
+                          DAM2(I)=LBUF%DMG(JJ(2)+I)
+                        ELSEIF (MLW == 15) THEN
                           DAM1(I)=LBUF%DAM(JJ(1)+I)
                           DAM2(I)=LBUF%DAM(JJ(2)+I)
-                          WPLA(I) = ABS(LBUF%PLA(I))
-                          DMAX(I) = PM(64,IMAT)
-                          WPMAX(I)= PM(41,IMAT)
-                          IF (DAM1(I) >= DMAX(I).OR.DAM2(I) >= DMAX(I).OR.
-     .                        WPLA(I) < ZERO.OR.WPLA(I) >= WPMAX(I))
-     .                    FAIL(I) = FAIL(I) + ONE
-                        ENDDO
-                      ENDIF
+                        ENDIF
+                        WPLA(I) = ABS(LBUF%PLA(I))
+                        DMAX(I) = PM(64,IMAT)
+                        WPMAX(I)= PM(41,IMAT)
+                        IF (DAM1(I) >= DMAX(I).OR.DAM2(I) >= DMAX(I).OR.
+     .                       WPLA(I) < ZERO.OR.WPLA(I) >= WPMAX(I))
+     .                   FAIL(I) = FAIL(I) + ONE
+                      ENDDO
                     ENDDO
                   ENDDO  !  DO IL=1,NLAY
                   DO  I=1,NEL
@@ -2988,8 +3013,8 @@ C
                             EPSF1(I)= ONE/PM(98,MATLY(J))
                             EPSF2(I)= ONE/PM(99,MATLY(J))
 C
-                            VG(1) = MAX(VG(1),LBUF%DAM(JJ(1)+I)*DMAX(I))
-                            VG(2) = MAX(VG(2),LBUF%DAM(JJ(2)+I)*DMAX(I))
+                            VG(1) = MAX(VG(1),LBUF%DMG(JJ(1)+I)*DMAX(I))
+                            VG(2) = MAX(VG(2),LBUF%DMG(JJ(2)+I)*DMAX(I))
                             VG(3)=MAX(VG(3),ABS(LBUF%PLA(I))*WPMAX(I))
                             IF(LBUF%CRAK(JJ(1)+I) > ZERO) VG(4)=  MAX(VG(4),
      .                                  (LBUF%CRAK(JJ(1)+I)+EPST1(I))*EPSF1(I))
@@ -3074,8 +3099,8 @@ c
                             EPSF1(I)= ONE/PM(98,MATLY(IADR + I))
                             EPSF2(I)= ONE/PM(99,MATLY(IADR + I))
 C
-                            VG(1) = MAX(VG(1),LBUF%DAM(JJ(1)+I)*DMAX(I))
-                            VG(2) = MAX(VG(2),LBUF%DAM(JJ(2)+I)*DMAX(I))
+                            VG(1) = MAX(VG(1),LBUF%DMG(JJ(1)+I)*DMAX(I))
+                            VG(2) = MAX(VG(2),LBUF%DMG(JJ(2)+I)*DMAX(I))
                             VG(3)= MAX(VG(3),ABS(LBUF%PLA(I))*WPMAX(I))
                             IF(LBUF%CRAK(JJ(1)+I) > ZERO) VG(4)=  MAX(VG(4),
      .                      (LBUF%CRAK(JJ(1)+I)+EPST1(I))*EPSF1(I))
@@ -3152,8 +3177,8 @@ c
                               EPSF1(I)= ONE/PM(98,MATLY(IADR + I))
                               EPSF2(I)= ONE/PM(99,MATLY(IADR + I))
 C
-                              VG(1) = MAX(VG(1),LBUF%DAM(JJ(1)+I)*DMAX(I))
-                              VG(2) = MAX(VG(2),LBUF%DAM(JJ(2)+I)*DMAX(I))
+                              VG(1) = MAX(VG(1),LBUF%DMG(JJ(1)+I)*DMAX(I))
+                              VG(2) = MAX(VG(2),LBUF%DMG(JJ(2)+I)*DMAX(I))
                               VG(3)= MAX(VG(3),ABS(LBUF%PLA(I))*WPMAX(I))
                               IF(LBUF%CRAK(JJ(1)+I) > ZERO) VG(4)=  MAX(VG(4),
      .                             (LBUF%CRAK(JJ(1)+I)+EPST1(I))*EPSF1(I))
@@ -3212,8 +3237,8 @@ c ILAYER=ILAY NPT=IPT
                           EPSF1(I)= ONE/PM(98,MATLY(J))
                           EPSF2(I)= ONE/PM(99,MATLY(J))
 C
-                          VG(1) = MAX(VG(1),LBUF%DAM(JJ(1)+I)*DMAX(I))
-                          VG(2) = MAX(VG(2),LBUF%DAM(JJ(2)+I)*DMAX(I))
+                          VG(1) = MAX(VG(1),LBUF%DMG(JJ(1)+I)*DMAX(I))
+                          VG(2) = MAX(VG(2),LBUF%DMG(JJ(2)+I)*DMAX(I))
                           VG(3)= MAX(VG(3),ABS(LBUF%PLA(I))*WPMAX(I))
                           IF(LBUF%CRAK(JJ(1)+I) > ZERO) VG(4)=  MAX(VG(4),
      .                              (LBUF%CRAK(JJ(1)+I)+EPST1(I))*EPSF1(I))
@@ -3268,8 +3293,8 @@ c ILAYER=IL NPT=NULL
                           EPSF1(I)= ONE/PM(98,MATLY(J))
                           EPSF2(I)= ONE/PM(99,MATLY(J))
 C
-                          VG(1) = MAX(VG(1),LBUF%DAM(JJ(1)+I)*DMAX(I))
-                          VG(2) = MAX(VG(2),LBUF%DAM(JJ(2)+I)*DMAX(I))
+                          VG(1) = MAX(VG(1),LBUF%DMG(JJ(1)+I)*DMAX(I))
+                          VG(2) = MAX(VG(2),LBUF%DMG(JJ(2)+I)*DMAX(I))
                           VG(3)= MAX(VG(3),ABS(LBUF%PLA(I))*WPMAX(I))
                           IF(LBUF%CRAK(JJ(1)+I) > ZERO) VG(4)=  MAX(VG(4),
      .                              (LBUF%CRAK(JJ(1)+I)+EPST1(I))*EPSF1(I))
@@ -3333,8 +3358,8 @@ C
                             EPSF1(I)= ONE/PM(98,MATLY(J))
                             EPSF2(I)= ONE/PM(99,MATLY(J))
 C
-                            VG(1) = MAX(VG(1),LBUF%DAM(JJ(1)+I)*DMAX(I))
-                            VG(2) = MAX(VG(2),LBUF%DAM(JJ(2)+I)*DMAX(I))
+                            VG(1) = MAX(VG(1),LBUF%DMG(JJ(1)+I)*DMAX(I))
+                            VG(2) = MAX(VG(2),LBUF%DMG(JJ(2)+I)*DMAX(I))
                             VG(3)= MAX(VG(3),ABS(LBUF%PLA(I))*WPMAX(I))
                             IF(LBUF%CRAK(JJ(1)+I) > ZERO) VG(4)=  MAX(VG(4),
      .                                (LBUF%CRAK(JJ(1)+I)+EPST1(I))*EPSF1(I))
@@ -3395,8 +3420,8 @@ c NPT=IPT
                           EPSF1(I)= ONE/PM(98,MATLY(J))
                           EPSF2(I)= ONE/PM(99,MATLY(J))
 C
-                          VG(1) = MAX(VG(1),LBUF%DAM(JJ(1)+I)*DMAX(I))
-                          VG(2) = MAX(VG(2),LBUF%DAM(JJ(2)+I)*DMAX(I))
+                          VG(1) = MAX(VG(1),LBUF%DMG(JJ(1)+I)*DMAX(I))
+                          VG(2) = MAX(VG(2),LBUF%DMG(JJ(2)+I)*DMAX(I))
                           VG(3)= MAX(VG(3),ABS(LBUF%PLA(I))*WPMAX(I))
                           IF(LBUF%CRAK(JJ(1)+I) > ZERO) VG(4)=  MAX(VG(4),
      .                              (LBUF%CRAK(JJ(1)+I)+EPST1(I))*EPSF1(I))
@@ -3526,8 +3551,8 @@ C
                           EPSF1(I)= ONE/PM(98,MATLY(J))
                           EPSF2(I)= ONE/PM(99,MATLY(J))
 C
-                          VG(1) = MAX(VG(1),LBUF%DAM(JJ(1)+I)*DMAX(I))
-                          VG(2) = MAX(VG(2),LBUF%DAM(JJ(2)+I)*DMAX(I))
+                          VG(1) = MAX(VG(1),LBUF%DMG(JJ(1)+I)*DMAX(I))
+                          VG(2) = MAX(VG(2),LBUF%DMG(JJ(2)+I)*DMAX(I))
                           VG(3)= MAX(VG(3),ABS(LBUF%PLA(I))*WPMAX(I))
                           IF(LBUF%CRAK(JJ(1)+I) > ZERO) VG(4)=  MAX(VG(4),
      .                              (LBUF%CRAK(JJ(1)+I)+EPST1(I))*EPSF1(I))
@@ -5936,7 +5961,11 @@ C--------------------------------------------------
 C--------------------------------------------------
             ENDIF  ! KEYWORD
 C--------------------------------------------------
-            CALL H3D_WRITE_SCALAR(IOK_PART,IS_WRITTEN_SHELL,SHELL_SCALAR,NEL,OFFSET,NFT,VALUE,IS_WRITTEN_VALUE)
+            IF(CALLED_FROM_PYTHON) THEN
+              SHELL_SCALAR(1:MVSIZ) = VALUE(1:MVSIZ)
+            ELSE
+              CALL H3D_WRITE_SCALAR(IOK_PART,IS_WRITTEN_SHELL,SHELL_SCALAR,NEL,OFFSET,NFT,VALUE,IS_WRITTEN_VALUE)
+            ENDIF
           ENDIF  ! ITY
 c
 C-----------------------------------------------

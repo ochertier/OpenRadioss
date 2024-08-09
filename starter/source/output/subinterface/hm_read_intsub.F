@@ -20,28 +20,28 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  HM_READ_INTSUB                source/output/subinterface/hm_read_intsub.F
-Chd|-- called by -----------
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        FRETITL                       source/starter/freform.F      
-Chd|        FRETITL2                      source/starter/freform.F      
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        HM_GET_INT_ARRAY_INDEX        source/devtools/hm_reader/hm_get_int_array_index.F
-Chd|        HM_OPTION_COUNT               source/devtools/hm_reader/hm_option_count.F
-Chd|        HM_OPTION_READ_KEY            source/devtools/hm_reader/hm_option_read_key.F
-Chd|        HM_OPTION_START               source/devtools/hm_reader/hm_option_start.F
-Chd|        HM_SZ_R2R                     source/coupling/rad2rad/routines_r2r.F
-Chd|        UDOUBLE                       source/system/sysfus.F        
-Chd|        NGR2USR                       source/system/nintrr.F        
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        R2R_MOD                       share/modules1/r2r_mod.F      
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_read_intsub           ../starter/source/output/subinterface/hm_read_intsub.F
+      !||--- called by ------------------------------------------------------
+      !||    lectur                   ../starter/source/starter/lectur.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                   ../starter/source/output/message/message.F
+      !||    fretitl                  ../starter/source/starter/freform.F
+      !||    fretitl2                 ../starter/source/starter/freform.F
+      !||    hm_get_int_array_index   ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+      !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    hm_option_count          ../starter/source/devtools/hm_reader/hm_option_count.F
+      !||    hm_option_read_key       ../starter/source/devtools/hm_reader/hm_option_read_key.F
+      !||    hm_option_start          ../starter/source/devtools/hm_reader/hm_option_start.F
+      !||    hm_sz_r2r                ../starter/source/coupling/rad2rad/routines_r2r.F
+      !||    ngr2usr                  ../starter/source/system/nintrr.F
+      !||    udouble                  ../starter/source/system/sysfus.F
+      !||--- uses       -----------------------------------------------------
+      !||    hm_option_read_mod       ../starter/share/modules1/hm_option_read_mod.F
+      !||    message_mod              ../starter/share/message_module/message_mod.F
+      !||    r2r_mod                  ../starter/share/modules1/r2r_mod.F
+      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE HM_READ_INTSUB(IGRNOD,IGRSURF,NOM_OPT,IGRSLIN,LSUBMODEL)
 C-----------------------------------------------
 C   M o d u l e s
@@ -51,6 +51,7 @@ C-----------------------------------------------
       USE HM_OPTION_READ_MOD
       USE SUBMODEL_MOD
       USE R2R_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARLINE, NCHARFIELD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -75,15 +76,14 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER WORK(70000)
-      INTEGER I,NI,NOINT,L,J,K,NISUB,ID,IDINT,IDGRN,IDSURF,IDSURF1,IDSURF2,
-     .        TRU,N,J10(10),IA,ITH,INDEX_NOM_OPT
-      INTEGER UID,SUB_ID,ID1,ID2,ID3,
-     .        INTSUB_TYP(NINTSUB),ISLIN1,ISLIN2,ISU1,ISU2,ISURF1,ISURF2,NFLAG,STAT
+      INTEGER I,NI,NOINT,L,J,K,NISUB,ID,IDINT,IDGRN,IDSURF,IDSURF1,IDSURF2,TRU,N,J10(10),IA,ITH,INDEX_NOM_OPT
+      INTEGER UID,SUB_ID,ID1,ID2,ID3,INTSUB_TYP(NINTSUB),ISLIN1,ISLIN2,ISU1,ISU2,ISURF1,ISURF2,NFLAG,STAT
       INTEGER, DIMENSION(:), ALLOCATABLE :: ID_INTER,FLAG_INTER
-      my_real
-     .   BID
-      CHARACTER TITR*nchartitle,MESS*40,KEY*ncharline,KEY2*ncharfield,COPT*ncharline
-!
+      my_real BID
+      CHARACTER(LEN=NCHARTITLE) :: TITR
+      CHARACTER MESS*40
+      CHARACTER(LEN=NCHARLINE) :: KEY,COPT
+      CHARACTER(LEN=NCHARFIELD) :: KEY2
       INTEGER, DIMENSION(:), POINTER :: INGR2USR
       INTEGER :: II, NVAR, IDSMAX, NTHINTER,IVAR,NB,ID_TYPE19,OKSURF
       LOGICAL IS_AVAILABLE
@@ -159,8 +159,7 @@ C
           ID_INTER(NI) = NOINT
           NOM_OPT(1,INDEX_NOM_OPT)=NOINT
 C
-          CALL FRETITL(TITR,NOM_OPT(LNOPT1-LTITR+1,
-     .                              NI),LTITR)
+          CALL FRETITL(TITR,NOM_OPT(LNOPT1-LTITR+1,NI),LTITR)
         ENDIF
       ENDDO
 C

@@ -20,16 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  BSIGINI                       source/elements/beam/bsigini.F
-Chd|-- called by -----------
-Chd|        PINIT3                        source/elements/beam/pinit3.F 
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        FRETITL2                      source/starter/freform.F      
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    bsigini                ../starter/source/elements/beam/bsigini.F
+      !||--- called by ------------------------------------------------------
+      !||    pinit3                 ../starter/source/elements/beam/pinit3.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    fretitl2               ../starter/source/starter/freform.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE BSIGINI(ELBUF_STR,
      .                   IGTYP    ,NEL    ,NSIGBEAM  ,SIGBEAM   ,PTBEAM,
      .                   IXP      ,IGEO   )
@@ -38,6 +38,7 @@ C   M o d u l e s
 C-----------------------------------------------
       USE ELBUFDEF_MOD
       USE MESSAGE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -53,8 +54,7 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IGTYP,NEL,NSIGBEAM
       INTEGER PTBEAM(*),IXP(NIXP,*),IGEO(NPROPGI,*)
-      my_real
-     .   SIGBEAM(NSIGBEAM,*)
+      my_real SIGBEAM(NSIGBEAM,*)
 !
       TYPE (ELBUF_STRUCT_), TARGET :: ELBUF_STR
 C-----------------------------------------------
@@ -62,8 +62,7 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,J,II,JJ,IPT,IR,IS,PT,KK(3),ILAY,NPTI,PID,IPID
 !
-      CHARACTER*nchartitle,
-     .   TITR1
+      CHARACTER(LEN=NCHARTITLE)::TITR1
 !
       TYPE(G_BUFEL_),POINTER :: GBUF
       TYPE(L_BUFEL_),POINTER :: LBUF

@@ -20,23 +20,24 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  NBADMESH                      source/model/remesh/nbadmesh.F
-Chd|-- called by -----------
-Chd|        CONTRL                        source/starter/contrl.F       
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        CONSTIT                       source/elements/nodes/constit.F
-Chd|        HM_GET_FLOATV                 source/devtools/hm_reader/hm_get_floatv.F
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        HM_GET_INT_ARRAY_INDEX        source/devtools/hm_reader/hm_get_int_array_index.F
-Chd|        HM_OPTION_READ_KEY            source/devtools/hm_reader/hm_option_read_key.F
-Chd|        HM_OPTION_START               source/devtools/hm_reader/hm_option_start.F
-Chd|        USR2SYS                       source/system/sysfus.F        
-Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    nbadmesh                 ../starter/source/model/remesh/nbadmesh.F
+      !||--- called by ------------------------------------------------------
+      !||    contrl                   ../starter/source/starter/contrl.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                   ../starter/source/output/message/message.F
+      !||    constit                  ../starter/source/elements/nodes/constit.F
+      !||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
+      !||    hm_get_int_array_index   ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+      !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    hm_option_read_key       ../starter/source/devtools/hm_reader/hm_option_read_key.F
+      !||    hm_option_start          ../starter/source/devtools/hm_reader/hm_option_start.F
+      !||    usr2sys                  ../starter/source/system/sysfus.F
+      !||--- uses       -----------------------------------------------------
+      !||    hm_option_read_mod       ../starter/share/modules1/hm_option_read_mod.F
+      !||    message_mod              ../starter/share/message_module/message_mod.F
+      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE NBADMESH(LSUBMODEL,NUMNUSR,UNITAB)
 C----------------------------------------------------------
 C   M o d u l e s
@@ -45,6 +46,7 @@ C-----------------------------------------------
       USE SUBMODEL_MOD
       USE HM_OPTION_READ_MOD
       USE UNITAB_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARKEY
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -59,7 +61,6 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NUMNUSR
-C     REAL
       TYPE(SUBMODEL_DATA) LSUBMODEL(*)
       TYPE (UNIT_TYPE_),INTENT(IN) ::UNITAB 
 C-----------------------------------------------
@@ -71,8 +72,9 @@ C-----------------------------------------------
      .        N,IP,ID,I,J,NLEV,NMUL,STAT,INDEX_PART,NPART_ADM
       INTEGER USR2SYS,NUMNUSR1,IDS,NI,NJ,NK,NL,K,L,P,Q,QQ,
      .        NN,UID,IP0,ID_IP
-C     REAL
-      CHARACTER MESS*40,TITR*nchartitle,KEY*ncharkey
+      CHARACTER MESS*40
+      CHARACTER(LEN=NCHARTITLE) :: TITR
+      CHARACTER(LEN=NCHARKEY) :: KEY
       INTEGER , DIMENSION(:), ALLOCATABLE :: IPARTC, SHELL_ID
       INTEGER , DIMENSION(:), ALLOCATABLE :: IPARTTG, SH3N_ID
       REAL*8 , DIMENSION(:), ALLOCATABLE :: SH_ANGLE, SH_THK

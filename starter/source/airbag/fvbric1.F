@@ -20,16 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  FVBRIC1                       source/airbag/fvbric1.F       
-Chd|-- called by -----------
-Chd|        INIT_MONVOL                   source/airbag/init_monvol.F   
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        FVNORMAL                      source/airbag/fvmbag1.F       
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        MONVOL_STRUCT_MOD             share/modules1/monvol_struct_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    fvbric1                ../starter/source/airbag/fvbric1.F
+      !||--- called by ------------------------------------------------------
+      !||    init_monvol            ../starter/source/airbag/init_monvol.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    fvnormal               ../starter/source/airbag/fvmbag1.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    monvol_struct_mod      ../starter/share/modules1/monvol_struct_mod.F
+      !||====================================================================
       SUBROUTINE FVBRIC1(T_MONVOLN, IBUF , ELEM  , IXS    , IBRIC,
      .                   TBRIC, NEL   , NELA   , NBRIC, 
      .                   TFAC , TAGELS, MONVID , NELI,
@@ -37,6 +38,7 @@ Chd|====================================================================
      .                   ELTG , X     , TITR, NB_NODE)
       USE MESSAGE_MOD
       USE MONVOL_STRUCT_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -60,10 +62,8 @@ C-----------------------------------------------
       INTEGER, DIMENSION(2, NBRIC), INTENT(IN) :: TBRIC
       INTEGER, DIMENSION(12, NBRIC), INTENT(INOUT) :: TFAC
       INTEGER, DIMENSION(NEL + NELI), INTENT(IN) :: ELTG
-      my_real
-     .        X(3,*)
-      CHARACTER*nchartitle,
-     .        TITR
+      my_real X(3,*)
+      CHARACTER(len=nchartitle) :: TITR
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

@@ -20,22 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  HM_PREREAD_BEM                source/loads/bem/hm_read_bem.F
-Chd|-- called by -----------
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        ARRET                         source/system/arret.F         
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        HM_OPTION_COUNT               source/devtools/hm_reader/hm_option_count.F
-Chd|        HM_OPTION_READ_KEY            source/devtools/hm_reader/hm_option_read_key.F
-Chd|        HM_OPTION_START               source/devtools/hm_reader/hm_option_start.F
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_preread_bem         ../starter/source/loads/bem/hm_read_bem.F
+      !||--- called by ------------------------------------------------------
+      !||    lectur                 ../starter/source/starter/lectur.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    arret                  ../starter/source/system/arret.F
+      !||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    hm_option_count        ../starter/source/devtools/hm_reader/hm_option_count.F
+      !||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
+      !||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
+      !||--- uses       -----------------------------------------------------
+      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE HM_PREREAD_BEM(IGRSURF,IGRNOD, NNFT ,
      .     UNITAB, NOM_OPT, LSUBMODEL)
 C-----------------------------------------------
@@ -46,6 +46,7 @@ C-----------------------------------------------
       USE GROUPDEF_MOD
       USE SUBMODEL_MOD
       USE HM_OPTION_READ_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -76,7 +77,7 @@ C-----------------------------------------------
       INTEGER JFORM, FREESURF, NELMAX, HG
       my_real
      .        RBID
-      CHARACTER TITR*nchartitle
+      CHARACTER(LEN=NCHARTITLE)::TITR
       LOGICAL :: IS_AVAILABLE
       INTEGER :: HM_NDAA, HM_NFLOW
       
@@ -242,32 +243,31 @@ C
 C
       RETURN
       END
-Chd|====================================================================
-Chd|  HM_READ_BEM                   source/loads/bem/hm_read_bem.F
-Chd|-- called by -----------
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        ARRET                         source/system/arret.F         
-Chd|        HM_GET_FLOATV                 source/devtools/hm_reader/hm_get_floatv.F
-Chd|        HM_GET_FLOATV_DIM             source/devtools/hm_reader/hm_get_floatv_dim.F
-Chd|        HM_GET_FLOAT_ARRAY_INDEX      source/devtools/hm_reader/hm_get_float_array_index.F
-Chd|        HM_GET_FLOAT_ARRAY_INDEX_DIM  source/devtools/hm_reader/hm_get_float_array_index_dim.F
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        HM_GET_INT_ARRAY_INDEX        source/devtools/hm_reader/hm_get_int_array_index.F
-Chd|        HM_OPTION_COUNT               source/devtools/hm_reader/hm_option_count.F
-Chd|        HM_OPTION_READ_KEY            source/devtools/hm_reader/hm_option_read_key.F
-Chd|        HM_OPTION_START               source/devtools/hm_reader/hm_option_start.F
-Chd|        INIT_QD                       source/fluid/init_qd.F        
-Chd|        INIT_TG                       source/fluid/init_tg.F        
-Chd|        MASS_FLUID_QD                 source/fluid/mass-fluid_qd.F  
-Chd|        MASS_FLUID_TG                 source/fluid/mass-fluid_tg.F  
-Chd|        ID                            source/boundary_conditions/ebcs/hm_read_ebcs_inlet.F
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_read_bem                    ../starter/source/loads/bem/hm_read_bem.F
+      !||--- called by ------------------------------------------------------
+      !||    lectur                         ../starter/source/starter/lectur.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                         ../starter/source/output/message/message.F
+      !||    arret                          ../starter/source/system/arret.F
+      !||    hm_get_float_array_index       ../starter/source/devtools/hm_reader/hm_get_float_array_index.F
+      !||    hm_get_float_array_index_dim   ../starter/source/devtools/hm_reader/hm_get_float_array_index_dim.F
+      !||    hm_get_floatv                  ../starter/source/devtools/hm_reader/hm_get_floatv.F
+      !||    hm_get_floatv_dim              ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
+      !||    hm_get_int_array_index         ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+      !||    hm_get_intv                    ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    hm_option_count                ../starter/source/devtools/hm_reader/hm_option_count.F
+      !||    hm_option_read_key             ../starter/source/devtools/hm_reader/hm_option_read_key.F
+      !||    hm_option_start                ../starter/source/devtools/hm_reader/hm_option_start.F
+      !||    init_qd                        ../starter/source/fluid/init_qd.F
+      !||    init_tg                        ../starter/source/fluid/init_tg.F
+      !||    mass_fluid_qd                  ../starter/source/fluid/mass-fluid_qd.F
+      !||    mass_fluid_tg                  ../starter/source/fluid/mass-fluid_tg.F
+      !||--- uses       -----------------------------------------------------
+      !||    hm_option_read_mod             ../starter/share/modules1/hm_option_read_mod.F
+      !||    message_mod                    ../starter/share/message_module/message_mod.F
+      !||    submodel_mod                   ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE HM_READ_BEM(IGRSURF, IFLOW   , RFLOW  ,
      .                    NPC    , IGRNOD  , MEMFLOW,UNITAB,
      .                    X      , NOM_OPT , LGAUGE ,IGRV, LSUBMODEL)
@@ -279,6 +279,7 @@ C-----------------------------------------------
       USE GROUPDEF_MOD
       USE SUBMODEL_MOD
       USE HM_OPTION_READ_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARKEY
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -296,12 +297,10 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       TYPE (UNIT_TYPE_),INTENT(IN) ::UNITAB 
-      INTEGER IFLOW(*),
-     .        NPC(*)
+      INTEGER IFLOW(*),NPC(*)
       INTEGER NOM_OPT(LNOPT1,*), LGAUGE(3,*), IGRV(NIGRV,*)
       INTEGER(KIND=8) MEMFLOW(*)
-      my_real
-     .        RFLOW(*), X(3,*)
+      my_real RFLOW(*), X(3,*)
       TYPE(SUBMODEL_DATA), DIMENSION(NSUBMOD), INTENT(IN) :: LSUBMODEL
 C-----------------------------------------------
       TYPE (GROUP_)  , DIMENSION(NGRNOD)  :: IGRNOD
@@ -310,26 +309,26 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER IADI, IADR, I, ID, ITYP, II, NINOUT, ISU, J, IPIMP,
-     .     NN, IAD, ITAG(NUMNOD), IAD1, IAD2, J1, J2, J3, J4, ISH34,
-     .     NNO, ITABINV(NUMNOD), NEL, IVFREE, IFVEL, IFPRES,
-     .     K, IFUNC, L, IFPA, IADMATI, IADMATR, III, IGR, NNN,
-     .     NBLOC, IFORM, ILVOUT, ITAGIO(NUMNOD), NG1, NG2, NG3, NG4,
-     .     N1, N2, N3, N4, PROD, NPROW, NPCOL, ITEST, IVINI, IFVINI,
-     .     IINSIDE, NRMAX, NR, ISUIO,NFLOW0, NBLOCMAX, UID,
-     .     IFLAGUNIT,IUNIT
+     .        NN, IAD, ITAG(NUMNOD), IAD1, IAD2, J1, J2, J3, J4, ISH34,
+     .        NNO, ITABINV(NUMNOD), NEL, IVFREE, IFVEL, IFPRES,
+     .        K, IFUNC, L, IFPA, IADMATI, IADMATR, III, IGR, NNN,
+     .        NBLOC, IFORM, ILVOUT, ITAGIO(NUMNOD), NG1, NG2, NG3, NG4,
+     .        N1, N2, N3, N4, PROD, NPROW, NPCOL, ITEST, IVINI, IFVINI,
+     .        IINSIDE, NRMAX, NR, ISUIO,NFLOW0, NBLOCMAX, UID,
+     .        IFLAGUNIT,IUNIT
       INTEGER JFORM, KFORM, II1, II2, II3, II4, II5, II6
       INTEGER IR1, IR2, IR3,IR4, IR5, IR6, IR7, IR8, IR9, IR10, IR11
       INTEGER IPRES, IWAVE, INTEGR, FREESURF, AFTERFLOW, GRAV_ID, NELMAX, IBID, HG
       INTEGER, DIMENSION(:), ALLOCATABLE :: N_SHELL
-      my_real
-     .     SFPA, SFVEL, SFPRES, SCALT, DTSUB, RHO, TOLE, SCALT_PA,
-     .     SFVINI, DIRX, DIRY, DIRZ, NORM, RNSPMD, SCALT_VI
+      my_real SFPA, SFVEL, SFPRES, SCALT, DTSUB, RHO, TOLE, SCALT_PA,
+     .        SFVINI, DIRX, DIRY, DIRZ, NORM, RNSPMD, SCALT_VI
       my_real XC, YC, ZC, XS, YS, ZS, SSP, PMAX, THETA
       my_real APMAX, ATHETA, PMIN
       my_real XA, YA, ZA, XD, YD, ZD, TT
       my_real, DIMENSION(:,:), ALLOCATABLE :: CBEM
       my_real :: FAC_GEN
-      CHARACTER KEY*ncharkey,TITR*nchartitle
+      CHARACTER(LEN=NCHARKEY) :: KEY
+      CHARACTER(LEN=NCHARTITLE) :: TITR
       LOGICAL :: IS_AVAILABLE
       INTEGER :: HM_NDAA, HM_NFLOW
       

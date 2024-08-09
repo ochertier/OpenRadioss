@@ -20,31 +20,33 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  HM_READ_PROP26                source/properties/spring/hm_read_prop26.F
-Chd|-- called by -----------
-Chd|        HM_READ_PROPERTIES            source/properties/hm_read_properties.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        FRETITL2                      source/starter/freform.F      
-Chd|        HM_GET_FLOATV                 source/devtools/hm_reader/hm_get_floatv.F
-Chd|        HM_GET_FLOATV_DIM             source/devtools/hm_reader/hm_get_floatv_dim.F
-Chd|        HM_GET_FLOAT_ARRAY_INDEX      source/devtools/hm_reader/hm_get_float_array_index.F
-Chd|        HM_GET_FLOAT_ARRAY_INDEX_DIM  source/devtools/hm_reader/hm_get_float_array_index_dim.F
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        HM_GET_INT_ARRAY_INDEX        source/devtools/hm_reader/hm_get_int_array_index.F
-Chd|        HM_OPTION_IS_ENCRYPTED        source/devtools/hm_reader/hm_option_is_encrypted.F
-Chd|        ELBUFTAG_MOD                  share/modules1/elbuftag_mod.F 
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_read_prop26                 ../starter/source/properties/spring/hm_read_prop26.F
+      !||--- called by ------------------------------------------------------
+      !||    hm_read_properties             ../starter/source/properties/hm_read_properties.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                         ../starter/source/output/message/message.F
+      !||    fretitl2                       ../starter/source/starter/freform.F
+      !||    hm_get_float_array_index       ../starter/source/devtools/hm_reader/hm_get_float_array_index.F
+      !||    hm_get_float_array_index_dim   ../starter/source/devtools/hm_reader/hm_get_float_array_index_dim.F
+      !||    hm_get_floatv                  ../starter/source/devtools/hm_reader/hm_get_floatv.F
+      !||    hm_get_floatv_dim              ../starter/source/devtools/hm_reader/hm_get_floatv_dim.F
+      !||    hm_get_int_array_index         ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+      !||    hm_get_intv                    ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    hm_option_is_encrypted         ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+      !||--- uses       -----------------------------------------------------
+      !||    elbuftag_mod                   ../starter/share/modules1/elbuftag_mod.F
+      !||    message_mod                    ../starter/share/message_module/message_mod.F
+      !||    submodel_mod                   ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE HM_READ_PROP26(GEO     , IGEO  , UNITAB   , IG   , IGTYP,
      .                          PROP_TAG, IDTITL, LSUBMODEL)
 C-----------------------------------------------
       USE UNITAB_MOD
       USE ELBUFTAG_MOD    
       USE MESSAGE_MOD
-      USE SUBMODEL_MOD     
+      USE SUBMODEL_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -64,7 +66,7 @@ C-----------------------------------------------
 C     REAL
       my_real
      .   GEO(NPROPG)
-      CHARACTER IDTITL*nchartitle
+      CHARACTER(LEN=NCHARTITLE)::IDTITL
       TYPE(PROP_TAG_) , DIMENSION(0:MAXPROP) :: PROP_TAG
       TYPE(SUBMODEL_DATA),INTENT(IN)::LSUBMODEL(*)
 C-----------------------------------------------
@@ -75,8 +77,7 @@ C     REAL
       my_real
      .   MASS,KMAX,DMAX,XFAC,YFAC,RATE,ALPHA,DMIN,
      .   PUN,YFAC_DIM,XFAC_DIM
-      CHARACTER*nchartitle,
-     .   TITR
+      CHARACTER(LEN=NCHARTITLE) :: TITR
       LOGICAL IS_AVAILABLE, IS_ENCRYPTED
 C=======================================================================
       PUN = EM01

@@ -20,20 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  NLOCAL_INIT_STA               source/materials/fail/nlocal_init_sta.F
-Chd|-- called by -----------
-Chd|        NLOC_DMG_INIT                 source/materials/fail/nloc_dmg_init.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        C3FINT_REG_INI                source/elements/sh3n/coque3n/c3fint_reg_ini.F
-Chd|        CBAFINT_REG_INI               source/elements/shell/coqueba/cbafint_reg_ini.F
-Chd|        CDKFINT_REG_INI               source/elements/sh3n/coquedk/cdkfint_reg_ini.F
-Chd|        CFINT_REG_INI                 source/elements/shell/coque/cfint_reg_ini.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        NLOCAL_REG_MOD                ../common_source/modules/nlocal_reg_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    nlocal_init_sta   ../starter/source/materials/fail/nlocal_init_sta.F
+      !||--- called by ------------------------------------------------------
+      !||    nloc_dmg_init     ../starter/source/materials/fail/nloc_dmg_init.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg            ../starter/source/output/message/message.F
+      !||    c3fint_reg_ini    ../starter/source/elements/sh3n/coque3n/c3fint_reg_ini.F
+      !||    cbafint_reg_ini   ../starter/source/elements/shell/coqueba/cbafint_reg_ini.F
+      !||    cdkfint_reg_ini   ../starter/source/elements/sh3n/coquedk/cdkfint_reg_ini.F
+      !||    cfint_reg_ini     ../starter/source/elements/shell/coque/cfint_reg_ini.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod       ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE NLOCAL_INIT_STA(ELBUF_TAB,NLOC_DMG ,IPARG    ,IXC      ,
      .                           IXS      ,IXTG     ,AREA     ,X        ,
      .                           XREFS    ,XREFC    ,XREFTG   ,IPM      ,
@@ -72,7 +71,7 @@ C-----------------------------------------------
       LOGICAL :: CONVERGED,FAILURE
       INTEGER :: L_NLOC,NG,ILOC,NEL,NFT,ITY,FORMU
       my_real
-     .   DT_NL,TIME,NORM_1,NORM
+     .   DT_NL,TIME,NORM_1,NORM,D
       my_real,
      .  PARAMETER :: TOL1 = 5.0D-4
       my_real,
@@ -159,7 +158,8 @@ C-----------------------------------------------
           UNL = UNL + DNL
           ! Convergence criterion
           CONVERGED = ((NORM<TOL1).AND.(ABS(NORM-NORM_1)<TOL2).AND.(TIME/=ZERO))
-          IF (ISNAN(SQRT(DOT_PRODUCT(DNL,DNL)))) THEN 
+          D = (SQRT(DOT_PRODUCT(DNL,DNL)))
+          IF (D .NE. D) THEN 
             CALL ANCMSG(MSGID=1765,MSGTYPE=MSGERROR,
      .                  ANMODE=ANINFO_BLIND_1) 
             EXIT

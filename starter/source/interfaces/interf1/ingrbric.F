@@ -20,17 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  INGRBRIC                      source/interfaces/interf1/ingrbric.F
-Chd|-- called by -----------
-Chd|        LECINS                        source/interfaces/interf1/lecins.F
-Chd|        LECINT                        source/interfaces/interf1/lecint.F
-Chd|-- calls ---------------
-Chd|====================================================================
+      !||====================================================================
+      !||    ingrbric     ../starter/source/interfaces/interf1/ingrbric.F
+      !||--- called by ------------------------------------------------------
+      !||    lecins       ../starter/source/interfaces/interf1/lecins.F
+      !||    lecint       ../starter/source/interfaces/interf1/lecint.F
+      !||--- uses       -----------------------------------------------------
+      !||    format_mod   ../starter/share/modules1/format_mod.F90
+      !||====================================================================
       SUBROUTINE INGRBRIC(MSN,BRICS, MSV, IXS, NBRIC, PM,S_MSV ,IGEO)
 C-----------------------------------------------------------------------
 C This subroutine lists all brick in the /GRBRICK
 C (for example it is used with /inter/type22 which recquires a grbrick_id)
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
+        USE FORMAT_MOD , ONLY : FMW_10I
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------

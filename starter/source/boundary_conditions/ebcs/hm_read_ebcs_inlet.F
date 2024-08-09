@@ -20,24 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  HM_READ_EBCS_INLET            source/boundary_conditions/ebcs/hm_read_ebcs_inlet.F
-Chd|-- called by -----------
-Chd|        READ_EBCS                     source/boundary_conditions/ebcs/read_ebcs.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        HM_GET_FLOATV                 source/devtools/hm_reader/hm_get_floatv.F
-Chd|        HM_GET_FLOAT_ARRAY_INDEX      source/devtools/hm_reader/hm_get_float_array_index.F
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        HM_GET_INT_ARRAY_INDEX        source/devtools/hm_reader/hm_get_int_array_index.F
-Chd|        HM_OPTION_IS_ENCRYPTED        source/devtools/hm_reader/hm_option_is_encrypted.F
-Chd|        NGR2USR                       source/system/nintrr.F        
-Chd|        EBCS_MOD                      ../common_source/modules/boundary_conditions/ebcs_mod.F
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        MULTI_FVM_MOD                 ../common_source/modules/ale/multi_fvm_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_read_ebcs_inlet         ../starter/source/boundary_conditions/ebcs/hm_read_ebcs_inlet.F
+      !||--- called by ------------------------------------------------------
+      !||    read_ebcs                  ../starter/source/boundary_conditions/ebcs/read_ebcs.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                     ../starter/source/output/message/message.F
+      !||    hm_get_float_array_index   ../starter/source/devtools/hm_reader/hm_get_float_array_index.F
+      !||    hm_get_floatv              ../starter/source/devtools/hm_reader/hm_get_floatv.F
+      !||    hm_get_int_array_index     ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+      !||    hm_get_intv                ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    hm_option_is_encrypted     ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
+      !||    ngr2usr                    ../starter/source/system/nintrr.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod                ../starter/share/message_module/message_mod.F
+      !||    submodel_mod               ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE HM_READ_EBCS_INLET(IGRSURF,NPC, MULTI_FVM, UNITAB, ID, TITR, UID, LSUBMODEL, KEY2, SUB_INDEX, EBCS)
 C-----------------------------------------------
 C   M o d u l e s
@@ -48,6 +46,7 @@ C-----------------------------------------------
       USE GROUPDEF_MOD
       USE SUBMODEL_MOD
       USE EBCS_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARKEY
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -67,10 +66,10 @@ C-----------------------------------------------
       INTEGER,INTENT(IN) :: SUB_INDEX !< submodel index used to shift function identifiers if defined
       TYPE (MULTI_FVM_STRUCT), INTENT(INOUT) :: MULTI_FVM
       TYPE (SURF_)   ,TARGET,  DIMENSION(NSURF)   :: IGRSURF
-      CHARACTER, INTENT(IN) :: TITR*nchartitle
+      CHARACTER(LEN=NCHARTITLE), INTENT(IN) :: TITR
       TYPE(SUBMODEL_DATA) LSUBMODEL(NSUBMOD)
       LOGICAL IS_AVAILABLE,IS_ENCRYPTED
-      CHARACTER,INTENT(IN) :: KEY2*ncharkey
+      CHARACTER(LEN=NCHARKEY),INTENT(IN) :: KEY2
       TYPE(t_ebcs_inlet), INTENT(INOUT) :: EBCS
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s

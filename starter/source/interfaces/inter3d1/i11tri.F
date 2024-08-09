@@ -20,16 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  I11TRI                        source/interfaces/inter3d1/i11tri.F
-Chd|-- called by -----------
-Chd|        I11BUC1                       source/interfaces/inter3d1/i11buc1.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        I11STO                        source/interfaces/inter3d1/i11sto.F
-Chd|        I7DSTK                        source/interfaces/inter3d1/i7dstk.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    i11tri                 ../starter/source/interfaces/inter3d1/i11tri.F
+      !||--- called by ------------------------------------------------------
+      !||    i11buc1                ../starter/source/interfaces/inter3d1/i11buc1.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    i11sto                 ../starter/source/interfaces/inter3d1/i11sto.F
+      !||    i7dstk                 ../starter/source/interfaces/inter3d1/i7dstk.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE I11TRI(
      1      BPE   ,PE    ,BPN   ,PN    ,ADD,
      2      IRECTS,X     ,NB_SC ,NB_MC ,XYZM,
@@ -39,6 +40,7 @@ Chd|====================================================================
      6      MAXBOX,MINBOX,J_STOK,ADDCM,CHAINE,
      7      PROV_S,PROV_M,II_STOK,MULTIMP,ID,TITR)
       USE MESSAGE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C============================================================================
 C  cette routine est appelee par : I11BUC1(/inter3d1/i11buc1.F)
 C----------------------------------------------------------------------------
@@ -70,8 +72,7 @@ C-----------------------------------------------
      .   X(3,*),XYZM(6,*),TZINF,DBUC,
      .   MAXBOX,MINBOX
       INTEGER ID
-      CHARACTER*nchartitle,
-     .   TITR
+      CHARACTER(LEN=NCHARTITLE) :: TITR
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

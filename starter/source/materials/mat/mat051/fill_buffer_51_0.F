@@ -20,21 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  FILL_BUFFER_51_0              source/materials/mat/mat051/fill_buffer_51_0.F
-Chd|-- called by -----------
-Chd|        READ_MATERIAL_MODELS          source/materials/read_material_models.F
-Chd|-- calls ---------------
-Chd|        FILL_BUFFER_51                source/materials/mat/mat051/fill_buffer_51.F
-Chd|        MATPARAM_DEF_MOD              ../common_source/modules/mat_elem/matparam_def_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    fill_buffer_51_0       ../starter/source/materials/mat/mat051/fill_buffer_51_0.F
+      !||--- called by ------------------------------------------------------
+      !||    read_material_models   ../starter/source/materials/read_material_models.F
+      !||--- calls      -----------------------------------------------------
+      !||    fill_buffer_51         ../starter/source/materials/mat/mat051/fill_buffer_51.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE FILL_BUFFER_51_0(MATPARAM_TAB, IPM, PM, BUFMAT)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
-      USE MATPARAM_DEF_MOD      
+      USE MATPARAM_DEF_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C-----------------------------------------------
@@ -62,7 +63,7 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER II,ILAW,IFORM,IADBUF,MAT_ID,NPAR
-      CHARACTER*nchartitle TITR     
+      CHARACTER(LEN=NCHARTITLE) :: TITR
       my_real, DIMENSION(:), POINTER :: UPARAM       
 C-----------------------------------------------
 C   S o u r c e   L i n e s

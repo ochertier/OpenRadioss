@@ -20,16 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  SIGEPS110C_NICE               source/materials/mat/mat110/sigeps110c_nice.F
-Chd|-- called by -----------
-Chd|        SIGEPS110C                    source/materials/mat/mat110/sigeps110c.F
-Chd|-- calls ---------------
-Chd|        TABLE2D_VINTERP_LOG           source/tools/curve/table2d_vinterp_log.F
-Chd|        TABLE_VINTERP                 source/tools/curve/table_tools.F
-Chd|        INTERFACE_TABLE_MOD           share/modules/table_mod.F     
-Chd|        TABLE_MOD                     share/modules/table_mod.F     
-Chd|====================================================================
+      !||====================================================================
+      !||    sigeps110c_nice       ../engine/source/materials/mat/mat110/sigeps110c_nice.F
+      !||--- called by ------------------------------------------------------
+      !||    sigeps110c            ../engine/source/materials/mat/mat110/sigeps110c.F
+      !||--- calls      -----------------------------------------------------
+      !||    table2d_vinterp_log   ../engine/source/tools/curve/table2d_vinterp_log.F
+      !||    table_vinterp         ../engine/source/tools/curve/table_tools.F
+      !||--- uses       -----------------------------------------------------
+      !||    interface_table_mod   ../engine/share/modules/table_mod.F
+      !||    table_mod             ../engine/share/modules/table_mod.F
+      !||====================================================================
       SUBROUTINE SIGEPS110C_NICE(
      1     NEL     ,NGL     ,NUPARAM ,NUVAR   ,NPF     , 
      2     TIME    ,TIMESTEP,UPARAM  ,UVAR    ,JTHE    ,OFF     ,
@@ -40,7 +41,7 @@ Chd|====================================================================
      7     SIGNXX  ,SIGNYY  ,SIGNXY  ,SIGNYZ  ,SIGNZX  ,THKLY   ,
      8     THK     ,SIGY    ,ET      ,TEMPEL  ,TEMP    ,SEQ     ,
      9     TF      ,NUMTABL ,ITABLE  ,TABLE   ,NVARTMP ,VARTMP  ,
-     A     SIGA    ,INLOC   ,DPLANL  )
+     A     SIGA    ,INLOC   ,DPLANL  ,LOFF    )
       !=======================================================================
       !      Modules
       !=======================================================================
@@ -69,7 +70,7 @@ Chd|====================================================================
      .   DEPSXX,DEPSYY,DEPSXY,DEPSYZ,DEPSZX,
      .   EPSPXX,EPSPYY,EPSPXY,EPSPYZ,EPSPZX ,
      .   SIGOXX,SIGOYY,SIGOXY,SIGOYZ,SIGOZX,
-     .   GS,THKLY,DPLANL
+     .   GS,THKLY,DPLANL,LOFF
 c
       my_real ,DIMENSION(NEL), INTENT(OUT)   :: 
      .   SOUNDSP,SIGY,ET,EPSP,
@@ -959,15 +960,15 @@ c
           UVAR(I,1) = ASRATE * DPDT + (ONE - ASRATE) * UVAR(I,1)
           EPSP(I)   = UVAR(I,1)
         ENDIF
-        ! USR Outputs
+        ! USR Outputs & coefficient for hourglass
         IF (DPLA(I) > ZERO) THEN 
           UVAR(I,2) = PHI(I)  ! Yield function value
+          ET(I)     = HARDP(I) / (HARDP(I) + YOUNG) 
         ELSE
           UVAR(I,2) = ZERO
+          ET(I)     = ONE
         ENDIF
         SEQ(I)     = SIGVG(I) ! SIGEQ
-        ! Coefficient for hourglass
-        ET(I)      = HARDP(I) / (HARDP(I) + YOUNG) 
         ! Computation of the sound speed   
         SOUNDSP(I) = SQRT(A11/RHO(I))
         ! Storing the yield stress
@@ -975,7 +976,7 @@ c
         ! Computation of the thickness variation 
         DEELZZ(I) = -NU*(SIGNXX(I)-SIGOXX(I)+SIGNYY(I)-SIGOYY(I))/YOUNG
         ! Computation of the non-local thickness variation
-        IF (INLOC > 0) THEN 
+        IF ((INLOC > 0).AND.(LOFF(I) == ONE)) THEN 
           ! Computation of the principal stresses
           MOHR_RADIUS = SQRT(((SIGNXX(I)-SIGNYY(I))/TWO)**2 + SIGNXY(I)**2)
           MOHR_CENTER = (SIGNXX(I)+SIGNYY(I))/TWO

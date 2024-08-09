@@ -20,19 +20,21 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  I25PWR3                       source/interfaces/inter3d1/i25pwr3.F
-Chd|-- called by -----------
-Chd|        ININT3                        source/interfaces/inter3d1/inint3.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    i25pwr3                ../starter/source/interfaces/inter3d1/i25pwr3.F
+      !||--- called by ------------------------------------------------------
+      !||    inint3                 ../starter/source/interfaces/inter3d1/inint3.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE I25PWR3(ITAB  ,INACTI,CAND_E,CAND_N ,STFN     ,
      1                   X     ,I_STOK,NSV   ,IWPENE ,PENE_OLD,
      2                   NOINT ,NTY   ,MSR   ,IRTLM  ,IRECT    ,
      4                   NSN   ,ID    ,TITR   ,MSEGLO,ICONT_I)
       USE MESSAGE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -54,8 +56,7 @@ C     REAL
       my_real
      .   STFN(*),X(3,*),PENE_OLD(5,*)
       INTEGER ID
-      CHARACTER*nchartitle,
-     .   TITR
+      CHARACTER(LEN=NCHARTITLE) :: TITR
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -133,12 +134,11 @@ C            Reset (Same tracking will be done again in Engine)
 C
       RETURN
       END
-Chd|====================================================================
-Chd|  I25CAND                       source/interfaces/inter3d1/i25pwr3.F
-Chd|-- called by -----------
-Chd|        ININT3                        source/interfaces/inter3d1/inint3.F
-Chd|-- calls ---------------
-Chd|====================================================================
+      !||====================================================================
+      !||    i25cand   ../starter/source/interfaces/inter3d1/i25pwr3.F
+      !||--- called by ------------------------------------------------------
+      !||    inint3    ../starter/source/interfaces/inter3d1/inint3.F
+      !||====================================================================
       SUBROUTINE I25CAND(CAND_E,CAND_N,NSN  ,IRTLM ,II_STOK ,
      *                   NRTM  ,MSEGTYP)
 C

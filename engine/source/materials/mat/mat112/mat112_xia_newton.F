@@ -20,15 +20,16 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  MAT112_XIA_NEWTON             source/materials/mat/mat112/mat112_xia_newton.F
-Chd|-- called by -----------
-Chd|        SIGEPS112                     source/materials/mat/mat112/sigeps112.F
-Chd|-- calls ---------------
-Chd|        TABLE2D_VINTERP_LOG           source/tools/curve/table2d_vinterp_log.F
-Chd|        INTERFACE_TABLE_MOD           share/modules/table_mod.F     
-Chd|        TABLE_MOD                     share/modules/table_mod.F     
-Chd|====================================================================
+      !||====================================================================
+      !||    mat112_xia_newton     ../engine/source/materials/mat/mat112/mat112_xia_newton.F
+      !||--- called by ------------------------------------------------------
+      !||    sigeps112             ../engine/source/materials/mat/mat112/sigeps112.F
+      !||--- calls      -----------------------------------------------------
+      !||    table2d_vinterp_log   ../engine/source/tools/curve/table2d_vinterp_log.F
+      !||--- uses       -----------------------------------------------------
+      !||    interface_table_mod   ../engine/share/modules/table_mod.F
+      !||    table_mod             ../engine/share/modules/table_mod.F
+      !||====================================================================
       SUBROUTINE MAT112_XIA_NEWTON(
      1     NEL     ,NGL     ,NUPARAM ,NUVAR   ,TIME    ,TIMESTEP,
      2     UPARAM  ,UVAR    ,JTHE    ,OFF     ,RHO0    ,RHO     ,
@@ -840,10 +841,18 @@ c
         ENDIF
         ! Coefficient for hourglass and soundspeed
         IF (EEZZ(I) >= ZERO) THEN 
-          ET(I)      = HARDP(I) / (HARDP(I) + MAX(YOUNG1,YOUNG2,YOUNG3))
+          IF (DPLA(I) > ZERO) THEN 
+            ET(I) = HARDP(I) / (HARDP(I) + MAX(YOUNG1,YOUNG2,YOUNG3))
+          ELSE
+            ET(I) = ONE
+          ENDIF
           SOUNDSP(I) = SQRT(MAX(A11,A12,A21,A22,YOUNG3,G12,G23,G31)/ RHO(I))
         ELSE
-          ET(I)      = HARDP(I) / (HARDP(I) + MAX(YOUNG1,YOUNG2,E3C*CC*EXP(-CC*EEZZ(I))))
+          IF (DPLA(I) > ZERO) THEN 
+            ET(I) = HARDP(I) / (HARDP(I) + MAX(YOUNG1,YOUNG2,E3C*CC*EXP(-CC*EEZZ(I))))
+          ELSE
+            ET(I) = ONE
+          ENDIF
           SOUNDSP(I) = SQRT(MAX(A11,A12,A21,A22,E3C*CC*EXP(-CC*EEZZ(I)),G12,G23,G31)/ RHO(I))        
         ENDIF
         ! Storing the yield stress

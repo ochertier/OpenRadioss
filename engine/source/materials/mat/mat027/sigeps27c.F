@@ -20,17 +20,17 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  SIGEPS27C                     source/materials/mat/mat027/sigeps27c.F
-Chd|-- called by -----------
-Chd|        MULAWC                        source/materials/mat_share/mulawc.F
-Chd|-- calls ---------------
-Chd|        M27CRAK                       source/materials/mat/mat027/m27crak.F
-Chd|        M27ELAS                       source/materials/mat/mat027/m27elas.F
-Chd|        M27PLAS                       source/materials/mat/mat027/m27plas.F
-Chd|        ROTO_SIG                      source/airbag/roto.F          
-Chd|        UROTO_SIG                     source/airbag/uroto.F         
-Chd|====================================================================
+      !||====================================================================
+      !||    sigeps27c   ../engine/source/materials/mat/mat027/sigeps27c.F
+      !||--- called by ------------------------------------------------------
+      !||    mulawc      ../engine/source/materials/mat_share/mulawc.F
+      !||--- calls      -----------------------------------------------------
+      !||    m27crak     ../engine/source/materials/mat/mat027/m27crak.F
+      !||    m27elas     ../engine/source/materials/mat/mat027/m27elas.F
+      !||    m27plas     ../engine/source/materials/mat/mat027/m27plas.F
+      !||    roto_sig    ../engine/source/airbag/roto.F
+      !||    uroto_sig   ../engine/source/airbag/uroto.F
+      !||====================================================================
       SUBROUTINE SIGEPS27C(
      1                   JFT    ,JLT    ,PM     ,THK    ,OFF   ,
      2                   GSTR   ,IMAT   ,DT1C   ,IPLA   ,SHF   ,
@@ -40,7 +40,7 @@ Chd|====================================================================
      6                   DEPSXX ,DEPSYY ,DEPSXY ,DEPSYZ ,DEPSZX,
      7                   SIGOXX ,SIGOYY ,SIGOXY ,SIGOYZ ,SIGOZX,
      8                   SIGNXX ,SIGNYY ,SIGNXY ,SIGNYZ ,SIGNZX,
-     9                   DIRDMG ,PLA    ,INLOC  ,DPLANL )
+     9                   DIRDMG ,PLA    ,INLOC  ,DPLANL ,LOFF  )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -69,6 +69,7 @@ C     REAL
      .   SIGOYZ(NEL),SIGOZX(NEL),SIGNXX(NEL),SIGNYY(NEL),SIGNXY(NEL),
      .   SIGNYZ(NEL),SIGNZX(NEL),DIRDMG(NEL,2),
      .   PLA(NEL),CRAK(NEL),DAM(NEL),ZZ(MVSIZ)
+      my_real, DIMENSION(NEL), INTENT(IN) :: LOFF
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -146,8 +147,10 @@ C-----------------------
 !---
       DO I=JFT,JLT
         IF (INLOC > 0) THEN
-          EZZ(I) = -NU*(SIGNXX(I)-SIGOXX(I)+SIGNYY(I)-SIGOYY(I))/YOUNG
-          EZZ(I) = EZZ(I) - MAX(DPLANL(I),ZERO)*HALF*(SIGNXX(I)+SIGNYY(I))/YLD(I)
+          IF (LOFF(I) == ONE) THEN 
+            EZZ(I) = -NU*(SIGNXX(I)-SIGOXX(I)+SIGNYY(I)-SIGOYY(I))/YOUNG
+            EZZ(I) = EZZ(I) - MAX(DPLANL(I),ZERO)*HALF*(SIGNXX(I)+SIGNYY(I))/YLD(I)
+          ENDIF
         ELSE
           EZZ(I) =-(DEPSXX(I)+DEPSYY(I))*NU-(ONE - TWO*NU)*EZZ(I)
           EZZ(I) = EZZ(I)/(ONE-NU)

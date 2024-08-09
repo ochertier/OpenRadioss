@@ -20,20 +20,25 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  QMORTH2                       source/elements/solid_2d/quad/qmorth2.F
-Chd|-- called by -----------
-Chd|        Q4INIT2                       source/elements/solid_2d/quad4/q4init2.F
-Chd|        QINIT2                        source/elements/solid_2d/quad/qinit2.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        FRETITL2                      source/starter/freform.F      
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    qmorth2                ../starter/source/elements/solid_2d/quad/qmorth2.F
+      !||--- called by ------------------------------------------------------
+      !||    q4init2                ../starter/source/elements/solid_2d/quad4/q4init2.F
+      !||    qinit2                 ../starter/source/elements/solid_2d/quad/qinit2.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    fretitl2               ../starter/source/starter/freform.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE QMORTH2(PID  ,GEO  ,IGEO ,GAMA, NEL,
      .                   RY   ,RZ   ,SY   ,SZ, 
      .                   E1Y  ,E1Z  ,E2Y  ,E2Z)
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
       USE MESSAGE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -49,7 +54,6 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER JHBE,NEL
       INTEGER PID(*),IGEO(NPROPGI,*)
-C     REAL
       my_real
      .   GEO(NPROPG,*),GAMA(NEL,6),
      .   RY(*) ,RZ(*) ,SY(*) ,SZ(*),
@@ -66,16 +70,14 @@ C     REAL
      .   G11,G22,G33,G12,G21,G23,G32,G13,G31
       my_real
      .   SK(6)
-      CHARACTER*nchartitle,
-     .   TITR
+      CHARACTER(LEN=NCHARTITLE)::TITR
 C-----------------------------------------------------------------------
 C     Repere orthotrope
 C=======================================================================
       DO I=LFT,LLT
         IG = PID(I)
         ID=IGEO(1,IG)
-        CALL FRETITL2(TITR,
-     .                IGEO(NPROPGI-LTITR+1,IG),LTITR)
+        CALL FRETITL2(TITR,IGEO(NPROPGI-LTITR+1,IG),LTITR)
         IPNUM = IGEO(2,IG)
         VX  = GEO(7,IG)
         VY  = GEO(8,IG)

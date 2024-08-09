@@ -20,12 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  MAT87C_HANSEL                 source/materials/mat/mat087/mat87c_hansel.F
-Chd|-- called by -----------
-Chd|        SIGEPS87C                     source/materials/mat/mat087/sigeps87c.F
-Chd|-- calls ---------------
-Chd|====================================================================
+      !||====================================================================
+      !||    mat87c_hansel   ../engine/source/materials/mat/mat087/mat87c_hansel.F
+      !||--- called by ------------------------------------------------------
+      !||    sigeps87c       ../engine/source/materials/mat/mat087/sigeps87c.F
+      !||====================================================================
       SUBROUTINE MAT87C_HANSEL(
      1   NEL,     NUPARAM, NUVAR,   TIME,
      2   TIMESTEP,UVAR,    RHO0,    THKLY,
@@ -38,7 +37,7 @@ Chd|====================================================================
      9   DPLA,    EPSP,    YLD,     ETSE,
      A   GS,      ISRATE,  FCUT,    UPARAM,
      B   TEMPEL,  SIGB,    INLOC,   DPLANL,
-     C   SEQ,     JTHE)
+     C   SEQ,     JTHE,    LOFF)
 C=======================================================================
 C   BARLAT YLD2000 material model
 C=======================================================================
@@ -103,6 +102,7 @@ C-----------------------------------------------
      .   DEPSXY(NEL),DEPSYZ(NEL),DEPSZX(NEL),
      .   SIGOXX(NEL),SIGOYY(NEL), 
      .   SIGOXY(NEL),SIGOYZ(NEL),SIGOZX(NEL)
+      my_real, DIMENSION(NEL), INTENT(IN) :: LOFF
 C-----------------------------------------------
 C   O U T P U T   A r g u m e n t s
 C-----------------------------------------------
@@ -720,7 +720,7 @@ c
         UVAR(I,2)  = YLD(I)
         SEQ(I)     = SIG(I)/NORM_SP
         DEELZZ(I ) = -NU*(SIGNXX(I)-SIGOXX(I)+SIGNYY(I)-SIGOYY(I))/E
-        IF (INLOC > 0) THEN
+        IF ((INLOC > 0).AND.(LOFF(I) == ONE)) THEN
           NORMSIG = SIGNXX(I)*SIGNXX(I) + SIGNYY(I)*SIGNYY(I) 
      .            + TWO*SIGNXY(I)*SIGNXY(I)
           IF (NORMSIG > ZERO) THEN

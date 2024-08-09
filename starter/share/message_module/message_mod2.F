@@ -20,19 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  MESSAGE_MOD2                  share/message_module/message_mod2.F
-Chd|-- called by -----------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|-- calls ---------------
-Chd|====================================================================
+      !||====================================================================
+      !||    message_mod2           ../starter/share/message_module/message_mod2.F
+      !||--- called by ------------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||--- uses       -----------------------------------------------------
+      !||====================================================================
       MODULE MESSAGE_MOD2
-#include "nchar_c.inc"
+      USE NAMES_AND_TITLES_MOD , ONLY : ncharline
       TYPE TMESSAGE
 C message size
         INTEGER SMESSAGE
-        CHARACTER*ncharline,DIMENSION(:), ALLOCATABLE :: MESSAGE
+        CHARACTER(len=ncharline),DIMENSION(:), ALLOCATABLE :: MESSAGE
 C dimension : size
       END TYPE TMESSAGE
 c
@@ -69,8 +69,8 @@ C
       PARAMETER (MSG_CUMU=0)
       PARAMETER (MSG_PRINT=1)
 
-      CHARACTER*ncharline, DIMENSION(:), ALLOCATABLE :: MESSAGESFILE
-      CHARACTER*ncharline ERR_CATEGORY
+      CHARACTER(len=ncharline), DIMENSION(:), ALLOCATABLE :: MESSAGESFILE
+      CHARACTER(len=ncharline) :: ERR_CATEGORY
       INTEGER SMESSAGESFILE
 
       INTEGER NCHAROUT

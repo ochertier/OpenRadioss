@@ -20,24 +20,24 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  HM_READ_CLUSTER               source/output/cluster/hm_read_cluster.F
-Chd|-- called by -----------
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        FRETITL                       source/starter/freform.F      
-Chd|        HM_GET_FLOATV                 source/devtools/hm_reader/hm_get_floatv.F
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        HM_OPTION_READ_KEY            source/devtools/hm_reader/hm_option_read_key.F
-Chd|        HM_OPTION_START               source/devtools/hm_reader/hm_option_start.F
-Chd|        ITRIMHPSORT                   source/output/cluster/itrimhpsort.F
-Chd|        CLUSTER_MOD                   share/modules1/cluster_mod.F  
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_read_cluster        ../starter/source/output/cluster/hm_read_cluster.F
+      !||--- called by ------------------------------------------------------
+      !||    lectur                 ../starter/source/starter/lectur.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    fretitl                ../starter/source/starter/freform.F
+      !||    hm_get_floatv          ../starter/source/devtools/hm_reader/hm_get_floatv.F
+      !||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
+      !||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
+      !||    itrimhpsort            ../starter/source/output/cluster/itrimhpsort.F
+      !||--- uses       -----------------------------------------------------
+      !||    cluster_mod            ../starter/share/modules1/cluster_mod.F
+      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE HM_READ_CLUSTER(CLUSTERS,UNITAB ,ISKN    ,IGRBRIC,IGRSPRING,
      .                           IXS     ,IXR    ,NOM_OPT ,LSUBMODEL)
 C-----------------------------------------------
@@ -48,7 +48,8 @@ C-----------------------------------------------
       USE CLUSTER_MOD
       USE GROUPDEF_MOD
       USE SUBMODEL_MOD
-      USE HM_OPTION_READ_MOD 
+      USE HM_OPTION_READ_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARFIELD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -65,8 +66,7 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       TYPE (UNIT_TYPE_),INTENT(IN) ::UNITAB 
-      INTEGER ISKN(LISKN,*),
-     .   IXS(NIXS,NUMELS),IXR(NIXR,NUMELR),NOM_OPT(LNOPT1,*)
+      INTEGER ISKN(LISKN,*),IXS(NIXS,NUMELS),IXR(NIXR,NUMELR),NOM_OPT(LNOPT1,*)
       TYPE (CLUSTER_) ,DIMENSION(NCLUSTER) :: CLUSTERS
       TYPE(SUBMODEL_DATA),INTENT(IN)::LSUBMODEL(NSUBMOD)
 C-----------------------------------------------
@@ -78,10 +78,9 @@ C-----------------------------------------------
       INTEGER I,J,K,II,JJ,KK,N,CLID,UID,ICLUS,IAD,IG,IGR,ISK,IFAIL,
      .   IEL,NEL,NNOD,IFLAGUNIT,VAL,NNOD0,ITY,NELMAX
       INTEGER NOD1(2000),NOD2(2000),SUB_INDEX,ISK_L
-      my_real
-     .   BID(1),AX(4),NX(4),FMAX(2),MMAX(2)
-      CHARACTER TITR*nchartitle
-      CHARACTER KEY *ncharfield
+      my_real BID(1),AX(4),NX(4),FMAX(2),MMAX(2)
+      CHARACTER(LEN=NCHARTITLE)::TITR
+      CHARACTER(LEN=NCHARFIELD) :: KEY
       PARAMETER (NELMAX = 500)
       LOGICAL :: IS_AVAILABLE,FOUND
 C=======================================================================

@@ -20,22 +20,25 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  FIXFLUX                       source/constraints/thermic/fixflux.F
-Chd|-- called by -----------
-Chd|        RESOL                         source/engine/resol.F         
-Chd|-- calls ---------------
-Chd|        ARRET                         source/system/arret.F         
-Chd|        S4VOLUME                      source/elements/solid/solide4/s4volume.F
-Chd|        S8EVOLUME                     source/elements/solid/solide8e/s8evolume.F
-Chd|        FINTER                        source/tools/curve/finter.F   
-Chd|        SENSOR_MOD                    share/modules/sensor_mod.F    
-Chd|====================================================================
+      !||====================================================================
+      !||    fixflux               ../engine/source/constraints/thermic/fixflux.F
+      !||--- called by ------------------------------------------------------
+      !||    resol                 ../engine/source/engine/resol.F
+      !||--- calls      -----------------------------------------------------
+      !||    arret                 ../engine/source/system/arret.F
+      !||    finter                ../engine/source/tools/curve/finter.F
+      !||    s4volume              ../engine/source/elements/solid/solide4/s4volume.F
+      !||    s8evolume             ../engine/source/elements/solid/solide8e/s8evolume.F
+      !||--- uses       -----------------------------------------------------
+      !||    python_funct_mod      ../common_source/modules/python_mod.F90
+      !||    sensor_mod            ../engine/share/modules/sensor_mod.F
+      !||====================================================================
       SUBROUTINE FIXFLUX (IBFFLUX ,FBFFLUX ,NPC   ,TF  ,X  ,IXS,
-     1                    NSENSOR ,SENSOR_TAB,FTHE  ,IAD ,FTHESKY)
+     1                    NSENSOR ,SENSOR_TAB,FTHE  ,IAD ,FTHESKY, PYTHON)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------  
+      USE PYTHON_FUNCT_MOD
       USE SENSOR_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -63,6 +66,7 @@ C     REAL
      .   FBFFLUX(LFACTHER,*), TF(*), X(3,*),
      .   FTHESKY(LSKY), FTHE(*)
       TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      TYPE(PYTHON_) :: PYTHON
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -77,6 +81,7 @@ C     REAL
       my_real TTA, TTB, DT1A, DT1N, VOLG, BID
       my_real FINTER 
       EXTERNAL FINTER
+      INTEGER :: ISMOOTH
 C=======================================================================
       IFUNC_OLD = 0
       TS_OLD    = ZERO
@@ -125,7 +130,14 @@ C
          FCY = FBFFLUX(1,NL)
          FCX = FBFFLUX(2,NL)
          IF(IFUNC_OLD /= IFUNC .OR. TS_OLD /= TS .OR. FCY_OLD /= FCY ) THEN
-          FLUX_DENS = FCY*FINTER(IFUNC, TS*FCX,NPC,TF,DYDX)
+           ISMOOTH = 0
+           IF (IFUNC > 0) ISMOOTH = NPC(2*NFUNCT+IFUNC+1)
+           IF(ISMOOTH < 0) THEN
+             CALL PYTHON_CALL_FUNCT1D(PYTHON, -ISMOOTH,TS*FCX, FLUX_DENS)
+             FLUX_DENS = FCY*FLUX_DENS
+           ELSE
+             FLUX_DENS = FCY*FINTER(IFUNC, TS*FCX,NPC,TF,DYDX)
+           ENDIF
           IFUNC_OLD = IFUNC
           TS_OLD    = TS
           FCY_OLD   = FCY
@@ -263,7 +275,13 @@ C----------------------------
              FCY   = FBFFLUX(1,NL)
              FCX   = FBFFLUX(2,NL)
              IF(IFUNC_OLD /= IFUNC .OR. TS_OLD /= TS) THEN
-               FLUX_DENS = FINTER(IFUNC,TS*FCX,NPC,TF,DYDX)
+               ISMOOTH = 0
+               IF (IFUNC > 0) ISMOOTH = NPC(2*NFUNCT+IFUNC+1)
+               IF(ISMOOTH < 0) THEN
+                 CALL PYTHON_CALL_FUNCT1D(PYTHON, -ISMOOTH,TS*FCX, FLUX_DENS)
+               ELSE
+                 FLUX_DENS = FINTER(IFUNC,TS*FCX,NPC,TF,DYDX)
+               ENDIF
                IFUNC_OLD = IFUNC
                TS_OLD = TS
              ENDIF

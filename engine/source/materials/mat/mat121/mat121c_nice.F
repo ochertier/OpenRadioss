@@ -20,13 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  MAT121C_NICE                  source/materials/mat/mat121/mat121c_nice.F
-Chd|-- called by -----------
-Chd|        SIGEPS121C                    source/materials/mat/mat121/sigeps121c.F
-Chd|-- calls ---------------
-Chd|        VINTER2                       source/tools/curve/vinter.F   
-Chd|====================================================================
+      !||====================================================================
+      !||    mat121c_nice   ../engine/source/materials/mat/mat121/mat121c_nice.F
+      !||--- called by ------------------------------------------------------
+      !||    sigeps121c     ../engine/source/materials/mat/mat121/sigeps121c.F
+      !||--- calls      -----------------------------------------------------
+      !||    vinter2        ../engine/source/tools/curve/vinter.F
+      !||====================================================================
       SUBROUTINE MAT121C_NICE(
      1         NEL     ,NGL     ,NUPARAM ,NUVAR   ,NFUNC   ,IFUNC   ,NPF     ,
      2         TF      ,TIMESTEP,TIME    ,UPARAM  ,UVAR    ,RHO     ,PLA     ,
@@ -35,7 +35,7 @@ Chd|====================================================================
      5         EPSPXX  ,EPSPYY  ,EPSPXY  ,EPSPYZ  ,EPSPZX  ,
      6         SIGOXX  ,SIGOYY  ,SIGOXY  ,SIGOYZ  ,SIGOZX  ,
      7         SIGNXX  ,SIGNYY  ,SIGNXY  ,SIGNYZ  ,SIGNZX  ,
-     8         SIGY    ,ET      ,DPLANL  ,SEQ     ,INLOC   )
+     8         SIGY    ,ET      ,DPLANL  ,SEQ     ,INLOC   ,LOFF    )
       !=======================================================================
       !      Implicit types
       !=======================================================================
@@ -53,7 +53,7 @@ Chd|====================================================================
       my_real,DIMENSION(NUPARAM), INTENT(IN) :: 
      .   UPARAM
       my_real,DIMENSION(NEL), INTENT(IN)     :: 
-     .   RHO,DPLANL,GS,THKLY,
+     .   RHO,DPLANL,GS,THKLY,LOFF,
      .   DEPSXX,DEPSYY,DEPSXY,DEPSYZ,DEPSZX,
      .   EPSPXX,EPSPYY,EPSPXY,EPSPYZ,EPSPZX,
      .   SIGOXX,SIGOYY,SIGOXY,SIGOYZ,SIGOZX
@@ -391,11 +391,13 @@ c
 c
       ! Storing new values
       DO I=1,NEL  
-        ! Storage of yield function value
+        ! Storage of yield function value & coefficient for hourglass
         IF (DPLA(I) > ZERO) THEN 
           UVAR(I,1) = PHI(I)
+          ET(I) = HARDP(I) / (HARDP(I) + YOUNG(I)) 
         ELSE
           UVAR(I,1) = ZERO
+          ET(I) = ONE
         ENDIF
         ! Storage of derivatives in case of viscoplastic formulation
         IF (Ivisc == 1) THEN 
@@ -404,16 +406,16 @@ c
         ENDIF
         ! USR Outputs
         SEQ(I) = SIGVM(I) ! SIGEQ
-        ! Coefficient for hourglass
-        ET(I) = HARDP(I) / (HARDP(I) + YOUNG(I)) 
         ! Computation of the sound speed   
         SOUNDSP(I) = SQRT(A11(I)/RHO(I))
         ! Storing the yield stress
         SIGY(I) = YLD(I)  
         ! Thickness variation
         IF (INLOC > 0) THEN
-          DEZZ(I) = -NU*(SIGNXX(I)-SIGOXX(I)+SIGNYY(I)-SIGOYY(I))/YOUNG(I)
-          DEZZ(I) = DEZZ(I) - MAX(DPLANL(I),ZERO)*HALF*(SIGNXX(I)+SIGNYY(I))/MAX(YLD(I),EM20)
+          IF (LOFF(I) == ONE) THEN 
+            DEZZ(I) = -NU*(SIGNXX(I)-SIGOXX(I)+SIGNYY(I)-SIGOYY(I))/YOUNG(I)
+            DEZZ(I) = DEZZ(I) - MAX(DPLANL(I),ZERO)*HALF*(SIGNXX(I)+SIGNYY(I))/MAX(YLD(I),EM20)
+          ENDIF
         ELSE
           DEZZ(I) = -NU*(SIGNXX(I)-SIGOXX(I)+SIGNYY(I)-SIGOYY(I))/YOUNG(I) + DEZZ(I)
         ENDIF

@@ -20,20 +20,20 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  OUTPUT_SCHLIEREN              source/output/anim/generate/output_schlieren.F
-Chd|-- called by -----------
-Chd|        DFUNC0                        source/output/anim/generate/dfunc0.F
-Chd|        DFUNCC                        source/output/anim/generate/dfuncc.F
-Chd|        DFUNCS                        source/output/anim/generate/dfunc6.F
-Chd|        H3D_QUAD_SCALAR               source/output/h3d/h3d_results/h3d_quad_scalar.F
-Chd|        H3D_SHELL_SCALAR_1            source/output/h3d/h3d_results/h3d_shell_scalar_1.F
-Chd|        H3D_SOLID_SCALAR_1            source/output/h3d/h3d_results/h3d_solid_scalar_1.F
-Chd|-- calls ---------------
-Chd|        ALE_CONNECTIVITY_MOD          ../common_source/modules/ale/ale_connectivity_mod.F
-Chd|        ELBUFDEF_MOD                  ../common_source/modules/mat_elem/elbufdef_mod.F
-Chd|        INITBUF_MOD                   share/resol/initbuf.F         
-Chd|====================================================================
+      !||====================================================================
+      !||    output_schlieren       ../engine/source/output/anim/generate/output_schlieren.F
+      !||--- called by ------------------------------------------------------
+      !||    dfunc0                 ../engine/source/output/anim/generate/dfunc0.F
+      !||    dfuncc                 ../engine/source/output/anim/generate/dfuncc.F
+      !||    dfuncs                 ../engine/source/output/anim/generate/dfunc6.F
+      !||    h3d_quad_scalar_1      ../engine/source/output/h3d/h3d_results/h3d_quad_scalar_1.F90
+      !||    h3d_shell_scalar_1     ../engine/source/output/h3d/h3d_results/h3d_shell_scalar_1.F
+      !||    h3d_solid_scalar_1     ../engine/source/output/h3d/h3d_results/h3d_solid_scalar_1.F
+      !||--- uses       -----------------------------------------------------
+      !||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
+      !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
+      !||    initbuf_mod            ../engine/share/resol/initbuf.F
+      !||====================================================================
       SUBROUTINE OUTPUT_SCHLIEREN(
      1                     EVAR   , IX    , X          ,
      2                     IPARG  , WA_L  , ELBUF_TAB  ,ALE_CONNECTIVITY ,VOL,
@@ -222,8 +222,10 @@ C-----------------------------------------------
             A1 =Yi(2)*(Zi(3)-Zi(4))+Yi(3)*(Zi(4)-Zi(2))+Yi(4)*(Zi(2)-Zi(3))
             A2 =Yi(2)*(Zi(4)-Zi(1))+Yi(4)*(Zi(1)-Zi(2))+Yi(1)*(Zi(2)-Zi(4))
             AREA(I)=(A1+A2)* HALF
+          ELSE IF (ELBUF_TAB(NG)%GBUF%G_AREA >= I) THEN
+            AREA(I)=ELBUF_TAB(NG)%GBUF%AREA(I)
           ELSE
-           AREA(I)=ELBUF_TAB(NG)%GBUF%AREA(I)
+            AREA(I) = ONE
           ENDIF
         ENDDO                                                                                                                       
       ELSEIF(N2D>0 .AND. ITYP==7)THEN !triangles

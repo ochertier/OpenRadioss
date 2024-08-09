@@ -20,21 +20,25 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  ADMLCNT                       source/model/remesh/admlist.F 
-Chd|-- called by -----------
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        FREERR                        source/starter/freform.F      
-Chd|        MY_EXIT                       source/output/analyse/analyse.c
-Chd|        MY_ORDERS                     ../common_source/tools/sort/my_orders.c
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
-      SUBROUTINE ADMLCNT(NIX     ,IX      ,NUMEL   ,IPARTEL ,IPART   ,
-     .                   KELTREE ,ELTREE  ,KSONTREE,NSONTREE,KLEVTREE,
-     .                   NLIST   ,MESS    ,IX1     ,IX2     ,INDEX   ,
+      !||====================================================================
+      !||    admlcnt                ../starter/source/model/remesh/admlist.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    my_exit                ../starter/source/output/analyse/analyse.c
+      !||--- uses       -----------------------------------------------------
+      !||    format_mod             ../starter/share/modules1/format_mod.F90
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
+      SUBROUTINE ADMLCNT(NIX     ,IX      ,NUMEL       ,IPARTEL ,IPART   ,
+     .                   KELTREE ,ELTREE  ,KSONTREE    ,NSONTREE,KLEVTREE,
+     .                   NLIST   ,MESS    ,IX1         ,IX2     ,INDEX   ,
      .                   KK      ,NEL     ,TYPE    ,ID      ,TITR)
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
       USE MESSAGE_MOD
+      USE FORMAT_MOD , ONLY : FMT_10I
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -52,8 +56,7 @@ C-----------------------------------------------
      .        NLIST,IX1(*), IX2(*), INDEX(*), KK, NEL, LEVEL
       CHARACTER MESS*40
       INTEGER ID
-      CHARACTER*nchartitle,
-     .   TITR,TYPE
+      CHARACTER(LEN=NCHARTITLE) :: TITR,TYPE
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -161,22 +164,26 @@ C-----------------------
 
       RETURN
       END     
-Chd|====================================================================
-Chd|  ADMLIST                       source/model/remesh/admlist.F 
-Chd|-- called by -----------
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        FREERR                        source/starter/freform.F      
-Chd|        MY_EXIT                       source/output/analyse/analyse.c
-Chd|        MY_ORDERS                     ../common_source/tools/sort/my_orders.c
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
-      SUBROUTINE ADMLIST(NIX     ,IX      ,NUMEL   ,IPARTEL ,IPART   ,
-     .                   KELTREE ,ELTREE  ,KSONTREE,NSONTREE,KLEVTREE,
-     .                   NLIST   ,MESS    ,IX1     ,IX2     ,INDEX   ,
-     .                   KK      ,NEL     ,NELT    ,TYPE    ,ID      ,
+      !||====================================================================
+      !||    admlist                ../starter/source/model/remesh/admlist.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    my_exit                ../starter/source/output/analyse/analyse.c
+      !||--- uses       -----------------------------------------------------
+      !||    format_mod             ../starter/share/modules1/format_mod.F90
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
+      SUBROUTINE ADMLIST(NIX     ,IX      ,NUMEL   ,IPARTEL     ,IPART   ,
+     .                   KELTREE ,ELTREE  ,KSONTREE,NSONTREE    ,KLEVTREE,
+     .                   NLIST   ,MESS    ,IX1     ,IX2         ,INDEX   ,
+     .                   KK      ,NEL     ,NELT    ,TYPE        ,ID      ,
      .                   TITR)
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
       USE MESSAGE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      USE FORMAT_MOD , ONLY : FMT_10I
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -195,8 +202,7 @@ C-----------------------------------------------
      .        NLIST, IX1(*), IX2(*), INDEX(*), KK, NEL, NELT(*)
       CHARACTER MESS*40
       INTEGER ID
-      CHARACTER*nchartitle,
-     .   TITR,TYPE
+      CHARACTER(LEN=NCHARTITLE) :: TITR,TYPE
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -267,13 +273,7 @@ C-----------------------
         IF(LIST(I)==IX1(J))THEN
           LIST(I)=IX2(J)
         ELSE
-           CALL ANCMSG(MSGID=70,
-     .                 MSGTYPE=MSGERROR,
-     .                 ANMODE=ANINFO,
-     .                 C1=TYPE,
-     .                 I1=ID,
-     .                 C2=TITR,
-     .                 I2=LIST(I))
+           CALL ANCMSG(MSGID=70, MSGTYPE=MSGERROR, ANMODE=ANINFO, C1=TYPE, I1=ID, C2=TITR, I2=LIST(I))
            RETURN
         ENDIF
       ENDDO

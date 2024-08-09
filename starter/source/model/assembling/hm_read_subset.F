@@ -20,24 +20,24 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  HM_READ_SUBSET                source/model/assembling/hm_read_subset.F
-Chd|-- called by -----------
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        ECRSUB2                       source/model/assembling/hm_read_subset.F
-Chd|        FRETITL2                      source/starter/freform.F      
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        HM_GET_INT_ARRAY_INDEX        source/devtools/hm_reader/hm_get_int_array_index.F
-Chd|        HM_OPTION_READ_KEY            source/devtools/hm_reader/hm_option_read_key.F
-Chd|        HM_OPTION_START               source/devtools/hm_reader/hm_option_start.F
-Chd|        UDOUBLE_IGR                   source/system/sysfus.F        
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_read_subset           ../starter/source/model/assembling/hm_read_subset.F
+      !||--- called by ------------------------------------------------------
+      !||    lectur                   ../starter/source/starter/lectur.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                   ../starter/source/output/message/message.F
+      !||    ecrsub2                  ../starter/source/model/assembling/hm_read_subset.F
+      !||    fretitl2                 ../starter/source/starter/freform.F
+      !||    hm_get_int_array_index   ../starter/source/devtools/hm_reader/hm_get_int_array_index.F
+      !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    hm_option_read_key       ../starter/source/devtools/hm_reader/hm_option_read_key.F
+      !||    hm_option_start          ../starter/source/devtools/hm_reader/hm_option_start.F
+      !||    udouble_igr              ../starter/source/system/sysfus.F
+      !||--- uses       -----------------------------------------------------
+      !||    hm_option_read_mod       ../starter/share/modules1/hm_option_read_mod.F
+      !||    message_mod              ../starter/share/message_module/message_mod.F
+      !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE HM_READ_SUBSET(SUBSET,IPART,NSUBS,NPART,LSUBMODEL)
 C-----------------------------------------------
 C   ROUTINE DESCRIPTION :
@@ -93,7 +93,8 @@ C-----------------------------------------------
       INTEGER J10(10)
       INTEGER, DIMENSION(NPART+NSUBS) :: BUFTMP
       my_real BID
-      CHARACTER TITR*nchartitle,MESS*40
+      CHARACTER(LEN=NCHARTITLE) :: TITR
+      CHARACTER MESS*40
       LOGICAL IS_AVAILABLE
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
@@ -383,19 +384,19 @@ c-----------
       RETURN
       END
 c
-Chd|====================================================================
-Chd|  ECRSUB2                       source/model/assembling/hm_read_subset.F
-Chd|-- called by -----------
-Chd|        HM_READ_SUBSET                source/model/assembling/hm_read_subset.F
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        FRETITL2                      source/starter/freform.F      
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    ecrsub2                ../starter/source/model/assembling/hm_read_subset.F
+      !||--- called by ------------------------------------------------------
+      !||    hm_read_subset         ../starter/source/model/assembling/hm_read_subset.F
+      !||--- calls      -----------------------------------------------------
+      !||    fretitl2               ../starter/source/starter/freform.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE ECRSUB2(SUBSET,NSUBS,ISU,IPART,NIVMAX)
       USE MESSAGE_MOD
       USE GROUPDEF_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -416,7 +417,7 @@ C-----------------------------------------------
       INTEGER I,K,K2,L,LL,NP,IP,ID,NIVEAU,NIVMAX,TITLEN
       INTEGER CNT(0:33)
       CHARACTER LIGNE*132,LIGN2*132,BAR(33)*10,BLI*21
-      CHARACTER TITR*nchartitle
+      CHARACTER(LEN=NCHARTITLE)::TITR
       DATA BAR /33*'|         '/
       DATA BLI /'|____________________'/
       DATA CNT /34*0/
@@ -455,14 +456,7 @@ c     ligne subset
       ELSE
         K = 3
       ENDIF
-C  +++
-!      if (ID == 50000005)then
-!        write(iout,*)'MIRC_STOP_SUBSETS',ID,ISU,NIVEAU,L
-!        write(iout,*)'MIRC_STOP_SUBSETS',LEN(SUBSET(ISU)%TITLE),
-!     . SUBSET(ISU)%TITLE
-!        stop
-!      endif
-C  ---
+
       DO I=1,NIVEAU-1
         LIGNE(K:K+L-1)=BAR(I)(1:L)
         K=K+L

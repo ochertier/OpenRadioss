@@ -20,14 +20,13 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  SET_INIT                      source/model/sets/set_init.F  
-Chd|-- called by -----------
-Chd|        HM_SET                        source/model/sets/hm_set.F    
-Chd|-- calls ---------------
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        SETDEF_MOD                    ../common_source/modules/setdef_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    set_init               ../starter/source/model/sets/set_init.F
+      !||--- called by ------------------------------------------------------
+      !||    hm_set                 ../starter/source/model/sets/hm_set.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE SET_INIT(
      .                    SET     ,IGS  ,SET_ID, SET_TITLE, ISET_TYPE)
 C-----------------------------------------------
@@ -35,6 +34,7 @@ C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
       USE SETDEF_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -47,7 +47,7 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IGS,SET_ID,ISET_TYPE
-      CHARACTER SET_TITLE*nchartitle
+      CHARACTER(LEN=NCHARTITLE)::SET_TITLE
 C-----------------------------------------------
       TYPE (SET_), DIMENSION(NSETS)   :: SET
 C-----------------------------------------------
@@ -93,6 +93,7 @@ C-----------------------------------------------
       SET(IGS)%HAS_LINE_SEG= 0        ! Flag if a line was created from surface (QA Print)
       SET(IGS)%NB_ELLIPSE=0           ! Flag nb of ellipses (one per /SET)
       SET(IGS)%NB_NODENS= 0           ! SET nb of nodens
+      SET(IGS)%NB_SPHCEL= 0           ! SET nb of sphcel
 
       SET(IGS)%NB_ELLIPSE= 0          ! SET nb of Ellipses (max = 1, one per /SET)
       SET(IGS)%ELLIPSE_IAD_BUFR= 0    ! surface buffer adress in SET

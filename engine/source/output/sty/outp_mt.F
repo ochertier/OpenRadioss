@@ -20,15 +20,19 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  OUTP_MT                       source/output/sty/outp_mt.F   
-Chd|-- called by -----------
-Chd|        GENOUTP                       source/output/sty/genoutp.F   
-Chd|-- calls ---------------
-Chd|        FRETITL2                      source/input/freform.F        
-Chd|        SPMD_GLOB_DSUM9               source/mpi/interfaces/spmd_th.F
-Chd|====================================================================
+      !||====================================================================
+      !||    outp_mt           ../engine/source/output/sty/outp_mt.F
+      !||--- called by ------------------------------------------------------
+      !||    genoutp           ../engine/source/output/sty/genoutp.F
+      !||--- calls      -----------------------------------------------------
+      !||    fretitl2          ../engine/source/input/freform.F
+      !||    spmd_glob_dsum9   ../engine/source/mpi/interfaces/spmd_th.F
+      !||====================================================================
       SUBROUTINE OUTP_MT(PM,NPART,PARTSAV,IPART,IPM)
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
+C
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -46,18 +50,14 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IPM(NPROPMI,*)
-C     REAL
-      my_real
-     .   PM(NPROPM,*),PARTSAV(NPSAV,*)
+      my_real PM(NPROPM,*),PARTSAV(NPSAV,*)
       INTEGER NPART,IPART(LIPART1,*)
       INTEGER LEN
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,J,USRMID,K,I1,M
-      my_real
-     .   MAS,XM,YM,ZM,IE,KE,
-     .   PARTSAV2(NPSAV,NPART)
+      my_real MAS,XM,YM,ZM,IE,KE,PARTSAV2(NPSAV,NPART)
       CHARACTER*100 CARD
 C
       DO M=1,NPSAV

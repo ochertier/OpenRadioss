@@ -20,23 +20,25 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  MATFUN_USR2SYS                source/materials/tools/matfun_usr2sys.F
-Chd|-- called by -----------
-Chd|        LAW158_UPD                    source/materials/mat/mat158/law158_upd.F
-Chd|        LAW58_UPD                     source/materials/mat/mat058/law58_upd.F
-Chd|        UPDMAT                        source/materials/updmat.F     
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        TABLE_MOD                     share/modules1/table_mod.F    
-Chd|====================================================================
+      !||====================================================================
+      !||    matfun_usr2sys         ../starter/source/materials/tools/matfun_usr2sys.F
+      !||--- called by ------------------------------------------------------
+      !||    law158_upd             ../starter/source/materials/mat/mat158/law158_upd.F
+      !||    law58_upd              ../starter/source/materials/mat/mat058/law58_upd.F
+      !||    updmat                 ../starter/source/materials/updmat.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||--- uses       -----------------------------------------------------
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    table_mod              ../starter/share/modules1/table_mod.F
+      !||====================================================================
       SUBROUTINE MATFUN_USR2SYS(TITR,MAT_ID, NFUNC  ,IFUNC  ,FUNC_ID  )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
       USE TABLE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -49,7 +51,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      CHARACTER*nchartitle :: TITR
+      CHARACTER(LEN=NCHARTITLE) :: TITR
       INTEGER  , DIMENSION(NFUNC)  :: IFUNC
       INTEGER  , DIMENSION(NFUNCT) :: FUNC_ID
       INTEGER  :: MAT_ID, NFUNC

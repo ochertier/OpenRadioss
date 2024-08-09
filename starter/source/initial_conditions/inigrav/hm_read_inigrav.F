@@ -20,22 +20,22 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  HM_READ_INIGRAV               source/initial_conditions/inigrav/hm_read_inigrav.F
-Chd|-- called by -----------
-Chd|        LECTUR                        source/starter/lectur.F       
-Chd|-- calls ---------------
-Chd|        ANCMSG                        source/output/message/message.F
-Chd|        HM_GET_FLOATV                 source/devtools/hm_reader/hm_get_floatv.F
-Chd|        HM_GET_INTV                   source/devtools/hm_reader/hm_get_intv.F
-Chd|        HM_OPTION_READ_KEY            source/devtools/hm_reader/hm_option_read_key.F
-Chd|        HM_OPTION_START               source/devtools/hm_reader/hm_option_start.F
-Chd|        GROUPDEF_MOD                  ../common_source/modules/groupdef_mod.F
-Chd|        HM_OPTION_READ_MOD            share/modules1/hm_option_read_mod.F
-Chd|        INIGRAV                       share/modules1/inigrav_mod.F  
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|        SUBMODEL_MOD                  share/modules1/submodel_mod.F 
-Chd|====================================================================
+      !||====================================================================
+      !||    hm_read_inigrav        ../starter/source/initial_conditions/inigrav/hm_read_inigrav.F
+      !||--- called by ------------------------------------------------------
+      !||    lectur                 ../starter/source/starter/lectur.F
+      !||--- calls      -----------------------------------------------------
+      !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    hm_get_floatv          ../starter/source/devtools/hm_reader/hm_get_floatv.F
+      !||    hm_get_intv            ../starter/source/devtools/hm_reader/hm_get_intv.F
+      !||    hm_option_read_key     ../starter/source/devtools/hm_reader/hm_option_read_key.F
+      !||    hm_option_start        ../starter/source/devtools/hm_reader/hm_option_start.F
+      !||--- uses       -----------------------------------------------------
+      !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
+      !||    inigrav                ../starter/share/modules1/inigrav_mod.F
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
+      !||====================================================================
       SUBROUTINE HM_READ_INIGRAV(IGRV     ,IBUF     ,AGRV     ,ITAB     ,ITABM1   ,
      .                           IGRPART  ,NPC      ,UNITAB   ,ISKN     ,
      .                           ITAGND   ,IGRSURF  ,PLD      ,BUFSF    ,LSUBMODEL)
@@ -48,6 +48,7 @@ C-----------------------------------------------
       USE GROUPDEF_MOD
       USE SUBMODEL_MOD
       USE HM_OPTION_READ_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARFIELD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -80,8 +81,9 @@ C-----------------------------------------------
       INTEGER I, NOD, NCUR, NOSKEW,NSKW,NN,IGS,UID,
      .        IAD,NS,IWA,J,K,ID,K1,K2,NCURS,N1,N2,NC,L,
      .        ITAG, IFLAGUNIT,FLAG_FMT,FLAG_FMT_TMP,IFIX_TMP,IADPL
-      CHARACTER XYZ*ncharfield, X*1, Y*1, Z*1, XX*2, YY*2, ZZ*2, MESS*40
-      CHARACTER TITR*nchartitle
+      CHARACTER(LEN=NCHARFIELD) :: XYZ
+      CHARACTER X*1, Y*1, Z*1, XX*2, YY*2, ZZ*2, MESS*40
+      CHARACTER(LEN=NCHARTITLE)::TITR
       
       INTEGER     :: IGU,ISU,IGRAV,IBID, IG, IS, IDIR, PN1, ICURS, IIGRAV,IIG,IIS
       my_real     :: BX_,BY_,BZ_, GRAV0,NX,NY,NZ,NORM,PSURF,BID

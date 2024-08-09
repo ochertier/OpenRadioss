@@ -20,13 +20,14 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-Chd|====================================================================
-Chd|  INSURF_DX                     source/interfaces/interf1/insurf_dx.F
-Chd|-- called by -----------
-Chd|        LECINT                        source/interfaces/interf1/lecint.F
-Chd|-- calls ---------------
-Chd|        MESSAGE_MOD                   share/message_module/message_mod.F
-Chd|====================================================================
+      !||====================================================================
+      !||    insurf_dx              ../starter/source/interfaces/interf1/insurf_dx.F
+      !||--- called by ------------------------------------------------------
+      !||    lecint                 ../starter/source/interfaces/interf1/lecint.F
+      !||--- uses       -----------------------------------------------------
+      !||    format_mod             ../starter/share/modules1/format_mod.F90
+      !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||====================================================================
       SUBROUTINE INSURF_DX(NRT       ,MSN   ,IR    ,IRECT ,NOINT  ,
      .                  SURF_NODES,ITAB  ,MSV   ,ID    ,TITR   ,
      .                  NTAG      ,S_MSV  ,SIRECT, X, STIFF_STAT)
@@ -34,6 +35,8 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      USE FORMAT_MOD , ONLY : FMW_4I
 C-----------------------------------------------
 C     LECTURE DES SURFACES ET DECOMPTE DES SEGMENTS
 C           ENTREE : 
@@ -60,8 +63,7 @@ C-----------------------------------------------
       INTEGER IRECT(4,SIRECT/4), ITAB(NUMNOD), MSV(S_MSV),SURF_NODES(NRT,4)
       INTEGER ID
       my_real, INTENT(INOUT) :: X(3,NUMNOD)
-      CHARACTER*nchartitle,
-     .   TITR
+      CHARACTER(LEN=NCHARTITLE) :: TITR
       INTEGER, DIMENSION(2*NUMNOD+1), INTENT(INOUT) ::  NTAG
       my_real, INTENT(INOUT) :: STIFF_STAT(3)
       INTEGER,INTENT(IN) :: NOINT
